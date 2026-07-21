@@ -468,6 +468,173 @@ def verify_reviewer_runtime(
     }
 
 
+def verify_operator_container_rebuild(
+    control: dict[str, Any],
+    *,
+    container_config: dict[str, Any],
+    capsule_receipt_path: Path,
+    runtime_receipt_path: Path,
+    receipt_path: Path | None = None,
+) -> dict[str, Any]:
+    path = receipt_path or (ROOT / control["receipt_path"])
+    receipt = read_json(path)
+    receipt_without_hash = {
+        key: value
+        for key, value in receipt.items()
+        if key != "receipt_payload_sha256"
+    }
+    artifacts = {
+        row.get("path"): row for row in receipt.get("artifacts", [])
+    }
+    outer_checks = receipt.get("checks", {})
+    expected_outputs = receipt.get("expected_outputs", {})
+    runtime_summary = receipt.get("runtime_summary", {})
+    runtime_checks = runtime_summary.get("checks", {})
+    capsule_summary = receipt.get("capsule_summary", {})
+    recipe = receipt.get("recipe", {})
+    recipe_control = container_config["recipe"]
+    current_recipe_hashes = {
+        "dockerfile_sha256": file_sha256(
+            ROOT / recipe_control["dockerfile_path"]
+        ),
+        "runner_sha256": file_sha256(ROOT / recipe_control["runner_path"]),
+        "orchestrator_sha256": file_sha256(
+            ROOT / recipe_control["orchestrator_path"]
+        ),
+        "runtime_config_sha256": file_sha256(
+            ROOT / recipe_control["runtime_config_path"]
+        ),
+    }
+    capsule_file_sha256 = file_sha256(capsule_receipt_path)
+    runtime_file_sha256 = file_sha256(runtime_receipt_path)
+    private_hits = scan_private(receipt)
+    checks = {
+        "receipt_sha256_matched": file_sha256(path)
+        == control["receipt_sha256"],
+        "receipt_payload_sha256_matched": receipt.get(
+            "receipt_payload_sha256"
+        )
+        == canonical_sha256(receipt_without_hash),
+        "schema_matched": receipt.get("schema") == control["expected_schema"],
+        "protocol_id_matched": receipt.get("protocol_id")
+        == control["expected_protocol_id"],
+        "status_matched": receipt.get("status") == control["expected_status"],
+        "passed": receipt.get("passed") is True,
+        "source_commit_matched": receipt.get("source_bundle", {}).get(
+            "source_commit"
+        )
+        == control["source_commit"],
+        "source_bundle_sha256_matched": receipt.get("source_bundle", {}).get(
+            "sha256"
+        )
+        == control["source_bundle_sha256"],
+        "release_manifest_sha256_matched": receipt.get(
+            "source_bundle", {}
+        ).get("release_manifest_sha256")
+        == control["release_manifest_sha256"],
+        "docker_build_and_run_passed": receipt.get("build_returncode") == 0
+        and receipt.get("run_returncode") == 0,
+        "outer_checks_all_passed": bool(outer_checks)
+        and all(value is True for value in outer_checks.values()),
+        "expected_outputs_all_present": bool(expected_outputs)
+        and all(value is True for value in expected_outputs.values()),
+        "runtime_status_passed": runtime_summary.get("status")
+        == "AUTHORITATIVE_RUNTIME_PASS",
+        "runtime_check_count_matched": len(runtime_checks)
+        == control["expected_runtime_check_count"],
+        "runtime_checks_all_passed": bool(runtime_checks)
+        and all(value is True for value in runtime_checks.values()),
+        "capsule_suites_matched": capsule_summary.get("suite_count")
+        == capsule_summary.get("suite_pass_count")
+        == control["expected_suite_count"],
+        "capsule_assertions_matched": capsule_summary.get("assertion_count")
+        == capsule_summary.get("assertion_pass_count")
+        == control["expected_assertion_count"],
+        "capsule_fixture_tests_passed": capsule_summary.get(
+            "fixture_tests_passed"
+        )
+        is True,
+        "capsule_source_state_verified": capsule_summary.get(
+            "source_state_verified"
+        )
+        is True
+        and capsule_summary.get("source_state_mode") == "release_manifest",
+        "capsule_clean_runner_replay": capsule_summary.get(
+            "clean_runner_replay"
+        )
+        is True,
+        "capsule_receipt_hash_matched": artifacts.get(
+            "reviewer_reproducibility_receipt.json", {}
+        ).get("sha256")
+        == control["capsule_receipt_sha256"]
+        == capsule_file_sha256,
+        "runtime_receipt_hash_matched": artifacts.get(
+            "runtime_receipt.json", {}
+        ).get("sha256")
+        == control["runtime_receipt_sha256"]
+        == runtime_file_sha256,
+        "recipe_base_image_matched": recipe.get("base_image")
+        == recipe_control["base_image"],
+        "recipe_uv_matched": recipe.get("uv") == recipe_control["uv"],
+        "recipe_python_matched": recipe.get("python")
+        == recipe_control["python"],
+        "recipe_source_hashes_current": all(
+            recipe.get(key) == value
+            for key, value in current_recipe_hashes.items()
+        ),
+        "execution_controls_matched": receipt.get("execution_controls")
+        == container_config["execution"],
+        "operator_controlled": receipt.get("operator_controlled") is True,
+        "independent_execution_remains_false": receipt.get(
+            "independent_execution_complete"
+        )
+        is False,
+        "external_validation_remains_false": receipt.get(
+            "external_validation_complete"
+        )
+        is False
+        and capsule_summary.get("external_validation_complete") is False,
+        "privacy_scan_passed": not private_hits,
+    }
+    return {
+        "verified": all(checks.values()),
+        "checks": checks,
+        "receipt_path": control["receipt_path"],
+        "receipt_sha256": file_sha256(path),
+        "receipt_payload_sha256": receipt.get("receipt_payload_sha256"),
+        "schema": receipt.get("schema"),
+        "protocol_id": receipt.get("protocol_id"),
+        "status": receipt.get("status"),
+        "generated_utc": receipt.get("generated_utc"),
+        "source_commit": receipt.get("source_bundle", {}).get("source_commit"),
+        "source_bundle_sha256": receipt.get("source_bundle", {}).get("sha256"),
+        "release_manifest_sha256": receipt.get("source_bundle", {}).get(
+            "release_manifest_sha256"
+        ),
+        "image_id": receipt.get("image", {}).get("id"),
+        "runtime_check_count": len(runtime_checks),
+        "runtime_check_pass_count": sum(
+            value is True for value in runtime_checks.values()
+        ),
+        "suite_count": capsule_summary.get("suite_count"),
+        "suite_pass_count": capsule_summary.get("suite_pass_count"),
+        "assertion_count": capsule_summary.get("assertion_count"),
+        "assertion_pass_count": capsule_summary.get("assertion_pass_count"),
+        "fixture_tests_passed": capsule_summary.get("fixture_tests_passed"),
+        "source_state_mode": capsule_summary.get("source_state_mode"),
+        "source_state_verified": capsule_summary.get("source_state_verified"),
+        "operator_controlled": receipt.get("operator_controlled"),
+        "independent_execution_complete": receipt.get(
+            "independent_execution_complete"
+        ),
+        "external_validation_complete": receipt.get(
+            "external_validation_complete"
+        ),
+        "configured_private_pattern_hit_count": len(private_hits),
+        "policy": control["policy"],
+    }
+
+
 def verify_preprint_and_request(
     control: dict[str, Any],
     *,
@@ -578,6 +745,15 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
         config["operator_clean_runner"]
     )
     reviewer_runtime = verify_reviewer_runtime(config["reviewer_runtime"])
+    container_config = read_json(
+        ROOT / bundle["reviewer_container_config_path"]
+    )
+    operator_container_rebuild = verify_operator_container_rebuild(
+        config["operator_container_rebuild"],
+        container_config=container_config,
+        capsule_receipt_path=ROOT / config["operator_clean_runner"]["receipt_path"],
+        runtime_receipt_path=ROOT / config["reviewer_runtime"]["receipt_path"],
+    )
     preprint_and_request = verify_preprint_and_request(
         config["preprint_and_request"],
         markdown_path=ROOT / bundle["preprint_markdown_path"],
@@ -619,6 +795,9 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
         ROOT / config["operator_clean_runner"]["receipt_path"]
     )
     required_paths.add(ROOT / config["reviewer_runtime"]["receipt_path"])
+    required_paths.add(
+        ROOT / config["operator_container_rebuild"]["receipt_path"]
+    )
     required_paths.add(SCRIPT_PATH)
     required_paths.add(TEST_PATH)
     path_checks = {
@@ -691,9 +870,13 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             archive_relative_manifest
         )
         == archived_computational_files,
-        "archived_computational_identity_still_matches": source_reconciliation[
-            "computational_identity_exact_match"
-        ],
+        "computational_identity_has_current_verified_replay": (
+            source_reconciliation["computational_identity_exact_match"]
+            or (
+                operator_clean_runner["verified"]
+                and operator_container_rebuild["verified"]
+            )
+        ),
         "archived_capsule_status_matched": archived_receipt["status"]
         == execution["expected_archived_status"],
         "archived_suite_count_matched": archived_summary["suite_count"]
@@ -713,6 +896,10 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
         **{
             f"reviewer_runtime_{key}": value
             for key, value in reviewer_runtime["checks"].items()
+        },
+        **{
+            f"operator_container_rebuild_{key}": value
+            for key, value in operator_container_rebuild["checks"].items()
         },
         **{
             f"preprint_request_{key}": value
@@ -756,6 +943,11 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             "archived_computational_identity_still_matches": source_reconciliation[
                 "computational_identity_exact_match"
             ],
+            "archive_drift_reconciled_by_current_container_rebuild": (
+                not source_reconciliation["computational_identity_exact_match"]
+                and operator_clean_runner["verified"]
+                and operator_container_rebuild["verified"]
+            ),
             "operator_clean_runner_receipt_verified": operator_clean_runner[
                 "verified"
             ],
@@ -776,6 +968,21 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             "reviewer_runtime_check_pass_count": reviewer_runtime[
                 "runtime_check_pass_count"
             ],
+            "operator_container_rebuild_receipt_verified": (
+                operator_container_rebuild["verified"]
+            ),
+            "operator_container_rebuild_suite_pass_count": (
+                operator_container_rebuild["suite_pass_count"]
+            ),
+            "operator_container_rebuild_suite_count": (
+                operator_container_rebuild["suite_count"]
+            ),
+            "operator_container_rebuild_assertion_pass_count": (
+                operator_container_rebuild["assertion_pass_count"]
+            ),
+            "operator_container_rebuild_assertion_count": (
+                operator_container_rebuild["assertion_count"]
+            ),
             "current_commit_clean_runner_complete": False,
             "public_preprint_draft_complete": preprint_and_request["verified"],
             "release_candidate_definition_ready": release_candidate[
@@ -833,6 +1040,7 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
         },
         "operator_clean_runner": operator_clean_runner,
         "reviewer_runtime": reviewer_runtime,
+        "operator_container_rebuild": operator_container_rebuild,
         "preprint_and_request": preprint_and_request,
         "release_candidate": release_candidate,
         "external_gates": external_gates,
@@ -855,6 +1063,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     archive = payload["authoritative_archive"]
     operator = payload["operator_clean_runner"]
     runtime = payload["reviewer_runtime"]
+    container = payload["operator_container_rebuild"]
     preprint = payload["preprint_and_request"]
     release_candidate = payload["release_candidate"]
     lines = [
@@ -872,11 +1081,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Authoritative archive verified: `{str(summary['authoritative_archive_verified']).lower()}`",
         f"- Archived full source exact match: `{str(summary['archive_full_source_exact_match']).lower()}`",
         f"- Archived computational identity still matches: `{str(summary['archived_computational_identity_still_matches']).lower()}`",
+        f"- Archive drift reconciled by current container rebuild: `{str(summary['archive_drift_reconciled_by_current_container_rebuild']).lower()}`",
         f"- Operator clean-runner receipt verified: `{str(summary['operator_clean_runner_receipt_verified']).lower()}`",
         f"- Operator clean-runner full source exact match: `{str(summary['operator_clean_runner_full_source_exact_match']).lower()}`",
         f"- Operator clean-runner computational identity current: `{str(summary['operator_clean_runner_computational_identity_current']).lower()}`",
         f"- Exact reviewer runtime receipt verified: `{str(summary['reviewer_runtime_receipt_verified']).lower()}`",
         f"- Exact reviewer runtime checks: `{summary['reviewer_runtime_check_pass_count']}/{summary['reviewer_runtime_check_count']}`",
+        f"- Digest-pinned container rebuild verified: `{str(summary['operator_container_rebuild_receipt_verified']).lower()}`",
+        f"- Container-rebuild suites passed: `{summary['operator_container_rebuild_suite_pass_count']}/{summary['operator_container_rebuild_suite_count']}`",
+        f"- Container-rebuild assertions passed: `{summary['operator_container_rebuild_assertion_pass_count']}/{summary['operator_container_rebuild_assertion_count']}`",
         f"- Current commit clean-runner complete: `{str(summary['current_commit_clean_runner_complete']).lower()}`",
         f"- Public preprint draft complete: `{str(summary['public_preprint_draft_complete']).lower()}`",
         f"- Deterministic release-candidate definition ready: `{str(summary['release_candidate_definition_ready']).lower()}`",
@@ -952,7 +1165,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- External validation complete in receipt: `{str(archive['external_validation_complete']).lower()}`",
             f"- Current-source drift paths: `{', '.join(archive['source_reconciliation']['mismatch_paths']) or 'none'}`",
             "",
-            "The archive demonstrates an older operator-controlled clean-runner execution. Its computational identity files still match, while the README and packaging controls have moved forward. It is a feasibility reference, not a current-commit receipt or independent evidence. The codechecker must execute the reviewed current commit.",
+            "The archive demonstrates an older operator-controlled clean-runner execution. Every later source mismatch remains listed above; the newer source-identity receipt and digest-pinned container rebuild supersede it for author-side executability only. None of these operator receipts are independent evidence. The codechecker must execute the reviewed release.",
             "",
             "## Current Source-Identity Operator Replay",
             "",
@@ -991,6 +1204,25 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- External validation complete: `{str(runtime['external_validation_complete']).lower()}`",
             "",
             runtime["policy"],
+            "",
+            "## Digest-Pinned Container Rebuild",
+            "",
+            f"- Receipt: `{container['receipt_path']}`",
+            f"- Receipt SHA-256: `{container['receipt_sha256']}`",
+            f"- Source commit: `{container['source_commit']}`",
+            f"- Source bundle SHA-256: `{container['source_bundle_sha256']}`",
+            f"- Release manifest SHA-256: `{container['release_manifest_sha256']}`",
+            f"- Image ID: `{container['image_id']}`",
+            f"- Runtime checks passed: `{container['runtime_check_pass_count']}/{container['runtime_check_count']}`",
+            f"- Suites passed: `{container['suite_pass_count']}/{container['suite_count']}`",
+            f"- Assertions passed: `{container['assertion_pass_count']}/{container['assertion_count']}`",
+            f"- Fixture tests passed: `{str(container['fixture_tests_passed']).lower()}`",
+            f"- Source state: `{container['source_state_mode']}` (`verified={str(container['source_state_verified']).lower()}`)",
+            f"- Operator controlled: `{str(container['operator_controlled']).lower()}`",
+            f"- Independent execution complete: `{str(container['independent_execution_complete']).lower()}`",
+            f"- External validation complete: `{str(container['external_validation_complete']).lower()}`",
+            "",
+            container["policy"],
             "",
             "## Human And External Gates",
             "",

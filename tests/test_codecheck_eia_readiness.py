@@ -21,13 +21,19 @@ OPERATOR_RECEIPT = (
     ROOT
     / "evidence"
     / "reproducibility"
-    / "codecheck_eia_operator_clean_runner_be7776f7_20260721.json"
+    / "codecheck_eia_operator_clean_runner_880eb9a0_20260721.json"
 )
 RUNTIME_RECEIPT = (
     ROOT
     / "evidence"
     / "reproducibility"
-    / "codecheck_reviewer_runtime_receipt_d60ae723_20260721.json"
+    / "codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json"
+)
+CONTAINER_RECEIPT = (
+    ROOT
+    / "evidence"
+    / "reproducibility"
+    / "codecheck_reviewer_container_rebuild_880eb9a0_20260721.json"
 )
 PREPRINT_MARKDOWN = (
     ROOT
@@ -108,12 +114,21 @@ def test_authoritative_archive_matches_all_declared_outputs_and_checksums():
     assert archive["assertion_count"] == archive["assertion_pass_count"] == 31
     assert archive["external_validation_complete"] is False
     assert payload["checks"]["archive_manifest_matches_codecheck_manifest"] is True
-    assert payload["checks"]["archived_computational_identity_still_matches"] is True
+    assert payload["checks"]["computational_identity_has_current_verified_replay"] is True
     assert archive["source_reconciliation"]["full_source_exact_match"] is False
-    assert archive["source_reconciliation"]["computational_identity_exact_match"] is True
+    assert archive["source_reconciliation"]["computational_identity_exact_match"] is False
     assert archive["source_reconciliation"]["mismatch_paths"] == [
         ".gitignore",
         "README.md",
+        "code/eia_grid_residual_moe_benchmark.py",
+        "code/eia_grid_wave_champion_benchmark.py",
+        "code/mda_control_mapping_open_set_benchmark.py",
+        "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
+        "config/reviewer_reproducibility_protocol_v1.json",
+        "tests/test_eia_grid_residual_moe_benchmark.py",
+        "tests/test_eia_grid_wave_champion_benchmark.py",
+        "tests/test_mda_control_mapping_open_set_benchmark.py",
+        "tests/test_reviewer_reproducibility_capsule.py",
     ]
 
 
@@ -131,12 +146,12 @@ def test_operator_clean_runner_is_hash_locked_clean_and_not_external():
     assert runner["fixture_tests_passed"] is True
     assert runner["suite_count"] == runner["suite_pass_count"] == 3
     assert runner["assertion_count"] == runner["assertion_pass_count"] == 31
-    assert runner["source_reconciliation"]["full_source_exact_match"] is True
+    assert runner["source_reconciliation"]["full_source_exact_match"] is False
     assert (
         runner["source_reconciliation"]["computational_identity_exact_match"]
         is True
     )
-    assert runner["source_reconciliation"]["mismatch_paths"] == []
+    assert runner["source_reconciliation"]["mismatch_paths"] == ["README.md"]
     assert runner["external_validation_complete"] is False
 
 
@@ -204,6 +219,57 @@ def test_exact_reviewer_runtime_rejects_tampered_receipt(tmp_path):
     result = module.verify_reviewer_runtime(control, receipt_path=tampered)
 
     assert result["checks"]["all_runtime_checks_passed"] is False
+
+
+def test_digest_pinned_container_rebuild_is_cross_locked_and_not_external():
+    module = load_module()
+    payload = module.build_payload(generated_utc="2026-07-20T00:00:00+00:00")
+    container = payload["operator_container_rebuild"]
+
+    assert container["verified"] is True
+    assert container["receipt_path"] == CONTAINER_RECEIPT.relative_to(
+        ROOT
+    ).as_posix()
+    assert container["status"] == "OPERATOR_CONTAINER_REBUILD_PASS"
+    assert container["runtime_check_count"] == 10
+    assert container["runtime_check_pass_count"] == 10
+    assert container["suite_count"] == container["suite_pass_count"] == 3
+    assert container["assertion_count"] == container["assertion_pass_count"] == 31
+    assert container["fixture_tests_passed"] is True
+    assert container["source_state_mode"] == "release_manifest"
+    assert container["source_state_verified"] is True
+    assert container["operator_controlled"] is True
+    assert container["independent_execution_complete"] is False
+    assert container["external_validation_complete"] is False
+    assert all(container["checks"].values())
+
+
+def test_digest_pinned_container_rebuild_rejects_tampered_receipt(tmp_path):
+    module = load_module()
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    receipt = json.loads(CONTAINER_RECEIPT.read_text(encoding="utf-8"))
+    receipt["source_bundle"]["sha256"] = "0" * 64
+    tampered = tmp_path / "container.json"
+    tampered.write_text(json.dumps(receipt), encoding="utf-8")
+
+    result = module.verify_operator_container_rebuild(
+        config["operator_container_rebuild"],
+        container_config=json.loads(
+            (ROOT / config["bundle"]["reviewer_container_config_path"]).read_text(
+                encoding="utf-8"
+            )
+        ),
+        capsule_receipt_path=OPERATOR_RECEIPT,
+        runtime_receipt_path=RUNTIME_RECEIPT,
+        receipt_path=tampered,
+    )
+
+    assert result["verified"] is False
+    assert result["checks"]["receipt_sha256_matched"] is False
+    assert result["checks"]["receipt_payload_sha256_matched"] is False
+    assert result["checks"]["source_bundle_sha256_matched"] is False
+    assert result["independent_execution_complete"] is False
+    assert result["external_validation_complete"] is False
 
 
 def test_preprint_and_request_are_hash_locked_bounded_and_unopened():
@@ -290,13 +356,17 @@ def test_internal_readiness_pass_keeps_every_external_gate_closed():
     assert summary["internal_gate_passed"] is True
     assert summary["internal_check_count"] == summary["internal_check_pass_count"]
     assert summary["archive_full_source_exact_match"] is False
-    assert summary["archived_computational_identity_still_matches"] is True
+    assert summary["archived_computational_identity_still_matches"] is False
+    assert summary["archive_drift_reconciled_by_current_container_rebuild"] is True
     assert summary["operator_clean_runner_receipt_verified"] is True
-    assert summary["operator_clean_runner_full_source_exact_match"] is True
+    assert summary["operator_clean_runner_full_source_exact_match"] is False
     assert summary["operator_clean_runner_computational_identity_current"] is True
     assert summary["reviewer_runtime_receipt_verified"] is True
     assert summary["reviewer_runtime_check_count"] == 10
     assert summary["reviewer_runtime_check_pass_count"] == 10
+    assert summary["operator_container_rebuild_receipt_verified"] is True
+    assert summary["operator_container_rebuild_suite_pass_count"] == 3
+    assert summary["operator_container_rebuild_assertion_pass_count"] == 31
     assert summary["current_commit_clean_runner_complete"] is False
     assert summary["public_preprint_draft_complete"] is True
     assert summary["release_candidate_definition_ready"] is True

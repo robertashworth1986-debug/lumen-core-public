@@ -109,7 +109,7 @@ The repository preserves an archived clean GitHub runner bundle at `evidence/rep
 
 That archive is operator-supplied reproducibility evidence. It is not independent execution. The `codechecker`, `report`, `certificate`, and external signature fields are intentionally absent until an external process supplies them.
 
-The separate receipt at `evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json` records 10/10 exact runtime checks passing for Ubuntu 24.04, x86-64, CPython 3.11.9, glibc 2.39, deterministic environment controls, and the dependency-lock hash. It is also first-party evidence and changes no external gate.
+The current runtime receipt at `evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json` records 10/10 exact runtime checks passing for Ubuntu 24.04, x86-64, CPython 3.11.9, glibc 2.39, deterministic environment controls, and the dependency-lock hash. The cross-locked container receipt at `evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json` records a no-cache rebuild from the deterministic source ZIP with 3/3 suites, 31/31 assertions, and the selected fixture tests passing. Both are first-party evidence and change no external gate.
 
 ## Separation From The Live Prospective Lane
 

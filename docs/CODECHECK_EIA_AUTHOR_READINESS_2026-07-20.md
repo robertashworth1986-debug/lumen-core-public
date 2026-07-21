@@ -1,22 +1,26 @@
 # CODECHECK EIA Author Readiness
 
-Generated UTC: `2026-07-21T16:25:18.374469+00:00`
+Generated UTC: `2026-07-21T16:52:43.669163+00:00`
 
 An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.
 
 ## Decision
 
-- Status: `AUTHOR_PACKET_BLOCKED`
-- Internal checks: `88/90`
+- Status: `AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW`
+- Internal checks: `121/121`
 - Declared reproducible outputs: `6`
 - Authoritative archive verified: `true`
 - Archived full source exact match: `false`
 - Archived computational identity still matches: `false`
-- Operator clean-runner receipt verified: `false`
+- Archive drift reconciled by current container rebuild: `true`
+- Operator clean-runner receipt verified: `true`
 - Operator clean-runner full source exact match: `false`
-- Operator clean-runner computational identity current: `false`
+- Operator clean-runner computational identity current: `true`
 - Exact reviewer runtime receipt verified: `true`
 - Exact reviewer runtime checks: `10/10`
+- Digest-pinned container rebuild verified: `true`
+- Container-rebuild suites passed: `3/3`
+- Container-rebuild assertions passed: `31/31`
 - Current commit clean-runner complete: `false`
 - Public preprint draft complete: `true`
 - Deterministic release-candidate definition ready: `true`
@@ -29,7 +33,7 @@ An author-readiness pass proves only that the declared public files, execution m
 - Independent execution complete: `false`
 - Certificate issued: `false`
 - External validation complete: `false`
-- Readiness SHA-256: `b2c84719cb468a68a7e95eb073ac428d0356135b3b0782f54c6ba7a44b79bb79`
+- Readiness SHA-256: `b676a523515d5dc76bbbfb84ba3dd06d40bd974297f50fa17f02c0c84c21f9ba`
 
 An internal pass means the author-side bundle is coherent enough for Robert to review. It is not a submission receipt, external execution, or certificate.
 
@@ -55,9 +59,9 @@ python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --r
 ## Public Preprint And Request Draft
 
 - Markdown: `docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md`
-- Markdown SHA-256: `52920f927d3f41727b9fb44f808f53cdbb61acfda575b2a208242cfa500ce665`
+- Markdown SHA-256: `723141f2fea749af3625a5556824e2606f2f0d1eb0e975c5c17ed31868856eba`
 - PDF: `docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
-- PDF SHA-256: `11a4c2f99c4f20517e33b528af59cf0bf986cfd6e98bccc9678e3025b07ccb27`
+- PDF SHA-256: `e3261285bc1142e603d270c80f7daad24c3f490690527fac48a11ac0156fa47c`
 - PDF pages: `5`
 - Manifest reference: `Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
 - Stable public identifier: `not assigned`
@@ -72,8 +76,8 @@ The manuscript and request text are author-side drafts. A stable public preprint
 ## Immutable Release Candidate
 
 - Proposed tag: `codecheck-eia-v0.1.0`
-- Bundle inputs: `43`
-- Bundle input chain SHA-256: `63452c80420b2677f368a2d1324af90b94b67393ae88169ba457b53682d40378`
+- Bundle inputs: `44`
+- Bundle input chain SHA-256: `da6cf1479eaccec0d81c0a74e5c4c8602925189518f50dac1e6f04421cefc800`
 - Internal definition ready: `true`
 - Publication ready: `false`
 - GitHub release published: `false`
@@ -93,17 +97,17 @@ Creating a draft or published release, enabling repository integrations, attachi
 - External validation complete in receipt: `false`
 - Current-source drift paths: `.gitignore, README.md, code/eia_grid_residual_moe_benchmark.py, code/eia_grid_wave_champion_benchmark.py, code/mda_control_mapping_open_set_benchmark.py, code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py, config/reviewer_reproducibility_protocol_v1.json, tests/test_eia_grid_residual_moe_benchmark.py, tests/test_eia_grid_wave_champion_benchmark.py, tests/test_mda_control_mapping_open_set_benchmark.py, tests/test_reviewer_reproducibility_capsule.py`
 
-The archive demonstrates an older operator-controlled clean-runner execution. Its computational identity files still match, while the README and packaging controls have moved forward. It is a feasibility reference, not a current-commit receipt or independent evidence. The codechecker must execute the reviewed current commit.
+The archive demonstrates an older operator-controlled clean-runner execution. Every later source mismatch remains listed above; the newer source-identity receipt and digest-pinned container rebuild supersede it for author-side executability only. None of these operator receipts are independent evidence. The codechecker must execute the reviewed release.
 
 ## Current Source-Identity Operator Replay
 
-- Receipt: `evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json`
-- Receipt SHA-256: `8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351`
-- Source commit: `be7776f78af659f56c11a89bef0aab8ca07d5c18`
-- Source artifacts matched: `12/21`
+- Receipt: `evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json`
+- Receipt SHA-256: `9e5153953f3f6fac77dca9107908a4834d9d16dad022413d0e39d36033ff2f03`
+- Source commit: `880eb9a0d6af71a95ea4899a2b33917013269dab`
+- Source artifacts matched: `22/23`
 - Full source exact match: `false`
-- Computational identity exact match: `false`
-- Documentation drift paths: `code/eia_grid_residual_moe_benchmark.py, code/eia_grid_wave_champion_benchmark.py, code/mda_control_mapping_open_set_benchmark.py, code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py, config/reviewer_reproducibility_protocol_v1.json, tests/test_eia_grid_residual_moe_benchmark.py, tests/test_eia_grid_wave_champion_benchmark.py, tests/test_mda_control_mapping_open_set_benchmark.py, tests/test_reviewer_reproducibility_capsule.py`
+- Computational identity exact match: `true`
+- Documentation drift paths: `README.md`
 - Relevant source clean: `true`
 - Clean-runner replay: `true`
 - Authoritative runtime matched: `true`
@@ -113,15 +117,15 @@ The archive demonstrates an older operator-controlled clean-runner execution. It
 - Assertions passed: `31/31`
 - External validation complete in receipt: `false`
 
-Author-operated Docker replay with network access disabled and the protocol-pinned Ubuntu, CPython, and dependency environment.
+Author-operated rebuild from the deterministic release ZIP in the digest-pinned reviewer container, with execution networking disabled, a read-only root filesystem, dropped capabilities, and the protocol-pinned Ubuntu, CPython, and dependency environment.
 
 This receipt is internal operator evidence, not independent execution or external validation. It may establish current computational identity only while every benchmark, protocol, frozen input, dependency lock, workflow, and test artifact in the receipt still matches byte-for-byte under its declared portable hash mode. Documentation drift must remain visible and requires a current-commit independent execution before any external claim changes.
 
 ## Exact Reviewer Runtime Receipt
 
-- Receipt: `evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json`
-- Receipt SHA-256: `abb21ce411597b31df39bf4dc858cf378e41ea8b2d68cd53c73bc7302a0d659d`
-- Declared source commit: `d60ae7230a8391f05768fa2c24893efa7f8f281f`
+- Receipt: `evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json`
+- Receipt SHA-256: `34d0c3c720b06894d9434878b010a4c936c357655e156f7a36d937811a437816`
+- Declared source commit: `880eb9a0d6af71a95ea4899a2b33917013269dab`
 - Runtime checks passed: `10/10`
 - Observed OS: `ubuntu 24.04`
 - Observed architecture: `x86_64`
@@ -132,6 +136,25 @@ This receipt is internal operator evidence, not independent execution or externa
 - External validation complete: `false`
 
 This first-party receipt closes the author-side ambiguity between a generic Linux/Python match and the specifically claimed Ubuntu 24.04 x86-64 CPython 3.11.9 glibc 2.39 runtime. It does not convert the replay into independent execution or external validation.
+
+## Digest-Pinned Container Rebuild
+
+- Receipt: `evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json`
+- Receipt SHA-256: `02879eb7f650256935325cfb09e391ac61658c321823b53fd24aeec226a801ec`
+- Source commit: `880eb9a0d6af71a95ea4899a2b33917013269dab`
+- Source bundle SHA-256: `ae413b6ecf8cca226bbffa8eb29c99e8a932ccee1ac88539e7301e90b5587ba4`
+- Release manifest SHA-256: `fc0798c082f6c8e05e5cf8501fed818d7956f8c0f35b21838abf02194f98f949`
+- Image ID: `sha256:e6f0991d7b1ee8d87b541ef75b19f00b8957abcf517d83f8b35c298fb42c3931`
+- Runtime checks passed: `10/10`
+- Suites passed: `3/3`
+- Assertions passed: `31/31`
+- Fixture tests passed: `true`
+- Source state: `release_manifest` (`verified=true`)
+- Operator controlled: `true`
+- Independent execution complete: `false`
+- External validation complete: `false`
+
+This first-party receipt proves only that the named release ZIP rebuilt and passed inside the pinned operator-controlled container under the recorded isolation controls. Independent execution, a CODECHECK certificate, scientific validation, field validation, performance endorsement, and external validation remain false.
 
 ## Human And External Gates
 

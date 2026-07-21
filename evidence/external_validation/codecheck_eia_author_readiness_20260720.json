@@ -49,7 +49,7 @@
         {
           "archived_sha256": "c08b9273c6bcb8a2cba388d1fa5a680010d325106da5399b6cd9f7c0b739fac1",
           "current_match": false,
-          "current_sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56",
+          "current_sha256": "4d5f24da1c3c15324af95b7b91a5c2048e3c28c255646bd0f5eb4387936cc736",
           "path": "README.md",
           "role": "documentation_or_packaging"
         },
@@ -191,7 +191,6 @@
     "archive_manifest_matches_codecheck_manifest": true,
     "archived_assertion_count_matched": true,
     "archived_capsule_status_matched": true,
-    "archived_computational_identity_still_matches": false,
     "archived_receipt_keeps_external_validation_false": true,
     "archived_suite_count_matched": true,
     "codecheck_explicit_document_start": true,
@@ -199,6 +198,7 @@
     "codecheck_utf8": true,
     "codecheck_yaml_directive_present": true,
     "codechecker_metadata_left_external": true,
+    "computational_identity_has_current_verified_replay": true,
     "corresponding_author_present": true,
     "license_distinguishes_code_and_eia_data": true,
     "manifest_exactly_matched_protocol": true,
@@ -208,7 +208,7 @@
     "operator_clean_runner_assertions_matched": true,
     "operator_clean_runner_authoritative_runtime_matched": true,
     "operator_clean_runner_clean_runner_replay": true,
-    "operator_clean_runner_declared_computational_identity_still_matches": false,
+    "operator_clean_runner_declared_computational_identity_still_matches": true,
     "operator_clean_runner_dependency_closure_exact_match": true,
     "operator_clean_runner_dependency_lock_passed": true,
     "operator_clean_runner_dependency_versions_exact_match": true,
@@ -221,6 +221,37 @@
     "operator_clean_runner_source_commit_matched": true,
     "operator_clean_runner_status_matched": true,
     "operator_clean_runner_suites_matched": true,
+    "operator_container_rebuild_capsule_assertions_matched": true,
+    "operator_container_rebuild_capsule_clean_runner_replay": true,
+    "operator_container_rebuild_capsule_fixture_tests_passed": true,
+    "operator_container_rebuild_capsule_receipt_hash_matched": true,
+    "operator_container_rebuild_capsule_source_state_verified": true,
+    "operator_container_rebuild_capsule_suites_matched": true,
+    "operator_container_rebuild_docker_build_and_run_passed": true,
+    "operator_container_rebuild_execution_controls_matched": true,
+    "operator_container_rebuild_expected_outputs_all_present": true,
+    "operator_container_rebuild_external_validation_remains_false": true,
+    "operator_container_rebuild_independent_execution_remains_false": true,
+    "operator_container_rebuild_operator_controlled": true,
+    "operator_container_rebuild_outer_checks_all_passed": true,
+    "operator_container_rebuild_passed": true,
+    "operator_container_rebuild_privacy_scan_passed": true,
+    "operator_container_rebuild_protocol_id_matched": true,
+    "operator_container_rebuild_receipt_payload_sha256_matched": true,
+    "operator_container_rebuild_receipt_sha256_matched": true,
+    "operator_container_rebuild_recipe_base_image_matched": true,
+    "operator_container_rebuild_recipe_python_matched": true,
+    "operator_container_rebuild_recipe_source_hashes_current": true,
+    "operator_container_rebuild_recipe_uv_matched": true,
+    "operator_container_rebuild_release_manifest_sha256_matched": true,
+    "operator_container_rebuild_runtime_check_count_matched": true,
+    "operator_container_rebuild_runtime_checks_all_passed": true,
+    "operator_container_rebuild_runtime_receipt_hash_matched": true,
+    "operator_container_rebuild_runtime_status_passed": true,
+    "operator_container_rebuild_schema_matched": true,
+    "operator_container_rebuild_source_bundle_sha256_matched": true,
+    "operator_container_rebuild_source_commit_matched": true,
+    "operator_container_rebuild_status_matched": true,
     "paper_reference_matches_preprint": true,
     "paper_title_present": true,
     "preprint_request_claim_boundaries_present": true,
@@ -377,18 +408,18 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T16:25:18.374469+00:00",
+  "generated_utc": "2026-07-21T16:52:43.669163+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "operator_clean_runner": {
     "assertion_count": 31,
     "assertion_pass_count": 31,
     "authoritative_runtime_match": true,
-    "capsule_sha256": "8b7e56df13844b070d35956c94d5801754c110d639ac56d412509cf58f9493de",
+    "capsule_sha256": "73e868b194f1c90539f01290e754a15557ec741e59a5cb5c573608abce737b03",
     "checks": {
       "assertions_matched": true,
       "authoritative_runtime_matched": true,
       "clean_runner_replay": true,
-      "declared_computational_identity_still_matches": false,
+      "declared_computational_identity_still_matches": true,
       "dependency_closure_exact_match": true,
       "dependency_lock_passed": true,
       "dependency_versions_exact_match": true,
@@ -405,34 +436,26 @@
     "clean_runner_replay": true,
     "configured_private_pattern_hit_count": 0,
     "dependency_closure_exact_match": true,
-    "execution_control": "Author-operated Docker replay with network access disabled and the protocol-pinned Ubuntu, CPython, and dependency environment.",
+    "execution_control": "Author-operated rebuild from the deterministic release ZIP in the digest-pinned reviewer container, with execution networking disabled, a read-only root filesystem, dropped capabilities, and the protocol-pinned Ubuntu, CPython, and dependency environment.",
     "external_validation_complete": false,
     "fixture_tests_passed": true,
-    "generated_utc": "2026-07-21T14:07:27.410611+00:00",
+    "generated_utc": "2026-07-21T16:28:23.870869+00:00",
     "policy": "This receipt is internal operator evidence, not independent execution or external validation. It may establish current computational identity only while every benchmark, protocol, frozen input, dependency lock, workflow, and test artifact in the receipt still matches byte-for-byte under its declared portable hash mode. Documentation drift must remain visible and requires a current-commit independent execution before any external claim changes.",
-    "receipt_path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json",
-    "receipt_sha256": "8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351",
+    "receipt_path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json",
+    "receipt_sha256": "9e5153953f3f6fac77dca9107908a4834d9d16dad022413d0e39d36033ff2f03",
     "relevant_source_clean": true,
     "schema": "reviewer_reproducibility_capsule.v1",
-    "source_chain_sha256": "ca04c902d143c89f1ae9bf089447be241060ef39c504199d5a865d219760679c",
-    "source_commit": "be7776f78af659f56c11a89bef0aab8ca07d5c18",
+    "source_chain_sha256": "abeab3e8070e63261dbbb620cf36a019bea3a4d68cd8ba1ddbceab2d9e0e447e",
+    "source_commit": "880eb9a0d6af71a95ea4899a2b33917013269dab",
     "source_reconciliation": {
-      "archived_source_count": 21,
-      "computational_identity_exact_match": false,
-      "computational_identity_path_count": 20,
-      "current_match_count": 12,
+      "archived_source_count": 23,
+      "computational_identity_exact_match": true,
+      "computational_identity_path_count": 22,
+      "current_match_count": 22,
       "full_source_exact_match": false,
-      "mismatch_count": 9,
+      "mismatch_count": 1,
       "mismatch_paths": [
-        "code/eia_grid_residual_moe_benchmark.py",
-        "code/eia_grid_wave_champion_benchmark.py",
-        "code/mda_control_mapping_open_set_benchmark.py",
-        "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
-        "config/reviewer_reproducibility_protocol_v1.json",
-        "tests/test_eia_grid_residual_moe_benchmark.py",
-        "tests/test_eia_grid_wave_champion_benchmark.py",
-        "tests/test_mda_control_mapping_open_set_benchmark.py",
-        "tests/test_reviewer_reproducibility_capsule.py"
+        "README.md"
       ],
       "rows": [
         {
@@ -451,35 +474,42 @@
         },
         {
           "archived_sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56",
-          "current_match": true,
-          "current_sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56",
+          "current_match": false,
+          "current_sha256": "4d5f24da1c3c15324af95b7b91a5c2048e3c28c255646bd0f5eb4387936cc736",
           "path": "README.md",
           "role": "documentation_or_packaging"
         },
         {
-          "archived_sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100",
-          "current_match": false,
+          "archived_sha256": "da7287501982f09856b7b5ea9b707928ad6e7be10caf45d67eaf81bf553f1452",
+          "current_match": true,
           "current_sha256": "da7287501982f09856b7b5ea9b707928ad6e7be10caf45d67eaf81bf553f1452",
           "path": "code/eia_grid_residual_moe_benchmark.py",
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "b3586ddc568f6bd4aa6ae48bbb289ab579eab773699dba5ac32234d393627791",
-          "current_match": false,
+          "archived_sha256": "a16fc3e55c275625da24d7ea453a830b6ab8a47ea82aee4a3cb25f7fc5933bc5",
+          "current_match": true,
           "current_sha256": "a16fc3e55c275625da24d7ea453a830b6ab8a47ea82aee4a3cb25f7fc5933bc5",
           "path": "code/eia_grid_wave_champion_benchmark.py",
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "5346d8f4b66b7a19a6b0daf58bd4e983f4a2108346d6d51429ec0f387ab7ed8c",
-          "current_match": false,
+          "archived_sha256": "da3399399f965565132c114a9fd6c667b2cd95a6e0d62808d7693f75fe63eba6",
+          "current_match": true,
           "current_sha256": "da3399399f965565132c114a9fd6c667b2cd95a6e0d62808d7693f75fe63eba6",
           "path": "code/mda_control_mapping_open_set_benchmark.py",
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "2481919eca73df9469b372367d676d8713687c940f6565a1380d69547464f8e3",
-          "current_match": false,
+          "archived_sha256": "1ea879aebdd45c58778d6ebb21ee4bd1be4d071250e779d6257288979f8c20bb",
+          "current_match": true,
+          "current_sha256": "1ea879aebdd45c58778d6ebb21ee4bd1be4d071250e779d6257288979f8c20bb",
+          "path": "code/ops/RUN_FAA_SDR_10K_BENCHMARK.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "cda60da03beefa75cf10d227b6dffe1be422a5e1531fc8b1b763fcfa805d0028",
+          "current_match": true,
           "current_sha256": "cda60da03beefa75cf10d227b6dffe1be422a5e1531fc8b1b763fcfa805d0028",
           "path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
           "role": "computational_identity"
@@ -513,8 +543,15 @@
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1",
-          "current_match": false,
+          "archived_sha256": "9768865e9e1aab551aea678c871de05c1085c0e2152e93afd0309a592edae32a",
+          "current_match": true,
+          "current_sha256": "9768865e9e1aab551aea678c871de05c1085c0e2152e93afd0309a592edae32a",
+          "path": "config/reviewer_protocol_provenance_v1.json",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "c69fb78965cdf420e8354042f1e90d11c6b7dde59f0a4d9fb27d9dec58f4cb01",
+          "current_match": true,
           "current_sha256": "c69fb78965cdf420e8354042f1e90d11c6b7dde59f0a4d9fb27d9dec58f4cb01",
           "path": "config/reviewer_reproducibility_protocol_v1.json",
           "role": "computational_identity"
@@ -541,15 +578,15 @@
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "0aa6af3aa74ecb561c15a1b9560ed80014bc692679e61e6c6fa93bb75cc8ba68",
-          "current_match": false,
+          "archived_sha256": "bedbdd6527b94e71ced78482ad806eaa8a011b25a3dbfcc565748e5ca4c19b77",
+          "current_match": true,
           "current_sha256": "bedbdd6527b94e71ced78482ad806eaa8a011b25a3dbfcc565748e5ca4c19b77",
           "path": "tests/test_eia_grid_residual_moe_benchmark.py",
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "175010b5aa97951fe1770d4f67b1b9b4597baff113d55b34021a103ca04055bb",
-          "current_match": false,
+          "archived_sha256": "390e0399f7b1ef93a7c815b0431371ad0564579a47a40d871f0d2db1cbfe93a0",
+          "current_match": true,
           "current_sha256": "390e0399f7b1ef93a7c815b0431371ad0564579a47a40d871f0d2db1cbfe93a0",
           "path": "tests/test_eia_grid_wave_champion_benchmark.py",
           "role": "computational_identity"
@@ -562,8 +599,8 @@
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "0798b6a130f48b012c75877fd56d9aeb36be033b5620b974e89fc46b76585db8",
-          "current_match": false,
+          "archived_sha256": "73984c678cc488ec722c01795573559a0637f0abf2e16da92b3c7bd8790cb840",
+          "current_match": true,
           "current_sha256": "73984c678cc488ec722c01795573559a0637f0abf2e16da92b3c7bd8790cb840",
           "path": "tests/test_mda_control_mapping_open_set_benchmark.py",
           "role": "computational_identity"
@@ -576,8 +613,8 @@
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "4995d85976b862e16041e7e42ef005c0cb9b1543944cbed11ea254a37923948b",
-          "current_match": false,
+          "archived_sha256": "576ccc0b49cbfb8012d078c4d403e16ca17700ca3943134087517845392d3d2b",
+          "current_match": true,
           "current_sha256": "576ccc0b49cbfb8012d078c4d403e16ca17700ca3943134087517845392d3d2b",
           "path": "tests/test_reviewer_reproducibility_capsule.py",
           "role": "computational_identity"
@@ -587,7 +624,68 @@
     "status": "BOUNDED_REPRODUCIBILITY_PASS",
     "suite_count": 3,
     "suite_pass_count": 3,
-    "verified": false
+    "verified": true
+  },
+  "operator_container_rebuild": {
+    "assertion_count": 31,
+    "assertion_pass_count": 31,
+    "checks": {
+      "capsule_assertions_matched": true,
+      "capsule_clean_runner_replay": true,
+      "capsule_fixture_tests_passed": true,
+      "capsule_receipt_hash_matched": true,
+      "capsule_source_state_verified": true,
+      "capsule_suites_matched": true,
+      "docker_build_and_run_passed": true,
+      "execution_controls_matched": true,
+      "expected_outputs_all_present": true,
+      "external_validation_remains_false": true,
+      "independent_execution_remains_false": true,
+      "operator_controlled": true,
+      "outer_checks_all_passed": true,
+      "passed": true,
+      "privacy_scan_passed": true,
+      "protocol_id_matched": true,
+      "receipt_payload_sha256_matched": true,
+      "receipt_sha256_matched": true,
+      "recipe_base_image_matched": true,
+      "recipe_python_matched": true,
+      "recipe_source_hashes_current": true,
+      "recipe_uv_matched": true,
+      "release_manifest_sha256_matched": true,
+      "runtime_check_count_matched": true,
+      "runtime_checks_all_passed": true,
+      "runtime_receipt_hash_matched": true,
+      "runtime_status_passed": true,
+      "schema_matched": true,
+      "source_bundle_sha256_matched": true,
+      "source_commit_matched": true,
+      "status_matched": true
+    },
+    "configured_private_pattern_hit_count": 0,
+    "external_validation_complete": false,
+    "fixture_tests_passed": true,
+    "generated_utc": "2026-07-21T16:29:00.944278+00:00",
+    "image_id": "sha256:e6f0991d7b1ee8d87b541ef75b19f00b8957abcf517d83f8b35c298fb42c3931",
+    "independent_execution_complete": false,
+    "operator_controlled": true,
+    "policy": "This first-party receipt proves only that the named release ZIP rebuilt and passed inside the pinned operator-controlled container under the recorded isolation controls. Independent execution, a CODECHECK certificate, scientific validation, field validation, performance endorsement, and external validation remain false.",
+    "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_CONTAINER_20260721",
+    "receipt_path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json",
+    "receipt_payload_sha256": "ac71f866681f8384dc749567bcaefb2e162e2e90b6ab3955dcfc2f95e44faa14",
+    "receipt_sha256": "02879eb7f650256935325cfb09e391ac61658c321823b53fd24aeec226a801ec",
+    "release_manifest_sha256": "fc0798c082f6c8e05e5cf8501fed818d7956f8c0f35b21838abf02194f98f949",
+    "runtime_check_count": 10,
+    "runtime_check_pass_count": 10,
+    "schema": "codecheck_reviewer_container_run_receipt.v1",
+    "source_bundle_sha256": "ae413b6ecf8cca226bbffa8eb29c99e8a932ccee1ac88539e7301e90b5587ba4",
+    "source_commit": "880eb9a0d6af71a95ea4899a2b33917013269dab",
+    "source_state_mode": "release_manifest",
+    "source_state_verified": true,
+    "status": "OPERATOR_CONTAINER_REBUILD_PASS",
+    "suite_count": 3,
+    "suite_pass_count": 3,
+    "verified": true
   },
   "path_checks": {
     ".github/workflows/codecheck-eia-readiness.yml": true,
@@ -615,8 +713,9 @@
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
     "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
-    "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json": true,
-    "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json": true,
+    "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json": true,
+    "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json": true,
+    "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json": true,
     "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
     "requirements-reviewer-ubuntu-py311.lock": true,
     "tests/test_codecheck_eia_readiness.py": true,
@@ -624,19 +723,19 @@
     "tests/test_codecheck_reviewer_container.py": true,
     "tests/test_codecheck_reviewer_runtime.py": true
   },
-  "portable_input_chain_sha256": "e1a71735123f0bde41ac91db7a06356862a8c503c14f19d2962a768058dd64d6",
+  "portable_input_chain_sha256": "f33b343979ef32473e2d6c7bf8ff33365b0d673e77d1c626941b8be6c5c0f1ff",
   "portable_inputs": [
     {
-      "bytes": 7881,
+      "bytes": 8071,
       "hash_mode": "utf8_lf",
       "path": ".github/workflows/codecheck-eia-readiness.yml",
-      "sha256": "3725b228ffb0821b527ab52746d0e367ad0667f1a512170b7b5eb04c1dee4442"
+      "sha256": "b2e7ebc1e3f184ea1c109471a517ce7f528eb5f53b5f5741e353d64633c5c4c2"
     },
     {
-      "bytes": 15541,
+      "bytes": 16243,
       "hash_mode": "utf8_lf",
       "path": "README.md",
-      "sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56"
+      "sha256": "4d5f24da1c3c15324af95b7b91a5c2048e3c28c255646bd0f5eb4387936cc736"
     },
     {
       "bytes": 1891,
@@ -657,10 +756,10 @@
       "sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880"
     },
     {
-      "bytes": 48180,
+      "bytes": 59416,
       "hash_mode": "utf8_lf",
       "path": "code/ops/BUILD_CODECHECK_EIA_READINESS.py",
-      "sha256": "75a6ebe5ce330d00396fdbf64d25f7272d4d695062b71c867fa0ee7117eb6da2"
+      "sha256": "c2bcf0e52cdd86f2b17ef31477725f63669604f26d0421008963251fd16b693d"
     },
     {
       "bytes": 10355,
@@ -711,16 +810,16 @@
       "sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c"
     },
     {
-      "bytes": 12349,
+      "bytes": 13914,
       "hash_mode": "utf8_lf",
       "path": "config/codecheck_eia_readiness_v1.json",
-      "sha256": "537556963cc736c2098cd8ed36641cfcb995c8b63462ab32478c4ee171620aa2"
+      "sha256": "fb4080b60c88a3bd9600b9d9967bf57425299bbf1a571bcf70078d9c970af5a0"
     },
     {
-      "bytes": 6082,
+      "bytes": 6174,
       "hash_mode": "utf8_lf",
       "path": "config/codecheck_eia_release_candidate_v1.json",
-      "sha256": "6242343841b58b67b3ea4dc58b6936d51588a76d818d650b8412da5c2e57a022"
+      "sha256": "339b4d5860281b3e7b798df955f7186cd4dd33178af0178a714f58d6234f8609"
     },
     {
       "bytes": 2601,
@@ -771,40 +870,46 @@
       "sha256": "c6b200fd49bca5d4e50cb06845824c532107ec61b976f6eb41268f9b3683a246"
     },
     {
-      "bytes": 7640,
+      "bytes": 7905,
       "hash_mode": "utf8_lf",
       "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
-      "sha256": "bdb7804ccd72f229515a7a71696e2df5e165df4b721009aa12b89cc8f74140da"
+      "sha256": "c07a2d79d3c95c0bbd7b990c220b25698f7a6d7b8ba9a1a4f9e38447b7703b24"
     },
     {
-      "bytes": 5419,
+      "bytes": 5487,
       "hash_mode": "utf8_lf",
       "path": "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md",
-      "sha256": "ac6b2c723caa3b5d3ab273269d0df5790febc9d7913b806afe538531f904ae26"
+      "sha256": "91de67be9b9ee88eadfd5ce34ed7f2d99c308c83311debd0676636a15e2161e6"
     },
     {
-      "bytes": 10880,
+      "bytes": 11412,
       "hash_mode": "utf8_lf",
       "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
-      "sha256": "52920f927d3f41727b9fb44f808f53cdbb61acfda575b2a208242cfa500ce665"
+      "sha256": "723141f2fea749af3625a5556824e2606f2f0d1eb0e975c5c17ed31868856eba"
     },
     {
-      "bytes": 13630,
+      "bytes": 13982,
       "hash_mode": "raw",
       "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
-      "sha256": "11a4c2f99c4f20517e33b528af59cf0bf986cfd6e98bccc9678e3025b07ccb27"
+      "sha256": "e3261285bc1142e603d270c80f7daad24c3f490690527fac48a11ac0156fa47c"
     },
     {
-      "bytes": 26114,
+      "bytes": 27420,
       "hash_mode": "utf8_lf",
-      "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json",
-      "sha256": "8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351"
+      "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json",
+      "sha256": "9e5153953f3f6fac77dca9107908a4834d9d16dad022413d0e39d36033ff2f03"
+    },
+    {
+      "bytes": 8522,
+      "hash_mode": "utf8_lf",
+      "path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json",
+      "sha256": "02879eb7f650256935325cfb09e391ac61658c321823b53fd24aeec226a801ec"
     },
     {
       "bytes": 3009,
       "hash_mode": "utf8_lf",
-      "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json",
-      "sha256": "abb21ce411597b31df39bf4dc858cf378e41ea8b2d68cd53c73bc7302a0d659d"
+      "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json",
+      "sha256": "34d0c3c720b06894d9434878b010a4c936c357655e156f7a36d937811a437816"
     },
     {
       "bytes": 114366,
@@ -819,16 +924,16 @@
       "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
     },
     {
-      "bytes": 16544,
+      "bytes": 19801,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_readiness.py",
-      "sha256": "65be14b91d08b66ad784353ce01ea4b3d127fae52383df4536cea155d0b5b969"
+      "sha256": "a81b388d443903cb969e678d16fe847f5067ab4c2c1f44f222f0e16781b1af69"
     },
     {
       "bytes": 6498,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_release_candidate.py",
-      "sha256": "0aec1cc627ed055cb3a645d2561a42353eaea74f4ade2fdba99e7fde9cc4c2df"
+      "sha256": "308e0ff02faf778a27bd568c72b30716a20ddd3918415de5f85c9aa152157370"
     },
     {
       "bytes": 7981,
@@ -866,11 +971,11 @@
     "duplicate_request_reconciled": false,
     "immutable_public_source_release": null,
     "markdown_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
-    "markdown_sha256": "52920f927d3f41727b9fb44f808f53cdbb61acfda575b2a208242cfa500ce665",
+    "markdown_sha256": "723141f2fea749af3625a5556824e2606f2f0d1eb0e975c5c17ed31868856eba",
     "paper_reference": "Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
     "pdf_page_count": 5,
     "pdf_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
-    "pdf_sha256": "11a4c2f99c4f20517e33b528af59cf0bf986cfd6e98bccc9678e3025b07ccb27",
+    "pdf_sha256": "e3261285bc1142e603d270c80f7daad24c3f490690527fac48a11ac0156fa47c",
     "policy": "The manuscript and request text are author-side drafts. A stable public preprint identifier, immutable public source release, duplicate-request reconciliation, Robert's review, and fresh action-time HumanUnlock are required before one production request may be opened.",
     "request_path": "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
     "stable_public_identifier": null,
@@ -881,10 +986,10 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "b2c84719cb468a68a7e95eb073ac428d0356135b3b0782f54c6ba7a44b79bb79",
+  "readiness_sha256": "b676a523515d5dc76bbbfb84ba3dd06d40bd974297f50fa17f02c0c84c21f9ba",
   "release_candidate": {
-    "bundle_input_chain_sha256": "63452c80420b2677f368a2d1324af90b94b67393ae88169ba457b53682d40378",
-    "bundle_input_count": 43,
+    "bundle_input_chain_sha256": "da6cf1479eaccec0d81c0a74e5c4c8602925189518f50dac1e6f04421cefc800",
+    "bundle_input_count": 44,
     "bundle_inputs": [
       {
         "bytes": 4832,
@@ -911,10 +1016,10 @@
         "sha256": "2e399326d1698e17d388b7d5acb27006176e76fc8a8eead8d883494f3eb1bcfb"
       },
       {
-        "bytes": 15541,
+        "bytes": 16243,
         "hash_mode": "utf8_lf",
         "path": "README.md",
-        "sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56"
+        "sha256": "4d5f24da1c3c15324af95b7b91a5c2048e3c28c255646bd0f5eb4387936cc736"
       },
       {
         "bytes": 41939,
@@ -977,10 +1082,10 @@
         "sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880"
       },
       {
-        "bytes": 6082,
+        "bytes": 6174,
         "hash_mode": "utf8_lf",
         "path": "config/codecheck_eia_release_candidate_v1.json",
-        "sha256": "6242343841b58b67b3ea4dc58b6936d51588a76d818d650b8412da5c2e57a022"
+        "sha256": "339b4d5860281b3e7b798df955f7186cd4dd33178af0178a714f58d6234f8609"
       },
       {
         "bytes": 2601,
@@ -1037,40 +1142,46 @@
         "sha256": "0e001267b4932fc973db0fd72d9a1080e2d299859b25ca89aa2eb58f091986fd"
       },
       {
-        "bytes": 7640,
+        "bytes": 7905,
         "hash_mode": "utf8_lf",
         "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
-        "sha256": "bdb7804ccd72f229515a7a71696e2df5e165df4b721009aa12b89cc8f74140da"
+        "sha256": "c07a2d79d3c95c0bbd7b990c220b25698f7a6d7b8ba9a1a4f9e38447b7703b24"
       },
       {
-        "bytes": 10880,
+        "bytes": 11412,
         "hash_mode": "utf8_lf",
         "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
-        "sha256": "52920f927d3f41727b9fb44f808f53cdbb61acfda575b2a208242cfa500ce665"
+        "sha256": "723141f2fea749af3625a5556824e2606f2f0d1eb0e975c5c17ed31868856eba"
       },
       {
-        "bytes": 13630,
+        "bytes": 13982,
         "hash_mode": "binary",
         "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
-        "sha256": "11a4c2f99c4f20517e33b528af59cf0bf986cfd6e98bccc9678e3025b07ccb27"
+        "sha256": "e3261285bc1142e603d270c80f7daad24c3f490690527fac48a11ac0156fa47c"
       },
       {
-        "bytes": 5419,
+        "bytes": 5487,
         "hash_mode": "utf8_lf",
         "path": "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md",
-        "sha256": "ac6b2c723caa3b5d3ab273269d0df5790febc9d7913b806afe538531f904ae26"
+        "sha256": "91de67be9b9ee88eadfd5ce34ed7f2d99c308c83311debd0676636a15e2161e6"
       },
       {
-        "bytes": 26114,
+        "bytes": 27420,
         "hash_mode": "utf8_lf",
-        "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json",
-        "sha256": "8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351"
+        "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json",
+        "sha256": "9e5153953f3f6fac77dca9107908a4834d9d16dad022413d0e39d36033ff2f03"
+      },
+      {
+        "bytes": 8522,
+        "hash_mode": "utf8_lf",
+        "path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json",
+        "sha256": "02879eb7f650256935325cfb09e391ac61658c321823b53fd24aeec226a801ec"
       },
       {
         "bytes": 3009,
         "hash_mode": "utf8_lf",
-        "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json",
-        "sha256": "abb21ce411597b31df39bf4dc858cf378e41ea8b2d68cd53c73bc7302a0d659d"
+        "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json",
+        "sha256": "34d0c3c720b06894d9434878b010a4c936c357655e156f7a36d937811a437816"
       },
       {
         "bytes": 114366,
@@ -1094,7 +1205,7 @@
         "bytes": 6498,
         "hash_mode": "utf8_lf",
         "path": "tests/test_codecheck_eia_release_candidate.py",
-        "sha256": "0aec1cc627ed055cb3a645d2561a42353eaea74f4ade2fdba99e7fde9cc4c2df"
+        "sha256": "308e0ff02faf778a27bd568c72b30716a20ddd3918415de5f85c9aa152157370"
       },
       {
         "bytes": 7981,
@@ -1243,8 +1354,9 @@
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
       "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
-      "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json": true,
-      "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json": true,
+      "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json": true,
+      "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json": true,
+      "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json": true,
       "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
       "requirements-reviewer-ubuntu-py311.lock": true,
       "requirements-reviewer.txt": true,
@@ -1288,8 +1400,9 @@
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
       "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
-      "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json": true,
-      "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json": true,
+      "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json": true,
+      "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json": true,
+      "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json": true,
       "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
       "requirements-reviewer-ubuntu-py311.lock": true,
       "requirements-reviewer.txt": true,
@@ -1389,7 +1502,7 @@
       "system": "Linux"
     },
     "external_validation_complete": false,
-    "generated_utc": "2026-07-21T15:22:04.871883+00:00",
+    "generated_utc": "2026-07-21T16:28:23.480158+00:00",
     "independent_execution_complete": false,
     "observed": {
       "environment": {
@@ -1414,13 +1527,13 @@
     "operator_controlled": true,
     "policy": "This first-party receipt closes the author-side ambiguity between a generic Linux/Python match and the specifically claimed Ubuntu 24.04 x86-64 CPython 3.11.9 glibc 2.39 runtime. It does not convert the replay into independent execution or external validation.",
     "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_RUNTIME_20260721",
-    "receipt_path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json",
-    "receipt_payload_sha256": "5b7b53914e9299515e0b27fd45cf8f2ae17ae7ae897d9b3fd827efe25cc6d079",
-    "receipt_sha256": "abb21ce411597b31df39bf4dc858cf378e41ea8b2d68cd53c73bc7302a0d659d",
+    "receipt_path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json",
+    "receipt_payload_sha256": "e6cfba1532177e3b68ca8f06b4bcf6f954ce3e8ae6f22e398e993153749e1a20",
+    "receipt_sha256": "34d0c3c720b06894d9434878b010a4c936c357655e156f7a36d937811a437816",
     "runtime_check_count": 10,
     "runtime_check_pass_count": 10,
     "schema": "codecheck_reviewer_runtime_receipt.v1",
-    "source_commit": "d60ae7230a8391f05768fa2c24893efa7f8f281f",
+    "source_commit": "880eb9a0d6af71a95ea4899a2b33917013269dab",
     "source_reconciliation": [
       {
         "current_match": true,
@@ -1439,8 +1552,9 @@
     "verified": true
   },
   "schema": "codecheck_eia_author_readiness.v1",
-  "status": "AUTHOR_PACKET_BLOCKED",
+  "status": "AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW",
   "summary": {
+    "archive_drift_reconciled_by_current_container_rebuild": true,
     "archive_full_source_exact_match": false,
     "archived_assertion_pass_count": 31,
     "archived_computational_identity_still_matches": false,
@@ -1456,13 +1570,18 @@
     "human_author_review_complete": false,
     "immutable_public_source_release_complete": false,
     "independent_execution_complete": false,
-    "internal_check_count": 90,
-    "internal_check_pass_count": 88,
-    "internal_gate_passed": false,
+    "internal_check_count": 121,
+    "internal_check_pass_count": 121,
+    "internal_gate_passed": true,
     "manifest_output_count": 6,
-    "operator_clean_runner_computational_identity_current": false,
+    "operator_clean_runner_computational_identity_current": true,
     "operator_clean_runner_full_source_exact_match": false,
-    "operator_clean_runner_receipt_verified": false,
+    "operator_clean_runner_receipt_verified": true,
+    "operator_container_rebuild_assertion_count": 31,
+    "operator_container_rebuild_assertion_pass_count": 31,
+    "operator_container_rebuild_receipt_verified": true,
+    "operator_container_rebuild_suite_count": 3,
+    "operator_container_rebuild_suite_pass_count": 3,
     "public_preprint_draft_complete": true,
     "release_candidate_definition_ready": true,
     "release_candidate_publication_ready": false,

@@ -1,0 +1,799 @@
+{
+  "capsule_sha256": "73e868b194f1c90539f01290e754a15557ec741e59a5cb5c573608abce737b03",
+  "claim_boundary": "A passing capsule proves that the named code reproduced the declared bounded facts from the packaged input under the recorded environment. It does not prove agency approval, cybersecurity certification, external validation, field performance, realized savings, patent scope, trading performance, or funding eligibility.",
+  "dependencies": [
+    {
+      "distribution": "lightgbm",
+      "import_name": "lightgbm",
+      "installed": true,
+      "observed_version": "4.6.0",
+      "publisher": "lightgbm",
+      "purl": "pkg:pypi/lightgbm@4.6.0",
+      "relationship": "direct",
+      "version": "4.6.0",
+      "version_match": true
+    },
+    {
+      "distribution": "numpy",
+      "import_name": "numpy",
+      "installed": true,
+      "observed_version": "2.3.5",
+      "publisher": "Travis E. Oliphant et al.",
+      "purl": "pkg:pypi/numpy@2.3.5",
+      "relationship": "direct",
+      "version": "2.3.5",
+      "version_match": true
+    },
+    {
+      "distribution": "packaging",
+      "import_name": "packaging",
+      "installed": true,
+      "observed_version": "25.0",
+      "publisher": "packaging",
+      "purl": "pkg:pypi/packaging@25.0",
+      "relationship": "runner",
+      "version": "25.0",
+      "version_match": true
+    },
+    {
+      "distribution": "pandas",
+      "import_name": "pandas",
+      "installed": true,
+      "observed_version": "2.3.3",
+      "publisher": "pandas",
+      "purl": "pkg:pypi/pandas@2.3.3",
+      "relationship": "direct",
+      "version": "2.3.3",
+      "version_match": true
+    },
+    {
+      "distribution": "pytest",
+      "import_name": "pytest",
+      "installed": true,
+      "observed_version": "9.1.0",
+      "publisher": "Brianna Laugher, Bruno Oliveira, Floris Bruynooghe, Freya Bruhin, Holger Krekel, Others (See AUTHORS), Ronny Pfannschmidt",
+      "purl": "pkg:pypi/pytest@9.1.0",
+      "relationship": "test",
+      "version": "9.1.0",
+      "version_match": true
+    },
+    {
+      "distribution": "scikit-learn",
+      "import_name": "sklearn",
+      "installed": true,
+      "observed_version": "1.8.0",
+      "publisher": "scikit-learn",
+      "purl": "pkg:pypi/scikit-learn@1.8.0",
+      "relationship": "direct",
+      "version": "1.8.0",
+      "version_match": true
+    },
+    {
+      "distribution": "scipy",
+      "import_name": "scipy",
+      "installed": true,
+      "observed_version": "1.16.3",
+      "publisher": "scipy",
+      "purl": "pkg:pypi/scipy@1.16.3",
+      "relationship": "transitive_numeric_runtime",
+      "version": "1.16.3",
+      "version_match": true
+    },
+    {
+      "distribution": "xgboost",
+      "import_name": "xgboost",
+      "installed": true,
+      "observed_version": "3.2.0",
+      "publisher": "xgboost",
+      "purl": "pkg:pypi/xgboost@3.2.0",
+      "relationship": "direct",
+      "version": "3.2.0",
+      "version_match": true
+    }
+  ],
+  "dependency_closure": {
+    "expected_package_count": 18,
+    "missing_packages": [],
+    "observed_package_count": 18,
+    "observed_packages": {
+      "iniconfig": "2.3.0",
+      "joblib": "1.5.3",
+      "lightgbm": "4.6.0",
+      "numpy": "2.3.5",
+      "nvidia-nccl-cu12": "2.30.7",
+      "packaging": "25.0",
+      "pandas": "2.3.3",
+      "pluggy": "1.6.0",
+      "pygments": "2.20.0",
+      "pytest": "9.1.0",
+      "python-dateutil": "2.9.0.post0",
+      "pytz": "2026.2",
+      "scikit-learn": "1.8.0",
+      "scipy": "1.16.3",
+      "six": "1.17.0",
+      "threadpoolctl": "3.6.0",
+      "tzdata": "2026.3",
+      "xgboost": "3.2.0"
+    },
+    "passed": true,
+    "unexpected_packages": [],
+    "version_mismatches": {}
+  },
+  "dependency_lock": {
+    "checks": {
+      "all_direct_pins_matched": true,
+      "authoritative_target_declared": true,
+      "cross_platform_scope_not_overclaimed": true,
+      "direct_requirements_valid": true,
+      "every_locked_package_hashed": true,
+      "lock_contains_only_safe_directives": true,
+      "lock_package_count_matched": true,
+      "lock_sha256_matched": true,
+      "lock_syntax_valid": true,
+      "protocol_schema_matched": true,
+      "required_linux_transitives_matched": true,
+      "resolver_header_matches_protocol": true,
+      "source_builds_prohibited": true,
+      "workflow_installs_declared_lock": true,
+      "workflow_requires_binary_artifacts": true,
+      "workflow_requires_hashes": true,
+      "workflow_runs_dependency_consistency_check": true,
+      "workflow_uses_authoritative_runner": true,
+      "workflow_verifies_lock_before_install": true
+    },
+    "direct_matches": {
+      "lightgbm": true,
+      "numpy": true,
+      "packaging": true,
+      "pandas": true,
+      "pytest": true,
+      "scikit-learn": true,
+      "scipy": true,
+      "xgboost": true
+    },
+    "direct_requirement_count": 8,
+    "errors": [],
+    "known_gap": "Other operating systems and architectures are not covered by this receipt until separately resolved, hash-locked, and replayed.",
+    "locked_hash_count": 263,
+    "locked_package_count": 18,
+    "locked_packages": {
+      "iniconfig": "2.3.0",
+      "joblib": "1.5.3",
+      "lightgbm": "4.6.0",
+      "numpy": "2.3.5",
+      "nvidia-nccl-cu12": "2.30.7",
+      "packaging": "25.0",
+      "pandas": "2.3.3",
+      "pluggy": "1.6.0",
+      "pygments": "2.20.0",
+      "pytest": "9.1.0",
+      "python-dateutil": "2.9.0.post0",
+      "pytz": "2026.2",
+      "scikit-learn": "1.8.0",
+      "scipy": "1.16.3",
+      "six": "1.17.0",
+      "threadpoolctl": "3.6.0",
+      "tzdata": "2026.3",
+      "xgboost": "3.2.0"
+    },
+    "passed": true,
+    "receipt_sha256": "e8ff149fbb8560bb2ac9c9f62b470b265e4984ae9ce804c3cc23fcf9ac7aca72",
+    "required_transitive_matches": {
+      "nvidia-nccl-cu12": true
+    },
+    "requirements_lock_path": "requirements-reviewer-ubuntu-py311.lock",
+    "requirements_lock_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+    "requirements_path": "requirements-reviewer.txt",
+    "schema": "reviewer_dependency_lock_verification.v1",
+    "scope_boundary": "Complete for the authoritative Ubuntu 24.04 x86-64 CPython 3.11.9 reviewer runner only.",
+    "status": "AUTHORITATIVE_RUNNER_LOCK_VALID",
+    "target": {
+      "name": "uv",
+      "python": "3.11.9",
+      "source_builds_allowed": false,
+      "target_platform": "x86_64-unknown-linux-gnu",
+      "version": "0.11.28"
+    },
+    "unsafe_token_hits": []
+  },
+  "environment": {
+    "authoritative_runtime": {
+      "checks": {
+        "machine": true,
+        "python": true,
+        "system": true
+      },
+      "expected": {
+        "github_image": "ubuntu-24.04",
+        "machine": "x86_64",
+        "python": "3.11.9",
+        "system": "Linux"
+      },
+      "matches": true,
+      "observed": {
+        "machine": "x86_64",
+        "python": "3.11.9",
+        "system": "Linux"
+      }
+    },
+    "implementation": "CPython",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.11.9",
+    "pythonhashseed": "0",
+    "runtime_control": {
+      "expected": {
+        "MKL_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "4",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTHONHASHSEED": "0",
+        "TZ": "UTC"
+      },
+      "matches": true,
+      "observed": {
+        "MKL_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "4",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTHONHASHSEED": "0",
+        "TZ": "UTC"
+      }
+    },
+    "thread_limits": {
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "1"
+    },
+    "timezone": "UTC"
+  },
+  "excluded_full_replays": [
+    {
+      "lane": "faa_sdr_10k",
+      "reason": "The four official FAA SDR CSV source files total about 114 MB and are not bundled in this capsule. Algorithmic fixture tests run, but the 10,000-report result is not clean-room replayed here."
+    },
+    {
+      "lane": "locked_source_baseline_replay_sweep",
+      "reason": "The broader private/local source universe is not bundled into the public capsule."
+    },
+    {
+      "lane": "external_validation",
+      "reason": "A clean CI replay is software reproducibility evidence, not independent scientific or field validation."
+    }
+  ],
+  "fixture_tests": {
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_eia_grid_wave_champion_benchmark.py",
+      "tests/test_eia_grid_residual_moe_benchmark.py",
+      "tests/test_mda_control_mapping_open_set_benchmark.py",
+      "tests/test_faa_sdr_10k_benchmark.py",
+      "tests/test_reviewer_dependency_lock.py",
+      "tests/test_reviewer_reproducibility_capsule.py",
+      "-k",
+      "not frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe and not published_receipt_reconciles_hashes_assertions_and_public_projection and not sbom_has_scoped_component_identity_and_dependency_relationships and not markdown_reports_failures_and_unmet_external_gates_plainly"
+    ],
+    "elapsed_seconds": 5.0,
+    "exit_code": 0,
+    "log_path": "out/codecheck_eia/logs/fixture_tests.log",
+    "log_sha256": "adf5675b1b37a9c86855e4a4ac4fffbd15fa9f17053a818aa7f83fec577c7409",
+    "passed": true
+  },
+  "frozen_input": {
+    "assertions": [
+      {
+        "actual": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9",
+        "assertion_id": "compressed_sha256",
+        "expected": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9",
+        "passed": true
+      },
+      {
+        "actual": "8b480ec4923c17d3782eacd428ee5ea599525145ce2a0772ba934aba0a40da59",
+        "assertion_id": "uncompressed_sha256",
+        "expected": "8b480ec4923c17d3782eacd428ee5ea599525145ce2a0772ba934aba0a40da59",
+        "passed": true
+      },
+      {
+        "actual": "594684318e85e3440e385cff3e30c5d095930410572c6c4b39472814ae4655dd",
+        "assertion_id": "row_chain_sha256",
+        "expected": "594684318e85e3440e385cff3e30c5d095930410572c6c4b39472814ae4655dd",
+        "passed": true
+      },
+      {
+        "actual": 14704,
+        "assertion_id": "row_count",
+        "expected": 14704,
+        "passed": true
+      },
+      {
+        "actual": false,
+        "assertion_id": "credential_serialized",
+        "expected": false,
+        "passed": true
+      }
+    ],
+    "input_id": "eia_grid_validation_panel_20260713",
+    "passed": true,
+    "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
+  },
+  "generated_utc": "2026-07-21T16:28:23.870869+00:00",
+  "git": {
+    "branch": "release-bundle",
+    "commit": "880eb9a0d6af71a95ea4899a2b33917013269dab",
+    "mode": "release_manifest",
+    "release_manifest": {
+      "bundle_input_check_chain_sha256": "84fa7bc3a8f852236914a3028457422ad2ca7f14c1ded0f1aa1a0c1c342ac4b5",
+      "bundle_input_count": 43,
+      "bundle_input_pass_count": 43,
+      "checks": {
+        "bundle_input_hashes_matched": true,
+        "bundle_inputs_present": true,
+        "environment_source_commit_valid": true,
+        "schema_matched": true,
+        "source_artifacts_manifested": true,
+        "source_commit_matches_environment": true,
+        "source_commit_valid": true
+      },
+      "failed_paths": [],
+      "manifest_sha256": "fc0798c082f6c8e05e5cf8501fed818d7956f8c0f35b21838abf02194f98f949",
+      "passed": true,
+      "present": true,
+      "source_commit": "880eb9a0d6af71a95ea4899a2b33917013269dab"
+    },
+    "relevant_change_digest": "880ddfa5fc51ba6e6081e2c35bcb4cdabaf6a32b3aa72e45abae4260c55f2d8a",
+    "relevant_change_line_count": 0,
+    "relevant_source_clean": true,
+    "source_state_verified": true
+  },
+  "known_gap": "Other operating systems and architectures are not covered by this receipt until separately resolved, hash-locked, and replayed.",
+  "privacy_scan": {
+    "configured_pattern_hit_count": 0,
+    "passed": true
+  },
+  "protocol_amendment": {
+    "amended_utc": "2026-07-14",
+    "failed_github_run_ids": [
+      29335084468,
+      29335574945
+    ],
+    "numeric_portability_observation": {
+      "absolute_difference": 0.000905599006055829,
+      "github_run_id": 29335574945,
+      "reference_best_mase": 0.21211186326437864,
+      "relative_difference": 0.00426944062495496,
+      "ubuntu_best_mase": 0.2112062642583228
+    },
+    "policy": "Keep structural, identity, coverage, and gate assertions exact. For the XGBoost residual MASE only, accept at most 1% relative drift from the frozen reference and record the exact observed metric in every receipt.",
+    "preregistration_boundary": "This portability tolerance is a post-observation protocol amendment, not a preregistered scientific threshold. The failed runs and their receipts remain in GitHub Actions history.",
+    "reason": "The first clean Ubuntu replay exposed a missing ignored panel path; the second clean replay passed 30 of 31 assertions but measured a 0.4269440625% XGBoost CPU histogram MASE drift relative to the Windows reference while preserving the selected champion, comparison count, and every gate outcome."
+  },
+  "protocol_id": "LUMENCORE_REVIEWER_REPRODUCIBILITY_20260714",
+  "schema": "reviewer_reproducibility_capsule.v1",
+  "source_artifacts": [
+    {
+      "bytes": 4832,
+      "hash_mode": "utf8_lf",
+      "path": ".github/workflows/reviewer-reproducibility.yml",
+      "sha256": "2fa8feb63735603960688161a252d2efa68077a51b27dc48bcdfe0d99d0ae14e"
+    },
+    {
+      "bytes": 2660,
+      "hash_mode": "utf8_lf",
+      "path": ".gitignore",
+      "sha256": "72bba006cb5d77f56677464c515d3ea5fff56293542d8655f2d14cd4099d59a7"
+    },
+    {
+      "bytes": 15541,
+      "hash_mode": "utf8_lf",
+      "path": "README.md",
+      "sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56"
+    },
+    {
+      "bytes": 41939,
+      "hash_mode": "utf8_lf",
+      "path": "code/eia_grid_residual_moe_benchmark.py",
+      "sha256": "da7287501982f09856b7b5ea9b707928ad6e7be10caf45d67eaf81bf553f1452"
+    },
+    {
+      "bytes": 47916,
+      "hash_mode": "utf8_lf",
+      "path": "code/eia_grid_wave_champion_benchmark.py",
+      "sha256": "a16fc3e55c275625da24d7ea453a830b6ab8a47ea82aee4a3cb25f7fc5933bc5"
+    },
+    {
+      "bytes": 38451,
+      "hash_mode": "utf8_lf",
+      "path": "code/mda_control_mapping_open_set_benchmark.py",
+      "sha256": "da3399399f965565132c114a9fd6c667b2cd95a6e0d62808d7693f75fe63eba6"
+    },
+    {
+      "bytes": 38394,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/RUN_FAA_SDR_10K_BENCHMARK.py",
+      "sha256": "1ea879aebdd45c58778d6ebb21ee4bd1be4d071250e779d6257288979f8c20bb"
+    },
+    {
+      "bytes": 50187,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
+      "sha256": "cda60da03beefa75cf10d227b6dffe1be422a5e1531fc8b1b763fcfa805d0028"
+    },
+    {
+      "bytes": 9082,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+      "sha256": "79c03eb63443a8b9bba3cf48e206a8b44f7a9f8e8fa382a6c3b97e8ec5a1c676"
+    },
+    {
+      "bytes": 8422,
+      "hash_mode": "utf8_lf",
+      "path": "config/eia_grid_residual_moe_protocol_v1.json",
+      "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+    },
+    {
+      "bytes": 7963,
+      "hash_mode": "utf8_lf",
+      "path": "config/eia_grid_wave_champion_protocol_v1.json",
+      "sha256": "273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d"
+    },
+    {
+      "bytes": 8387,
+      "hash_mode": "utf8_lf",
+      "path": "config/mda_control_mapping_open_set_protocol_v2.json",
+      "sha256": "9a694ed6f194137880c070e73355ef826a51d3fed438ccf65adf6d4726ca80f0"
+    },
+    {
+      "bytes": 1263,
+      "hash_mode": "utf8_lf",
+      "path": "config/reviewer_protocol_provenance_v1.json",
+      "sha256": "9768865e9e1aab551aea678c871de05c1085c0e2152e93afd0309a592edae32a"
+    },
+    {
+      "bytes": 10103,
+      "hash_mode": "utf8_lf",
+      "path": "config/reviewer_reproducibility_protocol_v1.json",
+      "sha256": "c69fb78965cdf420e8354042f1e90d11c6b7dde59f0a4d9fb27d9dec58f4cb01"
+    },
+    {
+      "bytes": 114366,
+      "hash_mode": "raw",
+      "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+      "sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9"
+    },
+    {
+      "bytes": 23602,
+      "hash_mode": "utf8_lf",
+      "path": "requirements-reviewer-ubuntu-py311.lock",
+      "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
+    },
+    {
+      "bytes": 122,
+      "hash_mode": "utf8_lf",
+      "path": "requirements-reviewer.txt",
+      "sha256": "4b99049b4bc579f6d2a5a675e612f513e1a24db79775a2120e60334a0c72bbd4"
+    },
+    {
+      "bytes": 4420,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_eia_grid_residual_moe_benchmark.py",
+      "sha256": "bedbdd6527b94e71ced78482ad806eaa8a011b25a3dbfcc565748e5ca4c19b77"
+    },
+    {
+      "bytes": 8186,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_eia_grid_wave_champion_benchmark.py",
+      "sha256": "390e0399f7b1ef93a7c815b0431371ad0564579a47a40d871f0d2db1cbfe93a0"
+    },
+    {
+      "bytes": 3342,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_faa_sdr_10k_benchmark.py",
+      "sha256": "c2bbaac93e10883f30424998fa676bd69d313e4815760b97e43f84d20a86c7d5"
+    },
+    {
+      "bytes": 4263,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_mda_control_mapping_open_set_benchmark.py",
+      "sha256": "73984c678cc488ec722c01795573559a0637f0abf2e16da92b3c7bd8790cb840"
+    },
+    {
+      "bytes": 3697,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_reviewer_dependency_lock.py",
+      "sha256": "cc10d035ef2712e41292ceec6b5fa93df93dfcb2145ab9b6d323b00b4d87d09f"
+    },
+    {
+      "bytes": 15577,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_reviewer_reproducibility_capsule.py",
+      "sha256": "576ccc0b49cbfb8012d078c4d403e16ca17700ca3943134087517845392d3d2b"
+    }
+  ],
+  "source_chain_sha256": "abeab3e8070e63261dbbb620cf36a019bea3a4d68cd8ba1ddbceab2d9e0e447e",
+  "standards_references": [
+    {
+      "name": "NIST SP 800-218 Secure Software Development Framework 1.1",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "use": "Informative source for provenance, protected artifacts, and repeatable verification practices. This capsule is not a NIST certification or full SSDF attestation."
+    },
+    {
+      "name": "CISA 2025 Minimum Elements for a Software Bill of Materials",
+      "url": "https://www.cisa.gov/sites/default/files/2025-08/2025_CISA_SBOM_Minimum_Elements.pdf",
+      "use": "Informative public-comment-draft reference for component identity and dependency relationships. The emitted inventory is scoped to the reviewer suite and is not a complete product SBOM."
+    },
+    {
+      "name": "pip Secure Installs",
+      "url": "https://pip.pypa.io/en/stable/topics/secure-installs/",
+      "use": "Primary installer guidance for all-or-nothing hash checking, exact transitive pins, and binary-only installation."
+    },
+    {
+      "name": "uv pip compile",
+      "url": "https://docs.astral.sh/uv/pip/compile/",
+      "use": "Primary resolver documentation for the target-specific, hash-emitting lock generation command recorded in the lock header."
+    }
+  ],
+  "status": "BOUNDED_REPRODUCIBILITY_PASS",
+  "suites": [
+    {
+      "assertions": [
+        {
+          "actual": 14704,
+          "assertion_id": "panel_rows",
+          "expected": 14704,
+          "passed": true
+        },
+        {
+          "actual": 1525,
+          "assertion_id": "holdout_rows",
+          "expected": 1525,
+          "passed": true
+        },
+        {
+          "actual": 8,
+          "assertion_id": "holdout_authorities",
+          "expected": 8,
+          "passed": true
+        },
+        {
+          "actual": "lissajous_phase_paths",
+          "assertion_id": "selected_candidate",
+          "expected": "lissajous_phase_paths",
+          "passed": true
+        },
+        {
+          "actual": "autoregressive_ridge_p14",
+          "assertion_id": "best_strategy",
+          "expected": "autoregressive_ridge_p14",
+          "passed": true
+        },
+        {
+          "absolute_difference": 4.440892098500626e-16,
+          "absolute_tolerance": 1e-06,
+          "actual": 0.4794593727181179,
+          "assertion_id": "best_mase",
+          "expected": 0.47945937271811834,
+          "passed": true,
+          "relative_difference": 9.262290719909434e-16
+        },
+        {
+          "absolute_difference": 2.220446049250313e-16,
+          "absolute_tolerance": 1e-06,
+          "actual": 1.2535086832250912,
+          "assertion_id": "kuramoto_mase",
+          "expected": 1.253508683225091,
+          "passed": true,
+          "relative_difference": 1.7713846572944643e-16
+        },
+        {
+          "actual": false,
+          "assertion_id": "promotion_gate_passed",
+          "expected": false,
+          "passed": true
+        },
+        {
+          "actual": false,
+          "assertion_id": "field_validation_complete",
+          "expected": false,
+          "passed": true
+        }
+      ],
+      "elapsed_seconds": 22.711,
+      "fact_projection": {
+        "baseline_comparison_count": 6,
+        "best_mase": 0.4794593727181179,
+        "best_strategy": "autoregressive_ridge_p14",
+        "evaluation_rows": 22530,
+        "field_validation_complete": false,
+        "kuramoto_mase": 1.2535086832250912,
+        "promotion_gate_passed": false,
+        "selected_candidate": "lissajous_phase_paths"
+      },
+      "fact_projection_sha256": "11bcfa0fe7bf90634e9a960669181c55091342f46ce8b19655fdc7653a43f3a7",
+      "kind": "measured_public_data_replay",
+      "passed": true,
+      "runner": "eia_wave",
+      "suite_id": "eia_wave_frozen_holdout"
+    },
+    {
+      "assertions": [
+        {
+          "actual": 14704,
+          "assertion_id": "panel_rows",
+          "expected": 14704,
+          "passed": true
+        },
+        {
+          "actual": 1176,
+          "assertion_id": "holdout_rows",
+          "expected": 1176,
+          "passed": true
+        },
+        {
+          "actual": 8,
+          "assertion_id": "holdout_authorities",
+          "expected": 8,
+          "passed": true
+        },
+        {
+          "actual": "xgboost_residual",
+          "assertion_id": "selected_candidate",
+          "expected": "xgboost_residual",
+          "passed": true
+        },
+        {
+          "actual": "xgboost_residual",
+          "assertion_id": "best_strategy",
+          "expected": "xgboost_residual",
+          "passed": true
+        },
+        {
+          "absolute_difference": 0.0009055990060558294,
+          "actual": 0.2112062642583228,
+          "assertion_id": "best_mase",
+          "expected": 0.21211186326437864,
+          "passed": true,
+          "relative_difference": 0.004269440624954959,
+          "relative_tolerance": 0.01
+        },
+        {
+          "actual": 6,
+          "assertion_id": "baseline_comparison_count",
+          "expected": 6,
+          "passed": true
+        },
+        {
+          "actual": false,
+          "assertion_id": "promotion_gate_passed",
+          "expected": false,
+          "passed": true
+        },
+        {
+          "actual": false,
+          "assertion_id": "coverage_gate_passed",
+          "expected": false,
+          "passed": true
+        },
+        {
+          "actual": false,
+          "assertion_id": "field_validation_complete",
+          "expected": false,
+          "passed": true
+        }
+      ],
+      "elapsed_seconds": 7.511,
+      "fact_projection": {
+        "baseline_comparison_count": 6,
+        "best_mase": 0.2112062642583228,
+        "best_strategy": "xgboost_residual",
+        "coverage_gate_passed": false,
+        "evaluation_rows": 16975,
+        "field_validation_complete": false,
+        "holm_positive_point_improvement_count": 6,
+        "promotion_gate_passed": false,
+        "selected_candidate": "xgboost_residual"
+      },
+      "fact_projection_sha256": "d2052b0fee6fd7b2ae89285084c4dd46fb3500fb3c998073a3b27976bb147eed",
+      "kind": "measured_public_data_replay",
+      "passed": true,
+      "runner": "eia_residual",
+      "suite_id": "eia_residual_frozen_holdout"
+    },
+    {
+      "assertions": [
+        {
+          "actual": 128,
+          "assertion_id": "fixture_count",
+          "expected": 128,
+          "passed": true
+        },
+        {
+          "actual": 36,
+          "assertion_id": "holdout_count",
+          "expected": 36,
+          "passed": true
+        },
+        {
+          "absolute_difference": 0.0,
+          "absolute_tolerance": 1e-12,
+          "actual": 0.9433962264150945,
+          "assertion_id": "candidate_micro_f1",
+          "expected": 0.9433962264150945,
+          "passed": true,
+          "relative_difference": 0.0
+        },
+        {
+          "absolute_difference": 0.0,
+          "absolute_tolerance": 1e-12,
+          "actual": 0.9583333333333334,
+          "assertion_id": "candidate_supported_coverage",
+          "expected": 0.9583333333333334,
+          "passed": true,
+          "relative_difference": 0.0
+        },
+        {
+          "absolute_difference": 0.0,
+          "absolute_tolerance": 1e-12,
+          "actual": 0.0,
+          "assertion_id": "candidate_unsupported_mapping_rate",
+          "expected": 0.0,
+          "passed": true,
+          "relative_difference": 0.0
+        },
+        {
+          "actual": false,
+          "assertion_id": "promotion_gate_passed",
+          "expected": false,
+          "passed": true
+        },
+        {
+          "actual": false,
+          "assertion_id": "operational_or_field_claim_allowed",
+          "expected": false,
+          "passed": true
+        }
+      ],
+      "elapsed_seconds": 0.072,
+      "fact_projection": {
+        "candidate_micro_f1": 0.9433962264150945,
+        "candidate_supported_coverage": 0.9583333333333334,
+        "candidate_unsupported_mapping_rate": 0.0,
+        "fixture_chain_sha256": "25f32a2e03157f6f058f1022bec7d0f0ea151991fc4e1c68d0b91fe59b1e278e",
+        "fixture_count": 128,
+        "holdout_count": 36,
+        "operational_or_field_claim_allowed": false,
+        "promotion_gate_passed": false
+      },
+      "fact_projection_sha256": "6cbbc86400aa77f0305dd13c3d08b9a46dce26e731b96aade2abf2933d7f56e4",
+      "kind": "deterministic_synthetic_falsification_replay",
+      "passed": true,
+      "runner": "mda_open_set",
+      "suite_id": "mda_open_set_v2"
+    }
+  ],
+  "summary": {
+    "agency_certification_complete": false,
+    "artifact_hash_lock_complete": true,
+    "assertion_count": 31,
+    "assertion_pass_count": 31,
+    "authoritative_runtime_match": true,
+    "clean_runner_replay": true,
+    "cross_platform_artifact_hash_lock_complete": false,
+    "dependency_closure_exact_match": true,
+    "dependency_count": 8,
+    "dependency_lock_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+    "dependency_version_match_count": 8,
+    "dependency_versions_exact_match": true,
+    "deterministic_environment_match": true,
+    "external_validation_complete": false,
+    "fixture_tests_executed": true,
+    "fixture_tests_passed": true,
+    "frozen_input_passed": true,
+    "locked_package_count": 18,
+    "relevant_source_clean": true,
+    "sbom_component_count": 18,
+    "source_state_mode": "release_manifest",
+    "source_state_verified": true,
+    "suite_count": 3,
+    "suite_pass_count": 3
+  }
+}

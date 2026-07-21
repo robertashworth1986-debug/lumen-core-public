@@ -9,7 +9,7 @@ Not peer reviewed. No external validation or CODECHECK certificate has been issu
 
 Computational claims are difficult to evaluate when source code, inputs, dependency versions, expected outputs, and failed decision gates are separated across a large project. This paper defines a narrow, public, executable capsule that packages two frozen benchmarks derived from U.S. Energy Information Administration Form EIA-930 data and one deterministic synthetic falsification suite. The capsule declares six output files and 31 bounded assertions. It also records exact dependency closure, source hashes, environment controls, a scoped software bill of materials, and negative promotion outcomes.
 
-An author-operated replay on Ubuntu 24.04 x86-64 with CPython 3.11.9 reproduced all three suites and all 31 assertions from a clean checkout with networking disabled. This result establishes first-party executable reproducibility only. It does not establish independent reproduction, scientific validity, field performance, agency approval, realized savings, patent scope, profitable trading, or company valuation. The capsule is prepared for independent execution through the CODECHECK community workflow, but no external request, assignment, execution, or certificate is claimed in this draft.
+An author-operated rebuild from a deterministic source ZIP in a digest-pinned Ubuntu 24.04 x86-64 container with CPython 3.11.9 reproduced all three suites, all 31 assertions, and all 28 selected fixture tests with execution networking disabled. This result establishes first-party executable reproducibility only. It does not establish independent reproduction, scientific validity, field performance, agency approval, realized savings, patent scope, profitable trading, or company valuation. The capsule is prepared for independent execution through the CODECHECK community workflow, but no external request, assignment, execution, or certificate is claimed in this draft.
 
 ## 1. Research Question And Claim Boundary
 
@@ -41,7 +41,7 @@ The third suite uses 128 deterministic synthetic fixtures for open-set control m
 
 ### 3.1 Environment control
 
-The authoritative environment is Ubuntu 24.04 x86-64 with CPython 3.11.9 and glibc 2.39. A separate fail-closed verifier directly reads the OS release, architecture, Python and libc versions, deterministic environment variables, and dependency-lock hash. Dependencies are installed from `requirements-reviewer-ubuntu-py311.lock` using `--require-hashes` and `--only-binary=:all:`. The runner then checks the installed transitive closure, package versions, frozen-input hash, source-artifact chain, and privacy patterns before issuing a bounded receipt.
+The authoritative environment is Ubuntu 24.04 x86-64 with CPython 3.11.9 and glibc 2.39. The public container recipe pins the Ubuntu platform manifest, uv archive hash and version, Python version, and binary-only dependency lock. Execution uses no network, a read-only root filesystem, dropped Linux capabilities, `no-new-privileges`, bounded memory, CPU, and process limits, and separate read-only input and writable output mounts. A fail-closed verifier reads the OS release, architecture, Python and libc versions, deterministic environment variables, dependency-lock hash, release-manifest hashes, and source provenance before issuing a bounded receipt.
 
 ### 3.2 Execution
 
@@ -116,21 +116,22 @@ After observing that difference, the protocol was amended to permit at most one 
 
 ## 6. Author-Operated Reproducibility Evidence
 
-The current public author receipt records an isolated, network-disabled replay of source commit `be7776f78af659f56c11a89bef0aab8ca07d5c18` under the authoritative Linux and Python environment:
+The current public author receipts record a no-cache rebuild of deterministic source bundle `ae413b6ecf8cca226bbffa8eb29c99e8a932ccee1ac88539e7301e90b5587ba4` from source commit `880eb9a0d6af71a95ea4899a2b33917013269dab` under the authoritative Linux and Python environment:
 
 - Relevant source clean: true
 - Exact dependency closure: true
-- Fixture tests passed: true
+- Fixture tests passed: 28 of 28 selected tests
 - Suites passed: 3 of 3
 - Assertions passed: 31 of 31
 - External validation complete: false
-- Receipt SHA-256: `8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351`
-- Capsule SHA-256: `8b7e56df13844b070d35956c94d5801754c110d639ac56d412509cf58f9493de`
-- Source-chain SHA-256: `ca04c902d143c89f1ae9bf089447be241060ef39c504199d5a865d219760679c`
+- Container receipt SHA-256: `02879eb7f650256935325cfb09e391ac61658c321823b53fd24aeec226a801ec`
+- Capsule receipt SHA-256: `9e5153953f3f6fac77dca9107908a4834d9d16dad022413d0e39d36033ff2f03`
+- Capsule payload SHA-256: `73e868b194f1c90539f01290e754a15557ec741e59a5cb5c573608abce737b03`
+- Source-chain SHA-256: `abeab3e8070e63261dbbb620cf36a019bea3a4d68cd8ba1ddbceab2d9e0e447e`
 
 This is first-party evidence. An independent codechecker must execute the reviewed source and document what was checked, how it was checked, and what was reproduced before any external claim changes.
 
-The companion runtime receipt binds the environment claim to 10/10 measured checks: Ubuntu 24.04, Linux, x86-64, CPython 3.11.9, glibc 2.39, five deterministic environment values, and the exact dependency-lock hash. That receipt is also operator-controlled and leaves independent execution and external validation false.
+The companion runtime receipt binds the environment claim to 10/10 measured checks: Ubuntu 24.04, Linux, x86-64, CPython 3.11.9, glibc 2.39, five deterministic environment values, and the exact dependency-lock hash. The container receipt cross-locks that runtime receipt, the capsule receipt, release manifest, source bundle, recipe hashes, and isolation controls. All are operator-controlled and leave independent execution and external validation false.
 
 ## 7. Limitations
 

@@ -1,0 +1,90 @@
+{
+  "checks": {
+    "deterministic_environment": true,
+    "libc_name": true,
+    "libc_version": true,
+    "machine": true,
+    "os_release_id": true,
+    "os_release_version_id": true,
+    "python": true,
+    "requirements_lock_present": true,
+    "requirements_lock_sha256": true,
+    "system": true
+  },
+  "claim_boundary": "This first-party runtime receipt verifies only the named operating-system, architecture, Python, libc, deterministic environment variables, dependency-lock hash, and verifier source identity. It is not an independent execution, CODECHECK certificate, scientific validation, field validation, performance endorsement, or valuation evidence.",
+  "expected": {
+    "environment": {
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PYTHONHASHSEED": "0",
+      "TZ": "UTC"
+    },
+    "github_image": "ubuntu-24.04",
+    "libc": {
+      "name": "glibc",
+      "version": "2.39"
+    },
+    "machine": "x86_64",
+    "os_release": {
+      "id": "ubuntu",
+      "version_id": "24.04"
+    },
+    "python": "3.11.9",
+    "requirements_lock": {
+      "path": "requirements-reviewer-ubuntu-py311.lock",
+      "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
+    },
+    "system": "Linux"
+  },
+  "external_validation_complete": false,
+  "generated_utc": "2026-07-21T16:28:23.480158+00:00",
+  "independent_execution_complete": false,
+  "observed": {
+    "environment": {
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PYTHONHASHSEED": "0",
+      "TZ": "UTC"
+    },
+    "libc": {
+      "name": "glibc",
+      "version": "2.39"
+    },
+    "machine": "x86_64",
+    "os_release": {
+      "id": "ubuntu",
+      "version_id": "24.04"
+    },
+    "python": "3.11.9",
+    "system": "Linux"
+  },
+  "operator_controlled": true,
+  "passed": true,
+  "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_RUNTIME_20260721",
+  "receipt_payload_sha256": "e6cfba1532177e3b68ca8f06b4bcf6f954ce3e8ae6f22e398e993153749e1a20",
+  "requirements_lock_observed_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+  "schema": "codecheck_reviewer_runtime_receipt.v1",
+  "source": {
+    "files": [
+      {
+        "bytes": 8205,
+        "path": "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+        "sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c"
+      },
+      {
+        "bytes": 1480,
+        "path": "config/codecheck_reviewer_runtime_v1.json",
+        "sha256": "23a850097ef9da3cf112920595dddcea3afb22d3d4b9f5d70d37b099c7da359e"
+      }
+    ],
+    "git_metadata_available": false,
+    "relevant_change_line_count": null,
+    "relevant_source_clean_observed": null,
+    "repository_commit_declared_by_operator": "880eb9a0d6af71a95ea4899a2b33917013269dab",
+    "repository_commit_observed": null,
+    "source_chain_sha256": "57adecf2afae8caa33f7c0b308355c1d57d9b540b583a57ffce5b0a50068d19e"
+  },
+  "status": "AUTHORITATIVE_RUNTIME_PASS"
+}
