@@ -51,6 +51,8 @@ The second command is the complete focused suite. It checks canonical hashing, a
 
 The lattice is derived only from the verifier report: red means integrity failure, amber means valid evidence with open authority gates, and green is available only when integrity is valid and every required gate passes. The visualization is not a performance score.
 
+The macro, meso, and micro layers reuse one receipt-derived seed across three nested projections of a bounded tesseract contract: 16 vertices, 32 edges, and eight edges for each of four mathematical dimensions. This is a deterministic visual encoding of custody scale and authority state. It does not claim a measured physical fourth dimension, a scientific fractal dimension, engineering performance, or external certification.
+
 ## Claim Boundary
 
 This tool verifies declared receipt integrity, repository artifact identity, internal manifest consistency, and fail-closed gate logic. SHA-256 does not authenticate the receipt author. ProofLock does not independently validate the truth of an arbitrary claim, establish patent rights, certify safety or security, authorize external action, or replace qualified engineering, legal, regulatory, or scientific review.

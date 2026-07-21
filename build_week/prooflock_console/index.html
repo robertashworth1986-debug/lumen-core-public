@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="light">
   <title>ProofLock Console</title>
   <link rel="icon" href="prooflock_favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=20260719.1">
-  <link rel="stylesheet" href="prooflock_lattice.css">
+  <link rel="stylesheet" href="styles.css?v=20260721.2">
+  <link rel="stylesheet" href="prooflock_lattice.css?v=20260721.2">
 </head>
 <body>
   <header class="appbar">
@@ -60,9 +60,21 @@
     <section class="lattice-band" aria-labelledby="latticeHeading">
       <canvas id="evidenceLattice" aria-hidden="true"></canvas>
       <div class="lattice-copy">
-        <p class="lattice-kicker">Deterministic receipt state</p>
-        <h2 id="latticeHeading">Evidence lattice</h2>
+        <p class="lattice-kicker">Macro-to-micro deterministic state</p>
+        <h2 id="latticeHeading">Custody hyperlattice</h2>
         <p id="latticeStatus" aria-live="polite">Awaiting canonical verification.</p>
+      </div>
+      <div class="lattice-axis" aria-hidden="true">
+        <span>Source</span>
+        <i></i>
+        <span>Receipt</span>
+        <i></i>
+        <span>Authority</span>
+        <i></i>
+        <span>Decision</span>
+      </div>
+      <div class="lattice-scale" aria-hidden="true">
+        <span>Macro</span><i></i><span>Meso</span><i></i><span>Micro</span>
       </div>
       <p class="lattice-boundary">Visual state represents receipt integrity and authority gates, not engineering performance or certification.</p>
     </section>
@@ -135,6 +147,6 @@
     <p id="verificationLive" class="sr-only" aria-live="polite">Awaiting verification.</p>
   </main>
 
-  <script src="bootstrap.js?v=20260719.1" type="module"></script>
+  <script src="bootstrap.js?v=20260721.2" type="module"></script>
 </body>
 </html>

@@ -12,8 +12,25 @@
     HOLD: 0xf3b84b,
     PROMOTE: 0x55e0a3,
     CYAN: 0x49d9e8,
+    ICE: 0xc8fbff,
+    BLUE: 0x6298ff,
+    MINT: 0x6ff2bb,
+    GRAPHITE: 0x24434b,
     INK: 0x07131b,
   });
+
+  const TESSERACT_VERTICES = Object.freeze(Array.from({ length: 16 }, (_unused, index) => Object.freeze([
+    index & 1 ? 1 : -1,
+    index & 2 ? 1 : -1,
+    index & 4 ? 1 : -1,
+    index & 8 ? 1 : -1,
+  ])));
+  const TESSERACT_EDGES = Object.freeze(TESSERACT_VERTICES.flatMap((_vertex, start) => (
+    [0, 1, 2, 3]
+      .map((dimension) => [start, start ^ (1 << dimension), dimension])
+      .filter(([_start, end]) => end > start)
+      .map((edge) => Object.freeze(edge))
+  )));
 
   const runtime = {
     canvas: null,
@@ -34,6 +51,7 @@
     paused: true,
     hidden: false,
     pointer: { x: 0, y: 0 },
+    hyperFrames: [],
     phase: "idle",
     guidedRunning: false,
     listeners: [],
@@ -58,6 +76,29 @@
       mixed ^= mixed + Math.imul(mixed ^ (mixed >>> 7), mixed | 61);
       return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
     };
+  }
+
+  function rotatePair(first, second, angle) {
+    const cosine = Math.cos(angle);
+    const sine = Math.sin(angle);
+    return [first * cosine - second * sine, first * sine + second * cosine];
+  }
+
+  function projectTesseract(angle = 0, scale = 1, phase = 0) {
+    const vertices = TESSERACT_VERTICES.map((source) => {
+      let [x, y, z, w] = source;
+      [x, w] = rotatePair(x, w, angle * 0.91 + phase);
+      [y, w] = rotatePair(y, w, angle * 0.67 + phase * 0.71);
+      [z, w] = rotatePair(z, w, angle * 0.47 - phase * 0.37);
+      [x, y] = rotatePair(x, y, angle * 0.11 + phase * 0.19);
+      const perspective = 3.35 / Math.max(1.65, 4.15 - w);
+      return Object.freeze({
+        x: x * perspective * scale,
+        y: y * perspective * scale,
+        z: z * perspective * scale,
+      });
+    });
+    return Object.freeze({ vertices, edges: TESSERACT_EDGES });
   }
 
   function deriveVisualState(report) {
@@ -99,9 +140,9 @@
       return {
         id: String(artifact.artifact_id || `artifact-${index + 1}`),
         status: artifact.hash_matches ? "PASS" : "FAIL",
-        x: -2.9 + ratio * 5.8 + jitter,
-        y: Math.sin(ratio * Math.PI * 1.4 - 0.6) * 0.8 + (random() - 0.5) * 0.25,
-        z: Math.cos(ratio * Math.PI * 1.8) * 0.55 + (random() - 0.5) * 0.22,
+        x: -1.72 + ratio * 3.44 + jitter * 0.55,
+        y: Math.sin(ratio * Math.PI * 1.5 - 0.7) * 0.62 + (random() - 0.5) * 0.18,
+        z: Math.cos(ratio * Math.PI * 1.9) * 0.72 + (random() - 0.5) * 0.18,
       };
     });
     const gates = (report?.gates || receipt?.gates || []).map((gate, index) => ({
@@ -124,7 +165,7 @@
     if (phase === "restored") return "Canonical receipt restored and verified; promotion remains held.";
     if (model.state === "FAIL") return "Integrity failed. The evidence lattice is fractured.";
     if (model.state === "PROMOTE") return "Integrity verified and all required gates are clear.";
-    return "Integrity verified. The amber containment ring holds promotion at open gates.";
+    return "Integrity verified. The amber authority torus holds promotion at open gates.";
   }
 
   function disposeMaterial(material) {
@@ -144,6 +185,7 @@
     runtime.scene.remove(runtime.sceneGroup);
     disposeObject(runtime.sceneGroup);
     runtime.sceneGroup = null;
+    runtime.hyperFrames = [];
   }
 
   function colorForStatus(status) {
@@ -156,17 +198,207 @@
     if (points.length < 2) return;
     const curvePoints = points.map((point) => new THREE.Vector3(point.x, point.y + offset, point.z));
     const curve = new THREE.CatmullRomCurve3(curvePoints, false, "catmullrom", 0.35);
-    const geometry = new THREE.TubeGeometry(curve, runtime.profile.curveSegments, 0.045, 8, false);
+    const geometry = new THREE.TubeGeometry(curve, runtime.profile.curveSegments, 0.026, 6, false);
     const material = new THREE.MeshStandardMaterial({
       color,
       emissive: color,
-      emissiveIntensity: 0.38,
-      metalness: 0.35,
-      roughness: 0.32,
+      emissiveIntensity: 0.62,
+      metalness: 0.5,
+      roughness: 0.24,
       transparent: true,
       opacity,
     });
     group.add(new THREE.Mesh(geometry, material));
+  }
+
+  function createHyperFrame(THREE, group, model, options) {
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(TESSERACT_EDGES.length * 6);
+    const colors = new Float32Array(TESSERACT_EDGES.length * 6);
+    const dimensionColors = [COLORS.CYAN, COLORS.BLUE, COLORS.MINT, colorForStatus(model.state)];
+    TESSERACT_EDGES.forEach(([_start, _end, dimension], edgeIndex) => {
+      const color = new THREE.Color(dimensionColors[dimension]);
+      const offset = edgeIndex * 6;
+      colors.set([color.r, color.g, color.b, color.r, color.g, color.b], offset);
+    });
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    const material = new THREE.LineBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      opacity: options.opacity,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const frame = new THREE.LineSegments(geometry, material);
+    frame.name = `hyperframe-${options.label}`;
+    frame.userData = {
+      phase: options.phase,
+      scale: options.scale,
+      speed: options.speed,
+    };
+    runtime.hyperFrames.push(frame);
+    group.add(frame);
+    return frame;
+  }
+
+  function updateHyperFrames(now = 0) {
+    runtime.hyperFrames.forEach((frame) => {
+      const motion = runtime.profile?.animate ? now * frame.userData.speed : 0.72;
+      const projection = projectTesseract(motion, frame.userData.scale, frame.userData.phase);
+      const positions = frame.geometry.getAttribute("position");
+      projection.edges.forEach(([start, end], edgeIndex) => {
+        const first = projection.vertices[start];
+        const second = projection.vertices[end];
+        const offset = edgeIndex * 6;
+        positions.array.set([first.x, first.y, first.z, second.x, second.y, second.z], offset);
+      });
+      positions.needsUpdate = true;
+    });
+  }
+
+  function addPolyhedralContainment(THREE, group, model) {
+    const solid = new THREE.DodecahedronGeometry(3.08, 0);
+    const geometry = new THREE.EdgesGeometry(solid, 1);
+    solid.dispose();
+    const shell = new THREE.LineSegments(
+      geometry,
+      new THREE.LineBasicMaterial({
+        color: colorForStatus(model.state),
+        transparent: true,
+        opacity: model.state === "FAIL" ? 0.18 : 0.28,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      }),
+    );
+    shell.name = "containment-shell";
+    shell.scale.set(1, 0.78, 0.92);
+    shell.rotation.set(0.18, 0.28, 0.08);
+    group.add(shell);
+  }
+
+  function addAuthorityRing(THREE, group, model) {
+    const ring = new THREE.Group();
+    ring.name = "authority-ring";
+    ring.rotation.set(0.92, 0.18, -0.2);
+    const guide = new THREE.Mesh(
+      new THREE.TorusGeometry(2.72, 0.012, 4, 96),
+      new THREE.MeshBasicMaterial({ color: COLORS.GRAPHITE, transparent: true, opacity: 0.72 }),
+    );
+    ring.add(guide);
+    const gateCount = Math.max(model.gates.length, 1);
+    model.gates.forEach((gate, index) => {
+      const full = (Math.PI * 2) / gateCount;
+      const gap = gate.status === "PASS" ? 0.08 : 0.19;
+      const arc = Math.max(0.12, full - gap);
+      const segment = new THREE.Mesh(
+        new THREE.TorusGeometry(2.72, gate.status === "PASS" ? 0.022 : 0.04, 5, 28, arc),
+        new THREE.MeshBasicMaterial({
+          color: colorForStatus(gate.status),
+          transparent: true,
+          opacity: gate.status === "PASS" ? 0.68 : 0.96,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+      );
+      segment.rotation.z = index * full + gap * 0.5;
+      ring.add(segment);
+    });
+    group.add(ring);
+  }
+
+  function addDecisionCore(THREE, group, model) {
+    const color = colorForStatus(model.state);
+    const core = new THREE.Group();
+    core.name = "decision-core";
+    const outerSolid = new THREE.OctahedronGeometry(0.54, 0);
+    const outerEdges = new THREE.EdgesGeometry(outerSolid);
+    outerSolid.dispose();
+    core.add(new THREE.LineSegments(
+      outerEdges,
+      new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.96 }),
+    ));
+    const innerSolid = new THREE.IcosahedronGeometry(0.24, 0);
+    const innerEdges = new THREE.EdgesGeometry(innerSolid);
+    innerSolid.dispose();
+    core.add(new THREE.LineSegments(
+      innerEdges,
+      new THREE.LineBasicMaterial({ color: COLORS.ICE, transparent: true, opacity: 0.82 }),
+    ));
+    [
+      [Math.PI / 2, 0, 0],
+      [0, Math.PI / 2, 0],
+      [Math.PI / 4, Math.PI / 4, 0],
+    ].forEach((rotation, index) => {
+      const orbit = new THREE.Mesh(
+        new THREE.TorusGeometry(0.72 + index * 0.08, 0.01, 4, 56),
+        new THREE.MeshBasicMaterial({ color: index === 2 ? color : COLORS.CYAN, transparent: true, opacity: 0.48 }),
+      );
+      orbit.rotation.set(...rotation);
+      core.add(orbit);
+    });
+    group.add(core);
+  }
+
+  function addArtifactSpine(THREE, group, model) {
+    const fallbackPoints = [
+      { x: -1.7, y: -0.38, z: 0.18 },
+      { x: -0.58, y: 0.48, z: 0.62 },
+      { x: 0.58, y: 0.42, z: -0.48 },
+      { x: 1.7, y: -0.24, z: 0.2 },
+    ];
+    const points = model.artifacts.length > 1 ? model.artifacts : fallbackPoints;
+    const primaryColor = colorForStatus(model.state);
+    addRibbon(THREE, group, points, primaryColor, model.state === "FAIL" ? 0.66 : 0.9);
+    addRibbon(THREE, group, points, COLORS.CYAN, model.state === "FAIL" ? 0.18 : 0.36, 0.1);
+
+    model.artifacts.forEach((artifact, index) => {
+      const node = new THREE.Group();
+      node.position.set(artifact.x, artifact.y, artifact.z);
+      const color = colorForStatus(artifact.status);
+      const solid = new THREE.IcosahedronGeometry(0.17 + (index % 2) * 0.025, 0);
+      const edges = new THREE.EdgesGeometry(solid);
+      solid.dispose();
+      node.add(new THREE.LineSegments(
+        edges,
+        new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.96 }),
+      ));
+      const halo = new THREE.Mesh(
+        new THREE.TorusGeometry(0.28, 0.009, 4, 36),
+        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.56 }),
+      );
+      halo.rotation.x = Math.PI / 2;
+      node.add(halo);
+      group.add(node);
+    });
+  }
+
+  function addScaleField(THREE, group, model) {
+    createHyperFrame(THREE, group, model, { label: "macro", scale: 2.08, opacity: 0.34, phase: 0.08, speed: 0.000055 });
+    createHyperFrame(THREE, group, model, { label: "meso", scale: 1.26, opacity: 0.64, phase: 0.62, speed: -0.000082 });
+    createHyperFrame(THREE, group, model, { label: "micro", scale: 0.62, opacity: 0.92, phase: 1.12, speed: 0.00012 });
+    updateHyperFrames(0);
+
+    const random = seededRandom(model.seed ^ 0xa5a5a5a5);
+    const particlePositions = new Float32Array(runtime.profile.particleCount * 3);
+    const shellRadii = [0.78, 1.58, 2.72];
+    for (let index = 0; index < runtime.profile.particleCount; index += 1) {
+      const shell = shellRadii[index % shellRadii.length];
+      const radius = shell + (random() - 0.5) * 0.18;
+      const angle = random() * Math.PI * 2;
+      const elevation = (random() - 0.5) * Math.PI;
+      particlePositions[index * 3] = Math.cos(angle) * Math.cos(elevation) * radius;
+      particlePositions[index * 3 + 1] = Math.sin(elevation) * radius * 0.72;
+      particlePositions[index * 3 + 2] = Math.sin(angle) * Math.cos(elevation) * radius;
+    }
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
+    const particles = new THREE.Points(
+      particleGeometry,
+      new THREE.PointsMaterial({ color: COLORS.ICE, size: 0.018, transparent: true, opacity: 0.34 }),
+    );
+    particles.name = "proof-particles";
+    group.add(particles);
   }
 
   function rebuildThree(model) {
@@ -174,102 +406,14 @@
     if (!THREE || !runtime.scene) return;
     clearThreeScene();
     const group = new THREE.Group();
-    group.rotation.x = -0.16;
+    group.rotation.x = -0.08;
     runtime.scene.add(group);
     runtime.sceneGroup = group;
-
-    const fallbackPoints = [
-      { x: -2.9, y: -0.4, z: 0.1 },
-      { x: -1.0, y: 0.6, z: 0.5 },
-      { x: 1.0, y: 0.4, z: -0.35 },
-      { x: 2.9, y: -0.25, z: 0.15 },
-    ];
-    const points = model.artifacts.length > 1 ? model.artifacts : fallbackPoints;
-    const primaryColor = colorForStatus(model.state);
-    addRibbon(THREE, group, points, primaryColor, model.state === "FAIL" ? 0.62 : 0.88);
-    addRibbon(THREE, group, points, COLORS.CYAN, model.state === "FAIL" ? 0.18 : 0.34, 0.15);
-
-    if (model.artifacts.length > 1) {
-      const positions = [];
-      model.artifacts.forEach((artifact) => positions.push(artifact.x, artifact.y, artifact.z));
-      const lineGeometry = new THREE.BufferGeometry();
-      lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-      const lineMaterial = new THREE.LineBasicMaterial({ color: primaryColor, transparent: true, opacity: 0.5 });
-      group.add(new THREE.Line(lineGeometry, lineMaterial));
-    }
-
-    model.artifacts.forEach((artifact, index) => {
-      const node = new THREE.Group();
-      node.position.set(artifact.x, artifact.y, artifact.z);
-      const color = colorForStatus(artifact.status);
-      const geometry = new THREE.IcosahedronGeometry(0.22 + (index % 2) * 0.04, 1);
-      const material = new THREE.MeshPhysicalMaterial({
-        color,
-        emissive: color,
-        emissiveIntensity: artifact.status === "PASS" ? 0.45 : 0.7,
-        metalness: 0.45,
-        roughness: 0.2,
-        clearcoat: 0.6,
-      });
-      node.add(new THREE.Mesh(geometry, material));
-      const halo = new THREE.Mesh(
-        new THREE.TorusGeometry(0.34, 0.012, 6, 40),
-        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.7 }),
-      );
-      halo.rotation.x = Math.PI / 2;
-      node.add(halo);
-      group.add(node);
-    });
-
-    const gateCount = Math.max(model.gates.length, 1);
-    model.gates.forEach((gate, index) => {
-      const full = (Math.PI * 2) / gateCount;
-      const start = index * full + 0.055;
-      const length = Math.max(0.12, full - (gate.status === "PASS" ? 0.075 : 0.2));
-      const color = colorForStatus(gate.status);
-      const segment = new THREE.Mesh(
-        new THREE.RingGeometry(3.28, 3.36, 56, 1, start, length),
-        new THREE.MeshBasicMaterial({
-          color,
-          side: THREE.DoubleSide,
-          transparent: true,
-          opacity: gate.status === "PASS" ? 0.7 : 0.95,
-        }),
-      );
-      segment.rotation.x = -0.42;
-      segment.rotation.z = 0.16;
-      group.add(segment);
-    });
-
-    const containment = new THREE.Mesh(
-      new THREE.SphereGeometry(3.65, 32, 20),
-      new THREE.MeshBasicMaterial({
-        color: primaryColor,
-        wireframe: true,
-        transparent: true,
-        opacity: model.state === "PROMOTE" ? 0.14 : model.state === "FAIL" ? 0.1 : 0.075,
-      }),
-    );
-    containment.scale.y = 0.56;
-    group.add(containment);
-
-    const random = seededRandom(model.seed ^ 0xa5a5a5a5);
-    const particlePositions = new Float32Array(runtime.profile.particleCount * 3);
-    for (let index = 0; index < runtime.profile.particleCount; index += 1) {
-      const radius = 1.2 + random() * 3.2;
-      const angle = random() * Math.PI * 2;
-      particlePositions[index * 3] = Math.cos(angle) * radius;
-      particlePositions[index * 3 + 1] = (random() - 0.5) * 3.2;
-      particlePositions[index * 3 + 2] = Math.sin(angle) * radius;
-    }
-    const particleGeometry = new THREE.BufferGeometry();
-    particleGeometry.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
-    const particles = new THREE.Points(
-      particleGeometry,
-      new THREE.PointsMaterial({ color: COLORS.CYAN, size: 0.025, transparent: true, opacity: 0.38 }),
-    );
-    particles.name = "proof-particles";
-    group.add(particles);
+    addScaleField(THREE, group, model);
+    addPolyhedralContainment(THREE, group, model);
+    addAuthorityRing(THREE, group, model);
+    addArtifactSpine(THREE, group, model);
+    addDecisionCore(THREE, group, model);
   }
 
   function canvasSize() {
@@ -290,25 +434,44 @@
     if (!context || !model) return;
     const { width, height } = canvasSize();
     context.clearRect(0, 0, width, height);
-    const gradient = context.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, "#07131b");
-    gradient.addColorStop(0.58, "#0b2028");
-    gradient.addColorStop(1, "#071117");
-    context.fillStyle = gradient;
+    context.fillStyle = "#061014";
     context.fillRect(0, 0, width, height);
 
-    const centerX = width * 0.5;
-    const centerY = height * 0.52;
-    const scale = Math.min(width / 9.5, height / 5.2);
-    const pulse = runtime.profile.animate ? 1 + Math.sin(now * 0.0018) * 0.025 : 1;
+    const compact = width / Math.max(height, 1) < 1.25;
+    const centerX = width * (compact ? 0.5 : 0.67);
+    const centerY = height * (compact ? 0.58 : 0.51);
+    const scale = Math.min(width / (compact ? 7.2 : 10.2), height / 7.2);
+    const pulse = runtime.profile.animate ? 1 + Math.sin(now * 0.0012) * 0.012 : 1;
     const stateColor = model.state === "FAIL" ? "#ff5368" : model.state === "PROMOTE" ? "#55e0a3" : "#f3b84b";
+    const dimensionColors = ["#49d9e8", "#6298ff", "#6ff2bb", stateColor];
 
     context.save();
     context.translate(centerX, centerY);
     context.scale(pulse, pulse);
+
+    [
+      { scale: 2.08, phase: 0.08, alpha: 0.32 },
+      { scale: 1.26, phase: 0.62, alpha: 0.58 },
+      { scale: 0.62, phase: 1.12, alpha: 0.88 },
+    ].forEach((layer) => {
+      const angle = runtime.profile.animate ? now * 0.00006 : 0.72;
+      const projection = projectTesseract(angle, layer.scale, layer.phase);
+      projection.edges.forEach(([start, end, dimension]) => {
+        const first = projection.vertices[start];
+        const second = projection.vertices[end];
+        context.strokeStyle = dimensionColors[dimension];
+        context.lineWidth = Math.max(1, scale * (dimension === 3 ? 0.018 : 0.011));
+        context.globalAlpha = layer.alpha;
+        context.beginPath();
+        context.moveTo(first.x * scale, -first.y * scale);
+        context.lineTo(second.x * scale, -second.y * scale);
+        context.stroke();
+      });
+    });
+
+    context.globalAlpha = 0.82;
     context.strokeStyle = stateColor;
-    context.lineWidth = Math.max(2, scale * 0.028);
-    context.globalAlpha = 0.8;
+    context.lineWidth = Math.max(2, scale * 0.026);
     context.beginPath();
     model.artifacts.forEach((artifact, index) => {
       const x = artifact.x * scale;
@@ -321,10 +484,19 @@
     model.artifacts.forEach((artifact) => {
       context.fillStyle = artifact.status === "PASS" ? "#55e0a3" : "#ff5368";
       context.shadowColor = context.fillStyle;
-      context.shadowBlur = 16;
+      context.shadowBlur = 8;
       context.beginPath();
-      context.arc(artifact.x * scale, -artifact.y * scale, Math.max(5, scale * 0.12), 0, Math.PI * 2);
-      context.fill();
+      const x = artifact.x * scale;
+      const y = -artifact.y * scale;
+      const radius = Math.max(5, scale * 0.11);
+      context.moveTo(x, y - radius);
+      context.lineTo(x + radius, y);
+      context.lineTo(x, y + radius);
+      context.lineTo(x - radius, y);
+      context.closePath();
+      context.strokeStyle = context.fillStyle;
+      context.lineWidth = Math.max(1, scale * 0.014);
+      context.stroke();
     });
     context.shadowBlur = 0;
 
@@ -333,9 +505,9 @@
       const arc = (Math.PI * 2) / gateCount;
       const gap = gate.status === "PASS" ? 0.055 : 0.18;
       context.strokeStyle = gate.status === "PASS" ? "#55e0a3" : gate.status === "FAIL" ? "#ff5368" : "#f3b84b";
-      context.lineWidth = Math.max(2, scale * 0.04);
+      context.lineWidth = Math.max(2, scale * 0.032);
       context.beginPath();
-      context.arc(0, 0, scale * 3.25, index * arc + gap, (index + 1) * arc - gap);
+      context.arc(0, 0, scale * 2.72, index * arc + gap, (index + 1) * arc - gap);
       context.stroke();
     });
     context.restore();
@@ -348,7 +520,14 @@
       runtime.renderer.setPixelRatio(Math.min(root.devicePixelRatio || 1, runtime.profile.maxPixelRatio));
       runtime.renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), false);
       runtime.camera.aspect = Math.max(1, rect.width) / Math.max(1, rect.height);
+      const compact = rect.width < 700;
+      runtime.camera.position.set(0, compact ? 0.12 : 0.28, compact ? 9.8 : 9.1);
       runtime.camera.updateProjectionMatrix();
+      if (runtime.sceneGroup) {
+        runtime.sceneGroup.position.x = compact ? 0 : 1.08;
+        runtime.sceneGroup.position.y = compact ? -0.62 : 0;
+        runtime.sceneGroup.scale.setScalar(compact ? 0.82 : 1);
+      }
       runtime.renderer.render(runtime.scene, runtime.camera);
     } else {
       drawCanvas(performance.now());
@@ -377,14 +556,22 @@
 
     if (runtime.frameNumber % runtime.frameStride === 0) {
       if (runtime.renderer && runtime.sceneGroup) {
-        const speed = runtime.phase === "authority" ? 0.00022 : 0.00009;
-        runtime.sceneGroup.rotation.y = now * speed + runtime.pointer.x * 0.08;
-        runtime.sceneGroup.rotation.x = -0.16 + runtime.pointer.y * 0.04;
-        if (runtime.model.state === "FAIL") {
-          runtime.sceneGroup.position.x = Math.sin(now * 0.006) * 0.025;
-        } else {
-          runtime.sceneGroup.position.x = 0;
+        updateHyperFrames(now);
+        const phaseSpeed = runtime.phase === "authority" ? 1.5 : 1;
+        runtime.sceneGroup.rotation.y = 0.13 + Math.sin(now * 0.00012 * phaseSpeed) * 0.15 + runtime.pointer.x * 0.07;
+        runtime.sceneGroup.rotation.x = -0.08 + runtime.pointer.y * 0.035;
+        const authorityRing = runtime.sceneGroup.getObjectByName("authority-ring");
+        if (authorityRing) authorityRing.rotation.z = -0.2 + now * 0.000045 * phaseSpeed;
+        const decisionCore = runtime.sceneGroup.getObjectByName("decision-core");
+        if (decisionCore) {
+          decisionCore.rotation.x = now * 0.00011;
+          decisionCore.rotation.y = -now * 0.00015;
         }
+        const containment = runtime.sceneGroup.getObjectByName("containment-shell");
+        if (containment) containment.rotation.y = 0.28 - now * 0.000018;
+        const compact = runtime.canvas.getBoundingClientRect().width < 700;
+        const baseX = compact ? 0 : 1.08;
+        runtime.sceneGroup.position.x = baseX + (runtime.model.state === "FAIL" ? Math.sin(now * 0.006) * 0.025 : 0);
         runtime.renderer.render(runtime.scene, runtime.camera);
       } else {
         drawCanvas(now);
@@ -421,15 +608,17 @@
         runtime.renderer = new THREE.WebGLRenderer({ canvas: runtime.canvas, antialias: runtime.profile.tier === "high", alpha: true });
         runtime.renderer.setClearColor(COLORS.INK, 1);
         runtime.renderer.outputColorSpace = THREE.SRGBColorSpace || runtime.renderer.outputColorSpace;
+        if (THREE.ACESFilmicToneMapping) runtime.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        runtime.renderer.toneMappingExposure = 1.08;
         runtime.scene = new THREE.Scene();
-        runtime.scene.fog = new THREE.FogExp2(COLORS.INK, 0.055);
-        runtime.camera = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
-        runtime.camera.position.set(0, 0.35, 8.4);
-        runtime.scene.add(new THREE.AmbientLight(0xb7dce1, 1.25));
-        const keyLight = new THREE.PointLight(COLORS.CYAN, 16, 24);
+        runtime.scene.fog = new THREE.FogExp2(COLORS.INK, 0.038);
+        runtime.camera = new THREE.PerspectiveCamera(36, 1, 0.1, 50);
+        runtime.camera.position.set(0, 0.28, 9.1);
+        runtime.scene.add(new THREE.AmbientLight(0xb7dce1, 1.05));
+        const keyLight = new THREE.PointLight(COLORS.CYAN, 20, 28);
         keyLight.position.set(2.5, 3, 5);
         runtime.scene.add(keyLight);
-        const rimLight = new THREE.PointLight(COLORS.OPEN, 10, 18);
+        const rimLight = new THREE.PointLight(COLORS.OPEN, 12, 22);
         rimLight.position.set(-3, -1, 3);
         runtime.scene.add(rimLight);
       } catch (_error) {
@@ -546,6 +735,7 @@
     runtime.model = null;
     runtime.profile = null;
     runtime.frameTimes = [];
+    runtime.hyperFrames = [];
     runtime.previousFrame = 0;
     runtime.phase = "idle";
     runtime.guidedRunning = false;
@@ -558,6 +748,7 @@
     destroy,
     initialize,
     pause,
+    projectTesseract,
     resolveQualityProfile,
     resume,
     runGuidedProof,

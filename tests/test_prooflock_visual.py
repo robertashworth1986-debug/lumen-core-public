@@ -16,7 +16,7 @@ SAMPLE = APP_DIR / "sample_receipt.json"
 CORE = APP_DIR / "prooflock_core.js"
 LATTICE = APP_DIR / "prooflock_lattice.js"
 PYTHON_VERIFIER = APP_DIR / "verify_receipt.py"
-APP_RELEASE_VERSION = "20260719.1"
+APP_RELEASE_VERSION = "20260721.2"
 THREE_RELEASE_VERSION = "20260718.1"
 
 
@@ -56,6 +56,51 @@ def test_visual_seed_is_deterministic_from_receipt_hash():
     first, second, changed = json.loads(output)
     assert first == second
     assert first != changed
+
+
+def test_hyperlattice_is_a_bounded_four_dimensional_projection():
+    output = run_node(
+        f"""
+        const lattice = require({json.dumps(js_path(LATTICE))});
+        const first = lattice.projectTesseract(0.42, 1.0, 0.18);
+        const second = lattice.projectTesseract(0.67, 1.0, 0.18);
+        const dimensions = [0, 1, 2, 3].map((dimension) =>
+          first.edges.filter((edge) => edge[2] === dimension).length
+        );
+        const finite = first.vertices.every((vertex) =>
+          [vertex.x, vertex.y, vertex.z].every(Number.isFinite)
+        );
+        console.log(JSON.stringify({{
+          vertices: first.vertices.length,
+          edges: first.edges.length,
+          dimensions,
+          finite,
+          motionChangesProjection: JSON.stringify(first.vertices) !== JSON.stringify(second.vertices)
+        }}));
+        """
+    )
+    contract = json.loads(output)
+    assert contract == {
+        "vertices": 16,
+        "edges": 32,
+        "dimensions": [8, 8, 8, 8],
+        "finite": True,
+        "motionChangesProjection": True,
+    }
+
+
+def test_console_declares_macro_meso_micro_hyperlattice_layers():
+    html = (APP_DIR / "index.html").read_text(encoding="utf-8")
+    lattice = LATTICE.read_text(encoding="utf-8")
+    readme = (APP_DIR / "README.md").read_text(encoding="utf-8")
+
+    assert "Custody hyperlattice" in html
+    assert all(f">{label}<" in html for label in ("Macro", "Meso", "Micro"))
+    assert all(f'label: "{label}"' in lattice for label in ("macro", "meso", "micro"))
+    assert "TESSERACT_VERTICES" in lattice
+    assert "TESSERACT_EDGES" in lattice
+    assert "does not claim a measured physical fourth dimension" in readme
+    assert "a scientific fractal dimension" in readme
 
 
 def test_browser_editor_normalization_is_stable_on_windows_line_endings():
