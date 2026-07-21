@@ -15,7 +15,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Required private gates: `50`
 - Passed private gates: `35`
 - Open gates: `15`
-- Gate SHA-256: `5f0799416e680fea31268beb7cd9e5854cd1fe31ff2ebd61a8ec401654087b57`
+- Gate SHA-256: `e6e9b72d87a7ee7148f8911cc561fc5586010fe914882a2cdf2d76ec6cf163b8`
 
 ## Package Integrity
 
@@ -60,6 +60,14 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Receipt header valid: `true`
 - Workbook size matches receipt: `true`
 - Workbook hash matches receipt: `true`
+- Workbook OOXML package valid: `true`
+- Workbook structure and cell bindings valid: `true`
+- Workbook sheets match receipt: `true`
+- Workbook formulas inspected: `88`
+- Workbook formula errors: `0`
+- Workbook error cells: `0`
+- Financials derived from workbook contents: `true`
+- Workbook content failure code: `None`
 - Formula scan clean: `true`
 - Export/reimport verified: `true`
 - Financial reconciliation passes: `true`

@@ -6,6 +6,7 @@ import json
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
 
 import pytest
 
@@ -152,6 +153,14 @@ def valid_volume3_artifact_state() -> dict:
         "receipt_header_valid": True,
         "workbook_size_matches_receipt": True,
         "workbook_hash_matches_receipt": True,
+        "workbook_ooxml_valid": True,
+        "workbook_structure_valid": True,
+        "workbook_sheet_names_match_receipt": True,
+        "workbook_formula_count": 3,
+        "workbook_formula_error_count": 0,
+        "workbook_error_cell_count": 0,
+        "workbook_financials_derived_from_contents": True,
+        "workbook_content_failure_code": None,
         "formula_scan_clean": True,
         "export_reimport_verified": True,
         "financial_reconciliation_pass": True,
@@ -225,6 +234,125 @@ def complete_evidence_states(module) -> tuple[dict, dict, dict, dict]:
         valid_cmmc_packet_state(),
         valid_documentary_register_state(module),
     )
+
+
+def write_volume3_workbook(
+    path: Path,
+    *,
+    total_value: str = "100000",
+    total_type: str = "n",
+    workbook_content_type_as_default: bool = False,
+) -> None:
+    workbook_default = (
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"
+        if workbook_content_type_as_default
+        else "application/xml"
+    )
+    workbook_override = (
+        ""
+        if workbook_content_type_as_default
+        else '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+    )
+    content_types = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="{workbook_default}"/>
+  {workbook_override}
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+</Types>"""
+    root_rels = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>"""
+    workbook = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Cost" sheetId="1" r:id="rId1"/>
+    <sheet name="Spend Plan" sheetId="2" r:id="rId2"/>
+  </sheets>
+</workbook>"""
+    workbook_rels = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
+</Relationships>"""
+    cost_sheet = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetData>
+    <row r="18">
+      <c r="C18" t="inlineStr"><is><t>Total Hours / Average rate</t></is></c>
+      <c r="D18"><f>SUM(D8:D17)</f><v>640</v></c>
+    </row>
+    <row r="58">
+      <c r="C58" t="inlineStr"><is><t>Total Sub Contract Labor</t></is></c>
+      <c r="F58"><f>SUM(F52:F56)</f><v>0</v></c>
+    </row>
+    <row r="84">
+      <c r="B84" t="inlineStr"><is><t>Total Estimated Cost and Profit</t></is></c>
+      <c r="F84" t="{total_type}"><f>SUM(F80:F83)</f><v>{total_value}</v></c>
+    </row>
+  </sheetData>
+</worksheet>"""
+    spend_sheet = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetData>
+    <row r="1"><c r="B1"><f>'Cost'!$F$84</f><v>100000</v></c></row>
+    <row r="2">
+      <c r="B2" t="inlineStr"><is><t>Month 1</t></is></c>
+      <c r="C2" t="inlineStr"><is><t>Month 2</t></is></c>
+      <c r="D2" t="inlineStr"><is><t>Month 3</t></is></c>
+      <c r="E2" t="inlineStr"><is><t>Month 4</t></is></c>
+      <c r="F2" t="inlineStr"><is><t>Month 5</t></is></c>
+      <c r="G2" t="inlineStr"><is><t>Month 6</t></is></c>
+    </row>
+    <row r="3">
+      <c r="B3"><v>16667</v></c><c r="C3"><v>16667</v></c>
+      <c r="D3"><v>16667</v></c><c r="E3"><v>16667</v></c>
+      <c r="F3"><v>16667</v></c><c r="G3"><v>16665</v></c>
+    </row>
+    <row r="5">
+      <c r="A5" t="inlineStr"><is><t>Cumulative Total</t></is></c>
+      <c r="G5"><f>SUM($B$3:G3)</f><v>100000</v></c>
+    </row>
+  </sheetData>
+</worksheet>"""
+    with ZipFile(path, "w", compression=ZIP_DEFLATED) as archive:
+        archive.writestr("[Content_Types].xml", content_types)
+        archive.writestr("_rels/.rels", root_rels)
+        archive.writestr("xl/workbook.xml", workbook)
+        archive.writestr("xl/_rels/workbook.xml.rels", workbook_rels)
+        archive.writestr("xl/worksheets/sheet1.xml", cost_sheet)
+        archive.writestr("xl/worksheets/sheet2.xml", spend_sheet)
+
+
+def write_volume3_receipt(module, receipt: Path, workbook: Path) -> str:
+    workbook_bytes = workbook.read_bytes()
+    workbook_sha256 = hashlib.sha256(workbook_bytes).hexdigest().upper()
+    receipt.write_text(
+        json.dumps(
+            {
+                "schema": module.PRIVATE_VOLUME3_RECEIPT_SCHEMA,
+                "topic": module.TOPIC,
+                "file": workbook.name,
+                "bytes": len(workbook_bytes),
+                "sha256": workbook_sha256,
+                "sheets": ["Cost", "Spend Plan"],
+                "total_usd": 100000,
+                "firm_cost_usd": 100000,
+                "subcontractor_cost_usd": 0,
+                "taba_requested": False,
+                "duration_months": 6,
+                "pi_hours": 640,
+                "formula_error_count": 0,
+                "export_reimport_verified": True,
+                "corporate_official_review_required": True,
+                "cost_basis_supported": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    return workbook_sha256
 
 
 def test_default_gate_verifies_package_and_fails_closed_without_private_input():
@@ -852,31 +980,8 @@ def test_private_volume3_receipt_verifies_workbook_without_exposing_path_or_hash
     module = load_module()
     workbook = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_COST_FINAL.xlsx"
     receipt = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_FINAL_RECEIPT.private.json"
-    workbook_bytes = b"synthetic-private-volume3-workbook"
-    workbook.write_bytes(workbook_bytes)
-    workbook_sha256 = hashlib.sha256(workbook_bytes).hexdigest().upper()
-    receipt.write_text(
-        json.dumps(
-            {
-                "schema": module.PRIVATE_VOLUME3_RECEIPT_SCHEMA,
-                "topic": module.TOPIC,
-                "file": workbook.name,
-                "bytes": len(workbook_bytes),
-                "sha256": workbook_sha256,
-                "total_usd": 100000,
-                "firm_cost_usd": 100000,
-                "subcontractor_cost_usd": 0,
-                "taba_requested": False,
-                "duration_months": 6,
-                "pi_hours": 640,
-                "formula_error_count": 0,
-                "export_reimport_verified": True,
-                "corporate_official_review_required": True,
-                "cost_basis_supported": False,
-            }
-        ),
-        encoding="utf-8",
-    )
+    write_volume3_workbook(workbook)
+    workbook_sha256 = write_volume3_receipt(module, receipt, workbook)
     monkeypatch.setattr(
         module, "validate_private_target", lambda path: Path(path).resolve()
     )
@@ -886,6 +991,14 @@ def test_private_volume3_receipt_verifies_workbook_without_exposing_path_or_hash
 
     assert state["receipt_integrity_pass"] is True
     assert state["workbook_hash_matches_receipt"] is True
+    assert state["workbook_ooxml_valid"] is True
+    assert state["workbook_structure_valid"] is True
+    assert state["workbook_sheet_names_match_receipt"] is True
+    assert state["workbook_formula_count"] == 5
+    assert state["workbook_formula_error_count"] == 0
+    assert state["workbook_error_cell_count"] == 0
+    assert state["workbook_financials_derived_from_contents"] is True
+    assert state["workbook_content_failure_code"] is None
     assert state["financial_reconciliation_pass"] is True
     assert state["review_guardrails_preserved"] is True
     assert module.volume3_artifact_is_verified(state) is True
@@ -894,6 +1007,115 @@ def test_private_volume3_receipt_verifies_workbook_without_exposing_path_or_hash
     assert state["private_hash_exposed"] is False
     assert str(workbook) not in serialized
     assert workbook_sha256 not in serialized
+
+
+def test_private_volume3_accepts_workbook_content_type_default(
+    tmp_path: Path, monkeypatch
+):
+    module = load_module()
+    workbook = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_COST_FINAL.xlsx"
+    receipt = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_FINAL_RECEIPT.private.json"
+    write_volume3_workbook(workbook, workbook_content_type_as_default=True)
+    write_volume3_receipt(module, receipt, workbook)
+    monkeypatch.setattr(
+        module, "validate_private_target", lambda path: Path(path).resolve()
+    )
+
+    state = module.inspect_private_volume3_artifact(receipt, workbook)
+
+    assert state["workbook_ooxml_valid"] is True
+    assert state["workbook_structure_valid"] is True
+    assert state["receipt_integrity_pass"] is True
+
+
+def test_private_volume3_rejects_renamed_non_ooxml_bytes(
+    tmp_path: Path, monkeypatch
+):
+    module = load_module()
+    workbook = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_COST_FINAL.xlsx"
+    receipt = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_FINAL_RECEIPT.private.json"
+    workbook.write_bytes(b"not-an-ooxml-workbook")
+    write_volume3_receipt(module, receipt, workbook)
+    monkeypatch.setattr(
+        module, "validate_private_target", lambda path: Path(path).resolve()
+    )
+
+    state = module.inspect_private_volume3_artifact(receipt, workbook)
+
+    assert state["workbook_hash_matches_receipt"] is True
+    assert state["workbook_ooxml_valid"] is False
+    assert state["formula_scan_clean"] is False
+    assert state["financial_reconciliation_pass"] is False
+    assert state["receipt_integrity_pass"] is False
+    assert state["artifact_binding_sha256"] is None
+    assert module.volume3_artifact_is_verified(state) is False
+
+
+def test_private_volume3_rejects_duplicate_ooxml_members(
+    tmp_path: Path, monkeypatch
+):
+    module = load_module()
+    workbook = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_COST_FINAL.xlsx"
+    receipt = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_FINAL_RECEIPT.private.json"
+    write_volume3_workbook(workbook)
+    with pytest.warns(UserWarning, match="Duplicate name"):
+        with ZipFile(workbook, "a", compression=ZIP_DEFLATED) as archive:
+            archive.writestr("xl/workbook.xml", "<duplicate/>")
+    write_volume3_receipt(module, receipt, workbook)
+    monkeypatch.setattr(
+        module, "validate_private_target", lambda path: Path(path).resolve()
+    )
+
+    state = module.inspect_private_volume3_artifact(receipt, workbook)
+
+    assert state["workbook_content_failure_code"] == "OOXML_DUPLICATE_MEMBER"
+    assert state["workbook_ooxml_valid"] is False
+    assert state["receipt_integrity_pass"] is False
+
+
+def test_private_volume3_receipt_cannot_override_workbook_formula_error(
+    tmp_path: Path, monkeypatch
+):
+    module = load_module()
+    workbook = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_COST_FINAL.xlsx"
+    receipt = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_FINAL_RECEIPT.private.json"
+    write_volume3_workbook(workbook, total_value="#VALUE!", total_type="e")
+    write_volume3_receipt(module, receipt, workbook)
+    monkeypatch.setattr(
+        module, "validate_private_target", lambda path: Path(path).resolve()
+    )
+
+    state = module.inspect_private_volume3_artifact(receipt, workbook)
+
+    assert state["workbook_hash_matches_receipt"] is True
+    assert state["workbook_formula_error_count"] == 1
+    assert state["workbook_error_cell_count"] == 1
+    assert state["formula_scan_clean"] is False
+    assert state["financial_reconciliation_pass"] is False
+    assert state["receipt_integrity_pass"] is False
+    assert module.volume3_artifact_is_verified(state) is False
+
+
+def test_private_volume3_receipt_cannot_override_workbook_financial_drift(
+    tmp_path: Path, monkeypatch
+):
+    module = load_module()
+    workbook = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_COST_FINAL.xlsx"
+    receipt = tmp_path / "MISSIONWEAVE_DSIP_VOLUME3_FINAL_RECEIPT.private.json"
+    write_volume3_workbook(workbook, total_value="99999")
+    write_volume3_receipt(module, receipt, workbook)
+    monkeypatch.setattr(
+        module, "validate_private_target", lambda path: Path(path).resolve()
+    )
+
+    state = module.inspect_private_volume3_artifact(receipt, workbook)
+
+    assert state["workbook_hash_matches_receipt"] is True
+    assert state["workbook_ooxml_valid"] is False
+    assert state["workbook_content_failure_code"] == "OOXML_FINANCIAL_CONTENT_INVALID"
+    assert state["financial_reconciliation_pass"] is False
+    assert state["receipt_integrity_pass"] is False
+    assert module.volume3_artifact_is_verified(state) is False
 
 
 def test_private_jcp_evidence_requires_hash_matched_portal_pdf(

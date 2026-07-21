@@ -414,12 +414,12 @@
       "worktree_eol_differs_from_git_blob": true
     },
     "missionweave_dsip_action_gate": {
-      "bytes": 23891,
-      "identity_source": "COMMITTED_GIT_BLOB",
+      "bytes": 24792,
+      "identity_source": "WORKTREE_BYTES",
       "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
       "present": true,
-      "sha256": "97670D2A8FC76EE8209B235278FDAECAC16199B7553874B0379D8D0BC2891B26",
-      "worktree_eol_differs_from_git_blob": true
+      "sha256": "1070EC552B89FCC8494CB7429F8BE2998531BB64E73D07734A36D3848B213DD9",
+      "worktree_eol_differs_from_git_blob": false
     },
     "nashville_official_deadline_confirmation": {
       "bytes": 2272,
@@ -459,7 +459,7 @@
       "path": "evidence/openai_build_week/prooflock_youtube_publication_receipt_20260721.json",
       "present": true,
       "sha256": "127D3286581634E34592C420CAD6D109C119570947C210EC1FCC653F578F3C14",
-      "worktree_eol_differs_from_git_blob": false
+      "worktree_eol_differs_from_git_blob": true
     },
     "outreach_followup_policy_config": {
       "bytes": 5864,

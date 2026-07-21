@@ -4,14 +4,17 @@ import argparse
 import hashlib
 import hmac
 import json
+import posixpath
 import re
 import shutil
 import subprocess
+import xml.etree.ElementTree as ET
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
+from zipfile import BadZipFile, ZipFile
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -59,6 +62,39 @@ PRIVATE_SCHEMA = "lumencore.missionweave_dsip_action_private.v1"
 PUBLIC_SCHEMA = "lumencore.missionweave_dsip_action_gate.v1"
 PRIVATE_VOLUME3_RECEIPT_SCHEMA = (
     "lumencore.missionweave_dsip_volume3_final_receipt_private.v1"
+)
+OOXML_MAIN_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+OOXML_DOCUMENT_REL_NS = (
+    "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+)
+OOXML_PACKAGE_REL_NS = (
+    "http://schemas.openxmlformats.org/package/2006/relationships"
+)
+OOXML_CONTENT_TYPES_NS = (
+    "http://schemas.openxmlformats.org/package/2006/content-types"
+)
+OOXML_WORKBOOK_CONTENT_TYPE = (
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"
+)
+VOLUME3_EXPECTED_SHEETS = ("Cost", "Spend Plan")
+VOLUME3_MAX_ZIP_ENTRIES = 256
+VOLUME3_MAX_UNCOMPRESSED_BYTES = 20 * 1024 * 1024
+VOLUME3_PROHIBITED_PART_PREFIXES = (
+    "xl/activex/",
+    "xl/embeddings/",
+    "xl/externallinks/",
+)
+EXCEL_ERROR_VALUES = frozenset(
+    {
+        "#NULL!",
+        "#DIV/0!",
+        "#VALUE!",
+        "#REF!",
+        "#NAME?",
+        "#NUM!",
+        "#N/A",
+        "#GETTING_DATA",
+    }
 )
 PRIVATE_JCP_EVIDENCE_SCHEMA = "lumencore.missionweave_jcp_evidence_private.v1"
 CMMC_PACKET_SCHEMA = "lumencore.cmmc_export_evidence_packet.v1"
@@ -573,6 +609,304 @@ def parse_phase_i_total(value: Any) -> Decimal | None:
     return amount
 
 
+def normalize_cell_text(value: Any) -> str:
+    if not isinstance(value, str):
+        return ""
+    return re.sub(r"\s+", " ", value.strip()).lower()
+
+
+def normalize_formula(value: Any) -> str:
+    if not isinstance(value, str):
+        return ""
+    return re.sub(r"\s+", "", value).upper().lstrip("=")
+
+
+def ooxml_member_path(base: str, target: str) -> str | None:
+    if not isinstance(target, str) or not target or "\\" in target:
+        return None
+    if target.startswith("/"):
+        candidate = posixpath.normpath(target.lstrip("/"))
+    else:
+        candidate = posixpath.normpath(posixpath.join(posixpath.dirname(base), target))
+    if candidate in {"", ".", ".."} or candidate.startswith("../"):
+        return None
+    return candidate
+
+
+def ooxml_cell_value(cell: ET.Element, shared_strings: list[str]) -> Any:
+    cell_type = cell.get("t")
+    value_node = cell.find(f"{{{OOXML_MAIN_NS}}}v")
+    if cell_type == "inlineStr":
+        return "".join(
+            node.text or "" for node in cell.iter(f"{{{OOXML_MAIN_NS}}}t")
+        )
+    if value_node is None:
+        return None
+    value = value_node.text
+    if cell_type == "s" and value is not None:
+        try:
+            return shared_strings[int(value)]
+        except (IndexError, TypeError, ValueError):
+            return None
+    return value
+
+
+def inspect_volume3_workbook_contents(workbook_path: Path) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "ooxml_valid": False,
+        "structure_valid": False,
+        "sheet_names": [],
+        "formula_count": 0,
+        "formula_error_count": 0,
+        "error_cell_count": 0,
+        "financials_derived_from_contents": False,
+        "financials": {},
+        "failure_code": "WORKBOOK_NOT_INSPECTED",
+    }
+    try:
+        with ZipFile(workbook_path) as archive:
+            infos = archive.infolist()
+            if not infos or len(infos) > VOLUME3_MAX_ZIP_ENTRIES:
+                result["failure_code"] = "OOXML_ENTRY_COUNT_INVALID"
+                return result
+            member_names = [info.filename for info in infos]
+            if len(member_names) != len(set(member_names)):
+                result["failure_code"] = "OOXML_DUPLICATE_MEMBER"
+                return result
+            if any(info.flag_bits & 0x1 for info in infos):
+                result["failure_code"] = "OOXML_ENCRYPTED_PART"
+                return result
+            if sum(info.file_size for info in infos) > VOLUME3_MAX_UNCOMPRESSED_BYTES:
+                result["failure_code"] = "OOXML_UNCOMPRESSED_SIZE_EXCEEDED"
+                return result
+
+            members = set(member_names)
+            for member in members:
+                normalized = posixpath.normpath(member.replace("\\", "/"))
+                if (
+                    member.startswith(("/", "\\"))
+                    or normalized in {"", ".", ".."}
+                    or normalized.startswith("../")
+                    or normalized != member
+                ):
+                    result["failure_code"] = "OOXML_UNSAFE_MEMBER_PATH"
+                    return result
+                lower_member = member.lower()
+                if lower_member.endswith("vbaproject.bin") or any(
+                    lower_member.startswith(prefix)
+                    for prefix in VOLUME3_PROHIBITED_PART_PREFIXES
+                ):
+                    result["failure_code"] = "OOXML_ACTIVE_OR_EXTERNAL_PART"
+                    return result
+
+            required_members = {
+                "[Content_Types].xml",
+                "_rels/.rels",
+                "xl/workbook.xml",
+                "xl/_rels/workbook.xml.rels",
+            }
+            if not required_members.issubset(members):
+                result["failure_code"] = "OOXML_REQUIRED_PART_MISSING"
+                return result
+
+            for member in sorted(name for name in members if name.endswith(".rels")):
+                relation_root = ET.fromstring(archive.read(member))
+                for relation in relation_root.findall(
+                    f"{{{OOXML_PACKAGE_REL_NS}}}Relationship"
+                ):
+                    if str(relation.get("TargetMode", "")).lower() == "external":
+                        result["failure_code"] = "OOXML_EXTERNAL_RELATIONSHIP"
+                        return result
+
+            content_types = ET.fromstring(archive.read("[Content_Types].xml"))
+            content_type_overrides = {
+                str(override.get("PartName", "")): override.get("ContentType")
+                for override in content_types.findall(
+                    f"{{{OOXML_CONTENT_TYPES_NS}}}Override"
+                )
+            }
+            content_type_defaults = {
+                str(default.get("Extension", "")).lower(): default.get("ContentType")
+                for default in content_types.findall(
+                    f"{{{OOXML_CONTENT_TYPES_NS}}}Default"
+                )
+            }
+            workbook_content_type = content_type_overrides.get(
+                "/xl/workbook.xml"
+            ) or content_type_defaults.get("xml")
+            workbook_type_valid = workbook_content_type == OOXML_WORKBOOK_CONTENT_TYPE
+            if not workbook_type_valid:
+                result["failure_code"] = "OOXML_WORKBOOK_CONTENT_TYPE_INVALID"
+                return result
+
+            shared_strings: list[str] = []
+            if "xl/sharedStrings.xml" in members:
+                shared_root = ET.fromstring(archive.read("xl/sharedStrings.xml"))
+                for shared_item in shared_root.findall(
+                    f"{{{OOXML_MAIN_NS}}}si"
+                ):
+                    shared_strings.append(
+                        "".join(
+                            node.text or ""
+                            for node in shared_item.iter(f"{{{OOXML_MAIN_NS}}}t")
+                        )
+                    )
+
+            workbook_root = ET.fromstring(archive.read("xl/workbook.xml"))
+            workbook_rel_root = ET.fromstring(
+                archive.read("xl/_rels/workbook.xml.rels")
+            )
+            workbook_relations = {
+                relation.get("Id"): relation.get("Target")
+                for relation in workbook_rel_root.findall(
+                    f"{{{OOXML_PACKAGE_REL_NS}}}Relationship"
+                )
+            }
+            sheet_nodes = workbook_root.findall(
+                f".//{{{OOXML_MAIN_NS}}}sheet"
+            )
+            sheet_names = [str(node.get("name", "")) for node in sheet_nodes]
+            result["sheet_names"] = sheet_names
+            if tuple(sheet_names) != VOLUME3_EXPECTED_SHEETS:
+                result["failure_code"] = "OOXML_WORKSHEET_SET_INVALID"
+                return result
+
+            cells_by_sheet: dict[str, dict[str, dict[str, Any]]] = {}
+            formula_count = 0
+            formula_error_count = 0
+            error_cell_count = 0
+            for sheet_node in sheet_nodes:
+                relationship_id = sheet_node.get(
+                    f"{{{OOXML_DOCUMENT_REL_NS}}}id"
+                )
+                target = workbook_relations.get(relationship_id)
+                sheet_path = ooxml_member_path("xl/workbook.xml", str(target or ""))
+                if (
+                    sheet_path is None
+                    or not sheet_path.startswith("xl/worksheets/")
+                    or sheet_path not in members
+                ):
+                    result["failure_code"] = "OOXML_WORKSHEET_RELATION_INVALID"
+                    return result
+                sheet_root = ET.fromstring(archive.read(sheet_path))
+                sheet_cells: dict[str, dict[str, Any]] = {}
+                for cell in sheet_root.findall(f".//{{{OOXML_MAIN_NS}}}c"):
+                    coordinate = str(cell.get("r", "")).upper()
+                    if not re.fullmatch(r"[A-Z]{1,3}[1-9][0-9]{0,6}", coordinate):
+                        result["failure_code"] = "OOXML_CELL_REFERENCE_INVALID"
+                        return result
+                    formula_node = cell.find(f"{{{OOXML_MAIN_NS}}}f")
+                    value = ooxml_cell_value(cell, shared_strings)
+                    is_error = bool(
+                        cell.get("t") == "e"
+                        or (
+                            isinstance(value, str)
+                            and value.strip().upper() in EXCEL_ERROR_VALUES
+                        )
+                    )
+                    if formula_node is not None:
+                        formula_count += 1
+                        if is_error:
+                            formula_error_count += 1
+                    if is_error:
+                        error_cell_count += 1
+                    sheet_cells[coordinate] = {
+                        "value": value,
+                        "formula": (
+                            formula_node.text if formula_node is not None else None
+                        ),
+                    }
+                cells_by_sheet[str(sheet_node.get("name"))] = sheet_cells
+
+            result["formula_count"] = formula_count
+            result["formula_error_count"] = formula_error_count
+            result["error_cell_count"] = error_cell_count
+            if formula_count == 0:
+                result["failure_code"] = "OOXML_FORMULAS_MISSING"
+                return result
+
+            cost_cells = cells_by_sheet["Cost"]
+            spend_cells = cells_by_sheet["Spend Plan"]
+            required_labels = {
+                ("Cost", "C18"): "total hours / average rate",
+                ("Cost", "C58"): "total sub contract labor",
+                ("Cost", "B84"): "total estimated cost and profit",
+                ("Spend Plan", "A5"): "cumulative total",
+            }
+            for (sheet_name, coordinate), expected_label in required_labels.items():
+                actual = cells_by_sheet.get(sheet_name, {}).get(coordinate, {}).get(
+                    "value"
+                )
+                if normalize_cell_text(actual) != expected_label:
+                    result["failure_code"] = "OOXML_COST_LABEL_BINDING_INVALID"
+                    return result
+
+            required_formulas = {
+                ("Cost", "F84"): "SUM(F80:F83)",
+                ("Spend Plan", "B1"): "'COST'!$F$84",
+                ("Spend Plan", "G5"): "SUM($B$3:G3)",
+            }
+            for (sheet_name, coordinate), expected_formula in required_formulas.items():
+                actual = cells_by_sheet.get(sheet_name, {}).get(coordinate, {}).get(
+                    "formula"
+                )
+                if normalize_formula(actual) != normalize_formula(expected_formula):
+                    result["failure_code"] = "OOXML_COST_FORMULA_BINDING_INVALID"
+                    return result
+
+            total_usd = parse_phase_i_total(cost_cells.get("F84", {}).get("value"))
+            subcontractor_cost_usd = parse_phase_i_total(
+                cost_cells.get("F58", {}).get("value")
+            )
+            pi_hours = parse_phase_i_total(cost_cells.get("D18", {}).get("value"))
+            spend_plan_total = parse_phase_i_total(
+                spend_cells.get("G5", {}).get("value")
+            )
+            month_values = [
+                parse_phase_i_total(spend_cells.get(f"{column}3", {}).get("value"))
+                for column in "BCDEFG"
+            ]
+            month_labels_valid = all(
+                normalize_cell_text(spend_cells.get(f"{column}2", {}).get("value"))
+                == f"month {index}"
+                for index, column in enumerate("BCDEFG", start=1)
+            )
+            financials_valid = bool(
+                total_usd is not None
+                and subcontractor_cost_usd is not None
+                and pi_hours is not None
+                and spend_plan_total is not None
+                and all(value is not None for value in month_values)
+                and month_labels_valid
+                and sum(value for value in month_values if value is not None)
+                == spend_plan_total
+                and spend_plan_total == total_usd
+            )
+            if not financials_valid:
+                result["failure_code"] = "OOXML_FINANCIAL_CONTENT_INVALID"
+                return result
+
+            result.update(
+                {
+                    "ooxml_valid": True,
+                    "structure_valid": True,
+                    "financials_derived_from_contents": True,
+                    "financials": {
+                        "total_usd": total_usd,
+                        "firm_cost_usd": total_usd - subcontractor_cost_usd,
+                        "subcontractor_cost_usd": subcontractor_cost_usd,
+                        "duration_months": len(month_values),
+                        "pi_hours": pi_hours,
+                    },
+                    "failure_code": None,
+                }
+            )
+            return result
+    except (BadZipFile, ET.ParseError, KeyError, OSError, RuntimeError, ValueError):
+        result["failure_code"] = "OOXML_PARSE_FAILED"
+        return result
+
+
 def inspect_private_volume3_artifact(
     receipt_path: Path = PRIVATE_FINAL_VOLUME3_RECEIPT,
     workbook_path: Path = PRIVATE_FINAL_VOLUME3_WORKBOOK,
@@ -587,6 +921,14 @@ def inspect_private_volume3_artifact(
         "receipt_header_valid": False,
         "workbook_size_matches_receipt": False,
         "workbook_hash_matches_receipt": False,
+        "workbook_ooxml_valid": False,
+        "workbook_structure_valid": False,
+        "workbook_sheet_names_match_receipt": False,
+        "workbook_formula_count": 0,
+        "workbook_formula_error_count": None,
+        "workbook_error_cell_count": None,
+        "workbook_financials_derived_from_contents": False,
+        "workbook_content_failure_code": "WORKBOOK_NOT_INSPECTED",
         "formula_scan_clean": False,
         "export_reimport_verified": False,
         "financial_reconciliation_pass": False,
@@ -619,15 +961,53 @@ def inspect_private_volume3_artifact(
         valid_sha256(receipt.get("sha256"))
         and str(receipt["sha256"]).upper() == sha256_file(workbook_target)
     )
-    state["formula_scan_clean"] = receipt.get("formula_error_count") == 0
-    state["export_reimport_verified"] = receipt.get("export_reimport_verified") is True
+    workbook_contents = inspect_volume3_workbook_contents(workbook_target)
+    state["workbook_ooxml_valid"] = workbook_contents["ooxml_valid"]
+    state["workbook_structure_valid"] = workbook_contents["structure_valid"]
+    state["workbook_sheet_names_match_receipt"] = bool(
+        isinstance(receipt.get("sheets"), list)
+        and receipt["sheets"] == workbook_contents["sheet_names"]
+    )
+    state["workbook_formula_count"] = workbook_contents["formula_count"]
+    state["workbook_formula_error_count"] = workbook_contents[
+        "formula_error_count"
+    ]
+    state["workbook_error_cell_count"] = workbook_contents["error_cell_count"]
+    state["workbook_financials_derived_from_contents"] = workbook_contents[
+        "financials_derived_from_contents"
+    ]
+    state["workbook_content_failure_code"] = workbook_contents["failure_code"]
+    state["formula_scan_clean"] = bool(
+        state["workbook_ooxml_valid"]
+        and state["workbook_formula_count"] > 0
+        and state["workbook_formula_error_count"] == 0
+        and state["workbook_error_cell_count"] == 0
+        and receipt.get("formula_error_count")
+        == state["workbook_formula_error_count"]
+    )
+    state["export_reimport_verified"] = bool(
+        state["workbook_ooxml_valid"]
+        and receipt.get("export_reimport_verified") is True
+    )
+    workbook_financials = workbook_contents["financials"]
     state["financial_reconciliation_pass"] = bool(
-        parse_phase_i_total(receipt.get("total_usd")) == PHASE_I_CEILING
-        and parse_phase_i_total(receipt.get("firm_cost_usd")) == PHASE_I_CEILING
-        and parse_phase_i_total(receipt.get("subcontractor_cost_usd")) == Decimal("0")
+        state["workbook_financials_derived_from_contents"]
+        and workbook_financials.get("total_usd") == PHASE_I_CEILING
+        and workbook_financials.get("firm_cost_usd") == PHASE_I_CEILING
+        and workbook_financials.get("subcontractor_cost_usd") == Decimal("0")
+        and workbook_financials.get("duration_months") == 6
+        and workbook_financials.get("pi_hours") == Decimal("640")
+        and parse_phase_i_total(receipt.get("total_usd"))
+        == workbook_financials.get("total_usd")
+        and parse_phase_i_total(receipt.get("firm_cost_usd"))
+        == workbook_financials.get("firm_cost_usd")
+        and parse_phase_i_total(receipt.get("subcontractor_cost_usd"))
+        == workbook_financials.get("subcontractor_cost_usd")
         and receipt.get("taba_requested") is False
-        and receipt.get("duration_months") == 6
-        and receipt.get("pi_hours") == 640
+        and receipt.get("duration_months")
+        == workbook_financials.get("duration_months")
+        and parse_phase_i_total(receipt.get("pi_hours"))
+        == workbook_financials.get("pi_hours")
     )
     state["review_guardrails_preserved"] = bool(
         receipt.get("corporate_official_review_required") is True
@@ -639,6 +1019,10 @@ def inspect_private_volume3_artifact(
             "receipt_header_valid",
             "workbook_size_matches_receipt",
             "workbook_hash_matches_receipt",
+            "workbook_ooxml_valid",
+            "workbook_structure_valid",
+            "workbook_sheet_names_match_receipt",
+            "workbook_financials_derived_from_contents",
             "formula_scan_clean",
             "export_reimport_verified",
             "financial_reconciliation_pass",
@@ -660,6 +1044,15 @@ def volume3_artifact_is_verified(state: Any) -> bool:
         and state.get("receipt_header_valid") is True
         and state.get("workbook_size_matches_receipt") is True
         and state.get("workbook_hash_matches_receipt") is True
+        and state.get("workbook_ooxml_valid") is True
+        and state.get("workbook_structure_valid") is True
+        and state.get("workbook_sheet_names_match_receipt") is True
+        and isinstance(state.get("workbook_formula_count"), int)
+        and state.get("workbook_formula_count", 0) > 0
+        and state.get("workbook_formula_error_count") == 0
+        and state.get("workbook_error_cell_count") == 0
+        and state.get("workbook_financials_derived_from_contents") is True
+        and state.get("workbook_content_failure_code") is None
         and state.get("formula_scan_clean") is True
         and state.get("export_reimport_verified") is True
         and state.get("financial_reconciliation_pass") is True
@@ -2135,6 +2528,14 @@ def build_payload(
             "receipt_header_valid",
             "workbook_size_matches_receipt",
             "workbook_hash_matches_receipt",
+            "workbook_ooxml_valid",
+            "workbook_structure_valid",
+            "workbook_sheet_names_match_receipt",
+            "workbook_formula_count",
+            "workbook_formula_error_count",
+            "workbook_error_cell_count",
+            "workbook_financials_derived_from_contents",
+            "workbook_content_failure_code",
             "formula_scan_clean",
             "export_reimport_verified",
             "financial_reconciliation_pass",
@@ -2536,6 +2937,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Receipt header valid: `{str(volume3['receipt_header_valid']).lower()}`",
         f"- Workbook size matches receipt: `{str(volume3['workbook_size_matches_receipt']).lower()}`",
         f"- Workbook hash matches receipt: `{str(volume3['workbook_hash_matches_receipt']).lower()}`",
+        f"- Workbook OOXML package valid: `{str(volume3['workbook_ooxml_valid']).lower()}`",
+        f"- Workbook structure and cell bindings valid: `{str(volume3['workbook_structure_valid']).lower()}`",
+        f"- Workbook sheets match receipt: `{str(volume3['workbook_sheet_names_match_receipt']).lower()}`",
+        f"- Workbook formulas inspected: `{volume3['workbook_formula_count']}`",
+        f"- Workbook formula errors: `{volume3['workbook_formula_error_count']}`",
+        f"- Workbook error cells: `{volume3['workbook_error_cell_count']}`",
+        f"- Financials derived from workbook contents: `{str(volume3['workbook_financials_derived_from_contents']).lower()}`",
+        f"- Workbook content failure code: `{volume3['workbook_content_failure_code']}`",
         f"- Formula scan clean: `{str(volume3['formula_scan_clean']).lower()}`",
         f"- Export/reimport verified: `{str(volume3['export_reimport_verified']).lower()}`",
         f"- Financial reconciliation passes: `{str(volume3['financial_reconciliation_pass']).lower()}`",

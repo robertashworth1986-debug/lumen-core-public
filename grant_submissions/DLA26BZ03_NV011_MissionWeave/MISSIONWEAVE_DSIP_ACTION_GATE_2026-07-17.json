@@ -3,7 +3,7 @@
     "claim_boundary_present": true,
     "controls_valid": true,
     "failure_code": null,
-    "file_sha256": "8C29BAAEE1B7A545AA882C451AA836D91B0F6304FEBDA1AA6792EDA4CE216839",
+    "file_sha256": "5362EEE1FAFBE3061FEEF5FE14E885199CB567347630A4A2FFD252483C214B00",
     "gate_decisions": {
       "NO_DUPLICATE_COST_OR_DELIVERABLE": false,
       "TECHNICAL_DATA_RIGHTS_ASSERTION": false
@@ -224,7 +224,7 @@
     },
     "submission_readiness_logic_unchanged": true
   },
-  "gate_sha256": "5f0799416e680fea31268beb7cd9e5854cd1fe31ff2ebd61a8ec401654087b57",
+  "gate_sha256": "e6e9b72d87a7ee7148f8911cc561fc5586010fe914882a2cdf2d76ec6cf163b8",
   "gate_summary": {
     "open_gate_count": 15,
     "passed_private_gate_count": 35,
@@ -335,7 +335,7 @@
       "VOLUME5_UPLOAD_SET"
     ]
   },
-  "generated_utc": "2026-07-21T16:55:30.059565+00:00",
+  "generated_utc": "2026-07-21T20:43:48.362350+00:00",
   "jcp_evidence_protocol": {
     "bare_boolean_can_clear_gate": false,
     "bytes": 4034,
@@ -440,9 +440,17 @@
     "receipt_integrity_pass": true,
     "receipt_present": true,
     "review_guardrails_preserved": true,
+    "workbook_content_failure_code": null,
+    "workbook_error_cell_count": 0,
+    "workbook_financials_derived_from_contents": true,
+    "workbook_formula_count": 88,
+    "workbook_formula_error_count": 0,
     "workbook_hash_matches_receipt": true,
+    "workbook_ooxml_valid": true,
     "workbook_present": true,
-    "workbook_size_matches_receipt": true
+    "workbook_sheet_names_match_receipt": true,
+    "workbook_size_matches_receipt": true,
+    "workbook_structure_valid": true
   },
   "schema": "lumencore.missionweave_dsip_action_gate.v1",
   "source_integrity": {
