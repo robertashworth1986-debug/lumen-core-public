@@ -42,6 +42,12 @@ OPENAI_BUILD_WEEK_READINESS = (
     / "OPENAI_BUILD_WEEK_20260721"
     / "OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json"
 )
+OPENAI_BUILD_WEEK_SUBMISSION_RECEIPT = (
+    ROOT
+    / "evidence"
+    / "openai_build_week"
+    / "prooflock_youtube_publication_receipt_20260721.json"
+)
 OPENAI_BUILD_WEEK_HANDOFF_CONTROL = (
     ROOT
     / "grant_submissions"
@@ -72,6 +78,22 @@ def read_json(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError(f"Expected JSON object: {path}")
     return payload
+
+
+def validate_self_hashed_receipt(payload: dict[str, Any], *, field: str) -> None:
+    claimed = payload.get(field)
+    canonical = dict(payload)
+    canonical.pop(field, None)
+    observed = hashlib.sha256(
+        json.dumps(
+            canonical,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+        ).encode("utf-8")
+    ).hexdigest()
+    if not isinstance(claimed, str) or claimed.lower() != observed:
+        raise ValueError("Self-hashed receipt identity is invalid")
 
 
 def normalize_text_eol(payload: bytes) -> bytes:
@@ -119,6 +141,7 @@ def build_payload() -> dict[str, Any]:
     darpa = read_json(DARPA_SN_26_97_RECEIPT)
     missionweave = read_json(MISSIONWEAVE_ACTION_GATE)
     build_week = read_json(OPENAI_BUILD_WEEK_READINESS)
+    build_week_submission = read_json(OPENAI_BUILD_WEEK_SUBMISSION_RECEIPT)
     build_week_handoff = read_json(OPENAI_BUILD_WEEK_HANDOFF_CONTROL)
     response_registry = read_json(OUTREACH_RESPONSE_TEMPLATE_REGISTRY)
     followup_config = read_json(OUTREACH_FOLLOWUP_POLICY_CONFIG)
@@ -161,6 +184,21 @@ def build_payload() -> dict[str, Any]:
         != "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
     ):
         raise ValueError("OpenAI Build Week readiness is missing or stale")
+    validate_self_hashed_receipt(build_week_submission, field="receipt_sha256")
+    build_week_devpost = build_week_submission.get("devpost", {})
+    build_week_controls = build_week_submission.get("controls", {})
+    if (
+        build_week_submission.get("schema")
+        != "lumencore.prooflock_youtube_publication_receipt.v1"
+        or build_week_devpost.get("submission_state") != "SUBMITTED"
+        or build_week_devpost.get("final_submission_performed") is not True
+        or build_week_devpost.get("public_project_page_resolved") is not True
+        or build_week_devpost.get("confirmation_email_received") is not True
+        or build_week_devpost.get("confirmation_email_reply_required") is not False
+        or build_week_controls.get("contest_acceptance_claimed") is not False
+        or build_week_controls.get("award_claimed") is not False
+    ):
+        raise ValueError("OpenAI Build Week submission receipt is missing or unsafe")
     if (
         build_week_handoff.get("schema")
         != "lumencore.build_week_handoff_integrity_control.v1"
@@ -345,20 +383,27 @@ def build_payload() -> dict[str, Any]:
         {
             "lane_id": "openai_build_week_prooflock",
             "organization": "OpenAI Build Week / Devpost",
-            "latest_event_type": "PROJECT_CORE_VERIFIED_SUBMISSION_FIELDS_OPEN",
-            "latest_event_utc": build_week["generated_utc"],
-            "state": build_week["status"],
+            "latest_event_type": "DEVPOST_SUBMISSION_CONFIRMED",
+            "latest_event_utc": build_week_devpost["confirmation_email_utc"],
+            "state": "PORTAL_SUBMISSION_CONFIRMED",
             "deadline_utc": build_week["official_requirements"]["facts"][
                 "submission_period"
             ]["deadline_utc"],
+            "portal_submission_verified": True,
+            "confirmation_email_received": True,
+            "public_project_page_resolved": True,
+            "public_page_video_embed_matches": True,
+            "confirmed_model_reference": build_week_devpost[
+                "public_page_model_reference"
+            ],
             "email_reply_required": False,
             "send_now": False,
             "no_send_before": None,
             "do_not_duplicate_send": True,
             "next_action": (
-                "Confirm model provenance and the /feedback session ID, deploy the public demo, "
-                "record the required public video, complete Devpost registration, and obtain "
-                "action-time approval before final submission."
+                "Preserve the submission receipt and monitor for a judging or correction request. "
+                "Do not reply to the automated confirmation, resubmit without a verified issue, "
+                "or describe successful submission as selection, endorsement, or an award."
             ),
         },
         {
@@ -594,6 +639,9 @@ def build_payload() -> dict[str, Any]:
             ),
             "openai_build_week_readiness": artifact_status(
                 OPENAI_BUILD_WEEK_READINESS
+            ),
+            "openai_build_week_submission_receipt": artifact_status(
+                OPENAI_BUILD_WEEK_SUBMISSION_RECEIPT
             ),
             "openai_build_week_handoff_integrity_control": artifact_status(
                 OPENAI_BUILD_WEEK_HANDOFF_CONTROL

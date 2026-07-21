@@ -389,6 +389,9 @@ def test_modes_route_closed_inbound_portal_private_and_account_work_separately()
     assert rows["epri_open_power_ai_mou"]["action_state"] == (
         "MONITOR_INBOUND_ONLY"
     )
+    assert rows["openai_build_week_prooflock"]["action_state"] == (
+        "MONITOR_INBOUND_ONLY"
+    )
     assert rows["missionweave_dsip_proposal"]["action_state"] == "HELD_NO_SEND"
     assert rows["openai_build_week_internal_handoff"]["action_state"] == (
         "PRIVATE_RECONCILIATION_OPEN"

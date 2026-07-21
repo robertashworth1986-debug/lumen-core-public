@@ -99,6 +99,12 @@ OPENAI_BUILD_WEEK_DEMO_SCRIPT = (
 OPENAI_BUILD_WEEK_REQUIREMENTS = (
     OPENAI_BUILD_WEEK_DIR / "OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json"
 )
+OPENAI_BUILD_WEEK_SUBMISSION_RECEIPT = (
+    ROOT
+    / "evidence"
+    / "openai_build_week"
+    / "prooflock_youtube_publication_receipt_20260721.json"
+)
 MISSIONWEAVE_DIR = (
     ROOT / "grant_submissions" / "DLA26BZ03_NV011_MissionWeave"
 )
@@ -275,6 +281,19 @@ def rel(path: Path) -> str:
 
 def stable_sha256(payload: Any) -> str:
     return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+
+
+def canonical_receipt_sha256(payload: dict[str, Any], *, field: str) -> str:
+    canonical = dict(payload)
+    canonical.pop(field, None)
+    return hashlib.sha256(
+        json.dumps(
+            canonical,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+        ).encode("utf-8")
+    ).hexdigest()
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -1062,6 +1081,7 @@ def base_sources() -> dict[str, Any]:
             DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT
         ),
         "openai_build_week_submission_readiness": OPENAI_BUILD_WEEK_READINESS,
+        "openai_build_week_submission_receipt": OPENAI_BUILD_WEEK_SUBMISSION_RECEIPT,
         "openai_build_week_project_description": OPENAI_BUILD_WEEK_DESCRIPTION,
         "openai_build_week_demo_script": OPENAI_BUILD_WEEK_DEMO_SCRIPT,
         "openai_build_week_requirements": OPENAI_BUILD_WEEK_REQUIREMENTS,
@@ -1317,7 +1337,9 @@ def build_darpa_submission_lane(
     }
 
 
-def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
+def build_openai_build_week_lane(
+    readiness: dict[str, Any], submission_receipt: dict[str, Any]
+) -> dict[str, Any]:
     requirements = readiness.get("official_requirements", {})
     facts = requirements.get("facts", {})
     submission_period = facts.get("submission_period", {})
@@ -1352,9 +1374,50 @@ def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
         ):
             integrity_errors.append(f"hash_or_size:{item.get('path')}")
     source_integrity_pass = not control_errors and not integrity_errors
+
+    devpost = submission_receipt.get("devpost", {})
+    receipt_controls = submission_receipt.get("controls", {})
+    receipt_errors: list[str] = []
+    if (
+        submission_receipt.get("schema")
+        != "lumencore.prooflock_youtube_publication_receipt.v1"
+    ):
+        receipt_errors.append("schema")
+    claimed_receipt_sha256 = submission_receipt.get("receipt_sha256")
+    if (
+        not isinstance(claimed_receipt_sha256, str)
+        or claimed_receipt_sha256.lower()
+        != canonical_receipt_sha256(submission_receipt, field="receipt_sha256")
+    ):
+        receipt_errors.append("receipt_sha256")
+    for field, expected in {
+        "submission_state": "SUBMITTED",
+        "final_submission_performed": True,
+        "public_project_page_resolved": True,
+        "public_page_submitted_to": "OpenAI Build Week",
+        "public_page_video_embed_matches": True,
+        "public_page_model_reference": "GPT-5.6",
+        "confirmation_email_received": True,
+        "confirmation_email_reply_required": False,
+    }.items():
+        if devpost.get(field) != expected:
+            receipt_errors.append(f"devpost:{field}")
+    for field in (
+        "private_session_identifier_exposed",
+        "patent_sensitive_material_exposed",
+        "external_validation_claimed",
+        "contest_acceptance_claimed",
+        "award_claimed",
+    ):
+        if receipt_controls.get(field) is not False:
+            receipt_errors.append(f"controls:{field}")
+
+    submission_confirmed = not receipt_errors
+    routing_integrity_pass = source_integrity_pass and not receipt_errors
     source_blockers = [
         *(f"control:{error}" for error in control_errors),
         *(f"artifact:{error}" for error in integrity_errors),
+        *(f"submission_receipt:{error}" for error in receipt_errors),
     ]
 
     outputs = readiness.get("outputs", {})
@@ -1370,19 +1433,29 @@ def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
         "official_deadline_text": "July 21, 2026 at 5:00 PM Pacific / 7:00 PM Central",
         "deadline_semantics": "OFFICIAL_RULES_DEADLINE_VERIFIED",
         "command": (
-            "STAGE_APPLICATION"
-            if source_integrity_pass
+            "SENT_VERIFIED"
+            if submission_confirmed
+            else "STAGE_APPLICATION"
+            if routing_integrity_pass
             else FRESHNESS_BLOCKED_COMMAND
         ),
-        "pre_freshness_command": "STAGE_APPLICATION",
+        "pre_freshness_command": (
+            "SENT_VERIFIED" if submission_confirmed else "STAGE_APPLICATION"
+        ),
         "eligibility_state": (
+            "SUBMISSION_CONFIRMED_MONITOR_ONLY"
+            if submission_confirmed
+            else
             "CORE_PROJECT_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
-            if source_integrity_pass
+            if routing_integrity_pass
             else "SOURCE_INTEGRITY_RECONCILIATION_REQUIRED"
         ),
         "fit_state": (
+            "SUBMITTED_DEVELOPER_TOOLS_ENTRY"
+            if submission_confirmed
+            else
             "DEVELOPER_TOOLS_WORKING_PROJECT_STRONG_FIT"
-            if source_integrity_pass
+            if routing_integrity_pass
             else "DEVELOPER_TOOLS_FIT_HELD_FOR_SOURCE_RECONCILIATION"
         ),
         "submission_route": "Devpost submission manager",
@@ -1396,46 +1469,77 @@ def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
             str(outputs.get("description_draft")),
             str(outputs.get("demo_script")),
             str(outputs.get("requirements_receipt")),
+            rel(OPENAI_BUILD_WEEK_SUBMISSION_RECEIPT),
         ],
-        "readiness_status": readiness.get("status"),
+        "readiness_status": (
+            "PORTAL_SUBMISSION_CONFIRMED" if submission_confirmed else readiness.get("status")
+        ),
         "readiness_gate_total": counts.get("gate_total"),
         "readiness_gate_pass_count": counts.get("pass"),
         "readiness_gate_open_count": counts.get("open"),
         "public_demo_url": project.get("public_demo_url"),
-        "youtube_demo_url": project.get("youtube_demo_url"),
-        "feedback_session_id_present": bool(project.get("feedback_session_id")),
-        "confirmed_model_present": bool(project.get("confirmed_model")),
+        "youtube_demo_url": (
+            submission_receipt.get("youtube", {}).get("url")
+            if submission_confirmed
+            else project.get("youtube_demo_url")
+        ),
+        "feedback_session_id_present": (
+            devpost.get("feedback_session_id_saved") is True
+            if submission_confirmed
+            else bool(project.get("feedback_session_id"))
+        ),
+        "confirmed_model_present": (
+            bool(devpost.get("public_page_model_reference"))
+            if submission_confirmed
+            else bool(project.get("confirmed_model"))
+        ),
         "scoped_tree": project.get("scoped_tree"),
         "source_integrity_pass": source_integrity_pass,
         "source_control_errors": control_errors,
         "source_artifact_errors": integrity_errors,
-        "source_recheck_required": not source_integrity_pass,
-        "freshness_blockers": source_blockers,
+        "submission_receipt_errors": receipt_errors,
+        "submission_confirmed": submission_confirmed,
+        "source_recheck_required": not submission_confirmed and not routing_integrity_pass,
+        "freshness_blockers": [] if submission_confirmed else source_blockers,
         "source_freshness_status": (
+            "PORTAL_SUBMISSION_CONFIRMED_RECEIPT_BACKED"
+            if submission_confirmed
+            else
             "CURRENT_WITHIN_PINNED_ARTIFACT_SET"
-            if source_integrity_pass
+            if routing_integrity_pass
             else "BLOCKED_REVERIFY_REQUIRED"
         ),
-        "source_data_current": source_integrity_pass,
-        "deadline_actionable": source_integrity_pass,
+        "source_data_current": True if submission_confirmed else routing_integrity_pass,
+        "deadline_actionable": False if submission_confirmed else routing_integrity_pass,
         "deadline_currently_verified": True,
         "why_now": (
+            "Devpost submission is confirmed by the public project page and confirmation email. "
+            "Preserve the receipt and monitor for a judging or correction request without "
+            "describing submission as selection, endorsement, or an award."
+            if submission_confirmed
+            else
             "This is the nearest unresolved submission deadline. The readiness control and "
             "local app artifacts reconcile; the public demo, model label, /feedback Session "
             "ID, video, Devpost registration, and final review remain open."
-            if source_integrity_pass
+            if routing_integrity_pass
             else "This is the nearest unresolved submission deadline, but its readiness control "
             "does not reconcile to the current local app artifacts. Hold staging claims until "
             "the exact public commit, artifact manifest, and submission fields are refreshed."
         ),
         "today_work": (
             [
+                "Preserve the self-hashed submission receipt and public project URL.",
+                "Monitor inbound-only for a judging, correction, or organizer request; do not duplicate the submission.",
+            ]
+            if submission_confirmed
+            else
+            [
                 "Deploy the self-contained console to a stable public URL and verify every sample artifact fetch.",
                 "Capture the exact project-building model label and the /feedback Session ID without guessing.",
                 "Record and privacy-review the bounded demonstration, keep it under three minutes with audio, and publish it to YouTube.",
                 "Populate the Devpost draft and stop for publicity, IP, certification, and final-submit review.",
             ]
-            if source_integrity_pass
+            if routing_integrity_pass
             else [
                 "Reconcile the readiness packet to the exact public ProofLock commit and artifact hashes.",
                 "Regenerate the bounded submission receipt before relying on any core-ready statement.",
@@ -1443,11 +1547,14 @@ def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
             ]
         ),
         "human_gate": (
+            []
+            if submission_confirmed
+            else
             [
                 "Robert provides the exact model label and /feedback Session ID from the qualifying task.",
                 "Robert reviews the public demo video, Devpost publicity/IP terms, certifications, and final submission.",
             ]
-            if source_integrity_pass
+            if routing_integrity_pass
             else [
                 "A bounded operator reconciles the exact public commit and artifact receipt.",
                 "Robert reviews the reconciled public demo, model/session provenance, publicity/IP terms, certifications, and final submission.",
@@ -1455,7 +1562,22 @@ def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
         ),
         "external_send_allowed_without_human": False,
         "final_submit_allowed_without_human": False,
-        "claim_boundary": readiness.get("claim_boundary"),
+        "submission_status": (
+            "PORTAL_SUBMISSION_CONFIRMED" if submission_confirmed else readiness.get("status")
+        ),
+        "sent_utc": devpost.get("confirmation_email_utc") if submission_confirmed else None,
+        "receipt_path": rel(OPENAI_BUILD_WEEK_SUBMISSION_RECEIPT),
+        "receipt_attachment_sha256": claimed_receipt_sha256,
+        "verification_scope": (
+            "PUBLIC_PROJECT_PAGE_AND_CONFIRMATION_EMAIL_OBSERVED"
+            if submission_confirmed
+            else "READINESS_PACKET_ONLY"
+        ),
+        "claim_boundary": (
+            submission_receipt.get("claim_boundary")
+            if submission_confirmed
+            else readiness.get("claim_boundary")
+        ),
     }
 
 
@@ -1545,6 +1667,7 @@ def build_command_lanes(
     darpa_submission_receipt: dict[str, Any] | None = None,
     darpa_public_submission_receipt: dict[str, Any] | None = None,
     openai_build_week_readiness: dict[str, Any] | None = None,
+    openai_build_week_submission_receipt: dict[str, Any] | None = None,
     scan_date: date = SCAN_DATE,
     curation_control: dict[str, Any] | None = None,
     source_freshness: dict[str, Any] | None = None,
@@ -2635,7 +2758,12 @@ def build_command_lanes(
             darpa_submission_receipt or {}, darpa_public_submission_receipt or {}
         )
     )
-    lanes.append(build_openai_build_week_lane(openai_build_week_readiness or {}))
+    lanes.append(
+        build_openai_build_week_lane(
+            openai_build_week_readiness or {},
+            openai_build_week_submission_receipt or {},
+        )
+    )
 
     apply_submission_receipts(lanes, submission_receipt or {})
     apply_nashville_submission_receipt(
@@ -2695,6 +2823,9 @@ def build_payload(
         DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT
     )
     openai_build_week_readiness = read_json(OPENAI_BUILD_WEEK_READINESS)
+    openai_build_week_submission_receipt = read_json(
+        OPENAI_BUILD_WEEK_SUBMISSION_RECEIPT
+    )
     sam_rotation_control = read_json(SAM_KEY_ROTATION_CONTROL)
     if sam_rotation_control.get("schema") != "lumencore.sam_public_credential_rotation_control.v1":
         raise ValueError("SAM.gov API-key rotation control is missing or stale")
@@ -2733,6 +2864,7 @@ def build_payload(
         darpa_submission_receipt,
         darpa_public_submission_receipt,
         openai_build_week_readiness,
+        openai_build_week_submission_receipt,
         scan_date,
         curation_control,
         source_freshness,
@@ -2809,7 +2941,17 @@ def build_payload(
     }
     freshness_blocked = [row for row in lanes if row["freshness_blockers"]]
     sam_live_source = source_freshness["sources"]["sam_live_discovery"]
-    if build_week_lane["source_integrity_pass"]:
+    if build_week_lane["submission_confirmed"]:
+        strongest_today_action = (
+            "OpenAI Build Week is submission-confirmed; preserve the receipt and do not "
+            "resubmit absent a verified correction. "
+        )
+        fastest_low_friction_lane = (
+            "OpenAI Build Week is submission-confirmed by the public project page and "
+            "Devpost email. Monitor inbound-only without claiming selection or an award. "
+            "MissionWeave is now the nearest active portal deadline."
+        )
+    elif build_week_lane["source_integrity_pass"]:
         strongest_today_action = (
             "Finish the OpenAI Build Week external gates first: deploy and verify the public demo, "
             "capture the exact model label and /feedback Session ID, record the privacy-reviewed "
@@ -2865,6 +3007,9 @@ def build_payload(
             "sam_zero_row_inconclusive_blocker": sam_live_source["zero_rows"],
             "build_week_source_integrity_pass": build_week_lane[
                 "source_integrity_pass"
+            ],
+            "build_week_submission_confirmed": build_week_lane[
+                "submission_confirmed"
             ],
             "build_week_source_recheck_required": build_week_lane[
                 "source_recheck_required"
@@ -3057,7 +3202,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        f"Direct answer: HarborSentinel remains urgent but is not ready; its dedicated package stays visible while stale source, DSIP, package-integrity, eligibility, compliance, cost, and portal gates remain closed. Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. {summary['critical_same_day_infrastructure_action']} Finish the OpenAI Build Week public-demo, provenance, video, and Devpost preview gates before its July 21 close, then stage the hash-verified MissionWeave DSIP package for July 22 noon Eastern. Refresh NSF before resuming its rolling Project Pitch staging, close the declined Cambridge FHWA teaming route without another follow-up, and keep DOJ/BOP partner-only.",
+        f"Direct answer: HarborSentinel remains urgent but is not ready; its dedicated package stays visible while stale source, DSIP, package-integrity, eligibility, compliance, cost, and portal gates remain closed. Nashville EC is portal-confirmed; DARPA was sent before deadline and returned a generic procedural response; NASA and Army are sent, and CDC acknowledged receipt. {summary['critical_same_day_infrastructure_action']} OpenAI Build Week is submission-confirmed, so preserve its receipt and stage the hash-verified MissionWeave DSIP package for July 22 noon Eastern. Refresh NSF before resuming its rolling Project Pitch staging, close the declined Cambridge FHWA teaming route without another follow-up, and keep DOJ/BOP partner-only.",
         "",
         "## Control Line",
         "",

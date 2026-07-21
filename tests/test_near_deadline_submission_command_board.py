@@ -63,7 +63,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert payload["summary"]["lane_count"] == 23
     assert payload["summary"]["curated_navy_lane_count"] == 3
     assert payload["summary"]["stage_now_count"] == 3
-    assert payload["summary"]["sent_verified_count"] == 5
+    assert payload["summary"]["sent_verified_count"] == 6
     assert payload["summary"]["emergency_eligibility_gate_count"] == 0
     assert payload["summary"]["no_bid_or_partner_only_count"] == 6
     assert payload["summary"]["expired_without_verified_send_count"] == 1
@@ -125,20 +125,22 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         "75D301-26-RFI-73483",
         "NASHVILLE-EC-FALL-2026",
         "DARPA-SN-26-97",
+        "OPENAI-BUILD-WEEK-2026",
     }
 
     assert "HHS-2026-ACL-NIDILRR-REGE-0212" in payload["summary"]["closest_deadline_lane"]
     assert "DLA26BZ03-NV011" in payload["summary"]["closest_stage_ready_lane"]
-    assert "Reconcile the OpenAI Build Week readiness packet" in payload["summary"][
+    assert "OpenAI Build Week is submission-confirmed" in payload["summary"][
         "strongest_today_action"
     ]
     assert payload["summary"]["build_week_source_integrity_pass"] is False
-    assert payload["summary"]["build_week_source_recheck_required"] is True
-    assert payload["summary"]["build_week_source_blocker_count"] == 3
+    assert payload["summary"]["build_week_submission_confirmed"] is True
+    assert payload["summary"]["build_week_source_recheck_required"] is False
+    assert payload["summary"]["build_week_source_blocker_count"] == 0
     assert "Nashville EC is portal-confirmed" in payload["summary"][
         "strongest_today_action"
     ]
-    assert "readiness packet is held" in payload["summary"][
+    assert "MissionWeave is now the nearest active portal deadline" in payload["summary"][
         "fastest_low_friction_lane"
     ]
 
@@ -293,29 +295,33 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         for row in payload["lanes"]
         if row["opportunity_number"] == "OPENAI-BUILD-WEEK-2026"
     )
-    assert build_week["command"] == "REVERIFY_SOURCE_BEFORE_STAGE"
-    assert build_week["pre_freshness_command"] == "STAGE_APPLICATION"
+    assert build_week["command"] == "SENT_VERIFIED"
+    assert build_week["pre_freshness_command"] == "SENT_VERIFIED"
     assert build_week["deadline_date"] == "2026-07-21"
     assert build_week["deadline_utc"] == "2026-07-22T00:00:00Z"
     assert build_week["deadline_semantics"] == "OFFICIAL_RULES_DEADLINE_VERIFIED"
-    assert build_week["readiness_status"] == (
-        "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
-    )
+    assert build_week["readiness_status"] == "PORTAL_SUBMISSION_CONFIRMED"
     assert build_week["readiness_gate_total"] == 10
     assert build_week["readiness_gate_pass_count"] == 5
     assert build_week["readiness_gate_open_count"] == 5
     assert build_week["public_demo_url"] == (
         "https://lumen-core.ai/build_week/prooflock_console/"
     )
-    assert build_week["youtube_demo_url"] is None
-    assert build_week["feedback_session_id_present"] is False
-    assert build_week["confirmed_model_present"] is False
-    assert len(build_week["package_files"]) == 5
+    assert build_week["youtube_demo_url"] == "https://youtu.be/3qhK9WSJuaY"
+    assert build_week["feedback_session_id_present"] is True
+    assert build_week["confirmed_model_present"] is True
+    assert len(build_week["package_files"]) == 6
     assert build_week["source_integrity_pass"] is False
-    assert build_week["source_recheck_required"] is True
+    assert build_week["submission_confirmed"] is True
+    assert build_week["submission_receipt_errors"] == []
+    assert build_week["source_recheck_required"] is False
     assert build_week["source_control_errors"] == []
     assert len(build_week["source_artifact_errors"]) == 3
-    assert len(build_week["freshness_blockers"]) == 3
+    assert build_week["freshness_blockers"] == []
+    assert build_week["submission_status"] == "PORTAL_SUBMISSION_CONFIRMED"
+    assert build_week["sent_utc"] == "2026-07-21T16:00:55Z"
+    assert build_week["portal_status"] == "PORTAL_CONFIRMED_RECEIPT_BACKED"
+    assert build_week["human_gate"] == []
 
     missionweave = next(
         row
@@ -577,7 +583,10 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "Expired without verified send: `1`" in rendered
     assert "CDC acknowledged receipt" in rendered
     assert "Nashville EC is portal-confirmed" in rendered
-    assert "DARPA was sent before deadline with acknowledgment pending" in rendered
+    assert (
+        "DARPA was sent before deadline and returned a generic procedural response"
+        in rendered
+    )
     assert "SAM.gov public credential rotation became overdue" in rendered
     assert "Guarded installer: `code/ops/INSTALL_SAM_PUBLIC_CREDENTIAL.py`" in rendered
     assert "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE" in rendered
@@ -619,6 +628,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "nashville_ec_submission_receipt",
         "darpa_sn_26_97_submission_receipt",
         "openai_build_week_submission_readiness",
+        "openai_build_week_submission_receipt",
         "openai_build_week_project_description",
         "openai_build_week_demo_script",
         "openai_build_week_requirements",

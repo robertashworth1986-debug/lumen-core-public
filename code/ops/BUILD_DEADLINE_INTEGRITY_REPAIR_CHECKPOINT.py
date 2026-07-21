@@ -29,6 +29,7 @@ SOURCES = (
     "config/outreach_followup_policies_v1.json",
     "dashboard/data/human_action_docket.json",
     "dashboard/data/submission_authority_matrix.json",
+    "evidence/openai_build_week/prooflock_youtube_publication_receipt_20260721.json",
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md",
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md",

@@ -1,0 +1,71 @@
+{
+  "schema": "lumencore.prooflock_youtube_publication_receipt.v1",
+  "observed_utc": "2026-07-21T16:02:38Z",
+  "source_video": {
+    "filename": "prooflock_console_openai_build_week_demo_luma_candidate.mp4",
+    "sha256": "9f1d417cb29c132ecc9a31f3a572adbcb3ebd66208517e70ad9adab6e8684b15",
+    "size_bytes": 6580808,
+    "local_duration_seconds": 125.27,
+    "video_codec": "h264",
+    "audio_codec": "aac",
+    "width": 1920,
+    "height": 1080,
+    "frame_rate_fps": 30
+  },
+  "synthetic_narration": {
+    "filename": "prooflock_console_build_week_narration_luma_timeline_candidate.wav",
+    "sha256": "28eab0b0b0436ece39fad8d1655e9862022cea8b461a843225e23c6363aaede0",
+    "size_bytes": 6013030,
+    "duration_seconds": 125.269833,
+    "sample_rate_hz": 24000,
+    "channels": 1,
+    "transcription_qa_sha256": "48a65c309c04558dce44e28b8b14e05c16b242e6bf56fca6e1d846e515a6e62f",
+    "critical_phrases_present": true,
+    "voice_disclosure_present": true
+  },
+  "youtube": {
+    "video_id": "3qhK9WSJuaY",
+    "url": "https://youtu.be/3qhK9WSJuaY",
+    "title": "ProofLock Console | OpenAI Build Week 2026",
+    "visibility": "PUBLIC",
+    "audience": "NOT_MADE_FOR_KIDS",
+    "copyright_check": "COMPLETE_NO_ISSUES_FOUND",
+    "studio_filename_match": true,
+    "studio_player_duration_display": "2:06",
+    "public_watch_url_resolved": true,
+    "public_oembed_title_match": true,
+    "public_oembed_provider": "YouTube",
+    "custom_thumbnail_state": "BLOCKED_PENDING_CHANNEL_PHONE_VERIFICATION"
+  },
+  "devpost": {
+    "video_url_saved_in_project_details": true,
+    "project_details_step_saved": true,
+    "observed_completed_step_count": 5,
+    "observed_total_step_count": 5,
+    "feedback_session_id_saved": true,
+    "submission_state": "SUBMITTED",
+    "submission_completed_by_user_report": true,
+    "public_project_page_resolved": true,
+    "public_project_url": "https://devpost.com/software/prooflock-console",
+    "public_page_submitted_to": "OpenAI Build Week",
+    "public_page_video_embed_matches": true,
+    "public_page_model_reference": "GPT-5.6",
+    "confirmation_email_received": true,
+    "confirmation_email_utc": "2026-07-21T16:00:55Z",
+    "confirmation_email_subject": "Submission confirmed: ProofLock Console",
+    "confirmation_email_reply_required": false,
+    "post_submission_editing_allowed_until_deadline": true,
+    "confirmation_email_deadline": "2026-07-21T17:00:00-07:00",
+    "final_terms_review_independently_verified": false,
+    "final_submission_performed": true
+  },
+  "controls": {
+    "private_session_identifier_exposed": false,
+    "patent_sensitive_material_exposed": false,
+    "external_validation_claimed": false,
+    "contest_acceptance_claimed": false,
+    "award_claimed": false
+  },
+  "claim_boundary": "This receipt records the observed YouTube publication state, declared local source-video and narration identities, transcript-QA boundaries, Robert's report that he completed submission, the publicly resolved Devpost page showing ProofLock Console submitted to OpenAI Build Week with the matching video embedded, and Devpost's submission-confirmation email. It does not independently prove that terms were read, contest acceptance beyond successful submission, judging, award, OpenAI endorsement, external validation, engineering performance, safety, patent rights, funding, or commercial readiness.",
+  "receipt_sha256": "c83e6e722ee80670b5a3435684e007c85f2544a99e68282259ec811cae9a78fb"
+}

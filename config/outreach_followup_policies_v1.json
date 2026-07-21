@@ -67,11 +67,11 @@
     },
     {
       "lane_id": "openai_build_week_prooflock",
-      "mode": "PORTAL_ACTION",
+      "mode": "INBOUND_ONLY",
       "eligible_template_id": null,
       "not_before_utc": null,
       "max_proactive_sends": 0,
-      "rationale": "The remaining work is external submission-field, feedback-session, deployment, and video completion rather than an email reply."
+      "rationale": "Devpost submission is confirmed by the public project page and confirmation email. Monitor for a judging or correction request; do not reply to the automated confirmation or duplicate the submission."
     },
     {
       "lane_id": "openai_build_week_internal_handoff",

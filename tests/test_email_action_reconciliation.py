@@ -43,9 +43,9 @@ def test_reconciliation_is_deterministic_and_no_send():
     assert actual["summary"]["follow_up_mode_counts"] == {
         "ACCOUNT_ACTION": 1,
         "CLOSED": 2,
-        "INBOUND_ONLY": 8,
+        "INBOUND_ONLY": 9,
         "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 2,
-        "PORTAL_ACTION": 2,
+        "PORTAL_ACTION": 1,
         "PRIVATE_RECONCILIATION": 1,
     }
     assert actual["summary"]["human_account_action_count"] == 4
@@ -122,7 +122,18 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
 
     build_week = lanes["openai_build_week_prooflock"]
     assert build_week["deadline_utc"] == "2026-07-22T00:00:00Z"
-    assert build_week["state"] == "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
+    assert build_week["latest_event_type"] == "DEVPOST_SUBMISSION_CONFIRMED"
+    assert build_week["latest_event_utc"] == "2026-07-21T16:00:55Z"
+    assert build_week["state"] == "PORTAL_SUBMISSION_CONFIRMED"
+    assert build_week["portal_submission_verified"] is True
+    assert build_week["confirmation_email_received"] is True
+    assert build_week["public_project_page_resolved"] is True
+    assert build_week["public_page_video_embed_matches"] is True
+    assert build_week["confirmed_model_reference"] == "GPT-5.6"
+    assert build_week["email_reply_required"] is False
+    assert build_week["send_now"] is False
+    assert build_week["follow_up_policy"]["mode"] == "INBOUND_ONLY"
+    assert "Do not reply" in build_week["next_action"]
 
     build_week_handoff = lanes["openai_build_week_internal_handoff"]
     assert build_week_handoff["state"] == (
@@ -186,6 +197,7 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert source_evidence["darpa_sn_26_97_public_submission_receipt"]["present"] is True
     assert source_evidence["missionweave_dsip_action_gate"]["present"] is True
     assert source_evidence["openai_build_week_readiness"]["present"] is True
+    assert source_evidence["openai_build_week_submission_receipt"]["present"] is True
     assert source_evidence["openai_build_week_handoff_integrity_control"][
         "present"
     ] is True
