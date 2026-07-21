@@ -393,6 +393,9 @@ def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     assert lifecycle["submission_readiness_logic_unchanged"] is True
     assert lifecycle["classification_can_clear_gate"] is False
     assert lifecycle["all_open_gates_classified_once"] is True
+    assert lifecycle["classification_version"] == "missionweave.gate_lifecycle.v2"
+    assert lifecycle["dependency_graph_acyclic"] is True
+    assert lifecycle["dependency_stage_order_valid"] is True
     sequence = payload["founder_action_sequence"]
     sequenced_open = [
         gate
@@ -1222,6 +1225,26 @@ def test_checked_jcp_flag_cannot_clear_gate_without_private_receipt():
     ] is False
 
 
+def test_lifecycle_fails_closed_if_final_no_duplicate_decision_is_moved_before_preview(
+    monkeypatch,
+):
+    module = load_module()
+    monkeypatch.setattr(
+        module,
+        "LIFECYCLE_ACTION_TIME_GATES",
+        frozenset(
+            set(module.LIFECYCLE_ACTION_TIME_GATES).difference(
+                {"NO_DUPLICATE_COST_OR_DELIVERABLE"}
+            )
+        ),
+    )
+
+    with pytest.raises(module.MissionWeaveGateError) as exc:
+        module.gate_lifecycle_stages(module.required_private_gates())
+
+    assert exc.value.code == "GATE_LIFECYCLE_DEPENDENCY_ORDER_INVALID"
+
+
 def test_written_public_outputs_and_checklist_are_current_and_safe():
     module = load_module()
     payload = json.loads(module.OUT_JSON.read_text(encoding="utf-8"))
@@ -1257,6 +1280,25 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     assert len(lifecycle_open) == len(set(lifecycle_open))
     assert lifecycle["classification_can_clear_gate"] is False
     assert lifecycle["submission_readiness_logic_unchanged"] is True
+    assert lifecycle["classification_version"] == "missionweave.gate_lifecycle.v2"
+    assert lifecycle["dependency_graph_acyclic"] is True
+    assert lifecycle["dependency_stage_order_valid"] is True
+    no_duplicate_dependency = lifecycle["dependencies"][
+        "NO_DUPLICATE_COST_OR_DELIVERABLE"
+    ]
+    assert no_duplicate_dependency["gate_stage"] == (
+        "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN"
+    )
+    assert set(no_duplicate_dependency["required_gates"]) == {
+        "COMPLETE_PORTAL_PREVIEW_REVIEW",
+        "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+    }
+    assert "NO_DUPLICATE_COST_OR_DELIVERABLE" not in lifecycle["stages"][
+        "A_PRE_SUBMISSION_CONTENT_AND_EVIDENCE"
+    ]["open_gates"]
+    assert "NO_DUPLICATE_COST_OR_DELIVERABLE" in lifecycle["stages"][
+        "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN"
+    ]["open_gates"]
     negotiation = lifecycle["stages"][
         "B_PRE_AWARD_OR_CONTRACT_NEGOTIATION_READINESS"
     ]
@@ -1281,6 +1323,13 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
         "06_FRESH_PORTAL_PREVIEW",
         "07_ACTION_TIME_REVIEW_AND_AUTHORIZATION",
     ]
+    step_by_id = {step["step_id"]: step for step in sequence["ordered_steps"]}
+    assert "NO_DUPLICATE_COST_OR_DELIVERABLE" not in step_by_id[
+        "04_COMPLIANCE_AND_CONFLICT_POSITION"
+    ]["open_gates"]
+    assert "NO_DUPLICATE_COST_OR_DELIVERABLE" in step_by_id[
+        "07_ACTION_TIME_REVIEW_AND_AUTHORIZATION"
+    ]["open_gates"]
     assert "## Reconciliation Groups" in markdown
     assert "## Lifecycle Boundaries" in markdown
     assert "## Founder Action Sequence" in markdown

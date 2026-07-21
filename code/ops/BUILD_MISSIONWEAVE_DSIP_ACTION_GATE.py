@@ -335,9 +335,30 @@ LIFECYCLE_ACTION_TIME_GATES = frozenset(
         "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
         "COMPLETE_PORTAL_PREVIEW_REVIEW",
         "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+        "NO_DUPLICATE_COST_OR_DELIVERABLE",
         "PORTAL_PREVIEW_RECEIPT_HASH",
     }
 )
+
+GATE_LIFECYCLE_DEPENDENCIES = {
+    "COMPLETE_PORTAL_PREVIEW_REVIEW": frozenset({"VOLUME5_UPLOAD_SET"}),
+    "PORTAL_PREVIEW_RECEIPT_HASH": frozenset({"VOLUME5_UPLOAD_SET"}),
+    "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW": frozenset(
+        {"COMPLETE_PORTAL_PREVIEW_REVIEW", "PORTAL_PREVIEW_RECEIPT_HASH"}
+    ),
+    "NO_DUPLICATE_COST_OR_DELIVERABLE": frozenset(
+        {
+            "COMPLETE_PORTAL_PREVIEW_REVIEW",
+            "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+        }
+    ),
+    "ACTION_TIME_APPROVAL_TIMESTAMP": frozenset(
+        {"CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW", "PORTAL_PREVIEW_RECEIPT_HASH"}
+    ),
+    "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION": frozenset(
+        {"ACTION_TIME_APPROVAL_TIMESTAMP"}
+    ),
+}
 
 FOUNDER_ACTION_DEFINITIONS = (
     {
@@ -377,22 +398,22 @@ FOUNDER_ACTION_DEFINITIONS = (
     },
     {
         "step_id": "04_COMPLIANCE_AND_CONFLICT_POSITION",
-        "title": "Review conflicts, cost separation, data rights, CMMC, and export-control planning",
+        "title": "Prepare conflicts, cost separation, data rights, CMMC, and export-control positions",
         "gate_ids": frozenset(
             {
                 "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
                 "CONFLICTS_AND_JOINT_VENTURE_STATUS",
                 "CURRENT_CMMC_REQUIREMENTS_REVIEW",
-                "NO_DUPLICATE_COST_OR_DELIVERABLE",
                 "TECHNICAL_DATA_RIGHTS_ASSERTION",
                 "TECHNOLOGY_CONTROL_PLAN_DECISION",
             }
         ),
         "instruction": (
-            "Answer conflicts and joint-venture status from current facts; reconcile the "
-            "no-duplicate-cost position and technical-data-rights schedule against source "
-            "records; review the live CMMC requirement; preserve the no-overclaim position; "
-            "and document the bounded Technology Control Plan position. The DLA component "
+            "Answer conflicts and joint-venture status from current facts; prepare the "
+            "no-duplicate-cost reconciliation for its final post-preview corporate decision; "
+            "reconcile the technical-data-rights schedule against source records; review the "
+            "live CMMC requirement; preserve the no-overclaim position; and document the "
+            "bounded Technology Control Plan position. The DLA component "
             "instructions say an ITAR/EAR topic firm may be required to submit a TCP during "
             "contracting negotiation; that does not establish a current proposal-upload "
             "requirement or agency acceptance."
@@ -433,17 +454,20 @@ FOUNDER_ACTION_DEFINITIONS = (
     },
     {
         "step_id": "07_ACTION_TIME_REVIEW_AND_AUTHORIZATION",
-        "title": "Perform corporate review and action-time authorization",
+        "title": "Perform final corporate review, no-duplicate decision, and authorization",
         "gate_ids": frozenset(
             {
                 "ACTION_TIME_APPROVAL_TIMESTAMP",
                 "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
                 "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+                "NO_DUPLICATE_COST_OR_DELIVERABLE",
             }
         ),
         "instruction": (
-            "Only after the fresh preview is stable, review every volume as corporate official, "
-            "capture the short-lived approval binding, and authorize the exact final submission."
+            "Only after the fresh preview is stable, review every volume as corporate official; "
+            "finalize and hash-bind the no-duplicate-cost and deliverable decision against that "
+            "exact preview; capture the short-lived approval binding; and authorize the exact "
+            "final submission."
         ),
         "evidence_required": "Fresh approval timestamp and binding to the current preview/upload set",
         "human_boundary": "The final certification and submit click are founder-only actions.",
@@ -1930,6 +1954,75 @@ def gate_reconciliation_groups(unresolved_gates: list[str]) -> dict[str, Any]:
     return groups
 
 
+def lifecycle_dependency_state(
+    stage_definitions: tuple[
+        tuple[str, set[str] | frozenset[str], str, str], ...
+    ],
+) -> dict[str, Any]:
+    required = set(required_private_gates())
+    dependency_gates = set(GATE_LIFECYCLE_DEPENDENCIES)
+    dependency_targets = set().union(*GATE_LIFECYCLE_DEPENDENCIES.values())
+    if not dependency_gates.union(dependency_targets).issubset(required):
+        raise MissionWeaveGateError("GATE_LIFECYCLE_DEPENDENCY_DRIFT")
+
+    stage_index_by_gate: dict[str, int] = {}
+    stage_id_by_gate: dict[str, str] = {}
+    for stage_index, (stage_id, members, _, _) in enumerate(stage_definitions):
+        for gate_id in members:
+            if gate_id in stage_index_by_gate:
+                raise MissionWeaveGateError("GATE_LIFECYCLE_STAGE_OVERLAP")
+            stage_index_by_gate[gate_id] = stage_index
+            stage_id_by_gate[gate_id] = stage_id
+    if set(stage_index_by_gate) != required:
+        raise MissionWeaveGateError("GATE_LIFECYCLE_CLASSIFICATION_DRIFT")
+
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(gate_id: str) -> None:
+        if gate_id in visiting:
+            raise MissionWeaveGateError("GATE_LIFECYCLE_DEPENDENCY_CYCLE")
+        if gate_id in visited:
+            return
+        visiting.add(gate_id)
+        for dependency in GATE_LIFECYCLE_DEPENDENCIES.get(gate_id, frozenset()):
+            visit(dependency)
+        visiting.remove(gate_id)
+        visited.add(gate_id)
+
+    for gate_id in sorted(required):
+        visit(gate_id)
+
+    for gate_id, dependencies in GATE_LIFECYCLE_DEPENDENCIES.items():
+        gate_stage = stage_index_by_gate[gate_id]
+        if any(
+            stage_index_by_gate[dependency] > gate_stage
+            for dependency in dependencies
+        ):
+            raise MissionWeaveGateError("GATE_LIFECYCLE_DEPENDENCY_ORDER_INVALID")
+
+    return {
+        "dependency_policy_version": "missionweave.gate_lifecycle_dependencies.v1",
+        "dependency_graph_acyclic": True,
+        "dependency_stage_order_valid": True,
+        "dependency_edge_count": sum(
+            len(dependencies)
+            for dependencies in GATE_LIFECYCLE_DEPENDENCIES.values()
+        ),
+        "dependencies": {
+            gate_id: {
+                "gate_stage": stage_id_by_gate[gate_id],
+                "required_gates": sorted(dependencies),
+                "required_gate_stages": {
+                    dependency: stage_id_by_gate[dependency]
+                    for dependency in sorted(dependencies)
+                },
+            }
+            for gate_id, dependencies in sorted(GATE_LIFECYCLE_DEPENDENCIES.items())
+        },
+    }
+
+
 def gate_lifecycle_stages(unresolved_gates: list[str]) -> dict[str, Any]:
     required = set(required_private_gates())
     action_time = set(LIFECYCLE_ACTION_TIME_GATES)
@@ -1978,6 +2071,7 @@ def gate_lifecycle_stages(unresolved_gates: list[str]) -> dict[str, Any]:
         classified.update(members)
     if classified != required:
         raise MissionWeaveGateError("GATE_LIFECYCLE_CLASSIFICATION_DRIFT")
+    dependency_state = lifecycle_dependency_state(stage_definitions)
 
     unresolved = set(unresolved_gates)
     allowed_unresolved = required.union({"OFFICIAL_SOURCE_INTEGRITY"})
@@ -2010,11 +2104,12 @@ def gate_lifecycle_stages(unresolved_gates: list[str]) -> dict[str, Any]:
         raise MissionWeaveGateError("GATE_LIFECYCLE_OPEN_GATE_COVERAGE_DRIFT")
 
     return {
-        "classification_version": "missionweave.gate_lifecycle.v1",
+        "classification_version": "missionweave.gate_lifecycle.v2",
         "submission_readiness_logic_unchanged": True,
         "classification_can_clear_gate": False,
         "all_open_gates_classified_once": True,
         "live_portal_or_contracting_office_confirmation_required": True,
+        **dependency_state,
         "stages": stages,
     }
 
@@ -2078,7 +2173,7 @@ def founder_action_sequence(unresolved_gates: list[str]) -> dict[str, Any]:
         raise MissionWeaveGateError("FOUNDER_ACTION_OPEN_GATE_COVERAGE_DRIFT")
 
     return {
-        "sequence_version": "missionweave.founder_action_sequence.v1",
+        "sequence_version": "missionweave.founder_action_sequence.v2",
         "open_step_count": len(ordered_steps),
         "all_open_gates_covered_once": True,
         "classification_can_clear_gate": False,

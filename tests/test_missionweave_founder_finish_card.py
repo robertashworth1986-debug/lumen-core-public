@@ -94,7 +94,7 @@ def test_finish_card_covers_every_open_gate_once_and_preserves_human_boundaries(
     assert [
         stage["open_gate_count"]
         for stage in payload["operator_focus"]["lifecycle_stages"]
-    ] == [8, 2, 5]
+    ] == [7, 2, 6]
     assert [
         stage["title"] for stage in payload["operator_focus"]["lifecycle_stages"]
     ] == ["Do now", "Bound the pre-award position", "Do last"]
@@ -147,7 +147,7 @@ def test_finish_card_self_hash_and_rendered_operator_language_are_current():
     assert "CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py" in rendered
     assert "CMMC And TCP Decision Support" in rendered
     assert rendered.index("## What To Do Now") < rendered.index("## Do These In Order")
-    assert "**Do now**: 8 open" in rendered
+    assert "**Do now**: 7 open" in rendered
     assert "APPLICABILITY_UNRESOLVED" in rendered
     assert "during contracting negotiation" in rendered
     assert "does not prove JCP approval" in rendered
