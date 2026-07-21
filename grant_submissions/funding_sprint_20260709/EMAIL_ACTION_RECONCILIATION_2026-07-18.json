@@ -116,6 +116,35 @@
       "do_not_duplicate_send": true,
       "email_reply_required": false,
       "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "nashville_vlpa_patent_referral",
+        "max_proactive_sends": 0,
+        "mode": "CLOSED",
+        "not_before_utc": null,
+        "rationale": "VLPA confirmed patent matters are outside its scope and supplied three referral routes; close this route without a courtesy reply or duplicate request."
+      },
+      "lane_id": "nashville_vlpa_patent_referral",
+      "latest_event_type": "PATENT_SCOPE_DECLINE_AND_REFERRALS_RECEIVED",
+      "latest_event_utc": "2026-07-21T22:34:44Z",
+      "next_action": "Close the VLPA route. Contact one official referral intake at a time for a limited-scope procedural deadline review, and disclose no unpublished application contents until confidentiality and representation terms are understood.",
+      "no_send_before": null,
+      "organization": "Volunteer Lawyers and Professionals for the Arts",
+      "patent_service_available": false,
+      "referral_acceptance_confirmed_count": 0,
+      "referral_organizations": [
+        "Nashville Bar Association",
+        "Tennessee Bar Association",
+        "University of Tennessee College of Law Legal Clinic"
+      ],
+      "referral_route_count": 3,
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "PATENT_SERVICE_UNAVAILABLE_THREE_REFERRAL_ROUTES_IDENTIFIED"
+    },
+    {
+      "do_not_duplicate_send": true,
+      "email_reply_required": false,
+      "follow_up_policy": {
         "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
         "lane_id": "lanl_vision_licensing_followup",
         "max_proactive_sends": 1,
@@ -422,6 +451,7 @@
     "Funding, grant, contract, SBIR/STTR, DSIP, NSF, SAM.gov, and Research.gov",
     "Patent routing and Georgia PATENTS",
     "USPTO Pro Se procedural access guidance for an already-filed application",
+    "Nashville VLPA patent-scope decline and attorney-referral routes",
     "LANL VISION and licensing follow-up",
     "EPRI Open Power AI Consortium onboarding",
     "FHWA TSMO qualified-partner outreach",
@@ -482,6 +512,14 @@
       "sha256": "E606530B0CCBAB06347BEF60DE527B4A76E5EE35BD7A15E71C3A0B49647BE505",
       "worktree_eol_differs_from_git_blob": false
     },
+    "nashville_vlpa_patent_referral_receipt": {
+      "bytes": 2079,
+      "identity_source": "COMMITTED_GIT_BLOB",
+      "path": "grant_submissions/funding_sprint_20260709/NASHVILLE_VLPA_PATENT_REFERRAL_RECEIPT_2026-07-21.json",
+      "present": true,
+      "sha256": "F85875794EEE63B379B1DAF4C92FE5117F34DD108FDE52A3EF3EE8993EAA66B0",
+      "worktree_eol_differs_from_git_blob": false
+    },
     "openai_build_week_handoff_integrity_control": {
       "bytes": 3529,
       "identity_source": "COMMITTED_GIT_BLOB",
@@ -507,11 +545,11 @@
       "worktree_eol_differs_from_git_blob": false
     },
     "outreach_followup_policy_config": {
-      "bytes": 6358,
+      "bytes": 6717,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "config/outreach_followup_policies_v1.json",
       "present": true,
-      "sha256": "0E23FD97636BF839C665ACC7BB95E2C4DAF3FBFAAAAB3446755BA724ECE48445",
+      "sha256": "CDEA8B7559C57F7E9EF0BF71D7ECEDCAA4EC88800EDF77F645DDC18C763F1DA6",
       "worktree_eol_differs_from_git_blob": false
     },
     "outreach_response_template_registry": {
@@ -533,20 +571,20 @@
   },
   "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
   "summary": {
-    "duplicate_outbound_risk_count": 16,
+    "duplicate_outbound_risk_count": 17,
     "email_reply_required_count": 0,
     "external_send_allowed_without_human": false,
     "follow_up_mode_counts": {
       "ACCOUNT_ACTION": 1,
-      "CLOSED": 2,
+      "CLOSED": 3,
       "INBOUND_ONLY": 10,
       "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 2,
       "PORTAL_ACTION": 1,
       "PRIVATE_RECONCILIATION": 1
     },
     "human_account_action_count": 4,
-    "lane_count": 17,
-    "monitor_no_send_template_count": 16,
+    "lane_count": 18,
+    "monitor_no_send_template_count": 17,
     "out_of_office_count": 1,
     "send_now_count": 0
   }

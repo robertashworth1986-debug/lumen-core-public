@@ -6,11 +6,11 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 
 ## Control Line
 
-- Reconciled lanes: `17`
+- Reconciled lanes: `18`
 - Reply required now: `0`
 - Send now: `0`
-- Duplicate-outbound risks: `16`
-- No-send template coverage: `16`
+- Duplicate-outbound risks: `17`
+- No-send template coverage: `17`
 - Human account actions: `4`
 - Browser navigation performed: `false`
 
@@ -22,6 +22,7 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 | EPRI Open Power AI Consortium | `MOU_ROUTING_SENT_OUT_OF_OFFICE_RECEIVED` | `INBOUND_ONLY` | `false` | Wait for the MOU, a correction request, or an onboarding question; do not resend identity details. |
 | Georgia PATENTS | `SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION` | `CLOSED` | `false` | Close this pro bono route without a reply. Continue the private Patent Center docket capture, USPTO Pro Se procedural route, and a verified practitioner referral without emailing unpublished application material. |
 | USPTO Pro Se Assistance Center | `ACCESS_PATH_IDENTIFIED_DEADLINE_NOT_CONFIRMED` | `INBOUND_ONLY` | `false` | Use a verified uspto.gov account and identity verification, or order the application through Document Services, then call the Pro Se Assistance Center with the private service-request reference available. Do not disclose unpublished application material in public artifacts. |
+| Volunteer Lawyers and Professionals for the Arts | `PATENT_SERVICE_UNAVAILABLE_THREE_REFERRAL_ROUTES_IDENTIFIED` | `CLOSED` | `false` | Close the VLPA route. Contact one official referral intake at a time for a limited-scope procedural deadline review, and disclose no unpublished application contents until confidentiality and representation terms are understood. |
 | Los Alamos National Laboratory | `PACKAGE_SENT_RESPONSE_PENDING` | `ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD` | `false` | Wait for LANL; use the single bounded follow-up only on or after July 23 if no reply arrives. |
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `INBOUND_ONLY` | `false` | Monitor for a CDC clarification, replacement request, or scheduling message; do not resend the response. |
 | DARPA Multi X Office | `FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY` | `INBOUND_ONLY` | `false` | Record the agency thread response and monitor for a specific clarification, replacement request, or workshop invitation. Do not reply to the generic procedural response or resend the package. |
