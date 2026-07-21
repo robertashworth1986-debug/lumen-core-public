@@ -21,6 +21,10 @@
     "license_path": "LICENSE",
     "citation_path": "CITATION.cff",
     "method_note_path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+    "preprint_markdown_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
+    "preprint_pdf_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+    "preprint_builder_path": "code/ops/BUILD_CODECHECK_PREPRINT_PDF.py",
+    "community_request_draft_path": "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
     "runner_path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
     "reviewer_protocol_path": "config/reviewer_reproducibility_protocol_v1.json",
     "dependency_verifier_path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
@@ -52,8 +56,23 @@
     "expected_status": "BOUNDED_REPRODUCIBILITY_PASS",
     "expected_suite_count": 3,
     "expected_assertion_count": 31,
+    "noncomputational_documentation_or_packaging_paths": [
+      "README.md"
+    ],
     "execution_control": "Author-operated Docker replay with network access disabled and the protocol-pinned Ubuntu, CPython, and dependency environment.",
-    "policy": "This receipt is internal operator evidence, not independent execution or external validation. It may establish current declared source identity only while every source artifact in the receipt still matches the repository byte-for-byte under its declared portable hash mode."
+    "policy": "This receipt is internal operator evidence, not independent execution or external validation. It may establish current computational identity only while every benchmark, protocol, frozen input, dependency lock, workflow, and test artifact in the receipt still matches byte-for-byte under its declared portable hash mode. Documentation drift must remain visible and requires a current-commit independent execution before any external claim changes."
+  },
+  "preprint_and_request": {
+    "official_launch_pad": "https://codecheck.org.uk/launch-pad/",
+    "paper_reference": "Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+    "source_sha256": "13bfcb537cf4e41ea249a2a94a8ced9e3f2363740e0cec802f582ca776a62818",
+    "pdf_sha256": "a87908b14fe1ac9d05c224f51e9562723592addc24aefe4e2690c943d02c52ef",
+    "expected_pdf_page_count": 5,
+    "stable_public_identifier": null,
+    "immutable_public_source_release": null,
+    "duplicate_request_reconciled": false,
+    "community_request_opened": false,
+    "policy": "The manuscript and request text are author-side drafts. A stable public preprint identifier, immutable public source release, duplicate-request reconciliation, Robert's review, and fresh action-time HumanUnlock are required before one production request may be opened."
   },
   "archive_reconciliation": {
     "noncomputational_documentation_or_packaging_paths": [
@@ -69,13 +88,17 @@
     "CITATION.cff",
     "codecheck.yml",
     "code/ops/BUILD_CODECHECK_EIA_READINESS.py",
+    "code/ops/BUILD_CODECHECK_PREPRINT_PDF.py",
     "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py",
     "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
     "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
     "config/codecheck_eia_readiness_v1.json",
     "config/external_validation_authority_docket_v1.json",
     "config/reviewer_reproducibility_protocol_v1.json",
+    "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
     "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+    "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
+    "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
     "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json",
     "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
     "requirements-reviewer-ubuntu-py311.lock",
@@ -89,10 +112,34 @@
       "meaning": "The author reviews the bounded method note, manifest, public files, and exact ask."
     },
     {
+      "gate_id": "stable_public_preprint_identifier",
+      "complete": false,
+      "owner": "Robert Ashworth",
+      "meaning": "The bounded manuscript receives a stable public URL or DOI that can be cited in the CODECHECK request."
+    },
+    {
+      "gate_id": "immutable_public_source_release",
+      "complete": false,
+      "owner": "Robert Ashworth",
+      "meaning": "The reviewed public source is frozen at an immutable release or commit and every packet hash is reconciled to it."
+    },
+    {
+      "gate_id": "duplicate_request_reconciled",
+      "complete": false,
+      "owner": "Luma3 validation lane",
+      "meaning": "Gmail, GitHub, and local outreach controls confirm that no prior CODECHECK request would be duplicated."
+    },
+    {
       "gate_id": "submission_authorized",
       "complete": false,
       "owner": "Robert Ashworth",
       "meaning": "Action-time HumanUnlock authorizes opening a single CODECHECK request without duplicate outreach."
+    },
+    {
+      "gate_id": "codecheck_register_issue_opened",
+      "complete": false,
+      "owner": "Robert Ashworth and CODECHECK",
+      "meaning": "Exactly one production register issue is opened through the current official route and its URL is recorded."
     },
     {
       "gate_id": "codechecker_assigned",

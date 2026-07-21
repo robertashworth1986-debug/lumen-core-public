@@ -23,6 +23,19 @@ OPERATOR_RECEIPT = (
     / "reproducibility"
     / "codecheck_eia_operator_clean_runner_be7776f7_20260721.json"
 )
+PREPRINT_MARKDOWN = (
+    ROOT
+    / "docs"
+    / "preprint"
+    / "BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md"
+)
+PREPRINT_PDF = (
+    ROOT
+    / "docs"
+    / "preprint"
+    / "BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf"
+)
+REQUEST_DRAFT = ROOT / "docs" / "CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md"
 
 
 def load_module():
@@ -46,6 +59,10 @@ def test_codecheck_configuration_is_author_scoped_and_manifest_exact():
     assert parsed["manifest_paths_safe"] is True
     assert parsed["manifest_paths_unique"] is True
     assert parsed["paper_title_present"] is True
+    assert (
+        parsed["paper_reference"]
+        == config["preprint_and_request"]["paper_reference"]
+    )
     assert parsed["corresponding_author_present"] is True
     assert parsed["codechecker_metadata_present"] is False
     assert parsed["report_metadata_present"] is False
@@ -106,6 +123,11 @@ def test_operator_clean_runner_is_hash_locked_clean_and_not_external():
     assert runner["suite_count"] == runner["suite_pass_count"] == 3
     assert runner["assertion_count"] == runner["assertion_pass_count"] == 31
     assert runner["source_reconciliation"]["full_source_exact_match"] is True
+    assert (
+        runner["source_reconciliation"]["computational_identity_exact_match"]
+        is True
+    )
+    assert runner["source_reconciliation"]["mismatch_paths"] == []
     assert runner["external_validation_complete"] is False
 
 
@@ -125,6 +147,48 @@ def test_operator_clean_runner_rejects_a_tampered_receipt(tmp_path):
     assert result["checks"]["receipt_sha256_matched"] is False
     assert result["checks"]["status_matched"] is False
     assert result["external_validation_complete"] is False
+
+
+def test_preprint_and_request_are_hash_locked_bounded_and_unopened():
+    module = load_module()
+    payload = module.build_payload(generated_utc="2026-07-20T00:00:00+00:00")
+    packet = payload["preprint_and_request"]
+
+    assert packet["verified"] is True
+    assert packet["markdown_path"] == PREPRINT_MARKDOWN.relative_to(ROOT).as_posix()
+    assert packet["pdf_path"] == PREPRINT_PDF.relative_to(ROOT).as_posix()
+    assert packet["request_path"] == REQUEST_DRAFT.relative_to(ROOT).as_posix()
+    assert packet["pdf_page_count"] == 5
+    assert packet["stable_public_identifier"] is None
+    assert packet["immutable_public_source_release"] is None
+    assert packet["duplicate_request_reconciled"] is False
+    assert packet["community_request_ready"] is False
+    assert packet["community_request_opened"] is False
+    assert all(packet["checks"].values())
+
+
+def test_preprint_verification_rejects_tampered_source(tmp_path):
+    module = load_module()
+    control = json.loads(CONFIG.read_text(encoding="utf-8"))[
+        "preprint_and_request"
+    ]
+    tampered = tmp_path / "preprint.md"
+    tampered.write_text(
+        PREPRINT_MARKDOWN.read_text(encoding="utf-8") + "\nunsupported claim\n",
+        encoding="utf-8",
+    )
+
+    result = module.verify_preprint_and_request(
+        control,
+        markdown_path=tampered,
+        pdf_path=PREPRINT_PDF,
+        request_path=REQUEST_DRAFT,
+    )
+
+    assert result["verified"] is False
+    assert result["checks"]["source_sha256_matched"] is False
+    assert result["community_request_ready"] is False
+    assert result["community_request_opened"] is False
 
 
 def test_ci_gate_is_read_only_pinned_and_retriggers_for_portable_inputs():
@@ -153,11 +217,15 @@ def test_internal_readiness_pass_keeps_every_external_gate_closed():
     assert summary["archive_full_source_exact_match"] is False
     assert summary["archived_computational_identity_still_matches"] is True
     assert summary["operator_clean_runner_receipt_verified"] is True
-    assert (
-        summary["operator_clean_runner_declared_source_identity_current"]
-        is True
-    )
+    assert summary["operator_clean_runner_full_source_exact_match"] is True
+    assert summary["operator_clean_runner_computational_identity_current"] is True
     assert summary["current_commit_clean_runner_complete"] is False
+    assert summary["public_preprint_draft_complete"] is True
+    assert summary["stable_public_preprint_identifier_complete"] is False
+    assert summary["immutable_public_source_release_complete"] is False
+    assert summary["duplicate_request_reconciled"] is False
+    assert summary["community_request_ready"] is False
+    assert summary["community_request_opened"] is False
     assert summary["human_author_review_complete"] is False
     assert summary["submission_authorized"] is False
     assert summary["codechecker_assigned"] is False
@@ -208,11 +276,14 @@ def test_published_outputs_match_a_timestamp_stable_rebuild():
     assert "Independent execution complete: `false`" in rendered
     assert "Operator clean-runner receipt verified: `true`" in rendered
     assert (
-        "Operator clean-runner declared source identity current: `true`"
+        "Operator clean-runner computational identity current: `true`"
         in rendered
     )
     assert "Certificate issued: `false`" in rendered
     assert "External validation complete: `false`" in rendered
+    assert "Public preprint draft complete: `true`" in rendered
+    assert "Stable public preprint identifier complete: `false`" in rendered
+    assert "Community request opened: `false`" in rendered
 
 
 def test_published_output_comparison_fails_closed_on_stale_json(tmp_path):

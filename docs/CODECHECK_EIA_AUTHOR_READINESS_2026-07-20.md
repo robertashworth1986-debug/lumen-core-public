@@ -1,24 +1,31 @@
 # CODECHECK EIA Author Readiness
 
-Generated UTC: `2026-07-21T14:13:32.084964+00:00`
+Generated UTC: `2026-07-21T14:41:22.864963+00:00`
 
 An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.
 
 ## Decision
 
 - Status: `AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW`
-- Internal checks: `39/39`
+- Internal checks: `54/54`
 - Declared reproducible outputs: `6`
 - Authoritative archive verified: `true`
 - Archived full source exact match: `false`
 - Archived computational identity still matches: `true`
 - Operator clean-runner receipt verified: `true`
-- Operator clean-runner declared source identity current: `true`
+- Operator clean-runner full source exact match: `true`
+- Operator clean-runner computational identity current: `true`
 - Current commit clean-runner complete: `false`
+- Public preprint draft complete: `true`
+- Stable public preprint identifier complete: `false`
+- Immutable public source release complete: `false`
+- Duplicate request reconciled: `false`
+- Community request ready: `false`
+- Community request opened: `false`
 - Independent execution complete: `false`
 - Certificate issued: `false`
 - External validation complete: `false`
-- Readiness SHA-256: `8640037fe8aa4a89838b9bbbd1161269adcf685d8b752b724e59aec92b8b132d`
+- Readiness SHA-256: `86cd8cdd355756044d84706b6733f0f421eaef20c2604b49f8ab0e12a62e7061`
 
 An internal pass means the author-side bundle is coherent enough for Robert to review. It is not a submission receipt, external execution, or certificate.
 
@@ -40,6 +47,23 @@ python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --r
 - `out/codecheck_eia/logs/mda_open_set.log`
 - `out/codecheck_eia/logs/fixture_tests.log`
 
+## Public Preprint And Request Draft
+
+- Markdown: `docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md`
+- Markdown SHA-256: `13bfcb537cf4e41ea249a2a94a8ced9e3f2363740e0cec802f582ca776a62818`
+- PDF: `docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
+- PDF SHA-256: `a87908b14fe1ac9d05c224f51e9562723592addc24aefe4e2690c943d02c52ef`
+- PDF pages: `5`
+- Manifest reference: `Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
+- Stable public identifier: `not assigned`
+- Immutable public source release: `not frozen`
+- Duplicate request reconciled: `false`
+- Request draft: `docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md`
+- Community request ready: `false`
+- Community request opened: `false`
+
+The manuscript and request text are author-side drafts. A stable public preprint identifier, immutable public source release, duplicate-request reconciliation, Robert's review, and fresh action-time HumanUnlock are required before one production request may be opened.
+
 ## Archived Operator Execution
 
 - GitHub run: [29467557473](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/29467557473)
@@ -59,6 +83,9 @@ The archive demonstrates an older operator-controlled clean-runner execution. It
 - Receipt SHA-256: `8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351`
 - Source commit: `be7776f78af659f56c11a89bef0aab8ca07d5c18`
 - Source artifacts matched: `21/21`
+- Full source exact match: `true`
+- Computational identity exact match: `true`
+- Documentation drift paths: `none`
 - Relevant source clean: `true`
 - Clean-runner replay: `true`
 - Authoritative runtime matched: `true`
@@ -70,14 +97,18 @@ The archive demonstrates an older operator-controlled clean-runner execution. It
 
 Author-operated Docker replay with network access disabled and the protocol-pinned Ubuntu, CPython, and dependency environment.
 
-This receipt is internal operator evidence, not independent execution or external validation. It may establish current declared source identity only while every source artifact in the receipt still matches the repository byte-for-byte under its declared portable hash mode.
+This receipt is internal operator evidence, not independent execution or external validation. It may establish current computational identity only while every benchmark, protocol, frozen input, dependency lock, workflow, and test artifact in the receipt still matches byte-for-byte under its declared portable hash mode. Documentation drift must remain visible and requires a current-commit independent execution before any external claim changes.
 
 ## Human And External Gates
 
 | Gate | Complete | Owner | Meaning |
 |---|---:|---|---|
 | `human_author_review` | `false` | Robert Ashworth | The author reviews the bounded method note, manifest, public files, and exact ask. |
+| `stable_public_preprint_identifier` | `false` | Robert Ashworth | The bounded manuscript receives a stable public URL or DOI that can be cited in the CODECHECK request. |
+| `immutable_public_source_release` | `false` | Robert Ashworth | The reviewed public source is frozen at an immutable release or commit and every packet hash is reconciled to it. |
+| `duplicate_request_reconciled` | `false` | Luma3 validation lane | Gmail, GitHub, and local outreach controls confirm that no prior CODECHECK request would be duplicated. |
 | `submission_authorized` | `false` | Robert Ashworth | Action-time HumanUnlock authorizes opening a single CODECHECK request without duplicate outreach. |
+| `codecheck_register_issue_opened` | `false` | Robert Ashworth and CODECHECK | Exactly one production register issue is opened through the current official route and its URL is recorded. |
 | `codechecker_assigned` | `false` | CODECHECK | An independent codechecker accepts the execution assignment. |
 | `independent_execution_complete` | `false` | Independent codechecker | The codechecker executes the workflow and reconciles every declared manifest output. |
 | `certificate_issued` | `false` | CODECHECK | A public CODECHECK certificate or report identifier is issued by the external process. |
@@ -92,9 +123,11 @@ A later independent-execution certificate may reduce diligence risk around execu
 
 ## Shortest Safe Completion Sequence
 
-1. Robert reviews the method note, manifest, public files, and bounded ask.
-2. Freeze the exact reviewed commit or release identifier.
-3. Obtain action-time HumanUnlock for one CODECHECK request and recheck the outreach lock before sending.
-4. Let the assigned codechecker execute the workflow and populate external metadata; the operator does not fill those fields.
-5. Cite a certificate only after CODECHECK issues a public report identifier.
-6. Pursue a separate statistical-method review and the preregistered prospective EIA gates; neither can be substituted by executable-computation checking.
+1. Robert reviews the preprint, method note, manifest, license, request draft, and bounded ask.
+2. Publish the bounded preprint at a stable public URL or DOI.
+3. Freeze the exact reviewed public commit or release and reconcile every packet hash.
+4. Recheck Gmail, GitHub, and local outreach controls for duplicates, then obtain fresh action-time HumanUnlock for one CODECHECK request.
+5. Open exactly one request through the current official route and record its production issue URL.
+6. Let the assigned codechecker execute the workflow and populate external metadata; the operator does not fill those fields.
+7. Cite a certificate only after CODECHECK issues a public report identifier.
+8. Pursue a separate statistical-method review and the preregistered prospective EIA gates; neither can be substituted by executable-computation checking.

@@ -6,6 +6,13 @@ Repository: <https://github.com/robertashworth1986-debug/lumen-core-public>
 
 Prepared (America/Chicago): 2026-07-20
 
+## Companion Public Drafts
+
+- Bounded preprint: [`PDF`](preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf) and [`Markdown source`](preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md)
+- Community request: [`author-side HOLD draft`](CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md)
+
+The request has not been posted. A stable public preprint identifier, immutable public source release, duplicate-request reconciliation, author review, and fresh action-time HumanUnlock remain required before one production request may be opened.
+
 ## Abstract
 
 This note defines one narrow executable-computation target. The workflow replays two frozen benchmarks derived from public U.S. Energy Information Administration EIA-930 data and one deterministic synthetic falsification suite. It checks a fixed set of facts, emits a machine-readable receipt and scoped software bill of materials, and preserves failed promotion gates.

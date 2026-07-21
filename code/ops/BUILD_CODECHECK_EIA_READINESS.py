@@ -34,6 +34,33 @@ PRIVATE_PATTERNS = (
 )
 ROOT_KEY_PATTERN = re.compile(r"^(?P<key>[A-Za-z][A-Za-z0-9_-]*):(?:\s|$)")
 MANIFEST_FILE_PATTERN = re.compile(r"^\s+-\s+file:\s+(?P<value>.+?)\s*$")
+PDF_PAGE_PATTERN = re.compile(rb"/Type\s*/Page\b")
+
+PREPRINT_REQUIRED_TOKENS = (
+    "## Abstract",
+    "## 1. Research Question And Claim Boundary",
+    "## 3. Methods",
+    "## 4. Frozen Results To Reproduce",
+    "## 5. Preserved Failure And Protocol Amendment",
+    "## 7. Limitations",
+    "## 8. Data, Code, And Reproduction Availability",
+    "## 9. Ethics, Funding, And Competing Interests",
+    "## 10. Author Contribution",
+)
+PREPRINT_BOUNDARY_TOKENS = (
+    "Not peer reviewed. No external validation or CODECHECK certificate has been issued.",
+    "This result establishes first-party executable reproducibility only.",
+    "No CODECHECK issue, codechecker assignment, certificate, journal review, or DOI exists",
+    "A stable preprint identifier, immutable source release identifier, CODECHECK register issue, independent execution receipt, and certificate remain open gates.",
+)
+REQUEST_HOLD_TOKENS = (
+    "HOLD_STABLE_PREPRINT_IDENTIFIER_AND_HUMANUNLOCK",
+    "[STABLE_PUBLIC_PREPRINT_URL_OR_DOI_REQUIRED]",
+    "[IDENTIFIER_ASSIGNED_AT_ACTION_TIME]",
+    "Leave unassigned.",
+    "fresh action-time HumanUnlock",
+    "has not been posted, emailed, submitted, assigned, or accepted",
+)
 
 
 def now_utc() -> str:
@@ -145,6 +172,10 @@ def parse_codecheck_config(path: Path) -> dict[str, Any]:
             if manifest_match:
                 manifest.append(_yaml_scalar(manifest_match.group("value")))
 
+    reference_match = re.search(
+        r"^\s+reference:\s+(?P<value>.+?)\s*$", text, flags=re.MULTILINE
+    )
+
     return {
         "utf8_decoded": True,
         "explicit_document_start": any(line.strip() == "---" for line in lines),
@@ -166,6 +197,11 @@ def parse_codecheck_config(path: Path) -> dict[str, Any]:
         "manifest_paths_unique": len(manifest) == len(set(manifest)),
         "paper_title_present": bool(
             re.search(r"^\s+title:\s+.+$", text, flags=re.MULTILINE)
+        ),
+        "paper_reference": (
+            _yaml_scalar(reference_match.group("value"))
+            if reference_match
+            else None
         ),
         "corresponding_author_present": bool(
             re.search(r"^\s+-\s+name:\s+.+$", text, flags=re.MULTILINE)
@@ -246,7 +282,10 @@ def verify_operator_clean_runner(
     path = receipt_path or (ROOT / control["receipt_path"])
     receipt = read_json(path)
     summary = receipt.get("summary", {})
-    source_reconciliation = reconcile_archived_sources(receipt, set())
+    source_reconciliation = reconcile_archived_sources(
+        receipt,
+        set(control.get("noncomputational_documentation_or_packaging_paths", [])),
+    )
     private_hits = scan_private(receipt)
     checks = {
         "receipt_sha256_matched": file_sha256(path)
@@ -287,8 +326,8 @@ def verify_operator_clean_runner(
             "external_validation_complete"
         )
         is False,
-        "declared_source_identity_still_matches": source_reconciliation[
-            "full_source_exact_match"
+        "declared_computational_identity_still_matches": source_reconciliation[
+            "computational_identity_exact_match"
         ],
     }
     return {
@@ -323,6 +362,81 @@ def verify_operator_clean_runner(
     }
 
 
+def verify_preprint_and_request(
+    control: dict[str, Any],
+    *,
+    markdown_path: Path,
+    pdf_path: Path,
+    request_path: Path,
+) -> dict[str, Any]:
+    markdown_text = markdown_path.read_text(encoding="utf-8")
+    request_text = request_path.read_text(encoding="utf-8")
+    pdf_bytes = pdf_path.read_bytes()
+    pdf_page_count = len(PDF_PAGE_PATTERN.findall(pdf_bytes))
+    private_hits = scan_private(
+        {
+            "markdown": markdown_text,
+            "request": request_text,
+            "pdf": pdf_bytes.decode("latin-1"),
+        }
+    )
+    checks = {
+        "source_sha256_matched": file_sha256(markdown_path)
+        == control["source_sha256"],
+        "pdf_sha256_matched": file_sha256(pdf_path) == control["pdf_sha256"],
+        "pdf_header_present": pdf_bytes.startswith(b"%PDF-"),
+        "pdf_eof_present": pdf_bytes.rstrip().endswith(b"%%EOF"),
+        "pdf_page_count_matched": pdf_page_count
+        == control["expected_pdf_page_count"],
+        "required_manuscript_sections_present": all(
+            token in markdown_text for token in PREPRINT_REQUIRED_TOKENS
+        ),
+        "claim_boundaries_present": all(
+            token in markdown_text for token in PREPRINT_BOUNDARY_TOKENS
+        ),
+        "request_hold_controls_present": all(
+            token in request_text for token in REQUEST_HOLD_TOKENS
+        ),
+        "official_launch_pad_matched": control["official_launch_pad"]
+        in request_text,
+        "stable_public_identifier_unset": control["stable_public_identifier"]
+        is None,
+        "immutable_public_source_release_unset": control[
+            "immutable_public_source_release"
+        ]
+        is None,
+        "duplicate_request_reconciliation_open": control[
+            "duplicate_request_reconciled"
+        ]
+        is False,
+        "community_request_remains_unopened": control[
+            "community_request_opened"
+        ]
+        is False,
+        "privacy_scan_passed": not private_hits,
+    }
+    return {
+        "verified": all(checks.values()),
+        "checks": checks,
+        "markdown_path": display_path(markdown_path),
+        "markdown_sha256": file_sha256(markdown_path),
+        "pdf_path": display_path(pdf_path),
+        "pdf_sha256": file_sha256(pdf_path),
+        "pdf_page_count": pdf_page_count,
+        "paper_reference": control["paper_reference"],
+        "stable_public_identifier": control["stable_public_identifier"],
+        "immutable_public_source_release": control[
+            "immutable_public_source_release"
+        ],
+        "duplicate_request_reconciled": control[
+            "duplicate_request_reconciled"
+        ],
+        "request_path": display_path(request_path),
+        "community_request_ready": False,
+        "community_request_opened": control["community_request_opened"],
+        "configured_private_pattern_hit_count": len(private_hits),
+        "policy": control["policy"],
+    }
 def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
     config = read_json(CONFIG_PATH)
     generated_utc = generated_utc or now_utc()
@@ -356,6 +470,12 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
     )
     operator_clean_runner = verify_operator_clean_runner(
         config["operator_clean_runner"]
+    )
+    preprint_and_request = verify_preprint_and_request(
+        config["preprint_and_request"],
+        markdown_path=ROOT / bundle["preprint_markdown_path"],
+        pdf_path=ROOT / bundle["preprint_pdf_path"],
+        request_path=ROOT / bundle["community_request_draft_path"],
     )
 
     output_root = PurePosixPath(execution["output_root"])
@@ -391,12 +511,20 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
     readme_text = (ROOT / bundle["readme_path"]).read_text(encoding="utf-8")
     license_text = (ROOT / bundle["license_path"]).read_text(encoding="utf-8")
     method_text = (ROOT / bundle["method_note_path"]).read_text(encoding="utf-8")
+    preprint_text = (ROOT / bundle["preprint_markdown_path"]).read_text(
+        encoding="utf-8"
+    )
+    request_text = (ROOT / bundle["community_request_draft_path"]).read_text(
+        encoding="utf-8"
+    )
     public_text_privacy_hits = scan_private(
         {
             "codecheck": codecheck_path.read_text(encoding="utf-8"),
             "readme": readme_text,
             "license": license_text,
             "method_note": method_text,
+            "preprint": preprint_text,
+            "community_request_draft": request_text,
         }
     )
 
@@ -411,6 +539,8 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
         "manifest_paths_safe": codecheck["manifest_paths_safe"],
         "manifest_paths_unique": codecheck["manifest_paths_unique"],
         "paper_title_present": codecheck["paper_title_present"],
+        "paper_reference_matches_preprint": codecheck["paper_reference"]
+        == config["preprint_and_request"]["paper_reference"],
         "corresponding_author_present": codecheck["corresponding_author_present"],
         "codechecker_metadata_left_external": not codecheck[
             "codechecker_metadata_present"
@@ -458,6 +588,10 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             f"operator_clean_runner_{key}": value
             for key, value in operator_clean_runner["checks"].items()
         },
+        **{
+            f"preprint_request_{key}": value
+            for key, value in preprint_and_request["checks"].items()
+        },
         "public_text_privacy_scan_passed": not public_text_privacy_hits,
     }
     internal_gate_passed = all(checks.values())
@@ -488,12 +622,27 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             "operator_clean_runner_receipt_verified": operator_clean_runner[
                 "verified"
             ],
-            "operator_clean_runner_declared_source_identity_current": (
+            "operator_clean_runner_full_source_exact_match": (
                 operator_clean_runner["source_reconciliation"][
                     "full_source_exact_match"
                 ]
             ),
+            "operator_clean_runner_computational_identity_current": (
+                operator_clean_runner["source_reconciliation"][
+                    "computational_identity_exact_match"
+                ]
+            ),
             "current_commit_clean_runner_complete": False,
+            "public_preprint_draft_complete": preprint_and_request["verified"],
+            "stable_public_preprint_identifier_complete": False,
+            "immutable_public_source_release_complete": False,
+            "duplicate_request_reconciled": False,
+            "community_request_ready": preprint_and_request[
+                "community_request_ready"
+            ],
+            "community_request_opened": preprint_and_request[
+                "community_request_opened"
+            ],
             "archived_suite_pass_count": archived_summary["suite_pass_count"],
             "archived_assertion_pass_count": archived_summary[
                 "assertion_pass_count"
@@ -533,6 +682,7 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             "source_reconciliation": source_reconciliation,
         },
         "operator_clean_runner": operator_clean_runner,
+        "preprint_and_request": preprint_and_request,
         "external_gates": external_gates,
         "portable_inputs": portable_inputs,
         "portable_input_chain_sha256": canonical_sha256(portable_inputs),
@@ -552,6 +702,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     archive = payload["authoritative_archive"]
     operator = payload["operator_clean_runner"]
+    preprint = payload["preprint_and_request"]
     lines = [
         "# CODECHECK EIA Author Readiness",
         "",
@@ -568,8 +719,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Archived full source exact match: `{str(summary['archive_full_source_exact_match']).lower()}`",
         f"- Archived computational identity still matches: `{str(summary['archived_computational_identity_still_matches']).lower()}`",
         f"- Operator clean-runner receipt verified: `{str(summary['operator_clean_runner_receipt_verified']).lower()}`",
-        f"- Operator clean-runner declared source identity current: `{str(summary['operator_clean_runner_declared_source_identity_current']).lower()}`",
+        f"- Operator clean-runner full source exact match: `{str(summary['operator_clean_runner_full_source_exact_match']).lower()}`",
+        f"- Operator clean-runner computational identity current: `{str(summary['operator_clean_runner_computational_identity_current']).lower()}`",
         f"- Current commit clean-runner complete: `{str(summary['current_commit_clean_runner_complete']).lower()}`",
+        f"- Public preprint draft complete: `{str(summary['public_preprint_draft_complete']).lower()}`",
+        f"- Stable public preprint identifier complete: `{str(summary['stable_public_preprint_identifier_complete']).lower()}`",
+        f"- Immutable public source release complete: `{str(summary['immutable_public_source_release_complete']).lower()}`",
+        f"- Duplicate request reconciled: `{str(summary['duplicate_request_reconciled']).lower()}`",
+        f"- Community request ready: `{str(summary['community_request_ready']).lower()}`",
+        f"- Community request opened: `{str(summary['community_request_opened']).lower()}`",
         f"- Independent execution complete: `{str(summary['independent_execution_complete']).lower()}`",
         f"- Certificate issued: `{str(summary['certificate_issued']).lower()}`",
         f"- External validation complete: `{str(summary['external_validation_complete']).lower()}`",
@@ -594,6 +752,23 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
+            "## Public Preprint And Request Draft",
+            "",
+            f"- Markdown: `{preprint['markdown_path']}`",
+            f"- Markdown SHA-256: `{preprint['markdown_sha256']}`",
+            f"- PDF: `{preprint['pdf_path']}`",
+            f"- PDF SHA-256: `{preprint['pdf_sha256']}`",
+            f"- PDF pages: `{preprint['pdf_page_count']}`",
+            f"- Manifest reference: `{preprint['paper_reference']}`",
+            f"- Stable public identifier: `{preprint['stable_public_identifier'] or 'not assigned'}`",
+            f"- Immutable public source release: `{preprint['immutable_public_source_release'] or 'not frozen'}`",
+            f"- Duplicate request reconciled: `{str(preprint['duplicate_request_reconciled']).lower()}`",
+            f"- Request draft: `{preprint['request_path']}`",
+            f"- Community request ready: `{str(preprint['community_request_ready']).lower()}`",
+            f"- Community request opened: `{str(preprint['community_request_opened']).lower()}`",
+            "",
+            preprint["policy"],
+            "",
             "## Archived Operator Execution",
             "",
             f"- GitHub run: [{archive['github_run_id']}]({archive['github_run_url']})",
@@ -613,6 +788,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Receipt SHA-256: `{operator['receipt_sha256']}`",
             f"- Source commit: `{operator['source_commit']}`",
             f"- Source artifacts matched: `{operator['source_reconciliation']['current_match_count']}/{operator['source_reconciliation']['archived_source_count']}`",
+            f"- Full source exact match: `{str(operator['source_reconciliation']['full_source_exact_match']).lower()}`",
+            f"- Computational identity exact match: `{str(operator['source_reconciliation']['computational_identity_exact_match']).lower()}`",
+            f"- Documentation drift paths: `{', '.join(operator['source_reconciliation']['mismatch_paths']) or 'none'}`",
             f"- Relevant source clean: `{str(operator['relevant_source_clean']).lower()}`",
             f"- Clean-runner replay: `{str(operator['clean_runner_replay']).lower()}`",
             f"- Authoritative runtime matched: `{str(operator['authoritative_runtime_match']).lower()}`",
@@ -649,12 +827,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Shortest Safe Completion Sequence",
             "",
-            "1. Robert reviews the method note, manifest, public files, and bounded ask.",
-            "2. Freeze the exact reviewed commit or release identifier.",
-            "3. Obtain action-time HumanUnlock for one CODECHECK request and recheck the outreach lock before sending.",
-            "4. Let the assigned codechecker execute the workflow and populate external metadata; the operator does not fill those fields.",
-            "5. Cite a certificate only after CODECHECK issues a public report identifier.",
-            "6. Pursue a separate statistical-method review and the preregistered prospective EIA gates; neither can be substituted by executable-computation checking.",
+            "1. Robert reviews the preprint, method note, manifest, license, request draft, and bounded ask.",
+            "2. Publish the bounded preprint at a stable public URL or DOI.",
+            "3. Freeze the exact reviewed public commit or release and reconcile every packet hash.",
+            "4. Recheck Gmail, GitHub, and local outreach controls for duplicates, then obtain fresh action-time HumanUnlock for one CODECHECK request.",
+            "5. Open exactly one request through the current official route and record its production issue URL.",
+            "6. Let the assigned codechecker execute the workflow and populate external metadata; the operator does not fill those fields.",
+            "7. Cite a certificate only after CODECHECK issues a public report identifier.",
+            "8. Pursue a separate statistical-method review and the preregistered prospective EIA gates; neither can be substituted by executable-computation checking.",
         ]
     )
     return "\n".join(lines) + "\n"
