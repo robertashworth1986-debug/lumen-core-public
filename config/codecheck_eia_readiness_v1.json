@@ -1,0 +1,107 @@
+{
+  "schema": "codecheck_eia_author_readiness_protocol.v1",
+  "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
+  "version": 1,
+  "prepared_local_date": "2026-07-20",
+  "prepared_timezone": "America/Chicago",
+  "purpose": "Fail closed on author-side readiness for an independent CODECHECK execution of the bounded reviewer reproducibility capsule.",
+  "codecheck_specification": {
+    "version": "https://codecheck.org.uk/spec/config/1.0/",
+    "author_guide": "https://codecheck.org.uk/guide/community-workflow-author",
+    "required_author_files": [
+      "README.md",
+      "codecheck.yml",
+      "LICENSE"
+    ]
+  },
+  "bundle": {
+    "ci_workflow_path": ".github/workflows/codecheck-eia-readiness.yml",
+    "codecheck_config_path": "codecheck.yml",
+    "readme_path": "README.md",
+    "license_path": "LICENSE",
+    "citation_path": "CITATION.cff",
+    "method_note_path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+    "runner_path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
+    "reviewer_protocol_path": "config/reviewer_reproducibility_protocol_v1.json",
+    "dependency_verifier_path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+    "dependency_lock_path": "requirements-reviewer-ubuntu-py311.lock",
+    "frozen_input_path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+    "authority_config_path": "config/external_validation_authority_docket_v1.json",
+    "authority_builder_path": "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py"
+  },
+  "execution": {
+    "command": "python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --run-dir out/codecheck_eia",
+    "output_root": "out/codecheck_eia",
+    "manifest_paths": [
+      "out/codecheck_eia/reviewer_reproducibility_receipt.json",
+      "out/codecheck_eia/reviewer_suite_sbom.cdx.json",
+      "out/codecheck_eia/logs/eia_wave.log",
+      "out/codecheck_eia/logs/eia_residual.log",
+      "out/codecheck_eia/logs/mda_open_set.log",
+      "out/codecheck_eia/logs/fixture_tests.log"
+    ],
+    "expected_archived_status": "BOUNDED_REPRODUCIBILITY_PASS",
+    "expected_suite_count": 3,
+    "expected_assertion_count": 31
+  },
+  "archive_reconciliation": {
+    "noncomputational_documentation_or_packaging_paths": [
+      ".gitignore",
+      "README.md"
+    ],
+    "policy": "Report every drift from the archived operator run. Author readiness may remain open only when every benchmark, protocol, frozen input, dependency lock, workflow, and test artifact in the archived receipt still matches. A new independent execution must use the reviewed current commit."
+  },
+  "portable_input_paths": [
+    ".github/workflows/codecheck-eia-readiness.yml",
+    "README.md",
+    "LICENSE",
+    "CITATION.cff",
+    "codecheck.yml",
+    "code/ops/BUILD_CODECHECK_EIA_READINESS.py",
+    "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py",
+    "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
+    "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+    "config/codecheck_eia_readiness_v1.json",
+    "config/external_validation_authority_docket_v1.json",
+    "config/reviewer_reproducibility_protocol_v1.json",
+    "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+    "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+    "requirements-reviewer-ubuntu-py311.lock",
+    "tests/test_codecheck_eia_readiness.py"
+  ],
+  "external_gates": [
+    {
+      "gate_id": "human_author_review",
+      "complete": false,
+      "owner": "Robert Ashworth",
+      "meaning": "The author reviews the bounded method note, manifest, public files, and exact ask."
+    },
+    {
+      "gate_id": "submission_authorized",
+      "complete": false,
+      "owner": "Robert Ashworth",
+      "meaning": "Action-time HumanUnlock authorizes opening a single CODECHECK request without duplicate outreach."
+    },
+    {
+      "gate_id": "codechecker_assigned",
+      "complete": false,
+      "owner": "CODECHECK",
+      "meaning": "An independent codechecker accepts the execution assignment."
+    },
+    {
+      "gate_id": "independent_execution_complete",
+      "complete": false,
+      "owner": "Independent codechecker",
+      "meaning": "The codechecker executes the workflow and reconciles every declared manifest output."
+    },
+    {
+      "gate_id": "certificate_issued",
+      "complete": false,
+      "owner": "CODECHECK",
+      "meaning": "A public CODECHECK certificate or report identifier is issued by the external process."
+    }
+  ],
+  "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
+  "value_bridge": "A later independent-execution certificate may reduce diligence risk around executability. It would not establish scientific validity, field performance, model superiority, realized savings, company valuation, or buyer demand.",
+  "claim_boundary": "An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated."
+}

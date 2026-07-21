@@ -1,0 +1,424 @@
+{
+  "authoritative_archive": {
+    "archive_path": "evidence/reproducibility/github_run_29467557473",
+    "assertion_count": 31,
+    "assertion_pass_count": 31,
+    "capsule_sha256": "7dd1fb16006e5fd102e671c09e08c6280418620768c7e7f87552b0e63e8249b2",
+    "checksum_entry_count": 6,
+    "checksum_pass_count": 6,
+    "commit": "7ec23f948bef5bce5441ac75be9603216e78c019",
+    "complete_file_coverage": true,
+    "external_validation_complete": false,
+    "github_run_id": 29467557473,
+    "github_run_url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/29467557473",
+    "source_reconciliation": {
+      "archived_source_count": 21,
+      "computational_identity_exact_match": true,
+      "computational_identity_path_count": 19,
+      "current_match_count": 19,
+      "full_source_exact_match": false,
+      "mismatch_count": 2,
+      "mismatch_paths": [
+        ".gitignore",
+        "README.md"
+      ],
+      "rows": [
+        {
+          "archived_sha256": "2fa8feb63735603960688161a252d2efa68077a51b27dc48bcdfe0d99d0ae14e",
+          "current_match": true,
+          "current_sha256": "2fa8feb63735603960688161a252d2efa68077a51b27dc48bcdfe0d99d0ae14e",
+          "path": ".github/workflows/reviewer-reproducibility.yml",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "6532ecde9a663bcef41aceda6c01cfa9649808f2fb2a8b6d256de182f39f8b75",
+          "current_match": false,
+          "current_sha256": "72bba006cb5d77f56677464c515d3ea5fff56293542d8655f2d14cd4099d59a7",
+          "path": ".gitignore",
+          "role": "documentation_or_packaging"
+        },
+        {
+          "archived_sha256": "c08b9273c6bcb8a2cba388d1fa5a680010d325106da5399b6cd9f7c0b739fac1",
+          "current_match": false,
+          "current_sha256": "ca2153dff28be9ab95e768d168035ece7d9223fbbc7c0bb3b81b085511fca29d",
+          "path": "README.md",
+          "role": "documentation_or_packaging"
+        },
+        {
+          "archived_sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100",
+          "current_match": true,
+          "current_sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100",
+          "path": "code/eia_grid_residual_moe_benchmark.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "b3586ddc568f6bd4aa6ae48bbb289ab579eab773699dba5ac32234d393627791",
+          "current_match": true,
+          "current_sha256": "b3586ddc568f6bd4aa6ae48bbb289ab579eab773699dba5ac32234d393627791",
+          "path": "code/eia_grid_wave_champion_benchmark.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "5346d8f4b66b7a19a6b0daf58bd4e983f4a2108346d6d51429ec0f387ab7ed8c",
+          "current_match": true,
+          "current_sha256": "5346d8f4b66b7a19a6b0daf58bd4e983f4a2108346d6d51429ec0f387ab7ed8c",
+          "path": "code/mda_control_mapping_open_set_benchmark.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "2481919eca73df9469b372367d676d8713687c940f6565a1380d69547464f8e3",
+          "current_match": true,
+          "current_sha256": "2481919eca73df9469b372367d676d8713687c940f6565a1380d69547464f8e3",
+          "path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "79c03eb63443a8b9bba3cf48e206a8b44f7a9f8e8fa382a6c3b97e8ec5a1c676",
+          "current_match": true,
+          "current_sha256": "79c03eb63443a8b9bba3cf48e206a8b44f7a9f8e8fa382a6c3b97e8ec5a1c676",
+          "path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8",
+          "current_match": true,
+          "current_sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8",
+          "path": "config/eia_grid_residual_moe_protocol_v1.json",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d",
+          "current_match": true,
+          "current_sha256": "273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d",
+          "path": "config/eia_grid_wave_champion_protocol_v1.json",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "9a694ed6f194137880c070e73355ef826a51d3fed438ccf65adf6d4726ca80f0",
+          "current_match": true,
+          "current_sha256": "9a694ed6f194137880c070e73355ef826a51d3fed438ccf65adf6d4726ca80f0",
+          "path": "config/mda_control_mapping_open_set_protocol_v2.json",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1",
+          "current_match": true,
+          "current_sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1",
+          "path": "config/reviewer_reproducibility_protocol_v1.json",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9",
+          "current_match": true,
+          "current_sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9",
+          "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+          "current_match": true,
+          "current_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+          "path": "requirements-reviewer-ubuntu-py311.lock",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "4b99049b4bc579f6d2a5a675e612f513e1a24db79775a2120e60334a0c72bbd4",
+          "current_match": true,
+          "current_sha256": "4b99049b4bc579f6d2a5a675e612f513e1a24db79775a2120e60334a0c72bbd4",
+          "path": "requirements-reviewer.txt",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "0aa6af3aa74ecb561c15a1b9560ed80014bc692679e61e6c6fa93bb75cc8ba68",
+          "current_match": true,
+          "current_sha256": "0aa6af3aa74ecb561c15a1b9560ed80014bc692679e61e6c6fa93bb75cc8ba68",
+          "path": "tests/test_eia_grid_residual_moe_benchmark.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "175010b5aa97951fe1770d4f67b1b9b4597baff113d55b34021a103ca04055bb",
+          "current_match": true,
+          "current_sha256": "175010b5aa97951fe1770d4f67b1b9b4597baff113d55b34021a103ca04055bb",
+          "path": "tests/test_eia_grid_wave_champion_benchmark.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "c2bbaac93e10883f30424998fa676bd69d313e4815760b97e43f84d20a86c7d5",
+          "current_match": true,
+          "current_sha256": "c2bbaac93e10883f30424998fa676bd69d313e4815760b97e43f84d20a86c7d5",
+          "path": "tests/test_faa_sdr_10k_benchmark.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "0798b6a130f48b012c75877fd56d9aeb36be033b5620b974e89fc46b76585db8",
+          "current_match": true,
+          "current_sha256": "0798b6a130f48b012c75877fd56d9aeb36be033b5620b974e89fc46b76585db8",
+          "path": "tests/test_mda_control_mapping_open_set_benchmark.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "cc10d035ef2712e41292ceec6b5fa93df93dfcb2145ab9b6d323b00b4d87d09f",
+          "current_match": true,
+          "current_sha256": "cc10d035ef2712e41292ceec6b5fa93df93dfcb2145ab9b6d323b00b4d87d09f",
+          "path": "tests/test_reviewer_dependency_lock.py",
+          "role": "computational_identity"
+        },
+        {
+          "archived_sha256": "4995d85976b862e16041e7e42ef005c0cb9b1543944cbed11ea254a37923948b",
+          "current_match": true,
+          "current_sha256": "4995d85976b862e16041e7e42ef005c0cb9b1543944cbed11ea254a37923948b",
+          "path": "tests/test_reviewer_reproducibility_capsule.py",
+          "role": "computational_identity"
+        }
+      ]
+    },
+    "suite_count": 3,
+    "suite_pass_count": 3,
+    "verified": true
+  },
+  "checks": {
+    "all_required_paths_present": true,
+    "archive_checksum_and_identity_verified": true,
+    "archive_manifest_matches_codecheck_manifest": true,
+    "archived_assertion_count_matched": true,
+    "archived_capsule_status_matched": true,
+    "archived_computational_identity_still_matches": true,
+    "archived_receipt_keeps_external_validation_false": true,
+    "archived_suite_count_matched": true,
+    "codecheck_explicit_document_start": true,
+    "codecheck_spec_version_matched": true,
+    "codecheck_utf8": true,
+    "codecheck_yaml_directive_present": true,
+    "codechecker_metadata_left_external": true,
+    "corresponding_author_present": true,
+    "license_distinguishes_code_and_eia_data": true,
+    "manifest_exactly_matched_protocol": true,
+    "manifest_paths_safe": true,
+    "manifest_paths_unique": true,
+    "method_note_preserves_failed_gates": true,
+    "paper_title_present": true,
+    "public_text_privacy_scan_passed": true,
+    "readme_has_exact_codecheck_command": true,
+    "report_metadata_left_external": true
+  },
+  "claim_boundary": "An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.",
+  "codecheck_configuration": {
+    "codechecker_metadata_present": false,
+    "corresponding_author_present": true,
+    "explicit_document_start": true,
+    "manifest": [
+      "out/codecheck_eia/reviewer_reproducibility_receipt.json",
+      "out/codecheck_eia/reviewer_suite_sbom.cdx.json",
+      "out/codecheck_eia/logs/eia_wave.log",
+      "out/codecheck_eia/logs/eia_residual.log",
+      "out/codecheck_eia/logs/mda_open_set.log",
+      "out/codecheck_eia/logs/fixture_tests.log"
+    ],
+    "manifest_paths_safe": true,
+    "manifest_paths_unique": true,
+    "paper_title_present": true,
+    "report_metadata_present": false,
+    "root_keys": [
+      "version",
+      "manifest",
+      "paper",
+      "source",
+      "lumencore"
+    ],
+    "utf8_decoded": true,
+    "version": "https://codecheck.org.uk/spec/config/1.0/",
+    "yaml_directive": "%YAML 1.1"
+  },
+  "execution": {
+    "command": "python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --run-dir out/codecheck_eia",
+    "expected_archived_status": "BOUNDED_REPRODUCIBILITY_PASS",
+    "expected_assertion_count": 31,
+    "expected_suite_count": 3,
+    "manifest_paths": [
+      "out/codecheck_eia/reviewer_reproducibility_receipt.json",
+      "out/codecheck_eia/reviewer_suite_sbom.cdx.json",
+      "out/codecheck_eia/logs/eia_wave.log",
+      "out/codecheck_eia/logs/eia_residual.log",
+      "out/codecheck_eia/logs/mda_open_set.log",
+      "out/codecheck_eia/logs/fixture_tests.log"
+    ],
+    "output_root": "out/codecheck_eia"
+  },
+  "external_gates": [
+    {
+      "complete": false,
+      "gate_id": "human_author_review",
+      "meaning": "The author reviews the bounded method note, manifest, public files, and exact ask.",
+      "owner": "Robert Ashworth"
+    },
+    {
+      "complete": false,
+      "gate_id": "submission_authorized",
+      "meaning": "Action-time HumanUnlock authorizes opening a single CODECHECK request without duplicate outreach.",
+      "owner": "Robert Ashworth"
+    },
+    {
+      "complete": false,
+      "gate_id": "codechecker_assigned",
+      "meaning": "An independent codechecker accepts the execution assignment.",
+      "owner": "CODECHECK"
+    },
+    {
+      "complete": false,
+      "gate_id": "independent_execution_complete",
+      "meaning": "The codechecker executes the workflow and reconciles every declared manifest output.",
+      "owner": "Independent codechecker"
+    },
+    {
+      "complete": false,
+      "gate_id": "certificate_issued",
+      "meaning": "A public CODECHECK certificate or report identifier is issued by the external process.",
+      "owner": "CODECHECK"
+    }
+  ],
+  "generated_utc": "2026-07-21T03:48:41.861824+00:00",
+  "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
+  "path_checks": {
+    ".github/workflows/codecheck-eia-readiness.yml": true,
+    "CITATION.cff": true,
+    "LICENSE": true,
+    "README.md": true,
+    "code/ops/BUILD_CODECHECK_EIA_READINESS.py": true,
+    "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py": true,
+    "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py": true,
+    "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py": true,
+    "codecheck.yml": true,
+    "config/external_validation_authority_docket_v1.json": true,
+    "config/reviewer_reproducibility_protocol_v1.json": true,
+    "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md": true,
+    "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
+    "requirements-reviewer-ubuntu-py311.lock": true,
+    "tests/test_codecheck_eia_readiness.py": true
+  },
+  "portable_input_chain_sha256": "96c621bb15c2ae0f442eb07982a23858c9cd13d65eb76aa62d2711013e5fa18f",
+  "portable_inputs": [
+    {
+      "bytes": 4733,
+      "hash_mode": "utf8_lf",
+      "path": ".github/workflows/codecheck-eia-readiness.yml",
+      "sha256": "ac472eefd5ff14a01e836d0bbf5e2e4ecc9707e7fbf03bf782f89a7934a32fc4"
+    },
+    {
+      "bytes": 14869,
+      "hash_mode": "utf8_lf",
+      "path": "README.md",
+      "sha256": "ca2153dff28be9ab95e768d168035ece7d9223fbbc7c0bb3b81b085511fca29d"
+    },
+    {
+      "bytes": 1891,
+      "hash_mode": "utf8_lf",
+      "path": "LICENSE",
+      "sha256": "2e399326d1698e17d388b7d5acb27006176e76fc8a8eead8d883494f3eb1bcfb"
+    },
+    {
+      "bytes": 570,
+      "hash_mode": "utf8_lf",
+      "path": "CITATION.cff",
+      "sha256": "0472716b86e1bc426640af944aba7749fc5a5b2bdf4ffbe7fdc0d7e3690f5dc9"
+    },
+    {
+      "bytes": 1792,
+      "hash_mode": "utf8_lf",
+      "path": "codecheck.yml",
+      "sha256": "223a36faa2ae73757c98e5fec924f1750aa9729c839e14be921eaa2972df2cd5"
+    },
+    {
+      "bytes": 23764,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/BUILD_CODECHECK_EIA_READINESS.py",
+      "sha256": "def87e1a47a181384dfbf7595d677358a30e49e4fb85f7c275e60e3cb0a39c61"
+    },
+    {
+      "bytes": 31959,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py",
+      "sha256": "3bae7284e69e08be04ccb5aa494e1b8e9885f48d7c1b4e469c0554a45b4e236c"
+    },
+    {
+      "bytes": 45420,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
+      "sha256": "2481919eca73df9469b372367d676d8713687c940f6565a1380d69547464f8e3"
+    },
+    {
+      "bytes": 9082,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+      "sha256": "79c03eb63443a8b9bba3cf48e206a8b44f7a9f8e8fa382a6c3b97e8ec5a1c676"
+    },
+    {
+      "bytes": 5431,
+      "hash_mode": "utf8_lf",
+      "path": "config/codecheck_eia_readiness_v1.json",
+      "sha256": "9bf42f896da44347034598486232720f18786882c7e6d2517e2488825e58001b"
+    },
+    {
+      "bytes": 9722,
+      "hash_mode": "utf8_lf",
+      "path": "config/external_validation_authority_docket_v1.json",
+      "sha256": "053531bc5f7b2c59842225a3164ab3b049e246db0524cd2913c5190792a12688"
+    },
+    {
+      "bytes": 10007,
+      "hash_mode": "utf8_lf",
+      "path": "config/reviewer_reproducibility_protocol_v1.json",
+      "sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1"
+    },
+    {
+      "bytes": 6354,
+      "hash_mode": "utf8_lf",
+      "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+      "sha256": "c75ec4ca7d7a12e52cc3de5b1481c1aa909af5868fcc458b5273728013032b99"
+    },
+    {
+      "bytes": 114366,
+      "hash_mode": "raw",
+      "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+      "sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9"
+    },
+    {
+      "bytes": 23602,
+      "hash_mode": "utf8_lf",
+      "path": "requirements-reviewer-ubuntu-py311.lock",
+      "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
+    },
+    {
+      "bytes": 7683,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_codecheck_eia_readiness.py",
+      "sha256": "3c0da37fbd97cc912fcc6bb561314620bed69152462abdcaa5d3d4f0f2a8b63f"
+    }
+  ],
+  "privacy_scan": {
+    "configured_pattern_hit_count": 0,
+    "passed": true
+  },
+  "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
+  "readiness_sha256": "76243b77d2427458a029567f6b8a6c3945219fca9aaabb894c176942a7f76ac3",
+  "schema": "codecheck_eia_author_readiness.v1",
+  "status": "AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW",
+  "summary": {
+    "archive_full_source_exact_match": false,
+    "archived_assertion_pass_count": 31,
+    "archived_computational_identity_still_matches": true,
+    "archived_suite_pass_count": 3,
+    "authoritative_archive_verified": true,
+    "certificate_issued": false,
+    "codechecker_assigned": false,
+    "current_commit_clean_runner_complete": false,
+    "external_validation_complete": false,
+    "human_author_review_complete": false,
+    "independent_execution_complete": false,
+    "internal_check_count": 23,
+    "internal_check_pass_count": 23,
+    "internal_gate_passed": true,
+    "manifest_output_count": 6,
+    "submission_authorized": false
+  },
+  "value_bridge": "A later independent-execution certificate may reduce diligence risk around executability. It would not establish scientific validity, field performance, model superiority, realized savings, company valuation, or buyer demand."
+}

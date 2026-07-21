@@ -1,0 +1,30 @@
+%YAML 1.1
+---
+version: https://codecheck.org.uk/spec/config/1.0/
+
+manifest:
+  - file: "out/codecheck_eia/reviewer_reproducibility_receipt.json"
+    comment: "Machine-readable result and assertion receipt for all three bounded suites"
+  - file: "out/codecheck_eia/reviewer_suite_sbom.cdx.json"
+    comment: "CycloneDX inventory for the exact reviewer-suite dependency closure"
+  - file: "out/codecheck_eia/logs/eia_wave.log"
+    comment: "Captured execution log for the frozen EIA wave benchmark"
+  - file: "out/codecheck_eia/logs/eia_residual.log"
+    comment: "Captured execution log for the frozen EIA residual benchmark"
+  - file: "out/codecheck_eia/logs/mda_open_set.log"
+    comment: "Captured execution log for the deterministic MDA open-set falsification suite"
+  - file: "out/codecheck_eia/logs/fixture_tests.log"
+    comment: "Captured output from the bounded fixture and control tests"
+
+paper:
+  title: "A Bounded Reproducibility Capsule for Public-Data Benchmarking and Preserved Negative Gates"
+  authors:
+    - name: "Robert Ashworth"
+  reference: "Method note in this repository: docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md"
+
+source: "Code, frozen EIA-930-derived input, deterministic MDA fixtures, and execution controls are versioned in https://github.com/robertashworth1986-debug/lumen-core-public"
+
+lumencore:
+  run_command: "python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --run-dir out/codecheck_eia"
+  authoritative_environment: "Ubuntu 24.04 x86-64 with CPython 3.11.9 and requirements-reviewer-ubuntu-py311.lock"
+  boundary: "Independent execution of the manifest would establish executable reproducibility only, not scientific validity, external field validation, agency approval, realized savings, or company valuation."

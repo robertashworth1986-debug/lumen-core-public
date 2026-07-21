@@ -131,6 +131,21 @@ The protocol preserves two failed clean-runner attempts. The second passed 30/31
 
 This capsule does not bundle the roughly 114 MB FAA SDR source corpus or the wider local/private source universe. The authoritative Ubuntu 24.04 x86-64 CPython 3.11.9 runner has an exact, SHA-256-verified, binary-only lock for all 18 resolved packages. Other operating systems and architectures are not covered until separately resolved, hash-locked, and replayed. A green CI run is software reproducibility evidence, not independent scientific validation, security certification, agency approval, or field performance.
 
+## Independent Execution Packet
+
+The root [`codecheck.yml`](codecheck.yml) declares six outputs for an independent executable-computation check. The author-side readiness gate verifies the manifest, required public files, EIA data-use notice, frozen input, exact dependency controls, archived clean-runner checksums, preserved negative gates, and absence of operator-filled codechecker metadata.
+
+On the authoritative Ubuntu 24.04 x86-64 CPython 3.11.9 environment:
+
+```bash
+python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py
+python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-reviewer-ubuntu-py311.lock
+python -m pip check
+python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --run-dir out/codecheck_eia
+```
+
+Start with the [`executable-computation note`](docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md) and the machine-generated [`author-readiness report`](docs/CODECHECK_EIA_AUTHOR_READINESS_2026-07-20.md). The operator-side archive is not independent execution. Submission, codechecker assignment, execution, and certificate issuance remain external gates; contacting CODECHECK requires action-time HumanUnlock and an outreach-lock check.
+
 ## External Validation Authority
 
 The [`External Validation Authority Docket`](docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md) gives an independent evaluator one bounded decision: accept or decline authority to supervise the frozen EIA prospective experiment. Its machine-readable protocol records the run-specific archive containing the successful clean-runner receipt, scoped SBOM, logs, and checksum manifest. The docket defines exact Level 4 and Level 5 gates and maps current controls informatively to NIST AI RMF Govern, Map, Measure, and Manage functions.
