@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 from pathlib import Path
 
 
@@ -30,6 +31,13 @@ def test_mainline_integration_is_exact_bounded_and_fail_closed():
     assert receipt["privacy_scan"]["passed"] is True
     assert all(value is False for value in receipt["claim_state"].values())
     assert receipt["first_party_receipts"]["passed"] is True
+    review = receipt["author_review_preflight"]
+    assert review["passed"] is True
+    assert review["status"] == "READY_FOR_AUTHOR_REVIEW_NO_SEND"
+    assert review["human_decision_count"] == 9
+    assert review["human_completed_item_count"] == 0
+    assert review["human_author_review_complete"] is False
+    assert review["production_request_authorized"] is False
 
 
 def test_line_endings_do_not_change_frozen_text_identity(tmp_path):
@@ -84,6 +92,45 @@ def test_protocol_has_no_overlap_between_frozen_core_and_allowed_drift():
     drift = set(config["allowed_integration_drift_paths"])
 
     assert frozen.isdisjoint(drift)
+
+
+def test_author_review_card_proves_machine_facts_without_completing_human_gates():
+    module = load_module()
+    receipt = module.inspect_integration()
+
+    card = module.render_author_review_card(receipt)
+
+    assert "Status: `READY_FOR_AUTHOR_REVIEW_NO_SEND`" in card
+    assert "Passed: `14/14`" in card
+    assert "Completed by machine: `0/9`" in card
+    assert receipt["author_review_preflight"]["author_review_unlock_phrase"] in card
+    assert "That phrase records author review only." in card
+    assert "`external_validation_complete`: `false`" in card
+    assert "production CODECHECK request" in card
+
+
+def test_checked_public_author_assertion_fails_closed(tmp_path):
+    module = load_module()
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    control = config["author_review_control"]
+    for key in ("checklist_path", "request_draft_path", "license_path", "citation_path"):
+        relative = Path(control[key])
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, target)
+
+    checklist = tmp_path / control["checklist_path"]
+    text = checklist.read_text(encoding="utf-8")
+    checklist.write_text(text.replace("- [ ]", "- [x]", 1), encoding="utf-8")
+    codecheck_text = (ROOT / "codecheck.yml").read_text(encoding="utf-8")
+
+    review = module.inspect_author_review(config, codecheck_text, tmp_path)
+
+    assert review["passed"] is False
+    assert review["status"] == "AUTHOR_REVIEW_PREFLIGHT_BLOCKED"
+    assert review["checks"]["checklist_has_no_completed_assertions"] is False
+    assert review["human_completed_item_count"] == 1
+    assert review["human_author_review_complete"] is False
 
 
 def test_workflow_hashes_artifacts_from_the_uploaded_root():

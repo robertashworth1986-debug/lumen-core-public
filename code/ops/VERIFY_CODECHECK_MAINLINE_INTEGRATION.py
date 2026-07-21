@@ -17,6 +17,11 @@ REFERENCE_LINE = re.compile(
     re.MULTILINE,
 )
 CONFLICT_MARKERS = re.compile(r"^(?:<<<<<<<|=======|>>>>>>>)", re.MULTILINE)
+CHECKBOX_LINE = re.compile(
+    r"^- \[(?P<mark>[ xX])\] (?P<text>.+?)\s*$",
+    re.MULTILINE,
+)
+NUMBERED_LINE = re.compile(r"^\d+\.\s+", re.MULTILINE)
 PRIVATE_PATTERNS = (
     re.compile(r"(?<![A-Za-z0-9])[A-Za-z]:[/\\](?![/\\])", re.I),
     re.compile(
@@ -101,6 +106,166 @@ def parse_codecheck_manifest(text: str) -> list[str]:
     return outputs
 
 
+def normalize_whitespace(value: str) -> str:
+    return " ".join(value.split())
+
+
+def parse_checkbox_items(text: str) -> list[dict[str, Any]]:
+    items: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+    for line in text.splitlines():
+        match = CHECKBOX_LINE.match(line)
+        if match:
+            if current is not None:
+                current["text"] = normalize_whitespace(current["text"])
+                items.append(current)
+            current = {
+                "checked": bool(match.group("mark").strip()),
+                "text": match.group("text"),
+            }
+            continue
+        if current is not None and line.startswith(("  ", "\t")) and line.strip():
+            current["text"] += " " + line.strip()
+            continue
+        if current is not None:
+            current["text"] = normalize_whitespace(current["text"])
+            items.append(current)
+            current = None
+    if current is not None:
+        current["text"] = normalize_whitespace(current["text"])
+        items.append(current)
+    return items
+
+
+def inspect_author_review(
+    config: dict[str, Any],
+    codecheck_text: str,
+    root: Path = ROOT,
+) -> dict[str, Any]:
+    control = config["author_review_control"]
+    path_values = {
+        key: control[key]
+        for key in ("checklist_path", "request_draft_path", "license_path", "citation_path")
+    }
+    path_safety = {key: safe_repo_path(value) for key, value in path_values.items()}
+    path_presence = {
+        key: path_safety[key] and (root / PurePosixPath(value)).is_file()
+        for key, value in path_values.items()
+    }
+
+    def read_control_text(key: str) -> str:
+        if not path_presence[key]:
+            return ""
+        return (root / PurePosixPath(path_values[key])).read_text(encoding="utf-8")
+
+    checklist_text = read_control_text("checklist_path")
+    request_text = read_control_text("request_draft_path")
+    license_text = read_control_text("license_path")
+    citation_text = read_control_text("citation_path")
+    checklist_normalized = normalize_whitespace(checklist_text)
+    request_normalized = normalize_whitespace(request_text)
+    license_normalized = normalize_whitespace(license_text)
+    checklist_items = parse_checkbox_items(checklist_text)
+    completed_items = [row for row in checklist_items if row["checked"]]
+
+    missing_checklist_snippets = [
+        value
+        for value in control["required_checklist_snippets"]
+        if normalize_whitespace(value) not in checklist_normalized
+    ]
+    missing_request_snippets = [
+        value
+        for value in control["required_request_snippets"]
+        if normalize_whitespace(value) not in request_normalized
+    ]
+    missing_license_snippets = [
+        value
+        for value in control["required_license_snippets"]
+        if normalize_whitespace(value) not in license_normalized
+    ]
+    author = control["expected_author_name"]
+    family_name, given_name = author.split(" ", 1)[1], author.split(" ", 1)[0]
+    citation_author_exact = bool(
+        re.search(
+            rf'^\s+-\s+family-names:\s+"{re.escape(family_name)}"\s*$',
+            citation_text,
+            flags=re.MULTILINE,
+        )
+        and re.search(
+            rf'^\s+given-names:\s+"{re.escape(given_name)}"\s*$',
+            citation_text,
+            flags=re.MULTILINE,
+        )
+    )
+    codecheck_author_exact = bool(
+        re.search(
+            rf'^\s+-\s+name:\s+"{re.escape(author)}"\s*$',
+            codecheck_text,
+            flags=re.MULTILINE,
+        )
+    )
+    checklist_status_exact = (
+        f"Status: `{control['expected_checklist_status']}`" in checklist_text
+    )
+    request_status_exact = f"Status: `{control['expected_request_status']}`" in request_text
+    action_gate_count = len(NUMBERED_LINE.findall(checklist_text))
+    frozen = config["frozen_target"]
+    frozen_fact_checks = {
+        "source_commit_bound": frozen["commit"] in checklist_text
+        and frozen["commit"] in request_text,
+        "preprint_hash_bound": frozen["preprint_sha256"] in checklist_text,
+        "declared_output_count_bound": (
+            f"Declared outputs: `{frozen['declared_output_count']}`" in checklist_text
+        ),
+        "suite_assertion_counts_bound": (
+            f"`{frozen['suite_count']}` suites, `{frozen['assertion_count']}` assertions"
+            in checklist_text
+        ),
+        "panel_row_count_bound": (
+            f"`{frozen['frozen_panel_row_count']:,}` rows" in checklist_text
+        ),
+    }
+    checks = {
+        "control_paths_safe": all(path_safety.values()),
+        "control_paths_present": all(path_presence.values()),
+        "checklist_status_exact": checklist_status_exact,
+        "request_status_exact": request_status_exact,
+        "human_decision_count_exact": len(checklist_items)
+        == control["expected_human_decision_count"],
+        "checklist_has_no_completed_assertions": not completed_items,
+        "action_time_gate_count_exact": action_gate_count
+        == control["expected_action_time_gate_count"],
+        "checklist_language_complete": not missing_checklist_snippets,
+        "request_language_complete": not missing_request_snippets,
+        "license_language_complete": not missing_license_snippets,
+        "codecheck_author_exact": codecheck_author_exact,
+        "citation_author_exact": citation_author_exact,
+        "frozen_facts_bound": all(frozen_fact_checks.values()),
+        "identifier_left_for_action_time": control["identifier_placeholder"] in request_text,
+    }
+    passed = all(checks.values())
+    return {
+        "schema": "codecheck_author_review_preflight.v1",
+        "status": "READY_FOR_AUTHOR_REVIEW_NO_SEND" if passed else "AUTHOR_REVIEW_PREFLIGHT_BLOCKED",
+        "passed": passed,
+        "checks": checks,
+        "machine_check_count": len(checks),
+        "machine_check_pass_count": sum(bool(value) for value in checks.values()),
+        "human_decision_count": len(checklist_items),
+        "human_completed_item_count": len(completed_items),
+        "human_author_review_complete": False,
+        "human_decisions": checklist_items,
+        "action_time_gate_count": action_gate_count,
+        "action_time_gates_complete": False,
+        "frozen_fact_checks": frozen_fact_checks,
+        "missing_checklist_snippets": missing_checklist_snippets,
+        "missing_request_snippets": missing_request_snippets,
+        "missing_license_snippets": missing_license_snippets,
+        "author_review_unlock_phrase": control["author_review_unlock_phrase"],
+        "production_request_authorized": False,
+    }
+
+
 def scan_public_text(paths: list[str], root: Path = ROOT) -> list[dict[str, str]]:
     hits: list[dict[str, str]] = []
     for relative in paths:
@@ -169,6 +334,7 @@ def inspect_integration(config_path: Path = DEFAULT_CONFIG, root: Path = ROOT) -
     reference = REFERENCE_LINE.search(codecheck_text)
     privacy_hits = scan_public_text(config["public_text_scan_paths"], root)
     receipts = inspect_first_party_receipts(root)
+    author_review = inspect_author_review(config, codecheck_text, root)
 
     preprint_path = root / PurePosixPath(frozen["preprint_path"])
     preprint_sha = file_sha256(preprint_path) if preprint_path.is_file() else None
@@ -202,6 +368,7 @@ def inspect_integration(config_path: Path = DEFAULT_CONFIG, root: Path = ROOT) -
         and all(value is False for value in claim_state.values()),
         "public_text_scan_passed": not privacy_hits,
         "first_party_receipts_bounded": receipts["passed"],
+        "author_review_preflight_ready": author_review["passed"],
     }
     return {
         "schema": "codecheck_eia_mainline_integration_receipt.v1",
@@ -217,6 +384,7 @@ def inspect_integration(config_path: Path = DEFAULT_CONFIG, root: Path = ROOT) -
         "manifest_outputs": manifest_outputs,
         "preprint_observed_sha256": preprint_sha,
         "first_party_receipts": receipts,
+        "author_review_preflight": author_review,
         "privacy_scan": {"passed": not privacy_hits, "hits": privacy_hits},
         "claim_state": claim_state,
         "human_unlock_policy": config["human_unlock_policy"],
@@ -224,20 +392,72 @@ def inspect_integration(config_path: Path = DEFAULT_CONFIG, root: Path = ROOT) -
     }
 
 
+def render_author_review_card(receipt: dict[str, Any]) -> str:
+    review = receipt["author_review_preflight"]
+    target = receipt["frozen_target"]
+    claim_state = receipt["claim_state"]
+    machine_rows = "\n".join(
+        f"- [{'x' if passed else ' '}] `{name}`"
+        for name, passed in review["checks"].items()
+    )
+    human_rows = "\n".join(
+        f"- [ ] {row['text']}" for row in review["human_decisions"]
+    )
+    claim_rows = "\n".join(
+        f"- `{name}`: `{str(value).lower()}`" for name, value in claim_state.items()
+    )
+    return (
+        "# CODECHECK Author Review Decision Card\n\n"
+        f"Status: `{review['status']}`\n\n"
+        "This card proves packet consistency only. It does not prove that Robert "
+        "has read or accepted the materials, and it does not authorize a CODECHECK "
+        "request or any external contact.\n\n"
+        "## Frozen Target\n\n"
+        f"- Source commit: `{target['commit']}`\n"
+        f"- Preprint SHA-256: `{target['preprint_sha256']}`\n"
+        f"- Declared outputs: `{target['declared_output_count']}`\n"
+        f"- Suites and assertions: `{target['suite_count']}` / `{target['assertion_count']}`\n"
+        f"- Frozen panel rows: `{target['frozen_panel_row_count']:,}`\n\n"
+        "## Machine Preflight\n\n"
+        f"Passed: `{review['machine_check_pass_count']}/{review['machine_check_count']}`\n\n"
+        f"{machine_rows}\n\n"
+        "## Human Acknowledgments\n\n"
+        f"Completed by machine: `0/{review['human_decision_count']}`\n\n"
+        f"{human_rows}\n\n"
+        "## Claims That Remain False\n\n"
+        f"{claim_rows}\n\n"
+        "## Author Review Unlock\n\n"
+        "After personally completing the acknowledgments above, Robert may provide "
+        "this exact phrase:\n\n"
+        f"`{review['author_review_unlock_phrase']}`\n\n"
+        "That phrase records author review only. A fresh duplicate check, a collision-free "
+        "Launch Pad identifier, and separate action-time HumanUnlock are still required "
+        "before exactly one production CODECHECK request.\n"
+    )
+
+
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+def write_text(path: Path, value: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(value, encoding="utf-8", newline="\n")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--author-card", type=Path)
     args = parser.parse_args()
 
     receipt = inspect_integration(args.config.resolve())
     if args.output:
         write_json(args.output.resolve(), receipt)
+    if args.author_card:
+        write_text(args.author_card.resolve(), render_author_review_card(receipt))
     print(
         json.dumps(
             {
@@ -247,6 +467,10 @@ def main() -> int:
                 "frozen_file_count": receipt["frozen_file_count"],
                 "declared_output_count": len(receipt["manifest_outputs"]),
                 "external_validation_complete": receipt["claim_state"]["external_validation_complete"],
+                "author_review_status": receipt["author_review_preflight"]["status"],
+                "human_author_review_complete": receipt["author_review_preflight"][
+                    "human_author_review_complete"
+                ],
                 "failed_checks": [key for key, value in receipt["checks"].items() if not value],
             },
             indent=2,
