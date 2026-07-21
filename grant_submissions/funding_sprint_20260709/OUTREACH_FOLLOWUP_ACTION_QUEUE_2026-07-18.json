@@ -61,7 +61,7 @@
       "draft_rendered": false,
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 157354,
+      "hold_seconds_remaining": 156673,
       "inbox_recheck_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "max_proactive_sends": 1,
@@ -290,7 +290,7 @@
       "source_state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
     }
   ],
-  "as_of_utc": "2026-07-21T18:17:25.589093Z",
+  "as_of_utc": "2026-07-21T18:28:47Z",
   "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. Historical send-timing exceptions remain counted against the send cap and are surfaced fail-closed. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
   "controls": {
     "action_time_human_review_required": true,
@@ -308,7 +308,7 @@
       "4B5EDC6BCB11F72B7A0896FBEA672EC8C5DC1B9D19F4FDAD099AADF7E7C41D45"
     ]
   },
-  "queue_sha256": "ECCDEF39464C63D9D3308EE04D37BFACF7020893E408440F0B541461CD12D1A4",
+  "queue_sha256": "4DD48C4DDA9177375D946A4CA58516501122C28148963761F09397E1505A8B05",
   "routing_integrity_exceptions": [
     {
       "exception": "SENT_BEFORE_CONFIGURED_HOLD",
@@ -324,7 +324,7 @@
       "bytes": 23821,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "31EE60D64729D158E1B4E86D7E753420DD7DBEAFA21040BB7E0FB05584763BF6",
+      "sha256": "C13AB5C63DA0C61139B82CE3768DB6FD965DB48CF140F24B632BD9B3D56F167D",
       "worktree_eol_differs_from_git_blob": true
     },
     "followup_policy_config": {
@@ -342,17 +342,17 @@
       "worktree_eol_differs_from_git_blob": true
     },
     "response_registry_builder": {
-      "bytes": 19601,
+      "bytes": 22245,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py",
-      "sha256": "E3410ED6848C38AA3E0F385D95E8F1C02C59840117179A5F716EA923C319DAC8",
+      "sha256": "A58D0B352AB9EC1C09AE9350232FDF49488098B6D10051DC64C8193578D412CE",
       "worktree_eol_differs_from_git_blob": true
     },
     "response_template_registry": {
-      "bytes": 17846,
+      "bytes": 18092,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
-      "sha256": "40363208CEBE14EF8C8929DAE98172C3470A052A3A5EBB23D80BEE90BF233A21",
+      "sha256": "2B33DE429869DE41B20E64AFA12C512483A9F11AFEAD587653C325E58E25F289",
       "worktree_eol_differs_from_git_blob": true
     }
   },
