@@ -1,12 +1,12 @@
 {
   "schema": "lumencore.missionweave_founder_finish_card.v1",
-  "generated_utc": "2026-07-21T23:26:56.888548Z",
+  "generated_utc": "2026-07-21T23:24:50Z",
   "status": "FOUNDER_ACTION_REQUIRED_NOT_SUBMISSION_READY",
   "topic": "DLA26BZ03-NV011",
   "deadline": {
     "expected_local": "July 22, 2026 at 12:00 p.m. Eastern Time",
     "expected_utc": "2026-07-22T16:00:00Z",
-    "seconds_remaining": 59583,
+    "seconds_remaining": 59710,
     "hours_remaining_rounded_down": 16,
     "deadline_passed": false,
     "live_dsip_recheck_required": true,
@@ -201,8 +201,8 @@
   ],
   "outreach_control": {
     "queue_path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
-    "queue_as_of_utc": "2026-07-21T23:24:50.012666Z",
-    "queue_age_seconds": 126,
+    "queue_as_of_utc": "2026-07-21T23:24:50Z",
+    "queue_age_seconds": 0,
     "queue_status": "ROUTING_INTEGRITY_EXCEPTION_NO_SEND",
     "routing_integrity_exception_count": 1,
     "missionweave_action_state": "FOLLOWUP_LIMIT_REACHED_NO_SEND",
@@ -246,9 +246,9 @@
     "gate_canonical_text_sha256": "5FFF4C4074E8F0879C38662080E90CB5FE595E982359D88BBD10AE58EF5AAB5D",
     "gate_payload_sha256": "0d8ac4192af707c66f153782b1584764f84c0575aba223ce5bf1233e13e6840c",
     "gate_source_checks_pass": true,
-    "queue_canonical_text_sha256": "B82A244081EB45E8D54B3A69C9972255D57FCB0AD98E92B44FFF2B96FC979E6D",
-    "queue_payload_sha256": "0F6AC7B187AE0C19163E0F8EF79FAACD181F7BA15732DBED523958DF047CCEE1"
+    "queue_canonical_text_sha256": "88027C4293999BEAEB42DD7847402E91F344546BF70798571CA0327D1FE8C6D3",
+    "queue_payload_sha256": "B9B00F3A1EFCE74FD763FDB0B431B3A4C5061BC2024D60CD14433192FC230F1A"
   },
   "claim_boundary": "This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.",
-  "card_sha256": "C01C8E45F72B53FEA86511D1A5595AAA00F6323EDA17D09D8D2EEF7B751DEEA6"
+  "card_sha256": "BAFC299ACE777E92DF00FCC92B01342B48206CF77BB95796A11061BD2C0738FF"
 }

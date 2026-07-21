@@ -1,6 +1,6 @@
 # MissionWeave Founder Finish Card
 
-- Generated UTC: `2026-07-21T23:26:56.888548Z`
+- Generated UTC: `2026-07-21T23:24:50Z`
 - Deadline: **July 22, 2026 at 12:00 p.m. Eastern Time** (`2026-07-22T16:00:00Z`)
 - Time remaining at generation: `16` full hours
 - Current gate: **35/50 passed; 15 open**
@@ -108,7 +108,7 @@ Do not certify or click final submit until the regenerated action gate reports `
 
 - Action gate: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
 - Action-gate canonical-text SHA-256: `5FFF4C4074E8F0879C38662080E90CB5FE595E982359D88BBD10AE58EF5AAB5D`
-- Outreach queue canonical-text SHA-256: `B82A244081EB45E8D54B3A69C9972255D57FCB0AD98E92B44FFF2B96FC979E6D`
-- Card SHA-256: `C01C8E45F72B53FEA86511D1A5595AAA00F6323EDA17D09D8D2EEF7B751DEEA6`
+- Outreach queue canonical-text SHA-256: `88027C4293999BEAEB42DD7847402E91F344546BF70798571CA0327D1FE8C6D3`
+- Card SHA-256: `BAFC299ACE777E92DF00FCC92B01342B48206CF77BB95796A11061BD2C0738FF`
 
 This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.
