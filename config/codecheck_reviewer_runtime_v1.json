@@ -1,0 +1,36 @@
+{
+  "schema": "codecheck_reviewer_runtime_protocol.v1",
+  "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_RUNTIME_20260721",
+  "version": 1,
+  "purpose": "Fail closed unless the reviewer process is running in the exact operating-system, architecture, Python, libc, deterministic-environment, and dependency-lock scope claimed by the bounded capsule.",
+  "source": {
+    "script_path": "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+    "config_path": "config/codecheck_reviewer_runtime_v1.json"
+  },
+  "expected": {
+    "github_image": "ubuntu-24.04",
+    "system": "Linux",
+    "machine": "x86_64",
+    "python": "3.11.9",
+    "os_release": {
+      "id": "ubuntu",
+      "version_id": "24.04"
+    },
+    "libc": {
+      "name": "glibc",
+      "version": "2.39"
+    },
+    "environment": {
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PYTHONHASHSEED": "0",
+      "TZ": "UTC"
+    },
+    "requirements_lock": {
+      "path": "requirements-reviewer-ubuntu-py311.lock",
+      "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
+    }
+  },
+  "claim_boundary": "This first-party runtime receipt verifies only the named operating-system, architecture, Python, libc, deterministic environment variables, dependency-lock hash, and verifier source identity. It is not an independent execution, CODECHECK certificate, scientific validation, field validation, performance endorsement, or valuation evidence."
+}
