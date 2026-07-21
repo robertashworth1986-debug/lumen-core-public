@@ -202,7 +202,43 @@ def test_registry_builds_fail_closed_public_map() -> None:
     assert summary["field_or_acceptance_validated_entry_count"] == 0
     assert summary["patentability_determined"] is False
     assert summary["external_validation_claim_allowed"] is False
+    assert payload["file_hash_audit"]["summary"]["all_current"] is True
+    assert payload["file_hash_audit"]["summary"]["drift_count"] == 0
     assert len(payload["terminal_chain_sha256"]) == 64
+
+
+def test_registry_hash_audit_is_deterministic_and_non_mutating() -> None:
+    builder = load_path(BUILDER_PATH, "equation_hash_audit_builder")
+    registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    original = copy.deepcopy(registry)
+
+    first = builder.build_file_hash_audit(registry)
+    second = builder.build_file_hash_audit(registry)
+
+    assert first == second
+    assert registry == original
+    assert first["summary"]["all_current"] is True
+    assert first["summary"]["current_count"] == len(registry["files"])
+    assert first["summary"]["drift_count"] == 0
+    assert len(first["audit_sha256"]) == 64
+
+
+def test_registry_hash_audit_reports_drift_without_mutation() -> None:
+    builder = load_path(BUILDER_PATH, "equation_hash_drift_builder")
+    registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    first_path = next(iter(registry["files"]))
+    registry["files"][first_path]["sha256"] = "0" * 64
+    original = copy.deepcopy(registry)
+
+    audit = builder.build_file_hash_audit(registry)
+
+    assert registry == original
+    assert audit["summary"]["all_current"] is False
+    assert audit["summary"]["drift_count"] == 1
+    drift = [record for record in audit["records"] if record["status"] == "DRIFT"]
+    assert [record["path"] for record in drift] == [first_path]
+    assert drift[0]["expected_sha256"] == "0" * 64
+    assert len(drift[0]["observed_sha256"]) == 64
 
 
 def test_registry_rejects_hash_drift_claim_inflation_and_analogue_promotion() -> None:

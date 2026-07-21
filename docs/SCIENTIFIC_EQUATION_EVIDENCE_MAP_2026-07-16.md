@@ -1,9 +1,9 @@
 # Scientific Equation Evidence Map
 
-Generated UTC: `2026-07-16T05:00:39.300822+00:00`
-Registry SHA-256: `b9e9af6208059af2116f062f4434558dcb3495bde5bbc4f3d51490856953244f`
-Builder SHA-256: `100f6be0d0eb5b8fd2c67604d0e2ebde2fb9d10a6b8a0b54e99e36e42b67671e`
-Terminal chain SHA-256: `22023cb9cb8b7006215e9575f851b64f7e7ba9c75b2688d694b3947b9c733b42`
+Generated UTC: `2026-07-21T07:53:26.536023+00:00`
+Registry SHA-256: `3c73ea29c9a4a58060811f7700219f1c82ae102e8aecfa70ee6b4341490324c2`
+Builder SHA-256: `1077dd04512caeda698a661df3c822322972e8953e11ee71b16d2e83c6baf736`
+Terminal chain SHA-256: `0403a49b510968021b34350d2ab5697f7bd565bdec9e25e264551c0ef3617b5a`
 
 ## Truth Line
 
@@ -13,6 +13,8 @@ This map distinguishes exact standard methods, operational definitions, heuristi
 
 - Registered entries: `25`
 - Registered files: `26`
+- Registry files current: `true`
+- Registry hash drift count: `0`
 - Independently reproduced entries: `0`
 - Field or acceptance validated entries: `0`
 - Patentability determined: `false`

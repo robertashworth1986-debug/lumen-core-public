@@ -91,6 +91,73 @@ def repo_path(raw: str, root: Path = ROOT) -> Path:
     return candidate
 
 
+def build_file_hash_audit(
+    registry: dict[str, Any],
+    *,
+    root: Path = ROOT,
+) -> dict[str, Any]:
+    """Return a deterministic, non-mutating audit of registered file hashes."""
+    files = registry.get("files")
+    records: list[dict[str, Any]] = []
+    files_valid = isinstance(files, dict) and bool(files)
+    if files_valid:
+        for relative in sorted(files):
+            metadata = files[relative]
+            record: dict[str, Any] = {
+                "path": relative,
+                "role": metadata.get("role") if isinstance(metadata, dict) else None,
+                "expected_sha256": None,
+                "observed_sha256": None,
+                "byte_count": None,
+                "status": "INVALID_METADATA",
+            }
+            if not isinstance(metadata, dict):
+                records.append(record)
+                continue
+
+            expected = str(metadata.get("sha256") or "").lower()
+            record["expected_sha256"] = expected or None
+            try:
+                path = repo_path(relative, root)
+            except RegistryValidationError:
+                record["status"] = "INVALID_PATH"
+                records.append(record)
+                continue
+            if not path.is_file():
+                record["status"] = "MISSING"
+                records.append(record)
+                continue
+
+            record["byte_count"] = path.stat().st_size
+            record["observed_sha256"] = sha256_file(path)
+            if len(expected) != 64 or any(character not in "0123456789abcdef" for character in expected):
+                record["status"] = "INVALID_EXPECTED_HASH"
+            elif record["observed_sha256"] == expected:
+                record["status"] = "CURRENT"
+            else:
+                record["status"] = "DRIFT"
+            records.append(record)
+
+    status_counts = Counter(record["status"] for record in records)
+    summary = {
+        "registry_files_valid": files_valid,
+        "file_count": len(records),
+        "current_count": status_counts["CURRENT"],
+        "drift_count": status_counts["DRIFT"],
+        "missing_count": status_counts["MISSING"],
+        "invalid_metadata_count": status_counts["INVALID_METADATA"],
+        "invalid_path_count": status_counts["INVALID_PATH"],
+        "invalid_expected_hash_count": status_counts["INVALID_EXPECTED_HASH"],
+    }
+    summary["all_current"] = files_valid and summary["current_count"] == summary["file_count"]
+    audit_core = {
+        "schema": "lumencore_scientific_equation_registry_hash_audit_v1",
+        "summary": summary,
+        "records": records,
+    }
+    return {**audit_core, "audit_sha256": canonical_sha256(audit_core)}
+
+
 def find_symbol(tree: ast.Module, dotted: str) -> ast.AST | None:
     parts = dotted.split(".")
     body: list[ast.stmt] = tree.body
@@ -126,25 +193,20 @@ def _validate_files(registry: dict[str, Any], root: Path, verify_hashes: bool) -
     files = registry.get("files")
     if not isinstance(files, dict) or not files:
         return ["registry.files must be a nonempty object"]
-    for relative, metadata in files.items():
-        if not isinstance(metadata, dict):
+    audit = build_file_hash_audit(registry, root=root)
+    for record in audit["records"]:
+        relative = record["path"]
+        status = record["status"]
+        if status == "INVALID_METADATA":
             failures.append(f"file metadata is not an object: {relative}")
-            continue
-        try:
-            path = repo_path(relative, root)
-        except RegistryValidationError as exc:
-            failures.append(str(exc))
-            continue
-        if not path.is_file():
+        elif status == "INVALID_PATH":
+            failures.append(f"path escapes repository: {relative}")
+        elif status == "MISSING":
             failures.append(f"registered file is missing: {relative}")
-            continue
-        expected = str(metadata.get("sha256") or "").lower()
-        if len(expected) != 64:
+        elif status == "INVALID_EXPECTED_HASH":
             failures.append(f"registered file SHA-256 is invalid: {relative}")
-        elif verify_hashes:
-            observed = sha256_file(path)
-            if observed != expected:
-                failures.append(f"registered file SHA-256 mismatch: {relative}")
+        elif status == "DRIFT" and verify_hashes:
+            failures.append(f"registered file SHA-256 mismatch: {relative}")
     return failures
 
 
@@ -333,6 +395,7 @@ def current_git_head(root: Path = ROOT) -> str | None:
 def build_payload(registry_path: Path = DEFAULT_REGISTRY, *, root: Path = ROOT) -> dict[str, Any]:
     registry = read_json(registry_path)
     validation = validate_registry(registry, root=root)
+    file_hash_audit = build_file_hash_audit(registry, root=root)
     files = registry["files"]
     entries: list[dict[str, Any]] = []
     for raw in registry["entries"]:
@@ -401,6 +464,7 @@ def build_payload(registry_path: Path = DEFAULT_REGISTRY, *, root: Path = ROOT) 
             "external_validation_claim_allowed": False,
             "field_validation_claim_allowed": False,
         },
+        "file_hash_audit": file_hash_audit,
         "entries": entries,
         "chain": chain,
         "terminal_chain_sha256": terminal,
@@ -426,6 +490,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Registered entries: `{summary['entry_count']}`",
         f"- Registered files: `{summary['file_count']}`",
+        f"- Registry files current: `{str(payload['file_hash_audit']['summary']['all_current']).lower()}`",
+        f"- Registry hash drift count: `{payload['file_hash_audit']['summary']['drift_count']}`",
         f"- Independently reproduced entries: `{summary['independently_reproduced_entry_count']}`",
         f"- Field or acceptance validated entries: `{summary['field_or_acceptance_validated_entry_count']}`",
         "- Patentability determined: `false`",
@@ -475,8 +541,18 @@ def write_outputs(payload: dict[str, Any]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build the fail-closed scientific equation evidence map.")
     parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
-    parser.add_argument("--check-only", action="store_true")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--check-only", action="store_true")
+    mode.add_argument(
+        "--hash-audit-only",
+        action="store_true",
+        help="Print a non-mutating registered-file hash audit and fail on drift.",
+    )
     args = parser.parse_args()
+    if args.hash_audit_only:
+        audit = build_file_hash_audit(read_json(args.registry.resolve()))
+        print(json.dumps(audit, indent=2, sort_keys=True))
+        return 0 if audit["summary"]["all_current"] else 1
     payload = build_payload(args.registry.resolve())
     if not args.check_only:
         write_outputs(payload)
