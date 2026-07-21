@@ -1,13 +1,13 @@
 {
   "schema": "lumencore.missionweave_founder_finish_card.v1",
-  "generated_utc": "2026-07-21T21:41:24.362629Z",
+  "generated_utc": "2026-07-21T22:56:00Z",
   "status": "FOUNDER_ACTION_REQUIRED_NOT_SUBMISSION_READY",
   "topic": "DLA26BZ03-NV011",
   "deadline": {
     "expected_local": "July 22, 2026 at 12:00 p.m. Eastern Time",
     "expected_utc": "2026-07-22T16:00:00Z",
-    "seconds_remaining": 65915,
-    "hours_remaining_rounded_down": 18,
+    "seconds_remaining": 61440,
+    "hours_remaining_rounded_down": 17,
     "deadline_passed": false,
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
@@ -141,8 +141,8 @@
   ],
   "outreach_control": {
     "queue_path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
-    "queue_as_of_utc": "2026-07-21T21:40:21.404433Z",
-    "queue_age_seconds": 62,
+    "queue_as_of_utc": "2026-07-21T22:55:00Z",
+    "queue_age_seconds": 60,
     "queue_status": "ROUTING_INTEGRITY_EXCEPTION_NO_SEND",
     "routing_integrity_exception_count": 1,
     "missionweave_action_state": "FOLLOWUP_LIMIT_REACHED_NO_SEND",
@@ -186,9 +186,9 @@
     "gate_canonical_text_sha256": "ABBC656B11687706A441B9CDCF1272DFD324A34B6A1187EF0874FE83D05E3E88",
     "gate_payload_sha256": "f44725cd96edd1b5c1e65588e125ebbf46f753cf8fca5907b93d670af7165d7e",
     "gate_source_checks_pass": true,
-    "queue_canonical_text_sha256": "0E806C73A1B185E63F282F7FAAEFAF1FC0064E8AEF4D7E4BE56313888AD265B2",
-    "queue_payload_sha256": "9679D1E3E7E72A2DB7B61E906C8FD46F3089D48C8361DCCBA8D29A226931C5B9"
+    "queue_canonical_text_sha256": "F69E6781D1A6E37D9773BC4F19A66BC9F08691AEA982559EC58A9E2CA44BA0EA",
+    "queue_payload_sha256": "9A66B1C161CBE79EE7F5EC3A6C7F59B8C8F45CBA99180F2E9BADB1DE71D48301"
   },
   "claim_boundary": "This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.",
-  "card_sha256": "CBCFFD76D9132A5FF338719D556D848365F8BC594A213634BF66800286018D26"
+  "card_sha256": "F0732F60F96FB7728CB6387496A10E2EFB347B00DE77F242FEB4C566C4FAEFBA"
 }
