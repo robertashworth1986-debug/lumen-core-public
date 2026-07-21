@@ -1,0 +1,418 @@
+{
+  "schema": "lumencore.missionweave_deadline_closeout.v1",
+  "generated_utc": "2026-07-21T04:13:02.201879Z",
+  "topic": "DLA26BZ03-NV011",
+  "status": "FOUNDER_AND_PORTAL_CLOSEOUT_REQUIRED",
+  "deadline": {
+    "expected_utc": "2026-07-22T16:00:00Z",
+    "expected_local": "July 22, 2026 at 12:00 p.m. Eastern Time",
+    "seconds_remaining_at_build": 128817,
+    "state": "UNDER_48_HOURS",
+    "live_dsip_recheck_required": true,
+    "internal_upload_preview_target": "2026-07-21T15:00:00-05:00",
+    "founder_final_review_target": "2026-07-22T09:00:00-05:00"
+  },
+  "summary": {
+    "required_gate_count": 50,
+    "passed_gate_count": 34,
+    "open_gate_count": 16,
+    "action_count": 16,
+    "every_open_gate_has_one_action": true,
+    "known_supplemental_review_gap_count": 5,
+    "submission_ready_for_human_click": false,
+    "external_email_due": false
+  },
+  "reconciliation_groups": {
+    "A_DOCUMENTARY_RETRIEVAL": {
+      "count": 3,
+      "gates": [
+        "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+        "DSIP_FIRM_PIN_AVAILABILITY",
+        "PORTAL_PREVIEW_RECEIPT_HASH"
+      ],
+      "status": "OPEN"
+    },
+    "B_FOUNDER_FACTUAL_ANSWER": {
+      "count": 2,
+      "gates": [
+        "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+        "NO_DUPLICATE_COST_OR_DELIVERABLE"
+      ],
+      "status": "OPEN"
+    },
+    "C_LEGAL_CERTIFICATION_DECISION": {
+      "count": 8,
+      "gates": [
+        "ACTION_TIME_APPROVAL_TIMESTAMP",
+        "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+        "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+        "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+        "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+        "ITAR_SCOPE_CONFIRMED",
+        "TECHNICAL_DATA_RIGHTS_ASSERTION",
+        "TECHNOLOGY_CONTROL_PLAN_DECISION"
+      ],
+      "status": "OPEN"
+    },
+    "D_PORTAL_MECHANICS": {
+      "count": 1,
+      "gates": [
+        "COMPLETE_PORTAL_PREVIEW_REVIEW"
+      ],
+      "status": "OPEN"
+    },
+    "E_TECHNICAL_VOLUME_CONSISTENCY": {
+      "count": 2,
+      "gates": [
+        "VOLUME3_COST_BASIS",
+        "VOLUME5_UPLOAD_SET"
+      ],
+      "status": "OPEN"
+    },
+    "F_CLEARED_BY_EVIDENCE": {
+      "count": 34,
+      "gates": [
+        "ASSIGNED_PROPOSAL_NUMBER_CAPTURE",
+        "CAGE_MATCH",
+        "CONTROLLED_DATA_EXCLUDED",
+        "DSIP_AUTHENTICATION",
+        "DSIP_FIRM_ADMIN",
+        "DSIP_FIRM_LEVEL_FORMS",
+        "DSIP_ORGANIZATION_LINKAGE",
+        "FOREIGN_AFFILIATIONS_CURRENT_FACTS",
+        "FOREIGN_CITIZEN_ANSWER",
+        "LIVE_DSIP_DEADLINE_CONFIRMATION",
+        "NO_CMMC_STATUS_OVERCLAIM",
+        "OWNERSHIP_AND_AFFILIATES",
+        "PI_640_HOURS",
+        "PI_PRIMARY_EMPLOYMENT",
+        "PRIOR_CURRENT_PENDING_SUPPORT",
+        "PRIVATE_INPUT_TIMESTAMP",
+        "SAM_ACTIVE_STATUS",
+        "SAM_LEGAL_NAME_MATCH",
+        "SAM_REPRESENTATIONS_CURRENT",
+        "SBA_COMPANY_REGISTRY",
+        "SBC_CONTROL_ID",
+        "SBIR_PERCENTAGE_OF_WORK",
+        "SUBMITTER_AUTHORITY",
+        "UEI_MATCH",
+        "US_SMALL_BUSINESS_ELIGIBILITY",
+        "VOLUME1_PUBLIC_RELEASE_TEXT_REVIEW",
+        "VOLUME2_ASSIGNED_PROPOSAL_NUMBER_EMBEDDED",
+        "VOLUME2_PDF_HASH_MATCH",
+        "VOLUME2_REBUILD",
+        "VOLUME2_VIRUS_SCAN",
+        "VOLUME3_TOTAL_MATCHES_PHASE_I_CEILING",
+        "VOLUME4_CCR",
+        "VOLUME6_FWA_TRAINING",
+        "VOLUME7_FOREIGN_AFFILIATIONS_WEBFORM"
+      ],
+      "status": "CLEARED"
+    }
+  },
+  "volume3_review_state": {
+    "computation_and_export_transport_verified": true,
+    "verified_checks": {
+      "workbook_present": true,
+      "receipt_present": true,
+      "receipt_header_valid": true,
+      "workbook_size_matches_receipt": true,
+      "workbook_hash_matches_receipt": true,
+      "formula_scan_clean": true,
+      "export_reimport_verified": true,
+      "financial_reconciliation_pass": true,
+      "review_guardrails_preserved": true,
+      "receipt_integrity_pass": true
+    },
+    "official_ceiling_reconciled": true,
+    "cost_basis_support_gate_open": true,
+    "distinction": "Workbook arithmetic, formula scanning, export/reimport, and receipt integrity are verified. Labor-rate, owner-compensation, fringe, indirect-rate, travel, cloud, software, and equipment support remains a separate corporate-review gate."
+  },
+  "outreach_state": {
+    "lane_id": "missionweave_dsip_proposal",
+    "action_state": "FOLLOWUP_LIMIT_REACHED_NO_SEND",
+    "recorded_proactive_send_count": 1,
+    "max_proactive_sends": 1,
+    "send_now": false,
+    "duplicate_send_prohibited": true,
+    "next_action": "Monitor the existing thread and respond only to a specific inbound request."
+  },
+  "portal_state": {
+    "dsip": {
+      "observed_utc": "2026-07-21T01:16:07.3147675Z",
+      "completion_percent": 88,
+      "volume_v_percent": 0,
+      "certify_percent": 0
+    },
+    "sam": {
+      "observed_utc": "2026-07-21T01:23:12.8870469Z",
+      "active_current_registration_observed": true,
+      "current_far_dfars_reps_certs_page_observed": true,
+      "individual_answer_accuracy_certified_by_builder": false
+    },
+    "jcp": {
+      "authenticated_documentary_evidence_observed": false,
+      "state": "AUTHENTICATION_CODE_REQUIRED"
+    }
+  },
+  "ordered_actions": [
+    {
+      "gate_id": "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+      "order": 10,
+      "actor": "AUTHENTICATED_JCP_USER_AND_CORPORATE_OFFICIAL",
+      "capture_section": "eligibility_and_compliance",
+      "action": "Retrieve the current certified DD Form 2345 or the official JCP application-submission evidence allowed by the live instructions.",
+      "evidence_required": "A private portal-derived PDF and matching private receipt that satisfy the existing JCP evidence protocol; a checkbox or registration screen is not sufficient.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "DSIP_FIRM_PIN_AVAILABILITY",
+      "order": 20,
+      "actor": "AUTHENTICATED_DSIP_USER",
+      "capture_section": "identity",
+      "action": "Verify that the linked organization exposes a usable Firm PIN inside DSIP.",
+      "evidence_required": "Record only the yes/no availability state in the ignored private input; never store or publish the PIN value.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+      "order": 40,
+      "actor": "FOUNDER_AND_CORPORATE_OFFICIAL",
+      "capture_section": "eligibility_and_compliance",
+      "action": "Review the current ownership, conflict, affiliate, and joint-venture facts and answer only from the actual entity structure.",
+      "evidence_required": "A current founder factual answer reviewed against the proposal and entity records; no relationship may be inferred from family, school, or informal contacts.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "NO_DUPLICATE_COST_OR_DELIVERABLE",
+      "order": 45,
+      "actor": "FOUNDER_AND_CORPORATE_OFFICIAL",
+      "capture_section": "eligibility_and_compliance",
+      "action": "Reconcile MissionWeave against every live, pending, planned, and awarded effort before certifying that no duplicate cost, hour, or deliverable is requested.",
+      "evidence_required": "Authoritative support reconciliation, a supportable 640-hour and cost basis, a reviewed rights position, and corporate review of the exact final preview.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "VOLUME3_COST_BASIS",
+      "order": 50,
+      "actor": "CORPORATE_OFFICIAL_OR_QUALIFIED_COST_REVIEWER",
+      "capture_section": "proposal",
+      "action": "Support the direct-labor rate, owner-compensation treatment, fringe, G&A base, travel, cloud, software, and equipment assumptions in Volume 3.",
+      "evidence_required": "Rate and cost records plus a reviewed allowability and allocation basis. Correct formulas and a balanced workbook do not by themselves support the rates.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+      "order": 60,
+      "actor": "CORPORATE_OFFICIAL_AND_CYBER_REVIEWER",
+      "capture_section": "eligibility_and_compliance",
+      "action": "Review the live solicitation and amendment language for the current Phase I CMMC requirement.",
+      "evidence_required": "A dated review of the controlling live requirement; do not rely only on a historical amendment summary.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+      "order": 70,
+      "actor": "CORPORATE_OFFICIAL_AND_CYBER_REVIEWER",
+      "capture_section": "eligibility_and_compliance",
+      "action": "Document the supportable Phase I self-assessment position without claiming certification, compliance, or an accredited enclave.",
+      "evidence_required": "The authoritative evidence packet state required by the action-gate builder; a founder checkbox or portal observation alone cannot clear this gate.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "ITAR_SCOPE_CONFIRMED",
+      "order": 75,
+      "actor": "CORPORATE_OFFICIAL_AND_EXPORT_CONTROL_REVIEWER",
+      "capture_section": "eligibility_and_compliance",
+      "action": "Confirm the ITAR-marked scope only after the official JCP evidence, controlled-data boundary, and Technology Control Plan decision are all current and documented.",
+      "evidence_required": "Verified private JCP/DD Form 2345 evidence plus explicit control-plan and controlled-data-exclusion records; an isolated scope selection is insufficient.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "TECHNOLOGY_CONTROL_PLAN_DECISION",
+      "order": 80,
+      "actor": "CORPORATE_OFFICIAL_AND_EXPORT_CONTROL_REVIEWER",
+      "capture_section": "eligibility_and_compliance",
+      "action": "Decide whether a Technology Control Plan is required for the actual proposed scope and document the decision.",
+      "evidence_required": "A scope-specific export-control decision that preserves the prohibition on placing controlled technical data in the proposal.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "TECHNICAL_DATA_RIGHTS_ASSERTION",
+      "order": 85,
+      "actor": "CORPORATE_OFFICIAL_OR_QUALIFIED_RIGHTS_REVIEWER",
+      "capture_section": "eligibility_and_compliance",
+      "action": "Reconcile the proposed technical-data and software-rights assertion with the actual development-funding and final cost records.",
+      "evidence_required": "A supported cost/funding basis and corporate review of the exact final package; the candidate Volume 2 table or a founder checkbox alone cannot clear this gate.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "VOLUME5_UPLOAD_SET",
+      "order": 90,
+      "actor": "CORPORATE_OFFICIAL",
+      "capture_section": "proposal",
+      "action": "Review the final Volume 5 upload set after the JCP, CMMC, rights, and control-plan decisions are resolved.",
+      "evidence_required": "An explicit applicable/not-applicable decision for every conditional item in the Volume 5 worksheet and the exact final filenames selected in DSIP.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+      "order": 100,
+      "actor": "CORPORATE_OFFICIAL",
+      "capture_section": "approval",
+      "action": "Review all seven volumes, every certification answer, the cost total, and the final upload set as one coherent proposal.",
+      "evidence_required": "A current all-volume review after every upstream documentary and technical change is complete.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "COMPLETE_PORTAL_PREVIEW_REVIEW",
+      "order": 110,
+      "actor": "AUTHENTICATED_DSIP_USER_AND_CORPORATE_OFFICIAL",
+      "capture_section": "proposal",
+      "action": "Review the complete DSIP preview, including all fields, seven volumes, attachment names, cost total, certifications, and live countdown.",
+      "evidence_required": "A complete review performed after the final upload set is frozen; partial-page inspection is insufficient.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "PORTAL_PREVIEW_RECEIPT_HASH",
+      "order": 120,
+      "actor": "AUTHENTICATED_DSIP_USER",
+      "capture_section": "proposal",
+      "action": "Save the private preview receipt and bind it to the current upload set.",
+      "evidence_required": "A fresh private preview receipt hash, capture timestamp, and binding hash that match the current package within the action-gate freshness window.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "ACTION_TIME_APPROVAL_TIMESTAMP",
+      "order": 130,
+      "actor": "FOUNDER_AND_CORPORATE_OFFICIAL",
+      "capture_section": "approval",
+      "action": "Provide fresh approval only after reviewing the current bound portal preview.",
+      "evidence_required": "A fresh approval timestamp and binding generated after the current preview; general or earlier approval is insufficient.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    },
+    {
+      "gate_id": "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+      "order": 140,
+      "actor": "FOUNDER_AND_CORPORATE_OFFICIAL",
+      "capture_section": "approval",
+      "action": "Authorize the final Government submission for this exact preview and upload set.",
+      "evidence_required": "Recipient-specific, proposal-specific action-time authorization. The builder never clicks Submit and never signs on the founder's behalf.",
+      "gate_state_after_build": "OPEN",
+      "automatic_clear_allowed": false
+    }
+  ],
+  "supplemental_applicability_review": {
+    "status": "QUALIFIED_REVIEW_REQUIRED_BEFORE_SUBMISSION",
+    "automatic_clear_allowed": false,
+    "items": [
+      {
+        "id": "HUMAN_SUBJECTS_APPLICABILITY",
+        "actor": "QUALIFIED_HUMAN_SUBJECTS_REVIEWER",
+        "action": "Determine whether Component feedback, process discovery, or personnel-related data activities constitute human-subjects research, or document a scope boundary that excludes those activities.",
+        "state": "UNRESOLVED"
+      },
+      {
+        "id": "ANIMAL_USE_APPLICABILITY",
+        "actor": "FOUNDER_AND_QUALIFIED_COMPLIANCE_REVIEWER",
+        "action": "Confirm from the exact final scope whether animal use is inapplicable and make the proposal and portal answers agree.",
+        "state": "UNRESOLVED"
+      },
+      {
+        "id": "RECOMBINANT_DNA_APPLICABILITY",
+        "actor": "FOUNDER_AND_QUALIFIED_COMPLIANCE_REVIEWER",
+        "action": "Confirm from the exact final scope whether recombinant-DNA work is inapplicable and make the proposal and portal answers agree.",
+        "state": "UNRESOLVED"
+      },
+      {
+        "id": "FASCSA_REASONABLE_INQUIRY",
+        "actor": "CORPORATE_OFFICIAL_AND_SUPPLY_CHAIN_REVIEWER",
+        "action": "Perform and document the proposal-specific FASCSA reasonable inquiry before making the required representation.",
+        "state": "UNRESOLVED"
+      },
+      {
+        "id": "SUPPLY_CHAIN_CLAUSE_APPLICABILITY",
+        "actor": "CORPORATE_OFFICIAL_AND_SUPPLY_CHAIN_REVIEWER",
+        "action": "Review the applicable covered-article and supply-chain clauses against the actual hardware, software, cloud, and service inputs.",
+        "state": "UNRESOLVED"
+      }
+    ]
+  },
+  "capture_commands": {
+    "identity": "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section identity",
+    "eligibility_and_compliance": "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section eligibility_and_compliance",
+    "proposal": "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section proposal",
+    "approval": "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval",
+    "rebuild_gate": "python code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input <IGNORED_PRIVATE_INPUT>"
+  },
+  "controls": {
+    "builder_changed_private_gate_state": false,
+    "builder_read_credentials": false,
+    "builder_navigated_browser": false,
+    "builder_sent_email": false,
+    "builder_uploaded_files": false,
+    "builder_signed_or_certified": false,
+    "builder_clicked_final_submit": false,
+    "action_time_human_unlock_required": true,
+    "private_paths_or_hashes_exposed": false,
+    "unresolved_gate_automatic_clear_allowed": false
+  },
+  "source_evidence": {
+    "action_gate": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "bytes": 14976,
+      "sha256": "1CEB2651C4604856B2D5C51E9C891FDC83FBBF4EC5C68B73F2C4C108B0146FD2"
+    },
+    "followup_queue": {
+      "path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
+      "bytes": 21915,
+      "sha256": "5AE1A35B562C49CB0C2AB8AEF49F9E1146C7F4209361BB719FE169CE19FF56E5"
+    },
+    "cost_inputs": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME3_COST_INPUTS_2026-07-16.md",
+      "bytes": 3653,
+      "sha256": "5A8330A73CF853EA47EF6034C275ED8D99CCC21BB1AE336540A186C1DD47FFE2"
+    },
+    "volume5_worksheet": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME5_WORKSHEET_2026-07-16.md",
+      "bytes": 6607,
+      "sha256": "7F77792874DB59BAAE7AC41E99F4B9E0D8D7002442207F860BC5E58AF4551C4A"
+    },
+    "portal_checklist": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md",
+      "bytes": 8002,
+      "sha256": "911F3D3D1A8811F4D5D5DC883230CA826C4B684E9F0C4605403EA9E1E87A827B"
+    },
+    "live_dsip_receipt": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_LIVE_STATUS_RECEIPT_2026-07-20.json",
+      "bytes": 2306,
+      "sha256": "D48895F341B91FA6221ACBC04B8C667F5D59C7091832795E0BD71EEE8BAB4772"
+    },
+    "sam_reps_certs_receipt": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_SAM_CURRENT_REPS_CERTS_RECEIPT_2026-07-20.json",
+      "bytes": 1370,
+      "sha256": "C506FF4780E3A91375429C09E65E99438E0F37B817C26C3CC1D7873A969089F4"
+    }
+  },
+  "outputs": {
+    "json": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DEADLINE_CLOSEOUT_2026-07-20.json",
+    "markdown": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DEADLINE_CLOSEOUT_2026-07-20.md"
+  },
+  "claim_boundary": "This closeout packet converts the current public action gate into an ordered human and portal worklist. It does not clear any private gate, certify cost support, establish CMMC or export-control status, prove JCP eligibility, authorize a Government submission, or establish receipt, acceptance, selection, funding, award, deployment, validation, or economic performance. It also does not establish completion of the separately listed human-subjects, animal-use, recombinant-DNA, FASCSA, or supply-chain applicability reviews.",
+  "closeout_sha256": "FF16CADA5C4BABDAC50A277048F2CAD8D7222B0952F00C6E65D64BB426265845"
+}

@@ -13,9 +13,9 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Private target git-ignored: `true`
 - Private values exposed: `false`
 - Required private gates: `50`
-- Passed private gates: `36`
-- Open gates: `14`
-- Gate SHA-256: `0a64c071fa262c8ae55c2e17ec6f57a8ef1d13d9583135669639fad2ce777c94`
+- Passed private gates: `34`
+- Open gates: `16`
+- Gate SHA-256: `2d7931b86f957482c8b8022337ea76bded4e41a76856a63d1653cf1d20fa1edb`
 
 ## Package Integrity
 
@@ -41,8 +41,16 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Volume 3 total matches official ceiling: `true`
 - Volume 3 private amount exposed: `false`
 - Portal preview receipt present: `false`
+- Portal preview receipt timestamp present: `false`
+- Portal preview receipt fresh: `false`
+- Portal preview binding matches current upload set: `false`
+- Portal preview evidence current: `false`
 - Corporate official reviewed: `false`
 - Action-time authorized: `false`
+- Approval timestamp fresh: `false`
+- Approval follows the current preview: `false`
+- Approval bound to the current preview/upload set: `false`
+- Private approval binding exposed: `false`
 - DD Form 2345/JCP evidence verified: `false`
 
 ## Private Volume 3 Artifact Integrity
@@ -73,16 +81,26 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Private path exposed: `false`
 - Private hash exposed: `false`
 - Protocol: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_JCP_EVIDENCE_PROTOCOL_2026-07-18.json`
-- Protocol SHA-256: `04EB5334A96D672BF02FD00F5C80482D1BFD779F190D70DFCB411F2E6695CE06`
+- Protocol SHA-256: `E1ECB611C2284512DD3DCA9BC03030A18F2C997E7F52DE0DBEE14361948B4095`
+
+## CMMC Evidence Packet
+
+- Packet: `grant_submissions/compliance_evidence/CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json`
+- Schema valid: `true`
+- Integrity valid: `true`
+- MissionWeave requirement consumed: `true`
+- Requirement evidence state: `APPLICABILITY_UNRESOLVED`
+- Phase I position supported: `false`
+- Overclaim boundary present: `true`
 
 ## Reconciliation Groups
 
-- `A_DOCUMENTARY_RETRIEVAL`: `4` gates (`OPEN`)
-- `B_FOUNDER_FACTUAL_ANSWER`: `1` gates (`OPEN`)
-- `C_LEGAL_CERTIFICATION_DECISION`: `6` gates (`OPEN`)
+- `A_DOCUMENTARY_RETRIEVAL`: `3` gates (`OPEN`)
+- `B_FOUNDER_FACTUAL_ANSWER`: `2` gates (`OPEN`)
+- `C_LEGAL_CERTIFICATION_DECISION`: `8` gates (`OPEN`)
 - `D_PORTAL_MECHANICS`: `1` gates (`OPEN`)
 - `E_TECHNICAL_VOLUME_CONSISTENCY`: `2` gates (`OPEN`)
-- `F_CLEARED_BY_EVIDENCE`: `36` gates (`CLEARED`)
+- `F_CLEARED_BY_EVIDENCE`: `34` gates (`CLEARED`)
 
 ## Open Gates
 
@@ -95,8 +113,10 @@ This public-safe gate reports only package integrity and private-workflow comple
 - `CURRENT_CMMC_REQUIREMENTS_REVIEW`
 - `DD2345_OR_JCP_APPLICATION_EVIDENCE`
 - `DSIP_FIRM_PIN_AVAILABILITY`
+- `ITAR_SCOPE_CONFIRMED`
+- `NO_DUPLICATE_COST_OR_DELIVERABLE`
 - `PORTAL_PREVIEW_RECEIPT_HASH`
-- `SAM_REPRESENTATIONS_CURRENT`
+- `TECHNICAL_DATA_RIGHTS_ASSERTION`
 - `TECHNOLOGY_CONTROL_PLAN_DECISION`
 - `VOLUME3_COST_BASIS`
 - `VOLUME5_UPLOAD_SET`
@@ -105,10 +125,11 @@ This public-safe gate reports only package integrity and private-workflow comple
 
 1. Run `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target`. This validates the ignored destination without reading private contents.
 2. Run the hidden collector with `--section pre-submit`. It captures identity, proposal, and compliance sections but deliberately excludes action-time approval.
-3. After DSIP assigns a proposal number, run `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`. It reads the number only from the ignored private record, writes the assigned-number DOCX/PDF only to the ignored private area, performs PDF QA, and updates the private PDF hash without exposing either value publicly.
+3. After DSIP assigns a proposal number, run `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`. It reads the number only from the ignored private record, writes the assigned-number DOCX/PDF only to the ignored private area, performs PDF QA, and updates the private PDF hash without exposing either value publicly. Hash the completed portal-preview receipt with `--preview-receipt-file`; a manually entered digest does not establish freshness.
 4. For the ITAR-marked topic, save only an official JCP portal submission receipt or certified DD Form 2345 as a private PDF and complete `config/missionweave_jcp_evidence_private_template_v1.json` beside it. A boolean answer cannot clear this gate without a matching file hash.
-5. Run `--section approval` only after the corporate official reviews the complete portal preview at action time. The collector never requests or accepts a Firm PIN or login credential.
-6. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.
+5. Review the consumed CMMC packet at `grant_submissions/compliance_evidence/CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json`. An unresolved packet leaves the supported-position gate open even when a private boolean is checked.
+6. Run `--section approval` only after the corporate official reviews the fresh complete portal preview at action time. The collector binds that authorization to the current preview/upload-set identity and never requests or accepts a Firm PIN or login credential.
+7. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.
 
 ## Controls
 

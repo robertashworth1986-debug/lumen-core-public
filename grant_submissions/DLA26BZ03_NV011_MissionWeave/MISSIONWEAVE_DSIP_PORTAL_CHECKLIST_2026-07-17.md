@@ -23,6 +23,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Do not upload the tracked neutral PDF after DSIP assigns a proposal number. Run `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`; the final PDF remains ignored and its path, number, and hash remain absent from public artifacts.
 - Private Volume 3 receipt integrity passes: `true`. This verifies the ignored workbook against its ignored receipt without publishing either path or hash; it does not replace corporate-official cost-basis review.
 - Private DD Form 2345/JCP evidence integrity passes: `false`. A checked private flag cannot clear this gate unless an official portal PDF exists, its SHA-256 matches the ignored receipt, and entity/corporate review are confirmed.
+- CMMC/export evidence packet consumed with valid integrity: `true`. MissionWeave CMMC evidence state: `APPLICABILITY_UNRESOLVED`. An unresolved packet cannot support the Phase I position.
 
 ## Registration And Firm Controls
 
@@ -48,7 +49,7 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Confirm U.S. small-business eligibility, ownership and affiliates, PI primary employment, the proposed 640 PI hours, and the SBIR percentage-of-work rule.
 - Compare MissionWeave with every prior, current, pending, or planned proposal. Disclose overlap and request no duplicate PI hours, cloud costs, software work, or deliverables.
 - Treat the topic as ITAR-marked. Keep controlled technical data out of the proposal and document the DD Form 2345/JCP and Technology Control Plan decisions.
-- Projected CMMC level: `Level 2 (Self)`. Amendment 2 says CMMC Phase II implementation was suspended on July 13, 2026 while Phase I self-assessment requirements remain in place; the current live requirement must be reviewed before submission. Do not claim an assessment, certification, or compliant enclave without current evidence.
+- Projected CMMC level: `Level 2 (Self)`. Amendment 2 says CMMC Phase II implementation was suspended on July 13, 2026 while Phase I self-assessment requirements remain in place; the current live requirement must be reviewed before submission. Consume `grant_submissions/compliance_evidence/CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json` and do not claim an assessment, certification, or compliant enclave without current authoritative evidence.
 - Confirm foreign-citizen participation, foreign affiliations, conflicts, joint-venture status, and each technical-data/software-rights assertion from current records.
 - TABA is not requested. Do not add a provider without a named, supported, topic-specific need and a reconciled cost entry.
 
@@ -56,8 +57,8 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 
 1. Run `python code\ops\FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py` after the assigned proposal number is captured. Require `PRIVATE_VOLUME2_REBUILT_AND_QA_PASSED`.
 2. Inspect every populated field, all seven volumes, every attachment filename and hash, the cost total, and the live deadline.
-3. Save a private local preview receipt and record only its SHA-256 in the ignored private gate file.
-4. Capture the action-time approval section separately. This command never clicks submit:
+3. Save a private local preview receipt and capture it with `--section proposal --preview-receipt-file <private-preview-receipt>`. The collector records only private consistency metadata and rejects a stale receipt; a manually entered digest cannot establish freshness.
+4. Capture the action-time approval section separately. It cryptographically binds approval to the current preview/upload set and expires after 15 minutes. This command never clicks submit:
 
 ```powershell
 python code\ops\CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval
@@ -66,7 +67,7 @@ python code\ops\CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval
 5. Run:
 
 ```powershell
-python code\ops\BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input grant_submissions\DLA26BZ03_NV011_MissionWeave\private\MISSIONWEAVE_DSIP_ACTION.private.json
+python code\ops\BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input <IGNORED_PRIVATE_INPUT>
 ```
 
 6. Require status `READY_FOR_HUMAN_FINAL_SUBMIT_CLICK` and zero open gates.

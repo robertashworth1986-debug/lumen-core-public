@@ -1314,7 +1314,27 @@ def evaluate_private_payload(
         approval.get("final_submission_authorized_at_action_time") is True
         and approval_context_current
     )
-    itar_scope_confirmed = compliance.get("itar_scope_determination") == "SUBJECT_TO_ITAR"
+    corporate_review_current = gate_state["CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW"]
+    volume3_cost_basis_supported = proposal.get("volume3_cost_basis_supported") is True
+    gate_state["TECHNICAL_DATA_RIGHTS_ASSERTION"] = bool(
+        compliance.get("technical_data_rights_assertion_supported") is True
+        and volume3_cost_basis_supported
+        and corporate_review_current
+    )
+    gate_state["NO_DUPLICATE_COST_OR_DELIVERABLE"] = bool(
+        compliance.get("no_duplicate_cost_or_deliverable") is True
+        and gate_state["PRIOR_CURRENT_PENDING_SUPPORT"]
+        and gate_state["PI_640_HOURS"]
+        and gate_state["TECHNICAL_DATA_RIGHTS_ASSERTION"]
+        and volume3_cost_basis_supported
+        and corporate_review_current
+    )
+    itar_scope_confirmed = bool(
+        compliance.get("itar_scope_determination") == "SUBJECT_TO_ITAR"
+        and jcp_evidence_verified
+        and compliance.get("technology_control_plan_decision_documented") is True
+        and compliance.get("controlled_data_excluded_from_submission") is True
+    )
 
     gate_state.update(
         {
@@ -1510,7 +1530,7 @@ def build_payload(
         "submission_ready_for_human_click": ready,
         "source_integrity": public_source_state,
         "private_input": {
-            "expected_path": rel(DEFAULT_PRIVATE_INPUT),
+            "expected_path": "IGNORED_PRIVATE_ACTION_INPUT",
             "git_ignored_target": git_ignored(DEFAULT_PRIVATE_INPUT),
             "present": private_payload is not None,
             "sha256": None,
@@ -1525,8 +1545,8 @@ def build_payload(
             "private_final_volume2_path_exposed": False,
             "private_final_volume2_sha256_exposed": False,
             "capture_workflow": rel(PRIVATE_CAPTURE_WORKFLOW),
-            "jcp_evidence_receipt_expected_path": rel(
-                PRIVATE_JCP_EVIDENCE_RECEIPT
+            "jcp_evidence_receipt_expected_path": (
+                "IGNORED_PRIVATE_JCP_EVIDENCE_RECEIPT"
             ),
             "jcp_evidence_template": rel(PRIVATE_JCP_EVIDENCE_TEMPLATE),
             "pre_submit_excludes_action_time_approval": True,
@@ -1940,7 +1960,7 @@ python code\ops\CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval
 5. Run:
 
 ```powershell
-python code\ops\BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input grant_submissions\DLA26BZ03_NV011_MissionWeave\private\MISSIONWEAVE_DSIP_ACTION.private.json
+python code\ops\BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input <IGNORED_PRIVATE_INPUT>
 ```
 
 6. Require status `READY_FOR_HUMAN_FINAL_SUBMIT_CLICK` and zero open gates.

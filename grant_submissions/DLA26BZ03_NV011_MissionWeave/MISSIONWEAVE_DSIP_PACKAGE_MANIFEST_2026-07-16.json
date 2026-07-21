@@ -1,6 +1,6 @@
 {
   "schema": "missionweave_dsip_submission_package_manifest.v1",
-  "generated_utc": "2026-07-18T11:20:02.430541+00:00",
+  "generated_utc": "2026-07-21T04:12:47.220961+00:00",
   "topic": "DLA26BZ03-NV011",
   "deadline": "2026-07-22T12:00:00-04:00",
   "applicant": "Robert Ashworth d/b/a LumenCore",
@@ -14,8 +14,8 @@
     },
     {
       "path": "MISSIONWEAVE_DSIP_VOLUME1_PUBLIC_TEXT_2026-07-16.md",
-      "bytes": 4368,
-      "sha256": "768AFD85CBFAF2B775A25E9161EE5B3007BD980E2519B544353B95D3DDFA854E"
+      "bytes": 4382,
+      "sha256": "1196B6DDF48D0299F07E39CFF65A1B3ACDF8F5EBAE08AD334A7631FFE6C35056"
     },
     {
       "path": "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.md",

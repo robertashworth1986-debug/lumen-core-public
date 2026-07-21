@@ -1,8 +1,8 @@
 # MissionWeave DSIP Volume 1 Public Text
 
-Topic: DLA26BZ03-NV011  
-Title: Digital Twin of the Organization for Enhanced Mission Readiness  
-Applicant: Robert Ashworth d/b/a LumenCore  
+Topic: DLA26BZ03-NV011
+Title: MissionWeave: A Bounded Organizational Digital Twin for Mission-Readiness Decisions
+Applicant: Robert Ashworth d/b/a LumenCore
 Status: Nonproprietary DSIP-entry candidate; corporate-official review required before submission.
 
 ## Technical Abstract

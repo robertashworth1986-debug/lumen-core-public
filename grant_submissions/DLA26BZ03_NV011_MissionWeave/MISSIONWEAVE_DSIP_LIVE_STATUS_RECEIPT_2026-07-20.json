@@ -1,0 +1,54 @@
+{
+  "schema": "lumencore.missionweave_dsip_live_status_receipt.v1",
+  "status": "AUTHENTICATED_PORTAL_STATUS_OBSERVED_ACTIONS_REMAIN_OPEN",
+  "observed_utc": "2026-07-21T01:16:07.3147675Z",
+  "portal": "DoW SBIR/STTR Innovation Portal (DSIP)",
+  "topic": "DLA26BZ03-NV011",
+  "proposal_title": "MissionWeave: A Bounded Organizational Digital Twin for Mission-Readiness Decisions",
+  "proposal_state": {
+    "phase": "Phase I",
+    "program": "SBIR",
+    "component": "DLA",
+    "status": "In Progress",
+    "completion_percent": 88,
+    "firm_forms_percent": 100,
+    "volume_percent": {
+      "I": 100,
+      "II": 100,
+      "III": 100,
+      "IV": 100,
+      "V": 0,
+      "VI": 100,
+      "VII": 100
+    },
+    "certify_percent": 0
+  },
+  "live_deadline_observation": {
+    "solicitation_cycle": "SBIR/STTR BAA & CSO Release 3",
+    "close_date_displayed": "Jul 22, 2026",
+    "controlling_time_from_local_package": "12:00 PM ET",
+    "deadline_utc": "2026-07-22T16:00:00Z",
+    "amendment_notice_displayed": true,
+    "amendment_notice_date": "2026-07-15",
+    "foreign_risk_evaluation_notice_displayed": true
+  },
+  "remaining_portal_actions": [
+    "Complete and submit the applicable Volume V supporting-document set.",
+    "Review the final proposal preview after all seven volumes are frozen.",
+    "Complete final corporate certification and proposal submission only after the action-time gate passes."
+  ],
+  "private_evidence_binding": {
+    "private_receipt_recorded": true,
+    "artifact_count": 2,
+    "public_paths_or_hashes_disclosed": false
+  },
+  "redactions": {
+    "account_identifiers_recorded": false,
+    "assigned_proposal_identifier_recorded": false,
+    "firm_pin_recorded": false,
+    "ip_address_recorded": false,
+    "internal_portal_route_token_recorded": false,
+    "private_form_answers_recorded": false
+  },
+  "claim_boundary": "This receipt proves only the bounded authenticated DSIP status and deadline information visibly observed at the stated time. The private evidence binding is not independently reviewable from the public repository. It does not prove Volume V applicability or completeness, cost support, JCP or CMMC status, SAM representations, final preview review, certification, submission, agency acceptance, award, endorsement, or external validation."
+}

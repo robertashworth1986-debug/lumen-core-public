@@ -1,0 +1,25 @@
+{
+  "schema": "lumencore.missionweave_sam_current_reps_certs_receipt.v1",
+  "status": "AUTHENTICATED_CURRENT_RECORD_REPS_CERTS_OBSERVED",
+  "observed_utc": "2026-07-21T01:23:12.8870469Z",
+  "portal": "SAM.gov",
+  "observation": {
+    "entity_registration_status": "Active",
+    "registration_record": "Current",
+    "representations_and_certifications_page": "FAR/DFARS",
+    "current_representations_and_certifications_page_accessible": true
+  },
+  "private_evidence_binding": {
+    "private_receipt_recorded": true,
+    "artifact_count": 1,
+    "public_paths_or_hashes_disclosed": false
+  },
+  "redactions": {
+    "entity_identifiers_recorded": false,
+    "tax_or_bank_information_recorded": false,
+    "address_or_contact_information_recorded": false,
+    "registration_route_tokens_recorded": false,
+    "representation_answers_recorded": false
+  },
+  "claim_boundary": "This receipt proves only that an authenticated active current SAM.gov registration and its current FAR/DFARS Representations and Certifications page were visibly accessible at the stated time. The private evidence binding is not independently reviewable from the public repository. It does not certify the legal accuracy of individual answers, establish proposal eligibility, prove JCP or CMMC status, constitute legal advice, or prove submission, award, endorsement, or external validation."
+}

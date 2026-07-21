@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import re
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -36,8 +37,10 @@ AUTHORITATIVE_OPEN_GATES = {
     "CURRENT_CMMC_REQUIREMENTS_REVIEW",
     "DD2345_OR_JCP_APPLICATION_EVIDENCE",
     "DSIP_FIRM_PIN_AVAILABILITY",
+    "ITAR_SCOPE_CONFIRMED",
+    "NO_DUPLICATE_COST_OR_DELIVERABLE",
     "PORTAL_PREVIEW_RECEIPT_HASH",
-    "SAM_REPRESENTATIONS_CURRENT",
+    "TECHNICAL_DATA_RIGHTS_ASSERTION",
     "TECHNOLOGY_CONTROL_PLAN_DECISION",
     "VOLUME3_COST_BASIS",
     "VOLUME5_UPLOAD_SET",
@@ -196,6 +199,33 @@ def complete_evidence_states(module) -> tuple[dict, dict, dict]:
     )
 
 
+def rebind_action_context(
+    module,
+    payload: dict,
+    *,
+    volume3_artifact_state: dict,
+    jcp_evidence_state: dict,
+    cmmc_packet_state: dict,
+) -> None:
+    payload["proposal"]["portal_preview_binding_sha256"] = (
+        module.preview_evidence_binding_sha256(
+            payload,
+            volume3_artifact_state=volume3_artifact_state,
+            jcp_evidence_state=jcp_evidence_state,
+            cmmc_packet_state=cmmc_packet_state,
+        )
+    )
+    payload["approval"]["approval_binding_sha256"] = (
+        module.action_time_approval_binding_sha256(
+            payload,
+            approval_utc=payload["approval"]["approval_utc"],
+            volume3_artifact_state=volume3_artifact_state,
+            jcp_evidence_state=jcp_evidence_state,
+            cmmc_packet_state=cmmc_packet_state,
+        )
+    )
+
+
 def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     module = load_module()
     payload = module.build_payload()
@@ -225,6 +255,10 @@ def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     assert groups["F_CLEARED_BY_EVIDENCE"]["count"] == 0
     assert payload["private_input"]["git_ignored_target"] is True
     assert payload["private_input"]["private_values_exposed"] is False
+    assert payload["private_input"]["expected_path"] == "IGNORED_PRIVATE_ACTION_INPUT"
+    assert payload["private_input"]["jcp_evidence_receipt_expected_path"] == (
+        "IGNORED_PRIVATE_JCP_EVIDENCE_RECEIPT"
+    )
     assert payload["private_input"]["sha256"] is None
     assert payload["private_input"]["sha256_present"] is False
     assert payload["private_input"]["sha256_exposed"] is False
@@ -756,9 +790,87 @@ def test_checked_jcp_flag_cannot_clear_gate_without_private_receipt():
     assert "DD2345_OR_JCP_APPLICATION_EVIDENCE" in payload["gate_summary"][
         "unresolved_gates"
     ]
+    assert "ITAR_SCOPE_CONFIRMED" in payload["gate_summary"]["unresolved_gates"]
     assert payload["private_fact_state"][
         "dd2345_or_jcp_evidence_verified"
     ] is False
+
+
+def test_cost_and_rights_booleans_cannot_clear_without_supported_final_context():
+    module = load_module()
+    source_state, _ = module.inspect_source_package()
+    source_state = private_final_source_state(source_state)
+    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    private, proposal_number = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
+    private["proposal"]["volume3_cost_basis_supported"] = False
+    rebind_action_context(
+        module,
+        private,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
+
+    payload = module.build_payload(
+        private,
+        private_input_sha256="E" * 64,
+        source_state=source_state,
+        volume2_text=f"{proposal_number}\nassigned final header",
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        evaluated_utc=REFERENCE_UTC,
+    )
+
+    unresolved = set(payload["gate_summary"]["unresolved_gates"])
+    assert "VOLUME3_COST_BASIS" in unresolved
+    assert "TECHNICAL_DATA_RIGHTS_ASSERTION" in unresolved
+    assert "NO_DUPLICATE_COST_OR_DELIVERABLE" in unresolved
+
+
+def test_itar_scope_selection_cannot_clear_without_control_plan_decision():
+    module = load_module()
+    source_state, _ = module.inspect_source_package()
+    source_state = private_final_source_state(source_state)
+    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    private, proposal_number = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
+    private["eligibility_and_compliance"][
+        "technology_control_plan_decision_documented"
+    ] = False
+    rebind_action_context(
+        module,
+        private,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+    )
+
+    payload = module.build_payload(
+        private,
+        private_input_sha256="E" * 64,
+        source_state=source_state,
+        volume2_text=f"{proposal_number}\nassigned final header",
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        evaluated_utc=REFERENCE_UTC,
+    )
+
+    unresolved = set(payload["gate_summary"]["unresolved_gates"])
+    assert "TECHNOLOGY_CONTROL_PLAN_DECISION" in unresolved
+    assert "ITAR_SCOPE_CONFIRMED" in unresolved
 
 
 def test_written_public_outputs_and_checklist_are_current_and_safe():
@@ -773,7 +885,7 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     passed = summary["passed_private_gate_count"]
     open_count = summary["open_gate_count"]
     required = summary["required_private_gate_count"]
-    assert (passed, open_count, required) == (36, 14, 50)
+    assert (passed, open_count, required) == (34, 16, 50)
     assert set(summary["unresolved_gates"]) == AUTHORITATIVE_OPEN_GATES
     groups = summary["reconciliation_groups"]
     assert sum(group["count"] for group in groups.values()) == required
@@ -816,8 +928,15 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     assert payload["private_input"]["private_final_volume2_sha256_exposed"] is False
     assert "--section pre-submit" in markdown
     assert "never requests or accepts a Firm PIN or login credential" in markdown
-    assert "robertashworth4444" not in combined.lower()
-    assert "615-438-2502" not in combined
+    assert "/private/" not in combined.replace("\\", "/").lower()
+    assert re.search(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", combined, re.I) is None
+    assert (
+        re.search(
+            r"\b(?:\+?1[-.\s]?)?(?:\(\d{3}\)|\d{3})[-.\s]\d{3}[-.\s]\d{4}\b",
+            combined,
+        )
+        is None
+    )
     assert module.PRIVATE_VALUE_MARKERS[0] not in combined.lower()
     assert len(payload["gate_sha256"]) == 64
 
