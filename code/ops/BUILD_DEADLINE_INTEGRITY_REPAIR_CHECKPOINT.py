@@ -98,8 +98,19 @@ def source_path(relative_path: str) -> Path:
     return source
 
 
-def committed_blob(commit: str, relative_path: str) -> bytes:
-    return run_git("show", f"{commit}:{relative_path}", text=False)
+def committed_blob_oid(commit: str, relative_path: str) -> str:
+    return str(run_git("rev-parse", f"{commit}:{relative_path}"))
+
+
+def worktree_blob_oid(relative_path: str) -> str:
+    return str(
+        run_git(
+            "hash-object",
+            "--path",
+            relative_path,
+            relative_path,
+        )
+    )
 
 
 def destination_path(relative_path: str) -> Path:
@@ -124,9 +135,12 @@ def build_receipt(created_utc: str | None = None) -> dict[str, Any]:
     for relative_path in SOURCES:
         source = source_path(relative_path)
         worktree_bytes = source.read_bytes()
-        commit_bytes = committed_blob(source_commit, relative_path)
-        if worktree_bytes != commit_bytes:
-            raise ValueError(f"Worktree bytes differ from source commit: {relative_path}")
+        commit_oid = committed_blob_oid(source_commit, relative_path)
+        worktree_oid = worktree_blob_oid(relative_path)
+        if worktree_oid != commit_oid:
+            raise ValueError(
+                f"Git-normalized worktree content differs from source commit: {relative_path}"
+            )
 
         destination = destination_path(relative_path)
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -141,7 +155,9 @@ def build_receipt(created_utc: str | None = None) -> dict[str, Any]:
                 "destination": destination.as_posix(),
                 "bytes": len(worktree_bytes),
                 "sha256": source_hash,
-                "source_commit_blob_match": True,
+                "source_git_blob_oid": worktree_oid,
+                "commit_git_blob_oid": commit_oid,
+                "source_git_blob_match": True,
                 "copy_bytes": destination.stat().st_size,
                 "copy_sha256": destination_hash,
                 "copy_sha256_matched": True,
@@ -156,7 +172,7 @@ def build_receipt(created_utc: str | None = None) -> dict[str, Any]:
         "source_worktree_tracked_clean": True,
         "destination_root": DESTINATION_ROOT.as_posix(),
         "artifact_count": len(artifacts),
-        "all_source_bytes_match_commit": True,
+        "all_source_git_blobs_match_commit": True,
         "all_sha256_matched_after_copy": True,
         "relative_paths_preserved": True,
         "private_files_mirrored": False,
@@ -173,8 +189,9 @@ def build_receipt(created_utc: str | None = None) -> dict[str, Any]:
         ).as_posix(),
         "claim_boundary": (
             "This receipt proves only that the listed public deadline-routing code, tests, and "
-            "generated control surfaces matched the recorded Git commit and were copied to the "
-            "stated E-drive directory with matching SHA-256 hashes. It does not prove email "
+            "generated control surfaces matched the recorded Git commit after Git clean-filter "
+            "normalization and that their exact checkout bytes were copied to the stated E-drive "
+            "directory with matching SHA-256 hashes. It does not prove email "
             "transmission, portal submission, eligibility, certification, award, endorsement, "
             "external validation, technical performance, funding, or value. Final external and "
             "legal actions remain human-controlled."

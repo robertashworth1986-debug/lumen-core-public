@@ -20,13 +20,14 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest().upper()
 
 
-def git_blob(commit: str, relative_path: str) -> bytes:
+def git_blob_oid(commit: str, relative_path: str) -> str:
     return subprocess.run(
-        ["git", "show", f"{commit}:{relative_path}"],
+        ["git", "rev-parse", f"{commit}:{relative_path}"],
         cwd=ROOT,
         check=True,
         capture_output=True,
-    ).stdout
+        text=True,
+    ).stdout.strip()
 
 
 def test_checkpoint_is_commit_bound_public_safe_and_human_gated():
@@ -36,7 +37,7 @@ def test_checkpoint_is_commit_bound_public_safe_and_human_gated():
     assert len(payload["source_commit"]) == 40
     assert payload["source_worktree_tracked_clean"] is True
     assert payload["artifact_count"] == len(payload["artifacts"]) == 25
-    assert payload["all_source_bytes_match_commit"] is True
+    assert payload["all_source_git_blobs_match_commit"] is True
     assert payload["all_sha256_matched_after_copy"] is True
     assert payload["relative_paths_preserved"] is True
     assert payload["private_files_mirrored"] is False
@@ -61,10 +62,12 @@ def test_checkpoint_is_commit_bound_public_safe_and_human_gated():
         normalized = artifact["source"].replace("\\", "/").lower()
         assert "/private/" not in f"/{normalized}/"
         assert ".private." not in normalized
-        blob = git_blob(payload["source_commit"], artifact["source"])
-        assert len(blob) == artifact["bytes"] == artifact["copy_bytes"]
-        assert sha256_bytes(blob) == artifact["sha256"] == artifact["copy_sha256"]
-        assert artifact["source_commit_blob_match"] is True
+        commit_oid = git_blob_oid(payload["source_commit"], artifact["source"])
+        assert commit_oid == artifact["commit_git_blob_oid"]
+        assert artifact["source_git_blob_oid"] == artifact["commit_git_blob_oid"]
+        assert artifact["bytes"] == artifact["copy_bytes"]
+        assert artifact["sha256"] == artifact["copy_sha256"]
+        assert artifact["source_git_blob_match"] is True
         assert artifact["copy_sha256_matched"] is True
 
         destination = Path(artifact["destination"])
