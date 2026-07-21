@@ -1,0 +1,156 @@
+name: Reviewer reproducibility capsule
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/reviewer-reproducibility.yml"
+      - ".gitattributes"
+      - ".gitignore"
+      - "CITATION.cff"
+      - "LICENSE"
+      - "README.md"
+      - "codecheck.yml"
+      - "code/eia_grid_*_benchmark.py"
+      - "code/mda_control_mapping_open_set_benchmark.py"
+      - "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py"
+      - "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py"
+      - "code/ops/RUN_FAA_SDR_10K_BENCHMARK.py"
+      - "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py"
+      - "code/ops/VERIFY_CODECHECK_MAINLINE_INTEGRATION.py"
+      - "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py"
+      - "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py"
+      - "config/codecheck_*.json"
+      - "config/eia_grid_*_protocol_v1.json"
+      - "config/mda_control_mapping_open_set_protocol_v2.json"
+      - "config/reviewer_*_v1.json"
+      - "containers/codecheck-reviewer/**"
+      - "docs/CODECHECK_*.md"
+      - "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.*"
+      - "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md"
+      - "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/*.json"
+      - "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
+      - "requirements-reviewer.txt"
+      - "requirements-reviewer-ubuntu-py311.lock"
+      - "tests/test_codecheck_*.py"
+      - "tests/test_eia_grid_*_benchmark.py"
+      - "tests/test_faa_sdr_10k_benchmark.py"
+      - "tests/test_mda_control_mapping_open_set_benchmark.py"
+      - "tests/test_reviewer_*.py"
+  push:
+    paths:
+      - ".github/workflows/reviewer-reproducibility.yml"
+      - ".gitattributes"
+      - ".gitignore"
+      - "CITATION.cff"
+      - "LICENSE"
+      - "README.md"
+      - "codecheck.yml"
+      - "code/eia_grid_*_benchmark.py"
+      - "code/mda_control_mapping_open_set_benchmark.py"
+      - "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py"
+      - "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py"
+      - "code/ops/RUN_FAA_SDR_10K_BENCHMARK.py"
+      - "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py"
+      - "code/ops/VERIFY_CODECHECK_MAINLINE_INTEGRATION.py"
+      - "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py"
+      - "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py"
+      - "config/codecheck_*.json"
+      - "config/eia_grid_*_protocol_v1.json"
+      - "config/mda_control_mapping_open_set_protocol_v2.json"
+      - "config/reviewer_*_v1.json"
+      - "containers/codecheck-reviewer/**"
+      - "docs/CODECHECK_*.md"
+      - "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.*"
+      - "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md"
+      - "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/*.json"
+      - "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
+      - "requirements-reviewer.txt"
+      - "requirements-reviewer-ubuntu-py311.lock"
+      - "tests/test_codecheck_*.py"
+      - "tests/test_eia_grid_*_benchmark.py"
+      - "tests/test_faa_sdr_10k_benchmark.py"
+      - "tests/test_mda_control_mapping_open_set_benchmark.py"
+      - "tests/test_reviewer_*.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reviewer-reproducibility-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clean-room-replay:
+    name: Frozen public-data replay
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PYTHONHASHSEED: "0"
+      TZ: UTC
+      OMP_NUM_THREADS: "4"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+
+    steps:
+      - name: Check out the reviewed source
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install the pinned Python runtime
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11.9"
+
+      - name: Verify the immutable source boundary
+        run: python code/ops/VERIFY_CODECHECK_MAINLINE_INTEGRATION.py
+
+      - name: Install the reviewer-suite dependencies
+        run: |
+          python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py
+          python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-reviewer-ubuntu-py311.lock
+          python -m pip check
+
+      - name: Verify the authoritative runtime identity
+        run: python code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py --source-commit "${GITHUB_SHA}" --check-only
+
+      - name: Verify the capsule controls
+        run: |
+          python -m pytest -q \
+            tests/test_codecheck_eia_mainline_integration.py \
+            tests/test_codecheck_eia_release_candidate.py \
+            tests/test_codecheck_reviewer_container.py \
+            tests/test_codecheck_reviewer_runtime.py \
+            tests/test_reviewer_dependency_lock.py \
+            tests/test_reviewer_reproducibility_capsule.py \
+            -k "not published_receipt_reconciles_hashes_assertions_and_public_projection and not sbom_has_scoped_component_identity_and_dependency_relationships and not markdown_reports_failures_and_unmet_external_gates_plainly"
+
+      - name: Replay the frozen evidence and fixture gates
+        run: |
+          python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py \
+            --with-fixture-tests \
+            --run-dir out/reproducibility/ci \
+            --publish
+
+      - name: Verify the generated reviewer publications
+        run: |
+          python -m pytest -q tests/test_reviewer_dependency_lock.py tests/test_reviewer_reproducibility_capsule.py
+
+      - name: Hash the run artifacts
+        if: always()
+        shell: bash
+        run: |
+          if [ -d out/reproducibility/ci ]; then
+            find out/reproducibility/ci -type f ! -name SHA256SUMS -print0 \
+              | LC_ALL=C sort -z \
+              | xargs -0 sha256sum \
+              > out/reproducibility/ci/SHA256SUMS
+          fi
+
+      - name: Publish the bounded replay receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: reviewer-reproducibility-${{ github.sha }}
+          path: out/reproducibility/ci/
+          if-no-files-found: error
+          retention-days: 30

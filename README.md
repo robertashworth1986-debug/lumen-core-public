@@ -37,6 +37,20 @@ Primary links:
 - LumaJet / LumaSuit safe promotion packet: docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md
 - API and demo continuity checklist: docs/API_AND_DEMO_CONTINUITY_CHECKLIST.md
 - Current proof promotion backlog: docs/CURRENT_PROOF_PROMOTION_BACKLOG.md
+- CODECHECK executable-computation note: docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md
+- CODECHECK author review checklist: docs/CODECHECK_AUTHOR_REVIEW_CHECKLIST_2026-07-21.md
+
+### Independent execution target
+
+The root `codecheck.yml` defines one bounded external execution target: three
+reproducibility suites, 31 assertions, and six declared outputs. The reviewed
+source and five-page preprint are frozen at commit
+`1c0eb51754beffac6f4df484914e35efc21c253f`.
+
+Author-operated CI and container receipts are first-party executability
+evidence only. Independent execution, a CODECHECK certificate, scientific or
+field validation, agency approval, savings, trading performance, patent
+conclusions, and company valuation remain unverified.
 
 ---
 
