@@ -1,15 +1,15 @@
 # Outreach Follow-up Action Queue - 2026-07-18
 
 - Status: `ROUTING_INTEGRITY_EXCEPTION_NO_SEND`
-- As of UTC: `2026-07-21T22:55:00Z`
-- Lanes: `17`
+- As of UTC: `2026-07-21T23:10:00Z`
+- Lanes: `18`
 - Due for mailbox recheck: `0`
 - Held no-send: `1`
 - Drafts rendered: `0`
 - Send now: `0`
 - Routing integrity exceptions: `1`
 - Autonomous external send allowed: `false`
-- Queue SHA-256: `9A66B1C161CBE79EE7F5EC3A6C7F59B8C8F45CBA99180F2E9BADB1DE71D48301`
+- Queue SHA-256: `3753C504ED4EE7632ADA09029B949874BBF3BD542C05928B4699D65A080F26C7`
 
 ## Action Queue
 
@@ -19,6 +19,7 @@
 | EPRI Open Power AI Consortium | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | Georgia PATENTS | `CLOSED` | `CLOSED_NO_ACTION` | `none` | `none` |
 | USPTO Pro Se Assistance Center | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
+| Volunteer Lawyers and Professionals for the Arts | `CLOSED` | `CLOSED_NO_ACTION` | `none` | `none` |
 | Los Alamos National Laboratory | `ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD` | `HELD_NO_SEND` | `2026-07-23T14:00:00Z` | `BOUNDED_REVIEW_FOLLOWUP` |
 | Centers for Disease Control and Prevention | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
 | DARPA Multi X Office | `INBOUND_ONLY` | `MONITOR_INBOUND_ONLY` | `none` | `none` |
