@@ -240,6 +240,89 @@ def reconcile_archived_sources(
     }
 
 
+def verify_operator_clean_runner(
+    control: dict[str, Any], *, receipt_path: Path | None = None
+) -> dict[str, Any]:
+    path = receipt_path or (ROOT / control["receipt_path"])
+    receipt = read_json(path)
+    summary = receipt.get("summary", {})
+    source_reconciliation = reconcile_archived_sources(receipt, set())
+    private_hits = scan_private(receipt)
+    checks = {
+        "receipt_sha256_matched": file_sha256(path)
+        == control["receipt_sha256"],
+        "schema_matched": receipt.get("schema") == control["expected_schema"],
+        "status_matched": receipt.get("status") == control["expected_status"],
+        "source_commit_matched": receipt.get("git", {}).get("commit")
+        == control["source_commit"],
+        "relevant_source_clean": summary.get("relevant_source_clean") is True,
+        "clean_runner_replay": summary.get("clean_runner_replay") is True,
+        "authoritative_runtime_matched": summary.get(
+            "authoritative_runtime_match"
+        )
+        is True,
+        "dependency_lock_passed": receipt.get("dependency_lock", {}).get(
+            "passed"
+        )
+        is True,
+        "dependency_closure_exact_match": summary.get(
+            "dependency_closure_exact_match"
+        )
+        is True,
+        "dependency_versions_exact_match": summary.get(
+            "dependency_versions_exact_match"
+        )
+        is True,
+        "fixture_tests_passed": summary.get("fixture_tests_passed") is True,
+        "suites_matched": summary.get("suite_count")
+        == summary.get("suite_pass_count")
+        == control["expected_suite_count"],
+        "assertions_matched": summary.get("assertion_count")
+        == summary.get("assertion_pass_count")
+        == control["expected_assertion_count"],
+        "privacy_scan_passed": receipt.get("privacy_scan", {}).get("passed")
+        is True
+        and not private_hits,
+        "external_validation_remains_false": summary.get(
+            "external_validation_complete"
+        )
+        is False,
+        "declared_source_identity_still_matches": source_reconciliation[
+            "full_source_exact_match"
+        ],
+    }
+    return {
+        "verified": all(checks.values()),
+        "checks": checks,
+        "receipt_path": control["receipt_path"],
+        "receipt_sha256": file_sha256(path),
+        "schema": receipt.get("schema"),
+        "status": receipt.get("status"),
+        "generated_utc": receipt.get("generated_utc"),
+        "source_commit": receipt.get("git", {}).get("commit"),
+        "source_chain_sha256": receipt.get("source_chain_sha256"),
+        "capsule_sha256": receipt.get("capsule_sha256"),
+        "suite_count": summary.get("suite_count"),
+        "suite_pass_count": summary.get("suite_pass_count"),
+        "assertion_count": summary.get("assertion_count"),
+        "assertion_pass_count": summary.get("assertion_pass_count"),
+        "relevant_source_clean": summary.get("relevant_source_clean"),
+        "clean_runner_replay": summary.get("clean_runner_replay"),
+        "authoritative_runtime_match": summary.get("authoritative_runtime_match"),
+        "dependency_closure_exact_match": summary.get(
+            "dependency_closure_exact_match"
+        ),
+        "fixture_tests_passed": summary.get("fixture_tests_passed"),
+        "external_validation_complete": summary.get(
+            "external_validation_complete"
+        ),
+        "source_reconciliation": source_reconciliation,
+        "configured_private_pattern_hit_count": len(private_hits),
+        "execution_control": control["execution_control"],
+        "policy": control["policy"],
+    }
+
+
 def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
     config = read_json(CONFIG_PATH)
     generated_utc = generated_utc or now_utc()
@@ -271,6 +354,9 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             ]
         ),
     )
+    operator_clean_runner = verify_operator_clean_runner(
+        config["operator_clean_runner"]
+    )
 
     output_root = PurePosixPath(execution["output_root"])
     archive_relative_manifest = []
@@ -293,6 +379,9 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
         if key.endswith("_path") and key != "authority_config_path"
     }
     required_paths.add(authority_config_path)
+    required_paths.add(
+        ROOT / config["operator_clean_runner"]["receipt_path"]
+    )
     required_paths.add(SCRIPT_PATH)
     required_paths.add(TEST_PATH)
     path_checks = {
@@ -365,6 +454,10 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             "external_validation_complete"
         ]
         is False,
+        **{
+            f"operator_clean_runner_{key}": value
+            for key, value in operator_clean_runner["checks"].items()
+        },
         "public_text_privacy_scan_passed": not public_text_privacy_hits,
     }
     internal_gate_passed = all(checks.values())
@@ -392,6 +485,14 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             "archived_computational_identity_still_matches": source_reconciliation[
                 "computational_identity_exact_match"
             ],
+            "operator_clean_runner_receipt_verified": operator_clean_runner[
+                "verified"
+            ],
+            "operator_clean_runner_declared_source_identity_current": (
+                operator_clean_runner["source_reconciliation"][
+                    "full_source_exact_match"
+                ]
+            ),
             "current_commit_clean_runner_complete": False,
             "archived_suite_pass_count": archived_summary["suite_pass_count"],
             "archived_assertion_pass_count": archived_summary[
@@ -431,6 +532,7 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             ],
             "source_reconciliation": source_reconciliation,
         },
+        "operator_clean_runner": operator_clean_runner,
         "external_gates": external_gates,
         "portable_inputs": portable_inputs,
         "portable_input_chain_sha256": canonical_sha256(portable_inputs),
@@ -449,6 +551,7 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     archive = payload["authoritative_archive"]
+    operator = payload["operator_clean_runner"]
     lines = [
         "# CODECHECK EIA Author Readiness",
         "",
@@ -464,6 +567,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Authoritative archive verified: `{str(summary['authoritative_archive_verified']).lower()}`",
         f"- Archived full source exact match: `{str(summary['archive_full_source_exact_match']).lower()}`",
         f"- Archived computational identity still matches: `{str(summary['archived_computational_identity_still_matches']).lower()}`",
+        f"- Operator clean-runner receipt verified: `{str(summary['operator_clean_runner_receipt_verified']).lower()}`",
+        f"- Operator clean-runner declared source identity current: `{str(summary['operator_clean_runner_declared_source_identity_current']).lower()}`",
         f"- Current commit clean-runner complete: `{str(summary['current_commit_clean_runner_complete']).lower()}`",
         f"- Independent execution complete: `{str(summary['independent_execution_complete']).lower()}`",
         f"- Certificate issued: `{str(summary['certificate_issued']).lower()}`",
@@ -501,6 +606,25 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Current-source drift paths: `{', '.join(archive['source_reconciliation']['mismatch_paths']) or 'none'}`",
             "",
             "The archive demonstrates an older operator-controlled clean-runner execution. Its computational identity files still match, while the README and packaging controls have moved forward. It is a feasibility reference, not a current-commit receipt or independent evidence. The codechecker must execute the reviewed current commit.",
+            "",
+            "## Current Source-Identity Operator Replay",
+            "",
+            f"- Receipt: `{operator['receipt_path']}`",
+            f"- Receipt SHA-256: `{operator['receipt_sha256']}`",
+            f"- Source commit: `{operator['source_commit']}`",
+            f"- Source artifacts matched: `{operator['source_reconciliation']['current_match_count']}/{operator['source_reconciliation']['archived_source_count']}`",
+            f"- Relevant source clean: `{str(operator['relevant_source_clean']).lower()}`",
+            f"- Clean-runner replay: `{str(operator['clean_runner_replay']).lower()}`",
+            f"- Authoritative runtime matched: `{str(operator['authoritative_runtime_match']).lower()}`",
+            f"- Dependency closure matched: `{str(operator['dependency_closure_exact_match']).lower()}`",
+            f"- Fixture tests passed: `{str(operator['fixture_tests_passed']).lower()}`",
+            f"- Suites passed: `{operator['suite_pass_count']}/{operator['suite_count']}`",
+            f"- Assertions passed: `{operator['assertion_pass_count']}/{operator['assertion_count']}`",
+            f"- External validation complete in receipt: `{str(operator['external_validation_complete']).lower()}`",
+            "",
+            operator["execution_control"],
+            "",
+            operator["policy"],
             "",
             "## Human And External Gates",
             "",

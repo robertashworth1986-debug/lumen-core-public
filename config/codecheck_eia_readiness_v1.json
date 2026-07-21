@@ -44,6 +44,17 @@
     "expected_suite_count": 3,
     "expected_assertion_count": 31
   },
+  "operator_clean_runner": {
+    "receipt_path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json",
+    "receipt_sha256": "8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351",
+    "source_commit": "be7776f78af659f56c11a89bef0aab8ca07d5c18",
+    "expected_schema": "reviewer_reproducibility_capsule.v1",
+    "expected_status": "BOUNDED_REPRODUCIBILITY_PASS",
+    "expected_suite_count": 3,
+    "expected_assertion_count": 31,
+    "execution_control": "Author-operated Docker replay with network access disabled and the protocol-pinned Ubuntu, CPython, and dependency environment.",
+    "policy": "This receipt is internal operator evidence, not independent execution or external validation. It may establish current declared source identity only while every source artifact in the receipt still matches the repository byte-for-byte under its declared portable hash mode."
+  },
   "archive_reconciliation": {
     "noncomputational_documentation_or_packaging_paths": [
       ".gitignore",
@@ -65,6 +76,7 @@
     "config/external_validation_authority_docket_v1.json",
     "config/reviewer_reproducibility_protocol_v1.json",
     "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+    "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json",
     "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
     "requirements-reviewer-ubuntu-py311.lock",
     "tests/test_codecheck_eia_readiness.py"

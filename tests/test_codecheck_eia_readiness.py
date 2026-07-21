@@ -17,6 +17,12 @@ OUTPUT = (
     / "codecheck_eia_author_readiness_20260720.json"
 )
 MARKDOWN = ROOT / "docs" / "CODECHECK_EIA_AUTHOR_READINESS_2026-07-20.md"
+OPERATOR_RECEIPT = (
+    ROOT
+    / "evidence"
+    / "reproducibility"
+    / "codecheck_eia_operator_clean_runner_be7776f7_20260721.json"
+)
 
 
 def load_module():
@@ -85,6 +91,42 @@ def test_authoritative_archive_matches_all_declared_outputs_and_checksums():
     ]
 
 
+def test_operator_clean_runner_is_hash_locked_clean_and_not_external():
+    module = load_module()
+    payload = module.build_payload(generated_utc="2026-07-20T00:00:00+00:00")
+    runner = payload["operator_clean_runner"]
+
+    assert runner["verified"] is True
+    assert runner["receipt_path"] == OPERATOR_RECEIPT.relative_to(ROOT).as_posix()
+    assert runner["relevant_source_clean"] is True
+    assert runner["clean_runner_replay"] is True
+    assert runner["authoritative_runtime_match"] is True
+    assert runner["dependency_closure_exact_match"] is True
+    assert runner["fixture_tests_passed"] is True
+    assert runner["suite_count"] == runner["suite_pass_count"] == 3
+    assert runner["assertion_count"] == runner["assertion_pass_count"] == 31
+    assert runner["source_reconciliation"]["full_source_exact_match"] is True
+    assert runner["external_validation_complete"] is False
+
+
+def test_operator_clean_runner_rejects_a_tampered_receipt(tmp_path):
+    module = load_module()
+    control = json.loads(CONFIG.read_text(encoding="utf-8"))[
+        "operator_clean_runner"
+    ]
+    receipt = json.loads(OPERATOR_RECEIPT.read_text(encoding="utf-8"))
+    receipt["status"] = "TAMPERED"
+    tampered = tmp_path / "receipt.json"
+    tampered.write_text(json.dumps(receipt), encoding="utf-8")
+
+    result = module.verify_operator_clean_runner(control, receipt_path=tampered)
+
+    assert result["verified"] is False
+    assert result["checks"]["receipt_sha256_matched"] is False
+    assert result["checks"]["status_matched"] is False
+    assert result["external_validation_complete"] is False
+
+
 def test_ci_gate_is_read_only_pinned_and_retriggers_for_portable_inputs():
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     workflow = WORKFLOW.read_text(encoding="utf-8")
@@ -110,6 +152,11 @@ def test_internal_readiness_pass_keeps_every_external_gate_closed():
     assert summary["internal_check_count"] == summary["internal_check_pass_count"]
     assert summary["archive_full_source_exact_match"] is False
     assert summary["archived_computational_identity_still_matches"] is True
+    assert summary["operator_clean_runner_receipt_verified"] is True
+    assert (
+        summary["operator_clean_runner_declared_source_identity_current"]
+        is True
+    )
     assert summary["current_commit_clean_runner_complete"] is False
     assert summary["human_author_review_complete"] is False
     assert summary["submission_authorized"] is False
@@ -159,6 +206,11 @@ def test_published_outputs_match_a_timestamp_stable_rebuild():
     rendered = MARKDOWN.read_text(encoding="utf-8")
     assert "AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW" in rendered
     assert "Independent execution complete: `false`" in rendered
+    assert "Operator clean-runner receipt verified: `true`" in rendered
+    assert (
+        "Operator clean-runner declared source identity current: `true`"
+        in rendered
+    )
     assert "Certificate issued: `false`" in rendered
     assert "External validation complete: `false`" in rendered
 
