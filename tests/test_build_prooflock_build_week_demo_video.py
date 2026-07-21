@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_PROOFLOCK_BUILD_WEEK_DEMO_VIDEO.py"
+VOICEOVER = ROOT / "docs" / "OPENAI_BUILD_WEEK_PROOFLOCK_VOICEOVER_2026-07-20.md"
 
 
 def load_module():
@@ -53,6 +54,15 @@ def test_builder_contains_no_stale_orchestration_or_model_claim() -> None:
         "281b76fe20d281974a2e2b44670a6a63815fe421",
     ):
         assert stale not in source
+
+
+def test_voiceover_explicitly_explains_codex_and_gpt_5_6_use() -> None:
+    voiceover = VOICEOVER.read_text(encoding="utf-8")
+
+    assert "GPT-5.6" in voiceover
+    assert "OpenAI Codex" in voiceover
+    assert "built both verifier paths" in voiceover
+    assert "challenged the trust model" in voiceover
 
 
 def test_receipt_hash_verifier_detects_mutation() -> None:

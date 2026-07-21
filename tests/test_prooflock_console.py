@@ -239,7 +239,8 @@ def test_build_week_voiceover_is_bounded_and_describes_the_current_attack():
     assert "keeps the effective decision at HOLD" in voiceover
     assert "external validation" in voiceover
     assert "agent" not in voiceover.lower()
-    assert "gpt-" not in voiceover.lower()
+    assert "GPT-5.6" in voiceover
+    assert "gpt-5.6-sol" not in voiceover.lower()
 
 
 def test_public_session_reconciliation_is_bounded_and_identifier_free():

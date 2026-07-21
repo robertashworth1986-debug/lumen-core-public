@@ -10,6 +10,6 @@ Now the guided proof performs the harder attack. It changes every required gate 
 
 The console restores the exact canonical receipt text, rehashes the artifacts, and returns to the original HOLD state. The attack never changes the source files or grants itself authority.
 
-The same rules run in the browser and in a Python command-line verifier. Focused tests cover canonical hashes, path boundaries, browser and Python parity, deterministic visuals, reduced motion, exact restoration, accessibility hooks, deployment isolation, and local-only dependencies. The video names the exact source commit and test receipt used for this recording.
+The same rules run in the browser and in a Python verifier. Focused tests cover hashes, path boundaries, browser and Python parity, deterministic visuals, restoration, accessibility, deployment isolation, and local-only dependencies. The video names the exact source commit and test result.
 
-OpenAI Codex helped isolate, implement, challenge, and test this bounded release while preserving provenance. ProofLock demonstrates receipt integrity, artifact identity, policy enforcement, and authority separation. It does not claim that a hash proves safety, patentability, field performance, external validation, or commercial readiness.
+Using GPT-5.6 through OpenAI Codex, I isolated the release, built both verifier paths, challenged the trust model, and tested the system with provenance intact. ProofLock demonstrates receipt integrity, artifact identity, policy enforcement, and authority separation. It does not claim that a hash proves safety, patentability, field performance, external validation, or commercial readiness.
