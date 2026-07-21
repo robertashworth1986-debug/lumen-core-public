@@ -6,11 +6,11 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 
 ## Control Line
 
-- Reconciled lanes: `16`
+- Reconciled lanes: `17`
 - Reply required now: `0`
 - Send now: `0`
-- Duplicate-outbound risks: `15`
-- No-send template coverage: `15`
+- Duplicate-outbound risks: `16`
+- No-send template coverage: `16`
 - Human account actions: `4`
 - Browser navigation performed: `false`
 
@@ -18,9 +18,10 @@ Status: `NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION`
 
 | Lane | State | Follow-up mode | Reply now | Next action |
 |---|---|---|---:|---|
-| Nashville Entrepreneur Center | `PORTAL_SUBMISSION_CONFIRMED` | `INBOUND_ONLY` | `false` | Monitor for the rolling review result through August 3; do not resubmit, reply to the automated confirmation, or describe the application as selected. |
+| Nashville Entrepreneur Center | `MAIN_APPLICATION_AND_FINANCIAL_AID_FORM_SUBMITTED_REVIEW_PENDING` | `INBOUND_ONLY` | `false` | Monitor for the rolling review result through August 3; do not resubmit either form, send a courtesy reply, or describe the application or financial-aid request as selected or approved. |
 | EPRI Open Power AI Consortium | `MOU_ROUTING_SENT_OUT_OF_OFFICE_RECEIVED` | `INBOUND_ONLY` | `false` | Wait for the MOU, a correction request, or an onboarding question; do not resend identity details. |
 | Georgia PATENTS | `SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION` | `CLOSED` | `false` | Close this pro bono route without a reply. Continue the private Patent Center docket capture, USPTO Pro Se procedural route, and a verified practitioner referral without emailing unpublished application material. |
+| USPTO Pro Se Assistance Center | `ACCESS_PATH_IDENTIFIED_DEADLINE_NOT_CONFIRMED` | `INBOUND_ONLY` | `false` | Use a verified uspto.gov account and identity verification, or order the application through Document Services, then call the Pro Se Assistance Center with the private service-request reference available. Do not disclose unpublished application material in public artifacts. |
 | Los Alamos National Laboratory | `PACKAGE_SENT_RESPONSE_PENDING` | `ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD` | `false` | Wait for LANL; use the single bounded follow-up only on or after July 23 if no reply arrives. |
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `INBOUND_ONLY` | `false` | Monitor for a CDC clarification, replacement request, or scheduling message; do not resend the response. |
 | DARPA Multi X Office | `FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY` | `INBOUND_ONLY` | `false` | Record the agency thread response and monitor for a specific clarification, replacement request, or workshop invitation. Do not reply to the generic procedural response or resend the package. |

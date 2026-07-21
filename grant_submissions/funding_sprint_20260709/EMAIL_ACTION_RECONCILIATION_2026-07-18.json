@@ -13,18 +13,25 @@
       "do_not_duplicate_send": true,
       "email_reply_required": false,
       "expected_next_steps_by": "2026-08-03",
+      "financial_aid_deadline_time_explicit": false,
+      "financial_aid_deadline_timezone_explicit": false,
+      "financial_aid_duplicate_submission_allowed": false,
+      "financial_aid_form_submission_verified": true,
+      "financial_aid_request_deadline_date": "2026-07-22",
+      "financial_aid_request_received": true,
       "follow_up_policy": {
         "eligible_template_id": null,
         "lane_id": "nashville_ec_takeoff_fall_2026",
         "max_proactive_sends": 0,
         "mode": "INBOUND_ONLY",
         "not_before_utc": null,
-        "rationale": "Portal submission is confirmed; monitor through the stated review date and answer only a specific inbound request."
+        "rationale": "The main application and separate financial-aid form are both confirmed submitted; monitor through the stated review date and answer only a specific inbound request."
       },
       "lane_id": "nashville_ec_takeoff_fall_2026",
-      "latest_event_type": "PORTAL_SUBMISSION_CONFIRMED",
-      "latest_event_utc": "2026-07-18T04:54:52.709214Z",
-      "next_action": "Monitor for the rolling review result through August 3; do not resubmit, reply to the automated confirmation, or describe the application as selected.",
+      "latest_event_type": "FINANCIAL_AID_FORM_SUBMISSION_CONFIRMED",
+      "latest_event_utc": "2026-07-21T22:45:00Z",
+      "main_application_portal_submission_verified": true,
+      "next_action": "Monitor for the rolling review result through August 3; do not resubmit either form, send a courtesy reply, or describe the application or financial-aid request as selected or approved.",
       "no_send_before": null,
       "operational_local_deadline": "2026-07-17T23:59:00-05:00",
       "operational_utc_deadline": "2026-07-18T04:59:00Z",
@@ -32,7 +39,7 @@
       "portal_submission_verified": true,
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
-      "state": "PORTAL_SUBMISSION_CONFIRMED"
+      "state": "MAIN_APPLICATION_AND_FINANCIAL_AID_FORM_SUBMITTED_REVIEW_PENDING"
     },
     {
       "do_not_duplicate_send": true,
@@ -76,6 +83,34 @@
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
       "state": "SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION"
+    },
+    {
+      "already_filed_application": true,
+      "alternate_document_order_route": "USPTO Document Services Division",
+      "application_status_confirmed": false,
+      "do_not_duplicate_send": true,
+      "email_reply_required": false,
+      "filing_deadline_confirmed": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "uspto_pro_se_application_access_guidance",
+        "max_proactive_sends": 0,
+        "mode": "INBOUND_ONLY",
+        "not_before_utc": null,
+        "rationale": "Official guidance identifies account, identity-verification, and document-order access paths but does not confirm a deadline or application status; take the private account or phone action without sending another email."
+      },
+      "identity_verification_required": true,
+      "lane_id": "uspto_pro_se_application_access_guidance",
+      "latest_event_type": "OFFICIAL_ACCESS_PATH_GUIDANCE_RECEIVED",
+      "latest_event_utc": "2026-07-21T22:43:44Z",
+      "next_action": "Use a verified uspto.gov account and identity verification, or order the application through Document Services, then call the Pro Se Assistance Center with the private service-request reference available. Do not disclose unpublished application material in public artifacts.",
+      "no_send_before": null,
+      "organization": "USPTO Pro Se Assistance Center",
+      "patent_center_account_required": true,
+      "procedural_posture_confirmed": false,
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "ACCESS_PATH_IDENTIFIED_DEADLINE_NOT_CONFIRMED"
     },
     {
       "do_not_duplicate_send": true,
@@ -386,11 +421,13 @@
   "search_scope": [
     "Funding, grant, contract, SBIR/STTR, DSIP, NSF, SAM.gov, and Research.gov",
     "Patent routing and Georgia PATENTS",
+    "USPTO Pro Se procedural access guidance for an already-filed application",
     "LANL VISION and licensing follow-up",
     "EPRI Open Power AI Consortium onboarding",
     "FHWA TSMO qualified-partner outreach",
     "Nashville EC Fall 2026 TakeOff deadline-support query",
     "Nashville EC Fall 2026 TakeOff portal-submission confirmation",
+    "Nashville EC Fall 2026 financial-aid form request and submission confirmation",
     "DARPA-SN-26-97 formal RFI response and agency-thread state",
     "MissionWeave DSIP and OpenAI Build Week portal deadlines",
     "OpenAI Build Week self-sent handoff attachment integrity",
@@ -419,6 +456,14 @@
       "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
       "present": true,
       "sha256": "ABBC656B11687706A441B9CDCF1272DFD324A34B6A1187EF0874FE83D05E3E88",
+      "worktree_eol_differs_from_git_blob": false
+    },
+    "nashville_financial_aid_submission_receipt": {
+      "bytes": 1497,
+      "identity_source": "COMMITTED_GIT_BLOB",
+      "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FINANCIAL_AID_SUBMISSION_RECEIPT_2026-07-21.json",
+      "present": true,
+      "sha256": "51C4A0F6FCB9326E9FDD61691093D0E0ACB4640BE18836D3B8E370C51F20532F",
       "worktree_eol_differs_from_git_blob": false
     },
     "nashville_official_deadline_confirmation": {
@@ -462,11 +507,11 @@
       "worktree_eol_differs_from_git_blob": false
     },
     "outreach_followup_policy_config": {
-      "bytes": 5864,
+      "bytes": 6358,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "config/outreach_followup_policies_v1.json",
       "present": true,
-      "sha256": "15D00B862BDA00CA04B12F9EF1AE567A8721A6F49AD2645FD2F7239E9F0AC9A1",
+      "sha256": "0E23FD97636BF839C665ACC7BB95E2C4DAF3FBFAAAAB3446755BA724ECE48445",
       "worktree_eol_differs_from_git_blob": false
     },
     "outreach_response_template_registry": {
@@ -476,24 +521,32 @@
       "present": true,
       "sha256": "CFB09BD4F7F1E047608BB171F90989C427AA973E47CA5FD4E11670B5E36C8908",
       "worktree_eol_differs_from_git_blob": false
+    },
+    "uspto_pro_se_access_guidance_receipt": {
+      "bytes": 2049,
+      "identity_source": "COMMITTED_GIT_BLOB",
+      "path": "grant_submissions/funding_sprint_20260709/USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT_2026-07-21.json",
+      "present": true,
+      "sha256": "8F2F383413779086C00F8D13CC7B961D8CC97E5BCDD2B7817A8367B665530F12",
+      "worktree_eol_differs_from_git_blob": false
     }
   },
   "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
   "summary": {
-    "duplicate_outbound_risk_count": 15,
+    "duplicate_outbound_risk_count": 16,
     "email_reply_required_count": 0,
     "external_send_allowed_without_human": false,
     "follow_up_mode_counts": {
       "ACCOUNT_ACTION": 1,
       "CLOSED": 2,
-      "INBOUND_ONLY": 9,
+      "INBOUND_ONLY": 10,
       "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 2,
       "PORTAL_ACTION": 1,
       "PRIVATE_RECONCILIATION": 1
     },
     "human_account_action_count": 4,
-    "lane_count": 16,
-    "monitor_no_send_template_count": 15,
+    "lane_count": 17,
+    "monitor_no_send_template_count": 16,
     "out_of_office_count": 1,
     "send_now_count": 0
   }
