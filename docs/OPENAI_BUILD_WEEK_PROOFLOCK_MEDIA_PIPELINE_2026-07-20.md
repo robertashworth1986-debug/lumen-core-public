@@ -32,7 +32,7 @@ When the console source tree has not changed, existing PNG captures may be rebou
 
 ## Publication Gate
 
-The exact verified artifact is published unlisted at `https://youtu.be/af1bHPmIgeY`. YouTube reported no copyright issues, the public watch page and oEmbed metadata resolved, and the player exposed the complete 125.281-second media. The publication receipt is `evidence/openai_build_week/prooflock_youtube_publication_receipt_20260721.json`.
+The selected Luma-voice artifact is published publicly at `https://youtu.be/3qhK9WSJuaY`. The exact 125.27-second H.264/AAC file has SHA-256 `9f1d417cb29c132ecc9a31f3a572adbcb3ebd66208517e70ad9adab6e8684b15`. YouTube reported no copyright issues, the public watch page and oEmbed metadata resolved with the expected title, and the Studio player exposed the complete `2:06` media. The earlier unlisted upload is superseded for Devpost use. The publication receipt is `evidence/openai_build_week/prooflock_youtube_publication_receipt_20260721.json`.
 
 Do not call the Devpost entry submitted until all of these are true:
 

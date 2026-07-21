@@ -211,7 +211,7 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     assert "Do not present the historical public release as current-head evidence" in narration
     assert "`28 passed`" not in checklist
     assert "Verified video publication" in checklist
-    assert "https://youtu.be/af1bHPmIgeY" in checklist
+    assert "https://youtu.be/3qhK9WSJuaY" in checklist
     assert "publicly resolvable" in checklist
     assert "2026-07-20T21:41:43Z" in checklist
     assert "Current focused local test result: `55 passed, 3 skipped`" in checklist
@@ -219,7 +219,7 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     assert "Current live-file identity: `15/15`" in checklist
     assert "b2ac8cef10ee5b9db765a17cdbf6f13e6b917ce5" in checklist
     assert "4b241a62e4f3fd76582d5e7992cc6ff119e36594b4f77e8713a1a75bac7984bc" in checklist
-    assert "7db755aa1b8a2f4ab79ce95a463b1f80fc73ac28a2d31672e894ea8fbd5b8184" in checklist
+    assert "9f1d417cb29c132ecc9a31f3a572adbcb3ebd66208517e70ad9adab6e8684b15" in checklist
     assert "Historical release only" in release_receipt
     assert "must not be used as current release evidence" in release_receipt
     assert "`32 passed`" not in readiness
@@ -246,17 +246,19 @@ def test_youtube_publication_receipt_is_bounded_and_self_hashing():
 
     assert claimed_sha256 == hashlib.sha256(canonical).hexdigest()
     assert receipt["source_video"]["sha256"] == (
-        "7db755aa1b8a2f4ab79ce95a463b1f80fc73ac28a2d31672e894ea8fbd5b8184"
+        "9f1d417cb29c132ecc9a31f3a572adbcb3ebd66208517e70ad9adab6e8684b15"
     )
-    assert receipt["youtube"]["url"] == "https://youtu.be/af1bHPmIgeY"
-    assert receipt["youtube"]["visibility"] == "UNLISTED"
+    assert receipt["source_video"]["filename"].endswith("luma_candidate.mp4")
+    assert receipt["synthetic_narration"]["critical_phrases_present"] is True
+    assert receipt["youtube"]["url"] == "https://youtu.be/3qhK9WSJuaY"
+    assert receipt["youtube"]["visibility"] == "PUBLIC"
     assert receipt["youtube"]["copyright_check"] == "COMPLETE_NO_ISSUES_FOUND"
     assert receipt["youtube"]["public_watch_url_resolved"] is True
     assert receipt["devpost"]["final_submission_performed"] is False
     assert receipt["controls"]["private_session_identifier_exposed"] is False
-    assert "does not independently prove signed-out audio playback" in receipt[
-        "claim_boundary"
-    ]
+    assert receipt["devpost"]["feedback_session_id_saved"] is True
+    assert receipt["devpost"]["final_legal_review_completed"] is False
+    assert "does not independently prove contest submission" in receipt["claim_boundary"]
 
 
 def test_build_week_voiceover_is_bounded_and_describes_the_current_attack():

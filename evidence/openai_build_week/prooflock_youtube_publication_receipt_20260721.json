@@ -1,24 +1,37 @@
 {
   "schema": "lumencore.prooflock_youtube_publication_receipt.v1",
-  "observed_utc": "2026-07-21T14:18:30Z",
+  "observed_utc": "2026-07-21T15:51:51Z",
   "source_video": {
-    "filename": "prooflock_console_openai_build_week_demo_v2.mp4",
-    "sha256": "7db755aa1b8a2f4ab79ce95a463b1f80fc73ac28a2d31672e894ea8fbd5b8184",
-    "size_bytes": 6621177,
+    "filename": "prooflock_console_openai_build_week_demo_luma_candidate.mp4",
+    "sha256": "9f1d417cb29c132ecc9a31f3a572adbcb3ebd66208517e70ad9adab6e8684b15",
+    "size_bytes": 6580808,
     "local_duration_seconds": 125.27,
     "video_codec": "h264",
-    "audio_codec": "aac"
+    "audio_codec": "aac",
+    "width": 1920,
+    "height": 1080,
+    "frame_rate_fps": 30
+  },
+  "synthetic_narration": {
+    "filename": "prooflock_console_build_week_narration_luma_timeline_candidate.wav",
+    "sha256": "28eab0b0b0436ece39fad8d1655e9862022cea8b461a843225e23c6363aaede0",
+    "size_bytes": 6013030,
+    "duration_seconds": 125.269833,
+    "sample_rate_hz": 24000,
+    "channels": 1,
+    "transcription_qa_sha256": "48a65c309c04558dce44e28b8b14e05c16b242e6bf56fca6e1d846e515a6e62f",
+    "critical_phrases_present": true,
+    "voice_disclosure_present": true
   },
   "youtube": {
-    "video_id": "af1bHPmIgeY",
-    "url": "https://youtu.be/af1bHPmIgeY",
+    "video_id": "3qhK9WSJuaY",
+    "url": "https://youtu.be/3qhK9WSJuaY",
     "title": "ProofLock Console | OpenAI Build Week 2026",
-    "visibility": "UNLISTED",
+    "visibility": "PUBLIC",
     "audience": "NOT_MADE_FOR_KIDS",
     "copyright_check": "COMPLETE_NO_ISSUES_FOUND",
     "studio_filename_match": true,
-    "studio_player_duration_seconds": 125.281,
-    "studio_player_ready_state": 4,
+    "studio_player_duration_display": "2:06",
     "public_watch_url_resolved": true,
     "public_oembed_title_match": true,
     "public_oembed_provider": "YouTube",
@@ -27,9 +40,10 @@
   "devpost": {
     "video_url_saved_in_project_details": true,
     "project_details_step_saved": true,
-    "observed_completed_step_count": 3,
+    "observed_completed_step_count": 4,
     "observed_total_step_count": 5,
-    "feedback_session_id_still_required": true,
+    "feedback_session_id_saved": true,
+    "final_legal_review_completed": false,
     "final_submission_performed": false
   },
   "controls": {
@@ -39,6 +53,6 @@
     "contest_acceptance_claimed": false,
     "award_claimed": false
   },
-  "claim_boundary": "This receipt records the observed YouTube Studio publication state, a publicly resolvable watch page and oEmbed title, the declared local source-video identity, and the Devpost project-details save state. It does not independently prove signed-out audio playback, contest submission or acceptance, judging, award, OpenAI endorsement, external validation, engineering performance, safety, patent rights, funding, or commercial readiness.",
-  "receipt_sha256": "ea564dc383d2672ff5241d1a70df9a0fcc49d63965faf22e90ce9fefb9d4e2ca"
+  "claim_boundary": "This receipt records the observed YouTube Studio publication state, a publicly resolvable watch page and oEmbed title, the declared local source-video and narration identities, transcript-QA boundaries, and the Devpost project-details save state. It does not independently prove contest submission or acceptance, judging, award, OpenAI endorsement, external validation, engineering performance, safety, patent rights, funding, or commercial readiness.",
+  "receipt_sha256": "ca7d7e1140a85d542fe9c94f20c2076cbe8d0d4b7579b81ede04c363b573b018"
 }
