@@ -17,11 +17,13 @@ VAULT_ROOT = Path("E:/LumaProofVault")
 DESTINATION_ROOT = VAULT_ROOT / "SUBMISSIONS" / "DEADLINE_INTEGRITY_REPAIR_20260721"
 
 SOURCES = (
+    "code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py",
     "code/ops/BUILD_DEADLINE_INTEGRITY_REPAIR_CHECKPOINT.py",
     "code/ops/BUILD_DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT.py",
     "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
     "code/ops/BUILD_HUMAN_ACTION_DOCKET.py",
     "code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+    "code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py",
     "code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py",
     "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
     "code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py",
@@ -32,6 +34,8 @@ SOURCES = (
     "evidence/openai_build_week/prooflock_youtube_publication_receipt_20260721.json",
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md",
+    "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_FOUNDER_FINISH_CARD_2026-07-21.json",
+    "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_FOUNDER_FINISH_CARD_2026-07-21.md",
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md",
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_JCP_EVIDENCE_PROTOCOL_2026-07-18.json",
     "grant_submissions/compliance_evidence/CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json",
@@ -53,6 +57,8 @@ SOURCES = (
     "tests/test_federal_submission_protocol_packet.py",
     "tests/test_launchtn_3686_pitch_application.py",
     "tests/test_live_funding_portal_handoff.py",
+    "tests/test_capture_missionweave_jcp_evidence.py",
+    "tests/test_missionweave_founder_finish_card.py",
     "tests/test_missionweave_dsip_action_gate.py",
     "tests/test_nashville_ec_live_deadline_receipt.py",
     "tests/test_near_deadline_submission_command_board.py",

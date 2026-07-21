@@ -1,0 +1,194 @@
+{
+  "schema": "lumencore.missionweave_founder_finish_card.v1",
+  "generated_utc": "2026-07-21T18:14:02.066385Z",
+  "status": "FOUNDER_ACTION_REQUIRED_NOT_SUBMISSION_READY",
+  "topic": "DLA26BZ03-NV011",
+  "deadline": {
+    "expected_local": "July 22, 2026 at 12:00 p.m. Eastern Time",
+    "expected_utc": "2026-07-22T16:00:00Z",
+    "seconds_remaining": 78357,
+    "hours_remaining_rounded_down": 21,
+    "deadline_passed": false,
+    "live_dsip_recheck_required": true,
+    "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
+  },
+  "current_truth": {
+    "passed_gate_count": 35,
+    "open_gate_count": 15,
+    "required_gate_count": 50,
+    "submission_ready_for_human_click": false,
+    "portal_submission_observed": false,
+    "unresolved_gates": [
+      "ACTION_TIME_APPROVAL_TIMESTAMP",
+      "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+      "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+      "COMPLETE_PORTAL_PREVIEW_REVIEW",
+      "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+      "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+      "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+      "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+      "DSIP_FIRM_PIN_AVAILABILITY",
+      "NO_DUPLICATE_COST_OR_DELIVERABLE",
+      "PORTAL_PREVIEW_RECEIPT_HASH",
+      "TECHNICAL_DATA_RIGHTS_ASSERTION",
+      "TECHNOLOGY_CONTROL_PLAN_DECISION",
+      "VOLUME3_COST_BASIS",
+      "VOLUME5_UPLOAD_SET"
+    ]
+  },
+  "start_here": {
+    "title": "Submit the JCP application and retain official evidence",
+    "instruction": "Use the official JCP portal. Registration or prerequisites in progress are not enough; retain the official application-submission receipt PDF or a current certified DD Form 2345 in the ignored private evidence area.",
+    "url": "https://www.public.dacs.dla.mil/jcp/ext/",
+    "why_first": "Volume 5 cannot be locked without the required official JCP/DD Form 2345 evidence for the current ITAR-marked scope."
+  },
+  "portal_links": [
+    {
+      "name": "Official JCP portal",
+      "url": "https://www.public.dacs.dla.mil/jcp/ext/"
+    },
+    {
+      "name": "Defense SBIR/STTR submission portal",
+      "url": "https://www.dodsbirsttr.mil/submissions/"
+    }
+  ],
+  "ordered_founder_steps": [
+    {
+      "order": 1,
+      "step_id": "01_JCP_APPLICATION_EVIDENCE",
+      "title": "Submit the JCP application and retain official evidence",
+      "instruction": "Use the official JCP portal. Registration or prerequisites in progress are not enough; retain the official application-submission receipt PDF or a current certified DD Form 2345 in the ignored private evidence area.",
+      "evidence_required": "Hash-matched official JCP receipt PDF or certified DD Form 2345",
+      "human_boundary": "The founder completes any portal certification or final JCP submit action.",
+      "open_gates": [
+        "DD2345_OR_JCP_APPLICATION_EVIDENCE"
+      ]
+    },
+    {
+      "order": 2,
+      "step_id": "02_DSIP_FIRM_PIN_CONFIRMATION",
+      "title": "Confirm Firm PIN availability inside DSIP",
+      "instruction": "Confirm that the organization-linked DSIP account can access the Firm PIN. Do not place the PIN itself in chat, Git, logs, or the private gate record.",
+      "evidence_required": "Boolean availability state only; never the PIN value",
+      "human_boundary": "The founder handles authentication and any secret value.",
+      "open_gates": [
+        "DSIP_FIRM_PIN_AVAILABILITY"
+      ]
+    },
+    {
+      "order": 3,
+      "step_id": "03_VOLUME3_COST_SUPPORT",
+      "title": "Support and approve the Volume 3 cost basis",
+      "instruction": "Review the proposed labor rate, 640 PI hours, fringe, indirect base, cloud/data, travel, software/storage, no-subcontractor position, and 100,000 dollar total against actual records before approving the cost volume.",
+      "evidence_required": "Current founder records and corporate-official cost review",
+      "human_boundary": "The founder confirms the factual cost basis; the builder checks arithmetic only.",
+      "open_gates": [
+        "VOLUME3_COST_BASIS"
+      ]
+    },
+    {
+      "order": 4,
+      "step_id": "04_COMPLIANCE_AND_CONFLICT_POSITION",
+      "title": "Review conflicts, cost separation, data rights, CMMC, and export-control planning",
+      "instruction": "Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document whether a Technology Control Plan is a contracting-negotiation deliverable.",
+      "evidence_required": "Current source review, hash-bound documentary register, and bounded founder/corporate-official position",
+      "human_boundary": "No compliance, assessment, certification, or contracting-office acceptance is inferred.",
+      "open_gates": [
+        "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+        "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+        "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+        "NO_DUPLICATE_COST_OR_DELIVERABLE",
+        "TECHNICAL_DATA_RIGHTS_ASSERTION",
+        "TECHNOLOGY_CONTROL_PLAN_DECISION"
+      ]
+    },
+    {
+      "order": 5,
+      "step_id": "05_VOLUME5_UPLOAD_SET",
+      "title": "Lock the Volume 5 supporting-document set",
+      "instruction": "Upload only current, applicable documents. For the ITAR-marked scope, include the verified JCP/DD Form 2345 evidence required by the BAA; do not upload the obsolete foreign-affiliations PDF.",
+      "evidence_required": "Reviewed attachment list with current file hashes",
+      "human_boundary": "Any legally consequential upload or representation remains founder reviewed.",
+      "open_gates": [
+        "VOLUME5_UPLOAD_SET"
+      ]
+    },
+    {
+      "order": 6,
+      "step_id": "06_FRESH_PORTAL_PREVIEW",
+      "title": "Review and seal a fresh complete DSIP preview",
+      "instruction": "After every field and upload is final, inspect all seven volumes, filenames, hashes, cost totals, and the live deadline. Save the current preview receipt privately and bind it with the collector.",
+      "evidence_required": "Fresh portal-preview receipt bound to the exact upload set",
+      "human_boundary": "The founder reviews the rendered Government portal preview.",
+      "open_gates": [
+        "COMPLETE_PORTAL_PREVIEW_REVIEW",
+        "PORTAL_PREVIEW_RECEIPT_HASH"
+      ]
+    },
+    {
+      "order": 7,
+      "step_id": "07_ACTION_TIME_REVIEW_AND_AUTHORIZATION",
+      "title": "Perform corporate review and action-time authorization",
+      "instruction": "Only after the fresh preview is stable, review every volume as corporate official, capture the short-lived approval binding, and authorize the exact final submission.",
+      "evidence_required": "Fresh approval timestamp and binding to the current preview/upload set",
+      "human_boundary": "The final certification and submit click are founder-only actions.",
+      "open_gates": [
+        "ACTION_TIME_APPROVAL_TIMESTAMP",
+        "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+        "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW"
+      ]
+    }
+  ],
+  "outreach_control": {
+    "queue_path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
+    "queue_as_of_utc": "2026-07-21T18:08:35.103411Z",
+    "queue_age_seconds": 326,
+    "queue_status": "ROUTING_INTEGRITY_EXCEPTION_NO_SEND",
+    "routing_integrity_exception_count": 1,
+    "missionweave_action_state": "FOLLOWUP_LIMIT_REACHED_NO_SEND",
+    "recorded_proactive_send_count": 1,
+    "no_email_send_due": true,
+    "next_action": "The bounded proactive follow-up allowance is exhausted. Monitor the existing thread and respond only to a specific inbound request."
+  },
+  "safe_local_commands": [
+    "python code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py --check-target",
+    "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target",
+    "python code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py --check-target",
+    "python code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_ACTION.private.json",
+    "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval"
+  ],
+  "human_only_actions": [
+    "Enter passwords, Firm PIN values, and one-time authentication codes.",
+    "Confirm entity, cost, conflicts, rights, CMMC, and export-control facts.",
+    "Complete any JCP or DSIP certification or legal attestation.",
+    "Review the complete rendered Government portal preview.",
+    "Authorize and click the final DSIP submit control."
+  ],
+  "jcp_receipt_capture_command_template": "python code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py --evidence-file <PRIVATE_OFFICIAL_PDF> --evidence-kind JCP_APPLICATION_SUBMISSION_RECEIPT --source-issued-utc <OFFICIAL_RECEIPT_TIMESTAMP> --confirm-entity-match --confirm-corporate-review",
+  "never_record_in_public_files": [
+    "passwords",
+    "Firm PIN value",
+    "one-time authentication codes",
+    "private identifiers",
+    "assigned proposal number",
+    "private receipt paths or hashes"
+  ],
+  "controls": {
+    "builder_can_click_final_submit": false,
+    "builder_can_certify_legal_facts": false,
+    "builder_can_send_duplicate_followup": false,
+    "action_time_approval_required": true,
+    "approval_max_age_seconds": 900,
+    "preview_max_age_seconds": 1800
+  },
+  "source_integrity": {
+    "gate_path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+    "gate_canonical_text_sha256": "97670D2A8FC76EE8209B235278FDAECAC16199B7553874B0379D8D0BC2891B26",
+    "gate_payload_sha256": "5f0799416e680fea31268beb7cd9e5854cd1fe31ff2ebd61a8ec401654087b57",
+    "gate_source_checks_pass": true,
+    "queue_canonical_text_sha256": "1E170286BD57A99C7BBF99671D1BCA046D736252DB1300AD9DA6824FF065A25D",
+    "queue_payload_sha256": "30E48AEA6DD364950D58B5BEA16E9E4EBD2B4FC03D54B4B7A4275317059B4E7C"
+  },
+  "claim_boundary": "This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.",
+  "card_sha256": "BDF967C715704ECA3887C8254DF2D888CA0E07344E3152FAA044726071498514"
+}

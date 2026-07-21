@@ -36,7 +36,7 @@ def test_checkpoint_is_commit_bound_public_safe_and_human_gated():
     assert payload["schema"] == "lumencore.deadline_integrity_repair_checkpoint.v1"
     assert len(payload["source_commit"]) == 40
     assert payload["source_worktree_tracked_clean"] is True
-    assert payload["artifact_count"] == len(payload["artifacts"]) == 45
+    assert payload["artifact_count"] == len(payload["artifacts"]) == 51
     assert payload["all_source_git_blobs_match_commit"] is True
     assert payload["all_sha256_matched_after_copy"] is True
     assert payload["relative_paths_preserved"] is True
@@ -57,6 +57,12 @@ def test_checkpoint_is_commit_bound_public_safe_and_human_gated():
     assert (
         "evidence/openai_build_week/"
         "prooflock_youtube_publication_receipt_20260721.json"
+    ) in sources
+    assert "code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py" in sources
+    assert "code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py" in sources
+    assert (
+        "grant_submissions/DLA26BZ03_NV011_MissionWeave/"
+        "MISSIONWEAVE_FOUNDER_FINISH_CARD_2026-07-21.json"
     ) in sources
 
     unhashed = dict(payload)
