@@ -1,7 +1,7 @@
 # Outreach Follow-up Action Queue - 2026-07-18
 
 - Status: `ROUTING_INTEGRITY_EXCEPTION_NO_SEND`
-- As of UTC: `2026-07-21T15:24:51.123245Z`
+- As of UTC: `2026-07-21T15:27:03.222637Z`
 - Lanes: `16`
 - Due for mailbox recheck: `0`
 - Held no-send: `1`
@@ -9,7 +9,7 @@
 - Send now: `0`
 - Routing integrity exceptions: `1`
 - Autonomous external send allowed: `false`
-- Queue SHA-256: `F992D5FCAD4D6E791A0D5A9B23CA8B0BA1D7DD4F409741D125DE2B0B8A5F743F`
+- Queue SHA-256: `CCF79AC14693E8CE6174E901C20D91C2A235CD9AE7ABA39AA10AE5889B911BD8`
 
 ## Action Queue
 
