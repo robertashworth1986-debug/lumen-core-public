@@ -1,7 +1,7 @@
 {
   "schema": "lumencore.deadline_integrity_repair_checkpoint.v1",
-  "created_utc": "2026-07-21T16:25:07.621482Z",
-  "source_commit": "1f776a5c1b00ac6687b97f6e9cc2121bbbad7246",
+  "created_utc": "2026-07-21T16:26:38.171646Z",
+  "source_commit": "d4cd644fbbce9e33c9dff391f21cae89d321a33d",
   "source_branch": "codex/deadline-integrity-repair-20260721",
   "source_worktree_tracked_clean": true,
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721",
@@ -354,13 +354,13 @@
     {
       "source": "tests/test_deadline_integrity_repair_checkpoint.py",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/tests/test_deadline_integrity_repair_checkpoint.py",
-      "bytes": 3972,
-      "sha256": "AB27E7A85B6A132C8E285279C4D061B3015F95CDA4E732E645B21390E3787EC8",
-      "source_git_blob_oid": "68241b0272a89d45b63461050fcbd548d07e8ab5",
-      "commit_git_blob_oid": "68241b0272a89d45b63461050fcbd548d07e8ab5",
+      "bytes": 4102,
+      "sha256": "4222C8328CB179C710DF16F3BC94975CA446B41F4F3385F9677A413A1EDA8CFB",
+      "source_git_blob_oid": "acefb5a89ca5b001560d34bc2a13564f73806baf",
+      "commit_git_blob_oid": "acefb5a89ca5b001560d34bc2a13564f73806baf",
       "source_git_blob_match": true,
-      "copy_bytes": 3972,
-      "copy_sha256": "AB27E7A85B6A132C8E285279C4D061B3015F95CDA4E732E645B21390E3787EC8",
+      "copy_bytes": 4102,
+      "copy_sha256": "4222C8328CB179C710DF16F3BC94975CA446B41F4F3385F9677A413A1EDA8CFB",
       "copy_sha256_matched": true
     },
     {
@@ -559,5 +559,5 @@
   "receipt_copy_destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/DEADLINE_INTEGRITY_REPAIR_CHECKPOINT_2026-07-21.json",
   "sidecar_copy_destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/DEADLINE_INTEGRITY_REPAIR_CHECKPOINT_2026-07-21.json.sha256",
   "claim_boundary": "This receipt proves only that the listed public deadline-routing code, tests, and generated control surfaces matched the recorded Git commit after Git clean-filter normalization and that their exact checkout bytes were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove email transmission, portal submission, eligibility, certification, award, endorsement, external validation, technical performance, funding, or value. Final external and legal actions remain human-controlled.",
-  "receipt_payload_sha256": "E30701E6435C3038AC9FD1081F4FB54F87CB86185CEC059F1548CF175F3DCC5F"
+  "receipt_payload_sha256": "AB67610819DD097F4DCE3EFCF50D426381F5D210B468C4545FF101236A1FDFDF"
 }
