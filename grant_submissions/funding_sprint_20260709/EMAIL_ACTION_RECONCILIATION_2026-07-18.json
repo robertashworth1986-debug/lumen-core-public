@@ -403,7 +403,7 @@
       "path": "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json",
       "present": true,
       "sha256": "0D73A524950897D8A1080B5C4A7EF3D30CF55901154A96EE8D8A15E05A68044B",
-      "worktree_eol_differs_from_git_blob": true
+      "worktree_eol_differs_from_git_blob": false
     },
     "lvlup_independent_review_confirmation": {
       "bytes": 1908,
@@ -411,15 +411,15 @@
       "path": "grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json",
       "present": true,
       "sha256": "F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC",
-      "worktree_eol_differs_from_git_blob": true
+      "worktree_eol_differs_from_git_blob": false
     },
     "missionweave_dsip_action_gate": {
       "bytes": 24218,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
       "present": true,
-      "sha256": "BE0DB4A91D55D0EDE6DCEE82404643DCC2E3B97C9C4E50619C4C6157E0E168AA",
-      "worktree_eol_differs_from_git_blob": true
+      "sha256": "ABBC656B11687706A441B9CDCF1272DFD324A34B6A1187EF0874FE83D05E3E88",
+      "worktree_eol_differs_from_git_blob": false
     },
     "nashville_official_deadline_confirmation": {
       "bytes": 2272,
@@ -427,7 +427,7 @@
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json",
       "present": true,
       "sha256": "DAC4B3120D9B4EC2A822198426939B89FE96BF7294C0CC251D1A299BB76B00E2",
-      "worktree_eol_differs_from_git_blob": true
+      "worktree_eol_differs_from_git_blob": false
     },
     "nashville_submission_receipt": {
       "bytes": 1347,
@@ -435,7 +435,7 @@
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json",
       "present": true,
       "sha256": "E606530B0CCBAB06347BEF60DE527B4A76E5EE35BD7A15E71C3A0B49647BE505",
-      "worktree_eol_differs_from_git_blob": true
+      "worktree_eol_differs_from_git_blob": false
     },
     "openai_build_week_handoff_integrity_control": {
       "bytes": 3529,
@@ -443,7 +443,7 @@
       "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/BUILD_WEEK_HANDOFF_INTEGRITY_CONTROL_2026-07-17.json",
       "present": true,
       "sha256": "C762F0ED28698B4B0578B5E7BD8CE57DA5E8FEC5F710703F0ACD2CA0A4404BAB",
-      "worktree_eol_differs_from_git_blob": true
+      "worktree_eol_differs_from_git_blob": false
     },
     "openai_build_week_readiness": {
       "bytes": 10419,
@@ -451,7 +451,7 @@
       "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
       "present": true,
       "sha256": "F62728B470D7313A2E06E304C527D1C21844833EAE83D65010FDDF6E82C93A73",
-      "worktree_eol_differs_from_git_blob": true
+      "worktree_eol_differs_from_git_blob": false
     },
     "openai_build_week_submission_receipt": {
       "bytes": 3457,
@@ -459,7 +459,7 @@
       "path": "evidence/openai_build_week/prooflock_youtube_publication_receipt_20260721.json",
       "present": true,
       "sha256": "127D3286581634E34592C420CAD6D109C119570947C210EC1FCC653F578F3C14",
-      "worktree_eol_differs_from_git_blob": true
+      "worktree_eol_differs_from_git_blob": false
     },
     "outreach_followup_policy_config": {
       "bytes": 5864,
@@ -467,7 +467,7 @@
       "path": "config/outreach_followup_policies_v1.json",
       "present": true,
       "sha256": "15D00B862BDA00CA04B12F9EF1AE567A8721A6F49AD2645FD2F7239E9F0AC9A1",
-      "worktree_eol_differs_from_git_blob": true
+      "worktree_eol_differs_from_git_blob": false
     },
     "outreach_response_template_registry": {
       "bytes": 18191,
@@ -475,7 +475,7 @@
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
       "present": true,
       "sha256": "CFB09BD4F7F1E047608BB171F90989C427AA973E47CA5FD4E11670B5E36C8908",
-      "worktree_eol_differs_from_git_blob": true
+      "worktree_eol_differs_from_git_blob": false
     }
   },
   "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
