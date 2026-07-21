@@ -8,7 +8,7 @@
 - Open gates: `16`
 - Supplemental applicability gaps: `5`
 - Submission ready for human click: `false`
-- Closeout SHA-256: `FF16CADA5C4BABDAC50A277048F2CAD8D7222B0952F00C6E65D64BB426265845`
+- Closeout SHA-256: `DFC129B533603E97E30BEDAB9E49100F78A0DAEF1D0DE39AE6633C091B14F612`
 
 ## Operating Targets
 

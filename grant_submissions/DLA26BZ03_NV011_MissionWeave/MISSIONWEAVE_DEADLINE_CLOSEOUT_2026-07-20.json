@@ -375,8 +375,8 @@
   "source_evidence": {
     "action_gate": {
       "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
-      "bytes": 14976,
-      "sha256": "1CEB2651C4604856B2D5C51E9C891FDC83FBBF4EC5C68B73F2C4C108B0146FD2"
+      "bytes": 15311,
+      "sha256": "9AA92963ECC09C6316148FC366D4E9CD70F846C7D4885E398A37DEBB099970D1"
     },
     "followup_queue": {
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
@@ -414,5 +414,5 @@
     "markdown": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DEADLINE_CLOSEOUT_2026-07-20.md"
   },
   "claim_boundary": "This closeout packet converts the current public action gate into an ordered human and portal worklist. It does not clear any private gate, certify cost support, establish CMMC or export-control status, prove JCP eligibility, authorize a Government submission, or establish receipt, acceptance, selection, funding, award, deployment, validation, or economic performance. It also does not establish completion of the separately listed human-subjects, animal-use, recombinant-DNA, FASCSA, or supply-chain applicability reviews.",
-  "closeout_sha256": "FF16CADA5C4BABDAC50A277048F2CAD8D7222B0952F00C6E65D64BB426265845"
+  "closeout_sha256": "DFC129B533603E97E30BEDAB9E49100F78A0DAEF1D0DE39AE6633C091B14F612"
 }

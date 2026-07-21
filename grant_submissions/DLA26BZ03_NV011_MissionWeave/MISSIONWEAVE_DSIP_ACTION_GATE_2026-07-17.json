@@ -42,7 +42,7 @@
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
   },
-  "gate_sha256": "2d7931b86f957482c8b8022337ea76bded4e41a76856a63d1653cf1d20fa1edb",
+  "gate_sha256": "b5a7b5391e74ad23d186c0bd7624ed0d6d6228413e283f8080eaa4b6bd9c6bda",
   "gate_summary": {
     "open_gate_count": 16,
     "passed_private_gate_count": 34,
@@ -154,7 +154,7 @@
       "VOLUME5_UPLOAD_SET"
     ]
   },
-  "generated_utc": "2026-07-21T04:12:56.618510+00:00",
+  "generated_utc": "2026-07-21T20:33:30.046061+00:00",
   "jcp_evidence_protocol": {
     "bare_boolean_can_clear_gate": false,
     "bytes": 4034,
@@ -256,9 +256,17 @@
     "receipt_integrity_pass": true,
     "receipt_present": true,
     "review_guardrails_preserved": true,
+    "workbook_content_failure_code": null,
+    "workbook_error_cell_count": 0,
+    "workbook_financials_derived_from_contents": true,
+    "workbook_formula_count": 88,
+    "workbook_formula_error_count": 0,
     "workbook_hash_matches_receipt": true,
+    "workbook_ooxml_valid": true,
     "workbook_present": true,
-    "workbook_size_matches_receipt": true
+    "workbook_sheet_names_match_receipt": true,
+    "workbook_size_matches_receipt": true,
+    "workbook_structure_valid": true
   },
   "schema": "lumencore.missionweave_dsip_action_gate.v1",
   "source_integrity": {
