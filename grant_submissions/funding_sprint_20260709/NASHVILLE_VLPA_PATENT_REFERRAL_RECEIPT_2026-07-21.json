@@ -1,0 +1,44 @@
+{
+  "schema": "lumencore.nashville_vlpa_patent_referral_receipt.v1",
+  "status": "SERVICE_SCOPE_DECLINE_WITH_REFERRAL_ROUTES_RECEIVED",
+  "organization": "Volunteer Lawyers and Professionals for the Arts",
+  "official_message": {
+    "observed_utc": "2026-07-21T22:34:44Z",
+    "event_type": "PATENT_SCOPE_DECLINE_AND_REFERRALS",
+    "patent_service_available": false,
+    "volunteer_patent_assistance_available": false
+  },
+  "referral_routes": [
+    {
+      "organization": "Nashville Bar Association",
+      "route": "Attorney referral program",
+      "official_url": "https://www.nashvillebar.org/?pg=NeedAnAttorneyContactUs",
+      "patent_assistance_confirmed": false
+    },
+    {
+      "organization": "Tennessee Bar Association",
+      "route": "Find-an-attorney referral program",
+      "official_url": "https://www.tba.org/?pg=find-an-attorney",
+      "patent_assistance_confirmed": false
+    },
+    {
+      "organization": "University of Tennessee College of Law Legal Clinic",
+      "route": "Law-school clinic inquiry",
+      "official_url": "https://winston.utk.edu/clinics/",
+      "patent_assistance_confirmed": false
+    }
+  ],
+  "routing_controls": {
+    "email_reply_required": false,
+    "proactive_followup_to_declining_organization_allowed": false,
+    "duplicate_send_allowed": false,
+    "next_action": "Close the VLPA route. Contact one official referral intake at a time for a limited-scope procedural deadline review, and disclose no unpublished application contents until confidentiality and representation terms are understood."
+  },
+  "privacy_controls": {
+    "application_number_recorded": false,
+    "application_title_recorded": false,
+    "private_message_identifiers_recorded": false,
+    "unpublished_application_contents_recorded": false
+  },
+  "claim_boundary": "This receipt records a service-scope decline and suggested referral routes only. It does not prove referral eligibility, attorney availability, representation, confidentiality, deadline status, legal advice, patentability, allowance, issuance, ownership, or enforceability."
+}

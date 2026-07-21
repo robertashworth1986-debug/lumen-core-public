@@ -33,6 +33,9 @@ NASHVILLE_FINANCIAL_AID_SUBMISSION_RECEIPT = (
 USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT = (
     SPRINT_DIR / "USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT_2026-07-21.json"
 )
+NASHVILLE_VLPA_PATENT_REFERRAL_RECEIPT = (
+    SPRINT_DIR / "NASHVILLE_VLPA_PATENT_REFERRAL_RECEIPT_2026-07-21.json"
+)
 LVLUP_REVIEW_CONFIRMATION = (
     SPRINT_DIR / "LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json"
 )
@@ -150,6 +153,7 @@ def build_payload() -> dict[str, Any]:
         NASHVILLE_FINANCIAL_AID_SUBMISSION_RECEIPT
     )
     uspto_access = read_json(USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT)
+    nashville_vlpa = read_json(NASHVILLE_VLPA_PATENT_REFERRAL_RECEIPT)
     lvlup = read_json(LVLUP_REVIEW_CONFIRMATION)
     darpa = read_json(DARPA_SN_26_97_RECEIPT)
     missionweave = read_json(MISSIONWEAVE_ACTION_GATE)
@@ -203,6 +207,22 @@ def build_payload() -> dict[str, Any]:
         is not False
     ):
         raise ValueError("USPTO Pro Se access guidance receipt is missing or unsafe")
+    if (
+        nashville_vlpa.get("schema")
+        != "lumencore.nashville_vlpa_patent_referral_receipt.v1"
+        or nashville_vlpa.get("status")
+        != "SERVICE_SCOPE_DECLINE_WITH_REFERRAL_ROUTES_RECEIVED"
+        or nashville_vlpa.get("official_message", {}).get(
+            "patent_service_available"
+        )
+        is not False
+        or len(nashville_vlpa.get("referral_routes", [])) != 3
+        or nashville_vlpa.get("routing_controls", {}).get(
+            "proactive_followup_to_declining_organization_allowed"
+        )
+        is not False
+    ):
+        raise ValueError("Nashville VLPA referral receipt is missing or unsafe")
     if (
         lvlup.get("schema")
         != "lumencore.lvlup_independent_review_confirmation.v1"
@@ -388,6 +408,28 @@ def build_payload() -> dict[str, Any]:
             "no_send_before": None,
             "do_not_duplicate_send": True,
             "next_action": uspto_access["routing_controls"]["next_action"],
+        },
+        {
+            "lane_id": "nashville_vlpa_patent_referral",
+            "organization": "Volunteer Lawyers and Professionals for the Arts",
+            "latest_event_type": "PATENT_SCOPE_DECLINE_AND_REFERRALS_RECEIVED",
+            "latest_event_utc": nashville_vlpa["official_message"]["observed_utc"],
+            "state": "PATENT_SERVICE_UNAVAILABLE_THREE_REFERRAL_ROUTES_IDENTIFIED",
+            "patent_service_available": False,
+            "referral_route_count": len(nashville_vlpa["referral_routes"]),
+            "referral_organizations": [
+                row["organization"] for row in nashville_vlpa["referral_routes"]
+            ],
+            "referral_acceptance_confirmed_count": sum(
+                1
+                for row in nashville_vlpa["referral_routes"]
+                if row["patent_assistance_confirmed"]
+            ),
+            "email_reply_required": False,
+            "send_now": False,
+            "no_send_before": None,
+            "do_not_duplicate_send": True,
+            "next_action": nashville_vlpa["routing_controls"]["next_action"],
         },
         {
             "lane_id": "lanl_vision_licensing_followup",
@@ -667,6 +709,7 @@ def build_payload() -> dict[str, Any]:
             "Funding, grant, contract, SBIR/STTR, DSIP, NSF, SAM.gov, and Research.gov",
             "Patent routing and Georgia PATENTS",
             "USPTO Pro Se procedural access guidance for an already-filed application",
+            "Nashville VLPA patent-scope decline and attorney-referral routes",
             "LANL VISION and licensing follow-up",
             "EPRI Open Power AI Consortium onboarding",
             "FHWA TSMO qualified-partner outreach",
@@ -721,6 +764,9 @@ def build_payload() -> dict[str, Any]:
             ),
             "uspto_pro_se_access_guidance_receipt": artifact_status(
                 USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT
+            ),
+            "nashville_vlpa_patent_referral_receipt": artifact_status(
+                NASHVILLE_VLPA_PATENT_REFERRAL_RECEIPT
             ),
             "lvlup_independent_review_confirmation": artifact_status(
                 LVLUP_REVIEW_CONFIRMATION
@@ -872,6 +918,22 @@ def validate_payload(payload: dict[str, Any]) -> None:
         or uspto["do_not_duplicate_send"] is not True
     ):
         raise ValueError("USPTO Pro Se access-path control is incomplete")
+    vlpa = next(
+        lane
+        for lane in payload["lanes"]
+        if lane["lane_id"] == "nashville_vlpa_patent_referral"
+    )
+    if (
+        vlpa["state"]
+        != "PATENT_SERVICE_UNAVAILABLE_THREE_REFERRAL_ROUTES_IDENTIFIED"
+        or vlpa["patent_service_available"] is not False
+        or vlpa["referral_route_count"] != 3
+        or vlpa["referral_acceptance_confirmed_count"] != 0
+        or vlpa["email_reply_required"] is not False
+        or vlpa["send_now"] is not False
+        or vlpa["do_not_duplicate_send"] is not True
+    ):
+        raise ValueError("Nashville VLPA referral control is incomplete")
     lvlup = next(
         lane for lane in payload["lanes"] if lane["lane_id"] == "lvlup_optional_paid_event"
     )

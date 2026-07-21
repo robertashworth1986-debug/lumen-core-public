@@ -36,14 +36,14 @@ def test_reconciliation_is_deterministic_and_no_send():
     module.validate_payload(actual)
     assert actual == expected
     assert actual["status"] == "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
-    assert actual["summary"]["lane_count"] == 17
+    assert actual["summary"]["lane_count"] == 18
     assert actual["summary"]["email_reply_required_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
-    assert actual["summary"]["duplicate_outbound_risk_count"] == 16
-    assert actual["summary"]["monitor_no_send_template_count"] == 16
+    assert actual["summary"]["duplicate_outbound_risk_count"] == 17
+    assert actual["summary"]["monitor_no_send_template_count"] == 17
     assert actual["summary"]["follow_up_mode_counts"] == {
         "ACCOUNT_ACTION": 1,
-        "CLOSED": 2,
+        "CLOSED": 3,
         "INBOUND_ONLY": 10,
         "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 2,
         "PORTAL_ACTION": 1,
@@ -211,6 +211,22 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert uspto["do_not_duplicate_send"] is True
     assert uspto["follow_up_policy"]["mode"] == "INBOUND_ONLY"
 
+    vlpa = lanes["nashville_vlpa_patent_referral"]
+    assert vlpa["latest_event_type"] == (
+        "PATENT_SCOPE_DECLINE_AND_REFERRALS_RECEIVED"
+    )
+    assert vlpa["latest_event_utc"] == "2026-07-21T22:34:44Z"
+    assert vlpa["state"] == (
+        "PATENT_SERVICE_UNAVAILABLE_THREE_REFERRAL_ROUTES_IDENTIFIED"
+    )
+    assert vlpa["patent_service_available"] is False
+    assert vlpa["referral_route_count"] == 3
+    assert vlpa["referral_acceptance_confirmed_count"] == 0
+    assert vlpa["email_reply_required"] is False
+    assert vlpa["send_now"] is False
+    assert vlpa["do_not_duplicate_send"] is True
+    assert vlpa["follow_up_policy"]["mode"] == "CLOSED"
+
     lanl = lanes["lanl_vision_licensing_followup"]
     assert lanl["follow_up_policy"] == {
         "lane_id": "lanl_vision_licensing_followup",
@@ -244,6 +260,9 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
         "present"
     ] is True
     assert source_evidence["uspto_pro_se_access_guidance_receipt"]["present"] is True
+    assert source_evidence["nashville_vlpa_patent_referral_receipt"][
+        "present"
+    ] is True
     assert source_evidence["lvlup_independent_review_confirmation"]["present"] is True
     assert source_evidence["darpa_sn_26_97_public_submission_receipt"]["present"] is True
     assert source_evidence["missionweave_dsip_action_gate"]["present"] is True

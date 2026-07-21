@@ -42,6 +42,14 @@
       "rationale": "Official guidance identifies account, identity-verification, and document-order access paths but does not confirm a deadline or application status; take the private account or phone action without sending another email."
     },
     {
+      "lane_id": "nashville_vlpa_patent_referral",
+      "mode": "CLOSED",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "VLPA confirmed patent matters are outside its scope and supplied three referral routes; close this route without a courtesy reply or duplicate request."
+    },
+    {
       "lane_id": "lanl_vision_licensing_followup",
       "mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
