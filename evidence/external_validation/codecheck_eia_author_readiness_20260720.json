@@ -368,7 +368,7 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T15:36:03.090332+00:00",
+  "generated_utc": "2026-07-21T15:51:21.270769+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "operator_clean_runner": {
     "assertion_count": 31,
@@ -579,14 +579,18 @@
     "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py": true,
     "code/ops/BUILD_CODECHECK_PREPRINT_PDF.py": true,
     "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py": true,
+    "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py": true,
     "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py": true,
     "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py": true,
     "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py": true,
     "codecheck.yml": true,
     "config/codecheck_eia_release_candidate_v1.json": true,
+    "config/codecheck_reviewer_container_v1.json": true,
     "config/codecheck_reviewer_runtime_v1.json": true,
     "config/external_validation_authority_docket_v1.json": true,
     "config/reviewer_reproducibility_protocol_v1.json": true,
+    "containers/codecheck-reviewer/Dockerfile": true,
+    "containers/codecheck-reviewer/run_capsule.sh": true,
     "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md": true,
     "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md": true,
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
@@ -598,15 +602,16 @@
     "requirements-reviewer-ubuntu-py311.lock": true,
     "tests/test_codecheck_eia_readiness.py": true,
     "tests/test_codecheck_eia_release_candidate.py": true,
+    "tests/test_codecheck_reviewer_container.py": true,
     "tests/test_codecheck_reviewer_runtime.py": true
   },
-  "portable_input_chain_sha256": "375ff009c868f4772f1592227902effcaa92f47d4a4ffac937651b4f27d7ad02",
+  "portable_input_chain_sha256": "c2f6f0c3ceaaf1eabffd5fc7a5d5dbf73df7e8153d5a1f99dea781acf8ff6d84",
   "portable_inputs": [
     {
-      "bytes": 6967,
+      "bytes": 7677,
       "hash_mode": "utf8_lf",
       "path": ".github/workflows/codecheck-eia-readiness.yml",
-      "sha256": "2c3780e8e5151e09c97b06c0edce00443321aea0e5a8abc3d565fc1a9e7085b8"
+      "sha256": "167b3e703c72bd3836e93097fd2c869c9c5d8dc308586d93d75aaa81936ff738"
     },
     {
       "bytes": 15541,
@@ -657,6 +662,12 @@
       "sha256": "3bae7284e69e08be04ccb5aa494e1b8e9885f48d7c1b4e469c0554a45b4e236c"
     },
     {
+      "bytes": 22374,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py",
+      "sha256": "b33403bb7dd5d2442551f66eb90b5027558ebb356ddbf74af6696cc70cee022e"
+    },
+    {
       "bytes": 45420,
       "hash_mode": "utf8_lf",
       "path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
@@ -675,16 +686,22 @@
       "sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c"
     },
     {
-      "bytes": 11569,
+      "bytes": 12253,
       "hash_mode": "utf8_lf",
       "path": "config/codecheck_eia_readiness_v1.json",
-      "sha256": "aeb3dd2199e7527c802c97dad927efbf1c55c54c16470aa91b97bf75c5e998f9"
+      "sha256": "b538b5a38487c35fa34c5f89b15104002c6a6ccc5dff4bfd5e7ab6053248a7b8"
     },
     {
-      "bytes": 5733,
+      "bytes": 5986,
       "hash_mode": "utf8_lf",
       "path": "config/codecheck_eia_release_candidate_v1.json",
-      "sha256": "c6b02a0cf8814aaf04fd163db8746a2d97022e063b0f0207987ce919ec464923"
+      "sha256": "276f935e630395c5020139fdb709f5c785c10043a0794ee5a4707c107f9650d1"
+    },
+    {
+      "bytes": 2601,
+      "hash_mode": "utf8_lf",
+      "path": "config/codecheck_reviewer_container_v1.json",
+      "sha256": "c31119548da537c1b0f5bdaa2331f26143f24dc6eb1184e4504ecba7795cb897"
     },
     {
       "bytes": 1480,
@@ -703,6 +720,18 @@
       "hash_mode": "utf8_lf",
       "path": "config/reviewer_reproducibility_protocol_v1.json",
       "sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1"
+    },
+    {
+      "bytes": 2235,
+      "hash_mode": "utf8_lf",
+      "path": "containers/codecheck-reviewer/Dockerfile",
+      "sha256": "746307528a39cfe7d8cfe6891d6926fce64ed2b812f9a5202a368755b58561e8"
+    },
+    {
+      "bytes": 1510,
+      "hash_mode": "utf8_lf",
+      "path": "containers/codecheck-reviewer/run_capsule.sh",
+      "sha256": "d7891b8c159e7a2437361fe46f51f9c211b12fed7b880d82dc1ce193ebb34714"
     },
     {
       "bytes": 3286,
@@ -765,10 +794,16 @@
       "sha256": "65be14b91d08b66ad784353ce01ea4b3d127fae52383df4536cea155d0b5b969"
     },
     {
-      "bytes": 6110,
+      "bytes": 6498,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_release_candidate.py",
-      "sha256": "602edf4ffa825ec2d825382577c1d0ac07fe1910bcce05c6db580d4150bd220f"
+      "sha256": "0aec1cc627ed055cb3a645d2561a42353eaea74f4ade2fdba99e7fde9cc4c2df"
+    },
+    {
+      "bytes": 7981,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_codecheck_reviewer_container.py",
+      "sha256": "2f91a5bf16e0daa49fb17c4eda58c0452aa3c66a9ff176bbe5838f0dfc99337d"
     },
     {
       "bytes": 6066,
@@ -815,10 +850,10 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "2909e70b90141d3b3a5f97c0f22e6f1a71e48ee2c6eac253b4c2b8ada02c154d",
+  "readiness_sha256": "3199bf62ae6038ef2166784ca6359f1b711397538c3d7441c71b9bffa1995dec",
   "release_candidate": {
-    "bundle_input_chain_sha256": "b1012db563e090ba4f6b4f6b752290336ea04cff983c218428536cfad5fe8f35",
-    "bundle_input_count": 36,
+    "bundle_input_chain_sha256": "877027655744e6a4d07d4d12a7ca17ea13a25813694f44dfef2b7c94c3f7c1d3",
+    "bundle_input_count": 41,
     "bundle_inputs": [
       {
         "bytes": 4832,
@@ -875,6 +910,12 @@
         "sha256": "5065f238b5cb221521a075ae1314bc2437ade1f7ffd17db5720d54cac38797d2"
       },
       {
+        "bytes": 22374,
+        "hash_mode": "utf8_lf",
+        "path": "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py",
+        "sha256": "b33403bb7dd5d2442551f66eb90b5027558ebb356ddbf74af6696cc70cee022e"
+      },
+      {
         "bytes": 45420,
         "hash_mode": "utf8_lf",
         "path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
@@ -899,10 +940,16 @@
         "sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880"
       },
       {
-        "bytes": 5733,
+        "bytes": 5986,
         "hash_mode": "utf8_lf",
         "path": "config/codecheck_eia_release_candidate_v1.json",
-        "sha256": "c6b02a0cf8814aaf04fd163db8746a2d97022e063b0f0207987ce919ec464923"
+        "sha256": "276f935e630395c5020139fdb709f5c785c10043a0794ee5a4707c107f9650d1"
+      },
+      {
+        "bytes": 2601,
+        "hash_mode": "utf8_lf",
+        "path": "config/codecheck_reviewer_container_v1.json",
+        "sha256": "c31119548da537c1b0f5bdaa2331f26143f24dc6eb1184e4504ecba7795cb897"
       },
       {
         "bytes": 1480,
@@ -933,6 +980,18 @@
         "hash_mode": "utf8_lf",
         "path": "config/reviewer_reproducibility_protocol_v1.json",
         "sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1"
+      },
+      {
+        "bytes": 2235,
+        "hash_mode": "utf8_lf",
+        "path": "containers/codecheck-reviewer/Dockerfile",
+        "sha256": "746307528a39cfe7d8cfe6891d6926fce64ed2b812f9a5202a368755b58561e8"
+      },
+      {
+        "bytes": 1510,
+        "hash_mode": "binary",
+        "path": "containers/codecheck-reviewer/run_capsule.sh",
+        "sha256": "d7891b8c159e7a2437361fe46f51f9c211b12fed7b880d82dc1ce193ebb34714"
       },
       {
         "bytes": 7640,
@@ -989,10 +1048,16 @@
         "sha256": "4b99049b4bc579f6d2a5a675e612f513e1a24db79775a2120e60334a0c72bbd4"
       },
       {
-        "bytes": 6110,
+        "bytes": 6498,
         "hash_mode": "utf8_lf",
         "path": "tests/test_codecheck_eia_release_candidate.py",
-        "sha256": "602edf4ffa825ec2d825382577c1d0ac07fe1910bcce05c6db580d4150bd220f"
+        "sha256": "0aec1cc627ed055cb3a645d2561a42353eaea74f4ade2fdba99e7fde9cc4c2df"
+      },
+      {
+        "bytes": 7981,
+        "hash_mode": "utf8_lf",
+        "path": "tests/test_codecheck_reviewer_container.py",
+        "sha256": "2f91a5bf16e0daa49fb17c4eda58c0452aa3c66a9ff176bbe5838f0dfc99337d"
       },
       {
         "bytes": 6066,
@@ -1115,16 +1180,20 @@
       "code/eia_grid_wave_champion_benchmark.py": true,
       "code/mda_control_mapping_open_set_benchmark.py": true,
       "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py": true,
+      "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py": true,
       "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py": true,
       "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py": true,
       "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py": true,
       "codecheck.yml": true,
       "config/codecheck_eia_release_candidate_v1.json": true,
+      "config/codecheck_reviewer_container_v1.json": true,
       "config/codecheck_reviewer_runtime_v1.json": true,
       "config/eia_grid_residual_moe_protocol_v1.json": true,
       "config/eia_grid_wave_champion_protocol_v1.json": true,
       "config/mda_control_mapping_open_set_protocol_v2.json": true,
       "config/reviewer_reproducibility_protocol_v1.json": true,
+      "containers/codecheck-reviewer/Dockerfile": true,
+      "containers/codecheck-reviewer/run_capsule.sh": true,
       "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md": true,
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
@@ -1135,6 +1204,7 @@
       "requirements-reviewer-ubuntu-py311.lock": true,
       "requirements-reviewer.txt": true,
       "tests/test_codecheck_eia_release_candidate.py": true,
+      "tests/test_codecheck_reviewer_container.py": true,
       "tests/test_codecheck_reviewer_runtime.py": true,
       "tests/test_eia_grid_residual_moe_benchmark.py": true,
       "tests/test_eia_grid_wave_champion_benchmark.py": true,
@@ -1153,16 +1223,20 @@
       "code/eia_grid_wave_champion_benchmark.py": true,
       "code/mda_control_mapping_open_set_benchmark.py": true,
       "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py": true,
+      "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py": true,
       "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py": true,
       "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py": true,
       "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py": true,
       "codecheck.yml": true,
       "config/codecheck_eia_release_candidate_v1.json": true,
+      "config/codecheck_reviewer_container_v1.json": true,
       "config/codecheck_reviewer_runtime_v1.json": true,
       "config/eia_grid_residual_moe_protocol_v1.json": true,
       "config/eia_grid_wave_champion_protocol_v1.json": true,
       "config/mda_control_mapping_open_set_protocol_v2.json": true,
       "config/reviewer_reproducibility_protocol_v1.json": true,
+      "containers/codecheck-reviewer/Dockerfile": true,
+      "containers/codecheck-reviewer/run_capsule.sh": true,
       "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md": true,
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
@@ -1173,6 +1247,7 @@
       "requirements-reviewer-ubuntu-py311.lock": true,
       "requirements-reviewer.txt": true,
       "tests/test_codecheck_eia_release_candidate.py": true,
+      "tests/test_codecheck_reviewer_container.py": true,
       "tests/test_codecheck_reviewer_runtime.py": true,
       "tests/test_eia_grid_residual_moe_benchmark.py": true,
       "tests/test_eia_grid_wave_champion_benchmark.py": true,

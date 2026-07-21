@@ -95,7 +95,12 @@ def test_bundle_has_fixed_metadata_exact_inputs_and_no_duplicate_names(tmp_path)
         assert (
             f"{root}/code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py" in names
         )
+        assert f"{root}/code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py" in names
+        assert f"{root}/config/codecheck_reviewer_container_v1.json" in names
         assert f"{root}/config/codecheck_reviewer_runtime_v1.json" in names
+        assert f"{root}/containers/codecheck-reviewer/Dockerfile" in names
+        assert f"{root}/containers/codecheck-reviewer/run_capsule.sh" in names
+        assert f"{root}/tests/test_codecheck_reviewer_container.py" in names
         assert (
             f"{root}/evidence/reproducibility/"
             "codecheck_reviewer_runtime_receipt_d60ae723_20260721.json"
