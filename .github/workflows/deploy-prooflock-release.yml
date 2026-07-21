@@ -67,6 +67,76 @@ jobs:
           persist-credentials: false
           ref: ${{ needs.authorize.outputs.source_commit }}
 
+      - name: Verify public repository reviewer contract
+        shell: bash
+        env:
+          PUBLIC_REPOSITORY: robertashworth1986-debug/lumen-core-public
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' | tee /tmp/prooflock-public-metadata-receipt.json
+          from datetime import datetime, timezone
+          import json
+          import os
+          from urllib.request import Request, urlopen
+
+          repository = os.environ["PUBLIC_REPOSITORY"]
+          expected = {
+              "description": "Proof-to-pilot AI validation architecture with reproducible benchmarks, cryptographic evidence custody, and fail-closed review gates.",
+              "homepage": "https://lumen-core.ai",
+              "visibility": "public",
+              "default_branch": "main",
+              "topics": [
+                  "ai-assurance",
+                  "infrastructure",
+                  "provenance",
+                  "reproducibility",
+                  "sbir",
+                  "validation",
+              ],
+          }
+
+          def fetch_json(url):
+              request = Request(
+                  url,
+                  headers={
+                      "Accept": "application/vnd.github+json",
+                      "User-Agent": "LumenCore-ProofLock-Release-Preflight",
+                      "X-GitHub-Api-Version": "2022-11-28",
+                  },
+              )
+              with urlopen(request, timeout=15) as response:
+                  return json.load(response)
+
+          repo_url = f"https://api.github.com/repos/{repository}"
+          repo = fetch_json(repo_url)
+          topics = fetch_json(f"{repo_url}/topics")
+          observed = {
+              "description": repo.get("description"),
+              "homepage": (repo.get("homepage") or "").rstrip("/"),
+              "visibility": repo.get("visibility"),
+              "default_branch": repo.get("default_branch"),
+              "topics": sorted(set(topics.get("names") or [])),
+          }
+          mismatches = [
+              field for field, value in expected.items() if observed.get(field) != value
+          ]
+          receipt = {
+              "schema": "lumencore.prooflock_public_repository_metadata_receipt.v1",
+              "checked_utc": datetime.now(timezone.utc).isoformat(),
+              "repository": repository,
+              "status": "PASS" if not mismatches else "HOLD",
+              "expected": expected,
+              "observed": observed,
+              "mismatches": mismatches,
+          }
+          print(json.dumps(receipt, indent=2, sort_keys=True))
+          if mismatches:
+              raise SystemExit(
+                  "Public repository metadata preflight failed: "
+                  + ", ".join(mismatches)
+              )
+          PY
+
       - name: Package the exact immutable ProofLock snapshot
         shell: bash
         run: |
@@ -157,6 +227,7 @@ jobs:
         with:
           name: prooflock-deploy-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            /tmp/prooflock-public-metadata-receipt.json
             /tmp/prooflock-package-receipt.json
             /tmp/prooflock-deploy-receipt.txt
             /tmp/prooflock-live-gate.json

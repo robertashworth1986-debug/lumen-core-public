@@ -25,6 +25,18 @@ PROOFLOCK_CI_WORKFLOW = (
     ROOT / ".github" / "workflows" / "prooflock-build-week-ci.yml"
 )
 DASHBOARD_WORKFLOW = ROOT / ".github" / "workflows" / "deploy.yml"
+PUBLIC_REPOSITORY_DESCRIPTION = (
+    "Proof-to-pilot AI validation architecture with reproducible benchmarks, "
+    "cryptographic evidence custody, and fail-closed review gates."
+)
+PUBLIC_REPOSITORY_TOPICS = (
+    "ai-assurance",
+    "infrastructure",
+    "provenance",
+    "reproducibility",
+    "sbir",
+    "validation",
+)
 
 
 def load_packager():
@@ -165,6 +177,15 @@ def test_workflows_encode_the_bounded_fail_closed_contract():
     assert '[[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]' in prooflock
     assert "environment:\n      name: production" in prooflock
     assert "known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}" in prooflock
+    assert "Verify public repository reviewer contract" in prooflock
+    assert "prooflock-public-metadata-receipt.json" in prooflock
+    assert "lumencore.prooflock_public_repository_metadata_receipt.v1" in prooflock
+    assert prooflock.index("Verify public repository reviewer contract") < prooflock.index(
+        "Package the exact immutable ProofLock snapshot"
+    )
+    assert PUBLIC_REPOSITORY_DESCRIPTION in prooflock
+    for topic in PUBLIC_REPOSITORY_TOPICS:
+        assert f'"{topic}"' in prooflock
     assert "StrictHostKeyChecking=no" not in prooflock
     assert prooflock.index('[[ "$APPROVAL" == "DEPLOY_PROOFLOCK_EXACT_SNAPSHOT" ]]') < prooflock.index(
         "Install SSH key"
@@ -204,18 +225,8 @@ def test_manual_release_bridge_preserves_the_exact_snapshot_gate():
     assert "exact 15-file current-head parity" in source
     assert "Assert-PublicRepositoryMetadata" in source
     assert "PUBLIC_METADATA_HOLD" in source
-    assert (
-        "Proof-to-pilot AI validation architecture with reproducible benchmarks, "
-        "cryptographic evidence custody, and fail-closed review gates."
-    ) in source
-    for topic in (
-        "ai-assurance",
-        "infrastructure",
-        "provenance",
-        "reproducibility",
-        "sbir",
-        "validation",
-    ):
+    assert PUBLIC_REPOSITORY_DESCRIPTION in source
+    for topic in PUBLIC_REPOSITORY_TOPICS:
         assert f'"{topic}"' in source
 
 
