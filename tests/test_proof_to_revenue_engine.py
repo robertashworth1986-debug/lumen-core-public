@@ -21,10 +21,19 @@ def test_proof_to_revenue_engine_promotes_manual_paid_pilot_not_overclaims():
     module = load_module()
     payload = module.build_payload()
     summary = payload["summary"]
+    live_summary = json.loads(module.LIVE_DOMAIN_JSON.read_text(encoding="utf-8"))["summary"]
+    expected_live_hash_verified = (
+        live_summary.get("domain_deployment_state") == "LIVE_DOMAIN_HASH_VERIFIED"
+        and bool(live_summary.get("live_domain_reviewer_ready"))
+    )
 
     assert payload["schema"] == "proof_to_revenue_engine_v1"
-    assert summary["live_domain_hash_verified"] is False
-    assert summary["revenue_stage"] == "proof_stack_not_ready_for_outreach"
+    assert summary["live_domain_hash_verified"] is expected_live_hash_verified
+    assert summary["revenue_stage"] == (
+        "manual_paid_pilot_scoping_ready"
+        if expected_live_hash_verified
+        else "proof_stack_not_ready_for_outreach"
+    )
     assert summary["manual_reviewed_outreach_allowed"] is True
     assert summary["send_without_user_review_allowed"] is False
     assert summary["bulk_email_allowed"] is False
@@ -57,10 +66,13 @@ def test_proof_to_revenue_markdown_answers_next_questions():
     module = load_module()
     payload = module.build_payload()
     rendered = module.render_markdown(payload)
+    live_hash_verified = payload["summary"]["live_domain_hash_verified"]
 
     assert "Proof To Revenue Engine" in rendered
     assert "Deployment Verification" in rendered
     assert "Field Validation Unlock" in rendered
     assert "What To Ask Next" in rendered
-    assert "Live domain hash verified: `false`" in rendered
-    assert "public hash verification is still pending" in rendered
+    assert f"Live domain hash verified: `{str(live_hash_verified).lower()}`" in rendered
+    assert (
+        "public hashes match" if live_hash_verified else "public hash verification is still pending"
+    ) in rendered

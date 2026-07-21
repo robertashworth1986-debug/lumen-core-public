@@ -259,6 +259,7 @@ def test_context_preserves_positive_negative_and_waiting_evidence():
     assert "No independent evaluator" in health["claim_boundary"]
     assert cards["locked_source_baseline_replay"]["facts"]["candidate_win_count"] > 0
     assert cards["locked_source_baseline_replay"]["facts"]["candidate_loss_or_tie_count"] > 0
+    assert cards["locked_source_baseline_replay"]["facts"]["energy_proxy_unique_source_replays"] > 0
     residual = cards["eia_residual_holm_holdout"]
     residual_facts = residual["facts"]
     assert residual["attained_maturity_level"] == 3

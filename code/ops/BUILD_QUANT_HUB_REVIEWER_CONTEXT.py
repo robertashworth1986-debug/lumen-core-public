@@ -1718,9 +1718,9 @@ def build_context() -> dict[str, Any]:
                     "energy_proxy_routes_replayed",
                     "locked_replay.summary",
                 ),
-                "energy_proxy_unique_series_replays": require_value(
+                "energy_proxy_unique_source_replays": require_value(
                     replay_summary,
-                    "energy_proxy_unique_series_replays",
+                    "energy_proxy_unique_source_replays",
                     "locked_replay.summary",
                 ),
                 "replay_chain_sha256": require_value(replay_summary, "replay_chain_sha256", "locked_replay.summary"),

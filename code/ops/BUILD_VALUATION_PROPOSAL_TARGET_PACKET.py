@@ -128,12 +128,15 @@ def proposal_target(champion: dict[str, Any], locked_summary: dict[str, Any], la
         "why_this_first": (
             "The strongest current proof is a narrow phase/timing result: "
             f"{champion.get('champion_label', 'Kuramoto phase coupling')} beat "
-            f"{champion.get('named_baseline', 'kalman_filter')} on "
-            f"{champion.get('holdout_wins', 24)}/{champion.get('holdout_count', 24)} source-conditioned holdout checks. "
+            f"{champion.get('champion_baseline', 'kalman_filter')} on "
+            f"{champion.get('champion_holdout_wins', 0)}/{champion.get('champion_holdout_count', 0)} "
+            "source-conditioned holdout checks. "
             f"The broader locked sweep adds {locked_summary.get('baseline_comparison_count', 0)} baseline comparisons across "
             f"{locked_summary.get('adapter_backed_routes', 0)} adapter-backed routes."
         ),
         "strongest_lane": wave_lane.get("lane", "wave_resonance_timing"),
+        "strongest_candidate": champion.get("champion_family", ""),
+        "strongest_candidate_label": champion.get("champion_label", ""),
         "proposal_ask": "20-minute technical fit call, then a paid evidence review or buyer-authorized replay.",
         "paid_review_scope_usd": {"low": 5000, "high": 15000, "status": "scoping_range_not_value_claim"},
         "validation_bridge_round": {
@@ -267,6 +270,7 @@ def build_payload() -> dict[str, Any]:
             "live_trading_or_autonomous_execution_allowed": False,
             "grant_award_certainty_allowed": False,
             "medical_or_treatment_claim_allowed": False,
+            "paid_technical_evaluation_scoping_allowed": True,
         },
     }
     payload["packet_sha256"] = stable_sha256(

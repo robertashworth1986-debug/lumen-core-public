@@ -207,6 +207,26 @@ def audit_healthcare_feed(at: datetime) -> dict[str, Any]:
     }
 
 
+def latest_run_blocker(audit: dict[str, Any]) -> str:
+    run_id = str(audit.get("run_id") or "unknown")
+    model_count = int(audit.get("model_count") or 0)
+    raw_csv_count = int(audit.get("raw_csv_count") or 0)
+    failures = audit.get("model_failures") if isinstance(audit.get("model_failures"), dict) else {}
+    if model_count == 0:
+        return (
+            f"Run {run_id} is blocked from comparative headline use because no parseable model-result rows are "
+            f"available. The {raw_csv_count:,} raw CSV files establish input presence only, not comparative performance."
+        )
+    if failures:
+        failure_summary = ", ".join(
+            f"{model}: {int(details.get('invalid_rows') or 0):,} invalid of {int(details.get('total_rows') or 0):,} rows"
+            for model, details in sorted(failures.items())
+            if isinstance(details, dict)
+        )
+        return f"Run {run_id} is blocked from comparative headline use because model outputs are incomplete ({failure_summary})."
+    return f"Run {run_id} has complete parseable model rows; use remains bounded by the declared evaluation design."
+
+
 def build_mindwise_demo_feed() -> dict[str, Any]:
     source = read_json(HEALTHCARE_FEED)
     source_records = source.get("records") if isinstance(source.get("records"), list) else []
@@ -375,9 +395,8 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
                 "window. Cross-dataset CV does not remove that within-series look-ahead. Rebuild features from each "
                 "training window as train-only inputs before making prospective routing claims."
             ),
-            "latest_run_blocker": (
-                "Run 20260526T050639Z is blocked from comparative headline use because i_sarima has no valid RMSE "
-                "on all 1,118 datasets while the scorecard still describes a classical comparison."
+            "latest_run_blocker": latest_run_blocker(
+                next((row for row in run_audits if row.get("run_id") == "20260526T050639Z"), {})
             ),
             "healthcare_feed": feed_audit,
         },

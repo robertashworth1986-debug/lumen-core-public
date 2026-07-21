@@ -39,10 +39,45 @@ def test_priority_engine_blocks_broken_latest_run_from_headline_use():
 
     latest = audits["20260526T050639Z"]
     assert latest["all_models_complete"] is False
-    assert latest["model_failures"]["i_sarima"]["invalid_rows"] == 1118
+    assert latest["model_count"] == 0
+    assert latest["model_failures"] == {}
+    assert latest["raw_csv_count"] == 1118
     assert latest["reviewer_use"] == "blocked_from_comparative_headline"
-    assert payload["evidence_audit"]["best_bounded_exploratory_run"] == "20260505T121657Z"
-    assert payload["evidence_audit"]["best_bounded_exploratory_dataset_count"] == 673
+    assert "no parseable model-result rows" in payload["evidence_audit"]["latest_run_blocker"]
+    assert "input presence only, not comparative performance" in payload["evidence_audit"]["latest_run_blocker"]
+    assert "i_sarima" not in payload["evidence_audit"]["latest_run_blocker"]
+    assert payload["evidence_audit"]["best_bounded_exploratory_run"] is None
+    assert payload["evidence_audit"]["best_bounded_exploratory_dataset_count"] is None
+
+
+def test_latest_run_blocker_reports_only_observed_model_failures():
+    module = load_module()
+    blocker = module.latest_run_blocker(
+        {
+            "run_id": "fixture",
+            "model_count": 1,
+            "raw_csv_count": 3,
+            "model_failures": {"candidate": {"invalid_rows": 2, "total_rows": 3}},
+        }
+    )
+
+    assert "candidate: 2 invalid of 3 rows" in blocker
+    assert "i_sarima" not in blocker
+
+
+def test_latest_run_blocker_keeps_complete_rows_bounded():
+    module = load_module()
+    blocker = module.latest_run_blocker(
+        {
+            "run_id": "fixture",
+            "model_count": 2,
+            "raw_csv_count": 3,
+            "model_failures": {},
+        }
+    )
+
+    assert "complete parseable model rows" in blocker
+    assert "bounded by the declared evaluation design" in blocker
 
 
 def test_priority_engine_exposes_router_and_feed_gates():
