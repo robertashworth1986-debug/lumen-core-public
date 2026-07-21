@@ -22,17 +22,6 @@ VERIFIER_SOURCE = (
     ROOT / "code" / "ops" / "VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py"
 )
 DEFAULT_OUTPUT_ROOT = ROOT / "out" / "reviewer_handoffs"
-DEFAULT_PUBLIC_MANIFEST = (
-    ROOT
-    / "evidence"
-    / "external_validation"
-    / "eia_grid_hourly_independent_reproduction_handoff_20260716.json"
-)
-DEFAULT_RECEIPT_TEMPLATE = (
-    ROOT
-    / "config"
-    / "eia_grid_hourly_independent_reproduction_receipt_template_v1.json"
-)
 SOURCE_ARTIFACTS = {
     "config/eia_grid_prospective_hourly_router_protocol_v1.json": (
         "config/eia_grid_prospective_hourly_router_protocol_v1.json"
@@ -99,6 +88,29 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
         encoding="utf-8",
         newline="\n",
     )
+
+
+def require_new_publish_targets(
+    public_manifest_path: Path,
+    receipt_template_path: Path,
+) -> None:
+    """Fail closed before a packet build can mutate published evidence."""
+
+    targets = {
+        "public manifest": public_manifest_path.resolve(),
+        "receipt template": receipt_template_path.resolve(),
+    }
+    if len(set(targets.values())) != len(targets):
+        raise ValueError("public manifest and receipt template must be distinct files")
+    for label, target in targets.items():
+        try:
+            target.relative_to(ROOT)
+        except ValueError as exc:
+            raise ValueError(f"{label} must remain under the repository root: {target}") from exc
+        if target.exists():
+            raise FileExistsError(
+                f"refusing to overwrite existing {label}: {target}; choose a new versioned path"
+            )
 
 
 def git_source_state() -> dict[str, Any]:
@@ -438,6 +450,7 @@ def build_packet(
     public_manifest_path: Path,
     receipt_template_path: Path,
 ) -> dict[str, Any]:
+    require_new_publish_targets(public_manifest_path, receipt_template_path)
     verifier = load_verifier()
     source_state = git_source_state()
     generated = datetime.now(timezone.utc)
@@ -573,20 +586,26 @@ def build_packet(
     }
 
 
-def main() -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument(
         "--public-manifest",
         type=Path,
-        default=DEFAULT_PUBLIC_MANIFEST,
+        required=True,
+        help="New, non-existing public handoff path under the repository root.",
     )
     parser.add_argument(
         "--receipt-template-output",
         type=Path,
-        default=DEFAULT_RECEIPT_TEMPLATE,
+        required=True,
+        help="New, non-existing reviewer receipt-template path under the repository root.",
     )
-    args = parser.parse_args()
+    return parser
+
+
+def main() -> int:
+    args = build_parser().parse_args()
     result = build_packet(
         output_root=args.output_root.resolve(),
         public_manifest_path=args.public_manifest.resolve(),

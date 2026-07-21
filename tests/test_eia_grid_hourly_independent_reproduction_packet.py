@@ -58,6 +58,51 @@ def test_packet_source_bytes_match_current_commit() -> None:
     assert state["byte_exact_source_count"] == state["tracked_source_count"]
 
 
+def test_publish_targets_are_explicit_distinct_and_append_only(tmp_path: Path) -> None:
+    builder = load_path(BUILDER_PATH, "eia_reproduction_builder_publish_policy")
+    public_manifest = ROOT / "out" / "reviewer_handoffs" / "new_handoff.json"
+    receipt_template = ROOT / "out" / "reviewer_handoffs" / "new_template.json"
+
+    builder.require_new_publish_targets(public_manifest, receipt_template)
+
+    with pytest.raises(ValueError, match="distinct files"):
+        builder.require_new_publish_targets(public_manifest, public_manifest)
+
+    existing = tmp_path / "existing.json"
+    existing.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="repository root"):
+        builder.require_new_publish_targets(existing, receipt_template)
+
+    existing = ROOT / "out" / "reviewer_handoffs" / "existing_test_target.json"
+    existing.parent.mkdir(parents=True, exist_ok=True)
+    existing.write_text("{}\n", encoding="utf-8")
+    try:
+        with pytest.raises(FileExistsError, match="refusing to overwrite"):
+            builder.require_new_publish_targets(existing, receipt_template)
+    finally:
+        existing.unlink()
+
+
+def test_cli_requires_explicit_publish_targets() -> None:
+    builder = load_path(BUILDER_PATH, "eia_reproduction_builder_cli_policy")
+
+    with pytest.raises(SystemExit):
+        builder.build_parser().parse_args([])
+
+    args = builder.build_parser().parse_args(
+        [
+            "--public-manifest",
+            "out/reviewer_handoffs/new_handoff.json",
+            "--receipt-template-output",
+            "out/reviewer_handoffs/new_template.json",
+        ]
+    )
+    assert args.public_manifest == Path("out/reviewer_handoffs/new_handoff.json")
+    assert args.receipt_template_output == Path(
+        "out/reviewer_handoffs/new_template.json"
+    )
+
+
 def write_json(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")

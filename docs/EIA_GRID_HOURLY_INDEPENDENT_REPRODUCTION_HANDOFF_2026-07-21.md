@@ -27,6 +27,8 @@ On a reviewer-controlled machine, verify the frozen packet bytes, recompute its 
 
 Raw runtime bytes and the ZIP remain outside the public repository. The public handoff binds the retained packet by filename, size, and hashes.
 
+Historical handoffs are append-only. The packet builder requires explicit, distinct publication paths under the repository root and refuses to overwrite an existing manifest or receipt template. A later packet must use new versioned paths; it must not rewrite this July 21 snapshot or the retained July 16 predecessor.
+
 ## Frozen Result
 
 - Source-panel rows: `88,628`
