@@ -1,7 +1,7 @@
 {
   "schema": "lumencore.deadline_integrity_repair_checkpoint.v1",
-  "created_utc": "2026-07-21T14:36:28.642474Z",
-  "source_commit": "dc1fb3b4a524d925a2f2ec6910d0c302f252660a",
+  "created_utc": "2026-07-21T14:38:37.203758Z",
+  "source_commit": "52c32134808f4aa6a7247fbdf089965a3893ecec",
   "source_branch": "codex/deadline-integrity-repair-20260721",
   "source_worktree_tracked_clean": true,
   "destination_root": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721",
@@ -222,25 +222,25 @@
     {
       "source": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
-      "bytes": 19132,
-      "sha256": "77A0708DD4569A0708C27D08B3B18E13A69D01416B151F1BA237D357497624C4",
-      "source_git_blob_oid": "0d8893f1c2b6fe10001dc7ab147a31d959cd8ead",
-      "commit_git_blob_oid": "0d8893f1c2b6fe10001dc7ab147a31d959cd8ead",
+      "bytes": 19135,
+      "sha256": "83BC474F20D8DE208C32AF69DCAF31583F43CBD6F2695F1F6EC37CAFD9FE8878",
+      "source_git_blob_oid": "9a6e824f0965665d06de6acc4f72f7deb697f95c",
+      "commit_git_blob_oid": "9a6e824f0965665d06de6acc4f72f7deb697f95c",
       "source_git_blob_match": true,
-      "copy_bytes": 19132,
-      "copy_sha256": "77A0708DD4569A0708C27D08B3B18E13A69D01416B151F1BA237D357497624C4",
+      "copy_bytes": 19135,
+      "copy_sha256": "83BC474F20D8DE208C32AF69DCAF31583F43CBD6F2695F1F6EC37CAFD9FE8878",
       "copy_sha256_matched": true
     },
     {
       "source": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
       "destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
       "bytes": 2938,
-      "sha256": "6EAB8362CC33777B002BDC4A454B552501CCEC5F5C0A3BEB2743B66DC41FAE36",
-      "source_git_blob_oid": "41d17ac66364837a0b25b0cbf2defdf130092bd0",
-      "commit_git_blob_oid": "41d17ac66364837a0b25b0cbf2defdf130092bd0",
+      "sha256": "B3A026E39FA68E3EEA420DA40F20AEEE52D974B94D797D0428BFE7A180523EDB",
+      "source_git_blob_oid": "86199f22a2d3cb74d3dd40494fd8a9cf0c665910",
+      "commit_git_blob_oid": "86199f22a2d3cb74d3dd40494fd8a9cf0c665910",
       "source_git_blob_match": true,
       "copy_bytes": 2938,
-      "copy_sha256": "6EAB8362CC33777B002BDC4A454B552501CCEC5F5C0A3BEB2743B66DC41FAE36",
+      "copy_sha256": "B3A026E39FA68E3EEA420DA40F20AEEE52D974B94D797D0428BFE7A180523EDB",
       "copy_sha256_matched": true
     },
     {
@@ -487,5 +487,5 @@
   "receipt_copy_destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/DEADLINE_INTEGRITY_REPAIR_CHECKPOINT_2026-07-21.json",
   "sidecar_copy_destination": "E:/LumaProofVault/SUBMISSIONS/DEADLINE_INTEGRITY_REPAIR_20260721/grant_submissions/funding_sprint_20260709/DEADLINE_INTEGRITY_REPAIR_CHECKPOINT_2026-07-21.json.sha256",
   "claim_boundary": "This receipt proves only that the listed public deadline-routing code, tests, and generated control surfaces matched the recorded Git commit after Git clean-filter normalization and that their exact checkout bytes were copied to the stated E-drive directory with matching SHA-256 hashes. It does not prove email transmission, portal submission, eligibility, certification, award, endorsement, external validation, technical performance, funding, or value. Final external and legal actions remain human-controlled.",
-  "receipt_payload_sha256": "0FA7F710DC73CCBA963A8AA074B8A09129053E664E8F9F57A5891C52C63796D4"
+  "receipt_payload_sha256": "C27B5292837B4E533B24563B013CF20DE68F1175995315BA43500F6E1962826F"
 }
