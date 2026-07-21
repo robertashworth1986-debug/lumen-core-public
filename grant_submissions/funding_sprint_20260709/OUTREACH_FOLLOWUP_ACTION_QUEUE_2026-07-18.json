@@ -308,7 +308,7 @@
       "4B5EDC6BCB11F72B7A0896FBEA672EC8C5DC1B9D19F4FDAD099AADF7E7C41D45"
     ]
   },
-  "queue_sha256": "747C8A200535D1288CD0EC1713E5BC15122F2490EC0D4034F91E3D1C6299944A",
+  "queue_sha256": "C515C1880E93939B9075CA591228F10D20174457226A192B8FB13D2CF09E5DDB",
   "routing_integrity_exceptions": [
     {
       "exception": "SENT_BEFORE_CONFIGURED_HOLD",
@@ -321,11 +321,11 @@
   "schema": "lumencore.outreach_followup_action_queue.v1",
   "source_evidence": {
     "email_reconciliation": {
-      "bytes": 23324,
-      "identity_source": "WORKTREE_BYTES",
+      "bytes": 22840,
+      "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "B041F5E7BD13BCA472F61D082ADC81BB576A7244F59331A8F0B4B204EC0EFC5A",
-      "worktree_eol_differs_from_git_blob": false
+      "sha256": "041AC2F3CC7DA1053BAEB8A99A4C0CA75D88632DDAAF463F5067FA8275E61A63",
+      "worktree_eol_differs_from_git_blob": true
     },
     "followup_policy_config": {
       "bytes": 5670,
