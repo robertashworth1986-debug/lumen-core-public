@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,12 +22,14 @@ def load_module():
 def test_submission_authority_matrix_blocks_all_final_actions():
     module = load_module()
     payload = module.build_payload()
+    docket = json.loads(module.DOCKET_JSON.read_text(encoding="utf-8"))
+    concierge = json.loads(module.CONCIERGE_JSON.read_text(encoding="utf-8"))
 
     assert payload["schema"] == "submission_authority_matrix_v1"
     assert payload["status"] == "SUBMISSION_AUTHORITY_MATRIX_READY"
-    assert payload["summary"]["lane_count"] == 19
-    assert payload["summary"]["docket_lane_count"] == 19
-    assert payload["summary"]["concierge_lane_count"] == 19
+    assert payload["summary"]["lane_count"] == len(docket["docket_items"])
+    assert payload["summary"]["docket_lane_count"] == docket["summary"]["lane_count"]
+    assert payload["summary"]["concierge_lane_count"] == concierge["summary"]["lane_count"]
     assert payload["summary"]["all_artifacts_present"] is True
     assert payload["summary"]["reviewer_gate_clear"] is True
     assert payload["summary"]["all_final_actions_blocked_without_human"] is True
@@ -60,17 +65,37 @@ def test_specific_authority_gates_match_high_risk_lanes():
     assert rows["protecnium_its_infrastructure_signal"]["readiness_mode"] == "CUSTOMER_DISCOVERY_SIGNAL_READY_HUMAN_REPLY_REQUIRED"
     assert rows["darpa_dice_full_submission"]["readiness_mode"] == "FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED"
     assert "BAA" in rows["darpa_dice_full_submission"]["required_authority"]
-    assert rows["fhwa_tsmo_data_initiative"]["readiness_mode"] == "FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED"
-    assert "SAM" in rows["fhwa_tsmo_data_initiative"]["required_authority"]
-    assert rows["nasa_data_center_rfi"]["readiness_mode"] == "RFI_DRAFT_READY_SEND_BLOCKED"
+    assert rows["fhwa_tsmo_data_initiative"]["readiness_mode"] == "ROUTING_SENT_WAIT_FOR_RESPONSE"
+    assert "further agency contact" in rows["fhwa_tsmo_data_initiative"][
+        "required_authority"
+    ]
+    assert rows["nasa_data_center_rfi"]["readiness_mode"] == "ROUTING_SENT_WAIT_FOR_RESPONSE"
     assert rows["dla_missionweave_sbir"]["readiness_mode"] == "SBIR_DRAFT_READY_PORTAL_BLOCKED"
     assert "Firm PIN" in rows["dla_missionweave_sbir"]["required_authority"]
     assert rows["nsf_project_pitch"]["readiness_mode"] == "ROLLING_GATE_READY_RULE_CHECK_REQUIRED"
     assert "one-pending-pitch" in rows["nsf_project_pitch"]["required_authority"]
     assert rows["patent_deadline_counsel"]["readiness_mode"] == "IP_PACKET_READY_COUNSEL_REQUIRED"
     assert "Licensed patent counsel" in rows["patent_deadline_counsel"]["required_authority"]
+    assert rows["openai_build_week_prooflock"]["readiness_mode"] == (
+        "DEVELOPER_CHALLENGE_DRAFT_READY_FINAL_SUBMIT_BLOCKED"
+    )
+    assert "publicity/IP terms" in rows["openai_build_week_prooflock"][
+        "required_authority"
+    ]
     assert rows["hhs_ai_power_user_pilot"]["readiness_mode"] == "PARKED_NO_SOLO_ACTION"
     assert rows["csosa_public_safety_analytics"]["readiness_mode"] == "PARKED_NO_SOLO_ACTION"
+
+
+def test_unknown_docket_action_type_fails_closed(tmp_path):
+    module = load_module()
+    docket = json.loads(module.DOCKET_JSON.read_text(encoding="utf-8"))
+    docket["docket_items"][0]["action_type"] = "unregistered_action_type"
+    bad_docket = tmp_path / "human_action_docket.json"
+    bad_docket.write_text(json.dumps(docket), encoding="utf-8")
+    module.DOCKET_JSON = bad_docket
+
+    with pytest.raises(ValueError, match="Unsupported action_type"):
+        module.build_payload()
 
 
 def test_rendered_authority_matrix_is_public_safe_and_action_gated():

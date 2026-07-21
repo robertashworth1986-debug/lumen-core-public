@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -16,9 +17,26 @@ def load_module():
     return module
 
 
-def test_federal_submission_protocol_packet_is_human_gated_and_ready():
+def build_with_safe_profile(module, tmp_path, monkeypatch):
+    profile = {
+        "company": {
+            "sam_gov_status": "verification_required",
+            "duns_or_uei": "TEST-UEI-NOT-REAL",
+            "cage_code": "TEST-CAGE",
+        },
+        "submission_readiness": {},
+    }
+    profile_path = tmp_path / "company_profile.safe-test.json"
+    profile_path.write_text(json.dumps(profile), encoding="utf-8")
+    monkeypatch.setattr(module, "PROFILE_JSON", profile_path)
+    return module.build_payload()
+
+
+def test_federal_submission_protocol_packet_is_human_gated_and_ready(
+    tmp_path, monkeypatch
+):
     module = load_module()
-    payload = module.build_payload()
+    payload = build_with_safe_profile(module, tmp_path, monkeypatch)
     summary = payload["summary"]
 
     assert payload["schema"] == "federal_submission_protocol_packet_v1"
@@ -40,9 +58,9 @@ def test_federal_submission_protocol_packet_is_human_gated_and_ready():
     assert len(payload["federal_submission_protocol_packet_sha256"]) == 64
 
 
-def test_official_sources_cover_federal_submission_lanes():
+def test_official_sources_cover_federal_submission_lanes(tmp_path, monkeypatch):
     module = load_module()
-    payload = module.build_payload()
+    payload = build_with_safe_profile(module, tmp_path, monkeypatch)
     urls = " ".join(source["url"] for source in payload["official_sources"])
 
     assert "https://sam.gov/entity-registration" in urls
@@ -66,9 +84,9 @@ def test_official_sources_cover_federal_submission_lanes():
         assert source["lumen_gate"]
 
 
-def test_submission_readiness_uses_safe_company_profile_summary():
+def test_submission_readiness_uses_safe_company_profile_summary(tmp_path, monkeypatch):
     module = load_module()
-    payload = module.build_payload()
+    payload = build_with_safe_profile(module, tmp_path, monkeypatch)
     readiness = payload["submission_readiness"]
 
     assert readiness["sam_gov_status"] == "verification_required"
@@ -78,12 +96,12 @@ def test_submission_readiness_uses_safe_company_profile_summary():
     assert "grants_gov_account_verified" in readiness["blocked_readiness_flags"]
     assert "aor_authority_verified" in readiness["blocked_readiness_flags"]
     assert "dsip_account_verified" in readiness["blocked_readiness_flags"]
-    assert readiness["profile_source"] == "data/company_profile.json"
+    assert readiness["profile_source"].endswith("company_profile.safe-test.json")
 
 
-def test_protocol_evidence_sources_are_present_and_hash_backed():
+def test_protocol_evidence_sources_are_present_and_hash_backed(tmp_path, monkeypatch):
     module = load_module()
-    payload = module.build_payload()
+    payload = build_with_safe_profile(module, tmp_path, monkeypatch)
     by_path = {row["path"]: row for row in payload["evidence_status"]}
 
     expected_fragments = [
@@ -95,7 +113,7 @@ def test_protocol_evidence_sources_are_present_and_hash_backed():
         "AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
         "DATA_ROOM_MANIFEST_2026-07-09.md",
         "FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
-        "data/company_profile.json",
+        "company_profile.safe-test.json",
     ]
 
     for fragment in expected_fragments:
@@ -106,9 +124,11 @@ def test_protocol_evidence_sources_are_present_and_hash_backed():
         assert len(row["sha256"]) == 64
 
 
-def test_rendered_protocol_packet_is_public_safe_and_human_gated():
+def test_rendered_protocol_packet_is_public_safe_and_human_gated(
+    tmp_path, monkeypatch
+):
     module = load_module()
-    payload = module.build_payload()
+    payload = build_with_safe_profile(module, tmp_path, monkeypatch)
     rendered = module.render_markdown(payload)
     lowered = rendered.lower()
 
@@ -150,3 +170,23 @@ def test_rendered_protocol_packet_is_public_safe_and_human_gated():
     ]
     for phrase in risky_claims + sensitive_markers:
         assert phrase not in lowered
+
+
+def test_missing_private_profile_blocks_protocol_without_inventing_readiness(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    monkeypatch.setattr(module, "PROFILE_JSON", tmp_path / "missing-profile.json")
+
+    payload = module.build_payload()
+    assert payload["status"] == "FEDERAL_SUBMISSION_PROTOCOL_BLOCKED"
+    readiness = payload["submission_readiness"]
+    assert readiness["sam_gov_status"] == ""
+    assert readiness["uei_present_locally"] is False
+    assert readiness["cage_present_locally"] is False
+    profile_row = next(
+        row for row in payload["evidence_status"] if "missing-profile.json" in row["path"]
+    )
+    assert profile_row["present"] is False
+    assert profile_row["bytes"] == 0
+    assert profile_row["sha256"] == ""

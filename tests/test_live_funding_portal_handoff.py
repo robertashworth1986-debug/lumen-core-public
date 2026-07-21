@@ -15,6 +15,12 @@ MIRROR_RECEIPT = (
     / "funding_sprint_20260709"
     / "NASHVILLE_EC_PORTAL_HANDOFF_E_DRIVE_SYNC_RECEIPT_2026-07-17.json"
 )
+MISSIONWEAVE_GATE = (
+    ROOT
+    / "grant_submissions"
+    / "DLA26BZ03_NV011_MissionWeave"
+    / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
+)
 
 
 def load_module():
@@ -49,6 +55,9 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
     module = load_module()
     payload = module.build_payload(date(2026, 7, 17))
     queue = sorted(payload["queue"], key=lambda row: row["priority"])
+    missionweave_summary = json.loads(
+        MISSIONWEAVE_GATE.read_text(encoding="utf-8")
+    )["gate_summary"]
 
     assert [row["opportunity_number"] for row in queue] == [
         "NASHVILLE-EC-FALL-2026",
@@ -60,12 +69,12 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
     nashville = queue[0]
     assert nashville["deadline_date"] == "2026-07-17"
     assert nashville["action_gate"] == {
-        "status": "READY_FOR_HIDDEN_FOUNDER_INPUT",
+        "status": "PORTAL_SUBMISSION_CONFIRMED",
         "submission_ready_for_human_click": False,
         "required_private_gate_count": 15,
-        "passed_private_gate_count": 0,
-        "open_gate_count": 15,
-        "private_input_present": False,
+        "passed_private_gate_count": 15,
+        "open_gate_count": 0,
+        "private_input_present": True,
         "private_values_exposed": False,
     }
     assert nashville["deadline_support"] == {
@@ -90,13 +99,25 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
     assert missionweave["deadline_utc"] == "2026-07-22T16:00:00Z"
     assert "July 22, 2025" in missionweave["official_deadline_text"]
     assert any("15-file manifest" in action for action in missionweave["next_safe_action"])
-    assert any("beyond 13/50" in action for action in missionweave["next_safe_action"])
+    assert any(
+        (
+            "beyond "
+            f"{missionweave_summary['passed_private_gate_count']}/"
+            f"{missionweave_summary['required_private_gate_count']}"
+        )
+        in action
+        for action in missionweave["next_safe_action"]
+    )
     assert missionweave["action_gate"] == {
         "status": "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN",
         "submission_ready_for_human_click": False,
-        "required_private_gate_count": 50,
-        "passed_private_gate_count": 13,
-        "open_gate_count": 37,
+        "required_private_gate_count": missionweave_summary[
+            "required_private_gate_count"
+        ],
+        "passed_private_gate_count": missionweave_summary[
+            "passed_private_gate_count"
+        ],
+        "open_gate_count": missionweave_summary["open_gate_count"],
         "private_input_present": True,
         "private_values_exposed": False,
         "private_capture_tool": (
@@ -127,7 +148,11 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
         assert item["external_send_allowed_without_human"] is False
         assert item["final_submit_allowed_without_human"] is False
         assert item["stop_conditions"]
-        assert item["human_gate"]
+        if item["opportunity_number"] == "NASHVILLE-EC-FALL-2026":
+            assert item["human_gate"] == []
+            assert item["action_gate"]["status"] == "PORTAL_SUBMISSION_CONFIRMED"
+        else:
+            assert item["human_gate"]
         assert len(item["source_lane_sha256"]) == 64
 
 
@@ -150,18 +175,26 @@ def test_rendered_handoff_is_public_safe_and_has_no_stale_send_state() -> None:
     module = load_module()
     payload = module.build_payload(date(2026, 7, 17))
     rendered = module.render_markdown(payload)
+    missionweave_summary = json.loads(
+        MISSIONWEAVE_GATE.read_text(encoding="utf-8")
+    )["gate_summary"]
 
     assert "Live Funding Portal Handoff" in rendered
     assert "Navigation before resume signal: `false`" in rendered
     assert "DLA26BZ03-NV011" in rendered
-    assert "Passed: `0/15`" in rendered
+    assert "Passed: `15/15`" in rendered
     assert "Status: `OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED`" in rendered
     assert "Do not duplicate: `true`" in rendered
     assert "Email is application: `false`" in rendered
     assert "Reply required: `false`" in rendered
     assert "Timezone explicit in message: `false`" in rendered
     assert "Operational timezone: `America/Chicago`" in rendered
-    assert "Passed: `13/50`" in rendered
+    assert (
+        "Passed: "
+        f"`{missionweave_summary['passed_private_gate_count']}/"
+        f"{missionweave_summary['required_private_gate_count']}`"
+        in rendered
+    )
     assert "EPRI administrative onboarding was sent" in rendered
     assert "referred the request to the subject matter expert" in rendered
     assert "bounded acknowledgment is sent" in rendered

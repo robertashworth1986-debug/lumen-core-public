@@ -46,7 +46,7 @@ def load_command_board(scan_date: date) -> dict[str, Any]:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     payload = module.build_payload(scan_date=scan_date)
-    if payload.get("schema") != "near_deadline_submission_command_board_v4":
+    if payload.get("schema") != "near_deadline_submission_command_board_v5":
         raise ValueError("Near-deadline command board is missing or stale")
     return payload
 

@@ -16,7 +16,7 @@ Current date for this docket: `2026-07-09`.
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Docket SHA-256: `695b7e30c1f30ff463b608ccd882462b7c7dc1be02d35c729ad1bbf802231fe3`
+- Docket SHA-256: `5eb747dad34eea3715881b09fc9ce535088c40da3fac36fc7156be07ec360499`
 
 ## Immediate And Urgent Lanes
 
@@ -259,10 +259,10 @@ Current date for this docket: `2026-07-09`.
 - Lane ID: `fhwa_tsmo_data_initiative`
 - Channel: `federal_contract`
 - Status: `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING`
-- Action type: `human_review`
+- Action type: `agency_routing_watch`
 - Urgency: `ROLLING_OR_EVENT_GATED`
 - Action due: `None`
-- Action: Monitor the referred response lead for scheduling or a specific question and do not reuse the rejected address. If no response arrives by July 21, send at most one short scheduling follow-up. Before any teaming or proposal claim, verify written role, documentable corporate experience, conflicts, references, facilities, data rights, and schedule.
+- Action: Wait for routing response; do not prepare a prime bid.
 - First artifact: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md`
 - Decision question: Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?
 - Human gate: Human verifies SAM attachments, terms, pricing, reps/certs, and final submission authority.
@@ -273,10 +273,10 @@ Current date for this docket: `2026-07-09`.
 - Lane ID: `nasa_data_center_rfi`
 - Channel: `federal_rfi`
 - Status: `SENT_VERIFIED_RESPONSE_PENDING`
-- Action type: `human_review`
+- Action type: `agency_routing_watch`
 - Urgency: `ROLLING_OR_EVENT_GATED`
 - Action due: `None`
-- Action: Retain the SENT receipt and attachment hash; do not resend before the deadline.
+- Action: Wait for routing response; do not prepare a prime bid.
 - First artifact: `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md`
 - Decision question: Does the response provide useful market intelligence without claiming award readiness?
 - Human gate: Human verifies official response instructions, page limits, contacts, and final send.
@@ -287,10 +287,10 @@ Current date for this docket: `2026-07-09`.
 - Lane ID: `dla_missionweave_sbir`
 - Channel: `federal_sbir`
 - Status: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`
-- Action type: `human_review`
+- Action type: `federal_sbir_build`
 - Urgency: `ROLLING_OR_EVENT_GATED`
 - Action due: `None`
-- Action: Resolve the 37 open gates out of 50, review the complete portal preview, and retain the human-only final-submit boundary.
+- Action: Prepare technical volume, cost notes, and Firm PIN handoff checklist.
 - First artifact: `grant_submissions/funding_sprint_20260709/DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md`
 - Decision question: Is the Phase I work scoped to produce independently reviewable technical evidence?
 - Human gate: Human-only Firm PIN, certifications, cost approval, and final submit.

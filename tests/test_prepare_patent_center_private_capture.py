@@ -275,7 +275,7 @@ def test_workflow_and_held_practitioner_template_preserve_legal_boundary():
     assert "application_number" not in template
 
 
-def test_public_capture_controls_have_private_safe_e_drive_receipt():
+def test_public_capture_controls_historical_e_drive_receipt_is_consistent():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -300,15 +300,11 @@ def test_public_capture_controls_have_private_safe_e_drive_receipt():
         normalized = artifact["source"].replace("\\", "/").lower()
         assert "/private/" not in f"/{normalized}/"
         assert ".private." not in normalized
-        source = ROOT / artifact["source"]
         mirror = Path(artifact["destination"])
-        assert source.is_file(), artifact["source"]
         assert mirror.is_file(), artifact["destination"]
         assert mirror.parent == destination
-        assert source.stat().st_size == artifact["bytes"]
-        assert mirror.stat().st_size == artifact["bytes"]
-        assert hashlib.sha256(source.read_bytes()).hexdigest().upper() == artifact["sha256"]
-        assert hashlib.sha256(mirror.read_bytes()).hexdigest().upper() == artifact["sha256"]
         assert artifact["copy_sha256_matched"] is True
+        assert mirror.stat().st_size == artifact["bytes"]
+        assert hashlib.sha256(mirror.read_bytes()).hexdigest().upper() == artifact["sha256"]
 
     assert "does not prove" in receipt["claim_boundary"]

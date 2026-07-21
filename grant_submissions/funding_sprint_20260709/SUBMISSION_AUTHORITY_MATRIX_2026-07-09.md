@@ -7,18 +7,18 @@ This matrix is not a submission approval. It separates preparation work from the
 ## Gate Status
 
 - Status: `SUBMISSION_AUTHORITY_MATRIX_READY`
-- Lanes: `19`
+- Lanes: `20`
 - All artifacts present: `true`
 - Reviewer gate clear: `true`
 - All final actions blocked without human: `true`
-- Internal prepare allowed: `17`
+- Internal prepare allowed: `18`
 - No-solo or partner-only lanes: `4`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
 - External send without human: `false`
 - Final submission without human: `false`
 - Live trading allowed: `false`
-- Authority matrix SHA-256: `cffd27222b02fb13a027d956d1fb7e86293cfd89f77e09f79ce79a7b92d1ea4d`
+- Authority matrix SHA-256: `fde935ca74a10d1be801cd4163602791d4543683bbaaf98cd49b3a810398e14e`
 
 ## Authority Rows
 
@@ -50,7 +50,7 @@ Pre-action checks:
 
 - Lane ID: `evtit_blackdog_inkind`
 - Channel: `venture_engineering`
-- Status: `RESET_NOTE_SENT_TECH_REVIEW_PENDING`
+- Status: `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY`
 - Action type: `meeting_prep`
 - Urgency: `IMMEDIATE_24H`
 - Action due: `2026-07-09`
@@ -61,9 +61,9 @@ Pre-action checks:
 - Can accept terms without human: `false`
 - Required authority: Robert attends the meeting and approves any follow-up, build scope, or equity-for-services discussion.
 - First artifact: `grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md`
-- Claim boundary: Meeting and application evidence only; no investment, services award, or partnership has been accepted.
+- Claim boundary: The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.
 - Decision question: Can an in-kind engineering team accelerate proof portal, replay runner, manifest, and pilot onboarding?
-- Row SHA-256: `9ae3b0c8de662759cdbbd5d69c863a5705590071dcdb60efb36119b8edf3faeb`
+- Row SHA-256: `32aa3a13f85a34a7ee61ec70c93f0fcb711921eceb2d5a02cc1aabc08159afa7`
 
 Pre-action checks:
 - Use only the public proof links and sanitized packet artifacts.
@@ -74,7 +74,7 @@ Pre-action checks:
 
 - Lane ID: `lanl_vision_licensing_followup`
 - Channel: `federal_lab_tech_transfer`
-- Status: `WAITING_POC_RETURN`
+- Status: `OUTBOUND_SENT_RESPONSE_PENDING`
 - Action type: `lab_poc_followup`
 - Urgency: `URGENT_5D`
 - Action due: `2026-07-13`
@@ -85,9 +85,9 @@ Pre-action checks:
 - Can accept terms without human: `false`
 - Required authority: Robert approves any lab POC reply, NDA, licensing discussion, export-control response, or disclosure packet.
 - First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
-- Claim boundary: This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.
+- Claim boundary: The Gmail SENT record and attachment hash prove transmission only. They do not establish LANL receipt, evaluation, a license, endorsement, independent validation, a pilot, funding, deployment, or contract performance.
 - Decision question: Is there a bounded licensing or validation conversation worth pursuing with the named lab POC?
-- Row SHA-256: `475e6f42562f1c09b1a01611185c5d97f99665d7f8010b39ab897219c378e6d6`
+- Row SHA-256: `ee71b1b1e223f7f50a7a8590e7b768f52113dd9e8ac3a801b78dd0aa8a7dca41`
 
 Pre-action checks:
 - Keep the note limited to licensing-fit and validation questions.
@@ -98,7 +98,7 @@ Pre-action checks:
 
 - Lane ID: `lvlup_first_check`
 - Channel: `venture_cash`
-- Status: `WAITING_REVIEW`
+- Status: `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED`
 - Action type: `investor_watch`
 - Urgency: `ACTIVE_14D`
 - Action due: `2026-07-16`
@@ -109,20 +109,44 @@ Pre-action checks:
 - Can accept terms without human: `false`
 - Required authority: Robert approves any investor reply, diligence material, investor terms, or capital commitment.
 - First artifact: `grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md`
-- Claim boundary: Submission and acknowledgement only; no funding decision is represented.
+- Claim boundary: This receipt proves only that LvlUp Ventures stated in writing that declining the sponsor-backed track would not affect the separate investment and accelerator review and that the application would continue through its standard investment process. It does not prove Investment Committee consideration, diligence, selection, investment interest, funding, accelerator admission, endorsement, validation, or an offer.
 - Decision question: Is a small first check useful enough to preserve execution velocity and unlock pilots?
-- Row SHA-256: `f859089a74b4cf5796d801b5c393742ee1c1b8594536a1ce6a5ba3a1b79db195`
+- Row SHA-256: `10352b289f2a514a32f642de4b28359bf88d8df342b73f1ed66f47e4628fd0aa`
 
 Pre-action checks:
 - Send only requested materials or a measured follow-up after the review window.
 - Reconfirm no performance, revenue, valuation, or award claim is overstated.
 - Human reviews any instrument, SAFE, note, equity, or services term.
 
+### 2. OpenAI Build Week - ProofLock Console
+
+- Lane ID: `openai_build_week_prooflock`
+- Channel: `developer_challenge`
+- Status: `PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN`
+- Action type: `developer_challenge_build`
+- Urgency: `ACTIVE_14D`
+- Action due: `2026-07-21`
+- Readiness mode: `DEVELOPER_CHALLENGE_DRAFT_READY_FINAL_SUBMIT_BLOCKED`
+- Can prepare internally: `true`
+- Can send externally without human: `false`
+- Can submit without human: `false`
+- Can accept terms without human: `false`
+- Required authority: Robert verifies the exact public build, model and session provenance, video, publicity/IP terms, rules, certifications, and final challenge submission.
+- First artifact: `grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.md`
+- Claim boundary: This is a verified project-readiness lane, not proof of Devpost registration, model identity, final submission, eligibility acceptance, judging outcome, OpenAI endorsement, prize entitlement, external validation, or commercial value.
+- Decision question: Does the post-start ProofLock extension provide a coherent, non-trivial, judge-testable developer tool?
+- Row SHA-256: `04e6013b132a4994db6e8c5858bbdad130a45dde96841cb6afd64c796ec240ac`
+
+Pre-action checks:
+- Bind the demo and receipts to the exact public commit before making readiness claims.
+- Record the exact model label and qualifying feedback Session ID without guessing.
+- Human reviews publicity/IP terms, rules, certifications, and the final submit action.
+
 ### 3. USPTO / Georgia PATENTS pro bono routing
 
 - Lane ID: `uspto_georgia_patents_route`
 - Channel: `ip_readiness`
-- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Status: `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING`
 - Action type: `licensed_counsel_review`
 - Urgency: `IMMEDIATE_24H`
 - Action due: `2026-07-10`
@@ -133,9 +157,9 @@ Pre-action checks:
 - Can accept terms without human: `false`
 - Required authority: Licensed patent counsel and Robert decide any filing, continuation, PCT, disclosure, or claim strategy action.
 - First artifact: `grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md`
-- Claim boundary: This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.
+- Claim boundary: This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.
 - Decision question: What filing or claim action must licensed counsel verify before public expansion?
-- Row SHA-256: `e66aed7beadedf4374a8b9fe19381c5595026e6f98cd26152904f7c2608a1517`
+- Row SHA-256: `6988f829a123f4749cad8a343f026e6905371751fca4cab4519122cd185cd42d`
 
 Pre-action checks:
 - Prepare filed materials and claim-boundary packet.
@@ -170,55 +194,55 @@ Pre-action checks:
 
 - Lane ID: `fhwa_tsmo_data_initiative`
 - Channel: `federal_contract`
-- Status: `PHASE_I_TECH_VOLUME`
-- Action type: `federal_contract_build`
-- Urgency: `WATCHLIST`
-- Action due: `2026-08-03`
-- Readiness mode: `FEDERAL_DRAFT_READY_SUBMISSION_BLOCKED`
+- Status: `QUALIFIED_RESPONSE_LEAD_REFERRAL_ACKNOWLEDGED_FIT_CHECK_PENDING`
+- Action type: `agency_routing_watch`
+- Urgency: `ROLLING_OR_EVENT_GATED`
+- Action due: `None`
+- Readiness mode: `ROUTING_SENT_WAIT_FOR_RESPONSE`
 - Can prepare internally: `true`
 - Can send externally without human: `false`
 - Can submit without human: `false`
 - Can accept terms without human: `false`
-- Required authority: Robert verifies SAM access, solicitation attachments, pricing, reps/certs, and authorized representative status before submission.
+- Required authority: Robert approves any further agency contact after a routing response.
 - First artifact: `grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md`
-- Claim boundary: Prepared capability material only; no FHWA field result, safety benefit, or deployment claim.
+- Claim boundary: The Gmail records prove that the first route was rejected, the replacement message received a substantive reply, the request was referred to the subject matter expert leading this response, and one bounded acknowledgment was sent in that thread. The referral does not establish pursuit, a fit-check commitment, a teaming relationship, permission to cite corporate experience, independent validation, proposal compliance, submission, award, or funding.
 - Decision question: Can LumenCore contribute a bounded evidence workflow without overstating operational deployment?
-- Row SHA-256: `d2256582834310d33c94d80423a545ae3a37b4f73dce24d32b80e3a98a09cdcd`
+- Row SHA-256: `43a342b1457d3e80aca5c62e7ccac5af82a4186041314f7a61c85391184fa9dc`
 
 Pre-action checks:
-- Verify current SAM.gov package, amendments, contacts, due time, and required volumes.
-- Human approves price, exceptions, representations, and signature authority.
-- Keep claims bounded to proof-to-pilot evidence and no field deployment claim.
+- Do not prepare a hardware or prime quote.
+- Wait for routing signal or partner path.
+- Human approves any follow-up message.
 
 ### 5. NASA Data Center Infrastructure RFI
 
 - Lane ID: `nasa_data_center_rfi`
 - Channel: `federal_rfi`
-- Status: `RFI_RESPONSE_PREP`
-- Action type: `federal_rfi_build`
-- Urgency: `ACTIVE_14D`
-- Action due: `2026-07-17`
-- Readiness mode: `RFI_DRAFT_READY_SEND_BLOCKED`
+- Status: `SENT_VERIFIED_RESPONSE_PENDING`
+- Action type: `agency_routing_watch`
+- Urgency: `ROLLING_OR_EVENT_GATED`
+- Action due: `None`
+- Readiness mode: `ROUTING_SENT_WAIT_FOR_RESPONSE`
 - Can prepare internally: `true`
 - Can send externally without human: `false`
 - Can submit without human: `false`
 - Can accept terms without human: `false`
-- Required authority: Robert verifies official RFI instructions, contact address, page limits, and final send approval.
+- Required authority: Robert approves any further agency contact after a routing response.
 - First artifact: `grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md`
-- Claim boundary: RFI response only; no NASA partnership, contract, or infrastructure result is represented.
+- Claim boundary: Transmission does not establish agency acceptance, evaluation, validation, an award, or a contract.
 - Decision question: Does the response provide useful market intelligence without claiming award readiness?
-- Row SHA-256: `3c43d66a4253d5452bb50bb8391fa21fee1f7dfe557383979b9b2892a373aec2`
+- Row SHA-256: `5ce8e861d5a62299ec51cb11df3650e20df92e82688bf0ba6585372314dcf042`
 
 Pre-action checks:
-- Verify official response instructions and deadline.
-- Use market-research framing, not award or deployment language.
-- Human approves final email or portal upload.
+- Do not prepare a hardware or prime quote.
+- Wait for routing signal or partner path.
+- Human approves any follow-up message.
 
 ### 6. DLA MissionWeave DSIP SBIR
 
 - Lane ID: `dla_missionweave_sbir`
 - Channel: `federal_sbir`
-- Status: `DSIP_PACKAGE_PREP`
+- Status: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`
 - Action type: `federal_sbir_build`
 - Urgency: `ROLLING_OR_EVENT_GATED`
 - Action due: `None`
@@ -229,9 +253,9 @@ Pre-action checks:
 - Can accept terms without human: `false`
 - Required authority: Robert controls DSIP or SBIR portal login, Firm PIN, cost approval, certifications, and final submit.
 - First artifact: `grant_submissions/funding_sprint_20260709/DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md`
-- Claim boundary: No DLA integration, procurement, or certified readiness claim.
+- Claim boundary: This public gate proves package integrity, document-format checks, and the completion state of a bounded private DSIP fact workflow. It does not expose legal identifiers, a Firm PIN, the assigned proposal number, private portal evidence, or unsupported compliance facts. It does not establish DLA validation, CMMC status, ITAR compliance, award eligibility, proposal acceptance, submission, selection, contract, award, deployment, or realized performance.
 - Decision question: Is the Phase I work scoped to produce independently reviewable technical evidence?
-- Row SHA-256: `d0b0ddda5e4ced10566358c955109563c5f40ff61659d4b4c51c26b38cf4fdca`
+- Row SHA-256: `6aa6937e969fbea3c7081da7587d1e7602c2be36be45084d060f634386dc9bc7`
 
 Pre-action checks:
 - Human enters Firm PIN and confirms organization authority.
@@ -458,7 +482,7 @@ Pre-action checks:
 
 - Lane ID: `patent_deadline_counsel`
 - Channel: `ip_readiness`
-- Status: `PRO_BONO_ROUTE_IDENTIFIED_HUMAN_ACTION_REQUIRED`
+- Status: `OUTBOUND_SENT_INTAKE_RESPONSE_PENDING`
 - Action type: `licensed_counsel_review`
 - Urgency: `WATCHLIST`
 - Action due: `2026-07-25`
@@ -469,9 +493,9 @@ Pre-action checks:
 - Can accept terms without human: `false`
 - Required authority: Licensed patent counsel and Robert decide any filing, continuation, PCT, disclosure, or claim strategy action.
 - First artifact: `grant_submissions/funding_sprint_20260709/IP_PATENT_CLAIM_BOUNDARY_REGISTER_2026-07-09.md`
-- Claim boundary: This ledger is not legal advice and does not assert patentability, ownership, or filing sufficiency.
+- Claim boundary: This receipt records transmission of a nonconfidential intake-routing inquiry only. It does not establish program eligibility, acceptance, attorney-client representation, confidentiality, a verified USPTO deadline, preservation of rights, patentability, prosecution status, funding, or legal advice.
 - Decision question: What filing or claim action must licensed counsel verify before public expansion?
-- Row SHA-256: `c2eff942129bb6ce895de0f2d1e8968b9e69bab695030a9ac35addca7da2ef2c`
+- Row SHA-256: `bf67022a02f14f484dc180c9c36367a65c7ac0ac82bdeea786d94a98ebb5145c`
 
 Pre-action checks:
 - Prepare filed materials and claim-boundary packet.

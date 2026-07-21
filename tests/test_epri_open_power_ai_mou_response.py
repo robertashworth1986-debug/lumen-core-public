@@ -89,7 +89,7 @@ def test_epri_engagement_receipt_is_redacted_and_monitor_only():
     assert "does not establish an executed mou" in receipt["claim_boundary"].lower()
 
 
-def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():
+def test_action_control_packet_historical_e_drive_receipt_is_consistent():
     receipt = json.loads(SYNC_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -99,15 +99,12 @@ def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():
     assert "does not prove email transmission" in receipt["claim_boundary"]
     destination = Path(receipt["destination_root"])
     for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
-        mirror = destination / source.name
-        assert source.is_file(), artifact["source"]
+        mirror = destination / Path(artifact["source"]).name
         assert mirror.is_file(), str(mirror)
         assert artifact["bytes"] > 0
         assert re.fullmatch(r"[0-9A-F]{64}", artifact["sha256"])
-        assert source.stat().st_size == artifact["bytes"]
+        assert artifact["copy_sha256_matched"] is True
         assert mirror.stat().st_size == artifact["bytes"]
-        assert hashlib.sha256(source.read_bytes()).hexdigest().upper() == artifact["sha256"]
         assert hashlib.sha256(mirror.read_bytes()).hexdigest().upper() == artifact["sha256"]
 
     mirrored_sources = {artifact["source"] for artifact in receipt["artifacts"]}

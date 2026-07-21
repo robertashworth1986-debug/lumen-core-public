@@ -1288,19 +1288,21 @@ def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
     submission_period = facts.get("submission_period", {})
     counts = readiness.get("counts", {})
     project = readiness.get("project", {})
-    if (
-        readiness.get("schema")
-        != "lumencore.openai_build_week_submission_readiness.v1"
-        or readiness.get("status")
-        != "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
-        or readiness.get("core_ready") is not True
-        or readiness.get("ready_for_final_submission") is not False
-        or submission_period.get("deadline_central")
-        != "2026-07-21T19:00:00-05:00"
-        or counts.get("gate_total") != counts.get("pass", 0) + counts.get("open", 0)
-        or counts.get("fail") != 0
-    ):
-        raise ValueError("OpenAI Build Week readiness control is missing or stale")
+    control_errors: list[str] = []
+    if readiness.get("schema") != "lumencore.openai_build_week_submission_readiness.v1":
+        control_errors.append("schema")
+    if readiness.get("status") != "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN":
+        control_errors.append("status")
+    if readiness.get("core_ready") is not True:
+        control_errors.append("core_ready")
+    if readiness.get("ready_for_final_submission") is not False:
+        control_errors.append("ready_for_final_submission")
+    if submission_period.get("deadline_central") != "2026-07-21T19:00:00-05:00":
+        control_errors.append("deadline_central")
+    if counts.get("gate_total") != counts.get("pass", 0) + counts.get("open", 0):
+        control_errors.append("gate_count_reconciliation")
+    if counts.get("fail") != 0:
+        control_errors.append("failed_gate_count")
 
     integrity_errors: list[str] = []
     for item in readiness.get("app_artifacts", []):
@@ -1314,11 +1316,11 @@ def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
             or hashlib.sha256(data).hexdigest() != item.get("sha256")
         ):
             integrity_errors.append(f"hash_or_size:{item.get('path')}")
-    if integrity_errors:
-        raise ValueError(
-            "OpenAI Build Week app artifact verification failed: "
-            + ", ".join(integrity_errors)
-        )
+    source_integrity_pass = not control_errors and not integrity_errors
+    source_blockers = [
+        *(f"control:{error}" for error in control_errors),
+        *(f"artifact:{error}" for error in integrity_errors),
+    ]
 
     outputs = readiness.get("outputs", {})
     return {
@@ -1332,9 +1334,22 @@ def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
         "deadline_date": "2026-07-21",
         "official_deadline_text": "July 21, 2026 at 5:00 PM Pacific / 7:00 PM Central",
         "deadline_semantics": "OFFICIAL_RULES_DEADLINE_VERIFIED",
-        "command": "STAGE_APPLICATION",
-        "eligibility_state": "CORE_PROJECT_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
-        "fit_state": "DEVELOPER_TOOLS_WORKING_PROJECT_STRONG_FIT",
+        "command": (
+            "STAGE_APPLICATION"
+            if source_integrity_pass
+            else FRESHNESS_BLOCKED_COMMAND
+        ),
+        "pre_freshness_command": "STAGE_APPLICATION",
+        "eligibility_state": (
+            "CORE_PROJECT_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
+            if source_integrity_pass
+            else "SOURCE_INTEGRITY_RECONCILIATION_REQUIRED"
+        ),
+        "fit_state": (
+            "DEVELOPER_TOOLS_WORKING_PROJECT_STRONG_FIT"
+            if source_integrity_pass
+            else "DEVELOPER_TOOLS_FIT_HELD_FOR_SOURCE_RECONCILIATION"
+        ),
         "submission_route": "Devpost submission manager",
         "official_url": requirements.get("official_sources", {}).get("overview"),
         "secondary_url": requirements.get("official_sources", {}).get(
@@ -1356,21 +1371,53 @@ def build_openai_build_week_lane(readiness: dict[str, Any]) -> dict[str, Any]:
         "feedback_session_id_present": bool(project.get("feedback_session_id")),
         "confirmed_model_present": bool(project.get("confirmed_model")),
         "scoped_tree": project.get("scoped_tree"),
-        "why_now": (
-            "This is the nearest unresolved submission deadline. The working core, public "
-            "repository, license, and post-start evidence pass; the public demo, model label, "
-            "/feedback Session ID, video, Devpost registration, and final review remain open."
+        "source_integrity_pass": source_integrity_pass,
+        "source_control_errors": control_errors,
+        "source_artifact_errors": integrity_errors,
+        "source_recheck_required": not source_integrity_pass,
+        "freshness_blockers": source_blockers,
+        "source_freshness_status": (
+            "CURRENT_WITHIN_PINNED_ARTIFACT_SET"
+            if source_integrity_pass
+            else "BLOCKED_REVERIFY_REQUIRED"
         ),
-        "today_work": [
-            "Deploy the self-contained console to a stable public URL and verify every sample artifact fetch.",
-            "Capture the exact project-building model label and the /feedback Session ID without guessing.",
-            "Record and privacy-review the bounded demonstration, keep it under three minutes with audio, and publish it to YouTube.",
-            "Populate the Devpost draft and stop for publicity, IP, certification, and final-submit review.",
-        ],
-        "human_gate": [
-            "Robert provides the exact model label and /feedback Session ID from the qualifying task.",
-            "Robert reviews the public demo video, Devpost publicity/IP terms, certifications, and final submission.",
-        ],
+        "source_data_current": source_integrity_pass,
+        "deadline_actionable": source_integrity_pass,
+        "deadline_currently_verified": True,
+        "why_now": (
+            "This is the nearest unresolved submission deadline. The readiness control and "
+            "local app artifacts reconcile; the public demo, model label, /feedback Session "
+            "ID, video, Devpost registration, and final review remain open."
+            if source_integrity_pass
+            else "This is the nearest unresolved submission deadline, but its readiness control "
+            "does not reconcile to the current local app artifacts. Hold staging claims until "
+            "the exact public commit, artifact manifest, and submission fields are refreshed."
+        ),
+        "today_work": (
+            [
+                "Deploy the self-contained console to a stable public URL and verify every sample artifact fetch.",
+                "Capture the exact project-building model label and the /feedback Session ID without guessing.",
+                "Record and privacy-review the bounded demonstration, keep it under three minutes with audio, and publish it to YouTube.",
+                "Populate the Devpost draft and stop for publicity, IP, certification, and final-submit review.",
+            ]
+            if source_integrity_pass
+            else [
+                "Reconcile the readiness packet to the exact public ProofLock commit and artifact hashes.",
+                "Regenerate the bounded submission receipt before relying on any core-ready statement.",
+                "Keep deployment, publicity/IP acceptance, and final submit behind their existing human gates.",
+            ]
+        ),
+        "human_gate": (
+            [
+                "Robert provides the exact model label and /feedback Session ID from the qualifying task.",
+                "Robert reviews the public demo video, Devpost publicity/IP terms, certifications, and final submission.",
+            ]
+            if source_integrity_pass
+            else [
+                "A bounded operator reconciles the exact public commit and artifact receipt.",
+                "Robert reviews the reconciled public demo, model/session provenance, publicity/IP terms, certifications, and final submission.",
+            ]
+        ),
         "external_send_allowed_without_human": False,
         "final_submit_allowed_without_human": False,
         "claim_boundary": readiness.get("claim_boundary"),
@@ -2633,6 +2680,36 @@ def build_payload(
     }
     freshness_blocked = [row for row in lanes if row["freshness_blockers"]]
     sam_live_source = source_freshness["sources"]["sam_live_discovery"]
+    if build_week_lane["source_integrity_pass"]:
+        strongest_today_action = (
+            "Finish the OpenAI Build Week external gates first: deploy and verify the public demo, "
+            "capture the exact model label and /feedback Session ID, record the privacy-reviewed "
+            "sub-three-minute video, and stage the Devpost preview before the July 21 7:00 p.m. "
+            "Central close. "
+            f"Its current readiness control has {build_week_lane['readiness_gate_pass_count']}/"
+            f"{build_week_lane['readiness_gate_total']} gates passed and "
+            f"{build_week_lane['readiness_gate_open_count']} open. "
+        )
+        fastest_low_friction_lane = (
+            "OpenAI Build Week is the nearest unresolved low-friction reviewer route. "
+            f"The pinned artifact set reconciles and {build_week_lane['readiness_gate_pass_count']}/"
+            f"{build_week_lane['readiness_gate_total']} gates pass; the public demo, exact model "
+            "label, /feedback Session ID, video, Devpost registration, and final review remain open. "
+            "Nashville EC is no longer an open lane because its portal confirmation is receipt-backed."
+        )
+    else:
+        strongest_today_action = (
+            "Reconcile the OpenAI Build Week readiness packet to the exact public ProofLock commit "
+            "and artifact manifest before relying on its core-ready state; then complete only the "
+            "remaining model/session, video, terms-review, and final-submit gates before the July 21 "
+            "7:00 p.m. Central close. "
+        )
+        fastest_low_friction_lane = (
+            "OpenAI Build Week remains the nearest unresolved low-friction reviewer route, but its "
+            "local readiness packet is held because the pinned app artifacts do not reconcile. "
+            "Refresh the exact commit-bound receipt before staging or submission-readiness claims. "
+            "Nashville EC is no longer an open lane because its portal confirmation is receipt-backed."
+        )
 
     payload: dict[str, Any] = {
         "schema": "near_deadline_submission_command_board_v5",
@@ -2657,14 +2734,23 @@ def build_payload(
             "freshness_blocked_lane_count": len(freshness_blocked),
             "freshness_blocker_count": source_freshness["blocker_count"],
             "sam_zero_row_inconclusive_blocker": sam_live_source["zero_rows"],
+            "build_week_source_integrity_pass": build_week_lane[
+                "source_integrity_pass"
+            ],
+            "build_week_source_recheck_required": build_week_lane[
+                "source_recheck_required"
+            ],
+            "build_week_source_blocker_count": len(
+                build_week_lane["freshness_blockers"]
+            ),
             "package_status_counts": package_status_counts,
             "harbor_status": (
                 f"{harbor_lane['urgency_status']}; {harbor_lane['readiness_status']}; "
                 f"{harbor_lane['package_status']}; {harbor_lane['portal_status']}"
             ),
             "strongest_today_action": (
-                "Finish the OpenAI Build Week external gates first: deploy and verify the public demo, capture the exact model label and /feedback Session ID, record the privacy-reviewed sub-three-minute video, and stage the Devpost preview before the July 21 7:00 p.m. Central close. "
-                f"Its current readiness control has {build_week_lane['readiness_gate_pass_count']}/{build_week_lane['readiness_gate_total']} gates passed and {build_week_lane['readiness_gate_open_count']} open. "
+                strongest_today_action
+                +
                 f"Then use the MissionWeave checklist to move its private action gate beyond {missionweave_gate_progress} while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. "
                 "HarborSentinel is urgent but not ready: retain its dedicated package while rechecking DSIP, freshness, package integrity, eligibility, compliance, cost, and portal gates. "
                 "Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket."
@@ -2679,11 +2765,7 @@ def build_payload(
                 "DON26BZ03-NV063 HarborSentinel remains an urgent dedicated-package lane, but it is explicitly not ready and its stale topic mirror cannot refresh the controlling deadline or eligibility. NSF 26-510 stays the next rolling Project Pitch route after its source is refreshed."
             ),
             "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative remains partner-only through 2026-08-03, but the Cambridge Systematics response lead confirmed its team is already set, so that outreach route is closed. No solo bid, no duplicate follow-up, and no partner claim; reopen only through a different qualified organization with written role and corporate-experience evidence.",
-            "fastest_low_friction_lane": (
-                "OpenAI Build Week is the nearest unresolved low-friction reviewer route. "
-                f"The working core is verified and {build_week_lane['readiness_gate_pass_count']}/{build_week_lane['readiness_gate_total']} gates pass; the public demo, exact model label, /feedback Session ID, video, Devpost registration, and final review remain open. "
-                "Nashville EC is no longer an open lane because its portal confirmation is receipt-backed."
-            ),
+            "fastest_low_friction_lane": fastest_low_friction_lane,
             "all_final_actions_blocked_without_human": True,
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,

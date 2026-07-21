@@ -59,13 +59,13 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     )
     assert payload["summary"]["lane_count"] == 23
     assert payload["summary"]["curated_navy_lane_count"] == 3
-    assert payload["summary"]["stage_now_count"] == 4
+    assert payload["summary"]["stage_now_count"] == 3
     assert payload["summary"]["sent_verified_count"] == 5
     assert payload["summary"]["emergency_eligibility_gate_count"] == 0
     assert payload["summary"]["no_bid_or_partner_only_count"] == 6
     assert payload["summary"]["expired_without_verified_send_count"] == 1
     assert payload["summary"]["human_gated_count"] == 17
-    assert payload["summary"]["freshness_blocked_lane_count"] == 13
+    assert payload["summary"]["freshness_blocked_lane_count"] == 14
     assert payload["summary"]["sam_zero_row_inconclusive_blocker"] is True
     assert payload["summary"]["final_submit_allowed_without_human"] is False
     assert payload["summary"]["external_send_allowed_without_human"] is False
@@ -111,7 +111,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert "26-510" in stage_ids
     assert "W912HZ26SC005" not in stage_ids
     assert "NASHVILLE-EC-FALL-2026" not in stage_ids
-    assert "OPENAI-BUILD-WEEK-2026" in stage_ids
+    assert "OPENAI-BUILD-WEEK-2026" not in stage_ids
     assert "DLA26BZ03-NV011" in stage_ids
     assert "LAUNCHTN-3686-2026" in stage_ids
 
@@ -125,13 +125,19 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     }
 
     assert "HHS-2026-ACL-NIDILRR-REGE-0212" in payload["summary"]["closest_deadline_lane"]
-    assert "OPENAI-BUILD-WEEK-2026" in payload["summary"]["closest_stage_ready_lane"]
-    assert "5/10" in payload["summary"]["strongest_today_action"]
-    assert "5 open" in payload["summary"]["strongest_today_action"]
+    assert "DLA26BZ03-NV011" in payload["summary"]["closest_stage_ready_lane"]
+    assert "Reconcile the OpenAI Build Week readiness packet" in payload["summary"][
+        "strongest_today_action"
+    ]
+    assert payload["summary"]["build_week_source_integrity_pass"] is False
+    assert payload["summary"]["build_week_source_recheck_required"] is True
+    assert payload["summary"]["build_week_source_blocker_count"] == 3
     assert "Nashville EC is portal-confirmed" in payload["summary"][
         "strongest_today_action"
     ]
-    assert "5/10 gates pass" in payload["summary"]["fastest_low_friction_lane"]
+    assert "readiness packet is held" in payload["summary"][
+        "fastest_low_friction_lane"
+    ]
 
     nsf = next(row for row in payload["lanes"] if row["opportunity_number"] == "26-510")
     assert nsf["deadline_date"] == "2026-11-04"
@@ -280,7 +286,8 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         for row in payload["lanes"]
         if row["opportunity_number"] == "OPENAI-BUILD-WEEK-2026"
     )
-    assert build_week["command"] == "STAGE_APPLICATION"
+    assert build_week["command"] == "REVERIFY_SOURCE_BEFORE_STAGE"
+    assert build_week["pre_freshness_command"] == "STAGE_APPLICATION"
     assert build_week["deadline_date"] == "2026-07-21"
     assert build_week["deadline_utc"] == "2026-07-22T00:00:00Z"
     assert build_week["deadline_semantics"] == "OFFICIAL_RULES_DEADLINE_VERIFIED"
@@ -297,6 +304,11 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert build_week["feedback_session_id_present"] is False
     assert build_week["confirmed_model_present"] is False
     assert len(build_week["package_files"]) == 5
+    assert build_week["source_integrity_pass"] is False
+    assert build_week["source_recheck_required"] is True
+    assert build_week["source_control_errors"] == []
+    assert len(build_week["source_artifact_errors"]) == 3
+    assert len(build_week["freshness_blockers"]) == 3
 
     missionweave = next(
         row
@@ -489,7 +501,7 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
     assert "HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE" in rendered
     assert "Status: `PORTAL_SUBMISSION_CONFIRMED`" in rendered
     assert "OPENAI-BUILD-WEEK-2026" in rendered
-    assert "5/10 gates pass" in rendered
+    assert "pinned app artifacts do not reconcile" in rendered
     assert "Action gate: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`" in rendered
     missionweave_gate = json.loads(
         MISSIONWEAVE_ACTION_GATE.read_text(encoding="utf-8")
@@ -635,7 +647,10 @@ def test_stale_sources_and_zero_row_sam_fail_closed() -> None:
         "zero_friction_pack",
     ):
         descriptor = freshness["sources"][source]
-        assert descriptor["freshness_status"] == "STALE_REVERIFY_REQUIRED"
+        assert descriptor["freshness_status"] in {
+            "STALE_REVERIFY_REQUIRED",
+            "UNDATED_REVERIFY_REQUIRED",
+        }
         assert descriptor["blocking"] is True
 
     sam = freshness["sources"]["sam_live_discovery"]
@@ -648,9 +663,7 @@ def test_stale_sources_and_zero_row_sam_fail_closed() -> None:
     )
     assert sam["blocking"] is True
     assert payload["zero_friction_pack_status"] == "STALE_REVERIFY_REQUIRED"
-    assert payload["zero_friction_pack_reported_status"].endswith(
-        "HUMAN_ACTION_REQUIRED"
-    )
+    assert payload["zero_friction_pack_reported_status"] == "UNKNOWN"
 
     lanes = {row["opportunity_number"]: row for row in payload["lanes"]}
     erdc = lanes["W912HZ26SC005"]

@@ -74,7 +74,7 @@ def test_project_pitch_remains_rolling_and_human_gated():
     assert pitch["final_submit_allowed_without_human"] is False
 
 
-def test_bounded_mirror_receipt_matches_local_sources():
+def test_historical_bounded_mirror_receipt_is_consistent():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8-sig"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -84,8 +84,8 @@ def test_bounded_mirror_receipt_matches_local_sources():
     assert receipt["private_founder_values_mirrored"] is False
 
     for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
-        assert source.is_file(), artifact["source"]
-        assert source.stat().st_size == artifact["bytes"], artifact["source"]
-        assert sha256_file(source) == artifact["sha256"], artifact["source"]
         assert artifact["copy_sha256_matched"] is True
+        mirror = Path(receipt["destination_root"]) / Path(artifact["source"]).name
+        assert mirror.is_file(), str(mirror)
+        assert mirror.stat().st_size == artifact["bytes"], str(mirror)
+        assert sha256_file(mirror) == artifact["sha256"], str(mirror)

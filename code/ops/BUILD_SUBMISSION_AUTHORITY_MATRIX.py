@@ -38,6 +38,19 @@ SENSITIVE_MARKERS = [
 ]
 
 AUTHORITY_BY_ACTION_TYPE: dict[str, dict[str, Any]] = {
+    "human_review": {
+        "required_authority": "Robert reviews the cited evidence, unresolved facts, legal or financial implications, and exact proposed action before any external or final step.",
+        "readiness_mode": "HUMAN_REVIEW_REQUIRED_NO_FINAL_ACTION",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Reconcile the current source receipt and any no-duplicate-send control.",
+            "Keep unknown eligibility, authority, pricing, and compliance facts unresolved.",
+            "Human approves the exact action at execution time.",
+        ],
+    },
     "meeting_prep": {
         "required_authority": "Robert attends the meeting and approves any follow-up, build scope, or equity-for-services discussion.",
         "readiness_mode": "MEETING_PREP_READY_FINAL_TERMS_BLOCKED",
@@ -259,6 +272,19 @@ AUTHORITY_BY_ACTION_TYPE: dict[str, dict[str, Any]] = {
             "Human approves the selected topic and response plan.",
         ],
     },
+    "developer_challenge_build": {
+        "required_authority": "Robert verifies the exact public build, model and session provenance, video, publicity/IP terms, rules, certifications, and final challenge submission.",
+        "readiness_mode": "DEVELOPER_CHALLENGE_DRAFT_READY_FINAL_SUBMIT_BLOCKED",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Bind the demo and receipts to the exact public commit before making readiness claims.",
+            "Record the exact model label and qualifying feedback Session ID without guessing.",
+            "Human reviews publicity/IP terms, rules, certifications, and the final submit action.",
+        ],
+    },
 }
 
 
@@ -297,7 +323,11 @@ def build_payload() -> dict[str, Any]:
     rows = []
     for item in sorted(docket_items, key=lambda row: int(row.get("priority", 999))):
         action_type = str(item.get("action_type", "human_review"))
-        authority = AUTHORITY_BY_ACTION_TYPE[action_type]
+        authority = AUTHORITY_BY_ACTION_TYPE.get(action_type)
+        if authority is None:
+            raise ValueError(
+                f"Unsupported action_type in human action docket: {action_type}"
+            )
         row = {
             "lane_id": item.get("lane_id", ""),
             "name": item.get("name", ""),

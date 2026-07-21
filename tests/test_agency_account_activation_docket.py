@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import re
 from pathlib import Path
 
@@ -17,9 +18,37 @@ def load_module():
     return module
 
 
-def test_agency_account_activation_docket_is_ready_and_human_gated():
+def build_with_safe_profile(module, tmp_path, monkeypatch):
+    profile = {
+        "company": {
+            "sam_gov_status": "verification_required",
+            "duns_or_uei": "TEST-UEI-NOT-REAL",
+            "cage_code": "TEST-CAGE",
+        },
+        "submission_readiness": {},
+    }
+    profile_path = tmp_path / "company_profile.safe-test.json"
+    profile_path.write_text(json.dumps(profile), encoding="utf-8")
+    sam_capture_path = tmp_path / "sam_status.safe-test.json"
+    sam_capture_path.write_text(
+        json.dumps(
+            {
+                "registration_status": "Active Registration",
+                "expiration_date": "2026-08-30",
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(module, "PROFILE_JSON", profile_path)
+    monkeypatch.setattr(module, "SAM_CAPTURE_JSON", sam_capture_path)
+    return module.build_payload()
+
+
+def test_agency_account_activation_docket_is_ready_and_human_gated(
+    tmp_path, monkeypatch
+):
     module = load_module()
-    payload = module.build_payload()
+    payload = build_with_safe_profile(module, tmp_path, monkeypatch)
     summary = payload["summary"]
 
     assert payload["schema"] == "agency_account_activation_docket_v1"
@@ -42,9 +71,9 @@ def test_agency_account_activation_docket_is_ready_and_human_gated():
     assert len(payload["activation_docket_sha256"]) == 64
 
 
-def test_activation_rows_cover_federal_account_stack():
+def test_activation_rows_cover_federal_account_stack(tmp_path, monkeypatch):
     module = load_module()
-    payload = module.build_payload()
+    payload = build_with_safe_profile(module, tmp_path, monkeypatch)
     rows = {row["id"]: row for row in payload["activation_rows"]}
 
     expected = {
@@ -71,9 +100,9 @@ def test_activation_rows_cover_federal_account_stack():
         assert row["blocks"]
 
 
-def test_local_readiness_summarizes_private_fields_safely():
+def test_local_readiness_summarizes_private_fields_safely(tmp_path, monkeypatch):
     module = load_module()
-    payload = module.build_payload()
+    payload = build_with_safe_profile(module, tmp_path, monkeypatch)
     readiness = payload["local_readiness"]
 
     assert readiness["company_profile_status"] == "verification_required"
@@ -90,9 +119,9 @@ def test_local_readiness_summarizes_private_fields_safely():
     assert "dod_compliance_verified" in readiness["blocked_readiness_flags"]
 
 
-def test_official_sources_and_evidence_chain_are_present():
+def test_official_sources_and_evidence_chain_are_present(tmp_path, monkeypatch):
     module = load_module()
-    payload = module.build_payload()
+    payload = build_with_safe_profile(module, tmp_path, monkeypatch)
     urls = " ".join(source["url"] for source in payload["official_sources"])
 
     assert "https://sam.gov/entity-registration" in urls
@@ -112,9 +141,11 @@ def test_official_sources_and_evidence_chain_are_present():
         assert len(row["sha256"]) == 64
 
 
-def test_rendered_activation_docket_is_public_safe_and_human_gated():
+def test_rendered_activation_docket_is_public_safe_and_human_gated(
+    tmp_path, monkeypatch
+):
     module = load_module()
-    payload = module.build_payload()
+    payload = build_with_safe_profile(module, tmp_path, monkeypatch)
     rendered = module.render_markdown(payload)
     lowered = rendered.lower()
 
@@ -127,9 +158,8 @@ def test_rendered_activation_docket_is_public_safe_and_human_gated():
     assert "CAGE present locally: `true`" in rendered
 
     private_or_sensitive_markers = [
-        "SQY2XW71ZM51",
-        "14TM8",
-        "2613 Paddle Wheel",
+        "TEST-UEI-NOT-REAL",
+        "TEST-CAGE",
         "zoom.us",
         "meeting id",
         "password",
@@ -146,3 +176,23 @@ def test_rendered_activation_docket_is_public_safe_and_human_gated():
     assert re.search(r"\b\d{2}-\d{7}\b", rendered) is None
     assert re.search(r"\b\d{3}[-.]\d{3}[-.]\d{4}\b", rendered) is None
     assert re.search(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", rendered, re.I) is None
+
+
+def test_missing_private_profile_fails_closed_without_exposing_values(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    monkeypatch.setattr(module, "PROFILE_JSON", tmp_path / "missing-profile.json")
+
+    payload = module.build_payload()
+    readiness = payload["local_readiness"]
+    assert readiness["company_profile_status"] == ""
+    assert readiness["uei_present_locally"] is False
+    assert readiness["cage_present_locally"] is False
+    assert readiness["blocked_readiness_count"] == 6
+    profile_row = next(
+        row for row in payload["evidence_status"] if "missing-profile.json" in row["path"]
+    )
+    assert profile_row["present"] is False
+    assert profile_row["bytes"] == 0
+    assert profile_row["sha256"] == ""

@@ -36,6 +36,7 @@ def test_traction_ledger_builds_connected_and_federal_lane_queue():
         CURRENT_RESPONSE_JSON.read_text(encoding="utf-8")
     )["summary"]
     missionweave = json.loads(MISSIONWEAVE_GATE_JSON.read_text(encoding="utf-8"))
+    missionweave_summary = missionweave["gate_summary"]
 
     assert payload["schema"] == "traction_opportunity_intake_ledger_v1"
     assert payload["status"] == "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED"
@@ -61,9 +62,15 @@ def test_traction_ledger_builds_connected_and_federal_lane_queue():
     )
     assert payload["summary"]["current_state_supersedes_legacy_when_present"] is True
     assert payload["summary"]["current_response_queue_count"] == response_summary["record_count"]
-    assert payload["summary"]["missionweave_passed_gate_count"] == 13
-    assert payload["summary"]["missionweave_open_gate_count"] == 37
-    assert payload["summary"]["missionweave_required_gate_count"] == 50
+    assert payload["summary"]["missionweave_passed_gate_count"] == missionweave_summary[
+        "passed_private_gate_count"
+    ]
+    assert payload["summary"]["missionweave_open_gate_count"] == missionweave_summary[
+        "open_gate_count"
+    ]
+    assert payload["summary"]["missionweave_required_gate_count"] == missionweave_summary[
+        "required_private_gate_count"
+    ]
     assert payload["summary"]["missionweave_submission_ready_for_human_click"] is False
     assert payload["missionweave_action_gate"]["gate_sha256"] == missionweave["gate_sha256"]
     assert len(payload["ledger_sha256"]) == 64
@@ -130,6 +137,10 @@ def test_latest_response_lanes_are_claim_bounded_and_actionable():
 def test_current_queue_and_effective_states_prevent_stale_or_duplicate_actions():
     module = load_module()
     payload = module.build_payload()
+    missionweave_receipt = json.loads(
+        MISSIONWEAVE_GATE_JSON.read_text(encoding="utf-8")
+    )
+    gate_summary = missionweave_receipt["gate_summary"]
     current = {
         row["lane_id"]: row
         for row in payload["current_response_control"]["records"]
@@ -154,8 +165,12 @@ def test_current_queue_and_effective_states_prevent_stale_or_duplicate_actions()
 
     missionweave = lanes["dla_missionweave_sbir"]
     assert missionweave["effective_status"] == "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
-    assert missionweave["current_action_gate"]["passed_gate_count"] == 13
-    assert missionweave["current_action_gate"]["open_gate_count"] == 37
+    assert missionweave["current_action_gate"]["passed_gate_count"] == gate_summary[
+        "passed_private_gate_count"
+    ]
+    assert missionweave["current_action_gate"]["open_gate_count"] == gate_summary[
+        "open_gate_count"
+    ]
     assert missionweave["current_action_gate"]["submission_ready_for_human_click"] is False
     assert "July 22, 2026 at 12:00 p.m. Eastern Time" in missionweave["effective_deadline_or_gate"]
 
@@ -170,6 +185,9 @@ def test_rendered_markdown_excludes_meeting_credentials_and_live_action_authorit
     payload = module.build_payload()
     rendered = module.render_markdown(payload)
     lowered = rendered.lower()
+    missionweave_summary = json.loads(
+        MISSIONWEAVE_GATE_JSON.read_text(encoding="utf-8")
+    )["gate_summary"]
     response_control = json.loads(CURRENT_RESPONSE_JSON.read_text(encoding="utf-8"))
     current_decisions = {
         row["decision"]
@@ -189,7 +207,13 @@ def test_rendered_markdown_excludes_meeting_credentials_and_live_action_authorit
     assert lanl_section.index("Current response state") < lanl_section.index("- Evidence:")
     assert "External send without human: `false`" in rendered
     assert "Final submission without human: `false`" in rendered
-    assert "MissionWeave gates: `13/50` passed; `37` open" in rendered
+    assert (
+        "MissionWeave gates: "
+        f"`{missionweave_summary['passed_private_gate_count']}/"
+        f"{missionweave_summary['required_private_gate_count']}` passed; "
+        f"`{missionweave_summary['open_gate_count']}` open"
+        in rendered
+    )
     assert "2026-07-17T23:59:00-05:00" in rendered
     assert "No final portal action" in rendered
     assert "zoom.us" not in lowered

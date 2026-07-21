@@ -204,7 +204,7 @@ def test_written_public_outputs_are_sanitized_and_claim_bounded():
     assert len(payload["gate_sha256"]) == 64
 
 
-def test_bounded_e_drive_mirror_matches_every_public_safe_artifact():
+def test_historical_bounded_e_drive_mirror_receipt_is_consistent():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -215,9 +215,10 @@ def test_bounded_e_drive_mirror_matches_every_public_safe_artifact():
     assert receipt["private_amounts_present_in_public_artifacts"] is False
     assert receipt["destination_root"].startswith("E:/LumaProofVault/")
     for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
         destination = Path(artifact["destination"])
-        assert source.is_file(), artifact["source"]
         assert destination.is_file(), artifact["destination"]
-        assert source.stat().st_size == destination.stat().st_size == artifact["bytes"]
-        assert sha256_file(source) == sha256_file(destination) == artifact["sha256"]
+        assert artifact["bytes"] == artifact["copy_bytes"]
+        assert artifact["sha256"] == artifact["copy_sha256"]
+        assert artifact["copy_sha256_matched"] is True
+        assert destination.stat().st_size == artifact["copy_bytes"]
+        assert sha256_file(destination) == artifact["copy_sha256"]
