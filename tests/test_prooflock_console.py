@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 import re
@@ -209,10 +210,11 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     assert "exact source commit and current test receipt" in narration
     assert "Do not present the historical public release as current-head evidence" in narration
     assert "`28 passed`" not in checklist
-    assert "YouTube as **public or unlisted**" in checklist
-    assert "plays with audio while signed out" in checklist
+    assert "Verified video publication" in checklist
+    assert "https://youtu.be/af1bHPmIgeY" in checklist
+    assert "publicly resolvable" in checklist
     assert "2026-07-20T21:41:43Z" in checklist
-    assert "Current focused local test result: `54 passed, 3 skipped`" in checklist
+    assert "Current focused local test result: `55 passed, 3 skipped`" in checklist
     assert "GitHub account is locked by a billing issue" in checklist
     assert "Current live-file identity: `15/15`" in checklist
     assert "b2ac8cef10ee5b9db765a17cdbf6f13e6b917ce5" in checklist
@@ -227,6 +229,34 @@ def test_hashed_json_artifacts_are_checkout_byte_stable():
     attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8")
     assert "flowform_curved_motherboard_honeycomb_battery_v2_concept.json -text" in attributes
     assert "flowform_curved_motherboard_honeycomb_battery_v3_concept.json -text" in attributes
+
+
+def test_youtube_publication_receipt_is_bounded_and_self_hashing():
+    receipt_path = (
+        ROOT
+        / "evidence"
+        / "openai_build_week"
+        / "prooflock_youtube_publication_receipt_20260721.json"
+    )
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    claimed_sha256 = receipt.pop("receipt_sha256")
+    canonical = json.dumps(
+        receipt, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+    ).encode("utf-8")
+
+    assert claimed_sha256 == hashlib.sha256(canonical).hexdigest()
+    assert receipt["source_video"]["sha256"] == (
+        "7db755aa1b8a2f4ab79ce95a463b1f80fc73ac28a2d31672e894ea8fbd5b8184"
+    )
+    assert receipt["youtube"]["url"] == "https://youtu.be/af1bHPmIgeY"
+    assert receipt["youtube"]["visibility"] == "UNLISTED"
+    assert receipt["youtube"]["copyright_check"] == "COMPLETE_NO_ISSUES_FOUND"
+    assert receipt["youtube"]["public_watch_url_resolved"] is True
+    assert receipt["devpost"]["final_submission_performed"] is False
+    assert receipt["controls"]["private_session_identifier_exposed"] is False
+    assert "does not independently prove signed-out audio playback" in receipt[
+        "claim_boundary"
+    ]
 
 
 def test_build_week_voiceover_is_bounded_and_describes_the_current_attack():

@@ -86,6 +86,9 @@ desktop.ini
 # Cache / temp
 .cache/
 __MACOSX/
+.playwright-cli/
+output/speech/
+output/video/
 
 # Old / duplicate stack copies
 INSTITAL_STACK_V2/

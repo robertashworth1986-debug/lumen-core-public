@@ -32,13 +32,15 @@ When the console source tree has not changed, existing PNG captures may be rebou
 
 ## Publication Gate
 
-The current artifact is a verified local submission candidate. Do not call it the published contest video or submit the Devpost entry until all of these are true:
+The exact verified artifact is published unlisted at `https://youtu.be/af1bHPmIgeY`. YouTube reported no copyright issues, the public watch page and oEmbed metadata resolved, and the player exposed the complete 125.281-second media. The publication receipt is `evidence/openai_build_week/prooflock_youtube_publication_receipt_20260721.json`.
+
+Do not call the Devpost entry submitted until all of these are true:
 
 - the exact 15-file release remains live at `15/15` byte identity;
 - the live verifier continues to pass against the commit shown in the video;
 - the focused tests remain green at the displayed `54 passed, 3 skipped` result;
 - the real `/feedback` Session ID has been confirmed without publishing it;
-- the final public video plays while signed out; and
+- the final public video remains publicly resolvable; and
 - Robert reviews the complete preview and performs the legal/final submission action.
 
 The receipt proves local media assembly, declared file identity, bounded duration, and decode success. It does not prove publication, contest acceptance, judging, external validation, safety, patent rights, funding, or commercial readiness.
