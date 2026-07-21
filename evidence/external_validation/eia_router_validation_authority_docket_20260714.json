@@ -78,7 +78,7 @@
     },
     "verified": true
   },
-  "docket_sha256": "11219669d879fb815ce103daeeec04b1a7c941933fdec63f342ba4a225955d02",
+  "docket_sha256": "05b6d7bca50065978f34d7201b8e433c7edb53fcb6bd24cb118ff0a62cc2963d",
   "evaluator_acceptance": {
     "accepted_protocol_sha256": null,
     "accepted_utc": null,
@@ -181,7 +181,7 @@
     "source_publisher": "U.S. Energy Information Administration",
     "source_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/"
   },
-  "generated_utc": "2026-07-21T20:07:10.155974+00:00",
+  "generated_utc": "2026-07-21T20:38:42.997663+00:00",
   "maturity": {
     "current_supported_level": 3,
     "external_validation_complete": false,
@@ -236,7 +236,7 @@
       "remaining_gap": "No external organization has adopted an incident, escalation, or production-use decision process for this experiment."
     }
   ],
-  "portable_input_chain_sha256": "e5b3276c66daf2f6132b71cdba7a9c58a9491687535599f06694bcc96bda602a",
+  "portable_input_chain_sha256": "5876054e4ea31262151f794fd28e8aa5b18b41b0f9b45f68a6276eb7f72796c7",
   "portable_inputs": [
     {
       "bytes": 9722,
@@ -257,10 +257,10 @@
       "sha256": "21a70dbd739219ab8058707c92cb17b57e9f72c09d64b7ea38db3f88ea52a4fe"
     },
     {
-      "bytes": 3663,
+      "bytes": 3756,
       "hash_mode": "utf8_lf",
       "path": ".gitattributes",
-      "sha256": "c838aa61a183c3348ba5e44d39b551ecb853b4bd5888a9329ba82b552c3ee493"
+      "sha256": "7fad6e6f2e35f81367e575da3c36015f5c737597555fa3120d6b38810014afe3"
     },
     {
       "bytes": 2660,
@@ -353,10 +353,10 @@
       "sha256": "e95c3d7d88cdc732b86b28d93d7dba6db5216941c46edd2676822855e492243b"
     },
     {
-      "bytes": 4864,
+      "bytes": 7542,
       "hash_mode": "utf8_lf",
       "path": "docs/REVIEWER_START_HERE.md",
-      "sha256": "a257bde8c7757ef728384eb4fc763749b5494fd3947dfb69998209978dfc9ad6"
+      "sha256": "7156e4ca92f645255a5e00e3adfeb871a262f852fa067e1dc5fdac9c4f1ba744"
     },
     {
       "bytes": 8115,
@@ -383,10 +383,10 @@
       "sha256": "837de83d0a1d3e18ac288d09eee99c26051beaffa37996189a26336c2781a45f"
     },
     {
-      "bytes": 1818,
+      "bytes": 2448,
       "hash_mode": "utf8_lf",
       "path": "tests/test_github_workflow_governance.py",
-      "sha256": "a1ec52540c1f04842012e3475c28138b2b07bfff743c2cf2cb5d2db35d16bb91"
+      "sha256": "f598de8c60111fa596fc37f46c922610765ee4e28cf2ff3fa82251f0102cd4bd"
     },
     {
       "bytes": 3697,

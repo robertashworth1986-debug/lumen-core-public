@@ -1,53 +1,130 @@
 # Reviewer Start Here
 
-This page is the shortest defensible path through the LumenCore technical record.
+This page separates the current public execution check, the retained hourly packet,
+and the historical predecessor record. They answer different questions and must not
+be combined into a stronger claim.
 
-## Bottom Line
+## Current State
 
-The repository supports an implemented, tested evidence and benchmarking platform with source-conditioned replay and preserved negative results. Its current repository-wide supported evidence maturity is **Level 3**. It does not yet establish independent field validation, universal model superiority, realized savings, profitable live trading, regulatory approval, or patent scope.
+- Repository-wide supported evidence maturity: **Level 3**.
+- CODECHECK author packet: `AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW`.
+- Reviewed executable-computation source: `1c0eb51754beffac6f4df484914e35efc21c253f`.
+- Hourly packet snapshot: `486` predictions and `469` settlements.
+- Later runtime diagnostic: `546` predictions and `486` settlements. It is not
+  substituted into the frozen packet.
+- Common settled hours across all eight hourly authorities: `0`.
+- Independent execution, CODECHECK assignment, certificate, external validation,
+  field validation, agency acceptance, performance promotion, realized savings,
+  trading performance, patent scope, and valuation validation: **not established**.
 
-## Read In This Order
+GitHub checks are head-specific. Read the checks attached to the exact pull-request
+head; do not infer current CI state from an older receipt or run.
 
-1. `README.md` for claim boundaries and the maturity scale.
-2. `docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md` for the machine-generated evidence snapshot.
-3. `evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json` for the dated, public-safe successor snapshot and terminal-chain receipts.
-4. `docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md` for the predecessor-lane evaluator decision, archived clean-runner receipt, and exact Level 4/5 gates.
-5. `docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md` for the evaluator-owned receipt and fail-closed acceptance procedure; it must be explicitly amended before it governs the hourly successor.
-6. `docs/LOCKED_SOURCE_BASELINE_REPLAY_SWEEP_2026-06-30.md` for route-level wins and non-wins.
-7. `docs/FAA_SDR_SOURCE_AUDIT_2026-07-13.md` for the aviation source audit and its raw-data custody boundary.
-8. `docs/FAA_SDR_10K_BENCHMARK_2026-07-13.md` for the frozen holdout result and failed promotion gate.
-9. `docs/HYBRID_AGENT_OPERATING_MODEL_2026-07-13.md` for agent capabilities and HumanUnlock controls.
+## Choose One Review Decision
+
+| Route | Exact question | Public starting point | Current boundary |
+|---|---|---|---|
+| CODECHECK executable computation | Can an independent runner reproduce the six outputs declared by `codecheck.yml` from the pinned public source? | `docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md` | Author packet ready; independent execution and certificate false |
+| EIA hourly packet | Can a reviewer rehash the retained packet and independently recompute its chains, settlement arithmetic, and authority coverage? | `docs/EIA_GRID_HOURLY_INDEPENDENT_REPRODUCTION_HANDOFF_2026-07-21.md` | Retained ZIP required; completed external receipt absent |
+| Historical daily predecessor | Did the earlier evaluator-acceptance controls reconcile? | `docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md` | Historical only; it does not govern the hourly successor |
+
+## Fast Author-Packet Check
+
+From the current review branch, run the non-mutating readiness check first:
+
+```powershell
+python code/ops/BUILD_CODECHECK_EIA_READINESS.py --check-only
+```
+
+Expected status: `PASS`. This checks author-side artifact coherence only. It is not
+an independent run, CODECHECK acceptance, scientific validation, or a certificate.
+
+Read next:
+
+1. `docs/CODECHECK_EIA_AUTHOR_READINESS_2026-07-20.md`
+2. `docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
+3. `codecheck.yml`
+4. `CITATION.cff`
+5. `LICENSE`
+
+## Independent CODECHECK Execution
+
+The reviewed public source is frozen at commit
+`1c0eb51754beffac6f4df484914e35efc21c253f`. On Ubuntu 24.04 x86-64 with
+CPython 3.11.9 and glibc 2.39:
+
+```bash
+git clone https://github.com/robertashworth1986-debug/lumen-core-public.git
+cd lumen-core-public
+git checkout 1c0eb51754beffac6f4df484914e35efc21c253f
+python code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py --check-only
+python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py
+python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-reviewer-ubuntu-py311.lock
+python -m pip check
+python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --run-dir out/codecheck_eia
+```
+
+The bounded capsule declares three suites, 31 machine assertions, and six manifest
+outputs. The source includes negative gates, and a passing execution must preserve
+them. The repository's existing receipts are operator-controlled and remain
+first-party evidence. Only an independently controlled execution and external report
+can change that state.
+
+The exact community-request draft is intentionally held at
+`docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md`. Its Launch Pad identifier
+currently collides with an existing open register issue. Do not open a production
+request until that collision is resolved, duplicate-request reconciliation is fresh,
+Robert has reviewed the packet, and action-time HumanUnlock is recorded.
+
+## EIA Hourly Packet Review
+
+The public repository binds the retained packet by filename, size, hashes, protocol,
+and terminal chains. Raw runtime bytes and the packet ZIP are not public, so the
+hourly packet cannot be independently reproduced from this repository alone.
+
+After an authorized transfer and independent ZIP-hash check, extract the packet and
+run:
+
+```powershell
+python code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py --packet-dir .
+python code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py --packet-dir . --receipt REVIEWER_RECEIPT_TEMPLATE.json --expect-template
+```
+
+Current public records:
+
+- `evidence/external_validation/eia_grid_hourly_independent_reproduction_handoff_20260721.json`
+- `evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260721.json`
+- `config/eia_grid_hourly_independent_reproduction_receipt_template_20260721_v1.json`
+
+The operator may not fill reviewer identity, independence, execution, decision, or
+signature fields. A completed receipt requires reviewer-controlled independence
+evidence and a detached signature artifact. Even a valid receipt would establish
+only the bounded packet facts; it would not convert the incomplete authority panel
+into a performance pass.
+
+## Historical Predecessor Controls
+
+The preserved predecessor files remain useful for control design and audit history:
+
+```powershell
+python code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py --check-only
+python code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py --expect-template
+```
+
+Their handoff is `docs/EXTERNAL_EVALUATOR_ACCEPTANCE_HANDOFF_2026-07-14.md`.
+It must be explicitly amended or replaced before it can govern the hourly successor.
 
 ## Independent Review Roles
 
 | Review role | Decision owned by reviewer | Evidence or receipt |
 |---|---|---|
-| Reproducibility reviewer | Can the bounded public result be replayed from pinned inputs on an independent runner? | Reviewer capsule receipt, logs, SBOM, and checksum manifest |
+| Reproducibility reviewer | Can the bounded public result be replayed from pinned inputs on an independent runner? | Capsule receipt, logs, SBOM, checksums, and external report |
 | Domain and data owner | Are the source, eligible population, exclusions, baselines, and operational metric suitable for the stated use? | Dated protocol acceptance and authority artifact |
 | Security and privacy reviewer | Are custody, access, dependency, secret-scanning, privacy, and HumanUnlock controls adequate for the bounded evaluation? | Scoped findings, disposition record, and artifact hashes |
 | Independent technical evaluator | Did the frozen prospective experiment meet its predeclared gate without operator substitution or backfill? | Completed evaluator-owned acceptance and result receipts |
 
-Each role is independent of the operator. A reviewer may accept one bounded decision without endorsing the platform, a patent, an agency use, or a commercial claim.
-
-## Fast Verification
-
-```powershell
-python code/ops/BUILD_QUANT_HUB_REVIEWER_CONTEXT.py
-python code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py --check
-python code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py --check-only
-python code/ops/VERIFY_EXTERNAL_EVALUATOR_ACCEPTANCE.py --expect-template
-python -m pytest -q tests/test_quant_hub_reviewer_context.py
-python -m pytest -q tests/test_external_validation_authority_docket.py
-python -m pytest -q tests/test_external_evaluator_acceptance.py
-python -m pytest -q tests/test_faa_sdr_source_audit.py tests/test_faa_sdr_10k_benchmark.py
-python -m pytest -q tests/test_external_proof_vault.py tests/test_funding_sprint_reviewer_gate.py
-```
-
-The locked replay is broader and may take several minutes:
-
-```powershell
-python -m pytest -q tests/test_locked_source_baseline_replay_sweep.py
-```
+Each role is independent of the operator. A reviewer may accept one bounded decision
+without endorsing the platform, a patent, an agency use, or a commercial claim.
 
 ## Claim Check
 
@@ -55,14 +132,9 @@ python -m pytest -q tests/test_locked_source_baseline_replay_sweep.py
 |---|---|
 | Is the platform implemented? | Yes, for the bounded workflows represented by code and tests |
 | Are source-conditioned comparisons recorded? | Yes, with both wins and non-wins |
-| Is prospective performance established? | Not repository-wide; each prospective lane must report its own status |
-| Has an independent evaluator validated the platform? | No Level 5 receipt is present |
-| May this repository authorize a submission, legal filing, spend, or live order? | No; those actions require HumanUnlock |
+| Is prospective performance established? | No; the current hourly sample gates remain false |
+| Has an independent evaluator validated the platform? | No Level 5 receipt or CODECHECK certificate is present |
+| May this repository authorize a submission, legal filing, spend, live order, or external contact? | No; those actions require their own HumanUnlock and duplicate-action checks |
 
-## External Validation Target
-
-An acceptable Level 5 evaluation must name the evaluator, dataset owner, frozen eligible population, held-out period, baselines, metrics, acceptance threshold, exclusions, and receipt date before outcomes are observed. The current authority record and handoff are scoped to the preserved daily predecessor; they do not silently transfer to the hourly successor. The successor needs an explicit protocol-specific amendment or replacement acceptance record. Commercial value should be estimated only after the external owner accepts both the technical metric and the economic assumptions.
-
-## Citation
-
-Use `CITATION.cff` for the software record. Cite a dated evidence artifact separately when making a result-specific statement.
+Use `CITATION.cff` for the software record. Cite the exact dated evidence artifact
+separately for any result-specific statement.

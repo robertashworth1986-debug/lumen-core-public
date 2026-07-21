@@ -414,7 +414,7 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T20:05:39.969898+00:00",
+  "generated_utc": "2026-07-21T20:38:50.767852+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "operator_clean_runner": {
     "assertion_count": 31,
@@ -1356,7 +1356,7 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "554c40d4d8f64d78c6b59350e6e59b871829ba0414e38170e85a712ef3462438",
+  "readiness_sha256": "98641a2f033e5db02b0962cc1ec28cacdce60bb2ad428cba0ebe92928386dca1",
   "release_candidate": {
     "bundle_input_chain_sha256": "1189cc679a2897d55ac418ae930c7545345efa279868435038c498944c369bf6",
     "bundle_input_count": 44,
