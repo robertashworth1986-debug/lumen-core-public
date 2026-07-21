@@ -30,8 +30,9 @@ The live system: https://lumen-core.ai
 Verifiable proof (SHA-256 hash-chained): https://lumen-core.ai/evidence/
 Code: https://github.com/robertashworth1986-debug/lumen-core-public
 
-I'm posting this because I've been building in isolation. My three kids are the
-reason I keep going. I don't need a billion dollars. I need visibility.
+I'm an independent founder seeking reproducibility reviewers and bounded pilot
+partners. The public materials separate measured results from claims that still
+require external validation.
 
 AMA. I'm an open book.
 
@@ -68,8 +69,8 @@ healthcare capacity prediction, smart city infrastructure.
 I'm also building hardware: curved motherboards, honeycomb-cell EV batteries,
 a robot that moves the way living things move.
 
-I live in my van. My three kids are watching. I'm posting this because I've been
-building in silence and I think what I have deserves to be seen.
+I'm seeking technical reviewers and pilot partners who can evaluate the work
+against agreed baselines, acceptance criteria, and reproducible protocols.
 
 GitHub: https://github.com/robertashworth1986-debug/lumen-core-public
 
@@ -195,16 +196,17 @@ GitHub: https://github.com/robertashworth1986-debug/lumen-core-public
 
 Name: LumenCore™
 
-Tagline: Institutional-grade quant AI, built by one person in a van, live in production
+Tagline: Proof-to-pilot AI infrastructure with reproducible evidence and bounded execution
 
 Description:
 LumenCore is a full-stack institutional quantitative trading and AI intelligence
 platform built solo by Robert Ashworth over 12+ months with zero funding.
 
 What makes it different:
-• Live algorithmic trading with verifiable on-chain transaction IDs
-• Novel harmonic backpropagation AI (patent pending) — fundamentally different from MLn• Cross-sector intelligence: trading → energy → defense → healthcare → robotics
-• Built by one person. In a van. For three kids.
+• Tamper-evident evidence receipts with public verification instructions
+• Bounded agent workflows with explicit human authorization gates
+• Cross-domain pilot tooling for energy, defense, infrastructure, and analytics
+• Independent founder-led development with reproducible reviewer packets
 
 See the live system at lumen-core.ai.
 
