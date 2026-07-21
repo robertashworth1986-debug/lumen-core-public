@@ -536,6 +536,20 @@ def test_current_certification_documentary_register_is_consumed_and_open():
     assert module.certification_documentary_register_is_consumed(state) is True
 
 
+def test_canonical_tracked_sha256_uses_committed_bytes_for_eol_only_drift(
+    tmp_path: Path, monkeypatch
+):
+    module = load_module()
+    source = tmp_path / "source.md"
+    source.write_bytes(b"alpha\r\nbeta\r\n")
+    committed = b"alpha\nbeta\n"
+    monkeypatch.setattr(module, "read_head_blob", lambda _path: committed)
+
+    assert module.canonical_tracked_sha256(source) == hashlib.sha256(
+        committed
+    ).hexdigest().upper()
+
+
 def test_private_booleans_cannot_clear_open_documentary_gates():
     module = load_module()
     source_state, _ = module.inspect_source_package()

@@ -228,7 +228,7 @@ def convert_docx_to_pdf(
 
 
 def inspect_final_pdf(pdf_path: Path, proposal_number: str) -> dict[str, Any]:
-    info_text = GATE.run_pdf_tool("pdfinfo.exe", [str(pdf_path)])
+    info_text = GATE.run_pdf_tool("pdfinfo", [str(pdf_path)])
     pages_match = re.search(r"^Pages:\s+(\d+)\s*$", info_text, re.MULTILINE)
     encrypted_match = re.search(r"^Encrypted:\s+(\S+)\s*$", info_text, re.MULTILINE)
     size_match = re.search(

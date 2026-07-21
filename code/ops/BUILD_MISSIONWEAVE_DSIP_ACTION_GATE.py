@@ -499,6 +499,36 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest().upper()
 
 
+def normalize_text_eol(payload: bytes) -> bytes:
+    return payload.replace(b"\r\n", b"\n")
+
+
+def read_head_blob(path: Path) -> bytes | None:
+    try:
+        relative = path.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return None
+    completed = subprocess.run(
+        ["git", "show", f"HEAD:{relative}"],
+        cwd=ROOT,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
+    return completed.stdout if completed.returncode == 0 else None
+
+
+def canonical_tracked_sha256(path: Path) -> str:
+    worktree_bytes = path.read_bytes()
+    head_blob = read_head_blob(path)
+    if (
+        head_blob is not None
+        and normalize_text_eol(worktree_bytes) == normalize_text_eol(head_blob)
+    ):
+        worktree_bytes = head_blob
+    return hashlib.sha256(worktree_bytes).hexdigest().upper()
+
+
 def stable_sha256(payload: Any) -> str:
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
@@ -1521,7 +1551,7 @@ def inspect_certification_documentary_register(
                 and valid_sha256(recorded_hash)
                 and hmac.compare_digest(
                     str(recorded_hash).casefold(),
-                    sha256_file(expected_path).casefold(),
+                    canonical_tracked_sha256(expected_path).casefold(),
                 )
             ):
                 source_hashes_current = False
@@ -1739,7 +1769,7 @@ def require_compatible_keys(
 
 
 def run_pdf_tool(executable: str, arguments: list[str]) -> str:
-    path = shutil.which(executable)
+    path = shutil.which(f"{executable}.exe") or shutil.which(executable)
     if not path:
         raise MissionWeaveGateError(f"{executable.upper()}_NOT_AVAILABLE")
     result = subprocess.run(
@@ -1802,7 +1832,7 @@ def inspect_source_package(
             raise MissionWeaveGateError("PUBLIC_VOLUME2_NOT_FOUND")
         volume2_path_label = rel(selected_volume2)
 
-    info_text = run_pdf_tool("pdfinfo.exe", [str(selected_volume2)])
+    info_text = run_pdf_tool("pdfinfo", [str(selected_volume2)])
     pages_match = re.search(r"^Pages:\s+(\d+)\s*$", info_text, re.MULTILINE)
     encrypted_match = re.search(r"^Encrypted:\s+(\S+)\s*$", info_text, re.MULTILINE)
     size_match = re.search(r"^Page size:\s+([\d.]+) x ([\d.]+) pts", info_text, re.MULTILINE)

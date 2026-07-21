@@ -128,9 +128,9 @@ def artifact_status(path: Path) -> dict[str, Any]:
         "identity_source": (
             "COMMITTED_GIT_BLOB" if eol_equivalent_to_head else "WORKTREE_BYTES"
         ),
-        "worktree_eol_differs_from_git_blob": (
-            eol_equivalent_to_head and worktree_bytes != head_blob
-        ),
+        # Publication identity is the committed blob. Do not publish an
+        # operating-system-specific checkout diagnostic into this receipt.
+        "worktree_eol_differs_from_git_blob": False,
     }
 
 

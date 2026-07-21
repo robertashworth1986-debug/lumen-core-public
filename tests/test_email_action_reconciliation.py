@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -51,6 +52,24 @@ def test_reconciliation_is_deterministic_and_no_send():
     assert actual["summary"]["human_account_action_count"] == 4
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert all(lane["send_now"] is False for lane in actual["lanes"])
+
+
+def test_artifact_status_uses_committed_bytes_without_checkout_eol_drift(
+    tmp_path: Path, monkeypatch
+):
+    module = load_module()
+    source = tmp_path / "source.txt"
+    source.write_bytes(b"alpha\r\nbeta\r\n")
+    committed = b"alpha\nbeta\n"
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    monkeypatch.setattr(module, "read_head_blob", lambda _path: committed)
+
+    status = module.artifact_status(source)
+
+    assert status["identity_source"] == "COMMITTED_GIT_BLOB"
+    assert status["bytes"] == len(committed)
+    assert status["sha256"] == hashlib.sha256(committed).hexdigest().upper()
+    assert status["worktree_eol_differs_from_git_blob"] is False
 
 
 def test_duplicate_and_out_of_office_gates_are_explicit():

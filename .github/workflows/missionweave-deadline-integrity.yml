@@ -8,6 +8,7 @@ on:
       - ".gitignore"
       - ".github/workflows/missionweave-deadline-integrity.yml"
       - "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py"
+      - "code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py"
       - "code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py"
       - "code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py"
       - "code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py"
@@ -29,6 +30,7 @@ on:
       - ".gitignore"
       - ".github/workflows/missionweave-deadline-integrity.yml"
       - "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py"
+      - "code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py"
       - "code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py"
       - "code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py"
       - "code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py"
@@ -76,10 +78,16 @@ jobs:
       - name: Install the bounded test runner
         run: python -m pip install --disable-pip-version-check pytest==9.1.0
 
+      - name: Install the PDF inspection tool
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends --yes poppler-utils
+
       - name: Compile the deadline control builders
         run: |
           python -m py_compile \
             code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py \
+            code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py \
             code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py \
             code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py \
             code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py

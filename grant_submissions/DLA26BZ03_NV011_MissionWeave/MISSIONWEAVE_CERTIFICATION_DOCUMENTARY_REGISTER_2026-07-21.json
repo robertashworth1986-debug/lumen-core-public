@@ -7,7 +7,7 @@
     {
       "role": "PUBLIC_REPOSITORY_LICENSE",
       "path": "LICENSE",
-      "sha256": "A2C01DAE8F86B9D0BC5A1EC3D2BAAA6818DFD67D6E89E1FD506EAF77D0C02A8B"
+      "sha256": "691FB1B479C085A6C590ACF72B35B575312D5AF8AF73875CE77B1CD42A66649E"
     },
     {
       "role": "RELATED_EFFORT_OVERLAP_MATRIX",
@@ -82,6 +82,6 @@
   "claim_boundary": "This public register records source-bound documentary prerequisites for two MissionWeave certification gates. It does not establish cost allowability, prove the absence of all overlap, determine intellectual-property rights, replace qualified legal or accounting review, expose private review records, authorize submission, or certify any portal answer.",
   "integrity": {
     "hash_algorithm": "SHA-256",
-    "register_sha256": "28D6215A57C704C01FABF693B863C396014D9E11467C133402A3FF0EF75BEEB8"
+    "register_sha256": "9CBE0B3B054A9324DA6F4E47A06533A453B7DEE3BF7057A528D8E59DE53B96C1"
   }
 }

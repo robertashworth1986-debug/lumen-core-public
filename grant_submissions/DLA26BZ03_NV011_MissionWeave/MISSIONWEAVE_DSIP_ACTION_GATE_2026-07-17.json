@@ -3,7 +3,7 @@
     "claim_boundary_present": true,
     "controls_valid": true,
     "failure_code": null,
-    "file_sha256": "5362EEE1FAFBE3061FEEF5FE14E885199CB567347630A4A2FFD252483C214B00",
+    "file_sha256": "64B0C3FABF7B194E18862A7005B5E54DDF76E90354250F65E5A6E984F2226B18",
     "gate_decisions": {
       "NO_DUPLICATE_COST_OR_DELIVERABLE": false,
       "TECHNICAL_DATA_RIGHTS_ASSERTION": false
@@ -224,7 +224,7 @@
     },
     "submission_readiness_logic_unchanged": true
   },
-  "gate_sha256": "e6e9b72d87a7ee7148f8911cc561fc5586010fe914882a2cdf2d76ec6cf163b8",
+  "gate_sha256": "f44725cd96edd1b5c1e65588e125ebbf46f753cf8fca5907b93d670af7165d7e",
   "gate_summary": {
     "open_gate_count": 15,
     "passed_private_gate_count": 35,
@@ -335,7 +335,7 @@
       "VOLUME5_UPLOAD_SET"
     ]
   },
-  "generated_utc": "2026-07-21T20:43:48.362350+00:00",
+  "generated_utc": "2026-07-21T21:39:17.860849+00:00",
   "jcp_evidence_protocol": {
     "bare_boolean_can_clear_gate": false,
     "bytes": 4034,
