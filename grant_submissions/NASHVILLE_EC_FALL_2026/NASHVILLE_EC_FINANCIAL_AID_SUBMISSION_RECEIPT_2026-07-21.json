@@ -1,0 +1,30 @@
+{
+  "schema": "lumencore.nashville_ec_financial_aid_submission_receipt.v1",
+  "status": "FINANCIAL_AID_FORM_SUBMISSION_CONFIRMED",
+  "organization": "Nashville Entrepreneur Center",
+  "program": "Fall 2026 Accelerator",
+  "request": {
+    "official_email_observed_utc": "2026-07-20T19:52:03Z",
+    "requested_action": "Complete the separate three-question financial-aid information form.",
+    "deadline_date": "2026-07-22",
+    "deadline_time_explicit": false,
+    "deadline_timezone_explicit": false
+  },
+  "portal_confirmation": {
+    "observed_utc": "2026-07-21T22:45:00Z",
+    "evidence_method": "Read-only observation of the already-open form confirmation page in the browser session.",
+    "page_title": "Thank You",
+    "bounded_confirmation": "Your submission has been received.",
+    "submission_verified": true
+  },
+  "routing_controls": {
+    "email_reply_required": false,
+    "resubmission_allowed": false,
+    "duplicate_send_allowed": false,
+    "next_action": "Monitor for the stated accelerator review result or a specific new request. Do not resubmit the application or financial-aid form and do not send a courtesy reply.",
+    "private_form_answers_recorded": false,
+    "private_financial_details_recorded": false,
+    "private_message_identifiers_recorded": false
+  },
+  "claim_boundary": "This receipt records only the observed form-confirmation state. It does not prove program selection, financial-aid approval, funding, endorsement, validation, revenue, or an award."
+}

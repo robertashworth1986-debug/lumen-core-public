@@ -24,6 +24,15 @@ NASHVILLE_SUBMISSION_RECEIPT = (
     / "NASHVILLE_EC_FALL_2026"
     / "NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json"
 )
+NASHVILLE_FINANCIAL_AID_SUBMISSION_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "NASHVILLE_EC_FALL_2026"
+    / "NASHVILLE_EC_FINANCIAL_AID_SUBMISSION_RECEIPT_2026-07-21.json"
+)
+USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT = (
+    SPRINT_DIR / "USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT_2026-07-21.json"
+)
 LVLUP_REVIEW_CONFIRMATION = (
     SPRINT_DIR / "LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json"
 )
@@ -137,6 +146,10 @@ def artifact_status(path: Path) -> dict[str, Any]:
 def build_payload() -> dict[str, Any]:
     nashville = read_json(NASHVILLE_OFFICIAL_DEADLINE_CONFIRMATION)
     nashville_submission = read_json(NASHVILLE_SUBMISSION_RECEIPT)
+    nashville_financial_aid = read_json(
+        NASHVILLE_FINANCIAL_AID_SUBMISSION_RECEIPT
+    )
+    uspto_access = read_json(USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT)
     lvlup = read_json(LVLUP_REVIEW_CONFIRMATION)
     darpa = read_json(DARPA_SN_26_97_RECEIPT)
     missionweave = read_json(MISSIONWEAVE_ACTION_GATE)
@@ -158,6 +171,38 @@ def build_payload() -> dict[str, Any]:
         or nashville_submission.get("status") != "PORTAL_SUBMISSION_CONFIRMED"
     ):
         raise ValueError("Nashville application submission receipt is missing or stale")
+    if (
+        nashville_financial_aid.get("schema")
+        != "lumencore.nashville_ec_financial_aid_submission_receipt.v1"
+        or nashville_financial_aid.get("status")
+        != "FINANCIAL_AID_FORM_SUBMISSION_CONFIRMED"
+        or nashville_financial_aid.get("portal_confirmation", {}).get(
+            "submission_verified"
+        )
+        is not True
+        or nashville_financial_aid.get("routing_controls", {}).get(
+            "resubmission_allowed"
+        )
+        is not False
+    ):
+        raise ValueError(
+            "Nashville financial-aid submission receipt is missing or unsafe"
+        )
+    if (
+        uspto_access.get("schema")
+        != "lumencore.uspto_pro_se_access_guidance_receipt.v1"
+        or uspto_access.get("status")
+        != "OFFICIAL_ACCESS_PATH_GUIDANCE_RECEIVED_DEADLINE_NOT_CONFIRMED"
+        or uspto_access.get("unresolved_facts", {}).get(
+            "filing_deadline_confirmed"
+        )
+        is not False
+        or uspto_access.get("routing_controls", {}).get(
+            "proactive_followup_allowed"
+        )
+        is not False
+    ):
+        raise ValueError("USPTO Pro Se access guidance receipt is missing or unsafe")
     if (
         lvlup.get("schema")
         != "lumencore.lvlup_independent_review_confirmation.v1"
@@ -246,9 +291,11 @@ def build_payload() -> dict[str, Any]:
         {
             "lane_id": "nashville_ec_takeoff_fall_2026",
             "organization": "Nashville Entrepreneur Center",
-            "latest_event_type": "PORTAL_SUBMISSION_CONFIRMED",
-            "latest_event_utc": "2026-07-18T04:54:52.709214Z",
-            "state": nashville_submission["status"],
+            "latest_event_type": "FINANCIAL_AID_FORM_SUBMISSION_CONFIRMED",
+            "latest_event_utc": nashville_financial_aid["portal_confirmation"][
+                "observed_utc"
+            ],
+            "state": "MAIN_APPLICATION_AND_FINANCIAL_AID_FORM_SUBMITTED_REVIEW_PENDING",
             "operational_local_deadline": nashville["confirmation"][
                 "operational_local_deadline"
             ],
@@ -259,6 +306,19 @@ def build_payload() -> dict[str, Any]:
                 "timezone_explicit_in_message"
             ],
             "portal_submission_verified": True,
+            "main_application_portal_submission_verified": True,
+            "financial_aid_request_received": True,
+            "financial_aid_request_deadline_date": nashville_financial_aid[
+                "request"
+            ]["deadline_date"],
+            "financial_aid_deadline_time_explicit": nashville_financial_aid[
+                "request"
+            ]["deadline_time_explicit"],
+            "financial_aid_deadline_timezone_explicit": nashville_financial_aid[
+                "request"
+            ]["deadline_timezone_explicit"],
+            "financial_aid_form_submission_verified": True,
+            "financial_aid_duplicate_submission_allowed": False,
             "expected_next_steps_by": nashville_submission["confirmation_page"][
                 "expected_next_steps_by"
             ],
@@ -267,8 +327,9 @@ def build_payload() -> dict[str, Any]:
             "no_send_before": None,
             "do_not_duplicate_send": True,
             "next_action": (
-                "Monitor for the rolling review result through August 3; do not resubmit, "
-                "reply to the automated confirmation, or describe the application as selected."
+                "Monitor for the rolling review result through August 3; do not resubmit "
+                "either form, send a courtesy reply, or describe the application or "
+                "financial-aid request as selected or approved."
             ),
         },
         {
@@ -302,6 +363,31 @@ def build_payload() -> dict[str, Any]:
                 "docket capture, USPTO Pro Se procedural route, and a verified practitioner "
                 "referral without emailing unpublished application material."
             ),
+        },
+        {
+            "lane_id": "uspto_pro_se_application_access_guidance",
+            "organization": "USPTO Pro Se Assistance Center",
+            "latest_event_type": "OFFICIAL_ACCESS_PATH_GUIDANCE_RECEIVED",
+            "latest_event_utc": uspto_access["official_message"]["observed_utc"],
+            "state": "ACCESS_PATH_IDENTIFIED_DEADLINE_NOT_CONFIRMED",
+            "already_filed_application": True,
+            "patent_center_account_required": uspto_access["guidance"][
+                "patent_center_access_requires_uspto_account"
+            ],
+            "identity_verification_required": uspto_access["guidance"][
+                "patent_center_access_requires_identity_verification"
+            ],
+            "alternate_document_order_route": uspto_access["guidance"][
+                "alternate_document_order_route"
+            ],
+            "filing_deadline_confirmed": False,
+            "application_status_confirmed": False,
+            "procedural_posture_confirmed": False,
+            "email_reply_required": False,
+            "send_now": False,
+            "no_send_before": None,
+            "do_not_duplicate_send": True,
+            "next_action": uspto_access["routing_controls"]["next_action"],
         },
         {
             "lane_id": "lanl_vision_licensing_followup",
@@ -580,11 +666,13 @@ def build_payload() -> dict[str, Any]:
         "search_scope": [
             "Funding, grant, contract, SBIR/STTR, DSIP, NSF, SAM.gov, and Research.gov",
             "Patent routing and Georgia PATENTS",
+            "USPTO Pro Se procedural access guidance for an already-filed application",
             "LANL VISION and licensing follow-up",
             "EPRI Open Power AI Consortium onboarding",
             "FHWA TSMO qualified-partner outreach",
             "Nashville EC Fall 2026 TakeOff deadline-support query",
             "Nashville EC Fall 2026 TakeOff portal-submission confirmation",
+            "Nashville EC Fall 2026 financial-aid form request and submission confirmation",
             "DARPA-SN-26-97 formal RFI response and agency-thread state",
             "MissionWeave DSIP and OpenAI Build Week portal deadlines",
             "OpenAI Build Week self-sent handoff attachment integrity",
@@ -627,6 +715,12 @@ def build_payload() -> dict[str, Any]:
             ),
             "nashville_submission_receipt": artifact_status(
                 NASHVILLE_SUBMISSION_RECEIPT
+            ),
+            "nashville_financial_aid_submission_receipt": artifact_status(
+                NASHVILLE_FINANCIAL_AID_SUBMISSION_RECEIPT
+            ),
+            "uspto_pro_se_access_guidance_receipt": artifact_status(
+                USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT
             ),
             "lvlup_independent_review_confirmation": artifact_status(
                 LVLUP_REVIEW_CONFIRMATION
@@ -744,15 +838,40 @@ def validate_payload(payload: dict[str, Any]) -> None:
         if lane["lane_id"] == "nashville_ec_takeoff_fall_2026"
     )
     if (
-        nashville["state"] != "PORTAL_SUBMISSION_CONFIRMED"
+        nashville["state"]
+        != "MAIN_APPLICATION_AND_FINANCIAL_AID_FORM_SUBMITTED_REVIEW_PENDING"
         or nashville["operational_local_deadline"] != "2026-07-17T23:59:00-05:00"
         or nashville["operational_utc_deadline"] != "2026-07-18T04:59:00Z"
         or nashville["deadline_timezone_explicit_in_message"] is not False
         or nashville["portal_submission_verified"] is not True
+        or nashville["main_application_portal_submission_verified"] is not True
+        or nashville["financial_aid_request_received"] is not True
+        or nashville["financial_aid_request_deadline_date"] != "2026-07-22"
+        or nashville["financial_aid_deadline_time_explicit"] is not False
+        or nashville["financial_aid_deadline_timezone_explicit"] is not False
+        or nashville["financial_aid_form_submission_verified"] is not True
+        or nashville["financial_aid_duplicate_submission_allowed"] is not False
         or nashville["expected_next_steps_by"] != "2026-08-03"
         or nashville["do_not_duplicate_send"] is not True
     ):
         raise ValueError("Nashville EC submission control is incomplete")
+    uspto = next(
+        lane
+        for lane in payload["lanes"]
+        if lane["lane_id"] == "uspto_pro_se_application_access_guidance"
+    )
+    if (
+        uspto["state"] != "ACCESS_PATH_IDENTIFIED_DEADLINE_NOT_CONFIRMED"
+        or uspto["patent_center_account_required"] is not True
+        or uspto["identity_verification_required"] is not True
+        or uspto["filing_deadline_confirmed"] is not False
+        or uspto["application_status_confirmed"] is not False
+        or uspto["procedural_posture_confirmed"] is not False
+        or uspto["email_reply_required"] is not False
+        or uspto["send_now"] is not False
+        or uspto["do_not_duplicate_send"] is not True
+    ):
+        raise ValueError("USPTO Pro Se access-path control is incomplete")
     lvlup = next(
         lane for lane in payload["lanes"] if lane["lane_id"] == "lvlup_optional_paid_event"
     )

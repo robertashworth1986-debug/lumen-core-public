@@ -15,7 +15,7 @@
       "eligible_template_id": null,
       "not_before_utc": null,
       "max_proactive_sends": 0,
-      "rationale": "Portal submission is confirmed; monitor through the stated review date and answer only a specific inbound request."
+      "rationale": "The main application and separate financial-aid form are both confirmed submitted; monitor through the stated review date and answer only a specific inbound request."
     },
     {
       "lane_id": "epri_open_power_ai_mou",
@@ -32,6 +32,14 @@
       "not_before_utc": null,
       "max_proactive_sends": 0,
       "rationale": "The organization stated that it does not provide the requested service for an already-filed application."
+    },
+    {
+      "lane_id": "uspto_pro_se_application_access_guidance",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "Official guidance identifies account, identity-verification, and document-order access paths but does not confirm a deadline or application status; take the private account or phone action without sending another email."
     },
     {
       "lane_id": "lanl_vision_licensing_followup",

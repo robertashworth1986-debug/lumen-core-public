@@ -41,8 +41,8 @@ def test_followup_policy_config_is_complete_and_fail_closed():
 
     assert payload["schema"] == "lumencore.outreach_followup_policies.v1"
     assert payload["version"] == 1
-    assert len(rows) == 16
-    assert len({row["lane_id"] for row in rows}) == 16
+    assert len(rows) == 17
+    assert len({row["lane_id"] for row in rows}) == 17
     assert payload["controls"] == {
         "action_time_human_review_required": True,
         "builder_can_send_email": False,
@@ -83,8 +83,8 @@ def test_current_queue_is_deterministic_and_never_sends():
         "FOLLOWUP_RECHECK_DUE_HUMAN_REVIEW",
         "ROUTING_INTEGRITY_EXCEPTION_NO_SEND",
     }
-    assert actual["summary"]["lane_count"] == 16
-    assert sum(actual["summary"]["action_state_counts"].values()) == 16
+    assert actual["summary"]["lane_count"] == 17
+    assert sum(actual["summary"]["action_state_counts"].values()) == 17
     assert actual["summary"]["draft_rendered_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
     assert actual["summary"]["recorded_proactive_send_count"] == 1

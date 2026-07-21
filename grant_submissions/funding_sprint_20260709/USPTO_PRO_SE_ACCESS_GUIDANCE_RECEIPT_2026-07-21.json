@@ -1,0 +1,40 @@
+{
+  "schema": "lumencore.uspto_pro_se_access_guidance_receipt.v1",
+  "status": "OFFICIAL_ACCESS_PATH_GUIDANCE_RECEIVED_DEADLINE_NOT_CONFIRMED",
+  "organization": "USPTO Pro Se Assistance Center",
+  "official_message": {
+    "observed_utc": "2026-07-21T22:43:44Z",
+    "event_type": "OFFICIAL_PROCEDURAL_ACCESS_GUIDANCE",
+    "already_filed_application": true,
+    "private_service_request_reference_present": true,
+    "private_service_request_value_recorded": false
+  },
+  "guidance": {
+    "patent_center_access_requires_uspto_account": true,
+    "patent_center_access_requires_identity_verification": true,
+    "alternate_document_order_route": "USPTO Document Services Division",
+    "document_services_customer_service_phone": "800-972-6382",
+    "document_services_hours": "Monday through Friday, 8:30 a.m. to 5:00 p.m. Eastern Time",
+    "pro_se_assistance_phone": "866-767-3848"
+  },
+  "unresolved_facts": {
+    "filing_deadline_confirmed": false,
+    "application_status_confirmed": false,
+    "abandonment_status_confirmed": false,
+    "procedural_posture_confirmed": false,
+    "appointment_confirmed": false
+  },
+  "routing_controls": {
+    "email_reply_required": false,
+    "proactive_followup_allowed": false,
+    "duplicate_send_allowed": false,
+    "next_action": "Use a verified uspto.gov account and identity verification, or order the application through Document Services, then call the Pro Se Assistance Center with the private service-request reference available. Do not disclose unpublished application material in public artifacts."
+  },
+  "privacy_controls": {
+    "application_number_recorded": false,
+    "application_title_recorded": false,
+    "private_message_identifiers_recorded": false,
+    "unpublished_application_contents_recorded": false
+  },
+  "claim_boundary": "This receipt records official access-path guidance only. It does not establish a filing deadline, application status, abandonment, procedural posture, appointment, legal advice, patentability, allowance, issuance, ownership, or enforceability."
+}

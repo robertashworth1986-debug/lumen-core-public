@@ -36,15 +36,15 @@ def test_reconciliation_is_deterministic_and_no_send():
     module.validate_payload(actual)
     assert actual == expected
     assert actual["status"] == "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
-    assert actual["summary"]["lane_count"] == 16
+    assert actual["summary"]["lane_count"] == 17
     assert actual["summary"]["email_reply_required_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
-    assert actual["summary"]["duplicate_outbound_risk_count"] == 15
-    assert actual["summary"]["monitor_no_send_template_count"] == 15
+    assert actual["summary"]["duplicate_outbound_risk_count"] == 16
+    assert actual["summary"]["monitor_no_send_template_count"] == 16
     assert actual["summary"]["follow_up_mode_counts"] == {
         "ACCOUNT_ACTION": 1,
         "CLOSED": 2,
-        "INBOUND_ONLY": 9,
+        "INBOUND_ONLY": 10,
         "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 2,
         "PORTAL_ACTION": 1,
         "PRIVATE_RECONCILIATION": 1,
@@ -170,18 +170,46 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     )
 
     nashville = lanes["nashville_ec_takeoff_fall_2026"]
-    assert nashville["latest_event_type"] == "PORTAL_SUBMISSION_CONFIRMED"
-    assert nashville["latest_event_utc"] == "2026-07-18T04:54:52.709214Z"
-    assert nashville["state"] == "PORTAL_SUBMISSION_CONFIRMED"
+    assert nashville["latest_event_type"] == (
+        "FINANCIAL_AID_FORM_SUBMISSION_CONFIRMED"
+    )
+    assert nashville["latest_event_utc"] == "2026-07-21T22:45:00Z"
+    assert nashville["state"] == (
+        "MAIN_APPLICATION_AND_FINANCIAL_AID_FORM_SUBMITTED_REVIEW_PENDING"
+    )
     assert nashville["operational_local_deadline"] == "2026-07-17T23:59:00-05:00"
     assert nashville["operational_utc_deadline"] == "2026-07-18T04:59:00Z"
     assert nashville["deadline_timezone_explicit_in_message"] is False
     assert nashville["portal_submission_verified"] is True
+    assert nashville["main_application_portal_submission_verified"] is True
+    assert nashville["financial_aid_request_received"] is True
+    assert nashville["financial_aid_request_deadline_date"] == "2026-07-22"
+    assert nashville["financial_aid_deadline_time_explicit"] is False
+    assert nashville["financial_aid_deadline_timezone_explicit"] is False
+    assert nashville["financial_aid_form_submission_verified"] is True
+    assert nashville["financial_aid_duplicate_submission_allowed"] is False
     assert nashville["expected_next_steps_by"] == "2026-08-03"
     assert nashville["do_not_duplicate_send"] is True
     assert nashville["send_now"] is False
-    assert "do not resubmit" in nashville["next_action"]
+    assert "do not resubmit either form" in nashville["next_action"]
     assert nashville["follow_up_policy"]["mode"] == "INBOUND_ONLY"
+
+    uspto = lanes["uspto_pro_se_application_access_guidance"]
+    assert uspto["latest_event_type"] == (
+        "OFFICIAL_ACCESS_PATH_GUIDANCE_RECEIVED"
+    )
+    assert uspto["latest_event_utc"] == "2026-07-21T22:43:44Z"
+    assert uspto["state"] == "ACCESS_PATH_IDENTIFIED_DEADLINE_NOT_CONFIRMED"
+    assert uspto["already_filed_application"] is True
+    assert uspto["patent_center_account_required"] is True
+    assert uspto["identity_verification_required"] is True
+    assert uspto["filing_deadline_confirmed"] is False
+    assert uspto["application_status_confirmed"] is False
+    assert uspto["procedural_posture_confirmed"] is False
+    assert uspto["email_reply_required"] is False
+    assert uspto["send_now"] is False
+    assert uspto["do_not_duplicate_send"] is True
+    assert uspto["follow_up_policy"]["mode"] == "INBOUND_ONLY"
 
     lanl = lanes["lanl_vision_licensing_followup"]
     assert lanl["follow_up_policy"] == {
@@ -212,6 +240,10 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     source_evidence = module.build_payload()["source_evidence"]
     assert source_evidence["nashville_official_deadline_confirmation"]["present"] is True
     assert source_evidence["nashville_submission_receipt"]["present"] is True
+    assert source_evidence["nashville_financial_aid_submission_receipt"][
+        "present"
+    ] is True
+    assert source_evidence["uspto_pro_se_access_guidance_receipt"]["present"] is True
     assert source_evidence["lvlup_independent_review_confirmation"]["present"] is True
     assert source_evidence["darpa_sn_26_97_public_submission_receipt"]["present"] is True
     assert source_evidence["missionweave_dsip_action_gate"]["present"] is True
@@ -253,6 +285,8 @@ def test_public_reconciliation_excludes_private_mailbox_data():
         "client_secret",
         "refresh_token",
         "api_key",
+        "service_request_number",
+        "application_number\"",
     ):
         assert forbidden not in rendered
 
