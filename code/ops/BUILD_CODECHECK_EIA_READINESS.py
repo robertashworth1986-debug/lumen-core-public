@@ -3,8 +3,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.util
+import io
 import json
 import re
+import subprocess
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -54,10 +57,10 @@ PREPRINT_BOUNDARY_TOKENS = (
     "A stable preprint identifier, immutable source release identifier, CODECHECK register issue, independent execution receipt, and certificate remain open gates.",
 )
 REQUEST_HOLD_TOKENS = (
-    "HOLD_STABLE_PREPRINT_IDENTIFIER_AND_HUMANUNLOCK",
-    "[STABLE_PUBLIC_PREPRINT_URL_OR_DOI_REQUIRED]",
+    "HOLD_IDENTIFIER_COLLISION_DUPLICATE_RECHECK_AND_HUMANUNLOCK",
     "[IDENTIFIER_ASSIGNED_AT_ACTION_TIME]",
     "Leave unassigned.",
+    "identifier collision",
     "fresh action-time HumanUnlock",
     "has not been posted, emailed, submitted, assigned, or accepted",
 )
@@ -635,12 +638,222 @@ def verify_operator_container_rebuild(
     }
 
 
+def git_object_map(commit: str, relative_paths: list[str]) -> dict[str, bytes]:
+    unique_paths = sorted(set(relative_paths))
+    result = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(ROOT),
+            "archive",
+            "--format=zip",
+            commit,
+            "--",
+            *unique_paths,
+        ],
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return {}
+    try:
+        with zipfile.ZipFile(io.BytesIO(result.stdout)) as archive:
+            return {
+                path: archive.read(path)
+                for path in unique_paths
+                if path in archive.namelist()
+            }
+    except zipfile.BadZipFile:
+        return {}
+
+
+def git_check(*args: str) -> bool:
+    return (
+        subprocess.run(
+            ["git", "-C", str(ROOT), *args],
+            capture_output=True,
+            check=False,
+        ).returncode
+        == 0
+    )
+
+
+def portable_blob_sha256(raw: bytes, hash_mode: str) -> str | None:
+    if hash_mode == "binary":
+        content = raw
+    elif hash_mode == "utf8_lf":
+        try:
+            text = raw.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
+        except UnicodeDecodeError:
+            return None
+        content = text.encode("utf-8")
+    else:
+        return None
+    return hashlib.sha256(content).hexdigest()
+
+
+def verify_public_commit_freeze(
+    control: dict[str, Any],
+    *,
+    release_candidate: dict[str, Any],
+    pdf_path: Path,
+) -> dict[str, Any]:
+    repository = control["repository_full_name"]
+    commit = control["source_commit"]
+    preprint_path = control["preprint_path"]
+    source_url = control["source_url"]
+    preprint_url = control["preprint_url"]
+    expected_source_url = f"https://github.com/{repository}/commit/{commit}"
+    expected_preprint_url = (
+        f"https://raw.githubusercontent.com/{repository}/{commit}/{preprint_path}"
+    )
+
+    release_rows = release_candidate["bundle_inputs"]
+    commit_format_valid = bool(re.fullmatch(r"[0-9a-f]{40}", commit))
+    pinned_objects = (
+        git_object_map(
+            commit,
+            [row["path"] for row in release_rows] + [preprint_path],
+        )
+        if commit_format_valid
+        else {}
+    )
+    reconciliation_rows = []
+    for row in release_rows:
+        raw = pinned_objects.get(row["path"])
+        pinned_sha256 = (
+            portable_blob_sha256(raw, row["hash_mode"]) if raw is not None else None
+        )
+        reconciliation_rows.append(
+            {
+                "path": row["path"],
+                "hash_mode": row["hash_mode"],
+                "expected_sha256": row["sha256"],
+                "pinned_commit_sha256": pinned_sha256,
+                "matched": pinned_sha256 == row["sha256"],
+            }
+        )
+
+    pinned_pdf = pinned_objects.get(preprint_path)
+    pinned_pdf_sha256 = (
+        hashlib.sha256(pinned_pdf).hexdigest() if pinned_pdf is not None else None
+    )
+    pinned_pdf_git_blob_sha1 = (
+        hashlib.sha1(
+            f"blob {len(pinned_pdf)}\0".encode("ascii") + pinned_pdf,
+            usedforsecurity=False,
+        ).hexdigest()
+        if pinned_pdf is not None
+        else None
+    )
+    repository_format_valid = bool(
+        re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository)
+    )
+    preprint_path_object = PurePosixPath(preprint_path)
+    preprint_path_safe = (
+        bool(preprint_path)
+        and not preprint_path_object.is_absolute()
+        and ".." not in preprint_path_object.parts
+    )
+    commit_exists_local = commit_format_valid and git_check(
+        "cat-file", "-e", f"{commit}^{{commit}}"
+    )
+    commit_is_ancestor = commit_exists_local and git_check(
+        "merge-base", "--is-ancestor", commit, "HEAD"
+    )
+    stable_public_identifier_verified = all(
+        (
+            repository_format_valid,
+            commit_exists_local,
+            source_url == expected_source_url,
+            preprint_url == expected_preprint_url,
+            preprint_path_safe,
+            pinned_pdf_sha256 == file_sha256(pdf_path),
+            pinned_pdf_sha256 == control["preprint_sha256"],
+        )
+    )
+    immutable_public_source_release_verified = all(
+        (
+            repository_format_valid,
+            commit_exists_local,
+            commit_is_ancestor,
+            source_url == expected_source_url,
+            len(release_rows) == control["release_candidate_input_count"],
+            release_candidate["bundle_input_chain_sha256"]
+            == control["release_candidate_input_chain_sha256"],
+            all(row["matched"] for row in reconciliation_rows),
+        )
+    )
+    checks = {
+        "repository_format_valid": repository_format_valid,
+        "source_commit_format_valid": commit_format_valid,
+        "source_commit_exists_local": commit_exists_local,
+        "source_commit_is_ancestor_of_head": commit_is_ancestor,
+        "source_url_exact": source_url == expected_source_url,
+        "preprint_url_exact": preprint_url == expected_preprint_url,
+        "preprint_path_safe": preprint_path_safe,
+        "pinned_preprint_present": pinned_pdf is not None,
+        "pinned_preprint_sha256_matched": pinned_pdf_sha256
+        == control["preprint_sha256"]
+        == file_sha256(pdf_path),
+        "pinned_preprint_public_blob_matched": pinned_pdf_git_blob_sha1
+        == control["preprint_git_blob_sha1"],
+        "release_candidate_input_count_matched": len(release_rows)
+        == control["release_candidate_input_count"],
+        "release_candidate_input_chain_matched": release_candidate[
+            "bundle_input_chain_sha256"
+        ]
+        == control["release_candidate_input_chain_sha256"],
+        "release_candidate_inputs_match_pinned_commit": all(
+            row["matched"] for row in reconciliation_rows
+        ),
+        "stable_public_identifier_verified": stable_public_identifier_verified,
+        "immutable_public_source_release_verified": immutable_public_source_release_verified,
+        "external_validation_remains_false": control["external_validation_complete"]
+        is False,
+        "submission_authorization_remains_false": control["submission_authorized"]
+        is False,
+    }
+    return {
+        "verified": all(checks.values()),
+        "checks": checks,
+        "repository_full_name": repository,
+        "source_commit": commit,
+        "source_url": source_url,
+        "preprint_path": preprint_path,
+        "preprint_url": preprint_url,
+        "preprint_sha256": pinned_pdf_sha256,
+        "preprint_git_blob_sha1": pinned_pdf_git_blob_sha1,
+        "public_fetch_verified_utc": control["public_fetch_verified_utc"],
+        "public_fetch_verification_method": control[
+            "public_fetch_verification_method"
+        ],
+        "release_candidate_input_count": len(release_rows),
+        "release_candidate_input_chain_sha256": release_candidate[
+            "bundle_input_chain_sha256"
+        ],
+        "release_candidate_mismatch_count": sum(
+            not row["matched"] for row in reconciliation_rows
+        ),
+        "release_candidate_mismatch_paths": [
+            row["path"] for row in reconciliation_rows if not row["matched"]
+        ],
+        "release_candidate_reconciliation": reconciliation_rows,
+        "stable_public_identifier_verified": stable_public_identifier_verified,
+        "immutable_public_source_release_verified": immutable_public_source_release_verified,
+        "external_validation_complete": False,
+        "submission_authorized": False,
+        "policy": control["policy"],
+    }
+
+
 def verify_preprint_and_request(
     control: dict[str, Any],
     *,
     markdown_path: Path,
     pdf_path: Path,
     request_path: Path,
+    release_candidate: dict[str, Any],
 ) -> dict[str, Any]:
     markdown_text = markdown_path.read_text(encoding="utf-8")
     request_text = request_path.read_text(encoding="utf-8")
@@ -652,6 +865,11 @@ def verify_preprint_and_request(
             "request": request_text,
             "pdf": pdf_bytes.decode("latin-1"),
         }
+    )
+    public_commit_freeze = verify_public_commit_freeze(
+        control["public_commit_freeze"],
+        release_candidate=release_candidate,
+        pdf_path=pdf_path,
     )
     checks = {
         "source_sha256_matched": file_sha256(markdown_path)
@@ -672,12 +890,15 @@ def verify_preprint_and_request(
         ),
         "official_launch_pad_matched": control["official_launch_pad"]
         in request_text,
-        "stable_public_identifier_unset": control["stable_public_identifier"]
-        is None,
-        "immutable_public_source_release_unset": control[
+        "public_commit_freeze_verified": public_commit_freeze["verified"],
+        "stable_public_identifier_verified": control["stable_public_identifier"]
+        == public_commit_freeze["preprint_url"]
+        and public_commit_freeze["stable_public_identifier_verified"],
+        "immutable_public_source_release_verified": control[
             "immutable_public_source_release"
         ]
-        is None,
+        == public_commit_freeze["source_url"]
+        and public_commit_freeze["immutable_public_source_release_verified"],
         "duplicate_request_reconciliation_open": control[
             "duplicate_request_reconciled"
         ]
@@ -707,6 +928,7 @@ def verify_preprint_and_request(
         "request_path": display_path(request_path),
         "community_request_ready": False,
         "community_request_opened": control["community_request_opened"],
+        "public_commit_freeze": public_commit_freeze,
         "configured_private_pattern_hit_count": len(private_hits),
         "policy": control["policy"],
     }
@@ -754,12 +976,6 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
         capsule_receipt_path=ROOT / config["operator_clean_runner"]["receipt_path"],
         runtime_receipt_path=ROOT / config["reviewer_runtime"]["receipt_path"],
     )
-    preprint_and_request = verify_preprint_and_request(
-        config["preprint_and_request"],
-        markdown_path=ROOT / bundle["preprint_markdown_path"],
-        pdf_path=ROOT / bundle["preprint_pdf_path"],
-        request_path=ROOT / bundle["community_request_draft_path"],
-    )
     release_candidate_config_path = ROOT / bundle[
         "release_candidate_config_path"
     ]
@@ -768,6 +984,13 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
     )
     release_candidate = release_candidate_module.inspect_release_candidate(
         release_candidate_config_path
+    )
+    preprint_and_request = verify_preprint_and_request(
+        config["preprint_and_request"],
+        markdown_path=ROOT / bundle["preprint_markdown_path"],
+        pdf_path=ROOT / bundle["preprint_pdf_path"],
+        request_path=ROOT / bundle["community_request_draft_path"],
+        release_candidate=release_candidate,
     )
 
     output_root = PurePosixPath(execution["output_root"])
@@ -921,7 +1144,29 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
     internal_gate_passed = all(checks.values())
 
     portable_inputs = [artifact_row(path) for path in portable_paths]
-    external_gates = config["external_gates"]
+    verified_gate_states = {
+        "stable_public_preprint_identifier": preprint_and_request[
+            "public_commit_freeze"
+        ]["stable_public_identifier_verified"],
+        "immutable_public_source_release": preprint_and_request[
+            "public_commit_freeze"
+        ]["immutable_public_source_release_verified"],
+    }
+    external_gates = [
+        {
+            **gate,
+            "complete": verified_gate_states.get(gate["gate_id"], gate["complete"]),
+        }
+        for gate in config["external_gates"]
+    ]
+    configured_gate_states = {
+        gate["gate_id"]: gate["complete"] for gate in config["external_gates"]
+    }
+    for gate_id, verified_state in verified_gate_states.items():
+        checks[f"external_gate_{gate_id}_claim_matched"] = (
+            configured_gate_states[gate_id] is verified_state
+        )
+    internal_gate_passed = all(checks.values())
     payload: dict[str, Any] = {
         "schema": "codecheck_eia_author_readiness.v1",
         "protocol_id": config["protocol_id"],
@@ -991,8 +1236,12 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             "release_candidate_publication_ready": release_candidate[
                 "publication_ready"
             ],
-            "stable_public_preprint_identifier_complete": False,
-            "immutable_public_source_release_complete": False,
+            "stable_public_preprint_identifier_complete": verified_gate_states[
+                "stable_public_preprint_identifier"
+            ],
+            "immutable_public_source_release_complete": verified_gate_states[
+                "immutable_public_source_release"
+            ],
             "duplicate_request_reconciled": False,
             "community_request_ready": preprint_and_request[
                 "community_request_ready"
@@ -1134,6 +1383,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Manifest reference: `{preprint['paper_reference']}`",
             f"- Stable public identifier: `{preprint['stable_public_identifier'] or 'not assigned'}`",
             f"- Immutable public source release: `{preprint['immutable_public_source_release'] or 'not frozen'}`",
+            f"- Pinned source commit: `{preprint['public_commit_freeze']['source_commit']}`",
+            f"- Public preprint Git blob: `{preprint['public_commit_freeze']['preprint_git_blob_sha1']}`",
+            f"- Public fetch verified UTC: `{preprint['public_commit_freeze']['public_fetch_verified_utc']}`",
+            f"- Pinned release inputs reconciled: `{preprint['public_commit_freeze']['release_candidate_input_count'] - preprint['public_commit_freeze']['release_candidate_mismatch_count']}/{preprint['public_commit_freeze']['release_candidate_input_count']}`",
+            f"- Public commit freeze verified: `{str(preprint['public_commit_freeze']['verified']).lower()}`",
             f"- Duplicate request reconciled: `{str(preprint['duplicate_request_reconciled']).lower()}`",
             f"- Request draft: `{preprint['request_path']}`",
             f"- Community request ready: `{str(preprint['community_request_ready']).lower()}`",

@@ -61,6 +61,11 @@ def load_module():
     return module
 
 
+def inspect_release_candidate(module):
+    release_module = module.load_release_candidate_module(RELEASE_SCRIPT)
+    return release_module.inspect_release_candidate(RELEASE_CONFIG)
+
+
 def test_codecheck_configuration_is_author_scoped_and_manifest_exact():
     module = load_module()
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
@@ -282,8 +287,19 @@ def test_preprint_and_request_are_hash_locked_bounded_and_unopened():
     assert packet["pdf_path"] == PREPRINT_PDF.relative_to(ROOT).as_posix()
     assert packet["request_path"] == REQUEST_DRAFT.relative_to(ROOT).as_posix()
     assert packet["pdf_page_count"] == 5
-    assert packet["stable_public_identifier"] is None
-    assert packet["immutable_public_source_release"] is None
+    assert packet["stable_public_identifier"].startswith(
+        "https://raw.githubusercontent.com/"
+    )
+    assert packet["immutable_public_source_release"].endswith(
+        "1c0eb51754beffac6f4df484914e35efc21c253f"
+    )
+    assert packet["public_commit_freeze"]["verified"] is True
+    assert (
+        packet["public_commit_freeze"]["preprint_git_blob_sha1"]
+        == "7a36dbacc00f10f36f4f0b5cd514c8d4a8325940"
+    )
+    assert packet["public_commit_freeze"]["release_candidate_input_count"] == 44
+    assert packet["public_commit_freeze"]["release_candidate_mismatch_count"] == 0
     assert packet["duplicate_request_reconciled"] is False
     assert packet["community_request_ready"] is False
     assert packet["community_request_opened"] is False
@@ -306,12 +322,32 @@ def test_preprint_verification_rejects_tampered_source(tmp_path):
         markdown_path=tampered,
         pdf_path=PREPRINT_PDF,
         request_path=REQUEST_DRAFT,
+        release_candidate=inspect_release_candidate(module),
     )
 
     assert result["verified"] is False
     assert result["checks"]["source_sha256_matched"] is False
     assert result["community_request_ready"] is False
     assert result["community_request_opened"] is False
+
+
+def test_public_commit_freeze_fails_closed_on_unknown_commit():
+    module = load_module()
+    control = json.loads(CONFIG.read_text(encoding="utf-8"))[
+        "preprint_and_request"
+    ]["public_commit_freeze"]
+    control["source_commit"] = "0" * 40
+
+    result = module.verify_public_commit_freeze(
+        control,
+        release_candidate=inspect_release_candidate(module),
+        pdf_path=PREPRINT_PDF,
+    )
+
+    assert result["verified"] is False
+    assert result["checks"]["source_commit_exists_local"] is False
+    assert result["stable_public_identifier_verified"] is False
+    assert result["immutable_public_source_release_verified"] is False
 
 
 def test_release_candidate_is_integrated_but_every_publication_gate_is_closed():
@@ -342,12 +378,13 @@ def test_ci_gate_is_read_only_pinned_and_retriggers_for_portable_inputs():
     assert "BUILD_CODECHECK_EIA_READINESS.py --check-only" in workflow
     assert "tests/test_codecheck_eia_readiness.py" in workflow
     assert "actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd" in workflow
+    assert "fetch-depth: 0" in workflow
     assert "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1" in workflow
     for path in config["portable_input_paths"]:
         assert workflow.count(f'- "{path}"') == 2, path
 
 
-def test_internal_readiness_pass_keeps_every_external_gate_closed():
+def test_internal_readiness_pass_closes_only_commit_pinned_publication_gates():
     module = load_module()
     payload = module.build_payload(generated_utc="2026-07-20T00:00:00+00:00")
     summary = payload["summary"]
@@ -371,8 +408,8 @@ def test_internal_readiness_pass_keeps_every_external_gate_closed():
     assert summary["public_preprint_draft_complete"] is True
     assert summary["release_candidate_definition_ready"] is True
     assert summary["release_candidate_publication_ready"] is False
-    assert summary["stable_public_preprint_identifier_complete"] is False
-    assert summary["immutable_public_source_release_complete"] is False
+    assert summary["stable_public_preprint_identifier_complete"] is True
+    assert summary["immutable_public_source_release_complete"] is True
     assert summary["duplicate_request_reconciled"] is False
     assert summary["community_request_ready"] is False
     assert summary["community_request_opened"] is False
@@ -382,7 +419,17 @@ def test_internal_readiness_pass_keeps_every_external_gate_closed():
     assert summary["independent_execution_complete"] is False
     assert summary["certificate_issued"] is False
     assert summary["external_validation_complete"] is False
-    assert all(gate["complete"] is False for gate in payload["external_gates"])
+    gate_states = {
+        gate["gate_id"]: gate["complete"] for gate in payload["external_gates"]
+    }
+    assert gate_states["stable_public_preprint_identifier"] is True
+    assert gate_states["immutable_public_source_release"] is True
+    assert all(
+        complete is False
+        for gate_id, complete in gate_states.items()
+        if gate_id
+        not in {"stable_public_preprint_identifier", "immutable_public_source_release"}
+    )
     assert payload["privacy_scan"]["passed"] is True
 
 
@@ -436,7 +483,10 @@ def test_published_outputs_match_a_timestamp_stable_rebuild():
     assert "Public preprint draft complete: `true`" in rendered
     assert "Deterministic release-candidate definition ready: `true`" in rendered
     assert "Release publication ready: `false`" in rendered
-    assert "Stable public preprint identifier complete: `false`" in rendered
+    assert "Stable public preprint identifier complete: `true`" in rendered
+    assert "Immutable public source release complete: `true`" in rendered
+    assert "Pinned release inputs reconciled: `44/44`" in rendered
+    assert "Public commit freeze verified: `true`" in rendered
     assert "Community request opened: `false`" in rendered
 
 

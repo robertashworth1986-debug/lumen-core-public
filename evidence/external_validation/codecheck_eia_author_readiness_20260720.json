@@ -200,6 +200,8 @@
     "codechecker_metadata_left_external": true,
     "computational_identity_has_current_verified_replay": true,
     "corresponding_author_present": true,
+    "external_gate_immutable_public_source_release_claim_matched": true,
+    "external_gate_stable_public_preprint_identifier_claim_matched": true,
     "license_distinguishes_code_and_eia_data": true,
     "manifest_exactly_matched_protocol": true,
     "manifest_paths_safe": true,
@@ -257,17 +259,18 @@
     "preprint_request_claim_boundaries_present": true,
     "preprint_request_community_request_remains_unopened": true,
     "preprint_request_duplicate_request_reconciliation_open": true,
-    "preprint_request_immutable_public_source_release_unset": true,
+    "preprint_request_immutable_public_source_release_verified": true,
     "preprint_request_official_launch_pad_matched": true,
     "preprint_request_pdf_eof_present": true,
     "preprint_request_pdf_header_present": true,
     "preprint_request_pdf_page_count_matched": true,
     "preprint_request_pdf_sha256_matched": true,
     "preprint_request_privacy_scan_passed": true,
+    "preprint_request_public_commit_freeze_verified": true,
     "preprint_request_request_hold_controls_present": true,
     "preprint_request_required_manuscript_sections_present": true,
     "preprint_request_source_sha256_matched": true,
-    "preprint_request_stable_public_identifier_unset": true,
+    "preprint_request_stable_public_identifier_verified": true,
     "public_text_privacy_scan_passed": true,
     "readme_has_exact_codecheck_command": true,
     "release_candidate_bundle_paths_present": true,
@@ -360,13 +363,13 @@
       "owner": "Robert Ashworth"
     },
     {
-      "complete": false,
+      "complete": true,
       "gate_id": "stable_public_preprint_identifier",
       "meaning": "The bounded manuscript receives a stable public URL or DOI that can be cited in the CODECHECK request.",
       "owner": "Robert Ashworth"
     },
     {
-      "complete": false,
+      "complete": true,
       "gate_id": "immutable_public_source_release",
       "meaning": "The reviewed public source is frozen at an immutable release or commit and every packet hash is reconciled to it.",
       "owner": "Robert Ashworth"
@@ -408,7 +411,7 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T17:14:19.652406+00:00",
+  "generated_utc": "2026-07-21T18:51:51.489042+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "operator_clean_runner": {
     "assertion_count": 31,
@@ -723,13 +726,13 @@
     "tests/test_codecheck_reviewer_container.py": true,
     "tests/test_codecheck_reviewer_runtime.py": true
   },
-  "portable_input_chain_sha256": "2ecb5f6498c4a8e2cb7d0b9ea4fa8956bc5769796833c6de440e54cc5656264e",
+  "portable_input_chain_sha256": "503c47d57d7c983d5c00d2f1fd2c9ff9cc69e514986c135d978a356709b24550",
   "portable_inputs": [
     {
-      "bytes": 8071,
+      "bytes": 8110,
       "hash_mode": "utf8_lf",
       "path": ".github/workflows/codecheck-eia-readiness.yml",
-      "sha256": "aac666328cdb4a04365c7abf02e55621125b65360f2cf60cb02fa85f71f8418e"
+      "sha256": "105aefc846aaff5a66c1747d19ded781fab5ec7d8c6af35ea71b1fcf7a4be472"
     },
     {
       "bytes": 16243,
@@ -756,10 +759,10 @@
       "sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880"
     },
     {
-      "bytes": 59416,
+      "bytes": 69349,
       "hash_mode": "utf8_lf",
       "path": "code/ops/BUILD_CODECHECK_EIA_READINESS.py",
-      "sha256": "c2bcf0e52cdd86f2b17ef31477725f63669604f26d0421008963251fd16b693d"
+      "sha256": "16e7b18202e5552ac35880e21abcfee80498c73b989753dc7ab36ee1434bb268"
     },
     {
       "bytes": 10355,
@@ -810,10 +813,10 @@
       "sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c"
     },
     {
-      "bytes": 13914,
+      "bytes": 15803,
       "hash_mode": "utf8_lf",
       "path": "config/codecheck_eia_readiness_v1.json",
-      "sha256": "ed84d3136be14b683b125a03d7dbd554f6b4559e209796ab586112332db92f7c"
+      "sha256": "de26210e8407467cd6b0248a4ae347a6f1eeb281994a6b55c6cff1b7536a76ff"
     },
     {
       "bytes": 6174,
@@ -864,10 +867,10 @@
       "sha256": "0e001267b4932fc973db0fd72d9a1080e2d299859b25ca89aa2eb58f091986fd"
     },
     {
-      "bytes": 3286,
+      "bytes": 4128,
       "hash_mode": "utf8_lf",
       "path": "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
-      "sha256": "c6b200fd49bca5d4e50cb06845824c532107ec61b976f6eb41268f9b3683a246"
+      "sha256": "a13c115924af92c73c21a6c73e03d7d5b8ee859fce73022f953ae48624df774f"
     },
     {
       "bytes": 7905,
@@ -924,10 +927,10 @@
       "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
     },
     {
-      "bytes": 19801,
+      "bytes": 21806,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_readiness.py",
-      "sha256": "4a2e037e1057bd32d07b02111110cd997853846021e472885bef097bdc8bc830"
+      "sha256": "7523aedb182ad5199560efca4298cfeef47f2fdd699029b8017d599e7a81b1b5"
     },
     {
       "bytes": 6498,
@@ -953,32 +956,383 @@
       "claim_boundaries_present": true,
       "community_request_remains_unopened": true,
       "duplicate_request_reconciliation_open": true,
-      "immutable_public_source_release_unset": true,
+      "immutable_public_source_release_verified": true,
       "official_launch_pad_matched": true,
       "pdf_eof_present": true,
       "pdf_header_present": true,
       "pdf_page_count_matched": true,
       "pdf_sha256_matched": true,
       "privacy_scan_passed": true,
+      "public_commit_freeze_verified": true,
       "request_hold_controls_present": true,
       "required_manuscript_sections_present": true,
       "source_sha256_matched": true,
-      "stable_public_identifier_unset": true
+      "stable_public_identifier_verified": true
     },
     "community_request_opened": false,
     "community_request_ready": false,
     "configured_private_pattern_hit_count": 0,
     "duplicate_request_reconciled": false,
-    "immutable_public_source_release": null,
+    "immutable_public_source_release": "https://github.com/robertashworth1986-debug/lumen-core-public/commit/1c0eb51754beffac6f4df484914e35efc21c253f",
     "markdown_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
     "markdown_sha256": "2cc9a001b3a4c6a830b04b626f11b61f3a06ad49bf56e8599d4bb35c15b9f1a6",
     "paper_reference": "Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
     "pdf_page_count": 5,
     "pdf_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
     "pdf_sha256": "96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497",
-    "policy": "The manuscript and request text are author-side drafts. A stable public preprint identifier, immutable public source release, duplicate-request reconciliation, Robert's review, and fresh action-time HumanUnlock are required before one production request may be opened.",
+    "policy": "The manuscript and exact source are commit-pinned at stable public GitHub URLs. A fresh duplicate-request reconciliation, collision-free Launch Pad identifier, Robert's review, and fresh action-time HumanUnlock remain required before one production request may be opened.",
+    "public_commit_freeze": {
+      "checks": {
+        "external_validation_remains_false": true,
+        "immutable_public_source_release_verified": true,
+        "pinned_preprint_present": true,
+        "pinned_preprint_public_blob_matched": true,
+        "pinned_preprint_sha256_matched": true,
+        "preprint_path_safe": true,
+        "preprint_url_exact": true,
+        "release_candidate_input_chain_matched": true,
+        "release_candidate_input_count_matched": true,
+        "release_candidate_inputs_match_pinned_commit": true,
+        "repository_format_valid": true,
+        "source_commit_exists_local": true,
+        "source_commit_format_valid": true,
+        "source_commit_is_ancestor_of_head": true,
+        "source_url_exact": true,
+        "stable_public_identifier_verified": true,
+        "submission_authorization_remains_false": true
+      },
+      "external_validation_complete": false,
+      "immutable_public_source_release_verified": true,
+      "policy": "This receipt proves only that the cited preprint and all 44 deterministic release inputs match a public, commit-pinned GitHub source state. It is not a DOI, published release, CODECHECK acceptance, independent execution, certificate, scientific validation, field validation, performance endorsement, or valuation evidence.",
+      "preprint_git_blob_sha1": "7a36dbacc00f10f36f4f0b5cd514c8d4a8325940",
+      "preprint_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+      "preprint_sha256": "96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497",
+      "preprint_url": "https://raw.githubusercontent.com/robertashworth1986-debug/lumen-core-public/1c0eb51754beffac6f4df484914e35efc21c253f/docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+      "public_fetch_verification_method": "Connected GitHub commit fetch plus commit-addressed file fetch; reconciled to the local Git object and SHA-256.",
+      "public_fetch_verified_utc": "2026-07-21T18:51:12.3776340Z",
+      "release_candidate_input_chain_sha256": "1189cc679a2897d55ac418ae930c7545345efa279868435038c498944c369bf6",
+      "release_candidate_input_count": 44,
+      "release_candidate_mismatch_count": 0,
+      "release_candidate_mismatch_paths": [],
+      "release_candidate_reconciliation": [
+        {
+          "expected_sha256": "2fa8feb63735603960688161a252d2efa68077a51b27dc48bcdfe0d99d0ae14e",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": ".github/workflows/reviewer-reproducibility.yml",
+          "pinned_commit_sha256": "2fa8feb63735603960688161a252d2efa68077a51b27dc48bcdfe0d99d0ae14e"
+        },
+        {
+          "expected_sha256": "72bba006cb5d77f56677464c515d3ea5fff56293542d8655f2d14cd4099d59a7",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": ".gitignore",
+          "pinned_commit_sha256": "72bba006cb5d77f56677464c515d3ea5fff56293542d8655f2d14cd4099d59a7"
+        },
+        {
+          "expected_sha256": "1d96c42c599119efd294edd5e12bdab7ac3a47ebe0dcb182ac55014e061e441c",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "CITATION.cff",
+          "pinned_commit_sha256": "1d96c42c599119efd294edd5e12bdab7ac3a47ebe0dcb182ac55014e061e441c"
+        },
+        {
+          "expected_sha256": "2e399326d1698e17d388b7d5acb27006176e76fc8a8eead8d883494f3eb1bcfb",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "LICENSE",
+          "pinned_commit_sha256": "2e399326d1698e17d388b7d5acb27006176e76fc8a8eead8d883494f3eb1bcfb"
+        },
+        {
+          "expected_sha256": "bfe3bf5c66a22bf741bb9593e41aecb6836101700c00a9b1dcc0f584fe169855",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "README.md",
+          "pinned_commit_sha256": "bfe3bf5c66a22bf741bb9593e41aecb6836101700c00a9b1dcc0f584fe169855"
+        },
+        {
+          "expected_sha256": "c8478829cc9119cfd8b1391d6581ab8b8446062a9b011f92065579326a8d2a6e",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "code/eia_grid_residual_moe_benchmark.py",
+          "pinned_commit_sha256": "c8478829cc9119cfd8b1391d6581ab8b8446062a9b011f92065579326a8d2a6e"
+        },
+        {
+          "expected_sha256": "9fee3ac907415106545b5e9b54047e966ff86590549210f5eaedbe327ffa714b",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "code/eia_grid_wave_champion_benchmark.py",
+          "pinned_commit_sha256": "9fee3ac907415106545b5e9b54047e966ff86590549210f5eaedbe327ffa714b"
+        },
+        {
+          "expected_sha256": "5728dbd090abb0947e8cfe0acf3ac9f583170aa3bbb426a49ca007ba0159b7fd",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "code/mda_control_mapping_open_set_benchmark.py",
+          "pinned_commit_sha256": "5728dbd090abb0947e8cfe0acf3ac9f583170aa3bbb426a49ca007ba0159b7fd"
+        },
+        {
+          "expected_sha256": "5065f238b5cb221521a075ae1314bc2437ade1f7ffd17db5720d54cac38797d2",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py",
+          "pinned_commit_sha256": "5065f238b5cb221521a075ae1314bc2437ade1f7ffd17db5720d54cac38797d2"
+        },
+        {
+          "expected_sha256": "ee0f987deba96e25f70db58e9097cb53ce82c83d0b312493aef98dc7fbef7546",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py",
+          "pinned_commit_sha256": "ee0f987deba96e25f70db58e9097cb53ce82c83d0b312493aef98dc7fbef7546"
+        },
+        {
+          "expected_sha256": "1ea879aebdd45c58778d6ebb21ee4bd1be4d071250e779d6257288979f8c20bb",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "code/ops/RUN_FAA_SDR_10K_BENCHMARK.py",
+          "pinned_commit_sha256": "1ea879aebdd45c58778d6ebb21ee4bd1be4d071250e779d6257288979f8c20bb"
+        },
+        {
+          "expected_sha256": "cda60da03beefa75cf10d227b6dffe1be422a5e1531fc8b1b763fcfa805d0028",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
+          "pinned_commit_sha256": "cda60da03beefa75cf10d227b6dffe1be422a5e1531fc8b1b763fcfa805d0028"
+        },
+        {
+          "expected_sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+          "pinned_commit_sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c"
+        },
+        {
+          "expected_sha256": "79c03eb63443a8b9bba3cf48e206a8b44f7a9f8e8fa382a6c3b97e8ec5a1c676",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+          "pinned_commit_sha256": "79c03eb63443a8b9bba3cf48e206a8b44f7a9f8e8fa382a6c3b97e8ec5a1c676"
+        },
+        {
+          "expected_sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "codecheck.yml",
+          "pinned_commit_sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880"
+        },
+        {
+          "expected_sha256": "b721633d5053002c8f7b141e5ad0a4e12a9962cee0d4793a92c2c161da27b451",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "config/codecheck_eia_release_candidate_v1.json",
+          "pinned_commit_sha256": "b721633d5053002c8f7b141e5ad0a4e12a9962cee0d4793a92c2c161da27b451"
+        },
+        {
+          "expected_sha256": "c31119548da537c1b0f5bdaa2331f26143f24dc6eb1184e4504ecba7795cb897",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "config/codecheck_reviewer_container_v1.json",
+          "pinned_commit_sha256": "c31119548da537c1b0f5bdaa2331f26143f24dc6eb1184e4504ecba7795cb897"
+        },
+        {
+          "expected_sha256": "23a850097ef9da3cf112920595dddcea3afb22d3d4b9f5d70d37b099c7da359e",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "config/codecheck_reviewer_runtime_v1.json",
+          "pinned_commit_sha256": "23a850097ef9da3cf112920595dddcea3afb22d3d4b9f5d70d37b099c7da359e"
+        },
+        {
+          "expected_sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "config/eia_grid_residual_moe_protocol_v1.json",
+          "pinned_commit_sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+        },
+        {
+          "expected_sha256": "273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "config/eia_grid_wave_champion_protocol_v1.json",
+          "pinned_commit_sha256": "273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d"
+        },
+        {
+          "expected_sha256": "9a694ed6f194137880c070e73355ef826a51d3fed438ccf65adf6d4726ca80f0",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "config/mda_control_mapping_open_set_protocol_v2.json",
+          "pinned_commit_sha256": "9a694ed6f194137880c070e73355ef826a51d3fed438ccf65adf6d4726ca80f0"
+        },
+        {
+          "expected_sha256": "9768865e9e1aab551aea678c871de05c1085c0e2152e93afd0309a592edae32a",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "config/reviewer_protocol_provenance_v1.json",
+          "pinned_commit_sha256": "9768865e9e1aab551aea678c871de05c1085c0e2152e93afd0309a592edae32a"
+        },
+        {
+          "expected_sha256": "c69fb78965cdf420e8354042f1e90d11c6b7dde59f0a4d9fb27d9dec58f4cb01",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "config/reviewer_reproducibility_protocol_v1.json",
+          "pinned_commit_sha256": "c69fb78965cdf420e8354042f1e90d11c6b7dde59f0a4d9fb27d9dec58f4cb01"
+        },
+        {
+          "expected_sha256": "746307528a39cfe7d8cfe6891d6926fce64ed2b812f9a5202a368755b58561e8",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "containers/codecheck-reviewer/Dockerfile",
+          "pinned_commit_sha256": "746307528a39cfe7d8cfe6891d6926fce64ed2b812f9a5202a368755b58561e8"
+        },
+        {
+          "expected_sha256": "0e001267b4932fc973db0fd72d9a1080e2d299859b25ca89aa2eb58f091986fd",
+          "hash_mode": "binary",
+          "matched": true,
+          "path": "containers/codecheck-reviewer/run_capsule.sh",
+          "pinned_commit_sha256": "0e001267b4932fc973db0fd72d9a1080e2d299859b25ca89aa2eb58f091986fd"
+        },
+        {
+          "expected_sha256": "7c00f130eec80f43e94caa8f7ef96805aeb1afee05d07cbcf6821b39519303b6",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+          "pinned_commit_sha256": "7c00f130eec80f43e94caa8f7ef96805aeb1afee05d07cbcf6821b39519303b6"
+        },
+        {
+          "expected_sha256": "2cc9a001b3a4c6a830b04b626f11b61f3a06ad49bf56e8599d4bb35c15b9f1a6",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
+          "pinned_commit_sha256": "2cc9a001b3a4c6a830b04b626f11b61f3a06ad49bf56e8599d4bb35c15b9f1a6"
+        },
+        {
+          "expected_sha256": "96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497",
+          "hash_mode": "binary",
+          "matched": true,
+          "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+          "pinned_commit_sha256": "96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497"
+        },
+        {
+          "expected_sha256": "91de67be9b9ee88eadfd5ce34ed7f2d99c308c83311debd0676636a15e2161e6",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md",
+          "pinned_commit_sha256": "91de67be9b9ee88eadfd5ce34ed7f2d99c308c83311debd0676636a15e2161e6"
+        },
+        {
+          "expected_sha256": "f8280773d1fa3e1209f57c64d3fcdf9608e4d633c6a0148b2578fc45728b8a1a",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json",
+          "pinned_commit_sha256": "f8280773d1fa3e1209f57c64d3fcdf9608e4d633c6a0148b2578fc45728b8a1a"
+        },
+        {
+          "expected_sha256": "560cc3b5f187c0a4add90c527e967de36e13788c53e3bd8aaa63f97c10a3787e",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json",
+          "pinned_commit_sha256": "560cc3b5f187c0a4add90c527e967de36e13788c53e3bd8aaa63f97c10a3787e"
+        },
+        {
+          "expected_sha256": "929a0f8ad778071fbdabf82120016453579ff12aab13231f1d99dbb915af9d53",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json",
+          "pinned_commit_sha256": "929a0f8ad778071fbdabf82120016453579ff12aab13231f1d99dbb915af9d53"
+        },
+        {
+          "expected_sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9",
+          "hash_mode": "binary",
+          "matched": true,
+          "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+          "pinned_commit_sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9"
+        },
+        {
+          "expected_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "requirements-reviewer-ubuntu-py311.lock",
+          "pinned_commit_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
+        },
+        {
+          "expected_sha256": "4b99049b4bc579f6d2a5a675e612f513e1a24db79775a2120e60334a0c72bbd4",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "requirements-reviewer.txt",
+          "pinned_commit_sha256": "4b99049b4bc579f6d2a5a675e612f513e1a24db79775a2120e60334a0c72bbd4"
+        },
+        {
+          "expected_sha256": "044b55ef46de2c24b24acfd2a755bf3694c02efef4164d01b3faec5daf5abf7c",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "tests/test_codecheck_eia_release_candidate.py",
+          "pinned_commit_sha256": "044b55ef46de2c24b24acfd2a755bf3694c02efef4164d01b3faec5daf5abf7c"
+        },
+        {
+          "expected_sha256": "2f91a5bf16e0daa49fb17c4eda58c0452aa3c66a9ff176bbe5838f0dfc99337d",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "tests/test_codecheck_reviewer_container.py",
+          "pinned_commit_sha256": "2f91a5bf16e0daa49fb17c4eda58c0452aa3c66a9ff176bbe5838f0dfc99337d"
+        },
+        {
+          "expected_sha256": "c10a92d4fe120c3f8dbb3de4b6984673384f58e51a7dd560a0997a3506e7c2d4",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "tests/test_codecheck_reviewer_runtime.py",
+          "pinned_commit_sha256": "c10a92d4fe120c3f8dbb3de4b6984673384f58e51a7dd560a0997a3506e7c2d4"
+        },
+        {
+          "expected_sha256": "3ce4d672f8a209d5d9792f4285990911f1568f5ff36bf80f6d618ecbba31fb48",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "tests/test_eia_grid_residual_moe_benchmark.py",
+          "pinned_commit_sha256": "3ce4d672f8a209d5d9792f4285990911f1568f5ff36bf80f6d618ecbba31fb48"
+        },
+        {
+          "expected_sha256": "a0ce9a08f9d9409d9c52f37d24e112fc8a25c0f37297c536df40f03eeaf98824",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "tests/test_eia_grid_wave_champion_benchmark.py",
+          "pinned_commit_sha256": "a0ce9a08f9d9409d9c52f37d24e112fc8a25c0f37297c536df40f03eeaf98824"
+        },
+        {
+          "expected_sha256": "c2bbaac93e10883f30424998fa676bd69d313e4815760b97e43f84d20a86c7d5",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "tests/test_faa_sdr_10k_benchmark.py",
+          "pinned_commit_sha256": "c2bbaac93e10883f30424998fa676bd69d313e4815760b97e43f84d20a86c7d5"
+        },
+        {
+          "expected_sha256": "c3c8badaa94913d7e166d4cd8cb6563c71f66d67d5d5458dc1c463d28725695b",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "tests/test_mda_control_mapping_open_set_benchmark.py",
+          "pinned_commit_sha256": "c3c8badaa94913d7e166d4cd8cb6563c71f66d67d5d5458dc1c463d28725695b"
+        },
+        {
+          "expected_sha256": "cc10d035ef2712e41292ceec6b5fa93df93dfcb2145ab9b6d323b00b4d87d09f",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "tests/test_reviewer_dependency_lock.py",
+          "pinned_commit_sha256": "cc10d035ef2712e41292ceec6b5fa93df93dfcb2145ab9b6d323b00b4d87d09f"
+        },
+        {
+          "expected_sha256": "576ccc0b49cbfb8012d078c4d403e16ca17700ca3943134087517845392d3d2b",
+          "hash_mode": "utf8_lf",
+          "matched": true,
+          "path": "tests/test_reviewer_reproducibility_capsule.py",
+          "pinned_commit_sha256": "576ccc0b49cbfb8012d078c4d403e16ca17700ca3943134087517845392d3d2b"
+        }
+      ],
+      "repository_full_name": "robertashworth1986-debug/lumen-core-public",
+      "source_commit": "1c0eb51754beffac6f4df484914e35efc21c253f",
+      "source_url": "https://github.com/robertashworth1986-debug/lumen-core-public/commit/1c0eb51754beffac6f4df484914e35efc21c253f",
+      "stable_public_identifier_verified": true,
+      "submission_authorized": false,
+      "verified": true
+    },
     "request_path": "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
-    "stable_public_identifier": null,
+    "stable_public_identifier": "https://raw.githubusercontent.com/robertashworth1986-debug/lumen-core-public/1c0eb51754beffac6f4df484914e35efc21c253f/docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
     "verified": true
   },
   "privacy_scan": {
@@ -986,7 +1340,7 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "1c2552aa2baf413a3d48aed275b7460ede79f0e46baa50047619bf6f0ea55fb2",
+  "readiness_sha256": "ae2e19beeaac83eed48347dc01f36def8dacb8310e945525fb1e09786f851441",
   "release_candidate": {
     "bundle_input_chain_sha256": "1189cc679a2897d55ac418ae930c7545345efa279868435038c498944c369bf6",
     "bundle_input_count": 44,
@@ -1568,10 +1922,10 @@
     "duplicate_request_reconciled": false,
     "external_validation_complete": false,
     "human_author_review_complete": false,
-    "immutable_public_source_release_complete": false,
+    "immutable_public_source_release_complete": true,
     "independent_execution_complete": false,
-    "internal_check_count": 121,
-    "internal_check_pass_count": 121,
+    "internal_check_count": 124,
+    "internal_check_pass_count": 124,
     "internal_gate_passed": true,
     "manifest_output_count": 6,
     "operator_clean_runner_computational_identity_current": true,
@@ -1588,7 +1942,7 @@
     "reviewer_runtime_check_count": 10,
     "reviewer_runtime_check_pass_count": 10,
     "reviewer_runtime_receipt_verified": true,
-    "stable_public_preprint_identifier_complete": false,
+    "stable_public_preprint_identifier_complete": true,
     "submission_authorized": false
   },
   "value_bridge": "A later independent-execution certificate may reduce diligence risk around executability. It would not establish scientific validity, field performance, model superiority, realized savings, company valuation, or buyer demand."

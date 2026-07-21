@@ -1,13 +1,13 @@
 # CODECHECK EIA Author Readiness
 
-Generated UTC: `2026-07-21T17:14:19.652406+00:00`
+Generated UTC: `2026-07-21T18:51:51.489042+00:00`
 
 An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.
 
 ## Decision
 
 - Status: `AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW`
-- Internal checks: `121/121`
+- Internal checks: `124/124`
 - Declared reproducible outputs: `6`
 - Authoritative archive verified: `true`
 - Archived full source exact match: `false`
@@ -25,15 +25,15 @@ An author-readiness pass proves only that the declared public files, execution m
 - Public preprint draft complete: `true`
 - Deterministic release-candidate definition ready: `true`
 - Release publication ready: `false`
-- Stable public preprint identifier complete: `false`
-- Immutable public source release complete: `false`
+- Stable public preprint identifier complete: `true`
+- Immutable public source release complete: `true`
 - Duplicate request reconciled: `false`
 - Community request ready: `false`
 - Community request opened: `false`
 - Independent execution complete: `false`
 - Certificate issued: `false`
 - External validation complete: `false`
-- Readiness SHA-256: `1c2552aa2baf413a3d48aed275b7460ede79f0e46baa50047619bf6f0ea55fb2`
+- Readiness SHA-256: `ae2e19beeaac83eed48347dc01f36def8dacb8310e945525fb1e09786f851441`
 
 An internal pass means the author-side bundle is coherent enough for Robert to review. It is not a submission receipt, external execution, or certificate.
 
@@ -64,14 +64,19 @@ python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --r
 - PDF SHA-256: `96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497`
 - PDF pages: `5`
 - Manifest reference: `Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
-- Stable public identifier: `not assigned`
-- Immutable public source release: `not frozen`
+- Stable public identifier: `https://raw.githubusercontent.com/robertashworth1986-debug/lumen-core-public/1c0eb51754beffac6f4df484914e35efc21c253f/docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
+- Immutable public source release: `https://github.com/robertashworth1986-debug/lumen-core-public/commit/1c0eb51754beffac6f4df484914e35efc21c253f`
+- Pinned source commit: `1c0eb51754beffac6f4df484914e35efc21c253f`
+- Public preprint Git blob: `7a36dbacc00f10f36f4f0b5cd514c8d4a8325940`
+- Public fetch verified UTC: `2026-07-21T18:51:12.3776340Z`
+- Pinned release inputs reconciled: `44/44`
+- Public commit freeze verified: `true`
 - Duplicate request reconciled: `false`
 - Request draft: `docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md`
 - Community request ready: `false`
 - Community request opened: `false`
 
-The manuscript and request text are author-side drafts. A stable public preprint identifier, immutable public source release, duplicate-request reconciliation, Robert's review, and fresh action-time HumanUnlock are required before one production request may be opened.
+The manuscript and exact source are commit-pinned at stable public GitHub URLs. A fresh duplicate-request reconciliation, collision-free Launch Pad identifier, Robert's review, and fresh action-time HumanUnlock remain required before one production request may be opened.
 
 ## Immutable Release Candidate
 
@@ -161,8 +166,8 @@ This first-party receipt proves only that the named release ZIP rebuilt and pass
 | Gate | Complete | Owner | Meaning |
 |---|---:|---|---|
 | `human_author_review` | `false` | Robert Ashworth | The author reviews the bounded method note, manifest, public files, and exact ask. |
-| `stable_public_preprint_identifier` | `false` | Robert Ashworth | The bounded manuscript receives a stable public URL or DOI that can be cited in the CODECHECK request. |
-| `immutable_public_source_release` | `false` | Robert Ashworth | The reviewed public source is frozen at an immutable release or commit and every packet hash is reconciled to it. |
+| `stable_public_preprint_identifier` | `true` | Robert Ashworth | The bounded manuscript receives a stable public URL or DOI that can be cited in the CODECHECK request. |
+| `immutable_public_source_release` | `true` | Robert Ashworth | The reviewed public source is frozen at an immutable release or commit and every packet hash is reconciled to it. |
 | `duplicate_request_reconciled` | `false` | Luma3 validation lane | Gmail, GitHub, and local outreach controls confirm that no prior CODECHECK request would be duplicated. |
 | `submission_authorized` | `false` | Robert Ashworth | Action-time HumanUnlock authorizes opening a single CODECHECK request without duplicate outreach. |
 | `codecheck_register_issue_opened` | `false` | Robert Ashworth and CODECHECK | Exactly one production register issue is opened through the current official route and its URL is recorded. |
