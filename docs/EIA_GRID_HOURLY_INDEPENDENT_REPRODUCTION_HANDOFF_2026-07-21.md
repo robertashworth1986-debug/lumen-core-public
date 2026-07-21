@@ -54,6 +54,21 @@ python code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py --packet-dir . --r
 
 The operator must not fill reviewer identity, independence, execution, decision, or signature fields. A completed receipt also requires reviewer-controlled independence evidence and a detached signature artifact.
 
+## Operator Portability Check (Not Independent)
+
+The frozen ZIP was extracted into a fresh temporary directory for each of CPython `3.11.9`, `3.12.10`, and `3.14.6` on the same operator-controlled Windows host. Under every runtime, the offline verifier passed packet integrity, blank reviewer-receipt integrity, and blank evaluator-protocol integrity.
+
+- Runner: `code/ops/RUN_EIA_GRID_HOURLY_OPERATOR_PORTABILITY_CHECK.py`
+- Receipt: `evidence/reproducibility/eia_grid_hourly_operator_portability_receipt_20260721.json`
+- Receipt SHA-256: `8027a1451c6bb742f2ceeb917e04d5b3d150907a3f205115f37699d4abff8001`
+- Transfer checksum sidecar: `EIA_GRID_HOURLY_REPRODUCTION_20260721T040212Z.zip.sha256`
+- Fresh extraction per runtime: `true`
+- Independent reproduction complete: `false`
+- External validation complete: `false`
+- Performance promotion allowed: `false`
+
+This is software-portability evidence from one operator and one machine. It is not a reviewer-controlled execution and cannot satisfy the independent-reproduction gate.
+
 ## Action Boundary
 
 No completed external receipt exists. No validator contact, packet transfer, or follow-up is authorized by this file. Outreach remains duplicate-locked and requires action-time HumanUnlock.

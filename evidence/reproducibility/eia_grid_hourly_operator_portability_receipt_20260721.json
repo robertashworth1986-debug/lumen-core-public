@@ -1,0 +1,135 @@
+{
+  "all_checks_passed": true,
+  "claim_boundary": "These same-host operator-controlled runs show that the frozen packet's standard-library verifier, blank receipt, and blank evaluator protocol execute consistently across the recorded Python versions. They are not independent reproduction, external validation, model refitting, field evidence, performance promotion, agency acceptance, or economic proof.",
+  "cross_version_check_passed": true,
+  "external_validation_complete": false,
+  "fresh_extraction_per_runtime": true,
+  "generated_utc": "2026-07-21T04:21:12.734271+00:00",
+  "independent_reproduction_complete": false,
+  "next_valid_state": "A reviewer-controlled machine must rehash the packet, execute the verifier, and return independently retained receipt, independence, and signature artifacts.",
+  "operator_controlled": true,
+  "packet": {
+    "packet_manifest_file_sha256": "88333c09741de84caebde14da1bca4cd073bbac06ee1e48f4b28a32b93ef6432",
+    "packet_manifest_payload_sha256": "9625d8a3265f665c892b22852ee2319f5f20e399c434362b1d2d19d88e57de92",
+    "zip_bytes": 911410,
+    "zip_file_name": "EIA_GRID_HOURLY_REPRODUCTION_20260721T040212Z.zip",
+    "zip_sha256": "366039d85014cf509a118400bdc404d748f0eaf77ac3d60c5becc54489ae3cc5"
+  },
+  "performance_promotion_allowed": false,
+  "reviewer_controlled": false,
+  "runner": {
+    "isolated_python_mode": true,
+    "network_required": false,
+    "path": "code/ops/RUN_EIA_GRID_HOURLY_OPERATOR_PORTABILITY_CHECK.py",
+    "sha256": "c11173f3fa2da57311b3ab7541eb8840913ade981e3874c0bf2b0d7d2711790c"
+  },
+  "runs": [
+    {
+      "checks": {
+        "blank_evaluator_protocol_integrity_passed": true,
+        "blank_reviewer_receipt_integrity_passed": true,
+        "independent_reproduction_complete": false,
+        "packet_integrity_passed": true,
+        "performance_promotion_allowed": false
+      },
+      "fresh_extraction": true,
+      "packet_manifest_file_sha256": "88333c09741de84caebde14da1bca4cd073bbac06ee1e48f4b28a32b93ef6432",
+      "packet_manifest_payload_sha256": "9625d8a3265f665c892b22852ee2319f5f20e399c434362b1d2d19d88e57de92",
+      "runtime": {
+        "implementation": "CPython",
+        "isolated": true,
+        "machine": "AMD64",
+        "release": "10",
+        "system": "Windows",
+        "version": "3.11.9"
+      },
+      "snapshot_identity": {
+        "common_settled_hour_count": 0,
+        "prediction_count": 486,
+        "prediction_terminal_sha256": "d0168756f3b46d4ebe9803a042f423d65e2b3d1ed932442b92e501531d87a3ba",
+        "protocol_id": "EIA_GRID_PROSPECTIVE_HOURLY_ROUTER_20260715",
+        "settlement_count": 469,
+        "settlement_terminal_sha256": "efe307439c3ba67b39656e698a8956b4594c496ddbb991c5a42f2ef530d6bc98"
+      },
+      "verifier_stdout_sha256": {
+        "blank_evaluator_protocol": "e3d1d598a8604c1e7d41c48e72482f39d0addea430fff97ffe7047b544522015",
+        "blank_reviewer_receipt": "301cd89bf540e62f11350dbd514b41131bca415ec78fa19856dea3172bedc26a",
+        "packet": "6f35c6b8a93d1d8b880c280f1a9a5f0ec4269e482ae4f5a2436a99e7a9b275fc"
+      }
+    },
+    {
+      "checks": {
+        "blank_evaluator_protocol_integrity_passed": true,
+        "blank_reviewer_receipt_integrity_passed": true,
+        "independent_reproduction_complete": false,
+        "packet_integrity_passed": true,
+        "performance_promotion_allowed": false
+      },
+      "fresh_extraction": true,
+      "packet_manifest_file_sha256": "88333c09741de84caebde14da1bca4cd073bbac06ee1e48f4b28a32b93ef6432",
+      "packet_manifest_payload_sha256": "9625d8a3265f665c892b22852ee2319f5f20e399c434362b1d2d19d88e57de92",
+      "runtime": {
+        "implementation": "CPython",
+        "isolated": true,
+        "machine": "AMD64",
+        "release": "11",
+        "system": "Windows",
+        "version": "3.12.10"
+      },
+      "snapshot_identity": {
+        "common_settled_hour_count": 0,
+        "prediction_count": 486,
+        "prediction_terminal_sha256": "d0168756f3b46d4ebe9803a042f423d65e2b3d1ed932442b92e501531d87a3ba",
+        "protocol_id": "EIA_GRID_PROSPECTIVE_HOURLY_ROUTER_20260715",
+        "settlement_count": 469,
+        "settlement_terminal_sha256": "efe307439c3ba67b39656e698a8956b4594c496ddbb991c5a42f2ef530d6bc98"
+      },
+      "verifier_stdout_sha256": {
+        "blank_evaluator_protocol": "e3d1d598a8604c1e7d41c48e72482f39d0addea430fff97ffe7047b544522015",
+        "blank_reviewer_receipt": "301cd89bf540e62f11350dbd514b41131bca415ec78fa19856dea3172bedc26a",
+        "packet": "6f35c6b8a93d1d8b880c280f1a9a5f0ec4269e482ae4f5a2436a99e7a9b275fc"
+      }
+    },
+    {
+      "checks": {
+        "blank_evaluator_protocol_integrity_passed": true,
+        "blank_reviewer_receipt_integrity_passed": true,
+        "independent_reproduction_complete": false,
+        "packet_integrity_passed": true,
+        "performance_promotion_allowed": false
+      },
+      "fresh_extraction": true,
+      "packet_manifest_file_sha256": "88333c09741de84caebde14da1bca4cd073bbac06ee1e48f4b28a32b93ef6432",
+      "packet_manifest_payload_sha256": "9625d8a3265f665c892b22852ee2319f5f20e399c434362b1d2d19d88e57de92",
+      "runtime": {
+        "implementation": "CPython",
+        "isolated": true,
+        "machine": "AMD64",
+        "release": "11",
+        "system": "Windows",
+        "version": "3.14.6"
+      },
+      "snapshot_identity": {
+        "common_settled_hour_count": 0,
+        "prediction_count": 486,
+        "prediction_terminal_sha256": "d0168756f3b46d4ebe9803a042f423d65e2b3d1ed932442b92e501531d87a3ba",
+        "protocol_id": "EIA_GRID_PROSPECTIVE_HOURLY_ROUTER_20260715",
+        "settlement_count": 469,
+        "settlement_terminal_sha256": "efe307439c3ba67b39656e698a8956b4594c496ddbb991c5a42f2ef530d6bc98"
+      },
+      "verifier_stdout_sha256": {
+        "blank_evaluator_protocol": "e3d1d598a8604c1e7d41c48e72482f39d0addea430fff97ffe7047b544522015",
+        "blank_reviewer_receipt": "301cd89bf540e62f11350dbd514b41131bca415ec78fa19856dea3172bedc26a",
+        "packet": "6f35c6b8a93d1d8b880c280f1a9a5f0ec4269e482ae4f5a2436a99e7a9b275fc"
+      }
+    }
+  ],
+  "runtime_version_count": 3,
+  "runtime_versions": [
+    "3.11.9",
+    "3.12.10",
+    "3.14.6"
+  ],
+  "schema": "eia_grid_hourly_operator_portability_receipt.v1",
+  "status": "OPERATOR_CONTROLLED_CROSS_VERSION_CHECK_PASSED"
+}
