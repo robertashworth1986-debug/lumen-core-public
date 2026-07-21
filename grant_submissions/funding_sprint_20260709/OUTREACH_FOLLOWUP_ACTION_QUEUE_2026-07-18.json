@@ -308,7 +308,7 @@
       "4B5EDC6BCB11F72B7A0896FBEA672EC8C5DC1B9D19F4FDAD099AADF7E7C41D45"
     ]
   },
-  "queue_sha256": "4DD48C4DDA9177375D946A4CA58516501122C28148963761F09397E1505A8B05",
+  "queue_sha256": "7E55B9E50EE83BE30DBF3234EBB310F4569482632C34020C11456853C5BE8F90",
   "routing_integrity_exceptions": [
     {
       "exception": "SENT_BEFORE_CONFIGURED_HOLD",
@@ -324,7 +324,7 @@
       "bytes": 23821,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "C13AB5C63DA0C61139B82CE3768DB6FD965DB48CF140F24B632BD9B3D56F167D",
+      "sha256": "CDF9CB9FB4492F0A1AC2B85923BB70DA923CF5E74E403D3F55FBB61DBF75A1A4",
       "worktree_eol_differs_from_git_blob": true
     },
     "followup_policy_config": {
@@ -342,17 +342,17 @@
       "worktree_eol_differs_from_git_blob": true
     },
     "response_registry_builder": {
-      "bytes": 22245,
+      "bytes": 23475,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py",
-      "sha256": "A58D0B352AB9EC1C09AE9350232FDF49488098B6D10051DC64C8193578D412CE",
+      "sha256": "3F05446610C2197F91FDED29E3C99ECA376FCC03F675FA79AB9933761423AD29",
       "worktree_eol_differs_from_git_blob": true
     },
     "response_template_registry": {
-      "bytes": 18092,
+      "bytes": 18191,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
-      "sha256": "2B33DE429869DE41B20E64AFA12C512483A9F11AFEAD587653C325E58E25F289",
+      "sha256": "CFB09BD4F7F1E047608BB171F90989C427AA973E47CA5FD4E11670B5E36C8908",
       "worktree_eol_differs_from_git_blob": true
     }
   },
