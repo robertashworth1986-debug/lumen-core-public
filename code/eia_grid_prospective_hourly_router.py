@@ -653,30 +653,54 @@ def append_chain_record(path: Path, record: dict[str, Any], previous: str) -> di
     return output
 
 
-def eligible_targets(
+def eligible_target_scan(
     series: dict[str, dict[str, Any]],
     protocol: dict[str, Any],
     sealed_at: datetime,
-) -> tuple[list[tuple[str, str]], dict[str, int]]:
+) -> tuple[list[tuple[str, str]], dict[str, int], dict[str, dict[str, Any]]]:
     first_allowed = protocol["prospective_window"]["first_allowed_period_end_utc"]
     selected: list[tuple[str, str]] = []
     skipped: dict[str, int] = {}
+    authority_diagnostics = {
+        authority: {
+            "eligible_target_count": 0,
+            "pending_target_count": 0,
+            "eligible_target_already_sealed_count": 0,
+            "feature_ready_count": 0,
+            "sealed_record_count": 0,
+            "feature_blockers": {},
+            "skipped": {},
+        }
+        for authority in protocol["balancing_authorities"]
+    }
     for respondent in protocol["balancing_authorities"]:
         actual = series[respondent]["actual"]
         for target in sorted(series[respondent]["official"]):
             if target < first_allowed:
                 continue
             if target in actual:
-                skipped["target_actual_already_present"] = skipped.get(
-                    "target_actual_already_present", 0
-                ) + 1
+                reason = "target_actual_already_present"
+                skipped[reason] = skipped.get(reason, 0) + 1
+                authority_skipped = authority_diagnostics[respondent]["skipped"]
+                authority_skipped[reason] = authority_skipped.get(reason, 0) + 1
                 continue
             if sealed_at >= target_interval_start_utc(target):
-                skipped["target_interval_already_started"] = skipped.get(
-                    "target_interval_already_started", 0
-                ) + 1
+                reason = "target_interval_already_started"
+                skipped[reason] = skipped.get(reason, 0) + 1
+                authority_skipped = authority_diagnostics[respondent]["skipped"]
+                authority_skipped[reason] = authority_skipped.get(reason, 0) + 1
                 continue
             selected.append((respondent, target))
+            authority_diagnostics[respondent]["eligible_target_count"] += 1
+    return selected, skipped, authority_diagnostics
+
+
+def eligible_targets(
+    series: dict[str, dict[str, Any]],
+    protocol: dict[str, Any],
+    sealed_at: datetime,
+) -> tuple[list[tuple[str, str]], dict[str, int]]:
+    selected, skipped, _ = eligible_target_scan(series, protocol, sealed_at)
     return selected, skipped
 
 
@@ -688,21 +712,36 @@ def seal_from_panel(
     dry_run: bool,
 ) -> dict[str, Any]:
     series = series_by_authority(panel, protocol)
-    targets, skipped = eligible_targets(series, protocol, sealed_at)
+    targets, skipped, authority_diagnostics = eligible_target_scan(
+        series, protocol, sealed_at
+    )
     existing, previous = load_chain(PREDICTIONS_PATH)
     existing_keys = {
         (row["respondent"], row["target_period_end_utc"]) for row in existing
     }
-    pending = [(respondent, target) for respondent, target in targets if (respondent, target) not in existing_keys]
+    pending: list[tuple[str, str]] = []
+    for respondent, target in targets:
+        if (respondent, target) in existing_keys:
+            authority_diagnostics[respondent][
+                "eligible_target_already_sealed_count"
+            ] += 1
+            continue
+        authority_diagnostics[respondent]["pending_target_count"] += 1
+        pending.append((respondent, target))
     forecast_rows: list[dict[str, Any]] = []
     for respondent, target in pending:
         try:
             forecast_rows.append(
                 build_feature_row(series, protocol, respondent, target, require_actual=False)
             )
+            authority_diagnostics[respondent]["feature_ready_count"] += 1
         except ValueError as exc:
             reason = str(exc)
             skipped[reason] = skipped.get(reason, 0) + 1
+            authority_skipped = authority_diagnostics[respondent]["skipped"]
+            authority_skipped[reason] = authority_skipped.get(reason, 0) + 1
+            feature_blockers = authority_diagnostics[respondent]["feature_blockers"]
+            feature_blockers[reason] = feature_blockers.get(reason, 0) + 1
     if forecast_rows:
         latest_training_end = max(
             period
@@ -770,6 +809,7 @@ def seal_from_panel(
             sealed = append_chain_record(PREDICTIONS_PATH, record, previous)
         previous = sealed["record_sha256"]
         sealed_records.append(sealed)
+        authority_diagnostics[respondent]["sealed_record_count"] += 1
     return {
         "schema": "eia_grid_prospective_hourly_router_seal_run.v1",
         "run_utc": sealed_at.isoformat(),
@@ -779,6 +819,7 @@ def seal_from_panel(
         "sealed_record_count": len(sealed_records),
         "sealed_records": sealed_records,
         "skipped": skipped,
+        "authority_diagnostics": authority_diagnostics,
         "existing_prediction_count": len(existing),
     }
 
@@ -875,8 +916,17 @@ def build_status(
     protocol: dict[str, Any],
     predictions: list[dict[str, Any]],
     settlements: list[dict[str, Any]],
+    source_readiness_by_authority: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     authorities = protocol["balancing_authorities"]
+    prediction_periods = {
+        authority: {
+            row["target_period_end_utc"]
+            for row in predictions
+            if row["respondent"] == authority
+        }
+        for authority in authorities
+    }
     settled_periods = {
         authority: {
             row["target_period_end_utc"]
@@ -886,6 +936,42 @@ def build_status(
         for authority in authorities
     }
     common = sorted(set.intersection(*(settled_periods[a] for a in authorities)))
+    settled_authority_count_by_period = {
+        period: sum(period in settled_periods[authority] for authority in authorities)
+        for period in sorted(set().union(*(settled_periods[a] for a in authorities)))
+    }
+    authority_coverage = {
+        authority: {
+            "prediction_count": len(prediction_periods[authority]),
+            "settlement_count": len(settled_periods[authority]),
+            "unsettled_prediction_count": len(
+                prediction_periods[authority] - settled_periods[authority]
+            ),
+            "first_prediction_period": (
+                min(prediction_periods[authority])
+                if prediction_periods[authority]
+                else None
+            ),
+            "latest_prediction_period": (
+                max(prediction_periods[authority])
+                if prediction_periods[authority]
+                else None
+            ),
+            "first_settled_period": (
+                min(settled_periods[authority]) if settled_periods[authority] else None
+            ),
+            "latest_settled_period": (
+                max(settled_periods[authority]) if settled_periods[authority] else None
+            ),
+        }
+        for authority in authorities
+    }
+    authorities_with_predictions = [
+        authority for authority in authorities if prediction_periods[authority]
+    ]
+    authorities_with_settlements = [
+        authority for authority in authorities if settled_periods[authority]
+    ]
     candidates = [row["id"] for row in protocol["candidates"]]
     candidate_scores = {
         candidate: [
@@ -920,6 +1006,28 @@ def build_status(
         "common_settled_hour_count": common_count,
         "first_common_settled_period": common[0] if common else None,
         "latest_common_settled_period": common[-1] if common else None,
+        "authority_coverage": {
+            "required_authority_count": len(authorities),
+            "authorities_with_predictions": authorities_with_predictions,
+            "authorities_without_predictions": [
+                authority
+                for authority in authorities
+                if authority not in authorities_with_predictions
+            ],
+            "authorities_with_settlements": authorities_with_settlements,
+            "authorities_without_settlements": [
+                authority
+                for authority in authorities
+                if authority not in authorities_with_settlements
+            ],
+            "max_authorities_settled_on_same_period": max(
+                settled_authority_count_by_period.values(), default=0
+            ),
+            "by_authority": authority_coverage,
+        },
+        "latest_seal_source_readiness_by_authority": (
+            source_readiness_by_authority or {}
+        ),
         "router_mean_scaled_absolute_error": mean(router_scores) if router_scores else None,
         "fixed_candidate_mean_scaled_absolute_error": candidate_means,
         "current_best_fixed_candidate": best_fixed,
@@ -978,7 +1086,12 @@ def run_cycle(timeout: int = 60, dry_run: bool = False) -> dict[str, Any]:
             row["prediction_record_sha256"] not in prediction_hashes for row in settlements
         ):
             raise ValueError("settlement references a prediction outside the verified chain")
-        status = build_status(protocol, predictions, settlements)
+        status = build_status(
+            protocol,
+            predictions,
+            settlements,
+            seal["authority_diagnostics"],
+        )
         receipt_payload = {
             "schema": "eia_grid_prospective_hourly_router_operational_run.v1",
             "run_utc": now_utc().isoformat(),

@@ -4,7 +4,7 @@
   "files": {
     "code/frequency_cluster_truth_gauntlet.py": {"role": "source", "sha256": "3f705c443d1cc4d39624c31a4594f27669084cbdddf08ba34c0914aa133d4a18"},
     "code/eia_grid_residual_moe_benchmark.py": {"role": "source", "sha256": "d722b5fe19085057935510fae2c0499b8afd62eef06a3fc2051be681999e36dd"},
-    "code/eia_grid_prospective_hourly_router.py": {"role": "source", "sha256": "0ae7cade56b4d63d593ffffe5be81e97af7d53a413048ac0a14725edd4538f06"},
+    "code/eia_grid_prospective_hourly_router.py": {"role": "source", "sha256": "320ef29efd98a0cc62f33580e518762559c2cec821f9f6be13b2d87bd8fec656"},
     "code/dice_constraint_contract_benchmark.py": {"role": "source", "sha256": "499fe6378b1add7de032ce853b8e52f5d03be78b97513773de399008883f32cb"},
     "code/nv065_sensor_tasking_benchmark.py": {"role": "source", "sha256": "e901ec89a23408649bef129b216a4774062cb2d5b6ea0254b41f246330533602"},
     "code/missionweave_benchmark.py": {"role": "source", "sha256": "ecff9ead66347b48aff093ffd7affe8958f355bf93273be8820dc5326331e39d"},

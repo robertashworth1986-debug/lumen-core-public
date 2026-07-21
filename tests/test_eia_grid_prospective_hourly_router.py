@@ -131,6 +131,54 @@ def test_eligible_target_requires_future_interval_and_absent_actual():
     assert skipped["target_interval_already_started"] == 1
 
 
+def test_eligible_target_scan_reports_each_authority_without_changing_selection():
+    module = load_module()
+    panel, protocol = synthetic_panel(module)
+    series = module.series_by_authority(panel, protocol)
+
+    selected, skipped, diagnostics = module.eligible_target_scan(
+        series, protocol, datetime(2026, 7, 15, 12, 0, tzinfo=timezone.utc)
+    )
+
+    assert ("ERCO", "2026-07-15T14") in selected
+    assert skipped == {}
+    assert list(diagnostics) == protocol["balancing_authorities"]
+    assert diagnostics["ERCO"]["eligible_target_count"] == 1
+    assert diagnostics["ERCO"]["skipped"] == {}
+    assert diagnostics["SWPP"]["eligible_target_count"] == 0
+    assert diagnostics["TVA"]["eligible_target_count"] == 0
+
+
+def test_seal_attributes_feature_failure_to_the_blocked_authority(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    panel, protocol = synthetic_panel(module)
+    monkeypatch.setattr(module, "PREDICTIONS_PATH", tmp_path / "predictions.jsonl")
+
+    def reject_incomplete_window(*_args, **_kwargs):
+        raise ValueError("weekly residual window is incomplete")
+
+    monkeypatch.setattr(module, "build_feature_row", reject_incomplete_window)
+    result = module.seal_from_panel(
+        protocol,
+        panel,
+        {"source": "synthetic"},
+        datetime(2026, 7, 15, 12, 0, tzinfo=timezone.utc),
+        dry_run=True,
+    )
+
+    erco = result["authority_diagnostics"]["ERCO"]
+    assert result["sealed_record_count"] == 0
+    assert result["skipped"] == {"weekly residual window is incomplete": 1}
+    assert erco["eligible_target_count"] == 1
+    assert erco["pending_target_count"] == 1
+    assert erco["feature_ready_count"] == 0
+    assert erco["sealed_record_count"] == 0
+    assert erco["feature_blockers"] == {"weekly residual window is incomplete": 1}
+    assert erco["skipped"] == {"weekly residual window is incomplete": 1}
+
+
 def test_forecast_feature_excludes_target_actual():
     module = load_module()
     panel, protocol = synthetic_panel(module)
@@ -171,3 +219,59 @@ def test_text_file_hash_is_stable_across_line_endings(tmp_path):
     lf.write_bytes(b'{"value":1}\n')
     crlf.write_bytes(b'{"value":1}\r\n')
     assert module.file_sha256(lf) == module.file_sha256(crlf)
+
+
+def test_status_exposes_missing_authorities_without_promoting_sample_gate():
+    module = load_module()
+    protocol = module.load_protocol(PROTOCOL_PATH)
+    target = "2026-07-15T14"
+    active = protocol["balancing_authorities"][:6]
+    candidates = [row["id"] for row in protocol["candidates"]]
+    predictions = [
+        {"respondent": authority, "target_period_end_utc": target}
+        for authority in active
+    ]
+    settlements = [
+        {
+            "respondent": authority,
+            "target_period_end_utc": target,
+            "candidate_metrics": {
+                candidate: {"scaled_absolute_error": 0.5}
+                for candidate in candidates
+            },
+            "router_scaled_absolute_error": 0.5,
+        }
+        for authority in active
+    ]
+    source_readiness = {
+        authority: {
+            "eligible_target_count": 1,
+            "pending_target_count": 1,
+            "eligible_target_already_sealed_count": 0,
+            "feature_ready_count": 0,
+            "sealed_record_count": 0,
+            "feature_blockers": {"weekly residual window is incomplete": 1},
+            "skipped": {"weekly residual window is incomplete": 1},
+        }
+        for authority in ("SWPP", "TVA")
+    }
+
+    status = module.build_status(
+        protocol, predictions, settlements, source_readiness
+    )
+    coverage = status["authority_coverage"]
+
+    assert status["common_settled_hour_count"] == 0
+    assert status["sample_gates"] == {
+        "preliminary_ready": False,
+        "confirmatory_ready": False,
+        "durability_ready": False,
+        "note": "Sample readiness does not mean a scientific promotion gate passed.",
+    }
+    assert coverage["required_authority_count"] == 8
+    assert coverage["authorities_without_predictions"] == ["SWPP", "TVA"]
+    assert coverage["authorities_without_settlements"] == ["SWPP", "TVA"]
+    assert coverage["max_authorities_settled_on_same_period"] == 6
+    assert coverage["by_authority"]["CISO"]["settlement_count"] == 1
+    assert coverage["by_authority"]["SWPP"]["settlement_count"] == 0
+    assert status["latest_seal_source_readiness_by_authority"] == source_readiness

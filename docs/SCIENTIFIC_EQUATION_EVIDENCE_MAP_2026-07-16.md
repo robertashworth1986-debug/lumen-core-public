@@ -1,9 +1,9 @@
 # Scientific Equation Evidence Map
 
-Generated UTC: `2026-07-21T13:38:16.564494+00:00`
-Registry SHA-256: `1dc62d0aff32eabd7bb3d5db87e297995fd078108d67c92de2519bd6d97ceab6`
+Generated UTC: `2026-07-21T13:52:27.019439+00:00`
+Registry SHA-256: `2c8efd1535cef14ede2c11782db0ff43332b269797243c8ea1a4e712be2cea75`
 Builder SHA-256: `1077dd04512caeda698a661df3c822322972e8953e11ee71b16d2e83c6baf736`
-Terminal chain SHA-256: `78c528b9c788f4657c88151bc617a1f03d39d957124b70f51135b52f95a0f933`
+Terminal chain SHA-256: `c0b8783ac029d673008e0926ac1e6900d9abacdc420f64bed2a56e5500c8db4c`
 
 ## Truth Line
 
