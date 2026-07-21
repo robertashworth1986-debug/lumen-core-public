@@ -9,6 +9,24 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = ROOT / "code" / "ops" / "BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py"
+COMMITTED_PROJECTIONS = (
+    (
+        ROOT
+        / "evidence"
+        / "external_validation"
+        / "eia_grid_prospective_hourly_runtime_projection_20260716.json",
+        95,
+        84,
+    ),
+    (
+        ROOT
+        / "evidence"
+        / "external_validation"
+        / "eia_grid_prospective_hourly_runtime_projection_20260721.json",
+        486,
+        469,
+    ),
+)
 SPEC = importlib.util.spec_from_file_location("eia_hourly_runtime_projection", MODULE_PATH)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -162,8 +180,16 @@ def test_projection_rejects_output_outside_repository(tmp_path: Path) -> None:
         )
 
 
-def test_committed_projection_is_protocol_bound_and_public_safe() -> None:
-    projection = MODULE.read_json(ROOT / MODULE.OUTPUT_RELATIVE)
+@pytest.mark.parametrize(
+    ("projection_path", "expected_predictions", "expected_settlements"),
+    COMMITTED_PROJECTIONS,
+)
+def test_committed_projection_is_protocol_bound_and_public_safe(
+    projection_path: Path,
+    expected_predictions: int,
+    expected_settlements: int,
+) -> None:
+    projection = MODULE.read_json(projection_path)
     protocol_path = ROOT / MODULE.PROTOCOL_RELATIVE
     protocol = MODULE.read_json(protocol_path)
 
@@ -172,7 +198,7 @@ def test_committed_projection_is_protocol_bound_and_public_safe() -> None:
         protocol,
         protocol_sha256=MODULE.sha256_file(protocol_path),
     )
-    assert projection["sample_state"]["prediction_count"] == 95
-    assert projection["sample_state"]["settlement_count"] == 84
+    assert projection["sample_state"]["prediction_count"] == expected_predictions
+    assert projection["sample_state"]["settlement_count"] == expected_settlements
     assert projection["sample_state"]["common_settled_hour_count"] == 0
     assert projection["descriptive_metrics"]["sample_gate_open"] is False

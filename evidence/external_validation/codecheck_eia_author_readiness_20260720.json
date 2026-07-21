@@ -40,7 +40,7 @@
         {
           "archived_sha256": "c08b9273c6bcb8a2cba388d1fa5a680010d325106da5399b6cd9f7c0b739fac1",
           "current_match": false,
-          "current_sha256": "ca2153dff28be9ab95e768d168035ece7d9223fbbc7c0bb3b81b085511fca29d",
+          "current_sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56",
           "path": "README.md",
           "role": "documentation_or_packaging"
         },
@@ -276,7 +276,7 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T03:48:41.861824+00:00",
+  "generated_utc": "2026-07-21T04:07:18.968199+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "path_checks": {
     ".github/workflows/codecheck-eia-readiness.yml": true,
@@ -295,7 +295,7 @@
     "requirements-reviewer-ubuntu-py311.lock": true,
     "tests/test_codecheck_eia_readiness.py": true
   },
-  "portable_input_chain_sha256": "96c621bb15c2ae0f442eb07982a23858c9cd13d65eb76aa62d2711013e5fa18f",
+  "portable_input_chain_sha256": "bf7c378b91f30aafbff87cc69c313b4f355d8ad8f1cb0871f56f17ba09fe6449",
   "portable_inputs": [
     {
       "bytes": 4733,
@@ -304,10 +304,10 @@
       "sha256": "ac472eefd5ff14a01e836d0bbf5e2e4ecc9707e7fbf03bf782f89a7934a32fc4"
     },
     {
-      "bytes": 14869,
+      "bytes": 15541,
       "hash_mode": "utf8_lf",
       "path": "README.md",
-      "sha256": "ca2153dff28be9ab95e768d168035ece7d9223fbbc7c0bb3b81b085511fca29d"
+      "sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56"
     },
     {
       "bytes": 1891,
@@ -328,10 +328,10 @@
       "sha256": "223a36faa2ae73757c98e5fec924f1750aa9729c839e14be921eaa2972df2cd5"
     },
     {
-      "bytes": 23764,
+      "bytes": 23831,
       "hash_mode": "utf8_lf",
       "path": "code/ops/BUILD_CODECHECK_EIA_READINESS.py",
-      "sha256": "def87e1a47a181384dfbf7595d677358a30e49e4fb85f7c275e60e3cb0a39c61"
+      "sha256": "a101df6046b0521d7f33ce7ad6a13519e30f9b8d67fc60c702036fef1e2d9e4d"
     },
     {
       "bytes": 31959,
@@ -399,7 +399,7 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "76243b77d2427458a029567f6b8a6c3945219fca9aaabb894c176942a7f76ac3",
+  "readiness_sha256": "75381a860df9e03dcd93653e2b25861512bab121996d72a3ed63e32c82112689",
   "schema": "codecheck_eia_author_readiness.v1",
   "status": "AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW",
   "summary": {

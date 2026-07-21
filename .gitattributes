@@ -1,4 +1,8 @@
 /.gitattributes text eol=lf
+/README.md text eol=lf
+/LICENSE text eol=lf
+/CITATION.cff text eol=lf
+/codecheck.yml text eol=lf
 *.sh text eol=lf
 *.pdf binary
 *.docx binary
@@ -14,6 +18,25 @@ code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py text eol=lf
 code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py text eol=lf
 evidence/external_validation/eia_grid_hourly_router_design_benchmark_20260714.json text eol=lf
 evidence/external_validation/eia_grid_hourly_router_design_freeze_20260714.json text eol=lf
+config/eia_grid_hourly_independent_reproduction_receipt_template_*.json text eol=lf
+evidence/external_validation/eia_grid_hourly_independent_reproduction_handoff_*.json text eol=lf
+evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_*.json text eol=lf
+docs/EIA_GRID_HOURLY_INDEPENDENT_REPRODUCTION_HANDOFF_*.md text eol=lf
+/.github/workflows/codecheck-eia-readiness.yml text eol=lf
+code/ops/BUILD_CODECHECK_EIA_READINESS.py text eol=lf
+code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py text eol=lf
+code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py text eol=lf
+code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py text eol=lf
+config/codecheck_eia_readiness_v1.json text eol=lf
+config/external_validation_authority_docket_v1.json text eol=lf
+config/reviewer_reproducibility_protocol_v1.json text eol=lf
+docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md text eol=lf
+docs/CODECHECK_EIA_AUTHOR_READINESS_2026-07-20.md text eol=lf
+evidence/external_validation/codecheck_eia_author_readiness_20260720.json text eol=lf
+requirements-reviewer-ubuntu-py311.lock text eol=lf
+tests/test_codecheck_eia_readiness.py text eol=lf
+tests/test_eia_grid_hourly_independent_reproduction_packet.py text eol=lf
+tests/test_eia_hourly_runtime_projection.py text eol=lf
 grant_submissions/DLA26BZ03_NV011_MissionWeave/*.md text eol=lf
 grant_submissions/DLA26BZ03_NV011_MissionWeave/*.py text eol=lf
 grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_BUILD_METADATA_2026-07-16.json text eol=crlf

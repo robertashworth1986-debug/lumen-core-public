@@ -24,6 +24,14 @@ PUBLIC_HANDOFFS = (
         95,
         84,
     ),
+    (
+        ROOT
+        / "evidence"
+        / "external_validation"
+        / "eia_grid_hourly_independent_reproduction_handoff_20260721.json",
+        486,
+        469,
+    ),
 )
 EVALUATOR_TEMPLATE_PATH = (
     ROOT

@@ -1,0 +1,152 @@
+{
+  "claim_boundary": "A valid completed receipt can independently bind and reproduce the frozen packet's integrity, settlement arithmetic, and authority coverage. It does not refit the models, convert the incomplete authority panel into a performance pass, establish field validation, authenticate identity or signature semantics by itself, or support agency approval, safety, savings, patent, production, trading, or universal-superiority claims.",
+  "external_evaluator_protocol_template": {
+    "evaluation_design_frozen": false,
+    "minimum_bootstrap_replications_floor": 10000,
+    "minimum_common_hours_per_authority_floor": 720,
+    "operator_may_fill_evaluator_fields": false,
+    "path": "config/eia_grid_hourly_external_evaluator_protocol_template_v1.json",
+    "sha256": "f1284de55e059596a25c554d11520f5398cdae053f35a6362bab2f3e0e8776da"
+  },
+  "frozen_snapshot": {
+    "all_protocol_authorities_have_prospective_seals": false,
+    "authority_coverage": {
+      "CISO": {
+        "first_prediction_period": "2026-07-15T14",
+        "latest_prediction_period": "2026-07-21T07",
+        "prediction_count": 95,
+        "settlement_count": 90,
+        "source_actual_row_count": 5571,
+        "source_forecast_row_count": 5553
+      },
+      "ERCO": {
+        "first_prediction_period": "2026-07-15T14",
+        "latest_prediction_period": "2026-07-21T05",
+        "prediction_count": 83,
+        "settlement_count": 80,
+        "source_actual_row_count": 5571,
+        "source_forecast_row_count": 5526
+      },
+      "ISNE": {
+        "first_prediction_period": "2026-07-15T14",
+        "latest_prediction_period": "2026-07-21T04",
+        "prediction_count": 75,
+        "settlement_count": 73,
+        "source_actual_row_count": 5571,
+        "source_forecast_row_count": 5573
+      },
+      "MISO": {
+        "first_prediction_period": "2026-07-15T14",
+        "latest_prediction_period": "2026-07-21T05",
+        "prediction_count": 81,
+        "settlement_count": 78,
+        "source_actual_row_count": 5571,
+        "source_forecast_row_count": 5526
+      },
+      "NYIS": {
+        "first_prediction_period": "2026-07-15T14",
+        "latest_prediction_period": "2026-07-21T04",
+        "prediction_count": 74,
+        "settlement_count": 72,
+        "source_actual_row_count": 5565,
+        "source_forecast_row_count": 5478
+      },
+      "PJM": {
+        "first_prediction_period": "2026-07-15T14",
+        "latest_prediction_period": "2026-07-21T04",
+        "prediction_count": 78,
+        "settlement_count": 76,
+        "source_actual_row_count": 5571,
+        "source_forecast_row_count": 5550
+      },
+      "SWPP": {
+        "first_prediction_period": null,
+        "latest_prediction_period": null,
+        "prediction_count": 0,
+        "settlement_count": 0,
+        "source_actual_row_count": 5571,
+        "source_forecast_row_count": 5502
+      },
+      "TVA": {
+        "first_prediction_period": null,
+        "latest_prediction_period": null,
+        "prediction_count": 0,
+        "settlement_count": 0,
+        "source_actual_row_count": 5571,
+        "source_forecast_row_count": 5358
+      }
+    },
+    "claim_boundary": "A passing result would support bounded prospective public-data evidence for a frozen hourly specialist router. It does not establish patent validity or scope, utility control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority.",
+    "common_settled_hour_count": 0,
+    "current_best_fixed_candidate": "lightgbm_residual",
+    "first_common_settled_period": null,
+    "frozen_panel_feasibility_status": "INCOMPLETE_AUTHORITY_PANEL_ZERO_PROSPECTIVE_SEALS",
+    "independent_reproduction_complete": false,
+    "integrity_gate_passed": true,
+    "latest_common_settled_period": null,
+    "operational_receipt_count": 155,
+    "operational_terminal_sha256": "f7bbef89ba688326a3bd52735dc775a4e7585c842968505e9827aba80c7e9387",
+    "performance_promotion_allowed": false,
+    "prediction_count": 486,
+    "prediction_terminal_sha256": "d0168756f3b46d4ebe9803a042f423d65e2b3d1ed932442b92e501531d87a3ba",
+    "protocol_commit": "8fd49772dbeec3664b9c83c1d46f5c8583772946",
+    "protocol_id": "EIA_GRID_PROSPECTIVE_HOURLY_ROUTER_20260715",
+    "protocol_sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5",
+    "router_mean_scaled_absolute_error": 0.37003697446269557,
+    "router_skill_vs_current_best_fixed": 0.005969061405515397,
+    "sample_gates": {
+      "confirmatory_ready": false,
+      "durability_ready": false,
+      "preliminary_ready": false
+    },
+    "schema": "eia_grid_hourly_reproduction_snapshot_audit.v1",
+    "settlement_count": 469,
+    "settlement_metrics_recomputed": true,
+    "settlement_terminal_sha256": "efe307439c3ba67b39656e698a8956b4594c496ddbb991c5a42f2ef530d6bc98",
+    "source_panel_row_chain_sha256": "ee53210f0836a3e634bd61f8c4b1b6b3918126390f3f848985e0354627020713",
+    "source_panel_row_count": 88628,
+    "zero_prospective_seal_authorities": [
+      "SWPP",
+      "TVA"
+    ]
+  },
+  "generated_utc": "2026-07-21T04:02:12.802806+00:00",
+  "independent_reproduction_complete": false,
+  "integrity": {
+    "artifact_count": 17,
+    "offline_standard_library_verifier_included": true,
+    "packet_integrity_passed": true,
+    "settlement_metrics_recomputed": true
+  },
+  "next_valid_state": "A reviewer-controlled completed receipt plus independently retained independence and detached-signature artifacts.",
+  "packet": {
+    "directory_name": "EIA_GRID_HOURLY_REPRODUCTION_20260721T040212Z",
+    "packet_manifest_file_sha256": "88333c09741de84caebde14da1bca4cd073bbac06ee1e48f4b28a32b93ef6432",
+    "packet_manifest_payload_sha256": "9625d8a3265f665c892b22852ee2319f5f20e399c434362b1d2d19d88e57de92",
+    "private_runtime_payload_published_in_repository": false,
+    "zip_bytes": 911410,
+    "zip_file_name": "EIA_GRID_HOURLY_REPRODUCTION_20260721T040212Z.zip",
+    "zip_sha256": "366039d85014cf509a118400bdc404d748f0eaf77ac3d60c5becc54489ae3cc5"
+  },
+  "performance_promotion_allowed": false,
+  "receipt_template": {
+    "operator_may_fill_reviewer_fields": false,
+    "path": "config/eia_grid_hourly_independent_reproduction_receipt_template_20260721_v1.json",
+    "reviewer_fields_blank": true,
+    "sha256": "850c3ee9a523a15148635374ba5646e517f8cef63066b0fb3c7ad4f9f8734c0b"
+  },
+  "repository_source": {
+    "all_packet_sources_match_commit": true,
+    "byte_exact_source_count": 7,
+    "commit": "680e693bc75d19f9bba1f52b9bbebbaeea8a5ff1",
+    "tracked_source_count": 7
+  },
+  "schema": "eia_grid_hourly_independent_reproduction_handoff.v1",
+  "scientific_disclosures": {
+    "environment_lock_sha256": "d69ae015f77309ac652fa8b6fa2efdff31631e18ede437c458748b5d7da8577f",
+    "limitations_ledger_sha256": "4d725457f3b5b8c2aede2f8cc71bb166904f55308caca280cdab1e9617cf012c",
+    "model_refit_reproduction_included": false,
+    "seal_time_source_snapshot_per_batch_included": false
+  },
+  "status": "UNSIGNED_REVIEWER_HANDOFF_READY"
+}

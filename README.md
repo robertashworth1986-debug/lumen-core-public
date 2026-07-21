@@ -101,7 +101,7 @@ From the repository root:
 
 ```powershell
 python code/ops/BUILD_QUANT_HUB_REVIEWER_CONTEXT.py
-python code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py --check
+python code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py --check --output evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260721.json
 python -m pytest -q tests/test_quant_hub_reviewer_context.py tests/test_faa_sdr_source_audit.py tests/test_faa_sdr_10k_benchmark.py
 python -m pytest -q tests/test_external_proof_vault.py tests/test_funding_sprint_reviewer_gate.py
 ```
@@ -115,6 +115,8 @@ python -m pytest -q tests/test_locked_source_baseline_replay_sweep.py
 ## Clean-Room Reviewer Replay
 
 The bounded reviewer capsule packages the frozen public EIA panel in deterministic gzip form, exact-pins the direct Python environment, emits a scoped CycloneDX dependency inventory, replays two measured EIA holdouts and one deterministic MDA falsification lane, and records every expected fact as a machine assertion.
+
+The current hourly runtime snapshot is the dated [`2026-07-21 public-safe projection`](evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260721.json). Its matching [`independent-reproduction handoff`](docs/EIA_GRID_HOURLY_INDEPENDENT_REPRODUCTION_HANDOFF_2026-07-21.md) remains unsigned: independent reproduction, external validation, and performance promotion are all `false`. The July 16 projection and packet remain historical snapshots.
 
 ```powershell
 python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py
@@ -165,7 +167,7 @@ The mapping is voluntary and is not a NIST certification or agency approval. The
 4. Inspect the frozen FAA SDR benchmark and its failed promotion gate.
 5. Inspect route-level wins and non-wins in the locked replay ledger.
 6. Review the preserved MDA v1 and v2 failed gates.
-7. Verify both the preserved daily predecessor and the dated hourly runtime projection before making any forward-performance statement.
+7. Verify both the preserved daily predecessor and the current dated [`hourly runtime projection`](evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260721.json) before making any forward-performance statement.
 8. Treat the current [`External Validation Authority Docket`](docs/EXTERNAL_VALIDATION_AUTHORITY_DOCKET_2026-07-14.md) as scoped to the predecessor lane; an evaluator must accept an explicit hourly-lane amendment before supervising the successor.
 9. Require an independent evaluator to complete the applicable authority record before using Level 5 language.
 

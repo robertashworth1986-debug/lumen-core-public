@@ -1,0 +1,57 @@
+{
+  "chain_receipts": {
+    "operational_receipt_sha256": "f7bbef89ba688326a3bd52735dc775a4e7585c842968505e9827aba80c7e9387",
+    "prediction_terminal_sha256": "d0168756f3b46d4ebe9803a042f423d65e2b3d1ed932442b92e501531d87a3ba",
+    "settlement_terminal_sha256": "efe307439c3ba67b39656e698a8956b4594c496ddbb991c5a42f2ef530d6bc98",
+    "source_panel_row_chain_sha256": "ee53210f0836a3e634bd61f8c4b1b6b3918126390f3f848985e0354627020713",
+    "source_panel_row_count": 88628
+  },
+  "claim_boundary": "A passing result would support bounded prospective public-data evidence for a frozen hourly specialist router. It does not establish patent validity or scope, utility control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority.",
+  "descriptive_metrics": {
+    "best_fixed_mean_scaled_absolute_error": 0.37600603586821096,
+    "current_best_fixed_candidate": "lightgbm_residual",
+    "interpretation": "Descriptive incomplete-sample values only; no promotion or external-generalization claim is allowed.",
+    "router_mean_scaled_absolute_error": 0.37003697446269557,
+    "router_skill_vs_current_best_fixed": 0.005969061405515397,
+    "sample_gate_open": false
+  },
+  "integrity": {
+    "checks": {
+      "operational_receipt_reconciled": true,
+      "prediction_count_reconciled": true,
+      "prediction_terminal_hash_valid": true,
+      "protocol_commit_matched": true,
+      "protocol_identity_matched": true,
+      "settlement_count_reconciled": true,
+      "settlement_terminal_hash_valid": true,
+      "source_panel_chain_hash_valid": true
+    },
+    "configured_private_pattern_hit_count": 0,
+    "gate_passed": true
+  },
+  "projected_from_status_generated_utc": "2026-07-21T03:41:20.107370+00:00",
+  "protocol": {
+    "commit": "8fd49772dbeec3664b9c83c1d46f5c8583772946",
+    "path": "config/eia_grid_prospective_hourly_router_protocol_v1.json",
+    "protocol_id": "EIA_GRID_PROSPECTIVE_HOURLY_ROUTER_20260715",
+    "sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5"
+  },
+  "runtime_snapshot": {
+    "cycle_sha256": "c5973c1c8b43f7c3e6464ae636faaab9f8e6b75cf46d28526a12240634ab37fb",
+    "raw_runtime_in_public_repository": false,
+    "status_sha256": "951f32ebcae58c0c89095496b235205384ae4373a57db7cd294edff14ce1b9a3"
+  },
+  "sample_state": {
+    "common_settled_hour_count": 0,
+    "confirmatory_ready": false,
+    "durability_ready": false,
+    "first_common_settled_period": null,
+    "latest_common_settled_period": null,
+    "prediction_count": 486,
+    "preliminary_ready": false,
+    "promotion_evaluation_complete": false,
+    "settlement_count": 469
+  },
+  "schema": "eia_grid_prospective_hourly_runtime_projection.v1",
+  "state": "PROSPECTIVE_COLLECTION_ACTIVE"
+}
