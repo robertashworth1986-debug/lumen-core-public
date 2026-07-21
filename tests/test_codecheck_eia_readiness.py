@@ -21,19 +21,19 @@ OPERATOR_RECEIPT = (
     ROOT
     / "evidence"
     / "reproducibility"
-    / "codecheck_eia_operator_clean_runner_880eb9a0_20260721.json"
+    / "codecheck_eia_operator_clean_runner_b2ede058_20260721.json"
 )
 RUNTIME_RECEIPT = (
     ROOT
     / "evidence"
     / "reproducibility"
-    / "codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json"
+    / "codecheck_reviewer_runtime_receipt_b2ede058_20260721.json"
 )
 CONTAINER_RECEIPT = (
     ROOT
     / "evidence"
     / "reproducibility"
-    / "codecheck_reviewer_container_rebuild_880eb9a0_20260721.json"
+    / "codecheck_reviewer_container_rebuild_b2ede058_20260721.json"
 )
 PREPRINT_MARKDOWN = (
     ROOT

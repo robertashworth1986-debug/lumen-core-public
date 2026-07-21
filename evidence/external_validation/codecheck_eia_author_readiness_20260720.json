@@ -49,28 +49,28 @@
         {
           "archived_sha256": "c08b9273c6bcb8a2cba388d1fa5a680010d325106da5399b6cd9f7c0b739fac1",
           "current_match": false,
-          "current_sha256": "4d5f24da1c3c15324af95b7b91a5c2048e3c28c255646bd0f5eb4387936cc736",
+          "current_sha256": "bfe3bf5c66a22bf741bb9593e41aecb6836101700c00a9b1dcc0f584fe169855",
           "path": "README.md",
           "role": "documentation_or_packaging"
         },
         {
           "archived_sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100",
           "current_match": false,
-          "current_sha256": "da7287501982f09856b7b5ea9b707928ad6e7be10caf45d67eaf81bf553f1452",
+          "current_sha256": "c8478829cc9119cfd8b1391d6581ab8b8446062a9b011f92065579326a8d2a6e",
           "path": "code/eia_grid_residual_moe_benchmark.py",
           "role": "computational_identity"
         },
         {
           "archived_sha256": "b3586ddc568f6bd4aa6ae48bbb289ab579eab773699dba5ac32234d393627791",
           "current_match": false,
-          "current_sha256": "a16fc3e55c275625da24d7ea453a830b6ab8a47ea82aee4a3cb25f7fc5933bc5",
+          "current_sha256": "9fee3ac907415106545b5e9b54047e966ff86590549210f5eaedbe327ffa714b",
           "path": "code/eia_grid_wave_champion_benchmark.py",
           "role": "computational_identity"
         },
         {
           "archived_sha256": "5346d8f4b66b7a19a6b0daf58bd4e983f4a2108346d6d51429ec0f387ab7ed8c",
           "current_match": false,
-          "current_sha256": "da3399399f965565132c114a9fd6c667b2cd95a6e0d62808d7693f75fe63eba6",
+          "current_sha256": "5728dbd090abb0947e8cfe0acf3ac9f583170aa3bbb426a49ca007ba0159b7fd",
           "path": "code/mda_control_mapping_open_set_benchmark.py",
           "role": "computational_identity"
         },
@@ -140,14 +140,14 @@
         {
           "archived_sha256": "0aa6af3aa74ecb561c15a1b9560ed80014bc692679e61e6c6fa93bb75cc8ba68",
           "current_match": false,
-          "current_sha256": "bedbdd6527b94e71ced78482ad806eaa8a011b25a3dbfcc565748e5ca4c19b77",
+          "current_sha256": "3ce4d672f8a209d5d9792f4285990911f1568f5ff36bf80f6d618ecbba31fb48",
           "path": "tests/test_eia_grid_residual_moe_benchmark.py",
           "role": "computational_identity"
         },
         {
           "archived_sha256": "175010b5aa97951fe1770d4f67b1b9b4597baff113d55b34021a103ca04055bb",
           "current_match": false,
-          "current_sha256": "390e0399f7b1ef93a7c815b0431371ad0564579a47a40d871f0d2db1cbfe93a0",
+          "current_sha256": "a0ce9a08f9d9409d9c52f37d24e112fc8a25c0f37297c536df40f03eeaf98824",
           "path": "tests/test_eia_grid_wave_champion_benchmark.py",
           "role": "computational_identity"
         },
@@ -161,7 +161,7 @@
         {
           "archived_sha256": "0798b6a130f48b012c75877fd56d9aeb36be033b5620b974e89fc46b76585db8",
           "current_match": false,
-          "current_sha256": "73984c678cc488ec722c01795573559a0637f0abf2e16da92b3c7bd8790cb840",
+          "current_sha256": "c3c8badaa94913d7e166d4cd8cb6563c71f66d67d5d5458dc1c463d28725695b",
           "path": "tests/test_mda_control_mapping_open_set_benchmark.py",
           "role": "computational_identity"
         },
@@ -408,13 +408,13 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T16:52:43.669163+00:00",
+  "generated_utc": "2026-07-21T17:14:19.652406+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "operator_clean_runner": {
     "assertion_count": 31,
     "assertion_pass_count": 31,
     "authoritative_runtime_match": true,
-    "capsule_sha256": "73e868b194f1c90539f01290e754a15557ec741e59a5cb5c573608abce737b03",
+    "capsule_sha256": "92e48edf885e731ff502fa81698052d23d81827c84720231d403343799aff30b",
     "checks": {
       "assertions_matched": true,
       "authoritative_runtime_matched": true,
@@ -439,14 +439,14 @@
     "execution_control": "Author-operated rebuild from the deterministic release ZIP in the digest-pinned reviewer container, with execution networking disabled, a read-only root filesystem, dropped capabilities, and the protocol-pinned Ubuntu, CPython, and dependency environment.",
     "external_validation_complete": false,
     "fixture_tests_passed": true,
-    "generated_utc": "2026-07-21T16:28:23.870869+00:00",
+    "generated_utc": "2026-07-21T17:10:59.894355+00:00",
     "policy": "This receipt is internal operator evidence, not independent execution or external validation. It may establish current computational identity only while every benchmark, protocol, frozen input, dependency lock, workflow, and test artifact in the receipt still matches byte-for-byte under its declared portable hash mode. Documentation drift must remain visible and requires a current-commit independent execution before any external claim changes.",
-    "receipt_path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json",
-    "receipt_sha256": "9e5153953f3f6fac77dca9107908a4834d9d16dad022413d0e39d36033ff2f03",
+    "receipt_path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json",
+    "receipt_sha256": "f8280773d1fa3e1209f57c64d3fcdf9608e4d633c6a0148b2578fc45728b8a1a",
     "relevant_source_clean": true,
     "schema": "reviewer_reproducibility_capsule.v1",
-    "source_chain_sha256": "abeab3e8070e63261dbbb620cf36a019bea3a4d68cd8ba1ddbceab2d9e0e447e",
-    "source_commit": "880eb9a0d6af71a95ea4899a2b33917013269dab",
+    "source_chain_sha256": "2b5e73121212fe57b6cb0cd47565419ed88090be609b392c4aed5c35e0e7e3b6",
+    "source_commit": "b2ede0583776de47459fac4413f2570e2636f199",
     "source_reconciliation": {
       "archived_source_count": 23,
       "computational_identity_exact_match": true,
@@ -473,30 +473,30 @@
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56",
+          "archived_sha256": "4d5f24da1c3c15324af95b7b91a5c2048e3c28c255646bd0f5eb4387936cc736",
           "current_match": false,
-          "current_sha256": "4d5f24da1c3c15324af95b7b91a5c2048e3c28c255646bd0f5eb4387936cc736",
+          "current_sha256": "bfe3bf5c66a22bf741bb9593e41aecb6836101700c00a9b1dcc0f584fe169855",
           "path": "README.md",
           "role": "documentation_or_packaging"
         },
         {
-          "archived_sha256": "da7287501982f09856b7b5ea9b707928ad6e7be10caf45d67eaf81bf553f1452",
+          "archived_sha256": "c8478829cc9119cfd8b1391d6581ab8b8446062a9b011f92065579326a8d2a6e",
           "current_match": true,
-          "current_sha256": "da7287501982f09856b7b5ea9b707928ad6e7be10caf45d67eaf81bf553f1452",
+          "current_sha256": "c8478829cc9119cfd8b1391d6581ab8b8446062a9b011f92065579326a8d2a6e",
           "path": "code/eia_grid_residual_moe_benchmark.py",
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "a16fc3e55c275625da24d7ea453a830b6ab8a47ea82aee4a3cb25f7fc5933bc5",
+          "archived_sha256": "9fee3ac907415106545b5e9b54047e966ff86590549210f5eaedbe327ffa714b",
           "current_match": true,
-          "current_sha256": "a16fc3e55c275625da24d7ea453a830b6ab8a47ea82aee4a3cb25f7fc5933bc5",
+          "current_sha256": "9fee3ac907415106545b5e9b54047e966ff86590549210f5eaedbe327ffa714b",
           "path": "code/eia_grid_wave_champion_benchmark.py",
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "da3399399f965565132c114a9fd6c667b2cd95a6e0d62808d7693f75fe63eba6",
+          "archived_sha256": "5728dbd090abb0947e8cfe0acf3ac9f583170aa3bbb426a49ca007ba0159b7fd",
           "current_match": true,
-          "current_sha256": "da3399399f965565132c114a9fd6c667b2cd95a6e0d62808d7693f75fe63eba6",
+          "current_sha256": "5728dbd090abb0947e8cfe0acf3ac9f583170aa3bbb426a49ca007ba0159b7fd",
           "path": "code/mda_control_mapping_open_set_benchmark.py",
           "role": "computational_identity"
         },
@@ -578,16 +578,16 @@
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "bedbdd6527b94e71ced78482ad806eaa8a011b25a3dbfcc565748e5ca4c19b77",
+          "archived_sha256": "3ce4d672f8a209d5d9792f4285990911f1568f5ff36bf80f6d618ecbba31fb48",
           "current_match": true,
-          "current_sha256": "bedbdd6527b94e71ced78482ad806eaa8a011b25a3dbfcc565748e5ca4c19b77",
+          "current_sha256": "3ce4d672f8a209d5d9792f4285990911f1568f5ff36bf80f6d618ecbba31fb48",
           "path": "tests/test_eia_grid_residual_moe_benchmark.py",
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "390e0399f7b1ef93a7c815b0431371ad0564579a47a40d871f0d2db1cbfe93a0",
+          "archived_sha256": "a0ce9a08f9d9409d9c52f37d24e112fc8a25c0f37297c536df40f03eeaf98824",
           "current_match": true,
-          "current_sha256": "390e0399f7b1ef93a7c815b0431371ad0564579a47a40d871f0d2db1cbfe93a0",
+          "current_sha256": "a0ce9a08f9d9409d9c52f37d24e112fc8a25c0f37297c536df40f03eeaf98824",
           "path": "tests/test_eia_grid_wave_champion_benchmark.py",
           "role": "computational_identity"
         },
@@ -599,9 +599,9 @@
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "73984c678cc488ec722c01795573559a0637f0abf2e16da92b3c7bd8790cb840",
+          "archived_sha256": "c3c8badaa94913d7e166d4cd8cb6563c71f66d67d5d5458dc1c463d28725695b",
           "current_match": true,
-          "current_sha256": "73984c678cc488ec722c01795573559a0637f0abf2e16da92b3c7bd8790cb840",
+          "current_sha256": "c3c8badaa94913d7e166d4cd8cb6563c71f66d67d5d5458dc1c463d28725695b",
           "path": "tests/test_mda_control_mapping_open_set_benchmark.py",
           "role": "computational_identity"
         },
@@ -665,21 +665,21 @@
     "configured_private_pattern_hit_count": 0,
     "external_validation_complete": false,
     "fixture_tests_passed": true,
-    "generated_utc": "2026-07-21T16:29:00.944278+00:00",
-    "image_id": "sha256:e6f0991d7b1ee8d87b541ef75b19f00b8957abcf517d83f8b35c298fb42c3931",
+    "generated_utc": "2026-07-21T17:11:38.093014+00:00",
+    "image_id": "sha256:864ace1b42d399ad4147c570709a6de01f1466337902f43b2516223bfabf4e8b",
     "independent_execution_complete": false,
     "operator_controlled": true,
     "policy": "This first-party receipt proves only that the named release ZIP rebuilt and passed inside the pinned operator-controlled container under the recorded isolation controls. Independent execution, a CODECHECK certificate, scientific validation, field validation, performance endorsement, and external validation remain false.",
     "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_CONTAINER_20260721",
-    "receipt_path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json",
-    "receipt_payload_sha256": "ac71f866681f8384dc749567bcaefb2e162e2e90b6ab3955dcfc2f95e44faa14",
-    "receipt_sha256": "02879eb7f650256935325cfb09e391ac61658c321823b53fd24aeec226a801ec",
-    "release_manifest_sha256": "fc0798c082f6c8e05e5cf8501fed818d7956f8c0f35b21838abf02194f98f949",
+    "receipt_path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json",
+    "receipt_payload_sha256": "afc6f89b8d19b08fdc85ace94d54ee7342cacb56118f706e29b7f76f782b757b",
+    "receipt_sha256": "560cc3b5f187c0a4add90c527e967de36e13788c53e3bd8aaa63f97c10a3787e",
+    "release_manifest_sha256": "6b7530fef3188c2263241a85f8ccffba97c332e2df12c0d1e6dd4eedd6076c26",
     "runtime_check_count": 10,
     "runtime_check_pass_count": 10,
     "schema": "codecheck_reviewer_container_run_receipt.v1",
-    "source_bundle_sha256": "ae413b6ecf8cca226bbffa8eb29c99e8a932ccee1ac88539e7301e90b5587ba4",
-    "source_commit": "880eb9a0d6af71a95ea4899a2b33917013269dab",
+    "source_bundle_sha256": "0fa73c04454cfbd94f819b9584ccd2167982e3a95542e9345f687a1c823463ab",
+    "source_commit": "b2ede0583776de47459fac4413f2570e2636f199",
     "source_state_mode": "release_manifest",
     "source_state_verified": true,
     "status": "OPERATOR_CONTAINER_REBUILD_PASS",
@@ -713,9 +713,9 @@
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
     "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
-    "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json": true,
-    "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json": true,
-    "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json": true,
+    "evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json": true,
+    "evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json": true,
+    "evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json": true,
     "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
     "requirements-reviewer-ubuntu-py311.lock": true,
     "tests/test_codecheck_eia_readiness.py": true,
@@ -723,19 +723,19 @@
     "tests/test_codecheck_reviewer_container.py": true,
     "tests/test_codecheck_reviewer_runtime.py": true
   },
-  "portable_input_chain_sha256": "f33b343979ef32473e2d6c7bf8ff33365b0d673e77d1c626941b8be6c5c0f1ff",
+  "portable_input_chain_sha256": "2ecb5f6498c4a8e2cb7d0b9ea4fa8956bc5769796833c6de440e54cc5656264e",
   "portable_inputs": [
     {
       "bytes": 8071,
       "hash_mode": "utf8_lf",
       "path": ".github/workflows/codecheck-eia-readiness.yml",
-      "sha256": "b2e7ebc1e3f184ea1c109471a517ce7f528eb5f53b5f5741e353d64633c5c4c2"
+      "sha256": "aac666328cdb4a04365c7abf02e55621125b65360f2cf60cb02fa85f71f8418e"
     },
     {
       "bytes": 16243,
       "hash_mode": "utf8_lf",
       "path": "README.md",
-      "sha256": "4d5f24da1c3c15324af95b7b91a5c2048e3c28c255646bd0f5eb4387936cc736"
+      "sha256": "bfe3bf5c66a22bf741bb9593e41aecb6836101700c00a9b1dcc0f584fe169855"
     },
     {
       "bytes": 1891,
@@ -813,13 +813,13 @@
       "bytes": 13914,
       "hash_mode": "utf8_lf",
       "path": "config/codecheck_eia_readiness_v1.json",
-      "sha256": "fb4080b60c88a3bd9600b9d9967bf57425299bbf1a571bcf70078d9c970af5a0"
+      "sha256": "ed84d3136be14b683b125a03d7dbd554f6b4559e209796ab586112332db92f7c"
     },
     {
       "bytes": 6174,
       "hash_mode": "utf8_lf",
       "path": "config/codecheck_eia_release_candidate_v1.json",
-      "sha256": "339b4d5860281b3e7b798df955f7186cd4dd33178af0178a714f58d6234f8609"
+      "sha256": "b721633d5053002c8f7b141e5ad0a4e12a9962cee0d4793a92c2c161da27b451"
     },
     {
       "bytes": 2601,
@@ -873,7 +873,7 @@
       "bytes": 7905,
       "hash_mode": "utf8_lf",
       "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
-      "sha256": "c07a2d79d3c95c0bbd7b990c220b25698f7a6d7b8ba9a1a4f9e38447b7703b24"
+      "sha256": "7c00f130eec80f43e94caa8f7ef96805aeb1afee05d07cbcf6821b39519303b6"
     },
     {
       "bytes": 5487,
@@ -885,31 +885,31 @@
       "bytes": 11412,
       "hash_mode": "utf8_lf",
       "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
-      "sha256": "723141f2fea749af3625a5556824e2606f2f0d1eb0e975c5c17ed31868856eba"
+      "sha256": "2cc9a001b3a4c6a830b04b626f11b61f3a06ad49bf56e8599d4bb35c15b9f1a6"
     },
     {
       "bytes": 13982,
       "hash_mode": "raw",
       "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
-      "sha256": "e3261285bc1142e603d270c80f7daad24c3f490690527fac48a11ac0156fa47c"
+      "sha256": "96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497"
     },
     {
-      "bytes": 27420,
+      "bytes": 27422,
       "hash_mode": "utf8_lf",
-      "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json",
-      "sha256": "9e5153953f3f6fac77dca9107908a4834d9d16dad022413d0e39d36033ff2f03"
+      "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json",
+      "sha256": "f8280773d1fa3e1209f57c64d3fcdf9608e4d633c6a0148b2578fc45728b8a1a"
     },
     {
-      "bytes": 8522,
+      "bytes": 8495,
       "hash_mode": "utf8_lf",
-      "path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json",
-      "sha256": "02879eb7f650256935325cfb09e391ac61658c321823b53fd24aeec226a801ec"
+      "path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json",
+      "sha256": "560cc3b5f187c0a4add90c527e967de36e13788c53e3bd8aaa63f97c10a3787e"
     },
     {
       "bytes": 3009,
       "hash_mode": "utf8_lf",
-      "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json",
-      "sha256": "34d0c3c720b06894d9434878b010a4c936c357655e156f7a36d937811a437816"
+      "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json",
+      "sha256": "929a0f8ad778071fbdabf82120016453579ff12aab13231f1d99dbb915af9d53"
     },
     {
       "bytes": 114366,
@@ -927,13 +927,13 @@
       "bytes": 19801,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_readiness.py",
-      "sha256": "a81b388d443903cb969e678d16fe847f5067ab4c2c1f44f222f0e16781b1af69"
+      "sha256": "4a2e037e1057bd32d07b02111110cd997853846021e472885bef097bdc8bc830"
     },
     {
       "bytes": 6498,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_release_candidate.py",
-      "sha256": "308e0ff02faf778a27bd568c72b30716a20ddd3918415de5f85c9aa152157370"
+      "sha256": "044b55ef46de2c24b24acfd2a755bf3694c02efef4164d01b3faec5daf5abf7c"
     },
     {
       "bytes": 7981,
@@ -971,11 +971,11 @@
     "duplicate_request_reconciled": false,
     "immutable_public_source_release": null,
     "markdown_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
-    "markdown_sha256": "723141f2fea749af3625a5556824e2606f2f0d1eb0e975c5c17ed31868856eba",
+    "markdown_sha256": "2cc9a001b3a4c6a830b04b626f11b61f3a06ad49bf56e8599d4bb35c15b9f1a6",
     "paper_reference": "Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
     "pdf_page_count": 5,
     "pdf_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
-    "pdf_sha256": "e3261285bc1142e603d270c80f7daad24c3f490690527fac48a11ac0156fa47c",
+    "pdf_sha256": "96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497",
     "policy": "The manuscript and request text are author-side drafts. A stable public preprint identifier, immutable public source release, duplicate-request reconciliation, Robert's review, and fresh action-time HumanUnlock are required before one production request may be opened.",
     "request_path": "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
     "stable_public_identifier": null,
@@ -986,9 +986,9 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "b676a523515d5dc76bbbfb84ba3dd06d40bd974297f50fa17f02c0c84c21f9ba",
+  "readiness_sha256": "1c2552aa2baf413a3d48aed275b7460ede79f0e46baa50047619bf6f0ea55fb2",
   "release_candidate": {
-    "bundle_input_chain_sha256": "da6cf1479eaccec0d81c0a74e5c4c8602925189518f50dac1e6f04421cefc800",
+    "bundle_input_chain_sha256": "1189cc679a2897d55ac418ae930c7545345efa279868435038c498944c369bf6",
     "bundle_input_count": 44,
     "bundle_inputs": [
       {
@@ -1019,25 +1019,25 @@
         "bytes": 16243,
         "hash_mode": "utf8_lf",
         "path": "README.md",
-        "sha256": "4d5f24da1c3c15324af95b7b91a5c2048e3c28c255646bd0f5eb4387936cc736"
+        "sha256": "bfe3bf5c66a22bf741bb9593e41aecb6836101700c00a9b1dcc0f584fe169855"
       },
       {
-        "bytes": 41939,
+        "bytes": 42097,
         "hash_mode": "utf8_lf",
         "path": "code/eia_grid_residual_moe_benchmark.py",
-        "sha256": "da7287501982f09856b7b5ea9b707928ad6e7be10caf45d67eaf81bf553f1452"
+        "sha256": "c8478829cc9119cfd8b1391d6581ab8b8446062a9b011f92065579326a8d2a6e"
       },
       {
-        "bytes": 47916,
+        "bytes": 48074,
         "hash_mode": "utf8_lf",
         "path": "code/eia_grid_wave_champion_benchmark.py",
-        "sha256": "a16fc3e55c275625da24d7ea453a830b6ab8a47ea82aee4a3cb25f7fc5933bc5"
+        "sha256": "9fee3ac907415106545b5e9b54047e966ff86590549210f5eaedbe327ffa714b"
       },
       {
-        "bytes": 38451,
+        "bytes": 38561,
         "hash_mode": "utf8_lf",
         "path": "code/mda_control_mapping_open_set_benchmark.py",
-        "sha256": "da3399399f965565132c114a9fd6c667b2cd95a6e0d62808d7693f75fe63eba6"
+        "sha256": "5728dbd090abb0947e8cfe0acf3ac9f583170aa3bbb426a49ca007ba0159b7fd"
       },
       {
         "bytes": 19630,
@@ -1085,7 +1085,7 @@
         "bytes": 6174,
         "hash_mode": "utf8_lf",
         "path": "config/codecheck_eia_release_candidate_v1.json",
-        "sha256": "339b4d5860281b3e7b798df955f7186cd4dd33178af0178a714f58d6234f8609"
+        "sha256": "b721633d5053002c8f7b141e5ad0a4e12a9962cee0d4793a92c2c161da27b451"
       },
       {
         "bytes": 2601,
@@ -1145,19 +1145,19 @@
         "bytes": 7905,
         "hash_mode": "utf8_lf",
         "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
-        "sha256": "c07a2d79d3c95c0bbd7b990c220b25698f7a6d7b8ba9a1a4f9e38447b7703b24"
+        "sha256": "7c00f130eec80f43e94caa8f7ef96805aeb1afee05d07cbcf6821b39519303b6"
       },
       {
         "bytes": 11412,
         "hash_mode": "utf8_lf",
         "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
-        "sha256": "723141f2fea749af3625a5556824e2606f2f0d1eb0e975c5c17ed31868856eba"
+        "sha256": "2cc9a001b3a4c6a830b04b626f11b61f3a06ad49bf56e8599d4bb35c15b9f1a6"
       },
       {
         "bytes": 13982,
         "hash_mode": "binary",
         "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
-        "sha256": "e3261285bc1142e603d270c80f7daad24c3f490690527fac48a11ac0156fa47c"
+        "sha256": "96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497"
       },
       {
         "bytes": 5487,
@@ -1166,22 +1166,22 @@
         "sha256": "91de67be9b9ee88eadfd5ce34ed7f2d99c308c83311debd0676636a15e2161e6"
       },
       {
-        "bytes": 27420,
+        "bytes": 27422,
         "hash_mode": "utf8_lf",
-        "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json",
-        "sha256": "9e5153953f3f6fac77dca9107908a4834d9d16dad022413d0e39d36033ff2f03"
+        "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json",
+        "sha256": "f8280773d1fa3e1209f57c64d3fcdf9608e4d633c6a0148b2578fc45728b8a1a"
       },
       {
-        "bytes": 8522,
+        "bytes": 8495,
         "hash_mode": "utf8_lf",
-        "path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json",
-        "sha256": "02879eb7f650256935325cfb09e391ac61658c321823b53fd24aeec226a801ec"
+        "path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json",
+        "sha256": "560cc3b5f187c0a4add90c527e967de36e13788c53e3bd8aaa63f97c10a3787e"
       },
       {
         "bytes": 3009,
         "hash_mode": "utf8_lf",
-        "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json",
-        "sha256": "34d0c3c720b06894d9434878b010a4c936c357655e156f7a36d937811a437816"
+        "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json",
+        "sha256": "929a0f8ad778071fbdabf82120016453579ff12aab13231f1d99dbb915af9d53"
       },
       {
         "bytes": 114366,
@@ -1205,7 +1205,7 @@
         "bytes": 6498,
         "hash_mode": "utf8_lf",
         "path": "tests/test_codecheck_eia_release_candidate.py",
-        "sha256": "308e0ff02faf778a27bd568c72b30716a20ddd3918415de5f85c9aa152157370"
+        "sha256": "044b55ef46de2c24b24acfd2a755bf3694c02efef4164d01b3faec5daf5abf7c"
       },
       {
         "bytes": 7981,
@@ -1220,16 +1220,16 @@
         "sha256": "c10a92d4fe120c3f8dbb3de4b6984673384f58e51a7dd560a0997a3506e7c2d4"
       },
       {
-        "bytes": 4420,
+        "bytes": 4649,
         "hash_mode": "utf8_lf",
         "path": "tests/test_eia_grid_residual_moe_benchmark.py",
-        "sha256": "bedbdd6527b94e71ced78482ad806eaa8a011b25a3dbfcc565748e5ca4c19b77"
+        "sha256": "3ce4d672f8a209d5d9792f4285990911f1568f5ff36bf80f6d618ecbba31fb48"
       },
       {
-        "bytes": 8186,
+        "bytes": 8422,
         "hash_mode": "utf8_lf",
         "path": "tests/test_eia_grid_wave_champion_benchmark.py",
-        "sha256": "390e0399f7b1ef93a7c815b0431371ad0564579a47a40d871f0d2db1cbfe93a0"
+        "sha256": "a0ce9a08f9d9409d9c52f37d24e112fc8a25c0f37297c536df40f03eeaf98824"
       },
       {
         "bytes": 3342,
@@ -1238,10 +1238,10 @@
         "sha256": "c2bbaac93e10883f30424998fa676bd69d313e4815760b97e43f84d20a86c7d5"
       },
       {
-        "bytes": 4263,
+        "bytes": 4494,
         "hash_mode": "utf8_lf",
         "path": "tests/test_mda_control_mapping_open_set_benchmark.py",
-        "sha256": "73984c678cc488ec722c01795573559a0637f0abf2e16da92b3c7bd8790cb840"
+        "sha256": "c3c8badaa94913d7e166d4cd8cb6563c71f66d67d5d5458dc1c463d28725695b"
       },
       {
         "bytes": 3697,
@@ -1354,9 +1354,9 @@
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
       "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
-      "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json": true,
-      "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json": true,
-      "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json": true,
+      "evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json": true,
+      "evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json": true,
+      "evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json": true,
       "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
       "requirements-reviewer-ubuntu-py311.lock": true,
       "requirements-reviewer.txt": true,
@@ -1400,9 +1400,9 @@
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
       "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
-      "evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json": true,
-      "evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json": true,
-      "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json": true,
+      "evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json": true,
+      "evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json": true,
+      "evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json": true,
       "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
       "requirements-reviewer-ubuntu-py311.lock": true,
       "requirements-reviewer.txt": true,
@@ -1502,7 +1502,7 @@
       "system": "Linux"
     },
     "external_validation_complete": false,
-    "generated_utc": "2026-07-21T16:28:23.480158+00:00",
+    "generated_utc": "2026-07-21T17:10:59.378730+00:00",
     "independent_execution_complete": false,
     "observed": {
       "environment": {
@@ -1527,13 +1527,13 @@
     "operator_controlled": true,
     "policy": "This first-party receipt closes the author-side ambiguity between a generic Linux/Python match and the specifically claimed Ubuntu 24.04 x86-64 CPython 3.11.9 glibc 2.39 runtime. It does not convert the replay into independent execution or external validation.",
     "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_RUNTIME_20260721",
-    "receipt_path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json",
-    "receipt_payload_sha256": "e6cfba1532177e3b68ca8f06b4bcf6f954ce3e8ae6f22e398e993153749e1a20",
-    "receipt_sha256": "34d0c3c720b06894d9434878b010a4c936c357655e156f7a36d937811a437816",
+    "receipt_path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json",
+    "receipt_payload_sha256": "a043dadfb486a7f2bba14e44864607193935d17d4a099c0ad1400cf170184e28",
+    "receipt_sha256": "929a0f8ad778071fbdabf82120016453579ff12aab13231f1d99dbb915af9d53",
     "runtime_check_count": 10,
     "runtime_check_pass_count": 10,
     "schema": "codecheck_reviewer_runtime_receipt.v1",
-    "source_commit": "880eb9a0d6af71a95ea4899a2b33917013269dab",
+    "source_commit": "b2ede0583776de47459fac4413f2570e2636f199",
     "source_reconciliation": [
       {
         "current_match": true,

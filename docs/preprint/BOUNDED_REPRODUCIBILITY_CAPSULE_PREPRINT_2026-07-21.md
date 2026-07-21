@@ -116,7 +116,7 @@ After observing that difference, the protocol was amended to permit at most one 
 
 ## 6. Author-Operated Reproducibility Evidence
 
-The current public author receipts record a no-cache rebuild of deterministic source bundle `ae413b6ecf8cca226bbffa8eb29c99e8a932ccee1ac88539e7301e90b5587ba4` from source commit `880eb9a0d6af71a95ea4899a2b33917013269dab` under the authoritative Linux and Python environment:
+The current public author receipts record a no-cache rebuild of deterministic source bundle `0fa73c04454cfbd94f819b9584ccd2167982e3a95542e9345f687a1c823463ab` from source commit `b2ede0583776de47459fac4413f2570e2636f199` under the authoritative Linux and Python environment:
 
 - Relevant source clean: true
 - Exact dependency closure: true
@@ -124,10 +124,10 @@ The current public author receipts record a no-cache rebuild of deterministic so
 - Suites passed: 3 of 3
 - Assertions passed: 31 of 31
 - External validation complete: false
-- Container receipt SHA-256: `02879eb7f650256935325cfb09e391ac61658c321823b53fd24aeec226a801ec`
-- Capsule receipt SHA-256: `9e5153953f3f6fac77dca9107908a4834d9d16dad022413d0e39d36033ff2f03`
-- Capsule payload SHA-256: `73e868b194f1c90539f01290e754a15557ec741e59a5cb5c573608abce737b03`
-- Source-chain SHA-256: `abeab3e8070e63261dbbb620cf36a019bea3a4d68cd8ba1ddbceab2d9e0e447e`
+- Container receipt SHA-256: `560cc3b5f187c0a4add90c527e967de36e13788c53e3bd8aaa63f97c10a3787e`
+- Capsule receipt SHA-256: `f8280773d1fa3e1209f57c64d3fcdf9608e4d633c6a0148b2578fc45728b8a1a`
+- Capsule payload SHA-256: `92e48edf885e731ff502fa81698052d23d81827c84720231d403343799aff30b`
+- Source-chain SHA-256: `2b5e73121212fe57b6cb0cd47565419ed88090be609b392c4aed5c35e0e7e3b6`
 
 This is first-party evidence. An independent codechecker must execute the reviewed source and document what was checked, how it was checked, and what was reproduced before any external claim changes.
 

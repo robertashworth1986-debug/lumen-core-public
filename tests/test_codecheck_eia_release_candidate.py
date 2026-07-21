@@ -103,7 +103,7 @@ def test_bundle_has_fixed_metadata_exact_inputs_and_no_duplicate_names(tmp_path)
         assert f"{root}/tests/test_codecheck_reviewer_container.py" in names
         assert (
             f"{root}/evidence/reproducibility/"
-            "codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json"
+            "codecheck_reviewer_runtime_receipt_b2ede058_20260721.json"
             in names
         )
         manifest = json.loads(archive.read(f"{root}/RELEASE_MANIFEST.json"))

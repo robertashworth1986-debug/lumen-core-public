@@ -1,6 +1,6 @@
 # CODECHECK EIA Author Readiness
 
-Generated UTC: `2026-07-21T16:52:43.669163+00:00`
+Generated UTC: `2026-07-21T17:14:19.652406+00:00`
 
 An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.
 
@@ -33,7 +33,7 @@ An author-readiness pass proves only that the declared public files, execution m
 - Independent execution complete: `false`
 - Certificate issued: `false`
 - External validation complete: `false`
-- Readiness SHA-256: `b676a523515d5dc76bbbfb84ba3dd06d40bd974297f50fa17f02c0c84c21f9ba`
+- Readiness SHA-256: `1c2552aa2baf413a3d48aed275b7460ede79f0e46baa50047619bf6f0ea55fb2`
 
 An internal pass means the author-side bundle is coherent enough for Robert to review. It is not a submission receipt, external execution, or certificate.
 
@@ -59,9 +59,9 @@ python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --r
 ## Public Preprint And Request Draft
 
 - Markdown: `docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md`
-- Markdown SHA-256: `723141f2fea749af3625a5556824e2606f2f0d1eb0e975c5c17ed31868856eba`
+- Markdown SHA-256: `2cc9a001b3a4c6a830b04b626f11b61f3a06ad49bf56e8599d4bb35c15b9f1a6`
 - PDF: `docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
-- PDF SHA-256: `e3261285bc1142e603d270c80f7daad24c3f490690527fac48a11ac0156fa47c`
+- PDF SHA-256: `96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497`
 - PDF pages: `5`
 - Manifest reference: `Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
 - Stable public identifier: `not assigned`
@@ -77,7 +77,7 @@ The manuscript and request text are author-side drafts. A stable public preprint
 
 - Proposed tag: `codecheck-eia-v0.1.0`
 - Bundle inputs: `44`
-- Bundle input chain SHA-256: `da6cf1479eaccec0d81c0a74e5c4c8602925189518f50dac1e6f04421cefc800`
+- Bundle input chain SHA-256: `1189cc679a2897d55ac418ae930c7545345efa279868435038c498944c369bf6`
 - Internal definition ready: `true`
 - Publication ready: `false`
 - GitHub release published: `false`
@@ -101,9 +101,9 @@ The archive demonstrates an older operator-controlled clean-runner execution. Ev
 
 ## Current Source-Identity Operator Replay
 
-- Receipt: `evidence/reproducibility/codecheck_eia_operator_clean_runner_880eb9a0_20260721.json`
-- Receipt SHA-256: `9e5153953f3f6fac77dca9107908a4834d9d16dad022413d0e39d36033ff2f03`
-- Source commit: `880eb9a0d6af71a95ea4899a2b33917013269dab`
+- Receipt: `evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json`
+- Receipt SHA-256: `f8280773d1fa3e1209f57c64d3fcdf9608e4d633c6a0148b2578fc45728b8a1a`
+- Source commit: `b2ede0583776de47459fac4413f2570e2636f199`
 - Source artifacts matched: `22/23`
 - Full source exact match: `false`
 - Computational identity exact match: `true`
@@ -123,9 +123,9 @@ This receipt is internal operator evidence, not independent execution or externa
 
 ## Exact Reviewer Runtime Receipt
 
-- Receipt: `evidence/reproducibility/codecheck_reviewer_runtime_receipt_880eb9a0_20260721.json`
-- Receipt SHA-256: `34d0c3c720b06894d9434878b010a4c936c357655e156f7a36d937811a437816`
-- Declared source commit: `880eb9a0d6af71a95ea4899a2b33917013269dab`
+- Receipt: `evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json`
+- Receipt SHA-256: `929a0f8ad778071fbdabf82120016453579ff12aab13231f1d99dbb915af9d53`
+- Declared source commit: `b2ede0583776de47459fac4413f2570e2636f199`
 - Runtime checks passed: `10/10`
 - Observed OS: `ubuntu 24.04`
 - Observed architecture: `x86_64`
@@ -139,12 +139,12 @@ This first-party receipt closes the author-side ambiguity between a generic Linu
 
 ## Digest-Pinned Container Rebuild
 
-- Receipt: `evidence/reproducibility/codecheck_reviewer_container_rebuild_880eb9a0_20260721.json`
-- Receipt SHA-256: `02879eb7f650256935325cfb09e391ac61658c321823b53fd24aeec226a801ec`
-- Source commit: `880eb9a0d6af71a95ea4899a2b33917013269dab`
-- Source bundle SHA-256: `ae413b6ecf8cca226bbffa8eb29c99e8a932ccee1ac88539e7301e90b5587ba4`
-- Release manifest SHA-256: `fc0798c082f6c8e05e5cf8501fed818d7956f8c0f35b21838abf02194f98f949`
-- Image ID: `sha256:e6f0991d7b1ee8d87b541ef75b19f00b8957abcf517d83f8b35c298fb42c3931`
+- Receipt: `evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json`
+- Receipt SHA-256: `560cc3b5f187c0a4add90c527e967de36e13788c53e3bd8aaa63f97c10a3787e`
+- Source commit: `b2ede0583776de47459fac4413f2570e2636f199`
+- Source bundle SHA-256: `0fa73c04454cfbd94f819b9584ccd2167982e3a95542e9345f687a1c823463ab`
+- Release manifest SHA-256: `6b7530fef3188c2263241a85f8ccffba97c332e2df12c0d1e6dd4eedd6076c26`
+- Image ID: `sha256:864ace1b42d399ad4147c570709a6de01f1466337902f43b2516223bfabf4e8b`
 - Runtime checks passed: `10/10`
 - Suites passed: `3/3`
 - Assertions passed: `31/31`

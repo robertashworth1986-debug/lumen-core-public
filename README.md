@@ -153,7 +153,7 @@ python code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py
 python code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py --bundle-zip out/release_candidates/codecheck-eia-v0.1.0/LumenCore_CODECHECK_EIA_Source_Bundle_v0.1.0.zip --output-dir out/codecheck-container --execute
 ```
 
-The tracked operator receipt records 3/3 suites, 31/31 assertions, 28/28 selected fixture tests, exact runtime checks, and release-manifest verification passing for source commit `880eb9a0d6af71a95ea4899a2b33917013269dab`. It is first-party executability evidence; independent execution and external validation remain false.
+The tracked operator receipt records 3/3 suites, 31/31 assertions, 28/28 selected fixture tests, exact runtime checks, and release-manifest verification passing for source commit `b2ede0583776de47459fac4413f2570e2636f199`. It is first-party executability evidence; independent execution and external validation remain false.
 
 Start with the [`executable-computation note`](docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md) and the machine-generated [`author-readiness report`](docs/CODECHECK_EIA_AUTHOR_READINESS_2026-07-20.md). The operator-side archive is not independent execution. Submission, codechecker assignment, execution, and certificate issuance remain external gates; contacting CODECHECK requires action-time HumanUnlock and an outreach-lock check.
 
