@@ -81,6 +81,9 @@ DARPA_SN_26_97_DIR = ROOT / "grant_submissions" / "DARPA_SN_26_97"
 DARPA_SN_26_97_SUBMISSION_RECEIPT = (
     DARPA_SN_26_97_DIR / "DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.json"
 )
+DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT = (
+    SPRINT_DIR / "DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json"
+)
 OPENAI_BUILD_WEEK_DIR = (
     ROOT / "grant_submissions" / "OPENAI_BUILD_WEEK_20260721"
 )
@@ -1055,6 +1058,9 @@ def base_sources() -> dict[str, Any]:
         "nashville_ec_official_deadline_confirmation": NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION,
         "nashville_ec_submission_receipt": NASHVILLE_EC_SUBMISSION_RECEIPT,
         "darpa_sn_26_97_submission_receipt": DARPA_SN_26_97_SUBMISSION_RECEIPT,
+        "darpa_sn_26_97_public_submission_receipt": (
+            DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT
+        ),
         "openai_build_week_submission_readiness": OPENAI_BUILD_WEEK_READINESS,
         "openai_build_week_project_description": OPENAI_BUILD_WEEK_DESCRIPTION,
         "openai_build_week_demo_script": OPENAI_BUILD_WEEK_DEMO_SCRIPT,
@@ -1200,13 +1206,31 @@ def apply_nashville_submission_receipt(
     lane["claim_boundary"] = receipt.get("claim_boundary")
 
 
-def build_darpa_submission_lane(receipt: dict[str, Any]) -> dict[str, Any]:
+def build_darpa_submission_lane(
+    receipt: dict[str, Any], public_receipt: dict[str, Any]
+) -> dict[str, Any]:
     if (
         receipt.get("schema") != "lumencore.darpa_rfi_submission_receipt.v1"
         or receipt.get("status") != "EMAIL_SUBMISSION_SENT_BEFORE_DEADLINE"
         or receipt.get("notice_id") != "DARPA-SN-26-97"
     ):
         raise ValueError("DARPA-SN-26-97 submission receipt is missing or stale")
+    if (
+        public_receipt.get("schema")
+        != "lumencore.darpa_sn_26_97_public_submission_receipt.v1"
+        or public_receipt.get("status")
+        != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY"
+    ):
+        raise ValueError("DARPA-SN-26-97 public submission receipt is missing or stale")
+    public_thread = public_receipt.get("thread_reconciliation", {})
+    if (
+        public_thread.get("agency_thread_response_after_formal_package_observed")
+        is not True
+        or public_thread.get("explicit_attachment_receipt_confirmed") is not False
+        or public_thread.get("specific_action_request_observed") is not False
+        or public_thread.get("duplicate_send_allowed") is not False
+    ):
+        raise ValueError("DARPA-SN-26-97 agency response boundary is invalid")
 
     sent = parse_aware_datetime(str(receipt.get("sent", "")), field="DARPA sent")
     deadline = parse_aware_datetime(
@@ -1259,14 +1283,19 @@ def build_darpa_submission_lane(receipt: dict[str, Any]) -> dict[str, Any]:
                 DARPA_SN_26_97_DIR
                 / "DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.md"
             ),
+            rel(DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT),
+            rel(
+                SPRINT_DIR
+                / "DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.md"
+            ),
         ],
         "why_now": (
             "The sent-folder record is before the stated deadline and both attachment hashes "
-            "reconcile. No agency acknowledgment has been captured, so the verified scope is "
-            "send timing and attachment identity only."
+            "reconcile. DARPA later responded in the same thread with generic SAM.gov submission "
+            "guidance, but did not explicitly confirm either attachment or request further action."
         ),
         "today_work": [
-            "Monitor the existing thread for an acknowledgment, workshop invitation, or clarification request.",
+            "Record the agency thread response and monitor for a specific clarification, replacement request, or workshop invitation.",
             "Do not resend unless DARPA requests a replacement or additional material.",
         ],
         "human_gate": [],
@@ -1278,7 +1307,13 @@ def build_darpa_submission_lane(receipt: dict[str, Any]) -> dict[str, Any]:
         "receipt_attachment_sha256": stable_sha256(attachments),
         "verification_scope": receipt.get("evidence_state"),
         "acknowledgment_received": False,
-        "claim_boundary": receipt.get("claim_boundary"),
+        "agency_thread_response_received": True,
+        "agency_thread_response_received_utc": public_thread[
+            "agency_thread_response_received_utc"
+        ],
+        "explicit_attachment_receipt_confirmed": False,
+        "specific_action_request_observed": False,
+        "claim_boundary": public_receipt.get("claim_boundary"),
     }
 
 
@@ -1508,6 +1543,7 @@ def build_command_lanes(
     cdc_engagement_receipt: dict[str, Any] | None = None,
     nashville_submission_receipt: dict[str, Any] | None = None,
     darpa_submission_receipt: dict[str, Any] | None = None,
+    darpa_public_submission_receipt: dict[str, Any] | None = None,
     openai_build_week_readiness: dict[str, Any] | None = None,
     scan_date: date = SCAN_DATE,
     curation_control: dict[str, Any] | None = None,
@@ -2594,7 +2630,11 @@ def build_command_lanes(
     if cdc_lane is not None:
         lanes.append(cdc_lane)
 
-    lanes.append(build_darpa_submission_lane(darpa_submission_receipt or {}))
+    lanes.append(
+        build_darpa_submission_lane(
+            darpa_submission_receipt or {}, darpa_public_submission_receipt or {}
+        )
+    )
     lanes.append(build_openai_build_week_lane(openai_build_week_readiness or {}))
 
     apply_submission_receipts(lanes, submission_receipt or {})
@@ -2651,6 +2691,9 @@ def build_payload(
     cdc_engagement_receipt = read_json(CDC_ENGAGEMENT_RECEIPT)
     nashville_submission_receipt = read_json(NASHVILLE_EC_SUBMISSION_RECEIPT)
     darpa_submission_receipt = read_json(DARPA_SN_26_97_SUBMISSION_RECEIPT)
+    darpa_public_submission_receipt = read_json(
+        DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT
+    )
     openai_build_week_readiness = read_json(OPENAI_BUILD_WEEK_READINESS)
     sam_rotation_control = read_json(SAM_KEY_ROTATION_CONTROL)
     if sam_rotation_control.get("schema") != "lumencore.sam_public_credential_rotation_control.v1":
@@ -2688,6 +2731,7 @@ def build_payload(
         cdc_engagement_receipt,
         nashville_submission_receipt,
         darpa_submission_receipt,
+        darpa_public_submission_receipt,
         openai_build_week_readiness,
         scan_date,
         curation_control,
@@ -2838,7 +2882,7 @@ def build_payload(
                 +
                 f"Then use the MissionWeave checklist to move its private action gate beyond {missionweave_gate_progress} while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. "
                 "HarborSentinel is urgent but not ready: retain its dedicated package while rechecking DSIP, freshness, package integrity, eligibility, compliance, cost, and portal gates. "
-                "Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket."
+                "Nashville EC is portal-confirmed; DARPA was sent before deadline and later returned a generic procedural thread response without explicit attachment confirmation; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket."
             ),
             "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),

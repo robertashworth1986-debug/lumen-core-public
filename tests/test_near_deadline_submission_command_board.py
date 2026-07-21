@@ -280,9 +280,13 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert darpa["sent_utc"] == "2026-07-17T19:27:49Z"
     assert darpa["deadline_utc"] == "2026-07-17T21:00:00Z"
     assert darpa["acknowledgment_received"] is False
+    assert darpa["agency_thread_response_received"] is True
+    assert darpa["agency_thread_response_received_utc"] == "2026-07-21T15:25:21Z"
+    assert darpa["explicit_attachment_receipt_confirmed"] is False
+    assert darpa["specific_action_request_observed"] is False
     assert darpa["human_gate"] == []
     assert len(darpa["receipt_attachment_sha256"]) == 64
-    assert len(darpa["package_files"]) == 2
+    assert len(darpa["package_files"]) == 4
 
     build_week = next(
         row

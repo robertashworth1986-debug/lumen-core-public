@@ -14,10 +14,15 @@ OUT_MD = SPRINT / "DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.md"
 
 AGENCY_GUIDANCE_RECEIVED_UTC = "2026-07-17T18:34:56Z"
 FORMAL_PACKAGE_SENT_UTC = "2026-07-17T19:27:49Z"
+AGENCY_THREAD_RESPONSE_RECEIVED_UTC = "2026-07-21T15:25:21Z"
 FORMAL_MESSAGE_ID_SHA256 = (
     "1c0f162c52724e1fbd5fa89de5da825e421a700c5d1c475a67b2c195d62283d8"
 )
+AGENCY_THREAD_RESPONSE_MESSAGE_ID_SHA256 = (
+    "80df02ae1df9359993fea18a582cafdc3cbd13af0e0553d512fc12b030398f24"
+)
 SUBJECT = "RE: DARPA-SN-26-97 - Non-Proprietary RFI Response - LumenCore"
+STATUS = "FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY"
 
 
 def stable_hash(payload: Any) -> str:
@@ -29,8 +34,8 @@ def stable_hash(payload: Any) -> str:
 def build_payload() -> dict[str, Any]:
     payload: dict[str, Any] = {
         "schema": "lumencore.darpa_sn_26_97_public_submission_receipt.v1",
-        "as_of_date": "2026-07-17",
-        "status": "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING",
+        "as_of_date": "2026-07-21",
+        "status": STATUS,
         "opportunity": {
             "notice_id": "DARPA-SN-26-97",
             "title": "Request for Information: Low Resource Computing",
@@ -55,7 +60,18 @@ def build_payload() -> dict[str, Any]:
             "message_id_sha256": FORMAL_MESSAGE_ID_SHA256,
             "gmail_sent_label_observed": True,
             "immediate_delivery_rejection_observed": False,
-            "agency_receipt_after_formal_package_observed": False,
+            "agency_thread_response_after_formal_package_observed": True,
+            "agency_thread_response_received_utc": AGENCY_THREAD_RESPONSE_RECEIVED_UTC,
+            "agency_thread_response_message_id_sha256": (
+                AGENCY_THREAD_RESPONSE_MESSAGE_ID_SHA256
+            ),
+            "agency_thread_response_summary": (
+                "The agency welcomed RFI-related submissions that follow the SAM.gov "
+                "instructions. The response did not identify a correction, missing file, or "
+                "additional action."
+            ),
+            "explicit_attachment_receipt_confirmed": False,
+            "specific_action_request_observed": False,
             "duplicate_send_allowed": False,
         },
         "attachments": [
@@ -82,15 +98,18 @@ def build_payload() -> dict[str, Any]:
             "send_now": False,
             "do_not_duplicate_send": True,
             "next_action": (
-                "Monitor the existing agency thread for a receipt, clarification, or workshop "
-                "invitation. Do not resend the package without a specific agency request."
+                "Record the agency thread response and monitor for a specific clarification, "
+                "replacement request, or workshop invitation. Do not reply to the generic "
+                "procedural response or resend the package."
             ),
         },
         "claim_boundary": (
             "This receipt proves only that Gmail recorded a formal two-attachment package as sent "
-            "after the agency's same-day guidance and preserves the attachment hashes. It does not "
-            "prove delivery acceptance, deadline compliance, technical evaluation, independent "
-            "validation, workshop selection, funding, award, or operational performance."
+            "after the agency's same-day guidance, preserves the attachment hashes, and records a "
+            "later agency response in the same thread. The response does not explicitly confirm "
+            "either attachment or request further action. This receipt does not prove delivery "
+            "acceptance, deadline compliance, technical evaluation, independent validation, "
+            "workshop selection, funding, award, or operational performance."
         ),
     }
     payload["receipt_sha256"] = stable_hash(payload)
@@ -100,7 +119,7 @@ def build_payload() -> dict[str, Any]:
 def validate_payload(payload: dict[str, Any]) -> None:
     if payload.get("schema") != "lumencore.darpa_sn_26_97_public_submission_receipt.v1":
         raise ValueError("DARPA public submission receipt schema is invalid")
-    if payload.get("status") != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING":
+    if payload.get("status") != STATUS:
         raise ValueError("DARPA public submission state is stale")
     attachments = payload.get("attachments", [])
     if len(attachments) != 2:
@@ -109,7 +128,15 @@ def validate_payload(payload: dict[str, Any]) -> None:
         raise ValueError("DARPA attachment hash is invalid")
     if payload["opportunity"]["timely_submission_claimed"] is not False:
         raise ValueError("DARPA deadline compliance must remain unclaimed")
-    if payload["thread_reconciliation"]["duplicate_send_allowed"] is not False:
+    thread = payload["thread_reconciliation"]
+    if (
+        thread.get("agency_thread_response_after_formal_package_observed") is not True
+        or thread.get("agency_thread_response_received_utc")
+        != AGENCY_THREAD_RESPONSE_RECEIVED_UTC
+        or thread.get("explicit_attachment_receipt_confirmed") is not False
+        or thread.get("specific_action_request_observed") is not False
+        or thread.get("duplicate_send_allowed") is not False
+    ):
         raise ValueError("DARPA duplicate-send guard is missing")
     expected = dict(payload)
     observed_hash = expected.pop("receipt_sha256", None)
@@ -138,6 +165,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"Status: `{payload['status']}`",
         f"Formal package sent UTC: `{thread['formal_package_sent_utc']}`",
+        f"Agency thread response UTC: `{thread['agency_thread_response_received_utc']}`",
+        (
+            "Explicit attachment receipt confirmed: "
+            f"`{str(thread['explicit_attachment_receipt_confirmed']).lower()}`"
+        ),
         f"Attachment count: `{len(payload['attachments'])}`",
         "",
         "## Attachment Bindings",

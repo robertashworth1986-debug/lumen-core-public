@@ -18,6 +18,7 @@ DESTINATION_ROOT = VAULT_ROOT / "SUBMISSIONS" / "DEADLINE_INTEGRITY_REPAIR_20260
 
 SOURCES = (
     "code/ops/BUILD_DEADLINE_INTEGRITY_REPAIR_CHECKPOINT.py",
+    "code/ops/BUILD_DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT.py",
     "code/ops/BUILD_EMAIL_ACTION_RECONCILIATION.py",
     "code/ops/BUILD_HUMAN_ACTION_DOCKET.py",
     "code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
@@ -25,6 +26,7 @@ SOURCES = (
     "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
     "code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py",
     "code/ops/BUILD_SUBMISSION_AUTHORITY_MATRIX.py",
+    "config/outreach_followup_policies_v1.json",
     "dashboard/data/human_action_docket.json",
     "dashboard/data/submission_authority_matrix.json",
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
@@ -33,6 +35,8 @@ SOURCES = (
     "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_JCP_EVIDENCE_PROTOCOL_2026-07-18.json",
     "grant_submissions/compliance_evidence/CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json",
     "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
+    "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json",
+    "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.md",
     "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
     "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
@@ -41,6 +45,7 @@ SOURCES = (
     "out/ops/submission_authority_matrix_latest.json",
     "tests/test_agency_account_activation_docket.py",
     "tests/test_deadline_integrity_repair_checkpoint.py",
+    "tests/test_darpa_sn_26_97_public_submission_receipt.py",
     "tests/test_email_action_reconciliation.py",
     "tests/test_epri_open_power_ai_mou_response.py",
     "tests/test_erdc_sdc_phase2_rom_gate.py",

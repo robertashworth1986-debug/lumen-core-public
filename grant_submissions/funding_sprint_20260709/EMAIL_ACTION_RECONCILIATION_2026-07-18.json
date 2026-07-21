@@ -120,28 +120,31 @@
       "state": "RECEIPT_CONFIRMED_FOLLOW_UP_PENDING"
     },
     {
+      "agency_thread_response_observed": true,
       "attachment_count": 2,
       "deadline_date": "2026-07-17",
       "deadline_time_compliance_claimed": false,
       "do_not_duplicate_send": true,
       "email_reply_required": false,
+      "explicit_attachment_receipt_confirmed": false,
       "follow_up_policy": {
         "eligible_template_id": null,
         "lane_id": "darpa_sn_26_97_low_resource_computing_rfi",
         "max_proactive_sends": 0,
         "mode": "INBOUND_ONLY",
         "not_before_utc": null,
-        "rationale": "The formal package was sent; do not duplicate it and respond only to a specific agency request."
+        "rationale": "The formal package was sent and DARPA later repeated the SAM.gov submission guidance without identifying a correction, missing file, or additional action. Do not duplicate it; respond only to a specific agency request."
       },
       "lane_id": "darpa_sn_26_97_low_resource_computing_rfi",
-      "latest_event_type": "FORMAL_TWO_ATTACHMENT_RFI_PACKAGE_SENT",
-      "latest_event_utc": "2026-07-17T19:27:49Z",
-      "next_action": "Monitor the existing agency thread for a receipt, clarification, or workshop invitation. Do not resend the package without a specific agency request.",
+      "latest_event_type": "AGENCY_THREAD_RESPONSE_AFTER_FORMAL_PACKAGE",
+      "latest_event_utc": "2026-07-21T15:25:21Z",
+      "next_action": "Record the agency thread response and monitor for a specific clarification, replacement request, or workshop invitation. Do not reply to the generic procedural response or resend the package.",
       "no_send_before": null,
       "organization": "DARPA Multi X Office",
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
-      "state": "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+      "specific_action_request_observed": false,
+      "state": "FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY"
     },
     {
       "component_poc_included_on_original_message": true,
@@ -390,12 +393,12 @@
   ],
   "source_evidence": {
     "darpa_sn_26_97_public_submission_receipt": {
-      "bytes": 2778,
-      "identity_source": "COMMITTED_GIT_BLOB",
+      "bytes": 3537,
+      "identity_source": "WORKTREE_BYTES",
       "path": "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json",
       "present": true,
-      "sha256": "2E60EBF6816100E623EEB35DCAA4B9A053BFA8FBA5EF6947D6484DA2D68F61CF",
-      "worktree_eol_differs_from_git_blob": true
+      "sha256": "743FB8D9D33C8F27FD75824A50E2C3E96AD92B16780C9E4E1C2AC4209E469A13",
+      "worktree_eol_differs_from_git_blob": false
     },
     "lvlup_independent_review_confirmation": {
       "bytes": 1908,
@@ -446,12 +449,12 @@
       "worktree_eol_differs_from_git_blob": true
     },
     "outreach_followup_policy_config": {
-      "bytes": 5670,
-      "identity_source": "COMMITTED_GIT_BLOB",
+      "bytes": 5933,
+      "identity_source": "WORKTREE_BYTES",
       "path": "config/outreach_followup_policies_v1.json",
       "present": true,
-      "sha256": "34F758D02549726463FCC1A3BFAE36542FBEB8D393991BD66037B870DBD1444C",
-      "worktree_eol_differs_from_git_blob": true
+      "sha256": "04BEFE8110CABF522F6D907ADA945D07C70AACFEE5401A87BA69EECE117ADDBF",
+      "worktree_eol_differs_from_git_blob": false
     },
     "outreach_response_template_registry": {
       "bytes": 17846,

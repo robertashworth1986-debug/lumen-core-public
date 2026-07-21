@@ -29,13 +29,20 @@ def test_receipt_is_deterministic_bounded_and_matches_output():
 
     module.validate_payload(actual)
     assert actual == expected
-    assert actual["status"] == "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+    assert actual["status"] == (
+        "FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY"
+    )
     assert actual["thread_reconciliation"]["formal_package_sent_utc"] == (
         "2026-07-17T19:27:49Z"
     )
-    assert actual["thread_reconciliation"]["agency_receipt_after_formal_package_observed"] is False
+    thread = actual["thread_reconciliation"]
+    assert thread["agency_thread_response_after_formal_package_observed"] is True
+    assert thread["agency_thread_response_received_utc"] == "2026-07-21T15:25:21Z"
+    assert thread["explicit_attachment_receipt_confirmed"] is False
+    assert thread["specific_action_request_observed"] is False
     assert actual["opportunity"]["timely_submission_claimed"] is False
     assert actual["send_control"]["do_not_duplicate_send"] is True
+    assert actual["send_control"]["send_now"] is False
     assert len(actual["attachments"]) == 2
     assert all(re.fullmatch(r"[0-9a-f]{64}", row["sha256"]) for row in actual["attachments"])
 

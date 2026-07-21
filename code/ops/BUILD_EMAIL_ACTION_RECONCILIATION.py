@@ -146,7 +146,7 @@ def build_payload() -> dict[str, Any]:
         darpa.get("schema")
         != "lumencore.darpa_sn_26_97_public_submission_receipt.v1"
         or darpa.get("status")
-        != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+        != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY"
     ):
         raise ValueError("DARPA-SN-26-97 public receipt is missing or stale")
     if (
@@ -298,8 +298,10 @@ def build_payload() -> dict[str, Any]:
         {
             "lane_id": "darpa_sn_26_97_low_resource_computing_rfi",
             "organization": "DARPA Multi X Office",
-            "latest_event_type": "FORMAL_TWO_ATTACHMENT_RFI_PACKAGE_SENT",
-            "latest_event_utc": darpa["thread_reconciliation"]["formal_package_sent_utc"],
+            "latest_event_type": "AGENCY_THREAD_RESPONSE_AFTER_FORMAL_PACKAGE",
+            "latest_event_utc": darpa["thread_reconciliation"][
+                "agency_thread_response_received_utc"
+            ],
             "state": darpa["status"],
             "deadline_date": darpa["opportunity"]["deadline_date"],
             "deadline_time_compliance_claimed": False,
@@ -308,6 +310,15 @@ def build_payload() -> dict[str, Any]:
             "no_send_before": None,
             "do_not_duplicate_send": True,
             "attachment_count": len(darpa["attachments"]),
+            "agency_thread_response_observed": darpa["thread_reconciliation"][
+                "agency_thread_response_after_formal_package_observed"
+            ],
+            "explicit_attachment_receipt_confirmed": darpa[
+                "thread_reconciliation"
+            ]["explicit_attachment_receipt_confirmed"],
+            "specific_action_request_observed": darpa["thread_reconciliation"][
+                "specific_action_request_observed"
+            ],
             "next_action": darpa["send_control"]["next_action"],
         },
         {
@@ -669,8 +680,12 @@ def validate_payload(payload: dict[str, Any]) -> None:
         if lane["lane_id"] == "darpa_sn_26_97_low_resource_computing_rfi"
     )
     if (
-        darpa["state"] != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+        darpa["state"]
+        != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY"
         or darpa["attachment_count"] != 2
+        or darpa["agency_thread_response_observed"] is not True
+        or darpa["explicit_attachment_receipt_confirmed"] is not False
+        or darpa["specific_action_request_observed"] is not False
         or darpa["deadline_time_compliance_claimed"] is not False
         or darpa["do_not_duplicate_send"] is not True
     ):

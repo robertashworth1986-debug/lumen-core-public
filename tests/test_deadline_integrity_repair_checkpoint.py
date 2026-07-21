@@ -36,7 +36,7 @@ def test_checkpoint_is_commit_bound_public_safe_and_human_gated():
     assert payload["schema"] == "lumencore.deadline_integrity_repair_checkpoint.v1"
     assert len(payload["source_commit"]) == 40
     assert payload["source_worktree_tracked_clean"] is True
-    assert payload["artifact_count"] == len(payload["artifacts"]) == 39
+    assert payload["artifact_count"] == len(payload["artifacts"]) == 44
     assert payload["all_source_git_blobs_match_commit"] is True
     assert payload["all_sha256_matched_after_copy"] is True
     assert payload["relative_paths_preserved"] is True
@@ -47,6 +47,13 @@ def test_checkpoint_is_commit_bound_public_safe_and_human_gated():
     assert payload["certification_or_terms_accepted"] is False
     assert "does not prove email transmission" in payload["claim_boundary"]
     assert "human-controlled" in payload["claim_boundary"]
+    sources = {artifact["source"] for artifact in payload["artifacts"]}
+    assert "code/ops/BUILD_DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT.py" in sources
+    assert "config/outreach_followup_policies_v1.json" in sources
+    assert (
+        "grant_submissions/funding_sprint_20260709/"
+        "DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json"
+    ) in sources
 
     unhashed = dict(payload)
     recorded_payload_hash = unhashed.pop("receipt_payload_sha256")

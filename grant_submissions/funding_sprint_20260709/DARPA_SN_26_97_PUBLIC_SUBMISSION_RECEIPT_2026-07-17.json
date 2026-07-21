@@ -1,7 +1,7 @@
 {
   "schema": "lumencore.darpa_sn_26_97_public_submission_receipt.v1",
-  "as_of_date": "2026-07-17",
-  "status": "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING",
+  "as_of_date": "2026-07-21",
+  "status": "FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY",
   "opportunity": {
     "notice_id": "DARPA-SN-26-97",
     "title": "Request for Information: Low Resource Computing",
@@ -23,7 +23,12 @@
     "message_id_sha256": "1c0f162c52724e1fbd5fa89de5da825e421a700c5d1c475a67b2c195d62283d8",
     "gmail_sent_label_observed": true,
     "immediate_delivery_rejection_observed": false,
-    "agency_receipt_after_formal_package_observed": false,
+    "agency_thread_response_after_formal_package_observed": true,
+    "agency_thread_response_received_utc": "2026-07-21T15:25:21Z",
+    "agency_thread_response_message_id_sha256": "80df02ae1df9359993fea18a582cafdc3cbd13af0e0553d512fc12b030398f24",
+    "agency_thread_response_summary": "The agency welcomed RFI-related submissions that follow the SAM.gov instructions. The response did not identify a correction, missing file, or additional action.",
+    "explicit_attachment_receipt_confirmed": false,
+    "specific_action_request_observed": false,
     "duplicate_send_allowed": false
   },
   "attachments": [
@@ -49,8 +54,8 @@
   "send_control": {
     "send_now": false,
     "do_not_duplicate_send": true,
-    "next_action": "Monitor the existing agency thread for a receipt, clarification, or workshop invitation. Do not resend the package without a specific agency request."
+    "next_action": "Record the agency thread response and monitor for a specific clarification, replacement request, or workshop invitation. Do not reply to the generic procedural response or resend the package."
   },
-  "claim_boundary": "This receipt proves only that Gmail recorded a formal two-attachment package as sent after the agency's same-day guidance and preserves the attachment hashes. It does not prove delivery acceptance, deadline compliance, technical evaluation, independent validation, workshop selection, funding, award, or operational performance.",
-  "receipt_sha256": "d635d61984778c1d5c54096aaa9dc5bfe99bf39a7e26f431c7b3f64be35cb167"
+  "claim_boundary": "This receipt proves only that Gmail recorded a formal two-attachment package as sent after the agency's same-day guidance, preserves the attachment hashes, and records a later agency response in the same thread. The response does not explicitly confirm either attachment or request further action. This receipt does not prove delivery acceptance, deadline compliance, technical evaluation, independent validation, workshop selection, funding, award, or operational performance.",
+  "receipt_sha256": "74ee42e9a52ec7091a028d1ca46018bd67400b9bb0acf8d608d42250f61b2691"
 }

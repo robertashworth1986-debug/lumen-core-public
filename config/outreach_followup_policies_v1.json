@@ -55,7 +55,7 @@
       "eligible_template_id": null,
       "not_before_utc": null,
       "max_proactive_sends": 0,
-      "rationale": "The formal package was sent; do not duplicate it and respond only to a specific agency request."
+      "rationale": "The formal package was sent and DARPA later repeated the SAM.gov submission guidance without identifying a correction, missing file, or additional action. Do not duplicate it; respond only to a specific agency request."
     },
     {
       "lane_id": "missionweave_dsip_proposal",

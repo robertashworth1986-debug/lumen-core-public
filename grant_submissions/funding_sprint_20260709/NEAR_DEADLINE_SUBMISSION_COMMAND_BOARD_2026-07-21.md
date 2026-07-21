@@ -7,8 +7,8 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 ## Control Line
 
 - Status: `NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_FAIL_CLOSED_FRESHNESS_BLOCKERS`
-- Generated UTC: `2026-07-21T15:22:30.161674Z`
-- Freshness as-of UTC: `2026-07-21T15:22:30.161674Z`
+- Generated UTC: `2026-07-21T15:37:03.234037Z`
+- Freshness as-of UTC: `2026-07-21T15:37:03.234037Z`
 - Scan date: `2026-07-21`
 - Lane count: `23`
 - Curated Navy lanes: `3`
@@ -22,7 +22,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - SAM zero-row response is an inconclusive blocker: `true`
 - Harbor status: `URGENT_PUBLISHED_DEADLINE_REVERIFY_REQUIRED; URGENT_NOT_READY; DEDICATED_PACKAGE; PORTAL_ONLY_UNVERIFIED`
 - Package status counts: `{"CONCEPT": 4, "DEDICATED_PACKAGE": 7, "EXPIRED": 3, "NO_BID": 6, "PORTAL_ONLY": 3}`
-- Strongest today action: Reconcile the OpenAI Build Week readiness packet to the exact public ProofLock commit and artifact manifest before relying on its core-ready state; then complete only the remaining model/session, video, terms-review, and final-submit gates before the July 21 7:00 p.m. Central close. Then use the MissionWeave checklist to move its private action gate beyond 37/50 while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. HarborSentinel is urgent but not ready: retain its dedicated package while rechecking DSIP, freshness, package integrity, eligibility, compliance, cost, and portal gates. Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket.
+- Strongest today action: Reconcile the OpenAI Build Week readiness packet to the exact public ProofLock commit and artifact manifest before relying on its core-ready state; then complete only the remaining model/session, video, terms-review, and final-submit gates before the July 21 7:00 p.m. Central close. Then use the MissionWeave checklist to move its private action gate beyond 37/50 while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. HarborSentinel is urgent but not ready: retain its dedicated package while rechecking DSIP, freshness, package integrity, eligibility, compliance, cost, and portal gates. Nashville EC is portal-confirmed; DARPA was sent before deadline and later returned a generic procedural thread response without explicit attachment confirmation; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket.
 - Critical infrastructure action: SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: OPENAI-BUILD-WEEK-2026 OpenAI Build Week - ProofLock Console, due July 21, 2026 at 5:00 PM Pacific / 7:00 PM Central; command REVERIFY_SOURCE_BEFORE_STAGE; fit DEVELOPER_TOOLS_FIT_HELD_FOR_SOURCE_RECONCILIATION.
 - Closest stage-ready lane: DLA26BZ03-NV011 Digital Twin of the Organization for Enhanced Mission Readiness, due July 22, 2026 at 12:00 p.m. Eastern Time. The SBIR.gov topic record and DLA Release 3 schedule agree on July 22, 2026; the downloaded Amendment 2 BAA schedule line prints July 22, 2025, an apparent internal year typo. Reconfirm the live DSIP countdown before submission.; command STAGE_DSIP_PROPOSAL; fit STRONG_TOPIC_FIT_BOUNDED_SYNTHETIC_EVIDENCE_NO_DLA_VALIDATION_CLAIM.
@@ -33,7 +33,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `ef6abea67a6254b24c242a820491f648fc22dbc53c353415281a2e595ca916f9`
+- Command board SHA-256: `195555f45fa11907b9f1f16635d0f510bce4a8719df27650172188532b7161d7`
 
 ## Source Freshness
 
@@ -43,12 +43,12 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - Blockers: `6`
 - Boundary: Freshness describes local snapshots only. A current timestamp does not prove eligibility, an unchanged deadline, portal state, or submission readiness; zero-row or inconclusive discovery responses never prove opportunity absence.
 
-- `grant_reviewer_curation`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:21:42Z` age_hours=`104.013` blocking=`true`
-- `grant_reviewer_feed`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:58:16.957707Z` age_hours=`103.404` blocking=`true`
-- `sam_rush_board`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-10T17:17:18.392822Z` age_hours=`262.087` blocking=`true`
+- `grant_reviewer_curation`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:21:42Z` age_hours=`104.256` blocking=`true`
+- `grant_reviewer_feed`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:58:16.957707Z` age_hours=`103.646` blocking=`true`
+- `sam_rush_board`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-10T17:17:18.392822Z` age_hours=`262.329` blocking=`true`
 - `grants_ranked`: status=`UNDATED_REVERIFY_REQUIRED` freshness=`UNDATED_REVERIFY_REQUIRED` source_utc=`None` age_hours=`None` blocking=`true`
 - `zero_friction_pack`: status=`UNDATED_REVERIFY_REQUIRED` freshness=`UNDATED_REVERIFY_REQUIRED` source_utc=`None` age_hours=`None` blocking=`true`
-- `sam_live_discovery`: status=`ZERO_ROW_SAM_RESPONSE_INCONCLUSIVE_BLOCKER` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:57:56.457071Z` age_hours=`103.409` blocking=`true`
+- `sam_live_discovery`: status=`ZERO_ROW_SAM_RESPONSE_INCONCLUSIVE_BLOCKER` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:57:56.457071Z` age_hours=`103.652` blocking=`true`
   - SAM records: `0`; reported diagnostic: `HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE`; zero rows: `true`
 
 ## Operational Controls
@@ -111,7 +111,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - Receipt: `grant_submissions/DARPA_SN_26_97/DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.json`
 - Receipt evidence SHA-256: `d864f5074c37613cece57acfa492b3c07cff4389a10a17ae98a2edd6b5a0f6d1`
 - Verification scope: `SENT_FOLDER_AND_LOCAL_ATTACHMENT_MANIFEST_OBSERVED`
-- Claim boundary: This receipt verifies a sent-folder record before the stated deadline and reconciles the two local attachment hashes. It does not prove agency receipt, acceptance, workshop selection, endorsement, validation, funding, or award.
+- Claim boundary: This receipt proves only that Gmail recorded a formal two-attachment package as sent after the agency's same-day guidance, preserves the attachment hashes, and records a later agency response in the same thread. The response does not explicitly confirm either attachment or request further action. This receipt does not prove delivery acceptance, deadline compliance, technical evaluation, independent validation, workshop selection, funding, award, or operational performance.
 
 ### 9. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
@@ -529,17 +529,19 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - Freshness blockers:
   - `sam_rush_board:STALE_REVERIFY_REQUIRED`
   - `sam_live_discovery:ZERO_ROW_SAM_RESPONSE_INCONCLUSIVE_BLOCKER`
-- Claim boundary: This receipt verifies a sent-folder record before the stated deadline and reconciles the two local attachment hashes. It does not prove agency receipt, acceptance, workshop selection, endorsement, validation, funding, or award.
-- Why now: The sent-folder record is before the stated deadline and both attachment hashes reconcile. No agency acknowledgment has been captured, so the verified scope is send timing and attachment identity only.
+- Claim boundary: This receipt proves only that Gmail recorded a formal two-attachment package as sent after the agency's same-day guidance, preserves the attachment hashes, and records a later agency response in the same thread. The response does not explicitly confirm either attachment or request further action. This receipt does not prove delivery acceptance, deadline compliance, technical evaluation, independent validation, workshop selection, funding, award, or operational performance.
+- Why now: The sent-folder record is before the stated deadline and both attachment hashes reconcile. DARPA later responded in the same thread with generic SAM.gov submission guidance, but did not explicitly confirm either attachment or request further action.
 - Today work:
-  - Monitor the existing thread for an acknowledgment, workshop invitation, or clarification request.
+  - Record the agency thread response and monitor for a specific clarification, replacement request, or workshop invitation.
   - Do not resend unless DARPA requests a replacement or additional material.
 - Package files:
   - `grant_submissions/DARPA_SN_26_97/DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.json`
   - `grant_submissions/DARPA_SN_26_97/DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.md`
+  - `grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json`
+  - `grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `e48b31cffedcfa63a0db98d8d92eb3bd1d7eba91c5998b8ec5b09814e969c06e`
+- Lane SHA-256: `9c27cdd4574d6db9fa9e69c2ac0ff1b1b9a8b5eebb0b17a61642abacc01a8371`
 
 ### 4. OPENAI-BUILD-WEEK-2026 - OpenAI Build Week - ProofLock Console
 
@@ -711,7 +713,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   - `grant_submissions/NV063_HarborSentinel/render_qa_20260716_dsip_candidate_v1/page-5.png`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `408322616cd862460c5158698fa6206aab9e69b556995eecf8fad0dd54398d84`
+- Lane SHA-256: `81c100feacd2d8592c50f3643d4f2ff751baf803b6af5672a0bd1e7cf483b502`
 
 ### 7. DON26BZ03-NV065 - Adaptive Sensor Management
 
@@ -750,7 +752,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   - `grant_submissions/NV065_AdaptiveSensorManagement/NV065_READINESS.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `993d6795a9d0d7da035466576f3c331c4a7e4e7eb292aa52544a3cd412b29573`
+- Lane SHA-256: `1e92d750838ee9809a509c2ee1e23d7dd714b3e9ca12b673e81e78b4a2ecb73b`
 
 ### 8. DON26BZ03-NV061 - Predictive Movement for Object Oriented Tracking
 
@@ -789,7 +791,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   - `grant_submissions/NV061_TrackCast/NV061_READINESS.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `ac9fe5537c366d86b2672ad7b977b87cd6b781c514a46a3de4cfcd39ebd40f7f`
+- Lane SHA-256: `82b9f928695651c77aa50e36b2d8394da250db5b32e0d9de5bca889c45612199`
 
 ### 9. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
@@ -1350,6 +1352,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - `nashville_ec_official_deadline_confirmation`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json` present=`true` sha256=`39469c919cd9b7adb0dc3f2dc260169f81b531bbfa95b530cad4c2c998fd950a`
 - `nashville_ec_submission_receipt`: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json` present=`true` sha256=`2b4f2f4a18725b2d585adea456ffca1bf7ef0a441b3463c1eaa716d1d6d88590`
 - `darpa_sn_26_97_submission_receipt`: `grant_submissions/DARPA_SN_26_97/DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.json` present=`true` sha256=`a70a865ee72bcf94a9a412d85b728db9f7b5663c36c142e1dd277599e7943981`
+- `darpa_sn_26_97_public_submission_receipt`: `grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json` present=`true` sha256=`743fb8d9d33c8f27fd75824a50e2c3e96ad92b16780c9e4e1c2ac4209e469a13`
 - `openai_build_week_submission_readiness`: `grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json` present=`true` sha256=`dae0ef8377e3efd60942ce9a61859c4e42cc2404917a06704a6b15b18f280e2a`
 - `openai_build_week_project_description`: `grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PROJECT_DESCRIPTION_DRAFT_2026-07-17.md` present=`true` sha256=`c121a7e714920e9535ff522eb4b30e559bea52a470e05a2348211f4622f1bc14`
 - `openai_build_week_demo_script`: `grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEMO_SCRIPT_2026-07-17.md` present=`true` sha256=`72d1297e5f6793749645c73fa39ffb6b4f621b4be98e78d83948cc0e5e0e002c`

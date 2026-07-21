@@ -90,7 +90,14 @@ def test_duplicate_and_out_of_office_gates_are_explicit():
     assert georgia["no_send_before"] is None
 
     darpa = lanes["darpa_sn_26_97_low_resource_computing_rfi"]
-    assert darpa["state"] == "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+    assert darpa["state"] == (
+        "FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY"
+    )
+    assert darpa["latest_event_type"] == "AGENCY_THREAD_RESPONSE_AFTER_FORMAL_PACKAGE"
+    assert darpa["latest_event_utc"] == "2026-07-21T15:25:21Z"
+    assert darpa["agency_thread_response_observed"] is True
+    assert darpa["explicit_attachment_receipt_confirmed"] is False
+    assert darpa["specific_action_request_observed"] is False
     assert darpa["attachment_count"] == 2
     assert darpa["deadline_time_compliance_claimed"] is False
 
