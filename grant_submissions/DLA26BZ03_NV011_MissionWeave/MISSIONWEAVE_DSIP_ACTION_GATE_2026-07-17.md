@@ -15,7 +15,7 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Required private gates: `50`
 - Passed private gates: `37`
 - Open gates: `13`
-- Gate SHA-256: `4bfd10e185f1576e120f259c2b6c598a57cb61a0e8ba7d1419802dd21c391f7b`
+- Gate SHA-256: `933c6755682e31db4bbb329ff2be280a274e02405b8a1a97f31cc28d3d68f273`
 
 ## Package Integrity
 
@@ -101,6 +101,115 @@ This public-safe gate reports only package integrity and private-workflow comple
 - `D_PORTAL_MECHANICS`: `1` gates (`OPEN`)
 - `E_TECHNICAL_VOLUME_CONSISTENCY`: `2` gates (`OPEN`)
 - `F_CLEARED_BY_EVIDENCE`: `37` gates (`CLEARED`)
+
+## Lifecycle Boundaries
+
+This classification is explanatory only. It cannot clear a gate or change submission readiness, and current live portal or contracting-office instructions still control.
+
+### A_PRE_SUBMISSION_CONTENT_AND_EVIDENCE
+
+Evidence, content, registration, and portal facts required before the bounded final-submission gate can open.
+
+- Submission effect: `RESOLVE_BEFORE_FINAL_SUBMISSION`
+- Open gates: `6`
+- `CONFLICTS_AND_JOINT_VENTURE_STATUS`
+- `CURRENT_CMMC_REQUIREMENTS_REVIEW`
+- `DD2345_OR_JCP_APPLICATION_EVIDENCE`
+- `DSIP_FIRM_PIN_AVAILABILITY`
+- `VOLUME3_COST_BASIS`
+- `VOLUME5_UPLOAD_SET`
+
+### B_PRE_AWARD_OR_CONTRACT_NEGOTIATION_READINESS
+
+The proposal must state a current bounded position. Implementation proof may occur during pre-award or contract negotiation only if the live portal or contracting office permits it; these gates remain fail-closed now.
+
+- Submission effect: `REVIEW_AND_BOUND_POSITION_BEFORE_SUBMISSION`
+- Open gates: `2`
+- `CMMC_PHASE_I_SELF_ASSESSMENT_POSITION`
+- `TECHNOLOGY_CONTROL_PLAN_DECISION`
+
+### C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN
+
+Fresh preview, corporate review, and final authorization occur only after the upload set is stable and immediately before the human submit action.
+
+- Submission effect: `ACTION_TIME_HUMAN_ONLY`
+- Open gates: `5`
+- `ACTION_TIME_APPROVAL_TIMESTAMP`
+- `ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION`
+- `COMPLETE_PORTAL_PREVIEW_REVIEW`
+- `CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW`
+- `PORTAL_PREVIEW_RECEIPT_HASH`
+
+## Founder Action Sequence
+
+### 1. Submit the JCP application and retain official evidence
+
+Use the official JCP portal. Registration or prerequisites in progress are not enough; retain the official application-submission receipt PDF or a current certified DD Form 2345 in the ignored private evidence area.
+
+- Evidence required: Hash-matched official JCP receipt PDF or certified DD Form 2345
+- Human boundary: The founder completes any portal certification or final JCP submit action.
+- Open gates: `1`
+- `DD2345_OR_JCP_APPLICATION_EVIDENCE`
+
+### 2. Confirm Firm PIN availability inside DSIP
+
+Confirm that the organization-linked DSIP account can access the Firm PIN. Do not place the PIN itself in chat, Git, logs, or the private gate record.
+
+- Evidence required: Boolean availability state only; never the PIN value
+- Human boundary: The founder handles authentication and any secret value.
+- Open gates: `1`
+- `DSIP_FIRM_PIN_AVAILABILITY`
+
+### 3. Support and approve the Volume 3 cost basis
+
+Review the proposed labor rate, 640 PI hours, fringe, indirect base, cloud/data, travel, software/storage, no-subcontractor position, and 100,000 dollar total against actual records before approving the cost volume.
+
+- Evidence required: Current founder records and corporate-official cost review
+- Human boundary: The founder confirms the factual cost basis; the builder checks arithmetic only.
+- Open gates: `1`
+- `VOLUME3_COST_BASIS`
+
+### 4. Review conflicts, CMMC, and export-control planning
+
+Answer conflicts and joint-venture status from current facts, review the live CMMC requirement, preserve the no-overclaim position, and document whether a Technology Control Plan is a contracting-negotiation deliverable.
+
+- Evidence required: Current source review plus bounded founder/corporate-official position
+- Human boundary: No compliance, assessment, certification, or contracting-office acceptance is inferred.
+- Open gates: `4`
+- `CMMC_PHASE_I_SELF_ASSESSMENT_POSITION`
+- `CONFLICTS_AND_JOINT_VENTURE_STATUS`
+- `CURRENT_CMMC_REQUIREMENTS_REVIEW`
+- `TECHNOLOGY_CONTROL_PLAN_DECISION`
+
+### 5. Lock the Volume 5 supporting-document set
+
+Upload only current, applicable documents. For the ITAR-marked scope, include the verified JCP/DD Form 2345 evidence required by the BAA; do not upload the obsolete foreign-affiliations PDF.
+
+- Evidence required: Reviewed attachment list with current file hashes
+- Human boundary: Any legally consequential upload or representation remains founder reviewed.
+- Open gates: `1`
+- `VOLUME5_UPLOAD_SET`
+
+### 6. Review and seal a fresh complete DSIP preview
+
+After every field and upload is final, inspect all seven volumes, filenames, hashes, cost totals, and the live deadline. Save the current preview receipt privately and bind it with the collector.
+
+- Evidence required: Fresh portal-preview receipt bound to the exact upload set
+- Human boundary: The founder reviews the rendered Government portal preview.
+- Open gates: `2`
+- `COMPLETE_PORTAL_PREVIEW_REVIEW`
+- `PORTAL_PREVIEW_RECEIPT_HASH`
+
+### 7. Perform corporate review and action-time authorization
+
+Only after the fresh preview is stable, review every volume as corporate official, capture the short-lived approval binding, and authorize the exact final submission.
+
+- Evidence required: Fresh approval timestamp and binding to the current preview/upload set
+- Human boundary: The final certification and submit click are founder-only actions.
+- Open gates: `3`
+- `ACTION_TIME_APPROVAL_TIMESTAMP`
+- `ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION`
+- `CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW`
 
 ## Open Gates
 

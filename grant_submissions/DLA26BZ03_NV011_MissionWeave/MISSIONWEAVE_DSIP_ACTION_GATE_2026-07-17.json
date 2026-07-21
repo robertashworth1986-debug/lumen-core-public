@@ -42,7 +42,155 @@
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
   },
-  "gate_sha256": "4bfd10e185f1576e120f259c2b6c598a57cb61a0e8ba7d1419802dd21c391f7b",
+  "founder_action_sequence": {
+    "all_open_gates_covered_once": true,
+    "classification_can_clear_gate": false,
+    "final_submission_human_only": true,
+    "open_step_count": 7,
+    "ordered_steps": [
+      {
+        "evidence_required": "Hash-matched official JCP receipt PDF or certified DD Form 2345",
+        "human_boundary": "The founder completes any portal certification or final JCP submit action.",
+        "instruction": "Use the official JCP portal. Registration or prerequisites in progress are not enough; retain the official application-submission receipt PDF or a current certified DD Form 2345 in the ignored private evidence area.",
+        "open_gate_count": 1,
+        "open_gates": [
+          "DD2345_OR_JCP_APPLICATION_EVIDENCE"
+        ],
+        "status": "OPEN",
+        "step_id": "01_JCP_APPLICATION_EVIDENCE",
+        "title": "Submit the JCP application and retain official evidence"
+      },
+      {
+        "evidence_required": "Boolean availability state only; never the PIN value",
+        "human_boundary": "The founder handles authentication and any secret value.",
+        "instruction": "Confirm that the organization-linked DSIP account can access the Firm PIN. Do not place the PIN itself in chat, Git, logs, or the private gate record.",
+        "open_gate_count": 1,
+        "open_gates": [
+          "DSIP_FIRM_PIN_AVAILABILITY"
+        ],
+        "status": "OPEN",
+        "step_id": "02_DSIP_FIRM_PIN_CONFIRMATION",
+        "title": "Confirm Firm PIN availability inside DSIP"
+      },
+      {
+        "evidence_required": "Current founder records and corporate-official cost review",
+        "human_boundary": "The founder confirms the factual cost basis; the builder checks arithmetic only.",
+        "instruction": "Review the proposed labor rate, 640 PI hours, fringe, indirect base, cloud/data, travel, software/storage, no-subcontractor position, and 100,000 dollar total against actual records before approving the cost volume.",
+        "open_gate_count": 1,
+        "open_gates": [
+          "VOLUME3_COST_BASIS"
+        ],
+        "status": "OPEN",
+        "step_id": "03_VOLUME3_COST_SUPPORT",
+        "title": "Support and approve the Volume 3 cost basis"
+      },
+      {
+        "evidence_required": "Current source review plus bounded founder/corporate-official position",
+        "human_boundary": "No compliance, assessment, certification, or contracting-office acceptance is inferred.",
+        "instruction": "Answer conflicts and joint-venture status from current facts, review the live CMMC requirement, preserve the no-overclaim position, and document whether a Technology Control Plan is a contracting-negotiation deliverable.",
+        "open_gate_count": 4,
+        "open_gates": [
+          "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+          "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+          "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+          "TECHNOLOGY_CONTROL_PLAN_DECISION"
+        ],
+        "status": "OPEN",
+        "step_id": "04_COMPLIANCE_AND_CONFLICT_POSITION",
+        "title": "Review conflicts, CMMC, and export-control planning"
+      },
+      {
+        "evidence_required": "Reviewed attachment list with current file hashes",
+        "human_boundary": "Any legally consequential upload or representation remains founder reviewed.",
+        "instruction": "Upload only current, applicable documents. For the ITAR-marked scope, include the verified JCP/DD Form 2345 evidence required by the BAA; do not upload the obsolete foreign-affiliations PDF.",
+        "open_gate_count": 1,
+        "open_gates": [
+          "VOLUME5_UPLOAD_SET"
+        ],
+        "status": "OPEN",
+        "step_id": "05_VOLUME5_UPLOAD_SET",
+        "title": "Lock the Volume 5 supporting-document set"
+      },
+      {
+        "evidence_required": "Fresh portal-preview receipt bound to the exact upload set",
+        "human_boundary": "The founder reviews the rendered Government portal preview.",
+        "instruction": "After every field and upload is final, inspect all seven volumes, filenames, hashes, cost totals, and the live deadline. Save the current preview receipt privately and bind it with the collector.",
+        "open_gate_count": 2,
+        "open_gates": [
+          "COMPLETE_PORTAL_PREVIEW_REVIEW",
+          "PORTAL_PREVIEW_RECEIPT_HASH"
+        ],
+        "status": "OPEN",
+        "step_id": "06_FRESH_PORTAL_PREVIEW",
+        "title": "Review and seal a fresh complete DSIP preview"
+      },
+      {
+        "evidence_required": "Fresh approval timestamp and binding to the current preview/upload set",
+        "human_boundary": "The final certification and submit click are founder-only actions.",
+        "instruction": "Only after the fresh preview is stable, review every volume as corporate official, capture the short-lived approval binding, and authorize the exact final submission.",
+        "open_gate_count": 3,
+        "open_gates": [
+          "ACTION_TIME_APPROVAL_TIMESTAMP",
+          "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+          "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW"
+        ],
+        "status": "OPEN",
+        "step_id": "07_ACTION_TIME_REVIEW_AND_AUTHORIZATION",
+        "title": "Perform corporate review and action-time authorization"
+      }
+    ],
+    "sequence_version": "missionweave.founder_action_sequence.v1"
+  },
+  "gate_lifecycle": {
+    "all_open_gates_classified_once": true,
+    "classification_can_clear_gate": false,
+    "classification_version": "missionweave.gate_lifecycle.v1",
+    "live_portal_or_contracting_office_confirmation_required": true,
+    "stages": {
+      "A_PRE_SUBMISSION_CONTENT_AND_EVIDENCE": {
+        "all_required_gate_count": 43,
+        "description": "Evidence, content, registration, and portal facts required before the bounded final-submission gate can open.",
+        "open_gate_count": 6,
+        "open_gates": [
+          "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+          "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+          "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+          "DSIP_FIRM_PIN_AVAILABILITY",
+          "VOLUME3_COST_BASIS",
+          "VOLUME5_UPLOAD_SET"
+        ],
+        "status": "OPEN",
+        "submission_effect": "RESOLVE_BEFORE_FINAL_SUBMISSION"
+      },
+      "B_PRE_AWARD_OR_CONTRACT_NEGOTIATION_READINESS": {
+        "all_required_gate_count": 2,
+        "description": "The proposal must state a current bounded position. Implementation proof may occur during pre-award or contract negotiation only if the live portal or contracting office permits it; these gates remain fail-closed now.",
+        "open_gate_count": 2,
+        "open_gates": [
+          "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+          "TECHNOLOGY_CONTROL_PLAN_DECISION"
+        ],
+        "status": "OPEN",
+        "submission_effect": "REVIEW_AND_BOUND_POSITION_BEFORE_SUBMISSION"
+      },
+      "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN": {
+        "all_required_gate_count": 5,
+        "description": "Fresh preview, corporate review, and final authorization occur only after the upload set is stable and immediately before the human submit action.",
+        "open_gate_count": 5,
+        "open_gates": [
+          "ACTION_TIME_APPROVAL_TIMESTAMP",
+          "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+          "COMPLETE_PORTAL_PREVIEW_REVIEW",
+          "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+          "PORTAL_PREVIEW_RECEIPT_HASH"
+        ],
+        "status": "OPEN",
+        "submission_effect": "ACTION_TIME_HUMAN_ONLY"
+      }
+    },
+    "submission_readiness_logic_unchanged": true
+  },
+  "gate_sha256": "933c6755682e31db4bbb329ff2be280a274e02405b8a1a97f31cc28d3d68f273",
   "gate_summary": {
     "open_gate_count": 13,
     "passed_private_gate_count": 37,
@@ -151,7 +299,7 @@
       "VOLUME5_UPLOAD_SET"
     ]
   },
-  "generated_utc": "2026-07-21T14:10:12.853349+00:00",
+  "generated_utc": "2026-07-21T15:02:02.911025+00:00",
   "jcp_evidence_protocol": {
     "bare_boolean_can_clear_gate": false,
     "bytes": 4034,

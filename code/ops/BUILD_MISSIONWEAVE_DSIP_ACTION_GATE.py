@@ -241,6 +241,125 @@ GATE_RECONCILIATION_GROUPS = {
     ),
 }
 
+LIFECYCLE_PRE_AWARD_OR_NEGOTIATION_GATES = frozenset(
+    {
+        "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+        "TECHNOLOGY_CONTROL_PLAN_DECISION",
+    }
+)
+
+LIFECYCLE_ACTION_TIME_GATES = frozenset(
+    {
+        "ACTION_TIME_APPROVAL_TIMESTAMP",
+        "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+        "COMPLETE_PORTAL_PREVIEW_REVIEW",
+        "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+        "PORTAL_PREVIEW_RECEIPT_HASH",
+    }
+)
+
+FOUNDER_ACTION_DEFINITIONS = (
+    {
+        "step_id": "01_JCP_APPLICATION_EVIDENCE",
+        "title": "Submit the JCP application and retain official evidence",
+        "gate_ids": frozenset({"DD2345_OR_JCP_APPLICATION_EVIDENCE"}),
+        "instruction": (
+            "Use the official JCP portal. Registration or prerequisites in progress are "
+            "not enough; retain the official application-submission receipt PDF or a "
+            "current certified DD Form 2345 in the ignored private evidence area."
+        ),
+        "evidence_required": "Hash-matched official JCP receipt PDF or certified DD Form 2345",
+        "human_boundary": "The founder completes any portal certification or final JCP submit action.",
+    },
+    {
+        "step_id": "02_DSIP_FIRM_PIN_CONFIRMATION",
+        "title": "Confirm Firm PIN availability inside DSIP",
+        "gate_ids": frozenset({"DSIP_FIRM_PIN_AVAILABILITY"}),
+        "instruction": (
+            "Confirm that the organization-linked DSIP account can access the Firm PIN. "
+            "Do not place the PIN itself in chat, Git, logs, or the private gate record."
+        ),
+        "evidence_required": "Boolean availability state only; never the PIN value",
+        "human_boundary": "The founder handles authentication and any secret value.",
+    },
+    {
+        "step_id": "03_VOLUME3_COST_SUPPORT",
+        "title": "Support and approve the Volume 3 cost basis",
+        "gate_ids": frozenset({"VOLUME3_COST_BASIS"}),
+        "instruction": (
+            "Review the proposed labor rate, 640 PI hours, fringe, indirect base, cloud/data, "
+            "travel, software/storage, no-subcontractor position, and 100,000 dollar total "
+            "against actual records before approving the cost volume."
+        ),
+        "evidence_required": "Current founder records and corporate-official cost review",
+        "human_boundary": "The founder confirms the factual cost basis; the builder checks arithmetic only.",
+    },
+    {
+        "step_id": "04_COMPLIANCE_AND_CONFLICT_POSITION",
+        "title": "Review conflicts, CMMC, and export-control planning",
+        "gate_ids": frozenset(
+            {
+                "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+                "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+                "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+                "TECHNOLOGY_CONTROL_PLAN_DECISION",
+            }
+        ),
+        "instruction": (
+            "Answer conflicts and joint-venture status from current facts, review the live "
+            "CMMC requirement, preserve the no-overclaim position, and document whether a "
+            "Technology Control Plan is a contracting-negotiation deliverable."
+        ),
+        "evidence_required": "Current source review plus bounded founder/corporate-official position",
+        "human_boundary": (
+            "No compliance, assessment, certification, or contracting-office acceptance is inferred."
+        ),
+    },
+    {
+        "step_id": "05_VOLUME5_UPLOAD_SET",
+        "title": "Lock the Volume 5 supporting-document set",
+        "gate_ids": frozenset({"VOLUME5_UPLOAD_SET"}),
+        "instruction": (
+            "Upload only current, applicable documents. For the ITAR-marked scope, include "
+            "the verified JCP/DD Form 2345 evidence required by the BAA; do not upload the "
+            "obsolete foreign-affiliations PDF."
+        ),
+        "evidence_required": "Reviewed attachment list with current file hashes",
+        "human_boundary": "Any legally consequential upload or representation remains founder reviewed.",
+    },
+    {
+        "step_id": "06_FRESH_PORTAL_PREVIEW",
+        "title": "Review and seal a fresh complete DSIP preview",
+        "gate_ids": frozenset(
+            {"COMPLETE_PORTAL_PREVIEW_REVIEW", "PORTAL_PREVIEW_RECEIPT_HASH"}
+        ),
+        "instruction": (
+            "After every field and upload is final, inspect all seven volumes, filenames, "
+            "hashes, cost totals, and the live deadline. Save the current preview receipt "
+            "privately and bind it with the collector."
+        ),
+        "evidence_required": "Fresh portal-preview receipt bound to the exact upload set",
+        "human_boundary": "The founder reviews the rendered Government portal preview.",
+    },
+    {
+        "step_id": "07_ACTION_TIME_REVIEW_AND_AUTHORIZATION",
+        "title": "Perform corporate review and action-time authorization",
+        "gate_ids": frozenset(
+            {
+                "ACTION_TIME_APPROVAL_TIMESTAMP",
+                "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+                "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+            }
+        ),
+        "instruction": (
+            "Only after the fresh preview is stable, review every volume as corporate official, "
+            "capture the short-lived approval binding, and authorize the exact final submission."
+        ),
+        "evidence_required": "Fresh approval timestamp and binding to the current preview/upload set",
+        "human_boundary": "The final certification and submit click are founder-only actions.",
+    },
+)
+
 REQUIRED_VOLUME2_SECTIONS = (
     "1. Identification and Significance of the Problem or Opportunity",
     "2. Phase I Technical Objectives",
@@ -1023,6 +1142,163 @@ def gate_reconciliation_groups(unresolved_gates: list[str]) -> dict[str, Any]:
     return groups
 
 
+def gate_lifecycle_stages(unresolved_gates: list[str]) -> dict[str, Any]:
+    required = set(required_private_gates())
+    action_time = set(LIFECYCLE_ACTION_TIME_GATES)
+    pre_award = set(LIFECYCLE_PRE_AWARD_OR_NEGOTIATION_GATES)
+    if action_time.intersection(pre_award):
+        raise MissionWeaveGateError("GATE_LIFECYCLE_STAGE_OVERLAP")
+    if not action_time.union(pre_award).issubset(required):
+        raise MissionWeaveGateError("GATE_LIFECYCLE_CLASSIFICATION_DRIFT")
+
+    pre_submit = required.difference(action_time).difference(pre_award)
+    stage_definitions = (
+        (
+            "A_PRE_SUBMISSION_CONTENT_AND_EVIDENCE",
+            pre_submit,
+            (
+                "Evidence, content, registration, and portal facts required before the "
+                "bounded final-submission gate can open."
+            ),
+            "RESOLVE_BEFORE_FINAL_SUBMISSION",
+        ),
+        (
+            "B_PRE_AWARD_OR_CONTRACT_NEGOTIATION_READINESS",
+            pre_award,
+            (
+                "The proposal must state a current bounded position. Implementation proof "
+                "may occur during pre-award or contract negotiation only if the live portal "
+                "or contracting office permits it; these gates remain fail-closed now."
+            ),
+            "REVIEW_AND_BOUND_POSITION_BEFORE_SUBMISSION",
+        ),
+        (
+            "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN",
+            action_time,
+            (
+                "Fresh preview, corporate review, and final authorization occur only after "
+                "the upload set is stable and immediately before the human submit action."
+            ),
+            "ACTION_TIME_HUMAN_ONLY",
+        ),
+    )
+
+    classified: set[str] = set()
+    for _, members, _, _ in stage_definitions:
+        if classified.intersection(members):
+            raise MissionWeaveGateError("GATE_LIFECYCLE_STAGE_OVERLAP")
+        classified.update(members)
+    if classified != required:
+        raise MissionWeaveGateError("GATE_LIFECYCLE_CLASSIFICATION_DRIFT")
+
+    unresolved = set(unresolved_gates)
+    allowed_unresolved = required.union({"OFFICIAL_SOURCE_INTEGRITY"})
+    unknown = sorted(unresolved.difference(allowed_unresolved))
+    if unknown:
+        raise MissionWeaveGateError("GATE_LIFECYCLE_UNKNOWN_OPEN_GATE")
+
+    stages: dict[str, Any] = {}
+    classified_open: list[str] = []
+    for stage_id, members, description, submission_effect in stage_definitions:
+        open_gates = sorted(unresolved.intersection(members))
+        if (
+            stage_id == "A_PRE_SUBMISSION_CONTENT_AND_EVIDENCE"
+            and "OFFICIAL_SOURCE_INTEGRITY" in unresolved
+        ):
+            open_gates = ["OFFICIAL_SOURCE_INTEGRITY", *open_gates]
+        classified_open.extend(open_gates)
+        stages[stage_id] = {
+            "status": "OPEN" if open_gates else "CLEAR",
+            "open_gate_count": len(open_gates),
+            "open_gates": open_gates,
+            "all_required_gate_count": len(members),
+            "description": description,
+            "submission_effect": submission_effect,
+        }
+
+    if len(classified_open) != len(set(classified_open)):
+        raise MissionWeaveGateError("GATE_LIFECYCLE_OPEN_GATE_DUPLICATED")
+    if set(classified_open) != unresolved:
+        raise MissionWeaveGateError("GATE_LIFECYCLE_OPEN_GATE_COVERAGE_DRIFT")
+
+    return {
+        "classification_version": "missionweave.gate_lifecycle.v1",
+        "submission_readiness_logic_unchanged": True,
+        "classification_can_clear_gate": False,
+        "all_open_gates_classified_once": True,
+        "live_portal_or_contracting_office_confirmation_required": True,
+        "stages": stages,
+    }
+
+
+def founder_action_sequence(unresolved_gates: list[str]) -> dict[str, Any]:
+    unresolved = set(unresolved_gates)
+    assigned: set[str] = set()
+    ordered_steps: list[dict[str, Any]] = []
+
+    for definition in FOUNDER_ACTION_DEFINITIONS:
+        defined_gates = set(definition["gate_ids"])
+        overlap = assigned.intersection(defined_gates)
+        if overlap:
+            raise MissionWeaveGateError("FOUNDER_ACTION_GATE_OVERLAP")
+        open_gates = sorted(unresolved.intersection(defined_gates))
+        assigned.update(defined_gates)
+        if not open_gates:
+            continue
+        ordered_steps.append(
+            {
+                "step_id": definition["step_id"],
+                "title": definition["title"],
+                "status": "OPEN",
+                "open_gate_count": len(open_gates),
+                "open_gates": open_gates,
+                "instruction": definition["instruction"],
+                "evidence_required": definition["evidence_required"],
+                "human_boundary": definition["human_boundary"],
+            }
+        )
+
+    residual = sorted(unresolved.difference(assigned))
+    if residual:
+        ordered_steps.insert(
+            0,
+            {
+                "step_id": "00_OTHER_PRE_SUBMISSION_GATES",
+                "title": "Resolve remaining registration, content, and evidence gates",
+                "status": "OPEN",
+                "open_gate_count": len(residual),
+                "open_gates": residual,
+                "instruction": (
+                    "Resolve each listed gate from current documentary evidence or the live "
+                    "portal. Preserve unknown facts as open; do not infer completion."
+                ),
+                "evidence_required": "Current source, artifact, or authenticated portal evidence",
+                "human_boundary": (
+                    "Credentials, legal representations, certifications, and final actions remain human controlled."
+                ),
+            },
+        )
+
+    sequenced = [
+        gate
+        for step in ordered_steps
+        for gate in step["open_gates"]
+    ]
+    if len(sequenced) != len(set(sequenced)):
+        raise MissionWeaveGateError("FOUNDER_ACTION_OPEN_GATE_DUPLICATED")
+    if set(sequenced) != unresolved:
+        raise MissionWeaveGateError("FOUNDER_ACTION_OPEN_GATE_COVERAGE_DRIFT")
+
+    return {
+        "sequence_version": "missionweave.founder_action_sequence.v1",
+        "open_step_count": len(ordered_steps),
+        "all_open_gates_covered_once": True,
+        "classification_can_clear_gate": False,
+        "final_submission_human_only": True,
+        "ordered_steps": ordered_steps,
+    }
+
+
 def current_upload_set_identity_sha256(
     payload: dict[str, Any],
     *,
@@ -1436,6 +1712,8 @@ def build_payload(
         public_source_state["absolute_private_path_exposed"] = False
 
     reconciliation_groups = gate_reconciliation_groups(unresolved)
+    lifecycle_stages = gate_lifecycle_stages(unresolved)
+    action_sequence = founder_action_sequence(unresolved)
     public_volume3_artifact_state = {
         key: volume3_artifact_state.get(key)
         for key in (
@@ -1549,6 +1827,8 @@ def build_payload(
             "unresolved_gates": unresolved,
             "reconciliation_groups": reconciliation_groups,
         },
+        "gate_lifecycle": lifecycle_stages,
+        "founder_action_sequence": action_sequence,
         "private_fact_state": {
             "assigned_proposal_number_present": bool(
                 evaluation and evaluation["proposal_number_present"]
@@ -1836,7 +2116,46 @@ def render_markdown(payload: dict[str, Any]) -> str:
         lines.append(
             f"- `{group_id}`: `{group['count']}` gates (`{group['status']}`)"
         )
-    lines.extend(["", "## Open Gates", ""])
+    lines.extend(["", "## Lifecycle Boundaries", ""])
+    lines.extend(
+        [
+            "This classification is explanatory only. It cannot clear a gate or change submission readiness, and current live portal or contracting-office instructions still control.",
+            "",
+        ]
+    )
+    for stage_id, stage in payload["gate_lifecycle"]["stages"].items():
+        lines.extend(
+            [
+                f"### {stage_id}",
+                "",
+                stage["description"],
+                "",
+                f"- Submission effect: `{stage['submission_effect']}`",
+                f"- Open gates: `{stage['open_gate_count']}`",
+            ]
+        )
+        lines.extend(f"- `{gate}`" for gate in stage["open_gates"])
+        lines.append("")
+
+    lines.extend(["## Founder Action Sequence", ""])
+    for index, step in enumerate(
+        payload["founder_action_sequence"]["ordered_steps"], start=1
+    ):
+        lines.extend(
+            [
+                f"### {index}. {step['title']}",
+                "",
+                step["instruction"],
+                "",
+                f"- Evidence required: {step['evidence_required']}",
+                f"- Human boundary: {step['human_boundary']}",
+                f"- Open gates: `{step['open_gate_count']}`",
+            ]
+        )
+        lines.extend(f"- `{gate}`" for gate in step["open_gates"])
+        lines.append("")
+
+    lines.extend(["## Open Gates", ""])
     lines.extend(f"- `{gate}`" for gate in payload["gate_summary"]["unresolved_gates"])
     lines.extend(
         [
@@ -1871,6 +2190,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
 def render_portal_checklist(payload: dict[str, Any]) -> str:
     source = payload["source_integrity"]
     instruction = payload["official_instruction_facts"]
+    founder_steps = "\n".join(
+        (
+            f"{index}. **{step['title']}** - {step['instruction']} "
+            f"Evidence: {step['evidence_required']}"
+        )
+        for index, step in enumerate(
+            payload["founder_action_sequence"]["ordered_steps"], start=1
+        )
+    )
     return rf"""# MissionWeave DSIP Portal Checklist - 2026-07-17
 
 Use this sequence only after the user says `I'm in`. Inspect the current in-session browser page before navigating. Preserve any authentication already in progress.
@@ -1885,6 +2213,12 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Recheck the live DSIP countdown before entry and again before final submission.
 - Source discrepancy: {payload['deadline']['source_discrepancy']}
 - Amendment control: use `MISSIONWEAVE_AMENDMENT_2_PORTAL_CONTROL_2026-07-18.md`. Amendment 2 renames the due-diligence program as Foreign Risk Evaluation (FRE), but the required Volume 7 webform and its eight disclosure questions remain. Do not upload a foreign-affiliations PDF in Volume 5.
+
+## Exact Founder Order Of Operations
+
+This sequence covers every currently open gate exactly once. It does not certify a fact, clear a gate, or replace current portal instructions.
+
+{founder_steps}
 
 ## Package Lock
 

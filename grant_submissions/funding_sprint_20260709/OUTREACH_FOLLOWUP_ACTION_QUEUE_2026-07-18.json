@@ -61,7 +61,7 @@
       "draft_rendered": false,
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 171267,
+      "hold_seconds_remaining": 168916,
       "inbox_recheck_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "max_proactive_sends": 1,
@@ -290,7 +290,7 @@
       "source_state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
     }
   ],
-  "as_of_utc": "2026-07-21T14:25:32.459096Z",
+  "as_of_utc": "2026-07-21T15:04:43.836711Z",
   "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. Historical send-timing exceptions remain counted against the send cap and are surfaced fail-closed. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
   "controls": {
     "action_time_human_review_required": true,
@@ -308,7 +308,7 @@
       "4B5EDC6BCB11F72B7A0896FBEA672EC8C5DC1B9D19F4FDAD099AADF7E7C41D45"
     ]
   },
-  "queue_sha256": "C515C1880E93939B9075CA591228F10D20174457226A192B8FB13D2CF09E5DDB",
+  "queue_sha256": "462A8040E040F50AEC34EE3A9BD2B30415904A500DC7E6364E76A460940D7F72",
   "routing_integrity_exceptions": [
     {
       "exception": "SENT_BEFORE_CONFIGURED_HOLD",
@@ -321,11 +321,11 @@
   "schema": "lumencore.outreach_followup_action_queue.v1",
   "source_evidence": {
     "email_reconciliation": {
-      "bytes": 22840,
-      "identity_source": "COMMITTED_GIT_BLOB",
+      "bytes": 23321,
+      "identity_source": "WORKTREE_BYTES",
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
-      "sha256": "041AC2F3CC7DA1053BAEB8A99A4C0CA75D88632DDAAF463F5067FA8275E61A63",
-      "worktree_eol_differs_from_git_blob": true
+      "sha256": "642174E01503B4C3A46EBB4C88718C012285D1AE895D27BF29B57A3F6406D894",
+      "worktree_eol_differs_from_git_blob": false
     },
     "followup_policy_config": {
       "bytes": 5670,

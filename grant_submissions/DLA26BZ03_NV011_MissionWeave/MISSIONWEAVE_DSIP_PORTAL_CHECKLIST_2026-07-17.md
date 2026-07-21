@@ -13,6 +13,18 @@ Use this sequence only after the user says `I'm in`. Inspect the current in-sess
 - Source discrepancy: The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026.
 - Amendment control: use `MISSIONWEAVE_AMENDMENT_2_PORTAL_CONTROL_2026-07-18.md`. Amendment 2 renames the due-diligence program as Foreign Risk Evaluation (FRE), but the required Volume 7 webform and its eight disclosure questions remain. Do not upload a foreign-affiliations PDF in Volume 5.
 
+## Exact Founder Order Of Operations
+
+This sequence covers every currently open gate exactly once. It does not certify a fact, clear a gate, or replace current portal instructions.
+
+1. **Submit the JCP application and retain official evidence** - Use the official JCP portal. Registration or prerequisites in progress are not enough; retain the official application-submission receipt PDF or a current certified DD Form 2345 in the ignored private evidence area. Evidence: Hash-matched official JCP receipt PDF or certified DD Form 2345
+2. **Confirm Firm PIN availability inside DSIP** - Confirm that the organization-linked DSIP account can access the Firm PIN. Do not place the PIN itself in chat, Git, logs, or the private gate record. Evidence: Boolean availability state only; never the PIN value
+3. **Support and approve the Volume 3 cost basis** - Review the proposed labor rate, 640 PI hours, fringe, indirect base, cloud/data, travel, software/storage, no-subcontractor position, and 100,000 dollar total against actual records before approving the cost volume. Evidence: Current founder records and corporate-official cost review
+4. **Review conflicts, CMMC, and export-control planning** - Answer conflicts and joint-venture status from current facts, review the live CMMC requirement, preserve the no-overclaim position, and document whether a Technology Control Plan is a contracting-negotiation deliverable. Evidence: Current source review plus bounded founder/corporate-official position
+5. **Lock the Volume 5 supporting-document set** - Upload only current, applicable documents. For the ITAR-marked scope, include the verified JCP/DD Form 2345 evidence required by the BAA; do not upload the obsolete foreign-affiliations PDF. Evidence: Reviewed attachment list with current file hashes
+6. **Review and seal a fresh complete DSIP preview** - After every field and upload is final, inspect all seven volumes, filenames, hashes, cost totals, and the live deadline. Save the current preview receipt privately and bind it with the collector. Evidence: Fresh portal-preview receipt bound to the exact upload set
+7. **Perform corporate review and action-time authorization** - Only after the fresh preview is stable, review every volume as corporate official, capture the short-lived approval binding, and authorize the exact final submission. Evidence: Fresh approval timestamp and binding to the current preview/upload set
+
 ## Package Lock
 
 - Manifest files verified: `15`

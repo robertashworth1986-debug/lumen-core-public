@@ -222,6 +222,27 @@ def test_default_gate_verifies_package_and_fails_closed_without_private_input():
     groups = payload["gate_summary"]["reconciliation_groups"]
     assert sum(group["count"] for group in groups.values()) == 50
     assert groups["F_CLEARED_BY_EVIDENCE"]["count"] == 0
+    lifecycle = payload["gate_lifecycle"]
+    lifecycle_open = [
+        gate
+        for stage in lifecycle["stages"].values()
+        for gate in stage["open_gates"]
+    ]
+    assert set(lifecycle_open) == set(payload["gate_summary"]["unresolved_gates"])
+    assert len(lifecycle_open) == len(set(lifecycle_open))
+    assert lifecycle["submission_readiness_logic_unchanged"] is True
+    assert lifecycle["classification_can_clear_gate"] is False
+    assert lifecycle["all_open_gates_classified_once"] is True
+    sequence = payload["founder_action_sequence"]
+    sequenced_open = [
+        gate
+        for step in sequence["ordered_steps"]
+        for gate in step["open_gates"]
+    ]
+    assert set(sequenced_open) == set(payload["gate_summary"]["unresolved_gates"])
+    assert len(sequenced_open) == len(set(sequenced_open))
+    assert sequence["classification_can_clear_gate"] is False
+    assert sequence["final_submission_human_only"] is True
     assert payload["private_input"]["git_ignored_target"] is True
     assert payload["private_input"]["private_values_exposed"] is False
     assert payload["private_input"]["sha256"] is None
@@ -377,6 +398,11 @@ def test_complete_private_record_can_pass_without_exposing_private_values():
         "count": 50,
         "gates": module.required_private_gates(),
     }
+    assert all(
+        stage["open_gate_count"] == 0
+        for stage in payload["gate_lifecycle"]["stages"].values()
+    )
+    assert payload["founder_action_sequence"]["ordered_steps"] == []
     facts = payload["private_fact_state"]
     assert facts["assigned_proposal_number_present"] is True
     assert facts["assigned_proposal_number_embedded_in_volume2"] is True
@@ -785,7 +811,46 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
         == open_count
     )
     assert groups["F_CLEARED_BY_EVIDENCE"]["count"] == passed
+    lifecycle = payload["gate_lifecycle"]
+    lifecycle_open = [
+        gate
+        for stage in lifecycle["stages"].values()
+        for gate in stage["open_gates"]
+    ]
+    assert set(lifecycle_open) == AUTHORITATIVE_OPEN_GATES
+    assert len(lifecycle_open) == len(set(lifecycle_open))
+    assert lifecycle["classification_can_clear_gate"] is False
+    assert lifecycle["submission_readiness_logic_unchanged"] is True
+    negotiation = lifecycle["stages"][
+        "B_PRE_AWARD_OR_CONTRACT_NEGOTIATION_READINESS"
+    ]
+    assert set(negotiation["open_gates"]) == {
+        "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+        "TECHNOLOGY_CONTROL_PLAN_DECISION",
+    }
+    sequence = payload["founder_action_sequence"]
+    sequenced_open = [
+        gate
+        for step in sequence["ordered_steps"]
+        for gate in step["open_gates"]
+    ]
+    assert set(sequenced_open) == AUTHORITATIVE_OPEN_GATES
+    assert len(sequenced_open) == len(set(sequenced_open))
+    assert [step["step_id"] for step in sequence["ordered_steps"]] == [
+        "01_JCP_APPLICATION_EVIDENCE",
+        "02_DSIP_FIRM_PIN_CONFIRMATION",
+        "03_VOLUME3_COST_SUPPORT",
+        "04_COMPLIANCE_AND_CONFLICT_POSITION",
+        "05_VOLUME5_UPLOAD_SET",
+        "06_FRESH_PORTAL_PREVIEW",
+        "07_ACTION_TIME_REVIEW_AND_AUTHORIZATION",
+    ]
     assert "## Reconciliation Groups" in markdown
+    assert "## Lifecycle Boundaries" in markdown
+    assert "## Founder Action Sequence" in markdown
+    assert "## Exact Founder Order Of Operations" in checklist
+    assert "covers every currently open gate exactly once" in checklist
+    assert "cannot clear a gate or change submission readiness" in markdown
     assert payload["submission_ready_for_human_click"] is False
     assert payload["private_input"]["private_values_exposed"] is False
     assert payload["source_integrity"]["all_checks_pass"] is True
