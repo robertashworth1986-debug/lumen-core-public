@@ -7,12 +7,14 @@ on:
       - "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.*"
       - "build_week/prooflock_console/**"
       - "code/deploy/APPLY_PROOFLOCK_RELEASE_ON_VPS.sh"
+      - "code/deploy/PUSH_PROOFLOCK_RELEASE_ON_VPS.ps1"
       - "code/deploy/package_prooflock_release.py"
       - "code/ops/VERIFY_PROOFLOCK_LIVE_RELEASE.py"
       - "dashboard/assets/vendor/THREE_LICENSE.txt"
       - "dashboard/assets/vendor/three.core.min.js"
       - "dashboard/assets/vendor/three.module.min.js"
       - "docs/OPENAI_BUILD_WEEK_PROOFLOCK_PREDEPLOYMENT_GATE_2026-07-18.*"
+      - "docs/OPENAI_BUILD_WEEK_PROOFLOCK_HUMAN_GATE_CHECKLIST_2026-07-18.md"
       - "docs/OPENAI_BUILD_WEEK_PROOFLOCK_SUBMISSION_READINESS_2026-07-17.md"
       - "tests/test_prooflock_console.py"
       - "tests/test_prooflock_deploy_hardening.py"
@@ -28,12 +30,14 @@ on:
       - "assets/hardware/flowform_curved_motherboard_honeycomb_battery_v3_concept.*"
       - "build_week/prooflock_console/**"
       - "code/deploy/APPLY_PROOFLOCK_RELEASE_ON_VPS.sh"
+      - "code/deploy/PUSH_PROOFLOCK_RELEASE_ON_VPS.ps1"
       - "code/deploy/package_prooflock_release.py"
       - "code/ops/VERIFY_PROOFLOCK_LIVE_RELEASE.py"
       - "dashboard/assets/vendor/THREE_LICENSE.txt"
       - "dashboard/assets/vendor/three.core.min.js"
       - "dashboard/assets/vendor/three.module.min.js"
       - "docs/OPENAI_BUILD_WEEK_PROOFLOCK_PREDEPLOYMENT_GATE_2026-07-18.*"
+      - "docs/OPENAI_BUILD_WEEK_PROOFLOCK_HUMAN_GATE_CHECKLIST_2026-07-18.md"
       - "docs/OPENAI_BUILD_WEEK_PROOFLOCK_SUBMISSION_READINESS_2026-07-17.md"
       - "tests/test_prooflock_console.py"
       - "tests/test_prooflock_deploy_hardening.py"
@@ -74,6 +78,20 @@ jobs:
           tests/test_verify_prooflock_live_release.py
       - name: Check deployment shell syntax
         run: bash -n code/deploy/APPLY_PROOFLOCK_RELEASE_ON_VPS.sh
+      - name: Check operator PowerShell syntax
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path "code/deploy/PUSH_PROOFLOCK_RELEASE_ON_VPS.ps1"),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -ne 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
       - name: Check JavaScript syntax
         run: |
           node --check build_week/prooflock_console/app.js

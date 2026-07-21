@@ -17,7 +17,13 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGER_PATH = ROOT / "code" / "deploy" / "package_prooflock_release.py"
 APPLY_SCRIPT = ROOT / "code" / "deploy" / "APPLY_PROOFLOCK_RELEASE_ON_VPS.sh"
+MANUAL_RELEASE_SCRIPT = (
+    ROOT / "code" / "deploy" / "PUSH_PROOFLOCK_RELEASE_ON_VPS.ps1"
+)
 PROOFLOCK_WORKFLOW = ROOT / ".github" / "workflows" / "deploy-prooflock-release.yml"
+PROOFLOCK_CI_WORKFLOW = (
+    ROOT / ".github" / "workflows" / "prooflock-build-week-ci.yml"
+)
 DASHBOARD_WORKFLOW = ROOT / ".github" / "workflows" / "deploy.yml"
 
 
@@ -141,6 +147,7 @@ def test_workflows_encode_the_bounded_fail_closed_contract():
     module = load_packager()
     dashboard = DASHBOARD_WORKFLOW.read_text(encoding="utf-8")
     prooflock = PROOFLOCK_WORKFLOW.read_text(encoding="utf-8")
+    prooflock_ci = PROOFLOCK_CI_WORKFLOW.read_text(encoding="utf-8")
     apply_script = APPLY_SCRIPT.read_text(encoding="utf-8")
 
     dashboard_sync = dashboard.split("- name: Sync dashboard assets", maxsplit=1)[1].split(
@@ -153,6 +160,8 @@ def test_workflows_encode_the_bounded_fail_closed_contract():
     assert "workflow_dispatch:" in trigger
     assert "push:" not in trigger
     assert "DEPLOY_PROOFLOCK_EXACT_SNAPSHOT" in trigger
+    assert "code/deploy/PUSH_PROOFLOCK_RELEASE_ON_VPS.ps1" in prooflock_ci
+    assert "Check operator PowerShell syntax" in prooflock_ci
     assert '[[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]' in prooflock
     assert "environment:\n      name: production" in prooflock
     assert "known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}" in prooflock
@@ -172,6 +181,72 @@ def test_workflows_encode_the_bounded_fail_closed_contract():
     assert "--delete" not in apply_script
     for repo_path in module.RELEASE_PATHS:
         assert f'"{Path(repo_path).name}"' in apply_script
+
+
+def test_manual_release_bridge_preserves_the_exact_snapshot_gate():
+    source = MANUAL_RELEASE_SCRIPT.read_text(encoding="utf-8")
+
+    assert 'ValidatePattern("^[0-9a-f]{40}$")' in source
+    assert 'ValidateSet("HOLD", "DEPLOY_PROOFLOCK_EXACT_SNAPSHOT")' in source
+    assert 'if (-not $Execute)' in source
+    assert 'if ($Approval -ne $RequiredApproval)' in source
+    assert "SourceCommit must equal the current worktree HEAD" in source
+    assert "SourceCommit is not reachable from $RequiredRemoteRef" in source
+    assert '"archive"' in source
+    assert "$ApplyRepoPath" in source
+    assert "Exported apply script does not match the pinned Git blob" in source
+    assert '"StrictHostKeyChecking=yes"' in source
+    assert '"BatchMode=yes"' in source
+    assert '"UserKnownHostsFile=$KnownHostsPath"' in source
+    assert "StrictHostKeyChecking=no" not in source
+    assert "StrictHostKeyChecking=accept-new" not in source
+    assert "DEPLOYED_CURRENT_HEAD_LIVE_MATCH" in source
+    assert "exact 15-file current-head parity" in source
+
+
+def test_manual_release_bridge_packages_and_holds_without_network(tmp_path):
+    powershell = shutil.which("pwsh") or shutil.which("powershell")
+    if powershell is None:
+        pytest.skip("PowerShell is unavailable")
+
+    commit = git(ROOT, "rev-parse", "HEAD").decode("ascii").strip()
+    output_dir = tmp_path / "manual-release"
+    completed = subprocess.run(
+        [
+            powershell,
+            "-NoProfile",
+            "-File",
+            str(MANUAL_RELEASE_SCRIPT),
+            "-SourceCommit",
+            commit,
+            "-RepoRoot",
+            str(ROOT),
+            "-OutputDirectory",
+            str(output_dir),
+        ],
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    receipt = json.loads(
+        (output_dir / "prooflock-manual-release-receipt.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    manifest = json.loads(
+        (output_dir / "prooflock-release-manifest.json").read_text(encoding="utf-8")
+    )
+    assert receipt["status"] == "PACKAGED_HOLD"
+    assert receipt["source_commit"] == commit
+    assert receipt["execute_requested"] is False
+    assert receipt["deployment_attempted"] is False
+    assert receipt["deployment_succeeded"] is False
+    assert receipt["live_verification_succeeded"] is False
+    assert receipt["file_count"] == len(load_packager().RELEASE_PATHS)
+    assert receipt["archive_sha256"] == manifest["archive_sha256"]
+    assert (output_dir / "code" / "deploy" / APPLY_SCRIPT.name).is_file()
 
 
 def require_posix_apply_test() -> str:
