@@ -2,6 +2,8 @@
 
 **Official deadline recorded in the submission packet:** July 21, 2026 at 5:00 PM Pacific / 7:00 PM Central
 
+**Latest official reminder:** Devpost email `Deadline TOMORROW | last minute tips - OpenAI Build Week`, received `2026-07-20T21:41:43Z`, confirms the deadline, permits a YouTube video that is public or unlisted, requires voiceover coverage of both Codex and GPT-5.6, requires the `/feedback` Session ID, and requires the entry to show `Submitted` rather than `Draft`.
+
 **Internal target:** complete the human gates by July 20 at 6:00 PM Central so the final day is recovery time.
 
 ## Prepared Assets And Current Holds
@@ -58,7 +60,7 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 5. Require the current-commit live verifier to report `15/15`, preserve the immutable custody pin, and record that GitHub-hosted CI was unavailable if the bounded fallback was used.
 6. Replace the historical recording URL in the narration with the newly verified release URL.
 7. Record the live demonstration using the timed narration. Keep the final cut under three minutes with intelligible audio.
-8. Upload the video to YouTube as **public** and verify playback while signed out. Deviate only if the live Devpost form explicitly supersedes that requirement, and preserve a dated source receipt before doing so.
+8. Upload the video to YouTube as **public or unlisted** and verify playback while signed out. Preserve the dated Devpost reminder as the source for allowing an unlisted link.
 9. Enter the repository, live-demo, and YouTube URLs into Devpost. Paste only the verified Session ID and model identity.
 10. Confirm that pre-existing work and new Build Week work are separated exactly as stated above.
 11. Preview the complete entry and test every link in a signed-out window.
@@ -72,7 +74,7 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 - [ ] Title and description match this packet
 - [ ] Repository link opens without authentication
 - [ ] Live demonstration opens without authentication
-- [ ] YouTube video is under three minutes and plays with audio while signed out
+- [ ] YouTube video is public or unlisted, under three minutes, and plays with audio while signed out
 - [x] Private task-metadata Session ID candidate matches the published SHA-256
 - [ ] `/feedback` Session ID comes from the primary build task
 - [ ] Model name is directly confirmed from the primary task rather than inferred
@@ -85,4 +87,4 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 
 ## Stop Conditions
 
-Do not record the final public video or submit while the current live release is below `15/15`. Do not submit if the video link is private, the Session ID has not been confirmed through `/feedback`, the model identity is inferred, the live demo fails, the repository is inaccessible, neither GitHub CI nor the bounded manual fallback has produced equivalent preserved receipts, or the entry implies that receipt integrity proves the underlying engineering claim.
+Do not record the final shareable video or submit while the current live release is below `15/15`. Do not submit if the video cannot play while signed out, the Session ID has not been confirmed through `/feedback`, the model identity is inferred, the live demo fails, the repository is inaccessible, neither GitHub CI nor the bounded manual fallback has produced equivalent preserved receipts, or the entry implies that receipt integrity proves the underlying engineering claim.
