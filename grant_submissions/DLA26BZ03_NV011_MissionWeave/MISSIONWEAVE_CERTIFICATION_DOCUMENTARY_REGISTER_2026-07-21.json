@@ -1,0 +1,87 @@
+{
+  "schema": "lumencore.missionweave_certification_documentary_register.v1",
+  "generated_utc": "2026-07-21T16:43:50Z",
+  "topic": "DLA26BZ03-NV011",
+  "status": "DOCUMENTARY_PREREQUISITES_OPEN",
+  "source_artifacts": [
+    {
+      "role": "PUBLIC_REPOSITORY_LICENSE",
+      "path": "LICENSE",
+      "sha256": "A2C01DAE8F86B9D0BC5A1EC3D2BAAA6818DFD67D6E89E1FD506EAF77D0C02A8B"
+    },
+    {
+      "role": "RELATED_EFFORT_OVERLAP_MATRIX",
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_RELATED_EFFORT_OVERLAP_MATRIX_2026-07-18.md",
+      "sha256": "15AD5EE5C5FE9CCEF52CF893ED6158A2E0A77D0881CEC499DA0185CE9DC0445D"
+    },
+    {
+      "role": "VOLUME2_TECHNICAL_DATA_RIGHTS_ASSERTION",
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.md",
+      "sha256": "3A1569F945CAC2DAB4A699FC5543E043C55A32CE6CAAF882581AA22279BE528A"
+    },
+    {
+      "role": "VOLUME5_RIGHTS_AND_OVERLAP_WORKSHEET",
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME5_WORKSHEET_2026-07-16.md",
+      "sha256": "7F77792874DB59BAAE7AC41E99F4B9E0D8D7002442207F860BC5E58AF4551C4A"
+    }
+  ],
+  "gates": [
+    {
+      "gate_id": "NO_DUPLICATE_COST_OR_DELIVERABLE",
+      "documentary_clear": false,
+      "private_boolean_can_clear_alone": false,
+      "required_source_roles": [
+        "RELATED_EFFORT_OVERLAP_MATRIX",
+        "VOLUME5_RIGHTS_AND_OVERLAP_WORKSHEET"
+      ],
+      "open_prerequisites": [
+        "Reconcile every live or pending proposal or award against the authoritative portal record.",
+        "Support the MissionWeave 640-hour schedule and every cost category.",
+        "Separate background technology from proposal-specific work in the final rights and cost records.",
+        "Have the corporate official review the exact final volumes and portal preview."
+      ],
+      "review_record": {
+        "status": "OPEN",
+        "required_authority": "CORPORATE_OFFICIAL",
+        "completed_utc": null,
+        "private_review_receipt_sha256": null
+      }
+    },
+    {
+      "gate_id": "TECHNICAL_DATA_RIGHTS_ASSERTION",
+      "documentary_clear": false,
+      "private_boolean_can_clear_alone": false,
+      "required_source_roles": [
+        "PUBLIC_REPOSITORY_LICENSE",
+        "VOLUME2_TECHNICAL_DATA_RIGHTS_ASSERTION",
+        "VOLUME5_RIGHTS_AND_OVERLAP_WORKSHEET"
+      ],
+      "open_prerequisites": [
+        "Map every asserted item to an exact file or component and version.",
+        "Bind each asserted item to dated authorship and development-funding records.",
+        "Separate MIT-licensed public repository material, open-source dependencies, and public interfaces from any proposed restriction.",
+        "Complete qualified rights review and corporate-official review of the final assertion table."
+      ],
+      "review_record": {
+        "status": "OPEN",
+        "required_authority": "QUALIFIED_RIGHTS_REVIEW_AND_CORPORATE_OFFICIAL",
+        "completed_utc": null,
+        "private_review_receipt_sha256": null
+      }
+    }
+  ],
+  "controls": {
+    "source_hash_match_required": true,
+    "all_prerequisites_closed_required": true,
+    "review_receipt_hash_required_to_clear": true,
+    "private_boolean_can_clear_documentary_gate": false,
+    "register_change_invalidates_portal_preview_binding": true,
+    "register_change_invalidates_action_time_approval_binding": true,
+    "legal_or_accounting_conclusion_automated": false
+  },
+  "claim_boundary": "This public register records source-bound documentary prerequisites for two MissionWeave certification gates. It does not establish cost allowability, prove the absence of all overlap, determine intellectual-property rights, replace qualified legal or accounting review, expose private review records, authorize submission, or certify any portal answer.",
+  "integrity": {
+    "hash_algorithm": "SHA-256",
+    "register_sha256": "28D6215A57C704C01FABF693B863C396014D9E11467C133402A3FF0EF75BEEB8"
+  }
+}

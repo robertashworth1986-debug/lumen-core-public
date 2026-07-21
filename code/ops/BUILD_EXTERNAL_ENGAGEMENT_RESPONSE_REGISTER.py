@@ -298,7 +298,22 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         darpa_sn_26_97.get("schema")
         != "lumencore.darpa_sn_26_97_public_submission_receipt.v1"
         or darpa_sn_26_97.get("status")
-        != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+        != "FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY"
+        or darpa_sn_26_97.get("thread_reconciliation", {}).get(
+            "agency_thread_response_after_formal_package_observed"
+        )
+        is not True
+        or darpa_sn_26_97.get("thread_reconciliation", {}).get(
+            "specific_action_request_observed"
+        )
+        is not False
+        or darpa_sn_26_97.get("thread_reconciliation", {}).get(
+            "duplicate_send_allowed"
+        )
+        is not False
+        or darpa_sn_26_97.get("send_control", {}).get("send_now") is not False
+        or darpa_sn_26_97.get("send_control", {}).get("do_not_duplicate_send")
+        is not True
     ):
         raise ValueError("DARPA-SN-26-97 public submission receipt is missing or stale")
     if (

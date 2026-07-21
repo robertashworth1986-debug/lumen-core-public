@@ -1,4 +1,31 @@
 {
+  "certification_documentary_register": {
+    "claim_boundary_present": true,
+    "controls_valid": true,
+    "failure_code": null,
+    "file_sha256": "8C29BAAEE1B7A545AA882C451AA836D91B0F6304FEBDA1AA6792EDA4CE216839",
+    "gate_decisions": {
+      "NO_DUPLICATE_COST_OR_DELIVERABLE": false,
+      "TECHNICAL_DATA_RIGHTS_ASSERTION": false
+    },
+    "gate_rows_valid": true,
+    "gate_set_valid": true,
+    "generated_timestamp_valid": true,
+    "integrity_valid": true,
+    "open_gate_ids": [
+      "NO_DUPLICATE_COST_OR_DELIVERABLE",
+      "TECHNICAL_DATA_RIGHTS_ASSERTION"
+    ],
+    "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_CERTIFICATION_DOCUMENTARY_REGISTER_2026-07-21.json",
+    "register_consumed": true,
+    "register_present": true,
+    "register_regular_file": true,
+    "schema_valid": true,
+    "source_hashes_current": true,
+    "source_set_valid": true,
+    "status": "DOCUMENTARY_PREREQUISITES_OPEN",
+    "topic_valid": true
+  },
   "claim_boundary": "This public gate proves package integrity, document-format checks, and the completion state of a bounded private DSIP fact workflow. It does not expose legal identifiers, a Firm PIN, the assigned proposal number, private portal evidence, or unsupported compliance facts. It does not establish DLA validation, CMMC status, ITAR compliance, award eligibility, proposal acceptance, submission, selection, contract, award, deployment, or realized performance.",
   "cmmc_evidence_packet": {
     "cmmc_requirement_unique": true,
@@ -29,10 +56,13 @@
     "cmmc_boolean_can_clear_supported_position_gate": false,
     "cmmc_packet_integrity_required": true,
     "credentials_allowed_in_public_output": false,
+    "documentary_register_integrity_required": true,
+    "documentary_review_receipt_hash_required_to_clear": true,
     "external_send_performed": false,
     "jcp_receipt_fields_required_to_clear_gate": true,
     "portal_submit_performed": false,
     "preview_receipt_max_age_seconds": 1800,
+    "private_boolean_can_clear_documentary_gate": false,
     "private_identifiers_allowed_in_public_output": false,
     "upstream_change_invalidates_preview_and_approval": true
   },
@@ -85,19 +115,21 @@
         "title": "Support and approve the Volume 3 cost basis"
       },
       {
-        "evidence_required": "Current source review plus bounded founder/corporate-official position",
+        "evidence_required": "Current source review, hash-bound documentary register, and bounded founder/corporate-official position",
         "human_boundary": "No compliance, assessment, certification, or contracting-office acceptance is inferred.",
-        "instruction": "Answer conflicts and joint-venture status from current facts, review the live CMMC requirement, preserve the no-overclaim position, and document whether a Technology Control Plan is a contracting-negotiation deliverable.",
-        "open_gate_count": 4,
+        "instruction": "Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document whether a Technology Control Plan is a contracting-negotiation deliverable.",
+        "open_gate_count": 6,
         "open_gates": [
           "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
           "CONFLICTS_AND_JOINT_VENTURE_STATUS",
           "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+          "NO_DUPLICATE_COST_OR_DELIVERABLE",
+          "TECHNICAL_DATA_RIGHTS_ASSERTION",
           "TECHNOLOGY_CONTROL_PLAN_DECISION"
         ],
         "status": "OPEN",
         "step_id": "04_COMPLIANCE_AND_CONFLICT_POSITION",
-        "title": "Review conflicts, CMMC, and export-control planning"
+        "title": "Review conflicts, cost separation, data rights, CMMC, and export-control planning"
       },
       {
         "evidence_required": "Reviewed attachment list with current file hashes",
@@ -150,12 +182,14 @@
       "A_PRE_SUBMISSION_CONTENT_AND_EVIDENCE": {
         "all_required_gate_count": 43,
         "description": "Evidence, content, registration, and portal facts required before the bounded final-submission gate can open.",
-        "open_gate_count": 6,
+        "open_gate_count": 8,
         "open_gates": [
           "CONFLICTS_AND_JOINT_VENTURE_STATUS",
           "CURRENT_CMMC_REQUIREMENTS_REVIEW",
           "DD2345_OR_JCP_APPLICATION_EVIDENCE",
           "DSIP_FIRM_PIN_AVAILABILITY",
+          "NO_DUPLICATE_COST_OR_DELIVERABLE",
+          "TECHNICAL_DATA_RIGHTS_ASSERTION",
           "VOLUME3_COST_BASIS",
           "VOLUME5_UPLOAD_SET"
         ],
@@ -190,10 +224,10 @@
     },
     "submission_readiness_logic_unchanged": true
   },
-  "gate_sha256": "933c6755682e31db4bbb329ff2be280a274e02405b8a1a97f31cc28d3d68f273",
+  "gate_sha256": "5f0799416e680fea31268beb7cd9e5854cd1fe31ff2ebd61a8ec401654087b57",
   "gate_summary": {
-    "open_gate_count": 13,
-    "passed_private_gate_count": 37,
+    "open_gate_count": 15,
+    "passed_private_gate_count": 35,
     "reconciliation_groups": {
       "A_DOCUMENTARY_RETRIEVAL": {
         "count": 3,
@@ -205,20 +239,22 @@
         "status": "OPEN"
       },
       "B_FOUNDER_FACTUAL_ANSWER": {
-        "count": 1,
+        "count": 2,
         "gates": [
-          "CONFLICTS_AND_JOINT_VENTURE_STATUS"
+          "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+          "NO_DUPLICATE_COST_OR_DELIVERABLE"
         ],
         "status": "OPEN"
       },
       "C_LEGAL_CERTIFICATION_DECISION": {
-        "count": 6,
+        "count": 7,
         "gates": [
           "ACTION_TIME_APPROVAL_TIMESTAMP",
           "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
           "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
           "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
           "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+          "TECHNICAL_DATA_RIGHTS_ASSERTION",
           "TECHNOLOGY_CONTROL_PLAN_DECISION"
         ],
         "status": "OPEN"
@@ -239,7 +275,7 @@
         "status": "OPEN"
       },
       "F_CLEARED_BY_EVIDENCE": {
-        "count": 37,
+        "count": 35,
         "gates": [
           "ASSIGNED_PROPOSAL_NUMBER_CAPTURE",
           "CAGE_MATCH",
@@ -253,7 +289,6 @@
           "ITAR_SCOPE_CONFIRMED",
           "LIVE_DSIP_DEADLINE_CONFIRMATION",
           "NO_CMMC_STATUS_OVERCLAIM",
-          "NO_DUPLICATE_COST_OR_DELIVERABLE",
           "OWNERSHIP_AND_AFFILIATES",
           "PI_640_HOURS",
           "PI_PRIMARY_EMPLOYMENT",
@@ -266,7 +301,6 @@
           "SBC_CONTROL_ID",
           "SBIR_PERCENTAGE_OF_WORK",
           "SUBMITTER_AUTHORITY",
-          "TECHNICAL_DATA_RIGHTS_ASSERTION",
           "UEI_MATCH",
           "US_SMALL_BUSINESS_ELIGIBILITY",
           "VOLUME1_PUBLIC_RELEASE_TEXT_REVIEW",
@@ -293,13 +327,15 @@
       "CURRENT_CMMC_REQUIREMENTS_REVIEW",
       "DD2345_OR_JCP_APPLICATION_EVIDENCE",
       "DSIP_FIRM_PIN_AVAILABILITY",
+      "NO_DUPLICATE_COST_OR_DELIVERABLE",
       "PORTAL_PREVIEW_RECEIPT_HASH",
+      "TECHNICAL_DATA_RIGHTS_ASSERTION",
       "TECHNOLOGY_CONTROL_PLAN_DECISION",
       "VOLUME3_COST_BASIS",
       "VOLUME5_UPLOAD_SET"
     ]
   },
-  "generated_utc": "2026-07-21T15:02:02.911025+00:00",
+  "generated_utc": "2026-07-21T16:55:30.059565+00:00",
   "jcp_evidence_protocol": {
     "bare_boolean_can_clear_gate": false,
     "bytes": 4034,
@@ -336,10 +372,12 @@
     "assigned_proposal_number_embedded_in_volume2": true,
     "assigned_proposal_number_present": true,
     "assigned_proposal_number_value_exposed": false,
+    "certification_documentary_register_consumed": true,
     "cmmc_packet_consumed": true,
     "cmmc_phase_i_position_supported": false,
     "corporate_official_reviewed": false,
     "dd2345_or_jcp_evidence_verified": false,
+    "no_duplicate_cost_documentary_clear": false,
     "portal_preview_binding_matches_current_upload_set": false,
     "portal_preview_binding_present": false,
     "portal_preview_binding_value_exposed": false,
@@ -348,6 +386,7 @@
     "portal_preview_receipt_present": false,
     "portal_preview_receipt_timestamp_present": false,
     "portal_preview_receipt_value_exposed": false,
+    "technical_data_rights_documentary_clear": false,
     "volume2_pdf_hash_matches_private_record": true,
     "volume3_private_amount_exposed": false,
     "volume3_total_matches_official_ceiling": true

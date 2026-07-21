@@ -13,9 +13,9 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Private target git-ignored: `true`
 - Private values exposed: `false`
 - Required private gates: `50`
-- Passed private gates: `37`
-- Open gates: `13`
-- Gate SHA-256: `933c6755682e31db4bbb329ff2be280a274e02405b8a1a97f31cc28d3d68f273`
+- Passed private gates: `35`
+- Open gates: `15`
+- Gate SHA-256: `5f0799416e680fea31268beb7cd9e5854cd1fe31ff2ebd61a8ec401654087b57`
 
 ## Package Integrity
 
@@ -93,14 +93,25 @@ This public-safe gate reports only package integrity and private-workflow comple
 - Phase I position supported: `false`
 - Overclaim boundary present: `true`
 
+## Certification Documentary Register
+
+- Register: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_CERTIFICATION_DOCUMENTARY_REGISTER_2026-07-21.json`
+- Integrity valid: `true`
+- Source hashes current: `true`
+- Register consumed: `true`
+- Status: `DOCUMENTARY_PREREQUISITES_OPEN`
+- No-duplicate-cost documentary prerequisite clear: `false`
+- Technical-data-rights documentary prerequisite clear: `false`
+- A private boolean cannot clear either gate without a current, integrity-checked register and a hash-bound review record.
+
 ## Reconciliation Groups
 
 - `A_DOCUMENTARY_RETRIEVAL`: `3` gates (`OPEN`)
-- `B_FOUNDER_FACTUAL_ANSWER`: `1` gates (`OPEN`)
-- `C_LEGAL_CERTIFICATION_DECISION`: `6` gates (`OPEN`)
+- `B_FOUNDER_FACTUAL_ANSWER`: `2` gates (`OPEN`)
+- `C_LEGAL_CERTIFICATION_DECISION`: `7` gates (`OPEN`)
 - `D_PORTAL_MECHANICS`: `1` gates (`OPEN`)
 - `E_TECHNICAL_VOLUME_CONSISTENCY`: `2` gates (`OPEN`)
-- `F_CLEARED_BY_EVIDENCE`: `37` gates (`CLEARED`)
+- `F_CLEARED_BY_EVIDENCE`: `35` gates (`CLEARED`)
 
 ## Lifecycle Boundaries
 
@@ -111,11 +122,13 @@ This classification is explanatory only. It cannot clear a gate or change submis
 Evidence, content, registration, and portal facts required before the bounded final-submission gate can open.
 
 - Submission effect: `RESOLVE_BEFORE_FINAL_SUBMISSION`
-- Open gates: `6`
+- Open gates: `8`
 - `CONFLICTS_AND_JOINT_VENTURE_STATUS`
 - `CURRENT_CMMC_REQUIREMENTS_REVIEW`
 - `DD2345_OR_JCP_APPLICATION_EVIDENCE`
 - `DSIP_FIRM_PIN_AVAILABILITY`
+- `NO_DUPLICATE_COST_OR_DELIVERABLE`
+- `TECHNICAL_DATA_RIGHTS_ASSERTION`
 - `VOLUME3_COST_BASIS`
 - `VOLUME5_UPLOAD_SET`
 
@@ -169,16 +182,18 @@ Review the proposed labor rate, 640 PI hours, fringe, indirect base, cloud/data,
 - Open gates: `1`
 - `VOLUME3_COST_BASIS`
 
-### 4. Review conflicts, CMMC, and export-control planning
+### 4. Review conflicts, cost separation, data rights, CMMC, and export-control planning
 
-Answer conflicts and joint-venture status from current facts, review the live CMMC requirement, preserve the no-overclaim position, and document whether a Technology Control Plan is a contracting-negotiation deliverable.
+Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document whether a Technology Control Plan is a contracting-negotiation deliverable.
 
-- Evidence required: Current source review plus bounded founder/corporate-official position
+- Evidence required: Current source review, hash-bound documentary register, and bounded founder/corporate-official position
 - Human boundary: No compliance, assessment, certification, or contracting-office acceptance is inferred.
-- Open gates: `4`
+- Open gates: `6`
 - `CMMC_PHASE_I_SELF_ASSESSMENT_POSITION`
 - `CONFLICTS_AND_JOINT_VENTURE_STATUS`
 - `CURRENT_CMMC_REQUIREMENTS_REVIEW`
+- `NO_DUPLICATE_COST_OR_DELIVERABLE`
+- `TECHNICAL_DATA_RIGHTS_ASSERTION`
 - `TECHNOLOGY_CONTROL_PLAN_DECISION`
 
 ### 5. Lock the Volume 5 supporting-document set
@@ -222,7 +237,9 @@ Only after the fresh preview is stable, review every volume as corporate officia
 - `CURRENT_CMMC_REQUIREMENTS_REVIEW`
 - `DD2345_OR_JCP_APPLICATION_EVIDENCE`
 - `DSIP_FIRM_PIN_AVAILABILITY`
+- `NO_DUPLICATE_COST_OR_DELIVERABLE`
 - `PORTAL_PREVIEW_RECEIPT_HASH`
+- `TECHNICAL_DATA_RIGHTS_ASSERTION`
 - `TECHNOLOGY_CONTROL_PLAN_DECISION`
 - `VOLUME3_COST_BASIS`
 - `VOLUME5_UPLOAD_SET`
@@ -234,8 +251,9 @@ Only after the fresh preview is stable, review every volume as corporate officia
 3. After DSIP assigns a proposal number, run `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`. It reads the number only from the ignored private record, writes the assigned-number DOCX/PDF only to the ignored private area, performs PDF QA, and updates the private PDF hash without exposing either value publicly. Hash the completed portal-preview receipt with `--preview-receipt-file`; a manually entered digest does not establish freshness.
 4. For the ITAR-marked topic, save only an official JCP portal submission receipt or certified DD Form 2345 as a private PDF and complete `config/missionweave_jcp_evidence_private_template_v1.json` beside it. A boolean answer cannot clear this gate without a matching file hash.
 5. Review the consumed CMMC packet at `grant_submissions/compliance_evidence/CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json`. An unresolved packet leaves the supported-position gate open even when a private boolean is checked.
-6. Run `--section approval` only after the corporate official reviews the fresh complete portal preview at action time. The collector binds that authorization to the current preview/upload-set identity and never requests or accepts a Firm PIN or login credential.
-7. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.
+6. Resolve the source-bound prerequisites in `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_CERTIFICATION_DOCUMENTARY_REGISTER_2026-07-21.json`. Preserve each review receipt privately and bind only its SHA-256 in the register; a private checkbox alone cannot clear the no-duplicate-cost or technical-data-rights gates.
+7. Run `--section approval` only after the corporate official reviews the fresh complete portal preview at action time. The collector binds that authorization to the current preview/upload-set identity and never requests or accepts a Firm PIN or login credential.
+8. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.
 
 ## Controls
 
@@ -244,6 +262,7 @@ Only after the fresh preview is stable, review every volume as corporate officia
 - Portal submit performed: `false`
 - Builder can click final submit: `false`
 - Action-time human required: `true`
+- Private boolean can clear documentary gate: `false`
 
 ## Claim Boundary
 

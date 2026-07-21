@@ -7,8 +7,8 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 ## Control Line
 
 - Status: `NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_FAIL_CLOSED_FRESHNESS_BLOCKERS`
-- Generated UTC: `2026-07-21T16:19:41.450660Z`
-- Freshness as-of UTC: `2026-07-21T16:19:41.450660Z`
+- Generated UTC: `2026-07-21T16:59:04.514484Z`
+- Freshness as-of UTC: `2026-07-21T16:59:04.514484Z`
 - Scan date: `2026-07-21`
 - Lane count: `23`
 - Curated Navy lanes: `3`
@@ -22,18 +22,18 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - SAM zero-row response is an inconclusive blocker: `true`
 - Harbor status: `URGENT_PUBLISHED_DEADLINE_REVERIFY_REQUIRED; URGENT_NOT_READY; DEDICATED_PACKAGE; PORTAL_ONLY_UNVERIFIED`
 - Package status counts: `{"CONCEPT": 4, "DEDICATED_PACKAGE": 7, "EXPIRED": 3, "NO_BID": 6, "PORTAL_ONLY": 3}`
-- Strongest today action: OpenAI Build Week is submission-confirmed; preserve the receipt and do not resubmit absent a verified correction. Then use the MissionWeave checklist to move its private action gate beyond 37/50 while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. HarborSentinel is urgent but not ready: retain its dedicated package while rechecking DSIP, freshness, package integrity, eligibility, compliance, cost, and portal gates. Nashville EC is portal-confirmed; DARPA was sent before deadline and later returned a generic procedural thread response without explicit attachment confirmation; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket.
+- Strongest today action: OpenAI Build Week is submission-confirmed; preserve the receipt and do not resubmit absent a verified correction. Then use the MissionWeave checklist to move its private action gate beyond 35/50 while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. HarborSentinel is urgent but not ready: retain its dedicated package while rechecking DSIP, freshness, package integrity, eligibility, compliance, cost, and portal gates. Nashville EC is portal-confirmed; DARPA was sent before deadline and later returned a generic procedural thread response without explicit attachment confirmation; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket.
 - Critical infrastructure action: SAM.gov public credential rotation became overdue after 2026-07-16. Use the guarded hidden-input installer immediately, then require changed-fingerprint and live-API verification. Entity registration remains active; credential rotation is a separate account-maintenance action.
 - Closest deadline lane: DLA26BZ03-NV011 Digital Twin of the Organization for Enhanced Mission Readiness, due July 22, 2026 at 12:00 p.m. Eastern Time. The SBIR.gov topic record and DLA Release 3 schedule agree on July 22, 2026; the downloaded Amendment 2 BAA schedule line prints July 22, 2025, an apparent internal year typo. Reconfirm the live DSIP countdown before submission.; command STAGE_DSIP_PROPOSAL; fit STRONG_TOPIC_FIT_BOUNDED_SYNTHETIC_EVIDENCE_NO_DLA_VALIDATION_CLAIM.
 - Closest stage-ready lane: DLA26BZ03-NV011 Digital Twin of the Organization for Enhanced Mission Readiness, due July 22, 2026 at 12:00 p.m. Eastern Time. The SBIR.gov topic record and DLA Release 3 schedule agree on July 22, 2026; the downloaded Amendment 2 BAA schedule line prints July 22, 2025, an apparent internal year typo. Reconfirm the live DSIP countdown before submission.; command STAGE_DSIP_PROPOSAL; fit STRONG_TOPIC_FIT_BOUNDED_SYNTHETIC_EVIDENCE_NO_DLA_VALIDATION_CLAIM.
-- Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. The hidden sectioned collector captures DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate. The current public action gate is 37/50, with unsupported portal and compliance facts still open. DON26BZ03-NV063 HarborSentinel remains an urgent dedicated-package lane, but it is explicitly not ready and its stale topic mirror cannot refresh the controlling deadline or eligibility. NSF 26-510 stays the next rolling Project Pitch route after its source is refreshed.
+- Best grants lane: DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. The hidden sectioned collector captures DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate. The current public action gate is 35/50, with unsupported portal and compliance facts still open. DON26BZ03-NV063 HarborSentinel remains an urgent dedicated-package lane, but it is explicitly not ready and its stale topic mirror cannot refresh the controlling deadline or eligibility. NSF 26-510 stays the next rolling Project Pitch route after its source is refreshed.
 - Best contract lane: 693JJ326R000012 FHWA TSMO Data Initiative remains partner-only through 2026-08-03, but the Cambridge Systematics response lead confirmed its team is already set, so that outreach route is closed. No solo bid, no duplicate follow-up, and no partner claim; reopen only through a different qualified organization with written role and corporate-experience evidence.
 - Fastest low-friction lane: OpenAI Build Week is submission-confirmed by the public project page and Devpost email. Monitor inbound-only without claiming selection or an award. MissionWeave is now the nearest active portal deadline.
 - Final submit without human: `false`
 - External send without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
-- Command board SHA-256: `f32fae89112447acddd63d91e35ac2797f13a661f7bf448ff4e28723d87efd08`
+- Command board SHA-256: `9d35833dad81604a9247152aea346187034bf845d52d4dfa0760d96bd823109e`
 
 ## Source Freshness
 
@@ -43,12 +43,12 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - Blockers: `6`
 - Boundary: Freshness describes local snapshots only. A current timestamp does not prove eligibility, an unchanged deadline, portal state, or submission readiness; zero-row or inconclusive discovery responses never prove opportunity absence.
 
-- `grant_reviewer_curation`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:21:42Z` age_hours=`104.967` blocking=`true`
-- `grant_reviewer_feed`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:58:16.957707Z` age_hours=`104.357` blocking=`true`
-- `sam_rush_board`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-10T17:17:18.392822Z` age_hours=`263.04` blocking=`true`
+- `grant_reviewer_curation`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:21:42Z` age_hours=`105.623` blocking=`true`
+- `grant_reviewer_feed`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:58:16.957707Z` age_hours=`105.013` blocking=`true`
+- `sam_rush_board`: status=`STALE_REVERIFY_REQUIRED` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-10T17:17:18.392822Z` age_hours=`263.696` blocking=`true`
 - `grants_ranked`: status=`UNDATED_REVERIFY_REQUIRED` freshness=`UNDATED_REVERIFY_REQUIRED` source_utc=`None` age_hours=`None` blocking=`true`
 - `zero_friction_pack`: status=`UNDATED_REVERIFY_REQUIRED` freshness=`UNDATED_REVERIFY_REQUIRED` source_utc=`None` age_hours=`None` blocking=`true`
-- `sam_live_discovery`: status=`ZERO_ROW_SAM_RESPONSE_INCONCLUSIVE_BLOCKER` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:57:56.457071Z` age_hours=`104.362` blocking=`true`
+- `sam_live_discovery`: status=`ZERO_ROW_SAM_RESPONSE_INCONCLUSIVE_BLOCKER` freshness=`STALE_REVERIFY_REQUIRED` source_utc=`2026-07-17T07:57:56.457071Z` age_hours=`105.019` blocking=`true`
   - SAM records: `0`; reported diagnostic: `HTTP_404_EMPTY_RESPONSE_INCONCLUSIVE`; zero rows: `true`
 
 ## Operational Controls
@@ -596,12 +596,12 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - Route: Defense SBIR/STTR Innovation Portal (DSIP)
 - Official URL: https://www.sbir.gov/topics/12778
 - Secondary URL: https://www.dodsbirsttr.mil/
-- Why now: This is the nearest complete federal Phase I proposal package. The 15-file manifest verifies byte-for-byte, the technical candidate is claim-bounded, and the official topic fit is strong. It is not submission-ready: the current public action gate is 37/50, and every remaining gate must be resolved without exposing identity, cost, ITAR, CMMC, award-history, foreign-affiliation, rights, preview, or certification values.
+- Why now: This is the nearest complete federal Phase I proposal package. The 15-file manifest verifies byte-for-byte, the technical candidate is claim-bounded, and the official topic fit is strong. It is not submission-ready: the current public action gate is 35/50, and every remaining gate must be resolved without exposing identity, cost, ITAR, CMMC, award-history, foreign-affiliation, rights, preview, or certification values.
 - Today work:
   - Submit the JCP application and retain official evidence: Use the official JCP portal. Registration or prerequisites in progress are not enough; retain the official application-submission receipt PDF or a current certified DD Form 2345 in the ignored private evidence area.
   - Confirm Firm PIN availability inside DSIP: Confirm that the organization-linked DSIP account can access the Firm PIN. Do not place the PIN itself in chat, Git, logs, or the private gate record.
   - Support and approve the Volume 3 cost basis: Review the proposed labor rate, 640 PI hours, fringe, indirect base, cloud/data, travel, software/storage, no-subcontractor position, and 100,000 dollar total against actual records before approving the cost volume.
-  - Review conflicts, CMMC, and export-control planning: Answer conflicts and joint-venture status from current facts, review the live CMMC requirement, preserve the no-overclaim position, and document whether a Technology Control Plan is a contracting-negotiation deliverable.
+  - Review conflicts, cost separation, data rights, CMMC, and export-control planning: Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document whether a Technology Control Plan is a contracting-negotiation deliverable.
   - Lock the Volume 5 supporting-document set: Upload only current, applicable documents. For the ITAR-marked scope, include the verified JCP/DD Form 2345 evidence required by the BAA; do not upload the obsolete foreign-affiliations PDF.
   - Review and seal a fresh complete DSIP preview: After every field and upload is final, inspect all seven volumes, filenames, hashes, cost totals, and the live deadline. Save the current preview receipt privately and bind it with the collector.
   - Perform corporate review and action-time authorization: Only after the fresh preview is stable, review every volume as corporate official, capture the short-lived approval binding, and authorize the exact final submission.
@@ -627,8 +627,8 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   - `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py`
   - `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md`
 - Action gate: `PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN`
-- Action gates passed: `37/50`
-- Action gates open: `13`
+- Action gates passed: `35/50`
+- Action gates open: `15`
 - Private input present: `true`
 - Private values exposed: `false`
 - Ready for human final click: `false`
@@ -641,13 +641,13 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   1. Submit the JCP application and retain official evidence
   2. Confirm Firm PIN availability inside DSIP
   3. Support and approve the Volume 3 cost basis
-  4. Review conflicts, CMMC, and export-control planning
+  4. Review conflicts, cost separation, data rights, CMMC, and export-control planning
   5. Lock the Volume 5 supporting-document set
   6. Review and seal a fresh complete DSIP preview
   7. Perform corporate review and action-time authorization
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `a20f3314ebf9fcb5a244a46f3224de073cd6cac25d349ed8f5e26b6f2b0c0e64`
+- Lane SHA-256: `7410e1bc148593065a28ef8bc7afae85e3c4c1462f24dd809bae6f17bc5c2659`
 
 ### 6. DON26BZ03-NV063 - Anomalous Behavior Detection and Alerting for Congested Maritime Environments
 
@@ -703,7 +703,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   - `grant_submissions/NV063_HarborSentinel/render_qa_20260716_dsip_candidate_v1/page-5.png`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `d57d310ca132d9b0eca45d4af44d9a8a2be9729d13740dd7057a9de0c86ce14f`
+- Lane SHA-256: `37bb398c9356a4934f5299028f9f2702b6a9732efe46b9f8f81290a5ce2c7351`
 
 ### 7. DON26BZ03-NV065 - Adaptive Sensor Management
 
@@ -742,7 +742,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   - `grant_submissions/NV065_AdaptiveSensorManagement/NV065_READINESS.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `28b26e0382dd5380560654458dd4461d9fe3d9b88fba5309ad4683a3ce6946b7`
+- Lane SHA-256: `0ba87f969bb046997a0f4c4ff5a0b012b8a79ab45f5df28862d1139b3ac6dae9`
 
 ### 8. DON26BZ03-NV061 - Predictive Movement for Object Oriented Tracking
 
@@ -781,7 +781,7 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
   - `grant_submissions/NV061_TrackCast/NV061_READINESS.md`
 - External send without human: `false`
 - Final submit without human: `false`
-- Lane SHA-256: `6954a817979f4bee888f20ebbd123fd1a5248afa8d797a2c05714cb4b98df74c`
+- Lane SHA-256: `453757e1225642fd8a6a692418e2401f120d8bc9b52e1c36cba48540bd0a8aac`
 
 ### 9. ACCAPGAIDPRFI4 - Army Intelligence Data Platform RFI #4
 
@@ -1351,8 +1351,8 @@ Direct answer: HarborSentinel remains urgent but is not ready; its dedicated pac
 - `missionweave_dsip_package_manifest`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PACKAGE_MANIFEST_2026-07-16.json` present=`true` sha256=`e5ab4138476246685fd365f16b3be0d00679007765550d96844e2fa794b480c1`
 - `missionweave_dsip_assembly_map`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ASSEMBLY_MAP_2026-07-16.md` present=`true` sha256=`9f5f043d678bdcab74c7b1e4993c75a807da60bdb9a5ba05eeb5eb41487ed9ed`
 - `missionweave_volume2_pdf`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.pdf` present=`true` sha256=`88f92de4a22ff56f49d5c9c8d5bae8d3973db88f37634b648263958e3625eadb`
-- `missionweave_dsip_action_gate`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json` present=`true` sha256=`0eeb6f069dfd952fcae092d066a25469a46654ccbdcd4f1a2a535d26984866a5`
-- `missionweave_dsip_portal_checklist`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md` present=`true` sha256=`0159b102eea0a3c683d7e9c5cf2c68a8bde8fbbd5e6051e54395c4d35a59c62a`
+- `missionweave_dsip_action_gate`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json` present=`true` sha256=`24e20f494a0bbe2e1d012cbab3958caf7dada211767273a2ad5ba0eadb88c417`
+- `missionweave_dsip_portal_checklist`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md` present=`true` sha256=`6a65810e8cad9e5a319be8f83b9a2c573d2e8d22a7e9834fcca685c1e66256a6`
 - `missionweave_dsip_private_capture_tool`: `code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py` present=`true` sha256=`9370e2a9fd3a237dbe306431b8c6a1fb51db2069a5429db7d6572f66e96773f5`
 - `missionweave_dsip_private_volume2_finalizer`: `code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py` present=`true` sha256=`01e91a669e6b901f114a1b7ed5865c6dca90ceadc9b4e7acf1311f5173bcbb3a`
 - `missionweave_dsip_private_capture_workflow`: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md` present=`true` sha256=`b70a8345d7d7021ea146abfc728199086bb3da8b3dfa6c5fb88c82251b38704d`

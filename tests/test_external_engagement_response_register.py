@@ -169,7 +169,9 @@ def test_register_routes_current_actions_without_duplicate_sends():
         "next_action"
     ]
     darpa = records["darpa_sn_26_97_low_resource_computing_rfi"]
-    assert darpa["state"] == "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING"
+    assert darpa["state"] == (
+        "FORMAL_RFI_PACKAGE_SENT_AGENCY_RESPONSE_RECEIVED_MONITOR_ONLY"
+    )
     assert darpa["decision"] == "MONITOR_FORMAL_PACKAGE_NO_DUPLICATE"
     assert darpa["attachment_count"] == 2
     assert darpa["timely_submission_claimed"] is False

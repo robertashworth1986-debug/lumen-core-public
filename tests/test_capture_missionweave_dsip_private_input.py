@@ -34,8 +34,10 @@ AUTHORITATIVE_OPEN_GATES = {
     "CURRENT_CMMC_REQUIREMENTS_REVIEW",
     "DD2345_OR_JCP_APPLICATION_EVIDENCE",
     "DSIP_FIRM_PIN_AVAILABILITY",
+    "NO_DUPLICATE_COST_OR_DELIVERABLE",
     "PORTAL_PREVIEW_RECEIPT_HASH",
     "SAM_REPRESENTATIONS_CURRENT",
+    "TECHNICAL_DATA_RIGHTS_ASSERTION",
     "TECHNOLOGY_CONTROL_PLAN_DECISION",
     "VOLUME3_COST_BASIS",
     "VOLUME5_UPLOAD_SET",
@@ -147,7 +149,7 @@ def keep_pre_submit_answers() -> list[str]:
     ]
 
 
-def test_pre_submit_preserves_authoritative_36_of_50_and_excludes_approval(
+def test_pre_submit_preserves_authoritative_34_of_50_and_excludes_approval(
     tmp_path: Path,
 ):
     module = load_module()
@@ -189,8 +191,8 @@ def test_pre_submit_preserves_authoritative_36_of_50_and_excludes_approval(
     assert receipt["sections_updated"] == list(module.PRE_SUBMIT_SECTIONS)
     assert receipt["approval_section_explicitly_requested"] is False
     assert receipt["gate_summary"]["required_gate_count"] == 50
-    assert receipt["gate_summary"]["passed_gate_count"] == 36
-    assert receipt["gate_summary"]["open_gate_count"] == 14
+    assert receipt["gate_summary"]["passed_gate_count"] == 34
+    assert receipt["gate_summary"]["open_gate_count"] == 16
     assert set(receipt["gate_summary"]["unresolved_gates"]) == (
         AUTHORITATIVE_OPEN_GATES
     )
@@ -305,8 +307,8 @@ def test_fresh_preview_and_approval_bind_current_upload_then_upstream_change_cle
     assert preview_receipt["action_time_authorization_gate_passed"] is False
     assert approval_receipt["status"] == "PRIVATE_INPUT_SECTION_CAPTURED_GATES_OPEN"
     assert approval_receipt["action_time_authorization_gate_passed"] is True
-    assert approval_receipt["gate_summary"]["passed_gate_count"] == 42
-    assert approval_receipt["gate_summary"]["open_gate_count"] == 8
+    assert approval_receipt["gate_summary"]["passed_gate_count"] == 40
+    assert approval_receipt["gate_summary"]["open_gate_count"] == 10
     assert "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION" in approval_receipt[
         "gate_summary"
     ]["unresolved_gates"]

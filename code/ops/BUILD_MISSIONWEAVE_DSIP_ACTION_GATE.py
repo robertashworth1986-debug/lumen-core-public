@@ -48,6 +48,9 @@ CMMC_EVIDENCE_PACKET = (
     / "compliance_evidence"
     / "CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json"
 )
+CERTIFICATION_DOCUMENTARY_REGISTER = (
+    PACKAGE_DIR / "MISSIONWEAVE_CERTIFICATION_DOCUMENTARY_REGISTER_2026-07-21.json"
+)
 OUT_JSON = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
 OUT_MD = PACKAGE_DIR / "MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md"
 OUT_CHECKLIST = PACKAGE_DIR / "MISSIONWEAVE_DSIP_PORTAL_CHECKLIST_2026-07-17.md"
@@ -62,6 +65,48 @@ CMMC_PACKET_SCHEMA = "lumencore.cmmc_export_evidence_packet.v1"
 CMMC_PROGRAM_ID = "MissionWeave"
 CMMC_FACT_ID = "missionweave.cmmc_l2_self_status"
 CMMC_CONTROL = "CMMC_L2_SELF_STATUS"
+CERTIFICATION_DOCUMENTARY_SCHEMA = (
+    "lumencore.missionweave_certification_documentary_register.v1"
+)
+CERTIFICATION_DOCUMENTARY_GATE_IDS = frozenset(
+    {
+        "NO_DUPLICATE_COST_OR_DELIVERABLE",
+        "TECHNICAL_DATA_RIGHTS_ASSERTION",
+    }
+)
+CERTIFICATION_DOCUMENTARY_SOURCE_PATHS = {
+    "PUBLIC_REPOSITORY_LICENSE": ROOT / "LICENSE",
+    "RELATED_EFFORT_OVERLAP_MATRIX": (
+        PACKAGE_DIR / "MISSIONWEAVE_RELATED_EFFORT_OVERLAP_MATRIX_2026-07-18.md"
+    ),
+    "VOLUME2_TECHNICAL_DATA_RIGHTS_ASSERTION": (
+        PACKAGE_DIR / "MISSIONWEAVE_DSIP_VOLUME2_FINAL_CANDIDATE_2026-07-16.md"
+    ),
+    "VOLUME5_RIGHTS_AND_OVERLAP_WORKSHEET": (
+        PACKAGE_DIR / "MISSIONWEAVE_DSIP_VOLUME5_WORKSHEET_2026-07-16.md"
+    ),
+}
+CERTIFICATION_DOCUMENTARY_GATE_SOURCE_ROLES = {
+    "NO_DUPLICATE_COST_OR_DELIVERABLE": frozenset(
+        {
+            "RELATED_EFFORT_OVERLAP_MATRIX",
+            "VOLUME5_RIGHTS_AND_OVERLAP_WORKSHEET",
+        }
+    ),
+    "TECHNICAL_DATA_RIGHTS_ASSERTION": frozenset(
+        {
+            "PUBLIC_REPOSITORY_LICENSE",
+            "VOLUME2_TECHNICAL_DATA_RIGHTS_ASSERTION",
+            "VOLUME5_RIGHTS_AND_OVERLAP_WORKSHEET",
+        }
+    ),
+}
+CERTIFICATION_DOCUMENTARY_REVIEW_AUTHORITIES = {
+    "NO_DUPLICATE_COST_OR_DELIVERABLE": "CORPORATE_OFFICIAL",
+    "TECHNICAL_DATA_RIGHTS_ASSERTION": (
+        "QUALIFIED_RIGHTS_REVIEW_AND_CORPORATE_OFFICIAL"
+    ),
+}
 CMMC_READY_EVIDENCE_STATES = frozenset(
     {"AUTHORITATIVE_PROOF_INVENTORIED", "NOT_APPLICABLE_REVIEW_INVENTORIED"}
 )
@@ -296,21 +341,27 @@ FOUNDER_ACTION_DEFINITIONS = (
     },
     {
         "step_id": "04_COMPLIANCE_AND_CONFLICT_POSITION",
-        "title": "Review conflicts, CMMC, and export-control planning",
+        "title": "Review conflicts, cost separation, data rights, CMMC, and export-control planning",
         "gate_ids": frozenset(
             {
                 "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
                 "CONFLICTS_AND_JOINT_VENTURE_STATUS",
                 "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+                "NO_DUPLICATE_COST_OR_DELIVERABLE",
+                "TECHNICAL_DATA_RIGHTS_ASSERTION",
                 "TECHNOLOGY_CONTROL_PLAN_DECISION",
             }
         ),
         "instruction": (
-            "Answer conflicts and joint-venture status from current facts, review the live "
-            "CMMC requirement, preserve the no-overclaim position, and document whether a "
-            "Technology Control Plan is a contracting-negotiation deliverable."
+            "Answer conflicts and joint-venture status from current facts; reconcile the "
+            "no-duplicate-cost position and technical-data-rights schedule against source "
+            "records; review the live CMMC requirement; preserve the no-overclaim position; "
+            "and document whether a Technology Control Plan is a contracting-negotiation deliverable."
         ),
-        "evidence_required": "Current source review plus bounded founder/corporate-official position",
+        "evidence_required": (
+            "Current source review, hash-bound documentary register, and bounded "
+            "founder/corporate-official position"
+        ),
         "human_boundary": (
             "No compliance, assessment, certification, or contracting-office acceptance is inferred."
         ),
@@ -963,6 +1014,317 @@ def cmmc_packet_is_consumed(state: Any) -> bool:
     )
 
 
+def inspect_certification_documentary_register(
+    register_path: Path = CERTIFICATION_DOCUMENTARY_REGISTER,
+) -> dict[str, Any]:
+    gate_decisions = {
+        gate_id: False for gate_id in sorted(CERTIFICATION_DOCUMENTARY_GATE_IDS)
+    }
+    state: dict[str, Any] = {
+        "register_present": register_path.is_file(),
+        "register_regular_file": False,
+        "schema_valid": False,
+        "topic_valid": False,
+        "generated_timestamp_valid": False,
+        "integrity_valid": False,
+        "source_set_valid": False,
+        "source_hashes_current": False,
+        "gate_set_valid": False,
+        "gate_rows_valid": False,
+        "controls_valid": False,
+        "claim_boundary_present": False,
+        "register_consumed": False,
+        "status": None,
+        "gate_decisions": gate_decisions,
+        "open_gate_ids": sorted(gate_decisions),
+        "register_binding_sha256": None,
+        "failure_code": "CERTIFICATION_DOCUMENTARY_REGISTER_NOT_FOUND",
+    }
+    if register_path.is_symlink() or not register_path.is_file():
+        if register_path.is_symlink():
+            state["failure_code"] = (
+                "CERTIFICATION_DOCUMENTARY_REGISTER_SYMLINK_REJECTED"
+            )
+        return state
+    state["register_regular_file"] = True
+
+    try:
+        register = json.loads(register_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        state["failure_code"] = "CERTIFICATION_DOCUMENTARY_REGISTER_INVALID"
+        return state
+    if not isinstance(register, dict):
+        state["failure_code"] = "CERTIFICATION_DOCUMENTARY_REGISTER_NOT_OBJECT"
+        return state
+
+    expected_top_keys = {
+        "schema",
+        "generated_utc",
+        "topic",
+        "status",
+        "source_artifacts",
+        "gates",
+        "controls",
+        "claim_boundary",
+        "integrity",
+    }
+    if set(register) != expected_top_keys:
+        state["failure_code"] = "CERTIFICATION_DOCUMENTARY_REGISTER_SCHEMA_DRIFT"
+        return state
+
+    integrity = register.get("integrity")
+    expected_hash = (
+        integrity.get("register_sha256") if isinstance(integrity, dict) else None
+    )
+    candidate = deepcopy(register)
+    candidate_integrity = candidate.get("integrity")
+    if isinstance(candidate_integrity, dict):
+        candidate_integrity["register_sha256"] = ""
+    state["schema_valid"] = (
+        register.get("schema") == CERTIFICATION_DOCUMENTARY_SCHEMA
+    )
+    state["topic_valid"] = register.get("topic") == TOPIC
+    state["generated_timestamp_valid"] = valid_timestamp(
+        register.get("generated_utc")
+    )
+    state["integrity_valid"] = bool(
+        isinstance(integrity, dict)
+        and set(integrity) == {"hash_algorithm", "register_sha256"}
+        and integrity.get("hash_algorithm") == "SHA-256"
+        and valid_sha256(expected_hash)
+        and hmac.compare_digest(
+            str(expected_hash).casefold(), stable_sha256(candidate).casefold()
+        )
+    )
+
+    source_rows = register.get("source_artifacts")
+    source_by_role: dict[str, dict[str, Any]] = {}
+    source_rows_structural = isinstance(source_rows, list)
+    if source_rows_structural:
+        for row in source_rows:
+            if (
+                not isinstance(row, dict)
+                or set(row) != {"role", "path", "sha256"}
+                or not isinstance(row.get("role"), str)
+                or row["role"] in source_by_role
+            ):
+                source_rows_structural = False
+                break
+            source_by_role[row["role"]] = row
+    state["source_set_valid"] = bool(
+        source_rows_structural
+        and set(source_by_role) == set(CERTIFICATION_DOCUMENTARY_SOURCE_PATHS)
+    )
+    source_hashes_current = state["source_set_valid"]
+    if source_hashes_current:
+        for role, expected_path in CERTIFICATION_DOCUMENTARY_SOURCE_PATHS.items():
+            row = source_by_role[role]
+            recorded_hash = row.get("sha256")
+            if not (
+                row.get("path") == rel(expected_path)
+                and path_is_within(expected_path, ROOT)
+                and expected_path.is_file()
+                and not expected_path.is_symlink()
+                and valid_sha256(recorded_hash)
+                and hmac.compare_digest(
+                    str(recorded_hash).casefold(),
+                    sha256_file(expected_path).casefold(),
+                )
+            ):
+                source_hashes_current = False
+                break
+    state["source_hashes_current"] = bool(source_hashes_current)
+
+    gate_rows = register.get("gates")
+    gates_by_id: dict[str, dict[str, Any]] = {}
+    gate_rows_structural = isinstance(gate_rows, list)
+    if gate_rows_structural:
+        for row in gate_rows:
+            if (
+                not isinstance(row, dict)
+                or set(row)
+                != {
+                    "gate_id",
+                    "documentary_clear",
+                    "private_boolean_can_clear_alone",
+                    "required_source_roles",
+                    "open_prerequisites",
+                    "review_record",
+                }
+                or not isinstance(row.get("gate_id"), str)
+                or row["gate_id"] in gates_by_id
+            ):
+                gate_rows_structural = False
+                break
+            gates_by_id[row["gate_id"]] = row
+    state["gate_set_valid"] = bool(
+        gate_rows_structural
+        and set(gates_by_id) == set(CERTIFICATION_DOCUMENTARY_GATE_IDS)
+    )
+
+    gate_rows_valid = state["gate_set_valid"]
+    if gate_rows_valid:
+        for gate_id in sorted(CERTIFICATION_DOCUMENTARY_GATE_IDS):
+            row = gates_by_id[gate_id]
+            required_roles = row.get("required_source_roles")
+            prerequisites = row.get("open_prerequisites")
+            review = row.get("review_record")
+            documentary_clear = row.get("documentary_clear")
+            required_role_set = (
+                {
+                    value
+                    for value in required_roles
+                    if isinstance(value, str) and value
+                }
+                if isinstance(required_roles, list)
+                else set()
+            )
+            prerequisites_valid = bool(
+                isinstance(prerequisites, list)
+                and all(isinstance(value, str) and value for value in prerequisites)
+            )
+            review_structural = bool(
+                isinstance(review, dict)
+                and set(review)
+                == {
+                    "status",
+                    "required_authority",
+                    "completed_utc",
+                    "private_review_receipt_sha256",
+                }
+                and review.get("required_authority")
+                == CERTIFICATION_DOCUMENTARY_REVIEW_AUTHORITIES[gate_id]
+            )
+            cleared_review = bool(
+                review_structural
+                and review.get("status") == "COMPLETE"
+                and valid_timestamp(review.get("completed_utc"))
+                and valid_sha256(review.get("private_review_receipt_sha256"))
+            )
+            open_review = bool(
+                review_structural
+                and review.get("status") == "OPEN"
+                and review.get("completed_utc") is None
+                and review.get("private_review_receipt_sha256") is None
+            )
+            row_valid = bool(
+                isinstance(documentary_clear, bool)
+                and row.get("private_boolean_can_clear_alone") is False
+                and required_role_set
+                == set(CERTIFICATION_DOCUMENTARY_GATE_SOURCE_ROLES[gate_id])
+                and prerequisites_valid
+                and (
+                    (
+                        documentary_clear is True
+                        and prerequisites == []
+                        and cleared_review
+                    )
+                    or (
+                        documentary_clear is False
+                        and bool(prerequisites)
+                        and open_review
+                    )
+                )
+            )
+            if not row_valid:
+                gate_rows_valid = False
+                break
+            gate_decisions[gate_id] = bool(
+                documentary_clear
+                and cleared_review
+                and set(CERTIFICATION_DOCUMENTARY_GATE_SOURCE_ROLES[gate_id])
+                .issubset(source_by_role)
+            )
+    state["gate_rows_valid"] = bool(gate_rows_valid)
+
+    controls = register.get("controls")
+    state["controls_valid"] = bool(
+        isinstance(controls, dict)
+        and controls
+        == {
+            "source_hash_match_required": True,
+            "all_prerequisites_closed_required": True,
+            "review_receipt_hash_required_to_clear": True,
+            "private_boolean_can_clear_documentary_gate": False,
+            "register_change_invalidates_portal_preview_binding": True,
+            "register_change_invalidates_action_time_approval_binding": True,
+            "legal_or_accounting_conclusion_automated": False,
+        }
+    )
+    state["claim_boundary_present"] = bool(
+        isinstance(register.get("claim_boundary"), str)
+        and register["claim_boundary"].strip()
+    )
+    all_documentary_gates_clear = all(gate_decisions.values())
+    expected_status = (
+        "DOCUMENTARY_PREREQUISITES_CLEAR"
+        if all_documentary_gates_clear
+        else "DOCUMENTARY_PREREQUISITES_OPEN"
+    )
+    state["status"] = (
+        register.get("status") if isinstance(register.get("status"), str) else None
+    )
+    status_valid = state["status"] == expected_status
+    register_consumed = bool(
+        state["register_regular_file"]
+        and state["schema_valid"]
+        and state["topic_valid"]
+        and state["generated_timestamp_valid"]
+        and state["integrity_valid"]
+        and state["source_set_valid"]
+        and state["source_hashes_current"]
+        and state["gate_set_valid"]
+        and state["gate_rows_valid"]
+        and state["controls_valid"]
+        and state["claim_boundary_present"]
+        and status_valid
+    )
+    state["register_consumed"] = register_consumed
+    state["gate_decisions"] = (
+        gate_decisions
+        if register_consumed
+        else {gate_id: False for gate_id in sorted(gate_decisions)}
+    )
+    state["open_gate_ids"] = sorted(
+        gate_id
+        for gate_id, cleared in state["gate_decisions"].items()
+        if not cleared
+    )
+    state["register_binding_sha256"] = (
+        str(expected_hash).upper() if register_consumed else None
+    )
+    state["failure_code"] = (
+        None if register_consumed else "CERTIFICATION_DOCUMENTARY_REGISTER_REJECTED"
+    )
+    return state
+
+
+def certification_documentary_register_is_consumed(state: Any) -> bool:
+    if not isinstance(state, dict):
+        return False
+    decisions = state.get("gate_decisions")
+    return bool(
+        state.get("register_present") is True
+        and state.get("register_regular_file") is True
+        and state.get("schema_valid") is True
+        and state.get("topic_valid") is True
+        and state.get("generated_timestamp_valid") is True
+        and state.get("integrity_valid") is True
+        and state.get("source_set_valid") is True
+        and state.get("source_hashes_current") is True
+        and state.get("gate_set_valid") is True
+        and state.get("gate_rows_valid") is True
+        and state.get("controls_valid") is True
+        and state.get("claim_boundary_present") is True
+        and state.get("register_consumed") is True
+        and isinstance(decisions, dict)
+        and set(decisions) == set(CERTIFICATION_DOCUMENTARY_GATE_IDS)
+        and all(isinstance(value, bool) for value in decisions.values())
+        and state.get("failure_code") is None
+        and valid_sha256(state.get("register_binding_sha256"))
+    )
+
+
 def require_exact_keys(section: Any, expected: set[str], code: str) -> dict[str, Any]:
     if not isinstance(section, dict) or set(section) != expected:
         raise MissionWeaveGateError(code)
@@ -1305,7 +1667,10 @@ def current_upload_set_identity_sha256(
     jcp_evidence_state: dict[str, Any],
     volume3_artifact_state: dict[str, Any],
     cmmc_packet_state: dict[str, Any],
+    documentary_register_state: dict[str, Any] | None = None,
 ) -> str:
+    if documentary_register_state is None:
+        documentary_register_state = inspect_certification_documentary_register()
     identity = payload.get("identity")
     proposal = payload.get("proposal")
     compliance = payload.get("eligibility_and_compliance")
@@ -1344,6 +1709,13 @@ def current_upload_set_identity_sha256(
             if cmmc_packet_is_consumed(cmmc_packet_state)
             else None
         ),
+        "certification_documentary_register_binding_sha256": (
+            documentary_register_state.get("register_binding_sha256")
+            if certification_documentary_register_is_consumed(
+                documentary_register_state
+            )
+            else None
+        ),
     }
     return stable_sha256(context).upper()
 
@@ -1354,6 +1726,7 @@ def preview_evidence_binding_sha256(
     jcp_evidence_state: dict[str, Any],
     volume3_artifact_state: dict[str, Any],
     cmmc_packet_state: dict[str, Any],
+    documentary_register_state: dict[str, Any] | None = None,
 ) -> str | None:
     proposal = payload.get("proposal")
     if not isinstance(proposal, dict):
@@ -1372,6 +1745,7 @@ def preview_evidence_binding_sha256(
             jcp_evidence_state=jcp_evidence_state,
             volume3_artifact_state=volume3_artifact_state,
             cmmc_packet_state=cmmc_packet_state,
+            documentary_register_state=documentary_register_state,
         ),
     }
     return stable_sha256(binding).upper()
@@ -1384,6 +1758,7 @@ def action_time_approval_binding_sha256(
     jcp_evidence_state: dict[str, Any],
     volume3_artifact_state: dict[str, Any],
     cmmc_packet_state: dict[str, Any],
+    documentary_register_state: dict[str, Any] | None = None,
 ) -> str | None:
     if not valid_timestamp(approval_utc):
         return None
@@ -1401,12 +1776,14 @@ def action_time_approval_binding_sha256(
             jcp_evidence_state=jcp_evidence_state,
             volume3_artifact_state=volume3_artifact_state,
             cmmc_packet_state=cmmc_packet_state,
+            documentary_register_state=documentary_register_state,
         ),
         "upload_set_identity_sha256": current_upload_set_identity_sha256(
             payload,
             jcp_evidence_state=jcp_evidence_state,
             volume3_artifact_state=volume3_artifact_state,
             cmmc_packet_state=cmmc_packet_state,
+            documentary_register_state=documentary_register_state,
         ),
     }
     return stable_sha256(binding).upper()
@@ -1420,6 +1797,7 @@ def evaluate_private_payload(
     volume3_artifact_state: dict[str, Any] | None = None,
     jcp_evidence_state: dict[str, Any] | None = None,
     cmmc_packet_state: dict[str, Any] | None = None,
+    documentary_register_state: dict[str, Any] | None = None,
     evaluated_utc: datetime | str | None = None,
 ) -> dict[str, Any]:
     if payload.get("schema") != PRIVATE_SCHEMA:
@@ -1479,6 +1857,8 @@ def evaluate_private_payload(
         jcp_evidence_state = inspect_private_jcp_evidence()
     if cmmc_packet_state is None:
         cmmc_packet_state = inspect_cmmc_evidence_packet()
+    if documentary_register_state is None:
+        documentary_register_state = inspect_certification_documentary_register()
     jcp_evidence_verified = jcp_evidence_is_verified(jcp_evidence_state)
     gate_state["DD2345_OR_JCP_APPLICATION_EVIDENCE"] = bool(
         compliance.get("dd2345_or_jcp_application_evidence_ready") is True
@@ -1499,6 +1879,23 @@ def evaluate_private_payload(
         compliance.get("no_cmmc_status_overclaim") is True
         and cmmc_packet_consumed
         and cmmc_packet_state.get("overclaim_boundary_present") is True
+    )
+    documentary_register_consumed = certification_documentary_register_is_consumed(
+        documentary_register_state
+    )
+    documentary_gate_decisions = (
+        documentary_register_state.get("gate_decisions", {})
+        if documentary_register_consumed
+        else {}
+    )
+    gate_state["NO_DUPLICATE_COST_OR_DELIVERABLE"] = bool(
+        compliance.get("no_duplicate_cost_or_deliverable") is True
+        and documentary_gate_decisions.get("NO_DUPLICATE_COST_OR_DELIVERABLE")
+        is True
+    )
+    gate_state["TECHNICAL_DATA_RIGHTS_ASSERTION"] = bool(
+        compliance.get("technical_data_rights_assertion_supported") is True
+        and documentary_gate_decisions.get("TECHNICAL_DATA_RIGHTS_ASSERTION") is True
     )
 
     proposal_number = proposal.get("proposal_number")
@@ -1534,6 +1931,7 @@ def evaluate_private_payload(
         jcp_evidence_state=jcp_evidence_state,
         volume3_artifact_state=volume3_artifact_state,
         cmmc_packet_state=cmmc_packet_state,
+        documentary_register_state=documentary_register_state,
     )
     preview_binding_matches = bool(
         expected_preview_binding is not None
@@ -1564,6 +1962,7 @@ def evaluate_private_payload(
         jcp_evidence_state=jcp_evidence_state,
         volume3_artifact_state=volume3_artifact_state,
         cmmc_packet_state=cmmc_packet_state,
+        documentary_register_state=documentary_register_state,
     )
     recorded_approval_binding = approval.get("approval_binding_sha256")
     approval_binding_matches = bool(
@@ -1639,6 +2038,16 @@ def evaluate_private_payload(
             cmmc_packet_consumed
             and cmmc_packet_state.get("phase_i_position_supported") is True
         ),
+        "certification_documentary_register_consumed": (
+            documentary_register_consumed
+        ),
+        "no_duplicate_cost_documentary_clear": bool(
+            documentary_gate_decisions.get("NO_DUPLICATE_COST_OR_DELIVERABLE")
+            is True
+        ),
+        "technical_data_rights_documentary_clear": bool(
+            documentary_gate_decisions.get("TECHNICAL_DATA_RIGHTS_ASSERTION") is True
+        ),
     }
 
 
@@ -1651,6 +2060,7 @@ def build_payload(
     volume3_artifact_state: dict[str, Any] | None = None,
     jcp_evidence_state: dict[str, Any] | None = None,
     cmmc_packet_state: dict[str, Any] | None = None,
+    documentary_register_state: dict[str, Any] | None = None,
     evaluated_utc: datetime | str | None = None,
 ) -> dict[str, Any]:
     reference_utc = normalize_reference_time(evaluated_utc)
@@ -1668,6 +2078,8 @@ def build_payload(
         jcp_evidence_state = inspect_private_jcp_evidence()
     if cmmc_packet_state is None:
         cmmc_packet_state = inspect_cmmc_evidence_packet()
+    if documentary_register_state is None:
+        documentary_register_state = inspect_certification_documentary_register()
     evaluation = (
         evaluate_private_payload(
             private_payload,
@@ -1676,6 +2088,7 @@ def build_payload(
             volume3_artifact_state=volume3_artifact_state,
             jcp_evidence_state=jcp_evidence_state,
             cmmc_packet_state=cmmc_packet_state,
+            documentary_register_state=documentary_register_state,
             evaluated_utc=reference_utc,
         )
         if private_payload is not None
@@ -1766,6 +2179,28 @@ def build_payload(
             "requirements_review_basis_present",
             "phase_i_position_supported",
             "overclaim_boundary_present",
+            "failure_code",
+        )
+    }
+    public_documentary_register_state = {
+        key: documentary_register_state.get(key)
+        for key in (
+            "register_present",
+            "register_regular_file",
+            "schema_valid",
+            "topic_valid",
+            "generated_timestamp_valid",
+            "integrity_valid",
+            "source_set_valid",
+            "source_hashes_current",
+            "gate_set_valid",
+            "gate_rows_valid",
+            "controls_valid",
+            "claim_boundary_present",
+            "register_consumed",
+            "status",
+            "gate_decisions",
+            "open_gate_ids",
             "failure_code",
         )
     }
@@ -1897,6 +2332,17 @@ def build_payload(
             "cmmc_phase_i_position_supported": bool(
                 evaluation and evaluation["cmmc_phase_i_position_supported"]
             ),
+            "certification_documentary_register_consumed": bool(
+                evaluation
+                and evaluation["certification_documentary_register_consumed"]
+            ),
+            "no_duplicate_cost_documentary_clear": bool(
+                evaluation and evaluation["no_duplicate_cost_documentary_clear"]
+            ),
+            "technical_data_rights_documentary_clear": bool(
+                evaluation
+                and evaluation["technical_data_rights_documentary_clear"]
+            ),
         },
         "private_volume3_artifact": public_volume3_artifact_state,
         "private_jcp_evidence": public_jcp_evidence_state,
@@ -1909,6 +2355,16 @@ def build_payload(
                 else None
             ),
             **public_cmmc_packet_state,
+        },
+        "certification_documentary_register": {
+            "path": rel(CERTIFICATION_DOCUMENTARY_REGISTER),
+            "file_sha256": (
+                sha256_file(CERTIFICATION_DOCUMENTARY_REGISTER)
+                if CERTIFICATION_DOCUMENTARY_REGISTER.is_file()
+                and not CERTIFICATION_DOCUMENTARY_REGISTER.is_symlink()
+                else None
+            ),
+            **public_documentary_register_state,
         },
         "jcp_evidence_protocol": {
             "path": rel(JCP_EVIDENCE_PROTOCOL),
@@ -1947,6 +2403,9 @@ def build_payload(
             "jcp_receipt_fields_required_to_clear_gate": True,
             "cmmc_boolean_can_clear_supported_position_gate": False,
             "cmmc_packet_integrity_required": True,
+            "private_boolean_can_clear_documentary_gate": False,
+            "documentary_register_integrity_required": True,
+            "documentary_review_receipt_hash_required_to_clear": True,
             "preview_receipt_max_age_seconds": int(
                 PREVIEW_RECEIPT_MAX_AGE.total_seconds()
             ),
@@ -2013,6 +2472,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     volume3 = payload["private_volume3_artifact"]
     jcp = payload["private_jcp_evidence"]
     cmmc = payload["cmmc_evidence_packet"]
+    documentary = payload["certification_documentary_register"]
     lines = [
         "# MissionWeave DSIP Action Gate - 2026-07-17",
         "",
@@ -2109,6 +2569,17 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Phase I position supported: `{str(cmmc['phase_i_position_supported']).lower()}`",
         f"- Overclaim boundary present: `{str(cmmc['overclaim_boundary_present']).lower()}`",
         "",
+        "## Certification Documentary Register",
+        "",
+        f"- Register: `{documentary['path']}`",
+        f"- Integrity valid: `{str(documentary['integrity_valid']).lower()}`",
+        f"- Source hashes current: `{str(documentary['source_hashes_current']).lower()}`",
+        f"- Register consumed: `{str(documentary['register_consumed']).lower()}`",
+        f"- Status: `{documentary['status']}`",
+        f"- No-duplicate-cost documentary prerequisite clear: `{str(documentary['gate_decisions']['NO_DUPLICATE_COST_OR_DELIVERABLE']).lower()}`",
+        f"- Technical-data-rights documentary prerequisite clear: `{str(documentary['gate_decisions']['TECHNICAL_DATA_RIGHTS_ASSERTION']).lower()}`",
+        "- A private boolean cannot clear either gate without a current, integrity-checked register and a hash-bound review record.",
+        "",
         "## Reconciliation Groups",
         "",
     ]
@@ -2167,8 +2638,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"3. After DSIP assigns a proposal number, run `{payload['private_input']['private_volume2_finalizer']}`. It reads the number only from the ignored private record, writes the assigned-number DOCX/PDF only to the ignored private area, performs PDF QA, and updates the private PDF hash without exposing either value publicly. Hash the completed portal-preview receipt with `--preview-receipt-file`; a manually entered digest does not establish freshness.",
             f"4. For the ITAR-marked topic, save only an official JCP portal submission receipt or certified DD Form 2345 as a private PDF and complete `{payload['private_input']['jcp_evidence_template']}` beside it. A boolean answer cannot clear this gate without a matching file hash.",
             f"5. Review the consumed CMMC packet at `{payload['cmmc_evidence_packet']['path']}`. An unresolved packet leaves the supported-position gate open even when a private boolean is checked.",
-            "6. Run `--section approval` only after the corporate official reviews the fresh complete portal preview at action time. The collector binds that authorization to the current preview/upload-set identity and never requests or accepts a Firm PIN or login credential.",
-            "7. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.",
+            f"6. Resolve the source-bound prerequisites in `{payload['certification_documentary_register']['path']}`. Preserve each review receipt privately and bind only its SHA-256 in the register; a private checkbox alone cannot clear the no-duplicate-cost or technical-data-rights gates.",
+            "7. Run `--section approval` only after the corporate official reviews the fresh complete portal preview at action time. The collector binds that authorization to the current preview/upload-set identity and never requests or accepts a Firm PIN or login credential.",
+            "8. Run this public gate with `--private-input`; require every gate to pass before asking for the final human click.",
             "",
             "## Controls",
             "",
@@ -2177,6 +2649,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Portal submit performed: `{str(payload['controls']['portal_submit_performed']).lower()}`",
             f"- Builder can click final submit: `{str(payload['controls']['builder_can_click_final_submit']).lower()}`",
             f"- Action-time human required: `{str(payload['controls']['action_time_human_required']).lower()}`",
+            f"- Private boolean can clear documentary gate: `{str(payload['controls']['private_boolean_can_clear_documentary_gate']).lower()}`",
             "",
             "## Claim Boundary",
             "",
@@ -2231,6 +2704,7 @@ This sequence covers every currently open gate exactly once. It does not certify
 - Private Volume 3 receipt integrity passes: `{str(payload['private_volume3_artifact']['receipt_integrity_pass']).lower()}`. This verifies the ignored workbook against its ignored receipt without publishing either path or hash; it does not replace corporate-official cost-basis review.
 - Private DD Form 2345/JCP evidence integrity passes: `{str(payload['private_jcp_evidence']['evidence_integrity_pass']).lower()}`. A checked private flag cannot clear this gate unless an official portal PDF exists, its SHA-256 matches the ignored receipt, and entity/corporate review are confirmed.
 - CMMC/export evidence packet consumed with valid integrity: `{str(payload['cmmc_evidence_packet']['packet_consumed']).lower()}`. MissionWeave CMMC evidence state: `{payload['cmmc_evidence_packet']['requirement_evidence_state']}`. An unresolved packet cannot support the Phase I position.
+- Certification documentary register consumed with valid integrity: `{str(payload['certification_documentary_register']['register_consumed']).lower()}`. Source hashes current: `{str(payload['certification_documentary_register']['source_hashes_current']).lower()}`. A private checkbox cannot clear the no-duplicate-cost or technical-data-rights gate without its source-bound documentary decision and hash-bound review record.
 
 ## Registration And Firm Controls
 
@@ -2255,9 +2729,11 @@ This sequence covers every currently open gate exactly once. It does not certify
 
 - Confirm U.S. small-business eligibility, ownership and affiliates, PI primary employment, the proposed 640 PI hours, and the SBIR percentage-of-work rule.
 - Compare MissionWeave with every prior, current, pending, or planned proposal. Disclose overlap and request no duplicate PI hours, cloud costs, software work, or deliverables.
+- Keep `NO_DUPLICATE_COST_OR_DELIVERABLE` open until the authoritative proposal/award record, 640-hour schedule, cost categories, background/proposal separation, and final corporate review are reconciled in `{rel(CERTIFICATION_DOCUMENTARY_REGISTER)}`.
 - Treat the topic as ITAR-marked. Keep controlled technical data out of the proposal and document the DD Form 2345/JCP and Technology Control Plan decisions.
 - Projected CMMC level: `{instruction['projected_cmmc_level']}`. {instruction['cmmc_amendment_note']} Consume `{payload['cmmc_evidence_packet']['path']}` and do not claim an assessment, certification, or compliant enclave without current authoritative evidence.
 - Confirm foreign-citizen participation, foreign affiliations, conflicts, joint-venture status, and each technical-data/software-rights assertion from current records.
+- Keep `TECHNICAL_DATA_RIGHTS_ASSERTION` open until every asserted item is mapped to a version and funding-history record, MIT/open-source/public interfaces are separated from any restriction, and qualified rights plus corporate-official review is hash-bound in the documentary register.
 - TABA is not requested. Do not add a provider without a named, supported, topic-specific need and a reconciled cost entry.
 
 ## Final Preview Gate

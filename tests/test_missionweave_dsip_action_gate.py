@@ -36,7 +36,9 @@ AUTHORITATIVE_OPEN_GATES = {
     "CURRENT_CMMC_REQUIREMENTS_REVIEW",
     "DD2345_OR_JCP_APPLICATION_EVIDENCE",
     "DSIP_FIRM_PIN_AVAILABILITY",
+    "NO_DUPLICATE_COST_OR_DELIVERABLE",
     "PORTAL_PREVIEW_RECEIPT_HASH",
+    "TECHNICAL_DATA_RIGHTS_ASSERTION",
     "TECHNOLOGY_CONTROL_PLAN_DECISION",
     "VOLUME3_COST_BASIS",
     "VOLUME5_UPLOAD_SET",
@@ -58,6 +60,7 @@ def synthetic_private_payload(
     volume3_artifact_state: dict,
     jcp_evidence_state: dict,
     cmmc_packet_state: dict,
+    documentary_register_state: dict,
 ) -> tuple[dict, str]:
     payload = json.loads(TEMPLATE.read_text(encoding="utf-8"))
     payload["template_only"] = False
@@ -92,6 +95,7 @@ def synthetic_private_payload(
             volume3_artifact_state=volume3_artifact_state,
             jcp_evidence_state=jcp_evidence_state,
             cmmc_packet_state=cmmc_packet_state,
+            documentary_register_state=documentary_register_state,
         )
     )
     payload["approval"]["approval_utc"] = (
@@ -104,6 +108,7 @@ def synthetic_private_payload(
             volume3_artifact_state=volume3_artifact_state,
             jcp_evidence_state=jcp_evidence_state,
             cmmc_packet_state=cmmc_packet_state,
+            documentary_register_state=documentary_register_state,
         )
     )
     return payload, private_proposal_number
@@ -187,11 +192,38 @@ def valid_cmmc_packet_state(*, position_supported: bool = True) -> dict:
     }
 
 
-def complete_evidence_states(module) -> tuple[dict, dict, dict]:
+def valid_documentary_register_state(module) -> dict:
+    return {
+        "register_present": True,
+        "register_regular_file": True,
+        "schema_valid": True,
+        "topic_valid": True,
+        "generated_timestamp_valid": True,
+        "integrity_valid": True,
+        "source_set_valid": True,
+        "source_hashes_current": True,
+        "gate_set_valid": True,
+        "gate_rows_valid": True,
+        "controls_valid": True,
+        "claim_boundary_present": True,
+        "register_consumed": True,
+        "status": "DOCUMENTARY_PREREQUISITES_CLEAR",
+        "gate_decisions": {
+            gate_id: True
+            for gate_id in sorted(module.CERTIFICATION_DOCUMENTARY_GATE_IDS)
+        },
+        "open_gate_ids": [],
+        "register_binding_sha256": "D" * 64,
+        "failure_code": None,
+    }
+
+
+def complete_evidence_states(module) -> tuple[dict, dict, dict, dict]:
     return (
         valid_volume3_artifact_state(),
         valid_jcp_evidence_state(module),
         valid_cmmc_packet_state(),
+        valid_documentary_register_state(module),
     )
 
 
@@ -306,12 +338,14 @@ def test_cmmc_packet_is_consumed_but_unresolved_position_stays_open(
     source_state = private_final_source_state(source_state)
     volume3_state = valid_volume3_artifact_state()
     jcp_state = valid_jcp_evidence_state(module)
+    documentary_state = valid_documentary_register_state(module)
     private, proposal_number = synthetic_private_payload(
         module,
         source_state,
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=packet_state,
+        documentary_register_state=documentary_state,
     )
     payload = module.build_payload(
         private,
@@ -320,6 +354,7 @@ def test_cmmc_packet_is_consumed_but_unresolved_position_stays_open(
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=packet_state,
+        documentary_register_state=documentary_state,
         evaluated_utc=REFERENCE_UTC,
     )
 
@@ -359,17 +394,114 @@ def test_cmmc_packet_is_consumed_but_unresolved_position_stays_open(
     assert self_hashed_placeholder["phase_i_position_supported"] is False
 
 
-def test_complete_private_record_can_pass_without_exposing_private_values():
+def test_current_certification_documentary_register_is_consumed_and_open():
+    module = load_module()
+    state = module.inspect_certification_documentary_register()
+
+    assert state["register_consumed"] is True
+    assert state["source_hashes_current"] is True
+    assert state["gate_decisions"] == {
+        "NO_DUPLICATE_COST_OR_DELIVERABLE": False,
+        "TECHNICAL_DATA_RIGHTS_ASSERTION": False,
+    }
+    assert state["open_gate_ids"] == sorted(module.CERTIFICATION_DOCUMENTARY_GATE_IDS)
+    assert module.certification_documentary_register_is_consumed(state) is True
+
+
+def test_private_booleans_cannot_clear_open_documentary_gates():
     module = load_module()
     source_state, _ = module.inspect_source_package()
     source_state = private_final_source_state(source_state)
-    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    volume3_state = valid_volume3_artifact_state()
+    jcp_state = valid_jcp_evidence_state(module)
+    cmmc_state = valid_cmmc_packet_state()
+    documentary_state = module.inspect_certification_documentary_register()
     private, proposal_number = synthetic_private_payload(
         module,
         source_state,
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
+    )
+
+    payload = module.build_payload(
+        private,
+        source_state=source_state,
+        volume2_text=f"{proposal_number}\nassigned final header",
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
+        evaluated_utc=REFERENCE_UTC,
+    )
+
+    assert private["eligibility_and_compliance"][
+        "no_duplicate_cost_or_deliverable"
+    ] is True
+    assert private["eligibility_and_compliance"][
+        "technical_data_rights_assertion_supported"
+    ] is True
+    assert set(payload["gate_summary"]["unresolved_gates"]) == {
+        "NO_DUPLICATE_COST_OR_DELIVERABLE",
+        "TECHNICAL_DATA_RIGHTS_ASSERTION",
+    }
+    assert payload["private_fact_state"][
+        "no_duplicate_cost_documentary_clear"
+    ] is False
+    assert payload["private_fact_state"][
+        "technical_data_rights_documentary_clear"
+    ] is False
+
+
+def test_documentary_register_tampering_fails_closed(tmp_path: Path):
+    module = load_module()
+    register = json.loads(
+        module.CERTIFICATION_DOCUMENTARY_REGISTER.read_text(encoding="utf-8")
+    )
+
+    wrong_source = deepcopy(register)
+    wrong_source["source_artifacts"][0]["sha256"] = "0" * 64
+    wrong_source["integrity"]["register_sha256"] = ""
+    wrong_source["integrity"]["register_sha256"] = module.stable_sha256(wrong_source)
+    wrong_source_path = tmp_path / "wrong-source.json"
+    wrong_source_path.write_text(json.dumps(wrong_source), encoding="utf-8")
+    wrong_source_state = module.inspect_certification_documentary_register(
+        wrong_source_path
+    )
+    assert wrong_source_state["integrity_valid"] is True
+    assert wrong_source_state["source_hashes_current"] is False
+    assert wrong_source_state["register_consumed"] is False
+    assert all(
+        decision is False
+        for decision in wrong_source_state["gate_decisions"].values()
+    )
+
+    wrong_self_hash = deepcopy(register)
+    wrong_self_hash["claim_boundary"] += " tampered"
+    wrong_self_hash_path = tmp_path / "wrong-self-hash.json"
+    wrong_self_hash_path.write_text(json.dumps(wrong_self_hash), encoding="utf-8")
+    wrong_self_hash_state = module.inspect_certification_documentary_register(
+        wrong_self_hash_path
+    )
+    assert wrong_self_hash_state["integrity_valid"] is False
+    assert wrong_self_hash_state["register_consumed"] is False
+
+
+def test_complete_private_record_can_pass_without_exposing_private_values():
+    module = load_module()
+    source_state, _ = module.inspect_source_package()
+    source_state = private_final_source_state(source_state)
+    volume3_state, jcp_state, cmmc_state, documentary_state = (
+        complete_evidence_states(module)
+    )
+    private, proposal_number = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
     )
     synthetic_volume2_text = f"{proposal_number}\nFinal assigned proposal header"
 
@@ -381,6 +513,7 @@ def test_complete_private_record_can_pass_without_exposing_private_values():
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
         evaluated_utc=REFERENCE_UTC,
     )
     serialized = json.dumps(payload, sort_keys=True)
@@ -437,13 +570,16 @@ def test_stale_or_rebound_preview_cannot_reuse_action_time_approval():
     module = load_module()
     source_state, _ = module.inspect_source_package()
     source_state = private_final_source_state(source_state)
-    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    volume3_state, jcp_state, cmmc_state, documentary_state = (
+        complete_evidence_states(module)
+    )
     private, proposal_number = synthetic_private_payload(
         module,
         source_state,
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
     )
     volume2_text = f"{proposal_number}\nassigned final header"
 
@@ -454,6 +590,7 @@ def test_stale_or_rebound_preview_cannot_reuse_action_time_approval():
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
         evaluated_utc=REFERENCE_UTC + timedelta(minutes=26),
     )
     stale_open = set(stale["gate_summary"]["unresolved_gates"])
@@ -474,6 +611,7 @@ def test_stale_or_rebound_preview_cannot_reuse_action_time_approval():
             volume3_artifact_state=volume3_state,
             jcp_evidence_state=jcp_state,
             cmmc_packet_state=cmmc_state,
+            documentary_register_state=documentary_state,
         )
     )
     rebound_payload = module.build_payload(
@@ -483,6 +621,7 @@ def test_stale_or_rebound_preview_cannot_reuse_action_time_approval():
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
         evaluated_utc=REFERENCE_UTC,
     )
     rebound_facts = rebound_payload["private_fact_state"]
@@ -500,13 +639,16 @@ def test_upload_set_change_invalidates_preview_and_approval_bindings():
     module = load_module()
     source_state, _ = module.inspect_source_package()
     source_state = private_final_source_state(source_state)
-    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    volume3_state, jcp_state, cmmc_state, documentary_state = (
+        complete_evidence_states(module)
+    )
     private, proposal_number = synthetic_private_payload(
         module,
         source_state,
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
     )
     private["proposal"]["volume5_upload_set_reviewed"] = False
 
@@ -517,6 +659,7 @@ def test_upload_set_change_invalidates_preview_and_approval_bindings():
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
         evaluated_utc=REFERENCE_UTC,
     )
     facts = payload["private_fact_state"]
@@ -535,17 +678,62 @@ def test_upload_set_change_invalidates_preview_and_approval_bindings():
     }.issubset(unresolved)
 
 
+def test_documentary_register_change_invalidates_preview_and_approval_bindings():
+    module = load_module()
+    source_state, _ = module.inspect_source_package()
+    source_state = private_final_source_state(source_state)
+    volume3_state, jcp_state, cmmc_state, documentary_state = (
+        complete_evidence_states(module)
+    )
+    private, proposal_number = synthetic_private_payload(
+        module,
+        source_state,
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
+    )
+    changed_documentary_state = deepcopy(documentary_state)
+    changed_documentary_state["register_binding_sha256"] = "E" * 64
+
+    payload = module.build_payload(
+        private,
+        source_state=source_state,
+        volume2_text=f"{proposal_number}\nassigned final header",
+        volume3_artifact_state=volume3_state,
+        jcp_evidence_state=jcp_state,
+        cmmc_packet_state=cmmc_state,
+        documentary_register_state=changed_documentary_state,
+        evaluated_utc=REFERENCE_UTC,
+    )
+    facts = payload["private_fact_state"]
+    unresolved = set(payload["gate_summary"]["unresolved_gates"])
+
+    assert facts["portal_preview_binding_matches_current_upload_set"] is False
+    assert facts["approval_binding_matches_current_upload_set"] is False
+    assert {
+        "PORTAL_PREVIEW_RECEIPT_HASH",
+        "COMPLETE_PORTAL_PREVIEW_REVIEW",
+        "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+        "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+        "ACTION_TIME_APPROVAL_TIMESTAMP",
+    }.issubset(unresolved)
+
+
 def test_private_record_stays_open_when_pdf_header_or_action_gate_is_missing():
     module = load_module()
     source_state, actual_text = module.inspect_source_package()
     source_state = private_final_source_state(source_state)
-    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    volume3_state, jcp_state, cmmc_state, documentary_state = (
+        complete_evidence_states(module)
+    )
     private, _ = synthetic_private_payload(
         module,
         source_state,
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
     )
     private["approval"]["final_submission_authorized_at_action_time"] = False
 
@@ -557,6 +745,7 @@ def test_private_record_stays_open_when_pdf_header_or_action_gate_is_missing():
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
         evaluated_utc=REFERENCE_UTC,
     )
 
@@ -576,13 +765,16 @@ def test_private_record_auto_selects_guarded_private_final_pdf(
     module = load_module()
     base_state, _ = module.inspect_source_package()
     private_state = private_final_source_state(base_state)
-    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    volume3_state, jcp_state, cmmc_state, documentary_state = (
+        complete_evidence_states(module)
+    )
     private, proposal_number = synthetic_private_payload(
         module,
         private_state,
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
     )
     private_pdf = tmp_path / "MISSIONWEAVE_DSIP_VOLUME2_FINAL.private.pdf"
     private_pdf.write_bytes(b"private-final-marker")
@@ -601,6 +793,7 @@ def test_private_record_auto_selects_guarded_private_final_pdf(
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
         evaluated_utc=REFERENCE_UTC,
     )
 
@@ -621,13 +814,16 @@ def test_template_and_schema_drift_fail_closed():
         )
     assert exc.value.code == "TEMPLATE_CANNOT_BE_USED_AS_PRIVATE_INPUT"
 
-    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    volume3_state, jcp_state, cmmc_state, documentary_state = (
+        complete_evidence_states(module)
+    )
     private, _ = synthetic_private_payload(
         module,
         source_state,
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
     )
     private["identity"]["unexpected_private_field"] = "must not be accepted"
     with pytest.raises(module.MissionWeaveGateError) as exc:
@@ -757,13 +953,16 @@ def test_checked_jcp_flag_cannot_clear_gate_without_private_receipt():
     module = load_module()
     source_state, _ = module.inspect_source_package()
     source_state = private_final_source_state(source_state)
-    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    volume3_state, jcp_state, cmmc_state, documentary_state = (
+        complete_evidence_states(module)
+    )
     private, proposal_number = synthetic_private_payload(
         module,
         source_state,
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
     )
 
     payload = module.build_payload(
@@ -774,6 +973,7 @@ def test_checked_jcp_flag_cannot_clear_gate_without_private_receipt():
         volume3_artifact_state=volume3_state,
         jcp_evidence_state={"evidence_integrity_pass": False},
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
         evaluated_utc=REFERENCE_UTC,
     )
 
@@ -798,7 +998,7 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     passed = summary["passed_private_gate_count"]
     open_count = summary["open_gate_count"]
     required = summary["required_private_gate_count"]
-    assert (passed, open_count, required) == (37, 13, 50)
+    assert (passed, open_count, required) == (35, 15, 50)
     assert set(summary["unresolved_gates"]) == AUTHORITATIVE_OPEN_GATES
     groups = summary["reconciliation_groups"]
     assert sum(group["count"] for group in groups.values()) == required
@@ -873,7 +1073,9 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
     assert "FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py" in checklist
     assert "FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py" in markdown
     assert "Private DD Form 2345/JCP Evidence Integrity" in markdown
+    assert "## Certification Documentary Register" in markdown
     assert "A boolean answer cannot clear this gate" in markdown
+    assert "a private checkbox alone cannot clear" in combined
     assert "https://www.public.dacs.dla.mil/jcp/ext/" in checklist
     assert "prerequisites-in-progress" in checklist
     assert payload["private_input"]["private_final_volume2_path_exposed"] is False
@@ -889,13 +1091,16 @@ def test_written_public_outputs_and_checklist_are_current_and_safe():
 def test_public_safety_rejects_injected_private_contact_or_proposal_number():
     module = load_module()
     source_state, _ = module.inspect_source_package()
-    volume3_state, jcp_state, cmmc_state = complete_evidence_states(module)
+    volume3_state, jcp_state, cmmc_state, documentary_state = (
+        complete_evidence_states(module)
+    )
     private, proposal_number = synthetic_private_payload(
         module,
         source_state,
         volume3_artifact_state=volume3_state,
         jcp_evidence_state=jcp_state,
         cmmc_packet_state=cmmc_state,
+        documentary_register_state=documentary_state,
     )
 
     with pytest.raises(module.MissionWeaveGateError) as exc:
