@@ -20,6 +20,8 @@ def load_module():
 def test_builder_uses_current_bounded_v2_inputs() -> None:
     module = load_module()
 
+    assert module.MEDIA_RECEIPT_SCHEMA.endswith(".v2")
+    assert module.CONSOLE_REPO_PATH == "build_week/prooflock_console"
     assert module.WORK_DIR.name == "prooflock_console_build_week_v2"
     assert module.NARRATION_PATH.name == "prooflock_console_build_week_narration_v2.wav"
     assert module.OUTPUT_PATH.name == "prooflock_console_openai_build_week_demo_v2.mp4"
@@ -56,7 +58,7 @@ def test_builder_contains_no_stale_orchestration_or_model_claim() -> None:
 def test_receipt_hash_verifier_detects_mutation() -> None:
     module = load_module()
     receipt = {
-        "schema": "lumencore.prooflock_build_week_demo_video_receipt.v1",
+        "schema": "lumencore.prooflock_build_week_demo_video_receipt.v2",
         "narration": {
             "duration_seconds": 120.0,
             "openai_audio_api_succeeded": False,
@@ -84,6 +86,25 @@ def test_receipt_hash_verifier_detects_mutation() -> None:
     assert not valid
     assert "receipt_hash_mismatch" in errors
     assert "focused_test_evidence_missing" in errors
+
+
+def test_capture_provenance_requires_a_byte_identical_console_tree() -> None:
+    module = load_module()
+    commit = module.subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+    provenance = module.build_capture_provenance(commit, commit)
+
+    assert provenance["frame_source_commit"] == commit
+    assert provenance["public_console_commit"] == commit
+    assert provenance["console_repo_path"] == "build_week/prooflock_console"
+    assert provenance["console_tree_identity_match"] is True
+    assert provenance["frame_source_console_tree_oid"] == provenance["public_console_tree_oid"]
 
 
 def test_normalize_utc_requires_timezone() -> None:

@@ -17,6 +17,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[2]
+MEDIA_RECEIPT_SCHEMA = "lumencore.prooflock_build_week_demo_video_receipt.v2"
+CONSOLE_REPO_PATH = "build_week/prooflock_console"
 WORK_DIR = ROOT / "output" / "video" / "prooflock_console_build_week_v2"
 SOURCE_DIR = WORK_DIR / "frames"
 SLIDE_DIR = WORK_DIR / "slides"
@@ -70,6 +72,60 @@ def canonical_json(value: object) -> str:
 
 def stable_hash(value: object) -> str:
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
+
+
+def git_object_format() -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "--show-object-format"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    value = result.stdout.strip()
+    if value not in {"sha1", "sha256"}:
+        raise RuntimeError(f"unsupported Git object format: {value!r}")
+    return value
+
+
+def git_tree_oid(commit: str, repo_path: str = CONSOLE_REPO_PATH) -> str:
+    if re.fullmatch(r"[0-9a-f]{40}", commit) is None:
+        raise ValueError("commit must be an exact lowercase 40-character commit")
+    result = subprocess.run(
+        ["git", "rev-parse", f"{commit}:{repo_path}"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    oid = result.stdout.strip()
+    expected_length = 40 if git_object_format() == "sha1" else 64
+    if re.fullmatch(rf"[0-9a-f]{{{expected_length}}}", oid) is None:
+        raise RuntimeError(f"invalid Git tree object id: {oid!r}")
+    return oid
+
+
+def build_capture_provenance(public_commit: str, frame_source_commit: str) -> dict[str, object]:
+    object_format = git_object_format()
+    source_tree = git_tree_oid(frame_source_commit)
+    public_tree = git_tree_oid(public_commit)
+    if source_tree != public_tree:
+        raise RuntimeError(
+            "source frames cannot be rebound: the captured and public console trees differ"
+        )
+    return {
+        "frame_source_commit": frame_source_commit,
+        "public_console_commit": public_commit,
+        "console_repo_path": CONSOLE_REPO_PATH,
+        "git_object_format": object_format,
+        "frame_source_console_tree_oid": source_tree,
+        "public_console_tree_oid": public_tree,
+        "console_tree_identity_match": True,
+        "claim_boundary": (
+            "Matching Git tree identities prove that the captured and public console source bytes are equal. "
+            "They do not independently prove when or how the PNG frames were captured."
+        ),
+    }
 
 
 def font(path: Path, size: int) -> ImageFont.FreeTypeFont:
@@ -561,13 +617,14 @@ def write_receipt(
     observed_utc: str,
     slides: list[Path],
     public_commit: str,
+    frame_source_commit: str,
     test_evidence: str,
 ) -> Path:
     audio_seconds = narration_seconds(NARRATION_PATH)
     if not (1.0 < audio_seconds < 180.0):
         raise RuntimeError("narration duration is outside the Build Week video limit")
     facts = {
-        "schema": "lumencore.prooflock_build_week_demo_video_receipt.v1",
+        "schema": MEDIA_RECEIPT_SCHEMA,
         "observed_utc": observed_utc,
         "video": {
             "path": OUTPUT_PATH.relative_to(ROOT).as_posix(),
@@ -626,6 +683,7 @@ def write_receipt(
             )
         ],
         "public_console_commit": public_commit,
+        "capture_provenance": build_capture_provenance(public_commit, frame_source_commit),
         "focused_test_evidence": test_evidence,
         "motion_design": {
             "frames_per_second": 30,
@@ -644,9 +702,11 @@ def write_receipt(
             "audio_normalization": "EBU_R128_SINGLE_PASS_I_-16_TP_-1.5_LRA_11",
         },
         "claim_boundary": (
-            "This receipt proves local demo-video assembly, declared input identities, bounded duration, and a "
-            "successful decode check. It does not prove YouTube publication, Devpost acceptance, judging, award, "
-            "OpenAI endorsement, external validation, safety, patent rights, funding, or commercial readiness."
+            "This receipt proves local demo-video assembly, declared input identities, bounded duration, a "
+            "successful decode check, and byte-identical Git console trees for the declared capture and public "
+            "commits. It does not independently prove screenshot origin, YouTube publication, Devpost acceptance, "
+            "judging, award, OpenAI endorsement, external validation, safety, patent rights, funding, or commercial "
+            "readiness."
         ),
     }
     receipt = {**facts, "facts_sha256": stable_hash(facts)}
@@ -683,7 +743,7 @@ def verify_video_receipt(receipt: object) -> tuple[bool, list[str]]:
     if not isinstance(receipt, dict):
         return False, ["receipt_not_object"]
     errors: list[str] = []
-    if receipt.get("schema") != "lumencore.prooflock_build_week_demo_video_receipt.v1":
+    if receipt.get("schema") != MEDIA_RECEIPT_SCHEMA:
         errors.append("schema_mismatch")
 
     unhashed = copy.deepcopy(receipt)
@@ -756,6 +816,40 @@ def verify_video_receipt(receipt: object) -> tuple[bool, list[str]]:
     commit = receipt.get("public_console_commit")
     if not isinstance(commit, str) or re.fullmatch(r"[0-9a-f]{40}", commit) is None:
         errors.append("public_commit_invalid")
+    provenance = receipt.get("capture_provenance")
+    if not isinstance(provenance, dict):
+        errors.append("capture_provenance_missing")
+    else:
+        source_commit = provenance.get("frame_source_commit")
+        provenance_public_commit = provenance.get("public_console_commit")
+        object_format = provenance.get("git_object_format")
+        oid_length = 40 if object_format == "sha1" else 64 if object_format == "sha256" else 0
+        source_tree = provenance.get("frame_source_console_tree_oid")
+        public_tree = provenance.get("public_console_tree_oid")
+        if not isinstance(source_commit, str) or re.fullmatch(r"[0-9a-f]{40}", source_commit) is None:
+            errors.append("frame_source_commit_invalid")
+        if provenance_public_commit != commit:
+            errors.append("capture_public_commit_mismatch")
+        if provenance.get("console_repo_path") != CONSOLE_REPO_PATH:
+            errors.append("capture_console_path_mismatch")
+        if oid_length == 0:
+            errors.append("capture_git_object_format_invalid")
+        else:
+            oid_pattern = rf"[0-9a-f]{{{oid_length}}}"
+            if not isinstance(source_tree, str) or re.fullmatch(oid_pattern, source_tree) is None:
+                errors.append("frame_source_console_tree_oid_invalid")
+            if not isinstance(public_tree, str) or re.fullmatch(oid_pattern, public_tree) is None:
+                errors.append("public_console_tree_oid_invalid")
+        if source_tree != public_tree or provenance.get("console_tree_identity_match") is not True:
+            errors.append("capture_console_tree_identity_mismatch")
+        if isinstance(source_commit, str) and isinstance(commit, str):
+            try:
+                if git_tree_oid(source_commit) != source_tree:
+                    errors.append("frame_source_console_tree_not_current")
+                if git_tree_oid(commit) != public_tree:
+                    errors.append("public_console_tree_not_current")
+            except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError):
+                errors.append("capture_console_tree_unverifiable")
     test_evidence = receipt.get("focused_test_evidence")
     if not isinstance(test_evidence, str) or not test_evidence.strip():
         errors.append("focused_test_evidence_missing")
@@ -774,6 +868,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Build the bounded ProofLock Build Week demo video.")
     parser.add_argument("--observed-utc")
     parser.add_argument("--public-commit", help="Exact 40-character source commit used for the recording.")
+    parser.add_argument(
+        "--frame-source-commit",
+        help=(
+            "Exact commit from which the PNG frames were captured. Defaults to --public-commit; a different value "
+            "is accepted only when both console Git trees are byte-identical."
+        ),
+    )
     parser.add_argument("--test-evidence", help="Exact focused local test result used for the recording.")
     parser.add_argument("--verify", action="store_true", help="Verify the existing video receipt and inputs.")
     args = parser.parse_args()
@@ -785,6 +886,9 @@ def main() -> int:
         parser.error("--observed-utc is required when building")
     if not args.public_commit or re.fullmatch(r"[0-9a-f]{40}", args.public_commit) is None:
         parser.error("--public-commit must be an exact lowercase 40-character commit")
+    frame_source_commit = args.frame_source_commit or args.public_commit
+    if re.fullmatch(r"[0-9a-f]{40}", frame_source_commit) is None:
+        parser.error("--frame-source-commit must be an exact lowercase 40-character commit")
     if not args.test_evidence or not args.test_evidence.strip():
         parser.error("--test-evidence is required when building")
     observed_utc = normalize_utc(args.observed_utc)
@@ -795,6 +899,7 @@ def main() -> int:
         observed_utc,
         slides,
         args.public_commit,
+        frame_source_commit,
         args.test_evidence.strip(),
     )
     valid, errors = verify_video_receipt_file(receipt)

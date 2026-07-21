@@ -22,11 +22,13 @@ $observed = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
 python code\ops\BUILD_PROOFLOCK_BUILD_WEEK_DEMO_VIDEO.py `
   --observed-utc $observed `
   --public-commit $commit `
-  --test-evidence '50 passed, 3 skipped'
+  --test-evidence '53 passed, 3 skipped'
 python code\ops\BUILD_PROOFLOCK_BUILD_WEEK_DEMO_VIDEO.py --verify
 ```
 
 The builder creates a 1080p H.264/AAC video under three minutes, a 3:2 thumbnail, eight bounded slides, EBU R128 single-pass narration normalization, and a receipt that rehashes every declared input and output.
+
+When the console source tree has not changed, existing PNG captures may be rebound without being misrepresented as fresh captures. Pass the exact capture commit with `--frame-source-commit`. The builder resolves the console Git tree at both commits and fails closed unless the tree object IDs match exactly. The receipt records that provenance bridge and explicitly states that tree equality does not independently prove screenshot origin.
 
 ## Publication Gate
 
