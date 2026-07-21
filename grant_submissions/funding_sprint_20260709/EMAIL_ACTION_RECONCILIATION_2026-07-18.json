@@ -393,12 +393,12 @@
   ],
   "source_evidence": {
     "darpa_sn_26_97_public_submission_receipt": {
-      "bytes": 3537,
-      "identity_source": "WORKTREE_BYTES",
+      "bytes": 3476,
+      "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json",
       "present": true,
-      "sha256": "743FB8D9D33C8F27FD75824A50E2C3E96AD92B16780C9E4E1C2AC4209E469A13",
-      "worktree_eol_differs_from_git_blob": false
+      "sha256": "0D73A524950897D8A1080B5C4A7EF3D30CF55901154A96EE8D8A15E05A68044B",
+      "worktree_eol_differs_from_git_blob": true
     },
     "lvlup_independent_review_confirmation": {
       "bytes": 1908,
@@ -449,12 +449,12 @@
       "worktree_eol_differs_from_git_blob": true
     },
     "outreach_followup_policy_config": {
-      "bytes": 5933,
-      "identity_source": "WORKTREE_BYTES",
+      "bytes": 5793,
+      "identity_source": "COMMITTED_GIT_BLOB",
       "path": "config/outreach_followup_policies_v1.json",
       "present": true,
-      "sha256": "04BEFE8110CABF522F6D907ADA945D07C70AACFEE5401A87BA69EECE117ADDBF",
-      "worktree_eol_differs_from_git_blob": false
+      "sha256": "EB5D9AA4462EB3CC0BEB312A0A08CD1C546BBF554FD0A646EC6A91B561D669E4",
+      "worktree_eol_differs_from_git_blob": true
     },
     "outreach_response_template_registry": {
       "bytes": 17846,
