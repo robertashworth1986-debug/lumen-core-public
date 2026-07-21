@@ -165,6 +165,79 @@ def test_nested_secret_keys_and_private_key_material_fail_closed():
     assert private_key["secret_or_credential_fields"] == ["operator_note"]
 
 
+def test_camel_case_authorization_and_provider_credentials_fail_closed():
+    module = load_module()
+    facts = common_facts()
+    facts.update(
+        {
+            "opportunity_name": "Synthetic Notice",
+            "eligibility_question": "the current entity type is eligible",
+            "accessToken": "synthetic-value",
+        }
+    )
+    camel_case = module.render_response("DEADLINE_CLARIFICATION", facts)
+    assert camel_case["status"] == "BLOCKED_SECRET_OR_CREDENTIAL_FACT"
+    assert camel_case["secret_or_credential_fields"] == ["accessToken"]
+    assert "synthetic-value" not in json.dumps(camel_case)
+
+    facts.pop("accessToken")
+    facts["operator_note"] = "Authorization: Bearer SYNTHETIC_TOKEN_VALUE_123456"
+    authorization = module.render_response("DEADLINE_CLARIFICATION", facts)
+    assert authorization["status"] == "BLOCKED_SECRET_OR_CREDENTIAL_FACT"
+    assert authorization["secret_or_credential_fields"] == ["operator_note"]
+    assert "SYNTHETIC_TOKEN_VALUE_123456" not in json.dumps(authorization)
+
+    facts["operator_note"] = "sk-" + ("A" * 24)
+    provider_key = module.render_response("DEADLINE_CLARIFICATION", facts)
+    assert provider_key["status"] == "BLOCKED_SECRET_OR_CREDENTIAL_FACT"
+    assert provider_key["secret_or_credential_fields"] == ["operator_note"]
+    assert ("sk-" + ("A" * 24)) not in json.dumps(provider_key)
+
+
+def test_alphanumeric_codes_opaque_bytes_and_non_object_facts_fail_closed():
+    module = load_module()
+    facts = common_facts()
+    facts.update(
+        {
+            "opportunity_name": "Synthetic Notice",
+            "eligibility_question": "the current entity type is eligible",
+            "operator_note": "Verification code: A1B2C3",
+        }
+    )
+    alphanumeric = module.render_response("DEADLINE_CLARIFICATION", facts)
+    assert alphanumeric["status"] == "BLOCKED_SECRET_OR_CREDENTIAL_FACT"
+    assert alphanumeric["secret_or_credential_fields"] == ["operator_note"]
+    assert "A1B2C3" not in json.dumps(alphanumeric)
+
+    facts["operator_note"] = b"opaque-private-input"
+    opaque = module.render_response("DEADLINE_CLARIFICATION", facts)
+    assert opaque["status"] == "BLOCKED_SECRET_OR_CREDENTIAL_FACT"
+    assert opaque["secret_or_credential_fields"] == ["operator_note"]
+    assert "opaque-private-input" not in json.dumps(opaque)
+
+    try:
+        module.render_response("DEADLINE_CLARIFICATION", [])
+    except module.OutreachRegistryError as exc:
+        assert str(exc) == "FACTS_NOT_OBJECT"
+    else:
+        raise AssertionError("non-object facts must fail closed")
+
+
+def test_registry_rejects_hardcoded_credential_material():
+    module = load_module()
+    registry = module.read_registry()
+    registry["templates"][1]["body"] += (
+        "\nAuthorization: Bearer SYNTHETIC_TOKEN_VALUE_123456"
+    )
+
+    try:
+        module.validate_registry(registry)
+    except module.OutreachRegistryError as exc:
+        assert str(exc) == "HARDCODED_TEMPLATE_CREDENTIAL:DEADLINE_CLARIFICATION"
+    else:
+        raise AssertionError("hardcoded template credentials must fail closed")
+
+
 def test_deadline_urgency_is_timezone_aware_and_past_deadlines_block():
     module = load_module()
     facts = common_facts()
@@ -285,6 +358,8 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["controls"]["builder_can_send_email"] is False
     assert payload["controls"]["duplicate_send_fail_closed"] is True
     assert payload["controls"]["secret_or_credential_fail_closed"] is True
+    assert payload["controls"]["opaque_binary_fact_fail_closed"] is True
+    assert payload["controls"]["hardcoded_template_credential_fail_closed"] is True
     assert "Duplicate-send gate: `FAIL_CLOSED`" in markdown
     assert "Secret-or-credential gate: `FAIL_CLOSED`" in markdown
     assert "No message is rendered" in markdown

@@ -5,7 +5,9 @@
     "attachment_requires_explicit_request": true,
     "builder_can_send_email": false,
     "duplicate_send_fail_closed": true,
+    "hardcoded_template_credential_fail_closed": true,
     "missing_fact_fail_closed": true,
+    "opaque_binary_fact_fail_closed": true,
     "past_deadline_fail_closed": true,
     "secret_or_credential_fail_closed": true,
     "unchanged_rebuild_byte_stable": true

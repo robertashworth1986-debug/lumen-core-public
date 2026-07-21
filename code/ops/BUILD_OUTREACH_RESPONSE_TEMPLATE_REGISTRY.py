@@ -46,7 +46,9 @@ POSITIVE_CLAIM_MARKERS = (
     "will save",
 )
 SECRET_FIELD_RE = re.compile(
-    r"(?:^|_)(?:password|passwd|passphrase|otp|mfa_code|2fa_code|"
+    r"(?:^|_)(?:password|passwd|passphrase|credential|credentials|secret|"
+    r"token|authorization|authorization_header|auth_header|cookie|session_cookie|"
+    r"recovery_code|backup_code|otp|mfa_code|2fa_code|"
     r"one_time_code|authentication_code|auth_code|verification_code|"
     r"api_key|apikey|client_secret|secret_key|access_token|refresh_token|"
     r"bearer_token|private_key)(?:$|_)",
@@ -55,7 +57,8 @@ SECRET_FIELD_RE = re.compile(
 SECRET_VALUE_PATTERNS = (
     re.compile(
         r"\b(?:authentication|verification|one[-_\s]?time|mfa|2fa|otp)"
-        r"(?:[-_\s]?(?:code|passcode))?\s*(?:=|:|is)\s*[\"']?\d{4,10}\b",
+        r"(?:[-_\s]?(?:code|passcode))?\s*(?:=|:|is)\s*[\"']?"
+        r"(?=[A-Z0-9]{4,12}\b)(?=[A-Z0-9]*\d)[A-Z0-9]+\b",
         re.IGNORECASE,
     ),
     re.compile(
@@ -66,6 +69,20 @@ SECRET_VALUE_PATTERNS = (
     ),
     re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----", re.IGNORECASE),
     re.compile(r"\bhttps?://[^/\s:@]+:[^/\s@]+@", re.IGNORECASE),
+    re.compile(
+        r"\bauthorization\s*:\s*(?:bearer|basic)\s+[A-Z0-9._~+/=-]{8,}",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\beyJ[A-Z0-9_-]{8,}\.[A-Z0-9_-]{8,}\.[A-Z0-9_-]{8,}\b",
+        re.IGNORECASE,
+    ),
+    re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
+    re.compile(
+        r"\b(?:gh[pousr]_[A-Z0-9]{20,}|sk-(?:proj-)?[A-Z0-9_-]{16,}|"
+        r"xox[baprs]-[A-Z0-9-]{10,})\b",
+        re.IGNORECASE,
+    ),
 )
 
 
@@ -105,7 +122,10 @@ def _string_list(value: Any, code: str) -> list[str]:
 
 
 def _normalized_field_name(value: Any) -> str:
-    return re.sub(r"[^a-z0-9]+", "_", str(value).lower()).strip("_")
+    text = str(value).strip()
+    text = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", text)
+    text = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", "_", text)
+    return re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")
 
 
 def _value_contains_secret(value: Any) -> bool:
@@ -118,6 +138,8 @@ def _value_contains_secret(value: Any) -> bool:
         return False
     if isinstance(value, (list, tuple, set)):
         return any(_value_contains_secret(item) for item in value)
+    if isinstance(value, (bytes, bytearray, memoryview)):
+        return bool(value)
     if not isinstance(value, str):
         return False
     return any(pattern.search(value) for pattern in SECRET_VALUE_PATTERNS)
@@ -209,6 +231,10 @@ def validate_registry(payload: dict[str, Any]) -> dict[str, Any]:
                 raise OutreachRegistryError(
                     f"UNSUPPORTED_POSITIVE_CLAIM:{template_id}:{marker}"
                 )
+        if _value_contains_secret(subject + "\n" + body):
+            raise OutreachRegistryError(
+                f"HARDCODED_TEMPLATE_CREDENTIAL:{template_id}"
+            )
         if UUID_RE.search(subject + "\n" + body):
             raise OutreachRegistryError(f"PRIVATE_IDENTIFIER_IN_TEMPLATE:{template_id}")
 
@@ -294,6 +320,8 @@ def render_response(
     registry: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     payload = validate_registry(registry or read_registry())
+    if not isinstance(facts, dict):
+        raise OutreachRegistryError("FACTS_NOT_OBJECT")
     row = template_by_id(payload, template_id)
     deadline = deadline_state(facts.get("deadline_iso"), current_utc)
 
@@ -478,6 +506,8 @@ def build_public_payload(
             "duplicate_send_fail_closed": True,
             "missing_fact_fail_closed": True,
             "secret_or_credential_fail_closed": True,
+            "opaque_binary_fact_fail_closed": True,
+            "hardcoded_template_credential_fail_closed": True,
             "past_deadline_fail_closed": True,
             "attachment_requires_explicit_request": True,
             "builder_can_send_email": False,
