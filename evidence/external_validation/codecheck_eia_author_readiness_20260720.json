@@ -414,7 +414,7 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T19:10:06.922031+00:00",
+  "generated_utc": "2026-07-21T20:05:39.969898+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "operator_clean_runner": {
     "assertion_count": 31,
@@ -736,7 +736,7 @@
     "tests/test_codecheck_reviewer_container.py": true,
     "tests/test_codecheck_reviewer_runtime.py": true
   },
-  "portable_input_chain_sha256": "87894856a468f23862f0a3b9d3ccb378ac2e0dd96b578e59ff750938ac2150fa",
+  "portable_input_chain_sha256": "2ba97f4abc646ce4f70ced1f85ea18ce8e71419ed4499ea58b6821f7332bd240",
   "portable_inputs": [
     {
       "bytes": 8574,
@@ -943,10 +943,10 @@
       "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
     },
     {
-      "bytes": 23078,
+      "bytes": 24397,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_readiness.py",
-      "sha256": "5d62e96caa0cd88849d81e78e86128f3ff7eb1d39a91ad8f083c67229050db7b"
+      "sha256": "451d488e51df563dc30b08331dfb9e86a374c66e8200331a6c0cfd861cb77616"
     },
     {
       "bytes": 6498,
@@ -1356,7 +1356,7 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "52efc09c821e294f3550954721408aa19574a8f50c85fd032ad96fd0830ed9dd",
+  "readiness_sha256": "554c40d4d8f64d78c6b59350e6e59b871829ba0414e38170e85a712ef3462438",
   "release_candidate": {
     "bundle_input_chain_sha256": "1189cc679a2897d55ac418ae930c7545345efa279868435038c498944c369bf6",
     "bundle_input_count": 44,

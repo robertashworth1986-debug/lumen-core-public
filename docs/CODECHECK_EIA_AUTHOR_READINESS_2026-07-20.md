@@ -1,6 +1,6 @@
 # CODECHECK EIA Author Readiness
 
-Generated UTC: `2026-07-21T19:10:06.922031+00:00`
+Generated UTC: `2026-07-21T20:05:39.969898+00:00`
 
 An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.
 
@@ -34,7 +34,7 @@ An author-readiness pass proves only that the declared public files, execution m
 - Independent execution complete: `false`
 - Certificate issued: `false`
 - External validation complete: `false`
-- Readiness SHA-256: `52efc09c821e294f3550954721408aa19574a8f50c85fd032ad96fd0830ed9dd`
+- Readiness SHA-256: `554c40d4d8f64d78c6b59350e6e59b871829ba0414e38170e85a712ef3462438`
 
 An internal pass means the author-side bundle is coherent enough for Robert to review. It is not a submission receipt, external execution, or certificate.
 

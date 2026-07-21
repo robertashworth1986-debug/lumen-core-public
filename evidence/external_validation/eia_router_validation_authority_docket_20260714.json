@@ -78,7 +78,7 @@
     },
     "verified": true
   },
-  "docket_sha256": "4bdddef627bc01391646e1cf30aeecc37976ab811a364aef15e62bbfe232930e",
+  "docket_sha256": "11219669d879fb815ce103daeeec04b1a7c941933fdec63f342ba4a225955d02",
   "evaluator_acceptance": {
     "accepted_protocol_sha256": null,
     "accepted_utc": null,
@@ -181,7 +181,7 @@
     "source_publisher": "U.S. Energy Information Administration",
     "source_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/"
   },
-  "generated_utc": "2026-07-21T19:14:40.604413+00:00",
+  "generated_utc": "2026-07-21T20:07:10.155974+00:00",
   "maturity": {
     "current_supported_level": 3,
     "external_validation_complete": false,
@@ -236,7 +236,7 @@
       "remaining_gap": "No external organization has adopted an incident, escalation, or production-use decision process for this experiment."
     }
   ],
-  "portable_input_chain_sha256": "fb23ba6b3bebff25163164959fc4efdd7b55efd1e4919ccb512a2ba0c95d9c51",
+  "portable_input_chain_sha256": "e5b3276c66daf2f6132b71cdba7a9c58a9491687535599f06694bcc96bda602a",
   "portable_inputs": [
     {
       "bytes": 9722,
@@ -257,10 +257,10 @@
       "sha256": "21a70dbd739219ab8058707c92cb17b57e9f72c09d64b7ea38db3f88ea52a4fe"
     },
     {
-      "bytes": 2823,
+      "bytes": 3663,
       "hash_mode": "utf8_lf",
       "path": ".gitattributes",
-      "sha256": "5a58632ee472ac0049f5989a4ac9960b014f7aaf113503b9110c8d68ff4c1ca6"
+      "sha256": "c838aa61a183c3348ba5e44d39b551ecb853b4bd5888a9329ba82b552c3ee493"
     },
     {
       "bytes": 2660,
