@@ -249,7 +249,24 @@
     "release_candidate_public_text_privacy_scan_passed": true,
     "release_candidate_publication_remains_closed": true,
     "release_candidate_publication_state_fail_closed": true,
-    "report_metadata_left_external": true
+    "report_metadata_left_external": true,
+    "reviewer_runtime_all_runtime_checks_passed": true,
+    "reviewer_runtime_expected_runtime_matches_config": true,
+    "reviewer_runtime_external_validation_remains_false": true,
+    "reviewer_runtime_independent_execution_remains_false": true,
+    "reviewer_runtime_operator_controlled": true,
+    "reviewer_runtime_passed": true,
+    "reviewer_runtime_privacy_scan_passed": true,
+    "reviewer_runtime_protocol_id_matched": true,
+    "reviewer_runtime_receipt_payload_sha256_matched": true,
+    "reviewer_runtime_receipt_sha256_matched": true,
+    "reviewer_runtime_runtime_check_set_exact": true,
+    "reviewer_runtime_schema_matched": true,
+    "reviewer_runtime_source_chain_sha256_matched": true,
+    "reviewer_runtime_source_commit_declared": true,
+    "reviewer_runtime_source_files_current": true,
+    "reviewer_runtime_source_files_present": true,
+    "reviewer_runtime_status_matched": true
   },
   "claim_boundary": "An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.",
   "codecheck_configuration": {
@@ -351,7 +368,7 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T15:05:32.341807+00:00",
+  "generated_utc": "2026-07-21T15:36:03.090332+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "operator_clean_runner": {
     "assertion_count": 31,
@@ -563,9 +580,11 @@
     "code/ops/BUILD_CODECHECK_PREPRINT_PDF.py": true,
     "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py": true,
     "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py": true,
+    "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py": true,
     "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py": true,
     "codecheck.yml": true,
     "config/codecheck_eia_release_candidate_v1.json": true,
+    "config/codecheck_reviewer_runtime_v1.json": true,
     "config/external_validation_authority_docket_v1.json": true,
     "config/reviewer_reproducibility_protocol_v1.json": true,
     "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md": true,
@@ -574,18 +593,20 @@
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
     "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
     "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json": true,
+    "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json": true,
     "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
     "requirements-reviewer-ubuntu-py311.lock": true,
     "tests/test_codecheck_eia_readiness.py": true,
-    "tests/test_codecheck_eia_release_candidate.py": true
+    "tests/test_codecheck_eia_release_candidate.py": true,
+    "tests/test_codecheck_reviewer_runtime.py": true
   },
-  "portable_input_chain_sha256": "1715c70045441157d8153b98277630b55acf13e08e3eaef100ad7d538dd64eae",
+  "portable_input_chain_sha256": "375ff009c868f4772f1592227902effcaa92f47d4a4ffac937651b4f27d7ad02",
   "portable_inputs": [
     {
-      "bytes": 6159,
+      "bytes": 6967,
       "hash_mode": "utf8_lf",
       "path": ".github/workflows/codecheck-eia-readiness.yml",
-      "sha256": "07fd078c5e2f669f1b08cd955dad29ee0e8e84b5ae3244f2f13e8b2890dd5a30"
+      "sha256": "2c3780e8e5151e09c97b06c0edce00443321aea0e5a8abc3d565fc1a9e7085b8"
     },
     {
       "bytes": 15541,
@@ -612,10 +633,10 @@
       "sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880"
     },
     {
-      "bytes": 41875,
+      "bytes": 48180,
       "hash_mode": "utf8_lf",
       "path": "code/ops/BUILD_CODECHECK_EIA_READINESS.py",
-      "sha256": "1fae5abe9b738dc757943cec35a2328d484615a2152c5e26d2e4c1988332ea0e"
+      "sha256": "75a6ebe5ce330d00396fdbf64d25f7272d4d695062b71c867fa0ee7117eb6da2"
     },
     {
       "bytes": 10355,
@@ -648,16 +669,28 @@
       "sha256": "79c03eb63443a8b9bba3cf48e206a8b44f7a9f8e8fa382a6c3b97e8ec5a1c676"
     },
     {
-      "bytes": 9848,
+      "bytes": 8205,
       "hash_mode": "utf8_lf",
-      "path": "config/codecheck_eia_readiness_v1.json",
-      "sha256": "4b6b93a53f465f5c0af2d6245237eeb49cc93477763f812e6412eb153ec5bb67"
+      "path": "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+      "sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c"
     },
     {
-      "bytes": 5493,
+      "bytes": 11569,
+      "hash_mode": "utf8_lf",
+      "path": "config/codecheck_eia_readiness_v1.json",
+      "sha256": "aeb3dd2199e7527c802c97dad927efbf1c55c54c16470aa91b97bf75c5e998f9"
+    },
+    {
+      "bytes": 5733,
       "hash_mode": "utf8_lf",
       "path": "config/codecheck_eia_release_candidate_v1.json",
-      "sha256": "4eec7783ccb9c3a14c383ffc71747010845a350590449dccfc6737932742b1b2"
+      "sha256": "c6b02a0cf8814aaf04fd163db8746a2d97022e063b0f0207987ce919ec464923"
+    },
+    {
+      "bytes": 1480,
+      "hash_mode": "utf8_lf",
+      "path": "config/codecheck_reviewer_runtime_v1.json",
+      "sha256": "23a850097ef9da3cf112920595dddcea3afb22d3d4b9f5d70d37b099c7da359e"
     },
     {
       "bytes": 9722,
@@ -672,40 +705,46 @@
       "sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1"
     },
     {
-      "bytes": 3200,
+      "bytes": 3286,
       "hash_mode": "utf8_lf",
       "path": "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
-      "sha256": "b253a88c6905c11ed1e8256551ecdf561208e94a72ff05aa22699a7867e2781c"
+      "sha256": "c6b200fd49bca5d4e50cb06845824c532107ec61b976f6eb41268f9b3683a246"
     },
     {
-      "bytes": 7037,
+      "bytes": 7640,
       "hash_mode": "utf8_lf",
       "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
-      "sha256": "ba68cbfc71b230c41aa685932ffa86b84ad56afbbe2651c01adfced9613eb3e7"
+      "sha256": "bdb7804ccd72f229515a7a71696e2df5e165df4b721009aa12b89cc8f74140da"
     },
     {
-      "bytes": 5093,
+      "bytes": 5419,
       "hash_mode": "utf8_lf",
       "path": "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md",
-      "sha256": "6c820f343e630e4627654ae578c9e92041c0be408c3680c56f82cdbdc4bcfdef"
+      "sha256": "ac6b2c723caa3b5d3ab273269d0df5790febc9d7913b806afe538531f904ae26"
     },
     {
-      "bytes": 10343,
+      "bytes": 10880,
       "hash_mode": "utf8_lf",
       "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
-      "sha256": "13bfcb537cf4e41ea249a2a94a8ced9e3f2363740e0cec802f582ca776a62818"
+      "sha256": "52920f927d3f41727b9fb44f808f53cdbb61acfda575b2a208242cfa500ce665"
     },
     {
-      "bytes": 13270,
+      "bytes": 13630,
       "hash_mode": "raw",
       "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
-      "sha256": "a87908b14fe1ac9d05c224f51e9562723592addc24aefe4e2690c943d02c52ef"
+      "sha256": "11a4c2f99c4f20517e33b528af59cf0bf986cfd6e98bccc9678e3025b07ccb27"
     },
     {
       "bytes": 26114,
       "hash_mode": "utf8_lf",
       "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json",
       "sha256": "8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351"
+    },
+    {
+      "bytes": 3009,
+      "hash_mode": "utf8_lf",
+      "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json",
+      "sha256": "abb21ce411597b31df39bf4dc858cf378e41ea8b2d68cd53c73bc7302a0d659d"
     },
     {
       "bytes": 114366,
@@ -720,16 +759,22 @@
       "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
     },
     {
-      "bytes": 14005,
+      "bytes": 16544,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_readiness.py",
-      "sha256": "923ebd8042d89d8261e2641d7d90dd205d00beb7533ebcc4da7af7fd5d2022d8"
+      "sha256": "65be14b91d08b66ad784353ce01ea4b3d127fae52383df4536cea155d0b5b969"
     },
     {
-      "bytes": 5762,
+      "bytes": 6110,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_release_candidate.py",
-      "sha256": "cf0e272f46365dacae94cba9490157eaf1e543e52975b21fd2ca07c786efc1c4"
+      "sha256": "602edf4ffa825ec2d825382577c1d0ac07fe1910bcce05c6db580d4150bd220f"
+    },
+    {
+      "bytes": 6066,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_codecheck_reviewer_runtime.py",
+      "sha256": "c10a92d4fe120c3f8dbb3de4b6984673384f58e51a7dd560a0997a3506e7c2d4"
     }
   ],
   "preprint_and_request": {
@@ -755,11 +800,11 @@
     "duplicate_request_reconciled": false,
     "immutable_public_source_release": null,
     "markdown_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
-    "markdown_sha256": "13bfcb537cf4e41ea249a2a94a8ced9e3f2363740e0cec802f582ca776a62818",
+    "markdown_sha256": "52920f927d3f41727b9fb44f808f53cdbb61acfda575b2a208242cfa500ce665",
     "paper_reference": "Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
     "pdf_page_count": 5,
     "pdf_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
-    "pdf_sha256": "a87908b14fe1ac9d05c224f51e9562723592addc24aefe4e2690c943d02c52ef",
+    "pdf_sha256": "11a4c2f99c4f20517e33b528af59cf0bf986cfd6e98bccc9678e3025b07ccb27",
     "policy": "The manuscript and request text are author-side drafts. A stable public preprint identifier, immutable public source release, duplicate-request reconciliation, Robert's review, and fresh action-time HumanUnlock are required before one production request may be opened.",
     "request_path": "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
     "stable_public_identifier": null,
@@ -770,10 +815,10 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "761cdd83826d8868f982bcaebe51d4590ef20e7cfe732b66476daa111082c212",
+  "readiness_sha256": "2909e70b90141d3b3a5f97c0f22e6f1a71e48ee2c6eac253b4c2b8ada02c154d",
   "release_candidate": {
-    "bundle_input_chain_sha256": "19807a5ec4c9bfc4d835a96b1c4317577ba36c689a629bca085155b2819b1dd8",
-    "bundle_input_count": 32,
+    "bundle_input_chain_sha256": "b1012db563e090ba4f6b4f6b752290336ea04cff983c218428536cfad5fe8f35",
+    "bundle_input_count": 36,
     "bundle_inputs": [
       {
         "bytes": 4832,
@@ -836,6 +881,12 @@
         "sha256": "2481919eca73df9469b372367d676d8713687c940f6565a1380d69547464f8e3"
       },
       {
+        "bytes": 8205,
+        "hash_mode": "utf8_lf",
+        "path": "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+        "sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c"
+      },
+      {
         "bytes": 9082,
         "hash_mode": "utf8_lf",
         "path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
@@ -848,10 +899,16 @@
         "sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880"
       },
       {
-        "bytes": 5493,
+        "bytes": 5733,
         "hash_mode": "utf8_lf",
         "path": "config/codecheck_eia_release_candidate_v1.json",
-        "sha256": "4eec7783ccb9c3a14c383ffc71747010845a350590449dccfc6737932742b1b2"
+        "sha256": "c6b02a0cf8814aaf04fd163db8746a2d97022e063b0f0207987ce919ec464923"
+      },
+      {
+        "bytes": 1480,
+        "hash_mode": "utf8_lf",
+        "path": "config/codecheck_reviewer_runtime_v1.json",
+        "sha256": "23a850097ef9da3cf112920595dddcea3afb22d3d4b9f5d70d37b099c7da359e"
       },
       {
         "bytes": 8422,
@@ -878,34 +935,40 @@
         "sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1"
       },
       {
-        "bytes": 7037,
+        "bytes": 7640,
         "hash_mode": "utf8_lf",
         "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
-        "sha256": "ba68cbfc71b230c41aa685932ffa86b84ad56afbbe2651c01adfced9613eb3e7"
+        "sha256": "bdb7804ccd72f229515a7a71696e2df5e165df4b721009aa12b89cc8f74140da"
       },
       {
-        "bytes": 10343,
+        "bytes": 10880,
         "hash_mode": "utf8_lf",
         "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
-        "sha256": "13bfcb537cf4e41ea249a2a94a8ced9e3f2363740e0cec802f582ca776a62818"
+        "sha256": "52920f927d3f41727b9fb44f808f53cdbb61acfda575b2a208242cfa500ce665"
       },
       {
-        "bytes": 13270,
+        "bytes": 13630,
         "hash_mode": "binary",
         "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
-        "sha256": "a87908b14fe1ac9d05c224f51e9562723592addc24aefe4e2690c943d02c52ef"
+        "sha256": "11a4c2f99c4f20517e33b528af59cf0bf986cfd6e98bccc9678e3025b07ccb27"
       },
       {
-        "bytes": 5093,
+        "bytes": 5419,
         "hash_mode": "utf8_lf",
         "path": "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md",
-        "sha256": "6c820f343e630e4627654ae578c9e92041c0be408c3680c56f82cdbdc4bcfdef"
+        "sha256": "ac6b2c723caa3b5d3ab273269d0df5790febc9d7913b806afe538531f904ae26"
       },
       {
         "bytes": 26114,
         "hash_mode": "utf8_lf",
         "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json",
         "sha256": "8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351"
+      },
+      {
+        "bytes": 3009,
+        "hash_mode": "utf8_lf",
+        "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json",
+        "sha256": "abb21ce411597b31df39bf4dc858cf378e41ea8b2d68cd53c73bc7302a0d659d"
       },
       {
         "bytes": 114366,
@@ -926,10 +989,16 @@
         "sha256": "4b99049b4bc579f6d2a5a675e612f513e1a24db79775a2120e60334a0c72bbd4"
       },
       {
-        "bytes": 5762,
+        "bytes": 6110,
         "hash_mode": "utf8_lf",
         "path": "tests/test_codecheck_eia_release_candidate.py",
-        "sha256": "cf0e272f46365dacae94cba9490157eaf1e543e52975b21fd2ca07c786efc1c4"
+        "sha256": "602edf4ffa825ec2d825382577c1d0ac07fe1910bcce05c6db580d4150bd220f"
+      },
+      {
+        "bytes": 6066,
+        "hash_mode": "utf8_lf",
+        "path": "tests/test_codecheck_reviewer_runtime.py",
+        "sha256": "c10a92d4fe120c3f8dbb3de4b6984673384f58e51a7dd560a0997a3506e7c2d4"
       },
       {
         "bytes": 4309,
@@ -1047,9 +1116,11 @@
       "code/mda_control_mapping_open_set_benchmark.py": true,
       "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py": true,
       "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py": true,
+      "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py": true,
       "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py": true,
       "codecheck.yml": true,
       "config/codecheck_eia_release_candidate_v1.json": true,
+      "config/codecheck_reviewer_runtime_v1.json": true,
       "config/eia_grid_residual_moe_protocol_v1.json": true,
       "config/eia_grid_wave_champion_protocol_v1.json": true,
       "config/mda_control_mapping_open_set_protocol_v2.json": true,
@@ -1059,10 +1130,12 @@
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
       "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
       "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json": true,
+      "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json": true,
       "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
       "requirements-reviewer-ubuntu-py311.lock": true,
       "requirements-reviewer.txt": true,
       "tests/test_codecheck_eia_release_candidate.py": true,
+      "tests/test_codecheck_reviewer_runtime.py": true,
       "tests/test_eia_grid_residual_moe_benchmark.py": true,
       "tests/test_eia_grid_wave_champion_benchmark.py": true,
       "tests/test_faa_sdr_10k_benchmark.py": true,
@@ -1081,9 +1154,11 @@
       "code/mda_control_mapping_open_set_benchmark.py": true,
       "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py": true,
       "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py": true,
+      "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py": true,
       "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py": true,
       "codecheck.yml": true,
       "config/codecheck_eia_release_candidate_v1.json": true,
+      "config/codecheck_reviewer_runtime_v1.json": true,
       "config/eia_grid_residual_moe_protocol_v1.json": true,
       "config/eia_grid_wave_champion_protocol_v1.json": true,
       "config/mda_control_mapping_open_set_protocol_v2.json": true,
@@ -1093,10 +1168,12 @@
       "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
       "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
       "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json": true,
+      "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json": true,
       "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
       "requirements-reviewer-ubuntu-py311.lock": true,
       "requirements-reviewer.txt": true,
       "tests/test_codecheck_eia_release_candidate.py": true,
+      "tests/test_codecheck_reviewer_runtime.py": true,
       "tests/test_eia_grid_residual_moe_benchmark.py": true,
       "tests/test_eia_grid_wave_champion_benchmark.py": true,
       "tests/test_faa_sdr_10k_benchmark.py": true,
@@ -1143,6 +1220,102 @@
     "schema": "codecheck_eia_release_candidate_definition.v1",
     "value_boundary": "An immutable public release and later independent execution may reduce diligence risk around provenance and executability. Neither establishes scientific validity, commercial demand, realized savings, model superiority, trading alpha, or valuation."
   },
+  "reviewer_runtime": {
+    "checks": {
+      "all_runtime_checks_passed": true,
+      "expected_runtime_matches_config": true,
+      "external_validation_remains_false": true,
+      "independent_execution_remains_false": true,
+      "operator_controlled": true,
+      "passed": true,
+      "privacy_scan_passed": true,
+      "protocol_id_matched": true,
+      "receipt_payload_sha256_matched": true,
+      "receipt_sha256_matched": true,
+      "runtime_check_set_exact": true,
+      "schema_matched": true,
+      "source_chain_sha256_matched": true,
+      "source_commit_declared": true,
+      "source_files_current": true,
+      "source_files_present": true,
+      "status_matched": true
+    },
+    "configured_private_pattern_hit_count": 0,
+    "expected": {
+      "environment": {
+        "MKL_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "4",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTHONHASHSEED": "0",
+        "TZ": "UTC"
+      },
+      "github_image": "ubuntu-24.04",
+      "libc": {
+        "name": "glibc",
+        "version": "2.39"
+      },
+      "machine": "x86_64",
+      "os_release": {
+        "id": "ubuntu",
+        "version_id": "24.04"
+      },
+      "python": "3.11.9",
+      "requirements_lock": {
+        "path": "requirements-reviewer-ubuntu-py311.lock",
+        "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
+      },
+      "system": "Linux"
+    },
+    "external_validation_complete": false,
+    "generated_utc": "2026-07-21T15:22:04.871883+00:00",
+    "independent_execution_complete": false,
+    "observed": {
+      "environment": {
+        "MKL_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "4",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTHONHASHSEED": "0",
+        "TZ": "UTC"
+      },
+      "libc": {
+        "name": "glibc",
+        "version": "2.39"
+      },
+      "machine": "x86_64",
+      "os_release": {
+        "id": "ubuntu",
+        "version_id": "24.04"
+      },
+      "python": "3.11.9",
+      "system": "Linux"
+    },
+    "operator_controlled": true,
+    "policy": "This first-party receipt closes the author-side ambiguity between a generic Linux/Python match and the specifically claimed Ubuntu 24.04 x86-64 CPython 3.11.9 glibc 2.39 runtime. It does not convert the replay into independent execution or external validation.",
+    "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_RUNTIME_20260721",
+    "receipt_path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json",
+    "receipt_payload_sha256": "5b7b53914e9299515e0b27fd45cf8f2ae17ae7ae897d9b3fd827efe25cc6d079",
+    "receipt_sha256": "abb21ce411597b31df39bf4dc858cf378e41ea8b2d68cd53c73bc7302a0d659d",
+    "runtime_check_count": 10,
+    "runtime_check_pass_count": 10,
+    "schema": "codecheck_reviewer_runtime_receipt.v1",
+    "source_commit": "d60ae7230a8391f05768fa2c24893efa7f8f281f",
+    "source_reconciliation": [
+      {
+        "current_match": true,
+        "current_sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c",
+        "path": "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+        "receipt_sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c"
+      },
+      {
+        "current_match": true,
+        "current_sha256": "23a850097ef9da3cf112920595dddcea3afb22d3d4b9f5d70d37b099c7da359e",
+        "path": "config/codecheck_reviewer_runtime_v1.json",
+        "receipt_sha256": "23a850097ef9da3cf112920595dddcea3afb22d3d4b9f5d70d37b099c7da359e"
+      }
+    ],
+    "status": "AUTHORITATIVE_RUNTIME_PASS",
+    "verified": true
+  },
   "schema": "codecheck_eia_author_readiness.v1",
   "status": "AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW",
   "summary": {
@@ -1161,8 +1334,8 @@
     "human_author_review_complete": false,
     "immutable_public_source_release_complete": false,
     "independent_execution_complete": false,
-    "internal_check_count": 73,
-    "internal_check_pass_count": 73,
+    "internal_check_count": 90,
+    "internal_check_pass_count": 90,
     "internal_gate_passed": true,
     "manifest_output_count": 6,
     "operator_clean_runner_computational_identity_current": true,
@@ -1171,6 +1344,9 @@
     "public_preprint_draft_complete": true,
     "release_candidate_definition_ready": true,
     "release_candidate_publication_ready": false,
+    "reviewer_runtime_check_count": 10,
+    "reviewer_runtime_check_pass_count": 10,
+    "reviewer_runtime_receipt_verified": true,
     "stable_public_preprint_identifier_complete": false,
     "submission_authorized": false
   },

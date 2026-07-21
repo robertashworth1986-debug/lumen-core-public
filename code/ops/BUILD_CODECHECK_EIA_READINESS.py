@@ -373,6 +373,101 @@ def verify_operator_clean_runner(
     }
 
 
+def verify_reviewer_runtime(
+    control: dict[str, Any], *, receipt_path: Path | None = None
+) -> dict[str, Any]:
+    path = receipt_path or (ROOT / control["receipt_path"])
+    receipt = read_json(path)
+    runtime_config = read_json(ROOT / control["config_path"])
+    receipt_checks = receipt.get("checks", {})
+    source_rows = receipt.get("source", {}).get("files", [])
+    source_reconciliation = []
+    for row in source_rows:
+        relative_path = row.get("path", "")
+        current_path = ROOT / relative_path
+        current_sha256 = file_sha256(current_path) if current_path.is_file() else None
+        source_reconciliation.append(
+            {
+                "path": relative_path,
+                "receipt_sha256": row.get("sha256"),
+                "current_sha256": current_sha256,
+                "current_match": current_sha256 == row.get("sha256"),
+            }
+        )
+    receipt_without_hash = {
+        key: value
+        for key, value in receipt.items()
+        if key != "receipt_payload_sha256"
+    }
+    private_hits = scan_private(receipt)
+    checks = {
+        "receipt_sha256_matched": file_sha256(path) == control["receipt_sha256"],
+        "receipt_payload_sha256_matched": receipt.get("receipt_payload_sha256")
+        == canonical_sha256(receipt_without_hash),
+        "schema_matched": receipt.get("schema") == control["expected_schema"],
+        "protocol_id_matched": receipt.get("protocol_id")
+        == control["expected_protocol_id"],
+        "status_matched": receipt.get("status") == control["expected_status"],
+        "passed": receipt.get("passed") is True,
+        "expected_runtime_matches_config": receipt.get("expected")
+        == runtime_config.get("expected"),
+        "runtime_check_set_exact": sorted(receipt_checks)
+        == sorted(control["expected_checks"]),
+        "all_runtime_checks_passed": bool(receipt_checks)
+        and all(value is True for value in receipt_checks.values()),
+        "source_commit_declared": receipt.get("source", {}).get(
+            "repository_commit_declared_by_operator"
+        )
+        == control["source_commit"],
+        "source_files_present": bool(source_rows)
+        and all(row["current_sha256"] for row in source_reconciliation),
+        "source_files_current": bool(source_reconciliation)
+        and all(row["current_match"] for row in source_reconciliation),
+        "source_chain_sha256_matched": receipt.get("source", {}).get(
+            "source_chain_sha256"
+        )
+        == canonical_sha256(source_rows),
+        "operator_controlled": receipt.get("operator_controlled") is True,
+        "independent_execution_remains_false": receipt.get(
+            "independent_execution_complete"
+        )
+        is False,
+        "external_validation_remains_false": receipt.get(
+            "external_validation_complete"
+        )
+        is False,
+        "privacy_scan_passed": not private_hits,
+    }
+    return {
+        "verified": all(checks.values()),
+        "checks": checks,
+        "receipt_path": control["receipt_path"],
+        "receipt_sha256": file_sha256(path),
+        "receipt_payload_sha256": receipt.get("receipt_payload_sha256"),
+        "schema": receipt.get("schema"),
+        "protocol_id": receipt.get("protocol_id"),
+        "status": receipt.get("status"),
+        "generated_utc": receipt.get("generated_utc"),
+        "source_commit": receipt.get("source", {}).get(
+            "repository_commit_declared_by_operator"
+        ),
+        "runtime_check_count": len(receipt_checks),
+        "runtime_check_pass_count": sum(value is True for value in receipt_checks.values()),
+        "expected": receipt.get("expected"),
+        "observed": receipt.get("observed"),
+        "source_reconciliation": source_reconciliation,
+        "operator_controlled": receipt.get("operator_controlled"),
+        "independent_execution_complete": receipt.get(
+            "independent_execution_complete"
+        ),
+        "external_validation_complete": receipt.get(
+            "external_validation_complete"
+        ),
+        "configured_private_pattern_hit_count": len(private_hits),
+        "policy": control["policy"],
+    }
+
+
 def verify_preprint_and_request(
     control: dict[str, Any],
     *,
@@ -482,6 +577,7 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
     operator_clean_runner = verify_operator_clean_runner(
         config["operator_clean_runner"]
     )
+    reviewer_runtime = verify_reviewer_runtime(config["reviewer_runtime"])
     preprint_and_request = verify_preprint_and_request(
         config["preprint_and_request"],
         markdown_path=ROOT / bundle["preprint_markdown_path"],
@@ -522,6 +618,7 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
     required_paths.add(
         ROOT / config["operator_clean_runner"]["receipt_path"]
     )
+    required_paths.add(ROOT / config["reviewer_runtime"]["receipt_path"])
     required_paths.add(SCRIPT_PATH)
     required_paths.add(TEST_PATH)
     path_checks = {
@@ -614,6 +711,10 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             for key, value in operator_clean_runner["checks"].items()
         },
         **{
+            f"reviewer_runtime_{key}": value
+            for key, value in reviewer_runtime["checks"].items()
+        },
+        **{
             f"preprint_request_{key}": value
             for key, value in preprint_and_request["checks"].items()
         },
@@ -668,6 +769,13 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
                     "computational_identity_exact_match"
                 ]
             ),
+            "reviewer_runtime_receipt_verified": reviewer_runtime["verified"],
+            "reviewer_runtime_check_count": reviewer_runtime[
+                "runtime_check_count"
+            ],
+            "reviewer_runtime_check_pass_count": reviewer_runtime[
+                "runtime_check_pass_count"
+            ],
             "current_commit_clean_runner_complete": False,
             "public_preprint_draft_complete": preprint_and_request["verified"],
             "release_candidate_definition_ready": release_candidate[
@@ -724,6 +832,7 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             "source_reconciliation": source_reconciliation,
         },
         "operator_clean_runner": operator_clean_runner,
+        "reviewer_runtime": reviewer_runtime,
         "preprint_and_request": preprint_and_request,
         "release_candidate": release_candidate,
         "external_gates": external_gates,
@@ -745,6 +854,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     archive = payload["authoritative_archive"]
     operator = payload["operator_clean_runner"]
+    runtime = payload["reviewer_runtime"]
     preprint = payload["preprint_and_request"]
     release_candidate = payload["release_candidate"]
     lines = [
@@ -765,6 +875,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Operator clean-runner receipt verified: `{str(summary['operator_clean_runner_receipt_verified']).lower()}`",
         f"- Operator clean-runner full source exact match: `{str(summary['operator_clean_runner_full_source_exact_match']).lower()}`",
         f"- Operator clean-runner computational identity current: `{str(summary['operator_clean_runner_computational_identity_current']).lower()}`",
+        f"- Exact reviewer runtime receipt verified: `{str(summary['reviewer_runtime_receipt_verified']).lower()}`",
+        f"- Exact reviewer runtime checks: `{summary['reviewer_runtime_check_pass_count']}/{summary['reviewer_runtime_check_count']}`",
         f"- Current commit clean-runner complete: `{str(summary['current_commit_clean_runner_complete']).lower()}`",
         f"- Public preprint draft complete: `{str(summary['public_preprint_draft_complete']).lower()}`",
         f"- Deterministic release-candidate definition ready: `{str(summary['release_candidate_definition_ready']).lower()}`",
@@ -784,6 +896,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Exact Execution",
         "",
         "```bash",
+        "python code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py --check-only",
         "python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
         "python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-reviewer-ubuntu-py311.lock",
         "python -m pip check",
@@ -862,6 +975,22 @@ def render_markdown(payload: dict[str, Any]) -> str:
             operator["execution_control"],
             "",
             operator["policy"],
+            "",
+            "## Exact Reviewer Runtime Receipt",
+            "",
+            f"- Receipt: `{runtime['receipt_path']}`",
+            f"- Receipt SHA-256: `{runtime['receipt_sha256']}`",
+            f"- Declared source commit: `{runtime['source_commit']}`",
+            f"- Runtime checks passed: `{runtime['runtime_check_pass_count']}/{runtime['runtime_check_count']}`",
+            f"- Observed OS: `{runtime['observed']['os_release']['id']} {runtime['observed']['os_release']['version_id']}`",
+            f"- Observed architecture: `{runtime['observed']['machine']}`",
+            f"- Observed Python: `{runtime['observed']['python']}`",
+            f"- Observed libc: `{runtime['observed']['libc']['name']} {runtime['observed']['libc']['version']}`",
+            f"- Operator controlled: `{str(runtime['operator_controlled']).lower()}`",
+            f"- Independent execution complete: `{str(runtime['independent_execution_complete']).lower()}`",
+            f"- External validation complete: `{str(runtime['external_validation_complete']).lower()}`",
+            "",
+            runtime["policy"],
             "",
             "## Human And External Gates",
             "",

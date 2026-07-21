@@ -19,8 +19,10 @@ on:
       - "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py"
       - "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py"
       - "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py"
+      - "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py"
       - "config/codecheck_eia_readiness_v1.json"
       - "config/codecheck_eia_release_candidate_v1.json"
+      - "config/codecheck_reviewer_runtime_v1.json"
       - "config/eia_grid_residual_moe_protocol_v1.json"
       - "config/eia_grid_wave_champion_protocol_v1.json"
       - "config/external_validation_authority_docket_v1.json"
@@ -34,12 +36,14 @@ on:
       - "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf"
       - "evidence/external_validation/codecheck_eia_author_readiness_20260720.json"
       - "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json"
+      - "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json"
       - "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
       - "evidence/reproducibility/github_run_29467557473/**"
       - "requirements-reviewer-ubuntu-py311.lock"
       - "requirements-reviewer.txt"
       - "tests/test_codecheck_eia_readiness.py"
       - "tests/test_codecheck_eia_release_candidate.py"
+      - "tests/test_codecheck_reviewer_runtime.py"
       - "tests/test_eia_grid_residual_moe_benchmark.py"
       - "tests/test_eia_grid_wave_champion_benchmark.py"
       - "tests/test_faa_sdr_10k_benchmark.py"
@@ -63,8 +67,10 @@ on:
       - "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py"
       - "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py"
       - "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py"
+      - "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py"
       - "config/codecheck_eia_readiness_v1.json"
       - "config/codecheck_eia_release_candidate_v1.json"
+      - "config/codecheck_reviewer_runtime_v1.json"
       - "config/eia_grid_residual_moe_protocol_v1.json"
       - "config/eia_grid_wave_champion_protocol_v1.json"
       - "config/external_validation_authority_docket_v1.json"
@@ -78,12 +84,14 @@ on:
       - "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf"
       - "evidence/external_validation/codecheck_eia_author_readiness_20260720.json"
       - "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json"
+      - "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json"
       - "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz"
       - "evidence/reproducibility/github_run_29467557473/**"
       - "requirements-reviewer-ubuntu-py311.lock"
       - "requirements-reviewer.txt"
       - "tests/test_codecheck_eia_readiness.py"
       - "tests/test_codecheck_eia_release_candidate.py"
+      - "tests/test_codecheck_reviewer_runtime.py"
       - "tests/test_eia_grid_residual_moe_benchmark.py"
       - "tests/test_eia_grid_wave_champion_benchmark.py"
       - "tests/test_faa_sdr_10k_benchmark.py"
@@ -103,6 +111,12 @@ jobs:
     name: Author packet and archive gate
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      MKL_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "4"
+      OPENBLAS_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+      TZ: UTC
 
     steps:
       - name: Check out the reviewed source
@@ -112,6 +126,9 @@ jobs:
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.11.9"
+
+      - name: Verify the exact reviewer runtime
+        run: python code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py --check-only
 
       - name: Install the hash-locked reviewer dependencies
         run: |
@@ -126,4 +143,4 @@ jobs:
         run: python code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py
 
       - name: Test the fail-closed author and release packets
-        run: python -m pytest -q tests/test_codecheck_eia_readiness.py tests/test_codecheck_eia_release_candidate.py
+        run: python -m pytest -q tests/test_codecheck_eia_readiness.py tests/test_codecheck_eia_release_candidate.py tests/test_codecheck_reviewer_runtime.py

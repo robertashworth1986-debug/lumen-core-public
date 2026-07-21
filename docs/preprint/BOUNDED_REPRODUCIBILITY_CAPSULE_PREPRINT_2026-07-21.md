@@ -41,13 +41,14 @@ The third suite uses 128 deterministic synthetic fixtures for open-set control m
 
 ### 3.1 Environment control
 
-The authoritative environment is Ubuntu 24.04 x86-64 with CPython 3.11.9. Dependencies are installed from `requirements-reviewer-ubuntu-py311.lock` using `--require-hashes` and `--only-binary=:all:`. The runner checks the installed transitive closure, package versions, deterministic environment variables, frozen-input hash, source-artifact chain, and privacy patterns before issuing a bounded receipt.
+The authoritative environment is Ubuntu 24.04 x86-64 with CPython 3.11.9 and glibc 2.39. A separate fail-closed verifier directly reads the OS release, architecture, Python and libc versions, deterministic environment variables, and dependency-lock hash. Dependencies are installed from `requirements-reviewer-ubuntu-py311.lock` using `--require-hashes` and `--only-binary=:all:`. The runner then checks the installed transitive closure, package versions, frozen-input hash, source-artifact chain, and privacy patterns before issuing a bounded receipt.
 
 ### 3.2 Execution
 
 From the repository root, the declared workflow is:
 
 ```text
+python code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py --check-only
 python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py
 python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-reviewer-ubuntu-py311.lock
 python -m pip check
@@ -128,6 +129,8 @@ The current public author receipt records an isolated, network-disabled replay o
 - Source-chain SHA-256: `ca04c902d143c89f1ae9bf089447be241060ef39c504199d5a865d219760679c`
 
 This is first-party evidence. An independent codechecker must execute the reviewed source and document what was checked, how it was checked, and what was reproduced before any external claim changes.
+
+The companion runtime receipt binds the environment claim to 10/10 measured checks: Ubuntu 24.04, Linux, x86-64, CPython 3.11.9, glibc 2.39, five deterministic environment values, and the exact dependency-lock hash. That receipt is also operator-controlled and leaves independent execution and external validation false.
 
 ## 7. Limitations
 

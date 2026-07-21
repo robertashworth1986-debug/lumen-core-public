@@ -32,6 +32,9 @@
     "runner_path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
     "reviewer_protocol_path": "config/reviewer_reproducibility_protocol_v1.json",
     "dependency_verifier_path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+    "reviewer_runtime_verifier_path": "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+    "reviewer_runtime_config_path": "config/codecheck_reviewer_runtime_v1.json",
+    "reviewer_runtime_test_path": "tests/test_codecheck_reviewer_runtime.py",
     "dependency_lock_path": "requirements-reviewer-ubuntu-py311.lock",
     "frozen_input_path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
     "authority_config_path": "config/external_validation_authority_docket_v1.json",
@@ -66,11 +69,35 @@
     "execution_control": "Author-operated Docker replay with network access disabled and the protocol-pinned Ubuntu, CPython, and dependency environment.",
     "policy": "This receipt is internal operator evidence, not independent execution or external validation. It may establish current computational identity only while every benchmark, protocol, frozen input, dependency lock, workflow, and test artifact in the receipt still matches byte-for-byte under its declared portable hash mode. Documentation drift must remain visible and requires a current-commit independent execution before any external claim changes."
   },
+  "reviewer_runtime": {
+    "config_path": "config/codecheck_reviewer_runtime_v1.json",
+    "verifier_path": "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+    "test_path": "tests/test_codecheck_reviewer_runtime.py",
+    "receipt_path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json",
+    "receipt_sha256": "abb21ce411597b31df39bf4dc858cf378e41ea8b2d68cd53c73bc7302a0d659d",
+    "source_commit": "d60ae7230a8391f05768fa2c24893efa7f8f281f",
+    "expected_schema": "codecheck_reviewer_runtime_receipt.v1",
+    "expected_protocol_id": "LUMENCORE_CODECHECK_REVIEWER_RUNTIME_20260721",
+    "expected_status": "AUTHORITATIVE_RUNTIME_PASS",
+    "expected_checks": [
+      "deterministic_environment",
+      "libc_name",
+      "libc_version",
+      "machine",
+      "os_release_id",
+      "os_release_version_id",
+      "python",
+      "requirements_lock_present",
+      "requirements_lock_sha256",
+      "system"
+    ],
+    "policy": "This first-party receipt closes the author-side ambiguity between a generic Linux/Python match and the specifically claimed Ubuntu 24.04 x86-64 CPython 3.11.9 glibc 2.39 runtime. It does not convert the replay into independent execution or external validation."
+  },
   "preprint_and_request": {
     "official_launch_pad": "https://codecheck.org.uk/launch-pad/",
     "paper_reference": "Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
-    "source_sha256": "13bfcb537cf4e41ea249a2a94a8ced9e3f2363740e0cec802f582ca776a62818",
-    "pdf_sha256": "a87908b14fe1ac9d05c224f51e9562723592addc24aefe4e2690c943d02c52ef",
+    "source_sha256": "52920f927d3f41727b9fb44f808f53cdbb61acfda575b2a208242cfa500ce665",
+    "pdf_sha256": "11a4c2f99c4f20517e33b528af59cf0bf986cfd6e98bccc9678e3025b07ccb27",
     "expected_pdf_page_count": 5,
     "stable_public_identifier": null,
     "immutable_public_source_release": null,
@@ -97,8 +124,10 @@
     "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py",
     "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
     "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+    "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
     "config/codecheck_eia_readiness_v1.json",
     "config/codecheck_eia_release_candidate_v1.json",
+    "config/codecheck_reviewer_runtime_v1.json",
     "config/external_validation_authority_docket_v1.json",
     "config/reviewer_reproducibility_protocol_v1.json",
     "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
@@ -107,10 +136,12 @@
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
     "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json",
+    "evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json",
     "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
     "requirements-reviewer-ubuntu-py311.lock",
     "tests/test_codecheck_eia_readiness.py",
-    "tests/test_codecheck_eia_release_candidate.py"
+    "tests/test_codecheck_eia_release_candidate.py",
+    "tests/test_codecheck_reviewer_runtime.py"
   ],
   "external_gates": [
     {

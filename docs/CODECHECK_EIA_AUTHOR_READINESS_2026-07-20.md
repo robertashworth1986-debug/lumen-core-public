@@ -1,13 +1,13 @@
 # CODECHECK EIA Author Readiness
 
-Generated UTC: `2026-07-21T15:05:32.341807+00:00`
+Generated UTC: `2026-07-21T15:36:03.090332+00:00`
 
 An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.
 
 ## Decision
 
 - Status: `AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW`
-- Internal checks: `73/73`
+- Internal checks: `90/90`
 - Declared reproducible outputs: `6`
 - Authoritative archive verified: `true`
 - Archived full source exact match: `false`
@@ -15,6 +15,8 @@ An author-readiness pass proves only that the declared public files, execution m
 - Operator clean-runner receipt verified: `true`
 - Operator clean-runner full source exact match: `true`
 - Operator clean-runner computational identity current: `true`
+- Exact reviewer runtime receipt verified: `true`
+- Exact reviewer runtime checks: `10/10`
 - Current commit clean-runner complete: `false`
 - Public preprint draft complete: `true`
 - Deterministic release-candidate definition ready: `true`
@@ -27,13 +29,14 @@ An author-readiness pass proves only that the declared public files, execution m
 - Independent execution complete: `false`
 - Certificate issued: `false`
 - External validation complete: `false`
-- Readiness SHA-256: `761cdd83826d8868f982bcaebe51d4590ef20e7cfe732b66476daa111082c212`
+- Readiness SHA-256: `2909e70b90141d3b3a5f97c0f22e6f1a71e48ee2c6eac253b4c2b8ada02c154d`
 
 An internal pass means the author-side bundle is coherent enough for Robert to review. It is not a submission receipt, external execution, or certificate.
 
 ## Exact Execution
 
 ```bash
+python code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py --check-only
 python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py
 python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-reviewer-ubuntu-py311.lock
 python -m pip check
@@ -52,9 +55,9 @@ python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --r
 ## Public Preprint And Request Draft
 
 - Markdown: `docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md`
-- Markdown SHA-256: `13bfcb537cf4e41ea249a2a94a8ced9e3f2363740e0cec802f582ca776a62818`
+- Markdown SHA-256: `52920f927d3f41727b9fb44f808f53cdbb61acfda575b2a208242cfa500ce665`
 - PDF: `docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
-- PDF SHA-256: `a87908b14fe1ac9d05c224f51e9562723592addc24aefe4e2690c943d02c52ef`
+- PDF SHA-256: `11a4c2f99c4f20517e33b528af59cf0bf986cfd6e98bccc9678e3025b07ccb27`
 - PDF pages: `5`
 - Manifest reference: `Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf`
 - Stable public identifier: `not assigned`
@@ -69,8 +72,8 @@ The manuscript and request text are author-side drafts. A stable public preprint
 ## Immutable Release Candidate
 
 - Proposed tag: `codecheck-eia-v0.1.0`
-- Bundle inputs: `32`
-- Bundle input chain SHA-256: `19807a5ec4c9bfc4d835a96b1c4317577ba36c689a629bca085155b2819b1dd8`
+- Bundle inputs: `36`
+- Bundle input chain SHA-256: `b1012db563e090ba4f6b4f6b752290336ea04cff983c218428536cfad5fe8f35`
 - Internal definition ready: `true`
 - Publication ready: `false`
 - GitHub release published: `false`
@@ -113,6 +116,22 @@ The archive demonstrates an older operator-controlled clean-runner execution. It
 Author-operated Docker replay with network access disabled and the protocol-pinned Ubuntu, CPython, and dependency environment.
 
 This receipt is internal operator evidence, not independent execution or external validation. It may establish current computational identity only while every benchmark, protocol, frozen input, dependency lock, workflow, and test artifact in the receipt still matches byte-for-byte under its declared portable hash mode. Documentation drift must remain visible and requires a current-commit independent execution before any external claim changes.
+
+## Exact Reviewer Runtime Receipt
+
+- Receipt: `evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json`
+- Receipt SHA-256: `abb21ce411597b31df39bf4dc858cf378e41ea8b2d68cd53c73bc7302a0d659d`
+- Declared source commit: `d60ae7230a8391f05768fa2c24893efa7f8f281f`
+- Runtime checks passed: `10/10`
+- Observed OS: `ubuntu 24.04`
+- Observed architecture: `x86_64`
+- Observed Python: `3.11.9`
+- Observed libc: `glibc 2.39`
+- Operator controlled: `true`
+- Independent execution complete: `false`
+- External validation complete: `false`
+
+This first-party receipt closes the author-side ambiguity between a generic Linux/Python match and the specifically claimed Ubuntu 24.04 x86-64 CPython 3.11.9 glibc 2.39 runtime. It does not convert the replay into independent execution or external validation.
 
 ## Human And External Gates
 

@@ -10,6 +10,8 @@ No release, DOI, CODECHECK request, independent execution, certificate, or exter
 
 Freeze one bounded, public, reviewer-executable snapshot without turning first-party evidence into an external claim. The proposed release is limited to the preprint and the three-suite reproducibility capsule declared in `codecheck.yml`.
 
+The source bundle also includes the fail-closed reviewer-runtime verifier and its first-party receipt, which directly reconcile Ubuntu 24.04, x86-64, CPython 3.11.9, glibc 2.39, deterministic environment variables, and the dependency-lock hash. These checks reduce environment ambiguity but do not satisfy any external gate.
+
 ## Deterministic Candidate
 
 Build locally with:

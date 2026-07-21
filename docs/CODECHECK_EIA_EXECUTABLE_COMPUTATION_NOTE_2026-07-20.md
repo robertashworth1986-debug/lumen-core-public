@@ -36,7 +36,7 @@ The frozen protocol is [`reviewer_reproducibility_protocol_v1.json`](../config/r
 - Publisher: U.S. Energy Information Administration
 - Product: Form EIA-930 daily demand and day-ahead demand forecast by balancing authority
 - Frozen row count: 14,704
-- Authoritative runtime: Ubuntu 24.04 x86-64, CPython 3.11.9
+- Authoritative runtime: Ubuntu 24.04 x86-64, CPython 3.11.9, glibc 2.39
 - Dependency closure: 18 exact packages in `requirements-reviewer-ubuntu-py311.lock`
 - Installer controls: `--require-hashes` and `--only-binary=:all:`
 - Determinism controls: `PYTHONHASHSEED=0`, UTC, and bounded thread settings
@@ -94,19 +94,22 @@ After observing that failure, the protocol was amended to permit at most 1% rela
 From the repository root on the authoritative runtime:
 
 ```bash
+python code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py --check-only
 python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py
 python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-reviewer-ubuntu-py311.lock
 python -m pip check
 python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --run-dir out/codecheck_eia
 ```
 
-The execution must recreate every path listed in the root `codecheck.yml`. The machine receipt records all observed facts, assertion outcomes, environment controls, source hashes, dependency closure, and privacy scan.
+The runtime verifier reads `/etc/os-release`, the machine architecture, Python version, libc identity, deterministic environment variables, and dependency-lock hash before the capsule runs. The execution must recreate every path listed in the root `codecheck.yml`. The machine receipt records all observed facts, assertion outcomes, environment controls, source hashes, dependency closure, and privacy scan.
 
 ## Existing Internal Execution Evidence
 
 The repository preserves an archived clean GitHub runner bundle at `evidence/reproducibility/github_run_29467557473`. Its six computational artifacts reconcile with the archived `SHA256SUMS`, and the receipt records 3/3 suites and 31/31 assertions passing on the authoritative environment.
 
 That archive is operator-supplied reproducibility evidence. It is not independent execution. The `codechecker`, `report`, `certificate`, and external signature fields are intentionally absent until an external process supplies them.
+
+The separate receipt at `evidence/reproducibility/codecheck_reviewer_runtime_receipt_d60ae723_20260721.json` records 10/10 exact runtime checks passing for Ubuntu 24.04, x86-64, CPython 3.11.9, glibc 2.39, deterministic environment controls, and the dependency-lock hash. It is also first-party evidence and changes no external gate.
 
 ## Separation From The Live Prospective Lane
 

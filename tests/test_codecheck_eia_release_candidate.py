@@ -92,6 +92,15 @@ def test_bundle_has_fixed_metadata_exact_inputs_and_no_duplicate_names(tmp_path)
         assert len(names) == len(set(names))
         assert all(row.date_time == (1980, 1, 1, 0, 0, 0) for row in archive.infolist())
         root = definition["release"]["archive_root"]
+        assert (
+            f"{root}/code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py" in names
+        )
+        assert f"{root}/config/codecheck_reviewer_runtime_v1.json" in names
+        assert (
+            f"{root}/evidence/reproducibility/"
+            "codecheck_reviewer_runtime_receipt_d60ae723_20260721.json"
+            in names
+        )
         manifest = json.loads(archive.read(f"{root}/RELEASE_MANIFEST.json"))
         assert manifest["source_commit"] == "2" * 40
         assert manifest["bundle_input_chain_sha256"] == definition[

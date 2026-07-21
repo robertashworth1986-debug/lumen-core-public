@@ -23,6 +23,12 @@ OPERATOR_RECEIPT = (
     / "reproducibility"
     / "codecheck_eia_operator_clean_runner_be7776f7_20260721.json"
 )
+RUNTIME_RECEIPT = (
+    ROOT
+    / "evidence"
+    / "reproducibility"
+    / "codecheck_reviewer_runtime_receipt_d60ae723_20260721.json"
+)
 PREPRINT_MARKDOWN = (
     ROOT
     / "docs"
@@ -152,6 +158,54 @@ def test_operator_clean_runner_rejects_a_tampered_receipt(tmp_path):
     assert result["external_validation_complete"] is False
 
 
+def test_exact_reviewer_runtime_is_hash_locked_and_not_external():
+    module = load_module()
+    payload = module.build_payload(generated_utc="2026-07-20T00:00:00+00:00")
+    runtime = payload["reviewer_runtime"]
+
+    assert runtime["verified"] is True
+    assert runtime["receipt_path"] == RUNTIME_RECEIPT.relative_to(ROOT).as_posix()
+    assert runtime["runtime_check_count"] == 10
+    assert runtime["runtime_check_pass_count"] == 10
+    assert runtime["observed"]["os_release"] == {
+        "id": "ubuntu",
+        "version_id": "24.04",
+    }
+    assert runtime["observed"]["machine"] == "x86_64"
+    assert runtime["observed"]["python"] == "3.11.9"
+    assert runtime["observed"]["libc"] == {
+        "name": "glibc",
+        "version": "2.39",
+    }
+    assert runtime["operator_controlled"] is True
+    assert runtime["independent_execution_complete"] is False
+    assert runtime["external_validation_complete"] is False
+    assert all(runtime["checks"].values())
+
+
+def test_exact_reviewer_runtime_rejects_tampered_receipt(tmp_path):
+    module = load_module()
+    control = json.loads(CONFIG.read_text(encoding="utf-8"))["reviewer_runtime"]
+    receipt = json.loads(RUNTIME_RECEIPT.read_text(encoding="utf-8"))
+    receipt["observed"]["libc"]["version"] = "2.38"
+    tampered = tmp_path / "runtime.json"
+    tampered.write_text(json.dumps(receipt), encoding="utf-8")
+
+    result = module.verify_reviewer_runtime(control, receipt_path=tampered)
+
+    assert result["verified"] is False
+    assert result["checks"]["receipt_sha256_matched"] is False
+    assert result["checks"]["receipt_payload_sha256_matched"] is False
+    assert result["independent_execution_complete"] is False
+    assert result["external_validation_complete"] is False
+
+    receipt["checks"]["python_version"] = "true"
+    tampered.write_text(json.dumps(receipt), encoding="utf-8")
+    result = module.verify_reviewer_runtime(control, receipt_path=tampered)
+
+    assert result["checks"]["all_runtime_checks_passed"] is False
+
+
 def test_preprint_and_request_are_hash_locked_bounded_and_unopened():
     module = load_module()
     payload = module.build_payload(generated_utc="2026-07-20T00:00:00+00:00")
@@ -218,6 +272,7 @@ def test_ci_gate_is_read_only_pinned_and_retriggers_for_portable_inputs():
     assert "permissions:\n  contents: read" in workflow
     assert "runs-on: ubuntu-24.04" in workflow
     assert 'python-version: "3.11.9"' in workflow
+    assert "VERIFY_CODECHECK_REVIEWER_RUNTIME.py --check-only" in workflow
     assert "BUILD_CODECHECK_EIA_READINESS.py --check-only" in workflow
     assert "tests/test_codecheck_eia_readiness.py" in workflow
     assert "actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd" in workflow
@@ -239,6 +294,9 @@ def test_internal_readiness_pass_keeps_every_external_gate_closed():
     assert summary["operator_clean_runner_receipt_verified"] is True
     assert summary["operator_clean_runner_full_source_exact_match"] is True
     assert summary["operator_clean_runner_computational_identity_current"] is True
+    assert summary["reviewer_runtime_receipt_verified"] is True
+    assert summary["reviewer_runtime_check_count"] == 10
+    assert summary["reviewer_runtime_check_pass_count"] == 10
     assert summary["current_commit_clean_runner_complete"] is False
     assert summary["public_preprint_draft_complete"] is True
     assert summary["release_candidate_definition_ready"] is True
@@ -301,6 +359,8 @@ def test_published_outputs_match_a_timestamp_stable_rebuild():
         "Operator clean-runner computational identity current: `true`"
         in rendered
     )
+    assert "Exact reviewer runtime receipt verified: `true`" in rendered
+    assert "Exact reviewer runtime checks: `10/10`" in rendered
     assert "Certificate issued: `false`" in rendered
     assert "External validation complete: `false`" in rendered
     assert "Public preprint draft complete: `true`" in rendered
