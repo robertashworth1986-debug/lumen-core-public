@@ -1,5 +1,7 @@
 # OpenAI Build Week ProofLock Submission Readiness
 
+> **Historical checkpoint.** This July 18 snapshot is preserved for audit history and is not the current submission state. Use `docs/OPENAI_BUILD_WEEK_PROOFLOCK_HUMAN_GATE_CHECKLIST_2026-07-18.md` as the canonical current-readiness source.
+
 **State date:** 2026-07-18 UTC
 
 **Deadline:** July 21, 2026 at 5:00 PM Pacific / 7:00 PM Central

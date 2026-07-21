@@ -1,6 +1,6 @@
 # ProofLock Build Week Media Pipeline
 
-This pipeline assembles a bounded local rehearsal video and a machine-verifiable receipt. Generated audio, screenshots, motion segments, and video remain under ignored `output/` paths. The repository keeps the builder, voiceover, and tests.
+This pipeline assembles a bounded submission video candidate and a machine-verifiable receipt. Generated audio, screenshots, motion segments, and video remain under ignored `output/` paths. The repository keeps the builder, voiceover, and tests.
 
 ## Required Local Inputs
 
@@ -22,7 +22,7 @@ $observed = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
 python code\ops\BUILD_PROOFLOCK_BUILD_WEEK_DEMO_VIDEO.py `
   --observed-utc $observed `
   --public-commit $commit `
-  --test-evidence '53 passed, 3 skipped'
+  --test-evidence '54 passed, 3 skipped'
 python code\ops\BUILD_PROOFLOCK_BUILD_WEEK_DEMO_VIDEO.py --verify
 ```
 
@@ -32,11 +32,11 @@ When the console source tree has not changed, existing PNG captures may be rebou
 
 ## Publication Gate
 
-The current artifact is a local rehearsal. Do not call it the final public demo, upload it as the final contest video, or submit the Devpost entry until all of these are true:
+The current artifact is a verified local submission candidate. Do not call it the published contest video or submit the Devpost entry until all of these are true:
 
-- the exact 15-file release is live at `15/15` byte identity;
-- the live verifier passes against the same commit shown in the video;
-- the focused tests have been rerun and their exact result is displayed;
+- the exact 15-file release remains live at `15/15` byte identity;
+- the live verifier continues to pass against the commit shown in the video;
+- the focused tests remain green at the displayed `54 passed, 3 skipped` result;
 - the real `/feedback` Session ID has been confirmed without publishing it;
 - the final public video plays while signed out; and
 - Robert reviews the complete preview and performs the legal/final submission action.

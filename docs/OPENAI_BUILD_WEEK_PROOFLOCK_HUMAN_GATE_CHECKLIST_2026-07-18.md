@@ -4,7 +4,7 @@
 
 **Latest official reminder:** Devpost email `Deadline TOMORROW | last minute tips - OpenAI Build Week`, received `2026-07-20T21:41:43Z`, confirms the deadline, permits a YouTube video that is public or unlisted, requires voiceover coverage of both Codex and GPT-5.6, requires the `/feedback` Session ID, and requires the entry to show `Submitted` rather than `Draft`.
 
-**Internal target:** complete the human gates by July 20 at 6:00 PM Central so the final day is recovery time.
+**Current checkpoint:** July 21, 2026 at 8:47 AM Central. This is the canonical current-readiness source; older Build Week readiness and predeployment notes are historical records.
 
 ## Prepared Assets And Current Holds
 
@@ -12,18 +12,19 @@
 - Category: `Developer Tools`
 - Public repository: `https://github.com/robertashworth1986-debug/lumen-core-public`
 - Draft pull request: `https://github.com/robertashworth1986-debug/lumen-core-public/pull/36`
-- Historical live demonstration only: `https://lumen-core.ai/build_week/prooflock_console/?release=20260718.1&commit=e9a1aba`
-- Historical deployed source commit: `e9a1aba6fdfb368c64887af7e9caeee8aac21abb`; this release predates the corrected `decision == "PROMOTE"` invariant and must not be used for the final recording.
-- Deployment candidate: the exact 40-character commit selected at action time. This checklist is not a commit pin.
-- Current focused local test result: `52 passed, 3 skipped`; rerun immediately before recording and preserve the exact current-head receipt.
+- Current public demonstration: `https://lumen-core.ai/build_week/prooflock_console/`
+- Current deployed source commit: `b2ac8cef10ee5b9db765a17cdbf6f13e6b917ce5` on `build-week/prooflock-judge-ready`.
+- Current focused local test result: `54 passed, 3 skipped`.
 - Current-head GitHub Actions: workflow jobs did not start because the GitHub account is locked by a billing issue. This is an account gate, not a passing or failing test result.
-- Latest observed live-file identity: `4/15` against commit `305401d213cde9609e324d6559cd6fd00dfbe502` at `2026-07-21T04:40:55Z`; the live route is not current-head evidence. The live-release and submission gates remain `HOLD`.
+- Current live-file identity: `15/15` against commit `b2ac8cef10ee5b9db765a17cdbf6f13e6b917ce5` at `2026-07-21T13:47:38Z`; release gate `PASS`; live-gate SHA-256 `4b241a62e4f3fd76582d5e7992cc6ff119e36594b4f77e8713a1a75bac7984bc`.
+- Exact release archive: 15 files; SHA-256 `e6a1b8adea8fb14432e6d3d27c9021dbd9349473323c347d3276b9906c47ca65`.
+- Verified local video candidate: 125.27 seconds, H.264/AAC, SHA-256 `7db755aa1b8a2f4ab79ce95a463b1f80fc73ac28a2d31672e894ea8fbd5b8184`; media receipt verification returned no errors. Publication and signed-out playback remain open human gates.
 - Model evidence: retain the private task-metadata candidate, but do not state a final model identity until the primary task's `/feedback` value is directly confirmed.
 - Private Session ID SHA-256: `CEDEC32157F2516DF88505802805761AE3535F093FB9B1B06CA6DEFF4A344FD9`
 - Public repository metadata: both bounded release paths fail closed unless the exact reviewer-facing description, homepage, visibility, default branch, and six-topic set match the canonical public contract; each path preserves that decision in its release receipt.
 - Session hash reconciliation: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_SESSION_HASH_RECONCILIATION_2026-07-18.md`
-- Release receipt: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_LIVE_RELEASE_RECEIPT_2026-07-18.md`
-- Timed narration: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_DEMO_NARRATION_2026-07-18.md`
+- Historical release receipt: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_LIVE_RELEASE_RECEIPT_2026-07-18.md`
+- Final voiceover: `docs/OPENAI_BUILD_WEEK_PROOFLOCK_VOICEOVER_2026-07-20.md`
 
 ## Judge-Facing Copy
 
@@ -48,7 +49,7 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 1. Sign in to Devpost and verify the correct challenge, category, rules, deadline, and required fields.
 2. Run `/feedback` in the primary Codex build task and retain the exact Session ID requested by the form.
 3. Compare the private `/feedback` Session ID with the saved task-metadata candidate. Do not expose the private identifier in the repository or video, and do not infer a model name from local task metadata when the form requires direct `/feedback` evidence.
-4. Restore GitHub Actions billing eligibility and use the dedicated ProofLock release workflow. If the account lock cannot be cleared before the deadline, the bounded local operator bridge may be used only with the exact source commit and action-time token `DEPLOY_PROOFLOCK_EXACT_SNAPSHOT`:
+4. The bounded local operator bridge was used because GitHub Actions remained blocked before runner assignment. It deployed only the approved 15-file snapshot with the exact source commit and action-time token `DEPLOY_PROOFLOCK_EXACT_SNAPSHOT`:
 
    ```powershell
    pwsh code/deploy/PUSH_PROOFLOCK_RELEASE_ON_VPS.ps1 `
@@ -58,9 +59,9 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
    ```
 
    The bridge packages immutable Git blobs, requires the commit to equal `HEAD` and be reachable from the public release branch, verifies the pinned SSH host key, invokes only the bounded server-side installer, and preserves package, deployment, and live-gate receipts. It remains `HOLD` without both `-Execute` and the exact approval token.
-5. Require the current-commit live verifier to report `15/15`, preserve the immutable custody pin, and record that GitHub-hosted CI was unavailable if the bounded fallback was used.
-6. Replace the historical recording URL in the narration with the newly verified release URL.
-7. Record the live demonstration using the timed narration. Keep the final cut under three minutes with intelligible audio.
+5. Preserve the current `15/15` live-verifier receipt and the fact that GitHub-hosted CI was unavailable because the account was locked before runner assignment.
+6. Use the current public release URL and exact commit in the submission.
+7. Use the verified 125.27-second video candidate with intelligible computer-generated narration.
 8. Upload the video to YouTube as **public or unlisted** and verify playback while signed out. Preserve the dated Devpost reminder as the source for allowing an unlisted link.
 9. Enter the repository, live-demo, and YouTube URLs into Devpost. Paste only the verified Session ID and model identity.
 10. Confirm that pre-existing work and new Build Week work are separated exactly as stated above.
@@ -70,22 +71,22 @@ ProofLock proves declared receipt integrity, repository artifact identity, and r
 
 ## Final Review
 
-- [ ] Devpost account and challenge registration verified
-- [ ] Category is `Developer Tools`
-- [ ] Title and description match this packet
-- [ ] Repository link opens without authentication
-- [ ] Live demonstration opens without authentication
+- [x] Devpost account and challenge registration verified
+- [x] Category is `Developer Tools`
+- [x] Title and description match this packet
+- [x] Repository link opens without authentication
+- [x] Live demonstration opens without authentication
 - [ ] YouTube video is public or unlisted, under three minutes, and plays with audio while signed out
 - [x] Private task-metadata Session ID candidate matches the published SHA-256
 - [ ] `/feedback` Session ID comes from the primary build task
 - [ ] Model name is directly confirmed from the primary task rather than inferred
-- [ ] No patent-sensitive or private material is exposed
-- [ ] No safety, field-validation, revenue, certification, or patent claim is implied
-- [ ] Pre-existing and Build Week contributions are clearly separated
+- [x] No patent-sensitive or private material is exposed in the prepared entry and video
+- [x] No safety, field-validation, revenue, certification, or patent claim is implied
+- [x] Pre-existing and Build Week contributions are clearly separated
 - [ ] All links pass a final signed-out check
 - [ ] Robert has reviewed the full preview
 - [ ] Submission confirmation is saved and hashed
 
 ## Stop Conditions
 
-Do not record the final shareable video or submit while the current live release is below `15/15`. Do not submit if the video cannot play while signed out, the Session ID has not been confirmed through `/feedback`, the model identity is inferred, the live demo fails, the repository is inaccessible, neither GitHub CI nor the bounded manual fallback has produced equivalent preserved receipts, or the entry implies that receipt integrity proves the underlying engineering claim.
+Do not upload or submit if the video cannot play while signed out, the Session ID has not been confirmed through `/feedback`, the country is absent, the live demo fails, the repository is inaccessible, the final terms have not been reviewed by Robert, or the entry implies that receipt integrity proves the underlying engineering claim.

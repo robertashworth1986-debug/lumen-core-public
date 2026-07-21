@@ -212,10 +212,12 @@ def test_console_is_self_contained_and_documents_build_week_gates():
     assert "YouTube as **public or unlisted**" in checklist
     assert "plays with audio while signed out" in checklist
     assert "2026-07-20T21:41:43Z" in checklist
-    assert "Current focused local test result: `52 passed, 3 skipped`" in checklist
+    assert "Current focused local test result: `54 passed, 3 skipped`" in checklist
     assert "GitHub account is locked by a billing issue" in checklist
-    assert "Latest observed live-file identity: `4/15`" in checklist
-    assert "live verifier to report `15/15`" in checklist
+    assert "Current live-file identity: `15/15`" in checklist
+    assert "b2ac8cef10ee5b9db765a17cdbf6f13e6b917ce5" in checklist
+    assert "4b241a62e4f3fd76582d5e7992cc6ff119e36594b4f77e8713a1a75bac7984bc" in checklist
+    assert "7db755aa1b8a2f4ab79ce95a463b1f80fc73ac28a2d31672e894ea8fbd5b8184" in checklist
     assert "Historical release only" in release_receipt
     assert "must not be used as current release evidence" in release_receipt
     assert "`32 passed`" not in readiness
