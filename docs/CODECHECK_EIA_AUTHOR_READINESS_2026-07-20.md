@@ -1,13 +1,13 @@
 # CODECHECK EIA Author Readiness
 
-Generated UTC: `2026-07-21T14:41:22.864963+00:00`
+Generated UTC: `2026-07-21T15:05:32.341807+00:00`
 
 An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.
 
 ## Decision
 
 - Status: `AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW`
-- Internal checks: `54/54`
+- Internal checks: `73/73`
 - Declared reproducible outputs: `6`
 - Authoritative archive verified: `true`
 - Archived full source exact match: `false`
@@ -17,6 +17,8 @@ An author-readiness pass proves only that the declared public files, execution m
 - Operator clean-runner computational identity current: `true`
 - Current commit clean-runner complete: `false`
 - Public preprint draft complete: `true`
+- Deterministic release-candidate definition ready: `true`
+- Release publication ready: `false`
 - Stable public preprint identifier complete: `false`
 - Immutable public source release complete: `false`
 - Duplicate request reconciled: `false`
@@ -25,7 +27,7 @@ An author-readiness pass proves only that the declared public files, execution m
 - Independent execution complete: `false`
 - Certificate issued: `false`
 - External validation complete: `false`
-- Readiness SHA-256: `86cd8cdd355756044d84706b6733f0f421eaef20c2604b49f8ab0e12a62e7061`
+- Readiness SHA-256: `761cdd83826d8868f982bcaebe51d4590ef20e7cfe732b66476daa111082c212`
 
 An internal pass means the author-side bundle is coherent enough for Robert to review. It is not a submission receipt, external execution, or certificate.
 
@@ -63,6 +65,19 @@ python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --r
 - Community request opened: `false`
 
 The manuscript and request text are author-side drafts. A stable public preprint identifier, immutable public source release, duplicate-request reconciliation, Robert's review, and fresh action-time HumanUnlock are required before one production request may be opened.
+
+## Immutable Release Candidate
+
+- Proposed tag: `codecheck-eia-v0.1.0`
+- Bundle inputs: `32`
+- Bundle input chain SHA-256: `19807a5ec4c9bfc4d835a96b1c4317577ba36c689a629bca085155b2819b1dd8`
+- Internal definition ready: `true`
+- Publication ready: `false`
+- GitHub release published: `false`
+- Zenodo DOI issued: `false`
+- External validation complete: `false`
+
+Creating a draft or published release, enabling repository integrations, attaching assets, minting a DOI, opening a CODECHECK issue, or contacting a validator requires a fresh action-time HumanUnlock after duplicate-action reconciliation.
 
 ## Archived Operator Execution
 
@@ -124,10 +139,12 @@ A later independent-execution certificate may reduce diligence risk around execu
 ## Shortest Safe Completion Sequence
 
 1. Robert reviews the preprint, method note, manifest, license, request draft, and bounded ask.
-2. Publish the bounded preprint at a stable public URL or DOI.
-3. Freeze the exact reviewed public commit or release and reconcile every packet hash.
-4. Recheck Gmail, GitHub, and local outreach controls for duplicates, then obtain fresh action-time HumanUnlock for one CODECHECK request.
-5. Open exactly one request through the current official route and record its production issue URL.
-6. Let the assigned codechecker execute the workflow and populate external metadata; the operator does not fill those fields.
-7. Cite a certificate only after CODECHECK issues a public report identifier.
-8. Pursue a separate statistical-method review and the preregistered prospective EIA gates; neither can be substituted by executable-computation checking.
+2. Build the deterministic candidate with `python code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py` and reconcile its five local assets.
+3. Under fresh action-time HumanUnlock, enable the required external integrations and create one draft release targeting the exact reviewed commit.
+4. Attach all candidate assets, reconcile their uploaded hashes, and obtain fresh HumanUnlock before publishing an immutable release.
+5. Record the observed stable release URL and version-specific DOI only after GitHub and Zenodo expose them.
+6. Recheck Gmail, GitHub, and local outreach controls for duplicates, then obtain fresh action-time HumanUnlock for one CODECHECK request.
+7. Open exactly one request through the current official route and record its production issue URL.
+8. Let the assigned codechecker execute the workflow and populate external metadata; the operator does not fill those fields.
+9. Cite a certificate only after CODECHECK issues a public report identifier.
+10. Pursue a separate statistical-method review and the preregistered prospective EIA gates; neither can be substituted by executable-computation checking.

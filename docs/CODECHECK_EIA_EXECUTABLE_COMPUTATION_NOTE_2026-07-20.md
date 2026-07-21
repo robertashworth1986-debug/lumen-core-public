@@ -10,6 +10,7 @@ Prepared (America/Chicago): 2026-07-20
 
 - Bounded preprint: [`PDF`](preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf) and [`Markdown source`](preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md)
 - Community request: [`author-side HOLD draft`](CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md)
+- Immutable release: [`unpublished deterministic candidate plan`](release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md)
 
 The request has not been posted. A stable public preprint identifier, immutable public source release, duplicate-request reconciliation, author review, and fresh action-time HumanUnlock remain required before one production request may be opened.
 

@@ -2,6 +2,7 @@ cff-version: 1.2.0
 message: "If you use this software or its evidence protocol, cite this repository and the dated artifact that supports the specific result."
 title: "LumenCore Quant Hub: Evidence, Benchmarking, and Human-Gated Decision Infrastructure"
 type: software
+abstract: "Public evidence and benchmarking software that includes a bounded capsule for first-party executable reproducibility. Independent execution, scientific validation, field performance, commercial performance, and valuation remain unverified."
 authors:
   - family-names: "Ashworth"
     given-names: "Robert"

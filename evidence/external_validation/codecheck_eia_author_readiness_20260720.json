@@ -230,6 +230,25 @@
     "preprint_request_stable_public_identifier_unset": true,
     "public_text_privacy_scan_passed": true,
     "readme_has_exact_codecheck_command": true,
+    "release_candidate_bundle_paths_present": true,
+    "release_candidate_bundle_paths_safe": true,
+    "release_candidate_bundle_paths_unique": true,
+    "release_candidate_citation_abstract_bounded": true,
+    "release_candidate_citation_authors_present": true,
+    "release_candidate_citation_keywords_present": true,
+    "release_candidate_citation_license_matched": true,
+    "release_candidate_citation_repository_matched": true,
+    "release_candidate_citation_root_keys_unique": true,
+    "release_candidate_citation_tabs_absent": true,
+    "release_candidate_citation_title_matched": true,
+    "release_candidate_citation_type_matched": true,
+    "release_candidate_citation_utf8": true,
+    "release_candidate_citation_version_matched": true,
+    "release_candidate_definition_ready": true,
+    "release_candidate_external_validation_remains_false": true,
+    "release_candidate_public_text_privacy_scan_passed": true,
+    "release_candidate_publication_remains_closed": true,
+    "release_candidate_publication_state_fail_closed": true,
     "report_metadata_left_external": true
   },
   "claim_boundary": "An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.",
@@ -332,7 +351,7 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T14:41:22.864963+00:00",
+  "generated_utc": "2026-07-21T15:05:32.341807+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "operator_clean_runner": {
     "assertion_count": 31,
@@ -540,29 +559,33 @@
     "LICENSE": true,
     "README.md": true,
     "code/ops/BUILD_CODECHECK_EIA_READINESS.py": true,
+    "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py": true,
     "code/ops/BUILD_CODECHECK_PREPRINT_PDF.py": true,
     "code/ops/BUILD_EXTERNAL_VALIDATION_AUTHORITY_DOCKET.py": true,
     "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py": true,
     "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py": true,
     "codecheck.yml": true,
+    "config/codecheck_eia_release_candidate_v1.json": true,
     "config/external_validation_authority_docket_v1.json": true,
     "config/reviewer_reproducibility_protocol_v1.json": true,
     "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md": true,
     "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md": true,
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
+    "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
     "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json": true,
     "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
     "requirements-reviewer-ubuntu-py311.lock": true,
-    "tests/test_codecheck_eia_readiness.py": true
+    "tests/test_codecheck_eia_readiness.py": true,
+    "tests/test_codecheck_eia_release_candidate.py": true
   },
-  "portable_input_chain_sha256": "51d41019e7461f5f5f7b2eeda510c5e4fb76b1923b5aab1302f20ffc99b072b4",
+  "portable_input_chain_sha256": "1715c70045441157d8153b98277630b55acf13e08e3eaef100ad7d538dd64eae",
   "portable_inputs": [
     {
-      "bytes": 5467,
+      "bytes": 6159,
       "hash_mode": "utf8_lf",
       "path": ".github/workflows/codecheck-eia-readiness.yml",
-      "sha256": "bb5b5b2a909392fdf6b77af14a52a73eff58da221b2c187307126c2e0a6d92ba"
+      "sha256": "07fd078c5e2f669f1b08cd955dad29ee0e8e84b5ae3244f2f13e8b2890dd5a30"
     },
     {
       "bytes": 15541,
@@ -577,10 +600,10 @@
       "sha256": "2e399326d1698e17d388b7d5acb27006176e76fc8a8eead8d883494f3eb1bcfb"
     },
     {
-      "bytes": 570,
+      "bytes": 822,
       "hash_mode": "utf8_lf",
       "path": "CITATION.cff",
-      "sha256": "0472716b86e1bc426640af944aba7749fc5a5b2bdf4ffbe7fdc0d7e3690f5dc9"
+      "sha256": "1d96c42c599119efd294edd5e12bdab7ac3a47ebe0dcb182ac55014e061e441c"
     },
     {
       "bytes": 1811,
@@ -589,16 +612,22 @@
       "sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880"
     },
     {
-      "bytes": 38530,
+      "bytes": 41875,
       "hash_mode": "utf8_lf",
       "path": "code/ops/BUILD_CODECHECK_EIA_READINESS.py",
-      "sha256": "15ee0772e993fca780b652aad040d6135af42903e79c65a8f5053dfedd15aef6"
+      "sha256": "1fae5abe9b738dc757943cec35a2328d484615a2152c5e26d2e4c1988332ea0e"
     },
     {
       "bytes": 10355,
       "hash_mode": "utf8_lf",
       "path": "code/ops/BUILD_CODECHECK_PREPRINT_PDF.py",
       "sha256": "d15f0b3e9726d4847652c0795f0ceb416fa79dbe402f36539be8d43aeebf8580"
+    },
+    {
+      "bytes": 19630,
+      "hash_mode": "utf8_lf",
+      "path": "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py",
+      "sha256": "5065f238b5cb221521a075ae1314bc2437ade1f7ffd17db5720d54cac38797d2"
     },
     {
       "bytes": 31959,
@@ -619,10 +648,16 @@
       "sha256": "79c03eb63443a8b9bba3cf48e206a8b44f7a9f8e8fa382a6c3b97e8ec5a1c676"
     },
     {
-      "bytes": 9249,
+      "bytes": 9848,
       "hash_mode": "utf8_lf",
       "path": "config/codecheck_eia_readiness_v1.json",
-      "sha256": "62b3787b4fea4a2f0ecb61fd9a2b48895bf665dc81498ba273991d95aeb6b582"
+      "sha256": "4b6b93a53f465f5c0af2d6245237eeb49cc93477763f812e6412eb153ec5bb67"
+    },
+    {
+      "bytes": 5493,
+      "hash_mode": "utf8_lf",
+      "path": "config/codecheck_eia_release_candidate_v1.json",
+      "sha256": "4eec7783ccb9c3a14c383ffc71747010845a350590449dccfc6737932742b1b2"
     },
     {
       "bytes": 9722,
@@ -643,10 +678,16 @@
       "sha256": "b253a88c6905c11ed1e8256551ecdf561208e94a72ff05aa22699a7867e2781c"
     },
     {
-      "bytes": 6911,
+      "bytes": 7037,
       "hash_mode": "utf8_lf",
       "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
-      "sha256": "0e470284cc1002399bf1e3062231ad36d74c4935411c8200f97cc30dc7038938"
+      "sha256": "ba68cbfc71b230c41aa685932ffa86b84ad56afbbe2651c01adfced9613eb3e7"
+    },
+    {
+      "bytes": 5093,
+      "hash_mode": "utf8_lf",
+      "path": "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md",
+      "sha256": "6c820f343e630e4627654ae578c9e92041c0be408c3680c56f82cdbdc4bcfdef"
     },
     {
       "bytes": 10343,
@@ -679,10 +720,16 @@
       "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
     },
     {
-      "bytes": 12660,
+      "bytes": 14005,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_readiness.py",
-      "sha256": "06ae4d6498e12403b5905ec2d6a88286ccf580975ba4358c2ea00467da5f2345"
+      "sha256": "923ebd8042d89d8261e2641d7d90dd205d00beb7533ebcc4da7af7fd5d2022d8"
+    },
+    {
+      "bytes": 5762,
+      "hash_mode": "utf8_lf",
+      "path": "tests/test_codecheck_eia_release_candidate.py",
+      "sha256": "cf0e272f46365dacae94cba9490157eaf1e543e52975b21fd2ca07c786efc1c4"
     }
   ],
   "preprint_and_request": {
@@ -723,7 +770,379 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "86cd8cdd355756044d84706b6733f0f421eaef20c2604b49f8ab0e12a62e7061",
+  "readiness_sha256": "761cdd83826d8868f982bcaebe51d4590ef20e7cfe732b66476daa111082c212",
+  "release_candidate": {
+    "bundle_input_chain_sha256": "19807a5ec4c9bfc4d835a96b1c4317577ba36c689a629bca085155b2819b1dd8",
+    "bundle_input_count": 32,
+    "bundle_inputs": [
+      {
+        "bytes": 4832,
+        "hash_mode": "utf8_lf",
+        "path": ".github/workflows/reviewer-reproducibility.yml",
+        "sha256": "2fa8feb63735603960688161a252d2efa68077a51b27dc48bcdfe0d99d0ae14e"
+      },
+      {
+        "bytes": 2660,
+        "hash_mode": "utf8_lf",
+        "path": ".gitignore",
+        "sha256": "72bba006cb5d77f56677464c515d3ea5fff56293542d8655f2d14cd4099d59a7"
+      },
+      {
+        "bytes": 822,
+        "hash_mode": "utf8_lf",
+        "path": "CITATION.cff",
+        "sha256": "1d96c42c599119efd294edd5e12bdab7ac3a47ebe0dcb182ac55014e061e441c"
+      },
+      {
+        "bytes": 1891,
+        "hash_mode": "utf8_lf",
+        "path": "LICENSE",
+        "sha256": "2e399326d1698e17d388b7d5acb27006176e76fc8a8eead8d883494f3eb1bcfb"
+      },
+      {
+        "bytes": 15541,
+        "hash_mode": "utf8_lf",
+        "path": "README.md",
+        "sha256": "f9a868e41bc8d824c105a73254a2b78ec68a753f65700ef0bf59188b39aeca56"
+      },
+      {
+        "bytes": 41017,
+        "hash_mode": "utf8_lf",
+        "path": "code/eia_grid_residual_moe_benchmark.py",
+        "sha256": "1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100"
+      },
+      {
+        "bytes": 47012,
+        "hash_mode": "utf8_lf",
+        "path": "code/eia_grid_wave_champion_benchmark.py",
+        "sha256": "b3586ddc568f6bd4aa6ae48bbb289ab579eab773699dba5ac32234d393627791"
+      },
+      {
+        "bytes": 37529,
+        "hash_mode": "utf8_lf",
+        "path": "code/mda_control_mapping_open_set_benchmark.py",
+        "sha256": "5346d8f4b66b7a19a6b0daf58bd4e983f4a2108346d6d51429ec0f387ab7ed8c"
+      },
+      {
+        "bytes": 19630,
+        "hash_mode": "utf8_lf",
+        "path": "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py",
+        "sha256": "5065f238b5cb221521a075ae1314bc2437ade1f7ffd17db5720d54cac38797d2"
+      },
+      {
+        "bytes": 45420,
+        "hash_mode": "utf8_lf",
+        "path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
+        "sha256": "2481919eca73df9469b372367d676d8713687c940f6565a1380d69547464f8e3"
+      },
+      {
+        "bytes": 9082,
+        "hash_mode": "utf8_lf",
+        "path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+        "sha256": "79c03eb63443a8b9bba3cf48e206a8b44f7a9f8e8fa382a6c3b97e8ec5a1c676"
+      },
+      {
+        "bytes": 1811,
+        "hash_mode": "utf8_lf",
+        "path": "codecheck.yml",
+        "sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880"
+      },
+      {
+        "bytes": 5493,
+        "hash_mode": "utf8_lf",
+        "path": "config/codecheck_eia_release_candidate_v1.json",
+        "sha256": "4eec7783ccb9c3a14c383ffc71747010845a350590449dccfc6737932742b1b2"
+      },
+      {
+        "bytes": 8422,
+        "hash_mode": "utf8_lf",
+        "path": "config/eia_grid_residual_moe_protocol_v1.json",
+        "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+      },
+      {
+        "bytes": 7963,
+        "hash_mode": "utf8_lf",
+        "path": "config/eia_grid_wave_champion_protocol_v1.json",
+        "sha256": "273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d"
+      },
+      {
+        "bytes": 8387,
+        "hash_mode": "utf8_lf",
+        "path": "config/mda_control_mapping_open_set_protocol_v2.json",
+        "sha256": "9a694ed6f194137880c070e73355ef826a51d3fed438ccf65adf6d4726ca80f0"
+      },
+      {
+        "bytes": 10007,
+        "hash_mode": "utf8_lf",
+        "path": "config/reviewer_reproducibility_protocol_v1.json",
+        "sha256": "49582234ce107762f56a734b94d426e53fcec92e275b527a1a8f39a9822fc8d1"
+      },
+      {
+        "bytes": 7037,
+        "hash_mode": "utf8_lf",
+        "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+        "sha256": "ba68cbfc71b230c41aa685932ffa86b84ad56afbbe2651c01adfced9613eb3e7"
+      },
+      {
+        "bytes": 10343,
+        "hash_mode": "utf8_lf",
+        "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md",
+        "sha256": "13bfcb537cf4e41ea249a2a94a8ced9e3f2363740e0cec802f582ca776a62818"
+      },
+      {
+        "bytes": 13270,
+        "hash_mode": "binary",
+        "path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+        "sha256": "a87908b14fe1ac9d05c224f51e9562723592addc24aefe4e2690c943d02c52ef"
+      },
+      {
+        "bytes": 5093,
+        "hash_mode": "utf8_lf",
+        "path": "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md",
+        "sha256": "6c820f343e630e4627654ae578c9e92041c0be408c3680c56f82cdbdc4bcfdef"
+      },
+      {
+        "bytes": 26114,
+        "hash_mode": "utf8_lf",
+        "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json",
+        "sha256": "8584550e85b826aed925ee4c3e44fb6beeb9e4ada4919be0c877774b26892351"
+      },
+      {
+        "bytes": 114366,
+        "hash_mode": "binary",
+        "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+        "sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9"
+      },
+      {
+        "bytes": 23602,
+        "hash_mode": "utf8_lf",
+        "path": "requirements-reviewer-ubuntu-py311.lock",
+        "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
+      },
+      {
+        "bytes": 122,
+        "hash_mode": "utf8_lf",
+        "path": "requirements-reviewer.txt",
+        "sha256": "4b99049b4bc579f6d2a5a675e612f513e1a24db79775a2120e60334a0c72bbd4"
+      },
+      {
+        "bytes": 5762,
+        "hash_mode": "utf8_lf",
+        "path": "tests/test_codecheck_eia_release_candidate.py",
+        "sha256": "cf0e272f46365dacae94cba9490157eaf1e543e52975b21fd2ca07c786efc1c4"
+      },
+      {
+        "bytes": 4309,
+        "hash_mode": "utf8_lf",
+        "path": "tests/test_eia_grid_residual_moe_benchmark.py",
+        "sha256": "0aa6af3aa74ecb561c15a1b9560ed80014bc692679e61e6c6fa93bb75cc8ba68"
+      },
+      {
+        "bytes": 8140,
+        "hash_mode": "utf8_lf",
+        "path": "tests/test_eia_grid_wave_champion_benchmark.py",
+        "sha256": "175010b5aa97951fe1770d4f67b1b9b4597baff113d55b34021a103ca04055bb"
+      },
+      {
+        "bytes": 3342,
+        "hash_mode": "utf8_lf",
+        "path": "tests/test_faa_sdr_10k_benchmark.py",
+        "sha256": "c2bbaac93e10883f30424998fa676bd69d313e4815760b97e43f84d20a86c7d5"
+      },
+      {
+        "bytes": 4217,
+        "hash_mode": "utf8_lf",
+        "path": "tests/test_mda_control_mapping_open_set_benchmark.py",
+        "sha256": "0798b6a130f48b012c75877fd56d9aeb36be033b5620b974e89fc46b76585db8"
+      },
+      {
+        "bytes": 3697,
+        "hash_mode": "utf8_lf",
+        "path": "tests/test_reviewer_dependency_lock.py",
+        "sha256": "cc10d035ef2712e41292ceec6b5fa93df93dfcb2145ab9b6d323b00b4d87d09f"
+      },
+      {
+        "bytes": 14138,
+        "hash_mode": "utf8_lf",
+        "path": "tests/test_reviewer_reproducibility_capsule.py",
+        "sha256": "4995d85976b862e16041e7e42ef005c0cb9b1543944cbed11ea254a37923948b"
+      }
+    ],
+    "checks": {
+      "bundle_paths_present": true,
+      "bundle_paths_safe": true,
+      "bundle_paths_unique": true,
+      "citation_abstract_bounded": true,
+      "citation_authors_present": true,
+      "citation_keywords_present": true,
+      "citation_license_matched": true,
+      "citation_repository_matched": true,
+      "citation_root_keys_unique": true,
+      "citation_tabs_absent": true,
+      "citation_title_matched": true,
+      "citation_type_matched": true,
+      "citation_utf8": true,
+      "citation_version_matched": true,
+      "external_validation_remains_false": true,
+      "public_text_privacy_scan_passed": true,
+      "publication_state_fail_closed": true
+    },
+    "citation": {
+      "authors_present": true,
+      "fields": {
+        "abstract": "Public evidence and benchmarking software that includes a bounded capsule for first-party executable reproducibility. Independent execution, scientific validation, field performance, commercial performance, and valuation remain unverified.",
+        "authors": "",
+        "cff-version": "1.2.0",
+        "keywords": "",
+        "license": "MIT",
+        "message": "If you use this software or its evidence protocol, cite this repository and the dated artifact that supports the specific result.",
+        "repository-code": "https://github.com/robertashworth1986-debug/lumen-core-public",
+        "title": "LumenCore Quant Hub: Evidence, Benchmarking, and Human-Gated Decision Infrastructure",
+        "type": "software",
+        "url": "https://lumen-core.ai"
+      },
+      "keywords": [
+        "reproducible benchmarking",
+        "evidence provenance",
+        "hybrid routing",
+        "human-in-the-loop controls"
+      ],
+      "root_keys": [
+        "cff-version",
+        "message",
+        "title",
+        "type",
+        "abstract",
+        "authors",
+        "repository-code",
+        "url",
+        "license",
+        "keywords"
+      ],
+      "root_keys_unique": true,
+      "sha256": "1d96c42c599119efd294edd5e12bdab7ac3a47ebe0dcb182ac55014e061e441c",
+      "tabs_absent": true,
+      "utf8_decoded": true
+    },
+    "claim_boundary": "A deterministic release candidate proves only that a bounded set of public files can be packaged reproducibly with reconciled hashes. It is not a published release, DOI, CODECHECK request, independent execution, certificate, scientific validation, field validation, performance endorsement, or company valuation.",
+    "human_unlock_policy": "Creating a draft or published release, enabling repository integrations, attaching assets, minting a DOI, opening a CODECHECK issue, or contacting a validator requires a fresh action-time HumanUnlock after duplicate-action reconciliation.",
+    "internal_release_candidate_ready": true,
+    "official_references": {
+      "codecheck_author_guide": "https://codecheck.org.uk/guide/community-workflow-author",
+      "codecheck_launch_pad": "https://codecheck.org.uk/launch-pad/",
+      "github_immutable_releases": "https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases",
+      "github_verify_release_integrity": "https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/verify-release-integrity",
+      "zenodo_archive_github_release": "https://help.zenodo.org/docs/github/archive-software/github-upload/",
+      "zenodo_citation_cff": "https://help.zenodo.org/docs/github/describe-software/citation-file/",
+      "zenodo_enable_repository": "https://help.zenodo.org/docs/github/enable-repository/"
+    },
+    "path_presence": {
+      ".github/workflows/reviewer-reproducibility.yml": true,
+      ".gitignore": true,
+      "CITATION.cff": true,
+      "LICENSE": true,
+      "README.md": true,
+      "code/eia_grid_residual_moe_benchmark.py": true,
+      "code/eia_grid_wave_champion_benchmark.py": true,
+      "code/mda_control_mapping_open_set_benchmark.py": true,
+      "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py": true,
+      "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py": true,
+      "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py": true,
+      "codecheck.yml": true,
+      "config/codecheck_eia_release_candidate_v1.json": true,
+      "config/eia_grid_residual_moe_protocol_v1.json": true,
+      "config/eia_grid_wave_champion_protocol_v1.json": true,
+      "config/mda_control_mapping_open_set_protocol_v2.json": true,
+      "config/reviewer_reproducibility_protocol_v1.json": true,
+      "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md": true,
+      "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
+      "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
+      "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
+      "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json": true,
+      "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
+      "requirements-reviewer-ubuntu-py311.lock": true,
+      "requirements-reviewer.txt": true,
+      "tests/test_codecheck_eia_release_candidate.py": true,
+      "tests/test_eia_grid_residual_moe_benchmark.py": true,
+      "tests/test_eia_grid_wave_champion_benchmark.py": true,
+      "tests/test_faa_sdr_10k_benchmark.py": true,
+      "tests/test_mda_control_mapping_open_set_benchmark.py": true,
+      "tests/test_reviewer_dependency_lock.py": true,
+      "tests/test_reviewer_reproducibility_capsule.py": true
+    },
+    "path_safety": {
+      ".github/workflows/reviewer-reproducibility.yml": true,
+      ".gitignore": true,
+      "CITATION.cff": true,
+      "LICENSE": true,
+      "README.md": true,
+      "code/eia_grid_residual_moe_benchmark.py": true,
+      "code/eia_grid_wave_champion_benchmark.py": true,
+      "code/mda_control_mapping_open_set_benchmark.py": true,
+      "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py": true,
+      "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py": true,
+      "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py": true,
+      "codecheck.yml": true,
+      "config/codecheck_eia_release_candidate_v1.json": true,
+      "config/eia_grid_residual_moe_protocol_v1.json": true,
+      "config/eia_grid_wave_champion_protocol_v1.json": true,
+      "config/mda_control_mapping_open_set_protocol_v2.json": true,
+      "config/reviewer_reproducibility_protocol_v1.json": true,
+      "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md": true,
+      "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
+      "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
+      "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
+      "evidence/reproducibility/codecheck_eia_operator_clean_runner_be7776f7_20260721.json": true,
+      "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
+      "requirements-reviewer-ubuntu-py311.lock": true,
+      "requirements-reviewer.txt": true,
+      "tests/test_codecheck_eia_release_candidate.py": true,
+      "tests/test_eia_grid_residual_moe_benchmark.py": true,
+      "tests/test_eia_grid_wave_champion_benchmark.py": true,
+      "tests/test_faa_sdr_10k_benchmark.py": true,
+      "tests/test_mda_control_mapping_open_set_benchmark.py": true,
+      "tests/test_reviewer_dependency_lock.py": true,
+      "tests/test_reviewer_reproducibility_capsule.py": true
+    },
+    "privacy_scan": {
+      "hit_count": 0,
+      "hits": [],
+      "passed": true
+    },
+    "protocol_id": "LUMENCORE_CODECHECK_EIA_IMMUTABLE_RELEASE_CANDIDATE_20260721",
+    "publication_ready": false,
+    "publication_state": {
+      "certificate_issued": false,
+      "codecheck_request_opened": false,
+      "external_validation_complete": false,
+      "github_draft_release_created": false,
+      "github_immutable_releases_enabled": null,
+      "github_release_published": false,
+      "human_author_review_complete": false,
+      "immutable_release_url": null,
+      "independent_execution_complete": false,
+      "publication_authorized": false,
+      "release_asset_hashes_reconciled": false,
+      "release_assets_attached": false,
+      "stable_public_identifier": null,
+      "zenodo_doi_issued": false,
+      "zenodo_repository_enabled": null
+    },
+    "release": {
+      "archive_root": "lumencore-codecheck-eia-v0.1.0",
+      "bundle_asset_name": "LumenCore_CODECHECK_EIA_Source_Bundle_v0.1.0.zip",
+      "checksums_asset_name": "SHA256SUMS",
+      "deterministic_zip_timestamp": "1980-01-01T00:00:00Z",
+      "notes_asset_name": "LumenCore_CODECHECK_EIA_RELEASE_NOTES_v0.1.0.md",
+      "output_directory": "out/release_candidates/codecheck-eia-v0.1.0",
+      "preprint_asset_name": "LumenCore_CODECHECK_EIA_Preprint_v0.1.0.pdf",
+      "proposed_tag": "codecheck-eia-v0.1.0",
+      "receipt_asset_name": "LumenCore_CODECHECK_EIA_RELEASE_RECEIPT_v0.1.0.json",
+      "title": "LumenCore CODECHECK EIA Bounded Reproducibility Capsule"
+    },
+    "schema": "codecheck_eia_release_candidate_definition.v1",
+    "value_boundary": "An immutable public release and later independent execution may reduce diligence risk around provenance and executability. Neither establishes scientific validity, commercial demand, realized savings, model superiority, trading alpha, or valuation."
+  },
   "schema": "codecheck_eia_author_readiness.v1",
   "status": "AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW",
   "summary": {
@@ -742,14 +1161,16 @@
     "human_author_review_complete": false,
     "immutable_public_source_release_complete": false,
     "independent_execution_complete": false,
-    "internal_check_count": 54,
-    "internal_check_pass_count": 54,
+    "internal_check_count": 73,
+    "internal_check_pass_count": 73,
     "internal_gate_passed": true,
     "manifest_output_count": 6,
     "operator_clean_runner_computational_identity_current": true,
     "operator_clean_runner_full_source_exact_match": true,
     "operator_clean_runner_receipt_verified": true,
     "public_preprint_draft_complete": true,
+    "release_candidate_definition_ready": true,
+    "release_candidate_publication_ready": false,
     "stable_public_preprint_identifier_complete": false,
     "submission_authorized": false
   },

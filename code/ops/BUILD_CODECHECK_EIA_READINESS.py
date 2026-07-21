@@ -222,6 +222,17 @@ def load_authority_module(path: Path):
     return module
 
 
+def load_release_candidate_module(path: Path):
+    spec = importlib.util.spec_from_file_location(
+        "codecheck_eia_release_candidate_for_readiness", path
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"unable to load {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def scan_private(value: Any) -> list[str]:
     rendered = json.dumps(value, sort_keys=True, default=str)
     return [pattern.pattern for pattern in PRIVATE_PATTERNS if pattern.search(rendered)]
@@ -477,6 +488,15 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
         pdf_path=ROOT / bundle["preprint_pdf_path"],
         request_path=ROOT / bundle["community_request_draft_path"],
     )
+    release_candidate_config_path = ROOT / bundle[
+        "release_candidate_config_path"
+    ]
+    release_candidate_module = load_release_candidate_module(
+        ROOT / bundle["release_candidate_builder_path"]
+    )
+    release_candidate = release_candidate_module.inspect_release_candidate(
+        release_candidate_config_path
+    )
 
     output_root = PurePosixPath(execution["output_root"])
     archive_relative_manifest = []
@@ -517,6 +537,9 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
     request_text = (ROOT / bundle["community_request_draft_path"]).read_text(
         encoding="utf-8"
     )
+    release_plan_text = (ROOT / bundle["release_candidate_plan_path"]).read_text(
+        encoding="utf-8"
+    )
     public_text_privacy_hits = scan_private(
         {
             "codecheck": codecheck_path.read_text(encoding="utf-8"),
@@ -525,6 +548,8 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             "method_note": method_text,
             "preprint": preprint_text,
             "community_request_draft": request_text,
+            "release_candidate_plan": release_plan_text,
+            "release_candidate_config": read_json(release_candidate_config_path),
         }
     )
 
@@ -592,6 +617,17 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             f"preprint_request_{key}": value
             for key, value in preprint_and_request["checks"].items()
         },
+        **{
+            f"release_candidate_{key}": value
+            for key, value in release_candidate["checks"].items()
+        },
+        "release_candidate_definition_ready": release_candidate[
+            "internal_release_candidate_ready"
+        ],
+        "release_candidate_publication_remains_closed": release_candidate[
+            "publication_ready"
+        ]
+        is False,
         "public_text_privacy_scan_passed": not public_text_privacy_hits,
     }
     internal_gate_passed = all(checks.values())
@@ -634,6 +670,12 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
             ),
             "current_commit_clean_runner_complete": False,
             "public_preprint_draft_complete": preprint_and_request["verified"],
+            "release_candidate_definition_ready": release_candidate[
+                "internal_release_candidate_ready"
+            ],
+            "release_candidate_publication_ready": release_candidate[
+                "publication_ready"
+            ],
             "stable_public_preprint_identifier_complete": False,
             "immutable_public_source_release_complete": False,
             "duplicate_request_reconciled": False,
@@ -683,6 +725,7 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
         },
         "operator_clean_runner": operator_clean_runner,
         "preprint_and_request": preprint_and_request,
+        "release_candidate": release_candidate,
         "external_gates": external_gates,
         "portable_inputs": portable_inputs,
         "portable_input_chain_sha256": canonical_sha256(portable_inputs),
@@ -703,6 +746,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     archive = payload["authoritative_archive"]
     operator = payload["operator_clean_runner"]
     preprint = payload["preprint_and_request"]
+    release_candidate = payload["release_candidate"]
     lines = [
         "# CODECHECK EIA Author Readiness",
         "",
@@ -723,6 +767,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Operator clean-runner computational identity current: `{str(summary['operator_clean_runner_computational_identity_current']).lower()}`",
         f"- Current commit clean-runner complete: `{str(summary['current_commit_clean_runner_complete']).lower()}`",
         f"- Public preprint draft complete: `{str(summary['public_preprint_draft_complete']).lower()}`",
+        f"- Deterministic release-candidate definition ready: `{str(summary['release_candidate_definition_ready']).lower()}`",
+        f"- Release publication ready: `{str(summary['release_candidate_publication_ready']).lower()}`",
         f"- Stable public preprint identifier complete: `{str(summary['stable_public_preprint_identifier_complete']).lower()}`",
         f"- Immutable public source release complete: `{str(summary['immutable_public_source_release_complete']).lower()}`",
         f"- Duplicate request reconciled: `{str(summary['duplicate_request_reconciled']).lower()}`",
@@ -768,6 +814,19 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Community request opened: `{str(preprint['community_request_opened']).lower()}`",
             "",
             preprint["policy"],
+            "",
+            "## Immutable Release Candidate",
+            "",
+            f"- Proposed tag: `{release_candidate['release']['proposed_tag']}`",
+            f"- Bundle inputs: `{release_candidate['bundle_input_count']}`",
+            f"- Bundle input chain SHA-256: `{release_candidate['bundle_input_chain_sha256']}`",
+            f"- Internal definition ready: `{str(release_candidate['internal_release_candidate_ready']).lower()}`",
+            f"- Publication ready: `{str(release_candidate['publication_ready']).lower()}`",
+            f"- GitHub release published: `{str(release_candidate['publication_state']['github_release_published']).lower()}`",
+            f"- Zenodo DOI issued: `{str(release_candidate['publication_state']['zenodo_doi_issued']).lower()}`",
+            f"- External validation complete: `{str(release_candidate['publication_state']['external_validation_complete']).lower()}`",
+            "",
+            release_candidate["human_unlock_policy"],
             "",
             "## Archived Operator Execution",
             "",
@@ -828,13 +887,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "## Shortest Safe Completion Sequence",
             "",
             "1. Robert reviews the preprint, method note, manifest, license, request draft, and bounded ask.",
-            "2. Publish the bounded preprint at a stable public URL or DOI.",
-            "3. Freeze the exact reviewed public commit or release and reconcile every packet hash.",
-            "4. Recheck Gmail, GitHub, and local outreach controls for duplicates, then obtain fresh action-time HumanUnlock for one CODECHECK request.",
-            "5. Open exactly one request through the current official route and record its production issue URL.",
-            "6. Let the assigned codechecker execute the workflow and populate external metadata; the operator does not fill those fields.",
-            "7. Cite a certificate only after CODECHECK issues a public report identifier.",
-            "8. Pursue a separate statistical-method review and the preregistered prospective EIA gates; neither can be substituted by executable-computation checking.",
+            "2. Build the deterministic candidate with `python code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py` and reconcile its five local assets.",
+            "3. Under fresh action-time HumanUnlock, enable the required external integrations and create one draft release targeting the exact reviewed commit.",
+            "4. Attach all candidate assets, reconcile their uploaded hashes, and obtain fresh HumanUnlock before publishing an immutable release.",
+            "5. Record the observed stable release URL and version-specific DOI only after GitHub and Zenodo expose them.",
+            "6. Recheck Gmail, GitHub, and local outreach controls for duplicates, then obtain fresh action-time HumanUnlock for one CODECHECK request.",
+            "7. Open exactly one request through the current official route and record its production issue URL.",
+            "8. Let the assigned codechecker execute the workflow and populate external metadata; the operator does not fill those fields.",
+            "9. Cite a certificate only after CODECHECK issues a public report identifier.",
+            "10. Pursue a separate statistical-method review and the preregistered prospective EIA gates; neither can be substituted by executable-computation checking.",
         ]
     )
     return "\n".join(lines) + "\n"

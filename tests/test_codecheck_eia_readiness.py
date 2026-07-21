@@ -36,6 +36,9 @@ PREPRINT_PDF = (
     / "BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf"
 )
 REQUEST_DRAFT = ROOT / "docs" / "CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md"
+RELEASE_CONFIG = ROOT / "config" / "codecheck_eia_release_candidate_v1.json"
+RELEASE_SCRIPT = ROOT / "code" / "ops" / "BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py"
+RELEASE_PLAN = ROOT / "docs" / "release" / "CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md"
 
 
 def load_module():
@@ -191,6 +194,23 @@ def test_preprint_verification_rejects_tampered_source(tmp_path):
     assert result["community_request_opened"] is False
 
 
+def test_release_candidate_is_integrated_but_every_publication_gate_is_closed():
+    module = load_module()
+    payload = module.build_payload(generated_utc="2026-07-20T00:00:00+00:00")
+    candidate = payload["release_candidate"]
+
+    assert RELEASE_CONFIG.is_file()
+    assert RELEASE_SCRIPT.is_file()
+    assert RELEASE_PLAN.is_file()
+    assert candidate["internal_release_candidate_ready"] is True
+    assert candidate["publication_ready"] is False
+    assert candidate["publication_state"]["github_release_published"] is False
+    assert candidate["publication_state"]["zenodo_doi_issued"] is False
+    assert candidate["publication_state"]["codecheck_request_opened"] is False
+    assert candidate["publication_state"]["external_validation_complete"] is False
+    assert all(candidate["checks"].values())
+
+
 def test_ci_gate_is_read_only_pinned_and_retriggers_for_portable_inputs():
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     workflow = WORKFLOW.read_text(encoding="utf-8")
@@ -221,6 +241,8 @@ def test_internal_readiness_pass_keeps_every_external_gate_closed():
     assert summary["operator_clean_runner_computational_identity_current"] is True
     assert summary["current_commit_clean_runner_complete"] is False
     assert summary["public_preprint_draft_complete"] is True
+    assert summary["release_candidate_definition_ready"] is True
+    assert summary["release_candidate_publication_ready"] is False
     assert summary["stable_public_preprint_identifier_complete"] is False
     assert summary["immutable_public_source_release_complete"] is False
     assert summary["duplicate_request_reconciled"] is False
@@ -282,6 +304,8 @@ def test_published_outputs_match_a_timestamp_stable_rebuild():
     assert "Certificate issued: `false`" in rendered
     assert "External validation complete: `false`" in rendered
     assert "Public preprint draft complete: `true`" in rendered
+    assert "Deterministic release-candidate definition ready: `true`" in rendered
+    assert "Release publication ready: `false`" in rendered
     assert "Stable public preprint identifier complete: `false`" in rendered
     assert "Community request opened: `false`" in rendered
 
