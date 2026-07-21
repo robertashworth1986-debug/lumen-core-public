@@ -1,0 +1,176 @@
+{
+  "checks": {
+    "deterministic_environment": true,
+    "libc_name": true,
+    "libc_version": true,
+    "machine": true,
+    "os_release_id": true,
+    "os_release_version_id": true,
+    "python": true,
+    "requirements_lock_present": true,
+    "requirements_lock_sha256": true,
+    "system": true
+  },
+  "claim_boundary": "This first-party runtime receipt verifies only the named operating-system, architecture, Python, libc, deterministic environment variables, dependency-lock hash, and verifier source identity. It is not an independent execution, CODECHECK certificate, scientific validation, field validation, performance endorsement, or valuation evidence.",
+  "expected": {
+    "environment": {
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PYTHONHASHSEED": "0",
+      "TZ": "UTC"
+    },
+    "github_image": "ubuntu-24.04",
+    "libc": {
+      "name": "glibc",
+      "version": "2.39"
+    },
+    "machine": "x86_64",
+    "os_release": {
+      "id": "ubuntu",
+      "version_id": "24.04"
+    },
+    "python": "3.11.9",
+    "requirements_lock": {
+      "path": "requirements-reviewer-ubuntu-py311.lock",
+      "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
+    },
+    "system": "Linux"
+  },
+  "external_validation_complete": false,
+  "generated_utc": "2026-07-21T18:59:53.796950+00:00",
+  "independent_execution_complete": false,
+  "observed": {
+    "environment": {
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PYTHONHASHSEED": "0",
+      "TZ": "UTC"
+    },
+    "libc": {
+      "name": "glibc",
+      "version": "2.39"
+    },
+    "machine": "x86_64",
+    "os_release": {
+      "id": "ubuntu",
+      "version_id": "24.04"
+    },
+    "python": "3.11.9",
+    "system": "Linux"
+  },
+  "operator_controlled": true,
+  "passed": true,
+  "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_RUNTIME_20260721",
+  "receipt_payload_sha256": "8bc0aeabd51d9e37da9370d4e1e6e8a1857c7485bc690c37edd644aed06e9450",
+  "requirements_lock_observed_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+  "schema": "codecheck_reviewer_runtime_receipt.v1",
+  "source": {
+    "files": [
+      {
+        "bytes": 8205,
+        "path": "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+        "sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c"
+      },
+      {
+        "bytes": 1480,
+        "path": "config/codecheck_reviewer_runtime_v1.json",
+        "sha256": "23a850097ef9da3cf112920595dddcea3afb22d3d4b9f5d70d37b099c7da359e"
+      }
+    ],
+    "git_metadata_available": false,
+    "relevant_change_line_count": null,
+    "relevant_source_clean_observed": null,
+    "repository_commit_declared_by_operator": "1c0eb51754beffac6f4df484914e35efc21c253f",
+    "repository_commit_observed": null,
+    "source_chain_sha256": "57adecf2afae8caa33f7c0b308355c1d57d9b540b583a57ffce5b0a50068d19e"
+  },
+  "status": "AUTHORITATIVE_RUNTIME_PASS"
+}
+{
+  "checks": {
+    "all_direct_pins_matched": true,
+    "authoritative_target_declared": true,
+    "cross_platform_scope_not_overclaimed": true,
+    "direct_requirements_valid": true,
+    "every_locked_package_hashed": true,
+    "lock_contains_only_safe_directives": true,
+    "lock_package_count_matched": true,
+    "lock_sha256_matched": true,
+    "lock_syntax_valid": true,
+    "protocol_schema_matched": true,
+    "required_linux_transitives_matched": true,
+    "resolver_header_matches_protocol": true,
+    "source_builds_prohibited": true,
+    "workflow_installs_declared_lock": true,
+    "workflow_requires_binary_artifacts": true,
+    "workflow_requires_hashes": true,
+    "workflow_runs_dependency_consistency_check": true,
+    "workflow_uses_authoritative_runner": true,
+    "workflow_verifies_lock_before_install": true
+  },
+  "direct_matches": {
+    "lightgbm": true,
+    "numpy": true,
+    "packaging": true,
+    "pandas": true,
+    "pytest": true,
+    "scikit-learn": true,
+    "scipy": true,
+    "xgboost": true
+  },
+  "direct_requirement_count": 8,
+  "errors": [],
+  "known_gap": "Other operating systems and architectures are not covered by this receipt until separately resolved, hash-locked, and replayed.",
+  "locked_hash_count": 263,
+  "locked_package_count": 18,
+  "locked_packages": {
+    "iniconfig": "2.3.0",
+    "joblib": "1.5.3",
+    "lightgbm": "4.6.0",
+    "numpy": "2.3.5",
+    "nvidia-nccl-cu12": "2.30.7",
+    "packaging": "25.0",
+    "pandas": "2.3.3",
+    "pluggy": "1.6.0",
+    "pygments": "2.20.0",
+    "pytest": "9.1.0",
+    "python-dateutil": "2.9.0.post0",
+    "pytz": "2026.2",
+    "scikit-learn": "1.8.0",
+    "scipy": "1.16.3",
+    "six": "1.17.0",
+    "threadpoolctl": "3.6.0",
+    "tzdata": "2026.3",
+    "xgboost": "3.2.0"
+  },
+  "passed": true,
+  "receipt_sha256": "e8ff149fbb8560bb2ac9c9f62b470b265e4984ae9ce804c3cc23fcf9ac7aca72",
+  "required_transitive_matches": {
+    "nvidia-nccl-cu12": true
+  },
+  "requirements_lock_path": "requirements-reviewer-ubuntu-py311.lock",
+  "requirements_lock_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+  "requirements_path": "requirements-reviewer.txt",
+  "schema": "reviewer_dependency_lock_verification.v1",
+  "scope_boundary": "Complete for the authoritative Ubuntu 24.04 x86-64 CPython 3.11.9 reviewer runner only.",
+  "status": "AUTHORITATIVE_RUNNER_LOCK_VALID",
+  "target": {
+    "name": "uv",
+    "python": "3.11.9",
+    "source_builds_allowed": false,
+    "target_platform": "x86_64-unknown-linux-gnu",
+    "version": "0.11.28"
+  },
+  "unsafe_token_hits": []
+}
+No broken requirements found.
+{
+  "status": "BOUNDED_REPRODUCIBILITY_PASS",
+  "suites": 3,
+  "suite_passes": 3,
+  "assertion_passes": 31,
+  "assertions": 31,
+  "receipt": "out/codecheck_eia/reviewer_reproducibility_receipt.json"
+}

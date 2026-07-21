@@ -471,6 +471,68 @@ def verify_reviewer_runtime(
     }
 
 
+def verify_sha256_manifest(path: Path) -> dict[str, Any]:
+    rows = []
+    artifact_root = path.parent.resolve()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        match = re.fullmatch(r"([0-9a-f]{64})  (.+)", line)
+        if match is None:
+            rows.append(
+                {
+                    "path": line,
+                    "expected_sha256": None,
+                    "actual_sha256": None,
+                    "path_safe": False,
+                    "matched": False,
+                }
+            )
+            continue
+        expected_sha256, relative_path = match.groups()
+        path_object = PurePosixPath(relative_path)
+        artifact_path = path.parent.joinpath(*path_object.parts)
+        lexical_path_safe = (
+            bool(relative_path)
+            and not path_object.is_absolute()
+            and ".." not in path_object.parts
+            and ":" not in relative_path
+            and "\\" not in relative_path
+        )
+        try:
+            resolved_path_safe = artifact_path.resolve().is_relative_to(artifact_root)
+        except OSError:
+            resolved_path_safe = False
+        path_safe = lexical_path_safe and resolved_path_safe
+        actual_sha256 = (
+            file_sha256(artifact_path)
+            if path_safe and artifact_path.is_file()
+            else None
+        )
+        rows.append(
+            {
+                "path": relative_path,
+                "expected_sha256": expected_sha256,
+                "actual_sha256": actual_sha256,
+                "path_safe": path_safe,
+                "matched": path_safe and actual_sha256 == expected_sha256,
+            }
+        )
+    paths = [row["path"] for row in rows]
+    checks = {
+        "entries_present": bool(rows),
+        "entry_paths_unique": len(paths) == len(set(paths)),
+        "entry_paths_safe": all(row["path_safe"] for row in rows),
+        "entry_hashes_matched": all(row["matched"] for row in rows),
+    }
+    return {
+        "verified": all(checks.values()),
+        "checks": checks,
+        "entry_count": len(rows),
+        "matched_entry_count": sum(row["matched"] for row in rows),
+        "mismatch_paths": [row["path"] for row in rows if not row["matched"]],
+        "rows": rows,
+    }
+
+
 def verify_operator_container_rebuild(
     control: dict[str, Any],
     *,
@@ -510,7 +572,19 @@ def verify_operator_container_rebuild(
     }
     capsule_file_sha256 = file_sha256(capsule_receipt_path)
     runtime_file_sha256 = file_sha256(runtime_receipt_path)
-    private_hits = scan_private(receipt)
+    output_manifest_path = ROOT / control["output_manifest_path"]
+    output_manifest = verify_sha256_manifest(output_manifest_path)
+    output_text = {}
+    for row in output_manifest["rows"]:
+        artifact_path = output_manifest_path.parent.joinpath(
+            *PurePosixPath(row["path"]).parts
+        )
+        if row["path_safe"] and artifact_path.is_file():
+            try:
+                output_text[row["path"]] = artifact_path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                continue
+    private_hits = scan_private({"receipt": receipt, "outputs": output_text})
     checks = {
         "receipt_sha256_matched": file_sha256(path)
         == control["receipt_sha256"],
@@ -518,6 +592,11 @@ def verify_operator_container_rebuild(
             "receipt_payload_sha256"
         )
         == canonical_sha256(receipt_without_hash),
+        "output_manifest_sha256_matched": file_sha256(output_manifest_path)
+        == control["output_manifest_sha256"],
+        "output_manifest_entry_count_matched": output_manifest["entry_count"]
+        == control["expected_output_manifest_entry_count"],
+        "output_manifest_verified": output_manifest["verified"],
         "schema_matched": receipt.get("schema") == control["expected_schema"],
         "protocol_id_matched": receipt.get("protocol_id")
         == control["expected_protocol_id"],
@@ -605,6 +684,13 @@ def verify_operator_container_rebuild(
         "receipt_path": control["receipt_path"],
         "receipt_sha256": file_sha256(path),
         "receipt_payload_sha256": receipt.get("receipt_payload_sha256"),
+        "output_manifest_path": control["output_manifest_path"],
+        "output_manifest_sha256": file_sha256(output_manifest_path),
+        "output_manifest_entry_count": output_manifest["entry_count"],
+        "output_manifest_matched_entry_count": output_manifest[
+            "matched_entry_count"
+        ],
+        "output_manifest_mismatch_paths": output_manifest["mismatch_paths"],
         "schema": receipt.get("schema"),
         "protocol_id": receipt.get("protocol_id"),
         "status": receipt.get("status"),
@@ -1021,6 +1107,9 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
     required_paths.add(
         ROOT / config["operator_container_rebuild"]["receipt_path"]
     )
+    required_paths.add(
+        ROOT / config["operator_container_rebuild"]["output_manifest_path"]
+    )
     required_paths.add(SCRIPT_PATH)
     required_paths.add(TEST_PATH)
     path_checks = {
@@ -1229,6 +1318,16 @@ def build_payload(*, generated_utc: str | None = None) -> dict[str, Any]:
                 operator_container_rebuild["assertion_count"]
             ),
             "current_commit_clean_runner_complete": False,
+            "frozen_source_container_rebuild_complete": (
+                operator_clean_runner["verified"]
+                and operator_clean_runner["source_reconciliation"][
+                    "full_source_exact_match"
+                ]
+                and operator_container_rebuild["verified"]
+                and operator_clean_runner["source_commit"]
+                == operator_container_rebuild["source_commit"]
+                == preprint_and_request["public_commit_freeze"]["source_commit"]
+            ),
             "public_preprint_draft_complete": preprint_and_request["verified"],
             "release_candidate_definition_ready": release_candidate[
                 "internal_release_candidate_ready"
@@ -1340,6 +1439,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Container-rebuild suites passed: `{summary['operator_container_rebuild_suite_pass_count']}/{summary['operator_container_rebuild_suite_count']}`",
         f"- Container-rebuild assertions passed: `{summary['operator_container_rebuild_assertion_pass_count']}/{summary['operator_container_rebuild_assertion_count']}`",
         f"- Current commit clean-runner complete: `{str(summary['current_commit_clean_runner_complete']).lower()}`",
+        f"- Frozen reviewer source container rebuild complete: `{str(summary['frozen_source_container_rebuild_complete']).lower()}`",
         f"- Public preprint draft complete: `{str(summary['public_preprint_draft_complete']).lower()}`",
         f"- Deterministic release-candidate definition ready: `{str(summary['release_candidate_definition_ready']).lower()}`",
         f"- Release publication ready: `{str(summary['release_candidate_publication_ready']).lower()}`",

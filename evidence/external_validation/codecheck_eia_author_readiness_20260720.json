@@ -236,6 +236,9 @@
     "operator_container_rebuild_independent_execution_remains_false": true,
     "operator_container_rebuild_operator_controlled": true,
     "operator_container_rebuild_outer_checks_all_passed": true,
+    "operator_container_rebuild_output_manifest_entry_count_matched": true,
+    "operator_container_rebuild_output_manifest_sha256_matched": true,
+    "operator_container_rebuild_output_manifest_verified": true,
     "operator_container_rebuild_passed": true,
     "operator_container_rebuild_privacy_scan_passed": true,
     "operator_container_rebuild_protocol_id_matched": true,
@@ -411,13 +414,13 @@
       "owner": "CODECHECK"
     }
   ],
-  "generated_utc": "2026-07-21T18:51:51.489042+00:00",
+  "generated_utc": "2026-07-21T19:10:06.922031+00:00",
   "live_runtime_boundary": "This packet replays a dated frozen public-data computation. It intentionally excludes current prospective EIA counts and cannot be used to promote the live router or satisfy its preregistered sample gates.",
   "operator_clean_runner": {
     "assertion_count": 31,
     "assertion_pass_count": 31,
     "authoritative_runtime_match": true,
-    "capsule_sha256": "92e48edf885e731ff502fa81698052d23d81827c84720231d403343799aff30b",
+    "capsule_sha256": "aae7cf78b7345d9ddfd05e0508fccc2befbb7fed7c87e3370bd45648d3decec8",
     "checks": {
       "assertions_matched": true,
       "authoritative_runtime_matched": true,
@@ -442,24 +445,22 @@
     "execution_control": "Author-operated rebuild from the deterministic release ZIP in the digest-pinned reviewer container, with execution networking disabled, a read-only root filesystem, dropped capabilities, and the protocol-pinned Ubuntu, CPython, and dependency environment.",
     "external_validation_complete": false,
     "fixture_tests_passed": true,
-    "generated_utc": "2026-07-21T17:10:59.894355+00:00",
+    "generated_utc": "2026-07-21T18:59:54.232714+00:00",
     "policy": "This receipt is internal operator evidence, not independent execution or external validation. It may establish current computational identity only while every benchmark, protocol, frozen input, dependency lock, workflow, and test artifact in the receipt still matches byte-for-byte under its declared portable hash mode. Documentation drift must remain visible and requires a current-commit independent execution before any external claim changes.",
-    "receipt_path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json",
-    "receipt_sha256": "f8280773d1fa3e1209f57c64d3fcdf9608e4d633c6a0148b2578fc45728b8a1a",
+    "receipt_path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+    "receipt_sha256": "3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d",
     "relevant_source_clean": true,
     "schema": "reviewer_reproducibility_capsule.v1",
-    "source_chain_sha256": "2b5e73121212fe57b6cb0cd47565419ed88090be609b392c4aed5c35e0e7e3b6",
-    "source_commit": "b2ede0583776de47459fac4413f2570e2636f199",
+    "source_chain_sha256": "9f2cae2df44d1861eea522e08e8524ac010afea88ab59c5f38d7111c2d67d6a5",
+    "source_commit": "1c0eb51754beffac6f4df484914e35efc21c253f",
     "source_reconciliation": {
       "archived_source_count": 23,
       "computational_identity_exact_match": true,
       "computational_identity_path_count": 22,
-      "current_match_count": 22,
-      "full_source_exact_match": false,
-      "mismatch_count": 1,
-      "mismatch_paths": [
-        "README.md"
-      ],
+      "current_match_count": 23,
+      "full_source_exact_match": true,
+      "mismatch_count": 0,
+      "mismatch_paths": [],
       "rows": [
         {
           "archived_sha256": "2fa8feb63735603960688161a252d2efa68077a51b27dc48bcdfe0d99d0ae14e",
@@ -476,8 +477,8 @@
           "role": "computational_identity"
         },
         {
-          "archived_sha256": "4d5f24da1c3c15324af95b7b91a5c2048e3c28c255646bd0f5eb4387936cc736",
-          "current_match": false,
+          "archived_sha256": "bfe3bf5c66a22bf741bb9593e41aecb6836101700c00a9b1dcc0f584fe169855",
+          "current_match": true,
           "current_sha256": "bfe3bf5c66a22bf741bb9593e41aecb6836101700c00a9b1dcc0f584fe169855",
           "path": "README.md",
           "role": "documentation_or_packaging"
@@ -646,6 +647,9 @@
       "independent_execution_remains_false": true,
       "operator_controlled": true,
       "outer_checks_all_passed": true,
+      "output_manifest_entry_count_matched": true,
+      "output_manifest_sha256_matched": true,
+      "output_manifest_verified": true,
       "passed": true,
       "privacy_scan_passed": true,
       "protocol_id_matched": true,
@@ -668,21 +672,26 @@
     "configured_private_pattern_hit_count": 0,
     "external_validation_complete": false,
     "fixture_tests_passed": true,
-    "generated_utc": "2026-07-21T17:11:38.093014+00:00",
-    "image_id": "sha256:864ace1b42d399ad4147c570709a6de01f1466337902f43b2516223bfabf4e8b",
+    "generated_utc": "2026-07-21T19:00:29.866240+00:00",
+    "image_id": "sha256:d664acd915720042cfd209d9e17c6750657bce68b3509afb544f82a5d89929bd",
     "independent_execution_complete": false,
     "operator_controlled": true,
+    "output_manifest_entry_count": 12,
+    "output_manifest_matched_entry_count": 12,
+    "output_manifest_mismatch_paths": [],
+    "output_manifest_path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/SHA256SUMS",
+    "output_manifest_sha256": "6e1e76acc028ccff4099982b86516d4e4306aee27f0de7326b7870d9662e7908",
     "policy": "This first-party receipt proves only that the named release ZIP rebuilt and passed inside the pinned operator-controlled container under the recorded isolation controls. Independent execution, a CODECHECK certificate, scientific validation, field validation, performance endorsement, and external validation remain false.",
     "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_CONTAINER_20260721",
-    "receipt_path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json",
-    "receipt_payload_sha256": "afc6f89b8d19b08fdc85ace94d54ee7342cacb56118f706e29b7f76f782b757b",
-    "receipt_sha256": "560cc3b5f187c0a4add90c527e967de36e13788c53e3bd8aaa63f97c10a3787e",
-    "release_manifest_sha256": "6b7530fef3188c2263241a85f8ccffba97c332e2df12c0d1e6dd4eedd6076c26",
+    "receipt_path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/container_rebuild_receipt.json",
+    "receipt_payload_sha256": "7746bea77de62e4314e53129e12450a01cb92e3218ce52df9ee112d884c661a7",
+    "receipt_sha256": "188d62b4b36d1dc417801d630782632a542de64312ce77e796a1517282c8a916",
+    "release_manifest_sha256": "f82df9a5dff3b12fa38b56331577cd2379d611a5943c778197369afbb6728eac",
     "runtime_check_count": 10,
     "runtime_check_pass_count": 10,
     "schema": "codecheck_reviewer_container_run_receipt.v1",
-    "source_bundle_sha256": "0fa73c04454cfbd94f819b9584ccd2167982e3a95542e9345f687a1c823463ab",
-    "source_commit": "b2ede0583776de47459fac4413f2570e2636f199",
+    "source_bundle_sha256": "8d1e71100945d39f54849c80d8f9331c3aa6ede3884026bef44b0ef66539eb89",
+    "source_commit": "1c0eb51754beffac6f4df484914e35efc21c253f",
     "source_state_mode": "release_manifest",
     "source_state_verified": true,
     "status": "OPERATOR_CONTAINER_REBUILD_PASS",
@@ -716,9 +725,10 @@
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md": true,
     "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf": true,
     "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md": true,
-    "evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json": true,
-    "evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json": true,
-    "evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json": true,
+    "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/SHA256SUMS": true,
+    "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/container_rebuild_receipt.json": true,
+    "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json": true,
+    "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/runtime_receipt.json": true,
     "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": true,
     "requirements-reviewer-ubuntu-py311.lock": true,
     "tests/test_codecheck_eia_readiness.py": true,
@@ -726,13 +736,13 @@
     "tests/test_codecheck_reviewer_container.py": true,
     "tests/test_codecheck_reviewer_runtime.py": true
   },
-  "portable_input_chain_sha256": "503c47d57d7c983d5c00d2f1fd2c9ff9cc69e514986c135d978a356709b24550",
+  "portable_input_chain_sha256": "87894856a468f23862f0a3b9d3ccb378ac2e0dd96b578e59ff750938ac2150fa",
   "portable_inputs": [
     {
-      "bytes": 8110,
+      "bytes": 8574,
       "hash_mode": "utf8_lf",
       "path": ".github/workflows/codecheck-eia-readiness.yml",
-      "sha256": "105aefc846aaff5a66c1747d19ded781fab5ec7d8c6af35ea71b1fcf7a4be472"
+      "sha256": "2c2eeac6c42977fd67faeb10ae661179711fda48686fdeddc3785eb4a0c01dd5"
     },
     {
       "bytes": 16243,
@@ -759,10 +769,10 @@
       "sha256": "90daffa014a230871a2b76a3b0025bf1bd362ee86f86ad7d08bed8ab33d10880"
     },
     {
-      "bytes": 69349,
+      "bytes": 73650,
       "hash_mode": "utf8_lf",
       "path": "code/ops/BUILD_CODECHECK_EIA_READINESS.py",
-      "sha256": "16e7b18202e5552ac35880e21abcfee80498c73b989753dc7ab36ee1434bb268"
+      "sha256": "a705bd5f548b1207b2033a31a2d0308ca3e18a47262ab6a21b35b8a7e9f2eac7"
     },
     {
       "bytes": 10355,
@@ -813,10 +823,10 @@
       "sha256": "7180a657bf8fac142f2ef007078d9f812ea6ff1bf8bcaca6e134fae9b0b6e84c"
     },
     {
-      "bytes": 15803,
+      "bytes": 16261,
       "hash_mode": "utf8_lf",
       "path": "config/codecheck_eia_readiness_v1.json",
-      "sha256": "de26210e8407467cd6b0248a4ae347a6f1eeb281994a6b55c6cff1b7536a76ff"
+      "sha256": "6b19f82a3a7c853b615444abd8c72f3b3bc4afabdb59b8228f38a1265d0a6dfe"
     },
     {
       "bytes": 6174,
@@ -899,20 +909,26 @@
     {
       "bytes": 27422,
       "hash_mode": "utf8_lf",
-      "path": "evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json",
-      "sha256": "f8280773d1fa3e1209f57c64d3fcdf9608e4d633c6a0148b2578fc45728b8a1a"
+      "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+      "sha256": "3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d"
     },
     {
-      "bytes": 8495,
+      "bytes": 8534,
       "hash_mode": "utf8_lf",
-      "path": "evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json",
-      "sha256": "560cc3b5f187c0a4add90c527e967de36e13788c53e3bd8aaa63f97c10a3787e"
+      "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/container_rebuild_receipt.json",
+      "sha256": "188d62b4b36d1dc417801d630782632a542de64312ce77e796a1517282c8a916"
     },
     {
       "bytes": 3009,
       "hash_mode": "utf8_lf",
-      "path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json",
-      "sha256": "929a0f8ad778071fbdabf82120016453579ff12aab13231f1d99dbb915af9d53"
+      "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/runtime_receipt.json",
+      "sha256": "6908148d421a10f9592c7a9a5ccd4283cd66f3147b33b6381e27ddae9577ab8c"
+    },
+    {
+      "bytes": 1088,
+      "hash_mode": "utf8_lf",
+      "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/SHA256SUMS",
+      "sha256": "6e1e76acc028ccff4099982b86516d4e4306aee27f0de7326b7870d9662e7908"
     },
     {
       "bytes": 114366,
@@ -927,10 +943,10 @@
       "sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
     },
     {
-      "bytes": 21806,
+      "bytes": 23078,
       "hash_mode": "utf8_lf",
       "path": "tests/test_codecheck_eia_readiness.py",
-      "sha256": "7523aedb182ad5199560efca4298cfeef47f2fdd699029b8017d599e7a81b1b5"
+      "sha256": "5d62e96caa0cd88849d81e78e86128f3ff7eb1d39a91ad8f083c67229050db7b"
     },
     {
       "bytes": 6498,
@@ -1340,7 +1356,7 @@
     "passed": true
   },
   "protocol_id": "LUMENCORE_CODECHECK_EIA_AUTHOR_READINESS_20260720",
-  "readiness_sha256": "ae2e19beeaac83eed48347dc01f36def8dacb8310e945525fb1e09786f851441",
+  "readiness_sha256": "52efc09c821e294f3550954721408aa19574a8f50c85fd032ad96fd0830ed9dd",
   "release_candidate": {
     "bundle_input_chain_sha256": "1189cc679a2897d55ac418ae930c7545345efa279868435038c498944c369bf6",
     "bundle_input_count": 44,
@@ -1856,7 +1872,7 @@
       "system": "Linux"
     },
     "external_validation_complete": false,
-    "generated_utc": "2026-07-21T17:10:59.378730+00:00",
+    "generated_utc": "2026-07-21T18:59:53.796950+00:00",
     "independent_execution_complete": false,
     "observed": {
       "environment": {
@@ -1881,13 +1897,13 @@
     "operator_controlled": true,
     "policy": "This first-party receipt closes the author-side ambiguity between a generic Linux/Python match and the specifically claimed Ubuntu 24.04 x86-64 CPython 3.11.9 glibc 2.39 runtime. It does not convert the replay into independent execution or external validation.",
     "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_RUNTIME_20260721",
-    "receipt_path": "evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json",
-    "receipt_payload_sha256": "a043dadfb486a7f2bba14e44864607193935d17d4a099c0ad1400cf170184e28",
-    "receipt_sha256": "929a0f8ad778071fbdabf82120016453579ff12aab13231f1d99dbb915af9d53",
+    "receipt_path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/runtime_receipt.json",
+    "receipt_payload_sha256": "8bc0aeabd51d9e37da9370d4e1e6e8a1857c7485bc690c37edd644aed06e9450",
+    "receipt_sha256": "6908148d421a10f9592c7a9a5ccd4283cd66f3147b33b6381e27ddae9577ab8c",
     "runtime_check_count": 10,
     "runtime_check_pass_count": 10,
     "schema": "codecheck_reviewer_runtime_receipt.v1",
-    "source_commit": "b2ede0583776de47459fac4413f2570e2636f199",
+    "source_commit": "1c0eb51754beffac6f4df484914e35efc21c253f",
     "source_reconciliation": [
       {
         "current_match": true,
@@ -1921,15 +1937,16 @@
     "current_commit_clean_runner_complete": false,
     "duplicate_request_reconciled": false,
     "external_validation_complete": false,
+    "frozen_source_container_rebuild_complete": true,
     "human_author_review_complete": false,
     "immutable_public_source_release_complete": true,
     "independent_execution_complete": false,
-    "internal_check_count": 124,
-    "internal_check_pass_count": 124,
+    "internal_check_count": 127,
+    "internal_check_pass_count": 127,
     "internal_gate_passed": true,
     "manifest_output_count": 6,
     "operator_clean_runner_computational_identity_current": true,
-    "operator_clean_runner_full_source_exact_match": false,
+    "operator_clean_runner_full_source_exact_match": true,
     "operator_clean_runner_receipt_verified": true,
     "operator_container_rebuild_assertion_count": 31,
     "operator_container_rebuild_assertion_pass_count": 31,

@@ -17,24 +17,16 @@ OUTPUT = (
     / "codecheck_eia_author_readiness_20260720.json"
 )
 MARKDOWN = ROOT / "docs" / "CODECHECK_EIA_AUTHOR_READINESS_2026-07-20.md"
-OPERATOR_RECEIPT = (
+CONTAINER_OUTPUT = (
     ROOT
     / "evidence"
     / "reproducibility"
-    / "codecheck_eia_operator_clean_runner_b2ede058_20260721.json"
+    / "codecheck_reviewer_container_1c0eb517_20260721"
 )
-RUNTIME_RECEIPT = (
-    ROOT
-    / "evidence"
-    / "reproducibility"
-    / "codecheck_reviewer_runtime_receipt_b2ede058_20260721.json"
-)
-CONTAINER_RECEIPT = (
-    ROOT
-    / "evidence"
-    / "reproducibility"
-    / "codecheck_reviewer_container_rebuild_b2ede058_20260721.json"
-)
+OPERATOR_RECEIPT = CONTAINER_OUTPUT / "reviewer_reproducibility_receipt.json"
+RUNTIME_RECEIPT = CONTAINER_OUTPUT / "runtime_receipt.json"
+CONTAINER_RECEIPT = CONTAINER_OUTPUT / "container_rebuild_receipt.json"
+CONTAINER_MANIFEST = CONTAINER_OUTPUT / "SHA256SUMS"
 PREPRINT_MARKDOWN = (
     ROOT
     / "docs"
@@ -151,12 +143,12 @@ def test_operator_clean_runner_is_hash_locked_clean_and_not_external():
     assert runner["fixture_tests_passed"] is True
     assert runner["suite_count"] == runner["suite_pass_count"] == 3
     assert runner["assertion_count"] == runner["assertion_pass_count"] == 31
-    assert runner["source_reconciliation"]["full_source_exact_match"] is False
+    assert runner["source_reconciliation"]["full_source_exact_match"] is True
     assert (
         runner["source_reconciliation"]["computational_identity_exact_match"]
         is True
     )
-    assert runner["source_reconciliation"]["mismatch_paths"] == ["README.md"]
+    assert runner["source_reconciliation"]["mismatch_paths"] == []
     assert runner["external_validation_complete"] is False
 
 
@@ -240,6 +232,12 @@ def test_digest_pinned_container_rebuild_is_cross_locked_and_not_external():
     assert container["runtime_check_pass_count"] == 10
     assert container["suite_count"] == container["suite_pass_count"] == 3
     assert container["assertion_count"] == container["assertion_pass_count"] == 31
+    assert container["output_manifest_path"] == CONTAINER_MANIFEST.relative_to(
+        ROOT
+    ).as_posix()
+    assert container["output_manifest_entry_count"] == 12
+    assert container["output_manifest_matched_entry_count"] == 12
+    assert container["output_manifest_mismatch_paths"] == []
     assert container["fixture_tests_passed"] is True
     assert container["source_state_mode"] == "release_manifest"
     assert container["source_state_verified"] is True
@@ -275,6 +273,27 @@ def test_digest_pinned_container_rebuild_rejects_tampered_receipt(tmp_path):
     assert result["checks"]["source_bundle_sha256_matched"] is False
     assert result["independent_execution_complete"] is False
     assert result["external_validation_complete"] is False
+
+
+def test_sha256_manifest_rejects_posix_and_windows_traversal(tmp_path):
+    module = load_module()
+    outside = tmp_path / "outside.txt"
+    outside.write_text("outside", encoding="utf-8")
+    digest = module.file_sha256(outside)
+    packet = tmp_path / "packet"
+    packet.mkdir()
+    manifest = packet / "SHA256SUMS"
+    manifest.write_text(
+        f"{digest}  ../outside.txt\n{digest}  ..\\outside.txt\n",
+        encoding="utf-8",
+    )
+
+    result = module.verify_sha256_manifest(manifest)
+
+    assert result["verified"] is False
+    assert result["checks"]["entry_paths_safe"] is False
+    assert result["matched_entry_count"] == 0
+    assert all(row["path_safe"] is False for row in result["rows"])
 
 
 def test_preprint_and_request_are_hash_locked_bounded_and_unopened():
@@ -379,6 +398,12 @@ def test_ci_gate_is_read_only_pinned_and_retriggers_for_portable_inputs():
     assert "tests/test_codecheck_eia_readiness.py" in workflow
     assert "actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd" in workflow
     assert "fetch-depth: 0" in workflow
+    assert (
+        workflow.count(
+            'evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/**'
+        )
+        == 2
+    )
     assert "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1" in workflow
     for path in config["portable_input_paths"]:
         assert workflow.count(f'- "{path}"') == 2, path
@@ -396,7 +421,7 @@ def test_internal_readiness_pass_closes_only_commit_pinned_publication_gates():
     assert summary["archived_computational_identity_still_matches"] is False
     assert summary["archive_drift_reconciled_by_current_container_rebuild"] is True
     assert summary["operator_clean_runner_receipt_verified"] is True
-    assert summary["operator_clean_runner_full_source_exact_match"] is False
+    assert summary["operator_clean_runner_full_source_exact_match"] is True
     assert summary["operator_clean_runner_computational_identity_current"] is True
     assert summary["reviewer_runtime_receipt_verified"] is True
     assert summary["reviewer_runtime_check_count"] == 10
@@ -405,6 +430,7 @@ def test_internal_readiness_pass_closes_only_commit_pinned_publication_gates():
     assert summary["operator_container_rebuild_suite_pass_count"] == 3
     assert summary["operator_container_rebuild_assertion_pass_count"] == 31
     assert summary["current_commit_clean_runner_complete"] is False
+    assert summary["frozen_source_container_rebuild_complete"] is True
     assert summary["public_preprint_draft_complete"] is True
     assert summary["release_candidate_definition_ready"] is True
     assert summary["release_candidate_publication_ready"] is False
@@ -472,6 +498,7 @@ def test_published_outputs_match_a_timestamp_stable_rebuild():
     assert "AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW" in rendered
     assert "Independent execution complete: `false`" in rendered
     assert "Operator clean-runner receipt verified: `true`" in rendered
+    assert "Frozen reviewer source container rebuild complete: `true`" in rendered
     assert (
         "Operator clean-runner computational identity current: `true`"
         in rendered

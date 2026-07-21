@@ -1,20 +1,20 @@
 # CODECHECK EIA Author Readiness
 
-Generated UTC: `2026-07-21T18:51:51.489042+00:00`
+Generated UTC: `2026-07-21T19:10:06.922031+00:00`
 
 An author-readiness pass proves only that the declared public files, execution manifest, archived clean-runner receipt, licenses, and claim boundaries reconcile. It does not prove that CODECHECK accepted the request, that an independent codechecker executed the workflow, that a certificate exists, or that the science, prospective system, economics, patent position, or company valuation is externally validated.
 
 ## Decision
 
 - Status: `AUTHOR_PACKET_READY_FOR_HUMAN_REVIEW`
-- Internal checks: `124/124`
+- Internal checks: `127/127`
 - Declared reproducible outputs: `6`
 - Authoritative archive verified: `true`
 - Archived full source exact match: `false`
 - Archived computational identity still matches: `false`
 - Archive drift reconciled by current container rebuild: `true`
 - Operator clean-runner receipt verified: `true`
-- Operator clean-runner full source exact match: `false`
+- Operator clean-runner full source exact match: `true`
 - Operator clean-runner computational identity current: `true`
 - Exact reviewer runtime receipt verified: `true`
 - Exact reviewer runtime checks: `10/10`
@@ -22,6 +22,7 @@ An author-readiness pass proves only that the declared public files, execution m
 - Container-rebuild suites passed: `3/3`
 - Container-rebuild assertions passed: `31/31`
 - Current commit clean-runner complete: `false`
+- Frozen reviewer source container rebuild complete: `true`
 - Public preprint draft complete: `true`
 - Deterministic release-candidate definition ready: `true`
 - Release publication ready: `false`
@@ -33,7 +34,7 @@ An author-readiness pass proves only that the declared public files, execution m
 - Independent execution complete: `false`
 - Certificate issued: `false`
 - External validation complete: `false`
-- Readiness SHA-256: `ae2e19beeaac83eed48347dc01f36def8dacb8310e945525fb1e09786f851441`
+- Readiness SHA-256: `52efc09c821e294f3550954721408aa19574a8f50c85fd032ad96fd0830ed9dd`
 
 An internal pass means the author-side bundle is coherent enough for Robert to review. It is not a submission receipt, external execution, or certificate.
 
@@ -106,13 +107,13 @@ The archive demonstrates an older operator-controlled clean-runner execution. Ev
 
 ## Current Source-Identity Operator Replay
 
-- Receipt: `evidence/reproducibility/codecheck_eia_operator_clean_runner_b2ede058_20260721.json`
-- Receipt SHA-256: `f8280773d1fa3e1209f57c64d3fcdf9608e4d633c6a0148b2578fc45728b8a1a`
-- Source commit: `b2ede0583776de47459fac4413f2570e2636f199`
-- Source artifacts matched: `22/23`
-- Full source exact match: `false`
+- Receipt: `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json`
+- Receipt SHA-256: `3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d`
+- Source commit: `1c0eb51754beffac6f4df484914e35efc21c253f`
+- Source artifacts matched: `23/23`
+- Full source exact match: `true`
 - Computational identity exact match: `true`
-- Documentation drift paths: `README.md`
+- Documentation drift paths: `none`
 - Relevant source clean: `true`
 - Clean-runner replay: `true`
 - Authoritative runtime matched: `true`
@@ -128,9 +129,9 @@ This receipt is internal operator evidence, not independent execution or externa
 
 ## Exact Reviewer Runtime Receipt
 
-- Receipt: `evidence/reproducibility/codecheck_reviewer_runtime_receipt_b2ede058_20260721.json`
-- Receipt SHA-256: `929a0f8ad778071fbdabf82120016453579ff12aab13231f1d99dbb915af9d53`
-- Declared source commit: `b2ede0583776de47459fac4413f2570e2636f199`
+- Receipt: `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/runtime_receipt.json`
+- Receipt SHA-256: `6908148d421a10f9592c7a9a5ccd4283cd66f3147b33b6381e27ddae9577ab8c`
+- Declared source commit: `1c0eb51754beffac6f4df484914e35efc21c253f`
 - Runtime checks passed: `10/10`
 - Observed OS: `ubuntu 24.04`
 - Observed architecture: `x86_64`
@@ -144,12 +145,12 @@ This first-party receipt closes the author-side ambiguity between a generic Linu
 
 ## Digest-Pinned Container Rebuild
 
-- Receipt: `evidence/reproducibility/codecheck_reviewer_container_rebuild_b2ede058_20260721.json`
-- Receipt SHA-256: `560cc3b5f187c0a4add90c527e967de36e13788c53e3bd8aaa63f97c10a3787e`
-- Source commit: `b2ede0583776de47459fac4413f2570e2636f199`
-- Source bundle SHA-256: `0fa73c04454cfbd94f819b9584ccd2167982e3a95542e9345f687a1c823463ab`
-- Release manifest SHA-256: `6b7530fef3188c2263241a85f8ccffba97c332e2df12c0d1e6dd4eedd6076c26`
-- Image ID: `sha256:864ace1b42d399ad4147c570709a6de01f1466337902f43b2516223bfabf4e8b`
+- Receipt: `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/container_rebuild_receipt.json`
+- Receipt SHA-256: `188d62b4b36d1dc417801d630782632a542de64312ce77e796a1517282c8a916`
+- Source commit: `1c0eb51754beffac6f4df484914e35efc21c253f`
+- Source bundle SHA-256: `8d1e71100945d39f54849c80d8f9331c3aa6ede3884026bef44b0ef66539eb89`
+- Release manifest SHA-256: `f82df9a5dff3b12fa38b56331577cd2379d611a5943c778197369afbb6728eac`
+- Image ID: `sha256:d664acd915720042cfd209d9e17c6750657bce68b3509afb544f82a5d89929bd`
 - Runtime checks passed: `10/10`
 - Suites passed: `3/3`
 - Assertions passed: `31/31`
