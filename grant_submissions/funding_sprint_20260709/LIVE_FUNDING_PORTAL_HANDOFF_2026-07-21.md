@@ -10,8 +10,8 @@ This handoff is generated from the authoritative near-deadline command board. It
 - Navigation before resume signal: `false`
 - Inspect current page before navigation: `true`
 - First action after resume: Inspect the current URL and visible page without navigating. Continue the current authenticated portal to its next safe preview before switching lanes.
-- Source command-board SHA-256: `776662a40aa48d04c4eb5ed76395666735fc5f1ed1906fc74bbc0f98aec2beda`
-- Handoff SHA-256: `80dabc2c5fb4b36ab78bc2fc6ef5fef8aa5587de4279d3f7a4d46aad2f0eb8a5`
+- Source command-board SHA-256: `7c59ce19fd11a948cd13fd2ad974d7f219e4d2817101fbc1a953a42f291f9019`
+- Handoff SHA-256: `c0d927776e9367abbdcc616fc56c637cb9ce6b9845b0e7023b69b50f473d565c`
 
 ## Portal Queue
 
