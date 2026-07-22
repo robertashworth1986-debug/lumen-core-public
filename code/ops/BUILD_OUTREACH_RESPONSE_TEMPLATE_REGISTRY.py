@@ -30,8 +30,15 @@ VALID_ATTACHMENT_POLICIES = {
     "NONE",
     "EXPLICIT_REQUEST_ONLY",
 }
+VALID_DEADLINE_POLICIES = {
+    "NONE",
+    "OPTIONAL",
+    "REQUIRED",
+}
 TEMPLATE_ID_RE = re.compile(r"^[A-Z][A-Z0-9_]+$")
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+SUBJECT_CONTROL_RE = re.compile(r"[\x00-\x1F\x7F]")
+BODY_CONTROL_RE = re.compile(r"[\x00-\x09\x0B-\x1F\x7F]")
 UUID_RE = re.compile(
     r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
     r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"
@@ -192,6 +199,9 @@ def validate_registry(payload: dict[str, Any]) -> dict[str, Any]:
             raise OutreachRegistryError(f"SEND_POLICY_INVALID:{template_id}")
         if row.get("attachment_policy") not in VALID_ATTACHMENT_POLICIES:
             raise OutreachRegistryError(f"ATTACHMENT_POLICY_INVALID:{template_id}")
+        deadline_policy = row.get("deadline_policy")
+        if deadline_policy not in VALID_DEADLINE_POLICIES:
+            raise OutreachRegistryError(f"DEADLINE_POLICY_INVALID:{template_id}")
 
         required = set(
             _string_list(row.get("required_fields"), f"REQUIRED_FIELDS_INVALID:{template_id}")
@@ -207,6 +217,12 @@ def validate_registry(payload: dict[str, Any]) -> dict[str, Any]:
             raise OutreachRegistryError(f"OPTIONAL_DEFAULTS_INVALID:{template_id}")
         if not sensitive.issubset(required | routing | set(defaults)):
             raise OutreachRegistryError(f"SENSITIVE_FIELD_UNDECLARED:{template_id}")
+        if deadline_policy == "REQUIRED" and "deadline_iso" not in required:
+            raise OutreachRegistryError(
+                f"REQUIRED_DEADLINE_FIELD_UNDECLARED:{template_id}"
+            )
+        if deadline_policy != "REQUIRED" and "deadline_iso" in required:
+            raise OutreachRegistryError(f"DEADLINE_POLICY_FIELD_MISMATCH:{template_id}")
 
         subject = row.get("subject")
         body = row.get("body")
@@ -216,6 +232,12 @@ def validate_registry(payload: dict[str, Any]) -> dict[str, Any]:
             raise OutreachRegistryError(f"REPLY_TEMPLATE_EMPTY:{template_id}")
         if send_policy == "MONITOR_NO_SEND" and (subject.strip() or body.strip()):
             raise OutreachRegistryError(f"MONITOR_TEMPLATE_MUST_BE_EMPTY:{template_id}")
+        if SUBJECT_CONTROL_RE.search(subject):
+            raise OutreachRegistryError(
+                f"TEMPLATE_SUBJECT_CONTROL_CHARACTER:{template_id}"
+            )
+        if BODY_CONTROL_RE.search(body):
+            raise OutreachRegistryError(f"TEMPLATE_BODY_CONTROL_CHARACTER:{template_id}")
 
         placeholders = template_placeholders(subject + "\n" + body)
         declared = required | routing | set(defaults)
@@ -256,6 +278,8 @@ def template_by_id(payload: dict[str, Any], template_id: str) -> dict[str, Any]:
 
 
 def parse_aware_datetime(value: str) -> datetime:
+    if not isinstance(value, str) or not value.strip():
+        raise OutreachRegistryError("DEADLINE_INVALID")
     normalized = value.strip()
     if normalized.endswith("Z"):
         normalized = normalized[:-1] + "+00:00"
@@ -302,6 +326,7 @@ def _base_result(
         "template_id": row["template_id"],
         "status": status,
         "deadline": deadline,
+        "deadline_policy": row["deadline_policy"],
         "claim_boundary": payload["claim_boundary"],
         "send_performed": False,
         "send_allowed_by_builder": False,
@@ -323,7 +348,11 @@ def render_response(
     if not isinstance(facts, dict):
         raise OutreachRegistryError("FACTS_NOT_OBJECT")
     row = template_by_id(payload, template_id)
-    deadline = deadline_state(facts.get("deadline_iso"), current_utc)
+    deadline = {
+        "provided": False,
+        "urgency": "NOT_PROVIDED",
+        "hours_remaining": None,
+    }
 
     blocked_secret_fields = secret_or_credential_fields(facts)
     if blocked_secret_fields:
@@ -364,6 +393,28 @@ def render_response(
             }
         )
         return result
+
+    deadline_value = facts.get("deadline_iso")
+    if row["deadline_policy"] != "NONE" and deadline_value not in (None, ""):
+        try:
+            deadline = deadline_state(deadline_value, current_utc)
+        except OutreachRegistryError as exc:
+            deadline = {
+                "provided": True,
+                "urgency": "INVALID",
+                "hours_remaining": None,
+                "validation_error": str(exc),
+            }
+            result = _base_result(payload, row, "BLOCKED_INVALID_DEADLINE", deadline)
+            result.update(
+                {
+                    "duplicate_send_blocked": False,
+                    "subject": None,
+                    "body": None,
+                    "missing_fields": [],
+                }
+            )
+            return result
 
     required = list(row["required_fields"]) + list(row["routing_fields"])
     missing = sorted(
@@ -451,6 +502,28 @@ def render_response(
         raise OutreachRegistryError(
             f"UNRESOLVED_PLACEHOLDER_AFTER_RENDER:{','.join(sorted(remaining))}"
         )
+    if SUBJECT_CONTROL_RE.search(subject):
+        result = _base_result(payload, row, "BLOCKED_SUBJECT_CONTROL_CHARACTER", deadline)
+        result.update(
+            {
+                "duplicate_send_blocked": False,
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+            }
+        )
+        return result
+    if BODY_CONTROL_RE.search(body):
+        result = _base_result(payload, row, "BLOCKED_BODY_CONTROL_CHARACTER", deadline)
+        result.update(
+            {
+                "duplicate_send_blocked": False,
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+            }
+        )
+        return result
     lowered = (subject + "\n" + body).lower()
     for marker in POSITIVE_CLAIM_MARKERS:
         if marker in lowered:
@@ -509,6 +582,9 @@ def build_public_payload(
             "opaque_binary_fact_fail_closed": True,
             "hardcoded_template_credential_fail_closed": True,
             "past_deadline_fail_closed": True,
+            "deadline_policy_fail_closed": True,
+            "subject_header_injection_fail_closed": True,
+            "body_control_character_fail_closed": True,
             "attachment_requires_explicit_request": True,
             "builder_can_send_email": False,
             "action_time_human_review_required": True,
@@ -532,6 +608,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Missing-fact gate: `FAIL_CLOSED`",
         "- Secret-or-credential gate: `FAIL_CLOSED`",
         "- Past-deadline gate: `FAIL_CLOSED`",
+        "- Deadline-policy gate: `FAIL_CLOSED`",
+        "- Subject header-injection gate: `FAIL_CLOSED`",
         "- Unchanged rebuilds byte-stable: `true`",
         "",
         "## Claim Boundary",
@@ -547,14 +625,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Decision Matrix",
             "",
-            "| Template | Send policy | Attachment policy | Private render |",
-            "|---|---|---|---:|",
+            "| Template | Send policy | Attachment policy | Deadline policy | Private render |",
+            "|---|---|---|---|---:|",
         ]
     )
     for row in payload["templates"]:
         lines.append(
             f"| `{row['template_id']}` | `{row['send_policy']}` | "
-            f"`{row['attachment_policy']}` | `{str(row['private_render_only']).lower()}` |"
+            f"`{row['attachment_policy']}` | `{row['deadline_policy']}` | "
+            f"`{str(row['private_render_only']).lower()}` |"
         )
     for row in payload["templates"]:
         lines.extend(
@@ -567,6 +646,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Inbound states: `{', '.join(row['inbound_states'])}`",
                 f"- Reply triggers: `{', '.join(row['reply_triggers'])}`",
                 f"- Required fields: `{', '.join(row['required_fields'] + row['routing_fields']) or 'none'}`",
+                f"- Deadline policy: `{row['deadline_policy']}`",
                 "",
             ]
         )

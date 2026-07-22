@@ -1,7 +1,7 @@
 {
   "schema": "lumencore.outreach_response_templates.v1",
   "version": 1,
-  "source_effective_utc": "2026-07-21T18:28:47Z",
+  "source_effective_utc": "2026-07-22T00:11:07Z",
   "claim_boundary": "This response is a communication or routing artifact. It does not establish selection, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
@@ -32,6 +32,7 @@
       ],
       "send_policy": "MONITOR_NO_SEND",
       "attachment_policy": "NONE",
+      "deadline_policy": "NONE",
       "private_render_only": false,
       "required_fields": [],
       "routing_fields": [],
@@ -52,6 +53,7 @@
       ],
       "send_policy": "HUMAN_ACTION_DUE",
       "attachment_policy": "NONE",
+      "deadline_policy": "OPTIONAL",
       "private_render_only": false,
       "required_fields": [
         "recipient_name",
@@ -86,6 +88,7 @@
       ],
       "send_policy": "HUMAN_ACTION_DUE",
       "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+      "deadline_policy": "REQUIRED",
       "private_render_only": true,
       "required_fields": [
         "recipient_name",
@@ -93,6 +96,7 @@
         "submission_name",
         "portal_name",
         "deadline_local",
+        "deadline_iso",
         "portal_blocker",
         "steps_already_tried",
         "sender_name",
@@ -125,6 +129,7 @@
       ],
       "send_policy": "REPLY_AFTER_FACT_REVIEW",
       "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+      "deadline_policy": "OPTIONAL",
       "private_render_only": true,
       "required_fields": [
         "recipient_name",
@@ -159,6 +164,7 @@
       ],
       "send_policy": "REPLY_AFTER_FACT_REVIEW",
       "attachment_policy": "NONE",
+      "deadline_policy": "OPTIONAL",
       "private_render_only": true,
       "required_fields": [
         "recipient_name",
@@ -196,12 +202,14 @@
       ],
       "send_policy": "HUMAN_ACTION_DUE",
       "attachment_policy": "NONE",
+      "deadline_policy": "REQUIRED",
       "private_render_only": true,
       "required_fields": [
         "recipient_name",
         "source_subject",
         "topic_or_notice",
         "deadline_local",
+        "deadline_iso",
         "original_sent_local",
         "support_redirect_summary",
         "exact_instruction_question",
@@ -234,6 +242,7 @@
       ],
       "send_policy": "HUMAN_ACTION_DUE",
       "attachment_policy": "NONE",
+      "deadline_policy": "OPTIONAL",
       "private_render_only": true,
       "required_fields": [
         "recipient_name",
@@ -272,6 +281,7 @@
       ],
       "send_policy": "REPLY_AFTER_FACT_REVIEW",
       "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+      "deadline_policy": "OPTIONAL",
       "private_render_only": false,
       "required_fields": [
         "recipient_name",
@@ -309,6 +319,7 @@
       ],
       "send_policy": "REPLY_AFTER_FACT_REVIEW",
       "attachment_policy": "NONE",
+      "deadline_policy": "OPTIONAL",
       "private_render_only": false,
       "required_fields": [
         "recipient_name",
@@ -341,6 +352,7 @@
       ],
       "send_policy": "REPLY_AFTER_FACT_REVIEW",
       "attachment_policy": "NONE",
+      "deadline_policy": "OPTIONAL",
       "private_render_only": true,
       "required_fields": [
         "recipient_name",
@@ -383,6 +395,7 @@
       ],
       "send_policy": "HUMAN_ACTION_DUE",
       "attachment_policy": "NONE",
+      "deadline_policy": "OPTIONAL",
       "private_render_only": true,
       "required_fields": [
         "recipient_name",

@@ -58,6 +58,38 @@ def test_registry_validates_and_covers_high_value_response_states():
         "MOU_ONBOARDING_REPLY",
         "MEETING_REBOOK_REQUEST",
     } == ids
+    by_id = {row["template_id"]: row for row in registry["templates"]}
+    assert by_id["PORTAL_SUPPORT_DEADLINE_RESCUE"]["deadline_policy"] == "REQUIRED"
+    assert by_id["COMPONENT_INSTRUCTION_ESCALATION"]["deadline_policy"] == "REQUIRED"
+    assert all("deadline_policy" in row for row in registry["templates"])
+
+
+def test_registry_rejects_missing_or_inconsistent_deadline_policy():
+    module = load_module()
+    missing = module.read_registry()
+    missing["templates"][1].pop("deadline_policy")
+    try:
+        module.validate_registry(missing)
+    except module.OutreachRegistryError as exc:
+        assert str(exc) == "DEADLINE_POLICY_INVALID:DEADLINE_CLARIFICATION"
+    else:
+        raise AssertionError("missing deadline policy must fail closed")
+
+    inconsistent = module.read_registry()
+    rescue = next(
+        row
+        for row in inconsistent["templates"]
+        if row["template_id"] == "PORTAL_SUPPORT_DEADLINE_RESCUE"
+    )
+    rescue["required_fields"].remove("deadline_iso")
+    try:
+        module.validate_registry(inconsistent)
+    except module.OutreachRegistryError as exc:
+        assert str(exc) == (
+            "REQUIRED_DEADLINE_FIELD_UNDECLARED:PORTAL_SUPPORT_DEADLINE_RESCUE"
+        )
+    else:
+        raise AssertionError("required deadline policy must declare deadline_iso")
 
 
 def test_duplicate_send_and_monitor_states_fail_closed_without_rendering_message():
@@ -264,6 +296,71 @@ def test_deadline_urgency_is_timezone_aware_and_past_deadlines_block():
     assert past["status"] == "BLOCKED_DEADLINE_PASSED"
 
 
+def test_deadline_rescue_templates_require_valid_future_machine_deadlines():
+    module = load_module()
+    facts = common_facts()
+    facts.update(
+        {
+            "submission_name": "Synthetic Submission",
+            "portal_name": "Synthetic Portal",
+            "deadline_local": "July 22, 2026 at noon Eastern",
+            "portal_blocker": "The supporting-document section remains incomplete.",
+            "steps_already_tried": "Reviewed the official instructions and retried once.",
+        }
+    )
+
+    missing = module.render_response("PORTAL_SUPPORT_DEADLINE_RESCUE", facts)
+    assert missing["status"] == "BLOCKED_MISSING_FACTS"
+    assert missing["missing_fields"] == ["deadline_iso"]
+    assert missing["deadline_policy"] == "REQUIRED"
+
+    facts["deadline_iso"] = "2026-07-22T12:00:00"
+    invalid = module.render_response("PORTAL_SUPPORT_DEADLINE_RESCUE", facts)
+    assert invalid["status"] == "BLOCKED_INVALID_DEADLINE"
+    assert invalid["deadline"]["validation_error"] == "DEADLINE_TIMEZONE_REQUIRED"
+    assert invalid["subject"] is None
+
+    facts["deadline_iso"] = "2026-07-22T16:00:00Z"
+    past = module.render_response(
+        "PORTAL_SUPPORT_DEADLINE_RESCUE",
+        facts,
+        current_utc="2026-07-22T16:00:01Z",
+    )
+    assert past["status"] == "BLOCKED_DEADLINE_PASSED"
+
+    ready = module.render_response(
+        "PORTAL_SUPPORT_DEADLINE_RESCUE",
+        facts,
+        current_utc="2026-07-22T15:00:00Z",
+    )
+    assert ready["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
+    assert ready["deadline"]["urgency"] == "CRITICAL_UNDER_24_HOURS"
+
+
+def test_rendered_subject_and_body_control_characters_fail_closed():
+    module = load_module()
+    facts = common_facts()
+    facts.update(
+        {
+            "opportunity_name": "Synthetic Notice",
+            "eligibility_question": "the current entity type is eligible",
+            "source_subject": "Synthetic Notice\r\nBcc: injected@example.org",
+        }
+    )
+    subject = module.render_response("DEADLINE_CLARIFICATION", facts)
+    assert subject["status"] == "BLOCKED_SUBJECT_CONTROL_CHARACTER"
+    assert subject["subject"] is None
+    assert subject["body"] is None
+    assert "injected@example.org" not in json.dumps(subject)
+
+    facts["source_subject"] = "Synthetic Notice"
+    facts["eligibility_question"] = "the rule applies\x00without ambiguity"
+    body = module.render_response("DEADLINE_CLARIFICATION", facts)
+    assert body["status"] == "BLOCKED_BODY_CONTROL_CHARACTER"
+    assert body["subject"] is None
+    assert body["body"] is None
+
+
 def test_mou_and_validation_templates_preserve_private_and_claim_boundaries():
     module = load_module()
     mou = common_facts()
@@ -326,6 +423,7 @@ def test_mou_and_validation_templates_preserve_private_and_claim_boundaries():
         {
             "topic_or_notice": "Synthetic Topic",
             "deadline_local": "July 22, 2026 at noon Eastern",
+            "deadline_iso": "2026-07-22T16:00:00Z",
             "original_sent_local": "July 17, 2026",
             "support_redirect_summary": (
                 "Portal support directed the question to the component POC."
@@ -337,7 +435,9 @@ def test_mou_and_validation_templates_preserve_private_and_claim_boundaries():
         }
     )
     rendered_component = module.render_response(
-        "COMPONENT_INSTRUCTION_ESCALATION", component
+        "COMPONENT_INSTRUCTION_ESCALATION",
+        component,
+        current_utc="2026-07-21T16:00:00Z",
     )
     assert rendered_component["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
     assert rendered_component["attachment_policy"] == "NONE"
@@ -360,8 +460,13 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["controls"]["secret_or_credential_fail_closed"] is True
     assert payload["controls"]["opaque_binary_fact_fail_closed"] is True
     assert payload["controls"]["hardcoded_template_credential_fail_closed"] is True
+    assert payload["controls"]["deadline_policy_fail_closed"] is True
+    assert payload["controls"]["subject_header_injection_fail_closed"] is True
+    assert payload["controls"]["body_control_character_fail_closed"] is True
     assert "Duplicate-send gate: `FAIL_CLOSED`" in markdown
     assert "Secret-or-credential gate: `FAIL_CLOSED`" in markdown
+    assert "Deadline-policy gate: `FAIL_CLOSED`" in markdown
+    assert "Subject header-injection gate: `FAIL_CLOSED`" in markdown
     assert "No message is rendered" in markdown
     assert "receipt check only, not a duplicate submission" in markdown
     assert not re.search(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", combined)
