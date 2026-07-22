@@ -98,6 +98,12 @@ def test_finish_card_covers_every_open_gate_once_and_preserves_human_boundaries(
     assert [
         stage["title"] for stage in payload["operator_focus"]["lifecycle_stages"]
     ] == ["Do now", "Bound the pre-award position", "Do last"]
+    rails = payload["operator_command_rails"]
+    assert rails["current_fact_capture"]["open_gate_count"] == 9
+    assert rails["deferred_final_capture"]["open_gate_count"] == 6
+    assert "--open-gates-only" in rails["current_fact_capture"]["command"]
+    assert "--section approval" in rails["deferred_final_capture"]["approval_command"]
+    assert not any("--section approval" in command for command in payload["safe_local_commands"])
 
 
 def test_finish_card_records_no_duplicate_email_state_and_source_hashes():
@@ -150,6 +156,10 @@ def test_finish_card_self_hash_and_rendered_operator_language_are_current():
     assert "**Do now**: 7 open" in rendered
     assert "APPLICABILITY_UNRESOLVED" in rendered
     assert "during contracting negotiation" in rendered
+    assert "## One Bounded Fact Pass" in rendered
+    assert "asks only the `9` currently open non-final facts" in rendered
+    assert "--section pre-submit --open-gates-only" in rendered
+    assert "## Deferred Final Commands" in rendered
     assert "does not prove JCP approval" in rendered
 
 

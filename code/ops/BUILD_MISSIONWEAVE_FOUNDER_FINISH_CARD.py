@@ -233,6 +233,18 @@ def build_card(
 
     steps = _validated_steps(gate, unresolved)
     lifecycle_stages = _validated_lifecycle(gate, unresolved)
+    non_final_open_gates = [
+        gate_id
+        for stage in lifecycle_stages
+        if stage["stage_id"] != "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN"
+        for gate_id in stage["open_gates"]
+    ]
+    final_open_gates = [
+        gate_id
+        for stage in lifecycle_stages
+        if stage["stage_id"] == "C_FINAL_PREVIEW_AND_ACTION_TIME_HUMAN"
+        for gate_id in stage["open_gates"]
+    ]
     instruction_facts = gate.get("official_instruction_facts")
     _require(isinstance(instruction_facts, dict), "OFFICIAL_INSTRUCTION_FACTS_INVALID")
     _require(
@@ -368,6 +380,40 @@ def build_card(
             },
         },
         "ordered_founder_steps": steps,
+        "operator_command_rails": {
+            "current_fact_capture": {
+                "status": "RUN_NOW_HUMAN_FACT_REVIEW_REQUIRED",
+                "open_gate_count": len(non_final_open_gates),
+                "open_gate_ids": non_final_open_gates,
+                "command": (
+                    "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py "
+                    "--section pre-submit --open-gates-only "
+                    "--use-current-volume2-hash"
+                ),
+                "behavior": (
+                    "Prompts only unresolved non-final facts through hidden Y/N/Keep "
+                    "inputs. It never requests a Firm PIN value, password, or one-time code."
+                ),
+            },
+            "deferred_final_capture": {
+                "status": "DO_NOT_RUN_UNTIL_UPLOAD_SET_AND_PREVIEW_ARE_FINAL",
+                "open_gate_count": len(final_open_gates),
+                "open_gate_ids": final_open_gates,
+                "preview_command_template": (
+                    "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py "
+                    "--section proposal --open-gates-only "
+                    "--preview-receipt-file <PRIVATE_PREVIEW_RECEIPT>"
+                ),
+                "final_compliance_command": (
+                    "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py "
+                    "--section compliance --open-gates-only"
+                ),
+                "approval_command": (
+                    "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py "
+                    "--section approval"
+                ),
+            },
+        },
         "outreach_control": {
             "queue_path": rel(queue_path),
             "queue_as_of_utc": iso_z(queue_as_of),
@@ -396,12 +442,13 @@ def build_card(
             "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target",
             "python code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py --check-target",
             (
-                "python code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py "
-                f"--private-input {PRIVATE_INPUT}"
+                "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py "
+                "--section pre-submit --open-gates-only "
+                "--use-current-volume2-hash"
             ),
             (
-                "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py "
-                "--section approval"
+                "python code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py "
+                f"--private-input {PRIVATE_INPUT}"
             ),
         ],
         "human_only_actions": [
@@ -462,6 +509,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
     deadline = payload["deadline"]
     outreach = payload["outreach_control"]
     focus = payload["operator_focus"]
+    command_rails = payload["operator_command_rails"]
+    current_capture = command_rails["current_fact_capture"]
+    deferred_capture = command_rails["deferred_final_capture"]
     decision_support = focus["bounded_decision_support"]
     if outreach["email_action_state"] == "NO_EMAIL_DUE":
         email_due_text = "false"
@@ -508,6 +558,18 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- CMMC rule: {decision_support['cmmc']['safe_rule']}",
             f"- TCP rule: {decision_support['technology_control_plan']['safe_rule']}",
             "",
+            "## One Bounded Fact Pass",
+            "",
+            f"This asks only the `{current_capture['open_gate_count']}` currently open "
+            "non-final facts and preserves every already-cleared answer:",
+            "",
+            f"`{current_capture['command']}`",
+            "",
+            current_capture["behavior"],
+            "",
+            f"Deferred final-stage gates: `{deferred_capture['open_gate_count']}`. "
+            "Do not run preview or approval capture until the upload set is final.",
+            "",
             "## Do These In Order",
             "",
         ]
@@ -549,6 +611,20 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "After you have reviewed the official receipt PDF and its entity/timestamp, use this template locally:",
             "",
             f"`{payload['jcp_receipt_capture_command_template']}`",
+            "",
+            "## Deferred Final Commands",
+            "",
+            "Only after the upload set is final, bind the fresh private preview receipt:",
+            "",
+            f"`{deferred_capture['preview_command_template']}`",
+            "",
+            "After reviewing the preview, finish any still-open compliance decision:",
+            "",
+            f"`{deferred_capture['final_compliance_command']}`",
+            "",
+            "Run approval capture last, immediately before the founder-controlled submit action:",
+            "",
+            f"`{deferred_capture['approval_command']}`",
         ]
     )
     lines.extend(

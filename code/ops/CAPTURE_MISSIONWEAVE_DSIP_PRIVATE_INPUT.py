@@ -442,9 +442,16 @@ def choose_itar_scope(
         print("Invalid selection. Enter 1, 2, 3, or K.")
 
 
-def collect_identity(payload: dict[str, Any], *, prompt: Callable[[str], str]) -> None:
+def collect_identity(
+    payload: dict[str, Any],
+    *,
+    prompt: Callable[[str], str],
+    gate_filter: set[str] | None = None,
+) -> None:
     section = payload["identity"]
-    for field in GATE.IDENTITY_GATES:
+    for field, gate_id in GATE.IDENTITY_GATES.items():
+        if gate_filter is not None and gate_id not in gate_filter:
+            continue
         section[field] = choose_bool(
             IDENTITY_LABELS[field], section[field], prompt=prompt
         )
@@ -512,27 +519,42 @@ def collect_proposal(
     volume3_artifact_state: dict[str, Any],
     jcp_evidence_state: dict[str, Any],
     cmmc_packet_state: dict[str, Any],
+    gate_filter: set[str] | None = None,
 ) -> None:
     section = payload["proposal"]
-    section["proposal_number"] = choose_proposal_number(
-        section["proposal_number"], prompt=prompt
-    )
-    for field in GATE.PROPOSAL_FLAG_GATES:
+    proposal_number_gates = {
+        "ASSIGNED_PROPOSAL_NUMBER_CAPTURE",
+        "VOLUME2_ASSIGNED_PROPOSAL_NUMBER_EMBEDDED",
+    }
+    if gate_filter is None or gate_filter.intersection(proposal_number_gates):
+        section["proposal_number"] = choose_proposal_number(
+            section["proposal_number"], prompt=prompt
+        )
+    for field, gate_id in GATE.PROPOSAL_FLAG_GATES.items():
+        if gate_filter is not None and gate_id not in gate_filter:
+            continue
         section[field] = choose_bool(
             PROPOSAL_LABELS[field], section[field], prompt=prompt
         )
-    if use_current_volume2_hash:
-        section["volume2_pdf_sha256"] = hash_private_final_volume2()
-    else:
-        section["volume2_pdf_sha256"] = choose_sha256(
-            "Rebuilt Volume 2 PDF",
-            section["volume2_pdf_sha256"],
-            prompt=prompt,
+    if gate_filter is None or "VOLUME2_PDF_HASH_MATCH" in gate_filter:
+        if use_current_volume2_hash:
+            section["volume2_pdf_sha256"] = hash_private_final_volume2()
+        else:
+            section["volume2_pdf_sha256"] = choose_sha256(
+                "Rebuilt Volume 2 PDF",
+                section["volume2_pdf_sha256"],
+                prompt=prompt,
+            )
+    if gate_filter is None or "VOLUME3_TOTAL_MATCHES_PHASE_I_CEILING" in gate_filter:
+        section["volume3_total_usd"] = choose_phase_i_total(
+            section["volume3_total_usd"], prompt=prompt
         )
-    section["volume3_total_usd"] = choose_phase_i_total(
-        section["volume3_total_usd"], prompt=prompt
+    should_capture_preview = bool(
+        preview_receipt_file is not None
+        or gate_filter is None
+        or "PORTAL_PREVIEW_RECEIPT_HASH" in gate_filter
     )
-    if preview_receipt_file is not None:
+    if preview_receipt_file is not None and should_capture_preview:
         preview_sha256, preview_captured_utc = capture_preview_receipt(
             preview_receipt_file, reference_utc=reference_utc
         )
@@ -546,7 +568,7 @@ def collect_proposal(
                 cmmc_packet_state=cmmc_packet_state,
             )
         )
-    else:
+    elif should_capture_preview:
         prior_preview_sha256 = section["portal_preview_sha256"]
         section["portal_preview_sha256"] = choose_sha256(
             "Complete portal preview receipt",
@@ -562,16 +584,22 @@ def collect_proposal(
 
 
 def collect_compliance(
-    payload: dict[str, Any], *, prompt: Callable[[str], str]
+    payload: dict[str, Any],
+    *,
+    prompt: Callable[[str], str],
+    gate_filter: set[str] | None = None,
 ) -> None:
     section = payload["eligibility_and_compliance"]
-    for field in GATE.COMPLIANCE_GATES:
+    for field, gate_id in GATE.COMPLIANCE_GATES.items():
+        if gate_filter is not None and gate_id not in gate_filter:
+            continue
         section[field] = choose_bool(
             COMPLIANCE_LABELS[field], section[field], prompt=prompt
         )
-    section["itar_scope_determination"] = choose_itar_scope(
-        section["itar_scope_determination"], prompt=prompt
-    )
+    if gate_filter is None or "ITAR_SCOPE_CONFIRMED" in gate_filter:
+        section["itar_scope_determination"] = choose_itar_scope(
+            section["itar_scope_determination"], prompt=prompt
+        )
 
 
 def collect_approval(
@@ -701,6 +729,7 @@ def capture_private_sections(
     ]
     | None = None,
     use_current_volume2_hash: bool = False,
+    open_gates_only: bool = False,
     preview_receipt_file: Path | None = None,
     source_state: dict[str, Any] | None = None,
     volume2_text: str | None = None,
@@ -710,6 +739,7 @@ def capture_private_sections(
     reference_utc: datetime | str | None = None,
 ) -> dict[str, Any]:
     selected = normalize_sections(sections)
+    pre_submit_requested = "pre-submit" in sections
     if not selected:
         raise CaptureError("NO_CAPTURE_SECTION_SELECTED")
     if preview_receipt_file is not None and selected != ("proposal",):
@@ -738,6 +768,35 @@ def capture_private_sections(
         jcp_evidence_state = GATE.inspect_private_jcp_evidence()
     if cmmc_packet_state is None:
         cmmc_packet_state = GATE.inspect_cmmc_evidence_packet()
+    if source_state is None or volume2_text is None:
+        use_private_final = GATE.PRIVATE_FINAL_VOLUME2_PDF.is_file()
+        source_state, volume2_text = GATE.inspect_source_package(
+            GATE.PRIVATE_FINAL_VOLUME2_PDF if use_private_final else GATE.VOLUME2_PDF,
+            private_final=use_private_final,
+        )
+
+    gate_filter: set[str] | None = None
+    action_time_gate_ids_deferred: list[str] = []
+    open_gate_ids_before: list[str] = []
+    if open_gates_only:
+        try:
+            current_evaluation = GATE.evaluate_private_payload(
+                payload,
+                source_state=source_state,
+                volume2_text=volume2_text,
+                volume3_artifact_state=volume3_artifact_state,
+                jcp_evidence_state=jcp_evidence_state,
+                cmmc_packet_state=cmmc_packet_state,
+                evaluated_utc=evaluated_utc,
+            )
+        except GATE.MissionWeaveGateError as exc:
+            raise CaptureError(exc.code) from exc
+        open_gate_ids_before = list(current_evaluation["unresolved_gates"])
+        gate_filter = set(open_gate_ids_before)
+        if pre_submit_requested:
+            deferred = gate_filter.intersection(GATE.LIFECYCLE_ACTION_TIME_GATES)
+            action_time_gate_ids_deferred = sorted(deferred)
+            gate_filter.difference_update(deferred)
 
     upload_identity_before = GATE.current_upload_set_identity_sha256(
         payload,
@@ -750,11 +809,12 @@ def capture_private_sections(
 
     for section in selected:
         if section == "identity":
-            collect_identity(payload, prompt=prompt)
+            collect_identity(payload, prompt=prompt, gate_filter=gate_filter)
         elif section == "proposal":
             collect_proposal(
                 payload,
                 prompt=prompt,
+                gate_filter=gate_filter,
                 use_current_volume2_hash=use_current_volume2_hash,
                 preview_receipt_file=preview_receipt_file,
                 reference_utc=evaluated_utc,
@@ -763,7 +823,7 @@ def capture_private_sections(
                 cmmc_packet_state=cmmc_packet_state,
             )
         elif section == "eligibility_and_compliance":
-            collect_compliance(payload, prompt=prompt)
+            collect_compliance(payload, prompt=prompt, gate_filter=gate_filter)
         elif section == "approval":
             collect_approval(
                 payload,
@@ -794,12 +854,6 @@ def capture_private_sections(
     validate_payload_shape(payload)
     ensure_private_record_has_no_credential_material(payload)
 
-    if source_state is None or volume2_text is None:
-        use_private_final = GATE.PRIVATE_FINAL_VOLUME2_PDF.is_file()
-        source_state, volume2_text = GATE.inspect_source_package(
-            GATE.PRIVATE_FINAL_VOLUME2_PDF if use_private_final else GATE.VOLUME2_PDF,
-            private_final=use_private_final,
-        )
     try:
         evaluation = GATE.evaluate_private_payload(
             payload,
@@ -823,6 +877,9 @@ def capture_private_sections(
             else "PRIVATE_INPUT_SECTION_CAPTURED_GATES_OPEN"
         ),
         "sections_updated": list(selected),
+        "open_gates_only": open_gates_only,
+        "open_gate_ids_before": open_gate_ids_before,
+        "action_time_gate_ids_deferred": action_time_gate_ids_deferred,
         "approval_section_explicitly_requested": "approval" in selected,
         "existing_private_input_resumed": resumed,
         "output": destination.relative_to(root.resolve()).as_posix(),
@@ -913,6 +970,14 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--open-gates-only",
+        action="store_true",
+        help=(
+            "Prompt only fields mapped to currently unresolved gates. With the "
+            "pre-submit alias, final-preview and action-time gates are deferred."
+        ),
+    )
+    parser.add_argument(
         "--preview-receipt-file",
         type=Path,
         help="Hash a local portal-preview receipt without storing or printing its path",
@@ -924,7 +989,12 @@ def main() -> None:
     args = parse_args()
     try:
         if args.check_target:
-            if args.section or args.use_current_volume2_hash or args.preview_receipt_file:
+            if (
+                args.section
+                or args.use_current_volume2_hash
+                or args.open_gates_only
+                or args.preview_receipt_file
+            ):
                 raise CaptureError("CHECK_TARGET_CANNOT_CAPTURE")
             receipt = inspect_readiness(args.output)
         else:
@@ -934,6 +1004,7 @@ def main() -> None:
                 args.section,
                 target=args.output,
                 use_current_volume2_hash=args.use_current_volume2_hash,
+                open_gates_only=args.open_gates_only,
                 preview_receipt_file=args.preview_receipt_file,
             )
         print(json.dumps(receipt, indent=2, sort_keys=True))

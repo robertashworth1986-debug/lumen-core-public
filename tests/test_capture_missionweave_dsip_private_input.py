@@ -206,6 +206,46 @@ def test_pre_submit_preserves_authoritative_34_of_50_and_excludes_approval(
     assert "100000.00" not in public_receipt
 
 
+def test_open_gate_pre_submit_prompts_only_current_non_final_facts(tmp_path: Path):
+    module = load_module()
+    root = tmp_path / "repo"
+    private_dir = root / "private"
+    target = private_dir / "MISSIONWEAVE_DSIP_ACTION.private.json"
+    proposal_number = "DLA26BZ03-NV011-TEST0001"
+    private_dir.mkdir(parents=True)
+    target.write_text(
+        json.dumps(authoritative_private_payload(module, proposal_number)),
+        encoding="utf-8",
+    )
+    prompt = prompt_from(["k"] * 10)
+
+    receipt = module.capture_private_sections(
+        ["pre-submit"],
+        prompt=prompt,
+        target=target,
+        root=root,
+        private_dir=private_dir,
+        ignored_checker=lambda _path: True,
+        source_state=synthetic_source_state(),
+        volume2_text=f"{proposal_number}\nfinal assigned proposal header",
+        reference_utc=REFERENCE_UTC,
+        open_gates_only=True,
+        **unresolved_evidence_kwargs(module),
+    )
+
+    assert prompt.remaining == []
+    assert len(prompt.messages) == 10
+    assert not any("portal preview" in message.casefold() for message in prompt.messages)
+    assert not any("authorizes the final" in message.casefold() for message in prompt.messages)
+    assert not any("proposal number" in message.casefold() for message in prompt.messages)
+    assert receipt["open_gates_only"] is True
+    assert set(receipt["open_gate_ids_before"]) == AUTHORITATIVE_OPEN_GATES
+    assert set(receipt["action_time_gate_ids_deferred"]) == set(
+        module.GATE.LIFECYCLE_ACTION_TIME_GATES
+    )
+    assert receipt["gate_summary"]["open_gate_count"] == 16
+
+
 def test_explicit_approval_cannot_turn_authoritative_open_state_into_50_of_50(
     tmp_path: Path,
 ):

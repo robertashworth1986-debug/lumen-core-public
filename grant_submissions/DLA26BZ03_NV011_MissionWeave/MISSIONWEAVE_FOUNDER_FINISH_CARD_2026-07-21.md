@@ -1,8 +1,8 @@
 # MissionWeave Founder Finish Card
 
-- Generated UTC: `2026-07-22T00:38:26Z`
+- Generated UTC: `2026-07-22T01:02:27.791507Z`
 - Deadline: **July 22, 2026 at 12:00 p.m. Eastern Time** (`2026-07-22T16:00:00Z`)
-- Time remaining at generation: `15` full hours
+- Time remaining at generation: `14` full hours
 - Current gate: **35/50 passed; 15 open**
 - Submission-ready: **false**
 - Status: `FOUNDER_ACTION_REQUIRED_NOT_SUBMISSION_READY`
@@ -29,6 +29,16 @@ Work the pre-submission evidence stage first. Do not spend action-time approval 
 - CMMC evidence state: `APPLICABILITY_UNRESOLVED`; supported position: `false`.
 - CMMC rule: Do not mark the Phase I position supported from projected topic text alone; use current authoritative evidence or a qualified reviewed not-applicable determination.
 - TCP rule: Document only the present lifecycle position: a TCP may be requested during contracting negotiation. Do not claim it was submitted, approved, or accepted unless separate evidence proves that event.
+
+## One Bounded Fact Pass
+
+This asks only the `9` currently open non-final facts and preserves every already-cleared answer:
+
+`python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section pre-submit --open-gates-only --use-current-volume2-hash`
+
+Prompts only unresolved non-final facts through hidden Y/N/Keep inputs. It never requests a Firm PIN value, password, or one-time code.
+
+Deferred final-stage gates: `6`. Do not run preview or approval capture until the upload set is final.
 
 ## Do These In Order
 
@@ -85,7 +95,7 @@ Work the pre-submission evidence stage first. Do not spend action-time approval 
 
 - Queue status: `ROUTING_INTEGRITY_EXCEPTION_NO_SEND`
 - MissionWeave action: `FOLLOWUP_LIMIT_REACHED_NO_SEND`
-- Queue fresh for action time: **true** (`65` / `900` seconds)
+- Queue fresh for action time: **true** (`7` / `900` seconds)
 - Mailbox recheck required now: **false**
 - Additional email due now: **false**
 - Next action: The bounded proactive follow-up allowance is exhausted. Monitor the existing thread and respond only to a specific inbound request.
@@ -96,12 +106,26 @@ Work the pre-submission evidence stage first. Do not spend action-time approval 
 - `python code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py --check-target`
 - `python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target`
 - `python code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py --check-target`
+- `python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section pre-submit --open-gates-only --use-current-volume2-hash`
 - `python code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_ACTION.private.json`
-- `python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval`
 
 After you have reviewed the official receipt PDF and its entity/timestamp, use this template locally:
 
 `python code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py --evidence-file <PRIVATE_OFFICIAL_PDF> --evidence-kind JCP_APPLICATION_SUBMISSION_RECEIPT --source-issued-utc <OFFICIAL_RECEIPT_TIMESTAMP> --confirm-entity-match --confirm-corporate-review`
+
+## Deferred Final Commands
+
+Only after the upload set is final, bind the fresh private preview receipt:
+
+`python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section proposal --open-gates-only --preview-receipt-file <PRIVATE_PREVIEW_RECEIPT>`
+
+After reviewing the preview, finish any still-open compliance decision:
+
+`python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section compliance --open-gates-only`
+
+Run approval capture last, immediately before the founder-controlled submit action:
+
+`python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval`
 
 ## Stop Line
 
@@ -111,7 +135,7 @@ Do not certify or click final submit until the regenerated action gate reports `
 
 - Action gate: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
 - Action-gate canonical-text SHA-256: `2F3554BC852760F2C9D10B941A9F8263548C2302BF8C337F02B32C95B16A57C9`
-- Outreach queue canonical-text SHA-256: `D79FE5B0BEF98226AC4F0B4ED87C87311B63CD0E5D51C57CFF02C913822AF0D6`
-- Card SHA-256: `441027F634E2170CD7F22D8A0EF186A7809ADBE3ABDAE662E5F0981424620693`
+- Outreach queue canonical-text SHA-256: `78AC79D5BE60C38D888596A793DF9072376B83FA32FB9721FFA7D265D9D7F45B`
+- Card SHA-256: `D151B12600CA7BD33874F80027302A2CA9085AECB86228EC653E972E78F218B4`
 
 This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.

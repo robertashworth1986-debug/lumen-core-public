@@ -1,13 +1,13 @@
 {
   "schema": "lumencore.missionweave_founder_finish_card.v1",
-  "generated_utc": "2026-07-22T00:38:26Z",
+  "generated_utc": "2026-07-22T01:02:27.791507Z",
   "status": "FOUNDER_ACTION_REQUIRED_NOT_SUBMISSION_READY",
   "topic": "DLA26BZ03-NV011",
   "deadline": {
     "expected_local": "July 22, 2026 at 12:00 p.m. Eastern Time",
     "expected_utc": "2026-07-22T16:00:00Z",
-    "seconds_remaining": 55294,
-    "hours_remaining_rounded_down": 15,
+    "seconds_remaining": 53852,
+    "hours_remaining_rounded_down": 14,
     "deadline_passed": false,
     "live_dsip_recheck_required": true,
     "source_discrepancy": "The Amendment 2 BAA schedule line prints July 22, 2025; the 2026 SBIR topic record, DLA Release 3 schedule, and package sources agree on July 22, 2026."
@@ -199,10 +199,44 @@
       ]
     }
   ],
+  "operator_command_rails": {
+    "current_fact_capture": {
+      "status": "RUN_NOW_HUMAN_FACT_REVIEW_REQUIRED",
+      "open_gate_count": 9,
+      "open_gate_ids": [
+        "CONFLICTS_AND_JOINT_VENTURE_STATUS",
+        "CURRENT_CMMC_REQUIREMENTS_REVIEW",
+        "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+        "DSIP_FIRM_PIN_AVAILABILITY",
+        "TECHNICAL_DATA_RIGHTS_ASSERTION",
+        "VOLUME3_COST_BASIS",
+        "VOLUME5_UPLOAD_SET",
+        "CMMC_PHASE_I_SELF_ASSESSMENT_POSITION",
+        "TECHNOLOGY_CONTROL_PLAN_DECISION"
+      ],
+      "command": "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section pre-submit --open-gates-only --use-current-volume2-hash",
+      "behavior": "Prompts only unresolved non-final facts through hidden Y/N/Keep inputs. It never requests a Firm PIN value, password, or one-time code."
+    },
+    "deferred_final_capture": {
+      "status": "DO_NOT_RUN_UNTIL_UPLOAD_SET_AND_PREVIEW_ARE_FINAL",
+      "open_gate_count": 6,
+      "open_gate_ids": [
+        "ACTION_TIME_APPROVAL_TIMESTAMP",
+        "ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION",
+        "COMPLETE_PORTAL_PREVIEW_REVIEW",
+        "CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW",
+        "NO_DUPLICATE_COST_OR_DELIVERABLE",
+        "PORTAL_PREVIEW_RECEIPT_HASH"
+      ],
+      "preview_command_template": "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section proposal --open-gates-only --preview-receipt-file <PRIVATE_PREVIEW_RECEIPT>",
+      "final_compliance_command": "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section compliance --open-gates-only",
+      "approval_command": "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval"
+    }
+  },
   "outreach_control": {
     "queue_path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
-    "queue_as_of_utc": "2026-07-22T00:37:21Z",
-    "queue_age_seconds": 65,
+    "queue_as_of_utc": "2026-07-22T01:02:20.283715Z",
+    "queue_age_seconds": 7,
     "mailbox_recheck_max_age_seconds": 900,
     "queue_fresh_for_action_time": true,
     "mailbox_recheck_required_now": false,
@@ -219,8 +253,8 @@
     "python code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py --check-target",
     "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --check-target",
     "python code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py --check-target",
-    "python code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_ACTION.private.json",
-    "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section approval"
+    "python code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py --section pre-submit --open-gates-only --use-current-volume2-hash",
+    "python code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py --private-input grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_ACTION.private.json"
   ],
   "human_only_actions": [
     "Enter passwords, Firm PIN values, and one-time authentication codes.",
@@ -251,9 +285,9 @@
     "gate_canonical_text_sha256": "2F3554BC852760F2C9D10B941A9F8263548C2302BF8C337F02B32C95B16A57C9",
     "gate_payload_sha256": "8cb9e6f33064d43b4e963d21358263e739e7529fb964299220cb720a10a3c00f",
     "gate_source_checks_pass": true,
-    "queue_canonical_text_sha256": "D79FE5B0BEF98226AC4F0B4ED87C87311B63CD0E5D51C57CFF02C913822AF0D6",
-    "queue_payload_sha256": "9AE9C3BEEF6560A2E90A6E96552521D841AB54185EDCD81FE3E48CAF9AEE83B3"
+    "queue_canonical_text_sha256": "78AC79D5BE60C38D888596A793DF9072376B83FA32FB9721FFA7D265D9D7F45B",
+    "queue_payload_sha256": "E792FC78518E7B9F5479B0B4E71CBE14D1738ADF8A69460714DB2049B2D95009"
   },
   "claim_boundary": "This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.",
-  "card_sha256": "441027F634E2170CD7F22D8A0EF186A7809ADBE3ABDAE662E5F0981424620693"
+  "card_sha256": "D151B12600CA7BD33874F80027302A2CA9085AECB86228EC653E972E78F218B4"
 }

@@ -97,7 +97,7 @@
       "draft_rendered": false,
       "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
       "follow_up_mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
-      "hold_seconds_remaining": 134559,
+      "hold_seconds_remaining": 133059,
       "inbox_recheck_required": false,
       "lane_id": "lanl_vision_licensing_followup",
       "max_proactive_sends": 1,
@@ -326,7 +326,7 @@
       "source_state": "ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY"
     }
   ],
-  "as_of_utc": "2026-07-22T00:37:21Z",
+  "as_of_utc": "2026-07-22T01:02:20.283715Z",
   "claim_boundary": "This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, new send receipts require a deterministic source-message/thread-bound response identity, and a repeated identity fails closed; and neither condition authorizes a draft or send. Historical send-timing exceptions remain counted against the send cap and are surfaced fail-closed. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.",
   "controls": {
     "action_time_human_review_required": true,
@@ -348,7 +348,7 @@
       "4B5EDC6BCB11F72B7A0896FBEA672EC8C5DC1B9D19F4FDAD099AADF7E7C41D45"
     ]
   },
-  "queue_sha256": "9AE9C3BEEF6560A2E90A6E96552521D841AB54185EDCD81FE3E48CAF9AEE83B3",
+  "queue_sha256": "E792FC78518E7B9F5479B0B4E71CBE14D1738ADF8A69460714DB2049B2D95009",
   "routing_integrity_exceptions": [
     {
       "exception": "SENT_BEFORE_CONFIGURED_HOLD",
