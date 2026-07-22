@@ -1,0 +1,42 @@
+name: Evidence Graph Gate
+
+on:
+  pull_request:
+    paths:
+      - "config/evidence_graph_v1.json"
+      - "code/ops/VERIFY_EVIDENCE_GRAPH.py"
+      - "tests/test_evidence_graph.py"
+      - "docs/MACHINE_EVIDENCE_GRAPH.md"
+      - ".github/workflows/evidence-graph.yml"
+  push:
+    branches: [main]
+    paths:
+      - "config/evidence_graph_v1.json"
+      - "code/ops/VERIFY_EVIDENCE_GRAPH.py"
+      - "tests/test_evidence_graph.py"
+      - "docs/MACHINE_EVIDENCE_GRAPH.md"
+      - ".github/workflows/evidence-graph.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evidence-graph-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile verifier and tests
+        run: python -m py_compile code/ops/VERIFY_EVIDENCE_GRAPH.py tests/test_evidence_graph.py
+      - name: Verify machine graph
+        run: python code/ops/VERIFY_EVIDENCE_GRAPH.py --json
+      - name: Run regression tests
+        run: python -m unittest tests.test_evidence_graph -v
