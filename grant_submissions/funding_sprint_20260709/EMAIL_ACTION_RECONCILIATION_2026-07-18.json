@@ -553,11 +553,11 @@
       "worktree_eol_differs_from_git_blob": false
     },
     "outreach_response_template_registry": {
-      "bytes": 18781,
+      "bytes": 19646,
       "identity_source": "COMMITTED_GIT_BLOB",
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
       "present": true,
-      "sha256": "3A2A60BBF41F7B9519FF47F3AD0532E77CB1402BDDFBAC8515156F6379C8E1DC",
+      "sha256": "EDD2606B66F57AD0417696C85F59856ECC6E777128574AB547C819AF342F89D2",
       "worktree_eol_differs_from_git_blob": false
     },
     "uspto_pro_se_access_guidance_receipt": {
