@@ -1,12 +1,20 @@
 import copy
+import importlib.util
 import json
 import unittest
 from pathlib import Path
 
-from code.ops.VERIFY_EVIDENCE_GRAPH import load_json_strict, verify_graph
 
-
+VERIFIER_PATH = Path("code/ops/VERIFY_EVIDENCE_GRAPH.py")
 GRAPH_PATH = Path("config/evidence_graph_v1.json")
+
+spec = importlib.util.spec_from_file_location("verify_evidence_graph", VERIFIER_PATH)
+if spec is None or spec.loader is None:
+    raise RuntimeError(f"unable to load verifier from {VERIFIER_PATH}")
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+load_json_strict = module.load_json_strict
+verify_graph = module.verify_graph
 
 
 class EvidenceGraphTests(unittest.TestCase):
