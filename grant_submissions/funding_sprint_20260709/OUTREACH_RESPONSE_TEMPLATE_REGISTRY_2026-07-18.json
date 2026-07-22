@@ -6,20 +6,24 @@
     "body_control_character_fail_closed": true,
     "builder_can_send_email": false,
     "deadline_policy_fail_closed": true,
+    "deterministic_response_identity": true,
+    "duplicate_response_identity_fail_closed": true,
     "duplicate_send_fail_closed": true,
     "hardcoded_template_credential_fail_closed": true,
     "missing_fact_fail_closed": true,
     "opaque_binary_fact_fail_closed": true,
     "past_deadline_fail_closed": true,
     "secret_or_credential_fail_closed": true,
+    "source_message_and_thread_binding_required": true,
     "subject_header_injection_fail_closed": true,
     "unchanged_rebuild_byte_stable": true
   },
-  "generated_utc": "2026-07-22T00:11:07Z",
+  "generated_utc": "2026-07-22T00:30:34Z",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
     "Answer only the question asked; do not append an unrelated pitch or attachment.",
     "Do not send a duplicate when the requested information or packet is already in the thread.",
+    "Bind every send-capable render to the exact source message and thread, then derive a deterministic response identity before action-time review.",
     "Never imply independent validation, field performance, selection, funding, or savings without direct evidence.",
     "Keep legal, signatory, address, account, and portal identifiers in private renderings only.",
     "Attach files only when the recipient or governing instructions explicitly require them.",
@@ -35,8 +39,8 @@
     "REPLY_AFTER_FACT_REVIEW": 5
   },
   "source_config": "config/outreach_response_templates_v1.json",
-  "source_config_sha256": "DFC597823B423DAC6DF82CE86C878B84B8543047F5596418F42F01BC036817AD",
-  "source_effective_utc": "2026-07-22T00:11:07Z",
+  "source_config_sha256": "650FE5397000D4EA598BC0628F382EC67093AEC25DF0544A391C5317FCAB72F2",
+  "source_effective_utc": "2026-07-22T00:30:34Z",
   "source_schema": "lumencore.outreach_response_templates.v1",
   "template_count": 11,
   "templates": [
@@ -91,12 +95,14 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "send_policy": "HUMAN_ACTION_DUE",
       "sensitive_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "subject": "Re: {source_subject}",
       "template_id": "DEADLINE_CLARIFICATION"
@@ -130,12 +136,14 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "send_policy": "HUMAN_ACTION_DUE",
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "portal_blocker",
         "steps_already_tried"
       ],
@@ -166,12 +174,14 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "send_policy": "REPLY_AFTER_FACT_REVIEW",
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "requested_information"
       ],
       "subject": "Re: {source_subject}",
@@ -204,12 +214,14 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "send_policy": "REPLY_AFTER_FACT_REVIEW",
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "artifact_names"
       ],
       "subject": "Re: {source_subject}",
@@ -245,12 +257,14 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "send_policy": "HUMAN_ACTION_DUE",
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "support_redirect_summary"
       ],
       "subject": "Re: {source_subject}",
@@ -282,12 +296,14 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "send_policy": "HUMAN_ACTION_DUE",
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "package_name",
         "review_scope"
       ],
@@ -321,12 +337,14 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "send_policy": "REPLY_AFTER_FACT_REVIEW",
       "sensitive_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "subject": "Re: {source_subject} - bounded validation scope",
       "template_id": "VALIDATION_PILOT_REQUEST"
@@ -356,12 +374,14 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "send_policy": "REPLY_AFTER_FACT_REVIEW",
       "sensitive_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "subject": "Re: {source_subject}",
       "template_id": "DECLINE_CLOSEOUT"
@@ -393,12 +413,14 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "send_policy": "REPLY_AFTER_FACT_REVIEW",
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "legal_party_name",
         "business_address",
         "signatory_name",
@@ -434,12 +456,14 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "send_policy": "HUMAN_ACTION_DUE",
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "availability_windows"
       ],
       "subject": "Re: {source_subject}",
