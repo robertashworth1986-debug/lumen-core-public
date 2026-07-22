@@ -367,6 +367,67 @@ def completed_receipt(builder, verifier, report: dict, tmp_path: Path):
     return receipt, independence, signature
 
 
+def completed_evaluator_protocol(verifier, tmp_path: Path):
+    protocol = json.loads(EVALUATOR_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    independence = tmp_path / "evaluator_independence.txt"
+    independence.write_text("independent evaluator evidence", encoding="utf-8")
+    protocol["evaluator"] = {
+        "name": "Independent Evaluator",
+        "organization": "Independent Laboratory",
+        "technical_role": "Protocol authority",
+        "contact_channel": "evaluator@example.invalid",
+        "conflict_of_interest_disclosure": "No financial relationship disclosed.",
+        "independence_basis": "No role in protocol design or original execution.",
+        "authority_to_accept_protocol": "Authorized evaluator representative.",
+        "independence_evidence_sha256": verifier.file_sha256(independence),
+    }
+    protocol["data_contract"].update(
+        {
+            "publisher_or_owner": "Independent data owner",
+            "dataset_description": "Held-out hourly balancing-authority panel.",
+            "dataset_or_query_manifest_sha256": "1" * 64,
+            "custody_owner": "Independent evaluator",
+            "access_authority": "Evaluator-controlled access",
+            "held_out_from_lumencore_before_freeze": True,
+            "observation_availability_rule": "Use only values released before scoring.",
+            "target_release_timing_rule": "Score after official target release.",
+            "evaluation_start_utc": "2026-08-01T00:00:00Z",
+            "evaluation_end_utc": "2026-09-01T00:00:00Z",
+            "registered_authorities": ["A", "B"],
+            "authority_inclusion_rule": "Retain every preregistered authority.",
+            "missing_data_rule": "Preserve missing periods and report coverage.",
+            "revision_policy": "Use the first official release only.",
+        }
+    )
+    protocol["test_plan"].update(
+        {
+            "candidate_definition": "Frozen LumenCore candidate.",
+            "incumbent_baseline_id": "incumbent_v1",
+            "incumbent_baseline_definition": "Evaluator-owned incumbent forecast.",
+            "primary_metric": "mean_absolute_scaled_error",
+            "metric_direction": "lower_is_better",
+            "minimum_common_hours_per_authority": 720,
+            "minimum_effect_size": 0.01,
+            "bootstrap_replications": 10000,
+            "bootstrap_seed": 20260722,
+            "secondary_metrics": ["mean_absolute_error"],
+            "single_authority_regression_limit": 0.05,
+            "minimum_authority_mean_wins": 2,
+            "minimum_utc_day_win_rate": 0.55,
+        }
+    )
+    protocol["acceptance_contract"]["technical_gate_expression"] = (
+        "all preregistered corrected tests pass"
+    )
+    protocol["freeze"].update(
+        {
+            "accepted_utc": "2026-07-22T12:00:00Z",
+            "signature_method": "signed_email",
+        }
+    )
+    return protocol, independence
+
+
 def test_packet_and_unsigned_receipt_verify_offline(tmp_path: Path):
     verifier = load_path(VERIFIER_PATH, "eia_reproduction_verifier_packet")
     builder = load_path(BUILDER_PATH, "eia_reproduction_builder_packet")
@@ -381,6 +442,78 @@ def test_packet_and_unsigned_receipt_verify_offline(tmp_path: Path):
     assert report["snapshot"]["common_settled_hour_count"] == 0
     assert receipt_report["independent_reproduction_complete"] is False
     assert receipt_report["performance_promotion_allowed"] is False
+
+    readme = builder.reviewer_readme(report["snapshot"])
+    assert (
+        "--independence-artifact reviewer_independence.txt "
+        "--print-signing-payload-sha256"
+    ) in readme
+    assert "rejects a blank or incomplete receipt" in readme
+    assert "## Return Deliverables" in readme
+
+
+def test_receipt_signing_hash_requires_completed_reviewer_content(tmp_path: Path):
+    verifier = load_path(VERIFIER_PATH, "eia_reproduction_verifier_presign")
+    builder = load_path(BUILDER_PATH, "eia_reproduction_builder_presign")
+    packet = synthetic_packet(tmp_path, verifier)
+    report = verifier.verify_packet(packet)
+    receipt, independence, _ = completed_receipt(builder, verifier, report, tmp_path)
+    receipt["signature"]["signed_payload_sha256"] = None
+    receipt["signature"]["detached_signature_artifact_sha256"] = None
+
+    preflight = verifier.validate_receipt_for_signing(
+        receipt,
+        report,
+        independence_artifact=independence,
+    )
+
+    assert preflight["status"] == "READY_FOR_REVIEWER_SIGNATURE"
+    assert preflight["reviewer_content_validated"] is True
+    assert preflight["independence_artifact_validated"] is True
+    assert preflight["independent_reproduction_complete"] is False
+    assert preflight["signing_payload_sha256"] == (
+        verifier.receipt_signing_payload_sha256(receipt)
+    )
+
+    blank = builder.build_receipt_template(report)
+    with pytest.raises(ValueError, match="reviewer identity fields are incomplete"):
+        verifier.validate_receipt_for_signing(
+            blank,
+            report,
+            independence_artifact=independence,
+        )
+
+    receipt["signature"]["signed_payload_sha256"] = "2" * 64
+    with pytest.raises(ValueError, match="must be blank before signing"):
+        verifier.validate_receipt_for_signing(
+            receipt,
+            report,
+            independence_artifact=independence,
+        )
+
+
+def test_evaluator_signing_hash_requires_completed_protocol(tmp_path: Path):
+    verifier = load_path(VERIFIER_PATH, "eia_reproduction_verifier_evaluator_presign")
+    protocol, independence = completed_evaluator_protocol(verifier, tmp_path)
+
+    preflight = verifier.validate_evaluator_protocol_for_signing(
+        protocol,
+        independence_artifact=independence,
+    )
+
+    assert preflight["status"] == "READY_FOR_EVALUATOR_SIGNATURE"
+    assert preflight["evaluator_content_validated"] is True
+    assert preflight["evaluation_design_frozen"] is False
+    assert preflight["signing_payload_sha256"] == (
+        verifier.evaluator_protocol_signing_payload_sha256(protocol)
+    )
+
+    blank = json.loads(EVALUATOR_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    with pytest.raises(ValueError, match="evaluator.name"):
+        verifier.validate_evaluator_protocol_for_signing(
+            blank,
+            independence_artifact=independence,
+        )
 
 
 def test_settlement_metric_tamper_fails_closed(tmp_path: Path):

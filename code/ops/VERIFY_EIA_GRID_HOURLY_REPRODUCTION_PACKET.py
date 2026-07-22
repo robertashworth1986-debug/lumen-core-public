@@ -900,6 +900,54 @@ def validate_receipt(
     }
 
 
+def validate_receipt_for_signing(
+    receipt: dict[str, Any],
+    packet_report: dict[str, Any],
+    *,
+    independence_artifact: Path | None,
+) -> dict[str, Any]:
+    """Validate reviewer-controlled content before emitting a signing digest."""
+    signature = receipt.get("signature")
+    if not isinstance(signature, dict):
+        raise ValueError("receipt signature must be an object")
+    for field in (
+        "signed_payload_sha256",
+        "detached_signature_artifact_sha256",
+    ):
+        if signature.get(field) is not None:
+            raise ValueError(f"signature.{field} must be blank before signing")
+    if not independence_artifact or not independence_artifact.is_file():
+        raise ValueError("reviewer independence artifact is required before signing")
+
+    signing_payload_sha256 = receipt_signing_payload_sha256(receipt)
+    candidate = copy.deepcopy(receipt)
+    candidate_signature = candidate["signature"]
+    candidate_signature["signed_payload_sha256"] = signing_payload_sha256
+    candidate_signature["detached_signature_artifact_sha256"] = file_sha256(
+        independence_artifact
+    )
+
+    # Exercise the complete verifier on an isolated copy. The independence
+    # artifact is used only as a private placeholder for the not-yet-created
+    # signature artifact; no completed claim is returned from this preflight.
+    validate_receipt(
+        candidate,
+        packet_report,
+        expect_template=False,
+        independence_artifact=independence_artifact,
+        signature_artifact=independence_artifact,
+    )
+    return {
+        "schema": "eia_grid_hourly_receipt_signing_preflight.v1",
+        "status": "READY_FOR_REVIEWER_SIGNATURE",
+        "signing_payload_sha256": signing_payload_sha256,
+        "reviewer_content_validated": True,
+        "independence_artifact_validated": True,
+        "independent_reproduction_complete": False,
+        "performance_promotion_allowed": False,
+    }
+
+
 def evaluator_protocol_signing_payload(protocol: dict[str, Any]) -> dict[str, Any]:
     payload = copy.deepcopy(protocol)
     freeze = payload.setdefault("freeze", {})
@@ -1170,6 +1218,51 @@ def validate_evaluator_protocol(
     }
 
 
+def validate_evaluator_protocol_for_signing(
+    protocol: dict[str, Any],
+    *,
+    independence_artifact: Path | None,
+) -> dict[str, Any]:
+    """Validate evaluator-owned protocol content before emitting its digest."""
+    freeze = protocol.get("freeze")
+    if not isinstance(freeze, dict):
+        raise ValueError("evaluator protocol freeze must be an object")
+    for field in (
+        "accepted_protocol_payload_sha256",
+        "signed_payload_sha256",
+        "detached_signature_artifact_sha256",
+    ):
+        if freeze.get(field) is not None:
+            raise ValueError(f"freeze.{field} must be blank before signing")
+    if not independence_artifact or not independence_artifact.is_file():
+        raise ValueError("evaluator independence artifact is required before signing")
+
+    signing_payload_sha256 = evaluator_protocol_signing_payload_sha256(protocol)
+    candidate = copy.deepcopy(protocol)
+    candidate_freeze = candidate["freeze"]
+    candidate_freeze["accepted_protocol_payload_sha256"] = signing_payload_sha256
+    candidate_freeze["signed_payload_sha256"] = signing_payload_sha256
+    candidate_freeze["detached_signature_artifact_sha256"] = file_sha256(
+        independence_artifact
+    )
+
+    validate_evaluator_protocol(
+        candidate,
+        expect_template=False,
+        independence_artifact=independence_artifact,
+        signature_artifact=independence_artifact,
+    )
+    return {
+        "schema": "eia_grid_hourly_evaluator_protocol_signing_preflight.v1",
+        "status": "READY_FOR_EVALUATOR_SIGNATURE",
+        "signing_payload_sha256": signing_payload_sha256,
+        "evaluator_content_validated": True,
+        "independence_artifact_validated": True,
+        "evaluation_design_frozen": False,
+        "performance_promotion_allowed": False,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--packet-dir", type=Path, required=True)
@@ -1188,7 +1281,15 @@ def main() -> int:
         if args.evaluator_protocol:
             evaluator_protocol = read_json(args.evaluator_protocol.resolve())
             if args.print_signing_payload_sha256:
-                print(evaluator_protocol_signing_payload_sha256(evaluator_protocol))
+                preflight = validate_evaluator_protocol_for_signing(
+                    evaluator_protocol,
+                    independence_artifact=(
+                        args.independence_artifact.resolve()
+                        if args.independence_artifact
+                        else None
+                    ),
+                )
+                print(preflight["signing_payload_sha256"])
                 return 0
             report = validate_evaluator_protocol(
                 evaluator_protocol,
@@ -1207,7 +1308,16 @@ def main() -> int:
         elif args.receipt:
             receipt = read_json(args.receipt.resolve())
             if args.print_signing_payload_sha256:
-                print(receipt_signing_payload_sha256(receipt))
+                preflight = validate_receipt_for_signing(
+                    receipt,
+                    packet_report,
+                    independence_artifact=(
+                        args.independence_artifact.resolve()
+                        if args.independence_artifact
+                        else None
+                    ),
+                )
+                print(preflight["signing_payload_sha256"])
                 return 0
             report = validate_receipt(
                 receipt,
@@ -1225,6 +1335,11 @@ def main() -> int:
                 ),
             )
         else:
+            if args.print_signing_payload_sha256:
+                raise ValueError(
+                    "--print-signing-payload-sha256 requires --receipt or "
+                    "--evaluator-protocol"
+                )
             report = packet_report
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(

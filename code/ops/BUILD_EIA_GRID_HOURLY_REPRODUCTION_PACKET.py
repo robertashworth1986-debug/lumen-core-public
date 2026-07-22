@@ -330,14 +330,30 @@ Validate the blank external-evaluator protocol before the evaluator fills it:
 python code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py --packet-dir . --evaluator-protocol config/eia_grid_hourly_external_evaluator_protocol_template_v1.json --expect-evaluator-template
 ```
 
-After independently filling the receipt, compute its signing payload and verify the detached artifacts:
+After independently filling the receipt, select an allowed `signature.method` and leave `signed_payload_sha256` and `detached_signature_artifact_sha256` blank. Run the fail-closed pre-sign check with the reviewer-controlled independence artifact:
 
 ```powershell
-python code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py --packet-dir . --receipt completed_receipt.json --print-signing-payload-sha256
+python code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py --packet-dir . --receipt completed_receipt.json --independence-artifact reviewer_independence.txt --print-signing-payload-sha256
+```
+
+The command rejects a blank or incomplete receipt and prints a digest only after every non-signature field and the independence artifact validate. Sign that digest, enter it as `signed_payload_sha256`, enter the detached signature artifact's SHA-256, and run final verification:
+
+```powershell
 python code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py --packet-dir . --receipt completed_receipt.json --independence-artifact reviewer_independence.txt --signature-artifact detached_signature.bin
 ```
 
+Use the same fail-closed sequence to freeze a completed external-evaluator protocol before scoring:
+
+```powershell
+python code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py --packet-dir . --evaluator-protocol completed_evaluator_protocol.json --independence-artifact evaluator_independence.txt --print-signing-payload-sha256
+python code/ops/VERIFY_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py --packet-dir . --evaluator-protocol completed_evaluator_protocol.json --independence-artifact evaluator_independence.txt --signature-artifact evaluator_signature.bin
+```
+
 LumenCore must not fill reviewer-controlled fields.
+
+## Return Deliverables
+
+Return the completed receipt JSON, reviewer-independence artifact, detached signature artifact, and final verifier output. If the evaluator-protocol route is used, also return the completed evaluator protocol and its evaluator-controlled independence and signature artifacts. Preserve a `DID_NOT_REPRODUCE` decision and its notes exactly; do not discard or rewrite an adverse result.
 
 ## Scientific Boundary
 
