@@ -7,6 +7,8 @@
 - Missing-fact gate: `FAIL_CLOSED`
 - Secret-or-credential gate: `FAIL_CLOSED`
 - Past-deadline gate: `FAIL_CLOSED`
+- Deadline-policy gate: `FAIL_CLOSED`
+- Subject header-injection gate: `FAIL_CLOSED`
 - Unchanged rebuilds byte-stable: `true`
 
 ## Claim Boundary
@@ -27,19 +29,19 @@ This response is a communication or routing artifact. It does not establish sele
 
 ## Decision Matrix
 
-| Template | Send policy | Attachment policy | Private render |
-|---|---|---|---:|
-| `NO_DUPLICATE_MONITOR` | `MONITOR_NO_SEND` | `NONE` | `false` |
-| `DEADLINE_CLARIFICATION` | `HUMAN_ACTION_DUE` | `NONE` | `false` |
-| `PORTAL_SUPPORT_DEADLINE_RESCUE` | `HUMAN_ACTION_DUE` | `EXPLICIT_REQUEST_ONLY` | `true` |
-| `REQUESTED_INFORMATION_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `true` |
-| `SUBMISSION_RECEIPT_FOLLOWUP` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `true` |
-| `COMPONENT_INSTRUCTION_ESCALATION` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
-| `BOUNDED_REVIEW_FOLLOWUP` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
-| `VALIDATION_PILOT_REQUEST` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `false` |
-| `DECLINE_CLOSEOUT` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `false` |
-| `MOU_ONBOARDING_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `true` |
-| `MEETING_REBOOK_REQUEST` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
+| Template | Send policy | Attachment policy | Deadline policy | Private render |
+|---|---|---|---|---:|
+| `NO_DUPLICATE_MONITOR` | `MONITOR_NO_SEND` | `NONE` | `NONE` | `false` |
+| `DEADLINE_CLARIFICATION` | `HUMAN_ACTION_DUE` | `NONE` | `OPTIONAL` | `false` |
+| `PORTAL_SUPPORT_DEADLINE_RESCUE` | `HUMAN_ACTION_DUE` | `EXPLICIT_REQUEST_ONLY` | `REQUIRED` | `true` |
+| `REQUESTED_INFORMATION_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `OPTIONAL` | `true` |
+| `SUBMISSION_RECEIPT_FOLLOWUP` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `OPTIONAL` | `true` |
+| `COMPONENT_INSTRUCTION_ESCALATION` | `HUMAN_ACTION_DUE` | `NONE` | `REQUIRED` | `true` |
+| `BOUNDED_REVIEW_FOLLOWUP` | `HUMAN_ACTION_DUE` | `NONE` | `OPTIONAL` | `true` |
+| `VALIDATION_PILOT_REQUEST` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `OPTIONAL` | `false` |
+| `DECLINE_CLOSEOUT` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `OPTIONAL` | `false` |
+| `MOU_ONBOARDING_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `OPTIONAL` | `true` |
+| `MEETING_REBOOK_REQUEST` | `HUMAN_ACTION_DUE` | `NONE` | `OPTIONAL` | `true` |
 
 ## NO_DUPLICATE_MONITOR
 
@@ -48,6 +50,7 @@ Use after a receipt, out-of-office notice, completed answer, or final decline wh
 - Inbound states: `RECEIPT_CONFIRMED, OUT_OF_OFFICE, ALREADY_ANSWERED, DECLINE_FINAL`
 - Reply triggers: `NEW_FACT_REQUEST, CORRECTION_REQUEST, MOU_RECEIVED, PORTAL_INSTRUCTION`
 - Required fields: `none`
+- Deadline policy: `NONE`
 
 No message is rendered. Monitor the thread and do not duplicate-send.
 
@@ -58,6 +61,7 @@ Ask an authoritative contact to confirm the exact deadline or eligibility rule b
 - Inbound states: `DEADLINE_AMBIGUOUS, ELIGIBILITY_AMBIGUOUS`
 - Reply triggers: `AUTHORITATIVE_CLARIFICATION_NEEDED`
 - Required fields: `recipient_name, source_subject, opportunity_name, eligibility_question, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Deadline policy: `OPTIONAL`
 
 ```text
 Subject: Re: {source_subject}
@@ -80,7 +84,8 @@ Request official support instructions for a concrete portal blocker before a kno
 
 - Inbound states: `PORTAL_BLOCKER, SUBMISSION_AT_RISK`
 - Reply triggers: `SUPPORT_ACTION_REQUIRED`
-- Required fields: `recipient_name, source_subject, submission_name, portal_name, deadline_local, portal_blocker, steps_already_tried, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Required fields: `recipient_name, source_subject, submission_name, portal_name, deadline_local, deadline_iso, portal_blocker, steps_already_tried, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Deadline policy: `REQUIRED`
 
 ```text
 Subject: Time-sensitive portal support: {submission_name}
@@ -106,6 +111,7 @@ Answer a specific inbound fact request without adding unrelated claims or attach
 - Inbound states: `INFORMATION_REQUESTED, CORRECTION_REQUESTED`
 - Reply triggers: `FACTUAL_RESPONSE_REQUIRED`
 - Required fields: `recipient_name, source_subject, requested_information, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Deadline policy: `OPTIONAL`
 
 ```text
 Subject: Re: {source_subject}
@@ -131,6 +137,7 @@ Confirm delivery and readability after a required package was sent; this is not 
 - Inbound states: `SUBMISSION_SENT_NO_RECEIPT, RECEIPT_UNCERTAIN`
 - Reply triggers: `RECEIPT_CONFIRMATION_REQUIRED`
 - Required fields: `recipient_name, source_subject, submitted_at_local, submission_name, notice_or_topic, artifact_names, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Deadline policy: `OPTIONAL`
 
 ```text
 Subject: Re: {source_subject}
@@ -153,7 +160,8 @@ Follow up once with the authoritative component POC after portal support redirec
 
 - Inbound states: `SUPPORT_REDIRECTED_TO_COMPONENT, DEADLINE_BLOCKER_UNANSWERED`
 - Reply triggers: `COMPONENT_POC_FOLLOWUP_AFTER_NO_REPLY`
-- Required fields: `recipient_name, source_subject, topic_or_notice, deadline_local, original_sent_local, support_redirect_summary, exact_instruction_question, requested_reply_by_local, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Required fields: `recipient_name, source_subject, topic_or_notice, deadline_local, deadline_iso, original_sent_local, support_redirect_summary, exact_instruction_question, requested_reply_by_local, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Deadline policy: `REQUIRED`
 
 ```text
 Subject: Re: {source_subject}
@@ -179,6 +187,7 @@ Send one claim-bounded follow-up after a reviewed package and a defined hold, as
 - Inbound states: `PACKAGE_SENT_RESPONSE_PENDING`
 - Reply triggers: `HOLD_EXPIRED_NO_REPLY_AFTER_RECHECK`
 - Required fields: `recipient_name, source_subject, sent_date_local, package_name, review_scope, requested_next_step, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Deadline policy: `OPTIONAL`
 
 ```text
 Subject: Re: {source_subject}
@@ -204,6 +213,7 @@ Invite a qualified reviewer to define a bounded, independently reproducible eval
 - Inbound states: `VALIDATION_ROUTE_OPEN, PILOT_SCOPE_REQUESTED`
 - Reply triggers: `BOUNDED_REVIEW_PROPOSAL`
 - Required fields: `recipient_name, source_subject, problem_lane, validation_scope, protocol_summary, requested_next_step, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Deadline policy: `OPTIONAL`
 
 ```text
 Subject: Re: {source_subject} - bounded validation scope
@@ -232,6 +242,7 @@ Acknowledge a final decline professionally and stop the current outreach lane wi
 - Inbound states: `DECLINE_FINAL, TEAM_ALREADY_SET, SERVICE_NOT_OFFERED`
 - Reply triggers: `COURTESY_CLOSEOUT_DUE`
 - Required fields: `recipient_name, source_subject, future_fit, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Deadline policy: `OPTIONAL`
 
 ```text
 Subject: Re: {source_subject}
@@ -255,6 +266,7 @@ Provide exactly the legal-party and signatory facts requested for an MOU while r
 - Inbound states: `MOU_INFORMATION_REQUESTED`
 - Reply triggers: `LEGAL_PARTY_FACTS_REQUIRED`
 - Required fields: `recipient_name, source_subject, legal_party_name, organization_name, business_address, signatory_name, signatory_email, signatory_title, sender_name, sender_title, recipient_email, source_message_id`
+- Deadline policy: `OPTIONAL`
 
 ```text
 Subject: Re: {source_subject}
@@ -286,6 +298,7 @@ Correct a scheduling mistake, confirm continued interest, and request a specific
 - Inbound states: `MEETING_MISSED, TIMEZONE_ERROR, REBOOK_REQUIRED`
 - Reply triggers: `SCHEDULING_RESPONSE_REQUIRED`
 - Required fields: `recipient_name, source_subject, meeting_context, scheduling_correction, availability_windows, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Deadline policy: `OPTIONAL`
 
 ```text
 Subject: Re: {source_subject}
