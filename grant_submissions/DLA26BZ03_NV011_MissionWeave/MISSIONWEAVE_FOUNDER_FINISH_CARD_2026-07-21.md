@@ -1,6 +1,6 @@
 # MissionWeave Founder Finish Card
 
-- Generated UTC: `2026-07-22T00:01:37.332535Z`
+- Generated UTC: `2026-07-22T00:15:43Z`
 - Deadline: **July 22, 2026 at 12:00 p.m. Eastern Time** (`2026-07-22T16:00:00Z`)
 - Time remaining at generation: `15` full hours
 - Current gate: **35/50 passed; 15 open**
@@ -85,7 +85,7 @@ Work the pre-submission evidence stage first. Do not spend action-time approval 
 
 - Queue status: `ROUTING_INTEGRITY_EXCEPTION_NO_SEND`
 - MissionWeave action: `FOLLOWUP_LIMIT_REACHED_NO_SEND`
-- Queue fresh for action time: **true** (`34` / `900` seconds)
+- Queue fresh for action time: **true** (`78` / `900` seconds)
 - Mailbox recheck required now: **false**
 - Additional email due now: **false**
 - Next action: The bounded proactive follow-up allowance is exhausted. Monitor the existing thread and respond only to a specific inbound request.
@@ -111,7 +111,7 @@ Do not certify or click final submit until the regenerated action gate reports `
 
 - Action gate: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
 - Action-gate canonical-text SHA-256: `2F3554BC852760F2C9D10B941A9F8263548C2302BF8C337F02B32C95B16A57C9`
-- Outreach queue canonical-text SHA-256: `AEC8CA7A2B9F9FA5DC0477B563D12E8EA8775A97C671C80DC49562616D229526`
-- Card SHA-256: `C79C230E99CBBB548500F08BBFF0B3A834A62476814450B8DFBC31DCD4FA7985`
+- Outreach queue canonical-text SHA-256: `8F50030A024464B9561D5DFCA88DA926C3C18868BA9C0DD54598D45EE26758E8`
+- Card SHA-256: `12DF8B1531CFCA718021D4ABAFD246EEE331217456EE82601E7909E44BA9CD76`
 
 This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.
