@@ -1,12 +1,13 @@
 {
   "schema": "lumencore.outreach_response_templates.v1",
   "version": 1,
-  "source_effective_utc": "2026-07-22T00:11:07Z",
+  "source_effective_utc": "2026-07-22T00:30:34Z",
   "claim_boundary": "This response is a communication or routing artifact. It does not establish selection, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
     "Answer only the question asked; do not append an unrelated pitch or attachment.",
     "Do not send a duplicate when the requested information or packet is already in the thread.",
+    "Bind every send-capable render to the exact source message and thread, then derive a deterministic response identity before action-time review.",
     "Never imply independent validation, field performance, selection, funding, or savings without direct evidence.",
     "Keep legal, signatory, address, account, and portal identifiers in private renderings only.",
     "Attach files only when the recipient or governing instructions explicitly require them.",
@@ -66,11 +67,13 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "sensitive_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "optional_defaults": {},
       "subject": "Re: {source_subject}",
@@ -105,11 +108,13 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "portal_blocker",
         "steps_already_tried"
       ],
@@ -141,11 +146,13 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "requested_information"
       ],
       "optional_defaults": {},
@@ -179,11 +186,13 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "artifact_names"
       ],
       "optional_defaults": {},
@@ -220,11 +229,13 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "support_redirect_summary"
       ],
       "optional_defaults": {},
@@ -257,11 +268,13 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "package_name",
         "review_scope"
       ],
@@ -296,11 +309,13 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "sensitive_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "optional_defaults": {},
       "subject": "Re: {source_subject} - bounded validation scope",
@@ -331,11 +346,13 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "sensitive_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "optional_defaults": {},
       "subject": "Re: {source_subject}",
@@ -368,11 +385,13 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "legal_party_name",
         "business_address",
         "signatory_name",
@@ -409,11 +428,13 @@
       ],
       "routing_fields": [
         "recipient_email",
-        "source_message_id"
+        "source_message_id",
+        "source_thread_id"
       ],
       "sensitive_fields": [
         "recipient_email",
         "source_message_id",
+        "source_thread_id",
         "availability_windows"
       ],
       "optional_defaults": {},

@@ -88,6 +88,7 @@ def test_current_queue_is_deterministic_and_never_sends():
     assert actual["summary"]["draft_rendered_count"] == 0
     assert actual["summary"]["send_now_count"] == 0
     assert actual["summary"]["recorded_proactive_send_count"] == 1
+    assert actual["summary"]["recorded_response_identity_count"] == 0
     assert actual["summary"]["routing_integrity_exception_count"] == 1
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert actual["controls"]["mailbox_recheck_max_age_seconds"] == 900
@@ -98,6 +99,12 @@ def test_current_queue_is_deterministic_and_never_sends():
     assert actual["controls"][
         "historical_send_timing_exceptions_fail_closed"
     ] is True
+    assert actual["controls"]["response_identity_required_for_new_send_receipts"] is True
+    assert actual["controls"]["response_identity_replay_fail_closed"] is True
+    assert actual["controls"]["source_message_and_thread_binding_required"] is True
+    assert actual["controls"]["response_identity_required_after_utc"] == (
+        "2026-07-22T00:30:34Z"
+    )
     assert all(row["send_now"] is False for row in actual["actions"])
     assert all(row["draft_rendered"] is False for row in actual["actions"])
     assert sum(
@@ -157,6 +164,7 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
         "recipient_name": "Reviewer",
         "recipient_email": "reviewer@example.org",
         "source_message_id": "synthetic-message-id",
+        "source_thread_id": "synthetic-thread-id",
         "source_subject": "Bounded technical package",
         "sent_date_local": "July 16, 2026",
         "package_name": "a bounded technical package",
@@ -205,6 +213,9 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
     assert rendered["attachment_policy"] == "NONE"
     assert rendered["send_allowed_by_builder"] is False
     assert rendered["send_performed"] is False
+    assert rendered["thread_binding_complete"] is True
+    assert len(rendered["response_identity_sha256"]) == 64
+    assert rendered["ledger_response_identity_count"] == 0
     assert rendered["mailbox_rechecked"] is True
     assert rendered["mailbox_rechecked_utc"] == "2026-07-23T13:59:30Z"
     assert rendered["mailbox_recheck_age_seconds"] == 30
@@ -216,6 +227,18 @@ def test_lanl_followup_render_requires_every_gate_and_never_sends():
         rendered["body"]
     )
     assert "will not send another follow-up" in rendered["body"]
+
+    with pytest.raises(ValueError, match="MONITOR_NO_DUPLICATE_CONTENT"):
+        module.render_due_followup(
+            "lanl_vision_licensing_followup",
+            facts,
+            as_of_utc="2026-07-23T14:00:00Z",
+            mailbox_rechecked=True,
+            mailbox_rechecked_utc="2026-07-23T13:59:30Z",
+            mailbox_check_receipt_sha256=mailbox_receipt,
+            no_reply_confirmed=True,
+            prior_response_identity_sha256s=[rendered["response_identity_sha256"]],
+        )
 
 
 @pytest.mark.parametrize(
@@ -234,6 +257,7 @@ def test_followup_render_rejects_unreceipted_or_nonfresh_mailbox_checks(
         "recipient_name": "Reviewer",
         "recipient_email": "reviewer@example.org",
         "source_message_id": "synthetic-message-id",
+        "source_thread_id": "synthetic-thread-id",
         "source_subject": "Bounded technical package",
         "sent_date_local": "July 16, 2026",
         "package_name": "a bounded technical package",
@@ -271,6 +295,7 @@ def test_sealed_send_ledger_derives_count_and_exhausts_bounded_lane():
         "delivery_state": "SENT",
         "lane_id": "lanl_vision_licensing_followup",
         "sent_message_receipt_sha256": "A" * 64,
+        "response_identity_sha256": "C" * 64,
         "sent_utc": "2026-07-23T14:30:00Z",
         "template_id": "BOUNDED_REVIEW_FOLLOWUP",
     }
@@ -278,13 +303,16 @@ def test_sealed_send_ledger_derives_count_and_exhausts_bounded_lane():
     ledger["ledger_sha256"] = module.canonical_object_sha256(
         ledger, omit={"ledger_sha256"}
     )
-    counts, digests, timing_exceptions = module.validate_followup_send_ledger(
-        ledger, policies, template_ids, as_of=as_of
+    counts, digests, timing_exceptions, response_identities = (
+        module.validate_followup_send_ledger(
+            ledger, policies, template_ids, as_of=as_of
+        )
     )
 
     assert counts["lanl_vision_licensing_followup"] == 1
     assert len(digests["lanl_vision_licensing_followup"][0]) == 64
     assert timing_exceptions == []
+    assert response_identities == {"lanl_vision_licensing_followup": ["C" * 64]}
     reconciliation = module.read_json(module.EMAIL_RECONCILIATION)
     lane = next(
         row
@@ -312,6 +340,7 @@ def test_send_ledger_tamper_duplicate_and_private_material_fail_closed():
         "delivery_state": "SENT",
         "lane_id": "lanl_vision_licensing_followup",
         "sent_message_receipt_sha256": "B" * 64,
+        "response_identity_sha256": "D" * 64,
         "sent_utc": "2026-07-23T14:30:00Z",
         "template_id": "BOUNDED_REVIEW_FOLLOWUP",
     }
@@ -342,6 +371,35 @@ def test_send_ledger_tamper_duplicate_and_private_material_fail_closed():
     with pytest.raises(ValueError, match="private message material"):
         module.validate_followup_send_ledger(
             private, policies, template_ids, as_of=as_of
+        )
+
+    missing_identity = copy.deepcopy(base)
+    missing_identity_receipt = dict(receipt)
+    missing_identity_receipt.pop("response_identity_sha256")
+    missing_identity["receipts"] = [missing_identity_receipt]
+    missing_identity["ledger_sha256"] = module.canonical_object_sha256(
+        missing_identity, omit={"ledger_sha256"}
+    )
+    with pytest.raises(ValueError, match="missing its required response identity"):
+        module.validate_followup_send_ledger(
+            missing_identity, policies, template_ids, as_of=as_of
+        )
+
+    duplicate_identity = copy.deepcopy(base)
+    duplicate_identity["receipts"] = [
+        receipt,
+        dict(
+            receipt,
+            sent_message_receipt_sha256="E" * 64,
+            sent_utc="2026-07-23T14:31:00Z",
+        ),
+    ]
+    duplicate_identity["ledger_sha256"] = module.canonical_object_sha256(
+        duplicate_identity, omit={"ledger_sha256"}
+    )
+    with pytest.raises(ValueError, match="duplicate response identity"):
+        module.validate_followup_send_ledger(
+            duplicate_identity, policies, template_ids, as_of=as_of
         )
 
 

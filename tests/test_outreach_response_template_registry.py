@@ -31,6 +31,7 @@ def common_facts() -> dict[str, str]:
         "recipient_name": "Reviewer",
         "recipient_email": "reviewer@example.org",
         "source_message_id": "synthetic-message-id",
+        "source_thread_id": "synthetic-thread-id",
         "source_subject": "Validation inquiry",
         "sender_name": "Founder",
         "sender_title": "Founder / Systems Architect",
@@ -62,6 +63,13 @@ def test_registry_validates_and_covers_high_value_response_states():
     assert by_id["PORTAL_SUPPORT_DEADLINE_RESCUE"]["deadline_policy"] == "REQUIRED"
     assert by_id["COMPONENT_INSTRUCTION_ESCALATION"]["deadline_policy"] == "REQUIRED"
     assert all("deadline_policy" in row for row in registry["templates"])
+    for row in registry["templates"]:
+        if row["send_policy"] == "MONITOR_NO_SEND":
+            continue
+        assert {"recipient_email", "source_message_id", "source_thread_id"} <= set(
+            row["routing_fields"]
+        )
+        assert set(row["routing_fields"]) <= set(row["sensitive_fields"])
 
 
 def test_registry_rejects_missing_or_inconsistent_deadline_policy():
@@ -120,11 +128,54 @@ def test_duplicate_send_and_monitor_states_fail_closed_without_rendering_message
     assert monitor["send_performed"] is False
 
 
+def test_thread_bound_response_identity_is_deterministic_and_blocks_replay():
+    module = load_module()
+    facts = common_facts()
+    facts.update(
+        {
+            "problem_lane": "grid forecast replay",
+            "validation_scope": "one frozen public dataset and one incumbent baseline",
+            "protocol_summary": "predeclare splits, metrics, exclusions, and stop rules",
+            "requested_next_step": "name one technical reviewer",
+        }
+    )
+
+    first = module.render_response("VALIDATION_PILOT_REQUEST", facts)
+    repeated = module.render_response("VALIDATION_PILOT_REQUEST", dict(facts))
+    changed_thread = dict(facts, source_thread_id="synthetic-thread-id-2")
+    changed = module.render_response("VALIDATION_PILOT_REQUEST", changed_thread)
+    replay = module.render_response(
+        "VALIDATION_PILOT_REQUEST",
+        facts,
+        prior_response_identity_sha256s=[first["response_identity_sha256"]],
+    )
+    malformed = module.render_response(
+        "VALIDATION_PILOT_REQUEST",
+        facts,
+        prior_response_identity_sha256s=["not-a-sha256"],
+    )
+
+    assert first["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
+    assert first["thread_binding_complete"] is True
+    assert re.fullmatch(r"[0-9A-F]{64}", first["response_identity_sha256"])
+    assert repeated["response_identity_sha256"] == first["response_identity_sha256"]
+    assert changed["response_identity_sha256"] != first["response_identity_sha256"]
+    assert replay["status"] == "MONITOR_NO_DUPLICATE_CONTENT"
+    assert replay["duplicate_send_blocked"] is True
+    assert replay["duplicate_match_basis"] == "RESPONSE_IDENTITY_SHA256"
+    assert replay["response_identity_sha256"] == first["response_identity_sha256"]
+    assert replay["subject"] is None
+    assert replay["body"] is None
+    assert malformed["status"] == "BLOCKED_INVALID_PRIOR_RESPONSE_IDENTITY"
+    assert malformed["response_identity_sha256"] is None
+
+
 def test_missing_facts_invalid_email_and_unrequested_attachment_block_render():
     module = load_module()
     missing = module.render_response("DEADLINE_CLARIFICATION", {})
     assert missing["status"] == "BLOCKED_MISSING_FACTS"
     assert "recipient_email" in missing["missing_fields"]
+    assert "source_thread_id" in missing["missing_fields"]
 
     facts = common_facts()
     facts.update(
@@ -139,6 +190,15 @@ def test_missing_facts_invalid_email_and_unrequested_attachment_block_render():
     assert invalid["invalid_email_fields"] == ["recipient_email"]
 
     facts["recipient_email"] = "reviewer@example.org"
+    facts["source_thread_id"] = "invalid thread id"
+    invalid_routing = module.render_response("DEADLINE_CLARIFICATION", facts)
+    assert invalid_routing["status"] == "BLOCKED_INVALID_ROUTING_IDENTIFIER"
+    assert invalid_routing["invalid_routing_identifier_fields"] == [
+        "source_thread_id"
+    ]
+    assert invalid_routing["thread_binding_complete"] is False
+
+    facts["source_thread_id"] = "synthetic-thread-id"
     facts["attachment_files"] = ["packet.pdf"]
     attachment = module.render_response("DEADLINE_CLARIFICATION", facts)
     assert attachment["status"] == "BLOCKED_ATTACHMENT_NOT_AUTHORIZED"
@@ -457,6 +517,9 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["template_count"] == 11
     assert payload["controls"]["builder_can_send_email"] is False
     assert payload["controls"]["duplicate_send_fail_closed"] is True
+    assert payload["controls"]["duplicate_response_identity_fail_closed"] is True
+    assert payload["controls"]["deterministic_response_identity"] is True
+    assert payload["controls"]["source_message_and_thread_binding_required"] is True
     assert payload["controls"]["secret_or_credential_fail_closed"] is True
     assert payload["controls"]["opaque_binary_fact_fail_closed"] is True
     assert payload["controls"]["hardcoded_template_credential_fail_closed"] is True
@@ -464,6 +527,8 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["controls"]["subject_header_injection_fail_closed"] is True
     assert payload["controls"]["body_control_character_fail_closed"] is True
     assert "Duplicate-send gate: `FAIL_CLOSED`" in markdown
+    assert "Duplicate response-identity gate: `FAIL_CLOSED`" in markdown
+    assert "Source message/thread binding: `REQUIRED`" in markdown
     assert "Secret-or-credential gate: `FAIL_CLOSED`" in markdown
     assert "Deadline-policy gate: `FAIL_CLOSED`" in markdown
     assert "Subject header-injection gate: `FAIL_CLOSED`" in markdown

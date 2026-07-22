@@ -141,7 +141,12 @@ def validate_followup_send_ledger(
     template_ids: set[str],
     *,
     as_of: datetime,
-) -> tuple[Counter[str], dict[str, list[str]], list[dict[str, Any]]]:
+) -> tuple[
+    Counter[str],
+    dict[str, list[str]],
+    list[dict[str, Any]],
+    dict[str, list[str]],
+]:
     if ledger.get("schema") != SEND_LEDGER_SCHEMA:
         raise ValueError("Follow-up send ledger schema is invalid")
     controls = ledger.get("controls", {})
@@ -151,6 +156,9 @@ def validate_followup_send_ledger(
         or controls.get("private_identifiers_prohibited") is not True
     ):
         raise ValueError("Follow-up send ledger controls are unsafe")
+    response_identity_required_after = parse_aware_utc(
+        str(controls.get("response_identity_required_after_utc") or "")
+    )
     expected_ledger_sha = canonical_object_sha256(ledger, omit={"ledger_sha256"})
     if normalize_sha256(ledger.get("ledger_sha256"), "Follow-up send ledger") != (
         expected_ledger_sha
@@ -164,6 +172,8 @@ def validate_followup_send_ledger(
     receipt_digests: dict[str, list[str]] = {}
     timing_exceptions: list[dict[str, Any]] = []
     seen_sent_receipts: set[str] = set()
+    seen_response_identities: set[str] = set()
+    response_identities: dict[str, list[str]] = {}
     for index, receipt in enumerate(receipts):
         if not isinstance(receipt, dict):
             raise ValueError(f"Follow-up send receipt {index} is invalid")
@@ -194,11 +204,27 @@ def validate_followup_send_ledger(
         if sent_receipt_sha in seen_sent_receipts:
             raise ValueError("Follow-up send ledger contains a duplicate receipt")
         seen_sent_receipts.add(sent_receipt_sha)
+        response_identity_sha: str | None = None
+        if receipt.get("response_identity_sha256") not in (None, ""):
+            response_identity_sha = normalize_sha256(
+                receipt.get("response_identity_sha256"), "Response identity"
+            )
+            if response_identity_sha in seen_response_identities:
+                raise ValueError(
+                    "Follow-up send ledger contains a duplicate response identity"
+                )
+            seen_response_identities.add(response_identity_sha)
+        elif sent_at >= response_identity_required_after:
+            raise ValueError(
+                "Follow-up send receipt is missing its required response identity"
+            )
         # The ledger is append-only, so a historical queue rebuild can contain
         # receipts recorded after that snapshot. Validate them, but count only
         # receipts that existed by the requested as-of time.
         if sent_at > as_of:
             continue
+        if response_identity_sha:
+            response_identities.setdefault(lane_id, []).append(response_identity_sha)
         not_before = parse_aware_utc(str(policy.get("not_before_utc") or ""))
         if sent_at < not_before:
             timing_exceptions.append(
@@ -218,7 +244,7 @@ def validate_followup_send_ledger(
     for lane_id, count in counts.items():
         if count > int(policies[lane_id]["max_proactive_sends"]):
             raise ValueError(f"Follow-up send limit exceeded in ledger: {lane_id}")
-    return counts, receipt_digests, timing_exceptions
+    return counts, receipt_digests, timing_exceptions, response_identities
 
 
 def validate_embedded_source_evidence(reconciliation: dict[str, Any]) -> None:
@@ -276,6 +302,7 @@ def validate_sources(
     Counter[str],
     dict[str, list[str]],
     list[dict[str, Any]],
+    dict[str, list[str]],
 ]:
     if (
         reconciliation.get("schema")
@@ -291,6 +318,12 @@ def validate_sources(
         != "lumencore.outreach_response_template_registry.v1"
         or registry.get("controls", {}).get("builder_can_send_email") is not False
         or registry.get("controls", {}).get("duplicate_send_fail_closed") is not True
+        or registry.get("controls", {}).get("deterministic_response_identity")
+        is not True
+        or registry.get("controls", {}).get(
+            "source_message_and_thread_binding_required"
+        )
+        is not True
     ):
         raise ValueError("Response template registry is missing or unsafe")
     if (
@@ -326,15 +359,19 @@ def validate_sources(
         template_id = lane_policy.get("eligible_template_id")
         if template_id and template_id not in template_ids:
             raise ValueError(f"Unknown eligible template: {template_id}")
-    send_counts, send_receipt_digests, timing_exceptions = validate_followup_send_ledger(
-        send_ledger, policies, template_ids, as_of=as_of
-    )
+    (
+        send_counts,
+        send_receipt_digests,
+        timing_exceptions,
+        response_identities,
+    ) = validate_followup_send_ledger(send_ledger, policies, template_ids, as_of=as_of)
     return (
         template_ids,
         policies,
         send_counts,
         send_receipt_digests,
         timing_exceptions,
+        response_identities,
     )
 
 
@@ -420,6 +457,7 @@ def render_due_followup(
     mailbox_rechecked_utc: str,
     mailbox_check_receipt_sha256: str,
     no_reply_confirmed: bool,
+    prior_response_identity_sha256s: list[str] | None = None,
 ) -> dict[str, Any]:
     queue = build_payload(as_of_utc)
     action = next(
@@ -446,6 +484,20 @@ def render_due_followup(
         raise ValueError("No eligible follow-up template is configured")
 
     registry_module = load_response_registry_module()
+    provided_response_identities = registry_module.normalize_response_identity_sha256s(
+        prior_response_identity_sha256s
+    )
+    send_ledger = read_json(FOLLOWUP_SEND_LEDGER)
+    ledger_response_identities = {
+        normalize_sha256(receipt["response_identity_sha256"], "Response identity")
+        for receipt in send_ledger.get("receipts", [])
+        if receipt.get("lane_id") == lane_id
+        and receipt.get("response_identity_sha256") not in (None, "")
+        and parse_aware_utc(str(receipt.get("sent_utc") or "")) <= as_of
+    }
+    prior_response_identities = sorted(
+        provided_response_identities | ledger_response_identities
+    )
     rendered = registry_module.render_response(
         template_id,
         facts,
@@ -453,6 +505,7 @@ def render_due_followup(
         inbound_requires_response=True,
         explicit_attachment_request=False,
         current_utc=as_of_utc,
+        prior_response_identity_sha256s=prior_response_identities,
     )
     if not str(rendered.get("status", "")).startswith("READY_FOR_"):
         raise ValueError(f"Follow-up render blocked: {rendered.get('status')}")
@@ -466,6 +519,7 @@ def render_due_followup(
     rendered["no_reply_confirmed"] = True
     rendered["prior_followup_count"] = action["recorded_proactive_send_count"]
     rendered["max_proactive_sends"] = action["max_proactive_sends"]
+    rendered["ledger_response_identity_count"] = len(ledger_response_identities)
     return rendered
 
 
@@ -485,6 +539,7 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
         sent_counts,
         sent_receipt_digests,
         routing_integrity_exceptions,
+        response_identities,
     ) = validate_sources(
         reconciliation,
         registry,
@@ -519,6 +574,9 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
             "draft_rendered_count": sum(1 for row in actions if row["draft_rendered"]),
             "send_now_count": sum(1 for row in actions if row["send_now"]),
             "recorded_proactive_send_count": sum(sent_counts.values()),
+            "recorded_response_identity_count": sum(
+                len(rows) for rows in response_identities.values()
+            ),
             "routing_integrity_exception_count": len(
                 routing_integrity_exceptions
             ),
@@ -533,6 +591,12 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
             "mailbox_recheck_max_age_seconds": MAILBOX_RECHECK_MAX_AGE_SECONDS,
             "mailbox_recheck_receipt_required": True,
             "proactive_send_count_derived_from_sealed_ledger": True,
+            "response_identity_required_for_new_send_receipts": True,
+            "response_identity_replay_fail_closed": True,
+            "source_message_and_thread_binding_required": True,
+            "response_identity_required_after_utc": send_ledger["controls"][
+                "response_identity_required_after_utc"
+            ],
             "historical_send_timing_exceptions_fail_closed": True,
             "action_time_human_review_required": True,
             "final_send_performed": False,
@@ -549,6 +613,8 @@ def build_payload(as_of_utc: str | None = None) -> dict[str, Any]:
             "This queue evaluates communication timing and routing controls only. A hold "
             "expiration requires a fresh mailbox check that is recent, timestamped, and "
             "receipted; prior proactive sends are derived from a sealed receipt ledger, "
+            "new send receipts require a deterministic source-message/thread-bound response "
+            "identity, and a repeated identity fails closed; "
             "and neither condition authorizes a draft or send. Historical send-timing "
             "exceptions remain counted against the send cap and are surfaced fail-closed. "
             "The queue does not establish submission, receipt, selection, funding, endorsement, "

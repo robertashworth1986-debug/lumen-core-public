@@ -1,12 +1,13 @@
 {
-  "claim_boundary": "This ledger counts only bounded proactive follow-up sends recorded by privacy-safe sent-message receipt hashes. It does not expose recipients, message IDs, thread IDs, subjects, bodies, attachments, credentials, or private proposal facts, and it does not prove delivery, receipt, endorsement, validation, selection, funding, or award.",
+  "claim_boundary": "This ledger counts only bounded proactive follow-up sends recorded by privacy-safe sent-message receipt hashes. New receipts at or after the response-identity effective time must also carry the deterministic source-message/thread-bound response identity produced before action-time review; historical receipts remain explicitly grandfathered. The ledger does not expose recipients, message IDs, thread IDs, subjects, bodies, attachments, credentials, or private proposal facts, and it does not prove delivery, receipt, endorsement, validation, selection, funding, or award.",
   "controls": {
     "append_only": true,
     "count_derived_from_receipts": true,
-    "private_identifiers_prohibited": true
+    "private_identifiers_prohibited": true,
+    "response_identity_required_after_utc": "2026-07-22T00:30:34Z"
   },
   "initialized_utc": "2026-07-19T01:50:00Z",
-  "ledger_sha256": "1C56B710870F1DC45B902A6551F5A9B5BD2603103D7CB4F970D3E5509CF9A43D",
+  "ledger_sha256": "DF6B18FC4CCF00A37F2AC6B2C330A72976A92FF82A0814AF619E79963D0FA01F",
   "receipts": [
     {
       "delivery_state": "SENT",

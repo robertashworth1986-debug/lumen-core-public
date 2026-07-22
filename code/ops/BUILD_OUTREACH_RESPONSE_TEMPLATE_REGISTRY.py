@@ -37,12 +37,20 @@ VALID_DEADLINE_POLICIES = {
 }
 TEMPLATE_ID_RE = re.compile(r"^[A-Z][A-Z0-9_]+$")
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+ROUTING_IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9._:-]{3,256}$")
+SHA256_RE = re.compile(r"^[0-9A-Fa-f]{64}$")
 SUBJECT_CONTROL_RE = re.compile(r"[\x00-\x1F\x7F]")
 BODY_CONTROL_RE = re.compile(r"[\x00-\x09\x0B-\x1F\x7F]")
 UUID_RE = re.compile(
     r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
     r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"
 )
+RESPONSE_IDENTITY_SCHEMA = "lumencore.outreach_response_identity.v1"
+REQUIRED_SEND_ROUTING_FIELDS = {
+    "recipient_email",
+    "source_message_id",
+    "source_thread_id",
+}
 POSITIVE_CLAIM_MARKERS = (
     "guaranteed funding",
     "guaranteed savings",
@@ -106,6 +114,12 @@ def read_registry(path: Path = CONFIG) -> dict[str, Any]:
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest().upper()
+
+
+def canonical_object_sha256(payload: dict[str, Any]) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest().upper()
 
 
 def template_placeholders(text: str) -> set[str]:
@@ -217,6 +231,19 @@ def validate_registry(payload: dict[str, Any]) -> dict[str, Any]:
             raise OutreachRegistryError(f"OPTIONAL_DEFAULTS_INVALID:{template_id}")
         if not sensitive.issubset(required | routing | set(defaults)):
             raise OutreachRegistryError(f"SENSITIVE_FIELD_UNDECLARED:{template_id}")
+        if send_policy != "MONITOR_NO_SEND":
+            missing_routing = sorted(REQUIRED_SEND_ROUTING_FIELDS - routing)
+            if missing_routing:
+                raise OutreachRegistryError(
+                    f"REQUIRED_ROUTING_FIELD_UNDECLARED:{template_id}:"
+                    + ",".join(missing_routing)
+                )
+            unprotected_routing = sorted(routing - sensitive)
+            if unprotected_routing:
+                raise OutreachRegistryError(
+                    f"ROUTING_FIELD_NOT_SENSITIVE:{template_id}:"
+                    + ",".join(unprotected_routing)
+                )
         if deadline_policy == "REQUIRED" and "deadline_iso" not in required:
             raise OutreachRegistryError(
                 f"REQUIRED_DEADLINE_FIELD_UNDECLARED:{template_id}"
@@ -331,7 +358,43 @@ def _base_result(
         "send_performed": False,
         "send_allowed_by_builder": False,
         "action_time_human_review_required": True,
+        "response_identity_schema": RESPONSE_IDENTITY_SCHEMA,
+        "response_identity_sha256": None,
+        "thread_binding_complete": False,
     }
+
+
+def normalize_response_identity_sha256s(value: Any) -> set[str]:
+    if value is None:
+        return set()
+    if not isinstance(value, list):
+        raise OutreachRegistryError("PRIOR_RESPONSE_IDENTITIES_NOT_LIST")
+    normalized: set[str] = set()
+    for item in value:
+        if not isinstance(item, str) or not SHA256_RE.fullmatch(item.strip()):
+            raise OutreachRegistryError("PRIOR_RESPONSE_IDENTITY_INVALID")
+        normalized.add(item.strip().upper())
+    return normalized
+
+
+def build_response_identity_sha256(
+    row: dict[str, Any],
+    facts: dict[str, Any],
+    subject: str,
+    body: str,
+    attachments: list[str],
+) -> str:
+    identity_payload = {
+        "schema": RESPONSE_IDENTITY_SCHEMA,
+        "template_id": row["template_id"],
+        "source_thread_id": str(facts["source_thread_id"]).strip(),
+        "source_message_id": str(facts["source_message_id"]).strip(),
+        "recipient_email": str(facts["recipient_email"]).strip().lower(),
+        "subject": subject,
+        "body": body,
+        "attachment_files": [item.strip() for item in attachments],
+    }
+    return canonical_object_sha256(identity_payload)
 
 
 def render_response(
@@ -342,6 +405,7 @@ def render_response(
     inbound_requires_response: bool = True,
     explicit_attachment_request: bool = False,
     current_utc: str | None = None,
+    prior_response_identity_sha256s: list[str] | None = None,
     registry: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     payload = validate_registry(registry or read_registry())
@@ -390,6 +454,25 @@ def render_response(
                 "subject": None,
                 "body": None,
                 "missing_fields": [],
+            }
+        )
+        return result
+
+    try:
+        prior_response_identities = normalize_response_identity_sha256s(
+            prior_response_identity_sha256s
+        )
+    except OutreachRegistryError as exc:
+        result = _base_result(
+            payload, row, "BLOCKED_INVALID_PRIOR_RESPONSE_IDENTITY", deadline
+        )
+        result.update(
+            {
+                "duplicate_send_blocked": True,
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+                "validation_error": str(exc),
             }
         )
         return result
@@ -448,6 +531,27 @@ def render_response(
                 "body": None,
                 "missing_fields": [],
                 "invalid_email_fields": invalid_emails,
+            }
+        )
+        return result
+
+    invalid_routing_identifiers = sorted(
+        field
+        for field in ("source_message_id", "source_thread_id")
+        if field in required
+        and not ROUTING_IDENTIFIER_RE.fullmatch(str(facts[field]).strip())
+    )
+    if invalid_routing_identifiers:
+        result = _base_result(
+            payload, row, "BLOCKED_INVALID_ROUTING_IDENTIFIER", deadline
+        )
+        result.update(
+            {
+                "duplicate_send_blocked": True,
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+                "invalid_routing_identifier_fields": invalid_routing_identifiers,
             }
         )
         return result
@@ -513,6 +617,7 @@ def render_response(
             }
         )
         return result
+
     if BODY_CONTROL_RE.search(body):
         result = _base_result(payload, row, "BLOCKED_BODY_CONTROL_CHARACTER", deadline)
         result.update(
@@ -528,6 +633,25 @@ def render_response(
     for marker in POSITIVE_CLAIM_MARKERS:
         if marker in lowered:
             raise OutreachRegistryError(f"UNSUPPORTED_POSITIVE_CLAIM_RENDER:{marker}")
+
+    response_identity_sha256 = build_response_identity_sha256(
+        row, facts, subject, body, attachments
+    )
+    if response_identity_sha256 in prior_response_identities:
+        result = _base_result(payload, row, "MONITOR_NO_DUPLICATE_CONTENT", deadline)
+        result.update(
+            {
+                "duplicate_send_blocked": True,
+                "duplicate_match_basis": "RESPONSE_IDENTITY_SHA256",
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+                "response_identity_sha256": response_identity_sha256,
+                "thread_binding_complete": True,
+                "prior_response_identity_count": len(prior_response_identities),
+            }
+        )
+        return result
 
     sensitive_present = sorted(
         field for field in row["sensitive_fields"] if facts.get(field) not in (None, "")
@@ -550,6 +674,9 @@ def render_response(
             "private_render": private_render,
             "public_safe": not private_render,
             "sensitive_field_names": sensitive_present,
+            "response_identity_sha256": response_identity_sha256,
+            "thread_binding_complete": True,
+            "prior_response_identity_count": len(prior_response_identities),
         }
     )
     return result
@@ -577,6 +704,9 @@ def build_public_payload(
         "templates": payload["templates"],
         "controls": {
             "duplicate_send_fail_closed": True,
+            "duplicate_response_identity_fail_closed": True,
+            "deterministic_response_identity": True,
+            "source_message_and_thread_binding_required": True,
             "missing_fact_fail_closed": True,
             "secret_or_credential_fail_closed": True,
             "opaque_binary_fact_fail_closed": True,
@@ -605,6 +735,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Private-render templates: `{payload['private_render_template_count']}`",
         "- Builder can send email: `false`",
         "- Duplicate-send gate: `FAIL_CLOSED`",
+        "- Duplicate response-identity gate: `FAIL_CLOSED`",
+        "- Source message/thread binding: `REQUIRED`",
         "- Missing-fact gate: `FAIL_CLOSED`",
         "- Secret-or-credential gate: `FAIL_CLOSED`",
         "- Past-deadline gate: `FAIL_CLOSED`",
