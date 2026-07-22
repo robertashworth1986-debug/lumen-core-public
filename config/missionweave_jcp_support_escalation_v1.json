@@ -13,6 +13,41 @@
   "exact_human_unlock_phrase": "SEND ONE JCP URGENT SUPPORT REQUEST",
   "existing_component_lane_id": "missionweave_dsip_proposal",
   "existing_component_lane_required_state": "FOLLOWUP_LIMIT_REACHED_NO_SEND",
+  "official_support": {
+    "availability": "24/7/365",
+    "commercial_phone": "269-704-7921",
+    "customer_interaction_center_email": "dlacontactcenter@dla.mil",
+    "customer_interaction_center_phone": "1-877-352-2255",
+    "jcp_email": "jcp-admin@dla.mil",
+    "private_caller_inputs_required": [
+      "entity_name",
+      "cage_or_ncage_code"
+    ],
+    "source_url": "https://www.dla.mil/logistics-operations/services/joint-certification-program/DLA/",
+    "verified_utc": "2026-07-22T02:25:56Z"
+  },
+  "operator_policy": {
+    "call_script_paragraphs": [
+      "Hello. I am calling for Joint Certification Program portal support for an organization preparing a DLA SBIR proposal for topic DLA26BZ03-NV011, due today at 12:00 p.m. Eastern.",
+      "My JCP account and organization were created successfully, but the organization status fields remain unavailable and the certification preflight does not populate the SAM details needed for review.",
+      "I have not submitted a JCP application and I am not claiming JCP certification. Can you tell me the fastest official step to synchronize the entity record and, if the prerequisites are complete, obtain an official application-submission receipt before the proposal deadline?",
+      "I have the entity name and CAGE or NCAGE code available to provide privately when you ask for them."
+    ],
+    "hard_stop_display": "2026-07-22 9:30 AM Central / 10:30 AM Eastern",
+    "hard_stop_utc": "2026-07-22T14:30:00Z",
+    "hard_stop_reason": "Preserve a 90-minute review and portal buffer before the government deadline.",
+    "outcomes": {
+      "official_application_receipt_obtained": "PAUSE_AND_REVIEW_OFFICIAL_RECEIPT_BEFORE_DSIP",
+      "official_support_requests_secure_details": "PROVIDE_ONLY_THROUGH_OFFICIAL_SECURE_CHANNEL",
+      "official_support_says_prerequisites_incomplete": "STOP_NO_VOLUME_V_OR_FINAL_SUBMISSION",
+      "portal_has_no_official_receipt_at_hard_stop": "STOP_NO_VOLUME_V_OR_FINAL_SUBMISSION"
+    },
+    "prohibited_substitutes": [
+      "JCP organization-creation receipt",
+      "portal screenshot without official application-submission status",
+      "self-authored certification statement"
+    ]
+  },
   "portal_receipt_required_schema": "lumencore.missionweave_jcp_portal_organization_receipt.v1",
   "portal_receipt_required_status": "ORGANIZATION_CREATED_APPLICATION_NOT_SUBMITTED",
   "proposal_workspace": "L26BZ-NV011-1380",

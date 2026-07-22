@@ -6,6 +6,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,6 +25,21 @@ OUT_MD = MISSION_DIR / "MISSIONWEAVE_JCP_SUPPORT_ESCALATION_2026-07-22.md"
 
 PACKET_SCHEMA = "lumencore.missionweave_jcp_support_escalation.v1"
 CONFIG_SCHEMA = "lumencore.missionweave_jcp_support_escalation_config.v1"
+
+REQUIRED_OPERATOR_OUTCOMES = {
+    "official_application_receipt_obtained": (
+        "PAUSE_AND_REVIEW_OFFICIAL_RECEIPT_BEFORE_DSIP"
+    ),
+    "official_support_requests_secure_details": (
+        "PROVIDE_ONLY_THROUGH_OFFICIAL_SECURE_CHANNEL"
+    ),
+    "official_support_says_prerequisites_incomplete": (
+        "STOP_NO_VOLUME_V_OR_FINAL_SUBMISSION"
+    ),
+    "portal_has_no_official_receipt_at_hard_stop": (
+        "STOP_NO_VOLUME_V_OR_FINAL_SUBMISSION"
+    ),
+}
 
 
 class JcpSupportEscalationError(ValueError):
@@ -79,6 +95,61 @@ def require_config(config: dict[str, Any]) -> None:
         raise JcpSupportEscalationError("BODY_PARAGRAPHS_REQUIRED")
     if any(not isinstance(item, str) or not item.strip() for item in paragraphs):
         raise JcpSupportEscalationError("BODY_PARAGRAPH_INVALID")
+    require_official_support(config)
+    require_operator_policy(config)
+
+
+def require_official_support(config: dict[str, Any]) -> None:
+    support = config.get("official_support")
+    if not isinstance(support, dict):
+        raise JcpSupportEscalationError("OFFICIAL_SUPPORT_REQUIRED")
+    if support.get("availability") != "24/7/365":
+        raise JcpSupportEscalationError("OFFICIAL_SUPPORT_AVAILABILITY_INVALID")
+    if support.get("customer_interaction_center_phone") != "1-877-352-2255":
+        raise JcpSupportEscalationError("OFFICIAL_SUPPORT_PHONE_INVALID")
+    if support.get("jcp_email") != config.get("recipient"):
+        raise JcpSupportEscalationError("OFFICIAL_SUPPORT_JCP_EMAIL_MISMATCH")
+    source_url = support.get("source_url")
+    if not isinstance(source_url, str):
+        raise JcpSupportEscalationError("OFFICIAL_SUPPORT_SOURCE_INVALID")
+    parsed = urlparse(source_url)
+    if parsed.scheme != "https" or parsed.hostname not in {"dla.mil", "www.dla.mil"}:
+        raise JcpSupportEscalationError("OFFICIAL_SUPPORT_SOURCE_INVALID")
+    parse_utc(str(support.get("verified_utc", "")))
+    private_inputs = support.get("private_caller_inputs_required")
+    if private_inputs != ["entity_name", "cage_or_ncage_code"]:
+        raise JcpSupportEscalationError("PRIVATE_CALLER_INPUTS_INVALID")
+
+
+def require_operator_policy(config: dict[str, Any]) -> None:
+    policy = config.get("operator_policy")
+    if not isinstance(policy, dict):
+        raise JcpSupportEscalationError("OPERATOR_POLICY_REQUIRED")
+    call_script = policy.get("call_script_paragraphs")
+    if not isinstance(call_script, list) or not call_script:
+        raise JcpSupportEscalationError("CALL_SCRIPT_REQUIRED")
+    if any(not isinstance(item, str) or not item.strip() for item in call_script):
+        raise JcpSupportEscalationError("CALL_SCRIPT_INVALID")
+    script = "\n\n".join(call_script).lower()
+    forbidden_literals = (
+        "uei:",
+        "cage code:",
+        "password",
+        "one-time code",
+        "certified jcp",
+    )
+    if any(item in script for item in forbidden_literals):
+        raise JcpSupportEscalationError("CALL_SCRIPT_CONTAINS_FORBIDDEN_LITERAL")
+    deadline = parse_utc(config["deadline_utc"])
+    hard_stop = parse_utc(str(policy.get("hard_stop_utc", "")))
+    buffer_seconds = int((deadline - hard_stop).total_seconds())
+    if buffer_seconds != 90 * 60:
+        raise JcpSupportEscalationError("HARD_STOP_BUFFER_INVALID")
+    if policy.get("outcomes") != REQUIRED_OPERATOR_OUTCOMES:
+        raise JcpSupportEscalationError("OPERATOR_OUTCOMES_INVALID")
+    prohibited = policy.get("prohibited_substitutes")
+    if not isinstance(prohibited, list) or len(prohibited) < 3:
+        raise JcpSupportEscalationError("PROHIBITED_SUBSTITUTES_REQUIRED")
 
 
 def require_portal_receipt(receipt: dict[str, Any], config: dict[str, Any]) -> None:
@@ -223,6 +294,25 @@ def build_packet(
             "private_values_redacted": True,
             "sam_status_available": False,
         },
+        "official_support": {
+            **config["official_support"],
+            "private_caller_input_values_included": False,
+        },
+        "operator_policy": {
+            "call_now": generated < deadline,
+            "call_script": "\n\n".join(
+                config["operator_policy"]["call_script_paragraphs"]
+            ),
+            "hard_stop_display": config["operator_policy"]["hard_stop_display"],
+            "hard_stop_reason": config["operator_policy"]["hard_stop_reason"],
+            "hard_stop_utc": iso_z(
+                parse_utc(config["operator_policy"]["hard_stop_utc"])
+            ),
+            "outcomes": config["operator_policy"]["outcomes"],
+            "prohibited_substitutes": config["operator_policy"][
+                "prohibited_substitutes"
+            ],
+        },
         "proposal_workspace": config["proposal_workspace"],
         "readiness": readiness,
         "route_id": config["route_id"],
@@ -237,6 +327,8 @@ def render_markdown(packet: dict[str, Any]) -> str:
     action = packet["action"]
     draft = packet["draft"]
     readiness = packet["readiness"]
+    official_support = packet["official_support"]
+    operator_policy = packet["operator_policy"]
     checks = "\n".join(
         f"- [{'x' if passed else ' '}] `{key}`"
         for key, passed in readiness.items()
@@ -275,6 +367,31 @@ to true. The action-time phrase is:
 ## Claim Boundary
 
 {packet['claim_boundary']}
+
+## Call Now
+
+The official DLA Customer Interaction Center is listed as available
+`{official_support['availability']}`. Call `{official_support['customer_interaction_center_phone']}`
+and have the entity name and CAGE/NCAGE code ready to provide privately when
+the agent asks. Do not put either value in this public packet.
+
+Official source: {official_support['source_url']}
+
+### Script
+
+{operator_policy['call_script']}
+
+### Stop Rule
+
+**Operator hard stop:** {operator_policy['hard_stop_display']}
+
+{operator_policy['hard_stop_reason']} If no official application-submission
+receipt exists at that point, do not upload a substitute, certify Volume V, or
+submit the proposal as though JCP were complete.
+
+Prohibited substitutes:
+
+{chr(10).join(f'- {item}' for item in operator_policy['prohibited_substitutes'])}
 """
 
 

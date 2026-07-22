@@ -83,6 +83,10 @@ def test_builds_bounded_support_draft_without_authorizing_send():
     assert packet["deadline"]["seconds_remaining_at_generation"] == 50400
     assert packet["portal_evidence"]["private_hash_redacted"] is True
     assert "private_receipt_sha256" not in packet["portal_evidence"]
+    assert packet["official_support"]["availability"] == "24/7/365"
+    assert packet["official_support"]["private_caller_input_values_included"] is False
+    assert packet["operator_policy"]["call_now"] is True
+    assert packet["operator_policy"]["hard_stop_utc"] == "2026-07-22T14:30:00Z"
 
 
 def test_action_time_readiness_requires_all_controls_but_never_authorizes():
@@ -148,6 +152,43 @@ def test_draft_excludes_sensitive_identifiers_and_claims():
     assert "i am not claiming jcp certification" in body
 
 
+def test_official_call_route_is_privacy_safe_and_receipt_only():
+    module = load_module()
+    packet = build(module)
+    support = packet["official_support"]
+    policy = packet["operator_policy"]
+    script = policy["call_script"].lower()
+
+    assert support["source_url"].startswith("https://www.dla.mil/")
+    assert support["private_caller_inputs_required"] == [
+        "entity_name",
+        "cage_or_ncage_code",
+    ]
+    assert "i have not submitted a jcp application" in script
+    assert "i am not claiming jcp certification" in script
+    assert "cage code:" not in script
+    assert policy["outcomes"] == module.REQUIRED_OPERATOR_OUTCOMES
+    assert policy["outcomes"]["portal_has_no_official_receipt_at_hard_stop"] == (
+        "STOP_NO_VOLUME_V_OR_FINAL_SUBMISSION"
+    )
+    assert "JCP organization-creation receipt" in policy["prohibited_substitutes"]
+
+
+def test_rejects_nonofficial_support_source_or_short_hard_stop_buffer():
+    module = load_module()
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    config["official_support"]["source_url"] = "https://example.com/jcp"
+
+    with pytest.raises(module.JcpSupportEscalationError, match="SOURCE_INVALID"):
+        build(module, config=config)
+
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    config["operator_policy"]["hard_stop_utc"] = "2026-07-22T15:30:00Z"
+
+    with pytest.raises(module.JcpSupportEscalationError, match="BUFFER_INVALID"):
+        build(module, config=config)
+
+
 def test_render_is_deterministic_and_records_human_unlock_phrase():
     module = load_module()
     first = build(module)
@@ -157,3 +198,6 @@ def test_render_is_deterministic_and_records_human_unlock_phrase():
     markdown = module.render_markdown(first)
     assert "SEND ONE JCP URGENT SUPPORT REQUEST" in markdown
     assert "Send performed:** `false`" in markdown
+    assert "## Call Now" in markdown
+    assert "24/7/365" in markdown
+    assert "do not upload a substitute" in markdown.lower()
