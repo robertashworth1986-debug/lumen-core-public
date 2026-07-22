@@ -21,10 +21,11 @@
     "citation_path": "CITATION.cff",
     "expected_author_name": "Robert Ashworth",
     "expected_checklist_status": "HUMAN_REVIEW_REQUIRED_NO_SEND",
-    "expected_request_status": "HOLD_IDENTIFIER_COLLISION_DUPLICATE_RECHECK_AND_HUMANUNLOCK",
+    "expected_request_status": "ACTION_TIME_READY_CANDIDATE_UNASSIGNED_NO_SEND",
     "expected_human_decision_count": 9,
     "expected_action_time_gate_count": 5,
-    "identifier_placeholder": "[IDENTIFIER_ASSIGNED_AT_ACTION_TIME]",
+    "candidate_identifier": "2026-022",
+    "expected_issue_title": "Ashworth | 2026-022",
     "required_checklist_snippets": [
       "My name and authorship are correct.",
       "I reviewed the five-page preprint and the executable-computation note.",
@@ -51,6 +52,75 @@
       "LumenCore is not endorsed by EIA."
     ],
     "author_review_unlock_phrase": "CONFIRM CODECHECK AUTHOR REVIEW COMPLETE FOR FROZEN SOURCE 1c0eb51754beffac6f4df484914e35efc21c253f"
+  },
+  "official_request_contract": {
+    "author_guide_url": "https://codecheck.org.uk/guide/community-workflow-author",
+    "configuration_spec_url": "https://codecheck.org.uk/spec/config/1.0/",
+    "launch_pad_url": "https://codecheck.org.uk/launch-pad/",
+    "frozen_author_package_files": [
+      {
+        "path": "README.md",
+        "blob_sha1": "4153cd35f1d0395dd996a7975eacbeb4744aace1"
+      },
+      {
+        "path": "codecheck.yml",
+        "blob_sha1": "73df29b85fb7ea97e910b6b1fef1bea988cd1649"
+      },
+      {
+        "path": "LICENSE",
+        "blob_sha1": "2d896a766f4a38fe468823bdabb8bf250f672e7c"
+      }
+    ],
+    "required_readme_snippets": [
+      "## Independent Execution Packet",
+      "python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+      "python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-reviewer-ubuntu-py311.lock",
+      "python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --run-dir out/codecheck_eia",
+      "The root [`codecheck.yml`](codecheck.yml) declares six outputs"
+    ],
+    "required_license_snippets": [
+      "MIT License",
+      "Third-Party Data Notice",
+      "https://www.eia.gov/about/copyrights_reuse.php",
+      "https://www.eia.gov/opendata/terms-of-service.php",
+      "LumenCore is not endorsed by EIA."
+    ],
+    "required_yaml_root_fields": [
+      "version",
+      "manifest",
+      "paper",
+      "source",
+      "lumencore"
+    ],
+    "checker_managed_yaml_root_fields": [
+      "codechecker",
+      "report",
+      "summary",
+      "repository",
+      "check_time",
+      "certificate"
+    ],
+    "expected_specification_url": "https://codecheck.org.uk/spec/config/1.0/",
+    "expected_paper_title": "A Bounded Reproducibility Capsule for Public-Data Benchmarking and Preserved Negative Gates",
+    "expected_author_name": "Robert Ashworth",
+    "expected_reference": "Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+    "expected_source": "Code, frozen EIA-930-derived input, deterministic MDA fixtures, and execution controls are versioned in https://github.com/robertashworth1986-debug/lumen-core-public",
+    "expected_request_status": "ACTION_TIME_READY_CANDIDATE_UNASSIGNED_NO_SEND",
+    "candidate_identifier": "2026-022",
+    "expected_issue_title": "Ashworth | 2026-022",
+    "required_issue_labels": [
+      "community",
+      "needs codechecker",
+      "id assigned"
+    ],
+    "required_request_snippets": [
+      "Candidate `2026-022` was clear at the latest live recheck but is not reserved.",
+      "Leave unassigned. CODECHECK or a consenting independent volunteer must supply this field.",
+      "**Work**:",
+      "**Repository and workflow**:",
+      "Do not send a parallel team email.",
+      "fresh action-time HumanUnlock"
+    ]
   },
   "exact_frozen_files": [
     {"path": "CITATION.cff", "blob_sha1": "01a70e8cec86989e7ae91458c5582d51d0918038", "hash_mode": "utf8_lf"},
@@ -159,6 +229,6 @@
     "economic_validation_complete": false,
     "valuation_validation_complete": false
   },
-  "human_unlock_policy": "Author review, duplicate-action reconciliation, collision-free Launch Pad identifier assignment, and fresh action-time HumanUnlock are required before one production CODECHECK request. Independent execution and validation fields remain false until external evidence is received.",
+  "human_unlock_policy": "Author review, duplicate-action reconciliation, a collision-free production-register identifier, exact current label verification, and fresh action-time HumanUnlock are required before one production CODECHECK request. Independent execution and validation fields remain false until external evidence is received.",
   "claim_boundary": "A passing integration check proves only byte identity of the listed computational core with the immutable target, presence and safety of the six-file manifest, and fail-closed claim state. It is not independent execution, a CODECHECK certificate, scientific validation, field validation, agency acceptance, performance endorsement, economic proof, or valuation evidence."
 }

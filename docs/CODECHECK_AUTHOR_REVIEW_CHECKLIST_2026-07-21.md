@@ -40,12 +40,12 @@ Robert should confirm each statement before any production request:
 All of these must pass after author review:
 
 1. Recheck Gmail, GitHub, and local outreach controls for a prior request.
-2. Confirm the CODECHECK Launch Pad assigns one collision-free identifier.
+2. Confirm the production register and current label set permit one collision-free identifier.
 3. Obtain fresh action-time HumanUnlock for exactly one production issue.
 4. Record the resulting issue URL and timestamp.
 5. Keep codechecker assignment, independent execution, report, certificate,
    and external-validation fields false until CODECHECK supplies evidence.
 
-As of the last verified preflight, open CODECHECK register issue #199 already
-uses identifier `2026-021`. Do not create a production issue while that
-collision remains.
+Open CODECHECK register issue #199 already uses identifier `2026-021`.
+Candidate `2026-022` was clear at the latest live recheck but is not reserved.
+Recheck immediately before action and stop if that candidate is no longer clear.

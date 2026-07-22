@@ -1,16 +1,26 @@
 # CODECHECK Community Request Draft
 
-Status: `HOLD_IDENTIFIER_COLLISION_DUPLICATE_RECHECK_AND_HUMANUNLOCK`
+Status: `ACTION_TIME_READY_CANDIDATE_UNASSIGNED_NO_SEND`
 
-This is an author-side draft. It has not been posted, emailed, submitted, assigned, or accepted. At action time, use the current CODECHECK Launch Pad and do not invent or reserve a certificate identifier outside that process.
+This is an author-side draft. It has not been posted, emailed, submitted, assigned, or accepted. Candidate `2026-022` was clear at the latest live recheck but is not reserved. At action time, recheck the production register and use the current CODECHECK Launch Pad or the official register issue route. Stop if the identifier or labels cannot be verified.
 
-The public preprint and exact source are frozen at commit `1c0eb51754beffac6f4df484914e35efc21c253f`. A 2026-07-21 Launch Pad preflight exposed an identifier collision: the proposed `2026-021` identifier was already present in [open register issue #199](https://github.com/codecheckers/register/issues/199) without the `id assigned` label. Do not create a production issue until the Launch Pad or register state resolves that collision and a fresh preflight returns one unambiguous identifier.
+The public preprint and exact source are frozen at commit `1c0eb51754beffac6f4df484914e35efc21c253f`. Open register issue [#199](https://github.com/codecheckers/register/issues/199) already uses `2026-021`. A later production-register search found no `2026-022` issue and no Ashworth issue. That makes `2026-022` a candidate only, not an assignment or reservation. Recheck immediately before action and stop on any collision.
 
-Official routes checked on 2026-07-21:
+Official routes checked again on 2026-07-22:
 
 - Author guide: https://codecheck.org.uk/guide/community-workflow-author
 - Configuration specification: https://codecheck.org.uk/spec/config/1.0/
 - Launch Pad: https://codecheck.org.uk/launch-pad/
+
+## Official Author-Package Contract
+
+The frozen commit contains the three author-side files required by the current community guide:
+
+- root `README.md` with the hash-locked Ubuntu execution commands,
+- root `codecheck.yml` with the six-output manifest and scholarly-work metadata,
+- root `LICENSE` with the MIT software license and separate EIA data-use notice.
+
+The frozen package contains the declared code and data. Checker-managed fields such as `codechecker`, `report`, `certificate`, and `check_time` remain absent until an independent codechecker supplies them.
 
 ## Launch Pad Fields
 
@@ -24,11 +34,15 @@ Leave unassigned. CODECHECK or a consenting independent volunteer must supply th
 
 ### Issue Title
 
-`[IDENTIFIER_ASSIGNED_AT_ACTION_TIME] Ashworth - A Bounded Reproducibility Capsule for Public-Data Benchmarking and Preserved Negative Gates`
+`Ashworth | 2026-022`
 
 ### Labels
 
-Select the current CODECHECK community and needs-codechecker labels offered by the production Launch Pad. Do not guess stale label names.
+- `community`
+- `needs codechecker`
+- `id assigned`
+
+These labels were verified against the current production-register pattern. Recheck that they still exist immediately before action.
 
 ### Issue Description
 
@@ -45,7 +59,7 @@ Select the current CODECHECK community and needs-codechecker labels offered by t
 1. Keep the commit-pinned public preprint and the 30-file computational-core identity register reconciled to source commit `1c0eb51754beffac6f4df484914e35efc21c253f`.
 2. Reconcile Gmail, GitHub, and local outreach registries immediately before action to prove no prior CODECHECK request would be duplicated.
 3. Robert reviews the public manuscript, issue body, source commit, license, and bounded ask.
-4. Obtain a fresh action-time HumanUnlock from Robert for exactly one production-register issue.
-5. Confirm the production Launch Pad reports no identifier collision and assigns one unambiguous identifier.
-6. Open exactly one issue through the current production Launch Pad.
+4. Recheck that `2026-022` is unused and that all three labels remain valid.
+5. Obtain a fresh action-time HumanUnlock from Robert for exactly one production-register issue titled `Ashworth | 2026-022`.
+6. Open exactly one issue. Do not send a parallel team email.
 7. Record the resulting issue URL and timestamp; keep assignment, execution, certificate, and external-validation fields false until CODECHECK supplies evidence.
