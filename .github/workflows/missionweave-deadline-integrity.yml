@@ -12,7 +12,9 @@ on:
       - "code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py"
       - "code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py"
       - "code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py"
+      - "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
       - "config/outreach_followup_policies_v1.json"
+      - "config/outreach_response_templates_v1.json"
       - "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
       - "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md"
       - "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_FOUNDER_FINISH_CARD_2026-07-21.json"
@@ -23,10 +25,13 @@ on:
       - "grant_submissions/funding_sprint_20260709/USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT_2026-07-21.json"
       - "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json"
       - "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md"
+      - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
+      - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md"
       - "tests/test_email_action_reconciliation.py"
       - "tests/test_missionweave_dsip_action_gate.py"
       - "tests/test_missionweave_founder_finish_card.py"
       - "tests/test_outreach_followup_action_queue.py"
+      - "tests/test_outreach_response_template_registry.py"
   push:
     paths:
       - ".gitattributes"
@@ -37,7 +42,9 @@ on:
       - "code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py"
       - "code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py"
       - "code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py"
+      - "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
       - "config/outreach_followup_policies_v1.json"
+      - "config/outreach_response_templates_v1.json"
       - "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json"
       - "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.md"
       - "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_FOUNDER_FINISH_CARD_2026-07-21.json"
@@ -48,10 +55,13 @@ on:
       - "grant_submissions/funding_sprint_20260709/USPTO_PRO_SE_ACCESS_GUIDANCE_RECEIPT_2026-07-21.json"
       - "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json"
       - "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md"
+      - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
+      - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md"
       - "tests/test_email_action_reconciliation.py"
       - "tests/test_missionweave_dsip_action_gate.py"
       - "tests/test_missionweave_founder_finish_card.py"
       - "tests/test_outreach_followup_action_queue.py"
+      - "tests/test_outreach_response_template_registry.py"
 
 permissions:
   contents: read
@@ -96,7 +106,8 @@ jobs:
             code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py \
             code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py \
             code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py \
-            code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py
+            code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py \
+            code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py
 
       - name: Verify deterministic public receipts and no-send controls
         run: |
@@ -104,7 +115,8 @@ jobs:
             tests/test_email_action_reconciliation.py \
             tests/test_missionweave_dsip_action_gate.py \
             tests/test_missionweave_founder_finish_card.py \
-            tests/test_outreach_followup_action_queue.py
+            tests/test_outreach_followup_action_queue.py \
+            tests/test_outreach_response_template_registry.py
 
       - name: Confirm verification did not rewrite tracked evidence
         run: git diff --exit-code
