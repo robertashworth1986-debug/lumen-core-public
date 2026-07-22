@@ -1,8 +1,8 @@
 # MissionWeave Founder Finish Card
 
-- Generated UTC: `2026-07-21T23:24:50Z`
+- Generated UTC: `2026-07-22T00:01:37.332535Z`
 - Deadline: **July 22, 2026 at 12:00 p.m. Eastern Time** (`2026-07-22T16:00:00Z`)
-- Time remaining at generation: `16` full hours
+- Time remaining at generation: `15` full hours
 - Current gate: **35/50 passed; 15 open**
 - Submission-ready: **false**
 - Status: `FOUNDER_ACTION_REQUIRED_NOT_SUBMISSION_READY`
@@ -19,9 +19,9 @@ Why first: Volume 5 cannot be locked without the required official JCP/DD Form 2
 
 Work the pre-submission evidence stage first. Do not spend action-time approval or certify final submission until the upload set and fresh portal preview are complete.
 
-- **Do now**: 8 open. Evidence, content, registration, and portal facts required before the bounded final-submission gate can open.
+- **Do now**: 7 open. Evidence, content, registration, and portal facts required before the bounded final-submission gate can open.
 - **Bound the pre-award position**: 2 open. The proposal must state a current bounded position. Implementation proof may occur during pre-award or contract negotiation only if the live portal or contracting office permits it; these gates remain fail-closed now.
-- **Do last**: 5 open. Fresh preview, corporate review, and final authorization occur only after the upload set is stable and immediately before the human submit action.
+- **Do last**: 6 open. Fresh preview, corporate review, and final authorization occur only after the upload set is stable and immediately before the human submit action.
 
 ### CMMC And TCP Decision Support
 
@@ -53,12 +53,12 @@ Work the pre-submission evidence stage first. Do not spend action-time approval 
 - Human boundary: The founder confirms the factual cost basis; the builder checks arithmetic only.
 - Clears: `VOLUME3_COST_BASIS`
 
-### 4. Review conflicts, cost separation, data rights, CMMC, and export-control planning
+### 4. Prepare conflicts, cost separation, data rights, CMMC, and export-control positions
 
-- Do: Answer conflicts and joint-venture status from current facts; reconcile the no-duplicate-cost position and technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document the bounded Technology Control Plan position. The DLA component instructions say an ITAR/EAR topic firm may be required to submit a TCP during contracting negotiation; that does not establish a current proposal-upload requirement or agency acceptance.
+- Do: Answer conflicts and joint-venture status from current facts; prepare the no-duplicate-cost reconciliation for its final post-preview corporate decision; reconcile the technical-data-rights schedule against source records; review the live CMMC requirement; preserve the no-overclaim position; and document the bounded Technology Control Plan position. The DLA component instructions say an ITAR/EAR topic firm may be required to submit a TCP during contracting negotiation; that does not establish a current proposal-upload requirement or agency acceptance.
 - Evidence needed: Current source review, hash-bound documentary register, and bounded founder/corporate-official position
 - Human boundary: No compliance, assessment, certification, or contracting-office acceptance is inferred.
-- Clears: `CMMC_PHASE_I_SELF_ASSESSMENT_POSITION, CONFLICTS_AND_JOINT_VENTURE_STATUS, CURRENT_CMMC_REQUIREMENTS_REVIEW, NO_DUPLICATE_COST_OR_DELIVERABLE, TECHNICAL_DATA_RIGHTS_ASSERTION, TECHNOLOGY_CONTROL_PLAN_DECISION`
+- Clears: `CMMC_PHASE_I_SELF_ASSESSMENT_POSITION, CONFLICTS_AND_JOINT_VENTURE_STATUS, CURRENT_CMMC_REQUIREMENTS_REVIEW, TECHNICAL_DATA_RIGHTS_ASSERTION, TECHNOLOGY_CONTROL_PLAN_DECISION`
 
 ### 5. Lock the Volume 5 supporting-document set
 
@@ -74,18 +74,18 @@ Work the pre-submission evidence stage first. Do not spend action-time approval 
 - Human boundary: The founder reviews the rendered Government portal preview.
 - Clears: `COMPLETE_PORTAL_PREVIEW_REVIEW, PORTAL_PREVIEW_RECEIPT_HASH`
 
-### 7. Perform corporate review and action-time authorization
+### 7. Perform final corporate review, no-duplicate decision, and authorization
 
-- Do: Only after the fresh preview is stable, review every volume as corporate official, capture the short-lived approval binding, and authorize the exact final submission.
+- Do: Only after the fresh preview is stable, review every volume as corporate official; finalize and hash-bind the no-duplicate-cost and deliverable decision against that exact preview; capture the short-lived approval binding; and authorize the exact final submission.
 - Evidence needed: Fresh approval timestamp and binding to the current preview/upload set
 - Human boundary: The final certification and submit click are founder-only actions.
-- Clears: `ACTION_TIME_APPROVAL_TIMESTAMP, ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION, CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW`
+- Clears: `ACTION_TIME_APPROVAL_TIMESTAMP, ACTION_TIME_FINAL_SUBMISSION_AUTHORIZATION, CORPORATE_OFFICIAL_ALL_VOLUME_REVIEW, NO_DUPLICATE_COST_OR_DELIVERABLE`
 
 ## Email State
 
 - Queue status: `ROUTING_INTEGRITY_EXCEPTION_NO_SEND`
 - MissionWeave action: `FOLLOWUP_LIMIT_REACHED_NO_SEND`
-- Queue fresh for action time: **true** (`0` / `900` seconds)
+- Queue fresh for action time: **true** (`34` / `900` seconds)
 - Mailbox recheck required now: **false**
 - Additional email due now: **false**
 - Next action: The bounded proactive follow-up allowance is exhausted. Monitor the existing thread and respond only to a specific inbound request.
@@ -110,8 +110,8 @@ Do not certify or click final submit until the regenerated action gate reports `
 ## Source Lock
 
 - Action gate: `grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json`
-- Action-gate canonical-text SHA-256: `5FFF4C4074E8F0879C38662080E90CB5FE595E982359D88BBD10AE58EF5AAB5D`
-- Outreach queue canonical-text SHA-256: `88027C4293999BEAEB42DD7847402E91F344546BF70798571CA0327D1FE8C6D3`
-- Card SHA-256: `EB92CCA4520AC44713C8B98D51FAB20BDB40F29C71F2D08CDE91644F500A52F2`
+- Action-gate canonical-text SHA-256: `2F3554BC852760F2C9D10B941A9F8263548C2302BF8C337F02B32C95B16A57C9`
+- Outreach queue canonical-text SHA-256: `AEC8CA7A2B9F9FA5DC0477B563D12E8EA8775A97C671C80DC49562616D229526`
+- Card SHA-256: `C79C230E99CBBB548500F08BBFF0B3A834A62476814450B8DFBC31DCD4FA7985`
 
 This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.
