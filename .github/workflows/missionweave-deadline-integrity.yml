@@ -14,6 +14,7 @@ on:
       - "code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py"
       - "code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py"
       - "code/ops/BUILD_MISSIONWEAVE_JCP_SUPPORT_ESCALATION.py"
+      - "code/ops/CAPTURE_MISSIONWEAVE_JCP_SUPPORT_SEND_RECEIPT.py"
       - "code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py"
       - "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
       - "config/outreach_followup_policies_v1.json"
@@ -41,6 +42,7 @@ on:
       - "tests/test_missionweave_dsip_action_gate.py"
       - "tests/test_missionweave_founder_finish_card.py"
       - "tests/test_missionweave_jcp_support_escalation.py"
+      - "tests/test_capture_missionweave_jcp_support_send_receipt.py"
       - "tests/test_outreach_followup_action_queue.py"
       - "tests/test_outreach_response_template_registry.py"
   push:
@@ -55,6 +57,7 @@ on:
       - "code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py"
       - "code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py"
       - "code/ops/BUILD_MISSIONWEAVE_JCP_SUPPORT_ESCALATION.py"
+      - "code/ops/CAPTURE_MISSIONWEAVE_JCP_SUPPORT_SEND_RECEIPT.py"
       - "code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py"
       - "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
       - "config/outreach_followup_policies_v1.json"
@@ -82,6 +85,7 @@ on:
       - "tests/test_missionweave_dsip_action_gate.py"
       - "tests/test_missionweave_founder_finish_card.py"
       - "tests/test_missionweave_jcp_support_escalation.py"
+      - "tests/test_capture_missionweave_jcp_support_send_receipt.py"
       - "tests/test_outreach_followup_action_queue.py"
       - "tests/test_outreach_response_template_registry.py"
 
@@ -131,6 +135,7 @@ jobs:
             code/ops/BUILD_MISSIONWEAVE_DSIP_ACTION_GATE.py \
             code/ops/BUILD_MISSIONWEAVE_FOUNDER_FINISH_CARD.py \
             code/ops/BUILD_MISSIONWEAVE_JCP_SUPPORT_ESCALATION.py \
+            code/ops/CAPTURE_MISSIONWEAVE_JCP_SUPPORT_SEND_RECEIPT.py \
             code/ops/BUILD_OUTREACH_FOLLOWUP_ACTION_QUEUE.py \
             code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py
 
@@ -143,6 +148,7 @@ jobs:
             tests/test_missionweave_dsip_action_gate.py \
             tests/test_missionweave_founder_finish_card.py \
             tests/test_missionweave_jcp_support_escalation.py \
+            tests/test_capture_missionweave_jcp_support_send_receipt.py \
             tests/test_outreach_followup_action_queue.py \
             tests/test_outreach_response_template_registry.py
 
