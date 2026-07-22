@@ -508,6 +508,27 @@ def test_evaluator_signing_hash_requires_completed_protocol(tmp_path: Path):
         verifier.evaluator_protocol_signing_payload_sha256(protocol)
     )
 
+    signature = tmp_path / "evaluator_signature.txt"
+    signature.write_text("evaluator signature artifact", encoding="utf-8")
+    protocol["freeze"].update(
+        {
+            "accepted_protocol_payload_sha256": preflight[
+                "signing_payload_sha256"
+            ],
+            "signed_payload_sha256": preflight["signing_payload_sha256"],
+            "detached_signature_artifact_sha256": verifier.file_sha256(signature),
+        }
+    )
+    final = verifier.validate_evaluator_protocol(
+        protocol,
+        expect_template=False,
+        independence_artifact=independence,
+        signature_artifact=signature,
+    )
+    assert final["status"] == "EXTERNAL_EVALUATOR_PROTOCOL_ACCEPTED_AND_FROZEN"
+    assert final["evaluation_design_frozen"] is True
+    assert final["performance_promotion_allowed"] is False
+
     blank = json.loads(EVALUATOR_TEMPLATE_PATH.read_text(encoding="utf-8"))
     with pytest.raises(ValueError, match="evaluator.name"):
         verifier.validate_evaluator_protocol_for_signing(
