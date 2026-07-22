@@ -1,7 +1,7 @@
 # Outreach Follow-up Action Queue - 2026-07-18
 
 - Status: `ROUTING_INTEGRITY_EXCEPTION_NO_SEND`
-- As of UTC: `2026-07-22T00:14:25Z`
+- As of UTC: `2026-07-22T00:37:21Z`
 - Lanes: `18`
 - Due for mailbox recheck: `0`
 - Held no-send: `1`
@@ -9,7 +9,7 @@
 - Send now: `0`
 - Routing integrity exceptions: `1`
 - Autonomous external send allowed: `false`
-- Queue SHA-256: `3DFE3A9605B5D32347130DCA7482614339D80309AD4229087EC76FD57138EA8E`
+- Queue SHA-256: `9AE9C3BEEF6560A2E90A6E96552521D841AB54185EDCD81FE3E48CAF9AEE83B3`
 
 ## Action Queue
 
@@ -42,4 +42,4 @@
 
 ## Claim Boundary
 
-This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, and neither condition authorizes a draft or send. Historical send-timing exceptions remain counted against the send cap and are surfaced fail-closed. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.
+This queue evaluates communication timing and routing controls only. A hold expiration requires a fresh mailbox check that is recent, timestamped, and receipted; prior proactive sends are derived from a sealed receipt ledger, new send receipts require a deterministic source-message/thread-bound response identity, and a repeated identity fails closed; and neither condition authorizes a draft or send. Historical send-timing exceptions remain counted against the send cap and are surfaced fail-closed. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information.
