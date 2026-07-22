@@ -1,12 +1,12 @@
 {
   "schema": "lumencore.missionweave_founder_finish_card.v1",
-  "generated_utc": "2026-07-22T00:15:43Z",
+  "generated_utc": "2026-07-22T00:38:26Z",
   "status": "FOUNDER_ACTION_REQUIRED_NOT_SUBMISSION_READY",
   "topic": "DLA26BZ03-NV011",
   "deadline": {
     "expected_local": "July 22, 2026 at 12:00 p.m. Eastern Time",
     "expected_utc": "2026-07-22T16:00:00Z",
-    "seconds_remaining": 56657,
+    "seconds_remaining": 55294,
     "hours_remaining_rounded_down": 15,
     "deadline_passed": false,
     "live_dsip_recheck_required": true,
@@ -201,8 +201,8 @@
   ],
   "outreach_control": {
     "queue_path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
-    "queue_as_of_utc": "2026-07-22T00:14:25Z",
-    "queue_age_seconds": 78,
+    "queue_as_of_utc": "2026-07-22T00:37:21Z",
+    "queue_age_seconds": 65,
     "mailbox_recheck_max_age_seconds": 900,
     "queue_fresh_for_action_time": true,
     "mailbox_recheck_required_now": false,
@@ -251,9 +251,9 @@
     "gate_canonical_text_sha256": "2F3554BC852760F2C9D10B941A9F8263548C2302BF8C337F02B32C95B16A57C9",
     "gate_payload_sha256": "8cb9e6f33064d43b4e963d21358263e739e7529fb964299220cb720a10a3c00f",
     "gate_source_checks_pass": true,
-    "queue_canonical_text_sha256": "8F50030A024464B9561D5DFCA88DA926C3C18868BA9C0DD54598D45EE26758E8",
-    "queue_payload_sha256": "3DFE3A9605B5D32347130DCA7482614339D80309AD4229087EC76FD57138EA8E"
+    "queue_canonical_text_sha256": "D79FE5B0BEF98226AC4F0B4ED87C87311B63CD0E5D51C57CFF02C913822AF0D6",
+    "queue_payload_sha256": "9AE9C3BEEF6560A2E90A6E96552521D841AB54185EDCD81FE3E48CAF9AEE83B3"
   },
   "claim_boundary": "This card is a current operator checklist derived from local control artifacts. It does not prove JCP approval, DD Form 2345 certification, CMMC status, ITAR compliance, proposal submission, DLA receipt, eligibility, selection, award, endorsement, deployment, technical validation, funding, or value.",
-  "card_sha256": "12DF8B1531CFCA718021D4ABAFD246EEE331217456EE82601E7909E44BA9CD76"
+  "card_sha256": "441027F634E2170CD7F22D8A0EF186A7809ADBE3ABDAE662E5F0981424620693"
 }
