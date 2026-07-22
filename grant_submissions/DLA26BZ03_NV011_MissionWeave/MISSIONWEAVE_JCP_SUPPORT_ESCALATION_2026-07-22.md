@@ -15,6 +15,7 @@
 - [x] `fresh_duplicate_check_confirmed`
 - [ ] `founder_review_confirmed`
 - [x] `gmail_draft_created`
+- [x] `gmail_draft_identity_match_confirmed`
 - [x] `portal_receipt_reconciled_privately`
 
 The existing DSIP/component follow-up lane remains exhausted and must not be
@@ -31,6 +32,8 @@ to true. The action-time phrase is:
 **Subject:** Urgent JCP portal status sync before DLA SBIR deadline - DLA26BZ03-NV011
 
 **Attachments:** None
+
+**Outbound request identity:** `127EFC391BB4BC90129344E3C88232A38871258A95C45985B7E6EF2CA322789E`
 
 Hello JCP Support,
 

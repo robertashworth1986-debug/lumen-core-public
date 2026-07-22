@@ -25,6 +25,7 @@ OUT_MD = MISSION_DIR / "MISSIONWEAVE_JCP_SUPPORT_ESCALATION_2026-07-22.md"
 
 PACKET_SCHEMA = "lumencore.missionweave_jcp_support_escalation.v1"
 CONFIG_SCHEMA = "lumencore.missionweave_jcp_support_escalation_config.v1"
+OUTBOUND_REQUEST_IDENTITY_SCHEMA = "lumencore.outbound_request_identity.v1"
 
 REQUIRED_OPERATOR_OUTCOMES = {
     "official_application_receipt_obtained": (
@@ -62,6 +63,35 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest().upper()
+
+
+def sha256_text(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest().upper()
+
+
+def sha256_canonical_json(value: dict[str, Any]) -> str:
+    canonical = json.dumps(
+        value,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest().upper()
+
+
+def build_outbound_request_identity(config: dict[str, Any], body: str) -> dict[str, str]:
+    identity = {
+        "attachment_policy": str(config["attachment_policy"]),
+        "body_sha256": sha256_text(body),
+        "recipient": str(config["recipient"]).strip().lower(),
+        "route_id": str(config["route_id"]).strip(),
+        "schema": OUTBOUND_REQUEST_IDENTITY_SCHEMA,
+        "subject": str(config["subject"]).strip(),
+    }
+    return {
+        **identity,
+        "outbound_request_identity_sha256": sha256_canonical_json(identity),
+    }
 
 
 def parse_utc(value: str) -> datetime:
@@ -207,6 +237,7 @@ def build_packet(
     founder_review_confirmed: bool = False,
     fresh_duplicate_check_confirmed: bool = False,
     gmail_draft_created: bool = False,
+    gmail_draft_identity_match_confirmed: bool = False,
 ) -> dict[str, Any]:
     require_config(config)
     require_portal_receipt(portal_receipt, config)
@@ -221,6 +252,7 @@ def build_packet(
     seconds_remaining = max(0, int((deadline - generated).total_seconds()))
 
     body = "\n\n".join(config["body_paragraphs"])
+    outbound_identity = build_outbound_request_identity(config, body)
     forbidden_literals = (
         "password",
         "one-time code",
@@ -239,6 +271,9 @@ def build_packet(
         "fresh_duplicate_check_confirmed": bool(fresh_duplicate_check_confirmed),
         "founder_review_confirmed": bool(founder_review_confirmed),
         "gmail_draft_created": bool(gmail_draft_created),
+        "gmail_draft_identity_match_confirmed": bool(
+            gmail_draft_identity_match_confirmed
+        ),
         "portal_receipt_reconciled_privately": True,
     }
     action_time_ready = all(readiness.values())
@@ -270,8 +305,13 @@ def build_packet(
         },
         "draft": {
             "attachment_policy": "NONE",
+            "body_sha256": outbound_identity["body_sha256"],
             "body": body,
+            "identity_schema": outbound_identity["schema"],
             "mailbox_draft_created": bool(gmail_draft_created),
+            "outbound_request_identity_sha256": outbound_identity[
+                "outbound_request_identity_sha256"
+            ],
             "recipient": config["recipient"],
             "recipient_role": config["recipient_role"],
             "subject": config["subject"],
@@ -362,6 +402,8 @@ to true. The action-time phrase is:
 
 **Attachments:** None
 
+**Outbound request identity:** `{draft['outbound_request_identity_sha256']}`
+
 {draft['body']}
 
 ## Claim Boundary
@@ -420,6 +462,10 @@ def main() -> int:
     parser.add_argument("--confirm-founder-review", action="store_true")
     parser.add_argument("--confirm-fresh-duplicate-check", action="store_true")
     parser.add_argument("--confirm-gmail-draft-created", action="store_true")
+    parser.add_argument(
+        "--confirm-gmail-draft-identity-match",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     portal_receipt = read_json(args.portal_receipt)
@@ -432,6 +478,9 @@ def main() -> int:
         founder_review_confirmed=args.confirm_founder_review,
         fresh_duplicate_check_confirmed=args.confirm_fresh_duplicate_check,
         gmail_draft_created=args.confirm_gmail_draft_created,
+        gmail_draft_identity_match_confirmed=(
+            args.confirm_gmail_draft_identity_match
+        ),
     )
     write_outputs(packet, args.out_json, args.out_md)
     print(json.dumps({

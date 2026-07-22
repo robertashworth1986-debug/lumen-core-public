@@ -12,13 +12,16 @@
   "claim_boundary": "This packet prepares one JCP portal-support request. It does not prove JCP application submission, DD Form 2345 certification, SAM or SPRS compliance, proposal submission, eligibility, or award status.",
   "deadline": {
     "display": "2026-07-22 12:00 PM Eastern / 11:00 AM Central",
-    "seconds_remaining_at_generation": 48701,
+    "seconds_remaining_at_generation": 48073,
     "utc": "2026-07-22T16:00:00Z"
   },
   "draft": {
     "attachment_policy": "NONE",
+    "body_sha256": "85A9D3733C7B68B8C4A2BF00C013AC720DFF92A921EAD4D237ADD704259FCEF2",
     "body": "Hello JCP Support,\n\nI am preparing a DLA SBIR proposal for topic DLA26BZ03-NV011, due July 22, 2026 at 12:00 p.m. Eastern. My JCP account and organization were created successfully, but the organization status fields remain unavailable and the certification preflight does not populate the SAM details needed for review.\n\nI have not submitted a JCP application and I am not claiming JCP certification. Could you please advise the fastest official step to synchronize the entity record and, if the prerequisites are complete, obtain an official application-submission receipt before the proposal deadline?\n\nI will not transmit export-controlled technical information, credentials, or private entity identifiers by email. I can provide account or entity details through an official secure channel upon request.\n\nThank you,\n\nRobert Ashworth",
+    "identity_schema": "lumencore.outbound_request_identity.v1",
     "mailbox_draft_created": true,
+    "outbound_request_identity_sha256": "127EFC391BB4BC90129344E3C88232A38871258A95C45985B7E6EF2CA322789E",
     "recipient": "jcp-admin@dla.mil",
     "recipient_role": "JCP_ADMIN_SUPPORT",
     "subject": "Urgent JCP portal status sync before DLA SBIR deadline - DLA26BZ03-NV011"
@@ -29,7 +32,7 @@
     "recorded_proactive_send_count": 1,
     "send_now": false
   },
-  "generated_utc": "2026-07-22T02:28:19Z",
+  "generated_utc": "2026-07-22T02:38:47Z",
   "portal_evidence": {
     "application_submitted": false,
     "organization_created": true,
@@ -78,6 +81,7 @@
     "fresh_duplicate_check_confirmed": true,
     "founder_review_confirmed": false,
     "gmail_draft_created": true,
+    "gmail_draft_identity_match_confirmed": true,
     "portal_receipt_reconciled_privately": true
   },
   "route_id": "missionweave_jcp_portal_support",

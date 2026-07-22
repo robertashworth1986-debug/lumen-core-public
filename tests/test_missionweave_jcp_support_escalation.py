@@ -70,6 +70,11 @@ def test_builds_bounded_support_draft_without_authorizing_send():
     assert packet["route_id"] == "missionweave_jcp_portal_support"
     assert packet["draft"]["recipient"] == "jcp-admin@dla.mil"
     assert packet["draft"]["attachment_policy"] == "NONE"
+    assert len(packet["draft"]["body_sha256"]) == 64
+    assert len(packet["draft"]["outbound_request_identity_sha256"]) == 64
+    assert packet["draft"]["identity_schema"] == (
+        module.OUTBOUND_REQUEST_IDENTITY_SCHEMA
+    )
     assert packet["draft"]["mailbox_draft_created"] is False
     assert packet["action"]["send_authorized"] is False
     assert packet["action"]["send_performed"] is False
@@ -78,6 +83,7 @@ def test_builds_bounded_support_draft_without_authorizing_send():
         "fresh_duplicate_check_confirmed",
         "founder_review_confirmed",
         "gmail_draft_created",
+        "gmail_draft_identity_match_confirmed",
     }
     assert packet["existing_component_route"]["send_now"] is False
     assert packet["deadline"]["seconds_remaining_at_generation"] == 50400
@@ -97,6 +103,7 @@ def test_action_time_readiness_requires_all_controls_but_never_authorizes():
         founder_review_confirmed=True,
         fresh_duplicate_check_confirmed=True,
         gmail_draft_created=True,
+        gmail_draft_identity_match_confirmed=True,
     )
 
     assert partial["action"]["action_time_ready"] is False
@@ -106,6 +113,36 @@ def test_action_time_readiness_requires_all_controls_but_never_authorizes():
     assert ready["draft"]["mailbox_draft_created"] is True
     assert ready["action"]["send_decision"] == (
         "READY_FOR_ACTION_TIME_HUMAN_UNLOCK_NOT_AUTHORIZED"
+    )
+
+
+def test_outbound_request_identity_is_stable_and_mutation_sensitive():
+    module = load_module()
+    first = build(module)
+    repeated = build(module)
+    changed_config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    changed_config["subject"] += " [changed]"
+    changed = build(module, config=changed_config)
+
+    first_identity = first["draft"]["outbound_request_identity_sha256"]
+    assert first_identity == repeated["draft"]["outbound_request_identity_sha256"]
+    assert first_identity != changed["draft"]["outbound_request_identity_sha256"]
+    assert first["draft"]["body_sha256"] == repeated["draft"]["body_sha256"]
+    assert first["draft"]["body_sha256"] == changed["draft"]["body_sha256"]
+
+
+def test_outbound_request_identity_binds_no_attachment_policy():
+    module = load_module()
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    body = "\n\n".join(config["body_paragraphs"])
+    identity = module.build_outbound_request_identity(config, body)
+    altered = dict(config)
+    altered["attachment_policy"] = "ONE_FILE"
+    altered_identity = module.build_outbound_request_identity(altered, body)
+
+    assert identity["attachment_policy"] == "NONE"
+    assert identity["outbound_request_identity_sha256"] != (
+        altered_identity["outbound_request_identity_sha256"]
     )
 
 
@@ -198,6 +235,7 @@ def test_render_is_deterministic_and_records_human_unlock_phrase():
     markdown = module.render_markdown(first)
     assert "SEND ONE JCP URGENT SUPPORT REQUEST" in markdown
     assert "Send performed:** `false`" in markdown
+    assert "**Outbound request identity:**" in markdown
     assert "## Call Now" in markdown
     assert "24/7/365" in markdown
     assert "do not upload a substitute" in markdown.lower()
