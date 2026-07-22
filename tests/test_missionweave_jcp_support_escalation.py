@@ -70,27 +70,36 @@ def test_builds_bounded_support_draft_without_authorizing_send():
     assert packet["route_id"] == "missionweave_jcp_portal_support"
     assert packet["draft"]["recipient"] == "jcp-admin@dla.mil"
     assert packet["draft"]["attachment_policy"] == "NONE"
+    assert packet["draft"]["mailbox_draft_created"] is False
     assert packet["action"]["send_authorized"] is False
     assert packet["action"]["send_performed"] is False
     assert packet["action"]["action_time_ready"] is False
+    assert set(packet["action"]["missing_readiness_controls"]) == {
+        "fresh_duplicate_check_confirmed",
+        "founder_review_confirmed",
+        "gmail_draft_created",
+    }
     assert packet["existing_component_route"]["send_now"] is False
     assert packet["deadline"]["seconds_remaining_at_generation"] == 50400
     assert packet["portal_evidence"]["private_hash_redacted"] is True
     assert "private_receipt_sha256" not in packet["portal_evidence"]
 
 
-def test_action_time_readiness_requires_both_human_controls_but_never_authorizes():
+def test_action_time_readiness_requires_all_controls_but_never_authorizes():
     module = load_module()
     partial = build(module, founder_review_confirmed=True)
     ready = build(
         module,
         founder_review_confirmed=True,
         fresh_duplicate_check_confirmed=True,
+        gmail_draft_created=True,
     )
 
     assert partial["action"]["action_time_ready"] is False
     assert ready["action"]["action_time_ready"] is True
+    assert ready["action"]["missing_readiness_controls"] == []
     assert ready["action"]["send_authorized"] is False
+    assert ready["draft"]["mailbox_draft_created"] is True
     assert ready["action"]["send_decision"] == (
         "READY_FOR_ACTION_TIME_HUMAN_UNLOCK_NOT_AUTHORIZED"
     )

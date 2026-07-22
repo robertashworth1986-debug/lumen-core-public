@@ -135,6 +135,7 @@ def build_packet(
     generated_utc: str,
     founder_review_confirmed: bool = False,
     fresh_duplicate_check_confirmed: bool = False,
+    gmail_draft_created: bool = False,
 ) -> dict[str, Any]:
     require_config(config)
     require_portal_receipt(portal_receipt, config)
@@ -166,18 +167,23 @@ def build_packet(
         "draft_contains_no_attachment": True,
         "fresh_duplicate_check_confirmed": bool(fresh_duplicate_check_confirmed),
         "founder_review_confirmed": bool(founder_review_confirmed),
+        "gmail_draft_created": bool(gmail_draft_created),
         "portal_receipt_reconciled_privately": True,
     }
     action_time_ready = all(readiness.values())
+    missing_readiness_controls = [
+        key for key, passed in readiness.items() if not passed
+    ]
     return {
         "action": {
             "action_time_ready": action_time_ready,
             "exact_human_unlock_phrase": config["exact_human_unlock_phrase"],
+            "missing_readiness_controls": missing_readiness_controls,
             "send_authorized": False,
             "send_decision": (
                 "READY_FOR_ACTION_TIME_HUMAN_UNLOCK_NOT_AUTHORIZED"
                 if action_time_ready
-                else "HOLD_FOUNDER_REVIEW_DUPLICATE_RECHECK_AND_HUMAN_UNLOCK"
+                else "HOLD_MISSING_READINESS_CONTROLS_AND_HUMAN_UNLOCK"
             ),
             "send_performed": False,
         },
@@ -194,6 +200,7 @@ def build_packet(
         "draft": {
             "attachment_policy": "NONE",
             "body": body,
+            "mailbox_draft_created": bool(gmail_draft_created),
             "recipient": config["recipient"],
             "recipient_role": config["recipient_role"],
             "subject": config["subject"],
@@ -295,6 +302,7 @@ def main() -> int:
     parser.add_argument("--out-md", type=Path, default=OUT_MD)
     parser.add_argument("--confirm-founder-review", action="store_true")
     parser.add_argument("--confirm-fresh-duplicate-check", action="store_true")
+    parser.add_argument("--confirm-gmail-draft-created", action="store_true")
     args = parser.parse_args()
 
     portal_receipt = read_json(args.portal_receipt)
@@ -306,6 +314,7 @@ def main() -> int:
         generated_utc=args.as_of_utc,
         founder_review_confirmed=args.confirm_founder_review,
         fresh_duplicate_check_confirmed=args.confirm_fresh_duplicate_check,
+        gmail_draft_created=args.confirm_gmail_draft_created,
     )
     write_outputs(packet, args.out_json, args.out_md)
     print(json.dumps({

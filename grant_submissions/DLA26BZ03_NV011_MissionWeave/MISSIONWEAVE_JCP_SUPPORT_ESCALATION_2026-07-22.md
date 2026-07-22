@@ -1,6 +1,6 @@
 # MissionWeave JCP Support Escalation
 
-**State:** `HOLD_FOUNDER_REVIEW_DUPLICATE_RECHECK_AND_HUMAN_UNLOCK`
+**State:** `HOLD_MISSING_READINESS_CONTROLS_AND_HUMAN_UNLOCK`
 
 **Deadline:** 2026-07-22 12:00 PM Eastern / 11:00 AM Central
 
@@ -12,8 +12,9 @@
 
 - [x] `component_route_duplicate_block_preserved`
 - [x] `draft_contains_no_attachment`
-- [ ] `fresh_duplicate_check_confirmed`
+- [x] `fresh_duplicate_check_confirmed`
 - [ ] `founder_review_confirmed`
+- [x] `gmail_draft_created`
 - [x] `portal_receipt_reconciled_privately`
 
 The existing DSIP/component follow-up lane remains exhausted and must not be
