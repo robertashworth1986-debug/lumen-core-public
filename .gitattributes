@@ -18,10 +18,12 @@ examples/proof_capsule/** text eol=lf
 /code/ops/RUN_FAA_SDR_10K_BENCHMARK.py text eol=lf
 /code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py text eol=lf
 /code/ops/VERIFY_CODECHECK_MAINLINE_INTEGRATION.py text eol=lf
+/code/ops/VERIFY_CODECHECK_INDEPENDENT_EXECUTION_RECEIPT.py text eol=lf
 /code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py text eol=lf
 /code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py text eol=lf
 /config/codecheck_eia_mainline_integration_v1.json text eol=lf
 /config/codecheck_eia_release_candidate_v1.json text eol=lf
+/config/codecheck_independent_execution_receipt_template_v1.json text eol=lf
 /config/codecheck_reviewer_container_v1.json text eol=lf
 /config/codecheck_reviewer_runtime_v1.json text eol=lf
 /config/eia_grid_residual_moe_protocol_v1.json text eol=lf
@@ -34,12 +36,14 @@ examples/proof_capsule/** text eol=lf
 /docs/CODECHECK_AUTHOR_REVIEW_CHECKLIST_2026-07-21.md text eol=lf
 /docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md text eol=lf
 /docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md text eol=lf
+/docs/CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md text eol=lf
 /docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md text eol=lf
 /docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md text eol=lf
 /docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf binary
 /evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/*.json text eol=lf
 /evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz binary
 /tests/test_codecheck_eia_mainline_integration.py text eol=lf
+/tests/test_codecheck_independent_execution_receipt.py text eol=lf
 /tests/test_codecheck_eia_release_candidate.py text eol=lf
 /tests/test_codecheck_reviewer_container.py text eol=lf
 /tests/test_codecheck_reviewer_runtime.py text eol=lf
