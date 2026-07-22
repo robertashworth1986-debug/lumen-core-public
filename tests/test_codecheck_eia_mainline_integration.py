@@ -38,6 +38,54 @@ def test_mainline_integration_is_exact_bounded_and_fail_closed():
     assert review["human_completed_item_count"] == 0
     assert review["human_author_review_complete"] is False
     assert review["production_request_authorized"] is False
+    contract = receipt["official_request_contract"]
+    assert contract["passed"] is True
+    assert contract["status"] == "OFFICIAL_REQUEST_CONTRACT_READY_NO_SEND"
+    assert contract["candidate_identifier"] == "2026-022"
+    assert contract["candidate_reserved"] is False
+    assert contract["external_action_authorized"] is False
+    assert contract["request_opened"] is False
+
+
+def test_official_request_contract_binds_the_frozen_author_package():
+    module = load_module()
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+
+    contract = module.inspect_official_request_contract(config)
+
+    assert contract["passed"] is True
+    assert len(contract["frozen_author_files"]) == 3
+    assert all(row["present"] for row in contract["frozen_author_files"])
+    assert all(row["matched"] for row in contract["frozen_author_files"])
+    assert all(row["utf8"] for row in contract["frozen_author_files"])
+    assert contract["missing_readme_snippets"] == []
+    assert contract["missing_license_snippets"] == []
+    assert contract["missing_request_snippets"] == []
+    assert contract["missing_request_labels"] == []
+    assert contract["missing_yaml_root_fields"] == []
+    assert contract["checker_managed_yaml_root_fields_present"] == []
+
+
+def test_frozen_author_package_detects_wrong_blob_identity():
+    module = load_module()
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    row = dict(config["official_request_contract"]["frozen_author_package_files"][0])
+    row["blob_sha1"] = "0" * 40
+
+    observed = module.inspect_frozen_git_file(config["frozen_target"]["commit"], row)
+
+    assert observed["present"] is True
+    assert observed["matched"] is False
+
+
+def test_yaml_root_field_parser_exposes_premature_checker_metadata():
+    module = load_module()
+    fields = module.parse_yaml_root_fields(
+        "%YAML 1.1\n---\nmanifest:\n  - file: out/result.json\npaper:\n  title: bounded\n"
+        "codechecker:\n  - name: Premature Reviewer\nreport: pending\n"
+    )
+
+    assert fields == ["manifest", "paper", "codechecker", "report"]
 
 
 def test_line_endings_do_not_change_frozen_text_identity(tmp_path):
@@ -138,6 +186,7 @@ def test_workflow_hashes_artifacts_from_the_uploaded_root():
         encoding="utf-8"
     )
 
+    assert "fetch-depth: 0" in workflow
     assert "cd out/reproducibility/ci" in workflow
     assert "find . -type f ! -name SHA256SUMS -print0" in workflow
     assert "> SHA256SUMS" in workflow

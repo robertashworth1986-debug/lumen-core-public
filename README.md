@@ -43,6 +43,18 @@ evidence only. Independent execution, a CODECHECK certificate, scientific or
 field validation, agency approval, savings, trading performance, patent
 conclusions, and company valuation remain unverified.
 
+### Frozen CODECHECK package
+
+The external execution target is the immutable source commit above, not the
+moving branch head. Its root `README.md`, `codecheck.yml`, and `LICENSE` form
+the author package required by the CODECHECK community workflow. The frozen
+README contains the exact dependency-lock and capsule commands; the six files
+declared in `codecheck.yml` are the outputs a reviewer must recreate.
+
+This branch separately verifies that the 30-file computational core remains
+byte-identical to that target. Reviewer assignment, execution, reporting, and
+certificate metadata are intentionally absent until supplied by CODECHECK.
+
 ## Core method
 
 ```text

@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -22,6 +23,8 @@ CHECKBOX_LINE = re.compile(
     re.MULTILINE,
 )
 NUMBERED_LINE = re.compile(r"^\d+\.\s+", re.MULTILINE)
+YAML_ROOT_FIELD = re.compile(r"^(?P<name>[A-Za-z][A-Za-z0-9_-]*):(?:\s|$)")
+COMMIT_SHA = re.compile(r"^[0-9a-f]{40}$")
 PRIVATE_PATTERNS = (
     re.compile(r"(?<![A-Za-z0-9])[A-Za-z]:[/\\](?![/\\])", re.I),
     re.compile(
@@ -90,6 +93,52 @@ def inspect_frozen_file(row: dict[str, str], root: Path = ROOT) -> dict[str, Any
     }
 
 
+def inspect_frozen_git_file(
+    commit: str,
+    row: dict[str, str],
+    root: Path = ROOT,
+) -> dict[str, Any]:
+    relative = row["path"]
+    safe = safe_repo_path(relative)
+    commit_safe = bool(COMMIT_SHA.fullmatch(commit))
+    observed = None
+    text = None
+    error = None
+    present = False
+    if safe and commit_safe:
+        try:
+            result = subprocess.run(
+                ["git", "cat-file", "blob", f"{commit}:{relative}"],
+                cwd=root,
+                capture_output=True,
+                check=False,
+                timeout=10,
+            )
+            present = result.returncode == 0
+            if present:
+                observed = git_blob_sha1(result.stdout)
+                try:
+                    text = result.stdout.decode("utf-8")
+                except UnicodeDecodeError as exc:
+                    error = str(exc)
+            else:
+                error = result.stderr.decode("utf-8", errors="replace").strip()
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            error = str(exc)
+    return {
+        "path": relative,
+        "safe": safe,
+        "commit_safe": commit_safe,
+        "present": present,
+        "expected_blob_sha1": row["blob_sha1"],
+        "observed_blob_sha1": observed,
+        "matched": present and observed == row["blob_sha1"],
+        "utf8": text is not None,
+        "text": text,
+        "error": error,
+    }
+
+
 def parse_codecheck_manifest(text: str) -> list[str]:
     outputs: list[str] = []
     in_manifest = False
@@ -104,6 +153,17 @@ def parse_codecheck_manifest(text: str) -> list[str]:
             if match:
                 outputs.append(match.group("path"))
     return outputs
+
+
+def parse_yaml_root_fields(text: str) -> list[str]:
+    fields: list[str] = []
+    for line in text.splitlines():
+        if not line or line.startswith((" ", "\t", "#", "%", "---")):
+            continue
+        match = YAML_ROOT_FIELD.match(line)
+        if match:
+            fields.append(match.group("name"))
+    return fields
 
 
 def normalize_whitespace(value: str) -> str:
@@ -241,7 +301,12 @@ def inspect_author_review(
         "codecheck_author_exact": codecheck_author_exact,
         "citation_author_exact": citation_author_exact,
         "frozen_facts_bound": all(frozen_fact_checks.values()),
-        "identifier_left_for_action_time": control["identifier_placeholder"] in request_text,
+        "candidate_identifier_bounded": (
+            control["expected_issue_title"] in request_text
+            and control["candidate_identifier"] in request_text
+            and "not reserved" in request_text
+            and "[IDENTIFIER_ASSIGNED_AT_ACTION_TIME]" not in request_text
+        ),
     }
     passed = all(checks.values())
     return {
@@ -263,6 +328,140 @@ def inspect_author_review(
         "missing_license_snippets": missing_license_snippets,
         "author_review_unlock_phrase": control["author_review_unlock_phrase"],
         "production_request_authorized": False,
+    }
+
+
+def inspect_official_request_contract(
+    config: dict[str, Any],
+    root: Path = ROOT,
+) -> dict[str, Any]:
+    contract = config["official_request_contract"]
+    frozen = config["frozen_target"]
+    rows = [
+        inspect_frozen_git_file(frozen["commit"], row, root)
+        for row in contract["frozen_author_package_files"]
+    ]
+    package = {row["path"]: row for row in rows}
+
+    def package_text(path: str) -> str:
+        row = package.get(path, {})
+        value = row.get("text")
+        return value if isinstance(value, str) else ""
+
+    readme_text = package_text("README.md")
+    codecheck_text = package_text("codecheck.yml")
+    license_text = package_text("LICENSE")
+    request_path = root / config["author_review_control"]["request_draft_path"]
+    request_text = request_path.read_text(encoding="utf-8") if request_path.is_file() else ""
+
+    readme_normalized = normalize_whitespace(readme_text)
+    license_normalized = normalize_whitespace(license_text)
+    request_normalized = normalize_whitespace(request_text)
+    root_fields = parse_yaml_root_fields(codecheck_text)
+    root_field_set = set(root_fields)
+    manifest_outputs = parse_codecheck_manifest(codecheck_text)
+
+    missing_readme_snippets = [
+        value
+        for value in contract["required_readme_snippets"]
+        if normalize_whitespace(value) not in readme_normalized
+    ]
+    missing_license_snippets = [
+        value
+        for value in contract["required_license_snippets"]
+        if normalize_whitespace(value) not in license_normalized
+    ]
+    missing_request_snippets = [
+        value
+        for value in contract["required_request_snippets"]
+        if normalize_whitespace(value) not in request_normalized
+    ]
+    missing_labels = [
+        value
+        for value in contract["required_issue_labels"]
+        if f"- `{value}`" not in request_text
+    ]
+    checker_managed_present = sorted(
+        root_field_set.intersection(contract["checker_managed_yaml_root_fields"])
+    )
+    required_root_fields_missing = sorted(
+        set(contract["required_yaml_root_fields"]).difference(root_field_set)
+    )
+    expected_outputs = config["manifest_outputs"]
+    status_line = f"Status: `{contract['expected_request_status']}`"
+
+    checks = {
+        "frozen_commit_safe": bool(COMMIT_SHA.fullmatch(frozen["commit"])),
+        "frozen_author_paths_safe": all(row["safe"] for row in rows),
+        "frozen_author_paths_unique": len(rows) == len({row["path"] for row in rows}),
+        "frozen_author_files_present": all(row["present"] for row in rows),
+        "frozen_author_files_blob_exact": all(row["matched"] for row in rows),
+        "frozen_author_files_utf8": all(row["utf8"] for row in rows),
+        "readme_execution_contract_complete": not missing_readme_snippets,
+        "license_contract_complete": not missing_license_snippets,
+        "yaml_explicit_document": codecheck_text.startswith("%YAML 1.1\n---\n"),
+        "yaml_root_fields_unique": len(root_fields) == len(root_field_set),
+        "yaml_required_root_fields_present": not required_root_fields_missing,
+        "yaml_checker_managed_fields_absent": not checker_managed_present,
+        "yaml_specification_exact": (
+            f"version: {contract['expected_specification_url']}" in codecheck_text
+        ),
+        "yaml_manifest_exact": manifest_outputs == expected_outputs,
+        "yaml_manifest_unique": len(manifest_outputs) == len(set(manifest_outputs)),
+        "yaml_manifest_safe": all(safe_repo_path(value) for value in manifest_outputs),
+        "yaml_paper_title_exact": (
+            f"  title: \"{contract['expected_paper_title']}\"" in codecheck_text
+        ),
+        "yaml_author_exact": (
+            f"    - name: \"{contract['expected_author_name']}\"" in codecheck_text
+        ),
+        "yaml_reference_exact": (
+            f"  reference: \"{contract['expected_reference']}\"" in codecheck_text
+        ),
+        "yaml_source_exact": (
+            f"source: \"{contract['expected_source']}\"" in codecheck_text
+        ),
+        "request_draft_present": request_path.is_file(),
+        "request_status_exact": status_line in request_text,
+        "request_title_exact": f"`{contract['expected_issue_title']}`" in request_text,
+        "request_labels_exact": not missing_labels,
+        "request_language_complete": not missing_request_snippets,
+        "request_candidate_unassigned": (
+            contract["candidate_identifier"] in request_text
+            and "not reserved" in request_text
+            and "[IDENTIFIER_ASSIGNED_AT_ACTION_TIME]" not in request_text
+        ),
+    }
+    passed = all(checks.values())
+    return {
+        "schema": "codecheck_official_request_contract.v1",
+        "status": (
+            "OFFICIAL_REQUEST_CONTRACT_READY_NO_SEND"
+            if passed
+            else "OFFICIAL_REQUEST_CONTRACT_BLOCKED"
+        ),
+        "passed": passed,
+        "official_sources": {
+            "author_guide": contract["author_guide_url"],
+            "configuration_specification": contract["configuration_spec_url"],
+            "launch_pad": contract["launch_pad_url"],
+        },
+        "frozen_source_commit": frozen["commit"],
+        "frozen_author_files": [
+            {key: value for key, value in row.items() if key != "text"} for row in rows
+        ],
+        "checks": checks,
+        "missing_readme_snippets": missing_readme_snippets,
+        "missing_license_snippets": missing_license_snippets,
+        "missing_request_snippets": missing_request_snippets,
+        "missing_request_labels": missing_labels,
+        "missing_yaml_root_fields": required_root_fields_missing,
+        "checker_managed_yaml_root_fields_present": checker_managed_present,
+        "manifest_outputs": manifest_outputs,
+        "candidate_identifier": contract["candidate_identifier"],
+        "candidate_reserved": False,
+        "external_action_authorized": False,
+        "request_opened": False,
     }
 
 
@@ -335,6 +534,7 @@ def inspect_integration(config_path: Path = DEFAULT_CONFIG, root: Path = ROOT) -
     privacy_hits = scan_public_text(config["public_text_scan_paths"], root)
     receipts = inspect_first_party_receipts(root)
     author_review = inspect_author_review(config, codecheck_text, root)
+    official_request = inspect_official_request_contract(config, root)
 
     preprint_path = root / PurePosixPath(frozen["preprint_path"])
     preprint_sha = file_sha256(preprint_path) if preprint_path.is_file() else None
@@ -369,6 +569,7 @@ def inspect_integration(config_path: Path = DEFAULT_CONFIG, root: Path = ROOT) -
         "public_text_scan_passed": not privacy_hits,
         "first_party_receipts_bounded": receipts["passed"],
         "author_review_preflight_ready": author_review["passed"],
+        "official_request_contract_ready": official_request["passed"],
     }
     return {
         "schema": "codecheck_eia_mainline_integration_receipt.v1",
@@ -385,6 +586,7 @@ def inspect_integration(config_path: Path = DEFAULT_CONFIG, root: Path = ROOT) -
         "preprint_observed_sha256": preprint_sha,
         "first_party_receipts": receipts,
         "author_review_preflight": author_review,
+        "official_request_contract": official_request,
         "privacy_scan": {"passed": not privacy_hits, "hits": privacy_hits},
         "claim_state": claim_state,
         "human_unlock_policy": config["human_unlock_policy"],
@@ -468,6 +670,9 @@ def main() -> int:
                 "declared_output_count": len(receipt["manifest_outputs"]),
                 "external_validation_complete": receipt["claim_state"]["external_validation_complete"],
                 "author_review_status": receipt["author_review_preflight"]["status"],
+                "official_request_contract_status": receipt["official_request_contract"][
+                    "status"
+                ],
                 "human_author_review_complete": receipt["author_review_preflight"][
                     "human_author_review_complete"
                 ],
