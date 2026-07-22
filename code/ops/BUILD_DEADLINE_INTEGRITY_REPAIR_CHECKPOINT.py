@@ -17,6 +17,7 @@ VAULT_ROOT = Path("E:/LumaProofVault")
 DESTINATION_ROOT = VAULT_ROOT / "SUBMISSIONS" / "DEADLINE_INTEGRITY_REPAIR_20260721"
 
 SOURCES = (
+    "code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py",
     "code/ops/CAPTURE_MISSIONWEAVE_JCP_EVIDENCE.py",
     "code/ops/BUILD_DEADLINE_INTEGRITY_REPAIR_CHECKPOINT.py",
     "code/ops/BUILD_DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT.py",
@@ -57,6 +58,7 @@ SOURCES = (
     "tests/test_federal_submission_protocol_packet.py",
     "tests/test_launchtn_3686_pitch_application.py",
     "tests/test_live_funding_portal_handoff.py",
+    "tests/test_capture_missionweave_dsip_private_input.py",
     "tests/test_capture_missionweave_jcp_evidence.py",
     "tests/test_missionweave_founder_finish_card.py",
     "tests/test_missionweave_dsip_action_gate.py",
