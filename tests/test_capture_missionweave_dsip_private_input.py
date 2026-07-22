@@ -5,7 +5,7 @@ import importlib.util
 import json
 import os
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 import pytest
 
@@ -684,7 +684,7 @@ def test_current_volume2_hash_uses_only_guarded_private_final(
     assert error.value.code == "PRIVATE_FINAL_VOLUME2_NOT_FOUND"
 
 
-def test_private_collector_snapshot_remains_immutable_on_e_drive() -> None:
+def test_private_collector_snapshot_receipt_is_portable() -> None:
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -695,9 +695,29 @@ def test_private_collector_snapshot_remains_immutable_on_e_drive() -> None:
 
     for artifact in receipt["artifacts"]:
         relative = Path(artifact["source"])
-        destination = Path(artifact["destination"])
+        destination = PureWindowsPath(artifact["destination"])
         assert relative.is_absolute() is False
         assert ".." not in relative.parts
+        assert destination.is_absolute()
+        assert destination.drive.upper() == "E:"
+        assert ".." not in destination.parts
+        assert artifact["bytes"] > 0
+        assert len(artifact["sha256"]) == 64
+        int(artifact["sha256"], 16)
+        assert artifact["copy_sha256_matched"] is True
+
+    assert "does not prove" in receipt["claim_boundary"]
+
+
+@pytest.mark.skipif(
+    not MIRROR_RECEIPT_COPY.is_file(),
+    reason="historical E-drive mirror is unavailable on this runner",
+)
+def test_private_collector_snapshot_remains_immutable_on_available_e_drive() -> None:
+    receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
+
+    for artifact in receipt["artifacts"]:
+        destination = Path(artifact["destination"])
         assert destination.is_file(), artifact["destination"]
         assert destination.stat().st_size == artifact["bytes"]
         destination_hash = hashlib.sha256(destination.read_bytes()).hexdigest().upper()
@@ -708,4 +728,3 @@ def test_private_collector_snapshot_remains_immutable_on_e_drive() -> None:
     assert hashlib.sha256(MIRROR_RECEIPT.read_bytes()).hexdigest() == hashlib.sha256(
         MIRROR_RECEIPT_COPY.read_bytes()
     ).hexdigest()
-    assert "does not prove" in receipt["claim_boundary"]
