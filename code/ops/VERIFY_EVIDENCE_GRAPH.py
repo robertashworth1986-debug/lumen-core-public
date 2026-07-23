@@ -115,6 +115,20 @@ REQUIRED_NODE_FIELDS = {
 
 NODE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 PR_REFERENCE_RE = re.compile(r"(?:/pull/|#)(\d+)")
+HUMAN_STATE_MARKERS = {
+    "merged_capability": "**MERGED**",
+    "deployed_demo": "**DEPLOYED DEMO**",
+    "first_party_reproduced": "**FIRST-PARTY REPRODUCED**",
+    "externally_executable": "**EXTERNALLY EXECUTABLE**",
+    "external_complete": "**EXTERNAL COMPLETE**",
+    "field_validated": "**FIELD VALIDATED**",
+    "commercially_validated": "**COMMERCIALLY VALIDATED**",
+    "held": "**HELD**",
+    "historical": "**HISTORICAL**",
+}
+EVIDENCE_LEGEND_HEADING = "## Evidence-state legend"
+MARKDOWN_H2_RE = re.compile(r"^##\s+", re.MULTILINE)
+LEGEND_STATE_ROW_RE = re.compile(r"^\|\s*(\*\*[^|\n]+\*\*)\s*\|", re.MULTILINE)
 
 
 def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -414,6 +428,38 @@ def verify_repository_contract(
             raise ValueError(
                 f"EVIDENCE_INDEX.md is missing machine entrypoint {required_path}"
             )
+
+    legend_start = index.find(EVIDENCE_LEGEND_HEADING)
+    if legend_start < 0:
+        raise ValueError("EVIDENCE_INDEX.md omits the evidence-state legend")
+    legend_line_end = index.find("\n", legend_start)
+    if legend_line_end < 0:
+        raise ValueError("EVIDENCE_INDEX.md evidence-state legend has no table")
+    legend_tail = index[legend_line_end + 1 :]
+    next_heading = MARKDOWN_H2_RE.search(legend_tail)
+    legend = legend_tail[: next_heading.start()] if next_heading else legend_tail
+    legend_markers = LEGEND_STATE_ROW_RE.findall(legend)
+    marker_counts = {
+        marker: legend_markers.count(marker)
+        for marker in set(legend_markers)
+    }
+    expected_markers = set(HUMAN_STATE_MARKERS.values())
+    missing_state_markers = sorted(expected_markers - set(legend_markers))
+    unexpected_state_markers = sorted(set(legend_markers) - expected_markers)
+    duplicate_state_markers = sorted(
+        marker for marker, count in marker_counts.items() if count != 1
+    )
+    if (
+        missing_state_markers
+        or unexpected_state_markers
+        or duplicate_state_markers
+    ):
+        raise ValueError(
+            "EVIDENCE_INDEX.md evidence-state markers do not match the machine registry: "
+            f"missing={missing_state_markers}, "
+            f"unexpected={unexpected_state_markers}, "
+            f"duplicates={duplicate_state_markers}"
+        )
 
     graph_pr_numbers = {
         node["pr_number"]

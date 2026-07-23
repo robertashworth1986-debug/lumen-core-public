@@ -124,7 +124,7 @@ The verifier fails closed on:
 - loss of the canonical README-to-index entrypoint;
 - loss of the machine graph, verifier, or protocol links from the evidence index.
 
-The path-scoped GitHub Actions workflow compiles the verifier, validates the graph and reviewer-navigation contract, runs 19 adversarial regression tests, and uploads a machine-readable verification receipt for 30 days.
+The path-scoped GitHub Actions workflow compiles the verifier, validates the graph and reviewer-navigation contract, runs 21 adversarial regression tests, and uploads a machine-readable verification receipt for 30 days.
 
 ## Extension rule
 

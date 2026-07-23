@@ -171,6 +171,56 @@ class EvidenceGraphTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "omit graph PRs"):
             verify_repository_contract(graph, Path(".").resolve())
 
+    def test_repository_contract_requires_full_human_state_legend(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "docs").mkdir()
+            (root / "README.md").write_text(
+                Path("README.md").read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            (root / "EVIDENCE_INDEX.md").write_text(
+                Path("EVIDENCE_INDEX.md")
+                .read_text(encoding="utf-8")
+                .replace("| **HISTORICAL** |", "| **PAST RECORD** |"),
+                encoding="utf-8",
+            )
+            (root / "docs" / "PR_CONSOLIDATION_MAP_2026-07-22.md").write_text(
+                Path("docs/PR_CONSOLIDATION_MAP_2026-07-22.md").read_text(
+                    encoding="utf-8"
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "evidence-state markers"):
+                verify_repository_contract(self.graph, root)
+
+    def test_repository_contract_scopes_state_markers_to_legend_table(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "docs").mkdir()
+            (root / "README.md").write_text(
+                Path("README.md").read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            (root / "EVIDENCE_INDEX.md").write_text(
+                Path("EVIDENCE_INDEX.md")
+                .read_text(encoding="utf-8")
+                .replace(
+                    "| **MERGED** | Present on the default branch. |\n",
+                    "",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            (root / "docs" / "PR_CONSOLIDATION_MAP_2026-07-22.md").write_text(
+                Path("docs/PR_CONSOLIDATION_MAP_2026-07-22.md").read_text(
+                    encoding="utf-8"
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "evidence-state markers"):
+                verify_repository_contract(self.graph, root)
+
     def test_json_is_strict_and_serializable(self):
         encoded = json.dumps(
             self.graph,

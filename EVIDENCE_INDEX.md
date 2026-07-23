@@ -28,6 +28,9 @@ The machine graph is an index over detailed source records, not a replacement fo
 | **EXTERNALLY EXECUTABLE** | A bounded package exists for a non-author evaluator; no outside result is implied. |
 | **EXTERNAL COMPLETE** | A qualified outside evaluator executed the agreed protocol and produced an accepted receipt. |
 | **FIELD VALIDATED** | A data owner or operational partner validated the result under agreed field conditions. |
+| **COMMERCIALLY VALIDATED** | A signed scope or purchase record, delivery record, and payment or contract evidence support the named commercial result. |
+| **HELD** | The item is intentionally blocked from promotion until its named evidence or authority gate is satisfied. |
+| **HISTORICAL** | The item is preserved as lineage or prior work and is not the current canonical implementation or claim. |
 
 ## 1. Canonical merged assurance foundation
 
