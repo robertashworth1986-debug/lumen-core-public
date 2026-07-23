@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_outreach_registry.v1",
-  "updated_utc": "2026-07-17T00:20:44Z",
+  "updated_utc": "2026-07-23T16:58:01Z",
   "policy": {
     "send_authority": "Robert Ashworth",
     "codex_send_allowed": false,
@@ -14,16 +14,16 @@
     {
       "campaign_key": "epri-opai-membership-mou",
       "organization": "EPRI / Open Power AI Consortium",
-      "status": "action_required_draft_ready",
+      "status": "blocked",
       "thread_mode": "existing_thread_only",
-      "outbound_sequence": 1,
-      "last_outbound_utc": "2026-07-16T05:29:58Z",
+      "outbound_sequence": 3,
+      "last_outbound_utc": "2026-07-22T22:42:01Z",
       "duplicate_detected": true,
       "duplicate_count": 1,
       "inbound_since_last_outbound": true,
-      "next_allowed_action": "review_existing_draft_then_reply_once_after_explicit_approval",
+      "next_allowed_action": "founder_review_and_signature_decision_in_docusign_no_email_reply_required",
       "outreach_id": "LC-EPRI-OPAI-MOU-001",
-      "notes": "A second standalone membership request exists. Do not start another thread."
+      "notes": "EPRI issued the MOU on 2026-07-23. A second standalone membership request exists. Do not start another thread or send an acknowledgment before founder review."
     },
     {
       "campaign_key": "evtit-productization-review",
@@ -66,6 +66,127 @@
       "next_allowed_action": "wait_for_substantive_cdc_follow_up",
       "outreach_id": "LC-CDC-RFI-73483-001",
       "notes": "Receipt was confirmed. A receipt is not selection, validation, award, or deployment."
+    },
+    {
+      "campaign_key": "darpa-sn-26-97-rfi",
+      "organization": "DARPA Multi X Office",
+      "status": "receipt_confirmed_waiting",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 2,
+      "last_outbound_utc": "2026-07-17T19:27:49Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": true,
+      "next_allowed_action": "wait_for_substantive_request_or_workshop_contact",
+      "outreach_id": "LC-DARPA-SN-26-97-001",
+      "notes": "DARPA welcomed submissions compliant with the SAM.gov instructions and the package was sent. Do not send the existing reply draft or another receipt request."
+    },
+    {
+      "campaign_key": "nashville-ec-fall-2026",
+      "organization": "Nashville Entrepreneur Center",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "last_outbound_utc": "2026-07-21T22:59:20Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "verify_financial_aid_form_status_outside_email_then_wait_for_review",
+      "outreach_id": "LC-NEC-FALL-2026-001",
+      "notes": "Christopher Smith was already told the form would be completed. Do not send another assurance or application summary unless EC asks."
+    },
+    {
+      "campaign_key": "uspto-application-record-19281546",
+      "organization": "USPTO Pro Se Assistance Center / Document Services Division",
+      "status": "blocked",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 4,
+      "last_outbound_utc": "2026-07-22T22:41:42Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": true,
+      "next_allowed_action": "use_authenticated_access_or_document_services_order_path_and_reply_only_if_specific_clarification_is_required",
+      "outreach_id": "LC-USPTO-19281546-001",
+      "notes": "The generic CCC response did not confirm the exact unpublished file-wrapper ordering path. Prefer the directed portal or customer-service call; any clarifying email requires exact founder approval."
+    },
+    {
+      "campaign_key": "ut-legal-clinic-patent-referral",
+      "organization": "University of Tennessee Legal Clinic",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "last_outbound_utc": "2026-07-22T22:44:19Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_substantive_reply",
+      "outreach_id": "LC-UT-LEGAL-PATENT-001",
+      "notes": "Time-sensitive referral request is already sent. Do not duplicate it."
+    },
+    {
+      "campaign_key": "army-aidp-draft-cfs-2",
+      "organization": "Army Contracting Command - Aberdeen Proving Ground",
+      "status": "receipt_confirmed_waiting",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": true,
+      "next_allowed_action": "wait_for_substantive_army_follow_up",
+      "outreach_id": "LC-ARMY-AIDP-CFS2-001",
+      "notes": "ACC-APG confirmed receipt on 2026-07-14. Receipt is not selection, validation, award, or deployment. Do not request another receipt."
+    },
+    {
+      "campaign_key": "air-force-saf-aq-rfi-26-0001",
+      "organization": "United States Air Force",
+      "status": "receipt_confirmed_waiting",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": true,
+      "next_allowed_action": "wait_for_substantive_air_force_follow_up",
+      "outreach_id": "LC-USAF-SAF-AQ-RFI-26-0001-001",
+      "notes": "The Air Force confirmed receipt on 2026-07-13. Receipt is not selection, validation, award, or deployment. Do not request another receipt."
+    },
+    {
+      "campaign_key": "darpa-dice-proposal-abstract",
+      "organization": "DARPA",
+      "status": "receipt_confirmed_waiting",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": true,
+      "next_allowed_action": "inspect_baat_or_inbound_status_then_prepare_full_proposal_only_if_authorized",
+      "outreach_id": "LC-DARPA-DICE-ABSTRACT-001",
+      "notes": "The IPTO submission-finalization confirmation establishes receipt of the DICE proposal abstract. Do not send the stray Gmail draft or submit a duplicate abstract."
+    },
+    {
+      "campaign_key": "dla-missionweave-l26bz-nv011-1380",
+      "organization": "Defense Logistics Agency / DSIP",
+      "status": "closed",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 0,
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": true,
+      "next_allowed_action": "preserve_packet_and_reuse_only_for_a_new_matching_topic",
+      "outreach_id": "LC-DLA-MISSIONWEAVE-NV011-001",
+      "notes": "DSIP confirmed proposal creation, not final submission. No final-submission receipt was found before the 2026-07-22 noon ET deadline. Do not represent this lane as submitted and do not send a late receipt request."
+    },
+    {
+      "campaign_key": "navy-harborsentinel-don26bz03-nv063",
+      "organization": "Department of the Navy / DSIP",
+      "status": "closed",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 0,
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "preserve_packet_and_reuse_only_for_a_new_matching_topic_or_named_partner",
+      "outreach_id": "LC-NAVY-HARBORSENTINEL-NV063-001",
+      "notes": "No final-submission receipt was found before the 2026-07-22 noon ET deadline. Do not represent this lane as submitted and do not initiate late-submission outreach."
     }
   ]
 }
