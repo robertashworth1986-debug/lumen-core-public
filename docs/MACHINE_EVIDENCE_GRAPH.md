@@ -14,6 +14,12 @@ Regression tests:
 
 - `tests/test_evidence_graph.py`
 
+Human navigation surfaces:
+
+- `README.md`
+- `EVIDENCE_INDEX.md`
+- `docs/PR_CONSOLIDATION_MAP_2026-07-22.md`
+
 ## Design principle
 
 The graph is not a simplified replacement for the repository. It is an index over the detailed implementation, receipts, tests, pull requests, evidence packages, and claim boundaries.
@@ -53,6 +59,17 @@ The graph distinguishes:
 
 These states are not interchangeable. A deterministic author replay cannot silently become an independent reproduction. A deployed demo cannot silently become field validation. A proposed commercial package cannot silently become customer traction.
 
+## Promotion contract
+
+The verifier owns the canonical transition registry. The JSON graph must contain the same transitions and exact required evidence markers.
+
+- `first_party_reproduced` → `externally_executable`
+- `externally_executable` → `external_complete`
+- `external_complete` → `field_validated`
+- `field_validated` → `commercially_validated`
+
+A node assigned to `external_complete`, `field_validated`, or `commercially_validated` must carry the required support markers for that state. Merely changing a state label does not promote the evidence.
+
 ## Current machine conclusions
 
 The indexed public state currently supports:
@@ -74,23 +91,40 @@ The EchoLock pilot remains held because a discoverable public report path, basel
 
 ## Verification
 
-Run:
+Run the graph and repository-navigation contract:
 
 ```bash
 python code/ops/VERIFY_EVIDENCE_GRAPH.py --json
-python -m unittest tests.test_evidence_graph -v
+python -m unittest discover -s tests -p "test_evidence_graph.py" -v
+```
+
+To inspect a standalone graph file without the repository navigation surfaces:
+
+```bash
+python code/ops/VERIFY_EVIDENCE_GRAPH.py path/to/graph.json \
+  --skip-repository-contract \
+  --json
 ```
 
 The verifier fails closed on:
 
-- duplicate JSON keys;
+- oversized, invalid UTF-8, duplicate-key, or non-finite JSON;
+- repository identity or timestamp-format mismatch;
+- duplicate evidence-state declarations;
+- malformed node identity, type, title, PR number, or merged-state metadata;
 - duplicate node IDs or PR numbers;
-- unknown nodes in edges;
+- unknown, duplicate, or self-referential edges;
 - unsupported evidence states or relationship types;
 - contradictory support boundaries;
-- silent promotion of PR #64 beyond `externally_executable`;
+- missing evidence required by upper promotion states;
+- promotion-transition or requirement drift;
+- silent reclassification of PR #64 beyond `externally_executable`;
 - unsupported EchoLock pilot promotion;
-- external-complete nodes lacking completed-execution support.
+- human navigation that omits an indexed pull request;
+- loss of the canonical README-to-index entrypoint;
+- loss of the machine graph, verifier, or protocol links from the evidence index.
+
+The path-scoped GitHub Actions workflow compiles the verifier, validates the graph and reviewer-navigation contract, runs 19 adversarial regression tests, and uploads a machine-readable verification receipt for 30 days.
 
 ## Extension rule
 
