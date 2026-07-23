@@ -1,0 +1,124 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-07-23T21:20:00Z",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "status": "exploratory_founder_authorized_inquiry",
+  "purpose": "Provide a public-safe, machine-readable entrypoint for qualified acquisition, licensing, acquihire, or paid-pilot discussions without transferring rights or promoting unsupported evidence.",
+  "public_contact_path": "https://lumen-core.ai/proof_to_pilot.html",
+  "transaction_options": [
+    {
+      "id": "whole-company-acquisition",
+      "structure": "whole_company_acquisition",
+      "available_for_discussion": true,
+      "requires": ["qualified_counterparty", "scope_and_chain_of_title_review", "technical_and_financial_diligence", "signed_definitive_agreement", "verified_consideration"],
+      "does_not_authorize": ["pre-closing_ip_transfer", "credential_access", "binding_sale", "unsupported_warranties"]
+    },
+    {
+      "id": "exclusive-field-license",
+      "structure": "exclusive_field_of_use_license",
+      "available_for_discussion": true,
+      "requires": ["defined_field_and_territory", "reserved_founder_rights", "license_fee_or_other_consideration", "signed_definitive_agreement"],
+      "does_not_authorize": ["unbounded_exclusivity", "parent_platform_transfer", "pre-agreement_use"]
+    },
+    {
+      "id": "non-exclusive-license",
+      "structure": "non_exclusive_technology_license",
+      "available_for_discussion": true,
+      "requires": ["defined_modules_and_use", "license_fee_or_other_consideration", "claim_and_publicity_controls", "signed_definitive_agreement"],
+      "does_not_authorize": ["ownership_transfer", "sublicensing_without_permission", "pre-agreement_use"]
+    },
+    {
+      "id": "acquihire-plus-license",
+      "structure": "acquihire_plus_defined_ip_license",
+      "available_for_discussion": true,
+      "requires": ["defined_role_and_compensation", "defined_ip_scope", "founder_and_buyer_legal_review", "signed_employment_and_license_documents"],
+      "does_not_authorize": ["automatic_parent_ip_assignment", "unpaid_transition_work", "pre-agreement_use"]
+    },
+    {
+      "id": "paid-pilot-option",
+      "structure": "paid_validation_pilot_with_option",
+      "available_for_discussion": true,
+      "requires": ["authorized_source", "accepted_baseline", "locked_metric", "signed_paid_scope", "separate_option_terms"],
+      "does_not_authorize": ["guaranteed_result", "automatic_acquisition", "field_validation_before_execution"]
+    }
+  ],
+  "public_assets": [
+    {
+      "graph_node_id": "pr-34",
+      "evidence_state": "merged_capability",
+      "role": "artifact_integrity_foundation"
+    },
+    {
+      "graph_node_id": "pr-36",
+      "evidence_state": "deployed_demo",
+      "role": "bounded_public_demonstration"
+    },
+    {
+      "graph_node_id": "pr-49",
+      "evidence_state": "externally_executable",
+      "role": "external_evaluation_protocol_candidate"
+    },
+    {
+      "graph_node_id": "pr-55",
+      "evidence_state": "first_party_reproduced",
+      "role": "deep_reproducibility_record"
+    },
+    {
+      "graph_node_id": "pr-64",
+      "evidence_state": "externally_executable",
+      "role": "preferred_independent_execution_target"
+    },
+    {
+      "graph_node_id": "prooflock-console",
+      "evidence_state": "deployed_demo",
+      "role": "live_reviewer_surface"
+    }
+  ],
+  "diligence_requirements": [
+    "founder_identity_and_authority",
+    "asset_inventory_and_chain_of_title",
+    "patent_record_and_ip_scope_review",
+    "third_party_license_and_data_rights_review",
+    "financial_tax_and_liability_review",
+    "security_and_credential_separation_review",
+    "independent_execution_of_agreed_package",
+    "buyer_specific_integration_and_transition_plan",
+    "signed_definitive_documents",
+    "verified_consideration"
+  ],
+  "private_until_qualified_diligence": [
+    "private_financial_records",
+    "founder_personal_information",
+    "unpublished_enabling_details",
+    "patent_sensitive_material",
+    "credentials_and_tokens",
+    "private_infrastructure_and_datasets",
+    "regulated_or_export_controlled_information",
+    "buyer_specific_pricing_and_terms"
+  ],
+  "claim_boundaries": [
+    "no_external_validation_claim",
+    "no_customer_adoption_claim",
+    "no_revenue_claim",
+    "no_field_performance_claim",
+    "no_certified_safety_claim",
+    "no_agency_endorsement_claim",
+    "no_award_claim",
+    "no_public_transaction_valuation",
+    "no_binding_transfer_without_definitive_agreement"
+  ],
+  "founder_control": {
+    "external_inquiries_authorized": true,
+    "nda_signature_authorized": false,
+    "binding_sale_authorized": false,
+    "license_signature_authorized": false,
+    "ip_transfer_authorized": false,
+    "credential_transfer_authorized": false
+  },
+  "asking_price": {
+    "public": false,
+    "amount": null,
+    "currency": null,
+    "rule": "Set only after structure, included assets, liabilities, diligence scope, transition obligations, and qualified advice are defined."
+  }
+}
