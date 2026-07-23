@@ -28,7 +28,7 @@ class OutreachGateTests(unittest.TestCase):
     def test_codex_can_draft_but_cannot_send(self) -> None:
         draft = MODULE.evaluate(
             self.registry,
-            "epri-opai-membership-mou",
+            "evtit-productization-review",
             actor="codex",
             action="draft",
             mode="reply",
@@ -36,7 +36,7 @@ class OutreachGateTests(unittest.TestCase):
         self.assertTrue(draft["allowed"])
         send = MODULE.evaluate(
             self.registry,
-            "epri-opai-membership-mou",
+            "evtit-productization-review",
             actor="codex",
             action="send",
             mode="reply",
@@ -59,7 +59,7 @@ class OutreachGateTests(unittest.TestCase):
         self.assertFalse(result["allowed"])
         self.assertIn("existing thread", result["reason"])
 
-    def test_epri_reply_requires_explicit_approval_and_gmail_preflight(self) -> None:
+    def test_epri_mou_signature_state_blocks_email_reply(self) -> None:
         no_approval = MODULE.evaluate(
             self.registry,
             "epri-opai-membership-mou",
@@ -78,7 +78,7 @@ class OutreachGateTests(unittest.TestCase):
             explicit_approval=True,
         )
         self.assertFalse(no_preflight["allowed"])
-        allowed = MODULE.evaluate(
+        blocked = MODULE.evaluate(
             self.registry,
             "epri-opai-membership-mou",
             actor="chatgpt",
@@ -87,7 +87,8 @@ class OutreachGateTests(unittest.TestCase):
             explicit_approval=True,
             gmail_preflight_complete=True,
         )
-        self.assertTrue(allowed["allowed"])
+        self.assertFalse(blocked["allowed"])
+        self.assertIn("campaign status is blocked", blocked["reason"])
 
     def test_waiting_campaign_blocks_another_send(self) -> None:
         result = MODULE.evaluate(
