@@ -3,18 +3,24 @@ name: Evidence Graph Gate
 on:
   pull_request:
     paths:
+      - "README.md"
+      - "EVIDENCE_INDEX.md"
       - "config/evidence_graph_v1.json"
       - "code/ops/VERIFY_EVIDENCE_GRAPH.py"
       - "tests/test_evidence_graph.py"
       - "docs/MACHINE_EVIDENCE_GRAPH.md"
+      - "docs/PR_CONSOLIDATION_MAP_2026-07-22.md"
       - ".github/workflows/evidence-graph.yml"
   push:
     branches: [main]
     paths:
+      - "README.md"
+      - "EVIDENCE_INDEX.md"
       - "config/evidence_graph_v1.json"
       - "code/ops/VERIFY_EVIDENCE_GRAPH.py"
       - "tests/test_evidence_graph.py"
       - "docs/MACHINE_EVIDENCE_GRAPH.md"
+      - "docs/PR_CONSOLIDATION_MAP_2026-07-22.md"
       - ".github/workflows/evidence-graph.yml"
 
 permissions:
@@ -27,16 +33,29 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 1
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - name: Compile verifier and tests
         run: python -m py_compile code/ops/VERIFY_EVIDENCE_GRAPH.py tests/test_evidence_graph.py
-      - name: Verify machine graph
-        run: python code/ops/VERIFY_EVIDENCE_GRAPH.py --json
-      - name: Run regression tests
+      - name: Verify graph and reviewer navigation contract
+        run: |
+          mkdir -p out/evidence-graph
+          python code/ops/VERIFY_EVIDENCE_GRAPH.py --json \
+            | tee out/evidence-graph/evidence-graph-verification.json
+          python -m json.tool out/evidence-graph/evidence-graph-verification.json >/dev/null
+      - name: Run adversarial regression tests
         run: python -m unittest discover -s tests -p "test_evidence_graph.py" -v
+      - name: Upload verification receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-graph-verification-${{ github.sha }}
+          path: out/evidence-graph/evidence-graph-verification.json
+          if-no-files-found: error
+          retention-days: 30
