@@ -1,6 +1,6 @@
 # Pull Request Consolidation Map — 2026-07-22
 
-This document records the recommended repository cleanup order after reviewing PRs #34 through #65. It is an information-architecture control, not a merge authorization.
+This document records the recommended repository cleanup order after reviewing PRs #34 through #66. It is an information-architecture control, not a merge authorization.
 
 ## Canonical product spine
 
@@ -22,11 +22,16 @@ This document records the recommended repository cleanup order after reviewing P
    - canonical proposed offer: PR #35
    - public buyer-facing website: PR #38
 
+5. **Reviewer navigation and public-copy governance**
+   - merged reviewer-facing copy correction: PR #57
+   - canonical evidence index and machine graph: PR #66
+
 ## Recommended review and merge order
 
 ### Stage 1 — Reviewer entrypoint
 
-- Merge the evidence-index branch after link and wording review.
+- Merge PR #66 only after conflict reconciliation, graph verification, and human/machine navigation parity pass.
+- Preserve PR #57 as merged public-copy provenance; wording cleanup is not technical validation.
 - Do not promote draft PR claims into default-branch truth merely by linking them.
 
 ### Stage 2 — Small bounded fixes
