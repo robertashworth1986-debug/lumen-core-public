@@ -101,4 +101,4 @@ Otherwise, update the backlog note and stop.
 
 ## Immediate decision
 
-The next founder-facing action is review of the **issued EPRI Open Power AI Consortium MOU**. The next repository action is a bounded independent execution of the **PR #64** package followed by an immutable third-party receipt. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. None of these states authorizes an additional outbound email by itself.
+The next founder-facing action is review of the **issued EPRI Open Power AI Consortium MOU**. The next repository action is a bounded independent execution of the **PR #64** package followed by an immutable third-party receipt. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized.
