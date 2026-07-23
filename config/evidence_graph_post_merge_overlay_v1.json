@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-07-23T21:40:00Z",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "base_graph_path": "config/evidence_graph_v1.json",
+  "base_graph_blob_sha": "32eb7e388478fe4a68a74801627fc2e0dd31fb81",
+  "purpose": "Record the verified post-merge state of PRs 66 and 67 without silently mutating the canonical graph before its human and machine documentation are reconciled together.",
+  "corrections": [
+    {
+      "node_id": "pr-66",
+      "operation": "replace",
+      "expected_before": {
+        "state": "held",
+        "merged": false
+      },
+      "after": {
+        "state": "merged_capability",
+        "merged": true
+      }
+    },
+    {
+      "node_id": "pr-67",
+      "operation": "add",
+      "after": {
+        "id": "pr-67",
+        "type": "pull_request",
+        "title": "Agency receipt reconciliation and outreach locks",
+        "pr_number": 67,
+        "state": "merged_capability",
+        "merged": true,
+        "canonical_role": "current_outreach_and_receipt_state_reconciliation",
+        "supports": [
+          "confirmed_receipt_indexing",
+          "duplicate_outreach_locking",
+          "founder_only_action_preservation",
+          "operating_state_refresh"
+        ],
+        "does_not_support": [
+          "proposal_submission",
+          "selection",
+          "award",
+          "funding",
+          "contract",
+          "external_validation"
+        ]
+      }
+    }
+  ],
+  "documentation_gap": {
+    "present": true,
+    "missing_paths": [
+      "EVIDENCE_INDEX.md",
+      "docs/PR_CONSOLIDATION_MAP_2026-07-22.md"
+    ],
+    "rule": "This overlay is a verified correction record, not the canonical graph. Canonicalization requires the graph and both human reviewer documents to be updated and verified together."
+  },
+  "claim_boundaries": [
+    "no_external_validation_promotion",
+    "no_submission_claim",
+    "no_selection_or_award_claim",
+    "no_funding_or_contract_claim",
+    "no_sale_or_valuation_claim",
+    "no_automatic_merge_authorization"
+  ]
+}
