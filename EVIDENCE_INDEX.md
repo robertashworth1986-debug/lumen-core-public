@@ -8,6 +8,16 @@ LumenCore is a proof-to-pilot assurance platform. Its current public strengths a
 
 The repository does **not** currently establish independent scientific validation, field-validated savings, agency endorsement, certified safety, audited revenue, or customer adoption unless a separately identified external record says so.
 
+## Human and machine entrypoints
+
+- Human evidence index: `EVIDENCE_INDEX.md`
+- Machine graph: [`config/evidence_graph_v1.json`](config/evidence_graph_v1.json)
+- Fail-closed verifier: [`code/ops/VERIFY_EVIDENCE_GRAPH.py`](code/ops/VERIFY_EVIDENCE_GRAPH.py)
+- Graph protocol: [`docs/MACHINE_EVIDENCE_GRAPH.md`](docs/MACHINE_EVIDENCE_GRAPH.md)
+- PR disposition map: [`docs/PR_CONSOLIDATION_MAP_2026-07-22.md`](docs/PR_CONSOLIDATION_MAP_2026-07-22.md)
+
+The machine graph is an index over detailed source records, not a replacement for them. CI verifies that upper evidence states retain their required support markers and that the reviewer-facing documents do not silently omit indexed pull requests.
+
 ## Evidence-state legend
 
 | State | Meaning |
@@ -104,6 +114,7 @@ The EIA lane preserves an important adverse fact: the frozen eight-authority pro
 
 - [#38 — Conversion-ready public website](https://github.com/robertashworth1986-debug/lumen-core-public/pull/38): bounded public offer and immutable release design; draft, not a current default-branch claim.
 - [#40 — Repository trust and contribution hardening](https://github.com/robertashworth1986-debug/lumen-core-public/pull/40): removes unsupported production/security language; draft.
+- [#57 — Reviewer-facing repository copy cleanup](https://github.com/robertashworth1986-debug/lumen-core-public/pull/57): merged public-copy correction; not technical validation.
 - [#60 — Protect operator gateway APIs by default](https://github.com/robertashworth1986-debug/lumen-core-public/pull/60): fail-closed outer API authentication boundary; draft and not deployed by the PR.
 
 ## 7. Pilot and external-engagement register
@@ -134,8 +145,11 @@ This map prevents reviewers from treating every open draft as an independent pro
 | 50 | Windows evidence-route portability fix | Merge before refreshing the overlapping evidence-route PR. |
 | 52 | Proof Capsule v3 | Decide explicitly: merge as the new standard or close as an unadopted draft. |
 | 54–62 | Stacked EIA/CODECHECK development history | Preserve history; consolidate the final clean implementation through #64. |
+| 57 | Merged reviewer-copy cleanup | Keep as merged provenance; do not treat wording cleanup as validation. |
+| 60 | Operator API security boundary | Keep as a separate focused security and deployment review. |
 | 64 | Clean-mainline reviewer package | Treat as the preferred consolidation target after focused review. |
 | 65 | Deadline-specific JCP support escalation | Keep separate from the technical evidence product; close/retire when the deadline lane is complete. |
+| 66 | Evidence index and machine navigation | Merge only after conflict reconciliation and current-head graph verification. |
 
 ## 9. Reviewer scoring boundary
 
