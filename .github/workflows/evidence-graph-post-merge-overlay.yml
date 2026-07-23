@@ -1,0 +1,63 @@
+name: Evidence Graph Post-Merge Overlay Gate
+
+on:
+  pull_request:
+    paths:
+      - "config/evidence_graph_v1.json"
+      - "config/evidence_graph_post_merge_overlay_v1.json"
+      - "code/ops/VERIFY_EVIDENCE_GRAPH.py"
+      - "code/ops/VERIFY_EVIDENCE_GRAPH_OVERLAY.py"
+      - "tests/test_evidence_graph_overlay.py"
+      - "docs/POST_MERGE_EVIDENCE_RECONCILIATION_2026-07-23.md"
+      - ".github/workflows/evidence-graph-post-merge-overlay.yml"
+  push:
+    branches: [main]
+    paths:
+      - "config/evidence_graph_v1.json"
+      - "config/evidence_graph_post_merge_overlay_v1.json"
+      - "code/ops/VERIFY_EVIDENCE_GRAPH.py"
+      - "code/ops/VERIFY_EVIDENCE_GRAPH_OVERLAY.py"
+      - "tests/test_evidence_graph_overlay.py"
+      - "docs/POST_MERGE_EVIDENCE_RECONCILIATION_2026-07-23.md"
+      - ".github/workflows/evidence-graph-post-merge-overlay.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evidence-graph-overlay-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile overlay verifier and tests
+        run: |
+          python -m py_compile \
+            code/ops/VERIFY_EVIDENCE_GRAPH.py \
+            code/ops/VERIFY_EVIDENCE_GRAPH_OVERLAY.py \
+            tests/test_evidence_graph_overlay.py
+      - name: Verify bounded post-merge correction
+        run: |
+          mkdir -p out/evidence-graph-overlay
+          python code/ops/VERIFY_EVIDENCE_GRAPH_OVERLAY.py --json \
+            | tee out/evidence-graph-overlay/verification.json
+          python -m json.tool out/evidence-graph-overlay/verification.json >/dev/null
+      - name: Run adversarial overlay tests
+        run: python -m unittest tests.test_evidence_graph_overlay -v
+      - name: Upload overlay verification receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-graph-overlay-${{ github.sha }}
+          path: out/evidence-graph-overlay/verification.json
+          if-no-files-found: error
+          retention-days: 30
