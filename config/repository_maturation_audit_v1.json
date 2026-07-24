@@ -1,0 +1,195 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-07-24T06:07:00Z",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "purpose": "Account for every observed pull request, separate the canonical proof-to-pilot product from operational and preserved-research lanes, and enforce a bounded consolidation order.",
+  "canonical_lane": "proof_to_pilot_technical_claim_assurance",
+  "canonical_product_spine": [
+    "proof_capsule",
+    "prooflock",
+    "external_replication_contract",
+    "independent_executor_package",
+    "bounded_paid_pilot",
+    "buyer_or_transaction_packet"
+  ],
+  "operating_rules": [
+    "evidence_before_claims",
+    "one_canonical_owner_per_capability",
+    "negative_results_are_retained",
+    "external_execution_is_not_external_validation",
+    "field_and_commercial_promotion_require_separate_external_records",
+    "no_geometry_is_sacred_until_it_wins",
+    "research_museum_material_does_not_compete_with_the_product_spine"
+  ],
+  "observed_pull_requests": [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+    20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 34, 35, 36, 37,
+    38, 40, 42, 49, 50, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+    64, 65, 66, 67, 68, 69
+  ],
+  "dispositions": {
+    "merged_canonical": [
+      7, 15, 17, 18, 20, 21, 23, 24, 25, 26, 27, 28, 29, 30, 31, 34, 57, 66, 67
+    ],
+    "closed_preserved_research_or_superseded": [
+      1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 22
+    ],
+    "open_active_external_or_deadline": [14, 37],
+    "open_merge_candidate": [35, 36, 38, 40, 49, 52, 60, 64, 68],
+    "open_consolidation_source": [32, 50, 54, 55, 61, 62],
+    "open_retire_now": [16, 42, 53, 56, 58, 59, 63, 65],
+    "open_replace_overlay": [69]
+  },
+  "priority_findings": [
+    {
+      "id": "p0-public-evidence-route",
+      "severity": "p0",
+      "state": "operationally_broken",
+      "finding": "The current public health receipt reports https://lumen-core.ai/evidence/ at HTTP 502 while five of six monitored endpoints are healthy.",
+      "evidence_paths": [
+        "data/site_health.json",
+        "code/ops/repair_evidence_route.py",
+        "code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh",
+        ".github/workflows/deploy.yml"
+      ],
+      "required_action": "Inspect the latest production workflow or manually dispatch the bounded deploy, preserve the failed-run receipt, and require HTTP 200 plus the proof-to-pilot evidence marker before closure.",
+      "does_not_authorize": [
+        "unreviewed_nginx_edit",
+        "credential_change",
+        "dns_change",
+        "claim_promotion"
+      ]
+    },
+    {
+      "id": "p0-independent-execution-gap",
+      "severity": "p0",
+      "state": "evidence_gate_open",
+      "finding": "The strongest reviewer package is externally executable but has no completed non-author receipt.",
+      "source_pull_requests": [49, 54, 55, 61, 62, 64],
+      "required_action": "Rebuild PR 64 on current main, merge one canonical external-review contract, then obtain one named non-author execution receipt.",
+      "does_not_authorize": [
+        "external_validation_claim",
+        "codecheck_certificate_claim",
+        "field_validation_claim"
+      ]
+    },
+    {
+      "id": "p1-post-merge-state-drift",
+      "severity": "p1",
+      "state": "canonical_reconciliation_required",
+      "finding": "The evidence graph and reviewer documents require an atomic post-merge update for PRs 66 and 67; PR 69 is only a temporary overlay.",
+      "source_pull_requests": [66, 67, 69],
+      "required_action": "Update the graph, human evidence index, and consolidation map in one commit, then retire the overlay.",
+      "does_not_authorize": ["evidence_promotion"]
+    },
+    {
+      "id": "p1-open-pr-overhang",
+      "severity": "p1",
+      "state": "repository_review_cost_high",
+      "finding": "Expired operations, stacked ancestors, superseded route work, and current product work remain open together, increasing reviewer ambiguity.",
+      "required_action": "Close the eight retire-now pull requests with preserved-history comments and close ancestry only after its canonical successor is merged.",
+      "does_not_authorize": ["branch_deletion", "history_rewrite"]
+    },
+    {
+      "id": "p1-geometry-scientific-contract",
+      "severity": "p1",
+      "state": "protocol_required_before_promotion",
+      "finding": "Geometry research exists across Euclidean, spiral, helical, branching, gyroid, phyllotactic, manifold, graph, and topology-aware concepts, but no single current protocol governs physics claims and cross-lane comparison.",
+      "required_action": "Adopt config/geometry_evaluation_protocol_v1.json and require task-specific frozen baselines, units, invariants, ablations, uncertainty, and negative controls.",
+      "does_not_authorize": [
+        "universal_geometry_champion",
+        "field_performance_claim",
+        "physics_validation_claim"
+      ]
+    }
+  ],
+  "merge_program": [
+    {
+      "order": 1,
+      "action": "atomic_canonical_state_update",
+      "pull_requests": [69],
+      "outcome": "Replace the temporary overlay with synchronized graph, evidence index, and consolidation map updates; close PR 69 after replacement."
+    },
+    {
+      "order": 2,
+      "action": "canonical_external_replication_contract",
+      "pull_requests": [49],
+      "outcome": "Rebase or port the fail-closed external-replication docket onto current main and merge after exact-head review."
+    },
+    {
+      "order": 3,
+      "action": "clean_independent_executor_package",
+      "pull_requests": [54, 55, 61, 62, 64],
+      "outcome": "Use PR 64 as the sole clean-mainline target, preserve frozen negative results, then close stacked ancestors as historical development."
+    },
+    {
+      "order": 4,
+      "action": "prooflock_durable_release_split",
+      "pull_requests": [36],
+      "outcome": "Port durable verifier, release, and deployment identity assets without importing the full historical execution log into the canonical reviewer path."
+    },
+    {
+      "order": 5,
+      "action": "default_deny_operator_boundary",
+      "pull_requests": [60],
+      "outcome": "Merge the security boundary separately from deployment; keep credential provisioning and client migration action-time gated."
+    },
+    {
+      "order": 6,
+      "action": "commercial_offer_and_public_surface",
+      "pull_requests": [35, 38, 40],
+      "outcome": "Founder-review the bounded sprint, port current trust language, and rebase the exact public release after the evidence spine is stable."
+    },
+    {
+      "order": 7,
+      "action": "strategic_transaction_optionality",
+      "pull_requests": [68],
+      "outcome": "Merge only after founder review confirms that discussion authority remains non-binding and no public asking price is asserted."
+    },
+    {
+      "order": 8,
+      "action": "proof_capsule_v3_decision",
+      "pull_requests": [52],
+      "outcome": "Perform a differential review against merged v2; either adopt v3 as the new standard and update every entrypoint, or close it explicitly as unadopted."
+    }
+  ],
+  "retirement_program": {
+    "retire_now": {
+      "pull_requests": [16, 42, 53, 56, 58, 59, 63, 65],
+      "reason": "Superseded, stale, or deadline-expired operational work; preserve branches and receipts but remove them from the active review queue."
+    },
+    "retire_after_successor": {
+      "pull_requests": [32, 50, 54, 55, 61, 62],
+      "reason": "Extract unique non-duplicated controls into the named successor before closing as preserved ancestry."
+    }
+  },
+  "active_holds": [
+    {
+      "pull_request": 14,
+      "reason": "Wait for a bounded LANL response or close as no-fit; do not imply a completed meeting or relationship."
+    },
+    {
+      "pull_request": 37,
+      "reason": "DICE remains an active deadline lane; keep proposal and legal certifications outside the product merge queue."
+    }
+  ],
+  "maturity_definition": {
+    "level_1": "One coherent public claim and bounded artifact custody.",
+    "level_2": "Deterministic first-party replay from pinned source and environment.",
+    "level_3": "Externally executable package with fail-closed reviewer controls.",
+    "level_4": "Completed named non-author execution receipt with deviations and negative results.",
+    "level_5": "Field validation under an authorized owner, locked baseline, metric, window, and acceptance record.",
+    "level_6": "Commercial validation supported by signed scope, delivery, and payment or contract evidence."
+  },
+  "current_supported_maturity": "level_3",
+  "current_false_claims": [
+    "independent_validation_complete",
+    "field_validation_complete",
+    "commercial_validation_complete",
+    "certified_safety",
+    "agency_endorsement",
+    "universal_geometry_superiority",
+    "audited_revenue",
+    "public_transaction_valuation"
+  ]
+}
