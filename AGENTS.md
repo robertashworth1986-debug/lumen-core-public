@@ -12,8 +12,8 @@ Trading, grants, scouting, geometry, swarm, aviation, maritime, sensor, and othe
 
 Only three founder outcomes may be active at once:
 
-1. **EPRI / Open Power AI Consortium onboarding** — one reply in the existing MOU thread after Robert reviews the saved draft.
-2. **One external validation or paid-pilot conversion** — LANL and EVTit are waiting lanes; do not send another message until a substantive inbound response arrives.
+1. **EPRI / Open Power AI Consortium onboarding** — Robert signed the MOU and one bounded onboarding follow-up was sent. Wait for consortium access, a working-group owner, or a specific request. Do not send another acknowledgment or packet.
+2. **Federal traction and licensing conversion** — one NASA AI-support capability/package request and one INL software-licensing expression of interest were sent on July 24. Wait for substantive replies or official submission instructions. LANL, EVTit, CDC, DARPA, Army, Air Force, and other receipt-only lanes remain frozen unless a qualified inbound request arrives.
 3. **Patent official-record protection** — retrieve and review the official Patent Center record, notices, and deadlines before creating more public patent packages.
 
 Funding opportunities remain a deadline queue, not a product-development queue. Do not build a new package unless it is already in the canonical funding handoff, the verified deadline is near, and no existing package can be updated.
