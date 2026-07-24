@@ -5,20 +5,26 @@ on:
     paths:
       - "config/repository_maturation_audit_v1.json"
       - "config/geometry_evaluation_protocol_v1.json"
+      - "config/known_pr_head_branches_v1.json"
       - "docs/REPOSITORY_MATURATION_AUDIT_2026-07-24.md"
       - "docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md"
       - "code/ops/VERIFY_REPOSITORY_MATURATION_AND_GEOMETRY.py"
+      - "code/ops/BUILD_REPOSITORY_BRANCH_CENSUS.py"
       - "tests/test_repository_maturation_and_geometry.py"
+      - "tests/test_repository_branch_census.py"
       - ".github/workflows/repository-maturation-audit.yml"
   push:
     branches: [main]
     paths:
       - "config/repository_maturation_audit_v1.json"
       - "config/geometry_evaluation_protocol_v1.json"
+      - "config/known_pr_head_branches_v1.json"
       - "docs/REPOSITORY_MATURATION_AUDIT_2026-07-24.md"
       - "docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md"
       - "code/ops/VERIFY_REPOSITORY_MATURATION_AND_GEOMETRY.py"
+      - "code/ops/BUILD_REPOSITORY_BRANCH_CENSUS.py"
       - "tests/test_repository_maturation_and_geometry.py"
+      - "tests/test_repository_branch_census.py"
       - ".github/workflows/repository-maturation-audit.yml"
 
 permissions:
@@ -31,32 +37,44 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-          fetch-depth: 1
+          fetch-depth: 0
+      - name: Fetch complete remote branch namespace
+        run: git fetch --no-tags origin '+refs/heads/*:refs/remotes/origin/*'
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Compile verifier and tests
+      - name: Compile verifiers and tests
         run: |
           python -m py_compile \
             code/ops/VERIFY_REPOSITORY_MATURATION_AND_GEOMETRY.py \
-            tests/test_repository_maturation_and_geometry.py
+            code/ops/BUILD_REPOSITORY_BRANCH_CENSUS.py \
+            tests/test_repository_maturation_and_geometry.py \
+            tests/test_repository_branch_census.py
       - name: Verify maturation and geometry protocols
         run: |
           mkdir -p out/repository-maturation
           python code/ops/VERIFY_REPOSITORY_MATURATION_AND_GEOMETRY.py --json \
             | tee out/repository-maturation/verification.json
           python -m json.tool out/repository-maturation/verification.json >/dev/null
+      - name: Build complete Git-native branch census
+        run: |
+          python code/ops/BUILD_REPOSITORY_BRANCH_CENSUS.py \
+            --output out/repository-maturation/branch-census.json
+          python -m json.tool out/repository-maturation/branch-census.json >/dev/null
       - name: Run adversarial regression tests
-        run: python -m unittest tests.test_repository_maturation_and_geometry -v
-      - name: Upload verification receipt
+        run: |
+          python -m unittest \
+            tests.test_repository_maturation_and_geometry \
+            tests.test_repository_branch_census -v
+      - name: Upload verification receipts
         uses: actions/upload-artifact@v4
         with:
           name: repository-maturation-verification-${{ github.sha }}
-          path: out/repository-maturation/verification.json
+          path: out/repository-maturation/*.json
           if-no-files-found: error
           retention-days: 30
