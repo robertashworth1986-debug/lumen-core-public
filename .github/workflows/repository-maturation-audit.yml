@@ -1,0 +1,62 @@
+name: Repository Maturation Audit Gate
+
+on:
+  pull_request:
+    paths:
+      - "config/repository_maturation_audit_v1.json"
+      - "config/geometry_evaluation_protocol_v1.json"
+      - "docs/REPOSITORY_MATURATION_AUDIT_2026-07-24.md"
+      - "docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md"
+      - "code/ops/VERIFY_REPOSITORY_MATURATION_AND_GEOMETRY.py"
+      - "tests/test_repository_maturation_and_geometry.py"
+      - ".github/workflows/repository-maturation-audit.yml"
+  push:
+    branches: [main]
+    paths:
+      - "config/repository_maturation_audit_v1.json"
+      - "config/geometry_evaluation_protocol_v1.json"
+      - "docs/REPOSITORY_MATURATION_AUDIT_2026-07-24.md"
+      - "docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md"
+      - "code/ops/VERIFY_REPOSITORY_MATURATION_AND_GEOMETRY.py"
+      - "tests/test_repository_maturation_and_geometry.py"
+      - ".github/workflows/repository-maturation-audit.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-maturation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile verifier and tests
+        run: |
+          python -m py_compile \
+            code/ops/VERIFY_REPOSITORY_MATURATION_AND_GEOMETRY.py \
+            tests/test_repository_maturation_and_geometry.py
+      - name: Verify maturation and geometry protocols
+        run: |
+          mkdir -p out/repository-maturation
+          python code/ops/VERIFY_REPOSITORY_MATURATION_AND_GEOMETRY.py --json \
+            | tee out/repository-maturation/verification.json
+          python -m json.tool out/repository-maturation/verification.json >/dev/null
+      - name: Run adversarial regression tests
+        run: python -m unittest tests.test_repository_maturation_and_geometry -v
+      - name: Upload verification receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-maturation-verification-${{ github.sha }}
+          path: out/repository-maturation/verification.json
+          if-no-files-found: error
+          retention-days: 30
