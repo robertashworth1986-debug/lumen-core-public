@@ -10,18 +10,24 @@ The canonical product spine is:
 
 `Proof Capsule -> ProofLock -> external-replication contract -> independent-executor package -> bounded paid pilot -> buyer or transaction packet`
 
-This audit classifies every pull request returned by the connected GitHub PR census through PR #69. Every observed PR is accounted for in `config/repository_maturation_audit_v1.json`.
+The pre-audit classification dataset covers every pull request returned by the connected GitHub census through PR #69. Every one of those 58 PRs is assigned exactly one disposition in `config/repository_maturation_audit_v1.json`. The live branch registry separately tracks the audit PR and later control PRs so the repository census stays current as new work is opened.
 
-The earlier connector limitation is now closed by a Git-native CI census. The audit workflow fetches `refs/heads/*` directly, enumerates every remote branch and exact tip SHA, checks every open PR head, tests ancestry against `main`, and fails if a branch without an observed PR is not classified. The current exact-head receipt records:
+The earlier connector limitation is closed by a Git-native CI census. The workflow fetches `refs/heads/*` directly, enumerates every remote branch and exact tip SHA, checks every open PR head, tests ancestry against `main`, and fails if a branch without an observed PR is not classified. The current exact-head receipt records:
 
-- **75 remote branches**;
-- **59 observed PR head branches**, including this audit branch;
+- **76 remote branches**;
+- **60 observed PR head branches**, including PRs #71 and #72;
 - **16 branch-only lines** absent from the PR census;
 - **0 missing open-PR heads**;
 - **0 unclassified branch-only lines**;
 - one deleted historical PR head, `geometry-coverage-audit-20260623`.
 
 The 16 branch-only lines are assigned exactly once in `config/repository_branch_disposition_v1.json`: five are already merged aliases or ancestors, five are selective-port sources, and six are preserved historical branches that must not be merged wholesale.
+
+Current exact-head verification at `811039b55d8e497195c93c786d632d4a2acfd751`:
+
+- Repository Maturation Audit Gate run `30101787984`: success;
+- Order Safety Promotion Gate run `30101787946`: success;
+- complete remote fetch, branch census, ancestry checks, disposition checks, maturation/geometry verification, adversarial tests, and receipt upload all passed.
 
 ## Highest-severity findings
 
@@ -109,6 +115,7 @@ Closing these drafts does not erase evidence or declare their work invalid. It r
 
 - **#14:** wait for a bounded LANL response, specific information request, rescheduled discussion, or no-fit closure.
 - **#37:** keep DICE proposal work separate from the product merge queue and preserve every legal, portal, and certification gate.
+- **#72:** exact outreach-state reconciliation for EPRI, NASA, and INL; merge only as a control receipt, not as traction or award evidence.
 
 ### Replace temporary reconciliation
 
