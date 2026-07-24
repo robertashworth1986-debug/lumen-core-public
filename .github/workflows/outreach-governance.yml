@@ -25,8 +25,11 @@ permissions:
 jobs:
   outreach-lock:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -40,4 +43,7 @@ jobs:
         run: |
           grep -q "Codex is \*\*draft-only for all external communication\*\*" AGENTS.md
           grep -q "Work-in-progress limit" docs/CANONICAL_OPERATING_STATE.md
-          grep -q "No other outbound message is currently authorized" docs/CANONICAL_OPERATING_STATE.md
+          grep -q "No duplicate outbound message is currently authorized" docs/CANONICAL_OPERATING_STATE.md
+          grep -q '"campaign_key": "epri-opai-membership-mou"' config/outreach_registry_v1.json
+          grep -q '"campaign_key": "nasa-ai-tech-support-80nssc26935917q-r1"' config/outreach_registry_v1.json
+          grep -q '"campaign_key": "inl-software-publishing-26-043"' config/outreach_registry_v1.json
