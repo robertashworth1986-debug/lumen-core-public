@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-07-24T14:30:00Z",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "purpose": "Assign every remote branch without an observed pull-request head to one explicit repository-maturation disposition.",
+  "dispositions": {
+    "merged_alias_or_ancestor": [
+      "agent/proof-capsule-validator",
+      "agent/prooflock-cinematic-build-week",
+      "deploy/retry-after-safe-capacity-recovery-20260717",
+      "fix/vps-staging-directory-preflight-20260717",
+      "research/architecture-discovery-validation-engine"
+    ],
+    "preserve_and_port_selected_artifacts": [
+      "agent/public-site-conversion-v1",
+      "agent/whitehole-blackhole-evidence-core",
+      "codex/bounded-deadline-evidence-20260719",
+      "codex/live-domain-proof-feed-bundle",
+      "codex/public-safe-compat-20260619"
+    ],
+    "preserve_historical_no_direct_merge": [
+      "codex/deadline-receipts-20260718",
+      "codex/harborsentinel-deadline-reconcile-20260719",
+      "codex/kraken-validate-safety-20260619",
+      "codex/live-data-no-orders-gate",
+      "codex/mindwise-product-lane-20260718",
+      "remote-main-backup-20260511-100612"
+    ]
+  },
+  "rationales": {
+    "agent/proof-capsule-validator": "Branch tip is already an ancestor of current main.",
+    "agent/prooflock-cinematic-build-week": "Branch tip is already an ancestor of current main.",
+    "deploy/retry-after-safe-capacity-recovery-20260717": "Deployment retry tip is already an ancestor of current main.",
+    "fix/vps-staging-directory-preflight-20260717": "Preflight repair tip is already an ancestor of current main.",
+    "research/architecture-discovery-validation-engine": "Branch tip is already an ancestor of current main.",
+    "agent/public-site-conversion-v1": "Contains a branch-only public-site implementation handoff; preserve and reconcile with PR #38 rather than merge the stale branch.",
+    "agent/whitehole-blackhole-evidence-core": "Contains a branch-only evidence package initializer; inspect and port only if a current evidence owner requires it.",
+    "codex/bounded-deadline-evidence-20260719": "Contains unique outage-second economic and Node-RED safety artifacts; review for selective porting under current commercial and claim boundaries.",
+    "codex/live-domain-proof-feed-bundle": "Preserve as a branch-only live-domain packaging source; no direct merge without current production and privacy review.",
+    "codex/public-safe-compat-20260619": "Preserve as a compatibility source; port only exact still-needed public-safe adapters.",
+    "codex/deadline-receipts-20260718": "Large stale integration branch with hundreds of commits and extensive overlap; preserve for archaeology and never merge wholesale.",
+    "codex/harborsentinel-deadline-reconcile-20260719": "Deadline-era HarborSentinel reconciliation is historical and should not re-enter the active deadline queue.",
+    "codex/kraken-validate-safety-20260619": "Superseded by the merged repository-wide no-orders safety implementation in PR #18.",
+    "codex/live-data-no-orders-gate": "Superseded by the merged repository-wide no-orders safety implementation in PR #18.",
+    "codex/mindwise-product-lane-20260718": "Historical integration parent for later stacked work; preserve ancestry and do not merge wholesale.",
+    "remote-main-backup-20260511-100612": "Historical remote-main backup; preserve as recovery history, not an active product branch."
+  },
+  "rules": {
+    "new_unclassified_branch_allowed": false,
+    "direct_merge_of_preserve_historical_no_direct_merge_allowed": false,
+    "direct_merge_of_preserve_and_port_selected_artifacts_allowed": false,
+    "selected_port_requires_current_owner_and_tests": true
+  }
+}
