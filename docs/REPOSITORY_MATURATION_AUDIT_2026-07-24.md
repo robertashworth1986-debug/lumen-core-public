@@ -10,7 +10,18 @@ The canonical product spine is:
 
 `Proof Capsule -> ProofLock -> external-replication contract -> independent-executor package -> bounded paid pilot -> buyer or transaction packet`
 
-This audit classifies every pull request returned by the connected GitHub PR census through PR #69. GitHub branch search returned no branch listing, so non-PR orphan branches cannot be claimed as exhaustively enumerated from this connector. Every observed PR and every observed PR head is accounted for in `config/repository_maturation_audit_v1.json`.
+This audit classifies every pull request returned by the connected GitHub PR census through PR #69. Every observed PR is accounted for in `config/repository_maturation_audit_v1.json`.
+
+The earlier connector limitation is now closed by a Git-native CI census. The audit workflow fetches `refs/heads/*` directly, enumerates every remote branch and exact tip SHA, checks every open PR head, tests ancestry against `main`, and fails if a branch without an observed PR is not classified. The current exact-head receipt records:
+
+- **75 remote branches**;
+- **59 observed PR head branches**, including this audit branch;
+- **16 branch-only lines** absent from the PR census;
+- **0 missing open-PR heads**;
+- **0 unclassified branch-only lines**;
+- one deleted historical PR head, `geometry-coverage-audit-20260623`.
+
+The 16 branch-only lines are assigned exactly once in `config/repository_branch_disposition_v1.json`: five are already merged aliases or ancestors, five are selective-port sources, and six are preserved historical branches that must not be merged wholesale.
 
 ## Highest-severity findings
 
@@ -34,6 +45,39 @@ The repository has strong first-party reproducibility and an externally executab
 ### P1 — active PR overhang obscures the product
 
 Open work currently mixes canonical product candidates, stacked ancestry, expired proposal operations, live external lanes, and historical research. This increases reviewer cost and makes a mature repository look less settled than the underlying engineering deserves.
+
+## Branch-only disposition
+
+### Already merged aliases or ancestors
+
+- `agent/proof-capsule-validator`
+- `agent/prooflock-cinematic-build-week`
+- `deploy/retry-after-safe-capacity-recovery-20260717`
+- `fix/vps-staging-directory-preflight-20260717`
+- `research/architecture-discovery-validation-engine`
+
+These require no merge. Their exact tips are already ancestors of `main`.
+
+### Preserve and selectively port
+
+- `agent/public-site-conversion-v1`
+- `agent/whitehole-blackhole-evidence-core`
+- `codex/bounded-deadline-evidence-20260719`
+- `codex/live-domain-proof-feed-bundle`
+- `codex/public-safe-compat-20260619`
+
+These contain branch-only handoffs, compatibility code, evidence packaging, or economic-value controls. They are not merge candidates as branches. Any recovery requires one current owner, exact selected paths, current tests, and current claim/privacy review.
+
+### Preserve historically; never merge wholesale
+
+- `codex/deadline-receipts-20260718`
+- `codex/harborsentinel-deadline-reconcile-20260719`
+- `codex/kraken-validate-safety-20260619`
+- `codex/live-data-no-orders-gate`
+- `codex/mindwise-product-lane-20260718`
+- `remote-main-backup-20260511-100612`
+
+The two Kraken/no-orders branches are superseded by merged PR #18. The deadline and product-parent branches contain large stale overlap or expired state. The remote-main backup is recovery history, not an active product branch.
 
 ## Pull-request disposition
 
@@ -107,6 +151,7 @@ The current public evidence supports **Level 3: externally executable** for the 
 4. Rebuild #64 on current `main`; close its stacked ancestors after parity is proven.
 5. Obtain one completed non-author execution receipt.
 6. Stabilize ProofLock, security, commercial, website, and transaction layers in that order.
-7. Use the geometry protocol only for named customer, evaluator, solicitation, or research questions—not as a competing company identity.
+7. Review the five selective-port branch-only sources under current owners; never merge the six historical branch-only lines wholesale.
+8. Use the geometry protocol only for named customer, evaluator, solicitation, or research questions—not as a competing company identity.
 
 **Operating principle:** become unusually trustworthy in one difficult lane rather than vaguely broad in every AI lane.
