@@ -1,0 +1,82 @@
+import importlib.util
+import unittest
+from pathlib import Path
+
+
+MODULE_PATH = Path("code/ops/BUILD_REPOSITORY_BRANCH_CENSUS.py")
+spec = importlib.util.spec_from_file_location("branch_census", MODULE_PATH)
+if spec is None or spec.loader is None:
+    raise RuntimeError(f"unable to load {MODULE_PATH}")
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+
+classify_branches = module.classify_branches
+validate_registry = module.validate_registry
+
+
+class RepositoryBranchCensusTests(unittest.TestCase):
+    def setUp(self):
+        self.registry = {
+            "schema_version": "1.0",
+            "repository": "robertashworth1986-debug/lumen-core-public",
+            "default_branch": "main",
+            "observed_pr_heads": [
+                {"number": 10, "state": "open", "head": "feature/open"},
+                {"number": 9, "state": "merged", "head": "feature/merged"},
+                {"number": 8, "state": "closed_unmerged", "head": "feature/closed"},
+            ],
+        }
+
+    def test_valid_registry_and_branch_classification(self):
+        entries = validate_registry(self.registry)
+        result = classify_branches(
+            {
+                "main": "a" * 40,
+                "feature/open": "b" * 40,
+                "feature/merged": "c" * 40,
+                "orphan/no-pr": "d" * 40,
+            },
+            entries,
+            "main",
+        )
+        self.assertEqual(result["missing_open_pr_heads"], [])
+        self.assertEqual(result["unknown_non_pr_branches"], ["orphan/no-pr"])
+        self.assertEqual(result["deleted_historical_pr_heads"], ["feature/closed"])
+
+    def test_missing_open_pr_head_fails_closed(self):
+        entries = validate_registry(self.registry)
+        with self.assertRaisesRegex(ValueError, "open PR head branches missing"):
+            classify_branches({"main": "a" * 40}, entries, "main")
+
+    def test_missing_default_branch_fails_closed(self):
+        entries = validate_registry(self.registry)
+        with self.assertRaisesRegex(ValueError, "default branch"):
+            classify_branches({"feature/open": "b" * 40}, entries, "main")
+
+    def test_duplicate_pr_number_rejected(self):
+        registry = dict(self.registry)
+        registry["observed_pr_heads"] = list(self.registry["observed_pr_heads"]) + [
+            {"number": 10, "state": "closed_unmerged", "head": "duplicate/number"}
+        ]
+        with self.assertRaisesRegex(ValueError, "duplicate PR number"):
+            validate_registry(registry)
+
+    def test_duplicate_head_branch_rejected(self):
+        registry = dict(self.registry)
+        registry["observed_pr_heads"] = list(self.registry["observed_pr_heads"]) + [
+            {"number": 11, "state": "closed_unmerged", "head": "feature/open"}
+        ]
+        with self.assertRaisesRegex(ValueError, "duplicate PR head branch"):
+            validate_registry(registry)
+
+    def test_unsafe_branch_name_rejected(self):
+        registry = dict(self.registry)
+        registry["observed_pr_heads"] = [
+            {"number": 10, "state": "open", "head": "../unsafe"}
+        ]
+        with self.assertRaisesRegex(ValueError, "unsafe head branch"):
+            validate_registry(registry)
+
+
+if __name__ == "__main__":
+    unittest.main()
