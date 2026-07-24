@@ -59,26 +59,13 @@ class OutreachGateTests(unittest.TestCase):
         self.assertFalse(result["allowed"])
         self.assertIn("existing thread", result["reason"])
 
-    def test_epri_mou_signature_state_blocks_email_reply(self) -> None:
-        no_approval = MODULE.evaluate(
-            self.registry,
-            "epri-opai-membership-mou",
-            actor="chatgpt",
-            action="send",
-            mode="reply",
-            gmail_preflight_complete=True,
+    def test_epri_signed_mou_followup_is_now_locked_waiting(self) -> None:
+        campaign = MODULE.campaign_by_key(
+            self.registry, "epri-opai-membership-mou"
         )
-        self.assertFalse(no_approval["allowed"])
-        no_preflight = MODULE.evaluate(
-            self.registry,
-            "epri-opai-membership-mou",
-            actor="chatgpt",
-            action="send",
-            mode="reply",
-            explicit_approval=True,
-        )
-        self.assertFalse(no_preflight["allowed"])
-        blocked = MODULE.evaluate(
+        self.assertEqual(campaign["status"], "waiting_for_reply")
+        self.assertEqual(campaign["outbound_sequence"], 4)
+        result = MODULE.evaluate(
             self.registry,
             "epri-opai-membership-mou",
             actor="chatgpt",
@@ -87,8 +74,44 @@ class OutreachGateTests(unittest.TestCase):
             explicit_approval=True,
             gmail_preflight_complete=True,
         )
-        self.assertFalse(blocked["allowed"])
-        self.assertIn("campaign status is blocked", blocked["reason"])
+        self.assertFalse(result["allowed"])
+        self.assertIn("wait for a substantive inbound reply", result["reason"])
+
+    def test_nasa_same_day_capability_note_is_locked_waiting(self) -> None:
+        campaign = MODULE.campaign_by_key(
+            self.registry, "nasa-ai-tech-support-80nssc26935917q-r1"
+        )
+        self.assertEqual(campaign["status"], "waiting_for_reply")
+        self.assertEqual(campaign["outbound_sequence"], 1)
+        result = MODULE.evaluate(
+            self.registry,
+            campaign["campaign_key"],
+            actor="human",
+            action="send",
+            mode="reply",
+            explicit_approval=True,
+            gmail_preflight_complete=True,
+        )
+        self.assertFalse(result["allowed"])
+        self.assertIn("wait for a substantive inbound reply", result["reason"])
+
+    def test_inl_software_license_interest_is_locked_waiting(self) -> None:
+        campaign = MODULE.campaign_by_key(
+            self.registry, "inl-software-publishing-26-043"
+        )
+        self.assertEqual(campaign["status"], "waiting_for_reply")
+        self.assertEqual(campaign["outbound_sequence"], 1)
+        result = MODULE.evaluate(
+            self.registry,
+            campaign["campaign_key"],
+            actor="chatgpt",
+            action="send",
+            mode="reply",
+            explicit_approval=True,
+            gmail_preflight_complete=True,
+        )
+        self.assertFalse(result["allowed"])
+        self.assertIn("wait for a substantive inbound reply", result["reason"])
 
     def test_waiting_campaign_blocks_another_send(self) -> None:
         result = MODULE.evaluate(
