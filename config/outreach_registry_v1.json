@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_outreach_registry.v1",
-  "updated_utc": "2026-07-23T16:58:01Z",
+  "updated_utc": "2026-07-24T14:17:16Z",
   "policy": {
     "send_authority": "Robert Ashworth",
     "codex_send_allowed": false,
@@ -14,16 +14,44 @@
     {
       "campaign_key": "epri-opai-membership-mou",
       "organization": "EPRI / Open Power AI Consortium",
-      "status": "blocked",
+      "status": "waiting_for_reply",
       "thread_mode": "existing_thread_only",
-      "outbound_sequence": 3,
-      "last_outbound_utc": "2026-07-22T22:42:01Z",
+      "outbound_sequence": 4,
+      "last_outbound_utc": "2026-07-24T14:09:23Z",
       "duplicate_detected": true,
       "duplicate_count": 1,
-      "inbound_since_last_outbound": true,
-      "next_allowed_action": "founder_review_and_signature_decision_in_docusign_no_email_reply_required",
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_consortium_access_or_specific_working_group_onboarding_reply",
       "outreach_id": "LC-EPRI-OPAI-MOU-001",
-      "notes": "EPRI issued the MOU on 2026-07-23. A second standalone membership request exists. Do not start another thread or send an acknowledgment before founder review."
+      "notes": "Robert confirmed the MOU was signed in DocuSign. One bounded onboarding follow-up was sent asking when access is active and which working group or contribution path fits. Signature and onboarding are not endorsement, funding, contract award, pilot, or external validation. Do not send another message until substantive inbound arrives."
+    },
+    {
+      "campaign_key": "nasa-ai-tech-support-80nssc26935917q-r1",
+      "organization": "NASA Shared Services Center",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "last_outbound_utc": "2026-07-24T14:10:17Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_solicitation_package_or_clarification_then_prepare_only_a_compliant_quote_with_exact_pricing_and_representations",
+      "outreach_id": "LC-NASA-80NSSC26935917Q-R1-001",
+      "notes": "One capability and solicitation-package request was sent before the listed same-day deadline. It did not claim a compliant quote, NASA validation, mission performance, certification, or award. Do not send another message unless NASA replies or a compliant submission is explicitly approved from the exact solicitation package."
+    },
+    {
+      "campaign_key": "inl-software-publishing-26-043",
+      "organization": "Idaho National Laboratory / Battelle Energy Alliance",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "last_outbound_utc": "2026-07-24T14:17:16Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_expression_of_interest_format_naics_and_maturity_guidance",
+      "outreach_id": "LC-INL-26-043-001",
+      "notes": "One bounded software-licensing expression of interest was sent for ProofLock and Proof Capsule capabilities. It did not claim prior INL deployment, federal authorization, external certification, field validation, or an accepted commercial product. Do not send another message until substantive inbound arrives."
     },
     {
       "campaign_key": "evtit-productization-review",
