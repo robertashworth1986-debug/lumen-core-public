@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -12,6 +14,7 @@ ARGOS_DIR = ROOT / "grant_submissions" / "ONC_ARGOS_20260730"
 ARGOS_OUTPUT = ARGOS_DIR / "output"
 OPPORTUNITY_MAP = ROOT / "docs" / "CURRENT_FEDERAL_OPPORTUNITY_GATE_MAP_2026-07-26.md"
 SCIENCE_MAP = ROOT / "docs" / "SCIENTIFIC_CONTRIBUTION_AND_NEXT_EXPERIMENTS_2026-07-26.md"
+ARGOS_CONFORMANCE = ARGOS_DIR / "ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.json"
 
 
 def sha256(path: Path) -> str:
@@ -20,6 +23,16 @@ def sha256(path: Path) -> str:
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_argos_conformance_builder():
+    path = ARGOS_DIR / "build_argos_conformance_gate.py"
+    spec = importlib.util.spec_from_file_location("build_argos_conformance_gate", path)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def test_lumencore_company_and_lumaarc_seal_are_distinct_and_hash_locked():
@@ -147,6 +160,105 @@ def test_argos_primary_partner_draft_is_exactly_bound_and_still_unsent():
     assert primary["outreach"]["gmail_draft_created"] is True
     assert primary["outreach"]["gmail_identifiers_stored_public"] is False
     assert primary["outreach"]["sent"] is False
+
+
+def test_argos_conformance_gate_binds_requirements_and_current_blockers():
+    conformance = load_json(ARGOS_CONFORMANCE)
+    checks = {row["check_id"]: row for row in conformance["checks"]}
+
+    assert conformance["schema"] == "lumencore.argos_response_conformance_gate.v1"
+    assert conformance["notice_id"] == "ONC-ARGOS-SSN-2026-OS351107"
+    assert conformance["deadline_utc"] == "2026-07-30T21:00:00Z"
+    assert conformance["decision"] == "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY"
+    assert conformance["summary"] == {
+        "blocked_count": 5,
+        "check_count": 18,
+        "external_action_performed": False,
+        "fail_count": 0,
+        "pass_count": 13,
+        "submission_authorized": False,
+    }
+
+    expected_pass = {
+        "OFFICIAL_NOTICE_CURRENT",
+        "DEADLINE_OPEN",
+        "ACCEPTED_FILES_PRESENT",
+        "ARTIFACT_HASH_CUSTODY",
+        "US_LETTER_SIZE",
+        "ONE_INCH_MARGINS",
+        "TWELVE_POINT_TIMES_NEW_ROMAN",
+        "CONTENT_PAGE_LIMIT",
+        "VISUAL_QA",
+        "NO_UNAUTHORIZED_PARTNER_NAME",
+        "SIMILAR_SCOPE_BOUNDARY",
+        "CLAIM_BOUNDARIES",
+        "PARTNER_DRAFT_UNSENT",
+    }
+    expected_blocked = {
+        "PRIVATE_COVER_FACTS",
+        "AUTHORIZED_NAMED_TEAM",
+        "GOVERNMENT_DUPLICATE_RECHECK",
+        "FINAL_DISPATCH_BINDING",
+        "ACTION_TIME_APPROVAL",
+    }
+    assert {check_id for check_id, row in checks.items() if row["status"] == "PASS"} == expected_pass
+    assert {
+        check_id for check_id, row in checks.items() if row["status"] == "BLOCKED"
+    } == expected_blocked
+    assert all(row["status"] != "FAIL" for row in checks.values())
+
+    custody = {row["path"]: row for row in conformance["source_custody"]}
+    for relative_path, row in custody.items():
+        source = ROOT / relative_path
+        assert source.stat().st_size == row["bytes"]
+        assert sha256(source) == row["sha256"]
+
+
+def test_argos_conformance_outputs_are_deterministic():
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ARGOS_DIR / "build_argos_conformance_gate.py"),
+            "--check",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+        text=True,
+        timeout=30,
+    )
+
+    assert result.returncode == 0, result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt["status"] == "CURRENT"
+    assert receipt["decision"] == "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY"
+    assert receipt["fail_count"] == 0
+    assert receipt["submission_authorized"] is False
+    assert receipt["external_action_performed"] is False
+
+
+def test_argos_conformance_fails_on_unauthorized_partner_injection(
+    monkeypatch, tmp_path
+):
+    builder = load_argos_conformance_builder()
+    original = builder.RESPONSE_MARKDOWN.read_text(encoding="utf-8")
+    tainted = tmp_path / builder.RESPONSE_MARKDOWN.name
+    tainted.write_text(
+        original + "\nProposed committed team member: EMI Advisors\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    monkeypatch.setattr(builder, "RESPONSE_MARKDOWN", tainted)
+    monkeypatch.setattr(builder, "rel", lambda path: str(path))
+
+    payload = builder.build_payload("2026-07-27T19:46:00Z")
+    checks = {row["check_id"]: row for row in payload["checks"]}
+
+    assert checks["NO_UNAUTHORIZED_PARTNER_NAME"]["status"] == "FAIL"
+    assert "EMI Advisors" in checks["NO_UNAUTHORIZED_PARTNER_NAME"]["evidence"]
+    assert checks["ARTIFACT_HASH_CUSTODY"]["status"] == "FAIL"
+    assert payload["summary"]["fail_count"] >= 2
+    assert payload["decision"] == "FAIL_CONFORMANCE"
 
 
 def test_argos_outreach_sequence_and_action_time_gate_remain_unsent():

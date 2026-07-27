@@ -34,15 +34,30 @@ the seal name, not a rename of the LumenCore company.
   body used by the current Gmail draft
 - `ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json`: public-safe duplicate,
   route, body-hash, draft, and send-boundary receipt
+- `ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.json`: machine-readable
+  requirement verdict, source custody, and fail-closed send decision
+- `ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.md`: reviewer-readable
+  requirement matrix and blocker actions
 - `ARGOS_ACTION_TIME_FINALIZATION_CHECKLIST_2026-07-27.md`: private fact,
   team, evidence, file, duplicate, and dispatch gates
 - `build_argos_response.py`: deterministic response builder
+- `build_argos_conformance_gate.py`: deterministic format, evidence, claim,
+  authority, duplicate, and dispatch conformance builder
 
 ## Rebuild
 
 ```powershell
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_response.py
+python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py
+python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py --check
 ```
+
+## Conformance Meaning
+
+`PASS` means the named requirement is supported by the current packet and
+receipts. `BLOCKED` means the packet intentionally remains unsendable pending a
+required private fact or authority. Any documentary, formatting, hash,
+unauthorized-name, or claim-boundary defect produces `FAIL_CONFORMANCE`.
 
 ## Submission Boundary
 

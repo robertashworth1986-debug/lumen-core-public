@@ -1,0 +1,174 @@
+{
+  "checks": [
+    {
+      "check_id": "OFFICIAL_NOTICE_CURRENT",
+      "evidence": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
+      "requirement": "The official notice is active and its identity and deadline are explicit.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "DEADLINE_OPEN",
+      "evidence": "evaluated=2026-07-27T19:46:00Z; deadline=2026-07-30T21:00:00Z",
+      "requirement": "The response is evaluated before the exact Government deadline.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ACCEPTED_FILES_PRESENT",
+      "evidence": "docx=True; pdf=True; receipts=True",
+      "requirement": "Both accepted review formats and their receipts are present.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ARTIFACT_HASH_CUSTODY",
+      "evidence": "docx_sha256=eaf9015d1c2b003ccb8321dc30f5bca4f07a90bd16313e2bb6d2e2c57544e8b4; pdf_sha256=25d8d79e1c2f28fba0876ecbae1f78d618e6147b6f30bd040caed3acbd315173",
+      "requirement": "Markdown, DOCX, and PDF hashes reconcile to the current receipts.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "US_LETTER_SIZE",
+      "evidence": "sections=2; expected_twips=12240x15840",
+      "requirement": "Every DOCX section uses US Letter dimensions.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ONE_INCH_MARGINS",
+      "evidence": "sections=2; expected_twips=1440",
+      "requirement": "Every DOCX section uses one-inch content margins.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "TWELVE_POINT_TIMES_NEW_ROMAN",
+      "evidence": "font=Times New Roman; half_points=24",
+      "requirement": "The Normal style is Times New Roman 12 point.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "CONTENT_PAGE_LIMIT",
+      "evidence": "cover_pages=1; content_pages=9; limit=10",
+      "requirement": "The response stays within ten content pages excluding the cover.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "VISUAL_QA",
+      "evidence": "inspected_pages=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+      "requirement": "Every rendered page is inspected without clipping or overlap.",
+      "status": "PASS"
+    },
+    {
+      "blocker": "Insert only currently verified private entity and contact facts in the private final copy.",
+      "check_id": "PRIVATE_COVER_FACTS",
+      "evidence": "placeholder_count=6; required_private_fact_count=9",
+      "requirement": "Every required cover fact is resolved and no placeholder remains.",
+      "status": "BLOCKED"
+    },
+    {
+      "blocker": "Obtain written partner role, name, credential, and reference authorization.",
+      "check_id": "AUTHORIZED_NAMED_TEAM",
+      "evidence": "required_teaming_fact_count=7; candidate_name_authorizations=0",
+      "requirement": "Every named team role, credential, and reference is documented and authorized.",
+      "status": "BLOCKED"
+    },
+    {
+      "check_id": "NO_UNAUTHORIZED_PARTNER_NAME",
+      "evidence": "unauthorized_names_found=[]",
+      "requirement": "The Government response names no uncommitted teaming candidate.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "SIMILAR_SCOPE_BOUNDARY",
+      "evidence": "Explicit similar-scope matrix and acquisition implications are present.",
+      "requirement": "Adjacent component evidence is not represented as federal-health prior performance.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "CLAIM_BOUNDARIES",
+      "evidence": "forbidden_promotion_phrases_found=[]",
+      "requirement": "Unsupported certification, authorization, validation, savings, and prime claims remain prohibited.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "PARTNER_DRAFT_UNSENT",
+      "evidence": "draft_present=True; sent=False; attachments=0",
+      "requirement": "The bounded partner inquiry remains an unsent, no-attachment draft.",
+      "status": "PASS"
+    },
+    {
+      "blocker": "Repeat the exact Government-response duplicate search immediately before send.",
+      "check_id": "GOVERNMENT_DUPLICATE_RECHECK",
+      "evidence": "last_preliminary_check=2026-07-27T19:05:00Z",
+      "requirement": "A fresh full-mailbox duplicate check is bound to the final Government response.",
+      "status": "BLOCKED"
+    },
+    {
+      "blocker": "Build and inspect the private final action packet after the cover and team gates pass.",
+      "check_id": "FINAL_DISPATCH_BINDING",
+      "evidence": "recipient=False; subject=False; body=False; attachments=False",
+      "requirement": "The final Government recipient, subject, body, and attachment set are verified together.",
+      "status": "BLOCKED"
+    },
+    {
+      "blocker": "Obtain exact action-time approval only after every other blocker is cleared.",
+      "check_id": "ACTION_TIME_APPROVAL",
+      "evidence": "approval_required=True; submission_authorized=False",
+      "requirement": "Single-use action-time human approval is bound to the exact Government dispatch.",
+      "status": "BLOCKED"
+    }
+  ],
+  "claim_boundary": "PASS means the named documentary or formatting requirement is supported. BLOCKED means the current artifact is intentionally not send-ready. Neither passing checks nor a polished packet establishes submission, acceptance, selection, award, authorization, certification, external validation, field performance, or savings.",
+  "deadline_utc": "2026-07-30T21:00:00Z",
+  "decision": "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY",
+  "evaluated_utc": "2026-07-27T19:46:00Z",
+  "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+  "safest_next_action": "Resolve the private cover and authorized-team blockers first. Then rebuild the private final copy, rerun this gate, repeat the official-notice and full-mailbox duplicate checks, and request exact action-time approval.",
+  "schema": "lumencore.argos_response_conformance_gate.v1",
+  "source_custody": [
+    {
+      "bytes": 5047,
+      "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
+      "sha256": "23b05d0b44d3c2b76bd4bc2e20116baa746ccef8738805a192a348f26ee9e61b"
+    },
+    {
+      "bytes": 7358,
+      "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json",
+      "sha256": "dab21e6d40a1b0cd9dfa4308f79f0a703cc8a91768a17452f01599e7a3309a09"
+    },
+    {
+      "bytes": 2314,
+      "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
+      "sha256": "c4aacfdea8e973473f5de23311aa32f5d5c9be07f7a75c6a0285fac302a37fe5"
+    },
+    {
+      "bytes": 13824,
+      "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md",
+      "sha256": "f665ce36c78b709e785879dff7ba45958418d222378a72aab5c1fa6029071955"
+    },
+    {
+      "bytes": 754,
+      "path": "grant_submissions/ONC_ARGOS_20260730/output/build_receipt.json",
+      "sha256": "069faba7b9064be391bb8be0fe74f207de82d39f3860de48d7d71365440c47ae"
+    },
+    {
+      "bytes": 1379,
+      "path": "grant_submissions/ONC_ARGOS_20260730/output/render_qa_receipt.json",
+      "sha256": "1d5130c9735090501e46c2fdb1ac1f1ce3668ba3956a666c3ebfe9cf884db124"
+    },
+    {
+      "bytes": 729860,
+      "path": "grant_submissions/ONC_ARGOS_20260730/output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.docx",
+      "sha256": "eaf9015d1c2b003ccb8321dc30f5bca4f07a90bd16313e2bb6d2e2c57544e8b4"
+    },
+    {
+      "bytes": 232859,
+      "path": "grant_submissions/ONC_ARGOS_20260730/output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.pdf",
+      "sha256": "25d8d79e1c2f28fba0876ecbae1f78d618e6147b6f30bd040caed3acbd315173"
+    }
+  ],
+  "summary": {
+    "blocked_count": 5,
+    "check_count": 18,
+    "external_action_performed": false,
+    "fail_count": 0,
+    "pass_count": 13,
+    "submission_authorized": false
+  }
+}
