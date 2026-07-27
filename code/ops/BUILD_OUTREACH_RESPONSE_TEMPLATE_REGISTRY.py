@@ -62,6 +62,8 @@ POSITIVE_CLAIM_MARKERS = (
 CLAIM_EVIDENCE_RECEIPT_SCHEMA = (
     "lumencore.outreach_claim_evidence_receipt.v1"
 )
+DISPATCH_BINDING_SCHEMA = "lumencore.outreach_dispatch_binding.v1"
+SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 CLAIM_EVIDENCE_RECEIPT_FIELDS = {
     "claim_allowed",
     "fact_field",
@@ -127,8 +129,20 @@ class OutreachRegistryError(ValueError):
     pass
 
 
+def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise OutreachRegistryError(f"DUPLICATE_JSON_KEY:{key}")
+        result[key] = value
+    return result
+
+
 def read_registry(path: Path = CONFIG) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload = json.loads(
+        path.read_text(encoding="utf-8"),
+        object_pairs_hook=_reject_duplicate_keys,
+    )
     if not isinstance(payload, dict):
         raise OutreachRegistryError("REGISTRY_NOT_OBJECT")
     return payload
@@ -151,6 +165,107 @@ def canonical_object_sha256(
             bounded, sort_keys=True, separators=(",", ":")
         ).encode("utf-8")
     )
+
+
+def _normalize_attachment_files(raw_attachments: Any) -> list[str]:
+    attachments = raw_attachments or []
+    if not isinstance(attachments, list) or not all(
+        isinstance(item, str) and item.strip() for item in attachments
+    ):
+        raise OutreachRegistryError("ATTACHMENT_LIST_INVALID")
+    normalized = [item.strip() for item in attachments]
+    names = [item.casefold() for item in normalized]
+    if len(names) != len(set(names)):
+        raise OutreachRegistryError("DUPLICATE_ATTACHMENT_NAME")
+    return normalized
+
+
+def _attachment_binding(
+    attachments: list[str],
+    attachment_sha256s: dict[str, str] | None,
+) -> tuple[list[dict[str, str | None]], str, bool]:
+    supplied: Any = {} if attachment_sha256s is None else attachment_sha256s
+    if not isinstance(supplied, dict) or not all(
+        isinstance(name, str) and name.strip() and isinstance(digest, str)
+        for name, digest in supplied.items()
+    ):
+        raise OutreachRegistryError("ATTACHMENT_SHA256_MAP_INVALID")
+
+    normalized_supplied: dict[str, str] = {}
+    for name, digest in supplied.items():
+        normalized_name = name.strip().casefold()
+        if normalized_name in normalized_supplied:
+            raise OutreachRegistryError("DUPLICATE_ATTACHMENT_HASH_NAME")
+        if not SHA256_RE.fullmatch(digest.strip()):
+            raise OutreachRegistryError("ATTACHMENT_SHA256_INVALID")
+        normalized_supplied[normalized_name] = digest.strip().upper()
+
+    attachment_names = {name.casefold() for name in attachments}
+    if normalized_supplied and set(normalized_supplied) != attachment_names:
+        raise OutreachRegistryError("ATTACHMENT_HASH_SET_MISMATCH")
+
+    hashes_bound = not attachments or set(normalized_supplied) == attachment_names
+    entries = sorted(
+        (
+            {
+                "name_sha256": sha256_bytes(name.casefold().encode("utf-8")),
+                "content_sha256": normalized_supplied.get(name.casefold()),
+            }
+            for name in attachments
+        ),
+        key=lambda item: item["name_sha256"],
+    )
+    attachment_set_sha256 = canonical_object_sha256({"attachments": entries})
+    return entries, attachment_set_sha256, hashes_bound
+
+
+def _dispatch_binding(
+    *,
+    payload: dict[str, Any],
+    row: dict[str, Any],
+    facts: dict[str, Any],
+    subject: str,
+    body: str,
+    rendered_deadline_iso: str | None,
+    attachment_entries: list[dict[str, str | None]],
+    attachment_set_sha256: str,
+    attachment_content_hashes_bound: bool,
+    evidence_receipt_sha256s: dict[str, str],
+    already_sent: bool,
+    inbound_requires_response: bool,
+    explicit_attachment_request: bool,
+) -> dict[str, Any]:
+    recipient_route = str(facts["recipient_email"]).strip().casefold()
+    source_message_id = str(facts.get("source_message_id") or "").strip()
+    core = {
+        "schema": DISPATCH_BINDING_SCHEMA,
+        "template_id": row["template_id"],
+        "registry_source_config_sha256": canonical_object_sha256(payload),
+        "recipient_route_sha256": sha256_bytes(recipient_route.encode("utf-8")),
+        "source_message_id_sha256": (
+            sha256_bytes(source_message_id.encode("utf-8"))
+            if source_message_id
+            else None
+        ),
+        "subject_sha256": sha256_bytes(subject.encode("utf-8")),
+        "body_sha256": sha256_bytes(body.encode("utf-8")),
+        "deadline_utc": rendered_deadline_iso,
+        "send_policy": row["send_policy"],
+        "attachment_policy": row["attachment_policy"],
+        "attachment_count": len(attachment_entries),
+        "attachment_entries": attachment_entries,
+        "attachment_set_sha256": attachment_set_sha256,
+        "attachment_content_hashes_bound": attachment_content_hashes_bound,
+        "claim_evidence_receipt_sha256s": dict(
+            sorted(evidence_receipt_sha256s.items())
+        ),
+        "duplicate_send_state": {
+            "already_sent": already_sent,
+            "inbound_requires_response": inbound_requires_response,
+        },
+        "explicit_attachment_request": explicit_attachment_request,
+    }
+    return {**core, "binding_sha256": canonical_object_sha256(core)}
 
 
 def _rooted_artifact(path_value: Any) -> Path:
@@ -207,7 +322,10 @@ def validate_claim_evidence_receipt(
 ) -> str:
     path = _rooted_artifact(receipt_path)
     try:
-        receipt = json.loads(path.read_text(encoding="utf-8"))
+        receipt = json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=_reject_duplicate_keys,
+        )
     except (OSError, json.JSONDecodeError) as exc:
         raise OutreachRegistryError("CLAIM_EVIDENCE_RECEIPT_INVALID_JSON") from exc
     if not isinstance(receipt, dict):
@@ -559,6 +677,10 @@ def _base_result(
         "send_performed": False,
         "send_allowed_by_builder": False,
         "action_time_human_review_required": True,
+        "dispatch_binding": None,
+        "exact_action_time_approval_ready": False,
+        "exact_action_time_approval_phrase": None,
+        "exact_action_time_approval_blockers": ["RENDER_NOT_READY"],
     }
 
 
@@ -570,6 +692,7 @@ def render_response(
     inbound_requires_response: bool = True,
     explicit_attachment_request: bool = False,
     claim_evidence_receipts: dict[str, str] | None = None,
+    attachment_sha256s: dict[str, str] | None = None,
     current_utc: str | None = None,
     registry: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -703,11 +826,7 @@ def render_response(
         )
         return result
 
-    attachments = facts.get("attachment_files") or []
-    if not isinstance(attachments, list) or not all(
-        isinstance(item, str) and item.strip() for item in attachments
-    ):
-        raise OutreachRegistryError("ATTACHMENT_LIST_INVALID")
+    attachments = _normalize_attachment_files(facts.get("attachment_files"))
     attachment_blocked = bool(attachments) and (
         row["attachment_policy"] == "NONE"
         or (
@@ -790,6 +909,42 @@ def render_response(
         if private_render
         else "READY_FOR_ACTION_TIME_REVIEW"
     )
+    attachment_entries, attachment_set_sha256, attachment_hashes_bound = (
+        _attachment_binding(attachments, attachment_sha256s)
+    )
+    rendered_deadline_iso = (
+        values["deadline_iso"] if deadline["provided"] else None
+    )
+    dispatch_binding = _dispatch_binding(
+        payload=payload,
+        row=row,
+        facts=facts,
+        subject=subject,
+        body=body,
+        rendered_deadline_iso=rendered_deadline_iso,
+        attachment_entries=attachment_entries,
+        attachment_set_sha256=attachment_set_sha256,
+        attachment_content_hashes_bound=attachment_hashes_bound,
+        evidence_receipt_sha256s=evidence_receipt_sha256s,
+        already_sent=already_sent,
+        inbound_requires_response=inbound_requires_response,
+        explicit_attachment_request=explicit_attachment_request,
+    )
+    exact_approval_ready = attachment_hashes_bound
+    exact_approval_phrase = None
+    exact_approval_blockers: list[str] = []
+    if exact_approval_ready:
+        exact_approval_phrase = (
+            "APPROVE OUTREACH DISPATCH: "
+            f"template {row['template_id']}; "
+            f"binding SHA-256 {dispatch_binding['binding_sha256']}; "
+            f"subject SHA-256 {dispatch_binding['subject_sha256']}; "
+            f"body SHA-256 {dispatch_binding['body_sha256']}; "
+            "attachment set SHA-256 "
+            f"{dispatch_binding['attachment_set_sha256']}."
+        )
+    else:
+        exact_approval_blockers.append("ATTACHMENT_CONTENT_HASHES_REQUIRED")
     result = _base_result(payload, row, status, deadline)
     result.update(
         {
@@ -802,11 +957,13 @@ def render_response(
             "private_render": private_render,
             "public_safe": not private_render,
             "sensitive_field_names": sensitive_present,
-            "rendered_deadline_iso": (
-                values["deadline_iso"] if deadline["provided"] else None
-            ),
+            "rendered_deadline_iso": rendered_deadline_iso,
             "claim_risk_fields": sorted(fact_risks),
             "claim_evidence_receipt_sha256s": evidence_receipt_sha256s,
+            "dispatch_binding": dispatch_binding,
+            "exact_action_time_approval_ready": exact_approval_ready,
+            "exact_action_time_approval_phrase": exact_approval_phrase,
+            "exact_action_time_approval_blockers": exact_approval_blockers,
         }
     )
     return result
@@ -873,6 +1030,12 @@ def build_public_payload(
             "claim_evidence_receipt_template": (
                 CLAIM_EVIDENCE_TEMPLATE.relative_to(ROOT).as_posix()
             ),
+            "duplicate_json_key_fail_closed": True,
+            "ready_render_has_dispatch_binding": True,
+            "recipient_route_and_source_thread_hash_bound": True,
+            "subject_body_deadline_and_attachment_set_hash_bound": True,
+            "attachment_content_hash_required_for_exact_approval": True,
+            "exact_approval_phrase_is_binding_scoped": True,
             "source_config_hash_cross_platform_canonical_json": True,
             "builder_can_send_email": False,
             "action_time_human_review_required": True,
@@ -897,6 +1060,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Past-deadline gate: `FAIL_CLOSED`",
         "- Inserted-fact claim gate: `FAIL_CLOSED`",
         "- High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`",
+        "- Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`",
+        "- Attachment content required for exact approval: `true`",
+        "- Exact approval phrase: `BINDING_SCOPED`",
         f"- Static quality gate: `{payload['quality_gate']['status']}`",
         f"- Static quality checks: `{payload['quality_gate']['check_count']}`",
         "- Unchanged rebuilds byte-stable: `true`",
@@ -960,7 +1126,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Operating Boundary",
             "",
-            "This registry renders drafts and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A hash-bound receipt proves only that an exact inserted fact was reviewed against the listed source bytes; it does not by itself establish independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
+            "This registry renders drafts, immutable dispatch bindings, and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set. The exact approval phrase is withheld until every attachment content hash is bound. A binding scopes approval; it is not proof of transmission, receipt, content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
             "",
         ]
     )

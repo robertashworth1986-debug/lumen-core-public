@@ -8,6 +8,9 @@
 - Past-deadline gate: `FAIL_CLOSED`
 - Inserted-fact claim gate: `FAIL_CLOSED`
 - High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`
+- Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`
+- Attachment content required for exact approval: `true`
+- Exact approval phrase: `BINDING_SCOPED`
 - Static quality gate: `PASS`
 - Static quality checks: `180`
 - Unchanged rebuilds byte-stable: `true`
@@ -432,4 +435,4 @@ Thank you,
 
 ## Operating Boundary
 
-This registry renders drafts and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A hash-bound receipt proves only that an exact inserted fact was reviewed against the listed source bytes; it does not by itself establish independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.
+This registry renders drafts, immutable dispatch bindings, and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set. The exact approval phrase is withheld until every attachment content hash is bound. A binding scopes approval; it is not proof of transmission, receipt, content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.

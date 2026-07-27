@@ -119,8 +119,12 @@ def test_duplicate_send_and_monitor_states_fail_closed_without_rendering_message
     assert duplicate["duplicate_send_blocked"] is True
     assert duplicate["subject"] is None
     assert duplicate["body"] is None
+    assert duplicate["dispatch_binding"] is None
+    assert duplicate["exact_action_time_approval_ready"] is False
     assert monitor["status"] == "MONITOR_NO_SEND"
     assert monitor["send_performed"] is False
+    assert monitor["dispatch_binding"] is None
+    assert monitor["exact_action_time_approval_phrase"] is None
 
 
 def test_missing_facts_invalid_email_and_unrequested_attachment_block_render():
@@ -165,6 +169,18 @@ def test_deadline_urgency_is_timezone_aware_and_past_deadlines_block():
     )
     assert critical["deadline"]["urgency"] == "CRITICAL_UNDER_24_HOURS"
     assert critical["deadline"]["hours_remaining"] == 23.0
+    assert critical["dispatch_binding"]["deadline_utc"] == "2026-07-19T16:00:00Z"
+
+    later_deadline_facts = copy.deepcopy(facts)
+    later_deadline_facts["deadline_iso"] = "2026-07-19T12:00:00-05:00"
+    later_deadline = module.render_response(
+        "DEADLINE_CLARIFICATION",
+        later_deadline_facts,
+        current_utc="2026-07-18T17:00:00+00:00",
+    )
+    assert later_deadline["dispatch_binding"]["binding_sha256"] != critical[
+        "dispatch_binding"
+    ]["binding_sha256"]
 
     past = module.render_response(
         "DEADLINE_CLARIFICATION",
@@ -356,6 +372,22 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
         is True
     )
     assert payload["controls"]["claim_evidence_source_artifacts_rehashed"] is True
+    assert payload["controls"]["duplicate_json_key_fail_closed"] is True
+    assert payload["controls"]["ready_render_has_dispatch_binding"] is True
+    assert (
+        payload["controls"]["recipient_route_and_source_thread_hash_bound"] is True
+    )
+    assert (
+        payload["controls"]["subject_body_deadline_and_attachment_set_hash_bound"]
+        is True
+    )
+    assert (
+        payload["controls"][
+            "attachment_content_hash_required_for_exact_approval"
+        ]
+        is True
+    )
+    assert payload["controls"]["exact_approval_phrase_is_binding_scoped"] is True
     assert payload["controls"]["claim_evidence_receipt_schema"] == (
         module.CLAIM_EVIDENCE_RECEIPT_SCHEMA
     )
@@ -370,6 +402,8 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert "Duplicate-send gate: `FAIL_CLOSED`" in markdown
     assert "Inserted-fact claim gate: `FAIL_CLOSED`" in markdown
     assert "EXACT_VALUE_AND_SOURCE_HASH_BOUND" in markdown
+    assert "RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND" in markdown
+    assert "Exact approval phrase: `BINDING_SCOPED`" in markdown
     assert "Static quality gate: `PASS`" in markdown
     assert "No message is rendered" in markdown
     assert "receipt check only, not a duplicate submission" in markdown
@@ -501,6 +535,83 @@ def test_requested_information_may_contain_literal_json_braces():
 
     assert rendered["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
     assert '{"status":"bounded","send_now":false}' in rendered["body"]
+    assert rendered["dispatch_binding"]["schema"] == module.DISPATCH_BINDING_SCHEMA
+    assert rendered["exact_action_time_approval_ready"] is True
+    assert rendered["exact_action_time_approval_phrase"].startswith(
+        "APPROVE OUTREACH DISPATCH:"
+    )
+
+
+def test_ready_dispatch_binding_is_stable_private_safe_and_scope_sensitive():
+    module = load_module()
+    facts = common_facts()
+    facts.update(
+        {
+            "problem_lane": "grid forecast replay",
+            "validation_scope": "one frozen public dataset and one incumbent baseline",
+            "protocol_summary": "predeclare splits, metrics, exclusions, and stop rules",
+            "requested_next_step": "name one technical reviewer",
+        }
+    )
+
+    first = module.render_response("VALIDATION_PILOT_REQUEST", facts)
+    second = module.render_response("VALIDATION_PILOT_REQUEST", copy.deepcopy(facts))
+
+    assert first["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
+    assert first["dispatch_binding"] == second["dispatch_binding"]
+    binding = first["dispatch_binding"]
+    assert binding["schema"] == module.DISPATCH_BINDING_SCHEMA
+    assert binding["binding_sha256"] == module.canonical_object_sha256(
+        binding, omit={"binding_sha256"}
+    )
+    assert binding["attachment_count"] == 0
+    assert binding["attachment_content_hashes_bound"] is True
+    assert first["exact_action_time_approval_ready"] is True
+    assert first["exact_action_time_approval_blockers"] == []
+    assert binding["binding_sha256"] in first["exact_action_time_approval_phrase"]
+    assert binding["subject_sha256"] in first["exact_action_time_approval_phrase"]
+    assert binding["body_sha256"] in first["exact_action_time_approval_phrase"]
+    assert (
+        binding["attachment_set_sha256"]
+        in first["exact_action_time_approval_phrase"]
+    )
+    private_safe_binding = json.dumps(binding, sort_keys=True)
+    assert facts["recipient_email"] not in private_safe_binding
+    assert facts["source_message_id"] not in private_safe_binding
+    assert facts["recipient_email"] not in first["exact_action_time_approval_phrase"]
+    assert (
+        facts["source_message_id"]
+        not in first["exact_action_time_approval_phrase"]
+    )
+
+    recipient_change = copy.deepcopy(facts)
+    recipient_change["recipient_email"] = "other-reviewer@example.org"
+    source_change = copy.deepcopy(facts)
+    source_change["source_message_id"] = "different-synthetic-message"
+    body_change = copy.deepcopy(facts)
+    body_change["requested_next_step"] = "name two technical reviewers"
+
+    assert (
+        module.render_response(
+            "VALIDATION_PILOT_REQUEST", recipient_change
+        )["dispatch_binding"]["binding_sha256"]
+        != binding["binding_sha256"]
+    )
+    assert (
+        module.render_response(
+            "VALIDATION_PILOT_REQUEST", source_change
+        )["dispatch_binding"]["binding_sha256"]
+        != binding["binding_sha256"]
+    )
+    body_changed_render = module.render_response(
+        "VALIDATION_PILOT_REQUEST", body_change
+    )
+    assert body_changed_render["dispatch_binding"]["body_sha256"] != binding[
+        "body_sha256"
+    ]
+    assert body_changed_render["dispatch_binding"]["binding_sha256"] != binding[
+        "binding_sha256"
+    ]
 
 
 def test_requested_asset_delivery_requires_explicit_request_and_private_review():
@@ -539,6 +650,83 @@ def test_requested_asset_delivery_requires_explicit_request_and_private_review()
     assert "do not imply endorsement" in rendered["body"]
     assert rendered["send_allowed_by_builder"] is False
     assert rendered["send_performed"] is False
+    assert rendered["dispatch_binding"]["attachment_content_hashes_bound"] is False
+    assert rendered["exact_action_time_approval_ready"] is False
+    assert rendered["exact_action_time_approval_phrase"] is None
+    assert rendered["exact_action_time_approval_blockers"] == [
+        "ATTACHMENT_CONTENT_HASHES_REQUIRED"
+    ]
+
+    content_hashes = {
+        "lumencore-light.png": "A" * 64,
+        "lumencore-dark.png": "B" * 64,
+    }
+    hash_bound = module.render_response(
+        "REQUESTED_ASSET_DELIVERY_REPLY",
+        facts,
+        explicit_attachment_request=True,
+        attachment_sha256s=content_hashes,
+    )
+    assert hash_bound["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
+    assert hash_bound["dispatch_binding"]["attachment_content_hashes_bound"] is True
+    assert hash_bound["exact_action_time_approval_ready"] is True
+    assert hash_bound["exact_action_time_approval_blockers"] == []
+    assert hash_bound["exact_action_time_approval_phrase"] is not None
+    assert "lumencore-light.png" not in json.dumps(
+        hash_bound["dispatch_binding"], sort_keys=True
+    )
+    assert "lumencore-dark.png" not in hash_bound[
+        "exact_action_time_approval_phrase"
+    ]
+
+    changed_hashes = dict(content_hashes)
+    changed_hashes["lumencore-dark.png"] = "C" * 64
+    changed = module.render_response(
+        "REQUESTED_ASSET_DELIVERY_REPLY",
+        facts,
+        explicit_attachment_request=True,
+        attachment_sha256s=changed_hashes,
+    )
+    assert changed["dispatch_binding"]["attachment_set_sha256"] != hash_bound[
+        "dispatch_binding"
+    ]["attachment_set_sha256"]
+    assert changed["dispatch_binding"]["binding_sha256"] != hash_bound[
+        "dispatch_binding"
+    ]["binding_sha256"]
+
+    with pytest.raises(
+        module.OutreachRegistryError, match="ATTACHMENT_HASH_SET_MISMATCH"
+    ):
+        module.render_response(
+            "REQUESTED_ASSET_DELIVERY_REPLY",
+            facts,
+            explicit_attachment_request=True,
+            attachment_sha256s={"lumencore-light.png": "A" * 64},
+        )
+
+    with pytest.raises(
+        module.OutreachRegistryError, match="ATTACHMENT_SHA256_MAP_INVALID"
+    ):
+        module.render_response(
+            "REQUESTED_ASSET_DELIVERY_REPLY",
+            facts,
+            explicit_attachment_request=True,
+            attachment_sha256s=[],
+        )
+
+    duplicate_names = copy.deepcopy(facts)
+    duplicate_names["attachment_files"] = [
+        "lumencore-light.png",
+        "LUMENCORE-LIGHT.PNG",
+    ]
+    with pytest.raises(
+        module.OutreachRegistryError, match="DUPLICATE_ATTACHMENT_NAME"
+    ):
+        module.render_response(
+            "REQUESTED_ASSET_DELIVERY_REPLY",
+            duplicate_names,
+            explicit_attachment_request=True,
+        )
 
 
 def test_high_risk_inserted_claims_require_exact_evidence_receipts():
@@ -648,6 +836,30 @@ def test_exact_claim_receipt_rehashes_sources_and_fails_after_tampering(
         "six_month_milestone": receipt["receipt_sha256"]
     }
 
+    revised_receipt = copy.deepcopy(receipt)
+    revised_receipt["review_basis"] += " Second independent review pass."
+    revised_receipt["receipt_sha256"] = module.canonical_object_sha256(
+        revised_receipt, omit={"receipt_sha256"}
+    )
+    receipt_path.write_text(
+        json.dumps(revised_receipt, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    revised_render = module.render_response(
+        "DIRECT_INVESTOR_REVIEW_REQUEST",
+        facts,
+        claim_evidence_receipts={
+            "six_month_milestone": "evidence/claim_receipt.json"
+        },
+        registry=registry,
+    )
+    assert revised_render["claim_evidence_receipt_sha256s"] == {
+        "six_month_milestone": revised_receipt["receipt_sha256"]
+    }
+    assert revised_render["dispatch_binding"]["binding_sha256"] != rendered[
+        "dispatch_binding"
+    ]["binding_sha256"]
+
     source_path.write_text("Tampered after review.\n", encoding="utf-8")
     blocked = module.render_response(
         "DIRECT_INVESTOR_REVIEW_REQUEST",
@@ -672,6 +884,39 @@ def test_claim_evidence_template_is_deliberately_non_authorizing():
     ):
         module.validate_claim_evidence_receipt(
             "config/outreach_claim_evidence_receipt_template_v1.json",
+            fact_field="six_month_milestone",
+            fact_value="Synthetic claim",
+            risk_codes=["UNSUPPORTED_AWARD_OR_CONTRACT"],
+        )
+
+
+def test_duplicate_json_keys_fail_closed_in_registry_and_evidence_receipts(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    duplicate_registry = tmp_path / "duplicate_registry.json"
+    duplicate_registry.write_text(
+        '{"schema":"first","schema":"second"}\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        module.OutreachRegistryError, match=r"DUPLICATE_JSON_KEY:schema"
+    ):
+        module.read_registry(duplicate_registry)
+
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    evidence_dir = tmp_path / "evidence"
+    evidence_dir.mkdir()
+    duplicate_receipt = evidence_dir / "duplicate_receipt.json"
+    duplicate_receipt.write_text(
+        '{"schema":"first","schema":"second"}\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        module.OutreachRegistryError, match=r"DUPLICATE_JSON_KEY:schema"
+    ):
+        module.validate_claim_evidence_receipt(
+            "evidence/duplicate_receipt.json",
             fact_field="six_month_milestone",
             fact_value="Synthetic claim",
             risk_codes=["UNSUPPORTED_AWARD_OR_CONTRACT"],
