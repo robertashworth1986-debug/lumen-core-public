@@ -1,0 +1,11 @@
+{
+  "claim_allowed": false,
+  "fact_field": "TO_BE_FILLED",
+  "fact_value_sha256": "TO_BE_COMPUTED_FROM_EXACT_RENDERED_FACT",
+  "receipt_sha256": "TO_BE_COMPUTED_AFTER_REVIEW",
+  "review_basis": "TO_BE_FILLED_WITH_THE_DIRECT_EVIDENCE_BASIS_AND_CLAIM_LIMITS",
+  "reviewed_utc": "TO_BE_FILLED_WITH_AN_AWARE_ISO_8601_TIMESTAMP",
+  "risk_codes": [],
+  "schema": "lumencore.outreach_claim_evidence_receipt.v1",
+  "source_artifacts": []
+}
