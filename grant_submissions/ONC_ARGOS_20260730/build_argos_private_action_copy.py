@@ -24,12 +24,27 @@ TEAM_REGISTER = ARGOS_DIR / "ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json"
 
 NOTICE_ID = "ONC-ARGOS-SSN-2026-OS351107"
 FACT_SCHEMA = "lumencore.argos_private_facts.v1"
+RECEIPT_SCHEMA = "lumencore.argos_private_action_copy_receipt.v1"
+RECEIPT_DECISION = "PRIVATE_COVER_READY_TEAM_AND_DISPATCH_BLOCKED"
 PRIVATE_MARKER = "ACTION_TIME_PRIVATE_FACT_REQUIRED"
 PRIVATE_DISPLAY_MARKER = "Pending action-time fact"
 PRIVATE_STATUS = "PRIVATE ACTION COPY - HUMAN REVIEW REQUIRED"
 TEXT_OUTPUT_NAME = "ARGOS_PRIVATE_ACTION_COPY.md"
 DOCX_OUTPUT_NAME = "ARGOS_PRIVATE_ACTION_COPY.docx"
 RECEIPT_OUTPUT_NAME = "ARGOS_PRIVATE_ACTION_COPY_RECEIPT.json"
+PUBLIC_VAULT_ROOTS = (Path(r"E:\LumaProofVault"),)
+CLAIM_BOUNDARY = (
+    "This receipt proves only that a private action copy was generated from a "
+    "schema-valid, user-attested facts file without changing the public templates. "
+    "It does not prove team authority, final dispatch verification, submission, "
+    "acceptance, selection, award, compliance, certification, or authorization."
+)
+SAFEST_NEXT_ACTION = (
+    "Keep the private copy outside Git and public mirrors. Review every inserted "
+    "fact and the rendered cover with the user, resolve written team authority, "
+    "then run the Government duplicate and final-dispatch gates before requesting "
+    "single-use action-time approval."
+)
 
 REQUIRED_FACT_KEYS = (
     "legal_company_name",
@@ -92,15 +107,37 @@ def is_within(path: Path, parent: Path) -> bool:
         return False
 
 
+def public_storage_roots() -> tuple[Path, ...]:
+    configured = tuple(root for root in PUBLIC_VAULT_ROOTS if root.is_absolute())
+    return (ROOT, *configured)
+
+
 def validate_private_path(path: Path, label: str) -> Path:
     resolved = path.expanduser().resolve()
-    if is_within(resolved, ROOT):
-        raise ValueError(f"{label} must be outside the public repository")
+    if any(is_within(resolved, public_root) for public_root in public_storage_roots()):
+        raise ValueError(
+            f"{label} must be outside the public repository and public mirror vaults"
+        )
     return resolved
 
 
+def _reject_duplicate_keys(pairs: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
 def read_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    payload = json.loads(
+        path.read_text(encoding="utf-8"),
+        object_pairs_hook=_reject_duplicate_keys,
+    )
+    if not isinstance(payload, dict):
+        raise ValueError(f"{path.name} must contain a JSON object")
+    return payload
 
 
 def validate_fact_value(key: str, fact: dict, evaluated: datetime) -> None:
@@ -338,6 +375,195 @@ def output_paths(output_dir: Path) -> tuple[Path, Path, Path]:
     )
 
 
+def require_exact_keys(value: object, expected: set[str], label: str) -> dict:
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must be an object")
+    actual = set(value)
+    if actual != expected:
+        missing = sorted(expected - actual)
+        unexpected = sorted(actual - expected)
+        raise ValueError(
+            f"{label} keys are invalid; missing={missing}; unexpected={unexpected}"
+        )
+    return value
+
+
+def expected_field_states(facts: dict) -> dict:
+    return {
+        key: {
+            "status": facts[key]["status"],
+            "source_kind": facts[key]["source_kind"],
+            "verified_utc": parse_utc(facts[key]["verified_utc"]).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+        }
+        for key in REQUIRED_FACT_KEYS
+    }
+
+
+def reject_private_receipt_leaks(
+    receipt: dict,
+    facts: dict,
+    private_facts_path: Path,
+    private_output_dir: Path,
+) -> None:
+    receipt_text = json.dumps(receipt, sort_keys=True)
+    raw_values = {
+        fact["value"].strip()
+        for fact in facts.values()
+        if fact["value"].strip() != "NOT_APPLICABLE"
+    }
+    private_fragments = raw_values | set(display_values(facts).values())
+    if any(fragment and fragment in receipt_text for fragment in private_fragments):
+        raise ValueError("private value leaked into the redacted receipt")
+    if any(
+        str(private_path) in receipt_text
+        for private_path in (private_facts_path, private_output_dir)
+    ):
+        raise ValueError("private path leaked into the redacted receipt")
+
+
+def validate_private_receipt(
+    receipt: dict,
+    facts: dict,
+    private_facts_path: Path,
+    private_output_dir: Path,
+    markdown_path: Path,
+    docx_path: Path,
+    evaluated: datetime,
+) -> None:
+    require_exact_keys(
+        receipt,
+        {
+            "schema",
+            "evaluated_utc",
+            "notice_id",
+            "decision",
+            "required_fact_count",
+            "private_value_count",
+            "placeholder_count",
+            "field_states",
+            "facts_file",
+            "public_templates",
+            "outputs",
+            "team_authority_resolved",
+            "candidate_name_authorization_count",
+            "government_send_ready",
+            "submission_authorized",
+            "external_action_performed",
+            "private_values_logged",
+            "private_output_mirrored_to_public_vault",
+            "claim_boundary",
+            "safest_next_action",
+        },
+        "private receipt",
+    )
+    reject_private_receipt_leaks(
+        receipt,
+        facts,
+        private_facts_path,
+        private_output_dir,
+    )
+
+    if receipt["schema"] != RECEIPT_SCHEMA:
+        raise ValueError("private receipt schema is not supported")
+    if receipt["notice_id"] != NOTICE_ID:
+        raise ValueError("private receipt notice_id does not match Project Argos")
+    if receipt["decision"] != RECEIPT_DECISION:
+        raise ValueError("private receipt decision is not fail-closed")
+    if parse_utc(receipt["evaluated_utc"]) > evaluated:
+        raise ValueError("private receipt has a future evaluation timestamp")
+    if receipt["required_fact_count"] != len(REQUIRED_FACT_KEYS):
+        raise ValueError("private receipt required-fact count is stale")
+    if receipt["private_value_count"] != len(facts):
+        raise ValueError("private receipt value count is stale")
+    if receipt["placeholder_count"] != 0:
+        raise ValueError("private receipt reports unresolved placeholders")
+    if receipt["field_states"] != expected_field_states(facts):
+        raise ValueError("private receipt field states are stale")
+
+    facts_file = require_exact_keys(
+        receipt["facts_file"],
+        {"bytes", "sha256", "path_logged"},
+        "private receipt facts_file",
+    )
+    if facts_file["bytes"] != private_facts_path.stat().st_size:
+        raise ValueError("private facts byte count is stale")
+    if facts_file["sha256"] != sha256(private_facts_path):
+        raise ValueError("private facts custody hash is stale")
+    if facts_file["path_logged"] is not False:
+        raise ValueError("private receipt claims a private path was logged")
+
+    public_templates = require_exact_keys(
+        receipt["public_templates"],
+        {"markdown_sha256", "docx_sha256", "unchanged"},
+        "private receipt public_templates",
+    )
+    if public_templates["markdown_sha256"] != sha256(PUBLIC_MARKDOWN):
+        raise ValueError("public Markdown template changed")
+    if public_templates["docx_sha256"] != sha256(PUBLIC_DOCX):
+        raise ValueError("public DOCX template changed")
+    if public_templates["unchanged"] is not True:
+        raise ValueError("private receipt does not prove public template stability")
+
+    outputs = require_exact_keys(
+        receipt["outputs"],
+        {"markdown", "docx"},
+        "private receipt outputs",
+    )
+    markdown = require_exact_keys(
+        outputs["markdown"],
+        {"name", "bytes", "sha256"},
+        "private receipt Markdown output",
+    )
+    docx = require_exact_keys(
+        outputs["docx"],
+        {"name", "bytes", "sha256"},
+        "private receipt DOCX output",
+    )
+    if markdown["name"] != TEXT_OUTPUT_NAME or docx["name"] != DOCX_OUTPUT_NAME:
+        raise ValueError("private receipt output names are stale")
+    if markdown["bytes"] != markdown_path.stat().st_size:
+        raise ValueError("private Markdown byte count is stale")
+    if docx["bytes"] != docx_path.stat().st_size:
+        raise ValueError("private DOCX byte count is stale")
+    if markdown["sha256"] != sha256(markdown_path):
+        raise ValueError("private Markdown custody hash is stale")
+    if docx["sha256"] != sha256(docx_path):
+        raise ValueError("private DOCX custody hash is stale")
+
+    gate = read_json(SUBMISSION_GATE)
+    team = read_json(TEAM_REGISTER)
+    expected_team_authority = bool(
+        gate["send_gate"]["all_teaming_facts_resolved"]
+    )
+    expected_name_authorizations = sum(
+        int(candidate["verification"]["authorization_to_name_in_response"])
+        for candidate in team["candidates"]
+    )
+    if receipt["team_authority_resolved"] is not expected_team_authority:
+        raise ValueError("private receipt team-authority state is stale")
+    if (
+        receipt["candidate_name_authorization_count"]
+        != expected_name_authorizations
+    ):
+        raise ValueError("private receipt candidate-authorization count is stale")
+
+    required_false_controls = (
+        "government_send_ready",
+        "submission_authorized",
+        "external_action_performed",
+        "private_values_logged",
+        "private_output_mirrored_to_public_vault",
+    )
+    if any(receipt[key] is not False for key in required_false_controls):
+        raise ValueError("private receipt external-action controls are not fail-closed")
+    if receipt["claim_boundary"] != CLAIM_BOUNDARY:
+        raise ValueError("private receipt claim boundary is stale")
+    if receipt["safest_next_action"] != SAFEST_NEXT_ACTION:
+        raise ValueError("private receipt safest-next-action text is stale")
+
+
 def public_summary(status: str, receipt: dict) -> dict:
     return {
         "status": status,
@@ -389,94 +615,87 @@ def build_private_copy(
     staged_markdown = temporary_paths[markdown_path]
     staged_docx = temporary_paths[docx_path]
     staged_receipt = temporary_paths[receipt_path]
-    staged_markdown.write_text(private_markdown, encoding="utf-8", newline="\n")
+    final_paths = (markdown_path, docx_path, receipt_path)
     try:
+        staged_markdown.write_text(private_markdown, encoding="utf-8", newline="\n")
         render_private_docx(PUBLIC_DOCX, staged_docx, values)
-    except Exception:
-        for staged_path in temporary_paths.values():
-            staged_path.unlink(missing_ok=True)
-        raise
 
-    placeholder_count = (
-        private_markdown.count(PRIVATE_MARKER)
-        + private_markdown.count(PRIVATE_DISPLAY_MARKER)
-    )
-    public_hashes_after = {
-        "markdown_sha256": sha256(PUBLIC_MARKDOWN),
-        "docx_sha256": sha256(PUBLIC_DOCX),
-    }
-    field_states = {
-        key: {
-            "status": facts[key]["status"],
-            "source_kind": facts[key]["source_kind"],
-            "verified_utc": parse_utc(facts[key]["verified_utc"]).strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
-            ),
+        placeholder_count = (
+            private_markdown.count(PRIVATE_MARKER)
+            + private_markdown.count(PRIVATE_DISPLAY_MARKER)
+        )
+        public_hashes_after = {
+            "markdown_sha256": sha256(PUBLIC_MARKDOWN),
+            "docx_sha256": sha256(PUBLIC_DOCX),
         }
-        for key in REQUIRED_FACT_KEYS
-    }
-    team_authority_resolved = bool(gate["send_gate"]["all_teaming_facts_resolved"])
-    receipt = {
-        "schema": "lumencore.argos_private_action_copy_receipt.v1",
-        "evaluated_utc": evaluated.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "notice_id": NOTICE_ID,
-        "decision": "PRIVATE_COVER_READY_TEAM_AND_DISPATCH_BLOCKED",
-        "required_fact_count": len(REQUIRED_FACT_KEYS),
-        "private_value_count": len(facts),
-        "placeholder_count": placeholder_count,
-        "field_states": field_states,
-        "facts_file": {
-            "bytes": private_facts_path.stat().st_size,
-            "sha256": sha256(private_facts_path),
-            "path_logged": False,
-        },
-        "public_templates": {
-            **public_hashes_after,
-            "unchanged": public_hashes_before == public_hashes_after,
-        },
-        "outputs": {
-            "markdown": {
-                "name": markdown_path.name,
-                "bytes": staged_markdown.stat().st_size,
-                "sha256": sha256(staged_markdown),
+        field_states = expected_field_states(facts)
+        team_authority_resolved = bool(
+            gate["send_gate"]["all_teaming_facts_resolved"]
+        )
+        receipt = {
+            "schema": RECEIPT_SCHEMA,
+            "evaluated_utc": evaluated.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "notice_id": NOTICE_ID,
+            "decision": RECEIPT_DECISION,
+            "required_fact_count": len(REQUIRED_FACT_KEYS),
+            "private_value_count": len(facts),
+            "placeholder_count": placeholder_count,
+            "field_states": field_states,
+            "facts_file": {
+                "bytes": private_facts_path.stat().st_size,
+                "sha256": sha256(private_facts_path),
+                "path_logged": False,
             },
-            "docx": {
-                "name": docx_path.name,
-                "bytes": staged_docx.stat().st_size,
-                "sha256": sha256(staged_docx),
+            "public_templates": {
+                **public_hashes_after,
+                "unchanged": public_hashes_before == public_hashes_after,
             },
-        },
-        "team_authority_resolved": team_authority_resolved,
-        "candidate_name_authorization_count": sum(
-            int(candidate["verification"]["authorization_to_name_in_response"])
-            for candidate in team["candidates"]
-        ),
-        "government_send_ready": False,
-        "submission_authorized": False,
-        "external_action_performed": False,
-        "private_values_logged": False,
-        "private_output_mirrored_to_public_vault": False,
-        "claim_boundary": (
-            "This receipt proves only that a private action copy was generated from a "
-            "schema-valid, user-attested facts file without changing the public templates. "
-            "It does not prove team authority, final dispatch verification, submission, "
-            "acceptance, selection, award, compliance, certification, or authorization."
-        ),
-        "safest_next_action": (
-            "Keep the private copy outside Git and public mirrors. Review every inserted "
-            "fact and the rendered cover with the user, resolve written team authority, "
-            "then run the Government duplicate and final-dispatch gates before requesting "
-            "single-use action-time approval."
-        ),
-    }
-    staged_receipt.write_text(
-        json.dumps(receipt, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-        newline="\n",
-    )
-    staged_markdown.replace(markdown_path)
-    staged_docx.replace(docx_path)
-    staged_receipt.replace(receipt_path)
+            "outputs": {
+                "markdown": {
+                    "name": markdown_path.name,
+                    "bytes": staged_markdown.stat().st_size,
+                    "sha256": sha256(staged_markdown),
+                },
+                "docx": {
+                    "name": docx_path.name,
+                    "bytes": staged_docx.stat().st_size,
+                    "sha256": sha256(staged_docx),
+                },
+            },
+            "team_authority_resolved": team_authority_resolved,
+            "candidate_name_authorization_count": sum(
+                int(candidate["verification"]["authorization_to_name_in_response"])
+                for candidate in team["candidates"]
+            ),
+            "government_send_ready": False,
+            "submission_authorized": False,
+            "external_action_performed": False,
+            "private_values_logged": False,
+            "private_output_mirrored_to_public_vault": False,
+            "claim_boundary": CLAIM_BOUNDARY,
+            "safest_next_action": SAFEST_NEXT_ACTION,
+        }
+        validate_private_receipt(
+            receipt,
+            facts,
+            private_facts_path,
+            private_output_dir,
+            staged_markdown,
+            staged_docx,
+            evaluated,
+        )
+        staged_receipt.write_text(
+            json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        staged_markdown.replace(markdown_path)
+        staged_docx.replace(docx_path)
+        staged_receipt.replace(receipt_path)
+    except Exception:
+        for generated_path in (*temporary_paths.values(), *final_paths):
+            generated_path.unlink(missing_ok=True)
+        raise
     return receipt
 
 
@@ -489,22 +708,25 @@ def check_private_copy(facts_path: Path, output_dir: Path, as_of_utc: str) -> di
     if not all(path.is_file() for path in (markdown_path, docx_path, receipt_path)):
         raise FileNotFoundError("private action-copy output set is incomplete")
     receipt = read_json(receipt_path)
-    values = list(display_values(facts).values())
-    receipt_text = receipt_path.read_text(encoding="utf-8")
-    if any(value in receipt_text for value in values):
-        raise ValueError("private value leaked into the redacted receipt")
-    if receipt["facts_file"]["sha256"] != sha256(private_facts_path):
-        raise ValueError("private facts custody hash is stale")
-    if receipt["outputs"]["markdown"]["sha256"] != sha256(markdown_path):
-        raise ValueError("private Markdown custody hash is stale")
-    if receipt["outputs"]["docx"]["sha256"] != sha256(docx_path):
-        raise ValueError("private DOCX custody hash is stale")
-    if receipt["public_templates"]["markdown_sha256"] != sha256(PUBLIC_MARKDOWN):
-        raise ValueError("public Markdown template changed")
-    if receipt["public_templates"]["docx_sha256"] != sha256(PUBLIC_DOCX):
-        raise ValueError("public DOCX template changed")
-    if PRIVATE_MARKER in markdown_path.read_text(encoding="utf-8"):
+    validate_private_receipt(
+        receipt,
+        facts,
+        private_facts_path,
+        private_output_dir,
+        markdown_path,
+        docx_path,
+        evaluated,
+    )
+    markdown_text = markdown_path.read_text(encoding="utf-8")
+    if PRIVATE_MARKER in markdown_text or PRIVATE_DISPLAY_MARKER in markdown_text:
         raise ValueError("private Markdown contains a placeholder")
+    with ZipFile(docx_path) as archive:
+        document_xml = archive.read("word/document.xml")
+    if (
+        PRIVATE_MARKER.encode() in document_xml
+        or PRIVATE_DISPLAY_MARKER.encode() in document_xml
+    ):
+        raise ValueError("private DOCX contains a placeholder")
     return receipt
 
 

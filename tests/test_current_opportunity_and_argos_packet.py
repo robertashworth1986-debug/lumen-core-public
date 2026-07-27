@@ -469,11 +469,26 @@ def test_argos_private_finalizer_readiness_is_redacted_and_fail_closed():
     assert set(schema["properties"]["facts"]["required"]) == set(
         readiness["required_fact_keys"]
     )
-    assert readiness["verification"]["focused_test_count"] == 30
-    assert readiness["verification"]["focused_test_pass_count"] == 30
+    assert readiness["verification"]["focused_test_count"] == 37
+    assert readiness["verification"]["focused_test_pass_count"] == 37
     assert readiness["verification"]["synthetic_private_values_only"] is True
     assert readiness["verification"]["synthetic_pdf_page_count"] == 10
     assert readiness["verification"]["synthetic_pdf_page_size"] == "US Letter"
+    assert readiness["verification"]["post_validation_failure_cleanup_tested"] is True
+    assert readiness["verification"]["duplicate_json_key_rejection_tested"] is True
+    assert readiness["verification"]["public_vault_path_rejection_tested"] is True
+    assert readiness["verification"]["receipt_schema_validation_tested"] is True
+    assert (
+        readiness["verification"][
+            "tampered_external_action_controls_rejection_tested"
+        ]
+        is True
+    )
+    assert readiness["verification"]["output_size_drift_rejection_tested"] is True
+    assert (
+        readiness["verification"]["individual_private_value_leak_rejection_tested"]
+        is True
+    )
     assert readiness["verification"]["actual_private_facts_used"] is False
     assert (
         readiness["verification"]["actual_private_action_copy_generated"] is False
@@ -596,8 +611,128 @@ def test_argos_private_finalizer_builds_without_public_mutation_or_value_logging
             assert fact["value"] not in cli.stdout
 
 
+def test_argos_private_finalizer_rejects_tampered_receipt_controls(tmp_path):
+    builder = load_argos_private_finalizer()
+    facts_path = tmp_path / "private_facts.json"
+    output_dir = tmp_path / "private_action_copy"
+    facts_path.write_text(
+        json.dumps(dummy_private_fact_payload(), indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    builder.build_private_copy(
+        facts_path,
+        output_dir,
+        "2026-07-27T19:55:00Z",
+    )
+    receipt_path = output_dir / builder.RECEIPT_OUTPUT_NAME
+    original = json.loads(receipt_path.read_text(encoding="utf-8"))
+
+    tampered = json.loads(json.dumps(original))
+    tampered["submission_authorized"] = True
+    receipt_path.write_text(
+        json.dumps(tampered, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    with pytest.raises(ValueError, match="external-action controls"):
+        builder.check_private_copy(
+            facts_path,
+            output_dir,
+            "2026-07-27T19:56:00Z",
+        )
+
+    tampered = json.loads(json.dumps(original))
+    tampered["outputs"]["docx"]["bytes"] += 1
+    receipt_path.write_text(
+        json.dumps(tampered, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    with pytest.raises(ValueError, match="DOCX byte count is stale"):
+        builder.check_private_copy(
+            facts_path,
+            output_dir,
+            "2026-07-27T19:56:00Z",
+        )
+
+
+def test_argos_private_finalizer_rejects_receipt_value_leaks(tmp_path):
+    builder = load_argos_private_finalizer()
+    payload = dummy_private_fact_payload()
+    facts_path = tmp_path / "private_facts.json"
+    output_dir = tmp_path / "private_action_copy"
+    facts_path.write_text(
+        json.dumps(payload, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    builder.build_private_copy(
+        facts_path,
+        output_dir,
+        "2026-07-27T19:55:00Z",
+    )
+    receipt_path = output_dir / builder.RECEIPT_OUTPUT_NAME
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    receipt["claim_boundary"] += f" {payload['facts']['uei']['value']}"
+    receipt_path.write_text(
+        json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+    with pytest.raises(ValueError, match="private value leaked"):
+        builder.check_private_copy(
+            facts_path,
+            output_dir,
+            "2026-07-27T19:56:00Z",
+        )
+
+
+def test_argos_private_finalizer_cleans_partial_outputs_after_validation_failure(
+    tmp_path,
+    monkeypatch,
+):
+    builder = load_argos_private_finalizer()
+    facts_path = tmp_path / "private_facts.json"
+    output_dir = tmp_path / "private_action_copy"
+    facts_path.write_text(
+        json.dumps(dummy_private_fact_payload(), indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+    def fail_validation(*args, **kwargs):
+        raise RuntimeError("synthetic receipt validation failure")
+
+    monkeypatch.setattr(builder, "validate_private_receipt", fail_validation)
+    with pytest.raises(RuntimeError, match="synthetic receipt validation failure"):
+        builder.build_private_copy(
+            facts_path,
+            output_dir,
+            "2026-07-27T19:55:00Z",
+        )
+
+    assert output_dir.is_dir()
+    assert list(output_dir.iterdir()) == []
+
+
+def test_argos_private_finalizer_rejects_duplicate_json_keys(tmp_path):
+    builder = load_argos_private_finalizer()
+    duplicate = tmp_path / "duplicate.json"
+    duplicate.write_text(
+        '{"schema":"first","schema":"second"}\n',
+        encoding="utf-8",
+        newline="\n",
+    )
+
+    with pytest.raises(ValueError, match="duplicate JSON key: schema"):
+        builder.read_json(duplicate)
+
+
 def test_argos_private_finalizer_rejects_public_paths_and_prohibited_fields(
     tmp_path,
+    monkeypatch,
 ):
     builder = load_argos_private_finalizer()
     payload = dummy_private_fact_payload()
@@ -608,6 +743,15 @@ def test_argos_private_finalizer_rejects_public_paths_and_prohibited_fields(
         builder.build_private_copy(
             facts_path,
             ARGOS_DIR / "forbidden_private_output",
+            "2026-07-27T19:55:00Z",
+        )
+
+    public_vault = tmp_path / "public_vault"
+    monkeypatch.setattr(builder, "PUBLIC_VAULT_ROOTS", (public_vault,))
+    with pytest.raises(ValueError, match="public mirror vaults"):
+        builder.build_private_copy(
+            facts_path,
+            public_vault / "forbidden_private_output",
             "2026-07-27T19:55:00Z",
         )
 

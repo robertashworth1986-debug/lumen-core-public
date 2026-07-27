@@ -71,13 +71,22 @@ The private finalizer intentionally has no in-repository default:
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_private_action_copy.py `
   --facts C:\private\argos_facts.json `
   --output-dir C:\private\argos_action_copy_20260727
+
+python .\grant_submissions\ONC_ARGOS_20260730\build_argos_private_action_copy.py `
+  --facts C:\private\argos_facts.json `
+  --output-dir C:\private\argos_action_copy_20260727 `
+  --check
 ```
 
 The populated facts file and generated private action copy must remain outside
-Git and public mirrors. The finalizer rejects EIN, TIN, SSN, banking,
-credential, password, API-key, and OTP fields because the Argos cover does not
-request them. A generated private cover does not clear team, duplicate,
-dispatch, or approval gates.
+Git and public mirrors, including `E:\LumaProofVault`. The finalizer rejects
+EIN, TIN, SSN, banking, credential, password, API-key, and OTP fields because
+the Argos cover does not request them. Its check mode verifies exact receipt
+schema, counts, output sizes and hashes, public-template custody, current team
+state, false external-action controls, and the absence of individual private
+values or private paths. Duplicate JSON keys, altered authorization flags,
+partial outputs, and stale receipt metadata fail closed. A generated private
+cover does not clear team, duplicate, dispatch, or approval gates.
 
 ## Conformance Meaning
 

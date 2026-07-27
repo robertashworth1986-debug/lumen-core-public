@@ -8,7 +8,7 @@
     },
     {
       "check_id": "DEADLINE_OPEN",
-      "evidence": "evaluated=2026-07-27T20:38:00Z; deadline=2026-07-30T21:00:00Z",
+      "evidence": "evaluated=2026-07-27T20:55:16Z; deadline=2026-07-30T21:00:00Z",
       "requirement": "The response is evaluated before the exact Government deadline.",
       "status": "PASS"
     },
@@ -123,7 +123,7 @@
   "claim_boundary": "PASS means the named documentary or formatting requirement is supported. BLOCKED means the current artifact is intentionally not send-ready. Neither passing checks nor a polished packet establishes submission, acceptance, selection, award, authorization, certification, external validation, field performance, or savings.",
   "deadline_utc": "2026-07-30T21:00:00Z",
   "decision": "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY",
-  "evaluated_utc": "2026-07-27T20:38:00Z",
+  "evaluated_utc": "2026-07-27T20:55:16Z",
   "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
   "safest_next_action": "Resolve the private cover and authorized-team blockers first. Then rebuild the private final copy, rerun this gate, repeat the official-notice and full-mailbox duplicate checks, and request exact action-time approval.",
   "schema": "lumencore.argos_response_conformance_gate.v1",
