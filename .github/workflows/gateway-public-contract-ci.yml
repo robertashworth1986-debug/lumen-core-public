@@ -7,6 +7,8 @@ on:
       - 'code/luma_experience_gateway.py'
       - 'code/luma_experience_gateway_legacy.py'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
+      - 'code/ops/classify_bounded_deployment_scope.py'
+      - 'tests/test_bounded_deployment_scope.py'
       - 'tests/test_booth_public_contract_runtime.py'
       - '.github/workflows/deploy.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
@@ -17,6 +19,8 @@ on:
       - 'code/luma_experience_gateway.py'
       - 'code/luma_experience_gateway_legacy.py'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
+      - 'code/ops/classify_bounded_deployment_scope.py'
+      - 'tests/test_bounded_deployment_scope.py'
       - 'tests/test_booth_public_contract_runtime.py'
       - '.github/workflows/deploy.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
@@ -46,6 +50,8 @@ jobs:
             code/booth_public_contract.py \
             code/luma_experience_gateway.py \
             code/luma_experience_gateway_legacy.py \
+            code/ops/classify_bounded_deployment_scope.py \
+            tests/test_bounded_deployment_scope.py \
             tests/test_booth_public_contract_runtime.py
 
       - name: Run public contract tests without third-party dependencies
@@ -54,12 +60,17 @@ jobs:
           python - <<'PY'
           import runpy
 
-          namespace = runpy.run_path("tests/test_booth_public_contract_runtime.py")
-          tests = [
-              (name, value)
-              for name, value in namespace.items()
-              if name.startswith("test_") and callable(value)
-          ]
+          tests = []
+          for path in (
+              "tests/test_bounded_deployment_scope.py",
+              "tests/test_booth_public_contract_runtime.py",
+          ):
+              namespace = runpy.run_path(path)
+              tests.extend(
+                  (f"{path}:{name}", value)
+                  for name, value in namespace.items()
+                  if name.startswith("test_") and callable(value)
+              )
           if not tests:
               raise SystemExit("no public-contract tests discovered")
           for name, test in sorted(tests):

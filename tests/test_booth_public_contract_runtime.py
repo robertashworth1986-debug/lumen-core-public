@@ -156,6 +156,13 @@ def test_deployment_repairs_only_the_public_contract_dependency() -> None:
         encoding="utf-8"
     )
     assert "Apply bounded gateway dependency repair" in workflow
+    assert "Classify bounded deployment scope" in workflow
+    assert "deploy_site:" in workflow
+    assert "deploy_gateway:" in workflow
+    assert "deploy_evidence:" in workflow
+    assert "steps.scope.outputs.site_changed == 'true'" in workflow
+    assert "steps.scope.outputs.gateway_changed == 'true'" in workflow
+    assert "steps.scope.outputs.evidence_changed == 'true'" in workflow
     assert "https://lumen-core.ai/health?deploy=${GITHUB_SHA}" in workflow
     assert '[[ "$HEALTH" == "200" ]]' in workflow
     assert 'python3 -m json.tool "$tmp_health"' in workflow

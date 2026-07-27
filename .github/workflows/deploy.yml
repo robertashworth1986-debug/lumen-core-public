@@ -5,16 +5,34 @@ on:
     branches: [main]
     paths:
       - 'dashboard/**/*.html'
-      - 'assets/**'
+      - 'dashboard/**/*.js'
+      - 'dashboard/**/*.css'
+      - 'dashboard/*.json'
       - 'data/*.json'
-      - '*.html'
       - 'code/ops/repair_evidence_route.py'
       - 'code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh'
       - 'code/booth_public_contract.py'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
+      - 'code/ops/classify_bounded_deployment_scope.py'
       - 'code/deploy/nginx/lumatrader.conf'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
+    inputs:
+      deploy_site:
+        description: Sync dashboard and data content
+        required: false
+        type: boolean
+        default: false
+      deploy_gateway:
+        description: Install the bounded gateway dependency
+        required: false
+        type: boolean
+        default: false
+      deploy_evidence:
+        description: Apply the bounded evidence route repair
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -58,6 +76,57 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Classify bounded deployment scope
+        id: scope
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+          MANUAL_SITE: ${{ inputs.deploy_site }}
+          MANUAL_GATEWAY: ${{ inputs.deploy_gateway }}
+          MANUAL_EVIDENCE: ${{ inputs.deploy_evidence }}
+        run: |
+          set -euo pipefail
+          receipt=/tmp/lumencore-deployment-scope.json
+
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            args=(--mode manual)
+            [[ "${MANUAL_SITE,,}" == "true" ]] && args+=(--manual-scope site)
+            [[ "${MANUAL_GATEWAY,,}" == "true" ]] && args+=(--manual-scope gateway)
+            [[ "${MANUAL_EVIDENCE,,}" == "true" ]] && args+=(--manual-scope evidence)
+          else
+            changed=/tmp/lumencore-deployment-changed-paths.txt
+            if [[ "$BEFORE_SHA" =~ ^[0-9a-f]{40}$ ]] \
+              && [[ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]]; then
+              if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+                git fetch --no-tags --depth=1 origin "$BEFORE_SHA"
+              fi
+              git diff --name-only --diff-filter=ACMRT "$BEFORE_SHA" "$CURRENT_SHA" \
+                | LC_ALL=C sort -u > "$changed"
+            else
+              git show --format= --name-only "$CURRENT_SHA" \
+                | LC_ALL=C sort -u > "$changed"
+            fi
+            args=(--mode push --changed-path-file "$changed")
+          fi
+
+          python3 code/ops/classify_bounded_deployment_scope.py \
+            "${args[@]}" \
+            --output "$receipt" \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Upload deployment scope receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-scope-${{ github.run_id }}
+          path: /tmp/lumencore-deployment-scope.json
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Verify gateway runtime dependency closure
         shell: bash
@@ -104,6 +173,7 @@ jobs:
             'sudo -n true && printf "SUDO_OK\n"'
 
       - name: Ensure remote transfer dependencies
+        if: steps.scope.outputs.mutation_requested == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -173,6 +243,7 @@ jobs:
           ' | tee /tmp/lumencore-vps-preflight.txt
 
       - name: Verify VPS disk capacity
+        if: steps.scope.outputs.mutation_requested == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -210,7 +281,8 @@ jobs:
             fi
           '
 
-      - name: Prepare root-owned content directories
+      - name: Prepare site content directories
+        if: steps.scope.outputs.site_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -218,13 +290,11 @@ jobs:
             set -eu
             sudo -n install -d -m 755 \
               /opt/lumencore \
-              /opt/lumencore/code \
               /opt/lumencore/dashboard \
               /opt/lumencore/dashboard/data \
               /opt/lumencore/data
             for directory in \
               /opt/lumencore \
-              /opt/lumencore/code \
               /opt/lumencore/dashboard \
               /opt/lumencore/dashboard/data \
               /opt/lumencore/data; do
@@ -233,7 +303,20 @@ jobs:
             printf "CONTENT_DIRECTORIES_OK\n"
           '
 
+      - name: Prepare gateway code directory
+        if: steps.scope.outputs.gateway_changed == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+            sudo -n install -d -m 755 /opt/lumencore /opt/lumencore/code
+            sudo -n test -d /opt/lumencore/code
+            printf "GATEWAY_CODE_DIRECTORY_OK\n"
+          '
+
       - name: Prepare writable repair staging directory
+        if: steps.scope.outputs.evidence_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -252,6 +335,7 @@ jobs:
           '
 
       - name: Prepare writable gateway dependency staging directory
+        if: steps.scope.outputs.gateway_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -276,6 +360,7 @@ jobs:
           retention-days: 7
 
       - name: Sync dashboard assets
+        if: steps.scope.outputs.site_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -292,6 +377,7 @@ jobs:
             "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/"
 
       - name: Sync data snapshots
+        if: steps.scope.outputs.site_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -308,6 +394,7 @@ jobs:
             "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/data/"
 
       - name: Upload bounded repair tools
+        if: steps.scope.outputs.evidence_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -318,6 +405,7 @@ jobs:
             "opc@${{ secrets.VPS_HOST }}:/tmp/lumencore-evidence-route/"
 
       - name: Upload bounded gateway dependency repair
+        if: steps.scope.outputs.gateway_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -328,6 +416,7 @@ jobs:
             "opc@${{ secrets.VPS_HOST }}:/tmp/lumencore-gateway-runtime/"
 
       - name: Apply bounded gateway dependency repair
+        if: steps.scope.outputs.gateway_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -339,6 +428,7 @@ jobs:
               bash /tmp/lumencore-gateway-runtime/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --apply"
 
       - name: Apply bounded evidence route repair
+        if: steps.scope.outputs.evidence_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -387,20 +477,22 @@ jobs:
           COMMIT_SHA: ${{ github.sha }}
           TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           JOB_STATUS: ${{ job.status }}
+          DEPLOY_SCOPE: ${{ steps.scope.outputs.scope_summary }}
         run: |
           set -euo pipefail
+          SCOPE="${DEPLOY_SCOPE:-unknown}"
           case "$JOB_STATUS" in
             success)
               STATE=success
-              DESCRIPTION="Bounded VPS deployment passed all smoke tests"
+              DESCRIPTION="Bounded VPS ${SCOPE} run passed all smoke tests"
               ;;
             cancelled)
               STATE=error
-              DESCRIPTION="Bounded VPS deployment was cancelled"
+              DESCRIPTION="Bounded VPS ${SCOPE} run was cancelled"
               ;;
             *)
               STATE=failure
-              DESCRIPTION="Bounded VPS deployment failed or rolled back"
+              DESCRIPTION="Bounded VPS ${SCOPE} run failed or rolled back"
               ;;
           esac
           export STATE DESCRIPTION
