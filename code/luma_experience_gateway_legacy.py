@@ -24,6 +24,8 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from booth_public_contract import public_booth_projection
+
 log = logging.getLogger("luma_experience_gateway")
 
 
@@ -2823,12 +2825,12 @@ def _append_jsonl(
 def master_booth_brief() -> dict[str, Any]:
     payload = load_json(BOOTH_EXPLAINER_BRIEF_FILE, {})
     if isinstance(payload, dict) and payload:
-        out = dict(payload)
+        out = public_booth_projection(payload)
         out["source"] = "prebuilt"
         out["served_utc"] = now_utc()
         return out
 
-    out = _build_booth_explainer_brief_payload()
+    out = public_booth_projection(_build_booth_explainer_brief_payload())
     out["source"] = "live_fallback"
     out["served_utc"] = now_utc()
     return out

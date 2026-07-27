@@ -10,6 +10,8 @@ on:
       - '*.html'
       - 'code/ops/repair_evidence_route.py'
       - 'code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh'
+      - 'code/booth_public_contract.py'
+      - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
       - 'code/deploy/nginx/lumatrader.conf'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
@@ -56,6 +58,30 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Verify gateway runtime dependency closure
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            code/booth_public_contract.py \
+            code/luma_experience_gateway.py \
+            code/luma_experience_gateway_legacy.py
+          python3 - <<'PY'
+          import sys
+          sys.path.insert(0, "code")
+          from booth_public_contract import public_booth_projection
+
+          projected = public_booth_projection({
+              "founder_profile": {"ein": "12-3456789"},
+              "live_execution": {"recent_trades": [{"txid": "OABCDE-FGHIJK-LMNOPQ"}]},
+          })
+          assert projected["supported_maturity_level"] == 3
+          assert projected["live_execution_authority"] is False
+          assert projected["profit_claim_allowed"] is False
+          assert "ein" not in projected["founder_profile"]
+          assert projected["live_execution"]["recent_trades"] == []
+          PY
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -192,11 +218,13 @@ jobs:
             set -eu
             sudo -n install -d -m 755 \
               /opt/lumencore \
+              /opt/lumencore/code \
               /opt/lumencore/dashboard \
               /opt/lumencore/dashboard/data \
               /opt/lumencore/data
             for directory in \
               /opt/lumencore \
+              /opt/lumencore/code \
               /opt/lumencore/dashboard \
               /opt/lumencore/dashboard/data \
               /opt/lumencore/data; do
@@ -221,6 +249,21 @@ jobs:
             : > "$probe"
             rm -f "$probe"
             printf "REPAIR_STAGING_OK uid=%s gid=%s\n" "$remote_uid" "$remote_gid"
+          '
+
+      - name: Prepare writable gateway dependency staging directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+            set -eu
+            remote_uid="$(id -u)"
+            remote_gid="$(id -g)"
+            sudo -n rm -rf /tmp/lumencore-gateway-runtime
+            sudo -n install -d -m 700 /tmp/lumencore-gateway-runtime
+            sudo -n chown "$remote_uid:$remote_gid" /tmp/lumencore-gateway-runtime
+            test -w /tmp/lumencore-gateway-runtime
+            printf "GATEWAY_STAGING_OK uid=%s gid=%s\n" "$remote_uid" "$remote_gid"
           '
 
       - name: Upload VPS preflight diagnostics
@@ -274,6 +317,27 @@ jobs:
             code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh \
             "opc@${{ secrets.VPS_HOST }}:/tmp/lumencore-evidence-route/"
 
+      - name: Upload bounded gateway dependency repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -rlvz --inplace --no-perms --omit-dir-times \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            code/booth_public_contract.py \
+            code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh \
+            "opc@${{ secrets.VPS_HOST }}:/tmp/lumencore-gateway-runtime/"
+
+      - name: Apply bounded gateway dependency repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_SHA="$(sha256sum code/booth_public_contract.py | awk '{print $1}')"
+          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
+            "sudo -n env \
+              LUMENCORE_PUBLIC_CONTRACT_SOURCE=/tmp/lumencore-gateway-runtime/booth_public_contract.py \
+              LUMENCORE_EXPECTED_PUBLIC_CONTRACT_SHA256=${EXPECTED_SHA} \
+              bash /tmp/lumencore-gateway-runtime/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --apply"
+
       - name: Apply bounded evidence route repair
         shell: bash
         run: |
@@ -288,7 +352,8 @@ jobs:
           tmp_root="$(mktemp)"
           tmp_evidence="$(mktemp)"
           tmp_data="$(mktemp)"
-          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data"' EXIT
+          tmp_health="$(mktemp)"
+          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data" "$tmp_health"' EXIT
 
           status() {
             local url="$1"
@@ -299,17 +364,20 @@ jobs:
           ROOT="$(status "https://lumen-core.ai/?deploy=${GITHUB_SHA}" "$tmp_root")"
           EVIDENCE="$(status "https://lumen-core.ai/evidence/?deploy=${GITHUB_SHA}" "$tmp_evidence")"
           DATA="$(status "https://lumen-core.ai/data/site_health.json?deploy=${GITHUB_SHA}" "$tmp_data")"
+          HEALTH="$(status "https://lumen-core.ai/health?deploy=${GITHUB_SHA}" "$tmp_health")"
 
-          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000}"
+          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Static health data: ${DATA:-000} | Gateway health: ${HEALTH:-000}"
 
           [[ "$ROOT" == "200" ]]
           [[ "$EVIDENCE" == "200" ]]
           [[ "$DATA" == "200" ]]
+          [[ "$HEALTH" == "200" ]]
           grep -Fq 'One proof path. One bounded decision.' "$tmp_root"
           grep -Fq 'name="lumencore-surface" content="proof-to-pilot-evidence-v1"' "$tmp_evidence"
           python3 -m json.tool "$tmp_data" >/dev/null
+          python3 -m json.tool "$tmp_health" >/dev/null
 
-          echo "Production root, bounded evidence page, and health JSON are live."
+          echo "Production root, bounded evidence page, static health data, and gateway health are live."
 
       - name: Publish production deployment receipt
         if: always()
