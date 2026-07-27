@@ -124,41 +124,49 @@
   "source_custody": [
     {
       "bytes": 5047,
+      "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
       "sha256": "23b05d0b44d3c2b76bd4bc2e20116baa746ccef8738805a192a348f26ee9e61b"
     },
     {
       "bytes": 7358,
+      "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json",
       "sha256": "dab21e6d40a1b0cd9dfa4308f79f0a703cc8a91768a17452f01599e7a3309a09"
     },
     {
       "bytes": 2314,
+      "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
       "sha256": "c4aacfdea8e973473f5de23311aa32f5d5c9be07f7a75c6a0285fac302a37fe5"
     },
     {
       "bytes": 13824,
+      "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md",
       "sha256": "f665ce36c78b709e785879dff7ba45958418d222378a72aab5c1fa6029071955"
     },
     {
-      "bytes": 754,
+      "bytes": 738,
+      "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/output/build_receipt.json",
-      "sha256": "069faba7b9064be391bb8be0fe74f207de82d39f3860de48d7d71365440c47ae"
+      "sha256": "b1305aeed32e23d2d56e9711c19454b5950841a73e3dad1f3088f8a4bc4e5974"
     },
     {
-      "bytes": 1379,
+      "bytes": 1361,
+      "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/output/render_qa_receipt.json",
-      "sha256": "1d5130c9735090501e46c2fdb1ac1f1ce3668ba3956a666c3ebfe9cf884db124"
+      "sha256": "b51c240f25086ab1a99994f7f5936a4a15a7d478ed845a34c1cc6df727491bae"
     },
     {
       "bytes": 729860,
+      "hash_mode": "BINARY_RAW",
       "path": "grant_submissions/ONC_ARGOS_20260730/output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.docx",
       "sha256": "eaf9015d1c2b003ccb8321dc30f5bca4f07a90bd16313e2bb6d2e2c57544e8b4"
     },
     {
       "bytes": 232859,
+      "hash_mode": "BINARY_RAW",
       "path": "grant_submissions/ONC_ARGOS_20260730/output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.pdf",
       "sha256": "25d8d79e1c2f28fba0876ecbae1f78d618e6147b6f30bd040caed3acbd315173"
     }

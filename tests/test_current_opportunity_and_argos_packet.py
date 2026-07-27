@@ -25,6 +25,15 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def custody_bytes(path: Path, hash_mode: str) -> bytes:
+    data = path.read_bytes()
+    if hash_mode == "BINARY_RAW":
+        return data
+    assert hash_mode == "TEXT_UTF8_LF"
+    text = data.decode("utf-8")
+    return text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+
+
 def load_argos_conformance_builder():
     path = ARGOS_DIR / "build_argos_conformance_gate.py"
     spec = importlib.util.spec_from_file_location("build_argos_conformance_gate", path)
@@ -210,8 +219,9 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
     custody = {row["path"]: row for row in conformance["source_custody"]}
     for relative_path, row in custody.items():
         source = ROOT / relative_path
-        assert source.stat().st_size == row["bytes"]
-        assert sha256(source) == row["sha256"]
+        source_bytes = custody_bytes(source, row["hash_mode"])
+        assert len(source_bytes) == row["bytes"]
+        assert hashlib.sha256(source_bytes).hexdigest() == row["sha256"]
 
 
 def test_argos_conformance_outputs_are_deterministic():
@@ -259,6 +269,20 @@ def test_argos_conformance_fails_on_unauthorized_partner_injection(
     assert checks["ARTIFACT_HASH_CUSTODY"]["status"] == "FAIL"
     assert payload["summary"]["fail_count"] >= 2
     assert payload["decision"] == "FAIL_CONFORMANCE"
+
+
+def test_argos_text_custody_is_stable_across_line_endings(tmp_path):
+    builder = load_argos_conformance_builder()
+    lf = tmp_path / "lf.json"
+    crlf = tmp_path / "crlf.json"
+    lf.write_bytes(b'{\n  "status": "BLOCKED"\n}\n')
+    crlf.write_bytes(b'{\r\n  "status": "BLOCKED"\r\n}\r\n')
+
+    assert builder.custody_hash_mode(lf) == "TEXT_UTF8_LF"
+    assert builder.custody_bytes(lf) == builder.custody_bytes(crlf)
+    assert hashlib.sha256(builder.custody_bytes(lf)).hexdigest() == hashlib.sha256(
+        builder.custody_bytes(crlf)
+    ).hexdigest()
 
 
 def test_argos_outreach_sequence_and_action_time_gate_remain_unsent():

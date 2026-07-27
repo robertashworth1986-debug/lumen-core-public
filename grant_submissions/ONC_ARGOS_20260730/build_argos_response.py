@@ -955,6 +955,7 @@ def main() -> int:
     (OUTPUT / "build_receipt.json").write_text(
         json.dumps(receipt, indent=2) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     print(json.dumps(receipt, indent=2))
     return 0

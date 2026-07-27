@@ -36,10 +36,25 @@ FORBIDDEN_PROMOTION_PHRASES = (
     "guaranteed savings",
     "full-prime ready",
 )
+TEXT_CUSTODY_SUFFIXES = {".json", ".md", ".py"}
 
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def custody_bytes(path: Path) -> bytes:
+    data = path.read_bytes()
+    if path.suffix.lower() not in TEXT_CUSTODY_SUFFIXES:
+        return data
+    text = data.decode("utf-8")
+    return text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+
+
+def custody_hash_mode(path: Path) -> str:
+    if path.suffix.lower() in TEXT_CUSTODY_SUFFIXES:
+        return "TEXT_UTF8_LF"
+    return "BINARY_RAW"
 
 
 def read_json(path: Path) -> dict:
@@ -395,8 +410,9 @@ def build_payload(as_of_utc: str) -> dict:
         "source_custody": [
             {
                 "path": rel(path),
-                "bytes": path.stat().st_size,
-                "sha256": sha256(path),
+                "bytes": len(custody_bytes(path)),
+                "sha256": hashlib.sha256(custody_bytes(path)).hexdigest(),
+                "hash_mode": custody_hash_mode(path),
             }
             for path in source_paths
         ],
