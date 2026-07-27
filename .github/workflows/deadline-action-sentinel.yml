@@ -14,7 +14,10 @@ on:
       - "evidence/opportunity/deadline_action_sentinel_latest.json"
       - "evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json"
       - "evidence/opportunity/official_status_events_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json"
       - "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_private_action_copy.py"
       - "tests/test_current_opportunity_and_argos_packet.py"
       - "tests/test_deadline_action_sentinel.py"
   push:
@@ -31,7 +34,10 @@ on:
       - "evidence/opportunity/deadline_action_sentinel_latest.json"
       - "evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json"
       - "evidence/opportunity/official_status_events_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json"
       - "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_private_action_copy.py"
       - "tests/test_current_opportunity_and_argos_packet.py"
       - "tests/test_deadline_action_sentinel.py"
 
@@ -58,12 +64,15 @@ jobs:
           python-version: "3.12"
 
       - name: Install focused test dependency
-        run: python -m pip install --disable-pip-version-check pytest
+        run: >-
+          python -m pip install --disable-pip-version-check
+          pytest python-docx==1.2.0
 
       - name: Compile builder and tests
         run: |
           python -m py_compile \
             code/ops/BUILD_DEADLINE_ACTION_SENTINEL.py \
+            grant_submissions/ONC_ARGOS_20260730/build_argos_private_action_copy.py \
             tests/test_deadline_action_sentinel.py
 
       - name: Verify the committed snapshot is current

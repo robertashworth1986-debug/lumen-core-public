@@ -224,6 +224,8 @@ def test_ci_enforces_snapshot_and_fail_closed_tests():
     workflow = WORKFLOW.read_text(encoding="utf-8")
 
     assert "BUILD_DEADLINE_ACTION_SENTINEL.py --check" in workflow
+    assert "python-docx==1.2.0" in workflow
+    assert "build_argos_private_action_copy.py" in workflow
     assert "tests/test_deadline_action_sentinel.py" in workflow
     assert "tests/test_current_opportunity_and_argos_packet.py" in workflow
     assert "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json" in workflow
