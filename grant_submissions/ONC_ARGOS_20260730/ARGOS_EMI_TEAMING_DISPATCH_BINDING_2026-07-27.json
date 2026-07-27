@@ -1,9 +1,9 @@
 {
   "approval_window": {
     "current_wall_clock_evaluation_required": true,
-    "expires_utc": "2026-07-27T22:43:14Z",
+    "expires_utc": "2026-07-27T23:04:04Z",
     "fresh_mailbox_and_draft_readback_required_for_each_new_window": true,
-    "opened_utc": "2026-07-27T22:38:14Z",
+    "opened_utc": "2026-07-27T22:59:04Z",
     "window_seconds": 300
   },
   "checks": [
@@ -39,7 +39,7 @@
     },
     {
       "check_id": "DEADLINE_ORDER",
-      "evidence": "generated_utc=2026-07-27T22:38:14Z; partner_target_utc=2026-07-28T17:00:00Z; government_deadline_utc=2026-07-30T21:00:00Z",
+      "evidence": "generated_utc=2026-07-27T22:59:04Z; partner_target_utc=2026-07-28T17:00:00Z; government_deadline_utc=2026-07-30T21:00:00Z",
       "requirement": "The snapshot precedes the partner target, which precedes the Government deadline.",
       "status": "PASS"
     },
@@ -57,7 +57,7 @@
     },
     {
       "check_id": "FRESH_DRAFT_READBACK",
-      "evidence": "age_seconds=17; draft_present=True; sent=False",
+      "evidence": "age_seconds=0; draft_present=True; sent=False",
       "requirement": "The current Gmail draft readback matches the exact route, subject, body, and empty attachment set.",
       "status": "PASS"
     },
@@ -91,18 +91,18 @@
   },
   "decision": "VERIFIED_SNAPSHOT_READY_FOR_SINGLE_USE_ACTION_TIME_APPROVAL",
   "dispatch_binding": {
-    "approval_window_expires_utc": "2026-07-27T22:43:14Z",
-    "approval_window_opened_utc": "2026-07-27T22:38:14Z",
+    "approval_window_expires_utc": "2026-07-27T23:04:04Z",
+    "approval_window_opened_utc": "2026-07-27T22:59:04Z",
     "attachment_count": 0,
     "attachment_set_sha256": "EBD556927E470484600924709BAA4E88A21379E9163BC37AB00E4AAD4886BEA8",
     "bcc_count": 0,
-    "binding_sha256": "41B4F157017C7E7A27BCE4284834A23C317D1CC7891AD212B924AD5D938620FB",
+    "binding_sha256": "7600DCA91386D3A8BC682B59B2B7365B915F6E339BD031D65DE73FE687CE2876",
     "body_bytes": 2067,
     "body_sha256": "A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2",
     "cc_count": 0,
-    "gmail_route_readback_receipt_sha256": "A75BDAFD3A1C72E63268D85C7C7E98D37C7D50F90C98CB73E1E743324E94E4B5",
+    "gmail_route_readback_receipt_sha256": "9698A7BE9A7EC6CCA32826FD690D02AA644BBB1CC6649C4F5C94FCFE2C442661",
     "government_deadline_utc": "2026-07-30T21:00:00Z",
-    "mailbox_duplicate_receipt_sha256": "03A169D93219AEF1580C10BF00E9BA4AB48B0C7C31331D016300C3CA52749EC4",
+    "mailbox_duplicate_receipt_sha256": "7C3945002711A7179DD2C6CCE070E52D25D5DC55CB363B535B86C5A9ABD89520",
     "official_notice_url_sha256": "9655DC0EB06A53B7D4387A84FDF57A6DD312C60F2236A2962ACEDDAFF38973DB",
     "partner_interest_target_utc": "2026-07-28T17:00:00Z",
     "recipient_route_sha256": "9F6DD46B05DE97D56576B7A128511E61FA9F00F73275D2E15DFB1B286BF6ADCE",
@@ -113,13 +113,13 @@
     "template_canonical_sha256": "79D3C96AFF6D9D0C68CF665A499EBD819E7BA66ED10B1A3C094ED2D20C907A6E",
     "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY"
   },
-  "exact_action_time_approval_phrase": "APPROVE ONE ARGOS TEAMING DISPATCH: recipient EMI Advisors LLC / Evelyn Gallego; template INITIAL_PARTNER_TEAMING_INQUIRY; binding SHA-256 41B4F157017C7E7A27BCE4284834A23C317D1CC7891AD212B924AD5D938620FB; subject SHA-256 80FEEDC1540F859AC970FD32A3F9DFF0E03C5B347130C7FFF2E4E24382C5993B; body SHA-256 A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2; attachment set SHA-256 EBD556927E470484600924709BAA4E88A21379E9163BC37AB00E4AAD4886BEA8; expires 2026-07-27T22:43:14Z.",
+  "exact_action_time_approval_phrase": "APPROVE ONE ARGOS TEAMING DISPATCH: recipient EMI Advisors LLC / Evelyn Gallego; template INITIAL_PARTNER_TEAMING_INQUIRY; binding SHA-256 7600DCA91386D3A8BC682B59B2B7365B915F6E339BD031D65DE73FE687CE2876; subject SHA-256 80FEEDC1540F859AC970FD32A3F9DFF0E03C5B347130C7FFF2E4E24382C5993B; body SHA-256 A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2; attachment set SHA-256 EBD556927E470484600924709BAA4E88A21379E9163BC37AB00E4AAD4886BEA8; expires 2026-07-27T23:04:04Z.",
   "failed_checks": [],
-  "generated_utc": "2026-07-27T22:38:14Z",
-  "safest_next_action": "At action time, repeat the full-mailbox duplicate search and Gmail draft readback, update the source gate timestamps and counts, rebuild this binding, then accept only the newly displayed unexpired exact approval phrase. Do not send if any bound field changes.",
+  "generated_utc": "2026-07-27T22:59:04Z",
+  "safest_next_action": "At action time, repeat the full-mailbox duplicate search and Gmail draft readback, update the duplicate counts and the separate readback_checked_utc receipt, rebuild this binding, then accept only the newly displayed unexpired exact approval phrase. Do not send if any bound field changes.",
   "schema": "lumencore.initial_outreach_dispatch_binding.v1",
   "source_gate": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
-  "source_gate_sha256": "D4F39C5AD7C417BC2AED94628E0548B13085EC4A60D4BA260AF6F04745D77F7B",
+  "source_gate_sha256": "37BA0616CB6624C472F3052D68F96E63F5287447A83EC3251104B07DD609DA43",
   "summary": {
     "approval_received": false,
     "check_count": 12,

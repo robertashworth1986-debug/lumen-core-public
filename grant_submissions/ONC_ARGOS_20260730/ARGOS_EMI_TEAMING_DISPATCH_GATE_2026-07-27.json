@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.argos_partner_dispatch_gate.v1",
-  "generated_utc": "2026-07-27T22:38:14Z",
+  "generated_utc": "2026-07-27T22:59:04Z",
   "opportunity": {
     "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
     "official_notice_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
@@ -53,7 +53,7 @@
     "decision": "NO_DUPLICATE_FOUND"
   },
   "fresh_duplicate_recheck": {
-    "checked_utc": "2026-07-27T22:38:14Z",
+    "checked_utc": "2026-07-27T22:59:04Z",
     "search_scope": "ALL_MAIL_EXACT_SUBJECT_OR_RECIPIENT_OR_NOTICE",
     "matching_message_count": 1,
     "matching_current_draft_count": 1,
@@ -63,6 +63,7 @@
   "gmail_draft_receipt": {
     "created_utc": "2026-07-27T19:34:27Z",
     "updated_utc": "2026-07-27T22:37:57Z",
+    "readback_checked_utc": "2026-07-27T22:59:04Z",
     "draft_present": true,
     "subject_matches": true,
     "body_matches_source_after_newline_normalization": true,

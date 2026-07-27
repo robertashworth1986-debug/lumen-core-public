@@ -5,6 +5,7 @@ import importlib.util
 import json
 import subprocess
 import sys
+from datetime import timedelta
 from pathlib import Path
 
 import pytest
@@ -292,6 +293,9 @@ def test_argos_primary_partner_draft_is_exactly_bound_and_still_unsent():
     assert gate["gmail_draft_receipt"]["draft_present"] is True
     assert gate["gmail_draft_receipt"]["subject_matches"] is True
     assert gate["gmail_draft_receipt"]["body_matches_source_after_newline_normalization"] is True
+    assert gate["gmail_draft_receipt"]["readback_checked_utc"] >= gate[
+        "gmail_draft_receipt"
+    ]["updated_utc"]
     assert gate["gmail_draft_receipt"]["attachment_count"] == 0
     assert gate["gmail_draft_receipt"]["sent"] is False
     assert gate["controls"]["draft_creation_authorizes_send"] is False
@@ -362,7 +366,13 @@ def test_argos_primary_partner_binding_rejects_stale_or_duplicate_mailbox_state(
     )
 
     stale = json.loads(json.dumps(gate))
-    stale["generated_utc"] = "2026-07-27T22:54:15Z"
+    stale["generated_utc"] = "2026-07-27T23:00:00Z"
+    stale["fresh_duplicate_recheck"]["checked_utc"] = (
+        "2026-07-27T22:44:59Z"
+    )
+    stale["gmail_draft_receipt"]["readback_checked_utc"] = (
+        "2026-07-27T22:44:59Z"
+    )
     stale_payload = builder.build_payload(stale)
     assert stale_payload["decision"] == "BLOCKED_DISPATCH_GATE_INTEGRITY"
     assert {
@@ -385,6 +395,30 @@ def test_argos_primary_partner_binding_rejects_stale_or_duplicate_mailbox_state(
     assert "FRESH_DUPLICATE_RECHECK" in duplicate_payload["failed_checks"]
     assert duplicate_payload["summary"]["send_authorized"] is False
     assert duplicate_payload["summary"]["send_performed"] is False
+
+
+def test_argos_primary_partner_binding_uses_readback_time_not_draft_mutation_time():
+    builder = load_argos_teaming_dispatch_builder()
+    gate = load_json(
+        ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
+    )
+    fresh = json.loads(json.dumps(gate))
+    fresh["generated_utc"] = "2026-07-27T23:00:00Z"
+    fresh["fresh_duplicate_recheck"]["checked_utc"] = (
+        "2026-07-27T22:59:59Z"
+    )
+    fresh["gmail_draft_receipt"]["readback_checked_utc"] = (
+        "2026-07-27T22:59:59Z"
+    )
+
+    payload = builder.build_payload(fresh)
+
+    assert payload["decision"] == (
+        "VERIFIED_SNAPSHOT_READY_FOR_SINGLE_USE_ACTION_TIME_APPROVAL"
+    )
+    assert payload["summary"]["fail_count"] == 0
+    assert payload["dispatch_binding"] is not None
+    assert payload["dispatch_binding"]["gmail_route_readback_receipt_sha256"]
 
 
 @pytest.mark.parametrize(
@@ -414,6 +448,12 @@ def test_argos_primary_partner_binding_rejects_stale_or_duplicate_mailbox_state(
         ),
         (
             lambda gate: gate["gmail_draft_receipt"].update({"sent": True}),
+            "FRESH_DRAFT_READBACK",
+        ),
+        (
+            lambda gate: gate["gmail_draft_receipt"].update(
+                {"readback_checked_utc": "2026-07-27T23:59:59Z"}
+            ),
             "FRESH_DRAFT_READBACK",
         ),
         (
@@ -457,7 +497,13 @@ def test_argos_primary_partner_binding_approval_window_expires_exactly():
 
     expired = builder.evaluate_action_time(
         payload,
-        "2026-07-27T22:43:15Z",
+        builder.utc_iso(
+            builder.parse_utc(
+                payload["approval_window"]["expires_utc"],
+                "APPROVAL_EXPIRES_UTC",
+            )
+            + timedelta(seconds=1)
+        ),
     )
     assert expired["approval_window_current"] is False
     assert expired["decision"] == "EXPIRED_OR_BLOCKED_REBUILD_REQUIRED"

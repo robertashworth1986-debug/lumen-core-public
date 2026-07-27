@@ -8,7 +8,7 @@
     },
     {
       "check_id": "DEADLINE_OPEN",
-      "evidence": "evaluated=2026-07-27T22:38:14Z; deadline=2026-07-30T21:00:00Z",
+      "evidence": "evaluated=2026-07-27T22:59:36Z; deadline=2026-07-30T21:00:00Z",
       "requirement": "The response is evaluated before the exact Government deadline.",
       "status": "PASS"
     },
@@ -123,7 +123,7 @@
   "claim_boundary": "PASS means the named documentary or formatting requirement is supported. BLOCKED means the current artifact is intentionally not send-ready. Neither passing checks nor a polished packet establishes submission, acceptance, selection, award, authorization, certification, external validation, field performance, or savings.",
   "deadline_utc": "2026-07-30T21:00:00Z",
   "decision": "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY",
-  "evaluated_utc": "2026-07-27T22:38:14Z",
+  "evaluated_utc": "2026-07-27T22:59:36Z",
   "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
   "safest_next_action": "Resolve the private cover and authorized-team blockers first. Then rebuild the private final copy, rerun this gate, repeat the official-notice and full-mailbox duplicate checks, and request exact action-time approval.",
   "schema": "lumencore.argos_response_conformance_gate.v1",
@@ -141,16 +141,16 @@
       "sha256": "dab21e6d40a1b0cd9dfa4308f79f0a703cc8a91768a17452f01599e7a3309a09"
     },
     {
-      "bytes": 4050,
+      "bytes": 4102,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
-      "sha256": "d4f39c5ad7c417bc2aed94628e0548b13085ec4a60d4ba260af6f04745d77f7b"
+      "sha256": "37ba0616cb6624c472f3052d68f96e63f5287447a83ec3251104b07dd609da43"
     },
     {
-      "bytes": 7092,
+      "bytes": 7120,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json",
-      "sha256": "f28f940fc8502b8df30c5491f7cb4840adacc3f6a8cb54bd80cbb490aa7c61cd"
+      "sha256": "2e132cef3e1bc499b72332ab983d400046d76b1422e36caf9b697b4ec72c04df"
     },
     {
       "bytes": 4540,

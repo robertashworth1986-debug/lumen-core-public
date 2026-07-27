@@ -78,8 +78,10 @@ python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py --
 
 The committed teaming binding is a historical snapshot, not standing send
 authority. At action time, first repeat the full-mailbox duplicate search and
-Gmail draft readback, update the public-safe gate receipt, rebuild the binding,
-and then verify that its five-minute window is still current:
+Gmail draft readback, update the public-safe duplicate counts and
+`readback_checked_utc` receipt, rebuild the binding, and then verify that its
+five-minute window is still current. `updated_utc` records the last actual
+draft mutation and is not advanced merely to refresh the readback:
 
 ```powershell
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_teaming_dispatch_binding.py `

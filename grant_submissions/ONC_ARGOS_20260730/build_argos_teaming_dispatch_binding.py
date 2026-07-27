@@ -274,8 +274,14 @@ def build_payload(
     )
     draft_created = parse_utc(draft.get("created_utc"), "DRAFT_CREATED_UTC")
     draft_updated = parse_utc(draft.get("updated_utc"), "DRAFT_UPDATED_UTC")
+    draft_readback_checked = parse_utc(
+        draft.get("readback_checked_utc"),
+        "DRAFT_READBACK_CHECKED_UTC",
+    )
     duplicate_age = (generated - duplicate_checked).total_seconds()
-    draft_age = (generated - draft_updated).total_seconds()
+    draft_readback_age = (
+        generated - draft_readback_checked
+    ).total_seconds()
 
     matching_message_count = duplicate.get("matching_message_count")
     matching_current_draft_count = duplicate.get(
@@ -371,7 +377,11 @@ def build_payload(
         and recipient.get("recipient_address_stored_in_public_gate") is False
     )
     preflight_holds = bool(
-        preflight_checked <= draft_created <= draft_updated <= generated
+        preflight_checked
+        <= draft_created
+        <= draft_updated
+        <= draft_readback_checked
+        <= generated
         and preflight.get("matching_messages_before_draft") == 0
         and preflight.get("decision") == "NO_DUPLICATE_FOUND"
     )
@@ -382,7 +392,7 @@ def build_payload(
         and duplicate.get("decision") == "NO_DUPLICATE_ONLY_CURRENT_DRAFT"
     )
     draft_holds = bool(
-        0 <= draft_age <= DRAFT_READBACK_MAX_AGE_SECONDS
+        0 <= draft_readback_age <= DRAFT_READBACK_MAX_AGE_SECONDS
         and draft.get("draft_present") is True
         and draft.get("subject_matches") is True
         and draft.get("body_matches_source_after_newline_normalization") is True
@@ -497,7 +507,7 @@ def build_payload(
             "The current Gmail draft readback matches the exact route, subject, body, and empty attachment set.",
             draft_holds,
             (
-                f"age_seconds={int(draft_age)}; "
+                f"age_seconds={int(draft_readback_age)}; "
                 f"draft_present={draft.get('draft_present')}; "
                 f"sent={draft.get('sent')}"
             ),
@@ -554,6 +564,7 @@ def build_payload(
     draft_receipt_core = {
         "created_utc": utc_iso(draft_created),
         "updated_utc": utc_iso(draft_updated),
+        "readback_checked_utc": utc_iso(draft_readback_checked),
         "draft_present": draft.get("draft_present"),
         "subject_matches": draft.get("subject_matches"),
         "body_matches_source_after_newline_normalization": draft.get(
@@ -668,9 +679,10 @@ def build_payload(
         ),
         "safest_next_action": (
             "At action time, repeat the full-mailbox duplicate search and Gmail "
-            "draft readback, update the source gate timestamps and counts, rebuild "
-            "this binding, then accept only the newly displayed unexpired exact "
-            "approval phrase. Do not send if any bound field changes."
+            "draft readback, update the duplicate counts and the separate "
+            "readback_checked_utc receipt, rebuild this binding, then accept only "
+            "the newly displayed unexpired exact approval phrase. Do not send if "
+            "any bound field changes."
         ),
     }
 
