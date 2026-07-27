@@ -1,6 +1,6 @@
 # Deadline Action Sentinel
 
-Evaluated UTC: `2026-07-27T19:21:35Z`
+Evaluated UTC: `2026-07-27T19:35:30Z`
 Posture: `HUMAN_ACTION_REQUIRED_FAIL_CLOSED`
 
 ## Control Boundary
@@ -21,7 +21,7 @@ Posture: `HUMAN_ACTION_REQUIRED_FAIL_CLOSED`
 
 ## Source Custody
 
-- `ONC_ARGOS_20260730`: `grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json` at SHA-256 `3efe6ccbf3662c17b91f5c39881fb2ec31b8b6c61b73ca9bb537c493cf011a19`; observed gate `BLOCK_SEND`.
+- `ONC_ARGOS_20260730`: `grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json` at SHA-256 `23b05d0b44d3c2b76bd4bc2e20116baa746ccef8738805a192a348f26ee9e61b`; observed gate `BLOCK_SEND`.
 - `NASHVILLE_ONBOARDING_20260731`: private official-event metadata only; source content and identifiers intentionally excluded.
 - `NASHVILLE_DEPOSIT_20260814`: private official-event metadata only; source content and identifiers intentionally excluded.
 

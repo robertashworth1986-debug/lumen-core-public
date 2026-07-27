@@ -30,6 +30,10 @@ the seal name, not a rename of the LumenCore company.
   teaming candidates and authorization state
 - `ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md`: one-at-a-time partner
   outreach sequence; none sent
+- `ARGOS_EMI_TEAMING_INQUIRY_BODY.md`: exact no-attachment primary inquiry
+  body used by the current Gmail draft
+- `ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json`: public-safe duplicate,
+  route, body-hash, draft, and send-boundary receipt
 - `ARGOS_ACTION_TIME_FINALIZATION_CHECKLIST_2026-07-27.md`: private fact,
   team, evidence, file, duplicate, and dispatch gates
 - `build_argos_response.py`: deterministic response builder

@@ -8,7 +8,7 @@
     "teaming_permitted": true,
     "named_team_members_and_roles_required": true
   },
-  "status": "CANDIDATES_IDENTIFIED_OUTREACH_NOT_SENT",
+  "status": "PRIMARY_GMAIL_DRAFT_CREATED_NOT_SENT",
   "selection_strategy": {
     "primary_route": "EMI_ADVISORS_AS_CONSORTIUM_CONVENER",
     "fallback_route": "INDEX_ANALYTICS_AS_FEDERAL_HEALTH_INTEGRATION_LEAD",
@@ -49,9 +49,12 @@
         "authorization_to_use_credentials_or_references": false
       },
       "outreach": {
-        "mailbox_duplicate_check_utc": "2026-07-27T19:05:00Z",
+        "mailbox_duplicate_check_utc": "2026-07-27T19:34:13Z",
         "matching_prior_or_draft_outreach_found": false,
         "draft_ready": true,
+        "gmail_draft_created": true,
+        "gmail_draft_observed_utc": "2026-07-27T19:34:27Z",
+        "gmail_identifiers_stored_public": false,
         "sent": false
       }
     },

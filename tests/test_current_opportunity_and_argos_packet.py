@@ -47,6 +47,9 @@ def test_argos_gate_remains_partner_first_and_fail_closed():
     assert gate["send_gate"]["submission_authorized"] is False
     assert gate["send_gate"]["exact_action_time_human_approval_required"] is True
     assert gate["send_gate"]["decision"] == "BLOCK_SEND"
+    assert gate["partner_search"]["status"] == "PRIMARY_GMAIL_DRAFT_CREATED_NOT_SENT"
+    assert gate["partner_search"]["outreach_sent_count"] == 0
+    assert gate["partner_search"]["gmail_draft_count"] == 1
     assert gate["claim_boundaries"]["full_prime_readiness_claim_allowed"] is False
     assert gate["claim_boundaries"]["realized_savings_claim_allowed"] is False
 
@@ -100,7 +103,7 @@ def test_argos_teaming_register_is_source_bound_and_does_not_claim_commitment():
     register = load_json(ARGOS_DIR / "ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json")
 
     assert register["schema"] == "lumencore.argos_teaming_candidate_register.v1"
-    assert register["status"] == "CANDIDATES_IDENTIFIED_OUTREACH_NOT_SENT"
+    assert register["status"] == "PRIMARY_GMAIL_DRAFT_CREATED_NOT_SENT"
     assert register["opportunity"]["named_team_members_and_roles_required"] is True
     assert len(register["candidates"]) == 3
     assert register["selection_strategy"]["contact_sequence"] == (
@@ -114,6 +117,36 @@ def test_argos_teaming_register_is_source_bound_and_does_not_claim_commitment():
         assert candidate["outreach"]["sent"] is False
     assert register["claim_boundaries"]["candidate_listing_is_not_a_commitment"] is True
     assert register["claim_boundaries"]["no_outreach_send_is_authorized_by_this_register"] is True
+
+
+def test_argos_primary_partner_draft_is_exactly_bound_and_still_unsent():
+    body = ARGOS_DIR / "ARGOS_EMI_TEAMING_INQUIRY_BODY.md"
+    gate = load_json(ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json")
+    primary = load_json(
+        ARGOS_DIR / "ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json"
+    )["candidates"][0]
+
+    assert gate["schema"] == "lumencore.argos_partner_dispatch_gate.v1"
+    assert gate["recipient_route"]["organization"] == "EMI Advisors LLC"
+    assert gate["recipient_route"]["public_route_verified"] is True
+    assert gate["recipient_route"]["recipient_address_stored_in_public_gate"] is False
+    assert gate["message"]["body_sha256"] == sha256(body)
+    assert gate["message"]["body_bytes"] == body.stat().st_size
+    assert gate["message"]["attachment_count"] == 0
+    assert gate["message"]["cc_count"] == 0
+    assert gate["message"]["bcc_count"] == 0
+    assert gate["mailbox_duplicate_preflight"]["matching_messages_before_draft"] == 0
+    assert gate["gmail_draft_receipt"]["draft_present"] is True
+    assert gate["gmail_draft_receipt"]["subject_matches"] is True
+    assert gate["gmail_draft_receipt"]["body_matches_source_after_newline_normalization"] is True
+    assert gate["gmail_draft_receipt"]["attachment_count"] == 0
+    assert gate["gmail_draft_receipt"]["sent"] is False
+    assert gate["controls"]["draft_creation_authorizes_send"] is False
+    assert gate["controls"]["single_use_action_time_approval_required"] is True
+    assert gate["decision"] == "GMAIL_DRAFT_READY_SEND_BLOCKED"
+    assert primary["outreach"]["gmail_draft_created"] is True
+    assert primary["outreach"]["gmail_identifiers_stored_public"] is False
+    assert primary["outreach"]["sent"] is False
 
 
 def test_argos_outreach_sequence_and_action_time_gate_remain_unsent():

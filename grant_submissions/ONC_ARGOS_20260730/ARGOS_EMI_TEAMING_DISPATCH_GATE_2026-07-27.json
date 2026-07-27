@@ -1,0 +1,55 @@
+{
+  "schema": "lumencore.argos_partner_dispatch_gate.v1",
+  "generated_utc": "2026-07-27T19:34:47Z",
+  "opportunity": {
+    "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+    "government_deadline_utc": "2026-07-30T21:00:00Z",
+    "partner_interest_target_utc": "2026-07-28T17:00:00Z"
+  },
+  "recipient_route": {
+    "organization": "EMI Advisors LLC",
+    "named_addressee": "Evelyn Gallego",
+    "route_type": "PUBLIC_CORPORATE_PARTNERSHIP_CONTACT",
+    "official_contact_source": "https://www.emiadvisors.net/contact-us",
+    "official_partnership_source": "https://www.emiadvisors.net/",
+    "public_route_verified": true,
+    "recipient_address_stored_in_public_gate": false
+  },
+  "message": {
+    "subject": "Time-sensitive teaming inquiry - HHS Project Argos sources sought",
+    "body_path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_INQUIRY_BODY.md",
+    "body_sha256": "2b60892fba927c58345de510025afefc6f8fc5a581e6e1ff0729b7f04886a896",
+    "body_bytes": 1804,
+    "attachment_count": 0,
+    "cc_count": 0,
+    "bcc_count": 0
+  },
+  "mailbox_duplicate_preflight": {
+    "checked_utc": "2026-07-27T19:34:13Z",
+    "search_scope": "ALL_MAIL_EXACT_SUBJECT_OR_RECIPIENT_OR_NOTICE",
+    "matching_messages_before_draft": 0,
+    "decision": "NO_DUPLICATE_FOUND"
+  },
+  "gmail_draft_receipt": {
+    "created_utc": "2026-07-27T19:34:27Z",
+    "draft_present": true,
+    "subject_matches": true,
+    "body_matches_source_after_newline_normalization": true,
+    "recipient_route_matches": true,
+    "attachment_count": 0,
+    "cc_count": 0,
+    "bcc_count": 0,
+    "gmail_identifiers_stored_in_public_gate": false,
+    "sent": false
+  },
+  "controls": {
+    "draft_creation_authorizes_send": false,
+    "single_use_action_time_approval_required": true,
+    "fresh_duplicate_recheck_required_before_send": true,
+    "final_subject_body_recipient_and_attachment_set_must_match": true,
+    "partner_name_use_in_government_response_requires_written_authorization": true,
+    "builder_can_send": false
+  },
+  "decision": "GMAIL_DRAFT_READY_SEND_BLOCKED",
+  "safest_next_action": "Review the exact Gmail draft. Before sending, repeat the full-mailbox duplicate search and obtain single-use action-time approval for the displayed recipient route, exact subject, exact body SHA-256, and zero-attachment set."
+}

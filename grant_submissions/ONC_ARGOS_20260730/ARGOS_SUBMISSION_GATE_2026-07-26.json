@@ -60,13 +60,15 @@
     "official_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view"
   },
   "partner_search": {
-    "status": "CANDIDATES_IDENTIFIED_OUTREACH_NOT_SENT",
+    "status": "PRIMARY_GMAIL_DRAFT_CREATED_NOT_SENT",
     "candidate_register": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json",
     "outreach_drafts": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md",
     "candidate_count": 3,
     "candidate_interest_confirmed_count": 0,
     "candidate_name_use_authorized_count": 0,
     "outreach_sent_count": 0,
+    "gmail_draft_count": 1,
+    "primary_dispatch_gate": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
     "primary_partner_interest_target_utc": "2026-07-28T17:00:00Z"
   },
   "required_private_facts": [
