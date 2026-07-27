@@ -1,7 +1,7 @@
 # Outreach Response Template Registry - 2026-07-18
 
-- Templates: `15`
-- Private-render templates: `11`
+- Templates: `16`
+- Private-render templates: `12`
 - Builder can send email: `false`
 - Duplicate-send gate: `FAIL_CLOSED`
 - Missing-fact gate: `FAIL_CLOSED`
@@ -12,7 +12,7 @@
 - Attachment content required for exact approval: `true`
 - Exact approval phrase: `BINDING_SCOPED`
 - Static quality gate: `PASS`
-- Static quality checks: `180`
+- Static quality checks: `192`
 - Unchanged rebuilds byte-stable: `true`
 
 ## Claim Boundary
@@ -36,8 +36,8 @@ This response is a communication or routing artifact. It does not establish sele
 ## Quality Gate
 
 - All templates pass: `true`
-- Deadline-control templates: `COMPONENT_INSTRUCTION_ESCALATION, PORTAL_SUPPORT_DEADLINE_RESCUE`
-- HTTPS public URL fields: `3`
+- Deadline-control templates: `COMPONENT_INSTRUCTION_ESCALATION, INITIAL_PARTNER_TEAMING_INQUIRY, PORTAL_SUPPORT_DEADLINE_RESCUE`
+- HTTPS public URL fields: `6`
 
 ## Decision Matrix
 
@@ -54,6 +54,7 @@ This response is a communication or routing artifact. It does not establish sele
 | `WARM_INVESTOR_INTRO_REQUEST` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `FUNDING_REVIEW_STATUS_CHECK` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `DIRECT_INVESTOR_REVIEW_REQUEST` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
+| `INITIAL_PARTNER_TEAMING_INQUIRY` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `VALIDATION_PILOT_REQUEST` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `false` |
 | `DECLINE_CLOSEOUT` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `false` |
 | `MOU_ONBOARDING_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `true` |
@@ -323,6 +324,47 @@ Public proof: {public_proof_url}
 No attachment is included. If this is not the correct route, would you please direct me to the official application channel? I will not send a duplicate initial request.
 
 Thank you,
+{sender_name}
+{sender_title}
+{organization_name}
+```
+
+## INITIAL_PARTNER_TEAMING_INQUIRY
+
+Send one no-attachment fit-check to a verified public corporate route for an active opportunity that permits teaming, while preserving qualification and partner-authority boundaries.
+
+- Inbound states: `VERIFIED_PUBLIC_PARTNER_ROUTE_NO_PRIOR_THREAD`
+- Reply triggers: `ONE_INITIAL_BOUNDED_TEAMING_INQUIRY`
+- Required fields: `recipient_name, agency_name, opportunity_name, notice_type, opportunity_summary, deadline_iso, teaming_basis, bounded_contribution, qualification_boundary, partner_fit_basis, requested_partner_role, authorization_request, duplicate_review_disclosure, source_opportunity_url, public_company_url, public_proof_url, sender_name, sender_title, organization_name, recipient_email`
+
+```text
+Subject: Time-sensitive teaming inquiry - {opportunity_name}
+
+Hello {recipient_name},
+
+I am {sender_name}, {sender_title} of {organization_name}. {agency_name} posted {opportunity_name}, a {notice_type}: {opportunity_summary}
+
+The official response deadline is {deadline_iso}. {teaming_basis}
+
+Our bounded contribution is {bounded_contribution}
+
+Qualification boundary: {qualification_boundary}
+
+Partner fit basis: {partner_fit_basis}
+
+Would your organization be open to a rapid fit check for the following role: {requested_partner_role}
+
+Before either organization is named or any credential is used, we need written confirmation of: {authorization_request}
+
+Duplicate-send check: {duplicate_review_disclosure}
+
+This inquiry requests a nonbinding fit check only. It does not request pricing, a commitment, or permission to represent an unverified qualification. No attachment is included. A prompt reply would preserve time for both parties to reconcile an accurate response before the official deadline.
+
+Official notice: {source_opportunity_url}
+Company: {public_company_url}
+Public proof: {public_proof_url}
+
+Respectfully,
 {sender_name}
 {sender_title}
 {organization_name}

@@ -222,6 +222,12 @@ def test_argos_teaming_register_is_source_bound_and_does_not_claim_commitment():
 def test_argos_primary_partner_draft_is_exactly_bound_and_still_unsent():
     body = ARGOS_DIR / "ARGOS_EMI_TEAMING_INQUIRY_BODY.md"
     gate = load_json(ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json")
+    registry = load_json(
+        ROOT
+        / "grant_submissions"
+        / "funding_sprint_20260709"
+        / "OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
+    )
     primary = load_json(
         ARGOS_DIR / "ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json"
     )["candidates"][0]
@@ -230,12 +236,43 @@ def test_argos_primary_partner_draft_is_exactly_bound_and_still_unsent():
     assert gate["recipient_route"]["organization"] == "EMI Advisors LLC"
     assert gate["recipient_route"]["public_route_verified"] is True
     assert gate["recipient_route"]["recipient_address_stored_in_public_gate"] is False
+    selection = gate["template_selection"]
+    template = next(
+        row
+        for row in registry["templates"]
+        if row["template_id"] == selection["template_id"]
+    )
+    template_sha256 = hashlib.sha256(
+        json.dumps(
+            template, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest().upper()
+    assert selection["template_id"] == "INITIAL_PARTNER_TEAMING_INQUIRY"
+    assert selection["registry_source_config_sha256"] == registry[
+        "source_config_sha256"
+    ]
+    assert selection["template_canonical_sha256"] == template_sha256
+    assert selection["relationship"] == "OPPORTUNITY_SPECIFIC_SPECIALIZATION"
+    assert selection["message_body_independently_hash_bound"] is True
+    assert template["send_policy"] == "HUMAN_ACTION_DUE"
+    assert template["attachment_policy"] == "NONE"
+    assert "FRESH_DUPLICATE_RECHECK_BEFORE_SEND" in selection[
+        "required_controls_preserved"
+    ]
     assert gate["message"]["body_sha256"] == sha256(body)
     assert gate["message"]["body_bytes"] == body.stat().st_size
+    assert gate["message"]["official_notice_link_present"] is True
+    assert gate["message"]["duplicate_disclosure_present"] is True
     assert gate["message"]["attachment_count"] == 0
     assert gate["message"]["cc_count"] == 0
     assert gate["message"]["bcc_count"] == 0
     assert gate["mailbox_duplicate_preflight"]["matching_messages_before_draft"] == 0
+    assert gate["fresh_duplicate_recheck"]["matching_message_count"] == 1
+    assert gate["fresh_duplicate_recheck"]["matching_current_draft_count"] == 1
+    assert gate["fresh_duplicate_recheck"]["matching_sent_or_received_count"] == 0
+    assert gate["fresh_duplicate_recheck"]["decision"] == (
+        "NO_DUPLICATE_ONLY_CURRENT_DRAFT"
+    )
     assert gate["gmail_draft_receipt"]["draft_present"] is True
     assert gate["gmail_draft_receipt"]["subject_matches"] is True
     assert gate["gmail_draft_receipt"]["body_matches_source_after_newline_normalization"] is True
@@ -400,6 +437,20 @@ def test_argos_conformance_outputs_are_deterministic():
     assert receipt["fail_count"] == 0
     assert receipt["submission_authorized"] is False
     assert receipt["external_action_performed"] is False
+
+
+def test_argos_conformance_canonicalizes_fractional_action_timestamps():
+    module = load_argos_conformance_builder()
+
+    fractional = module.build_payload("2026-07-27T22:20:07.4384411+00:00")
+    canonical = module.build_payload("2026-07-27T22:20:07Z")
+
+    assert fractional == canonical
+    assert fractional["evaluated_utc"] == "2026-07-27T22:20:07Z"
+    deadline_check = next(
+        row for row in fractional["checks"] if row["check_id"] == "DEADLINE_OPEN"
+    )
+    assert "evaluated=2026-07-27T22:20:07Z" in deadline_check["evidence"]
 
 
 def test_argos_conformance_fails_on_unauthorized_partner_injection(

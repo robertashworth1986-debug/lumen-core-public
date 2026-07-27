@@ -8,7 +8,7 @@
     },
     {
       "check_id": "DEADLINE_OPEN",
-      "evidence": "evaluated=2026-07-27T20:55:16Z; deadline=2026-07-30T21:00:00Z",
+      "evidence": "evaluated=2026-07-27T22:23:00Z; deadline=2026-07-30T21:00:00Z",
       "requirement": "The response is evaluated before the exact Government deadline.",
       "status": "PASS"
     },
@@ -123,7 +123,7 @@
   "claim_boundary": "PASS means the named documentary or formatting requirement is supported. BLOCKED means the current artifact is intentionally not send-ready. Neither passing checks nor a polished packet establishes submission, acceptance, selection, award, authorization, certification, external validation, field performance, or savings.",
   "deadline_utc": "2026-07-30T21:00:00Z",
   "decision": "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY",
-  "evaluated_utc": "2026-07-27T20:55:16Z",
+  "evaluated_utc": "2026-07-27T22:23:00Z",
   "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
   "safest_next_action": "Resolve the private cover and authorized-team blockers first. Then rebuild the private final copy, rerun this gate, repeat the official-notice and full-mailbox duplicate checks, and request exact action-time approval.",
   "schema": "lumencore.argos_response_conformance_gate.v1",
@@ -141,10 +141,10 @@
       "sha256": "dab21e6d40a1b0cd9dfa4308f79f0a703cc8a91768a17452f01599e7a3309a09"
     },
     {
-      "bytes": 2314,
+      "bytes": 3665,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
-      "sha256": "c4aacfdea8e973473f5de23311aa32f5d5c9be07f7a75c6a0285fac302a37fe5"
+      "sha256": "e2149c9290adc0527ae6739115437d037b116088ae30d707af25331db74d9e9a"
     },
     {
       "bytes": 4540,

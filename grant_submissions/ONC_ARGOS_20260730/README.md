@@ -31,9 +31,11 @@ the seal name, not a rename of the LumenCore company.
 - `ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md`: one-at-a-time partner
   outreach sequence; none sent
 - `ARGOS_EMI_TEAMING_INQUIRY_BODY.md`: exact no-attachment primary inquiry
-  body used by the current Gmail draft
+  body used by the current Gmail draft; includes the official notice and
+  current duplicate-search disclosure
 - `ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json`: public-safe duplicate,
-  route, body-hash, draft, and send-boundary receipt
+  route, selected `INITIAL_PARTNER_TEAMING_INQUIRY` template family, body-hash,
+  draft, and send-boundary receipt
 - `ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.json`: machine-readable
   requirement verdict, source custody, and fail-closed send decision
 - `ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.md`: reviewer-readable

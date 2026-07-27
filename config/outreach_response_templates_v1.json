@@ -410,6 +410,49 @@
       "body": "Hello {recipient_name},\n\nI am {sender_name}, {sender_title} of {organization_name}. {company_one_line}\n\nI am requesting a review for {investor_program_name}. Our current ask is {current_raise_amount} for {current_raise_purpose}. The six-month milestone is {six_month_milestone}\n\nClimate-positive component: {climate_component}\n\nCurrent stage and claim boundary: {current_stage_disclosure}\n\nCompany: {public_company_url}\nPublic proof: {public_proof_url}\n\nNo attachment is included. If this is not the correct route, would you please direct me to the official application channel? I will not send a duplicate initial request.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
     },
     {
+      "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
+      "description": "Send one no-attachment fit-check to a verified public corporate route for an active opportunity that permits teaming, while preserving qualification and partner-authority boundaries.",
+      "inbound_states": [
+        "VERIFIED_PUBLIC_PARTNER_ROUTE_NO_PRIOR_THREAD"
+      ],
+      "reply_triggers": [
+        "ONE_INITIAL_BOUNDED_TEAMING_INQUIRY"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "attachment_policy": "NONE",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "agency_name",
+        "opportunity_name",
+        "notice_type",
+        "opportunity_summary",
+        "deadline_iso",
+        "teaming_basis",
+        "bounded_contribution",
+        "qualification_boundary",
+        "partner_fit_basis",
+        "requested_partner_role",
+        "authorization_request",
+        "duplicate_review_disclosure",
+        "source_opportunity_url",
+        "public_company_url",
+        "public_proof_url",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email"
+      ],
+      "sensitive_fields": [
+        "recipient_email"
+      ],
+      "optional_defaults": {},
+      "subject": "Time-sensitive teaming inquiry - {opportunity_name}",
+      "body": "Hello {recipient_name},\n\nI am {sender_name}, {sender_title} of {organization_name}. {agency_name} posted {opportunity_name}, a {notice_type}: {opportunity_summary}\n\nThe official response deadline is {deadline_iso}. {teaming_basis}\n\nOur bounded contribution is {bounded_contribution}\n\nQualification boundary: {qualification_boundary}\n\nPartner fit basis: {partner_fit_basis}\n\nWould your organization be open to a rapid fit check for the following role: {requested_partner_role}\n\nBefore either organization is named or any credential is used, we need written confirmation of: {authorization_request}\n\nDuplicate-send check: {duplicate_review_disclosure}\n\nThis inquiry requests a nonbinding fit check only. It does not request pricing, a commitment, or permission to represent an unverified qualification. No attachment is included. A prompt reply would preserve time for both parties to reconcile an accurate response before the official deadline.\n\nOfficial notice: {source_opportunity_url}\nCompany: {public_company_url}\nPublic proof: {public_proof_url}\n\nRespectfully,\n{sender_name}\n{sender_title}\n{organization_name}"
+    },
+    {
       "template_id": "VALIDATION_PILOT_REQUEST",
       "description": "Invite a qualified reviewer to define a bounded, independently reproducible evaluation rather than endorse a broad platform claim.",
       "inbound_states": [

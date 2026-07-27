@@ -42,17 +42,18 @@
     "Reject rendered subject lines containing line breaks or other mail-header injection characters.",
     "Require action-time human review for every outbound response."
   ],
-  "private_render_template_count": 11,
+  "private_render_template_count": 12,
   "quality_gate": {
     "all_templates_pass": true,
-    "check_count": 180,
+    "check_count": 192,
     "deadline_control_template_ids": [
       "COMPONENT_INSTRUCTION_ESCALATION",
+      "INITIAL_PARTNER_TEAMING_INQUIRY",
       "PORTAL_SUPPORT_DEADLINE_RESCUE"
     ],
-    "https_public_url_field_count": 3,
+    "https_public_url_field_count": 6,
     "status": "PASS",
-    "template_count": 15,
+    "template_count": 16,
     "template_results": [
       {
         "checks": {
@@ -305,6 +306,31 @@
           "template_subject_is_single_line": true,
           "template_text_is_within_render_limits": true
         },
+        "deadline_iso_control_required": true,
+        "failed_checks": [],
+        "https_public_url_fields": [
+          "public_company_url",
+          "public_proof_url",
+          "source_opportunity_url"
+        ],
+        "status": "PASS",
+        "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY"
+      },
+      {
+        "checks": {
+          "all_required_fields_are_rendered": true,
+          "all_routing_fields_are_sensitive": true,
+          "field_declarations_are_disjoint": true,
+          "field_lists_have_no_duplicates": true,
+          "known_deadline_uses_single_structured_value": true,
+          "monitor_template_is_content_free": true,
+          "nonrouting_sensitive_fields_force_private_render": true,
+          "sendable_identity_fields_are_required": true,
+          "sendable_recipient_route_is_required": true,
+          "sendable_template_has_greeting_and_signature": true,
+          "template_subject_is_single_line": true,
+          "template_text_is_within_render_limits": true
+        },
         "deadline_iso_control_required": false,
         "failed_checks": [],
         "https_public_url_fields": [],
@@ -378,16 +404,16 @@
   },
   "schema": "lumencore.outreach_response_template_registry.v1",
   "send_policy_counts": {
-    "HUMAN_ACTION_DUE": 8,
+    "HUMAN_ACTION_DUE": 9,
     "MONITOR_NO_SEND": 1,
     "REPLY_AFTER_FACT_REVIEW": 6
   },
   "source_config": "config/outreach_response_templates_v1.json",
   "source_config_hash_basis": "SORTED_COMPACT_JSON_UTF8",
-  "source_config_sha256": "62DA3B3CAF054B312FB3811DEEB6D5671C275C853037CFCA733B2590475D5034",
+  "source_config_sha256": "776B96677CECAAF89CE99071A948BD099C5B9D4B55370A66D2D8FA3E2801D79D",
   "source_effective_utc": "2026-07-25T22:53:44Z",
   "source_schema": "lumencore.outreach_response_templates.v1",
-  "template_count": 15,
+  "template_count": 16,
   "templates": [
     {
       "attachment_policy": "NONE",
@@ -780,6 +806,49 @@
       ],
       "subject": "{organization_name} - {current_raise_amount} validation bridge for {investor_program_name}",
       "template_id": "DIRECT_INVESTOR_REVIEW_REQUEST"
+    },
+    {
+      "attachment_policy": "NONE",
+      "body": "Hello {recipient_name},\n\nI am {sender_name}, {sender_title} of {organization_name}. {agency_name} posted {opportunity_name}, a {notice_type}: {opportunity_summary}\n\nThe official response deadline is {deadline_iso}. {teaming_basis}\n\nOur bounded contribution is {bounded_contribution}\n\nQualification boundary: {qualification_boundary}\n\nPartner fit basis: {partner_fit_basis}\n\nWould your organization be open to a rapid fit check for the following role: {requested_partner_role}\n\nBefore either organization is named or any credential is used, we need written confirmation of: {authorization_request}\n\nDuplicate-send check: {duplicate_review_disclosure}\n\nThis inquiry requests a nonbinding fit check only. It does not request pricing, a commitment, or permission to represent an unverified qualification. No attachment is included. A prompt reply would preserve time for both parties to reconcile an accurate response before the official deadline.\n\nOfficial notice: {source_opportunity_url}\nCompany: {public_company_url}\nPublic proof: {public_proof_url}\n\nRespectfully,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Send one no-attachment fit-check to a verified public corporate route for an active opportunity that permits teaming, while preserving qualification and partner-authority boundaries.",
+      "inbound_states": [
+        "VERIFIED_PUBLIC_PARTNER_ROUTE_NO_PRIOR_THREAD"
+      ],
+      "optional_defaults": {},
+      "private_render_only": true,
+      "reply_triggers": [
+        "ONE_INITIAL_BOUNDED_TEAMING_INQUIRY"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "agency_name",
+        "opportunity_name",
+        "notice_type",
+        "opportunity_summary",
+        "deadline_iso",
+        "teaming_basis",
+        "bounded_contribution",
+        "qualification_boundary",
+        "partner_fit_basis",
+        "requested_partner_role",
+        "authorization_request",
+        "duplicate_review_disclosure",
+        "source_opportunity_url",
+        "public_company_url",
+        "public_proof_url",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "sensitive_fields": [
+        "recipient_email"
+      ],
+      "subject": "Time-sensitive teaming inquiry - {opportunity_name}",
+      "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY"
     },
     {
       "attachment_policy": "EXPLICIT_REQUEST_ONLY",

@@ -69,13 +69,62 @@ def direct_investor_facts() -> dict[str, str]:
     return facts
 
 
+def partner_teaming_facts() -> dict[str, str]:
+    facts = common_facts()
+    facts.pop("source_message_id")
+    facts.update(
+        {
+            "agency_name": "Synthetic Health Agency",
+            "opportunity_name": "Synthetic Evidence Assurance Sources Sought",
+            "notice_type": "sources sought notice for market research",
+            "opportunity_summary": (
+                "a bounded proof of concept for monitoring public program artifacts"
+            ),
+            "deadline_iso": "2026-07-30T17:00:00-04:00",
+            "teaming_basis": (
+                "The official notice permits respondents to identify proposed "
+                "team members and roles."
+            ),
+            "bounded_contribution": (
+                "authorized public-source custody, deterministic validation, "
+                "traceability, and reproducible evidence packages."
+            ),
+            "qualification_boundary": (
+                "No health-agency authorization, certification, prior "
+                "performance, or prime-delivery qualification is claimed."
+            ),
+            "partner_fit_basis": (
+                "The recipient publishes directly relevant interoperability "
+                "and program-policy experience."
+            ),
+            "requested_partner_role": (
+                "evaluate serving as the domain-policy lead or convening a "
+                "qualified team."
+            ),
+            "authorization_request": (
+                "the role under evaluation, authorized principal, available "
+                "technical and security leads, and any additional organization "
+                "that should join the discussion."
+            ),
+            "duplicate_review_disclosure": (
+                "A full-mailbox search found no prior message to this route "
+                "about this opportunity."
+            ),
+            "source_opportunity_url": "https://example.gov/opportunity",
+            "public_company_url": "https://example.org",
+            "public_proof_url": "https://example.org/proof",
+        }
+    )
+    return facts
+
+
 def test_registry_validates_and_covers_high_value_response_states():
     module = load_module()
     registry = module.validate_registry(module.read_registry())
     ids = {row["template_id"] for row in registry["templates"]}
 
     assert registry["schema"] == module.SCHEMA
-    assert len(ids) == 15
+    assert len(ids) == 16
     assert {
         "NO_DUPLICATE_MONITOR",
         "DEADLINE_CLARIFICATION",
@@ -88,11 +137,47 @@ def test_registry_validates_and_covers_high_value_response_states():
         "WARM_INVESTOR_INTRO_REQUEST",
         "FUNDING_REVIEW_STATUS_CHECK",
         "DIRECT_INVESTOR_REVIEW_REQUEST",
+        "INITIAL_PARTNER_TEAMING_INQUIRY",
         "VALIDATION_PILOT_REQUEST",
         "DECLINE_CLOSEOUT",
         "MOU_ONBOARDING_REPLY",
         "MEETING_REBOOK_REQUEST",
     } == ids
+
+
+def test_initial_partner_teaming_inquiry_is_deadline_bound_and_no_attachment():
+    module = load_module()
+    facts = partner_teaming_facts()
+
+    rendered = module.render_response(
+        "INITIAL_PARTNER_TEAMING_INQUIRY",
+        facts,
+        current_utc="2026-07-27T22:00:00Z",
+    )
+
+    assert rendered["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
+    assert rendered["template_id"] == "INITIAL_PARTNER_TEAMING_INQUIRY"
+    assert rendered["attachment_policy"] == "NONE"
+    assert rendered["attachment_count"] == 0
+    assert rendered["deadline"]["deadline_utc"] == "2026-07-30T21:00:00+00:00"
+    assert rendered["deadline"]["urgency"] == "HIGH_UNDER_72_HOURS"
+    assert "2026-07-30T21:00:00Z" in rendered["body"]
+    assert "No attachment is included" in rendered["body"]
+    assert "No health-agency authorization" in rendered["body"]
+    assert rendered["exact_action_time_approval_ready"] is True
+    assert "template INITIAL_PARTNER_TEAMING_INQUIRY" in (
+        rendered["exact_action_time_approval_phrase"]
+    )
+
+    duplicate = module.render_response(
+        "INITIAL_PARTNER_TEAMING_INQUIRY",
+        facts,
+        already_sent=True,
+        inbound_requires_response=False,
+        current_utc="2026-07-27T22:00:00Z",
+    )
+    assert duplicate["status"] == "MONITOR_NO_DUPLICATE"
+    assert duplicate["body"] is None
 
 
 def test_duplicate_send_and_monitor_states_fail_closed_without_rendering_message():
@@ -344,18 +429,19 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     combined = OUT_JSON.read_text(encoding="utf-8") + markdown
 
     assert payload["schema"] == module.PUBLIC_SCHEMA
-    assert payload["template_count"] == 15
+    assert payload["template_count"] == 16
     assert payload["controls"]["builder_can_send_email"] is False
     assert payload["controls"]["duplicate_send_fail_closed"] is True
     assert payload["quality_gate"]["status"] == "PASS"
     assert payload["quality_gate"]["all_templates_pass"] is True
-    assert payload["quality_gate"]["template_count"] == 15
-    assert payload["quality_gate"]["check_count"] == 180
+    assert payload["quality_gate"]["template_count"] == 16
+    assert payload["quality_gate"]["check_count"] == 192
     assert payload["quality_gate"]["deadline_control_template_ids"] == [
         "COMPONENT_INSTRUCTION_ESCALATION",
+        "INITIAL_PARTNER_TEAMING_INQUIRY",
         "PORTAL_SUPPORT_DEADLINE_RESCUE",
     ]
-    assert payload["quality_gate"]["https_public_url_field_count"] == 3
+    assert payload["quality_gate"]["https_public_url_field_count"] == 6
     assert all(
         row["status"] == "PASS"
         for row in payload["quality_gate"]["template_results"]
@@ -425,7 +511,7 @@ def test_source_config_hash_and_builder_payload_agree():
     )
     assert payload["source_config_hash_basis"] == "SORTED_COMPACT_JSON_UTF8"
     assert payload["send_policy_counts"] == {
-        "HUMAN_ACTION_DUE": 8,
+        "HUMAN_ACTION_DUE": 9,
         "MONITOR_NO_SEND": 1,
         "REPLY_AFTER_FACT_REVIEW": 6,
     }

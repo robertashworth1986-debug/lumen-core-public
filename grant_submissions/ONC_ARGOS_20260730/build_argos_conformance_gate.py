@@ -133,6 +133,7 @@ def result(
 
 def build_payload(as_of_utc: str) -> dict:
     evaluated = parse_utc(as_of_utc)
+    evaluated_utc = evaluated.strftime("%Y-%m-%dT%H:%M:%SZ")
     gate = read_json(SUBMISSION_GATE)
     team = read_json(TEAM_REGISTER)
     partner_dispatch = read_json(PARTNER_DISPATCH_GATE)
@@ -231,7 +232,7 @@ def build_payload(as_of_utc: str) -> dict:
             "DEADLINE_OPEN",
             "The response is evaluated before the exact Government deadline.",
             "PASS" if evaluated < deadline else "FAIL",
-            f"evaluated={as_of_utc}; deadline={gate['opportunity']['deadline_utc']}",
+            f"evaluated={evaluated_utc}; deadline={gate['opportunity']['deadline_utc']}",
         ),
         result(
             "ACCEPTED_FILES_PRESENT",
@@ -424,7 +425,7 @@ def build_payload(as_of_utc: str) -> dict:
     )
     return {
         "schema": "lumencore.argos_response_conformance_gate.v1",
-        "evaluated_utc": evaluated.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "evaluated_utc": evaluated_utc,
         "notice_id": gate["opportunity"]["notice_id"],
         "deadline_utc": gate["opportunity"]["deadline_utc"],
         "decision": decision,

@@ -1,10 +1,29 @@
 {
   "schema": "lumencore.argos_partner_dispatch_gate.v1",
-  "generated_utc": "2026-07-27T19:34:47Z",
+  "generated_utc": "2026-07-27T22:22:14Z",
   "opportunity": {
     "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
     "government_deadline_utc": "2026-07-30T21:00:00Z",
     "partner_interest_target_utc": "2026-07-28T17:00:00Z"
+  },
+  "template_selection": {
+    "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
+    "registry_path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
+    "registry_source_config_sha256": "776B96677CECAAF89CE99071A948BD099C5B9D4B55370A66D2D8FA3E2801D79D",
+    "template_canonical_sha256": "79D3C96AFF6D9D0C68CF665A499EBD819E7BA66ED10B1A3C094ED2D20C907A6E",
+    "relationship": "OPPORTUNITY_SPECIFIC_SPECIALIZATION",
+    "exact_template_render_used": false,
+    "message_body_independently_hash_bound": true,
+    "required_controls_preserved": [
+      "VERIFIED_PUBLIC_PARTNER_ROUTE",
+      "OFFICIAL_OPPORTUNITY_URL",
+      "OFFICIAL_TIMEZONE_AWARE_DEADLINE",
+      "EXPLICIT_QUALIFICATION_BOUNDARY",
+      "WRITTEN_PARTNER_AUTHORITY_REQUIRED",
+      "NO_ATTACHMENTS",
+      "FRESH_DUPLICATE_RECHECK_BEFORE_SEND",
+      "SINGLE_USE_ACTION_TIME_APPROVAL"
+    ]
   },
   "recipient_route": {
     "organization": "EMI Advisors LLC",
@@ -18,8 +37,10 @@
   "message": {
     "subject": "Time-sensitive teaming inquiry - HHS Project Argos sources sought",
     "body_path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_INQUIRY_BODY.md",
-    "body_sha256": "2b60892fba927c58345de510025afefc6f8fc5a581e6e1ff0729b7f04886a896",
-    "body_bytes": 1804,
+    "body_sha256": "dd8b7a762071672221e9c9e9d54b85ba5848bf777a5f988d0a119a6a802b522d",
+    "body_bytes": 2040,
+    "official_notice_link_present": true,
+    "duplicate_disclosure_present": true,
     "attachment_count": 0,
     "cc_count": 0,
     "bcc_count": 0
@@ -30,8 +51,17 @@
     "matching_messages_before_draft": 0,
     "decision": "NO_DUPLICATE_FOUND"
   },
+  "fresh_duplicate_recheck": {
+    "checked_utc": "2026-07-27T22:21:21Z",
+    "search_scope": "ALL_MAIL_EXACT_SUBJECT_OR_RECIPIENT_OR_NOTICE",
+    "matching_message_count": 1,
+    "matching_current_draft_count": 1,
+    "matching_sent_or_received_count": 0,
+    "decision": "NO_DUPLICATE_ONLY_CURRENT_DRAFT"
+  },
   "gmail_draft_receipt": {
     "created_utc": "2026-07-27T19:34:27Z",
+    "updated_utc": "2026-07-27T22:21:58Z",
     "draft_present": true,
     "subject_matches": true,
     "body_matches_source_after_newline_normalization": true,

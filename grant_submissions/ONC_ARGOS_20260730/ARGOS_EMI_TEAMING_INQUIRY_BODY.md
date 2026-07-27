@@ -30,6 +30,12 @@ credential use is requested. A reply by Tuesday, July 28 at 1:00 PM Eastern
 would leave time to reconcile the team and response before the Government
 deadline.
 
+Duplicate-send check: a fresh full-mailbox search found no prior sent or
+received message to this route about Project Argos; only this unsent draft is
+present.
+
+Official notice:
+https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view
 Public reviewer surface: https://lumen-core.ai/
 Public evidence repository:
 https://github.com/robertashworth1986-debug/lumen-core-public
