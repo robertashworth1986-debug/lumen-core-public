@@ -56,12 +56,17 @@ examples/proof_capsule/** text eol=lf
 /tests/test_reviewer_reproducibility_capsule.py text eol=lf
 
 # Canonical bytes for the current LumenCore opportunity and Argos review packet.
+/.github/workflows/deadline-action-sentinel.yml text eol=lf
 /assets/brand/lumaarc_arc_seal_v1.png binary
 /assets/brand/lumaarc_arc_seal_v1.receipt.json text eol=lf
 /code/ops/BUILD_E_DRIVE_PROOF_VAULT_INVENTORY.ps1 text eol=lf
+/code/ops/BUILD_DEADLINE_ACTION_SENTINEL.py text eol=lf
 /code/ops/MIRROR_REVIEW_PACKET_TO_E_DRIVE.ps1 text eol=lf
+/config/deadline_action_sentinel_v1.json text eol=lf
 /docs/CURRENT_FEDERAL_OPPORTUNITY_GATE_MAP_2026-07-26.md text eol=lf
+/docs/DEADLINE_ACTION_SENTINEL.md text eol=lf
 /docs/SCIENTIFIC_CONTRIBUTION_AND_NEXT_EXPERIMENTS_2026-07-26.md text eol=lf
+/evidence/opportunity/deadline_action_sentinel_latest.json text eol=lf
 /grant_submissions/ONC_ARGOS_20260730/*.json text eol=lf
 /grant_submissions/ONC_ARGOS_20260730/*.md text eol=lf
 /grant_submissions/ONC_ARGOS_20260730/*.py text eol=lf
@@ -69,3 +74,4 @@ examples/proof_capsule/** text eol=lf
 /grant_submissions/ONC_ARGOS_20260730/output/*.docx binary
 /grant_submissions/ONC_ARGOS_20260730/output/*.pdf binary
 /tests/test_current_opportunity_and_argos_packet.py text eol=lf
+/tests/test_deadline_action_sentinel.py text eol=lf

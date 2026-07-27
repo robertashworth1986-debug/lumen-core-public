@@ -114,6 +114,7 @@ def test_opportunity_and_science_maps_preserve_current_gates():
     assert "not guaranteed payments" in opportunity
     assert "No automated sign-in" in opportunity
     assert "exact action-time approval" in opportunity
+    assert "Deadline Action Sentinel" in opportunity
 
     assert "no promoted champion" in science
     assert "Kuramoto phase-coupling candidate recorded 1.253509" in science

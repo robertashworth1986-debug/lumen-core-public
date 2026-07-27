@@ -13,6 +13,9 @@ Mode: official-source triage; no portal submission authorized
 - A short deadline does not justify a knowingly false capability statement.
 - Every send requires a fresh duplicate check and exact action-time approval of
   recipient, subject, body, and attachments.
+- The machine-checkable [Deadline Action Sentinel](DEADLINE_ACTION_SENTINEL.md)
+  preserves exact deadlines where the source supports them and fails closed on
+  date-only milestones, unknown timezones, and every external action.
 
 ## Deadline Map
 

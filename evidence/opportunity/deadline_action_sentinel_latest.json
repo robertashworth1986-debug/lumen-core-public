@@ -1,0 +1,158 @@
+{
+  "schema": "lumencore.deadline_action_sentinel.v1",
+  "evaluated_utc": "2026-07-27T02:46:54Z",
+  "posture": "HUMAN_ACTION_REQUIRED_FAIL_CLOSED",
+  "controls": {
+    "read_only_builder": true,
+    "autonomous_email_send_allowed": false,
+    "autonomous_portal_action_allowed": false,
+    "autonomous_agreement_acceptance_allowed": false,
+    "autonomous_payment_allowed": false,
+    "autonomous_signature_allowed": false,
+    "autonomous_certification_allowed": false,
+    "authenticated_portal_session_use_allowed": false,
+    "action_time_human_approval_required": true,
+    "unknown_deadline_time_fail_closed": true,
+    "duplicate_recheck_required_before_external_send": true
+  },
+  "prohibited_actions": [
+    "SEND_EMAIL",
+    "OPEN_AUTHENTICATED_PORTAL",
+    "CHANGE_PORTAL_ANSWER",
+    "UPLOAD_FILE",
+    "ACCEPT_AGREEMENT",
+    "SIGN",
+    "CERTIFY",
+    "SUBMIT",
+    "PAY"
+  ],
+  "alert_window_hours": 120,
+  "summary": {
+    "lane_count": 3,
+    "human_attention_count": 3,
+    "exact_deadline_count": 1,
+    "date_only_deadline_count": 2,
+    "autonomous_external_action_count": 0,
+    "external_actions_executed_count": 0,
+    "state_counts": {
+      "BLOCKED_HUMAN_ACTION_DUE": 1,
+      "HUMAN_DATE_ONLY_ACTION_OPEN": 2
+    }
+  },
+  "lanes": [
+    {
+      "id": "ONC_ARGOS_20260730",
+      "title": "HHS Project Argos Sources Sought",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "external_action_type": "EMAIL_RESPONSE",
+      "completion_evidence_present": false,
+      "blockers": [
+        "Private cover facts remain unresolved.",
+        "Qualified health IT and federal cybersecurity teaming roles remain unresolved.",
+        "Final recipient, subject, body, and attachment set have not been action-time verified.",
+        "A fresh duplicate-send recheck is still required."
+      ],
+      "blocker_count": 4,
+      "requires_human_attention": true,
+      "external_action_authorized": false,
+      "send_now": false,
+      "external_action_executed": false,
+      "safest_next_action": "Resolve the private cover facts and qualified teaming roles, inspect the rendered response, then perform a fresh official-notice and duplicate-send review before requesting exact approval for one bounded response.",
+      "source_receipt": {
+        "kind": "REPOSITORY_GATE",
+        "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
+        "sha256": "c2a85b56555c5ed35bd998c34207d241b8635b01d48c79e97ab0440802dee5d8",
+        "bound_deadline_field": "opportunity.deadline_utc",
+        "observed_status": "BLOCK_SEND"
+      },
+      "state": "BLOCKED_HUMAN_ACTION_DUE",
+      "urgency": "WITHIN_ALERT_WINDOW",
+      "deadline": {
+        "precision": "EXACT",
+        "iso_utc": "2026-07-30T21:00:00Z",
+        "local_display": "July 30, 2026 at 5:00 PM EDT",
+        "timezone": "America/New_York",
+        "cutoff_time_known": true,
+        "timezone_known": true,
+        "exact_countdown_available": true,
+        "deadline_passed": false,
+        "seconds_until_deadline": 324786,
+        "hours_until_deadline": 90.22
+      }
+    },
+    {
+      "id": "NASHVILLE_ONBOARDING_20260731",
+      "title": "Nashville cohort onboarding milestone",
+      "visibility": "PRIVATE_METADATA_ONLY",
+      "external_action_type": "ONBOARDING_OR_AGREEMENT_ACTION",
+      "completion_evidence_present": false,
+      "blockers": [
+        "The exact cutoff time and controlling timezone are not established in the retained metadata.",
+        "Agreement terms require direct human review.",
+        "No completion receipt is present."
+      ],
+      "blocker_count": 3,
+      "requires_human_attention": true,
+      "external_action_authorized": false,
+      "send_now": false,
+      "external_action_executed": false,
+      "safest_next_action": "With the user present, open the official route, verify the exact cutoff and timezone, review all terms, and preserve a completion receipt. Do not accept, sign, submit, or pay autonomously.",
+      "source_receipt": {
+        "kind": "PRIVATE_OFFICIAL_INBOUND_STATUS_EVENT",
+        "private_source_excluded": true,
+        "identifiers_excluded": true
+      },
+      "state": "HUMAN_DATE_ONLY_ACTION_OPEN",
+      "urgency": "UNKNOWN_EXACT_CUTOFF_FAIL_CLOSED",
+      "deadline": {
+        "precision": "DATE_ONLY",
+        "date": "2026-07-31",
+        "cutoff_time_known": false,
+        "timezone_known": false,
+        "exact_countdown_available": false,
+        "deadline_passed": null,
+        "calendar_relation": "FUTURE_BY_UTC_CALENDAR_DATE"
+      }
+    },
+    {
+      "id": "NASHVILLE_DEPOSIT_20260814",
+      "title": "Nashville cohort deposit milestone",
+      "visibility": "PRIVATE_METADATA_ONLY",
+      "external_action_type": "PAYMENT_OR_CONFIRMATION_ACTION",
+      "completion_evidence_present": false,
+      "blockers": [
+        "The exact cutoff time and controlling timezone are not established in the retained metadata.",
+        "Payment terms and the official destination require direct human verification.",
+        "No payment or completion receipt is present."
+      ],
+      "blocker_count": 3,
+      "requires_human_attention": true,
+      "external_action_authorized": false,
+      "send_now": false,
+      "external_action_executed": false,
+      "safest_next_action": "After onboarding terms are accepted by the user, verify the official payment terms and destination with the user present. Do not enter payment details or pay autonomously.",
+      "source_receipt": {
+        "kind": "PRIVATE_OFFICIAL_INBOUND_STATUS_EVENT",
+        "private_source_excluded": true,
+        "identifiers_excluded": true
+      },
+      "state": "HUMAN_DATE_ONLY_ACTION_OPEN",
+      "urgency": "UNKNOWN_EXACT_CUTOFF_FAIL_CLOSED",
+      "deadline": {
+        "precision": "DATE_ONLY",
+        "date": "2026-08-14",
+        "cutoff_time_known": false,
+        "timezone_known": false,
+        "exact_countdown_available": false,
+        "deadline_passed": null,
+        "calendar_relation": "FUTURE_BY_UTC_CALENDAR_DATE"
+      }
+    }
+  ],
+  "claim_boundaries": [
+    "This sentinel is a read-only deadline and blocker view.",
+    "A warning is not authority to send, open a signed-in portal, upload, accept terms, sign, certify, submit, or pay.",
+    "Date-only milestones never receive an invented cutoff time, timezone, exact countdown, or definitive overdue label.",
+    "Drafted, sent, submitted, accepted, and paid remain distinct evidence states."
+  ]
+}
