@@ -105,7 +105,7 @@ jobs:
               if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
                 git fetch --no-tags --depth=1 origin "$BEFORE_SHA"
               fi
-              git diff --name-only --diff-filter=ACMRT "$BEFORE_SHA" "$CURRENT_SHA" \
+              git diff --name-only --diff-filter=ACDMRT "$BEFORE_SHA" "$CURRENT_SHA" \
                 | LC_ALL=C sort -u > "$changed"
             else
               git show --format= --name-only "$CURRENT_SHA" \
@@ -162,14 +162,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" \
             'printf "SSH_OK\n"'
 
       - name: Verify passwordless sudo
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" \
             'sudo -n true && printf "SUDO_OK\n"'
 
       - name: Ensure remote transfer dependencies
@@ -177,7 +177,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" '
             set -eu
             missing=""
             for command_name in rsync python3 curl; do
@@ -207,7 +207,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" '
             set -eu
             sudo -n nginx -t
             sudo -n systemctl is-active --quiet nginx
@@ -232,7 +232,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" '
             set -eu
             printf "Remote identity: "
             id
@@ -247,7 +247,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" '
             set -eu
             set -- $(df -Pk /opt | tail -n 1)
             available_kb="$4"
@@ -270,7 +270,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" '
             set -eu
             set -- $(df -Pi /opt | tail -n 1)
             available_inodes="$4"
@@ -286,7 +286,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" '
             set -eu
             sudo -n install -d -m 755 \
               /opt/lumencore \
@@ -308,7 +308,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" '
             set -eu
             sudo -n install -d -m 755 /opt/lumencore /opt/lumencore/code
             sudo -n test -d /opt/lumencore/code
@@ -320,7 +320,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" '
             set -eu
             remote_uid="$(id -u)"
             remote_gid="$(id -g)"
@@ -339,7 +339,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" '
             set -eu
             remote_uid="$(id -u)"
             remote_gid="$(id -g)"
@@ -372,7 +372,7 @@ jobs:
             --exclude='node_modules/' \
             --exclude='data/' \
             --exclude='assets/vendor/three.min.js' \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15" \
             dashboard/ \
             "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/"
 
@@ -383,13 +383,13 @@ jobs:
           set -euo pipefail
           rsync -rlvz --inplace --size-only --no-perms --omit-dir-times \
             --rsync-path="sudo -n rsync" \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15" \
             data/ \
             "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/data/"
 
           rsync -rlvz --delete --inplace --size-only --no-perms --omit-dir-times \
             --rsync-path="sudo -n rsync" \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15" \
             data/ \
             "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/data/"
 
@@ -399,7 +399,7 @@ jobs:
         run: |
           set -euo pipefail
           rsync -rlvz --inplace --no-perms --omit-dir-times \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15" \
             code/ops/repair_evidence_route.py \
             code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh \
             "opc@${{ secrets.VPS_HOST }}:/tmp/lumencore-evidence-route/"
@@ -410,7 +410,7 @@ jobs:
         run: |
           set -euo pipefail
           rsync -rlvz --inplace --no-perms --omit-dir-times \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15" \
             code/booth_public_contract.py \
             code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh \
             "opc@${{ secrets.VPS_HOST }}:/tmp/lumencore-gateway-runtime/"
@@ -421,7 +421,7 @@ jobs:
         run: |
           set -euo pipefail
           EXPECTED_SHA="$(sha256sum code/booth_public_contract.py | awk '{print $1}')"
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" \
             "sudo -n env \
               LUMENCORE_PUBLIC_CONTRACT_SOURCE=/tmp/lumencore-gateway-runtime/booth_public_contract.py \
               LUMENCORE_EXPECTED_PUBLIC_CONTRACT_SHA256=${EXPECTED_SHA} \
@@ -432,7 +432,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 "opc@${{ secrets.VPS_HOST }}" \
             "sudo -n bash /tmp/lumencore-evidence-route/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh --apply"
 
       - name: Smoke test canonical production surfaces

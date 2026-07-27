@@ -190,3 +190,15 @@ def test_every_vps_mutation_step_has_the_matching_scope_guard() -> None:
     assert "- 'dashboard/*.json'" in workflow
     assert "- 'assets/**'" not in workflow
     assert "\n      - '*.html'\n" not in workflow
+
+
+def test_deployment_workflow_captures_deletions_and_verifies_ssh_hosts() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "--diff-filter=ACDMRT" in workflow
+    assert "StrictHostKeyChecking=no" not in workflow
+    assert "StrictHostKeyChecking=yes" in workflow
+    assert "BatchMode=yes" in workflow
+    assert "ConnectTimeout=15" in workflow
