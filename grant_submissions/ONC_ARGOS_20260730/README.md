@@ -36,6 +36,11 @@ the seal name, not a rename of the LumenCore company.
 - `ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json`: public-safe duplicate,
   route, selected `INITIAL_PARTNER_TEAMING_INQUIRY` template family, body-hash,
   draft, and send-boundary receipt
+- `ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json`: deterministic
+  12-check binding over the registry, public route, exact subject/body,
+  deadlines, duplicate search, Gmail readback, and empty attachment set
+- `ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.md`: reviewer-readable
+  binding, five-minute approval window, and claim boundary
 - `ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.json`: machine-readable
   requirement verdict, source custody, and fail-closed send decision
 - `ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.md`: reviewer-readable
@@ -45,6 +50,8 @@ the seal name, not a rename of the LumenCore company.
 - `build_argos_response.py`: deterministic response builder
 - `build_argos_conformance_gate.py`: deterministic format, evidence, claim,
   authority, duplicate, and dispatch conformance builder
+- `build_argos_teaming_dispatch_binding.py`: fail-closed partner-draft
+  verifier and time-limited exact-approval binding builder; it cannot send
 - `build_argos_private_action_copy.py`: privacy-preserving action-copy
   finalizer; requires a populated facts file and output directory outside Git
 - `ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json`: structure-only schema for the
@@ -63,9 +70,24 @@ the seal name, not a rename of the LumenCore company.
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_response.py
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_claim_evidence_map.py
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_claim_evidence_map.py --check
+python .\grant_submissions\ONC_ARGOS_20260730\build_argos_teaming_dispatch_binding.py
+python .\grant_submissions\ONC_ARGOS_20260730\build_argos_teaming_dispatch_binding.py --check
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py --check
 ```
+
+The committed teaming binding is a historical snapshot, not standing send
+authority. At action time, first repeat the full-mailbox duplicate search and
+Gmail draft readback, update the public-safe gate receipt, rebuild the binding,
+and then verify that its five-minute window is still current:
+
+```powershell
+python .\grant_submissions\ONC_ARGOS_20260730\build_argos_teaming_dispatch_binding.py `
+  --action-time-check
+```
+
+An expired check returns a nonzero result and requires a fresh rebuild. The
+builder never sends email, and the exact approval phrase remains single-use.
 
 The private finalizer intentionally has no in-repository default:
 
@@ -102,4 +124,6 @@ unauthorized-name, or claim-boundary defect produces `FAIL_CONFORMANCE`.
 Do not send this response until every required private fact and teaming fact in
 the gate file is resolved, the final document is reviewed, duplicate-send state
 is rechecked, and the user gives exact action-time approval for the final
-recipient, attachment, subject, and body.
+recipient, attachment, subject, and body. The separate partner inquiry also
+requires a fresh duplicate search, a matching Gmail readback, a current
+five-minute binding, and exact single-use approval.

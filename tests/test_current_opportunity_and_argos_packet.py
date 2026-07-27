@@ -22,6 +22,9 @@ ARGOS_PRIVATE_READINESS = (
 )
 ARGOS_PRIVATE_SCHEMA = ARGOS_DIR / "ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json"
 ARGOS_CLAIM_MAP = ARGOS_DIR / "ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
+ARGOS_TEAMING_BINDING = (
+    ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json"
+)
 
 
 def sha256(path: Path) -> str:
@@ -64,6 +67,19 @@ def load_argos_private_finalizer():
 def load_argos_claim_evidence_builder():
     path = ARGOS_DIR / "build_argos_claim_evidence_map.py"
     spec = importlib.util.spec_from_file_location("build_argos_claim_evidence_map", path)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_argos_teaming_dispatch_builder():
+    path = ARGOS_DIR / "build_argos_teaming_dispatch_binding.py"
+    spec = importlib.util.spec_from_file_location(
+        "build_argos_teaming_dispatch_binding",
+        path,
+    )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -284,6 +300,200 @@ def test_argos_primary_partner_draft_is_exactly_bound_and_still_unsent():
     assert primary["outreach"]["gmail_draft_created"] is True
     assert primary["outreach"]["gmail_identifiers_stored_public"] is False
     assert primary["outreach"]["sent"] is False
+
+
+def test_argos_primary_partner_binding_is_deterministic_and_fail_closed():
+    builder = load_argos_teaming_dispatch_builder()
+    committed = load_json(ARGOS_TEAMING_BINDING)
+    rebuilt = builder.build_payload()
+
+    assert rebuilt == committed
+    assert committed["schema"] == (
+        "lumencore.initial_outreach_dispatch_binding.v1"
+    )
+    assert committed["decision"] == (
+        "VERIFIED_SNAPSHOT_READY_FOR_SINGLE_USE_ACTION_TIME_APPROVAL"
+    )
+    assert committed["summary"] == {
+        "approval_received": False,
+        "check_count": 12,
+        "external_action_performed": False,
+        "fail_count": 0,
+        "pass_count": 12,
+        "send_authorized": False,
+        "send_performed": False,
+        "snapshot_ready_for_exact_approval": True,
+    }
+    binding = committed["dispatch_binding"]
+    assert binding["schema"] == (
+        "lumencore.initial_outreach_dispatch_binding_core.v1"
+    )
+    assert binding["template_id"] == "INITIAL_PARTNER_TEAMING_INQUIRY"
+    assert binding["attachment_count"] == 0
+    assert binding["cc_count"] == 0
+    assert binding["bcc_count"] == 0
+    assert binding["body_sha256"] == sha256(
+        ARGOS_DIR / "ARGOS_EMI_TEAMING_INQUIRY_BODY.md"
+    ).upper()
+    assert binding["binding_sha256"] == builder.canonical_object_sha256(
+        {
+            key: value
+            for key, value in binding.items()
+            if key != "binding_sha256"
+        }
+    )
+    phrase = committed["exact_action_time_approval_phrase"]
+    assert binding["binding_sha256"] in phrase
+    assert binding["subject_sha256"] in phrase
+    assert binding["body_sha256"] in phrase
+    assert binding["attachment_set_sha256"] in phrase
+    assert committed["approval_window"]["expires_utc"] in phrase
+    assert "@" not in phrase
+    assert committed["controls"]["builder_can_send"] is False
+    assert committed["controls"][
+        "approval_phrase_authorizes_send_without_current_validation"
+    ] is False
+
+
+def test_argos_primary_partner_binding_rejects_stale_or_duplicate_mailbox_state():
+    builder = load_argos_teaming_dispatch_builder()
+    gate = load_json(
+        ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
+    )
+
+    stale = json.loads(json.dumps(gate))
+    stale["generated_utc"] = "2026-07-27T22:54:15Z"
+    stale_payload = builder.build_payload(stale)
+    assert stale_payload["decision"] == "BLOCKED_DISPATCH_GATE_INTEGRITY"
+    assert {
+        "FRESH_DRAFT_READBACK",
+        "FRESH_DUPLICATE_RECHECK",
+    }.issubset(stale_payload["failed_checks"])
+    assert stale_payload["dispatch_binding"] is None
+    assert stale_payload["exact_action_time_approval_phrase"] is None
+
+    duplicate = json.loads(json.dumps(gate))
+    duplicate["fresh_duplicate_recheck"].update(
+        {
+            "matching_message_count": 2,
+            "matching_current_draft_count": 1,
+            "matching_sent_or_received_count": 1,
+            "decision": "DUPLICATE_FOUND",
+        }
+    )
+    duplicate_payload = builder.build_payload(duplicate)
+    assert "FRESH_DUPLICATE_RECHECK" in duplicate_payload["failed_checks"]
+    assert duplicate_payload["summary"]["send_authorized"] is False
+    assert duplicate_payload["summary"]["send_performed"] is False
+
+
+@pytest.mark.parametrize(
+    ("mutation", "failed_check"),
+    [
+        (
+            lambda gate: gate["message"].update(
+                {"body_sha256": "0" * 64}
+            ),
+            "BODY_CUSTODY",
+        ),
+        (
+            lambda gate: gate["template_selection"].update(
+                {"template_canonical_sha256": "0" * 64}
+            ),
+            "REGISTRY_BINDING",
+        ),
+        (
+            lambda gate: gate["recipient_route"].update(
+                {"official_contact_source": "http://127.0.0.1/contact"}
+            ),
+            "PUBLIC_RECIPIENT_ROUTE",
+        ),
+        (
+            lambda gate: gate["message"].update({"attachment_count": 1}),
+            "ZERO_ATTACHMENT_SET",
+        ),
+        (
+            lambda gate: gate["gmail_draft_receipt"].update({"sent": True}),
+            "FRESH_DRAFT_READBACK",
+        ),
+        (
+            lambda gate: gate["controls"].update(
+                {"approval_window_seconds": 3600}
+            ),
+            "FAIL_CLOSED_CONTROLS",
+        ),
+    ],
+)
+def test_argos_primary_partner_binding_rejects_tampering(
+    mutation,
+    failed_check,
+):
+    builder = load_argos_teaming_dispatch_builder()
+    gate = load_json(
+        ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
+    )
+    tampered = json.loads(json.dumps(gate))
+    mutation(tampered)
+    payload = builder.build_payload(tampered)
+
+    assert failed_check in payload["failed_checks"]
+    assert payload["decision"] == "BLOCKED_DISPATCH_GATE_INTEGRITY"
+    assert payload["dispatch_binding"] is None
+    assert payload["exact_action_time_approval_phrase"] is None
+    assert payload["summary"]["send_authorized"] is False
+    assert payload["summary"]["send_performed"] is False
+
+
+def test_argos_primary_partner_binding_approval_window_expires_exactly():
+    builder = load_argos_teaming_dispatch_builder()
+    payload = builder.build_payload()
+
+    current = builder.evaluate_action_time(
+        payload,
+        payload["approval_window"]["expires_utc"],
+    )
+    assert current["approval_window_current"] is True
+    assert current["send_authorized"] is False
+
+    expired = builder.evaluate_action_time(
+        payload,
+        "2026-07-27T22:43:15Z",
+    )
+    assert expired["approval_window_current"] is False
+    assert expired["decision"] == "EXPIRED_OR_BLOCKED_REBUILD_REQUIRED"
+    assert expired["send_authorized"] is False
+    assert expired["send_performed"] is False
+
+
+def test_argos_primary_partner_binding_rejects_duplicate_json_keys(tmp_path):
+    builder = load_argos_teaming_dispatch_builder()
+    path = tmp_path / "duplicate.json"
+    path.write_text('{"schema":"one","schema":"two"}', encoding="utf-8")
+
+    with pytest.raises(builder.DispatchBindingError, match="DUPLICATE_JSON_KEY"):
+        builder.read_json(path)
+
+
+def test_argos_primary_partner_binding_cli_check_is_current():
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ARGOS_DIR / "build_argos_teaming_dispatch_binding.py"),
+            "--check",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt["status"] == "CURRENT"
+    assert receipt["pass_count"] == 12
+    assert receipt["fail_count"] == 0
+    assert receipt["send_authorized"] is False
+    assert receipt["send_performed"] is False
 
 
 def test_argos_conformance_gate_binds_requirements_and_current_blockers():

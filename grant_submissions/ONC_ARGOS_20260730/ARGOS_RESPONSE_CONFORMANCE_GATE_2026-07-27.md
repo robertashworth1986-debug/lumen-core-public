@@ -1,6 +1,6 @@
 # Project Argos Response Conformance Gate
 
-Evaluated UTC: `2026-07-27T22:23:00Z`
+Evaluated UTC: `2026-07-27T22:38:14Z`
 Decision: `BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY`
 
 ## Summary
@@ -17,7 +17,7 @@ Decision: `BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY`
 | Check | Status | Requirement | Evidence |
 | --- | --- | --- | --- |
 | `OFFICIAL_NOTICE_CURRENT` | `PASS` | The official notice is active and its identity and deadline are explicit. | https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view |
-| `DEADLINE_OPEN` | `PASS` | The response is evaluated before the exact Government deadline. | evaluated=2026-07-27T22:23:00Z; deadline=2026-07-30T21:00:00Z |
+| `DEADLINE_OPEN` | `PASS` | The response is evaluated before the exact Government deadline. | evaluated=2026-07-27T22:38:14Z; deadline=2026-07-30T21:00:00Z |
 | `ACCEPTED_FILES_PRESENT` | `PASS` | Both accepted review formats and their receipts are present. | docx=True; pdf=True; receipts=True |
 | `ARTIFACT_HASH_CUSTODY` | `PASS` | Markdown, DOCX, and PDF hashes reconcile to the current receipts. | docx_sha256=7d17d228d88acbd06b5fb5d8aaff513bf476dd31920e9a5660ff71147145dea5; pdf_sha256=6260617bb2ae0de6d6b6817c70d3146351889db16d1c288a6edb48c8c19d0c04 |
 | `US_LETTER_SIZE` | `PASS` | Every DOCX section uses US Letter dimensions. | sections=2; expected_twips=12240x15840 |
@@ -33,7 +33,7 @@ Decision: `BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY`
 | `SIMILAR_SCOPE_BOUNDARY` | `PASS` | Adjacent component evidence is not represented as federal-health prior performance. | Explicit similar-scope matrix and acquisition implications are present. |
 | `CLAIM_BOUNDARIES` | `PASS` | Unsupported certification, authorization, validation, savings, and prime claims remain prohibited. | forbidden_promotion_phrases_found=[] |
 | `CLAIM_EVIDENCE_TRACEABILITY` | `PASS` | Each affirmative engineering proof statement is bound to named public evidence and explicit non-claims. | claim_count=3; status=VERIFIED_BOUNDED_CLAIM_MAP; source_custody_hold=True |
-| `PARTNER_DRAFT_UNSENT` | `PASS` | The bounded partner inquiry remains an unsent, no-attachment draft. | draft_present=True; sent=False; attachments=0 |
+| `PARTNER_DRAFT_UNSENT` | `PASS` | The bounded partner inquiry remains an unsent, no-attachment draft. | draft_present=True; sent=False; attachments=0; binding_checks=12/12 |
 | `GOVERNMENT_DUPLICATE_RECHECK` | `BLOCKED` | A fresh full-mailbox duplicate check is bound to the final Government response. | last_preliminary_check=2026-07-27T19:05:00Z |
 |  |  | **Blocker action** | Repeat the exact Government-response duplicate search immediately before send. |
 | `FINAL_DISPATCH_BINDING` | `BLOCKED` | The final Government recipient, subject, body, and attachment set are verified together. | recipient=False; subject=False; body=False; attachments=False |

@@ -17,9 +17,18 @@ on:
       - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json"
       - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json"
       - "grant_submissions/ONC_ARGOS_20260730/ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.md"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_INQUIRY_BODY.md"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.md"
       - "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json"
+      - "grant_submissions/ONC_ARGOS_20260730/README.md"
       - "grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_conformance_gate.py"
       - "grant_submissions/ONC_ARGOS_20260730/build_argos_private_action_copy.py"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py"
       - "tests/test_current_opportunity_and_argos_packet.py"
       - "tests/test_deadline_action_sentinel.py"
   push:
@@ -39,9 +48,18 @@ on:
       - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json"
       - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json"
       - "grant_submissions/ONC_ARGOS_20260730/ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.md"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_INQUIRY_BODY.md"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.md"
       - "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json"
+      - "grant_submissions/ONC_ARGOS_20260730/README.md"
       - "grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_conformance_gate.py"
       - "grant_submissions/ONC_ARGOS_20260730/build_argos_private_action_copy.py"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py"
       - "tests/test_current_opportunity_and_argos_packet.py"
       - "tests/test_deadline_action_sentinel.py"
 
@@ -77,11 +95,19 @@ jobs:
           python -m py_compile \
             code/ops/BUILD_DEADLINE_ACTION_SENTINEL.py \
             grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py \
+            grant_submissions/ONC_ARGOS_20260730/build_argos_conformance_gate.py \
             grant_submissions/ONC_ARGOS_20260730/build_argos_private_action_copy.py \
+            grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py \
             tests/test_deadline_action_sentinel.py
 
       - name: Verify the Argos claim-to-evidence map
         run: python grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py --check
+
+      - name: Verify the Argos teaming dispatch binding
+        run: python grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py --check
+
+      - name: Verify the Argos response conformance gate
+        run: python grant_submissions/ONC_ARGOS_20260730/build_argos_conformance_gate.py --check
 
       - name: Verify the committed snapshot is current
         run: python code/ops/BUILD_DEADLINE_ACTION_SENTINEL.py --check

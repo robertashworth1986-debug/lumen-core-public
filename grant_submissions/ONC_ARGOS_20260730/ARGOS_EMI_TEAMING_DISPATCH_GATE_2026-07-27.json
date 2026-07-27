@@ -1,8 +1,9 @@
 {
   "schema": "lumencore.argos_partner_dispatch_gate.v1",
-  "generated_utc": "2026-07-27T22:22:14Z",
+  "generated_utc": "2026-07-27T22:38:14Z",
   "opportunity": {
     "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+    "official_notice_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
     "government_deadline_utc": "2026-07-30T21:00:00Z",
     "partner_interest_target_utc": "2026-07-28T17:00:00Z"
   },
@@ -37,8 +38,8 @@
   "message": {
     "subject": "Time-sensitive teaming inquiry - HHS Project Argos sources sought",
     "body_path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_INQUIRY_BODY.md",
-    "body_sha256": "dd8b7a762071672221e9c9e9d54b85ba5848bf777a5f988d0a119a6a802b522d",
-    "body_bytes": 2040,
+    "body_sha256": "a102bbd27e2bafba744d0fd1ade40565f2d8a97b970a0962344e5e70776ec6e2",
+    "body_bytes": 2067,
     "official_notice_link_present": true,
     "duplicate_disclosure_present": true,
     "attachment_count": 0,
@@ -52,7 +53,7 @@
     "decision": "NO_DUPLICATE_FOUND"
   },
   "fresh_duplicate_recheck": {
-    "checked_utc": "2026-07-27T22:21:21Z",
+    "checked_utc": "2026-07-27T22:38:14Z",
     "search_scope": "ALL_MAIL_EXACT_SUBJECT_OR_RECIPIENT_OR_NOTICE",
     "matching_message_count": 1,
     "matching_current_draft_count": 1,
@@ -61,7 +62,7 @@
   },
   "gmail_draft_receipt": {
     "created_utc": "2026-07-27T19:34:27Z",
-    "updated_utc": "2026-07-27T22:21:58Z",
+    "updated_utc": "2026-07-27T22:37:57Z",
     "draft_present": true,
     "subject_matches": true,
     "body_matches_source_after_newline_normalization": true,
@@ -78,8 +79,11 @@
     "fresh_duplicate_recheck_required_before_send": true,
     "final_subject_body_recipient_and_attachment_set_must_match": true,
     "partner_name_use_in_government_response_requires_written_authorization": true,
+    "approval_binding_required": true,
+    "approval_window_seconds": 300,
+    "dispatch_binding_path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json",
     "builder_can_send": false
   },
   "decision": "GMAIL_DRAFT_READY_SEND_BLOCKED",
-  "safest_next_action": "Review the exact Gmail draft. Before sending, repeat the full-mailbox duplicate search and obtain single-use action-time approval for the displayed recipient route, exact subject, exact body SHA-256, and zero-attachment set."
+  "safest_next_action": "Review the exact Gmail draft. Before sending, repeat the full-mailbox duplicate search and draft readback, rebuild the companion dispatch binding, verify its five-minute window is current, and obtain single-use action-time approval for the displayed recipient route, exact subject, exact body SHA-256, and zero-attachment set."
 }

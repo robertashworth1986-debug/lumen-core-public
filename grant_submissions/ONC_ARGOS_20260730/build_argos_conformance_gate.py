@@ -18,6 +18,9 @@ DEFAULT_MARKDOWN = ARGOS_DIR / "ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.md"
 SUBMISSION_GATE = ARGOS_DIR / "ARGOS_SUBMISSION_GATE_2026-07-26.json"
 TEAM_REGISTER = ARGOS_DIR / "ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json"
 PARTNER_DISPATCH_GATE = ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
+PARTNER_DISPATCH_BINDING = (
+    ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json"
+)
 CLAIM_EVIDENCE_MAP = ARGOS_DIR / "ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
 RESPONSE_MARKDOWN = ARGOS_DIR / "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md"
 BUILD_RECEIPT = OUTPUT_DIR / "build_receipt.json"
@@ -137,6 +140,7 @@ def build_payload(as_of_utc: str) -> dict:
     gate = read_json(SUBMISSION_GATE)
     team = read_json(TEAM_REGISTER)
     partner_dispatch = read_json(PARTNER_DISPATCH_GATE)
+    partner_binding = read_json(PARTNER_DISPATCH_BINDING)
     claim_evidence_map = read_json(CLAIM_EVIDENCE_MAP)
     build = read_json(BUILD_RECEIPT)
     render = read_json(RENDER_RECEIPT)
@@ -350,11 +354,19 @@ def build_payload(as_of_utc: str) -> dict:
             if partner_dispatch["gmail_draft_receipt"]["draft_present"]
             and not partner_dispatch["gmail_draft_receipt"]["sent"]
             and partner_dispatch["message"]["attachment_count"] == 0
+            and partner_binding["summary"]["pass_count"]
+            == partner_binding["summary"]["check_count"]
+            and partner_binding["summary"]["fail_count"] == 0
+            and not partner_binding["summary"]["send_authorized"]
+            and not partner_binding["summary"]["send_performed"]
             else "FAIL",
             (
                 f"draft_present={partner_dispatch['gmail_draft_receipt']['draft_present']}; "
                 f"sent={partner_dispatch['gmail_draft_receipt']['sent']}; "
-                f"attachments={partner_dispatch['message']['attachment_count']}"
+                f"attachments={partner_dispatch['message']['attachment_count']}; "
+                f"binding_checks="
+                f"{partner_binding['summary']['pass_count']}/"
+                f"{partner_binding['summary']['check_count']}"
             ),
         ),
         result(
@@ -416,6 +428,7 @@ def build_payload(as_of_utc: str) -> dict:
         SUBMISSION_GATE,
         TEAM_REGISTER,
         PARTNER_DISPATCH_GATE,
+        PARTNER_DISPATCH_BINDING,
         CLAIM_EVIDENCE_MAP,
         RESPONSE_MARKDOWN,
         BUILD_RECEIPT,

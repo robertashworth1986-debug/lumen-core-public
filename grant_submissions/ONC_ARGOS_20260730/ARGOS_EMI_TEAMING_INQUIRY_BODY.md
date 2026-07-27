@@ -26,9 +26,9 @@ For a truthful response, we would need written confirmation of:
 - whether BookZurman or Digital HIE should be included in the discussion.
 
 This is market research only. No pricing, binding commitment, or unsupported
-credential use is requested. A reply by Tuesday, July 28 at 1:00 PM Eastern
-would leave time to reconcile the team and response before the Government
-deadline.
+credential use is requested. No attachment is included. A reply by Tuesday,
+July 28 at 1:00 PM Eastern would leave time to reconcile the team and response
+before the Government deadline.
 
 Duplicate-send check: a fresh full-mailbox search found no prior sent or
 received message to this route about Project Argos; only this unsent draft is
