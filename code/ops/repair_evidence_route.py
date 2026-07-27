@@ -26,7 +26,8 @@ LOCATION_PATTERN = re.compile(r"(?m)^[ \t]*location[ \t]+/evidence/[ \t]*\{")
 REDIRECT_PATTERN = re.compile(
     r"(?m)^[ \t]*location[ \t]+=[ \t]*/evidence[ \t]*\{"
 )
-SAFE_ROOT_PATTERN = re.compile(r"^/[A-Za-z0-9._/-]+$")
+SAFE_POSIX_ROOT_PATTERN = re.compile(r"^/[A-Za-z0-9._/-]+$")
+SAFE_WINDOWS_ROOT_PATTERN = re.compile(r"^[A-Za-z]:/[A-Za-z0-9._/-]+$")
 
 
 class RouteRepairError(RuntimeError):
@@ -41,13 +42,23 @@ class RepairResult:
 
 
 def _safe_document_root(path: Path | str) -> str:
-    value = str(path)
-    if not SAFE_ROOT_PATTERN.fullmatch(value):
+    value = str(path).replace("\\", "/").rstrip("/")
+    absolute_form = bool(
+        SAFE_POSIX_ROOT_PATTERN.fullmatch(value)
+        or SAFE_WINDOWS_ROOT_PATTERN.fullmatch(value)
+    )
+    segments = value.split("/")
+    if (
+        not absolute_form
+        or "//" in value
+        or any(segment in {".", ".."} for segment in segments)
+    ):
         raise RouteRepairError(
-            "document root must be an absolute path containing only "
-            "letters, digits, dot, underscore, slash, or hyphen"
+            "document root must be a traversal-free POSIX or drive-absolute "
+            "path containing only letters, digits, dot, underscore, slash, "
+            "or hyphen"
         )
-    return value.rstrip("/") or "/"
+    return value
 
 
 def _find_balanced_block(
