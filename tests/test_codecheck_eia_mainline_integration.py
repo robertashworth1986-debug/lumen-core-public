@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import shutil
+import subprocess
 from pathlib import Path
 
 
@@ -98,6 +99,38 @@ def test_line_endings_do_not_change_frozen_text_identity(tmp_path):
     assert module.git_blob_sha1(module.portable_bytes(lf, "utf8_lf")) == module.git_blob_sha1(
         module.portable_bytes(crlf, "utf8_lf")
     )
+
+
+def test_every_frozen_input_has_checkout_custody_matching_its_hash_mode():
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    rows = config["exact_frozen_files"]
+    paths = [row["path"] for row in rows]
+    result = subprocess.run(
+        ["git", "check-attr", "text", "eol", "binary", "--", *paths],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+        text=True,
+        timeout=15,
+    )
+
+    assert result.returncode == 0, result.stderr
+    observed: dict[str, dict[str, str]] = {path: {} for path in paths}
+    for line in result.stdout.splitlines():
+        path, attribute, value = line.rsplit(": ", 2)
+        observed[path][attribute] = value
+
+    assert set(observed) == set(paths)
+    for row in rows:
+        attrs = observed[row["path"]]
+        if row["hash_mode"] == "utf8_lf":
+            assert attrs["text"] == "set", row["path"]
+            assert attrs["eol"] == "lf", row["path"]
+            assert attrs["binary"] == "unspecified", row["path"]
+        else:
+            assert row["hash_mode"] == "binary"
+            assert attrs["text"] == "unset", row["path"]
+            assert attrs["binary"] == "set", row["path"]
 
 
 def test_manifest_parser_preserves_order_and_rejects_duplicate_or_unsafe_outputs():
