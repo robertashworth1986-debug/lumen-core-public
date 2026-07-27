@@ -1,4 +1,4 @@
-# Project Argos Partner-First Capability Statement
+# Project Argos Capability Statement - Bounded Teaming Response
 
 
 
@@ -38,6 +38,8 @@
 
 | Small-business designation(s) | ACTION_TIME_PRIVATE_FACT_REQUIRED |
 
+| Public reviewer surface | https://lumen-core.ai/ |
+
 | Public evidence repository | https://github.com/robertashworth1986-debug/lumen-core-public |
 
 
@@ -46,9 +48,9 @@
 
 
 
-LumenCore responds to this Sources Sought as a prospective evidence-assurance and deterministic-validation workstream contributor, not as a presently qualified full-scope health IT prime. The public LumenCore repository demonstrates bounded patterns for authorized-source custody, deterministic replay, rule traceability, hash-locked evidence cases, human decision gates, negative-result retention, and reviewer handoff.
+LumenCore offers Project Argos a bounded evidence-assurance and deterministic-validation workstream: authorized-source custody, rule traceability, hash-locked evidence cases, human decision gates, adverse-result retention, and reviewer handoff. These are component capabilities supported by the public LumenCore repository and live reviewer surface.
 
-For Project Argos, those patterns align most directly with requirements traceability, public-source ingestion provenance, deterministic validator orchestration, evidence-case generation, corrective-action retest records, and production handoff documentation. A credible team still requires named FHIR R4/CHPL and ONC Certification Program expertise plus an HHS ATO/FIPS 199/security assessment lead. LumenCore recommends participating under, or alongside, a qualified health IT and federal cybersecurity prime.
+For Project Argos, those patterns align most directly with requirements traceability, public-source ingestion provenance, deterministic validator orchestration, evidence-case generation, corrective-action retest records, and production handoff documentation. LumenCore is responding at component level and does not claim presently qualified full-scope health IT prime readiness. A credible team still requires named FHIR R4/CHPL and ONC Certification Program expertise plus an HHS ATO/FIPS 199/security lead.
 
 
 
@@ -124,7 +126,7 @@ For Project Argos, those patterns align most directly with requirements traceabi
 
 
 
-## 5. Demonstrated Evidence and Claim Boundaries
+## 5. Component Evidence and Similar-Scope Status
 
 
 
@@ -134,9 +136,27 @@ For Project Argos, those patterns align most directly with requirements traceabi
 
 | Public reviewer capsule | 31 of 31 declared assertions and 3 of 3 suites reproduced in the packaged clean-run workflow, with dependency and source-state checks. | First-party bounded reproducibility only; not external validation, agency certification, field performance, or health IT past performance. |
 
-| Measured public EIA replay | 14,704 panel rows; frozen multi-authority holdouts; explicit baseline ranking; negative Kuramoto result retained rather than promoted. | Grid-demand benchmark only; it demonstrates evidence discipline, not transfer to FHIR, healthcare, compliance, or operational savings. |
+| Custody and validation controls | Versioned manifests, SHA-256 receipts, schema checks, duplicate-action locks, and fail-closed gate records support an inspectable evidence workflow. | Control artifacts do not establish health-domain correctness, production authorization, contract performance, or agency acceptance. |
 
-| Residual-model replay | A residual candidate ranked first on the frozen replay while promotion, coverage, and field-validation gates remained false. | Point improvement is not a production or economic claim; prospective and independent gates remain open. |
+| Adverse-result retention | Public records preserve failed promotion gates, negative findings, and unresolved authorities instead of converting them into favorable claims. | Transparent failure handling is an engineering pattern, not proof of FHIR conformance, regulatory interpretation, or field performance. |
+
+
+
+The notice requests experience of similar scope and complexity. The matrix below distinguishes LumenCore component evidence from qualifications that must come from an authorized team; adjacent technical work is not treated as federal health prior performance.
+
+
+
+| Capability area | Present support | Acquisition implication |
+
+| --- | --- | --- |
+
+| Evidence custody, traceability, and deterministic validation | Component pattern supported by public code, tests, receipts, and reviewer artifacts. | LumenCore can be evaluated for a bounded evidence-assurance workstream. |
+
+| FHIR R4, CHPL/Lantern/NPPES, and ONC Certification Program delivery | No direct LumenCore prior-performance reference is claimed. | Named and authorized health IT/FHIR partner evidence is required. |
+
+| HHS ATO, FIPS 199, SSP/control implementation, and 3PAO coordination | No direct LumenCore HHS authorization reference is claimed. | Named and authorized federal cybersecurity lead and independent assessment path are required. |
+
+| Full-scope federal health program integration | No full-prime readiness or comparable federal health delivery is claimed. | A qualified small-business prime or integrated team must own program delivery and provide relevant references. |
 
 
 

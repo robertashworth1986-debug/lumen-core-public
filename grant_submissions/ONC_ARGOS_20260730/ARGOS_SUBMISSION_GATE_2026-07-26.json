@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.opportunity_submission_gate.v1",
-  "generated_utc": "2026-07-27T01:08:35Z",
+  "generated_utc": "2026-07-27T19:12:10Z",
   "opportunity": {
     "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
     "title": "Project Argos Agentic AI Proof of Concept",
@@ -43,10 +43,31 @@
     "legal_entity_name_inferred_from_seal": false
   },
   "duplicate_send_check": {
-    "checked_utc": "2026-07-27T00:55:00Z",
+    "checked_utc": "2026-07-27T19:05:00Z",
     "matching_sent_response_found": false,
     "matching_draft_response_found": false,
     "decision": "NO_DUPLICATE_FOUND_BUT_RECHECK_AT_ACTION_TIME"
+  },
+  "official_notice_recheck": {
+    "checked_utc": "2026-07-27T19:08:00Z",
+    "notice_active": true,
+    "deadline_utc": "2026-07-30T21:00:00Z",
+    "submission_channel": "EMAIL_TO_OFFICIAL_PRIMARY_POINT_OF_CONTACT",
+    "primary_point_of_contact_name": "Donna Sykes",
+    "primary_point_of_contact_address_stored_in_public_gate": false,
+    "teaming_permitted": true,
+    "named_team_members_and_roles_required": true,
+    "official_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view"
+  },
+  "partner_search": {
+    "status": "CANDIDATES_IDENTIFIED_OUTREACH_NOT_SENT",
+    "candidate_register": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json",
+    "outreach_drafts": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md",
+    "candidate_count": 3,
+    "candidate_interest_confirmed_count": 0,
+    "candidate_name_use_authorized_count": 0,
+    "outreach_sent_count": 0,
+    "primary_partner_interest_target_utc": "2026-07-28T17:00:00Z"
   },
   "required_private_facts": [
     "legal_company_name",
@@ -95,5 +116,5 @@
     "exact_action_time_human_approval_required": true,
     "decision": "BLOCK_SEND"
   },
-  "safest_next_action": "Resolve cover facts and qualified teaming roles, review the rendered response, recheck the full mailbox thread and official notice, then request exact approval for the final recipient, subject, body, and attachment set."
+  "safest_next_action": "Review the primary EMI Advisors teaming inquiry, perform a fresh mailbox duplicate check, and request exact approval for that one recipient and body. Continue final response work only after a qualified team authorizes its names, roles, credentials, and relevant references."
 }

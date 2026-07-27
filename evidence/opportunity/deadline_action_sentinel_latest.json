@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.deadline_action_sentinel.v1",
-  "evaluated_utc": "2026-07-27T02:46:54Z",
+  "evaluated_utc": "2026-07-27T19:21:35Z",
   "posture": "HUMAN_ACTION_REQUIRED_FAIL_CLOSED",
   "controls": {
     "read_only_builder": true,
@@ -61,7 +61,7 @@
       "source_receipt": {
         "kind": "REPOSITORY_GATE",
         "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
-        "sha256": "c2a85b56555c5ed35bd998c34207d241b8635b01d48c79e97ab0440802dee5d8",
+        "sha256": "3efe6ccbf3662c17b91f5c39881fb2ec31b8b6c61b73ca9bb537c493cf011a19",
         "bound_deadline_field": "opportunity.deadline_utc",
         "observed_status": "BLOCK_SEND"
       },
@@ -76,8 +76,8 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": false,
-        "seconds_until_deadline": 324786,
-        "hours_until_deadline": 90.22
+        "seconds_until_deadline": 265105,
+        "hours_until_deadline": 73.64
       }
     },
     {

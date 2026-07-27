@@ -1,11 +1,11 @@
 {
   "schema": "lumencore.argos_render_qa.v1",
-  "inspected_utc": "2026-07-27T01:28:08.8260059Z",
-  "docx_sha256": "731dd16725c53a424b36ff712cc1b12e85d4077b2d526c09e8bdcce6661a52c3",
-  "pdf_sha256": "ec2aa1c71390df830ac6e95f078f935173c7b524b2c52be4bf58b49fff2a1602",
-  "total_pages": 9,
+  "inspected_utc": "2026-07-27T19:24:32.6726521Z",
+  "docx_sha256": "eaf9015d1c2b003ccb8321dc30f5bca4f07a90bd16313e2bb6d2e2c57544e8b4",
+  "pdf_sha256": "25d8d79e1c2f28fba0876ecbae1f78d618e6147b6f30bd040caed3acbd315173",
+  "total_pages": 10,
   "cover_pages": 1,
-  "content_pages": 8,
+  "content_pages": 9,
   "content_page_limit": 10,
   "page_limit_passed": true,
   "inspected_pages": [
@@ -17,7 +17,8 @@
     6,
     7,
     8,
-    9
+    9,
+    10
   ],
   "visual_inspection_passed": true,
   "overlap_or_clipping_found": false,
@@ -27,7 +28,8 @@
   "seal_name": "LumaArc seal of approval",
   "submission_authorized": false,
   "notes": [
-    "All nine rendered pages were visually inspected at full resolution.",
+    "All ten rendered pages were visually inspected at full resolution.",
+    "The inspection used the local ignored output/rendered_manual_v3 render set; the tracked review artifacts are the DOCX, PDF, and their hashes.",
     "The cover identifies LumenCore as the company and LumaArc only as the seal of approval.",
     "Cover placeholders are explicitly labeled pending action-time facts.",
     "The response remains blocked pending private facts, named teaming qualifications, duplicate recheck, final review, and exact action-time approval."

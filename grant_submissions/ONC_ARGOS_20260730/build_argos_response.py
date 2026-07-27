@@ -24,6 +24,8 @@ LOGO_SHA256 = "1ed1c9b00e273aa9e781bd7fd0a4fcc3fc542257c6d294c8e8fbfada500701af"
 NOTICE_ID = "ONC-ARGOS-SSN-2026-OS351107"
 DEADLINE = "July 30, 2026 at 5:00 PM Eastern"
 PUBLIC_REPO = "https://github.com/robertashworth1986-debug/lumen-core-public"
+PUBLIC_SITE = "https://lumen-core.ai/"
+RESPONSE_TITLE = "Project Argos Capability Statement - Bounded Teaming Response"
 
 PRIVATE_FACT = "ACTION_TIME_PRIVATE_FACT_REQUIRED"
 TEAMING_FACT = "ACTION_TIME_TEAMING_FACT_REQUIRED"
@@ -40,21 +42,20 @@ CAUTION_FILL = "FFF4CC"
 
 EXECUTIVE_PARAGRAPHS = [
     (
-        "LumenCore responds to this Sources Sought as a prospective evidence-assurance "
-        "and deterministic-validation workstream contributor, not as a presently "
-        "qualified full-scope health IT prime. The public LumenCore repository "
-        "demonstrates bounded patterns for authorized-source custody, deterministic "
-        "replay, rule traceability, hash-locked evidence cases, human decision gates, "
-        "negative-result retention, and reviewer handoff."
+        "LumenCore offers Project Argos a bounded evidence-assurance and "
+        "deterministic-validation workstream: authorized-source custody, rule "
+        "traceability, hash-locked evidence cases, human decision gates, adverse-result "
+        "retention, and reviewer handoff. These are component capabilities supported by "
+        "the public LumenCore repository and live reviewer surface."
     ),
     (
         "For Project Argos, those patterns align most directly with requirements "
         "traceability, public-source ingestion provenance, deterministic validator "
         "orchestration, evidence-case generation, corrective-action retest records, "
-        "and production handoff documentation. A credible team still requires named "
-        "FHIR R4/CHPL and ONC Certification Program expertise plus an HHS "
-        "ATO/FIPS 199/security assessment lead. LumenCore recommends participating "
-        "under, or alongside, a qualified health IT and federal cybersecurity prime."
+        "and production handoff documentation. LumenCore is responding at component "
+        "level and does not claim presently qualified full-scope health IT prime "
+        "readiness. A credible team still requires named FHIR R4/CHPL and ONC "
+        "Certification Program expertise plus an HHS ATO/FIPS 199/security lead."
     ),
 ]
 
@@ -228,18 +229,44 @@ EVIDENCE_ROWS = [
         "certification, field performance, or health IT past performance.",
     ),
     (
-        "Measured public EIA replay",
-        "14,704 panel rows; frozen multi-authority holdouts; explicit baseline ranking; "
-        "negative Kuramoto result retained rather than promoted.",
-        "Grid-demand benchmark only; it demonstrates evidence discipline, not transfer "
-        "to FHIR, healthcare, compliance, or operational savings.",
+        "Custody and validation controls",
+        "Versioned manifests, SHA-256 receipts, schema checks, duplicate-action locks, "
+        "and fail-closed gate records support an inspectable evidence workflow.",
+        "Control artifacts do not establish health-domain correctness, production "
+        "authorization, contract performance, or agency acceptance.",
     ),
     (
-        "Residual-model replay",
-        "A residual candidate ranked first on the frozen replay while promotion, "
-        "coverage, and field-validation gates remained false.",
-        "Point improvement is not a production or economic claim; prospective and "
-        "independent gates remain open.",
+        "Adverse-result retention",
+        "Public records preserve failed promotion gates, negative findings, and "
+        "unresolved authorities instead of converting them into favorable claims.",
+        "Transparent failure handling is an engineering pattern, not proof of FHIR "
+        "conformance, regulatory interpretation, or field performance.",
+    ),
+]
+
+SIMILAR_SCOPE_ROWS = [
+    (
+        "Evidence custody, traceability, and deterministic validation",
+        "Component pattern supported by public code, tests, receipts, and reviewer "
+        "artifacts.",
+        "LumenCore can be evaluated for a bounded evidence-assurance workstream.",
+    ),
+    (
+        "FHIR R4, CHPL/Lantern/NPPES, and ONC Certification Program delivery",
+        "No direct LumenCore prior-performance reference is claimed.",
+        "Named and authorized health IT/FHIR partner evidence is required.",
+    ),
+    (
+        "HHS ATO, FIPS 199, SSP/control implementation, and 3PAO coordination",
+        "No direct LumenCore HHS authorization reference is claimed.",
+        "Named and authorized federal cybersecurity lead and independent assessment "
+        "path are required.",
+    ),
+    (
+        "Full-scope federal health program integration",
+        "No full-prime readiness or comparable federal health delivery is claimed.",
+        "A qualified small-business prime or integrated team must own program delivery "
+        "and provide relevant references.",
     ),
 ]
 
@@ -463,7 +490,7 @@ def configure_document(doc: Document) -> None:
     styles["Heading 3"].paragraph_format.space_before = Pt(6)
     styles["Heading 3"].paragraph_format.space_after = Pt(3)
 
-    doc.core_properties.title = "Project Argos Partner-First Capability Response Draft"
+    doc.core_properties.title = RESPONSE_TITLE
     doc.core_properties.subject = NOTICE_ID
     doc.core_properties.author = "LumenCore"
     doc.core_properties.keywords = "Project Argos, sources sought, evidence assurance"
@@ -578,7 +605,7 @@ def add_cover(doc: Document) -> None:
     for text, bold, color, after in (
         ("LUMENCORE", True, INK, 2),
         ("LUMAARC SEAL OF APPROVAL", False, MUTED, 4),
-        ("PARTNER-FIRST CAPABILITY STATEMENT", True, INK, 4),
+        ("MARKET RESEARCH CAPABILITY STATEMENT", True, INK, 4),
         ("Project Argos Agentic AI Proof of Concept", True, INK, 4),
         (f"Sources Sought Notice {NOTICE_ID}", False, MUTED, 18),
         ("DRAFT - HUMAN REVIEW AND ACTION-TIME FACTS REQUIRED", True, RGBColor(0x8A, 0x51, 0x00), 18),
@@ -599,6 +626,7 @@ def add_cover(doc: Document) -> None:
         ("Authorized point of contact", PRIVATE_FACT_DISPLAY),
         ("Telephone / email", PRIVATE_FACT_DISPLAY),
         ("Small-business designation(s)", PRIVATE_FACT_DISPLAY),
+        ("Public reviewer surface", PUBLIC_SITE),
         ("Public evidence repository", PUBLIC_REPO),
         ("Response deadline", DEADLINE),
     ]
@@ -703,7 +731,7 @@ def build_docx() -> None:
     for idx, (label, text) in enumerate(WORKSTREAM_STEPS, start=1):
         add_numbered_item(doc, str(idx), f"{label}: {text}")
 
-    add_heading(doc, "5. Demonstrated Evidence and Claim Boundaries", level=1)
+    add_heading(doc, "5. Component Evidence and Similar-Scope Status", level=1)
     add_paragraph(
         doc,
         "The following public records support the engineering patterns offered here. "
@@ -714,6 +742,19 @@ def build_docx() -> None:
         ["Evidence record", "What the public artifact supports", "What it does not support"],
         EVIDENCE_ROWS,
         [1.35, 2.75, 2.40],
+    )
+    add_paragraph(
+        doc,
+        "The notice requests experience of similar scope and complexity. The matrix "
+        "below distinguishes LumenCore component evidence from qualifications that must "
+        "come from an authorized team; it does not substitute adjacent technical work "
+        "for federal health prior performance.",
+    )
+    fill_table(
+        doc,
+        ["Capability area", "Present support", "Acquisition implication"],
+        SIMILAR_SCOPE_ROWS,
+        [1.75, 2.30, 2.45],
     )
     add_paragraph(
         doc,
@@ -796,7 +837,7 @@ def table_markdown(headers: list[str], rows: list[tuple[str, ...]]) -> list[str]
 
 def build_markdown() -> None:
     lines = [
-        "# Project Argos Partner-First Capability Statement",
+        f"# {RESPONSE_TITLE}",
         "",
         f"**Notice:** `{NOTICE_ID}`",
         f"**Deadline:** {DEADLINE}",
@@ -816,6 +857,7 @@ def build_markdown() -> None:
         ("Authorized point of contact", PRIVATE_FACT),
         ("Telephone / email", PRIVATE_FACT),
         ("Small-business designation(s)", PRIVATE_FACT),
+        ("Public reviewer surface", PUBLIC_SITE),
         ("Public evidence repository", PUBLIC_REPO),
     ]
     lines.extend(table_markdown(["Field", "Current response"], cover_rows))
@@ -844,11 +886,27 @@ def build_markdown() -> None:
         f"{idx}. **{label}.** {text}"
         for idx, (label, text) in enumerate(WORKSTREAM_STEPS, start=1)
     )
-    lines.extend(["", "## 5. Demonstrated Evidence and Claim Boundaries", ""])
+    lines.extend(["", "## 5. Component Evidence and Similar-Scope Status", ""])
     lines.extend(
         table_markdown(
             ["Evidence record", "What it supports", "What it does not support"],
             EVIDENCE_ROWS,
+        )
+    )
+    lines.extend(
+        [
+            "",
+            "The notice requests experience of similar scope and complexity. The matrix "
+            "below distinguishes LumenCore component evidence from qualifications that "
+            "must come from an authorized team; adjacent technical work is not treated "
+            "as federal health prior performance.",
+            "",
+        ]
+    )
+    lines.extend(
+        table_markdown(
+            ["Capability area", "Present support", "Acquisition implication"],
+            SIMILAR_SCOPE_ROWS,
         )
     )
     lines.extend(["", "## 6. Delivery and Security Approach", ""])

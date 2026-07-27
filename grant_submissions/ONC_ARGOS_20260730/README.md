@@ -26,6 +26,12 @@ the seal name, not a rename of the LumenCore company.
 - `output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.docx`: editable response
 - `output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.pdf`: rendered review copy
 - `ARGOS_SUBMISSION_GATE_2026-07-26.json`: action-time facts and send gate
+- `ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json`: ranked, source-bound
+  teaming candidates and authorization state
+- `ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md`: one-at-a-time partner
+  outreach sequence; none sent
+- `ARGOS_ACTION_TIME_FINALIZATION_CHECKLIST_2026-07-27.md`: private fact,
+  team, evidence, file, duplicate, and dispatch gates
 - `build_argos_response.py`: deterministic response builder
 
 ## Rebuild

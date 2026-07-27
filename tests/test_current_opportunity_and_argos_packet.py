@@ -71,8 +71,8 @@ def test_argos_generated_outputs_match_their_receipts():
     assert qa["seal_name"] == "LumaArc seal of approval"
     assert qa["docx_sha256"] == sha256(docx)
     assert qa["pdf_sha256"] == sha256(pdf)
-    assert qa["total_pages"] == 9
-    assert qa["content_pages"] == 8
+    assert qa["total_pages"] == 10
+    assert qa["content_pages"] == 9
     assert qa["content_pages"] <= qa["content_page_limit"]
     assert qa["visual_inspection_passed"] is True
     assert qa["overlap_or_clipping_found"] is False
@@ -84,13 +84,52 @@ def test_argos_response_uses_the_company_name_without_inflated_claims():
         encoding="utf-8"
     )
 
-    assert "LumenCore responds to this Sources Sought" in response
+    assert "LumenCore offers Project Argos a bounded evidence-assurance" in response
     assert "LumaArc seal of approval" in response
     assert "LumaArc responds" not in response
     assert "| Brand | LumaArc |" not in response
-    assert "not as a presently qualified full-scope health IT prime" in response
+    assert "does not claim presently qualified full-scope health IT prime readiness" in response
     assert "a proof-of-concept result alone is not an Authority to Operate" in response
+    assert "No direct LumenCore prior-performance reference is claimed" in response
+    assert "Measured public EIA replay" not in response
+    assert "negative Kuramoto result" not in response
     assert "patent-sensitive" not in response
+
+
+def test_argos_teaming_register_is_source_bound_and_does_not_claim_commitment():
+    register = load_json(ARGOS_DIR / "ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json")
+
+    assert register["schema"] == "lumencore.argos_teaming_candidate_register.v1"
+    assert register["status"] == "CANDIDATES_IDENTIFIED_OUTREACH_NOT_SENT"
+    assert register["opportunity"]["named_team_members_and_roles_required"] is True
+    assert len(register["candidates"]) == 3
+    assert register["selection_strategy"]["contact_sequence"] == (
+        "ONE_ROUTE_AT_A_TIME_WITH_FRESH_DUPLICATE_CHECK"
+    )
+    for candidate in register["candidates"]:
+        assert candidate["primary_sources"]
+        assert all(source.startswith("https://") for source in candidate["primary_sources"])
+        assert candidate["verification"]["interest_confirmed"] is False
+        assert candidate["verification"]["authorization_to_name_in_response"] is False
+        assert candidate["outreach"]["sent"] is False
+    assert register["claim_boundaries"]["candidate_listing_is_not_a_commitment"] is True
+    assert register["claim_boundaries"]["no_outreach_send_is_authorized_by_this_register"] is True
+
+
+def test_argos_outreach_sequence_and_action_time_gate_remain_unsent():
+    outreach = (
+        ARGOS_DIR / "ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md"
+    ).read_text(encoding="utf-8")
+    checklist = (
+        ARGOS_DIR / "ARGOS_ACTION_TIME_FINALIZATION_CHECKLIST_2026-07-27.md"
+    ).read_text(encoding="utf-8")
+
+    assert "READY_FOR_REVIEW - NOT SENT" in outreach
+    assert "First-contact attachment set: none." in outreach
+    assert "not sent in parallel by default" in outreach
+    assert "Current decision:** `BLOCK_SEND`" in checklist
+    assert "Exact action-time approval" in checklist
+    assert "Private identifiers stay outside the public repository" in checklist
 
 
 def test_opportunity_and_science_maps_preserve_current_gates():
