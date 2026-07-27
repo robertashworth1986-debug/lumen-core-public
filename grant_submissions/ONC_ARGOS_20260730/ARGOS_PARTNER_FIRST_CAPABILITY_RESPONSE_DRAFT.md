@@ -48,7 +48,7 @@
 
 
 
-LumenCore offers Project Argos a bounded evidence-assurance and deterministic-validation workstream: authorized-source custody, rule traceability, hash-locked evidence cases, human decision gates, adverse-result retention, and reviewer handoff. These are component capabilities supported by the public LumenCore repository and live reviewer surface.
+LumenCore offers Project Argos a bounded evidence-assurance and deterministic-validation workstream: authorized-source custody, rule traceability, hash-locked evidence cases, human decision gates, adverse-result retention, and reviewer handoff. These are component capabilities supported by the public LumenCore repository and public reviewer surface.
 
 For Project Argos, those patterns align most directly with requirements traceability, public-source ingestion provenance, deterministic validator orchestration, evidence-case generation, corrective-action retest records, and production handoff documentation. LumenCore is responding at component level and does not claim presently qualified full-scope health IT prime readiness. A credible team still requires named FHIR R4/CHPL and ONC Certification Program expertise plus an HHS ATO/FIPS 199/security lead.
 

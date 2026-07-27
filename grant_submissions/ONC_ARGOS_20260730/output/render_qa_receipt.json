@@ -1,8 +1,8 @@
 {
   "schema": "lumencore.argos_render_qa.v1",
-  "inspected_utc": "2026-07-27T19:24:32.6726521Z",
-  "docx_sha256": "eaf9015d1c2b003ccb8321dc30f5bca4f07a90bd16313e2bb6d2e2c57544e8b4",
-  "pdf_sha256": "25d8d79e1c2f28fba0876ecbae1f78d618e6147b6f30bd040caed3acbd315173",
+  "inspected_utc": "2026-07-27T20:37:03.5116538Z",
+  "docx_sha256": "7d17d228d88acbd06b5fb5d8aaff513bf476dd31920e9a5660ff71147145dea5",
+  "pdf_sha256": "6260617bb2ae0de6d6b6817c70d3146351889db16d1c288a6edb48c8c19d0c04",
   "total_pages": 10,
   "cover_pages": 1,
   "content_pages": 9,
@@ -29,7 +29,7 @@
   "submission_authorized": false,
   "notes": [
     "All ten rendered pages were visually inspected at full resolution.",
-    "The inspection used the local ignored output/rendered_manual_v3 render set; the tracked review artifacts are the DOCX, PDF, and their hashes.",
+      "The inspection used the local output/rendered_v5 render set; the tracked review artifacts are the DOCX, PDF, and their hashes.",
     "The cover identifies LumenCore as the company and LumaArc only as the seal of approval.",
     "Cover placeholders are explicitly labeled pending action-time facts.",
     "The response remains blocked pending private facts, named teaming qualifications, duplicate recheck, final review, and exact action-time approval."

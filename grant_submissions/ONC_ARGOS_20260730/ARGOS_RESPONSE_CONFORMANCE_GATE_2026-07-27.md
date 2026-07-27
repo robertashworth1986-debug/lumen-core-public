@@ -1,12 +1,12 @@
 # Project Argos Response Conformance Gate
 
-Evaluated UTC: `2026-07-27T19:46:00Z`
+Evaluated UTC: `2026-07-27T20:38:00Z`
 Decision: `BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY`
 
 ## Summary
 
-- Checks: `18`
-- Pass: `13`
+- Checks: `19`
+- Pass: `14`
 - Blocked: `5`
 - Fail: `0`
 - Submission authorized: `false`
@@ -17,9 +17,9 @@ Decision: `BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY`
 | Check | Status | Requirement | Evidence |
 | --- | --- | --- | --- |
 | `OFFICIAL_NOTICE_CURRENT` | `PASS` | The official notice is active and its identity and deadline are explicit. | https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view |
-| `DEADLINE_OPEN` | `PASS` | The response is evaluated before the exact Government deadline. | evaluated=2026-07-27T19:46:00Z; deadline=2026-07-30T21:00:00Z |
+| `DEADLINE_OPEN` | `PASS` | The response is evaluated before the exact Government deadline. | evaluated=2026-07-27T20:38:00Z; deadline=2026-07-30T21:00:00Z |
 | `ACCEPTED_FILES_PRESENT` | `PASS` | Both accepted review formats and their receipts are present. | docx=True; pdf=True; receipts=True |
-| `ARTIFACT_HASH_CUSTODY` | `PASS` | Markdown, DOCX, and PDF hashes reconcile to the current receipts. | docx_sha256=eaf9015d1c2b003ccb8321dc30f5bca4f07a90bd16313e2bb6d2e2c57544e8b4; pdf_sha256=25d8d79e1c2f28fba0876ecbae1f78d618e6147b6f30bd040caed3acbd315173 |
+| `ARTIFACT_HASH_CUSTODY` | `PASS` | Markdown, DOCX, and PDF hashes reconcile to the current receipts. | docx_sha256=7d17d228d88acbd06b5fb5d8aaff513bf476dd31920e9a5660ff71147145dea5; pdf_sha256=6260617bb2ae0de6d6b6817c70d3146351889db16d1c288a6edb48c8c19d0c04 |
 | `US_LETTER_SIZE` | `PASS` | Every DOCX section uses US Letter dimensions. | sections=2; expected_twips=12240x15840 |
 | `ONE_INCH_MARGINS` | `PASS` | Every DOCX section uses one-inch content margins. | sections=2; expected_twips=1440 |
 | `TWELVE_POINT_TIMES_NEW_ROMAN` | `PASS` | The Normal style is Times New Roman 12 point. | font=Times New Roman; half_points=24 |
@@ -32,6 +32,7 @@ Decision: `BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY`
 | `NO_UNAUTHORIZED_PARTNER_NAME` | `PASS` | The Government response names no uncommitted teaming candidate. | unauthorized_names_found=[] |
 | `SIMILAR_SCOPE_BOUNDARY` | `PASS` | Adjacent component evidence is not represented as federal-health prior performance. | Explicit similar-scope matrix and acquisition implications are present. |
 | `CLAIM_BOUNDARIES` | `PASS` | Unsupported certification, authorization, validation, savings, and prime claims remain prohibited. | forbidden_promotion_phrases_found=[] |
+| `CLAIM_EVIDENCE_TRACEABILITY` | `PASS` | Each affirmative engineering proof statement is bound to named public evidence and explicit non-claims. | claim_count=3; status=VERIFIED_BOUNDED_CLAIM_MAP; source_custody_hold=True |
 | `PARTNER_DRAFT_UNSENT` | `PASS` | The bounded partner inquiry remains an unsent, no-attachment draft. | draft_present=True; sent=False; attachments=0 |
 | `GOVERNMENT_DUPLICATE_RECHECK` | `BLOCKED` | A fresh full-mailbox duplicate check is bound to the final Government response. | last_preliminary_check=2026-07-27T19:05:00Z |
 |  |  | **Blocker action** | Repeat the exact Government-response duplicate search immediately before send. |

@@ -18,6 +18,7 @@ DEFAULT_MARKDOWN = ARGOS_DIR / "ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.md"
 SUBMISSION_GATE = ARGOS_DIR / "ARGOS_SUBMISSION_GATE_2026-07-26.json"
 TEAM_REGISTER = ARGOS_DIR / "ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json"
 PARTNER_DISPATCH_GATE = ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
+CLAIM_EVIDENCE_MAP = ARGOS_DIR / "ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
 RESPONSE_MARKDOWN = ARGOS_DIR / "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md"
 BUILD_RECEIPT = OUTPUT_DIR / "build_receipt.json"
 RENDER_RECEIPT = OUTPUT_DIR / "render_qa_receipt.json"
@@ -135,6 +136,7 @@ def build_payload(as_of_utc: str) -> dict:
     gate = read_json(SUBMISSION_GATE)
     team = read_json(TEAM_REGISTER)
     partner_dispatch = read_json(PARTNER_DISPATCH_GATE)
+    claim_evidence_map = read_json(CLAIM_EVIDENCE_MAP)
     build = read_json(BUILD_RECEIPT)
     render = read_json(RENDER_RECEIPT)
     response = RESPONSE_MARKDOWN.read_text(encoding="utf-8")
@@ -195,6 +197,23 @@ def build_payload(as_of_utc: str) -> dict:
     candidate_authorizations = sum(
         int(candidate["verification"]["authorization_to_name_in_response"])
         for candidate in team["candidates"]
+    )
+    claim_map_sources_hold = all(
+        (ROOT / row["path"]).is_file()
+        and hashlib.sha256(custody_bytes(ROOT / row["path"])).hexdigest()
+        == row["sha256"]
+        and row["hash_mode"] == custody_hash_mode(ROOT / row["path"])
+        for row in claim_evidence_map["source_custody"]
+    )
+    claim_evidence_traceability = (
+        claim_evidence_map["status"] == "VERIFIED_BOUNDED_CLAIM_MAP"
+        and claim_evidence_map["response"]["sha256"] == sha256(RESPONSE_MARKDOWN)
+        and claim_evidence_map["response"]["material_claim_count"]
+        == len(claim_evidence_map["claims"])
+        and all(row["supported"] for row in claim_evidence_map["claims"])
+        and claim_map_sources_hold
+        and claim_evidence_map["external_action_performed"] is False
+        and claim_evidence_map["submission_authorized"] is False
     )
 
     checks = [
@@ -314,6 +333,16 @@ def build_payload(as_of_utc: str) -> dict:
             f"forbidden_promotion_phrases_found={forbidden_phrases}",
         ),
         result(
+            "CLAIM_EVIDENCE_TRACEABILITY",
+            "Each affirmative engineering proof statement is bound to named public evidence and explicit non-claims.",
+            "PASS" if claim_evidence_traceability else "FAIL",
+            (
+                f"claim_count={len(claim_evidence_map['claims'])}; "
+                f"status={claim_evidence_map['status']}; "
+                f"source_custody_hold={claim_map_sources_hold}"
+            ),
+        ),
+        result(
             "PARTNER_DRAFT_UNSENT",
             "The bounded partner inquiry remains an unsent, no-attachment draft.",
             "PASS"
@@ -386,6 +415,7 @@ def build_payload(as_of_utc: str) -> dict:
         SUBMISSION_GATE,
         TEAM_REGISTER,
         PARTNER_DISPATCH_GATE,
+        CLAIM_EVIDENCE_MAP,
         RESPONSE_MARKDOWN,
         BUILD_RECEIPT,
         RENDER_RECEIPT,

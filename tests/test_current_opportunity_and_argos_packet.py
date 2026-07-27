@@ -21,6 +21,7 @@ ARGOS_PRIVATE_READINESS = (
     ARGOS_DIR / "ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json"
 )
 ARGOS_PRIVATE_SCHEMA = ARGOS_DIR / "ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json"
+ARGOS_CLAIM_MAP = ARGOS_DIR / "ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
 
 
 def sha256(path: Path) -> str:
@@ -53,6 +54,16 @@ def load_argos_conformance_builder():
 def load_argos_private_finalizer():
     path = ARGOS_DIR / "build_argos_private_action_copy.py"
     spec = importlib.util.spec_from_file_location("build_argos_private_action_copy", path)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_argos_claim_evidence_builder():
+    path = ARGOS_DIR / "build_argos_claim_evidence_map.py"
+    spec = importlib.util.spec_from_file_location("build_argos_claim_evidence_map", path)
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -181,6 +192,8 @@ def test_argos_response_uses_the_company_name_without_inflated_claims():
     assert "does not claim presently qualified full-scope health IT prime readiness" in response
     assert "a proof-of-concept result alone is not an Authority to Operate" in response
     assert "No direct LumenCore prior-performance reference is claimed" in response
+    assert "public reviewer surface" in response
+    assert "live reviewer surface" not in response
     assert "Measured public EIA replay" not in response
     assert "negative Kuramoto result" not in response
     assert "patent-sensitive" not in response
@@ -246,10 +259,10 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
     assert conformance["decision"] == "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY"
     assert conformance["summary"] == {
         "blocked_count": 5,
-        "check_count": 18,
+        "check_count": 19,
         "external_action_performed": False,
         "fail_count": 0,
-        "pass_count": 13,
+        "pass_count": 14,
         "submission_authorized": False,
     }
 
@@ -266,6 +279,7 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
         "NO_UNAUTHORIZED_PARTNER_NAME",
         "SIMILAR_SCOPE_BOUNDARY",
         "CLAIM_BOUNDARIES",
+        "CLAIM_EVIDENCE_TRACEABILITY",
         "PARTNER_DRAFT_UNSENT",
     }
     expected_blocked = {
@@ -287,6 +301,82 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
         source_bytes = custody_bytes(source, row["hash_mode"])
         assert len(source_bytes) == row["bytes"]
         assert hashlib.sha256(source_bytes).hexdigest() == row["sha256"]
+
+
+def test_argos_material_claims_are_bound_to_exact_public_evidence():
+    claim_map = load_json(ARGOS_CLAIM_MAP)
+
+    assert claim_map["schema"] == "lumencore.argos_claim_evidence_map.v1"
+    assert claim_map["status"] == "VERIFIED_BOUNDED_CLAIM_MAP"
+    assert claim_map["response"]["sha256"] == sha256(
+        ARGOS_DIR / "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md"
+    )
+    assert claim_map["response"]["material_claim_count"] == 3
+    assert all(claim_map["checks"].values())
+    assert all(claim["supported"] for claim in claim_map["claims"])
+    assert claim_map["external_action_performed"] is False
+    assert claim_map["submission_authorized"] is False
+
+    by_id = {row["claim_id"]: row for row in claim_map["claims"]}
+    replay = by_id["BOUNDED_REPRODUCIBILITY_COUNTS"]
+    assert replay["evidence"]["source_commit"] == (
+        "1c0eb51754beffac6f4df484914e35efc21c253f"
+    )
+    assert replay["evidence"]["suite_pass_count"] == 3
+    assert replay["evidence"]["assertion_pass_count"] == 31
+    assert "external_validation" in replay["does_not_support"]
+
+    for row in claim_map["source_custody"]:
+        source = ROOT / row["path"]
+        source_bytes = custody_bytes(source, row["hash_mode"])
+        assert hashlib.sha256(source_bytes).hexdigest() == row["sha256"]
+
+
+def test_argos_claim_evidence_map_is_deterministic():
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ARGOS_DIR / "build_argos_claim_evidence_map.py"),
+            "--check",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+        text=True,
+        timeout=30,
+    )
+
+    assert result.returncode == 0, result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt["status"] == "CURRENT"
+    assert receipt["decision"] == "VERIFIED_BOUNDED_CLAIM_MAP"
+    assert receipt["claim_count"] == 3
+    assert receipt["all_claims_supported"] is True
+    assert receipt["external_action_performed"] is False
+    assert receipt["submission_authorized"] is False
+
+
+def test_argos_claim_evidence_map_fails_closed_on_receipt_drift(
+    monkeypatch, tmp_path
+):
+    builder = load_argos_claim_evidence_builder()
+    receipt = builder.read_json(builder.REVIEWER_RECEIPT)
+    receipt["summary"]["assertion_pass_count"] = 30
+    tainted = tmp_path / "reviewer_reproducibility_receipt.json"
+    tainted.write_text(
+        json.dumps(receipt, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    monkeypatch.setattr(builder, "REVIEWER_RECEIPT", tainted)
+    monkeypatch.setattr(builder, "rel", lambda path: str(path))
+
+    payload = builder.build_payload("2026-07-27T20:30:00Z")
+    claims = {row["claim_id"]: row for row in payload["claims"]}
+
+    assert payload["status"] == "FAIL_CLAIM_TRACEABILITY"
+    assert payload["checks"]["reviewer_receipt_counts_hold"] is False
+    assert claims["BOUNDED_REPRODUCIBILITY_COUNTS"]["supported"] is False
 
 
 def test_argos_conformance_outputs_are_deterministic():

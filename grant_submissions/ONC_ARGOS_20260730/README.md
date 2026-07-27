@@ -49,11 +49,18 @@ the seal name, not a rename of the LumenCore company.
   nine minimum necessary private cover facts; never populate this tracked file
 - `ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json`: redacted tooling and
   privacy-boundary receipt; no private copy has been generated
+- `ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json`: machine-readable binding from
+  each material engineering proof statement to the exact public receipt,
+  source commit, evidence-graph node, negative-result boundary, and non-claims
+- `build_argos_claim_evidence_map.py`: deterministic offline verifier for the
+  claim-to-evidence map; it makes no live-domain availability claim
 
 ## Rebuild
 
 ```powershell
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_response.py
+python .\grant_submissions\ONC_ARGOS_20260730\build_argos_claim_evidence_map.py
+python .\grant_submissions\ONC_ARGOS_20260730\build_argos_claim_evidence_map.py --check
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py --check
 ```

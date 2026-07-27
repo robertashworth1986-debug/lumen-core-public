@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.deadline_action_sentinel.v1",
-  "evaluated_utc": "2026-07-27T20:14:28Z",
+  "evaluated_utc": "2026-07-27T20:37:53Z",
   "posture": "HUMAN_ACTION_REQUIRED_FAIL_CLOSED",
   "controls": {
     "read_only_builder": true,
@@ -78,8 +78,8 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": true,
-        "seconds_until_deadline": -11668,
-        "hours_until_deadline": -3.24
+        "seconds_until_deadline": -13073,
+        "hours_until_deadline": -3.63
       }
     },
     {
@@ -154,8 +154,8 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": false,
-        "seconds_until_deadline": 261932,
-        "hours_until_deadline": 72.76
+        "seconds_until_deadline": 260527,
+        "hours_until_deadline": 72.37
       }
     },
     {

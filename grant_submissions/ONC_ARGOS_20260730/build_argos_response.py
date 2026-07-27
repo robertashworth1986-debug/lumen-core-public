@@ -46,7 +46,7 @@ EXECUTIVE_PARAGRAPHS = [
         "deterministic-validation workstream: authorized-source custody, rule "
         "traceability, hash-locked evidence cases, human decision gates, adverse-result "
         "retention, and reviewer handoff. These are component capabilities supported by "
-        "the public LumenCore repository and live reviewer surface."
+        "the public LumenCore repository and public reviewer surface."
     ),
     (
         "For Project Argos, those patterns align most directly with requirements "

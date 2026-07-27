@@ -5,11 +5,11 @@
   "logo_sha256": "1ed1c9b00e273aa9e781bd7fd0a4fcc3fc542257c6d294c8e8fbfada500701af",
   "markdown": {
     "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md",
-    "sha256": "f665ce36c78b709e785879dff7ba45958418d222378a72aab5c1fa6029071955"
+    "sha256": "0d7cfc14fb52eb0df75dea32f29c55d825f253c357ae75f1641c6d17c3a070c1"
   },
   "docx": {
     "path": "grant_submissions/ONC_ARGOS_20260730/output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.docx",
-    "sha256": "eaf9015d1c2b003ccb8321dc30f5bca4f07a90bd16313e2bb6d2e2c57544e8b4"
+    "sha256": "7d17d228d88acbd06b5fb5d8aaff513bf476dd31920e9a5660ff71147145dea5"
   },
   "submission_authorized": false,
   "exact_action_time_human_approval_required": true

@@ -8,7 +8,7 @@
     },
     {
       "check_id": "DEADLINE_OPEN",
-      "evidence": "evaluated=2026-07-27T19:46:00Z; deadline=2026-07-30T21:00:00Z",
+      "evidence": "evaluated=2026-07-27T20:38:00Z; deadline=2026-07-30T21:00:00Z",
       "requirement": "The response is evaluated before the exact Government deadline.",
       "status": "PASS"
     },
@@ -20,7 +20,7 @@
     },
     {
       "check_id": "ARTIFACT_HASH_CUSTODY",
-      "evidence": "docx_sha256=eaf9015d1c2b003ccb8321dc30f5bca4f07a90bd16313e2bb6d2e2c57544e8b4; pdf_sha256=25d8d79e1c2f28fba0876ecbae1f78d618e6147b6f30bd040caed3acbd315173",
+      "evidence": "docx_sha256=7d17d228d88acbd06b5fb5d8aaff513bf476dd31920e9a5660ff71147145dea5; pdf_sha256=6260617bb2ae0de6d6b6817c70d3146351889db16d1c288a6edb48c8c19d0c04",
       "requirement": "Markdown, DOCX, and PDF hashes reconcile to the current receipts.",
       "status": "PASS"
     },
@@ -87,6 +87,12 @@
       "status": "PASS"
     },
     {
+      "check_id": "CLAIM_EVIDENCE_TRACEABILITY",
+      "evidence": "claim_count=3; status=VERIFIED_BOUNDED_CLAIM_MAP; source_custody_hold=True",
+      "requirement": "Each affirmative engineering proof statement is bound to named public evidence and explicit non-claims.",
+      "status": "PASS"
+    },
+    {
       "check_id": "PARTNER_DRAFT_UNSENT",
       "evidence": "draft_present=True; sent=False; attachments=0",
       "requirement": "The bounded partner inquiry remains an unsent, no-attachment draft.",
@@ -117,7 +123,7 @@
   "claim_boundary": "PASS means the named documentary or formatting requirement is supported. BLOCKED means the current artifact is intentionally not send-ready. Neither passing checks nor a polished packet establishes submission, acceptance, selection, award, authorization, certification, external validation, field performance, or savings.",
   "deadline_utc": "2026-07-30T21:00:00Z",
   "decision": "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY",
-  "evaluated_utc": "2026-07-27T19:46:00Z",
+  "evaluated_utc": "2026-07-27T20:38:00Z",
   "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
   "safest_next_action": "Resolve the private cover and authorized-team blockers first. Then rebuild the private final copy, rerun this gate, repeat the official-notice and full-mailbox duplicate checks, and request exact action-time approval.",
   "schema": "lumencore.argos_response_conformance_gate.v1",
@@ -141,42 +147,48 @@
       "sha256": "c4aacfdea8e973473f5de23311aa32f5d5c9be07f7a75c6a0285fac302a37fe5"
     },
     {
-      "bytes": 13824,
+      "bytes": 4540,
+      "hash_mode": "TEXT_UTF8_LF",
+      "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json",
+      "sha256": "82a271d8b1098900a92eab9248adf8c8d9456f15b1807fdb79eef2bf5aa4a4e3"
+    },
+    {
+      "bytes": 13826,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md",
-      "sha256": "f665ce36c78b709e785879dff7ba45958418d222378a72aab5c1fa6029071955"
+      "sha256": "0d7cfc14fb52eb0df75dea32f29c55d825f253c357ae75f1641c6d17c3a070c1"
     },
     {
       "bytes": 738,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/output/build_receipt.json",
-      "sha256": "b1305aeed32e23d2d56e9711c19454b5950841a73e3dad1f3088f8a4bc4e5974"
+      "sha256": "8d4c371dcba2646445ff5c8c10e367c3102060ac522b2deef16b6275ccad3272"
     },
     {
-      "bytes": 1361,
+      "bytes": 1348,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/output/render_qa_receipt.json",
-      "sha256": "b51c240f25086ab1a99994f7f5936a4a15a7d478ed845a34c1cc6df727491bae"
+      "sha256": "329eebc5edb89874fe6836e00b095f8ca18a685edacf5fc1137f6f4d5020a28f"
     },
     {
-      "bytes": 729860,
+      "bytes": 729857,
       "hash_mode": "BINARY_RAW",
       "path": "grant_submissions/ONC_ARGOS_20260730/output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.docx",
-      "sha256": "eaf9015d1c2b003ccb8321dc30f5bca4f07a90bd16313e2bb6d2e2c57544e8b4"
+      "sha256": "7d17d228d88acbd06b5fb5d8aaff513bf476dd31920e9a5660ff71147145dea5"
     },
     {
-      "bytes": 232859,
+      "bytes": 232856,
       "hash_mode": "BINARY_RAW",
       "path": "grant_submissions/ONC_ARGOS_20260730/output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.pdf",
-      "sha256": "25d8d79e1c2f28fba0876ecbae1f78d618e6147b6f30bd040caed3acbd315173"
+      "sha256": "6260617bb2ae0de6d6b6817c70d3146351889db16d1c288a6edb48c8c19d0c04"
     }
   ],
   "summary": {
     "blocked_count": 5,
-    "check_count": 18,
+    "check_count": 19,
     "external_action_performed": false,
     "fail_count": 0,
-    "pass_count": 13,
+    "pass_count": 14,
     "submission_authorized": false
   }
 }
