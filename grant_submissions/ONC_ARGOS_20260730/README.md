@@ -43,6 +43,12 @@ the seal name, not a rename of the LumenCore company.
 - `build_argos_response.py`: deterministic response builder
 - `build_argos_conformance_gate.py`: deterministic format, evidence, claim,
   authority, duplicate, and dispatch conformance builder
+- `build_argos_private_action_copy.py`: privacy-preserving action-copy
+  finalizer; requires a populated facts file and output directory outside Git
+- `ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json`: structure-only schema for the
+  nine minimum necessary private cover facts; never populate this tracked file
+- `ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json`: redacted tooling and
+  privacy-boundary receipt; no private copy has been generated
 
 ## Rebuild
 
@@ -51,6 +57,20 @@ python .\grant_submissions\ONC_ARGOS_20260730\build_argos_response.py
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py --check
 ```
+
+The private finalizer intentionally has no in-repository default:
+
+```powershell
+python .\grant_submissions\ONC_ARGOS_20260730\build_argos_private_action_copy.py `
+  --facts C:\private\argos_facts.json `
+  --output-dir C:\private\argos_action_copy_20260727
+```
+
+The populated facts file and generated private action copy must remain outside
+Git and public mirrors. The finalizer rejects EIN, TIN, SSN, banking,
+credential, password, API-key, and OTP fields because the Argos cover does not
+request them. A generated private cover does not clear team, duplicate,
+dispatch, or approval gates.
 
 ## Conformance Meaning
 

@@ -7,6 +7,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 BRAND_DIR = ROOT / "assets" / "brand"
@@ -15,6 +17,10 @@ ARGOS_OUTPUT = ARGOS_DIR / "output"
 OPPORTUNITY_MAP = ROOT / "docs" / "CURRENT_FEDERAL_OPPORTUNITY_GATE_MAP_2026-07-26.md"
 SCIENCE_MAP = ROOT / "docs" / "SCIENTIFIC_CONTRIBUTION_AND_NEXT_EXPERIMENTS_2026-07-26.md"
 ARGOS_CONFORMANCE = ARGOS_DIR / "ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.json"
+ARGOS_PRIVATE_READINESS = (
+    ARGOS_DIR / "ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json"
+)
+ARGOS_PRIVATE_SCHEMA = ARGOS_DIR / "ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json"
 
 
 def sha256(path: Path) -> str:
@@ -42,6 +48,65 @@ def load_argos_conformance_builder():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def load_argos_private_finalizer():
+    path = ARGOS_DIR / "build_argos_private_action_copy.py"
+    spec = importlib.util.spec_from_file_location("build_argos_private_action_copy", path)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def dummy_private_fact_payload() -> dict:
+    verified = "2026-07-27T18:00:00Z"
+
+    def fact(value: str, source_kind: str = "OFFICIAL_ENTITY_RECORD") -> dict:
+        return {
+            "value": value,
+            "status": "VERIFIED",
+            "source_kind": source_kind,
+            "verified_utc": verified,
+        }
+
+    return {
+        "schema": "lumencore.argos_private_facts.v1",
+        "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+        "facts": {
+            "legal_company_name": fact("Example Test Entity LLC"),
+            "uei": fact("ABCDEF123456", "OFFICIAL_SAM_RECORD"),
+            "duns_if_notice_or_entity_record_requires_it": {
+                "value": "NOT_APPLICABLE",
+                "status": "NOT_APPLICABLE",
+                "source_kind": "OFFICIAL_SAM_RECORD",
+                "verified_utc": verified,
+            },
+            "company_address": fact("100 Test Avenue, Example City, TN 37000"),
+            "authorized_point_of_contact_name_and_title": fact(
+                "Casey Example, Authorized Representative",
+                "FOUNDER_VERIFIED_BUSINESS_RECORD",
+            ),
+            "authorized_point_of_contact_phone": fact(
+                "(555) 010-1234", "FOUNDER_VERIFIED_BUSINESS_RECORD"
+            ),
+            "authorized_point_of_contact_email": fact(
+                "casey@example.invalid", "FOUNDER_VERIFIED_BUSINESS_RECORD"
+            ),
+            "small_business_designations": fact(
+                "Small business test fixture", "OFFICIAL_SAM_RECORD"
+            ),
+            "sam_registration_status_and_expiration": fact(
+                "ACTIVE through 2099-12-31 test fixture", "OFFICIAL_SAM_RECORD"
+            ),
+        },
+        "assertions": {
+            "facts_current_and_accurate": True,
+            "authorized_for_this_response": True,
+            "minimum_necessary_business_information_only": True,
+        },
+    }
 
 
 def test_lumencore_company_and_lumaarc_seal_are_distinct_and_hash_locked():
@@ -283,6 +348,226 @@ def test_argos_text_custody_is_stable_across_line_endings(tmp_path):
     assert hashlib.sha256(builder.custody_bytes(lf)).hexdigest() == hashlib.sha256(
         builder.custody_bytes(crlf)
     ).hexdigest()
+
+
+def test_argos_private_finalizer_readiness_is_redacted_and_fail_closed():
+    readiness = load_json(ARGOS_PRIVATE_READINESS)
+    schema = load_json(ARGOS_PRIVATE_SCHEMA)
+
+    assert readiness["schema"] == "lumencore.argos_private_finalizer_readiness.v1"
+    assert readiness["status"] == "TOOLING_VERIFIED_NO_PRIVATE_COPY_GENERATED"
+    assert readiness["decision"] == "PRIVATE_INPUT_AND_ACTION_TIME_ATTESTATION_REQUIRED"
+    assert readiness["required_fact_count"] == 9
+    assert readiness["controls"] == {
+        "external_action_performed": False,
+        "government_send_authorized": False,
+        "populated_facts_file_allowed_in_repository": False,
+        "private_output_allowed_in_repository": False,
+        "private_output_mirrored_to_public_vault": False,
+        "private_values_logged": False,
+        "public_templates_mutated": False,
+        "team_authority_bypassed": False,
+    }
+    assert {"ein", "tin", "ssn", "bank_account", "routing_number", "otp"} <= set(
+        readiness["prohibited_private_fields"]
+    )
+    assert schema["$id"] == "lumencore.argos_private_facts.v1"
+    assert readiness["tool_sha256"] == sha256(
+        ARGOS_DIR / "build_argos_private_action_copy.py"
+    )
+    assert readiness["input_schema_sha256"] == sha256(ARGOS_PRIVATE_SCHEMA)
+    assert set(schema["properties"]["facts"]["required"]) == set(
+        readiness["required_fact_keys"]
+    )
+    assert readiness["verification"]["focused_test_count"] == 28
+    assert readiness["verification"]["focused_test_pass_count"] == 28
+    assert readiness["verification"]["synthetic_private_values_only"] is True
+    assert readiness["verification"]["synthetic_pdf_page_count"] == 10
+    assert readiness["verification"]["synthetic_pdf_page_size"] == "US Letter"
+    assert readiness["verification"]["actual_private_facts_used"] is False
+    assert (
+        readiness["verification"]["actual_private_action_copy_generated"] is False
+    )
+    serialized = json.dumps({"readiness": readiness, "schema": schema}).lower()
+    assert "example test entity" not in serialized
+    assert "abcde" not in serialized
+
+
+def test_argos_private_finalizer_builds_without_public_mutation_or_value_logging(
+    tmp_path,
+):
+    builder = load_argos_private_finalizer()
+    facts_path = tmp_path / "private_facts.json"
+    output_dir = tmp_path / "private_action_copy"
+    payload = dummy_private_fact_payload()
+    facts_path.write_text(
+        json.dumps(payload, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    public_hashes_before = {
+        "markdown": sha256(builder.PUBLIC_MARKDOWN),
+        "docx": sha256(builder.PUBLIC_DOCX),
+    }
+
+    receipt = builder.build_private_copy(
+        facts_path,
+        output_dir,
+        "2026-07-27T19:55:00Z",
+    )
+    private_markdown = output_dir / builder.TEXT_OUTPUT_NAME
+    private_docx = output_dir / builder.DOCX_OUTPUT_NAME
+    private_receipt = output_dir / builder.RECEIPT_OUTPUT_NAME
+
+    assert receipt["decision"] == "PRIVATE_COVER_READY_TEAM_AND_DISPATCH_BLOCKED"
+    assert receipt["required_fact_count"] == 9
+    assert receipt["private_value_count"] == 9
+    assert receipt["placeholder_count"] == 0
+    assert receipt["public_templates"]["unchanged"] is True
+    assert receipt["team_authority_resolved"] is False
+    assert receipt["candidate_name_authorization_count"] == 0
+    assert receipt["government_send_ready"] is False
+    assert receipt["submission_authorized"] is False
+    assert receipt["external_action_performed"] is False
+    assert receipt["private_values_logged"] is False
+    assert receipt["private_output_mirrored_to_public_vault"] is False
+    assert private_markdown.is_file()
+    assert private_docx.is_file()
+    assert private_receipt.is_file()
+    assert receipt["outputs"]["markdown"]["sha256"] == sha256(private_markdown)
+    assert receipt["outputs"]["docx"]["sha256"] == sha256(private_docx)
+
+    markdown_text = private_markdown.read_text(encoding="utf-8")
+    assert builder.PRIVATE_MARKER not in markdown_text
+    assert builder.PRIVATE_DISPLAY_MARKER not in markdown_text
+    assert builder.PRIVATE_STATUS in markdown_text
+    assert "No tax, banking, credential" in markdown_text
+    for fact in payload["facts"].values():
+        if fact["value"] != "NOT_APPLICABLE":
+            assert fact["value"] in markdown_text
+
+    document = builder.Document(private_docx)
+    docx_text = "\n".join(
+        cell.text
+        for table in document.tables
+        for row in table.rows
+        for cell in row.cells
+    )
+    assert builder.PRIVATE_DISPLAY_MARKER not in docx_text
+    assert payload["facts"]["legal_company_name"]["value"] in docx_text
+    assert payload["facts"]["uei"]["value"] in docx_text
+    header_text = "\n".join(
+        paragraph.text
+        for section in document.sections
+        for paragraph in section.header.paragraphs
+    )
+    assert "Private action copy" in header_text
+    assert "| Draft" not in header_text
+
+    receipt_text = private_receipt.read_text(encoding="utf-8")
+    for fact in payload["facts"].values():
+        if fact["value"] != "NOT_APPLICABLE":
+            assert fact["value"] not in receipt_text
+    assert str(facts_path) not in receipt_text
+    assert public_hashes_before == {
+        "markdown": sha256(builder.PUBLIC_MARKDOWN),
+        "docx": sha256(builder.PUBLIC_DOCX),
+    }
+
+    checked = builder.check_private_copy(
+        facts_path,
+        output_dir,
+        "2026-07-27T19:56:00Z",
+    )
+    assert checked["outputs"] == receipt["outputs"]
+
+    cli = subprocess.run(
+        [
+            sys.executable,
+            str(ARGOS_DIR / "build_argos_private_action_copy.py"),
+            "--facts",
+            str(facts_path),
+            "--output-dir",
+            str(output_dir),
+            "--as-of-utc",
+            "2026-07-27T19:56:00Z",
+            "--check",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+        text=True,
+        timeout=30,
+    )
+    assert cli.returncode == 0, cli.stderr
+    assert json.loads(cli.stdout)["status"] == "CURRENT"
+    for fact in payload["facts"].values():
+        if fact["value"] != "NOT_APPLICABLE":
+            assert fact["value"] not in cli.stdout
+
+
+def test_argos_private_finalizer_rejects_public_paths_and_prohibited_fields(
+    tmp_path,
+):
+    builder = load_argos_private_finalizer()
+    payload = dummy_private_fact_payload()
+    facts_path = tmp_path / "private_facts.json"
+    facts_path.write_text(json.dumps(payload), encoding="utf-8", newline="\n")
+
+    with pytest.raises(ValueError, match="outside the public repository"):
+        builder.build_private_copy(
+            facts_path,
+            ARGOS_DIR / "forbidden_private_output",
+            "2026-07-27T19:55:00Z",
+        )
+
+    payload["facts"]["ein"] = {
+        "value": "prohibited-test-value",
+        "status": "VERIFIED",
+        "source_kind": "OFFICIAL_ENTITY_RECORD",
+        "verified_utc": "2026-07-27T18:00:00Z",
+    }
+    facts_path.write_text(json.dumps(payload), encoding="utf-8", newline="\n")
+    with pytest.raises(ValueError, match="prohibited sensitive fields"):
+        builder.build_private_copy(
+            facts_path,
+            tmp_path / "prohibited_output",
+            "2026-07-27T19:55:00Z",
+        )
+
+
+def test_argos_private_finalizer_rejects_false_or_future_attestations(tmp_path):
+    builder = load_argos_private_finalizer()
+    payload = dummy_private_fact_payload()
+    payload["assertions"]["facts_current_and_accurate"] = False
+    facts_path = tmp_path / "private_facts.json"
+    facts_path.write_text(json.dumps(payload), encoding="utf-8", newline="\n")
+    with pytest.raises(ValueError, match="assertion must be explicitly true"):
+        builder.build_private_copy(
+            facts_path,
+            tmp_path / "false_attestation",
+            "2026-07-27T19:55:00Z",
+        )
+
+    payload = dummy_private_fact_payload()
+    payload["facts"]["uei"]["verified_utc"] = "2026-07-28T00:00:00Z"
+    facts_path.write_text(json.dumps(payload), encoding="utf-8", newline="\n")
+    with pytest.raises(ValueError, match="future verification timestamp"):
+        builder.build_private_copy(
+            facts_path,
+            tmp_path / "future_attestation",
+            "2026-07-27T19:55:00Z",
+        )
+
+    payload = dummy_private_fact_payload()
+    payload["facts"]["company_address"]["value"] = "X" * 181
+    facts_path.write_text(json.dumps(payload), encoding="utf-8", newline="\n")
+    with pytest.raises(ValueError, match="private-cover length limit"):
+        builder.build_private_copy(
+            facts_path,
+            tmp_path / "oversized_value",
+            "2026-07-27T19:55:00Z",
+        )
 
 
 def test_argos_outreach_sequence_and_action_time_gate_remain_unsent():

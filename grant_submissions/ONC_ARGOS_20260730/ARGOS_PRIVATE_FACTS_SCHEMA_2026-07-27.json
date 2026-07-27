@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lumencore.argos_private_facts.v1",
+  "title": "LumenCore Project Argos private action-time facts",
+  "description": "This schema contains structure only. A populated file must remain outside Git and public mirrors. Do not add EIN, TIN, SSN, banking, credential, password, API-key, OTP, patient, CUI, classified, or patent-sensitive data.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "notice_id",
+    "facts",
+    "assertions"
+  ],
+  "properties": {
+    "schema": {
+      "const": "lumencore.argos_private_facts.v1"
+    },
+    "notice_id": {
+      "const": "ONC-ARGOS-SSN-2026-OS351107"
+    },
+    "facts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "legal_company_name",
+        "uei",
+        "duns_if_notice_or_entity_record_requires_it",
+        "company_address",
+        "authorized_point_of_contact_name_and_title",
+        "authorized_point_of_contact_phone",
+        "authorized_point_of_contact_email",
+        "small_business_designations",
+        "sam_registration_status_and_expiration"
+      ],
+      "properties": {
+        "legal_company_name": {
+          "$ref": "#/$defs/verifiedFact"
+        },
+        "uei": {
+          "$ref": "#/$defs/verifiedFact"
+        },
+        "duns_if_notice_or_entity_record_requires_it": {
+          "$ref": "#/$defs/verifiedOrNotApplicableFact"
+        },
+        "company_address": {
+          "$ref": "#/$defs/verifiedFact"
+        },
+        "authorized_point_of_contact_name_and_title": {
+          "$ref": "#/$defs/verifiedFact"
+        },
+        "authorized_point_of_contact_phone": {
+          "$ref": "#/$defs/verifiedFact"
+        },
+        "authorized_point_of_contact_email": {
+          "$ref": "#/$defs/verifiedFact"
+        },
+        "small_business_designations": {
+          "$ref": "#/$defs/verifiedFact"
+        },
+        "sam_registration_status_and_expiration": {
+          "$ref": "#/$defs/verifiedFact"
+        }
+      }
+    },
+    "assertions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "facts_current_and_accurate",
+        "authorized_for_this_response",
+        "minimum_necessary_business_information_only"
+      ],
+      "properties": {
+        "facts_current_and_accurate": {
+          "const": true
+        },
+        "authorized_for_this_response": {
+          "const": true
+        },
+        "minimum_necessary_business_information_only": {
+          "const": true
+        }
+      }
+    }
+  },
+  "$defs": {
+    "verifiedFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "status",
+        "source_kind",
+        "verified_utc"
+      ],
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "const": "VERIFIED"
+        },
+        "source_kind": {
+          "enum": [
+            "OFFICIAL_ENTITY_RECORD",
+            "OFFICIAL_SAM_RECORD",
+            "FOUNDER_VERIFIED_BUSINESS_RECORD",
+            "OFFICIAL_CORRESPONDENCE"
+          ]
+        },
+        "verified_utc": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "verifiedOrNotApplicableFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "status",
+        "source_kind",
+        "verified_utc"
+      ],
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "VERIFIED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "source_kind": {
+          "enum": [
+            "OFFICIAL_ENTITY_RECORD",
+            "OFFICIAL_SAM_RECORD",
+            "FOUNDER_VERIFIED_BUSINESS_RECORD",
+            "OFFICIAL_CORRESPONDENCE"
+          ]
+        },
+        "verified_utc": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
