@@ -121,7 +121,7 @@ def assert_no_private_fields(value: Any, path: str = "config") -> None:
 
 def source_receipt(binding: dict[str, Any], deadline: dict[str, Any]) -> dict[str, Any]:
     kind = str(binding.get("kind", "")).strip()
-    if kind == "REPOSITORY_GATE":
+    if kind in {"REPOSITORY_GATE", "REPOSITORY_DATE_GATE"}:
         relative_path = Path(str(binding.get("path", "")))
         if not relative_path.as_posix() or relative_path.is_absolute():
             raise ValueError("repository source path must be relative")
@@ -140,12 +140,24 @@ def source_receipt(binding: dict[str, Any], deadline: dict[str, Any]) -> dict[st
         observed_status = str(resolve_field(source, status_field))
         required_status = str(binding.get("required_status", "")).strip()
 
-        if deadline.get("precision") != "EXACT":
-            raise ValueError("repository deadline binding requires EXACT precision")
-        if parse_aware_datetime(observed_deadline, deadline_field) != parse_aware_datetime(
-            str(deadline.get("iso_utc", "")), "deadline.iso_utc"
-        ):
-            raise ValueError("configured deadline does not match the repository gate")
+        if kind == "REPOSITORY_GATE":
+            if deadline.get("precision") != "EXACT":
+                raise ValueError("repository deadline binding requires EXACT precision")
+            if parse_aware_datetime(
+                observed_deadline, deadline_field
+            ) != parse_aware_datetime(
+                str(deadline.get("iso_utc", "")), "deadline.iso_utc"
+            ):
+                raise ValueError("configured deadline does not match the repository gate")
+        else:
+            if deadline.get("precision") != "DATE_ONLY":
+                raise ValueError(
+                    "repository date binding requires DATE_ONLY precision"
+                )
+            if parse_date(observed_deadline, deadline_field) != parse_date(
+                str(deadline.get("date", "")), "deadline.date"
+            ):
+                raise ValueError("configured date does not match the repository gate")
         if observed_status != required_status:
             raise ValueError(
                 "repository gate status changed: "
@@ -458,7 +470,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     )
     for lane in payload["lanes"]:
         receipt = lane["source_receipt"]
-        if receipt["kind"] == "REPOSITORY_GATE":
+        if receipt["kind"] in {"REPOSITORY_GATE", "REPOSITORY_DATE_GATE"}:
             lines.append(
                 f"- `{lane['id']}`: `{receipt['path']}` at SHA-256 "
                 f"`{receipt['sha256']}`; observed gate `{receipt['observed_status']}`."

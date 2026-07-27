@@ -27,6 +27,61 @@
   "alert_window_hours": 120,
   "lanes": [
     {
+      "id": "DAF_CSDR_20260727",
+      "title": "DAF CSDR Support and Curation CSO",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "deadline": {
+        "precision": "EXACT",
+        "iso_utc": "2026-07-27T17:00:00Z",
+        "local_display": "July 27, 2026 at 1:00 PM EDT",
+        "timezone": "America/New_York",
+        "cutoff_time_known": true,
+        "timezone_known": true
+      },
+      "source_binding": {
+        "kind": "REPOSITORY_GATE",
+        "path": "evidence/opportunity/csdr_deadline_gate_2026-07-27.json",
+        "deadline_field": "opportunity.deadline_utc",
+        "status_field": "decision",
+        "required_status": "PAST_DEADLINE_NO_LATE_OR_DUPLICATE_ACTION"
+      },
+      "external_action_type": "CAPABILITY_OUTREACH_OR_STEP_1_WHITE_PAPER",
+      "completion_evidence_present": false,
+      "blockers": [
+        "The exact Government deadline has passed.",
+        "No formal Step 1 white-paper receipt is present.",
+        "Direct CSDR and FlexFile delivery experience, qualified cost-data leadership, key personnel, and security qualifications are not established.",
+        "A prior bounded capability email must not be duplicated."
+      ],
+      "safest_next_action": "Do not submit late or duplicate the prior capability email. Monitor only for an inbound request from the Government or a qualified prime."
+    },
+    {
+      "id": "NSF_26_510_20260727",
+      "title": "NSF SBIR/STTR 26-510 full-proposal cycle",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "deadline": {
+        "precision": "DATE_ONLY",
+        "date": "2026-07-27",
+        "cutoff_time_known": false,
+        "timezone_known": false
+      },
+      "source_binding": {
+        "kind": "REPOSITORY_DATE_GATE",
+        "path": "evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json",
+        "deadline_field": "opportunity.deadline_date",
+        "status_field": "decision",
+        "required_status": "BLOCKED_NO_OFFICIAL_PROJECT_PITCH_INVITATION"
+      },
+      "external_action_type": "RESEARCH_GOV_FULL_PROPOSAL",
+      "completion_evidence_present": false,
+      "blockers": [
+        "No official Phase I or Fast-Track Project Pitch invitation was found.",
+        "No eligible full-proposal route or submission receipt is present.",
+        "The submitting organization's controlling local timezone is not bound in the public evidence."
+      ],
+      "safest_next_action": "Do not attempt a July 27 full proposal. Select one bounded research lane and prepare a truthful Project Pitch for the November 4, 2026 cycle."
+    },
+    {
       "id": "ONC_ARGOS_20260730",
       "title": "HHS Project Argos Sources Sought",
       "visibility": "PUBLIC_OPPORTUNITY",

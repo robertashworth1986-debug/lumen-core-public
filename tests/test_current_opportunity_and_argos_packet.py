@@ -379,8 +379,8 @@ def test_argos_private_finalizer_readiness_is_redacted_and_fail_closed():
     assert set(schema["properties"]["facts"]["required"]) == set(
         readiness["required_fact_keys"]
     )
-    assert readiness["verification"]["focused_test_count"] == 28
-    assert readiness["verification"]["focused_test_pass_count"] == 28
+    assert readiness["verification"]["focused_test_count"] == 30
+    assert readiness["verification"]["focused_test_pass_count"] == 30
     assert readiness["verification"]["synthetic_private_values_only"] is True
     assert readiness["verification"]["synthetic_pdf_page_count"] == 10
     assert readiness["verification"]["synthetic_pdf_page_size"] == "US Letter"

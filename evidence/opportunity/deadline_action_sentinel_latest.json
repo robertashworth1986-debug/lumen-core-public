@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.deadline_action_sentinel.v1",
-  "evaluated_utc": "2026-07-27T20:08:01Z",
+  "evaluated_utc": "2026-07-27T20:14:28Z",
   "posture": "HUMAN_ACTION_REQUIRED_FAIL_CLOSED",
   "controls": {
     "read_only_builder": true,
@@ -28,18 +28,96 @@
   ],
   "alert_window_hours": 120,
   "summary": {
-    "lane_count": 3,
-    "human_attention_count": 3,
-    "exact_deadline_count": 1,
-    "date_only_deadline_count": 2,
+    "lane_count": 5,
+    "human_attention_count": 5,
+    "exact_deadline_count": 2,
+    "date_only_deadline_count": 3,
     "autonomous_external_action_count": 0,
     "external_actions_executed_count": 0,
     "state_counts": {
       "BLOCKED_HUMAN_ACTION_DUE": 1,
-      "HUMAN_DATE_ONLY_ACTION_OPEN": 2
+      "HUMAN_DATE_ONLY_ACTION_DUE_DATE_UNKNOWN_CUTOFF": 1,
+      "HUMAN_DATE_ONLY_ACTION_OPEN": 2,
+      "PAST_DEADLINE_NO_EXTERNAL_ACTION_AUTHORIZED": 1
     }
   },
   "lanes": [
+    {
+      "id": "DAF_CSDR_20260727",
+      "title": "DAF CSDR Support and Curation CSO",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "external_action_type": "CAPABILITY_OUTREACH_OR_STEP_1_WHITE_PAPER",
+      "completion_evidence_present": false,
+      "blockers": [
+        "The exact Government deadline has passed.",
+        "No formal Step 1 white-paper receipt is present.",
+        "Direct CSDR and FlexFile delivery experience, qualified cost-data leadership, key personnel, and security qualifications are not established.",
+        "A prior bounded capability email must not be duplicated."
+      ],
+      "blocker_count": 4,
+      "requires_human_attention": true,
+      "external_action_authorized": false,
+      "send_now": false,
+      "external_action_executed": false,
+      "safest_next_action": "Do not submit late or duplicate the prior capability email. Monitor only for an inbound request from the Government or a qualified prime.",
+      "source_receipt": {
+        "kind": "REPOSITORY_GATE",
+        "path": "evidence/opportunity/csdr_deadline_gate_2026-07-27.json",
+        "sha256": "cc578d67d891a1bed326331433af5d6b2d3d36c7078e71bb333ef17c4300d23b",
+        "bound_deadline_field": "opportunity.deadline_utc",
+        "observed_status": "PAST_DEADLINE_NO_LATE_OR_DUPLICATE_ACTION"
+      },
+      "state": "PAST_DEADLINE_NO_EXTERNAL_ACTION_AUTHORIZED",
+      "urgency": "PAST",
+      "deadline": {
+        "precision": "EXACT",
+        "iso_utc": "2026-07-27T17:00:00Z",
+        "local_display": "July 27, 2026 at 1:00 PM EDT",
+        "timezone": "America/New_York",
+        "cutoff_time_known": true,
+        "timezone_known": true,
+        "exact_countdown_available": true,
+        "deadline_passed": true,
+        "seconds_until_deadline": -11668,
+        "hours_until_deadline": -3.24
+      }
+    },
+    {
+      "id": "NSF_26_510_20260727",
+      "title": "NSF SBIR/STTR 26-510 full-proposal cycle",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "external_action_type": "RESEARCH_GOV_FULL_PROPOSAL",
+      "completion_evidence_present": false,
+      "blockers": [
+        "No official Phase I or Fast-Track Project Pitch invitation was found.",
+        "No eligible full-proposal route or submission receipt is present.",
+        "The submitting organization's controlling local timezone is not bound in the public evidence."
+      ],
+      "blocker_count": 3,
+      "requires_human_attention": true,
+      "external_action_authorized": false,
+      "send_now": false,
+      "external_action_executed": false,
+      "safest_next_action": "Do not attempt a July 27 full proposal. Select one bounded research lane and prepare a truthful Project Pitch for the November 4, 2026 cycle.",
+      "source_receipt": {
+        "kind": "REPOSITORY_DATE_GATE",
+        "path": "evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json",
+        "sha256": "6c4ee6bab204851a3e1b83063e7f9e43b9e0ef41c01c67aa87d8ad7a8bd41a94",
+        "bound_deadline_field": "opportunity.deadline_date",
+        "observed_status": "BLOCKED_NO_OFFICIAL_PROJECT_PITCH_INVITATION"
+      },
+      "state": "HUMAN_DATE_ONLY_ACTION_DUE_DATE_UNKNOWN_CUTOFF",
+      "urgency": "UNKNOWN_EXACT_CUTOFF_FAIL_CLOSED",
+      "deadline": {
+        "precision": "DATE_ONLY",
+        "date": "2026-07-27",
+        "cutoff_time_known": false,
+        "timezone_known": false,
+        "exact_countdown_available": false,
+        "deadline_passed": null,
+        "calendar_relation": "SAME_UTC_CALENDAR_DATE"
+      }
+    },
     {
       "id": "ONC_ARGOS_20260730",
       "title": "HHS Project Argos Sources Sought",
@@ -76,8 +154,8 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": false,
-        "seconds_until_deadline": 262319,
-        "hours_until_deadline": 72.87
+        "seconds_until_deadline": 261932,
+        "hours_until_deadline": 72.76
       }
     },
     {

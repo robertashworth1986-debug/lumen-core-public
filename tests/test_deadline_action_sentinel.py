@@ -65,6 +65,32 @@ def test_exact_deadline_turns_past_without_authorizing_late_action():
     assert argos["external_action_authorized"] is False
 
 
+def test_monday_deadline_lanes_are_reconciled_without_new_action():
+    payload = SENTINEL.build_sentinel(CONFIG, as_of("2026-07-27T20:12:08Z"))
+    csdr = lane(payload, "DAF_CSDR_20260727")
+    nsf = lane(payload, "NSF_26_510_20260727")
+
+    assert csdr["state"] == "PAST_DEADLINE_NO_EXTERNAL_ACTION_AUTHORIZED"
+    assert csdr["deadline"]["deadline_passed"] is True
+    assert (
+        csdr["source_receipt"]["observed_status"]
+        == "PAST_DEADLINE_NO_LATE_OR_DUPLICATE_ACTION"
+    )
+    assert csdr["send_now"] is False
+    assert csdr["external_action_authorized"] is False
+
+    assert nsf["state"] == "HUMAN_DATE_ONLY_ACTION_DUE_DATE_UNKNOWN_CUTOFF"
+    assert nsf["urgency"] == "UNKNOWN_EXACT_CUTOFF_FAIL_CLOSED"
+    assert nsf["deadline"]["deadline_passed"] is None
+    assert "iso_utc" not in nsf["deadline"]
+    assert (
+        nsf["source_receipt"]["observed_status"]
+        == "BLOCKED_NO_OFFICIAL_PROJECT_PITCH_INVITATION"
+    )
+    assert nsf["send_now"] is False
+    assert nsf["external_action_authorized"] is False
+
+
 @pytest.mark.parametrize(
     ("evaluated", "expected_state", "expected_relation"),
     [
@@ -118,12 +144,29 @@ def test_autonomous_control_tampering_is_rejected(tmp_path: Path):
 def test_source_deadline_mismatch_is_rejected(tmp_path: Path):
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     changed = deepcopy(config)
-    changed["lanes"][0]["deadline"]["iso_utc"] = "2026-07-30T22:00:00Z"
+    argos = next(
+        item for item in changed["lanes"] if item["id"] == "ONC_ARGOS_20260730"
+    )
+    argos["deadline"]["iso_utc"] = "2026-07-30T22:00:00Z"
     tampered = tmp_path / "deadline-mismatch.json"
     write_config(tampered, changed)
 
     with pytest.raises(ValueError, match="does not match the repository gate"):
         SENTINEL.build_sentinel(tampered, as_of("2026-07-27T02:45:00Z"))
+
+
+def test_source_date_mismatch_is_rejected(tmp_path: Path):
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    changed = deepcopy(config)
+    nsf = next(
+        item for item in changed["lanes"] if item["id"] == "NSF_26_510_20260727"
+    )
+    nsf["deadline"]["date"] = "2026-07-28"
+    tampered = tmp_path / "date-mismatch.json"
+    write_config(tampered, changed)
+
+    with pytest.raises(ValueError, match="does not match the repository gate"):
+        SENTINEL.build_sentinel(tampered, as_of("2026-07-27T20:12:08Z"))
 
 
 def test_snapshot_is_current_private_safe_and_action_free():
@@ -135,6 +178,15 @@ def test_snapshot_is_current_private_safe_and_action_free():
 
     assert snapshot == rebuilt
     assert MARKDOWN_OUTPUT.read_text(encoding="utf-8") == markdown
+    assert (
+        "`NSF_26_510_20260727`: "
+        "`evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json`"
+        in markdown
+    )
+    assert (
+        "`NSF_26_510_20260727`: private official-event metadata only"
+        not in markdown
+    )
     assert snapshot["summary"]["autonomous_external_action_count"] == 0
     assert snapshot["summary"]["external_actions_executed_count"] == 0
     assert all(item["send_now"] is False for item in snapshot["lanes"])
@@ -175,4 +227,7 @@ def test_ci_enforces_snapshot_and_fail_closed_tests():
     assert "tests/test_deadline_action_sentinel.py" in workflow
     assert "tests/test_current_opportunity_and_argos_packet.py" in workflow
     assert "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json" in workflow
+    assert "evidence/opportunity/csdr_deadline_gate_2026-07-27.json" in workflow
+    assert "evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json" in workflow
+    assert "evidence/opportunity/official_status_events_2026-07-27.json" in workflow
     assert "permissions:\n  contents: read" in workflow
