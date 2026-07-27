@@ -1,0 +1,16 @@
+{
+  "schema": "lumencore.argos_response_build_receipt.v1",
+  "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+  "status": "DRAFT_REVIEW_READY_NOT_SEND_READY",
+  "logo_sha256": "1ed1c9b00e273aa9e781bd7fd0a4fcc3fc542257c6d294c8e8fbfada500701af",
+  "markdown": {
+    "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md",
+    "sha256": "91083b1cfd5fa07b7aeca63216a47fc84d48fe21fbd898564c84e6c4d1a30b43"
+  },
+  "docx": {
+    "path": "grant_submissions/ONC_ARGOS_20260730/output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.docx",
+    "sha256": "731dd16725c53a424b36ff712cc1b12e85d4077b2d526c09e8bdcce6661a52c3"
+  },
+  "submission_authorized": false,
+  "exact_action_time_human_approval_required": true
+}

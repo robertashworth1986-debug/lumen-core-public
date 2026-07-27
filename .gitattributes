@@ -3,6 +3,7 @@ examples/proof_capsule/** text eol=lf
 
 # Canonical bytes for the bounded CODECHECK reviewer capsule.
 /.github/workflows/reviewer-reproducibility.yml text eol=lf
+/.gitattributes text eol=lf
 /.gitignore text eol=lf
 /CITATION.cff text eol=lf
 /LICENSE text eol=lf
@@ -53,3 +54,18 @@ examples/proof_capsule/** text eol=lf
 /tests/test_mda_control_mapping_open_set_benchmark.py text eol=lf
 /tests/test_reviewer_dependency_lock.py text eol=lf
 /tests/test_reviewer_reproducibility_capsule.py text eol=lf
+
+# Canonical bytes for the current LumenCore opportunity and Argos review packet.
+/assets/brand/lumaarc_arc_seal_v1.png binary
+/assets/brand/lumaarc_arc_seal_v1.receipt.json text eol=lf
+/code/ops/BUILD_E_DRIVE_PROOF_VAULT_INVENTORY.ps1 text eol=lf
+/code/ops/MIRROR_REVIEW_PACKET_TO_E_DRIVE.ps1 text eol=lf
+/docs/CURRENT_FEDERAL_OPPORTUNITY_GATE_MAP_2026-07-26.md text eol=lf
+/docs/SCIENTIFIC_CONTRIBUTION_AND_NEXT_EXPERIMENTS_2026-07-26.md text eol=lf
+/grant_submissions/ONC_ARGOS_20260730/*.json text eol=lf
+/grant_submissions/ONC_ARGOS_20260730/*.md text eol=lf
+/grant_submissions/ONC_ARGOS_20260730/*.py text eol=lf
+/grant_submissions/ONC_ARGOS_20260730/output/*.json text eol=lf
+/grant_submissions/ONC_ARGOS_20260730/output/*.docx binary
+/grant_submissions/ONC_ARGOS_20260730/output/*.pdf binary
+/tests/test_current_opportunity_and_argos_packet.py text eol=lf

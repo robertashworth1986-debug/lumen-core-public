@@ -1,0 +1,99 @@
+{
+  "schema": "lumencore.opportunity_submission_gate.v1",
+  "generated_utc": "2026-07-27T01:08:35Z",
+  "opportunity": {
+    "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+    "title": "Project Argos Agentic AI Proof of Concept",
+    "agency": "U.S. Department of Health and Human Services",
+    "notice_type": "SOURCES_SOUGHT_MARKET_RESEARCH",
+    "set_aside": "TOTAL_SMALL_BUSINESS",
+    "naics": "541512",
+    "official_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
+    "deadline_local": "2026-07-30T17:00:00-04:00",
+    "deadline_utc": "2026-07-30T21:00:00Z",
+    "deadline_timezone": "America/New_York"
+  },
+  "response": {
+    "company_name": "LumenCore",
+    "strategy": "PARTNER_FIRST_EVIDENCE_ASSURANCE_WORKSTREAM",
+    "template_id": "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_V1",
+    "status": "DRAFT_REVIEW_READY_NOT_SEND_READY",
+    "page_limit": {
+      "content_pages_max": 10,
+      "cover_excluded": true
+    },
+    "format": {
+      "page_size": "US_LETTER",
+      "font": "Times New Roman",
+      "font_size_pt": 12,
+      "margins_in": 1,
+      "accepted_files": [
+        "DOCX",
+        "PDF"
+      ]
+    }
+  },
+  "brand": {
+    "company_name": "LumenCore",
+    "seal_name": "LumaArc seal of approval",
+    "asset_path": "assets/brand/lumaarc_arc_seal_v1.png",
+    "asset_sha256": "1ed1c9b00e273aa9e781bd7fd0a4fcc3fc542257c6d294c8e8fbfada500701af",
+    "founder_selected_for_current_materials": true,
+    "company_rename_claim_allowed": false,
+    "legal_entity_name_inferred_from_seal": false
+  },
+  "duplicate_send_check": {
+    "checked_utc": "2026-07-27T00:55:00Z",
+    "matching_sent_response_found": false,
+    "matching_draft_response_found": false,
+    "decision": "NO_DUPLICATE_FOUND_BUT_RECHECK_AT_ACTION_TIME"
+  },
+  "required_private_facts": [
+    "legal_company_name",
+    "uei",
+    "duns_if_notice_or_entity_record_requires_it",
+    "company_address",
+    "authorized_point_of_contact_name_and_title",
+    "authorized_point_of_contact_phone",
+    "authorized_point_of_contact_email",
+    "small_business_designations",
+    "sam_registration_status_and_expiration"
+  ],
+  "required_teaming_facts": [
+    "qualified_health_it_or_fhir_prime_or_partner",
+    "federal_health_regulatory_subject_matter_lead",
+    "hhs_ato_and_fips_199_security_lead",
+    "3pao_or_assessment_support_path",
+    "named_team_members_and_roles",
+    "truthful_relevant_prior_performance_references",
+    "authorized_use_of_each_partner_name_and_credential"
+  ],
+  "claim_boundaries": {
+    "current_fhir_r4_or_chpl_delivery_claim_allowed": false,
+    "current_hhs_ato_claim_allowed": false,
+    "current_3pao_claim_allowed": false,
+    "federal_health_prior_performance_claim_allowed": false,
+    "agency_approval_claim_allowed": false,
+    "external_validation_claim_allowed": false,
+    "field_performance_claim_allowed": false,
+    "realized_savings_claim_allowed": false,
+    "full_prime_readiness_claim_allowed": false,
+    "bounded_reproducibility_claim_allowed": true,
+    "artifact_custody_claim_allowed": true,
+    "deterministic_validation_pattern_claim_allowed": true,
+    "human_review_gate_pattern_claim_allowed": true
+  },
+  "send_gate": {
+    "submission_authorized": false,
+    "final_recipient_verified": false,
+    "final_subject_verified": false,
+    "final_body_verified": false,
+    "final_attachments_verified": false,
+    "all_private_facts_resolved": false,
+    "all_teaming_facts_resolved": false,
+    "duplicate_send_rechecked": false,
+    "exact_action_time_human_approval_required": true,
+    "decision": "BLOCK_SEND"
+  },
+  "safest_next_action": "Resolve cover facts and qualified teaming roles, review the rendered response, recheck the full mailbox thread and official notice, then request exact approval for the final recipient, subject, body, and attachment set."
+}
