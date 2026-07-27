@@ -1,0 +1,112 @@
+{
+  "schema": "lumencore.codecheck_independent_execution_receipt.v1",
+  "receipt_id": null,
+  "generated_at_utc": null,
+  "review_target": {
+    "source_commit": "1c0eb51754beffac6f4df484914e35efc21c253f",
+    "source_url": "https://github.com/robertashworth1986-debug/lumen-core-public/commit/1c0eb51754beffac6f4df484914e35efc21c253f",
+    "preprint_url": "https://raw.githubusercontent.com/robertashworth1986-debug/lumen-core-public/1c0eb51754beffac6f4df484914e35efc21c253f/docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+    "preprint_sha256": "96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497",
+    "codecheck_manifest_portable_sha256": "e1d984b9dd877b7847e9d454c0ca89fa129dbd76beb8b7fac26701d079d5136c",
+    "dependency_lock_portable_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+    "run_command": "python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --run-dir out/codecheck_eia"
+  },
+  "reviewer": {
+    "full_name": null,
+    "affiliation_or_independent_status": null,
+    "identity_reference": null,
+    "relationship_to_author": null,
+    "conflict_disclosure": null,
+    "is_author": null,
+    "employed_or_contracted_by_lumencore": null,
+    "paid_for_favorable_result": null,
+    "reviewer_controlled_environment": null
+  },
+  "execution": {
+    "started_at_utc": null,
+    "completed_at_utc": null,
+    "source_acquisition_url": "https://github.com/robertashworth1986-debug/lumen-core-public/commit/1c0eb51754beffac6f4df484914e35efc21c253f",
+    "source_commit": "1c0eb51754beffac6f4df484914e35efc21c253f",
+    "source_tree_clean": null,
+    "run_command": "python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --run-dir out/codecheck_eia",
+    "network_access_during_execution": null,
+    "runtime": {
+      "system": null,
+      "machine": null,
+      "python": null,
+      "glibc": null,
+      "timezone": null,
+      "deterministic_environment": {
+        "MKL_NUM_THREADS": null,
+        "OMP_NUM_THREADS": null,
+        "OPENBLAS_NUM_THREADS": null,
+        "PYTHONHASHSEED": null,
+        "TZ": null
+      }
+    },
+    "dependency_lock_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18"
+  },
+  "result": {
+    "status": "NOT_RUN",
+    "capsule_status": null,
+    "suite_count": null,
+    "suite_pass_count": null,
+    "assertion_count": null,
+    "assertion_pass_count": null,
+    "capsule_receipt_sha256": null,
+    "external_validation_complete": false,
+    "agency_certification_complete": false,
+    "field_validation_complete": false,
+    "economic_validation_complete": false,
+    "valuation_validation_complete": false
+  },
+  "manifest": [
+    {
+      "path": "out/codecheck_eia/reviewer_reproducibility_receipt.json",
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "path": "out/codecheck_eia/reviewer_suite_sbom.cdx.json",
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "path": "out/codecheck_eia/logs/eia_wave.log",
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "path": "out/codecheck_eia/logs/eia_residual.log",
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "path": "out/codecheck_eia/logs/mda_open_set.log",
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "path": "out/codecheck_eia/logs/fixture_tests.log",
+      "sha256": null,
+      "bytes": null
+    }
+  ],
+  "attestation": {
+    "text": "I attest that I independently acquired the named immutable source, executed it in a reviewer-controlled environment without author operation, recorded the observed outcome including failures, and did not alter the generated artifacts or preserved negative gates.",
+    "signed_by": null,
+    "signed_at_utc": null,
+    "evidence_url": null
+  },
+  "claim_state": {
+    "independent_execution_documented": false,
+    "bounded_reproduction_passed": false,
+    "codecheck_certificate_issued": false,
+    "external_validation_complete": false,
+    "scientific_validation_complete": false,
+    "field_validation_complete": false,
+    "economic_validation_complete": false,
+    "valuation_validation_complete": false
+  },
+  "claim_boundary": "A completed and verified receipt can document one independent execution of the named bounded capsule. It does not by itself create a CODECHECK certificate, validate the scientific interpretation, establish field performance, prove savings, certify agency acceptance, or validate company valuation."
+}

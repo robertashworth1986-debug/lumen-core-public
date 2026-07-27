@@ -1,0 +1,174 @@
+{
+  "schema": "eia_grid_wave_champion_protocol.v1",
+  "protocol_id": "EIA_GRID_WAVE_CHAMPION_20260713",
+  "version": 1,
+  "frozen_date_utc": "2026-07-13",
+  "purpose": "Test whether an actually implemented wave-geometry forecast can beat strong algorithmic baselines and EIA's published day-ahead demand forecast on untouched daily balancing-authority demand.",
+  "primary_hypothesis": "The development-selected wave candidate has lower seasonal-MASE than every predeclared baseline on the common-intersection 2026 holdout panel.",
+  "source": {
+    "publisher": "U.S. Energy Information Administration",
+    "product": "Form EIA-930 daily demand and day-ahead demand forecast by balancing authority",
+    "api_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/",
+    "documentation": "https://www.eia.gov/opendata/documentation.php",
+    "frequency": "daily",
+    "actual_type": "D",
+    "official_forecast_type": "DF",
+    "value_units": "megawatthours",
+    "credential_policy": "Read EIA_API_KEY or EIA_API_KEY_PREMIUM from the environment. Never serialize, print, hash, or copy the credential."
+  },
+  "panel": {
+    "start_date": "2024-01-01",
+    "end_date": "2026-07-12",
+    "balancing_authorities": [
+      {
+        "respondent": "CISO",
+        "name": "California Independent System Operator",
+        "timezone": "Pacific"
+      },
+      {
+        "respondent": "ERCO",
+        "name": "Electric Reliability Council of Texas",
+        "timezone": "Central"
+      },
+      {
+        "respondent": "ISNE",
+        "name": "ISO New England",
+        "timezone": "Eastern"
+      },
+      {
+        "respondent": "MISO",
+        "name": "Midcontinent Independent System Operator",
+        "timezone": "Central"
+      },
+      {
+        "respondent": "NYIS",
+        "name": "New York Independent System Operator",
+        "timezone": "Eastern"
+      },
+      {
+        "respondent": "PJM",
+        "name": "PJM Interconnection",
+        "timezone": "Eastern"
+      },
+      {
+        "respondent": "SWPP",
+        "name": "Southwest Power Pool",
+        "timezone": "Central"
+      },
+      {
+        "respondent": "TVA",
+        "name": "Tennessee Valley Authority",
+        "timezone": "Central"
+      }
+    ],
+    "deduplication": "One row per respondent, timezone, type, and period. Duplicate values must agree or be reported as a data-quality conflict.",
+    "common_intersection": "Primary comparisons use only target dates containing actual demand, EIA day-ahead forecast, and every algorithmic forecast."
+  },
+  "split": {
+    "minimum_history_days": 90,
+    "development_start": "2024-04-01",
+    "development_end": "2025-12-31",
+    "holdout_start": "2026-01-01",
+    "holdout_end": "2026-07-12",
+    "development_origin_stride_days": 7,
+    "holdout_origin_stride_days": 1,
+    "forecast_horizon_days": 1,
+    "rolling_rule": "At target date t, algorithms may use actual observations through t-1 only. Hyperparameters and candidate identity may not change after development selection."
+  },
+  "baselines": [
+    {
+      "id": "eia_day_ahead_forecast",
+      "kind": "official_baseline",
+      "definition": "Use EIA type DF for the same respondent, timezone, and target period."
+    },
+    {
+      "id": "seasonal_naive_7",
+      "kind": "algorithmic_baseline",
+      "definition": "Forecast the observed demand from exactly seven days before the target."
+    },
+    {
+      "id": "naive_last",
+      "kind": "algorithmic_baseline",
+      "definition": "Forecast the most recent observed demand."
+    },
+    {
+      "id": "kalman_local_linear_trend",
+      "kind": "algorithmic_baseline",
+      "definition": "Two-state local-level/local-trend Kalman filter. Process and observation variances are deterministic functions of pre-origin first differences; no fitted holdout parameters."
+    },
+    {
+      "id": "autoregressive_ridge_p14",
+      "kind": "algorithmic_baseline",
+      "definition": "Fourteen-lag autoregression fitted on at most 730 pre-origin observations after history-only standardization, with ridge lambda 1.0."
+    },
+    {
+      "id": "fft_extrapolation_top5",
+      "kind": "algorithmic_baseline",
+      "definition": "History-only linear detrending followed by five highest-amplitude nonzero Fourier modes and one-step extrapolation."
+    }
+  ],
+  "wave_candidates": [
+    {
+      "id": "lissajous_phase_paths",
+      "definition": "Ridge harmonic regression with fixed periods 7, 30.4375, and 365.25 days plus intercept and linear trend; maximum history 730 days; ridge lambda 0.0001."
+    },
+    {
+      "id": "kuramoto_phase_coupling",
+      "definition": "Fit the same fixed seasonal oscillators on pre-origin history, then advance their actual phases one day with the Kuramoto equation using Euler integration and fixed coupling K=0.01 radians per step."
+    },
+    {
+      "id": "firefly_synchronization",
+      "definition": "Fit the fixed seasonal oscillators, then apply a fixed beta=0.02 phase attraction toward the highest-amplitude oscillator before one-day reconstruction."
+    },
+    {
+      "id": "chladni_nodal_patterns",
+      "definition": "Ridge harmonic regression with fixed periods 7, 14, 30.4375, and 365.25 days plus pairwise nodal interaction terms; maximum history 730 days; ridge lambda 0.001."
+    }
+  ],
+  "selection": {
+    "rule": "Choose exactly one wave candidate with the lowest mean seasonal-MASE across all development forecasts. Ties break by lower mean absolute error, then candidate id.",
+    "holdout_visibility": "No holdout metric may participate in candidate selection, parameter choice, source inclusion, or tie breaking.",
+    "no_post_selection_substitution": true
+  },
+  "metrics": {
+    "primary": "seasonal_mase_7",
+    "primary_definition": "Absolute error divided by the mean absolute seven-day difference available in pre-origin history.",
+    "secondary": [
+      "absolute_error_mwh",
+      "absolute_percentage_error",
+      "directional_accuracy",
+      "runtime_ms"
+    ],
+    "aggregation_unit": "balancing_authority_calendar_month",
+    "native_unit": "megawatthours"
+  },
+  "inference": {
+    "paired_delta_direction": "baseline seasonal-MASE minus selected-candidate seasonal-MASE; positive favors the candidate",
+    "paired_units": "Balancing-authority calendar months on common-intersection holdout dates",
+    "bootstrap": "10,000 deterministic cluster-bootstrap draws resampling balancing authorities with replacement and retaining their months; seed 20260713",
+    "sign_test": "Exact two-sided sign test over nonzero balancing-authority-month mean deltas",
+    "multiple_comparison_control": "Holm correction across the selected candidate versus all six predeclared baselines",
+    "source_robustness": "Report the number of balancing authorities with positive mean skill and the worst balancing-authority regression."
+  },
+  "promotion_gate": {
+    "minimum_balancing_authorities": 8,
+    "minimum_common_holdout_days_per_authority": 150,
+    "minimum_paired_authority_months": 40,
+    "required_authority_mean_wins": 6,
+    "required_month_win_rate": 0.6,
+    "maximum_single_authority_mase_regression": 0.05,
+    "require_positive_cluster_bootstrap_lower_bound": true,
+    "require_holm_adjusted_p_at_most": 0.05,
+    "must_beat_every_predeclared_baseline": true,
+    "external_replication_required_for_field_claim": true
+  },
+  "execution_controls": {
+    "maximum_history_days": 730,
+    "network_action": "Read-only HTTPS GET to the official EIA route only.",
+    "trading_execution_allowed": false,
+    "external_submission_allowed": false,
+    "dollar_conversion_allowed": false,
+    "post_holdout_tuning_allowed": false
+  },
+  "claim_boundary": "This protocol can produce measured public-data software forecast evidence in native MWh. It cannot by itself establish field control, grid reliability improvement, realized savings, procurement acceptance, safety, external validation, trading edge, or an unbeatable claim."
+}

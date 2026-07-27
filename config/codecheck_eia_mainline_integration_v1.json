@@ -1,0 +1,234 @@
+{
+  "schema": "codecheck_eia_mainline_integration_protocol.v1",
+  "protocol_id": "LUMENCORE_CODECHECK_EIA_MAINLINE_INTEGRATION_20260721",
+  "version": 1,
+  "purpose": "Prove that the bounded computational core on current mainline remains byte-identical to the immutable external review target while integration-only controls are explicit and external claims remain false.",
+  "frozen_target": {
+    "commit": "1c0eb51754beffac6f4df484914e35efc21c253f",
+    "source_url": "https://github.com/robertashworth1986-debug/lumen-core-public/commit/1c0eb51754beffac6f4df484914e35efc21c253f",
+    "preprint_path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+    "preprint_url": "https://raw.githubusercontent.com/robertashworth1986-debug/lumen-core-public/1c0eb51754beffac6f4df484914e35efc21c253f/docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+    "preprint_sha256": "96e744c613d2ae9ae1fcefc82f4e066edc1aac437939c8653a81407ed2157497",
+    "suite_count": 3,
+    "assertion_count": 31,
+    "declared_output_count": 6,
+    "frozen_panel_row_count": 14704
+  },
+  "author_review_control": {
+    "checklist_path": "docs/CODECHECK_AUTHOR_REVIEW_CHECKLIST_2026-07-21.md",
+    "request_draft_path": "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
+    "license_path": "LICENSE",
+    "citation_path": "CITATION.cff",
+    "expected_author_name": "Robert Ashworth",
+    "expected_checklist_status": "HUMAN_REVIEW_REQUIRED_NO_SEND",
+    "expected_request_status": "ACTION_TIME_READY_CANDIDATE_UNASSIGNED_NO_SEND",
+    "expected_human_decision_count": 9,
+    "expected_action_time_gate_count": 5,
+    "candidate_identifier": "2026-022",
+    "expected_issue_title": "Ashworth | 2026-022",
+    "required_checklist_snippets": [
+      "My name and authorship are correct.",
+      "I reviewed the five-page preprint and the executable-computation note.",
+      "at most 1% relative drift for the XGBoost residual MASE only.",
+      "I reviewed the six-file manifest in `codecheck.yml`.",
+      "I reviewed the MIT software license and the separate EIA data-use notice.",
+      "independently execute the frozen source, recreate all six outputs",
+      "author-operated receipts are first-party evidence only.",
+      "failed promotion and coverage gate.",
+      "company valuation remain unverified."
+    ],
+    "required_request_snippets": [
+      "This is an author-side draft. It has not been posted, emailed, submitted, assigned, or accepted.",
+      "immutable source commit https://github.com/robertashworth1986-debug/lumen-core-public/commit/1c0eb51754beffac6f4df484914e35efc21c253f",
+      "The author-side clean-runner receipt is first-party evidence only",
+      "It does not validate the live prospective router",
+      "fresh action-time HumanUnlock"
+    ],
+    "required_license_snippets": [
+      "MIT License",
+      "Third-Party Data Notice",
+      "https://www.eia.gov/about/copyrights_reuse.php",
+      "https://www.eia.gov/opendata/terms-of-service.php",
+      "LumenCore is not endorsed by EIA."
+    ],
+    "author_review_unlock_phrase": "CONFIRM CODECHECK AUTHOR REVIEW COMPLETE FOR FROZEN SOURCE 1c0eb51754beffac6f4df484914e35efc21c253f"
+  },
+  "official_request_contract": {
+    "author_guide_url": "https://codecheck.org.uk/guide/community-workflow-author",
+    "configuration_spec_url": "https://codecheck.org.uk/spec/config/1.0/",
+    "launch_pad_url": "https://codecheck.org.uk/launch-pad/",
+    "frozen_author_package_files": [
+      {
+        "path": "README.md",
+        "blob_sha1": "4153cd35f1d0395dd996a7975eacbeb4744aace1"
+      },
+      {
+        "path": "codecheck.yml",
+        "blob_sha1": "73df29b85fb7ea97e910b6b1fef1bea988cd1649"
+      },
+      {
+        "path": "LICENSE",
+        "blob_sha1": "2d896a766f4a38fe468823bdabb8bf250f672e7c"
+      }
+    ],
+    "required_readme_snippets": [
+      "## Independent Execution Packet",
+      "python code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py",
+      "python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-reviewer-ubuntu-py311.lock",
+      "python code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py --with-fixture-tests --run-dir out/codecheck_eia",
+      "The root [`codecheck.yml`](codecheck.yml) declares six outputs"
+    ],
+    "required_license_snippets": [
+      "MIT License",
+      "Third-Party Data Notice",
+      "https://www.eia.gov/about/copyrights_reuse.php",
+      "https://www.eia.gov/opendata/terms-of-service.php",
+      "LumenCore is not endorsed by EIA."
+    ],
+    "required_yaml_root_fields": [
+      "version",
+      "manifest",
+      "paper",
+      "source",
+      "lumencore"
+    ],
+    "checker_managed_yaml_root_fields": [
+      "codechecker",
+      "report",
+      "summary",
+      "repository",
+      "check_time",
+      "certificate"
+    ],
+    "expected_specification_url": "https://codecheck.org.uk/spec/config/1.0/",
+    "expected_paper_title": "A Bounded Reproducibility Capsule for Public-Data Benchmarking and Preserved Negative Gates",
+    "expected_author_name": "Robert Ashworth",
+    "expected_reference": "Public preprint draft in this repository: docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf",
+    "expected_source": "Code, frozen EIA-930-derived input, deterministic MDA fixtures, and execution controls are versioned in https://github.com/robertashworth1986-debug/lumen-core-public",
+    "expected_request_status": "ACTION_TIME_READY_CANDIDATE_UNASSIGNED_NO_SEND",
+    "candidate_identifier": "2026-022",
+    "expected_issue_title": "Ashworth | 2026-022",
+    "required_issue_labels": [
+      "community",
+      "needs codechecker",
+      "id assigned"
+    ],
+    "required_request_snippets": [
+      "Candidate `2026-022` was clear at the latest live recheck but is not reserved.",
+      "Leave unassigned. CODECHECK or a consenting independent volunteer must supply this field.",
+      "**Work**:",
+      "**Repository and workflow**:",
+      "Do not send a parallel team email.",
+      "fresh action-time HumanUnlock"
+    ]
+  },
+  "exact_frozen_files": [
+    {"path": "CITATION.cff", "blob_sha1": "01a70e8cec86989e7ae91458c5582d51d0918038", "hash_mode": "utf8_lf"},
+    {"path": "code/eia_grid_residual_moe_benchmark.py", "blob_sha1": "a384b4eceb7d6cbaf8a26ed0a4de0280de2726f5", "hash_mode": "utf8_lf"},
+    {"path": "code/eia_grid_wave_champion_benchmark.py", "blob_sha1": "3bacb31bb97d0b617e80fb3c4801adbb5430696c", "hash_mode": "utf8_lf"},
+    {"path": "code/mda_control_mapping_open_set_benchmark.py", "blob_sha1": "61efbf745f878ac9801b2c5059f74f6216b03608", "hash_mode": "utf8_lf"},
+    {"path": "code/ops/BUILD_CODECHECK_EIA_RELEASE_CANDIDATE.py", "blob_sha1": "cd376f3878fe940cb10554ac23033baf02ec4a0e", "hash_mode": "utf8_lf"},
+    {"path": "code/ops/RUN_CODECHECK_REVIEWER_CONTAINER.py", "blob_sha1": "f7ba095fc780b5f72b2cb973f0104cbf5220f075", "hash_mode": "utf8_lf"},
+    {"path": "code/ops/RUN_FAA_SDR_10K_BENCHMARK.py", "blob_sha1": "f079cf2fa364ef00e8bc4e30b737b57ee8df8bbc", "hash_mode": "utf8_lf"},
+    {"path": "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py", "blob_sha1": "e7352aea73b57b15d33a86243c83a3877abcab0c", "hash_mode": "utf8_lf"},
+    {"path": "code/ops/VERIFY_REVIEWER_DEPENDENCY_LOCK.py", "blob_sha1": "041d40fb41851e22b0a02f468c2ede75ec7c0c0b", "hash_mode": "utf8_lf"},
+    {"path": "config/codecheck_reviewer_container_v1.json", "blob_sha1": "a4141288aad4ff0ca6aa904a06f5e5c7053a0d18", "hash_mode": "utf8_lf"},
+    {"path": "config/codecheck_reviewer_runtime_v1.json", "blob_sha1": "ab9d8e62d41f0c39d1384ac3b50bb180445c204e", "hash_mode": "utf8_lf"},
+    {"path": "config/eia_grid_residual_moe_protocol_v1.json", "blob_sha1": "f8de13c3c3753a1cfae0629bf69037170ff440be", "hash_mode": "utf8_lf"},
+    {"path": "config/eia_grid_wave_champion_protocol_v1.json", "blob_sha1": "c1bfff883cf82d4dd59061da32b6b99d5ae58211", "hash_mode": "utf8_lf"},
+    {"path": "config/mda_control_mapping_open_set_protocol_v2.json", "blob_sha1": "b4fd4a4ffe96d7aaa44cc799dd742fb786ab2860", "hash_mode": "utf8_lf"},
+    {"path": "config/reviewer_protocol_provenance_v1.json", "blob_sha1": "309b571df60c71fb681eafd9f225692331521434", "hash_mode": "utf8_lf"},
+    {"path": "config/reviewer_reproducibility_protocol_v1.json", "blob_sha1": "b0ab58be9dbc579349967bcbca641094d65055b1", "hash_mode": "utf8_lf"},
+    {"path": "containers/codecheck-reviewer/Dockerfile", "blob_sha1": "1464d2bc3ed1c586d0222e532bdeac8d80f2a589", "hash_mode": "utf8_lf"},
+    {"path": "containers/codecheck-reviewer/run_capsule.sh", "blob_sha1": "3715588e14eca61b1326b9b320f88d1f8ec8e31d", "hash_mode": "utf8_lf"},
+    {"path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md", "blob_sha1": "62f7b0122a6c3b315e0c83a09cc790401060323c", "hash_mode": "utf8_lf"},
+    {"path": "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.pdf", "blob_sha1": "7a36dbacc00f10f36f4f0b5cd514c8d4a8325940", "hash_mode": "binary"},
+    {"path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz", "blob_sha1": "a9fcdb3d55f7bebbdc8badbf6ad2fe4babee20df", "hash_mode": "binary"},
+    {"path": "requirements-reviewer-ubuntu-py311.lock", "blob_sha1": "7aa1cd20ea541327f7ea38dad5347922952298fa", "hash_mode": "utf8_lf"},
+    {"path": "requirements-reviewer.txt", "blob_sha1": "5b8981c6b4bc711675416268cc3447349b8745c6", "hash_mode": "utf8_lf"},
+    {"path": "tests/test_codecheck_reviewer_container.py", "blob_sha1": "57e8ff776436a5f2df39501a5d969ead03b56338", "hash_mode": "utf8_lf"},
+    {"path": "tests/test_eia_grid_residual_moe_benchmark.py", "blob_sha1": "c977f53fbac42a70c3d7fa722ba08a3ef7399cd0", "hash_mode": "utf8_lf"},
+    {"path": "tests/test_eia_grid_wave_champion_benchmark.py", "blob_sha1": "8446ec239c6b206d37912d69676e16374a5ad624", "hash_mode": "utf8_lf"},
+    {"path": "tests/test_faa_sdr_10k_benchmark.py", "blob_sha1": "7e2225aaadcc15682d087fe41885234d8e7f9734", "hash_mode": "utf8_lf"},
+    {"path": "tests/test_mda_control_mapping_open_set_benchmark.py", "blob_sha1": "9f3fd0842777ce03439cf79a07e0b4caf017cf3a", "hash_mode": "utf8_lf"},
+    {"path": "tests/test_reviewer_dependency_lock.py", "blob_sha1": "7237c127a86279c930499d0d09e10c2f3dfc4191", "hash_mode": "utf8_lf"},
+    {"path": "tests/test_reviewer_reproducibility_capsule.py", "blob_sha1": "7609f082b46e93d26a7df7dc09865de82d727a11", "hash_mode": "utf8_lf"}
+  ],
+  "required_integration_paths": [
+    ".gitattributes",
+    ".github/workflows/reviewer-reproducibility.yml",
+    "codecheck.yml",
+    "code/ops/VERIFY_CODECHECK_INDEPENDENT_EXECUTION_RECEIPT.py",
+    "code/ops/VERIFY_CODECHECK_MAINLINE_INTEGRATION.py",
+    "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+    "config/codecheck_eia_mainline_integration_v1.json",
+    "config/codecheck_eia_release_candidate_v1.json",
+    "config/codecheck_independent_execution_receipt_template_v1.json",
+    "docs/CODECHECK_AUTHOR_REVIEW_CHECKLIST_2026-07-21.md",
+    "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+    "docs/CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md",
+    "tests/test_codecheck_independent_execution_receipt.py",
+    "tests/test_codecheck_eia_mainline_integration.py",
+    "tests/test_codecheck_eia_release_candidate.py",
+    "tests/test_codecheck_reviewer_runtime.py"
+  ],
+  "allowed_integration_drift_paths": [
+    ".gitattributes",
+    ".github/workflows/reviewer-reproducibility.yml",
+    ".gitignore",
+    "LICENSE",
+    "README.md",
+    "codecheck.yml",
+    "code/ops/VERIFY_CODECHECK_INDEPENDENT_EXECUTION_RECEIPT.py",
+    "code/ops/VERIFY_CODECHECK_MAINLINE_INTEGRATION.py",
+    "code/ops/VERIFY_CODECHECK_REVIEWER_RUNTIME.py",
+    "config/codecheck_eia_mainline_integration_v1.json",
+    "config/codecheck_eia_release_candidate_v1.json",
+    "config/codecheck_independent_execution_receipt_template_v1.json",
+    "docs/CODECHECK_AUTHOR_REVIEW_CHECKLIST_2026-07-21.md",
+    "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
+    "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+    "docs/CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md",
+    "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/container_rebuild_receipt.json",
+    "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+    "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/runtime_receipt.json",
+    "tests/test_codecheck_eia_mainline_integration.py",
+    "tests/test_codecheck_independent_execution_receipt.py",
+    "tests/test_codecheck_eia_release_candidate.py",
+    "tests/test_codecheck_reviewer_runtime.py"
+  ],
+  "manifest_outputs": [
+    "out/codecheck_eia/reviewer_reproducibility_receipt.json",
+    "out/codecheck_eia/reviewer_suite_sbom.cdx.json",
+    "out/codecheck_eia/logs/eia_wave.log",
+    "out/codecheck_eia/logs/eia_residual.log",
+    "out/codecheck_eia/logs/mda_open_set.log",
+    "out/codecheck_eia/logs/fixture_tests.log"
+  ],
+  "public_text_scan_paths": [
+    "CITATION.cff",
+    "LICENSE",
+    "README.md",
+    "codecheck.yml",
+    "docs/CODECHECK_AUTHOR_REVIEW_CHECKLIST_2026-07-21.md",
+    "docs/CODECHECK_COMMUNITY_REQUEST_DRAFT_2026-07-21.md",
+    "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+    "docs/CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md",
+    "config/codecheck_independent_execution_receipt_template_v1.json",
+    "docs/release/CODECHECK_EIA_IMMUTABLE_RELEASE_PLAN_2026-07-21.md",
+    "docs/preprint/BOUNDED_REPRODUCIBILITY_CAPSULE_PREPRINT_2026-07-21.md"
+  ],
+  "claim_state": {
+    "codecheck_request_opened": false,
+    "independent_execution_complete": false,
+    "certificate_issued": false,
+    "external_validation_complete": false,
+    "field_validation_complete": false,
+    "agency_acceptance_complete": false,
+    "performance_endorsement_complete": false,
+    "economic_validation_complete": false,
+    "valuation_validation_complete": false
+  },
+  "human_unlock_policy": "Author review, duplicate-action reconciliation, a collision-free production-register identifier, exact current label verification, and fresh action-time HumanUnlock are required before one production CODECHECK request. Independent execution and validation fields remain false until external evidence is received.",
+  "claim_boundary": "A passing integration check proves only byte identity of the listed computational core with the immutable target, presence and safety of the six-file manifest, and fail-closed claim state. It is not independent execution, a CODECHECK certificate, scientific validation, field validation, agency acceptance, performance endorsement, economic proof, or valuation evidence."
+}

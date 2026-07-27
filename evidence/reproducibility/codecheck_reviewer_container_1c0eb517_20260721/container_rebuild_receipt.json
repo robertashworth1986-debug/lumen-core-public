@@ -1,0 +1,254 @@
+{
+  "artifacts": [
+    {
+      "bytes": 11020,
+      "path": "docker_build_stderr.txt",
+      "sha256": "2256880d7bced9c31d96bc43d62693343170f18a5fa7ff61cf4d96b8fc5fadc9"
+    },
+    {
+      "bytes": 0,
+      "path": "docker_build_stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "path": "docker_run_stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 5825,
+      "path": "docker_run_stdout.txt",
+      "sha256": "521f91f8778904c218e608d1c99c46fa89422e8da8b86d726f877238382f5eab"
+    },
+    {
+      "bytes": 1576,
+      "path": "logs/eia_residual.log",
+      "sha256": "8acfa0e62d47bd4519302c3ccdee97a550ef61f103633ca17087f9ee441f3bd4"
+    },
+    {
+      "bytes": 0,
+      "path": "logs/eia_wave.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 113,
+      "path": "logs/fixture_tests.log",
+      "sha256": "f6a0468e6b1ddd90f249c03d0fc280dbe15250afad4b25cbf7ca14b041183c5e"
+    },
+    {
+      "bytes": 0,
+      "path": "logs/mda_open_set.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 27422,
+      "path": "reviewer_reproducibility_receipt.json",
+      "sha256": "3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d"
+    },
+    {
+      "bytes": 12883,
+      "path": "reviewer_suite_sbom.cdx.json",
+      "sha256": "18462432af0b60af0312a8c1a09ce688033fe4f4cf7198a4d74195db079bb14e"
+    },
+    {
+      "bytes": 3009,
+      "path": "runtime_receipt.json",
+      "sha256": "6908148d421a10f9592c7a9a5ccd4283cd66f3147b33b6381e27ddae9577ab8c"
+    }
+  ],
+  "build_returncode": 0,
+  "capsule_summary": {
+    "agency_certification_complete": false,
+    "artifact_hash_lock_complete": true,
+    "assertion_count": 31,
+    "assertion_pass_count": 31,
+    "authoritative_runtime_match": true,
+    "clean_runner_replay": true,
+    "cross_platform_artifact_hash_lock_complete": false,
+    "dependency_closure_exact_match": true,
+    "dependency_count": 8,
+    "dependency_lock_sha256": "e2f514c3c1c10a0278d4ef1147fee1cdd5b1126e5d34d8ee88bba1c4e1d14b18",
+    "dependency_version_match_count": 8,
+    "dependency_versions_exact_match": true,
+    "deterministic_environment_match": true,
+    "external_validation_complete": false,
+    "fixture_tests_executed": true,
+    "fixture_tests_passed": true,
+    "frozen_input_passed": true,
+    "locked_package_count": 18,
+    "relevant_source_clean": true,
+    "sbom_component_count": 18,
+    "source_state_mode": "release_manifest",
+    "source_state_verified": true,
+    "suite_count": 3,
+    "suite_pass_count": 3
+  },
+  "checks": {
+    "bundle_verified": true,
+    "capsule_assertions_31_of_31": true,
+    "capsule_external_validation_false": true,
+    "capsule_passed": true,
+    "capsule_suites_3_of_3": true,
+    "docker_build_passed": true,
+    "docker_run_passed": true,
+    "expected_outputs_present": true,
+    "image_id_observed": true,
+    "recipe_static_checks_passed": true,
+    "runtime_external_validation_false": true,
+    "runtime_independent_execution_false": true,
+    "runtime_passed": true
+  },
+  "claim_boundary": "A passing container-rebuild receipt proves only that an operator rebuilt the digest-pinned public recipe and reproduced the bounded capsule under the named isolation controls. It is not independent execution, a CODECHECK certificate, scientific validation, field validation, performance endorsement, agency acceptance, or valuation evidence.",
+  "command_templates": {
+    "build": [
+      "docker",
+      "build",
+      "--pull",
+      "--no-cache",
+      "--progress=plain",
+      "--platform",
+      "linux/amd64",
+      "--file",
+      "<SOURCE_DIR>/containers/codecheck-reviewer/Dockerfile",
+      "--tag",
+      "lumencore-codecheck-eia:1c0eb517-transfer",
+      "<SOURCE_DIR>"
+    ],
+    "run": [
+      "docker",
+      "run",
+      "--rm",
+      "--platform",
+      "linux/amd64",
+      "--network",
+      "none",
+      "--read-only",
+      "--cap-drop",
+      "ALL",
+      "--security-opt",
+      "no-new-privileges",
+      "--pids-limit",
+      "512",
+      "--memory",
+      "4g",
+      "--cpus",
+      "4",
+      "--tmpfs",
+      "/tmp:rw,nosuid,nodev,noexec,size=256m",
+      "--tmpfs",
+      "/work:rw,nosuid,nodev,exec,size=2g",
+      "--env",
+      "CODECHECK_SOURCE_COMMIT=<SOURCE_COMMIT>",
+      "--mount",
+      "type=bind,source=<SOURCE_DIR>,target=/input,readonly",
+      "--mount",
+      "type=bind,source=<OUTPUT_DIR>,target=/output",
+      "lumencore-codecheck-eia:1c0eb517-transfer"
+    ]
+  },
+  "execution_controls": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "cpus": "4",
+    "input_mount": "/input",
+    "memory": "4g",
+    "network": "none",
+    "output_mount": "/output",
+    "pids_limit": 512,
+    "read_only": true,
+    "security_opt": [
+      "no-new-privileges"
+    ],
+    "tmpfs": [
+      "/tmp:rw,nosuid,nodev,noexec,size=256m",
+      "/work:rw,nosuid,nodev,exec,size=2g"
+    ]
+  },
+  "expected_outputs": {
+    "logs/eia_residual.log": true,
+    "logs/eia_wave.log": true,
+    "logs/fixture_tests.log": true,
+    "logs/mda_open_set.log": true,
+    "reviewer_reproducibility_receipt.json": true,
+    "reviewer_suite_sbom.cdx.json": true,
+    "runtime_receipt.json": true
+  },
+  "external_validation_complete": false,
+  "generated_utc": "2026-07-21T19:00:29.866240+00:00",
+  "human_unlock_policy": "Publishing a release, opening a CODECHECK request, transferring a packet, contacting a validator, certifying an assertion, or changing an external-validation field requires duplicate-action reconciliation and fresh action-time HumanUnlock.",
+  "image": {
+    "id": "sha256:d664acd915720042cfd209d9e17c6750657bce68b3509afb544f82a5d89929bd",
+    "tag": "lumencore-codecheck-eia:1c0eb517-transfer"
+  },
+  "independent_execution_complete": false,
+  "operator_controlled": true,
+  "passed": true,
+  "protocol_id": "LUMENCORE_CODECHECK_REVIEWER_CONTAINER_20260721",
+  "receipt_payload_sha256": "7746bea77de62e4314e53129e12450a01cb92e3218ce52df9ee112d884c661a7",
+  "recipe": {
+    "base_image": {
+      "index_digest": "sha256:d94c97dd9cacf183d0a6fd12a8e87b526e9e928307674ae9c94139139c0c6eae",
+      "platform": "linux/amd64",
+      "platform_manifest_digest": "sha256:3612b800eaae8513e7dca54f21d2e4eda48eda57426f3746a78677f342ac7ee9",
+      "repository": "mcr.microsoft.com/devcontainers/base",
+      "tag": "ubuntu-24.04"
+    },
+    "dockerfile_sha256": "746307528a39cfe7d8cfe6891d6926fce64ed2b812f9a5202a368755b58561e8",
+    "orchestrator_sha256": "ee0f987deba96e25f70db58e9097cb53ce82c83d0b312493aef98dc7fbef7546",
+    "python": "3.11.9",
+    "runner_sha256": "0e001267b4932fc973db0fd72d9a1080e2d299859b25ca89aa2eb58f091986fd",
+    "runtime_config_sha256": "23a850097ef9da3cf112920595dddcea3afb22d3d4b9f5d70d37b099c7da359e",
+    "uv": {
+      "archive_sha256": "e490a6464492183c5d4534a5527fb4440f7f2bb2f228162ad7e4afe076dc0224",
+      "archive_url": "https://github.com/astral-sh/uv/releases/download/0.11.28/uv-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "0.11.28"
+    }
+  },
+  "run_returncode": 0,
+  "runtime_summary": {
+    "checks": {
+      "deterministic_environment": true,
+      "libc_name": true,
+      "libc_version": true,
+      "machine": true,
+      "os_release_id": true,
+      "os_release_version_id": true,
+      "python": true,
+      "requirements_lock_present": true,
+      "requirements_lock_sha256": true,
+      "system": true
+    },
+    "observed": {
+      "environment": {
+        "MKL_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "4",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTHONHASHSEED": "0",
+        "TZ": "UTC"
+      },
+      "libc": {
+        "name": "glibc",
+        "version": "2.39"
+      },
+      "machine": "x86_64",
+      "os_release": {
+        "id": "ubuntu",
+        "version_id": "24.04"
+      },
+      "python": "3.11.9",
+      "system": "Linux"
+    },
+    "status": "AUTHORITATIVE_RUNTIME_PASS"
+  },
+  "schema": "codecheck_reviewer_container_run_receipt.v1",
+  "source_bundle": {
+    "bundle_input_count": 44,
+    "entry_count": 46,
+    "release_manifest_sha256": "f82df9a5dff3b12fa38b56331577cd2379d611a5943c778197369afbb6728eac",
+    "sha256": "8d1e71100945d39f54849c80d8f9331c3aa6ede3884026bef44b0ef66539eb89",
+    "source_commit": "1c0eb51754beffac6f4df484914e35efc21c253f",
+    "source_commit_utc": "2026-07-21T18:12:34Z"
+  },
+  "status": "OPERATOR_CONTAINER_REBUILD_PASS"
+}
