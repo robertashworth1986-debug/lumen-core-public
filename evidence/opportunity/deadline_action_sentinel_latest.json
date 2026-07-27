@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.deadline_action_sentinel.v1",
-  "evaluated_utc": "2026-07-27T19:35:30Z",
+  "evaluated_utc": "2026-07-27T20:08:01Z",
   "posture": "HUMAN_ACTION_REQUIRED_FAIL_CLOSED",
   "controls": {
     "read_only_builder": true,
@@ -76,8 +76,8 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": false,
-        "seconds_until_deadline": 264270,
-        "hours_until_deadline": 73.41
+        "seconds_until_deadline": 262319,
+        "hours_until_deadline": 72.87
       }
     },
     {
