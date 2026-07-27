@@ -1,0 +1,56 @@
+name: Outreach Response Template Registry Gate
+
+on:
+  pull_request:
+    paths:
+      - "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
+      - "config/outreach_claim_evidence_receipt_template_v1.json"
+      - "config/outreach_response_templates_v1.json"
+      - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
+      - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md"
+      - "tests/test_outreach_response_template_registry.py"
+      - ".github/workflows/outreach-response-template-registry.yml"
+  push:
+    branches: [main]
+    paths:
+      - "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
+      - "config/outreach_claim_evidence_receipt_template_v1.json"
+      - "config/outreach_response_templates_v1.json"
+      - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
+      - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md"
+      - "tests/test_outreach_response_template_registry.py"
+      - ".github/workflows/outreach-response-template-registry.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: outreach-response-template-registry-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install focused test dependency
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Compile builder and tests
+        run: >-
+          python -m py_compile
+          code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py
+          tests/test_outreach_response_template_registry.py
+      - name: Validate registry without writes
+        run: python code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py --check
+      - name: Verify generated artifacts are current
+        run: |
+          python code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py
+          git diff --exit-code --
+      - name: Run fail-closed registry tests
+        run: >-
+          python -m pytest
+          tests/test_outreach_response_template_registry.py
+          -q
