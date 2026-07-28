@@ -1,6 +1,6 @@
 # LumenCore Engine Commercialization Audit
 
-Generated at: `2026-07-28T02:45:00+00:00`
+Generated at: `2026-07-28T02:57:29+00:00`
 
 ## Decision
 
@@ -14,6 +14,8 @@ This audit separates implementation evidence from what can honestly be offered t
 - Concept-only lanes: `2`
 - Design-partner-ready lanes: `4`
 - Subscription-ready lanes: `0`
+- Distinct supplemental candidates after deduplication: `4`
+- Named candidate systems after deduplication: `19`
 
 No engine is labeled subscription-ready until tenant isolation, authentication, billing, support, data-rights, deployment health, and buyer acceptance are evidenced.
 
@@ -24,6 +26,28 @@ No engine is labeled subscription-ready until tenant isolation, authentication, 
 3. LumaCore Orchestrator: sell governed workflow integration after public gateway health is restored.
 4. LumaScout: sell a private forward-tracked discovery sprint after data-rights review.
 5. Keep trading, sports, hardware, XR, identity, energy, and world-model lanes in research or grant mode until their stated gates pass.
+
+## Supplemental Drive Discovery
+
+A targeted read-only scan covered project-like C-drive roots, non-sensitive iCloud folders, origin/main, and selected tested branches. Credentials, account data, personal identifiers, patent-sensitive contents, virtual environments, and bulk archives were excluded.
+
+The scan found four distinct additions, but they are not four finished products: one is in `origin/main`, two are tested branch-only candidates, and one is a private synthetic prototype.
+Names that are older lineages, specializations, or supporting documents stay mapped into the existing 15 lanes instead of inflating the portfolio.
+
+| Candidate | Evidence scope | Disposition | Maps to | Verification |
+|---|---|---|---|---|
+| HarborSentinel | `origin_main` | `add_to_portfolio` | `new candidate` | 10 focused tests passed on origin/main-derived audit worktree; current evidence is deterministic synthetic validation only. |
+| ProofLock Console | `tested_open_pr` | `branch_candidate` | `new candidate` | PR 36 head 239cb172 passed 21 focused tests; the console is not in origin/main. |
+| LumaJarvis Voice Context Console | `tested_branch_only` | `branch_candidate` | `new candidate` | Commit a97ffbdd lineage passed 3 focused tests; the implementation is not in origin/main. |
+| LockItDown256 Media Coherence Optimizer | `private_local_prototype` | `private_prototype` | `new candidate` | The selected Python source compiles, but it uses synthetic priors and has no located focused tests or user-outcome evidence. |
+| LumaSkin XR Research Platform | `tested_branch_only` | `map_to_existing` | `luma_xr_command_room` | Commit c1d65b50 lineage passed 33 focused tests; it remains a branch-only fail-closed research protocol. |
+| LumaQ Command System | `origin_main` | `map_to_existing` | `lumacore_orchestrator` | Origin/main contains builder and execution-pack scripts, but no focused LumaQ tests were located. |
+| EchoLock / EdgeLock / HyperCore lineage | `private_local_legacy` | `map_to_existing` | `lumen_infrastructure_sentinel` | Selected EchoLock sources compile, but the roots are marked legacy and the scoring/ROI examples are simulation-bound. |
+| LumaQuantLab / LumenFinanceLab lineage | `private_local_research` | `map_to_existing` | `lumatrader` | Selected sources compile; the roots contain public-data research pipelines and multiple files not present byte-for-byte in origin/main. |
+| WhiteHole / WhiteHoleLab lineage | `private_local_mixed_vault` | `map_to_existing` | `lumatrader` | Selected Kraken research and evidence scripts compile; the vault mixes lineage, duplicated artifacts, simulation, and operations scaffolds. |
+| LumenOrchestrator lineage | `private_local_scripts` | `map_to_existing` | `lumacore_orchestrator` | The root contains PowerShell hashing, web-probe, and delta scripts but no located focused tests. |
+| iCloud pilot, EIA, and world-model material | `icloud_supporting_material` | `supporting_material_only` | `multiple_existing_lanes` | The non-sensitive scan found mostly briefs, reports, text notes, archived evidence, and an older LumaTrader copy rather than additional tested engines. |
+| LumenMacro / NovaCore archive roots | `private_local_archive` | `archive_only` | `world_model_engine` | LumenMacro exposed artifacts without located source; NovaCore contained no project files outside a virtual-environment directory. |
 
 ## Portfolio Matrix
 
