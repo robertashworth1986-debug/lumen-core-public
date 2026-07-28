@@ -229,7 +229,7 @@
       "bytes": 2325,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json",
-      "sha256": "283cfa3648881c91a0217c53660ceb6899bfc09f1f848f0b18e0afef20b3b868"
+      "sha256": "47bfd746821eaf6671bd56583ce4a3c0cfa73759f4e788df34e7fb9bdc2beb80"
     },
     {
       "bytes": 1372,
@@ -238,16 +238,16 @@
       "sha256": "b2214c1386a154a12d798b9a6e95f4a3a79d4e90250133061afd20c0fb501e39"
     },
     {
-      "bytes": 9474,
-      "hash_mode": "BINARY_RAW",
+      "bytes": 9168,
+      "hash_mode": "TEXT_UTF8_LF",
       "path": "LamaScout/config/api_registry.yaml",
-      "sha256": "d2bbd8b87b7248f6437793be3f3756096e6c6d7223935595f18e2f781f971440"
+      "sha256": "1ca8ab3982f7019c25682550d8f617e25788d875f2a8a5ff54fe314fa8e11896"
     },
     {
-      "bytes": 17469,
+      "bytes": 17645,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py",
-      "sha256": "5359438d8b63e3139f72874724fbff646064675ec6270fd9896c75312b926145"
+      "sha256": "4ffa85df7ab6ae6e40fbdf089419bb1879c34cbbb84878d6aa9be5e34a0a66a7"
     }
   ],
   "summary": {

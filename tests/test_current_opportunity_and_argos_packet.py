@@ -823,16 +823,22 @@ def test_argos_conformance_fails_on_unauthorized_partner_injection(
 
 def test_argos_text_custody_is_stable_across_line_endings(tmp_path):
     builder = load_argos_conformance_builder()
-    lf = tmp_path / "lf.json"
-    crlf = tmp_path / "crlf.json"
-    lf.write_bytes(b'{\n  "status": "BLOCKED"\n}\n')
-    crlf.write_bytes(b'{\r\n  "status": "BLOCKED"\r\n}\r\n')
+    for suffix, content in (
+        (".json", b'{\n  "status": "BLOCKED"\n}\n'),
+        (".yaml", b"status: BLOCKED\n"),
+    ):
+        lf = tmp_path / f"lf{suffix}"
+        crlf = tmp_path / f"crlf{suffix}"
+        lf.write_bytes(content)
+        crlf.write_bytes(content.replace(b"\n", b"\r\n"))
 
-    assert builder.custody_hash_mode(lf) == "TEXT_UTF8_LF"
-    assert builder.custody_bytes(lf) == builder.custody_bytes(crlf)
-    assert hashlib.sha256(builder.custody_bytes(lf)).hexdigest() == hashlib.sha256(
-        builder.custody_bytes(crlf)
-    ).hexdigest()
+        assert builder.custody_hash_mode(lf) == "TEXT_UTF8_LF"
+        assert builder.custody_bytes(lf) == builder.custody_bytes(crlf)
+        assert hashlib.sha256(
+            builder.custody_bytes(lf)
+        ).hexdigest() == hashlib.sha256(
+            builder.custody_bytes(crlf)
+        ).hexdigest()
 
 
 def test_argos_security_receipt_requires_exact_head_blob_set():

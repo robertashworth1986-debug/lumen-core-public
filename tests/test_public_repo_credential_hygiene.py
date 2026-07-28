@@ -152,6 +152,16 @@ def test_scanner_reports_field_metadata_without_returning_values():
     assert scan["env_references"] == ["SPOTIFY_CLIENT_ID"]
 
 
+def test_target_hash_is_stable_across_line_endings(tmp_path):
+    module = load_verifier()
+    lf = tmp_path / "registry-lf.yaml"
+    crlf = tmp_path / "registry-crlf.yaml"
+    lf.write_bytes(b"api_key: ${YOUTUBE_API_KEY}\n")
+    crlf.write_bytes(b"api_key: ${YOUTUBE_API_KEY}\r\n")
+
+    assert module.file_sha256(lf) == module.file_sha256(crlf)
+
+
 def test_security_verifier_cli_is_current_and_redacted():
     result = subprocess.run(
         [sys.executable, str(VERIFIER), "--check"],

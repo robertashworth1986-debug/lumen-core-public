@@ -74,7 +74,7 @@ FORBIDDEN_PROMOTION_PHRASES = (
     "guaranteed savings",
     "full-prime ready",
 )
-TEXT_CUSTODY_SUFFIXES = {".json", ".md", ".py"}
+TEXT_CUSTODY_SUFFIXES = {".json", ".md", ".py", ".yaml", ".yml"}
 
 
 def sha256(path: Path) -> str:
@@ -322,7 +322,9 @@ def build_payload(as_of_utc: str) -> dict:
         and security_state.get("target_path")
         == PUBLIC_CREDENTIAL_CONFIG.relative_to(ROOT).as_posix()
         and security_state.get("target_sha256")
-        == sha256(PUBLIC_CREDENTIAL_CONFIG)
+        == hashlib.sha256(
+            custody_bytes(PUBLIC_CREDENTIAL_CONFIG)
+        ).hexdigest()
         and security_state["current_file"]["placeholder_only"] is True
         and security_state["current_file"]["non_placeholder_value_count"] == 0
         and security_state["current_file"][
