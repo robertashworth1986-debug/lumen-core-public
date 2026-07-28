@@ -1,0 +1,1075 @@
+{
+  "schema": "lumencore_engine_commercialization_audit_v1",
+  "generated_at_utc": "2026-07-28T02:45:00+00:00",
+  "source_registry": "config/lumencore_engine_commercialization_v1.json",
+  "source_note": "The 15 names originated in a founder inventory email. This registry treats that email as a hypothesis and uses repository paths, not the email, as implementation evidence.",
+  "boundaries": [
+    "A present file is not proof of production readiness, customer adoption, external validation, or economic value.",
+    "A local test is evidence of bounded software behavior only.",
+    "Trading and sports lanes remain research and paper-only until prospective, after-cost evidence and applicable legal controls pass.",
+    "Hardware, XR, identity, energy, and smart-city claims remain conceptual or simulation-bound until independent domain validation exists.",
+    "Final government certifications, signatures, prices, uploads, and submissions remain human-controlled."
+  ],
+  "summary": {
+    "engine_count": 15,
+    "maturity_counts": {
+      "component_prototype": 2,
+      "concept_only": 2,
+      "evidence_backed_candidate": 2,
+      "runnable_candidate": 9
+    },
+    "commercial_posture_counts": {
+      "concept_only": 2,
+      "design_partner_ready": 4,
+      "research_only": 9
+    },
+    "design_partner_ready_ids": [
+      "lumengov_grant_factory",
+      "lumacore_orchestrator",
+      "lumascout",
+      "lumen_infrastructure_sentinel"
+    ],
+    "subscription_ready_count": 0,
+    "subscription_ready_reason": "No engine is labeled subscription-ready until tenant isolation, authentication, billing, support, data-rights, deployment health, and buyer acceptance are evidenced."
+  },
+  "engines": [
+    {
+      "id": "lumengov_grant_factory",
+      "name": "LumenGov Grant Factory",
+      "safe_description": "Opportunity qualification, evidence assembly, conformance checks, and human-controlled submission preflight.",
+      "observed_maturity": "evidence_backed_candidate",
+      "commercial_posture": "design_partner_ready",
+      "evidence_classes_present": 7,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": true,
+        "sample": true,
+        "documentation": true,
+        "artifact": true,
+        "public_surface": true
+      },
+      "missing_paths": [],
+      "payer": "Startups, research teams, grant consultants, and small government contractors",
+      "bounded_offer": "A 30-day design-partner pilot that monitors opportunities and prepares reviewable submission packets without autonomous certification or submission.",
+      "revenue_route": "Managed pilot, then organization subscription with seats, monitoring, evidence storage, and optional preflight support.",
+      "contract_or_grant_route": "Small-business workflow modernization contract or innovation-management grant.",
+      "acceptance_gate": "Against the buyer's current workflow, reduce verified preparation latency or conformance defects while preserving source and approval controls.",
+      "claim_boundary": "No guaranteed eligibility, submission, award, savings, or portal authority.",
+      "next_build": "Package one tenant-isolated pilot with buyer-owned baselines, official-source freshness checks, and exportable receipts.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/grant_submission_kit.py",
+            "exists": true,
+            "bytes": 28768,
+            "sha256": "547554f9d26415cb5df492cb9a751e85ba4384e0b559702607d45eb14f85a543"
+          },
+          {
+            "path": "code/grant_application_factory.py",
+            "exists": true,
+            "bytes": 100139,
+            "sha256": "db149bdde033985e770fdbcac4def66845afc8c4bda26833b59ba423bc3e2a66"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/grant_submission_kit.py",
+            "exists": true,
+            "bytes": 28768,
+            "sha256": "547554f9d26415cb5df492cb9a751e85ba4384e0b559702607d45eb14f85a543"
+          }
+        ],
+        "test": [
+          {
+            "path": "tests/test_grant_submission_readiness_audit.py",
+            "exists": true,
+            "bytes": 2782,
+            "sha256": "e0eefe0247a4ec0883eb276e0710f12d67a88c83f14fa6ed45662b5662ff5d83"
+          },
+          {
+            "path": "tests/test_grant_dashboard_status_feed.py",
+            "exists": true,
+            "bytes": 4212,
+            "sha256": "b6b3bf63ffd89183853e5035be2e2b557f1a0da5a41322ccd05ecad34ffa1ac1"
+          }
+        ],
+        "sample": [
+          {
+            "path": "data/grant_catalog.json",
+            "exists": true,
+            "bytes": 11649,
+            "sha256": "b5208ba125fc7cd01571966b301c406ca3046cdb559ac89864cc50c015b5a498"
+          }
+        ],
+        "documentation": [
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "bytes": 4065,
+            "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+          }
+        ],
+        "artifact": [
+          {
+            "path": "dashboard/data/grant_readiness_status.json",
+            "exists": true,
+            "bytes": 16948,
+            "sha256": "6af28e80f31784b79f5e81d11961cc7ceac8e2956ca9645cfb33f06c0c2d7a12"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "dashboard/grants.html",
+            "exists": true,
+            "bytes": 85902,
+            "sha256": "ee8c207fb00a9dafde2fcc96c330331ec05a1cf9fe47e26d06f044ede5a07e5f"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lumacore_orchestrator",
+      "name": "LumaCore Orchestrator",
+      "safe_description": "Routing, sequencing, health, and evidence-pack assembly across bounded subsystems.",
+      "observed_maturity": "runnable_candidate",
+      "commercial_posture": "design_partner_ready",
+      "evidence_classes_present": 6,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": false,
+        "sample": true,
+        "documentation": true,
+        "artifact": true,
+        "public_surface": true
+      },
+      "missing_paths": [],
+      "payer": "Internal operations first, then enterprise evidence and workflow teams",
+      "bounded_offer": "A private workflow-orchestration pilot with fail-closed approvals and replayable receipts.",
+      "revenue_route": "Implementation engagement followed by an enterprise orchestration and evidence-retention license.",
+      "contract_or_grant_route": "Workflow modernization, trustworthy-AI, or evidence-governance subcontract.",
+      "acceptance_gate": "Complete a declared workflow with fewer verified defects or less preparation time while preserving every approval and abstention rule.",
+      "claim_boundary": "No autonomous legal, procurement, financial, trading, or safety-critical authority.",
+      "next_build": "Restore public gateway health, add tenant isolation, and expose one stable governed-workflow API.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
+            "exists": true,
+            "bytes": 31983,
+            "sha256": "7ee79f11105f45962647ff8232c49356b2766234b32c80c8ea9782f2a8f8ff9f"
+          },
+          {
+            "path": "code/run_universal_meta_orchestrator.py",
+            "exists": true,
+            "bytes": 26417,
+            "sha256": "6a83dd366a6f90d7ee436d76a14e0fbb1859c7a70acc9f1529a6c7a4843b7d70"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
+            "exists": true,
+            "bytes": 31983,
+            "sha256": "7ee79f11105f45962647ff8232c49356b2766234b32c80c8ea9782f2a8f8ff9f"
+          },
+          {
+            "path": "code/run_universal_meta_orchestrator.py",
+            "exists": true,
+            "bytes": 26417,
+            "sha256": "6a83dd366a6f90d7ee436d76a14e0fbb1859c7a70acc9f1529a6c7a4843b7d70"
+          }
+        ],
+        "test": [],
+        "sample": [
+          {
+            "path": "config/ecosystem_engine_config.json",
+            "exists": true,
+            "bytes": 3860,
+            "sha256": "b47273fd83eef3c55be099eeab09e19e5a75e337ce32e5af3b5d480fb96b4fc0"
+          }
+        ],
+        "documentation": [
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "bytes": 4065,
+            "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+          }
+        ],
+        "artifact": [
+          {
+            "path": "truth_orchestrator_status.json",
+            "exists": true,
+            "bytes": 5043,
+            "sha256": "597c61ea5b9f1e6d6513476b369c9f4c6125dc3cc305e6a697756b66aaab934f"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "dashboard/mission_control.html",
+            "exists": true,
+            "bytes": 134140,
+            "sha256": "602a0a7c38110395284fedba247a5065a050477864888c112611129dc68f6703"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lumascout",
+      "name": "LumaScout",
+      "safe_description": "Source-receipted artist and creator discovery shortlists with forward outcome tracking.",
+      "observed_maturity": "runnable_candidate",
+      "commercial_posture": "design_partner_ready",
+      "evidence_classes_present": 5,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": false,
+        "sample": true,
+        "documentation": true,
+        "artifact": false,
+        "public_surface": true
+      },
+      "missing_paths": [],
+      "payer": "Labels, artist-management teams, agencies, and creator-economy research groups",
+      "bounded_offer": "A private discovery sprint that produces a pre-registered shortlist and tracks forward outcomes against a transparent popularity baseline.",
+      "revenue_route": "Paid shortlist sprint followed by a team watchlist and alert subscription.",
+      "contract_or_grant_route": "Creative-industry analytics pilot or data-rights-compliant research partnership.",
+      "acceptance_gate": "Forward shortlist outcomes improve on a declared popularity baseline using licensed or permitted data.",
+      "claim_boundary": "No hit prediction, label adoption, or undocumented cross-platform data-rights claim.",
+      "next_build": "Add deterministic fixture tests, source-rights metadata, and a forward-outcome receipt.",
+      "evidence": {
+        "source": [
+          {
+            "path": "LamaScout/src/pipeline.py",
+            "exists": true,
+            "bytes": 3252,
+            "sha256": "edc7f3a357bad2d78f2106df35f5a0ac30c9b86937115547bea58ab87e1de0a4"
+          },
+          {
+            "path": "LamaScout/src/scoring.py",
+            "exists": true,
+            "bytes": 20108,
+            "sha256": "b6947bbcef9a3d89f7d4e9e155db811c8cf3960111df48d52011c5179aa39e2e"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "LamaScout/src/artist_scout_engine.py",
+            "exists": true,
+            "bytes": 161,
+            "sha256": "1c581551297746feef853fb38cbaeeb4133c5b18a3d29bf90cb64eb53f7ea9f3"
+          }
+        ],
+        "test": [],
+        "sample": [
+          {
+            "path": "LamaScout/config/artist_scout_config.yaml",
+            "exists": true,
+            "bytes": 1987,
+            "sha256": "358d0e3888318da22d3c957a3c4e3cdf9e9879c460b682a9acba4ec96b168e31"
+          }
+        ],
+        "documentation": [
+          {
+            "path": "LamaScout/README.md",
+            "exists": true,
+            "bytes": 6484,
+            "sha256": "2d2455b64a1da6fcea25ef34715faa4420246133230930b6fe935e766c588ce3"
+          },
+          {
+            "path": "LamaScout/ARCHITECTURE.md",
+            "exists": true,
+            "bytes": 3606,
+            "sha256": "c10fd788c6c6c598678c4cff5827cfdc32cbdf4d1f4cdfda859485fc1eeb0cb1"
+          }
+        ],
+        "artifact": [],
+        "public_surface": [
+          {
+            "path": "dashboard/lumascout.html",
+            "exists": true,
+            "bytes": 377,
+            "sha256": "bbd4a8fdb1201d5f025a48f77f2e02dd2cfb15a506818df47c05884ca7d7cb54"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lumen_infrastructure_sentinel",
+      "name": "Lumen Infrastructure Sentinel",
+      "safe_description": "Infrastructure baseline, drift, anomaly, and evidence-packet tooling.",
+      "observed_maturity": "runnable_candidate",
+      "commercial_posture": "design_partner_ready",
+      "evidence_classes_present": 5,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": false,
+        "sample": false,
+        "documentation": true,
+        "artifact": true,
+        "public_surface": true
+      },
+      "missing_paths": [],
+      "payer": "Data-center operators, utilities, hospital IT, telecom teams, and managed-service providers",
+      "bounded_offer": "A buyer-authorized baseline and drift audit on one bounded system with a pre-agreed alert and evidence contract.",
+      "revenue_route": "Fixed-price assessment followed by a monitoring and evidence-retention subscription.",
+      "contract_or_grant_route": "Resilience pilot, infrastructure-monitoring subcontract, or energy reliability research award.",
+      "acceptance_gate": "Detect declared injected or historical failure modes at an agreed false-alert rate using buyer-authorized data.",
+      "claim_boundary": "No outage prevention, realized savings, field validation, or safety-control claim.",
+      "next_build": "Add an injection-test harness, operator acceptance receipt, and deployment-independent health contract.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/institutional_harmonic_infrastructure.py",
+            "exists": true,
+            "bytes": 10128,
+            "sha256": "dc02fc412f9cca503e50265ab75a17f8dfe4fe0fc83c99036202d48110341207"
+          },
+          {
+            "path": "code/execution/infra_constraint_monitor.py",
+            "exists": true,
+            "bytes": 65433,
+            "sha256": "d69a80d205238a0693e267fa285d2e1a7b57e0b039881b6348480f396a46081f"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/institutional_harmonic_infrastructure.py",
+            "exists": true,
+            "bytes": 10128,
+            "sha256": "dc02fc412f9cca503e50265ab75a17f8dfe4fe0fc83c99036202d48110341207"
+          }
+        ],
+        "test": [],
+        "sample": [],
+        "documentation": [
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "bytes": 4065,
+            "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+          }
+        ],
+        "artifact": [
+          {
+            "path": "institutional_harmonic_infrastructure_proof.json",
+            "exists": true,
+            "bytes": 2016,
+            "sha256": "72b009f39ec58c032966d71fcfeadb0974b03b7c9b84a097d7b88888df4bf589"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "code/execution/build_infra_audit_dashboard.py",
+            "exists": true,
+            "bytes": 47081,
+            "sha256": "1d287304fb45d3742a5c4f932440274f7428e1d5f5ddfd7bafea0f14b49c9097"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lumatrader",
+      "name": "LumaTrader",
+      "safe_description": "Paper-only market research, model comparison, runtime controls, and replayable decision evidence.",
+      "observed_maturity": "evidence_backed_candidate",
+      "commercial_posture": "research_only",
+      "evidence_classes_present": 7,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": true,
+        "sample": true,
+        "documentation": true,
+        "artifact": true,
+        "public_surface": true
+      },
+      "missing_paths": [],
+      "payer": "Quant research teams, fintech labs, and model-governance groups",
+      "bounded_offer": "A fixed-scope paper/replay evaluation with declared baselines, costs, abstention rules, and a reproducible evidence packet.",
+      "revenue_route": "Paid research engagement first; subscription only after prospective after-cost evidence and operational controls pass.",
+      "contract_or_grant_route": "Research subcontract, model-governance pilot, or non-dilutive validation award.",
+      "acceptance_gate": "Prospective paper protocol beats a named baseline after fees and slippage without breaching risk or reconciliation gates.",
+      "claim_boundary": "No alpha, profitability, institutional readiness, or live-capital claim.",
+      "next_build": "Publish a buyer-safe paper/replay API contract and a clean prospective scorecard.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/execution/execution_orchestrator.py",
+            "exists": true,
+            "bytes": 9026,
+            "sha256": "21ebaf9623d9b12e4b2d6db1a7c55c304358fcb7b4353c412c4093a4f9bb436e"
+          },
+          {
+            "path": "code/institutional_harmonic_suite.py",
+            "exists": true,
+            "bytes": 28333,
+            "sha256": "843cd423e4c83d7989684f1cc7574554691693909cb5442ab52c3c82e7de006a"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/execution/execution_orchestrator.py",
+            "exists": true,
+            "bytes": 9026,
+            "sha256": "21ebaf9623d9b12e4b2d6db1a7c55c304358fcb7b4353c412c4093a4f9bb436e"
+          }
+        ],
+        "test": [
+          {
+            "path": "tests/test_order_safety_alpaca_paper_boundary.py",
+            "exists": true,
+            "bytes": 5247,
+            "sha256": "052d548b43bc14626706d8c2b556205d4fbb94352f176ca491a3e96158f5d2f2"
+          }
+        ],
+        "sample": [
+          {
+            "path": "config/accounts/KRAKEN_PRIMARY/runtime_control.json",
+            "exists": true,
+            "bytes": 489,
+            "sha256": "341775322d161c6f7fe96dce4ecfe264c6694d60a1df1c19c1f54b32fedf0e39"
+          }
+        ],
+        "documentation": [
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "bytes": 4065,
+            "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+          }
+        ],
+        "artifact": [
+          {
+            "path": "institutional_summary.json",
+            "exists": true,
+            "bytes": 563,
+            "sha256": "b2f00d4b4f9042daf03bbfb04de08d3f2434ef5bfb7a2f6dcf84fe8ebc1d6936"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "dashboard/kraken_execution_dashboard.html",
+            "exists": true,
+            "bytes": 72608,
+            "sha256": "74ea063a6a112846eef09cd36c2049ddf20d5c5670d495a04f0d9416db85b661"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kraken_sentinel_lumasniper",
+      "name": "Kraken Sentinel / LumaSniper",
+      "safe_description": "Crypto-market telemetry, guarded signal research, and paper-execution controls.",
+      "observed_maturity": "runnable_candidate",
+      "commercial_posture": "research_only",
+      "evidence_classes_present": 6,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": false,
+        "sample": true,
+        "documentation": true,
+        "artifact": true,
+        "public_surface": true
+      },
+      "missing_paths": [],
+      "payer": "Digital-asset research teams and boutique quantitative labs",
+      "bounded_offer": "A private paper-trading instrumentation and reconciliation sprint.",
+      "revenue_route": "Research services first; no signal subscription before a prospective protocol passes.",
+      "contract_or_grant_route": "Fintech research subcontract or controlled-risk tooling pilot.",
+      "acceptance_gate": "Prospective after-fee paper results, deterministic kill controls, and complete ledger reconciliation.",
+      "claim_boundary": "No live trading authority, profit, return, or investment-advice claim.",
+      "next_build": "Add Kraken-specific tests, a read-only demo feed, and a signed paper-ledger verifier.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/kraken_execution.py",
+            "exists": true,
+            "bytes": 4935,
+            "sha256": "27c4f7799ed1da8dd46a06d9adf535ec350dc6cc829473b49d982caa2bbe25c5"
+          },
+          {
+            "path": "code/kraken_swing_hunter.py",
+            "exists": true,
+            "bytes": 2299,
+            "sha256": "d49e6a8b9bdbdb66e5e476799956f704049068f75c4ded49d39ee7b07e14554c"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/kraken_swing_hunter.py",
+            "exists": true,
+            "bytes": 2299,
+            "sha256": "d49e6a8b9bdbdb66e5e476799956f704049068f75c4ded49d39ee7b07e14554c"
+          }
+        ],
+        "test": [],
+        "sample": [
+          {
+            "path": "config/accounts/KRAKEN_PRIMARY/runtime_control.json",
+            "exists": true,
+            "bytes": 489,
+            "sha256": "341775322d161c6f7fe96dce4ecfe264c6694d60a1df1c19c1f54b32fedf0e39"
+          }
+        ],
+        "documentation": [
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "bytes": 4065,
+            "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+          }
+        ],
+        "artifact": [
+          {
+            "path": "runtime_env_hydration_proof.json",
+            "exists": true,
+            "bytes": 3136,
+            "sha256": "dd11711403dd2ffd3d45e62f83ea6c92c95e857940f9bf6eabf17aec31908430"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "dashboard/kraken_execution_dashboard.html",
+            "exists": true,
+            "bytes": 72608,
+            "sha256": "74ea063a6a112846eef09cd36c2049ddf20d5c5670d495a04f0d9416db85b661"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cyber_forensics_assist",
+      "name": "Cyber Forensics Assist",
+      "safe_description": "Prototype evidence-component scoring and investigation chronology support.",
+      "observed_maturity": "component_prototype",
+      "commercial_posture": "research_only",
+      "evidence_classes_present": 4,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": false,
+        "test": false,
+        "sample": true,
+        "documentation": false,
+        "artifact": true,
+        "public_surface": true
+      },
+      "missing_paths": [],
+      "payer": "Incident-response consultants, legal support teams, and internal security analysts",
+      "bounded_offer": "A synthetic-data workflow review for evidence organization and report consistency.",
+      "revenue_route": "Professional-services prototype before any software subscription.",
+      "contract_or_grant_route": "Cyber workflow research or digital-evidence tooling subcontract.",
+      "acceptance_gate": "On approved synthetic cases, improve reviewer agreement or chronology completeness without modifying source evidence.",
+      "claim_boundary": "No forensic conclusion, chain-of-custody certification, legal admissibility, or autonomous incident response.",
+      "next_build": "Separate the cold-case demo from cyber use, add immutable source references, tests, and expert review.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/cold_case_engine.py",
+            "exists": true,
+            "bytes": 6910,
+            "sha256": "cc71f0a931afbe01b617a130b706d25a3e686cdaae2121c5ea46f716e358ddc7"
+          }
+        ],
+        "entrypoint": [],
+        "test": [],
+        "sample": [
+          {
+            "path": "code/output/cold_case_summary.json",
+            "exists": true,
+            "bytes": 1154,
+            "sha256": "ad4ea4f09577dde153c933af22cddb7f881420bed3758c6dadd7abb120b02b72"
+          }
+        ],
+        "documentation": [],
+        "artifact": [
+          {
+            "path": "code/output/cold_case_summary.json",
+            "exists": true,
+            "bytes": 1154,
+            "sha256": "ad4ea4f09577dde153c933af22cddb7f881420bed3758c6dadd7abb120b02b72"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "code/build_cold_case_dashboard.py",
+            "exists": true,
+            "bytes": 7292,
+            "sha256": "0c7488c3cc4726de7014365c7e77bcf38d1173f76e874450446a4a931bb72759"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sports_harmonic_edge",
+      "name": "Sports Harmonic Edge",
+      "safe_description": "Sports-odds ingestion and research scoring under explicit uncertainty and paper-only controls.",
+      "observed_maturity": "runnable_candidate",
+      "commercial_posture": "research_only",
+      "evidence_classes_present": 4,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": false,
+        "sample": true,
+        "documentation": true,
+        "artifact": false,
+        "public_surface": false
+      },
+      "missing_paths": [],
+      "payer": "Sports media research desks and analytics teams",
+      "bounded_offer": "A historical and prospective research report comparing declared scoring methods to simple market baselines.",
+      "revenue_route": "Research report or analytics tooling license only after prospective evidence and legal review.",
+      "contract_or_grant_route": "Sports-data methods research or media analytics subcontract.",
+      "acceptance_gate": "Prospective calibration and ranking metrics beat declared simple baselines without hidden selection.",
+      "claim_boundary": "No betting advice, guaranteed edge, profit, or consumer wagering automation.",
+      "next_build": "Add licensed fixtures, calibration tests, a prospective lock, and a non-wagering demonstration.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/sports_odds_engine.py",
+            "exists": true,
+            "bytes": 21150,
+            "sha256": "5dd438f6ca5852882deeeb45590da3d07c54f15e1610587aae936836f9c7c32f"
+          },
+          {
+            "path": "code/sports_intelligence_layer.py",
+            "exists": true,
+            "bytes": 43162,
+            "sha256": "eeba728befaed1dd35dff0fd34ee07f87dccb098a33cae54ad1639192d4ae97e"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/sports_odds_engine.py",
+            "exists": true,
+            "bytes": 21150,
+            "sha256": "5dd438f6ca5852882deeeb45590da3d07c54f15e1610587aae936836f9c7c32f"
+          }
+        ],
+        "test": [],
+        "sample": [
+          {
+            "path": "config/ecosystem_engine_config.json",
+            "exists": true,
+            "bytes": 3860,
+            "sha256": "b47273fd83eef3c55be099eeab09e19e5a75e337ce32e5af3b5d480fb96b4fc0"
+          }
+        ],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "bytes": 4965,
+            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "energy_harmonization_engine",
+      "name": "Energy Harmonization Engine",
+      "safe_description": "Energy-data evidence pipeline and simulation research component.",
+      "observed_maturity": "runnable_candidate",
+      "commercial_posture": "research_only",
+      "evidence_classes_present": 3,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": false,
+        "sample": false,
+        "documentation": true,
+        "artifact": false,
+        "public_surface": false
+      },
+      "missing_paths": [],
+      "payer": "Utilities, facility operators, energy researchers, and government laboratories",
+      "bounded_offer": "A buyer-authorized forecast replay or evidence-quality assessment on one declared decision.",
+      "revenue_route": "Validation service first; monitoring subscription only after operator acceptance.",
+      "contract_or_grant_route": "DOE, EPRI, utility, or resilience research pilot.",
+      "acceptance_gate": "On operator-approved data, meet declared accuracy, calibration, timeliness, and economic-conversion rules against named baselines.",
+      "claim_boundary": "No nuclear control, field validation, outage savings, or universal harmonic superiority.",
+      "next_build": "Complete one prospective EIA settlement lane and one operator-defined replay.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/ops/run_sector_energy_evidence_pipeline.py",
+            "exists": true,
+            "bytes": 16774,
+            "sha256": "71f599e8251fb1cb4a9672558f4c8443436afcb6bac296ad4292d14916f63014"
+          },
+          {
+            "path": "code/institutional_harmonic_infrastructure.py",
+            "exists": true,
+            "bytes": 10128,
+            "sha256": "dc02fc412f9cca503e50265ab75a17f8dfe4fe0fc83c99036202d48110341207"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/ops/run_sector_energy_evidence_pipeline.py",
+            "exists": true,
+            "bytes": 16774,
+            "sha256": "71f599e8251fb1cb4a9672558f4c8443436afcb6bac296ad4292d14916f63014"
+          }
+        ],
+        "test": [],
+        "sample": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "bytes": 4965,
+            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "flowform_hardware_engine",
+      "name": "FlowForm Hardware Engine",
+      "safe_description": "Simulation and audit tooling for geometry-informed routing concepts.",
+      "observed_maturity": "runnable_candidate",
+      "commercial_posture": "research_only",
+      "evidence_classes_present": 3,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": false,
+        "sample": false,
+        "documentation": true,
+        "artifact": false,
+        "public_surface": false
+      },
+      "missing_paths": [],
+      "payer": "Future aerospace, robotics, EV, and electronics R&D teams",
+      "bounded_offer": "A simulation-only comparison against declared geometry and routing baselines.",
+      "revenue_route": "Research engagement or IP option; no hardware license before independent bench evidence.",
+      "contract_or_grant_route": "SBIR/STTR, lab collaboration, or OEM research subcontract.",
+      "acceptance_gate": "Pre-registered simulation and then independent bench tests beat named baselines on declared measures.",
+      "claim_boundary": "No physical thermal, electromagnetic, battery, structural, or manufacturing-performance claim.",
+      "next_build": "Freeze one geometry, comparator, metric set, mesh, solver settings, and independent bench plan.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/ops/flowform_phase_lock_audit.py",
+            "exists": true,
+            "bytes": 13748,
+            "sha256": "7c591e361b6b8a20aceadd382c910cd62727ccd8f4e113793dae435111dd8845"
+          },
+          {
+            "path": "code/ops/harmonic_flowform_impact_explainer.py",
+            "exists": true,
+            "bytes": 25586,
+            "sha256": "0b55e9462800453e170cc1044381e56c01ba3fcca4dd4b3bcf1feb3553f3f2e9"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/ops/flowform_phase_lock_audit.py",
+            "exists": true,
+            "bytes": 13748,
+            "sha256": "7c591e361b6b8a20aceadd382c910cd62727ccd8f4e113793dae435111dd8845"
+          }
+        ],
+        "test": [],
+        "sample": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "bytes": 4965,
+            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "luma_xr_command_room",
+      "name": "Luma XR Command Room",
+      "safe_description": "Prototype launch and interface assets for immersive system-state visualization.",
+      "observed_maturity": "runnable_candidate",
+      "commercial_posture": "research_only",
+      "evidence_classes_present": 3,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": false,
+        "sample": false,
+        "documentation": true,
+        "artifact": false,
+        "public_surface": false
+      },
+      "missing_paths": [
+        "dashboard/alpha_burst_lab_holo_3d.html"
+      ],
+      "payer": "Simulation labs, training teams, museums, and enterprise demonstration groups",
+      "bounded_offer": "A fixed-scope visualization prototype using non-sensitive sample telemetry.",
+      "revenue_route": "Custom implementation services, then an SDK license after usability validation.",
+      "contract_or_grant_route": "Human-factors, simulation, or training-interface grant and subcontract work.",
+      "acceptance_gate": "Users complete declared monitoring tasks with acceptable error, latency, and comfort measures.",
+      "claim_boundary": "No operational command authority, training efficacy, motion-sickness prevention, or safety certification.",
+      "next_build": "Restore the missing demo asset, add deterministic sample telemetry, and run usability tests.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/START_IMMERSIVE_STACK.ps1",
+            "exists": true,
+            "bytes": 643,
+            "sha256": "def0aabb0e2076e453481ab24c64c941549347bb602d5b9dc71bbde5dc06ece9"
+          },
+          {
+            "path": "code/unity_bridge/INSTALL_UNITY_BRIDGE.ps1",
+            "exists": true,
+            "bytes": 1417,
+            "sha256": "234249926d908037b0c8b1a543e2008ff5c171ed2c0898e5848a213a5d9285c9"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/START_IMMERSIVE_STACK.ps1",
+            "exists": true,
+            "bytes": 643,
+            "sha256": "def0aabb0e2076e453481ab24c64c941549347bb602d5b9dc71bbde5dc06ece9"
+          }
+        ],
+        "test": [],
+        "sample": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "bytes": 4965,
+            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+          }
+        ],
+        "artifact": [],
+        "public_surface": [
+          {
+            "path": "dashboard/alpha_burst_lab_holo_3d.html",
+            "exists": false,
+            "bytes": null,
+            "sha256": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "world_model_engine",
+      "name": "World Model Engine",
+      "safe_description": "Cross-sector data-normalization and scenario-analysis prototype.",
+      "observed_maturity": "runnable_candidate",
+      "commercial_posture": "research_only",
+      "evidence_classes_present": 3,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": false,
+        "sample": false,
+        "documentation": true,
+        "artifact": false,
+        "public_surface": false
+      },
+      "missing_paths": [],
+      "payer": "Enterprise strategy, research, and government analytics teams",
+      "bounded_offer": "A scoped scenario model using one buyer-owned decision, source set, baseline, and uncertainty register.",
+      "revenue_route": "Modeling services before any platform subscription.",
+      "contract_or_grant_route": "Cross-sector resilience, policy-modeling, or decision-support research contract.",
+      "acceptance_gate": "Reproduce declared scenarios and improve a named decision metric without hidden data or hindsight.",
+      "claim_boundary": "No complete world model, operational prediction, policy authority, or cross-sector superiority claim.",
+      "next_build": "Narrow to one decision problem and add source contracts, fixtures, tests, and calibrated uncertainty.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/execution/cross_sector_intel_pipeline.py",
+            "exists": true,
+            "bytes": 19264,
+            "sha256": "7b44dd1e2a46cfedcb25c62179ff57b963f8b837681d88b4df068387e3914ad0"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/execution/cross_sector_intel_pipeline.py",
+            "exists": true,
+            "bytes": 19264,
+            "sha256": "7b44dd1e2a46cfedcb25c62179ff57b963f8b837681d88b4df068387e3914ad0"
+          }
+        ],
+        "test": [],
+        "sample": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "bytes": 4965,
+            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "crowdfund_radar",
+      "name": "CrowdFund Radar",
+      "safe_description": "Campaign discovery and evidence-linked research queue tooling.",
+      "observed_maturity": "component_prototype",
+      "commercial_posture": "research_only",
+      "evidence_classes_present": 2,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": true,
+        "entrypoint": true,
+        "test": false,
+        "sample": false,
+        "documentation": false,
+        "artifact": false,
+        "public_surface": false
+      },
+      "missing_paths": [],
+      "payer": "Product scouts, trend-research teams, and angel-network analysts",
+      "bounded_offer": "A campaign-research sprint that ranks public opportunities with source links and explicit uncertainty.",
+      "revenue_route": "Analyst service first; watchlist subscription after source rights and forward validation are established.",
+      "contract_or_grant_route": "Innovation-scouting services or ecosystem research contract.",
+      "acceptance_gate": "A pre-registered ranking shows useful forward lift over a simple campaign-popularity baseline.",
+      "claim_boundary": "No investment recommendation, campaign quality guarantee, or return claim.",
+      "next_build": "Add fixtures, tests, source-terms metadata, a public-safe dashboard, and forward labels.",
+      "evidence": {
+        "source": [
+          {
+            "path": "code/crowdfunding_engine.py",
+            "exists": true,
+            "bytes": 22603,
+            "sha256": "9ab276070c643fe855abfcef401dcada19b9da2b19b96bb11955eebcc11564c1"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/crowdfunding_engine.py",
+            "exists": true,
+            "bytes": 22603,
+            "sha256": "9ab276070c643fe855abfcef401dcada19b9da2b19b96bb11955eebcc11564c1"
+          }
+        ],
+        "test": [],
+        "sample": [],
+        "documentation": [],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "echoform_identity_engine",
+      "name": "EchoForm Identity Engine",
+      "safe_description": "Identity-consistent digital-twin architecture concept.",
+      "observed_maturity": "concept_only",
+      "commercial_posture": "concept_only",
+      "evidence_classes_present": 1,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": false,
+        "entrypoint": false,
+        "test": false,
+        "sample": false,
+        "documentation": true,
+        "artifact": false,
+        "public_surface": false
+      },
+      "missing_paths": [],
+      "payer": "Future personal-AI, simulation, and identity-platform research partners",
+      "bounded_offer": "Architecture workshop only after privacy, consent, threat-model, and data-minimization requirements are defined.",
+      "revenue_route": "Research or architecture services; no subscription until a consent-first prototype exists.",
+      "contract_or_grant_route": "Privacy-preserving digital-twin research grant or university collaboration.",
+      "acceptance_gate": "A consent-first prototype passes privacy, deletion, provenance, and identity-consistency tests.",
+      "claim_boundary": "No biometric certification, medical inference, identity proof, or continuity-of-person claim.",
+      "next_build": "Create a non-biometric reference implementation with revocable consent and deletion tests.",
+      "evidence": {
+        "source": [],
+        "entrypoint": [],
+        "test": [],
+        "sample": [],
+        "documentation": [
+          {
+            "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
+            "exists": true,
+            "bytes": 5279,
+            "sha256": "c098a0830ec220edffd77dd4dbad8322b5d5085d5e609f821daf783550969e37"
+          },
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "bytes": 4965,
+            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "smart_city_node_engine",
+      "name": "Smart City Node Engine",
+      "safe_description": "Smart-city and telecom edge-routing concept.",
+      "observed_maturity": "concept_only",
+      "commercial_posture": "concept_only",
+      "evidence_classes_present": 1,
+      "evidence_classes_total": 7,
+      "present": {
+        "source": false,
+        "entrypoint": false,
+        "test": false,
+        "sample": false,
+        "documentation": true,
+        "artifact": false,
+        "public_surface": false
+      },
+      "missing_paths": [],
+      "payer": "Future municipal, utility, and telecom research partners",
+      "bounded_offer": "No paid software offer yet; only a requirements and simulation-scoping workshop.",
+      "revenue_route": "Research services before any product or subscription.",
+      "contract_or_grant_route": "Smart-community, edge-computing, or infrastructure-resilience research grant.",
+      "acceptance_gate": "A simulator and declared baseline demonstrate reproducible latency, resilience, or resource-allocation improvement.",
+      "claim_boundary": "No city deployment, critical-infrastructure control, latency, resilience, or savings claim.",
+      "next_build": "Implement a small deterministic edge-routing simulator with baseline and failure-injection tests.",
+      "evidence": {
+        "source": [],
+        "entrypoint": [],
+        "test": [],
+        "sample": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "bytes": 4965,
+            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    }
+  ]
+}
