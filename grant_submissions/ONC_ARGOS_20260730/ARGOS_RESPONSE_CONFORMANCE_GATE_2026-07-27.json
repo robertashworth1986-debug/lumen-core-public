@@ -233,10 +233,10 @@
       "sha256": "9d6e2254920db96d9930efd73b299a662a836baf679f628db710d7461c199b51"
     },
     {
-      "bytes": 1410,
+      "bytes": 1421,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/output/render_qa_receipt.json",
-      "sha256": "beb24b9b9c3a5d727a4035c0527f974bba7278b1356ffaad62683b80a83a589e"
+      "sha256": "eed098ecb88172ad9c38de1de9d181f00622e37d535de18f4579c7efd0d0bf70"
     },
     {
       "bytes": 729798,
