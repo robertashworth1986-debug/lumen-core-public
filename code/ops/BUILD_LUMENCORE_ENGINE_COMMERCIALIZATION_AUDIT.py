@@ -430,7 +430,11 @@ def main() -> int:
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
 
-    payload = build_payload(read_json(args.config), parse_utc(args.as_of_utc))
+    as_of_utc = args.as_of_utc
+    if args.check and as_of_utc is None and args.json_out.exists():
+        as_of_utc = read_json(args.json_out).get("generated_at_utc")
+
+    payload = build_payload(read_json(args.config), parse_utc(as_of_utc))
     rendered_json = json.dumps(payload, indent=2) + "\n"
     rendered_md = render_markdown(payload)
 

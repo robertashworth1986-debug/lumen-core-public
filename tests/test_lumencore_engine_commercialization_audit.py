@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 
@@ -109,3 +111,31 @@ def test_markdown_never_calls_an_engine_subscription_ready():
     assert "Distinct supplemental candidates after deduplication: `4`" in markdown
     assert "guaranteed awards" not in markdown.lower()
     assert "15 finished products" in markdown
+
+
+def test_check_reuses_the_existing_output_timestamp(tmp_path):
+    json_out = tmp_path / "audit.json"
+    md_out = tmp_path / "audit.md"
+    command = [
+        sys.executable,
+        str(MODULE_PATH),
+        "--config",
+        str(CONFIG_PATH),
+        "--json-out",
+        str(json_out),
+        "--md-out",
+        str(md_out),
+    ]
+
+    subprocess.run(
+        [*command, "--as-of-utc", "2026-07-28T02:57:29Z"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        [*command, "--check"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
