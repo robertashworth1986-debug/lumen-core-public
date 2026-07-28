@@ -19,6 +19,7 @@ CONSUMPTION_SCRIPT = (
 HANDOFF_SCRIPT = (
     ROOT / "code" / "ops" / "EVALUATE_OUTREACH_DISPATCH_HANDOFF.py"
 )
+SYNTHETIC_UNLOCK = "synthetic-private-unlock"
 
 
 def load_registry():
@@ -92,7 +93,7 @@ def ready_inputs(
             )
         ),
     )
-    unlock = "synthetic-private-unlock"
+    unlock = SYNTHETIC_UNLOCK
     handoff_evaluated = opened + timedelta(seconds=1)
     reservation = module.build_dispatch_reservation(
         authorization,
@@ -182,6 +183,8 @@ def run_cli(
     consumption_directory: Path,
     *,
     check: bool = False,
+    human_unlock_token: str | None = SYNTHETIC_UNLOCK,
+    expected_human_unlock_sha256: str | None = None,
 ) -> subprocess.CompletedProcess[str]:
     command = [
         sys.executable,
@@ -197,9 +200,25 @@ def run_cli(
     ]
     if check:
         command.append("--check")
+    env = os.environ.copy()
+    if human_unlock_token is None:
+        env.pop("LUMA_HUMAN_UNLOCK_TOKEN", None)
+    else:
+        env["LUMA_HUMAN_UNLOCK_TOKEN"] = human_unlock_token
+    if expected_human_unlock_sha256 is None and human_unlock_token is not None:
+        expected_human_unlock_sha256 = load_registry().sha256_bytes(
+            human_unlock_token.encode("utf-8")
+        )
+    if expected_human_unlock_sha256 is None:
+        env.pop("LUMA_HUMAN_UNLOCK_SHA256", None)
+    else:
+        env["LUMA_HUMAN_UNLOCK_SHA256"] = (
+            expected_human_unlock_sha256
+        )
     return subprocess.run(
         command,
         cwd=ROOT,
+        env=env,
         capture_output=True,
         text=True,
         check=False,
@@ -229,6 +248,8 @@ def test_cli_captures_redacted_single_use_consumption_receipt(tmp_path):
     assert receipt["receipt_builder_can_send_email"] is False
     assert summary["outputs_written"] is True
     assert summary["dispatch_reservation_finalized"] is True
+    assert summary["handoff_keyed_authentication_verified"] is True
+    assert summary["private_human_unlock_revalidated"] is True
     assert not (
         consumption_directory
         / f"{authorization['dispatch_binding']['binding_sha256']}.pending"
@@ -238,6 +259,8 @@ def test_cli_captures_redacted_single_use_consumption_receipt(tmp_path):
     assert observation["thread_id"] not in serialized
     assert "reviewer@example.org" not in serialized
     assert authorization["dispatch_binding"]["body_sha256"] not in result.stdout
+    assert SYNTHETIC_UNLOCK not in result.stdout
+    assert SYNTHETIC_UNLOCK not in serialized
 
     module = load_registry()
     unlock = "synthetic-private-unlock"
@@ -326,6 +349,104 @@ def test_cli_requires_exact_pending_dispatch_reservation(tmp_path):
 
     assert result.returncode != 0
     assert "DISPATCH_RESERVATION_REQUIRED" in result.stderr
+    assert not list(consumption_directory.glob("*.json"))
+
+
+def test_cli_requires_private_unlock_again_for_consumption(tmp_path):
+    consumption_directory = tmp_path / "consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
+    paths = write_inputs(tmp_path, authorization, handoff, observation)
+
+    result = run_cli(
+        *paths,
+        consumption_directory,
+        human_unlock_token=None,
+    )
+
+    assert result.returncode != 0
+    assert (
+        "DISPATCH_CONSUMPTION_HUMAN_UNLOCK_TOKEN_REQUIRED"
+        in result.stderr
+    )
+    assert not list(consumption_directory.glob("*.json"))
+
+
+def test_cli_rejects_wrong_private_unlock_for_consumption(tmp_path):
+    consumption_directory = tmp_path / "consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
+    paths = write_inputs(tmp_path, authorization, handoff, observation)
+    module = load_registry()
+
+    result = run_cli(
+        *paths,
+        consumption_directory,
+        human_unlock_token="wrong-private-unlock",
+        expected_human_unlock_sha256=module.sha256_bytes(
+            SYNTHETIC_UNLOCK.encode("utf-8")
+        ),
+    )
+
+    assert result.returncode != 0
+    assert "DISPATCH_CONSUMPTION_HUMAN_UNLOCK_MISMATCH" in result.stderr
+    assert not list(consumption_directory.glob("*.json"))
+
+
+def test_cli_rejects_rehashed_but_unauthenticated_handoff_forgery(tmp_path):
+    consumption_directory = tmp_path / "consumption"
+    authorization, valid_handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
+    module = load_registry()
+    reservation_path = consumption_directory / (
+        f"{authorization['dispatch_binding']['binding_sha256']}.pending"
+    )
+    reservation = json.loads(reservation_path.read_text(encoding="utf-8"))
+    blocked = module.evaluate_action_time_dispatch_handoff(
+        authorization,
+        exact_approval_phrase=authorization[
+            "exact_action_time_approval_phrase"
+        ],
+        current_utc=valid_handoff["evaluated_utc"],
+        human_unlock_token=None,
+        expected_human_unlock_sha256=None,
+        consumption_directory_checked=True,
+        consumption_directory_sha256=(
+            module.consumption_directory_identity_sha256(
+                consumption_directory
+            )
+        ),
+        consumption_receipt_present=False,
+        dispatch_reservation_created=True,
+        dispatch_reservation_present=False,
+        dispatch_reservation_sha256=reservation["reservation_sha256"],
+    )
+    forged = dict(blocked)
+    forged.update(
+        {
+            "status": "READY_FOR_CONNECTED_SENDER_SINGLE_USE_DISPATCH",
+            "private_human_unlock_configured": True,
+            "private_human_unlock_supplied": True,
+            "private_human_unlock_valid": True,
+            "blockers": [],
+            "dispatch_authorized": True,
+            "send_authorized": True,
+            "handoff_authentication_hmac_sha256": "A" * 64,
+        }
+    )
+    forged["receipt_sha256"] = module.canonical_object_sha256(
+        forged,
+        omit={"receipt_sha256"},
+    )
+    paths = write_inputs(tmp_path, authorization, forged, observation)
+
+    result = run_cli(*paths, consumption_directory)
+
+    assert result.returncode != 0
+    assert "DISPATCH_HANDOFF_AUTHENTICATION_HMAC_MISMATCH" in result.stderr
     assert not list(consumption_directory.glob("*.json"))
 
 

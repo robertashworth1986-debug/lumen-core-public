@@ -107,10 +107,6 @@ def main() -> int:
         help="Path to a private action-time authorization JSON artifact.",
     )
     parser.add_argument(
-        "--current-utc",
-        help="Aware UTC timestamp; defaults to the current wall clock.",
-    )
-    parser.add_argument(
         "--consumption-directory",
         type=Path,
         required=True,
@@ -142,7 +138,7 @@ def main() -> int:
     )
     consumption_receipt_present = consumption_path.exists()
     dispatch_reservation_present = reservation_path.exists()
-    evaluated_utc = args.current_utc or current_utc()
+    evaluated_utc = current_utc()
     handoff = registry.evaluate_action_time_dispatch_handoff(
         authorization,
         exact_approval_phrase=os.environ.get(APPROVAL_PHRASE_ENV, ""),

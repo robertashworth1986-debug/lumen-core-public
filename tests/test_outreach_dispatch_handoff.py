@@ -6,6 +6,7 @@ import json
 import os
 import subprocess
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 
@@ -29,8 +30,15 @@ def load_registry():
     return module
 
 
-def mailbox_receipt(binding: dict[str, object]) -> dict[str, object]:
-    checked_utc = "2026-07-27T22:04:55Z"
+def iso_z(value: datetime) -> str:
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def mailbox_receipt(
+    binding: dict[str, object],
+    *,
+    checked_utc: str,
+) -> dict[str, object]:
     return {
         "attachment_count": binding["attachment_count"],
         "attachment_set_sha256": binding["attachment_set_sha256"],
@@ -59,6 +67,9 @@ def mailbox_receipt(binding: dict[str, object]) -> dict[str, object]:
 def build_authorization(consumption_directory: Path):
     module = load_registry()
     consumption_directory.mkdir(parents=True, exist_ok=True)
+    opened = datetime.now(timezone.utc).replace(
+        microsecond=0
+    ) - timedelta(seconds=2)
     facts = {
         "recipient_name": "Reviewer",
         "recipient_email": "reviewer@example.org",
@@ -72,8 +83,11 @@ def build_authorization(consumption_directory: Path):
     rendered = module.render_response("REQUESTED_INFORMATION_REPLY", facts)
     authorization = module.build_action_time_authorization(
         rendered,
-        mailbox_receipt(rendered["dispatch_binding"]),
-        current_utc="2026-07-27T22:05:00Z",
+        mailbox_receipt(
+            rendered["dispatch_binding"],
+            checked_utc=iso_z(opened),
+        ),
+        current_utc=iso_z(opened),
         consumption_directory_sha256=(
             module.consumption_directory_identity_sha256(
                 consumption_directory
@@ -112,8 +126,6 @@ def run_handoff(
         str(authorization_path),
         "--consumption-directory",
         str(directory),
-        "--current-utc",
-        "2026-07-27T22:09:59Z",
     ]
     if consumed:
         command.append("--dispatch-consumed")
@@ -125,6 +137,19 @@ def run_handoff(
         text=True,
         check=False,
     )
+
+
+def test_cli_exposes_no_backdatable_clock_override():
+    result = subprocess.run(
+        [sys.executable, str(HANDOFF_SCRIPT), "--help"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "--current-utc" not in result.stdout
 
 
 def test_cli_requires_private_unlock_and_never_exposes_private_inputs(tmp_path):
@@ -150,6 +175,7 @@ def test_cli_requires_private_unlock_and_never_exposes_private_inputs(tmp_path):
     assert blocked["private_human_unlock_valid"] is False
     assert blocked["dispatch_authorized"] is False
     assert blocked["send_authorized"] is False
+    assert blocked["handoff_authentication_hmac_sha256"] is None
     assert blocked["blockers"] == [
         "DISPATCH_RESERVATION_REQUIRED",
         "PRIVATE_HUMAN_UNLOCK_TOKEN_REQUIRED",
@@ -176,6 +202,16 @@ def test_cli_requires_private_unlock_and_never_exposes_private_inputs(tmp_path):
     assert receipt["dispatch_reservation_created"] is True
     assert receipt["dispatch_reservation_present"] is False
     assert receipt["dispatch_reservation_sha256"]
+    assert receipt[
+        "handoff_authentication_hmac_sha256"
+    ] == module.canonical_object_hmac_sha256(
+        receipt,
+        key=token,
+        omit={
+            "handoff_authentication_hmac_sha256",
+            "receipt_sha256",
+        },
+    )
     pending = tmp_path / "consumption" / (
         f"{authorization['dispatch_binding']['binding_sha256']}.pending"
     )
@@ -281,6 +317,34 @@ def test_cli_cannot_bypass_consumption_with_alternate_directory(tmp_path):
     assert "CONSUMPTION_DIRECTORY_IDENTITY_MISMATCH" in bypass_receipt[
         "blockers"
     ]
+
+
+def test_cli_cannot_erase_consumption_by_replacing_bound_directory(tmp_path):
+    canonical_directory = tmp_path / "canonical-consumption"
+    module, authorization = build_authorization(canonical_directory)
+    authorization_path = tmp_path / "authorization.json"
+    authorization_path.write_text(
+        json.dumps(authorization),
+        encoding="utf-8",
+    )
+    moved_directory = tmp_path / "moved-consumption"
+    canonical_directory.rename(moved_directory)
+    canonical_directory.mkdir()
+    token = "synthetic-private-unlock"
+
+    result = run_handoff(
+        authorization_path,
+        phrase=authorization["exact_action_time_approval_phrase"],
+        token=token,
+        expected_sha256=module.sha256_bytes(token.encode("utf-8")),
+        consumption_directory=canonical_directory,
+    )
+
+    assert result.returncode == 3, result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt["dispatch_authorized"] is False
+    assert "CONSUMPTION_DIRECTORY_IDENTITY_MISMATCH" in receipt["blockers"]
+    assert not list(canonical_directory.iterdir())
 
 
 def test_cli_allows_only_one_exclusive_dispatch_reservation(tmp_path):

@@ -11,6 +11,10 @@ from typing import Any
 import BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY as registry
 
 
+HUMAN_UNLOCK_TOKEN_ENV = "LUMA_HUMAN_UNLOCK_TOKEN"
+HUMAN_UNLOCK_SHA256_ENV = "LUMA_HUMAN_UNLOCK_SHA256"
+
+
 def read_json_object(path: Path, error_code: str) -> dict[str, Any]:
     payload = json.loads(
         path.read_text(encoding="utf-8"),
@@ -101,6 +105,8 @@ def receipt_summary(
         "receipt_output": str(output_path),
         "outputs_written": outputs_written,
         "dispatch_reservation_finalized": outputs_written,
+        "handoff_keyed_authentication_verified": True,
+        "private_human_unlock_revalidated": True,
         "single_use_binding_consumed": True,
         "duplicate_send_allowed": False,
         "send_performed_by_receipt_builder": False,
@@ -141,7 +147,9 @@ def main() -> int:
         description=(
             "Capture a privacy-safe single-use dispatch-consumption receipt "
             "from an authorized handoff and fresh private Gmail SENT "
-            "observation. This tool cannot send email."
+            "observation. The private HumanUnlock is revalidated through "
+            "protected runtime environment variables. This tool cannot send "
+            "email."
         )
     )
     parser.add_argument(
@@ -232,6 +240,10 @@ def main() -> int:
         dispatch_reservation,
         current_utc=current_utc(),
         consumption_directory_sha256=consumption_directory_sha256,
+        human_unlock_token=os.environ.get(HUMAN_UNLOCK_TOKEN_ENV),
+        expected_human_unlock_sha256=os.environ.get(
+            HUMAN_UNLOCK_SHA256_ENV
+        ),
     )
     receipt_output = deterministic_receipt_path(
         args.consumption_directory,

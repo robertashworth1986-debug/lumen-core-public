@@ -150,13 +150,13 @@ ACTION_TIME_APPROVAL_BINDING_SCHEMA = (
     "lumencore.outreach_action_time_approval_binding.v2"
 )
 ACTION_TIME_DISPATCH_HANDOFF_SCHEMA = (
-    "lumencore.outreach_action_time_dispatch_handoff.v2"
+    "lumencore.outreach_action_time_dispatch_handoff.v3"
 )
 POST_SEND_OBSERVATION_SCHEMA = (
     "lumencore.outreach_post_send_observation.private.v1"
 )
 DISPATCH_CONSUMPTION_RECEIPT_SCHEMA = (
-    "lumencore.outreach_dispatch_consumption_receipt.v2"
+    "lumencore.outreach_dispatch_consumption_receipt.v3"
 )
 DISPATCH_RESERVATION_SCHEMA = "lumencore.outreach_dispatch_reservation.v1"
 ACTION_TIME_MAILBOX_MAX_AGE_SECONDS = 15 * 60
@@ -307,6 +307,7 @@ ACTION_TIME_DISPATCH_HANDOFF_FIELDS = {
     "dispatch_reservation_sha256",
     "evaluated_utc",
     "external_action_performed",
+    "handoff_authentication_hmac_sha256",
     "handoff_can_send_email",
     "mailbox_receipt_sha256",
     "private_human_unlock_configured",
@@ -499,13 +500,42 @@ def sha256_bytes(data: bytes) -> str:
 
 def consumption_directory_identity_sha256(path: Path) -> str:
     try:
+        unresolved_stat = path.lstat()
+    except OSError as exc:
+        raise OutreachRegistryError("CONSUMPTION_DIRECTORY_REQUIRED") from exc
+    if path.is_symlink() or (
+        getattr(unresolved_stat, "st_file_attributes", 0) & 0x400
+    ):
+        raise OutreachRegistryError(
+            "CONSUMPTION_DIRECTORY_REPARSE_POINT_PROHIBITED"
+        )
+    try:
         resolved = path.resolve(strict=True)
     except OSError as exc:
         raise OutreachRegistryError("CONSUMPTION_DIRECTORY_REQUIRED") from exc
     if not resolved.is_dir():
         raise OutreachRegistryError("CONSUMPTION_DIRECTORY_REQUIRED")
+    resolved_stat = resolved.stat()
+    device_id = int(resolved_stat.st_dev)
+    file_id = int(resolved_stat.st_ino)
+    if device_id <= 0 or file_id <= 0:
+        raise OutreachRegistryError(
+            "CONSUMPTION_DIRECTORY_FILESYSTEM_ID_UNAVAILABLE"
+        )
     canonical_path = os.path.normcase(os.path.realpath(os.fspath(resolved)))
-    return sha256_bytes(canonical_path.encode("utf-8"))
+    identity = {
+        "schema": "lumencore.outreach_consumption_directory_identity.v2",
+        "canonical_path": canonical_path,
+        "filesystem_device_id": device_id,
+        "filesystem_file_id": file_id,
+    }
+    return sha256_bytes(
+        json.dumps(
+            identity,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    )
 
 
 def canonical_object_sha256(
@@ -521,6 +551,31 @@ def canonical_object_sha256(
             bounded, sort_keys=True, separators=(",", ":")
         ).encode("utf-8")
     )
+
+
+def canonical_object_hmac_sha256(
+    payload: dict[str, Any],
+    *,
+    key: str,
+    omit: set[str] | None = None,
+) -> str:
+    if not isinstance(key, str) or not key:
+        raise OutreachRegistryError("HMAC_KEY_REQUIRED")
+    bounded = {
+        field: value
+        for field, value in payload.items()
+        if field not in (omit or set())
+    }
+    message = json.dumps(
+        bounded,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hmac.new(
+        key.encode("utf-8"),
+        message,
+        hashlib.sha256,
+    ).hexdigest().upper()
 
 
 def _normalize_attachment_files(raw_attachments: Any) -> list[str]:
@@ -1728,6 +1783,13 @@ def build_action_time_authorization(
     expires = current + timedelta(
         seconds=ACTION_TIME_APPROVAL_WINDOW_SECONDS
     )
+    mailbox_freshness_expires = min(
+        parse_aware_datetime(normalized_receipt["checked_utc"]),
+        parse_aware_datetime(
+            normalized_receipt["draft_readback_checked_utc"]
+        ),
+    ) + timedelta(seconds=ACTION_TIME_MAILBOX_MAX_AGE_SECONDS)
+    expires = min(expires, mailbox_freshness_expires)
     if deadline is not None:
         expires = min(expires, deadline)
     opened_utc = current.isoformat().replace("+00:00", "Z")
@@ -1782,8 +1844,11 @@ def build_action_time_authorization(
             "exact_phrase_required": True,
             "single_use": True,
             "consumption_directory_identity_bound": True,
+            "consumption_directory_filesystem_object_bound": True,
             "private_human_unlock_required_for_dispatch": True,
+            "keyed_handoff_authentication_required_for_dispatch": True,
             "authorization_evaluator_can_send_email": False,
+            "approval_expiry_bounded_by_mailbox_freshness": True,
             "deadline_reached_fail_closed": True,
             "duplicate_send_fail_closed": True,
         },
@@ -2308,15 +2373,33 @@ def evaluate_action_time_dispatch_handoff(
         "claim_boundary": (
             "This receipt only evaluates a hash-bound draft, fresh mailbox "
             "receipt, exact action-time approval, private HumanUnlock, and "
-            "the canonical consumption directory. "
+            "the canonical consumption directory. An authorized handoff is "
+            "authenticated with HMAC-SHA256 under the private HumanUnlock. "
             "It cannot send email and does not prove transmission, delivery, "
             "receipt, factual accuracy, partner authority, submission, award, "
-            "validation, performance, or savings."
+            "validation, performance, or savings. The HMAC is tamper evidence "
+            "relative to a private unlock unavailable to the artifact editor; "
+            "it does not establish OS-level caller identity or provider "
+            "provenance."
+        ),
+    }
+    handoff_authentication_hmac_sha256 = (
+        canonical_object_hmac_sha256(
+            core,
+            key=human_unlock_token,
+        )
+        if dispatch_authorized and human_unlock_token is not None
+        else None
+    )
+    authenticated_core = {
+        **core,
+        "handoff_authentication_hmac_sha256": (
+            handoff_authentication_hmac_sha256
         ),
     }
     result = {
-        **core,
-        "receipt_sha256": canonical_object_sha256(core),
+        **authenticated_core,
+        "receipt_sha256": canonical_object_sha256(authenticated_core),
     }
     serialized = json.dumps(result, sort_keys=True)
     private_values = (
@@ -2340,6 +2423,8 @@ def _validate_dispatch_handoff_for_consumption(
     *,
     consumption_directory_sha256: str,
     dispatch_reservation_sha256: str,
+    human_unlock_token: str | None,
+    expected_human_unlock_sha256: str | None,
 ) -> tuple[dict[str, Any], datetime]:
     if not isinstance(handoff, dict):
         raise OutreachRegistryError("DISPATCH_HANDOFF_INVALID")
@@ -2390,6 +2475,44 @@ def _validate_dispatch_handoff_for_consumption(
         raise OutreachRegistryError("DISPATCH_HANDOFF_NOT_READY")
     if handoff.get("blockers") != []:
         raise OutreachRegistryError("DISPATCH_HANDOFF_HAS_BLOCKERS")
+
+    if not isinstance(human_unlock_token, str) or not human_unlock_token:
+        raise OutreachRegistryError(
+            "DISPATCH_CONSUMPTION_HUMAN_UNLOCK_TOKEN_REQUIRED"
+        )
+    normalized_expected_unlock_sha256 = _normalize_required_sha256(
+        expected_human_unlock_sha256,
+        "DISPATCH_CONSUMPTION_HUMAN_UNLOCK_SHA256_INVALID",
+    )
+    observed_unlock_sha256 = sha256_bytes(
+        human_unlock_token.encode("utf-8")
+    )
+    if not hmac.compare_digest(
+        observed_unlock_sha256,
+        normalized_expected_unlock_sha256,
+    ):
+        raise OutreachRegistryError(
+            "DISPATCH_CONSUMPTION_HUMAN_UNLOCK_MISMATCH"
+        )
+    observed_handoff_hmac = _normalize_required_sha256(
+        handoff.get("handoff_authentication_hmac_sha256"),
+        "DISPATCH_HANDOFF_AUTHENTICATION_HMAC_INVALID",
+    )
+    expected_handoff_hmac = canonical_object_hmac_sha256(
+        handoff,
+        key=human_unlock_token,
+        omit={
+            "handoff_authentication_hmac_sha256",
+            "receipt_sha256",
+        },
+    )
+    if not hmac.compare_digest(
+        observed_handoff_hmac,
+        expected_handoff_hmac,
+    ):
+        raise OutreachRegistryError(
+            "DISPATCH_HANDOFF_AUTHENTICATION_HMAC_MISMATCH"
+        )
 
     approval_binding = authorization.get("approval_binding")
     dispatch_binding = authorization.get("dispatch_binding")
@@ -2606,6 +2729,8 @@ def build_dispatch_consumption_receipt(
     *,
     current_utc: str,
     consumption_directory_sha256: str,
+    human_unlock_token: str | None,
+    expected_human_unlock_sha256: str | None,
 ) -> dict[str, Any]:
     if not isinstance(authorization, dict) or authorization.get(
         "schema"
@@ -2625,6 +2750,10 @@ def build_dispatch_consumption_receipt(
             handoff,
             consumption_directory_sha256=consumption_directory_sha256,
             dispatch_reservation_sha256=dispatch_reservation_sha256,
+            human_unlock_token=human_unlock_token,
+            expected_human_unlock_sha256=(
+                expected_human_unlock_sha256
+            ),
         )
     )
     normalized_observation, observation_sha256, sent = (
@@ -2672,12 +2801,15 @@ def build_dispatch_consumption_receipt(
         "subject_body_and_recipient_values_omitted": True,
         "claim_boundary": (
             "This receipt proves only that a fresh private Gmail observation "
-            "matched the authorized dispatch and recorded exactly one SENT "
-            "copy with no current draft. It consumes the local single-use "
-            "binding and prohibits duplicate send. It does not prove delivery, "
+            "matched the keyed-authenticated dispatch and recorded exactly "
+            "one SENT copy with no current draft. It consumes the local "
+            "single-use binding and prohibits duplicate send. It does not "
+            "prove delivery, "
             "recipient receipt or response, factual accuracy, partner authority, "
             "submission, acceptance, award, funding, validation, performance, "
-            "or savings. The receipt builder cannot send email."
+            "or savings. The receipt builder cannot send email. The HMAC does "
+            "not establish OS-level caller identity or authenticate the Gmail "
+            "observation."
         ),
     }
     return {
@@ -2823,7 +2955,17 @@ def build_public_payload(
             "dispatch_consumption_receipt_builder_can_send_email": False,
             "dispatch_consumption_directory_required": True,
             "dispatch_consumption_directory_identity_hash_bound": True,
+            "dispatch_consumption_directory_filesystem_object_bound": True,
+            "dispatch_consumption_directory_reparse_points_prohibited": True,
             "dispatch_handoff_checks_consumption_directory": True,
+            "dispatch_handoff_keyed_authentication_required": True,
+            "dispatch_handoff_keyed_authentication_algorithm": (
+                "HMAC-SHA256"
+            ),
+            "dispatch_consumption_revalidates_private_human_unlock": True,
+            "dispatch_handoff_cli_uses_system_wall_clock_only": True,
+            "dispatch_handoff_cli_clock_override_allowed": False,
+            "action_time_approval_expiry_bounded_by_mailbox_freshness": True,
             "dispatch_reservation_schema": DISPATCH_RESERVATION_SCHEMA,
             "dispatch_handoff_requires_exclusive_reservation": True,
             "competing_handoff_reservation_fail_closed": True,
@@ -2876,6 +3018,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "`code/ops/BUILD_OUTREACH_ACTION_TIME_AUTHORIZATION.py`",
         "- Authorization builder can approve or send email: `false`",
         "- Private HumanUnlock: `REQUIRED_AT_RUNTIME`",
+        "- Dispatch handoff keyed authentication: `HMAC-SHA256`",
+        "- Consumption revalidates private HumanUnlock: `true`",
+        "- Dispatch handoff production clock: `SYSTEM_UTC_ONLY`",
+        "- Approval expiry bounded by mailbox freshness: `true`",
+        "- Consumption directory filesystem object bound: `true`",
+        "- Consumption directory reparse points allowed: `false`",
         "- Dispatch handoff can send email: `false`",
         "- Post-send observation: `FRESH_EXACT_SENT_COPY_REQUIRED`",
         "- Consumed binding duplicate send allowed: `false`",
@@ -2951,7 +3099,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Operating Boundary",
             "",
-            "This registry renders drafts, immutable dispatch bindings, action-time authorization records, routing decisions, and privacy-safe post-send consumption receipts only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes or until the deadline, whichever comes first. Dispatch authorization additionally requires a private HumanUnlock checked only at runtime; the token and expected hash are omitted from receipts, and the evaluator cannot send. After a connected sender acts, consumption requires a fresh private Gmail observation with exactly one matching SENT copy, no current draft, no route, body, subject, attachment, CC, or BCC drift, and a send timestamp inside the approval window and before the deadline. The resulting redacted receipt marks the binding consumed and prohibits duplicate send, but it does not prove delivery or recipient response. A binding or receipt is not proof of content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
+            "This registry renders drafts, immutable dispatch bindings, action-time authorization records, routing decisions, and privacy-safe post-send consumption receipts only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes, the remaining mailbox-evidence freshness, or the deadline, whichever comes first. The production handoff CLI uses the system UTC wall clock and exposes no clock override. Dispatch authorization additionally requires a private HumanUnlock checked only at runtime; an authorized handoff is authenticated with HMAC-SHA256 under that private unlock, while the token and expected hash remain omitted from receipts and the evaluator cannot send. The HMAC provides tamper evidence only while the private unlock is unavailable to the artifact editor; it does not establish OS-level caller identity or provider provenance. The consumption ledger identity binds both its canonical path and filesystem object and rejects reparse points. After a connected sender acts, consumption revalidates the private unlock and keyed handoff, then requires a fresh private Gmail observation with exactly one matching SENT copy, no current draft, no route, body, subject, attachment, CC, or BCC drift, and a send timestamp inside the approval window and before the deadline. The resulting redacted receipt marks the binding consumed and prohibits duplicate send, but it does not prove delivery or recipient response. A binding or receipt is not proof of content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
             "",
         ]
     )

@@ -652,6 +652,36 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
         is True
     )
     assert (
+        payload["controls"][
+            "dispatch_handoff_keyed_authentication_required"
+        ]
+        is True
+    )
+    assert payload["controls"][
+        "dispatch_handoff_keyed_authentication_algorithm"
+    ] == "HMAC-SHA256"
+    assert (
+        payload["controls"][
+            "dispatch_consumption_revalidates_private_human_unlock"
+        ]
+        is True
+    )
+    assert payload["controls"][
+        "dispatch_consumption_directory_filesystem_object_bound"
+    ] is True
+    assert payload["controls"][
+        "dispatch_consumption_directory_reparse_points_prohibited"
+    ] is True
+    assert payload["controls"][
+        "dispatch_handoff_cli_uses_system_wall_clock_only"
+    ] is True
+    assert payload["controls"][
+        "dispatch_handoff_cli_clock_override_allowed"
+    ] is False
+    assert payload["controls"][
+        "action_time_approval_expiry_bounded_by_mailbox_freshness"
+    ] is True
+    assert (
         payload["controls"]["competing_handoff_reservation_fail_closed"]
         is True
     )
@@ -733,6 +763,21 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert "Exact approval phrase: `BINDING_SCOPED_SINGLE_USE`" in markdown
     assert "Exact approval window: `5_MINUTES_MAX`" in markdown
     assert "Private HumanUnlock: `REQUIRED_AT_RUNTIME`" in markdown
+    assert "Dispatch handoff keyed authentication: `HMAC-SHA256`" in (
+        markdown
+    )
+    assert "Consumption revalidates private HumanUnlock: `true`" in (
+        markdown
+    )
+    assert "Dispatch handoff production clock: `SYSTEM_UTC_ONLY`" in (
+        markdown
+    )
+    assert "Approval expiry bounded by mailbox freshness: `true`" in (
+        markdown
+    )
+    assert "Consumption directory filesystem object bound: `true`" in (
+        markdown
+    )
     assert "Dispatch handoff can send email: `false`" in markdown
     assert "Static quality gate: `PASS`" in markdown
     assert "No message is rendered" in markdown
@@ -1125,6 +1170,24 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
         is True
     )
     assert (
+        authorization["controls"][
+            "keyed_handoff_authentication_required_for_dispatch"
+        ]
+        is True
+    )
+    assert (
+        authorization["controls"][
+            "consumption_directory_filesystem_object_bound"
+        ]
+        is True
+    )
+    assert (
+        authorization["controls"][
+            "approval_expiry_bounded_by_mailbox_freshness"
+        ]
+        is True
+    )
+    assert (
         authorization["controls"]["authorization_evaluator_can_send_email"]
         is False
     )
@@ -1193,6 +1256,16 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
         handoff["dispatch_reservation_sha256"]
         == TEST_DISPATCH_RESERVATION_SHA256
     )
+    assert handoff[
+        "handoff_authentication_hmac_sha256"
+    ] == module.canonical_object_hmac_sha256(
+        handoff,
+        key=unlock_token,
+        omit={
+            "handoff_authentication_hmac_sha256",
+            "receipt_sha256",
+        },
+    )
     assert handoff["receipt_sha256"] == module.canonical_object_sha256(
         handoff,
         omit={"receipt_sha256"},
@@ -1240,6 +1313,7 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     assert missing_unlock["private_human_unlock_valid"] is False
     assert missing_unlock["dispatch_authorized"] is False
     assert missing_unlock["send_authorized"] is False
+    assert missing_unlock["handoff_authentication_hmac_sha256"] is None
     assert missing_unlock["blockers"] == [
         "PRIVATE_HUMAN_UNLOCK_TOKEN_REQUIRED"
     ]
@@ -1261,6 +1335,7 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     )
     assert wrong_unlock["private_human_unlock_valid"] is False
     assert wrong_unlock["dispatch_authorized"] is False
+    assert wrong_unlock["handoff_authentication_hmac_sha256"] is None
     assert wrong_unlock["blockers"] == ["PRIVATE_HUMAN_UNLOCK_MISMATCH"]
 
     malformed_unlock_hash = module.evaluate_action_time_dispatch_handoff(
@@ -1278,6 +1353,9 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     )
     assert malformed_unlock_hash["private_human_unlock_valid"] is False
     assert malformed_unlock_hash["dispatch_authorized"] is False
+    assert malformed_unlock_hash[
+        "handoff_authentication_hmac_sha256"
+    ] is None
     assert malformed_unlock_hash["blockers"] == [
         "PRIVATE_HUMAN_UNLOCK_SHA256_INVALID"
     ]
@@ -1348,6 +1426,37 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     assert "ACTION_TIME_MAILBOX_RECEIPT_HASH_MISMATCH" in (
         tampered_receipt_result["blockers"]
     )
+
+
+def test_action_time_window_never_outlives_mailbox_evidence_freshness():
+    module = load_module()
+    facts = common_facts()
+    facts["requested_information"] = "One bounded technical-review summary."
+    rendered = module.render_response(
+        "REQUESTED_INFORMATION_REPLY",
+        facts,
+    )
+    binding = rendered["dispatch_binding"]
+    authorization = module.build_action_time_authorization(
+        rendered,
+        mailbox_receipt(binding, checked_utc="2026-07-27T22:00:00Z"),
+        current_utc="2026-07-27T22:14:54Z",
+        consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
+    )
+
+    assert authorization["approval_binding"][
+        "approval_window_expires_utc"
+    ] == "2026-07-27T22:15:00Z"
+    assert authorization["controls"]["approval_window_seconds"] == 6
+    at_freshness_limit = module.evaluate_action_time_authorization(
+        authorization,
+        exact_approval_phrase=authorization[
+            "exact_action_time_approval_phrase"
+        ],
+        current_utc="2026-07-27T22:15:00Z",
+    )
+    assert at_freshness_limit["action_time_approval_valid"] is False
+    assert "APPROVAL_WINDOW_EXPIRED" in at_freshness_limit["blockers"]
 
 
 def test_action_time_authorization_rejects_deadline_and_bad_mailbox_evidence():
