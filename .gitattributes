@@ -81,6 +81,12 @@ examples/proof_capsule/** text eol=lf
 /tests/test_current_opportunity_and_argos_packet.py text eol=lf
 /tests/test_deadline_action_sentinel.py text eol=lf
 
+# Canonical bytes for guarded outreach templates and their generated registry.
+/code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py text eol=lf
+/grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json text eol=lf
+/grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md text eol=lf
+/tests/test_outreach_response_template_registry.py text eol=lf
+
 # Canonical bytes for the external technical-review packet.
 /.github/workflows/external-technical-review-packet.yml text eol=lf
 /QUICKSTART.md text eol=lf

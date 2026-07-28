@@ -35,6 +35,20 @@ def load_module():
     return module
 
 
+def test_generated_artifact_writers_use_canonical_lf_bytes(tmp_path):
+    module = load_module()
+    json_path = tmp_path / "registry.json"
+    markdown_path = tmp_path / "registry.md"
+
+    module.write_json(json_path, {"line": "one\ntwo"})
+    module.write_text(markdown_path, "one\r\ntwo\r\n")
+
+    for path in (json_path, markdown_path):
+        payload = path.read_bytes()
+        assert b"\r\n" not in payload
+        assert payload.endswith(b"\n")
+
+
 def common_facts() -> dict[str, str]:
     return {
         "recipient_name": "Reviewer",
@@ -481,7 +495,7 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["quality_gate"]["status"] == "PASS"
     assert payload["quality_gate"]["all_templates_pass"] is True
     assert payload["quality_gate"]["template_count"] == 17
-    assert payload["quality_gate"]["check_count"] == 204
+    assert payload["quality_gate"]["check_count"] == 238
     assert payload["quality_gate"]["deadline_control_template_ids"] == [
         "COMPONENT_INSTRUCTION_ESCALATION",
         "INITIAL_PARTNER_TEAMING_INQUIRY",
@@ -497,6 +511,14 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["controls"]["public_url_requires_https_without_credentials"] is True
     assert payload["controls"]["rendered_subject_header_injection_fail_closed"] is True
     assert payload["controls"]["rendered_fact_claim_guard_fail_closed"] is True
+    assert payload["controls"]["unicode_nfkc_claim_scan"] is True
+    assert payload["controls"]["unicode_format_character_fail_closed"] is True
+    assert (
+        payload["controls"][
+            "guarantee_and_superlative_claims_never_authorizable"
+        ]
+        is True
+    )
     assert (
         payload["controls"][
             "high_risk_claim_requires_hash_bound_evidence_receipt"
@@ -620,6 +642,11 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["source_config_hash_basis"] == "SORTED_COMPACT_JSON_UTF8"
     assert "Duplicate-send gate: `FAIL_CLOSED`" in markdown
     assert "Inserted-fact claim gate: `FAIL_CLOSED`" in markdown
+    assert "Unicode format-character gate: `FAIL_CLOSED`" in markdown
+    assert "Claim scan normalization: `UNICODE_NFKC`" in markdown
+    assert "Guarantees and superlatives authorizable by receipt: `false`" in (
+        markdown
+    )
     assert "EXACT_VALUE_AND_SOURCE_HASH_BOUND" in markdown
     assert "RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND" in markdown
     assert "Draft binding is send authorization: `false`" in markdown
@@ -744,10 +771,51 @@ def test_known_deadlines_urls_and_rendered_subjects_fail_closed():
         }
     )
     unsafe = module.render_response("FUNDING_REVIEW_STATUS_CHECK", review)
-    assert unsafe["status"] == "BLOCKED_UNSAFE_RENDERED_CONTENT"
-    assert "SUBJECT_LINE_BREAK" in unsafe["unsafe_reasons"]
+    assert unsafe["status"] == "BLOCKED_UNSAFE_FACT_VALUES"
+    assert unsafe["unsafe_fact_fields"] == {
+        "source_subject": ["CONTROL_CHARACTER"]
+    }
     assert unsafe["subject"] is None
     assert unsafe["body"] is None
+
+
+def test_unicode_spoofing_and_normalized_guarantees_fail_closed():
+    module = load_module()
+    review = common_facts()
+    review.update(
+        {
+            "source_subject": "Review update\u2028Bcc: hidden@example.org",
+            "application_name": "Synthetic application",
+            "application_date_local": "July 4, 2026",
+            "stated_review_window": "5-10 business days",
+            "duplicate_review_disclosure": "No duplicate review requested.",
+        }
+    )
+
+    unsafe = module.render_response("FUNDING_REVIEW_STATUS_CHECK", review)
+    assert unsafe["status"] == "BLOCKED_UNSAFE_FACT_VALUES"
+    assert unsafe["unsafe_fact_fields"] == {
+        "source_subject": ["UNICODE_LINE_SEPARATOR"]
+    }
+    assert unsafe["subject"] is None
+    assert unsafe["body"] is None
+
+    facts = direct_investor_facts()
+    facts["six_month_milestone"] = (
+        "\uff27\uff55\uff41\uff52\uff41\uff4e\uff54\uff45\uff45\uff44 "
+        "funding after the next milestone."
+    )
+    blocked = module.render_response("DIRECT_INVESTOR_REVIEW_REQUEST", facts)
+    assert blocked["status"] == "BLOCKED_UNSUPPORTED_CLAIM_FACTS"
+    assert blocked["invalid_claim_evidence_fields"] == {
+        "six_month_milestone": "CLAIM_RISK_NOT_AUTHORIZABLE"
+    }
+    assert blocked["non_authorizable_claim_fields"] == [
+        "six_month_milestone"
+    ]
+    assert blocked["non_authorizable_claim_risk_codes"] == [
+        "UNSUPPORTED_GUARANTEE"
+    ]
 
 
 def test_requested_information_may_contain_literal_json_braces():
@@ -1366,8 +1434,14 @@ def test_high_risk_inserted_claims_require_exact_evidence_receipts():
         "UNSUPPORTED_SUPERLATIVE",
     ]
     assert rendered["invalid_claim_evidence_fields"] == {
-        "six_month_milestone": "MISSING_EVIDENCE_RECEIPT"
+        "six_month_milestone": "CLAIM_RISK_NOT_AUTHORIZABLE"
     }
+    assert rendered["non_authorizable_claim_fields"] == [
+        "six_month_milestone"
+    ]
+    assert rendered["non_authorizable_claim_risk_codes"] == [
+        "UNSUPPORTED_SUPERLATIVE"
+    ]
 
 
 def test_explicitly_negated_claim_boundaries_do_not_trigger_claim_gate():
@@ -1503,6 +1577,21 @@ def test_claim_evidence_template_is_deliberately_non_authorizing():
             fact_field="six_month_milestone",
             fact_value="Synthetic claim",
             risk_codes=["UNSUPPORTED_AWARD_OR_CONTRACT"],
+        )
+
+
+def test_guarantees_and_superlatives_cannot_be_enabled_by_local_receipt():
+    module = load_module()
+
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="CLAIM_RISK_NOT_AUTHORIZABLE",
+    ):
+        module.validate_claim_evidence_receipt(
+            "not-used.json",
+            fact_field="six_month_milestone",
+            fact_value="Guaranteed funding.",
+            risk_codes=["UNSUPPORTED_GUARANTEE"],
         )
 
 

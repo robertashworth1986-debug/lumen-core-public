@@ -7,6 +7,9 @@
 - Missing-fact gate: `FAIL_CLOSED`
 - Past-deadline gate: `FAIL_CLOSED`
 - Inserted-fact claim gate: `FAIL_CLOSED`
+- Unicode format-character gate: `FAIL_CLOSED`
+- Claim scan normalization: `UNICODE_NFKC`
+- Guarantees and superlatives authorizable by receipt: `false`
 - High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`
 - Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`
 - Attachment content required for exact approval: `true`
@@ -26,7 +29,7 @@
 - Canonical consumption directory: `REQUIRED_FOR_HANDOFF`
 - Consumption receipt filename: `DISPATCH_BINDING_SHA256`
 - Static quality gate: `PASS`
-- Static quality checks: `204`
+- Static quality checks: `238`
 - Unchanged rebuilds byte-stable: `true`
 
 ## Claim Boundary

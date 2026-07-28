@@ -7,6 +7,7 @@ import ipaddress
 import json
 import re
 import string
+import unicodedata
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -43,12 +44,25 @@ VALID_ATTACHMENT_POLICIES = {
     "EXPLICIT_REQUEST_ONLY",
 }
 TEMPLATE_ID_RE = re.compile(r"^[A-Z][A-Z0-9_]+$")
+FIELD_NAME_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 UUID_RE = re.compile(
     r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
     r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"
 )
 CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+UNICODE_LINE_BREAKS = {"\u0085", "\u2028", "\u2029"}
+UNICODE_BLOCKED_CATEGORIES = {"Cf", "Cs"}
+HYPHEN_TRANSLATION = str.maketrans(
+    {
+        "\u2010": "-",
+        "\u2011": "-",
+        "\u2012": "-",
+        "\u2013": "-",
+        "\u2014": "-",
+        "\u2212": "-",
+    }
+)
 SENDABLE_IDENTITY_FIELDS = {
     "recipient_name",
     "sender_name",
@@ -146,6 +160,10 @@ CLAIM_RISK_PATTERNS = {
         r"(?:all|every|the incumbent|the baseline)\b",
         re.IGNORECASE,
     ),
+}
+NON_AUTHORIZABLE_CLAIM_RISK_CODES = {
+    "UNSUPPORTED_GUARANTEE",
+    "UNSUPPORTED_SUPERLATIVE",
 }
 ACTION_TIME_MAILBOX_RECEIPT_FIELDS = {
     "attachment_count",
@@ -373,6 +391,11 @@ def _normalize_attachment_files(raw_attachments: Any) -> list[str]:
     ):
         raise OutreachRegistryError("ATTACHMENT_LIST_INVALID")
     normalized = [item.strip() for item in attachments]
+    if any(
+        unsafe_text_reasons(item, allow_line_breaks=False)
+        for item in normalized
+    ):
+        raise OutreachRegistryError("ATTACHMENT_NAME_UNSAFE")
     names = [item.casefold() for item in normalized]
     if len(names) != len(set(names)):
         raise OutreachRegistryError("DUPLICATE_ATTACHMENT_NAME")
@@ -491,6 +514,35 @@ def _assertion_is_negated(text: str, match_start: int) -> bool:
     return bool(NEGATION_WINDOW_RE.search(window))
 
 
+def security_normalize_text(text: str) -> str:
+    normalized = unicodedata.normalize("NFKC", text).translate(HYPHEN_TRANSLATION)
+    normalized = "".join(
+        character
+        for character in normalized
+        if unicodedata.category(character) not in UNICODE_BLOCKED_CATEGORIES
+    )
+    normalized = "".join(
+        " " if character in UNICODE_LINE_BREAKS else character
+        for character in normalized
+    )
+    return normalized
+
+
+def unsafe_text_reasons(text: str, *, allow_line_breaks: bool) -> list[str]:
+    reasons: set[str] = set()
+    for character in text:
+        category = unicodedata.category(character)
+        if category in UNICODE_BLOCKED_CATEGORIES:
+            reasons.add("UNICODE_FORMAT_OR_SURROGATE")
+        if character in UNICODE_LINE_BREAKS:
+            reasons.add("UNICODE_LINE_SEPARATOR")
+        if category == "Cc":
+            if allow_line_breaks and character in {"\n", "\t"}:
+                continue
+            reasons.add("CONTROL_CHARACTER")
+    return sorted(reasons)
+
+
 def claim_fact_risks(facts: dict[str, Any]) -> dict[str, list[str]]:
     risks: dict[str, list[str]] = {}
     for field, raw_value in facts.items():
@@ -498,12 +550,13 @@ def claim_fact_risks(facts: dict[str, Any]) -> dict[str, list[str]]:
             continue
         if not isinstance(raw_value, str) or not raw_value.strip():
             continue
+        normalized_value = security_normalize_text(raw_value)
         codes = []
         for code, pattern in CLAIM_RISK_PATTERNS.items():
             matches = [
                 match
-                for match in pattern.finditer(raw_value)
-                if not _assertion_is_negated(raw_value, match.start())
+                for match in pattern.finditer(normalized_value)
+                if not _assertion_is_negated(normalized_value, match.start())
             ]
             if matches:
                 codes.append(code)
@@ -519,6 +572,8 @@ def validate_claim_evidence_receipt(
     fact_value: str,
     risk_codes: list[str],
 ) -> str:
+    if set(risk_codes).intersection(NON_AUTHORIZABLE_CLAIM_RISK_CODES):
+        raise OutreachRegistryError("CLAIM_RISK_NOT_AUTHORIZABLE")
     path = _rooted_artifact(receipt_path)
     try:
         receipt = json.loads(
@@ -625,6 +680,10 @@ def template_quality_profile(row: dict[str, Any]) -> dict[str, Any]:
             or required.intersection(default_fields)
             or routing.intersection(default_fields)
         ),
+        "field_names_are_ascii_identifiers": all(
+            FIELD_NAME_RE.fullmatch(field)
+            for field in required | routing | sensitive | default_fields
+        ),
         "all_required_fields_are_rendered": not (required - placeholders),
         "all_routing_fields_are_sensitive": routing.issubset(sensitive),
         "nonrouting_sensitive_fields_force_private_render": (
@@ -659,6 +718,10 @@ def template_quality_profile(row: dict[str, Any]) -> dict[str, Any]:
         ),
         "template_subject_is_single_line": (
             "\r" not in row["subject"] and "\n" not in row["subject"]
+        ),
+        "template_text_has_no_unsafe_unicode": not (
+            unsafe_text_reasons(row["subject"], allow_line_breaks=False)
+            or unsafe_text_reasons(row["body"], allow_line_breaks=True)
         ),
         "template_text_is_within_render_limits": (
             len(row["subject"]) <= MAX_RENDERED_SUBJECT_CHARS
@@ -793,7 +856,7 @@ def validate_registry(payload: dict[str, Any]) -> dict[str, Any]:
                 f"PLACEHOLDER_UNDECLARED:{template_id}:{','.join(undeclared)}"
             )
 
-        lowered = (subject + "\n" + body).lower()
+        lowered = security_normalize_text(subject + "\n" + body).lower()
         for marker in POSITIVE_CLAIM_MARKERS:
             if marker in lowered:
                 raise OutreachRegistryError(
@@ -943,6 +1006,40 @@ def render_response(
         )
         return result
 
+    subject_fields = template_placeholders(row["subject"])
+    rendered_fields = template_placeholders(row["subject"] + "\n" + row["body"])
+    inspected_fields = sorted(
+        set(row["routing_fields"]).union(rendered_fields)
+    )
+    unsafe_fact_fields: dict[str, list[str]] = {}
+    for field in inspected_fields:
+        raw_value = facts.get(field)
+        if not isinstance(raw_value, str):
+            continue
+        reasons = unsafe_text_reasons(
+            raw_value,
+            allow_line_breaks=(
+                field not in subject_fields
+                and field not in row["routing_fields"]
+            ),
+        )
+        if reasons:
+            unsafe_fact_fields[field] = reasons
+    if unsafe_fact_fields:
+        result = _base_result(
+            payload, row, "BLOCKED_UNSAFE_FACT_VALUES", deadline
+        )
+        result.update(
+            {
+                "duplicate_send_blocked": False,
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+                "unsafe_fact_fields": unsafe_fact_fields,
+            }
+        )
+        return result
+
     invalid_emails = sorted(
         field
         for field in required
@@ -988,7 +1085,23 @@ def render_response(
         raise OutreachRegistryError("CLAIM_EVIDENCE_RECEIPT_MAP_INVALID")
     invalid_evidence_fields: dict[str, str] = {}
     evidence_receipt_sha256s: dict[str, str] = {}
+    non_authorizable_claim_fields = sorted(
+        field
+        for field, risk_codes in fact_risks.items()
+        if set(risk_codes).intersection(NON_AUTHORIZABLE_CLAIM_RISK_CODES)
+    )
+    non_authorizable_claim_risk_codes = sorted(
+        {
+            code
+            for field in non_authorizable_claim_fields
+            for code in fact_risks[field]
+            if code in NON_AUTHORIZABLE_CLAIM_RISK_CODES
+        }
+    )
     for field, risk_codes in fact_risks.items():
+        if set(risk_codes).intersection(NON_AUTHORIZABLE_CLAIM_RISK_CODES):
+            invalid_evidence_fields[field] = "CLAIM_RISK_NOT_AUTHORIZABLE"
+            continue
         receipt_path = evidence_receipts.get(field)
         if not receipt_path:
             invalid_evidence_fields[field] = "MISSING_EVIDENCE_RECEIPT"
@@ -1021,6 +1134,12 @@ def render_response(
                     }
                 ),
                 "invalid_claim_evidence_fields": invalid_evidence_fields,
+                "non_authorizable_claim_fields": (
+                    non_authorizable_claim_fields
+                ),
+                "non_authorizable_claim_risk_codes": (
+                    non_authorizable_claim_risk_codes
+                ),
             }
         )
         return result
@@ -1075,6 +1194,10 @@ def render_response(
         unsafe_reasons.append("SUBJECT_CONTROL_CHARACTER")
     if CONTROL_CHAR_RE.search(body):
         unsafe_reasons.append("BODY_CONTROL_CHARACTER")
+    for reason in unsafe_text_reasons(subject, allow_line_breaks=False):
+        unsafe_reasons.append(f"SUBJECT_{reason}")
+    for reason in unsafe_text_reasons(body, allow_line_breaks=True):
+        unsafe_reasons.append(f"BODY_{reason}")
     if len(subject) > MAX_RENDERED_SUBJECT_CHARS:
         unsafe_reasons.append("SUBJECT_TOO_LONG")
     if len(body) > MAX_RENDERED_BODY_CHARS:
@@ -1094,7 +1217,7 @@ def render_response(
         )
         return result
 
-    lowered = (subject + "\n" + body).lower()
+    lowered = security_normalize_text(subject + "\n" + body).lower()
     for marker in POSITIVE_CLAIM_MARKERS:
         if marker in lowered:
             raise OutreachRegistryError(f"UNSUPPORTED_POSITIVE_CLAIM_RENDER:{marker}")
@@ -2118,6 +2241,9 @@ def build_public_payload(
             "rendered_subject_header_injection_fail_closed": True,
             "rendered_length_limits_fail_closed": True,
             "rendered_fact_claim_guard_fail_closed": True,
+            "unicode_nfkc_claim_scan": True,
+            "unicode_format_character_fail_closed": True,
+            "guarantee_and_superlative_claims_never_authorizable": True,
             "high_risk_claim_requires_hash_bound_evidence_receipt": True,
             "claim_evidence_source_artifacts_rehashed": True,
             "claim_evidence_receipt_schema": CLAIM_EVIDENCE_RECEIPT_SCHEMA,
@@ -2207,6 +2333,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Missing-fact gate: `FAIL_CLOSED`",
         "- Past-deadline gate: `FAIL_CLOSED`",
         "- Inserted-fact claim gate: `FAIL_CLOSED`",
+        "- Unicode format-character gate: `FAIL_CLOSED`",
+        "- Claim scan normalization: `UNICODE_NFKC`",
+        "- Guarantees and superlatives authorizable by receipt: `false`",
         "- High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`",
         "- Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`",
         "- Attachment content required for exact approval: `true`",
@@ -2299,12 +2428,21 @@ def render_markdown(payload: dict[str, Any]) -> str:
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    canonical_text = text.replace("\r\n", "\n").replace("\r", "\n")
+    path.write_text(
+        canonical_text.rstrip("\n") + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def main() -> None:
