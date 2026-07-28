@@ -2,7 +2,7 @@
   "checks": [
     {
       "check_id": "OFFICIAL_NOTICE_CURRENT",
-      "evidence": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view; checked_utc=2026-07-28T17:21:48Z; age_seconds=668; amendment_observed=False",
+      "evidence": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view; checked_utc=2026-07-28T17:21:48Z; age_seconds=1849; amendment_observed=False",
       "requirement": "The official notice is active and its identity and deadline are explicit.",
       "status": "PASS"
     },
@@ -27,7 +27,7 @@
     },
     {
       "check_id": "DEADLINE_OPEN",
-      "evidence": "evaluated=2026-07-28T17:32:56Z; deadline=2026-07-30T21:00:00Z",
+      "evidence": "evaluated=2026-07-28T17:52:37Z; deadline=2026-07-30T21:00:00Z",
       "requirement": "The response is evaluated before the exact Government deadline.",
       "status": "PASS"
     },
@@ -142,7 +142,7 @@
   "claim_boundary": "PASS means the named documentary or formatting requirement is supported. BLOCKED means the current artifact is intentionally not send-ready. Neither passing checks nor a polished packet establishes submission, acceptance, selection, award, authorization, certification, external validation, field performance, or savings.",
   "deadline_utc": "2026-07-30T21:00:00Z",
   "decision": "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY",
-  "evaluated_utc": "2026-07-28T17:32:56Z",
+  "evaluated_utc": "2026-07-28T17:52:37Z",
   "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
   "safest_next_action": "Complete provider credential rotation and public-history remediation, then resolve the private cover and authorized-team blockers. Rebuild the private final copy, rerun this gate, repeat the official-notice and full-mailbox duplicate checks, and request exact action-time approval.",
   "schema": "lumencore.argos_response_conformance_gate.v1",
@@ -166,10 +166,10 @@
       "sha256": "bcbcee8d16010724439024d2811ba78adf991e4787439de8c9e33f06e0e990ea"
     },
     {
-      "bytes": 7120,
+      "bytes": 7201,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json",
-      "sha256": "55bf2423d1d5eeba7f595541da1b7ca3d007afbc5150ba0fbc75774e23ed11e3"
+      "sha256": "cebe3ac450892323efceec33383d6dff54d1771403a8b2644931f7972d3f12d9"
     },
     {
       "bytes": 3813,
@@ -226,16 +226,16 @@
       "sha256": "5479d7db1dc3777d9e6c177f92800bd198392105d46a2cf78c56554c86b8820d"
     },
     {
-      "bytes": 2203,
+      "bytes": 2325,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json",
-      "sha256": "58b1eebd679545985e4ee6e05e026c7f71d63221dd118949238182fb1241f6c2"
+      "sha256": "283cfa3648881c91a0217c53660ceb6899bfc09f1f848f0b18e0afef20b3b868"
     },
     {
-      "bytes": 1321,
+      "bytes": 1372,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "config/public_credential_remediation_status_v1.json",
-      "sha256": "a28710bf316cd2e9b8d11f6b66e80b6d4c69eb0d6bd06475e580eb79386e69de"
+      "sha256": "b2214c1386a154a12d798b9a6e95f4a3a79d4e90250133061afd20c0fb501e39"
     },
     {
       "bytes": 9474,
@@ -244,10 +244,10 @@
       "sha256": "d2bbd8b87b7248f6437793be3f3756096e6c6d7223935595f18e2f781f971440"
     },
     {
-      "bytes": 16887,
+      "bytes": 17469,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py",
-      "sha256": "cc90882051f90cd960e1402284d7eae542e0af17a093b32fa97983372f213a4e"
+      "sha256": "5359438d8b63e3139f72874724fbff646064675ec6270fd9896c75312b926145"
     }
   ],
   "summary": {

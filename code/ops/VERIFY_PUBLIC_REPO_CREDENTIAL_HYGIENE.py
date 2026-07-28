@@ -44,6 +44,7 @@ PLACEHOLDER_MARKERS = {
 }
 PROVIDER_KEYS = {"spotify", "youtube"}
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
+GIT_OBJECT_RE = re.compile(r"^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$")
 EVIDENCE_FIELDS = {
     "status",
     "verified_utc",
@@ -263,57 +264,63 @@ def git_output(*args: str, check: bool = True) -> str:
 
 def historical_exposure_summary() -> dict[str, Any]:
     relative = TARGET_RELATIVE.as_posix()
-    refs = [
-        line.strip()
-        for line in git_output(
-            "for-each-ref",
-            "--format=%(refname)",
-            "refs/heads",
-            "refs/remotes",
-            "refs/tags",
-        ).splitlines()
-        if line.strip()
-    ]
-    if not refs:
-        raise CredentialHygieneError("HISTORY_SCAN_HAS_NO_REACHABLE_REFS")
+    shallow = git_output("rev-parse", "--is-shallow-repository").strip()
+    if shallow != "false":
+        raise CredentialHygieneError("HISTORY_SCAN_REQUIRES_COMPLETE_CLONE")
+    if not git_output("rev-parse", "--verify", "HEAD").strip():
+        raise CredentialHygieneError("HISTORY_SCAN_HAS_NO_HEAD")
     commits = [
         line.strip()
-        for line in git_output("rev-list", "--all", "--", relative).splitlines()
+        for line in git_output("rev-list", "HEAD", "--", relative).splitlines()
         if line.strip()
     ]
-    exposed_commit_count = 0
-    exposed_keys: set[str] = set()
+    if not commits:
+        raise CredentialHygieneError("HISTORY_SCAN_HAS_NO_TARGET_HISTORY")
+    blob_ids: set[str] = set()
     for commit in commits:
+        blob_id = git_output("rev-parse", f"{commit}:{relative}").strip()
+        if not GIT_OBJECT_RE.fullmatch(blob_id):
+            raise CredentialHygieneError(
+                f"HISTORY_BLOB_ID_INVALID:{commit[:12]}"
+            )
+        blob_ids.add(blob_id.lower())
+
+    exposed_blob_count = 0
+    exposed_keys: set[str] = set()
+    for blob_id in sorted(blob_ids):
         result = subprocess.run(
-            ["git", "-C", str(ROOT), "show", f"{commit}:{relative}"],
+            ["git", "-C", str(ROOT), "cat-file", "blob", blob_id],
             capture_output=True,
             check=False,
             timeout=30,
         )
         if result.returncode != 0:
             raise CredentialHygieneError(
-                f"HISTORY_OBJECT_READ_FAILED:{commit[:12]}"
+                f"HISTORY_OBJECT_READ_FAILED:{blob_id[:12]}"
             )
         try:
             text = result.stdout.decode("utf-8")
         except UnicodeDecodeError as exc:
             raise CredentialHygieneError(
-                f"HISTORY_OBJECT_DECODE_FAILED:{commit[:12]}"
+                f"HISTORY_OBJECT_DECODE_FAILED:{blob_id[:12]}"
             ) from exc
         scan = scan_text(text)
         if scan["non_placeholder_fields"]:
-            exposed_commit_count += 1
+            exposed_blob_count += 1
             exposed_keys.update(
                 row["key"] for row in scan["non_placeholder_fields"]
             )
+    blob_set_sha256 = hashlib.sha256(
+        ("\n".join(sorted(blob_ids)) + "\n").encode("ascii")
+    ).hexdigest()
     return {
         "scan_complete": True,
-        "scan_scope": "LOCAL_REACHABLE_REFS_FOR_TARGET_PATH",
-        "local_reachable_ref_count": len(refs),
-        "target_history_commit_count": len(commits),
+        "scan_scope": "HEAD_REACHABLE_UNIQUE_BLOBS_FOR_TARGET_PATH",
+        "target_history_blob_count": len(blob_ids),
+        "target_history_blob_set_sha256": blob_set_sha256,
         "scan_failure_count": 0,
-        "historical_exposure_detected": exposed_commit_count > 0,
-        "historical_exposed_commit_count": exposed_commit_count,
+        "historical_exposure_detected": exposed_blob_count > 0,
+        "historical_exposed_blob_count": exposed_blob_count,
         "historical_sensitive_field_names": sorted(exposed_keys),
     }
 

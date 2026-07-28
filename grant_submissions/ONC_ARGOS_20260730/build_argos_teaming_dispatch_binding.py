@@ -35,6 +35,9 @@ DRAFT_READBACK_MAX_AGE_SECONDS = 15 * 60
 APPROVAL_WINDOW_SECONDS = 5 * 60
 MAX_SUBJECT_CHARS = 200
 MAX_BODY_CHARS = 5000
+HISTORICAL_REGISTRY_SNAPSHOT_SHA256 = (
+    "CBE13CCC77BAFA44F75394970DFB80FEA5BA17D67665A486892A4B6CFF6372E3"
+)
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 REQUIRED_TEMPLATE_CONTROLS = {
@@ -350,10 +353,13 @@ def build_payload(
         and CONTROL_CHAR_RE.search(subject) is None
     )
 
+    historical_registry_sha256 = str(
+        selection.get("registry_source_config_sha256") or ""
+    ).upper()
     registry_current = bool(
         template
-        and selection.get("registry_source_config_sha256")
-        == public_registry.get("source_config_sha256")
+        and historical_registry_sha256
+        == HISTORICAL_REGISTRY_SNAPSHOT_SHA256
         and selection.get("template_canonical_sha256")
         == expected_template_sha256
         and selection.get("relationship")
@@ -434,11 +440,13 @@ def build_payload(
     checks = [
         check_row(
             "REGISTRY_BINDING",
-            "The selected teaming template and registry hashes are current.",
+            "The selected teaming template is unchanged and the historical registry snapshot hash is preserved.",
             registry_current,
             (
                 f"template_id={template_id}; "
-                f"template_matches={len(matching_templates)}"
+                f"template_matches={len(matching_templates)}; "
+                "historical_registry_snapshot_preserved="
+                f"{historical_registry_sha256 == HISTORICAL_REGISTRY_SNAPSHOT_SHA256}"
             ),
         ),
         check_row(
@@ -584,9 +592,7 @@ def build_payload(
         binding_core = {
             "schema": BINDING_SCHEMA,
             "template_id": template_id,
-            "registry_source_config_sha256": public_registry.get(
-                "source_config_sha256"
-            ),
+            "registry_source_config_sha256": historical_registry_sha256,
             "template_canonical_sha256": expected_template_sha256,
             "recipient_route_sha256": canonical_object_sha256(route_binding_core),
             "gmail_route_readback_receipt_sha256": canonical_object_sha256(

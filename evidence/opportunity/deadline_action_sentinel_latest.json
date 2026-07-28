@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.deadline_action_sentinel.v1",
-  "evaluated_utc": "2026-07-28T17:33:06Z",
+  "evaluated_utc": "2026-07-28T17:52:37Z",
   "posture": "HUMAN_ACTION_REQUIRED_FAIL_CLOSED",
   "controls": {
     "read_only_builder": true,
@@ -78,8 +78,8 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": true,
-        "seconds_until_deadline": -88386,
-        "hours_until_deadline": -24.55
+        "seconds_until_deadline": -89557,
+        "hours_until_deadline": -24.88
       }
     },
     {
@@ -187,15 +187,15 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": false,
-        "seconds_until_deadline": 185214,
-        "hours_until_deadline": 51.45
+        "seconds_until_deadline": 184043,
+        "hours_until_deadline": 51.12
       },
       "outreach_status": {
         "observed_state": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
         "recorded_utc": "2026-07-28T16:45:49Z",
         "current_state_as_of_evaluation": "PARTNER_TARGET_PASSED_WAITING_FOR_REPLY",
         "partner_interest_target_utc": "2026-07-28T17:00:00Z",
-        "seconds_until_partner_target": -1986,
+        "seconds_until_partner_target": -3157,
         "mailbox_state_as_of_record": {
           "current_draft_count": 0,
           "sent_count": 1,

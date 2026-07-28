@@ -107,32 +107,44 @@ jobs:
       - name: Verify the Argos claim-to-evidence map
         run: python grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py --check
 
-      - name: Verify the historical Argos teaming binding is non-reusable
+      - name: Verify the historical Argos teaming binding is exact and expired
         run: |
-          set +e
           python grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py --check \
             > "${RUNNER_TEMP}/argos-historical-binding-check.json"
-          binding_status=$?
+          set +e
+          python grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py --action-time-check \
+            > "${RUNNER_TEMP}/argos-historical-binding-action-time.json"
+          action_time_status=$?
           set -e
-          test "${binding_status}" -eq 1
+          test "${action_time_status}" -eq 3
           python - <<'PY'
           import json
           import os
           from pathlib import Path
 
-          receipt = json.loads(
+          check_receipt = json.loads(
               (Path(os.environ["RUNNER_TEMP"]) / "argos-historical-binding-check.json")
               .read_text(encoding="utf-8")
           )
-          assert receipt == {
-              "status": "STALE",
-              "decision": "BLOCKED_DISPATCH_GATE_INTEGRITY",
+          assert check_receipt == {
+              "status": "CURRENT",
+              "decision": "VERIFIED_SNAPSHOT_READY_FOR_SINGLE_USE_ACTION_TIME_APPROVAL",
               "check_count": 12,
-              "pass_count": 11,
-              "fail_count": 1,
+              "pass_count": 12,
+              "fail_count": 0,
               "send_authorized": False,
               "send_performed": False,
           }
+          action_time = json.loads(
+              (
+                  Path(os.environ["RUNNER_TEMP"])
+                  / "argos-historical-binding-action-time.json"
+              ).read_text(encoding="utf-8")
+          )
+          assert action_time["approval_window_current"] is False
+          assert action_time["decision"] == "EXPIRED_OR_BLOCKED_REBUILD_REQUIRED"
+          assert action_time["send_authorized"] is False
+          assert action_time["send_performed"] is False
           PY
 
       - name: Verify the Argos response conformance gate

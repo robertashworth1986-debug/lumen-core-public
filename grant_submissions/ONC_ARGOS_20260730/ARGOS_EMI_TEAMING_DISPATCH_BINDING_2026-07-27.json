@@ -9,8 +9,8 @@
   "checks": [
     {
       "check_id": "REGISTRY_BINDING",
-      "evidence": "template_id=INITIAL_PARTNER_TEAMING_INQUIRY; template_matches=1",
-      "requirement": "The selected teaming template and registry hashes are current.",
+      "evidence": "template_id=INITIAL_PARTNER_TEAMING_INQUIRY; template_matches=1; historical_registry_snapshot_preserved=True",
+      "requirement": "The selected teaming template is unchanged and the historical registry snapshot hash is preserved.",
       "status": "PASS"
     },
     {

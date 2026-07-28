@@ -387,9 +387,11 @@ def test_argos_primary_partner_binding_is_preserved_but_not_reusable():
     committed = load_json(ARGOS_TEAMING_BINDING)
     rebuilt = builder.build_payload()
 
-    assert rebuilt != committed
-    assert rebuilt["decision"] == "BLOCKED_DISPATCH_GATE_INTEGRITY"
-    assert rebuilt["failed_checks"] == ["REGISTRY_BINDING"]
+    assert rebuilt == committed
+    assert rebuilt["decision"] == (
+        "VERIFIED_SNAPSHOT_READY_FOR_SINGLE_USE_ACTION_TIME_APPROVAL"
+    )
+    assert rebuilt["failed_checks"] == []
     assert committed["schema"] == (
         "lumencore.initial_outreach_dispatch_binding.v1"
     )
@@ -411,6 +413,9 @@ def test_argos_primary_partner_binding_is_preserved_but_not_reusable():
         "lumencore.initial_outreach_dispatch_binding_core.v1"
     )
     assert binding["template_id"] == "INITIAL_PARTNER_TEAMING_INQUIRY"
+    assert binding["registry_source_config_sha256"] == load_json(
+        ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
+    )["template_selection"]["registry_source_config_sha256"]
     assert binding["attachment_count"] == 0
     assert binding["cc_count"] == 0
     assert binding["bcc_count"] == 0
@@ -475,7 +480,7 @@ def test_argos_primary_partner_binding_rejects_stale_or_duplicate_mailbox_state(
     assert duplicate_payload["summary"]["send_performed"] is False
 
 
-def test_argos_registry_drift_blocks_even_with_fresh_historical_readback():
+def test_argos_historical_registry_snapshot_tamper_blocks_with_fresh_readback():
     builder = load_argos_teaming_dispatch_builder()
     gate = load_json(
         ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
@@ -488,6 +493,7 @@ def test_argos_registry_drift_blocks_even_with_fresh_historical_readback():
     fresh["gmail_draft_receipt"]["readback_checked_utc"] = (
         "2026-07-27T22:59:59Z"
     )
+    fresh["template_selection"]["registry_source_config_sha256"] = "0" * 64
 
     payload = builder.build_payload(fresh)
 
@@ -596,7 +602,7 @@ def test_argos_primary_partner_binding_rejects_duplicate_json_keys(tmp_path):
         builder.read_json(path)
 
 
-def test_argos_primary_partner_binding_cli_rejects_historical_registry_snapshot():
+def test_argos_primary_partner_binding_cli_preserves_historical_registry_snapshot():
     result = subprocess.run(
         [
             sys.executable,
@@ -609,12 +615,14 @@ def test_argos_primary_partner_binding_cli_rejects_historical_registry_snapshot(
         check=False,
     )
 
-    assert result.returncode == 1, result.stdout + result.stderr
+    assert result.returncode == 0, result.stdout + result.stderr
     receipt = json.loads(result.stdout)
-    assert receipt["status"] == "STALE"
-    assert receipt["decision"] == "BLOCKED_DISPATCH_GATE_INTEGRITY"
-    assert receipt["pass_count"] == 11
-    assert receipt["fail_count"] == 1
+    assert receipt["status"] == "CURRENT"
+    assert receipt["decision"] == (
+        "VERIFIED_SNAPSHOT_READY_FOR_SINGLE_USE_ACTION_TIME_APPROVAL"
+    )
+    assert receipt["pass_count"] == 12
+    assert receipt["fail_count"] == 0
     assert receipt["send_authorized"] is False
     assert receipt["send_performed"] is False
 
@@ -827,26 +835,17 @@ def test_argos_text_custody_is_stable_across_line_endings(tmp_path):
     ).hexdigest()
 
 
-def test_argos_security_receipt_portability_ignores_only_ref_count():
+def test_argos_security_receipt_requires_exact_head_blob_set():
     conformance = load_argos_conformance_builder()
     committed = load_json(ARGOS_SECURITY_GATE)
-    different_checkout = json.loads(json.dumps(committed))
-    different_checkout["history"]["local_reachable_ref_count"] += 1
+    current, receipt_current = conformance.current_security_payload(committed)
+    assert receipt_current is True
+    assert current == committed
 
-    assert conformance.security_receipts_equivalent(
-        committed,
-        different_checkout,
-    )
-
-    different_checkout["history"]["target_history_commit_count"] += 1
-    assert not conformance.security_receipts_equivalent(
-        committed,
-        different_checkout,
-    )
-
-    invalid_count = json.loads(json.dumps(committed))
-    invalid_count["history"]["local_reachable_ref_count"] = 0
-    assert not conformance.security_receipts_equivalent(committed, invalid_count)
+    tampered = json.loads(json.dumps(committed))
+    tampered["history"]["target_history_blob_set_sha256"] = "0" * 64
+    _, receipt_current = conformance.current_security_payload(tampered)
+    assert receipt_current is False
 
 
 def test_argos_security_receipt_tampering_cannot_clear_gates():

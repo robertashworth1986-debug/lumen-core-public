@@ -48,13 +48,17 @@ def test_security_receipt_matches_placeholder_only_current_file():
     assert payload["history"]["scan_complete"] is True
     assert payload["history"]["scan_failure_count"] == 0
     assert payload["history"]["scan_scope"] == (
-        "LOCAL_REACHABLE_REFS_FOR_TARGET_PATH"
+        "HEAD_REACHABLE_UNIQUE_BLOBS_FOR_TARGET_PATH"
     )
     assert (
         payload["history"]["remote_public_history_verification_confirmed"]
         is False
     )
-    assert payload["history"]["historical_exposed_commit_count"] == 2
+    assert payload["history"]["historical_exposed_blob_count"] == 1
+    assert payload["history"]["target_history_blob_count"] == 2
+    assert module.SHA256_RE.fullmatch(
+        payload["history"]["target_history_blob_set_sha256"]
+    )
     assert set(payload["history"]["historical_sensitive_field_names"]) == {
         "api_key",
         "client_id",
@@ -84,10 +88,14 @@ def test_historical_object_read_failure_blocks_the_scan(monkeypatch):
     module = load_verifier()
 
     def fake_git_output(*args, **_kwargs):
-        if args[0] == "for-each-ref":
-            return "refs/heads/main\n"
+        if args[:2] == ("rev-parse", "--is-shallow-repository"):
+            return "false\n"
+        if args[:3] == ("rev-parse", "--verify", "HEAD"):
+            return ("f" * 40) + "\n"
         if args[0] == "rev-list":
             return ("a" * 40) + "\n"
+        if args[0] == "rev-parse":
+            return ("b" * 40) + "\n"
         raise AssertionError(args)
 
     monkeypatch.setattr(module, "git_output", fake_git_output)
@@ -103,6 +111,23 @@ def test_historical_object_read_failure_blocks_the_scan(monkeypatch):
     with pytest.raises(
         module.CredentialHygieneError,
         match="HISTORY_OBJECT_READ_FAILED",
+    ):
+        module.historical_exposure_summary()
+
+
+def test_historical_scan_rejects_a_shallow_repository(monkeypatch):
+    module = load_verifier()
+    monkeypatch.setattr(
+        module,
+        "git_output",
+        lambda *args, **_kwargs: "true\n"
+        if args[:2] == ("rev-parse", "--is-shallow-repository")
+        else "",
+    )
+
+    with pytest.raises(
+        module.CredentialHygieneError,
+        match="HISTORY_SCAN_REQUIRES_COMPLETE_CLONE",
     ):
         module.historical_exposure_summary()
 

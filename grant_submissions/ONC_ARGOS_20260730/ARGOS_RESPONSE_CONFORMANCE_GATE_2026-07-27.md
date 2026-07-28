@@ -1,6 +1,6 @@
 # Project Argos Response Conformance Gate
 
-Evaluated UTC: `2026-07-28T17:32:56Z`
+Evaluated UTC: `2026-07-28T17:52:37Z`
 Decision: `BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY`
 
 ## Summary
@@ -16,12 +16,12 @@ Decision: `BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY`
 
 | Check | Status | Requirement | Evidence |
 | --- | --- | --- | --- |
-| `OFFICIAL_NOTICE_CURRENT` | `PASS` | The official notice is active and its identity and deadline are explicit. | https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view; checked_utc=2026-07-28T17:21:48Z; age_seconds=668; amendment_observed=False |
+| `OFFICIAL_NOTICE_CURRENT` | `PASS` | The official notice is active and its identity and deadline are explicit. | https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view; checked_utc=2026-07-28T17:21:48Z; age_seconds=1849; amendment_observed=False |
 | `OFFICIAL_SOW_SOURCE_CUSTODY` | `PASS` | The official four-page draft SOW attachment is preserved with exact binary custody. | bytes=174359; sha256=6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354; source_receipt_sha256=5479d7db1dc3777d9e6c177f92800bd198392105d46a2cf78c56554c86b8820d |
 | `PUBLIC_REPOSITORY_CREDENTIAL_RECEIPT` | `PASS` | The current public credential configuration contains environment references only and its receipt matches the current file. | placeholder_only=True; non_placeholder_value_count=0; required_environment_references_present=True; scan_complete=True; scan_failure_count=0 |
 | `PUBLIC_REPOSITORY_ROTATION_AND_HISTORY` | `BLOCKED` | Previously exposed provider credentials are rotated and prior public Git objects are remediated before the repository is linked or the final response is sent. | provider_rotations_confirmed=False; history_remediation_confirmed=False; remote_public_history_verification_confirmed=False; historical_exposure_detected=True; public_repository_link_allowed=False |
 |  |  | **Blocker action** | Rotate the affected provider credentials, record non-secret receipts, remediate reachable public Git history, and verify the remote before linking the repository or sending. |
-| `DEADLINE_OPEN` | `PASS` | The response is evaluated before the exact Government deadline. | evaluated=2026-07-28T17:32:56Z; deadline=2026-07-30T21:00:00Z |
+| `DEADLINE_OPEN` | `PASS` | The response is evaluated before the exact Government deadline. | evaluated=2026-07-28T17:52:37Z; deadline=2026-07-30T21:00:00Z |
 | `ACCEPTED_FILES_PRESENT` | `PASS` | Both accepted review formats and their receipts are present. | docx=True; pdf=True; receipts=True |
 | `ARTIFACT_HASH_CUSTODY` | `PASS` | Markdown, DOCX, and PDF hashes reconcile to the current receipts. | docx_sha256=7d17d228d88acbd06b5fb5d8aaff513bf476dd31920e9a5660ff71147145dea5; pdf_sha256=6260617bb2ae0de6d6b6817c70d3146351889db16d1c288a6edb48c8c19d0c04 |
 | `US_LETTER_SIZE` | `PASS` | Every DOCX section uses US Letter dimensions. | sections=2; expected_twips=12240x15840 |
