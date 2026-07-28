@@ -447,6 +447,19 @@ def test_observation_is_deterministic_and_hash_bound() -> None:
     assert first["overall"] == "operational"
     assert first["healthy_count"] == len(SURFACES)
     assert first["total_count"] == len(SURFACES)
+    assert first["metric_semantics"] == {
+        "metric_name": "point_in_time_public_surface_contract_pass_count",
+        "numerator_field": "healthy_count",
+        "denominator_field": "total_count",
+        "scope": "selected_public_endpoints_at_checked_utc",
+        "repository_quality_score": False,
+        "cross_repository_comparison": False,
+        "valuation_signal": False,
+        "scientific_performance_evidence": False,
+        "external_validation_evidence": False,
+    }
+    assert "repository quality relative to peers" in first["claim_boundary"]
+    assert "valuation" in first["claim_boundary"]
     assert all(row["ok"] for row in first["endpoints"].values())
     assert first["controls"]["production_mutation_performed"] is False
     assert first["controls"]["credentials_used"] is False
@@ -500,6 +513,9 @@ def test_observer_error_receipt_is_fail_closed_and_hash_bound() -> None:
     assert receipt["overall"] == "observer_error"
     assert receipt["healthy_count"] == 0
     assert receipt["total_count"] == len(SURFACES)
+    assert receipt["metric_semantics"]["repository_quality_score"] is False
+    assert receipt["metric_semantics"]["cross_repository_comparison"] is False
+    assert receipt["metric_semantics"]["valuation_signal"] is False
     assert all(not row["ok"] for row in receipt["endpoints"].values())
     serialized = json.dumps(receipt)
     assert "synthetic private error" not in serialized

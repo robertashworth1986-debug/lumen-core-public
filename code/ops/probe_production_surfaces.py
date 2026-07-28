@@ -385,6 +385,17 @@ def build_observation(
         "overall": overall,
         "healthy_count": healthy_count,
         "total_count": total_count,
+        "metric_semantics": {
+            "metric_name": "point_in_time_public_surface_contract_pass_count",
+            "numerator_field": "healthy_count",
+            "denominator_field": "total_count",
+            "scope": "selected_public_endpoints_at_checked_utc",
+            "repository_quality_score": False,
+            "cross_repository_comparison": False,
+            "valuation_signal": False,
+            "scientific_performance_evidence": False,
+            "external_validation_evidence": False,
+        },
         "endpoints": endpoints,
         "controls": {
             "read_only": True,
@@ -403,7 +414,8 @@ def build_observation(
             "This receipt observes public reachability and expected response "
             "shape at one timestamp. It does not prove availability outside the "
             "probe, production readiness, security, performance, savings, "
-            "validation, endorsement, contract eligibility, or award."
+            "validation, endorsement, contract eligibility, award, repository "
+            "quality relative to peers, or valuation."
         ),
     }
     payload["observation_sha256"] = canonical_object_sha256(payload)
@@ -440,6 +452,17 @@ def build_observer_error_observation(
         "overall": "observer_error",
         "healthy_count": 0,
         "total_count": len(SURFACES),
+        "metric_semantics": {
+            "metric_name": "point_in_time_public_surface_contract_pass_count",
+            "numerator_field": "healthy_count",
+            "denominator_field": "total_count",
+            "scope": "selected_public_endpoints_at_checked_utc",
+            "repository_quality_score": False,
+            "cross_repository_comparison": False,
+            "valuation_signal": False,
+            "scientific_performance_evidence": False,
+            "external_validation_evidence": False,
+        },
         "endpoints": endpoints,
         "controls": {
             "read_only": True,
