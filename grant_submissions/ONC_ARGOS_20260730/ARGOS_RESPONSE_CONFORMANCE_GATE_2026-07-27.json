@@ -10,7 +10,7 @@
     {
       "blocks_send": true,
       "check_id": "OFFICIAL_SOW_SOURCE_CUSTODY",
-      "evidence": "bytes=174359; sha256=6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354; source_receipt_sha256=bef28a26ac6a496d3f1fc5f0a92aaa6e52cbc601b32d0ba831aa204533362414",
+      "evidence": "bytes=174359; sha256=6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354; source_receipt_sha256=5479d7db1dc3777d9e6c177f92800bd198392105d46a2cf78c56554c86b8820d",
       "requirement": "The official four-page draft SOW attachment is preserved with exact binary custody.",
       "status": "PASS"
     },
