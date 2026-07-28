@@ -774,6 +774,16 @@ def main() -> int:
                 "status": status,
                 "decision": payload["decision"],
                 **payload["summary"],
+                "failed_checks": [
+                    row["check_id"]
+                    for row in payload["checks"]
+                    if row["status"] == "FAIL"
+                ],
+                "blocked_checks": [
+                    row["check_id"]
+                    for row in payload["checks"]
+                    if row["status"] == "BLOCKED"
+                ],
                 "json_output": str(args.json_output),
                 "markdown_output": str(args.markdown_output),
             },
