@@ -40,7 +40,9 @@ Inspect-only mode validates and compares all three source files without writing.
 Apply mode requires root, installs the fixed booth projection, default-deny
 gateway facade, and private-identifier-safe legacy provider; restarts only
 luma-gateway when needed; and rolls all files back unless bounded health,
-booth, and blocked-route probes pass.
+booth, and blocked-route probes pass. Apply also requires a private
+LUMA_HUMAN_UNLOCK_TOKEN of at least 32 characters and at least 1 MiB of free
+space on the target filesystem.
 EOF
 }
 
@@ -51,6 +53,15 @@ for arg in "$@"; do
     *) echo "ERROR: unknown argument: $arg" >&2; usage >&2; exit 2 ;;
   esac
 done
+
+if [[ "$APPLY" == true ]]; then
+  human_unlock_token="${LUMA_HUMAN_UNLOCK_TOKEN:-}"
+  if (( ${#human_unlock_token} < 32 )); then
+    echo "ERROR: --apply requires a private HumanUnlock value of at least 32 characters" >&2
+    exit 2
+  fi
+  unset human_unlock_token LUMA_HUMAN_UNLOCK_TOKEN
+fi
 
 if ! [[ "$PROBE_ATTEMPTS" =~ ^[0-9]+$ ]] \
   || (( PROBE_ATTEMPTS < 1 || PROBE_ATTEMPTS > 30 )) \
@@ -183,6 +194,12 @@ for required in systemctl curl; do
   }
 done
 systemctl cat "$SERVICE" >/dev/null
+TARGET_PARENT="$(dirname -- "$CONTRACT_TARGET")"
+AVAILABLE_KB="$(df -Pk "$TARGET_PARENT" | awk 'NR == 2 {print $4}')"
+if ! [[ "$AVAILABLE_KB" =~ ^[0-9]+$ ]] || (( AVAILABLE_KB < 1024 )); then
+  echo "ERROR: at least 1 MiB of free target-filesystem space is required" >&2
+  exit 9
+fi
 install -d -o root -g root -m 755 "$(dirname -- "$CONTRACT_TARGET")"
 install -d -o root -g root -m 755 "$(dirname -- "$FACADE_TARGET")"
 install -d -o root -g root -m 755 "$(dirname -- "$LEGACY_TARGET")"

@@ -202,6 +202,9 @@ def test_deployment_repairs_the_fixed_contract_and_gateway_runtime() -> None:
 
     assert "Inspect-only by default" in script
     assert "--apply" in script
+    assert "LUMA_HUMAN_UNLOCK_TOKEN" in script
+    assert "${#human_unlock_token} < 32" in script
+    assert "unset human_unlock_token LUMA_HUMAN_UNLOCK_TOKEN" in script
     assert "booth_public_contract.py" in script
     assert "luma_experience_gateway.py" in script
     assert "luma_experience_gateway_legacy.py" in script
@@ -220,6 +223,11 @@ def test_deployment_repairs_the_fixed_contract_and_gateway_runtime() -> None:
     assert "LUMENCORE_GATEWAY_PROBE_ATTEMPTS" in script
     assert "LUMENCORE_GATEWAY_PROBE_DELAY_SECONDS" in script
     assert 'dirname -- "$LEGACY_TARGET"' in script
+    assert "AVAILABLE_KB" in script
+    assert "at least 1 MiB of free target-filesystem space is required" in script
+    assert script.index('if [[ "$APPLY" == true ]]') < script.index(
+        'install -d -o root -g root -m 755'
+    )
 
     workflow = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
         encoding="utf-8"
