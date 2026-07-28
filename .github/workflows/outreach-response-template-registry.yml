@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
+      - "config/outreach_action_time_mailbox_receipt_template_v1.json"
       - "config/outreach_claim_evidence_receipt_template_v1.json"
       - "config/outreach_response_templates_v1.json"
       - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
@@ -14,6 +15,7 @@ on:
     branches: [main]
     paths:
       - "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
+      - "config/outreach_action_time_mailbox_receipt_template_v1.json"
       - "config/outreach_claim_evidence_receipt_template_v1.json"
       - "config/outreach_response_templates_v1.json"
       - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"

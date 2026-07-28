@@ -7,7 +7,7 @@ import json
 import re
 import string
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
@@ -17,6 +17,9 @@ ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "config" / "outreach_response_templates_v1.json"
 CLAIM_EVIDENCE_TEMPLATE = (
     ROOT / "config" / "outreach_claim_evidence_receipt_template_v1.json"
+)
+ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE = (
+    ROOT / "config" / "outreach_action_time_mailbox_receipt_template_v1.json"
 )
 SPRINT_DIR = ROOT / "grant_submissions" / "funding_sprint_20260709"
 OUT_OPS = ROOT / "out" / "ops"
@@ -63,6 +66,17 @@ CLAIM_EVIDENCE_RECEIPT_SCHEMA = (
     "lumencore.outreach_claim_evidence_receipt.v1"
 )
 DISPATCH_BINDING_SCHEMA = "lumencore.outreach_dispatch_binding.v1"
+ACTION_TIME_MAILBOX_RECEIPT_SCHEMA = (
+    "lumencore.outreach_action_time_mailbox_receipt.v1"
+)
+ACTION_TIME_AUTHORIZATION_SCHEMA = (
+    "lumencore.outreach_action_time_authorization.v1"
+)
+ACTION_TIME_APPROVAL_BINDING_SCHEMA = (
+    "lumencore.outreach_action_time_approval_binding.v1"
+)
+ACTION_TIME_MAILBOX_MAX_AGE_SECONDS = 15 * 60
+ACTION_TIME_APPROVAL_WINDOW_SECONDS = 5 * 60
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 CLAIM_EVIDENCE_RECEIPT_FIELDS = {
     "claim_allowed",
@@ -119,6 +133,29 @@ CLAIM_RISK_PATTERNS = {
         re.IGNORECASE,
     ),
 }
+ACTION_TIME_MAILBOX_RECEIPT_FIELDS = {
+    "attachment_count",
+    "attachment_set_sha256",
+    "bcc_count",
+    "body_sha256",
+    "cc_count",
+    "checked_utc",
+    "current_draft_only",
+    "draft_present",
+    "draft_readback_checked_utc",
+    "draft_sent",
+    "full_mailbox_search_completed",
+    "identifiers_omitted",
+    "matching_current_draft_count",
+    "matching_received_after_draft_count",
+    "matching_sent_count",
+    "message_body_omitted",
+    "recipient_route_sha256",
+    "schema",
+    "search_scope",
+    "source_message_id_sha256",
+    "subject_sha256",
+}
 NEGATION_WINDOW_RE = re.compile(
     r"\b(?:no|not|never|without|unverified|unproven)\b",
     re.IGNORECASE,
@@ -145,6 +182,56 @@ def read_registry(path: Path = CONFIG) -> dict[str, Any]:
     )
     if not isinstance(payload, dict):
         raise OutreachRegistryError("REGISTRY_NOT_OBJECT")
+    return payload
+
+
+def validate_action_time_mailbox_receipt_template(
+    path: Path = ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE,
+) -> dict[str, Any]:
+    payload = json.loads(
+        path.read_text(encoding="utf-8"),
+        object_pairs_hook=_reject_duplicate_keys,
+    )
+    if not isinstance(payload, dict):
+        raise OutreachRegistryError(
+            "ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE_NOT_OBJECT"
+        )
+    if set(payload) != ACTION_TIME_MAILBOX_RECEIPT_FIELDS:
+        raise OutreachRegistryError(
+            "ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE_FIELDS_INVALID"
+        )
+    if payload.get("schema") != ACTION_TIME_MAILBOX_RECEIPT_SCHEMA:
+        raise OutreachRegistryError(
+            "ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE_SCHEMA_INVALID"
+        )
+    expected_non_authorizing_values = {
+        "attachment_count": 0,
+        "attachment_set_sha256": None,
+        "bcc_count": 0,
+        "body_sha256": None,
+        "cc_count": 0,
+        "checked_utc": None,
+        "current_draft_only": False,
+        "draft_present": False,
+        "draft_readback_checked_utc": None,
+        "draft_sent": False,
+        "full_mailbox_search_completed": False,
+        "identifiers_omitted": True,
+        "matching_current_draft_count": 0,
+        "matching_received_after_draft_count": 0,
+        "matching_sent_count": 0,
+        "message_body_omitted": True,
+        "recipient_route_sha256": None,
+        "search_scope": "ALL_MAIL_BOUND_ROUTE_THREAD_SUBJECT_BODY",
+        "source_message_id_sha256": None,
+        "subject_sha256": None,
+    }
+    for field, expected in expected_non_authorizing_values.items():
+        if payload.get(field) != expected:
+            raise OutreachRegistryError(
+                "ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE_MUST_NOT_AUTHORIZE:"
+                f"{field}"
+            )
     return payload
 
 
@@ -930,21 +1017,13 @@ def render_response(
         inbound_requires_response=inbound_requires_response,
         explicit_attachment_request=explicit_attachment_request,
     )
-    exact_approval_ready = attachment_hashes_bound
+    draft_binding_complete = attachment_hashes_bound
+    exact_approval_ready = False
     exact_approval_phrase = None
-    exact_approval_blockers: list[str] = []
-    if exact_approval_ready:
-        exact_approval_phrase = (
-            "APPROVE OUTREACH DISPATCH: "
-            f"template {row['template_id']}; "
-            f"binding SHA-256 {dispatch_binding['binding_sha256']}; "
-            f"subject SHA-256 {dispatch_binding['subject_sha256']}; "
-            f"body SHA-256 {dispatch_binding['body_sha256']}; "
-            "attachment set SHA-256 "
-            f"{dispatch_binding['attachment_set_sha256']}."
-        )
-    else:
+    exact_approval_blockers = ["ACTION_TIME_MAILBOX_RECEIPT_REQUIRED"]
+    if not attachment_hashes_bound:
         exact_approval_blockers.append("ATTACHMENT_CONTENT_HASHES_REQUIRED")
+    exact_approval_blockers.sort()
     result = _base_result(payload, row, status, deadline)
     result.update(
         {
@@ -961,6 +1040,7 @@ def render_response(
             "claim_risk_fields": sorted(fact_risks),
             "claim_evidence_receipt_sha256s": evidence_receipt_sha256s,
             "dispatch_binding": dispatch_binding,
+            "draft_binding_complete": draft_binding_complete,
             "exact_action_time_approval_ready": exact_approval_ready,
             "exact_action_time_approval_phrase": exact_approval_phrase,
             "exact_action_time_approval_blockers": exact_approval_blockers,
@@ -969,10 +1049,453 @@ def render_response(
     return result
 
 
+def _normalize_optional_sha256(value: Any, code: str) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str) or not SHA256_RE.fullmatch(value.strip()):
+        raise OutreachRegistryError(code)
+    return value.strip().upper()
+
+
+def _normalize_required_sha256(value: Any, code: str) -> str:
+    normalized = _normalize_optional_sha256(value, code)
+    if normalized is None:
+        raise OutreachRegistryError(code)
+    return normalized
+
+
+def _validated_ready_dispatch_binding(
+    rendered: dict[str, Any],
+) -> dict[str, Any]:
+    if not isinstance(rendered, dict):
+        raise OutreachRegistryError("RENDERED_RESPONSE_INVALID")
+    if rendered.get("status") not in {
+        "READY_FOR_ACTION_TIME_REVIEW",
+        "READY_FOR_PRIVATE_ACTION_TIME_REVIEW",
+    }:
+        raise OutreachRegistryError("RENDERED_RESPONSE_NOT_READY")
+    if rendered.get("send_allowed_by_builder") is not False:
+        raise OutreachRegistryError("RENDERED_BUILDER_SEND_CONTROL_INVALID")
+    if rendered.get("send_performed") is not False:
+        raise OutreachRegistryError("RENDERED_SEND_STATE_INVALID")
+    if rendered.get("draft_binding_complete") is not True:
+        raise OutreachRegistryError("DRAFT_BINDING_INCOMPLETE")
+    binding = rendered.get("dispatch_binding")
+    if not isinstance(binding, dict):
+        raise OutreachRegistryError("DISPATCH_BINDING_MISSING")
+    if binding.get("schema") != DISPATCH_BINDING_SCHEMA:
+        raise OutreachRegistryError("DISPATCH_BINDING_SCHEMA_INVALID")
+    expected_sha256 = canonical_object_sha256(
+        binding,
+        omit={"binding_sha256"},
+    )
+    if binding.get("binding_sha256") != expected_sha256:
+        raise OutreachRegistryError("DISPATCH_BINDING_HASH_MISMATCH")
+    for field in (
+        "binding_sha256",
+        "recipient_route_sha256",
+        "subject_sha256",
+        "body_sha256",
+        "attachment_set_sha256",
+    ):
+        _normalize_required_sha256(
+            binding.get(field),
+            f"DISPATCH_BINDING_{field.upper()}_INVALID",
+        )
+    _normalize_optional_sha256(
+        binding.get("source_message_id_sha256"),
+        "DISPATCH_BINDING_SOURCE_MESSAGE_SHA256_INVALID",
+    )
+    if binding.get("attachment_content_hashes_bound") is not True:
+        raise OutreachRegistryError("ATTACHMENT_CONTENT_HASHES_REQUIRED")
+    duplicate_state = binding.get("duplicate_send_state")
+    if not isinstance(duplicate_state, dict):
+        raise OutreachRegistryError("DISPATCH_DUPLICATE_STATE_INVALID")
+    if duplicate_state.get("already_sent") is not False:
+        raise OutreachRegistryError("DISPATCH_ALREADY_SENT")
+    return binding
+
+
+def _validate_action_time_mailbox_receipt(
+    receipt: dict[str, Any],
+    binding: dict[str, Any],
+    current: datetime,
+) -> tuple[dict[str, Any], str]:
+    if not isinstance(receipt, dict):
+        raise OutreachRegistryError("ACTION_TIME_MAILBOX_RECEIPT_INVALID")
+    if set(receipt) != ACTION_TIME_MAILBOX_RECEIPT_FIELDS:
+        raise OutreachRegistryError("ACTION_TIME_MAILBOX_RECEIPT_FIELDS_INVALID")
+    if receipt.get("schema") != ACTION_TIME_MAILBOX_RECEIPT_SCHEMA:
+        raise OutreachRegistryError("ACTION_TIME_MAILBOX_RECEIPT_SCHEMA_INVALID")
+    if receipt.get("search_scope") != "ALL_MAIL_BOUND_ROUTE_THREAD_SUBJECT_BODY":
+        raise OutreachRegistryError("ACTION_TIME_MAILBOX_SEARCH_SCOPE_INVALID")
+
+    required_true = {
+        "current_draft_only",
+        "draft_present",
+        "full_mailbox_search_completed",
+        "identifiers_omitted",
+        "message_body_omitted",
+    }
+    for field in required_true:
+        if receipt.get(field) is not True:
+            raise OutreachRegistryError(
+                f"ACTION_TIME_MAILBOX_CONTROL_INVALID:{field}"
+            )
+    if receipt.get("draft_sent") is not False:
+        raise OutreachRegistryError("ACTION_TIME_DRAFT_ALREADY_SENT")
+
+    expected_counts = {
+        "matching_current_draft_count": 1,
+        "matching_sent_count": 0,
+        "matching_received_after_draft_count": 0,
+        "cc_count": 0,
+        "bcc_count": 0,
+    }
+    for field, expected in expected_counts.items():
+        value = receipt.get(field)
+        if (
+            not isinstance(value, int)
+            or isinstance(value, bool)
+            or value != expected
+        ):
+            raise OutreachRegistryError(
+                f"ACTION_TIME_MAILBOX_COUNT_INVALID:{field}"
+            )
+    attachment_count = receipt.get("attachment_count")
+    if (
+        not isinstance(attachment_count, int)
+        or isinstance(attachment_count, bool)
+        or attachment_count != binding.get("attachment_count")
+    ):
+        raise OutreachRegistryError("ACTION_TIME_ATTACHMENT_COUNT_MISMATCH")
+
+    digest_fields = {
+        "recipient_route_sha256": "ACTION_TIME_RECIPIENT_ROUTE_MISMATCH",
+        "source_message_id_sha256": "ACTION_TIME_SOURCE_MESSAGE_MISMATCH",
+        "subject_sha256": "ACTION_TIME_SUBJECT_MISMATCH",
+        "body_sha256": "ACTION_TIME_BODY_MISMATCH",
+        "attachment_set_sha256": "ACTION_TIME_ATTACHMENT_SET_MISMATCH",
+    }
+    normalized_receipt = dict(receipt)
+    for field, mismatch_code in digest_fields.items():
+        observed = _normalize_optional_sha256(
+            receipt.get(field),
+            f"ACTION_TIME_{field.upper()}_INVALID",
+        )
+        expected = _normalize_optional_sha256(
+            binding.get(field),
+            f"DISPATCH_BINDING_{field.upper()}_INVALID",
+        )
+        if observed != expected:
+            raise OutreachRegistryError(mismatch_code)
+        normalized_receipt[field] = observed
+
+    checked = parse_aware_datetime(str(receipt.get("checked_utc") or ""))
+    readback_checked = parse_aware_datetime(
+        str(receipt.get("draft_readback_checked_utc") or "")
+    )
+    for label, observed in (
+        ("MAILBOX_SEARCH", checked),
+        ("DRAFT_READBACK", readback_checked),
+    ):
+        age_seconds = (current - observed).total_seconds()
+        if age_seconds < 0:
+            raise OutreachRegistryError(
+                f"ACTION_TIME_{label}_FROM_FUTURE"
+            )
+        if age_seconds > ACTION_TIME_MAILBOX_MAX_AGE_SECONDS:
+            raise OutreachRegistryError(
+                f"ACTION_TIME_{label}_STALE"
+            )
+    normalized_receipt["checked_utc"] = canonical_utc(
+        str(receipt["checked_utc"])
+    )
+    normalized_receipt["draft_readback_checked_utc"] = canonical_utc(
+        str(receipt["draft_readback_checked_utc"])
+    )
+    return normalized_receipt, canonical_object_sha256(normalized_receipt)
+
+
+def _action_time_approval_phrase(binding: dict[str, Any]) -> str:
+    return (
+        "APPROVE ONE OUTREACH DISPATCH: "
+        f"template {binding['template_id']}; "
+        f"action-time binding SHA-256 {binding['binding_sha256']}; "
+        f"draft binding SHA-256 {binding['dispatch_binding_sha256']}; "
+        f"subject SHA-256 {binding['subject_sha256']}; "
+        f"body SHA-256 {binding['body_sha256']}; "
+        f"attachment set SHA-256 {binding['attachment_set_sha256']}; "
+        f"expires {binding['approval_window_expires_utc']}."
+    )
+
+
+def build_action_time_authorization(
+    rendered: dict[str, Any],
+    mailbox_receipt: dict[str, Any],
+    *,
+    current_utc: str,
+) -> dict[str, Any]:
+    binding = _validated_ready_dispatch_binding(rendered)
+    current = parse_aware_datetime(current_utc)
+    deadline_value = binding.get("deadline_utc")
+    deadline = (
+        parse_aware_datetime(str(deadline_value))
+        if deadline_value is not None
+        else None
+    )
+    if deadline is not None and current >= deadline:
+        raise OutreachRegistryError("ACTION_TIME_DEADLINE_REACHED")
+
+    normalized_receipt, receipt_sha256 = (
+        _validate_action_time_mailbox_receipt(
+            mailbox_receipt,
+            binding,
+            current,
+        )
+    )
+    expires = current + timedelta(
+        seconds=ACTION_TIME_APPROVAL_WINDOW_SECONDS
+    )
+    if deadline is not None:
+        expires = min(expires, deadline)
+    opened_utc = current.isoformat().replace("+00:00", "Z")
+    expires_utc = expires.isoformat().replace("+00:00", "Z")
+    core = {
+        "schema": ACTION_TIME_APPROVAL_BINDING_SCHEMA,
+        "template_id": str(binding["template_id"]),
+        "dispatch_binding_sha256": str(binding["binding_sha256"]),
+        "mailbox_receipt_sha256": receipt_sha256,
+        "recipient_route_sha256": str(binding["recipient_route_sha256"]),
+        "source_message_id_sha256": binding.get("source_message_id_sha256"),
+        "subject_sha256": str(binding["subject_sha256"]),
+        "body_sha256": str(binding["body_sha256"]),
+        "attachment_set_sha256": str(binding["attachment_set_sha256"]),
+        "approval_window_opened_utc": opened_utc,
+        "approval_window_expires_utc": expires_utc,
+        "single_use": True,
+    }
+    approval_binding = {
+        **core,
+        "binding_sha256": canonical_object_sha256(core),
+    }
+    phrase = _action_time_approval_phrase(approval_binding)
+    return {
+        "schema": ACTION_TIME_AUTHORIZATION_SCHEMA,
+        "status": "READY_FOR_SINGLE_USE_EXACT_APPROVAL",
+        "generated_utc": opened_utc,
+        "dispatch_binding": dict(binding),
+        "mailbox_receipt": normalized_receipt,
+        "mailbox_receipt_sha256": receipt_sha256,
+        "approval_binding": approval_binding,
+        "exact_action_time_approval_phrase": phrase,
+        "approval_received": False,
+        "action_time_approval_valid": False,
+        "send_authorized": False,
+        "send_performed": False,
+        "builder_can_send_email": False,
+        "controls": {
+            "fresh_full_mailbox_search_required": True,
+            "fresh_exact_draft_readback_required": True,
+            "mailbox_max_age_seconds": ACTION_TIME_MAILBOX_MAX_AGE_SECONDS,
+            "approval_window_seconds": int(
+                (expires - current).total_seconds()
+            ),
+            "exact_phrase_required": True,
+            "single_use": True,
+            "deadline_reached_fail_closed": True,
+            "duplicate_send_fail_closed": True,
+        },
+        "claim_boundary": (
+            "This authorization binds one fresh draft snapshot for exact human "
+            "approval. It does not send email, prove delivery or receipt, "
+            "certify facts, authorize partner-name use, submit a portal action, "
+            "or establish selection, award, funding, validation, performance, "
+            "or savings."
+        ),
+    }
+
+
+def evaluate_action_time_authorization(
+    authorization: dict[str, Any],
+    *,
+    exact_approval_phrase: str,
+    current_utc: str,
+    dispatch_consumed: bool = False,
+) -> dict[str, Any]:
+    if not isinstance(authorization, dict) or authorization.get(
+        "schema"
+    ) != ACTION_TIME_AUTHORIZATION_SCHEMA:
+        raise OutreachRegistryError("ACTION_TIME_AUTHORIZATION_INVALID")
+    if not isinstance(dispatch_consumed, bool):
+        raise OutreachRegistryError("DISPATCH_CONSUMED_STATE_INVALID")
+    approval_binding = authorization.get("approval_binding")
+    if not isinstance(approval_binding, dict) or approval_binding.get(
+        "schema"
+    ) != ACTION_TIME_APPROVAL_BINDING_SCHEMA:
+        raise OutreachRegistryError("ACTION_TIME_APPROVAL_BINDING_INVALID")
+    expected_binding_sha256 = canonical_object_sha256(
+        approval_binding,
+        omit={"binding_sha256"},
+    )
+    binding_hash_valid = (
+        approval_binding.get("binding_sha256")
+        == expected_binding_sha256
+    )
+    expected_phrase = _action_time_approval_phrase(approval_binding)
+    phrase_integrity_valid = (
+        authorization.get("exact_action_time_approval_phrase")
+        == expected_phrase
+    )
+    phrase_matches = exact_approval_phrase == expected_phrase
+    current = parse_aware_datetime(current_utc)
+    opened = parse_aware_datetime(
+        str(approval_binding.get("approval_window_opened_utc") or "")
+    )
+    expires = parse_aware_datetime(
+        str(approval_binding.get("approval_window_expires_utc") or "")
+    )
+    approval_window_seconds = (expires - opened).total_seconds()
+    approval_window_bounded = (
+        0 < approval_window_seconds <= ACTION_TIME_APPROVAL_WINDOW_SECONDS
+    )
+
+    dispatch_binding = authorization.get("dispatch_binding")
+    dispatch_binding_hash_valid = False
+    dispatch_scope_matches = False
+    deadline_bounds_window = True
+    if isinstance(dispatch_binding, dict):
+        dispatch_binding_hash_valid = (
+            dispatch_binding.get("schema") == DISPATCH_BINDING_SCHEMA
+            and dispatch_binding.get("binding_sha256")
+            == canonical_object_sha256(
+                dispatch_binding,
+                omit={"binding_sha256"},
+            )
+        )
+        dispatch_scope_matches = all(
+            (
+                approval_binding.get("template_id")
+                == dispatch_binding.get("template_id"),
+                approval_binding.get("dispatch_binding_sha256")
+                == dispatch_binding.get("binding_sha256"),
+                approval_binding.get("recipient_route_sha256")
+                == dispatch_binding.get("recipient_route_sha256"),
+                approval_binding.get("source_message_id_sha256")
+                == dispatch_binding.get("source_message_id_sha256"),
+                approval_binding.get("subject_sha256")
+                == dispatch_binding.get("subject_sha256"),
+                approval_binding.get("body_sha256")
+                == dispatch_binding.get("body_sha256"),
+                approval_binding.get("attachment_set_sha256")
+                == dispatch_binding.get("attachment_set_sha256"),
+            )
+        )
+        deadline_value = dispatch_binding.get("deadline_utc")
+        if deadline_value is not None:
+            deadline_bounds_window = expires <= parse_aware_datetime(
+                str(deadline_value)
+            )
+
+    mailbox_receipt_integrity_valid = False
+    mailbox_receipt_scope_matches = False
+    mailbox_receipt = authorization.get("mailbox_receipt")
+    if isinstance(dispatch_binding, dict) and isinstance(
+        mailbox_receipt, dict
+    ):
+        try:
+            normalized_receipt, observed_receipt_sha256 = (
+                _validate_action_time_mailbox_receipt(
+                    mailbox_receipt,
+                    dispatch_binding,
+                    opened,
+                )
+            )
+        except OutreachRegistryError:
+            pass
+        else:
+            mailbox_receipt_integrity_valid = (
+                mailbox_receipt == normalized_receipt
+                and authorization.get("mailbox_receipt_sha256")
+                == observed_receipt_sha256
+                and approval_binding.get("mailbox_receipt_sha256")
+                == observed_receipt_sha256
+            )
+            mailbox_receipt_scope_matches = True
+
+    window_current = opened <= current < expires
+    valid = all(
+        (
+            binding_hash_valid,
+            phrase_integrity_valid,
+            phrase_matches,
+            approval_window_bounded,
+            dispatch_binding_hash_valid,
+            dispatch_scope_matches,
+            deadline_bounds_window,
+            mailbox_receipt_integrity_valid,
+            mailbox_receipt_scope_matches,
+            window_current,
+            not dispatch_consumed,
+        )
+    )
+    blockers = []
+    if not binding_hash_valid:
+        blockers.append("ACTION_TIME_BINDING_HASH_MISMATCH")
+    if not phrase_integrity_valid:
+        blockers.append("STORED_APPROVAL_PHRASE_TAMPERED")
+    if not phrase_matches:
+        blockers.append("EXACT_APPROVAL_PHRASE_MISMATCH")
+    if not approval_window_bounded:
+        blockers.append("APPROVAL_WINDOW_BOUNDS_INVALID")
+    if not dispatch_binding_hash_valid:
+        blockers.append("DISPATCH_BINDING_HASH_MISMATCH")
+    if not dispatch_scope_matches:
+        blockers.append("ACTION_TIME_DISPATCH_SCOPE_MISMATCH")
+    if not deadline_bounds_window:
+        blockers.append("ACTION_TIME_DEADLINE_WINDOW_MISMATCH")
+    if not mailbox_receipt_integrity_valid:
+        blockers.append("ACTION_TIME_MAILBOX_RECEIPT_HASH_MISMATCH")
+    if not mailbox_receipt_scope_matches:
+        blockers.append("ACTION_TIME_MAILBOX_SCOPE_MISMATCH")
+    if current < opened:
+        blockers.append("APPROVAL_WINDOW_NOT_OPEN")
+    elif current >= expires:
+        blockers.append("APPROVAL_WINDOW_EXPIRED")
+    if dispatch_consumed:
+        blockers.append("SINGLE_USE_BINDING_ALREADY_CONSUMED")
+    return {
+        "status": (
+            "CURRENT_EXACT_APPROVAL_PRESENT"
+            if valid
+            else "EXPIRED_OR_BLOCKED_REBUILD_REQUIRED"
+        ),
+        "evaluated_utc": current.isoformat().replace("+00:00", "Z"),
+        "action_time_approval_valid": valid,
+        "approval_window_current": window_current,
+        "approval_window_bounded": approval_window_bounded,
+        "dispatch_binding_integrity_valid": dispatch_binding_hash_valid,
+        "dispatch_scope_matches": dispatch_scope_matches,
+        "deadline_bounds_window": deadline_bounds_window,
+        "mailbox_receipt_integrity_valid": (
+            mailbox_receipt_integrity_valid
+        ),
+        "mailbox_receipt_scope_matches": mailbox_receipt_scope_matches,
+        "single_use_binding_consumed": dispatch_consumed,
+        "blockers": sorted(blockers),
+        "builder_can_send_email": False,
+        "send_authorized": valid,
+        "send_performed": False,
+    }
+
+
 def build_public_payload(
     registry: dict[str, Any] | None = None, generated_utc: str | None = None
 ) -> dict[str, Any]:
     payload = validate_registry(registry or read_registry())
+    action_time_mailbox_receipt_template = (
+        validate_action_time_mailbox_receipt_template()
+    )
     policy_counts = Counter(row["send_policy"] for row in payload["templates"])
     private_count = sum(bool(row["private_render_only"]) for row in payload["templates"])
     quality_rows = [
@@ -1032,10 +1555,33 @@ def build_public_payload(
             ),
             "duplicate_json_key_fail_closed": True,
             "ready_render_has_dispatch_binding": True,
+            "draft_binding_is_not_send_authorization": True,
             "recipient_route_and_source_thread_hash_bound": True,
             "subject_body_deadline_and_attachment_set_hash_bound": True,
             "attachment_content_hash_required_for_exact_approval": True,
             "exact_approval_phrase_is_binding_scoped": True,
+            "action_time_mailbox_receipt_required": True,
+            "action_time_mailbox_receipt_schema": (
+                ACTION_TIME_MAILBOX_RECEIPT_SCHEMA
+            ),
+            "action_time_mailbox_receipt_template": (
+                ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE.relative_to(
+                    ROOT
+                ).as_posix()
+            ),
+            "action_time_mailbox_receipt_template_sha256": (
+                canonical_object_sha256(
+                    action_time_mailbox_receipt_template
+                )
+            ),
+            "action_time_mailbox_max_age_seconds": (
+                ACTION_TIME_MAILBOX_MAX_AGE_SECONDS
+            ),
+            "action_time_approval_window_seconds": (
+                ACTION_TIME_APPROVAL_WINDOW_SECONDS
+            ),
+            "exact_approval_expires": True,
+            "single_use_action_time_binding": True,
             "source_config_hash_cross_platform_canonical_json": True,
             "builder_can_send_email": False,
             "action_time_human_review_required": True,
@@ -1062,7 +1608,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`",
         "- Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`",
         "- Attachment content required for exact approval: `true`",
-        "- Exact approval phrase: `BINDING_SCOPED`",
+        "- Draft binding is send authorization: `false`",
+        "- Action-time mailbox receipt: `REQUIRED`",
+        "- Action-time mailbox freshness: `15_MINUTES_MAX`",
+        "- Exact approval phrase: `BINDING_SCOPED_SINGLE_USE`",
+        "- Exact approval window: `5_MINUTES_MAX`",
         f"- Static quality gate: `{payload['quality_gate']['status']}`",
         f"- Static quality checks: `{payload['quality_gate']['check_count']}`",
         "- Unchanged rebuilds byte-stable: `true`",
@@ -1126,7 +1676,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Operating Boundary",
             "",
-            "This registry renders drafts, immutable dispatch bindings, and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set. The exact approval phrase is withheld until every attachment content hash is bound. A binding scopes approval; it is not proof of transmission, receipt, content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
+            "This registry renders drafts, immutable dispatch bindings, action-time authorization records, and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes or until the deadline, whichever comes first. A binding scopes approval; it is not proof of transmission, receipt, content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
             "",
         ]
     )

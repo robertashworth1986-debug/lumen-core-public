@@ -19,6 +19,9 @@ OUT_JSON = (
     / "OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
 )
 OUT_MD = OUT_JSON.with_suffix(".md")
+ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE = (
+    ROOT / "config" / "outreach_action_time_mailbox_receipt_template_v1.json"
+)
 
 
 def load_module():
@@ -118,6 +121,36 @@ def partner_teaming_facts() -> dict[str, str]:
     return facts
 
 
+def mailbox_receipt(
+    binding: dict[str, object],
+    *,
+    checked_utc: str = "2026-07-27T22:04:55Z",
+) -> dict[str, object]:
+    return {
+        "attachment_count": binding["attachment_count"],
+        "attachment_set_sha256": binding["attachment_set_sha256"],
+        "bcc_count": 0,
+        "body_sha256": binding["body_sha256"],
+        "cc_count": 0,
+        "checked_utc": checked_utc,
+        "current_draft_only": True,
+        "draft_present": True,
+        "draft_readback_checked_utc": checked_utc,
+        "draft_sent": False,
+        "full_mailbox_search_completed": True,
+        "identifiers_omitted": True,
+        "matching_current_draft_count": 1,
+        "matching_received_after_draft_count": 0,
+        "matching_sent_count": 0,
+        "message_body_omitted": True,
+        "recipient_route_sha256": binding["recipient_route_sha256"],
+        "schema": "lumencore.outreach_action_time_mailbox_receipt.v1",
+        "search_scope": "ALL_MAIL_BOUND_ROUTE_THREAD_SUBJECT_BODY",
+        "source_message_id_sha256": binding["source_message_id_sha256"],
+        "subject_sha256": binding["subject_sha256"],
+    }
+
+
 def test_registry_validates_and_covers_high_value_response_states():
     module = load_module()
     registry = module.validate_registry(module.read_registry())
@@ -165,10 +198,12 @@ def test_initial_partner_teaming_inquiry_is_deadline_bound_and_no_attachment():
     assert "2026-07-30T21:00:00Z" in rendered["body"]
     assert "No attachment is included" in rendered["body"]
     assert "No health-agency authorization" in rendered["body"]
-    assert rendered["exact_action_time_approval_ready"] is True
-    assert "template INITIAL_PARTNER_TEAMING_INQUIRY" in (
-        rendered["exact_action_time_approval_phrase"]
-    )
+    assert rendered["draft_binding_complete"] is True
+    assert rendered["exact_action_time_approval_ready"] is False
+    assert rendered["exact_action_time_approval_phrase"] is None
+    assert rendered["exact_action_time_approval_blockers"] == [
+        "ACTION_TIME_MAILBOX_RECEIPT_REQUIRED"
+    ]
 
     duplicate = module.render_response(
         "INITIAL_PARTNER_TEAMING_INQUIRY",
@@ -482,6 +517,23 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
         is True
     )
     assert payload["controls"]["exact_approval_phrase_is_binding_scoped"] is True
+    assert payload["controls"]["draft_binding_is_not_send_authorization"] is True
+    assert payload["controls"]["action_time_mailbox_receipt_required"] is True
+    assert payload["controls"]["action_time_mailbox_receipt_schema"] == (
+        module.ACTION_TIME_MAILBOX_RECEIPT_SCHEMA
+    )
+    assert payload["controls"]["action_time_mailbox_receipt_template"] == (
+        "config/outreach_action_time_mailbox_receipt_template_v1.json"
+    )
+    assert payload["controls"][
+        "action_time_mailbox_receipt_template_sha256"
+    ] == module.canonical_object_sha256(
+        module.validate_action_time_mailbox_receipt_template()
+    )
+    assert payload["controls"]["action_time_mailbox_max_age_seconds"] == 900
+    assert payload["controls"]["action_time_approval_window_seconds"] == 300
+    assert payload["controls"]["exact_approval_expires"] is True
+    assert payload["controls"]["single_use_action_time_binding"] is True
     assert payload["controls"]["claim_evidence_receipt_schema"] == (
         module.CLAIM_EVIDENCE_RECEIPT_SCHEMA
     )
@@ -497,7 +549,10 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert "Inserted-fact claim gate: `FAIL_CLOSED`" in markdown
     assert "EXACT_VALUE_AND_SOURCE_HASH_BOUND" in markdown
     assert "RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND" in markdown
-    assert "Exact approval phrase: `BINDING_SCOPED`" in markdown
+    assert "Draft binding is send authorization: `false`" in markdown
+    assert "Action-time mailbox receipt: `REQUIRED`" in markdown
+    assert "Exact approval phrase: `BINDING_SCOPED_SINGLE_USE`" in markdown
+    assert "Exact approval window: `5_MINUTES_MAX`" in markdown
     assert "Static quality gate: `PASS`" in markdown
     assert "No message is rendered" in markdown
     assert "receipt check only, not a duplicate submission" in markdown
@@ -630,10 +685,9 @@ def test_requested_information_may_contain_literal_json_braces():
     assert rendered["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
     assert '{"status":"bounded","send_now":false}' in rendered["body"]
     assert rendered["dispatch_binding"]["schema"] == module.DISPATCH_BINDING_SCHEMA
-    assert rendered["exact_action_time_approval_ready"] is True
-    assert rendered["exact_action_time_approval_phrase"].startswith(
-        "APPROVE OUTREACH DISPATCH:"
-    )
+    assert rendered["draft_binding_complete"] is True
+    assert rendered["exact_action_time_approval_ready"] is False
+    assert rendered["exact_action_time_approval_phrase"] is None
 
 
 def test_ready_dispatch_binding_is_stable_private_safe_and_scope_sensitive():
@@ -660,23 +714,15 @@ def test_ready_dispatch_binding_is_stable_private_safe_and_scope_sensitive():
     )
     assert binding["attachment_count"] == 0
     assert binding["attachment_content_hashes_bound"] is True
-    assert first["exact_action_time_approval_ready"] is True
-    assert first["exact_action_time_approval_blockers"] == []
-    assert binding["binding_sha256"] in first["exact_action_time_approval_phrase"]
-    assert binding["subject_sha256"] in first["exact_action_time_approval_phrase"]
-    assert binding["body_sha256"] in first["exact_action_time_approval_phrase"]
-    assert (
-        binding["attachment_set_sha256"]
-        in first["exact_action_time_approval_phrase"]
-    )
+    assert first["draft_binding_complete"] is True
+    assert first["exact_action_time_approval_ready"] is False
+    assert first["exact_action_time_approval_blockers"] == [
+        "ACTION_TIME_MAILBOX_RECEIPT_REQUIRED"
+    ]
+    assert first["exact_action_time_approval_phrase"] is None
     private_safe_binding = json.dumps(binding, sort_keys=True)
     assert facts["recipient_email"] not in private_safe_binding
     assert facts["source_message_id"] not in private_safe_binding
-    assert facts["recipient_email"] not in first["exact_action_time_approval_phrase"]
-    assert (
-        facts["source_message_id"]
-        not in first["exact_action_time_approval_phrase"]
-    )
 
     recipient_change = copy.deepcopy(facts)
     recipient_change["recipient_email"] = "other-reviewer@example.org"
@@ -706,6 +752,258 @@ def test_ready_dispatch_binding_is_stable_private_safe_and_scope_sensitive():
     assert body_changed_render["dispatch_binding"]["binding_sha256"] != binding[
         "binding_sha256"
     ]
+
+
+def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
+    module = load_module()
+    facts = common_facts()
+    facts["requested_information"] = "One bounded technical-review summary."
+    rendered = module.render_response("REQUESTED_INFORMATION_REPLY", facts)
+    binding = rendered["dispatch_binding"]
+
+    authorization = module.build_action_time_authorization(
+        rendered,
+        mailbox_receipt(binding),
+        current_utc="2026-07-27T22:05:00Z",
+    )
+
+    assert authorization["schema"] == module.ACTION_TIME_AUTHORIZATION_SCHEMA
+    assert authorization["status"] == "READY_FOR_SINGLE_USE_EXACT_APPROVAL"
+    assert authorization["approval_binding"]["approval_window_opened_utc"] == (
+        "2026-07-27T22:05:00Z"
+    )
+    assert authorization["approval_binding"]["approval_window_expires_utc"] == (
+        "2026-07-27T22:10:00Z"
+    )
+    assert authorization["controls"]["approval_window_seconds"] == 300
+    assert authorization["controls"]["single_use"] is True
+    assert authorization["builder_can_send_email"] is False
+    assert authorization["send_authorized"] is False
+    assert authorization["send_performed"] is False
+    phrase = authorization["exact_action_time_approval_phrase"]
+    assert phrase.startswith("APPROVE ONE OUTREACH DISPATCH:")
+    assert authorization["approval_binding"]["binding_sha256"] in phrase
+    assert binding["binding_sha256"] in phrase
+    serialized = json.dumps(authorization, sort_keys=True)
+    assert facts["recipient_email"] not in serialized
+    assert facts["source_message_id"] not in serialized
+
+    current = module.evaluate_action_time_authorization(
+        authorization,
+        exact_approval_phrase=phrase,
+        current_utc="2026-07-27T22:09:59Z",
+    )
+    assert current["status"] == "CURRENT_EXACT_APPROVAL_PRESENT"
+    assert current["action_time_approval_valid"] is True
+    assert current["send_authorized"] is True
+    assert current["builder_can_send_email"] is False
+    assert current["send_performed"] is False
+
+    expired = module.evaluate_action_time_authorization(
+        authorization,
+        exact_approval_phrase=phrase,
+        current_utc="2026-07-27T22:10:00Z",
+    )
+    assert expired["action_time_approval_valid"] is False
+    assert expired["send_authorized"] is False
+    assert expired["blockers"] == ["APPROVAL_WINDOW_EXPIRED"]
+
+    wrong_phrase = module.evaluate_action_time_authorization(
+        authorization,
+        exact_approval_phrase=phrase + " altered",
+        current_utc="2026-07-27T22:06:00Z",
+    )
+    assert wrong_phrase["action_time_approval_valid"] is False
+    assert wrong_phrase["blockers"] == ["EXACT_APPROVAL_PHRASE_MISMATCH"]
+
+    consumed = module.evaluate_action_time_authorization(
+        authorization,
+        exact_approval_phrase=phrase,
+        current_utc="2026-07-27T22:06:00Z",
+        dispatch_consumed=True,
+    )
+    assert consumed["action_time_approval_valid"] is False
+    assert consumed["blockers"] == ["SINGLE_USE_BINDING_ALREADY_CONSUMED"]
+
+    extended = copy.deepcopy(authorization)
+    extended_binding = extended["approval_binding"]
+    extended_binding["approval_window_expires_utc"] = "2026-07-27T22:20:00Z"
+    extended_binding["binding_sha256"] = module.canonical_object_sha256(
+        extended_binding,
+        omit={"binding_sha256"},
+    )
+    extended_phrase = module._action_time_approval_phrase(extended_binding)
+    extended["exact_action_time_approval_phrase"] = extended_phrase
+    extended_result = module.evaluate_action_time_authorization(
+        extended,
+        exact_approval_phrase=extended_phrase,
+        current_utc="2026-07-27T22:06:00Z",
+    )
+    assert extended_result["action_time_approval_valid"] is False
+    assert "APPROVAL_WINDOW_BOUNDS_INVALID" in extended_result["blockers"]
+
+    tampered_dispatch = copy.deepcopy(authorization)
+    tampered_dispatch["dispatch_binding"]["body_sha256"] = "F" * 64
+    tampered_dispatch_result = module.evaluate_action_time_authorization(
+        tampered_dispatch,
+        exact_approval_phrase=phrase,
+        current_utc="2026-07-27T22:06:00Z",
+    )
+    assert tampered_dispatch_result["action_time_approval_valid"] is False
+    assert "DISPATCH_BINDING_HASH_MISMATCH" in (
+        tampered_dispatch_result["blockers"]
+    )
+
+    tampered_receipt = copy.deepcopy(authorization)
+    tampered_receipt["mailbox_receipt"]["matching_sent_count"] = 1
+    tampered_receipt_result = module.evaluate_action_time_authorization(
+        tampered_receipt,
+        exact_approval_phrase=phrase,
+        current_utc="2026-07-27T22:06:00Z",
+    )
+    assert tampered_receipt_result["action_time_approval_valid"] is False
+    assert "ACTION_TIME_MAILBOX_RECEIPT_HASH_MISMATCH" in (
+        tampered_receipt_result["blockers"]
+    )
+
+
+def test_action_time_authorization_rejects_deadline_and_bad_mailbox_evidence():
+    module = load_module()
+    rendered = module.render_response(
+        "INITIAL_PARTNER_TEAMING_INQUIRY",
+        partner_teaming_facts(),
+        current_utc="2026-07-27T22:00:00Z",
+    )
+    binding = rendered["dispatch_binding"]
+
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="ACTION_TIME_DEADLINE_REACHED",
+    ):
+        module.build_action_time_authorization(
+            rendered,
+            mailbox_receipt(binding, checked_utc="2026-07-30T20:59:59Z"),
+            current_utc="2026-07-30T21:00:00Z",
+        )
+
+    cases = [
+        (
+            {"matching_sent_count": 1},
+            "2026-07-27T22:05:00Z",
+            "ACTION_TIME_MAILBOX_COUNT_INVALID:matching_sent_count",
+        ),
+        (
+            {"matching_received_after_draft_count": 1},
+            "2026-07-27T22:05:00Z",
+            "ACTION_TIME_MAILBOX_COUNT_INVALID:matching_received_after_draft_count",
+        ),
+        (
+            {"draft_sent": True},
+            "2026-07-27T22:05:00Z",
+            "ACTION_TIME_DRAFT_ALREADY_SENT",
+        ),
+        (
+            {"body_sha256": "F" * 64},
+            "2026-07-27T22:05:00Z",
+            "ACTION_TIME_BODY_MISMATCH",
+        ),
+        (
+            {"private_message_id": "must-not-be-present"},
+            "2026-07-27T22:05:00Z",
+            "ACTION_TIME_MAILBOX_RECEIPT_FIELDS_INVALID",
+        ),
+    ]
+    for changes, current_utc, expected in cases:
+        receipt = mailbox_receipt(binding)
+        receipt.update(changes)
+        with pytest.raises(module.OutreachRegistryError, match=expected):
+            module.build_action_time_authorization(
+                rendered,
+                receipt,
+                current_utc=current_utc,
+            )
+
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="ACTION_TIME_MAILBOX_SEARCH_STALE",
+    ):
+        module.build_action_time_authorization(
+            rendered,
+            mailbox_receipt(binding),
+            current_utc="2026-07-27T22:20:00Z",
+        )
+
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="ACTION_TIME_MAILBOX_SEARCH_FROM_FUTURE",
+    ):
+        module.build_action_time_authorization(
+            rendered,
+            mailbox_receipt(binding),
+            current_utc="2026-07-27T22:04:00Z",
+        )
+
+    stale_readback = mailbox_receipt(binding)
+    stale_readback["checked_utc"] = "2026-07-27T22:19:59Z"
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="ACTION_TIME_DRAFT_READBACK_STALE",
+    ):
+        module.build_action_time_authorization(
+            rendered,
+            stale_readback,
+            current_utc="2026-07-27T22:20:00Z",
+        )
+
+    future_readback = mailbox_receipt(binding)
+    future_readback["checked_utc"] = "2026-07-27T22:03:59Z"
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="ACTION_TIME_DRAFT_READBACK_FROM_FUTURE",
+    ):
+        module.build_action_time_authorization(
+            rendered,
+            future_readback,
+            current_utc="2026-07-27T22:04:00Z",
+        )
+
+
+def test_mailbox_receipt_template_is_deliberately_non_authorizing(tmp_path):
+    module = load_module()
+    template = json.loads(
+        ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE.read_text(encoding="utf-8")
+    )
+    assert set(template) == module.ACTION_TIME_MAILBOX_RECEIPT_FIELDS
+    assert template["schema"] == module.ACTION_TIME_MAILBOX_RECEIPT_SCHEMA
+    assert template["full_mailbox_search_completed"] is False
+    assert template["draft_present"] is False
+    assert template["matching_current_draft_count"] == 0
+    assert module.validate_action_time_mailbox_receipt_template() == template
+    unsafe_template = copy.deepcopy(template)
+    unsafe_template["full_mailbox_search_completed"] = True
+    unsafe_path = tmp_path / "unsafe_mailbox_receipt.json"
+    unsafe_path.write_text(
+        json.dumps(unsafe_template, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE_MUST_NOT_AUTHORIZE",
+    ):
+        module.validate_action_time_mailbox_receipt_template(unsafe_path)
+
+    facts = common_facts()
+    facts["requested_information"] = "One bounded technical-review summary."
+    rendered = module.render_response("REQUESTED_INFORMATION_REPLY", facts)
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="ACTION_TIME_MAILBOX_CONTROL_INVALID",
+    ):
+        module.build_action_time_authorization(
+            rendered,
+            template,
+            current_utc="2026-07-27T22:05:00Z",
+        )
 
 
 def test_requested_asset_delivery_requires_explicit_request_and_private_review():
@@ -748,8 +1046,18 @@ def test_requested_asset_delivery_requires_explicit_request_and_private_review()
     assert rendered["exact_action_time_approval_ready"] is False
     assert rendered["exact_action_time_approval_phrase"] is None
     assert rendered["exact_action_time_approval_blockers"] == [
-        "ATTACHMENT_CONTENT_HASHES_REQUIRED"
+        "ACTION_TIME_MAILBOX_RECEIPT_REQUIRED",
+        "ATTACHMENT_CONTENT_HASHES_REQUIRED",
     ]
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="DRAFT_BINDING_INCOMPLETE",
+    ):
+        module.build_action_time_authorization(
+            rendered,
+            mailbox_receipt(rendered["dispatch_binding"]),
+            current_utc="2026-07-27T22:05:00Z",
+        )
 
     content_hashes = {
         "lumencore-light.png": "A" * 64,
@@ -763,15 +1071,15 @@ def test_requested_asset_delivery_requires_explicit_request_and_private_review()
     )
     assert hash_bound["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
     assert hash_bound["dispatch_binding"]["attachment_content_hashes_bound"] is True
-    assert hash_bound["exact_action_time_approval_ready"] is True
-    assert hash_bound["exact_action_time_approval_blockers"] == []
-    assert hash_bound["exact_action_time_approval_phrase"] is not None
+    assert hash_bound["draft_binding_complete"] is True
+    assert hash_bound["exact_action_time_approval_ready"] is False
+    assert hash_bound["exact_action_time_approval_blockers"] == [
+        "ACTION_TIME_MAILBOX_RECEIPT_REQUIRED"
+    ]
+    assert hash_bound["exact_action_time_approval_phrase"] is None
     assert "lumencore-light.png" not in json.dumps(
         hash_bound["dispatch_binding"], sort_keys=True
     )
-    assert "lumencore-dark.png" not in hash_bound[
-        "exact_action_time_approval_phrase"
-    ]
 
     changed_hashes = dict(content_hashes)
     changed_hashes["lumencore-dark.png"] = "C" * 64

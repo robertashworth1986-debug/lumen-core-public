@@ -10,7 +10,11 @@
 - High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`
 - Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`
 - Attachment content required for exact approval: `true`
-- Exact approval phrase: `BINDING_SCOPED`
+- Draft binding is send authorization: `false`
+- Action-time mailbox receipt: `REQUIRED`
+- Action-time mailbox freshness: `15_MINUTES_MAX`
+- Exact approval phrase: `BINDING_SCOPED_SINGLE_USE`
+- Exact approval window: `5_MINUTES_MAX`
 - Static quality gate: `PASS`
 - Static quality checks: `204`
 - Unchanged rebuilds byte-stable: `true`
@@ -488,4 +492,4 @@ Thank you,
 
 ## Operating Boundary
 
-This registry renders drafts, immutable dispatch bindings, and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set. The exact approval phrase is withheld until every attachment content hash is bound. A binding scopes approval; it is not proof of transmission, receipt, content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.
+This registry renders drafts, immutable dispatch bindings, action-time authorization records, and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes or until the deadline, whichever comes first. A binding scopes approval; it is not proof of transmission, receipt, content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.
