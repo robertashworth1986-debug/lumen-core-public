@@ -20,6 +20,22 @@ def _git_blob_sha(data: bytes) -> str:
     return hashlib.sha1(f"blob {len(data)}\0".encode("ascii") + data).hexdigest()
 
 
+def _git_blob_sha_variants(data: bytes) -> set[str]:
+    """Return content hashes while tolerating only LF/CRLF checkout drift."""
+
+    lf = data.replace(b"\r\n", b"\n")
+    crlf = lf.replace(b"\n", b"\r\n")
+    return {
+        _git_blob_sha(data),
+        _git_blob_sha(lf),
+        _git_blob_sha(crlf),
+    }
+
+
+def _expected_blob_matches(data: bytes, expected: str) -> bool:
+    return expected in _git_blob_sha_variants(data)
+
+
 def _matching_rule(path: str, rules: list[dict[str, Any]]) -> dict[str, Any] | None:
     for rule in rules:
         if fnmatch.fnmatch(path, str(rule.get("path", ""))):
@@ -80,7 +96,7 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
             continue
 
         expected = str(rule.get("expected_git_blob_sha", "") or "")
-        if expected and item["git_blob_sha"] != expected:
+        if expected and not _expected_blob_matches(raw, expected):
             errors.append({
                 "path": relative,
                 "code": "preserved_blob_mismatch",
@@ -112,7 +128,7 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
 
         raw = path.read_bytes()
         text = raw.decode("utf-8", errors="replace")
-        if expected and _git_blob_sha(raw) != expected:
+        if expected and not _expected_blob_matches(raw, expected):
             mismatch = {
                 "path": rule_path,
                 "code": "preserved_blob_mismatch",

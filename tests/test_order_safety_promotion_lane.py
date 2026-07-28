@@ -198,6 +198,48 @@ class PromotionLaneSafetyTests(unittest.TestCase):
         self.assertEqual(report["status"], "fail")
         self.assertTrue(any(error["code"] == "preserved_blob_mismatch" for error in report["errors"]))
 
+    def test_auditor_tolerates_only_lf_crlf_checkout_drift(self) -> None:
+        module = load_path(
+            "order_path_audit_line_endings_test",
+            ROOT / "code" / "ops" / "AUDIT_ORDER_SUBMISSION_PATHS.py",
+        )
+        lf_content = b'ENDPOINT = "AddOrder"\n'
+        expected = module._git_blob_sha(lf_content)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            legacy = root / "code" / "engine_legacy.py"
+            legacy.parent.mkdir(parents=True)
+            legacy.write_bytes(lf_content.replace(b"\n", b"\r\n"))
+            policy = {
+                "version": "test",
+                "promotion_stage": "live_data_no_orders",
+                "patterns": {"kraken_add_order": r"\bAddOrder\b"},
+                "rules": [
+                    {
+                        "path": "code/engine_legacy.py",
+                        "classification": "historical_preserved",
+                        "expected_git_blob_sha": expected,
+                    },
+                ],
+            }
+            line_ending_only = module.audit_repository(root, policy)
+            legacy.write_bytes(
+                lf_content.replace(b"AddOrder", b"AddOrderChanged").replace(
+                    b"\n",
+                    b"\r\n",
+                )
+            )
+            content_changed = module.audit_repository(root, policy)
+
+        self.assertEqual(line_ending_only["status"], "pass")
+        self.assertEqual(content_changed["status"], "fail")
+        self.assertTrue(
+            any(
+                error["code"] == "preserved_blob_mismatch"
+                for error in content_changed["errors"]
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

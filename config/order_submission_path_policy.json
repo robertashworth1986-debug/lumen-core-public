@@ -40,7 +40,7 @@
     {
       "path": "code/luma_experience_gateway_legacy.py",
       "classification": "historical_preserved",
-      "expected_git_blob_sha": "3f995bbfd99e1dc2b8993cd81f639e1dcc393eb2"
+      "expected_git_blob_sha": "9934278e5f856640e5c059380456f50b0a17276a"
     },
     {
       "path": "code/auto_ticket_producer_legacy.py",
