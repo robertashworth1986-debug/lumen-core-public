@@ -22,6 +22,9 @@ CLAIM_EVIDENCE_TEMPLATE = (
 ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE = (
     ROOT / "config" / "outreach_action_time_mailbox_receipt_template_v1.json"
 )
+POST_SEND_OBSERVATION_TEMPLATE = (
+    ROOT / "config" / "outreach_post_send_observation_template_v1.json"
+)
 SPRINT_DIR = ROOT / "grant_submissions" / "funding_sprint_20260709"
 OUT_OPS = ROOT / "out" / "ops"
 OUT_JSON = SPRINT_DIR / "OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
@@ -79,8 +82,15 @@ ACTION_TIME_APPROVAL_BINDING_SCHEMA = (
 ACTION_TIME_DISPATCH_HANDOFF_SCHEMA = (
     "lumencore.outreach_action_time_dispatch_handoff.v1"
 )
+POST_SEND_OBSERVATION_SCHEMA = (
+    "lumencore.outreach_post_send_observation.private.v1"
+)
+DISPATCH_CONSUMPTION_RECEIPT_SCHEMA = (
+    "lumencore.outreach_dispatch_consumption_receipt.v1"
+)
 ACTION_TIME_MAILBOX_MAX_AGE_SECONDS = 15 * 60
 ACTION_TIME_APPROVAL_WINDOW_SECONDS = 5 * 60
+POST_SEND_MAILBOX_MAX_AGE_SECONDS = 15 * 60
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 CLAIM_EVIDENCE_RECEIPT_FIELDS = {
     "claim_allowed",
@@ -160,6 +170,54 @@ ACTION_TIME_MAILBOX_RECEIPT_FIELDS = {
     "source_message_id_sha256",
     "subject_sha256",
 }
+POST_SEND_OBSERVATION_FIELDS = {
+    "attachment_count",
+    "attachment_set_sha256",
+    "bcc_count",
+    "body_sha256",
+    "cc_count",
+    "checked_utc",
+    "draft_label_present",
+    "full_mailbox_search_completed",
+    "identifiers_private",
+    "matching_current_draft_count",
+    "matching_sent_count",
+    "message_body_omitted",
+    "message_id",
+    "recipient_route_sha256",
+    "schema",
+    "search_scope",
+    "sent_label_present",
+    "sent_utc",
+    "source_message_id_sha256",
+    "subject_sha256",
+    "thread_id",
+}
+ACTION_TIME_DISPATCH_HANDOFF_FIELDS = {
+    "action_time_approval_valid",
+    "approval_binding_sha256",
+    "approval_window_current",
+    "blockers",
+    "claim_boundary",
+    "consumption_directory_checked",
+    "consumption_receipt_present",
+    "dispatch_authorized",
+    "dispatch_binding_sha256",
+    "evaluated_utc",
+    "external_action_performed",
+    "handoff_can_send_email",
+    "mailbox_receipt_sha256",
+    "private_human_unlock_configured",
+    "private_human_unlock_supplied",
+    "private_human_unlock_valid",
+    "private_inputs_omitted",
+    "receipt_sha256",
+    "schema",
+    "send_authorized",
+    "send_performed",
+    "single_use_binding_consumed",
+    "status",
+}
 NEGATION_WINDOW_RE = re.compile(
     r"\b(?:no|not|never|without|unverified|unproven)\b",
     re.IGNORECASE,
@@ -234,6 +292,56 @@ def validate_action_time_mailbox_receipt_template(
         if payload.get(field) != expected:
             raise OutreachRegistryError(
                 "ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE_MUST_NOT_AUTHORIZE:"
+                f"{field}"
+            )
+    return payload
+
+
+def validate_post_send_observation_template(
+    path: Path = POST_SEND_OBSERVATION_TEMPLATE,
+) -> dict[str, Any]:
+    payload = json.loads(
+        path.read_text(encoding="utf-8"),
+        object_pairs_hook=_reject_duplicate_keys,
+    )
+    if not isinstance(payload, dict):
+        raise OutreachRegistryError(
+            "POST_SEND_OBSERVATION_TEMPLATE_NOT_OBJECT"
+        )
+    if set(payload) != POST_SEND_OBSERVATION_FIELDS:
+        raise OutreachRegistryError(
+            "POST_SEND_OBSERVATION_TEMPLATE_FIELDS_INVALID"
+        )
+    if payload.get("schema") != POST_SEND_OBSERVATION_SCHEMA:
+        raise OutreachRegistryError(
+            "POST_SEND_OBSERVATION_TEMPLATE_SCHEMA_INVALID"
+        )
+    expected_non_authorizing_values = {
+        "attachment_count": 0,
+        "attachment_set_sha256": None,
+        "bcc_count": 0,
+        "body_sha256": None,
+        "cc_count": 0,
+        "checked_utc": None,
+        "draft_label_present": False,
+        "full_mailbox_search_completed": False,
+        "identifiers_private": True,
+        "matching_current_draft_count": 0,
+        "matching_sent_count": 0,
+        "message_body_omitted": True,
+        "message_id": None,
+        "recipient_route_sha256": None,
+        "search_scope": "ALL_MAIL_BOUND_ROUTE_THREAD_SUBJECT_BODY",
+        "sent_label_present": False,
+        "sent_utc": None,
+        "source_message_id_sha256": None,
+        "subject_sha256": None,
+        "thread_id": None,
+    }
+    for field, expected in expected_non_authorizing_values.items():
+        if payload.get(field) != expected:
+            raise OutreachRegistryError(
+                "POST_SEND_OBSERVATION_TEMPLATE_MUST_NOT_AUTHORIZE:"
                 f"{field}"
             )
     return payload
@@ -1506,12 +1614,25 @@ def evaluate_action_time_dispatch_handoff(
     human_unlock_token: str | None,
     expected_human_unlock_sha256: str | None,
     dispatch_consumed: bool = False,
+    consumption_directory_checked: bool = False,
+    consumption_receipt_present: bool = False,
 ) -> dict[str, Any]:
+    if not isinstance(consumption_directory_checked, bool):
+        raise OutreachRegistryError(
+            "CONSUMPTION_DIRECTORY_CHECK_STATE_INVALID"
+        )
+    if not isinstance(consumption_receipt_present, bool):
+        raise OutreachRegistryError(
+            "CONSUMPTION_RECEIPT_STATE_INVALID"
+        )
+    observed_consumed = bool(
+        dispatch_consumed or consumption_receipt_present
+    )
     approval = evaluate_action_time_authorization(
         authorization,
         exact_approval_phrase=exact_approval_phrase,
         current_utc=current_utc,
-        dispatch_consumed=dispatch_consumed,
+        dispatch_consumed=observed_consumed,
     )
     token_present = (
         isinstance(human_unlock_token, str) and bool(human_unlock_token)
@@ -1536,9 +1657,14 @@ def evaluate_action_time_dispatch_handoff(
         )
         if not unlock_valid:
             unlock_blockers.append("PRIVATE_HUMAN_UNLOCK_MISMATCH")
+    if not consumption_directory_checked:
+        unlock_blockers.append("CONSUMPTION_DIRECTORY_NOT_CHECKED")
 
     dispatch_authorized = bool(
-        approval["action_time_approval_valid"] and unlock_valid
+        approval["action_time_approval_valid"]
+        and unlock_valid
+        and consumption_directory_checked
+        and not consumption_receipt_present
     )
     blockers = sorted(
         set(approval["blockers"]).union(unlock_blockers)
@@ -1573,7 +1699,9 @@ def evaluate_action_time_dispatch_handoff(
         "private_human_unlock_configured": unlock_hash_configured,
         "private_human_unlock_supplied": token_present,
         "private_human_unlock_valid": unlock_valid,
-        "single_use_binding_consumed": dispatch_consumed,
+        "consumption_directory_checked": consumption_directory_checked,
+        "consumption_receipt_present": consumption_receipt_present,
+        "single_use_binding_consumed": observed_consumed,
         "blockers": blockers,
         "dispatch_authorized": dispatch_authorized,
         "send_authorized": dispatch_authorized,
@@ -1583,7 +1711,8 @@ def evaluate_action_time_dispatch_handoff(
         "private_inputs_omitted": True,
         "claim_boundary": (
             "This receipt only evaluates a hash-bound draft, fresh mailbox "
-            "receipt, exact action-time approval, and private HumanUnlock. "
+            "receipt, exact action-time approval, private HumanUnlock, and "
+            "the canonical consumption directory. "
             "It cannot send email and does not prove transmission, delivery, "
             "receipt, factual accuracy, partner authority, submission, award, "
             "validation, performance, or savings."
@@ -1609,12 +1738,334 @@ def evaluate_action_time_dispatch_handoff(
     return result
 
 
+def _validate_dispatch_handoff_for_consumption(
+    authorization: dict[str, Any],
+    handoff: dict[str, Any],
+) -> tuple[dict[str, Any], datetime]:
+    if not isinstance(handoff, dict):
+        raise OutreachRegistryError("DISPATCH_HANDOFF_INVALID")
+    if set(handoff) != ACTION_TIME_DISPATCH_HANDOFF_FIELDS:
+        raise OutreachRegistryError("DISPATCH_HANDOFF_FIELDS_INVALID")
+    if handoff.get("schema") != ACTION_TIME_DISPATCH_HANDOFF_SCHEMA:
+        raise OutreachRegistryError("DISPATCH_HANDOFF_SCHEMA_INVALID")
+    expected_receipt_sha256 = canonical_object_sha256(
+        handoff,
+        omit={"receipt_sha256"},
+    )
+    if handoff.get("receipt_sha256") != expected_receipt_sha256:
+        raise OutreachRegistryError("DISPATCH_HANDOFF_RECEIPT_HASH_MISMATCH")
+
+    required_true = {
+        "action_time_approval_valid",
+        "approval_window_current",
+        "consumption_directory_checked",
+        "dispatch_authorized",
+        "private_human_unlock_configured",
+        "private_human_unlock_supplied",
+        "private_human_unlock_valid",
+        "private_inputs_omitted",
+        "send_authorized",
+    }
+    for field in required_true:
+        if handoff.get(field) is not True:
+            raise OutreachRegistryError(
+                f"DISPATCH_HANDOFF_CONTROL_INVALID:{field}"
+            )
+    required_false = {
+        "external_action_performed",
+        "handoff_can_send_email",
+        "consumption_receipt_present",
+        "send_performed",
+        "single_use_binding_consumed",
+    }
+    for field in required_false:
+        if handoff.get(field) is not False:
+            raise OutreachRegistryError(
+                f"DISPATCH_HANDOFF_CONTROL_INVALID:{field}"
+            )
+    if handoff.get("status") != (
+        "READY_FOR_CONNECTED_SENDER_SINGLE_USE_DISPATCH"
+    ):
+        raise OutreachRegistryError("DISPATCH_HANDOFF_NOT_READY")
+    if handoff.get("blockers") != []:
+        raise OutreachRegistryError("DISPATCH_HANDOFF_HAS_BLOCKERS")
+
+    approval_binding = authorization.get("approval_binding")
+    dispatch_binding = authorization.get("dispatch_binding")
+    if not isinstance(approval_binding, dict) or not isinstance(
+        dispatch_binding, dict
+    ):
+        raise OutreachRegistryError(
+            "DISPATCH_CONSUMPTION_AUTHORIZATION_BINDINGS_MISSING"
+        )
+    expected_scope = {
+        "approval_binding_sha256": approval_binding.get("binding_sha256"),
+        "dispatch_binding_sha256": dispatch_binding.get("binding_sha256"),
+        "mailbox_receipt_sha256": authorization.get(
+            "mailbox_receipt_sha256"
+        ),
+    }
+    for field, expected in expected_scope.items():
+        observed = _normalize_required_sha256(
+            handoff.get(field),
+            f"DISPATCH_HANDOFF_{field.upper()}_INVALID",
+        )
+        normalized_expected = _normalize_required_sha256(
+            expected,
+            f"DISPATCH_AUTHORIZATION_{field.upper()}_INVALID",
+        )
+        if observed != normalized_expected:
+            raise OutreachRegistryError(
+                f"DISPATCH_HANDOFF_{field.upper()}_MISMATCH"
+            )
+
+    evaluated_utc = canonical_utc(
+        str(handoff.get("evaluated_utc") or "")
+    )
+    approval = evaluate_action_time_authorization(
+        authorization,
+        exact_approval_phrase=str(
+            authorization.get("exact_action_time_approval_phrase") or ""
+        ),
+        current_utc=evaluated_utc,
+        dispatch_consumed=False,
+    )
+    if approval.get("action_time_approval_valid") is not True:
+        raise OutreachRegistryError(
+            "DISPATCH_HANDOFF_AUTHORIZATION_RECHECK_FAILED"
+        )
+    return dict(handoff), parse_aware_datetime(evaluated_utc)
+
+
+def _validate_post_send_observation(
+    observation: dict[str, Any],
+    authorization: dict[str, Any],
+    *,
+    handoff_evaluated: datetime,
+    current: datetime,
+) -> tuple[dict[str, Any], str, datetime]:
+    if not isinstance(observation, dict):
+        raise OutreachRegistryError("POST_SEND_OBSERVATION_INVALID")
+    if set(observation) != POST_SEND_OBSERVATION_FIELDS:
+        raise OutreachRegistryError("POST_SEND_OBSERVATION_FIELDS_INVALID")
+    if observation.get("schema") != POST_SEND_OBSERVATION_SCHEMA:
+        raise OutreachRegistryError("POST_SEND_OBSERVATION_SCHEMA_INVALID")
+    if observation.get("search_scope") != (
+        "ALL_MAIL_BOUND_ROUTE_THREAD_SUBJECT_BODY"
+    ):
+        raise OutreachRegistryError("POST_SEND_SEARCH_SCOPE_INVALID")
+
+    required_true = {
+        "full_mailbox_search_completed",
+        "identifiers_private",
+        "message_body_omitted",
+        "sent_label_present",
+    }
+    for field in required_true:
+        if observation.get(field) is not True:
+            raise OutreachRegistryError(
+                f"POST_SEND_CONTROL_INVALID:{field}"
+            )
+    if observation.get("draft_label_present") is not False:
+        raise OutreachRegistryError("POST_SEND_DRAFT_LABEL_PRESENT")
+
+    expected_counts = {
+        "matching_current_draft_count": 0,
+        "matching_sent_count": 1,
+        "cc_count": 0,
+        "bcc_count": 0,
+    }
+    for field, expected in expected_counts.items():
+        value = observation.get(field)
+        if (
+            not isinstance(value, int)
+            or isinstance(value, bool)
+            or value != expected
+        ):
+            raise OutreachRegistryError(
+                f"POST_SEND_COUNT_INVALID:{field}"
+            )
+
+    dispatch_binding = authorization.get("dispatch_binding")
+    approval_binding = authorization.get("approval_binding")
+    if not isinstance(dispatch_binding, dict) or not isinstance(
+        approval_binding, dict
+    ):
+        raise OutreachRegistryError(
+            "POST_SEND_AUTHORIZATION_BINDINGS_MISSING"
+        )
+    attachment_count = observation.get("attachment_count")
+    if (
+        not isinstance(attachment_count, int)
+        or isinstance(attachment_count, bool)
+        or attachment_count != dispatch_binding.get("attachment_count")
+    ):
+        raise OutreachRegistryError("POST_SEND_ATTACHMENT_COUNT_MISMATCH")
+
+    digest_fields = {
+        "recipient_route_sha256": "POST_SEND_RECIPIENT_ROUTE_MISMATCH",
+        "source_message_id_sha256": "POST_SEND_SOURCE_MESSAGE_MISMATCH",
+        "subject_sha256": "POST_SEND_SUBJECT_MISMATCH",
+        "body_sha256": "POST_SEND_BODY_MISMATCH",
+        "attachment_set_sha256": "POST_SEND_ATTACHMENT_SET_MISMATCH",
+    }
+    normalized = dict(observation)
+    for field, mismatch_code in digest_fields.items():
+        observed = _normalize_optional_sha256(
+            observation.get(field),
+            f"POST_SEND_{field.upper()}_INVALID",
+        )
+        expected = _normalize_optional_sha256(
+            dispatch_binding.get(field),
+            f"POST_SEND_DISPATCH_{field.upper()}_INVALID",
+        )
+        if observed != expected:
+            raise OutreachRegistryError(mismatch_code)
+        normalized[field] = observed
+
+    for field in ("message_id", "thread_id"):
+        value = observation.get(field)
+        if (
+            not isinstance(value, str)
+            or len(value.strip()) < 8
+            or len(value.strip()) > 512
+            or any(character.isspace() for character in value)
+            or CONTROL_CHAR_RE.search(value) is not None
+        ):
+            raise OutreachRegistryError(
+                f"POST_SEND_PRIVATE_IDENTIFIER_INVALID:{field}"
+            )
+        normalized[field] = value.strip()
+
+    checked = parse_aware_datetime(
+        str(observation.get("checked_utc") or "")
+    )
+    sent = parse_aware_datetime(str(observation.get("sent_utc") or ""))
+    age_seconds = (current - checked).total_seconds()
+    if age_seconds < 0:
+        raise OutreachRegistryError("POST_SEND_MAILBOX_SEARCH_FROM_FUTURE")
+    if age_seconds > POST_SEND_MAILBOX_MAX_AGE_SECONDS:
+        raise OutreachRegistryError("POST_SEND_MAILBOX_SEARCH_STALE")
+    if sent > checked:
+        raise OutreachRegistryError("POST_SEND_CHECK_PRECEDES_SEND")
+    if sent + timedelta(seconds=5) < handoff_evaluated:
+        raise OutreachRegistryError("POST_SEND_PRECEDES_AUTHORIZED_HANDOFF")
+
+    opened = parse_aware_datetime(
+        str(
+            approval_binding.get("approval_window_opened_utc")
+            or ""
+        )
+    )
+    expires = parse_aware_datetime(
+        str(
+            approval_binding.get("approval_window_expires_utc")
+            or ""
+        )
+    )
+    if sent < opened:
+        raise OutreachRegistryError("POST_SEND_PRECEDES_APPROVAL_WINDOW")
+    if sent >= expires:
+        raise OutreachRegistryError("POST_SEND_AT_OR_AFTER_APPROVAL_EXPIRY")
+    deadline_value = dispatch_binding.get("deadline_utc")
+    if deadline_value is not None and sent >= parse_aware_datetime(
+        str(deadline_value)
+    ):
+        raise OutreachRegistryError("POST_SEND_AT_OR_AFTER_DEADLINE")
+
+    normalized["checked_utc"] = canonical_utc(
+        str(observation["checked_utc"])
+    )
+    normalized["sent_utc"] = canonical_utc(
+        str(observation["sent_utc"])
+    )
+    return normalized, canonical_object_sha256(normalized), sent
+
+
+def build_dispatch_consumption_receipt(
+    authorization: dict[str, Any],
+    handoff: dict[str, Any],
+    post_send_observation: dict[str, Any],
+    *,
+    current_utc: str,
+) -> dict[str, Any]:
+    if not isinstance(authorization, dict) or authorization.get(
+        "schema"
+    ) != ACTION_TIME_AUTHORIZATION_SCHEMA:
+        raise OutreachRegistryError(
+            "DISPATCH_CONSUMPTION_AUTHORIZATION_INVALID"
+        )
+    current = parse_aware_datetime(current_utc)
+    validated_handoff, handoff_evaluated = (
+        _validate_dispatch_handoff_for_consumption(
+            authorization,
+            handoff,
+        )
+    )
+    normalized_observation, observation_sha256, sent = (
+        _validate_post_send_observation(
+            post_send_observation,
+            authorization,
+            handoff_evaluated=handoff_evaluated,
+            current=current,
+        )
+    )
+    approval_binding = authorization["approval_binding"]
+    dispatch_binding = authorization["dispatch_binding"]
+    core = {
+        "schema": DISPATCH_CONSUMPTION_RECEIPT_SCHEMA,
+        "status": "SINGLE_USE_BINDING_CONSUMED_SENT_COPY_VERIFIED",
+        "captured_utc": current.isoformat().replace("+00:00", "Z"),
+        "sent_utc": sent.isoformat().replace("+00:00", "Z"),
+        "observation_checked_utc": normalized_observation["checked_utc"],
+        "template_id": approval_binding["template_id"],
+        "approval_binding_sha256": approval_binding["binding_sha256"],
+        "dispatch_binding_sha256": dispatch_binding["binding_sha256"],
+        "pre_send_mailbox_receipt_sha256": authorization[
+            "mailbox_receipt_sha256"
+        ],
+        "dispatch_handoff_receipt_sha256": validated_handoff[
+            "receipt_sha256"
+        ],
+        "post_send_observation_sha256": observation_sha256,
+        "delivery_state": "GMAIL_SENT_FOLDER_RECORDED",
+        "matching_sent_count": 1,
+        "matching_current_draft_count": 0,
+        "single_use_binding_consumed": True,
+        "duplicate_send_allowed": False,
+        "send_performed": True,
+        "delivery_confirmed": False,
+        "recipient_response_confirmed": False,
+        "send_performed_by_receipt_builder": False,
+        "external_action_performed_by_receipt_builder": False,
+        "receipt_builder_can_send_email": False,
+        "private_message_identifiers_omitted": True,
+        "subject_body_and_recipient_values_omitted": True,
+        "claim_boundary": (
+            "This receipt proves only that a fresh private Gmail observation "
+            "matched the authorized dispatch and recorded exactly one SENT "
+            "copy with no current draft. It consumes the local single-use "
+            "binding and prohibits duplicate send. It does not prove delivery, "
+            "recipient receipt or response, factual accuracy, partner authority, "
+            "submission, acceptance, award, funding, validation, performance, "
+            "or savings. The receipt builder cannot send email."
+        ),
+    }
+    return {
+        **core,
+        "receipt_sha256": canonical_object_sha256(core),
+    }
+
+
 def build_public_payload(
     registry: dict[str, Any] | None = None, generated_utc: str | None = None
 ) -> dict[str, Any]:
     payload = validate_registry(registry or read_registry())
     action_time_mailbox_receipt_template = (
         validate_action_time_mailbox_receipt_template()
+    )
+    post_send_observation_template = (
+        validate_post_send_observation_template()
     )
     policy_counts = Counter(row["send_policy"] for row in payload["templates"])
     private_count = sum(bool(row["private_render_only"]) for row in payload["templates"])
@@ -1709,6 +2160,30 @@ def build_public_payload(
             "action_time_authorization_builder_can_send_email": False,
             "private_human_unlock_required_for_dispatch": True,
             "dispatch_handoff_can_send_email": False,
+            "post_send_observation_required_for_consumption": True,
+            "post_send_observation_schema": POST_SEND_OBSERVATION_SCHEMA,
+            "post_send_observation_template": (
+                POST_SEND_OBSERVATION_TEMPLATE.relative_to(
+                    ROOT
+                ).as_posix()
+            ),
+            "post_send_observation_template_sha256": (
+                canonical_object_sha256(post_send_observation_template)
+            ),
+            "post_send_mailbox_max_age_seconds": (
+                POST_SEND_MAILBOX_MAX_AGE_SECONDS
+            ),
+            "dispatch_consumption_receipt_schema": (
+                DISPATCH_CONSUMPTION_RECEIPT_SCHEMA
+            ),
+            "dispatch_consumption_receipt_builder": (
+                "code/ops/CAPTURE_OUTREACH_DISPATCH_CONSUMPTION.py"
+            ),
+            "dispatch_consumption_receipt_builder_can_send_email": False,
+            "dispatch_consumption_directory_required": True,
+            "dispatch_handoff_checks_consumption_directory": True,
+            "consumption_receipt_name_bound_to_dispatch_sha256": True,
+            "consumed_binding_duplicate_send_allowed": False,
             "source_config_hash_cross_platform_canonical_json": True,
             "builder_can_send_email": False,
             "action_time_human_review_required": True,
@@ -1745,6 +2220,13 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Authorization builder can approve or send email: `false`",
         "- Private HumanUnlock: `REQUIRED_AT_RUNTIME`",
         "- Dispatch handoff can send email: `false`",
+        "- Post-send observation: `FRESH_EXACT_SENT_COPY_REQUIRED`",
+        "- Consumed binding duplicate send allowed: `false`",
+        "- Dispatch consumption builder: "
+        "`code/ops/CAPTURE_OUTREACH_DISPATCH_CONSUMPTION.py`",
+        "- Consumption receipt builder can send email: `false`",
+        "- Canonical consumption directory: `REQUIRED_FOR_HANDOFF`",
+        "- Consumption receipt filename: `DISPATCH_BINDING_SHA256`",
         f"- Static quality gate: `{payload['quality_gate']['status']}`",
         f"- Static quality checks: `{payload['quality_gate']['check_count']}`",
         "- Unchanged rebuilds byte-stable: `true`",
@@ -1808,7 +2290,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Operating Boundary",
             "",
-            "This registry renders drafts, immutable dispatch bindings, action-time authorization records, and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes or until the deadline, whichever comes first. Dispatch authorization additionally requires a private HumanUnlock checked only at runtime; the token and expected hash are omitted from receipts, and the evaluator cannot send. A binding scopes approval; it is not proof of transmission, receipt, content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
+            "This registry renders drafts, immutable dispatch bindings, action-time authorization records, routing decisions, and privacy-safe post-send consumption receipts only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes or until the deadline, whichever comes first. Dispatch authorization additionally requires a private HumanUnlock checked only at runtime; the token and expected hash are omitted from receipts, and the evaluator cannot send. After a connected sender acts, consumption requires a fresh private Gmail observation with exactly one matching SENT copy, no current draft, no route, body, subject, attachment, CC, or BCC drift, and a send timestamp inside the approval window and before the deadline. The resulting redacted receipt marks the binding consumed and prohibits duplicate send, but it does not prove delivery or recipient response. A binding or receipt is not proof of content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
             "",
         ]
     )

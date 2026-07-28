@@ -83,6 +83,7 @@ def run_handoff(
     token: str | None,
     expected_sha256: str,
     consumed: bool = False,
+    consumption_directory: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env["LUMA_OUTREACH_EXACT_APPROVAL_PHRASE"] = phrase
@@ -91,11 +92,19 @@ def run_handoff(
         env.pop("LUMA_HUMAN_UNLOCK_TOKEN", None)
     else:
         env["LUMA_HUMAN_UNLOCK_TOKEN"] = token
+    directory = (
+        consumption_directory
+        if consumption_directory is not None
+        else authorization_path.parent / "consumption"
+    )
+    directory.mkdir(parents=True, exist_ok=True)
     command = [
         sys.executable,
         str(HANDOFF_SCRIPT),
         "--authorization",
         str(authorization_path),
+        "--consumption-directory",
+        str(directory),
         "--current-utc",
         "2026-07-27T22:09:59Z",
     ]
@@ -135,6 +144,8 @@ def test_cli_requires_private_unlock_and_never_exposes_private_inputs(tmp_path):
     assert receipt["send_performed"] is False
     assert receipt["external_action_performed"] is False
     assert receipt["private_inputs_omitted"] is True
+    assert receipt["consumption_directory_checked"] is True
+    assert receipt["consumption_receipt_present"] is False
     assert phrase not in allowed.stdout
     assert token not in allowed.stdout
     assert expected_sha256 not in allowed.stdout
@@ -181,4 +192,37 @@ def test_cli_fails_closed_after_single_use_binding_is_consumed(tmp_path):
     assert receipt["private_human_unlock_valid"] is True
     assert receipt["dispatch_authorized"] is False
     assert receipt["send_performed"] is False
+    assert "SINGLE_USE_BINDING_ALREADY_CONSUMED" in receipt["blockers"]
+
+
+def test_cli_blocks_when_deterministic_consumption_receipt_exists(tmp_path):
+    module, authorization = build_authorization()
+    authorization_path = tmp_path / "authorization.json"
+    authorization_path.write_text(
+        json.dumps(authorization),
+        encoding="utf-8",
+    )
+    consumption_directory = tmp_path / "consumption"
+    consumption_directory.mkdir()
+    binding_sha256 = authorization["dispatch_binding"]["binding_sha256"]
+    (consumption_directory / f"{binding_sha256}.json").write_text(
+        "{}\n",
+        encoding="utf-8",
+    )
+    token = "synthetic-private-unlock"
+
+    result = run_handoff(
+        authorization_path,
+        phrase=authorization["exact_action_time_approval_phrase"],
+        token=token,
+        expected_sha256=module.sha256_bytes(token.encode("utf-8")),
+        consumption_directory=consumption_directory,
+    )
+
+    assert result.returncode == 3, result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt["consumption_directory_checked"] is True
+    assert receipt["consumption_receipt_present"] is True
+    assert receipt["single_use_binding_consumed"] is True
+    assert receipt["dispatch_authorized"] is False
     assert "SINGLE_USE_BINDING_ALREADY_CONSUMED" in receipt["blockers"]

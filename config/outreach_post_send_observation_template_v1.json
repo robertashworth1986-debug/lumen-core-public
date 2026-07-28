@@ -1,0 +1,23 @@
+{
+  "attachment_count": 0,
+  "attachment_set_sha256": null,
+  "bcc_count": 0,
+  "body_sha256": null,
+  "cc_count": 0,
+  "checked_utc": null,
+  "draft_label_present": false,
+  "full_mailbox_search_completed": false,
+  "identifiers_private": true,
+  "matching_current_draft_count": 0,
+  "matching_sent_count": 0,
+  "message_body_omitted": true,
+  "message_id": null,
+  "recipient_route_sha256": null,
+  "schema": "lumencore.outreach_post_send_observation.private.v1",
+  "search_scope": "ALL_MAIL_BOUND_ROUTE_THREAD_SUBJECT_BODY",
+  "sent_label_present": false,
+  "sent_utc": null,
+  "source_message_id_sha256": null,
+  "subject_sha256": null,
+  "thread_id": null
+}

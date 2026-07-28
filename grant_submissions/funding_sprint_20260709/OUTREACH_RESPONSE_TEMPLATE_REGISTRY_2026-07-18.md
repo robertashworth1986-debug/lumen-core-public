@@ -19,6 +19,12 @@
 - Authorization builder can approve or send email: `false`
 - Private HumanUnlock: `REQUIRED_AT_RUNTIME`
 - Dispatch handoff can send email: `false`
+- Post-send observation: `FRESH_EXACT_SENT_COPY_REQUIRED`
+- Consumed binding duplicate send allowed: `false`
+- Dispatch consumption builder: `code/ops/CAPTURE_OUTREACH_DISPATCH_CONSUMPTION.py`
+- Consumption receipt builder can send email: `false`
+- Canonical consumption directory: `REQUIRED_FOR_HANDOFF`
+- Consumption receipt filename: `DISPATCH_BINDING_SHA256`
 - Static quality gate: `PASS`
 - Static quality checks: `204`
 - Unchanged rebuilds byte-stable: `true`
@@ -496,4 +502,4 @@ Thank you,
 
 ## Operating Boundary
 
-This registry renders drafts, immutable dispatch bindings, action-time authorization records, and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes or until the deadline, whichever comes first. Dispatch authorization additionally requires a private HumanUnlock checked only at runtime; the token and expected hash are omitted from receipts, and the evaluator cannot send. A binding scopes approval; it is not proof of transmission, receipt, content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.
+This registry renders drafts, immutable dispatch bindings, action-time authorization records, routing decisions, and privacy-safe post-send consumption receipts only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes or until the deadline, whichever comes first. Dispatch authorization additionally requires a private HumanUnlock checked only at runtime; the token and expected hash are omitted from receipts, and the evaluator cannot send. After a connected sender acts, consumption requires a fresh private Gmail observation with exactly one matching SENT copy, no current draft, no route, body, subject, attachment, CC, or BCC drift, and a send timestamp inside the approval window and before the deadline. The resulting redacted receipt marks the binding consumed and prohibits duplicate send, but it does not prove delivery or recipient response. A binding or receipt is not proof of content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.

@@ -22,6 +22,9 @@ OUT_MD = OUT_JSON.with_suffix(".md")
 ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE = (
     ROOT / "config" / "outreach_action_time_mailbox_receipt_template_v1.json"
 )
+POST_SEND_OBSERVATION_TEMPLATE = (
+    ROOT / "config" / "outreach_post_send_observation_template_v1.json"
+)
 
 
 def load_module():
@@ -550,6 +553,56 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
         is False
     )
     assert (
+        payload["controls"][
+            "post_send_observation_required_for_consumption"
+        ]
+        is True
+    )
+    assert payload["controls"]["post_send_observation_schema"] == (
+        module.POST_SEND_OBSERVATION_SCHEMA
+    )
+    assert payload["controls"]["post_send_observation_template"] == (
+        "config/outreach_post_send_observation_template_v1.json"
+    )
+    assert payload["controls"][
+        "post_send_observation_template_sha256"
+    ] == module.canonical_object_sha256(
+        module.validate_post_send_observation_template()
+    )
+    assert payload["controls"]["post_send_mailbox_max_age_seconds"] == 900
+    assert payload["controls"]["dispatch_consumption_receipt_schema"] == (
+        module.DISPATCH_CONSUMPTION_RECEIPT_SCHEMA
+    )
+    assert payload["controls"]["dispatch_consumption_receipt_builder"] == (
+        "code/ops/CAPTURE_OUTREACH_DISPATCH_CONSUMPTION.py"
+    )
+    assert (
+        payload["controls"][
+            "dispatch_consumption_receipt_builder_can_send_email"
+        ]
+        is False
+    )
+    assert (
+        payload["controls"]["dispatch_consumption_directory_required"]
+        is True
+    )
+    assert (
+        payload["controls"][
+            "dispatch_handoff_checks_consumption_directory"
+        ]
+        is True
+    )
+    assert (
+        payload["controls"][
+            "consumption_receipt_name_bound_to_dispatch_sha256"
+        ]
+        is True
+    )
+    assert (
+        payload["controls"]["consumed_binding_duplicate_send_allowed"]
+        is False
+    )
+    assert (
         payload["controls"]["private_human_unlock_required_for_dispatch"]
         is True
     )
@@ -843,6 +896,8 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
         expected_human_unlock_sha256=module.sha256_bytes(
             unlock_token.encode("utf-8")
         ),
+        consumption_directory_checked=True,
+        consumption_receipt_present=False,
     )
     assert handoff["status"] == (
         "READY_FOR_CONNECTED_SENDER_SINGLE_USE_DISPATCH"
@@ -855,6 +910,8 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     assert handoff["external_action_performed"] is False
     assert handoff["handoff_can_send_email"] is False
     assert handoff["private_inputs_omitted"] is True
+    assert handoff["consumption_directory_checked"] is True
+    assert handoff["consumption_receipt_present"] is False
     assert handoff["receipt_sha256"] == module.canonical_object_sha256(
         handoff,
         omit={"receipt_sha256"},
@@ -862,6 +919,22 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     serialized_handoff = json.dumps(handoff, sort_keys=True)
     assert unlock_token not in serialized_handoff
     assert phrase not in serialized_handoff
+
+    unchecked_consumption_directory = (
+        module.evaluate_action_time_dispatch_handoff(
+            authorization,
+            exact_approval_phrase=phrase,
+            current_utc="2026-07-27T22:09:59Z",
+            human_unlock_token=unlock_token,
+            expected_human_unlock_sha256=module.sha256_bytes(
+                unlock_token.encode("utf-8")
+            ),
+        )
+    )
+    assert unchecked_consumption_directory["dispatch_authorized"] is False
+    assert unchecked_consumption_directory["blockers"] == [
+        "CONSUMPTION_DIRECTORY_NOT_CHECKED"
+    ]
 
     missing_unlock = module.evaluate_action_time_dispatch_handoff(
         authorization,
@@ -871,6 +944,8 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
         expected_human_unlock_sha256=module.sha256_bytes(
             unlock_token.encode("utf-8")
         ),
+        consumption_directory_checked=True,
+        consumption_receipt_present=False,
     )
     assert missing_unlock["action_time_approval_valid"] is True
     assert missing_unlock["private_human_unlock_valid"] is False
@@ -888,6 +963,8 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
         expected_human_unlock_sha256=module.sha256_bytes(
             unlock_token.encode("utf-8")
         ),
+        consumption_directory_checked=True,
+        consumption_receipt_present=False,
     )
     assert wrong_unlock["private_human_unlock_valid"] is False
     assert wrong_unlock["dispatch_authorized"] is False
@@ -899,6 +976,8 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
         current_utc="2026-07-27T22:09:59Z",
         human_unlock_token=unlock_token,
         expected_human_unlock_sha256="not-a-sha256",
+        consumption_directory_checked=True,
+        consumption_receipt_present=False,
     )
     assert malformed_unlock_hash["private_human_unlock_valid"] is False
     assert malformed_unlock_hash["dispatch_authorized"] is False
@@ -1111,6 +1190,34 @@ def test_mailbox_receipt_template_is_deliberately_non_authorizing(tmp_path):
             template,
             current_utc="2026-07-27T22:05:00Z",
         )
+
+
+def test_post_send_observation_template_is_non_authorizing(tmp_path):
+    module = load_module()
+    template = json.loads(
+        POST_SEND_OBSERVATION_TEMPLATE.read_text(encoding="utf-8")
+    )
+    assert set(template) == module.POST_SEND_OBSERVATION_FIELDS
+    assert template["schema"] == module.POST_SEND_OBSERVATION_SCHEMA
+    assert template["full_mailbox_search_completed"] is False
+    assert template["sent_label_present"] is False
+    assert template["matching_sent_count"] == 0
+    assert template["message_id"] is None
+    assert template["thread_id"] is None
+    assert module.validate_post_send_observation_template() == template
+
+    unsafe_template = copy.deepcopy(template)
+    unsafe_template["sent_label_present"] = True
+    unsafe_path = tmp_path / "unsafe_post_send_observation.json"
+    unsafe_path.write_text(
+        json.dumps(unsafe_template, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="POST_SEND_OBSERVATION_TEMPLATE_MUST_NOT_AUTHORIZE",
+    ):
+        module.validate_post_send_observation_template(unsafe_path)
 
 
 def test_requested_asset_delivery_requires_explicit_request_and_private_review():
