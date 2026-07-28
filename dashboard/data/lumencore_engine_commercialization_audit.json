@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_commercialization_audit_v1",
-  "generated_at_utc": "2026-07-28T02:57:29+00:00",
+  "generated_at_utc": "2026-07-28T03:10:10.757597+00:00",
   "source_registry": "config/lumencore_engine_commercialization_v1.json",
   "source_note": "The 15 names originated in a founder inventory email. This registry treats that email as a hypothesis and uses repository paths, not the email, as implementation evidence.",
   "boundaries": [
