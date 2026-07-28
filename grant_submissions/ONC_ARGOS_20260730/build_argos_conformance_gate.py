@@ -99,6 +99,25 @@ def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def security_receipts_equivalent(committed: dict, current: dict) -> bool:
+    portable_receipts = []
+    for receipt in (committed, current):
+        portable = json.loads(json.dumps(receipt))
+        history = portable.get("history")
+        if not isinstance(history, dict):
+            return False
+        reachable_ref_count = history.get("local_reachable_ref_count")
+        if (
+            not isinstance(reachable_ref_count, int)
+            or isinstance(reachable_ref_count, bool)
+            or reachable_ref_count < 1
+        ):
+            return False
+        history.pop("local_reachable_ref_count")
+        portable_receipts.append(portable)
+    return portable_receipts[0] == portable_receipts[1]
+
+
 def current_security_payload(committed: dict) -> tuple[dict, bool]:
     spec = importlib.util.spec_from_file_location(
         "argos_conformance_credential_hygiene",
@@ -109,10 +128,7 @@ def current_security_payload(committed: dict) -> tuple[dict, bool]:
     verifier = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(verifier)
     current = verifier.build_payload()
-    receipt_current = (
-        verifier.canonical_json_bytes(committed)
-        == verifier.canonical_json_bytes(current)
-    )
+    receipt_current = security_receipts_equivalent(committed, current)
     return current, receipt_current
 
 
