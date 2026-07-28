@@ -86,6 +86,12 @@ examples/proof_capsule/** text eol=lf
 /grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json text eol=lf
 /grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md text eol=lf
 /tests/test_outreach_response_template_registry.py text eol=lf
+/tests/test_public_repo_credential_hygiene.py text eol=lf
+/LamaScout/config/api_registry.yaml text eol=lf
+/code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py text eol=lf
+/config/public_credential_remediation_status_v1.json text eol=lf
+/grant_submissions/ONC_ARGOS_20260730/ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json text eol=lf
+/grant_submissions/funding_sprint_20260709/source_attachments/Project?Argos?SOW?-?SSN.pdf binary
 
 # Canonical bytes for the external technical-review packet.
 /.github/workflows/external-technical-review-packet.yml text eol=lf

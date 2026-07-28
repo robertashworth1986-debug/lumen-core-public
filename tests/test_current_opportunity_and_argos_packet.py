@@ -26,6 +26,26 @@ ARGOS_CLAIM_MAP = ARGOS_DIR / "ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
 ARGOS_TEAMING_BINDING = (
     ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json"
 )
+ARGOS_PARTNER_STATUS = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json"
+)
+ARGOS_OFFICIAL_SOW = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "source_attachments"
+    / "Project Argos SOW - SSN.pdf"
+)
+ARGOS_OFFICIAL_SOW_SOURCE_RECEIPT = (
+    ARGOS_OFFICIAL_SOW.parent
+    / "PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json"
+)
+ARGOS_SECURITY_GATE = (
+    ARGOS_DIR / "ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json"
+)
 
 
 def sha256(path: Path) -> str:
@@ -150,8 +170,9 @@ def test_lumencore_company_and_lumaarc_seal_are_distinct_and_hash_locked():
     assert sha256(logo) == receipt["sha256"]
 
 
-def test_argos_gate_remains_partner_first_and_fail_closed():
+def test_argos_gate_records_one_partner_send_and_remains_fail_closed():
     gate = load_json(ARGOS_DIR / "ARGOS_SUBMISSION_GATE_2026-07-26.json")
+    partner_status = load_json(ARGOS_PARTNER_STATUS)
 
     assert gate["schema"] == "lumencore.opportunity_submission_gate.v1"
     assert gate["opportunity"]["notice_id"] == "ONC-ARGOS-SSN-2026-OS351107"
@@ -162,11 +183,61 @@ def test_argos_gate_remains_partner_first_and_fail_closed():
     assert gate["send_gate"]["submission_authorized"] is False
     assert gate["send_gate"]["exact_action_time_human_approval_required"] is True
     assert gate["send_gate"]["decision"] == "BLOCK_SEND"
-    assert gate["partner_search"]["status"] == "PRIMARY_GMAIL_DRAFT_CREATED_NOT_SENT"
-    assert gate["partner_search"]["outreach_sent_count"] == 0
-    assert gate["partner_search"]["gmail_draft_count"] == 1
+    assert gate["partner_search"]["status"] == "PRIMARY_INQUIRY_SENT_ONCE_WAITING_FOR_REPLY"
+    assert gate["partner_search"]["outreach_sent_count"] == 1
+    assert gate["partner_search"]["gmail_draft_count"] == 0
+    assert gate["partner_search"]["matching_inbound_count"] == 0
+    assert gate["partner_search"]["sent_copy_verified"] is True
+    assert gate["partner_search"]["duplicate_send_prohibited"] is True
+    assert (
+        partner_status["status"]
+        == "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY"
+    )
+    assert partner_status["mailbox_observation"]["matching_sent_count"] == 1
+    assert partner_status["mailbox_observation"]["matching_current_draft_count"] == 0
+    assert partner_status["mailbox_observation"]["matching_inbound_count"] == 0
+    assert partner_status["controls"]["post_send_sent_copy_verified"] is True
+    assert partner_status["controls"]["duplicate_send_prohibited"] is True
+    assert partner_status["controls"]["public_action_time_binding_reconciled"] is False
+    assert partner_status["prior_binding"]["binding_match_status"] == (
+        "MISMATCH_RETAINED_AS_UNRECONCILED_PUBLIC_AUDIT_GAP"
+    )
+    assert (
+        partner_status["prior_binding"]["public_authorization_chain_reconciled"]
+        is False
+    )
+    assert (
+        partner_status["prior_binding"][
+            "sent_content_source_bound_by_post_send_hashes"
+        ]
+        is True
+    )
     assert gate["claim_boundaries"]["full_prime_readiness_claim_allowed"] is False
     assert gate["claim_boundaries"]["realized_savings_claim_allowed"] is False
+
+
+def test_argos_official_sow_and_public_security_receipt_are_exactly_bound():
+    security = load_json(ARGOS_SECURITY_GATE)
+    source = load_json(ARGOS_OFFICIAL_SOW_SOURCE_RECEIPT)
+
+    assert ARGOS_OFFICIAL_SOW.stat().st_size == 174359
+    assert sha256(ARGOS_OFFICIAL_SOW) == (
+        "6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354"
+    )
+    assert source["schema"] == "lumencore.official_source_attachment_receipt.v1"
+    assert source["notice"]["notice_id"] == "ONC-ARGOS-SSN-2026-OS351107"
+    assert source["attachment"]["access"] == "PUBLIC"
+    assert source["remote_refresh"]["http_status"] == 200
+    assert source["remote_refresh"]["matches_local_copy"] is True
+    assert source["remote_refresh"]["sha256"] == sha256(ARGOS_OFFICIAL_SOW)
+    assert all(source["checks"].values())
+    assert security["schema"] == "lumencore.public_repository_security_gate.v1"
+    assert security["current_file"]["placeholder_only"] is True
+    assert security["current_file"]["non_placeholder_value_count"] == 0
+    assert security["history"]["historical_exposure_detected"] is True
+    assert security["public_repository_link_allowed"] is False
+    assert security["final_argos_send_allowed_by_security_gate"] is False
+    assert security["external_action_performed"] is False
 
 
 def test_argos_generated_outputs_match_their_receipts():
@@ -220,7 +291,7 @@ def test_argos_teaming_register_is_source_bound_and_does_not_claim_commitment():
     register = load_json(ARGOS_DIR / "ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json")
 
     assert register["schema"] == "lumencore.argos_teaming_candidate_register.v1"
-    assert register["status"] == "PRIMARY_GMAIL_DRAFT_CREATED_NOT_SENT"
+    assert register["status"] == "PRIMARY_INQUIRY_SENT_ONCE_WAITING_FOR_REPLY"
     assert register["opportunity"]["named_team_members_and_roles_required"] is True
     assert len(register["candidates"]) == 3
     assert register["selection_strategy"]["contact_sequence"] == (
@@ -231,12 +302,16 @@ def test_argos_teaming_register_is_source_bound_and_does_not_claim_commitment():
         assert all(source.startswith("https://") for source in candidate["primary_sources"])
         assert candidate["verification"]["interest_confirmed"] is False
         assert candidate["verification"]["authorization_to_name_in_response"] is False
-        assert candidate["outreach"]["sent"] is False
+    primary, *fallbacks = register["candidates"]
+    assert primary["outreach"]["sent"] is True
+    assert primary["outreach"]["sent_copy_verified"] is True
+    assert primary["outreach"]["duplicate_send_prohibited"] is True
+    assert all(candidate["outreach"]["sent"] is False for candidate in fallbacks)
     assert register["claim_boundaries"]["candidate_listing_is_not_a_commitment"] is True
     assert register["claim_boundaries"]["no_outreach_send_is_authorized_by_this_register"] is True
 
 
-def test_argos_primary_partner_draft_is_exactly_bound_and_still_unsent():
+def test_argos_primary_partner_dispatch_gate_is_historical_after_registry_change():
     body = ARGOS_DIR / "ARGOS_EMI_TEAMING_INQUIRY_BODY.md"
     gate = load_json(ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json")
     registry = load_json(
@@ -265,7 +340,7 @@ def test_argos_primary_partner_draft_is_exactly_bound_and_still_unsent():
         ).encode("utf-8")
     ).hexdigest().upper()
     assert selection["template_id"] == "INITIAL_PARTNER_TEAMING_INQUIRY"
-    assert selection["registry_source_config_sha256"] == registry[
+    assert selection["registry_source_config_sha256"] != registry[
         "source_config_sha256"
     ]
     assert selection["template_canonical_sha256"] == template_sha256
@@ -301,17 +376,20 @@ def test_argos_primary_partner_draft_is_exactly_bound_and_still_unsent():
     assert gate["controls"]["draft_creation_authorizes_send"] is False
     assert gate["controls"]["single_use_action_time_approval_required"] is True
     assert gate["decision"] == "GMAIL_DRAFT_READY_SEND_BLOCKED"
-    assert primary["outreach"]["gmail_draft_created"] is True
+    assert primary["outreach"]["gmail_draft_created"] is False
     assert primary["outreach"]["gmail_identifiers_stored_public"] is False
-    assert primary["outreach"]["sent"] is False
+    assert primary["outreach"]["sent"] is True
+    assert primary["outreach"]["sent_copy_verified"] is True
 
 
-def test_argos_primary_partner_binding_is_deterministic_and_fail_closed():
+def test_argos_primary_partner_binding_is_preserved_but_not_reusable():
     builder = load_argos_teaming_dispatch_builder()
     committed = load_json(ARGOS_TEAMING_BINDING)
     rebuilt = builder.build_payload()
 
-    assert rebuilt == committed
+    assert rebuilt != committed
+    assert rebuilt["decision"] == "BLOCKED_DISPATCH_GATE_INTEGRITY"
+    assert rebuilt["failed_checks"] == ["REGISTRY_BINDING"]
     assert committed["schema"] == (
         "lumencore.initial_outreach_dispatch_binding.v1"
     )
@@ -397,7 +475,7 @@ def test_argos_primary_partner_binding_rejects_stale_or_duplicate_mailbox_state(
     assert duplicate_payload["summary"]["send_performed"] is False
 
 
-def test_argos_primary_partner_binding_uses_readback_time_not_draft_mutation_time():
+def test_argos_registry_drift_blocks_even_with_fresh_historical_readback():
     builder = load_argos_teaming_dispatch_builder()
     gate = load_json(
         ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
@@ -413,12 +491,10 @@ def test_argos_primary_partner_binding_uses_readback_time_not_draft_mutation_tim
 
     payload = builder.build_payload(fresh)
 
-    assert payload["decision"] == (
-        "VERIFIED_SNAPSHOT_READY_FOR_SINGLE_USE_ACTION_TIME_APPROVAL"
-    )
-    assert payload["summary"]["fail_count"] == 0
-    assert payload["dispatch_binding"] is not None
-    assert payload["dispatch_binding"]["gmail_route_readback_receipt_sha256"]
+    assert payload["decision"] == "BLOCKED_DISPATCH_GATE_INTEGRITY"
+    assert payload["failed_checks"] == ["REGISTRY_BINDING"]
+    assert payload["summary"]["fail_count"] == 1
+    assert payload["dispatch_binding"] is None
 
 
 @pytest.mark.parametrize(
@@ -486,7 +562,7 @@ def test_argos_primary_partner_binding_rejects_tampering(
 
 def test_argos_primary_partner_binding_approval_window_expires_exactly():
     builder = load_argos_teaming_dispatch_builder()
-    payload = builder.build_payload()
+    payload = load_json(ARGOS_TEAMING_BINDING)
 
     current = builder.evaluate_action_time(
         payload,
@@ -520,7 +596,7 @@ def test_argos_primary_partner_binding_rejects_duplicate_json_keys(tmp_path):
         builder.read_json(path)
 
 
-def test_argos_primary_partner_binding_cli_check_is_current():
+def test_argos_primary_partner_binding_cli_rejects_historical_registry_snapshot():
     result = subprocess.run(
         [
             sys.executable,
@@ -533,11 +609,12 @@ def test_argos_primary_partner_binding_cli_check_is_current():
         check=False,
     )
 
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.returncode == 1, result.stdout + result.stderr
     receipt = json.loads(result.stdout)
-    assert receipt["status"] == "CURRENT"
-    assert receipt["pass_count"] == 12
-    assert receipt["fail_count"] == 0
+    assert receipt["status"] == "STALE"
+    assert receipt["decision"] == "BLOCKED_DISPATCH_GATE_INTEGRITY"
+    assert receipt["pass_count"] == 11
+    assert receipt["fail_count"] == 1
     assert receipt["send_authorized"] is False
     assert receipt["send_performed"] is False
 
@@ -551,16 +628,18 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
     assert conformance["deadline_utc"] == "2026-07-30T21:00:00Z"
     assert conformance["decision"] == "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY"
     assert conformance["summary"] == {
-        "blocked_count": 5,
-        "check_count": 19,
+        "blocked_count": 6,
+        "check_count": 22,
         "external_action_performed": False,
         "fail_count": 0,
-        "pass_count": 14,
+        "pass_count": 16,
         "submission_authorized": False,
     }
 
     expected_pass = {
         "OFFICIAL_NOTICE_CURRENT",
+        "OFFICIAL_SOW_SOURCE_CUSTODY",
+        "PUBLIC_REPOSITORY_CREDENTIAL_RECEIPT",
         "DEADLINE_OPEN",
         "ACCEPTED_FILES_PRESENT",
         "ARTIFACT_HASH_CUSTODY",
@@ -573,7 +652,7 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
         "SIMILAR_SCOPE_BOUNDARY",
         "CLAIM_BOUNDARIES",
         "CLAIM_EVIDENCE_TRACEABILITY",
-        "PARTNER_DRAFT_UNSENT",
+        "PARTNER_OUTREACH_SENT_ONCE",
     }
     expected_blocked = {
         "PRIVATE_COVER_FACTS",
@@ -581,6 +660,7 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
         "GOVERNMENT_DUPLICATE_RECHECK",
         "FINAL_DISPATCH_BINDING",
         "ACTION_TIME_APPROVAL",
+        "PUBLIC_REPOSITORY_ROTATION_AND_HISTORY",
     }
     assert {check_id for check_id, row in checks.items() if row["status"] == "PASS"} == expected_pass
     assert {
@@ -747,6 +827,21 @@ def test_argos_text_custody_is_stable_across_line_endings(tmp_path):
     ).hexdigest()
 
 
+def test_argos_security_receipt_tampering_cannot_clear_gates():
+    conformance = load_argos_conformance_builder()
+    finalizer = load_argos_private_finalizer()
+    tampered = load_json(ARGOS_SECURITY_GATE)
+    tampered["decision"] = "PASS_TARGETED_CREDENTIAL_AND_REMOTE_HISTORY_GATE"
+    tampered["public_repository_link_allowed"] = True
+    tampered["final_argos_send_allowed_by_security_gate"] = True
+
+    current, receipt_current = conformance.current_security_payload(tampered)
+    assert receipt_current is False
+    assert current["public_repository_link_allowed"] is False
+    with pytest.raises(ValueError, match="stale or was edited"):
+        finalizer.validate_security_gate(tampered)
+
+
 def test_argos_private_finalizer_readiness_is_redacted_and_fail_closed():
     readiness = load_json(ARGOS_PRIVATE_READINESS)
     schema = load_json(ARGOS_PRIVATE_SCHEMA)
@@ -776,8 +871,8 @@ def test_argos_private_finalizer_readiness_is_redacted_and_fail_closed():
     assert set(schema["properties"]["facts"]["required"]) == set(
         readiness["required_fact_keys"]
     )
-    assert readiness["verification"]["focused_test_count"] == 37
-    assert readiness["verification"]["focused_test_pass_count"] == 37
+    assert readiness["verification"]["focused_test_count"] == 40
+    assert readiness["verification"]["focused_test_pass_count"] == 40
     assert readiness["verification"]["synthetic_private_values_only"] is True
     assert readiness["verification"]["synthetic_pdf_page_count"] == 10
     assert readiness["verification"]["synthetic_pdf_page_size"] == "US Letter"
@@ -785,6 +880,10 @@ def test_argos_private_finalizer_readiness_is_redacted_and_fail_closed():
     assert readiness["verification"]["duplicate_json_key_rejection_tested"] is True
     assert readiness["verification"]["public_vault_path_rejection_tested"] is True
     assert readiness["verification"]["receipt_schema_validation_tested"] is True
+    assert (
+        readiness["verification"]["blocked_repository_link_suppression_tested"]
+        is True
+    )
     assert (
         readiness["verification"][
             "tampered_external_action_controls_rejection_tested"
@@ -843,6 +942,12 @@ def test_argos_private_finalizer_builds_without_public_mutation_or_value_logging
     assert receipt["external_action_performed"] is False
     assert receipt["private_values_logged"] is False
     assert receipt["private_output_mirrored_to_public_vault"] is False
+    assert receipt["public_repository_security"] == {
+        "gate_sha256": sha256(ARGOS_SECURITY_GATE),
+        "decision": "BLOCK_PUBLIC_REPO_LINK_AND_FINAL_EXTERNAL_RESPONSE",
+        "public_repository_link_allowed": False,
+        "public_repository_link_included": False,
+    }
     assert private_markdown.is_file()
     assert private_docx.is_file()
     assert private_receipt.is_file()
@@ -850,6 +955,8 @@ def test_argos_private_finalizer_builds_without_public_mutation_or_value_logging
     assert receipt["outputs"]["docx"]["sha256"] == sha256(private_docx)
 
     markdown_text = private_markdown.read_text(encoding="utf-8")
+    assert builder.PUBLIC_REPOSITORY_URL not in markdown_text
+    assert builder.PUBLIC_REPOSITORY_WITHHELD in markdown_text
     assert builder.PRIVATE_MARKER not in markdown_text
     assert builder.PRIVATE_DISPLAY_MARKER not in markdown_text
     assert builder.PRIVATE_STATUS in markdown_text
@@ -859,6 +966,15 @@ def test_argos_private_finalizer_builds_without_public_mutation_or_value_logging
             assert fact["value"] in markdown_text
 
     document = builder.Document(private_docx)
+    document_text = "\n".join(
+        paragraph.text
+        for table in document.tables
+        for row in table.rows
+        for cell in row.cells
+        for paragraph in cell.paragraphs
+    )
+    assert builder.PUBLIC_REPOSITORY_URL not in document_text
+    assert builder.PUBLIC_REPOSITORY_WITHHELD in document_text
     docx_text = "\n".join(
         cell.text
         for table in document.tables
@@ -1111,7 +1227,7 @@ def test_argos_private_finalizer_rejects_false_or_future_attestations(tmp_path):
         )
 
 
-def test_argos_outreach_sequence_and_action_time_gate_remain_unsent():
+def test_argos_outreach_sequence_preserves_sent_once_and_government_gate():
     outreach = (
         ARGOS_DIR / "ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md"
     ).read_text(encoding="utf-8")
@@ -1119,7 +1235,8 @@ def test_argos_outreach_sequence_and_action_time_gate_remain_unsent():
         ARGOS_DIR / "ARGOS_ACTION_TIME_FINALIZATION_CHECKLIST_2026-07-27.md"
     ).read_text(encoding="utf-8")
 
-    assert "READY_FOR_REVIEW - NOT SENT" in outreach
+    assert "PRIMARY_SENT_ONCE - NO CURRENT DRAFT - WAITING_FOR_REPLY" in outreach
+    assert "Do not resend it." in outreach
     assert "First-contact attachment set: none." in outreach
     assert "not sent in parallel by default" in outreach
     assert "Current decision:** `BLOCK_SEND`" in checklist

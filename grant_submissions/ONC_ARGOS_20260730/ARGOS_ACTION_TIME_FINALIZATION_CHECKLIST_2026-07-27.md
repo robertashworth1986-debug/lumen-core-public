@@ -18,6 +18,7 @@
   information.
 - The final response goes only to the primary point of contact identified in
   the current official SAM.gov notice.
+- Submission is by email, not by SAM.gov or another portal.
 
 ## Private Cover Gate
 
@@ -45,6 +46,8 @@ the private final copy.
 
 ## Evidence and File Gate
 
+- [ ] The official four-page SOW attachment matches SHA-256
+  `6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354`.
 - [ ] Similar-scope references are truthful, relevant, current, and authorized.
 - [ ] LumenCore component evidence remains clearly separated from partner prior
   performance.
@@ -54,9 +57,16 @@ the private final copy.
 - [ ] Final PDF has no clipping, overlap, broken table, missing logo, or page
   limit defect.
 - [ ] Final attachment contains no placeholders.
+- [ ] Spotify and YouTube credentials previously present in public history are
+  rotated with non-secret receipts.
+- [ ] Reachable public Git history is remediated and the remote is verified.
+- [ ] The public repository link remains suppressed until both security checks
+  pass.
 
 ## Dispatch Gate
 
+- [x] The bounded partner inquiry was sent exactly once with no attachment,
+  CC, or BCC; do not resend it.
 - [ ] Official notice and attachment were rechecked after the last amendment.
 - [ ] Full Gmail search found no prior sent response or conflicting draft.
 - [ ] Final recipient, subject, body, and one attachment set are displayed

@@ -1,7 +1,7 @@
 # Outreach Response Template Registry - 2026-07-18
 
-- Templates: `17`
-- Private-render templates: `12`
+- Templates: `18`
+- Private-render templates: `13`
 - Builder can send email: `false`
 - Duplicate-send gate: `FAIL_CLOSED`
 - Missing-fact gate: `FAIL_CLOSED`
@@ -47,7 +47,7 @@
 - Consumption finalizes exact reservation: `true`
 - Consumption receipt filename: `DISPATCH_BINDING_SHA256`
 - Static quality gate: `PASS`
-- Static quality checks: `255`
+- Static quality checks: `270`
 - Unchanged rebuilds byte-stable: `true`
 
 ## Claim Boundary
@@ -71,8 +71,8 @@ This response is a communication or routing artifact. It does not establish sele
 ## Quality Gate
 
 - All templates pass: `true`
-- Deadline-control templates: `COMPONENT_INSTRUCTION_ESCALATION, INITIAL_PARTNER_TEAMING_INQUIRY, PORTAL_SUPPORT_DEADLINE_RESCUE`
-- HTTPS public URL fields: `6`
+- Deadline-control templates: `COMPONENT_INSTRUCTION_ESCALATION, FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE, INITIAL_PARTNER_TEAMING_INQUIRY, PORTAL_SUPPORT_DEADLINE_RESCUE`
+- HTTPS public URL fields: `7`
 
 ## Decision Matrix
 
@@ -95,6 +95,7 @@ This response is a communication or routing artifact. It does not establish sele
 | `DECLINE_CLOSEOUT` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `false` |
 | `MOU_ONBOARDING_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `true` |
 | `MEETING_REBOOK_REQUEST` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
+| `FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE` | `HUMAN_ACTION_DUE` | `EXPLICIT_REQUEST_ONLY` | `true` |
 
 ## NO_DUPLICATE_MONITOR
 
@@ -516,6 +517,39 @@ I apologize for the scheduling mistake regarding {meeting_context}. {scheduling_
 I remain interested and can meet during: {availability_windows}. Please use whichever available slot is easiest, or send the correct rebooking link.
 
 Thank you,
+{sender_name}
+{sender_title}
+{organization_name}
+```
+
+## FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE
+
+Transmit one capability response explicitly requested by an official sources-sought or market-research notice, with a source-bound deadline, attachment inventory, information-handling disclosure, and exact action-time review.
+
+- Inbound states: `OFFICIAL_MARKET_RESEARCH_NOTICE_OPEN, CAPABILITY_RESPONSE_READY_FOR_ACTION_TIME_REVIEW`
+- Reply triggers: `OFFICIAL_CAPABILITY_RESPONSE_REQUIRED`
+- Required fields: `recipient_name, agency_name, notice_title, notice_id, official_source_url, official_source_checked_utc, official_source_receipt_sha256, deadline_iso, legal_entity_name, attachment_inventory, information_handling_disclosure, sender_name, sender_title, organization_name, recipient_email`
+
+```text
+Subject: Sources Sought Response - {notice_id} - {legal_entity_name}
+
+Hello {recipient_name},
+
+Attached is {legal_entity_name}'s capability response to {notice_title} ({notice_id}) for {agency_name}. The official response deadline is {deadline_iso}.
+
+Official notice: {official_source_url}
+Official source rechecked: {official_source_checked_utc}
+Source receipt SHA-256: {official_source_receipt_sha256}
+
+Attachment inventory: {attachment_inventory}
+
+This response is provided solely for market research. It does not include a price proposal and does not imply a solicitation, reimbursement, Government commitment, selection, or award.
+
+Information-handling disclosure: {information_handling_disclosure}
+
+Please confirm receipt only if your process normally provides one; no duplicate response will be sent without a new request.
+
+Respectfully,
 {sender_name}
 {sender_title}
 {organization_name}

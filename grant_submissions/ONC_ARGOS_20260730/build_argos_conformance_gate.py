@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -21,12 +22,45 @@ PARTNER_DISPATCH_GATE = ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.
 PARTNER_DISPATCH_BINDING = (
     ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json"
 )
+PARTNER_STATUS = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json"
+)
 CLAIM_EVIDENCE_MAP = ARGOS_DIR / "ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
 RESPONSE_MARKDOWN = ARGOS_DIR / "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md"
 BUILD_RECEIPT = OUTPUT_DIR / "build_receipt.json"
 RENDER_RECEIPT = OUTPUT_DIR / "render_qa_receipt.json"
 DOCX = OUTPUT_DIR / "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.docx"
 PDF = OUTPUT_DIR / "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.pdf"
+OFFICIAL_SOW = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "source_attachments"
+    / "Project Argos SOW - SSN.pdf"
+)
+OFFICIAL_SOW_SHA256 = (
+    "6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354"
+)
+OFFICIAL_SOW_BYTES = 174359
+OFFICIAL_SOW_SOURCE_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "source_attachments"
+    / "PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json"
+)
+SECURITY_GATE = (
+    ARGOS_DIR / "ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json"
+)
+SECURITY_STATUS = ROOT / "config" / "public_credential_remediation_status_v1.json"
+PUBLIC_CREDENTIAL_CONFIG = ROOT / "LamaScout" / "config" / "api_registry.yaml"
+SECURITY_VERIFIER = (
+    ROOT / "code" / "ops" / "VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py"
+)
+OFFICIAL_NOTICE_MAX_AGE_SECONDS = 24 * 60 * 60
 
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 NS = {"w": W_NS}
@@ -63,6 +97,23 @@ def custody_hash_mode(path: Path) -> str:
 
 def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def current_security_payload(committed: dict) -> tuple[dict, bool]:
+    spec = importlib.util.spec_from_file_location(
+        "argos_conformance_credential_hygiene",
+        SECURITY_VERIFIER,
+    )
+    if spec is None or spec.loader is None:
+        raise ValueError("public repository security verifier cannot be loaded")
+    verifier = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(verifier)
+    current = verifier.build_payload()
+    receipt_current = (
+        verifier.canonical_json_bytes(committed)
+        == verifier.canonical_json_bytes(current)
+    )
+    return current, receipt_current
 
 
 def rel(path: Path) -> str:
@@ -135,19 +186,38 @@ def result(
 
 
 def build_payload(as_of_utc: str) -> dict:
-    evaluated = parse_utc(as_of_utc)
+    evaluated = parse_utc(as_of_utc).replace(microsecond=0)
     evaluated_utc = evaluated.strftime("%Y-%m-%dT%H:%M:%SZ")
     gate = read_json(SUBMISSION_GATE)
     team = read_json(TEAM_REGISTER)
     partner_dispatch = read_json(PARTNER_DISPATCH_GATE)
     partner_binding = read_json(PARTNER_DISPATCH_BINDING)
+    partner_status = read_json(PARTNER_STATUS)
     claim_evidence_map = read_json(CLAIM_EVIDENCE_MAP)
+    security_gate = read_json(SECURITY_GATE)
+    security_state, security_receipt_current = current_security_payload(
+        security_gate
+    )
+    official_sow_source = read_json(OFFICIAL_SOW_SOURCE_RECEIPT)
     build = read_json(BUILD_RECEIPT)
     render = read_json(RENDER_RECEIPT)
     response = RESPONSE_MARKDOWN.read_text(encoding="utf-8")
     docx_format = inspect_docx_format(DOCX)
 
     deadline = parse_utc(gate["opportunity"]["deadline_utc"])
+    notice_checked = parse_utc(gate["official_notice_recheck"]["checked_utc"])
+    notice_age_seconds = (evaluated - notice_checked).total_seconds()
+    official_notice_current = (
+        0 <= notice_age_seconds <= OFFICIAL_NOTICE_MAX_AGE_SECONDS
+        and gate["official_notice_recheck"]["notice_active"] is True
+        and gate["official_notice_recheck"]["deadline_utc"]
+        == gate["opportunity"]["deadline_utc"]
+        and gate["official_notice_recheck"]["official_url"]
+        == gate["opportunity"]["official_url"]
+        and gate["official_notice_recheck"]["notice_id"]
+        == gate["opportunity"]["notice_id"]
+        and gate["official_notice_recheck"]["amendment_observed"] is False
+    )
     placeholders = response.count(PRIVATE_PLACEHOLDER)
     unauthorized_names = [
         name for name in UNAUTHORIZED_PARTNER_NAMES if name.lower() in response.lower()
@@ -220,17 +290,144 @@ def build_payload(as_of_utc: str) -> dict:
         and claim_evidence_map["external_action_performed"] is False
         and claim_evidence_map["submission_authorized"] is False
     )
+    official_sow_custody = (
+        OFFICIAL_SOW.is_file()
+        and OFFICIAL_SOW.stat().st_size == OFFICIAL_SOW_BYTES
+        and sha256(OFFICIAL_SOW) == OFFICIAL_SOW_SHA256
+        and official_sow_source.get("schema")
+        == "lumencore.official_source_attachment_receipt.v1"
+        and official_sow_source["notice"]["notice_id"]
+        == gate["opportunity"]["notice_id"]
+        and official_sow_source["notice"]["official_url"]
+        == gate["opportunity"]["official_url"]
+        and official_sow_source["attachment"]["document_name"]
+        == OFFICIAL_SOW.name
+        and official_sow_source["attachment"]["access"] == "PUBLIC"
+        and official_sow_source["local_copy"]["path"] == rel(OFFICIAL_SOW)
+        and official_sow_source["local_copy"]["bytes"] == OFFICIAL_SOW_BYTES
+        and official_sow_source["local_copy"]["sha256"]
+        == OFFICIAL_SOW_SHA256
+        and official_sow_source["remote_refresh"]["http_status"] == 200
+        and official_sow_source["remote_refresh"]["downloaded_bytes"]
+        == OFFICIAL_SOW_BYTES
+        and official_sow_source["remote_refresh"]["sha256"]
+        == OFFICIAL_SOW_SHA256
+        and official_sow_source["remote_refresh"]["matches_local_copy"] is True
+        and all(official_sow_source["checks"].values())
+    )
+    security_receipt_current = (
+        security_receipt_current
+        and security_state.get("schema")
+        == "lumencore.public_repository_security_gate.v1"
+        and security_state.get("target_path")
+        == PUBLIC_CREDENTIAL_CONFIG.relative_to(ROOT).as_posix()
+        and security_state.get("target_sha256")
+        == sha256(PUBLIC_CREDENTIAL_CONFIG)
+        and security_state["current_file"]["placeholder_only"] is True
+        and security_state["current_file"]["non_placeholder_value_count"] == 0
+        and security_state["current_file"][
+            "required_environment_references_present"
+        ]
+        is True
+        and security_state["history"]["scan_complete"] is True
+        and security_state["history"]["scan_failure_count"] == 0
+        and security_state.get("external_action_performed") is False
+    )
+    security_rotation_and_history_clear = (
+        security_receipt_current
+        and all(
+            row["confirmed"]
+            for row in security_state["provider_rotation"].values()
+        )
+        and security_state["history"]["remediation_confirmed"] is True
+        and security_state["history"][
+            "remote_public_history_verification_confirmed"
+        ]
+        is True
+        and security_state["history"]["historical_exposure_detected"] is False
+        and security_state["decision"]
+        == "PASS_TARGETED_CREDENTIAL_AND_REMOTE_HISTORY_GATE"
+        and security_state["public_repository_link_allowed"] is True
+        and security_state["final_argos_send_allowed_by_security_gate"] is True
+    )
+    partner_outreach_sent_once = (
+        partner_status.get("schema")
+        == "lumencore.argos_partner_outreach_status.v1"
+        and partner_status.get("status")
+        == "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY"
+        and partner_status["mailbox_observation"]["matching_current_draft_count"] == 0
+        and partner_status["mailbox_observation"]["matching_sent_count"] == 1
+        and partner_status["mailbox_observation"]["matching_inbound_count"] == 0
+        and partner_status["mailbox_observation"]["sent_copy_present"] is True
+        and partner_status["mailbox_observation"]["attachment_count"] == 0
+        and partner_status["mailbox_observation"]["cc_count"] == 0
+        and partner_status["mailbox_observation"]["bcc_count"] == 0
+        and partner_status["controls"]["final_send_performed"] is True
+        and partner_status["controls"]["post_send_sent_copy_verified"] is True
+        and partner_status["controls"]["duplicate_send_prohibited"] is True
+        and partner_status["controls"]["partner_name_use_requires_written_authority"]
+        is True
+    )
 
     checks = [
         result(
             "OFFICIAL_NOTICE_CURRENT",
             "The official notice is active and its identity and deadline are explicit.",
-            "PASS"
-            if gate["official_notice_recheck"]["notice_active"]
-            and gate["official_notice_recheck"]["deadline_utc"]
-            == gate["opportunity"]["deadline_utc"]
-            else "FAIL",
-            gate["opportunity"]["official_url"],
+            "PASS" if official_notice_current else "FAIL",
+            (
+                f"{gate['opportunity']['official_url']}; "
+                f"checked_utc={gate['official_notice_recheck']['checked_utc']}; "
+                f"age_seconds={int(notice_age_seconds)}; "
+                "amendment_observed="
+                f"{gate['official_notice_recheck']['amendment_observed']}"
+            ),
+        ),
+        result(
+            "OFFICIAL_SOW_SOURCE_CUSTODY",
+            "The official four-page draft SOW attachment is preserved with exact binary custody.",
+            "PASS" if official_sow_custody else "FAIL",
+            (
+                f"bytes={OFFICIAL_SOW.stat().st_size if OFFICIAL_SOW.is_file() else 0}; "
+                f"sha256={sha256(OFFICIAL_SOW) if OFFICIAL_SOW.is_file() else 'MISSING'}; "
+                f"source_receipt_sha256={sha256(OFFICIAL_SOW_SOURCE_RECEIPT)}"
+            ),
+        ),
+        result(
+            "PUBLIC_REPOSITORY_CREDENTIAL_RECEIPT",
+            "The current public credential configuration contains environment references only and its receipt matches the current file.",
+            "PASS" if security_receipt_current else "FAIL",
+            (
+                "placeholder_only="
+                f"{security_state['current_file']['placeholder_only']}; "
+                "non_placeholder_value_count="
+                f"{security_state['current_file']['non_placeholder_value_count']}; "
+                "required_environment_references_present="
+                f"{security_state['current_file']['required_environment_references_present']}; "
+                f"scan_complete={security_state['history']['scan_complete']}; "
+                f"scan_failure_count={security_state['history']['scan_failure_count']}"
+            ),
+        ),
+        result(
+            "PUBLIC_REPOSITORY_ROTATION_AND_HISTORY",
+            "Previously exposed provider credentials are rotated and prior public Git objects are remediated before the repository is linked or the final response is sent.",
+            "PASS" if security_rotation_and_history_clear else "BLOCKED",
+            (
+                "provider_rotations_confirmed="
+                f"{all(row['confirmed'] for row in security_state['provider_rotation'].values())}; "
+                "history_remediation_confirmed="
+                f"{security_state['history']['remediation_confirmed']}; "
+                "remote_public_history_verification_confirmed="
+                f"{security_state['history']['remote_public_history_verification_confirmed']}; "
+                "historical_exposure_detected="
+                f"{security_state['history']['historical_exposure_detected']}; "
+                "public_repository_link_allowed="
+                f"{security_state['public_repository_link_allowed']}"
+            ),
+            (
+                "Rotate the affected provider credentials, record non-secret "
+                "receipts, remediate reachable public Git history, and verify "
+                "the remote before linking the repository or sending."
+            ),
         ),
         result(
             "DEADLINE_OPEN",
@@ -348,25 +545,20 @@ def build_payload(as_of_utc: str) -> dict:
             ),
         ),
         result(
-            "PARTNER_DRAFT_UNSENT",
-            "The bounded partner inquiry remains an unsent, no-attachment draft.",
-            "PASS"
-            if partner_dispatch["gmail_draft_receipt"]["draft_present"]
-            and not partner_dispatch["gmail_draft_receipt"]["sent"]
-            and partner_dispatch["message"]["attachment_count"] == 0
-            and partner_binding["summary"]["pass_count"]
-            == partner_binding["summary"]["check_count"]
-            and partner_binding["summary"]["fail_count"] == 0
-            and not partner_binding["summary"]["send_authorized"]
-            and not partner_binding["summary"]["send_performed"]
-            else "FAIL",
+            "PARTNER_OUTREACH_SENT_ONCE",
+            "The bounded partner inquiry was sent exactly once without attachments, CC, or BCC and is now duplicate-locked while awaiting a reply.",
+            "PASS" if partner_outreach_sent_once else "FAIL",
             (
-                f"draft_present={partner_dispatch['gmail_draft_receipt']['draft_present']}; "
-                f"sent={partner_dispatch['gmail_draft_receipt']['sent']}; "
-                f"attachments={partner_dispatch['message']['attachment_count']}; "
-                f"binding_checks="
-                f"{partner_binding['summary']['pass_count']}/"
-                f"{partner_binding['summary']['check_count']}"
+                "drafts="
+                f"{partner_status['mailbox_observation']['matching_current_draft_count']}; "
+                "sent="
+                f"{partner_status['mailbox_observation']['matching_sent_count']}; "
+                "inbound="
+                f"{partner_status['mailbox_observation']['matching_inbound_count']}; "
+                "sent_copy_verified="
+                f"{partner_status['controls']['post_send_sent_copy_verified']}; "
+                "duplicate_send_prohibited="
+                f"{partner_status['controls']['duplicate_send_prohibited']}"
             ),
         ),
         result(
@@ -429,12 +621,19 @@ def build_payload(as_of_utc: str) -> dict:
         TEAM_REGISTER,
         PARTNER_DISPATCH_GATE,
         PARTNER_DISPATCH_BINDING,
+        PARTNER_STATUS,
         CLAIM_EVIDENCE_MAP,
         RESPONSE_MARKDOWN,
         BUILD_RECEIPT,
         RENDER_RECEIPT,
         DOCX,
         PDF,
+        OFFICIAL_SOW,
+        OFFICIAL_SOW_SOURCE_RECEIPT,
+        SECURITY_GATE,
+        SECURITY_STATUS,
+        PUBLIC_CREDENTIAL_CONFIG,
+        SECURITY_VERIFIER,
     )
     return {
         "schema": "lumencore.argos_response_conformance_gate.v1",
@@ -468,8 +667,9 @@ def build_payload(as_of_utc: str) -> dict:
             "validation, field performance, or savings."
         ),
         "safest_next_action": (
-            "Resolve the private cover and authorized-team blockers first. Then rebuild "
-            "the private final copy, rerun this gate, repeat the official-notice and "
+            "Complete provider credential rotation and public-history remediation, "
+            "then resolve the private cover and authorized-team blockers. Rebuild the "
+            "private final copy, rerun this gate, repeat the official-notice and "
             "full-mailbox duplicate checks, and request exact action-time approval."
         ),
     }

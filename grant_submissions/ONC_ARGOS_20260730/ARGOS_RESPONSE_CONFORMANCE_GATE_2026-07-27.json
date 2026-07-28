@@ -2,13 +2,32 @@
   "checks": [
     {
       "check_id": "OFFICIAL_NOTICE_CURRENT",
-      "evidence": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
+      "evidence": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view; checked_utc=2026-07-28T17:21:48Z; age_seconds=668; amendment_observed=False",
       "requirement": "The official notice is active and its identity and deadline are explicit.",
       "status": "PASS"
     },
     {
+      "check_id": "OFFICIAL_SOW_SOURCE_CUSTODY",
+      "evidence": "bytes=174359; sha256=6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354; source_receipt_sha256=5479d7db1dc3777d9e6c177f92800bd198392105d46a2cf78c56554c86b8820d",
+      "requirement": "The official four-page draft SOW attachment is preserved with exact binary custody.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "PUBLIC_REPOSITORY_CREDENTIAL_RECEIPT",
+      "evidence": "placeholder_only=True; non_placeholder_value_count=0; required_environment_references_present=True; scan_complete=True; scan_failure_count=0",
+      "requirement": "The current public credential configuration contains environment references only and its receipt matches the current file.",
+      "status": "PASS"
+    },
+    {
+      "blocker": "Rotate the affected provider credentials, record non-secret receipts, remediate reachable public Git history, and verify the remote before linking the repository or sending.",
+      "check_id": "PUBLIC_REPOSITORY_ROTATION_AND_HISTORY",
+      "evidence": "provider_rotations_confirmed=False; history_remediation_confirmed=False; remote_public_history_verification_confirmed=False; historical_exposure_detected=True; public_repository_link_allowed=False",
+      "requirement": "Previously exposed provider credentials are rotated and prior public Git objects are remediated before the repository is linked or the final response is sent.",
+      "status": "BLOCKED"
+    },
+    {
       "check_id": "DEADLINE_OPEN",
-      "evidence": "evaluated=2026-07-28T04:54:14Z; deadline=2026-07-30T21:00:00Z",
+      "evidence": "evaluated=2026-07-28T17:32:56Z; deadline=2026-07-30T21:00:00Z",
       "requirement": "The response is evaluated before the exact Government deadline.",
       "status": "PASS"
     },
@@ -93,9 +112,9 @@
       "status": "PASS"
     },
     {
-      "check_id": "PARTNER_DRAFT_UNSENT",
-      "evidence": "draft_present=True; sent=False; attachments=0; binding_checks=12/12",
-      "requirement": "The bounded partner inquiry remains an unsent, no-attachment draft.",
+      "check_id": "PARTNER_OUTREACH_SENT_ONCE",
+      "evidence": "drafts=0; sent=1; inbound=0; sent_copy_verified=True; duplicate_send_prohibited=True",
+      "requirement": "The bounded partner inquiry was sent exactly once without attachments, CC, or BCC and is now duplicate-locked while awaiting a reply.",
       "status": "PASS"
     },
     {
@@ -123,22 +142,22 @@
   "claim_boundary": "PASS means the named documentary or formatting requirement is supported. BLOCKED means the current artifact is intentionally not send-ready. Neither passing checks nor a polished packet establishes submission, acceptance, selection, award, authorization, certification, external validation, field performance, or savings.",
   "deadline_utc": "2026-07-30T21:00:00Z",
   "decision": "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY",
-  "evaluated_utc": "2026-07-28T04:54:14Z",
+  "evaluated_utc": "2026-07-28T17:32:56Z",
   "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
-  "safest_next_action": "Resolve the private cover and authorized-team blockers first. Then rebuild the private final copy, rerun this gate, repeat the official-notice and full-mailbox duplicate checks, and request exact action-time approval.",
+  "safest_next_action": "Complete provider credential rotation and public-history remediation, then resolve the private cover and authorized-team blockers. Rebuild the private final copy, rerun this gate, repeat the official-notice and full-mailbox duplicate checks, and request exact action-time approval.",
   "schema": "lumencore.argos_response_conformance_gate.v1",
   "source_custody": [
     {
-      "bytes": 5047,
+      "bytes": 5633,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
-      "sha256": "23b05d0b44d3c2b76bd4bc2e20116baa746ccef8738805a192a348f26ee9e61b"
+      "sha256": "d79558ab1fa476e2343da7303b4102cbbdb176b09994ec20904dce7511a9c897"
     },
     {
-      "bytes": 7358,
+      "bytes": 7634,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json",
-      "sha256": "dab21e6d40a1b0cd9dfa4308f79f0a703cc8a91768a17452f01599e7a3309a09"
+      "sha256": "87e15fc64b8bbe3b0f21238ec2fea5097e860461309f7fe49d6c63d3ac2ed027"
     },
     {
       "bytes": 4102,
@@ -151,6 +170,12 @@
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json",
       "sha256": "55bf2423d1d5eeba7f595541da1b7ca3d007afbc5150ba0fbc75774e23ed11e3"
+    },
+    {
+      "bytes": 3813,
+      "hash_mode": "TEXT_UTF8_LF",
+      "path": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
+      "sha256": "dda72e9982db764952d9ee6991ce9579b447b07b7820dea48edb05807b2bba5a"
     },
     {
       "bytes": 4540,
@@ -187,14 +212,50 @@
       "hash_mode": "BINARY_RAW",
       "path": "grant_submissions/ONC_ARGOS_20260730/output/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.pdf",
       "sha256": "6260617bb2ae0de6d6b6817c70d3146351889db16d1c288a6edb48c8c19d0c04"
+    },
+    {
+      "bytes": 174359,
+      "hash_mode": "BINARY_RAW",
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/Project Argos SOW - SSN.pdf",
+      "sha256": "6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354"
+    },
+    {
+      "bytes": 2022,
+      "hash_mode": "TEXT_UTF8_LF",
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json",
+      "sha256": "5479d7db1dc3777d9e6c177f92800bd198392105d46a2cf78c56554c86b8820d"
+    },
+    {
+      "bytes": 2203,
+      "hash_mode": "TEXT_UTF8_LF",
+      "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json",
+      "sha256": "58b1eebd679545985e4ee6e05e026c7f71d63221dd118949238182fb1241f6c2"
+    },
+    {
+      "bytes": 1321,
+      "hash_mode": "TEXT_UTF8_LF",
+      "path": "config/public_credential_remediation_status_v1.json",
+      "sha256": "a28710bf316cd2e9b8d11f6b66e80b6d4c69eb0d6bd06475e580eb79386e69de"
+    },
+    {
+      "bytes": 9474,
+      "hash_mode": "BINARY_RAW",
+      "path": "LamaScout/config/api_registry.yaml",
+      "sha256": "d2bbd8b87b7248f6437793be3f3756096e6c6d7223935595f18e2f781f971440"
+    },
+    {
+      "bytes": 16887,
+      "hash_mode": "TEXT_UTF8_LF",
+      "path": "code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py",
+      "sha256": "cc90882051f90cd960e1402284d7eae542e0af17a093b32fa97983372f213a4e"
     }
   ],
   "summary": {
-    "blocked_count": 5,
-    "check_count": 19,
+    "blocked_count": 6,
+    "check_count": 22,
     "external_action_performed": false,
     "fail_count": 0,
-    "pass_count": 14,
+    "pass_count": 16,
     "submission_authorized": false
   }
 }

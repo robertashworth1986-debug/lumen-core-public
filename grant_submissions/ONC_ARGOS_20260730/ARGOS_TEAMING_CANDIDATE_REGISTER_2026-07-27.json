@@ -1,6 +1,7 @@
 {
   "schema": "lumencore.argos_teaming_candidate_register.v1",
   "generated_utc": "2026-07-27T19:12:10Z",
+  "updated_utc": "2026-07-28T16:45:49Z",
   "opportunity": {
     "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
     "official_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
@@ -8,7 +9,7 @@
     "teaming_permitted": true,
     "named_team_members_and_roles_required": true
   },
-  "status": "PRIMARY_GMAIL_DRAFT_CREATED_NOT_SENT",
+  "status": "PRIMARY_INQUIRY_SENT_ONCE_WAITING_FOR_REPLY",
   "selection_strategy": {
     "primary_route": "EMI_ADVISORS_AS_CONSORTIUM_CONVENER",
     "fallback_route": "INDEX_ANALYTICS_AS_FEDERAL_HEALTH_INTEGRATION_LEAD",
@@ -49,13 +50,19 @@
         "authorization_to_use_credentials_or_references": false
       },
       "outreach": {
-        "mailbox_duplicate_check_utc": "2026-07-27T19:34:13Z",
-        "matching_prior_or_draft_outreach_found": false,
-        "draft_ready": true,
-        "gmail_draft_created": true,
-        "gmail_draft_observed_utc": "2026-07-27T19:34:27Z",
+        "mailbox_duplicate_check_utc": "2026-07-28T16:45:49Z",
+        "matching_prior_or_draft_outreach_found": true,
+        "draft_ready": false,
+        "gmail_draft_created": false,
+        "historical_gmail_draft_observed_utc": "2026-07-27T19:34:27Z",
         "gmail_identifiers_stored_public": false,
-        "sent": false
+        "sent": true,
+        "sent_utc": "2026-07-28T15:39:34Z",
+        "sent_copy_verified": true,
+        "attachment_count": 0,
+        "cc_count": 0,
+        "bcc_count": 0,
+        "duplicate_send_prohibited": true
       }
     },
     {
@@ -141,5 +148,5 @@
     "no_prior_performance_reference_may_be_used_without_documentary_support_and_permission": true,
     "no_outreach_send_is_authorized_by_this_register": true
   },
-  "safest_next_action": "Review the primary EMI Advisors teaming inquiry, perform a fresh mailbox duplicate check, and request exact approval for that one recipient and exact body before sending. If no response by the internal target, review the Index Analytics fallback draft."
+  "safest_next_action": "Do not resend the primary EMI Advisors inquiry. Monitor for a reply, preserve the public binding mismatch as an audit gap, and continue the Government response independently. Review any fallback route only after a fresh mailbox check and a new route-specific decision."
 }

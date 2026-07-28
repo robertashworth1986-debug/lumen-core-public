@@ -61,7 +61,7 @@ PRIVATE_FIELD_KEYS = {
 }
 SHA256_HEX_LENGTH = 64
 ARGOS_STATUS_SCHEMA = "lumencore.argos_partner_outreach_status.v1"
-ARGOS_DRAFT_ONLY_STATUS = "DRAFT_ONLY_APPROVAL_EXPIRED_DEADLINE_OPEN"
+ARGOS_SENT_ONCE_STATUS = "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -164,8 +164,11 @@ def argos_outreach_status_receipt(
         raise ValueError("unexpected Argos outreach status schema")
     if status.get("lane_id") != binding.get("required_lane_id"):
         raise ValueError("Argos outreach status lane changed")
-    if status.get("status") != ARGOS_DRAFT_ONLY_STATUS:
-        raise ValueError("Argos outreach status is no longer draft-only")
+    required_outreach_status = binding.get("required_outreach_status")
+    if required_outreach_status != ARGOS_SENT_ONCE_STATUS:
+        raise ValueError("Argos required outreach status is not the sent-once state")
+    if status.get("status") != required_outreach_status:
+        raise ValueError("Argos outreach status is not the required sent-once state")
 
     recorded_utc = parse_aware_datetime(
         str(status.get("recorded_utc", "")),
@@ -176,22 +179,39 @@ def argos_outreach_status_receipt(
     prior_binding = status.get("prior_binding")
     source_control = status.get("source_control")
     controls = status.get("controls")
-    gate_opportunity = gate.get("opportunity")
-    gate_selection = gate.get("template_selection")
-    gate_message = gate.get("message")
-    gate_controls = gate.get("controls")
+    submission_opportunity = gate.get("opportunity")
+    submission_partner_search = gate.get("partner_search")
+    submission_send_gate = gate.get("send_gate")
     required_objects = {
         "outreach_status.opportunity": opportunity,
         "outreach_status.mailbox_observation": mailbox,
         "outreach_status.prior_binding": prior_binding,
         "outreach_status.source_control": source_control,
         "outreach_status.controls": controls,
-        "dispatch_gate.opportunity": gate_opportunity,
-        "dispatch_gate.template_selection": gate_selection,
-        "dispatch_gate.message": gate_message,
-        "dispatch_gate.controls": gate_controls,
+        "submission_gate.opportunity": submission_opportunity,
+        "submission_gate.partner_search": submission_partner_search,
+        "submission_gate.send_gate": submission_send_gate,
     }
     for label, value in required_objects.items():
+        if not isinstance(value, dict):
+            raise ValueError(f"{label} must be an object")
+
+    dispatch_relative_path, dispatch_path = resolve_repository_file(
+        source_control.get("public_dispatch_gate_path"),
+        "outreach_status.source_control.public_dispatch_gate_path",
+    )
+    dispatch_gate = read_json(dispatch_path)
+    assert_no_private_fields(dispatch_gate, "dispatch_gate")
+    dispatch_opportunity = dispatch_gate.get("opportunity")
+    dispatch_selection = dispatch_gate.get("template_selection")
+    dispatch_message = dispatch_gate.get("message")
+    dispatch_controls = dispatch_gate.get("controls")
+    for label, value in {
+        "dispatch_gate.opportunity": dispatch_opportunity,
+        "dispatch_gate.template_selection": dispatch_selection,
+        "dispatch_gate.message": dispatch_message,
+        "dispatch_gate.controls": dispatch_controls,
+    }.items():
         if not isinstance(value, dict):
             raise ValueError(f"{label} must be an object")
 
@@ -203,35 +223,46 @@ def argos_outreach_status_receipt(
         str(opportunity.get("government_deadline_utc", "")),
         "outreach_status.government_deadline_utc",
     )
-    gate_deadline = parse_aware_datetime(
-        str(gate_opportunity.get("government_deadline_utc", "")),
+    submission_deadline = parse_aware_datetime(
+        str(submission_opportunity.get("deadline_utc", "")),
+        "submission_gate.deadline_utc",
+    )
+    dispatch_deadline = parse_aware_datetime(
+        str(dispatch_opportunity.get("government_deadline_utc", "")),
         "dispatch_gate.government_deadline_utc",
     )
     partner_target = parse_aware_datetime(
         str(opportunity.get("partner_interest_target_utc", "")),
         "outreach_status.partner_interest_target_utc",
     )
-    gate_partner_target = parse_aware_datetime(
-        str(gate_opportunity.get("partner_interest_target_utc", "")),
+    submission_partner_target = parse_aware_datetime(
+        str(submission_partner_search.get("primary_partner_interest_target_utc", "")),
+        "submission_gate.primary_partner_interest_target_utc",
+    )
+    dispatch_partner_target = parse_aware_datetime(
+        str(dispatch_opportunity.get("partner_interest_target_utc", "")),
         "dispatch_gate.partner_interest_target_utc",
     )
     if not (
         configured_deadline
         == status_deadline
-        == gate_deadline
-        and partner_target == gate_partner_target
+        == submission_deadline
+        == dispatch_deadline
+        and partner_target
+        == submission_partner_target
+        == dispatch_partner_target
     ):
         raise ValueError("Argos deadline or partner target changed across sources")
     if not recorded_utc < status_deadline:
-        raise ValueError("Argos draft-only status cannot be recorded after the deadline")
+        raise ValueError("Argos sent-once status cannot be recorded after the deadline")
     if not partner_target < status_deadline:
         raise ValueError("Argos partner target must precede the Government deadline")
 
     if mailbox.get("full_mailbox_search_completed") is not True:
         raise ValueError("Argos full-mailbox duplicate search is not recorded")
     expected_counts = {
-        "matching_current_draft_count": 1,
-        "matching_sent_count": 0,
+        "matching_current_draft_count": 0,
+        "matching_sent_count": 1,
         "matching_inbound_count": 0,
         "attachment_count": 0,
         "cc_count": 0,
@@ -245,23 +276,37 @@ def argos_outreach_status_receipt(
             or value != expected
         ):
             raise ValueError(f"Argos mailbox count changed: {field}")
+    if mailbox.get("current_draft_only") is not False:
+        raise ValueError("Argos sent-once receipt cannot remain draft-only")
     for field in (
-        "current_draft_only",
+        "sent_copy_present",
         "gmail_identifiers_omitted",
         "message_body_omitted",
     ):
         if mailbox.get(field) is not True:
-            raise ValueError(f"Argos privacy or draft-only control failed: {field}")
+            raise ValueError(f"Argos privacy or sent-copy control failed: {field}")
+    checked_utc = parse_aware_datetime(
+        str(mailbox.get("checked_utc", "")),
+        "outreach_status.mailbox_observation.checked_utc",
+    )
+    sent_utc = parse_aware_datetime(
+        str(mailbox.get("sent_utc", "")),
+        "outreach_status.mailbox_observation.sent_utc",
+    )
+    if checked_utc != recorded_utc:
+        raise ValueError("Argos mailbox check time must match the status record time")
+    if not sent_utc <= checked_utc < status_deadline:
+        raise ValueError("Argos sent-copy chronology is invalid")
 
-    subject = str(gate_message.get("subject", ""))
+    subject = str(dispatch_message.get("subject", ""))
     subject_sha256 = hashlib.sha256(subject.encode("utf-8")).hexdigest().upper()
     body_relative_path, body_path = resolve_repository_file(
-        gate_message.get("body_path"),
+        dispatch_message.get("body_path"),
         "dispatch_gate.message.body_path",
     )
     body_sha256 = sha256(body_path).upper()
     declared_gate_body_sha256 = normalized_sha256(
-        gate_message.get("body_sha256"),
+        dispatch_message.get("body_sha256"),
         "dispatch_gate.message.body_sha256",
     )
     observed_subject_sha256 = normalized_sha256(
@@ -273,46 +318,70 @@ def argos_outreach_status_receipt(
         "outreach_status.mailbox_observation.body_sha256",
     )
     if subject_sha256 != observed_subject_sha256:
-        raise ValueError("Argos draft subject hash no longer matches the dispatch gate")
+        raise ValueError("Argos sent subject hash no longer matches the dispatch gate")
     if not body_sha256 == declared_gate_body_sha256 == observed_body_sha256:
-        raise ValueError("Argos draft body hash no longer matches the committed source")
+        raise ValueError("Argos sent body hash no longer matches the committed source")
     for field in ("attachment_count", "cc_count", "bcc_count"):
-        if gate_message.get(field) != 0:
+        if dispatch_message.get(field) != 0:
             raise ValueError(f"Argos dispatch gate must retain zero {field}")
 
     selected_template_id = str(source_control.get("selected_template_id", ""))
     if (
         not selected_template_id
-        or selected_template_id != gate_selection.get("template_id")
+        or selected_template_id != dispatch_selection.get("template_id")
     ):
         raise ValueError("Argos selected template changed across sources")
     declared_gate_path = str(source_control.get("public_dispatch_gate_path", ""))
-    if declared_gate_path != gate_relative_path.as_posix():
+    if declared_gate_path != dispatch_relative_path.as_posix():
         raise ValueError("Argos status points to a different dispatch gate")
     declared_gate_sha256 = normalized_sha256(
         source_control.get("public_dispatch_gate_sha256"),
         "outreach_status.source_control.public_dispatch_gate_sha256",
     )
-    if declared_gate_sha256 != sha256(gate_path).upper():
+    if declared_gate_sha256 != sha256(dispatch_path).upper():
         raise ValueError("Argos dispatch gate SHA-256 changed")
 
     binding_relative_path, binding_path = resolve_repository_file(
-        gate_controls.get("dispatch_binding_path"),
+        dispatch_controls.get("dispatch_binding_path"),
         "dispatch_gate.controls.dispatch_binding_path",
     )
     binding_payload = read_json(binding_path)
     binding_core = binding_payload.get("dispatch_binding")
     if not isinstance(binding_core, dict):
         raise ValueError("Argos dispatch binding core must be an object")
-    prior_binding_sha256 = normalized_sha256(
-        prior_binding.get("binding_sha256"),
-        "outreach_status.prior_binding.binding_sha256",
+    observed_binding_sha256 = normalized_sha256(
+        prior_binding.get("observed_action_time_binding_sha256"),
+        "outreach_status.prior_binding.observed_action_time_binding_sha256",
     )
-    if prior_binding_sha256 != normalized_sha256(
+    historical_binding_sha256 = normalized_sha256(
         binding_core.get("binding_sha256"),
         "dispatch_binding.binding_sha256",
+    )
+    declared_historical_binding_sha256 = normalized_sha256(
+        prior_binding.get("historical_snapshot_binding_sha256"),
+        "outreach_status.prior_binding.historical_snapshot_binding_sha256",
+    )
+    if declared_historical_binding_sha256 != historical_binding_sha256:
+        raise ValueError(
+            "Argos status no longer matches the historical binding snapshot"
+        )
+    binding_matches = observed_binding_sha256 == historical_binding_sha256
+    expected_binding_status = (
+        "MATCHED_TO_HISTORICAL_SNAPSHOT"
+        if binding_matches
+        else "MISMATCH_RETAINED_AS_UNRECONCILED_PUBLIC_AUDIT_GAP"
+    )
+    if prior_binding.get("binding_match_status") != expected_binding_status:
+        raise ValueError("Argos binding-match status is inconsistent")
+    if (
+        prior_binding.get("public_authorization_chain_reconciled")
+        is not binding_matches
     ):
-        raise ValueError("Argos prior binding hash changed")
+        raise ValueError(
+            "Argos public authorization-chain reconciliation is inconsistent"
+        )
+    if prior_binding.get("sent_content_source_bound_by_post_send_hashes") is not True:
+        raise ValueError("Argos sent content must remain source-bound")
     prior_binding_expires = parse_aware_datetime(
         str(prior_binding.get("expires_utc", "")),
         "outreach_status.prior_binding.expires_utc",
@@ -323,18 +392,24 @@ def argos_outreach_status_receipt(
     )
     if prior_binding_expires != binding_expires:
         raise ValueError("Argos prior binding expiry changed")
-    if not prior_binding_expires < recorded_utc:
+    if not prior_binding_expires < sent_utc <= recorded_utc:
         raise ValueError("Argos prior binding is not expired at record time")
     if prior_binding.get("expired_at_record_time") is not True:
         raise ValueError("Argos status must mark the prior binding expired")
     if prior_binding.get("prior_approval_reusable") is not False:
         raise ValueError("Argos prior approval must remain nonreusable")
+    if controls.get("public_action_time_binding_reconciled") is not binding_matches:
+        raise ValueError(
+            "Argos outreach control disagrees with binding reconciliation"
+        )
 
     required_true_controls = {
-        "fresh_full_mailbox_recheck_required",
-        "fresh_draft_readback_required",
-        "new_five_minute_exact_approval_required",
+        "fresh_full_mailbox_recheck_completed_before_send",
+        "fresh_draft_readback_completed_before_send",
+        "action_time_human_approval_received",
         "private_human_unlock_required",
+        "final_send_performed",
+        "post_send_sent_copy_verified",
         "duplicate_send_prohibited",
         "partner_name_use_requires_written_authority",
     }
@@ -344,18 +419,22 @@ def argos_outreach_status_receipt(
     for field in ("builder_can_send_email", "draft_creation_authorizes_send"):
         if controls.get(field) is not False:
             raise ValueError(f"Argos outreach control must remain false: {field}")
-    if gate_controls.get("builder_can_send") is not False:
+    if dispatch_controls.get("builder_can_send") is not False:
         raise ValueError("Argos dispatch builder must remain unable to send")
+    if submission_send_gate.get("decision") != "BLOCK_SEND":
+        raise ValueError("Argos Government response send gate must remain blocked")
 
     return {
         "path": status_relative_path.as_posix(),
         "sha256": sha256(status_path),
         "recorded_utc": format_utc(recorded_utc),
-        "observed_state": ARGOS_DRAFT_ONLY_STATUS,
+        "observed_state": ARGOS_SENT_ONCE_STATUS,
         "partner_interest_target_utc": format_utc(partner_target),
+        "mailbox_checked_utc": format_utc(checked_utc),
+        "sent_utc": format_utc(sent_utc),
         "mailbox_state": {
-            "current_draft_count": 1,
-            "sent_count": 0,
+            "current_draft_count": 0,
+            "sent_count": 1,
             "inbound_count": 0,
             "attachment_count": 0,
             "cc_count": 0,
@@ -366,8 +445,12 @@ def argos_outreach_status_receipt(
         "body_sha256": body_sha256,
         "selected_template_id": selected_template_id,
         "prior_binding": {
-            "path": binding_relative_path.as_posix(),
-            "binding_sha256": prior_binding_sha256,
+            "historical_snapshot_path": binding_relative_path.as_posix(),
+            "historical_snapshot_binding_sha256": historical_binding_sha256,
+            "observed_action_time_binding_sha256": observed_binding_sha256,
+            "binding_match_status": expected_binding_status,
+            "public_authorization_chain_reconciled": binding_matches,
+            "sent_content_source_bound_by_post_send_hashes": True,
             "expires_utc": format_utc(prior_binding_expires),
             "expired_at_record_time": True,
             "prior_approval_reusable": False,
@@ -573,7 +656,7 @@ def evaluate_lane(
         if seconds_until <= 0:
             state = "PAST_DEADLINE_NO_EXTERNAL_ACTION_AUTHORIZED"
         elif receipt["kind"] == "REPOSITORY_GATE_WITH_OUTREACH_STATUS":
-            state = "DRAFT_ONLY_APPROVAL_EXPIRED_HUMAN_ACTION_DUE"
+            state = "PARTNER_OUTREACH_SENT_ONCE_GOVERNMENT_RESPONSE_DUE"
         elif seconds_until <= alert_window_hours * 3600:
             state = "BLOCKED_HUMAN_ACTION_DUE"
         else:
@@ -612,9 +695,9 @@ def evaluate_lane(
             )
             target_seconds_until = int((partner_target - as_of_utc).total_seconds())
             if target_seconds_until < 0:
-                target_state = "PARTNER_TARGET_PASSED_GOVERNMENT_DEADLINE_OPEN"
+                target_state = "PARTNER_TARGET_PASSED_WAITING_FOR_REPLY"
             else:
-                target_state = "PARTNER_TARGET_OPEN"
+                target_state = "PARTNER_INQUIRY_SENT_WAITING_FOR_REPLY"
             result["outreach_status"] = {
                 "observed_state": str(outreach_status["observed_state"]),
                 "recorded_utc": str(outreach_status["recorded_utc"]),
@@ -635,8 +718,23 @@ def evaluate_lane(
                 "body_sha256": str(outreach_status["body_sha256"]),
                 "prior_binding_expired": True,
                 "prior_approval_reusable": False,
-                "fresh_recheck_required": True,
-                "new_exact_approval_required": True,
+                "binding_match_status": str(
+                    outreach_status["prior_binding"]["binding_match_status"]
+                ),
+                "public_authorization_chain_reconciled": bool(
+                    outreach_status["prior_binding"][
+                        "public_authorization_chain_reconciled"
+                    ]
+                ),
+                "sent_content_source_bound_by_post_send_hashes": bool(
+                    outreach_status["prior_binding"][
+                        "sent_content_source_bound_by_post_send_hashes"
+                    ]
+                ),
+                "fresh_recheck_required": False,
+                "new_exact_approval_required": False,
+                "duplicate_send_prohibited": True,
+                "government_response_action_time_gates_required": True,
             }
         return result
 

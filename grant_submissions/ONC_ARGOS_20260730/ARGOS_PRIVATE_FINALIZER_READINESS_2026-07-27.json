@@ -4,7 +4,7 @@
   "status": "TOOLING_VERIFIED_NO_PRIVATE_COPY_GENERATED",
   "decision": "PRIVATE_INPUT_AND_ACTION_TIME_ATTESTATION_REQUIRED",
   "tool": "grant_submissions/ONC_ARGOS_20260730/build_argos_private_action_copy.py",
-  "tool_sha256": "87add56d9be65aa8c112833f5abe9c2eaa7818590819f5aeb1a85b8f28ab9dc6",
+  "tool_sha256": "d21ce41170fc8141aad5515324179c6e5815444491f305ad7ec3e11c0b6ac97a",
   "input_schema": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json",
   "input_schema_sha256": "af259499dcae6728702e673b35acea5b36d872bd94946a00b74a3a54a2d1a166",
   "required_fact_count": 9,
@@ -41,9 +41,9 @@
     "external_action_performed": false
   },
   "verification": {
-    "verified_utc": "2026-07-27T20:54:18Z",
-    "focused_test_count": 37,
-    "focused_test_pass_count": 37,
+    "verified_utc": "2026-07-28T17:34:09Z",
+    "focused_test_count": 40,
+    "focused_test_pass_count": 40,
     "synthetic_private_values_only": true,
     "synthetic_docx_rendered_to_pdf": true,
     "synthetic_pdf_page_count": 10,
@@ -67,9 +67,10 @@
     "individual_private_value_leak_rejection_tested": true,
     "receipt_value_non_disclosure_tested": true,
     "public_template_hash_stability_tested": true,
+    "blocked_repository_link_suppression_tested": true,
     "actual_private_facts_used": false,
     "actual_private_action_copy_generated": false
   },
-  "claim_boundary": "Tooling readiness does not mean private facts were found, verified, inserted, reviewed, rendered, submitted, accepted, selected, or awarded. Team and final-dispatch gates remain independent blockers.",
-  "safest_next_action": "Create the populated facts file outside Git from current official records with the user present, attest only to facts the user can verify, generate a new private output directory, and inspect every inserted field before any team or dispatch decision."
+  "claim_boundary": "Tooling readiness does not mean private facts were found, verified, inserted, reviewed, rendered, submitted, accepted, selected, or awarded. Repository-security, team, and final-dispatch gates remain independent blockers.",
+  "safest_next_action": "Complete provider credential rotation and public-history remediation, then create the populated facts file outside Git from current official records with the user present, attest only to facts the user can verify, generate a new private output directory, and inspect every inserted field before any team or dispatch decision."
 }

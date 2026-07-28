@@ -176,7 +176,7 @@ def test_registry_validates_and_covers_high_value_response_states():
     ids = {row["template_id"] for row in registry["templates"]}
 
     assert registry["schema"] == module.SCHEMA
-    assert len(ids) == 17
+    assert len(ids) == 18
     assert {
         "NO_DUPLICATE_MONITOR",
         "NO_DUPLICATE_MEETING_PREP",
@@ -191,11 +191,71 @@ def test_registry_validates_and_covers_high_value_response_states():
         "FUNDING_REVIEW_STATUS_CHECK",
         "DIRECT_INVESTOR_REVIEW_REQUEST",
         "INITIAL_PARTNER_TEAMING_INQUIRY",
+        "FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE",
         "VALIDATION_PILOT_REQUEST",
         "DECLINE_CLOSEOUT",
         "MOU_ONBOARDING_REPLY",
         "MEETING_REBOOK_REQUEST",
     } == ids
+
+
+def test_formal_government_market_research_response_is_source_bound_and_private():
+    module = load_module()
+    facts = common_facts()
+    facts.pop("source_message_id")
+    facts.update(
+        {
+            "agency_name": "Synthetic Health Agency",
+            "notice_title": "Synthetic Evidence Assurance Sources Sought",
+            "notice_id": "SYNTHETIC-SSN-2026-001",
+            "deadline_iso": "2026-07-30T17:00:00-04:00",
+            "official_source_url": "https://example.gov/notices/synthetic-ssn",
+            "official_source_checked_utc": "2026-07-28T16:24:00Z",
+            "official_source_receipt_sha256": "B" * 64,
+            "legal_entity_name": "Synthetic Evidence Systems LLC",
+            "attachment_inventory": (
+                "Synthetic_Evidence_Assurance_Capability_Response.pdf "
+                "(SHA-256 bound at action time)"
+            ),
+            "attachment_files": [
+                "Synthetic_Evidence_Assurance_Capability_Response.pdf"
+            ],
+            "information_handling_disclosure": (
+                "No classified information, controlled unclassified "
+                "information, patient data, protected health information, or "
+                "proprietary technical detail is included."
+            ),
+            "recipient_email": "official@example.gov",
+        }
+    )
+
+    rendered = module.render_response(
+        "FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE",
+        facts,
+        explicit_attachment_request=True,
+        attachment_sha256s={
+            "Synthetic_Evidence_Assurance_Capability_Response.pdf": "A" * 64
+        },
+        current_utc="2026-07-28T16:24:00Z",
+    )
+
+    assert rendered["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
+    assert rendered["private_render"] is True
+    assert rendered["attachment_policy"] == "EXPLICIT_REQUEST_ONLY"
+    assert rendered["attachment_count"] == 1
+    assert rendered["deadline"]["deadline_utc"] == "2026-07-30T21:00:00+00:00"
+    assert rendered["deadline"]["urgency"] == "HIGH_UNDER_72_HOURS"
+    assert rendered["subject"] == (
+        "Sources Sought Response - SYNTHETIC-SSN-2026-001 - "
+        "Synthetic Evidence Systems LLC"
+    )
+    assert "does not include a price proposal" in rendered["body"]
+    assert "no duplicate response will be sent" in rendered["body"]
+    assert "https://example.gov/notices/synthetic-ssn" in rendered["body"]
+    assert "2026-07-28T16:24:00Z" in rendered["body"]
+    assert "B" * 64 in rendered["body"]
+    assert rendered["send_performed"] is False
+    assert rendered["exact_action_time_approval_ready"] is False
 
 
 def test_initial_partner_teaming_inquiry_is_deadline_bound_and_no_attachment():
@@ -491,19 +551,20 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     combined = OUT_JSON.read_text(encoding="utf-8") + markdown
 
     assert payload["schema"] == module.PUBLIC_SCHEMA
-    assert payload["template_count"] == 17
+    assert payload["template_count"] == 18
     assert payload["controls"]["builder_can_send_email"] is False
     assert payload["controls"]["duplicate_send_fail_closed"] is True
     assert payload["quality_gate"]["status"] == "PASS"
     assert payload["quality_gate"]["all_templates_pass"] is True
-    assert payload["quality_gate"]["template_count"] == 17
-    assert payload["quality_gate"]["check_count"] == 255
+    assert payload["quality_gate"]["template_count"] == 18
+    assert payload["quality_gate"]["check_count"] == 270
     assert payload["quality_gate"]["deadline_control_template_ids"] == [
         "COMPONENT_INSTRUCTION_ESCALATION",
+        "FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE",
         "INITIAL_PARTNER_TEAMING_INQUIRY",
         "PORTAL_SUPPORT_DEADLINE_RESCUE",
     ]
-    assert payload["quality_gate"]["https_public_url_field_count"] == 6
+    assert payload["quality_gate"]["https_public_url_field_count"] == 7
     assert all(
         row["status"] == "PASS"
         for row in payload["quality_gate"]["template_results"]
@@ -783,9 +844,11 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert "No message is rendered" in markdown
     assert "receipt check only, not a duplicate submission" in markdown
     assert not re.search(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", combined)
+    assert not re.search(
+        r"(?<!\d)(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}(?!\d)",
+        combined,
+    )
     assert not module.UUID_RE.search(combined)
-    assert "robertashworth4444" not in combined.lower()
-    assert "615-438-2502" not in combined
 
 
 def test_source_config_hash_and_builder_payload_agree():
@@ -800,7 +863,7 @@ def test_source_config_hash_and_builder_payload_agree():
     )
     assert payload["source_config_hash_basis"] == "SORTED_COMPACT_JSON_UTF8"
     assert payload["send_policy_counts"] == {
-        "HUMAN_ACTION_DUE": 9,
+        "HUMAN_ACTION_DUE": 10,
         "MONITOR_NO_SEND": 2,
         "REPLY_AFTER_FACT_REVIEW": 6,
     }

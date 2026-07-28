@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_outreach_registry.v1",
-  "updated_utc": "2026-07-23T16:58:01Z",
+  "updated_utc": "2026-07-28T17:38:17Z",
   "policy": {
     "send_authority": "Robert Ashworth",
     "codex_send_allowed": false,
@@ -163,17 +163,17 @@
       "notes": "The IPTO submission-finalization confirmation establishes receipt of the DICE proposal abstract. Do not send the stray Gmail draft or submit a duplicate abstract."
     },
     {
-      "campaign_key": "dla-missionweave-l26bz-nv011-1380",
+      "campaign_key": "dla-missionweave-dla26bz03-nv011",
       "organization": "Defense Logistics Agency / DSIP",
       "status": "closed",
       "thread_mode": "existing_thread_only",
-      "outbound_sequence": 0,
+      "outbound_sequence": 3,
       "duplicate_detected": false,
       "duplicate_count": 0,
       "inbound_since_last_outbound": true,
-      "next_allowed_action": "preserve_packet_and_reuse_only_for_a_new_matching_topic",
+      "next_allowed_action": "preserve_packet_monitor_only_and_reuse_only_for_a_new_matching_topic",
       "outreach_id": "LC-DLA-MISSIONWEAVE-NV011-001",
-      "notes": "DSIP confirmed proposal creation, not final submission. No final-submission receipt was found before the 2026-07-22 noon ET deadline. Do not represent this lane as submitted and do not send a late receipt request."
+      "notes": "Official DLA SBIR/STTR Program Operations confirmed on 2026-07-28 that DSIP showed the proposal as In Progress and therefore not formally submitted. The 2026-07-22 noon ET deadline passed. Public-safe receipt: grant_submissions/funding_sprint_20260709/DLA_NV011_OFFICIAL_STATUS_RECEIPT_2026-07-28.json. Do not represent this lane as submitted and do not send another status request without a new official ask."
     },
     {
       "campaign_key": "navy-harborsentinel-don26bz03-nv063",
@@ -187,6 +187,19 @@
       "next_allowed_action": "preserve_packet_and_reuse_only_for_a_new_matching_topic_or_named_partner",
       "outreach_id": "LC-NAVY-HARBORSENTINEL-NV063-001",
       "notes": "No final-submission receipt was found before the 2026-07-22 noon ET deadline. Do not represent this lane as submitted and do not initiate late-submission outreach."
+    },
+    {
+      "campaign_key": "hhs-project-argos-sources-sought",
+      "organization": "U.S. Department of Health and Human Services / Project Argos",
+      "status": "action_required_draft_ready",
+      "thread_mode": "new_thread_allowed",
+      "outbound_sequence": 0,
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "finish_private_cover_and_team_authority_rotate_exposed_provider_credentials_remediate_and_verify_public_history_then_run_fresh_notice_and_full_mailbox_preflight_and_request_exact_hash_bound_action_time_send_approval",
+      "outreach_id": "LC-HHS-ARGOS-SSN-2026-001",
+      "notes": "Official sources-sought response is due 2026-07-30T17:00:00-04:00. The response is email-based, not a SAM portal submission. No HHS response has been sent. Do not name a teammate without written role authority. Do not include the public repository URL until provider rotations, reachable-history remediation, and public-remote verification are recorded. The public core remains blocked on current private SAM cover facts, authorized team roles, repository security, fresh official-notice and mailbox checks, final attachment review, and exact action-time approval."
     }
   ]
 }

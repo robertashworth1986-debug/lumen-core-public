@@ -9,6 +9,8 @@ This directory contains a bounded, partner-first capability response for:
 - Agency: U.S. Department of Health and Human Services
 - Response deadline: July 30, 2026 at 5:00 PM Eastern
 - Official notice: <https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view>
+- Submission route: email to the official notice contact; no portal sign-in or
+  portal submission is required for this response
 
 ## Position
 
@@ -28,17 +30,19 @@ the seal name, not a rename of the LumenCore company.
 - `ARGOS_SUBMISSION_GATE_2026-07-26.json`: action-time facts and send gate
 - `ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json`: ranked, source-bound
   teaming candidates and authorization state
-- `ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md`: one-at-a-time partner
-  outreach sequence; none sent
+- `ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md`: historical one-at-a-time
+  partner outreach plan
 - `ARGOS_EMI_TEAMING_INQUIRY_BODY.md`: exact no-attachment primary inquiry
-  body used by the current Gmail draft; includes the official notice and
-  current duplicate-search disclosure
+  body used by the single sent partner inquiry; includes the official notice
+  and duplicate-search disclosure
 - `ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json`: public-safe duplicate,
   route, selected `INITIAL_PARTNER_TEAMING_INQUIRY` template family, body-hash,
-  draft, and send-boundary receipt
+  draft, and historical pre-send boundary receipt
 - `ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json`: deterministic
-  12-check binding over the registry, public route, exact subject/body,
-  deadlines, duplicate search, Gmail readback, and empty attachment set
+  historical 12-check binding over the then-current registry, public route,
+  exact subject/body, deadlines, duplicate search, Gmail readback, and empty
+  attachment set; it is expired and not reusable, and its binding hash does
+  not reconcile to the separately observed action-time binding hash
 - `ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.md`: reviewer-readable
   binding, five-minute approval window, and claim boundary
 - `ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.json`: machine-readable
@@ -63,6 +67,19 @@ the seal name, not a rename of the LumenCore company.
   source commit, evidence-graph node, negative-result boundary, and non-claims
 - `build_argos_claim_evidence_map.py`: deterministic offline verifier for the
   claim-to-evidence map; it makes no live-domain availability claim
+- `../funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json`:
+  post-send receipt proving one sent copy, zero current drafts, zero inbound
+  replies, and a duplicate-send prohibition
+- `../funding_sprint_20260709/source_attachments/Project Argos SOW - SSN.pdf`:
+  exact four-page official SOW attachment, SHA-256
+  `6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354`
+- `../funding_sprint_20260709/source_attachments/PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json`:
+  read-only SAM notice observation and direct public attachment refresh receipt
+- `ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json`: public-safe
+  credential and Git-history gate; the current file is placeholder-only, but
+  provider rotations and public-history remediation remain unproven
+- `../../code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py`: deterministic
+  verifier that never prints credential values
 
 ## Rebuild
 
@@ -70,26 +87,19 @@ the seal name, not a rename of the LumenCore company.
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_response.py
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_claim_evidence_map.py
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_claim_evidence_map.py --check
-python .\grant_submissions\ONC_ARGOS_20260730\build_argos_teaming_dispatch_binding.py
-python .\grant_submissions\ONC_ARGOS_20260730\build_argos_teaming_dispatch_binding.py --check
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py
 python .\grant_submissions\ONC_ARGOS_20260730\build_argos_conformance_gate.py --check
+python .\code\ops\VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py --check
 ```
 
-The committed teaming binding is a historical snapshot, not standing send
-authority. At action time, first repeat the full-mailbox duplicate search and
-Gmail draft readback, update the public-safe duplicate counts and
-`readback_checked_utc` receipt, rebuild the binding, and then verify that its
-five-minute window is still current. `updated_utc` records the last actual
-draft mutation and is not advanced merely to refresh the readback:
-
-```powershell
-python .\grant_submissions\ONC_ARGOS_20260730\build_argos_teaming_dispatch_binding.py `
-  --action-time-check
-```
-
-An expired check returns a nonzero result and requires a fresh rebuild. The
-builder never sends email, and the exact approval phrase remains single-use.
+The committed teaming binding is a historical pre-send snapshot, not standing
+send authority. The inquiry was sent once at `2026-07-28T15:39:34Z` with no
+attachment, CC, or BCC. No inbound reply was present at the recorded check.
+Its observed action-time binding hash does not match the committed historical
+snapshot, so the public authorization chain is explicitly unreconciled even
+though the sent subject and body match committed source hashes. Do not rebuild
+the historical binding or resend the inquiry. A partner may be named only
+after written role confirmation.
 
 The private finalizer intentionally has no in-repository default:
 
@@ -112,7 +122,10 @@ schema, counts, output sizes and hashes, public-template custody, current team
 state, false external-action controls, and the absence of individual private
 values or private paths. Duplicate JSON keys, altered authorization flags,
 partial outputs, and stale receipt metadata fail closed. A generated private
-cover does not clear team, duplicate, dispatch, or approval gates.
+cover does not clear repository-security, team, duplicate, dispatch, or
+approval gates. While the repository-security gate is blocked, the private
+finalizer replaces the public repository URL with a withholding notice without
+mutating the public template.
 
 ## Conformance Meaning
 
@@ -124,8 +137,8 @@ unauthorized-name, or claim-boundary defect produces `FAIL_CONFORMANCE`.
 ## Submission Boundary
 
 Do not send this response until every required private fact and teaming fact in
-the gate file is resolved, the final document is reviewed, duplicate-send state
-is rechecked, and the user gives exact action-time approval for the final
-recipient, attachment, subject, and body. The separate partner inquiry also
-requires a fresh duplicate search, a matching Gmail readback, a current
-five-minute binding, and exact single-use approval.
+the gate file is resolved, provider credentials are rotated, reachable public
+Git history is remediated and verified, the final document is reviewed,
+duplicate-send state is rechecked, and the user gives exact action-time
+approval for the final recipient, attachment, subject, and body. The separate
+partner inquiry is already sent once and is duplicate-locked.

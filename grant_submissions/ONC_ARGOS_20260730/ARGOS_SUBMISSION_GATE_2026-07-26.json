@@ -49,7 +49,8 @@
     "decision": "NO_DUPLICATE_FOUND_BUT_RECHECK_AT_ACTION_TIME"
   },
   "official_notice_recheck": {
-    "checked_utc": "2026-07-27T19:08:00Z",
+    "checked_utc": "2026-07-28T17:21:48Z",
+    "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
     "notice_active": true,
     "deadline_utc": "2026-07-30T21:00:00Z",
     "submission_channel": "EMAIL_TO_OFFICIAL_PRIMARY_POINT_OF_CONTACT",
@@ -57,17 +58,24 @@
     "primary_point_of_contact_address_stored_in_public_gate": false,
     "teaming_permitted": true,
     "named_team_members_and_roles_required": true,
-    "official_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view"
+    "official_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
+    "amendment_observed": false,
+    "action_time_recheck_required": true
   },
   "partner_search": {
-    "status": "PRIMARY_GMAIL_DRAFT_CREATED_NOT_SENT",
+    "status": "PRIMARY_INQUIRY_SENT_ONCE_WAITING_FOR_REPLY",
     "candidate_register": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json",
     "outreach_drafts": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md",
     "candidate_count": 3,
     "candidate_interest_confirmed_count": 0,
     "candidate_name_use_authorized_count": 0,
-    "outreach_sent_count": 0,
-    "gmail_draft_count": 1,
+    "outreach_sent_count": 1,
+    "gmail_draft_count": 0,
+    "matching_inbound_count": 0,
+    "sent_copy_verified": true,
+    "sent_utc": "2026-07-28T15:39:34Z",
+    "duplicate_send_prohibited": true,
+    "current_status_receipt": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
     "primary_dispatch_gate": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
     "primary_partner_interest_target_utc": "2026-07-28T17:00:00Z"
   },
@@ -114,9 +122,11 @@
     "final_attachments_verified": false,
     "all_private_facts_resolved": false,
     "all_teaming_facts_resolved": false,
+    "public_repository_security_gate_clear": false,
+    "official_notice_rechecked_at_action_time": false,
     "duplicate_send_rechecked": false,
     "exact_action_time_human_approval_required": true,
     "decision": "BLOCK_SEND"
   },
-  "safest_next_action": "Review the primary EMI Advisors teaming inquiry, perform a fresh mailbox duplicate check, and request exact approval for that one recipient and body. Continue final response work only after a qualified team authorizes its names, roles, credentials, and relevant references."
+  "safest_next_action": "Do not resend the partner inquiry. Complete the private SAM cover facts, provider credential rotation and public-history remediation, and written team authority while monitoring for a reply. Immediately before any Government email, recheck the official notice and full mailbox, inspect the exact attachments, and request one hash-bound action-time approval."
 }
