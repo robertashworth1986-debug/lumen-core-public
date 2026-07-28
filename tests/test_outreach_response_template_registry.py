@@ -511,8 +511,11 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["controls"]["public_url_requires_https_without_credentials"] is True
     assert payload["controls"]["rendered_subject_header_injection_fail_closed"] is True
     assert payload["controls"]["rendered_fact_claim_guard_fail_closed"] is True
-    assert payload["controls"]["unicode_nfkc_claim_scan"] is True
+    assert payload["controls"]["unicode_nfkd_claim_scan"] is True
     assert payload["controls"]["unicode_format_character_fail_closed"] is True
+    assert payload["controls"]["mixed_script_confusable_fail_closed"] is True
+    assert payload["controls"]["claim_scan_diacritic_fold"] is True
+    assert payload["controls"]["bounded_confusable_skeleton_scan"] is True
     assert (
         payload["controls"][
             "guarantee_and_superlative_claims_never_authorizable"
@@ -643,7 +646,14 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert "Duplicate-send gate: `FAIL_CLOSED`" in markdown
     assert "Inserted-fact claim gate: `FAIL_CLOSED`" in markdown
     assert "Unicode format-character gate: `FAIL_CLOSED`" in markdown
-    assert "Claim scan normalization: `UNICODE_NFKC`" in markdown
+    assert "Mixed-script confusable gate: `FAIL_CLOSED`" in markdown
+    assert (
+        "Claim scan normalization: `UNICODE_NFKD_DIACRITIC_FOLD`"
+        in markdown
+    )
+    assert "Bounded Greek/Cyrillic confusable skeleton scan: `enabled`" in (
+        markdown
+    )
     assert "Guarantees and superlatives authorizable by receipt: `false`" in (
         markdown
     )
@@ -816,6 +826,44 @@ def test_unicode_spoofing_and_normalized_guarantees_fail_closed():
     assert blocked["non_authorizable_claim_risk_codes"] == [
         "UNSUPPORTED_GUARANTEE"
     ]
+
+
+def test_mixed_script_and_diacritic_claim_spoofs_fail_closed():
+    module = load_module()
+    mixed_script = direct_investor_facts()
+    mixed_script["six_month_milestone"] = (
+        "Gu\u0430ranteed funding after the next milestone."
+    )
+
+    assert module.claim_fact_risks(mixed_script) == {
+        "six_month_milestone": ["UNSUPPORTED_GUARANTEE"]
+    }
+    blocked = module.render_response(
+        "DIRECT_INVESTOR_REVIEW_REQUEST", mixed_script
+    )
+    assert blocked["status"] == "BLOCKED_UNSAFE_FACT_VALUES"
+    assert blocked["unsafe_fact_fields"] == {
+        "six_month_milestone": ["MIXED_SCRIPT_CONFUSABLE"]
+    }
+    assert blocked["subject"] is None
+    assert blocked["body"] is None
+
+    diacritic = direct_investor_facts()
+    diacritic["six_month_milestone"] = (
+        "Guara\u0301nteed funding after the next milestone."
+    )
+    blocked = module.render_response(
+        "DIRECT_INVESTOR_REVIEW_REQUEST", diacritic
+    )
+    assert blocked["status"] == "BLOCKED_UNSUPPORTED_CLAIM_FACTS"
+    assert blocked["invalid_claim_evidence_fields"] == {
+        "six_month_milestone": "CLAIM_RISK_NOT_AUTHORIZABLE"
+    }
+
+    assert module.unsafe_text_reasons(
+        "\u041c\u0430\u0440\u0438\u044f",
+        allow_line_breaks=False,
+    ) == []
 
 
 def test_requested_information_may_contain_literal_json_braces():

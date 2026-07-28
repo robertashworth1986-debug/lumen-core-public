@@ -8,7 +8,9 @@
 - Past-deadline gate: `FAIL_CLOSED`
 - Inserted-fact claim gate: `FAIL_CLOSED`
 - Unicode format-character gate: `FAIL_CLOSED`
-- Claim scan normalization: `UNICODE_NFKC`
+- Mixed-script confusable gate: `FAIL_CLOSED`
+- Claim scan normalization: `UNICODE_NFKD_DIACRITIC_FOLD`
+- Bounded Greek/Cyrillic confusable skeleton scan: `enabled`
 - Guarantees and superlatives authorizable by receipt: `false`
 - High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`
 - Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`

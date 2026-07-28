@@ -63,6 +63,61 @@ HYPHEN_TRANSLATION = str.maketrans(
         "\u2212": "-",
     }
 )
+CONFUSABLE_TRANSLATION = str.maketrans(
+    {
+        # Bounded Greek and Cyrillic lookalikes used only for security scans.
+        "\u0391": "A",
+        "\u0392": "B",
+        "\u0395": "E",
+        "\u0397": "H",
+        "\u0399": "I",
+        "\u039a": "K",
+        "\u039c": "M",
+        "\u039d": "N",
+        "\u039f": "O",
+        "\u03a1": "P",
+        "\u03a4": "T",
+        "\u03a5": "Y",
+        "\u03a7": "X",
+        "\u03b1": "a",
+        "\u03b5": "e",
+        "\u03b9": "i",
+        "\u03ba": "k",
+        "\u03bf": "o",
+        "\u03c1": "p",
+        "\u03c4": "t",
+        "\u03c5": "y",
+        "\u03c7": "x",
+        "\u0410": "A",
+        "\u0412": "B",
+        "\u0415": "E",
+        "\u041a": "K",
+        "\u041c": "M",
+        "\u041d": "H",
+        "\u041e": "O",
+        "\u0420": "P",
+        "\u0421": "C",
+        "\u0422": "T",
+        "\u0423": "Y",
+        "\u0425": "X",
+        "\u0406": "I",
+        "\u0408": "J",
+        "\u0430": "a",
+        "\u0432": "b",
+        "\u0435": "e",
+        "\u043a": "k",
+        "\u043c": "m",
+        "\u043e": "o",
+        "\u0440": "p",
+        "\u0441": "c",
+        "\u0442": "t",
+        "\u0443": "y",
+        "\u0445": "x",
+        "\u0456": "i",
+        "\u0458": "j",
+    }
+)
+SECURITY_SCRIPT_FAMILIES = {"LATIN", "GREEK", "CYRILLIC"}
 SENDABLE_IDENTITY_FIELDS = {
     "recipient_name",
     "sender_name",
@@ -515,11 +570,14 @@ def _assertion_is_negated(text: str, match_start: int) -> bool:
 
 
 def security_normalize_text(text: str) -> str:
-    normalized = unicodedata.normalize("NFKC", text).translate(HYPHEN_TRANSLATION)
+    normalized = unicodedata.normalize("NFKD", text)
+    normalized = normalized.translate(HYPHEN_TRANSLATION)
+    normalized = normalized.translate(CONFUSABLE_TRANSLATION)
     normalized = "".join(
         character
         for character in normalized
-        if unicodedata.category(character) not in UNICODE_BLOCKED_CATEGORIES
+        if unicodedata.category(character)
+        not in UNICODE_BLOCKED_CATEGORIES | {"Mn", "Mc", "Me"}
     )
     normalized = "".join(
         " " if character in UNICODE_LINE_BREAKS else character
@@ -528,8 +586,43 @@ def security_normalize_text(text: str) -> str:
     return normalized
 
 
+def unicode_script_family(character: str) -> str | None:
+    if not character.isalpha():
+        return None
+    name = unicodedata.name(character, "")
+    return next(
+        (script for script in SECURITY_SCRIPT_FAMILIES if script in name),
+        None,
+    )
+
+
+def has_mixed_script_confusable_token(text: str) -> bool:
+    token_scripts: set[str] = set()
+
+    def token_is_unsafe() -> bool:
+        return (
+            "LATIN" in token_scripts
+            and bool(token_scripts.intersection({"GREEK", "CYRILLIC"}))
+        )
+
+    for character in text:
+        category = unicodedata.category(character)
+        script = unicode_script_family(character)
+        if script:
+            token_scripts.add(script)
+            continue
+        if category in {"Mn", "Mc", "Me"} or character.isdigit():
+            continue
+        if token_is_unsafe():
+            return True
+        token_scripts.clear()
+    return token_is_unsafe()
+
+
 def unsafe_text_reasons(text: str, *, allow_line_breaks: bool) -> list[str]:
     reasons: set[str] = set()
+    if has_mixed_script_confusable_token(text):
+        reasons.add("MIXED_SCRIPT_CONFUSABLE")
     for character in text:
         category = unicodedata.category(character)
         if category in UNICODE_BLOCKED_CATEGORIES:
@@ -2241,8 +2334,11 @@ def build_public_payload(
             "rendered_subject_header_injection_fail_closed": True,
             "rendered_length_limits_fail_closed": True,
             "rendered_fact_claim_guard_fail_closed": True,
-            "unicode_nfkc_claim_scan": True,
+            "unicode_nfkd_claim_scan": True,
             "unicode_format_character_fail_closed": True,
+            "mixed_script_confusable_fail_closed": True,
+            "claim_scan_diacritic_fold": True,
+            "bounded_confusable_skeleton_scan": True,
             "guarantee_and_superlative_claims_never_authorizable": True,
             "high_risk_claim_requires_hash_bound_evidence_receipt": True,
             "claim_evidence_source_artifacts_rehashed": True,
@@ -2334,7 +2430,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Past-deadline gate: `FAIL_CLOSED`",
         "- Inserted-fact claim gate: `FAIL_CLOSED`",
         "- Unicode format-character gate: `FAIL_CLOSED`",
-        "- Claim scan normalization: `UNICODE_NFKC`",
+        "- Mixed-script confusable gate: `FAIL_CLOSED`",
+        "- Claim scan normalization: `UNICODE_NFKD_DIACRITIC_FOLD`",
+        "- Bounded Greek/Cyrillic confusable skeleton scan: `enabled`",
         "- Guarantees and superlatives authorizable by receipt: `false`",
         "- High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`",
         "- Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`",
