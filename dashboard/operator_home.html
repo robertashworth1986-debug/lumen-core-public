@@ -4,9 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LumenCore Proof-to-Pilot Review Home</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./assets/lumencore.css">
 <link rel="stylesheet" href="./assets/luma_command_fabric.css">
 <style>
@@ -86,25 +83,25 @@
       <p>Public promotion requires explicit data rights, a preselected comparator and metric, preserved negative results, public-safe artifacts, and a statement of what remains unproven.</p>
       <div class="actions">
         <a class="btn primary" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CLAIM_BOUNDARY_REGISTER.md">Claim Register</a>
-        <a class="btn" href="/mission_control.html">System Status</a>
+        <a class="btn" href="/health">Bounded Health JSON</a>
       </div>
     </article>
 
     <article class="panel lane">
       <div class="label">External validation / pilot</div>
       <div class="metric">CONTROLLED GATE</div>
-      <div class="state warn">ROUTING ACTIVE · NO ENDORSEMENT CLAIM</div>
+      <div class="state warn">PILOT ROUTE DEFINED · NO ENDORSEMENT CLAIM</div>
       <p>A valid next step is a buyer-, lab-, or consortium-reviewed test using authorized data, an incumbent baseline, a locked acceptance threshold, and one documented go/no-go decision.</p>
       <div class="actions">
         <a class="btn primary" href="https://github.com/robertashworth1986-debug/lumen-core-public/tree/main/examples/proof_capsule">Open Public Capsule</a>
-        <a class="btn" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20bounded%20technical%20review">Request Bounded Review</a>
+        <a class="btn" href="https://github.com/robertashworth1986-debug/lumen-core-public/issues/new">Request Bounded Review</a>
       </div>
     </article>
   </section>
 
   <section class="three">
     <article class="panel">
-      <h2>Proven Today</h2>
+      <h2>Implemented And Reproducible</h2>
       <ul>
         <li>A public Proof Capsule schema and reviewer-first evidence method.</li>
         <li>A bounded EIA/Kraken replay summary with positive and negative metrics.</li>
@@ -129,26 +126,27 @@
     </article>
   </section>
 </main>
-<script src="./assets/luma_command_fabric.js"></script>
 <script>
 async function updateRuntimeStamp() {
   try {
-    const response = await fetch('/api/snapshot', {cache: 'no-store'});
+    const response = await fetch('/api/master/booth-brief', {cache: 'no-store'});
     if (!response.ok) throw new Error(String(response.status));
     const snapshot = await response.json();
-    const gate = snapshot.runtime?.execution_gate || {};
-    const live = gate.execution_authorized === true;
+    const bounded =
+      snapshot.schema === 'lumencore.public_booth_contract.v2' &&
+      snapshot.supported_maturity_level === 3 &&
+      snapshot.public_claim_allowed === false &&
+      snapshot.live_execution_authority === false;
+    if (!bounded) throw new Error('contract mismatch');
     const mode = document.getElementById('mode');
-    mode.textContent = live
-      ? 'RUNTIME REPORTS LIVE EXECUTION AUTHORIZED · REVIEW CLAIM BOUNDARIES'
-      : 'PUBLIC REVIEW MODE · LIVE ORDERS NOT AUTHORIZED';
-    mode.className = 'mode ' + (live ? 'warn' : 'good');
+    mode.textContent = 'PUBLIC REVIEW MODE · LEVEL 3 BOUNDED SUMMARY';
+    mode.className = 'mode good';
     document.getElementById('stamp').textContent =
-      'runtime snapshot ' + String(snapshot.generated_utc || 'timestamp unavailable') +
-      ' · public evidence remains bounded by its capsule';
+      'bounded summary ' + String(snapshot.generated_utc || 'timestamp unavailable') +
+      ' · counts are source-reported and not external validation';
   } catch (error) {
     document.getElementById('stamp').textContent =
-      'runtime API unavailable · static Proof Capsule review remains available';
+      'bounded contract unavailable · static Proof Capsule review remains available';
   }
 }
 updateRuntimeStamp();

@@ -39,7 +39,9 @@ LumaScout is designed for one mission: finding the artists who are about to brea
 
 ## Getting started
 
-1. Add raw data into `data/raw/` or configure live API credentials in `config/api_registry.yaml`.
+1. Add raw data into `data/raw/`. For optional live sources, copy the variable names
+   from `.env.example` into an untracked `.env` file or the process environment.
+   Never put credential values in `config/api_registry.yaml`.
 2. Review `config/artist_scout_config.yaml` to set thresholds, weights, and required columns.
 3. Install LumaScout dependencies:
    ```powershell
@@ -65,7 +67,7 @@ LumaScout is designed for one mission: finding the artists who are about to brea
 
 ## Next steps
 
-- add authentication keys for YouTube, Spotify, Meta/Instagram, Google Trends, TikTok, Twitter/X
+- configure optional API credentials through runtime environment variables
 - implement API-specific fetch functions in `src/api_clients.py`
 - add champion lineage and Monte Carlo strategy optimizer
 - add live dashboard integration and report automation

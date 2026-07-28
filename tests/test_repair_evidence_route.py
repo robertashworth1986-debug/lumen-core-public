@@ -73,8 +73,22 @@ class RepairEvidenceRouteTests(unittest.TestCase):
             MODULE.repair_config(PROXIED + PROXIED, ROOT)
 
     def test_refuses_unsafe_document_root(self) -> None:
-        with self.assertRaises(MODULE.RouteRepairError):
-            MODULE.repair_config(PROXIED, "/opt/lumencore/dashboard; return 200")
+        unsafe_roots = (
+            "/opt/lumencore/dashboard; return 200",
+            "/opt/lumencore/dashboard/../../etc",
+            "/opt/lumencore//dashboard",
+            r"\\server\share\dashboard",
+        )
+        for unsafe_root in unsafe_roots:
+            with self.subTest(root=unsafe_root):
+                with self.assertRaises(MODULE.RouteRepairError):
+                    MODULE.repair_config(PROXIED, unsafe_root)
+
+    def test_accepts_canonical_windows_document_root(self) -> None:
+        windows_root = "C:/LumaTrader/dashboard"
+        result = MODULE.repair_config(PROXIED, windows_root)
+        self.assertIn(f"root {windows_root};", result.repaired)
+        MODULE.validate_repaired_config(result.repaired, windows_root)
 
     def test_preserves_unrelated_config(self) -> None:
         result = MODULE.repair_config(PROXIED, ROOT)

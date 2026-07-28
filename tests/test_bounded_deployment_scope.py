@@ -19,6 +19,8 @@ def test_gateway_only_change_does_not_select_site_or_evidence() -> None:
         mode="push",
         changed_paths=[
             "code/booth_public_contract.py",
+            "code/luma_experience_gateway.py",
+            "code/luma_experience_gateway_legacy.py",
             "code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh",
             ".github/workflows/deploy.yml",
             "tests/test_booth_public_contract_runtime.py",
@@ -40,6 +42,8 @@ def test_evidence_only_change_selects_only_evidence() -> None:
         changed_paths=[
             "code/ops/repair_evidence_route.py",
             "code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh",
+            "code/ops/repair_public_edge.py",
+            "code/ops/REPAIR_PUBLIC_EDGE_ON_VPS.sh",
         ],
     )
 
@@ -170,11 +174,9 @@ def test_every_vps_mutation_step_has_the_matching_scope_guard() -> None:
         "Verify VPS disk capacity": "mutation_requested",
         "Prepare site content directories": "site_changed",
         "Prepare gateway code directory": "gateway_changed",
-        "Prepare writable repair staging directory": "evidence_changed",
         "Prepare writable gateway dependency staging directory": "gateway_changed",
         "Sync dashboard assets": "site_changed",
         "Sync data snapshots": "site_changed",
-        "Upload bounded repair tools": "evidence_changed",
         "Upload bounded gateway dependency repair": "gateway_changed",
         "Apply bounded gateway dependency repair": "gateway_changed",
         "Apply bounded evidence route repair": "evidence_changed",
@@ -183,13 +185,21 @@ def test_every_vps_mutation_step_has_the_matching_scope_guard() -> None:
         block = step_block(name)
         assert f"if: steps.scope.outputs.{output} == 'true'" in block
 
+    for name in (
+        "Prepare writable repair staging directory",
+        "Upload bounded repair tools",
+        "Apply public edge guard",
+    ):
+        block = step_block(name)
+        assert "steps.scope.outputs.evidence_changed == 'true'" in block
+        assert "steps.scope.outputs.gateway_changed == 'true'" in block
+
     assert "--delete" not in step_block("Apply bounded gateway dependency repair")
     assert "--delete" not in step_block("Apply bounded evidence route repair")
-    assert "- 'dashboard/**/*.js'" in workflow
-    assert "- 'dashboard/**/*.css'" in workflow
-    assert "- 'dashboard/*.json'" in workflow
-    assert "- 'assets/**'" not in workflow
-    assert "\n      - '*.html'\n" not in workflow
+    assert "DEPLOY_BOUNDED_LUMENCORE_TO_PRODUCTION" in workflow
+    assert "\n  push:\n" not in workflow
+    assert "--size-only" not in workflow
+    assert workflow.count("--checksum") == 3
 
 
 def test_deployment_workflow_captures_deletions_and_verifies_ssh_hosts() -> None:

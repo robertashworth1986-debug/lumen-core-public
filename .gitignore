@@ -15,6 +15,7 @@ build/
 # Secrets / keys
 *.env
 *.env.*
+!LamaScout/.env.example
 luma_live_keys.env
 .env.live
 .env.sports
@@ -22,6 +23,7 @@ luma_live_keys.env
 *.secret
 *_secret*
 *_key*
+!tests/test_lamascout_secret_controls.py
 
 # Large generated / data files
 *.csv

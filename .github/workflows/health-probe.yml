@@ -1,17 +1,16 @@
-name: 🔍 Site Health Probe
+name: Production Surface Observation
 
 on:
   schedule:
-    # Probe every 15 minutes, but only commit on an endpoint-state change or once per UTC day.
     - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: scheduled-repository-writer
-  cancel-in-progress: false
+  group: production-surface-observer
+  cancel-in-progress: true
 
 jobs:
   health-probe:
@@ -21,168 +20,95 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Probe all production endpoints
+      - name: Observe bounded public surfaces
         id: probe
         shell: bash
-        env:
-          CURL_TIMEOUT_SECONDS: '10'
         run: |
           set -euo pipefail
-          mkdir -p data
+          mkdir -p artifacts
 
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          TODAY=$(date -u +"%Y-%m-%d")
+          set +e
+          python3 code/ops/probe_production_surfaces.py \
+            --timeout-seconds 10 \
+            --require-healthy \
+            --output artifacts/production_surface_observation.json \
+            > /dev/null
+          observer_rc=$?
+          set -e
 
-          PREV_OVERALL=$(jq -r '.overall // "unknown"' data/site_health.json 2>/dev/null || echo "unknown")
-          PREV_HEALTHY=$(jq -r '.healthy_count // -1' data/site_health.json 2>/dev/null || echo "-1")
-          PREV_DATE=$(jq -r '.checked_utc // ""' data/site_health.json 2>/dev/null | cut -c1-10 || true)
-          PREV_ENDPOINT_STATE=$(
-            jq -cS '
-              .endpoints // {}
-              | to_entries
-              | map({name: .key, status: .value.status, status_text: (.value.status_text // ""), ok: .value.ok})
-              | sort_by(.name)
-            ' data/site_health.json 2>/dev/null || echo '[]'
-          )
+          jq empty artifacts/production_surface_observation.json
+          jq -e '
+            .endpoints
+            | to_entries
+            | length > 0 and all(
+                .[];
+                (.value.body_sha256
+                  | type == "string" and test("^[0-9a-f]{64}$"))
+                and (.value.body_valid | type == "boolean")
+                and (.value.validation_state | type == "string")
+              )
+          ' artifacts/production_surface_observation.json > /dev/null
+          TIMESTAMP=$(jq -r '.checked_utc' artifacts/production_surface_observation.json)
+          OVERALL=$(jq -r '.overall' artifacts/production_surface_observation.json)
+          HEALTHY=$(jq -r '.healthy_count' artifacts/production_surface_observation.json)
+          TOTAL=$(jq -r '.total_count' artifacts/production_surface_observation.json)
 
-          check_endpoint() {
-            local name=$1
-            local url=$2
-            local code
-            local status
-            local ok
+          case "$OVERALL" in
+            operational) COLOR="brightgreen" ;;
+            degraded) COLOR="yellow" ;;
+            outage|observer_error) COLOR="red" ;;
+            *) COLOR="lightgrey" ;;
+          esac
 
-            # HTTP errors such as 502 are valid probe results, so do not use curl
-            # --fail. Normalize transport failures to numeric 0 while preserving
-            # the conventional three-character status text "000".
-            code=$(
-              curl \
-                --silent \
-                --show-error \
-                --location \
-                --max-redirs 5 \
-                --max-time "$CURL_TIMEOUT_SECONDS" \
-                --output /dev/null \
-                --write-out "%{http_code}" \
-                "$url" \
-                2>/dev/null
-            ) || code="000"
-            [[ "$code" =~ ^[0-9]{3}$ ]] || code="000"
+          jq -n \
+            --arg message "${OVERALL} (${HEALTHY}/${TOTAL})" \
+            --arg color "$COLOR" \
+            '{
+              schemaVersion: 1,
+              label: "observed status",
+              message: $message,
+              color: $color,
+              cacheSeconds: 60
+            }' > artifacts/production_surface_badge.json
+          jq empty artifacts/production_surface_badge.json
 
-            status=$((10#$code))
-            if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then
-              ok="true"
-            else
-              ok="false"
-            fi
-
-            printf '  "%s": { "url": "%s", "status": %d, "status_text": "%s", "ok": %s }' \
-              "$name" "$url" "$status" "$code" "$ok"
-          }
-
-          PORTAL=$(check_endpoint "portal" "https://lumen-core.ai/")
-          EVIDENCE=$(check_endpoint "evidence" "https://lumen-core.ai/evidence/")
-          KRAKEN_DB=$(check_endpoint "kraken_dashboard" "https://lumen-core.ai/kraken_execution_dashboard.html")
-          MISSION=$(check_endpoint "mission_control" "https://lumen-core.ai/mission_control.html")
-          APPROVAL=$(check_endpoint "approval_hub" "https://lumen-core.ai/agent_approval_hub.html")
-          FORECAST=$(check_endpoint "forecast" "https://lumen-core.ai/forecast.html")
-
-          ALL_UP=6
-          HEALTHY=$(printf '%s\n' "$PORTAL" "$EVIDENCE" "$KRAKEN_DB" "$MISSION" "$APPROVAL" "$FORECAST" | grep -c '"ok": true' || true)
-
-          if [[ "$HEALTHY" -eq "$ALL_UP" ]]; then
-            OVERALL="operational"
-            COLOR="brightgreen"
-          elif [[ "$HEALTHY" -gt 3 ]]; then
-            OVERALL="degraded"
-            COLOR="yellow"
-          else
-            OVERALL="outage"
-            COLOR="red"
-          fi
-
-          cat > data/site_health.json <<EOF
-          {
-            "checked_utc": "${TIMESTAMP}",
-            "overall": "${OVERALL}",
-            "healthy_count": ${HEALTHY},
-            "total_count": ${ALL_UP},
-            "endpoints": {
-          ${PORTAL},
-          ${EVIDENCE},
-          ${KRAKEN_DB},
-          ${MISSION},
-          ${APPROVAL},
-          ${FORECAST}
-            }
-          }
-          EOF
-
-          jq empty data/site_health.json
-
-          CURRENT_ENDPOINT_STATE=$(
-            jq -cS '
-              .endpoints
-              | to_entries
-              | map({name: .key, status: .value.status, status_text: (.value.status_text // ""), ok: .value.ok})
-              | sort_by(.name)
-            ' data/site_health.json
-          )
-
-          cat > data/uptime_badge.json <<EOF
-          {
-            "schemaVersion": 1,
-            "label": "status",
-            "message": "${OVERALL} (${HEALTHY}/${ALL_UP})",
-            "color": "${COLOR}",
-            "cacheSeconds": 60
-          }
-          EOF
-
-          jq empty data/uptime_badge.json
-
-          SHOULD_COMMIT="false"
-          REASON="no material status change"
-
-          if [[ "$OVERALL" != "$PREV_OVERALL" ]] \
-            || [[ "$HEALTHY" != "$PREV_HEALTHY" ]] \
-            || [[ "$CURRENT_ENDPOINT_STATE" != "$PREV_ENDPOINT_STATE" ]]; then
-            SHOULD_COMMIT="true"
-            REASON="endpoint state changed"
-          elif [[ "$PREV_DATE" != "$TODAY" ]]; then
-            SHOULD_COMMIT="true"
-            REASON="daily snapshot"
-          fi
-
+          echo "observer_rc=${observer_rc}" >> "$GITHUB_OUTPUT"
           echo "overall=${OVERALL}" >> "$GITHUB_OUTPUT"
           echo "healthy=${HEALTHY}" >> "$GITHUB_OUTPUT"
+          echo "total=${TOTAL}" >> "$GITHUB_OUTPUT"
           echo "timestamp=${TIMESTAMP}" >> "$GITHUB_OUTPUT"
-          echo "should_commit=${SHOULD_COMMIT}" >> "$GITHUB_OUTPUT"
-          echo "commit_reason=${REASON}" >> "$GITHUB_OUTPUT"
 
-          echo "Health result: ${OVERALL} (${HEALTHY}/${ALL_UP}); ${REASON}."
+          {
+            echo "## Production Surface Observation"
+            echo
+            echo "- Checked UTC: \`${TIMESTAMP}\`"
+            echo "- Result: \`${OVERALL}\`"
+            echo "- Passing surfaces: \`${HEALTHY}/${TOTAL}\`"
+            echo "- Observer exit code: \`${observer_rc}\`"
+            echo
+            echo "This is one bounded, read-only observation. It is not an uptime, performance, security, savings, validation, eligibility, or award claim."
+          } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Commit material health report
-        if: steps.probe.outputs.should_commit == 'true'
+      - name: Upload bounded observation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-surface-observation-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Fail on non-operational observation
+        if: steps.probe.outputs.observer_rc == '2'
         shell: bash
         run: |
-          set -euo pipefail
-          git config user.name "lumencore-bot"
-          git config user.email "bot@lumen-core.ai"
-          git add data/site_health.json data/uptime_badge.json
+          echo "::error::lumen-core.ai observation is ${{ steps.probe.outputs.overall }} - ${{ steps.probe.outputs.healthy }}/${{ steps.probe.outputs.total }} surfaces passed status and body validation"
+          exit 1
 
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(health): ${{ steps.probe.outputs.commit_reason }} — ${{ steps.probe.outputs.overall }} — ${{ steps.probe.outputs.healthy }}/6 @ ${{ steps.probe.outputs.timestamp }}"
-            git pull --rebase origin "${GITHUB_REF_NAME}"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
-          fi
-
-      - name: Warn on outage
-        if: steps.probe.outputs.overall == 'outage'
+      - name: Fail on observer runtime error
+        if: steps.probe.outputs.observer_rc != '0' && steps.probe.outputs.observer_rc != '2'
         shell: bash
         run: |
-          echo "::warning::lumen-core.ai is reporting an outage — ${{ steps.probe.outputs.healthy }}/6 endpoints healthy"
-          # Non-fatal: preserve the status report for operator review.
+          echo "::error::The observer produced a fail-closed error receipt."
+          exit 1

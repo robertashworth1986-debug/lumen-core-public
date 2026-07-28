@@ -6,24 +6,42 @@ on:
       - 'code/booth_public_contract.py'
       - 'code/luma_experience_gateway.py'
       - 'code/luma_experience_gateway_legacy.py'
+      - 'code/deploy/nginx/lumatrader.conf'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
       - 'code/ops/classify_bounded_deployment_scope.py'
+      - 'code/ops/probe_production_surfaces.py'
+      - 'config/private_runtime_identifiers.example'
+      - 'dashboard/evidence/index_bounded.html'
+      - 'dashboard/operator_home.html'
       - 'tests/test_bounded_deployment_scope.py'
       - 'tests/test_booth_public_contract_runtime.py'
+      - 'tests/test_public_gateway_allowlist.py'
+      - 'tests/test_public_reviewer_privacy.py'
+      - 'tests/test_production_surface_observer.py'
       - '.github/workflows/deploy.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
+      - '.github/workflows/health-probe.yml'
   push:
     branches: [main]
     paths:
       - 'code/booth_public_contract.py'
       - 'code/luma_experience_gateway.py'
       - 'code/luma_experience_gateway_legacy.py'
+      - 'code/deploy/nginx/lumatrader.conf'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
       - 'code/ops/classify_bounded_deployment_scope.py'
+      - 'code/ops/probe_production_surfaces.py'
+      - 'config/private_runtime_identifiers.example'
+      - 'dashboard/evidence/index_bounded.html'
+      - 'dashboard/operator_home.html'
       - 'tests/test_bounded_deployment_scope.py'
       - 'tests/test_booth_public_contract_runtime.py'
+      - 'tests/test_public_gateway_allowlist.py'
+      - 'tests/test_public_reviewer_privacy.py'
+      - 'tests/test_production_surface_observer.py'
       - '.github/workflows/deploy.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
+      - '.github/workflows/health-probe.yml'
   workflow_dispatch:
 
 permissions:
@@ -51,8 +69,12 @@ jobs:
             code/luma_experience_gateway.py \
             code/luma_experience_gateway_legacy.py \
             code/ops/classify_bounded_deployment_scope.py \
+            code/ops/probe_production_surfaces.py \
             tests/test_bounded_deployment_scope.py \
-            tests/test_booth_public_contract_runtime.py
+            tests/test_booth_public_contract_runtime.py \
+            tests/test_public_gateway_allowlist.py \
+            tests/test_public_reviewer_privacy.py \
+            tests/test_production_surface_observer.py
 
       - name: Run public contract tests without third-party dependencies
         run: |
@@ -64,6 +86,9 @@ jobs:
           for path in (
               "tests/test_bounded_deployment_scope.py",
               "tests/test_booth_public_contract_runtime.py",
+              "tests/test_public_gateway_allowlist.py",
+              "tests/test_public_reviewer_privacy.py",
+              "tests/test_production_surface_observer.py",
           ):
               namespace = runpy.run_path(path)
               tests.extend(

@@ -4,6 +4,7 @@ reports/
 logs/
 data/normalized/
 .venv/
+.env
 __pycache__/
 *.pyc
 *.log

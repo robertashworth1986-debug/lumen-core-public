@@ -4,7 +4,14 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
-from .settings import API_REGISTRY, CFG, REP, API_SNAPSHOT_DIR, utc_now
+from .settings import (
+    API_REGISTRY,
+    API_REGISTRY_TEMPLATE,
+    CFG,
+    REP,
+    API_SNAPSHOT_DIR,
+    utc_now,
+)
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -62,7 +69,7 @@ def build_run_proof(
         "run_id": run_id,
         "generated_utc": utc_now(),
         "config_hash": hash_text(CFG),
-        "api_registry_hash": hash_text(API_REGISTRY),
+        "api_registry_hash": hash_text(API_REGISTRY_TEMPLATE),
         "active_sources": active_sources,
         "raw_inputs": inputs,
         "live_row_count": live_row_count,

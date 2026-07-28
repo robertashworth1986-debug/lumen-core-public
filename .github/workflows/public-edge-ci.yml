@@ -1,0 +1,55 @@
+name: Public Edge Contract Gate
+
+on:
+  pull_request:
+    paths:
+      - 'code/deploy/nginx/lumatrader.conf'
+      - 'code/ops/repair_public_edge.py'
+      - 'code/ops/REPAIR_PUBLIC_EDGE_ON_VPS.sh'
+      - 'tests/test_repair_public_edge.py'
+      - '.github/workflows/public-edge-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'code/deploy/nginx/lumatrader.conf'
+      - 'code/ops/repair_public_edge.py'
+      - 'code/ops/REPAIR_PUBLIC_EDGE_ON_VPS.sh'
+      - 'tests/test_repair_public_edge.py'
+      - '.github/workflows/public-edge-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-edge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Compile and test public edge repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            code/ops/repair_public_edge.py \
+            tests/test_repair_public_edge.py
+          python3 - <<'PY'
+          import runpy
+
+          namespace = runpy.run_path("tests/test_repair_public_edge.py")
+          tests = sorted(
+              (name, value)
+              for name, value in namespace.items()
+              if name.startswith("test_") and callable(value)
+          )
+          if not tests:
+              raise SystemExit("no public-edge tests discovered")
+          for name, test in tests:
+              test()
+              print(f"PASS {name}")
+          print(f"PASS_COUNT={len(tests)}")
+          PY
+          bash -n code/ops/REPAIR_PUBLIC_EDGE_ON_VPS.sh

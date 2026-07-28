@@ -2664,13 +2664,13 @@ def _build_booth_explainer_brief_payload() -> dict[str, Any]:
     trades = _tail_jsonl(LIVE_TRADE_LEDGER_FILE, 120)
 
     default_founder_profile = {
-        "founder": "Robert BabyRay Ashworth",
-        "company_system": "LumenCore / NovaCore / LumaCore",
-        "uei": "SQY2XW71ZM51",
-        "cage": "14TM8",
-        "ein": "39-3507463",
-        "uspto_non_provisional_application": "19/281,546",
-        "patent_title": "LumenCore: A Modular AI Node Framework for Conscious Systems Integration",
+        "founder": os.getenv("LUMENCORE_PRIVATE_FOUNDER_DISPLAY_NAME", ""),
+        "company_system": "LumenCore",
+        "uei": os.getenv("LUMENCORE_PRIVATE_UEI", ""),
+        "cage": os.getenv("LUMENCORE_PRIVATE_CAGE", ""),
+        "ein": os.getenv("LUMENCORE_PRIVATE_EIN", ""),
+        "uspto_non_provisional_application": os.getenv("LUMENCORE_PRIVATE_PATENT_APPLICATION", ""),
+        "patent_title": os.getenv("LUMENCORE_PRIVATE_PATENT_TITLE", ""),
     }
 
     founder_profile = default_founder_profile

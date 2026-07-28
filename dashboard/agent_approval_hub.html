@@ -259,6 +259,15 @@ async function fetchJson(path) {
     return null;
   }
 }
+function boundedHealth(value) {
+  const generated = Date.parse(String(value?.generated_utc || ''));
+  const ageMs = Date.now() - generated;
+  const fresh = Number.isFinite(generated) && ageMs <= 300000 && ageMs >= -60000;
+  const schemaOk = value?.schema === 'lumencore.public_gateway_health.v1';
+  if (!fresh || !schemaOk) return { state: 'stale', healthy: false };
+  const healthy = value?.status === 'ok' && value?.all_healthy === true;
+  return { state: healthy ? 'operational' : 'degraded', healthy };
+}
 function setText(id, value) {
   const el = $(id);
   if (el) el.textContent = value;
@@ -270,7 +279,7 @@ function countPending(queue) {
 async function boot() {
   const [queue, health, brief, evidence] = await Promise.all([
     fetchJson('/api/master/approval-queue'),
-    fetchJson('/data/site_health.json'),
+    fetchJson('/health'),
     fetchJson('/api/federal_brief.json'),
     fetchJson('/api/evidence_summary.json')
   ]);
@@ -288,12 +297,12 @@ async function boot() {
   setText('evidence-count', Number.isFinite(frozen) && frozen > 0 ? String(frozen) : '--');
   setText('evidence-sub', evidence ? 'evidence API loaded' : 'static evidence index available');
 
-  const overall = health?.overall || 'checking';
-  const healthy = health ? `${health.healthy_count}/${health.total_count}` : '--';
-  setText('system-health', health ? healthy : '--');
-  setText('system-sub', `status: ${overall}`);
-  setText('health-chip', health ? `health: ${overall} ${healthy}` : 'health: unknown');
-  $('health-chip')?.classList.add(overall === 'operational' ? 'good' : overall === 'outage' ? 'bad' : 'warn');
+  const healthState = boundedHealth(health);
+  const healthCount = health ? (healthState.healthy ? '1/1' : '0/1') : '--';
+  setText('system-health', healthCount);
+  setText('system-sub', `status: ${healthState.state}`);
+  setText('health-chip', health ? `health: ${healthState.state} ${healthCount}` : 'health: unknown');
+  $('health-chip')?.classList.add(healthState.healthy ? 'good' : 'warn');
 }
 boot();
 </script>

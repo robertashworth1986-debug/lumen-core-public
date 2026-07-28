@@ -13,11 +13,15 @@ SCOPE_NAMES = ("site", "gateway", "evidence")
 
 GATEWAY_PATHS = {
     "code/booth_public_contract.py",
+    "code/luma_experience_gateway.py",
+    "code/luma_experience_gateway_legacy.py",
     "code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh",
 }
 EVIDENCE_PATHS = {
     "code/deploy/nginx/lumatrader.conf",
+    "code/ops/REPAIR_PUBLIC_EDGE_ON_VPS.sh",
     "code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh",
+    "code/ops/repair_public_edge.py",
     "code/ops/repair_evidence_route.py",
 }
 CONTROL_PATHS = {

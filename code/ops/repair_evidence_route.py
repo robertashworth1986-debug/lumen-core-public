@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import os
+import posixpath
 import re
 import shutil
 import stat
@@ -26,7 +27,8 @@ LOCATION_PATTERN = re.compile(r"(?m)^[ \t]*location[ \t]+/evidence/[ \t]*\{")
 REDIRECT_PATTERN = re.compile(
     r"(?m)^[ \t]*location[ \t]+=[ \t]*/evidence[ \t]*\{"
 )
-SAFE_ROOT_PATTERN = re.compile(r"^/[A-Za-z0-9._/-]+$")
+SAFE_POSIX_ROOT_PATTERN = re.compile(r"^/[A-Za-z0-9._/-]+$")
+SAFE_WINDOWS_ROOT_PATTERN = re.compile(r"^[A-Za-z]:/[A-Za-z0-9._/-]+$")
 
 
 class RouteRepairError(RuntimeError):
@@ -41,13 +43,27 @@ class RepairResult:
 
 
 def _safe_document_root(path: Path | str) -> str:
-    value = str(path)
-    if not SAFE_ROOT_PATTERN.fullmatch(value):
+    value = str(path).replace("\\", "/")
+    if value.startswith("//"):
+        raise RouteRepairError("UNC document roots are not allowed")
+    if not (
+        SAFE_POSIX_ROOT_PATTERN.fullmatch(value)
+        or SAFE_WINDOWS_ROOT_PATTERN.fullmatch(value)
+    ):
         raise RouteRepairError(
             "document root must be an absolute path containing only "
-            "letters, digits, dot, underscore, slash, or hyphen"
+            "letters, digits, dot, underscore, slash, drive colon, or hyphen"
         )
-    return value.rstrip("/") or "/"
+    value = value.rstrip("/")
+    if SAFE_WINDOWS_ROOT_PATTERN.fullmatch(value):
+        segments = value[3:].split("/")
+    else:
+        segments = value[1:].split("/")
+    if not segments or any(segment in {"", ".", ".."} for segment in segments):
+        raise RouteRepairError("document root must be canonical and traversal-free")
+    if posixpath.normpath(value) != value:
+        raise RouteRepairError("document root must be canonical and traversal-free")
+    return value
 
 
 def _find_balanced_block(

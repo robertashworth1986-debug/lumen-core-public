@@ -8,7 +8,8 @@ The core purpose is to ingest live raw artist/culture data, normalize it, score 
 
 ## Data flow
 
-1. `config/api_registry.yaml` defines active live sources, endpoints, and credentials.
+1. `config/api_registry.yaml` defines active live sources, endpoints, and
+   environment-variable references. Credential values are runtime-only.
 2. `data/raw/` receives raw drops and API ingestion files.
 3. `src/artist_scout_engine.py` loads raw data and optionally live API results.
 4. `data/normalized/` stores unified row-level normalized assets.
@@ -38,6 +39,10 @@ LumaScout is intentionally built to be modular internally while remaining simple
 ## API registry design
 
 The registry file is the single source of truth for active sources.
+
+Tracked registry authentication fields must be exact `${LUMASCOUT_*}` references.
+`src/credential_config.py` rejects literal values and unknown references, and
+missing runtime variables resolve to empty strings so adapters fail closed.
 
 Each entry includes:
 - source name

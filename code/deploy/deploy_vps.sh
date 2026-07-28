@@ -331,6 +331,7 @@ ExecStart=$PYTHON_BIN -m uvicorn luma_experience_gateway:app --app-dir $CODE_DIR
 Restart=always
 RestartSec=3
 Environment=PYTHONUNBUFFERED=1
+Environment=LUMENCORE_GATEWAY_OPERATOR_ROUTES=0
 Environment=LUMA_STACK_ROOT=$STACK_ROOT
 Environment=LUMA_DASHBOARD_DIR=$DASHBOARD_SRC
 
