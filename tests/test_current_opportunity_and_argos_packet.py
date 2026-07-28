@@ -827,6 +827,28 @@ def test_argos_text_custody_is_stable_across_line_endings(tmp_path):
     ).hexdigest()
 
 
+def test_argos_security_receipt_portability_ignores_only_ref_count():
+    conformance = load_argos_conformance_builder()
+    committed = load_json(ARGOS_SECURITY_GATE)
+    different_checkout = json.loads(json.dumps(committed))
+    different_checkout["history"]["local_reachable_ref_count"] += 1
+
+    assert conformance.security_receipts_equivalent(
+        committed,
+        different_checkout,
+    )
+
+    different_checkout["history"]["target_history_commit_count"] += 1
+    assert not conformance.security_receipts_equivalent(
+        committed,
+        different_checkout,
+    )
+
+    invalid_count = json.loads(json.dumps(committed))
+    invalid_count["history"]["local_reachable_ref_count"] = 0
+    assert not conformance.security_receipts_equivalent(committed, invalid_count)
+
+
 def test_argos_security_receipt_tampering_cannot_clear_gates():
     conformance = load_argos_conformance_builder()
     finalizer = load_argos_private_finalizer()
