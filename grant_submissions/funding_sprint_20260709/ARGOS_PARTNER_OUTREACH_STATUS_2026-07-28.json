@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.argos_partner_outreach_status.v1",
-  "recorded_utc": "2026-07-28T16:45:49Z",
+  "recorded_utc": "2026-07-28T20:19:34Z",
   "lane_id": "argos_emi_teaming_inquiry",
   "status": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
   "opportunity": {
@@ -19,12 +19,13 @@
     "address_omitted": true
   },
   "mailbox_observation": {
-    "checked_utc": "2026-07-28T16:45:49Z",
+    "checked_utc": "2026-07-28T20:19:34Z",
     "full_mailbox_search_completed": true,
     "search_scope": "ALL_MAIL_EXACT_SUBJECT_OR_RECIPIENT_OR_NOTICE",
     "matching_current_draft_count": 0,
     "matching_sent_count": 1,
     "matching_inbound_count": 0,
+    "matching_thread_message_count": 1,
     "current_draft_only": false,
     "sent_copy_present": true,
     "sent_utc": "2026-07-28T15:39:34Z",

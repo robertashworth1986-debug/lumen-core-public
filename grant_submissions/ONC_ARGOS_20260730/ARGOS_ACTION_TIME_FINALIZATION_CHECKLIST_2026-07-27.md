@@ -13,7 +13,8 @@
 - US Letter, Times New Roman 12 point, 1-inch margins.
 - Cover identifies title, company, UEI or DUNS if applicable, address, point of
   contact, telephone, email, and small-business designation.
-- All proposed team members and their roles are clearly identified.
+- If a team is proposed, all proposed organizations and their roles are clearly
+  identified. The current response is standalone and proposes no outside team.
 - No proprietary, classified, confidential, CUI, patient, or sensitive
   information.
 - The final response goes only to the primary point of contact identified in
@@ -32,36 +33,44 @@
 Private identifiers stay outside the public repository and are inserted only in
 the private final copy.
 
-## Team Gate
+## Response Mode and Team Disclosure Gate
 
-- [ ] Every named organization has confirmed interest in writing.
-- [ ] Every organization has authorized use of its name, role, credentials, and
-  referenced experience.
-- [ ] A named FHIR R4/CHPL/ONC technical lead is documented.
-- [ ] A named HHS ATO/FIPS 199/SSP security lead is documented.
-- [ ] An independent assessment path is identified without creating an
-  assessor-independence conflict.
-- [ ] A qualified prime or program-integration lead owns staffing, hosting,
-  delivery acceptance, and relevant federal-health references.
+- [x] Response mode is `STANDALONE_RESPONDENT`.
+- [x] LumenCore is identified as the sole respondent.
+- [x] No teaming arrangement, joint venture, or subcontractor is proposed.
+- [x] No uncommitted organization, principal, credential, or prior-performance
+  reference is named.
+- [x] FHIR/CHPL/ONC, HHS ATO/FIPS 199/SSP, independent assessment, and
+  full-program delivery gaps are disclosed rather than assigned to an unnamed
+  partner.
+- [ ] If the response mode changes, every proposed organization, role,
+  credential, and reference is re-bound to current written authority before
+  rebuilding the packet.
 
 ## Evidence and File Gate
 
 - [ ] The official four-page SOW attachment matches SHA-256
   `6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354`.
 - [ ] Similar-scope references are truthful, relevant, current, and authorized.
-- [ ] LumenCore component evidence remains clearly separated from partner prior
-  performance.
+- [ ] LumenCore component evidence remains clearly separated from unproven
+  federal-health qualifications.
 - [ ] No external-validation, agency-approval, savings, certification, or
   production-readiness claim exceeds its supporting evidence.
 - [ ] DOCX and PDF hashes match the final build and render-QA receipts.
 - [ ] Final PDF has no clipping, overlap, broken table, missing logo, or page
   limit defect.
 - [ ] Final attachment contains no placeholders.
+- [ ] The exact external attachment contains no repository URL, live-site URL,
+  hyperlink, external DOCX relationship, PDF action, or embedded file.
+- [x] The current external-response template contains no repository or live-site
+  route.
+
+The following remain mandatory before linking or promoting the repository but
+do not block a verified self-contained Government attachment:
+
 - [ ] Spotify and YouTube credentials previously present in public history are
   rotated with non-secret receipts.
 - [ ] Reachable public Git history is remediated and the remote is verified.
-- [ ] The public repository link remains suppressed until both security checks
-  pass.
 
 ## Dispatch Gate
 
@@ -80,4 +89,5 @@ Suggested approval form:
 `APPROVE ARGOS SEND: use the displayed official HHS recipient, exact subject, exact body, and final PDF with the displayed SHA-256.`
 
 Until that approval is given against a complete, displayed action packet, the
-response remains prepared but not sent.
+response remains prepared but not sent. The previously sent partner inquiry is
+optional to this standalone response and remains duplicate-locked.

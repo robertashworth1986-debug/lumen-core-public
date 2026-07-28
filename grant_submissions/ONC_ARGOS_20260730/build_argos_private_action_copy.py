@@ -29,16 +29,21 @@ SECURITY_VERIFIER = (
 
 NOTICE_ID = "ONC-ARGOS-SSN-2026-OS351107"
 FACT_SCHEMA = "lumencore.argos_private_facts.v1"
-RECEIPT_SCHEMA = "lumencore.argos_private_action_copy_receipt.v1"
-RECEIPT_DECISION = "PRIVATE_COVER_READY_TEAM_AND_DISPATCH_BLOCKED"
+RECEIPT_SCHEMA = "lumencore.argos_private_action_copy_receipt.v2"
+RECEIPT_DECISION = "PRIVATE_COVER_READY_STANDALONE_DISPATCH_BLOCKED"
 PRIVATE_MARKER = "ACTION_TIME_PRIVATE_FACT_REQUIRED"
 PRIVATE_DISPLAY_MARKER = "Pending action-time fact"
 PRIVATE_STATUS = "PRIVATE ACTION COPY - HUMAN REVIEW REQUIRED"
 PUBLIC_REPOSITORY_URL = (
     "https://github.com/robertashworth1986-debug/lumen-core-public"
 )
-PUBLIC_REPOSITORY_WITHHELD = (
-    "Withheld pending credential rotation and public-history remediation"
+PUBLIC_SITE_URL = "https://lumen-core.ai/"
+FORBIDDEN_EXTERNAL_ROUTE_TOKENS = (
+    PUBLIC_REPOSITORY_URL,
+    PUBLIC_SITE_URL,
+    "github.com",
+    "lumen-core-public",
+    "robertashworth1986-debug",
 )
 TEXT_OUTPUT_NAME = "ARGOS_PRIVATE_ACTION_COPY.md"
 DOCX_OUTPUT_NAME = "ARGOS_PRIVATE_ACTION_COPY.docx"
@@ -47,15 +52,16 @@ PUBLIC_VAULT_ROOTS = (Path(r"E:\LumaProofVault"),)
 CLAIM_BOUNDARY = (
     "This receipt proves only that a private action copy was generated from a "
     "schema-valid, user-attested facts file without changing the public templates. "
-    "It does not prove team authority, final dispatch verification, submission, "
+    "It also proves that the generated Markdown and DOCX contain no known repository "
+    "or live-site route. It does not prove final dispatch verification, submission, "
     "acceptance, selection, award, compliance, certification, or authorization."
 )
 SAFEST_NEXT_ACTION = (
     "Keep the private copy outside Git and public mirrors. Review every inserted "
-    "fact and the rendered cover with the user, complete credential rotation and "
-    "public-history remediation, resolve written team authority, then run the "
-    "Government duplicate and final-dispatch gates before requesting single-use "
-    "action-time approval."
+    "fact and the rendered cover with the user, preserve the link-free attachment "
+    "boundary, then run the Government duplicate and final-dispatch gates before "
+    "requesting single-use action-time approval. Credential rotation and public-history "
+    "remediation remain required before any public repository promotion."
 )
 
 REQUIRED_FACT_KEYS = (
@@ -152,7 +158,7 @@ def read_json(path: Path) -> dict:
     return payload
 
 
-def validate_security_gate(payload: dict) -> bool:
+def validate_security_gate(payload: dict) -> dict[str, bool]:
     spec = importlib.util.spec_from_file_location(
         "argos_public_credential_hygiene",
         SECURITY_VERIFIER,
@@ -170,10 +176,11 @@ def validate_security_gate(payload: dict) -> bool:
             "the canonical verifier"
         )
     link_allowed = current_payload["public_repository_link_allowed"]
+    sanitized_allowed = current_payload["sanitized_external_response_allowed"]
     send_allowed = current_payload[
         "final_argos_send_allowed_by_security_gate"
     ]
-    if link_allowed is not send_allowed:
+    if send_allowed is not (link_allowed or sanitized_allowed):
         raise ValueError("public repository security decision is inconsistent")
     if link_allowed:
         provider_rotations_clear = all(
@@ -194,7 +201,58 @@ def validate_security_gate(payload: dict) -> bool:
             raise ValueError(
                 "public repository security gate cannot clear the repository link"
             )
-    return link_allowed
+    elif sanitized_allowed:
+        history = current_payload["history"]
+        if not (
+            current_payload["decision"]
+            == "ALLOW_SANITIZED_EXTERNAL_RESPONSE_BLOCK_PUBLIC_REPO_LINK"
+            and current_payload["current_file"]["placeholder_only"] is True
+            and current_payload["current_file"][
+                "required_environment_references_present"
+            ]
+            is True
+            and history["scan_complete"] is True
+            and history["scan_failure_count"] == 0
+        ):
+            raise ValueError(
+                "public repository security gate cannot clear the sanitized path"
+            )
+    if not send_allowed:
+        raise ValueError("repository security preconditions block external response")
+    return {
+        "public_repository_link_allowed": link_allowed,
+        "sanitized_external_response_allowed": sanitized_allowed,
+        "final_argos_send_allowed_by_security_gate": send_allowed,
+    }
+
+
+def assert_no_external_repository_route(text: str, label: str) -> None:
+    lowered = text.lower()
+    found = [
+        token
+        for token in FORBIDDEN_EXTERNAL_ROUTE_TOKENS
+        if token.lower() in lowered
+    ]
+    if found:
+        raise ValueError(f"{label} contains a blocked external route")
+
+
+def assert_docx_repo_isolated(path: Path) -> None:
+    with ZipFile(path) as archive:
+        for member in archive.infolist():
+            data = archive.read(member)
+            lowered = data.lower()
+            if any(
+                token.lower().encode("utf-8") in lowered
+                for token in FORBIDDEN_EXTERNAL_ROUTE_TOKENS
+            ):
+                raise ValueError(
+                    f"private DOCX contains a blocked external route in {member.filename}"
+                )
+            if member.filename.endswith(".rels") and b'targetmode="external"' in lowered:
+                raise ValueError(
+                    f"private DOCX contains an external relationship in {member.filename}"
+                )
 
 
 def validate_fact_value(key: str, fact: dict, evaluated: datetime) -> None:
@@ -314,7 +372,6 @@ def markdown_escape(value: str) -> str:
 def render_private_markdown(
     template: str,
     values: dict[str, str],
-    public_repository_link_allowed: bool,
 ) -> str:
     output = template.replace(
         "**Status:** `DRAFT - HUMAN REVIEW AND ACTION-TIME FACTS REQUIRED`",
@@ -333,16 +390,9 @@ def render_private_markdown(
     if replaced != set(values):
         raise ValueError("public Markdown cover fields do not match the finalizer map")
     output = "\n".join(lines).rstrip() + "\n"
-    if not public_repository_link_allowed:
-        if output.count(PUBLIC_REPOSITORY_URL) != 1:
-            raise ValueError("public repository link cannot be safely suppressed")
-        output = output.replace(
-            PUBLIC_REPOSITORY_URL,
-            PUBLIC_REPOSITORY_WITHHELD,
-            1,
-        )
     if PRIVATE_MARKER in output or PRIVATE_DISPLAY_MARKER in output:
         raise ValueError("private Markdown still contains a private-fact placeholder")
+    assert_no_external_repository_route(output, "private Markdown")
     handling = (
         "\n**Handling:** Minimum necessary verified business registration and contact "
         "facts only. No tax, banking, credential, patient, CUI, classified, or "
@@ -383,7 +433,6 @@ def render_private_docx(
     template_path: Path,
     output_path: Path,
     values: dict[str, str],
-    public_repository_link_allowed: bool,
 ) -> None:
     doc = Document(template_path)
     replaced = set()
@@ -394,9 +443,6 @@ def render_private_docx(
                 row.cells[1].text = values[label]
                 style_private_cell(row.cells[1])
                 replaced.add(label)
-            if label == "Public evidence repository" and not public_repository_link_allowed:
-                row.cells[1].text = PUBLIC_REPOSITORY_WITHHELD
-                style_private_cell(row.cells[1])
     if replaced != set(values):
         raise ValueError("public DOCX cover fields do not match the finalizer map")
 
@@ -435,6 +481,7 @@ def render_private_docx(
                 if "Draft" in run.text:
                     run.text = run.text.replace("Draft", "Private action copy")
     doc.save(output_path)
+    assert_docx_repo_isolated(output_path)
     with ZipFile(output_path) as archive:
         document_xml = archive.read("word/document.xml")
     if (
@@ -442,11 +489,6 @@ def render_private_docx(
         or PRIVATE_DISPLAY_MARKER.encode() in document_xml
     ):
         raise ValueError("private DOCX still contains a private-fact placeholder")
-    if (
-        not public_repository_link_allowed
-        and PUBLIC_REPOSITORY_URL.encode() in document_xml
-    ):
-        raise ValueError("private DOCX still contains the blocked repository link")
 
 
 def output_paths(output_dir: Path) -> tuple[Path, Path, Path]:
@@ -529,7 +571,8 @@ def validate_private_receipt(
             "public_templates",
             "public_repository_security",
             "outputs",
-            "team_authority_resolved",
+            "response_mode",
+            "team_disclosure_resolved",
             "candidate_name_authorization_count",
             "government_send_ready",
             "submission_authorized",
@@ -590,14 +633,19 @@ def validate_private_receipt(
         raise ValueError("private receipt does not prove public template stability")
 
     security_gate = read_json(SECURITY_GATE)
-    link_allowed = validate_security_gate(security_gate)
+    security_decision = validate_security_gate(security_gate)
+    link_allowed = security_decision["public_repository_link_allowed"]
+    sanitized_allowed = security_decision["sanitized_external_response_allowed"]
     security = require_exact_keys(
         receipt["public_repository_security"],
         {
             "gate_sha256",
             "decision",
             "public_repository_link_allowed",
+            "sanitized_external_response_allowed",
+            "government_send_security_precondition_allowed",
             "public_repository_link_included",
+            "attachment_repo_isolated",
         },
         "private receipt public_repository_security",
     )
@@ -607,8 +655,17 @@ def validate_private_receipt(
         raise ValueError("private receipt public repository security decision is stale")
     if security["public_repository_link_allowed"] is not link_allowed:
         raise ValueError("private receipt repository-link permission is stale")
-    if security["public_repository_link_included"] is not link_allowed:
+    if security["sanitized_external_response_allowed"] is not sanitized_allowed:
+        raise ValueError("private receipt sanitized-response permission is stale")
+    if (
+        security["government_send_security_precondition_allowed"]
+        is not security_decision["final_argos_send_allowed_by_security_gate"]
+    ):
+        raise ValueError("private receipt security precondition is stale")
+    if security["public_repository_link_included"] is not False:
         raise ValueError("private receipt repository-link inclusion is unsafe")
+    if security["attachment_repo_isolated"] is not True:
+        raise ValueError("private receipt does not prove repository isolation")
 
     outputs = require_exact_keys(
         receipt["outputs"],
@@ -638,31 +695,20 @@ def validate_private_receipt(
     markdown_text = markdown_path.read_text(encoding="utf-8")
     with ZipFile(docx_path) as archive:
         document_xml = archive.read("word/document.xml")
-    if link_allowed:
-        if (
-            PUBLIC_REPOSITORY_URL not in markdown_text
-            or PUBLIC_REPOSITORY_URL.encode() not in document_xml
-        ):
-            raise ValueError("allowed public repository link is missing")
-    elif (
-        PUBLIC_REPOSITORY_URL in markdown_text
-        or PUBLIC_REPOSITORY_URL.encode() in document_xml
-        or PUBLIC_REPOSITORY_WITHHELD not in markdown_text
-        or PUBLIC_REPOSITORY_WITHHELD.encode() not in document_xml
-    ):
-        raise ValueError("blocked public repository link was not safely suppressed")
+    assert_no_external_repository_route(markdown_text, "private Markdown")
+    assert_docx_repo_isolated(docx_path)
 
     gate = read_json(SUBMISSION_GATE)
     team = read_json(TEAM_REGISTER)
-    expected_team_authority = bool(
-        gate["send_gate"]["all_teaming_facts_resolved"]
-    )
+    expected_team_disclosure = bool(gate["send_gate"]["team_disclosure_resolved"])
     expected_name_authorizations = sum(
         int(candidate["verification"]["authorization_to_name_in_response"])
         for candidate in team["candidates"]
     )
-    if receipt["team_authority_resolved"] is not expected_team_authority:
-        raise ValueError("private receipt team-authority state is stale")
+    if receipt["response_mode"] != gate["response"]["response_mode"]:
+        raise ValueError("private receipt response mode is stale")
+    if receipt["team_disclosure_resolved"] is not expected_team_disclosure:
+        raise ValueError("private receipt team-disclosure state is stale")
     if (
         receipt["candidate_name_authorization_count"]
         != expected_name_authorizations
@@ -698,6 +744,9 @@ def public_summary(status: str, receipt: dict) -> dict:
         "public_repository_link_included": receipt[
             "public_repository_security"
         ]["public_repository_link_included"],
+        "attachment_repo_isolated": receipt[
+            "public_repository_security"
+        ]["attachment_repo_isolated"],
     }
 
 
@@ -715,7 +764,10 @@ def build_private_copy(
     gate = read_json(SUBMISSION_GATE)
     team = read_json(TEAM_REGISTER)
     security_gate = read_json(SECURITY_GATE)
-    public_repository_link_allowed = validate_security_gate(security_gate)
+    security_decision = validate_security_gate(security_gate)
+    public_repository_link_allowed = security_decision[
+        "public_repository_link_allowed"
+    ]
 
     public_hashes_before = {
         "markdown_sha256": sha256(PUBLIC_MARKDOWN),
@@ -737,7 +789,6 @@ def build_private_copy(
     private_markdown = render_private_markdown(
         PUBLIC_MARKDOWN.read_text(encoding="utf-8"),
         values,
-        public_repository_link_allowed,
     )
     staged_markdown = temporary_paths[markdown_path]
     staged_docx = temporary_paths[docx_path]
@@ -749,7 +800,6 @@ def build_private_copy(
             PUBLIC_DOCX,
             staged_docx,
             values,
-            public_repository_link_allowed,
         )
 
         placeholder_count = (
@@ -761,8 +811,8 @@ def build_private_copy(
             "docx_sha256": sha256(PUBLIC_DOCX),
         }
         field_states = expected_field_states(facts)
-        team_authority_resolved = bool(
-            gate["send_gate"]["all_teaming_facts_resolved"]
+        team_disclosure_resolved = bool(
+            gate["send_gate"]["team_disclosure_resolved"]
         )
         receipt = {
             "schema": RECEIPT_SCHEMA,
@@ -786,7 +836,14 @@ def build_private_copy(
                 "gate_sha256": sha256(SECURITY_GATE),
                 "decision": security_gate["decision"],
                 "public_repository_link_allowed": public_repository_link_allowed,
-                "public_repository_link_included": public_repository_link_allowed,
+                "sanitized_external_response_allowed": security_decision[
+                    "sanitized_external_response_allowed"
+                ],
+                "government_send_security_precondition_allowed": security_decision[
+                    "final_argos_send_allowed_by_security_gate"
+                ],
+                "public_repository_link_included": False,
+                "attachment_repo_isolated": True,
             },
             "outputs": {
                 "markdown": {
@@ -800,7 +857,8 @@ def build_private_copy(
                     "sha256": sha256(staged_docx),
                 },
             },
-            "team_authority_resolved": team_authority_resolved,
+            "response_mode": gate["response"]["response_mode"],
+            "team_disclosure_resolved": team_disclosure_resolved,
             "candidate_name_authorization_count": sum(
                 int(candidate["verification"]["authorization_to_name_in_response"])
                 for candidate in team["candidates"]

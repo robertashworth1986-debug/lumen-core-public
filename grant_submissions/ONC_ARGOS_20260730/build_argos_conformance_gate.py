@@ -4,10 +4,13 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from xml.etree import ElementTree
 from zipfile import ZipFile
+
+from pypdf import PdfReader
 
 
 ARGOS_DIR = Path(__file__).resolve().parent
@@ -65,7 +68,25 @@ OFFICIAL_NOTICE_MAX_AGE_SECONDS = 24 * 60 * 60
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 NS = {"w": W_NS}
 PRIVATE_PLACEHOLDER = "ACTION_TIME_PRIVATE_FACT_REQUIRED"
-UNAUTHORIZED_PARTNER_NAMES = ("EMI Advisors", "Index Analytics", "BookZurman")
+TEAMING_SEMANTIC_NORMALIZATION = (
+    "TEAMING_PERMITTED_IDENTIFY_ALL_PROPOSED_TEAM_MEMBERS_AND_ORGANIZATIONAL_ROLES_IF_ANY"
+)
+TEAMED_RESPONSE_PHRASES = (
+    "partner-led",
+    "pending partner",
+    "participant in a named team",
+    "with partner review",
+    "with fhir partner",
+    "with security partner",
+    "with domain partner",
+)
+FORBIDDEN_EXTERNAL_ROUTE_TOKENS = (
+    "https://github.com/robertashworth1986-debug/lumen-core-public",
+    "https://lumen-core.ai/",
+    "github.com",
+    "lumen-core-public",
+    "robertashworth1986-debug",
+)
 FORBIDDEN_PROMOTION_PHRASES = (
     "agency approved",
     "hhs authorized",
@@ -75,6 +96,20 @@ FORBIDDEN_PROMOTION_PHRASES = (
     "full-prime ready",
 )
 TEXT_CUSTODY_SUFFIXES = {".json", ".md", ".py", ".yaml", ".yml"}
+ENTITY_LEGAL_SUFFIXES = {
+    "co",
+    "company",
+    "corp",
+    "corporation",
+    "inc",
+    "incorporated",
+    "limited",
+    "llc",
+    "llp",
+    "lp",
+    "ltd",
+    "pllc",
+}
 
 
 def sha256(path: Path) -> str:
@@ -127,6 +162,39 @@ def parse_utc(value: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
+def normalized_entity_text(value: str) -> str:
+    return " ".join(re.findall(r"[a-z0-9]+", value.lower()))
+
+
+def entity_name_aliases(value: str) -> set[str]:
+    tokens = normalized_entity_text(value).split()
+    aliases = {" ".join(tokens)} if tokens else set()
+    while tokens and tokens[-1] in ENTITY_LEGAL_SUFFIXES:
+        tokens.pop()
+    if len(tokens) >= 2:
+        aliases.add(" ".join(tokens))
+    return aliases
+
+
+def unauthorized_candidate_names(team: dict, response: str) -> list[str]:
+    normalized_response = normalized_entity_text(response)
+    found: set[str] = set()
+    for candidate in team["candidates"]:
+        if candidate["verification"]["authorization_to_name_in_response"]:
+            continue
+        organization = candidate["organization"]
+        principal = candidate["named_principal"]
+        if any(
+            alias and alias in normalized_response
+            for alias in entity_name_aliases(organization)
+        ):
+            found.add(organization)
+        normalized_principal = normalized_entity_text(principal)
+        if normalized_principal and normalized_principal in normalized_response:
+            found.add(principal)
+    return sorted(found)
+
+
 def inspect_docx_format(path: Path) -> dict:
     with ZipFile(path) as archive:
         styles = ElementTree.fromstring(archive.read("word/styles.xml"))
@@ -167,18 +235,103 @@ def inspect_docx_format(path: Path) -> dict:
     }
 
 
+def inspect_template_external_routes(
+    response_text: str,
+    docx_path: Path,
+    pdf_path: Path,
+) -> dict:
+    found: list[str] = []
+    lowered_response = response_text.lower()
+    for token in FORBIDDEN_EXTERNAL_ROUTE_TOKENS:
+        if token.lower() in lowered_response:
+            found.append(f"markdown:{token}")
+    for phrase in (
+        "public repository",
+        "public reviewer surface",
+        "supported by public code",
+    ):
+        if phrase in lowered_response:
+            found.append(f"markdown_narrative:{phrase}")
+
+    docx_external_relationships = 0
+    with ZipFile(docx_path) as archive:
+        for member in archive.infolist():
+            data = archive.read(member).lower()
+            for token in FORBIDDEN_EXTERNAL_ROUTE_TOKENS:
+                if token.lower().encode("utf-8") in data:
+                    found.append(f"docx:{member.filename}:{token}")
+            if (
+                member.filename.endswith(".rels")
+                and b'targetmode="external"' in data
+            ):
+                docx_external_relationships += 1
+
+    reader = PdfReader(pdf_path)
+    pdf_text = "\n".join(page.extract_text() or "" for page in reader.pages)
+    lowered_pdf_text = pdf_text.lower()
+    for token in FORBIDDEN_EXTERNAL_ROUTE_TOKENS:
+        if token.lower() in lowered_pdf_text:
+            found.append(f"pdf_text:{token}")
+
+    pdf_actions: list[str] = []
+    for page_number, page in enumerate(reader.pages, start=1):
+        for annotation_ref in page.get("/Annots", []):
+            annotation = annotation_ref.get_object()
+            action = annotation.get("/A")
+            if action is None:
+                continue
+            action = action.get_object()
+            action_kind = str(action.get("/S", "UNKNOWN"))
+            target = str(
+                action.get("/URI")
+                or action.get("/F")
+                or action.get("/D")
+                or ""
+            )
+            pdf_actions.append(
+                f"page={page_number};kind={action_kind};target={target}"
+            )
+            lowered_target = target.lower()
+            for token in FORBIDDEN_EXTERNAL_ROUTE_TOKENS:
+                if token.lower() in lowered_target:
+                    found.append(f"pdf_action:page={page_number}:{token}")
+
+    root = reader.trailer["/Root"]
+    pdf_open_action = root.get("/OpenAction") is not None
+    pdf_embedded_files = False
+    names = root.get("/Names")
+    if names is not None:
+        names = names.get_object()
+        pdf_embedded_files = names.get("/EmbeddedFiles") is not None
+    return {
+        "isolated": not found
+        and docx_external_relationships == 0
+        and not pdf_actions
+        and not pdf_open_action
+        and not pdf_embedded_files,
+        "found_routes": sorted(set(found)),
+        "docx_external_relationship_count": docx_external_relationships,
+        "pdf_actions": pdf_actions,
+        "pdf_open_action": pdf_open_action,
+        "pdf_embedded_files": pdf_embedded_files,
+    }
+
+
 def result(
     check_id: str,
     requirement: str,
     status: str,
     evidence: str,
     blocker: str | None = None,
+    *,
+    blocks_send: bool = True,
 ) -> dict:
     row = {
         "check_id": check_id,
         "requirement": requirement,
         "status": status,
         "evidence": evidence,
+        "blocks_send": blocks_send,
     }
     if blocker:
         row["blocker"] = blocker
@@ -219,9 +372,68 @@ def build_payload(as_of_utc: str) -> dict:
         and gate["official_notice_recheck"]["amendment_observed"] is False
     )
     placeholders = response.count(PRIVATE_PLACEHOLDER)
-    unauthorized_names = [
-        name for name in UNAUTHORIZED_PARTNER_NAMES if name.lower() in response.lower()
+    candidate_authorizations = sum(
+        int(candidate["verification"]["authorization_to_name_in_response"])
+        for candidate in team["candidates"]
+    )
+    unauthorized_names = unauthorized_candidate_names(team, response)
+    teamed_phrases_found = [
+        phrase for phrase in TEAMED_RESPONSE_PHRASES if phrase in response.lower()
     ]
+    response_mode = gate["response"]["response_mode"]
+    proposed_team_organizations = gate["response"][
+        "proposed_team_organizations"
+    ]
+    standalone_disclosure_present = all(
+        fragment in response
+        for fragment in (
+            "LumenCore is the sole respondent.",
+            "No teaming arrangement, joint venture, or subcontracting relationship is proposed.",
+            "No other organization or individual is proposed as a team member.",
+            "this response does not represent another organization's commitment, qualifications, past performance, or authority.",
+        )
+    )
+    standalone_mode_consistent = (
+        response_mode == "STANDALONE_RESPONDENT"
+        and gate["response"]["teaming_proposed"] is False
+        and gate["response"]["subcontracting_proposed"] is False
+        and proposed_team_organizations == []
+        and gate["response"]["team_disclosure_status"]
+        == "RESOLVED_NO_EXTERNAL_TEAM_PROPOSED"
+        and gate["send_gate"]["team_disclosure_resolved"] is True
+        and gate["send_gate"]["all_teaming_facts_resolved"] is True
+        and gate["required_teaming_facts"] == []
+        and candidate_authorizations == 0
+        and not unauthorized_names
+        and not teamed_phrases_found
+        and standalone_disclosure_present
+    )
+    teamed_mode_consistent = (
+        response_mode == "TEAMED_RESPONSE"
+        and gate["response"]["teaming_proposed"] is True
+        and bool(proposed_team_organizations)
+        and gate["send_gate"]["all_teaming_facts_resolved"] is True
+        and candidate_authorizations >= len(proposed_team_organizations)
+    )
+    response_mode_consistent = (
+        standalone_mode_consistent or teamed_mode_consistent
+    )
+    notice_teaming_semantics_hold = (
+        gate["official_notice_recheck"]["teaming_permitted"] is True
+        and gate["official_notice_recheck"]["team_required_for_response"] is False
+        and gate["official_notice_recheck"][
+            "team_identification_required_if_teaming_proposed"
+        ]
+        is True
+        and gate["official_notice_recheck"][
+            "teaming_clause_semantic_normalization"
+        ]
+        == TEAMING_SEMANTIC_NORMALIZATION
+        and gate["official_notice_recheck"]["teaming_clause_semantic_sha256"]
+        == hashlib.sha256(
+            TEAMING_SEMANTIC_NORMALIZATION.encode("utf-8")
+        ).hexdigest()
+    )
     forbidden_phrases = [
         phrase for phrase in FORBIDDEN_PROMOTION_PHRASES if phrase in response.lower()
     ]
@@ -269,9 +481,17 @@ def build_payload(as_of_utc: str) -> dict:
             RENDER_RECEIPT,
         )
     )
-    candidate_authorizations = sum(
-        int(candidate["verification"]["authorization_to_name_in_response"])
-        for candidate in team["candidates"]
+    external_route_isolation = (
+        inspect_template_external_routes(response, DOCX, PDF)
+        if all_files_present
+        else {
+            "isolated": False,
+            "found_routes": ["required_artifact_missing"],
+            "docx_external_relationship_count": 0,
+            "pdf_actions": [],
+            "pdf_open_action": False,
+            "pdf_embedded_files": False,
+        }
     )
     claim_map_sources_hold = all(
         (ROOT / row["path"]).is_file()
@@ -281,7 +501,8 @@ def build_payload(as_of_utc: str) -> dict:
         for row in claim_evidence_map["source_custody"]
     )
     claim_evidence_traceability = (
-        claim_evidence_map["status"] == "VERIFIED_BOUNDED_CLAIM_MAP"
+        claim_evidence_map["status"]
+        == "VERIFIED_BOUNDED_INTERNAL_CLAIM_MAP"
         and claim_evidence_map["response"]["sha256"] == sha256(RESPONSE_MARKDOWN)
         and claim_evidence_map["response"]["material_claim_count"]
         == len(claim_evidence_map["claims"])
@@ -352,6 +573,19 @@ def build_payload(as_of_utc: str) -> dict:
         and security_state["public_repository_link_allowed"] is True
         and security_state["final_argos_send_allowed_by_security_gate"] is True
     )
+    security_sanitized_external_response_clear = (
+        security_receipt_current
+        and security_state["current_file"]["placeholder_only"] is True
+        and security_state["current_file"][
+            "required_environment_references_present"
+        ]
+        is True
+        and security_state["history"]["scan_complete"] is True
+        and security_state["history"]["scan_failure_count"] == 0
+        and security_state["sanitized_external_response_allowed"] is True
+        and security_state["final_argos_send_allowed_by_security_gate"] is True
+        and external_route_isolation["isolated"] is True
+    )
     partner_outreach_sent_once = (
         partner_status.get("schema")
         == "lumencore.argos_partner_outreach_status.v1"
@@ -395,6 +629,21 @@ def build_payload(as_of_utc: str) -> dict:
             ),
         ),
         result(
+            "OFFICIAL_NOTICE_TEAMING_SEMANTICS",
+            "The notice permits teaming but requires names and roles only when a team is proposed.",
+            "PASS" if notice_teaming_semantics_hold else "FAIL",
+            (
+                "teaming_permitted="
+                f"{gate['official_notice_recheck']['teaming_permitted']}; "
+                "team_required_for_response="
+                f"{gate['official_notice_recheck']['team_required_for_response']}; "
+                "identify_if_proposed="
+                f"{gate['official_notice_recheck']['team_identification_required_if_teaming_proposed']}; "
+                "semantic_sha256="
+                f"{gate['official_notice_recheck']['teaming_clause_semantic_sha256']}"
+            ),
+        ),
+        result(
             "PUBLIC_REPOSITORY_CREDENTIAL_RECEIPT",
             "The current public credential configuration contains environment references only and its receipt matches the current file.",
             "PASS" if security_receipt_current else "FAIL",
@@ -411,7 +660,7 @@ def build_payload(as_of_utc: str) -> dict:
         ),
         result(
             "PUBLIC_REPOSITORY_ROTATION_AND_HISTORY",
-            "Previously exposed provider credentials are rotated and prior public Git objects are remediated before the repository is linked or the final response is sent.",
+            "Previously exposed provider credentials are rotated and prior public Git objects are remediated before the repository is linked or promoted.",
             "PASS" if security_rotation_and_history_clear else "BLOCKED",
             (
                 "provider_rotations_confirmed="
@@ -428,7 +677,35 @@ def build_payload(as_of_utc: str) -> dict:
             (
                 "Rotate the affected provider credentials, record non-secret "
                 "receipts, remediate reachable public Git history, and verify "
-                "the remote before linking the repository or sending."
+                "the remote before linking or promoting the repository."
+            ),
+            blocks_send=False,
+        ),
+        result(
+            "SANITIZED_EXTERNAL_RESPONSE_SECURITY_PATH",
+            "The Government response is self-contained, link-free, and allowed by the current targeted security gate.",
+            "PASS" if security_sanitized_external_response_clear else "FAIL",
+            (
+                "security_receipt_current="
+                f"{security_receipt_current}; "
+                "sanitized_external_response_allowed="
+                f"{security_state.get('sanitized_external_response_allowed')}; "
+                "final_argos_send_allowed_by_security_gate="
+                f"{security_state.get('final_argos_send_allowed_by_security_gate')}; "
+                "attachment_repo_isolated="
+                f"{external_route_isolation['isolated']}; "
+                "found_routes="
+                f"{external_route_isolation['found_routes']}; "
+                "docx_external_relationship_count="
+                f"{external_route_isolation['docx_external_relationship_count']}; "
+                f"pdf_actions={external_route_isolation['pdf_actions']}; "
+                f"pdf_open_action={external_route_isolation['pdf_open_action']}; "
+                f"pdf_embedded_files={external_route_isolation['pdf_embedded_files']}"
+            ),
+            (
+                "Rebuild the current security receipt and remove every repository, "
+                "live-site, hyperlink, external relationship, PDF action, and embedded "
+                "file from the Government attachment set."
             ),
         ),
         result(
@@ -502,17 +779,23 @@ def build_payload(as_of_utc: str) -> dict:
             "Insert only currently verified private entity and contact facts in the private final copy.",
         ),
         result(
-            "AUTHORIZED_NAMED_TEAM",
-            "Every named team role, credential, and reference is documented and authorized.",
-            "PASS"
-            if gate["send_gate"]["all_teaming_facts_resolved"]
-            and candidate_authorizations > 0
-            else "BLOCKED",
+            "RESPONSE_MODE_AND_TEAM_DISCLOSURE",
+            "The response mode, proposed-team state, and documentary disclosure are mutually consistent.",
+            "PASS" if response_mode_consistent else "FAIL",
             (
+                f"response_mode={response_mode}; "
+                f"teaming_proposed={gate['response']['teaming_proposed']}; "
+                f"subcontracting_proposed={gate['response']['subcontracting_proposed']}; "
+                f"proposed_team_organizations={proposed_team_organizations}; "
                 f"required_teaming_fact_count={len(gate['required_teaming_facts'])}; "
-                f"candidate_name_authorizations={candidate_authorizations}"
+                f"candidate_name_authorizations={candidate_authorizations}; "
+                f"teamed_phrases_found={teamed_phrases_found}; "
+                f"standalone_disclosure_present={standalone_disclosure_present}"
             ),
-            "Obtain written partner role, name, credential, and reference authorization.",
+            (
+                "Use a truthful standalone disclosure with no outside names or roles, "
+                "or bind every proposed team member and role to written authority."
+            ),
         ),
         result(
             "NO_UNAUTHORIZED_PARTNER_NAME",
@@ -538,7 +821,7 @@ def build_payload(as_of_utc: str) -> dict:
         ),
         result(
             "CLAIM_EVIDENCE_TRACEABILITY",
-            "Each affirmative engineering proof statement is bound to named public evidence and explicit non-claims.",
+            "Each affirmative engineering proof statement is bound to named first-party evidence and explicit non-claims.",
             "PASS" if claim_evidence_traceability else "FAIL",
             (
                 f"claim_count={len(claim_evidence_map['claims'])}; "
@@ -562,6 +845,7 @@ def build_payload(as_of_utc: str) -> dict:
                 "duplicate_send_prohibited="
                 f"{partner_status['controls']['duplicate_send_prohibited']}"
             ),
+            blocks_send=False,
         ),
         result(
             "GOVERNMENT_DUPLICATE_RECHECK",
@@ -588,7 +872,7 @@ def build_payload(as_of_utc: str) -> dict:
                 "recipient={final_recipient_verified}; subject={final_subject_verified}; "
                 "body={final_body_verified}; attachments={final_attachments_verified}"
             ).format(**gate["send_gate"]),
-            "Build and inspect the private final action packet after the cover and team gates pass.",
+            "Build and inspect the private final action packet after the cover and response-mode gates pass.",
         ),
         result(
             "ACTION_TIME_APPROVAL",
@@ -611,11 +895,24 @@ def build_payload(as_of_utc: str) -> dict:
         status: sum(row["status"] == status for row in checks)
         for status in ("PASS", "BLOCKED", "FAIL")
     }
+    send_blocking_rows = [
+        row for row in checks if row["blocks_send"] and row["status"] != "PASS"
+    ]
+    send_fail_count = sum(
+        row["status"] == "FAIL" for row in send_blocking_rows
+    )
+    send_blocked_count = sum(
+        row["status"] == "BLOCKED" for row in send_blocking_rows
+    )
+    advisory_blocked_count = sum(
+        row["status"] == "BLOCKED" and not row["blocks_send"]
+        for row in checks
+    )
     decision = (
         "FAIL_CONFORMANCE"
-        if counts["FAIL"]
+        if send_fail_count
         else "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY"
-        if counts["BLOCKED"]
+        if send_blocked_count
         else "READY_FOR_ACTION_TIME_REVIEW"
     )
     source_paths = (
@@ -638,7 +935,7 @@ def build_payload(as_of_utc: str) -> dict:
         SECURITY_VERIFIER,
     )
     return {
-        "schema": "lumencore.argos_response_conformance_gate.v1",
+        "schema": "lumencore.argos_response_conformance_gate.v2",
         "evaluated_utc": evaluated_utc,
         "notice_id": gate["opportunity"]["notice_id"],
         "deadline_utc": gate["opportunity"]["deadline_utc"],
@@ -648,6 +945,9 @@ def build_payload(as_of_utc: str) -> dict:
             "pass_count": counts["PASS"],
             "blocked_count": counts["BLOCKED"],
             "fail_count": counts["FAIL"],
+            "send_blocked_count": send_blocked_count,
+            "send_fail_count": send_fail_count,
+            "advisory_blocked_count": advisory_blocked_count,
             "submission_authorized": gate["send_gate"]["submission_authorized"],
             "external_action_performed": False,
         },
@@ -663,16 +963,20 @@ def build_payload(as_of_utc: str) -> dict:
         ],
         "claim_boundary": (
             "PASS means the named documentary or formatting requirement is supported. "
-            "BLOCKED means the current artifact is intentionally not send-ready. "
+            "BLOCKED with blocks_send=true means the current artifact is intentionally "
+            "not send-ready. BLOCKED with blocks_send=false is a separately tracked "
+            "promotion or operational-control gap that does not prevent a self-contained "
+            "link-free Government response. "
             "Neither passing checks nor a polished packet establishes submission, "
             "acceptance, selection, award, authorization, certification, external "
             "validation, field performance, or savings."
         ),
         "safest_next_action": (
-            "Complete provider credential rotation and public-history remediation, "
-            "then resolve the private cover and authorized-team blockers. Rebuild the "
+            "Resolve the private cover facts, build and inspect the self-contained "
             "private final copy, rerun this gate, repeat the official-notice and "
-            "full-mailbox duplicate checks, and request exact action-time approval."
+            "full-mailbox duplicate checks, bind the exact dispatch, and request exact "
+            "action-time approval. Continue provider credential rotation and public-history "
+            "remediation before any repository link or public promotion."
         ),
     }
 
@@ -690,22 +994,28 @@ def render_markdown(payload: dict) -> str:
         f"- Pass: `{payload['summary']['pass_count']}`",
         f"- Blocked: `{payload['summary']['blocked_count']}`",
         f"- Fail: `{payload['summary']['fail_count']}`",
+        f"- Send-blocking blocked: `{payload['summary']['send_blocked_count']}`",
+        f"- Send-blocking fail: `{payload['summary']['send_fail_count']}`",
+        f"- Advisory blocked: `{payload['summary']['advisory_blocked_count']}`",
         f"- Submission authorized: `{str(payload['summary']['submission_authorized']).lower()}`",
         f"- External action performed: `{str(payload['summary']['external_action_performed']).lower()}`",
         "",
         "## Requirement Matrix",
         "",
-        "| Check | Status | Requirement | Evidence |",
-        "| --- | --- | --- | --- |",
+        "| Check | Status | Blocks send | Requirement | Evidence |",
+        "| --- | --- | --- | --- | --- |",
     ]
     for row in payload["checks"]:
         evidence = row["evidence"].replace("|", "\\|").replace("\n", " ")
         requirement = row["requirement"].replace("|", "\\|")
         lines.append(
-            f"| `{row['check_id']}` | `{row['status']}` | {requirement} | {evidence} |"
+            f"| `{row['check_id']}` | `{row['status']}` | "
+            f"`{str(row['blocks_send']).lower()}` | {requirement} | {evidence} |"
         )
         if row.get("blocker"):
-            lines.append(f"|  |  | **Blocker action** | {row['blocker']} |")
+            lines.append(
+                f"|  |  |  | **Blocker action** | {row['blocker']} |"
+            )
     lines.extend(
         [
             "",

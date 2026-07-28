@@ -355,6 +355,12 @@ def build_payload() -> dict[str, Any]:
         and remote_history_verified
         and not history["historical_exposure_detected"]
     )
+    sanitized_external_response_allowed = (
+        current_safe
+        and required_env_refs_present
+        and history["scan_complete"]
+        and history["scan_failure_count"] == 0
+    )
     return {
         "schema": RECEIPT_SCHEMA,
         "generated_utc": status["updated_utc"],
@@ -398,14 +404,26 @@ def build_payload() -> dict[str, Any]:
         "decision": (
             "PASS_TARGETED_CREDENTIAL_AND_REMOTE_HISTORY_GATE"
             if all_gates_clear
-            else "BLOCK_PUBLIC_REPO_LINK_AND_FINAL_EXTERNAL_RESPONSE"
+            else "ALLOW_SANITIZED_EXTERNAL_RESPONSE_BLOCK_PUBLIC_REPO_LINK"
+            if sanitized_external_response_allowed
+            else "BLOCK_PUBLIC_REPO_LINK_AND_EXTERNAL_RESPONSE"
         ),
         "public_repository_link_allowed": all_gates_clear,
-        "final_argos_send_allowed_by_security_gate": all_gates_clear,
+        "sanitized_external_response_allowed": (
+            sanitized_external_response_allowed
+        ),
+        "final_argos_send_allowed_by_security_gate": (
+            all_gates_clear or sanitized_external_response_allowed
+        ),
         "external_action_performed": False,
         "claim_boundary": status["claim_boundary"],
         "safest_next_action": (
-            "Rotate the affected provider credentials, record non-secret "
+            "Use only a self-contained, link-free external response while rotating "
+            "the affected provider credentials, recording non-secret receipts, "
+            "remediating reachable public Git history, and independently verifying "
+            "the public remote."
+            if sanitized_external_response_allowed and not all_gates_clear
+            else "Rotate the affected provider credentials, record non-secret "
             "provider receipts, remove exposed Git objects from every reachable "
             "public reference, independently verify the public remote history, "
             "and rebuild this targeted gate."

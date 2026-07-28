@@ -2,7 +2,7 @@
 
 Status: `DRAFT_REVIEW_READY_NOT_SEND_READY`
 
-This directory contains a bounded, partner-first capability response for:
+This directory contains a bounded, standalone small-business capability response for:
 
 - Notice: `ONC-ARGOS-SSN-2026-OS351107`
 - Type: Sources Sought / market research
@@ -14,13 +14,15 @@ This directory contains a bounded, partner-first capability response for:
 
 ## Position
 
-LumenCore is presented as an evidence-assurance and deterministic-validation
-workstream contributor under a qualified health IT/FHIR and federal
-cybersecurity prime or teaming arrangement. The response does not claim current
-FHIR R4, CHPL, HHS ATO, 3PAO, or federal health prior performance.
+LumenCore is the sole respondent and proposes no teaming arrangement, joint
+venture, or subcontractor. It presents bounded evidence-management and
+deterministic-validation capabilities while explicitly identifying unproven
+FHIR R4, CHPL, HHS ATO, 3PAO, and federal-health delivery qualifications.
+The notice permits teaming but requires organizations and roles only if a team
+is proposed.
 
-The founder-confirmed LumaArc seal of approval appears on the cover. LumaArc is
-the seal name, not a rename of the LumenCore company.
+The founder-confirmed LumaArc brand mark appears on the cover. LumaArc is the
+mark name, not a rename of the LumenCore company.
 
 ## Files
 
@@ -50,7 +52,7 @@ the seal name, not a rename of the LumenCore company.
 - `ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.md`: reviewer-readable
   requirement matrix and blocker actions
 - `ARGOS_ACTION_TIME_FINALIZATION_CHECKLIST_2026-07-27.md`: private fact,
-  team, evidence, file, duplicate, and dispatch gates
+  response-mode, evidence, file, duplicate, and dispatch gates
 - `build_argos_response.py`: deterministic response builder
 - `build_argos_conformance_gate.py`: deterministic format, evidence, claim,
   authority, duplicate, and dispatch conformance builder
@@ -63,7 +65,7 @@ the seal name, not a rename of the LumenCore company.
 - `ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json`: redacted tooling and
   privacy-boundary receipt; no private copy has been generated
 - `ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json`: machine-readable binding from
-  each material engineering proof statement to the exact public receipt,
+  each material engineering proof statement to exact named first-party receipts,
   source commit, evidence-graph node, negative-result boundary, and non-claims
 - `build_argos_claim_evidence_map.py`: deterministic offline verifier for the
   claim-to-evidence map; it makes no live-domain availability claim
@@ -77,7 +79,8 @@ the seal name, not a rename of the LumenCore company.
   read-only SAM notice observation and direct public attachment refresh receipt
 - `ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json`: public-safe
   credential and Git-history gate; the current file is placeholder-only, but
-  provider rotations and public-history remediation remain unproven
+  provider rotations and public-history remediation remain unproven. It permits
+  only a self-contained external response with no repository or live-site route
 - `../../code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py`: deterministic
   verifier that never prints credential values
 
@@ -98,8 +101,9 @@ attachment, CC, or BCC. No inbound reply was present at the recorded check.
 Its observed action-time binding hash does not match the committed historical
 snapshot, so the public authorization chain is explicitly unreconciled even
 though the sent subject and body match committed source hashes. Do not rebuild
-the historical binding or resend the inquiry. A partner may be named only
-after written role confirmation.
+the historical binding or resend the inquiry. The inquiry is optional to this
+standalone response. A partner may be named only after written role
+confirmation and a deliberate switch to teamed-response mode.
 
 The private finalizer intentionally has no in-repository default:
 
@@ -118,27 +122,30 @@ The populated facts file and generated private action copy must remain outside
 Git and public mirrors, including `E:\LumaProofVault`. The finalizer rejects
 EIN, TIN, SSN, banking, credential, password, API-key, and OTP fields because
 the Argos cover does not request them. Its check mode verifies exact receipt
-schema, counts, output sizes and hashes, public-template custody, current team
-state, false external-action controls, and the absence of individual private
+schema, counts, output sizes and hashes, public-template custody, current
+response mode, false external-action controls, and the absence of individual private
 values or private paths. Duplicate JSON keys, altered authorization flags,
 partial outputs, and stale receipt metadata fail closed. A generated private
-cover does not clear repository-security, team, duplicate, dispatch, or
-approval gates. While the repository-security gate is blocked, the private
-finalizer replaces the public repository URL with a withholding notice without
-mutating the public template.
+cover does not clear duplicate, dispatch, or approval gates. The finalizer
+always removes repository and live-site routes from the external attachment and
+rejects external DOCX relationships.
 
 ## Conformance Meaning
 
 `PASS` means the named requirement is supported by the current packet and
-receipts. `BLOCKED` means the packet intentionally remains unsendable pending a
-required private fact or authority. Any documentary, formatting, hash,
-unauthorized-name, or claim-boundary defect produces `FAIL_CONFORMANCE`.
+receipts. `BLOCKED` with `blocks_send=true` means the packet remains unsendable.
+`BLOCKED` with `blocks_send=false` records a separate public-promotion or
+operational gap. Any send-relevant documentary, formatting, hash,
+unauthorized-name, route-isolation, or claim-boundary defect produces
+`FAIL_CONFORMANCE`.
 
 ## Submission Boundary
 
-Do not send this response until every required private fact and teaming fact in
-the gate file is resolved, provider credentials are rotated, reachable public
-Git history is remediated and verified, the final document is reviewed,
-duplicate-send state is rechecked, and the user gives exact action-time
-approval for the final recipient, attachment, subject, and body. The separate
-partner inquiry is already sent once and is duplicate-locked.
+Do not send this response until every required private fact is resolved, the
+standalone disclosure remains exact, the self-contained attachment is reviewed,
+the official notice and duplicate-send state are rechecked, and the user gives
+exact action-time approval for the final recipient, attachment, subject, and
+body. Provider credential rotation and public-history remediation remain
+mandatory before linking or promoting the repository, but they do not block a
+verified link-free attachment. The separate partner inquiry is already sent
+once and is duplicate-locked.

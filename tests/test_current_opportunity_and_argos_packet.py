@@ -178,7 +178,16 @@ def test_argos_gate_records_one_partner_send_and_remains_fail_closed():
     assert gate["opportunity"]["notice_id"] == "ONC-ARGOS-SSN-2026-OS351107"
     assert gate["opportunity"]["deadline_utc"] == "2026-07-30T21:00:00Z"
     assert gate["response"]["company_name"] == "LumenCore"
-    assert gate["response"]["strategy"] == "PARTNER_FIRST_EVIDENCE_ASSURANCE_WORKSTREAM"
+    assert gate["response"]["strategy"] == (
+        "STANDALONE_BOUNDED_EVIDENCE_MANAGEMENT_RESPONSE"
+    )
+    assert gate["response"]["response_mode"] == "STANDALONE_RESPONDENT"
+    assert gate["response"]["teaming_proposed"] is False
+    assert gate["response"]["subcontracting_proposed"] is False
+    assert gate["response"]["proposed_team_organizations"] == []
+    assert gate["response"]["team_disclosure_status"] == (
+        "RESOLVED_NO_EXTERNAL_TEAM_PROPOSED"
+    )
     assert gate["brand"]["seal_name"] == "LumaArc seal of approval"
     assert gate["send_gate"]["submission_authorized"] is False
     assert gate["send_gate"]["exact_action_time_human_approval_required"] is True
@@ -236,7 +245,11 @@ def test_argos_official_sow_and_public_security_receipt_are_exactly_bound():
     assert security["current_file"]["non_placeholder_value_count"] == 0
     assert security["history"]["historical_exposure_detected"] is True
     assert security["public_repository_link_allowed"] is False
-    assert security["final_argos_send_allowed_by_security_gate"] is False
+    assert security["sanitized_external_response_allowed"] is True
+    assert security["final_argos_send_allowed_by_security_gate"] is True
+    assert security["decision"] == (
+        "ALLOW_SANITIZED_EXTERNAL_RESPONSE_BLOCK_PUBLIC_REPO_LINK"
+    )
     assert security["external_action_performed"] is False
 
 
@@ -273,15 +286,22 @@ def test_argos_response_uses_the_company_name_without_inflated_claims():
         encoding="utf-8"
     )
 
-    assert "LumenCore offers Project Argos a bounded evidence-assurance" in response
-    assert "LumaArc seal of approval" in response
+    assert (
+        "Based on named first-party software artifacts, LumenCore can demonstrate"
+        in response
+    )
+    assert "LumaArc brand mark" in response
     assert "LumaArc responds" not in response
     assert "| Brand | LumaArc |" not in response
     assert "does not claim presently qualified full-scope health IT prime readiness" in response
     assert "a proof-of-concept result alone is not an Authority to Operate" in response
     assert "No direct LumenCore prior-performance reference is claimed" in response
-    assert "public reviewer surface" in response
+    assert "LumenCore is the sole respondent." in response
+    assert "No other organization or individual is proposed as a team member." in response
+    assert "public reviewer surface" not in response
     assert "live reviewer surface" not in response
+    assert "github.com" not in response
+    assert "lumen-core.ai" not in response
     assert "Measured public EIA replay" not in response
     assert "negative Kuramoto result" not in response
     assert "patent-sensitive" not in response
@@ -631,23 +651,28 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
     conformance = load_json(ARGOS_CONFORMANCE)
     checks = {row["check_id"]: row for row in conformance["checks"]}
 
-    assert conformance["schema"] == "lumencore.argos_response_conformance_gate.v1"
+    assert conformance["schema"] == "lumencore.argos_response_conformance_gate.v2"
     assert conformance["notice_id"] == "ONC-ARGOS-SSN-2026-OS351107"
     assert conformance["deadline_utc"] == "2026-07-30T21:00:00Z"
     assert conformance["decision"] == "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY"
     assert conformance["summary"] == {
-        "blocked_count": 6,
-        "check_count": 22,
+        "advisory_blocked_count": 1,
+        "blocked_count": 5,
+        "check_count": 24,
         "external_action_performed": False,
         "fail_count": 0,
-        "pass_count": 16,
+        "pass_count": 19,
+        "send_blocked_count": 4,
+        "send_fail_count": 0,
         "submission_authorized": False,
     }
 
     expected_pass = {
         "OFFICIAL_NOTICE_CURRENT",
         "OFFICIAL_SOW_SOURCE_CUSTODY",
+        "OFFICIAL_NOTICE_TEAMING_SEMANTICS",
         "PUBLIC_REPOSITORY_CREDENTIAL_RECEIPT",
+        "SANITIZED_EXTERNAL_RESPONSE_SECURITY_PATH",
         "DEADLINE_OPEN",
         "ACCEPTED_FILES_PRESENT",
         "ARTIFACT_HASH_CUSTODY",
@@ -656,6 +681,7 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
         "TWELVE_POINT_TIMES_NEW_ROMAN",
         "CONTENT_PAGE_LIMIT",
         "VISUAL_QA",
+        "RESPONSE_MODE_AND_TEAM_DISCLOSURE",
         "NO_UNAUTHORIZED_PARTNER_NAME",
         "SIMILAR_SCOPE_BOUNDARY",
         "CLAIM_BOUNDARIES",
@@ -664,7 +690,6 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
     }
     expected_blocked = {
         "PRIVATE_COVER_FACTS",
-        "AUTHORIZED_NAMED_TEAM",
         "GOVERNMENT_DUPLICATE_RECHECK",
         "FINAL_DISPATCH_BINDING",
         "ACTION_TIME_APPROVAL",
@@ -675,6 +700,19 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
         check_id for check_id, row in checks.items() if row["status"] == "BLOCKED"
     } == expected_blocked
     assert all(row["status"] != "FAIL" for row in checks.values())
+    assert checks["PUBLIC_REPOSITORY_ROTATION_AND_HISTORY"]["blocks_send"] is False
+    assert checks["SANITIZED_EXTERNAL_RESPONSE_SECURITY_PATH"]["blocks_send"] is True
+    assert all(
+        row["blocks_send"] is True
+        for check_id, row in checks.items()
+        if check_id
+        in {
+            "PRIVATE_COVER_FACTS",
+            "GOVERNMENT_DUPLICATE_RECHECK",
+            "FINAL_DISPATCH_BINDING",
+            "ACTION_TIME_APPROVAL",
+        }
+    )
 
     custody = {row["path"]: row for row in conformance["source_custody"]}
     for relative_path, row in custody.items():
@@ -687,8 +725,8 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
 def test_argos_material_claims_are_bound_to_exact_public_evidence():
     claim_map = load_json(ARGOS_CLAIM_MAP)
 
-    assert claim_map["schema"] == "lumencore.argos_claim_evidence_map.v1"
-    assert claim_map["status"] == "VERIFIED_BOUNDED_CLAIM_MAP"
+    assert claim_map["schema"] == "lumencore.argos_claim_evidence_map.v2"
+    assert claim_map["status"] == "VERIFIED_BOUNDED_INTERNAL_CLAIM_MAP"
     assert claim_map["response"]["sha256"] == sha256(
         ARGOS_DIR / "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md"
     )
@@ -699,7 +737,7 @@ def test_argos_material_claims_are_bound_to_exact_public_evidence():
     assert claim_map["submission_authorized"] is False
 
     by_id = {row["claim_id"]: row for row in claim_map["claims"]}
-    replay = by_id["BOUNDED_REPRODUCIBILITY_COUNTS"]
+    replay = by_id["FIRST_PARTY_REPRODUCIBILITY_PACKAGE"]
     assert replay["evidence"]["source_commit"] == (
         "1c0eb51754beffac6f4df484914e35efc21c253f"
     )
@@ -730,7 +768,7 @@ def test_argos_claim_evidence_map_is_deterministic():
     assert result.returncode == 0, result.stderr
     receipt = json.loads(result.stdout)
     assert receipt["status"] == "CURRENT"
-    assert receipt["decision"] == "VERIFIED_BOUNDED_CLAIM_MAP"
+    assert receipt["decision"] == "VERIFIED_BOUNDED_INTERNAL_CLAIM_MAP"
     assert receipt["claim_count"] == 3
     assert receipt["all_claims_supported"] is True
     assert receipt["external_action_performed"] is False
@@ -757,7 +795,7 @@ def test_argos_claim_evidence_map_fails_closed_on_receipt_drift(
 
     assert payload["status"] == "FAIL_CLAIM_TRACEABILITY"
     assert payload["checks"]["reviewer_receipt_counts_hold"] is False
-    assert claims["BOUNDED_REPRODUCIBILITY_COUNTS"]["supported"] is False
+    assert claims["FIRST_PARTY_REPRODUCIBILITY_PACKAGE"]["supported"] is False
 
 
 def test_argos_conformance_outputs_are_deterministic():
@@ -898,8 +936,8 @@ def test_argos_private_finalizer_readiness_is_redacted_and_fail_closed():
     assert set(schema["properties"]["facts"]["required"]) == set(
         readiness["required_fact_keys"]
     )
-    assert readiness["verification"]["focused_test_count"] == 40
-    assert readiness["verification"]["focused_test_pass_count"] == 40
+    assert readiness["verification"]["focused_test_count"] == 42
+    assert readiness["verification"]["focused_test_pass_count"] == 42
     assert readiness["verification"]["synthetic_private_values_only"] is True
     assert readiness["verification"]["synthetic_pdf_page_count"] == 10
     assert readiness["verification"]["synthetic_pdf_page_size"] == "US Letter"
@@ -908,9 +946,10 @@ def test_argos_private_finalizer_readiness_is_redacted_and_fail_closed():
     assert readiness["verification"]["public_vault_path_rejection_tested"] is True
     assert readiness["verification"]["receipt_schema_validation_tested"] is True
     assert (
-        readiness["verification"]["blocked_repository_link_suppression_tested"]
+        readiness["verification"]["external_route_isolation_tested"]
         is True
     )
+    assert readiness["verification"]["sanitized_security_path_tested"] is True
     assert (
         readiness["verification"][
             "tampered_external_action_controls_rejection_tested"
@@ -957,12 +996,16 @@ def test_argos_private_finalizer_builds_without_public_mutation_or_value_logging
     private_docx = output_dir / builder.DOCX_OUTPUT_NAME
     private_receipt = output_dir / builder.RECEIPT_OUTPUT_NAME
 
-    assert receipt["decision"] == "PRIVATE_COVER_READY_TEAM_AND_DISPATCH_BLOCKED"
+    assert receipt["schema"] == "lumencore.argos_private_action_copy_receipt.v2"
+    assert receipt["decision"] == (
+        "PRIVATE_COVER_READY_STANDALONE_DISPATCH_BLOCKED"
+    )
     assert receipt["required_fact_count"] == 9
     assert receipt["private_value_count"] == 9
     assert receipt["placeholder_count"] == 0
     assert receipt["public_templates"]["unchanged"] is True
-    assert receipt["team_authority_resolved"] is False
+    assert receipt["response_mode"] == "STANDALONE_RESPONDENT"
+    assert receipt["team_disclosure_resolved"] is True
     assert receipt["candidate_name_authorization_count"] == 0
     assert receipt["government_send_ready"] is False
     assert receipt["submission_authorized"] is False
@@ -971,9 +1014,12 @@ def test_argos_private_finalizer_builds_without_public_mutation_or_value_logging
     assert receipt["private_output_mirrored_to_public_vault"] is False
     assert receipt["public_repository_security"] == {
         "gate_sha256": sha256(ARGOS_SECURITY_GATE),
-        "decision": "BLOCK_PUBLIC_REPO_LINK_AND_FINAL_EXTERNAL_RESPONSE",
+        "decision": "ALLOW_SANITIZED_EXTERNAL_RESPONSE_BLOCK_PUBLIC_REPO_LINK",
         "public_repository_link_allowed": False,
+        "sanitized_external_response_allowed": True,
+        "government_send_security_precondition_allowed": True,
         "public_repository_link_included": False,
+        "attachment_repo_isolated": True,
     }
     assert private_markdown.is_file()
     assert private_docx.is_file()
@@ -983,7 +1029,9 @@ def test_argos_private_finalizer_builds_without_public_mutation_or_value_logging
 
     markdown_text = private_markdown.read_text(encoding="utf-8")
     assert builder.PUBLIC_REPOSITORY_URL not in markdown_text
-    assert builder.PUBLIC_REPOSITORY_WITHHELD in markdown_text
+    assert builder.PUBLIC_SITE_URL not in markdown_text
+    assert "github.com" not in markdown_text
+    assert "lumen-core-public" not in markdown_text
     assert builder.PRIVATE_MARKER not in markdown_text
     assert builder.PRIVATE_DISPLAY_MARKER not in markdown_text
     assert builder.PRIVATE_STATUS in markdown_text
@@ -1001,7 +1049,10 @@ def test_argos_private_finalizer_builds_without_public_mutation_or_value_logging
         for paragraph in cell.paragraphs
     )
     assert builder.PUBLIC_REPOSITORY_URL not in document_text
-    assert builder.PUBLIC_REPOSITORY_WITHHELD in document_text
+    assert builder.PUBLIC_SITE_URL not in document_text
+    assert "github.com" not in document_text
+    assert "lumen-core-public" not in document_text
+    builder.assert_docx_repo_isolated(private_docx)
     docx_text = "\n".join(
         cell.text
         for table in document.tables

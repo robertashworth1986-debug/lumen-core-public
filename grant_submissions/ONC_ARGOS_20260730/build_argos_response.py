@@ -23,14 +23,10 @@ LOGO_SHA256 = "1ed1c9b00e273aa9e781bd7fd0a4fcc3fc542257c6d294c8e8fbfada500701af"
 
 NOTICE_ID = "ONC-ARGOS-SSN-2026-OS351107"
 DEADLINE = "July 30, 2026 at 5:00 PM Eastern"
-PUBLIC_REPO = "https://github.com/robertashworth1986-debug/lumen-core-public"
-PUBLIC_SITE = "https://lumen-core.ai/"
-RESPONSE_TITLE = "Project Argos Capability Statement - Bounded Teaming Response"
+RESPONSE_TITLE = "Project Argos Capability Statement - Bounded Small-Business Response"
 
 PRIVATE_FACT = "ACTION_TIME_PRIVATE_FACT_REQUIRED"
-TEAMING_FACT = "ACTION_TIME_TEAMING_FACT_REQUIRED"
 PRIVATE_FACT_DISPLAY = "Pending action-time fact"
-TEAMING_FACT_DISPLAY = "Pending named and authorized partner"
 
 INK = RGBColor(0x17, 0x22, 0x2B)
 MUTED = RGBColor(0x52, 0x60, 0x6B)
@@ -42,11 +38,12 @@ CAUTION_FILL = "FFF4CC"
 
 EXECUTIVE_PARAGRAPHS = [
     (
-        "LumenCore offers Project Argos a bounded evidence-assurance and "
-        "deterministic-validation workstream: authorized-source custody, rule "
-        "traceability, hash-locked evidence cases, human decision gates, adverse-result "
-        "retention, and reviewer handoff. These are component capabilities supported by "
-        "the public LumenCore repository and public reviewer surface."
+        "Based on named first-party software artifacts, LumenCore can demonstrate "
+        "source-artifact custody, versioned rule execution, evidence-package assembly, "
+        "human approval gates, adverse-result retention, and reproducible reviewer "
+        "handoff. Evidence packages are accompanied by SHA-256 integrity manifests. "
+        "These are bounded component capabilities, not comparable federal-health past "
+        "performance."
     ),
     (
         "For Project Argos, those patterns align most directly with requirements "
@@ -54,8 +51,8 @@ EXECUTIVE_PARAGRAPHS = [
         "orchestration, evidence-case generation, corrective-action retest records, "
         "and production handoff documentation. LumenCore is responding at component "
         "level and does not claim presently qualified full-scope health IT prime "
-        "readiness. A credible team still requires named FHIR R4/CHPL and ONC "
-        "Certification Program expertise plus an HHS ATO/FIPS 199/security lead."
+        "readiness, FHIR R4 conformance authority, HHS ATO leadership, or an evaluated "
+        "health-domain deployment."
     ),
 ]
 
@@ -93,92 +90,90 @@ TASK_ROWS = [
     (
         "1",
         "Initiation, requirements, and regulatory traceability",
-        "Core contribution with partner review",
-        "Build a versioned requirements-to-test-to-evidence matrix; define evidence "
-        "identifiers, severity fields, human checkpoints, decision rights, schedules, "
-        "and change-control receipts. A health-regulatory lead must approve mappings "
-        "to 45 CFR and ONC program practice.",
+        "Partial capability",
+        "Build a versioned requirements-to-test-to-evidence matrix with evidence IDs, "
+        "severity, human checkpoints, schedules, and change control. No complete 45 CFR "
+        "or CHPL mapping or authorized regulatory interpretation is claimed.",
     ),
     (
         "2",
         "Monthly administrative reporting",
-        "Core contribution",
-        "Produce source-backed status reports with task progress, blockers, expected "
-        "completion dates, evidence links, decisions, and unresolved gates.",
+        "Partial capability",
+        "Produce source-backed status, blockers, milestones, event timelines, evidence "
+        "IDs, decisions, and unresolved gates. Comparable HHS reporting performance is "
+        "not claimed.",
     ),
     (
         "3",
         "Public-source discovery and ingestion",
-        "Core contribution with FHIR partner",
-        "Implement source inventory, raw-response custody, timestamps, request "
-        "metadata, hashes, lineage, precedence rules, data dictionaries, and "
-        "reproducible normalized projections. Partner validates CHPL, Lantern, NPPES, "
-        "and FHIR domain mappings.",
+        "Partial capability",
+        "Implement source inventory, raw-response custody, timestamps, headers, hashes, "
+        "lineage, precedence, dictionaries, and normalized projections. CHPL, Lantern, "
+        "NPPES, and FHIR connectors are not demonstrated.",
     ),
     (
         "4",
         "Agentic architecture and governance",
-        "Core contribution with security partner",
+        "Partial capability",
         "Separate deterministic validators from AI support; version policies, prompts, "
-        "rules, retries, rate limits, fallbacks, error handling, and audit logs; require "
-        "human authorization for compliance determinations.",
+        "rules, retries, fallbacks, and audit logs; require human compliance decisions. "
+        "No deployed health-domain architecture or secure HHS boundary is demonstrated.",
     ),
     (
         "5",
         "Publication and FHIR R4 conformance testing",
-        "Partner-led",
-        "LumenCore can wrap validator outputs in traceable evidence cases and regression "
-        "receipts. A qualified FHIR/ONC partner must own standards interpretation, test "
-        "design, and conformance acceptance.",
+        "Not demonstrated",
+        "Package supplied validator outputs as traceable evidence cases and regression "
+        "receipts. No FHIR R4 test authority, quarterly operation, publication-failure "
+        "detection, or conformance acceptance is claimed.",
     ),
     (
         "6",
         "Real-world endpoint observation",
-        "Partner-led with evidence support",
-        "Contribute safe-observation logging, scope controls, drift records, hashes, and "
-        "replayable comparison artifacts. Partner owns health-endpoint semantics, "
-        "Government-approved access boundaries, and PHI avoidance controls.",
+        "Not demonstrated",
+        "Contribute safe-observation logs, scope controls, drift records, hashes, and "
+        "replay. Health-endpoint semantics, capability-sufficiency tests, "
+        "published-versus-observed comparison, and approved access are not demonstrated.",
     ),
     (
         "7",
         "Evidence case generation and triage",
-        "Core contribution",
-        "Assemble raw and normalized artifacts, validator output, request/response "
-        "logs, timestamps, hashes, severity, rule traceability, issue narratives, "
-        "deduplication keys, and machine/human-readable exports.",
+        "Strongest partial capability",
+        "Assemble raw and normalized artifacts, logs, timestamps, hashes, severity, rule "
+        "traceability, narratives, deduplication, screenshots, clustering, and "
+        "human/machine exports. A designated HHS-system export remains unproven.",
     ),
     (
         "8",
         "Corrective-action workflow support",
-        "Core contribution with regulatory approval",
-        "Provide controlled draft, review, authorization, retest, and before/after "
-        "evidence workflows. ONC/ONC-ACB discretion and regulatory interpretation stay "
-        "with authorized personnel.",
+        "Partial capability",
+        "Provide controlled drafting, review, authorization, retest, before/after "
+        "evidence, and recurrence fields. No ONC/ONC-ACB discretion or regulatory "
+        "interpretation authority is claimed.",
     ),
     (
         "9",
         "HHS Authority to Operate",
-        "Security-partner-led",
-        "LumenCore can supply component inventories, reproducibility records, change "
-        "receipts, evidence links, and control-test artifacts. The team requires an "
-        "experienced HHS ATO/FIPS 199/SSP lead and authorized assessment support.",
+        "Not demonstrated",
+        "Supply component inventories, reproducibility and change receipts, evidence "
+        "IDs, and control-test artifacts. No HHS ATO lead, FIPS 199/SSP delivery, 3PAO "
+        "coordination, milestone reporting, or authorization package is claimed.",
     ),
     (
         "10",
         "Production-ready PPC release package",
-        "Core contribution with prime",
-        "Package code, dependency locks, manifests, runbooks, rollback procedures, "
-        "limitations, test coverage, operating assumptions, costs, staffing needs, and "
-        "reviewer receipts. Hosting and production acceptance remain prime/Government "
-        "decisions.",
+        "Partial capability",
+        "Package code, dependency locks, manifests, runbooks, rollback, limitations, "
+        "tests, assumptions, costs, staffing, and reviewer receipts. No HHS-deployable "
+        "package, hosting approval, or production acceptance is demonstrated.",
     ),
     (
         "11",
         "Public-artifact assessment and FY 2027 strategy",
-        "Core contribution with domain partner",
-        "Extend the same traceability and evidence-case pattern to approved public "
-        "documentation checks, prototype scoring only under locked criteria, and retain "
-        "uncertainty and adverse findings in expansion recommendations.",
+        "Partial capability",
+        "Apply traceability to approved public-document checks and locked prototype "
+        "scoring. EHI/API criteria, controlling regulatory citations, and a validated "
+        "FY 2027 strategy are not demonstrated.",
     ),
 ]
 
@@ -222,9 +217,9 @@ WORKSTREAM_STEPS = [
 
 EVIDENCE_ROWS = [
     (
-        "Public reviewer capsule",
-        "31 of 31 declared assertions and 3 of 3 suites reproduced in the packaged "
-        "clean-run workflow, with dependency and source-state checks.",
+        "First-party reproducibility package",
+        "A named package and SHA-256 receipt record successful execution of its declared "
+        "checks under an identified source state.",
         "First-party bounded reproducibility only; not external validation, agency "
         "certification, field performance, or health IT past performance.",
     ),
@@ -237,7 +232,7 @@ EVIDENCE_ROWS = [
     ),
     (
         "Adverse-result retention",
-        "Public records preserve failed promotion gates, negative findings, and "
+        "Named first-party records preserve failed promotion gates, negative findings, and "
         "unresolved authorities instead of converting them into favorable claims.",
         "Transparent failure handling is an engineering pattern, not proof of FHIR "
         "conformance, regulatory interpretation, or field performance.",
@@ -247,26 +242,26 @@ EVIDENCE_ROWS = [
 SIMILAR_SCOPE_ROWS = [
     (
         "Evidence custody, traceability, and deterministic validation",
-        "Component pattern supported by public code, tests, receipts, and reviewer "
-        "artifacts.",
-        "LumenCore can be evaluated for a bounded evidence-assurance workstream.",
+        "Component pattern supported by named first-party code, tests, receipts, and "
+        "reviewer artifacts.",
+        "Available for authorized review after repository security screening.",
     ),
     (
         "FHIR R4, CHPL/Lantern/NPPES, and ONC Certification Program delivery",
         "No direct LumenCore prior-performance reference is claimed.",
-        "Named and authorized health IT/FHIR partner evidence is required.",
+        "Future acquisition staffing or separately authorized teaming would be required; "
+        "no outside team is proposed in this response.",
     ),
     (
         "HHS ATO, FIPS 199, SSP/control implementation, and 3PAO coordination",
         "No direct LumenCore HHS authorization reference is claimed.",
-        "Named and authorized federal cybersecurity lead and independent assessment "
-        "path are required.",
+        "Future acquisition staffing or separately authorized teaming would be required; "
+        "no ATO lead or assessor is proposed in this response.",
     ),
     (
         "Full-scope federal health program integration",
         "No full-prime readiness or comparable federal health delivery is claimed.",
-        "A qualified small-business prime or integrated team must own program delivery "
-        "and provide relevant references.",
+        "LumenCore should not be treated as a presently qualified full-scope prime.",
     ),
 ]
 
@@ -292,37 +287,37 @@ SECURITY_BULLETS = [
     ),
 ]
 
-TEAM_ROWS = [
+CAPABILITY_GAP_ROWS = [
     (
-        "LumenCore evidence-assurance workstream",
-        "Source custody, deterministic validation orchestration, traceability, evidence "
-        "cases, hashes, claim boundaries, reviewer packages, retest receipts.",
-        "Public repository evidence supports bounded reproducibility patterns.",
+        "Response posture",
+        "LumenCore is the sole respondent. No teaming arrangement, joint venture, or "
+        "subcontracting relationship is proposed.",
+        "No external proposed team members exist to identify.",
     ),
     (
-        "Health IT/FHIR and ONC program lead",
+        "Health IT/FHIR and ONC program authority",
         "CHPL/Lantern/NPPES semantics, FHIR R4 Endpoint/Organization/Bundle testing, "
         "ONC regulatory mapping, corrective-action content review.",
-        TEAMING_FACT_DISPLAY,
+        "Capability gap disclosed; no person or organization is represented.",
     ),
     (
-        "Federal cybersecurity/ATO lead",
+        "Federal cybersecurity/ATO authority",
         "HHS authorization boundary, FIPS 199, SSP, control implementation, assessment "
         "coordination, POA&M and authorization package.",
-        TEAMING_FACT_DISPLAY,
+        "Capability gap disclosed; no person or organization is represented.",
     ),
     (
-        "Prime/program integration lead",
+        "Comparable full-program delivery",
         "Contract performance, staffing, Government coordination, hosting, delivery "
         "acceptance, health-domain prior performance, and integrated schedule.",
-        TEAMING_FACT_DISPLAY,
+        "Not demonstrated and not claimed.",
     ),
 ]
 
 MOBILIZATION_ROWS = [
     (
         "0-30 days",
-        "Confirm team, scope, source authorization, regulatory ownership, hosting "
+        "Confirm scope, source authorization, regulatory ownership, hosting "
         "assumptions, traceability schema, security boundary, and pilot cohort.",
     ),
     (
@@ -347,7 +342,7 @@ QUESTIONS = [
     "What proof-of-concept duration, target cohort size, and Government hosting environment should respondents assume for acquisition planning?",
     "Which organization owns final interpretation of 45 CFR and ONC Certification Program test outcomes, and what review service levels are expected?",
     "Will HHS provide an approved source list, rate-limit policy, synthetic test corpus, and expected evidence-case export schema?",
-    "Is HHS seeking one full-scope prime, or would it value clearly bounded small-business teaming responses for evidence assurance, FHIR validation, and ATO workstreams?",
+    "Which deliverables define the minimum viable first acquisition phase, and may HHS evaluate a bounded small-business contribution separately from full-scope prime readiness?",
     "What existing HHS authorization boundary, reusable controls, continuous-monitoring services, or 3PAO arrangements may be available to the PPC?",
 ]
 
@@ -604,7 +599,7 @@ def add_cover(doc: Document) -> None:
 
     for text, bold, color, after in (
         ("LUMENCORE", True, INK, 2),
-        ("LUMAARC SEAL OF APPROVAL", False, MUTED, 4),
+        ("LUMAARC BRAND MARK", False, MUTED, 4),
         ("MARKET RESEARCH CAPABILITY STATEMENT", True, INK, 4),
         ("Project Argos Agentic AI Proof of Concept", True, INK, 4),
         (f"Sources Sought Notice {NOTICE_ID}", False, MUTED, 18),
@@ -620,14 +615,11 @@ def add_cover(doc: Document) -> None:
     rows = [
         ("Company name", "LumenCore"),
         ("Responding legal entity", PRIVATE_FACT_DISPLAY),
-        ("Seal", "LumaArc seal of approval"),
         ("UEI / DUNS if applicable", PRIVATE_FACT_DISPLAY),
         ("Company address", PRIVATE_FACT_DISPLAY),
         ("Authorized point of contact", PRIVATE_FACT_DISPLAY),
         ("Telephone / email", PRIVATE_FACT_DISPLAY),
         ("Small-business designation(s)", PRIVATE_FACT_DISPLAY),
-        ("Public reviewer surface", PUBLIC_SITE),
-        ("Public evidence repository", PUBLIC_REPO),
         ("Response deadline", DEADLINE),
     ]
     fill_table(doc, ["Required cover field", "Current response"], rows, [2.05, 4.45], header_fill=GRAY_FILL)
@@ -698,8 +690,9 @@ def build_docx() -> None:
     p = cell.paragraphs[0]
     p.paragraph_format.space_after = Pt(0)
     r = p.add_run(
-        "Recommended acquisition position: bounded evidence-assurance workstream "
-        "participant in a named team. Full-prime readiness is not claimed."
+        "Response posture: bounded small-business component capability. LumenCore is "
+        "the sole respondent; no outside team is proposed; full-prime readiness is not "
+        "claimed."
     )
     set_run(r, bold=True)
 
@@ -707,12 +700,12 @@ def build_docx() -> None:
     for item in UNDERSTANDING_BULLETS:
         add_bullet(doc, item)
 
-    add_heading(doc, "3. Task-by-Task Capability and Teaming Matrix", level=1)
+    add_heading(doc, "3. Task-by-Task Capability and Gap Matrix", level=1)
     add_paragraph(
         doc,
-        "The matrix distinguishes current evidence-backed contribution from work that "
-        "must be led or accepted by qualified health IT, regulatory, cybersecurity, "
-        "prime, and Government personnel.",
+        "The matrix distinguishes current first-party component capability from work "
+        "that has not been demonstrated. It does not assign any task to an unnamed "
+        "partner or represent another organization's authority.",
     )
     fill_table(
         doc,
@@ -734,21 +727,23 @@ def build_docx() -> None:
     add_heading(doc, "5. Component Evidence and Similar-Scope Status", level=1)
     add_paragraph(
         doc,
-        "The following public records support the engineering patterns offered here. "
-        "They are not presented as healthcare, agency, field, or economic validation.",
+        "The following named first-party records support the engineering patterns "
+        "offered here and are available for authorized review after repository security "
+        "screening. They are not presented as healthcare, agency, field, or economic "
+        "validation.",
     )
     fill_table(
         doc,
-        ["Evidence record", "What the public artifact supports", "What it does not support"],
+        ["Evidence record", "What the record supports", "What it does not support"],
         EVIDENCE_ROWS,
         [1.35, 2.75, 2.40],
     )
     add_paragraph(
         doc,
         "The notice requests experience of similar scope and complexity. The matrix "
-        "below distinguishes LumenCore component evidence from qualifications that must "
-        "come from an authorized team; it does not substitute adjacent technical work "
-        "for federal health prior performance.",
+        "below distinguishes LumenCore component evidence from material qualifications "
+        "that are not demonstrated; it does not substitute adjacent technical work for "
+        "federal health prior performance.",
     )
     fill_table(
         doc,
@@ -758,7 +753,7 @@ def build_docx() -> None:
     )
     add_paragraph(
         doc,
-        "The public evidence index states the present boundary directly: current "
+        "The internal evidence index states the present boundary directly: current "
         "strengths are artifact custody, deterministic replay, fail-closed claim "
         "governance, reviewer handoff packaging, and bounded pilot design. Independent "
         "scientific validation, field-validated savings, agency endorsement, certified "
@@ -772,24 +767,28 @@ def build_docx() -> None:
         add_bullet(doc, item)
     add_paragraph(
         doc,
-        "Current boundary: the public repository is not an HHS-authorized production "
-        "system and does not establish an ATO, FHIR certification, 3PAO assessment, or "
-        "federal health deployment. Those are explicit team and acquisition gates.",
+        "Current boundary: the cited first-party artifacts are not an HHS-authorized "
+        "production system and do not establish an ATO, FHIR certification, 3PAO "
+        "assessment, or federal health deployment. Those remain acquisition and "
+        "authorization gaps.",
         bold=True,
     )
 
-    add_heading(doc, "7. Teaming Structure and Missing Qualifications", level=1)
+    add_heading(doc, "7. Standalone Response and Capability Gaps", level=1)
     fill_table(
         doc,
-        ["Workstream", "Accountability", "Current gate"],
-        TEAM_ROWS,
+        ["Area", "Required or relevant capability", "Current status"],
+        CAPABILITY_GAP_ROWS,
         [1.65, 3.25, 1.60],
     )
     add_paragraph(
         doc,
-        "No partner name, credential, contract vehicle, clearance, prior-performance "
-        "reference, or legal designation will be included without authorization and "
-        "documentary support at action time.",
+        "Teaming status as of submission: LumenCore has not formed or been authorized "
+        "to represent a team for this response. No other organization or individual is "
+        "proposed as a team member. The rows above identify capability gaps, not "
+        "proposed or committed team members. LumenCore is open to future acquisition or "
+        "teaming discussions, but this response does not represent another "
+        "organization's commitment, qualifications, past performance, or authority.",
         italic=True,
     )
 
@@ -807,10 +806,10 @@ def build_docx() -> None:
         add_numbered_item(doc, str(idx), question)
     add_paragraph(
         doc,
-        "Requested next step: include LumenCore in market-research or teaming discussions "
-        "where a qualified prime needs an inspectable evidence-assurance workstream for "
-        "source custody, deterministic validators, rule traceability, human-gated issue "
-        "disposition, and reproducible handoff.",
+        "For acquisition planning, HHS may treat this response as evidence of bounded "
+        "small-business capacity in evidence management and validation orchestration. "
+        "If HHS conducts follow-up market research, LumenCore is available to "
+        "demonstrate the cited artifacts and answer technical questions.",
         bold=True,
     )
     add_paragraph(
@@ -843,7 +842,7 @@ def build_markdown() -> None:
         f"**Deadline:** {DEADLINE}",
         "**Status:** `DRAFT - HUMAN REVIEW AND ACTION-TIME FACTS REQUIRED`",
         "",
-        f"![Founder-selected LumaArc seal of approval](../../assets/brand/lumaarc_arc_seal_v1.png)",
+        f"![Founder-selected LumaArc brand mark](../../assets/brand/lumaarc_arc_seal_v1.png)",
         "",
         "## Required Cover Facts",
         "",
@@ -851,14 +850,11 @@ def build_markdown() -> None:
     cover_rows = [
         ("Company name", "LumenCore"),
         ("Responding legal entity", PRIVATE_FACT),
-        ("Seal", "LumaArc seal of approval"),
         ("UEI / DUNS if applicable", PRIVATE_FACT),
         ("Company address", PRIVATE_FACT),
         ("Authorized point of contact", PRIVATE_FACT),
         ("Telephone / email", PRIVATE_FACT),
         ("Small-business designation(s)", PRIVATE_FACT),
-        ("Public reviewer surface", PUBLIC_SITE),
-        ("Public evidence repository", PUBLIC_REPO),
     ]
     lines.extend(table_markdown(["Field", "Current response"], cover_rows))
     lines.extend(["", "## 1. Executive Fit and Recommended Role", ""])
@@ -866,15 +862,26 @@ def build_markdown() -> None:
     lines.extend(
         [
             "",
-            "**Recommended acquisition position:** bounded evidence-assurance "
-            "workstream participant in a named team. Full-prime readiness is not claimed.",
+            "**Response posture:** bounded small-business component capability. "
+            "LumenCore is the sole respondent; no outside team is proposed; full-prime "
+            "readiness is not claimed.",
             "",
             "## 2. Understanding of the Requirement",
             "",
         ]
     )
     lines.extend(f"- {item}" for item in UNDERSTANDING_BULLETS)
-    lines.extend(["", "## 3. Task-by-Task Capability and Teaming Matrix", ""])
+    lines.extend(
+        [
+            "",
+            "## 3. Task-by-Task Capability and Gap Matrix",
+            "",
+            "This matrix distinguishes current first-party component capability from "
+            "work that has not been demonstrated. It does not assign any task to an "
+            "unnamed partner or represent another organization's authority.",
+            "",
+        ]
+    )
     lines.extend(
         table_markdown(
             ["Task", "Requirement", "Proposed position", "Bounded contribution"],
@@ -886,7 +893,17 @@ def build_markdown() -> None:
         f"{idx}. **{label}.** {text}"
         for idx, (label, text) in enumerate(WORKSTREAM_STEPS, start=1)
     )
-    lines.extend(["", "## 5. Component Evidence and Similar-Scope Status", ""])
+    lines.extend(
+        [
+            "",
+            "## 5. Component Evidence and Similar-Scope Status",
+            "",
+            "The named first-party records below are available for authorized review "
+            "after repository security screening. They are not presented as healthcare, "
+            "agency, field, or economic validation.",
+            "",
+        ]
+    )
     lines.extend(
         table_markdown(
             ["Evidence record", "What it supports", "What it does not support"],
@@ -897,9 +914,9 @@ def build_markdown() -> None:
         [
             "",
             "The notice requests experience of similar scope and complexity. The matrix "
-            "below distinguishes LumenCore component evidence from qualifications that "
-            "must come from an authorized team; adjacent technical work is not treated "
-            "as federal health prior performance.",
+            "below distinguishes LumenCore component evidence from material "
+            "qualifications that are not demonstrated; adjacent technical work is not "
+            "treated as federal health prior performance.",
             "",
         ]
     )
@@ -911,8 +928,36 @@ def build_markdown() -> None:
     )
     lines.extend(["", "## 6. Delivery and Security Approach", ""])
     lines.extend(f"- {item}" for item in SECURITY_BULLETS)
-    lines.extend(["", "## 7. Teaming Structure and Missing Qualifications", ""])
-    lines.extend(table_markdown(["Workstream", "Accountability", "Current gate"], TEAM_ROWS))
+    lines.extend(
+        [
+            "",
+            "**Current boundary:** the cited first-party artifacts are not an "
+            "HHS-authorized production system and do not establish an ATO, FHIR "
+            "certification, 3PAO assessment, or federal health deployment.",
+            "",
+            "## 7. Standalone Response and Capability Gaps",
+            "",
+        ]
+    )
+    lines.extend(
+        table_markdown(
+            ["Area", "Required or relevant capability", "Current status"],
+            CAPABILITY_GAP_ROWS,
+        )
+    )
+    lines.extend(
+        [
+            "",
+            "*Teaming status as of submission: LumenCore has not formed or been "
+            "authorized to represent a team for this response. No other organization "
+            "or individual is proposed as a team member. The rows above identify "
+            "capability gaps, not proposed or committed team members. LumenCore is open "
+            "to future acquisition or teaming discussions, but this response does not "
+            "represent another organization's commitment, qualifications, past "
+            "performance, or authority.*",
+            "",
+        ]
+    )
     lines.extend(["", "## 8. Illustrative Mobilization Plan", ""])
     lines.extend(table_markdown(["Period", "Illustrative outcome"], MOBILIZATION_ROWS))
     lines.extend(["", "## 9. Questions and Requested Next Step", ""])
@@ -920,9 +965,11 @@ def build_markdown() -> None:
     lines.extend(
         [
             "",
-            "**Requested next step:** include LumenCore in market-research or teaming "
-            "discussions where a qualified prime needs an inspectable evidence-assurance "
-            "workstream.",
+            "**Requested next step:** for acquisition planning, HHS may treat this "
+            "response as evidence of bounded small-business capacity in evidence "
+            "management and validation orchestration. If HHS conducts follow-up market "
+            "research, LumenCore is available to demonstrate the cited artifacts and "
+            "answer technical questions.",
             "",
             "> This response is for market research only and is not an offer, proposal, "
             "certification, or representation that every draft SOW task is presently covered.",

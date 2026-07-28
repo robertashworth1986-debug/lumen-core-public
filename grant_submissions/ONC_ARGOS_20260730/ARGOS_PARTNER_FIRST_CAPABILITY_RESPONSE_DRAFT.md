@@ -1,4 +1,4 @@
-# Project Argos Capability Statement - Bounded Teaming Response
+# Project Argos Capability Statement - Bounded Small-Business Response
 
 
 
@@ -10,7 +10,7 @@
 
 
 
-![Founder-selected LumaArc seal of approval](../../assets/brand/lumaarc_arc_seal_v1.png)
+![Founder-selected LumaArc brand mark](../../assets/brand/lumaarc_arc_seal_v1.png)
 
 
 
@@ -26,8 +26,6 @@
 
 | Responding legal entity | ACTION_TIME_PRIVATE_FACT_REQUIRED |
 
-| Seal | LumaArc seal of approval |
-
 | UEI / DUNS if applicable | ACTION_TIME_PRIVATE_FACT_REQUIRED |
 
 | Company address | ACTION_TIME_PRIVATE_FACT_REQUIRED |
@@ -38,23 +36,19 @@
 
 | Small-business designation(s) | ACTION_TIME_PRIVATE_FACT_REQUIRED |
 
-| Public reviewer surface | https://lumen-core.ai/ |
-
-| Public evidence repository | https://github.com/robertashworth1986-debug/lumen-core-public |
-
 
 
 ## 1. Executive Fit and Recommended Role
 
 
 
-LumenCore offers Project Argos a bounded evidence-assurance and deterministic-validation workstream: authorized-source custody, rule traceability, hash-locked evidence cases, human decision gates, adverse-result retention, and reviewer handoff. These are component capabilities supported by the public LumenCore repository and public reviewer surface.
+Based on named first-party software artifacts, LumenCore can demonstrate source-artifact custody, versioned rule execution, evidence-package assembly, human approval gates, adverse-result retention, and reproducible reviewer handoff. Evidence packages are accompanied by SHA-256 integrity manifests. These are bounded component capabilities, not comparable federal-health past performance.
 
-For Project Argos, those patterns align most directly with requirements traceability, public-source ingestion provenance, deterministic validator orchestration, evidence-case generation, corrective-action retest records, and production handoff documentation. LumenCore is responding at component level and does not claim presently qualified full-scope health IT prime readiness. A credible team still requires named FHIR R4/CHPL and ONC Certification Program expertise plus an HHS ATO/FIPS 199/security lead.
+For Project Argos, those patterns align most directly with requirements traceability, public-source ingestion provenance, deterministic validator orchestration, evidence-case generation, corrective-action retest records, and production handoff documentation. LumenCore is responding at component level and does not claim presently qualified full-scope health IT prime readiness, FHIR R4 conformance authority, HHS ATO leadership, or an evaluated health-domain deployment.
 
 
 
-**Recommended acquisition position:** bounded evidence-assurance workstream participant in a named team. Full-prime readiness is not claimed.
+**Response posture:** bounded small-business component capability. LumenCore is the sole respondent; no outside team is proposed; full-prime readiness is not claimed.
 
 
 
@@ -74,7 +68,11 @@ For Project Argos, those patterns align most directly with requirements traceabi
 
 
 
-## 3. Task-by-Task Capability and Teaming Matrix
+## 3. Task-by-Task Capability and Gap Matrix
+
+
+
+This matrix distinguishes current first-party component capability from work that has not been demonstrated. It does not assign any task to an unnamed partner or represent another organization's authority.
 
 
 
@@ -82,27 +80,27 @@ For Project Argos, those patterns align most directly with requirements traceabi
 
 | --- | --- | --- | --- |
 
-| 1 | Initiation, requirements, and regulatory traceability | Core contribution with partner review | Build a versioned requirements-to-test-to-evidence matrix; define evidence identifiers, severity fields, human checkpoints, decision rights, schedules, and change-control receipts. A health-regulatory lead must approve mappings to 45 CFR and ONC program practice. |
+| 1 | Initiation, requirements, and regulatory traceability | Partial capability | Build a versioned requirements-to-test-to-evidence matrix with evidence IDs, severity, human checkpoints, schedules, and change control. No complete 45 CFR or CHPL mapping or authorized regulatory interpretation is claimed. |
 
-| 2 | Monthly administrative reporting | Core contribution | Produce source-backed status reports with task progress, blockers, expected completion dates, evidence links, decisions, and unresolved gates. |
+| 2 | Monthly administrative reporting | Partial capability | Produce source-backed status, blockers, milestones, event timelines, evidence IDs, decisions, and unresolved gates. Comparable HHS reporting performance is not claimed. |
 
-| 3 | Public-source discovery and ingestion | Core contribution with FHIR partner | Implement source inventory, raw-response custody, timestamps, request metadata, hashes, lineage, precedence rules, data dictionaries, and reproducible normalized projections. Partner validates CHPL, Lantern, NPPES, and FHIR domain mappings. |
+| 3 | Public-source discovery and ingestion | Partial capability | Implement source inventory, raw-response custody, timestamps, headers, hashes, lineage, precedence, dictionaries, and normalized projections. CHPL, Lantern, NPPES, and FHIR connectors are not demonstrated. |
 
-| 4 | Agentic architecture and governance | Core contribution with security partner | Separate deterministic validators from AI support; version policies, prompts, rules, retries, rate limits, fallbacks, error handling, and audit logs; require human authorization for compliance determinations. |
+| 4 | Agentic architecture and governance | Partial capability | Separate deterministic validators from AI support; version policies, prompts, rules, retries, fallbacks, and audit logs; require human compliance decisions. No deployed health-domain architecture or secure HHS boundary is demonstrated. |
 
-| 5 | Publication and FHIR R4 conformance testing | Partner-led | LumenCore can wrap validator outputs in traceable evidence cases and regression receipts. A qualified FHIR/ONC partner must own standards interpretation, test design, and conformance acceptance. |
+| 5 | Publication and FHIR R4 conformance testing | Not demonstrated | Package supplied validator outputs as traceable evidence cases and regression receipts. No FHIR R4 test authority, quarterly operation, publication-failure detection, or conformance acceptance is claimed. |
 
-| 6 | Real-world endpoint observation | Partner-led with evidence support | Contribute safe-observation logging, scope controls, drift records, hashes, and replayable comparison artifacts. Partner owns health-endpoint semantics, Government-approved access boundaries, and PHI avoidance controls. |
+| 6 | Real-world endpoint observation | Not demonstrated | Contribute safe-observation logs, scope controls, drift records, hashes, and replay. Health-endpoint semantics, capability-sufficiency tests, published-versus-observed comparison, and approved access are not demonstrated. |
 
-| 7 | Evidence case generation and triage | Core contribution | Assemble raw and normalized artifacts, validator output, request/response logs, timestamps, hashes, severity, rule traceability, issue narratives, deduplication keys, and machine/human-readable exports. |
+| 7 | Evidence case generation and triage | Strongest partial capability | Assemble raw and normalized artifacts, logs, timestamps, hashes, severity, rule traceability, narratives, deduplication, screenshots, clustering, and human/machine exports. A designated HHS-system export remains unproven. |
 
-| 8 | Corrective-action workflow support | Core contribution with regulatory approval | Provide controlled draft, review, authorization, retest, and before/after evidence workflows. ONC/ONC-ACB discretion and regulatory interpretation stay with authorized personnel. |
+| 8 | Corrective-action workflow support | Partial capability | Provide controlled drafting, review, authorization, retest, before/after evidence, and recurrence fields. No ONC/ONC-ACB discretion or regulatory interpretation authority is claimed. |
 
-| 9 | HHS Authority to Operate | Security-partner-led | LumenCore can supply component inventories, reproducibility records, change receipts, evidence links, and control-test artifacts. The team requires an experienced HHS ATO/FIPS 199/SSP lead and authorized assessment support. |
+| 9 | HHS Authority to Operate | Not demonstrated | Supply component inventories, reproducibility and change receipts, evidence IDs, and control-test artifacts. No HHS ATO lead, FIPS 199/SSP delivery, 3PAO coordination, milestone reporting, or authorization package is claimed. |
 
-| 10 | Production-ready PPC release package | Core contribution with prime | Package code, dependency locks, manifests, runbooks, rollback procedures, limitations, test coverage, operating assumptions, costs, staffing needs, and reviewer receipts. Hosting and production acceptance remain prime/Government decisions. |
+| 10 | Production-ready PPC release package | Partial capability | Package code, dependency locks, manifests, runbooks, rollback, limitations, tests, assumptions, costs, staffing, and reviewer receipts. No HHS-deployable package, hosting approval, or production acceptance is demonstrated. |
 
-| 11 | Public-artifact assessment and FY 2027 strategy | Core contribution with domain partner | Extend the same traceability and evidence-case pattern to approved public documentation checks, prototype scoring only under locked criteria, and retain uncertainty and adverse findings in expansion recommendations. |
+| 11 | Public-artifact assessment and FY 2027 strategy | Partial capability | Apply traceability to approved public-document checks and locked prototype scoring. EHI/API criteria, controlling regulatory citations, and a validated FY 2027 strategy are not demonstrated. |
 
 
 
@@ -130,19 +128,23 @@ For Project Argos, those patterns align most directly with requirements traceabi
 
 
 
+The named first-party records below are available for authorized review after repository security screening. They are not presented as healthcare, agency, field, or economic validation.
+
+
+
 | Evidence record | What it supports | What it does not support |
 
 | --- | --- | --- |
 
-| Public reviewer capsule | 31 of 31 declared assertions and 3 of 3 suites reproduced in the packaged clean-run workflow, with dependency and source-state checks. | First-party bounded reproducibility only; not external validation, agency certification, field performance, or health IT past performance. |
+| First-party reproducibility package | A named package and SHA-256 receipt record successful execution of its declared checks under an identified source state. | First-party bounded reproducibility only; not external validation, agency certification, field performance, or health IT past performance. |
 
 | Custody and validation controls | Versioned manifests, SHA-256 receipts, schema checks, duplicate-action locks, and fail-closed gate records support an inspectable evidence workflow. | Control artifacts do not establish health-domain correctness, production authorization, contract performance, or agency acceptance. |
 
-| Adverse-result retention | Public records preserve failed promotion gates, negative findings, and unresolved authorities instead of converting them into favorable claims. | Transparent failure handling is an engineering pattern, not proof of FHIR conformance, regulatory interpretation, or field performance. |
+| Adverse-result retention | Named first-party records preserve failed promotion gates, negative findings, and unresolved authorities instead of converting them into favorable claims. | Transparent failure handling is an engineering pattern, not proof of FHIR conformance, regulatory interpretation, or field performance. |
 
 
 
-The notice requests experience of similar scope and complexity. The matrix below distinguishes LumenCore component evidence from qualifications that must come from an authorized team; adjacent technical work is not treated as federal health prior performance.
+The notice requests experience of similar scope and complexity. The matrix below distinguishes LumenCore component evidence from material qualifications that are not demonstrated; adjacent technical work is not treated as federal health prior performance.
 
 
 
@@ -150,13 +152,13 @@ The notice requests experience of similar scope and complexity. The matrix below
 
 | --- | --- | --- |
 
-| Evidence custody, traceability, and deterministic validation | Component pattern supported by public code, tests, receipts, and reviewer artifacts. | LumenCore can be evaluated for a bounded evidence-assurance workstream. |
+| Evidence custody, traceability, and deterministic validation | Component pattern supported by named first-party code, tests, receipts, and reviewer artifacts. | Available for authorized review after repository security screening. |
 
-| FHIR R4, CHPL/Lantern/NPPES, and ONC Certification Program delivery | No direct LumenCore prior-performance reference is claimed. | Named and authorized health IT/FHIR partner evidence is required. |
+| FHIR R4, CHPL/Lantern/NPPES, and ONC Certification Program delivery | No direct LumenCore prior-performance reference is claimed. | Future acquisition staffing or separately authorized teaming would be required; no outside team is proposed in this response. |
 
-| HHS ATO, FIPS 199, SSP/control implementation, and 3PAO coordination | No direct LumenCore HHS authorization reference is claimed. | Named and authorized federal cybersecurity lead and independent assessment path are required. |
+| HHS ATO, FIPS 199, SSP/control implementation, and 3PAO coordination | No direct LumenCore HHS authorization reference is claimed. | Future acquisition staffing or separately authorized teaming would be required; no ATO lead or assessor is proposed in this response. |
 
-| Full-scope federal health program integration | No full-prime readiness or comparable federal health delivery is claimed. | A qualified small-business prime or integrated team must own program delivery and provide relevant references. |
+| Full-scope federal health program integration | No full-prime readiness or comparable federal health delivery is claimed. | LumenCore should not be treated as a presently qualified full-scope prime. |
 
 
 
@@ -174,21 +176,31 @@ The notice requests experience of similar scope and complexity. The matrix below
 
 
 
-## 7. Teaming Structure and Missing Qualifications
+**Current boundary:** the cited first-party artifacts are not an HHS-authorized production system and do not establish an ATO, FHIR certification, 3PAO assessment, or federal health deployment.
 
 
 
-| Workstream | Accountability | Current gate |
+## 7. Standalone Response and Capability Gaps
+
+
+
+| Area | Required or relevant capability | Current status |
 
 | --- | --- | --- |
 
-| LumenCore evidence-assurance workstream | Source custody, deterministic validation orchestration, traceability, evidence cases, hashes, claim boundaries, reviewer packages, retest receipts. | Public repository evidence supports bounded reproducibility patterns. |
+| Response posture | LumenCore is the sole respondent. No teaming arrangement, joint venture, or subcontracting relationship is proposed. | No external proposed team members exist to identify. |
 
-| Health IT/FHIR and ONC program lead | CHPL/Lantern/NPPES semantics, FHIR R4 Endpoint/Organization/Bundle testing, ONC regulatory mapping, corrective-action content review. | Pending named and authorized partner |
+| Health IT/FHIR and ONC program authority | CHPL/Lantern/NPPES semantics, FHIR R4 Endpoint/Organization/Bundle testing, ONC regulatory mapping, corrective-action content review. | Capability gap disclosed; no person or organization is represented. |
 
-| Federal cybersecurity/ATO lead | HHS authorization boundary, FIPS 199, SSP, control implementation, assessment coordination, POA&M and authorization package. | Pending named and authorized partner |
+| Federal cybersecurity/ATO authority | HHS authorization boundary, FIPS 199, SSP, control implementation, assessment coordination, POA&M and authorization package. | Capability gap disclosed; no person or organization is represented. |
 
-| Prime/program integration lead | Contract performance, staffing, Government coordination, hosting, delivery acceptance, health-domain prior performance, and integrated schedule. | Pending named and authorized partner |
+| Comparable full-program delivery | Contract performance, staffing, Government coordination, hosting, delivery acceptance, health-domain prior performance, and integrated schedule. | Not demonstrated and not claimed. |
+
+
+
+*Teaming status as of submission: LumenCore has not formed or been authorized to represent a team for this response. No other organization or individual is proposed as a team member. The rows above identify capability gaps, not proposed or committed team members. LumenCore is open to future acquisition or teaming discussions, but this response does not represent another organization's commitment, qualifications, past performance, or authority.*
+
+
 
 
 
@@ -200,7 +212,7 @@ The notice requests experience of similar scope and complexity. The matrix below
 
 | --- | --- |
 
-| 0-30 days | Confirm team, scope, source authorization, regulatory ownership, hosting assumptions, traceability schema, security boundary, and pilot cohort. |
+| 0-30 days | Confirm scope, source authorization, regulatory ownership, hosting assumptions, traceability schema, security boundary, and pilot cohort. |
 
 | 31-90 days | Stand up bounded ingestion, lineage, deterministic validator interfaces, evidence-case schema, human work queue, baseline test corpus, and audit logs. |
 
@@ -220,13 +232,13 @@ The notice requests experience of similar scope and complexity. The matrix below
 
 3. Will HHS provide an approved source list, rate-limit policy, synthetic test corpus, and expected evidence-case export schema?
 
-4. Is HHS seeking one full-scope prime, or would it value clearly bounded small-business teaming responses for evidence assurance, FHIR validation, and ATO workstreams?
+4. Which deliverables define the minimum viable first acquisition phase, and may HHS evaluate a bounded small-business contribution separately from full-scope prime readiness?
 
 5. What existing HHS authorization boundary, reusable controls, continuous-monitoring services, or 3PAO arrangements may be available to the PPC?
 
 
 
-**Requested next step:** include LumenCore in market-research or teaming discussions where a qualified prime needs an inspectable evidence-assurance workstream.
+**Requested next step:** for acquisition planning, HHS may treat this response as evidence of bounded small-business capacity in evidence management and validation orchestration. If HHS conducts follow-up market research, LumenCore is available to demonstrate the cited artifacts and answer technical questions.
 
 
 

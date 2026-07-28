@@ -12,6 +12,10 @@ historical planning artifact, not a current send instruction. Before considering
 any fallback, recheck the full mailbox and rebuild a route-specific,
 single-use action packet.
 
+**Current Government-response posture:** standalone. Teaming is permitted but
+not required. No fallback partner outreach is needed to submit the truthful
+standalone response, and no outreach in this file should delay that response.
+
 ## 1. Primary Route - EMI Advisors
 
 **Use:** Historical primary route. Sent once; do not resend. EMI Advisors
@@ -150,6 +154,7 @@ Founder, LumenCore
 - Primary route and fallback route are not sent in parallel by default.
 - Candidate identification is not authorization to name a partner in the HHS
   response.
-- A Government response is not sent until private cover facts, authorized team
-  roles, relevant references, rendered-file QA, duplicate checks, and exact
-  action-time approval all pass.
+- A Government response is not sent until private cover facts, response-mode
+  consistency, rendered-file QA, duplicate checks, and exact action-time
+  approval all pass. Written team authority is additionally required only if
+  the response is deliberately changed from standalone to teamed.
