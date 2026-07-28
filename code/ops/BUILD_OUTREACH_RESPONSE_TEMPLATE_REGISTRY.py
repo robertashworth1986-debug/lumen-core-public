@@ -181,6 +181,12 @@ CLAIM_RISK_PATTERNS = {
     ),
     "UNSUPPORTED_EXTERNAL_VALIDATION": re.compile(
         r"\b(?:independently|externally)\s+"
+        r"(?:reproduced|validated|verified)\b|"
+        r"\b(?:reproduced|validated|verified)\s+by\s+(?:an?\s+)?"
+        r"(?:independent|external)\s+"
+        r"(?:reviewer|third[- ]party|evaluator|auditor)\b|"
+        r"\b(?:independent|external)\s+"
+        r"(?:reviewer|third[- ]party|evaluator|auditor)\s+"
         r"(?:reproduced|validated|verified)\b",
         re.IGNORECASE,
     ),
@@ -192,18 +198,34 @@ CLAIM_RISK_PATTERNS = {
     "UNSUPPORTED_ECONOMIC_OUTCOME": re.compile(
         r"\b(?:realized|validated|proven)\s+(?:annual\s+)?savings\b|"
         r"\bwill save\b|\bsaved\s+\$|"
+        r"\b(?:saved|will save|reduces?|reduced)\s+(?:the\s+)?"
+        r"(?:agency|customer|client|operator|organization|government)\s+"
+        r"\$[\d,.]+\s*(?:million|billion|m|b)?\b|"
+        r"\breduced\s+(?:annual\s+)?costs?\s+by\s+"
+        r"(?:\d+(?:\.\d+)?%|\$[\d,.]+\s*(?:million|billion|m|b)?)\b|"
         r"\$[\d,.]+\s*(?:million|billion|m|b)?\s+"
         r"(?:in\s+)?(?:annual\s+)?(?:savings|value)\b",
         re.IGNORECASE,
     ),
     "UNSUPPORTED_AGENCY_ACCEPTANCE": re.compile(
         r"\b(?:government|federal|agency)[- ](?:approved|accepted)\b|"
-        r"\baccepted by (?:darpa|dod|doe|nasa|nsf|epri|lanl)\b",
+        r"\b(?:accepted|approved|endorsed)\s+by\s+(?:the\s+)?"
+        r"(?:darpa|dod|doe|nasa|nsf|epri|lanl|government|"
+        r"federal government|agency)\b|"
+        r"\b(?:darpa|dod|doe|nasa|nsf|epri|lanl|government|"
+        r"federal government|agency)\s+(?:has\s+)?"
+        r"(?:approved|accepted|endorsed)\b",
         re.IGNORECASE,
     ),
     "UNSUPPORTED_AWARD_OR_CONTRACT": re.compile(
-        r"\b(?:won|received|awarded)\s+(?:an?\s+)?"
-        r"(?:grant|contract|award)\b",
+        r"\b(?:won|received|secured)\s+(?:an?\s+)?(?:federal\s+)?"
+        r"(?:grant|contract|award)\b|"
+        r"\bawarded\s+(?:(?:us|the\s+(?:company|team|project|platform))\s+)?"
+        r"(?:an?\s+)?(?:federal\s+)?(?:grant|contract|award)\b|"
+        r"\bselected\s+for\s+(?:an?\s+)?"
+        r"(?:grant|contract|award|funding)\b|"
+        r"\b(?:darpa|dod|doe|nasa|nsf|epri|lanl|government|"
+        r"federal government|agency)\s+(?:has\s+)?(?:awarded|funded)\b",
         re.IGNORECASE,
     ),
     "UNSUPPORTED_CUSTOMER_TRACTION": re.compile(
@@ -211,8 +233,9 @@ CLAIM_RISK_PATTERNS = {
         re.IGNORECASE,
     ),
     "UNSUPPORTED_BASELINE_SUPERIORITY": re.compile(
-        r"\b(?:outperforms?|beats?)\s+"
-        r"(?:all|every|the incumbent|the baseline)\b",
+        r"\b(?:outperform(?:s|ed|ing)?|beat(?:s|ing)?)\s+"
+        r"(?:all|every|the incumbent|the baseline|"
+        r"(?:the\s+)?(?:accepted|named|incumbent)\s+baseline)\b",
         re.IGNORECASE,
     ),
 }
@@ -292,7 +315,9 @@ ACTION_TIME_DISPATCH_HANDOFF_FIELDS = {
     "status",
 }
 DIRECT_CLAIM_NEGATION_SUFFIX_RE = re.compile(
-    r"\b(?:no|not|never|without|unverified|unproven)"
+    r"\b(?:(?:is|are|was|were|has|have|had)\s+"
+    r"(?:not|never)(?:\s+been)?|"
+    r"no|not|never|without|unverified|unproven)"
     r"(?:\s+(?:currently|yet|current|any|a|an|the|credible|reported|"
     r"documented|evidence|of)){0,2}\s*$",
     re.IGNORECASE,
@@ -690,19 +715,24 @@ def claim_fact_risks(facts: dict[str, Any]) -> dict[str, list[str]]:
             continue
         if not isinstance(raw_value, str) or not raw_value.strip():
             continue
-        normalized_value = security_normalize_text(raw_value)
-        codes = []
-        for code, pattern in CLAIM_RISK_PATTERNS.items():
-            matches = [
-                match
-                for match in pattern.finditer(normalized_value)
-                if not _assertion_is_negated(normalized_value, match.start())
-            ]
-            if matches:
-                codes.append(code)
+        codes = claim_text_risk_codes(raw_value)
         if codes:
-            risks[field] = sorted(codes)
+            risks[field] = codes
     return dict(sorted(risks.items()))
+
+
+def claim_text_risk_codes(text: str) -> list[str]:
+    normalized_value = security_normalize_text(text)
+    codes = []
+    for code, pattern in CLAIM_RISK_PATTERNS.items():
+        matches = [
+            match
+            for match in pattern.finditer(normalized_value)
+            if not _assertion_is_negated(normalized_value, match.start())
+        ]
+        if matches:
+            codes.append(code)
+    return sorted(codes)
 
 
 def validate_claim_evidence_receipt(
@@ -862,6 +892,9 @@ def template_quality_profile(row: dict[str, Any]) -> dict[str, Any]:
         "template_text_has_no_unsafe_unicode": not (
             unsafe_text_reasons(row["subject"], allow_line_breaks=False)
             or unsafe_text_reasons(row["body"], allow_line_breaks=True)
+        ),
+        "template_text_has_no_unsupported_claims": not claim_text_risk_codes(
+            row["subject"] + "\n" + row["body"]
         ),
         "template_text_is_within_render_limits": (
             len(row["subject"]) <= MAX_RENDERED_SUBJECT_CHARS
@@ -1357,11 +1390,24 @@ def render_response(
         )
         return result
 
-    lowered = security_normalize_text(subject + "\n" + body).lower()
+    rendered_text = subject + "\n" + body
+    lowered = security_normalize_text(rendered_text).lower()
     unsupported_claim_markers = sorted(
         marker for marker in POSITIVE_CLAIM_MARKERS if marker in lowered
     )
-    if unsupported_claim_markers:
+    rendered_claim_risk_codes = claim_text_risk_codes(rendered_text)
+    evidence_authorized_claim_risk_codes = sorted(
+        {
+            code
+            for field in evidence_receipt_sha256s
+            for code in fact_risks.get(field, [])
+        }
+    )
+    unsupported_rendered_claim_risk_codes = sorted(
+        set(rendered_claim_risk_codes)
+        - set(evidence_authorized_claim_risk_codes)
+    )
+    if unsupported_claim_markers or unsupported_rendered_claim_risk_codes:
         result = _base_result(
             payload, row, "BLOCKED_UNSUPPORTED_RENDERED_CLAIM", deadline
         )
@@ -1372,6 +1418,12 @@ def render_response(
                 "body": None,
                 "missing_fields": [],
                 "unsupported_claim_markers": unsupported_claim_markers,
+                "unsupported_claim_risk_codes": (
+                    unsupported_rendered_claim_risk_codes
+                ),
+                "evidence_authorized_claim_risk_codes": (
+                    evidence_authorized_claim_risk_codes
+                ),
             }
         )
         return result
@@ -2395,6 +2447,9 @@ def build_public_payload(
             "rendered_subject_header_injection_fail_closed": True,
             "rendered_length_limits_fail_closed": True,
             "rendered_fact_claim_guard_fail_closed": True,
+            "static_template_full_claim_taxonomy_fail_closed": True,
+            "rendered_full_claim_taxonomy_fail_closed": True,
+            "evidence_authorized_claim_codes_explicitly_bounded": True,
             "unicode_nfkd_claim_scan": True,
             "unicode_format_character_fail_closed": True,
             "mixed_script_confusable_fail_closed": True,
@@ -2493,6 +2548,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Missing-fact gate: `FAIL_CLOSED`",
         "- Past-deadline gate: `FAIL_CLOSED`",
         "- Inserted-fact claim gate: `FAIL_CLOSED`",
+        "- Static-template full claim taxonomy: `FAIL_CLOSED`",
+        "- Rendered-output full claim taxonomy: `FAIL_CLOSED`",
+        "- Evidence-authorized rendered claim codes: `EXPLICITLY_BOUNDED`",
         "- Unicode format-character gate: `FAIL_CLOSED`",
         "- Mixed-script confusable gate: `FAIL_CLOSED`",
         "- Claim scan normalization: `UNICODE_NFKD_DIACRITIC_FOLD`",

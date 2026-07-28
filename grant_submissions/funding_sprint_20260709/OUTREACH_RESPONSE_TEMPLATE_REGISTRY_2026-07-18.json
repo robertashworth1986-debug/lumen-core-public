@@ -31,6 +31,7 @@
     "draft_binding_is_not_send_authorization": true,
     "duplicate_json_key_fail_closed": true,
     "duplicate_send_fail_closed": true,
+    "evidence_authorized_claim_codes_explicitly_bounded": true,
     "exact_approval_expires": true,
     "exact_approval_phrase_is_binding_scoped": true,
     "guarantee_and_superlative_claims_never_authorizable": true,
@@ -52,10 +53,12 @@
     "recipient_route_and_source_thread_hash_bound": true,
     "rendered_deadline_matches_evaluated_deadline": true,
     "rendered_fact_claim_guard_fail_closed": true,
+    "rendered_full_claim_taxonomy_fail_closed": true,
     "rendered_length_limits_fail_closed": true,
     "rendered_subject_header_injection_fail_closed": true,
     "single_use_action_time_binding": true,
     "source_config_hash_cross_platform_canonical_json": true,
+    "static_template_full_claim_taxonomy_fail_closed": true,
     "subject_body_deadline_and_attachment_set_hash_bound": true,
     "unchanged_rebuild_byte_stable": true,
     "unicode_format_character_fail_closed": true,
@@ -80,7 +83,7 @@
   "private_render_template_count": 12,
   "quality_gate": {
     "all_templates_pass": true,
-    "check_count": 238,
+    "check_count": 255,
     "deadline_control_template_ids": [
       "COMPONENT_INSTRUCTION_ESCALATION",
       "INITIAL_PARTNER_TEAMING_INQUIRY",
@@ -105,6 +108,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -128,6 +132,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -151,6 +156,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -174,6 +180,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": true,
@@ -197,6 +204,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -220,6 +228,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -243,6 +252,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -266,6 +276,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": true,
@@ -289,6 +300,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -312,6 +324,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -337,6 +350,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -360,6 +374,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -386,6 +401,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": true,
@@ -413,6 +429,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -436,6 +453,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -459,6 +477,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -482,6 +501,7 @@
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
           "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,

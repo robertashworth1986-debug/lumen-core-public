@@ -7,6 +7,9 @@
 - Missing-fact gate: `FAIL_CLOSED`
 - Past-deadline gate: `FAIL_CLOSED`
 - Inserted-fact claim gate: `FAIL_CLOSED`
+- Static-template full claim taxonomy: `FAIL_CLOSED`
+- Rendered-output full claim taxonomy: `FAIL_CLOSED`
+- Evidence-authorized rendered claim codes: `EXPLICITLY_BOUNDED`
 - Unicode format-character gate: `FAIL_CLOSED`
 - Mixed-script confusable gate: `FAIL_CLOSED`
 - Claim scan normalization: `UNICODE_NFKD_DIACRITIC_FOLD`
@@ -34,7 +37,7 @@
 - Canonical consumption directory: `REQUIRED_FOR_HANDOFF`
 - Consumption receipt filename: `DISPATCH_BINDING_SHA256`
 - Static quality gate: `PASS`
-- Static quality checks: `238`
+- Static quality checks: `255`
 - Unchanged rebuilds byte-stable: `true`
 
 ## Claim Boundary

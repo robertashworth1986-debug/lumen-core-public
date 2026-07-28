@@ -495,7 +495,7 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["quality_gate"]["status"] == "PASS"
     assert payload["quality_gate"]["all_templates_pass"] is True
     assert payload["quality_gate"]["template_count"] == 17
-    assert payload["quality_gate"]["check_count"] == 238
+    assert payload["quality_gate"]["check_count"] == 255
     assert payload["quality_gate"]["deadline_control_template_ids"] == [
         "COMPONENT_INSTRUCTION_ESCALATION",
         "INITIAL_PARTNER_TEAMING_INQUIRY",
@@ -511,6 +511,20 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["controls"]["public_url_requires_https_without_credentials"] is True
     assert payload["controls"]["rendered_subject_header_injection_fail_closed"] is True
     assert payload["controls"]["rendered_fact_claim_guard_fail_closed"] is True
+    assert (
+        payload["controls"]["static_template_full_claim_taxonomy_fail_closed"]
+        is True
+    )
+    assert (
+        payload["controls"]["rendered_full_claim_taxonomy_fail_closed"]
+        is True
+    )
+    assert (
+        payload["controls"][
+            "evidence_authorized_claim_codes_explicitly_bounded"
+        ]
+        is True
+    )
     assert payload["controls"]["unicode_nfkd_claim_scan"] is True
     assert payload["controls"]["unicode_format_character_fail_closed"] is True
     assert payload["controls"]["mixed_script_confusable_fail_closed"] is True
@@ -654,6 +668,11 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["source_config_hash_basis"] == "SORTED_COMPACT_JSON_UTF8"
     assert "Duplicate-send gate: `FAIL_CLOSED`" in markdown
     assert "Inserted-fact claim gate: `FAIL_CLOSED`" in markdown
+    assert "Static-template full claim taxonomy: `FAIL_CLOSED`" in markdown
+    assert "Rendered-output full claim taxonomy: `FAIL_CLOSED`" in markdown
+    assert "Evidence-authorized rendered claim codes: `EXPLICITLY_BOUNDED`" in (
+        markdown
+    )
     assert "Unicode format-character gate: `FAIL_CLOSED`" in markdown
     assert "Mixed-script confusable gate: `FAIL_CLOSED`" in markdown
     assert (
@@ -750,6 +769,82 @@ def test_quality_gate_rejects_unused_and_overlapping_field_declarations():
     template["required_fields"].append("recipient_email")
     with pytest.raises(module.OutreachRegistryError, match="QUALITY_GATE_FAILED"):
         module.validate_registry(broken)
+
+
+@pytest.mark.parametrize(
+    ("claim_text", "expected_code"),
+    [
+        ("We won a federal grant.", "UNSUPPORTED_AWARD_OR_CONTRACT"),
+        ("DARPA approved our system.", "UNSUPPORTED_AGENCY_ACCEPTANCE"),
+        (
+            "The model outperformed the baseline.",
+            "UNSUPPORTED_BASELINE_SUPERIORITY",
+        ),
+        (
+            "An independent third party validated performance.",
+            "UNSUPPORTED_EXTERNAL_VALIDATION",
+        ),
+        (
+            "The deployment saved the agency $10 million.",
+            "UNSUPPORTED_ECONOMIC_OUTCOME",
+        ),
+    ],
+)
+def test_static_template_full_claim_taxonomy_fails_closed(
+    claim_text, expected_code
+):
+    module = load_module()
+    registry = module.read_registry(CONFIG)
+    broken = copy.deepcopy(registry)
+    template = next(
+        row
+        for row in broken["templates"]
+        if row["template_id"] == "REQUESTED_INFORMATION_REPLY"
+    )
+    template["body"] = template["body"].replace(
+        "Best regards,",
+        f"{claim_text}\n\nBest regards,",
+    )
+
+    assert module.claim_text_risk_codes(claim_text) == [expected_code]
+    with pytest.raises(
+        module.OutreachRegistryError,
+        match="template_text_has_no_unsupported_claims",
+    ):
+        module.validate_registry(broken)
+
+
+def test_rendered_cross_boundary_claim_fails_closed():
+    module = load_module()
+    registry = module.read_registry(CONFIG)
+    modified = copy.deepcopy(registry)
+    template = next(
+        row
+        for row in modified["templates"]
+        if row["template_id"] == "REQUESTED_INFORMATION_REPLY"
+    )
+    template["body"] = template["body"].replace(
+        "{requested_information}",
+        "DARPA {requested_information}",
+    )
+    module.validate_registry(modified)
+    facts = common_facts()
+    facts["requested_information"] = "approved our system."
+
+    blocked = module.render_response(
+        "REQUESTED_INFORMATION_REPLY",
+        facts,
+        registry=modified,
+    )
+
+    assert blocked["status"] == "BLOCKED_UNSUPPORTED_RENDERED_CLAIM"
+    assert blocked["unsupported_claim_markers"] == []
+    assert blocked["unsupported_claim_risk_codes"] == [
+        "UNSUPPORTED_AGENCY_ACCEPTANCE"
+    ]
+    assert blocked["evidence_authorized_claim_risk_codes"] == []
+    assert blocked["subject"] is None
+    assert blocked["body"] is None
 
 
 def test_known_deadlines_urls_and_rendered_subjects_fail_closed():
@@ -1511,6 +1606,9 @@ def test_high_risk_inserted_claims_require_exact_evidence_receipts():
 
 def test_explicitly_negated_claim_boundaries_do_not_trigger_claim_gate():
     module = load_module()
+    assert module.claim_text_risk_codes(
+        "The current evidence has not been independently reproduced."
+    ) == []
     facts = direct_investor_facts()
     facts["current_stage_disclosure"] = (
         "The work is not independently validated, and no realized savings "
