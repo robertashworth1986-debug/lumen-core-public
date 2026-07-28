@@ -45,7 +45,7 @@
   "private_render_template_count": 12,
   "quality_gate": {
     "all_templates_pass": true,
-    "check_count": 192,
+    "check_count": 204,
     "deadline_control_template_ids": [
       "COMPONENT_INSTRUCTION_ESCALATION",
       "INITIAL_PARTNER_TEAMING_INQUIRY",
@@ -53,7 +53,7 @@
     ],
     "https_public_url_field_count": 6,
     "status": "PASS",
-    "template_count": 16,
+    "template_count": 17,
     "template_results": [
       {
         "checks": {
@@ -75,6 +75,27 @@
         "https_public_url_fields": [],
         "status": "PASS",
         "template_id": "NO_DUPLICATE_MONITOR"
+      },
+      {
+        "checks": {
+          "all_required_fields_are_rendered": true,
+          "all_routing_fields_are_sensitive": true,
+          "field_declarations_are_disjoint": true,
+          "field_lists_have_no_duplicates": true,
+          "known_deadline_uses_single_structured_value": true,
+          "monitor_template_is_content_free": true,
+          "nonrouting_sensitive_fields_force_private_render": true,
+          "sendable_identity_fields_are_required": true,
+          "sendable_recipient_route_is_required": true,
+          "sendable_template_has_greeting_and_signature": true,
+          "template_subject_is_single_line": true,
+          "template_text_is_within_render_limits": true
+        },
+        "deadline_iso_control_required": false,
+        "failed_checks": [],
+        "https_public_url_fields": [],
+        "status": "PASS",
+        "template_id": "NO_DUPLICATE_MEETING_PREP"
       },
       {
         "checks": {
@@ -405,15 +426,15 @@
   "schema": "lumencore.outreach_response_template_registry.v1",
   "send_policy_counts": {
     "HUMAN_ACTION_DUE": 9,
-    "MONITOR_NO_SEND": 1,
+    "MONITOR_NO_SEND": 2,
     "REPLY_AFTER_FACT_REVIEW": 6
   },
   "source_config": "config/outreach_response_templates_v1.json",
   "source_config_hash_basis": "SORTED_COMPACT_JSON_UTF8",
-  "source_config_sha256": "776B96677CECAAF89CE99071A948BD099C5B9D4B55370A66D2D8FA3E2801D79D",
+  "source_config_sha256": "CBE13CCC77BAFA44F75394970DFB80FEA5BA17D67665A486892A4B6CFF6372E3",
   "source_effective_utc": "2026-07-25T22:53:44Z",
   "source_schema": "lumencore.outreach_response_templates.v1",
-  "template_count": 16,
+  "template_count": 17,
   "templates": [
     {
       "attachment_policy": "NONE",
@@ -439,6 +460,29 @@
       "sensitive_fields": [],
       "subject": "",
       "template_id": "NO_DUPLICATE_MONITOR"
+    },
+    {
+      "attachment_policy": "NONE",
+      "body": "",
+      "description": "Use when one calendar invitation already exists and the meeting is confirmed or accepted; prepare evidence and monitor the existing event without sending another reply or invitation.",
+      "inbound_states": [
+        "MEETING_CONFIRMED",
+        "CALENDAR_INVITE_ACCEPTED",
+        "MEETING_PREP_DUE"
+      ],
+      "optional_defaults": {},
+      "private_render_only": false,
+      "reply_triggers": [
+        "SCHEDULE_CHANGE",
+        "NEW_MEETING_QUESTION",
+        "ATTENDANCE_PROBLEM"
+      ],
+      "required_fields": [],
+      "routing_fields": [],
+      "send_policy": "MONITOR_NO_SEND",
+      "sensitive_fields": [],
+      "subject": "",
+      "template_id": "NO_DUPLICATE_MEETING_PREP"
     },
     {
       "attachment_policy": "NONE",

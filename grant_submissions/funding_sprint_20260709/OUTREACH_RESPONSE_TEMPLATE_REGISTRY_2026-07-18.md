@@ -1,6 +1,6 @@
 # Outreach Response Template Registry - 2026-07-18
 
-- Templates: `16`
+- Templates: `17`
 - Private-render templates: `12`
 - Builder can send email: `false`
 - Duplicate-send gate: `FAIL_CLOSED`
@@ -12,7 +12,7 @@
 - Attachment content required for exact approval: `true`
 - Exact approval phrase: `BINDING_SCOPED`
 - Static quality gate: `PASS`
-- Static quality checks: `192`
+- Static quality checks: `204`
 - Unchanged rebuilds byte-stable: `true`
 
 ## Claim Boundary
@@ -44,6 +44,7 @@ This response is a communication or routing artifact. It does not establish sele
 | Template | Send policy | Attachment policy | Private render |
 |---|---|---|---:|
 | `NO_DUPLICATE_MONITOR` | `MONITOR_NO_SEND` | `NONE` | `false` |
+| `NO_DUPLICATE_MEETING_PREP` | `MONITOR_NO_SEND` | `NONE` | `false` |
 | `DEADLINE_CLARIFICATION` | `HUMAN_ACTION_DUE` | `NONE` | `false` |
 | `PORTAL_SUPPORT_DEADLINE_RESCUE` | `HUMAN_ACTION_DUE` | `EXPLICIT_REQUEST_ONLY` | `true` |
 | `REQUESTED_INFORMATION_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `true` |
@@ -66,6 +67,16 @@ Use after a receipt, out-of-office notice, completed answer, or final decline wh
 
 - Inbound states: `RECEIPT_CONFIRMED, OUT_OF_OFFICE, ALREADY_ANSWERED, DECLINE_FINAL`
 - Reply triggers: `NEW_FACT_REQUEST, CORRECTION_REQUEST, MOU_RECEIVED, PORTAL_INSTRUCTION`
+- Required fields: `none`
+
+No message is rendered. Monitor the thread and do not duplicate-send.
+
+## NO_DUPLICATE_MEETING_PREP
+
+Use when one calendar invitation already exists and the meeting is confirmed or accepted; prepare evidence and monitor the existing event without sending another reply or invitation.
+
+- Inbound states: `MEETING_CONFIRMED, CALENDAR_INVITE_ACCEPTED, MEETING_PREP_DUE`
+- Reply triggers: `SCHEDULE_CHANGE, NEW_MEETING_QUESTION, ATTENDANCE_PROBLEM`
 - Required fields: `none`
 
 No message is rendered. Monitor the thread and do not duplicate-send.

@@ -1,0 +1,397 @@
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+from typing import Any
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlsplit
+from urllib.request import Request, urlopen
+
+
+ROOT = Path(__file__).resolve().parents[2]
+CONFIG = ROOT / "config" / "external_technical_review_packet_v1.json"
+TEMPLATE_CONFIG = ROOT / "config" / "outreach_response_templates_v1.json"
+JSON_OUT = ROOT / "dashboard" / "data" / "external_technical_review_packet.json"
+MD_OUT = ROOT / "docs" / "EXTERNAL_TECHNICAL_REVIEW_PACKET_2026-07-28.md"
+
+CONFIG_SCHEMA = "lumencore.external_technical_review_packet_config.v1"
+OUTPUT_SCHEMA = "lumencore.external_technical_review_packet.v1"
+
+
+class ReviewPacketError(ValueError):
+    pass
+
+
+def read_json(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ReviewPacketError(f"EXPECTED_OBJECT:{path}")
+    return payload
+
+
+def canonical_sha256(payload: Any) -> str:
+    encoded = json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def safe_repo_path(value: str) -> Path:
+    relative = Path(value)
+    if relative.is_absolute() or ".." in relative.parts:
+        raise ReviewPacketError(f"UNSAFE_EVIDENCE_PATH:{value}")
+    resolved = (ROOT / relative).resolve()
+    if ROOT.resolve() not in resolved.parents:
+        raise ReviewPacketError(f"EVIDENCE_PATH_OUTSIDE_REPO:{value}")
+    return resolved
+
+
+def validate_https_url(value: str) -> None:
+    parsed = urlsplit(value)
+    if (
+        parsed.scheme != "https"
+        or not parsed.netloc
+        or parsed.username
+        or parsed.password
+        or parsed.fragment
+    ):
+        raise ReviewPacketError(f"UNSAFE_PUBLIC_URL:{value}")
+
+
+def _nonempty_list(payload: dict[str, Any], key: str) -> list[Any]:
+    value = payload.get(key)
+    if not isinstance(value, list) or not value:
+        raise ReviewPacketError(f"MISSING_NONEMPTY_LIST:{key}")
+    return value
+
+
+def validate_config(config: dict[str, Any]) -> dict[str, Any]:
+    if config.get("schema") != CONFIG_SCHEMA:
+        raise ReviewPacketError("CONFIG_SCHEMA_INVALID")
+    if config.get("status") != "MEETING_PREP_READY_NO_DUPLICATE_SEND":
+        raise ReviewPacketError("CONFIG_STATUS_INVALID")
+    if not str(config.get("generated_at_utc") or "").endswith("Z"):
+        raise ReviewPacketError("GENERATED_AT_MUST_BE_UTC")
+    if not str(config.get("claim_boundary") or "").strip():
+        raise ReviewPacketError("CLAIM_BOUNDARY_MISSING")
+
+    controls = config.get("controls")
+    expected_controls = {
+        "builder_can_send_email": False,
+        "builder_can_create_calendar_event": False,
+        "builder_can_accept_terms": False,
+        "duplicate_invite_prohibited": True,
+        "meeting_credentials_omitted": True,
+        "recipient_identity_omitted": True,
+        "private_identifiers_omitted": True,
+    }
+    if controls != expected_controls:
+        raise ReviewPacketError("CONTROL_SET_INVALID")
+
+    meeting = config.get("meeting")
+    if not isinstance(meeting, dict):
+        raise ReviewPacketError("MEETING_MISSING")
+    if meeting.get("invite_state") != "ACCEPTED":
+        raise ReviewPacketError("MEETING_NOT_ACCEPTED")
+    if meeting.get("selected_template_id") != "NO_DUPLICATE_MEETING_PREP":
+        raise ReviewPacketError("MEETING_TEMPLATE_INVALID")
+    if meeting.get("duration_minutes") != 30:
+        raise ReviewPacketError("MEETING_DURATION_INVALID")
+
+    templates = read_json(TEMPLATE_CONFIG).get("templates")
+    selected = next(
+        (
+            row
+            for row in templates
+            if row.get("template_id") == meeting["selected_template_id"]
+        ),
+        None,
+    )
+    if (
+        selected is None
+        or selected.get("send_policy") != "MONITOR_NO_SEND"
+        or selected.get("subject") != ""
+        or selected.get("body") != ""
+    ):
+        raise ReviewPacketError("MEETING_TEMPLATE_NOT_FAIL_CLOSED")
+
+    for surface in _nonempty_list(config, "public_surfaces"):
+        if not isinstance(surface, dict):
+            raise ReviewPacketError("PUBLIC_SURFACE_INVALID")
+        validate_https_url(str(surface.get("url") or ""))
+        if not isinstance(surface.get("observed_http_status"), int):
+            raise ReviewPacketError("PUBLIC_SURFACE_STATUS_INVALID")
+        if not str(surface.get("verified_at_utc") or "").endswith("Z"):
+            raise ReviewPacketError("PUBLIC_SURFACE_TIME_INVALID")
+        if not str(surface.get("limitation") or "").strip():
+            raise ReviewPacketError("PUBLIC_SURFACE_LIMITATION_MISSING")
+
+    for reference in _nonempty_list(config, "draft_references"):
+        validate_https_url(str(reference.get("url") or ""))
+        if reference.get("state") != "DRAFT_PR_NOT_MERGED":
+            raise ReviewPacketError("DRAFT_REFERENCE_STATE_INVALID")
+
+    for key in (
+        "evidence_assets",
+        "agenda",
+        "reviewer_questions",
+        "bounded_next_steps",
+        "known_gaps",
+        "claims_not_to_make",
+        "note_capture_fields",
+    ):
+        _nonempty_list(config, key)
+    return config
+
+
+def evidence_record(item: dict[str, Any]) -> dict[str, Any]:
+    relative = str(item.get("path") or "")
+    path = safe_repo_path(relative)
+    if not path.is_file():
+        raise ReviewPacketError(f"EVIDENCE_MISSING:{relative}")
+    record: dict[str, Any] = {
+        "path": relative,
+        "purpose": str(item.get("purpose") or ""),
+        "bytes": path.stat().st_size,
+        "sha256": sha256_file(path),
+        "required_status": item.get("required_status"),
+        "observed_status": None,
+        "claim_boundary": None,
+    }
+    if item.get("required_status"):
+        payload = read_json(path)
+        record["observed_status"] = payload.get("status")
+        record["claim_boundary"] = payload.get("claim_boundary")
+        if record["observed_status"] != item["required_status"]:
+            raise ReviewPacketError(f"EVIDENCE_STATUS_MISMATCH:{relative}")
+        if not str(record["claim_boundary"] or "").strip():
+            raise ReviewPacketError(f"EVIDENCE_BOUNDARY_MISSING:{relative}")
+    return record
+
+
+def build_payload(config: dict[str, Any]) -> dict[str, Any]:
+    config = validate_config(config)
+    evidence = [evidence_record(item) for item in config["evidence_assets"]]
+    return {
+        "schema": OUTPUT_SCHEMA,
+        "generated_at_utc": config["generated_at_utc"],
+        "status": config["status"],
+        "source_config": CONFIG.relative_to(ROOT).as_posix(),
+        "source_config_sha256": canonical_sha256(config),
+        "template_config_sha256": canonical_sha256(read_json(TEMPLATE_CONFIG)),
+        "claim_boundary": config["claim_boundary"],
+        "controls": config["controls"],
+        "meeting": config["meeting"],
+        "summary": {
+            "evidence_asset_count": len(evidence),
+            "public_surface_count": len(config["public_surfaces"]),
+            "demo_surface_count": sum(
+                1 for row in config["public_surfaces"] if row["demo"]
+            ),
+            "degraded_surface_count": sum(
+                1
+                for row in config["public_surfaces"]
+                if row["observed_http_status"] >= 400
+            ),
+            "reviewer_question_count": len(config["reviewer_questions"]),
+            "known_gap_count": len(config["known_gaps"]),
+            "duplicate_invite_blocked": True,
+        },
+        "evidence_assets": evidence,
+        "public_surfaces": config["public_surfaces"],
+        "public_surface_snapshot_sha256": canonical_sha256(config["public_surfaces"]),
+        "draft_references": config["draft_references"],
+        "agenda": config["agenda"],
+        "reviewer_questions": config["reviewer_questions"],
+        "bounded_next_steps": config["bounded_next_steps"],
+        "known_gaps": config["known_gaps"],
+        "claims_not_to_make": config["claims_not_to_make"],
+        "note_capture_fields": config["note_capture_fields"],
+    }
+
+
+def render_markdown(payload: dict[str, Any]) -> str:
+    meeting = payload["meeting"]
+    lines = [
+        "# External Technical Review Packet",
+        "",
+        f"Status: `{payload['status']}`",
+        "",
+        "## Decision",
+        "",
+        meeting["objective"],
+        "",
+        f"Opening: {meeting['opening_statement']}",
+        "",
+        f"Requested outcome: {meeting['requested_outcome']}",
+        "",
+        "One calendar invitation already exists and is accepted. Do not send another reply or invitation unless the schedule changes or the reviewer asks a new question.",
+        "",
+        "## Evidence Walkthrough",
+        "",
+        "| Artifact | Purpose | Observed status | SHA-256 |",
+        "|---|---|---|---|",
+    ]
+    for row in payload["evidence_assets"]:
+        status = row["observed_status"] or "FILE_PRESENT"
+        lines.append(
+            f"| `{row['path']}` | {row['purpose']} | `{status}` | `{row['sha256']}` |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "The receipt statuses above are bounded first-party or operator-controlled evidence. Their own claim boundaries remain controlling.",
+            "",
+            "## Public Surface Snapshot",
+            "",
+            "| Surface | HTTP | Demo | Limitation |",
+            "|---|---:|---|---|",
+        ]
+    )
+    for row in payload["public_surfaces"]:
+        demo = "yes" if row["demo"] else "no"
+        lines.append(
+            f"| [{row['label']}]({row['url']}) | `{row['observed_http_status']}` | `{demo}` | {row['limitation']} |"
+        )
+
+    lines.extend(["", "## Agenda", ""])
+    for row in payload["agenda"]:
+        lines.append(
+            f"- **{row['minutes']} - {row['purpose']}:** {row['content']}"
+        )
+
+    lines.extend(["", "## Reviewer Questions", ""])
+    lines.extend(
+        f"{index}. {question}"
+        for index, question in enumerate(payload["reviewer_questions"], start=1)
+    )
+
+    lines.extend(["", "## Bounded Next Steps", ""])
+    lines.extend(f"- {item}" for item in payload["bounded_next_steps"])
+
+    lines.extend(["", "## Known Gaps", ""])
+    lines.extend(f"- {item}" for item in payload["known_gaps"])
+
+    lines.extend(["", "## Claims Not To Make", ""])
+    lines.extend(f"- `{item}`" for item in payload["claims_not_to_make"])
+
+    lines.extend(
+        [
+            "",
+            "## Notes To Capture",
+            "",
+            "| Field | Meeting note |",
+            "|---|---|",
+        ]
+    )
+    lines.extend(f"| `{field}` | |" for field in payload["note_capture_fields"])
+
+    lines.extend(
+        [
+            "",
+            "## Boundary",
+            "",
+            payload["claim_boundary"],
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def observe_http_status(url: str) -> int:
+    request = Request(url, method="HEAD", headers={"User-Agent": "LumenCoreReview/1.0"})
+    try:
+        with urlopen(request, timeout=20) as response:
+            return int(response.status)
+    except HTTPError as exc:
+        return int(exc.code)
+    except URLError as exc:
+        raise ReviewPacketError(f"LIVE_SURFACE_UNREACHABLE:{url}:{exc.reason}") from exc
+
+
+def verify_live_surfaces(config: dict[str, Any]) -> list[dict[str, Any]]:
+    observed = []
+    for row in config["public_surfaces"]:
+        status = observe_http_status(row["url"])
+        observed.append(
+            {
+                "url": row["url"],
+                "expected_status": row["observed_http_status"],
+                "observed_status": status,
+                "match": status == row["observed_http_status"],
+            }
+        )
+    mismatches = [row for row in observed if not row["match"]]
+    if mismatches:
+        raise ReviewPacketError(
+            "LIVE_SURFACE_STATUS_DRIFT:"
+            + ",".join(f"{row['url']}={row['observed_status']}" for row in mismatches)
+        )
+    return observed
+
+
+def write_outputs(payload: dict[str, Any]) -> None:
+    JSON_OUT.parent.mkdir(parents=True, exist_ok=True)
+    MD_OUT.parent.mkdir(parents=True, exist_ok=True)
+    JSON_OUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    MD_OUT.write_text(render_markdown(payload), encoding="utf-8")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Build the no-duplicate external technical review packet."
+    )
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--verify-live", action="store_true")
+    args = parser.parse_args()
+
+    config = validate_config(read_json(CONFIG))
+    live = verify_live_surfaces(config) if args.verify_live else []
+    payload = build_payload(config)
+    rendered_json = json.dumps(payload, indent=2) + "\n"
+    rendered_md = render_markdown(payload)
+
+    if args.check:
+        stale = []
+        if not JSON_OUT.is_file() or JSON_OUT.read_text(encoding="utf-8") != rendered_json:
+            stale.append(JSON_OUT.relative_to(ROOT).as_posix())
+        if not MD_OUT.is_file() or MD_OUT.read_text(encoding="utf-8") != rendered_md:
+            stale.append(MD_OUT.relative_to(ROOT).as_posix())
+        if stale:
+            raise ReviewPacketError("STALE_OUTPUTS:" + ",".join(stale))
+    else:
+        write_outputs(payload)
+
+    print(
+        json.dumps(
+            {
+                "status": payload["status"],
+                "evidence_asset_count": payload["summary"]["evidence_asset_count"],
+                "public_surface_count": payload["summary"]["public_surface_count"],
+                "degraded_surface_count": payload["summary"][
+                    "degraded_surface_count"
+                ],
+                "duplicate_invite_blocked": payload["summary"][
+                    "duplicate_invite_blocked"
+                ],
+                "live_verified": bool(live),
+            },
+            indent=2,
+        )
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

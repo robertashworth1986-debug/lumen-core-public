@@ -43,6 +43,29 @@
       "body": ""
     },
     {
+      "template_id": "NO_DUPLICATE_MEETING_PREP",
+      "description": "Use when one calendar invitation already exists and the meeting is confirmed or accepted; prepare evidence and monitor the existing event without sending another reply or invitation.",
+      "inbound_states": [
+        "MEETING_CONFIRMED",
+        "CALENDAR_INVITE_ACCEPTED",
+        "MEETING_PREP_DUE"
+      ],
+      "reply_triggers": [
+        "SCHEDULE_CHANGE",
+        "NEW_MEETING_QUESTION",
+        "ATTENDANCE_PROBLEM"
+      ],
+      "send_policy": "MONITOR_NO_SEND",
+      "attachment_policy": "NONE",
+      "private_render_only": false,
+      "required_fields": [],
+      "routing_fields": [],
+      "sensitive_fields": [],
+      "optional_defaults": {},
+      "subject": "",
+      "body": ""
+    },
+    {
       "template_id": "DEADLINE_CLARIFICATION",
       "description": "Ask an authoritative contact to confirm the exact deadline or eligibility rule before a package is finalized.",
       "inbound_states": [

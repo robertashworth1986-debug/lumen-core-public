@@ -124,9 +124,10 @@ def test_registry_validates_and_covers_high_value_response_states():
     ids = {row["template_id"] for row in registry["templates"]}
 
     assert registry["schema"] == module.SCHEMA
-    assert len(ids) == 16
+    assert len(ids) == 17
     assert {
         "NO_DUPLICATE_MONITOR",
+        "NO_DUPLICATE_MEETING_PREP",
         "DEADLINE_CLARIFICATION",
         "PORTAL_SUPPORT_DEADLINE_RESCUE",
         "REQUESTED_INFORMATION_REPLY",
@@ -199,6 +200,7 @@ def test_duplicate_send_and_monitor_states_fail_closed_without_rendering_message
         inbound_requires_response=False,
     )
     monitor = module.render_response("NO_DUPLICATE_MONITOR", {})
+    meeting_prep = module.render_response("NO_DUPLICATE_MEETING_PREP", {})
 
     assert duplicate["status"] == "MONITOR_NO_DUPLICATE"
     assert duplicate["duplicate_send_blocked"] is True
@@ -210,6 +212,12 @@ def test_duplicate_send_and_monitor_states_fail_closed_without_rendering_message
     assert monitor["send_performed"] is False
     assert monitor["dispatch_binding"] is None
     assert monitor["exact_action_time_approval_phrase"] is None
+    assert meeting_prep["status"] == "MONITOR_NO_SEND"
+    assert meeting_prep["send_performed"] is False
+    assert meeting_prep["subject"] is None
+    assert meeting_prep["body"] is None
+    assert meeting_prep["dispatch_binding"] is None
+    assert meeting_prep["exact_action_time_approval_phrase"] is None
 
 
 def test_missing_facts_invalid_email_and_unrequested_attachment_block_render():
@@ -429,13 +437,13 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     combined = OUT_JSON.read_text(encoding="utf-8") + markdown
 
     assert payload["schema"] == module.PUBLIC_SCHEMA
-    assert payload["template_count"] == 16
+    assert payload["template_count"] == 17
     assert payload["controls"]["builder_can_send_email"] is False
     assert payload["controls"]["duplicate_send_fail_closed"] is True
     assert payload["quality_gate"]["status"] == "PASS"
     assert payload["quality_gate"]["all_templates_pass"] is True
-    assert payload["quality_gate"]["template_count"] == 16
-    assert payload["quality_gate"]["check_count"] == 192
+    assert payload["quality_gate"]["template_count"] == 17
+    assert payload["quality_gate"]["check_count"] == 204
     assert payload["quality_gate"]["deadline_control_template_ids"] == [
         "COMPONENT_INSTRUCTION_ESCALATION",
         "INITIAL_PARTNER_TEAMING_INQUIRY",
@@ -512,7 +520,7 @@ def test_source_config_hash_and_builder_payload_agree():
     assert payload["source_config_hash_basis"] == "SORTED_COMPACT_JSON_UTF8"
     assert payload["send_policy_counts"] == {
         "HUMAN_ACTION_DUE": 9,
-        "MONITOR_NO_SEND": 1,
+        "MONITOR_NO_SEND": 2,
         "REPLY_AFTER_FACT_REVIEW": 6,
     }
 
