@@ -1702,6 +1702,11 @@ def build_public_payload(
             ),
             "exact_approval_expires": True,
             "single_use_action_time_binding": True,
+            "action_time_authorization_builder": (
+                "code/ops/BUILD_OUTREACH_ACTION_TIME_AUTHORIZATION.py"
+            ),
+            "action_time_authorization_builder_can_approve": False,
+            "action_time_authorization_builder_can_send_email": False,
             "private_human_unlock_required_for_dispatch": True,
             "dispatch_handoff_can_send_email": False,
             "source_config_hash_cross_platform_canonical_json": True,
@@ -1735,6 +1740,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Action-time mailbox freshness: `15_MINUTES_MAX`",
         "- Exact approval phrase: `BINDING_SCOPED_SINGLE_USE`",
         "- Exact approval window: `5_MINUTES_MAX`",
+        "- Action-time authorization builder: "
+        "`code/ops/BUILD_OUTREACH_ACTION_TIME_AUTHORIZATION.py`",
+        "- Authorization builder can approve or send email: `false`",
         "- Private HumanUnlock: `REQUIRED_AT_RUNTIME`",
         "- Dispatch handoff can send email: `false`",
         f"- Static quality gate: `{payload['quality_gate']['status']}`",

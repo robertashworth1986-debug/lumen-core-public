@@ -534,6 +534,21 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["controls"]["action_time_approval_window_seconds"] == 300
     assert payload["controls"]["exact_approval_expires"] is True
     assert payload["controls"]["single_use_action_time_binding"] is True
+    assert payload["controls"]["action_time_authorization_builder"] == (
+        "code/ops/BUILD_OUTREACH_ACTION_TIME_AUTHORIZATION.py"
+    )
+    assert (
+        payload["controls"][
+            "action_time_authorization_builder_can_approve"
+        ]
+        is False
+    )
+    assert (
+        payload["controls"][
+            "action_time_authorization_builder_can_send_email"
+        ]
+        is False
+    )
     assert (
         payload["controls"]["private_human_unlock_required_for_dispatch"]
         is True

@@ -2,6 +2,9 @@
   "claim_boundary": "This response is a communication or routing artifact. It does not establish selection, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "controls": {
     "action_time_approval_window_seconds": 300,
+    "action_time_authorization_builder": "code/ops/BUILD_OUTREACH_ACTION_TIME_AUTHORIZATION.py",
+    "action_time_authorization_builder_can_approve": false,
+    "action_time_authorization_builder_can_send_email": false,
     "action_time_human_review_required": true,
     "action_time_mailbox_max_age_seconds": 900,
     "action_time_mailbox_receipt_required": true,

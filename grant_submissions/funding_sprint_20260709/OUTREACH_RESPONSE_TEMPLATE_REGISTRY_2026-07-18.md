@@ -15,6 +15,8 @@
 - Action-time mailbox freshness: `15_MINUTES_MAX`
 - Exact approval phrase: `BINDING_SCOPED_SINGLE_USE`
 - Exact approval window: `5_MINUTES_MAX`
+- Action-time authorization builder: `code/ops/BUILD_OUTREACH_ACTION_TIME_AUTHORIZATION.py`
+- Authorization builder can approve or send email: `false`
 - Private HumanUnlock: `REQUIRED_AT_RUNTIME`
 - Dispatch handoff can send email: `false`
 - Static quality gate: `PASS`
