@@ -79,8 +79,12 @@ def read_json(path: Path) -> dict[str, Any]:
     return payload
 
 
+def canonical_source_bytes(path: Path) -> bytes:
+    return path.read_bytes().replace(b"\r\n", b"\n")
+
+
 def artifact_status(path: Path) -> dict[str, Any]:
-    data = path.read_bytes()
+    data = canonical_source_bytes(path)
     return {
         "path": path.relative_to(ROOT).as_posix(),
         "present": True,

@@ -60,8 +60,21 @@ def read_json(path: Path) -> dict[str, Any]:
     return payload
 
 
+def canonical_source_bytes(path: Path) -> bytes:
+    return path.read_bytes().replace(b"\r\n", b"\n")
+
+
 def sha256_file(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest().upper()
+    return hashlib.sha256(canonical_source_bytes(path)).hexdigest().upper()
+
+
+def source_evidence_signatures(path: Path) -> set[tuple[int, str]]:
+    raw = path.read_bytes()
+    variants = {raw, raw.replace(b"\r\n", b"\n")}
+    return {
+        (len(content), hashlib.sha256(content).hexdigest().upper())
+        for content in variants
+    }
 
 
 def parse_aware_utc(value: str) -> datetime:
@@ -82,10 +95,11 @@ def utc_iso(value: datetime) -> str:
 
 
 def source_status(path: Path) -> dict[str, Any]:
+    content = canonical_source_bytes(path)
     return {
         "path": path.relative_to(ROOT).as_posix(),
-        "bytes": path.stat().st_size,
-        "sha256": sha256_file(path),
+        "bytes": len(content),
+        "sha256": hashlib.sha256(content).hexdigest().upper(),
     }
 
 
@@ -199,9 +213,12 @@ def validate_embedded_source_evidence(reconciliation: dict[str, Any]) -> None:
             raise ValueError(f"Source evidence presence drift: {source_id}")
         if not present:
             continue
-        if candidate.stat().st_size != recorded.get("bytes"):
+        signatures = source_evidence_signatures(candidate)
+        expected_bytes = recorded.get("bytes")
+        expected_sha256 = recorded.get("sha256")
+        if expected_bytes not in {byte_count for byte_count, _ in signatures}:
             raise ValueError(f"Source evidence byte-count drift: {source_id}")
-        if sha256_file(candidate) != recorded.get("sha256"):
+        if (expected_bytes, expected_sha256) not in signatures:
             raise ValueError(f"Source evidence hash drift: {source_id}")
 
 

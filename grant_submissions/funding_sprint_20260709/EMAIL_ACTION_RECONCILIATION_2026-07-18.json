@@ -419,64 +419,64 @@
   ],
   "source_evidence": {
     "darpa_sn_26_97_public_submission_receipt": {
-      "bytes": 2834,
+      "bytes": 2778,
       "path": "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json",
       "present": true,
-      "sha256": "89B64A1A282AB72F0738E068952A14A82E38F5AEC4A78C1B7D2B4F4930410CB4"
+      "sha256": "2E60EBF6816100E623EEB35DCAA4B9A053BFA8FBA5EF6947D6484DA2D68F61CF"
     },
     "lvlup_independent_review_confirmation": {
-      "bytes": 1939,
+      "bytes": 1908,
       "path": "grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json",
       "present": true,
-      "sha256": "0E51AB591549AC78345BE919B97AE37CD8D80133DEE65888850D2C2F8E1EC1EE"
+      "sha256": "F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC"
     },
     "missionweave_dsip_action_gate": {
-      "bytes": 13106,
+      "bytes": 12767,
       "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
       "present": true,
-      "sha256": "60EB6F4EA94067C653BDCD7B7765AAB03DF4AD627A99B9C65E4D89C54991F53A"
+      "sha256": "5642930AFAC999758BF154048590A2643C45A4F3FDDE7A63D69CA2C70F3C2975"
     },
     "nashville_financial_aid_action": {
-      "bytes": 2841,
+      "bytes": 2762,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_FINANCIAL_AID_ACTION_2026-07-20.json",
       "present": true,
-      "sha256": "1688435510D8BE006BFF6FDF53D2FB436CE6FF907159E3191F64065FF6D4FD9D"
+      "sha256": "300CA7092B70B6F84F36ECBB452B5F911BE89399590DDB8DF92F56A7B6E9BBD2"
     },
     "nashville_official_deadline_confirmation": {
-      "bytes": 2310,
+      "bytes": 2272,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json",
       "present": true,
-      "sha256": "39469C919CD9B7ADB0DC3F2DC260169F81B531BBFA95B530CAD4C2C998FD950A"
+      "sha256": "DAC4B3120D9B4EC2A822198426939B89FE96BF7294C0CC251D1A299BB76B00E2"
     },
     "nashville_submission_receipt": {
-      "bytes": 1374,
+      "bytes": 1347,
       "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json",
       "present": true,
-      "sha256": "2B4F2F4A18725B2D585ADEA456FFCA1BF7EF0A441B3463C1EAA716D1D6D88590"
+      "sha256": "E606530B0CCBAB06347BEF60DE527B4A76E5EE35BD7A15E71C3A0B49647BE505"
     },
     "openai_build_week_handoff_integrity_control": {
-      "bytes": 3587,
+      "bytes": 3529,
       "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/BUILD_WEEK_HANDOFF_INTEGRITY_CONTROL_2026-07-17.json",
       "present": true,
-      "sha256": "26907C567B22D6AE1B34EE83B2C39E588BAE01CB1E21E19D7E187714993E8EF6"
+      "sha256": "C762F0ED28698B4B0578B5E7BD8CE57DA5E8FEC5F710703F0ACD2CA0A4404BAB"
     },
     "openai_build_week_readiness": {
-      "bytes": 10649,
+      "bytes": 10419,
       "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
       "present": true,
-      "sha256": "DAE0EF8377E3EFD60942CE9A61859C4E42CC2404917A06704A6B15B18F280E2A"
+      "sha256": "F62728B470D7313A2E06E304C527D1C21844833EAE83D65010FDDF6E82C93A73"
     },
     "outreach_followup_policy_config": {
-      "bytes": 6202,
+      "bytes": 6069,
       "path": "config/outreach_followup_policies_v1.json",
       "present": true,
-      "sha256": "43FD6A626282AFEB86A76E5EDB61D568AB1BED5AC2F81ECFB0AB9CACCADC9E86"
+      "sha256": "5B5BAEA19CDDCC6E579A3BB65DA665FFABDEC6743DA69530754AEC3E9E211FCE"
     },
     "outreach_response_template_registry": {
-      "bytes": 18275,
+      "bytes": 17846,
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
       "present": true,
-      "sha256": "A72FA6DF0B4F6626D43062FC96957647CFEECC0EE5E6270333E47DA16FB61789"
+      "sha256": "40363208CEBE14EF8C8929DAE98172C3470A052A3A5EBB23D80BEE90BF233A21"
     }
   },
   "status": "DEADLINE_BEARING_PORTAL_ACTION_OPEN_NO_EMAIL_SEND",

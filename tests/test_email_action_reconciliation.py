@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -52,6 +53,21 @@ def test_reconciliation_is_deterministic_and_no_send():
     assert actual["summary"]["deadline_bearing_portal_action_count"] == 2
     assert actual["summary"]["external_send_allowed_without_human"] is False
     assert all(lane["send_now"] is False for lane in actual["lanes"])
+
+
+def test_artifact_status_is_line_ending_stable(monkeypatch, tmp_path):
+    module = load_module()
+    canonical = b'{\n  "status": "sealed"\n}\n'
+    evidence_path = tmp_path / "evidence.json"
+    evidence_path.write_bytes(canonical.replace(b"\n", b"\r\n"))
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+
+    assert module.artifact_status(evidence_path) == {
+        "bytes": len(canonical),
+        "path": "evidence.json",
+        "present": True,
+        "sha256": hashlib.sha256(canonical).hexdigest().upper(),
+    }
 
 
 def test_duplicate_and_out_of_office_gates_are_explicit():

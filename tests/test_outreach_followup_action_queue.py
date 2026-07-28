@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 from datetime import datetime, timezone
@@ -110,6 +111,39 @@ def test_current_queue_is_deterministic_and_never_sends():
         if row["action_state"] == "RECHECK_MAILBOX_BEFORE_DRAFT"
     )
     assert len(actual["queue_sha256"]) == 64
+
+
+def test_source_evidence_validation_accepts_git_crlf_checkout(
+    monkeypatch, tmp_path
+):
+    module = load_module()
+    canonical = b'{\n  "status": "sealed"\n}\n'
+    evidence_path = tmp_path / "evidence.json"
+    evidence_path.write_bytes(canonical.replace(b"\n", b"\r\n"))
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+
+    assert module.source_status(evidence_path) == {
+        "bytes": len(canonical),
+        "path": "evidence.json",
+        "sha256": hashlib.sha256(canonical).hexdigest().upper(),
+    }
+
+    reconciliation = {
+        "source_evidence": {
+            "portable_receipt": {
+                "bytes": len(canonical),
+                "path": "evidence.json",
+                "present": True,
+                "sha256": hashlib.sha256(canonical).hexdigest().upper(),
+            }
+        }
+    }
+
+    module.validate_embedded_source_evidence(reconciliation)
+
+    reconciliation["source_evidence"]["portable_receipt"]["sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="Source evidence hash drift"):
+        module.validate_embedded_source_evidence(reconciliation)
 
 
 def test_default_build_uses_current_utc_instead_of_frozen_reference():
