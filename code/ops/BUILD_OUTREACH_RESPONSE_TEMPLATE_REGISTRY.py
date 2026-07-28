@@ -291,8 +291,40 @@ ACTION_TIME_DISPATCH_HANDOFF_FIELDS = {
     "single_use_binding_consumed",
     "status",
 }
-NEGATION_WINDOW_RE = re.compile(
-    r"\b(?:no|not|never|without|unverified|unproven)\b",
+DIRECT_CLAIM_NEGATION_SUFFIX_RE = re.compile(
+    r"\b(?:no|not|never|without|unverified|unproven)"
+    r"(?:\s+(?:currently|yet|current|any|a|an|the|credible|reported|"
+    r"documented|evidence|of)){0,2}\s*$",
+    re.IGNORECASE,
+)
+EXPLICIT_CLAIM_NEGATION_SUFFIX_RE = re.compile(
+    r"\b(?:"
+    r"(?:do|does|did)\s+not\s+claim|"
+    r"(?:make|makes|made)\s+no\s+claim|"
+    r"never\s+claim(?:s|ed|ing)?|"
+    r"without\s+claim(?:s|ed|ing)?"
+    r")"
+    r"(?:\s+(?:that|of))?"
+    r"(?:\s+(?:the|our|this|these|those|any))?"
+    r"(?:\s+current)?"
+    r"(?:\s+(?:work|system|platform|result|results|performance|evidence|"
+    r"outcome|outcomes|technology|model|models|product|service|services|"
+    r"solution|solutions))?"
+    r"(?:\s+(?:is|are|was|were|has|have|had)(?:\s+been)?)?\s*$",
+    re.IGNORECASE,
+)
+NEGATED_CLAIM_LIST_ITEM = (
+    r"(?:field validation|field performance|production validation|"
+    r"production performance|production deployment|customer revenue|"
+    r"customer traction|commercial deployment|paying customers?|"
+    r"realized savings|validated savings|proven savings|external validation|"
+    r"independent validation|independently validated performance|"
+    r"agency acceptance|government approval|awards?|grants?|contracts?)"
+)
+NEGATED_CLAIM_LIST_SUFFIX_RE = re.compile(
+    rf"\bno\s+{NEGATED_CLAIM_LIST_ITEM}"
+    rf"(?:\s*,\s*{NEGATED_CLAIM_LIST_ITEM})*"
+    r"\s*,?\s*(?:(?:or|nor)\s+)?$",
     re.IGNORECASE,
 )
 
@@ -562,11 +594,26 @@ def _rooted_artifact(path_value: Any) -> Path:
 
 
 def _assertion_is_negated(text: str, match_start: int) -> bool:
-    window = text[max(0, match_start - 40) : match_start]
-    boundary = max(window.rfind("."), window.rfind(";"), window.rfind("\n"))
-    if boundary >= 0:
-        window = window[boundary + 1 :]
-    return bool(NEGATION_WINDOW_RE.search(window))
+    window = text[max(0, match_start - 160) : match_start]
+    sentence_boundary = max(
+        window.rfind(separator)
+        for separator in (".", ";", ":", "\n", "!", "?")
+    )
+    sentence_window = (
+        window[sentence_boundary + 1 :] if sentence_boundary >= 0 else window
+    )
+    clause_boundary = max(
+        window.rfind(separator)
+        for separator in (".", ";", ":", ",", "\n", "!", "?")
+    )
+    clause_window = (
+        window[clause_boundary + 1 :] if clause_boundary >= 0 else window
+    )
+    return bool(
+        DIRECT_CLAIM_NEGATION_SUFFIX_RE.search(clause_window)
+        or EXPLICIT_CLAIM_NEGATION_SUFFIX_RE.search(clause_window)
+        or NEGATED_CLAIM_LIST_SUFFIX_RE.search(sentence_window)
+    )
 
 
 def security_normalize_text(text: str) -> str:
@@ -1311,9 +1358,23 @@ def render_response(
         return result
 
     lowered = security_normalize_text(subject + "\n" + body).lower()
-    for marker in POSITIVE_CLAIM_MARKERS:
-        if marker in lowered:
-            raise OutreachRegistryError(f"UNSUPPORTED_POSITIVE_CLAIM_RENDER:{marker}")
+    unsupported_claim_markers = sorted(
+        marker for marker in POSITIVE_CLAIM_MARKERS if marker in lowered
+    )
+    if unsupported_claim_markers:
+        result = _base_result(
+            payload, row, "BLOCKED_UNSUPPORTED_RENDERED_CLAIM", deadline
+        )
+        result.update(
+            {
+                "duplicate_send_blocked": False,
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+                "unsupported_claim_markers": unsupported_claim_markers,
+            }
+        )
+        return result
 
     sensitive_present = sorted(
         field for field in row["sensitive_fields"] if facts.get(field) not in (None, "")
@@ -2339,6 +2400,9 @@ def build_public_payload(
             "mixed_script_confusable_fail_closed": True,
             "claim_scan_diacritic_fold": True,
             "bounded_confusable_skeleton_scan": True,
+            "claim_negation_requires_direct_scope": True,
+            "unrelated_negation_cannot_suppress_claim_gate": True,
+            "positive_claim_marker_structured_fail_closed": True,
             "guarantee_and_superlative_claims_never_authorizable": True,
             "high_risk_claim_requires_hash_bound_evidence_receipt": True,
             "claim_evidence_source_artifacts_rehashed": True,
@@ -2433,6 +2497,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Mixed-script confusable gate: `FAIL_CLOSED`",
         "- Claim scan normalization: `UNICODE_NFKD_DIACRITIC_FOLD`",
         "- Bounded Greek/Cyrillic confusable skeleton scan: `enabled`",
+        "- Claim negation scope: `DIRECT_OR_EXPLICIT_CLAIM_GRAMMAR`",
+        "- Unrelated earlier negation suppresses claim gate: `false`",
+        "- Positive-marker fallback: `STRUCTURED_FAIL_CLOSED`",
         "- Guarantees and superlatives authorizable by receipt: `false`",
         "- High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`",
         "- Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`",

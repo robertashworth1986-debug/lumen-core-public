@@ -11,6 +11,9 @@
 - Mixed-script confusable gate: `FAIL_CLOSED`
 - Claim scan normalization: `UNICODE_NFKD_DIACRITIC_FOLD`
 - Bounded Greek/Cyrillic confusable skeleton scan: `enabled`
+- Claim negation scope: `DIRECT_OR_EXPLICIT_CLAIM_GRAMMAR`
+- Unrelated earlier negation suppresses claim gate: `false`
+- Positive-marker fallback: `STRUCTURED_FAIL_CLOSED`
 - Guarantees and superlatives authorizable by receipt: `false`
 - High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`
 - Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`

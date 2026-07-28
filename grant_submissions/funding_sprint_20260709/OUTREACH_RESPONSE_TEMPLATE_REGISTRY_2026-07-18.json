@@ -18,6 +18,7 @@
     "claim_evidence_receipt_schema": "lumencore.outreach_claim_evidence_receipt.v1",
     "claim_evidence_receipt_template": "config/outreach_claim_evidence_receipt_template_v1.json",
     "claim_evidence_source_artifacts_rehashed": true,
+    "claim_negation_requires_direct_scope": true,
     "claim_scan_diacritic_fold": true,
     "consumed_binding_duplicate_send_allowed": false,
     "consumption_receipt_name_bound_to_dispatch_sha256": true,
@@ -39,6 +40,7 @@
     "mixed_script_confusable_fail_closed": true,
     "overlapping_field_declaration_fail_closed": true,
     "past_deadline_fail_closed": true,
+    "positive_claim_marker_structured_fail_closed": true,
     "post_send_mailbox_max_age_seconds": 900,
     "post_send_observation_required_for_consumption": true,
     "post_send_observation_schema": "lumencore.outreach_post_send_observation.private.v1",
@@ -58,6 +60,7 @@
     "unchanged_rebuild_byte_stable": true,
     "unicode_format_character_fail_closed": true,
     "unicode_nfkd_claim_scan": true,
+    "unrelated_negation_cannot_suppress_claim_gate": true,
     "unused_required_field_fail_closed": true
   },
   "generated_utc": "2026-07-25T22:53:44Z",

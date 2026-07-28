@@ -516,6 +516,15 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["controls"]["mixed_script_confusable_fail_closed"] is True
     assert payload["controls"]["claim_scan_diacritic_fold"] is True
     assert payload["controls"]["bounded_confusable_skeleton_scan"] is True
+    assert payload["controls"]["claim_negation_requires_direct_scope"] is True
+    assert (
+        payload["controls"]["unrelated_negation_cannot_suppress_claim_gate"]
+        is True
+    )
+    assert (
+        payload["controls"]["positive_claim_marker_structured_fail_closed"]
+        is True
+    )
     assert (
         payload["controls"][
             "guarantee_and_superlative_claims_never_authorizable"
@@ -654,6 +663,14 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert "Bounded Greek/Cyrillic confusable skeleton scan: `enabled`" in (
         markdown
     )
+    assert (
+        "Claim negation scope: `DIRECT_OR_EXPLICIT_CLAIM_GRAMMAR`"
+        in markdown
+    )
+    assert "Unrelated earlier negation suppresses claim gate: `false`" in (
+        markdown
+    )
+    assert "Positive-marker fallback: `STRUCTURED_FAIL_CLOSED`" in markdown
     assert "Guarantees and superlatives authorizable by receipt: `false`" in (
         markdown
     )
@@ -1508,6 +1525,64 @@ def test_explicitly_negated_claim_boundaries_do_not_trigger_claim_gate():
     assert rendered["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
     assert rendered["claim_risk_fields"] == []
     assert rendered["claim_evidence_receipt_sha256s"] == {}
+
+
+def test_unrelated_negation_cannot_suppress_later_claim_gate():
+    module = load_module()
+    facts = direct_investor_facts()
+    facts["six_month_milestone"] = (
+        "No attachment is included and guaranteed award is expected."
+    )
+
+    assert module.claim_fact_risks(facts) == {
+        "six_month_milestone": ["UNSUPPORTED_GUARANTEE"]
+    }
+    blocked = module.render_response(
+        "DIRECT_INVESTOR_REVIEW_REQUEST",
+        facts,
+    )
+    assert blocked["status"] == "BLOCKED_UNSUPPORTED_CLAIM_FACTS"
+    assert blocked["invalid_claim_evidence_fields"] == {
+        "six_month_milestone": "CLAIM_RISK_NOT_AUTHORIZABLE"
+    }
+
+    facts["six_month_milestone"] = (
+        "This is not a draft, guaranteed success is expected."
+    )
+    assert module.claim_fact_risks(facts) == {
+        "six_month_milestone": ["UNSUPPORTED_GUARANTEE"]
+    }
+
+    facts["six_month_milestone"] = (
+        "No attachment is included, guaranteed award is expected."
+    )
+    assert module.claim_fact_risks(facts) == {
+        "six_month_milestone": ["UNSUPPORTED_GUARANTEE"]
+    }
+
+
+def test_explicit_claim_negation_is_narrow_and_marker_fallback_is_structured():
+    module = load_module()
+    facts = direct_investor_facts()
+    facts["six_month_milestone"] = (
+        "We do not claim guaranteed success or any award."
+    )
+    ready = module.render_response(
+        "DIRECT_INVESTOR_REVIEW_REQUEST",
+        facts,
+    )
+    assert ready["status"] == "READY_FOR_PRIVATE_ACTION_TIME_REVIEW"
+    assert ready["claim_risk_fields"] == []
+
+    facts["six_month_milestone"] = "We do not claim guaranteed funding."
+    blocked = module.render_response(
+        "DIRECT_INVESTOR_REVIEW_REQUEST",
+        facts,
+    )
+    assert blocked["status"] == "BLOCKED_UNSUPPORTED_RENDERED_CLAIM"
+    assert blocked["unsupported_claim_markers"] == ["guaranteed funding"]
+    assert blocked["subject"] is None
+    assert blocked["body"] is None
 
 
 def test_exact_claim_receipt_rehashes_sources_and_fails_after_tampering(
