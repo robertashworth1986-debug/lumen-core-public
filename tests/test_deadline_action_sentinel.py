@@ -45,13 +45,13 @@ def write_config(path: Path, payload: dict) -> None:
 
 
 def test_argos_exact_deadline_is_bound_to_gate_and_fail_closed():
-    payload = SENTINEL.build_sentinel(CONFIG, as_of("2026-07-28T16:50:00Z"))
+    payload = SENTINEL.build_sentinel(CONFIG, as_of("2026-07-28T20:20:00Z"))
     argos = lane(payload, "ONC_ARGOS_20260730")
 
     assert argos["state"] == "PARTNER_OUTREACH_SENT_ONCE_GOVERNMENT_RESPONSE_DUE"
     assert argos["urgency"] == "WITHIN_72_HOURS"
     assert argos["deadline"]["iso_utc"] == "2026-07-30T21:00:00Z"
-    assert argos["deadline"]["hours_until_deadline"] == 52.17
+    assert argos["deadline"]["hours_until_deadline"] == 48.67
     assert argos["deadline"]["deadline_passed"] is False
     assert (
         argos["source_receipt"]["observed_status"]
@@ -64,9 +64,9 @@ def test_argos_exact_deadline_is_bound_to_gate_and_fail_closed():
     outreach = argos["outreach_status"]
     assert (
         outreach["current_state_as_of_evaluation"]
-        == "PARTNER_INQUIRY_SENT_WAITING_FOR_REPLY"
+        == "PARTNER_TARGET_PASSED_WAITING_FOR_REPLY"
     )
-    assert outreach["seconds_until_partner_target"] == 600
+    assert outreach["seconds_until_partner_target"] == -12000
     assert outreach["mailbox_state_as_of_record"] == {
         "current_draft_count": 0,
         "sent_count": 1,
@@ -117,7 +117,7 @@ def test_argos_status_cannot_be_used_before_its_record_time():
 
 
 def test_monday_deadline_lanes_are_reconciled_without_new_action():
-    payload = SENTINEL.build_sentinel(CONFIG, as_of("2026-07-28T16:50:00Z"))
+    payload = SENTINEL.build_sentinel(CONFIG, as_of("2026-07-28T20:20:00Z"))
     csdr = lane(payload, "DAF_CSDR_20260727")
     nsf = lane(payload, "NSF_26_510_20260727")
 

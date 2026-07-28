@@ -270,7 +270,7 @@ def test_argos_generated_outputs_match_their_receipts():
 
     assert qa["schema"] == "lumencore.argos_render_qa.v1"
     assert qa["company_name"] == "LumenCore"
-    assert qa["seal_name"] == "LumaArc seal of approval"
+    assert qa["seal_name"] == "Founder-selected LumaArc brand mark"
     assert qa["docx_sha256"] == sha256(docx)
     assert qa["pdf_sha256"] == sha256(pdf)
     assert qa["total_pages"] == 10
