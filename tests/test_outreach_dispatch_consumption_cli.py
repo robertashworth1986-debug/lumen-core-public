@@ -38,9 +38,11 @@ def iso_z(value: datetime) -> str:
 
 def ready_inputs(
     *,
+    consumption_directory: Path,
     base: datetime | None = None,
 ) -> tuple[dict[str, object], dict[str, object], dict[str, object]]:
     module = load_registry()
+    consumption_directory.mkdir(parents=True, exist_ok=True)
     opened = (base or (datetime.now(timezone.utc) - timedelta(seconds=10)))
     opened = opened.replace(microsecond=0)
     rendered = module.render_response(
@@ -84,9 +86,25 @@ def ready_inputs(
         rendered,
         mailbox,
         current_utc=iso_z(opened),
+        consumption_directory_sha256=(
+            module.consumption_directory_identity_sha256(
+                consumption_directory
+            )
+        ),
     )
     unlock = "synthetic-private-unlock"
     handoff_evaluated = opened + timedelta(seconds=1)
+    reservation = module.build_dispatch_reservation(
+        authorization,
+        current_utc=iso_z(handoff_evaluated),
+    )
+    reservation_path = consumption_directory / (
+        f"{binding['binding_sha256']}.pending"
+    )
+    reservation_path.write_text(
+        json.dumps(reservation),
+        encoding="utf-8",
+    )
     handoff = module.evaluate_action_time_dispatch_handoff(
         authorization,
         exact_approval_phrase=authorization[
@@ -98,7 +116,17 @@ def ready_inputs(
             unlock.encode("utf-8")
         ),
         consumption_directory_checked=True,
+        consumption_directory_sha256=(
+            module.consumption_directory_identity_sha256(
+                consumption_directory
+            )
+        ),
         consumption_receipt_present=False,
+        dispatch_reservation_created=True,
+        dispatch_reservation_present=False,
+        dispatch_reservation_sha256=reservation[
+            "reservation_sha256"
+        ],
     )
     observation = {
         "attachment_count": binding["attachment_count"],
@@ -179,9 +207,11 @@ def run_cli(
 
 
 def test_cli_captures_redacted_single_use_consumption_receipt(tmp_path):
-    authorization, handoff, observation = ready_inputs()
-    paths = write_inputs(tmp_path, authorization, handoff, observation)
     consumption_directory = tmp_path / "consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
+    paths = write_inputs(tmp_path, authorization, handoff, observation)
     receipt_path = consumption_directory / (
         f"{authorization['dispatch_binding']['binding_sha256']}.json"
     )
@@ -198,6 +228,11 @@ def test_cli_captures_redacted_single_use_consumption_receipt(tmp_path):
     assert receipt["send_performed_by_receipt_builder"] is False
     assert receipt["receipt_builder_can_send_email"] is False
     assert summary["outputs_written"] is True
+    assert summary["dispatch_reservation_finalized"] is True
+    assert not (
+        consumption_directory
+        / f"{authorization['dispatch_binding']['binding_sha256']}.pending"
+    ).exists()
     serialized = json.dumps(receipt)
     assert observation["message_id"] not in serialized
     assert observation["thread_id"] not in serialized
@@ -240,9 +275,11 @@ def test_cli_captures_redacted_single_use_consumption_receipt(tmp_path):
 
 
 def test_cli_check_mode_validates_without_writing(tmp_path):
-    authorization, handoff, observation = ready_inputs()
-    paths = write_inputs(tmp_path, authorization, handoff, observation)
     consumption_directory = tmp_path / "consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
+    paths = write_inputs(tmp_path, authorization, handoff, observation)
     receipt_path = consumption_directory / (
         f"{authorization['dispatch_binding']['binding_sha256']}.json"
     )
@@ -252,50 +289,100 @@ def test_cli_check_mode_validates_without_writing(tmp_path):
     assert result.returncode == 0, result.stderr
     assert receipt_path.exists() is False
     assert json.loads(result.stdout)["outputs_written"] is False
+    assert (
+        consumption_directory
+        / f"{authorization['dispatch_binding']['binding_sha256']}.pending"
+    ).is_file()
+
+
+def test_cli_rejects_unbound_consumption_directory(tmp_path):
+    canonical_directory = tmp_path / "canonical-consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=canonical_directory
+    )
+    paths = write_inputs(tmp_path, authorization, handoff, observation)
+    alternate_directory = tmp_path / "alternate-consumption"
+    alternate_directory.mkdir()
+
+    result = run_cli(*paths, alternate_directory)
+
+    assert result.returncode != 0
+    assert "DISPATCH_CONSUMPTION_DIRECTORY_IDENTITY_MISMATCH" in result.stderr
+    assert not list(alternate_directory.glob("*.json"))
+
+
+def test_cli_requires_exact_pending_dispatch_reservation(tmp_path):
+    consumption_directory = tmp_path / "consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
+    paths = write_inputs(tmp_path, authorization, handoff, observation)
+    reservation_path = consumption_directory / (
+        f"{authorization['dispatch_binding']['binding_sha256']}.pending"
+    )
+    reservation_path.unlink()
+
+    result = run_cli(*paths, consumption_directory)
+
+    assert result.returncode != 0
+    assert "DISPATCH_RESERVATION_REQUIRED" in result.stderr
+    assert not list(consumption_directory.glob("*.json"))
 
 
 def test_cli_rejects_duplicate_sent_copy_count(tmp_path):
-    authorization, handoff, observation = ready_inputs()
+    consumption_directory = tmp_path / "consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
     observation["matching_sent_count"] = 2
     paths = write_inputs(tmp_path, authorization, handoff, observation)
 
-    result = run_cli(*paths, tmp_path / "consumption")
+    result = run_cli(*paths, consumption_directory)
 
     assert result.returncode != 0
     assert "POST_SEND_COUNT_INVALID:matching_sent_count" in result.stderr
 
 
 def test_cli_rejects_surviving_draft(tmp_path):
-    authorization, handoff, observation = ready_inputs()
+    consumption_directory = tmp_path / "consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
     observation["draft_label_present"] = True
     observation["matching_current_draft_count"] = 1
     paths = write_inputs(tmp_path, authorization, handoff, observation)
 
-    result = run_cli(*paths, tmp_path / "consumption")
+    result = run_cli(*paths, consumption_directory)
 
     assert result.returncode != 0
     assert "POST_SEND_DRAFT_LABEL_PRESENT" in result.stderr
 
 
 def test_cli_rejects_hash_drift(tmp_path):
-    authorization, handoff, observation = ready_inputs()
+    consumption_directory = tmp_path / "consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
     observation["body_sha256"] = "A" * 64
     paths = write_inputs(tmp_path, authorization, handoff, observation)
 
-    result = run_cli(*paths, tmp_path / "consumption")
+    result = run_cli(*paths, consumption_directory)
 
     assert result.returncode != 0
     assert "POST_SEND_BODY_MISMATCH" in result.stderr
 
 
 def test_cli_rejects_stale_post_send_search(tmp_path):
-    authorization, handoff, observation = ready_inputs()
+    consumption_directory = tmp_path / "consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
     observation["checked_utc"] = iso_z(
         datetime.now(timezone.utc) - timedelta(hours=1)
     )
     paths = write_inputs(tmp_path, authorization, handoff, observation)
 
-    result = run_cli(*paths, tmp_path / "consumption")
+    result = run_cli(*paths, consumption_directory)
 
     assert result.returncode != 0
     assert "POST_SEND_MAILBOX_SEARCH_STALE" in result.stderr
@@ -303,23 +390,28 @@ def test_cli_rejects_stale_post_send_search(tmp_path):
 
 def test_cli_rejects_send_at_approval_expiry(tmp_path):
     base = datetime.now(timezone.utc) - timedelta(minutes=10)
-    authorization, handoff, observation = ready_inputs(base=base)
+    consumption_directory = tmp_path / "consumption"
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory,
+        base=base,
+    )
     observation["sent_utc"] = authorization["approval_binding"][
         "approval_window_expires_utc"
     ]
     paths = write_inputs(tmp_path, authorization, handoff, observation)
 
-    result = run_cli(*paths, tmp_path / "consumption")
+    result = run_cli(*paths, consumption_directory)
 
     assert result.returncode != 0
     assert "POST_SEND_AT_OR_AFTER_APPROVAL_EXPIRY" in result.stderr
 
 
 def test_cli_refuses_to_overwrite_existing_consumption_receipt(tmp_path):
-    authorization, handoff, observation = ready_inputs()
-    paths = write_inputs(tmp_path, authorization, handoff, observation)
     consumption_directory = tmp_path / "consumption"
-    consumption_directory.mkdir()
+    authorization, handoff, observation = ready_inputs(
+        consumption_directory=consumption_directory
+    )
+    paths = write_inputs(tmp_path, authorization, handoff, observation)
     receipt_path = consumption_directory / (
         f"{authorization['dispatch_binding']['binding_sha256']}.json"
     )

@@ -25,6 +25,8 @@ ACTION_TIME_MAILBOX_RECEIPT_TEMPLATE = (
 POST_SEND_OBSERVATION_TEMPLATE = (
     ROOT / "config" / "outreach_post_send_observation_template_v1.json"
 )
+TEST_CONSUMPTION_DIRECTORY_SHA256 = "C" * 64
+TEST_DISPATCH_RESERVATION_SHA256 = "D" * 64
 
 
 def load_module():
@@ -636,6 +638,29 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     )
     assert (
         payload["controls"][
+            "dispatch_consumption_directory_identity_hash_bound"
+        ]
+        is True
+    )
+    assert payload["controls"]["dispatch_reservation_schema"] == (
+        module.DISPATCH_RESERVATION_SCHEMA
+    )
+    assert (
+        payload["controls"][
+            "dispatch_handoff_requires_exclusive_reservation"
+        ]
+        is True
+    )
+    assert (
+        payload["controls"]["competing_handoff_reservation_fail_closed"]
+        is True
+    )
+    assert (
+        payload["controls"]["consumption_finalizes_exact_reservation"]
+        is True
+    )
+    assert (
+        payload["controls"][
             "dispatch_handoff_checks_consumption_directory"
         ]
         is True
@@ -696,6 +721,14 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert "EXACT_VALUE_AND_SOURCE_HASH_BOUND" in markdown
     assert "RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND" in markdown
     assert "Draft binding is send authorization: `false`" in markdown
+    assert "Consumption directory identity: `HASH_BOUND_IN_EXACT_APPROVAL`" in (
+        markdown
+    )
+    assert "Dispatch handoff reservation: `ATOMIC_EXCLUSIVE_REQUIRED`" in (
+        markdown
+    )
+    assert "Competing handoff reservation: `FAIL_CLOSED`" in markdown
+    assert "Consumption finalizes exact reservation: `true`" in markdown
     assert "Action-time mailbox receipt: `REQUIRED`" in markdown
     assert "Exact approval phrase: `BINDING_SCOPED_SINGLE_USE`" in markdown
     assert "Exact approval window: `5_MINUTES_MAX`" in markdown
@@ -1068,6 +1101,7 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
         rendered,
         mailbox_receipt(binding),
         current_utc="2026-07-27T22:05:00Z",
+        consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
     )
 
     assert authorization["schema"] == module.ACTION_TIME_AUTHORIZATION_SCHEMA
@@ -1080,6 +1114,10 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     )
     assert authorization["controls"]["approval_window_seconds"] == 300
     assert authorization["controls"]["single_use"] is True
+    assert (
+        authorization["controls"]["consumption_directory_identity_bound"]
+        is True
+    )
     assert (
         authorization["controls"][
             "private_human_unlock_required_for_dispatch"
@@ -1097,6 +1135,7 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     assert phrase.startswith("APPROVE ONE OUTREACH DISPATCH:")
     assert authorization["approval_binding"]["binding_sha256"] in phrase
     assert binding["binding_sha256"] in phrase
+    assert TEST_CONSUMPTION_DIRECTORY_SHA256 in phrase
     serialized = json.dumps(authorization, sort_keys=True)
     assert facts["recipient_email"] not in serialized
     assert facts["source_message_id"] not in serialized
@@ -1125,7 +1164,11 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
             unlock_token.encode("utf-8")
         ),
         consumption_directory_checked=True,
+        consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         consumption_receipt_present=False,
+        dispatch_reservation_created=True,
+        dispatch_reservation_present=False,
+        dispatch_reservation_sha256=TEST_DISPATCH_RESERVATION_SHA256,
     )
     assert handoff["status"] == (
         "READY_FOR_CONNECTED_SENDER_SINGLE_USE_DISPATCH"
@@ -1139,7 +1182,17 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     assert handoff["handoff_can_send_email"] is False
     assert handoff["private_inputs_omitted"] is True
     assert handoff["consumption_directory_checked"] is True
+    assert (
+        handoff["consumption_directory_sha256"]
+        == TEST_CONSUMPTION_DIRECTORY_SHA256
+    )
     assert handoff["consumption_receipt_present"] is False
+    assert handoff["dispatch_reservation_created"] is True
+    assert handoff["dispatch_reservation_present"] is False
+    assert (
+        handoff["dispatch_reservation_sha256"]
+        == TEST_DISPATCH_RESERVATION_SHA256
+    )
     assert handoff["receipt_sha256"] == module.canonical_object_sha256(
         handoff,
         omit={"receipt_sha256"},
@@ -1157,6 +1210,10 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
             expected_human_unlock_sha256=module.sha256_bytes(
                 unlock_token.encode("utf-8")
             ),
+            consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
+            dispatch_reservation_created=True,
+            dispatch_reservation_present=False,
+            dispatch_reservation_sha256=TEST_DISPATCH_RESERVATION_SHA256,
         )
     )
     assert unchecked_consumption_directory["dispatch_authorized"] is False
@@ -1173,7 +1230,11 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
             unlock_token.encode("utf-8")
         ),
         consumption_directory_checked=True,
+        consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         consumption_receipt_present=False,
+        dispatch_reservation_created=True,
+        dispatch_reservation_present=False,
+        dispatch_reservation_sha256=TEST_DISPATCH_RESERVATION_SHA256,
     )
     assert missing_unlock["action_time_approval_valid"] is True
     assert missing_unlock["private_human_unlock_valid"] is False
@@ -1192,7 +1253,11 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
             unlock_token.encode("utf-8")
         ),
         consumption_directory_checked=True,
+        consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         consumption_receipt_present=False,
+        dispatch_reservation_created=True,
+        dispatch_reservation_present=False,
+        dispatch_reservation_sha256=TEST_DISPATCH_RESERVATION_SHA256,
     )
     assert wrong_unlock["private_human_unlock_valid"] is False
     assert wrong_unlock["dispatch_authorized"] is False
@@ -1205,7 +1270,11 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
         human_unlock_token=unlock_token,
         expected_human_unlock_sha256="not-a-sha256",
         consumption_directory_checked=True,
+        consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         consumption_receipt_present=False,
+        dispatch_reservation_created=True,
+        dispatch_reservation_present=False,
+        dispatch_reservation_sha256=TEST_DISPATCH_RESERVATION_SHA256,
     )
     assert malformed_unlock_hash["private_human_unlock_valid"] is False
     assert malformed_unlock_hash["dispatch_authorized"] is False
@@ -1298,6 +1367,7 @@ def test_action_time_authorization_rejects_deadline_and_bad_mailbox_evidence():
             rendered,
             mailbox_receipt(binding, checked_utc="2026-07-30T20:59:59Z"),
             current_utc="2026-07-30T21:00:00Z",
+            consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         )
 
     cases = [
@@ -1335,6 +1405,9 @@ def test_action_time_authorization_rejects_deadline_and_bad_mailbox_evidence():
                 rendered,
                 receipt,
                 current_utc=current_utc,
+                consumption_directory_sha256=(
+                    TEST_CONSUMPTION_DIRECTORY_SHA256
+                ),
             )
 
     with pytest.raises(
@@ -1345,6 +1418,7 @@ def test_action_time_authorization_rejects_deadline_and_bad_mailbox_evidence():
             rendered,
             mailbox_receipt(binding),
             current_utc="2026-07-27T22:20:00Z",
+            consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         )
 
     with pytest.raises(
@@ -1355,6 +1429,7 @@ def test_action_time_authorization_rejects_deadline_and_bad_mailbox_evidence():
             rendered,
             mailbox_receipt(binding),
             current_utc="2026-07-27T22:04:00Z",
+            consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         )
 
     stale_readback = mailbox_receipt(binding)
@@ -1367,6 +1442,7 @@ def test_action_time_authorization_rejects_deadline_and_bad_mailbox_evidence():
             rendered,
             stale_readback,
             current_utc="2026-07-27T22:20:00Z",
+            consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         )
 
     future_readback = mailbox_receipt(binding)
@@ -1379,6 +1455,7 @@ def test_action_time_authorization_rejects_deadline_and_bad_mailbox_evidence():
             rendered,
             future_readback,
             current_utc="2026-07-27T22:04:00Z",
+            consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         )
 
 
@@ -1417,6 +1494,7 @@ def test_mailbox_receipt_template_is_deliberately_non_authorizing(tmp_path):
             rendered,
             template,
             current_utc="2026-07-27T22:05:00Z",
+            consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         )
 
 
@@ -1499,6 +1577,7 @@ def test_requested_asset_delivery_requires_explicit_request_and_private_review()
             rendered,
             mailbox_receipt(rendered["dispatch_binding"]),
             current_utc="2026-07-27T22:05:00Z",
+            consumption_directory_sha256=TEST_CONSUMPTION_DIRECTORY_SHA256,
         )
 
     content_hashes = {

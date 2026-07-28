@@ -100,6 +100,7 @@ def receipt_summary(
         ],
         "receipt_output": str(output_path),
         "outputs_written": outputs_written,
+        "dispatch_reservation_finalized": outputs_written,
         "single_use_binding_consumed": True,
         "duplicate_send_allowed": False,
         "send_performed_by_receipt_builder": False,
@@ -117,6 +118,22 @@ def deterministic_receipt_path(
         "DISPATCH_CONSUMPTION_BINDING_SHA256_INVALID",
     )
     return consumption_directory / f"{binding_sha256}.json"
+
+
+def deterministic_reservation_path(
+    consumption_directory: Path,
+    authorization: dict[str, Any],
+) -> Path:
+    binding = authorization.get("dispatch_binding")
+    if not isinstance(binding, dict):
+        raise registry.OutreachRegistryError(
+            "DISPATCH_RESERVATION_BINDING_MISSING"
+        )
+    binding_sha256 = registry._normalize_required_sha256(
+        binding.get("binding_sha256"),
+        "DISPATCH_RESERVATION_BINDING_SHA256_INVALID",
+    )
+    return consumption_directory / f"{binding_sha256}.pending"
 
 
 def main() -> int:
@@ -161,20 +178,60 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    consumption_directory_sha256 = (
+        registry.consumption_directory_identity_sha256(
+            args.consumption_directory
+        )
+    )
+    authorization = read_json_object(
+        args.authorization,
+        "DISPATCH_CONSUMPTION_AUTHORIZATION_NOT_OBJECT",
+    )
+    approval_binding = authorization.get("approval_binding")
+    if not isinstance(approval_binding, dict):
+        raise registry.OutreachRegistryError(
+            "DISPATCH_CONSUMPTION_APPROVAL_BINDING_MISSING"
+        )
+    bound_consumption_directory_sha256 = (
+        registry._normalize_required_sha256(
+            approval_binding.get("consumption_directory_sha256"),
+            "DISPATCH_CONSUMPTION_BOUND_DIRECTORY_SHA256_INVALID",
+        )
+    )
+    if (
+        consumption_directory_sha256
+        != bound_consumption_directory_sha256
+    ):
+        raise registry.OutreachRegistryError(
+            "DISPATCH_CONSUMPTION_DIRECTORY_IDENTITY_MISMATCH"
+        )
+    handoff = read_json_object(
+        args.dispatch_handoff,
+        "DISPATCH_CONSUMPTION_HANDOFF_NOT_OBJECT",
+    )
+    post_send_observation = read_json_object(
+        args.post_send_observation,
+        "POST_SEND_OBSERVATION_NOT_OBJECT",
+    )
+    reservation_path = deterministic_reservation_path(
+        args.consumption_directory,
+        authorization,
+    )
+    if not reservation_path.is_file():
+        raise registry.OutreachRegistryError(
+            "DISPATCH_RESERVATION_REQUIRED"
+        )
+    dispatch_reservation = read_json_object(
+        reservation_path,
+        "DISPATCH_RESERVATION_NOT_OBJECT",
+    )
     receipt = registry.build_dispatch_consumption_receipt(
-        read_json_object(
-            args.authorization,
-            "DISPATCH_CONSUMPTION_AUTHORIZATION_NOT_OBJECT",
-        ),
-        read_json_object(
-            args.dispatch_handoff,
-            "DISPATCH_CONSUMPTION_HANDOFF_NOT_OBJECT",
-        ),
-        read_json_object(
-            args.post_send_observation,
-            "POST_SEND_OBSERVATION_NOT_OBJECT",
-        ),
+        authorization,
+        handoff,
+        post_send_observation,
+        dispatch_reservation,
         current_utc=current_utc(),
+        consumption_directory_sha256=consumption_directory_sha256,
     )
     receipt_output = deterministic_receipt_path(
         args.consumption_directory,
@@ -182,6 +239,7 @@ def main() -> int:
     )
     if not args.check:
         write_json_exclusive(receipt_output, receipt)
+        reservation_path.unlink()
     print(
         json.dumps(
             receipt_summary(

@@ -64,6 +64,9 @@ def authorization_summary(
         "approval_binding_sha256": approval_binding["binding_sha256"],
         "dispatch_binding_sha256": dispatch_binding["binding_sha256"],
         "mailbox_receipt_sha256": authorization["mailbox_receipt_sha256"],
+        "consumption_directory_sha256": approval_binding[
+            "consumption_directory_sha256"
+        ],
         "authorization_output": str(output_path),
         "outputs_written": outputs_written,
         "exact_approval_phrase_stored_in_private_output": outputs_written,
@@ -96,6 +99,15 @@ def main() -> int:
         help="Path to a fresh private mailbox-recheck JSON artifact.",
     )
     parser.add_argument(
+        "--consumption-directory",
+        type=Path,
+        required=True,
+        help=(
+            "Existing private canonical directory whose resolved identity "
+            "is bound into the exact approval."
+        ),
+    )
+    parser.add_argument(
         "--authorization-output",
         type=Path,
         required=True,
@@ -118,6 +130,11 @@ def main() -> int:
             "ACTION_TIME_MAILBOX_RECEIPT_NOT_OBJECT",
         ),
         current_utc=current_utc(),
+        consumption_directory_sha256=(
+            registry.consumption_directory_identity_sha256(
+                args.consumption_directory
+            )
+        ),
     )
     if not args.check:
         write_private_json_atomic(args.authorization_output, authorization)

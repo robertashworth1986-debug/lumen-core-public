@@ -35,6 +35,10 @@
 - Dispatch consumption builder: `code/ops/CAPTURE_OUTREACH_DISPATCH_CONSUMPTION.py`
 - Consumption receipt builder can send email: `false`
 - Canonical consumption directory: `REQUIRED_FOR_HANDOFF`
+- Consumption directory identity: `HASH_BOUND_IN_EXACT_APPROVAL`
+- Dispatch handoff reservation: `ATOMIC_EXCLUSIVE_REQUIRED`
+- Competing handoff reservation: `FAIL_CLOSED`
+- Consumption finalizes exact reservation: `true`
 - Consumption receipt filename: `DISPATCH_BINDING_SHA256`
 - Static quality gate: `PASS`
 - Static quality checks: `255`

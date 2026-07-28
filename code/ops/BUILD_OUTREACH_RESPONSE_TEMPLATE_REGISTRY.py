@@ -5,6 +5,7 @@ import hashlib
 import hmac
 import ipaddress
 import json
+import os
 import re
 import string
 import unicodedata
@@ -143,20 +144,21 @@ ACTION_TIME_MAILBOX_RECEIPT_SCHEMA = (
     "lumencore.outreach_action_time_mailbox_receipt.v1"
 )
 ACTION_TIME_AUTHORIZATION_SCHEMA = (
-    "lumencore.outreach_action_time_authorization.v1"
+    "lumencore.outreach_action_time_authorization.v2"
 )
 ACTION_TIME_APPROVAL_BINDING_SCHEMA = (
-    "lumencore.outreach_action_time_approval_binding.v1"
+    "lumencore.outreach_action_time_approval_binding.v2"
 )
 ACTION_TIME_DISPATCH_HANDOFF_SCHEMA = (
-    "lumencore.outreach_action_time_dispatch_handoff.v1"
+    "lumencore.outreach_action_time_dispatch_handoff.v2"
 )
 POST_SEND_OBSERVATION_SCHEMA = (
     "lumencore.outreach_post_send_observation.private.v1"
 )
 DISPATCH_CONSUMPTION_RECEIPT_SCHEMA = (
-    "lumencore.outreach_dispatch_consumption_receipt.v1"
+    "lumencore.outreach_dispatch_consumption_receipt.v2"
 )
+DISPATCH_RESERVATION_SCHEMA = "lumencore.outreach_dispatch_reservation.v1"
 ACTION_TIME_MAILBOX_MAX_AGE_SECONDS = 15 * 60
 ACTION_TIME_APPROVAL_WINDOW_SECONDS = 5 * 60
 POST_SEND_MAILBOX_MAX_AGE_SECONDS = 15 * 60
@@ -296,9 +298,13 @@ ACTION_TIME_DISPATCH_HANDOFF_FIELDS = {
     "blockers",
     "claim_boundary",
     "consumption_directory_checked",
+    "consumption_directory_sha256",
     "consumption_receipt_present",
     "dispatch_authorized",
     "dispatch_binding_sha256",
+    "dispatch_reservation_created",
+    "dispatch_reservation_present",
+    "dispatch_reservation_sha256",
     "evaluated_utc",
     "external_action_performed",
     "handoff_can_send_email",
@@ -312,6 +318,16 @@ ACTION_TIME_DISPATCH_HANDOFF_FIELDS = {
     "send_authorized",
     "send_performed",
     "single_use_binding_consumed",
+    "status",
+}
+DISPATCH_RESERVATION_FIELDS = {
+    "approval_binding_sha256",
+    "consumption_directory_sha256",
+    "dispatch_binding_sha256",
+    "reservation_sha256",
+    "reserved_utc",
+    "schema",
+    "send_performed",
     "status",
 }
 DIRECT_CLAIM_NEGATION_SUFFIX_RE = re.compile(
@@ -479,6 +495,17 @@ def validate_post_send_observation_template(
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest().upper()
+
+
+def consumption_directory_identity_sha256(path: Path) -> str:
+    try:
+        resolved = path.resolve(strict=True)
+    except OSError as exc:
+        raise OutreachRegistryError("CONSUMPTION_DIRECTORY_REQUIRED") from exc
+    if not resolved.is_dir():
+        raise OutreachRegistryError("CONSUMPTION_DIRECTORY_REQUIRED")
+    canonical_path = os.path.normcase(os.path.realpath(os.fspath(resolved)))
+    return sha256_bytes(canonical_path.encode("utf-8"))
 
 
 def canonical_object_sha256(
@@ -1667,6 +1694,8 @@ def _action_time_approval_phrase(binding: dict[str, Any]) -> str:
         f"subject SHA-256 {binding['subject_sha256']}; "
         f"body SHA-256 {binding['body_sha256']}; "
         f"attachment set SHA-256 {binding['attachment_set_sha256']}; "
+        f"consumption directory SHA-256 "
+        f"{binding['consumption_directory_sha256']}; "
         f"expires {binding['approval_window_expires_utc']}."
     )
 
@@ -1676,6 +1705,7 @@ def build_action_time_authorization(
     mailbox_receipt: dict[str, Any],
     *,
     current_utc: str,
+    consumption_directory_sha256: str,
 ) -> dict[str, Any]:
     binding = _validated_ready_dispatch_binding(rendered)
     current = parse_aware_datetime(current_utc)
@@ -1702,6 +1732,10 @@ def build_action_time_authorization(
         expires = min(expires, deadline)
     opened_utc = current.isoformat().replace("+00:00", "Z")
     expires_utc = expires.isoformat().replace("+00:00", "Z")
+    normalized_consumption_directory_sha256 = _normalize_required_sha256(
+        consumption_directory_sha256,
+        "CONSUMPTION_DIRECTORY_SHA256_INVALID",
+    )
     core = {
         "schema": ACTION_TIME_APPROVAL_BINDING_SCHEMA,
         "template_id": str(binding["template_id"]),
@@ -1712,6 +1746,9 @@ def build_action_time_authorization(
         "subject_sha256": str(binding["subject_sha256"]),
         "body_sha256": str(binding["body_sha256"]),
         "attachment_set_sha256": str(binding["attachment_set_sha256"]),
+        "consumption_directory_sha256": (
+            normalized_consumption_directory_sha256
+        ),
         "approval_window_opened_utc": opened_utc,
         "approval_window_expires_utc": expires_utc,
         "single_use": True,
@@ -1744,6 +1781,7 @@ def build_action_time_authorization(
             ),
             "exact_phrase_required": True,
             "single_use": True,
+            "consumption_directory_identity_bound": True,
             "private_human_unlock_required_for_dispatch": True,
             "authorization_evaluator_can_send_email": False,
             "deadline_reached_fail_closed": True,
@@ -1785,7 +1823,24 @@ def evaluate_action_time_authorization(
         approval_binding.get("binding_sha256")
         == expected_binding_sha256
     )
-    expected_phrase = _action_time_approval_phrase(approval_binding)
+    consumption_directory_binding_valid = False
+    try:
+        bound_consumption_directory_sha256 = _normalize_required_sha256(
+            approval_binding.get("consumption_directory_sha256"),
+            "CONSUMPTION_DIRECTORY_SHA256_INVALID",
+        )
+    except OutreachRegistryError:
+        bound_consumption_directory_sha256 = None
+    else:
+        consumption_directory_binding_valid = (
+            approval_binding.get("consumption_directory_sha256")
+            == bound_consumption_directory_sha256
+        )
+    expected_phrase = (
+        _action_time_approval_phrase(approval_binding)
+        if consumption_directory_binding_valid
+        else ""
+    )
     phrase_integrity_valid = (
         authorization.get("exact_action_time_approval_phrase")
         == expected_phrase
@@ -1870,6 +1925,7 @@ def evaluate_action_time_authorization(
     valid = all(
         (
             binding_hash_valid,
+            consumption_directory_binding_valid,
             phrase_integrity_valid,
             phrase_matches,
             approval_window_bounded,
@@ -1885,6 +1941,8 @@ def evaluate_action_time_authorization(
     blockers = []
     if not binding_hash_valid:
         blockers.append("ACTION_TIME_BINDING_HASH_MISMATCH")
+    if not consumption_directory_binding_valid:
+        blockers.append("CONSUMPTION_DIRECTORY_BINDING_INVALID")
     if not phrase_integrity_valid:
         blockers.append("STORED_APPROVAL_PHRASE_TAMPERED")
     if not phrase_matches:
@@ -1917,6 +1975,9 @@ def evaluate_action_time_authorization(
         "action_time_approval_valid": valid,
         "approval_window_current": window_current,
         "approval_window_bounded": approval_window_bounded,
+        "consumption_directory_binding_valid": (
+            consumption_directory_binding_valid
+        ),
         "dispatch_binding_integrity_valid": dispatch_binding_hash_valid,
         "dispatch_scope_matches": dispatch_scope_matches,
         "deadline_bounds_window": deadline_bounds_window,
@@ -1935,6 +1996,140 @@ def evaluate_action_time_authorization(
     }
 
 
+def build_dispatch_reservation(
+    authorization: dict[str, Any],
+    *,
+    current_utc: str,
+) -> dict[str, Any]:
+    approval = evaluate_action_time_authorization(
+        authorization,
+        exact_approval_phrase=str(
+            authorization.get("exact_action_time_approval_phrase") or ""
+        ),
+        current_utc=current_utc,
+        dispatch_consumed=False,
+    )
+    if approval.get("action_time_approval_valid") is not True:
+        raise OutreachRegistryError(
+            "DISPATCH_RESERVATION_AUTHORIZATION_INVALID"
+        )
+    approval_binding = authorization.get("approval_binding")
+    dispatch_binding = authorization.get("dispatch_binding")
+    if not isinstance(approval_binding, dict) or not isinstance(
+        dispatch_binding, dict
+    ):
+        raise OutreachRegistryError(
+            "DISPATCH_RESERVATION_BINDINGS_MISSING"
+        )
+    core = {
+        "schema": DISPATCH_RESERVATION_SCHEMA,
+        "status": "SINGLE_USE_DISPATCH_RESERVED",
+        "reserved_utc": approval["evaluated_utc"],
+        "approval_binding_sha256": _normalize_required_sha256(
+            approval_binding.get("binding_sha256"),
+            "DISPATCH_RESERVATION_APPROVAL_SHA256_INVALID",
+        ),
+        "dispatch_binding_sha256": _normalize_required_sha256(
+            dispatch_binding.get("binding_sha256"),
+            "DISPATCH_RESERVATION_BINDING_SHA256_INVALID",
+        ),
+        "consumption_directory_sha256": _normalize_required_sha256(
+            approval_binding.get("consumption_directory_sha256"),
+            "DISPATCH_RESERVATION_DIRECTORY_SHA256_INVALID",
+        ),
+        "send_performed": False,
+    }
+    return {
+        **core,
+        "reservation_sha256": canonical_object_sha256(core),
+    }
+
+
+def validate_dispatch_reservation(
+    reservation: dict[str, Any],
+    authorization: dict[str, Any],
+    *,
+    consumption_directory_sha256: str,
+) -> tuple[dict[str, Any], str]:
+    if not isinstance(reservation, dict):
+        raise OutreachRegistryError("DISPATCH_RESERVATION_INVALID")
+    if set(reservation) != DISPATCH_RESERVATION_FIELDS:
+        raise OutreachRegistryError("DISPATCH_RESERVATION_FIELDS_INVALID")
+    if reservation.get("schema") != DISPATCH_RESERVATION_SCHEMA:
+        raise OutreachRegistryError("DISPATCH_RESERVATION_SCHEMA_INVALID")
+    if reservation.get("status") != "SINGLE_USE_DISPATCH_RESERVED":
+        raise OutreachRegistryError("DISPATCH_RESERVATION_STATUS_INVALID")
+    if reservation.get("send_performed") is not False:
+        raise OutreachRegistryError("DISPATCH_RESERVATION_SEND_STATE_INVALID")
+    expected_reservation_sha256 = canonical_object_sha256(
+        reservation,
+        omit={"reservation_sha256"},
+    )
+    if reservation.get("reservation_sha256") != expected_reservation_sha256:
+        raise OutreachRegistryError("DISPATCH_RESERVATION_HASH_MISMATCH")
+
+    approval_binding = authorization.get("approval_binding")
+    dispatch_binding = authorization.get("dispatch_binding")
+    if not isinstance(approval_binding, dict) or not isinstance(
+        dispatch_binding, dict
+    ):
+        raise OutreachRegistryError(
+            "DISPATCH_RESERVATION_AUTHORIZATION_BINDINGS_MISSING"
+        )
+    expected_scope = {
+        "approval_binding_sha256": approval_binding.get("binding_sha256"),
+        "dispatch_binding_sha256": dispatch_binding.get("binding_sha256"),
+        "consumption_directory_sha256": approval_binding.get(
+            "consumption_directory_sha256"
+        ),
+    }
+    normalized = dict(reservation)
+    for field, expected in expected_scope.items():
+        observed = _normalize_required_sha256(
+            reservation.get(field),
+            f"DISPATCH_RESERVATION_{field.upper()}_INVALID",
+        )
+        normalized_expected = _normalize_required_sha256(
+            expected,
+            f"DISPATCH_RESERVATION_AUTHORIZATION_{field.upper()}_INVALID",
+        )
+        if observed != normalized_expected:
+            raise OutreachRegistryError(
+                f"DISPATCH_RESERVATION_{field.upper()}_MISMATCH"
+            )
+        normalized[field] = observed
+    observed_directory_sha256 = _normalize_required_sha256(
+        consumption_directory_sha256,
+        "DISPATCH_RESERVATION_OBSERVED_DIRECTORY_SHA256_INVALID",
+    )
+    if observed_directory_sha256 != normalized[
+        "consumption_directory_sha256"
+    ]:
+        raise OutreachRegistryError(
+            "DISPATCH_RESERVATION_DIRECTORY_IDENTITY_MISMATCH"
+        )
+
+    reserved = parse_aware_datetime(
+        str(reservation.get("reserved_utc") or "")
+    )
+    opened = parse_aware_datetime(
+        str(approval_binding.get("approval_window_opened_utc") or "")
+    )
+    expires = parse_aware_datetime(
+        str(approval_binding.get("approval_window_expires_utc") or "")
+    )
+    if not opened <= reserved < expires:
+        raise OutreachRegistryError(
+            "DISPATCH_RESERVATION_OUTSIDE_APPROVAL_WINDOW"
+        )
+    normalized["reserved_utc"] = reserved.isoformat().replace("+00:00", "Z")
+    if normalized != reservation:
+        raise OutreachRegistryError(
+            "DISPATCH_RESERVATION_NOT_CANONICAL"
+        )
+    return normalized, expected_reservation_sha256
+
+
 def evaluate_action_time_dispatch_handoff(
     authorization: dict[str, Any],
     *,
@@ -1944,7 +2139,11 @@ def evaluate_action_time_dispatch_handoff(
     expected_human_unlock_sha256: str | None,
     dispatch_consumed: bool = False,
     consumption_directory_checked: bool = False,
+    consumption_directory_sha256: str | None = None,
     consumption_receipt_present: bool = False,
+    dispatch_reservation_created: bool = False,
+    dispatch_reservation_present: bool = False,
+    dispatch_reservation_sha256: str | None = None,
 ) -> dict[str, Any]:
     if not isinstance(consumption_directory_checked, bool):
         raise OutreachRegistryError(
@@ -1954,8 +2153,57 @@ def evaluate_action_time_dispatch_handoff(
         raise OutreachRegistryError(
             "CONSUMPTION_RECEIPT_STATE_INVALID"
         )
+    if not isinstance(dispatch_reservation_created, bool):
+        raise OutreachRegistryError(
+            "DISPATCH_RESERVATION_CREATED_STATE_INVALID"
+        )
+    if not isinstance(dispatch_reservation_present, bool):
+        raise OutreachRegistryError(
+            "DISPATCH_RESERVATION_PRESENT_STATE_INVALID"
+        )
+    normalized_dispatch_reservation_sha256 = None
+    if dispatch_reservation_created:
+        try:
+            normalized_dispatch_reservation_sha256 = (
+                _normalize_required_sha256(
+                    dispatch_reservation_sha256,
+                    "DISPATCH_RESERVATION_SHA256_INVALID",
+                )
+            )
+        except OutreachRegistryError:
+            pass
+    elif dispatch_reservation_sha256 is not None:
+        raise OutreachRegistryError(
+            "DISPATCH_RESERVATION_SHA256_WITHOUT_CREATION"
+        )
+    observed_consumption_directory_sha256 = None
+    consumption_directory_identity_matches = False
+    try:
+        observed_consumption_directory_sha256 = _normalize_required_sha256(
+            consumption_directory_sha256,
+            "CONSUMPTION_DIRECTORY_SHA256_INVALID",
+        )
+    except OutreachRegistryError:
+        pass
+    approval_binding = authorization.get("approval_binding")
+    if isinstance(approval_binding, dict):
+        try:
+            expected_consumption_directory_sha256 = (
+                _normalize_required_sha256(
+                    approval_binding.get("consumption_directory_sha256"),
+                    "CONSUMPTION_DIRECTORY_BINDING_INVALID",
+                )
+            )
+        except OutreachRegistryError:
+            expected_consumption_directory_sha256 = None
+        consumption_directory_identity_matches = bool(
+            observed_consumption_directory_sha256
+            and observed_consumption_directory_sha256
+            == expected_consumption_directory_sha256
+        )
     observed_consumed = bool(
-        dispatch_consumed or consumption_receipt_present
+        dispatch_consumed
+        or consumption_receipt_present
     )
     approval = evaluate_action_time_authorization(
         authorization,
@@ -1988,17 +2236,28 @@ def evaluate_action_time_dispatch_handoff(
             unlock_blockers.append("PRIVATE_HUMAN_UNLOCK_MISMATCH")
     if not consumption_directory_checked:
         unlock_blockers.append("CONSUMPTION_DIRECTORY_NOT_CHECKED")
+    if not consumption_directory_identity_matches:
+        unlock_blockers.append("CONSUMPTION_DIRECTORY_IDENTITY_MISMATCH")
+    if dispatch_reservation_present:
+        unlock_blockers.append("SINGLE_USE_BINDING_ALREADY_RESERVED")
+    if not dispatch_reservation_created and not dispatch_reservation_present:
+        unlock_blockers.append("DISPATCH_RESERVATION_REQUIRED")
+    elif normalized_dispatch_reservation_sha256 is None:
+        unlock_blockers.append("DISPATCH_RESERVATION_SHA256_INVALID")
 
     dispatch_authorized = bool(
         approval["action_time_approval_valid"]
         and unlock_valid
         and consumption_directory_checked
+        and consumption_directory_identity_matches
         and not consumption_receipt_present
+        and not dispatch_reservation_present
+        and dispatch_reservation_created
+        and normalized_dispatch_reservation_sha256 is not None
     )
     blockers = sorted(
         set(approval["blockers"]).union(unlock_blockers)
     )
-    approval_binding = authorization.get("approval_binding")
     dispatch_binding = authorization.get("dispatch_binding")
     core = {
         "schema": ACTION_TIME_DISPATCH_HANDOFF_SCHEMA,
@@ -2029,7 +2288,15 @@ def evaluate_action_time_dispatch_handoff(
         "private_human_unlock_supplied": token_present,
         "private_human_unlock_valid": unlock_valid,
         "consumption_directory_checked": consumption_directory_checked,
+        "consumption_directory_sha256": (
+            observed_consumption_directory_sha256
+        ),
         "consumption_receipt_present": consumption_receipt_present,
+        "dispatch_reservation_created": dispatch_reservation_created,
+        "dispatch_reservation_present": dispatch_reservation_present,
+        "dispatch_reservation_sha256": (
+            normalized_dispatch_reservation_sha256
+        ),
         "single_use_binding_consumed": observed_consumed,
         "blockers": blockers,
         "dispatch_authorized": dispatch_authorized,
@@ -2070,6 +2337,9 @@ def evaluate_action_time_dispatch_handoff(
 def _validate_dispatch_handoff_for_consumption(
     authorization: dict[str, Any],
     handoff: dict[str, Any],
+    *,
+    consumption_directory_sha256: str,
+    dispatch_reservation_sha256: str,
 ) -> tuple[dict[str, Any], datetime]:
     if not isinstance(handoff, dict):
         raise OutreachRegistryError("DISPATCH_HANDOFF_INVALID")
@@ -2089,6 +2359,7 @@ def _validate_dispatch_handoff_for_consumption(
         "approval_window_current",
         "consumption_directory_checked",
         "dispatch_authorized",
+        "dispatch_reservation_created",
         "private_human_unlock_configured",
         "private_human_unlock_supplied",
         "private_human_unlock_valid",
@@ -2104,6 +2375,7 @@ def _validate_dispatch_handoff_for_consumption(
         "external_action_performed",
         "handoff_can_send_email",
         "consumption_receipt_present",
+        "dispatch_reservation_present",
         "send_performed",
         "single_use_binding_consumed",
     }
@@ -2133,6 +2405,10 @@ def _validate_dispatch_handoff_for_consumption(
         "mailbox_receipt_sha256": authorization.get(
             "mailbox_receipt_sha256"
         ),
+        "consumption_directory_sha256": approval_binding.get(
+            "consumption_directory_sha256"
+        ),
+        "dispatch_reservation_sha256": dispatch_reservation_sha256,
     }
     for field, expected in expected_scope.items():
         observed = _normalize_required_sha256(
@@ -2147,6 +2423,17 @@ def _validate_dispatch_handoff_for_consumption(
             raise OutreachRegistryError(
                 f"DISPATCH_HANDOFF_{field.upper()}_MISMATCH"
             )
+    observed_consumption_directory_sha256 = _normalize_required_sha256(
+        consumption_directory_sha256,
+        "DISPATCH_CONSUMPTION_DIRECTORY_SHA256_INVALID",
+    )
+    if (
+        observed_consumption_directory_sha256
+        != expected_scope["consumption_directory_sha256"]
+    ):
+        raise OutreachRegistryError(
+            "DISPATCH_CONSUMPTION_DIRECTORY_IDENTITY_MISMATCH"
+        )
 
     evaluated_utc = canonical_utc(
         str(handoff.get("evaluated_utc") or "")
@@ -2315,8 +2602,10 @@ def build_dispatch_consumption_receipt(
     authorization: dict[str, Any],
     handoff: dict[str, Any],
     post_send_observation: dict[str, Any],
+    dispatch_reservation: dict[str, Any],
     *,
     current_utc: str,
+    consumption_directory_sha256: str,
 ) -> dict[str, Any]:
     if not isinstance(authorization, dict) or authorization.get(
         "schema"
@@ -2325,10 +2614,17 @@ def build_dispatch_consumption_receipt(
             "DISPATCH_CONSUMPTION_AUTHORIZATION_INVALID"
         )
     current = parse_aware_datetime(current_utc)
+    _, dispatch_reservation_sha256 = validate_dispatch_reservation(
+        dispatch_reservation,
+        authorization,
+        consumption_directory_sha256=consumption_directory_sha256,
+    )
     validated_handoff, handoff_evaluated = (
         _validate_dispatch_handoff_for_consumption(
             authorization,
             handoff,
+            consumption_directory_sha256=consumption_directory_sha256,
+            dispatch_reservation_sha256=dispatch_reservation_sha256,
         )
     )
     normalized_observation, observation_sha256, sent = (
@@ -2350,6 +2646,10 @@ def build_dispatch_consumption_receipt(
         "template_id": approval_binding["template_id"],
         "approval_binding_sha256": approval_binding["binding_sha256"],
         "dispatch_binding_sha256": dispatch_binding["binding_sha256"],
+        "consumption_directory_sha256": (
+            approval_binding["consumption_directory_sha256"]
+        ),
+        "dispatch_reservation_sha256": dispatch_reservation_sha256,
         "pre_send_mailbox_receipt_sha256": authorization[
             "mailbox_receipt_sha256"
         ],
@@ -2522,7 +2822,12 @@ def build_public_payload(
             ),
             "dispatch_consumption_receipt_builder_can_send_email": False,
             "dispatch_consumption_directory_required": True,
+            "dispatch_consumption_directory_identity_hash_bound": True,
             "dispatch_handoff_checks_consumption_directory": True,
+            "dispatch_reservation_schema": DISPATCH_RESERVATION_SCHEMA,
+            "dispatch_handoff_requires_exclusive_reservation": True,
+            "competing_handoff_reservation_fail_closed": True,
+            "consumption_finalizes_exact_reservation": True,
             "consumption_receipt_name_bound_to_dispatch_sha256": True,
             "consumed_binding_duplicate_send_allowed": False,
             "source_config_hash_cross_platform_canonical_json": True,
@@ -2578,6 +2883,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "`code/ops/CAPTURE_OUTREACH_DISPATCH_CONSUMPTION.py`",
         "- Consumption receipt builder can send email: `false`",
         "- Canonical consumption directory: `REQUIRED_FOR_HANDOFF`",
+        "- Consumption directory identity: `HASH_BOUND_IN_EXACT_APPROVAL`",
+        "- Dispatch handoff reservation: `ATOMIC_EXCLUSIVE_REQUIRED`",
+        "- Competing handoff reservation: `FAIL_CLOSED`",
+        "- Consumption finalizes exact reservation: `true`",
         "- Consumption receipt filename: `DISPATCH_BINDING_SHA256`",
         f"- Static quality gate: `{payload['quality_gate']['status']}`",
         f"- Static quality checks: `{payload['quality_gate']['check_count']}`",

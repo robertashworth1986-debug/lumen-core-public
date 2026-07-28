@@ -54,6 +54,44 @@ def consumption_receipt_path(
     return consumption_directory / f"{binding_sha256}.json"
 
 
+def dispatch_reservation_path(
+    authorization: dict[str, Any],
+    consumption_directory: Path,
+) -> Path:
+    receipt_path = consumption_receipt_path(
+        authorization,
+        consumption_directory,
+    )
+    return receipt_path.with_suffix(".pending")
+
+
+def write_json_exclusive(path: Path, payload: dict[str, Any]) -> None:
+    serialized = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    try:
+        descriptor = os.open(
+            path,
+            os.O_CREAT | os.O_EXCL | os.O_WRONLY,
+            0o600,
+        )
+    except FileExistsError as exc:
+        raise registry.OutreachRegistryError(
+            "DISPATCH_RESERVATION_ALREADY_EXISTS"
+        ) from exc
+    try:
+        with os.fdopen(
+            descriptor,
+            "w",
+            encoding="utf-8",
+            newline="\n",
+        ) as handle:
+            handle.write(serialized)
+            handle.flush()
+            os.fsync(handle.fileno())
+    except BaseException:
+        path.unlink(missing_ok=True)
+        raise
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
@@ -89,15 +127,26 @@ def main() -> int:
     args = parser.parse_args()
 
     authorization = read_authorization(args.authorization)
+    consumption_directory_sha256 = (
+        registry.consumption_directory_identity_sha256(
+            args.consumption_directory
+        )
+    )
     consumption_path = consumption_receipt_path(
         authorization,
         args.consumption_directory,
     )
+    reservation_path = dispatch_reservation_path(
+        authorization,
+        args.consumption_directory,
+    )
     consumption_receipt_present = consumption_path.exists()
+    dispatch_reservation_present = reservation_path.exists()
+    evaluated_utc = args.current_utc or current_utc()
     handoff = registry.evaluate_action_time_dispatch_handoff(
         authorization,
         exact_approval_phrase=os.environ.get(APPROVAL_PHRASE_ENV, ""),
-        current_utc=args.current_utc or current_utc(),
+        current_utc=evaluated_utc,
         human_unlock_token=os.environ.get(HUMAN_UNLOCK_TOKEN_ENV),
         expected_human_unlock_sha256=os.environ.get(
             HUMAN_UNLOCK_SHA256_ENV
@@ -106,8 +155,71 @@ def main() -> int:
             args.dispatch_consumed or consumption_receipt_present
         ),
         consumption_directory_checked=True,
+        consumption_directory_sha256=consumption_directory_sha256,
         consumption_receipt_present=consumption_receipt_present,
+        dispatch_reservation_created=False,
+        dispatch_reservation_present=dispatch_reservation_present,
+        dispatch_reservation_sha256=None,
     )
+    if handoff["blockers"] == ["DISPATCH_RESERVATION_REQUIRED"]:
+        reservation = registry.build_dispatch_reservation(
+            authorization,
+            current_utc=evaluated_utc,
+        )
+        try:
+            write_json_exclusive(reservation_path, reservation)
+        except registry.OutreachRegistryError as exc:
+            if str(exc) != "DISPATCH_RESERVATION_ALREADY_EXISTS":
+                raise
+            handoff = registry.evaluate_action_time_dispatch_handoff(
+                authorization,
+                exact_approval_phrase=os.environ.get(
+                    APPROVAL_PHRASE_ENV,
+                    "",
+                ),
+                current_utc=evaluated_utc,
+                human_unlock_token=os.environ.get(HUMAN_UNLOCK_TOKEN_ENV),
+                expected_human_unlock_sha256=os.environ.get(
+                    HUMAN_UNLOCK_SHA256_ENV
+                ),
+                dispatch_consumed=args.dispatch_consumed,
+                consumption_directory_checked=True,
+                consumption_directory_sha256=(
+                    consumption_directory_sha256
+                ),
+                consumption_receipt_present=(
+                    consumption_receipt_present
+                ),
+                dispatch_reservation_created=False,
+                dispatch_reservation_present=True,
+                dispatch_reservation_sha256=None,
+            )
+        else:
+            handoff = registry.evaluate_action_time_dispatch_handoff(
+                authorization,
+                exact_approval_phrase=os.environ.get(
+                    APPROVAL_PHRASE_ENV,
+                    "",
+                ),
+                current_utc=evaluated_utc,
+                human_unlock_token=os.environ.get(HUMAN_UNLOCK_TOKEN_ENV),
+                expected_human_unlock_sha256=os.environ.get(
+                    HUMAN_UNLOCK_SHA256_ENV
+                ),
+                dispatch_consumed=args.dispatch_consumed,
+                consumption_directory_checked=True,
+                consumption_directory_sha256=(
+                    consumption_directory_sha256
+                ),
+                consumption_receipt_present=(
+                    consumption_receipt_present
+                ),
+                dispatch_reservation_created=True,
+                dispatch_reservation_present=False,
+                dispatch_reservation_sha256=reservation[
+                    "reservation_sha256"
+                ],
+            )
     print(json.dumps(handoff, indent=2, sort_keys=True))
     return 0 if handoff["dispatch_authorized"] else 3
 

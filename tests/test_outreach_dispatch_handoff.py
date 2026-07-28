@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import importlib.util
 import json
 import os
@@ -55,8 +56,9 @@ def mailbox_receipt(binding: dict[str, object]) -> dict[str, object]:
     }
 
 
-def build_authorization():
+def build_authorization(consumption_directory: Path):
     module = load_registry()
+    consumption_directory.mkdir(parents=True, exist_ok=True)
     facts = {
         "recipient_name": "Reviewer",
         "recipient_email": "reviewer@example.org",
@@ -72,6 +74,11 @@ def build_authorization():
         rendered,
         mailbox_receipt(rendered["dispatch_binding"]),
         current_utc="2026-07-27T22:05:00Z",
+        consumption_directory_sha256=(
+            module.consumption_directory_identity_sha256(
+                consumption_directory
+            )
+        ),
     )
     return module, authorization
 
@@ -121,7 +128,7 @@ def run_handoff(
 
 
 def test_cli_requires_private_unlock_and_never_exposes_private_inputs(tmp_path):
-    module, authorization = build_authorization()
+    module, authorization = build_authorization(tmp_path / "consumption")
     authorization_path = tmp_path / "authorization.json"
     authorization_path.write_text(
         json.dumps(authorization),
@@ -130,6 +137,26 @@ def test_cli_requires_private_unlock_and_never_exposes_private_inputs(tmp_path):
     phrase = authorization["exact_action_time_approval_phrase"]
     token = "synthetic-private-unlock"
     expected_sha256 = module.sha256_bytes(token.encode("utf-8"))
+
+    missing = run_handoff(
+        authorization_path,
+        phrase=phrase,
+        token=None,
+        expected_sha256=expected_sha256,
+    )
+    assert missing.returncode == 3, missing.stderr
+    blocked = json.loads(missing.stdout)
+    assert blocked["action_time_approval_valid"] is True
+    assert blocked["private_human_unlock_valid"] is False
+    assert blocked["dispatch_authorized"] is False
+    assert blocked["send_authorized"] is False
+    assert blocked["blockers"] == [
+        "DISPATCH_RESERVATION_REQUIRED",
+        "PRIVATE_HUMAN_UNLOCK_TOKEN_REQUIRED",
+    ]
+    assert phrase not in missing.stdout
+    assert token not in missing.stdout
+    assert expected_sha256 not in missing.stdout
 
     allowed = run_handoff(
         authorization_path,
@@ -146,32 +173,20 @@ def test_cli_requires_private_unlock_and_never_exposes_private_inputs(tmp_path):
     assert receipt["private_inputs_omitted"] is True
     assert receipt["consumption_directory_checked"] is True
     assert receipt["consumption_receipt_present"] is False
+    assert receipt["dispatch_reservation_created"] is True
+    assert receipt["dispatch_reservation_present"] is False
+    assert receipt["dispatch_reservation_sha256"]
+    pending = tmp_path / "consumption" / (
+        f"{authorization['dispatch_binding']['binding_sha256']}.pending"
+    )
+    assert pending.is_file()
     assert phrase not in allowed.stdout
     assert token not in allowed.stdout
     assert expected_sha256 not in allowed.stdout
 
-    missing = run_handoff(
-        authorization_path,
-        phrase=phrase,
-        token=None,
-        expected_sha256=expected_sha256,
-    )
-    assert missing.returncode == 3, missing.stderr
-    blocked = json.loads(missing.stdout)
-    assert blocked["action_time_approval_valid"] is True
-    assert blocked["private_human_unlock_valid"] is False
-    assert blocked["dispatch_authorized"] is False
-    assert blocked["send_authorized"] is False
-    assert blocked["blockers"] == [
-        "PRIVATE_HUMAN_UNLOCK_TOKEN_REQUIRED"
-    ]
-    assert phrase not in missing.stdout
-    assert token not in missing.stdout
-    assert expected_sha256 not in missing.stdout
-
 
 def test_cli_fails_closed_after_single_use_binding_is_consumed(tmp_path):
-    module, authorization = build_authorization()
+    module, authorization = build_authorization(tmp_path / "consumption")
     authorization_path = tmp_path / "authorization.json"
     authorization_path.write_text(
         json.dumps(authorization),
@@ -196,14 +211,13 @@ def test_cli_fails_closed_after_single_use_binding_is_consumed(tmp_path):
 
 
 def test_cli_blocks_when_deterministic_consumption_receipt_exists(tmp_path):
-    module, authorization = build_authorization()
+    consumption_directory = tmp_path / "consumption"
+    module, authorization = build_authorization(consumption_directory)
     authorization_path = tmp_path / "authorization.json"
     authorization_path.write_text(
         json.dumps(authorization),
         encoding="utf-8",
     )
-    consumption_directory = tmp_path / "consumption"
-    consumption_directory.mkdir()
     binding_sha256 = authorization["dispatch_binding"]["binding_sha256"]
     (consumption_directory / f"{binding_sha256}.json").write_text(
         "{}\n",
@@ -226,3 +240,78 @@ def test_cli_blocks_when_deterministic_consumption_receipt_exists(tmp_path):
     assert receipt["single_use_binding_consumed"] is True
     assert receipt["dispatch_authorized"] is False
     assert "SINGLE_USE_BINDING_ALREADY_CONSUMED" in receipt["blockers"]
+
+
+def test_cli_cannot_bypass_consumption_with_alternate_directory(tmp_path):
+    canonical_directory = tmp_path / "canonical-consumption"
+    module, authorization = build_authorization(canonical_directory)
+    authorization_path = tmp_path / "authorization.json"
+    authorization_path.write_text(
+        json.dumps(authorization),
+        encoding="utf-8",
+    )
+    binding_sha256 = authorization["dispatch_binding"]["binding_sha256"]
+    (canonical_directory / f"{binding_sha256}.json").write_text(
+        "{}\n",
+        encoding="utf-8",
+    )
+    alternate_directory = tmp_path / "alternate-consumption"
+    token = "synthetic-private-unlock"
+    expected_sha256 = module.sha256_bytes(token.encode("utf-8"))
+
+    blocked = run_handoff(
+        authorization_path,
+        phrase=authorization["exact_action_time_approval_phrase"],
+        token=token,
+        expected_sha256=expected_sha256,
+        consumption_directory=canonical_directory,
+    )
+    bypass_attempt = run_handoff(
+        authorization_path,
+        phrase=authorization["exact_action_time_approval_phrase"],
+        token=token,
+        expected_sha256=expected_sha256,
+        consumption_directory=alternate_directory,
+    )
+
+    assert blocked.returncode == 3, blocked.stderr
+    assert bypass_attempt.returncode == 3, bypass_attempt.stderr
+    bypass_receipt = json.loads(bypass_attempt.stdout)
+    assert bypass_receipt["dispatch_authorized"] is False
+    assert "CONSUMPTION_DIRECTORY_IDENTITY_MISMATCH" in bypass_receipt[
+        "blockers"
+    ]
+
+
+def test_cli_allows_only_one_exclusive_dispatch_reservation(tmp_path):
+    consumption_directory = tmp_path / "consumption"
+    module, authorization = build_authorization(consumption_directory)
+    authorization_path = tmp_path / "authorization.json"
+    authorization_path.write_text(
+        json.dumps(authorization),
+        encoding="utf-8",
+    )
+    token = "synthetic-private-unlock"
+    kwargs = {
+        "phrase": authorization["exact_action_time_approval_phrase"],
+        "token": token,
+        "expected_sha256": module.sha256_bytes(token.encode("utf-8")),
+        "consumption_directory": consumption_directory,
+    }
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(
+            executor.map(
+                lambda _: run_handoff(authorization_path, **kwargs),
+                range(2),
+            )
+        )
+
+    assert sorted(result.returncode for result in results) == [0, 3]
+    allowed = next(result for result in results if result.returncode == 0)
+    denied = next(result for result in results if result.returncode == 3)
+    assert json.loads(allowed.stdout)["dispatch_reservation_created"] is True
+    blocked = json.loads(denied.stdout)
+    assert blocked["dispatch_authorized"] is False
+    assert blocked["dispatch_reservation_present"] is True
+    assert "SINGLE_USE_BINDING_ALREADY_RESERVED" in blocked["blockers"]

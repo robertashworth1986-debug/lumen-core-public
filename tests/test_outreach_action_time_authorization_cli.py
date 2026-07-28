@@ -77,7 +77,14 @@ def run_cli(
     authorization_path: Path,
     *,
     check: bool = False,
+    consumption_directory: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
+    directory = (
+        consumption_directory
+        if consumption_directory is not None
+        else authorization_path.parent / "consumption"
+    )
+    directory.mkdir(parents=True, exist_ok=True)
     command = [
         sys.executable,
         str(AUTHORIZATION_SCRIPT),
@@ -85,6 +92,8 @@ def run_cli(
         str(rendered_path),
         "--mailbox-receipt",
         str(mailbox_path),
+        "--consumption-directory",
+        str(directory),
         "--authorization-output",
         str(authorization_path),
     ]
@@ -134,6 +143,9 @@ def test_cli_builds_private_packet_without_printing_message_fields(tmp_path):
     assert summary["exact_approval_phrase_printed"] is False
     assert summary["send_authorized"] is False
     assert summary["send_performed"] is False
+    assert summary["consumption_directory_sha256"] == authorization[
+        "approval_binding"
+    ]["consumption_directory_sha256"]
     assert phrase not in result.stdout
     assert "reviewer@example.org" not in result.stdout
     assert "synthetic-message-id" not in result.stdout
