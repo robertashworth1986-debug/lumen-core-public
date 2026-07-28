@@ -134,6 +134,107 @@ def audit_engine(engine: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def audit_supplemental_discovery(
+    config: dict[str, Any], primary_engine_ids: set[str]
+) -> dict[str, Any]:
+    supplemental = config.get("supplemental_discovery")
+    if not isinstance(supplemental, dict):
+        raise ValueError("supplemental_discovery must be an object")
+
+    records = supplemental.get("records")
+    if not isinstance(records, list) or not records:
+        raise ValueError("supplemental_discovery.records must be a non-empty list")
+
+    required_fields = {
+        "id",
+        "name",
+        "evidence_scope",
+        "disposition",
+        "maps_to",
+        "verification",
+        "evidence",
+        "claim_boundary",
+        "next_action",
+    }
+    allowed_dispositions = {
+        "add_to_portfolio",
+        "branch_candidate",
+        "private_prototype",
+        "map_to_existing",
+        "supporting_material_only",
+        "archive_only",
+    }
+    distinct_dispositions = {
+        "add_to_portfolio",
+        "branch_candidate",
+        "private_prototype",
+    }
+
+    ids = [record.get("id") for record in records if isinstance(record, dict)]
+    if len(ids) != len(records) or len(ids) != len(set(ids)):
+        raise ValueError("Supplemental discovery ids must be unique strings")
+    if primary_engine_ids.intersection(ids):
+        raise ValueError("Supplemental discovery ids must not duplicate primary engine ids")
+
+    audited: list[dict[str, Any]] = []
+    for record in records:
+        missing_fields = required_fields.difference(record)
+        if missing_fields:
+            raise ValueError(
+                f"{record.get('id')}: missing supplemental fields {sorted(missing_fields)}"
+            )
+        if record["disposition"] not in allowed_dispositions:
+            raise ValueError(f"{record['id']}: unsupported supplemental disposition")
+
+        maps_to = record["maps_to"]
+        if maps_to not in primary_engine_ids and maps_to not in {None, "multiple_existing_lanes"}:
+            raise ValueError(f"{record['id']}: maps_to must reference a primary engine")
+
+        evidence_paths = record["evidence"]
+        if not isinstance(evidence_paths, list) or any(
+            not isinstance(path, str) or Path(path).is_absolute() for path in evidence_paths
+        ):
+            raise ValueError(f"{record['id']}: evidence must contain relative repository paths")
+        evidence = [path_record(path) for path in evidence_paths]
+        if record["evidence_scope"] == "origin_main":
+            if not evidence:
+                raise ValueError(f"{record['id']}: origin_main records require evidence paths")
+            missing = [item["path"] for item in evidence if not item["exists"]]
+            if missing:
+                raise ValueError(f"{record['id']}: origin_main evidence missing: {missing}")
+
+        audited.append({**record, "evidence": evidence})
+
+    distinct_count = sum(
+        record["disposition"] in distinct_dispositions for record in audited
+    )
+    configured_distinct = supplemental.get("distinct_additions_count")
+    if configured_distinct != distinct_count:
+        raise ValueError(
+            "supplemental_discovery.distinct_additions_count does not match dispositions"
+        )
+
+    combined_count = len(primary_engine_ids) + distinct_count
+    if supplemental.get("combined_candidate_system_count") != combined_count:
+        raise ValueError(
+            "supplemental_discovery.combined_candidate_system_count is inconsistent"
+        )
+
+    return {
+        "audited_at_utc": supplemental["audited_at_utc"],
+        "scope_note": supplemental["scope_note"],
+        "distinct_additions_count": distinct_count,
+        "combined_candidate_system_count": combined_count,
+        "disposition_counts": dict(
+            sorted(Counter(record["disposition"] for record in audited).items())
+        ),
+        "evidence_scope_counts": dict(
+            sorted(Counter(record["evidence_scope"] for record in audited).items())
+        ),
+        "records": audited,
+    }
+
+
 def build_payload(config: dict[str, Any], as_of_utc: str) -> dict[str, Any]:
     engines = config.get("engines")
     if not isinstance(engines, list) or len(engines) != 15:
@@ -143,6 +244,7 @@ def build_payload(config: dict[str, Any], as_of_utc: str) -> dict[str, Any]:
     if len(ids) != len(set(ids)):
         raise ValueError("Engine ids must be unique")
 
+    supplemental = audit_supplemental_discovery(config, set(ids))
     audited = [audit_engine(engine) for engine in engines]
     maturity_counts = Counter(engine["observed_maturity"] for engine in audited)
     commercial_counts = Counter(engine["commercial_posture"] for engine in audited)
@@ -179,8 +281,13 @@ def build_payload(config: dict[str, Any], as_of_utc: str) -> dict[str, Any]:
                 "No engine is labeled subscription-ready until tenant isolation, authentication, billing, "
                 "support, data-rights, deployment health, and buyer acceptance are evidenced."
             ),
+            "supplemental_distinct_additions": supplemental["distinct_additions_count"],
+            "combined_candidate_system_count": supplemental[
+                "combined_candidate_system_count"
+            ],
         },
         "engines": ranked,
+        "supplemental_discovery": supplemental,
     }
 
 
@@ -206,6 +313,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Concept-only lanes: `{maturity.get('concept_only', 0)}`",
         f"- Design-partner-ready lanes: `{commercial.get('design_partner_ready', 0)}`",
         f"- Subscription-ready lanes: `{summary['subscription_ready_count']}`",
+        f"- Distinct supplemental candidates after deduplication: `{summary['supplemental_distinct_additions']}`",
+        f"- Named candidate systems after deduplication: `{summary['combined_candidate_system_count']}`",
         "",
         summary["subscription_ready_reason"],
         "",
@@ -217,11 +326,36 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "4. LumaScout: sell a private forward-tracked discovery sprint after data-rights review.",
         "5. Keep trading, sports, hardware, XR, identity, energy, and world-model lanes in research or grant mode until their stated gates pass.",
         "",
+        "## Supplemental Drive Discovery",
+        "",
+        payload["supplemental_discovery"]["scope_note"],
+        "",
+        "The scan found four distinct additions, but they are not four finished products: one is in "
+        "`origin/main`, two are tested branch-only candidates, and one is a private synthetic prototype.",
+        "Names that are older lineages, specializations, or supporting documents stay mapped into the "
+        "existing 15 lanes instead of inflating the portfolio.",
+        "",
+        "| Candidate | Evidence scope | Disposition | Maps to | Verification |",
+        "|---|---|---|---|---|",
+    ]
+
+    for record in payload["supplemental_discovery"]["records"]:
+        maps_to = record["maps_to"] or "new candidate"
+        verification = record["verification"].replace("|", "/")
+        lines.append(
+            f"| {record['name']} | `{record['evidence_scope']}` | "
+            f"`{record['disposition']}` | `{maps_to}` | {verification} |"
+        )
+
+    lines.extend(
+        [
+        "",
         "## Portfolio Matrix",
         "",
         "| Engine | Repo maturity | Commercial posture | Evidence | Buyer-safe next offer |",
         "|---|---|---|---:|---|",
-    ]
+        ]
+    )
 
     for engine in payload["engines"]:
         offer = engine["bounded_offer"].replace("|", "/")
@@ -286,7 +420,9 @@ def write_outputs(payload: dict[str, Any], json_out: Path, md_out: Path) -> None
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Audit the 15-engine commercialization inventory.")
+    parser = argparse.ArgumentParser(
+        description="Audit the founder engine inventory and supplemental discovery."
+    )
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--json-out", type=Path, default=DEFAULT_JSON)
     parser.add_argument("--md-out", type=Path, default=DEFAULT_MD)

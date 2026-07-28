@@ -25,6 +25,38 @@ def test_registry_has_exactly_fifteen_unique_engines():
     assert len(set(ids)) == 15
 
 
+def test_supplemental_discovery_deduplicates_local_and_branch_lineage():
+    module = load_module()
+    config = module.read_json(CONFIG_PATH)
+    payload = module.build_payload(config, "2026-07-28T02:57:29+00:00")
+    supplemental = payload["supplemental_discovery"]
+    by_id = {record["id"]: record for record in supplemental["records"]}
+
+    assert supplemental["distinct_additions_count"] == 4
+    assert supplemental["combined_candidate_system_count"] == 19
+    assert by_id["harbor_sentinel"]["evidence_scope"] == "origin_main"
+    assert all(item["exists"] for item in by_id["harbor_sentinel"]["evidence"])
+    assert by_id["prooflock_console"]["disposition"] == "branch_candidate"
+    assert by_id["lumaskin_xr_research_platform"]["maps_to"] == "luma_xr_command_room"
+    assert by_id["lumaquant_lumenfinance_lineage"]["maps_to"] == "lumatrader"
+    assert by_id["icloud_supporting_material"]["disposition"] == "supporting_material_only"
+
+
+def test_supplemental_registry_contains_no_absolute_or_secret_evidence_paths():
+    module = load_module()
+    config = module.read_json(CONFIG_PATH)
+    payload = module.build_payload(config, "2026-07-28T02:57:29+00:00")
+
+    for record in payload["supplemental_discovery"]["records"]:
+        for evidence in record["evidence"]:
+            path = evidence["path"].lower()
+            assert not Path(evidence["path"]).is_absolute()
+            assert not any(
+                marker in path
+                for marker in ("token", "credential", "private_key", "driver license")
+            )
+
+
 def test_audit_is_fail_closed_for_subscription_readiness():
     module = load_module()
     config = module.read_json(CONFIG_PATH)
@@ -32,6 +64,7 @@ def test_audit_is_fail_closed_for_subscription_readiness():
 
     assert payload["summary"]["engine_count"] == 15
     assert payload["summary"]["subscription_ready_count"] == 0
+    assert payload["summary"]["combined_candidate_system_count"] == 19
     assert all(
         engine["commercial_posture"] in {"design_partner_ready", "research_only", "concept_only"}
         for engine in payload["engines"]
@@ -73,5 +106,6 @@ def test_markdown_never_calls_an_engine_subscription_ready():
     markdown = module.render_markdown(payload)
 
     assert "Subscription-ready lanes: `0`" in markdown
+    assert "Distinct supplemental candidates after deduplication: `4`" in markdown
     assert "guaranteed awards" not in markdown.lower()
     assert "15 finished products" in markdown

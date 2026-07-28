@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_commercialization_audit_v1",
-  "generated_at_utc": "2026-07-28T02:45:00+00:00",
+  "generated_at_utc": "2026-07-28T02:57:29+00:00",
   "source_registry": "config/lumencore_engine_commercialization_v1.json",
   "source_note": "The 15 names originated in a founder inventory email. This registry treats that email as a hypothesis and uses repository paths, not the email, as implementation evidence.",
   "boundaries": [
@@ -30,7 +30,9 @@
       "lumen_infrastructure_sentinel"
     ],
     "subscription_ready_count": 0,
-    "subscription_ready_reason": "No engine is labeled subscription-ready until tenant isolation, authentication, billing, support, data-rights, deployment health, and buyer acceptance are evidenced."
+    "subscription_ready_reason": "No engine is labeled subscription-ready until tenant isolation, authentication, billing, support, data-rights, deployment health, and buyer acceptance are evidenced.",
+    "supplemental_distinct_additions": 4,
+    "combined_candidate_system_count": 19
   },
   "engines": [
     {
@@ -1071,5 +1073,215 @@
         "public_surface": []
       }
     }
-  ]
+  ],
+  "supplemental_discovery": {
+    "audited_at_utc": "2026-07-28T02:57:29+00:00",
+    "scope_note": "A targeted read-only scan covered project-like C-drive roots, non-sensitive iCloud folders, origin/main, and selected tested branches. Credentials, account data, personal identifiers, patent-sensitive contents, virtual environments, and bulk archives were excluded.",
+    "distinct_additions_count": 4,
+    "combined_candidate_system_count": 19,
+    "disposition_counts": {
+      "add_to_portfolio": 1,
+      "archive_only": 1,
+      "branch_candidate": 2,
+      "map_to_existing": 6,
+      "private_prototype": 1,
+      "supporting_material_only": 1
+    },
+    "evidence_scope_counts": {
+      "icloud_supporting_material": 1,
+      "origin_main": 2,
+      "private_local_archive": 1,
+      "private_local_legacy": 1,
+      "private_local_mixed_vault": 1,
+      "private_local_prototype": 1,
+      "private_local_research": 1,
+      "private_local_scripts": 1,
+      "tested_branch_only": 2,
+      "tested_open_pr": 1
+    },
+    "records": [
+      {
+        "id": "harbor_sentinel",
+        "name": "HarborSentinel",
+        "evidence_scope": "origin_main",
+        "disposition": "add_to_portfolio",
+        "maps_to": null,
+        "verification": "10 focused tests passed on origin/main-derived audit worktree; current evidence is deterministic synthetic validation only.",
+        "evidence": [
+          {
+            "path": "code/harbor_sentinel_benchmark.py",
+            "exists": true,
+            "bytes": 33742,
+            "sha256": "8ec80504efd01d6be6a31f8b50c3d4757fabd233ed7a37640adc698d1b470c3d"
+          },
+          {
+            "path": "code/harbor_sentinel_validation_suite.py",
+            "exists": true,
+            "bytes": 16432,
+            "sha256": "dc9c2586efa5659b8934f02fec37e6afea4afac3780fdff6c566743b10ee14ac"
+          },
+          {
+            "path": "tests/test_harbor_sentinel_benchmark.py",
+            "exists": true,
+            "bytes": 5626,
+            "sha256": "b50141710b3a36bc780f297395a710c15791464615eb6a4900a2f934102080fe"
+          },
+          {
+            "path": "tests/test_harbor_sentinel_validation_suite.py",
+            "exists": true,
+            "bytes": 1603,
+            "sha256": "5ba5ef9420d9ab603eb529c885a4c86f53c52bc1b19109c8eced2eab6c26dd24"
+          },
+          {
+            "path": "docs/HARBOR_SENTINEL_VALIDATION_2026-06-13.md",
+            "exists": true,
+            "bytes": 3978,
+            "sha256": "718d20bb85bd163b6670440cf61d7c989b47abc5fabe93dff08c2c39d3b18b51"
+          }
+        ],
+        "claim_boundary": "No operational sensor, harbor, SSDS, adversarial, cybersecurity, classified-environment, or field-performance claim.",
+        "next_action": "Package a buyer-approved replay using permitted operational or representative data and a named incumbent comparator."
+      },
+      {
+        "id": "prooflock_console",
+        "name": "ProofLock Console",
+        "evidence_scope": "tested_open_pr",
+        "disposition": "branch_candidate",
+        "maps_to": null,
+        "verification": "PR 36 head 239cb172 passed 21 focused tests; the console is not in origin/main.",
+        "evidence": [],
+        "claim_boundary": "Receipt integrity and policy checks do not independently establish the truth of arbitrary claims, safety, certification, or release authority.",
+        "next_action": "Reconcile PR 36 against newer open PRs, merge only with human approval, deploy the exact reviewed head, and capture a fresh public hash receipt."
+      },
+      {
+        "id": "lumajarvis_voice_context_console",
+        "name": "LumaJarvis Voice Context Console",
+        "evidence_scope": "tested_branch_only",
+        "disposition": "branch_candidate",
+        "maps_to": null,
+        "verification": "Commit a97ffbdd lineage passed 3 focused tests; the implementation is not in origin/main.",
+        "evidence": [],
+        "claim_boundary": "A context console is not autonomous decision authority, durable memory proof, or evidence that external actions occurred.",
+        "next_action": "Consolidate the branch implementation, add privacy and retention tests, and expose one bounded local-first workflow."
+      },
+      {
+        "id": "lockitdown256_media_coherence",
+        "name": "LockItDown256 Media Coherence Optimizer",
+        "evidence_scope": "private_local_prototype",
+        "disposition": "private_prototype",
+        "maps_to": null,
+        "verification": "The selected Python source compiles, but it uses synthetic priors and has no located focused tests or user-outcome evidence.",
+        "evidence": [],
+        "claim_boundary": "No content-performance lift, engagement gain, CapCut integration, or buyer value is established.",
+        "next_action": "Create a privacy-safe fixture set, compare against a simple edit-timing baseline, and measure blinded reviewer agreement before migration."
+      },
+      {
+        "id": "lumaskin_xr_research_platform",
+        "name": "LumaSkin XR Research Platform",
+        "evidence_scope": "tested_branch_only",
+        "disposition": "map_to_existing",
+        "maps_to": "luma_xr_command_room",
+        "verification": "Commit c1d65b50 lineage passed 33 focused tests; it remains a branch-only fail-closed research protocol.",
+        "evidence": [],
+        "claim_boundary": "No medical, comfort, safety, human-performance, or physical-device claim.",
+        "next_action": "Treat it as the research and safety protocol under Luma XR rather than inflating the independent product count."
+      },
+      {
+        "id": "lumaq_command_system",
+        "name": "LumaQ Command System",
+        "evidence_scope": "origin_main",
+        "disposition": "map_to_existing",
+        "maps_to": "lumacore_orchestrator",
+        "verification": "Origin/main contains builder and execution-pack scripts, but no focused LumaQ tests were located.",
+        "evidence": [
+          {
+            "path": "code/deploy/lumaq_brain_builder.py",
+            "exists": true,
+            "bytes": 28493,
+            "sha256": "69b915a636cb5cc93bde96dfedc0cf7003e40d8a382ebd684e1307cf0a73ee34"
+          },
+          {
+            "path": "code/deploy/build_lumaq_execution_pack.py",
+            "exists": true,
+            "bytes": 21935,
+            "sha256": "77d0e393a72638f440db05cda45fb89b6830a9c15e9ff16b079df16c3a4cc673"
+          },
+          {
+            "path": "code/deploy/RUN_LUMAQ_BRAIN.ps1",
+            "exists": true,
+            "bytes": 1863,
+            "sha256": "1fa8cfcd1413e63c3fa43aeecea118a1391349b4c249acf6ad4c83f13eca6ece"
+          }
+        ],
+        "claim_boundary": "Repository scanning and report assembly do not establish production orchestration, deployment readiness, or live execution authority.",
+        "next_action": "Keep LumaQ as an internal Orchestrator surface until deterministic fixtures and tests cover every generated decision."
+      },
+      {
+        "id": "echolock_edgelock_hypercore_lineage",
+        "name": "EchoLock / EdgeLock / HyperCore lineage",
+        "evidence_scope": "private_local_legacy",
+        "disposition": "map_to_existing",
+        "maps_to": "lumen_infrastructure_sentinel",
+        "verification": "Selected EchoLock sources compile, but the roots are marked legacy and the scoring/ROI examples are simulation-bound.",
+        "evidence": [],
+        "claim_boundary": "No outage prediction, cost saving, infrastructure control, or field validation.",
+        "next_action": "Preserve as lineage and port only reviewed tests or invariants into the Infrastructure Sentinel."
+      },
+      {
+        "id": "lumaquant_lumenfinance_lineage",
+        "name": "LumaQuantLab / LumenFinanceLab lineage",
+        "evidence_scope": "private_local_research",
+        "disposition": "map_to_existing",
+        "maps_to": "lumatrader",
+        "verification": "Selected sources compile; the roots contain public-data research pipelines and multiple files not present byte-for-byte in origin/main.",
+        "evidence": [],
+        "claim_boundary": "No current alpha, after-cost superiority, live-trading readiness, or independent validation.",
+        "next_action": "Inventory data licenses and tests, then migrate only non-duplicated research components that pass prospective paper protocols."
+      },
+      {
+        "id": "whitehole_lineage",
+        "name": "WhiteHole / WhiteHoleLab lineage",
+        "evidence_scope": "private_local_mixed_vault",
+        "disposition": "map_to_existing",
+        "maps_to": "lumatrader",
+        "verification": "Selected Kraken research and evidence scripts compile; the vault mixes lineage, duplicated artifacts, simulation, and operations scaffolds.",
+        "evidence": [],
+        "claim_boundary": "No scientific breakthrough, trading edge, uptime, or field result follows from the vault contents.",
+        "next_action": "Quarantine duplicates, preserve hashes, and migrate only isolated source with tests and a declared target lane."
+      },
+      {
+        "id": "lumenorchestrator_lineage",
+        "name": "LumenOrchestrator lineage",
+        "evidence_scope": "private_local_scripts",
+        "disposition": "map_to_existing",
+        "maps_to": "lumacore_orchestrator",
+        "verification": "The root contains PowerShell hashing, web-probe, and delta scripts but no located focused tests.",
+        "evidence": [],
+        "claim_boundary": "Hashing and probes are custody components, not a production orchestration product.",
+        "next_action": "Port only deterministic custody and health primitives behind the governed Orchestrator API."
+      },
+      {
+        "id": "icloud_supporting_material",
+        "name": "iCloud pilot, EIA, and world-model material",
+        "evidence_scope": "icloud_supporting_material",
+        "disposition": "supporting_material_only",
+        "maps_to": "multiple_existing_lanes",
+        "verification": "The non-sensitive scan found mostly briefs, reports, text notes, archived evidence, and an older LumaTrader copy rather than additional tested engines.",
+        "evidence": [],
+        "claim_boundary": "Documents and archived outputs are not implementation, current validation, or deployment evidence.",
+        "next_action": "Use only as claim-reviewed proposal context or lineage; do not count it as another engine."
+      },
+      {
+        "id": "lumenmacro_novacore_archive",
+        "name": "LumenMacro / NovaCore archive roots",
+        "evidence_scope": "private_local_archive",
+        "disposition": "archive_only",
+        "maps_to": "world_model_engine",
+        "verification": "LumenMacro exposed artifacts without located source; NovaCore contained no project files outside a virtual-environment directory.",
+        "evidence": [],
+        "claim_boundary": "No runnable engine or scientific result is established.",
+        "next_action": "Retain for provenance only unless source, tests, and a reproducible protocol are recovered."
+      }
+    ]
+  }
 }
