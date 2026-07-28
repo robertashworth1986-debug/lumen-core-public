@@ -1,0 +1,99 @@
+{
+  "schema_version": "v1",
+  "generated_at_utc": "2026-07-28T01:59:46Z",
+  "mode": "read_only_audit",
+  "claim_boundary": {
+    "capacity_observations_are_point_in_time": true,
+    "cpu_sample_proves_long_term_headroom": false,
+    "endpoint_count_is_repo_quality_score": false,
+    "endpoint_count_is_scientific_performance": false,
+    "account_specific_cost_verified": false
+  },
+  "current_instance": {
+    "provider": "Oracle Cloud Infrastructure",
+    "region": "us-ashburn-1",
+    "shape": "VM.Standard3.Flex",
+    "architecture": "x86_64",
+    "ocpus": 1,
+    "vcpus": 2,
+    "memory_gib": 16,
+    "network_gbps": 1,
+    "boot_disk_bytes": 50036998144,
+    "root_filesystem_bytes": 31608274944,
+    "root_available_bytes": 20480,
+    "root_used_percent": 100,
+    "root_inode_used_percent": 98,
+    "oracle_diagnostics_available_bytes": 15882457088,
+    "out_tree_bytes": 15731261440,
+    "government_snapshot_bytes": 9606524861,
+    "government_snapshot_files": 66194
+  },
+  "capacity_targets": {
+    "root_minimum_free_gib": 20,
+    "byte_utilization": {
+      "warning_percent": 70,
+      "high_percent": 80,
+      "critical_percent": 90
+    },
+    "inode_utilization": {
+      "warning_percent": 70,
+      "high_percent": 80,
+      "critical_percent": 90
+    },
+    "restart_loop": {
+      "warning_restarts_per_15_minutes": 3,
+      "critical_restarts_per_15_minutes": 10
+    },
+    "compute_scale_gate": {
+      "minimum_observation_days": 7,
+      "cpu_sustained_percent": 70,
+      "cpu_sustained_minutes": 15,
+      "memory_sustained_percent": 80,
+      "requires_named_workflow_benchmark": true
+    }
+  },
+  "recovery_floor": {
+    "ocpus": 1,
+    "memory_gib": 16,
+    "boot_volume_gb": 150,
+    "boot_volume_performance": "balanced",
+    "increase_compute_now": false
+  },
+  "growth_safe_target": {
+    "ocpus": 1,
+    "memory_gib": 16,
+    "boot_volume_gb_min": 100,
+    "boot_volume_gb_max": 150,
+    "boot_volume_performance": "balanced",
+    "data_volume_gb": 200,
+    "data_volume_performance": "balanced",
+    "data_mount": "/opt/lumencore/out",
+    "archive_tier": "private_object_storage_with_lifecycle_policy"
+  },
+  "required_sequence": [
+    "confirm_console_estimate_and_account_credits",
+    "create_and_confirm_boot_volume_backup",
+    "stop_or_rate_limit_restart_loops",
+    "expand_storage",
+    "extend_guest_partition_lvm_and_xfs",
+    "verify_byte_and_inode_headroom",
+    "deploy_reviewed_gateway_and_snapshot_controls",
+    "start_services_one_at_a_time",
+    "verify_local_and_external_contracts",
+    "configure_capacity_and_restart_rate_alerts",
+    "perform_backup_restore_test"
+  ],
+  "action_time_approval_required": [
+    "create_backup",
+    "resize_volume",
+    "change_volume_performance",
+    "attach_or_mount_volume",
+    "stop_start_restart_or_disable_service",
+    "move_compress_archive_or_delete_evidence",
+    "modify_fstab_lvm_xfs_nginx_dns_or_certificates",
+    "deploy_repair_branch",
+    "change_shape_ocpus_or_memory",
+    "reboot_instance",
+    "incur_or_accept_cost"
+  ]
+}

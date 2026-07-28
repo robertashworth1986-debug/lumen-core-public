@@ -54,3 +54,11 @@ sudo systemctl reload nginx
 ## Claim boundary
 
 A healthy route proves only that a static public review page is reachable. It does not establish external validation, consortium membership, agency endorsement, production deployment of the underlying methods, field savings, patent outcome, or universal model superiority.
+
+## Capacity prerequisite
+
+The production root filesystem was observed at 100% byte utilization and 98%
+inode utilization on `2026-07-28T01:59:46Z`. Do not apply this route repair
+until bounded filesystem headroom exists. See
+`docs/VPS_CAPACITY_AUDIT_2026-07-27.md` and
+`config/vps_capacity_policy_v1.json`.
