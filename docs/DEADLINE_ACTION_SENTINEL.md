@@ -1,6 +1,6 @@
 # Deadline Action Sentinel
 
-Evaluated UTC: `2026-07-28T17:52:37Z`
+Evaluated UTC: `2026-07-28T20:19:49Z`
 Posture: `HUMAN_ACTION_REQUIRED_FAIL_CLOSED`
 
 ## Control Boundary
@@ -25,8 +25,8 @@ Posture: `HUMAN_ACTION_REQUIRED_FAIL_CLOSED`
 
 - `DAF_CSDR_20260727`: `evidence/opportunity/csdr_deadline_gate_2026-07-27.json` at SHA-256 `cc578d67d891a1bed326331433af5d6b2d3d36c7078e71bb333ef17c4300d23b`; observed gate `PAST_DEADLINE_NO_LATE_OR_DUPLICATE_ACTION`.
 - `NSF_26_510_20260727`: `evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json` at SHA-256 `6c4ee6bab204851a3e1b83063e7f9e43b9e0ef41c01c67aa87d8ad7a8bd41a94`; observed gate `BLOCKED_NO_OFFICIAL_PROJECT_PITCH_INVITATION`.
-- `ONC_ARGOS_20260730`: `grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json` at SHA-256 `d79558ab1fa476e2343da7303b4102cbbdb176b09994ec20904dce7511a9c897`; observed gate `BLOCK_SEND`.
-  Outreach receipt: `grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json` at SHA-256 `dda72e9982db764952d9ee6991ce9579b447b07b7820dea48edb05807b2bba5a`; observed `SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY` at `2026-07-28T16:45:49Z` with 0 draft, 1 sent, and 0 inbound; prior approval expired and is not reusable.
+- `ONC_ARGOS_20260730`: `grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json` at SHA-256 `a5732b70547091a146f51f70456946834b3c34e1917c0efa2f11057d73ff1a89`; observed gate `BLOCK_SEND`.
+  Outreach receipt: `grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json` at SHA-256 `f1185a5187038b62ccb8d28628ad3860a03e8efb73c47aede6f29566c5389191`; observed `SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY` at `2026-07-28T20:19:34Z` with 0 draft, 1 sent, and 0 inbound; prior approval expired and is not reusable.
 - `NASHVILLE_ONBOARDING_20260731`: private official-event metadata only; source content and identifiers intentionally excluded.
 - `NASHVILLE_DEPOSIT_20260814`: private official-event metadata only; source content and identifiers intentionally excluded.
 

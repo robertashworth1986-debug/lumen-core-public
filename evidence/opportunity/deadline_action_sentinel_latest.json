@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.deadline_action_sentinel.v1",
-  "evaluated_utc": "2026-07-28T17:52:37Z",
+  "evaluated_utc": "2026-07-28T20:19:49Z",
   "posture": "HUMAN_ACTION_REQUIRED_FAIL_CLOSED",
   "controls": {
     "read_only_builder": true,
@@ -78,8 +78,8 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": true,
-        "seconds_until_deadline": -89557,
-        "hours_until_deadline": -24.88
+        "seconds_until_deadline": -98389,
+        "hours_until_deadline": -27.33
       }
     },
     {
@@ -140,16 +140,16 @@
       "source_receipt": {
         "kind": "REPOSITORY_GATE_WITH_OUTREACH_STATUS",
         "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
-        "sha256": "d79558ab1fa476e2343da7303b4102cbbdb176b09994ec20904dce7511a9c897",
+        "sha256": "a5732b70547091a146f51f70456946834b3c34e1917c0efa2f11057d73ff1a89",
         "bound_deadline_field": "opportunity.deadline_utc",
         "observed_status": "BLOCK_SEND",
         "outreach_status": {
           "path": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
-          "sha256": "dda72e9982db764952d9ee6991ce9579b447b07b7820dea48edb05807b2bba5a",
-          "recorded_utc": "2026-07-28T16:45:49Z",
+          "sha256": "f1185a5187038b62ccb8d28628ad3860a03e8efb73c47aede6f29566c5389191",
+          "recorded_utc": "2026-07-28T20:19:34Z",
           "observed_state": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
           "partner_interest_target_utc": "2026-07-28T17:00:00Z",
-          "mailbox_checked_utc": "2026-07-28T16:45:49Z",
+          "mailbox_checked_utc": "2026-07-28T20:19:34Z",
           "sent_utc": "2026-07-28T15:39:34Z",
           "mailbox_state": {
             "current_draft_count": 0,
@@ -187,15 +187,15 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": false,
-        "seconds_until_deadline": 184043,
-        "hours_until_deadline": 51.12
+        "seconds_until_deadline": 175211,
+        "hours_until_deadline": 48.67
       },
       "outreach_status": {
         "observed_state": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
-        "recorded_utc": "2026-07-28T16:45:49Z",
+        "recorded_utc": "2026-07-28T20:19:34Z",
         "current_state_as_of_evaluation": "PARTNER_TARGET_PASSED_WAITING_FOR_REPLY",
         "partner_interest_target_utc": "2026-07-28T17:00:00Z",
-        "seconds_until_partner_target": -3157,
+        "seconds_until_partner_target": -11989,
         "mailbox_state_as_of_record": {
           "current_draft_count": 0,
           "sent_count": 1,
