@@ -36,8 +36,8 @@
     {
       "path": "QUICKSTART.md",
       "purpose": "Five-minute public reproduction entry point.",
-      "bytes": 3498,
-      "sha256": "8f3b410ae35d6f304cfa392ce469d8ce2bc3d83b2de5a0e0ef49e58e363386cb",
+      "bytes": 3410,
+      "sha256": "f83d2a48137e36e3d8d238064f74f21b452e77c2bc7b9db9c917525412a16089",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -45,8 +45,8 @@
     {
       "path": "docs/PROOF_CAPSULE_SCHEMA.md",
       "purpose": "Proof Capsule field, hash, and verification contract.",
-      "bytes": 5479,
-      "sha256": "dff155473cf4e0024a277df993500c66440093c1651213ed0138e9556060d3d4",
+      "bytes": 5334,
+      "sha256": "5d53383ac483047621649e94d69ce26048b9434df9ac4bbecbb797830c33617a",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -63,8 +63,8 @@
     {
       "path": "code/proof_capsule_verifier.py",
       "purpose": "Local verifier used to inspect capsule integrity.",
-      "bytes": 21838,
-      "sha256": "84cb3a7918b806488a74dec22560743033e06a6ee361a21f2369e958de2da146",
+      "bytes": 21168,
+      "sha256": "019b9e54322c97f49c46bcc6605c9c2ea7330cea4e6b068127676152a0220d41",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null

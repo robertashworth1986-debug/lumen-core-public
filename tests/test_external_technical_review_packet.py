@@ -48,6 +48,21 @@ def test_every_evidence_asset_exists_and_is_hash_bound():
             assert row["claim_boundary"]
 
 
+def test_text_evidence_digest_and_size_are_line_ending_stable(tmp_path):
+    module = load_module()
+    lf_path = tmp_path / "lf.txt"
+    crlf_path = tmp_path / "crlf.txt"
+    lf_path.write_bytes(b"alpha\nbeta\n")
+    crlf_path.write_bytes(b"alpha\r\nbeta\r\n")
+
+    assert module.canonical_file_bytes(lf_path) == b"alpha\nbeta\n"
+    assert module.canonical_file_bytes(crlf_path) == b"alpha\nbeta\n"
+    assert module.sha256_file(lf_path) == module.sha256_file(crlf_path)
+    assert len(module.canonical_file_bytes(lf_path)) == len(
+        module.canonical_file_bytes(crlf_path)
+    )
+
+
 def test_public_snapshot_discloses_the_degraded_dynamic_endpoint():
     module = load_module()
     payload = module.build_payload(module.read_json(CONFIG))
@@ -58,6 +73,44 @@ def test_public_snapshot_discloses_the_degraded_dynamic_endpoint():
     assert by_label["Dynamic health endpoint"]["observed_http_status"] == 502
     assert by_label["Dynamic health endpoint"]["demo"] is False
     assert all(row["url"].startswith("https://") for row in by_label.values())
+
+
+def test_live_surface_verification_accepts_the_exact_bounded_snapshot(monkeypatch):
+    module = load_module()
+    config = module.read_json(CONFIG)
+    expected = {
+        row["url"]: row["observed_http_status"] for row in config["public_surfaces"]
+    }
+    monkeypatch.setattr(
+        module, "observe_http_status", lambda url: expected[url]
+    )
+
+    observed = module.verify_live_surfaces(config)
+
+    assert len(observed) == len(expected)
+    assert all(row["match"] for row in observed)
+
+
+def test_live_surface_verification_fails_closed_on_status_drift(monkeypatch):
+    module = load_module()
+    config = module.read_json(CONFIG)
+    expected = {
+        row["url"]: row["observed_http_status"] for row in config["public_surfaces"]
+    }
+    drift_url = config["public_surfaces"][0]["url"]
+    monkeypatch.setattr(
+        module,
+        "observe_http_status",
+        lambda url: 503 if url == drift_url else expected[url],
+    )
+
+    try:
+        module.verify_live_surfaces(config)
+    except module.ReviewPacketError as exc:
+        assert str(exc).startswith("LIVE_SURFACE_STATUS_DRIFT:")
+        assert f"{drift_url}=503" in str(exc)
+    else:
+        raise AssertionError("live status drift must fail closed")
 
 
 def test_packet_keeps_draft_and_external_evidence_boundaries_explicit():

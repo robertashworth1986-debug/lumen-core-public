@@ -38,12 +38,19 @@ def canonical_sha256(payload: Any) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def canonical_file_bytes(path: Path) -> bytes:
+    content = path.read_bytes()
+    if b"\x00" in content:
+        return content
+    try:
+        content.decode("utf-8")
+    except UnicodeDecodeError:
+        return content
+    return content.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
 def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    return hashlib.sha256(canonical_file_bytes(path)).hexdigest()
 
 
 def safe_repo_path(value: str) -> Path:
@@ -159,11 +166,12 @@ def evidence_record(item: dict[str, Any]) -> dict[str, Any]:
     path = safe_repo_path(relative)
     if not path.is_file():
         raise ReviewPacketError(f"EVIDENCE_MISSING:{relative}")
+    canonical_bytes = canonical_file_bytes(path)
     record: dict[str, Any] = {
         "path": relative,
         "purpose": str(item.get("purpose") or ""),
-        "bytes": path.stat().st_size,
-        "sha256": sha256_file(path),
+        "bytes": len(canonical_bytes),
+        "sha256": hashlib.sha256(canonical_bytes).hexdigest(),
         "required_status": item.get("required_status"),
         "observed_status": None,
         "claim_boundary": None,

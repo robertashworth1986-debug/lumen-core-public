@@ -80,3 +80,14 @@ examples/proof_capsule/** text eol=lf
 /grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json text eol=lf
 /tests/test_current_opportunity_and_argos_packet.py text eol=lf
 /tests/test_deadline_action_sentinel.py text eol=lf
+
+# Canonical bytes for the external technical-review packet.
+/.github/workflows/external-technical-review-packet.yml text eol=lf
+/QUICKSTART.md text eol=lf
+/code/ops/BUILD_EXTERNAL_TECHNICAL_REVIEW_PACKET.py text eol=lf
+/code/proof_capsule_verifier.py text eol=lf
+/config/external_technical_review_packet_v1.json text eol=lf
+/dashboard/data/external_technical_review_packet.json text eol=lf
+/docs/EXTERNAL_TECHNICAL_REVIEW_PACKET_2026-07-28.md text eol=lf
+/docs/PROOF_CAPSULE_SCHEMA.md text eol=lf
+/tests/test_external_technical_review_packet.py text eol=lf

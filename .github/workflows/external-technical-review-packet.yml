@@ -1,0 +1,56 @@
+name: External Technical Review Packet
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/external-technical-review-packet.yml"
+      - "code/ops/BUILD_EXTERNAL_TECHNICAL_REVIEW_PACKET.py"
+      - "config/external_technical_review_packet_v1.json"
+      - "config/outreach_response_templates_v1.json"
+      - "dashboard/data/external_technical_review_packet.json"
+      - "docs/EXTERNAL_TECHNICAL_REVIEW_PACKET_2026-07-28.md"
+      - "tests/test_external_technical_review_packet.py"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/external-technical-review-packet.yml"
+      - "code/ops/BUILD_EXTERNAL_TECHNICAL_REVIEW_PACKET.py"
+      - "config/external_technical_review_packet_v1.json"
+      - "config/outreach_response_templates_v1.json"
+      - "dashboard/data/external_technical_review_packet.json"
+      - "docs/EXTERNAL_TECHNICAL_REVIEW_PACKET_2026-07-28.md"
+      - "tests/test_external_technical_review_packet.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-packet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test runner
+        run: python -m pip install pytest==9.1.0
+      - name: Verify generated packet
+        run: python code/ops/BUILD_EXTERNAL_TECHNICAL_REVIEW_PACKET.py --check
+      - name: Run packet controls
+        run: python -m pytest -q tests/test_external_technical_review_packet.py
+
+  live-surface-preflight:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compare public surfaces with the bounded snapshot
+        run: >
+          python code/ops/BUILD_EXTERNAL_TECHNICAL_REVIEW_PACKET.py
+          --check
+          --verify-live
