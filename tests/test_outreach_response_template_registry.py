@@ -534,6 +534,11 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert payload["controls"]["action_time_approval_window_seconds"] == 300
     assert payload["controls"]["exact_approval_expires"] is True
     assert payload["controls"]["single_use_action_time_binding"] is True
+    assert (
+        payload["controls"]["private_human_unlock_required_for_dispatch"]
+        is True
+    )
+    assert payload["controls"]["dispatch_handoff_can_send_email"] is False
     assert payload["controls"]["claim_evidence_receipt_schema"] == (
         module.CLAIM_EVIDENCE_RECEIPT_SCHEMA
     )
@@ -553,6 +558,8 @@ def test_written_public_registry_is_current_and_contains_no_contact_values():
     assert "Action-time mailbox receipt: `REQUIRED`" in markdown
     assert "Exact approval phrase: `BINDING_SCOPED_SINGLE_USE`" in markdown
     assert "Exact approval window: `5_MINUTES_MAX`" in markdown
+    assert "Private HumanUnlock: `REQUIRED_AT_RUNTIME`" in markdown
+    assert "Dispatch handoff can send email: `false`" in markdown
     assert "Static quality gate: `PASS`" in markdown
     assert "No message is rendered" in markdown
     assert "receipt check only, not a duplicate submission" in markdown
@@ -777,6 +784,16 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     )
     assert authorization["controls"]["approval_window_seconds"] == 300
     assert authorization["controls"]["single_use"] is True
+    assert (
+        authorization["controls"][
+            "private_human_unlock_required_for_dispatch"
+        ]
+        is True
+    )
+    assert (
+        authorization["controls"]["authorization_evaluator_can_send_email"]
+        is False
+    )
     assert authorization["builder_can_send_email"] is False
     assert authorization["send_authorized"] is False
     assert authorization["send_performed"] is False
@@ -795,9 +812,84 @@ def test_action_time_authorization_is_private_safe_exact_and_five_minutes():
     )
     assert current["status"] == "CURRENT_EXACT_APPROVAL_PRESENT"
     assert current["action_time_approval_valid"] is True
-    assert current["send_authorized"] is True
+    assert current["private_human_unlock_required"] is True
+    assert current["private_human_unlock_valid"] is False
+    assert current["dispatch_authorized"] is False
+    assert current["send_authorized"] is False
     assert current["builder_can_send_email"] is False
     assert current["send_performed"] is False
+
+    unlock_token = "synthetic-private-unlock"
+    handoff = module.evaluate_action_time_dispatch_handoff(
+        authorization,
+        exact_approval_phrase=phrase,
+        current_utc="2026-07-27T22:09:59Z",
+        human_unlock_token=unlock_token,
+        expected_human_unlock_sha256=module.sha256_bytes(
+            unlock_token.encode("utf-8")
+        ),
+    )
+    assert handoff["status"] == (
+        "READY_FOR_CONNECTED_SENDER_SINGLE_USE_DISPATCH"
+    )
+    assert handoff["action_time_approval_valid"] is True
+    assert handoff["private_human_unlock_valid"] is True
+    assert handoff["dispatch_authorized"] is True
+    assert handoff["send_authorized"] is True
+    assert handoff["send_performed"] is False
+    assert handoff["external_action_performed"] is False
+    assert handoff["handoff_can_send_email"] is False
+    assert handoff["private_inputs_omitted"] is True
+    assert handoff["receipt_sha256"] == module.canonical_object_sha256(
+        handoff,
+        omit={"receipt_sha256"},
+    )
+    serialized_handoff = json.dumps(handoff, sort_keys=True)
+    assert unlock_token not in serialized_handoff
+    assert phrase not in serialized_handoff
+
+    missing_unlock = module.evaluate_action_time_dispatch_handoff(
+        authorization,
+        exact_approval_phrase=phrase,
+        current_utc="2026-07-27T22:09:59Z",
+        human_unlock_token=None,
+        expected_human_unlock_sha256=module.sha256_bytes(
+            unlock_token.encode("utf-8")
+        ),
+    )
+    assert missing_unlock["action_time_approval_valid"] is True
+    assert missing_unlock["private_human_unlock_valid"] is False
+    assert missing_unlock["dispatch_authorized"] is False
+    assert missing_unlock["send_authorized"] is False
+    assert missing_unlock["blockers"] == [
+        "PRIVATE_HUMAN_UNLOCK_TOKEN_REQUIRED"
+    ]
+
+    wrong_unlock = module.evaluate_action_time_dispatch_handoff(
+        authorization,
+        exact_approval_phrase=phrase,
+        current_utc="2026-07-27T22:09:59Z",
+        human_unlock_token="wrong-unlock",
+        expected_human_unlock_sha256=module.sha256_bytes(
+            unlock_token.encode("utf-8")
+        ),
+    )
+    assert wrong_unlock["private_human_unlock_valid"] is False
+    assert wrong_unlock["dispatch_authorized"] is False
+    assert wrong_unlock["blockers"] == ["PRIVATE_HUMAN_UNLOCK_MISMATCH"]
+
+    malformed_unlock_hash = module.evaluate_action_time_dispatch_handoff(
+        authorization,
+        exact_approval_phrase=phrase,
+        current_utc="2026-07-27T22:09:59Z",
+        human_unlock_token=unlock_token,
+        expected_human_unlock_sha256="not-a-sha256",
+    )
+    assert malformed_unlock_hash["private_human_unlock_valid"] is False
+    assert malformed_unlock_hash["dispatch_authorized"] is False
+    assert malformed_unlock_hash["blockers"] == [
+        "PRIVATE_HUMAN_UNLOCK_SHA256_INVALID"
+    ]
 
     expired = module.evaluate_action_time_authorization(
         authorization,

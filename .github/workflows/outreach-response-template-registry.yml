@@ -4,23 +4,27 @@ on:
   pull_request:
     paths:
       - "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
+      - "code/ops/EVALUATE_OUTREACH_DISPATCH_HANDOFF.py"
       - "config/outreach_action_time_mailbox_receipt_template_v1.json"
       - "config/outreach_claim_evidence_receipt_template_v1.json"
       - "config/outreach_response_templates_v1.json"
       - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
       - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md"
       - "tests/test_outreach_response_template_registry.py"
+      - "tests/test_outreach_dispatch_handoff.py"
       - ".github/workflows/outreach-response-template-registry.yml"
   push:
     branches: [main]
     paths:
       - "code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py"
+      - "code/ops/EVALUATE_OUTREACH_DISPATCH_HANDOFF.py"
       - "config/outreach_action_time_mailbox_receipt_template_v1.json"
       - "config/outreach_claim_evidence_receipt_template_v1.json"
       - "config/outreach_response_templates_v1.json"
       - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
       - "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md"
       - "tests/test_outreach_response_template_registry.py"
+      - "tests/test_outreach_dispatch_handoff.py"
       - ".github/workflows/outreach-response-template-registry.yml"
 
 permissions:
@@ -44,7 +48,9 @@ jobs:
         run: >-
           python -m py_compile
           code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py
+          code/ops/EVALUATE_OUTREACH_DISPATCH_HANDOFF.py
           tests/test_outreach_response_template_registry.py
+          tests/test_outreach_dispatch_handoff.py
       - name: Validate registry without writes
         run: python code/ops/BUILD_OUTREACH_RESPONSE_TEMPLATE_REGISTRY.py --check
       - name: Verify generated artifacts are current
@@ -55,4 +61,5 @@ jobs:
         run: >-
           python -m pytest
           tests/test_outreach_response_template_registry.py
+          tests/test_outreach_dispatch_handoff.py
           -q

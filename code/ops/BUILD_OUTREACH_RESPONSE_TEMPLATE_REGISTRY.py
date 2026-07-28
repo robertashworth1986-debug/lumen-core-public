@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import hmac
 import ipaddress
 import json
 import re
@@ -74,6 +75,9 @@ ACTION_TIME_AUTHORIZATION_SCHEMA = (
 )
 ACTION_TIME_APPROVAL_BINDING_SCHEMA = (
     "lumencore.outreach_action_time_approval_binding.v1"
+)
+ACTION_TIME_DISPATCH_HANDOFF_SCHEMA = (
+    "lumencore.outreach_action_time_dispatch_handoff.v1"
 )
 ACTION_TIME_MAILBOX_MAX_AGE_SECONDS = 15 * 60
 ACTION_TIME_APPROVAL_WINDOW_SECONDS = 5 * 60
@@ -1303,6 +1307,8 @@ def build_action_time_authorization(
             ),
             "exact_phrase_required": True,
             "single_use": True,
+            "private_human_unlock_required_for_dispatch": True,
+            "authorization_evaluator_can_send_email": False,
             "deadline_reached_fail_closed": True,
             "duplicate_send_fail_closed": True,
         },
@@ -1484,9 +1490,123 @@ def evaluate_action_time_authorization(
         "single_use_binding_consumed": dispatch_consumed,
         "blockers": sorted(blockers),
         "builder_can_send_email": False,
-        "send_authorized": valid,
+        "private_human_unlock_required": True,
+        "private_human_unlock_valid": False,
+        "dispatch_authorized": False,
+        "send_authorized": False,
         "send_performed": False,
     }
+
+
+def evaluate_action_time_dispatch_handoff(
+    authorization: dict[str, Any],
+    *,
+    exact_approval_phrase: str,
+    current_utc: str,
+    human_unlock_token: str | None,
+    expected_human_unlock_sha256: str | None,
+    dispatch_consumed: bool = False,
+) -> dict[str, Any]:
+    approval = evaluate_action_time_authorization(
+        authorization,
+        exact_approval_phrase=exact_approval_phrase,
+        current_utc=current_utc,
+        dispatch_consumed=dispatch_consumed,
+    )
+    token_present = (
+        isinstance(human_unlock_token, str) and bool(human_unlock_token)
+    )
+    unlock_hash_configured = (
+        isinstance(expected_human_unlock_sha256, str)
+        and SHA256_RE.fullmatch(expected_human_unlock_sha256) is not None
+    )
+    unlock_valid = False
+    unlock_blockers: list[str] = []
+    if not unlock_hash_configured:
+        unlock_blockers.append("PRIVATE_HUMAN_UNLOCK_SHA256_INVALID")
+    if not token_present:
+        unlock_blockers.append("PRIVATE_HUMAN_UNLOCK_TOKEN_REQUIRED")
+    if token_present and unlock_hash_configured:
+        observed_unlock_sha256 = sha256_bytes(
+            human_unlock_token.encode("utf-8")
+        )
+        unlock_valid = hmac.compare_digest(
+            observed_unlock_sha256,
+            expected_human_unlock_sha256.upper(),
+        )
+        if not unlock_valid:
+            unlock_blockers.append("PRIVATE_HUMAN_UNLOCK_MISMATCH")
+
+    dispatch_authorized = bool(
+        approval["action_time_approval_valid"] and unlock_valid
+    )
+    blockers = sorted(
+        set(approval["blockers"]).union(unlock_blockers)
+    )
+    approval_binding = authorization.get("approval_binding")
+    dispatch_binding = authorization.get("dispatch_binding")
+    core = {
+        "schema": ACTION_TIME_DISPATCH_HANDOFF_SCHEMA,
+        "status": (
+            "READY_FOR_CONNECTED_SENDER_SINGLE_USE_DISPATCH"
+            if dispatch_authorized
+            else "BLOCKED_NO_SEND"
+        ),
+        "evaluated_utc": approval["evaluated_utc"],
+        "approval_binding_sha256": (
+            approval_binding.get("binding_sha256")
+            if isinstance(approval_binding, dict)
+            else None
+        ),
+        "dispatch_binding_sha256": (
+            dispatch_binding.get("binding_sha256")
+            if isinstance(dispatch_binding, dict)
+            else None
+        ),
+        "mailbox_receipt_sha256": authorization.get(
+            "mailbox_receipt_sha256"
+        ),
+        "action_time_approval_valid": approval[
+            "action_time_approval_valid"
+        ],
+        "approval_window_current": approval["approval_window_current"],
+        "private_human_unlock_configured": unlock_hash_configured,
+        "private_human_unlock_supplied": token_present,
+        "private_human_unlock_valid": unlock_valid,
+        "single_use_binding_consumed": dispatch_consumed,
+        "blockers": blockers,
+        "dispatch_authorized": dispatch_authorized,
+        "send_authorized": dispatch_authorized,
+        "send_performed": False,
+        "external_action_performed": False,
+        "handoff_can_send_email": False,
+        "private_inputs_omitted": True,
+        "claim_boundary": (
+            "This receipt only evaluates a hash-bound draft, fresh mailbox "
+            "receipt, exact action-time approval, and private HumanUnlock. "
+            "It cannot send email and does not prove transmission, delivery, "
+            "receipt, factual accuracy, partner authority, submission, award, "
+            "validation, performance, or savings."
+        ),
+    }
+    result = {
+        **core,
+        "receipt_sha256": canonical_object_sha256(core),
+    }
+    serialized = json.dumps(result, sort_keys=True)
+    private_values = (
+        exact_approval_phrase,
+        human_unlock_token,
+        expected_human_unlock_sha256,
+    )
+    if any(
+        isinstance(value, str) and value and value in serialized
+        for value in private_values
+    ):
+        raise OutreachRegistryError(
+            "ACTION_TIME_HANDOFF_EXPOSES_PRIVATE_INPUT"
+        )
+    return result
 
 
 def build_public_payload(
@@ -1582,6 +1702,8 @@ def build_public_payload(
             ),
             "exact_approval_expires": True,
             "single_use_action_time_binding": True,
+            "private_human_unlock_required_for_dispatch": True,
+            "dispatch_handoff_can_send_email": False,
             "source_config_hash_cross_platform_canonical_json": True,
             "builder_can_send_email": False,
             "action_time_human_review_required": True,
@@ -1613,6 +1735,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Action-time mailbox freshness: `15_MINUTES_MAX`",
         "- Exact approval phrase: `BINDING_SCOPED_SINGLE_USE`",
         "- Exact approval window: `5_MINUTES_MAX`",
+        "- Private HumanUnlock: `REQUIRED_AT_RUNTIME`",
+        "- Dispatch handoff can send email: `false`",
         f"- Static quality gate: `{payload['quality_gate']['status']}`",
         f"- Static quality checks: `{payload['quality_gate']['check_count']}`",
         "- Unchanged rebuilds byte-stable: `true`",
@@ -1676,7 +1800,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Operating Boundary",
             "",
-            "This registry renders drafts, immutable dispatch bindings, action-time authorization records, and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes or until the deadline, whichever comes first. A binding scopes approval; it is not proof of transmission, receipt, content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
+            "This registry renders drafts, immutable dispatch bindings, action-time authorization records, and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes or until the deadline, whichever comes first. Dispatch authorization additionally requires a private HumanUnlock checked only at runtime; the token and expected hash are omitted from receipts, and the evaluator cannot send. A binding scopes approval; it is not proof of transmission, receipt, content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
             "",
         ]
     )
