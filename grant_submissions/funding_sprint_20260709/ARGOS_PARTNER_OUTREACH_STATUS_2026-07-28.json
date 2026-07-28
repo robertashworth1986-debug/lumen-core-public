@@ -1,0 +1,60 @@
+{
+  "schema": "lumencore.argos_partner_outreach_status.v1",
+  "recorded_utc": "2026-07-28T04:47:45Z",
+  "lane_id": "argos_emi_teaming_inquiry",
+  "status": "DRAFT_ONLY_APPROVAL_EXPIRED_DEADLINE_OPEN",
+  "opportunity": {
+    "name": "HHS Project Argos sources sought",
+    "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+    "government_deadline_utc": "2026-07-30T21:00:00Z",
+    "government_deadline_local": "2026-07-30T17:00:00-04:00",
+    "government_deadline_timezone": "America/New_York",
+    "partner_interest_target_utc": "2026-07-28T17:00:00Z",
+    "notice_type": "SOURCES_SOUGHT_MARKET_RESEARCH"
+  },
+  "recipient_route": {
+    "organization": "EMI Advisors LLC",
+    "named_addressee": "Evelyn Gallego",
+    "public_route_verified": true,
+    "address_omitted": true
+  },
+  "mailbox_observation": {
+    "full_mailbox_search_completed": true,
+    "search_scope": "ALL_MAIL_EXACT_SUBJECT_OR_RECIPIENT_OR_NOTICE",
+    "matching_current_draft_count": 1,
+    "matching_sent_count": 0,
+    "matching_inbound_count": 0,
+    "current_draft_only": true,
+    "gmail_identifiers_omitted": true,
+    "message_body_omitted": true,
+    "subject_sha256": "80FEEDC1540F859AC970FD32A3F9DFF0E03C5B347130C7FFF2E4E24382C5993B",
+    "body_sha256": "A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2",
+    "attachment_count": 0,
+    "cc_count": 0,
+    "bcc_count": 0
+  },
+  "prior_binding": {
+    "binding_sha256": "D363D349B1E9D99F3DE3981192FB7AE4F5FE63DA3B07268E742354CF626D5B27",
+    "expires_utc": "2026-07-27T23:33:38Z",
+    "expired_at_record_time": true,
+    "prior_approval_reusable": false
+  },
+  "source_control": {
+    "base_public_packet_commit": "0c097a2d9b3c58b3fe15b7b7e6ed71ac434d97d0",
+    "public_dispatch_gate_path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
+    "public_dispatch_gate_sha256": "BCBCEE8D16010724439024D2811BA78ADF991E4787439DE8C9E33F06E0E990EA",
+    "selected_template_id": "INITIAL_PARTNER_TEAMING_INQUIRY"
+  },
+  "controls": {
+    "builder_can_send_email": false,
+    "draft_creation_authorizes_send": false,
+    "fresh_full_mailbox_recheck_required": true,
+    "fresh_draft_readback_required": true,
+    "new_five_minute_exact_approval_required": true,
+    "private_human_unlock_required": true,
+    "duplicate_send_prohibited": true,
+    "partner_name_use_requires_written_authority": true
+  },
+  "next_action": "Before the partner-interest target, repeat the full-mailbox duplicate search and exact draft readback, rebuild the five-minute dispatch binding, and obtain one new exact action-time approval. Do not send from the expired binding.",
+  "claim_boundary": "This record establishes only that one bounded partner inquiry was observed as a current Gmail draft with no matching sent or inbound message at the recorded check. It does not send email, authorize partner-name use, establish submission, award, funding, selection, validation, performance, or savings."
+}

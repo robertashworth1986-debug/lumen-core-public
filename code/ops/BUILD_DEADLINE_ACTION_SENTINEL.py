@@ -59,6 +59,9 @@ PRIVATE_FIELD_KEYS = {
     "thread_id",
     "token",
 }
+SHA256_HEX_LENGTH = 64
+ARGOS_STATUS_SCHEMA = "lumencore.argos_partner_outreach_status.v1"
+ARGOS_DRAFT_ONLY_STATUS = "DRAFT_ONLY_APPROVAL_EXPIRED_DEADLINE_OPEN"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -74,6 +77,31 @@ def canonical_json(payload: dict[str, Any]) -> str:
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def resolve_repository_file(path_value: Any, label: str) -> tuple[Path, Path]:
+    relative_path = Path(str(path_value or ""))
+    if not relative_path.as_posix() or relative_path.is_absolute():
+        raise ValueError(f"{label} must be a relative repository path")
+    source_path = (ROOT / relative_path).resolve()
+    try:
+        source_path.relative_to(ROOT.resolve())
+    except ValueError as exc:
+        raise ValueError(f"{label} must stay inside the worktree") from exc
+    if not source_path.is_file():
+        raise ValueError(f"{label} does not exist: {relative_path.as_posix()}")
+    return relative_path, source_path
+
+
+def normalized_sha256(value: Any, label: str) -> str:
+    normalized = str(value or "").strip().upper()
+    if len(normalized) != SHA256_HEX_LENGTH:
+        raise ValueError(f"{label} must be a SHA-256 hex digest")
+    try:
+        int(normalized, 16)
+    except ValueError as exc:
+        raise ValueError(f"{label} must be a SHA-256 hex digest") from exc
+    return normalized
 
 
 def parse_aware_datetime(value: str, label: str) -> datetime:
@@ -119,20 +147,250 @@ def assert_no_private_fields(value: Any, path: str = "config") -> None:
             assert_no_private_fields(nested, f"{path}[{index}]")
 
 
+def argos_outreach_status_receipt(
+    binding: dict[str, Any],
+    deadline: dict[str, Any],
+    gate_relative_path: Path,
+    gate_path: Path,
+    gate: dict[str, Any],
+) -> dict[str, Any]:
+    status_relative_path, status_path = resolve_repository_file(
+        binding.get("outreach_status_path"),
+        "outreach_status_path",
+    )
+    status = read_json(status_path)
+    assert_no_private_fields(status, "outreach_status")
+    if status.get("schema") != ARGOS_STATUS_SCHEMA:
+        raise ValueError("unexpected Argos outreach status schema")
+    if status.get("lane_id") != binding.get("required_lane_id"):
+        raise ValueError("Argos outreach status lane changed")
+    if status.get("status") != ARGOS_DRAFT_ONLY_STATUS:
+        raise ValueError("Argos outreach status is no longer draft-only")
+
+    recorded_utc = parse_aware_datetime(
+        str(status.get("recorded_utc", "")),
+        "outreach_status.recorded_utc",
+    )
+    opportunity = status.get("opportunity")
+    mailbox = status.get("mailbox_observation")
+    prior_binding = status.get("prior_binding")
+    source_control = status.get("source_control")
+    controls = status.get("controls")
+    gate_opportunity = gate.get("opportunity")
+    gate_selection = gate.get("template_selection")
+    gate_message = gate.get("message")
+    gate_controls = gate.get("controls")
+    required_objects = {
+        "outreach_status.opportunity": opportunity,
+        "outreach_status.mailbox_observation": mailbox,
+        "outreach_status.prior_binding": prior_binding,
+        "outreach_status.source_control": source_control,
+        "outreach_status.controls": controls,
+        "dispatch_gate.opportunity": gate_opportunity,
+        "dispatch_gate.template_selection": gate_selection,
+        "dispatch_gate.message": gate_message,
+        "dispatch_gate.controls": gate_controls,
+    }
+    for label, value in required_objects.items():
+        if not isinstance(value, dict):
+            raise ValueError(f"{label} must be an object")
+
+    configured_deadline = parse_aware_datetime(
+        str(deadline.get("iso_utc", "")),
+        "deadline.iso_utc",
+    )
+    status_deadline = parse_aware_datetime(
+        str(opportunity.get("government_deadline_utc", "")),
+        "outreach_status.government_deadline_utc",
+    )
+    gate_deadline = parse_aware_datetime(
+        str(gate_opportunity.get("government_deadline_utc", "")),
+        "dispatch_gate.government_deadline_utc",
+    )
+    partner_target = parse_aware_datetime(
+        str(opportunity.get("partner_interest_target_utc", "")),
+        "outreach_status.partner_interest_target_utc",
+    )
+    gate_partner_target = parse_aware_datetime(
+        str(gate_opportunity.get("partner_interest_target_utc", "")),
+        "dispatch_gate.partner_interest_target_utc",
+    )
+    if not (
+        configured_deadline
+        == status_deadline
+        == gate_deadline
+        and partner_target == gate_partner_target
+    ):
+        raise ValueError("Argos deadline or partner target changed across sources")
+    if not recorded_utc < status_deadline:
+        raise ValueError("Argos draft-only status cannot be recorded after the deadline")
+    if not partner_target < status_deadline:
+        raise ValueError("Argos partner target must precede the Government deadline")
+
+    if mailbox.get("full_mailbox_search_completed") is not True:
+        raise ValueError("Argos full-mailbox duplicate search is not recorded")
+    expected_counts = {
+        "matching_current_draft_count": 1,
+        "matching_sent_count": 0,
+        "matching_inbound_count": 0,
+        "attachment_count": 0,
+        "cc_count": 0,
+        "bcc_count": 0,
+    }
+    for field, expected in expected_counts.items():
+        value = mailbox.get(field)
+        if (
+            not isinstance(value, int)
+            or isinstance(value, bool)
+            or value != expected
+        ):
+            raise ValueError(f"Argos mailbox count changed: {field}")
+    for field in (
+        "current_draft_only",
+        "gmail_identifiers_omitted",
+        "message_body_omitted",
+    ):
+        if mailbox.get(field) is not True:
+            raise ValueError(f"Argos privacy or draft-only control failed: {field}")
+
+    subject = str(gate_message.get("subject", ""))
+    subject_sha256 = hashlib.sha256(subject.encode("utf-8")).hexdigest().upper()
+    body_relative_path, body_path = resolve_repository_file(
+        gate_message.get("body_path"),
+        "dispatch_gate.message.body_path",
+    )
+    body_sha256 = sha256(body_path).upper()
+    declared_gate_body_sha256 = normalized_sha256(
+        gate_message.get("body_sha256"),
+        "dispatch_gate.message.body_sha256",
+    )
+    observed_subject_sha256 = normalized_sha256(
+        mailbox.get("subject_sha256"),
+        "outreach_status.mailbox_observation.subject_sha256",
+    )
+    observed_body_sha256 = normalized_sha256(
+        mailbox.get("body_sha256"),
+        "outreach_status.mailbox_observation.body_sha256",
+    )
+    if subject_sha256 != observed_subject_sha256:
+        raise ValueError("Argos draft subject hash no longer matches the dispatch gate")
+    if not body_sha256 == declared_gate_body_sha256 == observed_body_sha256:
+        raise ValueError("Argos draft body hash no longer matches the committed source")
+    for field in ("attachment_count", "cc_count", "bcc_count"):
+        if gate_message.get(field) != 0:
+            raise ValueError(f"Argos dispatch gate must retain zero {field}")
+
+    selected_template_id = str(source_control.get("selected_template_id", ""))
+    if (
+        not selected_template_id
+        or selected_template_id != gate_selection.get("template_id")
+    ):
+        raise ValueError("Argos selected template changed across sources")
+    declared_gate_path = str(source_control.get("public_dispatch_gate_path", ""))
+    if declared_gate_path != gate_relative_path.as_posix():
+        raise ValueError("Argos status points to a different dispatch gate")
+    declared_gate_sha256 = normalized_sha256(
+        source_control.get("public_dispatch_gate_sha256"),
+        "outreach_status.source_control.public_dispatch_gate_sha256",
+    )
+    if declared_gate_sha256 != sha256(gate_path).upper():
+        raise ValueError("Argos dispatch gate SHA-256 changed")
+
+    binding_relative_path, binding_path = resolve_repository_file(
+        gate_controls.get("dispatch_binding_path"),
+        "dispatch_gate.controls.dispatch_binding_path",
+    )
+    binding_payload = read_json(binding_path)
+    binding_core = binding_payload.get("dispatch_binding")
+    if not isinstance(binding_core, dict):
+        raise ValueError("Argos dispatch binding core must be an object")
+    prior_binding_sha256 = normalized_sha256(
+        prior_binding.get("binding_sha256"),
+        "outreach_status.prior_binding.binding_sha256",
+    )
+    if prior_binding_sha256 != normalized_sha256(
+        binding_core.get("binding_sha256"),
+        "dispatch_binding.binding_sha256",
+    ):
+        raise ValueError("Argos prior binding hash changed")
+    prior_binding_expires = parse_aware_datetime(
+        str(prior_binding.get("expires_utc", "")),
+        "outreach_status.prior_binding.expires_utc",
+    )
+    binding_expires = parse_aware_datetime(
+        str(binding_core.get("approval_window_expires_utc", "")),
+        "dispatch_binding.approval_window_expires_utc",
+    )
+    if prior_binding_expires != binding_expires:
+        raise ValueError("Argos prior binding expiry changed")
+    if not prior_binding_expires < recorded_utc:
+        raise ValueError("Argos prior binding is not expired at record time")
+    if prior_binding.get("expired_at_record_time") is not True:
+        raise ValueError("Argos status must mark the prior binding expired")
+    if prior_binding.get("prior_approval_reusable") is not False:
+        raise ValueError("Argos prior approval must remain nonreusable")
+
+    required_true_controls = {
+        "fresh_full_mailbox_recheck_required",
+        "fresh_draft_readback_required",
+        "new_five_minute_exact_approval_required",
+        "private_human_unlock_required",
+        "duplicate_send_prohibited",
+        "partner_name_use_requires_written_authority",
+    }
+    for field in required_true_controls:
+        if controls.get(field) is not True:
+            raise ValueError(f"Argos outreach control must remain true: {field}")
+    for field in ("builder_can_send_email", "draft_creation_authorizes_send"):
+        if controls.get(field) is not False:
+            raise ValueError(f"Argos outreach control must remain false: {field}")
+    if gate_controls.get("builder_can_send") is not False:
+        raise ValueError("Argos dispatch builder must remain unable to send")
+
+    return {
+        "path": status_relative_path.as_posix(),
+        "sha256": sha256(status_path),
+        "recorded_utc": format_utc(recorded_utc),
+        "observed_state": ARGOS_DRAFT_ONLY_STATUS,
+        "partner_interest_target_utc": format_utc(partner_target),
+        "mailbox_state": {
+            "current_draft_count": 1,
+            "sent_count": 0,
+            "inbound_count": 0,
+            "attachment_count": 0,
+            "cc_count": 0,
+            "bcc_count": 0,
+        },
+        "subject_sha256": subject_sha256,
+        "body_path": body_relative_path.as_posix(),
+        "body_sha256": body_sha256,
+        "selected_template_id": selected_template_id,
+        "prior_binding": {
+            "path": binding_relative_path.as_posix(),
+            "binding_sha256": prior_binding_sha256,
+            "expires_utc": format_utc(prior_binding_expires),
+            "expired_at_record_time": True,
+            "prior_approval_reusable": False,
+        },
+    }
+
+
 def source_receipt(binding: dict[str, Any], deadline: dict[str, Any]) -> dict[str, Any]:
     kind = str(binding.get("kind", "")).strip()
-    if kind in {"REPOSITORY_GATE", "REPOSITORY_DATE_GATE"}:
-        relative_path = Path(str(binding.get("path", "")))
-        if not relative_path.as_posix() or relative_path.is_absolute():
-            raise ValueError("repository source path must be relative")
-        source_path = (ROOT / relative_path).resolve()
-        try:
-            source_path.relative_to(ROOT.resolve())
-        except ValueError as exc:
-            raise ValueError("repository source path must stay inside the worktree") from exc
-        if not source_path.is_file():
-            raise ValueError(f"repository source does not exist: {relative_path.as_posix()}")
-
+    repository_gate_kinds = {
+        "REPOSITORY_GATE",
+        "REPOSITORY_DATE_GATE",
+        "REPOSITORY_GATE_WITH_OUTREACH_STATUS",
+    }
+    exact_gate_kinds = {
+        "REPOSITORY_GATE",
+        "REPOSITORY_GATE_WITH_OUTREACH_STATUS",
+    }
+    if kind in repository_gate_kinds:
+        relative_path, source_path = resolve_repository_file(
+            binding.get("path"),
+            "repository source path",
+        )
         source = read_json(source_path)
         deadline_field = str(binding.get("deadline_field", "")).strip()
         status_field = str(binding.get("status_field", "")).strip()
@@ -140,7 +398,7 @@ def source_receipt(binding: dict[str, Any], deadline: dict[str, Any]) -> dict[st
         observed_status = str(resolve_field(source, status_field))
         required_status = str(binding.get("required_status", "")).strip()
 
-        if kind == "REPOSITORY_GATE":
+        if kind in exact_gate_kinds:
             if deadline.get("precision") != "EXACT":
                 raise ValueError("repository deadline binding requires EXACT precision")
             if parse_aware_datetime(
@@ -164,13 +422,22 @@ def source_receipt(binding: dict[str, Any], deadline: dict[str, Any]) -> dict[st
                 f"expected {required_status}, observed {observed_status}"
             )
 
-        return {
+        receipt = {
             "kind": kind,
             "path": relative_path.as_posix(),
             "sha256": sha256(source_path),
             "bound_deadline_field": deadline_field,
             "observed_status": observed_status,
         }
+        if kind == "REPOSITORY_GATE_WITH_OUTREACH_STATUS":
+            receipt["outreach_status"] = argos_outreach_status_receipt(
+                binding,
+                deadline,
+                relative_path,
+                source_path,
+                source,
+            )
+        return receipt
 
     if kind == "PRIVATE_OFFICIAL_INBOUND_STATUS_EVENT":
         if binding.get("private_source_excluded") is not True:
@@ -262,7 +529,7 @@ def validate_config(config: dict[str, Any]) -> None:
 
 
 def urgency_for(seconds_until: int, alert_window_hours: int) -> str:
-    if seconds_until < 0:
+    if seconds_until <= 0:
         return "PAST"
     hours_until = seconds_until / 3600
     if hours_until <= 8:
@@ -282,6 +549,7 @@ def evaluate_lane(
     deadline = lane["deadline"]
     blockers = [str(value) for value in lane["blockers"]]
     precision = deadline["precision"]
+    receipt = source_receipt(lane["source_binding"], deadline)
 
     result: dict[str, Any] = {
         "id": str(lane["id"]),
@@ -296,14 +564,16 @@ def evaluate_lane(
         "send_now": False,
         "external_action_executed": False,
         "safest_next_action": str(lane["safest_next_action"]),
-        "source_receipt": source_receipt(lane["source_binding"], deadline),
+        "source_receipt": receipt,
     }
 
     if precision == "EXACT":
         deadline_utc = parse_aware_datetime(str(deadline["iso_utc"]), "deadline.iso_utc")
         seconds_until = int((deadline_utc - as_of_utc).total_seconds())
-        if seconds_until < 0:
+        if seconds_until <= 0:
             state = "PAST_DEADLINE_NO_EXTERNAL_ACTION_AUTHORIZED"
+        elif receipt["kind"] == "REPOSITORY_GATE_WITH_OUTREACH_STATUS":
+            state = "DRAFT_ONLY_APPROVAL_EXPIRED_HUMAN_ACTION_DUE"
         elif seconds_until <= alert_window_hours * 3600:
             state = "BLOCKED_HUMAN_ACTION_DUE"
         else:
@@ -320,12 +590,54 @@ def evaluate_lane(
                     "cutoff_time_known": True,
                     "timezone_known": True,
                     "exact_countdown_available": True,
-                    "deadline_passed": seconds_until < 0,
+                    "deadline_passed": seconds_until <= 0,
                     "seconds_until_deadline": seconds_until,
                     "hours_until_deadline": round(seconds_until / 3600, 2),
                 },
             }
         )
+        outreach_status = receipt.get("outreach_status")
+        if isinstance(outreach_status, dict):
+            recorded_utc = parse_aware_datetime(
+                str(outreach_status["recorded_utc"]),
+                "outreach_status.recorded_utc",
+            )
+            if recorded_utc > as_of_utc:
+                raise ValueError(
+                    "Argos outreach status cannot be used before its record time"
+                )
+            partner_target = parse_aware_datetime(
+                str(outreach_status["partner_interest_target_utc"]),
+                "outreach_status.partner_interest_target_utc",
+            )
+            target_seconds_until = int((partner_target - as_of_utc).total_seconds())
+            if target_seconds_until < 0:
+                target_state = "PARTNER_TARGET_PASSED_GOVERNMENT_DEADLINE_OPEN"
+            else:
+                target_state = "PARTNER_TARGET_OPEN"
+            result["outreach_status"] = {
+                "observed_state": str(outreach_status["observed_state"]),
+                "recorded_utc": str(outreach_status["recorded_utc"]),
+                "current_state_as_of_evaluation": (
+                    "OFFICIAL_DEADLINE_PASSED_NO_SEND"
+                    if seconds_until <= 0
+                    else target_state
+                ),
+                "partner_interest_target_utc": format_utc(partner_target),
+                "seconds_until_partner_target": target_seconds_until,
+                "mailbox_state_as_of_record": dict(
+                    outreach_status["mailbox_state"]
+                ),
+                "selected_template_id": str(
+                    outreach_status["selected_template_id"]
+                ),
+                "subject_sha256": str(outreach_status["subject_sha256"]),
+                "body_sha256": str(outreach_status["body_sha256"]),
+                "prior_binding_expired": True,
+                "prior_approval_reusable": False,
+                "fresh_recheck_required": True,
+                "new_exact_approval_required": True,
+            }
         return result
 
     deadline_date = parse_date(str(deadline["date"]), "deadline.date")
@@ -470,11 +782,28 @@ def render_markdown(payload: dict[str, Any]) -> str:
     )
     for lane in payload["lanes"]:
         receipt = lane["source_receipt"]
-        if receipt["kind"] in {"REPOSITORY_GATE", "REPOSITORY_DATE_GATE"}:
+        if receipt["kind"] in {
+            "REPOSITORY_GATE",
+            "REPOSITORY_DATE_GATE",
+            "REPOSITORY_GATE_WITH_OUTREACH_STATUS",
+        }:
             lines.append(
                 f"- `{lane['id']}`: `{receipt['path']}` at SHA-256 "
                 f"`{receipt['sha256']}`; observed gate `{receipt['observed_status']}`."
             )
+            outreach_status = receipt.get("outreach_status")
+            if isinstance(outreach_status, dict):
+                mailbox = outreach_status["mailbox_state"]
+                lines.append(
+                    f"  Outreach receipt: `{outreach_status['path']}` at SHA-256 "
+                    f"`{outreach_status['sha256']}`; observed "
+                    f"`{outreach_status['observed_state']}` at "
+                    f"`{outreach_status['recorded_utc']}` with "
+                    f"{mailbox['current_draft_count']} draft, "
+                    f"{mailbox['sent_count']} sent, and "
+                    f"{mailbox['inbound_count']} inbound; prior approval expired "
+                    "and is not reusable."
+                )
         else:
             lines.append(
                 f"- `{lane['id']}`: private official-event metadata only; source "

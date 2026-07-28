@@ -94,21 +94,23 @@
         "timezone_known": true
       },
       "source_binding": {
-        "kind": "REPOSITORY_GATE",
-        "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
-        "deadline_field": "opportunity.deadline_utc",
-        "status_field": "send_gate.decision",
-        "required_status": "BLOCK_SEND"
+        "kind": "REPOSITORY_GATE_WITH_OUTREACH_STATUS",
+        "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
+        "deadline_field": "opportunity.government_deadline_utc",
+        "status_field": "decision",
+        "required_status": "GMAIL_DRAFT_READY_SEND_BLOCKED",
+        "outreach_status_path": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
+        "required_lane_id": "argos_emi_teaming_inquiry"
       },
       "external_action_type": "EMAIL_RESPONSE",
       "completion_evidence_present": false,
       "blockers": [
-        "Private cover facts remain unresolved.",
-        "Qualified health IT and federal cybersecurity teaming roles remain unresolved.",
-        "Final recipient, subject, body, and attachment set have not been action-time verified.",
-        "A fresh duplicate-send recheck is still required."
+        "One matching Gmail draft and zero sent or inbound copies were observed at the recorded full-mailbox check.",
+        "The latest five-minute dispatch binding expired and its approval cannot be reused.",
+        "A fresh full-mailbox duplicate search, exact draft readback, private HumanUnlock, and new exact action-time approval are still required.",
+        "Written partner authority is required before using the partner name or qualifications in a Government response."
       ],
-      "safest_next_action": "Resolve the private cover facts and qualified teaming roles, inspect the rendered response, then perform a fresh official-notice and duplicate-send review before requesting exact approval for one bounded response."
+      "safest_next_action": "Before the partner-interest target, repeat the full-mailbox duplicate search and exact draft readback, rebuild the five-minute dispatch binding, and obtain one new exact action-time approval. Do not send from the expired binding."
     },
     {
       "id": "NASHVILLE_ONBOARDING_20260731",

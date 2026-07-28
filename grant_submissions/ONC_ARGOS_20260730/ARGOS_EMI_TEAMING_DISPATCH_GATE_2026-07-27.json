@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.argos_partner_dispatch_gate.v1",
-  "generated_utc": "2026-07-27T22:59:04Z",
+  "generated_utc": "2026-07-27T23:28:38Z",
   "opportunity": {
     "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
     "official_notice_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
@@ -10,7 +10,7 @@
   "template_selection": {
     "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
     "registry_path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
-    "registry_source_config_sha256": "776B96677CECAAF89CE99071A948BD099C5B9D4B55370A66D2D8FA3E2801D79D",
+    "registry_source_config_sha256": "CBE13CCC77BAFA44F75394970DFB80FEA5BA17D67665A486892A4B6CFF6372E3",
     "template_canonical_sha256": "79D3C96AFF6D9D0C68CF665A499EBD819E7BA66ED10B1A3C094ED2D20C907A6E",
     "relationship": "OPPORTUNITY_SPECIFIC_SPECIALIZATION",
     "exact_template_render_used": false,
@@ -53,7 +53,7 @@
     "decision": "NO_DUPLICATE_FOUND"
   },
   "fresh_duplicate_recheck": {
-    "checked_utc": "2026-07-27T22:59:04Z",
+    "checked_utc": "2026-07-27T23:28:38Z",
     "search_scope": "ALL_MAIL_EXACT_SUBJECT_OR_RECIPIENT_OR_NOTICE",
     "matching_message_count": 1,
     "matching_current_draft_count": 1,
@@ -63,7 +63,7 @@
   "gmail_draft_receipt": {
     "created_utc": "2026-07-27T19:34:27Z",
     "updated_utc": "2026-07-27T22:37:57Z",
-    "readback_checked_utc": "2026-07-27T22:59:04Z",
+    "readback_checked_utc": "2026-07-27T23:28:38Z",
     "draft_present": true,
     "subject_matches": true,
     "body_matches_source_after_newline_normalization": true,
