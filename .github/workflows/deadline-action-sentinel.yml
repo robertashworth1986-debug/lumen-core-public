@@ -105,8 +105,33 @@ jobs:
       - name: Verify the Argos claim-to-evidence map
         run: python grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py --check
 
-      - name: Verify the Argos teaming dispatch binding
-        run: python grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py --check
+      - name: Verify the historical Argos teaming binding is non-reusable
+        run: |
+          set +e
+          python grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py --check \
+            > "${RUNNER_TEMP}/argos-historical-binding-check.json"
+          binding_status=$?
+          set -e
+          test "${binding_status}" -eq 1
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          receipt = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "argos-historical-binding-check.json")
+              .read_text(encoding="utf-8")
+          )
+          assert receipt == {
+              "status": "STALE",
+              "decision": "BLOCKED_DISPATCH_GATE_INTEGRITY",
+              "check_count": 12,
+              "pass_count": 11,
+              "fail_count": 1,
+              "send_authorized": False,
+              "send_performed": False,
+          }
+          PY
 
       - name: Verify the Argos response conformance gate
         run: python grant_submissions/ONC_ARGOS_20260730/build_argos_conformance_gate.py --check
