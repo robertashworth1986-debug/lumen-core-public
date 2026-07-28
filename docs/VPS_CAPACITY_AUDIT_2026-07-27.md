@@ -9,6 +9,11 @@
 The production VPS does not currently need more CPU or memory. It needs storage
 capacity, storage separation, retention controls, and restart-loop protection.
 
+The approved recovery-floor resize was completed after this audit. See
+`docs/VPS_CAPACITY_CHANGE_RECEIPT_2026-07-27.md` for the public-safe operation
+receipt. The growth-safe separate-volume and Object Storage layout remains a
+future change, not a completed deployment.
+
 The current instance is `VM.Standard3.Flex` with 1 OCPU, 2 x86 vCPUs, 16 GB of
 memory, and 1 Gbps networking. A five-second sample showed 67% to 100% idle CPU,
 about 13 GB of available memory, and no swap use. Those observations do not
@@ -158,17 +163,17 @@ assumed compatible.
 9. Keep at least 20 GiB free on the root filesystem.
 10. Test one restore from backup before treating the backup policy as proven.
 
-## Approval Boundary
+## Original Approval Boundary
 
-This audit made no production changes. Each of the following remains
-action-time approval gated:
+The read-only audit made no production changes. A later exact action-time
+approval authorized only a full boot backup and an online boot-volume resize
+to 150 GB at Balanced performance. That completed action does not authorize any
+of the following:
 
-- creating a billable backup or volume;
-- changing a boot-volume size or performance level;
 - attaching or mounting a block volume;
 - stopping, starting, restarting, or disabling a production service;
 - moving, compressing, archiving, or deleting evidence;
-- editing `/etc/fstab`, LVM, XFS, Nginx, DNS, or certificates;
+- editing `/etc/fstab`, Nginx, DNS, or certificates;
 - deploying the repair branch;
 - changing instance shape, OCPUs, or memory;
 - rebooting the instance.
