@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -24,13 +25,57 @@ SECTOR_MATRIX = ROOT / "out" / "sector_value_matrix.json"
 DOLLAR_CLAIM_GATE = ROOT / "out" / "ops" / "dollar_claim_gate_latest.json"
 LIVE_BREADTH_KEY_GATE = ROOT / "out" / "ops" / "live_breadth_key_gate_latest.json"
 GEOMETRY_BRIDGE = ROOT / "out" / "ops" / "geometry_championship_bridge_latest.json"
-CHAMPION_GAUNTLET = ROOT / "out" / "ops" / "champion_metric_gauntlet_latest.json"
+GEOMETRY_CHAMPION = ROOT / "out" / "ops" / "geometry_champion_of_champions_latest.json"
+KURAMOTO_CROSS_SECTOR = ROOT / "out" / "ops" / "kuramoto_cross_sector_benchmark_latest.json"
+PROOF_TO_REVENUE = ROOT / "out" / "ops" / "proof_to_revenue_engine_latest.json"
 TWIN_SEED_PATH = Path(
     os.environ.get(
         "LUMA_TWIN_SEED_PATH",
         str(Path.home() / "iCloudDrive" / "Downloads 2" / "Copy of twin_seed.json"),
     )
 )
+
+BLOCKED_PUBLIC_CLAIM_PHRASES = (
+    "reviewer-safe winner state",
+    "current strongest family",
+    "current internal champion",
+    "money printer",
+    "$4,520",
+    "$39,595,200",
+)
+
+
+def validate_portal_claim_surface(html: str) -> None:
+    lowered = html.lower()
+    blocked = [
+        phrase
+        for phrase in BLOCKED_PUBLIC_CLAIM_PHRASES
+        if phrase.lower() in lowered
+    ]
+    if blocked:
+        raise ValueError(
+            "dashboard portal contains blocked claim phrases: "
+            + ", ".join(blocked)
+        )
+    required = (
+        "No Current Performance Champion",
+        "No Current Dollar Projection",
+        "No model-performance marketing is allowed.",
+    )
+    missing = [phrase for phrase in required if phrase not in html]
+    if missing:
+        raise ValueError(
+            "dashboard portal is missing claim-control phrases: "
+            + ", ".join(missing)
+        )
+
+
+def atomic_write_text(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    normalized = "\n".join(line.rstrip() for line in text.splitlines()) + "\n"
+    temporary.write_text(normalized, encoding="utf-8")
+    os.replace(temporary, path)
 
 
 def load_json(path: Path, default: Any) -> Any:
@@ -64,13 +109,29 @@ def main() -> None:
     dollar_claim_gate = load_json(DOLLAR_CLAIM_GATE, {})
     live_breadth_key_gate = load_json(LIVE_BREADTH_KEY_GATE, {})
     geometry_bridge = load_json(GEOMETRY_BRIDGE, {})
-    champion_gauntlet = load_json(CHAMPION_GAUNTLET, {})
+    geometry_champion = load_json(GEOMETRY_CHAMPION, {})
+    kuramoto_cross_sector = load_json(KURAMOTO_CROSS_SECTOR, {})
+    proof_to_revenue = load_json(PROOF_TO_REVENUE, {})
     twin_seed = load_json(TWIN_SEED_PATH, {})
     now = datetime.now(timezone.utc).isoformat()
     dollar_summary = dollar_claim_gate.get("summary", {}) if isinstance(dollar_claim_gate.get("summary"), dict) else {}
     key_summary = live_breadth_key_gate.get("summary", {}) if isinstance(live_breadth_key_gate.get("summary"), dict) else {}
     geometry_summary = geometry_bridge.get("summary", {}) if isinstance(geometry_bridge.get("summary"), dict) else {}
-    gauntlet_summary = champion_gauntlet.get("summary", {}) if isinstance(champion_gauntlet.get("summary"), dict) else {}
+    champion_summary = (
+        geometry_champion.get("summary", {})
+        if isinstance(geometry_champion.get("summary"), dict)
+        else {}
+    )
+    cross_sector_gates = (
+        kuramoto_cross_sector.get("gates", {})
+        if isinstance(kuramoto_cross_sector.get("gates"), dict)
+        else {}
+    )
+    revenue_summary = (
+        proof_to_revenue.get("summary", {})
+        if isinstance(proof_to_revenue.get("summary"), dict)
+        else {}
+    )
     branching_benchmark = geometry_bridge.get("branching_transport_benchmark", {}) if isinstance(geometry_bridge.get("branching_transport_benchmark"), dict) else {}
     branching_geometry = branching_benchmark.get("best_geometry", {}) if isinstance(branching_benchmark.get("best_geometry"), dict) else {}
     branching_baseline = branching_benchmark.get("best_baseline", {}) if isinstance(branching_benchmark.get("best_baseline"), dict) else {}
@@ -83,10 +144,9 @@ def main() -> None:
       ("Investor Room", "investor_command_room.html"),
       ("Investor Wallboard", "investor_wallboard.html"),
       ("Luma Voice Context", "luma_voice_context_console.html"),
-      ("Champion Gauntlet", "data/champion_metric_gauntlet.json"),
+      ("Current Claim Controls", "data/proof_to_revenue_engine.json"),
+      ("Source-Native Family Ledger", "data/source_native_family_baseline_ledger.json"),
       ("Dollar Claim Gate", "data/dollar_claim_gate.json"),
-      ("Field Validation Feed", "data/field_validation_control_room.json"),
-      ("Field Outreach Feed", "data/field_validation_outreach_board.json"),
       ("Geometry Bridge", "data/geometry_championship_bridge.json"),
       ("Kraken Execution", "kraken_execution_dashboard.html"),
       ("Scenario Mission", "scenario_mission.html"),
@@ -110,14 +170,50 @@ def main() -> None:
         "claim_safe_lanes": int(dollar_summary.get("allowed_estimated_value_claims", 0) or 0),
         "configured_live_breadth_providers": int(key_summary.get("configured_providers", 0) or 0),
         "geometry_family_count": int(geometry_summary.get("family_count", 0) or 0),
-        "champion_family": gauntlet_summary.get("champion_family", "not run"),
-        "champion_holdout_wins": int(gauntlet_summary.get("holdout_wins", 0) or 0),
-        "champion_holdout_count": int(gauntlet_summary.get("holdout_count", 0) or 0),
-        "champion_gate_pass_count": int(gauntlet_summary.get("gauntlet_pass_count", 0) or 0),
-        "champion_gate_total_count": int(gauntlet_summary.get("gauntlet_total_count", 0) or 0),
-        "champion_blocking_gate_count": int(gauntlet_summary.get("blocking_gate_count", 0) or 0),
-        "geometry_proof_champion_lane": geometry_summary.get("proof_champion_lane", "—"),
-        "geometry_proof_champion_family": geometry_summary.get("proof_champion_family", "—"),
+        "research_candidate_family": (
+            kuramoto_cross_sector.get("candidate", {}).get("id", "not run")
+            if isinstance(kuramoto_cross_sector.get("candidate"), dict)
+            else "not run"
+        ),
+        "cross_sector_status": kuramoto_cross_sector.get(
+            "status", "CURRENT_CROSS_SECTOR_BENCHMARK_MISSING"
+        ),
+        "cross_sector_gain_proven_count": int(
+            cross_sector_gates.get("sector_gain_proven_count", 0) or 0
+        ),
+        "cross_sector_sector_count": int(cross_sector_gates.get("sector_count", 0) or 0),
+        "model_performance_marketing_allowed": bool(
+            revenue_summary.get("model_performance_marketing_allowed", False)
+        ),
+        "internal_performance_champion_present": bool(
+            revenue_summary.get("internal_performance_champion_present", False)
+        ),
+        "direct_all_baseline_global_holm_positive_count": int(
+            champion_summary.get(
+                "direct_all_baseline_global_holm_positive_count", 0
+            )
+            or 0
+        ),
+        "measured_reference_candidate": revenue_summary.get(
+            "measured_reference_candidate", "kuramoto_phase_coupling"
+        ),
+        "measured_reference_named_baseline": revenue_summary.get(
+            "internal_replay_named_baseline", "kalman_local_linear_trend"
+        ),
+        "measured_reference_holdout_wins": int(
+            revenue_summary.get("internal_replay_holdout_wins", 0) or 0
+        ),
+        "measured_reference_holdout_count": int(
+            revenue_summary.get("internal_replay_holdout_count", 0) or 0
+        ),
+        "measured_reference_mean_delta": float(
+            revenue_summary.get("internal_replay_mean_delta", 0.0) or 0.0
+        ),
+        "sellable_product_name": revenue_summary.get(
+            "sellable_product_name", "ProofLock Opportunity Operations"
+        ),
+        "geometry_proof_champion_lane": "none",
+        "geometry_proof_champion_family": "none",
         "branching_benchmark_gate": branching_benchmark.get("gate", "not run"),
         "branching_best_geometry": branching_geometry.get("strategy", "not run"),
         "branching_best_baseline": branching_baseline.get("strategy", "not run"),
@@ -151,11 +247,14 @@ def main() -> None:
             },
             "claims": {
                 "title": "Dollar Claim Gate",
-                "text": f"Current safe language supports bounded estimated value on {int(dollar_summary.get('allowed_estimated_value_claims', 0) or 0)} live-measured lanes: {fmt_usd(dollar_summary.get('allowed_estimated_hourly_value_usd', 0.0))} per hour / {fmt_usd(dollar_summary.get('allowed_estimated_annual_value_usd', 0.0))} per year under stated assumptions. Context-only value of {fmt_usd(dollar_summary.get('blocked_context_only_annual_value_usd', 0.0))} stays blocked until validation, source-rights, and uncertainty gates pass.",
+                "text": (
+                    "No current lane clears the buyer-approved dollar-projection gate. "
+                    "Product value must be measured against a buyer-owned workflow or operational baseline."
+                ),
             },
             "geometry": {
                 "title": "Geometry Proof Bridge",
-                "text": f"Geometry Championship currently tracks {int(geometry_summary.get('family_count', 0) or 0)} route, path, flowform, field, and signal families. The latest branching-transport generated benchmark shows {branching_geometry.get('strategy', 'not run')} versus {branching_baseline.get('strategy', 'not run')} with gate {branching_benchmark.get('gate', 'not run')} and score delta {float(branching_benchmark.get('score_delta_vs_best_baseline', 0.0) or 0.0):.6f}. This is proof-building evidence, not field validation or live execution authorization.",
+                "text": f"Geometry Championship currently tracks {int(geometry_summary.get('family_count', 0) or 0)} route, path, flowform, field, and signal families, with no current performance champion. The latest branching-transport generated benchmark shows {branching_geometry.get('strategy', 'not run')} versus {branching_baseline.get('strategy', 'not run')} with gate {branching_benchmark.get('gate', 'not run')} and score delta {float(branching_benchmark.get('score_delta_vs_best_baseline', 0.0) or 0.0):.6f}. This is generated proof-building evidence, not field validation, a promotion, or live execution authorization.",
             },
         },
     }
@@ -245,7 +344,7 @@ def main() -> None:
       <div class=\"card reveal\">
         <div class=\"eyebrow\">Runtime Snapshot</div>
         <div class=\"metric\"><div class=\"label\">Paper Equity</div><div class=\"value\">{payload['paper_equity']}</div></div>
-        <div class=\"metric\"><div class=\"label\">Claim-Safe Value</div><div class=\"value\">{payload['claim_safe_hourly']}/hr</div></div>
+        <div class=\"metric\"><div class=\"label\">Claimable Modeled Value</div><div class=\"value\">{payload['claim_safe_hourly']}/hr</div></div>
         <div class=\"metric\"><div class=\"label\">Live-Breadth Providers</div><div class=\"value\">{payload['configured_live_breadth_providers']}</div></div>
         <div class=\"metric\"><div class=\"label\">Top Scout Prospect</div><div class=\"value\" style=\"font-size:1.15rem;\">{payload['top_scout']}</div></div>
       </div>
@@ -254,14 +353,14 @@ def main() -> None:
       <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Mission Control</div><h2 style=\"margin-top:12px;\">Operator Root</h2><p style=\"margin-top:10px;\">System health, claim boundaries, live-domain posture, and the single entry point for reviewers.</p><div class=\"metric\"><div class=\"label\">Top Lane</div><div class=\"value\">{payload['top_lane']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"mission_control.html\">Launch</a></div></div>
       <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Grants</div><h2 style=\"margin-top:12px;\">Submission Console</h2><p style=\"margin-top:10px;\">Opportunity readiness, application packages, submission gates, and grant-specific proof.</p><div class=\"metric\"><div class=\"label\">Claim-Safe Annual</div><div class=\"value\">{payload['claim_safe_annual']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"grants.html\">Launch</a></div></div>
       <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Quant Lab</div><h2 style=\"margin-top:12px;\">Benchmark Lab</h2><p style=\"margin-top:10px;\">Geometry families, champions, live-breadth feeds, and repeatable benchmark evidence.</p><div class=\"metric\"><div class=\"label\">Families</div><div class=\"value\">{payload['geometry_family_count']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"quant_lab.html\">Launch</a></div></div>
-      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Proof To Pilot</div><h2 style=\"margin-top:12px;\">Field Validation Gate</h2><p style=\"margin-top:10px;\">Buyer-authorized replay, validation blockers, outreach targets, and paid evaluation scope.</p><div class=\"metric\"><div class=\"label\">Holdout Wins</div><div class=\"value\">{payload['champion_holdout_wins']}/{payload['champion_holdout_count']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"proof_to_pilot.html\">Launch</a></div></div>
-      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Dollar Claim Gate</div><h2 style=\"margin-top:12px;\">Bounded Value Surface</h2><p style=\"margin-top:10px;\">Shows what can be safely stated as estimated value today and what remains blocked as context-only upside.</p><div class=\"metric\"><div class=\"label\">Safe Annual Estimate</div><div class=\"value\">{payload['claim_safe_annual']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"data/dollar_claim_gate.json\">Open Gate</a></div></div>
-      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Champion Gauntlet</div><h2 style=\"margin-top:12px;\">Reviewer-Safe Winner State</h2><p style=\"margin-top:10px;\">Current strongest family: {payload['champion_family']}; gate sheet separates internal proof from field-validation and dollar-savings blockers.</p><div class=\"metric\"><div class=\"label\">Holdout Wins</div><div class=\"value\">{payload['champion_holdout_wins']}/{payload['champion_holdout_count']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"data/champion_metric_gauntlet.json\">Open Gauntlet</a></div></div>
+      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Proof To Pilot</div><h2 style=\"margin-top:12px;\">External Validation Gate</h2><p style=\"margin-top:10px;\">Buyer-approved baselines, prospective sample gates, independent receipts, and human-controlled pilot scope.</p><div class=\"metric\"><div class=\"label\">Proven Sector Gains</div><div class=\"value\">{payload['cross_sector_gain_proven_count']}/{payload['cross_sector_sector_count']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"proof_to_pilot.html\">Launch</a></div></div>
+      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Dollar Claim Gate</div><h2 style=\"margin-top:12px;\">No Current Dollar Projection</h2><p style=\"margin-top:10px;\">No lane currently has the buyer-approved baseline, economic conversion, held-out validation, and uncertainty evidence required to publish dollars.</p><div class=\"metric\"><div class=\"label\">Claimable Annual Estimate</div><div class=\"value\">{payload['claim_safe_annual']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"data/dollar_claim_gate.json\">Open Gate</a></div></div>
+      <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Current Claim Control</div><h2 style=\"margin-top:12px;\">No Current Performance Champion</h2><p style=\"margin-top:10px;\">{payload['measured_reference_candidate']} is a measured negative reference: {payload['measured_reference_holdout_wins']}/{payload['measured_reference_holdout_count']} paired holdout wins versus {payload['measured_reference_named_baseline']}, mean delta {payload['measured_reference_mean_delta']:.6f}. No model-performance marketing is allowed.</p><div class=\"metric\"><div class=\"label\">Global Promotions</div><div class=\"value\">{payload['direct_all_baseline_global_holm_positive_count']}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"data/proof_to_revenue_engine.json\">Open Controls</a></div></div>
       <div class=\"card portal-card reveal\"><div class=\"eyebrow\">Geometry Bridge</div><h2 style=\"margin-top:12px;\">Branching Benchmark</h2><p style=\"margin-top:10px;\">Latest frozen lane result: {payload['branching_best_geometry']} vs {payload['branching_best_baseline']}; proof-building only, not field validation or live execution.</p><div class=\"metric\"><div class=\"label\">Score Delta</div><div class=\"value\">{payload['branching_score_delta']:.6f}</div></div><div class=\"actions\"><a class=\"btn primary\" href=\"data/geometry_championship_bridge.json\">Open Bridge</a></div></div>
     </section>
     <section class="card reveal" style="margin-top:20px;"><div class="eyebrow">Critical Live Boards</div><h2 style="margin-top:12px;">Operations + Reviewer Quick Launch</h2><p style="margin-top:10px;">The first four links are the master boards. Secondary rooms stay linked, but new proof work should wire into one of those four before it becomes public-facing.</p><div class="actions" style="margin-top:14px;">{critical_links_html}</div></section>
     <section class=\"card reveal\" style=\"margin-top:20px;\"><div class=\"eyebrow\">Immersive</div><h2 style=\"margin-top:12px;\">LumaCore XR Entry</h2><p style=\"margin-top:10px;\">Launch the real-time immersive bridge with cinematic visuals, live websocket data, and voice-guided walkthrough mode for demos.</p><div class=\"actions\" style=\"margin-top:14px;\"><a class=\"btn primary\" href=\"luma_experience.html\">Launch Immersive Experience</a></div></section>
-    <section class=\"card reveal\" style=\"margin-top:20px;\"><div class=\"eyebrow\">Notes</div><ul><li>Generated UTC: {now}</li><li>Unified board remains the most complete investor surface.</li><li>Dollar language is claim-safe only at {payload['claim_safe_hourly']}/hour / {payload['claim_safe_annual']}/year under stated assumptions.</li><li>Context-only blocked annual value is {payload['blocked_context_annual']} and must not be promoted until validation gates pass.</li><li>Immersive mode is now wired through the live gateway endpoint.</li></ul></section>
+    <section class=\"card reveal\" style=\"margin-top:20px;\"><div class=\"eyebrow\">Notes</div><ul><li>Generated UTC: {now}</li><li>Public hashes prove byte identity and deployment custody only, not model skill.</li><li>Current claimable modeled value is {payload['claim_safe_hourly']}/hour / {payload['claim_safe_annual']}/year.</li><li>The immediate commercial lane is {payload['sellable_product_name']}, measured against a buyer-owned workflow baseline.</li><li>No performance, savings, field-validation, or autonomous-execution claim is authorized.</li></ul></section>
   </div>
   <button class=\"luma-fab\" id=\"fab\">Luma Explainer</button>
   <div class=\"overlay\" id=\"overlay\"></div>
@@ -373,8 +472,8 @@ def main() -> None:
     function chipsFor(key) {{
       if (key === 'overview') return [`Claim-safe hourly: ${{payload.claim_safe_hourly}}`, `Live providers: ${{payload.configured_live_breadth_providers}}`, `Top scout: ${{payload.top_scout}}`];
       if (key === 'unified') return [`Top lane: ${{payload.top_lane}}`, `Active surface: ${{payload.active_surface}}`, 'Flagship board'];
-      if (key === 'claims') return [`Claim-safe annual: ${{payload.claim_safe_annual}}`, `Allowed lanes: ${{payload.claim_safe_lanes}}`, `Blocked context: ${{payload.blocked_context_annual}}`];
-      if (key === 'geometry') return [`Families: ${{payload.geometry_family_count}}`, `Proof lane: ${{payload.geometry_proof_champion_lane}}`, `Candidate: ${{payload.geometry_proof_champion_family}}`];
+      if (key === 'claims') return [`Claimable annual: ${{payload.claim_safe_annual}}`, `Allowed lanes: ${{payload.claim_safe_lanes}}`, `Sector gains: ${{payload.cross_sector_gain_proven_count}}/${{payload.cross_sector_sector_count}}`];
+      if (key === 'geometry') return [`Families: ${{payload.geometry_family_count}}`, 'Current performance champion: none', `Direct global promotions: ${{payload.direct_all_baseline_global_holm_positive_count}}`];
       if (key === 'paper') return [`Paper equity: ${{payload.paper_equity}}`, `Trades: ${{payload.paper_trades}}`, `PnL: ${{payload.paper_pnl}}`];
       return [`Top scout: ${{payload.top_scout}}`, `Candidates: ${{payload.production_candidates}}`, `Generated: ${{String(payload.generated_utc || '').slice(11,19)}} UTC`];
     }}
@@ -436,14 +535,16 @@ def main() -> None:
 </html>
 """
 
-    HTML_OUT.write_text(html, encoding="utf-8")
-    INDEX_OUT.write_text(
-        """<!DOCTYPE html>
+    validate_portal_claim_surface(html)
+    atomic_write_text(HTML_OUT, html)
+    written_html = HTML_OUT.read_text(encoding="utf-8")
+    validate_portal_claim_surface(written_html)
+    index_html = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="refresh" content="0; url=operator_home.html" />
+  <meta http-equiv="refresh" content="0; url=dashboard_portal.html" />
   <title>LumenCore Public Proof Gateway</title>
   <style>
     body{margin:0;min-height:100vh;display:grid;place-items:center;background:#05070f;color:#e9f3ff;font-family:Segoe UI,Arial,sans-serif}
@@ -454,14 +555,26 @@ def main() -> None:
   <main>
     <h1>LumenCore Public Proof Gateway</h1>
     <p>Opening the current reviewer-safe proof surface.</p>
-    <p><a href="operator_home.html">Continue to operator home</a></p>
+    <p><a href="dashboard_portal.html">Continue to the reviewer portal</a></p>
   </main>
 </body>
 </html>
-""",
-        encoding="utf-8",
+"""
+    atomic_write_text(INDEX_OUT, index_html)
+    print(
+        json.dumps(
+            {
+                "dashboard": str(HTML_OUT),
+                "index": str(INDEX_OUT),
+                "generated_utc": now,
+                "claim_surface_verified": True,
+                "dashboard_sha256": hashlib.sha256(
+                    written_html.encode("utf-8")
+                ).hexdigest(),
+            },
+            indent=2,
+        )
     )
-    print(json.dumps({"dashboard": str(HTML_OUT), "index": str(INDEX_OUT), "generated_utc": now}, indent=2))
 
 
 if __name__ == "__main__":

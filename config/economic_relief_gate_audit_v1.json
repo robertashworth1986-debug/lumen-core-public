@@ -1,0 +1,1112 @@
+{
+  "schema": "lumencore.economic_relief_gate_audit_config.v1",
+  "audit_as_of_utc": "2026-07-29T14:08:24Z",
+  "classifications": [
+    "LOCALLY_FIXABLE_NOW",
+    "DOCUMENTARY_RETRIEVAL_NEEDED",
+    "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+    "LEGAL_OR_CERTIFICATION_DECISION",
+    "EXPIRED_OR_CLOSED_ROUTE",
+    "UNSUPPORTED_ASSUMPTION"
+  ],
+  "required_domains": [
+    "SAM_LOGIN",
+    "GRANTS_GOV",
+    "RESEARCH_GOV",
+    "DSIP_SBIR_STTR",
+    "DLA_JCP_DD2345",
+    "CMMC_FRE_ITAR",
+    "CORPORATE_LEGAL_FOUNDER",
+    "BUDGET_CEILINGS",
+    "PORTAL_RECEIPTS",
+    "DUPLICATE_SUBMISSION_CONTROLS"
+  ],
+  "rules": [
+    "No local boolean, draft, hash, queue state, or portal observation clears a legal, certification, submission, or award gate.",
+    "A gate marked CLEARED requires a portal-issued record, agency determination, or qualified legal review declared as clearance evidence.",
+    "Private evidence paths are replaced by opaque private references in generated outputs.",
+    "Closed routes remain closed; the audit never recommends a late or duplicate submission.",
+    "A submission receipt is distinct from a portal preview, an account registration, and an award or acceptance notice.",
+    "SAM.gov active status does not establish Grants.gov, Research.gov, DSIP, JCP, CMMC, export, AOR, or final-submit authority.",
+    "FRE, ITAR, EAR, CUI, FCI, CMMC, cost allowability, data rights, conflicts, and corporate certifications remain human or qualified-review decisions.",
+    "Every generated finding is bound to source bytes and fails closed when a configured evidence check stops matching."
+  ],
+  "sources": {
+    "agency_activation_docket": {
+      "path": "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
+      "source_class": "LOCAL_CONTROL",
+      "sensitivity": "PUBLIC"
+    },
+    "cmmc_export_packet": {
+      "path": "grant_submissions/compliance_evidence/CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json",
+      "source_class": "LOCAL_CONTROL",
+      "sensitivity": "PUBLIC"
+    },
+    "darpa_submission_receipt": {
+      "path": "grant_submissions/DARPA_SN_26_97/DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.json",
+      "source_class": "PORTAL_OBSERVED",
+      "sensitivity": "PUBLIC"
+    },
+    "grant_queue_index": {
+      "path": "out/grants/_queue/index.json",
+      "source_class": "LOCAL_QUEUE",
+      "sensitivity": "PUBLIC"
+    },
+    "handoff_20260715": {
+      "path": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
+      "source_class": "PORTAL_OBSERVED",
+      "sensitivity": "PUBLIC"
+    },
+    "handoff_20260717": {
+      "path": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "source_class": "LOCAL_CONTROL",
+      "sensitivity": "PUBLIC"
+    },
+    "jcp_org_receipt_private": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_JCP_PORTAL_ORGANIZATION_CREATION_RECEIPT_2026-07-22.private.json",
+      "source_class": "PORTAL_OBSERVED",
+      "sensitivity": "PRIVATE"
+    },
+    "missionweave_action_private": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_ACTION.private.json",
+      "source_class": "FOUNDER_ATTESTATION",
+      "sensitivity": "PRIVATE"
+    },
+    "missionweave_action_public": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "source_class": "LOCAL_CONTROL",
+      "sensitivity": "PUBLIC"
+    },
+    "missionweave_gap_index": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DOCUMENTARY_GAP_INDEX_2026-07-18.json",
+      "source_class": "LOCAL_CONTROL",
+      "sensitivity": "PUBLIC"
+    },
+    "missionweave_topic": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/source_attachments/DLA26BZ03_NV011_OFFICIAL_TOPIC_DETAILS.json",
+      "source_class": "OFFICIAL_SOURCE",
+      "sensitivity": "PUBLIC"
+    },
+    "missionweave_volume3_private": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_DSIP_VOLUME3_FINAL_RECEIPT.private.json",
+      "source_class": "LOCAL_CONTROL",
+      "sensitivity": "PRIVATE"
+    },
+    "nashville_submission_receipt": {
+      "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json",
+      "source_class": "PORTAL_OBSERVED",
+      "sensitivity": "PUBLIC"
+    },
+    "nist_application": {
+      "path": "out/grants/_approved/nist_sbir_25/20260505T121657Z/application.json",
+      "source_class": "LOCAL_DRAFT",
+      "sensitivity": "PUBLIC"
+    },
+    "nist_budget": {
+      "path": "out/grants/_approved/nist_sbir_25/20260505T121657Z/budget.json",
+      "source_class": "LOCAL_DRAFT",
+      "sensitivity": "PUBLIC"
+    },
+    "outreach_registry": {
+      "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
+      "source_class": "LOCAL_CONTROL",
+      "sensitivity": "PUBLIC"
+    },
+    "portfolio_external_action_ledger": {
+      "path": "out/portfolio_external_action_ledger/portfolio_external_action_ledger_latest.json",
+      "source_class": "LOCAL_CONTROL",
+      "sensitivity": "PUBLIC"
+    },
+    "sam_reps_receipt_private": {
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/private/MISSIONWEAVE_SAM_CURRENT_REPS_CERTS_EVIDENCE_RECEIPT.private.json",
+      "source_class": "PORTAL_OBSERVED",
+      "sensitivity": "PRIVATE"
+    },
+    "sam_workspace_capture": {
+      "path": "grant_submissions/SAM_GOV_ENTITY_STATUS_CAPTURE_2026-06-20.md",
+      "source_class": "PORTAL_OBSERVED",
+      "sensitivity": "PUBLIC"
+    }
+  },
+  "gates": [
+    {
+      "gate_id": "sam.active_registration_action_time_currentness",
+      "domain": "SAM_LOGIN",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "PARTIAL",
+      "priority": "P0",
+      "reviewer_question": "Is the applying entity currently active in SAM.gov for the intended award type?",
+      "current_answer": "A signed-in workspace capture observed an active All Awards registration with a future expiration date, but it is not an action-time status check.",
+      "proof_required_to_clear": "A current signed-in SAM.gov entity-status record for the same legal entity, reviewed immediately before the relevant submission.",
+      "safest_next_action": "Recheck the entity workspace at action time and capture only a redacted status receipt.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "sam_workspace_capture",
+          "kind": "text_contains",
+          "expected": "Registration status: `Active Registration`",
+          "label": "Signed-in SAM workspace recorded Active Registration."
+        },
+        {
+          "source_id": "sam_workspace_capture",
+          "kind": "text_contains",
+          "expected": "Expiration date: `2026-08-30`",
+          "label": "Recorded SAM expiration is after the audit snapshot."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/identity/sam_active_verified",
+          "expected": true,
+          "label": "Private DSIP facts record says SAM active was reviewed."
+        }
+      ]
+    },
+    {
+      "gate_id": "sam.representations_and_certifications_current",
+      "domain": "SAM_LOGIN",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "PARTIAL",
+      "priority": "P0",
+      "reviewer_question": "Are SAM.gov representations and certifications current for this submission?",
+      "current_answer": "A private, hash-bound portal evidence record exists and the private action record says current, but neither artifact is an agency determination or action-time corporate review.",
+      "proof_required_to_clear": "A current SAM.gov reps-and-certs record for the same entity plus corporate-official review for the selected opportunity.",
+      "safest_next_action": "Review current reps and certs in SAM.gov and reconcile the dated public gate without publishing private data.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/identity/sam_representations_current",
+          "expected": true,
+          "label": "Private action record marks SAM representations current."
+        },
+        {
+          "source_id": "sam_reps_receipt_private",
+          "kind": "json_equals",
+          "pointer": "/portal",
+          "expected": "SAM.gov",
+          "label": "Private evidence binding identifies SAM.gov as the observed portal."
+        }
+      ]
+    },
+    {
+      "gate_id": "login_gov.per_portal_linkage_coverage",
+      "domain": "SAM_LOGIN",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "PARTIAL",
+      "priority": "P1",
+      "reviewer_question": "Does Login.gov authentication actually reach every required federal submission portal?",
+      "current_answer": "Research.gov sign-in and DSIP authentication were observed, while Grants.gov applicant authentication and role linkage remain unverified.",
+      "proof_required_to_clear": "Current successful access receipts for each required portal, with the correct organization and role shown without exposing credentials.",
+      "safest_next_action": "Verify each portal separately; do not infer Grants.gov access from Research.gov or DSIP access.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "handoff_20260715",
+          "kind": "text_contains",
+          "expected": "Research.gov sign-in completed",
+          "label": "Research.gov sign-in was observed."
+        },
+        {
+          "source_id": "handoff_20260715",
+          "kind": "text_contains",
+          "expected": "Grants.gov | Applicant login | Complete Login.gov authentication",
+          "label": "Grants.gov Login.gov authentication remained open."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/identity/dsip_authenticated",
+          "expected": true,
+          "label": "DSIP authentication was recorded."
+        }
+      ]
+    },
+    {
+      "gate_id": "sam.api_key_rotation_is_not_entity_eligibility",
+      "domain": "SAM_LOGIN",
+      "classification": "UNSUPPORTED_ASSUMPTION",
+      "state": "NOT_A_GATE",
+      "priority": "P2",
+      "reviewer_question": "Does overdue SAM.gov public API key rotation make the entity registration inactive?",
+      "current_answer": "No. The repository explicitly separates credential maintenance from entity-registration status.",
+      "proof_required_to_clear": "No clearance is needed because this is not an award-readiness gate; credential rotation remains a separate security task.",
+      "safest_next_action": "Keep credential maintenance private and never describe it as an entity-registration defect.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "handoff_20260717",
+          "kind": "text_contains",
+          "expected": "Do not describe entity registration as defective merely because key rotation is overdue.",
+          "label": "The portal handoff separates key rotation from entity status."
+        }
+      ]
+    },
+    {
+      "gate_id": "grants_gov.applicant_profile_and_entity_linkage",
+      "domain": "GRANTS_GOV",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Is the Grants.gov applicant profile linked to the correct active entity?",
+      "current_answer": "No current local receipt verifies the Grants.gov applicant profile or entity linkage.",
+      "proof_required_to_clear": "A current Grants.gov applicant-profile receipt showing the correct organization linkage, without credentials or private identifiers.",
+      "safest_next_action": "Authenticate in Grants.gov, inspect the applicant profile and organization linkage, then stop before any certification or submission.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "agency_activation_docket",
+          "kind": "text_contains",
+          "expected": "Local readiness flags do not yet verify Grants.gov profile or AOR authority.",
+          "label": "The activation docket leaves Grants.gov profile linkage unverified."
+        }
+      ]
+    },
+    {
+      "gate_id": "grants_gov.workspace_manager_aor_ebiz_authority",
+      "domain": "GRANTS_GOV",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Are Workspace Manager, AOR, and EBiz POC authorities established for submission?",
+      "current_answer": "No authoritative role receipt is present; local code intentionally keeps signature-equivalent authority human-controlled.",
+      "proof_required_to_clear": "Current Grants.gov role evidence showing Workspace Manager and AOR authority plus any required EBiz POC authorization.",
+      "safest_next_action": "Verify roles and authorization in Grants.gov before creating a final workspace submission.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "agency_activation_docket",
+          "kind": "text_contains",
+          "expected": "Confirm Workspace Manager and AOR roles.",
+          "label": "Workspace Manager and AOR roles remain a named action."
+        },
+        {
+          "source_id": "agency_activation_docket",
+          "kind": "text_contains",
+          "expected": "Confirm EBiz POC authorization before any package submit.",
+          "label": "EBiz POC authorization remains a named action."
+        }
+      ]
+    },
+    {
+      "gate_id": "research_gov.organization_registration_and_admin_role",
+      "domain": "RESEARCH_GOV",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Is the organization registered with NSF and is the Administrator role established?",
+      "current_answer": "Research.gov access and an exact SAM entity match were observed, but the organization was reported as not registered with NSF and the Administrator workflow was unfinished.",
+      "proof_required_to_clear": "Research.gov confirmation of organization registration and the appropriate Administrator or submitting role.",
+      "safest_next_action": "Complete factual organization fields and role setup, then stop before review, certification, or proposal submission.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "handoff_20260715",
+          "kind": "text_contains",
+          "expected": "Registered with NSF: No",
+          "label": "Research.gov reported the organization was not registered with NSF."
+        },
+        {
+          "source_id": "handoff_20260715",
+          "kind": "text_contains",
+          "expected": "requires the SAM point of contact to obtain the Administrator role",
+          "label": "Research.gov required a SAM POC Administrator role."
+        }
+      ]
+    },
+    {
+      "gate_id": "research_gov.nsf_project_pitch_and_invitation",
+      "domain": "RESEARCH_GOV",
+      "classification": "DOCUMENTARY_RETRIEVAL_NEEDED",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Has NSF issued the Project Pitch invitation required for a full Phase I proposal?",
+      "current_answer": "No official invitation is verified, so the near full-proposal date is not reachable from current evidence.",
+      "proof_required_to_clear": "An official NSF Project Pitch invitation or current portal record showing the permitted proposal state.",
+      "safest_next_action": "Inspect the NSF Project Pitch portal for a pending pitch or invitation; do not open a full proposal workspace without one.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "handoff_20260717",
+          "kind": "text_contains",
+          "expected": "no official Project Pitch invitation was verified",
+          "label": "The current handoff records no verified NSF invitation."
+        }
+      ]
+    },
+    {
+      "gate_id": "dsip.account_firm_and_organization_linkage",
+      "domain": "DSIP_SBIR_STTR",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "PARTIAL",
+      "priority": "P1",
+      "reviewer_question": "Can the authorized submitter reach the correct DSIP firm and organization workspace?",
+      "current_answer": "A private action record says authentication, firm administration, organization linkage, and submitter authority were observed, but those observations are not a durable portal-issued authority record.",
+      "proof_required_to_clear": "A current DSIP portal record showing the correct firm, organization, and submitter role for the selected topic.",
+      "safest_next_action": "Recheck the DSIP firm and organization linkage only when a live route requires it.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/identity/firm_admin_confirmed",
+          "expected": true,
+          "label": "Firm administration was recorded."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/identity/organization_linked",
+          "expected": true,
+          "label": "DSIP organization linkage was recorded."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/identity/submitter_authority_confirmed",
+          "expected": true,
+          "label": "Submitter authority was locally recorded."
+        }
+      ]
+    },
+    {
+      "gate_id": "dsip.firm_pin_availability",
+      "domain": "DSIP_SBIR_STTR",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Is the DSIP Firm PIN available to the authorized human without exposing it?",
+      "current_answer": "No. The private action record leaves Firm PIN availability false.",
+      "proof_required_to_clear": "Private, action-time confirmation by the authorized user that the Firm PIN is available inside DSIP.",
+      "safest_next_action": "Verify availability only inside the authenticated portal and never store the PIN in this audit.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/identity/firm_pin_available_in_dsip",
+          "expected": false,
+          "label": "Firm PIN availability remains false."
+        }
+      ]
+    },
+    {
+      "gate_id": "dsip.fwa_training_documentary_proof",
+      "domain": "DSIP_SBIR_STTR",
+      "classification": "DOCUMENTARY_RETRIEVAL_NEEDED",
+      "state": "PARTIAL",
+      "priority": "P1",
+      "reviewer_question": "Is current Fraud, Waste, and Abuse training supported by retrievable evidence?",
+      "current_answer": "The private action record says training is current, but the bounded documentary scan found no qualifying training evidence candidate.",
+      "proof_required_to_clear": "A current training completion record reviewed privately and matched to the required annual period.",
+      "safest_next_action": "Retrieve or complete the official training record before the next live DSIP submission.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/proposal/volume6_fwa_training_current",
+          "expected": true,
+          "label": "Private facts say FWA training is current."
+        },
+        {
+          "source_id": "missionweave_gap_index",
+          "kind": "json_equals",
+          "pointer": "/summary/candidate_counts/MISSIONWEAVE_FWA_TRAINING_EVIDENCE",
+          "expected": 0,
+          "label": "The bounded documentary scan found no FWA evidence candidate."
+        }
+      ]
+    },
+    {
+      "gate_id": "dsip.complete_portal_preview_and_receipt",
+      "domain": "PORTAL_RECEIPTS",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Was the complete proposal preview reviewed and bound to a portal receipt?",
+      "current_answer": "No. The private action record says the preview was not reviewed and no preview hash is present.",
+      "proof_required_to_clear": "A complete portal preview reviewed by the authorized human and a private receipt hash captured before final submission.",
+      "safest_next_action": "For the next live route, reach the complete preview, review every volume and certification, and record a private receipt before any final click.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/proposal/portal_preview_reviewed",
+          "expected": false,
+          "label": "Portal preview review remains false."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/proposal/portal_preview_sha256",
+          "expected": null,
+          "label": "No portal preview hash is present."
+        }
+      ]
+    },
+    {
+      "gate_id": "dsip.missionweave_release_deadline",
+      "domain": "DSIP_SBIR_STTR",
+      "classification": "EXPIRED_OR_CLOSED_ROUTE",
+      "state": "CLOSED_ROUTE",
+      "priority": "P0",
+      "reviewer_question": "Is DLA topic DLA26BZ03-NV011 still open for an on-time proposal?",
+      "current_answer": "No. The recorded noon Eastern deadline passed before this audit snapshot, and no portal submission was performed.",
+      "proof_required_to_clear": "Only a new official reopening or amendment could create a new route; local files cannot reopen it.",
+      "safest_next_action": "Archive the lane as not submitted, preserve the reusable package, and do not attempt a late or duplicate submission.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_public",
+          "kind": "timestamp_before_as_of",
+          "pointer": "/deadline/expected_utc",
+          "label": "MissionWeave deadline precedes the audit snapshot."
+        },
+        {
+          "source_id": "missionweave_action_public",
+          "kind": "json_equals",
+          "pointer": "/controls/portal_submit_performed",
+          "expected": false,
+          "label": "The public gate records no portal submission."
+        }
+      ]
+    },
+    {
+      "gate_id": "jcp.organization_profile_is_not_application",
+      "domain": "DLA_JCP_DD2345",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "PARTIAL",
+      "priority": "P1",
+      "reviewer_question": "Does the JCP organization profile prove that a JCP application was submitted?",
+      "current_answer": "No. The portal observation records organization creation and linkage, while application submission remains false.",
+      "proof_required_to_clear": "A JCP-issued application submission receipt for the correct organization and scope.",
+      "safest_next_action": "Use the existing organization profile as setup only; complete the official application workflow when a live controlled-data route warrants it.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "jcp_org_receipt_private",
+          "kind": "json_equals",
+          "pointer": "/events/organization_created_successfully",
+          "expected": true,
+          "label": "JCP organization creation was observed."
+        },
+        {
+          "source_id": "jcp_org_receipt_private",
+          "kind": "json_equals",
+          "pointer": "/events/organization_linked_to_user",
+          "expected": true,
+          "label": "JCP organization linkage was observed."
+        },
+        {
+          "source_id": "jcp_org_receipt_private",
+          "kind": "json_equals",
+          "pointer": "/events/jcp_application_submitted",
+          "expected": false,
+          "label": "JCP application submission remains false."
+        }
+      ]
+    },
+    {
+      "gate_id": "jcp.application_submission_receipt",
+      "domain": "DLA_JCP_DD2345",
+      "classification": "OFFICIAL_PORTAL_OR_HUMAN_ACTION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Is there an official JCP application submission receipt?",
+      "current_answer": "No. The current portal receipt says the application was not submitted and no official submission receipt is available.",
+      "proof_required_to_clear": "A portal-issued JCP application submission receipt matched to the correct entity and application.",
+      "safest_next_action": "Complete the application in JCP only after the required security, export, and corporate reviews are ready.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "jcp_org_receipt_private",
+          "kind": "json_equals",
+          "pointer": "/events/jcp_application_submitted",
+          "expected": false,
+          "label": "JCP application was not submitted."
+        },
+        {
+          "source_id": "jcp_org_receipt_private",
+          "kind": "json_equals",
+          "pointer": "/events/official_application_submission_receipt_available",
+          "expected": false,
+          "label": "No official JCP application receipt is available."
+        }
+      ]
+    },
+    {
+      "gate_id": "jcp.dd2345_certification",
+      "domain": "DLA_JCP_DD2345",
+      "classification": "DOCUMENTARY_RETRIEVAL_NEEDED",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Is a current certified DD Form 2345 available for controlled technical data access?",
+      "current_answer": "No. The current JCP portal observation records no certified DD2345.",
+      "proof_required_to_clear": "A JCP-issued certified DD2345 matched to the correct entity and current scope.",
+      "safest_next_action": "Do not claim JCP approval; obtain and privately retain the official certification when issued.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "jcp_org_receipt_private",
+          "kind": "json_equals",
+          "pointer": "/events/certified_dd2345_available",
+          "expected": false,
+          "label": "No certified DD2345 is available."
+        }
+      ]
+    },
+    {
+      "gate_id": "cmmc.authoritative_evidence_inventory",
+      "domain": "CMMC_FRE_ITAR",
+      "classification": "DOCUMENTARY_RETRIEVAL_NEEDED",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Does the evidence packet contain authoritative proof for the CMMC and export requirements it tracks?",
+      "current_answer": "No. The packet reports nineteen open requirements and zero authoritative requirements.",
+      "proof_required_to_clear": "Current portal-issued, agency, or qualified-review evidence for each applicable requirement, with entity and scope matching.",
+      "safest_next_action": "Work the nineteen requirements individually; never convert a local evidence packet into a compliance claim.",
+      "actionable_now": true,
+      "checks": [
+        {
+          "source_id": "cmmc_export_packet",
+          "kind": "json_equals",
+          "pointer": "/packet_state",
+          "expected": "EVIDENCE_INCOMPLETE",
+          "label": "CMMC and export packet state is incomplete."
+        },
+        {
+          "source_id": "cmmc_export_packet",
+          "kind": "json_equals",
+          "pointer": "/summary/open_requirement_count",
+          "expected": 19,
+          "label": "Nineteen CMMC and export requirements remain open."
+        },
+        {
+          "source_id": "cmmc_export_packet",
+          "kind": "json_equals",
+          "pointer": "/summary/authoritative_requirement_count",
+          "expected": 0,
+          "label": "No authoritative requirement proof is inventoried."
+        }
+      ]
+    },
+    {
+      "gate_id": "cmmc.sprs_assessment_and_annual_affirmation",
+      "domain": "CMMC_FRE_ITAR",
+      "classification": "LEGAL_OR_CERTIFICATION_DECISION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Are the required CMMC self-assessment position, SPRS record, and annual affirmation supportable?",
+      "current_answer": "No. Current CMMC review and Phase I self-assessment support remain false, and the evidence packet has no authoritative proof.",
+      "proof_required_to_clear": "Current requirement review, a supportable assessment, any required SPRS record, and the authorized affirmation or contracting determination.",
+      "safest_next_action": "Have the authorized official and qualified security reviewer determine the live requirement before making any CMMC representation.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/eligibility_and_compliance/current_cmmc_requirements_reviewed",
+          "expected": false,
+          "label": "Current CMMC requirements review remains false."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/eligibility_and_compliance/cmmc_phase_i_self_assessment_position_supported",
+          "expected": false,
+          "label": "CMMC Phase I self-assessment support remains false."
+        },
+        {
+          "source_id": "cmmc_export_packet",
+          "kind": "text_contains",
+          "expected": "CMMC_ANNUAL_AFFIRMATION",
+          "label": "The evidence packet tracks annual CMMC affirmation."
+        }
+      ]
+    },
+    {
+      "gate_id": "fre.foreign_affiliation_relationship_review",
+      "domain": "CMMC_FRE_ITAR",
+      "classification": "LEGAL_OR_CERTIFICATION_DECISION",
+      "state": "PARTIAL",
+      "priority": "P0",
+      "reviewer_question": "Were FRE foreign-affiliation disclosures answered from current facts and reviewed with conflicts and ownership context?",
+      "current_answer": "The Volume 7 webform was recorded complete, but conflicts and joint-venture review plus corporate-official review remain false.",
+      "proof_required_to_clear": "Current factual disclosures, conflicts and ownership review, and authorized corporate certification in the live form.",
+      "safest_next_action": "Revalidate every covered person, entity, investment, obligation, and foreign relationship before the next certification.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/eligibility_and_compliance/foreign_affiliations_webform_answered_from_current_facts",
+          "expected": true,
+          "label": "Foreign-affiliation webform answers were recorded from current facts."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/eligibility_and_compliance/conflicts_and_joint_venture_status_reviewed",
+          "expected": false,
+          "label": "Conflicts and joint-venture review remains false."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/approval/corporate_official_reviewed_all_volumes",
+          "expected": false,
+          "label": "Corporate-official review remains false."
+        }
+      ]
+    },
+    {
+      "gate_id": "export.itar_and_ear_classification",
+      "domain": "CMMC_FRE_ITAR",
+      "classification": "LEGAL_OR_CERTIFICATION_DECISION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Has a qualified authority separately determined the applicable ITAR and EAR classifications?",
+      "current_answer": "The official topic is ITAR-marked and the founder record treats the effort as subject to ITAR, but no qualified legal or agency classification is inventoried and EAR remains a separate branch.",
+      "proof_required_to_clear": "A qualified export-control review or agency determination that separately addresses ITAR and EAR scope.",
+      "safest_next_action": "Obtain qualified export review before handling controlled technical data or making an export-compliance claim.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_topic",
+          "kind": "json_equals",
+          "pointer": "/itar",
+          "expected": true,
+          "label": "The official topic record is ITAR-marked."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/eligibility_and_compliance/itar_scope_determination",
+          "expected": "SUBJECT_TO_ITAR",
+          "label": "The private founder record treats the effort as subject to ITAR."
+        },
+        {
+          "source_id": "cmmc_export_packet",
+          "kind": "json_equals",
+          "pointer": "/summary/authoritative_requirement_count",
+          "expected": 0,
+          "label": "No authoritative export requirement proof is inventoried."
+        }
+      ]
+    },
+    {
+      "gate_id": "export.technology_control_plan_decision",
+      "domain": "CMMC_FRE_ITAR",
+      "classification": "LEGAL_OR_CERTIFICATION_DECISION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Has a technology control plan decision been documented for the proposed work?",
+      "current_answer": "No. The private action record leaves the technology control plan decision false.",
+      "proof_required_to_clear": "A qualified review deciding whether a technology control plan is required and, if required, an approved plan.",
+      "safest_next_action": "Make the control-plan decision with qualified export and security review before pursuing controlled work.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/eligibility_and_compliance/technology_control_plan_decision_documented",
+          "expected": false,
+          "label": "Technology control plan decision remains false."
+        }
+      ]
+    },
+    {
+      "gate_id": "corporate.all_volume_and_cost_review",
+      "domain": "CORPORATE_LEGAL_FOUNDER",
+      "classification": "LEGAL_OR_CERTIFICATION_DECISION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Has the corporate official reviewed every volume, representation, and cost basis?",
+      "current_answer": "No. Corporate-official review is false, and the cost receipt explicitly retains that review requirement.",
+      "proof_required_to_clear": "A dated corporate-official review of all volumes, representations, totals, rates, and certification language.",
+      "safest_next_action": "Perform the corporate review only against a live opportunity and final package, then record a private approval receipt.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/approval/corporate_official_reviewed_all_volumes",
+          "expected": false,
+          "label": "Corporate-official all-volume review remains false."
+        },
+        {
+          "source_id": "missionweave_volume3_private",
+          "kind": "json_equals",
+          "pointer": "/corporate_official_review_required",
+          "expected": true,
+          "label": "The private cost receipt still requires corporate review."
+        }
+      ]
+    },
+    {
+      "gate_id": "founder.conflicts_support_and_current_facts",
+      "domain": "CORPORATE_LEGAL_FOUNDER",
+      "classification": "LEGAL_OR_CERTIFICATION_DECISION",
+      "state": "PARTIAL",
+      "priority": "P1",
+      "reviewer_question": "Are founder-controlled eligibility, conflicts, support, work-share, and rights facts complete and current?",
+      "current_answer": "Several eligibility and support fields were recorded as reviewed, but conflicts and joint-venture status remains false and all facts require action-time revalidation.",
+      "proof_required_to_clear": "A current founder factual review reconciled to corporate records, support disclosures, work share, and the live solicitation.",
+      "safest_next_action": "Refresh the private factual worksheet for the next live route and escalate any legal ambiguity instead of inferring an answer.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/eligibility_and_compliance/pi_primary_employment_confirmed",
+          "expected": true,
+          "label": "PI primary employment was recorded as confirmed."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/eligibility_and_compliance/prior_current_pending_support_reviewed",
+          "expected": true,
+          "label": "Prior, current, and pending support was recorded as reviewed."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/eligibility_and_compliance/conflicts_and_joint_venture_status_reviewed",
+          "expected": false,
+          "label": "Conflicts and joint-venture review remains false."
+        }
+      ]
+    },
+    {
+      "gate_id": "founder.action_time_submission_authorization",
+      "domain": "CORPORATE_LEGAL_FOUNDER",
+      "classification": "LEGAL_OR_CERTIFICATION_DECISION",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Did the authorized founder approve the exact final submission at action time?",
+      "current_answer": "No. Final-submission authorization is false and no final portal action is recorded.",
+      "proof_required_to_clear": "An explicit action-time authorization tied to the exact final preview and submission route.",
+      "safest_next_action": "Keep authorization false until a live, fully reviewed package is in final preview.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/approval/final_submission_authorized_at_action_time",
+          "expected": false,
+          "label": "Action-time final-submission authorization remains false."
+        },
+        {
+          "source_id": "missionweave_action_public",
+          "kind": "json_equals",
+          "pointer": "/controls/portal_submit_performed",
+          "expected": false,
+          "label": "No final portal submission was performed."
+        }
+      ]
+    },
+    {
+      "gate_id": "budget.nist_packet_exceeds_ceiling",
+      "domain": "BUDGET_CEILINGS",
+      "classification": "LOCALLY_FIXABLE_NOW",
+      "state": "OPEN",
+      "priority": "P1",
+      "reviewer_question": "Does the staged NIST packet stay within its recorded award ceiling?",
+      "current_answer": "No. The staged budget total exceeds its own ceiling.",
+      "proof_required_to_clear": "A rebuilt budget at or below the controlling live opportunity ceiling, with all totals reconciled.",
+      "safest_next_action": "Do not reuse the stale packet; rebuild its budget only after a current NIST opportunity and ceiling are verified.",
+      "actionable_now": true,
+      "checks": [
+        {
+          "source_id": "nist_budget",
+          "kind": "json_number_gt_pointer",
+          "pointer": "/total",
+          "other_pointer": "/ceiling_usd",
+          "label": "The NIST packet total exceeds its recorded ceiling."
+        }
+      ]
+    },
+    {
+      "gate_id": "budget.missionweave_arithmetic_not_cost_certification",
+      "domain": "BUDGET_CEILINGS",
+      "classification": "LEGAL_OR_CERTIFICATION_DECISION",
+      "state": "PARTIAL",
+      "priority": "P1",
+      "reviewer_question": "Does matching the Phase I ceiling prove that the MissionWeave cost basis is supportable?",
+      "current_answer": "No. The total matches the recorded ceiling, but cost-basis support is false and corporate review remains required.",
+      "proof_required_to_clear": "A reviewed cost basis supporting labor, indirect treatment, other direct costs, work share, allowability, and the exact live ceiling.",
+      "safest_next_action": "Preserve the arithmetic as reusable work, but do not certify or reuse rates without a fresh corporate review.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_volume3_private",
+          "kind": "json_equals",
+          "pointer": "/total_usd",
+          "expected": 100000,
+          "label": "The private cost volume totals one hundred thousand dollars."
+        },
+        {
+          "source_id": "missionweave_action_public",
+          "kind": "json_equals",
+          "pointer": "/official_instruction_facts/phase_i_base_ceiling_usd",
+          "expected": 100000,
+          "label": "The public gate records the same Phase I base ceiling."
+        },
+        {
+          "source_id": "missionweave_action_private",
+          "kind": "json_equals",
+          "pointer": "/proposal/volume3_cost_basis_supported",
+          "expected": false,
+          "label": "Volume 3 cost-basis support remains false."
+        }
+      ]
+    },
+    {
+      "gate_id": "route.nist_between_cycles",
+      "domain": "BUDGET_CEILINGS",
+      "classification": "EXPIRED_OR_CLOSED_ROUTE",
+      "state": "CLOSED_ROUTE",
+      "priority": "P1",
+      "reviewer_question": "Is the staged NIST SBIR route currently open and actionable?",
+      "current_answer": "No. The frozen queue records the route as unavailable and between cycles.",
+      "proof_required_to_clear": "A newly published official NIST opportunity with a verified open window and current requirements.",
+      "safest_next_action": "Keep the packet archival until an official new cycle opens; do not submit against the stale catalog entry.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "grant_queue_index",
+          "kind": "json_equals",
+          "pointer": "/items/4/program_id",
+          "expected": "nist_sbir_25",
+          "label": "The frozen queue item is the NIST SBIR packet."
+        },
+        {
+          "source_id": "grant_queue_index",
+          "kind": "json_equals",
+          "pointer": "/items/4/opportunity_window/status",
+          "expected": "unavailable",
+          "label": "The NIST opportunity window is unavailable."
+        },
+        {
+          "source_id": "grant_queue_index",
+          "kind": "json_equals",
+          "pointer": "/items/4/actionable",
+          "expected": false,
+          "label": "The NIST packet is not actionable."
+        }
+      ]
+    },
+    {
+      "gate_id": "packet.nist_unresolved_placeholders",
+      "domain": "BUDGET_CEILINGS",
+      "classification": "DOCUMENTARY_RETRIEVAL_NEEDED",
+      "state": "OPEN",
+      "priority": "P1",
+      "reviewer_question": "Does the staged NIST application still contain unresolved identity or contact placeholders?",
+      "current_answer": "Yes. The application JSON contains unresolved placeholder values.",
+      "proof_required_to_clear": "Authoritative entity and contact facts inserted only into a new live-cycle packet, with no placeholder tokens remaining.",
+      "safest_next_action": "Retire the stale packet and populate a new one from current private entity records only after a live opportunity is verified.",
+      "actionable_now": true,
+      "checks": [
+        {
+          "source_id": "nist_application",
+          "kind": "text_regex_count_gt",
+          "pattern": "TO_BE_FILLED",
+          "threshold": 0,
+          "label": "The NIST application contains unresolved placeholders."
+        }
+      ]
+    },
+    {
+      "gate_id": "queue.current_opportunity_freshness",
+      "domain": "DUPLICATE_SUBMISSION_CONTROLS",
+      "classification": "LOCALLY_FIXABLE_NOW",
+      "state": "OPEN",
+      "priority": "P0",
+      "reviewer_question": "Is the central grant queue fresh enough to drive current submissions?",
+      "current_answer": "No. The queue index was rebuilt, but its underlying official-opportunity scan is still more than thirty days old and all 98 locally approved packets remain stale.",
+      "proof_required_to_clear": "A newly generated queue built from a current official-opportunity scan, with stale approvals demoted and current routes reconciled to the near-deadline command board.",
+      "safest_next_action": "Refresh the official opportunity scan and demote stale approvals before selecting or reviving any legacy packet.",
+      "actionable_now": true,
+      "checks": [
+        {
+          "source_id": "grant_queue_index",
+          "kind": "timestamp_age_days_gt",
+          "pointer": "/opportunity_scan/generated_utc",
+          "days": 30,
+          "label": "The underlying opportunity scan is older than thirty days."
+        },
+        {
+          "source_id": "grant_queue_index",
+          "kind": "json_number_gt",
+          "pointer": "/n_stale_approved",
+          "threshold": 0,
+          "label": "The queue contains stale-approved packets."
+        }
+      ]
+    },
+    {
+      "gate_id": "receipts.portfolio_submission_ledger_reconciliation",
+      "domain": "PORTAL_RECEIPTS",
+      "classification": "LOCALLY_FIXABLE_NOW",
+      "state": "CLEARED",
+      "priority": "P0",
+      "reviewer_question": "Can one central ledger prevent duplicate submission across every grant, contract, and award route?",
+      "current_answer": "Yes for local reconciliation. The hash-bound portfolio ledger now assigns one unique action key per record, inventories recorded submissions and explicit not-submitted states, blocks duplicate action keys, and has no external-action handler. This clears the local process defect only; it does not prove agency receipt, eligibility, acceptance, award, or funding.",
+      "proof_required_to_clear": "A current, hash-bound per-opportunity ledger with unique action keys, source-bound receipts or explicit not-submitted states, duplicate-key rejection, and no submission capability.",
+      "safest_next_action": "Rebuild and verify the portfolio ledger after every official receipt, portal status change, outbound transmission, or explicit non-submission event.",
+      "actionable_now": false,
+      "clearance_evidence_source_ids": [
+        "portfolio_external_action_ledger"
+      ],
+      "checks": [
+        {
+          "source_id": "portfolio_external_action_ledger",
+          "kind": "json_equals",
+          "pointer": "/schema",
+          "expected": "lumencore.portfolio_external_action_ledger.v1",
+          "label": "The canonical portfolio external-action ledger is present."
+        },
+        {
+          "source_id": "portfolio_external_action_ledger",
+          "kind": "json_number_equals_pointer",
+          "pointer": "/summary/unique_action_key_count",
+          "other_pointer": "/summary/record_count",
+          "label": "Every portfolio record has a unique action key."
+        },
+        {
+          "source_id": "portfolio_external_action_ledger",
+          "kind": "json_equals",
+          "pointer": "/summary/external_submission_recorded_count",
+          "expected": 6,
+          "label": "The ledger inventories the six source-bound external submission records currently declared."
+        },
+        {
+          "source_id": "portfolio_external_action_ledger",
+          "kind": "json_number_gt",
+          "pointer": "/summary/local_not_submitted_count",
+          "threshold": 0,
+          "label": "The ledger preserves explicit local not-submitted states."
+        },
+        {
+          "source_id": "portfolio_external_action_ledger",
+          "kind": "json_equals",
+          "pointer": "/controls/duplicate_action_keys_fail_closed",
+          "expected": true,
+          "label": "Duplicate action keys fail closed."
+        },
+        {
+          "source_id": "portfolio_external_action_ledger",
+          "kind": "json_equals",
+          "pointer": "/controls/builder_can_submit",
+          "expected": false,
+          "label": "The reconciliation ledger cannot submit externally."
+        }
+      ]
+    },
+    {
+      "gate_id": "duplicate.outreach_control_is_not_portal_ledger",
+      "domain": "DUPLICATE_SUBMISSION_CONTROLS",
+      "classification": "LOCALLY_FIXABLE_NOW",
+      "state": "CLEARED",
+      "priority": "P1",
+      "reviewer_question": "Does the outreach duplicate-send registry also prevent duplicate portal submissions?",
+      "current_answer": "The outreach registry still governs email-template duplication, while the portfolio ledger now reconciles email sends, portal submissions, and explicit non-submission states under unique action keys. This clears the local reconciliation gap only; all portal actions remain human-controlled.",
+      "proof_required_to_clear": "A fail-closed outreach registry plus a current portfolio action ledger with unique action keys, duplicate-key rejection, and no external-action capability.",
+      "safest_next_action": "Rebuild both controls after every external state change and require current source verification plus action-time human review before any new send or portal submission.",
+      "actionable_now": false,
+      "clearance_evidence_source_ids": [
+        "portfolio_external_action_ledger"
+      ],
+      "checks": [
+        {
+          "source_id": "outreach_registry",
+          "kind": "json_equals",
+          "pointer": "/controls/duplicate_send_fail_closed",
+          "expected": true,
+          "label": "The outreach template registry fails closed on duplicate sends."
+        },
+        {
+          "source_id": "portfolio_external_action_ledger",
+          "kind": "json_equals",
+          "pointer": "/controls/duplicate_action_keys_fail_closed",
+          "expected": true,
+          "label": "The portfolio ledger rejects duplicate action keys."
+        },
+        {
+          "source_id": "portfolio_external_action_ledger",
+          "kind": "json_number_equals_pointer",
+          "pointer": "/summary/unique_action_key_count",
+          "other_pointer": "/summary/record_count",
+          "label": "The portfolio ledger has one unique action key per record."
+        },
+        {
+          "source_id": "portfolio_external_action_ledger",
+          "kind": "json_equals",
+          "pointer": "/controls/builder_can_submit",
+          "expected": false,
+          "label": "The portfolio ledger cannot perform portal submissions."
+        }
+      ]
+    },
+    {
+      "gate_id": "assumption.local_readiness_equals_award_eligibility",
+      "domain": "CORPORATE_LEGAL_FOUNDER",
+      "classification": "UNSUPPORTED_ASSUMPTION",
+      "state": "NOT_A_GATE",
+      "priority": "P0",
+      "reviewer_question": "Do local package integrity checks establish award eligibility or agency acceptance?",
+      "current_answer": "No. The controlling public gate explicitly disclaims award eligibility, acceptance, submission, and compliance conclusions.",
+      "proof_required_to_clear": "No local clearance is possible; only the designated portal, agency, or contracting authority can establish those external outcomes.",
+      "safest_next_action": "Keep package-integrity claims separate from eligibility, acceptance, award, and compliance claims.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "missionweave_action_public",
+          "kind": "text_contains",
+          "expected": "It does not establish DLA validation, CMMC status, ITAR compliance, award eligibility",
+          "label": "The public gate disclaims award and compliance conclusions."
+        }
+      ]
+    },
+    {
+      "gate_id": "assumption.approved_queue_item_is_actionable",
+      "domain": "PORTAL_RECEIPTS",
+      "classification": "UNSUPPORTED_ASSUMPTION",
+      "state": "NOT_A_GATE",
+      "priority": "P0",
+      "reviewer_question": "Does an approved local packet mean that a current opportunity is actionable?",
+      "current_answer": "No. The rebuilt legacy queue has 98 approved packets, all 98 are stale, and zero items are currently actionable.",
+      "proof_required_to_clear": "No assumption should be cleared; each route needs a current official window and a fresh package preflight.",
+      "safest_next_action": "Treat approved as a local drafting state only and refresh the official opportunity before work begins.",
+      "actionable_now": false,
+      "checks": [
+        {
+          "source_id": "grant_queue_index",
+          "kind": "json_equals",
+          "pointer": "/n_approved",
+          "expected": 98,
+          "label": "The frozen queue contains ninety-eight approved packets."
+        },
+        {
+          "source_id": "grant_queue_index",
+          "kind": "json_equals",
+          "pointer": "/n_stale_approved",
+          "expected": 98,
+          "label": "All approved packets in the frozen queue are stale."
+        },
+        {
+          "source_id": "grant_queue_index",
+          "kind": "json_equals",
+          "pointer": "/n_actionable",
+          "expected": 0,
+          "label": "No legacy queue item is currently marked actionable."
+        }
+      ]
+    }
+  ]
+}

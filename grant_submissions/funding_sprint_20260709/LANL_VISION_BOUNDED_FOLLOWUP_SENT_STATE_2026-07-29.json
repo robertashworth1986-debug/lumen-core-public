@@ -1,0 +1,17 @@
+{
+  "claim_boundary": "This privacy-safe mailbox state proves only that one bounded follow-up was transmitted in the existing LANL thread and that no later inbound message was observed during the full-thread read. It does not establish receipt, evaluation, endorsement, licensing, funding, deployment, validation, or contract performance.",
+  "delivery_state": "SENT",
+  "duplicate_send_blocked": true,
+  "external_action_performed_by_builder": false,
+  "full_thread_read": true,
+  "inbound_after_followup_count": 0,
+  "lane_id": "lanl_vision_licensing_followup",
+  "mailbox_rechecked_utc": "2026-07-29T14:46:41Z",
+  "max_proactive_followups": 1,
+  "next_action": "Monitor the existing thread and respond only to a specific inbound request. Do not send another proactive follow-up.",
+  "observed_thread_message_count": 3,
+  "proactive_followup_count": 1,
+  "schema": "lumencore.privacy_safe_email_send_state.v1",
+  "sent_utc": "2026-07-27T13:49:21Z",
+  "status": "BOUNDED_FOLLOWUP_SENT_RESPONSE_PENDING_INBOUND_ONLY"
+}

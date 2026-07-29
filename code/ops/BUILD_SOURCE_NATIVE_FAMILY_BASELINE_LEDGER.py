@@ -841,6 +841,232 @@ def build_family_and_route_ledgers(
     return families, routes
 
 
+def build_source_coverage_matrix(
+    matrix: dict[str, Any],
+    families: list[dict[str, Any]],
+    routes: list[dict[str, Any]],
+    cards: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    coverage: list[dict[str, Any]] = []
+    for lane_row in as_list(matrix.get("matrix")):
+        if not isinstance(lane_row, dict):
+            continue
+        lane = str(lane_row.get("lane", ""))
+        lane_families = [
+            row for row in families if str(row.get("lane", "")) == lane
+        ]
+        for source_ref in as_list(
+            lane_row.get("direct_measured_replay_sources")
+        ):
+            if not isinstance(source_ref, dict):
+                continue
+            source = str(source_ref.get("source", "")).upper()
+            baseline_ids = [
+                str(value)
+                for value in as_list(
+                    source_ref.get("source_specific_baselines")
+                )
+            ]
+            source_routes = [
+                row
+                for row in routes
+                if row.get("lane") == lane and row.get("source") == source
+            ]
+            source_cards = [
+                row
+                for row in cards
+                if row.get("lane") == lane and row.get("source") == source
+            ]
+            comparisons = [
+                comparison
+                for card in source_cards
+                for comparison in as_list(card.get("baseline_comparisons"))
+                if isinstance(comparison, dict)
+            ]
+            executed_route_count = sum(
+                1
+                for row in source_routes
+                if str(row.get("status", "")).endswith("_executed")
+            )
+            executed_family_ids = sorted(
+                {
+                    str(card.get("candidate_family_id", ""))
+                    for card in source_cards
+                    if card.get("candidate_family_id")
+                }
+            )
+            coverage_status = (
+                "EXECUTED_FULL_REGISTERED_FAMILY_COVERAGE"
+                if lane_families
+                and len(executed_family_ids) == len(lane_families)
+                else (
+                    "EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE"
+                    if executed_route_count
+                    else "BLOCKED_NO_EXECUTED_FAMILY_ADAPTER"
+                )
+            )
+            row = {
+                "lane": lane,
+                "source": source,
+                "source_rows": as_int(source_ref.get("rows")),
+                "source_snapshot_json": source_ref.get("snapshot_json", ""),
+                "source_snapshot_sha256": source_ref.get(
+                    "snapshot_sha256", ""
+                ),
+                "source_native_baseline_ids": baseline_ids,
+                "source_native_baseline_count": len(baseline_ids),
+                "registered_lane_family_count": len(lane_families),
+                "implemented_lane_family_count": sum(
+                    1
+                    for family in lane_families
+                    if family.get("implementation_present")
+                ),
+                "executed_candidate_family_ids": executed_family_ids,
+                "executed_candidate_family_count": len(executed_family_ids),
+                "eligible_candidate_source_baseline_route_count": len(
+                    source_routes
+                ),
+                "executed_candidate_source_baseline_route_count": (
+                    executed_route_count
+                ),
+                "blocked_family_implementation_route_count": sum(
+                    1
+                    for route in source_routes
+                    if route.get("status")
+                    == "blocked_family_implementation_missing"
+                ),
+                "blocked_direct_adapter_route_count": sum(
+                    1
+                    for route in source_routes
+                    if route.get("status")
+                    == "blocked_direct_adapter_missing_family"
+                ),
+                "inference_sufficient_comparison_count": sum(
+                    1
+                    for comparison in comparisons
+                    if as_dict(comparison.get("paired_inference")).get(
+                        "inference_sufficient", True
+                    )
+                ),
+                "inference_insufficient_comparison_count": sum(
+                    1
+                    for comparison in comparisons
+                    if not as_dict(comparison.get("paired_inference")).get(
+                        "inference_sufficient", True
+                    )
+                ),
+                "candidate_beats_every_baseline_on_mean_count": sum(
+                    1
+                    for card in source_cards
+                    if as_dict(card.get("baseline_gauntlet")).get(
+                        "candidate_beats_all_registered_baselines_mean"
+                    )
+                ),
+                "candidate_beats_every_baseline_after_global_holm_count": sum(
+                    1
+                    for card in source_cards
+                    if as_dict(card.get("baseline_gauntlet")).get(
+                        "candidate_beats_all_registered_baselines_after_global_holm"
+                    )
+                ),
+                "prospectively_protected_candidate_count": sum(
+                    1
+                    for card in source_cards
+                    if card.get("prospectively_protected_candidate")
+                ),
+                "internal_promotion_gate_pass_count": sum(
+                    1
+                    for card in source_cards
+                    if card.get(
+                        "internal_source_native_promotion_gate_passed"
+                    )
+                ),
+                "coverage_status": coverage_status,
+                "cross_source_baseline_substitution_allowed": False,
+                "cross_lane_ranking_allowed": False,
+                "public_performance_claim_allowed": False,
+                "real_dollar_savings_claim_allowed": False,
+            }
+            row["source_baseline_contract_sha256"] = stable_sha256(
+                {
+                    "lane": lane,
+                    "source": source,
+                    "source_snapshot_sha256": row[
+                        "source_snapshot_sha256"
+                    ],
+                    "source_native_baseline_ids": baseline_ids,
+                }
+            )
+            coverage.append(row)
+    coverage.sort(key=lambda row: (row["lane"], row["source"]))
+    return coverage
+
+
+def build_adapter_expansion_queue(
+    families: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    queued: list[dict[str, Any]] = []
+    for family in families:
+        if (
+            family.get("direct_source_count", 0) <= 0
+            or family.get("implementation_present")
+        ):
+            continue
+        registry_status = str(family.get("registry_status", ""))
+        if registry_status == "benchmark_design_ready":
+            priority_tier = 1
+            evidence_role = "development_only_benchmark_candidate"
+        elif registry_status == "legacy_transform_only":
+            priority_tier = 3
+            evidence_role = "exploratory_legacy_transform_control"
+        else:
+            priority_tier = 2
+            evidence_role = "development_only_research_candidate"
+        queued.append(
+            {
+                "lane": family.get("lane", ""),
+                "family_id": family.get("family_id", ""),
+                "label": family.get("label", ""),
+                "registry_status": registry_status,
+                "disposition": family.get("disposition", ""),
+                "priority_tier": priority_tier,
+                "evidence_role": evidence_role,
+                "direct_source_count": family.get("direct_source_count", 0),
+                "potential_source_baseline_route_count": family.get(
+                    "direct_source_baseline_route_count", 0
+                ),
+                "required_adapter_tests": [
+                    "deterministic_replay",
+                    "chronology_and_no_future_data",
+                    "matched_compute_budget",
+                    "source_native_metric_and_units",
+                    "missing_data_and_abstention",
+                    "no_holdout_selected_candidate",
+                ],
+                "development_sweep_allowed": True,
+                "holdout_selection_allowed": False,
+                "confirmatory_claim_allowed_after_development_sweep": False,
+                "public_performance_claim_allowed": False,
+                "next_action": (
+                    "Implement in the existing lane adapter, run only on the "
+                    "development partition, and freeze one challenger before a "
+                    "new prospective or untouched holdout evaluation."
+                ),
+            }
+        )
+    queued.sort(
+        key=lambda row: (
+            as_int(row.get("priority_tier"), 99),
+            -as_int(row.get("potential_source_baseline_route_count")),
+            str(row.get("lane", "")),
+            str(row.get("family_id", "")),
+        )
+    )
+    for rank, row in enumerate(queued, start=1):
+        row["rank"] = rank
+    return queued
+
+
 def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
     generated = generated_utc or now_utc()
     registry = read_json(REGISTRY_JSON)
@@ -869,6 +1095,10 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         cards,
         implementation_overrides=implementation_overrides,
     )
+    source_coverage = build_source_coverage_matrix(
+        matrix, families, routes, cards
+    )
+    adapter_expansion_queue = build_adapter_expansion_queue(families)
     positive_comparisons = [
         {
             "lane": card["lane"],
@@ -957,6 +1187,20 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             1
             for row in routes
             if row["status"] == "blocked_family_implementation_missing"
+        ),
+        "source_coverage_card_count": len(source_coverage),
+        "direct_lane_missing_family_implementation_count": len(
+            adapter_expansion_queue
+        ),
+        "benchmark_design_ready_adapter_backlog_count": sum(
+            1
+            for row in adapter_expansion_queue
+            if row["registry_status"] == "benchmark_design_ready"
+        ),
+        "legacy_transform_exploratory_backlog_count": sum(
+            1
+            for row in adapter_expansion_queue
+            if row["registry_status"] == "legacy_transform_only"
         ),
         "individual_comparison_global_holm_positive_count": len(
             positive_comparisons
@@ -1052,6 +1296,32 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
                 "candidate/source cards beat every registered baseline."
             ),
             "current_alpha_or_champion": "none",
+            "what_next": (
+                f"Implement the {len(adapter_expansion_queue)} missing families "
+                "that are compatible with qualified direct-source lanes as "
+                "development-only adapters, then freeze a small challenger set "
+                "before any untouched or prospective scoring."
+            ),
+        },
+        "registry_separation": {
+            "family_registry": str(REGISTRY_JSON.relative_to(ROOT)).replace(
+                "\\", "/"
+            ),
+            "source_and_baseline_contract_registry": str(
+                WIRING_MATRIX_JSON.relative_to(ROOT)
+            ).replace("\\", "/"),
+            "live_breadth_inventory_role": (
+                "Source discovery, custody, freshness, task compatibility, and "
+                "qualification only."
+            ),
+            "source_native_benchmark_role": (
+                "Candidate scoring only after a qualified source is paired with "
+                "that source's predeclared lane-native baselines and metric."
+            ),
+            "live_breadth_inventory_is_performance_evidence": False,
+            "inventory_row_count_is_benchmark_sample_size": False,
+            "cross_source_baseline_substitution_allowed": False,
+            "cross_lane_ranking_allowed": False,
         },
         "summary": summary,
         "positive_subset_research_leads": positive_comparisons,
@@ -1083,6 +1353,8 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "adapter_receipts": adapter_receipts,
         "family_ledger": families,
         "source_baseline_route_ledger": routes,
+        "source_coverage_matrix": source_coverage,
+        "adapter_expansion_queue": adapter_expansion_queue,
         "prospective_priorities": [
             {
                 "rank": 1,
@@ -1172,6 +1444,8 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "candidate_source_cards": cards,
             "family_ledger": families,
             "source_baseline_route_ledger": routes,
+            "source_coverage_matrix": source_coverage,
+            "adapter_expansion_queue": adapter_expansion_queue,
         }
     )
     return payload
@@ -1191,7 +1465,21 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Why not: {payload['direct_answer']['why_not']}",
         f"- What ran: {payload['direct_answer']['what_ran_now']}",
         f"- What won: {payload['direct_answer']['what_won']}",
+        f"- What next: {payload['direct_answer']['what_next']}",
         "- Current alpha or champion: `none`",
+        "",
+        "## Registry Separation",
+        "",
+        (
+            "The live-breadth registry and the source-native benchmark ledger "
+            "are not the same thing. Live breadth qualifies source custody, "
+            "freshness, and task compatibility. This ledger scores a candidate "
+            "only after that source is paired with its predeclared native "
+            "baselines and metric."
+        ),
+        "- Live-breadth inventory rows are performance evidence: `false`",
+        "- Cross-source baseline substitution allowed: `false`",
+        "- Cross-lane ranking allowed: `false`",
         "",
         "## Current Coverage",
         "",
@@ -1205,6 +1493,27 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Executed comparisons: `{summary['executed_direct_source_baseline_comparison_count']}`",
         f"- Globally corrected individual subset wins: `{summary['individual_comparison_global_holm_positive_count']}`",
         f"- Full source-native gauntlet passes: `{summary['candidate_source_beats_every_baseline_global_holm_count']}`",
+        f"- Direct-lane adapter backlog: `{summary['direct_lane_missing_family_implementation_count']}`",
+        "",
+        "## Per-Source Native Baseline Coverage",
+        "",
+        "| Lane | Source | Native Baselines | Families Run / Registered | Routes Run / Eligible | Mean All-Baseline Leads | Holm All-Baseline Passes | Status |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |",
+    ]
+    for row in payload["source_coverage_matrix"]:
+        lines.append(
+            f"| `{row['lane']}` | `{row['source']}` | "
+            f"{row['source_native_baseline_count']} | "
+            f"{row['executed_candidate_family_count']} / "
+            f"{row['registered_lane_family_count']} | "
+            f"{row['executed_candidate_source_baseline_route_count']} / "
+            f"{row['eligible_candidate_source_baseline_route_count']} | "
+            f"{row['candidate_beats_every_baseline_on_mean_count']} | "
+            f"{row['candidate_beats_every_baseline_after_global_holm_count']} | "
+            f"`{row['coverage_status']}` |"
+        )
+    lines.extend(
+        [
         "",
         "## Claim Boundary",
         "",
@@ -1214,7 +1523,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "| Source | Candidate | Baseline | Score Delta | Global Holm p |",
         "| --- | --- | --- | ---: | ---: |",
-    ]
+        ]
+    )
     for row in payload["positive_subset_research_leads"]:
         lines.append(
             f"| `{row['source']}` | `{row['candidate_family_id']}` | "

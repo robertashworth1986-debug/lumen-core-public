@@ -97,6 +97,34 @@ def validate_protocol(
     ):
         errors.append("current_state_not_fail_closed")
 
+    amendments = protocol.get("freeze_amendments", [])
+    if not isinstance(amendments, list):
+        errors.append("freeze_amendments_invalid")
+        amendments = []
+    for index, amendment in enumerate(amendments):
+        prefix = f"freeze_amendments[{index}]"
+        if not isinstance(amendment, dict):
+            errors.append(f"{prefix}_invalid")
+            continue
+        if amendment.get("eligible_future_observation_count_at_amendment") != 0:
+            errors.append(f"{prefix}_post_observation_change_forbidden")
+        for key in (
+            "outcome_dependent_change",
+            "candidate_selection_changed",
+            "registered_baselines_changed",
+            "primary_endpoint_changed",
+            "sample_gates_changed",
+            "decision_rule_changed",
+        ):
+            if amendment.get(key) is not False:
+                errors.append(f"{prefix}_{key}_must_be_false")
+        prior_hash = str(amendment.get("prior_artifact_sha256", "")).lower()
+        amended_hash = str(
+            amendment.get("amended_artifact_sha256", "")
+        ).lower()
+        if len(prior_hash) != 64 or len(amended_hash) != 64:
+            errors.append(f"{prefix}_artifact_hash_invalid")
+
     artifacts = protocol.get("frozen_artifacts")
     if not isinstance(artifacts, list) or not artifacts:
         errors.append("frozen_artifact_manifest_missing")

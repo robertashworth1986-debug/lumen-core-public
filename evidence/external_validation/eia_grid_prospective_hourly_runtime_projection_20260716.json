@@ -1,18 +1,18 @@
 {
   "chain_receipts": {
-    "operational_receipt_sha256": "6be30e2e30e2f7015710dee3b1d27465e1d52dd8300db8ee6f305d18bb981cad",
-    "prediction_terminal_sha256": "daa839587b2dcd53b245ebef587f40f89518de457505c0e20f8e1a4480d7bbad",
-    "settlement_terminal_sha256": "2e2d1708ee878e00a53e2330fc6be2917226ef62f5a12372439306babc917dee",
-    "source_panel_row_chain_sha256": "7a1fdef7c59001c25b014154b941c5b5f3117909323742025650bf6fcf7a54d9",
-    "source_panel_row_count": 86716
+    "operational_receipt_sha256": "3285dd7a173ad77d905a706764dec976b64b34796a6cedcd19063bae5b18ddca",
+    "prediction_terminal_sha256": "f9c6678caf49deabb44dbcd42f978ceed85e0130bffbcb678b4dfa325bf96c07",
+    "settlement_terminal_sha256": "03730308d25ab2e02ce6f5f3a947b16933daa99b7c9c522efaf39e0e7d93475f",
+    "source_panel_row_chain_sha256": "224803bdd7ba0b309df62d39165fa783a6bbfd28552b21e35de2d85cae6e78f8",
+    "source_panel_row_count": 91860
   },
   "claim_boundary": "A passing result would support bounded prospective public-data evidence for a frozen hourly specialist router. It does not establish patent validity or scope, utility control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority.",
   "descriptive_metrics": {
-    "best_fixed_mean_scaled_absolute_error": 0.565979860265308,
+    "best_fixed_mean_scaled_absolute_error": 0.37043655555057636,
     "current_best_fixed_candidate": "xgboost_residual",
     "interpretation": "Descriptive incomplete-sample values only; no promotion or external-generalization claim is allowed.",
-    "router_mean_scaled_absolute_error": 0.5594402233961369,
-    "router_skill_vs_current_best_fixed": 0.006539636869171139,
+    "router_mean_scaled_absolute_error": 0.36566234044542595,
+    "router_skill_vs_current_best_fixed": 0.0047742151051504145,
     "sample_gate_open": false
   },
   "integrity": {
@@ -29,7 +29,7 @@
     "configured_private_pattern_hit_count": 0,
     "gate_passed": true
   },
-  "projected_from_status_generated_utc": "2026-07-16T04:43:09.416701+00:00",
+  "projected_from_status_generated_utc": "2026-07-29T14:41:16.822019+00:00",
   "protocol": {
     "commit": "8fd49772dbeec3664b9c83c1d46f5c8583772946",
     "path": "config/eia_grid_prospective_hourly_router_protocol_v1.json",
@@ -37,20 +37,20 @@
     "sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5"
   },
   "runtime_snapshot": {
-    "cycle_sha256": "f539a25c8151a447111f71d520ab8852bbf04b7e08b6c3bbb925840a845a0c6c",
+    "cycle_sha256": "5823d0dd3a50e21fe3b49d0b6f4062f7c52d324331a543cfe902c950f492674b",
     "raw_runtime_in_public_repository": false,
-    "status_sha256": "b98426d85540b9904b65228244d1493971c1aa8e78401578efb4035dd6cf7a4a"
+    "status_sha256": "0bd56428558c3ada2c42f34a7835e9ad2893e29a1c8989d96589bac7d6c74f04"
   },
   "sample_state": {
-    "common_settled_hour_count": 0,
+    "common_settled_hour_count": 42,
     "confirmatory_ready": false,
     "durability_ready": false,
-    "first_common_settled_period": null,
-    "latest_common_settled_period": null,
-    "prediction_count": 95,
+    "first_common_settled_period": "2026-07-23T17",
+    "latest_common_settled_period": "2026-07-29T04",
+    "prediction_count": 1170,
     "preliminary_ready": false,
     "promotion_evaluation_complete": false,
-    "settlement_count": 84
+    "settlement_count": 1124
   },
   "schema": "eia_grid_prospective_hourly_runtime_projection.v1",
   "state": "PROSPECTIVE_COLLECTION_ACTIVE"

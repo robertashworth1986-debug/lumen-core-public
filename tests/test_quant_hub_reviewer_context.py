@@ -358,8 +358,13 @@ def test_context_outputs_are_identical_and_public_safe(tmp_path):
     assert "FAA SDR frozen 10,000-report triage benchmark" in markdown
     assert "EIA residual hybrid frozen holdout" in markdown
     assert "Frozen EIA prospective hourly router" in markdown
-    assert "prediction_count=95" in markdown
-    assert "common_settled_hour_count=0" in markdown
+    cards = {row["proof_id"]: row for row in context["proof_cards"]}
+    hourly_facts = cards["eia_prospective_hourly_router"]["facts"]
+    assert f"prediction_count={hourly_facts['prediction_count']}" in markdown
+    assert (
+        "common_settled_hour_count="
+        f"{hourly_facts['common_settled_hour_count']}"
+    ) in markdown
     assert "Hardware and 3D design-prior metadata custody" in markdown
     assert "Local system-health history custody audit" in markdown
     assert "holm_result=6/6 Holm-positive internal comparisons" in markdown

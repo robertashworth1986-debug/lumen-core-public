@@ -1,7 +1,7 @@
 # Source-Native Family Baseline Ledger
 
-Generated UTC: `2026-07-29T13:50:39.530209+00:00`
-Ledger SHA-256: `c97115afd801ef4f699c96be4d10a314cedb1f860a6ceab9c709dff1c3230e0a`
+Generated UTC: `2026-07-29T14:59:45.081967+00:00`
+Ledger SHA-256: `e21ce6f5f02cbb59c2b62582e40e30cc6ef0d54b840d566383fc184785fe95e7`
 
 ## Direct Answer
 
@@ -9,7 +9,15 @@ Ledger SHA-256: `c97115afd801ef4f699c96be4d10a314cedb1f860a6ceab9c709dff1c3230e0
 - Why not: 105 of 140 registered families lack implementations, and only 3 lanes currently have executable direct measured adapters.
 - What ran: 126 candidate-source-baseline comparisons across 23 candidate/source cards.
 - What won: 0 individual subset comparisons survived global correction, but 0 candidate/source cards beat every registered baseline.
+- What next: Implement the 58 missing families that are compatible with qualified direct-source lanes as development-only adapters, then freeze a small challenger set before any untouched or prospective scoring.
 - Current alpha or champion: `none`
+
+## Registry Separation
+
+The live-breadth registry and the source-native benchmark ledger are not the same thing. Live breadth qualifies source custody, freshness, and task compatibility. This ledger scores a candidate only after that source is paired with its predeclared native baselines and metric.
+- Live-breadth inventory rows are performance evidence: `false`
+- Cross-source baseline substitution allowed: `false`
+- Cross-lane ranking allowed: `false`
 
 ## Current Coverage
 
@@ -23,6 +31,22 @@ Ledger SHA-256: `c97115afd801ef4f699c96be4d10a314cedb1f860a6ceab9c709dff1c3230e0
 - Executed comparisons: `126`
 - Globally corrected individual subset wins: `0`
 - Full source-native gauntlet passes: `0`
+- Direct-lane adapter backlog: `58`
+
+## Per-Source Native Baseline Coverage
+
+| Lane | Source | Native Baselines | Families Run / Registered | Routes Run / Eligible | Mean All-Baseline Leads | Holm All-Baseline Passes | Status |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
+| `market_signal_geometry` | `ALPHAVANTAGE` | 4 | 4 / 23 | 16 / 92 | 1 | 0 | `EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE` |
+| `market_signal_geometry` | `KRAKEN_PUBLIC` | 4 | 4 / 23 | 16 / 92 | 0 | 0 | `EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE` |
+| `market_signal_geometry` | `TWELVE_DATA` | 4 | 4 / 23 | 16 / 92 | 0 | 0 | `EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE` |
+| `time_series_model_routing` | `ALPHAVANTAGE` | 8 | 1 / 31 | 8 / 248 | 0 | 0 | `EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE` |
+| `time_series_model_routing` | `BLS` | 8 | 1 / 31 | 8 / 248 | 0 | 0 | `EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE` |
+| `time_series_model_routing` | `EIA_GRID_VALIDATION` | 8 | 1 / 31 | 8 / 248 | 0 | 0 | `EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE` |
+| `time_series_model_routing` | `FRED` | 8 | 1 / 31 | 8 / 248 | 0 | 0 | `EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE` |
+| `time_series_model_routing` | `KRAKEN_PUBLIC` | 8 | 1 / 31 | 8 / 248 | 0 | 0 | `EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE` |
+| `time_series_model_routing` | `TWELVE_DATA` | 8 | 1 / 31 | 8 / 248 | 0 | 0 | `EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE` |
+| `wave_resonance_timing` | `EIA_GRID_VALIDATION` | 6 | 5 / 14 | 30 / 84 | 0 | 0 | `EXECUTED_PARTIAL_REGISTERED_FAMILY_COVERAGE` |
 
 ## Claim Boundary
 

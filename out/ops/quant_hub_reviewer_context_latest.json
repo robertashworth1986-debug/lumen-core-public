@@ -1,6 +1,6 @@
 {
   "schema": "quant_hub_reviewer_context.v1",
-  "generated_utc": "2026-07-16T02:54:01.489295+00:00",
+  "generated_utc": "2026-07-29T14:49:13.261440+00:00",
   "identity": {
     "repository_display_name": "Quant Hub Repo",
     "technical_platform": "LumenCore",
@@ -15,7 +15,7 @@
     "highest_repository_wide_supported_level": 3,
     "level_5_attained": false,
     "level_5_gate": "No Level 5 claim is allowed without a named external validator, independent data or field setting, accepted metric, dated receipt, and preserved artifact hashes.",
-    "summary": "Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. The frozen hourly successor has 95 sealed predictions and 78 settlements, but 0 common settled hours and no open sample gate. Level 4 and Level 5 have not been attained."
+    "summary": "Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. The frozen hourly successor has 1170 sealed predictions and 1124 settlements, but 42 common settled hours and no open sample gate. Level 4 and Level 5 have not been attained."
   },
   "proof_cards": [
     {
@@ -41,9 +41,9 @@
       "attained_maturity_level": 1,
       "status": "indexed",
       "facts": {
-        "managed_file_count": 101014,
-        "managed_total_bytes": 58220081958,
-        "inventory_chain_sha256": "517c1adaa9c929b52605425f6bb215c20e83d7d55c3188b0900dfa83ddc4e9bd",
+        "managed_file_count": 104732,
+        "managed_total_bytes": 58817069850,
+        "inventory_chain_sha256": "ffcd220f4339d7d2fd0bf992a2a052c7bf6840e879d567aefbab6c48b1d5598e",
         "secret_content_indexed": false,
         "sensitive_paths_redacted": true
       },
@@ -269,17 +269,17 @@
       "attained_maturity_level": 3,
       "status": "complete_with_wins_and_non_wins",
       "facts": {
-        "adapter_backed_routes": 404,
-        "baseline_comparison_count": 2861,
-        "candidate_win_count": 1456,
-        "candidate_loss_or_tie_count": 1405,
-        "estimated_rows_replayed": 96223,
-        "numeric_samples_read": 127057,
-        "energy_proxy_routes_replayed": 185,
-        "energy_proxy_unique_series_replays": 114,
-        "replay_chain_sha256": "5784587d8d04ca59e21354704d83e6b1ceddbf04c4cb7c267d6432d0a8f74934"
+        "adapter_backed_routes": 4,
+        "baseline_comparison_count": 22,
+        "candidate_win_count": 10,
+        "candidate_loss_or_tie_count": 12,
+        "estimated_rows_replayed": 0,
+        "numeric_samples_read": 32608,
+        "energy_proxy_routes_replayed": 0,
+        "energy_proxy_unique_series_replays": 0,
+        "replay_chain_sha256": "528fc58acb98cbbfd7961e40a607f9c588e69a0b61e479f8e1527ddbca29e096"
       },
-      "claim_boundary": "Locked source baseline replay sweep. This runs every ready local/uploaded measured source row from the geometry live source manifest through available source-conditioned replay adapters and compares candidates against the locked baselines for their lane. It includes an energy price-pressure proxy adapter so those rows are tested instead of blocked. This is source-conditioned replay evidence, not field validation, not realized savings, not a fixed-dollar frozen-delta sales claim, not live trading, and not a medical or addiction-treatment claim."
+      "claim_boundary": "Compatibility-gated locked-source replay audit. Legacy manifest readiness does not establish source-task compatibility, so unjoined manifest rows are excluded. Only v3 matrix-qualified direct measured replays and source-conditioned synthetic stress runs may appear. Context-only sources, zero-numeric fallbacks, and generic local-file inventory cannot produce wins. This is not field validation, realized savings, a fixed-dollar sales claim, live trading, or a medical claim."
     },
     {
       "proof_id": "eia_residual_holm_holdout",
@@ -341,9 +341,9 @@
       "target_maturity_level": 4,
       "status": "PROSPECTIVE_COLLECTION_ACTIVE",
       "facts": {
-        "prediction_count": 95,
-        "settlement_count": 78,
-        "common_settled_hour_count": 0,
+        "prediction_count": 1170,
+        "settlement_count": 1124,
+        "common_settled_hour_count": 42,
         "preliminary_ready": false,
         "confirmatory_ready": false,
         "durability_ready": false,
@@ -352,11 +352,11 @@
         "confirmatory_threshold_common_hours_per_authority": 720,
         "durability_threshold_common_hours_per_authority": 2160,
         "current_best_fixed_candidate": "xgboost_residual",
-        "router_skill_vs_current_best_fixed": 0.006447991445170942,
-        "operational_receipt_sha256": "49b37f5edf0c560c9991ccd97317aa64b6bb92c1bc2dcb7ec589247acfe02037",
-        "prediction_terminal_sha256": "daa839587b2dcd53b245ebef587f40f89518de457505c0e20f8e1a4480d7bbad",
-        "settlement_terminal_sha256": "ea492138d81b787f3fedce25b477d81b0b51a873e56a478872084fa8290d3fa6",
-        "runtime_projection_source_sha256": "661f7437ba862880c69a54f3d0d1b3394ab885fcd6a705c558c381b4f7383778",
+        "router_skill_vs_current_best_fixed": 0.0047742151051504145,
+        "operational_receipt_sha256": "3285dd7a173ad77d905a706764dec976b64b34796a6cedcd19063bae5b18ddca",
+        "prediction_terminal_sha256": "f9c6678caf49deabb44dbcd42f978ceed85e0130bffbcb678b4dfa325bf96c07",
+        "settlement_terminal_sha256": "03730308d25ab2e02ce6f5f3a947b16933daa99b7c9c522efaf39e0e7d93475f",
+        "runtime_projection_source_sha256": "a1b46cce0e26291f8f4acf9d62c82ed5201fc5fbab10944a133c9cbde0a87c90",
         "protocol_source_sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5"
       },
       "claim_boundary": "A passing result would support bounded prospective public-data evidence for a frozen hourly specialist router. It does not establish patent validity or scope, utility control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority."
@@ -418,10 +418,10 @@
       "title": "Funding-package language and secret scan",
       "evidence_class": "review_packaging_control",
       "attained_maturity_level": 1,
-      "status": "clear",
+      "status": "blocked",
       "facts": {
-        "reviewer_gate_clear": true,
-        "markdown_file_count": 44,
+        "reviewer_gate_clear": false,
+        "markdown_file_count": 115,
         "unsafe_claim_count": 0,
         "unsafe_secret_count": 0
       },
@@ -442,7 +442,7 @@
       "The optional private-universe receipt federates existing manifests and represents no fresh full universe scan, manifest-referenced file byte read, broad-root scan, archive extraction, or live reconciliation; only individually authorized explicit files may be read for SHA-256, and candidate lane counts remain metadata heuristics rather than content validation. The receipt names no independent evaluator.",
       "The development-selected EIA residual hybrid has 6/6 Holm-positive internal comparisons on its frozen internal holdout, but the full protocol gate is CLOSED.",
       "The predecessor daily EIA prospective protocol is preserved at zero predictions and zero settlements because its seal timing could not be weakened or backfilled.",
-      "The frozen hourly successor has 95 sealed predictions and 78 settlements, but only 0 common settled hours; its preliminary, confirmatory, durability, and promotion gates remain closed.",
+      "The frozen hourly successor has 1170 sealed predictions and 1124 settlements, but only 42 common settled hours; its preliminary, confirmatory, durability, and promotion gates remain closed.",
       "A prior external proof packet reports all copied artifact hashes verified."
     ],
     "blocked_without_new_evidence": {
@@ -565,8 +565,8 @@
     {
       "source_id": "eia_hourly_runtime_projection",
       "path": "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json",
-      "bytes": 2824,
-      "sha256": "661f7437ba862880c69a54f3d0d1b3394ab885fcd6a705c558c381b4f7383778"
+      "bytes": 2854,
+      "sha256": "a1b46cce0e26291f8f4acf9d62c82ed5201fc5fbab10944a133c9cbde0a87c90"
     },
     {
       "source_id": "eia_prospective_router",
@@ -589,8 +589,8 @@
     {
       "source_id": "estate_index",
       "path": "out/ops/lumencore_estate_master_index_latest.json",
-      "bytes": 52897,
-      "sha256": "e073a44231045764739b5d4e74c263f07f30b50b971566b0c812aa152f81a233"
+      "bytes": 52641,
+      "sha256": "262b598bd6241187806421367d39948c981af943e0eac78d1a5edce40cd58c79"
     },
     {
       "source_id": "faa_sdr_10k",
@@ -625,8 +625,8 @@
     {
       "source_id": "locked_replay",
       "path": "out/ops/locked_source_baseline_replay_sweep_latest.json",
-      "bytes": 4333517,
-      "sha256": "6f2cedc0cd76c6ffb3d8697c4b5de0df2699f9fd577bc4b33fffdd1f2a17271b"
+      "bytes": 131723,
+      "sha256": "9313cc447252bf5e66689f598062fdc77be711fd0b8d889889e48ebbf6da60e3"
     },
     {
       "source_id": "mda_feasibility_v1",
@@ -655,11 +655,11 @@
     {
       "source_id": "reviewer_gate",
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
-      "bytes": 44208,
-      "sha256": "f87df88b282493cf511e441a6272cc60e2131a27ca93add662691aeb0d27f49a"
+      "bytes": 123836,
+      "sha256": "e8f78f0a8794c348c78900eef551fd812cd9e4df62fb0e42229c6c74424ea190"
     }
   ],
-  "source_input_chain_sha256": "35e7896f02953316320e389134e6c71f4835914bb27bc44178ffefa1a6635730",
+  "source_input_chain_sha256": "9b59eef354b89373f4ae6ff0e500bd9d7cebf5ccbda447a84726c33312bd3b11",
   "outputs": {
     "machine_readable": "out/ops/quant_hub_reviewer_context_latest.json",
     "dashboard_mirror": "dashboard/data/quant_hub_reviewer_context.json",

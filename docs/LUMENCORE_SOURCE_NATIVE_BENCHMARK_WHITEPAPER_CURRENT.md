@@ -1,6 +1,6 @@
 # Source-Native Benchmarking for Nature-Inspired Time-Series Families: A Fail-Closed Experimental Protocol
 
-- Generated UTC: `2026-07-29T13:50:39+00:00`
+- Generated UTC: `2026-07-29T15:00:47.919698+00:00`
 - Status: `CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED`
 - Peer reviewed: `false`
 - Independently validated: `false`
@@ -63,7 +63,7 @@ The former FRED and TWELVE_DATA subset leads are retired because they do not sur
 - Formula: `rMAE = MAE_candidate / MAE_baseline`
 - Contrasts: `16`
 - Correction: `one_sided_holm_familywise`
-- Protocol SHA-256: `1ae3e105d3cf636dfd2527a6d8d3cde152997eda3aa49449c7b65939f8d93c66`
+- Protocol SHA-256: `980ebaa821212965bffe04334df8c19f1a03e12acac7d9d04f38f21f03b0e1e5`
 
 ## Scientific Contribution
 
@@ -89,4 +89,4 @@ The prior BioGeometry, scalar-field, bioresonance, cooling-savings, zero-point, 
 
 ## Receipt
 
-- Whitepaper payload SHA-256: `6d7ba7e4d1d119c0755fa15bb22fa91c39d0220caccb21fe5f1b69c24165e706`
+- Whitepaper payload SHA-256: `3aa9ec5768f6f3219cf81abcd29ba92f4b055765e72f6b6971f9300263d5e85e`

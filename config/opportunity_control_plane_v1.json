@@ -1,0 +1,392 @@
+{
+  "schema": "lumencore.opportunity_control_plane_config.v1",
+  "version": 1,
+  "input_schema": "lumencore.public_opportunity_leads.v1",
+  "record_schema": "lumencore.public_opportunity_lead.v1",
+  "default_input_paths": [
+    "grant_submissions/funding_sprint_20260709/CURRENT_PUBLIC_OPPORTUNITY_LEADS_2026-07-25.json"
+  ],
+  "controls": {
+    "action_time_human_approval_required": true,
+    "authenticated_access_allowed": false,
+    "autonomous_apply_allowed": false,
+    "autonomous_certify_allowed": false,
+    "autonomous_login_allowed": false,
+    "autonomous_post_allowed": false,
+    "autonomous_send_allowed": false,
+    "autonomous_sign_allowed": false,
+    "autonomous_submit_allowed": false,
+    "duplicate_suppression_required": true,
+    "eligibility_uncertainty_fail_closed": true,
+    "external_mutation_allowed": false,
+    "local_files_only": true,
+    "missing_claim_boundary_fail_closed": true,
+    "missing_source_url_fail_closed": true,
+    "network_access_allowed": false,
+    "stale_source_fail_closed": true
+  },
+  "ingest_limits": {
+    "accepted_extensions": [
+      ".json",
+      ".jsonl"
+    ],
+    "max_file_bytes": 5242880,
+    "max_future_observation_skew_seconds": 300,
+    "max_records_per_file": 5000
+  },
+  "allowed_environments": [
+    "LIVE_PUBLIC",
+    "TEST_FIXTURE"
+  ],
+  "allowed_lead_origins": [
+    "VERIFIED_PUBLIC_SOURCE",
+    "JOB_ALERT_METADATA"
+  ],
+  "allowed_source_verification_states": [
+    "PUBLIC_SOURCE_OBSERVED",
+    "PUBLIC_SOURCE_RECHECK_REQUIRED"
+  ],
+  "allowed_source_observation_precisions": [
+    "EXACT_TIME",
+    "DATE_ONLY"
+  ],
+  "allowed_compensation_states": [
+    "STATED",
+    "PARTIAL",
+    "CAVEAT",
+    "UNKNOWN",
+    "NOT_APPLICABLE"
+  ],
+  "allowed_source_authorities": [
+    "OFFICIAL",
+    "FIRST_PARTY",
+    "TRUSTED_AGGREGATOR",
+    "OTHER_PUBLIC"
+  ],
+  "allowed_eligibility_states": [
+    "CONFIRMED",
+    "LIKELY",
+    "UNCERTAIN",
+    "INELIGIBLE"
+  ],
+  "allowed_deadline_states": [
+    "EXACT",
+    "NONE_STATED",
+    "UNKNOWN"
+  ],
+  "allowed_answer_states": [
+    "CONFIRMED",
+    "UNRESOLVED",
+    "NOT_APPLICABLE"
+  ],
+  "prohibited_input_key_fragments": [
+    "access_token",
+    "account_password",
+    "api_key",
+    "client_secret",
+    "credential",
+    "login_cookie",
+    "one_time_password",
+    "otp",
+    "password",
+    "private_key",
+    "refresh_token",
+    "session_cookie"
+  ],
+  "priority_model": {
+    "fit_multiplier": 1,
+    "fresh_source_points": 5,
+    "stale_source_penalty": -100,
+    "expired_deadline_penalty": -200,
+    "unknown_deadline_penalty": -25,
+    "open_without_stated_deadline_points": 0,
+    "source_authority_points": {
+      "OFFICIAL": 15,
+      "FIRST_PARTY": 10,
+      "TRUSTED_AGGREGATOR": 3,
+      "OTHER_PUBLIC": 0
+    },
+    "eligibility_points": {
+      "CONFIRMED": 15,
+      "LIKELY": 7,
+      "UNCERTAIN": -10,
+      "INELIGIBLE": -200
+    },
+    "deadline_urgency": [
+      {
+        "max_hours": 48,
+        "points": 20
+      },
+      {
+        "max_hours": 168,
+        "points": 14
+      },
+      {
+        "max_hours": 720,
+        "points": 7
+      }
+    ]
+  },
+  "global_claim_boundary": "This local queue is a source-bound triage and drafting aid. It does not establish eligibility, availability, authority, submission, receipt, selection, employment, partnership, investment, licensing, pilot acceptance, funding, award, endorsement, technical validation, commercial performance, or permission to disclose nonpublic information.",
+  "lane_policies": {
+    "government": {
+      "display_name": "Government opportunities",
+      "template_family": "GOVERNMENT_OPPORTUNITY_RESPONSE",
+      "proposed_action_type": "PREPARE_APPLICATION_OR_RESPONSE_DRAFT",
+      "stale_after_hours": 72,
+      "minimum_fit_score": 55,
+      "draft_source_authorities": [
+        "OFFICIAL"
+      ],
+      "draft_deadline_states": [
+        "EXACT",
+        "NONE_STATED"
+      ],
+      "lane_priority_points": 20,
+      "reviewer_questions": [
+        {
+          "id": "controlling_notice",
+          "question": "What official notice, solicitation, topic, and amendment version controls?",
+          "required_for_draft": true
+        },
+        {
+          "id": "scope_fit",
+          "question": "Which stated scope, outcome, and deliverable requirements does the proposed work address?",
+          "required_for_draft": true
+        },
+        {
+          "id": "applicant_eligibility",
+          "question": "What applicant, entity, ownership, location, and small-business eligibility rules apply?",
+          "required_for_draft": true
+        },
+        {
+          "id": "deadline_route",
+          "question": "What exact deadline, timezone, submission route, and late-submission rule apply?",
+          "required_for_draft": true
+        },
+        {
+          "id": "registration_authority",
+          "question": "Which registrations, roles, representations, and signing authorities must be current?",
+          "required_for_draft": true
+        },
+        {
+          "id": "budget_terms",
+          "question": "What funding ceiling, cost share, indirect-cost, period-of-performance, and budget restrictions apply?",
+          "required_for_draft": true
+        },
+        {
+          "id": "evaluation_criteria",
+          "question": "What evaluation criteria, weights, page limits, attachments, and compliance gates control review?",
+          "required_for_draft": true
+        },
+        {
+          "id": "evidence_boundary",
+          "question": "Which technical and past-performance claims are supported, and which remain hypotheses or proposed validation?",
+          "required_for_draft": true
+        },
+        {
+          "id": "ip_data_rights",
+          "question": "What intellectual-property, data-rights, publication, export-control, and disclosure terms apply?",
+          "required_for_draft": true
+        },
+        {
+          "id": "security_compliance",
+          "question": "What cybersecurity, CMMC, controlled-data, facility, personnel, or supply-chain requirements apply?",
+          "required_for_draft": true
+        },
+        {
+          "id": "partners_resources",
+          "question": "Which partners, facilities, letters, licenses, certifications, or key personnel are required?",
+          "required_for_draft": true
+        },
+        {
+          "id": "conflicts_duplication",
+          "question": "Are there conflicts, duplicate submissions, prior applications, organizational conflicts, or exclusivity limits?",
+          "required_for_draft": true
+        }
+      ]
+    },
+    "job": {
+      "display_name": "Job opportunities",
+      "template_family": "JOB_APPLICATION_RESPONSE",
+      "proposed_action_type": "PREPARE_RESUME_AND_COVER_NOTE_DRAFT",
+      "stale_after_hours": 168,
+      "minimum_fit_score": 50,
+      "draft_source_authorities": [
+        "OFFICIAL",
+        "FIRST_PARTY"
+      ],
+      "draft_deadline_states": [
+        "EXACT",
+        "NONE_STATED"
+      ],
+      "lane_priority_points": 8,
+      "reviewer_questions": [
+        {
+          "id": "role_status",
+          "question": "Is the role currently open on the employer's first-party careers source?",
+          "required_for_draft": true
+        },
+        {
+          "id": "minimum_qualifications",
+          "question": "Which minimum qualifications are confirmed and which remain uncertain?",
+          "required_for_draft": true
+        },
+        {
+          "id": "work_location",
+          "question": "What location, remote, travel, schedule, and work-authorization conditions apply?",
+          "required_for_draft": true
+        },
+        {
+          "id": "compensation_terms",
+          "question": "What compensation range and employment classification are publicly stated?",
+          "required_for_draft": false
+        },
+        {
+          "id": "application_materials",
+          "question": "Which resume, portfolio, repository, writing sample, or reference materials are requested?",
+          "required_for_draft": true
+        },
+        {
+          "id": "claim_fit",
+          "question": "Which experience claims map directly to the role without overstating outcomes?",
+          "required_for_draft": true
+        }
+      ]
+    },
+    "licensing": {
+      "display_name": "Licensing opportunities",
+      "template_family": "LICENSING_FIT_RESPONSE",
+      "proposed_action_type": "PREPARE_LICENSING_FIT_DRAFT",
+      "stale_after_hours": 336,
+      "minimum_fit_score": 55,
+      "draft_source_authorities": [
+        "OFFICIAL",
+        "FIRST_PARTY"
+      ],
+      "draft_deadline_states": [
+        "EXACT",
+        "NONE_STATED"
+      ],
+      "lane_priority_points": 12,
+      "reviewer_questions": [
+        {
+          "id": "rights_owner",
+          "question": "Who controls the rights and what public evidence supports that routing?",
+          "required_for_draft": true
+        },
+        {
+          "id": "available_rights",
+          "question": "Which rights, fields of use, territories, exclusivity options, and sublicensing rights are available?",
+          "required_for_draft": true
+        },
+        {
+          "id": "diligence_stage",
+          "question": "What technical maturity, diligence material, encumbrances, and validation limits are stated?",
+          "required_for_draft": true
+        },
+        {
+          "id": "commercial_terms",
+          "question": "Which fees, royalties, milestones, diligence obligations, and agreement steps are known or unresolved?",
+          "required_for_draft": true
+        },
+        {
+          "id": "confidentiality_route",
+          "question": "What nonconfidential first step and later confidentiality or agreement route apply?",
+          "required_for_draft": true
+        }
+      ]
+    },
+    "venture_partner": {
+      "display_name": "Venture and strategic-partner opportunities",
+      "template_family": "VENTURE_PARTNER_FIT_RESPONSE",
+      "proposed_action_type": "PREPARE_PARTNER_FIT_DRAFT",
+      "stale_after_hours": 168,
+      "minimum_fit_score": 55,
+      "draft_source_authorities": [
+        "OFFICIAL",
+        "FIRST_PARTY"
+      ],
+      "draft_deadline_states": [
+        "EXACT",
+        "NONE_STATED"
+      ],
+      "lane_priority_points": 10,
+      "reviewer_questions": [
+        {
+          "id": "mandate_fit",
+          "question": "What public mandate, sector, stage, geography, and check or partnership profile applies?",
+          "required_for_draft": true
+        },
+        {
+          "id": "engagement_route",
+          "question": "What first-party introduction, application, event, or referral route is available?",
+          "required_for_draft": true
+        },
+        {
+          "id": "traction_evidence",
+          "question": "Which traction, validation, customer, repository, and live-product claims are presently supportable?",
+          "required_for_draft": true
+        },
+        {
+          "id": "ask_use",
+          "question": "What bounded ask, use of funds or partnership objective, milestones, and risks can be stated precisely?",
+          "required_for_draft": true
+        },
+        {
+          "id": "conflict_terms",
+          "question": "What confidentiality, exclusivity, conflict, data-sharing, or portfolio-overlap constraints apply?",
+          "required_for_draft": true
+        }
+      ]
+    },
+    "pilot": {
+      "display_name": "Pilot and field-evaluation opportunities",
+      "template_family": "BOUNDED_PILOT_RESPONSE",
+      "proposed_action_type": "PREPARE_BOUNDED_PILOT_DRAFT",
+      "stale_after_hours": 168,
+      "minimum_fit_score": 55,
+      "draft_source_authorities": [
+        "OFFICIAL",
+        "FIRST_PARTY"
+      ],
+      "draft_deadline_states": [
+        "EXACT",
+        "NONE_STATED"
+      ],
+      "lane_priority_points": 15,
+      "reviewer_questions": [
+        {
+          "id": "problem_owner",
+          "question": "Who owns the operational problem and what decision would a pilot inform?",
+          "required_for_draft": true
+        },
+        {
+          "id": "data_authority",
+          "question": "What data, access authority, retention, privacy, security, and sharing constraints apply?",
+          "required_for_draft": true
+        },
+        {
+          "id": "evaluation_design",
+          "question": "What baseline, metrics, holdout, exclusions, acceptance criteria, and failure rules would be locked before scoring?",
+          "required_for_draft": true
+        },
+        {
+          "id": "deployment_boundary",
+          "question": "Is the proposed work read-only, retrospective, sandboxed, or operational, and who authorizes each step?",
+          "required_for_draft": true
+        },
+        {
+          "id": "commercial_route",
+          "question": "What procurement, agreement, insurance, support, IP, and post-pilot decision route applies?",
+          "required_for_draft": true
+        },
+        {
+          "id": "evidence_boundary",
+          "question": "Which performance statements are measured, independently validated, proposed, or explicitly not yet established?",
+          "required_for_draft": true
+        }
+      ]
+    }
+  }
+}

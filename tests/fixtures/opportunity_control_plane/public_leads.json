@@ -1,0 +1,311 @@
+{
+  "schema": "lumencore.public_opportunity_leads.v1",
+  "environment": "TEST_FIXTURE",
+  "records": [
+    {
+      "record_id": "fixture-gov-official-001",
+      "lane": "government",
+      "lead_origin": "VERIFIED_PUBLIC_SOURCE",
+      "title": "Synthetic Grid Resilience Research Opportunity",
+      "organization": "Example Public Energy Agency",
+      "summary": "Synthetic fixture for a public research opportunity with a controlling-source observation and an exact deadline.",
+      "canonical_opportunity_url": "https://example.gov/opportunities/synthetic-grid-resilience?utm_source=test",
+      "source": {
+        "url": "https://example.gov/opportunities/synthetic-grid-resilience?utm_source=test",
+        "authority": "OFFICIAL",
+        "verification_state": "PUBLIC_SOURCE_OBSERVED",
+        "observed_utc": "2026-07-23T17:00:00Z",
+        "observed_precision": "EXACT_TIME",
+        "observed_date": null,
+        "published_utc": "2026-07-20T13:00:00Z",
+        "updated_utc": "2026-07-23T15:00:00Z"
+      },
+      "deadline": {
+        "state": "EXACT",
+        "at_utc": "2026-08-01T21:00:00Z",
+        "local": "2026-08-01T17:00:00-04:00",
+        "timezone": "America/New_York",
+        "source_text": "Synthetic fixture deadline: August 1, 2026 at 5:00 PM Eastern."
+      },
+      "compensation": {
+        "state": "NOT_APPLICABLE",
+        "source_text": "Compensation is not applicable to this synthetic government-opportunity fixture."
+      },
+      "eligibility": {
+        "state": "CONFIRMED",
+        "basis": "Synthetic fixture marks all configured applicant requirements confirmed for parser testing only.",
+        "unresolved_requirements": []
+      },
+      "fit": {
+        "score": 90,
+        "basis": "Synthetic scope references grid resilience, forecasting, and evidence-bound evaluation."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Synthetic fixture only; it is not a real solicitation, eligibility determination, application, agency relationship, or award prospect."
+    },
+    {
+      "record_id": "fixture-gov-aggregator-duplicate-001",
+      "lane": "government",
+      "lead_origin": "VERIFIED_PUBLIC_SOURCE",
+      "title": "Synthetic Grid Resilience Research Opportunity",
+      "organization": "Example Public Energy Agency",
+      "summary": "Synthetic aggregator duplicate used to prove deterministic preference for the controlling public source.",
+      "canonical_opportunity_url": "https://example.gov/opportunities/synthetic-grid-resilience",
+      "source": {
+        "url": "https://alerts.example.org/federal/synthetic-grid-resilience",
+        "authority": "TRUSTED_AGGREGATOR",
+        "verification_state": "PUBLIC_SOURCE_OBSERVED",
+        "observed_utc": "2026-07-23T16:30:00Z",
+        "observed_precision": "EXACT_TIME",
+        "observed_date": null,
+        "published_utc": "2026-07-20T14:00:00Z",
+        "updated_utc": "2026-07-22T14:00:00Z"
+      },
+      "deadline": {
+        "state": "EXACT",
+        "at_utc": "2026-08-01T21:00:00Z",
+        "local": "2026-08-01T17:00:00-04:00",
+        "timezone": "America/New_York",
+        "source_text": "Synthetic aggregator repeats an August 1, 2026 at 5:00 PM Eastern deadline."
+      },
+      "compensation": {
+        "state": "NOT_APPLICABLE",
+        "source_text": "Compensation is not applicable to this synthetic government-opportunity fixture."
+      },
+      "eligibility": {
+        "state": "LIKELY",
+        "basis": "Synthetic aggregator metadata suggests possible fit but is not controlling.",
+        "unresolved_requirements": [
+          "Confirm eligibility against the official notice and current amendments."
+        ]
+      },
+      "fit": {
+        "score": 92,
+        "basis": "Synthetic title metadata has strong keyword overlap but does not supersede the official source."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Synthetic duplicate only; aggregator metadata does not establish a current notice, deadline, eligibility, or award prospect."
+    },
+    {
+      "record_id": "fixture-job-first-party-001",
+      "lane": "job",
+      "lead_origin": "VERIFIED_PUBLIC_SOURCE",
+      "title": "Synthetic AI Solutions Architect",
+      "organization": "Example Technology Employer",
+      "summary": "Synthetic first-party job fixture with a confirmed open-page observation, stated compensation, and no stated application deadline.",
+      "canonical_opportunity_url": "https://careers.example.com/jobs/synthetic-ai-solutions-architect",
+      "source": {
+        "url": "https://careers.example.com/jobs/synthetic-ai-solutions-architect",
+        "authority": "FIRST_PARTY",
+        "verification_state": "PUBLIC_SOURCE_OBSERVED",
+        "observed_utc": "2026-07-23T17:15:00Z",
+        "observed_precision": "EXACT_TIME",
+        "observed_date": null,
+        "published_utc": "2026-07-21T14:00:00Z",
+        "updated_utc": "2026-07-23T14:30:00Z"
+      },
+      "deadline": {
+        "state": "NONE_STATED",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "The synthetic first-party posting states no application deadline."
+      },
+      "compensation": {
+        "state": "STATED",
+        "source_text": "Synthetic fixture compensation range is stated on the first-party posting for parser coverage only."
+      },
+      "eligibility": {
+        "state": "CONFIRMED",
+        "basis": "Synthetic fixture marks the listed minimum qualifications and work conditions confirmed for testing only.",
+        "unresolved_requirements": []
+      },
+      "fit": {
+        "score": 83,
+        "basis": "Synthetic role scope maps to AI architecture, forecasting, and evidence-focused delivery."
+      },
+      "reviewer_answers": {
+        "role_status": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic first-party page is marked open in the fixture.",
+          "source_url": "https://careers.example.com/jobs/synthetic-ai-solutions-architect"
+        },
+        "minimum_qualifications": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic fixture requirements are captured in the local test record.",
+          "source_url": "https://careers.example.com/jobs/synthetic-ai-solutions-architect"
+        },
+        "work_location": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic fixture states the location and work arrangement.",
+          "source_url": "https://careers.example.com/jobs/synthetic-ai-solutions-architect"
+        },
+        "compensation_terms": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic fixture includes a stated compensation field.",
+          "source_url": "https://careers.example.com/jobs/synthetic-ai-solutions-architect"
+        },
+        "application_materials": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic fixture lists a resume and concise portfolio summary.",
+          "source_url": "https://careers.example.com/jobs/synthetic-ai-solutions-architect"
+        },
+        "claim_fit": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic fixture requires only source-bound experience statements.",
+          "source_url": "https://careers.example.com/jobs/synthetic-ai-solutions-architect"
+        }
+      },
+      "claim_boundary": "Synthetic job fixture only; it does not establish a real opening, qualification, interview, compensation offer, or employment outcome."
+    },
+    {
+      "record_id": "fixture-license-first-party-001",
+      "lane": "licensing",
+      "lead_origin": "VERIFIED_PUBLIC_SOURCE",
+      "title": "Synthetic Grid Analytics Licensing Route",
+      "organization": "Example University Technology Transfer Office",
+      "summary": "Synthetic first-party licensing fixture with a public nonconfidential route and no stated response deadline.",
+      "canonical_opportunity_url": "https://transfer.example.edu/technologies/synthetic-grid-analytics",
+      "source": {
+        "url": "https://transfer.example.edu/technologies/synthetic-grid-analytics",
+        "authority": "FIRST_PARTY",
+        "verification_state": "PUBLIC_SOURCE_OBSERVED",
+        "observed_utc": "2026-07-23T17:20:00Z",
+        "observed_precision": "EXACT_TIME",
+        "observed_date": null,
+        "published_utc": "2026-07-01T15:00:00Z",
+        "updated_utc": "2026-07-22T15:00:00Z"
+      },
+      "deadline": {
+        "state": "NONE_STATED",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "The synthetic first-party licensing page states no response deadline."
+      },
+      "compensation": {
+        "state": "NOT_APPLICABLE",
+        "source_text": "Employment compensation is not applicable to this synthetic licensing fixture."
+      },
+      "eligibility": {
+        "state": "CONFIRMED",
+        "basis": "Synthetic fixture marks the public nonconfidential inquiry route available for testing only.",
+        "unresolved_requirements": []
+      },
+      "fit": {
+        "score": 78,
+        "basis": "Synthetic technology description overlaps with grid analytics and bounded evaluation."
+      },
+      "reviewer_answers": {
+        "rights_owner": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic fixture identifies the example technology-transfer office as the public route.",
+          "source_url": "https://transfer.example.edu/technologies/synthetic-grid-analytics"
+        },
+        "available_rights": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic fixture lists nonexclusive evaluation rights for parser testing.",
+          "source_url": "https://transfer.example.edu/technologies/synthetic-grid-analytics"
+        },
+        "diligence_stage": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic fixture labels maturity and validation limits as unverified outside the fixture.",
+          "source_url": "https://transfer.example.edu/technologies/synthetic-grid-analytics"
+        },
+        "commercial_terms": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic fixture states that commercial terms require later human negotiation.",
+          "source_url": "https://transfer.example.edu/technologies/synthetic-grid-analytics"
+        },
+        "confidentiality_route": {
+          "status": "CONFIRMED",
+          "answer": "Synthetic fixture starts with a nonconfidential inquiry before any agreement.",
+          "source_url": "https://transfer.example.edu/technologies/synthetic-grid-analytics"
+        }
+      },
+      "claim_boundary": "Synthetic licensing fixture only; it does not establish ownership, availability, freedom to operate, license terms, technical validation, or a licensing deal."
+    },
+    {
+      "record_id": "fixture-venture-stale-001",
+      "lane": "venture_partner",
+      "lead_origin": "VERIFIED_PUBLIC_SOURCE",
+      "title": "Synthetic Deep-Tech Partner Program",
+      "organization": "Example Ventures",
+      "summary": "Synthetic venture-partner lead with an intentionally stale first-party observation.",
+      "canonical_opportunity_url": "https://ventures.example.com/programs/synthetic-deep-tech",
+      "source": {
+        "url": "https://ventures.example.com/programs/synthetic-deep-tech",
+        "authority": "FIRST_PARTY",
+        "verification_state": "PUBLIC_SOURCE_OBSERVED",
+        "observed_utc": "2026-07-10T12:00:00Z",
+        "observed_precision": "EXACT_TIME",
+        "observed_date": null,
+        "published_utc": "2026-06-01T12:00:00Z",
+        "updated_utc": "2026-07-01T12:00:00Z"
+      },
+      "deadline": {
+        "state": "NONE_STATED",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "The stale synthetic page stated no application deadline."
+      },
+      "compensation": {
+        "state": "NOT_APPLICABLE",
+        "source_text": "Employment compensation is not applicable to this synthetic venture-partner fixture."
+      },
+      "eligibility": {
+        "state": "CONFIRMED",
+        "basis": "Synthetic fixture marks the public program profile aligned for testing only.",
+        "unresolved_requirements": []
+      },
+      "fit": {
+        "score": 85,
+        "basis": "Synthetic mandate references deep-tech infrastructure and evidence-driven pilots."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Synthetic stale lead only; it does not establish a current program, mandate fit, introduction route, investment interest, or financing outcome."
+    },
+    {
+      "record_id": "fixture-pilot-expired-001",
+      "lane": "pilot",
+      "lead_origin": "VERIFIED_PUBLIC_SOURCE",
+      "title": "Synthetic Utility Analytics Sandbox",
+      "organization": "Example Utility",
+      "summary": "Synthetic pilot lead with an exact deadline that is closed at the fixture evaluation time.",
+      "canonical_opportunity_url": "https://utility.example.com/pilots/synthetic-grid-sandbox",
+      "source": {
+        "url": "https://utility.example.com/pilots/synthetic-grid-sandbox",
+        "authority": "FIRST_PARTY",
+        "verification_state": "PUBLIC_SOURCE_OBSERVED",
+        "observed_utc": "2026-07-23T16:00:00Z",
+        "observed_precision": "EXACT_TIME",
+        "observed_date": null,
+        "published_utc": "2026-07-15T14:00:00Z",
+        "updated_utc": "2026-07-23T14:00:00Z"
+      },
+      "deadline": {
+        "state": "EXACT",
+        "at_utc": "2026-07-23T17:00:00Z",
+        "local": "2026-07-23T12:00:00-05:00",
+        "timezone": "America/Chicago",
+        "source_text": "Synthetic fixture deadline: July 23, 2026 at noon Central."
+      },
+      "compensation": {
+        "state": "NOT_APPLICABLE",
+        "source_text": "Employment compensation is not applicable to this synthetic pilot fixture."
+      },
+      "eligibility": {
+        "state": "CONFIRMED",
+        "basis": "Synthetic fixture marks the stated participant profile confirmed for parser testing only.",
+        "unresolved_requirements": []
+      },
+      "fit": {
+        "score": 88,
+        "basis": "Synthetic pilot scope references grid analytics and a read-only evaluation."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Synthetic closed pilot fixture only; it does not establish a current call, data access, customer relationship, technical validation, procurement path, or pilot selection."
+    }
+  ]
+}

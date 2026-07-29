@@ -1,6 +1,6 @@
 # LumenCore Current Reviewer Front Door
 
-As of UTC: `2026-07-29T13:51:22.851785Z`
+As of UTC: `2026-07-29T15:02:00Z`
 Status: `CURRENT_REVIEWER_FRONT_DOOR_READY_HUMAN_RELEASE_REQUIRED`
 
 This is the current review entry point. Legacy decks, capability packets, whitepapers, and speculative archives are not substitutes for these governed artifacts.
@@ -50,7 +50,7 @@ This is the current review entry point. Legacy decks, capability packets, whitep
 - Role: `technical_method_and_limitations`
 - Path: `output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf`
 - Status: `CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED`
-- SHA-256: `8A567A033C3DBE51DA23477F296F0782A105E6A40F54F20597A459244E9CE91B`
+- SHA-256: `2476B88BC8B49D14BDE6468FD30B05131778ED9915381B9BB2B7A78ADB5B2D5A`
 - External release authorized: `false`
 
 ### source_native_family_baseline_ledger
@@ -58,7 +58,7 @@ This is the current review entry point. Legacy decks, capability packets, whitep
 - Role: `machine_readable_benchmark_evidence`
 - Path: `out/ops/source_native_family_baseline_ledger_latest.json`
 - Status: `INTERNAL_EVIDENCE_REVIEW_REQUIRED`
-- SHA-256: `7BC80126D77E8EDEC39D0FE97ADFF15C477BA681A985B0DABB431C0B4E963D2D`
+- SHA-256: `627D0ADD4D31514F7A47DBF8E8C51B0FA46DF72635F336133F54ABB85B00927A`
 - External release authorized: `false`
 
 ### market_signal_source_native_benchmark
@@ -74,7 +74,7 @@ This is the current review entry point. Legacy decks, capability packets, whitep
 - Role: `future_only_validation_gate`
 - Path: `out/ops/time_series_source_native_prospective_protocol_status.json`
 - Status: `FROZEN_AWAITING_FUTURE_OBSERVATIONS`
-- SHA-256: `B66AF0CA033D95982B4B38C2CA9699A1386B3ADDF07A56B0C988C73125C508CD`
+- SHA-256: `535F8494CAA6EF409E44BDC901B0423C287FF578BBC5876A2B48EC96D5F7E37D`
 - External release authorized: `false`
 
 ### near_deadline_submission_command_board
@@ -82,7 +82,7 @@ This is the current review entry point. Legacy decks, capability packets, whitep
 - Role: `current_opportunity_and_action_router`
 - Path: `out/ops/near_deadline_submission_command_board_latest.json`
 - Status: `NEAR_DEADLINE_COMMAND_BOARD_ACTIVE_FAIL_CLOSED_FRESHNESS_BLOCKERS`
-- SHA-256: `D454536F60425F1F234985D09A338972F07DC8DA930F58811AA16F8FEFF75C8B`
+- SHA-256: `CF1E9C1871D0564D374823B746AEADC76D240219AE8BED5207DBF7125B837781`
 - External release authorized: `false`
 
 ### portfolio_external_action_ledger
@@ -90,7 +90,7 @@ This is the current review entry point. Legacy decks, capability packets, whitep
 - Role: `duplicate_suppression_and_receipt_state`
 - Path: `out/portfolio_external_action_ledger/portfolio_external_action_ledger_latest.json`
 - Status: `RECONCILED_FAIL_CLOSED_LEDGER_READY`
-- SHA-256: `76781D1CAEDA42DB17F51571E12C56C18C173D78CD729A1F8829CFC4CF31FC4C`
+- SHA-256: `E33E847E2BF03B03EF7A0A6762B1ABB5E00993332809D493206A19071C87C71F`
 - External release authorized: `false`
 
 ## Release Controls
@@ -111,4 +111,4 @@ This front door proves the presence and hashes of current local review artifacts
 
 Select only the artifacts required by a verified recipient or official notice, recheck the current requirements and duplicate-send ledger, and obtain action-time founder review before any upload, send, certification, agreement acceptance, or payment.
 
-Front-door SHA-256: `DA7AC9B2684D98AAE261D521F14BE8168439F8E28AC1240D002150820C3ADA0B`
+Front-door SHA-256: `78AB98FB28B07265E0E05706DBB11BD29340186C2574289AC6B5B38361ED6872`

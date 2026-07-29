@@ -1,0 +1,350 @@
+{
+  "schema": "lumencore.public_opportunity_leads.v1",
+  "environment": "TEST_FIXTURE",
+  "records": [
+    {
+      "record_id": "gmail-alert-deloitte-tech-strategy-20260723",
+      "lane": "job",
+      "lead_origin": "JOB_ALERT_METADATA",
+      "title": "Technology Strategy Innovation and Delivery Transformation Manager",
+      "organization": "Deloitte",
+      "summary": "Job-alert metadata described a Nashville hybrid manager role. The employer posting, exact location terms, current availability, and application route require a first-party source recheck.",
+      "canonical_opportunity_url": null,
+      "source": {
+        "url": null,
+        "authority": "TRUSTED_AGGREGATOR",
+        "verification_state": "PUBLIC_SOURCE_RECHECK_REQUIRED",
+        "observed_utc": "2026-07-23T00:00:00Z",
+        "observed_precision": "DATE_ONLY",
+        "observed_date": "2026-07-23",
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "UNKNOWN",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "No application deadline or timezone was included in the July 23, 2026 job-alert metadata."
+      },
+      "compensation": {
+        "state": "UNKNOWN",
+        "source_text": "No compensation terms were included in the bounded job-alert metadata."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "Title and location metadata alone do not establish minimum qualifications or application eligibility.",
+        "unresolved_requirements": [
+          "Confirm the current first-party employer posting and minimum qualifications."
+        ]
+      },
+      "fit": {
+        "score": 68,
+        "basis": "Title metadata suggests technology strategy and delivery overlap, but duties and requirements have not been source-checked."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Metadata-only job lead; it does not establish a current opening, employer endorsement, qualification, compensation, interview, or employment outcome."
+    },
+    {
+      "record_id": "gmail-alert-fedex-ai-architect-20260723",
+      "lane": "job",
+      "lead_origin": "JOB_ALERT_METADATA",
+      "title": "AI Business Solution Architect",
+      "organization": "Federal Express",
+      "summary": "Job-alert metadata named an AI business solution architect role. The first-party posting, location, duties, qualifications, and current status require recheck.",
+      "canonical_opportunity_url": null,
+      "source": {
+        "url": null,
+        "authority": "TRUSTED_AGGREGATOR",
+        "verification_state": "PUBLIC_SOURCE_RECHECK_REQUIRED",
+        "observed_utc": "2026-07-23T00:00:00Z",
+        "observed_precision": "DATE_ONLY",
+        "observed_date": "2026-07-23",
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "UNKNOWN",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "No application deadline or timezone was included in the July 23, 2026 job-alert metadata."
+      },
+      "compensation": {
+        "state": "UNKNOWN",
+        "source_text": "No compensation terms were included in the bounded job-alert metadata."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "Job-alert title metadata does not establish experience, education, location, or work-authorization requirements.",
+        "unresolved_requirements": [
+          "Confirm the current first-party employer posting and all minimum qualifications."
+        ]
+      },
+      "fit": {
+        "score": 80,
+        "basis": "Title metadata suggests AI architecture and business-solution overlap, but the role description is unverified."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Metadata-only job lead; it does not establish a current opening, employer endorsement, qualification, compensation, interview, or employment outcome."
+    },
+    {
+      "record_id": "gmail-alert-affirm-ai-solutions-20260723",
+      "lane": "job",
+      "lead_origin": "JOB_ALERT_METADATA",
+      "title": "AI Solutions Engineer",
+      "organization": "Affirm",
+      "summary": "Job-alert metadata described a Nashville remote AI solutions engineer role. Remote scope, jurisdiction, current status, and first-party application terms require recheck.",
+      "canonical_opportunity_url": null,
+      "source": {
+        "url": null,
+        "authority": "TRUSTED_AGGREGATOR",
+        "verification_state": "PUBLIC_SOURCE_RECHECK_REQUIRED",
+        "observed_utc": "2026-07-23T00:00:00Z",
+        "observed_precision": "DATE_ONLY",
+        "observed_date": "2026-07-23",
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "UNKNOWN",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "No application deadline or timezone was included in the July 23, 2026 job-alert metadata."
+      },
+      "compensation": {
+        "state": "UNKNOWN",
+        "source_text": "No compensation terms were included in the bounded job-alert metadata."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "The alert does not establish remote-location eligibility, required experience, or current role status.",
+        "unresolved_requirements": [
+          "Confirm the current first-party posting, remote-location rules, and minimum qualifications."
+        ]
+      },
+      "fit": {
+        "score": 82,
+        "basis": "Title metadata suggests AI solution engineering overlap, but responsibilities and requirements are unverified."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Metadata-only job lead; it does not establish a current opening, employer endorsement, qualification, compensation, interview, or employment outcome."
+    },
+    {
+      "record_id": "gmail-alert-highspring-ai-portfolio-20260723",
+      "lane": "job",
+      "lead_origin": "JOB_ALERT_METADATA",
+      "title": "Enterprise AI Portfolio Lead",
+      "organization": "Highspring",
+      "summary": "Job-alert metadata described a Nashville hybrid enterprise AI portfolio lead role and an Easy Apply route. Both the first-party opening and any platform application route require human recheck.",
+      "canonical_opportunity_url": null,
+      "source": {
+        "url": null,
+        "authority": "TRUSTED_AGGREGATOR",
+        "verification_state": "PUBLIC_SOURCE_RECHECK_REQUIRED",
+        "observed_utc": "2026-07-23T00:00:00Z",
+        "observed_precision": "DATE_ONLY",
+        "observed_date": "2026-07-23",
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "UNKNOWN",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "No application deadline or timezone was included in the July 23, 2026 job-alert metadata."
+      },
+      "compensation": {
+        "state": "UNKNOWN",
+        "source_text": "No compensation terms were included in the bounded job-alert metadata."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "Alert metadata and an Easy Apply label do not establish role status, application completeness, or qualifications.",
+        "unresolved_requirements": [
+          "Confirm the first-party posting, hybrid-location terms, minimum qualifications, and authorized application route."
+        ]
+      },
+      "fit": {
+        "score": 76,
+        "basis": "Title metadata suggests enterprise AI portfolio overlap, but the role scope is unverified."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Metadata-only job lead; Easy Apply is not application authority, and this record does not establish a current opening, qualification, compensation, interview, or employment outcome."
+    },
+    {
+      "record_id": "gmail-alert-lt-harper-field-cto-20260723",
+      "lane": "job",
+      "lead_origin": "JOB_ALERT_METADATA",
+      "title": "Field CTO - Cyber, Cloud and Data",
+      "organization": "LT Harper",
+      "summary": "Job-alert metadata described a United States remote field CTO role spanning cyber, cloud, and data. Employer identity, current status, remote eligibility, and role terms require recheck.",
+      "canonical_opportunity_url": null,
+      "source": {
+        "url": null,
+        "authority": "TRUSTED_AGGREGATOR",
+        "verification_state": "PUBLIC_SOURCE_RECHECK_REQUIRED",
+        "observed_utc": "2026-07-23T00:00:00Z",
+        "observed_precision": "DATE_ONLY",
+        "observed_date": "2026-07-23",
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "UNKNOWN",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "No application deadline or timezone was included in the July 23, 2026 job-alert metadata."
+      },
+      "compensation": {
+        "state": "UNKNOWN",
+        "source_text": "No compensation terms were included in the bounded job-alert metadata."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "Alert metadata does not establish executive-level requirements, travel, remote jurisdiction, or work authorization.",
+        "unresolved_requirements": [
+          "Confirm the first-party posting, employer route, remote terms, and minimum executive qualifications."
+        ]
+      },
+      "fit": {
+        "score": 72,
+        "basis": "Title metadata suggests cloud and data leadership overlap, but cyber scope and seniority requirements are unverified."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Metadata-only job lead; it does not establish a current opening, employer identity verification, qualification, compensation, interview, or employment outcome."
+    },
+    {
+      "record_id": "gmail-alert-gdit-sector-cto-20260723",
+      "lane": "job",
+      "lead_origin": "JOB_ALERT_METADATA",
+      "title": "Army and Defense Agencies Sector CTO",
+      "organization": "GDIT",
+      "summary": "Job-alert metadata named an Army and Defense Agencies sector CTO role. Clearance, citizenship, location, travel, current status, and first-party application requirements require recheck.",
+      "canonical_opportunity_url": null,
+      "source": {
+        "url": null,
+        "authority": "TRUSTED_AGGREGATOR",
+        "verification_state": "PUBLIC_SOURCE_RECHECK_REQUIRED",
+        "observed_utc": "2026-07-23T00:00:00Z",
+        "observed_precision": "DATE_ONLY",
+        "observed_date": "2026-07-23",
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "UNKNOWN",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "No application deadline or timezone was included in the July 23, 2026 job-alert metadata."
+      },
+      "compensation": {
+        "state": "UNKNOWN",
+        "source_text": "No compensation terms were included in the bounded job-alert metadata."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "The alert does not establish clearance, citizenship, executive experience, or other defense-sector requirements.",
+        "unresolved_requirements": [
+          "Confirm the first-party posting and all clearance, citizenship, location, and experience requirements."
+        ]
+      },
+      "fit": {
+        "score": 70,
+        "basis": "Title metadata suggests government technology leadership overlap, but defense-sector gates are unverified."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Metadata-only job lead; it does not establish a current opening, clearance eligibility, qualification, compensation, interview, or employment outcome."
+    },
+    {
+      "record_id": "gmail-alert-axial-chief-ai-officer-20260723",
+      "lane": "job",
+      "lead_origin": "JOB_ALERT_METADATA",
+      "title": "Chief AI Officer",
+      "organization": "Axial Search",
+      "summary": "Job-alert metadata described a United States remote chief AI officer search. The hiring company, recruiter authority, current status, remote terms, and role requirements require recheck.",
+      "canonical_opportunity_url": null,
+      "source": {
+        "url": null,
+        "authority": "TRUSTED_AGGREGATOR",
+        "verification_state": "PUBLIC_SOURCE_RECHECK_REQUIRED",
+        "observed_utc": "2026-07-23T00:00:00Z",
+        "observed_precision": "DATE_ONLY",
+        "observed_date": "2026-07-23",
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "UNKNOWN",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "No application deadline or timezone was included in the July 23, 2026 job-alert metadata."
+      },
+      "compensation": {
+        "state": "UNKNOWN",
+        "source_text": "No compensation terms were included in the bounded job-alert metadata."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "Recruiter alert metadata does not establish the hiring company, mandate, executive requirements, or application authority.",
+        "unresolved_requirements": [
+          "Confirm recruiter authority, hiring organization, first-party role evidence, and executive qualifications."
+        ]
+      },
+      "fit": {
+        "score": 74,
+        "basis": "Title metadata suggests AI leadership overlap, but employer, mandate, and scope are unverified."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Metadata-only recruiter lead; it does not establish a current opening, recruiter authority, hiring-company identity, qualification, compensation, interview, or employment outcome."
+    },
+    {
+      "record_id": "gmail-alert-vibes-meet-cto-20260723",
+      "lane": "job",
+      "lead_origin": "JOB_ALERT_METADATA",
+      "title": "CTO",
+      "organization": "Vibes Meet",
+      "summary": "Job-alert metadata described a remote CTO role with equity-based compensation and salary only after investment. The company, financing condition, current role status, legal terms, and first-party posting require recheck.",
+      "canonical_opportunity_url": null,
+      "source": {
+        "url": null,
+        "authority": "TRUSTED_AGGREGATOR",
+        "verification_state": "PUBLIC_SOURCE_RECHECK_REQUIRED",
+        "observed_utc": "2026-07-23T00:00:00Z",
+        "observed_precision": "DATE_ONLY",
+        "observed_date": "2026-07-23",
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "UNKNOWN",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "No application deadline or timezone was included in the July 23, 2026 job-alert metadata."
+      },
+      "compensation": {
+        "state": "CAVEAT",
+        "source_text": "Job-alert metadata described equity-based compensation and salary only after investment; all terms remain unverified."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "Alert metadata does not establish company status, financing, employment classification, equity terms, or executive requirements.",
+        "unresolved_requirements": [
+          "Confirm the first-party role, company and financing status, written compensation terms, employment classification, and executive requirements."
+        ]
+      },
+      "fit": {
+        "score": 60,
+        "basis": "Title metadata suggests technical leadership overlap, but company, role, financing, and compensation conditions are unverified."
+      },
+      "reviewer_answers": {},
+      "claim_boundary": "Metadata-only lead with a compensation caveat; it does not establish a current opening, financing, salary, equity value, employment relationship, qualification, interview, or outcome."
+    }
+  ]
+}

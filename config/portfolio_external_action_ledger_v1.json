@@ -1,0 +1,704 @@
+{
+  "claim_boundary": "This ledger reconciles local queue state, local engagement controls, observed portal confirmations, official confirmation emails, outbound transmission receipts, and explicit not-submitted states. It records selection or agreement completion only where a current source-bound official event says so; it does not establish broader eligibility, agency acceptance, legal sufficiency, membership, endorsement, award, contract, funding, licensing, deployment, independent validation, commercial results, or future performance.",
+  "explicit_actions": [
+    {
+      "action_key": "submission::nashville_ec_takeoff_fall_2026",
+      "category": "OFFICIAL_COHORT_SELECTION_ONBOARDING_DUE",
+      "channel": "OFFICIAL_EMAIL_AND_PORTAL",
+      "claim_boundary": "The portal receipt proves submission, and the later official notice proves cohort selection plus stated onboarding and deposit dates. Neither proves onboarding completion, agreement acceptance, payment, funding, endorsement, validation, or an award.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "PORTAL_SUBMISSION_CONFIRMED",
+          "pointer": "/status",
+          "source_id": "nashville_submission_receipt"
+        },
+        {
+          "expected": "COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE",
+          "pointer": "/events/4/status",
+          "source_id": "official_inbound_status_event_register"
+        },
+        {
+          "expected": true,
+          "pointer": "/events/4/evidence/cohort_selected",
+          "source_id": "official_inbound_status_event_register"
+        }
+      ],
+      "evidence_source_ids": [
+        "nashville_submission_receipt",
+        "official_inbound_status_event_register"
+      ],
+      "expected_base_state": "COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE",
+      "lane_id": "nashville_ec_takeoff_fall_2026",
+      "lifecycle_state": "COHORT_SELECTED_ONBOARDING_AGREEMENT_DUE",
+      "name": "Nashville Entrepreneur Center Fall 2026 application",
+      "next_action": "Review every onboarding answer and participation term before the July 31 account action. Treat agreement acceptance and the August 14 deposit as separate human-approved actions; do not resubmit or send a duplicate acceptance email.",
+      "organization": "Nashville Entrepreneur Center",
+      "overlay_record_id": "engagement::nashville_ec_takeoff_fall_2026",
+      "portfolio_domain": "VENTURE_AND_AWARD",
+      "primary_receipt_pointer": "/events/4",
+      "primary_receipt_source_id": "official_inbound_status_event_register",
+      "receipt_class": "OFFICIAL_COHORT_SELECTION_EMAIL_STATE",
+      "record_id": "external::nashville_ec_takeoff_fall_2026"
+    },
+    {
+      "action_key": "submission::darpa_sn_26_97_low_resource_computing_rfi",
+      "category": "EXTERNAL_SUBMISSION_RECORDED_OUTBOUND",
+      "channel": "EMAIL",
+      "claim_boundary": "The sent-message receipt proves timely outbound transmission of a market-research response. It does not prove agency receipt, acceptance, evaluation, selection, award, contract, or funding.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "EMAIL_SUBMISSION_SENT_BEFORE_DEADLINE",
+          "pointer": "/status",
+          "source_id": "darpa_submission_receipt"
+        }
+      ],
+      "evidence_source_ids": [
+        "darpa_submission_receipt"
+      ],
+      "expected_base_state": "FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING",
+      "lane_id": "darpa_sn_26_97_low_resource_computing_rfi",
+      "lifecycle_state": "OUTBOUND_SUBMISSION_SENT_AGENCY_RECEIPT_PENDING",
+      "name": "DARPA-SN-26-97 Low Resource Computing RFI response",
+      "next_action": "Monitor the existing agency thread. Do not resend the package and reply only to a specific agency request.",
+      "organization": "Defense Advanced Research Projects Agency",
+      "overlay_record_id": "engagement::darpa_sn_26_97_low_resource_computing_rfi",
+      "portfolio_domain": "GOVERNMENT_MARKET_RESEARCH",
+      "primary_receipt_source_id": "darpa_submission_receipt",
+      "receipt_class": "OUTBOUND_EMAIL_SUBMISSION_RECEIPT",
+      "record_id": "external::darpa_sn_26_97_low_resource_computing_rfi"
+    },
+    {
+      "action_key": "submission::cdc_ai_acquisition_rfi",
+      "category": "EXTERNAL_SUBMISSION_RECEIPT_CONFIRMED",
+      "channel": "EMAIL",
+      "claim_boundary": "The engagement record captures outbound transmission and an agency receipt acknowledgment. It does not prove evaluation, selection, award, contract, deployment, or funding.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "lumencore.external_engagement_response_register.v1",
+          "pointer": "/schema",
+          "source_id": "engagement_register"
+        }
+      ],
+      "evidence_source_ids": [
+        "engagement_register"
+      ],
+      "expected_base_state": "RECEIPT_CONFIRMED_FOLLOW_UP_PENDING",
+      "lane_id": "cdc_ai_acquisition_rfi",
+      "lifecycle_state": "AGENCY_RECEIPT_CONFIRMED_MONITOR_ONLY",
+      "name": "CDC AI acquisition RFI response",
+      "next_action": "Monitor the existing agency thread. No duplicate submission or proactive reply is due.",
+      "organization": "Centers for Disease Control and Prevention",
+      "overlay_record_id": "engagement::cdc_ai_acquisition_rfi",
+      "portfolio_domain": "GOVERNMENT_MARKET_RESEARCH",
+      "receipt_class": "AGENCY_RECEIPT_ACKNOWLEDGMENT_RECORD",
+      "record_id": "external::cdc_ai_acquisition_rfi"
+    },
+    {
+      "action_key": "submission::army_aidp_draft_cfs_feedback",
+      "category": "EXTERNAL_SUBMISSION_RECORDED_OUTBOUND",
+      "channel": "EMAIL",
+      "claim_boundary": "The sent-message artifact proves outbound market-research feedback transmission. It does not prove acceptance, evaluation, award, contract, deployment, or funding.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "ACCAPGAIDPRFI4",
+          "pointer": "/submissions/0/notice_id",
+          "source_id": "external_submission_receipt"
+        },
+        {
+          "expected": "SENT_WITH_ATTACHMENT",
+          "pointer": "/submissions/0/result",
+          "source_id": "external_submission_receipt"
+        }
+      ],
+      "evidence_source_ids": [
+        "engagement_register",
+        "external_submission_receipt"
+      ],
+      "expected_base_state": "SENT_VERIFIED_RESPONSE_PENDING",
+      "lane_id": "army_aidp_draft_cfs_feedback",
+      "lifecycle_state": "OUTBOUND_SUBMISSION_SENT_RESPONSE_PENDING",
+      "name": "Army AIDP draft solicitation feedback",
+      "next_action": "Monitor the existing thread and do not resend the workbook.",
+      "organization": "United States Army",
+      "overlay_record_id": "engagement::army_aidp_draft_cfs_feedback",
+      "portfolio_domain": "GOVERNMENT_MARKET_RESEARCH",
+      "primary_receipt_pointer": "/submissions/0",
+      "primary_receipt_source_id": "external_submission_receipt",
+      "receipt_class": "OUTBOUND_EMAIL_SUBMISSION_RECEIPT",
+      "record_id": "external::army_aidp_draft_cfs_feedback"
+    },
+    {
+      "action_key": "submission::nasa_data_center_rfi",
+      "category": "EXTERNAL_SUBMISSION_RECORDED_OUTBOUND",
+      "channel": "EMAIL",
+      "claim_boundary": "The sent-message artifact proves outbound market-research response transmission. It does not prove agency receipt, acceptance, evaluation, award, contract, deployment, or funding.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "80TECH26RFI0020",
+          "pointer": "/submissions/1/notice_id",
+          "source_id": "external_submission_receipt"
+        },
+        {
+          "expected": "SENT_WITH_ATTACHMENT",
+          "pointer": "/submissions/1/result",
+          "source_id": "external_submission_receipt"
+        }
+      ],
+      "evidence_source_ids": [
+        "engagement_register",
+        "external_submission_receipt"
+      ],
+      "expected_base_state": "SENT_VERIFIED_RESPONSE_PENDING",
+      "lane_id": "nasa_data_center_rfi",
+      "lifecycle_state": "OUTBOUND_SUBMISSION_SENT_RESPONSE_PENDING",
+      "name": "NASA data-center infrastructure RFI response",
+      "next_action": "Monitor the existing agency thread and do not resend the response.",
+      "organization": "National Aeronautics and Space Administration",
+      "overlay_record_id": "engagement::nasa_data_center_rfi",
+      "portfolio_domain": "GOVERNMENT_MARKET_RESEARCH",
+      "primary_receipt_pointer": "/submissions/1",
+      "primary_receipt_source_id": "external_submission_receipt",
+      "receipt_class": "OUTBOUND_EMAIL_SUBMISSION_RECEIPT",
+      "record_id": "external::nasa_data_center_rfi"
+    },
+    {
+      "action_key": "agreement::epri_open_power_ai_mou",
+      "category": "COMPLETED_MOU_PRIVATE_CUSTODY_REVIEW",
+      "channel": "DOCUSIGN_AND_EMAIL",
+      "claim_boundary": "The official completion message proves that all parties completed the MOU and that a completed document was attached. It does not interpret legal obligations, prove completion of onboarding duties, establish funding, licensing, deployment, endorsement, or technical validation.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "MOU_COMPLETED_BY_ALL_PARTIES_PRIVATE_CUSTODY_REQUIRED",
+          "pointer": "/events/9/status",
+          "source_id": "official_inbound_status_event_register"
+        },
+        {
+          "expected": true,
+          "pointer": "/events/9/evidence/all_parties_completed",
+          "source_id": "official_inbound_status_event_register"
+        },
+        {
+          "expected": true,
+          "pointer": "/events/9/evidence/completed_document_attached",
+          "source_id": "official_inbound_status_event_register"
+        },
+        {
+          "expected": false,
+          "pointer": "/events/9/evidence/onboarding_obligations_reviewed",
+          "source_id": "official_inbound_status_event_register"
+        }
+      ],
+      "evidence_source_ids": [
+        "official_inbound_status_event_register",
+        "epri_signing_state"
+      ],
+      "expected_base_state": "MOU_COMPLETED_BY_ALL_PARTIES_PRIVATE_CUSTODY_REQUIRED",
+      "lane_id": "epri_open_power_ai_mou",
+      "lifecycle_state": "MOU_COMPLETED_PRIVATE_CUSTODY_AND_OBLIGATION_REVIEW_PENDING",
+      "name": "EPRI Open Power AI Consortium MOU",
+      "next_action": "Archive the completed document privately, record its hash, and review obligations without exposing signing details. Keep the separate requested-logo lane pending exact asset and permitted-use review; do not reply automatically or sign again.",
+      "organization": "Electric Power Research Institute",
+      "overlay_record_id": "engagement::epri_open_power_ai_mou",
+      "portfolio_domain": "AGREEMENT_AND_LICENSING",
+      "primary_receipt_pointer": "/events/9",
+      "primary_receipt_source_id": "official_inbound_status_event_register",
+      "receipt_class": "OFFICIAL_ALL_PARTIES_COMPLETION_EMAIL_STATE",
+      "record_id": "external::epri_open_power_ai_mou"
+    },
+    {
+      "action_key": "outreach::argos_emi_teaming_inquiry",
+      "category": "EXTERNAL_COMMUNICATION_RECORDED",
+      "channel": "EMAIL",
+      "claim_boundary": "The privacy-safe mailbox status proves that one bounded partner inquiry was sent once and observed in the sent mailbox. It does not prove delivery, review, reply, teaming authority, Government acceptance, selection, funding, award, contract, validation, performance, or savings.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
+          "pointer": "/status",
+          "source_id": "argos_partner_outreach_status"
+        },
+        {
+          "expected": 0,
+          "pointer": "/mailbox_observation/matching_current_draft_count",
+          "source_id": "argos_partner_outreach_status"
+        },
+        {
+          "expected": 1,
+          "pointer": "/mailbox_observation/matching_sent_count",
+          "source_id": "argos_partner_outreach_status"
+        },
+        {
+          "expected": 0,
+          "pointer": "/mailbox_observation/matching_inbound_count",
+          "source_id": "argos_partner_outreach_status"
+        },
+        {
+          "expected": true,
+          "pointer": "/controls/final_send_performed",
+          "source_id": "argos_partner_outreach_status"
+        },
+        {
+          "expected": true,
+          "pointer": "/controls/post_send_sent_copy_verified",
+          "source_id": "argos_partner_outreach_status"
+        },
+        {
+          "expected": true,
+          "pointer": "/controls/duplicate_send_prohibited",
+          "source_id": "argos_partner_outreach_status"
+        }
+      ],
+      "evidence_source_ids": [
+        "argos_partner_outreach_status"
+      ],
+      "expected_base_state": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
+      "lane_id": "argos_emi_teaming_inquiry",
+      "lifecycle_state": "PARTNER_INQUIRY_SENT_ONCE_MONITOR_ONLY",
+      "name": "Argos partner teaming inquiry",
+      "next_action": "Do not resend. Monitor the existing thread for a substantive reply, and do not name the organization as a team member without written role authority.",
+      "organization": "EMI Advisors LLC",
+      "overlay_record_id": "engagement::argos_emi_teaming_inquiry",
+      "portfolio_domain": "GOVERNMENT_PARTNER_TEAMING",
+      "primary_receipt_source_id": "argos_partner_outreach_status",
+      "receipt_class": "HASHED_GMAIL_SENT_RECEIPT",
+      "record_id": "external::argos_emi_teaming_inquiry"
+    },
+    {
+      "action_key": "submission::argos_government_sources_sought",
+      "category": "EXTERNAL_SUBMISSION_RECORDED_OUTBOUND",
+      "channel": "EMAIL",
+      "claim_boundary": "The privacy-safe record proves one outbound Project Argos sources-sought response, a sent-copy verification, and an automatic reply. The automatic reply is not a substantive agency receipt and the record does not prove evaluation, acceptance, selection, award, contract, funding, validation, performance, or savings.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "SENT_ONCE_POST_SEND_VERIFIED_NO_DUPLICATE",
+          "pointer": "/status",
+          "source_id": "argos_government_submission_status"
+        },
+        {
+          "expected": true,
+          "pointer": "/mailbox_observation/post_send_sent_copy_verified",
+          "source_id": "argos_government_submission_status"
+        },
+        {
+          "expected": 1,
+          "pointer": "/mailbox_observation/matching_sent_count_after_send",
+          "source_id": "argos_government_submission_status"
+        },
+        {
+          "expected": true,
+          "pointer": "/controls/automatic_reply_is_not_a_request_to_resend",
+          "source_id": "argos_government_submission_status"
+        },
+        {
+          "expected": true,
+          "pointer": "/controls/duplicate_send_prohibited",
+          "source_id": "argos_government_submission_status"
+        }
+      ],
+      "evidence_source_ids": [
+        "argos_government_submission_status"
+      ],
+      "lane_id": "argos_government_sources_sought",
+      "lifecycle_state": "OUTBOUND_SUBMISSION_SENT_AUTOMATIC_REPLY_ONLY_MONITOR",
+      "name": "Project Argos Government sources-sought response",
+      "next_action": "Do not resend. Monitor the existing agency thread and respond only to a substantive agency request; do not treat the automatic reply as evaluation or acceptance.",
+      "organization": "United States Department of Health and Human Services",
+      "portfolio_domain": "GOVERNMENT_MARKET_RESEARCH",
+      "primary_receipt_source_id": "argos_government_submission_status",
+      "receipt_class": "OUTBOUND_EMAIL_SENT_COPY_AND_AUTOMATIC_REPLY_RECEIPT",
+      "record_id": "external::argos_government_sources_sought"
+    },
+    {
+      "action_key": "submission::openai_build_week_prooflock_console",
+      "category": "EXTERNAL_SUBMISSION_CONFIRMED",
+      "channel": "DEVPOST_PORTAL",
+      "claim_boundary": "The official Devpost confirmation email proves a submission event. It does not prove eligibility, judging, endorsement, selection, award, funding, external validation, commercial value, or future performance.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "OFFICIAL_SUBMISSION_CONFIRMATION_EMAIL_OBSERVED",
+          "pointer": "/status",
+          "source_id": "openai_build_week_confirmation"
+        }
+      ],
+      "evidence_source_ids": [
+        "openai_build_week_confirmation"
+      ],
+      "lane_id": "openai_build_week_prooflock_console",
+      "lifecycle_state": "SUBMITTED_MONITOR_ORGANIZER_REQUESTS",
+      "name": "ProofLock Console OpenAI Build Week submission",
+      "next_action": "Monitor the existing Devpost account and official email for organizer or judging requests. Do not resubmit or claim selection or award.",
+      "organization": "OpenAI Build Week via Devpost",
+      "portfolio_domain": "VENTURE_AND_AWARD",
+      "primary_receipt_source_id": "openai_build_week_confirmation",
+      "receipt_class": "OFFICIAL_SUBMISSION_CONFIRMATION_EMAIL",
+      "record_id": "external::openai_build_week_prooflock_console"
+    },
+    {
+      "action_key": "application::lvlup_first_check_fund",
+      "category": "USER_REPORTED_APPLICATION_NO_PORTAL_RECEIPT",
+      "channel": "EXTERNAL_APPLICATION_AND_EMAIL_THREAD",
+      "claim_boundary": "The record supports a user-reported application update and contact acknowledgment only. It is not a portal receipt and does not prove application completeness, review, selection, investment, funding, valuation, or endorsement.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "USER_REPORTED_APPLICATION_ACKNOWLEDGED_NO_PORTAL_RECEIPT",
+          "pointer": "/status",
+          "source_id": "lvlup_first_check_state"
+        },
+        {
+          "expected": false,
+          "pointer": "/evidence/official_portal_receipt_observed",
+          "source_id": "lvlup_first_check_state"
+        }
+      ],
+      "evidence_source_ids": [
+        "lvlup_first_check_state"
+      ],
+      "lane_id": "lvlup_first_check_fund_application",
+      "lifecycle_state": "APPLICATION_REPORTED_ACKNOWLEDGED_INBOUND_ONLY",
+      "name": "LvlUp Ventures First Check Fund application",
+      "next_action": "Monitor the existing thread for a substantive request or decision. Do not submit another application or send another proactive follow-up.",
+      "organization": "LvlUp Ventures",
+      "portfolio_domain": "VENTURE_AND_AWARD",
+      "primary_receipt_source_id": "lvlup_first_check_state",
+      "receipt_class": "USER_REPORTED_APPLICATION_WITH_CONTACT_ACKNOWLEDGMENT",
+      "record_id": "external::lvlup_first_check_fund_application"
+    },
+    {
+      "action_key": "submission::dla26bz03_nv011_missionweave",
+      "category": "NOT_SUBMITTED_CLOSED",
+      "channel": "DSIP_PORTAL",
+      "claim_boundary": "The official DLA response records the DSIP proposal as In Progress and not formally submitted after the deadline. It proves the negative submission state only; it does not establish eligibility, compliance, acceptance, award, contract, funding, or authority to revive the expired route.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "OFFICIAL_DLA_CONFIRMED_PROPOSAL_IN_PROGRESS_NOT_SUBMITTED",
+          "pointer": "/status",
+          "source_id": "dla_dsip_official_non_submission_receipt"
+        },
+        {
+          "expected": "IN_PROGRESS",
+          "pointer": "/evidence/portal_status",
+          "source_id": "dla_dsip_official_non_submission_receipt"
+        },
+        {
+          "expected": false,
+          "pointer": "/evidence/formally_submitted",
+          "source_id": "dla_dsip_official_non_submission_receipt"
+        },
+        {
+          "expected": false,
+          "pointer": "/evidence/submission_receipt_observed",
+          "source_id": "dla_dsip_official_non_submission_receipt"
+        },
+        {
+          "expected": true,
+          "pointer": "/evidence/deadline_elapsed",
+          "source_id": "dla_dsip_official_non_submission_receipt"
+        }
+      ],
+      "evidence_source_ids": [
+        "dla_dsip_official_non_submission_receipt",
+        "missionweave_action_gate"
+      ],
+      "lane_id": "dla26bz03_nv011_missionweave",
+      "lifecycle_state": "NOT_SUBMITTED_DEADLINE_PASSED",
+      "name": "DLA26BZ03-NV011 MissionWeave proposal",
+      "next_action": "Keep the route closed unless an official reopening or amendment creates a new opportunity. Preserve reusable work without claiming submission.",
+      "organization": "Defense Logistics Agency",
+      "portfolio_domain": "GOVERNMENT_FUNDING_QUEUE",
+      "primary_receipt_source_id": "dla_dsip_official_non_submission_receipt",
+      "receipt_class": "OFFICIAL_DLA_NON_SUBMISSION_EMAIL_STATE",
+      "record_id": "external::dla26bz03_nv011_missionweave"
+    },
+    {
+      "action_key": "followup::lanl_vision_licensing::1",
+      "category": "EXTERNAL_COMMUNICATION_RECORDED",
+      "channel": "EMAIL",
+      "claim_boundary": "The privacy-safe full-thread send state proves only that one bounded follow-up was transmitted and that no later inbound message was observed at reconciliation time. It does not establish receipt, endorsement, licensing, evaluation, funding, deployment, validation, or contract performance.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "SENT",
+          "pointer": "/delivery_state",
+          "source_id": "lanl_followup_sent_state"
+        },
+        {
+          "expected": 0,
+          "pointer": "/inbound_after_followup_count",
+          "source_id": "lanl_followup_sent_state"
+        },
+        {
+          "expected": 1,
+          "pointer": "/proactive_followup_count",
+          "source_id": "lanl_followup_sent_state"
+        },
+        {
+          "expected": 1,
+          "pointer": "/max_proactive_followups",
+          "source_id": "lanl_followup_sent_state"
+        },
+        {
+          "expected": true,
+          "pointer": "/duplicate_send_blocked",
+          "source_id": "lanl_followup_sent_state"
+        }
+      ],
+      "evidence_source_ids": [
+        "lanl_followup_sent_state"
+      ],
+      "lane_id": "lanl_vision_licensing_followup",
+      "lifecycle_state": "BOUNDED_FOLLOWUP_SENT_RESPONSE_PENDING_INBOUND_ONLY",
+      "name": "LANL VISION bounded follow-up allowance",
+      "next_action": "Monitor the existing thread and respond only to a specific inbound request. The single proactive follow-up allowance is exhausted; do not send again.",
+      "organization": "Los Alamos National Laboratory",
+      "portfolio_domain": "AGREEMENT_AND_LICENSING",
+      "primary_receipt_source_id": "lanl_followup_sent_state",
+      "receipt_class": "PRIVACY_SAFE_FULL_THREAD_SEND_STATE",
+      "record_id": "external::lanl_vision_bounded_followup_1"
+    },
+    {
+      "action_key": "followup::lvlup_warm_investor_intro::1",
+      "category": "EXTERNAL_COMMUNICATION_RECORDED",
+      "channel": "EMAIL",
+      "claim_boundary": "The hash-only sent-message receipt proves one outbound warm-introduction follow-up. It does not prove receipt, an introduction, endorsement, investment, funding, selection, or an award.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "SENT",
+          "pointer": "/receipts/0/delivery_state",
+          "source_id": "lvlup_outreach_send_state"
+        },
+        {
+          "expected": "WARM_INVESTOR_INTRO_REQUEST",
+          "pointer": "/receipts/0/template_id",
+          "source_id": "lvlup_outreach_send_state"
+        }
+      ],
+      "evidence_source_ids": [
+        "lvlup_outreach_send_state"
+      ],
+      "lane_id": "lvlup_warm_investor_intro",
+      "lifecycle_state": "OUTBOUND_FOLLOWUP_SENT_MONITOR_ONLY",
+      "name": "LvlUp warm investor-introduction follow-up",
+      "next_action": "Monitor the existing thread for a substantive introduction or question. Do not send another proactive introduction follow-up.",
+      "organization": "LvlUp Ventures",
+      "portfolio_domain": "VENTURE_AND_AWARD",
+      "primary_receipt_pointer": "/receipts/0",
+      "primary_receipt_source_id": "lvlup_outreach_send_state",
+      "receipt_class": "HASHED_GMAIL_SENT_RECEIPT",
+      "record_id": "external::lvlup_warm_investor_intro_followup_1"
+    },
+    {
+      "action_key": "response::lvlup_application_review_status::1",
+      "category": "EXTERNAL_COMMUNICATION_RECORDED",
+      "channel": "EMAIL",
+      "claim_boundary": "The observed LvlUp reply records that the application is active and remains under review, with no additional materials requested. It does not establish application completeness, diligence, selection, endorsement, investment, funding, valuation, an award, or any outcome or decision date.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "SENT",
+          "pointer": "/receipts/1/delivery_state",
+          "source_id": "lvlup_outreach_send_state"
+        },
+        {
+          "expected": "FUNDING_REVIEW_STATUS_CHECK",
+          "pointer": "/receipts/1/template_id",
+          "source_id": "lvlup_outreach_send_state"
+        },
+        {
+          "expected": "APPLICATION_ACTIVE_COMMITTEE_REVIEW_NO_ADDITIONAL_MATERIALS",
+          "pointer": "/status",
+          "source_id": "lvlup_application_review_status_response"
+        },
+        {
+          "expected": true,
+          "pointer": "/evidence/application_active",
+          "source_id": "lvlup_application_review_status_response"
+        },
+        {
+          "expected": false,
+          "pointer": "/evidence/additional_materials_requested",
+          "source_id": "lvlup_application_review_status_response"
+        },
+        {
+          "expected": false,
+          "pointer": "/action/email_reply_required",
+          "source_id": "lvlup_application_review_status_response"
+        }
+      ],
+      "evidence_source_ids": [
+        "lvlup_outreach_send_state",
+        "lvlup_application_review_status_response"
+      ],
+      "lane_id": "lvlup_application_review_status",
+      "lifecycle_state": "APPLICATION_ACTIVE_COMMITTEE_REVIEW_INBOUND_ONLY",
+      "name": "LvlUp application review-status reply",
+      "next_action": "Monitor the existing thread for a substantive request or decision. Do not reply now and do not send additional materials unless LvlUp specifically requests them.",
+      "organization": "LvlUp Ventures",
+      "portfolio_domain": "VENTURE_AND_AWARD",
+      "primary_receipt_source_id": "lvlup_application_review_status_response",
+      "receipt_class": "OFFICIAL_APPLICATION_STATUS_EMAIL_STATE",
+      "record_id": "external::lvlup_application_review_status_followup_1"
+    },
+    {
+      "action_key": "outreach::third_sphere_seedstrap_direct_review::1",
+      "category": "EXTERNAL_COMMUNICATION_RECORDED",
+      "channel": "EMAIL",
+      "claim_boundary": "The hash-only sent-message receipt records one outbound public-safe investor-review request. It does not prove receipt, application submission, review, eligibility, endorsement, diligence, investment, funding, valuation, selection, or an award.",
+      "duplicate_action_blocked": true,
+      "evidence_assertions": [
+        {
+          "expected": "SENT",
+          "pointer": "/receipt/delivery_state",
+          "source_id": "third_sphere_outreach_send_state"
+        },
+        {
+          "expected": "DIRECT_INVESTOR_REVIEW_REQUEST",
+          "pointer": "/receipt/template_id",
+          "source_id": "third_sphere_outreach_send_state"
+        }
+      ],
+      "evidence_source_ids": [
+        "third_sphere_outreach_send_state"
+      ],
+      "lane_id": "third_sphere_seedstrap_direct_review",
+      "lifecycle_state": "INITIAL_PUBLIC_SAFE_REVIEW_REQUEST_SENT_MONITOR_ONLY",
+      "name": "Third Sphere Seedstrap initial review request",
+      "next_action": "Monitor the existing thread for a substantive response or official application instruction. Do not send another proactive initial request.",
+      "organization": "Third Sphere",
+      "portfolio_domain": "VENTURE_AND_AWARD",
+      "primary_receipt_pointer": "/receipt",
+      "primary_receipt_source_id": "third_sphere_outreach_send_state",
+      "receipt_class": "HASHED_GMAIL_SENT_RECEIPT",
+      "record_id": "external::third_sphere_seedstrap_initial_review_request_1"
+    }
+  ],
+  "schema": "lumencore.portfolio_external_action_ledger_config.v1",
+  "snapshot_utc": "2026-07-29T01:54:02Z",
+  "sources": [
+    {
+      "authority": "Configured central grant packet queue. It is a local workflow index, not an official opportunity or submission record.",
+      "kind": "grant_queue",
+      "path": "out/grants/_queue/index.json",
+      "source_id": "grant_queue_index"
+    },
+    {
+      "authority": "Current local reconciliation of controlled external engagement lanes and duplicate-send decisions.",
+      "kind": "engagement_register",
+      "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.json",
+      "source_id": "engagement_register"
+    },
+    {
+      "authority": "Privacy-safe official inbound event register with message content, meeting credentials, and private identifiers omitted.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/OFFICIAL_INBOUND_STATUS_EVENT_REGISTER_2026-07-25.json",
+      "source_id": "official_inbound_status_event_register"
+    },
+    {
+      "authority": "Privacy-safe Argos partner-inquiry sent-copy status with no message content or private mailbox identifiers.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
+      "source_id": "argos_partner_outreach_status"
+    },
+    {
+      "authority": "Privacy-safe Project Argos Government submission status with sent-copy verification, hash-only dispatch details, and the automatic reply classified as non-substantive.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/ARGOS_GOVERNMENT_SUBMISSION_STATUS_2026-07-28.json",
+      "source_id": "argos_government_submission_status"
+    },
+    {
+      "authority": "Observed Nashville Entrepreneur Center portal confirmation record.",
+      "kind": "json",
+      "path": "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json",
+      "source_id": "nashville_submission_receipt"
+    },
+    {
+      "authority": "Read-back record of the outbound DARPA market-research response.",
+      "kind": "json",
+      "path": "grant_submissions/DARPA_SN_26_97/DARPA_SN_26_97_SUBMISSION_RECEIPT_2026-07-17.json",
+      "source_id": "darpa_submission_receipt"
+    },
+    {
+      "authority": "MissionWeave action gate preserving the not-ready and not-submitted state.",
+      "kind": "json",
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "source_id": "missionweave_action_gate"
+    },
+    {
+      "authority": "Privacy-safe official DLA response confirming that the DSIP proposal remained In Progress and was not formally submitted before the deadline.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/DLA_DSIP_OFFICIAL_NON_SUBMISSION_RECEIPT_2026-07-28.json",
+      "source_id": "dla_dsip_official_non_submission_receipt"
+    },
+    {
+      "authority": "Read-back receipt containing separately identified Army and NASA outbound submissions.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_SUBMISSION_RECEIPT_2026-07-13.json",
+      "source_id": "external_submission_receipt"
+    },
+    {
+      "authority": "Public-safe EPRI signing-state record derived from the official request, user action report, and observed post-sign finish screen.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_SIGNING_STATE_2026-07-23.json",
+      "source_id": "epri_signing_state"
+    },
+    {
+      "authority": "Hash-only full-thread LANL mailbox recheck receipt with no reply observed after the source package.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_MAILBOX_RECHECK_RECEIPT_2026-07-23.json",
+      "source_id": "lanl_mailbox_recheck"
+    },
+    {
+      "authority": "Privacy-safe full-thread state confirming that the single bounded LANL follow-up was sent and the proactive allowance is exhausted.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_BOUNDED_FOLLOWUP_SENT_STATE_2026-07-29.json",
+      "source_id": "lanl_followup_sent_state"
+    },
+    {
+      "authority": "Public-safe state record derived from the official Devpost submission confirmation email.",
+      "kind": "json",
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_CONFIRMATION_STATE_2026-07-21.json",
+      "source_id": "openai_build_week_confirmation"
+    },
+    {
+      "authority": "Public-safe LvlUp application state distinguishing a user report and contact acknowledgment from a portal receipt.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/LVLUP_FIRST_CHECK_FUND_APPLICATION_STATE_2026-07-23.json",
+      "source_id": "lvlup_first_check_state"
+    },
+    {
+      "authority": "Hash-only sent-message state for one warm-introduction follow-up and one application-status check, with private Gmail identifiers and message content omitted.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/LVLUP_OUTREACH_SEND_STATE_2026-07-23.json",
+      "source_id": "lvlup_outreach_send_state"
+    },
+    {
+      "authority": "Privacy-safe state derived from the official LvlUp reply confirming that the application is active and remains under review, with no additional materials requested.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/LVLUP_APPLICATION_REVIEW_STATUS_RESPONSE_STATE_2026-07-23.json",
+      "source_id": "lvlup_application_review_status_response"
+    },
+    {
+      "authority": "Hash-only sent-message state for one public-safe Third Sphere Seedstrap review request, with the recipient address, Gmail identifiers, subject, and body omitted.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/THIRD_SPHERE_SEEDSTRAP_OUTREACH_SEND_STATE_2026-07-23.json",
+      "source_id": "third_sphere_outreach_send_state"
+    },
+    {
+      "authority": "Hash-only quarantine state for unsent Gmail drafts that conflict with inbound-only or exhausted follow-up controls.",
+      "kind": "json",
+      "path": "grant_submissions/funding_sprint_20260709/OUTREACH_DRAFT_QUARANTINE_STATE_2026-07-23.json",
+      "source_id": "outreach_draft_quarantine_state"
+    }
+  ],
+  "title": "LumenCore Portfolio External Action Ledger"
+}

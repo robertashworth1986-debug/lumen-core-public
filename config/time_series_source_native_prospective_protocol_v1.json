@@ -159,6 +159,31 @@
       "No retrospective result can become confirmatory after inspection."
     ]
   },
+  "freeze_amendments": [
+    {
+      "amendment_id": "REPORTING_COVERAGE_METADATA_20260729_01",
+      "amended_utc": "2026-07-29T14:58:51Z",
+      "pre_amendment_protocol_payload_sha256": "1ae3e105d3cf636dfd2527a6d8d3cde152997eda3aa49449c7b65939f8d93c66",
+      "artifact_path": "code/ops/BUILD_SOURCE_NATIVE_FAMILY_BASELINE_LEDGER.py",
+      "prior_artifact_sha256": "a917d02cc773de754a9e038dba3f13370f58956128fe0f398ba2a0c289c6a25c",
+      "amended_artifact_sha256": "33613b821b1e57e92a50a70438753151f26a634772836e8c530a01721723dd61",
+      "change_class": "NON_SCORING_REPORTING_AND_COVERAGE_METADATA_ONLY",
+      "change_scope": [
+        "per-source native baseline coverage matrix",
+        "missing direct-lane adapter expansion queue",
+        "live-breadth versus benchmark registry separation",
+        "reviewer-facing markdown tables and next-action text"
+      ],
+      "eligible_future_observation_count_at_amendment": 0,
+      "outcome_dependent_change": false,
+      "candidate_selection_changed": false,
+      "registered_baselines_changed": false,
+      "primary_endpoint_changed": false,
+      "sample_gates_changed": false,
+      "decision_rule_changed": false,
+      "claim_boundary": "This amendment records non-scoring reporting additions made before any eligible post-freeze observation. It does not reopen candidate selection, baseline selection, endpoint design, sample gates, stopping rules, or promotion criteria."
+    }
+  ],
   "frozen_artifacts": [
     {
       "path": "code/geometry_time_series_model_routing_benchmark.py",
@@ -170,7 +195,7 @@
     },
     {
       "path": "code/ops/BUILD_SOURCE_NATIVE_FAMILY_BASELINE_LEDGER.py",
-      "sha256": "a917d02cc773de754a9e038dba3f13370f58956128fe0f398ba2a0c289c6a25c"
+      "sha256": "33613b821b1e57e92a50a70438753151f26a634772836e8c530a01721723dd61"
     },
     {
       "path": "code/ops/BUILD_GEOMETRY_LIVE_WIRING_MATRIX.py",
@@ -190,5 +215,5 @@
     "live_execution_allowed": false
   },
   "claim_boundary": "A future complete pass would support only bounded prospective forecasting accuracy for the named sources, series, horizons, and periods. It would not establish trading alpha, operational field performance, realized savings, enterprise value, universal superiority, or deployment authority.",
-  "protocol_payload_sha256": "1ae3e105d3cf636dfd2527a6d8d3cde152997eda3aa49449c7b65939f8d93c66"
+  "protocol_payload_sha256": "980ebaa821212965bffe04334df8c19f1a03e12acac7d9d04f38f21f03b0e1e5"
 }

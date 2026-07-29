@@ -1,7 +1,7 @@
 # Pitch Deck Governance
 
 - Status: `GOVERNED_CURRENT_DECK_WITH_ARCHIVED_LEGACY`
-- As of: `2026-07-29T13:51:18.873538Z`
+- As of: `2026-07-29T15:01:11.693460Z`
 - Registered PPTX files: `29`
 - Current PDF companion: `1`
 - External release authorized: `false`
@@ -49,4 +49,4 @@ The current deck supports review of software, custody, benchmark design, and a b
 
 Use only the current review-required deck or its governed PDF companion after founder, recipient, and venue-specific review; this receipt does not authorize sending or publication.
 
-Control SHA-256: `314E1803E24E356454D4DEAC5E1A379229BDEB09B1995A6E2C675BC8681CE1DA`
+Control SHA-256: `2236714935B015F720DA348A6F23EA410329506338065EBB0AE9634A0654F73D`

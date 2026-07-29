@@ -142,6 +142,8 @@ def verify_ledger_hash(ledger: dict[str, Any]) -> bool:
         "source_baseline_route_ledger": ledger.get(
             "source_baseline_route_ledger"
         ),
+        "source_coverage_matrix": ledger.get("source_coverage_matrix"),
+        "adapter_expansion_queue": ledger.get("adapter_expansion_queue"),
     }
     encoded = json.dumps(material, sort_keys=True, default=str).encode("utf-8")
     return expected == hashlib.sha256(encoded).hexdigest()

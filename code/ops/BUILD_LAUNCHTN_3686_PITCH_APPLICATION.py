@@ -9,29 +9,40 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "grant_submissions" / "LAUNCHTN_3686_PITCH_2026"
-OUT_JSON = OUT_DIR / "LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json"
-OUT_MD = OUT_DIR / "LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-17.md"
-PITCH_DECK_PATH = OUT_DIR / "LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx"
+OUT_JSON = OUT_DIR / "LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-29.json"
+OUT_MD = OUT_DIR / "LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-29.md"
+PITCH_DECK_PATH = (
+    ROOT
+    / "output"
+    / "pptx"
+    / "LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx"
+)
 FINANCIAL_MODEL_PATH = OUT_DIR / "LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx"
 
 FORM_URL = "https://airtable.com/app6GRZNbU72OmaK1/pagudvfO1hH7SmzBl/form"
 INVESTTN_URL = "https://investtn.org/"
 
 SOURCE_ARTIFACTS = {
-    "business_plan": ROOT / "docs" / "LUMENCORE_BUSINESS_PLAN_INVESTOR_READY_UPDATED_2026-07-03.md",
-    "current_proof_state": ROOT / "docs" / "CURRENT_LUMA_PROOF_STATE_2026-06-25.md",
-    "epri_receipt": ROOT
-    / "grant_submissions"
-    / "funding_sprint_20260709"
-    / "EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json",
+    "current_source_native_whitepaper": ROOT
+    / "docs"
+    / "LUMENCORE_SOURCE_NATIVE_BENCHMARK_WHITEPAPER_CURRENT.md",
+    "current_family_ledger": ROOT
+    / "out"
+    / "ops"
+    / "source_native_family_baseline_ledger_latest.json",
+    "current_market_benchmark": ROOT
+    / "out"
+    / "ops"
+    / "market_signal_source_native_benchmark_latest.json",
+    "pitch_deck_governance": ROOT
+    / "out"
+    / "ops"
+    / "pitch_deck_governance_latest.json",
+    "application_refresh": OUT_DIR / "LAUNCHTN_3686_APPLICATION_REFRESH_2026-07-29.md",
     "lanl_receipt": ROOT
     / "grant_submissions"
     / "funding_sprint_20260709"
     / "LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
-    "existing_pitch_deck": ROOT
-    / "grant_submissions"
-    / "funding_sprint_20260709"
-    / "LUMENCORE_PITCH_DECK_SEND_READY_2026-07-09.pptx",
 }
 
 COMPANY_STRUCTURE_OPTIONS = (
@@ -126,13 +137,12 @@ PROBLEM_AND_CUSTOMER = (
 )
 
 REVENUE_MODEL = (
-    "Planned, not yet realized: organizations would pay a one-time $5,000-$10,000 fee for a "
-    "scoped evidence-review sprint, $20,000-$50,000 for a buyer-controlled historical replay "
-    "pilot, and $60,000-$150,000 per year for software, evidence hosting, and validation "
-    "support after independent validation. Exact scope and pricing remain founder-approval "
-    "assumptions in the financial model. Grant-funded validation and government R&D contracts "
-    "are complementary channels and are not counted as recurring software revenue. LumenCore "
-    "currently claims no revenue or signed customer."
+    "Planned, not yet realized: LumenCore uses a staged B2B model consisting of a scoped "
+    "technical evidence review, a buyer-controlled historical replay pilot, and software plus "
+    "verification support only after agreed acceptance gates pass. Grant-funded validation "
+    "and government R&D contracts are complementary channels rather than recurring software "
+    "revenue. No price, raise amount, forecast, booked revenue, or signed customer is approved "
+    "in this packet; every commercial and financial assumption requires founder review."
 )
 
 GO_TO_MARKET = (
@@ -148,35 +158,44 @@ GO_TO_MARKET = (
 )
 
 ACHIEVEMENTS = (
-    "A working technical MVP and public reviewer surface exist, including locked "
+    "A working technical MVP and public reviewer surface exist with locked "
     "baseline-versus-candidate protocols, past-only evaluation, explicit abstention, "
-    "negative-result preservation, reproducible manifests, and hash-verifiable evidence "
-    "receipts. Internal replay experiments cover public energy and other time-series sources "
-    "with named baseline comparisons; these results remain internal evidence, not field or "
-    "independent validation. EPRI initiated an Open Power AI onboarding information exchange, "
-    "LANL received a bounded technical package, and federal capability responses have recorded "
-    "transmission receipts. These are engagement milestones, not endorsements, partnerships, "
-    "awards, or customer results. The next milestone is one independent reproduction and one "
-    "buyer-owned replay pilot with preregistered acceptance metrics."
+    "negative-result preservation, reproducible manifests, and hash-verifiable receipts. The "
+    "current source-native research ledger records 140 registered families, 35 implementations, "
+    "126 direct comparisons across 23 candidate-source cards, zero global Holm-positive "
+    "comparisons, and zero promoted champions. Those are local software and protocol results, "
+    "not field or independent validation. Outreach records prove bounded transmission only; "
+    "they do not prove receipt, endorsement, partnership, award, or customer traction. The next "
+    "milestone is one independent reproduction and one buyer-owned replay pilot with "
+    "preregistered acceptance metrics."
 )
 
 OPTIONAL_NOTE = (
-    "LumenCore is applying as a Tennessee-based, pre-revenue technical startup. Performance "
-    "results will remain labeled as internal until independently reproduced. The founder is "
-    "seeking disciplined help with customer focus, pricing, and conversion from reproducible "
-    "technical proof to the first paid buyer-controlled pilot."
+    "LumenCore is a pre-revenue technical project seeking disciplined help with customer focus "
+    "and conversion from reproducible local proof to a first paid buyer-controlled pilot. "
+    "Tennessee eligibility and every legal, employment, funding-history, pricing, and raise "
+    "statement remain subject to founder verification. Performance results remain labeled as "
+    "local until independently reproduced."
 )
 
 ATTACHMENT_QA = {
     "launchtn_pitch_deck": {
         "path": PITCH_DECK_PATH,
-        "expected_sha256": "c607e94d8e072ec9d9f93da0d8c372fd5592b01d2ca3b4f71c0a079417c18a69",
-        "qa_date": "2026-07-17",
+        "expected_sha256": "4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a",
+        "qa_date": "2026-07-29",
         "qa_checks": [
-            "11-slide application-specific narrative",
+            "11-slide governed current evidence-to-pilot narrative",
             "Every slide visually inspected at original render resolution",
             "slides_test.py passed with no overflow detected",
-            "Claims separated into current evidence and outside-validation gates",
+            "Current evidence counts and negative results preserved",
+        ],
+        "blocked_status": "CURRENT_DECK_VENUE_COVERAGE_AND_FOUNDER_REVIEW_REQUIRED",
+        "missing_requirements": [
+            "LaunchTN-specific competitive landscape",
+            "business model and go-to-market framing",
+            "customer profile",
+            "founder-approved raise ask",
+            "founding-team and Tennessee eligibility facts",
         ],
     },
     "launchtn_financial_model": {
@@ -189,6 +208,12 @@ ATTACHMENT_QA = {
             "All model check cells passed",
             "Formula-error scan returned zero matches",
             "Every sheet visually inspected after layout repair",
+        ],
+        "blocked_status": "PLANNING_MODEL_ARITHMETIC_QA_ONLY_FOUNDER_ASSUMPTION_APPROVAL_REQUIRED",
+        "missing_requirements": [
+            "founder approval of every pricing assumption",
+            "founder approval of raise and use-of-funds assumptions",
+            "actual-versus-planning labels on all revenue, customer, hiring, margin, and cash rows",
         ],
     },
 }
@@ -245,7 +270,7 @@ def build_attachment_record(
     elif not qa_hash_matches:
         status = "ATTACHMENT_CHANGED_REVIEW_AND_QA_REQUIRED"
     else:
-        status = "QA_PASSED_FOUNDER_APPROVAL_REQUIRED"
+        status = qa["blocked_status"]
     record: dict[str, Any] = {
         "id": attachment_id,
         "portal_requirement": portal_requirement,
@@ -255,6 +280,9 @@ def build_attachment_record(
         "qa_date": qa["qa_date"],
         "qa_checks": list(qa["qa_checks"]),
         "status": status,
+        "structural_qa_passed": qa_hash_matches,
+        "safe_to_upload": False,
+        "missing_requirements": list(qa["missing_requirements"]),
         "founder_approval_required": True,
     }
     if source_candidate is not None:
@@ -293,7 +321,14 @@ def field(
 
 
 FIELDS = [
-    field("company_name", "Company Name", True, "LumenCore"),
+    field(
+        "company_name",
+        "Company Name",
+        True,
+        "[ENTER VERIFIED LEGAL ENTITY OR APPROVED TRADE NAME AS THE FORM REQUIRES]",
+        "HUMAN_CONFIRM_REQUIRED",
+        evidence="Current legal entity record and portal naming instruction required",
+    ),
     field("founder_names", "Founder(s) Name(s)", True, "Robert Ashworth"),
     field(
         "founder_phone",
@@ -326,8 +361,22 @@ FIELDS = [
         "PRIVATE_PORTAL_ENTRY",
         evidence="Founder-controlled legal or business address record",
     ),
-    field("company_city", "Company City", True, "Nashville"),
-    field("company_state", "Company State", True, "TN"),
+    field(
+        "company_city",
+        "Company City",
+        True,
+        "[ENTER CITY THAT MATCHES THE VERIFIED HEADQUARTERS ADDRESS]",
+        "HUMAN_CONFIRM_REQUIRED",
+        evidence="Must match the private headquarters address entered in the portal",
+    ),
+    field(
+        "company_state",
+        "Company State",
+        True,
+        "[ENTER STATE THAT MATCHES THE VERIFIED HEADQUARTERS ADDRESS]",
+        "HUMAN_CONFIRM_REQUIRED",
+        evidence="Must match the private headquarters address entered in the portal",
+    ),
     field(
         "company_zip",
         "Company Zip Code",
@@ -470,17 +519,17 @@ FIELDS = [
         "pitch_deck",
         "Pitch Deck",
         True,
-        "[ATTACH HASH-VERIFIED LAUNCHTN-SPECIFIC DECK AFTER FOUNDER REVIEW]",
-        "ATTACHMENT_QA_PASSED_FOUNDER_APPROVAL_REQUIRED",
-        evidence="Application-specific deck passed content, visual, and overflow QA",
+        "[NO SAFE UPLOAD YET: BUILD AND REVIEW A CURRENT LAUNCHTN-SPECIFIC DECK]",
+        "CURRENT_DECK_VENUE_COVERAGE_AND_FOUNDER_REVIEW_REQUIRED",
+        evidence="The governed current deck is structurally clean but lacks required venue-specific content",
     ),
     field(
         "financials",
         "Upload attachments that contain information about your financials",
         True,
-        "[ATTACH HASH-VERIFIED FORMULA-DRIVEN MODEL AFTER FOUNDER REVIEW]",
-        "ATTACHMENT_QA_PASSED_FOUNDER_APPROVAL_REQUIRED",
-        evidence="Formula-driven model includes pricing, COGS, gross margin, and five-year projections",
+        "[NO SAFE UPLOAD YET: APPROVE AND RELABEL EVERY PLANNING ASSUMPTION]",
+        "PLANNING_MODEL_ARITHMETIC_QA_ONLY_FOUNDER_ASSUMPTION_APPROVAL_REQUIRED",
+        evidence="The formula-driven model passes arithmetic checks but its business assumptions are unapproved",
     ),
     field(
         "other_attachment",
@@ -494,6 +543,7 @@ FIELDS = [
         "(Optional) Anything else you would like us to know?",
         False,
         OPTIONAL_NOTE,
+        "OPTIONAL_HOLD_UNTIL_ELIGIBILITY_CONFIRMED",
         evidence="Current claim boundary and commercialization need",
     ),
 ]
@@ -505,7 +555,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         build_attachment_record(
             attachment_id="launchtn_pitch_deck",
             portal_requirement="Competitive landscape, business model, go-to-market, customer profiles, raise ask, and founding team",
-            source_candidate=rel(SOURCE_ARTIFACTS["existing_pitch_deck"]),
+            source_candidate=rel(PITCH_DECK_PATH),
         ),
         build_attachment_record(
             attachment_id="launchtn_financial_model",
@@ -523,11 +573,11 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         if attachment_id is None:
             continue
         attachment = attachment_by_id[attachment_id]
-        if attachment["status"] != "QA_PASSED_FOUNDER_APPROVAL_REQUIRED":
-            row["status"] = attachment["status"]
+        row["status"] = attachment["status"]
         row["proposed_answer"] = (
-            f"Attach {attachment['path']} after founder review; SHA-256 "
-            f"{attachment['sha256'] or '[missing]'}."
+            f"Do not attach yet. Candidate {attachment['path']} is present with SHA-256 "
+            f"{attachment['sha256'] or '[missing]'}, but remains blocked by: "
+            f"{'; '.join(attachment['missing_requirements'])}."
         )
 
     status_counts: dict[str, int] = {}
@@ -545,7 +595,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "industry_sectors": list(SECTOR_OPTIONS),
     }
     payload: dict[str, Any] = {
-        "schema": "lumencore.launchtn_3686_pitch_application.v1",
+        "schema": "lumencore.launchtn_3686_pitch_application.v2",
         "generated_utc": generated_utc or now_utc(),
         "opportunity": {
             "name": "3686 Pitch Competition 2026, presented by Amazon",
@@ -558,7 +608,10 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "form_url": FORM_URL,
             "formal_investtn_application": False,
             "investtn_url": INVESTTN_URL,
-            "portal_schema_status": "OBSERVED_WITHOUT_SAVE_OR_SUBMIT_2026-07-17",
+            "portal_schema_status": (
+                "FORM_OPEN_DEADLINE_AND_UPLOAD_FIELDS_RECHECKED_2026-07-29_"
+                "FULL_SCHEMA_AND_ATTESTATIONS_REQUIRE_LIVE_REVIEW"
+            ),
             "eligibility_fit": "POTENTIAL_TENNESSEE_STARTUP_FIT_REQUIRES_FOUNDER_ATTESTATION",
         },
         "summary": {
@@ -583,8 +636,17 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
                 row["present"] for row in required_attachments
             ),
             "required_attachments_qa_passed": sum(
-                row["status"] == "QA_PASSED_FOUNDER_APPROVAL_REQUIRED"
+                row["safe_to_upload"]
                 for row in required_attachments
+            ),
+            "required_attachments_structural_qa_passed": sum(
+                row["structural_qa_passed"] for row in required_attachments
+            ),
+            "required_attachments_safe_to_upload": sum(
+                row["safe_to_upload"] for row in required_attachments
+            ),
+            "upload_set_ready": all(
+                row["safe_to_upload"] for row in required_attachments
             ),
             "final_submit_allowed_without_human": False,
         },
@@ -593,14 +655,17 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
         "required_attachments": required_attachments,
         "human_fact_gate": [
             "Enter private founder email, optional phone, company street address, and ZIP only in the authenticated portal.",
-            "Verify headquarters county against the submitted private address.",
+            "Verify legal company name, headquarters city, state, county, and ZIP against the submitted private address.",
             "Verify legal formation year and entity structure.",
             "Attest which Tennessee statutory eligibility statement is true.",
             "Verify the full-time employee count under the portal's definition.",
             "Confirm whether any LaunchTN capital has ever been received.",
-            "Approve the planned pricing ranges, raise ask, and financial-model assumptions.",
-            "Review both required attachments and the final portal preview before submission.",
+            "Approve or replace every pricing, raise, revenue, customer, hiring, margin, and cash assumption.",
+            "Build and visually review a LaunchTN-specific deck that covers every requested topic.",
+            "Recheck the live portal schema, file limits, terms, and attestations.",
+            "Review both required attachments and the complete final portal preview before submission.",
         ],
+        "safe_upload_set": [],
         "source_artifacts": {
             name: artifact_status(path) for name, path in SOURCE_ARTIFACTS.items()
         },
@@ -611,9 +676,16 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "permission to submit without a founder-reviewed final preview."
         ),
         "final_action_gate": {
-            "status": "HUMAN_FACTS_FOUNDER_APPROVAL_AND_FINAL_PREVIEW_REQUIRED",
+            "status": (
+                "PORTAL_FACTS_VENUE_DECK_FINANCIAL_APPROVAL_AND_"
+                "FINAL_PREVIEW_REQUIRED"
+            ),
             "submit_allowed_without_human": False,
-            "action": "Resolve founder facts, approve pricing and funding assumptions, attach the hash-verified QA-passed files, review the live final preview, then submit before the verified deadline.",
+            "action": (
+                "Resolve founder and eligibility facts, rebuild the venue-specific deck, "
+                "approve or replace every financial assumption, recheck the live portal, "
+                "and stop at the complete final preview for action-time founder review."
+            ),
         },
     }
     payload["application_packet_sha256"] = stable_sha256(payload)
@@ -631,10 +703,14 @@ def validate_payload(payload: dict[str, Any]) -> None:
         payload["required_attachments"]
     ):
         raise ValueError("LaunchTN attachment gate count is inconsistent")
-    if payload["summary"]["required_attachments_qa_passed"] != len(
+    if payload["summary"]["required_attachments_structural_qa_passed"] != len(
         payload["required_attachments"]
     ):
-        raise ValueError("One or more LaunchTN attachments is missing or differs from its QA hash")
+        raise ValueError("One or more LaunchTN attachment candidates failed structural QA")
+    if payload["summary"]["required_attachments_safe_to_upload"] != 0:
+        raise ValueError("LaunchTN attachment candidates must remain fail-closed")
+    if payload["summary"]["upload_set_ready"] or payload["safe_upload_set"]:
+        raise ValueError("LaunchTN safe upload set must remain empty until gates pass")
     if payload["summary"]["final_submit_allowed_without_human"]:
         raise ValueError("LaunchTN final submit must remain human-gated")
 
@@ -642,7 +718,7 @@ def validate_payload(payload: dict[str, Any]) -> None:
 def render_markdown(payload: dict[str, Any]) -> str:
     opportunity = payload["opportunity"]
     lines = [
-        "# Launch Tennessee 3686 Pitch Competition 2026 Portal Field Map",
+        "# Launch Tennessee 3686 Pitch Competition 2026 Current Portal Field Map",
         "",
         f"Generated UTC: `{payload['generated_utc']}`",
         "",
@@ -654,6 +730,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- This is not the formal InvestTN investment application.",
         f"- Eligibility: `{opportunity['eligibility_fit']}`",
         f"- Packet SHA-256: `{payload['application_packet_sha256']}`",
+        f"- Safe upload set ready: `{str(payload['summary']['upload_set_ready']).lower()}`",
         "- Final submit without founder review: `false`",
         "",
         "## Portal Fields",
@@ -692,10 +769,13 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Bytes: `{attachment['bytes']}`",
                 f"- SHA-256: `{attachment['sha256']}`",
                 f"- QA hash matches: `{str(attachment['qa_hash_matches']).lower()}`",
+                f"- Structural QA passed: `{str(attachment['structural_qa_passed']).lower()}`",
+                f"- Safe to upload: `{str(attachment['safe_to_upload']).lower()}`",
                 f"- QA date: `{attachment['qa_date']}`",
                 f"- Portal requirement: {attachment['portal_requirement']}",
                 f"- Founder approval required: `{str(attachment['founder_approval_required']).lower()}`",
                 f"- QA checks: {'; '.join(attachment['qa_checks'])}",
+                f"- Missing requirements: {'; '.join(attachment['missing_requirements'])}",
                 "",
             ]
         )
