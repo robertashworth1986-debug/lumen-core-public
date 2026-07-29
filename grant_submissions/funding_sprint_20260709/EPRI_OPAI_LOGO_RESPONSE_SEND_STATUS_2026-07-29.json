@@ -1,0 +1,59 @@
+{
+  "schema": "lumencore.epri_opai_logo_response_send_status.v1",
+  "recorded_utc": "2026-07-29T19:46:14Z",
+  "lane_id": "epri_open_power_ai_mou",
+  "status": "SENT_ONCE_POST_SEND_VERIFIED_NO_DUPLICATE",
+  "authorization": {
+    "current_user_send_approval_received": true,
+    "fresh_full_thread_read_completed": true,
+    "exact_permitted_use_boundary_confirmed": true,
+    "fresh_duplicate_check_completed": true
+  },
+  "mailbox_observation": {
+    "matching_logo_attachment_sent_count_before_send": 0,
+    "matching_epri_attachment_sent_count_before_send": 0,
+    "sent_utc": "2026-07-29T19:45:31Z",
+    "post_send_sent_copy_verified": true,
+    "matching_logo_attachment_sent_count_after_send": 1,
+    "gmail_identifiers_omitted": true,
+    "recipient_addresses_omitted": true,
+    "message_body_omitted": true
+  },
+  "dispatch": {
+    "recipient_route_sha256": "9E955DCCBC108EEF22AB5AE52AEF5CA071CC42C02E464BE73A910B291FBC07AB",
+    "subject_sha256": "EB9AE6DE011FF4AB2FD2D764B4EAE8131F19554D943475165AB5DAE1A330749C",
+    "body_sha256": "64C6D7C17A7C0840496C8B2FE130B5DCCAECE19C7F7F87372E4EEF36C28E8C72",
+    "attachment_count": 2,
+    "cc_count": 1,
+    "bcc_count": 0,
+    "attachments": [
+      {
+        "filename": "lumencore_logo_on_dark_1024.png",
+        "file_bytes": 105408,
+        "sha256": "2829E259A38F1D3914F80A6A688F13CE0D80513278FCCF869D47FF77D270A62C"
+      },
+      {
+        "filename": "lumencore_logo_on_light_1024.png",
+        "file_bytes": 105988,
+        "sha256": "7B14DCF7BB72C78EAC7F73F6C0DA76E229CB8329040160FCC9FCFF4D3D2FE5E5"
+      }
+    ]
+  },
+  "permitted_use": {
+    "opai_member_presentations": true,
+    "opai_website": true,
+    "other_use_authorized": false,
+    "endorsement_implied": false,
+    "independent_validation_implied": false,
+    "performance_claim_implied": false
+  },
+  "controls": {
+    "single_send_only": true,
+    "duplicate_send_prohibited": true,
+    "additional_attachments_sent": false,
+    "contact_and_work_group_facts_repeated": false,
+    "external_action_performed": true
+  },
+  "next_action": "Do not resend the logo pair. Monitor the existing EPRI Open Power AI thread for acceptance, a formatting request, or a substantive consortium contribution request.",
+  "claim_boundary": "This receipt establishes only that one bounded EPRI Open Power AI logo reply was sent once and observed in Gmail SENT with the two allowlisted PNG files. It does not prove delivery, publication, endorsement, technical validation, funding, licensing beyond the recorded use, deployment, or award."
+}
