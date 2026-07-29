@@ -1,0 +1,169 @@
+{
+  "schema": "market_signal_kraken_panel_benchmark_protocol_v1",
+  "protocol_id": "LUMENCORE_MARKET_SIGNAL_KRAKEN_PANEL_20260729_V1",
+  "protocol_date": "2026-07-29",
+  "mode": "retrospective_development_paper_replay",
+  "purpose": "Repair the single-series evidence bottleneck by applying the already-registered market-signal candidates and baselines to a pre-scoring, turnover-ranked public Kraken panel.",
+  "evidence_boundary": "Exploratory retrospective paper/replay only. The panel was selected before this benchmark was scored, but it was not prospectively protected and its series share a common crypto-market regime. Results do not establish alpha, edge, profit, value, field performance, execution quality, independence, or live-trading authority.",
+  "base_implementation": {
+    "strategy_protocol_path": "config/market_signal_source_native_benchmark_protocol_v1.json",
+    "strategy_protocol_file_sha256": "aad9b860562674c2e5df5b11a8ffd34186abaf7884205a89cffec8f9f4bddad4",
+    "strategy_builder_path": "code/ops/BUILD_MARKET_SIGNAL_SOURCE_NATIVE_BENCHMARK.py",
+    "strategy_builder_file_sha256": "86e83bcf0cb7df0a33c250c09eadff4bb765032a0094687138b2e22e13ee1e3c",
+    "collector_path": "code/ops/collect_kraken_hourly_history.py",
+    "collector_file_sha256": "f8d4f30f5a9937c27e6dcb81747982002e2fb05f2615d50e58d439d82d7ea60e"
+  },
+  "collector_receipt": {
+    "path": "out/ops/kraken_history_collector_latest.json",
+    "file_sha256": "1ba19460d3bd4f25b7627eb75ccc5a8db715470a860a0d6ec63c5a6c8d94ac55",
+    "generated_utc": "2026-07-29T20:12:54.023470+00:00",
+    "scope": "kraken_hourly_history_collector",
+    "execution_authorized": false,
+    "interval_min": 60,
+    "pairs_discovered": 689,
+    "pairs_selected": 20,
+    "pairs_updated": 20,
+    "pair_errors": 0
+  },
+  "selection": {
+    "pre_scoring_rule": "Start with the collector's descending 24-hour-turnover list with the legacy alpha-priority file disabled; require a USD quote; exclude fiat and stablecoin base assets; keep one pair per base asset; preserve collector order.",
+    "candidate_or_baseline_scores_used_in_selection": false,
+    "legacy_alpha_priority_enabled": false,
+    "eligible_quote": "USD",
+    "excluded_base_assets": [
+      "EUR",
+      "GBP",
+      "USDC",
+      "USDT"
+    ],
+    "selected_pair_order": [
+      "USDT/USD",
+      "USDC/USD",
+      "BTC/USD",
+      "ETH/USD",
+      "EUR/USD",
+      "USDC/USDT",
+      "SOL/USD",
+      "XRP/USD",
+      "ADA/USD",
+      "BTC/USDT",
+      "HYPE/USD",
+      "SUI/USD",
+      "XMR/USD",
+      "LTC/USD",
+      "XMR/USDT",
+      "GBP/USD",
+      "DOGE/USD",
+      "ZEC/USD",
+      "ETH/USDT",
+      "TAO/USD"
+    ],
+    "panel": [
+      {
+        "pair": "BTC/USD",
+        "path": "data/kraken_hourly_history/ohlc_BTC_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 77329585.52,
+        "file_sha256": "094ddf65624d105817d33d0c3bc2bc2b09b26bbc357a355547d1840812eda8c5"
+      },
+      {
+        "pair": "ETH/USD",
+        "path": "data/kraken_hourly_history/ohlc_ETH_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 31514905.17,
+        "file_sha256": "27add38811efc4b2289e46c7a6036b9482b604a4ac96ea51fd1f3fa1d6180b9b"
+      },
+      {
+        "pair": "SOL/USD",
+        "path": "data/kraken_hourly_history/ohlc_SOL_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 13149769.76,
+        "file_sha256": "97de4210de9faba97c685276f12c434365238241a06726e73ea97080e8c5ba78"
+      },
+      {
+        "pair": "XRP/USD",
+        "path": "data/kraken_hourly_history/ohlc_XRP_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 12708145.04,
+        "file_sha256": "e8bd1260dac9f7e9dc1b1b82a65d48c28a157237cbc05a6d468570264e724758"
+      },
+      {
+        "pair": "ADA/USD",
+        "path": "data/kraken_hourly_history/ohlc_ADA_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 9587420.3,
+        "file_sha256": "8c64b379e47b005a6f47fde5f27651bd8a24b387ee2c3f379b7e1e940b06b88d"
+      },
+      {
+        "pair": "HYPE/USD",
+        "path": "data/kraken_hourly_history/ohlc_HYPE_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 4133959.2,
+        "file_sha256": "6e1a2f31817f07e5e01ffde77c3f36beacd4703d9e4ed04348489ac0daa35b1f"
+      },
+      {
+        "pair": "SUI/USD",
+        "path": "data/kraken_hourly_history/ohlc_SUI_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 3971845.21,
+        "file_sha256": "ee46394824a5a74b66de427c80ea78df7e405da6a1d707199cfc8d7e9b5cf7ae"
+      },
+      {
+        "pair": "XMR/USD",
+        "path": "data/kraken_hourly_history/ohlc_XMR_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 3961686.32,
+        "file_sha256": "4ba0d8d6ab1302bc20fad49890b62843c05f17840748de0947c147ffff486350"
+      },
+      {
+        "pair": "LTC/USD",
+        "path": "data/kraken_hourly_history/ohlc_LTC_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 3342632.5,
+        "file_sha256": "ed3219eb7975dcaf822356ca382d03d183b78e03f23c8447446b7badc632ddcf"
+      },
+      {
+        "pair": "DOGE/USD",
+        "path": "data/kraken_hourly_history/ohlc_DOGE_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 2832183.33,
+        "file_sha256": "59ac3045c4c7a74a0975f43b01b725d891de049be9d5e7c587ddeb7743634357"
+      },
+      {
+        "pair": "ZEC/USD",
+        "path": "data/kraken_hourly_history/ohlc_ZEC_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 2501911.28,
+        "file_sha256": "4e49854ff7bb190e51fd6ab92ba5c41c3565eb89d05ebe62b4ce9ef7204c4927"
+      },
+      {
+        "pair": "TAO/USD",
+        "path": "data/kraken_hourly_history/ohlc_TAO_USD.csv",
+        "row_count": 720,
+        "turnover_24h_usd": 2014708.28,
+        "file_sha256": "4ce9859793b7df8d0652f4d15c6ce0fc49c5b2ff17acd781ca85aa0c749f6c4c"
+      }
+    ]
+  },
+  "inference": {
+    "paired_unit": "source_series",
+    "exploratory_test": "two_sided_exact_sign_test_on_pair_level_risk_adjusted_score_deltas",
+    "global_multiple_comparison_control": "holm",
+    "familywise_alpha": 0.05,
+    "minimum_pair_count_for_exploratory_test": 5,
+    "common_time_market_factor_warning": "The pairs share one exchange and overlapping timestamps, so pair-level signs may remain cross-dependent.",
+    "confirmatory_inference_allowed": false,
+    "promotion_eligible": false
+  },
+  "claim_controls": {
+    "alpha_claim_allowed": false,
+    "edge_claim_allowed": false,
+    "profit_claim_allowed": false,
+    "value_claim_allowed": false,
+    "field_performance_claim_allowed": false,
+    "prospective_validation_claim_allowed": false,
+    "live_trading_allowed": false,
+    "external_action_allowed": false,
+    "promotion_allowed": false
+  }
+}

@@ -51,6 +51,9 @@ SOURCE_NATIVE_LEDGER = (
 MARKET_SIGNAL_BENCHMARK = (
     ROOT / "out" / "ops" / "market_signal_source_native_benchmark_latest.json"
 )
+MARKET_SIGNAL_KRAKEN_PANEL = (
+    ROOT / "out" / "ops" / "market_signal_kraken_panel_benchmark_latest.json"
+)
 PROSPECTIVE_STATUS = (
     ROOT / "out" / "ops" / "time_series_source_native_prospective_protocol_status.json"
 )
@@ -144,6 +147,7 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
     whitepaper = read_json(WHITEPAPER_MANIFEST)
     source_native = read_json(SOURCE_NATIVE_LEDGER)
     market_signal = read_json(MARKET_SIGNAL_BENCHMARK)
+    market_signal_panel = read_json(MARKET_SIGNAL_KRAKEN_PANEL)
     prospective = read_json(PROSPECTIVE_STATUS)
     command_board = read_json(COMMAND_BOARD)
     external_actions = read_json(EXTERNAL_ACTION_LEDGER)
@@ -218,6 +222,13 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
         "market_signal_global_holm_positive_count": 0,
         "market_signal_promoted_candidate_count": 0,
     }
+    panel_counts = {
+        "market_signal_panel_pair_count": 12,
+        "market_signal_panel_comparison_count": 16,
+        "market_signal_panel_global_holm_positive_count": 1,
+        "market_signal_panel_all_baseline_mean_winner_count": 0,
+        "market_signal_panel_promoted_candidate_count": 0,
+    }
     if any(summary.get(key) != value for key, value in expected_counts.items()):
         raise FrontDoorError("Source-native evidence snapshot changed; refresh review")
     if (
@@ -244,6 +255,43 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
         or market_negative.get("global_holm_positive_count") != 0
     ):
         raise FrontDoorError("Market-signal evidence is not fail closed")
+    market_panel_summary = market_signal_panel.get("result_summary", {})
+    market_panel_claim_controls = market_signal_panel.get("claim_controls")
+    if (
+        market_signal_panel.get("schema")
+        != "market_signal_kraken_panel_benchmark_v1"
+        or market_signal_panel.get("status")
+        != "RETROSPECTIVE_PANEL_SCREEN_NO_PROMOTION"
+        or market_signal_panel.get("external_actions") != []
+        or not isinstance(market_panel_claim_controls, dict)
+        or not market_panel_claim_controls
+        or any(
+            bool(value)
+            for value in market_panel_claim_controls.values()
+        )
+        or market_signal_panel.get("implementation_summary", {}).get(
+            "source_series_count"
+        )
+        != 12
+        or market_panel_summary.get(
+            "candidate_source_baseline_comparison_count"
+        )
+        != 16
+        or market_panel_summary.get(
+            "exploratory_global_holm_positive_count"
+        )
+        != 1
+        or market_panel_summary.get(
+            "candidate_beats_every_baseline_on_mean_count"
+        )
+        != 0
+        or market_panel_summary.get("promotion_count") != 0
+        or market_panel_summary.get("confirmatory_inference_allowed")
+        is not False
+    ):
+        raise FrontDoorError(
+            "Kraken-panel market-signal evidence is not fail closed"
+        )
 
     board_summary = command_board.get("summary", {})
     if (
@@ -297,6 +345,12 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             str(market_signal.get("status", "UNKNOWN")),
         ),
         artifact_row(
+            "market_signal_kraken_panel_benchmark",
+            "retrospective_multi_series_challenger_screen",
+            MARKET_SIGNAL_KRAKEN_PANEL,
+            str(market_signal_panel.get("status", "UNKNOWN")),
+        ),
+        artifact_row(
             "prospective_protocol_status",
             "future_only_validation_gate",
             PROSPECTIVE_STATUS,
@@ -340,6 +394,7 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
         "status": STATUS,
         "summary": {
             **expected_counts,
+            **panel_counts,
             "eligible_future_observation_count": 0,
             "promoted_champion_count": 0,
             "artifact_count": len(artifacts),
@@ -359,6 +414,7 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             "current_source_native_whitepaper",
             "source_native_family_baseline_ledger",
             "market_signal_source_native_benchmark",
+            "market_signal_kraken_panel_benchmark",
             "prospective_protocol_status",
             "near_deadline_submission_command_board",
             "portfolio_external_action_ledger",
@@ -417,6 +473,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Global Holm-positive comparisons: `{summary['individual_comparison_global_holm_positive_count']}`",
         f"- Market-signal comparisons: `{summary['market_signal_comparison_count']}`",
         f"- Market-signal inferentially insufficient: `{summary['market_signal_inference_insufficient_count']}`",
+        f"- Kraken-panel pairs: `{summary['market_signal_panel_pair_count']}`",
+        f"- Kraken-panel comparisons: `{summary['market_signal_panel_comparison_count']}`",
+        f"- Kraken-panel exploratory Holm positives: `{summary['market_signal_panel_global_holm_positive_count']}`",
+        f"- Kraken-panel all-baseline mean winners: `{summary['market_signal_panel_all_baseline_mean_winner_count']}`",
         f"- Promoted champions: `{summary['promoted_champion_count']}`",
         f"- Eligible future observations: `{summary['eligible_future_observation_count']}`",
         f"- Stage-ready opportunity lanes: `{summary['open_stage_ready_lane_count']}`",

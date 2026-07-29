@@ -22,6 +22,9 @@ PROTOCOL_PATH = ROOT / "config" / "time_series_source_native_prospective_protoco
 PROTOCOL_STATUS_PATH = (
     ROOT / "out" / "ops" / "time_series_source_native_prospective_protocol_status.json"
 )
+MARKET_SIGNAL_KRAKEN_PANEL_PATH = (
+    ROOT / "out" / "ops" / "market_signal_kraken_panel_benchmark_latest.json"
+)
 ARC_SEAL_LOGO = ROOT / "assets" / "brand" / "lumaarc_eclipse_corona_concept_v1.png"
 
 OUTPUT_MD = ROOT / "docs" / "LUMENCORE_SOURCE_NATIVE_BENCHMARK_WHITEPAPER_CURRENT.md"
@@ -154,6 +157,7 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
     ledger = read_json(LEDGER_PATH)
     protocol = read_json(PROTOCOL_PATH)
     protocol_status = read_json(PROTOCOL_STATUS_PATH)
+    market_panel = read_json(MARKET_SIGNAL_KRAKEN_PANEL_PATH)
     summary = ledger.get("summary")
     if not isinstance(summary, dict):
         raise WhitepaperError("Ledger summary is missing")
@@ -165,6 +169,102 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
         "protocol_payload_sha256"
     ):
         raise WhitepaperError("Prospective protocol hashes do not agree")
+    if market_panel.get("schema") != "market_signal_kraken_panel_benchmark_v1":
+        raise WhitepaperError("Unexpected market-signal panel schema")
+    if market_panel.get("status") != "RETROSPECTIVE_PANEL_SCREEN_NO_PROMOTION":
+        raise WhitepaperError("Unexpected market-signal panel status")
+    claim_controls = market_panel.get("claim_controls")
+    if not isinstance(claim_controls, dict) or any(claim_controls.values()):
+        raise WhitepaperError("Market-signal panel claim controls must remain false")
+    if market_panel.get("external_actions") != []:
+        raise WhitepaperError("Market-signal panel must not authorize external actions")
+
+    panel_protocol = market_panel.get("protocol_summary")
+    panel_result = market_panel.get("result_summary")
+    panel_inputs = market_panel.get("inputs")
+    panel_comparisons = market_panel.get("comparisons")
+    if not all(
+        isinstance(value, dict)
+        for value in (panel_protocol, panel_result, panel_inputs)
+    ) or not isinstance(panel_comparisons, list):
+        raise WhitepaperError("Market-signal panel sections are incomplete")
+
+    panel_selection = panel_protocol.get("selection")
+    panel_inference = panel_protocol.get("inference")
+    panel_files = panel_inputs.get("panel_files")
+    if not all(
+        isinstance(value, dict) for value in (panel_selection, panel_inference)
+    ) or not isinstance(panel_files, list):
+        raise WhitepaperError("Market-signal panel protocol inputs are incomplete")
+
+    panel_pair_count = panel_selection.get("panel_pair_count")
+    panel_comparison_count = panel_result.get(
+        "candidate_source_baseline_comparison_count"
+    )
+    panel_holm_positive_count = panel_result.get(
+        "exploratory_global_holm_positive_count"
+    )
+    panel_all_baseline_mean_winner_count = panel_result.get(
+        "candidate_beats_every_baseline_on_mean_count"
+    )
+    panel_all_baseline_holm_winner_count = panel_result.get(
+        "candidate_beats_every_baseline_after_global_holm_count"
+    )
+    panel_promotion_count = panel_result.get("promotion_count")
+    if (
+        panel_pair_count != 12
+        or len(panel_files) != panel_pair_count
+        or panel_comparison_count != 16
+        or len(panel_comparisons) != panel_comparison_count
+        or panel_holm_positive_count != 1
+        or panel_all_baseline_mean_winner_count != 0
+        or panel_all_baseline_holm_winner_count != 0
+        or panel_promotion_count != 0
+        or panel_result.get("confirmatory_inference_allowed") is not False
+        or panel_inference.get("confirmatory_inference_allowed") is not False
+        or panel_inference.get("promotion_eligible") is not False
+    ):
+        raise WhitepaperError("Market-signal panel invariants do not match")
+
+    positive_panel_comparisons = [
+        item
+        for item in panel_comparisons
+        if isinstance(item, dict)
+        and item.get("statistically_positive_after_global_holm") is True
+    ]
+    if len(positive_panel_comparisons) != 1:
+        raise WhitepaperError("Expected one exploratory panel comparison")
+    narrow_panel_result = positive_panel_comparisons[0]
+    if (
+        narrow_panel_result.get("candidate_family_id") != "beast_strategy_trend"
+        or narrow_panel_result.get("baseline_id") != "ridge_return_baseline"
+        or narrow_panel_result.get("promotion_eligible") is not False
+        or narrow_panel_result.get("independence_assumption_confirmed") is not False
+    ):
+        raise WhitepaperError("Unexpected exploratory market-signal panel result")
+
+    trend_panel_comparisons = [
+        item
+        for item in panel_comparisons
+        if isinstance(item, dict)
+        and item.get("candidate_family_id") == "beast_strategy_trend"
+    ]
+    trend_baseline_losses = [
+        {
+            "baseline_id": item.get("baseline_id"),
+            "mean_risk_adjusted_score_delta": item.get(
+                "mean_risk_adjusted_score_delta"
+            ),
+        }
+        for item in trend_panel_comparisons
+        if item.get("candidate_beats_baseline_mean") is False
+    ]
+    if {item["baseline_id"] for item in trend_baseline_losses} != {
+        "buy_and_hold",
+        "moving_average_cross",
+        "volatility_targeting",
+    }:
+        raise WhitepaperError("Market-signal trend baseline losses changed")
 
     candidate = protocol.get("candidate")
     endpoint = protocol.get("primary_endpoint")
@@ -198,13 +298,17 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
             "LumenCore registers candidate computational families inspired by natural "
             "forms, but does not treat inspiration as evidence. This note reports a "
             "source-native benchmark ledger, the retrospective disposition of prior "
-            "leads, and a frozen prospective protocol. The current ledger contains "
+            "leads, a fixed-rule 12-pair retrospective market panel, and a frozen "
+            "prospective protocol. The current ledger contains "
             f"{summary.get('registered_family_count')} registered families, "
             f"{summary.get('implementation_present_count')} implementations, and "
             f"{summary.get('executed_direct_source_baseline_comparison_count')} "
-            "direct candidate-source-baseline comparisons. No candidate passes the "
-            "promotion gate. The scientific contribution is therefore a reproducible "
-            "comparison and falsification framework, not a performance champion."
+            "direct candidate-source-baseline comparisons. The market panel repairs "
+            "the prior single-series bookkeeping bottleneck and contains one narrow "
+            "exploratory Holm-positive comparison, but its candidate loses on mean to "
+            "three other registered baselines. No candidate passes the promotion gate. "
+            "The scientific contribution is therefore a reproducible comparison and "
+            "falsification framework, not a performance champion."
         ),
         "current_snapshot": {
             "registered_family_count": summary.get("registered_family_count"),
@@ -250,6 +354,15 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
             "market_signal_global_holm_positive_count": summary.get(
                 "market_signal_global_holm_positive_count"
             ),
+            "market_signal_panel_pair_count": panel_pair_count,
+            "market_signal_panel_comparison_count": panel_comparison_count,
+            "market_signal_panel_global_holm_positive_count": (
+                panel_holm_positive_count
+            ),
+            "market_signal_panel_all_baseline_mean_winner_count": (
+                panel_all_baseline_mean_winner_count
+            ),
+            "market_signal_panel_promotion_count": panel_promotion_count,
             "performance_claim_allowed": False,
         },
         "method": {
@@ -288,10 +401,58 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
                 "were also run against four registered baselines on each of Kraken, "
                 "TwelveData, and AlphaVantage. All 48 market comparisons are "
                 "inferentially insufficient because each source currently supplies "
-                "one source-series cluster. Across the ledger, zero comparisons "
-                "survive the global correction and zero candidate-source cards pass "
-                "promotion."
+                "one source-series cluster. A separate fixed-rule Kraken panel then "
+                "evaluated the same four candidates against four baselines across 12 "
+                "pre-scoring-selected pairs. One of 16 comparisons was positive after "
+                "exploratory global Holm correction: beast_strategy_trend versus "
+                "ridge_return_baseline, with mean unannualized risk-adjusted-score "
+                f"delta {narrow_panel_result.get('mean_risk_adjusted_score_delta')}, "
+                f"raw exact sign-test p {narrow_panel_result.get('raw_cluster_sign_test_p_value')}, "
+                "and global Holm-adjusted "
+                f"p {narrow_panel_result.get('global_holm_adjusted_p_value')}. "
+                "The same candidate lost on mean to buy-and-hold, moving-average-cross, "
+                "and volatility-targeting baselines. Across the authoritative ledger "
+                "and panel, zero candidate cards beat every baseline and zero candidates "
+                "pass promotion."
             ),
+        },
+        "market_signal_panel_result": {
+            "status": market_panel.get("status"),
+            "pair_count": panel_pair_count,
+            "comparison_count": panel_comparison_count,
+            "mean_positive_comparison_count": panel_result.get(
+                "comparison_mean_win_count"
+            ),
+            "exploratory_global_holm_positive_count": panel_holm_positive_count,
+            "candidate_beats_every_baseline_on_mean_count": (
+                panel_all_baseline_mean_winner_count
+            ),
+            "candidate_beats_every_baseline_after_global_holm_count": (
+                panel_all_baseline_holm_winner_count
+            ),
+            "promotion_count": panel_promotion_count,
+            "confirmatory_inference_allowed": False,
+            "narrow_exploratory_result": {
+                "candidate_family_id": narrow_panel_result.get(
+                    "candidate_family_id"
+                ),
+                "baseline_id": narrow_panel_result.get("baseline_id"),
+                "mean_risk_adjusted_score_delta": narrow_panel_result.get(
+                    "mean_risk_adjusted_score_delta"
+                ),
+                "raw_p_value": narrow_panel_result.get(
+                    "raw_cluster_sign_test_p_value"
+                ),
+                "global_holm_adjusted_p_value": narrow_panel_result.get(
+                    "global_holm_adjusted_p_value"
+                ),
+                "promotion_eligible": False,
+            },
+            "same_candidate_baseline_losses_on_mean": trend_baseline_losses,
+            "common_time_market_factor_warning": panel_inference.get(
+                "common_time_market_factor_warning"
+            ),
+            "conclusion": panel_result.get("conclusion"),
         },
         "prospective_protocol": {
             "protocol_id": protocol.get("protocol_id"),
@@ -327,6 +488,7 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
             "A full-family multiple-testing rule that prevents cherry-picking isolated wins.",
             "A future-only protocol with fixed endpoints, effect floor, sample gates, ablations, and falsification states.",
             "A cost-aware market-signal replay that uses identical timestamps, future-return rows, turnover costs, and source-specific baselines without granting a promotion from descriptive wins.",
+            "A pre-scoring 12-pair Kraken panel that holds candidate, baseline, timing, and 10-basis-point turnover-cost rules fixed while retaining losses and a narrow exploratory positive result.",
             "A machine-readable claim boundary that keeps software proof separate from field, economic, or deployment claims.",
         ],
         "limitations": [
@@ -342,10 +504,21 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
                 "or context until implemented."
             ),
             (
-                f"All {summary.get('market_signal_inference_insufficient_count')} "
-                "market-signal comparisons are inferentially insufficient under the "
-                "predeclared five-cluster minimum; descriptive score differences are "
-                "not alpha or edge."
+                f"The original {summary.get('market_signal_inference_insufficient_count')} "
+                "market-signal comparisons remain inferentially insufficient under the "
+                "predeclared five-cluster minimum because each source has one registered "
+                "series."
+            ),
+            (
+                "The 12-pair Kraken panel meets the exploratory pair-count floor, but "
+                "pair-level signs share one exchange and overlapping market timestamps. "
+                "Independence is therefore unconfirmed, and its one narrow Holm-positive "
+                "comparison is not confirmatory alpha or edge."
+            ),
+            (
+                "The panel's narrow trend-versus-ridge result is not a promotion: the "
+                "same candidate loses on mean to the other three registered baselines, "
+                "and no candidate beats every baseline."
             ),
             (
                 "The prospective protocol has zero eligible future observations and "
@@ -361,6 +534,7 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
             file_receipt(LEDGER_PATH),
             file_receipt(PROTOCOL_PATH),
             file_receipt(PROTOCOL_STATUS_PATH),
+            file_receipt(MARKET_SIGNAL_KRAKEN_PANEL_PATH),
             file_receipt(ARC_SEAL_LOGO),
         ],
         "archived_legacy_whitepapers": archived,
@@ -378,6 +552,11 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
         "market_signal_comparison_count",
         "market_signal_inference_insufficient_count",
         "market_signal_global_holm_positive_count",
+        "market_signal_panel_pair_count",
+        "market_signal_panel_comparison_count",
+        "market_signal_panel_global_holm_positive_count",
+        "market_signal_panel_all_baseline_mean_winner_count",
+        "market_signal_panel_promotion_count",
     )
     if any(
         not isinstance(payload["current_snapshot"].get(key), int)
@@ -434,6 +613,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Market-signal sources: `{snapshot['market_signal_source_count']}`",
         f"- Market-signal comparisons: `{snapshot['market_signal_comparison_count']}`",
         f"- Market-signal inferentially insufficient: `{snapshot['market_signal_inference_insufficient_count']}`",
+        f"- Kraken panel pairs: `{snapshot['market_signal_panel_pair_count']}`",
+        f"- Kraken panel comparisons: `{snapshot['market_signal_panel_comparison_count']}`",
+        f"- Kraken panel exploratory Holm-positive comparisons: `{snapshot['market_signal_panel_global_holm_positive_count']}`",
+        f"- Kraken panel all-baseline mean winners: `{snapshot['market_signal_panel_all_baseline_mean_winner_count']}`",
+        f"- Kraken panel promotions: `{snapshot['market_signal_panel_promotion_count']}`",
         "",
         "## Source-Native Method",
         "",
@@ -592,6 +776,16 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
     )
     styles.add(
         ParagraphStyle(
+            name="ReceiptLC",
+            parent=styles["BodyText"],
+            fontName="Helvetica",
+            fontSize=6.4,
+            leading=7.6,
+            textColor=muted,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
             name="TableHeaderLC",
             parent=styles["BodyText"],
             fontName="Helvetica-Bold",
@@ -723,26 +917,58 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
             "Market comparisons inferentially insufficient",
             snapshot["market_signal_inference_insufficient_count"],
         ),
+        ("Kraken panel pairs", snapshot["market_signal_panel_pair_count"]),
+        (
+            "Kraken panel comparisons",
+            snapshot["market_signal_panel_comparison_count"],
+        ),
+        (
+            "Kraken panel exploratory Holm positives",
+            snapshot["market_signal_panel_global_holm_positive_count"],
+        ),
+        (
+            "Kraken panel all-baseline mean winners",
+            snapshot["market_signal_panel_all_baseline_mean_winner_count"],
+        ),
+        (
+            "Kraken panel promotions",
+            snapshot["market_signal_panel_promotion_count"],
+        ),
         (
             "Prospective eligible observations",
             prospective["eligible_future_observation_count"],
         ),
     ]
+    snapshot_midpoint = (len(snapshot_rows) + 1) // 2
+    snapshot_grid_rows = []
+    for index in range(snapshot_midpoint):
+        left_label, left_value = snapshot_rows[index]
+        if index + snapshot_midpoint < len(snapshot_rows):
+            right_label, right_value = snapshot_rows[index + snapshot_midpoint]
+            right_cells = [
+                Paragraph(right_label, styles["BodyLC"]),
+                Paragraph(f"<b>{right_value}</b>", styles["BodyLC"]),
+            ]
+        else:
+            right_cells = ["", ""]
+        snapshot_grid_rows.append(
+            [
+                Paragraph(left_label, styles["BodyLC"]),
+                Paragraph(f"<b>{left_value}</b>", styles["BodyLC"]),
+                *right_cells,
+            ]
+        )
     snapshot_table = Table(
         [
             [
                 Paragraph("State", styles["TableHeaderLC"]),
                 Paragraph("Count", styles["TableHeaderLC"]),
+                Paragraph("State", styles["TableHeaderLC"]),
+                Paragraph("Count", styles["TableHeaderLC"]),
             ],
-            *[
-                [
-                    Paragraph(label, styles["BodyLC"]),
-                    Paragraph(f"<b>{value}</b>", styles["BodyLC"]),
-                ]
-                for label, value in snapshot_rows
-            ],
+            *snapshot_grid_rows,
         ],
-        colWidths=[5.65 * inch, 1.25 * inch],
+        colWidths=[2.75 * inch, 0.7 * inch, 2.75 * inch, 0.7 * inch],
         repeatRows=1,
     )
     snapshot_table.setStyle(
@@ -751,6 +977,7 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
                 ("BACKGROUND", (0, 0), (-1, 0), navy),
                 ("GRID", (0, 0), (-1, -1), 0.45, line),
                 ("ALIGN", (1, 1), (1, -1), "CENTER"),
+                ("ALIGN", (3, 1), (3, -1), "CENTER"),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 7),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 7),
@@ -971,21 +1198,22 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
             Paragraph("Reproducibility receipts", styles["H1LC"]),
             Paragraph(
                 (
-                    "The ledger, prospective configuration, and prospective status "
-                    "are bound below. Hashes establish byte identity and custody only; "
-                    "they do not establish scientific correctness or external acceptance."
+                    "The ledger, prospective configuration, prospective status, and "
+                    "retrospective market panel are bound below. Hashes establish byte "
+                    "identity and custody only; they do not establish scientific "
+                    "correctness or external acceptance."
                 ),
                 styles["BodyLC"],
             ),
         ]
     )
     receipt_rows = []
-    for receipt in payload["canonical_source_receipts"][:3]:
+    for receipt in payload["canonical_source_receipts"][:4]:
         receipt_rows.append(
             [
-                Paragraph(receipt["path"], styles["SmallLC"]),
-                Paragraph(str(receipt["bytes"]), styles["SmallLC"]),
-                Paragraph(receipt["sha256"], styles["SmallLC"]),
+                Paragraph(receipt["path"], styles["ReceiptLC"]),
+                Paragraph(str(receipt["bytes"]), styles["ReceiptLC"]),
+                Paragraph(receipt["sha256"], styles["ReceiptLC"]),
             ]
         )
     receipt_table = Table(
@@ -1008,8 +1236,8 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 5),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("TOPPADDING", (0, 0), (-1, -1), 2),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
             ]
         )
     )

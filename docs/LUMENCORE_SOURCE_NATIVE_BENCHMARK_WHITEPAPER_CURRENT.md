@@ -1,6 +1,6 @@
 # Source-Native Benchmarking for Nature-Inspired Time-Series Families: A Fail-Closed Experimental Protocol
 
-- Generated UTC: `2026-07-29T15:00:47.919698+00:00`
+- Generated UTC: `2026-07-29T20:29:40.745027+00:00`
 - Status: `CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED`
 - Peer reviewed: `false`
 - Independently validated: `false`
@@ -10,7 +10,7 @@
 
 ## Abstract
 
-LumenCore registers candidate computational families inspired by natural forms, but does not treat inspiration as evidence. This note reports a source-native benchmark ledger, the retrospective disposition of prior leads, and a frozen prospective protocol. The current ledger contains 140 registered families, 35 implementations, and 126 direct candidate-source-baseline comparisons. No candidate passes the promotion gate. The scientific contribution is therefore a reproducible comparison and falsification framework, not a performance champion.
+LumenCore registers candidate computational families inspired by natural forms, but does not treat inspiration as evidence. This note reports a source-native benchmark ledger, the retrospective disposition of prior leads, a fixed-rule 12-pair retrospective market panel, and a frozen prospective protocol. The current ledger contains 140 registered families, 35 implementations, and 126 direct candidate-source-baseline comparisons. The market panel repairs the prior single-series bookkeeping bottleneck and contains one narrow exploratory Holm-positive comparison, but its candidate loses on mean to three other registered baselines. No candidate passes the promotion gate. The scientific contribution is therefore a reproducible comparison and falsification framework, not a performance champion.
 
 ## Research Question
 
@@ -29,6 +29,11 @@ Can a predeclared candidate family beat every accepted baseline for a specific s
 - Market-signal sources: `3`
 - Market-signal comparisons: `48`
 - Market-signal inferentially insufficient: `48`
+- Kraken panel pairs: `12`
+- Kraken panel comparisons: `16`
+- Kraken panel exploratory Holm-positive comparisons: `1`
+- Kraken panel all-baseline mean winners: `0`
+- Kraken panel promotions: `0`
 
 ## Source-Native Method
 
@@ -49,7 +54,7 @@ Can a predeclared candidate family beat every accepted baseline for a specific s
 
 ## Retrospective Result
 
-The former FRED and TWELVE_DATA subset leads are retired because they do not survive source-series clustering and the complete source-native baseline gauntlet. Four fixed market-signal families were also run against four registered baselines on each of Kraken, TwelveData, and AlphaVantage. All 48 market comparisons are inferentially insufficient because each source currently supplies one source-series cluster. Across the ledger, zero comparisons survive the global correction and zero candidate-source cards pass promotion.
+The former FRED and TWELVE_DATA subset leads are retired because they do not survive source-series clustering and the complete source-native baseline gauntlet. Four fixed market-signal families were also run against four registered baselines on each of Kraken, TwelveData, and AlphaVantage. All 48 market comparisons are inferentially insufficient because each source currently supplies one source-series cluster. A separate fixed-rule Kraken panel then evaluated the same four candidates against four baselines across 12 pre-scoring-selected pairs. One of 16 comparisons was positive after exploratory global Holm correction: beast_strategy_trend versus ridge_return_baseline, with mean unannualized risk-adjusted-score delta 0.061277644465, raw exact sign-test p 0.00634765625, and global Holm-adjusted p 0.04443359375. The same candidate lost on mean to buy-and-hold, moving-average-cross, and volatility-targeting baselines. Across the authoritative ledger and panel, zero candidate cards beat every baseline and zero candidates pass promotion.
 
 ## Frozen Prospective Protocol
 
@@ -73,13 +78,16 @@ The former FRED and TWELVE_DATA subset leads are retired because they do not sur
 - A full-family multiple-testing rule that prevents cherry-picking isolated wins.
 - A future-only protocol with fixed endpoints, effect floor, sample gates, ablations, and falsification states.
 - A cost-aware market-signal replay that uses identical timestamps, future-return rows, turnover costs, and source-specific baselines without granting a promotion from descriptive wins.
+- A pre-scoring 12-pair Kraken panel that holds candidate, baseline, timing, and 10-basis-point turnover-cost rules fixed while retaining losses and a narrow exploratory positive result.
 - A machine-readable claim boundary that keeps software proof separate from field, economic, or deployment claims.
 
 ## Limitations
 
 - 105 of 140 registered families lack implementations.
 - Only 3 lanes currently have executable direct measured adapters; the wider nature-inspired registry remains inventory, synthetic stress, or context until implemented.
-- All 48 market-signal comparisons are inferentially insufficient under the predeclared five-cluster minimum; descriptive score differences are not alpha or edge.
+- The original 48 market-signal comparisons remain inferentially insufficient under the predeclared five-cluster minimum because each source has one registered series.
+- The 12-pair Kraken panel meets the exploratory pair-count floor, but pair-level signs share one exchange and overlapping market timestamps. Independence is therefore unconfirmed, and its one narrow Holm-positive comparison is not confirmatory alpha or edge.
+- The panel's narrow trend-versus-ridge result is not a promotion: the same candidate loses on mean to the other three registered baselines, and no candidate beats every baseline.
 - The prospective protocol has zero eligible future observations and cannot yet support a prospective accuracy conclusion.
 - No result establishes universal superiority, field performance, trading alpha, realized savings, customer acceptance, or deployment authority.
 
@@ -89,4 +97,4 @@ The prior BioGeometry, scalar-field, bioresonance, cooling-savings, zero-point, 
 
 ## Receipt
 
-- Whitepaper payload SHA-256: `3aa9ec5768f6f3219cf81abcd29ba92f4b055765e72f6b6971f9300263d5e85e`
+- Whitepaper payload SHA-256: `e766bbd499c526bd480e98c71c578a6ca7fef5c09b74229e5e3f3d72cd3c581f`

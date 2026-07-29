@@ -39,9 +39,17 @@ def test_current_reviewer_front_door_is_fail_closed_and_hash_backed():
     assert summary["market_signal_inference_insufficient_count"] == 48
     assert summary["market_signal_global_holm_positive_count"] == 0
     assert summary["market_signal_promoted_candidate_count"] == 0
+    assert summary["market_signal_panel_pair_count"] == 12
+    assert summary["market_signal_panel_comparison_count"] == 16
+    assert summary["market_signal_panel_global_holm_positive_count"] == 1
+    assert (
+        summary["market_signal_panel_all_baseline_mean_winner_count"]
+        == 0
+    )
+    assert summary["market_signal_panel_promoted_candidate_count"] == 0
     assert summary["promoted_champion_count"] == 0
     assert summary["eligible_future_observation_count"] == 0
-    assert summary["artifact_count"] == 12
+    assert summary["artifact_count"] == 13
     assert summary["external_release_authorized_count"] == 0
     assert summary["human_release_review_required"] is True
 
@@ -87,6 +95,10 @@ def test_current_reviewer_front_door_renders_only_bounded_claims():
     assert "Global Holm-positive comparisons: `0`" in rendered
     assert "Market-signal comparisons: `48`" in rendered
     assert "Market-signal inferentially insufficient: `48`" in rendered
+    assert "Kraken-panel pairs: `12`" in rendered
+    assert "Kraken-panel comparisons: `16`" in rendered
+    assert "Kraken-panel exploratory Holm positives: `1`" in rendered
+    assert "Kraken-panel all-baseline mean winners: `0`" in rendered
     assert "Promoted champions: `0`" in rendered
     assert "Eligible future observations: `0`" in rendered
     assert "External release authorized: `false`" in rendered
