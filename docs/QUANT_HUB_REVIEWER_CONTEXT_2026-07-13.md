@@ -1,6 +1,6 @@
 # Quant Hub Reviewer Context
 
-Generated UTC: `2026-07-29T14:49:13.261440+00:00`
+Generated UTC: `2026-07-29T15:15:07.233193+00:00`
 
 ## Identity
 
@@ -15,7 +15,7 @@ Generated UTC: `2026-07-29T14:49:13.261440+00:00`
 
 - Highest repository-wide supported maturity: `Level 3`
 - Level 5 attained: `false`
-- Summary: Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. The frozen hourly successor has 1170 sealed predictions and 1124 settlements, but 42 common settled hours and no open sample gate. Level 4 and Level 5 have not been attained.
+- Summary: Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. The frozen hourly successor has 1170 sealed predictions and 1127 settlements, but 42 common settled hours and no open sample gate. Level 4 and Level 5 have not been attained.
 
 Maturity is claim-specific. It is not a product-readiness, agency-approval, patent, security, or valuation grade.
 
@@ -32,7 +32,7 @@ Maturity is claim-specific. It is not a product-readiness, agency-approval, pate
 | Locked source-conditioned baseline replay | `source_conditioned_replay` | 3 | `complete_with_wins_and_non_wins` | adapter_backed_routes=4, baseline_comparison_count=22, candidate_win_count=10, candidate_loss_or_tie_count=12, estimated_rows_replayed=0 |
 | EIA residual hybrid frozen holdout | `source_conditioned_frozen_holdout` | 3 | `all_internal_comparisons_holm_positive_full_protocol_gate_closed` | holm_result=6/6 Holm-positive internal comparisons, full_protocol_gate=CLOSED, coverage_result=90/150 minimum common days, selected_candidate=xgboost_residual, holdout_rows=1176 |
 | Preserved predecessor daily EIA prospective router | `prospective_protocol` | 1 | `WAITING_FOR_FIRST_ELIGIBLE_FORECAST` | first_allowed_target_date=2026-07-14, prediction_count=0, settlement_count=0, promotion_evaluation_complete=False, preliminary_30_days_ready=False |
-| Frozen EIA prospective hourly router | `prospective_collection_incomplete` | 1 | `PROSPECTIVE_COLLECTION_ACTIVE` | prediction_count=1170, settlement_count=1124, common_settled_hour_count=42, preliminary_ready=False, confirmatory_ready=False |
+| Frozen EIA prospective hourly router | `prospective_collection_incomplete` | 1 | `PROSPECTIVE_COLLECTION_ACTIVE` | prediction_count=1170, settlement_count=1127, common_settled_hour_count=42, preliminary_ready=False, confirmatory_ready=False |
 | MDA mapping synthetic feasibility v1 | `frozen_synthetic_benchmark` | 2 | `gate_failed_preserved` | fixture_count=96, candidate_micro_f1=0.9166666666666666, candidate_unsupported_mapping_rate=1.0, micro_f1_delta_over_best_baseline=0.023049645390070927, gate_passed=False |
 | MDA mapping independent open-set v2 | `frozen_synthetic_benchmark` | 2 | `safer_unsupported_behavior_but_gate_failed` | fixture_count=128, candidate_micro_f1=0.9433962264150945, supported_coverage=0.9583333333333334, unsupported_mapping_rate=0.0, micro_f1_delta_over_best_baseline=0.020319303338171446 |
 | FAA SDR frozen 10,000-report triage benchmark | `source_conditioned_frozen_holdout` | 3 | `completed_candidate_not_promoted` | holdout_rows=10000, holdout_unique_keys=10000, development_key_overlap=0, scenario_model_evaluations=80000, candidate_macro_f1=0.14217 |
@@ -49,7 +49,7 @@ Maturity is claim-specific. It is not a product-readiness, agency-approval, pate
 - The optional private-universe receipt federates existing manifests and represents no fresh full universe scan, manifest-referenced file byte read, broad-root scan, archive extraction, or live reconciliation; only individually authorized explicit files may be read for SHA-256, and candidate lane counts remain metadata heuristics rather than content validation. The receipt names no independent evaluator.
 - The development-selected EIA residual hybrid has 6/6 Holm-positive internal comparisons on its frozen internal holdout, but the full protocol gate is CLOSED.
 - The predecessor daily EIA prospective protocol is preserved at zero predictions and zero settlements because its seal timing could not be weakened or backfilled.
-- The frozen hourly successor has 1170 sealed predictions and 1124 settlements, but only 42 common settled hours; its preliminary, confirmatory, durability, and promotion gates remain closed.
+- The frozen hourly successor has 1170 sealed predictions and 1127 settlements, but only 42 common settled hours; its preliminary, confirmatory, durability, and promotion gates remain closed.
 - A prior external proof packet reports all copied artifact hashes verified.
 
 ## Blocked Claims
@@ -131,10 +131,10 @@ Public builders may report metadata and public-safe evidence only. They must not
 
 ## Source Chain
 
-Input chain SHA-256: `9b59eef354b89373f4ae6ff0e500bd9d7cebf5ccbda447a84726c33312bd3b11`
+Input chain SHA-256: `53636343fea22029b33f96df2b74bbc8836763f9e63dc5174e912d8868057ee0`
 
 - `config/eia_grid_prospective_hourly_router_protocol_v1.json` | `5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5` | `8463` bytes
-- `evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json` | `a1b46cce0e26291f8f4acf9d62c82ed5201fc5fbab10944a133c9cbde0a87c90` | `2854` bytes
+- `evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json` | `583123359b1d6e46c63ae39b2eb9749a6d278efde84a1c99440edc2a9f1ff5b5` | `2852` bytes
 - `out/eia_grid_prospective_hybrid_router/prospective_status_latest.json` | `fe57fc67b6377cc71699d8cdf5ee5e19c5d6f5e88d947fc9a188dde20578121e` | `1989` bytes
 - `out/eia_grid_residual_moe/eia_grid_residual_moe_benchmark_latest.json` | `e2e0bc779823e543784c24675e18c12bcb821e65911168c2d3339b6da67ea744` | `19279` bytes
 - `config/eia_grid_residual_moe_protocol_v1.json` | `79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8` | `8422` bytes

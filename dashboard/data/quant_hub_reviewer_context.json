@@ -1,6 +1,6 @@
 {
   "schema": "quant_hub_reviewer_context.v1",
-  "generated_utc": "2026-07-29T14:49:13.261440+00:00",
+  "generated_utc": "2026-07-29T15:15:07.233193+00:00",
   "identity": {
     "repository_display_name": "Quant Hub Repo",
     "technical_platform": "LumenCore",
@@ -15,7 +15,7 @@
     "highest_repository_wide_supported_level": 3,
     "level_5_attained": false,
     "level_5_gate": "No Level 5 claim is allowed without a named external validator, independent data or field setting, accepted metric, dated receipt, and preserved artifact hashes.",
-    "summary": "Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. The frozen hourly successor has 1170 sealed predictions and 1124 settlements, but 42 common settled hours and no open sample gate. Level 4 and Level 5 have not been attained."
+    "summary": "Level 3 source-conditioned replay and frozen EIA holdout evidence are supported. The EIA residual candidate has 6/6 Holm-positive internal comparisons, but its full protocol gate is CLOSED. The frozen hourly successor has 1170 sealed predictions and 1127 settlements, but 42 common settled hours and no open sample gate. Level 4 and Level 5 have not been attained."
   },
   "proof_cards": [
     {
@@ -342,7 +342,7 @@
       "status": "PROSPECTIVE_COLLECTION_ACTIVE",
       "facts": {
         "prediction_count": 1170,
-        "settlement_count": 1124,
+        "settlement_count": 1127,
         "common_settled_hour_count": 42,
         "preliminary_ready": false,
         "confirmatory_ready": false,
@@ -352,11 +352,11 @@
         "confirmatory_threshold_common_hours_per_authority": 720,
         "durability_threshold_common_hours_per_authority": 2160,
         "current_best_fixed_candidate": "xgboost_residual",
-        "router_skill_vs_current_best_fixed": 0.0047742151051504145,
-        "operational_receipt_sha256": "3285dd7a173ad77d905a706764dec976b64b34796a6cedcd19063bae5b18ddca",
+        "router_skill_vs_current_best_fixed": 0.004764203330115457,
+        "operational_receipt_sha256": "0d99841b978b8e358d23e7b408e95e177f904cec0ee66fe9de6b6f9a746b65cf",
         "prediction_terminal_sha256": "f9c6678caf49deabb44dbcd42f978ceed85e0130bffbcb678b4dfa325bf96c07",
-        "settlement_terminal_sha256": "03730308d25ab2e02ce6f5f3a947b16933daa99b7c9c522efaf39e0e7d93475f",
-        "runtime_projection_source_sha256": "a1b46cce0e26291f8f4acf9d62c82ed5201fc5fbab10944a133c9cbde0a87c90",
+        "settlement_terminal_sha256": "b14d6ba2c2112d018e3cefeaf635f5aefd66c6031ac185dc63343994d266fbc0",
+        "runtime_projection_source_sha256": "583123359b1d6e46c63ae39b2eb9749a6d278efde84a1c99440edc2a9f1ff5b5",
         "protocol_source_sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5"
       },
       "claim_boundary": "A passing result would support bounded prospective public-data evidence for a frozen hourly specialist router. It does not establish patent validity or scope, utility control, realized savings, grid reliability improvement, production readiness, trading edge, or universal model superiority."
@@ -442,7 +442,7 @@
       "The optional private-universe receipt federates existing manifests and represents no fresh full universe scan, manifest-referenced file byte read, broad-root scan, archive extraction, or live reconciliation; only individually authorized explicit files may be read for SHA-256, and candidate lane counts remain metadata heuristics rather than content validation. The receipt names no independent evaluator.",
       "The development-selected EIA residual hybrid has 6/6 Holm-positive internal comparisons on its frozen internal holdout, but the full protocol gate is CLOSED.",
       "The predecessor daily EIA prospective protocol is preserved at zero predictions and zero settlements because its seal timing could not be weakened or backfilled.",
-      "The frozen hourly successor has 1170 sealed predictions and 1124 settlements, but only 42 common settled hours; its preliminary, confirmatory, durability, and promotion gates remain closed.",
+      "The frozen hourly successor has 1170 sealed predictions and 1127 settlements, but only 42 common settled hours; its preliminary, confirmatory, durability, and promotion gates remain closed.",
       "A prior external proof packet reports all copied artifact hashes verified."
     ],
     "blocked_without_new_evidence": {
@@ -565,8 +565,8 @@
     {
       "source_id": "eia_hourly_runtime_projection",
       "path": "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json",
-      "bytes": 2854,
-      "sha256": "a1b46cce0e26291f8f4acf9d62c82ed5201fc5fbab10944a133c9cbde0a87c90"
+      "bytes": 2852,
+      "sha256": "583123359b1d6e46c63ae39b2eb9749a6d278efde84a1c99440edc2a9f1ff5b5"
     },
     {
       "source_id": "eia_prospective_router",
@@ -659,7 +659,7 @@
       "sha256": "e8f78f0a8794c348c78900eef551fd812cd9e4df62fb0e42229c6c74424ea190"
     }
   ],
-  "source_input_chain_sha256": "9b59eef354b89373f4ae6ff0e500bd9d7cebf5ccbda447a84726c33312bd3b11",
+  "source_input_chain_sha256": "53636343fea22029b33f96df2b74bbc8836763f9e63dc5174e912d8868057ee0",
   "outputs": {
     "machine_readable": "out/ops/quant_hub_reviewer_context_latest.json",
     "dashboard_mirror": "dashboard/data/quant_hub_reviewer_context.json",
