@@ -86,7 +86,7 @@ def test_packet_has_no_ready_prime_or_partner_response():
     snapshot = payload["current_evidence_snapshot"]
     assert snapshot["registered_family_count"] == 140
     assert snapshot["implementation_present_count"] == 35
-    assert snapshot["executed_direct_source_baseline_comparison_count"] == 120
+    assert snapshot["executed_direct_source_baseline_comparison_count"] == 126
     assert snapshot["promotion_gate_pass_count"] == 0
     assert snapshot["global_holm_positive_count"] == 0
     assert snapshot["prospective_protocol_status"] == (

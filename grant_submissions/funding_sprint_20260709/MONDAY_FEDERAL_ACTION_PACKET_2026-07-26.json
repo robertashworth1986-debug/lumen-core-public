@@ -1,0 +1,487 @@
+{
+  "schema": "lumencore.monday_federal_action_packet.v1",
+  "status": "NO_TRUTHFUL_MONDAY_PRIME_OR_PARTNER_RESPONSE_READY",
+  "as_of_utc": "2026-07-29T13:50:39Z",
+  "summary": {
+    "opportunity_count": 5,
+    "prime_submission_ready_count": 0,
+    "partner_brief_ready_count": 0,
+    "future_partner_route_count": 3,
+    "complete_source_set_count": 4,
+    "partial_source_set_count": 1,
+    "instruction_conformance_ready_count": 0,
+    "no_go_or_partner_only_count": 5,
+    "closed_deadline_count": 5,
+    "external_action_count": 0
+  },
+  "controls": {
+    "action_time_human_approval_required": true,
+    "authenticated_portal_action_allowed": false,
+    "autonomous_certification_allowed": false,
+    "autonomous_email_send_allowed": false,
+    "autonomous_submission_allowed": false,
+    "duplicate_suppression_required": true,
+    "mandatory_requirement_fail_closed": true,
+    "performance_claims_require_independent_evidence": true,
+    "private_identifiers_omitted": true,
+    "response_instructions_structured": true,
+    "source_set_completeness_required_for_ready_state": true
+  },
+  "company_profile": {
+    "public_name": "LumenCore",
+    "public_domain": "https://lumen-core.ai",
+    "positioning": "Evidence engineering for AI, data, software, and technical decisions",
+    "truthful_prime_boundary": "LumenCore does not represent current federal past performance, an ATO, FedRAMP authorization, CMMC certification, a facility clearance, cleared personnel, agency endorsement, or field validation.",
+    "truthful_partner_posture": "LumenCore is strongest as a bounded evidence-engineering workstream under a qualified prime or as a public-data or buyer-authorized technical review sprint.",
+    "current_capabilities": [
+      "Source hashing and schema-aware ingestion",
+      "Frozen evaluation plans and baseline-versus-candidate replay",
+      "Machine-readable claim and evidence states",
+      "Append-only artifact and decision receipts",
+      "Negative, neutral, inconclusive, and adverse-result retention",
+      "Human approval gates for promotion, rerun, hold, or rejection",
+      "Reviewer-facing reproducibility and conformance packages"
+    ],
+    "proposed_deliverables": [
+      "Source and authority registry",
+      "Locked evaluation and acceptance plan",
+      "Reproducible execution bundle",
+      "Deviation and failure log",
+      "Evidence-to-claim traceability matrix",
+      "Reviewer decision packet with explicit limitations"
+    ]
+  },
+  "current_evidence_snapshot": {
+    "registered_family_count": 140,
+    "implementation_present_count": 35,
+    "implementation_required_count": 105,
+    "executed_direct_source_baseline_comparison_count": 126,
+    "promotion_gate_pass_count": 0,
+    "global_holm_positive_count": 0,
+    "prospective_protocol_id": "LUMENCORE_TS_SOURCE_NATIVE_20260729_V1",
+    "prospective_protocol_status": "FROZEN_AWAITING_FUTURE_OBSERVATIONS",
+    "prospective_promotion_decision": "WAITING_FOR_NEW_SOURCE_ROWS",
+    "eligible_future_observation_count": 0,
+    "performance_claim_allowed": false,
+    "field_validation_claim_allowed": false,
+    "real_dollar_claim_allowed": false,
+    "source_receipts": [
+      {
+        "path": "out/ops/source_native_family_baseline_ledger_latest.json",
+        "bytes": 2159316,
+        "sha256": "7BC80126D77E8EDEC39D0FE97ADFF15C477BA681A985B0DABB431C0B4E963D2D"
+      },
+      {
+        "path": "out/ops/time_series_source_native_prospective_protocol_status.json",
+        "bytes": 1108,
+        "sha256": "B66AF0CA033D95982B4B38C2CA9699A1386B3ADDF07A56B0C988C73125C508CD"
+      }
+    ],
+    "claim_boundary": "This ledger separates executable direct measured comparisons from source-conditioned synthetic stress, generated benchmarks, and context-only inventory. Individual baseline wins are exploratory research leads unless the same predeclared candidate beats every source-native baseline after the global multiple-comparison correction on a prospectively protected holdout. No current card passes that gate. Nothing here establishes field validation, realized savings, enterprise value, trading edge, or live-execution authority."
+  },
+  "opportunities": [
+    {
+      "record_id": "dcsa-jmitt-hs002126qe046",
+      "notice_id": "HS002126QE046",
+      "title": "JCITS Malware Intelligence Triage Tool Platform",
+      "agency": "Defense Counterintelligence and Security Agency",
+      "official_url": "https://sam.gov/opp/b04cf8b2cd66485983de43f074884c97/view",
+      "source_observed_utc": "2026-07-26T22:21:40Z",
+      "deadline_utc": "2026-07-27T14:00:00Z",
+      "deadline_local": "2026-07-27 10:00 AM Eastern, conservative 14:00Z cutoff",
+      "deadline_source_literal": "07/27/2026 at 10:00 a.m. EST",
+      "deadline_normalization": "14:00Z conservative operational cutoff because the source says EST during daylight season",
+      "timezone_clarification_required": true,
+      "notice_type": "Combined synopsis and solicitation - intended sole source",
+      "set_aside": "Unrestricted due to sole-source posture",
+      "fit_score": 20,
+      "decision": "NO_GO_INTENDED_SOLE_SOURCE_EQUIVALENCE_NOT_ESTABLISHED",
+      "truthful_role": "No current prime, challenge, or independent partner role; any future contribution would require invitation and workshare through the identified sole-source platform owner.",
+      "duplicate_state": "NO_PRIOR_RESPONSE_IDENTIFIED",
+      "partner_route_state": "NONE",
+      "source_set_state": "FROZEN_PARTIAL_ATTACHMENTS_NOT_CAPTURED",
+      "source_set_complete": false,
+      "source_files": [
+        {
+          "path": "grant_submissions/funding_sprint_20260709/source_attachments/HS002126QE046_Combined_Synopsis.docx",
+          "official_url": "https://sam.gov/api/prod/opps/v3/opportunities/resources/files/40fa280f95404f6ea54bd1c4fdc0ec24/download?fn=Combined%20Synopsis.docx",
+          "role": "Combined synopsis, sole-source rationale, core capability, and response instructions",
+          "bytes": 79730,
+          "sha256": "B90A1BC4D5061CB2F0C0F6E3051D217437195ED2FEC09332DD8A76DD1BDE8A92"
+        }
+      ],
+      "response_instructions": {
+        "channel": "EMAIL_TO_BOTH_NAMED_OFFICIALS",
+        "recipient_role_count": 2,
+        "subject_line": "Not stated in the reviewed synopsis",
+        "file_format": "Electronic response; hard copy prohibited",
+        "page_limit": "Not stated",
+        "format_rules": "Quotes or capability statements considered under the intended sole-source notice",
+        "required_contents": [
+          "Exact JMITT platform equivalence",
+          "Apiary and MReTT integration",
+          "Required malware repository and analysis capability",
+          "Price if submitting a quote"
+        ],
+        "source_precedence": "Combined synopsis plus Attachments 1 through 3; attachments remain uncaptured, so the source set is partial"
+      },
+      "mandatory_requirements": [
+        {
+          "id": "operational_malware_platform",
+          "description": "Operational malware intelligence triage platform meeting the stated ingestion, analysis, and response-time requirements",
+          "state": "NOT_ESTABLISHED"
+        },
+        {
+          "id": "required_integrations",
+          "description": "Existing Apiary and Malware Relationship Triage Tool integration capability",
+          "state": "NOT_ESTABLISHED"
+        },
+        {
+          "id": "existing_platform_and_repository_scale",
+          "description": "Existing JMITT platform, required repository scale, custom algorithms, visualizations, and support capacity",
+          "state": "NOT_ESTABLISHED"
+        }
+      ],
+      "safest_next_action": "Do not submit a quote or capability challenge.",
+      "seconds_remaining": 0,
+      "deadline_closed": true,
+      "missing_mandatory_evidence": [
+        "operational_malware_platform",
+        "required_integrations",
+        "existing_platform_and_repository_scale"
+      ],
+      "prime_submission_ready": false,
+      "partner_brief_ready": false,
+      "future_partner_route_possible_not_ready": false,
+      "instruction_conformance_ready": false,
+      "external_action_authorized": false
+    },
+    {
+      "record_id": "usbr-hdb-140r4026r0021",
+      "notice_id": "140R4026R0021",
+      "title": "Hydrological Database Support Services",
+      "agency": "Bureau of Reclamation",
+      "official_url": "https://sam.gov/opp/2ba21e10478544f8b17eb20f6205b0d3/view",
+      "source_observed_utc": "2026-07-26T22:21:40Z",
+      "deadline_utc": "2026-07-27T16:00:00Z",
+      "deadline_local": "2026-07-27 10:00 AM Mountain Time",
+      "deadline_source_literal": "27 July 2026, by 10:00 AM Mountain Time",
+      "deadline_normalization": "16:00Z conservative July Mountain Time cutoff",
+      "timezone_clarification_required": false,
+      "notice_type": "Sources sought",
+      "set_aside": "Market research; small-business capability is material",
+      "fit_score": 42,
+      "decision": "NO_GO_PRIME_PARTNER_ROUTE_POSSIBLE_NOT_READY",
+      "truthful_role": "Potential future evidence-quality or reproducibility subcontractor to an established HDB and Oracle support team.",
+      "duplicate_state": "NO_PRIOR_RESPONSE_IDENTIFIED",
+      "partner_route_state": "POSSIBLE_NOT_READY",
+      "source_set_state": "FROZEN_REVIEWED",
+      "source_set_complete": true,
+      "source_files": [
+        {
+          "path": "grant_submissions/funding_sprint_20260709/source_attachments/140R4026R0021_Sources_Sought_Notice.pdf",
+          "official_url": "https://sam.gov/api/prod/opps/v3/opportunities/resources/files/8cbd7291a3e74dc79ba9673b51e7e6d9/download?fn=Sources%20Sought%20Notice.pdf",
+          "role": "Controlling sources-sought notice and response instructions",
+          "bytes": 142286,
+          "sha256": "791563E7465EFE5EDDBAFBFC14A15040DAF3576538DD4712C36B093B50B071CA"
+        }
+      ],
+      "response_instructions": {
+        "channel": "EMAIL",
+        "recipient_role_count": 1,
+        "subject_line": "Sources Sought - HDB Support Services IDIQ - 140R4026R0021",
+        "file_format": "Searchable PDF",
+        "page_limit": "Five pages maximum, excluding cover page",
+        "format_rules": "Proprietary information clearly marked; no proposal, quotation, or detailed cost proposal",
+        "required_contents": [
+          "Company and entity information",
+          "NAICS size and socioeconomic status",
+          "Up to three comparable projects",
+          "Full HDB, Oracle, OpenDCS, DECODES, RHEL, RiverWare, API, testing, documentation, and cybersecurity capability",
+          "Staffing, qualifications, continuity, and urgent-response capacity"
+        ],
+        "source_precedence": "Current official sources-sought notice"
+      },
+      "mandatory_requirements": [
+        {
+          "id": "hdb_experience",
+          "description": "Demonstrated Hydrological Database support, maintenance, and development experience",
+          "state": "NOT_ESTABLISHED"
+        },
+        {
+          "id": "oracle_expertise",
+          "description": "Deep Oracle database and HDB ecosystem expertise",
+          "state": "NOT_ESTABLISHED"
+        },
+        {
+          "id": "urgent_support_capacity",
+          "description": "Qualified support staff and urgent response capacity for a mission database of record",
+          "state": "NOT_ESTABLISHED"
+        }
+      ],
+      "safest_next_action": "Do not send a five-page capability response. Reopen only through a documented teaming route with an established HDB and Oracle contractor.",
+      "seconds_remaining": 0,
+      "deadline_closed": true,
+      "missing_mandatory_evidence": [
+        "hdb_experience",
+        "oracle_expertise",
+        "urgent_support_capacity"
+      ],
+      "prime_submission_ready": false,
+      "partner_brief_ready": false,
+      "future_partner_route_possible_not_ready": true,
+      "instruction_conformance_ready": false,
+      "external_action_authorized": false
+    },
+    {
+      "record_id": "air-force-csdr-fa701426scs01",
+      "notice_id": "FA701426SCS01",
+      "title": "Cost and Software Data Reporting Support and Curation",
+      "agency": "Department of the Air Force",
+      "official_url": "https://sam.gov/opp/d7ee23c80d4749beb5b905da08aed6d6/view",
+      "source_observed_utc": "2026-07-26T22:21:40Z",
+      "deadline_utc": "2026-07-27T17:00:00Z",
+      "deadline_local": "2026-07-27 1:00 PM EDT",
+      "deadline_source_literal": "July 27, 2026 at 1:00 PM EDT",
+      "deadline_normalization": "17:00Z exact conversion from EDT",
+      "timezone_clarification_required": false,
+      "notice_type": "Commercial Solutions Opening - Step 1 white paper",
+      "set_aside": "100 percent small business",
+      "fit_score": 82,
+      "decision": "NO_READY_RESPONSE_FUTURE_PARTNER_ROUTE_BLOCKED",
+      "truthful_role": "A future evidence-lineage workstream may be considered only after a qualified CSDR prime verifies direct CSDR and FlexFile experience, cleared performing personnel, access, OCI, NDA, data-rights, and workshare gates.",
+      "duplicate_state": "FRIDAY_CAPABILITY_EMAIL_ALREADY_SENT_NO_DUPLICATE",
+      "partner_route_state": "POSSIBLE_NOT_READY",
+      "source_set_state": "FROZEN_REVIEWED",
+      "source_set_complete": true,
+      "source_files": [
+        {
+          "path": "grant_submissions/funding_sprint_20260709/source_attachments/FA701426SCS01_Amendment_2_CSO_Solicitation_2026-07-24.pdf",
+          "official_url": "https://sam.gov/opp/d7ee23c80d4749beb5b905da08aed6d6/view",
+          "role": "Controlling Amendment 2 CSO instructions",
+          "bytes": 232275,
+          "sha256": "477A943F5813507CE6B36B612F1EEAFD005BD88EC1BED7F2D2F299AC5DC8DC91"
+        },
+        {
+          "path": "grant_submissions/funding_sprint_20260709/source_attachments/FA701426SCS01_PWS_CSDR_Support_and_Curation.pdf",
+          "official_url": "https://sam.gov/opp/d7ee23c80d4749beb5b905da08aed6d6/view",
+          "role": "Performance work statement and personnel qualifications",
+          "bytes": 219023,
+          "sha256": "0B899A7565115FDFC694A7ED163A751BA8A71A2DAA8D08175761C1D2EFAF8849"
+        }
+      ],
+      "response_instructions": {
+        "channel": "EMAIL",
+        "recipient_role_count": 1,
+        "subject_line": "Notice identifier and response title required by the controlling CSO",
+        "file_format": "Microsoft Word",
+        "page_limit": "No page limit stated",
+        "format_rules": "12-point Times New Roman, single-spaced, letter size, one-inch margins, numbered pages",
+        "required_contents": [
+          "Page 1 program, company, size, entity, and point-of-contact fields",
+          "Period and objectives",
+          "Technical summary and deliverables",
+          "Technical approach",
+          "Time-phased rough order of magnitude"
+        ],
+        "source_precedence": "Current CSO amendment and PWS"
+      },
+      "mandatory_requirements": [
+        {
+          "id": "direct_csdr_flexfile_experience",
+          "description": "Demonstrated hands-on CSDR, FlexFile, and related reporting-system experience",
+          "state": "NOT_ESTABLISHED"
+        },
+        {
+          "id": "secret_cleared_personnel",
+          "description": "All performing contractor and subcontractor personnel hold at least a Secret clearance",
+          "state": "NOT_ESTABLISHED"
+        },
+        {
+          "id": "task_three_lead",
+          "description": "Task 3 lead has at least ten years of weapon-system acquisition and cost-estimating experience with direct CSDR domain experience",
+          "state": "NOT_ESTABLISHED"
+        },
+        {
+          "id": "task_four_lead",
+          "description": "Task 4 lead has at least ten years of data curation or data science experience with substantial DoD or CSDR-comparable data and CSDR-suite familiarity",
+          "state": "NOT_ESTABLISHED"
+        }
+      ],
+      "safest_next_action": "Do not submit a prime or partner response and do not duplicate Friday outreach. Reopen only if a qualified CSDR prime first verifies direct experience, cleared performing personnel, access, OCI, NDA, data-rights, and workshare gates.",
+      "seconds_remaining": 0,
+      "deadline_closed": true,
+      "missing_mandatory_evidence": [
+        "direct_csdr_flexfile_experience",
+        "secret_cleared_personnel",
+        "task_three_lead",
+        "task_four_lead"
+      ],
+      "prime_submission_ready": false,
+      "partner_brief_ready": false,
+      "future_partner_route_possible_not_ready": true,
+      "instruction_conformance_ready": false,
+      "external_action_authorized": false
+    },
+    {
+      "record_id": "nasa-cypris-80nssc26938528q",
+      "notice_id": "80NSSC26938528Q",
+      "title": "Cypris AI Dashboard Subscription",
+      "agency": "NASA Shared Services Center",
+      "official_url": "https://sam.gov/opp/f2b8a742bf95434382f2cdb2db6a615b/view",
+      "source_observed_utc": "2026-07-26T22:21:40Z",
+      "deadline_utc": "2026-07-27T17:00:00Z",
+      "deadline_local": "2026-07-27 12:00 PM Central, conservative 17:00Z cutoff",
+      "deadline_source_literal": "7/27/2026 at 12:00 p.m. Central Standard Time",
+      "deadline_normalization": "17:00Z conservative operational cutoff because the source says CST during daylight season",
+      "timezone_clarification_required": true,
+      "notice_type": "Special notice - intended sole source",
+      "set_aside": "No set-aside stated",
+      "fit_score": 18,
+      "decision": "NO_GO_INTENDED_SOLE_SOURCE_EQUIVALENCE_NOT_ESTABLISHED",
+      "truthful_role": "No current prime or substitute-product role.",
+      "duplicate_state": "NO_PRIOR_RESPONSE_IDENTIFIED",
+      "partner_route_state": "NONE",
+      "source_set_state": "FROZEN_REVIEWED",
+      "source_set_complete": true,
+      "source_files": [
+        {
+          "path": "grant_submissions/funding_sprint_20260709/source_attachments/80NSSC26938528Q_Capability_Statement.pdf",
+          "official_url": "https://sam.gov/api/prod/opps/v3/opportunities/resources/files/2ada149fb42a40dc85426159b27ccddb/download?fn=Capability%20Statement.pdf",
+          "role": "Intended sole-source capability notice",
+          "bytes": 134329,
+          "sha256": "0EA07173792CE7F11260B42B210C2574DD1FDC6505EB44ED1755C0677A2F6C91"
+        }
+      ],
+      "response_instructions": {
+        "channel": "WRITTEN_RESPONSE_TO_IDENTIFIED_POC",
+        "recipient_role_count": 1,
+        "subject_line": "Not stated in the reviewed attachment",
+        "file_format": "Written capabilities and qualifications; oral responses prohibited",
+        "page_limit": "Not stated",
+        "format_rules": "Capability challenge only; exact one-year Cypris subscription equivalence must be supported",
+        "required_contents": [
+          "Capabilities and qualifications to perform the exact effort",
+          "Evidence sufficient to support a competitive-basis determination"
+        ],
+        "source_precedence": "Current official intended sole-source capability notice"
+      },
+      "mandatory_requirements": [
+        {
+          "id": "commercial_equivalent_platform",
+          "description": "Existing commercial platform meeting the stated Cypris subscription, content, integration, and seat requirements",
+          "state": "NOT_ESTABLISHED"
+        },
+        {
+          "id": "commercial_pricing",
+          "description": "Current commercial pricing and subscription terms for the required offering",
+          "state": "NOT_ESTABLISHED"
+        }
+      ],
+      "safest_next_action": "Do not submit a capability challenge to the intended sole-source notice.",
+      "seconds_remaining": 0,
+      "deadline_closed": true,
+      "missing_mandatory_evidence": [
+        "commercial_equivalent_platform",
+        "commercial_pricing"
+      ],
+      "prime_submission_ready": false,
+      "partner_brief_ready": false,
+      "future_partner_route_possible_not_ready": false,
+      "instruction_conformance_ready": false,
+      "external_action_authorized": false
+    },
+    {
+      "record_id": "dha-pha-modernization-ht003826sc004aoi1",
+      "notice_id": "HT003826SC004AOI1",
+      "title": "Periodic Health Assessment Modernization Capability",
+      "agency": "Defense Health Agency",
+      "official_url": "https://sam.gov/opp/53b337e7deec4fa683c84e6e74a3735e/view",
+      "source_observed_utc": "2026-07-26T22:21:40Z",
+      "deadline_utc": "2026-07-27T19:00:00Z",
+      "deadline_local": "2026-07-27 3:00 PM EDT",
+      "deadline_source_literal": "July 27, 2026 at 3:00 PM EDT",
+      "deadline_normalization": "19:00Z exact conversion from EDT",
+      "timezone_clarification_required": false,
+      "notice_type": "Commercial Solutions Opening area of interest",
+      "set_aside": "No small-business set-aside or participation goal per July 23 Q&A",
+      "fit_score": 48,
+      "decision": "NO_GO_PRIME_PARTNER_ROUTE_POSSIBLE_NOT_READY",
+      "truthful_role": "Potential future CDP conformance and evidence workstream under a team that already has a functioning end-to-end clinical PHA product and licensed-provider workflow.",
+      "duplicate_state": "NO_PRIOR_RESPONSE_IDENTIFIED",
+      "partner_route_state": "POSSIBLE_NOT_READY",
+      "source_set_state": "FROZEN_REVIEWED",
+      "source_set_complete": true,
+      "source_files": [
+        {
+          "path": "grant_submissions/funding_sprint_20260709/source_attachments/HT003826SC004AOI1_AOI1.pdf",
+          "official_url": "https://sam.gov/api/prod/opps/v3/opportunities/resources/files/c3fc75a0615949afbef2c59237687d38/download?fn=AOI1.pdf",
+          "role": "Area of Interest requirements and submission instructions",
+          "bytes": 250640,
+          "sha256": "34C8135B4D3E5FA128010702C55684B71A3632DEE70C8693A658D8DFAE12A6AC"
+        },
+        {
+          "path": "grant_submissions/funding_sprint_20260709/source_attachments/HT003826SC004AOI1_QA_2026-07-23.pdf",
+          "official_url": "https://sam.gov/api/prod/opps/v3/opportunities/resources/files/0bb2cef074944498b67359f755bcb693/download?fn=AOI%201%20Q_A.pdf",
+          "role": "July 23 official questions and answers",
+          "bytes": 138161,
+          "sha256": "A3CDD12A01A9DE4745D0C3F6DB7E7FAE12A10B1B3F4148917F11125FB3E1684B"
+        }
+      ],
+      "response_instructions": {
+        "channel": "EMAIL",
+        "recipient_role_count": 1,
+        "subject_line": "Not specified in the reviewed AOI",
+        "file_format": "Brief Notice of Intent to Demonstrate; no solution-brief template",
+        "page_limit": "Two pages maximum",
+        "format_rules": "No actual PII or PHI; synthetic or fully de-identified data only",
+        "required_contents": [
+          "Point of contact",
+          "Demonstrated capability summary",
+          "Team roles",
+          "Phase 1 and Phase 3 environment or access needs",
+          "Current operational status and environment",
+          "Applicable nontraditional defense contractor status"
+        ],
+        "source_precedence": "AOI plus July 23 official Q&A"
+      },
+      "mandatory_requirements": [
+        {
+          "id": "functioning_end_to_end_pha_product",
+          "description": "Live functioning end-to-end Parts A, B, C1, and C2 capability suitable for the Phase 1 demonstration",
+          "state": "NOT_ESTABLISHED"
+        },
+        {
+          "id": "clinical_provider_authority_workflow",
+          "description": "Healthcare-domain conversational AI, clinical risk scoring, and explicit licensed-provider decision authority",
+          "state": "NOT_ESTABLISHED"
+        },
+        {
+          "id": "mobile_web_and_data_integration_capability",
+          "description": "Working mobile and web workflow with required PHA data, dashboards, notifications, and integration posture",
+          "state": "NOT_ESTABLISHED"
+        }
+      ],
+      "safest_next_action": "Do not send a Notice of Intent. A future team route is possible only after a clinical-product lead demonstrates the full PHA workflow and licensed-provider authority; Phase 1 may use commercial cloud and synthetic data, while IL5 and IL6 remain later posture gates.",
+      "seconds_remaining": 0,
+      "deadline_closed": true,
+      "missing_mandatory_evidence": [
+        "functioning_end_to_end_pha_product",
+        "clinical_provider_authority_workflow",
+        "mobile_web_and_data_integration_capability"
+      ],
+      "prime_submission_ready": false,
+      "partner_brief_ready": false,
+      "future_partner_route_possible_not_ready": true,
+      "instruction_conformance_ready": false,
+      "external_action_authorized": false
+    }
+  ],
+  "artifacts": {
+    "decision_markdown": "grant_submissions/funding_sprint_20260709/MONDAY_FEDERAL_ACTION_PACKET_2026-07-26.md",
+    "csdr_partner_brief": "grant_submissions/funding_sprint_20260709/FA701426SCS01_PARTNER_ONLY_BRIEF_2026-07-26.md",
+    "public_safe_capability_pdf": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf"
+  },
+  "claim_boundary": "This packet is a source-bound decision and document-preparation aid. It does not establish eligibility, responsiveness, submission, receipt, selection, funding, award, contract performance, agency endorsement, independent validation, or permission to make an external representation.",
+  "control_sha256": "CAF9546A1A29075133776DE22787ED6003C27D9A9E198E00A677C01486E5491D"
+}

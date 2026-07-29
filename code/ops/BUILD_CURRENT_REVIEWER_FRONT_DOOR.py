@@ -208,7 +208,7 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
         "registered_family_count": 140,
         "implementation_present_count": 35,
         "implementation_required_count": 105,
-        "executed_direct_source_baseline_comparison_count": 120,
+        "executed_direct_source_baseline_comparison_count": 126,
         "individual_comparison_global_holm_positive_count": 0,
         "internal_source_native_promotion_gate_pass_count": 0,
         "market_signal_candidate_count": 4,

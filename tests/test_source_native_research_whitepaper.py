@@ -33,7 +33,8 @@ def test_whitepaper_reports_current_negative_result_and_seals_payload():
     assert payload["independently_validated"] is False
     assert payload["current_snapshot"]["registered_family_count"] == 140
     assert payload["current_snapshot"]["implementation_present_count"] == 35
-    assert payload["current_snapshot"]["executed_comparison_count"] == 120
+    assert payload["current_snapshot"]["direct_candidate_source_card_count"] == 23
+    assert payload["current_snapshot"]["executed_comparison_count"] == 126
     assert payload["current_snapshot"]["global_holm_positive_count"] == 0
     assert payload["current_snapshot"]["promotion_gate_pass_count"] == 0
     assert payload["current_snapshot"]["market_signal_candidate_count"] == 4

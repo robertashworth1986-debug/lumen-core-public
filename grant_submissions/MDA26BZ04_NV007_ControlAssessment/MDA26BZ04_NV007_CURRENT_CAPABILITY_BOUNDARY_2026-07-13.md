@@ -1,5 +1,12 @@
 # MDA26BZ04-NV007 Current Capability Boundary
 
+Status: `DOMAIN_BOUNDARY_REUSE_REQUIRES_CURRENT_SOURCE_RECHECK`
+
+This is a dated, scope-specific capability boundary, not a current solicitation
+response or submission attachment. Reuse requires a fresh official-notice
+check, current evidence receipts, and confirmation that every stated limitation
+still holds.
+
 Prepared: 2026-07-13
 
 ## Safe Current-Capability Statement

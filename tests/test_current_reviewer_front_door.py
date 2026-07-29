@@ -31,7 +31,7 @@ def test_current_reviewer_front_door_is_fail_closed_and_hash_backed():
     assert summary["registered_family_count"] == 140
     assert summary["implementation_present_count"] == 35
     assert summary["implementation_required_count"] == 105
-    assert summary["executed_direct_source_baseline_comparison_count"] == 120
+    assert summary["executed_direct_source_baseline_comparison_count"] == 126
     assert summary["individual_comparison_global_holm_positive_count"] == 0
     assert summary["market_signal_candidate_count"] == 4
     assert summary["market_signal_source_count"] == 3

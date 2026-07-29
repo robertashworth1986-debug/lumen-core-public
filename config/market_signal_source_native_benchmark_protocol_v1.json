@@ -1,0 +1,169 @@
+{
+  "schema": "market_signal_source_native_benchmark_protocol_v1",
+  "protocol_id": "LUMENCORE_MARKET_SIGNAL_SOURCE_NATIVE_20260729_V1",
+  "protocol_date": "2026-07-29",
+  "purpose": "Bounded retrospective paper/replay benchmark of transparent registered market-signal families against registered lane-native baselines on measured source snapshots.",
+  "mode": "EXPLORATORY_RETROSPECTIVE_PAPER_REPLAY_ONLY",
+  "evidence_boundary": "This protocol measures fixed, chronology-safe paper/replay rules on three already-registered snapshots. It does not establish alpha, edge, profit, value, field performance, prospective validity, execution quality, or live-trading authority.",
+  "inputs": {
+    "source_wiring_matrix": "out/ops/geometry_live_wiring_matrix_latest.json",
+    "family_registry": "config/geometry_championship_v1_registry.json"
+  },
+  "sources": [
+    {
+      "source": "KRAKEN_PUBLIC",
+      "snapshot_path": "data/live_measured/kraken_public/kraken_public_20260713T192646Z.json",
+      "snapshot_embedded_sha256": "38cee5af65406459ebd0e56ad241ed76f69862623ec7ddbff94b663381a05875",
+      "series_field": "pair",
+      "timestamp_field": "time",
+      "close_field": "close",
+      "periods_per_year": 8760,
+      "cost_bps_per_unit_turnover": 10.0,
+      "cost_note": "Fixed retrospective commission-plus-slippage proxy; excludes funding, borrow, latency, queue position, and market impact."
+    },
+    {
+      "source": "TWELVE_DATA",
+      "snapshot_path": "data/live_measured/twelve_data/twelve_data_20260713T192646Z.json",
+      "snapshot_embedded_sha256": "356de5123d56f17e55821814e629785c39e17382f1104314976566362aa6cc0e",
+      "series_field": "symbol",
+      "timestamp_field": "datetime",
+      "close_field": "close",
+      "periods_per_year": 252,
+      "cost_bps_per_unit_turnover": 5.0,
+      "cost_note": "Fixed retrospective commission-plus-slippage proxy; excludes borrow, spread variation, latency, taxes, and market impact."
+    },
+    {
+      "source": "ALPHAVANTAGE",
+      "snapshot_path": "data/live_measured/alphavantage/alphavantage_20260713T192646Z.json",
+      "snapshot_embedded_sha256": "4f98a6b0e7f569fd2d7a46760cf98eb80a0850efd2e2ce7e502fdf01f96ca5b9",
+      "series_field": "pair",
+      "timestamp_field": "date",
+      "close_field": "4. close",
+      "periods_per_year": 252,
+      "cost_bps_per_unit_turnover": 2.0,
+      "cost_note": "Fixed retrospective spread-and-slippage proxy; excludes financing, venue, latency, rollover, and market impact."
+    }
+  ],
+  "evaluation": {
+    "warmup_observations": 60,
+    "initial_position": 0.0,
+    "future_return_definition": "close[t] / close[t-1] - 1",
+    "signal_timing": "Every position applied to return[t] is computed only from observations at or before t-1.",
+    "position_bounds": [
+      -1.0,
+      1.0
+    ],
+    "transaction_cost_definition": "cost_bps_per_unit_turnover / 10000 * abs(position[t] - position[t-1])",
+    "paper_net_return_definition": "position[t] * future_return[t] - transaction_cost[t]",
+    "risk_adjusted_score_definition": "mean(paper_net_return) / sample_standard_deviation(paper_net_return), unannualized, zero when fewer than two observations or zero variance",
+    "drawdown_definition": "maximum peak-to-trough decline of the compounded paper net-return index",
+    "no_parameter_tuning_on_evaluation": true
+  },
+  "candidates": [
+    {
+      "family_id": "beast_strategy_trend",
+      "implementation_id": "lagged_return_mean_cross_v1",
+      "parameters": {
+        "fast_return_lookback": 5,
+        "slow_return_lookback": 20,
+        "long_position": 1.0,
+        "short_position": -1.0
+      }
+    },
+    {
+      "family_id": "beast_strategy_mean_revert",
+      "implementation_id": "lagged_return_zscore_reversion_v1",
+      "parameters": {
+        "reference_return_lookback": 20,
+        "entry_zscore": 1.0,
+        "long_position": 1.0,
+        "short_position": -1.0,
+        "neutral_position": 0.0
+      }
+    },
+    {
+      "family_id": "beast_strategy_breakout",
+      "implementation_id": "lagged_close_channel_breakout_v1",
+      "parameters": {
+        "channel_lookback": 20,
+        "long_position": 1.0,
+        "short_position": -1.0,
+        "neutral_position": 0.0
+      }
+    },
+    {
+      "family_id": "beast_strategy_regime_switch",
+      "implementation_id": "lagged_volatility_regime_switch_v1",
+      "parameters": {
+        "fast_volatility_lookback": 5,
+        "slow_volatility_lookback": 20,
+        "trend_family_id": "beast_strategy_trend",
+        "mean_revert_family_id": "beast_strategy_mean_revert"
+      }
+    }
+  ],
+  "baselines": [
+    {
+      "baseline_id": "buy_and_hold",
+      "implementation_id": "constant_long_v1",
+      "parameters": {
+        "position": 1.0
+      }
+    },
+    {
+      "baseline_id": "moving_average_cross",
+      "implementation_id": "lagged_close_mean_cross_v1",
+      "parameters": {
+        "fast_close_lookback": 10,
+        "slow_close_lookback": 30,
+        "long_position": 1.0,
+        "short_position": -1.0
+      }
+    },
+    {
+      "baseline_id": "ridge_return_baseline",
+      "implementation_id": "fixed_history_ridge_return_sign_v1",
+      "parameters": {
+        "return_lags": 5,
+        "training_window": 60,
+        "minimum_training_samples": 30,
+        "ridge_lambda": 0.001,
+        "long_position": 1.0,
+        "short_position": -1.0,
+        "neutral_position": 0.0
+      }
+    },
+    {
+      "baseline_id": "volatility_targeting",
+      "implementation_id": "lagged_long_volatility_target_v1",
+      "parameters": {
+        "volatility_lookback": 20,
+        "target_annual_volatility": 0.1,
+        "maximum_leverage": 1.0,
+        "minimum_volatility": 1e-12
+      }
+    }
+  ],
+  "inference": {
+    "paired_unit": "source_series",
+    "cluster_definition": "Each distinct source and series identifier is one cluster; overlapping time observations are never treated as independent inferential units.",
+    "test": "two_sided_exact_sign_test_on_source_series_risk_adjusted_score_deltas",
+    "ties": "excluded",
+    "global_multiple_comparison_control": "holm",
+    "familywise_alpha": 0.05,
+    "comparison_scope": "all candidate-source-baseline comparisons",
+    "minimum_clusters_for_interpretable_inference": 5,
+    "single_cluster_rule": "Return raw p=1.0 and mark inference insufficient rather than treating time observations as independent."
+  },
+  "claim_controls": {
+    "alpha_claim_allowed": false,
+    "edge_claim_allowed": false,
+    "profit_claim_allowed": false,
+    "value_claim_allowed": false,
+    "field_performance_claim_allowed": false,
+    "prospective_validation_claim_allowed": false,
+    "live_trading_allowed": false,
+    "external_action_allowed": false,
+    "promotion_allowed": false
+  }
+}

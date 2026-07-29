@@ -1,0 +1,170 @@
+{
+  "artifacts": [
+    {
+      "artifact_type": "historical_rfi_draft",
+      "bytes": 5710,
+      "claim_snapshot_refresh_required": true,
+      "deadline_closed": true,
+      "deadline_utc": "2026-07-13T23:59:59Z",
+      "dependencies": [],
+      "external_release_authorized": false,
+      "id": "air_force_aac_rfi_20260709",
+      "missing_text_markers": [],
+      "path": "grant_submissions/funding_sprint_20260709/AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
+      "required_text_markers": [
+        "Status: `HISTORICAL_DO_NOT_SEND`",
+        "quantitative evidence snapshot is dated 2026-07-09"
+      ],
+      "send_eligible": false,
+      "sha256": "D2B7AD45E342462096F6BD0A6574978D99CCB1B45341A49AC62898EC6AD348D4",
+      "status": "HISTORICAL_DO_NOT_SEND"
+    },
+    {
+      "artifact_type": "historical_capture_outline",
+      "bytes": 6358,
+      "claim_snapshot_refresh_required": true,
+      "deadline_closed": false,
+      "deadline_utc": "2026-08-03T23:59:59Z",
+      "dependencies": [],
+      "external_release_authorized": false,
+      "id": "fhwa_tsmo_outline_20260709",
+      "missing_text_markers": [],
+      "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
+      "required_text_markers": [
+        "Status: `CLOSED_ROUTE_DO_NOT_SEND`",
+        "This route is closed under the current outreach controls."
+      ],
+      "send_eligible": false,
+      "sha256": "61B9FFF2C10B2493265F00C399D2E9822E378A4FC87F95B9325014FCCA773DEA",
+      "status": "CLOSED_ROUTE_DO_NOT_SEND"
+    },
+    {
+      "artifact_type": "historical_pdf",
+      "bytes": 3333,
+      "claim_snapshot_refresh_required": true,
+      "deadline_closed": false,
+      "deadline_utc": "2026-08-03T23:59:59Z",
+      "dependencies": [],
+      "external_release_authorized": false,
+      "id": "fhwa_tsmo_pdf_20260709",
+      "missing_text_markers": [],
+      "path": "grant_submissions/funding_sprint_20260709/LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf",
+      "required_text_markers": [],
+      "send_eligible": false,
+      "sha256": "E331CB0F65951CE7844DDD60878A69E916852BF33334BCFAA96670E698629498",
+      "status": "CLOSED_ROUTE_DO_NOT_SEND"
+    },
+    {
+      "artifact_type": "domain_capability_boundary",
+      "bytes": 4717,
+      "claim_snapshot_refresh_required": true,
+      "deadline_closed": false,
+      "deadline_utc": "",
+      "dependencies": [],
+      "external_release_authorized": false,
+      "id": "mda_control_assessment_boundary_20260713",
+      "missing_text_markers": [],
+      "path": "grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md",
+      "required_text_markers": [
+        "Status: `DOMAIN_BOUNDARY_REUSE_REQUIRES_CURRENT_SOURCE_RECHECK`",
+        "Reuse requires a fresh official-notice"
+      ],
+      "send_eligible": false,
+      "sha256": "0F0E23DA0AE7E72AF5D179D3634F55E3B53E1CB0C8037CA35079F07C7A643247",
+      "status": "DOMAIN_BOUNDARY_REUSE_REQUIRES_CURRENT_SOURCE_RECHECK"
+    },
+    {
+      "artifact_type": "historical_public_safe_pdf",
+      "bytes": 890432,
+      "claim_snapshot_refresh_required": true,
+      "deadline_closed": false,
+      "deadline_utc": "",
+      "dependencies": [],
+      "external_release_authorized": false,
+      "id": "federal_capability_statement_20260726",
+      "missing_text_markers": [],
+      "path": "output/pdf/LumenCore_Federal_Capability_Statement_2026-07-26.pdf",
+      "required_text_markers": [],
+      "send_eligible": false,
+      "sha256": "C5CD72F62491688781EEC801BB9ED6A2C368EB9A7412754D476B25DE3EDE5967",
+      "status": "HISTORICAL_DO_NOT_SEND"
+    },
+    {
+      "artifact_type": "current_public_safe_pdf",
+      "bytes": 890365,
+      "claim_snapshot_refresh_required": false,
+      "deadline_closed": false,
+      "deadline_utc": "",
+      "dependencies": [
+        {
+          "bytes": 44691,
+          "path": "code/ops/BUILD_MONDAY_FEDERAL_ACTION_PACKET.py",
+          "sha256": "592B10BC192BC20ED4AA62626EB341A8AA5F18C7427ED8C837623464503EED81"
+        },
+        {
+          "bytes": 19754,
+          "path": "config/monday_federal_action_packet_v1.json",
+          "sha256": "3D322E18B940F416710822D80F35A001662E93E12B65F5F0E4FB8F96A9D779E9"
+        },
+        {
+          "bytes": 696635,
+          "path": "assets/brand/lumaarc_eclipse_corona_concept_v1.png",
+          "sha256": "1ED1C9B00E273AA9E781BD7FD0A4FCC3FC542257C6D294C8E8FBFADA500701AF"
+        },
+        {
+          "bytes": 9069,
+          "path": "tests/test_monday_federal_action_packet.py",
+          "sha256": "A70557332A303AAE1E10865765F700F5AC9E8E4FDA0AE04944CC74DC2F72B027"
+        },
+        {
+          "bytes": 2159316,
+          "path": "out/ops/source_native_family_baseline_ledger_latest.json",
+          "sha256": "7BC80126D77E8EDEC39D0FE97ADFF15C477BA681A985B0DABB431C0B4E963D2D"
+        },
+        {
+          "bytes": 1108,
+          "path": "out/ops/time_series_source_native_prospective_protocol_status.json",
+          "sha256": "B66AF0CA033D95982B4B38C2CA9699A1386B3ADDF07A56B0C988C73125C508CD"
+        }
+      ],
+      "external_release_authorized": false,
+      "id": "federal_capability_statement_current",
+      "missing_text_markers": [],
+      "path": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf",
+      "required_text_markers": [],
+      "send_eligible": false,
+      "sha256": "F7E9ED937196AEDC4AFDC22E2C51258DD0CF2225200D5EAB931DA9BFEF16C03B",
+      "status": "CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED"
+    }
+  ],
+  "as_of_utc": "2026-07-29T13:51:03.824313Z",
+  "blockers": {
+    "marker_failures": [],
+    "missing_artifacts": [],
+    "missing_dependencies": [],
+    "unregistered_artifacts": []
+  },
+  "claim_boundary": "This registry governs local capability artifacts and detects stale or unregistered packets. It does not establish eligibility, responsiveness, agency trust, certification, past performance, independent validation, submission, receipt, selection, award, or authority to contact an external party.",
+  "control_sha256": "69057DDED84E5E56682F02A73B3261C94CB6E864B91C1289FB9B587A3A521832",
+  "controls": {
+    "action_time_human_approval_required": true,
+    "autonomous_email_send_allowed": false,
+    "autonomous_submission_allowed": false,
+    "closed_route_reuse_allowed": false,
+    "duplicate_suppression_required": true,
+    "evidence_snapshot_refresh_required": true,
+    "performance_claims_require_independent_evidence": true,
+    "unregistered_capability_artifact_blocks_release": true
+  },
+  "safest_next_action": "Use only the current public-safe PDF after notice-specific claim, duplicate, and action-time human review; keep historical and closed-route files internal.",
+  "schema": "lumencore.capability_statement_governance.v1",
+  "status": "GOVERNED_CURRENT_PACKET_WITH_ARCHIVED_LEGACY",
+  "summary": {
+    "current_public_safe_count": 1,
+    "domain_boundary_refresh_count": 1,
+    "external_release_authorized_count": 0,
+    "historical_or_closed_count": 4,
+    "registered_artifact_count": 6,
+    "verified_artifact_count": 6
+  }
+}

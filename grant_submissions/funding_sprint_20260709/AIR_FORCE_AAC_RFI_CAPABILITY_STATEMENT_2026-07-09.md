@@ -1,5 +1,12 @@
 # Air Force Advanced Automation Contract RFI Capability Statement Draft - 2026-07-09
 
+Status: `HISTORICAL_DO_NOT_SEND`
+
+This deadline has passed. This file is retained as a historical capture artifact,
+not as a current capability statement or approved outreach attachment. Its
+quantitative evidence snapshot is dated 2026-07-09 and must be replaced with a
+current, source-bound receipt before any language is reused.
+
 Opportunity: `SAF-AQ-RFI-26-0001`
 
 Source: https://sam.gov/opp/3fa15f166ec244539c808be5c0496427/view

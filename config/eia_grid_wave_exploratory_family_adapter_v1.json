@@ -1,0 +1,49 @@
+{
+  "schema": "eia_grid_wave_exploratory_family_adapter.v1",
+  "adapter_id": "EIA_GRID_WAVE_EXPLORATORY_FAMILY_ADAPTER_20260729_V1",
+  "created_date_utc": "2026-07-29",
+  "status": "retrospective_exploratory_only",
+  "source_protocol": {
+    "path": "config/eia_grid_wave_champion_protocol_v1.json",
+    "sha256": "273eb823b0be4b2d403d0aaa591673c2e470e3d7f30abb166a43fe6e311a1c3d",
+    "protocol_id": "EIA_GRID_WAVE_CHAMPION_20260713",
+    "frozen_protocol_must_remain_unchanged": true
+  },
+  "candidate": {
+    "id": "heart_rate_variability_control",
+    "kind": "geometry_family",
+    "analogy_boundary": "An engineering analogue of adaptive variability around a stable rhythm; not a biological, medical, or clinical model.",
+    "definition": "Fit the frozen 7, 30.4375, and 365.25 day ridge harmonic model on history available before the target. Compute seven-day historical innovations, estimate recent and long-run robust centers and scales, and apply a bounded recent-minus-long-run innovation correction whose gain decreases when recent variability exceeds long-run variability.",
+    "parameters": {
+      "harmonic_periods_days": [
+        7.0,
+        30.4375,
+        365.25
+      ],
+      "harmonic_ridge": 0.0001,
+      "weekly_lag_days": 7,
+      "recent_innovation_window": 28,
+      "long_innovation_window": 180,
+      "correction_gain": 0.35,
+      "maximum_correction_robust_scales": 1.5
+    }
+  },
+  "evaluation_contract": {
+    "source": "EIA_GRID_VALIDATION",
+    "source_native_metric": "seasonal_mase_7",
+    "source_native_unit": "megawatthours",
+    "baseline_ids_inherited_from_frozen_protocol": true,
+    "history_rule": "At target date t, the candidate may use actual observations strictly before t only.",
+    "selection_rule": "No candidate selection. This fixed candidate is appended as a retrospective exploratory comparison only.",
+    "holdout_previously_observed": true,
+    "prospectively_protected": false,
+    "promotion_eligible": false
+  },
+  "claim_controls": {
+    "public_performance_claim_allowed": false,
+    "field_validation_claim_allowed": false,
+    "realized_savings_claim_allowed": false,
+    "trading_or_control_execution_allowed": false,
+    "external_replication_required_for_any_field_claim": true
+  }
+}

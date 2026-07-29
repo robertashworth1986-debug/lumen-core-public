@@ -1,5 +1,11 @@
 # FHWA TSMO Data Initiative Technical Capability Outline - 2026-07-09
 
+Status: `CLOSED_ROUTE_DO_NOT_SEND`
+
+This route is closed under the current outreach controls. Preserve this file as
+a historical capture artifact only. Do not submit it, reuse its old deadline,
+or present its 2026-07-09 evidence counts as current.
+
 Opportunity: `693JJ326R000012`
 
 Official SAM path: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view

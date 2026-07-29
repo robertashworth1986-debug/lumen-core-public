@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import ast
 import hashlib
+import importlib.util
 import json
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -20,14 +21,35 @@ DEFAULT_JSON = ROOT / "out" / "ops" / "full_geometry_protocol_field_latest.json"
 
 BENCHMARK_MODULES = {
     "branching_transport": ROOT / "code" / "geometry_branching_transport_benchmark.py",
+    "mission_network_routing": ROOT
+    / "code"
+    / "geometry_mission_network_routing_benchmark.py",
+    "multi_agent_coordination": ROOT
+    / "code"
+    / "geometry_multi_agent_coordination_benchmark.py",
     "optimal_curve_transport": ROOT / "code" / "geometry_optimal_curve_transport_benchmark.py",
     "thermal_ventilation": ROOT / "code" / "geometry_thermal_ventilation_benchmark.py",
     "time_series_model_routing": ROOT / "code" / "geometry_time_series_model_routing_benchmark.py",
     "wave_resonance_timing": ROOT / "code" / "geometry_wave_resonance_timing_benchmark.py",
 }
 
+PROTOCOL_BOUND_IMPLEMENTATIONS = {
+    "market_signal_geometry": (
+        ROOT / "config" / "market_signal_source_native_benchmark_protocol_v1.json",
+        ROOT / "code" / "ops" / "BUILD_MARKET_SIGNAL_SOURCE_NATIVE_BENCHMARK.py",
+    ),
+}
+
 LATEST_EVIDENCE = {
     "branching_transport": ROOT / "out" / "geometry_branching_transport" / "latest.json",
+    "mission_network_routing": ROOT
+    / "out"
+    / "geometry_mission_network_routing"
+    / "latest.json",
+    "multi_agent_coordination": ROOT
+    / "out"
+    / "geometry_multi_agent_coordination"
+    / "latest.json",
     "optimal_curve_transport": ROOT / "out" / "geometry_optimal_curve_transport" / "latest.json",
     "thermal_ventilation": ROOT / "out" / "geometry_thermal_ventilation" / "latest.json",
     "wave_resonance_timing": ROOT / "out" / "geometry_wave_resonance_timing" / "latest.json",
@@ -73,6 +95,12 @@ def literal_string(node: ast.AST) -> str | None:
     return value if isinstance(value, str) else None
 
 
+def string_list(value: Any) -> list[str]:
+    if not isinstance(value, (list, tuple)):
+        return []
+    return [str(item) for item in value if str(item)]
+
+
 def module_geometry_families(path: Path) -> set[str]:
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     families: set[str] = set()
@@ -93,10 +121,74 @@ def module_geometry_families(path: Path) -> set[str]:
     return families
 
 
-def evidence_geometry_families(path: Path) -> tuple[set[str], dict[str, Any]]:
+def protocol_bound_families(
+    protocol_path: Path,
+    builder_path: Path,
+) -> tuple[set[str], dict[str, Any]]:
+    protocol = load_json(protocol_path)
+    if (
+        protocol.get("schema")
+        != "market_signal_source_native_benchmark_protocol_v1"
+        or protocol.get("mode")
+        != "EXPLORATORY_RETROSPECTIVE_PAPER_REPLAY_ONLY"
+        or any(
+            bool(value)
+            for value in (protocol.get("claim_controls") or {}).values()
+        )
+    ):
+        raise ValueError(
+            f"protocol-bound implementation is not fail closed: {protocol_path}"
+        )
+    candidate_ids = tuple(
+        str(row.get("family_id", ""))
+        for row in protocol.get("candidates", [])
+        if isinstance(row, dict)
+    )
+    spec = importlib.util.spec_from_file_location(
+        "protocol_bound_market_signal_builder",
+        builder_path,
+    )
+    if spec is None or spec.loader is None:
+        raise ValueError(f"unable to load implementation builder: {builder_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if (
+        tuple(getattr(module, "EXPECTED_CANDIDATE_IDS", ()))
+        != candidate_ids
+        or not callable(getattr(module, "candidate_position", None))
+    ):
+        raise ValueError(
+            f"protocol candidate set differs from builder: {protocol_path}"
+        )
+    return set(candidate_ids), {
+        "protocol_path": str(protocol_path),
+        "protocol_sha256": sha256_file(protocol_path),
+        "protocol_id": protocol.get("protocol_id"),
+        "builder_path": str(builder_path),
+        "builder_sha256": sha256_file(builder_path),
+        "implemented_family_count": len(candidate_ids),
+        "implemented_families": sorted(candidate_ids),
+        "claim_controls_fail_closed": True,
+    }
+
+
+def evidence_geometry_families(
+    path: Path,
+    *,
+    expected_source_sha256: str | None = None,
+) -> tuple[set[str], dict[str, Any]]:
     if not path.exists():
         return set(), {"path": str(path), "exists": False}
     payload = load_json(path)
+    declared_source_sha256 = str(
+        ((payload.get("protocol") or {}).get("source_sha256") or "")
+    ).lower()
+    expected_source_sha256 = str(expected_source_sha256 or "").lower()
+    source_sha256_valid = (
+        declared_source_sha256 == expected_source_sha256
+        if declared_source_sha256 and expected_source_sha256
+        else None
+    )
     families = {
         str(row.get("family_id"))
         for row in payload.get("strategies", [])
@@ -104,6 +196,9 @@ def evidence_geometry_families(path: Path) -> tuple[set[str], dict[str, Any]]:
         and row.get("kind") == "geometry_family"
         and row.get("family_id")
     }
+    execution_accepted = source_sha256_valid is not False
+    if not execution_accepted:
+        families = set()
     return families, {
         "path": str(path),
         "exists": True,
@@ -112,6 +207,17 @@ def evidence_geometry_families(path: Path) -> tuple[set[str], dict[str, Any]]:
         "schema": payload.get("schema"),
         "validation_scenario_count": (payload.get("validation") or {}).get("scenario_count"),
         "promotion_gate": (payload.get("promotion_gate") or {}).get("gate"),
+        "declared_source_sha256": declared_source_sha256 or None,
+        "expected_source_sha256": expected_source_sha256 or None,
+        "source_sha256_valid": source_sha256_valid,
+        "source_binding_status": (
+            "current_source_hash_verified"
+            if source_sha256_valid is True
+            else "source_hash_mismatch_execution_rejected"
+            if source_sha256_valid is False
+            else "legacy_output_without_source_hash"
+        ),
+        "execution_accepted": execution_accepted,
     }
 
 
@@ -121,9 +227,20 @@ def replay_evidence(path: Path) -> tuple[dict[str, dict[str, Any]], dict[str, An
     payload = load_json(path)
     grouped: dict[str, dict[str, Any]] = {}
     for row in payload.get("route_results", []):
-        if not isinstance(row, dict) or not row.get("candidate_family"):
+        if not isinstance(row, dict):
             continue
-        family_id = str(row["candidate_family"])
+        family_id = str(
+            row.get("candidate_family")
+            or row.get("candidate_family_id")
+            or ""
+        )
+        if not family_id:
+            continue
+        baseline_comparisons = [
+            comparison
+            for comparison in row.get("baseline_comparisons", [])
+            if isinstance(comparison, dict)
+        ]
         item = grouped.setdefault(
             family_id,
             {
@@ -136,13 +253,28 @@ def replay_evidence(path: Path) -> tuple[dict[str, dict[str, Any]], dict[str, An
             },
         )
         item["route_count"] += 1
-        item["comparison_count"] += int(row.get("comparison_count") or 0)
-        item["candidate_win_count"] += int(row.get("candidate_win_count") or 0)
-        item["estimated_row_exposure"] += int(row.get("estimated_rows") or 0)
+        item["comparison_count"] += int(
+            row.get("comparison_count") or len(baseline_comparisons)
+        )
+        item["candidate_win_count"] += int(
+            row.get("candidate_win_count")
+            or sum(
+                bool(comparison.get("candidate_beats_baseline_mean"))
+                for comparison in baseline_comparisons
+            )
+        )
+        item["estimated_row_exposure"] += int(
+            row.get("estimated_rows")
+            or row.get("performance_rows_evaluated")
+            or 0
+        )
         if row.get("lane"):
             item["lanes"].add(str(row["lane"]))
         if row.get("system"):
             item["systems"].add(str(row["system"]))
+        for source in row.get("direct_replay_source_names", []):
+            if source:
+                item["systems"].add(str(source))
     normalized: dict[str, dict[str, Any]] = {}
     for family_id, row in grouped.items():
         normalized[family_id] = {
@@ -225,9 +357,15 @@ def build_matrix(
     confirmatory_audit_path: Path = DEFAULT_CONFIRMATORY_AUDIT,
     benchmark_modules: dict[str, Path] | None = None,
     latest_evidence: dict[str, Path] | None = None,
+    protocol_bound_implementations: (
+        dict[str, tuple[Path, Path]] | None
+    ) = None,
 ) -> dict[str, Any]:
     benchmark_modules = benchmark_modules or BENCHMARK_MODULES
     latest_evidence = latest_evidence or LATEST_EVIDENCE
+    protocol_bound_implementations = (
+        protocol_bound_implementations or PROTOCOL_BOUND_IMPLEMENTATIONS
+    )
     registry = load_json(registry_path)
     families = registry.get("families")
     lanes = registry.get("lanes")
@@ -252,10 +390,32 @@ def build_matrix(
             }
         )
 
+    protocol_implementation_receipts: list[dict[str, Any]] = []
+    for lane, (protocol_path, builder_path) in sorted(
+        protocol_bound_implementations.items()
+    ):
+        family_ids, receipt = protocol_bound_families(
+            protocol_path,
+            builder_path,
+        )
+        implemented_by_lane.setdefault(lane, set()).update(family_ids)
+        protocol_implementation_receipts.append(
+            {"lane": lane, **receipt}
+        )
+
     executed_by_lane: dict[str, set[str]] = {}
     evidence_receipts: list[dict[str, Any]] = []
     for lane, path in sorted(latest_evidence.items()):
-        family_ids, receipt = evidence_geometry_families(path)
+        module_path = benchmark_modules.get(lane)
+        expected_source_sha256 = (
+            sha256_file(module_path)
+            if module_path is not None and module_path.exists()
+            else None
+        )
+        family_ids, receipt = evidence_geometry_families(
+            path,
+            expected_source_sha256=expected_source_sha256,
+        )
         executed_by_lane[lane] = family_ids
         evidence_receipts.append({"lane": lane, **receipt, "executed_families": sorted(family_ids)})
 
@@ -297,8 +457,8 @@ def build_matrix(
             "lane": lane,
             "registry_status": family.get("status"),
             "competitor": family.get("competitor", True),
-            "protocol_baselines": str(lane_spec.get("baselines") or "").split(),
-            "protocol_metrics": str(lane_spec.get("metrics") or "").split(),
+            "protocol_baselines": string_list(lane_spec.get("baselines")),
+            "protocol_metrics": string_list(lane_spec.get("metrics")),
             "benchmark_hypothesis": family.get("benchmark_hypothesis"),
             "promotion_metric": family.get("promotion_metric"),
             "failure_mode": family.get("failure_mode"),
@@ -362,8 +522,10 @@ def build_matrix(
                 "implementation_required_count": sum(
                     row["disposition"].endswith("IMPLEMENTATION_REQUIRED") for row in items
                 ),
-                "protocol_baselines": str((lanes.get(lane) or {}).get("baselines") or "").split(),
-                "protocol_metrics": str((lanes.get(lane) or {}).get("metrics") or "").split(),
+                "protocol_baselines": string_list(
+                    (lanes.get(lane) or {}).get("baselines")
+                ),
+                "protocol_metrics": string_list((lanes.get(lane) or {}).get("metrics")),
             }
         )
 
@@ -425,6 +587,9 @@ def build_matrix(
                 "version": registry.get("version"),
             },
             "benchmark_modules": module_receipts,
+            "protocol_bound_implementations": (
+                protocol_implementation_receipts
+            ),
             "latest_evidence": evidence_receipts,
             "source_conditioned_replay": replay_receipt,
             "confirmatory_audit": confirmatory_receipt,

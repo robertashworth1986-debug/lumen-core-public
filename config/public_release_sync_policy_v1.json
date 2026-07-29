@@ -130,18 +130,18 @@
     {
       "id": "current_evidence_to_pilot_deck_pdf",
       "source_path": "output/pdf/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pdf",
-      "expected_source_sha256": "c96abe02b4da03a397ec861f1e52e133f02fe71e6bf99e647bc8d2536691bd7b",
-      "target_path": "dashboard/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_C96ABE02B4DA.pdf",
-      "public_url": "https://lumen-core.ai/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_C96ABE02B4DA.pdf",
+      "expected_source_sha256": "d46096d88e3c2805cfff5a5f9f4e6e6e9c310e55e7e290c9f95cc8ca975d4aed",
+      "target_path": "dashboard/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_D46096D88E3C.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_D46096D88E3C.pdf",
       "mime_type": "application/pdf",
       "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
       "claim_boundary": "The deck reports bounded internal software, custody, and source-native benchmark state; it does not establish model superiority, alpha, field performance, savings, revenue, valuation, customer adoption, award, or contract status.",
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "1b7b933781be69e02520c522c4d884ceef2b6a59b1aad6e8cd26ed5a3afa2dd4"
+        "expected_sha256": "b0601a121247c790a153814609336eb7c2fc28b3069ddfeec90c470e080229d7"
       },
-      "last_validated_utc": "2026-07-29T12:58:04Z",
+      "last_validated_utc": "2026-07-29T13:50:39Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
@@ -154,25 +154,25 @@
         },
         {
           "path": "output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx",
-          "expected_sha256": "a9a7efb11012e78cfe515fe902477c326a7a4b949b7a7f4c78f27f1d26ffb5e1"
+          "expected_sha256": "4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a"
         }
       ]
     },
     {
       "id": "source_native_benchmark_whitepaper_pdf",
       "source_path": "output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf",
-      "expected_source_sha256": "16c848ba0762e2b70b6802b4f6a041579ec19739852eea245fca910ede3cef52",
-      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_16C848BA0762.pdf",
-      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_16C848BA0762.pdf",
+      "expected_source_sha256": "8a567a033c3dbe51da23477f296f0782a105e6a40f54f20597a459244e9ce91b",
+      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_8A567A033C3D.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_8A567A033C3D.pdf",
       "mime_type": "application/pdf",
       "claim_state": "PROVENANCE_AND_REPRODUCIBILITY",
       "claim_boundary": "The whitepaper documents source-native protocols, measured comparison coverage, limitations, and negative results; it does not establish universal superiority, external validation, field performance, or realized economic value.",
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "1b7b933781be69e02520c522c4d884ceef2b6a59b1aad6e8cd26ed5a3afa2dd4"
+        "expected_sha256": "b0601a121247c790a153814609336eb7c2fc28b3069ddfeec90c470e080229d7"
       },
-      "last_validated_utc": "2026-07-29T12:58:04Z",
+      "last_validated_utc": "2026-07-29T13:50:39Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
@@ -181,25 +181,25 @@
         },
         {
           "path": "tests/test_source_native_research_whitepaper.py",
-          "expected_sha256": "7877b50991f157705fa8deb51b63227d11be7d7efa5906de8baa5642aa95f009"
+          "expected_sha256": "e967962994c75884dd5b4aaee6c38f8fd28b4b2179b7dcff1a80d346f487643d"
         }
       ]
     },
     {
       "id": "federal_capability_statement_pdf",
       "source_path": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf",
-      "expected_source_sha256": "98190e157e6bea90a3f94da69a1beb513e0fd6917e9c70e1b626753430ab2e42",
-      "target_path": "dashboard/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_98190E157E6B.pdf",
-      "public_url": "https://lumen-core.ai/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_98190E157E6B.pdf",
+      "expected_source_sha256": "f7e9ed937196aedc4afdc22e2c51258dd0cf2225200d5eab931da9bfef16c03b",
+      "target_path": "dashboard/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_F7E9ED937196.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_F7E9ED937196.pdf",
       "mime_type": "application/pdf",
       "claim_state": "NO_PERFORMANCE_CLAIM",
       "claim_boundary": "The capability statement describes current software, evidence controls, and bounded federal-use fit; it does not establish certification, government approval, award status, model superiority, field performance, or economic outcomes.",
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "1b7b933781be69e02520c522c4d884ceef2b6a59b1aad6e8cd26ed5a3afa2dd4"
+        "expected_sha256": "b0601a121247c790a153814609336eb7c2fc28b3069ddfeec90c470e080229d7"
       },
-      "last_validated_utc": "2026-07-29T12:58:04Z",
+      "last_validated_utc": "2026-07-29T13:50:39Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
@@ -212,7 +212,7 @@
         },
         {
           "path": "tests/test_monday_federal_action_packet.py",
-          "expected_sha256": "718088ee3a6adccb13f89c4f0d3ed54a94b2fe1a32bbc3b009b030fa113ada3b"
+          "expected_sha256": "a70557332a303aae1e10865765f700f5ac9e8e4fda0ae04944cc74dc2f72b027"
         },
         {
           "path": "code/ops/BUILD_CAPABILITY_STATEMENT_GOVERNANCE.py",

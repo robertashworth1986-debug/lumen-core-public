@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -38,8 +39,14 @@ def test_execution_is_not_inferred_from_registry_specification():
     assert by_id["leaf_veins"]["frozen_generated_benchmark_executed"] is True
     assert by_id["leaf_veins"]["source_conditioned_replay"]
     assert by_id["termite_mound_ventilation"]["frozen_generated_benchmark_executed"] is True
-    assert by_id["slime_mold_routing"]["implementation_present"] is False
-    assert by_id["slime_mold_routing"]["disposition"] == "PERFORMANCE_IMPLEMENTATION_REQUIRED"
+    assert by_id["slime_mold_routing"]["implementation_present"] is True
+    assert by_id["slime_mold_routing"]["frozen_generated_benchmark_executed"] is True
+    assert by_id["slime_mold_routing"]["disposition"] == "EXECUTED_FROZEN_GENERATED_BENCHMARK"
+    assert by_id["percolation_threshold_networks"]["implementation_present"] is False
+    assert (
+        by_id["percolation_threshold_networks"]["disposition"]
+        == "PERFORMANCE_IMPLEMENTATION_REQUIRED"
+    )
     assert payload["summary"]["all_registered_families_performance_executed"] is False
 
 
@@ -78,3 +85,45 @@ def test_every_family_carries_lane_protocol_and_claim_boundaries():
     assert "not field validation" in payload["evidence_boundary"].lower()
     assert payload["summary"]["certification_claim_allowed"] is False
     assert payload["claim_gate"]["internal_lumengrade_is_external_certification"] is False
+
+
+def test_lane_protocol_lists_remain_structured_ids():
+    module = load_module()
+    payload = module.build_matrix()
+    by_id = {row["family_id"]: row for row in payload["families"]}
+    by_lane = {row["lane"]: row for row in payload["lane_summary"]}
+
+    expected = ["dijkstra", "a_star", "min_cost_flow", "k_shortest_redundancy"]
+    assert by_id["bee_foraging_paths"]["protocol_baselines"] == expected
+    assert by_lane["mission_network_routing"]["protocol_baselines"] == expected
+    assert all("[" not in item and "'" not in item for item in expected)
+
+
+def test_declared_source_hash_mismatch_fails_closed(tmp_path):
+    module = load_module()
+    evidence = tmp_path / "latest.json"
+    evidence.write_text(
+        json.dumps(
+            {
+                "schema": "test",
+                "protocol": {"source_sha256": "a" * 64},
+                "strategies": [
+                    {
+                        "kind": "geometry_family",
+                        "family_id": "slime_mold_routing",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    families, receipt = module.evidence_geometry_families(
+        evidence,
+        expected_source_sha256="b" * 64,
+    )
+
+    assert families == set()
+    assert receipt["source_sha256_valid"] is False
+    assert receipt["execution_accepted"] is False
+    assert receipt["source_binding_status"] == "source_hash_mismatch_execution_rejected"

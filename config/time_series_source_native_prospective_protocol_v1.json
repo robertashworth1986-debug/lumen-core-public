@@ -1,0 +1,194 @@
+{
+  "schema": "time_series_source_native_prospective_protocol.v1",
+  "protocol_id": "LUMENCORE_TS_SOURCE_NATIVE_20260729_V1",
+  "status": "FROZEN_AWAITING_FUTURE_OBSERVATIONS",
+  "freeze": {
+    "freeze_utc": "2026-07-29T07:35:08.3642755Z",
+    "freeze_basis": "Protocol frozen before any refreshed FRED or Twelve Data outcome is admitted to the confirmatory set.",
+    "outcome_dependent_changes_allowed": false,
+    "interim_leaderboard_allowed": false,
+    "optional_stopping_allowed": false,
+    "backfill_into_confirmatory_set_allowed": false
+  },
+  "candidate": {
+    "registered_family_id": "fractal_brownian_surface",
+    "scientific_estimator_id": "hurst_conditioned_multiscale_increment_heuristic_v1",
+    "description": "Hurst-conditioned weighted multiscale increment heuristic using lags 1, 2, 4, and 8 with a bounded persistence multiplier.",
+    "universal_superiority_claim_allowed": false,
+    "trading_alpha_claim_allowed": false
+  },
+  "primary_sources": [
+    {
+      "source": "FRED",
+      "series": [
+        "DGS2",
+        "DGS10",
+        "CPIAUCSL",
+        "UNRATE"
+      ],
+      "daily_series": [
+        "DGS2",
+        "DGS10"
+      ],
+      "monthly_series": [
+        "CPIAUCSL",
+        "UNRATE"
+      ],
+      "eligible_observation_rule": "The first public release timestamp must be strictly after freeze_utc, and its prediction must already have a sealed receipt.",
+      "revision_policy": "Primary analysis uses the first value observed after release. Later revisions are retained only as a separately labeled sensitivity analysis.",
+      "daily_seasonal_period": 5,
+      "monthly_seasonal_period": 12,
+      "daily_autoregressive_lag": 5,
+      "monthly_autoregressive_lag": 12
+    },
+    {
+      "source": "TWELVE_DATA",
+      "series": [
+        "AAPL"
+      ],
+      "eligible_observation_rule": "The exchange session close must be strictly after freeze_utc, and its prediction must already have a sealed receipt.",
+      "revision_policy": "Point-in-time split-adjusted close under one frozen adjustment policy; adjustment-policy or symbol-history changes invalidate the arm.",
+      "seasonal_period": 5,
+      "autoregressive_lag": 5
+    }
+  ],
+  "registered_baselines": [
+    "naive_last",
+    "drift",
+    "moving_average",
+    "exponential_smoothing",
+    "linear_trend",
+    "seasonal_naive_source_period",
+    "damped_holt_ets",
+    "autoregressive_ridge_source_lag"
+  ],
+  "primary_hypothesis_family": {
+    "contrast_count": 16,
+    "construction": "One candidate-versus-each-registered-baseline contrast for FRED and for TWELVE_DATA.",
+    "correction": "one_sided_holm_familywise",
+    "familywise_alpha": 0.05,
+    "former_retrospective_leads_receive_preference": false
+  },
+  "primary_endpoint": {
+    "cell_unit": "series_horizon",
+    "metric": "relative_mean_absolute_error",
+    "formula": "rMAE = MAE_candidate / MAE_baseline",
+    "aggregation": "equal_weight_mean_log_ratio_across_series_horizon_cells",
+    "effect_floor": {
+      "maximum_rMAE": 0.95,
+      "minimum_relative_improvement": 0.05
+    },
+    "uncertainty_method": "synchronized_moving_block_bootstrap",
+    "bootstrap_replications": 20000,
+    "bootstrap_seed": 2026072901,
+    "confidence_level": 0.95,
+    "minimum_daily_block_sessions": 20,
+    "minimum_monthly_block_releases": 6
+  },
+  "sample_gates": {
+    "daily_arm": {
+      "minimum_future_eligible_sessions_per_series": 520,
+      "minimum_nonoverlapping_five_session_blocks": 104
+    },
+    "monthly_arm": {
+      "minimum_future_releases_per_series": 60
+    },
+    "coverage": {
+      "minimum_expected_calendar_fraction": 0.95,
+      "forward_fill_targets_allowed": false,
+      "silent_row_compression_allowed": false,
+      "duplicate_timestamps_allowed": false
+    },
+    "power_requirement": {
+      "target_power": 0.8,
+      "effect_floor": 0.05,
+      "power_method": "development_only_block_bootstrap",
+      "sample_gate_reduction_after_freeze_allowed": false
+    }
+  },
+  "secondary_metrics": [
+    "MASE",
+    "median_absolute_error",
+    "RMSSE",
+    "sMAPE",
+    "directional_accuracy",
+    "p95_absolute_error"
+  ],
+  "secondary_metrics_may_rescue_primary_failure": false,
+  "decision_rule": {
+    "replicated_lead": "All three former lead contrasts must pass inside the full 16-test Holm family and each adjusted one-sided bound must clear the 5 percent effect floor.",
+    "source_winner": "The candidate must beat all eight source baselines, no series-horizon cell may be worse by more than 5 percent, and the p95 error ratio must not exceed 1.10.",
+    "cross_source_promotion": "A source winner must repeat in a second independent prospective period.",
+    "integrity_failure": "INVALID",
+    "insufficient_sample": "INCONCLUSIVE_WAITING_FOR_NEW_SOURCE_ROWS",
+    "primary_failure": "CORRESPONDING_CLAIM_FALSIFIED"
+  },
+  "data_integrity": {
+    "strict_timestamp_order_required": true,
+    "duplicate_rejection_required": true,
+    "target_sentinel_test_required": true,
+    "prediction_before_release_receipt_required": true,
+    "history_only_normalization_required": true,
+    "first_vintage_verification_required": true,
+    "schema_change_invalidates_arm": true,
+    "cadence_change_invalidates_arm": true,
+    "timezone_change_invalidates_arm": true,
+    "symbol_or_adjustment_policy_change_invalidates_arm": true,
+    "distributional_regime_change_remains_in_sample": true
+  },
+  "predeclared_ablations": {
+    "status": "EXPLORATORY_ONLY",
+    "multiple_testing_control": "separate_false_discovery_rate_family",
+    "ablations": [
+      "fixed_hurst_0_5",
+      "equal_lag_weights",
+      "persistence_disabled",
+      "single_lag",
+      "leave_one_lag_out",
+      "local_trend_replacement"
+    ]
+  },
+  "retrospective_disposition": {
+    "former_subset_positive_count": 3,
+    "current_valid_subset_positive_count": 0,
+    "disposition": "RETIRED_EXPLORATORY_ONLY",
+    "reasons": [
+      "Overlapping origins and horizons were not independent.",
+      "The prior FRED collector requested oldest rather than latest observations.",
+      "The prior five-baseline roster was not source-native enough.",
+      "No retrospective result can become confirmatory after inspection."
+    ]
+  },
+  "frozen_artifacts": [
+    {
+      "path": "code/geometry_time_series_model_routing_benchmark.py",
+      "sha256": "2e7241ce62ae553fca28b695e98d3879080123e31639c3f930018cd0f90a925e"
+    },
+    {
+      "path": "code/ops/BUILD_TOP_GEOMETRY_LIVE_REPLAY_RESULTS.py",
+      "sha256": "12d474f11c97bd3b84041f4e3c5d745c98072bdc9ac5bad5debe15dc2990b04e"
+    },
+    {
+      "path": "code/ops/BUILD_SOURCE_NATIVE_FAMILY_BASELINE_LEDGER.py",
+      "sha256": "a917d02cc773de754a9e038dba3f13370f58956128fe0f398ba2a0c289c6a25c"
+    },
+    {
+      "path": "code/ops/BUILD_GEOMETRY_LIVE_WIRING_MATRIX.py",
+      "sha256": "99505f4c6d9601fb4ce361f96bfa7743a91da2e5dc7ef37039ef3e285a56976f"
+    },
+    {
+      "path": "requirements-reviewer.txt",
+      "sha256": "4b99049b4bc579f6d2a5a675e612f513e1a24db79775a2120e60334a0c72bbd4"
+    }
+  ],
+  "current_state": {
+    "eligible_future_observation_count": 0,
+    "promotion_decision": "WAITING_FOR_NEW_SOURCE_ROWS",
+    "performance_claim_allowed": false,
+    "field_validation_claim_allowed": false,
+    "real_dollar_claim_allowed": false,
+    "live_execution_allowed": false
+  },
+  "claim_boundary": "A future complete pass would support only bounded prospective forecasting accuracy for the named sources, series, horizons, and periods. It would not establish trading alpha, operational field performance, realized savings, enterprise value, universal superiority, or deployment authority.",
+  "protocol_payload_sha256": "1ae3e105d3cf636dfd2527a6d8d3cde152997eda3aa49449c7b65939f8d93c66"
+}
