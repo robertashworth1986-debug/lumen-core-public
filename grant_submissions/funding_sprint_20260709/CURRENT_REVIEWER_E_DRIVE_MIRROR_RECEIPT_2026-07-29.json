@@ -1,12 +1,12 @@
 {
   "schema": "lumencore.current_reviewer_e_drive_mirror_receipt.v1",
-  "generated_utc": "2026-07-29T15:13:14.668941Z",
+  "generated_utc": "2026-07-29T15:16:49.143634Z",
   "status": "CURRENT_REVIEWER_E_DRIVE_MIRROR_COMPLETE_HUMAN_RELEASE_REQUIRED",
   "source_root": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2",
   "destination_root": "E:\\LumaProofVault\\CURRENT_REVIEWER_CONTROL_PACKAGE_20260729",
   "artifact_count": 103,
-  "copied_count": 28,
-  "unchanged_count": 75,
+  "copied_count": 2,
+  "unchanged_count": 101,
   "all_copy_sha256_matched": true,
   "private_values_mirrored": false,
   "unapproved_launchtn_financial_model_mirrored": false,
@@ -306,10 +306,10 @@
       "classification": "internal_control_human_review_required",
       "role": "public_release",
       "bytes": 3929,
-      "sha256": "74FAD4D749B44FBA54FB37E9B70B1BCB4E472D830908CC864AEB601DD23A09AB",
+      "sha256": "2132318DB433D547B9425CC445DE10A0B55B00C5B7F0FEEA34FF5F1E9D5FC84A",
       "destination_relative_path": "docs/PUBLIC_RELEASE_SYNC_PLAN_2026-07-18.md",
       "copy_bytes": 3929,
-      "copy_sha256": "74FAD4D749B44FBA54FB37E9B70B1BCB4E472D830908CC864AEB601DD23A09AB",
+      "copy_sha256": "2132318DB433D547B9425CC445DE10A0B55B00C5B7F0FEEA34FF5F1E9D5FC84A",
       "copy_sha256_matched": true
     },
     {
@@ -702,10 +702,10 @@
       "classification": "machine_readable_control",
       "role": "public_release",
       "bytes": 27016,
-      "sha256": "CEF48A36A79B905EFAF019855DC3070DF5CF80579D8737E825996550CE1F2D53",
+      "sha256": "FFAFEBAA2484E1F889464CE7B51EEA1E410D5394EF5C0D2C4BE7F5B3EE2EA86C",
       "destination_relative_path": "out/ops/PUBLIC_RELEASE_SYNC_PLAN_2026-07-18.json",
       "copy_bytes": 27016,
-      "copy_sha256": "CEF48A36A79B905EFAF019855DC3070DF5CF80579D8737E825996550CE1F2D53",
+      "copy_sha256": "FFAFEBAA2484E1F889464CE7B51EEA1E410D5394EF5C0D2C4BE7F5B3EE2EA86C",
       "copy_sha256_matched": true
     },
     {
