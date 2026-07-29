@@ -14,18 +14,18 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 SPRINT_DIR = ROOT / "grant_submissions" / "funding_sprint_20260709"
 SOURCE_DIR = SPRINT_DIR / "source_attachments" / "W912HZ26SC005"
-SOURCE_MANIFEST = SOURCE_DIR / "SOURCE_MANIFEST_2026-07-16.json"
+SOURCE_MANIFEST = SOURCE_DIR / "SOURCE_MANIFEST_2026-07-29.json"
 PRIVATE_DIR = SPRINT_DIR / "private" / "W912HZ26SC005"
 DEFAULT_PRIVATE_INPUT = PRIVATE_DIR / "ERDC_SDC_PHASE2_ROM.private.json"
 TEMPLATE = ROOT / "config" / "erdc_sdc_phase2_rom_private_template_v1.json"
-OUT_JSON = SPRINT_DIR / "ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json"
-OUT_MD = SPRINT_DIR / "ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.md"
+OUT_JSON = SPRINT_DIR / "ERDC_SDC_PHASE2_ROM_GATE_2026-07-29.json"
+OUT_MD = SPRINT_DIR / "ERDC_SDC_PHASE2_ROM_GATE_2026-07-29.md"
 
 PRIVATE_SCHEMA = "lumencore.erdc_sdc_phase2_rom_private.v1"
-PUBLIC_SCHEMA = "lumencore.erdc_sdc_phase2_rom_gate.v1"
+PUBLIC_SCHEMA = "lumencore.erdc_sdc_phase2_rom_gate.v2"
 OPPORTUNITY_NUMBER = "W912HZ26SC005"
 PHASE_II_SCOPE = "PHASE_II_PROTOTYPE_DEVELOPMENT_ONLY"
-REQUIRED_PERIOD_WEEKS = 16
+PLANNING_PERIOD_WEEKS = 16
 REQUIRED_CERTIFICATIONS = (
     "direct_labor_rate_supported",
     "indirect_treatment_supported",
@@ -158,7 +158,7 @@ def calculate_private_rom(payload: dict[str, Any]) -> dict[str, Any]:
         raise RomGateError("OPPORTUNITY_NUMBER_MISMATCH")
     if payload.get("scope") != PHASE_II_SCOPE:
         raise RomGateError("PHASE_SCOPE_MISMATCH")
-    if payload.get("period_weeks") != REQUIRED_PERIOD_WEEKS:
+    if payload.get("period_weeks") != PLANNING_PERIOD_WEEKS:
         raise RomGateError("PERIOD_WEEKS_MISMATCH")
     if payload.get("template_only") is True:
         raise RomGateError("TEMPLATE_CANNOT_BE_USED_AS_PRIVATE_INPUT")
@@ -282,10 +282,20 @@ def source_integrity() -> dict[str, Any]:
             }
         )
     return {
+        "manifest_schema": manifest.get("schema"),
+        "manifest_as_of_date": manifest.get("as_of_date"),
+        "current_attachment_set_complete": manifest.get(
+            "current_attachment_set_complete"
+        ),
         "manifest_path": rel(SOURCE_MANIFEST),
         "manifest_sha256": sha256_file(SOURCE_MANIFEST),
         "files": rows,
-        "all_checks_pass": all(row["sha256_match"] and row["bytes_match"] for row in rows),
+        "all_checks_pass": (
+            all(row["sha256_match"] and row["bytes_match"] for row in rows)
+            and manifest.get("schema") == "lumencore.erdc_sdc_source_manifest.v2"
+            and manifest.get("as_of_date") == "2026-07-29"
+            and manifest.get("current_attachment_set_complete") is True
+        ),
     }
 
 
@@ -299,7 +309,9 @@ def unresolved_gates(calculation: dict[str, Any] | None) -> list[str]:
             "NO_UNCOMMITTED_SUBCONTRACTOR_COSTS",
             "FOUNDER_CANDIDATE_PRICE_APPROVAL",
             "PRIVATE_PDF_INSERTION",
-            "SAM_IDENTITY_ADDRESS_AND_CONTRACT_STATUS_MATCH",
+            "SAM_ALL_AWARDS_IDENTITY_ADDRESS_AND_CONTRACT_STATUS_MATCH",
+            "CURRENT_PROPOSAL_CONTACT_EMAIL",
+            "SUBMITTABLE_ACCOUNT_AND_COMPLETE_FORM_ACCESS",
             "PORTAL_PREVIEW_TERMS_AND_FINAL_CONFIRMATION",
         ]
     flags = calculation["certification_state"]
@@ -320,7 +332,9 @@ def unresolved_gates(calculation: dict[str, Any] | None) -> list[str]:
     gates.extend(
         [
             "PRIVATE_PDF_INSERTION",
-            "SAM_IDENTITY_ADDRESS_AND_CONTRACT_STATUS_MATCH",
+            "SAM_ALL_AWARDS_IDENTITY_ADDRESS_AND_CONTRACT_STATUS_MATCH",
+            "CURRENT_PROPOSAL_CONTACT_EMAIL",
+            "SUBMITTABLE_ACCOUNT_AND_COMPLETE_FORM_ACCESS",
             "PORTAL_PREVIEW_TERMS_AND_FINAL_CONFIRMATION",
         ]
     )
@@ -349,17 +363,26 @@ def build_payload(
         "schema": PUBLIC_SCHEMA,
         "generated_utc": now_utc(),
         "opportunity_number": OPPORTUNITY_NUMBER,
-        "deadline": "4:00 PM CT on August 7, 2026",
+        "deadline": {
+            "controlling_cso_pdf_text": "1700 EST, 07 AUG 2026",
+            "current_live_page_text": "4:00 PM CT on August 7, 2026",
+            "safest_operational_cutoff": "4:00 PM CT on August 7, 2026",
+            "reconciliation_rule": (
+                "Preserve both source texts and complete before the current live "
+                "page's earlier practical cutoff."
+            ),
+        },
         "status": status,
         "submission_ready": False,
         "phase_scope": PHASE_II_SCOPE,
-        "period_weeks": REQUIRED_PERIOD_WEEKS,
+        "period_weeks": PLANNING_PERIOD_WEEKS,
+        "period_semantics": "INTERNAL_PLANNING_ASSUMPTION_NOT_ERDC_MANDATED",
         "funding_currently_available": False,
         "private_input": {
             "expected_path": rel(DEFAULT_PRIVATE_INPUT),
             "git_ignored_target": git_ignored(DEFAULT_PRIVATE_INPUT),
             "present": private_payload is not None,
-            "sha256": private_input_sha256,
+            "fingerprint_exposed": False,
             "private_values_exposed": False,
         },
         "arithmetic": {
@@ -369,10 +392,7 @@ def build_payload(
             ),
             "candidate_price_present": bool(calculation),
             "candidate_price_value_exposed": False,
-            "labor_role_count": calculation["labor_role_count"] if calculation else 0,
-            "other_direct_cost_count": (
-                calculation["other_direct_cost_count"] if calculation else 0
-            ),
+            "private_row_counts_exposed": False,
         },
         "approval": {
             "founder_approved": bool(calculation and calculation["founder_approved"]),
@@ -420,7 +440,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     arithmetic = payload["arithmetic"]
     approval = payload["approval"]
     lines = [
-        "# ERDC SDC Phase II ROM Gate - 2026-07-17",
+        "# ERDC SDC Phase II ROM Gate - 2026-07-29",
         "",
         "This public-safe gate converts the remaining estimated-price blocker into a private, auditable workflow without publishing any rate or dollar amount.",
         "",
@@ -428,7 +448,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Status: `{payload['status']}`",
         f"- Submission ready: `{str(payload['submission_ready']).lower()}`",
-        f"- Deadline: `{payload['deadline']}`",
+        f"- Safest operational deadline: `{payload['deadline']['safest_operational_cutoff']}`",
+        f"- Original CSO PDF deadline text: `{payload['deadline']['controlling_cso_pdf_text']}`",
+        f"- Current live page deadline text: `{payload['deadline']['current_live_page_text']}`",
         f"- Scope: `{payload['phase_scope']}`",
         f"- Proposed period: `{payload['period_weeks']}` weeks",
         f"- Funding currently available: `{str(payload['funding_currently_available']).lower()}`",

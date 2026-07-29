@@ -1,24 +1,24 @@
 {
   "control_artifacts": [
     {
-      "bytes": 123836,
+      "bytes": 122947,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate_latest.json",
       "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
       "present": true,
       "role": "machine_control_json",
-      "sha256": "e8f78f0a8794c348c78900eef551fd812cd9e4df62fb0e42229c6c74424ea190"
+      "sha256": "230c3e306cb753c0d1c6ed4dcb4afe541c2729e19068a0b04f9d2bba6a2084ca"
     },
     {
-      "bytes": 123836,
+      "bytes": 122947,
       "classification": "machine_readable_proof_receipt",
       "control_name": "funding_sprint_reviewer_gate",
       "name": "funding_sprint_reviewer_gate.json",
       "path": "dashboard/data/funding_sprint_reviewer_gate.json",
       "present": true,
       "role": "dashboard_control_json",
-      "sha256": "e8f78f0a8794c348c78900eef551fd812cd9e4df62fb0e42229c6c74424ea190"
+      "sha256": "230c3e306cb753c0d1c6ed4dcb4afe541c2729e19068a0b04f9d2bba6a2084ca"
     },
     {
       "bytes": 88416,
@@ -591,7 +591,7 @@
     "traction_opportunity_intake_ledger": "TRACTION_INTAKE_READY_HUMAN_ACTION_REQUIRED",
     "venture_studio_terms_guardrail_packet": "VENTURE_STUDIO_TERMS_GUARDRAIL_READY_COUNSEL_REVIEW_REQUIRED"
   },
-  "data_room_manifest_sha256": "f8cc8ed658672f188ef9075076b6e42b6464c6c70deeb92e857ef5985dd85cb0",
+  "data_room_manifest_sha256": "522e851ef9a819a389c06bd5aec090c046c946e88f1904d430ab9dd7a71fe64b",
   "e_drive_targets": [
     "E:\\LumaProofVault\\LUMA_FUNDING_SPRINT_20260709_20260709T030617Z",
     "E:\\LumenCoreSync\\funding_sprint_20260709",
@@ -628,8 +628,8 @@
     "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
     "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md"
   ],
-  "generated_utc": "2026-07-29T15:01:32.081829+00:00",
-  "manifest_seed_sha256": "83ce5820971f1fc91de9f80855996371b5343fa603bf42ebcdd011115e76c825",
+  "generated_utc": "2026-07-29T16:17:50.155464+00:00",
+  "manifest_seed_sha256": "d8998d19bb1ae0b9df713aec547e21f38d13cf9ccd76fa5e993f12d40ef61353",
   "markdown_artifacts": [
     {
       "bytes": 12309,
@@ -744,12 +744,12 @@
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
     },
     {
-      "bytes": 4923,
+      "bytes": 4930,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
       "name": "CURRENT_REVIEWER_FRONT_DOOR_2026-07-29.md",
       "path": "grant_submissions/funding_sprint_20260709/CURRENT_REVIEWER_FRONT_DOOR_2026-07-29.md",
-      "sha256": "6928a7fc08d960c780ea35947fdd0c56ecd690a126348985e34913674aeff164"
+      "sha256": "4d105ee8516fef5b4e3bc127294a168f8f48a94a63a1eb0a2c2c566964146682"
     },
     {
       "bytes": 11434,
@@ -848,12 +848,12 @@
       "sha256": "002711f265d15b0e6435d401aac54c29ae831406279f339dbee165209ffd3888"
     },
     {
-      "bytes": 2692,
+      "bytes": 2986,
       "category": "supporting_markdown",
       "classification": "public_safe_markdown_review_required",
       "name": "ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-29.md",
       "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-29.md",
-      "sha256": "b4ebc5d4c6c60d3b754874f3aecca3d94504ec4e40966003177722f233057682"
+      "sha256": "dc3d7da63ab2d0c6ea42524a3f28168acf12569c9b8c13c14fe417c4b773e7f7"
     },
     {
       "bytes": 2723,
@@ -864,12 +864,12 @@
       "sha256": "e0f0deab1411418e37bdde2afee5d307742b8d9884d07d504ada250a03299204"
     },
     {
-      "bytes": 2759,
+      "bytes": 2965,
       "category": "supporting_markdown",
       "classification": "public_safe_markdown_review_required",
       "name": "ERDC_SDC_PHASE2_ROM_GATE_2026-07-29.md",
       "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-29.md",
-      "sha256": "a763b8542b72d63f39b885832b551ec61d6ad1df069b82b58535886607d37014"
+      "sha256": "576840f1d59827fea4510813d01e3e1be57e323dcde56373ec737519dc366978"
     },
     {
       "bytes": 5118,
@@ -880,12 +880,12 @@
       "sha256": "d1cddeee4cd7d2ace79c1c165f50b4de6a7d3058c6b9470b88bedcb0fb959ee2"
     },
     {
-      "bytes": 6368,
+      "bytes": 7397,
       "category": "supporting_markdown",
       "classification": "public_safe_markdown_review_required",
       "name": "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md",
       "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md",
-      "sha256": "db38ef60168a131cf4d95ed9ff6d09d5bf23c7a1bda2882a1270aeafce094a16"
+      "sha256": "9bd2316fbbcc2a0768cee2281713792e8175b27281b1ffa49a559d4d28f93f93"
     },
     {
       "bytes": 1534,
@@ -928,12 +928,12 @@
       "sha256": "ff2b08a05252c5a5e084916710c9148a76c922ce1ecc2dea9e64736f33cdd05e"
     },
     {
-      "bytes": 32025,
+      "bytes": 32052,
       "category": "supporting_markdown",
       "classification": "public_safe_markdown_review_required",
       "name": "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md",
       "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md",
-      "sha256": "10c92e56063f018f03cd91874d4da5ce9728119b39a6b981256fe85a1360e7fc"
+      "sha256": "b8988ee6283a0200ea13558bf6d6d5fb1ae54217269d08a18f113a1c6df18333"
     },
     {
       "bytes": 1785,
@@ -1024,12 +1024,12 @@
       "sha256": "01d2909dee960fafede915ed10080694105603ad190ab4c8f7a47aebd830d820"
     },
     {
-      "bytes": 17754,
+      "bytes": 16991,
       "category": "front_door_control",
       "classification": "public_safe_markdown_review_required",
       "name": "FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
-      "sha256": "e7ffa851a98947a9bd2efbe660837814c3e60e8f3697b0d11b12fd037477ab66"
+      "sha256": "d64914ddff3d47cacd8f1e5170a6d4cd7172b68ec4c23af58553f2f5d49b94b8"
     },
     {
       "bytes": 2822,
@@ -1144,12 +1144,12 @@
       "sha256": "21a6dd2ebbe57e1d11c23da2bc9761216eb842ad262db0f6ba575fb3f9e7a7f6"
     },
     {
-      "bytes": 16479,
+      "bytes": 16506,
       "category": "supporting_markdown",
       "classification": "public_safe_markdown_review_required",
       "name": "LIVE_FUNDING_PORTAL_HANDOFF_2026-07-29.md",
       "path": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-29.md",
-      "sha256": "d099d6217196ecd5b95a9aa6b1641d4f765184e2242ed19787b9eca686ded49d"
+      "sha256": "3c6ed476c1e90e93f9ceba0f7a7cc029a0f1f932c07d767aa70de76e5574eeda"
     },
     {
       "bytes": 14508,
@@ -1304,12 +1304,12 @@
       "sha256": "27435a4265da3c6275e1c4435bb2cef7ceae5944309238a0a490cf6179ecf706"
     },
     {
-      "bytes": 100492,
+      "bytes": 100904,
       "category": "supporting_markdown",
       "classification": "public_safe_markdown_review_required",
       "name": "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-29.md",
       "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-29.md",
-      "sha256": "03b95e43db9840da083ba898dca5d6ef0f649a47a7a63ebef19d27f6b153a2b3"
+      "sha256": "d3f363e254817a2e049fb8d111a310ca0f0dc9ed7affe5274cca8436c0ebdb0b"
     },
     {
       "bytes": 13217,
@@ -1512,12 +1512,12 @@
       "sha256": "4193b2e8c04cc05b2d7f6e25ca096f2a06e6ed700c1df629dc7b238096ccb4aa"
     },
     {
-      "bytes": 30345,
+      "bytes": 32254,
       "category": "supporting_markdown",
       "classification": "public_safe_markdown_review_required",
       "name": "SUBMISSION_CONFORMANCE_GATE_2026-07-25.md",
       "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_CONFORMANCE_GATE_2026-07-25.md",
-      "sha256": "f43d90f6e09f40ea0de7042a60811b9c21af97748b6bee7174ae5f16c7d12c8c"
+      "sha256": "5053fc2055ea88976fd540dd5a757707cdf24846c0b56ff33cfc8cd88e403875"
     },
     {
       "bytes": 11353,

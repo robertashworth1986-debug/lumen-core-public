@@ -21,15 +21,23 @@ def test_data_room_manifest_indexes_markdown_controls_and_mirrors():
     payload = module.build_payload()
 
     assert payload["schema"] == "data_room_manifest_v1"
-    assert payload["status"] == "DATA_ROOM_MANIFEST_READY"
+    assert payload["status"] == (
+        "DATA_ROOM_MANIFEST_PACKAGING_READY_ACTION_BLOCKED"
+    )
     assert payload["summary"]["manifested_markdown_count"] >= 53
     assert payload["summary"]["control_artifact_count"] == 56
     assert payload["summary"]["missing_control_artifact_count"] == 0
-    assert payload["summary"]["reviewer_gate_clear"] is True
+    assert payload["summary"]["reviewer_packaging_gate_clear"] is True
+    assert payload["summary"]["submission_argument_gate_clear"] is False
+    assert payload["summary"]["authority_gate_clear"] is False
+    assert payload["summary"]["manifest_packaging_ready"] is True
+    assert payload["summary"]["submission_action_ready"] is False
     assert payload["summary"]["unsafe_secret_count"] == 0
     assert payload["summary"]["unsafe_claim_count"] == 0
     assert payload["summary"]["decision_status"] == "REVIEWER_DECISION_BRIEF_READY"
-    assert payload["summary"]["authority_status"] == "SUBMISSION_AUTHORITY_MATRIX_READY"
+    assert payload["summary"]["authority_status"] == (
+        "SUBMISSION_AUTHORITY_MATRIX_BLOCKED"
+    )
     assert payload["summary"]["all_final_actions_blocked_without_human"] is True
     assert payload["summary"]["external_send_allowed_without_human"] is False
     assert payload["summary"]["final_submission_allowed_without_human"] is False
@@ -45,6 +53,7 @@ def test_manifest_artifacts_have_hashes_and_front_door_order():
     markdown_by_name = {row["name"]: row for row in payload["markdown_artifacts"]}
 
     expected_front_doors = {
+        "CURRENT_REVIEWER_FRONT_DOOR_2026-07-29.md",
         "REVIEWER_DECISION_BRIEF_2026-07-09.md",
         "FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
         "LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
@@ -75,10 +84,18 @@ def test_manifest_artifacts_have_hashes_and_front_door_order():
         "FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
     }
     assert expected_front_doors.issubset(markdown_by_name)
-    assert payload["front_door_order"][0].endswith("REVIEWER_DECISION_BRIEF_2026-07-09.md")
-    assert payload["front_door_order"][1].endswith("FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md")
-    assert payload["front_door_order"][2].endswith("LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md")
-    assert payload["front_door_order"][3].endswith("REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md")
+    assert payload["front_door_order"][0].endswith(
+        "CURRENT_REVIEWER_FRONT_DOOR_2026-07-29.md"
+    )
+    assert payload["front_door_order"][1].endswith(
+        "REVIEWER_DECISION_BRIEF_2026-07-09.md"
+    )
+    assert payload["front_door_order"][2].endswith(
+        "FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md"
+    )
+    assert payload["front_door_order"][3].endswith(
+        "LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md"
+    )
 
     for row in payload["markdown_artifacts"]:
         assert row["classification"] == "public_safe_markdown_review_required"

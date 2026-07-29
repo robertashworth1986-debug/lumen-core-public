@@ -1,0 +1,36 @@
+{
+  "schema": "lumencore.erdc_sdc_source_manifest.v2",
+  "as_of_date": "2026-07-29",
+  "opportunity_number": "W912HZ26SC005",
+  "official_project_url": "https://www.erdcwerx.org/sovereign-defense-cloud-for-high-performance-computing/",
+  "supersedes": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-16.json",
+  "files": [
+    {
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "exists": true,
+      "bytes": 162903,
+      "sha256": "ea456c2057dbe40128038ffff3e1eb5c055d8cd36e8af24ecd2ec5e8e5cde209",
+      "expected_pages": 7,
+      "official_url": "https://www.erdcwerx.org/wp-content/uploads/2026/05/CSO-HPCMP-SDC-30April2026-FINAL.pdf",
+      "role": "CONTROLLING_CSO"
+    },
+    {
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_20Jul2026.pdf",
+      "exists": true,
+      "bytes": 132595,
+      "sha256": "797afb7489629f0eb3c1f476fa8f2ad6b27255888a8f293453bcd4ee18181df3",
+      "expected_pages": 13,
+      "official_url": "https://www.erdcwerx.org/wp-content/uploads/2026/07/HPCMP-SDC-FAQ-Website-20Jul2026.pdf",
+      "role": "CURRENT_FAQ_SUPERSEDES_9_JUNE_FAQ"
+    }
+  ],
+  "archived_superseded_files": [
+    {
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_9June2026.pdf",
+      "status": "HISTORICAL_DO_NOT_USE_FOR_CURRENT_CONFORMANCE"
+    }
+  ],
+  "all_present": true,
+  "current_attachment_set_complete": true,
+  "claim_boundary": "These files establish current public solicitation and FAQ requirements only. They do not establish selection, funding availability, award, applicant eligibility, portal acceptance, or technical validation."
+}

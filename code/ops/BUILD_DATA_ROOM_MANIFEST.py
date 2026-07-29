@@ -48,6 +48,7 @@ CONTROL_NAMES = [
 ]
 
 FRONT_DOOR_FILES = {
+    "CURRENT_REVIEWER_FRONT_DOOR_2026-07-29.md",
     "REVIEWER_DECISION_BRIEF_2026-07-09.md",
     "FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
     "LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
@@ -234,8 +235,27 @@ def build_payload() -> dict[str, Any]:
     all_final_actions_blocked = bool(decision["summary"]["all_final_actions_blocked_without_human"]) and bool(
         authority["summary"]["all_final_actions_blocked_without_human"]
     )
-    gate_clear = bool(gate.get("reviewer_gate_clear")) and int(gate["summary"]["unsafe_secret_count"]) == 0 and int(gate["summary"]["unsafe_claim_count"]) == 0
+    gate_summary = gate["summary"]
+    submission_argument_gate_clear = bool(gate.get("reviewer_gate_clear"))
+    reviewer_packaging_gate_clear = (
+        bool(gate_summary.get("packaging_checks_clear"))
+        and int(gate_summary["unsafe_secret_count"]) == 0
+        and int(gate_summary["unsafe_claim_count"]) == 0
+    )
+    authority_gate_clear = (
+        authority.get("status") == "SUBMISSION_AUTHORITY_MATRIX_READY"
+    )
     all_controls_present = not missing_controls
+    manifest_packaging_ready = (
+        reviewer_packaging_gate_clear
+        and all_controls_present
+        and all_final_actions_blocked
+    )
+    submission_action_ready = (
+        manifest_packaging_ready
+        and submission_argument_gate_clear
+        and authority_gate_clear
+    )
 
     manifest_seed = {
         "markdown": [{k: row[k] for k in ("path", "sha256", "bytes", "category")} for row in markdown],
@@ -245,15 +265,27 @@ def build_payload() -> dict[str, Any]:
     payload = {
         "generated_utc": now_utc(),
         "schema": "data_room_manifest_v1",
-        "status": "DATA_ROOM_MANIFEST_READY" if gate_clear and all_controls_present and all_final_actions_blocked else "DATA_ROOM_MANIFEST_BLOCKED",
+        "status": (
+            "DATA_ROOM_MANIFEST_READY"
+            if submission_action_ready
+            else (
+                "DATA_ROOM_MANIFEST_PACKAGING_READY_ACTION_BLOCKED"
+                if manifest_packaging_ready
+                else "DATA_ROOM_MANIFEST_BLOCKED"
+            )
+        ),
         "summary": {
             "manifested_markdown_count": len(markdown),
             "control_artifact_count": len(control_rows),
             "missing_control_artifact_count": len(missing_controls),
             "category_counts": dict(sorted(category_counts.items())),
-            "reviewer_gate_clear": gate_clear,
-            "unsafe_secret_count": int(gate["summary"]["unsafe_secret_count"]),
-            "unsafe_claim_count": int(gate["summary"]["unsafe_claim_count"]),
+            "reviewer_packaging_gate_clear": reviewer_packaging_gate_clear,
+            "submission_argument_gate_clear": submission_argument_gate_clear,
+            "authority_gate_clear": authority_gate_clear,
+            "manifest_packaging_ready": manifest_packaging_ready,
+            "submission_action_ready": submission_action_ready,
+            "unsafe_secret_count": int(gate_summary["unsafe_secret_count"]),
+            "unsafe_claim_count": int(gate_summary["unsafe_claim_count"]),
             "decision_status": decision.get("status", ""),
             "decision_lane_count": int(decision["summary"]["lane_count"]),
             "decision_top_ready_lane_count": int(decision["summary"]["top_ready_lane_count"]),
@@ -266,6 +298,7 @@ def build_payload() -> dict[str, Any]:
             "e_drive_target_count": len(E_DRIVE_TARGETS),
         },
         "front_door_order": [
+            "grant_submissions/funding_sprint_20260709/CURRENT_REVIEWER_FRONT_DOOR_2026-07-29.md",
             "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
             "grant_submissions/funding_sprint_20260709/FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
             "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-10.md",
@@ -332,7 +365,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Manifested Markdown artifacts: `{summary['manifested_markdown_count']}`",
         f"- Control artifacts: `{summary['control_artifact_count']}`",
         f"- Missing control artifacts: `{summary['missing_control_artifact_count']}`",
-        f"- Reviewer gate clear: `{str(summary['reviewer_gate_clear']).lower()}`",
+        f"- Reviewer packaging gate clear: `{str(summary['reviewer_packaging_gate_clear']).lower()}`",
+        f"- Submission argument gate clear: `{str(summary['submission_argument_gate_clear']).lower()}`",
+        f"- Authority gate clear: `{str(summary['authority_gate_clear']).lower()}`",
+        f"- Manifest packaging ready: `{str(summary['manifest_packaging_ready']).lower()}`",
+        f"- Submission action ready: `{str(summary['submission_action_ready']).lower()}`",
         f"- Unsafe sensitive hits: `{summary['unsafe_secret_count']}`",
         f"- Unsafe claim hits: `{summary['unsafe_claim_count']}`",
         f"- Decision status: `{summary['decision_status']}`",

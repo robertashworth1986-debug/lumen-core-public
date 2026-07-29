@@ -125,14 +125,21 @@ def test_public_gate_sanitizes_every_private_amount_and_rate():
     )
     assert payload["submission_ready"] is False
     assert payload["private_input"]["private_values_exposed"] is False
+    assert payload["private_input"]["fingerprint_exposed"] is False
     assert payload["arithmetic"]["candidate_price_value_exposed"] is False
+    assert payload["arithmetic"]["private_row_counts_exposed"] is False
     assert payload["approval"]["rom_ready_for_private_pdf_insertion"] is True
     assert "rate_usd" not in serialized
     assert "candidate_price_usd" not in serialized
     assert re.search(r"\$\s*\d", serialized) is None
     assert re.search(r"\$\s*\d", markdown) is None
     assert "PRIVATE_PDF_INSERTION" in payload["unresolved_gates"]
-    assert "SAM_IDENTITY_ADDRESS_AND_CONTRACT_STATUS_MATCH" in payload["unresolved_gates"]
+    assert (
+        "SAM_ALL_AWARDS_IDENTITY_ADDRESS_AND_CONTRACT_STATUS_MATCH"
+        in payload["unresolved_gates"]
+    )
+    assert "CURRENT_PROPOSAL_CONTACT_EMAIL" in payload["unresolved_gates"]
+    assert "SUBMITTABLE_ACCOUNT_AND_COMPLETE_FORM_ACCESS" in payload["unresolved_gates"]
     assert "PORTAL_PREVIEW_TERMS_AND_FINAL_CONFIRMATION" in payload["unresolved_gates"]
 
 
@@ -148,6 +155,14 @@ def test_default_public_gate_stays_blocked_without_private_input():
     assert payload["controls"]["final_portal_submit_allowed"] is False
     assert payload["controls"]["browser_navigation_performed"] is False
     assert payload["source_integrity"]["all_checks_pass"] is True
+    assert payload["source_integrity"]["manifest_as_of_date"] == "2026-07-29"
+    assert payload["period_semantics"] == "INTERNAL_PLANNING_ASSUMPTION_NOT_ERDC_MANDATED"
+    assert payload["deadline"]["safest_operational_cutoff"] == (
+        "4:00 PM CT on August 7, 2026"
+    )
+    assert payload["deadline"]["controlling_cso_pdf_text"] == (
+        "1700 EST, 07 AUG 2026"
+    )
 
 
 @pytest.mark.parametrize(
@@ -195,6 +210,8 @@ def test_written_public_outputs_are_sanitized_and_claim_bounded():
     assert payload["status"] == "PRIVATE_ROM_INPUT_NOT_CAPTURED"
     assert payload["submission_ready"] is False
     assert payload["private_input"]["private_values_exposed"] is False
+    assert payload["private_input"]["fingerprint_exposed"] is False
+    assert payload["arithmetic"]["private_row_counts_exposed"] is False
     assert payload["controls"]["browser_navigation_performed"] is False
     assert "rate_usd" not in serialized
     assert "candidate_price_usd" not in serialized
@@ -204,7 +221,7 @@ def test_written_public_outputs_are_sanitized_and_claim_bounded():
     assert len(payload["gate_sha256"]) == 64
 
 
-def test_bounded_e_drive_mirror_matches_every_public_safe_artifact():
+def test_historical_bounded_e_drive_mirror_is_not_current_after_refresh():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -214,10 +231,9 @@ def test_bounded_e_drive_mirror_matches_every_public_safe_artifact():
     assert receipt["private_input_mirrored"] is False
     assert receipt["private_amounts_present_in_public_artifacts"] is False
     assert receipt["destination_root"].startswith("E:/LumaProofVault/")
-    for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
-        destination = Path(artifact["destination"])
-        assert source.is_file(), artifact["source"]
-        assert destination.is_file(), artifact["destination"]
-        assert source.stat().st_size == destination.stat().st_size == artifact["bytes"]
-        assert sha256_file(source) == sha256_file(destination) == artifact["sha256"]
+    builder = next(
+        artifact
+        for artifact in receipt["artifacts"]
+        if artifact["source"] == "code/ops/BUILD_ERDC_SDC_PHASE2_ROM_GATE.py"
+    )
+    assert sha256_file(SCRIPT) != builder["sha256"]

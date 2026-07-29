@@ -32,16 +32,17 @@ ROOT = Path(__file__).resolve().parents[2]
 SPRINT_DIR = ROOT / "grant_submissions" / "funding_sprint_20260709"
 SOURCE_DIR = SPRINT_DIR / "source_attachments" / "W912HZ26SC005"
 CSO_PDF = SOURCE_DIR / "CSO_HPCMP_SDC_30April2026_FINAL.pdf"
-FAQ_PDF = SOURCE_DIR / "HPCMP_SDC_FAQ_9June2026.pdf"
-SOURCE_MANIFEST = SOURCE_DIR / "SOURCE_MANIFEST_2026-07-16.json"
+FAQ_PDF = SOURCE_DIR / "HPCMP_SDC_FAQ_20Jul2026.pdf"
+SOURCE_MANIFEST = SOURCE_DIR / "SOURCE_MANIFEST_2026-07-29.json"
+SOURCE_NATIVE_LEDGER = ROOT / "out" / "ops" / "source_native_family_baseline_ledger_latest.json"
 OUT_PDF = (
     ROOT
     / "output"
     / "pdf"
-    / "LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf"
+    / "LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf"
 )
-OUT_JSON = SPRINT_DIR / "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json"
-OUT_MD = SPRINT_DIR / "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md"
+OUT_JSON = SPRINT_DIR / "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json"
+OUT_MD = SPRINT_DIR / "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md"
 
 FONT_DIR = Path("C:/Windows/Fonts")
 FONT_FILES = {
@@ -52,6 +53,11 @@ FONT_FILES = {
 }
 OFFICIAL_PROJECT_URL = (
     "https://www.erdcwerx.org/sovereign-defense-cloud-for-high-performance-computing/"
+)
+OFFICIAL_SUBMISSION_URL = (
+    "https://submit.erdcwerx.org/submit/"
+    "c94793e9-3b46-4f34-9d34-e6b07755af61/"
+    "sovereign-defense-cloud-for-high-performance-computing-cso"
 )
 PUBLIC_WEBSITE = "https://lumen-core.ai"
 PUBLIC_REPOSITORY = "https://github.com/robertashworth1986-debug/lumen-core-public"
@@ -93,6 +99,69 @@ def stable_hash(payload: Any) -> str:
     ).hexdigest()
 
 
+def research_evidence_receipt() -> dict[str, Any]:
+    payload = json.loads(SOURCE_NATIVE_LEDGER.read_text(encoding="utf-8"))
+    summary = payload.get("summary", {})
+    if not isinstance(summary, dict):
+        summary = {}
+
+    receipt = {
+        "path": rel(SOURCE_NATIVE_LEDGER),
+        "sha256": sha256_file(SOURCE_NATIVE_LEDGER),
+        "schema": payload.get("schema"),
+        "generated_utc": payload.get("generated_utc"),
+        "registered_family_count": summary.get("registered_family_count"),
+        "implementation_present_count": summary.get("implementation_present_count"),
+        "executed_direct_source_baseline_comparison_count": summary.get(
+            "executed_direct_source_baseline_comparison_count"
+        ),
+        "individual_comparison_global_holm_positive_count": summary.get(
+            "individual_comparison_global_holm_positive_count"
+        ),
+        "candidate_source_beats_every_baseline_global_holm_count": summary.get(
+            "candidate_source_beats_every_baseline_global_holm_count"
+        ),
+        "public_performance_claim_allowed": summary.get(
+            "public_performance_claim_allowed"
+        ),
+        "real_dollar_savings_claim_allowed": summary.get(
+            "real_dollar_savings_claim_allowed"
+        ),
+        "claim_boundary": summary.get("claim_boundary"),
+    }
+    count_fields = (
+        "registered_family_count",
+        "implementation_present_count",
+        "executed_direct_source_baseline_comparison_count",
+        "individual_comparison_global_holm_positive_count",
+        "candidate_source_beats_every_baseline_global_holm_count",
+    )
+    receipt["all_checks_pass"] = (
+        receipt["schema"] == "source_native_family_baseline_ledger_v1"
+        and all(
+            isinstance(receipt[field], int) and receipt[field] >= 0
+            for field in count_fields
+        )
+        and receipt["candidate_source_beats_every_baseline_global_holm_count"] == 0
+        and receipt["public_performance_claim_allowed"] is False
+        and receipt["real_dollar_savings_claim_allowed"] is False
+        and isinstance(receipt["claim_boundary"], str)
+        and bool(receipt["claim_boundary"].strip())
+    )
+    return receipt
+
+
+def research_evidence_sentence(receipt: dict[str, Any]) -> str:
+    holm_positive = receipt["individual_comparison_global_holm_positive_count"]
+    holm_text = "zero" if holm_positive == 0 else str(holm_positive)
+    return (
+        f"{receipt['registered_family_count']} registered families; "
+        f"{receipt['implementation_present_count']} family implementations present; "
+        f"{receipt['executed_direct_source_baseline_comparison_count']} direct comparisons; "
+        f"{holm_text} global Holm-positive comparisons."
+    )
+
+
 def register_fonts() -> None:
     for name, path in FONT_FILES.items():
         if not path.is_file():
@@ -116,8 +185,8 @@ def styles() -> dict[str, ParagraphStyle]:
             parent=base["BodyText"],
             fontName="TimesNewRoman",
             fontSize=12,
-            leading=12.4,
-            spaceAfter=3,
+            leading=12,
+            spaceAfter=1,
             alignment=TA_LEFT,
             textColor=colors.HexColor("#17212B"),
         ),
@@ -131,34 +200,34 @@ def styles() -> dict[str, ParagraphStyle]:
             firstLineIndent=-7,
             bulletFontName="TimesNewRoman",
             bulletFontSize=12,
-            spaceAfter=1,
+            spaceAfter=0,
             textColor=colors.HexColor("#17212B"),
         ),
         "h1": ParagraphStyle(
             "H1",
             parent=base["Heading1"],
             fontName="TimesNewRoman-Bold",
-            fontSize=15,
-            leading=16,
-            spaceAfter=4,
+            fontSize=12,
+            leading=12,
+            spaceAfter=2,
             textColor=colors.HexColor("#163A5F"),
         ),
         "h2": ParagraphStyle(
             "H2",
             parent=base["Heading2"],
             fontName="TimesNewRoman-Bold",
-            fontSize=13,
-            leading=13.4,
-            spaceBefore=2,
-            spaceAfter=2,
+            fontSize=12,
+            leading=12,
+            spaceBefore=1,
+            spaceAfter=1,
             textColor=colors.HexColor("#1E5B69"),
         ),
         "title": ParagraphStyle(
             "Title",
             parent=base["Title"],
             fontName="TimesNewRoman-Bold",
-            fontSize=22,
-            leading=25,
+            fontSize=12,
+            leading=14,
             alignment=TA_CENTER,
             textColor=colors.HexColor("#163A5F"),
             spaceAfter=14,
@@ -167,8 +236,8 @@ def styles() -> dict[str, ParagraphStyle]:
             "Subtitle",
             parent=base["BodyText"],
             fontName="TimesNewRoman",
-            fontSize=14,
-            leading=16,
+            fontSize=12,
+            leading=14,
             alignment=TA_CENTER,
             textColor=colors.HexColor("#1E5B69"),
             spaceAfter=8,
@@ -200,7 +269,7 @@ def styles() -> dict[str, ParagraphStyle]:
             parent=base["BodyText"],
             fontName="TimesNewRoman",
             fontSize=12,
-            leading=12.1,
+            leading=12,
             spaceAfter=0,
             alignment=TA_LEFT,
             textColor=colors.HexColor("#17212B"),
@@ -292,20 +361,14 @@ class ArchitectureDiagram(Flowable):
 def draw_page(canvas, doc) -> None:
     page = canvas.getPageNumber()
     canvas.saveState()
-    if page >= 3:
-        canvas.setFillColor(colors.HexColor("#163A5F"))
-        canvas.setFont("TimesNewRoman-Bold", 12)
-        canvas.drawString(72, 704, "W912HZ26SC005 | LumenCore Evidence Control Plane")
-        canvas.setStrokeColor(colors.HexColor("#7E8B94"))
-        canvas.line(72, 698, 540, 698)
     canvas.setFont("TimesNewRoman", 12)
     canvas.setFillColor(colors.HexColor("#17212B"))
     if page == 1:
-        footer = "Cover page - not counted toward five-page body"
+        footer = "1 of 7 pages - Cover page (excluded from five-page body)"
     elif page == 2:
-        footer = "Acronym list - not counted toward five-page body"
+        footer = "2 of 7 pages - Acronym list (excluded from five-page body)"
     else:
-        footer = f"{page - 2} of 5 pages"
+        footer = f"{page} of 7 pages - Body {page - 2} of 5"
     canvas.drawCentredString(306, 78, footer)
     canvas.setFillColor(colors.Color(0.65, 0.15, 0.12, alpha=0.08))
     canvas.setFont("TimesNewRoman-Bold", 34)
@@ -315,7 +378,11 @@ def draw_page(canvas, doc) -> None:
     canvas.restoreState()
 
 
-def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
+def build_story(
+    s: dict[str, ParagraphStyle],
+    research: dict[str, Any] | None = None,
+) -> list[Flowable]:
+    research = research or research_evidence_receipt()
     p = lambda text: paragraph(text, s["body"])
     c = lambda text: paragraph(text, s["cell"])
     h1 = lambda text: paragraph(text, s["h1"])
@@ -350,7 +417,7 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
             Spacer(1, 18),
             paragraph(f"Website: {PUBLIC_WEBSITE}", s["center"]),
             paragraph(f"Public repository: {PUBLIC_REPOSITORY}", s["center"]),
-            paragraph("Prepared July 17, 2026", s["center"]),
+            paragraph("Prepared July 29, 2026", s["center"]),
             PageBreak(),
         ]
     )
@@ -367,6 +434,7 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
         [c("HPC"), c("High Performance Computing")],
         [c("HPCMP"), c("High Performance Computing Modernization Program")],
         [c("ML"), c("Machine Learning")],
+        [c("MOSA"), c("Modular Open Systems Approach")],
         [c("OpenAPI"), c("Open standard for describing HTTP application interfaces")],
         [c("ROM"), c("Rough Order of Magnitude")],
         [c("SDC"), c("Sovereign Defense Cloud")],
@@ -378,7 +446,7 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
             h1("Acronyms and Abbreviations"),
             p(
                 "This list is separate from the five-page proposal body, consistent with the "
-                "June 9, 2026 Frequently Asked Questions."
+                "July 20, 2026 Frequently Asked Questions."
             ),
             styled_table(acronym_rows, [1.25 * inch, 5.25 * inch]),
             Spacer(1, 8),
@@ -417,8 +485,8 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
                 "The High Performance Computing Modernization Program must coordinate hybrid resources, "
                 "workflows, policy, and data without binding mission decisions to one vendor. LumenCore "
                 "proposes an evidence control plane that records what was requested, which policy and "
-                "orchestration path was selected, what artifacts were produced, and whether an independent "
-                "verifier can reproduce the resulting receipt."
+                "orchestration path was selected, what artifacts were produced, and whether the delivered "
+                "offline verifier can reproduce the resulting receipt."
             ),
             p(
                 "LumenCore is not proposed as a replacement for the five DoD Supercomputing Resource Centers, "
@@ -436,9 +504,10 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
             h2("Innovation"),
             p(
                 "The innovation is the application of predeclared acceptance rules, append-only evidence "
-                "chains, portable verification, and explicit failure retention to hybrid HPC and AI workflow "
-                "orchestration. The control plane measures decisions across replaceable components rather than "
-                "requiring a single vendor to own the full evidence path."
+                "chains, offline verification, and explicit failure retention to hybrid HPC and AI workflow "
+                "orchestration. The focused module uses Modular Open Systems Approach boundaries and "
+                "nonproprietary standards so it can integrate into a broader Sovereign Defense Cloud without "
+                "requiring one vendor to own the full evidence path."
             ),
             PageBreak(),
         ]
@@ -463,15 +532,17 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
                 "The default evidence path stores control metadata, schema references, policy results, hashes, "
                 "timestamps, and artifact locators. Mission data and model payloads remain in the authorized "
                 "environment unless the Government defines a narrower approved data flow. Each classification "
-                "level would use a separately deployed instance and enclave-approved interfaces; this draft "
-                "does not claim cross-domain transfer or classified-data certification."
+                "level would use a separately deployed instance and enclave-approved interfaces with absolute "
+                "data separation. This draft does not claim cross-domain transfer or classified-data certification."
             ),
             h2("Open replacement boundary"),
             p(
                 "Adapters implement versioned contracts around Kubernetes, OpenStack, workload schedulers, "
-                "storage, and observability systems. A component may be replaced while the evidence contract "
-                "and independent verifier remain stable. Government-selected identity and access services "
-                "provide identity context; Common Access Card authentication is not assumed to be the sole path."
+                "storage, and observability systems using widely adopted protocols such as OpenAPI and "
+                "Government-selected storage interfaces. A component or cloud may be replaced while the "
+                "evidence contract, workload portability, and offline verifier remain stable. Government-selected "
+                "identity and access services provide identity context; Common Access Card authentication is "
+                "not assumed to be the sole path."
             ),
             PageBreak(),
         ]
@@ -482,8 +553,8 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
         [c("Proposed period"), c("Activity"), c("Exit evidence")],
         [c("Weeks 1-3"), c("Lock one unclassified use case, interfaces, acceptance rules, and boundary."), c("Approved interface and test protocol; no production connection.")],
         [c("Weeks 4-8"), c("Build two adapters, policy registry, receipt chain, and offline verifier."), c("Schemas, tests, software bill of materials, and build receipt.")],
-        [c("Weeks 9-12"), c("Replay in shadow mode across two approved test environments."), c("Retained pass, fail, abstain, missing-data, and drift cases.")],
-        [c("Weeks 13-16"), c("Demonstrate portability, verification, review, and handoff."), c("Government-run verification and limitation register.")],
+        [c("Weeks 9-12"), c("Replay in advisory, human-in-the-loop shadow mode across two approved test environments."), c("Retained pass, fail, abstain, missing-data, override, and drift cases.")],
+        [c("Weeks 13-16"), c("Demonstrate cloud-agnostic portability, verification, phased handoff, and rollback."), c("Government-run verification, manual override, and limitation register.")],
     ]
     acceptance_rows = [
         [c("Acceptance dimension"), c("Proposed measurable check")],
@@ -504,12 +575,14 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
             h2("Proposed acceptance protocol"),
             p(
                 "Final thresholds, workloads, exclusions, and test environments would be locked with the "
-                "Government before scoring. No service level or performance threshold is invented in this draft."
+                "Government before scoring. AI recommendations remain advisory with human approval; any bounded "
+                "low-risk administrative automation requires explicit parameters, manual override, and retained "
+                "decision evidence. No service level or performance threshold is invented in this draft."
             ),
             styled_table(acceptance_rows, [1.45 * inch, 5.05 * inch]),
             h2("Government inputs and assumptions"),
             b("One unclassified workflow, approved test data, interface documentation, identity context, endpoints, and security constraints."),
-            b("A Government reviewer to approve the protocol and execute the independent verifier."),
+            b("A Government reviewer to approve the protocol and execute the delivered offline verifier."),
             b("No production access or specific Government Furnished Equipment is assumed before ERDC defines the boundary."),
             PageBreak(),
         ]
@@ -546,13 +619,15 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
             b("Use content hashes and locators instead of duplicating large HPC artifacts in the evidence ledger."),
             b("Expose capture latency, verification time, storage growth, and egress as measured cost drivers."),
             b("Keep adapters and storage replaceable so the Government can compare lifecycle cost and portability."),
+            b("Exercise both workload portability and bounded burst behavior without coupling the design to one cloud."),
             h2("Primary risks and controls"),
             styled_table(risk_rows, [1.55 * inch, 4.95 * inch]),
             h2("Operational support boundary"),
             p(
                 "The Phase II scope includes documented escalation, diagnostics, and expert engineering support "
-                "for the evidence component. A complete Level 3 concierge service for the full Sovereign Defense "
-                "Cloud is outside this module and would require a qualified integration and operations team."
+                "for the evidence component. Legacy HPC integration is a transition boundary, while the proposed "
+                "end state remains cloud-agnostic and modernized through phased, low-risk increments. A complete "
+                "Level 3 concierge service for the full Sovereign Defense Cloud is outside this focused module."
             ),
             PageBreak(),
         ]
@@ -562,14 +637,19 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
     evidence_rows = [
         [c("Evidence"), c("What it supports"), c("What it does not support")],
         [c("Public repository"), c("Inspectable builders, tests, schemas, and hash-manifest patterns."), c("DoD deployment, production readiness, or field validation.")],
-        [c("Offline verifier pattern"), c("Independent receipt checks and explicit failure reporting."), c("Government acceptance or classified accreditation.")],
+        [c("Offline verifier pattern"), c("Offline receipt checks and explicit failure reporting."), c("Independent validation, Government acceptance, or classified accreditation.")],
+        [
+            c("Source-native research ledger"),
+            c(research_evidence_sentence(research)),
+            c("SDC deployment, customer use, superiority, or field performance."),
+        ],
         [c("Public website"), c("Authentic project URL and public positioning."), c("Customers, revenue, or realized savings.")],
     ]
     gate_rows = [
         [c("Required finalization"), c("Current state")],
         [c("Phase II Rough Order of Magnitude"), c("No price is included. Founder approval is required before private finalization.")],
-        [c("SAM identity, address, and status"), c("Insert privately from the active SAM record; verify exact match and contract eligibility.")],
-        [c("Portal, amendments, and authority"), c("Recheck the live form and amendments; founder reviews all terms and final confirmation.")],
+        [c("SAM identity, address, status, and contact"), c("Insert privately from the active SAM record; verify exact match, all-awards contract eligibility, and current proposal email.")],
+        [c("Portal, account, amendments, and authority"), c("Sign in to Submittable, recheck the live form and amendments, and have the founder review all terms and final confirmation.")],
     ]
     story.extend(
         [
@@ -577,8 +657,10 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
             h2("Commercial approach"),
             p(
                 "LumenCore is modular software plus integration and verification services using commercial "
-                "technologies and open interfaces. A resultant award is expected to be firm-fixed price. The public "
-                "repository and website show the development approach; no open-market customer deployment is claimed."
+                "technologies and open interfaces. The proposal applies proven commercial interface, container, "
+                "hashing, and observability patterns in a new evidence-control role; it does not claim that the "
+                "integrated SDC module is already proven. The CSO states that any resultant award is expected "
+                "to be firm-fixed price."
             ),
             styled_table(evidence_rows, [1.35 * inch, 2.7 * inch, 2.45 * inch]),
             h2("Phase II Rough Order of Magnitude control"),
@@ -604,7 +686,11 @@ def build_story(s: dict[str, ParagraphStyle]) -> list[Flowable]:
     return story
 
 
-def build_pdf(path: Path = OUT_PDF) -> None:
+def build_pdf(
+    path: Path = OUT_PDF,
+    research: dict[str, Any] | None = None,
+) -> None:
+    research = research or research_evidence_receipt()
     register_fonts()
     path.parent.mkdir(parents=True, exist_ok=True)
     doc = BaseDocTemplate(
@@ -620,9 +706,9 @@ def build_pdf(path: Path = OUT_PDF) -> None:
     )
     frame = Frame(
         inch,
-        96,
+        90,
         letter[0] - 2 * inch,
-        588,
+        630,
         leftPadding=0,
         rightPadding=0,
         topPadding=0,
@@ -630,10 +716,14 @@ def build_pdf(path: Path = OUT_PDF) -> None:
         id="content",
     )
     doc.addPageTemplates([PageTemplate(id="all", frames=[frame], onPage=draw_page)])
-    doc.build(build_story(styles()))
+    doc.build(build_story(styles(), research))
 
 
-def inspect_pdf(path: Path = OUT_PDF) -> dict[str, Any]:
+def inspect_pdf(
+    path: Path = OUT_PDF,
+    research: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    research = research or research_evidence_receipt()
     reader = PdfReader(str(path))
     pages = reader.pages
     physical_pages = len(pages)
@@ -642,6 +732,10 @@ def inspect_pdf(path: Path = OUT_PDF) -> dict[str, Any]:
         for page in pages
     ]
     texts = [(page.extract_text() or "") for page in pages]
+    normalized_text = " ".join("\n".join(texts).split())
+    normalized_research_marker = " ".join(
+        research_evidence_sentence(research).split()
+    )
     with pdfplumber.open(path) as document:
         content_chars_by_page = [
             [
@@ -652,11 +746,10 @@ def inspect_pdf(path: Path = OUT_PDF) -> dict[str, Any]:
             ]
             for page in document.pages
         ]
-        char_sizes = [
+        content_char_sizes = [
             float(char["size"])
-            for page in document.pages
-            for char in page.chars
-            if str(char.get("text", "")).strip()
+            for chars in content_chars_by_page
+            for char in chars
         ]
         fonts = sorted(
             {
@@ -694,12 +787,30 @@ def inspect_pdf(path: Path = OUT_PDF) -> dict[str, Any]:
             and bounds["bottom"] <= 720.1
             for bounds in content_bounds
         ),
-        "minimum_detected_font_size": round(min(char_sizes), 2) if char_sizes else None,
-        "all_detected_text_at_least_12_point": bool(char_sizes) and min(char_sizes) >= 11.9,
+        "minimum_detected_font_size": (
+            round(min(content_char_sizes), 2) if content_char_sizes else None
+        ),
+        "maximum_detected_content_font_size": (
+            round(max(content_char_sizes), 2) if content_char_sizes else None
+        ),
+        "all_detected_text_at_least_12_point": (
+            bool(content_char_sizes) and min(content_char_sizes) >= 11.9
+        ),
+        "all_detected_content_text_12_point": (
+            bool(content_char_sizes)
+            and min(content_char_sizes) >= 11.9
+            and max(content_char_sizes) <= 12.1
+        ),
         "embedded_font_names": fonts,
         "times_new_roman_detected": any("TimesNewRoman" in name for name in fonts),
+        "all_physical_page_labels_present": all(
+            f"{index} of 7 pages" in texts[index - 1]
+            for index in range(1, 8)
+        )
+        if physical_pages == 7
+        else False,
         "body_page_labels_present": all(
-            f"{index} of 5 pages" in texts[index + 1] for index in range(1, 6)
+            f"Body {index} of 5" in texts[index + 1] for index in range(1, 6)
         )
         if physical_pages == 7
         else False,
@@ -717,6 +828,9 @@ def inspect_pdf(path: Path = OUT_PDF) -> dict[str, Any]:
                 "Phase II Rough Order of Magnitude control",
                 "Funding",
             )
+        ),
+        "research_evidence_marker_present": (
+            normalized_research_marker in normalized_text
         ),
     }
 
@@ -745,42 +859,66 @@ def source_integrity() -> dict[str, Any]:
             }
         )
     return {
+        "manifest_schema": manifest.get("schema"),
+        "manifest_as_of_date": manifest.get("as_of_date"),
+        "current_attachment_set_complete": manifest.get(
+            "current_attachment_set_complete"
+        ),
         "manifest_path": rel(SOURCE_MANIFEST),
         "manifest_sha256": sha256_file(SOURCE_MANIFEST),
         "files": files,
         "all_source_checks_pass": all(
             row["sha256_match"] and row["bytes_match"] and row["page_count_match"]
             for row in files
-        ),
+        )
+        and manifest.get("schema") == "lumencore.erdc_sdc_source_manifest.v2"
+        and manifest.get("as_of_date") == "2026-07-29"
+        and manifest.get("current_attachment_set_complete") is True,
     }
 
 
 def requirements() -> list[dict[str, Any]]:
     return [
         {"id": "FORMAT_01", "requirement": "Five-page maximum proposal body", "status": "PASS", "evidence": "PDF has five numbered body pages plus excluded cover and acronym pages."},
-        {"id": "FORMAT_02", "requirement": "Letter, portrait, single-sided, page X of Y", "status": "PASS", "evidence": "All seven physical pages are 612 by 792 points; body footers read 1 through 5 of 5 pages."},
+        {"id": "FORMAT_02", "requirement": "Letter, portrait, single-sided, page X of Y", "status": "PASS", "evidence": "All seven physical pages are 612 by 792 points and carry physical-page X of 7 plus body-page labels where applicable."},
         {"id": "FORMAT_03", "requirement": "Minimum one-inch margins", "status": "PASS", "evidence": "PDF character-coordinate inspection verifies all non-watermark text remains within a 72-point boundary."},
-        {"id": "FORMAT_04", "requirement": "12-point Times New Roman; no smaller table or diagram text", "status": "PASS", "evidence": "Embedded Windows Times New Roman files; PDF inspection rejects detected text below 12 points."},
+        {"id": "FORMAT_04", "requirement": "12-point Times New Roman, including tables and diagrams", "status": "PASS", "evidence": "Embedded Windows Times New Roman files; PDF inspection requires all substantive text to remain 12 point."},
         {"id": "FORMAT_05", "requirement": "English PDF under 20 MB", "status": "PASS", "evidence": "Generated PDF is English, Acrobat-readable, and size-checked."},
         {"id": "DISCLOSURE_01", "requirement": "No classified or proprietary information", "status": "PASS", "evidence": "Public-safe architecture and boundaries only; no private identity, patent claims, credentials, or classified data."},
         {"id": "TECH_01", "requirement": "Describe solution and mission effectiveness", "status": "PASS", "evidence": "Body pages 1 and 2 define the evidence control plane, mission gap, components, and focus-area alignment."},
         {"id": "TECH_02", "requirement": "Explain innovation and feasibility", "status": "PASS", "evidence": "Body pages 1, 3, and 4 define the new application, prototype plan, acceptance checks, risks, and controls."},
         {"id": "TECH_03", "requirement": "Provide URL and convincing evidence", "status": "PASS_BOUNDED", "evidence": "Public website and repository are listed; evidence limitations explicitly reject field-validation claims."},
         {"id": "ROM_01", "requirement": "One estimated price for Phase II prototype only", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Body page 5 preserves the required section but intentionally includes no unapproved amount."},
-        {"id": "SAM_01", "requirement": "Active SAM contract registration and matching solution address", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Public draft withholds identity and address; live SAM status and exact match must be verified before upload."},
-        {"id": "PORTAL_01", "requirement": "Submit through ERDCWERX form by 4:00 PM CT August 7, 2026", "status": "HUMAN_FINAL_ACTION_REQUIRED", "evidence": "Official live page reviewed July 17; no portal submission is represented."},
+        {"id": "SAM_01", "requirement": "Active SAM all-awards contract registration and matching solution address", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Public draft withholds identity and address; live SAM all-awards status, contract eligibility, and exact match must be verified before upload."},
+        {"id": "CONTACT_01", "requirement": "Current accurate proposal contact email", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Public draft intentionally omits private contact data; insert and verify in the private final copy."},
+        {"id": "ACCOUNT_01", "requirement": "Working Submittable account and access to the complete live form", "status": "HUMAN_ACCOUNT_ACCESS_REQUIRED", "evidence": "The public submission landing page requires a free Submittable account or supported federated sign-in; complete form access has not been verified."},
+        {"id": "PORTAL_01", "requirement": "Submit through ERDCWERX form before the safest current cutoff of 4:00 PM CT August 7, 2026", "status": "HUMAN_FINAL_ACTION_REQUIRED", "evidence": "The original CSO PDF says 1700 EST while the current live page says 4:00 PM CT; use the current live page's earlier practical cutoff. No portal submission is represented."},
         {"id": "FAQ_01", "requirement": "ROM excludes Phase III and IV", "status": "PASS", "evidence": "Body page 3 and price gate scope Phase II only."},
         {"id": "FAQ_02", "requirement": "Consider all classification levels without assuming CAC-only access", "status": "PASS_BOUNDED", "evidence": "Per-enclave architecture and identity-context boundary are described without claiming accreditation or cross-domain transfer."},
+        {"id": "FAQ_03", "requirement": "MOSA and nonproprietary standards prevent vendor lock-in", "status": "PASS_BOUNDED", "evidence": "Body pages 1 and 2 define focused-module MOSA boundaries, replaceable adapters, open contracts, and portable verification."},
+        {"id": "FAQ_04", "requirement": "AI remains human-in-the-loop with manual override", "status": "PASS_BOUNDED", "evidence": "Body page 3 keeps AI advisory and requires explicit parameters, manual override, and retained evidence for bounded administrative automation."},
+        {"id": "FAQ_05", "requirement": "Absolute data separation and cloud-agnostic portability", "status": "PASS_BOUNDED", "evidence": "Body pages 2 and 4 define separate enclave deployment, absolute data separation, replaceable clouds, workload portability, and bounded burst behavior."},
+        {"id": "FAQ_06", "requirement": "Legacy interoperability with phased low-risk migration", "status": "PASS_BOUNDED", "evidence": "Body pages 3 and 4 define shadow-mode prototype work, rollback evidence, legacy transition boundaries, and phased handoff."},
         {"id": "FUNDING_01", "requirement": "Do not imply current funds or guaranteed award", "status": "PASS", "evidence": "Cover, compliance gate, and claim boundary state funding is not currently available and no award is guaranteed."},
     ]
 
 
-def build_payload(pdf: dict[str, Any], sources: dict[str, Any]) -> dict[str, Any]:
+def build_payload(
+    pdf: dict[str, Any],
+    sources: dict[str, Any],
+    research: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    research = research or research_evidence_receipt()
     rows = requirements()
     blockers = [
         row
         for row in rows
-        if row["status"] in {"PRIVATE_FINALIZATION_REQUIRED", "HUMAN_FINAL_ACTION_REQUIRED"}
+        if row["status"]
+        in {
+            "PRIVATE_FINALIZATION_REQUIRED",
+            "HUMAN_ACCOUNT_ACCESS_REQUIRED",
+            "HUMAN_FINAL_ACTION_REQUIRED",
+        }
     ]
     technical_checks_pass = all(
         (
@@ -789,12 +927,16 @@ def build_payload(pdf: dict[str, Any], sources: dict[str, Any]) -> dict[str, Any
             pdf["all_pages_letter_portrait"],
             pdf["all_non_watermark_text_within_one_inch_margins"],
             pdf["all_detected_text_at_least_12_point"],
+            pdf["all_detected_content_text_12_point"],
             pdf["times_new_roman_detected"],
+            pdf["all_physical_page_labels_present"],
             pdf["body_page_labels_present"],
             pdf["draft_watermark_present_every_page"],
             pdf["required_content_markers_present"],
+            pdf["research_evidence_marker_present"],
             pdf["bytes"] < 20 * 1024 * 1024,
             sources["all_source_checks_pass"],
+            research["all_checks_pass"],
         )
     )
     payload: dict[str, Any] = {
@@ -802,14 +944,22 @@ def build_payload(pdf: dict[str, Any], sources: dict[str, Any]) -> dict[str, Any
         "generated_utc": now_utc(),
         "opportunity_number": "W912HZ26SC005",
         "deadline": {
-            "official_live_page_text": "4:00 PM CT on August 7, 2026",
+            "controlling_cso_pdf_text": "1700 EST, 07 AUG 2026",
+            "current_live_page_text": "4:00 PM CT on August 7, 2026",
+            "safest_operational_cutoff": "4:00 PM CT on August 7, 2026",
+            "reconciliation_rule": (
+                "Preserve both source texts and complete before the current live "
+                "page's earlier practical cutoff."
+            ),
+            "question_submission_cutoff": "July 31, 2026",
             "official_project_url": OFFICIAL_PROJECT_URL,
-            "live_page_reviewed_date": "2026-07-17",
+            "official_submission_url": OFFICIAL_SUBMISSION_URL,
+            "live_page_reviewed_date": "2026-07-29",
         },
         "status": (
-            "TECHNICAL_DRAFT_PASS_PRIVATE_ROM_AND_SAM_FINALIZATION_REQUIRED"
+            "CURRENT_PUBLIC_DRAFT_PASS_PRIVATE_ROM_SAM_CONTACT_ACCOUNT_AND_PORTAL_FINALIZATION_REQUIRED"
             if technical_checks_pass
-            else "TECHNICAL_DRAFT_FAILED_REVIEW_REQUIRED"
+            else "CURRENT_PUBLIC_DRAFT_FAILED_REVIEW_REQUIRED"
         ),
         "submission_ready": False,
         "technical_document_checks_pass": technical_checks_pass,
@@ -817,6 +967,7 @@ def build_payload(pdf: dict[str, Any], sources: dict[str, Any]) -> dict[str, Any
         "response_type": "RFI_STYLE_CSO_SOLUTION_BRIEF_EVALUATION_LANE",
         "pdf": pdf,
         "source_integrity": sources,
+        "research_evidence": research,
         "requirements": rows,
         "summary": {
             "requirement_count": len(rows),
@@ -834,7 +985,9 @@ def build_payload(pdf: dict[str, Any], sources: dict[str, Any]) -> dict[str, Any
         "required_private_finalization": [
             "Approve one Phase II-only firm-fixed-price Rough Order of Magnitude estimate.",
             "Insert the exact active SAM legal entity name and matching address in a private copy.",
-            "Reverify active SAM contract registration and review current ERDCWERX questions and answers.",
+            "Insert and verify the current proposal contact email in the private copy.",
+            "Reverify active SAM all-awards contract registration and review current ERDCWERX questions and answers.",
+            "Sign in to the required Submittable account and inspect the complete current form.",
             "Review the final private PDF, portal fields, representations, terms, and submission confirmation.",
         ],
         "claim_boundary": CLAIM_BOUNDARY,
@@ -848,16 +1001,19 @@ def render_markdown(payload: dict[str, Any]) -> str:
     pdf = payload["pdf"]
     summary = payload["summary"]
     lines = [
-        "# ERDC SDC Solution Brief Compliance Gate - 2026-07-17",
+        "# ERDC SDC Solution Brief Compliance Gate - 2026-07-29",
         "",
-        "The substantive public-safe brief is complete and technically compliant, but it is not submission-ready until the founder approves a Phase II-only price and a private SAM-matched legal identity/address is inserted and reverified.",
+        "The substantive public-safe brief is complete and technically compliant, but it is not submission-ready until the founder approves a Phase II-only price, private SAM/contact facts are inserted and reverified, and the complete authenticated portal form is reviewed.",
         "",
         "## Gate Summary",
         "",
         f"- Status: `{payload['status']}`",
         f"- Submission ready: `{str(payload['submission_ready']).lower()}`",
         f"- Funding currently available: `{str(payload['funding_currently_available']).lower()}`",
-        f"- Deadline: `{payload['deadline']['official_live_page_text']}`",
+        f"- Safest operational deadline: `{payload['deadline']['safest_operational_cutoff']}`",
+        f"- Original CSO PDF deadline text: `{payload['deadline']['controlling_cso_pdf_text']}`",
+        f"- Current live page deadline text: `{payload['deadline']['current_live_page_text']}`",
+        f"- Question submission cutoff: `{payload['deadline']['question_submission_cutoff']}`",
         f"- PDF pages: `{pdf['physical_page_count']}` physical; `{pdf['body_page_count']}` counted body pages",
         f"- PDF bytes: `{pdf['bytes']}`",
         f"- PDF SHA-256: `{pdf['sha256']}`",
@@ -868,6 +1024,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Body page labels present: `{str(pdf['body_page_labels_present']).lower()}`",
         f"- Technical document checks pass: `{str(payload['technical_document_checks_pass']).lower()}`",
         f"- Source checks pass: `{str(payload['source_integrity']['all_source_checks_pass']).lower()}`",
+        f"- Research evidence checks pass: `{str(payload['research_evidence']['all_checks_pass']).lower()}`",
+        f"- Research evidence SHA-256: `{payload['research_evidence']['sha256']}`",
+        f"- Registered families: `{payload['research_evidence']['registered_family_count']}`",
+        f"- Family implementations present: `{payload['research_evidence']['implementation_present_count']}`",
+        f"- Direct comparisons: `{payload['research_evidence']['executed_direct_source_baseline_comparison_count']}`",
+        f"- Global Holm-positive comparisons: `{payload['research_evidence']['individual_comparison_global_holm_positive_count']}`",
         f"- Finalization blockers: `{summary['finalization_blocker_count']}`",
         f"- External send without human: `{str(summary['external_send_allowed_without_human']).lower()}`",
         f"- Final portal submit without human: `{str(summary['final_portal_submit_allowed_without_human']).lower()}`",
@@ -896,10 +1058,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
 
 
 def main() -> None:
-    build_pdf()
-    pdf = inspect_pdf()
+    research = research_evidence_receipt()
+    build_pdf(research=research)
+    pdf = inspect_pdf(research=research)
     sources = source_integrity()
-    payload = build_payload(pdf, sources)
+    payload = build_payload(pdf, sources, research)
     OUT_JSON.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     OUT_MD.write_text(render_markdown(payload), encoding="utf-8")
     print(

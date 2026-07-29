@@ -34,10 +34,10 @@
       "status": "CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED"
     }
   ],
-  "as_of_utc": "2026-07-29T15:02:00Z",
+  "as_of_utc": "2026-07-29T16:17:49.671089Z",
   "claim_boundary": "This manifest binds exact local reviewer-artifact paths, byte counts, and SHA-256 values. It does not authorize publication or sending and does not establish external validation, model superiority, field performance, award, contract, revenue, savings, or valuation.",
   "external_release_authorized": false,
-  "manifest_sha256": "FCE0F7B7EBF4727996A03D3F43954691372144C3EB67842A7773308030394652",
+  "manifest_sha256": "7244C00DD8A377403B95B78442FEEA49BC6B9FA81A8DA89CBD593DFE59A02F57",
   "network_action_performed": false,
   "schema": "lumencore.current_reviewer_public_artifact_manifest.v1",
   "status": "SEALED_LOCAL_ARTIFACT_MANIFEST_HUMAN_RELEASE_REQUIRED"

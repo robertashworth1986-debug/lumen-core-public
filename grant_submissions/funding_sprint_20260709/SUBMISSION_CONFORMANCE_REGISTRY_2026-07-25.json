@@ -1,0 +1,699 @@
+{
+  "schema": "lumencore.submission_conformance_registry.v1",
+  "as_of_utc": "2026-07-29T12:06:41Z",
+  "required_criteria": [
+    "official_source_current",
+    "mandatory_format_and_route",
+    "program_objective_trace",
+    "foundational_leap",
+    "named_sota_baseline",
+    "program_metric_trace",
+    "mission_specific_experiment",
+    "evidence_applicability",
+    "team_compute_execution",
+    "risk_transition_and_falsifier"
+  ],
+  "controls": {
+    "artifact_presence_is_not_argument_readiness": true,
+    "criterion_phrase_presence_is_not_evidence": true,
+    "independent_red_team_receipt_required": true,
+    "missing_criterion_fails_closed": true,
+    "proxy_evidence_requires_applicability_boundary": true,
+    "separate_human_action_time_approval_required": true
+  },
+  "lanes": [
+    {
+      "lane_id": "sam_registration_external_validation_watch",
+      "name": "SAM.gov registration external validation watch",
+      "disposition": "NO_SUBMISSION_ROUTE",
+      "technical_argument_required": false,
+      "submission_candidate_active": false,
+      "current_state": "Registration validation watch, not a technical submission.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Keep registration state separate from technical proposal readiness.",
+      "claim_boundary": "Submitted or locally recorded registration data does not establish active award eligibility."
+    },
+    {
+      "lane_id": "lanl_vision_licensing_followup",
+      "name": "LANL VISION licensing opportunity follow-up",
+      "disposition": "MONITOR_ONLY_ALREADY_SENT",
+      "technical_argument_required": false,
+      "submission_candidate_active": false,
+      "current_state": "The July 16 package was sent. A fresh full-thread mailbox check found no later reply; the single bounded follow-up is hash-bound for action-time review but has not been sent or drafted in Gmail.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "At action time, recheck the complete package thread. If no reply remains, obtain exact single-use approval for the hash-bound zero-attachment follow-up; otherwise monitor and do not duplicate.",
+      "claim_boundary": "No LANL license, partnership, endorsement, or technical validation is established."
+    },
+    {
+      "lane_id": "uspto_georgia_patents_route",
+      "name": "USPTO and Georgia PATENTS pro bono routing",
+      "disposition": "NO_SUBMISSION_ROUTE",
+      "technical_argument_required": false,
+      "submission_candidate_active": false,
+      "current_state": "Closed routing path retained for counsel history only.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Use a current counsel or official patent-services route only when new evidence exists.",
+      "claim_boundary": "Routing history does not establish representation, filing status, patentability, ownership, scope, or freedom to operate."
+    },
+    {
+      "lane_id": "darpa_dice_full_submission",
+      "name": "DARPA DICE abstract and full-proposal route",
+      "disposition": "CLOSED_OFFICIAL_DECISION",
+      "technical_argument_required": true,
+      "submission_candidate_active": false,
+      "current_state": "Official comprehensive review discouraged a full proposal; no reply requested.",
+      "candidate_artifact": "grant_submissions/DICE_HR001126S0010/LumenCore_DICE_Abstract_FINAL_CANDIDATE.docx",
+      "official_source": "grant_submissions/DICE_HR001126S0010/HR001126S0010_OFFICIAL.pdf",
+      "postmortem": "grant_submissions/DICE_HR001126S0010/DICE_ABSTRACT_POSTMORTEM_2026-07-25.md",
+      "criteria": [
+        {
+          "criterion_id": "official_source_current",
+          "state": "PASS",
+          "finding": "The controlling BAA and required abstract template were retained locally before submission.",
+          "missing_evidence": [],
+          "source_refs": [
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/HR001126S0010_OFFICIAL.pdf",
+              "anchor": "Sections 2, 5, and 7"
+            },
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/A1_DICE_Abstract_Template_OFFICIAL.docx",
+              "anchor": "Abstract guidelines and required sections"
+            }
+          ]
+        },
+        {
+          "criterion_id": "mandatory_format_and_route",
+          "state": "PASS",
+          "finding": "The package followed the required section structure and received a BAAT receipt; the official decision did not identify it as nonconforming.",
+          "missing_evidence": [],
+          "source_refs": [
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/DICE_FINAL_CANDIDATE_REPORT.json",
+              "anchor": "Required sections, placeholder, hash, and package checks"
+            },
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/DICE_ABSTRACT_POSTMORTEM_2026-07-25.md",
+              "anchor": "Decision Boundary and What Was Submitted"
+            }
+          ]
+        },
+        {
+          "criterion_id": "program_objective_trace",
+          "state": "FAIL",
+          "finding": "The abstract discussed TA1 and TA2 topics but no submission-blocking crosswalk proved complete answers to every research question and program objective.",
+          "missing_evidence": [
+            "Objective-to-claim-to-test crosswalk covering every TA1 and TA2 research question",
+            "Reviewer-verifiable acceptance threshold for each objective"
+          ],
+          "source_refs": [
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/DICE_ABSTRACT_POSTMORTEM_2026-07-25.md",
+              "anchor": "No objective-to-claim trace was submission-blocking"
+            }
+          ]
+        },
+        {
+          "criterion_id": "foundational_leap",
+          "state": "FAIL",
+          "finding": "The coupling of sparse task markets, reputation, and local control was not differentiated as a new scientific principle strongly enough to survive comprehensive review.",
+          "missing_evidence": [
+            "One falsifiable foundational principle",
+            "Mechanistic explanation for why the coupling exceeds aggregation of known methods",
+            "Decisive experiment separating the proposed principle from component ablations"
+          ],
+          "source_refs": [
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/DICE_ABSTRACT_POSTMORTEM_2026-07-25.md",
+              "anchor": "The leap was asserted more strongly than it was differentiated"
+            }
+          ]
+        },
+        {
+          "criterion_id": "named_sota_baseline",
+          "state": "FAIL",
+          "finding": "The abstract used a generic centralized assignment baseline rather than a named current state-of-the-art multi-agent orchestration implementation matched to the proposed mission.",
+          "missing_evidence": [
+            "Named current SOTA centralized MAS baseline",
+            "Protocol-matched implementation and version",
+            "Ablations for each claimed novel mechanism"
+          ],
+          "source_refs": [
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/LumenCore_DICE_Abstract_FINAL_CANDIDATE.docx",
+              "anchor": "Sections 2.4 and 2.5"
+            }
+          ]
+        },
+        {
+          "criterion_id": "program_metric_trace",
+          "state": "PARTIAL",
+          "finding": "Agent scale, message counts, recovery, and role-coherence proxies were named, but formal role-coherence, cognitive-agility, long-horizon, and TA1-usable guarantee metrics were incomplete.",
+          "missing_evidence": [
+            "Formal role-coherence definition and calibration method",
+            "Cognitive-agility metric with anti-collapse threshold",
+            "One-thousand and ten-thousand inference-step adversarial evaluation plan",
+            "TA1-usable guarantee or statistical bound"
+          ],
+          "source_refs": [
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/LumenCore_DICE_Abstract_FINAL_CANDIDATE.docx",
+              "anchor": "Sections 2.3 through 2.5"
+            },
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/HR001126S0010_OFFICIAL.pdf",
+              "anchor": "TA2 research questions, challenges, and Section 2.5"
+            }
+          ]
+        },
+        {
+          "criterion_id": "mission_specific_experiment",
+          "state": "FAIL",
+          "finding": "The experiment used generic stochastic tasks instead of one concrete contested mission with distributed evidence, role dependencies, mission success criteria, and a matched SOTA baseline.",
+          "missing_evidence": [
+            "Concrete mission-specific scenario",
+            "Distributed and contradictory evidence model",
+            "Role-specific mission success and recovery thresholds",
+            "Matched foundation-model evaluation"
+          ],
+          "source_refs": [
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/DICE_ABSTRACT_POSTMORTEM_2026-07-25.md",
+              "anchor": "The experiment was not mission-specific enough"
+            }
+          ]
+        },
+        {
+          "criterion_id": "evidence_applicability",
+          "state": "PARTIAL",
+          "finding": "The abstract honestly bounded its synthetic task-executor evidence, but that evidence did not exercise inference-time control of heterogeneous foundation-model agents.",
+          "missing_evidence": [
+            "Open-weight foundation-model agent results",
+            "Black-box model agent results",
+            "Long-horizon role-control results",
+            "Adversarial context and cognitive-agility results"
+          ],
+          "source_refs": [
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/LumenCore_DICE_Abstract_FINAL_CANDIDATE.docx",
+              "anchor": "Section 2.4 evidence boundary"
+            }
+          ]
+        },
+        {
+          "criterion_id": "team_compute_execution",
+          "state": "FAIL",
+          "finding": "The package disclosed a one-person organization, unnamed future collaborators, and insufficient local compute without binding commitments that demonstrated execution capacity.",
+          "missing_evidence": [
+            "Named distributed-systems lead",
+            "Named inference-control lead",
+            "Named independent evaluator",
+            "Compute-access commitment and priced resource plan",
+            "Subaward or teaming commitment evidence"
+          ],
+          "source_refs": [
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/LumenCore_DICE_Abstract_FINAL_CANDIDATE.docx",
+              "anchor": "Sections 2.6 and 3"
+            }
+          ]
+        },
+        {
+          "criterion_id": "risk_transition_and_falsifier",
+          "state": "PARTIAL",
+          "finding": "Important risks and phase tests were named, but the package did not bind each core claim to a quantitative falsifier and transition owner.",
+          "missing_evidence": [
+            "Per-claim falsification thresholds",
+            "Named transition stakeholder or use-case owner",
+            "Failure-triggered down-select rules"
+          ],
+          "source_refs": [
+            {
+              "path": "grant_submissions/DICE_HR001126S0010/LumenCore_DICE_Abstract_FINAL_CANDIDATE.docx",
+              "anchor": "Sections 2.5 and 3"
+            }
+          ]
+        }
+      ],
+      "independent_red_team_receipt": null,
+      "next_action": "Do not reply or prepare a full proposal under this route. Reuse only generalized lessons in future opportunity screening.",
+      "claim_boundary": "The postmortem explains process weaknesses and does not claim access to unstated reviewer reasoning."
+    },
+    {
+      "lane_id": "fhwa_tsmo_data_initiative",
+      "name": "FHWA TSMO Data Initiative",
+      "disposition": "NO_SUBMISSION_ROUTE",
+      "technical_argument_required": false,
+      "submission_candidate_active": false,
+      "current_state": "The Cambridge Systematics partner route is closed and no alternate qualified-prime route is verified.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Do not revive or duplicate the closed Cambridge route. Reopen only after a different qualified organization provides a written role and current official scope.",
+      "claim_boundary": "The closed referral is not a contract route, teaming commitment, agency endorsement, technical selection, or permission to submit."
+    },
+    {
+      "lane_id": "nasa_data_center_rfi",
+      "name": "NASA Data Center Infrastructure RFI",
+      "disposition": "MONITOR_ONLY_ALREADY_SENT",
+      "technical_argument_required": true,
+      "submission_candidate_active": false,
+      "current_state": "Response sent and receipt state preserved; no duplicate submission.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Monitor for a specific clarification or replacement request; apply the full gate before any revised package.",
+      "claim_boundary": "A sent RFI response is market-research participation, not an award, endorsement, or validated capability."
+    },
+    {
+      "lane_id": "cdc_ai_acquisition_rfi",
+      "name": "CDC AI for Acquisition Support RFI",
+      "disposition": "MONITOR_ONLY_ALREADY_SENT",
+      "technical_argument_required": true,
+      "submission_candidate_active": false,
+      "current_state": "Response receipt was acknowledged; no duplicate submission or reply is required.",
+      "candidate_artifact": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ARTIFACT_MANIFEST_2026-07-15.json",
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Monitor for a specific clarification, replacement request, or scheduling message and do not resend the packet.",
+      "claim_boundary": "A receipt acknowledgment is not an award, endorsement, technical validation, or agency selection."
+    },
+    {
+      "lane_id": "dla_missionweave_sbir",
+      "name": "DLA MissionWeave DSIP SBIR",
+      "disposition": "EXPIRED_NO_VERIFIED_SUBMISSION",
+      "technical_argument_required": true,
+      "submission_candidate_active": false,
+      "current_state": "The July 22 noon Eastern deadline passed with portal, legal, founder, JCP, and technical gates still open and no verified submission receipt.",
+      "candidate_artifact": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "official_source": "grant_submissions/DLA26BZ03_NV011_MissionWeave/source_attachments/DLA26BZ03_NV011_OFFICIAL_TOPIC_DETAILS.json",
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Archive this route as expired without verified submission. Reuse only generalized, non-sensitive material after a fresh solicitation and full conformance audit.",
+      "claim_boundary": "Local packet work does not establish a DSIP submission, receipt, eligibility, JCP status, CMMC status, technical merit, award, or agency consideration."
+    },
+    {
+      "lane_id": "nsf_project_pitch",
+      "name": "NSF SBIR and STTR Project Pitch",
+      "disposition": "ACTIVE_SUBMISSION_CANDIDATE",
+      "technical_argument_required": true,
+      "submission_candidate_active": true,
+      "current_state": "Pitch drafting exists, but current official rules, pending-pitch state, invitation state, and source-bound argument criteria are unverified.",
+      "candidate_artifact": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md",
+      "official_source": "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-16.json",
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Refresh the official NSF source and build a criterion crosswalk before calling the pitch reviewer-ready.",
+      "claim_boundary": "A local pitch draft does not establish current eligibility, invitation, submission availability, or selection."
+    },
+    {
+      "lane_id": "erdc_sovereign_cloud_cso",
+      "name": "ERDC Sovereign Defense Cloud CSO",
+      "disposition": "ACTIVE_SUBMISSION_CANDIDATE",
+      "technical_argument_required": true,
+      "submission_candidate_active": true,
+      "current_state": "The current public-safe brief passes source, formatting, route, and objective-trace checks. It remains blocked on a named current comparator, quantitative mission thresholds, a locked HPCMP-representative experiment, team and compute commitments, independent red-team review, Phase II pricing, SAM all-awards facts, Submittable access, and final portal review.",
+      "candidate_artifact": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json",
+      "official_source": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-29.json",
+      "postmortem": null,
+      "criteria": [
+        {
+          "criterion_id": "official_source_current",
+          "state": "PASS",
+          "finding": "The current-source manifest binds the controlling CSO and July 20 FAQ, and the compliance gate preserves the current live-page deadline plus the original PDF text.",
+          "missing_evidence": [],
+          "source_refs": [
+            {
+              "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-29.json",
+              "anchor": "Current attachment set, official URLs, hashes, bytes, and supersession"
+            },
+            {
+              "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json",
+              "anchor": "deadline and source_integrity"
+            }
+          ]
+        },
+        {
+          "criterion_id": "mandatory_format_and_route",
+          "state": "PASS",
+          "finding": "The public draft has five counted body pages plus an excluded cover and acronym list, uses letter portrait format, one-inch margins, 12-point Times New Roman, physical and body page labels, a PDF under 20 MB, and the ERDCWERX portal route.",
+          "missing_evidence": [],
+          "source_refs": [
+            {
+              "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json",
+              "anchor": "pdf, requirements FORMAT_01 through FORMAT_05, ACCOUNT_01, and PORTAL_01"
+            },
+            {
+              "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
+              "anchor": "Seven physical pages; five-page body"
+            }
+          ]
+        },
+        {
+          "criterion_id": "program_objective_trace",
+          "state": "PASS",
+          "finding": "The brief maps the evidence-control module to Unified Service Layer, AI-Powered Orchestration evidence, Secure Data Fabric metadata, and Vendor Lock-In Prevention, all of which the CSO permits as a focused subset.",
+          "missing_evidence": [],
+          "source_refs": [
+            {
+              "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+              "anchor": "Section A focus areas and objective"
+            },
+            {
+              "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
+              "anchor": "Body pages 1 and 2"
+            }
+          ]
+        },
+        {
+          "criterion_id": "foundational_leap",
+          "state": "PARTIAL",
+          "finding": "The brief identifies a new application of predeclared acceptance rules, append-only evidence, offline verification, and retained failures to hybrid HPC and AI orchestration, but it does not yet distinguish that module experimentally from modern provenance, policy, and observability stacks.",
+          "missing_evidence": [
+            "Named incumbent evidence or observability architecture",
+            "Mechanism-level differentiation from that comparator",
+            "Ablation showing the value of predeclaration, failure retention, and offline verification"
+          ],
+          "source_refs": [
+            {
+              "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
+              "anchor": "Body page 1, Innovation"
+            }
+          ]
+        },
+        {
+          "criterion_id": "named_sota_baseline",
+          "state": "FAIL",
+          "finding": "The brief names open standards and architectural boundaries but does not name and protocol-match a current government or commercial evidence-control baseline.",
+          "missing_evidence": [
+            "Named current provenance, policy, or observability baseline with version",
+            "Protocol-matched baseline implementation or documented comparison plan",
+            "Ablations for each claimed novel control"
+          ],
+          "source_refs": [
+            {
+              "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
+              "anchor": "Body pages 1, 2, and 5"
+            }
+          ]
+        },
+        {
+          "criterion_id": "program_metric_trace",
+          "state": "PARTIAL",
+          "finding": "Integrity, portability, failure visibility, reproducibility, capture latency, verification time, storage growth, and egress are identified, but no current-source baseline values or quantitative acceptance thresholds are locked.",
+          "missing_evidence": [
+            "Baseline capture latency, verification time, storage growth, and egress measurements",
+            "Government-approved acceptance threshold for each metric",
+            "Cost-efficiency denominator and measurement window"
+          ],
+          "source_refs": [
+            {
+              "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
+              "anchor": "Body pages 3 and 4"
+            }
+          ]
+        },
+        {
+          "criterion_id": "mission_specific_experiment",
+          "state": "PARTIAL",
+          "finding": "The brief proposes a sixteen-week unclassified prototype with two replaceable adapters, two approved environments, shadow replay, Government-run verification, and rollback, but the actual HPCMP workflow, interfaces, data, workload scale, and comparator remain unlocked.",
+          "missing_evidence": [
+            "One named HPCMP-representative unclassified workflow",
+            "Approved interface and test-data boundary",
+            "Named comparator and workload-scale profile",
+            "Predeclared acceptance and stop thresholds"
+          ],
+          "source_refs": [
+            {
+              "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
+              "anchor": "Body page 3"
+            }
+          ]
+        },
+        {
+          "criterion_id": "evidence_applicability",
+          "state": "PARTIAL",
+          "finding": "The public repository and source-native ledger support inspectable evidence-control and negative-result-retention patterns, but they do not exercise an HPCMP environment, SDC integration, classified boundary, or Government workload.",
+          "missing_evidence": [
+            "HPCMP-representative workload trace or Government-approved surrogate",
+            "Two-environment adapter demonstration",
+            "Independent execution of the delivered verifier",
+            "Measured security, scale, and cost results within the proposed boundary"
+          ],
+          "source_refs": [
+            {
+              "path": "out/ops/source_native_family_baseline_ledger_latest.json",
+              "anchor": "summary and claim boundary"
+            },
+            {
+              "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
+              "anchor": "Body page 5, Evidence"
+            }
+          ]
+        },
+        {
+          "criterion_id": "team_compute_execution",
+          "state": "FAIL",
+          "finding": "The public brief does not bind named delivery roles, a prime integration owner, an independent evaluator, HPC and cloud access, or a supportable execution budget.",
+          "missing_evidence": [
+            "Named technical lead and delivery roles",
+            "Prime or integration owner for HPCMP interfaces",
+            "Independent evaluator commitment",
+            "Compute, storage, software, and access plan",
+            "Supported Phase II price and staffing basis"
+          ],
+          "source_refs": [
+            {
+              "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
+              "anchor": "Body pages 3 through 5"
+            },
+            {
+              "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-29.json",
+              "anchor": "unresolved_gates"
+            }
+          ]
+        },
+        {
+          "criterion_id": "risk_transition_and_falsifier",
+          "state": "PARTIAL",
+          "finding": "The brief identifies sensitive-data, performance, scale, accreditation, interoperability, rollback, and failure-visibility controls, but each core claim is not yet bound to a quantitative falsifier, transition owner, and Government decision threshold.",
+          "missing_evidence": [
+            "Per-claim falsification threshold",
+            "Government transition owner or prime integration owner",
+            "Failure-triggered stop and rollback rules",
+            "Authorization and security-boundary transition plan"
+          ],
+          "source_refs": [
+            {
+              "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
+              "anchor": "Body pages 3 and 4"
+            }
+          ]
+        }
+      ],
+      "independent_red_team_receipt": null,
+      "next_action": "Name one current comparator, lock one HPCMP-representative experiment with quantitative thresholds and falsifiers, bind delivery roles and compute access, obtain an internal red-team receipt, then separately complete the private ROM, SAM all-awards, contact, Submittable, and final portal gates.",
+      "claim_boundary": "Current-source and formatting conformance plus an explicit objective crosswalk do not establish applicant eligibility, reviewer readiness, pricing, SAM readiness, technical merit, independent validation, selection, award, deployment, savings, or Government validation."
+    },
+    {
+      "lane_id": "darpa_falcon_dpa26bz04_dv016",
+      "name": "DARPA FALCON Direct to Phase II",
+      "disposition": "BLOCKED_TECHNICAL_NO_GO",
+      "technical_argument_required": true,
+      "submission_candidate_active": false,
+      "current_state": "Final submission remains no-go: the preserved real-model attempts do not clear the required same-row ML-only, LLM-only, and hybrid comparison gates, and DP2 eligibility and execution evidence remain unresolved.",
+      "candidate_artifact": "grant_submissions/DPA26BZ04_DV016_FALCON/DPA26BZ04_DV016_GO_NO_GO_AND_DP2_GAP_MAP_2026-07-15.md",
+      "official_source": "grant_submissions/DPA26BZ04_DV016_FALCON/source_attachments/FALCON_FAQ_2026-07-13.pdf",
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Continue only the frozen evidence sprint. Do not assemble or submit a proposal unless the technical, source, DP2 eligibility, IP, team, compute, transition, and independent-review gates all close before the official deadline.",
+      "claim_boundary": "No hybrid superiority, external validation, agency approval, enterprise-scale performance, universal superiority, scholarly impact, or DP2 eligibility is established."
+    },
+    {
+      "lane_id": "launchtn_3686_pitch_2026",
+      "name": "Launch Tennessee 3686 Pitch Competition 2026",
+      "disposition": "ACTIVE_SUBMISSION_CANDIDATE",
+      "technical_argument_required": true,
+      "submission_candidate_active": true,
+      "current_state": "The application route and deadline are recorded, but applicant eligibility, current terms, pricing, use of funds, reviewer answers, evidence applicability, and founder attestations remain unresolved.",
+      "candidate_artifact": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-17.md",
+      "official_source": "grant_submissions/funding_sprint_20260709/CURRENT_PUBLIC_OPPORTUNITY_LEADS_2026-07-25.json",
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Recheck the first-party application source, resolve applicant facts and terms, and complete the full source-bound pitch argument and independent review before portal finalization.",
+      "claim_boundary": "A local application packet does not establish current eligibility, submission, receipt, finalist status, prize eligibility, funding, selection, investment, award, endorsement, or permission to disclose nonpublic information."
+    },
+    {
+      "lane_id": "microsoft_for_startups_no_referral_2026",
+      "name": "Microsoft for Startups no-referral path",
+      "disposition": "PARTNER_OR_TOPIC_GATE",
+      "technical_argument_required": false,
+      "submission_candidate_active": false,
+      "current_state": "Official public route observed; applicant eligibility, account history, agreements, payment method, and billing conversion controls require founder confirmation.",
+      "candidate_artifact": null,
+      "official_source": "grant_submissions/funding_sprint_20260709/CURRENT_PUBLIC_OPPORTUNITY_LEADS_2026-07-25.json",
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Resolve applicant facts and billing guardrails before any founder-only account or application action.",
+      "claim_boundary": "The public route does not establish eligibility, application, approval, credits, partnership, investment, funding, endorsement, or technical validation."
+    },
+    {
+      "lane_id": "aws_activate_founders_2026",
+      "name": "AWS Activate Founders package",
+      "disposition": "PARTNER_OR_TOPIC_GATE",
+      "technical_argument_required": false,
+      "submission_candidate_active": false,
+      "current_state": "Official public route observed; company age, funding stage, website, paid-tier account, prior credit history, terms, and billing controls require founder confirmation.",
+      "candidate_artifact": null,
+      "official_source": "grant_submissions/funding_sprint_20260709/CURRENT_PUBLIC_OPPORTUNITY_LEADS_2026-07-25.json",
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Resolve applicant facts, prior-credit history, terms, eligible services, expiration, and post-credit spending controls before any founder-only application action.",
+      "claim_boundary": "The public route does not establish eligibility, application, approval, credits, partnership, investment, funding, endorsement, or technical validation."
+    },
+    {
+      "lane_id": "nvidia_inception_2026",
+      "name": "NVIDIA Inception",
+      "disposition": "PARTNER_OR_TOPIC_GATE",
+      "technical_argument_required": false,
+      "submission_candidate_active": false,
+      "current_state": "Official public route observed; incorporation, company age, developer employment, website, organization type, application facts, and program terms require founder confirmation.",
+      "candidate_artifact": null,
+      "official_source": "grant_submissions/funding_sprint_20260709/CURRENT_PUBLIC_OPPORTUNITY_LEADS_2026-07-25.json",
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Resolve applicant facts and review current terms before any founder-only application or disclosure action.",
+      "claim_boundary": "The public route does not establish eligibility, application, membership, benefit availability, cloud credits, investor introduction, funding, endorsement, or technical validation."
+    },
+    {
+      "lane_id": "epa_r10_icpoes_route",
+      "name": "EPA Region 10 ICP-OES RFI route",
+      "disposition": "NO_SUBMISSION_ROUTE",
+      "technical_argument_required": false,
+      "submission_candidate_active": false,
+      "current_state": "Low-fit routing only.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Do not promote to a technical submission without a new official fit signal.",
+      "claim_boundary": "Routing research is not technical fit, eligibility, or an agency request."
+    },
+    {
+      "lane_id": "epa_ucmr6_partner_only",
+      "name": "EPA UCMR 6 analytical chemistry lab services",
+      "disposition": "PARTNER_OR_TOPIC_GATE",
+      "technical_argument_required": true,
+      "submission_candidate_active": false,
+      "current_state": "Qualified laboratory partner required; no solo submission route.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Require a qualified laboratory lead and a current official scope before any package assembly.",
+      "claim_boundary": "LumenCore does not claim laboratory qualification, analytical certification, or prime eligibility."
+    },
+    {
+      "lane_id": "fhwa_infrastructure_baa_call3",
+      "name": "FHWA Infrastructure R&D BAA Call 3.0",
+      "disposition": "PARTNER_OR_TOPIC_GATE",
+      "technical_argument_required": true,
+      "submission_candidate_active": false,
+      "current_state": "Topic scout only; no selected call or conforming package.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Select and verify a current official topic before drafting or conformance scoring.",
+      "claim_boundary": "Topic similarity does not establish scope fit, eligibility, or submission readiness."
+    },
+    {
+      "lane_id": "hhs_ai_power_user_pilot",
+      "name": "HHS AI Power User Advanced Models and Features Pilot",
+      "disposition": "PARTNER_OR_TOPIC_GATE",
+      "technical_argument_required": true,
+      "submission_candidate_active": false,
+      "current_state": "Do not prime solo.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Require a qualified prime or agency invitation before technical package work.",
+      "claim_boundary": "No prime eligibility, agency invitation, or pilot commitment is established."
+    },
+    {
+      "lane_id": "csosa_public_safety_analytics",
+      "name": "CSOSA Public Safety Data Analytics Platform",
+      "disposition": "PARTNER_OR_TOPIC_GATE",
+      "technical_argument_required": true,
+      "submission_candidate_active": false,
+      "current_state": "Do not prime solo.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Require a qualified prime, controlled-data boundary, and current official request.",
+      "claim_boundary": "No public-safety deployment, controlled-data authority, or prime eligibility is established."
+    },
+    {
+      "lane_id": "defense_energy_consortium",
+      "name": "Defense Energy Consortium CMO",
+      "disposition": "PARTNER_OR_TOPIC_GATE",
+      "technical_argument_required": true,
+      "submission_candidate_active": false,
+      "current_state": "Partner-introduction route only.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Wait for a concrete consortium problem statement or teaming request before a technical submission.",
+      "claim_boundary": "Membership or an introduction does not establish a funded project, consortium endorsement, or award route."
+    },
+    {
+      "lane_id": "patent_deadline_counsel",
+      "name": "Patent counsel and IP deadline defense",
+      "disposition": "NO_SUBMISSION_ROUTE",
+      "technical_argument_required": false,
+      "submission_candidate_active": false,
+      "current_state": "Counsel route only; filing and deadline facts remain legal-record questions.",
+      "candidate_artifact": null,
+      "official_source": null,
+      "postmortem": null,
+      "criteria": [],
+      "independent_red_team_receipt": null,
+      "next_action": "Use current official records and licensed counsel before any filing, deadline, ownership, or scope statement.",
+      "claim_boundary": "Repository artifacts do not establish filing status, legal deadlines, patentability, ownership, scope, infringement, or freedom to operate."
+    }
+  ]
+}

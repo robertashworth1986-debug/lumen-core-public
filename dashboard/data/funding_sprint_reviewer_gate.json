@@ -26,15 +26,15 @@
       "patented"
     ]
   },
-  "gate_sha256": "25a30d811afb800cd5890f48d3bd48a5985f09c25dfb6c29abe1f05a1360071d",
-  "generated_utc": "2026-07-17T10:27:33.849361+00:00",
+  "gate_sha256": "7b07d17d2f5216d86f708b18d98ba67658d99a5d3dd55c88456dba0e108407be",
+  "generated_utc": "2026-07-29T16:17:42.921907+00:00",
   "manifest": [
     {
-      "bytes": 12244,
+      "bytes": 12309,
       "classification": "public_safe_markdown_review_required",
       "name": "AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AGENCY_ACCOUNT_ACTIVATION_DOCKET_2026-07-09.md",
-      "sha256": "77be584815223c7940817ba6355603ff6f93f8475a6ec1fdcabdbad0d43479e5"
+      "sha256": "fca2c52439db61e406f1987b904208af64e6fb5c09cf8a66398432a08f2d11d7"
     },
     {
       "bytes": 8929,
@@ -44,18 +44,18 @@
       "sha256": "fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82"
     },
     {
-      "bytes": 32810,
+      "bytes": 51734,
       "classification": "public_safe_markdown_review_required",
       "name": "AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
-      "sha256": "df352e21244a5719742c84146e69112489ff582384a916f097811e036fd76f91"
+      "sha256": "92144b41199095ac7227f449e27b7b60decee8eab67046b65a391859c733621e"
     },
     {
-      "bytes": 5378,
+      "bytes": 5710,
       "classification": "public_safe_markdown_review_required",
       "name": "AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
-      "sha256": "8d44ce2a3e555ec99a6c6d82a904933b1f09196fa6f8b516b6c05b4cab935aab"
+      "sha256": "d2b7ad45e342462096f6bd0a6574978d99ccb1b45341a49ac62898ec6ad348d4"
     },
     {
       "bytes": 1697,
@@ -65,11 +65,11 @@
       "sha256": "c6ae2ebafa9c8f014bc1a01f571d33ba62fa36c85a8e90ba41edd34b69bc9c6f"
     },
     {
-      "bytes": 1213,
+      "bytes": 1216,
       "classification": "public_safe_markdown_review_required",
       "name": "ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md",
       "path": "grant_submissions/funding_sprint_20260709/ARMY_AIDP_RFI4_PARTNER_NOTE_STUB_2026-07-10.md",
-      "sha256": "3bca95adbee97d6f7a6613e07348baae40d27320bf41c0c00da6e67781c1f4d7"
+      "sha256": "3c0c9407c6ed91d3f081595e1cfa0f5e391b7b9484b31296e87c09d3510bfdef"
     },
     {
       "bytes": 2886,
@@ -79,11 +79,11 @@
       "sha256": "301b54144ec25b853fd74038e46d2d541ea3d3d64f3545e782de2981ec6c1e41"
     },
     {
-      "bytes": 6300,
+      "bytes": 6354,
       "classification": "public_safe_markdown_review_required",
       "name": "AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_GOVERNANCE_PACKET_2026-07-09.md",
-      "sha256": "f04cfca6d7b388c97303e354aaf9229ba3d46d57f54c6f56110d4ade89dd82b3"
+      "sha256": "6c97cd16f416812308a01c554759b6e67e9157e8b6c0af65813360ffc4cd6956"
     },
     {
       "bytes": 5263,
@@ -91,6 +91,13 @@
       "name": "AUTONOMOUS_QUANT_INNOVATION_SAFETY_PROTOCOL_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_INNOVATION_SAFETY_PROTOCOL_2026-07-09.md",
       "sha256": "050f64e5c86a866a3fd125e00911e4f3caeb387625f7c4386c355727ab3ac30a"
+    },
+    {
+      "bytes": 2319,
+      "classification": "public_safe_markdown_review_required",
+      "name": "CAPABILITY_ARTIFACT_GOVERNANCE_2026-07-26.md",
+      "path": "grant_submissions/funding_sprint_20260709/CAPABILITY_ARTIFACT_GOVERNANCE_2026-07-26.md",
+      "sha256": "f0276e855e9a2070e5e97c2f901161c79911bdc23ce3948c32fd688691ad6512"
     },
     {
       "bytes": 2778,
@@ -107,6 +114,13 @@
       "sha256": "d675cc756efcc84ccd219cce06560493ac2f7ea2c4cf3338aca45a1e5e52e567"
     },
     {
+      "bytes": 27967,
+      "classification": "public_safe_markdown_review_required",
+      "name": "CROSS_AGENCY_CAPABILITY_MATRIX_2026-07-26.md",
+      "path": "grant_submissions/funding_sprint_20260709/CROSS_AGENCY_CAPABILITY_MATRIX_2026-07-26.md",
+      "sha256": "8feade0e7f7b2adbdcba671fca6ee1b516b99ec7521a3d27810a186142f1123d"
+    },
+    {
       "bytes": 5384,
       "classification": "public_safe_markdown_review_required",
       "name": "CURRENT_LANE_SYNC_STATUS_2026-07-09.md",
@@ -114,25 +128,39 @@
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
     },
     {
-      "bytes": 11451,
+      "bytes": 4930,
+      "classification": "public_safe_markdown_review_required",
+      "name": "CURRENT_REVIEWER_FRONT_DOOR_2026-07-29.md",
+      "path": "grant_submissions/funding_sprint_20260709/CURRENT_REVIEWER_FRONT_DOOR_2026-07-29.md",
+      "sha256": "885fbf053c58c96e68ab9e792f0be42f33d525767b57b3f2509dcc7e3536b051"
+    },
+    {
+      "bytes": 11434,
       "classification": "public_safe_markdown_review_required",
       "name": "CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/CUSTOMER_COMMERCIALIZATION_PACKET_2026-07-09.md",
-      "sha256": "b1034846561675a25ff85134813c6e4bc0d71a5a48bad92f78610273c4499d28"
+      "sha256": "7074bd8929fab78dfbb6a2f2ace6cbb986578bffb4f5591557a54043d477ff98"
     },
     {
-      "bytes": 27683,
+      "bytes": 1048,
+      "classification": "public_safe_markdown_review_required",
+      "name": "DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.md",
+      "sha256": "d4edecb7c79a33572aa66367eef796f7e4e22d48a6d84ca3764c9693f0b52112"
+    },
+    {
+      "bytes": 42305,
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "f8d5e886dbea083bcb512748549e776d3a4c2e4b971ebb46c25b593001f16e7d"
+      "sha256": "0f86f78ed59c2dcbf062aa34023f47db6bbc78b02045e5046151dc49fa0634b7"
     },
     {
-      "bytes": 1443,
+      "bytes": 1446,
       "classification": "public_safe_markdown_review_required",
       "name": "DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md",
       "path": "grant_submissions/funding_sprint_20260709/DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md",
-      "sha256": "883b6164cd806d63add44194dd5ad9eaa2b798a553cfdf74e0ff076f9e397a19"
+      "sha256": "fd53d385531090a586c8fc7168e3dc14dff38f840bb57ed462f04e75ec725cdc"
     },
     {
       "bytes": 5275,
@@ -156,11 +184,32 @@
       "sha256": "2ef421abdd3c777f95e4ade019b1e998d04b2f2cdfebccc27904a6ea3ead87af"
     },
     {
-      "bytes": 2946,
+      "bytes": 4637,
       "classification": "public_safe_markdown_review_required",
       "name": "EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-17.md",
-      "sha256": "86bc8a9b322bae9293ff469f738c6ccbe9f5a196dc3bfcd382717f2f811baebd"
+      "sha256": "baa2b5b540897c89960b1bf0ed730a7a29790179a19fa3667d30589a5db164d3"
+    },
+    {
+      "bytes": 9357,
+      "classification": "public_safe_markdown_review_required",
+      "name": "EMAIL_ACTION_RECONCILIATION_2026-07-18.md",
+      "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.md",
+      "sha256": "a911ceb0b7fbc085c2356877ede859a45c3f1350cc8b249634cc5e6063c6febe"
+    },
+    {
+      "bytes": 1358,
+      "classification": "public_safe_markdown_review_required",
+      "name": "EPRI_OPAI_BRAND_ASSET_PACKET_2026-07-25.md",
+      "path": "grant_submissions/funding_sprint_20260709/EPRI_OPAI_BRAND_ASSET_PACKET_2026-07-25.md",
+      "sha256": "bd894e65d568ad0c87dd3725809e66c581b7408a25946188ed998751c06506ed"
+    },
+    {
+      "bytes": 3495,
+      "classification": "public_safe_markdown_review_required",
+      "name": "EPRI_OPAI_LOGO_RESPONSE_PACKET_2026-07-25.md",
+      "path": "grant_submissions/funding_sprint_20260709/EPRI_OPAI_LOGO_RESPONSE_PACKET_2026-07-25.md",
+      "sha256": "7b2755c99ea3497cc96c57e19b71190df1a993c3e899fae6ca952895c32e69bf"
     },
     {
       "bytes": 1840,
@@ -170,6 +219,34 @@
       "sha256": "efcf4fddced28472aa67f73b9b3d687f4dd317d42cf0162e57530b59a0114371"
     },
     {
+      "bytes": 2421,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md",
+      "sha256": "002711f265d15b0e6435d401aac54c29ae831406279f339dbee165209ffd3888"
+    },
+    {
+      "bytes": 2986,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-29.md",
+      "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-29.md",
+      "sha256": "dc3d7da63ab2d0c6ea42524a3f28168acf12569c9b8c13c14fe417c4b773e7f7"
+    },
+    {
+      "bytes": 2723,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.md",
+      "sha256": "e0f0deab1411418e37bdde2afee5d307742b8d9884d07d504ada250a03299204"
+    },
+    {
+      "bytes": 2965,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ERDC_SDC_PHASE2_ROM_GATE_2026-07-29.md",
+      "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PHASE2_ROM_GATE_2026-07-29.md",
+      "sha256": "576840f1d59827fea4510813d01e3e1be57e323dcde56373ec737519dc366978"
+    },
+    {
       "bytes": 5118,
       "classification": "public_safe_markdown_review_required",
       "name": "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md",
@@ -177,39 +254,53 @@
       "sha256": "d1cddeee4cd7d2ace79c1c165f50b4de6a7d3058c6b9470b88bedcb0fb959ee2"
     },
     {
-      "bytes": 1531,
+      "bytes": 7397,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md",
+      "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md",
+      "sha256": "9bd2316fbbcc2a0768cee2281713792e8175b27281b1ffa49a559d4d28f93f93"
+    },
+    {
+      "bytes": 1534,
       "classification": "public_safe_markdown_review_required",
       "name": "ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md",
       "path": "grant_submissions/funding_sprint_20260709/ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md",
-      "sha256": "da16f4de1cde669300680e230da53d57bc6072fc487b12bd78d77b0c67f99df9"
+      "sha256": "21101e29193eb49d01240917f0e5d820c30f0abb0fade1a3d9897b316f2e990d"
     },
     {
-      "bytes": 8261,
+      "bytes": 8679,
       "classification": "public_safe_markdown_review_required",
       "name": "EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
-      "sha256": "fa8fd779a9cce41f8169d77611417249ada18263e420da0271c44bd3d0bf6df8"
+      "sha256": "57270e08a2b2bacfb7e5bc77c607cfa8c90c35fd92aa010c7595352285c53777"
     },
     {
-      "bytes": 8493,
+      "bytes": 8935,
       "classification": "public_safe_markdown_review_required",
       "name": "EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
-      "sha256": "a9a309f607bd50ffe0b2ce773db08b135a932a42849f495730b61e160e42f5c9"
+      "sha256": "a99cb47050718693df37e5903c762c425c6797add294b614209773e7f6d16686"
     },
     {
-      "bytes": 11657,
+      "bytes": 22436,
       "classification": "public_safe_markdown_review_required",
       "name": "EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
       "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
-      "sha256": "f11482ff17c4417b2e8a67cb3c76d3139f78e2585b3939a6efadc93d9a65bfcb"
+      "sha256": "8c110a429d210a817d212019fff85332d014c570c5b9bad70d50016245c0e100"
     },
     {
-      "bytes": 22464,
+      "bytes": 26882,
       "classification": "public_safe_markdown_review_required",
       "name": "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
       "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-      "sha256": "32fd152bdca7a50564960c1774873eaf6b4e146c0805df2b6a89feac010ca540"
+      "sha256": "ff2b08a05252c5a5e084916710c9148a76c922ce1ecc2dea9e64736f33cdd05e"
+    },
+    {
+      "bytes": 32052,
+      "classification": "public_safe_markdown_review_required",
+      "name": "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md",
+      "path": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md",
+      "sha256": "b8988ee6283a0200ea13558bf6d6d5fb1ae54217269d08a18f113a1c6df18333"
     },
     {
       "bytes": 1785,
@@ -219,11 +310,18 @@
       "sha256": "c19902f8d654a4893f6b959e46459a51b76ba012b9f237b191c3754af99a098a"
     },
     {
-      "bytes": 10709,
+      "bytes": 3482,
+      "classification": "public_safe_markdown_review_required",
+      "name": "FA701426SCS01_PARTNER_ONLY_BRIEF_2026-07-26.md",
+      "path": "grant_submissions/funding_sprint_20260709/FA701426SCS01_PARTNER_ONLY_BRIEF_2026-07-26.md",
+      "sha256": "dab0e3cf3a1be9185f3929e38c115e1c81e1f2d07e4abb5b5a33a670ccb5b69a"
+    },
+    {
+      "bytes": 10765,
       "classification": "public_safe_markdown_review_required",
       "name": "FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
-      "sha256": "ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c"
+      "sha256": "97306f1e38ca70eabb8c70e41582fff239cb07a0150755e98449b5d8e2bb6ab2"
     },
     {
       "bytes": 2968,
@@ -233,25 +331,32 @@
       "sha256": "20fad12aef8afa1ce4bad5155cf8d0e9cb8850fea3143b3c188b2c21776d7ea5"
     },
     {
-      "bytes": 3118,
+      "bytes": 5215,
       "classification": "public_safe_markdown_review_required",
       "name": "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.md",
       "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.md",
-      "sha256": "bc838ff6dcd5d72a651b8920f7f514a4de3f54c0d4f76daaaecd67d2cb4c5720"
+      "sha256": "d5d8bbc0b4261804268cc3f23f0ca6c8bed2f06255f4a99dedb9f03a1d9b521b"
     },
     {
-      "bytes": 1388,
+      "bytes": 3426,
+      "classification": "public_safe_markdown_review_required",
+      "name": "FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md",
+      "sha256": "a3de835ab830e37f6cf8cb3c8374f876150be8c48c185efe73344378558828cd"
+    },
+    {
+      "bytes": 1391,
       "classification": "public_safe_markdown_review_required",
       "name": "FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md",
       "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md",
-      "sha256": "ef9644f44b66a979b743b0223efe7361e5e777dbed26c1838de13d991eb484d0"
+      "sha256": "989e1131bbef7ded7dd5303fc054f369838f8573042c1787878f639c6177778a"
     },
     {
-      "bytes": 6109,
+      "bytes": 6358,
       "classification": "public_safe_markdown_review_required",
       "name": "FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
-      "sha256": "f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046"
+      "sha256": "61b9fff2c10b2493265f00c399d2e9822e378a4fc87f95b9325014fcca773dea"
     },
     {
       "bytes": 2114,
@@ -268,11 +373,11 @@
       "sha256": "684b3d90fa1eecba727d042ce42a9256b5b9ba642ca5348466878b253ae0ffb9"
     },
     {
-      "bytes": 9956,
+      "bytes": 10011,
       "classification": "public_safe_markdown_review_required",
       "name": "FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
-      "sha256": "9d33dda1a48eea97860d60575c432f0c517085bbc9711fb75db839663deedbac"
+      "sha256": "01d2909dee960fafede915ed10080694105603ad190ab4c8f7a47aebd830d820"
     },
     {
       "bytes": 2822,
@@ -289,11 +394,11 @@
       "sha256": "25a62c9b6d81afe4d5eb731b4018fa73853b33cd75aefc0b37872022c4e42a8a"
     },
     {
-      "bytes": 20001,
+      "bytes": 29746,
       "classification": "public_safe_markdown_review_required",
       "name": "HUMAN_ACTION_DOCKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
-      "sha256": "81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6"
+      "sha256": "22df6ac5c43f1e9c6db0b2280eb909a17e861a4caf4b9fa01d0f7b83aacd4ed5"
     },
     {
       "bytes": 14268,
@@ -310,11 +415,11 @@
       "sha256": "43025b72c75f97cd24d09def3397606baa47afc471626f6a411b93988e3a6fce"
     },
     {
-      "bytes": 11129,
+      "bytes": 11183,
       "classification": "public_safe_markdown_review_required",
       "name": "IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
-      "sha256": "e9efbb7e405cc0dc8d283f991e353df8ff78f69864bde2aab0159839f8ecd306"
+      "sha256": "77513cd364b40f6236ffb2a19c337ac3c7c4f4efd0e23bc5d14735b04fb8f02c"
     },
     {
       "bytes": 7643,
@@ -331,6 +436,13 @@
       "sha256": "af04f6cb53f8320292902aae23825970fe35785e263f7851122eb1506c159d52"
     },
     {
+      "bytes": 1969,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LANL_VISION_BOUNDED_FOLLOWUP_DRAFT_2026-07-23.md",
+      "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_BOUNDED_FOLLOWUP_DRAFT_2026-07-23.md",
+      "sha256": "49b113d39a76269568d46e25280663fe61fb1fb3a434649dedaf84ab65049184"
+    },
+    {
       "bytes": 1727,
       "classification": "public_safe_markdown_review_required",
       "name": "LANL_VISION_FOLLOWUP_EMAIL_2026-07-16.md",
@@ -338,11 +450,11 @@
       "sha256": "c2e1b849ae7009891a2685431f7fc4f148c7ad4a4417d2aa6418695317a7d094"
     },
     {
-      "bytes": 9037,
+      "bytes": 9131,
       "classification": "public_safe_markdown_review_required",
       "name": "LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
-      "sha256": "95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762"
+      "sha256": "02da369cab53a8100837e493153de7ff7f1ff0a3d73f38dc227ee619d5b2c1da"
     },
     {
       "bytes": 9130,
@@ -350,6 +462,27 @@
       "name": "LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
       "path": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-15.md",
       "sha256": "35288fb81047332bc4ea12b794c69cf5d3945e6840264be36c24f90bfbfa22dd"
+    },
+    {
+      "bytes": 11665,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+      "sha256": "a41a9ff3df3899bfd87739a01ffff1f44a668dc70f74d094bac31ec4f0120335"
+    },
+    {
+      "bytes": 10573,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LIVE_FUNDING_PORTAL_HANDOFF_2026-07-26.md",
+      "path": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-26.md",
+      "sha256": "21a6dd2ebbe57e1d11c23da2bc9761216eb842ad262db0f6ba575fb3f9e7a7f6"
+    },
+    {
+      "bytes": 16506,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LIVE_FUNDING_PORTAL_HANDOFF_2026-07-29.md",
+      "path": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-29.md",
+      "sha256": "3c6ed476c1e90e93f9ceba0f7a7cc029a0f1f932c07d767aa70de76e5574eeda"
     },
     {
       "bytes": 14508,
@@ -366,11 +499,32 @@
       "sha256": "fdbd657b52ba01d1967011f21ec24249de0ad13a6f32dd3aa2f2919eb02ffe53"
     },
     {
-      "bytes": 8029,
+      "bytes": 14833,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LUMENCORE_ESTATE_MASTER_INDEX_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-17.md",
+      "sha256": "44c7835b11fb3422b508ebd6b8c75afe69589a07f4149c8683198369d17a6332"
+    },
+    {
+      "bytes": 1181,
+      "classification": "public_safe_markdown_review_required",
+      "name": "LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.md",
+      "sha256": "eb8aea087837b7f36a23d1694600bfadc932668c2aaa121d634ba8965eca7e05"
+    },
+    {
+      "bytes": 9479,
       "classification": "public_safe_markdown_review_required",
       "name": "MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
-      "sha256": "b6257f98e9cad35a244aa02264dec019204c5ede27357cdadba76a1019a9fac6"
+      "sha256": "d404933d689c24d7b233fe781aa6d3bdad9557c057438e84d117ab2461a5edb6"
+    },
+    {
+      "bytes": 11379,
+      "classification": "public_safe_markdown_review_required",
+      "name": "MONDAY_FEDERAL_ACTION_PACKET_2026-07-26.md",
+      "path": "grant_submissions/funding_sprint_20260709/MONDAY_FEDERAL_ACTION_PACKET_2026-07-26.md",
+      "sha256": "c463b63dd9415aecb65cdcd6e0303340c961e4f8d87443e6c7d3b425c3a66bca"
     },
     {
       "bytes": 1949,
@@ -394,18 +548,32 @@
       "sha256": "bcfdd40dfafc7ca0e7822679dba9d2504c2196b5701704d0ba3d46c5ce9448f6"
     },
     {
-      "bytes": 1395,
+      "bytes": 1398,
       "classification": "public_safe_markdown_review_required",
       "name": "NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md",
       "path": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md",
-      "sha256": "3c446a7b28b3cb921b30269655f94714986317a90d92096c76a463e8c5d5957c"
+      "sha256": "02b82f50853f20cd8b59cee71177513e79fbfb17c2a9566b0442e9f931f09935"
     },
     {
-      "bytes": 2927,
+      "bytes": 2610,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md",
+      "path": "grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md",
+      "sha256": "81225b12c7b8b7e614a0fd50d559bce076e2142e0535e06ea15deb01fe1a9c93"
+    },
+    {
+      "bytes": 3225,
       "classification": "public_safe_markdown_review_required",
       "name": "NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md",
       "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md",
-      "sha256": "b2cda719028098c6ca11258345e4cb82405f4e80853e8921e8571ab075bae61d"
+      "sha256": "b5894858cb5eb2826403d21e0f488079795d3af6f1c48e53c02462b93eab5912"
+    },
+    {
+      "bytes": 3597,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-29.md",
+      "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-29.md",
+      "sha256": "d80f25c38090cf3a4535073f1174108cb3df6c09b6fad19b6c413ecd9a16ae1a"
     },
     {
       "bytes": 14190,
@@ -429,11 +597,39 @@
       "sha256": "4be304aea326e10cc4b9a4c131a2fb0131e4f37fe572d0429817173b2e0cb873"
     },
     {
-      "bytes": 43600,
+      "bytes": 59776,
       "classification": "public_safe_markdown_review_required",
       "name": "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
       "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
-      "sha256": "a07816a1a3685fda035f1231cb66bef320564ca0e40c9cfad9a21a568f275540"
+      "sha256": "29c26bfdb2cc2776d6a65a16c33b63980399da0d7f57c597f74a1144e85ef76d"
+    },
+    {
+      "bytes": 90274,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-18.md",
+      "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-18.md",
+      "sha256": "4f8fdbc026d2ba758331529165ba39e415adae2759372cf82e926bc089c926d3"
+    },
+    {
+      "bytes": 90271,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-19.md",
+      "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-19.md",
+      "sha256": "27435a4265da3c6275e1c4435bb2cef7ceae5944309238a0a490cf6179ecf706"
+    },
+    {
+      "bytes": 100904,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-29.md",
+      "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-29.md",
+      "sha256": "d3f363e254817a2e049fb8d111a310ca0f0dc9ed7affe5274cca8436c0ebdb0b"
+    },
+    {
+      "bytes": 13217,
+      "classification": "public_safe_markdown_review_required",
+      "name": "NEAR_TERM_CAPITAL_AND_COMPUTE_RELIEF_PACKET_2026-07-23.md",
+      "path": "grant_submissions/funding_sprint_20260709/NEAR_TERM_CAPITAL_AND_COMPUTE_RELIEF_PACKET_2026-07-23.md",
+      "sha256": "28417d4ddd0b8106d0d211438e81f4768ae611c34ea9bb8019603fe5440f3091"
     },
     {
       "bytes": 8895,
@@ -469,6 +665,20 @@
       "name": "NUCLEAR_PARTNER_OUTREACH_DRAFTS_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/NUCLEAR_PARTNER_OUTREACH_DRAFTS_2026-07-09.md",
       "sha256": "48aee2b847dccfa3f748743fcf3778c0810d7b92f462368008c26496a7ab5439"
+    },
+    {
+      "bytes": 4522,
+      "classification": "public_safe_markdown_review_required",
+      "name": "OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
+      "path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
+      "sha256": "67a1f5dea1d7525f931ed3604aaae5ed99b4b166b1c86845516be38842016eb2"
+    },
+    {
+      "bytes": 20733,
+      "classification": "public_safe_markdown_review_required",
+      "name": "OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md",
+      "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md",
+      "sha256": "4bfc6bd6c5ca4e313a570e16c090334f3c2dae58bace10fede1667287306d046"
     },
     {
       "bytes": 3090,
@@ -513,18 +723,18 @@
       "sha256": "a00f0e2f9fb7bb162ff1adf5ca6bd72279c4be6832e7c77adae6cb05d1f091df"
     },
     {
-      "bytes": 30996,
+      "bytes": 38632,
       "classification": "public_safe_markdown_review_required",
       "name": "REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_CONCIERGE_PACKET_INDEX_2026-07-09.md",
-      "sha256": "04fae167c7755ac30ea8db7e7b8e9eccb48c16bbd8a456b7288602ef674c1e47"
+      "sha256": "c3b908bb414d378365507f562143da48aa08245603c3e77441e96a5911c8c33d"
     },
     {
-      "bytes": 23598,
+      "bytes": 23864,
       "classification": "public_safe_markdown_review_required",
       "name": "REVIEWER_DECISION_BRIEF_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
-      "sha256": "b9fcb9149ab06d23149883e94437dc9cfaabb23648c25eab0377755eaa8708f1"
+      "sha256": "f08ff5e8314c58d9826f69ffdc6fcbf531808254402b3cdee9a3281fb1561e35"
     },
     {
       "bytes": 16206,
@@ -538,21 +748,21 @@
       "classification": "public_safe_markdown_review_required",
       "name": "REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_INVESTOR_FAST_LANE_ROUTER_2026-07-09.md",
-      "sha256": "0aa291778092b21187a00266a0eeb2ce033804162aa12345e0ed5f596966ed5a"
+      "sha256": "8ded436ae8b126f2eda45b492c738b97cef2968686088c22bb62b90dcc99779c"
     },
     {
-      "bytes": 2219,
+      "bytes": 2267,
       "classification": "public_safe_markdown_review_required",
       "name": "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
       "path": "grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.md",
-      "sha256": "be187a93a7553e692c7781ea56686769d3f539b7b27e1d944dc525b4e1623440"
+      "sha256": "fdde93e3624fe8d704bc8ad166654e24dd5fdd592f46418f1f08caf5e76e0d9d"
     },
     {
-      "bytes": 18526,
+      "bytes": 19184,
       "classification": "public_safe_markdown_review_required",
       "name": "SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md",
       "path": "grant_submissions/funding_sprint_20260709/SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md",
-      "sha256": "a6cabe6659c6f468bed9fb87818d24c4b60003c13a85c986d57e1880b6dd3c6c"
+      "sha256": "23c87f057a1e3eeaa42fb085dd443856ff29b0ad570c2a17fc22224b4d8efd7e"
     },
     {
       "bytes": 4583,
@@ -562,6 +772,13 @@
       "sha256": "7f4f1a90c08f3c4df1b6f2b6d32b5b863a008a300f304feb807823846cdbf528"
     },
     {
+      "bytes": 2958,
+      "classification": "public_safe_markdown_review_required",
+      "name": "SBIR_GOV_FIRM_PROFILE_UPDATE_RECEIPT_2026-07-18.md",
+      "path": "grant_submissions/funding_sprint_20260709/SBIR_GOV_FIRM_PROFILE_UPDATE_RECEIPT_2026-07-18.md",
+      "sha256": "442e8b6a4d1791047043a0e5f88ad0050db0cd059d09bc1d2ea574e9f0002b45"
+    },
+    {
       "bytes": 6675,
       "classification": "public_safe_markdown_review_required",
       "name": "SBIR_PHASE1_TRIAGE_2026-07-09.md",
@@ -569,32 +786,46 @@
       "sha256": "9b57a099e9cb7de15e75d76c5060d155770e42ddedd5c6668fdf5b2cceb54df1"
     },
     {
-      "bytes": 24099,
+      "bytes": 5183,
+      "classification": "public_safe_markdown_review_required",
+      "name": "STAN_HERRING_MEETING_BRIEF_2026-07-28.md",
+      "path": "grant_submissions/funding_sprint_20260709/STAN_HERRING_MEETING_BRIEF_2026-07-28.md",
+      "sha256": "e6a1535f8a0caeb161b15a9887a04142e18b9420bdb6bdbec287f94815f54a77"
+    },
+    {
+      "bytes": 37885,
       "classification": "public_safe_markdown_review_required",
       "name": "SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
-      "sha256": "cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390"
+      "sha256": "4193b2e8c04cc05b2d7f6e25ca096f2a06e6ed700c1df629dc7b238096ccb4aa"
     },
     {
-      "bytes": 9967,
+      "bytes": 32254,
+      "classification": "public_safe_markdown_review_required",
+      "name": "SUBMISSION_CONFORMANCE_GATE_2026-07-25.md",
+      "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_CONFORMANCE_GATE_2026-07-25.md",
+      "sha256": "5053fc2055ea88976fd540dd5a757707cdf24846c0b56ff33cfc8cd88e403875"
+    },
+    {
+      "bytes": 11353,
       "classification": "public_safe_markdown_review_required",
       "name": "TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
-      "sha256": "2a99e42dd552ba573d55caf6fb7f14414fad25234966abf33debf4c5902e9dc5"
+      "sha256": "40b075b529eb48b8fae6f679618694a6941a40109fd60a55bf430f35bf690181"
     },
     {
-      "bytes": 25377,
+      "bytes": 54115,
       "classification": "public_safe_markdown_review_required",
       "name": "TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
-      "sha256": "4333999738c589b9ed7e7ecf0a3993c34cb98d60d21cb92d843c4c4c0baed1e8"
+      "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
     },
     {
-      "bytes": 1324,
+      "bytes": 1327,
       "classification": "public_safe_markdown_review_required",
       "name": "USTDA_INDO_PACIFIC_DIGITAL_INFRA_SCOPING_STUB_2026-07-10.md",
       "path": "grant_submissions/funding_sprint_20260709/USTDA_INDO_PACIFIC_DIGITAL_INFRA_SCOPING_STUB_2026-07-10.md",
-      "sha256": "c58d37b8ff6d50044599528adc5af801285bcdddf8397dd234ce07b06810f331"
+      "sha256": "60a9c5cc2bdc12f8ab92acd267a04113e6aac206a208fa6b9adcb608841b1ac1"
     },
     {
       "bytes": 7293,
@@ -611,87 +842,307 @@
   },
   "proof_cards": [
     {
-      "artifact": "AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
+      "argument_conformance_declared_pass": false,
+      "artifact": "grant_submissions/DICE_HR001126S0010/LumenCore_DICE_Abstract_FINAL_CANDIDATE.docx",
       "artifact_present": true,
-      "artifact_sha256": "8d44ce2a3e555ec99a6c6d82a904933b1f09196fa6f8b516b6c05b4cab935aab",
-      "card_sha256": "8c978900d26c1bf870ccb0ee1baccda5ee3122be5b1b91ae5c893b3a9bded1da",
-      "claim_boundary": "RFI response only; not a contract award or operational deployment.",
-      "deadline": "2026-07-13",
-      "human_gate": "Human approval before email/submission.",
-      "lane": "Air Force Advanced Automation Contract RFI",
-      "next_gate": "Verify SAM attachments, response address, page limit, and time zone before sending.",
-      "reviewer_posture": "ready_for_human_review",
-      "source": "https://sam.gov/opp/3fa15f166ec244539c808be5c0496427/view"
+      "artifact_sha256": "d54fc647a7eda47bcf31f4d21c0f67d089920e509a4039b7e9cef9f692f76a00",
+      "card_sha256": "509e8878ed17d535a0f41acb8c8df28841117115c2c39a2c78a1dd4bfd7414bf",
+      "claim_boundary": "The package was received but was not selected for a full proposal.",
+      "conformance_lane_id": "darpa_dice_full_submission",
+      "conformance_mapping_found": true,
+      "conformance_status": "CLOSED_OFFICIAL_DECISION_POSTMORTEM_ONLY",
+      "criterion_count": 10,
+      "criterion_pass_count": 2,
+      "deadline": "closed_official_decision",
+      "human_gate": "No reply or resubmission under the closed route.",
+      "lane": "DARPA DICE",
+      "next_gate": "Keep the route closed and reuse only the source-bound postmortem lessons.",
+      "readiness_blockers": [
+        "official_decision_closed_route"
+      ],
+      "reviewer_posture": "closed_official_decision_postmortem_only",
+      "reviewer_ready": false,
+      "source": "local_official_baa_and_decision_record",
+      "source_bound_argument_conformance_pass": false,
+      "submission_candidate_active": false,
+      "technical_argument_required": true
     },
     {
-      "artifact": "NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md",
+      "argument_conformance_declared_pass": false,
+      "artifact": "grant_submissions/funding_sprint_20260709/NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md",
       "artifact_present": true,
       "artifact_sha256": "bcfdd40dfafc7ca0e7822679dba9d2504c2196b5701704d0ba3d46c5ce9448f6",
-      "card_sha256": "ca0815e7fe0216ff861590a7429a97adc04a11253799b4848dae4ebe12120453",
+      "card_sha256": "5cefc72eb5fc92d4aed158ce78ec19aa21a45ebb407cf94fc56067e3f79156ae",
       "claim_boundary": "No NASA operational claim, energy-savings claim, or infrastructure deployment claim.",
+      "conformance_lane_id": "nasa_data_center_rfi",
+      "conformance_mapping_found": true,
+      "conformance_status": "MONITOR_ONLY_NO_DUPLICATE_SUBMISSION",
+      "criterion_count": 10,
+      "criterion_pass_count": 0,
       "deadline": "2026-07-17",
-      "human_gate": "Human approval before response submission.",
+      "human_gate": "Human approval before any requested replacement response.",
       "lane": "NASA Data Center Infrastructure RFI",
-      "next_gate": "Verify official SAM response instructions and build final PDF.",
-      "reviewer_posture": "ready_for_human_review",
-      "source": "https://sam.gov/workspace/contract/opp/b6d14a4b9eac476b997894d0c5a47a27/view"
+      "next_gate": "Monitor for a specific clarification or replacement request and do not resend.",
+      "readiness_blockers": [
+        "lane_is_monitor_only"
+      ],
+      "reviewer_posture": "monitor_only_no_duplicate_submission",
+      "reviewer_ready": false,
+      "source": "receipt_backed_historical_send",
+      "source_bound_argument_conformance_pass": false,
+      "submission_candidate_active": false,
+      "technical_argument_required": true
     },
     {
-      "artifact": "DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md",
+      "argument_conformance_declared_pass": false,
+      "artifact": "grant_submissions/funding_sprint_20260709/CDC_AI_ACQUISITION_RFI_ARTIFACT_MANIFEST_2026-07-15.json",
       "artifact_present": true,
-      "artifact_sha256": "cf0d3fd466ecfd8396d17f1c4787a7fa2898f49ee5f81ed377df05aa161029c4",
-      "card_sha256": "a4e2f2d5007f6bf55f2c5081689010eaadaf7c9ecd73f4f5827ece411c3704af",
-      "claim_boundary": "No DLA integration, certified readiness, or 10x productivity claim.",
-      "deadline": "2026-07-22",
-      "human_gate": "Human-only Firm PIN, certifications, cost approval, and final submit.",
+      "artifact_sha256": "68aba554d30f9caec5027705e4a3d8741e00447eedef74d5d089b54c600af7a1",
+      "card_sha256": "b834b7356e1d0a63a5dc4915086fd393accdf2f53811da1f8151f19a44a7e04b",
+      "claim_boundary": "Receipt acknowledgment is not an award, endorsement, selection, or technical validation.",
+      "conformance_lane_id": "cdc_ai_acquisition_rfi",
+      "conformance_mapping_found": true,
+      "conformance_status": "MONITOR_ONLY_NO_DUPLICATE_SUBMISSION",
+      "criterion_count": 10,
+      "criterion_pass_count": 0,
+      "deadline": "sent_receipt_acknowledged",
+      "human_gate": "Human approval before any requested replacement response.",
+      "lane": "CDC AI for Acquisition Support RFI",
+      "next_gate": "Monitor for a clarification, replacement request, or scheduling message and do not resend.",
+      "readiness_blockers": [
+        "lane_is_monitor_only"
+      ],
+      "reviewer_posture": "monitor_only_no_duplicate_submission",
+      "reviewer_ready": false,
+      "source": "receipt_backed_historical_send",
+      "source_bound_argument_conformance_pass": false,
+      "submission_candidate_active": false,
+      "technical_argument_required": true
+    },
+    {
+      "argument_conformance_declared_pass": false,
+      "artifact": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "artifact_present": true,
+      "artifact_sha256": "60eb6f4ea94067c653bdcd7b7765aab03df4ad627a99b9c65e4d89c54991f53a",
+      "card_sha256": "a04e5806fede9f73943946b2902cff73e3269cd04c8774edb6c3da210aced07b",
+      "claim_boundary": "No DSIP submission, receipt, DLA integration, certified readiness, or award is established.",
+      "conformance_lane_id": "dla_missionweave_sbir",
+      "conformance_mapping_found": true,
+      "conformance_status": "EXPIRED_NO_VERIFIED_SUBMISSION_REUSE_BLOCKED",
+      "criterion_count": 10,
+      "criterion_pass_count": 0,
+      "deadline": "2026-07-22T16:00:00Z",
+      "human_gate": "No submission action remains under the expired route.",
       "lane": "DLA MissionWeave DSIP SBIR",
-      "next_gate": "Robert enters Firm PIN directly; then inspect DSIP org authority, certs, cost, and upload preview.",
-      "reviewer_posture": "ready_for_human_review",
-      "source": "https://www.sbir.gov/topics/12778"
+      "next_gate": "Archive as expired without verified submission; do not revive the packet against a new topic without a new audit.",
+      "readiness_blockers": [
+        "expired_without_verified_submission"
+      ],
+      "reviewer_posture": "expired_no_verified_submission_reuse_blocked",
+      "reviewer_ready": false,
+      "source": "expired_official_topic_record",
+      "source_bound_argument_conformance_pass": false,
+      "submission_candidate_active": false,
+      "technical_argument_required": true
     },
     {
-      "artifact": "FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
+      "argument_conformance_declared_pass": false,
+      "artifact": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
       "artifact_present": true,
-      "artifact_sha256": "f6d090ccc82b6564449476be4c348b21f92554ffad9abe90dbb863744ebfa046",
-      "card_sha256": "b5466497b05782a87f0624dbd202d48a6732af4baa3c269b0d4c982ee91e53ae",
+      "artifact_sha256": "61b9fff2c10b2493265f00c399d2e9822e378a4fc87f95b9325014fcca773dea",
+      "card_sha256": "1b40a529ce5ce281abd4cd95331e1ec31ffb16ac2eec10ccf6918ee19173f6a4",
       "claim_boundary": "No FHWA field validation, safety benefit, or traffic operations deployment claim.",
-      "deadline": "2026-08-03",
-      "human_gate": "Human approval before pricing, reps/certs, or submission.",
+      "conformance_lane_id": "fhwa_tsmo_data_initiative",
+      "conformance_mapping_found": true,
+      "conformance_status": "NO_SUBMISSION_ARGUMENT_GATE_APPLICABLE",
+      "criterion_count": 10,
+      "criterion_pass_count": 0,
+      "deadline": "closed_partner_route",
+      "human_gate": "Human approval before any new partner outreach or submission work.",
       "lane": "FHWA TSMO Data Initiative",
-      "next_gate": "Download SAM package, build compliance matrix, decide prime-vs-team posture.",
-      "reviewer_posture": "ready_for_human_review",
-      "source": "https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view"
+      "next_gate": "Do not revive the Cambridge route; reopen only through a different qualified organization with a written role.",
+      "readiness_blockers": [
+        "lane_is_not_a_submission_route"
+      ],
+      "reviewer_posture": "not_a_current_submission_route",
+      "reviewer_ready": false,
+      "source": "closed_cambridge_partner_route",
+      "source_bound_argument_conformance_pass": false,
+      "submission_candidate_active": false,
+      "technical_argument_required": false
     },
     {
-      "artifact": "NUCLEAR_LICENSING_EVIDENCE_PARTNER_ONE_PAGER_2026-07-09.md",
+      "argument_conformance_declared_pass": false,
+      "artifact": "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-29.md",
       "artifact_present": true,
-      "artifact_sha256": "5d95bca13c79ed450a91e9330729106969e6c9b28fd6557e9c80d52f509c5b41",
-      "card_sha256": "8b8611f5847e39fa30430494e75249db28e6fca63e470f32c09d2cd66ad4172f",
-      "claim_boundary": "Partner-first; no NRC licensing authority, reactor safety validation, nuclear QA, or plant performance claim.",
-      "deadline": "2026-09-30",
-      "human_gate": "Human approval before partner outreach or FedConnect action.",
-      "lane": "DOE Advanced Nuclear Licensing Cost-Share",
-      "next_gate": "Qualified nuclear/licensing applicant or full NOFO review before any solo-prime action.",
-      "reviewer_posture": "ready_for_human_review",
-      "source": "https://www.fedconnect.net/FedConnect/default.aspx?ReturnUrl=%2Ffedconnect%2F%3Fdoc%3DDE-FOA-0003339%26agency%3DDOE&agency=DOE&doc=DE-FOA-0003339"
-    },
-    {
-      "artifact": "NSF_PROJECT_PITCH_DRAFT_2026-07-09.md",
-      "artifact_present": true,
-      "artifact_sha256": "baa66ab948fdc1bb57e898d8a6e4e0bf776c65ff4c6722ef658720c148f40e6f",
-      "card_sha256": "3e91f984f177a288262762f5f648c1e76abd9ff683a6f8d45e0bbfef11e02e50",
-      "claim_boundary": "Full proposal remains invitation-gated; no invitation is represented unless issued by NSF.",
+      "artifact_sha256": "1bc1b5507030e2032d071d6c375795a6c4327167c3d93c57da67ddbed623eafa",
+      "card_sha256": "e2088f6139f772189269316c18259549428cc1fcd9a5ee4c5c65ecf32c4602a9",
+      "claim_boundary": "No current eligibility, invitation, submission availability, selection, or award is represented.",
+      "conformance_lane_id": "nsf_project_pitch",
+      "conformance_mapping_found": true,
+      "conformance_status": "BLOCKED_UNASSESSED_CRITERIA",
+      "criterion_count": 10,
+      "criterion_pass_count": 0,
       "deadline": "rolling_invitation_gate",
       "human_gate": "Human approval before Project Pitch submit.",
       "lane": "NSF SBIR/STTR Project Pitch",
-      "next_gate": "Check NSF login and one-pending-pitch rule before submitting.",
-      "reviewer_posture": "ready_for_human_review",
-      "source": "https://seedfund.nsf.gov/project-pitch/"
+      "next_gate": "Verify applicant facts, authenticated prompts, title limit, topic selection, and active portal state before final review.",
+      "readiness_blockers": [
+        "lane_conformance_status_not_pass",
+        "argument_conformance_not_declared_pass",
+        "criterion_not_pass:official_source_current",
+        "criterion_sources_not_current:official_source_current",
+        "criterion_not_pass:mandatory_format_and_route",
+        "criterion_sources_not_current:mandatory_format_and_route",
+        "criterion_not_pass:program_objective_trace",
+        "criterion_sources_not_current:program_objective_trace",
+        "criterion_not_pass:foundational_leap",
+        "criterion_sources_not_current:foundational_leap",
+        "criterion_not_pass:named_sota_baseline",
+        "criterion_sources_not_current:named_sota_baseline",
+        "criterion_not_pass:program_metric_trace",
+        "criterion_sources_not_current:program_metric_trace",
+        "criterion_not_pass:mission_specific_experiment",
+        "criterion_sources_not_current:mission_specific_experiment",
+        "criterion_not_pass:evidence_applicability",
+        "criterion_sources_not_current:evidence_applicability",
+        "criterion_not_pass:team_compute_execution",
+        "criterion_sources_not_current:team_compute_execution",
+        "criterion_not_pass:risk_transition_and_falsifier",
+        "criterion_sources_not_current:risk_transition_and_falsifier",
+        "criterion_pass_count_incomplete",
+        "nonpassing_criterion_count_present",
+        "reviewer_card_artifact_not_conformance_candidate",
+        "independent_red_team_receipt_not_current",
+        "independent_red_team_not_passed"
+      ],
+      "reviewer_posture": "blocked_source_bound_argument_conformance",
+      "reviewer_ready": false,
+      "source": "current_public_official_source_audit",
+      "source_bound_argument_conformance_pass": false,
+      "submission_candidate_active": true,
+      "technical_argument_required": true
+    },
+    {
+      "argument_conformance_declared_pass": false,
+      "artifact": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json",
+      "artifact_present": true,
+      "artifact_sha256": "4b572b18631ac9ec19571a35610c46de36584d913e1b51941e224c5e4f7062cb",
+      "card_sha256": "2163050dbd90f802b551cafb264129b67139c77a8e64cd3c6aac8b75a5f99856",
+      "claim_boundary": "Current-source public-draft conformance does not establish applicant eligibility, private-final readiness, technical merit, selection, funding, or award.",
+      "conformance_lane_id": "erdc_sovereign_cloud_cso",
+      "conformance_mapping_found": true,
+      "conformance_status": "BLOCKED_CRITERION_FAILURE",
+      "criterion_count": 10,
+      "criterion_pass_count": 3,
+      "deadline": "2026-08-07T21:00:00Z_local_record_recheck_required",
+      "human_gate": "Human approval before pricing, representations, certification, upload, or final submit.",
+      "lane": "ERDC Sovereign Defense Cloud CSO",
+      "next_gate": "Approve the private Phase II-only ROM, verify SAM and contact facts, build and validate the private final PDF, and stop at the complete portal preview.",
+      "readiness_blockers": [
+        "lane_conformance_status_not_pass",
+        "argument_conformance_not_declared_pass",
+        "criterion_not_pass:foundational_leap",
+        "criterion_not_pass:named_sota_baseline",
+        "criterion_not_pass:program_metric_trace",
+        "criterion_not_pass:mission_specific_experiment",
+        "criterion_not_pass:evidence_applicability",
+        "criterion_not_pass:team_compute_execution",
+        "criterion_not_pass:risk_transition_and_falsifier",
+        "criterion_pass_count_incomplete",
+        "nonpassing_criterion_count_present",
+        "independent_red_team_receipt_not_current",
+        "independent_red_team_not_passed"
+      ],
+      "reviewer_posture": "blocked_source_bound_argument_conformance",
+      "reviewer_ready": false,
+      "source": "current_official_cso_and_july_20_faq",
+      "source_bound_argument_conformance_pass": false,
+      "submission_candidate_active": true,
+      "technical_argument_required": true
+    },
+    {
+      "argument_conformance_declared_pass": false,
+      "artifact": "grant_submissions/DPA26BZ04_DV016_FALCON/DPA26BZ04_DV016_GO_NO_GO_AND_DP2_GAP_MAP_2026-07-15.md",
+      "artifact_present": true,
+      "artifact_sha256": "b713ca0b0e1293d5bc85093fc3ab9774cd7111b6526777fdd120d95ae820ff6b",
+      "card_sha256": "d29c07c92b9a502c940007369f09a448510cd02b49a04ab77f8f941d04ac66fa",
+      "claim_boundary": "No hybrid superiority, external validation, agency approval, scholarly impact, enterprise scale, or DP2 eligibility is established.",
+      "conformance_lane_id": "darpa_falcon_dpa26bz04_dv016",
+      "conformance_mapping_found": true,
+      "conformance_status": "TECHNICAL_NO_GO_EVIDENCE_SPRINT_ONLY",
+      "criterion_count": 10,
+      "criterion_pass_count": 0,
+      "deadline": "2026-08-19T16:00:00Z",
+      "human_gate": "Human approval before any proposal assembly, certification, upload, or final submit.",
+      "lane": "DARPA FALCON Direct to Phase II",
+      "next_gate": "Continue only the frozen evidence sprint until every technical, DP2, IP, execution, and independent-review gate closes.",
+      "readiness_blockers": [
+        "technical_no_go"
+      ],
+      "reviewer_posture": "technical_no_go_evidence_sprint_only",
+      "reviewer_ready": false,
+      "source": "local_official_faq_and_baa_attachments",
+      "source_bound_argument_conformance_pass": false,
+      "submission_candidate_active": false,
+      "technical_argument_required": true
+    },
+    {
+      "argument_conformance_declared_pass": false,
+      "artifact": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-29.md",
+      "artifact_present": true,
+      "artifact_sha256": "d547c1cd3b5bf1ecc89f4b6e7d781ffbdb835536e1901745cb80fa68a5c192ee",
+      "card_sha256": "fa32144d0e59f0330a5aebbd44d7aa50af35c0592f083800ea6ae9339bedbf1b",
+      "claim_boundary": "No eligibility, submission, receipt, finalist status, prize, funding, selection, investment, or award is established.",
+      "conformance_lane_id": "launchtn_3686_pitch_2026",
+      "conformance_mapping_found": true,
+      "conformance_status": "BLOCKED_UNASSESSED_CRITERIA",
+      "criterion_count": 10,
+      "criterion_pass_count": 0,
+      "deadline": "2026-08-14T04:59:00Z",
+      "human_gate": "Human approval before attestations, disclosure choices, terms acceptance, or final submit.",
+      "lane": "Launch Tennessee 3686 Pitch Competition",
+      "next_gate": "Recheck the first-party source, resolve applicant facts and terms, and complete the source-bound pitch review.",
+      "readiness_blockers": [
+        "lane_conformance_status_not_pass",
+        "argument_conformance_not_declared_pass",
+        "criterion_not_pass:official_source_current",
+        "criterion_sources_not_current:official_source_current",
+        "criterion_not_pass:mandatory_format_and_route",
+        "criterion_sources_not_current:mandatory_format_and_route",
+        "criterion_not_pass:program_objective_trace",
+        "criterion_sources_not_current:program_objective_trace",
+        "criterion_not_pass:foundational_leap",
+        "criterion_sources_not_current:foundational_leap",
+        "criterion_not_pass:named_sota_baseline",
+        "criterion_sources_not_current:named_sota_baseline",
+        "criterion_not_pass:program_metric_trace",
+        "criterion_sources_not_current:program_metric_trace",
+        "criterion_not_pass:mission_specific_experiment",
+        "criterion_sources_not_current:mission_specific_experiment",
+        "criterion_not_pass:evidence_applicability",
+        "criterion_sources_not_current:evidence_applicability",
+        "criterion_not_pass:team_compute_execution",
+        "criterion_sources_not_current:team_compute_execution",
+        "criterion_not_pass:risk_transition_and_falsifier",
+        "criterion_sources_not_current:risk_transition_and_falsifier",
+        "criterion_pass_count_incomplete",
+        "nonpassing_criterion_count_present",
+        "reviewer_card_artifact_not_conformance_candidate",
+        "independent_red_team_receipt_not_current",
+        "independent_red_team_not_passed"
+      ],
+      "reviewer_posture": "blocked_source_bound_argument_conformance",
+      "reviewer_ready": false,
+      "source": "dated_first_party_application_observation",
+      "source_bound_argument_conformance_pass": false,
+      "submission_candidate_active": true,
+      "technical_argument_required": true
     }
   ],
-  "reviewer_gate_clear": true,
+  "reviewer_gate_clear": false,
   "scan": {
-    "boundary_hit_count": 86,
+    "boundary_hit_count": 130,
     "boundary_hits": [
       {
         "classification": "boundary_language",
@@ -701,30 +1152,37 @@
         "text": "- no raw credentials, logs, private keys, or unreviewed archives are attached."
       },
       {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
+        "line": 111,
+        "pattern": "token",
+        "text": "- Claim boundary: This queue evaluates communication timing and routing controls only. A hold expiration or open deadline requires a fresh mailbox check that is recent, timestamped, and receipted; a current draft is not a sent message, and prior proactive sends are derived from a sealed receipt ledger. None of those conditions authorizes a draft or send. Any future send must also bind the exact subject, body, recipient route, attachments, mailbox receipt, single-use action-time approval, and possession of a private HumanUnlock bearer token before an explicit Gmail action. The bearer proof records token possession only; it does not establish identity or legal signing authority. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information."
+      },
+      {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
-        "line": 15,
+        "line": 22,
         "phrase": "guaranteed award",
         "text": "This should be treated as the closest strong non-SBIR federal fit after the July 10 Waveform Governance RFI. It is a positioning response, not a guaranteed award."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
-        "line": 47,
+        "line": 54,
         "phrase": "realized savings",
         "text": "- It is not field validation, realized savings, certified AI assurance, CMMC certification, ATO, or operational Air Force deployment proof."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
-        "line": 89,
+        "line": 96,
         "phrase": "certified assurance",
         "text": "Our response describes how LumenCore can support centralized evaluation of AI automation candidates, source provenance, baseline-vs-candidate replay, human approval gates, and reviewer-facing evidence packages. We have intentionally bounded our claims to public proof-feed deployment and internal source-conditioned replay; we are not claiming field validation, certified assurance, or operational Air Force deployment."
       },
       {
         "classification": "boundary_language",
         "file": "grant_submissions/funding_sprint_20260709/AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
-        "line": 109,
+        "line": 116,
         "pattern": "secret",
         "text": "- Do not include credentials, private logs, secrets, raw zips, or unreviewed evidence bundles."
       },
@@ -769,6 +1227,34 @@
         "line": 143,
         "pattern": "secret",
         "text": "- secret scan;"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/CROSS_AGENCY_CAPABILITY_MATRIX_2026-07-26.md",
+        "line": 89,
+        "phrase": "realized savings",
+        "text": "- `realized_savings` - `NOT_PROVEN` - Modeled opportunity, replay deltas, and avoided-cost scenarios are not realized savings."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/CROSS_AGENCY_CAPABILITY_MATRIX_2026-07-26.md",
+        "line": 128,
+        "phrase": "realized savings",
+        "text": "- `realized_savings` - `NOT_PROVEN` - Modeled opportunity, replay deltas, and avoided-cost scenarios are not realized savings."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/CROSS_AGENCY_CAPABILITY_MATRIX_2026-07-26.md",
+        "line": 211,
+        "phrase": "realized savings",
+        "text": "- `realized_savings` - `NOT_PROVEN` - Modeled opportunity, replay deltas, and avoided-cost scenarios are not realized savings."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/CROSS_AGENCY_CAPABILITY_MATRIX_2026-07-26.md",
+        "line": 251,
+        "phrase": "realized savings",
+        "text": "- `realized_savings` - `NOT_PROVEN` - Modeled opportunity, replay deltas, and avoided-cost scenarios are not realized savings."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
@@ -855,6 +1341,20 @@
         "text": "This sync proves file custody and package availability on the E drive. It does not prove award eligibility, field validation, realized savings, valuation, or final submission acceptance."
       },
       {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.md",
+        "line": 27,
+        "pattern": "token",
+        "text": "| Login.gov | `NEW_DEVICE_SIGNIN_REQUIRES_USER_RECOGNITION` | `ACCOUNT_ACTION` | `false` | If the sign-in was yours, no action is needed. If it was not, navigate directly to Login.gov and immediately reset the password and authentication methods without using or exposing the email security token. |"
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.md",
+        "line": 27,
+        "pattern": "password",
+        "text": "| Login.gov | `NEW_DEVICE_SIGNIN_REQUIRES_USER_RECOGNITION` | `ACCOUNT_ACTION` | `false` | If the sign-in was yours, no action is needed. If it was not, navigate directly to Login.gov and immediately reset the password and authentication methods without using or exposing the email security token. |"
+      },
+      {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.md",
         "line": 45,
@@ -870,66 +1370,129 @@
       },
       {
         "classification": "blocked_or_boundary_claim_language",
-        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
-        "line": 53,
+        "file": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md",
+        "line": 60,
+        "phrase": "guaranteed award",
+        "text": "| `FUNDING_01` | `PASS` | Do not imply current funds or guaranteed award | Cover, compliance gate, and claim boundary state funding is not currently available and no award is guaranteed. |"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md",
+        "line": 78,
         "phrase": "realized savings",
-        "text": "- Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms."
+        "text": "This is a public-safe technical draft, not a submitted solution brief. It does not include the founder-approved Phase II price, private SAM-matched legal identity and address, a live SAM status verification, signature, certification, or portal confirmation. It does not claim ERDC selection, funding availability, a contract, Department of Defense deployment, an authorization to operate, classified-data handling, field validation, realized savings, or technical performance beyond the bounded repository evidence identified here."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
-        "line": 94,
+        "line": 143,
         "phrase": "realized savings",
         "text": "- Claim boundary: This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance."
       },
       {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+        "line": 235,
+        "pattern": "secret",
+        "text": "- Action gate: Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+        "line": 235,
+        "pattern": "password",
+        "text": "- Action gate: Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register."
+      },
+      {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
-        "line": 183,
+        "line": 295,
+        "phrase": "realized savings",
+        "text": "- Claim boundary: This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_CLOCK_GATE_2026-07-16.md",
+        "line": 312,
         "phrase": "realized savings",
         "text": "This gate verifies recorded communication controls, source hashes, deadline precision, and follow-up holds. It does not prove receipt unless a source receipt says so, and it does not establish evaluation, selection, membership, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-        "line": 46,
-        "phrase": "realized savings",
-        "text": "- Claim boundary: This packet prepares a truthful accelerator application. It does not claim a paying customer, field validation, independent validation, grant or investment funding, program acceptance, revenue, realized savings, or permission to accept fees or terms."
-      },
-      {
-        "classification": "blocked_or_boundary_claim_language",
-        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-        "line": 60,
+        "line": 61,
         "phrase": "realized savings",
         "text": "- Claim boundary: This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-        "line": 74,
+        "line": 75,
         "phrase": "realized savings",
         "text": "- Claim boundary: This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance."
       },
       {
         "classification": "boundary_language",
         "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-        "line": 113,
+        "line": 114,
         "pattern": "secret",
         "text": "- Action gate: Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register."
       },
       {
         "classification": "boundary_language",
         "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-        "line": 113,
+        "line": 114,
         "pattern": "password",
         "text": "- Action gate: Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.md",
-        "line": 252,
+        "line": 273,
         "phrase": "realized savings",
         "text": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md",
+        "line": 94,
+        "phrase": "realized savings",
+        "text": "- Claim boundary: This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md",
+        "line": 147,
+        "pattern": "secret",
+        "text": "- Action gate: Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md",
+        "line": 147,
+        "pattern": "password",
+        "text": "- Action gate: Founder completes the official SAM.gov one-time-password flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-18.md",
+        "line": 301,
+        "phrase": "realized savings",
+        "text": "This register records bounded communication and portal-preparation states. It does not prove evaluation, selection, endorsement, independent validation, a pilot, funding, an award, a contract, deployment, realized savings, or technical performance."
+      },
+      {
+        "classification": "noncredential_security_clearance_requirement",
+        "file": "grant_submissions/funding_sprint_20260709/FA701426SCS01_PARTNER_ONLY_BRIEF_2026-07-26.md",
+        "line": 23,
+        "pattern": "secret",
+        "text": "LumenCore does not claim direct CSDR or FlexFile past performance, Secret-cleared personnel, the required ten-year task-lead qualifications, access to proprietary CSDR data, or authority to perform inside Government systems. The PWS requires every performing contractor and subcontractor person to hold at least a Secret clearance, so a prime cannot cure LumenCore's current personnel gate merely by owning the prime role. A future team must establish the technical approach, staffing, security posture, price, representations, and submission before any partner outreach is considered ready."
+      },
+      {
+        "classification": "noncredential_security_clearance_requirement",
+        "file": "grant_submissions/funding_sprint_20260709/FA701426SCS01_PARTNER_ONLY_BRIEF_2026-07-26.md",
+        "line": 28,
+        "pattern": "secret",
+        "text": "- `secret_cleared_personnel` - All performing contractor and subcontractor personnel hold at least a Secret clearance"
       },
       {
         "classification": "blocked_or_boundary_claim_language",
@@ -962,16 +1525,44 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
-        "line": 75,
+        "line": 76,
         "phrase": "realized savings",
         "text": "- Boundary: No realized savings, guaranteed ROI, field validation, or bulk outreach is claimed."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/FUNDING_REVIEWER_ZERO_FRICTION_PACK_2026-07-10.md",
-        "line": 166,
+        "line": 167,
         "phrase": "realized savings",
         "text": "- claim of agency validation, patent grant, realized savings, customer ROI, or award certainty"
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
+        "line": 33,
+        "pattern": "secret",
+        "text": "- Human gate: Human account holder performs the authenticated rotation; no secret value is copied into the public docket."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
+        "line": 76,
+        "pattern": "secret",
+        "text": "- Human gate: Human account holder performs the authenticated rotation; no secret value is copied into the public docket."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
+        "line": 161,
+        "pattern": "token",
+        "text": "- Claim boundary: This queue evaluates communication timing and routing controls only. A hold expiration or open deadline requires a fresh mailbox check that is recent, timestamped, and receipted; a current draft is not a sent message, and prior proactive sends are derived from a sealed receipt ledger. None of those conditions authorizes a draft or send. Any future send must also bind the exact subject, body, recipient route, attachments, mailbox receipt, single-use action-time approval, and possession of a private HumanUnlock bearer token before an explicit Gmail action. The bearer proof records token possession only; it does not establish identity or legal signing authority. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
+        "line": 231,
+        "pattern": "token",
+        "text": "- Claim boundary: This queue evaluates communication timing and routing controls only. A hold expiration or open deadline requires a fresh mailbox check that is recent, timestamped, and receipted; a current draft is not a sent message, and prior proactive sends are derived from a sealed receipt ledger. None of those conditions authorizes a draft or send. Any future send must also bind the exact subject, body, recipient route, attachments, mailbox receipt, single-use action-time approval, and possession of a private HumanUnlock bearer token before an explicit Gmail action. The bearer proof records token possession only; it does not establish identity or legal signing authority. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
@@ -990,14 +1581,14 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
-        "line": 152,
+        "line": 153,
         "phrase": "patented",
         "text": "- do not use 'patented' unless a granted patent is verified"
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
-        "line": 154,
+        "line": 155,
         "phrase": "freedom to operate",
         "text": "- do not use 'freedom to operate'"
       },
@@ -1035,6 +1626,27 @@
         "line": 68,
         "pattern": "secret",
         "text": "1. In the existing signed-in SAM.gov tab, retrieve the already-generated replacement Public API Key and install it into the ignored local secret store; do not paste it into chat or Git."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-17.md",
+        "line": 173,
+        "phrase": "realized savings",
+        "text": "- Do not make unsupported claims of agency validation, award, customer deployment, realized savings, patent validity, field performance, CMMC status, or ITAR compliance."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-26.md",
+        "line": 164,
+        "phrase": "realized savings",
+        "text": "- Do not make unsupported claims of agency validation, award, customer deployment, realized savings, patent validity, field performance, CMMC status, or ITAR compliance."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-29.md",
+        "line": 189,
+        "phrase": "realized savings",
+        "text": "- Do not make unsupported claims of agency validation, award, customer deployment, realized savings, patent validity, field performance, CMMC status, or ITAR compliance."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
@@ -1094,6 +1706,34 @@
       },
       {
         "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-17.md",
+        "line": 5,
+        "phrase": "realized savings",
+        "text": "This is an audit and custody artifact. It does not claim a valuation, patent grant, agency approval, realized savings, field validation, live trading authority, or final submission authority."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-17.md",
+        "line": 26,
+        "pattern": "secret",
+        "text": "- Secret content indexed: `false`"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-17.md",
+        "line": 221,
+        "phrase": "realized savings",
+        "text": "- Public boundary: No agency validation, field validation, realized savings, or patent grant claim without the relevant human gate."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-17.md",
+        "line": 284,
+        "pattern": "secret",
+        "text": "- secret_contents_not_published: `True`"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
         "line": 5,
         "phrase": "realized savings",
@@ -1102,16 +1742,23 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
-        "line": 50,
+        "line": 71,
         "phrase": "realized savings",
         "text": "- Do not claim realized savings."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
-        "line": 51,
+        "line": 72,
         "phrase": "guaranteed award",
         "text": "- Do not claim guaranteed award."
+      },
+      {
+        "classification": "noncredential_security_clearance_requirement",
+        "file": "grant_submissions/funding_sprint_20260709/MONDAY_FEDERAL_ACTION_PACKET_2026-07-26.md",
+        "line": 101,
+        "pattern": "secret",
+        "text": "- `NOT_ESTABLISHED` - All performing contractor and subcontractor personnel hold at least a Secret clearance"
       },
       {
         "classification": "blocked_or_boundary_claim_language",
@@ -1142,6 +1789,20 @@
         "text": "- Boundary language: This response is market-research input only. LumenCore is not claiming NASA production access, NASA validation, FedRAMP authorization, or realized savings."
       },
       {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md",
+        "line": 41,
+        "pattern": "token",
+        "text": "Thank you. I will provide only the page name, visible error text, and approximate occurrence time. I will not email a password, verification code, session token, private financial answer, or screenshot containing account credentials."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md",
+        "line": 41,
+        "pattern": "password",
+        "text": "Thank you. I will provide only the page name, visible error text, and approximate occurrence time. I will not email a password, verification code, session token, private financial answer, or screenshot containing account credentials."
+      },
+      {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-11.md",
         "line": 273,
@@ -1165,9 +1826,44 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-17.md",
-        "line": 670,
+        "line": 770,
         "phrase": "realized savings",
         "text": "- claim of agency validation, award, realized savings, or customer ROI"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-18.md",
+        "line": 1298,
+        "phrase": "realized savings",
+        "text": "- claim of agency validation, award, realized savings, or customer ROI"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-19.md",
+        "line": 1298,
+        "phrase": "realized savings",
+        "text": "- claim of agency validation, award, realized savings, or customer ROI"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-29.md",
+        "line": 1464,
+        "phrase": "realized savings",
+        "text": "- claim of agency validation, award, realized savings, or customer ROI"
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NEAR_TERM_CAPITAL_AND_COMPUTE_RELIEF_PACKET_2026-07-23.md",
+        "line": 10,
+        "phrase": "guaranteed award",
+        "text": "4. **NVIDIA Inception in parallel after incorporation is confirmed.** It is free, has no application deadline or cohort, and can provide access to partner cloud-credit offers and eligible investor exposure. Benefits are opportunities, not guaranteed awards."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/NEAR_TERM_CAPITAL_AND_COMPUTE_RELIEF_PACKET_2026-07-23.md",
+        "line": 43,
+        "phrase": "realized savings",
+        "text": "LumenCore is pre-revenue and pilot-stage. A working technical MVP and public reviewer surface exist, with locked baseline-versus-candidate protocols, past-only evaluation, explicit abstention, negative-result preservation, reproducible manifests, and hash-verifiable receipts. Internal replay experiments cover public energy and other time-series sources with named baselines. Those results remain internal evidence and are not field validation, independent validation, customer results, or realized savings."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
@@ -1175,6 +1871,20 @@
         "line": 20,
         "phrase": "realized savings",
         "text": "Existing internal evidence supports feasibility but is intentionally bounded. LumenCore currently tracks a 29-source inventory with 25 measured providers and 2,580 measured rows in its latest live-source measurement artifact. Its internal replay stack has produced champion-vs-baseline results across source-conditioned scenarios, but those results are not being represented as field validation or realized savings. Phase I will replace ad hoc internal proof with a controlled, repeatable instrumentation workflow that can be tested on public benchmark-style infrastructure data and prepared for independent pilot review."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
+        "line": 51,
+        "pattern": "token",
+        "text": "This queue evaluates communication timing and routing controls only. A hold expiration or open deadline requires a fresh mailbox check that is recent, timestamped, and receipted; a current draft is not a sent message, and prior proactive sends are derived from a sealed receipt ledger. None of those conditions authorizes a draft or send. Any future send must also bind the exact subject, body, recipient route, attachments, mailbox receipt, single-use action-time approval, and possession of a private HumanUnlock bearer token before an explicit Gmail action. The bearer proof records token possession only; it does not establish identity or legal signing authority. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.md",
+        "line": 17,
+        "phrase": "realized savings",
+        "text": "This response is a communication or routing artifact. It does not establish selection, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
@@ -1290,10 +2000,59 @@
       },
       {
         "classification": "blocked_or_boundary_claim_language",
-        "file": "grant_submissions/funding_sprint_20260709/TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_2026-07-09.md",
-        "line": 37,
+        "file": "grant_submissions/funding_sprint_20260709/STAN_HERRING_MEETING_BRIEF_2026-07-28.md",
+        "line": 73,
         "phrase": "realized savings",
-        "text": "Safe technical claim: Kuramoto phase coupling is ready for a buyer-authorized field replay request after internal source-conditioned holdout evidence; it is not yet field validation or realized savings."
+        "text": "- No production customer outcome or realized savings is established."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
+        "line": 188,
+        "pattern": "token",
+        "text": "- Claim boundary: This queue evaluates communication timing and routing controls only. A hold expiration or open deadline requires a fresh mailbox check that is recent, timestamped, and receipted; a current draft is not a sent message, and prior proactive sends are derived from a sealed receipt ledger. None of those conditions authorizes a draft or send. Any future send must also bind the exact subject, body, recipient route, attachments, mailbox receipt, single-use action-time approval, and possession of a private HumanUnlock bearer token before an explicit Gmail action. The bearer proof records token possession only; it does not establish identity or legal signing authority. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
+        "line": 548,
+        "pattern": "token",
+        "text": "- Claim boundary: This queue evaluates communication timing and routing controls only. A hold expiration or open deadline requires a fresh mailbox check that is recent, timestamped, and receipted; a current draft is not a sent message, and prior proactive sends are derived from a sealed receipt ledger. None of those conditions authorizes a draft or send. Any future send must also bind the exact subject, body, recipient route, attachments, mailbox receipt, single-use action-time approval, and possession of a private HumanUnlock bearer token before an explicit Gmail action. The bearer proof records token possession only; it does not establish identity or legal signing authority. The queue does not establish submission, receipt, selection, funding, endorsement, validation, technical performance, or authority to disclose private information."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/SUBMISSION_CONFORMANCE_GATE_2026-07-25.md",
+        "line": 64,
+        "phrase": "freedom to operate",
+        "text": "- Boundary: Routing history does not establish representation, filing status, patentability, ownership, scope, or freedom to operate."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/SUBMISSION_CONFORMANCE_GATE_2026-07-25.md",
+        "line": 467,
+        "phrase": "freedom to operate",
+        "text": "- Boundary: Repository artifacts do not establish filing status, legal deadlines, patentability, ownership, scope, infringement, or freedom to operate."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "line": 89,
+        "phrase": "realized savings",
+        "text": "- Claim boundary: This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview."
+      },
+      {
+        "classification": "blocked_or_boundary_claim_language",
+        "file": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "line": 102,
+        "phrase": "realized savings",
+        "text": "- Claim boundary: This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance."
+      },
+      {
+        "classification": "boundary_language",
+        "file": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "line": 140,
+        "pattern": "secret",
+        "text": "- Action gate: Founder completes the official SAM.gov one-time verification code flow, supplies the replacement key only through the hidden local installer prompt, and authorizes the final account confirmation. No secret may enter this register."
       }
     ],
     "unsafe_claim_count": 0,
@@ -1301,17 +2060,59 @@
     "unsafe_secret_count": 0,
     "unsafe_secret_hits": []
   },
-  "schema": "funding_sprint_reviewer_gate_v1",
+  "schema": "funding_sprint_reviewer_gate_v2",
   "sprint_dir": "grant_submissions/funding_sprint_20260709",
-  "status": "REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED",
+  "status": "REVIEWER_GATE_BLOCKED_SOURCE_BOUND_ARGUMENT_CONFORMANCE",
+  "submission_conformance": {
+    "active_submission_candidate_count": 3,
+    "all_current_lanes_covered": true,
+    "bytes": 144652,
+    "document_valid": true,
+    "gate_sha256_valid": true,
+    "in_memory_override": false,
+    "missing_mapping_lane_ids": [],
+    "path": "out/ops/submission_conformance_gate_latest.json",
+    "present": true,
+    "required_argument_criteria": [
+      "official_source_current",
+      "mandatory_format_and_route",
+      "program_objective_trace",
+      "foundational_leap",
+      "named_sota_baseline",
+      "program_metric_trace",
+      "mission_specific_experiment",
+      "evidence_applicability",
+      "team_compute_execution",
+      "risk_transition_and_falsifier"
+    ],
+    "schema": "lumencore.submission_conformance_gate.v1",
+    "sha256": "8bf08b73b714c81d3fc95bd41c008d98dc9e89985b4db9c08f080ef4d06363a6",
+    "status": "SUBMISSION_CONFORMANCE_BLOCKED",
+    "stop_rule": "Packaging, hashes, rendering, safe wording, and portal facts never establish reviewer readiness. Every active technical packet must match a current candidate artifact and pass all source-bound criteria plus a separate red-team receipt.",
+    "unrepresented_active_lane_ids": [],
+    "validation_errors": []
+  },
   "summary": {
+    "active_argument_blocked_count": 3,
+    "active_argument_pass_count": 0,
+    "active_technical_candidate_count": 3,
     "all_cards_present": true,
     "autonomous_external_action_allowed": false,
-    "boundary_hit_count": 86,
+    "boundary_hit_count": 130,
+    "closed_route_count": 1,
+    "conformance_coverage_clear": true,
+    "conformance_document_valid": true,
+    "conformance_global_pass": false,
+    "conformance_global_status": "SUBMISSION_CONFORMANCE_BLOCKED",
+    "expired_route_count": 1,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 82,
-    "proof_card_count": 6,
+    "markdown_file_count": 115,
+    "missing_conformance_mapping_count": 0,
+    "packaging_checks_clear": true,
+    "proof_card_count": 9,
+    "technical_no_go_count": 1,
+    "unrepresented_active_conformance_lane_count": 0,
     "unsafe_claim_count": 0,
     "unsafe_secret_count": 0
   }
