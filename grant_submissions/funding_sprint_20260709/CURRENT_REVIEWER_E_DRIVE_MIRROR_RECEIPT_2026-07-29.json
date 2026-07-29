@@ -1,12 +1,12 @@
 {
   "schema": "lumencore.current_reviewer_e_drive_mirror_receipt.v1",
-  "generated_utc": "2026-07-29T16:17:56.136647Z",
+  "generated_utc": "2026-07-29T19:41:03.597818Z",
   "status": "CURRENT_REVIEWER_E_DRIVE_MIRROR_COMPLETE_HUMAN_RELEASE_REQUIRED",
   "source_root": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2",
   "destination_root": "E:\\LumaProofVault\\CURRENT_REVIEWER_CONTROL_PACKAGE_20260729",
-  "artifact_count": 104,
-  "copied_count": 16,
-  "unchanged_count": 88,
+  "artifact_count": 112,
+  "copied_count": 10,
+  "unchanged_count": 102,
   "all_copy_sha256_matched": true,
   "private_values_mirrored": false,
   "unapproved_launchtn_financial_model_mirrored": false,
@@ -41,11 +41,11 @@
       "path": "code/ops/BUILD_CURRENT_REVIEWER_E_DRIVE_MIRROR.py",
       "classification": "reproducibility_source",
       "role": "custody_mirror",
-      "bytes": 24404,
-      "sha256": "A36DB7DF7521AD06D3C671AC5518C808C33CA782485586F519644847F9DC2A84",
+      "bytes": 25575,
+      "sha256": "92372037C3C0C688CC9B07B7139CAAAD26479C09C16E4566964D05D94E6D8549",
       "destination_relative_path": "code/ops/BUILD_CURRENT_REVIEWER_E_DRIVE_MIRROR.py",
-      "copy_bytes": 24404,
-      "copy_sha256": "A36DB7DF7521AD06D3C671AC5518C808C33CA782485586F519644847F9DC2A84",
+      "copy_bytes": 25575,
+      "copy_sha256": "92372037C3C0C688CC9B07B7139CAAAD26479C09C16E4566964D05D94E6D8549",
       "copy_sha256_matched": true
     },
     {
@@ -68,6 +68,17 @@
       "destination_relative_path": "code/ops/BUILD_DATA_ROOM_MANIFEST.py",
       "copy_bytes": 19777,
       "copy_sha256": "0484D062FC513E75BEE59FA1F53217787B8E7DF616875A5E7CA666790E5D5EEE",
+      "copy_sha256_matched": true
+    },
+    {
+      "path": "code/ops/BUILD_DOE_GENESIS_PHASE1_PITCH_PACKET.py",
+      "classification": "reproducibility_source",
+      "role": "doe_genesis",
+      "bytes": 38953,
+      "sha256": "5BAC9C530E86C2C6A331755047503408AA77860434B024B1F24C88C58FB9FAC9",
+      "destination_relative_path": "code/ops/BUILD_DOE_GENESIS_PHASE1_PITCH_PACKET.py",
+      "copy_bytes": 38953,
+      "copy_sha256": "5BAC9C530E86C2C6A331755047503408AA77860434B024B1F24C88C58FB9FAC9",
       "copy_sha256_matched": true
     },
     {
@@ -167,6 +178,17 @@
       "destination_relative_path": "code/safe_diagnostics.py",
       "copy_bytes": 2804,
       "copy_sha256": "22291C79B6D3FDA189E5E28414A74ED42D34903AAC0532D99CBDCB2C4D860E04",
+      "copy_sha256_matched": true
+    },
+    {
+      "path": "code/watchers/doe_fy26_watcher.py",
+      "classification": "reproducibility_source",
+      "role": "doe_genesis",
+      "bytes": 9759,
+      "sha256": "B2F0E55AF30D60FB728807E15D3AA6DE95A92466623C0A6C0BD6C2605A4AEFD0",
+      "destination_relative_path": "code/watchers/doe_fy26_watcher.py",
+      "copy_bytes": 9759,
+      "copy_sha256": "B2F0E55AF30D60FB728807E15D3AA6DE95A92466623C0A6C0BD6C2605A4AEFD0",
       "copy_sha256_matched": true
     },
     {
@@ -522,6 +544,28 @@
       "copy_sha256_matched": true
     },
     {
+      "path": "grant_submissions/funding_sprint_20260709/DOE_FY26_GENESIS_PHASE1_PITCH_PACKET_2026-07-29.json",
+      "classification": "machine_readable_control",
+      "role": "doe_genesis",
+      "bytes": 20797,
+      "sha256": "0495921609177A871E2F6EA858E1E890DD082BA9502FD7E6A18928428F6E2546",
+      "destination_relative_path": "grant_submissions/funding_sprint_20260709/DOE_FY26_GENESIS_PHASE1_PITCH_PACKET_2026-07-29.json",
+      "copy_bytes": 20797,
+      "copy_sha256": "0495921609177A871E2F6EA858E1E890DD082BA9502FD7E6A18928428F6E2546",
+      "copy_sha256_matched": true
+    },
+    {
+      "path": "grant_submissions/funding_sprint_20260709/DOE_FY26_GENESIS_PHASE1_PITCH_PACKET_2026-07-29.md",
+      "classification": "internal_control_human_review_required",
+      "role": "doe_genesis",
+      "bytes": 15283,
+      "sha256": "2F7928F8D6ED1352C5F41DB8C714F4BC20F2A5E5776F7E33A6A7FFFF6D27AD9A",
+      "destination_relative_path": "grant_submissions/funding_sprint_20260709/DOE_FY26_GENESIS_PHASE1_PITCH_PACKET_2026-07-29.md",
+      "copy_bytes": 15283,
+      "copy_sha256": "2F7928F8D6ED1352C5F41DB8C714F4BC20F2A5E5776F7E33A6A7FFFF6D27AD9A",
+      "copy_sha256_matched": true
+    },
+    {
       "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
       "classification": "machine_readable_control",
       "role": "inbound_control",
@@ -676,6 +720,17 @@
       "copy_sha256_matched": true
     },
     {
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/DOE_FY26_GENESIS/Pitch-Stage-Key-Questions.docx",
+      "classification": "official_public_source",
+      "role": "doe_genesis",
+      "bytes": 194781,
+      "sha256": "06CABDB6F8CAA8BDD80AB5BDE1FFD916DD76DA18CB6DCDF7BDE48AB112196AE4",
+      "destination_relative_path": "grant_submissions/funding_sprint_20260709/source_attachments/DOE_FY26_GENESIS/Pitch-Stage-Key-Questions.docx",
+      "copy_bytes": 194781,
+      "copy_sha256": "06CABDB6F8CAA8BDD80AB5BDE1FFD916DD76DA18CB6DCDF7BDE48AB112196AE4",
+      "copy_sha256_matched": true
+    },
+    {
       "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
       "classification": "official_public_source",
       "role": "erdc_sdc",
@@ -706,6 +761,17 @@
       "destination_relative_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-29.json",
       "copy_bytes": 1804,
       "copy_sha256": "44A7D65CD214D97D691ECC66B3E731588FBAC9CB6C22E0E4B2D221C337AF56CE",
+      "copy_sha256_matched": true
+    },
+    {
+      "path": "out/grants/doe_fy26_watch.json",
+      "classification": "machine_readable_public_source_observation",
+      "role": "doe_genesis",
+      "bytes": 1222,
+      "sha256": "B8E14FE2CBBBBD3A4A3E328274DFD8E3AA94F532796DF28578EAD6B4C32B4240",
+      "destination_relative_path": "out/grants/doe_fy26_watch.json",
+      "copy_bytes": 1222,
+      "copy_sha256": "B8E14FE2CBBBBD3A4A3E328274DFD8E3AA94F532796DF28578EAD6B4C32B4240",
       "copy_sha256_matched": true
     },
     {
@@ -1020,11 +1086,11 @@
       "path": "tests/test_current_reviewer_e_drive_mirror.py",
       "classification": "reproducibility_test",
       "role": "custody_mirror",
-      "bytes": 4243,
-      "sha256": "91C1892C075EBE4A993F81D32B35FC34B6302B55A3227434E67FA5C5A8412755",
+      "bytes": 4496,
+      "sha256": "C9F70FC4E6186B64DA95054C84C7BE1C2A7B34E545CDB862486749E46B825320",
       "destination_relative_path": "tests/test_current_reviewer_e_drive_mirror.py",
-      "copy_bytes": 4243,
-      "copy_sha256": "91C1892C075EBE4A993F81D32B35FC34B6302B55A3227434E67FA5C5A8412755",
+      "copy_bytes": 4496,
+      "copy_sha256": "C9F70FC4E6186B64DA95054C84C7BE1C2A7B34E545CDB862486749E46B825320",
       "copy_sha256_matched": true
     },
     {
@@ -1047,6 +1113,28 @@
       "destination_relative_path": "tests/test_data_room_manifest.py",
       "copy_bytes": 5699,
       "copy_sha256": "B3F9DEC68659F72B6224BA020626F6EA23B23AC1DA84D3869FE206E3F95B22FB",
+      "copy_sha256_matched": true
+    },
+    {
+      "path": "tests/test_doe_fy26_watcher.py",
+      "classification": "reproducibility_test",
+      "role": "doe_genesis",
+      "bytes": 4299,
+      "sha256": "106F1B82094046CFA4E5E39FB468CE1A3E93D764835937C06DA64D8DB78A8B2B",
+      "destination_relative_path": "tests/test_doe_fy26_watcher.py",
+      "copy_bytes": 4299,
+      "copy_sha256": "106F1B82094046CFA4E5E39FB468CE1A3E93D764835937C06DA64D8DB78A8B2B",
+      "copy_sha256_matched": true
+    },
+    {
+      "path": "tests/test_doe_genesis_phase1_pitch_packet.py",
+      "classification": "reproducibility_test",
+      "role": "doe_genesis",
+      "bytes": 4840,
+      "sha256": "42932A70660538116967C5210E2464A22BD9F1A04A695936DB3545E147369BA8",
+      "destination_relative_path": "tests/test_doe_genesis_phase1_pitch_packet.py",
+      "copy_bytes": 4840,
+      "copy_sha256": "42932A70660538116967C5210E2464A22BD9F1A04A695936DB3545E147369BA8",
       "copy_sha256_matched": true
     },
     {

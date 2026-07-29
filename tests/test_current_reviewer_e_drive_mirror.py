@@ -68,6 +68,12 @@ def test_mirror_allowlist_is_current_and_excludes_private_inputs():
         "grant_submissions/LAUNCHTN_3686_PITCH_2026/"
         "LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-29.json"
     ) in paths
+    assert (
+        "grant_submissions/funding_sprint_20260709/"
+        "DOE_FY26_GENESIS_PHASE1_PITCH_PACKET_2026-07-29.json"
+    ) in paths
+    assert "code/watchers/doe_fy26_watcher.py" in paths
+    assert "out/grants/doe_fy26_watch.json" in paths
     assert not any("/private/" in f"/{path.lower()}/" for path in paths)
     assert not any(path.lower().endswith(".env") for path in paths)
     assert not any(

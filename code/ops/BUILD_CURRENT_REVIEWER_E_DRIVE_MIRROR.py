@@ -257,6 +257,46 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
         "launchtn_3686",
     ),
     (
+        "code/watchers/doe_fy26_watcher.py",
+        "reproducibility_source",
+        "doe_genesis",
+    ),
+    (
+        "tests/test_doe_fy26_watcher.py",
+        "reproducibility_test",
+        "doe_genesis",
+    ),
+    (
+        "out/grants/doe_fy26_watch.json",
+        "machine_readable_public_source_observation",
+        "doe_genesis",
+    ),
+    (
+        "code/ops/BUILD_DOE_GENESIS_PHASE1_PITCH_PACKET.py",
+        "reproducibility_source",
+        "doe_genesis",
+    ),
+    (
+        "tests/test_doe_genesis_phase1_pitch_packet.py",
+        "reproducibility_test",
+        "doe_genesis",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/DOE_FY26_GENESIS_PHASE1_PITCH_PACKET_2026-07-29.json",
+        "machine_readable_control",
+        "doe_genesis",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/DOE_FY26_GENESIS_PHASE1_PITCH_PACKET_2026-07-29.md",
+        "internal_control_human_review_required",
+        "doe_genesis",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/source_attachments/DOE_FY26_GENESIS/Pitch-Stage-Key-Questions.docx",
+        "official_public_source",
+        "doe_genesis",
+    ),
+    (
         "config/market_signal_source_native_benchmark_protocol_v1.json",
         "reproducibility_source",
         "source_native_research",

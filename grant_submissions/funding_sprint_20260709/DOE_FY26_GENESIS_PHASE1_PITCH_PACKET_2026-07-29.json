@@ -1,0 +1,325 @@
+{
+  "schema": "lumencore.doe_genesis_phase1_pitch_packet.v1",
+  "generated_utc": "2026-07-29T19:37:29.234983Z",
+  "status": "CONDITIONAL_TOPIC_FIT_R_AND_D_PROTOCOL_AND_FOUNDER_GATES_OPEN",
+  "opportunity": "DOE FY26 Phase I - Genesis Mission",
+  "topic": "Achieving AI-Driven Autonomous Laboratories",
+  "concept_name": "LumenCore Autonomous Experiment Assurance Plane",
+  "fit_decision": "CONDITIONAL_FIT_NOT_YET_SUBMISSION_READY",
+  "fit_basis": "The current stack supports evidence contracts, provenance, replay, adversarial testing, and fail-closed promotion. It does not yet establish laboratory integration or autonomous-lab performance.",
+  "official_state": {
+    "source_url": "https://sbir-sttr.connectwerx.org/portfolio-items/fy26genesismission/",
+    "source_checked_utc": "2026-07-29T19:29:43.519358+00:00",
+    "active_solicitation": true,
+    "deadline_literal": "September 10, 2026 at 2 PM ET",
+    "deadline_iso": "2026-09-10T14:00:00-04:00",
+    "days_to_deadline_at_generation": 42.938,
+    "application_portal_state": "COMING_SOON",
+    "application_portal_url": null,
+    "full_application_invitation_required": true,
+    "pitch_stage_first": true
+  },
+  "official_sources": {
+    "opportunity": "https://sbir-sttr.connectwerx.org/portfolio-items/fy26genesismission/",
+    "eligibility": "https://sbir-sttr.connectwerx.org/eligibility-criteria/",
+    "registrations": "https://www.energy.gov/technologycommercialization/required-sbirsttr-registrations",
+    "doe_program": "https://www.energy.gov/technologycommercialization/doe-small-business-innovation-research-sbir-and-small-business",
+    "faq_and_resources": "https://sbir-sttr.connectwerx.org/resources/"
+  },
+  "official_pitch_guide": {
+    "path": "grant_submissions/funding_sprint_20260709/source_attachments/DOE_FY26_GENESIS/Pitch-Stage-Key-Questions.docx",
+    "bytes": 194781,
+    "sha256": "06CABDB6F8CAA8BDD80AB5BDE1FFD916DD76DA18CB6DCDF7BDE48AB112196AE4",
+    "requirements_verified": true,
+    "word_limits": {
+      "summary_topic_mission_alignment": 100,
+      "technical_promise": 200,
+      "commercialization_potential": 200,
+      "team_qualifications": 200
+    }
+  },
+  "pitch_sections": [
+    {
+      "section_id": "summary_topic_mission_alignment",
+      "word_limit": 100,
+      "word_count": 92,
+      "within_limit": true,
+      "draft": "LumenCore Autonomous Experiment Assurance Plane is proposed middleware between AI experiment planners and laboratory instruments. It would convert experiments into machine-checkable contracts defining authorized actions, parameter bounds, required data and provenance, stopping rules, and human approvals; block noncompliant commands before dispatch; and issue replayable evidence capsules linking plans, inputs, actions, outputs, deviations, and negative results. Phase I would test only instrument simulators and synthetic workflows; no laboratory deployment is claimed. The project addresses Achieving AI-Driven Autonomous Laboratories by targeting repeatability, safer closed-loop automation, and richer auditable datasets without replacing laboratory control systems."
+    },
+    {
+      "section_id": "technical_promise",
+      "word_limit": 200,
+      "word_count": 181,
+      "within_limit": true,
+      "draft": "Autonomous laboratories can accelerate discovery, but nondeterministic AI planners can change hypotheses, parameters, or stopping criteria mid-run, complicating repeatability and scientific review. Current workflow engines, experiment trackers, and policy tools address parts of this problem. The research question is whether an interoperable assurance layer can bind them into one enforceable experiment contract without unacceptable latency or false blocks. The proposed innovation is a policy-compiled contract that binds the hypothesis, design space, baselines, instrument capabilities, approval points, data schema, and falsification rules before execution. A runtime mediator would validate every action against that contract and generate an evidence capsule linking plans, commands, observations, model versions, deviations, and preserved null results. This is a proposed integration and control method, not a deployed laboratory capability. Within 6 to 12 months, Phase I would implement adapters for three instrument simulators; compare direct-agent, Bluesky/databroker, HELAO-async, and component baselines; and run normal, fault-injection, and adversarial scenarios. Feasibility would require predeclared gates for command containment, provenance completeness, deterministic decision replay, over-blocking, and overhead. Failure of any critical safety or reproducibility gate would be reported as a no-go."
+    },
+    {
+      "section_id": "commercialization_potential",
+      "word_limit": 200,
+      "word_count": 183,
+      "within_limit": true,
+      "draft": "Target users are autonomous-lab developers, DOE user facilities, and industrial materials or biotechnology R&D teams that need to govern AI-directed experiments without replacing installed orchestration. The proposed entry product is an assurance gateway and adapter kit, sold first through paid evaluations and then annual site or platform licenses. No customer, revenue, laboratory deployment, or procurement commitment is claimed. Alternatives include Bluesky/databroker, HELAO-async, LIMS and ELN systems, MLflow Tracking, Open Policy Agent, and custom safety interlocks. These address orchestration, records, model tracking, policy, or instrument safety. The proposed differentiation is a vendor-neutral, machine-enforced chain from predeclared scientific intent through command authorization to a replayable evidence capsule that retains deviations and null results. Phase I must demonstrate incremental value over named baselines, not merely repackage logging. Customer discovery would test procurement, integration, cybersecurity, data rights, and validation through 20 structured interviews. Phase II readiness targets are two authorized, nonbinding evaluation commitments and one instrument-integration plan. Supply-chain planning centers on signed dependencies, adapter maintenance, and on-premises packages; other barriers are sales cycles, authorization requirements, vendor APIs, liability, and resistance to middleware in safety-relevant paths."
+    },
+    {
+      "section_id": "team_qualifications",
+      "word_limit": 200,
+      "word_count": 184,
+      "within_limit": true,
+      "draft": "LumenCore's demonstrated starting point is local evidence-governance software: hashed source custody, frozen protocols, named-baseline evaluation, reproducible receipts, retained negative results, and human approval gates. The current repository supports software-pattern and source-conditioned replay claims only; it does not establish autonomous-laboratory experience, independent validation, or field deployment. A credible Phase I team needs four named functions: [PI/software assurance lead], [laboratory automation and controls lead], [scientific-domain experimentalist], and [commercialization/customer-discovery lead]. Before submission, replace every bracket with an authorized person, role, relevant project evidence, availability, and employment status. No partnership should be implied without consent. The plan should add an authorized simulator or equipment-vendor collaborator. A laboratory partner would strengthen the pitch but is not claimed here. SBIR workshare and PI-employment requirements must be checked against the final team, or the project should be structured truthfully as STTR with required research-institution participation. Follow-on funding is contingent: Phase II only after technical gates and DOE approval, followed by paid evaluations, strategic platform partnerships, and non-SBIR revenue. Insert only verified cash, runway, prior awards, commitments, and matching resources; otherwise state that no committed follow-on capital is presently claimed."
+    }
+  ],
+  "proposed_phase_i_protocol": {
+    "phase_i_scope": "SIMULATION_AND_FAULT_INJECTION_NO_LAB_DEPLOYMENT_CLAIM",
+    "aims": [
+      "Compile experiment contracts that bind hypotheses, action bounds, models, approvals, stopping rules, data schemas, and falsification criteria across three simulator families.",
+      "Intercept commands before dispatch and test faults, policy bypasses, stale state, altered plans, and missing observations while remaining subordinate to physical interlocks.",
+      "Validate evidence capsules through blinded replay and compare trace completeness, reproducibility, diagnosis time, and overhead against frozen baseline versions."
+    ],
+    "named_baselines": [
+      "direct agent-to-simulator control with native JSON logs",
+      "Bluesky RunEngine with Ophyd and databroker",
+      "HELAO-async with native workflow and provenance handling",
+      "MLflow Tracking plus Open Policy Agent component baseline",
+      "no-assurance pass-through adapter and feature ablations"
+    ],
+    "fault_set": [
+      "stale model or policy version",
+      "missing required provenance",
+      "out-of-sequence action",
+      "threshold or constraint violation",
+      "operator override and authority mismatch"
+    ],
+    "proposed_targets_not_results": [
+      {
+        "metric": "contract compilation",
+        "target": ">=100 frozen contracts across three simulator families, >=95% valid compilation, and 100% seeded malformed or out-of-range plans rejected before dispatch"
+      },
+      {
+        "metric": "critical command containment",
+        "target": "0 critical unauthorized commands delivered in >=1,000 seeded trials, with a reported confidence bound and no zero-risk claim"
+      },
+      {
+        "metric": "valid-command admission",
+        "target": ">=97%, with Wilson 95% lower bound >=95%"
+      },
+      {
+        "metric": "critical provenance completeness",
+        "target": "100% of critical events bind plan, model, policy, instrument, input, and output identifiers"
+      },
+      {
+        "metric": "tamper detection",
+        "target": "100% of >=100 seeded record mutations detected"
+      },
+      {
+        "metric": "decision and trace replay",
+        "target": "100% authorization decisions reproduced from frozen inputs and >=95% complete traces reconstructed"
+      },
+      {
+        "metric": "runtime overhead",
+        "target": "p95 policy latency <=50 ms and median workflow overhead <=10% on declared non-hard-real-time simulators"
+      },
+      {
+        "metric": "diagnosis and market evidence",
+        "target": ">=30% lower median deviation-diagnosis time than the strongest baseline, 20 structured interviews, two authorized nonbinding evaluation commitments, and one instrument-integration plan"
+      }
+    ],
+    "target_status": "PROPOSED_MUST_BE_FROZEN_BEFORE_EVALUATION",
+    "critical_gate_rule": "Any critical containment, tamper-detection, or replay failure is a no-go and cannot be averaged away."
+  },
+  "submission_constraints": {
+    "pitch_count_cap_per_company": 3,
+    "reviewed_pitch_rule": "ONLY_LAST_THREE_SUBMITTED_PITCHES_REVIEWED",
+    "topic_change_after_pitch_allowed": false,
+    "prime_small_business_change_after_pitch_allowed": false,
+    "phase_i_period": "6_TO_12_MONTHS",
+    "phase_i_r_and_d_cap_usd": 250000,
+    "phase_i_cap_with_max_taba_usd": 256500,
+    "optional_references_pdf": {
+      "required": false,
+      "max_bytes": 5000000,
+      "print_capable": true,
+      "password_allowed": false,
+      "special_filename_characters_allowed": false
+    },
+    "generative_ai_use_disclosure_required": true
+  },
+  "red_team": {
+    "reviewer_verdict": "BORDERLINE_NOT_INVITE_READY_TODAY",
+    "truthful_position": "PRE_DISPATCH_EXPERIMENT_ASSURANCE_MIDDLEWARE_FOR_SIMULATED_WORKFLOWS",
+    "preferred_route": "PRIME_ONLY_AFTER_TEAM_DOMAIN_AND_ELIGIBILITY_GATES_OR_PARTNER_SIDE_ROLE",
+    "novelty_hypothesis": "A policy-compiled experiment contract can bind scientific intent, command authorization, model and instrument state, falsification rules, and replayable evidence before dispatch with measurable incremental value over established orchestration, tracking, and policy components.",
+    "rejection_triggers": [
+      "generic governance or compliance wrapper rather than experimental-workflow R&D",
+      "post-hoc log inspection without pre-dispatch command mediation",
+      "no measurable advantage over Bluesky, HELAO-async, MLflow plus OPA, or native interlocks",
+      "no specific simulator family, instrument class, experimental domain, or hazard model",
+      "software safety wording that displaces physical interlocks, ES&H controls, or operator authority",
+      "blocking every command to manufacture a perfect containment score",
+      "repository benchmark counts presented as laboratory validation",
+      "invented partnerships, deployments, customers, revenue, capital, or DOE experience",
+      "unresolved PI employment, workshare, ownership, registration, or certification gates",
+      "failure to disclose generative-AI assistance in an eventual submission",
+      "accelerated-discovery claims without direct measurement"
+    ],
+    "must_not_claim": [
+      "autonomous laboratory operation",
+      "laboratory instrument integration",
+      "physical safety certification",
+      "DOE deployment or endorsement",
+      "independent field validation",
+      "discovery acceleration",
+      "customer adoption, savings, or revenue"
+    ]
+  },
+  "current_evidence_snapshot": {
+    "registered_family_count": 140,
+    "implementation_present_count": 35,
+    "implementation_required_count": 105,
+    "promotion_gate_pass_count": 0,
+    "public_performance_claim_allowed": false,
+    "prospective_protocol_id": "LUMENCORE_TS_SOURCE_NATIVE_20260729_V1",
+    "prospective_protocol_status": "FROZEN_AWAITING_FUTURE_OBSERVATIONS",
+    "eligible_future_observation_count": 0,
+    "evidence_receipts": [
+      {
+        "path": "build_week/prooflock_console/verify_receipt.py",
+        "supports": "deterministic receipt verification and separation of integrity from promotion",
+        "evidence_level": "BOUNDED_SOFTWARE_IMPLEMENTATION",
+        "bytes": 7111,
+        "sha256": "71508E9E688CF333E8A62FF9E72118515FF5922573851E17950437404D905433"
+      },
+      {
+        "path": "tests/test_prooflock_console.py",
+        "supports": "adversarial tests for tampering, path traversal, missing evidence, and premature promotion",
+        "evidence_level": "LOCAL_SOFTWARE_TEST",
+        "bytes": 4225,
+        "sha256": "79671A6311C9EFE56690573DBE5DCD4D75340B416AE71FABC720FAADB5FED18D"
+      },
+      {
+        "path": "out/ops/source_native_family_baseline_ledger_latest.json",
+        "supports": "source-native baseline accounting and claim suppression",
+        "evidence_level": "LOCAL_RESEARCH_LEDGER",
+        "bytes": 2244585,
+        "sha256": "627D0ADD4D31514F7A47DBF8E8C51B0FA46DF72635F336133F54ABB85B00927A"
+      },
+      {
+        "path": "out/ops/time_series_source_native_prospective_protocol_status.json",
+        "supports": "frozen prospective protocol and wait-for-future-data state",
+        "evidence_level": "LOCAL_PROTOCOL_RECEIPT",
+        "bytes": 1108,
+        "sha256": "535F8494CAA6EF409E44BDC901B0423C287FF578BBC5876A2B48EC96D5F7E37D"
+      },
+      {
+        "path": "docs/ALPHA_EDGE_EVIDENCE_AUDIT_2026-07-29.md",
+        "supports": "preservation and classification of negative results",
+        "evidence_level": "LOCAL_SKEPTICAL_AUDIT",
+        "bytes": 24739,
+        "sha256": "B2EDFAEBAE170F3B93DEDC77A065FFC8D053FDFF21CA73A5DF65F5EF84CA4981"
+      },
+      {
+        "path": "docs/FULL_GEOMETRY_PROTOCOL_FIELD_2026-07-29.md",
+        "supports": "implemented-versus-unimplemented family accounting",
+        "evidence_level": "LOCAL_COVERAGE_AUDIT",
+        "bytes": 22844,
+        "sha256": "AB8AEA62B57BDA8345D8C25E3B3535D24C5B1F12F7FC76AC6826753F49742FBA"
+      },
+      {
+        "path": "code/hardware/lumenshell_safety_state_machine.py",
+        "supports": "software-only fail-closed state and fault-lockout patterns; no physical safety case",
+        "evidence_level": "EXECUTABLE_SOFTWARE_REQUIREMENTS_MODEL",
+        "bytes": 6332,
+        "sha256": "F4158CC92106983BDF50E395601298F8BAE8DBF7BC742A652D49F40D76678BBB"
+      },
+      {
+        "path": "tests/test_autonomous_agent_manifest_security.py",
+        "supports": "local tests for authorization, payload filtering, and human-controlled action gates",
+        "evidence_level": "LOCAL_SOFTWARE_TEST",
+        "bytes": 3084,
+        "sha256": "0011C4DAB3301ED0EC698BFDB8E47660443AC4A5F4B4D3BBC47B2D49A7F60955"
+      }
+    ]
+  },
+  "reference_candidates": [
+    {
+      "name": "Bluesky simulated hardware tutorial",
+      "url": "https://blueskyproject.io/tutorials/Hello%20Bluesky.html",
+      "use": "candidate simulation and orchestration baseline",
+      "relationship_claimed": false
+    },
+    {
+      "name": "Bluesky plan simulation documentation",
+      "url": "https://blueskyproject.io/bluesky/main/simulation.html",
+      "use": "candidate pre-execution inspection baseline",
+      "relationship_claimed": false
+    },
+    {
+      "name": "HELAO autonomous laboratory framework",
+      "url": "https://pubs.rsc.org/en/content/articlehtml/2023/dd/d3dd00166k",
+      "use": "candidate distributed-instrument orchestration baseline",
+      "relationship_claimed": false
+    },
+    {
+      "name": "NIST modular and autonomous laboratory ecosystem",
+      "url": "https://www.nist.gov/programs-projects/development-standards-support-modular-and-autonomous-laboratory-ecosystem",
+      "use": "standards landscape and prior-system boundary",
+      "relationship_claimed": false
+    },
+    {
+      "name": "NREL autonomous experimentation",
+      "url": "https://www.nrel.gov/materials-science/autonomous-experimentation",
+      "use": "application context and customer-discovery reference",
+      "relationship_claimed": false
+    }
+  ],
+  "open_gates": [
+    {
+      "gate": "small_business_eligibility",
+      "state": "FOUNDER_CONFIRMATION_REQUIRED",
+      "required_fact": "U.S. for-profit small business, no more than 500 employees, and qualifying 51% ownership and control"
+    },
+    {
+      "gate": "domestic_research",
+      "state": "FOUNDER_CONFIRMATION_REQUIRED",
+      "required_fact": "all proposed research and development performed in the U.S."
+    },
+    {
+      "gate": "principal_investigator",
+      "state": "FOUNDER_CONFIRMATION_REQUIRED",
+      "required_fact": "named PI, relevant qualifications, and primary-employment commitment at the small business if awarded"
+    },
+    {
+      "gate": "registrations",
+      "state": "DIRECT_PORTAL_EVIDENCE_REQUIRED",
+      "required_fact": "active SAM/UEI, SBA Company Registry, and DOE SBIR/STTR Application Hub registration"
+    },
+    {
+      "gate": "laboratory_domain_credibility",
+      "state": "PARTNER_OR_ADVISOR_EVIDENCE_REQUIRED",
+      "required_fact": "direct experimental-workflow expertise or a bounded plan to secure it before a full application"
+    },
+    {
+      "gate": "commercialization_and_financials",
+      "state": "FOUNDER_REVIEW_REQUIRED",
+      "required_fact": "truthful customer-discovery plan, pricing hypothesis, follow-on funding plan, and no invented traction"
+    },
+    {
+      "gate": "generative_ai_disclosure",
+      "state": "TRUTHFUL_DISCLOSURE_REQUIRED",
+      "required_fact": "state the extent and use of generative AI in developing both the pitch and any invited full application"
+    },
+    {
+      "gate": "action_time_review",
+      "state": "HUMAN_REVIEW_REQUIRED",
+      "required_fact": "final portal text, bibliography, company facts, certifications, and submit action reviewed at action time"
+    }
+  ],
+  "submission_ready": false,
+  "send_now": false,
+  "external_action_count": 0,
+  "portal_submit_allowed_without_human": false,
+  "autonomous_certification_allowed": false,
+  "autonomous_upload_allowed": false,
+  "claim_boundary": "This packet is a source-bound R&D pitch draft. It does not establish DOE eligibility, invitation, laboratory integration, autonomous-lab performance, adoption, savings, field validation, award, or authority to sign in, certify, upload, or submit.",
+  "safest_next_action": "Resolve the company, PI, registration, laboratory-domain, and commercialization facts; then red-team the bounded pitch before the AMP portal opens.",
+  "control_sha256": "77EB8FB975AF8B32DB830091D1838FDBE380894F0391DA381B4D37ECA91623DA"
+}
