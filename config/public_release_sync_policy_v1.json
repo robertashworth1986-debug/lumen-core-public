@@ -92,13 +92,13 @@
     {
       "id": "quant_hub_reviewer_context_json",
       "source_path": "dashboard/data/quant_hub_reviewer_context.json",
-      "expected_source_sha256": "9dea5125d91c94eab2fe87ef4a4ae01b0997525e443c31e0b8adc18de24818a4",
+      "expected_source_sha256": "ca7e01fd443a5bf57341a229d3dd881b528131ccded4f8b0108fddc50af76aaf",
       "target_path": "dashboard/data/quant_hub_reviewer_context.json",
       "public_url": "https://lumen-core.ai/data/quant_hub_reviewer_context.json",
       "mime_type": "application/json",
       "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
       "claim_boundary": "The feed reports bounded internal measurement and provenance state with explicit limitations; it does not establish external validation, government approval, or realized economic outcomes.",
-      "source_commit": "03f40a5de614d16a4f48e8796a64c7ef11c78126",
+      "source_commit": "3ef872e7f9e940c8ce5ebfefdc2b18b444b40910",
       "last_validated_utc": "2026-07-16T02:55:08Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
@@ -111,13 +111,13 @@
     {
       "id": "quant_hub_reviewer_context_markdown",
       "source_path": "docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md",
-      "expected_source_sha256": "690679b8e4967e86cf9a7a3836ae0b2e19a838825aed73db1d01e768ffbe94ab",
+      "expected_source_sha256": "ba3211de559ca42d8149913543e99e8b2cee7eae1e982b97ddd526b5825dd227",
       "target_path": "dashboard/evidence/QUANT_HUB_REVIEWER_CONTEXT.md",
       "public_url": "https://lumen-core.ai/evidence/QUANT_HUB_REVIEWER_CONTEXT.md",
       "mime_type": "text/markdown",
       "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
       "claim_boundary": "The reviewer context summarizes bounded internal evidence and its limitations; it does not establish external validation, government approval, or realized economic outcomes.",
-      "source_commit": "03f40a5de614d16a4f48e8796a64c7ef11c78126",
+      "source_commit": "3ef872e7f9e940c8ce5ebfefdc2b18b444b40910",
       "last_validated_utc": "2026-07-16T02:55:08Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
