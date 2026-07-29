@@ -12,6 +12,8 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 from urllib.parse import urlparse
 
+from pypdf import PdfReader
+
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_POLICY = ROOT / "config" / "public_release_sync_policy_v1.json"
@@ -54,6 +56,7 @@ HARD_ALLOWED_EXTENSION_MIME = {
     ".js": "text/javascript",
     ".json": "application/json",
     ".md": "text/markdown",
+    ".pdf": "application/pdf",
     ".svg": "image/svg+xml",
     ".txt": "text/plain",
 }
@@ -123,6 +126,13 @@ CLAIM_NEGATION = re.compile(
 )
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
+PROVENANCE_MODES = frozenset({"GIT_COMMIT", "GENERATED_RECEIPTS"})
+PDF_UNSAFE_MARKERS = (
+    (b"/EmbeddedFile", "PDF_EMBEDDED_FILE"),
+    (b"/JavaScript", "PDF_JAVASCRIPT"),
+    (b"/OpenAction", "PDF_OPEN_ACTION"),
+    (b"/Launch", "PDF_LAUNCH_ACTION"),
+)
 
 
 class PolicyError(ValueError):
@@ -265,19 +275,87 @@ def git_provenance_state(root: Path, commit: str, source_rel: str) -> tuple[str,
     return ("VERIFIED" if not errors else "FAILED", sorted(set(errors)))
 
 
-def scan_content(path: Path, mime_type: str, max_bytes: int) -> dict[str, Any]:
-    size = path.stat().st_size
-    if size > max_bytes:
-        return {"state": "BLOCKED", "findings": ["SOURCE_EXCEEDS_MAX_BYTES"], "bytes": size}
-    raw = path.read_bytes()
-    findings: list[str] = []
-    if b"\x00" in raw:
-        findings.append("NUL_BYTE_CONTENT")
+def git_checkout_state(root: Path, relative_path: str) -> dict[str, Any]:
     try:
-        text = raw.decode("utf-8")
-    except UnicodeDecodeError:
-        text = ""
-        findings.append("NON_UTF8_CONTENT")
+        tracked = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(root),
+                "ls-files",
+                "--error-unmatch",
+                "--",
+                relative_path,
+            ],
+            capture_output=True,
+            check=False,
+            timeout=15,
+        )
+        if tracked.returncode != 0:
+            return {"state": "UNTRACKED", "clean_at_head": False}
+        clean = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(root),
+                "diff",
+                "--quiet",
+                "HEAD",
+                "--",
+                relative_path,
+            ],
+            capture_output=True,
+            check=False,
+            timeout=15,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return {"state": "GIT_CHECK_FAILED", "clean_at_head": False}
+    if clean.returncode == 0:
+        return {"state": "CLEAN_AT_HEAD", "clean_at_head": True}
+    if clean.returncode == 1:
+        return {"state": "DIRTY_FROM_HEAD", "clean_at_head": False}
+    return {"state": "GIT_CHECK_FAILED", "clean_at_head": False}
+
+
+def receipt_contains_artifact_binding(
+    value: Any,
+    *,
+    source_path: str,
+    source_sha256: str,
+    source_bytes: int,
+) -> bool:
+    if isinstance(value, dict):
+        if (
+            value.get("path") == source_path
+            and str(value.get("sha256", "")).casefold()
+            == source_sha256.casefold()
+            and value.get("bytes") == source_bytes
+        ):
+            return True
+        return any(
+            receipt_contains_artifact_binding(
+                child,
+                source_path=source_path,
+                source_sha256=source_sha256,
+                source_bytes=source_bytes,
+            )
+            for child in value.values()
+        )
+    if isinstance(value, list):
+        return any(
+            receipt_contains_artifact_binding(
+                child,
+                source_path=source_path,
+                source_sha256=source_sha256,
+                source_bytes=source_bytes,
+            )
+            for child in value
+        )
+    return False
+
+
+def scan_text(text: str, mime_type: str) -> list[str]:
+    findings: list[str] = []
     if text:
         findings.extend(f"SECRET_CONTENT_{name}" for name, pattern in SECRET_PATTERNS if pattern.search(text))
         findings.extend(f"PII_CONTENT_{name}" for name, pattern in PII_PATTERNS if pattern.search(text))
@@ -296,8 +374,73 @@ def scan_content(path: Path, mime_type: str, max_bytes: int) -> dict[str, Any]:
                 json.loads(text, parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)))
             except (ValueError, json.JSONDecodeError):
                 findings.append("INVALID_JSON_CONTENT")
+    return findings
+
+
+def extract_pdf_text(path: Path) -> tuple[str, list[str]]:
+    findings: list[str] = []
+    try:
+        reader = PdfReader(str(path), strict=True)
+    except Exception:
+        return "", ["PDF_PARSE_FAILED"]
+    if reader.is_encrypted:
+        return "", ["PDF_ENCRYPTED"]
+
+    text_parts: list[str] = []
+    metadata = reader.metadata
+    if metadata:
+        text_parts.extend(str(value) for value in metadata.values() if value)
+
+    try:
+        for page in reader.pages:
+            text_parts.append(page.extract_text() or "")
+            annotations = page.get("/Annots") or []
+            for annotation_ref in annotations:
+                annotation = annotation_ref.get_object()
+                action = annotation.get("/A") if hasattr(annotation, "get") else None
+                uri = action.get("/URI") if hasattr(action, "get") else None
+                if uri:
+                    text_parts.append(str(uri))
+    except Exception:
+        findings.append("PDF_TEXT_EXTRACTION_FAILED")
+
+    text = "\n".join(text_parts)
+    if not text.strip():
+        findings.append("PDF_TEXT_EXTRACTION_EMPTY")
+    return text, findings
+
+
+def scan_content(path: Path, mime_type: str, max_bytes: int) -> dict[str, Any]:
+    size = path.stat().st_size
+    if size > max_bytes:
+        return {"state": "BLOCKED", "findings": ["SOURCE_EXCEEDS_MAX_BYTES"], "bytes": size}
+    raw = path.read_bytes()
+    findings: list[str] = []
+
+    if mime_type == "application/pdf":
+        if not raw.startswith(b"%PDF-"):
+            findings.append("PDF_MAGIC_INVALID")
+        findings.extend(code for marker, code in PDF_UNSAFE_MARKERS if marker in raw)
+        text, extraction_findings = extract_pdf_text(path)
+        findings.extend(extraction_findings)
+        findings.extend(scan_text(text, mime_type))
+    else:
+        if b"\x00" in raw:
+            findings.append("NUL_BYTE_CONTENT")
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            text = ""
+            findings.append("NON_UTF8_CONTENT")
+        findings.extend(scan_text(text, mime_type))
+
     findings = sorted(set(findings))
-    return {"state": "PASS" if not findings else "BLOCKED", "findings": findings, "bytes": size}
+    return {
+        "state": "PASS" if not findings else "BLOCKED",
+        "findings": findings,
+        "bytes": size,
+        "extracted_text_scanned": mime_type == "application/pdf",
+    }
 
 
 def validate_public_url(value: Any, allowed_hosts: set[str], allowed_prefixes: list[str]) -> list[str]:
@@ -381,7 +524,22 @@ def evaluate_item(
         "exact_hash_match": False,
         "overwrite_allowed": False,
     }
-    provenance = {"source_commit": entry.get("source_commit"), "state": "NOT_CHECKED", "findings": []}
+    provenance_mode = str(entry.get("provenance_mode") or "GIT_COMMIT")
+    provenance = {
+        "mode": provenance_mode,
+        "source_commit": entry.get("source_commit"),
+        "state": "NOT_CHECKED",
+        "findings": [],
+    }
+    source_checkout = {"state": "NOT_CHECKED", "clean_at_head": False}
+    artifact_receipt: dict[str, Any] = {
+        "path": None,
+        "expected_sha256": None,
+        "observed_sha256": None,
+        "binding_verified": False,
+        "checkout": {"state": "NOT_CHECKED", "clean_at_head": False},
+        "state": "NOT_CHECKED",
+    }
     test_receipts: list[dict[str, Any]] = []
 
     item_id = entry.get("id")
@@ -414,8 +572,13 @@ def evaluate_item(
     if not SHA256_RE.fullmatch(expected_sha):
         blockers.append("EXPECTED_SOURCE_SHA256_INVALID")
     source_commit = str(entry.get("source_commit") or "").casefold()
-    if not COMMIT_RE.fullmatch(source_commit) or source_commit == "0" * 40:
-        blockers.append("SOURCE_COMMIT_INVALID")
+    if provenance_mode not in PROVENANCE_MODES:
+        blockers.append("PROVENANCE_MODE_INVALID")
+    elif provenance_mode == "GIT_COMMIT":
+        if not COMMIT_RE.fullmatch(source_commit) or source_commit == "0" * 40:
+            blockers.append("SOURCE_COMMIT_INVALID")
+    elif source_commit:
+        blockers.append("GENERATED_RECEIPTS_SOURCE_COMMIT_MUST_BE_EMPTY")
 
     extension = PurePosixPath(source_rel).suffix.casefold() if source_rel else ""
     mime_type = entry.get("mime_type")
@@ -470,13 +633,110 @@ def evaluate_item(
                 blockers.append("STALE_SOURCE_HASH")
             content_scan = scan_content(source_path, str(mime_type), int(policy["max_source_bytes"]))
             blockers.extend(content_scan["findings"])
+            if provenance_mode == "GENERATED_RECEIPTS":
+                source_checkout = git_checkout_state(root, source_rel)
+                if not source_checkout["clean_at_head"]:
+                    blockers.append("SOURCE_NOT_CLEAN_AT_HEAD")
         except PathSafetyError as exc:
             blockers.append(f"SOURCE_{exc}")
 
-    if source_rel and COMMIT_RE.fullmatch(source_commit):
+    if provenance_mode == "GIT_COMMIT" and source_rel and COMMIT_RE.fullmatch(source_commit):
         state, findings = git_provenance_state(root, source_commit, source_rel)
-        provenance = {"source_commit": source_commit, "state": state, "findings": findings}
+        provenance = {
+            "mode": provenance_mode,
+            "source_commit": source_commit,
+            "state": state,
+            "findings": findings,
+        }
         blockers.extend(findings)
+    elif provenance_mode == "GENERATED_RECEIPTS":
+        provenance = {
+            "mode": provenance_mode,
+            "source_commit": None,
+            "state": "PENDING_RECEIPT_VERIFICATION",
+            "findings": [],
+        }
+
+    artifact_ref = entry.get("artifact_receipt_ref")
+    if provenance_mode == "GENERATED_RECEIPTS":
+        if not isinstance(artifact_ref, dict):
+            blockers.append("ARTIFACT_RECEIPT_REF_MISSING")
+        else:
+            try:
+                artifact_ref_rel = normalize_relative(
+                    artifact_ref.get("path"),
+                    "artifact_receipt_ref",
+                )
+                artifact_receipt["path"] = artifact_ref_rel
+                hits = denied_path_tokens(artifact_ref_rel, deny_tokens)
+                if hits:
+                    raise PathSafetyError("ARTIFACT_RECEIPT_PATH_DENIED")
+                expected_artifact_receipt_sha = str(
+                    artifact_ref.get("expected_sha256") or ""
+                ).casefold()
+                artifact_receipt["expected_sha256"] = (
+                    expected_artifact_receipt_sha
+                )
+                if not SHA256_RE.fullmatch(expected_artifact_receipt_sha):
+                    raise PathSafetyError("ARTIFACT_RECEIPT_SHA256_INVALID")
+                artifact_receipt_path = secure_existing_file(
+                    root,
+                    artifact_ref_rel,
+                )
+                observed_artifact_receipt_sha = sha256_file(
+                    artifact_receipt_path
+                )
+                artifact_receipt["observed_sha256"] = (
+                    observed_artifact_receipt_sha
+                )
+                artifact_receipt["checkout"] = git_checkout_state(
+                    root,
+                    artifact_ref_rel,
+                )
+                if not artifact_receipt["checkout"]["clean_at_head"]:
+                    blockers.append("ARTIFACT_RECEIPT_NOT_CLEAN_AT_HEAD")
+                if (
+                    observed_artifact_receipt_sha
+                    != expected_artifact_receipt_sha
+                ):
+                    artifact_receipt["state"] = "STALE"
+                    blockers.append("ARTIFACT_RECEIPT_STALE")
+                else:
+                    try:
+                        artifact_receipt_payload = json.loads(
+                            artifact_receipt_path.read_text(encoding="utf-8")
+                        )
+                    except (
+                        OSError,
+                        UnicodeDecodeError,
+                        json.JSONDecodeError,
+                    ):
+                        artifact_receipt["state"] = "INVALID_JSON"
+                        blockers.append("ARTIFACT_RECEIPT_INVALID_JSON")
+                    else:
+                        if (
+                            source_rel
+                            and source_sha
+                            and source_bytes is not None
+                            and receipt_contains_artifact_binding(
+                                artifact_receipt_payload,
+                                source_path=source_rel,
+                                source_sha256=source_sha,
+                                source_bytes=source_bytes,
+                            )
+                        ):
+                            artifact_receipt["binding_verified"] = True
+                            artifact_receipt["state"] = "VERIFIED"
+                        else:
+                            artifact_receipt["state"] = (
+                                "ARTIFACT_BINDING_MISSING"
+                            )
+                            blockers.append(
+                                "ARTIFACT_RECEIPT_BINDING_MISSING"
+                            )
+            except PathSafetyError as exc:
+                artifact_receipt["state"] = "BLOCKED"
+                blockers.append(str(exc))
 
     refs = entry.get("test_receipt_refs")
     if not isinstance(refs, list) or not refs:
@@ -501,12 +761,49 @@ def evaluate_item(
                 ref_path = secure_existing_file(root, ref_rel)
                 observed_ref_sha = sha256_file(ref_path)
                 row["observed_sha256"] = observed_ref_sha
+                if provenance_mode == "GENERATED_RECEIPTS":
+                    row["checkout"] = git_checkout_state(root, ref_rel)
+                    if not row["checkout"]["clean_at_head"]:
+                        blockers.append("TEST_RECEIPT_NOT_CLEAN_AT_HEAD")
                 row["state"] = "VERIFIED" if observed_ref_sha == expected_ref_sha else "STALE"
                 if row["state"] != "VERIFIED":
                     blockers.append("TEST_RECEIPT_STALE")
             except PathSafetyError as exc:
                 blockers.append(str(exc))
             test_receipts.append(row)
+
+    if provenance_mode == "GENERATED_RECEIPTS":
+        receipt_findings: list[str] = []
+        if artifact_receipt.get("state") != "VERIFIED":
+            receipt_findings.append(
+                "GENERATED_ARTIFACT_RECEIPT_VERIFICATION_FAILED"
+            )
+        if any(row.get("state") != "VERIFIED" for row in test_receipts):
+            receipt_findings.append("GENERATED_TEST_RECEIPT_VERIFICATION_FAILED")
+        checkout_rows = [
+            source_checkout,
+            artifact_receipt.get("checkout", {}),
+            *[row.get("checkout", {}) for row in test_receipts],
+        ]
+        if any(
+            row.get("clean_at_head") is not True for row in checkout_rows
+        ):
+            receipt_findings.append(
+                "GENERATED_CLEAN_CHECKOUT_VERIFICATION_FAILED"
+            )
+        provenance = {
+            "mode": provenance_mode,
+            "source_commit": None,
+            "state": (
+                "VERIFIED"
+                if artifact_receipt.get("state") == "VERIFIED"
+                and test_receipts
+                and not receipt_findings
+                else "FAILED"
+            ),
+            "findings": sorted(set(receipt_findings)),
+        }
+        blockers.extend(receipt_findings)
 
     if target_rel and source_sha:
         try:
@@ -538,6 +835,21 @@ def evaluate_item(
         "claim_state": claim_state,
         "claim_boundary": claim_boundary,
         "provenance": provenance,
+        "checkout_provenance": {
+            "required": provenance_mode == "GENERATED_RECEIPTS",
+            "state": (
+                "VERIFIED"
+                if provenance_mode == "GENERATED_RECEIPTS"
+                and provenance["state"] == "VERIFIED"
+                else (
+                    "FAILED"
+                    if provenance_mode == "GENERATED_RECEIPTS"
+                    else "VERIFIED_BY_GIT_COMMIT"
+                )
+            ),
+            "source": source_checkout,
+        },
+        "artifact_receipt_ref": artifact_receipt,
         "freshness": freshness,
         "test_receipt_refs": test_receipts,
         "content_scan": content_scan,
@@ -609,6 +921,16 @@ def build_plan(
     blocked = [row["id"] for row in items if row["blockers"]]
     exact = [row["id"] for row in items if row["planned_action"] == "NOOP_EXACT_MATCH"]
     planned_new = [row["id"] for row in items if row["planned_action"] == "PLAN_NEW_LOCAL_STAGE_COPY"]
+    generated_items = [
+        row
+        for row in items
+        if row["provenance"]["mode"] == "GENERATED_RECEIPTS"
+    ]
+    checkout_blocked = [
+        row["id"]
+        for row in generated_items
+        if row["checkout_provenance"]["state"] != "VERIFIED"
+    ]
 
     public_url_plan = [
         {
@@ -649,6 +971,17 @@ def build_plan(
         "network_actions": {action: HUMAN_GATE for action in NETWORK_ACTIONS},
         "human_gate": HUMAN_GATE,
         "overwrite_policy": "Never overwrite. Existing exact-hash targets are no-ops; mismatches are blocked.",
+        "checkout_reproducibility": {
+            "generated_item_count": len(generated_items),
+            "verified_count": len(generated_items) - len(checkout_blocked),
+            "blocked_count": len(checkout_blocked),
+            "blocked_item_ids": checkout_blocked,
+            "state": (
+                "CLEAN_CHECKOUT_VERIFIED"
+                if not checkout_blocked
+                else "CLEAN_CHECKOUT_NOT_REPRODUCIBLE"
+            ),
+        },
         "items": items,
         "public_url_verification_plan": public_url_plan,
         "summary": {
@@ -659,6 +992,8 @@ def build_plan(
             "exact_match_noop_item_ids": exact,
             "planned_new_local_stage_count": len(planned_new),
             "planned_new_local_stage_item_ids": planned_new,
+            "clean_checkout_blocked_count": len(checkout_blocked),
+            "clean_checkout_blocked_item_ids": checkout_blocked,
             "plan_state": "BLOCKED" if blocked else "DRY_RUN_READY_HUMAN_UNLOCK_REQUIRED",
             "local_copy_performed": False,
             "network_action_performed": False,
@@ -695,6 +1030,8 @@ def render_markdown(plan: dict[str, Any]) -> str:
         "- Allowlisted candidate bytes scanned locally for unsafe patterns: `true`",
         "- Secret or PII values emitted: `false`",
         "- Overwrite behavior: exact-hash targets are no-ops; mismatches are blocked",
+        f"- Clean-checkout generated artifacts verified: `{plan['checkout_reproducibility']['verified_count']}`",
+        f"- Clean-checkout generated artifacts blocked: `{plan['checkout_reproducibility']['blocked_count']}`",
         "",
         "## Candidates",
         "",

@@ -1,0 +1,140 @@
+{
+  "schema": "lumencore.pitch_deck_governance_config.v1",
+  "version": 1,
+  "controls": {
+    "action_time_human_approval_required": true,
+    "external_release_default": false,
+    "historical_decks_blocked": true,
+    "preserve_negative_results": true,
+    "source_notes_required_for_current_deck": true,
+    "unregistered_pptx_blocks_release": true,
+    "unsupported_financial_claims_block_release": true
+  },
+  "discovery": {
+    "roots": [
+      "data",
+      "grant_submissions",
+      "out",
+      "output/pptx",
+      "staples_upgrade_2026-05-21"
+    ],
+    "extension": ".pptx"
+  },
+  "legacy_collections": [
+    {
+      "id": "data_legacy_deck_corpus",
+      "path_prefix": "data/",
+      "status": "LEGACY_HIGH_RISK_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false
+    },
+    {
+      "id": "institutional_review_bundle_history",
+      "path_prefix": "out/INSTITUTIONAL_REVIEW_BUNDLE/",
+      "status": "GENERATED_HISTORICAL_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false
+    },
+    {
+      "id": "grant_unpack_provenance",
+      "path_prefix": "out/ops/grant_unpack/",
+      "status": "ARCHIVAL_PROVENANCE_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false
+    },
+    {
+      "id": "investor_mission_control_history",
+      "path_prefix": "out/ops/investor_mission_control/",
+      "status": "LEGACY_HIGH_RISK_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false
+    },
+    {
+      "id": "staples_generated_history",
+      "path_prefix": "out/ops/staples_visual_upgrade_2026-05-21/",
+      "status": "LEGACY_HIGH_RISK_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "current_evidence_to_pilot_deck",
+      "path": "output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx",
+      "status": "CURRENT_HUMAN_REVIEW_REQUIRED",
+      "external_release_authorized": false,
+      "send_eligible": false,
+      "required_slide_count": 11,
+      "required_notes_sources_count": 11,
+      "required_text_markers": [
+        "140 registered families; 35 implementations present",
+        "120 direct comparisons across 22 candidate-source cards",
+        "0 global Holm-positive comparisons",
+        "0 promoted champions",
+        "Zero eligible future observations today",
+        "No pricing, paid customer, savings, or contract is claimed."
+      ],
+      "banned_text_markers": [
+        "$250k",
+        "$65k",
+        "~75%",
+        "$5k-$10k",
+        "$20k-$50k",
+        "$60k-$150k / yr",
+        "Modeled positive EBITDA",
+        "Launch Tennessee",
+        "3686"
+      ],
+      "dependencies": [
+        "docs/LUMENCORE_SOURCE_NATIVE_BENCHMARK_WHITEPAPER_CURRENT.md",
+        "config/prooflock_opportunity_ops_pilot_v1.json",
+        "config/time_series_source_native_prospective_protocol_v1.json",
+        "out/ops/market_signal_source_native_benchmark_latest.json",
+        "out/ops/source_native_family_baseline_ledger_latest.json",
+        "out/ops/time_series_source_native_prospective_protocol_status.json"
+      ]
+    },
+    {
+      "id": "launchtn_3686_source_deck",
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx",
+      "status": "HISTORICAL_APPLICATION_SPECIFIC_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false,
+      "required_text_markers": [],
+      "banned_text_markers": [],
+      "dependencies": []
+    },
+    {
+      "id": "funding_sprint_send_ready_20260709",
+      "path": "grant_submissions/funding_sprint_20260709/LUMENCORE_PITCH_DECK_SEND_READY_2026-07-09.pptx",
+      "status": "HISTORICAL_STALE_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false,
+      "required_text_markers": [],
+      "banned_text_markers": [],
+      "dependencies": []
+    },
+    {
+      "id": "staples_ultra_20260521",
+      "path": "staples_upgrade_2026-05-21/STAPLES_PITCH_DECK_ULTRA_2026-05-21.pptx",
+      "status": "HISTORICAL_SPECULATIVE_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false,
+      "required_text_markers": [],
+      "banned_text_markers": [],
+      "dependencies": []
+    },
+    {
+      "id": "darpa_quad_chart_template",
+      "path": "grant_submissions/DPA26BZ04_DV016_FALCON/source_attachments/DARPA_TECHNICAL_SUMMARY_QUAD_CHART_TEMPLATE_2025-01.pptx",
+      "status": "SOURCE_TEMPLATE_NOT_A_LUMENCORE_DECK",
+      "external_release_authorized": false,
+      "send_eligible": false,
+      "required_text_markers": [],
+      "banned_text_markers": [],
+      "dependencies": []
+    }
+  ],
+  "source_template": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx",
+  "claim_boundary": "The current deck supports review of software, custody, benchmark design, and a bounded pilot contract. It does not establish model superiority, alpha, field performance, savings, revenue, valuation, customer adoption, award, or contract status."
+}

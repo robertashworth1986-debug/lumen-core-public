@@ -8,6 +8,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
+from reportlab.pdfgen import canvas
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -111,6 +112,51 @@ def build(module, root: Path, target: Path, policy: dict):
 
 def blockers(plan: dict) -> set[str]:
     return set(plan["items"][0]["blockers"])
+
+
+def write_pdf(path: Path, text: str) -> None:
+    document = canvas.Canvas(str(path))
+    document.drawString(72, 720, text)
+    document.save()
+
+
+def configure_generated_pdf_policy(root: Path, policy: dict, *, source_rel: str, target_rel: str) -> None:
+    source = root / source_rel
+    artifact_receipt_rel = "docs/receipts/generated-artifact.json"
+    artifact_receipt = root / artifact_receipt_rel
+    artifact_receipt.parent.mkdir(parents=True, exist_ok=True)
+    artifact_receipt.write_text(
+        json.dumps(
+            {
+                "artifacts": [
+                    {
+                        "path": source_rel,
+                        "bytes": source.stat().st_size,
+                        "sha256": sha256(source),
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    run_git(root, "add", source_rel, artifact_receipt_rel)
+    run_git(root, "commit", "-m", "seal generated PDF fixture")
+
+    policy["allowed_source_roots"] = ["output/pdf"]
+    policy["allowed_target_roots"] = ["public/evidence"]
+    policy["allowed_extension_mime"] = {".pdf": "application/pdf"}
+    entry = policy["allowlist"][0]
+    entry["source_path"] = source_rel
+    entry["expected_source_sha256"] = sha256(source)
+    entry["target_path"] = target_rel
+    entry["public_url"] = "https://example.test/evidence/public.pdf"
+    entry["mime_type"] = "application/pdf"
+    entry["provenance_mode"] = "GENERATED_RECEIPTS"
+    entry["artifact_receipt_ref"] = {
+        "path": artifact_receipt_rel,
+        "expected_sha256": sha256(artifact_receipt),
+    }
+    entry.pop("source_commit", None)
 
 
 def test_private_path_is_rejected_before_release(tmp_path: Path):
@@ -218,6 +264,116 @@ def test_plan_is_deterministic_for_same_inputs(tmp_path: Path):
     second = build(module, root, target, policy)
     assert first == second
     assert first["plan_sha256"] == second["plan_sha256"]
+
+
+def test_generated_pdf_is_scanned_and_receipt_gated(tmp_path: Path):
+    module = load_module()
+    source_rel = "output/pdf/public.pdf"
+    target_rel = "public/evidence/public.pdf"
+    root, target, policy = fixture_repo(
+        tmp_path,
+        source_rel=source_rel,
+        target_rel=target_rel,
+    )
+    write_pdf(root / source_rel, "Bounded internal evidence only. No external validation is asserted.")
+    configure_generated_pdf_policy(
+        root,
+        policy,
+        source_rel=source_rel,
+        target_rel=target_rel,
+    )
+
+    plan = build(module, root, target, policy)
+    row = plan["items"][0]
+    assert row["blockers"] == []
+    assert row["content_scan"]["state"] == "PASS"
+    assert row["content_scan"]["extracted_text_scanned"] is True
+    assert row["provenance"]["mode"] == "GENERATED_RECEIPTS"
+    assert row["provenance"]["state"] == "VERIFIED"
+    assert row["artifact_receipt_ref"]["binding_verified"] is True
+    assert row["checkout_provenance"]["state"] == "VERIFIED"
+    assert row["planned_action"] == "PLAN_NEW_LOCAL_STAGE_COPY"
+
+
+def test_generated_pdf_secret_is_blocked_without_echoing_value(tmp_path: Path):
+    module = load_module()
+    source_rel = "output/pdf/public.pdf"
+    target_rel = "public/evidence/public.pdf"
+    root, target, policy = fixture_repo(
+        tmp_path,
+        source_rel=source_rel,
+        target_rel=target_rel,
+    )
+    secret_value = "ABCD1234SUPERSECRET9999"
+    write_pdf(root / source_rel, f"api_key = {secret_value}")
+    configure_generated_pdf_policy(
+        root,
+        policy,
+        source_rel=source_rel,
+        target_rel=target_rel,
+    )
+
+    plan = build(module, root, target, policy)
+    assert "SECRET_CONTENT_SECRET_ASSIGNMENT" in blockers(plan)
+    assert secret_value not in json.dumps(plan)
+
+
+def test_unrelated_valid_receipt_cannot_bind_generated_pdf(tmp_path: Path):
+    module = load_module()
+    source_rel = "output/pdf/public.pdf"
+    target_rel = "public/evidence/public.pdf"
+    root, target, policy = fixture_repo(
+        tmp_path,
+        source_rel=source_rel,
+        target_rel=target_rel,
+    )
+    write_pdf(
+        root / source_rel,
+        "Bounded internal evidence only. No external validation is asserted.",
+    )
+    configure_generated_pdf_policy(
+        root,
+        policy,
+        source_rel=source_rel,
+        target_rel=target_rel,
+    )
+    unrelated = root / "tests" / "receipt.json"
+    policy["allowlist"][0]["artifact_receipt_ref"] = {
+        "path": "tests/receipt.json",
+        "expected_sha256": sha256(unrelated),
+    }
+
+    plan = build(module, root, target, policy)
+    assert "ARTIFACT_RECEIPT_BINDING_MISSING" in blockers(plan)
+    assert plan["items"][0]["artifact_receipt_ref"]["binding_verified"] is False
+    assert plan["items"][0]["provenance"]["state"] == "FAILED"
+
+
+def test_current_policy_keeps_three_reviewer_pdfs_artifact_bound_and_dry_run_only():
+    module = load_module()
+    plan = module.build_plan(
+        module.DEFAULT_POLICY,
+        root=ROOT,
+        target_root=ROOT,
+        as_of_utc="2026-07-29T12:58:04Z",
+    )
+    pdf_items = [
+        row for row in plan["items"] if row["mime_type"] == "application/pdf"
+    ]
+
+    assert plan["summary"]["item_count"] == 6
+    assert len(pdf_items) == 3
+    assert all(row["provenance"]["mode"] == "GENERATED_RECEIPTS" for row in pdf_items)
+    assert all(row["artifact_receipt_ref"]["binding_verified"] is True for row in pdf_items)
+    assert all(row["content_scan"]["state"] == "PASS" for row in pdf_items)
+    assert not any(
+        blocker.startswith("ARTIFACT_RECEIPT_")
+        and blocker != "ARTIFACT_RECEIPT_NOT_CLEAN_AT_HEAD"
+        for row in pdf_items
+        for blocker in row["blockers"]
+    )
+    assert all(row["copy_performed"] is False for row in plan["items"])
+    assert all(row["network_action_performed"] is False for row in plan["items"])
 
 
 def test_all_network_actions_require_human_unlock(tmp_path: Path):

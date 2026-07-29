@@ -1,0 +1,44 @@
+{
+  "artifact_count": 4,
+  "artifacts": [
+    {
+      "bytes": 890365,
+      "external_release_authorized": false,
+      "id": "current_capability_statement",
+      "path": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf",
+      "sha256": "98190E157E6BEA90A3F94DA69A1BEB513E0FD6917E9C70E1B626753430AB2E42",
+      "status": "CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED"
+    },
+    {
+      "bytes": 355644,
+      "external_release_authorized": false,
+      "id": "current_evidence_to_pilot_deck",
+      "path": "output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx",
+      "sha256": "A9A7EFB11012E78CFE515FE902477C326A7A4B949B7A7F4C78F27F1D26FFB5E1",
+      "status": "CURRENT_HUMAN_REVIEW_REQUIRED"
+    },
+    {
+      "bytes": 322467,
+      "external_release_authorized": false,
+      "id": "current_evidence_to_pilot_deck_pdf",
+      "path": "output/pdf/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pdf",
+      "sha256": "C96ABE02B4DA03A397EC861F1E52E133F02FE71E6BF99E647BC8D2536691BD7B",
+      "status": "CURRENT_PDF_COMPANION_HUMAN_REVIEW_REQUIRED"
+    },
+    {
+      "bytes": 894882,
+      "external_release_authorized": false,
+      "id": "current_source_native_whitepaper",
+      "path": "output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf",
+      "sha256": "16C848BA0762E2B70B6802B4F6A041579EC19739852EEA245FCA910EDE3CEF52",
+      "status": "CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED"
+    }
+  ],
+  "as_of_utc": "2026-07-29T13:20:00Z",
+  "claim_boundary": "This manifest binds exact local reviewer-artifact paths, byte counts, and SHA-256 values. It does not authorize publication or sending and does not establish external validation, model superiority, field performance, award, contract, revenue, savings, or valuation.",
+  "external_release_authorized": false,
+  "manifest_sha256": "134F12E7E6D51C88F515859C018690F495E7E887100542025FA0FA99EC3495D0",
+  "network_action_performed": false,
+  "schema": "lumencore.current_reviewer_public_artifact_manifest.v1",
+  "status": "SEALED_LOCAL_ARTIFACT_MANIFEST_HUMAN_RELEASE_REQUIRED"
+}

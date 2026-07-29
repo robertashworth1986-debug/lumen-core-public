@@ -5,7 +5,8 @@
   "purpose": "Allowlist reviewer-safe artifacts for a deterministic local sync preflight while prohibiting credentials, private material, unsupported claims, overwrites, and all autonomous network actions.",
   "allowed_source_roots": [
     "dashboard/data",
-    "docs"
+    "docs",
+    "output/pdf"
   ],
   "allowed_target_roots": [
     "dashboard/data",
@@ -15,6 +16,7 @@
     ".html": "text/html",
     ".json": "application/json",
     ".md": "text/markdown",
+    ".pdf": "application/pdf",
     ".svg": "image/svg+xml"
   },
   "allowed_claim_states": [
@@ -122,6 +124,103 @@
         {
           "path": "tests/test_quant_hub_reviewer_context.py",
           "expected_sha256": "b1af9b3a07603e7bd9a8d4b3a75d84658d7ad3fedcda5495f464798271d819ca"
+        }
+      ]
+    },
+    {
+      "id": "current_evidence_to_pilot_deck_pdf",
+      "source_path": "output/pdf/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pdf",
+      "expected_source_sha256": "c96abe02b4da03a397ec861f1e52e133f02fe71e6bf99e647bc8d2536691bd7b",
+      "target_path": "dashboard/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_C96ABE02B4DA.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_C96ABE02B4DA.pdf",
+      "mime_type": "application/pdf",
+      "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
+      "claim_boundary": "The deck reports bounded internal software, custody, and source-native benchmark state; it does not establish model superiority, alpha, field performance, savings, revenue, valuation, customer adoption, award, or contract status.",
+      "provenance_mode": "GENERATED_RECEIPTS",
+      "artifact_receipt_ref": {
+        "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
+        "expected_sha256": "1b7b933781be69e02520c522c4d884ceef2b6a59b1aad6e8cd26ed5a3afa2dd4"
+      },
+      "last_validated_utc": "2026-07-29T12:58:04Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "code/ops/BUILD_PITCH_DECK_GOVERNANCE.py",
+          "expected_sha256": "d624737d4da7cce78a85f242bbafc6f9572c2746bd92cf013bec23e1d97b94a0"
+        },
+        {
+          "path": "tests/test_pitch_deck_governance.py",
+          "expected_sha256": "d9e2dde23b337cb9f30d4430ae1aef716d9ad7722bfe0dd8f40ccba65bdcdcf1"
+        },
+        {
+          "path": "output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx",
+          "expected_sha256": "a9a7efb11012e78cfe515fe902477c326a7a4b949b7a7f4c78f27f1d26ffb5e1"
+        }
+      ]
+    },
+    {
+      "id": "source_native_benchmark_whitepaper_pdf",
+      "source_path": "output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf",
+      "expected_source_sha256": "16c848ba0762e2b70b6802b4f6a041579ec19739852eea245fca910ede3cef52",
+      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_16C848BA0762.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_16C848BA0762.pdf",
+      "mime_type": "application/pdf",
+      "claim_state": "PROVENANCE_AND_REPRODUCIBILITY",
+      "claim_boundary": "The whitepaper documents source-native protocols, measured comparison coverage, limitations, and negative results; it does not establish universal superiority, external validation, field performance, or realized economic value.",
+      "provenance_mode": "GENERATED_RECEIPTS",
+      "artifact_receipt_ref": {
+        "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
+        "expected_sha256": "1b7b933781be69e02520c522c4d884ceef2b6a59b1aad6e8cd26ed5a3afa2dd4"
+      },
+      "last_validated_utc": "2026-07-29T12:58:04Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "code/ops/BUILD_SOURCE_NATIVE_RESEARCH_WHITEPAPER.py",
+          "expected_sha256": "8d4b9061308535b1d3f2efbde40f6c4882edf44e57800c42635b0720f63ed372"
+        },
+        {
+          "path": "tests/test_source_native_research_whitepaper.py",
+          "expected_sha256": "7877b50991f157705fa8deb51b63227d11be7d7efa5906de8baa5642aa95f009"
+        }
+      ]
+    },
+    {
+      "id": "federal_capability_statement_pdf",
+      "source_path": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf",
+      "expected_source_sha256": "98190e157e6bea90a3f94da69a1beb513e0fd6917e9c70e1b626753430ab2e42",
+      "target_path": "dashboard/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_98190E157E6B.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_98190E157E6B.pdf",
+      "mime_type": "application/pdf",
+      "claim_state": "NO_PERFORMANCE_CLAIM",
+      "claim_boundary": "The capability statement describes current software, evidence controls, and bounded federal-use fit; it does not establish certification, government approval, award status, model superiority, field performance, or economic outcomes.",
+      "provenance_mode": "GENERATED_RECEIPTS",
+      "artifact_receipt_ref": {
+        "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
+        "expected_sha256": "1b7b933781be69e02520c522c4d884ceef2b6a59b1aad6e8cd26ed5a3afa2dd4"
+      },
+      "last_validated_utc": "2026-07-29T12:58:04Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "code/ops/BUILD_MONDAY_FEDERAL_ACTION_PACKET.py",
+          "expected_sha256": "592b10bc192bc20ed4aa62626eb341a8aa5f18c7427ed8c837623464503eed81"
+        },
+        {
+          "path": "config/monday_federal_action_packet_v1.json",
+          "expected_sha256": "3d322e18b940f416710822d80f35a001662e93e12b65f5f0e4fb8f96a9d779e9"
+        },
+        {
+          "path": "tests/test_monday_federal_action_packet.py",
+          "expected_sha256": "718088ee3a6adccb13f89c4f0d3ed54a94b2fe1a32bbc3b009b030fa113ada3b"
+        },
+        {
+          "path": "code/ops/BUILD_CAPABILITY_STATEMENT_GOVERNANCE.py",
+          "expected_sha256": "8cfb3394c87865817daa29433c0eaf1ee88ec6b5cd76375ad57ce201a6165581"
+        },
+        {
+          "path": "tests/test_capability_statement_governance.py",
+          "expected_sha256": "2e2d6089af70c4562ccedefb094dcecefbb09aadc0bb2bda3e1b9bd93e9230c7"
         }
       ]
     }

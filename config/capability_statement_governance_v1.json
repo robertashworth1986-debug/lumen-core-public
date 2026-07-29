@@ -1,0 +1,101 @@
+{
+  "schema": "lumencore.capability_statement_governance_config.v1",
+  "version": 1,
+  "controls": {
+    "action_time_human_approval_required": true,
+    "autonomous_email_send_allowed": false,
+    "autonomous_submission_allowed": false,
+    "closed_route_reuse_allowed": false,
+    "duplicate_suppression_required": true,
+    "evidence_snapshot_refresh_required": true,
+    "performance_claims_require_independent_evidence": true,
+    "unregistered_capability_artifact_blocks_release": true
+  },
+  "discovery": {
+    "roots": [
+      "grant_submissions",
+      "output/pdf"
+    ],
+    "filename_markers": [
+      "CAPABILITY_STATEMENT",
+      "CAPABILITY_OUTLINE",
+      "CAPABILITY_NOTE",
+      "CURRENT_CAPABILITY_BOUNDARY",
+      "Federal_Capability_Statement"
+    ]
+  },
+  "artifacts": [
+    {
+      "id": "air_force_aac_rfi_20260709",
+      "path": "grant_submissions/funding_sprint_20260709/AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
+      "artifact_type": "historical_rfi_draft",
+      "status": "HISTORICAL_DO_NOT_SEND",
+      "deadline_utc": "2026-07-13T23:59:59Z",
+      "required_text_markers": [
+        "Status: `HISTORICAL_DO_NOT_SEND`",
+        "quantitative evidence snapshot is dated 2026-07-09"
+      ],
+      "claim_snapshot_refresh_required": true
+    },
+    {
+      "id": "fhwa_tsmo_outline_20260709",
+      "path": "grant_submissions/funding_sprint_20260709/FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md",
+      "artifact_type": "historical_capture_outline",
+      "status": "CLOSED_ROUTE_DO_NOT_SEND",
+      "deadline_utc": "2026-08-03T23:59:59Z",
+      "required_text_markers": [
+        "Status: `CLOSED_ROUTE_DO_NOT_SEND`",
+        "This route is closed under the current outreach controls."
+      ],
+      "claim_snapshot_refresh_required": true
+    },
+    {
+      "id": "fhwa_tsmo_pdf_20260709",
+      "path": "grant_submissions/funding_sprint_20260709/LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf",
+      "artifact_type": "historical_pdf",
+      "status": "CLOSED_ROUTE_DO_NOT_SEND",
+      "deadline_utc": "2026-08-03T23:59:59Z",
+      "required_text_markers": [],
+      "claim_snapshot_refresh_required": true
+    },
+    {
+      "id": "mda_control_assessment_boundary_20260713",
+      "path": "grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md",
+      "artifact_type": "domain_capability_boundary",
+      "status": "DOMAIN_BOUNDARY_REUSE_REQUIRES_CURRENT_SOURCE_RECHECK",
+      "deadline_utc": "",
+      "required_text_markers": [
+        "Status: `DOMAIN_BOUNDARY_REUSE_REQUIRES_CURRENT_SOURCE_RECHECK`",
+        "Reuse requires a fresh official-notice"
+      ],
+      "claim_snapshot_refresh_required": true
+    },
+    {
+      "id": "federal_capability_statement_20260726",
+      "path": "output/pdf/LumenCore_Federal_Capability_Statement_2026-07-26.pdf",
+      "artifact_type": "historical_public_safe_pdf",
+      "status": "HISTORICAL_DO_NOT_SEND",
+      "deadline_utc": "",
+      "required_text_markers": [],
+      "claim_snapshot_refresh_required": true
+    },
+    {
+      "id": "federal_capability_statement_current",
+      "path": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf",
+      "artifact_type": "current_public_safe_pdf",
+      "status": "CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED",
+      "deadline_utc": "",
+      "required_text_markers": [],
+      "claim_snapshot_refresh_required": false,
+      "dependencies": [
+        "code/ops/BUILD_MONDAY_FEDERAL_ACTION_PACKET.py",
+        "config/monday_federal_action_packet_v1.json",
+        "assets/brand/lumaarc_eclipse_corona_concept_v1.png",
+        "tests/test_monday_federal_action_packet.py",
+        "out/ops/source_native_family_baseline_ledger_latest.json",
+        "out/ops/time_series_source_native_prospective_protocol_status.json"
+      ]
+    }
+  ],
+  "claim_boundary": "This registry governs local capability artifacts and detects stale or unregistered packets. It does not establish eligibility, responsiveness, agency trust, certification, past performance, independent validation, submission, receipt, selection, award, or authority to contact an external party."
+}
