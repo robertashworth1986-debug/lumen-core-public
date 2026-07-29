@@ -12,10 +12,7 @@ OUT_DIR = ROOT / "grant_submissions" / "LAUNCHTN_3686_PITCH_2026"
 OUT_JSON = OUT_DIR / "LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-29.json"
 OUT_MD = OUT_DIR / "LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-29.md"
 PITCH_DECK_PATH = (
-    ROOT
-    / "output"
-    / "pptx"
-    / "LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx"
+    OUT_DIR / "LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx"
 )
 FINANCIAL_MODEL_PATH = OUT_DIR / "LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx"
 
@@ -181,21 +178,22 @@ OPTIONAL_NOTE = (
 ATTACHMENT_QA = {
     "launchtn_pitch_deck": {
         "path": PITCH_DECK_PATH,
-        "expected_sha256": "4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a",
+        "expected_sha256": "f0edebdbcf0c29457b01a40a9d7238a441797e024d72404815f08f2191a23b3a",
         "qa_date": "2026-07-29",
         "qa_checks": [
-            "11-slide governed current evidence-to-pilot narrative",
+            "11-slide LaunchTN-specific evidence-to-pilot narrative",
             "Every slide visually inspected at original render resolution",
             "slides_test.py passed with no overflow detected",
+            "Template-following plan and fidelity checks passed with no issues",
+            "Customer, competition, business model, go-to-market, team, and competition ask are visible",
             "Current evidence counts and negative results preserved",
         ],
-        "blocked_status": "CURRENT_DECK_VENUE_COVERAGE_AND_FOUNDER_REVIEW_REQUIRED",
+        "blocked_status": "VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED",
         "missing_requirements": [
-            "LaunchTN-specific competitive landscape",
-            "business model and go-to-market framing",
-            "customer profile",
-            "founder-approved raise ask",
-            "founding-team and Tennessee eligibility facts",
+            "founder confirmation of legal entity, Tennessee eligibility, team, and company-stage facts",
+            "founder approval of the $10,000 competition ask and proposed prize-use plan",
+            "exact financing or raise disclosure if live portal review requires more than the competition-prize ask",
+            "final founder visual and claim review after inserting confirmed facts",
         ],
     },
     "launchtn_financial_model": {
@@ -519,9 +517,9 @@ FIELDS = [
         "pitch_deck",
         "Pitch Deck",
         True,
-        "[NO SAFE UPLOAD YET: BUILD AND REVIEW A CURRENT LAUNCHTN-SPECIFIC DECK]",
-        "CURRENT_DECK_VENUE_COVERAGE_AND_FOUNDER_REVIEW_REQUIRED",
-        evidence="The governed current deck is structurally clean but lacks required venue-specific content",
+        "[NO SAFE UPLOAD YET: CONFIRM FOUNDER FACTS AND REVIEW THE QA-PASSED VENUE DECK]",
+        "VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED",
+        evidence="The LaunchTN-specific deck covers the requested topic classes and passed structural QA; founder-controlled facts and final review remain",
     ),
     field(
         "financials",
@@ -661,7 +659,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "Verify the full-time employee count under the portal's definition.",
             "Confirm whether any LaunchTN capital has ever been received.",
             "Approve or replace every pricing, raise, revenue, customer, hiring, margin, and cash assumption.",
-            "Build and visually review a LaunchTN-specific deck that covers every requested topic.",
+            "Confirm the founder-controlled facts and review the QA-passed LaunchTN-specific deck after the final factual insertions.",
             "Recheck the live portal schema, file limits, terms, and attestations.",
             "Review both required attachments and the complete final portal preview before submission.",
         ],
@@ -682,7 +680,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             ),
             "submit_allowed_without_human": False,
             "action": (
-                "Resolve founder and eligibility facts, rebuild the venue-specific deck, "
+                "Resolve founder and eligibility facts, finalize the QA-passed venue deck, "
                 "approve or replace every financial assumption, recheck the live portal, "
                 "and stop at the complete final preview for action-time founder review."
             ),

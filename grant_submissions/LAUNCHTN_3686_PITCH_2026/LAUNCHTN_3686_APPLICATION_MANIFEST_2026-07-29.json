@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.launchtn_3686_pitch_application.v2",
-  "generated_utc": "2026-07-29T15:01:26.264034+00:00",
+  "generated_utc": "2026-07-29T15:43:58.568318+00:00",
   "opportunity": {
     "name": "3686 Pitch Competition 2026, presented by Amazon",
     "organizer": "Launch Tennessee",
@@ -25,7 +25,7 @@
       "OPTIONAL_OMIT_UNLESS_TRUE": 1,
       "HUMAN_ATTESTATION_REQUIRED": 1,
       "FOUNDER_PRICING_APPROVAL_REQUIRED": 1,
-      "CURRENT_DECK_VENUE_COVERAGE_AND_FOUNDER_REVIEW_REQUIRED": 1,
+      "VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED": 1,
       "PLANNING_MODEL_ARITHMETIC_QA_ONLY_FOUNDER_ASSUMPTION_APPROVAL_REQUIRED": 1,
       "OPTIONAL_OMIT_UNLESS_REVIEWED": 1,
       "OPTIONAL_HOLD_UNTIL_ELIGIBILITY_CONFIRMED": 1
@@ -360,9 +360,9 @@
       "field_id": "pitch_deck",
       "label": "Pitch Deck",
       "required": true,
-      "proposed_answer": "Do not attach yet. Candidate output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx is present with SHA-256 4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a, but remains blocked by: LaunchTN-specific competitive landscape; business model and go-to-market framing; customer profile; founder-approved raise ask; founding-team and Tennessee eligibility facts.",
-      "status": "CURRENT_DECK_VENUE_COVERAGE_AND_FOUNDER_REVIEW_REQUIRED",
-      "evidence": "The governed current deck is structurally clean but lacks required venue-specific content"
+      "proposed_answer": "Do not attach yet. Candidate grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx is present with SHA-256 f0edebdbcf0c29457b01a40a9d7238a441797e024d72404815f08f2191a23b3a, but remains blocked by: founder confirmation of legal entity, Tennessee eligibility, team, and company-stage facts; founder approval of the $10,000 competition ask and proposed prize-use plan; exact financing or raise disclosure if live portal review requires more than the competition-prize ask; final founder visual and claim review after inserting confirmed facts.",
+      "status": "VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED",
+      "evidence": "The LaunchTN-specific deck covers the requested topic classes and passed structural QA; founder-controlled facts and final review remain"
     },
     {
       "field_id": "financials",
@@ -393,31 +393,32 @@
     {
       "id": "launchtn_pitch_deck",
       "portal_requirement": "Competitive landscape, business model, go-to-market, customer profiles, raise ask, and founding team",
-      "path": "output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx",
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx",
       "present": true,
-      "bytes": 356403,
-      "sha256": "4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a",
-      "expected_sha256": "4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a",
+      "bytes": 356729,
+      "sha256": "f0edebdbcf0c29457b01a40a9d7238a441797e024d72404815f08f2191a23b3a",
+      "expected_sha256": "f0edebdbcf0c29457b01a40a9d7238a441797e024d72404815f08f2191a23b3a",
       "qa_hash_matches": true,
       "qa_date": "2026-07-29",
       "qa_checks": [
-        "11-slide governed current evidence-to-pilot narrative",
+        "11-slide LaunchTN-specific evidence-to-pilot narrative",
         "Every slide visually inspected at original render resolution",
         "slides_test.py passed with no overflow detected",
+        "Template-following plan and fidelity checks passed with no issues",
+        "Customer, competition, business model, go-to-market, team, and competition ask are visible",
         "Current evidence counts and negative results preserved"
       ],
-      "status": "CURRENT_DECK_VENUE_COVERAGE_AND_FOUNDER_REVIEW_REQUIRED",
+      "status": "VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED",
       "structural_qa_passed": true,
       "safe_to_upload": false,
       "missing_requirements": [
-        "LaunchTN-specific competitive landscape",
-        "business model and go-to-market framing",
-        "customer profile",
-        "founder-approved raise ask",
-        "founding-team and Tennessee eligibility facts"
+        "founder confirmation of legal entity, Tennessee eligibility, team, and company-stage facts",
+        "founder approval of the $10,000 competition ask and proposed prize-use plan",
+        "exact financing or raise disclosure if live portal review requires more than the competition-prize ask",
+        "final founder visual and claim review after inserting confirmed facts"
       ],
       "founder_approval_required": true,
-      "source_candidate": "output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx"
+      "source_candidate": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx"
     },
     {
       "id": "launchtn_financial_model",
@@ -456,7 +457,7 @@
     "Verify the full-time employee count under the portal's definition.",
     "Confirm whether any LaunchTN capital has ever been received.",
     "Approve or replace every pricing, raise, revenue, customer, hiring, margin, and cash assumption.",
-    "Build and visually review a LaunchTN-specific deck that covers every requested topic.",
+    "Confirm the founder-controlled facts and review the QA-passed LaunchTN-specific deck after the final factual insertions.",
     "Recheck the live portal schema, file limits, terms, and attestations.",
     "Review both required attachments and the complete final portal preview before submission."
   ],
@@ -489,8 +490,8 @@
     "application_refresh": {
       "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_REFRESH_2026-07-29.md",
       "present": true,
-      "bytes": 2481,
-      "sha256": "e6fd095811465578a260d1249f8fbeda3a7d68d2878326bcf422b494a67a4ca6"
+      "bytes": 2795,
+      "sha256": "b22968d2ff708d0880370f28af9397fa46154efe099001a578dc48483754e70e"
     },
     "lanl_receipt": {
       "path": "grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json",
@@ -503,7 +504,7 @@
   "final_action_gate": {
     "status": "PORTAL_FACTS_VENUE_DECK_FINANCIAL_APPROVAL_AND_FINAL_PREVIEW_REQUIRED",
     "submit_allowed_without_human": false,
-    "action": "Resolve founder and eligibility facts, rebuild the venue-specific deck, approve or replace every financial assumption, recheck the live portal, and stop at the complete final preview for action-time founder review."
+    "action": "Resolve founder and eligibility facts, finalize the QA-passed venue deck, approve or replace every financial assumption, recheck the live portal, and stop at the complete final preview for action-time founder review."
   },
-  "application_packet_sha256": "40a98196a062e437bd280bfcd2eb4c8cebedadd3f66b65cf5e8a9b213f427d34"
+  "application_packet_sha256": "4dda20f04c80fc4797d02d80aecf9c739bd835332c075f62a8fb134db069a8a2"
 }

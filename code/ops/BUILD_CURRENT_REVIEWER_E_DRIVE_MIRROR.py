@@ -252,6 +252,11 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
         "launchtn_3686",
     ),
     (
+        "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx",
+        "internal_control_human_review_required",
+        "launchtn_3686",
+    ),
+    (
         "config/market_signal_source_native_benchmark_protocol_v1.json",
         "reproducibility_source",
         "source_native_research",

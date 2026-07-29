@@ -1,6 +1,6 @@
 # Launch Tennessee 3686 Pitch Competition 2026 Current Portal Field Map
 
-Generated UTC: `2026-07-29T15:01:26.264034+00:00`
+Generated UTC: `2026-07-29T15:43:58.568318+00:00`
 
 ## Decision
 
@@ -9,7 +9,7 @@ Generated UTC: `2026-07-29T15:01:26.264034+00:00`
 - Cash prize: `$10,000`
 - This is not the formal InvestTN investment application.
 - Eligibility: `POTENTIAL_TENNESSEE_STARTUP_FIT_REQUIRES_FOUNDER_ATTESTATION`
-- Packet SHA-256: `40a98196a062e437bd280bfcd2eb4c8cebedadd3f66b65cf5e8a9b213f427d34`
+- Packet SHA-256: `4dda20f04c80fc4797d02d80aecf9c739bd835332c075f62a8fb134db069a8a2`
 - Safe upload set ready: `false`
 - Final submit without founder review: `false`
 
@@ -240,9 +240,9 @@ Generated UTC: `2026-07-29T15:01:26.264034+00:00`
 
 - Field ID: `pitch_deck`
 - Required: `true`
-- Status: `CURRENT_DECK_VENUE_COVERAGE_AND_FOUNDER_REVIEW_REQUIRED`
-- Proposed answer: Do not attach yet. Candidate output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx is present with SHA-256 4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a, but remains blocked by: LaunchTN-specific competitive landscape; business model and go-to-market framing; customer profile; founder-approved raise ask; founding-team and Tennessee eligibility facts.
-- Evidence basis: The governed current deck is structurally clean but lacks required venue-specific content
+- Status: `VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED`
+- Proposed answer: Do not attach yet. Candidate grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx is present with SHA-256 f0edebdbcf0c29457b01a40a9d7238a441797e024d72404815f08f2191a23b3a, but remains blocked by: founder confirmation of legal entity, Tennessee eligibility, team, and company-stage facts; founder approval of the $10,000 competition ask and proposed prize-use plan; exact financing or raise disclosure if live portal review requires more than the competition-prize ask; final founder visual and claim review after inserting confirmed facts.
+- Evidence basis: The LaunchTN-specific deck covers the requested topic classes and passed structural QA; founder-controlled facts and final review remain
 
 ### Upload attachments that contain information about your financials
 
@@ -272,19 +272,19 @@ Generated UTC: `2026-07-29T15:01:26.264034+00:00`
 
 ### launchtn_pitch_deck
 
-- Status: `CURRENT_DECK_VENUE_COVERAGE_AND_FOUNDER_REVIEW_REQUIRED`
-- Path: `output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx`
+- Status: `VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED`
+- Path: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx`
 - Present: `true`
-- Bytes: `356403`
-- SHA-256: `4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a`
+- Bytes: `356729`
+- SHA-256: `f0edebdbcf0c29457b01a40a9d7238a441797e024d72404815f08f2191a23b3a`
 - QA hash matches: `true`
 - Structural QA passed: `true`
 - Safe to upload: `false`
 - QA date: `2026-07-29`
 - Portal requirement: Competitive landscape, business model, go-to-market, customer profiles, raise ask, and founding team
 - Founder approval required: `true`
-- QA checks: 11-slide governed current evidence-to-pilot narrative; Every slide visually inspected at original render resolution; slides_test.py passed with no overflow detected; Current evidence counts and negative results preserved
-- Missing requirements: LaunchTN-specific competitive landscape; business model and go-to-market framing; customer profile; founder-approved raise ask; founding-team and Tennessee eligibility facts
+- QA checks: 11-slide LaunchTN-specific evidence-to-pilot narrative; Every slide visually inspected at original render resolution; slides_test.py passed with no overflow detected; Template-following plan and fidelity checks passed with no issues; Customer, competition, business model, go-to-market, team, and competition ask are visible; Current evidence counts and negative results preserved
+- Missing requirements: founder confirmation of legal entity, Tennessee eligibility, team, and company-stage facts; founder approval of the $10,000 competition ask and proposed prize-use plan; exact financing or raise disclosure if live portal review requires more than the competition-prize ask; final founder visual and claim review after inserting confirmed facts
 
 ### launchtn_financial_model
 
@@ -311,14 +311,14 @@ Generated UTC: `2026-07-29T15:01:26.264034+00:00`
 - Verify the full-time employee count under the portal's definition.
 - Confirm whether any LaunchTN capital has ever been received.
 - Approve or replace every pricing, raise, revenue, customer, hiring, margin, and cash assumption.
-- Build and visually review a LaunchTN-specific deck that covers every requested topic.
+- Confirm the founder-controlled facts and review the QA-passed LaunchTN-specific deck after the final factual insertions.
 - Recheck the live portal schema, file limits, terms, and attestations.
 - Review both required attachments and the complete final portal preview before submission.
 
 ## Final Action Gate
 
 - Status: `PORTAL_FACTS_VENUE_DECK_FINANCIAL_APPROVAL_AND_FINAL_PREVIEW_REQUIRED`
-- Action: Resolve founder and eligibility facts, rebuild the venue-specific deck, approve or replace every financial assumption, recheck the live portal, and stop at the complete final preview for action-time founder review.
+- Action: Resolve founder and eligibility facts, finalize the QA-passed venue deck, approve or replace every financial assumption, recheck the live portal, and stop at the complete final preview for action-time founder review.
 
 ## Source Artifacts
 
@@ -326,7 +326,7 @@ Generated UTC: `2026-07-29T15:01:26.264034+00:00`
 - `current_family_ledger`: present=`true` bytes=`2244585` sha256=`627d0add4d31514f7a47dbf8e8c51b0fa46df72635f336133f54abb85b00927a` path=`out/ops/source_native_family_baseline_ledger_latest.json`
 - `current_market_benchmark`: present=`true` bytes=`112638` sha256=`e2af8f9a4684714dc1243d718af99b77bd2da70d9094cee8086c324c8a3cd0ab` path=`out/ops/market_signal_source_native_benchmark_latest.json`
 - `pitch_deck_governance`: present=`true` bytes=`29307` sha256=`afdeb1628e7a9501a73206438170a25022343ea5e30ec1aba7aadaee5e4a400a` path=`out/ops/pitch_deck_governance_latest.json`
-- `application_refresh`: present=`true` bytes=`2481` sha256=`e6fd095811465578a260d1249f8fbeda3a7d68d2878326bcf422b494a67a4ca6` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_REFRESH_2026-07-29.md`
+- `application_refresh`: present=`true` bytes=`2795` sha256=`b22968d2ff708d0880370f28af9397fa46154efe099001a578dc48483754e70e` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_REFRESH_2026-07-29.md`
 - `lanl_receipt`: present=`true` bytes=`1414` sha256=`74303cfc65c85d9ef73fb80cc8177e5d08df43d03264ffce73251acd2cd9e9d0` path=`grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json`
 
 ## Claim Boundary

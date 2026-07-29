@@ -68,8 +68,10 @@ def test_manifest_matches_observed_launchtn_form_and_deadline():
     assert payload["opportunity"]["cash_prize_usd"] == 10000
     assert payload["opportunity"]["formal_investtn_application"] is False
     assert payload["opportunity"]["portal_schema_status"] == (
-        "OBSERVED_WITHOUT_SAVE_OR_SUBMIT_2026-07-17"
+        "FORM_OPEN_DEADLINE_AND_UPLOAD_FIELDS_RECHECKED_2026-07-29_"
+        "FULL_SCHEMA_AND_ATTESTATIONS_REQUIRE_LIVE_REVIEW"
     )
+    assert payload["schema"] == "lumencore.launchtn_3686_pitch_application.v2"
 
 
 def test_narratives_fit_limits_and_preserve_truth_boundaries():
@@ -89,9 +91,11 @@ def test_narratives_fit_limits_and_preserve_truth_boundaries():
         assert row["character_count"] <= row["character_limit"]
 
     assert "Planned, not yet realized" in by_id["revenue_model"]["proposed_answer"]
-    assert "no revenue or signed customer" in by_id["revenue_model"]["proposed_answer"]
+    assert "No price, raise amount, forecast" in by_id["revenue_model"]["proposed_answer"]
     assert "not field or independent validation" in by_id["achievements"]["proposed_answer"]
-    assert "not endorsements" in by_id["achievements"]["proposed_answer"]
+    assert "do not prove receipt, endorsement" in by_id["achievements"]["proposed_answer"]
+    assert "zero global Holm-positive comparisons" in by_id["achievements"]["proposed_answer"]
+    assert "zero promoted champions" in by_id["achievements"]["proposed_answer"]
     assert "go/no-go decision" in by_id["problem_customer"]["proposed_answer"]
     assert "guaranteed" not in " ".join(
         row["proposed_answer"].lower() for row in payload["fields"]
@@ -106,6 +110,9 @@ def test_private_legal_and_financial_facts_remain_gated():
     for field_id in ("founder_phone", "founder_email", "company_address", "company_zip"):
         assert by_id[field_id]["status"] == "PRIVATE_PORTAL_ENTRY"
     for field_id in (
+        "company_name",
+        "company_city",
+        "company_state",
         "company_county",
         "formation_year",
         "company_structure",
@@ -116,11 +123,13 @@ def test_private_legal_and_financial_facts_remain_gated():
     assert by_id["tennessee_eligibility"]["status"] == "HUMAN_ATTESTATION_REQUIRED"
     assert by_id["revenue_model"]["status"] == "FOUNDER_PRICING_APPROVAL_REQUIRED"
     assert by_id["pitch_deck"]["status"] == (
-        "ATTACHMENT_QA_PASSED_FOUNDER_APPROVAL_REQUIRED"
+        "VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED"
     )
     assert by_id["financials"]["status"] == (
-        "ATTACHMENT_QA_PASSED_FOUNDER_APPROVAL_REQUIRED"
+        "PLANNING_MODEL_ARITHMETIC_QA_ONLY_FOUNDER_ASSUMPTION_APPROVAL_REQUIRED"
     )
+    assert payload["summary"]["upload_set_ready"] is False
+    assert payload["safe_upload_set"] == []
     assert payload["summary"]["final_submit_allowed_without_human"] is False
     assert payload["final_action_gate"]["submit_allowed_without_human"] is False
 
@@ -155,18 +164,34 @@ def test_attachment_requirements_and_source_receipts_are_auditable():
     }
     assert all(row["founder_approval_required"] for row in payload["required_attachments"])
     assert payload["summary"]["required_attachments_present"] == 2
-    assert payload["summary"]["required_attachments_qa_passed"] == 2
+    assert payload["summary"]["required_attachments_qa_passed"] == 0
+    assert payload["summary"]["required_attachments_structural_qa_passed"] == 2
+    assert payload["summary"]["required_attachments_safe_to_upload"] == 0
     assert all(row["present"] for row in payload["required_attachments"])
     assert all(row["qa_hash_matches"] for row in payload["required_attachments"])
-    assert all(
-        row["status"] == "QA_PASSED_FOUNDER_APPROVAL_REQUIRED"
-        for row in payload["required_attachments"]
-    )
+    assert all(row["structural_qa_passed"] for row in payload["required_attachments"])
+    assert not any(row["safe_to_upload"] for row in payload["required_attachments"])
     assert all(
         row["sha256"] == row["expected_sha256"]
         for row in payload["required_attachments"]
     )
     assert all(row["qa_checks"] for row in payload["required_attachments"])
+    assert all(row["missing_requirements"] for row in payload["required_attachments"])
+    pitch_deck = next(
+        row
+        for row in payload["required_attachments"]
+        if row["id"] == "launchtn_pitch_deck"
+    )
+    assert pitch_deck["path"].endswith(
+        "LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx"
+    )
+    assert "business model and go-to-market framing" not in pitch_deck[
+        "missing_requirements"
+    ]
+    assert any(
+        "founder confirmation" in requirement
+        for requirement in pitch_deck["missing_requirements"]
+    )
     assert all(row["present"] for row in payload["source_artifacts"].values())
     assert all(
         re.fullmatch(r"[0-9a-f]{64}", row["sha256"] or "")
@@ -182,7 +207,8 @@ def test_rendered_map_is_private_safe_and_final_action_gated():
     lowered = rendered.lower()
 
     assert "Final submit without founder review: `false`" in rendered
-    assert "HUMAN_FACTS_FOUNDER_APPROVAL_AND_FINAL_PREVIEW_REQUIRED" in rendered
+    assert "PORTAL_FACTS_VENUE_DECK_FINANCIAL_APPROVAL_AND_FINAL_PREVIEW_REQUIRED" in rendered
+    assert "Safe upload set ready: `false`" in rendered
     assert "This is not the formal InvestTN investment application" in rendered
     assert "@gmail.com" not in lowered
     assert re.search(r"\(\d{3}\)\s*\d{3}-\d{4}", rendered) is None
@@ -192,7 +218,7 @@ def test_rendered_map_is_private_safe_and_final_action_gated():
     assert "permission to submit without a founder-reviewed final preview" in lowered
 
 
-def test_launchtn_bounded_mirror_receipt_matches_source_and_e_drive():
+def test_historical_launchtn_bounded_mirror_receipt_is_not_current():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -200,17 +226,6 @@ def test_launchtn_bounded_mirror_receipt_matches_source_and_e_drive():
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["browser_navigation_performed"] is False
     assert receipt["private_founder_values_mirrored"] is False
-    destination = Path(receipt["destination_root"])
-    for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
-        mirror = destination / source.name
-        assert source.is_file(), artifact["source"]
-        assert mirror.is_file(), str(mirror)
-        assert source.stat().st_size == artifact["bytes"], artifact["source"]
-        assert mirror.stat().st_size == artifact["bytes"], artifact["source"]
-        assert hashlib.sha256(source.read_bytes()).hexdigest().upper() == artifact["sha256"]
-        assert hashlib.sha256(mirror.read_bytes()).hexdigest().upper() == artifact["sha256"]
-        assert artifact["copy_sha256_matched"] is True
 
     mirrored_sources = {artifact["source"] for artifact in receipt["artifacts"]}
     assert {
@@ -223,4 +238,11 @@ def test_launchtn_bounded_mirror_receipt_matches_source_and_e_drive():
         "code/ops/BUILD_EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER.py",
         "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
     }.issubset(mirrored_sources)
+    assert not any("2026-07-29" in source for source in mirrored_sources)
+    builder = next(
+        artifact
+        for artifact in receipt["artifacts"]
+        if artifact["source"] == "code/ops/BUILD_LAUNCHTN_3686_PITCH_APPLICATION.py"
+    )
+    assert hashlib.sha256(SCRIPT.read_bytes()).hexdigest().upper() != builder["sha256"]
     assert "does not prove submission" in receipt["claim_boundary"].lower()
