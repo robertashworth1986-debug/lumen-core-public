@@ -81,7 +81,7 @@
       "test_receipt_refs": [
         {
           "path": "tests/test_quant_hub_reviewer_context.py",
-          "expected_sha256": "b1af9b3a07603e7bd9a8d4b3a75d84658d7ad3fedcda5495f464798271d819ca"
+          "expected_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9"
         },
         {
           "path": "out/reproducibility/reviewer_capsule_latest/reviewer_reproducibility_receipt.json",
@@ -92,38 +92,38 @@
     {
       "id": "quant_hub_reviewer_context_json",
       "source_path": "dashboard/data/quant_hub_reviewer_context.json",
-      "expected_source_sha256": "c684833237a76569b39500b4e38d6c6922f450ef7b9923da0774a0f0f58b61d6",
+      "expected_source_sha256": "9dea5125d91c94eab2fe87ef4a4ae01b0997525e443c31e0b8adc18de24818a4",
       "target_path": "dashboard/data/quant_hub_reviewer_context.json",
       "public_url": "https://lumen-core.ai/data/quant_hub_reviewer_context.json",
       "mime_type": "application/json",
       "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
       "claim_boundary": "The feed reports bounded internal measurement and provenance state with explicit limitations; it does not establish external validation, government approval, or realized economic outcomes.",
-      "source_commit": "e96f15021f6ab37d37dbcdbd53c8f14ce76ea2fd",
+      "source_commit": "03f40a5de614d16a4f48e8796a64c7ef11c78126",
       "last_validated_utc": "2026-07-16T02:55:08Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
           "path": "tests/test_quant_hub_reviewer_context.py",
-          "expected_sha256": "b1af9b3a07603e7bd9a8d4b3a75d84658d7ad3fedcda5495f464798271d819ca"
+          "expected_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9"
         }
       ]
     },
     {
       "id": "quant_hub_reviewer_context_markdown",
       "source_path": "docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md",
-      "expected_source_sha256": "8b777c293ab5371b5bc8220fc715a961efb10eba3e441bf9a025b6d5ea65225d",
+      "expected_source_sha256": "690679b8e4967e86cf9a7a3836ae0b2e19a838825aed73db1d01e768ffbe94ab",
       "target_path": "dashboard/evidence/QUANT_HUB_REVIEWER_CONTEXT.md",
       "public_url": "https://lumen-core.ai/evidence/QUANT_HUB_REVIEWER_CONTEXT.md",
       "mime_type": "text/markdown",
       "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
       "claim_boundary": "The reviewer context summarizes bounded internal evidence and its limitations; it does not establish external validation, government approval, or realized economic outcomes.",
-      "source_commit": "e96f15021f6ab37d37dbcdbd53c8f14ce76ea2fd",
+      "source_commit": "03f40a5de614d16a4f48e8796a64c7ef11c78126",
       "last_validated_utc": "2026-07-16T02:55:08Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
           "path": "tests/test_quant_hub_reviewer_context.py",
-          "expected_sha256": "b1af9b3a07603e7bd9a8d4b3a75d84658d7ad3fedcda5495f464798271d819ca"
+          "expected_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9"
         }
       ]
     },
@@ -139,7 +139,7 @@
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "b0601a121247c790a153814609336eb7c2fc28b3069ddfeec90c470e080229d7"
+        "expected_sha256": "b43f8583aba4de9ba9c92fca7e43752c6f4b90621cd23ffe199b5d736012a1dd"
       },
       "last_validated_utc": "2026-07-29T13:50:39Z",
       "max_age_hours": 720,
@@ -161,23 +161,23 @@
     {
       "id": "source_native_benchmark_whitepaper_pdf",
       "source_path": "output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf",
-      "expected_source_sha256": "8a567a033c3dbe51da23477f296f0782a105e6a40f54f20597a459244e9ce91b",
-      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_8A567A033C3D.pdf",
-      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_8A567A033C3D.pdf",
+      "expected_source_sha256": "2476b88bc8b49d14bde6468fd30b05131778ed9915381b9bb2b7a78adb5b2d5a",
+      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_2476B88BC8B4.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_2476B88BC8B4.pdf",
       "mime_type": "application/pdf",
       "claim_state": "PROVENANCE_AND_REPRODUCIBILITY",
       "claim_boundary": "The whitepaper documents source-native protocols, measured comparison coverage, limitations, and negative results; it does not establish universal superiority, external validation, field performance, or realized economic value.",
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "b0601a121247c790a153814609336eb7c2fc28b3069ddfeec90c470e080229d7"
+        "expected_sha256": "b43f8583aba4de9ba9c92fca7e43752c6f4b90621cd23ffe199b5d736012a1dd"
       },
       "last_validated_utc": "2026-07-29T13:50:39Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
           "path": "code/ops/BUILD_SOURCE_NATIVE_RESEARCH_WHITEPAPER.py",
-          "expected_sha256": "8d4b9061308535b1d3f2efbde40f6c4882edf44e57800c42635b0720f63ed372"
+          "expected_sha256": "91bec19c4544cefc5403cc76e77b4a17d27511e0a6c0960453e5755dcbbce900"
         },
         {
           "path": "tests/test_source_native_research_whitepaper.py",
@@ -197,7 +197,7 @@
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "b0601a121247c790a153814609336eb7c2fc28b3069ddfeec90c470e080229d7"
+        "expected_sha256": "b43f8583aba4de9ba9c92fca7e43752c6f4b90621cd23ffe199b5d736012a1dd"
       },
       "last_validated_utc": "2026-07-29T13:50:39Z",
       "max_age_hours": 720,
