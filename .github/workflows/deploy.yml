@@ -1,61 +1,72 @@
-name: Deploy bounded LumenCore site to VPS
+name: Deploy public reviewer release to VPS
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'dashboard/**/*.html'
-      - 'assets/**'
-      - 'data/*.json'
-      - '*.html'
-      - 'code/ops/repair_evidence_route.py'
-      - 'code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh'
-      - 'code/deploy/nginx/lumatrader.conf'
-      - '.github/workflows/deploy.yml'
   workflow_dispatch:
+    inputs:
+      release_plan_sha256:
+        description: Exact plan_sha256 from PUBLIC_RELEASE_SYNC_PLAN_2026-07-18.json
+        required: true
+        type: string
+      confirm_publication:
+        description: Explicit action-time publication confirmation
+        required: true
+        type: choice
+        default: DO_NOT_PUBLISH
+        options:
+          - DO_NOT_PUBLISH
+          - PUBLISH_PUBLIC_REVIEWER_RELEASE
 
 permissions:
   contents: read
-  statuses: write
 
 concurrency:
-  group: lumencore-production-site
+  group: public-reviewer-release-production
   cancel-in-progress: false
 
 jobs:
   deploy:
+    if: ${{ inputs.confirm_publication == 'PUBLISH_PUBLIC_REVIEWER_RELEASE' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
 
     steps:
-      - name: Mark production deployment pending
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify exact plan, HumanUnlock, and build isolated stage
+        id: release
         env:
-          GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
-          COMMIT_SHA: ${{ github.sha }}
-          TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EXPECTED_RELEASE_PLAN_SHA256: ${{ inputs.release_plan_sha256 }}
+          LUMA_HUMAN_UNLOCK_TOKEN: ${{ secrets.LUMA_HUMAN_UNLOCK_TOKEN }}
         run: |
           set -euo pipefail
-          python3 - <<'PY' > /tmp/deploy-status.json
-          import json, os
-          print(json.dumps({
-              "state": "pending",
-              "target_url": os.environ["TARGET_URL"],
-              "description": "Bounded VPS deployment is running",
-              "context": "production/lumencore-vps",
-          }))
-          PY
-          curl --fail-with-body -sS \
-            -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
-            --data-binary @/tmp/deploy-status.json
+          if [ "${#LUMA_HUMAN_UNLOCK_TOKEN}" -lt 32 ]; then
+            echo "::error::Action-time HumanUnlock is missing or too short."
+            exit 1
+          fi
+          PLAN_SHA256="$(
+            python - <<'PY'
+          import json
+          from pathlib import Path
 
-      - name: Checkout
-        uses: actions/checkout@v6
+          plan = json.loads(
+              Path("out/ops/PUBLIC_RELEASE_SYNC_PLAN_2026-07-18.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          print(plan["plan_sha256"])
+          PY
+          )"
+          if [ "$PLAN_SHA256" != "$EXPECTED_RELEASE_PLAN_SHA256" ]; then
+            echo "::error::Workflow input does not match the checked-out release plan."
+            exit 1
+          fi
+          unset LUMA_HUMAN_UNLOCK_TOKEN
+          python code/ops/BUILD_PUBLIC_RELEASE_STAGE_BUNDLE.py --stage
+          STAGE_ROOT=".deploy_stage/public_reviewer_release_${PLAN_SHA256:0:16}"
+          test -f "$STAGE_ROOT/manifest.json"
+          echo "stage_root=$STAGE_ROOT" >> "$GITHUB_OUTPUT"
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -63,292 +74,82 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
 
-      - name: Verify SSH connectivity
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
-            'printf "SSH_OK\n"'
-
-      - name: Verify passwordless sudo
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
-            'sudo -n true && printf "SUDO_OK\n"'
-
-      - name: Ensure remote transfer dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
-            set -eu
-            missing=""
-            for command_name in rsync python3 curl; do
-              if ! command -v "$command_name" >/dev/null 2>&1; then
-                missing="$missing $command_name"
-              fi
-            done
-            if [ -n "$missing" ]; then
-              if command -v dnf >/dev/null 2>&1; then
-                sudo -n dnf install -y $missing
-              elif command -v yum >/dev/null 2>&1; then
-                sudo -n yum install -y $missing
-              elif command -v apt-get >/dev/null 2>&1; then
-                sudo -n apt-get update -qq
-                sudo -n apt-get install -y $missing
-              else
-                echo "ERROR: no supported package manager for:$missing" >&2
-                exit 1
-              fi
-            fi
-            command -v rsync
-            command -v python3
-            command -v curl
-          '
-
-      - name: Verify active Nginx edge
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
-            set -eu
-            sudo -n nginx -t
-            sudo -n systemctl is-active --quiet nginx
-            echo "Active nginx candidates:"
-            found=0
-            for candidate in \
-              /etc/nginx/sites-enabled/lumatrader \
-              /etc/nginx/sites-available/lumatrader \
-              /etc/nginx/conf.d/lumatrader.conf; do
-              if [ -e "$candidate" ] || [ -L "$candidate" ]; then
-                found=$((found + 1))
-                printf "  %s -> %s\n" "$candidate" "$(readlink -f "$candidate" 2>/dev/null || printf unknown)"
-              fi
-            done
-            if [ "$found" -eq 0 ]; then
-              echo "ERROR: no lumatrader nginx candidate was found" >&2
-              exit 1
-            fi
-          '
-
-      - name: Capture VPS storage and identity
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
-            set -eu
-            printf "Remote identity: "
-            id
-            printf "Filesystem capacity:\n"
-            df -hP / /opt
-            printf "Filesystem inodes:\n"
-            df -iP / /opt
-          ' | tee /tmp/lumencore-vps-preflight.txt
-
-      - name: Verify VPS disk capacity
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
-            set -eu
-            set -- $(df -Pk /opt | tail -n 1)
-            available_kb="$4"
-            if [ "$available_kb" -lt 131072 ]; then
-              sudo -n journalctl --vacuum-size=50M >/dev/null 2>&1 || true
-              sudo -n dnf clean all >/dev/null 2>&1 || true
-              sudo -n yum clean all >/dev/null 2>&1 || true
-              sudo -n apt-get clean >/dev/null 2>&1 || true
-              set -- $(df -Pk /opt | tail -n 1)
-              available_kb="$4"
-            fi
-            printf "AVAILABLE_KB=%s\n" "$available_kb"
-            if [ "$available_kb" -lt 131072 ]; then
-              echo "ERROR: fewer than 128 MiB remain on the VPS filesystem" >&2
-              exit 1
-            fi
-          '
-
-      - name: Verify VPS inode capacity
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
-            set -eu
-            set -- $(df -Pi /opt | tail -n 1)
-            available_inodes="$4"
-            printf "AVAILABLE_INODES=%s\n" "$available_inodes"
-            if [ "$available_inodes" -lt 2048 ]; then
-              echo "ERROR: fewer than 2048 inodes remain on the VPS filesystem" >&2
-              exit 1
-            fi
-          '
-
-      - name: Prepare root-owned content directories
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
-            set -eu
-            sudo -n install -d -m 755 \
-              /opt/lumencore \
-              /opt/lumencore/dashboard \
-              /opt/lumencore/dashboard/data \
-              /opt/lumencore/data
-            for directory in \
-              /opt/lumencore \
-              /opt/lumencore/dashboard \
-              /opt/lumencore/dashboard/data \
-              /opt/lumencore/data; do
-              sudo -n test -d "$directory"
-            done
-            printf "CONTENT_DIRECTORIES_OK\n"
-          '
-
-      - name: Prepare writable repair staging directory
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
-            set -eu
-            remote_uid="$(id -u)"
-            remote_gid="$(id -g)"
-            sudo -n rm -rf /tmp/lumencore-evidence-route
-            sudo -n install -d -m 700 /tmp/lumencore-evidence-route
-            sudo -n chown "$remote_uid:$remote_gid" /tmp/lumencore-evidence-route
-            test -w /tmp/lumencore-evidence-route
-            probe="/tmp/lumencore-evidence-route/.lumencore-write-test.$$"
-            : > "$probe"
-            rm -f "$probe"
-            printf "REPAIR_STAGING_OK uid=%s gid=%s\n" "$remote_uid" "$remote_gid"
-          '
-
-      - name: Upload VPS preflight diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: vps-preflight-${{ github.run_id }}
-          path: /tmp/lumencore-vps-preflight.txt
-          if-no-files-found: warn
-          retention-days: 7
-
-      - name: Sync dashboard assets
-        shell: bash
-        run: |
-          set -euo pipefail
-          rsync -rlvz --delete --inplace --size-only --no-perms --omit-dir-times \
-            --rsync-path="sudo -n rsync" \
-            --exclude='*.py' \
-            --exclude='*.ps1' \
-            --exclude='.git/' \
-            --exclude='node_modules/' \
-            --exclude='data/' \
-            --exclude='assets/vendor/three.min.js' \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            dashboard/ \
-            "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/"
-
-      - name: Sync data snapshots
-        shell: bash
-        run: |
-          set -euo pipefail
-          rsync -rlvz --inplace --size-only --no-perms --omit-dir-times \
-            --rsync-path="sudo -n rsync" \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            data/ \
-            "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/data/"
-
-          rsync -rlvz --delete --inplace --size-only --no-perms --omit-dir-times \
-            --rsync-path="sudo -n rsync" \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            data/ \
-            "opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/data/"
-
-      - name: Upload bounded repair tools
-        shell: bash
-        run: |
-          set -euo pipefail
-          rsync -rlvz --inplace --no-perms --omit-dir-times \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            code/ops/repair_evidence_route.py \
-            code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh \
-            "opc@${{ secrets.VPS_HOST }}:/tmp/lumencore-evidence-route/"
-
-      - name: Apply bounded evidence route repair
-        shell: bash
-        run: |
-          set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" \
-            "sudo -n bash /tmp/lumencore-evidence-route/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh --apply"
-
-      - name: Smoke test canonical production surfaces
-        shell: bash
-        run: |
-          set -euo pipefail
-          tmp_root="$(mktemp)"
-          tmp_evidence="$(mktemp)"
-          tmp_data="$(mktemp)"
-          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data"' EXIT
-
-          status() {
-            local url="$1"
-            local output="$2"
-            curl -sS --max-time 15 -o "$output" -w '%{http_code}' "$url" || true
-          }
-
-          ROOT="$(status "https://lumen-core.ai/?deploy=${GITHUB_SHA}" "$tmp_root")"
-          EVIDENCE="$(status "https://lumen-core.ai/evidence/?deploy=${GITHUB_SHA}" "$tmp_evidence")"
-          DATA="$(status "https://lumen-core.ai/data/site_health.json?deploy=${GITHUB_SHA}" "$tmp_data")"
-
-          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000}"
-
-          [[ "$ROOT" == "200" ]]
-          [[ "$EVIDENCE" == "200" ]]
-          [[ "$DATA" == "200" ]]
-          grep -Fq 'One proof path. One bounded decision.' "$tmp_root"
-          grep -Fq 'name="lumencore-surface" content="proof-to-pilot-evidence-v1"' "$tmp_evidence"
-          python3 -m json.tool "$tmp_data" >/dev/null
-
-          echo "Production root, bounded evidence page, and health JSON are live."
-
-      - name: Publish production deployment receipt
-        if: always()
+      - name: Sync staged reviewer release to VPS
         env:
-          GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
-          COMMIT_SHA: ${{ github.sha }}
-          TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          JOB_STATUS: ${{ job.status }}
+          STAGE_ROOT: ${{ steps.release.outputs.stage_root }}
         run: |
           set -euo pipefail
-          case "$JOB_STATUS" in
-            success)
-              STATE=success
-              DESCRIPTION="Bounded VPS deployment passed all smoke tests"
-              ;;
-            cancelled)
-              STATE=error
-              DESCRIPTION="Bounded VPS deployment was cancelled"
-              ;;
-            *)
-              STATE=failure
-              DESCRIPTION="Bounded VPS deployment failed or rolled back"
-              ;;
-          esac
-          export STATE DESCRIPTION
-          python3 - <<'PY' > /tmp/deploy-status.json
-          import json, os
-          print(json.dumps({
-              "state": os.environ["STATE"],
-              "target_url": os.environ["TARGET_URL"],
-              "description": os.environ["DESCRIPTION"],
-              "context": "production/lumencore-vps",
-          }))
+          test -f "$STAGE_ROOT/manifest.json"
+          rsync -avz \
+            -e "ssh -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
+            "$STAGE_ROOT/dashboard/" \
+            opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/
+
+      - name: Verify immutable public artifact hashes
+        env:
+          STAGE_ROOT: ${{ steps.release.outputs.stage_root }}
+        run: |
+          set -euo pipefail
+          python - "$STAGE_ROOT/manifest.json" <<'PY' > /tmp/release-verification.tsv
+          import json
+          import sys
+
+          manifest = json.load(open(sys.argv[1], encoding="utf-8"))
+          for row in manifest["files"]:
+              print(
+                  row["source_sha256"],
+                  row["mime_type"],
+                  row["public_url"],
+                  sep="\t",
+              )
           PY
-          curl --fail-with-body -sS \
-            -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
-            --data-binary @/tmp/deploy-status.json
+          while IFS=$'\t' read -r expected_sha expected_mime url; do
+            body="$(mktemp)"
+            headers="$(mktemp)"
+            repeat_body="$(mktemp)"
+            head_status="$(
+              curl -sS --max-time 30 -I -o /dev/null -w "%{http_code}" "$url"
+            )"
+            if [ "$head_status" != "200" ]; then
+              echo "::error::Published HEAD status is $head_status for $url"
+              rm -f "$body" "$headers" "$repeat_body"
+              exit 1
+            fi
+            curl -fsS --max-time 30 -D "$headers" "$url" -o "$body"
+            observed_mime="$(
+              awk '
+                BEGIN { IGNORECASE=1 }
+                /^content-type:/ {
+                  gsub("\r", "")
+                  split($0, pair, ":")
+                  split(pair[2], value, ";")
+                  gsub(/^[ \t]+|[ \t]+$/, "", value[1])
+                  result=value[1]
+                }
+                END { print result }
+              ' "$headers"
+            )"
+            if [ "$observed_mime" != "$expected_mime" ]; then
+              echo "::error::Published MIME mismatch for $url"
+              rm -f "$body" "$headers" "$repeat_body"
+              exit 1
+            fi
+            observed_sha="$(sha256sum "$body" | awk '{print $1}')"
+            if [ "$observed_sha" != "$expected_sha" ]; then
+              echo "::error::Published hash mismatch for $url"
+              rm -f "$body" "$headers" "$repeat_body"
+              exit 1
+            fi
+            case "$url" in
+              *\?*) cache_url="${url}&release_verify=${expected_sha}" ;;
+              *) cache_url="${url}?release_verify=${expected_sha}" ;;
+            esac
+            curl -fsS --max-time 30 "$cache_url" -o "$repeat_body"
+            repeat_sha="$(sha256sum "$repeat_body" | awk '{print $1}')"
+            rm -f "$body" "$headers" "$repeat_body"
+            if [ "$repeat_sha" != "$expected_sha" ]; then
+              echo "::error::Cache-bypass hash mismatch for $url"
+              exit 1
+            fi
+          done < /tmp/release-verification.tsv
+          echo "All immutable reviewer artifacts match the sealed local stage."

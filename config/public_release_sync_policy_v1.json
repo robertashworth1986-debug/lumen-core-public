@@ -1,0 +1,228 @@
+{
+  "schema": "lumencore.public_release_sync_policy.v1",
+  "status": "frozen",
+  "mode": "DRY_RUN_ONLY",
+  "purpose": "Allowlist reviewer-safe artifacts for a deterministic local sync preflight while prohibiting credentials, private material, unsupported claims, overwrites, and all autonomous network actions.",
+  "allowed_source_roots": [
+    "dashboard/data",
+    "docs",
+    "output/pdf"
+  ],
+  "allowed_target_roots": [
+    "dashboard/data",
+    "dashboard/evidence"
+  ],
+  "allowed_extension_mime": {
+    ".html": "text/html",
+    ".json": "application/json",
+    ".md": "text/markdown",
+    ".pdf": "application/pdf",
+    ".svg": "image/svg+xml"
+  },
+  "allowed_claim_states": [
+    "BOUNDED_INTERNAL_EVIDENCE",
+    "NO_PERFORMANCE_CLAIM",
+    "PROCESS_RECEIPT",
+    "PROVENANCE_AND_REPRODUCIBILITY"
+  ],
+  "denied_path_tokens": [
+    ".env",
+    ".git",
+    "api_key",
+    "apikey",
+    "credential",
+    "gmail",
+    "grant_submissions",
+    "inbox",
+    "mailbox",
+    "oauth",
+    "otp",
+    "patent",
+    "personally_identifiable",
+    "pii",
+    "portal",
+    "private",
+    "raw_email",
+    "registry",
+    "secret",
+    "session",
+    "token"
+  ],
+  "allowed_public_hosts": [
+    "lumen-core.ai",
+    "www.lumen-core.ai"
+  ],
+  "allowed_public_url_prefixes": [
+    "/data/",
+    "/evidence/"
+  ],
+  "max_source_bytes": 5000000,
+  "max_source_age_hours": 720,
+  "network_actions": {
+    "deploy": "HUMAN_UNLOCK_REQUIRED",
+    "email": "HUMAN_UNLOCK_REQUIRED",
+    "post": "HUMAN_UNLOCK_REQUIRED",
+    "publish": "HUMAN_UNLOCK_REQUIRED",
+    "push": "HUMAN_UNLOCK_REQUIRED"
+  },
+  "allowlist": [
+    {
+      "id": "model_geometry_evidence_ledger",
+      "source_path": "docs/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER_2026-07-13.md",
+      "expected_source_sha256": "b8af64d9a54ccf373b9e8e9c8a09f6188b77cf02388d9b1e6c0801cfa5360244",
+      "target_path": "dashboard/evidence/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER.md",
+      "public_url": "https://lumen-core.ai/evidence/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER.md",
+      "mime_type": "text/markdown",
+      "claim_state": "PROVENANCE_AND_REPRODUCIBILITY",
+      "claim_boundary": "The ledger inventories bounded internal evidence and reproducibility state; it does not establish external validation, government approval, field performance, or commercial value.",
+      "source_commit": "27c84ae9467c513300a114664518aaf7e01ea048",
+      "last_validated_utc": "2026-07-13T21:41:39Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "tests/test_quant_hub_reviewer_context.py",
+          "expected_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9"
+        },
+        {
+          "path": "out/reproducibility/reviewer_capsule_latest/reviewer_reproducibility_receipt.json",
+          "expected_sha256": "2a55297c369fac57062ba8bce975348e588d6589a882f6fb554a9ced5c0e3acb"
+        }
+      ]
+    },
+    {
+      "id": "quant_hub_reviewer_context_json",
+      "source_path": "dashboard/data/quant_hub_reviewer_context.json",
+      "expected_source_sha256": "ca7e01fd443a5bf57341a229d3dd881b528131ccded4f8b0108fddc50af76aaf",
+      "target_path": "dashboard/data/quant_hub_reviewer_context.json",
+      "public_url": "https://lumen-core.ai/data/quant_hub_reviewer_context.json",
+      "mime_type": "application/json",
+      "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
+      "claim_boundary": "The feed reports bounded internal measurement and provenance state with explicit limitations; it does not establish external validation, government approval, or realized economic outcomes.",
+      "source_commit": "3ef872e7f9e940c8ce5ebfefdc2b18b444b40910",
+      "last_validated_utc": "2026-07-16T02:55:08Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "tests/test_quant_hub_reviewer_context.py",
+          "expected_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9"
+        }
+      ]
+    },
+    {
+      "id": "quant_hub_reviewer_context_markdown",
+      "source_path": "docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md",
+      "expected_source_sha256": "ba3211de559ca42d8149913543e99e8b2cee7eae1e982b97ddd526b5825dd227",
+      "target_path": "dashboard/evidence/QUANT_HUB_REVIEWER_CONTEXT.md",
+      "public_url": "https://lumen-core.ai/evidence/QUANT_HUB_REVIEWER_CONTEXT.md",
+      "mime_type": "text/markdown",
+      "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
+      "claim_boundary": "The reviewer context summarizes bounded internal evidence and its limitations; it does not establish external validation, government approval, or realized economic outcomes.",
+      "source_commit": "3ef872e7f9e940c8ce5ebfefdc2b18b444b40910",
+      "last_validated_utc": "2026-07-16T02:55:08Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "tests/test_quant_hub_reviewer_context.py",
+          "expected_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9"
+        }
+      ]
+    },
+    {
+      "id": "current_evidence_to_pilot_deck_pdf",
+      "source_path": "output/pdf/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pdf",
+      "expected_source_sha256": "d46096d88e3c2805cfff5a5f9f4e6e6e9c310e55e7e290c9f95cc8ca975d4aed",
+      "target_path": "dashboard/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_D46096D88E3C.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_D46096D88E3C.pdf",
+      "mime_type": "application/pdf",
+      "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
+      "claim_boundary": "The deck reports bounded internal software, custody, and source-native benchmark state; it does not establish model superiority, alpha, field performance, savings, revenue, valuation, customer adoption, award, or contract status.",
+      "provenance_mode": "GENERATED_RECEIPTS",
+      "artifact_receipt_ref": {
+        "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
+        "expected_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555"
+      },
+      "last_validated_utc": "2026-07-30T04:18:00Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "code/ops/BUILD_PITCH_DECK_GOVERNANCE.py",
+          "expected_sha256": "876deeaca05297b43016321f5782466a3300c62528113b18c0ec8ac6d3f58756"
+        },
+        {
+          "path": "tests/test_pitch_deck_governance.py",
+          "expected_sha256": "2693386c1eb0509c0603669a2c2cbc7c5a311015f05c75c9814b06fd6d488557"
+        },
+        {
+          "path": "output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx",
+          "expected_sha256": "4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a"
+        }
+      ]
+    },
+    {
+      "id": "source_native_benchmark_whitepaper_pdf",
+      "source_path": "output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf",
+      "expected_source_sha256": "e407897065ff0d695eec240112ee4a54cd7bc6c3ab509245d2728b253ddcba59",
+      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf",
+      "mime_type": "application/pdf",
+      "claim_state": "PROVENANCE_AND_REPRODUCIBILITY",
+      "claim_boundary": "The whitepaper documents source-native protocols, measured comparison coverage, limitations, and negative results; it does not establish universal superiority, external validation, field performance, or realized economic value.",
+      "provenance_mode": "GENERATED_RECEIPTS",
+      "artifact_receipt_ref": {
+        "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
+        "expected_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555"
+      },
+      "last_validated_utc": "2026-07-30T04:18:00Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "code/ops/BUILD_SOURCE_NATIVE_RESEARCH_WHITEPAPER.py",
+          "expected_sha256": "aa483df50d83d2f0ebea10f7466b0e1a3275245e3e331da987d6b862396f4d3e"
+        },
+        {
+          "path": "tests/test_source_native_research_whitepaper.py",
+          "expected_sha256": "673ee84d6daed37b89c52b2da00e07d1fd65f606fcc7ed9346033c0183747bbf"
+        }
+      ]
+    },
+    {
+      "id": "federal_capability_statement_pdf",
+      "source_path": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf",
+      "expected_source_sha256": "f7e9ed937196aedc4afdc22e2c51258dd0cf2225200d5eab931da9bfef16c03b",
+      "target_path": "dashboard/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_F7E9ED937196.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_F7E9ED937196.pdf",
+      "mime_type": "application/pdf",
+      "claim_state": "NO_PERFORMANCE_CLAIM",
+      "claim_boundary": "The capability statement describes current software, evidence controls, and bounded federal-use fit; it does not establish certification, government approval, award status, model superiority, field performance, or economic outcomes.",
+      "provenance_mode": "GENERATED_RECEIPTS",
+      "artifact_receipt_ref": {
+        "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
+        "expected_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555"
+      },
+      "last_validated_utc": "2026-07-30T04:18:00Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "code/ops/BUILD_MONDAY_FEDERAL_ACTION_PACKET.py",
+          "expected_sha256": "592b10bc192bc20ed4aa62626eb341a8aa5f18c7427ed8c837623464503eed81"
+        },
+        {
+          "path": "config/monday_federal_action_packet_v1.json",
+          "expected_sha256": "3d322e18b940f416710822d80f35a001662e93e12b65f5f0e4fb8f96a9d779e9"
+        },
+        {
+          "path": "tests/test_monday_federal_action_packet.py",
+          "expected_sha256": "a70557332a303aae1e10865765f700f5ac9e8e4fda0ae04944cc74dc2f72b027"
+        },
+        {
+          "path": "code/ops/BUILD_CAPABILITY_STATEMENT_GOVERNANCE.py",
+          "expected_sha256": "8cfb3394c87865817daa29433c0eaf1ee88ec6b5cd76375ad57ce201a6165581"
+        },
+        {
+          "path": "tests/test_capability_statement_governance.py",
+          "expected_sha256": "2e2d6089af70c4562ccedefb094dcecefbb09aadc0bb2bda3e1b9bd93e9230c7"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "all_upstream_dependencies_fresh": true,
+  "artifact_count": 4,
+  "artifacts": [
+    {
+      "bytes": 890365,
+      "external_release_authorized": false,
+      "id": "current_capability_statement",
+      "immutable_target_path": "dashboard/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_F7E9ED937196.pdf",
+      "local_only": false,
+      "path": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_F7E9ED937196.pdf",
+      "publication_state": "LOCAL_TARGET_ABSENT_NOT_PUBLISHED",
+      "release_item_id": "federal_capability_statement_pdf",
+      "sha256": "F7E9ED937196AEDC4AFDC22E2C51258DD0CF2225200D5EAB931DA9BFEF16C03B",
+      "status": "CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED",
+      "upstream_dependency_fresh": true
+    },
+    {
+      "bytes": 356403,
+      "external_release_authorized": false,
+      "id": "current_evidence_to_pilot_deck",
+      "immutable_target_path": null,
+      "local_only": true,
+      "path": "output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx",
+      "public_url": null,
+      "publication_state": "LOCAL_ONLY_SOURCE_NOT_PUBLICATION_CANDIDATE",
+      "release_item_id": null,
+      "sha256": "4DF644106AC2A4DF146A09A9F04A08535C88983A5DCE4DED48E2FB72C28EC55A",
+      "status": "CURRENT_HUMAN_REVIEW_REQUIRED",
+      "upstream_dependency_fresh": true
+    },
+    {
+      "bytes": 322466,
+      "external_release_authorized": false,
+      "id": "current_evidence_to_pilot_deck_pdf",
+      "immutable_target_path": "dashboard/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_D46096D88E3C.pdf",
+      "local_only": false,
+      "path": "output/pdf/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_D46096D88E3C.pdf",
+      "publication_state": "LOCAL_TARGET_ABSENT_NOT_PUBLISHED",
+      "release_item_id": "current_evidence_to_pilot_deck_pdf",
+      "sha256": "D46096D88E3C2805CFFF5A5F9F4E6E6E9C310E55E7E290C9F95CC8CA975D4AED",
+      "status": "CURRENT_PDF_COMPANION_HUMAN_REVIEW_REQUIRED",
+      "upstream_dependency_fresh": true
+    },
+    {
+      "bytes": 896055,
+      "external_release_authorized": false,
+      "id": "current_source_native_whitepaper",
+      "immutable_target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf",
+      "local_only": false,
+      "path": "output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf",
+      "publication_state": "LOCAL_TARGET_ABSENT_NOT_PUBLISHED",
+      "release_item_id": "source_native_benchmark_whitepaper_pdf",
+      "sha256": "E407897065FF0D695EEC240112EE4A54CD7BC6C3AB509245D2728B253DDCBA59",
+      "status": "CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED",
+      "upstream_dependency_fresh": true
+    }
+  ],
+  "as_of_utc": "2026-07-30T04:07:00.186149Z",
+  "claim_boundary": "This manifest binds exact local reviewer-artifact paths, byte counts, and SHA-256 values. It does not authorize publication or sending and does not establish external validation, model superiority, field performance, award, contract, revenue, savings, or valuation.",
+  "external_release_authorized": false,
+  "manifest_sha256": "C383D03F83029AE374702AE0D55A36B6147E9FEDD108FAE17C7B9A93AE27225E",
+  "network_action_performed": false,
+  "schema": "lumencore.current_reviewer_public_artifact_manifest.v1",
+  "status": "SEALED_LOCAL_ARTIFACT_MANIFEST_HUMAN_RELEASE_REQUIRED"
+}
