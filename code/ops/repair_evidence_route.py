@@ -134,6 +134,11 @@ def _static_blocks(document_root: Path | str) -> str:
         index index_bounded.html;
         try_files $uri $uri/ =404;
         add_header Cache-Control \"no-cache\" always;
+
+        location ~* \\.md$ {{
+            default_type text/markdown;
+            try_files $uri =404;
+        }}
     }}
 """
 
@@ -154,6 +159,7 @@ def repair_config(
         f"root {root};" in current
         and "index index_bounded.html;" in current
         and "try_files $uri $uri/ =404;" in current
+        and "default_type text/markdown;" in current
         and "proxy_pass" not in current
         and redirect is not None
     )
@@ -191,6 +197,8 @@ def validate_repaired_config(
         "index index_bounded.html;",
         "try_files $uri $uri/ =404;",
         'add_header Cache-Control "no-cache" always;',
+        "location ~* \\.md$ {",
+        "default_type text/markdown;",
     )
     missing = [item for item in required if item not in block]
     if missing:

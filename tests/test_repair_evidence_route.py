@@ -28,7 +28,7 @@ PROXIED = """server {
 }
 """
 
-STATIC = """server {
+STATIC = r"""server {
     listen 443 ssl;
 
     location = /evidence {
@@ -40,6 +40,11 @@ STATIC = """server {
         index index_bounded.html;
         try_files $uri $uri/ =404;
         add_header Cache-Control "no-cache" always;
+
+        location ~* \.md$ {
+            default_type text/markdown;
+            try_files $uri =404;
+        }
     }
 
     location / {
@@ -56,6 +61,7 @@ class RepairEvidenceRouteTests(unittest.TestCase):
         self.assertIn("location = /evidence", result.repaired)
         self.assertIn(f"root {ROOT};", result.repaired)
         self.assertIn("index index_bounded.html;", result.repaired)
+        self.assertIn("default_type text/markdown;", result.repaired)
         self.assertNotIn("proxy_pass http://luma_gateway", result.repaired)
         MODULE.validate_repaired_config(result.repaired, ROOT)
 
