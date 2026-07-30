@@ -412,8 +412,8 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
                 f"p {narrow_panel_result.get('global_holm_adjusted_p_value')}. "
                 "The same candidate lost on mean to buy-and-hold, moving-average-cross, "
                 "and volatility-targeting baselines. Across the authoritative ledger "
-                "and panel, zero candidate cards beat every baseline and zero candidates "
-                "pass promotion."
+                "and panel, zero candidate cards cleared the complete registered baseline "
+                "set and zero candidates pass promotion."
             ),
         },
         "market_signal_panel_result": {
@@ -518,7 +518,7 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
             (
                 "The panel's narrow trend-versus-ridge result is not a promotion: the "
                 "same candidate loses on mean to the other three registered baselines, "
-                "and no candidate beats every baseline."
+                "and no candidate clears the complete four-baseline set."
             ),
             (
                 "The prospective protocol has zero eligible future observations and "

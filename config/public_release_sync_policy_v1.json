@@ -139,9 +139,9 @@
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "b43f8583aba4de9ba9c92fca7e43752c6f4b90621cd23ffe199b5d736012a1dd"
+        "expected_sha256": "518e8bd19982f1e04af5cab7f53becd11d3eae36faa26db3e8c0101e76383b84"
       },
-      "last_validated_utc": "2026-07-29T13:50:39Z",
+      "last_validated_utc": "2026-07-30T03:32:50Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
@@ -161,27 +161,27 @@
     {
       "id": "source_native_benchmark_whitepaper_pdf",
       "source_path": "output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf",
-      "expected_source_sha256": "2476b88bc8b49d14bde6468fd30b05131778ed9915381b9bb2b7a78adb5b2d5a",
-      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_2476B88BC8B4.pdf",
-      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_2476B88BC8B4.pdf",
+      "expected_source_sha256": "e407897065ff0d695eec240112ee4a54cd7bc6c3ab509245d2728b253ddcba59",
+      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf",
       "mime_type": "application/pdf",
       "claim_state": "PROVENANCE_AND_REPRODUCIBILITY",
       "claim_boundary": "The whitepaper documents source-native protocols, measured comparison coverage, limitations, and negative results; it does not establish universal superiority, external validation, field performance, or realized economic value.",
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "b43f8583aba4de9ba9c92fca7e43752c6f4b90621cd23ffe199b5d736012a1dd"
+        "expected_sha256": "518e8bd19982f1e04af5cab7f53becd11d3eae36faa26db3e8c0101e76383b84"
       },
-      "last_validated_utc": "2026-07-29T13:50:39Z",
+      "last_validated_utc": "2026-07-30T03:32:50Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
           "path": "code/ops/BUILD_SOURCE_NATIVE_RESEARCH_WHITEPAPER.py",
-          "expected_sha256": "91bec19c4544cefc5403cc76e77b4a17d27511e0a6c0960453e5755dcbbce900"
+          "expected_sha256": "aa483df50d83d2f0ebea10f7466b0e1a3275245e3e331da987d6b862396f4d3e"
         },
         {
           "path": "tests/test_source_native_research_whitepaper.py",
-          "expected_sha256": "e967962994c75884dd5b4aaee6c38f8fd28b4b2179b7dcff1a80d346f487643d"
+          "expected_sha256": "673ee84d6daed37b89c52b2da00e07d1fd65f606fcc7ed9346033c0183747bbf"
         }
       ]
     },
@@ -197,9 +197,9 @@
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "b43f8583aba4de9ba9c92fca7e43752c6f4b90621cd23ffe199b5d736012a1dd"
+        "expected_sha256": "518e8bd19982f1e04af5cab7f53becd11d3eae36faa26db3e8c0101e76383b84"
       },
-      "last_validated_utc": "2026-07-29T13:50:39Z",
+      "last_validated_utc": "2026-07-30T03:32:50Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {

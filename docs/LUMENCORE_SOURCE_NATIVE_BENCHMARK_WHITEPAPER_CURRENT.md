@@ -1,6 +1,6 @@
 # Source-Native Benchmarking for Nature-Inspired Time-Series Families: A Fail-Closed Experimental Protocol
 
-- Generated UTC: `2026-07-29T20:29:40.745027+00:00`
+- Generated UTC: `2026-07-30T03:32:40+00:00`
 - Status: `CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED`
 - Peer reviewed: `false`
 - Independently validated: `false`
@@ -54,7 +54,7 @@ Can a predeclared candidate family beat every accepted baseline for a specific s
 
 ## Retrospective Result
 
-The former FRED and TWELVE_DATA subset leads are retired because they do not survive source-series clustering and the complete source-native baseline gauntlet. Four fixed market-signal families were also run against four registered baselines on each of Kraken, TwelveData, and AlphaVantage. All 48 market comparisons are inferentially insufficient because each source currently supplies one source-series cluster. A separate fixed-rule Kraken panel then evaluated the same four candidates against four baselines across 12 pre-scoring-selected pairs. One of 16 comparisons was positive after exploratory global Holm correction: beast_strategy_trend versus ridge_return_baseline, with mean unannualized risk-adjusted-score delta 0.061277644465, raw exact sign-test p 0.00634765625, and global Holm-adjusted p 0.04443359375. The same candidate lost on mean to buy-and-hold, moving-average-cross, and volatility-targeting baselines. Across the authoritative ledger and panel, zero candidate cards beat every baseline and zero candidates pass promotion.
+The former FRED and TWELVE_DATA subset leads are retired because they do not survive source-series clustering and the complete source-native baseline gauntlet. Four fixed market-signal families were also run against four registered baselines on each of Kraken, TwelveData, and AlphaVantage. All 48 market comparisons are inferentially insufficient because each source currently supplies one source-series cluster. A separate fixed-rule Kraken panel then evaluated the same four candidates against four baselines across 12 pre-scoring-selected pairs. One of 16 comparisons was positive after exploratory global Holm correction: beast_strategy_trend versus ridge_return_baseline, with mean unannualized risk-adjusted-score delta 0.061277644465, raw exact sign-test p 0.00634765625, and global Holm-adjusted p 0.04443359375. The same candidate lost on mean to buy-and-hold, moving-average-cross, and volatility-targeting baselines. Across the authoritative ledger and panel, zero candidate cards cleared the complete registered baseline set and zero candidates pass promotion.
 
 ## Frozen Prospective Protocol
 
@@ -87,7 +87,7 @@ The former FRED and TWELVE_DATA subset leads are retired because they do not sur
 - Only 3 lanes currently have executable direct measured adapters; the wider nature-inspired registry remains inventory, synthetic stress, or context until implemented.
 - The original 48 market-signal comparisons remain inferentially insufficient under the predeclared five-cluster minimum because each source has one registered series.
 - The 12-pair Kraken panel meets the exploratory pair-count floor, but pair-level signs share one exchange and overlapping market timestamps. Independence is therefore unconfirmed, and its one narrow Holm-positive comparison is not confirmatory alpha or edge.
-- The panel's narrow trend-versus-ridge result is not a promotion: the same candidate loses on mean to the other three registered baselines, and no candidate beats every baseline.
+- The panel's narrow trend-versus-ridge result is not a promotion: the same candidate loses on mean to the other three registered baselines, and no candidate clears the complete four-baseline set.
 - The prospective protocol has zero eligible future observations and cannot yet support a prospective accuracy conclusion.
 - No result establishes universal superiority, field performance, trading alpha, realized savings, customer acceptance, or deployment authority.
 
@@ -97,4 +97,4 @@ The prior BioGeometry, scalar-field, bioresonance, cooling-savings, zero-point, 
 
 ## Receipt
 
-- Whitepaper payload SHA-256: `e766bbd499c526bd480e98c71c578a6ca7fef5c09b74229e5e3f3d72cd3c581f`
+- Whitepaper payload SHA-256: `df603bae68cc4d053f0956d44eda0a4997e5c2a2cf8b992cd7871e2cf424e3a2`

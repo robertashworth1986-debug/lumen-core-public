@@ -26,18 +26,18 @@
       "status": "CURRENT_PDF_COMPANION_HUMAN_REVIEW_REQUIRED"
     },
     {
-      "bytes": 896040,
+      "bytes": 896055,
       "external_release_authorized": false,
       "id": "current_source_native_whitepaper",
       "path": "output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf",
-      "sha256": "0899DD2A4BABA0A65D8EE08E672459589C7E423405C5B503E22AB16C1BC6555B",
+      "sha256": "E407897065FF0D695EEC240112EE4A54CD7BC6C3AB509245D2728B253DDCBA59",
       "status": "CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED"
     }
   ],
-  "as_of_utc": "2026-07-29T20:29:41.650708Z",
+  "as_of_utc": "2026-07-30T03:32:50Z",
   "claim_boundary": "This manifest binds exact local reviewer-artifact paths, byte counts, and SHA-256 values. It does not authorize publication or sending and does not establish external validation, model superiority, field performance, award, contract, revenue, savings, or valuation.",
   "external_release_authorized": false,
-  "manifest_sha256": "74CFE82E57588DE6F967BA00554B0D531DADD8EBCD45202758628EE0E05F28AC",
+  "manifest_sha256": "25442175526F65BFCA2C379A62D50DA50F31EECAD221CDE77A9172FC69381A3D",
   "network_action_performed": false,
   "schema": "lumencore.current_reviewer_public_artifact_manifest.v1",
   "status": "SEALED_LOCAL_ARTIFACT_MANIFEST_HUMAN_RELEASE_REQUIRED"
