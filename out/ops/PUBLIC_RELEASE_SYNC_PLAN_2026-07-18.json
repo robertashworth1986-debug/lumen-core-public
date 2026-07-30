@@ -126,13 +126,13 @@
       "claim_boundary": "The feed presents candidate fixed-scope protocol-review terms with founder, buyer, recipient, data, and outreach gates still open; it does not establish a customer result, field validation, performance, savings, contract, or authorization to send.",
       "claim_state": "NO_PERFORMANCE_CLAIM",
       "content_scan": {
-        "bytes": 4885,
+        "bytes": 4793,
         "extracted_text_scanned": false,
         "findings": [],
         "state": "PASS"
       },
       "copy_performed": false,
-      "expected_source_sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
+      "expected_source_sha256": "bca444f3a3c506e31e24d182313c6f5482ee12819423a3a5aace6f4f12e30c11",
       "freshness": {
         "age_hours": 0.0,
         "last_validated_utc": "2026-07-30T05:42:55Z",
@@ -157,19 +157,19 @@
           "CACHE_BYPASS_REPEAT_HASH_MATCH"
         ],
         "expected_mime_type": "application/json",
-        "expected_sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
+        "expected_sha256": "bca444f3a3c506e31e24d182313c6f5482ee12819423a3a5aace6f4f12e30c11",
         "network_request_performed": false,
         "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
         "url": "https://lumen-core.ai/data/evidence_protocol_review_fixed_scope_offer.json"
       },
-      "source_bytes": 4885,
+      "source_bytes": 4793,
       "source_path": "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
-      "source_sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
+      "source_sha256": "bca444f3a3c506e31e24d182313c6f5482ee12819423a3a5aace6f4f12e30c11",
       "target_path": "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
       "target_probe": {
         "exact_hash_match": true,
         "overwrite_allowed": false,
-        "sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
+        "sha256": "bca444f3a3c506e31e24d182313c6f5482ee12819423a3a5aace6f4f12e30c11",
         "state": "EXACT_HASH_MATCH"
       },
       "test_receipt_refs": [
@@ -191,10 +191,10 @@
     "push": "HUMAN_UNLOCK_REQUIRED"
   },
   "overwrite_policy": "Never overwrite. Existing exact-hash targets are no-ops; mismatches are blocked.",
-  "plan_sha256": "e6510c2028daa5695daf0295c4b268f2017f0e7e1e302f0766de530ade1f3f83",
+  "plan_sha256": "8d76823580b87155589b0ca324e6fb2d0a55ec8580f8b55dcf823929b8b58c96",
   "planner_sha256": "59ca4b762587c12932b124f66f82962d818fec51b6c02298c6cdf3f50302e6e9",
   "policy_path": "config/public_release_incremental_offer_policy_v1.json",
-  "policy_sha256": "1ab8b68d7ed9ba46d6347019fd2bba4de8c31a290b1a949f8a0c9a7ddb3f62a6",
+  "policy_sha256": "2ba968ce72690d96d03c5ec463487ea29c1a57e6a982ae30c89d7647182f63dd",
   "public_url_verification_plan": [
     {
       "expected_mime_type": "text/html",
@@ -205,7 +205,7 @@
     },
     {
       "expected_mime_type": "application/json",
-      "expected_sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
+      "expected_sha256": "bca444f3a3c506e31e24d182313c6f5482ee12819423a3a5aace6f4f12e30c11",
       "id": "prooflock_fixed_scope_offer_json",
       "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
       "url": "https://lumen-core.ai/data/evidence_protocol_review_fixed_scope_offer.json"

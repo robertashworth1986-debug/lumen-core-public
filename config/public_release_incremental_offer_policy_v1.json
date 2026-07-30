@@ -62,7 +62,7 @@
     {
       "id": "prooflock_fixed_scope_offer_json",
       "source_path": "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
-      "expected_source_sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
+      "expected_source_sha256": "bca444f3a3c506e31e24d182313c6f5482ee12819423a3a5aace6f4f12e30c11",
       "target_path": "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
       "public_url": "https://lumen-core.ai/data/evidence_protocol_review_fixed_scope_offer.json",
       "mime_type": "application/json",

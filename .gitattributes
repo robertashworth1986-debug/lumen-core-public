@@ -2,6 +2,8 @@
 *.pdf binary
 *.pptx binary
 dashboard/data/quant_hub_reviewer_context.json binary
+dashboard/data/evidence_protocol_review_fixed_scope_offer.json binary
+dashboard/proof_to_pilot.html text eol=lf
 docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md binary
 docs/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER_2026-07-13.md text eol=lf
 docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json binary

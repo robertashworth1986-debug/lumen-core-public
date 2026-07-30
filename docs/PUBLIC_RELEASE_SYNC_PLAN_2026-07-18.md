@@ -2,7 +2,7 @@
 
 As of UTC: `2026-07-30T05:42:55Z`
 Plan state: `DRY_RUN_READY_HUMAN_UNLOCK_REQUIRED`
-Plan SHA-256: `e6510c2028daa5695daf0295c4b268f2017f0e7e1e302f0766de530ade1f3f83`
+Plan SHA-256: `8d76823580b87155589b0ca324e6fb2d0a55ec8580f8b55dcf823929b8b58c96`
 
 ## Decision
 
@@ -25,7 +25,7 @@ The dry-run plan passed local preflight. No files were copied and every network 
 | ID | Source | Target | Claim state | Action | Blockers | SHA-256 |
 |---|---|---|---|---|---:|---|
 | `proof_to_pilot_reviewer_page` | `dashboard/proof_to_pilot.html` | `dashboard/proof_to_pilot.html` | `NO_PERFORMANCE_CLAIM` | `NOOP_EXACT_MATCH` | `none` | `63471bd5f3f01f0d` |
-| `prooflock_fixed_scope_offer_json` | `dashboard/data/evidence_protocol_review_fixed_scope_offer.json` | `dashboard/data/evidence_protocol_review_fixed_scope_offer.json` | `NO_PERFORMANCE_CLAIM` | `NOOP_EXACT_MATCH` | `none` | `aca8e5fb8fe39b99` |
+| `prooflock_fixed_scope_offer_json` | `dashboard/data/evidence_protocol_review_fixed_scope_offer.json` | `dashboard/data/evidence_protocol_review_fixed_scope_offer.json` | `NO_PERFORMANCE_CLAIM` | `NOOP_EXACT_MATCH` | `none` | `bca444f3a3c506e3` |
 
 ## Public URL Verification
 
