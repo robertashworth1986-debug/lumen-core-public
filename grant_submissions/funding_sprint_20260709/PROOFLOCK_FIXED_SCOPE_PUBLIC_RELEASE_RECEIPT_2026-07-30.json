@@ -1,0 +1,56 @@
+{
+  "schema": "lumencore.prooflock_fixed_scope_public_release_receipt.v1",
+  "generated_utc": "2026-07-30T05:52:02Z",
+  "status": "PUBLIC_RELEASE_VERIFIED_BRANCH_NOT_MERGED_TO_MAIN",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "release_branch": "codex/public-reviewer-release-20260729",
+  "release_commit": "650094a7862deff922b8c2bf1fe582342d938b9d",
+  "release_plan_sha256": "8d76823580b87155589b0ca324e6fb2d0a55ec8580f8b55dcf823929b8b58c96",
+  "release_workflow": {
+    "run_id": 30517828717,
+    "url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/30517828717",
+    "conclusion": "success",
+    "completed_utc": "2026-07-30T05:52:02Z",
+    "exact_plan_verified": true,
+    "isolated_stage_verified": true,
+    "vps_sync_completed": true,
+    "route_repair_completed": true,
+    "immutable_public_hashes_verified": true
+  },
+  "failed_preflight_retained": {
+    "run_id": 30517706575,
+    "url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/30517706575",
+    "conclusion": "failure",
+    "failure_stage": "local isolated stage verification",
+    "failure_reason": "Cross-platform JSON line-ending hash mismatch",
+    "ssh_started": false,
+    "vps_mutation_performed": false
+  },
+  "public_artifacts": [
+    {
+      "id": "proof_to_pilot_reviewer_page",
+      "url": "https://lumen-core.ai/proof_to_pilot.html",
+      "http_status": 200,
+      "mime_type": "text/html",
+      "sha256": "63471bd5f3f01f0d79ce851f9ff41b5864c5f5028304b53f0f725508d5ecb16f",
+      "exact_hash_match": true
+    },
+    {
+      "id": "prooflock_fixed_scope_offer_json",
+      "url": "https://lumen-core.ai/data/evidence_protocol_review_fixed_scope_offer.json",
+      "http_status": 200,
+      "mime_type": "application/json",
+      "sha256": "bca444f3a3c506e31e24d182313c6f5482ee12819423a3a5aace6f4f12e30c11",
+      "exact_hash_match": true
+    }
+  ],
+  "controls": {
+    "one_time_human_unlock_deleted": true,
+    "external_outreach_sent": false,
+    "buyer_selected": false,
+    "price_committed": false,
+    "contract_created": false,
+    "main_branch_inclusion_verified": false
+  },
+  "claim_boundary": "This receipt proves publication and exact public-byte verification for the bounded reviewer page and draft service feed. It does not prove customer acceptance, revenue, contract award, external validation, model superiority, field performance, savings, or main-branch inclusion."
+}

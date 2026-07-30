@@ -1,0 +1,92 @@
+{
+  "schema": "lumencore.evidence_protocol_review_fixed_scope_offer.v1",
+  "generated_utc": "2026-07-30T05:44:17.451834Z",
+  "status": "DRAFT_FIXED_SCOPE_FOUNDER_PRICE_BUYER_AND_RECIPIENT_APPROVAL_REQUIRED",
+  "product_id": "prooflock_evidence_protocol_review_sprint_v1",
+  "product_name": "ProofLock Evidence Protocol Review Sprint",
+  "commercial_category": "professional_services_fixed_scope",
+  "purpose": "Help one buyer define and replay a source-native benchmark or evidence workflow without selling an unsupported model winner, savings estimate, or field result.",
+  "commercial_terms": {
+    "candidate_fixed_fee_usd": 3500,
+    "candidate_deposit_usd": 1750,
+    "candidate_balance_usd": 1750,
+    "existing_supported_service_range_usd": {
+      "low": 2500,
+      "high": 7500
+    },
+    "duration_business_days": 10,
+    "kickoff_condition": "Signed scope, cleared payment, named buyer owner, approved source, and complete buyer inputs",
+    "payment_timing": "Candidate only; founder and buyer must approve exact terms in writing",
+    "price_committed": false,
+    "founder_price_approval_required": true
+  },
+  "scope_limits": {
+    "buyer_workflows": 1,
+    "authorized_source_systems": 1,
+    "registered_incumbent_baselines_max": 3,
+    "candidate_methods_max": 2,
+    "evaluation_windows_max": 20,
+    "review_meetings": 2,
+    "revision_rounds": 1,
+    "production_access": false,
+    "portal_administration": false,
+    "autonomous_submission": false
+  },
+  "buyer_inputs_required": [
+    "One authorized timestamped source or approved public source",
+    "One operational question and target variable",
+    "The accepted incumbent and up to three source-native baselines",
+    "A frozen development and untouched holdout boundary",
+    "Acceptance metrics, guardrails, exclusions, and failure-reporting rules",
+    "A named buyer workflow owner authorized to approve the protocol"
+  ],
+  "deliverables": [
+    "Source-task compatibility and data-quality memo",
+    "Predeclared benchmark and evidence protocol",
+    "Registered incumbent-baseline matrix",
+    "Reproducible execution bundle with hashes and retained negative results",
+    "Offline reviewer packet with explicit claim and non-claim boundaries",
+    "One final readout and buyer decision memo"
+  ],
+  "acceptance_criteria": [
+    "All six deliverables are present and readable",
+    "The buyer-approved source, task, baselines, windows, metrics, and exclusions are frozen before evaluation",
+    "The supplied replay verifies against the delivered hashes on the agreed environment",
+    "Failures, abstentions, and negative results are retained rather than omitted",
+    "The final memo distinguishes observed results from inference and unsupported claims"
+  ],
+  "exclusions": [
+    "No promise of performance, savings, revenue, funding, award, or acceptance",
+    "A claim that any geometry family or model is a current champion",
+    "Production deployment, managed operations, or service-level agreement",
+    "Credentials, signatures, certifications, payments, uploads, sends, or submissions",
+    "Protected health information, controlled unclassified information, classified data, or export-controlled data",
+    "Legal, accounting, cybersecurity accreditation, or acquisition advice"
+  ],
+  "source_evidence": {
+    "field_packet": "out/ops/field_validation_buyer_pilot_packet_latest.json",
+    "field_packet_sha256": "7ae5ed8516623622e5f81a40e5040e888aa931bf91c1d8379881c1b99b92213f",
+    "control_room": "out/ops/proof_to_pilot_control_room_latest.json",
+    "control_room_sha256": "119c97fb0103956d0c054843b1b32affb566a804246f2b118394feff86f7b66a",
+    "protocol_review_packet_count": 2,
+    "internal_performance_champion_count": 0,
+    "pilot_ready_count": 0,
+    "paid_evaluation_offer_allowed": true
+  },
+  "controls": {
+    "buyer_selected": false,
+    "recipient_selected": false,
+    "buyer_data_approved": false,
+    "founder_price_approved": false,
+    "contract_terms_approved": false,
+    "external_send_allowed": false,
+    "bulk_outreach_allowed": false,
+    "portal_action_allowed": false,
+    "performance_claim_allowed": false,
+    "savings_claim_allowed": false,
+    "field_validation_claim_allowed": false
+  },
+  "safest_next_action": "Select one real buyer and one authorized source, confirm the buyer's accepted baseline, then obtain founder approval for the exact fixed fee, recipient, data terms, and outreach.",
+  "claim_boundary": "This is a draft fixed-scope professional-services offer supported by local protocol and receipt behavior. It is not a customer result, field validation, performance champion, realized savings estimate, contract, invoice, or outreach authorization.",
+  "payload_sha256": "912b0d2fc5181afee7b89927a6d65af2d0c0e392fb4c4bd1b74c28a35c4a743f"
+}

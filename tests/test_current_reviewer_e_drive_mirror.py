@@ -4,6 +4,8 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_CURRENT_REVIEWER_E_DRIVE_MIRROR.py"
@@ -27,6 +29,8 @@ def test_mirror_allowlist_is_current_and_excludes_private_inputs():
     assert len(artifacts) >= 75
     assert len(paths) == len(artifacts)
     assert "out/ops/current_reviewer_front_door_latest.json" in paths
+    assert "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py" in paths
+    assert "tests/test_near_deadline_submission_command_board.py" in paths
     assert (
         "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json"
     ) in paths
@@ -95,6 +99,33 @@ def test_mirror_allowlist_is_current_and_excludes_private_inputs():
         "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-29.json"
     ) in paths
     assert (
+        "grant_submissions/funding_sprint_20260709/"
+        "OFFICIAL_SEVEN_DAY_ACTION_BOARD_2026-07-30.json"
+    ) in paths
+    assert (
+        "grant_submissions/funding_sprint_20260709/"
+        "OFFICIAL_SEVEN_DAY_ACTION_BOARD_2026-07-30.md"
+    ) in paths
+    assert "out/ops/evidence_protocol_review_fixed_scope_offer_latest.json" in paths
+    assert "dashboard/data/evidence_protocol_review_fixed_scope_offer.json" in paths
+    assert "dashboard/proof_to_pilot.html" in paths
+    assert (
+        "docs/LUMENCORE_EVIDENCE_PROTOCOL_REVIEW_FIXED_SCOPE_OFFER_2026-07-30.md"
+        in paths
+    )
+    assert "code/ops/BUILD_EVIDENCE_PROTOCOL_REVIEW_FIXED_SCOPE_OFFER.py" in paths
+    assert "tests/test_evidence_protocol_review_fixed_scope_offer.py" in paths
+    assert (
+        "grant_submissions/funding_sprint_20260709/"
+        "PROOFLOCK_FIXED_SCOPE_PUBLIC_RELEASE_RECEIPT_2026-07-30.json"
+        in paths
+    )
+    assert (
+        "grant_submissions/funding_sprint_20260709/"
+        "PROOFLOCK_FIXED_SCOPE_PUBLIC_RELEASE_RECEIPT_2026-07-30.md"
+        in paths
+    )
+    assert (
         "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf"
     ) in paths
     assert (
@@ -135,6 +166,16 @@ def test_mirror_allowlist_is_current_and_excludes_private_inputs():
     assert "dashboard/brand/lumencore_logo_on_light_1024.png" in paths
     assert "code/watchers/doe_fy26_watcher.py" in paths
     assert "out/grants/doe_fy26_watch.json" in paths
+    product_manifest_path = (
+        "docs/receipts/PRODUCT_LANE_PRIORITY_BUNDLE_MANIFEST_2026-07-18.json"
+    )
+    assert product_manifest_path in paths
+    product_manifest = json.loads(
+        (ROOT / product_manifest_path).read_text(encoding="utf-8")
+    )
+    product_paths = {row["path"] for row in product_manifest["artifacts"]}
+    assert len(product_paths) == product_manifest["artifact_count"] == 14
+    assert product_paths <= paths
     assert not any("/private/" in f"/{path.lower()}/" for path in paths)
     assert not any(path.lower().endswith(".env") for path in paths)
     assert not any(
@@ -174,3 +215,20 @@ def test_mirror_copies_with_hash_parity_and_remains_human_gated(tmp_path: Path):
     )
 
     module.check(destination, receipt)
+
+
+def test_check_rejects_stale_receipt_counts(tmp_path: Path):
+    module = load_module()
+    destination = tmp_path / "mirror"
+    receipt = tmp_path / "receipt.json"
+    module.mirror(
+        destination,
+        receipt_path=receipt,
+        generated_utc="2026-07-29T18:00:00Z",
+    )
+    payload = json.loads(receipt.read_text(encoding="utf-8"))
+    payload["artifact_count"] += 1
+    receipt.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="artifact count is stale"):
+        module.check(destination, receipt)

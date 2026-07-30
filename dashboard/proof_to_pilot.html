@@ -47,6 +47,27 @@
     .list { margin: 0; padding-left: 20px; columns: 2; column-gap: 40px; }
     .list li { break-inside: avoid; margin-bottom: 8px; overflow-wrap: anywhere; }
     .boundary { padding: 16px; background: #eef4ff; border-left: 4px solid var(--blue); }
+    .offer-panel { display: grid; grid-template-columns: minmax(250px, .75fr) minmax(0, 1.25fr); overflow: hidden; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+    .offer-summary { min-width: 0; padding: 20px; border-right: 1px solid var(--line); }
+    .offer-summary h3 { margin: 4px 0 8px; font-size: 19px; }
+    .offer-purpose { margin: 0; color: var(--muted); }
+    .offer-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .offer-metric { min-width: 0; padding: 13px 10px 13px 0; }
+    .offer-metric + .offer-metric { padding-left: 14px; border-left: 1px solid var(--line); }
+    .offer-metric strong { display: block; font-size: 22px; overflow-wrap: anywhere; }
+    .offer-metric span { display: block; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .offer-detail { min-width: 0; padding: 20px; }
+    .offer-detail h3 { margin: 0 0 9px; font-size: 15px; }
+    .offer-detail h3:not(:first-child) { margin-top: 18px; }
+    .offer-scope { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 14px; margin: 0; padding: 0; list-style: none; }
+    .offer-scope li { min-width: 0; padding-left: 9px; border-left: 3px solid var(--green); overflow-wrap: anywhere; }
+    .offer-deliverables { margin: 0; padding-left: 22px; columns: 2; column-gap: 30px; }
+    .offer-deliverables li { break-inside: avoid; margin-bottom: 7px; overflow-wrap: anywhere; }
+    .offer-boundary { grid-column: 1 / -1; margin: 0; padding: 14px 20px; border-top: 1px solid #e1b85b; background: #fff8e8; color: #493508; }
+    .offer-boundary strong { color: #8a4b00; }
+    .offer-unavailable { grid-column: 1 / -1; padding: 20px; }
+    .offer-unavailable h3 { margin: 0 0 7px; font-size: 15px; }
+    .offer-unavailable p { margin: 0; color: var(--muted); }
     .error { color: var(--red); }
     .section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 14px; }
     .section-head h2 { margin-bottom: 4px; }
@@ -196,7 +217,10 @@
       .head { align-items: flex-start; flex-direction: column; padding: 16px 0; }
       .head-side { align-items: flex-start; }
       .nav { justify-content: flex-start; }
-      .summary, .gates, .cards { grid-template-columns: 1fr; }
+      .summary, .gates, .cards, .offer-panel, .offer-meta, .offer-scope { grid-template-columns: 1fr; }
+      .offer-summary { border-right: 0; border-bottom: 1px solid var(--line); }
+      .offer-metric + .offer-metric { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
+      .offer-deliverables { columns: 1; }
       .section-head { align-items: flex-start; flex-direction: column; gap: 8px; }
       .feed-meta { text-align: left; }
       .holo-panel, .modeled-panel { padding: 16px; }
@@ -214,7 +238,7 @@
       .constellation-card, .constellation-card:hover, .constellation-card:focus-visible, .comparison-card, .frozen-hybrid { transform: none; transition: none; }
     }
     @media (forced-colors: active) {
-      .holo-panel, .constellation-card, .fact-chip, .modeled-panel, .modeled-metric, .modeled-boundary, .evidence-lattice, .source-layer, .signal-tile, .reconciliation-note, .inference-note, .supporting-note, .holm-detail, .comparison-card, .comparison-stats div, .frozen-hybrid, .hybrid-metric { background: Canvas; color: CanvasText; border-color: CanvasText; box-shadow: none; }
+      .holo-panel, .constellation-card, .fact-chip, .modeled-panel, .modeled-metric, .modeled-boundary, .evidence-lattice, .source-layer, .signal-tile, .reconciliation-note, .inference-note, .supporting-note, .holm-detail, .comparison-card, .comparison-stats div, .frozen-hybrid, .hybrid-metric, .offer-panel, .offer-summary, .offer-meta, .offer-metric, .offer-scope li, .offer-boundary, .offer-unavailable { background: Canvas; color: CanvasText; border-color: CanvasText; box-shadow: none; }
       .proof-kicker, .constellation-card h3, .proof-pill, .fact-chip dt, .fact-chip dd, .claim-boundary, .modeled-metric strong, .modeled-metric span, .modeled-boundary strong { color: CanvasText; }
     }
   </style>
@@ -235,6 +259,18 @@
   <main class="wrap">
     <section class="summary" id="summary" aria-label="Evidence summary"></section>
     <section class="band"><h2>Claim gates</h2><div class="gates" id="gates"></div></section>
+    <section class="band" aria-labelledby="offer-title">
+      <div class="section-head">
+        <div><div class="label">Fixed-scope professional service</div><h2 id="offer-title">Buyer evidence protocol review</h2><p class="section-note">Candidate terms are shown only from the governed public-safe offer feed.</p></div>
+        <div class="feed-meta" id="offer-source" aria-live="polite">Offer feed loading…</div>
+      </div>
+      <article class="offer-panel" id="fixed-scope-offer" aria-live="polite" aria-busy="true">
+        <div class="offer-unavailable">
+          <h3>Fixed-scope offer withheld pending verification</h3>
+          <p>No product terms, price, duration, scope, or deliverables are inferred until the offer feed passes its public-safety controls.</p>
+        </div>
+      </article>
+    </section>
     <section class="band" aria-labelledby="constellation-title">
       <div class="section-head">
         <div><div class="label">Canonical reviewer evidence</div><h2 id="constellation-title">Evidence constellation</h2><p class="section-note" id="reviewer-count-note" aria-live="polite">Reviewer proof-card count loading…</p></div>
@@ -301,7 +337,8 @@
       sourceRegister: 'data/measured_source_evidence_register.json',
       sourceMeasurement: 'data/live_source_measurement_maximizer.json',
       evidenceHarvest: 'data/live_evidence_max_harvest.json',
-      topReplay: 'data/top_geometry_live_replay_results.json'
+      topReplay: 'data/top_geometry_live_replay_results.json',
+      offer: 'data/evidence_protocol_review_fixed_scope_offer.json'
     };
     const gateLabels = [
       ['manual_reviewed_outreach_allowed', 'Manual reviewed outreach allowed'],
@@ -322,6 +359,121 @@
       return [];
     };
     const escapeText = (value) => String(value ?? '');
+
+    function offerFeedValid(payload) {
+      const terms = object(payload?.commercial_terms);
+      const limits = object(payload?.scope_limits);
+      const controls = object(payload?.controls);
+      const deliverables = array(payload?.deliverables);
+      const exclusions = array(payload?.exclusions);
+      const generated = new Date(payload?.generated_utc || '');
+      const wholeNumber = (value) => typeof value === 'number' && Number.isInteger(value) && value >= 0;
+      const nonEmptyText = (value) => typeof value === 'string' && value.trim().length > 0;
+      const boundaryText = `${escapeText(payload?.claim_boundary)} ${exclusions.join(' ')}`.toLowerCase();
+      return payload?.schema === 'lumencore.evidence_protocol_review_fixed_scope_offer.v1'
+        && payload?.status === 'DRAFT_FIXED_SCOPE_FOUNDER_PRICE_BUYER_AND_RECIPIENT_APPROVAL_REQUIRED'
+        && payload?.product_id === 'prooflock_evidence_protocol_review_sprint_v1'
+        && nonEmptyText(payload?.product_name)
+        && nonEmptyText(payload?.purpose)
+        && !Number.isNaN(generated.getTime())
+        && typeof terms.candidate_fixed_fee_usd === 'number'
+        && Number.isFinite(terms.candidate_fixed_fee_usd)
+        && terms.candidate_fixed_fee_usd > 0
+        && wholeNumber(terms.duration_business_days)
+        && terms.duration_business_days > 0
+        && terms.founder_price_approval_required === true
+        && terms.price_committed === false
+        && wholeNumber(limits.buyer_workflows)
+        && limits.buyer_workflows === 1
+        && wholeNumber(limits.authorized_source_systems)
+        && limits.authorized_source_systems === 1
+        && wholeNumber(limits.registered_incumbent_baselines_max)
+        && wholeNumber(limits.candidate_methods_max)
+        && wholeNumber(limits.evaluation_windows_max)
+        && wholeNumber(limits.review_meetings)
+        && wholeNumber(limits.revision_rounds)
+        && limits.production_access === false
+        && limits.portal_administration === false
+        && limits.autonomous_submission === false
+        && deliverables.length === 6
+        && deliverables.every(nonEmptyText)
+        && exclusions.every(nonEmptyText)
+        && boundaryText.includes('performance')
+        && boundaryText.includes('savings')
+        && controls.founder_price_approved === false
+        && controls.external_send_allowed === false
+        && controls.performance_claim_allowed === false
+        && controls.savings_claim_allowed === false
+        && controls.field_validation_claim_allowed === false
+        && /^[0-9a-f]{64}$/.test(escapeText(payload?.payload_sha256));
+    }
+
+    function renderOffer(payload) {
+      const terms = object(payload.commercial_terms);
+      const limits = object(payload.scope_limits);
+      const panel = document.getElementById('fixed-scope-offer');
+      const summary = document.createElement('div'); summary.className = 'offer-summary';
+      const category = document.createElement('div'); category.className = 'label'; category.textContent = 'Candidate terms · founder approval required';
+      const title = document.createElement('h3'); title.textContent = escapeText(payload.product_name);
+      const purpose = document.createElement('p'); purpose.className = 'offer-purpose'; purpose.textContent = escapeText(payload.purpose);
+      const meta = document.createElement('div'); meta.className = 'offer-meta';
+      const price = document.createElement('div'); price.className = 'offer-metric';
+      const priceValue = document.createElement('strong');
+      priceValue.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(terms.candidate_fixed_fee_usd);
+      const priceLabel = document.createElement('span'); priceLabel.textContent = 'Candidate fixed fee · founder approval required';
+      price.append(priceValue, priceLabel);
+      const duration = document.createElement('div'); duration.className = 'offer-metric';
+      const durationValue = document.createElement('strong'); durationValue.textContent = `${escapeText(terms.duration_business_days)} business days`;
+      const durationLabel = document.createElement('span'); durationLabel.textContent = 'Duration after kickoff conditions are met';
+      duration.append(durationValue, durationLabel);
+      meta.append(price, duration);
+      summary.append(category, title, purpose, meta);
+
+      const detail = document.createElement('div'); detail.className = 'offer-detail';
+      const scopeTitle = document.createElement('h3'); scopeTitle.textContent = 'Fixed scope';
+      const scope = document.createElement('ul'); scope.className = 'offer-scope';
+      [
+        `${limits.buyer_workflows} buyer workflow and ${limits.authorized_source_systems} authorized source system`,
+        `Up to ${limits.registered_incumbent_baselines_max} incumbent baselines and ${limits.candidate_methods_max} candidate methods`,
+        `Up to ${limits.evaluation_windows_max} evaluation windows`,
+        `${limits.review_meetings} review meetings and ${limits.revision_rounds} revision round`,
+        'No production access, portal administration, or autonomous submission'
+      ].forEach((value) => {
+        const item = document.createElement('li'); item.textContent = escapeText(value); scope.append(item);
+      });
+      const deliverablesTitle = document.createElement('h3'); deliverablesTitle.textContent = 'Six deliverables';
+      const deliverables = document.createElement('ol'); deliverables.className = 'offer-deliverables';
+      array(payload.deliverables).forEach((value) => {
+        const item = document.createElement('li'); item.textContent = escapeText(value); deliverables.append(item);
+      });
+      detail.append(scopeTitle, scope, deliverablesTitle, deliverables);
+
+      const boundary = document.createElement('p'); boundary.className = 'offer-boundary';
+      const boundaryLabel = document.createElement('strong'); boundaryLabel.textContent = 'No performance or savings claim: ';
+      boundary.append(boundaryLabel, document.createTextNode('This fixed-scope review does not guarantee performance, savings, revenue, funding, award, acceptance, or a model winner. Founder approval is required before any price or outreach commitment.'));
+      panel.replaceChildren(summary, detail, boundary);
+      panel.setAttribute('aria-busy', 'false');
+      document.getElementById('offer-source').textContent = `Public-safe offer · ${describeFreshness(payload.generated_utc)}`;
+    }
+
+    function renderOfferUnavailable(result, integrityMismatch = false) {
+      const panel = document.getElementById('fixed-scope-offer');
+      const unavailable = document.createElement('div'); unavailable.className = 'offer-unavailable';
+      const title = document.createElement('h3');
+      title.textContent = integrityMismatch ? 'Fixed-scope offer withheld: integrity mismatch' : 'Fixed-scope offer unavailable';
+      const detail = document.createElement('p');
+      detail.textContent = `${escapeText(result?.reason?.message || 'Offer feed unavailable')}. No product terms, price, duration, scope, or deliverables are inferred; performance and savings claims remain prohibited.`;
+      unavailable.append(title, detail);
+      panel.replaceChildren(unavailable);
+      panel.setAttribute('aria-busy', 'false');
+      document.getElementById('offer-source').textContent = integrityMismatch
+        ? 'Offer feed malformed · terms withheld'
+        : 'Offer feed unavailable · freshness unknown';
+    }
+
+    function renderOfferIntegrityMismatch() {
+      renderOfferUnavailable({ reason: new Error('Offer feed failed public-safety validation') }, true);
+    }
 
     function renderSummary(payload, reviewerPayload = {}) {
       const summary = object(payload.summary);
@@ -375,9 +527,10 @@
       const card = document.createElement('article'); card.className = 'card';
       const title = document.createElement('h3'); title.textContent = escapeText(row.organization || row.buyer_role || row.target_segment || 'Reviewed buyer role');
       const detail = document.createElement('p');
-      const segment = escapeText(row.validation_lane || row.target_segment || row.locality || '').replaceAll('_', ' ');
+      const protocolFit = Array.isArray(row.protocol_review_fit) ? row.protocol_review_fit.join(' · ') : '';
+      const segment = escapeText(protocolFit || row.routing_status || row.validation_lane || row.target_segment || row.locality || '').replaceAll('_', ' ');
       detail.textContent = `${segment}${row.fit_score != null ? ` · fit ${escapeText(row.fit_score)}%` : ''}`;
-      const ask = document.createElement('p'); ask.textContent = escapeText(row.first_ask || row.primary_ask || row.why_this_matters || row.why_not_send_now || 'Human review required.');
+      const ask = document.createElement('p'); ask.textContent = escapeText(row.safe_first_ask || row.safe_next_action || row.first_ask || row.primary_ask || row.why_this_matters || row.why_not_send_now || 'Human review required.');
       card.append(title, detail, ask); return card;
     }
     function renderCards(payload) { document.getElementById('cards').replaceChildren(...pickArray(payload, ['top_cards', 'proof_cards', 'cards', 'pilot_cards']).map(cardNode)); }
@@ -836,6 +989,7 @@
       // Fail closed immediately: claim gates remain visible even before feeds resolve.
       renderSummary({});
       renderGates({});
+      renderOfferUnavailable({ reason: new Error('Offer feed not yet verified') });
       try {
         const feedEntries = Object.entries(feeds);
         const results = await Promise.allSettled(feedEntries.map(([, url]) => loadFeed(url)));
@@ -851,8 +1005,10 @@
         const sourceMeasurement = payload('sourceMeasurement');
         const evidenceHarvest = payload('evidenceHarvest');
         const topReplay = payload('topReplay');
+        const offer = payload('offer');
         const hybridCardReady = frozenHybridCard(reviewerContext) !== null;
         const topReplayValid = settled.topReplay.status === 'fulfilled' && topReplayEvidenceValid(topReplay);
+        const offerValid = settled.offer.status === 'fulfilled' && offerFeedValid(offer);
         const evidenceFeedsReady = ['reviewerContext', 'valueMeter', 'sourceRegister', 'sourceMeasurement', 'evidenceHarvest', 'topReplay']
           .every((key) => settled[key].status === 'fulfilled') && hybridCardReady && topReplayValid;
 
@@ -876,6 +1032,9 @@
         if (settled.topReplay.status === 'fulfilled' && topReplayValid) renderTopReplay(topReplay);
         else if (settled.topReplay.status === 'fulfilled') renderTopReplayIntegrityMismatch();
         else renderTopReplayUnavailable(settled.topReplay);
+        if (settled.offer.status === 'fulfilled' && offerValid) renderOffer(offer);
+        else if (settled.offer.status === 'fulfilled') renderOfferIntegrityMismatch();
+        else renderOfferUnavailable(settled.offer);
 
         if (settled.control.status !== 'fulfilled') {
           renderUnavailableCards('cards', 'Control-room proof feed', settled.control);
@@ -902,6 +1061,7 @@
         renderEvidenceHarvestUnavailable(failed);
         renderFrozenHybridUnavailable(failed);
         renderTopReplayUnavailable(failed);
+        renderOfferUnavailable(failed);
         document.getElementById('stamp').textContent = `Evidence feed unavailable: ${escapeText(error.message)}`;
         document.getElementById('stamp').classList.add('error');
       }

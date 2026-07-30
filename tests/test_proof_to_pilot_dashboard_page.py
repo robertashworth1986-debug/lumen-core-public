@@ -13,6 +13,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 PAGE = ROOT / "dashboard" / "proof_to_pilot.html"
 DATA = ROOT / "dashboard" / "data"
+OFFER_SOURCE = DATA / "evidence_protocol_review_fixed_scope_offer.json"
 
 
 def _top_replay_validator_results(payloads: list[dict]) -> list[bool]:
@@ -45,6 +46,36 @@ process.stdout.write(JSON.stringify(input.payloads.map((payload) => context.topR
     return json.loads(result.stdout)
 
 
+def _offer_validator_results(payloads: list[dict]) -> list[bool]:
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("Node.js is required to exercise the inline offer-feed validator")
+
+    html = PAGE.read_text(encoding="utf-8")
+    match = re.search(r"<script>([\s\S]*?)</script>", html)
+    assert match is not None
+    script = re.sub(r"\s*boot\(\);\s*$", "", match.group(1))
+    request = json.dumps({"script": script, "payloads": payloads})
+    runner = """
+const fs = require('fs');
+const vm = require('vm');
+const input = JSON.parse(fs.readFileSync(0, 'utf8'));
+const context = {};
+vm.createContext(context);
+vm.runInContext(input.script, context);
+process.stdout.write(JSON.stringify(input.payloads.map((payload) => context.offerFeedValid(payload))));
+"""
+    result = subprocess.run(
+        [node, "-e", runner],
+        input=request,
+        text=True,
+        capture_output=True,
+        check=True,
+        timeout=30,
+    )
+    return json.loads(result.stdout)
+
+
 def test_proof_to_pilot_dashboard_references_control_room_feed():
     html = PAGE.read_text(encoding="utf-8")
 
@@ -59,6 +90,7 @@ def test_proof_to_pilot_dashboard_references_control_room_feed():
     assert "data/live_source_measurement_maximizer.json" in html
     assert "data/live_evidence_max_harvest.json" in html
     assert "data/top_geometry_live_replay_results.json" in html
+    assert "data/evidence_protocol_review_fixed_scope_offer.json" in html
     assert "renderSummary" in html
     assert "renderGates" in html
     assert "renderCards" in html
@@ -72,6 +104,7 @@ def test_proof_to_pilot_dashboard_references_control_room_feed():
     assert "renderEvidenceHarvest" in html
     assert "renderTopReplay" in html
     assert "renderFrozenHybridStatus" in html
+    assert "renderOffer" in html
 
 
 def test_proof_to_pilot_dashboard_degrades_per_feed_and_fails_closed():
@@ -91,10 +124,98 @@ def test_proof_to_pilot_dashboard_degrades_per_feed_and_fails_closed():
     assert "renderEvidenceHarvestUnavailable" in html
     assert "renderTopReplayUnavailable" in html
     assert "renderFrozenHybridUnavailable" in html
+    assert "renderOfferUnavailable" in html
+    assert "renderOfferIntegrityMismatch" in html
     assert "'topReplay'" in html
     assert "&& hybridCardReady" in html
     assert "degraded:" in html
     assert "Promise.all(Object.values(feeds).map(loadFeed))" not in html
+
+
+def test_proof_to_pilot_dashboard_surfaces_fixed_scope_offer_without_claim_promotion():
+    html = PAGE.read_text(encoding="utf-8")
+
+    for visible_label in (
+        "Buyer evidence protocol review",
+        "Candidate fixed fee · founder approval required",
+        "Duration after kickoff conditions are met",
+        "Fixed scope",
+        "Six deliverables",
+        "No performance or savings claim:",
+    ):
+        assert visible_label in html
+
+    for source_field in (
+        "payload.product_name",
+        "candidate_fixed_fee_usd",
+        "duration_business_days",
+        "registered_incumbent_baselines_max",
+        "candidate_methods_max",
+        "evaluation_windows_max",
+        "payload.deliverables",
+    ):
+        assert source_field in html
+
+    assert "does not guarantee performance, savings, revenue, funding, award, acceptance, or a model winner" in html
+    assert "Founder approval is required before any price or outreach commitment." in html
+    assert "$3,500" not in html
+
+
+def test_proof_to_pilot_dashboard_fails_closed_for_missing_or_malformed_offer_feed():
+    html = PAGE.read_text(encoding="utf-8")
+
+    assert "function offerFeedValid(payload)" in html
+    assert "renderOfferUnavailable({ reason: new Error('Offer feed not yet verified') });" in html
+    assert "const offerValid = settled.offer.status === 'fulfilled' && offerFeedValid(offer);" in html
+    assert "if (settled.offer.status === 'fulfilled' && offerValid) renderOffer(offer);" in html
+    assert "else if (settled.offer.status === 'fulfilled') renderOfferIntegrityMismatch();" in html
+    assert "else renderOfferUnavailable(settled.offer);" in html
+    assert "No product terms, price, duration, scope, or deliverables are inferred" in html
+    assert "performance and savings claims remain prohibited." in html
+
+
+def test_offer_validator_rejects_terms_or_controls_that_are_not_public_safe():
+    offer = json.loads(OFFER_SOURCE.read_text(encoding="utf-8"))
+    invalid_payloads: list[dict] = []
+
+    missing_deliverable = copy.deepcopy(offer)
+    missing_deliverable["deliverables"].pop()
+    invalid_payloads.append(missing_deliverable)
+
+    string_price = copy.deepcopy(offer)
+    string_price["commercial_terms"]["candidate_fixed_fee_usd"] = "3500"
+    invalid_payloads.append(string_price)
+
+    committed_price = copy.deepcopy(offer)
+    committed_price["commercial_terms"]["price_committed"] = True
+    invalid_payloads.append(committed_price)
+
+    founder_approval_removed = copy.deepcopy(offer)
+    founder_approval_removed["commercial_terms"]["founder_price_approval_required"] = False
+    invalid_payloads.append(founder_approval_removed)
+
+    production_access_enabled = copy.deepcopy(offer)
+    production_access_enabled["scope_limits"]["production_access"] = True
+    invalid_payloads.append(production_access_enabled)
+
+    performance_claim_enabled = copy.deepcopy(offer)
+    performance_claim_enabled["controls"]["performance_claim_allowed"] = True
+    invalid_payloads.append(performance_claim_enabled)
+
+    savings_claim_enabled = copy.deepcopy(offer)
+    savings_claim_enabled["controls"]["savings_claim_allowed"] = True
+    invalid_payloads.append(savings_claim_enabled)
+
+    blank_product_name = copy.deepcopy(offer)
+    blank_product_name["product_name"] = " "
+    invalid_payloads.append(blank_product_name)
+
+    invalid_digest = copy.deepcopy(offer)
+    invalid_digest["payload_sha256"] = "not-a-digest"
+    invalid_payloads.append(invalid_digest)
+
+    results = _offer_validator_results([offer, *invalid_payloads])
+    assert results == [True, *([False] * len(invalid_payloads))]
 
 
 def test_proof_to_pilot_dashboard_renders_accessible_holographic_evidence():
@@ -262,6 +383,26 @@ def test_top_replay_validator_behavior_rejects_count_and_positive_row_mutations(
     complete_card_mismatch["replay_cards"][0]["baseline_gauntlet"]["candidate_beats_all_registered_baselines_after_global_holm"] = True
     invalid_payloads.append(complete_card_mismatch)
 
+    positive_replay = copy.deepcopy(replay)
+    positive_card = next(
+        card for card in positive_replay["replay_cards"] if card["baseline_comparisons"]
+    )
+    positive_comparison = positive_card["baseline_comparisons"][0]
+    positive_comparison["statistically_positive_after_global_holm"] = True
+    positive_comparison["global_holm_adjusted_p_value"] = 0.01
+    positive_comparison["paired_inference"].update(
+        {
+            "paired_unit_count": 10,
+            "win_count": 10,
+            "loss_count": 0,
+            "tie_count": 0,
+            "mean_score_delta": 0.2,
+            "raw_two_sided_sign_test_p_value": 0.001,
+            "bootstrap_mean_delta_ci95": [0.1, 0.3],
+        }
+    )
+    positive_replay["summary"]["registered_baseline_global_holm_positive_count"] = 1
+
     def positive_pair(payload: dict) -> tuple[dict, dict]:
         for card in payload["replay_cards"]:
             for comparison in card["baseline_comparisons"]:
@@ -269,40 +410,40 @@ def test_top_replay_validator_behavior_rejects_count_and_positive_row_mutations(
                     return card, comparison
         raise AssertionError("Expected a strict global-Holm-positive comparison")
 
-    candidate_missing = copy.deepcopy(replay)
+    candidate_missing = copy.deepcopy(positive_replay)
     positive_pair(candidate_missing)[0]["candidate_family_id"] = " "
     invalid_payloads.append(candidate_missing)
 
-    baseline_missing = copy.deepcopy(replay)
+    baseline_missing = copy.deepcopy(positive_replay)
     positive_pair(baseline_missing)[1]["baseline_family_id"] = ""
     invalid_payloads.append(baseline_missing)
 
-    nonpositive_mean = copy.deepcopy(replay)
+    nonpositive_mean = copy.deepcopy(positive_replay)
     positive_pair(nonpositive_mean)[1]["paired_inference"]["mean_score_delta"] = 0
     invalid_payloads.append(nonpositive_mean)
 
-    nonpositive_ci = copy.deepcopy(replay)
+    nonpositive_ci = copy.deepcopy(positive_replay)
     positive_pair(nonpositive_ci)[1]["paired_inference"]["bootstrap_mean_delta_ci95"][0] = 0
     invalid_payloads.append(nonpositive_ci)
 
-    raw_p_out_of_range = copy.deepcopy(replay)
+    raw_p_out_of_range = copy.deepcopy(positive_replay)
     positive_pair(raw_p_out_of_range)[1]["paired_inference"]["raw_two_sided_sign_test_p_value"] = 1.01
     invalid_payloads.append(raw_p_out_of_range)
 
-    raw_p_negative = copy.deepcopy(replay)
+    raw_p_negative = copy.deepcopy(positive_replay)
     positive_pair(raw_p_negative)[1]["paired_inference"]["raw_two_sided_sign_test_p_value"] = -0.000001
     invalid_payloads.append(raw_p_negative)
 
-    adjusted_p_out_of_range = copy.deepcopy(replay)
+    adjusted_p_out_of_range = copy.deepcopy(positive_replay)
     positive_pair(adjusted_p_out_of_range)[1]["global_holm_adjusted_p_value"] = 0.050001
     invalid_payloads.append(adjusted_p_out_of_range)
 
-    adjusted_p_negative = copy.deepcopy(replay)
+    adjusted_p_negative = copy.deepcopy(positive_replay)
     positive_pair(adjusted_p_negative)[1]["global_holm_adjusted_p_value"] = -0.000001
     invalid_payloads.append(adjusted_p_negative)
 
-    results = _top_replay_validator_results([replay, *invalid_payloads])
-    assert results == [True, *([False] * len(invalid_payloads))]
+    results = _top_replay_validator_results([replay, positive_replay, *invalid_payloads])
+    assert results == [True, True, *([False] * len(invalid_payloads))]
 
 
 def test_proof_to_pilot_dashboard_derives_frozen_hybrid_collection_status():

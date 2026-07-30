@@ -19,6 +19,12 @@ RECEIPT_PATH = (
 )
 FRONT_DOOR_PATH = ROOT / "out" / "ops" / "current_reviewer_front_door_latest.json"
 DATA_ROOM_PATH = ROOT / "out" / "ops" / "data_room_manifest_latest.json"
+PRODUCT_READINESS_MANIFEST_PATH = (
+    ROOT
+    / "docs"
+    / "receipts"
+    / "PRODUCT_LANE_PRIORITY_BUNDLE_MANIFEST_2026-07-18.json"
+)
 
 EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
     (
@@ -54,6 +60,16 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
     (
         "out/ops/near_deadline_submission_command_board_latest.json",
         "machine_readable_control",
+        "submission_control",
+    ),
+    (
+        "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+        "auditable_builder",
+        "submission_control",
+    ),
+    (
+        "tests/test_near_deadline_submission_command_board.py",
+        "verification_control",
         "submission_control",
     ),
     (
@@ -225,6 +241,56 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
         "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-29.json",
         "machine_readable_control",
         "nsf_project_pitch",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/OFFICIAL_SEVEN_DAY_ACTION_BOARD_2026-07-30.json",
+        "machine_readable_current_action_control",
+        "submission_control",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/OFFICIAL_SEVEN_DAY_ACTION_BOARD_2026-07-30.md",
+        "public_safe_human_review_required",
+        "submission_control",
+    ),
+    (
+        "out/ops/evidence_protocol_review_fixed_scope_offer_latest.json",
+        "machine_readable_draft_commercial_control",
+        "paid_protocol_review",
+    ),
+    (
+        "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
+        "public_safe_draft_commercial_feed",
+        "paid_protocol_review",
+    ),
+    (
+        "dashboard/proof_to_pilot.html",
+        "public_reviewer_surface",
+        "paid_protocol_review",
+    ),
+    (
+        "docs/LUMENCORE_EVIDENCE_PROTOCOL_REVIEW_FIXED_SCOPE_OFFER_2026-07-30.md",
+        "public_safe_draft_commercial_offer",
+        "paid_protocol_review",
+    ),
+    (
+        "code/ops/BUILD_EVIDENCE_PROTOCOL_REVIEW_FIXED_SCOPE_OFFER.py",
+        "reproducibility_source",
+        "paid_protocol_review",
+    ),
+    (
+        "tests/test_evidence_protocol_review_fixed_scope_offer.py",
+        "reproducibility_test",
+        "paid_protocol_review",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/PROOFLOCK_FIXED_SCOPE_PUBLIC_RELEASE_RECEIPT_2026-07-30.json",
+        "machine_readable_public_release_receipt",
+        "paid_protocol_review",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/PROOFLOCK_FIXED_SCOPE_PUBLIC_RELEASE_RECEIPT_2026-07-30.md",
+        "public_release_receipt",
+        "paid_protocol_review",
     ),
     (
         "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
@@ -814,6 +880,13 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest().upper()
 
 
+def stable_json_sha256(payload: Any) -> str:
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def validate_relative_path(relative_path: str) -> str:
     normalized = PurePosixPath(relative_path)
     if normalized.is_absolute() or ".." in normalized.parts:
@@ -822,6 +895,57 @@ def validate_relative_path(relative_path: str) -> str:
     if lowered & PROHIBITED_PARTS:
         raise ValueError(f"Private or credential path blocked: {relative_path}")
     return normalized.as_posix()
+
+
+def collect_product_readiness_artifacts() -> list[tuple[str, str, str]]:
+    manifest = read_json(PRODUCT_READINESS_MANIFEST_PATH)
+    if manifest.get("schema") != "product_lane_priority_bundle_manifest_v1":
+        raise ValueError("Product-readiness manifest schema is missing or stale")
+    artifacts = manifest.get("artifacts")
+    if not isinstance(artifacts, list):
+        raise ValueError("Product-readiness manifest artifacts must be a list")
+    if manifest.get("artifact_count") != len(artifacts):
+        raise ValueError("Product-readiness manifest artifact count is stale")
+    if manifest.get("all_artifacts_present") is not True:
+        raise ValueError("Product-readiness manifest reports missing artifacts")
+
+    manifest_without_receipt = dict(manifest)
+    recorded_manifest_sha256 = str(
+        manifest_without_receipt.pop("manifest_payload_sha256", "")
+    )
+    if recorded_manifest_sha256 != stable_json_sha256(manifest_without_receipt):
+        raise ValueError("Product-readiness manifest payload hash is stale")
+
+    records: list[tuple[str, str, str]] = []
+    seen: set[str] = set()
+    for item in artifacts:
+        if not isinstance(item, dict):
+            raise ValueError("Product-readiness artifact receipt must be an object")
+        relative_path = validate_relative_path(str(item.get("path", "")))
+        if not relative_path or relative_path in seen:
+            raise ValueError(
+                f"Product-readiness artifact path is empty or duplicated: {relative_path}"
+            )
+        seen.add(relative_path)
+        source = ROOT / Path(relative_path)
+        if item.get("exists") is not True or not source.is_file():
+            raise FileNotFoundError(source)
+        if source.stat().st_size != item.get("bytes"):
+            raise ValueError(
+                f"Product-readiness artifact byte count is stale: {relative_path}"
+            )
+        if sha256_file(source).lower() != str(item.get("sha256", "")).lower():
+            raise ValueError(
+                f"Product-readiness artifact hash is stale: {relative_path}"
+            )
+        records.append(
+            (
+                relative_path,
+                "product_readiness_receipt_member",
+                "product_readiness",
+            )
+        )
+    return records
 
 
 def collect_artifacts() -> list[dict[str, Any]]:
@@ -847,6 +971,14 @@ def collect_artifacts() -> list[dict[str, Any]]:
         for row in front_door["artifacts"]
     ]
     candidates.extend(EXTRA_ARTIFACTS)
+    candidates.append(
+        (
+            PRODUCT_READINESS_MANIFEST_PATH.relative_to(ROOT).as_posix(),
+            "product_readiness_manifest",
+            "product_readiness",
+        )
+    )
+    candidates.extend(collect_product_readiness_artifacts())
     deploy_bundle = read_json(
         ROOT / "out" / "ops" / "live_domain_proof_feed_deploy_bundle_latest.json"
     )
@@ -975,18 +1107,62 @@ def mirror(
 
 def check(destination_root: Path, receipt_path: Path = RECEIPT_PATH) -> None:
     payload = read_json(receipt_path)
+    if payload.get("schema") != "lumencore.current_reviewer_e_drive_mirror_receipt.v1":
+        raise ValueError("Mirror receipt schema is missing or stale")
+    if payload.get("status") != (
+        "CURRENT_REVIEWER_E_DRIVE_MIRROR_COMPLETE_HUMAN_RELEASE_REQUIRED"
+    ):
+        raise ValueError("Mirror receipt status is missing or stale")
     if payload.get("destination_root") != str(destination_root):
         raise ValueError("Mirror receipt destination does not match")
-    current = {row["path"]: row for row in collect_artifacts()}
-    recorded = {row["path"]: row for row in payload.get("artifacts", [])}
+    current_rows = collect_artifacts()
+    recorded_rows = payload.get("artifacts", [])
+    if not isinstance(recorded_rows, list):
+        raise ValueError("Mirror receipt artifacts must be a list")
+    if payload.get("artifact_count") != len(recorded_rows):
+        raise ValueError("Mirror receipt artifact count is stale")
+    if payload.get("artifact_count") != len(current_rows):
+        raise ValueError("Mirror receipt current artifact count is stale")
+    counts = (payload.get("copied_count"), payload.get("unchanged_count"))
+    if not all(isinstance(value, int) for value in counts):
+        raise ValueError("Mirror receipt copy counts are invalid")
+    if sum(counts) != payload.get("artifact_count"):
+        raise ValueError("Mirror receipt copy counts do not reconcile")
+    if payload.get("all_copy_sha256_matched") is not True:
+        raise ValueError("Mirror receipt does not report complete hash parity")
+    if payload.get("source_front_door_sha256") != sha256_file(FRONT_DOOR_PATH):
+        raise ValueError("Mirror receipt front-door hash is stale")
+    if payload.get("source_data_room_manifest_sha256") != sha256_file(DATA_ROOM_PATH):
+        raise ValueError("Mirror receipt data-room hash is stale")
+
+    current = {row["path"]: row for row in current_rows}
+    recorded = {row["path"]: row for row in recorded_rows}
+    if len(recorded) != len(recorded_rows):
+        raise ValueError("Mirror receipt contains duplicate artifact paths")
     if set(current) != set(recorded):
         raise ValueError("Mirror artifact set is stale")
     for relative_path, row in current.items():
-        if row["sha256"] != recorded[relative_path].get("sha256"):
+        receipt_row = recorded[relative_path]
+        if row["bytes"] != receipt_row.get("bytes"):
+            raise ValueError(f"Source artifact byte count changed: {relative_path}")
+        if row["sha256"] != receipt_row.get("sha256"):
             raise ValueError(f"Source artifact changed: {relative_path}")
         destination = destination_root / Path(relative_path)
         if not destination.is_file() or sha256_file(destination) != row["sha256"]:
             raise ValueError(f"Mirror copy is stale or missing: {relative_path}")
+        if (
+            receipt_row.get("copy_bytes") != row["bytes"]
+            or receipt_row.get("copy_sha256") != row["sha256"]
+            or receipt_row.get("copy_sha256_matched") is not True
+        ):
+            raise ValueError(f"Mirror receipt copy metadata is stale: {relative_path}")
+
+    receipt_destination = destination_root / "_receipts" / receipt_path.name
+    if (
+        not receipt_destination.is_file()
+        or sha256_file(receipt_destination) != sha256_file(receipt_path)
+    ):
+        raise ValueError("Mirrored receipt copy is stale or missing")
 
 
 def main() -> None:
