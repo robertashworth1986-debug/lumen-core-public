@@ -1,20 +1,31 @@
-name: 🚀 Deploy Dashboard to VPS
+name: Deploy public reviewer release to VPS
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'dashboard/**/*.html'
-      - 'assets/**'
-      - 'data/*.json'
-      - '*.html'
   workflow_dispatch:
+    inputs:
+      release_plan_sha256:
+        description: Exact plan_sha256 from PUBLIC_RELEASE_SYNC_PLAN_2026-07-18.json
+        required: true
+        type: string
+      confirm_publication:
+        description: Explicit action-time publication confirmation
+        required: true
+        type: choice
+        default: DO_NOT_PUBLISH
+        options:
+          - DO_NOT_PUBLISH
+          - PUBLISH_PUBLIC_REVIEWER_RELEASE
 
 permissions:
   contents: read
 
+concurrency:
+  group: public-reviewer-release-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
+    if: ${{ inputs.confirm_publication == 'PUBLISH_PUBLIC_REVIEWER_RELEASE' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
@@ -23,40 +34,122 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify exact plan, HumanUnlock, and build isolated stage
+        id: release
+        env:
+          EXPECTED_RELEASE_PLAN_SHA256: ${{ inputs.release_plan_sha256 }}
+          LUMA_HUMAN_UNLOCK_TOKEN: ${{ secrets.LUMA_HUMAN_UNLOCK_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ "${#LUMA_HUMAN_UNLOCK_TOKEN}" -lt 32 ]; then
+            echo "::error::Action-time HumanUnlock is missing or too short."
+            exit 1
+          fi
+          PLAN_SHA256="$(
+            python - <<'PY'
+          import json
+          from pathlib import Path
+
+          plan = json.loads(
+              Path("out/ops/PUBLIC_RELEASE_SYNC_PLAN_2026-07-18.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          print(plan["plan_sha256"])
+          PY
+          )"
+          if [ "$PLAN_SHA256" != "$EXPECTED_RELEASE_PLAN_SHA256" ]; then
+            echo "::error::Workflow input does not match the checked-out release plan."
+            exit 1
+          fi
+          unset LUMA_HUMAN_UNLOCK_TOKEN
+          python code/ops/BUILD_PUBLIC_RELEASE_STAGE_BUNDLE.py --stage
+          STAGE_ROOT=".deploy_stage/public_reviewer_release_${PLAN_SHA256:0:16}"
+          test -f "$STAGE_ROOT/manifest.json"
+          echo "stage_root=$STAGE_ROOT" >> "$GITHUB_OUTPUT"
+
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
 
-      - name: Sync dashboard assets to VPS
+      - name: Sync staged reviewer release to VPS
+        env:
+          STAGE_ROOT: ${{ steps.release.outputs.stage_root }}
         run: |
-          # Sync HTML dashboards + data JSON to VPS web roots
-          rsync -avz --delete \
-            --exclude='*.py' \
-            --exclude='*.ps1' \
-            --exclude='.git/' \
-            --exclude='node_modules/' \
-            -e "ssh -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
-            dashboard/ \
-            opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/
-
-          # Sync data snapshots
+          set -euo pipefail
+          test -f "$STAGE_ROOT/manifest.json"
           rsync -avz \
             -e "ssh -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
-            data/ \
-            opc@${{ secrets.VPS_HOST }}:/opt/lumencore/data/
+            "$STAGE_ROOT/dashboard/" \
+            opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/
 
-          echo "Dashboard deploy complete."
-
-      - name: Smoke test production endpoints
+      - name: Verify immutable public artifact hashes
+        env:
+          STAGE_ROOT: ${{ steps.release.outputs.stage_root }}
         run: |
-          sleep 5  # let nginx settle
-          PORTAL=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/ || echo "000")
-          DASH=$(curl -sf --max-time 10 -o /dev/null -w "%{http_code}" https://lumen-core.ai/kraken_execution_dashboard.html || echo "000")
-          echo "Portal: $PORTAL | Kraken Dashboard: $DASH"
-          if [ "$PORTAL" != "200" ] || [ "$DASH" != "200" ]; then
-            echo "::error::Post-deploy smoke test failed — check VPS nginx"
-            exit 1
-          fi
-          echo "✅ All production endpoints responding after deploy."
+          set -euo pipefail
+          python - "$STAGE_ROOT/manifest.json" <<'PY' > /tmp/release-verification.tsv
+          import json
+          import sys
+
+          manifest = json.load(open(sys.argv[1], encoding="utf-8"))
+          for row in manifest["files"]:
+              print(
+                  row["source_sha256"],
+                  row["mime_type"],
+                  row["public_url"],
+                  sep="\t",
+              )
+          PY
+          while IFS=$'\t' read -r expected_sha expected_mime url; do
+            body="$(mktemp)"
+            headers="$(mktemp)"
+            repeat_body="$(mktemp)"
+            head_status="$(
+              curl -sS --max-time 30 -I -o /dev/null -w "%{http_code}" "$url"
+            )"
+            if [ "$head_status" != "200" ]; then
+              echo "::error::Published HEAD status is $head_status for $url"
+              rm -f "$body" "$headers" "$repeat_body"
+              exit 1
+            fi
+            curl -fsS --max-time 30 -D "$headers" "$url" -o "$body"
+            observed_mime="$(
+              awk '
+                BEGIN { IGNORECASE=1 }
+                /^content-type:/ {
+                  gsub("\r", "")
+                  split($0, pair, ":")
+                  split(pair[2], value, ";")
+                  gsub(/^[ \t]+|[ \t]+$/, "", value[1])
+                  result=value[1]
+                }
+                END { print result }
+              ' "$headers"
+            )"
+            if [ "$observed_mime" != "$expected_mime" ]; then
+              echo "::error::Published MIME mismatch for $url"
+              rm -f "$body" "$headers" "$repeat_body"
+              exit 1
+            fi
+            observed_sha="$(sha256sum "$body" | awk '{print $1}')"
+            if [ "$observed_sha" != "$expected_sha" ]; then
+              echo "::error::Published hash mismatch for $url"
+              rm -f "$body" "$headers" "$repeat_body"
+              exit 1
+            fi
+            case "$url" in
+              *\?*) cache_url="${url}&release_verify=${expected_sha}" ;;
+              *) cache_url="${url}?release_verify=${expected_sha}" ;;
+            esac
+            curl -fsS --max-time 30 "$cache_url" -o "$repeat_body"
+            repeat_sha="$(sha256sum "$repeat_body" | awk '{print $1}')"
+            rm -f "$body" "$headers" "$repeat_body"
+            if [ "$repeat_sha" != "$expected_sha" ]; then
+              echo "::error::Cache-bypass hash mismatch for $url"
+              exit 1
+            fi
+          done < /tmp/release-verification.tsv
+          echo "All immutable reviewer artifacts match the sealed local stage."
