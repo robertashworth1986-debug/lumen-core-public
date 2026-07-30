@@ -130,7 +130,12 @@ LOCAL_BODY="$(mktemp)"
 PUBLIC_BODY="$(mktemp)"
 trap 'rm -f "$LOCAL_BODY" "$PUBLIC_BODY"' EXIT
 
-LOCAL_STATUS="$(curl -sS --max-time 15 --resolve "${DOMAIN}:443:127.0.0.1" -o "$LOCAL_BODY" -w '%{http_code}' "https://${DOMAIN}/evidence/?deploy=${STAMP}" || true)"
+LOCAL_STATUS="000"
+for attempt in $(seq 1 10); do
+  LOCAL_STATUS="$(curl -sS --max-time 15 --resolve "${DOMAIN}:443:127.0.0.1" -o "$LOCAL_BODY" -w '%{http_code}' "https://${DOMAIN}/evidence/?deploy=${STAMP}-local-${attempt}" || true)"
+  if [[ "$LOCAL_STATUS" == "200" ]] && grep -Fq "$MARKER" "$LOCAL_BODY"; then break; fi
+  sleep 1
+done
 if [[ "$LOCAL_STATUS" != "200" ]] || ! grep -Fq "$MARKER" "$LOCAL_BODY"; then
   echo "ERROR: local evidence route failed marker check (HTTP ${LOCAL_STATUS:-000})" >&2
   rollback 10

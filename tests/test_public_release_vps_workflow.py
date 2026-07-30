@@ -6,6 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github" / "workflows" / "deploy.yml"
+ROUTE_REPAIR = ROOT / "code" / "ops" / "REPAIR_EVIDENCE_ROUTE_ON_VPS.sh"
 
 
 def test_public_release_workflow_is_manual_and_plan_bound() -> None:
@@ -56,6 +57,15 @@ def test_public_release_repairs_static_evidence_route_before_verification() -> N
     assert "REPAIR_EVIDENCE_ROUTE_ON_VPS.sh" in text
     assert "sudo env LUMENCORE_DOMAIN=lumen-core.ai" in text
     assert "--apply" in text
+
+
+def test_route_repair_waits_for_reloaded_nginx_workers() -> None:
+    text = ROUTE_REPAIR.read_text(encoding="utf-8")
+
+    assert "for attempt in $(seq 1 10); do" in text
+    assert "deploy=${STAMP}-local-${attempt}" in text
+    assert '[[ "$LOCAL_STATUS" == "200" ]]' in text
+    assert "rollback 10" in text
 
 
 def test_public_release_workflow_runs_complete_post_publish_verification() -> None:
