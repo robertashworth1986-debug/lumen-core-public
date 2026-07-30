@@ -105,7 +105,8 @@ LumenCore does not claim, without separately linked evidence:
 - certified aircraft, suit, medical, weapons, or autonomous physical-control capability;
 - agency endorsement or award likelihood;
 - independent validation merely because internal CI is green;
-- universal superiority of a model, algorithm, geometry, or routing method.
+- universal superiority of a model, algorithm, geometry, or routing method;
+- experimental, field, safety, certification, patent-scope, performance, or deployment proof merely because a concept illustration or design render exists.
 
 ## Proof Capsule model
 
@@ -131,6 +132,8 @@ LumenCore does not claim, without separately linked evidence:
 - ProofLock Console: <https://lumen-core.ai/build_week/prooflock_console/>
 - Proof Capsule schema: [docs/PROOF_CAPSULE_SCHEMA.md](docs/PROOF_CAPSULE_SCHEMA.md)
 - Claim boundaries: [docs/CLAIM_BOUNDARY_REGISTER.md](docs/CLAIM_BOUNDARY_REGISTER.md)
+- Conceptual R&D and visual asset boundary: [docs/CONCEPTUAL_RND_AND_VISUAL_ASSET_BOUNDARY.md](docs/CONCEPTUAL_RND_AND_VISUAL_ASSET_BOUNDARY.md)
+- Private asset quarantine and redaction checklist: [docs/PRIVATE_ASSET_QUARANTINE_AND_REDACTION_CHECKLIST.md](docs/PRIVATE_ASSET_QUARANTINE_AND_REDACTION_CHECKLIST.md)
 - Founder/IP boundary: [docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md](docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
 - Pilot report template: [docs/PILOT_REPORT_TEMPLATE.md](docs/PILOT_REPORT_TEMPLATE.md)
 
