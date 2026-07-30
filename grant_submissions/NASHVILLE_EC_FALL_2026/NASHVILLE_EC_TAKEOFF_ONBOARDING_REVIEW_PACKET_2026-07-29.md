@@ -7,9 +7,19 @@ Status: `PORTAL_OPEN_LIVE_FORM_INSPECTED_FOUNDER_REVIEW_REQUIRED`
 - Official onboarding deadline: `2026-07-31`
 - Separate deposit deadline: `2026-08-14`
 - The official messages do not state a cutoff time or timezone for either date. Do not infer one; complete the onboarding review before the July 31 local business day if possible.
-- The live `TakeOff Fall 2026 Onboarding Form` was inspected read-only at `2026-07-29T12:47:22Z` and is open in the selected browser tab.
+- The live `TakeOff Fall 2026 Onboarding Form` was freshly inspected read-only at `2026-07-29T20:40:48Z` and is open in the selected browser tab.
+- The fresh check confirmed that no agreement checkbox was selected and the form remains unsubmitted.
 - Do not check agreement boxes, sign, upload, pay, or submit until Robert reviews the complete form.
 - The prior payment route was reported broken. Use only the corrected route in the latest official email after founder review; no payment link or discount code is copied into this packet.
+
+## Founder Action Now
+
+1. Review the paste-ready answers below and confirm or correct the private facts.
+2. Choose the preferred cohort and confirm the weekly in-person attendance commitment.
+3. Read the complete participation agreement, media permissions, tuition acknowledgment, and linked advisor code of conduct in the open form.
+4. Decide whether to accept each checkbox and sign. These are separate personal choices; general outreach approval is not substituted for them.
+5. Review the complete form preview, then personally authorize the final submit before the July 31 deadline.
+6. Handle the separate `$125` deposit decision by August 14; onboarding submission does not itself authorize payment.
 
 ## Live Form Coverage
 
@@ -23,6 +33,86 @@ The live form currently requests:
 - Four agreement checkboxes, media and progress-promotion permissions, a tuition acknowledgment, and a digital signature
 
 Founder-only or private fields remain blank. The live inspection did not type, select, check, sign, upload, pay, or submit anything.
+
+## Exact Live Control Reconciliation
+
+The live form has `47` data, upload, selection, agreement, or signature controls plus the final `Submit` button. Of those controls, `36` are visibly marked required and `11` are optional. A prior native-control count of `17` was incomplete because the ClickUp form implements several required dropdowns, rich-text fields, agreement checkboxes, and the signature as custom widgets.
+
+`SAFE_PASTE` means the answer is already claim-bounded in this packet. It does not authorize typing or external release. `FOUNDER_FACT`, `FOUNDER_DECISION`, `UPLOAD`, and `AGREEMENT` require Robert's current review.
+
+### Section 1 - Founder Info
+
+| ID | Live control | Required | State | Exact next action |
+|---|---|---:|---|---|
+| F01 | First Name | Yes | FOUNDER_FACT | Enter the current legal or preferred first name used for the cohort. |
+| F02 | Last Name | Yes | FOUNDER_FACT | Enter the current legal or preferred last name used for the cohort. |
+| F03 | Email | Yes | FOUNDER_FACT | Enter and verify the founder-controlled email address. |
+| F04 | Phone number | Yes | FOUNDER_FACT | Enter and verify the current founder-controlled phone number. |
+| F05 | City | Yes | FOUNDER_FACT | Confirm the current city before entry. |
+| F06 | County | No | OPTIONAL | Enter the current county if desired; do not infer it from the city. |
+| F07 | State | Yes | FOUNDER_FACT | Confirm the current state before selection or entry. |
+| F08 | Founder LinkedIn | Yes | SAFE_PASTE | `https://www.linkedin.com/in/robert-ashworth-40a9b7376` |
+| F09 | Founder Instagram | No | OPTIONAL | Leave blank unless Robert wants a current founder-controlled account included. |
+| F10 | Upload Your Headshot (for press/marketing) | Yes | UPLOAD | Robert selects the current image and separately approves press or marketing use. |
+| F11 | Pronouns | No | OPTIONAL | Robert may enter or leave blank. |
+| F12 | SEDI response | Yes | FOUNDER_DECISION | Read the live definition and select the truthful personal response. |
+| F13 | Emergency Contact Name | Yes | FOUNDER_FACT | Enter a current private emergency contact with that person's knowledge. |
+| F14 | Emergency Contact Phone Number | Yes | FOUNDER_FACT | Enter and verify the private emergency contact number. |
+| F15 | Skills, experience, or knowledge shared with the cohort | Yes | SAFE_PASTE | Use the bounded `Skills Shared With The Cohort` answer below. |
+
+### Section 2 - Business Info And Current Challenges
+
+| ID | Live control | Required | State | Exact next action |
+|---|---|---:|---|---|
+| B01 | Business Name | Yes | SAFE_PASTE | `LumenCore` |
+| B02 | Business Website | Yes | SAFE_PASTE | `https://lumen-core.ai` |
+| B03 | Business Social Media Page | Yes | FOUNDER_DECISION | Use a verified LumenCore company page. If none is currently controlled, confirm with EC whether the founder LinkedIn is acceptable; do not use the unverified `linkedin.com/company/1337` placeholder found in older local artifacts. |
+| B04 | Short 15-30 word company description | Yes | SAFE_PASTE | Use the 19-word company description below. |
+| B05 | Primary customer | Yes | SAFE_PASTE | Select `B2G (government agencies or entities)` if that exact live option remains available. |
+| B06 | Business type | Yes | SAFE_PASTE | Select `SaaS (Software-as-a-Service)` if that exact live option remains available. |
+| B07 | Current business stage | Yes | SAFE_PASTE | Select the closest truthful `Working prototype or MVP; pre-revenue` option. |
+| B08 | Lifetime Revenue Generated | Yes | FOUNDER_FACT | Confirm the current exact amount; the working answer is `$0`, not a verified portal fact. |
+| B09 | Current full-time team members | Yes | FOUNDER_FACT | Confirm the current exact count; the working answer is `1`. |
+| B10 | Forms of capital sought | Yes | FOUNDER_DECISION | Select only currently desired forms. Prioritize customer revenue and non-dilutive grants or contracts; do not imply acceptance of equity terms. |
+| B11 | Current capital raised to date | Yes | FOUNDER_FACT | Confirm the current exact amount; the working answer is `$0`. |
+| B12 | Primary industry | Yes | SAFE_PASTE | Select the closest truthful enterprise-software, artificial-intelligence, or GovTech option. |
+| B13 | Top 2-3 founder challenges | Yes | SAFE_PASTE | Use the three bounded challenges below. |
+| B14 | Areas most wanted for program support | Yes | SAFE_PASTE | Select the live categories matching customer discovery, product focus, pricing, procurement, sales, pilot scoping, advisor introductions, and non-dilutive funding. |
+| B15 | Topics, speakers, or questions | No | OPTIONAL | Use the bounded topics answer below if Robert wants it included. |
+| B16 | Upload Your Business Logo | Yes | UPLOAD | Use `dashboard/brand/lumencore_logo_on_light_1024.png` after visual confirmation. Do not use the LumaArc seal as the company logo. |
+| B17 | Current pitch deck | No | UPLOAD | Prefer `output/pdf/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pdf` after founder release review. |
+
+### Section 3 - Advisor Preferences
+
+| ID | Live control | Required | State | Exact next action |
+|---|---|---:|---|---|
+| A01 | Ideal advisor areas of expertise | Yes | SAFE_PASTE | Select the closest live categories matching enterprise sales, GovTech procurement, critical infrastructure, SaaS productization, pricing, and evidence-first AI validation. |
+| A02 | Ideal advisor background | Yes | SAFE_PASTE | Use the bounded advisor-background answer below. |
+| A03 | Top three introductions | No | OPTIONAL | Use the three role-based introduction requests below; do not imply that any named organization agreed to meet. |
+
+### Section 4 - Logistics
+
+| ID | Live control | Required | State | Exact next action |
+|---|---|---:|---|---|
+| L01 | Preferred TakeOff cohort | Yes | FOUNDER_DECISION | Choose the preferred cohort after reviewing the exact live times and travel feasibility. |
+| L02 | Can you attend all weekly sessions? | Yes | FOUNDER_DECISION | Attest only after confirming every session, the Labor Day-week Wednesday exception, and any travel constraints. |
+| L03 | Known conflicts | No | OPTIONAL | Enter every known conflict if L02 is not an unqualified yes; otherwise leave blank only if accurate. |
+| L04 | Dietary Restrictions | No | OPTIONAL | Enter current restrictions or leave blank if none. |
+| L05 | Fisk University status | No | OPTIONAL | Select the truthful personal status. |
+| L06 | Join a founder peer group | No | OPTIONAL | Robert decides after reviewing the commitment and privacy expectations. |
+| L07 | Join a Founders Circle Peer Group | No | OPTIONAL | Robert decides after reviewing the commitment and privacy expectations. |
+
+### Section 5 - Agreement And Data Sharing
+
+| ID | Live control | Required | State | Exact next action |
+|---|---|---:|---|---|
+| G01 | Program participation, attendance, and respectful engagement | Yes | AGREEMENT | Read the full participation agreement and decide personally whether to accept. |
+| G02 | Media and photography usage | Yes | AGREEMENT | Decide personally whether to grant the stated media and photography permission. |
+| G03 | Promotion of wins and progress | Yes | AGREEMENT | Decide personally whether EC may promote progress on its site, social media, and other channels. |
+| G04 | Tuition and installment acknowledgment | Yes | AGREEMENT | Review the `$500` tuition, financial-assistance treatment, installment route, and payment terms before accepting. |
+| G05 | Signature | Yes | AGREEMENT | Sign only after every field, upload, checkbox, and agreement term has been reviewed. |
+
+The final `Submit` button is a separate founder-controlled action. Submission redirects to Nexudus, but it does not authorize registration, discount-code entry, deposit payment, or acceptance of any additional terms on that platform.
 
 ## Financial Assistance And Payment Boundary
 
@@ -47,9 +137,12 @@ Evidence-first AI evaluation, reproducible Python testing, government opportunit
 
 Technical decision-makers at government agencies, utilities, infrastructure operators, and regulated enterprises who must justify an AI pilot or deployment with inspectable evidence.
 
+Portal selection: `B2G (government agencies or entities)`. This is the closest current option and does not prevent the description from naming regulated-enterprise and utility buyers.
+
 ### Business Type And Stage
 
-- Business model: `B2B SaaS plus scoped technical services`
+- Portal business type: `SaaS (Software-as-a-Service)`
+- Operating model: `B2B/B2G SaaS plus scoped technical services`
 - Current stage: `Working prototype or MVP; pre-revenue`
 - Full-time team members: `1`, subject to founder confirmation
 - Lifetime revenue: `$0`, only after founder confirmation

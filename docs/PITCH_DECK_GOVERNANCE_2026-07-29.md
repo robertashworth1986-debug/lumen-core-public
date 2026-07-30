@@ -1,8 +1,8 @@
 # Pitch Deck Governance
 
 - Status: `GOVERNED_CURRENT_DECK_WITH_ARCHIVED_LEGACY`
-- As of: `2026-07-29T15:01:11.693460Z`
-- Registered PPTX files: `29`
+- As of: `2026-07-30T04:04:59.159441Z`
+- Registered PPTX files: `30`
 - Current PDF companion: `1`
 - External release authorized: `false`
 - Send eligible: `false`
@@ -15,6 +15,7 @@
 | `data/Grants outreach_/Important documents_/LumenLogic_Telecom_Deck.pptx` | `LEGACY_HIGH_RISK_DO_NOT_SEND` | 7 | 0 | blocked |
 | `grant_submissions/DPA26BZ04_DV016_FALCON/source_attachments/DARPA_TECHNICAL_SUMMARY_QUAD_CHART_TEMPLATE_2025-01.pptx` | `SOURCE_TEMPLATE_NOT_A_LUMENCORE_DECK` | 1 | 0 | blocked |
 | `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx` | `HISTORICAL_APPLICATION_SPECIFIC_DO_NOT_SEND` | 11 | 0 | blocked |
+| `grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx` | `APPLICATION_SPECIFIC_REVIEW_REQUIRED_DO_NOT_SEND` | 11 | 0 | blocked |
 | `grant_submissions/funding_sprint_20260709/LUMENCORE_PITCH_DECK_SEND_READY_2026-07-09.pptx` | `HISTORICAL_STALE_DO_NOT_SEND` | 11 | 0 | blocked |
 | `out/INSTITUTIONAL_REVIEW_BUNDLE/nobel_tier_powerpoint_slides.pptx` | `GENERATED_HISTORICAL_DO_NOT_SEND` | 1 | 0 | blocked |
 | `out/ops/grant_unpack/SubmissionFiles_3591_1502_Concept_Paper_1/3591-1502_Robert_Ashworth_Summary_Slide.pptx` | `ARCHIVAL_PROVENANCE_DO_NOT_SEND` | 1 | 0 | blocked |
@@ -49,4 +50,4 @@ The current deck supports review of software, custody, benchmark design, and a b
 
 Use only the current review-required deck or its governed PDF companion after founder, recipient, and venue-specific review; this receipt does not authorize sending or publication.
 
-Control SHA-256: `2236714935B015F720DA348A6F23EA410329506338065EBB0AE9634A0654F73D`
+Control SHA-256: `FE587644FDF5A7B2E5E794C5941D68AB53B3E48F2AFA05E867EF96E4D1DC9D7C`

@@ -20,6 +20,7 @@ PUBLIC_ARTIFACT_MANIFEST = (
     / "receipts"
     / "CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json"
 )
+PUBLIC_RELEASE_POLICY = ROOT / "config" / "public_release_sync_policy_v1.json"
 
 CAPABILITY_PDF = ROOT / "output" / "pdf" / "LumenCore_Federal_Capability_Statement_CURRENT.pdf"
 CAPABILITY_GOVERNANCE = SPRINT_DIR / "CAPABILITY_ARTIFACT_GOVERNANCE_2026-07-26.json"
@@ -78,6 +79,12 @@ PUBLIC_ARTIFACT_IDS = (
     "current_evidence_to_pilot_deck_pdf",
     "current_source_native_whitepaper",
 )
+PUBLIC_RELEASE_ITEM_BY_ARTIFACT_ID = {
+    "current_capability_statement": "federal_capability_statement_pdf",
+    "current_evidence_to_pilot_deck": None,
+    "current_evidence_to_pilot_deck_pdf": "current_evidence_to_pilot_deck_pdf",
+    "current_source_native_whitepaper": "source_native_benchmark_whitepaper_pdf",
+}
 
 
 class FrontDoorError(ValueError):
@@ -141,6 +148,133 @@ def find_artifact(
     return matches[0]
 
 
+def dependency_freshness(
+    dependencies: list[dict[str, Any]],
+    *,
+    label: str,
+) -> dict[str, Any]:
+    records: list[dict[str, Any]] = []
+    for index, dependency in enumerate(dependencies):
+        if not isinstance(dependency, dict):
+            raise FrontDoorError(f"{label} dependency {index} is invalid")
+        relative = dependency.get("path")
+        expected_sha = str(dependency.get("sha256", "")).upper()
+        if not isinstance(relative, str) or not relative:
+            raise FrontDoorError(f"{label} dependency {index} has no path")
+        path = ROOT / relative
+        try:
+            path.resolve(strict=True).relative_to(ROOT.resolve(strict=True))
+        except (OSError, ValueError) as exc:
+            raise FrontDoorError(
+                f"{label} dependency is missing or outside the repository: {relative}"
+            ) from exc
+        observed_sha = sha256_file(path) if path.is_file() else None
+        expected_bytes = dependency.get("bytes")
+        observed_bytes = path.stat().st_size if path.is_file() else None
+        fresh = (
+            path.is_file()
+            and observed_sha == expected_sha
+            and (
+                expected_bytes is None
+                or observed_bytes == expected_bytes
+            )
+        )
+        records.append(
+            {
+                "path": relative,
+                "expected_sha256": expected_sha,
+                "observed_sha256": observed_sha,
+                "expected_bytes": expected_bytes,
+                "observed_bytes": observed_bytes,
+                "fresh": fresh,
+            }
+        )
+    stale = [row["path"] for row in records if not row["fresh"]]
+    result = {
+        "label": label,
+        "dependency_count": len(records),
+        "fresh_dependency_count": len(records) - len(stale),
+        "stale_dependency_count": len(stale),
+        "stale_dependency_paths": stale,
+        "all_fresh": not stale,
+        "dependencies": records,
+    }
+    if stale:
+        raise FrontDoorError(
+            f"{label} has stale governance dependencies: {', '.join(stale)}"
+        )
+    return result
+
+
+def public_release_bindings(
+    artifacts: list[dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    policy = read_json(PUBLIC_RELEASE_POLICY)
+    if (
+        policy.get("schema") != "lumencore.public_release_sync_policy.v1"
+        or policy.get("status") != "frozen"
+        or policy.get("mode") != "DRY_RUN_ONLY"
+    ):
+        raise FrontDoorError("Public-release policy is missing or not fail closed")
+    release_items = {
+        str(row.get("id")): row
+        for row in policy.get("allowlist", [])
+        if isinstance(row, dict)
+    }
+    by_id = {row["id"]: row for row in artifacts}
+    bindings: dict[str, dict[str, Any]] = {}
+    for artifact_id in PUBLIC_ARTIFACT_IDS:
+        artifact = by_id[artifact_id]
+        release_item_id = PUBLIC_RELEASE_ITEM_BY_ARTIFACT_ID[artifact_id]
+        if release_item_id is None:
+            bindings[artifact_id] = {
+                "release_item_id": None,
+                "immutable_target_path": None,
+                "public_url": None,
+                "publication_state": "LOCAL_ONLY_SOURCE_NOT_PUBLICATION_CANDIDATE",
+                "local_only": True,
+                "network_verification_performed": False,
+            }
+            continue
+        release_item = release_items.get(release_item_id)
+        if release_item is None:
+            raise FrontDoorError(
+                f"Public-release item is missing: {release_item_id}"
+            )
+        if (
+            release_item.get("source_path") != artifact["path"]
+            or str(release_item.get("expected_source_sha256", "")).upper()
+            != artifact["sha256"]
+        ):
+            raise FrontDoorError(
+                f"Public-release item is stale for {artifact_id}"
+            )
+        target_path = release_item.get("target_path")
+        public_url = release_item.get("public_url")
+        if not isinstance(target_path, str) or not isinstance(public_url, str):
+            raise FrontDoorError(
+                f"Public-release binding is incomplete for {artifact_id}"
+            )
+        target = ROOT / target_path
+        if target.is_file():
+            publication_state = (
+                "LOCAL_STAGE_PRESENT_PUBLIC_URL_UNVERIFIED"
+                if sha256_file(target) == artifact["sha256"]
+                else "LOCAL_STAGE_HASH_MISMATCH_BLOCKED"
+            )
+        else:
+            publication_state = "LOCAL_TARGET_ABSENT_NOT_PUBLISHED"
+        bindings[artifact_id] = {
+            "release_item_id": release_item_id,
+            "immutable_target_path": target_path,
+            "public_url": public_url,
+            "publication_state": publication_state,
+            "local_only": False,
+            "network_verification_performed": False,
+        }
+    return bindings
+
+
 def build_payload(as_of_utc: str) -> dict[str, Any]:
     capability = read_json(CAPABILITY_GOVERNANCE)
     pitch = read_json(PITCH_GOVERNANCE)
@@ -167,6 +301,10 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
         or capability_current.get("sha256") != sha256_file(CAPABILITY_PDF)
     ):
         raise FrontDoorError("Current capability statement failed governance")
+    capability_dependency_freshness = dependency_freshness(
+        capability_current.get("dependencies", []),
+        label="capability_statement_governance",
+    )
 
     if pitch.get("schema") != "lumencore.pitch_deck_governance.v1":
         raise FrontDoorError("Pitch-deck governance schema mismatch")
@@ -187,6 +325,10 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
         or pitch_pdf.get("sha256") != sha256_file(PITCH_DECK_PDF)
     ):
         raise FrontDoorError("Current pitch-deck PDF companion failed governance")
+    pitch_dependency_freshness = dependency_freshness(
+        pitch_current.get("dependencies", []),
+        label="pitch_deck_governance",
+    )
 
     if whitepaper.get("schema") != "lumencore.source_native_research_whitepaper.v1":
         raise FrontDoorError("Whitepaper manifest schema mismatch")
@@ -206,6 +348,10 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
         != sha256_file(WHITEPAPER_PDF)
     ):
         raise FrontDoorError("Current whitepaper failed governance")
+    whitepaper_dependency_freshness = dependency_freshness(
+        whitepaper.get("canonical_source_receipts", []),
+        label="whitepaper_manifest",
+    )
 
     summary = source_native.get("summary", {})
     expected_counts = {
@@ -387,6 +533,19 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             str(whitepaper.get("status", "UNKNOWN")),
         ),
     ]
+    release_bindings = public_release_bindings(artifacts)
+    upstream_dependency_freshness = {
+        "current_capability_statement": capability_dependency_freshness,
+        "current_evidence_to_pilot_deck": pitch_dependency_freshness,
+        "current_evidence_to_pilot_deck_pdf": pitch_dependency_freshness,
+        "current_source_native_whitepaper": whitepaper_dependency_freshness,
+    }
+    for artifact in artifacts:
+        artifact_id = artifact["id"]
+        if artifact_id in upstream_dependency_freshness:
+            artifact["upstream_dependency_fresh"] = (
+                upstream_dependency_freshness[artifact_id]["all_fresh"]
+            )
 
     payload = {
         "schema": SCHEMA,
@@ -399,6 +558,10 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             "promoted_champion_count": 0,
             "artifact_count": len(artifacts),
             "external_release_authorized_count": 0,
+            "public_artifact_upstream_dependency_fresh_count": sum(
+                result["all_fresh"]
+                for result in upstream_dependency_freshness.values()
+            ),
             "human_release_review_required": True,
             "open_stage_ready_lane_count": board_summary.get(
                 "stage_ready_count"
@@ -420,6 +583,8 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             "portfolio_external_action_ledger",
         ],
         "artifacts": artifacts,
+        "public_release_bindings": release_bindings,
+        "upstream_dependency_freshness": upstream_dependency_freshness,
         "claim_boundary": (
             "This front door proves the presence and hashes of current local review "
             "artifacts plus their fail-closed governance state. It does not establish "
@@ -539,6 +704,7 @@ def build_public_artifact_manifest(payload: dict[str, Any]) -> dict[str, Any]:
             raise FrontDoorError(
                 f"Missing public artifact manifest member: {artifact_id}"
             )
+        binding = payload["public_release_bindings"][artifact_id]
         artifacts.append(
             {
                 "id": row["id"],
@@ -546,6 +712,14 @@ def build_public_artifact_manifest(payload: dict[str, Any]) -> dict[str, Any]:
                 "bytes": row["bytes"],
                 "sha256": row["sha256"],
                 "status": row["status"],
+                "release_item_id": binding["release_item_id"],
+                "immutable_target_path": binding["immutable_target_path"],
+                "public_url": binding["public_url"],
+                "publication_state": binding["publication_state"],
+                "local_only": binding["local_only"],
+                "upstream_dependency_fresh": row[
+                    "upstream_dependency_fresh"
+                ],
                 "external_release_authorized": False,
             }
         )
@@ -555,6 +729,9 @@ def build_public_artifact_manifest(payload: dict[str, Any]) -> dict[str, Any]:
         "status": "SEALED_LOCAL_ARTIFACT_MANIFEST_HUMAN_RELEASE_REQUIRED",
         "artifact_count": len(artifacts),
         "artifacts": artifacts,
+        "all_upstream_dependencies_fresh": all(
+            row["upstream_dependency_fresh"] for row in artifacts
+        ),
         "external_release_authorized": False,
         "network_action_performed": False,
         "claim_boundary": (

@@ -105,6 +105,18 @@
       "dependencies": []
     },
     {
+      "id": "launchtn_3686_current_review_deck",
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx",
+      "status": "APPLICATION_SPECIFIC_REVIEW_REQUIRED_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false,
+      "required_text_markers": [],
+      "banned_text_markers": [],
+      "dependencies": [
+        "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-29.json"
+      ]
+    },
+    {
       "id": "funding_sprint_send_ready_20260709",
       "path": "grant_submissions/funding_sprint_20260709/LUMENCORE_PITCH_DECK_SEND_READY_2026-07-09.pptx",
       "status": "HISTORICAL_STALE_DO_NOT_SEND",

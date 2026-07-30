@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import json
 
 import BUILD_ALPACA_PREMIUM_DASHBOARD as alpaca
@@ -20,6 +21,8 @@ def main() -> None:
         # Immersive mode is an optional presentation surface. A missing source
         # page must not terminate the production dashboard refresh loop.
         immersive_status = f"skipped: {exc}"
+    # Long-running refresh workers must not retain stale claim-language templates.
+    importlib.reload(portal)
     portal.main()
     print(json.dumps({
         "status": "ok",

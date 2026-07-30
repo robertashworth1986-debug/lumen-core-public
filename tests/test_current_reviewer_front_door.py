@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,6 +54,7 @@ def test_current_reviewer_front_door_is_fail_closed_and_hash_backed():
     assert summary["eligible_future_observation_count"] == 0
     assert summary["artifact_count"] == 13
     assert summary["external_release_authorized_count"] == 0
+    assert summary["public_artifact_upstream_dependency_fresh_count"] == 4
     assert summary["human_release_review_required"] is True
 
     for row in payload["artifacts"]:
@@ -73,12 +77,33 @@ def test_current_reviewer_front_door_is_fail_closed_and_hash_backed():
         "lumencore.current_reviewer_public_artifact_manifest.v1"
     )
     assert manifest["artifact_count"] == 4
+    assert manifest["all_upstream_dependencies_fresh"] is True
     assert manifest["external_release_authorized"] is False
     assert manifest["network_action_performed"] is False
     assert {row["id"] for row in manifest["artifacts"]} == set(
         module.PUBLIC_ARTIFACT_IDS
     )
     assert all(len(row["sha256"]) == 64 for row in manifest["artifacts"])
+    by_id = {row["id"]: row for row in manifest["artifacts"]}
+    assert by_id["current_evidence_to_pilot_deck"]["local_only"] is True
+    assert (
+        by_id["current_evidence_to_pilot_deck"]["publication_state"]
+        == "LOCAL_ONLY_SOURCE_NOT_PUBLICATION_CANDIDATE"
+    )
+    for artifact_id in (
+        "current_capability_statement",
+        "current_evidence_to_pilot_deck_pdf",
+        "current_source_native_whitepaper",
+    ):
+        row = by_id[artifact_id]
+        assert row["release_item_id"]
+        assert row["immutable_target_path"].startswith("dashboard/evidence/")
+        assert row["public_url"].startswith("https://lumen-core.ai/evidence/")
+        assert row["publication_state"] in {
+            "LOCAL_TARGET_ABSENT_NOT_PUBLISHED",
+            "LOCAL_STAGE_PRESENT_PUBLIC_URL_UNVERIFIED",
+        }
+        assert row["upstream_dependency_fresh"] is True
     assert len(manifest["manifest_sha256"]) == 64
 
 
@@ -103,3 +128,20 @@ def test_current_reviewer_front_door_renders_only_bounded_claims():
     assert "Eligible future observations: `0`" in rendered
     assert "External release authorized: `false`" in rendered
     assert "does not establish model superiority, alpha, field performance" in rendered
+
+
+def test_front_door_rejects_stale_transitive_governance_dependency(
+    tmp_path: Path,
+):
+    module = load_module()
+    pitch = json.loads(module.PITCH_GOVERNANCE.read_text(encoding="utf-8"))
+    pitch["current_deck"]["dependencies"][0]["sha256"] = "0" * 64
+    stale_pitch = tmp_path / "pitch_deck_governance_latest.json"
+    stale_pitch.write_text(json.dumps(pitch), encoding="utf-8")
+    module.PITCH_GOVERNANCE = stale_pitch
+
+    with pytest.raises(
+        module.FrontDoorError,
+        match="stale governance dependencies",
+    ):
+        module.build_payload("2026-07-29T10:20:00Z")

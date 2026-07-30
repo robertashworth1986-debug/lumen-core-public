@@ -1,12 +1,12 @@
 # Capability Statement Governance
 
-- As of UTC: `2026-07-29T13:51:03.824313Z`
+- As of UTC: `2026-07-30T04:05:04.890145Z`
 - Status: `GOVERNED_CURRENT_PACKET_WITH_ARCHIVED_LEGACY`
 - Registered artifacts: `6`
 - Current public-safe artifacts: `1`
 - Historical or closed artifacts: `4`
 - External releases authorized: `0`
-- Control SHA-256: `69057DDED84E5E56682F02A73B3261C94CB6E864B91C1289FB9B587A3A521832`
+- Control SHA-256: `347338C3386BB62DC6C31363373EBF6C88EC8AE8C9858CCB6F8A2DBD1F87E82C`
 
 ## Artifact Register
 

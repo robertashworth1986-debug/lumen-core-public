@@ -60,6 +60,8 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert payload["summary"]["lane_count"] == 23
     assert payload["summary"]["curated_navy_lane_count"] == 3
     assert payload["summary"]["stage_now_count"] == 4
+    assert payload["summary"]["stage_candidate_count"] == 4
+    assert payload["summary"]["stage_ready_count"] == 0
     assert payload["summary"]["sent_verified_count"] == 5
     assert payload["summary"]["emergency_eligibility_gate_count"] == 0
     assert payload["summary"]["no_bid_or_partner_only_count"] == 6
@@ -75,7 +77,7 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     sam_rotation = payload["operational_controls"]["sam_public_key_rotation"]
     assert sam_rotation["status"] == "ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED"
     assert sam_rotation["deadline_state"] == "PAST_DUE"
-    assert sam_rotation["aliases_consistent"] is True
+    assert sam_rotation["aliases_consistent"] is False
     assert sam_rotation["replacement_installation_detected"] is False
     assert sam_rotation["rotation_verified"] is False
     assert sam_rotation["human_action_required"] is True
@@ -125,7 +127,10 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     }
 
     assert "HHS-2026-ACL-NIDILRR-REGE-0212" in payload["summary"]["closest_deadline_lane"]
-    assert "OPENAI-BUILD-WEEK-2026" in payload["summary"]["closest_stage_ready_lane"]
+    assert payload["summary"]["closest_stage_ready_lane"] == (
+        "No open lane is currently supported by the board."
+    )
+    assert payload["stage_ready"] == []
     assert "5/10" in payload["summary"]["strongest_today_action"]
     assert "5 open" in payload["summary"]["strongest_today_action"]
     assert "Nashville EC is portal-confirmed" in payload["summary"][
@@ -143,7 +148,13 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
         "2027-03-04",
         "2027-07-07",
     ]
-    assert nsf["nearest_listed_full_proposal_deadline_date"] == "2026-07-27"
+    assert nsf["past_listed_full_proposal_deadline_dates"] == ["2026-07-27"]
+    assert nsf["future_listed_full_proposal_deadline_dates"] == [
+        "2026-11-04",
+        "2027-03-04",
+        "2027-07-07",
+    ]
+    assert nsf["nearest_listed_full_proposal_deadline_date"] == "2026-11-04"
     assert nsf["nearest_listed_deadline_reachable"] is False
     assert nsf["full_proposal_planning_deadline_date"] == "2026-11-04"
     assert nsf["full_proposal_submission_allowed"] is False
@@ -151,8 +162,9 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert nsf["deadline_semantics"] == (
         "PROJECT_PITCH_GATE_ROLLING_FULL_PROPOSAL_INVITATION_REQUIRED"
     )
-    assert "July 27" in nsf["official_deadline_text"]
-    assert "not currently reachable" in nsf["official_deadline_text"]
+    assert "July 27, 2026 is past" in nsf["official_deadline_text"]
+    assert "November 4, 2026" in nsf["official_deadline_text"]
+    assert "remains unreachable" in nsf["official_deadline_text"]
     assert "26-510" in payload["summary"]["best_grants_lane"]
     assert "next rolling Project Pitch route" in payload["summary"][
         "best_grants_lane"
@@ -397,7 +409,10 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert launchtn["deadline_utc"] == "2026-08-14T04:59:00Z"
     assert launchtn["deadline_semantics"] == "VERIFIED_CDT_TIMESTAMP"
     assert len(launchtn["package_files"]) == 4
-    assert any(path.endswith("LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx") for path in launchtn["package_files"])
+    assert any(
+        path.endswith("LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx")
+        for path in launchtn["package_files"]
+    )
     assert any(path.endswith("LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx") for path in launchtn["package_files"])
     assert launchtn["external_send_allowed_without_human"] is False
     assert launchtn["final_submit_allowed_without_human"] is False
@@ -411,28 +426,278 @@ def test_near_deadline_board_identifies_stage_now_and_human_gates():
     assert erdc["pre_freshness_command"] == "STAGE_CONCEPT_PAPER"
     assert erdc["source_data_current"] is False
     assert erdc["deadline_actionable"] is False
-    assert erdc["technical_document_checks_pass"] is True
+    assert erdc["format_and_marker_checks_pass"] is True
+    assert erdc["semantic_review_complete"] is False
     assert erdc["solution_brief_status"] == (
-        "TECHNICAL_DRAFT_PASS_PRIVATE_ROM_AND_SAM_FINALIZATION_REQUIRED"
+        "CURRENT_PUBLIC_DRAFT_FORMAT_AND_MARKER_CHECKS_PASS_SEMANTIC_EVIDENCE_AND_PRIVATE_FINALIZATION_REQUIRED"
     )
     assert erdc["rom_gate_status"] == "PRIVATE_ROM_INPUT_NOT_CAPTURED"
     assert erdc["rom_private_input_present"] is False
     assert erdc["rom_ready_for_private_pdf_insertion"] is False
+    assert erdc["private_final_candidate_gate_status"] == (
+        "PRIVATE_FINAL_INPUTS_NOT_CAPTURED"
+    )
+    assert erdc["private_final_pdf_present"] is False
+    assert erdc["private_final_document_checks_pass"] is False
+    assert erdc["private_values_exposed_in_public_gate"] is False
     assert erdc["funding_currently_available"] is False
-    assert "TECHNICAL_DRAFT_PASS" in erdc["eligibility_state"]
-    assert "TECHNICAL_DOCUMENT_PASS" in erdc["fit_state"]
-    assert len(erdc["package_files"]) == 5
+    assert any("Submittable" in item for item in erdc["today_work"])
+    assert any("all-awards" in item for item in erdc["human_gate"])
+    assert "FORMAT_AND_MARKER_CHECKS_PASS" in erdc["eligibility_state"]
+    assert "REQUIRES_GOVERNMENT_COMPARATOR_EXTERNAL_TRUST_ROOT" in erdc["fit_state"]
+    assert len(erdc["package_files"]) == 7
     assert not any("CONCEPT_STUB" in path for path in erdc["package_files"])
     assert any(
-        path.endswith("ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json")
+        path.endswith("ERDC_SDC_PHASE2_ROM_GATE_2026-07-29.json")
         for path in erdc["package_files"]
     )
     assert any(
-        path.endswith("LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf")
+        path.endswith("LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf")
+        for path in erdc["package_files"]
+    )
+    assert any(
+        path.endswith("ERDC_SDC_PRIVATE_FINAL_CANDIDATE_GATE_2026-07-29.json")
+        for path in erdc["package_files"]
+    )
+    assert any(
+        path.endswith("ERDC_SDC_PRIVATE_FINAL_CANDIDATE_WORKFLOW_2026-07-29.md")
         for path in erdc["package_files"]
     )
     assert erdc["external_send_allowed_without_human"] is False
     assert erdc["final_submit_allowed_without_human"] is False
+
+
+def test_current_board_never_promotes_expired_lanes_in_summary():
+    module = load_module()
+    payload = module.build_payload(
+        scan_date=date(2026, 7, 29),
+        generated_utc="2026-07-29T08:14:15Z",
+        as_of_utc="2026-07-29T08:14:15Z",
+    )
+
+    summary = payload["summary"]
+    assert summary["expired_without_verified_send_count"] == 8
+    assert summary["sent_verified_count"] == 6
+    assert summary["human_action_due_count"] == 1
+    assert summary["closest_deadline_lane"].startswith(
+        "NASHVILLE-EC-FALL-2026"
+    )
+    assert "Finish the OpenAI Build Week" not in summary["strongest_today_action"]
+    assert "MissionWeave Phase I" not in summary["best_grants_lane"]
+    assert "W912HZ26SC005" in summary["strongest_today_action"]
+    assert "LaunchTN 3686" in summary["strongest_today_action"]
+    assert "$10,000" in summary["strongest_today_action"]
+    assert "LAUNCHTN-3686-2026" in summary[
+        "best_near_term_cash_award_lane"
+    ]
+    assert "no selection or award is implied" in summary[
+        "best_near_term_cash_award_lane"
+    ]
+    assert "NSF 26-510" in summary["best_grants_lane"]
+    assert "W912HZ26SC005" in summary["best_contract_lane"]
+    assert summary["fastest_low_friction_lane"] == (
+        "No low-friction staging lane is currently supported by the board."
+    )
+    assert "Expired lanes remain closed" in summary["strongest_today_action"]
+    assert summary["stage_candidate_count"] == 2
+    assert summary["stage_ready_count"] == 0
+    assert payload["stage_ready"] == []
+    lanes = {row["opportunity_number"]: row for row in payload["lanes"]}
+    assert lanes["NASHVILLE-EC-FALL-2026"]["command"] == (
+        "FOUNDER_ONBOARDING_ACTION_DUE"
+    )
+    assert lanes["NASHVILLE-EC-FALL-2026"]["deadline_utc"] is None
+    assert lanes["NASHVILLE-EC-FALL-2026"]["deadline_date"] == "2026-07-31"
+    assert lanes["NASHVILLE-EC-FALL-2026"]["live_form_control_count"] == 47
+    assert (
+        lanes["NASHVILLE-EC-FALL-2026"]["live_form_required_control_count"]
+        == 36
+    )
+    assert lanes["NASHVILLE-EC-FALL-2026"]["live_form_optional_control_count"] == 11
+    assert (
+        lanes["NASHVILLE-EC-FALL-2026"][
+            "live_form_agreement_or_signature_count"
+        ]
+        == 5
+    )
+    assert (
+        lanes["NASHVILLE-EC-FALL-2026"][
+            "live_form_native_required_count_previously_observed"
+        ]
+        == 17
+    )
+    assert (
+        lanes["NASHVILLE-EC-FALL-2026"][
+            "live_form_native_required_count_complete"
+        ]
+        is False
+    )
+    current_rendered = module.render_markdown(payload)
+    assert "Live form controls: `47`" in current_rendered
+    assert "Visibly required controls: `36`" in current_rendered
+    assert "Earlier native-required count complete: `false`" in current_rendered
+    assert lanes["OPENAI-BUILD-WEEK-2026"]["command"] == "SENT_VERIFIED"
+    assert lanes["OPENAI-BUILD-WEEK-2026"]["verification_scope"] == (
+        "OFFICIAL_DEVPOST_CONFIRMATION_EMAIL"
+    )
+    assert lanes["ONC-ARGOS-SSN-2026-OS351107"]["command"] == "SENT_VERIFIED"
+    assert lanes["ONC-ARGOS-SSN-2026-OS351107"]["verification_scope"] == (
+        "SENT_COPY_VERIFIED_AUTOMATIC_REPLY_ONLY"
+    )
+    assert lanes["DLA26BZ03-NV011"]["command"] == "EXPIRED_NO_SUBMISSION"
+    assert lanes["DLA26BZ03-NV011"]["submission_status"] == (
+        "OFFICIAL_DLA_CONFIRMED_PROPOSAL_IN_PROGRESS_NOT_SUBMITTED"
+    )
+    launchtn = next(
+        row
+        for row in payload["stage_now"]
+        if row["opportunity_number"] == "LAUNCHTN-3686-2026"
+    )
+    assert launchtn["classification"] == "STAGE_CANDIDATE_NOT_READINESS_CLAIM"
+    assert launchtn["deadline_actionable"] is False
+    assert launchtn["submission_ready"] is False
+    rendered = module.render_markdown(payload)
+    assert "Finish the OpenAI Build Week" not in rendered
+    assert "MissionWeave DSIP package for July 22" not in rendered
+    assert "## Stage Candidates" in rendered
+    assert "not readiness claims" in rendered
+
+
+def test_current_official_recheck_updates_active_and_closed_lanes():
+    module = load_module()
+    payload = module.build_payload(
+        scan_date=date(2026, 7, 29),
+        generated_utc="2026-07-29T10:30:00Z",
+        as_of_utc="2026-07-29T10:30:00Z",
+    )
+
+    summary = payload["summary"]
+    assert summary["lane_count"] == 27
+    assert summary["stage_candidate_count"] == 3
+    assert summary["stage_ready_count"] == 0
+    assert summary["sent_verified_count"] == 6
+    assert summary["no_bid_or_partner_only_count"] == 8
+    assert summary["expired_without_verified_send_count"] == 8
+    assert summary["human_gated_count"] == 11
+    assert summary["human_action_due_count"] == 1
+    assert summary["freshness_blocked_lane_count"] == 10
+    assert payload["stage_ready"] == []
+
+    lanes = {row["opportunity_number"]: row for row in payload["lanes"]}
+
+    erdc = lanes["W912HZ26SC005"]
+    assert erdc["command"] == "STAGE_CONCEPT_PAPER"
+    assert erdc["source_freshness_status"] == "CURRENT_OFFICIAL_RECHECK"
+    assert erdc["source_data_current"] is True
+    assert erdc["source_data_current_scope"] == (
+        "PUBLIC_OPPORTUNITY_STATUS_SCHEDULE_AND_CURRENT_ATTACHMENT_SET"
+    )
+    assert erdc["source_attachment_set_current"] is True
+    assert erdc["deadline_actionable"] is True
+    assert erdc["freshness_blockers"] == []
+    assert erdc["funding_currently_available"] is False
+    assert erdc["response_type"] == "RFI_ONLY_NO_CURRENT_FUNDING"
+    assert erdc["private_final_pdf_present"] is False
+    assert erdc["private_final_candidate_gate_status"] == (
+        "PRIVATE_FINAL_INPUTS_NOT_CAPTURED"
+    )
+    assert erdc["private_final_document_checks_pass"] is False
+    assert erdc["portal_upload_set_status"] == "NONE_PRIVATE_FINAL_REQUIRED"
+    assert erdc["portal_upload_files"] == []
+    assert erdc["submission_ready"] is False
+    assert erdc["semantic_review_complete"] is False
+    assert erdc["official_source_integrity_pass"] is True
+    assert erdc["bounded_evidence_receipt_pass"] is True
+    assert erdc["rom_submission_ready"] is False
+    assert erdc["private_final_submission_ready"] is False
+    assert erdc["private_final_unresolved_gate_count_effective"] == 12
+    assert (
+        "CURRENT_OFFICIAL_SOURCE_INTEGRITY"
+        in erdc["private_final_unresolved_gates_raw"]
+    )
+    assert (
+        "CURRENT_OFFICIAL_SOURCE_INTEGRITY"
+        not in erdc["private_final_unresolved_gates_effective"]
+    )
+    assert (
+        "BOUNDED_EVIDENCE_RECEIPT"
+        not in erdc["private_final_unresolved_gates_effective"]
+    )
+
+    launchtn = lanes["LAUNCHTN-3686-2026"]
+    assert launchtn["command"] == "STAGE_APPLICATION"
+    assert launchtn["source_freshness_status"] == "CURRENT_OFFICIAL_RECHECK"
+    assert launchtn["deadline_actionable"] is True
+    assert launchtn["submission_ready"] is False
+    assert launchtn["attachment_deck_status"] == (
+        "VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED"
+    )
+    assert launchtn["attachment_financial_status"] == (
+        "PLANNING_MODEL_ARITHMETIC_QA_ONLY_FOUNDER_ASSUMPTION_APPROVAL_REQUIRED"
+    )
+    assert launchtn["portal_upload_set_status"] == (
+        "NONE_ATTACHMENT_AND_PORTAL_GATES_OPEN"
+    )
+    assert launchtn["portal_upload_files"] == []
+    assert launchtn["application_manifest_status"] == "CURRENT_CANONICAL_MANIFEST"
+    assert launchtn["application_required_field_count"] == 25
+    assert launchtn["application_field_count"] == 30
+    assert launchtn["human_or_private_fact_gate_count"] == 14
+    assert launchtn["required_attachment_count"] == 2
+    assert launchtn["required_attachments_present"] == 2
+    assert launchtn["required_attachments_structural_qa_passed"] == 2
+    assert launchtn["required_attachments_final_qa_passed"] == 0
+    assert launchtn["required_attachments_safe_to_upload"] == 0
+    assert launchtn["attachments_final_qa"] == "0/2"
+    assert launchtn["safe_upload_count"] == 0
+    assert launchtn["upload_set_ready"] is False
+    assert any(
+        path.endswith(
+            "LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx"
+        )
+        for path in launchtn["package_files"]
+    )
+    assert not any(
+        path.endswith("LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx")
+        for path in launchtn["package_files"]
+    )
+    rendered = module.render_markdown(payload)
+    assert "Required attachments final QA: `0/2`" in rendered
+    assert "Safe upload count: `0`" in rendered
+    assert "Semantic review complete: `false`" in rendered
+    assert "Effective private-final unresolved gates: `12`" in rendered
+
+    fhwa = lanes["693JJ326R000012"]
+    assert fhwa["official_recheck_status"] == "ACTIVE_AMENDED"
+    assert fhwa["command"] == "NO_SOLO_SUBMIT_PARTNER_ONLY"
+    assert fhwa["deadline_actionable"] is True
+
+    army = lanes["W900KK-26-R-0001"]
+    assert army["command"] == "AUTHENTICATED_ATTACHMENT_REVIEW_REQUIRED"
+    assert army["source_data_current"] is True
+    assert army["deadline_actionable"] is False
+
+    mda = lanes["MDA26BZ04-NV007"]
+    assert mda["command"] == "NO_BID_TOPIC_REMOVED"
+    assert mda["deadline_utc"] is None
+    assert mda["deadline_date"] is None
+    assert mda["deadline_actionable"] is False
+
+    falcon = lanes["DPA26BZ04-DV016"]
+    assert falcon["command"] == "NO_BID_TECHNICAL_GATE_FAILED"
+    assert falcon["official_recheck_status"] == "OPEN"
+    assert falcon["deadline_actionable"] is False
+
+    nsf = lanes["26-510"]
+    assert nsf["source_freshness_status"] == "CURRENT_OFFICIAL_RECHECK"
+    assert nsf["deadline_semantics"] == (
+        "PROJECT_PITCH_ROLLING_NEXT_FULL_PROPOSAL_DEADLINE_INVITATION_REQUIRED"
+    )
+    assert nsf["deadline_actionable"] is False
+
+    for lane in payload["lanes"]:
+        assert lane["external_send_allowed_without_human"] is False
+        assert lane["final_submit_allowed_without_human"] is False
 
 
 def test_near_deadline_board_keeps_hud_and_bop_behind_correct_gates():
@@ -544,6 +809,8 @@ def test_near_deadline_board_rendering_is_safe_and_cites_sources():
         "erdc_solution_brief_compliance_gate",
         "erdc_phase2_rom_gate",
         "erdc_phase2_rom_workflow",
+        "erdc_private_final_candidate_gate",
+        "erdc_private_final_candidate_workflow",
         "erdc_source_manifest",
         "erdc_public_draft_pdf",
         "sam_public_key_rotation_control",
@@ -635,7 +902,10 @@ def test_stale_sources_and_zero_row_sam_fail_closed() -> None:
         "zero_friction_pack",
     ):
         descriptor = freshness["sources"][source]
-        assert descriptor["freshness_status"] == "STALE_REVERIFY_REQUIRED"
+        assert descriptor["freshness_status"] in {
+            "STALE_REVERIFY_REQUIRED",
+            "FUTURE_TIMESTAMP_REVERIFY_REQUIRED",
+        }
         assert descriptor["blocking"] is True
 
     sam = freshness["sources"]["sam_live_discovery"]

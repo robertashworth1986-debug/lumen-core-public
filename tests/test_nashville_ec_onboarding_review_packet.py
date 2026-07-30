@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 from pathlib import Path
 
 
@@ -69,3 +70,19 @@ def test_onboarding_packet_remains_founder_gated_and_claim_bounded() -> None:
     assert "Final submit" in text
     assert "Deposit and any payment terms" in text
     assert "does not prove revenue, customers, market validation" in text
+
+
+def test_onboarding_packet_reconciles_every_visible_live_control() -> None:
+    text = PACKET.read_text(encoding="utf-8")
+    rows = [
+        line
+        for line in text.splitlines()
+        if re.match(r"^\| [FBALG]\d{2} \|", line)
+    ]
+
+    assert len(rows) == 47
+    assert len([row for row in rows if "| Yes |" in row]) == 36
+    assert len([row for row in rows if "| No |" in row]) == 11
+    assert "plus the final `Submit` button" in text
+    assert "native-control count of `17` was incomplete" in text
+    assert "do not use the unverified `linkedin.com/company/1337` placeholder" in text

@@ -139,18 +139,18 @@
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "518e8bd19982f1e04af5cab7f53becd11d3eae36faa26db3e8c0101e76383b84"
+        "expected_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555"
       },
-      "last_validated_utc": "2026-07-30T03:32:50Z",
+      "last_validated_utc": "2026-07-30T04:18:00Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
           "path": "code/ops/BUILD_PITCH_DECK_GOVERNANCE.py",
-          "expected_sha256": "d624737d4da7cce78a85f242bbafc6f9572c2746bd92cf013bec23e1d97b94a0"
+          "expected_sha256": "876deeaca05297b43016321f5782466a3300c62528113b18c0ec8ac6d3f58756"
         },
         {
           "path": "tests/test_pitch_deck_governance.py",
-          "expected_sha256": "d9e2dde23b337cb9f30d4430ae1aef716d9ad7722bfe0dd8f40ccba65bdcdcf1"
+          "expected_sha256": "2693386c1eb0509c0603669a2c2cbc7c5a311015f05c75c9814b06fd6d488557"
         },
         {
           "path": "output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx",
@@ -170,9 +170,9 @@
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "518e8bd19982f1e04af5cab7f53becd11d3eae36faa26db3e8c0101e76383b84"
+        "expected_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555"
       },
-      "last_validated_utc": "2026-07-30T03:32:50Z",
+      "last_validated_utc": "2026-07-30T04:18:00Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
@@ -197,9 +197,9 @@
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "518e8bd19982f1e04af5cab7f53becd11d3eae36faa26db3e8c0101e76383b84"
+        "expected_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555"
       },
-      "last_validated_utc": "2026-07-30T03:32:50Z",
+      "last_validated_utc": "2026-07-30T04:18:00Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {

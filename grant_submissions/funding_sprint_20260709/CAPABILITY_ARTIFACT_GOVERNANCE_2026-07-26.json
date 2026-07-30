@@ -117,14 +117,14 @@
           "sha256": "A70557332A303AAE1E10865765F700F5AC9E8E4FDA0AE04944CC74DC2F72B027"
         },
         {
-          "bytes": 2159316,
+          "bytes": 2244585,
           "path": "out/ops/source_native_family_baseline_ledger_latest.json",
-          "sha256": "7BC80126D77E8EDEC39D0FE97ADFF15C477BA681A985B0DABB431C0B4E963D2D"
+          "sha256": "627D0ADD4D31514F7A47DBF8E8C51B0FA46DF72635F336133F54ABB85B00927A"
         },
         {
           "bytes": 1108,
           "path": "out/ops/time_series_source_native_prospective_protocol_status.json",
-          "sha256": "B66AF0CA033D95982B4B38C2CA9699A1386B3ADDF07A56B0C988C73125C508CD"
+          "sha256": "535F8494CAA6EF409E44BDC901B0423C287FF578BBC5876A2B48EC96D5F7E37D"
         }
       ],
       "external_release_authorized": false,
@@ -137,7 +137,7 @@
       "status": "CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED"
     }
   ],
-  "as_of_utc": "2026-07-29T13:51:03.824313Z",
+  "as_of_utc": "2026-07-30T04:05:04.890145Z",
   "blockers": {
     "marker_failures": [],
     "missing_artifacts": [],
@@ -145,7 +145,7 @@
     "unregistered_artifacts": []
   },
   "claim_boundary": "This registry governs local capability artifacts and detects stale or unregistered packets. It does not establish eligibility, responsiveness, agency trust, certification, past performance, independent validation, submission, receipt, selection, award, or authority to contact an external party.",
-  "control_sha256": "69057DDED84E5E56682F02A73B3261C94CB6E864B91C1289FB9B587A3A521832",
+  "control_sha256": "347338C3386BB62DC6C31363373EBF6C88EC8AE8C9858CCB6F8A2DBD1F87E82C",
   "controls": {
     "action_time_human_approval_required": true,
     "autonomous_email_send_allowed": false,

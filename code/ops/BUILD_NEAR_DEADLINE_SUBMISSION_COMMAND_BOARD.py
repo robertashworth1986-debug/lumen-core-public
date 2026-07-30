@@ -35,9 +35,23 @@ DOJ_BOP_SOURCE_MANIFEST = (
     / "DOJ_BOP_15BCMS26Q70000005_SOURCE_MANIFEST_2026-07-16.json"
 )
 NSF_PITCH_DIR = ROOT / "grant_submissions" / "NSF_Project_Pitch"
-NSF_PORTAL_FIELDS = NSF_PITCH_DIR / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
+NSF_PORTAL_FIELDS = NSF_PITCH_DIR / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-29.md"
+NSF_PASTE_CHECK = NSF_PITCH_DIR / "PROJECT_PITCH_PASTE_CHECK_2026-07-29.md"
 NSF_ROUTING_MANIFEST = (
-    NSF_PITCH_DIR / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json"
+    NSF_PITCH_DIR / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-29.json"
+)
+NSF_SOURCE_AUDIT = (
+    NSF_PITCH_DIR / "NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-29.json"
+)
+NSF_READINESS = NSF_PITCH_DIR / "PROJECT_PITCH_READINESS_2026-07-29.md"
+NSF_SOURCE_NATIVE_LEDGER = (
+    OUT_OPS / "source_native_family_baseline_ledger_latest.json"
+)
+NSF_MARKET_BENCHMARK_MANIFEST = (
+    OUT_OPS / "market_signal_source_native_benchmark_manifest_latest.json"
+)
+NSF_WHITEPAPER_MANIFEST = (
+    OUT_OPS / "source_native_research_whitepaper_manifest_latest.json"
 )
 NASHVILLE_EC_DIR = ROOT / "grant_submissions" / "NASHVILLE_EC_FALL_2026"
 NASHVILLE_EC_FIELD_MAP = (
@@ -95,6 +109,50 @@ OPENAI_BUILD_WEEK_DEMO_SCRIPT = (
 )
 OPENAI_BUILD_WEEK_REQUIREMENTS = (
     OPENAI_BUILD_WEEK_DIR / "OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json"
+)
+OPENAI_BUILD_WEEK_CONFIRMATION = (
+    OPENAI_BUILD_WEEK_DIR
+    / "OPENAI_BUILD_WEEK_SUBMISSION_CONFIRMATION_STATE_2026-07-21.json"
+)
+OFFICIAL_INBOUND_STATUS_EVENT_REGISTER = (
+    SPRINT_DIR / "OFFICIAL_INBOUND_STATUS_EVENT_REGISTER_2026-07-25.json"
+)
+NASHVILLE_EC_ONBOARDING_REVIEW_PACKET = (
+    NASHVILLE_EC_DIR
+    / "NASHVILLE_EC_TAKEOFF_ONBOARDING_REVIEW_PACKET_2026-07-29.md"
+)
+ARGOS_GOVERNMENT_SUBMISSION_STATUS = (
+    SPRINT_DIR / "ARGOS_GOVERNMENT_SUBMISSION_STATUS_2026-07-28.json"
+)
+DLA_DSIP_OFFICIAL_NON_SUBMISSION_RECEIPT = (
+    SPRINT_DIR / "DLA_DSIP_OFFICIAL_NON_SUBMISSION_RECEIPT_2026-07-28.json"
+)
+CURRENT_OFFICIAL_OPPORTUNITY_RECHECK = (
+    SPRINT_DIR / "CURRENT_OFFICIAL_OPPORTUNITY_RECHECK_2026-07-29.json"
+)
+CURRENT_EVIDENCE_DECK = (
+    ROOT
+    / "output"
+    / "pptx"
+    / "LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx"
+)
+LAUNCHTN_3686_REFRESH = (
+    ROOT
+    / "grant_submissions"
+    / "LAUNCHTN_3686_PITCH_2026"
+    / "LAUNCHTN_3686_APPLICATION_REFRESH_2026-07-29.md"
+)
+FALCON_NO_GO_MAP = (
+    ROOT
+    / "grant_submissions"
+    / "DPA26BZ04_DV016_FALCON"
+    / "DPA26BZ04_DV016_GO_NO_GO_AND_DP2_GAP_MAP_2026-07-15.md"
+)
+MDA_NV007_NO_GO_MAP = (
+    ROOT
+    / "grant_submissions"
+    / "MDA26BZ04_NV007_ControlAssessment"
+    / "MDA26BZ04_NV007_GO_NO_GO_AND_PROPOSAL_MAP_2026-07-13.md"
 )
 MISSIONWEAVE_DIR = (
     ROOT / "grant_submissions" / "DLA26BZ03_NV011_MissionWeave"
@@ -155,19 +213,20 @@ MISSIONWEAVE_COMPONENT_INSTRUCTIONS = (
 )
 LAUNCHTN_3686_DIR = ROOT / "grant_submissions" / "LAUNCHTN_3686_PITCH_2026"
 LAUNCHTN_3686_FIELD_MAP = (
-    LAUNCHTN_3686_DIR / "LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-17.md"
+    LAUNCHTN_3686_DIR / "LAUNCHTN_3686_PORTAL_FIELD_MAP_2026-07-29.md"
 )
 LAUNCHTN_3686_MANIFEST = (
-    LAUNCHTN_3686_DIR / "LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json"
+    LAUNCHTN_3686_DIR / "LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-29.json"
 )
 LAUNCHTN_3686_DECK = (
-    LAUNCHTN_3686_DIR / "LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx"
+    LAUNCHTN_3686_DIR
+    / "LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx"
 )
 LAUNCHTN_3686_FINANCIAL_MODEL = (
     LAUNCHTN_3686_DIR / "LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx"
 )
 EXTERNAL_ENGAGEMENT_REGISTER = (
-    SPRINT_DIR / "EXTERNAL_ENGAGEMENT_RESPONSE_REGISTER_2026-07-16.json"
+    ROOT / "out" / "ops" / "external_engagement_response_register_latest.json"
 )
 FHWA_PARTNER_OUTREACH_CONTROL = (
     SPRINT_DIR / "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json"
@@ -176,20 +235,26 @@ FHWA_PARTNER_RESPONSE_CONTROL = (
     SPRINT_DIR / "FHWA_TSMO_PARTNER_RESPONSE_CONTROL_2026-07-17.md"
 )
 ERDC_SOLUTION_BRIEF_GATE = (
-    SPRINT_DIR / "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-17.json"
+    SPRINT_DIR / "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json"
 )
-ERDC_ROM_GATE = SPRINT_DIR / "ERDC_SDC_PHASE2_ROM_GATE_2026-07-17.json"
+ERDC_ROM_GATE = SPRINT_DIR / "ERDC_SDC_PHASE2_ROM_GATE_2026-07-29.json"
 ERDC_ROM_WORKFLOW = (
-    SPRINT_DIR / "ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-17.md"
+    SPRINT_DIR / "ERDC_SDC_PHASE2_ROM_APPROVAL_WORKFLOW_2026-07-29.md"
+)
+ERDC_PRIVATE_FINAL_GATE = (
+    SPRINT_DIR / "ERDC_SDC_PRIVATE_FINAL_CANDIDATE_GATE_2026-07-29.json"
+)
+ERDC_PRIVATE_FINAL_WORKFLOW = (
+    ROOT / "docs" / "ERDC_SDC_PRIVATE_FINAL_CANDIDATE_WORKFLOW_2026-07-29.md"
 )
 ERDC_SOURCE_MANIFEST = (
     SPRINT_DIR
     / "source_attachments"
     / "W912HZ26SC005"
-    / "SOURCE_MANIFEST_2026-07-16.json"
+    / "SOURCE_MANIFEST_2026-07-29.json"
 )
 ERDC_PUBLIC_DRAFT_PDF = (
-    ROOT / "output" / "pdf" / "LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-17.pdf"
+    ROOT / "output" / "pdf" / "LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf"
 )
 SAM_KEY_ROTATION_CONTROL = (
     SPRINT_DIR / "SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json"
@@ -236,6 +301,8 @@ NO_BID_COMMANDS = {
     "NO_BID_MISSED_PREREQUISITE",
     "NO_SOLO_SUBMIT_PARTNER_ONLY",
     "PARTNER_OR_NO_BID",
+    "NO_BID_TECHNICAL_GATE_FAILED",
+    "NO_BID_TOPIC_REMOVED",
 }
 EXPIRED_COMMAND = "EXPIRED_NO_SUBMISSION"
 FRESHNESS_BLOCKED_COMMAND = "REVERIFY_SOURCE_BEFORE_STAGE"
@@ -308,8 +375,23 @@ def optional_aware_datetime(value: Any) -> datetime | None:
         return None
 
 
+def evidence_observed_by(
+    observed_utc: Any,
+    cutoff: datetime,
+    *,
+    field: str,
+) -> bool:
+    if observed_utc in (None, ""):
+        raise ValueError(f"{field} must include an observation timestamp")
+    observed = parse_aware_datetime(str(observed_utc), field=field).astimezone(
+        timezone.utc
+    )
+    return observed <= cutoff
+
+
 def source_timestamp(payload: dict[str, Any]) -> str | None:
     for key in (
+        "source_observed_utc",
         "generated_utc",
         "harvested_utc",
         "updated_utc",
@@ -1059,6 +1141,12 @@ def base_sources() -> dict[str, Any]:
         "openai_build_week_project_description": OPENAI_BUILD_WEEK_DESCRIPTION,
         "openai_build_week_demo_script": OPENAI_BUILD_WEEK_DEMO_SCRIPT,
         "openai_build_week_requirements": OPENAI_BUILD_WEEK_REQUIREMENTS,
+        "openai_build_week_submission_confirmation": OPENAI_BUILD_WEEK_CONFIRMATION,
+        "official_inbound_status_event_register": OFFICIAL_INBOUND_STATUS_EVENT_REGISTER,
+        "nashville_ec_onboarding_review_packet": NASHVILLE_EC_ONBOARDING_REVIEW_PACKET,
+        "argos_government_submission_status": ARGOS_GOVERNMENT_SUBMISSION_STATUS,
+        "dla_dsip_official_non_submission_receipt": DLA_DSIP_OFFICIAL_NON_SUBMISSION_RECEIPT,
+        "current_official_opportunity_recheck": CURRENT_OFFICIAL_OPPORTUNITY_RECHECK,
         "missionweave_dsip_package_manifest": MISSIONWEAVE_MANIFEST,
         "missionweave_dsip_assembly_map": MISSIONWEAVE_ASSEMBLY_MAP,
         "missionweave_volume2_pdf": MISSIONWEAVE_VOLUME2_PDF,
@@ -1080,6 +1168,8 @@ def base_sources() -> dict[str, Any]:
         "erdc_solution_brief_compliance_gate": ERDC_SOLUTION_BRIEF_GATE,
         "erdc_phase2_rom_gate": ERDC_ROM_GATE,
         "erdc_phase2_rom_workflow": ERDC_ROM_WORKFLOW,
+        "erdc_private_final_candidate_gate": ERDC_PRIVATE_FINAL_GATE,
+        "erdc_private_final_candidate_workflow": ERDC_PRIVATE_FINAL_WORKFLOW,
         "erdc_source_manifest": ERDC_SOURCE_MANIFEST,
         "erdc_public_draft_pdf": ERDC_PUBLIC_DRAFT_PDF,
         "sam_public_key_rotation_control": SAM_KEY_ROTATION_CONTROL,
@@ -1198,6 +1288,850 @@ def apply_nashville_submission_receipt(
     ]
     lane["human_gate"] = []
     lane["claim_boundary"] = receipt.get("claim_boundary")
+
+
+def apply_nashville_selection_and_onboarding(
+    lanes: list[dict[str, Any]],
+    event_register: dict[str, Any],
+) -> None:
+    if (
+        event_register.get("schema")
+        != "lumencore.official_inbound_status_event_register.v1"
+    ):
+        raise ValueError("Official inbound status-event register is missing or stale")
+    events = [
+        event
+        for event in event_register.get("events", [])
+        if event.get("lane_id") == "nashville_ec_takeoff_fall_2026"
+        and event.get("status")
+        == "COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE"
+    ]
+    if len(events) != 1:
+        raise ValueError("Nashville cohort-selection event is missing or ambiguous")
+    event = events[0]
+    evidence = event.get("evidence", {})
+    action = event.get("action", {})
+    deadline = action.get("deadline", {})
+    if (
+        evidence.get("cohort_selected") is not True
+        or evidence.get("onboarding_form_completed") is not False
+        or evidence.get("participation_agreement_accepted") is not False
+        or evidence.get("deposit_submitted") is not False
+        or deadline.get("onboarding_form_and_participation_agreement_date")
+        != "2026-07-31"
+        or deadline.get("deposit_date") != "2026-08-14"
+        or deadline.get("time_and_timezone_explicit") is not False
+    ):
+        raise ValueError("Nashville onboarding event failed reconciliation")
+
+    lane = next(
+        (
+            row
+            for row in lanes
+            if row.get("opportunity_number") == "NASHVILLE-EC-FALL-2026"
+        ),
+        None,
+    )
+    if lane is None or lane.get("command") != "SENT_VERIFIED":
+        raise ValueError("Nashville submitted lane is missing before onboarding overlay")
+
+    lane["pre_onboarding_command"] = lane["command"]
+    lane["command"] = "FOUNDER_ONBOARDING_ACTION_DUE"
+    lane["submission_status"] = event["status"]
+    lane["deadline_utc"] = None
+    lane["deadline_date"] = "2026-07-31"
+    lane["official_deadline_text"] = (
+        "Onboarding form and participation agreement due July 31, 2026; "
+        "the official message does not state a time or timezone. "
+        "The separate founder-controlled deposit date is August 14, 2026."
+    )
+    lane["deadline_semantics"] = (
+        "OFFICIAL_DATE_CONFIRMED_TIME_AND_TIMEZONE_NOT_STATED_COMPLETE_EARLY"
+    )
+    lane["deadline_actionable"] = True
+    lane["eligibility_state"] = "COHORT_SELECTED_ONBOARDING_NOT_COMPLETED"
+    lane["fit_state"] = "SELECTED_COHORT_FOUNDER_LEGAL_AND_PAYMENT_REVIEW_OPEN"
+    lane["action_gate_status"] = event["status"]
+    lane["action_gate_submission_ready_for_human_click"] = False
+    lane["action_gate_open_gate_count"] = len(action.get("missing_facts", []))
+    lane["action_gate_required_private_gate_count"] = len(
+        action.get("missing_facts", [])
+    )
+    lane["action_gate_passed_private_gate_count"] = 0
+    lane["action_gate_private_input_present"] = False
+    onboarding_packet = NASHVILLE_EC_ONBOARDING_REVIEW_PACKET.read_text(
+        encoding="utf-8"
+    )
+    required_onboarding_markers = (
+        "The live form has `47` data, upload, selection, agreement, or signature controls",
+        "Of those controls, `36` are visibly marked required and `11` are optional.",
+        "A prior native-control count of `17` was incomplete",
+    )
+    if not all(marker in onboarding_packet for marker in required_onboarding_markers):
+        raise ValueError("Nashville onboarding control reconciliation is missing or stale")
+    lane["live_form_control_count"] = 47
+    lane["live_form_required_control_count"] = 36
+    lane["live_form_optional_control_count"] = 11
+    lane["live_form_agreement_or_signature_count"] = 5
+    lane["live_form_native_required_count_previously_observed"] = 17
+    lane["live_form_native_required_count_complete"] = False
+    lane["live_form_last_inspected_utc"] = "2026-07-29T20:40:48Z"
+    lane["why_now"] = (
+        "The official selection notice creates a July 31 onboarding and "
+        "participation-agreement action. Selection is not funding or validation, "
+        "and the August 14 deposit remains a separate founder-controlled decision."
+    )
+    lane["today_work"] = [
+        "Review every onboarding answer, program expectation, and participation-agreement term.",
+        "Complete the founder-reviewed onboarding route before July 31; the official message states no cutoff time, so do not wait for an inferred end-of-day deadline.",
+        "Keep the corrected payment route and August 14 deposit separate; do not make a payment automatically.",
+        "Do not send another thank-you or duplicate acceptance message.",
+    ]
+    lane["human_gate"] = [
+        "Robert verifies every onboarding answer and attendance commitment.",
+        "Robert reviews and accepts the participation agreement only after legal and founder review.",
+        "Robert separately approves any deposit or remaining financial commitment before August 14.",
+    ]
+    lane["package_files"] = list(
+        dict.fromkeys(
+            [
+                *lane["package_files"],
+                rel(OFFICIAL_INBOUND_STATUS_EVENT_REGISTER),
+                rel(NASHVILLE_EC_ONBOARDING_REVIEW_PACKET),
+            ]
+        )
+    )
+    lane["receipt_path"] = rel(OFFICIAL_INBOUND_STATUS_EVENT_REGISTER)
+    lane["verification_scope"] = "OFFICIAL_COHORT_SELECTION_EMAIL_STATE"
+    lane["claim_boundary"] = (
+        "The portal receipt proves application submission and the later official "
+        "message proves cohort selection plus the stated onboarding and deposit dates. "
+        "Neither proves onboarding completion, agreement acceptance, payment, funding, "
+        "endorsement, independent validation, or an award."
+    )
+
+
+def apply_openai_build_week_confirmation(
+    lanes: list[dict[str, Any]],
+    receipt: dict[str, Any],
+) -> None:
+    evidence = receipt.get("evidence", {})
+    controls = receipt.get("controls", {})
+    if (
+        receipt.get("schema")
+        != "lumencore.openai_build_week_submission_confirmation_state.v1"
+        or receipt.get("status")
+        != "OFFICIAL_SUBMISSION_CONFIRMATION_EMAIL_OBSERVED"
+        or receipt.get("lane_id") != "openai_build_week_prooflock_console"
+        or evidence.get("submission_name") != "ProofLock Console"
+        or controls.get("do_not_duplicate_submission") is not True
+    ):
+        raise ValueError("OpenAI Build Week submission confirmation is missing or stale")
+    lane = next(
+        (
+            row
+            for row in lanes
+            if row.get("lane_id") == "openai_build_week_prooflock_console"
+        ),
+        None,
+    )
+    if lane is None:
+        raise ValueError("OpenAI Build Week command lane is missing")
+    lane["pre_send_command"] = lane["command"]
+    lane["command"] = "SENT_VERIFIED"
+    lane["submission_status"] = receipt["status"]
+    lane["sent_utc"] = evidence.get("confirmation_email_received_utc")
+    lane["receipt_path"] = rel(OPENAI_BUILD_WEEK_CONFIRMATION)
+    lane["receipt_attachment_sha256"] = hashlib.sha256(
+        OPENAI_BUILD_WEEK_CONFIRMATION.read_bytes()
+    ).hexdigest()
+    lane["verification_scope"] = "OFFICIAL_DEVPOST_CONFIRMATION_EMAIL"
+    lane["eligibility_state"] = "SUBMISSION_CONFIRMED_ELIGIBILITY_NOT_ADJUDICATED"
+    lane["today_work"] = [
+        "Monitor the existing Devpost account and official email for organizer or judging requests.",
+        "Do not resubmit or describe the project as selected, endorsed, funded, or awarded.",
+    ]
+    lane["human_gate"] = []
+    lane["claim_boundary"] = receipt.get("claim_boundary")
+
+
+def build_argos_government_submission_lane(
+    receipt: dict[str, Any],
+) -> dict[str, Any]:
+    opportunity = receipt.get("opportunity", {})
+    mailbox = receipt.get("mailbox_observation", {})
+    dispatch = receipt.get("dispatch", {})
+    controls = receipt.get("controls", {})
+    if (
+        receipt.get("schema") != "lumencore.argos_government_submission_status.v1"
+        or receipt.get("notice_id") != "ONC-ARGOS-SSN-2026-OS351107"
+        or receipt.get("status") != "SENT_ONCE_POST_SEND_VERIFIED_NO_DUPLICATE"
+        or mailbox.get("post_send_sent_copy_verified") is not True
+        or mailbox.get("matching_sent_count_after_send") != 1
+        or controls.get("automatic_reply_is_not_a_request_to_resend") is not True
+        or controls.get("duplicate_send_prohibited") is not True
+    ):
+        raise ValueError("Project Argos Government submission receipt is missing or stale")
+    attachment_sha256 = str(dispatch.get("attachment_sha256", ""))
+    if len(attachment_sha256) != 64:
+        raise ValueError("Project Argos attachment receipt is invalid")
+    return {
+        "rank": 2.4,
+        "lane_id": "argos_government_sources_sought",
+        "source_system": "Official notice recheck / Gmail sent-copy receipt",
+        "opportunity_number": receipt["notice_id"],
+        "title": "HHS Project Argos Sources Sought",
+        "agency": "United States Department of Health and Human Services",
+        "deadline_utc": opportunity.get("government_deadline_utc"),
+        "deadline_date": "2026-07-30",
+        "official_deadline_text": "July 30, 2026 at 5:00 PM Eastern Time",
+        "deadline_semantics": "OFFICIAL_SOURCE_RECHECKED_BEFORE_SEND",
+        "command": "SENT_VERIFIED",
+        "eligibility_state": "MARKET_RESEARCH_RESPONSE_SENT_ELIGIBILITY_NOT_ADJUDICATED",
+        "fit_state": "BOUNDED_CAPABILITY_RESPONSE_SENT_NO_ACCEPTANCE_CLAIM",
+        "submission_route": "Email response per the controlling sources-sought notice",
+        "official_url": None,
+        "package_files": [
+            rel(ARGOS_GOVERNMENT_SUBMISSION_STATUS),
+            "out/private/argos/action_copy_20260728/ARGOS_PRIVATE_ACTION_COPY.docx",
+        ],
+        "why_now": (
+            "One Government response was sent before the recorded deadline and its "
+            "sent copy was verified. The automatic reply is informational, not a "
+            "substantive agency receipt or evaluation."
+        ),
+        "today_work": [
+            "Monitor the existing agency thread for a substantive request.",
+            "Do not resend, and do not treat the automatic reply as acceptance or evaluation.",
+        ],
+        "human_gate": [],
+        "external_send_allowed_without_human": False,
+        "final_submit_allowed_without_human": False,
+        "submission_status": receipt["status"],
+        "sent_utc": mailbox.get("sent_utc"),
+        "receipt_path": rel(ARGOS_GOVERNMENT_SUBMISSION_STATUS),
+        "receipt_attachment_sha256": attachment_sha256,
+        "verification_scope": "SENT_COPY_VERIFIED_AUTOMATIC_REPLY_ONLY",
+        "claim_boundary": (
+            "This receipt proves one outbound sources-sought response and sent-copy "
+            "verification. It does not prove evaluation, acceptance, selection, award, "
+            "contract, funding, endorsement, validation, performance, or savings."
+        ),
+    }
+
+
+def apply_missionweave_non_submission_receipt(
+    lanes: list[dict[str, Any]],
+    receipt: dict[str, Any],
+) -> None:
+    evidence = receipt.get("evidence", {})
+    if (
+        receipt.get("schema")
+        != "lumencore.dla_dsip_official_non_submission_receipt.v1"
+        or receipt.get("status")
+        != "OFFICIAL_DLA_CONFIRMED_PROPOSAL_IN_PROGRESS_NOT_SUBMITTED"
+        or receipt.get("topic") != "DLA26BZ03-NV011"
+        or evidence.get("official_dla_response") is not True
+        or evidence.get("portal_status") != "IN_PROGRESS"
+        or evidence.get("formally_submitted") is not False
+        or evidence.get("submission_receipt_observed") is not False
+        or evidence.get("deadline_elapsed") is not True
+    ):
+        raise ValueError("MissionWeave official non-submission receipt is missing or stale")
+    lane = next(
+        (
+            row
+            for row in lanes
+            if row.get("opportunity_number") == "DLA26BZ03-NV011"
+        ),
+        None,
+    )
+    if lane is None:
+        raise ValueError("MissionWeave command lane is missing")
+    lane["pre_expiry_command"] = lane.get("pre_expiry_command") or lane["command"]
+    lane["command"] = EXPIRED_COMMAND
+    lane["submission_status"] = receipt["status"]
+    lane["eligibility_state"] = "OFFICIAL_PORTAL_STATE_IN_PROGRESS_NOT_SUBMITTED"
+    lane["why_now"] = (
+        "The official DLA response reported the DSIP proposal as In Progress and "
+        "therefore not formally submitted after the deadline. Preserve this negative "
+        "receipt and do not represent the package as submitted."
+    )
+    lane["today_work"] = [
+        "Archive the official non-submission receipt and preserve the failed gates for a future solicitation.",
+        "Do not resend, certify, upload, or imply that a formal submission occurred.",
+    ]
+    lane["human_gate"] = []
+    lane["receipt_path"] = rel(DLA_DSIP_OFFICIAL_NON_SUBMISSION_RECEIPT)
+    lane["receipt_attachment_sha256"] = hashlib.sha256(
+        DLA_DSIP_OFFICIAL_NON_SUBMISSION_RECEIPT.read_bytes()
+    ).hexdigest()
+    lane["verification_scope"] = "OFFICIAL_DLA_EMAIL_AND_PORTAL_STATUS_REPORT"
+    lane["claim_boundary"] = receipt.get("claim_boundary")
+
+
+def apply_current_official_opportunity_recheck(
+    lanes: list[dict[str, Any]],
+    receipt: dict[str, Any],
+) -> None:
+    controls = receipt.get("controls", {})
+    if (
+        receipt.get("schema")
+        != "lumencore.current_official_opportunity_recheck.v1"
+        or receipt.get("status")
+        != "OFFICIAL_PUBLIC_SOURCES_RECHECKED_READ_ONLY"
+        or controls.get("official_source_recheck_does_not_authorize_submission")
+        is not True
+        or controls.get("duplicate_send_suppression_required") is not True
+        or controls.get("external_send_allowed_without_human") is not False
+        or controls.get("final_submit_allowed_without_human") is not False
+    ):
+        raise ValueError("Current official opportunity recheck is missing or stale")
+
+    entries = {
+        str(row.get("opportunity_number")): row
+        for row in receipt.get("opportunities", [])
+    }
+    required = {
+        "ONC-ARGOS-SSN-2026-OS351107",
+        "75D301-26-RFI-73483",
+        "693JJ326R000012",
+        "W912HZ26SC005",
+        "LAUNCHTN-3686-2026",
+        "W900KK-26-R-0001",
+        "MDA26BZ04-NV007",
+        "DPA26BZ04-DV016",
+        "26-510",
+    }
+    if not required.issubset(entries):
+        raise ValueError("Current official opportunity recheck is incomplete")
+
+    receipt_path = rel(CURRENT_OFFICIAL_OPPORTUNITY_RECHECK)
+
+    def lane_for(number: str) -> dict[str, Any]:
+        lane = next(
+            (
+                row
+                for row in lanes
+                if row.get("opportunity_number") == number
+            ),
+            None,
+        )
+        if lane is None:
+            raise ValueError(f"Command lane missing for official recheck: {number}")
+        return lane
+
+    def add_files(lane: dict[str, Any], *paths: str) -> None:
+        lane["package_files"] = list(
+            dict.fromkeys([*lane.get("package_files", []), *paths])
+        )
+
+    def mark_current(
+        lane: dict[str, Any],
+        entry: dict[str, Any],
+        *,
+        deadline_actionable: bool,
+    ) -> None:
+        lane["deadline_utc"] = entry.get("deadline_utc")
+        if entry.get("deadline_local"):
+            lane["official_deadline_text"] = str(entry["deadline_local"])
+        lane["official_url"] = entry.get("official_url") or lane.get(
+            "official_url"
+        )
+        if entry.get("secondary_url"):
+            lane["secondary_url"] = entry["secondary_url"]
+        lane["official_recheck_status"] = entry["status"]
+        lane["official_recheck_amendment_status"] = entry.get(
+            "amendment_status"
+        )
+        lane["official_recheck_utc"] = receipt["source_rechecked_utc"]
+        lane["source_dependency_keys"] = list(
+            dict.fromkeys(
+                [
+                    *lane.get("source_dependency_keys", []),
+                    "current_official_opportunity_recheck",
+                ]
+            )
+        )
+        lane["freshness_blockers"] = []
+        lane["source_freshness_status"] = "CURRENT_OFFICIAL_RECHECK"
+        lane["source_data_current"] = True
+        lane["source_data_current_scope"] = (
+            "PUBLIC_OPPORTUNITY_STATUS_AND_SCHEDULE_ONLY"
+        )
+        lane["deadline_currently_verified"] = True
+        lane["deadline_actionable"] = deadline_actionable
+        lane["eligibility_currently_verified"] = False
+        add_files(lane, receipt_path)
+
+    for number in (
+        "ONC-ARGOS-SSN-2026-OS351107",
+        "75D301-26-RFI-73483",
+        "693JJ326R000012",
+    ):
+        mark_current(lane_for(number), entries[number], deadline_actionable=True)
+
+    erdc = lane_for("W912HZ26SC005")
+    mark_current(erdc, entries["W912HZ26SC005"], deadline_actionable=True)
+    if (
+        erdc.get("command") == FRESHNESS_BLOCKED_COMMAND
+        and erdc.get("pre_freshness_command") in STAGE_COMMANDS
+    ):
+        erdc["command"] = erdc["pre_freshness_command"]
+    erdc["readiness_status"] = (
+        "NOT_READY_PRIVATE_ROM_SAM_CONTACT_ACCOUNT_AND_PORTAL_GATED"
+    )
+    erdc["funding_currently_available"] = False
+    erdc["response_type"] = "RFI_ONLY_NO_CURRENT_FUNDING"
+    erdc["source_data_current_scope"] = (
+        "PUBLIC_OPPORTUNITY_STATUS_SCHEDULE_AND_CURRENT_ATTACHMENT_SET"
+    )
+    erdc["source_attachment_set_current"] = ERDC_SOURCE_MANIFEST.is_file()
+    erdc_private_gate = read_json(ERDC_PRIVATE_FINAL_GATE)
+    erdc["private_final_candidate_gate_status"] = erdc_private_gate.get("status")
+    erdc["private_final_pdf_present"] = (
+        erdc_private_gate.get("private_final_candidate_built") is True
+        and erdc_private_gate.get("pdf", {}).get("document_checks_pass") is True
+    )
+    erdc["private_final_document_checks_pass"] = (
+        erdc_private_gate.get("pdf", {}).get("document_checks_pass") is True
+    )
+    erdc["portal_upload_set_status"] = "NONE_PRIVATE_FINAL_REQUIRED"
+    erdc["portal_upload_files"] = []
+    erdc["why_now"] = (
+        "The official ERDCWERX page was rechecked on July 29 and keeps the "
+        "Commercial Solution pathway open through August 7 at 4:00 PM CT. "
+        "The current request is RFI-only and states that funding is not currently "
+        "available. The current CSO and July 20 FAQ are sealed, and the public draft "
+        "passes local format and marker checks only. The guarded private-candidate builder "
+        "is ready, but no private candidate exists because the ROM, SAM all-awards identity, "
+        "contact email, and founder certifications have not been captured. Submittable "
+        "account access, terms, and portal review remain open."
+    )
+    erdc["today_work"] = [
+        "Review and support one Phase II-only ROM in the ignored private workflow.",
+        "Verify the active SAM all-awards contract record and exact legal entity and address match.",
+        "Insert and verify the current proposal contact email.",
+        "Sign in to the required Submittable account and inspect the complete current form.",
+        "Run the guarded private-candidate builder, require all document and redaction checks to pass, inspect every page and form field, and stop at the complete ERDCWERX preview.",
+    ]
+
+    launchtn = lane_for("LAUNCHTN-3686-2026")
+    mark_current(
+        launchtn,
+        entries["LAUNCHTN-3686-2026"],
+        deadline_actionable=True,
+    )
+    add_files(
+        launchtn,
+        rel(LAUNCHTN_3686_REFRESH),
+        receipt_path,
+    )
+    launchtn["attachment_deck_status"] = (
+        "VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED"
+    )
+    launchtn["attachment_financial_status"] = (
+        "PLANNING_MODEL_ARITHMETIC_QA_ONLY_FOUNDER_ASSUMPTION_APPROVAL_REQUIRED"
+    )
+    launchtn["portal_upload_set_status"] = "NONE_ATTACHMENT_AND_PORTAL_GATES_OPEN"
+    launchtn["portal_upload_files"] = []
+    launchtn["submission_ready"] = False
+    launchtn["why_now"] = (
+        "The official hosted application was rechecked open through August 13 "
+        "at 11:59 PM CDT. The LaunchTN-specific deck now covers the requested "
+        "topic classes and passed visual, overflow, and template-fidelity QA, but "
+        "founder-controlled company, Tennessee, team, and financing facts remain "
+        "open. The financial workbook remains a planning "
+        "artifact whose pricing, raise, revenue, customer, margin, hiring, cash, "
+        "and cost assumptions require founder review. No safe upload set exists."
+    )
+    launchtn["today_work"] = [
+        "Verify the private legal, employment, Tennessee-eligibility, and funding-history facts.",
+        "Insert the confirmed founder-controlled facts into the QA-passed LaunchTN deck and complete the final visual and claim review.",
+        "Approve or replace every financial-model assumption and label planning values separately from actuals.",
+        "Recheck the live portal schema, file limits, terms, and attestations, then stop at the complete final preview.",
+    ]
+
+    nsf = lane_for("26-510")
+    mark_current(nsf, entries["26-510"], deadline_actionable=False)
+    nsf["deadline_date"] = "2026-11-04"
+    nsf["deadline_semantics"] = (
+        "PROJECT_PITCH_ROLLING_NEXT_FULL_PROPOSAL_DEADLINE_INVITATION_REQUIRED"
+    )
+    nsf["official_deadline_text"] = (
+        "Project Pitch is rolling with no standalone calendar deadline. The next "
+        "listed full-proposal deadline is November 4, 2026 at 5:00 PM in the "
+        "submitting organization's local time, and an official invitation is required."
+    )
+    nsf["source_data_current_scope"] = (
+        "PUBLIC_PROJECT_PITCH_INSTRUCTIONS_FIELD_LIMITS_AND_SCHEDULE_ONLY"
+    )
+    nsf["authenticated_form_schema_current"] = False
+    nsf["authenticated_portal_state_verified"] = False
+    nsf["applicant_eligibility_verified"] = False
+    nsf["invitation_verified"] = False
+    nsf["source_audit"] = rel(NSF_SOURCE_AUDIT)
+    add_files(
+        nsf,
+        rel(NSF_PORTAL_FIELDS),
+        rel(NSF_PASTE_CHECK),
+        rel(NSF_ROUTING_MANIFEST),
+        rel(NSF_SOURCE_AUDIT),
+        rel(NSF_READINESS),
+        rel(NSF_SOURCE_NATIVE_LEDGER),
+        rel(NSF_MARKET_BENCHMARK_MANIFEST),
+        rel(NSF_WHITEPAPER_MANIFEST),
+    )
+
+    army_entry = entries["W900KK-26-R-0001"]
+    lanes.append(
+        {
+            "rank": 6.5,
+            "lane_id": "army_w900kk_26_r_0001_rfi",
+            "source_system": "SAM.gov official public notice",
+            "opportunity_number": "W900KK-26-R-0001",
+            "title": army_entry["title"],
+            "agency": "Department of the Army",
+            "deadline_utc": army_entry["deadline_utc"],
+            "deadline_date": "2026-08-15",
+            "official_deadline_text": army_entry["deadline_local"],
+            "deadline_semantics": "OFFICIAL_PUBLIC_NOTICE_CURRENT_ATTACHMENTS_CONTROL_DETAILS",
+            "command": "AUTHENTICATED_ATTACHMENT_REVIEW_REQUIRED",
+            "eligibility_state": "UNRESOLVED_REQUIRES_CURRENT_ATTACHMENTS",
+            "fit_state": "UNRESOLVED_RFI_SCOPE_AND_RESPONSE_INSTRUCTIONS_NOT_PUBLICLY_VISIBLE",
+            "submission_route": army_entry["submission_channel"],
+            "official_url": army_entry["official_url"],
+            "package_files": [receipt_path],
+            "why_now": (
+                "The official public notice is active and revised through August 15, "
+                "but the response instructions and controlling scope are in SAM "
+                "attachments behind Request Access. No bid decision or response draft "
+                "is supportable until those files are reviewed."
+            ),
+            "today_work": [
+                "Use the authenticated SAM session to request or open the current attachments.",
+                "Capture the notice version, Section L or response instructions, mandatory qualifications, page limits, and delivery channel.",
+                "Run a fresh go/no-go before drafting or contacting anyone.",
+            ],
+            "human_gate": [
+                "Robert reviews the authenticated attachment-access terms and the current response instructions.",
+            ],
+            "source_dependency_keys": ["current_official_opportunity_recheck"],
+            "freshness_blockers": [],
+            "source_freshness_status": "CURRENT_OFFICIAL_RECHECK",
+            "source_data_current": True,
+            "deadline_currently_verified": True,
+            "deadline_actionable": False,
+            "eligibility_currently_verified": False,
+            "official_recheck_status": army_entry["status"],
+            "official_recheck_amendment_status": army_entry["amendment_status"],
+            "official_recheck_utc": receipt["source_rechecked_utc"],
+            "external_send_allowed_without_human": False,
+            "final_submit_allowed_without_human": False,
+        }
+    )
+
+    mda_entry = entries["MDA26BZ04-NV007"]
+    lanes.append(
+        {
+            "rank": 18.5,
+            "lane_id": "mda_nv007_removed_topic",
+            "source_system": "DoD SBIR/STTR official active-solicitation documents",
+            "opportunity_number": "MDA26BZ04-NV007",
+            "title": mda_entry["title"],
+            "agency": "Missile Defense Agency",
+            "deadline_utc": None,
+            "deadline_date": None,
+            "official_deadline_text": (
+                "No valid deadline: the topic was removed by the component."
+            ),
+            "deadline_semantics": "TOPIC_REMOVED_GENERAL_RELEASE_DEADLINE_NOT_APPLICABLE",
+            "command": "NO_BID_TOPIC_REMOVED",
+            "eligibility_state": "NOT_SUBMITTABLE_TOPIC_REMOVED",
+            "fit_state": "HISTORICAL_PACKAGE_ARCHIVE_ONLY",
+            "submission_route": None,
+            "official_url": mda_entry["official_url"],
+            "secondary_url": mda_entry["secondary_url"],
+            "package_files": [receipt_path, rel(MDA_NV007_NO_GO_MAP)],
+            "why_now": (
+                "The July 27 full-release document marks NV007 removed by the "
+                "component, and the current topic list skips NV007. The general "
+                "August 19 release deadline does not apply to this removed topic."
+            ),
+            "today_work": [
+                "Archive the existing technical package as reusable research material.",
+                "Do not open a DSIP proposal, upload files, or represent NV007 as active.",
+            ],
+            "human_gate": [],
+            "source_dependency_keys": ["current_official_opportunity_recheck"],
+            "freshness_blockers": [],
+            "source_freshness_status": "CURRENT_OFFICIAL_RECHECK",
+            "source_data_current": True,
+            "deadline_currently_verified": True,
+            "deadline_actionable": False,
+            "eligibility_currently_verified": False,
+            "official_recheck_status": mda_entry["status"],
+            "official_recheck_amendment_status": mda_entry["amendment_status"],
+            "official_recheck_utc": receipt["source_rechecked_utc"],
+            "external_send_allowed_without_human": False,
+            "final_submit_allowed_without_human": False,
+        }
+    )
+
+    falcon_entry = entries["DPA26BZ04-DV016"]
+    lanes.append(
+        {
+            "rank": 9.5,
+            "lane_id": "darpa_falcon_dp2",
+            "source_system": "DARPA official opportunity and DSIP",
+            "opportunity_number": "DPA26BZ04-DV016",
+            "title": falcon_entry["title"],
+            "agency": "Defense Advanced Research Projects Agency",
+            "deadline_utc": falcon_entry["deadline_utc"],
+            "deadline_date": "2026-08-19",
+            "official_deadline_text": falcon_entry["deadline_local"],
+            "deadline_semantics": "OFFICIAL_DARPA_ACTIVE_TOPIC_CURRENT",
+            "command": "NO_BID_TECHNICAL_GATE_FAILED",
+            "eligibility_state": "DP2_FEASIBILITY_AND_IP_GATES_NOT_ESTABLISHED",
+            "fit_state": "TOPIC_OPEN_LOCAL_REAL_MODEL_QUALIFICATION_REMAINS_NULL",
+            "submission_route": falcon_entry["submission_channel"],
+            "official_url": falcon_entry["official_url"],
+            "secondary_url": falcon_entry["secondary_url"],
+            "package_files": [receipt_path, rel(FALCON_NO_GO_MAP)],
+            "why_now": (
+                "FALCON is officially open through August 19, but the current local "
+                "record remains a technical no-go: three frozen real-model attempts "
+                "do not establish improvement over both required comparator families, "
+                "two-domain generality, DP2 equivalence, or scholarly impact."
+            ),
+            "today_work": [
+                "Preserve the null results and the gap map.",
+                "Do not build or submit a proposal unless every technical, DP2, IP, team, and independent-review gate is closed before a new frozen candidate is evaluated.",
+            ],
+            "human_gate": [],
+            "source_dependency_keys": ["current_official_opportunity_recheck"],
+            "freshness_blockers": [],
+            "source_freshness_status": "CURRENT_OFFICIAL_RECHECK",
+            "source_data_current": True,
+            "deadline_currently_verified": True,
+            "deadline_actionable": False,
+            "eligibility_currently_verified": False,
+            "official_recheck_status": falcon_entry["status"],
+            "official_recheck_amendment_status": falcon_entry["amendment_status"],
+            "official_recheck_utc": receipt["source_rechecked_utc"],
+            "external_send_allowed_without_human": False,
+            "final_submit_allowed_without_human": False,
+        }
+    )
+
+    for lane in lanes:
+        if receipt_path in lane.get("package_files", []):
+            lane["official_source_recheck_receipt"] = receipt_path
+            lane["claim_boundary"] = lane.get("claim_boundary") or receipt.get(
+                "claim_boundary"
+            )
+        classify_lane_status(lane)
+
+
+def apply_current_packet_gate_truth(lanes: list[dict[str, Any]]) -> None:
+    def lane_for(number: str) -> dict[str, Any]:
+        lane = next(
+            (
+                row
+                for row in lanes
+                if row.get("opportunity_number") == number
+            ),
+            None,
+        )
+        if lane is None:
+            raise ValueError(f"Command lane missing for packet gate: {number}")
+        return lane
+
+    launchtn_manifest = read_json(LAUNCHTN_3686_MANIFEST)
+    if launchtn_manifest.get("schema") != "lumencore.launchtn_3686_pitch_application.v2":
+        raise ValueError("LaunchTN 3686 application manifest is missing or stale")
+    launchtn_summary = launchtn_manifest.get("summary", {})
+    if not isinstance(launchtn_summary, dict):
+        raise ValueError("LaunchTN 3686 application summary is invalid")
+    launchtn_fields = {
+        str(field.get("field_id")): field
+        for field in launchtn_manifest.get("fields", [])
+        if isinstance(field, dict)
+    }
+    required_attachment_count = int(
+        launchtn_summary.get("required_attachment_gates", 0) or 0
+    )
+    attachment_final_qa_count = int(
+        launchtn_summary.get("required_attachments_qa_passed", 0) or 0
+    )
+    attachment_safe_upload_count = int(
+        launchtn_summary.get("required_attachments_safe_to_upload", 0) or 0
+    )
+    launchtn = lane_for("LAUNCHTN-3686-2026")
+    launchtn.update(
+        {
+            "application_manifest_status": "CURRENT_CANONICAL_MANIFEST",
+            "application_field_count": int(
+                launchtn_summary.get("field_count", 0) or 0
+            ),
+            "application_required_field_count": int(
+                launchtn_summary.get("required_field_count", 0) or 0
+            ),
+            "human_or_private_fact_gate_count": int(
+                launchtn_summary.get("human_or_private_fact_gates", 0) or 0
+            ),
+            "required_attachment_count": required_attachment_count,
+            "required_attachments_present": int(
+                launchtn_summary.get("required_attachments_present", 0) or 0
+            ),
+            "required_attachments_structural_qa_passed": int(
+                launchtn_summary.get(
+                    "required_attachments_structural_qa_passed", 0
+                )
+                or 0
+            ),
+            "required_attachments_final_qa_passed": attachment_final_qa_count,
+            "required_attachments_safe_to_upload": attachment_safe_upload_count,
+            "attachments_final_qa": (
+                f"{attachment_final_qa_count}/{required_attachment_count}"
+            ),
+            "safe_upload_count": attachment_safe_upload_count,
+            "upload_set_ready": launchtn_summary.get("upload_set_ready") is True,
+            "attachment_deck_status": launchtn_fields.get(
+                "pitch_deck", {}
+            ).get("status", "MISSING_FROM_CURRENT_MANIFEST"),
+            "attachment_financial_status": launchtn_fields.get(
+                "financials", {}
+            ).get("status", "MISSING_FROM_CURRENT_MANIFEST"),
+            "portal_upload_set_status": (
+                "CURRENT_MANIFEST_UPLOAD_SET_READY"
+                if launchtn_summary.get("upload_set_ready") is True
+                else "NONE_ATTACHMENT_AND_PORTAL_GATES_OPEN"
+            ),
+            "portal_upload_files": [],
+            "submission_ready": False,
+        }
+    )
+    launchtn["why_now"] = (
+        "The current LaunchTN manifest tracks "
+        f"{launchtn['application_required_field_count']}/"
+        f"{launchtn['application_field_count']} required fields and "
+        f"{required_attachment_count} required attachments. "
+        f"{launchtn['required_attachments_present']} attachments are present and "
+        f"{launchtn['required_attachments_structural_qa_passed']} pass structural QA, "
+        f"but final attachment QA is {launchtn['attachments_final_qa']} and the safe "
+        f"upload count is {attachment_safe_upload_count}. "
+        f"{launchtn['human_or_private_fact_gate_count']} human or private fact gates "
+        "remain. The portal upload set and final submission remain blocked."
+    )
+
+    erdc_solution_gate = read_json(ERDC_SOLUTION_BRIEF_GATE)
+    if erdc_solution_gate.get("schema") != (
+        "lumencore.erdc_sdc_solution_brief_compliance_gate.v1"
+    ):
+        raise ValueError("ERDC solution-brief compliance gate is missing or stale")
+    erdc_rom_gate = read_json(ERDC_ROM_GATE)
+    if erdc_rom_gate.get("schema") != "lumencore.erdc_sdc_phase2_rom_gate.v2":
+        raise ValueError("ERDC Phase II ROM gate is missing or stale")
+    erdc_private_gate = read_json(ERDC_PRIVATE_FINAL_GATE)
+    if erdc_private_gate.get("schema") != (
+        "lumencore.erdc_sdc_private_final_candidate_gate.v1"
+    ):
+        raise ValueError("ERDC private-final candidate gate is missing or stale")
+
+    erdc_source_integrity_pass = (
+        erdc_solution_gate.get("source_integrity", {}).get(
+            "all_source_checks_pass"
+        )
+        is True
+    )
+    erdc_bounded_evidence_receipt_pass = (
+        erdc_solution_gate.get("evidence_ablation", {}).get("all_checks_pass")
+        is True
+        and erdc_solution_gate.get("evidence_ablation", {}).get(
+            "receipt_checks_pass"
+        )
+        is True
+    )
+    raw_private_unresolved = list(
+        erdc_private_gate.get("unresolved_gates", [])
+    )
+    effective_private_unresolved = [
+        gate
+        for gate in raw_private_unresolved
+        if not (
+            gate == "CURRENT_OFFICIAL_SOURCE_INTEGRITY"
+            and erdc_source_integrity_pass
+        )
+        and not (
+            gate == "BOUNDED_EVIDENCE_RECEIPT"
+            and erdc_bounded_evidence_receipt_pass
+        )
+    ]
+    erdc = lane_for("W912HZ26SC005")
+    erdc.update(
+        {
+            "solution_brief_status": erdc_solution_gate.get("status"),
+            "format_and_marker_checks_pass": (
+                erdc_solution_gate.get("format_and_marker_checks_pass") is True
+            ),
+            "semantic_review_complete": (
+                erdc_solution_gate.get("semantic_review_complete") is True
+            ),
+            "official_source_integrity_pass": erdc_source_integrity_pass,
+            "bounded_evidence_receipt_pass": erdc_bounded_evidence_receipt_pass,
+            "rom_gate_status": erdc_rom_gate.get("status"),
+            "rom_submission_ready": erdc_rom_gate.get("submission_ready") is True,
+            "rom_unresolved_gates": list(
+                erdc_rom_gate.get("unresolved_gates", [])
+            ),
+            "private_final_candidate_gate_status": erdc_private_gate.get(
+                "status"
+            ),
+            "private_final_submission_ready": (
+                erdc_private_gate.get("submission_ready") is True
+            ),
+            "private_final_unresolved_gates_raw": raw_private_unresolved,
+            "private_final_unresolved_gates_effective": (
+                effective_private_unresolved
+            ),
+            "private_final_unresolved_gate_count_effective": len(
+                effective_private_unresolved
+            ),
+            "private_final_pdf_present": (
+                erdc_private_gate.get("private_final_candidate_built") is True
+                and erdc_private_gate.get("pdf", {}).get(
+                    "document_checks_pass"
+                )
+                is True
+            ),
+            "private_final_document_checks_pass": (
+                erdc_private_gate.get("pdf", {}).get("document_checks_pass")
+                is True
+            ),
+            "funding_currently_available": (
+                erdc_solution_gate.get("funding_currently_available") is True
+            ),
+            "portal_upload_set_status": "NONE_PRIVATE_FINAL_REQUIRED",
+            "portal_upload_files": [],
+            "submission_ready": False,
+        }
+    )
+    erdc["readiness_status"] = (
+        "NOT_READY_SEMANTIC_ROM_PRIVATE_FINAL_AND_PORTAL_GATES_OPEN"
+    )
+    erdc["why_now"] = (
+        f"The current ERDC solution gate is {erdc['solution_brief_status']}. "
+        f"Format and marker checks pass={str(erdc['format_and_marker_checks_pass']).lower()}, "
+        f"official source integrity pass={str(erdc_source_integrity_pass).lower()}, "
+        f"bounded evidence receipt pass={str(erdc_bounded_evidence_receipt_pass).lower()}, "
+        f"and semantic review complete={str(erdc['semantic_review_complete']).lower()}. "
+        f"The ROM gate is {erdc['rom_gate_status']}; the private-final gate is "
+        f"{erdc['private_final_candidate_gate_status']} with "
+        f"{len(effective_private_unresolved)} effective unresolved gates after "
+        "reconciling source integrity and the bounded evidence receipt. Funding is "
+        "not currently available, and no portal upload set exists."
+    )
 
 
 def build_darpa_submission_lane(receipt: dict[str, Any]) -> dict[str, Any]:
@@ -1462,9 +2396,15 @@ def build_command_lanes(
     nashville_submission_receipt: dict[str, Any] | None = None,
     darpa_submission_receipt: dict[str, Any] | None = None,
     openai_build_week_readiness: dict[str, Any] | None = None,
+    openai_build_week_confirmation: dict[str, Any] | None = None,
+    official_inbound_status_event_register: dict[str, Any] | None = None,
+    argos_government_submission_status: dict[str, Any] | None = None,
+    dla_dsip_official_non_submission_receipt: dict[str, Any] | None = None,
+    current_official_opportunity_recheck: dict[str, Any] | None = None,
     scan_date: date = SCAN_DATE,
     curation_control: dict[str, Any] | None = None,
     source_freshness: dict[str, Any] | None = None,
+    action_state_as_of_utc: str | None = None,
 ) -> list[dict[str, Any]]:
     curation_control = curation_control or read_json(GRANT_REVIEWER_CURATION)
     if source_freshness is None:
@@ -1476,6 +2416,10 @@ def build_command_lanes(
             zero_friction=read_json(ZERO_FRICTION),
             as_of_utc=now_utc(),
         )
+    action_state_cutoff = parse_aware_datetime(
+        action_state_as_of_utc or now_utc(),
+        field="action_state_as_of_utc",
+    ).astimezone(timezone.utc)
     nashville_gate = nashville_private_action_gate()
     nashville_deadline = read_json(NASHVILLE_EC_DEADLINE_RECEIPT)
     nashville_official_deadline = read_json(NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION)
@@ -1535,18 +2479,31 @@ def build_command_lanes(
     ):
         raise ValueError("ERDC solution-brief compliance gate is missing or stale")
     erdc_rom_gate = read_json(ERDC_ROM_GATE)
-    if erdc_rom_gate.get("schema") != "lumencore.erdc_sdc_phase2_rom_gate.v1":
+    if erdc_rom_gate.get("schema") != "lumencore.erdc_sdc_phase2_rom_gate.v2":
         raise ValueError("ERDC Phase II ROM gate is missing or stale")
-    erdc_technical_pass = (
-        erdc_solution_gate.get("technical_document_checks_pass") is True
+    erdc_private_final_gate = read_json(ERDC_PRIVATE_FINAL_GATE)
+    if erdc_private_final_gate.get("schema") != (
+        "lumencore.erdc_sdc_private_final_candidate_gate.v1"
+    ):
+        raise ValueError("ERDC private-final candidate gate is missing or stale")
+    erdc_format_and_marker_pass = (
+        erdc_solution_gate.get("format_and_marker_checks_pass") is True
         and erdc_solution_gate.get("source_integrity", {}).get(
             "all_source_checks_pass"
         )
         is True
+        and erdc_solution_gate.get("semantic_review_complete") is False
     )
     erdc_rom_ready = (
         erdc_rom_gate.get("approval", {}).get(
             "rom_ready_for_private_pdf_insertion"
+        )
+        is True
+    )
+    erdc_private_candidate_built = (
+        erdc_private_final_gate.get("private_final_candidate_built") is True
+        and erdc_private_final_gate.get("pdf", {}).get(
+            "document_checks_pass"
         )
         is True
     )
@@ -1911,14 +2868,15 @@ def build_command_lanes(
                 rel(LAUNCHTN_3686_FINANCIAL_MODEL),
             ],
             "why_now": (
-                "The application-specific deck and formula-driven five-year model have passed visual, "
-                "content, formula, and attachment-hash QA. The remaining gates are founder-controlled facts, "
-                "Tennessee eligibility, pricing and raise approval, and the live final preview."
+                "The current deck and planning workbook are present and hash-verified, but neither is safe "
+                "to upload. The deck needs venue-specific coverage; the workbook needs founder approval of "
+                "every assumption. Legal facts, Tennessee eligibility, live portal schema, and final preview "
+                "also remain open."
             ),
             "today_work": [
-                "Confirm the 11 private, legal, employment, Tennessee-eligibility, funding-history, and pricing facts in the application manifest.",
-                "Approve or revise the illustrative pricing ranges and $250,000 validation-bridge funding need.",
-                "Upload only the two hash-verified QA-passed attachments and stop at the complete final preview.",
+                "Resolve the private legal, employment, Tennessee-eligibility, and funding-history facts in the current manifest.",
+                "Build the venue-specific deck and approve or replace every financial assumption.",
+                "Recheck the live portal and stop at the complete final preview; no upload set is approved yet.",
             ],
             "human_gate": [
                 "Robert enters private contact and address facts only inside the authenticated portal.",
@@ -2027,7 +2985,7 @@ def build_command_lanes(
             "agency": nsf.get("raw", {}).get("agency", "U.S. National Science Foundation"),
             "deadline_utc": None,
             "deadline_date": nsf_full_proposal.get(
-                "next_planning_target", "2026-11-04"
+                "planning_target", "2026-11-04"
             ),
             "deadline_date_semantics": (
                 "INVITATION_CONTINGENT_PLANNING_TARGET_NOT_PROJECT_PITCH_DUE_DATE"
@@ -2037,26 +2995,34 @@ def build_command_lanes(
             "listed_full_proposal_deadline_dates": nsf_full_proposal.get(
                 "listed_deadlines", []
             ),
+            "past_listed_full_proposal_deadline_dates": nsf_full_proposal.get(
+                "past_listed_deadlines", []
+            ),
+            "future_listed_full_proposal_deadline_dates": nsf_full_proposal.get(
+                "future_listed_deadlines", []
+            ),
             "nearest_listed_full_proposal_deadline_date": nsf_full_proposal.get(
-                "nearest_listed_deadline"
+                "next_listed_deadline"
             ),
             "nearest_listed_deadline_reachable": nsf_full_proposal.get(
-                "july_27_2026_reachable", False
+                "next_listed_deadline_reachable", False
             ),
             "full_proposal_planning_deadline_date": nsf_full_proposal.get(
-                "next_planning_target", "2026-11-04"
+                "planning_target", "2026-11-04"
             ),
             "full_proposal_submission_allowed": False,
             "invitation_verified": False,
             "portal_state_verified": False,
             "official_deadline_text": (
-                "NSF 26-510 lists July 27 and November 4, 2026, then March 4 and "
-                "July 7, 2027, as full-proposal deadlines. July 27 is not currently "
-                "reachable because no official Project Pitch invitation was verified; "
-                "November 4 is planning only."
+                "The Project Pitch is rolling. July 27, 2026 is past. November 4, "
+                "2026 at 5:00 PM submitting-organization local time is the next "
+                "listed full-proposal deadline and remains unreachable without a "
+                "verified official invitation."
             ),
             "command": "STAGE_PROJECT_PITCH",
-            "eligibility_state": "PROJECT_PITCH_REQUIRED_INVITATION_NOT_VERIFIED",
+            "eligibility_state": (
+                "PUBLIC_ROUTE_CURRENT_PORTAL_AND_APPLICANT_FACTS_UNVERIFIED"
+            ),
             "fit_state": "STRONG_TRUSTWORTHY_AI_FIT_26_510_26_511_STAFF_CONFIRMATION_REQUIRED",
             "submission_route": (
                 "NSF Seed Fund Project Pitch now; Research.gov full proposal only after "
@@ -2067,21 +3033,26 @@ def build_command_lanes(
             "alternate_url": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology-0/nsf26-511/solicitation",
             "package_files": [
                 rel(NSF_PORTAL_FIELDS),
-                rel(NSF_PITCH_DIR / "PROJECT_PITCH_PASTE_CHECK_2026-07-16.md"),
+                rel(NSF_PASTE_CHECK),
                 rel(NSF_ROUTING_MANIFEST),
-                rel(NSF_PITCH_DIR / "PROJECT_PITCH_READINESS.md"),
+                rel(NSF_SOURCE_AUDIT),
+                rel(NSF_READINESS),
+                rel(NSF_SOURCE_NATIVE_LEDGER),
+                rel(NSF_MARKET_BENCHMARK_MANIFEST),
+                rel(NSF_WHITEPAPER_MANIFEST),
             ],
             "why_now": (
                 "This is the strongest grants-side route, but the immediate action is the "
-                "rolling Project Pitch. July 27 is an official full-proposal deadline but "
-                "is currently inaccessible without a verified invitation. NSF 26-510 is "
-                "the cleaner general deep-technology fit; use 26-511 only if NSF confirms "
-                "the software-defined scientific-instrumentation framing."
+                "rolling Project Pitch. November 4 is only an invitation-contingent "
+                "full-proposal planning date. NSF 26-510 is the cleaner general "
+                "deep-technology fit; use 26-511 only if NSF confirms the "
+                "software-defined scientific-instrumentation framing."
             ),
             "today_work": [
                 "Confirm in the Project Pitch portal that no pitch is pending and no invitation or full proposal is open.",
-                "Paste the four locally counted, claim-bounded fields from the canonical portal packet.",
-                "Stop at final review so the legal company facts and submission certification can be checked.",
+                "Compare the authenticated prompts and title limit with the July 29 public-source audit.",
+                "Verify the legal company, ownership, U.S.-performance, PI employment and effort, and submission-authority facts.",
+                "Paste the four locally counted, claim-bounded fields and stop at the complete final preview.",
             ],
             "human_gate": [
                 "Robert confirms the legal company profile, PI eligibility, and portal status.",
@@ -2138,14 +3109,14 @@ def build_command_lanes(
             "official_deadline_text": "August 7, 2026 at 4:00 PM Central Time",
             "command": "STAGE_CONCEPT_PAPER",
             "eligibility_state": (
-                "OPEN_CSO_TECHNICAL_DRAFT_PASS_PRIVATE_ROM_SAM_AND_PORTAL_GATES_OPEN"
-                if erdc_technical_pass
-                else "OPEN_CSO_TECHNICAL_DOCUMENT_REVIEW_REQUIRED"
+                "OPEN_RFI_CSO_FORMAT_AND_MARKER_CHECKS_PASS_SEMANTIC_EVIDENCE_AND_PRIVATE_GATES_OPEN"
+                if erdc_format_and_marker_pass
+                else "OPEN_CSO_PUBLIC_DRAFT_FORMAT_OR_SOURCE_REVIEW_REQUIRED"
             ),
             "fit_state": (
-                "STRONG_MODULAR_EVIDENCE_CONTROL_PLANE_FIT_TECHNICAL_DOCUMENT_PASS"
-                if erdc_technical_pass
-                else "MODULAR_EVIDENCE_CONTROL_PLANE_FIT_NOT_YET_TECHNICALLY_CLEARED"
+                "MODULAR_EVIDENCE_CONTROL_PLANE_FIT_REQUIRES_GOVERNMENT_COMPARATOR_EXTERNAL_TRUST_ROOT_AND_INDEPENDENT_REVIEW"
+                if erdc_format_and_marker_pass
+                else "MODULAR_EVIDENCE_CONTROL_PLANE_FIT_NOT_YET_FORMAT_OR_SOURCE_CLEARED"
             ),
             "submission_route": erdc.get("submission_route", "ERDCWERX Commercial Solutions Opening portal"),
             "official_url": erdc.get("official_url", "https://sam.gov/opp/8e32f0dfcdee42eeb3b2b03819a6ed25/view"),
@@ -2155,10 +3126,36 @@ def build_command_lanes(
                 rel(ERDC_SOLUTION_BRIEF_GATE),
                 rel(ERDC_ROM_GATE),
                 rel(ERDC_ROM_WORKFLOW),
+                rel(ERDC_PRIVATE_FINAL_GATE),
+                rel(ERDC_PRIVATE_FINAL_WORKFLOW),
                 rel(ERDC_SOURCE_MANIFEST),
             ],
             "solution_brief_status": erdc_solution_gate.get("status"),
-            "technical_document_checks_pass": erdc_technical_pass,
+            "format_and_marker_checks_pass": erdc_format_and_marker_pass,
+            "semantic_review_complete": erdc_solution_gate.get(
+                "semantic_review_complete"
+            ),
+            "format_and_marker_checks_scope": (
+                "CURRENT_PUBLIC_DRAFT_LAYOUT_MARKERS_SOURCE_CUSTODY_AND_LOCAL_RECEIPT_ONLY"
+            ),
+            "private_final_candidate_gate_status": erdc_private_final_gate.get(
+                "status"
+            ),
+            "private_final_pdf_present": erdc_private_candidate_built,
+            "private_final_document_checks_pass": (
+                erdc_private_final_gate.get("pdf", {}).get(
+                    "document_checks_pass"
+                )
+                is True
+            ),
+            "private_values_exposed_in_public_gate": (
+                erdc_private_final_gate.get("private_inputs", {}).get(
+                    "private_values_exposed"
+                )
+                is True
+            ),
+            "portal_upload_set_status": "NONE_PRIVATE_FINAL_REQUIRED",
+            "portal_upload_files": [],
             "rom_gate_status": erdc_rom_gate.get("status"),
             "rom_private_input_present": erdc_rom_gate.get("private_input", {}).get(
                 "present"
@@ -2170,18 +3167,26 @@ def build_command_lanes(
             )
             is True,
             "why_now": (
-                "A technically compliant public-safe five-page body now exists with verified official-source "
-                "hashes. The remaining work is private Phase II-only price approval, exact SAM contract-record "
-                "matching, and final portal review; the notice says funding is not currently available."
+                "A current-source public-safe five-page body passes local format and marker checks against "
+                "the CSO and July 20 FAQ. It is not an upload file or technical clearance. Open evidence "
+                "gates include public reproducibility, an external trust root, a Government comparator and "
+                "representative workload, committed execution resources, and independent review. A guarded "
+                "private-candidate builder now enforces exact SAM and contact facts, conservative delivery "
+                "boundaries, one Phase II-only total, seven-page document controls, and public redaction. "
+                "Its private inputs are not yet captured. Submittable access and final portal review remain "
+                "open; funding is not currently available."
             ),
             "today_work": [
                 "Use the ignored private ROM workflow to support each cost input and approve one Phase II-only estimated price.",
-                "Insert the approved price and exact SAM-matched legal identity and address only into the private final copy.",
+                "Capture and freshly verify the exact SAM all-awards legal identity, solution address, and current proposal contact in the ignored private-final input.",
+                "Run the guarded private-candidate builder and require all seven-page, exact-one-price, marker, metadata, and redaction checks to pass.",
+                "Sign in to the required Submittable account and inspect the complete current form.",
                 "Recheck the live ERDCWERX questions, amendments, terms, and complete preview before final confirmation.",
             ],
             "human_gate": [
                 "Robert approves the supported Phase II-only candidate price and timestamp.",
-                "Robert verifies active SAM contract registration and exact legal entity and address match.",
+                "Robert verifies active SAM all-awards contract registration and exact legal entity and address match.",
+                "Robert signs in to Submittable and reviews the complete current form.",
                 "Robert reviews the private final PDF, portal answers, terms, and final confirmation.",
             ],
             "external_send_allowed_without_human": False,
@@ -2464,11 +3469,57 @@ def build_command_lanes(
 
     lanes.append(build_darpa_submission_lane(darpa_submission_receipt or {}))
     lanes.append(build_openai_build_week_lane(openai_build_week_readiness or {}))
+    if argos_government_submission_status and evidence_observed_by(
+        argos_government_submission_status.get("recorded_utc"),
+        action_state_cutoff,
+        field="Project Argos Government receipt recorded_utc",
+    ):
+        lanes.append(
+            build_argos_government_submission_lane(
+                argos_government_submission_status
+            )
+        )
 
     apply_submission_receipts(lanes, submission_receipt or {})
     apply_nashville_submission_receipt(
         lanes, nashville_submission_receipt or {}
     )
+    if official_inbound_status_event_register:
+        nashville_selection_events = [
+            event
+            for event in official_inbound_status_event_register.get("events", [])
+            if event.get("lane_id") == "nashville_ec_takeoff_fall_2026"
+            and event.get("status")
+            == "COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE"
+        ]
+        if len(nashville_selection_events) != 1:
+            raise ValueError("Nashville cohort-selection event is missing or ambiguous")
+        if evidence_observed_by(
+            nashville_selection_events[0].get("source", {}).get("received_utc"),
+            action_state_cutoff,
+            field="Nashville cohort-selection received_utc",
+        ):
+            apply_nashville_selection_and_onboarding(
+                lanes, official_inbound_status_event_register
+            )
+    if openai_build_week_confirmation and evidence_observed_by(
+        openai_build_week_confirmation.get("evidence", {}).get(
+            "confirmation_email_received_utc"
+        ),
+        action_state_cutoff,
+        field="OpenAI Build Week confirmation received_utc",
+    ):
+        apply_openai_build_week_confirmation(
+            lanes, openai_build_week_confirmation
+        )
+    if dla_dsip_official_non_submission_receipt and evidence_observed_by(
+        dla_dsip_official_non_submission_receipt.get("as_of_utc"),
+        action_state_cutoff,
+        field="MissionWeave non-submission receipt as_of_utc",
+    ):
+        apply_missionweave_non_submission_receipt(
+            lanes, dla_dsip_official_non_submission_receipt
+        )
     normalize_lane_deadlines(lanes, scan_date)
     expire_closed_lanes(lanes)
     apply_lane_freshness_controls(
@@ -2477,6 +3528,18 @@ def build_command_lanes(
         set(sam),
         set(grants),
     )
+    if current_official_opportunity_recheck and evidence_observed_by(
+        current_official_opportunity_recheck.get("source_rechecked_utc"),
+        action_state_cutoff,
+        field="Current official opportunity recheck source_rechecked_utc",
+    ):
+        apply_current_official_opportunity_recheck(
+            lanes,
+            current_official_opportunity_recheck,
+        )
+        normalize_lane_deadlines(lanes, scan_date)
+        expire_closed_lanes(lanes)
+    apply_current_packet_gate_truth(lanes)
     lanes.sort(key=lambda row: (float(row["rank"]), row["opportunity_number"]))
     for rank, lane in enumerate(lanes, start=1):
         lane["rank"] = rank
@@ -2492,6 +3555,177 @@ def describe_lane(row: dict[str, Any] | None) -> str:
         f"{row['opportunity_number']} {row['title']}, due {deadline}; "
         f"command {row['command']}; fit {row['fit_state']}."
     )
+
+
+def lane_is_active(row: dict[str, Any]) -> bool:
+    return row["command"] not in {
+        "SENT_VERIFIED",
+        EXPIRED_COMMAND,
+        *NO_BID_COMMANDS,
+    }
+
+
+def build_summary_narratives(
+    *,
+    lanes: list[dict[str, Any]],
+    closest_stage: dict[str, Any] | None,
+    missionweave_lane: dict[str, Any],
+    build_week_lane: dict[str, Any],
+    missionweave_gate_progress: str,
+) -> dict[str, str]:
+    nsf_lane = next(
+        row for row in lanes if row["lane_id"] == "nsf_sbir_project_pitch"
+    )
+    erdc_lane = next(
+        row for row in lanes if row["lane_id"] == "erdc_sovereign_cloud_cso"
+    )
+    launchtn_lane = next(
+        row for row in lanes if row["lane_id"] == "launchtn_3686_pitch_2026"
+    )
+    nashville_lane = next(
+        row
+        for row in lanes
+        if row["lane_id"] == "nashville_ec_fall_2026_takeoff"
+    )
+
+    if lane_is_active(build_week_lane) and lane_is_active(missionweave_lane):
+        strongest_today_action = (
+            "Finish the OpenAI Build Week external gates first: deploy and verify the public demo, capture the exact model label and /feedback Session ID, record the privacy-reviewed sub-three-minute video, and stage the Devpost preview before the July 21 7:00 p.m. Central close. "
+            f"Its current readiness control has {build_week_lane['readiness_gate_pass_count']}/{build_week_lane['readiness_gate_total']} gates passed and {build_week_lane['readiness_gate_open_count']} open. "
+            f"Then use the MissionWeave checklist to move its private action gate beyond {missionweave_gate_progress} while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. "
+            "HarborSentinel is urgent but not ready: retain its dedicated package while rechecking DSIP, freshness, package integrity, eligibility, compliance, cost, and portal gates. "
+            "Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket."
+        )
+        best_grants_lane = (
+            "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. "
+            "The hidden sectioned collector captures DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate. "
+            f"The current public action gate is {missionweave_gate_progress}, with unsupported portal and compliance facts still open. "
+            "DON26BZ03-NV063 HarborSentinel remains an urgent dedicated-package lane, but it is explicitly not ready and its stale topic mirror cannot refresh the controlling deadline or eligibility. NSF 26-510 stays the next rolling Project Pitch route after its source is refreshed."
+        )
+        fastest_low_friction_lane = (
+            "OpenAI Build Week is the nearest unresolved low-friction reviewer route. "
+            f"The working core is verified and {build_week_lane['readiness_gate_pass_count']}/{build_week_lane['readiness_gate_total']} gates pass; the public demo, exact model label, /feedback Session ID, video, Devpost registration, and final review remain open. "
+            "Nashville EC is no longer an open lane because its portal confirmation is receipt-backed."
+        )
+    else:
+        action_parts: list[str] = []
+        if nashville_lane["command"] == "FOUNDER_ONBOARDING_ACTION_DUE":
+            action_parts.append(
+                "Complete the founder-reviewed Nashville EC onboarding form and participation-agreement review before July 31; the official message states no cutoff time, so finish early. Keep the August 14 deposit as a separate founder-controlled payment decision."
+            )
+        if lane_is_active(launchtn_lane):
+            if (
+                launchtn_lane["command"] == "STAGE_APPLICATION"
+                and launchtn_lane.get("source_freshness_status")
+                == "CURRENT_OFFICIAL_RECHECK"
+            ):
+                action_parts.append(
+                    "LaunchTN 3686 is the strongest near-term cash-award lane: the competition offers a $10,000 prize and closes August 13 at 11:59 PM CDT. Resolve the founder, legal, Tennessee-eligibility, prize-use, and financial-assumption gates, then stop at the complete final preview; do not upload or submit unapproved facts or attachments."
+                )
+            else:
+                action_parts.append(
+                    "Reverify the current LaunchTN 3686 source before resuming its $10,000 competition application; preserve the existing deck and financial-model work, and keep founder facts, eligibility, assumptions, uploads, and final submission gated."
+                )
+        if lane_is_active(erdc_lane):
+            if (
+                erdc_lane["command"] == "STAGE_CONCEPT_PAPER"
+                and erdc_lane.get("source_freshness_status")
+                == "CURRENT_OFFICIAL_RECHECK"
+            ):
+                action_parts.append(
+                    f"The official source for {erdc_lane['opportunity_number']} is current. Complete only the private ROM, SAM identity match, final PDF QA, and ERDCWERX preview; the RFI states that funding is not currently available, and the package is not submission-ready."
+                )
+            else:
+                action_parts.append(
+                    f"Reverify the complete controlling official source for {erdc_lane['opportunity_number']} before resuming its package; the board is fail-closed at `{erdc_lane['command']}` and does not treat its local draft as submission-ready."
+                )
+        if closest_stage is not None:
+            action_parts.append(
+                f"Stage {closest_stage['opportunity_number']} next from its existing package and stop at the authenticated final-review gate; current command `{closest_stage['command']}`."
+            )
+        if lane_is_active(nsf_lane) and closest_stage is not nsf_lane:
+            action_parts.append(
+                "Keep NSF 26-510 in the rolling Project Pitch lane, with invitation status and current portal rules verified before any full-proposal claim."
+            )
+        action_parts.append(
+            "Expired lanes remain closed, and receipt-backed sent lanes remain inbound-only unless new official evidence changes their state."
+        )
+        strongest_today_action = " ".join(action_parts)
+
+        if lane_is_active(nsf_lane):
+            best_grants_lane = (
+                "NSF 26-510 is the strongest currently supported grant route because its Project Pitch gate is rolling. "
+                "No invitation or reachable full-proposal deadline is claimed; verify the current official solicitation and portal state, then stage only the claim-bounded Project Pitch fields for human review."
+            )
+        else:
+            best_grants_lane = (
+                "No active grant lane is currently supported by fresh evidence. Reverify official sources before reopening an expired or invitation-gated package."
+            )
+
+        if closest_stage is None:
+            fastest_low_friction_lane = (
+                "No low-friction staging lane is currently supported by the board."
+            )
+        else:
+            deadline = (
+                closest_stage.get("official_deadline_text")
+                or closest_stage.get("deadline_utc")
+                or "a rolling gate"
+            )
+            fastest_low_friction_lane = (
+                f"{closest_stage['opportunity_number']} is the nearest supported low-friction staging route, due {deadline}. "
+                f"Its command is `{closest_stage['command']}`; private facts, pricing, attestations, attachments, and final submission remain human-gated."
+            )
+
+    if lane_is_active(launchtn_lane):
+        if (
+            launchtn_lane["command"] == "STAGE_APPLICATION"
+            and launchtn_lane.get("source_freshness_status")
+            == "CURRENT_OFFICIAL_RECHECK"
+        ):
+            best_near_term_cash_award_lane = (
+                "LAUNCHTN-3686-2026 is the strongest verified near-term cash-award lane: a $10,000 competition prize, due August 13, 2026 at 11:59 PM CDT. "
+                "The existing deck and financial model passed bounded local QA, but legal identity, Tennessee eligibility, founder facts, business assumptions, prize use, attachment approval, and the final portal preview remain open; no selection or award is implied."
+            )
+        else:
+            best_near_term_cash_award_lane = (
+                "LAUNCHTN-3686-2026 is the strongest potential near-term cash-award lane, but its controlling source must be reverified before the existing application package is resumed. "
+                "Founder facts, Tennessee eligibility, business assumptions, attachments, and final submission remain gated; no selection or award is implied."
+            )
+    else:
+        best_near_term_cash_award_lane = (
+            "No active near-term cash-award competition is currently supported by the board."
+        )
+
+    if lane_is_active(erdc_lane):
+        if (
+            erdc_lane["command"] == "STAGE_CONCEPT_PAPER"
+            and erdc_lane.get("source_freshness_status")
+            == "CURRENT_OFFICIAL_RECHECK"
+        ):
+            best_contract_lane = (
+                f"{erdc_lane['opportunity_number']} is the closest supported federal market-research lane, and its official ERDCWERX source is current through August 7 at 4:00 PM CT. "
+                "The pathway is RFI-only and says funding is not currently available. The public technical draft passes local document checks; private ROM, SAM-matched identity, terms, final PDF QA, and portal confirmation remain human-gated. "
+                "The 693JJ326R000012 FHWA notice is current and amended, but the contacted team was already set: no solo bid, no partner claim, and no duplicate follow-up."
+            )
+        else:
+            best_contract_lane = (
+                f"{erdc_lane['opportunity_number']} is the closest potentially actionable federal contract lane, but its current command is `{erdc_lane['command']}`. "
+                "Reverify the complete controlling notice, amendments, deadline, and submission route before resuming the existing technical package; private ROM, SAM-matched identity, terms, and final portal confirmation remain human-gated. "
+                "The 693JJ326R000012 FHWA route is closed because the contacted team was already set: no solo bid, no partner claim, and no duplicate follow-up."
+            )
+    else:
+        best_contract_lane = (
+            "693JJ326R000012 FHWA TSMO Data Initiative remains partner-only through 2026-08-03, but the Cambridge Systematics response lead confirmed its team is already set, so that outreach route is closed. No solo bid, no duplicate follow-up, and no partner claim; reopen only through a different qualified organization with written role and corporate-experience evidence."
+        )
+
+    return {
+        "strongest_today_action": strongest_today_action,
+        "best_near_term_cash_award_lane": best_near_term_cash_award_lane,
+        "best_grants_lane": best_grants_lane,
+        "best_contract_lane": best_contract_lane,
+        "fastest_low_friction_lane": fastest_low_friction_lane,
+    }
 
 
 def build_payload(
@@ -2520,6 +3754,19 @@ def build_payload(
     nashville_submission_receipt = read_json(NASHVILLE_EC_SUBMISSION_RECEIPT)
     darpa_submission_receipt = read_json(DARPA_SN_26_97_SUBMISSION_RECEIPT)
     openai_build_week_readiness = read_json(OPENAI_BUILD_WEEK_READINESS)
+    openai_build_week_confirmation = read_json(OPENAI_BUILD_WEEK_CONFIRMATION)
+    official_inbound_status_event_register = read_json(
+        OFFICIAL_INBOUND_STATUS_EVENT_REGISTER
+    )
+    argos_government_submission_status = read_json(
+        ARGOS_GOVERNMENT_SUBMISSION_STATUS
+    )
+    dla_dsip_official_non_submission_receipt = read_json(
+        DLA_DSIP_OFFICIAL_NON_SUBMISSION_RECEIPT
+    )
+    current_official_opportunity_recheck = read_json(
+        CURRENT_OFFICIAL_OPPORTUNITY_RECHECK
+    )
     sam_rotation_control = read_json(SAM_KEY_ROTATION_CONTROL)
     if sam_rotation_control.get("schema") != "lumencore.sam_public_credential_rotation_control.v1":
         raise ValueError("SAM.gov API-key rotation control is missing or stale")
@@ -2557,16 +3804,38 @@ def build_payload(
         nashville_submission_receipt,
         darpa_submission_receipt,
         openai_build_week_readiness,
+        openai_build_week_confirmation,
+        official_inbound_status_event_register,
+        argos_government_submission_status,
+        dla_dsip_official_non_submission_receipt,
+        current_official_opportunity_recheck,
         scan_date,
         curation_control,
         source_freshness,
+        board_as_of,
     )
-    stage_now = [row for row in lanes if row["command"] in STAGE_COMMANDS]
+    stage_candidates = [
+        row for row in lanes if row["command"] in STAGE_COMMANDS
+    ]
+    stage_ready = [
+        row
+        for row in stage_candidates
+        if row.get("deadline_actionable") is True
+        and row.get("submission_ready") is True
+        and not row.get("freshness_blockers")
+    ]
     sent_verified = [row for row in lanes if row["command"] == "SENT_VERIFIED"]
     emergency_gate = [row for row in lanes if row["command"] == "ELIGIBILITY_AND_PARTNER_GATE"]
     no_bid = [row for row in lanes if row["command"] in NO_BID_COMMANDS]
     expired = [row for row in lanes if row["command"] == EXPIRED_COMMAND]
     human_gated = [row for row in lanes if row["human_gate"]]
+    human_action_due = [
+        row
+        for row in lanes
+        if row["command"] == "FOUNDER_ONBOARDING_ACTION_DUE"
+        and row.get("days_to_close") is not None
+        and row["days_to_close"] >= 0
+    ]
     open_candidates = [
         row
         for row in lanes
@@ -2580,7 +3849,7 @@ def build_payload(
         default=None,
     )
     closest_stage = min(
-        stage_now,
+        stage_ready,
         key=lambda row: (row["days_to_close"], row["rank"]),
         default=None,
     )
@@ -2633,6 +3902,13 @@ def build_payload(
     }
     freshness_blocked = [row for row in lanes if row["freshness_blockers"]]
     sam_live_source = source_freshness["sources"]["sam_live_discovery"]
+    summary_narratives = build_summary_narratives(
+        lanes=lanes,
+        closest_stage=closest_stage,
+        missionweave_lane=missionweave_lane,
+        build_week_lane=build_week_lane,
+        missionweave_gate_progress=missionweave_gate_progress,
+    )
 
     payload: dict[str, Any] = {
         "schema": "near_deadline_submission_command_board_v5",
@@ -2648,12 +3924,15 @@ def build_payload(
                 row["opportunity_number"] in CURATED_NAVY_OPPORTUNITY_NUMBERS
                 for row in lanes
             ),
-            "stage_now_count": len(stage_now),
+            "stage_now_count": len(stage_candidates),
+            "stage_candidate_count": len(stage_candidates),
+            "stage_ready_count": len(stage_ready),
             "sent_verified_count": len(sent_verified),
             "emergency_eligibility_gate_count": len(emergency_gate),
             "no_bid_or_partner_only_count": len(no_bid),
             "expired_without_verified_send_count": len(expired),
             "human_gated_count": len(human_gated),
+            "human_action_due_count": len(human_action_due),
             "freshness_blocked_lane_count": len(freshness_blocked),
             "freshness_blocker_count": source_freshness["blocker_count"],
             "sam_zero_row_inconclusive_blocker": sam_live_source["zero_rows"],
@@ -2662,28 +3941,18 @@ def build_payload(
                 f"{harbor_lane['urgency_status']}; {harbor_lane['readiness_status']}; "
                 f"{harbor_lane['package_status']}; {harbor_lane['portal_status']}"
             ),
-            "strongest_today_action": (
-                "Finish the OpenAI Build Week external gates first: deploy and verify the public demo, capture the exact model label and /feedback Session ID, record the privacy-reviewed sub-three-minute video, and stage the Devpost preview before the July 21 7:00 p.m. Central close. "
-                f"Its current readiness control has {build_week_lane['readiness_gate_pass_count']}/{build_week_lane['readiness_gate_total']} gates passed and {build_week_lane['readiness_gate_open_count']} open. "
-                f"Then use the MissionWeave checklist to move its private action gate beyond {missionweave_gate_progress} while keeping the proposal number, final PDF identity, credentials, and action-time approval private for the July 22 noon Eastern close. "
-                "HarborSentinel is urgent but not ready: retain its dedicated package while rechecking DSIP, freshness, package integrity, eligibility, compliance, cost, and portal gates. "
-                "Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. Separately rotate the overdue SAM.gov public API credential without exposing it and capture the complete Patent Center docket."
-            ),
+            "strongest_today_action": summary_narratives["strongest_today_action"],
             "critical_same_day_infrastructure_action": sam_critical_action,
             "closest_deadline_lane": describe_lane(closest_open),
             "closest_stage_ready_lane": describe_lane(closest_stage),
-            "best_grants_lane": (
-                "DLA26BZ03-NV011 MissionWeave Phase I, due July 22, 2026 at noon Eastern: all 15 public package files are hash-verified and the 11-page neutral PDF passes format checks. "
-                "The hidden sectioned collector captures DSIP identity, proposal, and compliance facts without accepting credentials, and the guarded private finalizer can rebuild and QA the assigned-header PDF without exposing its number, path, or hash; approval remains a separate action-time gate. "
-                f"The current public action gate is {missionweave_gate_progress}, with unsupported portal and compliance facts still open. "
-                "DON26BZ03-NV063 HarborSentinel remains an urgent dedicated-package lane, but it is explicitly not ready and its stale topic mirror cannot refresh the controlling deadline or eligibility. NSF 26-510 stays the next rolling Project Pitch route after its source is refreshed."
-            ),
-            "best_contract_lane": "693JJ326R000012 FHWA TSMO Data Initiative remains partner-only through 2026-08-03, but the Cambridge Systematics response lead confirmed its team is already set, so that outreach route is closed. No solo bid, no duplicate follow-up, and no partner claim; reopen only through a different qualified organization with written role and corporate-experience evidence.",
-            "fastest_low_friction_lane": (
-                "OpenAI Build Week is the nearest unresolved low-friction reviewer route. "
-                f"The working core is verified and {build_week_lane['readiness_gate_pass_count']}/{build_week_lane['readiness_gate_total']} gates pass; the public demo, exact model label, /feedback Session ID, video, Devpost registration, and final review remain open. "
-                "Nashville EC is no longer an open lane because its portal confirmation is receipt-backed."
-            ),
+            "best_near_term_cash_award_lane": summary_narratives[
+                "best_near_term_cash_award_lane"
+            ],
+            "best_grants_lane": summary_narratives["best_grants_lane"],
+            "best_contract_lane": summary_narratives["best_contract_lane"],
+            "fastest_low_friction_lane": summary_narratives[
+                "fastest_low_friction_lane"
+            ],
             "all_final_actions_blocked_without_human": True,
             "external_send_allowed_without_human": False,
             "final_submit_allowed_without_human": False,
@@ -2723,6 +3992,20 @@ def build_payload(
             },
         },
         "lanes": lanes,
+        "human_action_due": [
+            {
+                "rank": row["rank"],
+                "opportunity_number": row["opportunity_number"],
+                "title": row["title"],
+                "command": row["command"],
+                "deadline_date": row["deadline_date"],
+                "official_deadline_text": row.get("official_deadline_text"),
+                "today_work": row["today_work"],
+                "human_gate": row["human_gate"],
+                "claim_boundary": row.get("claim_boundary"),
+            }
+            for row in human_action_due
+        ],
         "lane_status_groups": lane_status_groups,
         "sent_verified": [
             {
@@ -2743,13 +4026,34 @@ def build_payload(
                 "rank": row["rank"],
                 "opportunity_number": row["opportunity_number"],
                 "title": row["title"],
+                "classification": "STAGE_CANDIDATE_NOT_READINESS_CLAIM",
                 "command": row["command"],
                 "deadline_utc": row["deadline_utc"],
                 "official_deadline_text": row.get("official_deadline_text"),
                 "official_url": row["official_url"],
+                "deadline_actionable": row.get("deadline_actionable") is True,
+                "submission_ready": row.get("submission_ready") is True,
+                "freshness_blockers": row.get("freshness_blockers", []),
                 "package_files": row["package_files"],
             }
-            for row in stage_now
+            for row in stage_candidates
+        ],
+        "stage_ready": [
+            {
+                "rank": row["rank"],
+                "opportunity_number": row["opportunity_number"],
+                "title": row["title"],
+                "classification": "STAGE_READY_TYPED_GATES_PASS",
+                "command": row["command"],
+                "deadline_utc": row["deadline_utc"],
+                "official_deadline_text": row.get("official_deadline_text"),
+                "official_url": row["official_url"],
+                "deadline_actionable": True,
+                "submission_ready": True,
+                "freshness_blockers": [],
+                "package_files": row["package_files"],
+            }
+            for row in stage_ready
         ],
         "emergency_gate": [
             {
@@ -2846,7 +4150,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "This is the action board for getting the closest credible grants and federal contract responses fully staged.",
         "",
-        f"Direct answer: HarborSentinel remains urgent but is not ready; its dedicated package stays visible while stale source, DSIP, package-integrity, eligibility, compliance, cost, and portal gates remain closed. Nashville EC is portal-confirmed; DARPA was sent before deadline with acknowledgment pending; NASA and Army are sent, and CDC acknowledged receipt. {summary['critical_same_day_infrastructure_action']} Finish the OpenAI Build Week public-demo, provenance, video, and Devpost preview gates before its July 21 close, then stage the hash-verified MissionWeave DSIP package for July 22 noon Eastern. Refresh NSF before resuming its rolling Project Pitch staging, close the declined Cambridge FHWA teaming route without another follow-up, and keep DOJ/BOP partner-only.",
+        f"Direct answer: {summary['strongest_today_action']} {summary['critical_same_day_infrastructure_action']}",
         "",
         "## Control Line",
         "",
@@ -2856,12 +4160,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Scan date: `{payload['scan_date']}`",
         f"- Lane count: `{summary['lane_count']}`",
         f"- Curated Navy lanes: `{summary['curated_navy_lane_count']}`",
-        f"- Stage-now lanes: `{summary['stage_now_count']}`",
+        f"- Stage candidates: `{summary['stage_candidate_count']}`",
+        f"- Strict stage-ready lanes: `{summary['stage_ready_count']}`",
         f"- Sent and verified lanes: `{summary['sent_verified_count']}`",
         f"- Emergency eligibility gates: `{summary['emergency_eligibility_gate_count']}`",
         f"- No-bid or partner-only lanes: `{summary['no_bid_or_partner_only_count']}`",
         f"- Expired without verified send: `{summary['expired_without_verified_send_count']}`",
         f"- Human-gated lanes: `{summary['human_gated_count']}`",
+        f"- Human actions due: `{summary['human_action_due_count']}`",
         f"- Freshness-blocked lanes: `{summary['freshness_blocked_lane_count']}`",
         f"- SAM zero-row response is an inconclusive blocker: `{str(summary['sam_zero_row_inconclusive_blocker']).lower()}`",
         f"- Harbor status: `{summary['harbor_status']}`",
@@ -2870,6 +4176,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Critical infrastructure action: {summary['critical_same_day_infrastructure_action']}",
         f"- Closest deadline lane: {summary['closest_deadline_lane']}",
         f"- Closest stage-ready lane: {summary['closest_stage_ready_lane']}",
+        f"- Best near-term cash-award lane: {summary['best_near_term_cash_award_lane']}",
         f"- Best grants lane: {summary['best_grants_lane']}",
         f"- Best contract lane: {summary['best_contract_lane']}",
         f"- Fastest low-friction lane: {summary['fastest_low_friction_lane']}",
@@ -2945,6 +4252,31 @@ def render_markdown(payload: dict[str, Any]) -> str:
         )
     lines.extend(
         [
+        "## Human Action Due",
+        "",
+        ]
+    )
+    for row in payload["human_action_due"]:
+        lines.extend(
+            [
+                f"### {row['rank']}. {row['opportunity_number']} - {row['title']}",
+                "",
+                f"- Command: `{row['command']}`",
+                f"- Deadline date: `{row['deadline_date']}`",
+                f"- Official deadline: {row.get('official_deadline_text')}",
+                f"- Claim boundary: {row.get('claim_boundary')}",
+                "- Today work:",
+            ]
+        )
+        for item in row["today_work"]:
+            lines.append(f"  - {item}")
+        lines.append("- Human gate:")
+        for gate in row["human_gate"]:
+            lines.append(f"  - {gate}")
+        lines.append("")
+
+    lines.extend(
+        [
         "## Sent And Verified",
         "",
         ]
@@ -2964,7 +4296,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
             ]
         )
 
-    lines.extend(["## Stage Now", ""])
+    lines.extend(
+        [
+            "## Stage Candidates",
+            "",
+            "These are local work candidates, not readiness claims. A lane appears in the strict stage-ready set only when its deadline is actionable, its package is ready, and no freshness blocker remains.",
+            "",
+        ]
+    )
     for row in payload["stage_now"]:
         lines.extend(
             [
@@ -3122,6 +4461,39 @@ def render_markdown(payload: dict[str, Any]) -> str:
                     f"- Private input present: `{str(lane['action_gate_private_input_present']).lower()}`",
                     f"- Private values exposed: `{str(lane['action_gate_private_values_exposed']).lower()}`",
                     f"- Ready for human final click: `{str(lane['action_gate_submission_ready_for_human_click']).lower()}`",
+                ]
+            )
+        if lane.get("live_form_control_count") is not None:
+            lines.extend(
+                [
+                    f"- Live form controls: `{lane['live_form_control_count']}`",
+                    f"- Visibly required controls: `{lane['live_form_required_control_count']}`",
+                    f"- Optional controls: `{lane['live_form_optional_control_count']}`",
+                    f"- Agreement or signature controls: `{lane['live_form_agreement_or_signature_count']}`",
+                    f"- Earlier native-required count complete: `{str(lane['live_form_native_required_count_complete']).lower()}`",
+                    f"- Live form last inspected UTC: `{lane['live_form_last_inspected_utc']}`",
+                ]
+            )
+        if lane.get("application_manifest_status"):
+            lines.extend(
+                [
+                    f"- Application fields required: `{lane['application_required_field_count']}/{lane['application_field_count']}`",
+                    f"- Human or private fact gates: `{lane['human_or_private_fact_gate_count']}`",
+                    f"- Required attachments present: `{lane['required_attachments_present']}/{lane['required_attachment_count']}`",
+                    f"- Required attachments structural QA: `{lane['required_attachments_structural_qa_passed']}/{lane['required_attachment_count']}`",
+                    f"- Required attachments final QA: `{lane['attachments_final_qa']}`",
+                    f"- Safe upload count: `{lane['safe_upload_count']}`",
+                ]
+            )
+        if lane.get("private_final_unresolved_gates_effective") is not None:
+            lines.extend(
+                [
+                    f"- Semantic review complete: `{str(lane['semantic_review_complete']).lower()}`",
+                    f"- Official source integrity pass: `{str(lane['official_source_integrity_pass']).lower()}`",
+                    f"- Bounded evidence receipt pass: `{str(lane['bounded_evidence_receipt_pass']).lower()}`",
+                    f"- ROM gate: `{lane['rom_gate_status']}`",
+                    f"- Private-final gate: `{lane['private_final_candidate_gate_status']}`",
+                    f"- Effective private-final unresolved gates: `{lane['private_final_unresolved_gate_count_effective']}`",
                 ]
             )
         lines.extend(

@@ -55,7 +55,7 @@ def test_every_discovered_pptx_is_exactly_registered_or_quarantined():
         if module.legacy_collection_for(path, config["legacy_collections"]) is None
     ]
     assert unregistered == []
-    assert len(discovered) >= 29
+    assert len(discovered) >= 30
 
 
 def test_registry_blocks_release_and_separates_legacy_decks():
@@ -63,15 +63,25 @@ def test_registry_blocks_release_and_separates_legacy_decks():
     payload = module.build_registry(CONFIG, as_of_utc=AS_OF_UTC)
 
     assert payload["status"] == "GOVERNED_CURRENT_DECK_WITH_ARCHIVED_LEGACY"
-    assert payload["summary"]["registered_pptx_count"] >= 29
-    assert payload["summary"]["registered_exact_pptx_count"] == 5
+    assert payload["summary"]["registered_pptx_count"] >= 30
+    assert payload["summary"]["registered_exact_pptx_count"] == 6
     assert payload["summary"]["legacy_collection_file_count"] >= 24
     assert payload["summary"]["current_deck_count"] == 1
     assert payload["summary"]["current_pdf_companion_count"] == 1
-    assert payload["summary"]["historical_or_template_count"] >= 28
+    assert payload["summary"]["historical_or_template_count"] >= 29
     assert payload["summary"]["external_release_authorized_count"] == 0
     assert payload["summary"]["send_eligible_count"] == 0
     assert not any(payload["blockers"].values())
+    launchtn = next(
+        row
+        for row in payload["artifacts"]
+        if row["id"] == "launchtn_3686_current_review_deck"
+    )
+    assert launchtn["status"] == (
+        "APPLICATION_SPECIFIC_REVIEW_REQUIRED_DO_NOT_SEND"
+    )
+    assert launchtn["send_eligible"] is False
+    assert launchtn["external_release_authorized"] is False
 
 
 def test_current_deck_has_current_evidence_and_source_notes():
