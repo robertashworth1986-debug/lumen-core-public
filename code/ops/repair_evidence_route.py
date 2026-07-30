@@ -27,6 +27,7 @@ REDIRECT_PATTERN = re.compile(
     r"(?m)^[ \t]*location[ \t]+=[ \t]*/evidence[ \t]*\{"
 )
 SAFE_ROOT_PATTERN = re.compile(r"^/[A-Za-z0-9._/-]+$")
+SAFE_WINDOWS_ROOT_PATTERN = re.compile(r"^[A-Za-z]:/[A-Za-z0-9._/-]+$")
 
 
 class RouteRepairError(RuntimeError):
@@ -42,7 +43,11 @@ class RepairResult:
 
 def _safe_document_root(path: Path | str) -> str:
     value = str(path)
-    if not SAFE_ROOT_PATTERN.fullmatch(value):
+    is_safe = SAFE_ROOT_PATTERN.fullmatch(value) is not None
+    if not is_safe and os.name == "nt":
+        value = Path(value).as_posix()
+        is_safe = SAFE_WINDOWS_ROOT_PATTERN.fullmatch(value) is not None
+    if not is_safe:
         raise RouteRepairError(
             "document root must be an absolute path containing only "
             "letters, digits, dot, underscore, slash, or hyphen"

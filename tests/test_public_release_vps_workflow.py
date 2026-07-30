@@ -38,9 +38,24 @@ def test_public_release_workflow_never_broad_deletes_dashboard() -> None:
     assert "rsync -avz --delete" not in text
     assert "rsync -avz" not in text
     assert "rsync -rlvz --no-times --omit-dir-times" in text
+    assert "rm -rf" not in text
     assert "dashboard/ \\" not in text
     assert '"$STAGE_ROOT/dashboard/"' in text
     assert "/opt/lumencore/dashboard/" in text
+
+
+def test_public_release_repairs_static_evidence_route_before_verification() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+
+    sync_at = text.index("Sync staged reviewer release to VPS")
+    repair_at = text.index("Repair public evidence route atomically")
+    verify_at = text.index("Verify immutable public artifact hashes")
+
+    assert sync_at < repair_at < verify_at
+    assert "repair_evidence_route.py" in text
+    assert "REPAIR_EVIDENCE_ROUTE_ON_VPS.sh" in text
+    assert "sudo env LUMENCORE_DOMAIN=lumen-core.ai" in text
+    assert "--apply" in text
 
 
 def test_public_release_workflow_runs_complete_post_publish_verification() -> None:

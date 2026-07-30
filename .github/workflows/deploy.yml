@@ -85,6 +85,31 @@ jobs:
             "$STAGE_ROOT/dashboard/" \
             opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/
 
+      - name: Repair public evidence route atomically
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          REMOTE_DIR="/tmp/lumencore-evidence-route-${GITHUB_RUN_ID}"
+          SSH_ARGS=(
+            -o StrictHostKeyChecking=yes
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts"
+          )
+          cleanup() {
+            ssh "${SSH_ARGS[@]}" "opc@${VPS_HOST}" \
+              "rm -f -- '${REMOTE_DIR}/repair_evidence_route.py' '${REMOTE_DIR}/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh'; rmdir -- '${REMOTE_DIR}' 2>/dev/null || true" \
+              || true
+          }
+          trap cleanup EXIT
+          ssh "${SSH_ARGS[@]}" "opc@${VPS_HOST}" \
+            "install -d -m 700 '${REMOTE_DIR}'"
+          scp "${SSH_ARGS[@]}" \
+            code/ops/repair_evidence_route.py \
+            code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh \
+            "opc@${VPS_HOST}:${REMOTE_DIR}/"
+          ssh "${SSH_ARGS[@]}" "opc@${VPS_HOST}" \
+            "sudo env LUMENCORE_DOMAIN=lumen-core.ai bash '${REMOTE_DIR}/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh' --apply"
+
       - name: Verify immutable public artifact hashes
         env:
           STAGE_ROOT: ${{ steps.release.outputs.stage_root }}
