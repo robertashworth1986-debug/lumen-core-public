@@ -1,5 +1,5 @@
 {
-  "as_of_date": "2026-07-18",
+  "as_of_date": "2026-07-29",
   "claim_boundary": "This dated mailbox reconciliation records only the messages observable at the check. It does not prove that no later message exists, portal state, eligibility, submission, acceptance, award, validation, or authorization to disclose private account or patent information.",
   "evidence_method": "Connected Gmail metadata and relevant-thread reconciliation against sent receipts and the canonical response register.",
   "excluded_message_classes": [
@@ -9,33 +9,181 @@
   ],
   "lanes": [
     {
-      "deadline_timezone_explicit_in_message": false,
+      "attachment_count": 0,
+      "conflicting_gmail_draft_count": 0,
+      "current_draft_count": 0,
+      "deadline_action_required": false,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "duplicate_send_prohibited": true,
       "email_reply_required": false,
-      "expected_next_steps_by": "2026-08-03",
+      "follow_up_policy": {
+        "deadline_utc": "2026-07-30T21:00:00Z",
+        "eligible_template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
+        "lane_id": "argos_emi_teaming_inquiry",
+        "max_proactive_sends": 1,
+        "mode": "ONE_BOUNDED_INITIAL_OUTREACH_BEFORE_DEADLINE",
+        "not_before_utc": "2026-07-27T19:34:27Z",
+        "partner_interest_target_utc": "2026-07-28T17:00:00Z",
+        "rationale": "The one permitted no-attachment partner fit-check was sent once on 2026-07-28 and verified in Gmail SENT. The proactive allowance is exhausted. Monitor for a specific inbound reply and do not resend; complete the Government capability statement independently before the deadline."
+      },
+      "government_attachment_count": 1,
+      "government_automatic_reply_requires_resend": false,
+      "government_deadline_timezone": "America/New_York",
+      "government_deadline_utc": "2026-07-30T21:00:00Z",
+      "government_post_send_automatic_reply_observed": true,
+      "government_response_sent": true,
+      "government_response_state": "SENT_ONCE_POST_SEND_VERIFIED_NO_DUPLICATE",
+      "government_sent_before_deadline": true,
+      "government_sent_utc": "2026-07-29T01:52:18Z",
+      "lane_id": "argos_emi_teaming_inquiry",
+      "latest_event_type": "SENT_ONCE_POST_SEND_VERIFIED",
+      "latest_event_utc": "2026-07-28T15:39:34Z",
+      "matching_inbound_count": 0,
+      "matching_sent_count": 1,
+      "next_action": "Do not resend either the EMI teaming inquiry or the Government response. The Government response was sent once before the July 30 deadline and its sent copy was verified. Treat the out-of-office notice as informational only; monitor for a substantive reply.",
+      "no_send_before": null,
+      "organization": "EMI Advisors LLC",
+      "partner_interest_target_utc": "2026-07-28T17:00:00Z",
+      "prior_approval_binding_expired": true,
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY"
+    },
+    {
+      "account_action_required": true,
+      "cohort_selected": true,
+      "conflicting_gmail_draft_count": 0,
+      "deadline_time_and_timezone_explicit": false,
+      "deposit_date": "2026-08-14",
+      "deposit_submitted": false,
+      "discount_code_omitted": true,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "financial_assistance_amount_usd": 375,
+      "financial_assistance_reported": true,
       "follow_up_policy": {
         "eligible_template_id": null,
         "lane_id": "nashville_ec_takeoff_fall_2026",
         "max_proactive_sends": 0,
-        "mode": "INBOUND_ONLY",
+        "mode": "ACCOUNT_ACTION",
         "not_before_utc": null,
-        "rationale": "Portal submission is confirmed; monitor through the stated review date and answer only a specific inbound request."
+        "rationale": "The cohort invitation is confirmed and the thank-you was already sent. Nashville EC replaced an invalid TakeOff payment link and reconfirmed the onboarding form and participation agreement deadline of July 31 plus the deposit deadline of August 14. The agreement and payment both require founder review, and no duplicate email is due."
       },
+      "full_program_investment_usd": 500,
+      "info_session_attendance_required": false,
       "lane_id": "nashville_ec_takeoff_fall_2026",
-      "latest_event_type": "PORTAL_SUBMISSION_CONFIRMED",
-      "latest_event_utc": "2026-07-18T04:54:52.709214Z",
-      "next_action": "Monitor for the rolling review result through August 3; do not resubmit, reply to the automated confirmation, or describe the application as selected.",
+      "latest_event_type": "UPDATED_PAYMENT_AND_INFO_SESSION_ROUTES_RECEIVED",
+      "latest_event_utc": "2026-07-29T02:49:17Z",
+      "next_action": "Review and complete the official onboarding form and participation agreement by July 31. Preserve the corrected TakeOff payment route for founder-controlled payment by August 14. An information session is optional; verify its timezone and calendar conflicts before saving one. Do not accept the agreement, make a payment, or send another acceptance email automatically.",
       "no_send_before": null,
-      "operational_local_deadline": "2026-07-17T23:59:00-05:00",
-      "operational_utc_deadline": "2026-07-18T04:59:00Z",
+      "onboarding_deadline_reconfirmed": true,
+      "onboarding_form_and_participation_agreement_date": "2026-07-31",
+      "onboarding_form_completed": false,
+      "optional_info_session_count": 3,
+      "optional_info_session_selected": false,
+      "optional_info_session_timezone_explicit": false,
+      "optional_info_sessions_offered": true,
       "organization": "Nashville Entrepreneur Center",
-      "portal_submission_verified": true,
+      "participation_agreement_accepted": false,
+      "prior_portal_submission_verified": true,
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
-      "state": "PORTAL_SUBMISSION_CONFIRMED"
+      "state": "COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE",
+      "thank_you_and_acceptance_sent": true
     },
     {
+      "acknowledgment_sent": true,
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "tsa_industry_portal_capability",
+        "max_proactive_sends": 0,
+        "mode": "PORTAL_ACTION",
+        "not_before_utc": null,
+        "rationale": "TSA directed capability and meeting requests to its Industry Portal. The email acknowledgment was already sent, so prepare only a founder-reviewed portal entry and do not repeat email outreach."
+      },
+      "lane_id": "tsa_industry_portal_capability",
+      "latest_event_type": "OFFICIAL_INDUSTRY_PORTAL_ROUTE_RECEIVED",
+      "latest_event_utc": "2026-07-24T19:12:10Z",
+      "next_action": "Prepare a bounded portal entry for human review. Do not send another email or submit the portal request without reviewing the exact fields and final claims.",
+      "no_send_before": null,
+      "official_industry_portal_route_provided": true,
+      "organization": "Transportation Security Administration",
+      "portal_action_required": true,
+      "portal_submission_completed": false,
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "OFFICIAL_INDUSTRY_PORTAL_ROUTE_PROVIDED"
+    },
+    {
+      "account_action_required": true,
+      "account_created": true,
+      "account_identifier_omitted": true,
+      "conflicting_gmail_draft_count": 0,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "exact_application_verified": false,
+      "exact_role_verified": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "dla_amps_application_access",
+        "max_proactive_sends": 0,
+        "mode": "ACCOUNT_ACTION",
+        "not_before_utc": null,
+        "rationale": "The AMPS account is created, but the exact DLA application and external-user role have not been verified. Request no role until the sponsoring program or application point of contact confirms the exact name and access need."
+      },
+      "lane_id": "dla_amps_application_access",
+      "latest_event_type": "AMPS_ACCOUNT_CREATED_ROLE_REQUEST_NOT_VERIFIED",
+      "latest_event_utc": "2026-07-27T02:04:34Z",
+      "next_action": "Use the official AMPS site directly and verify the exact application and role with the sponsoring DLA program or application point of contact before submitting a role request.",
+      "no_send_before": null,
+      "organization": "Defense Logistics Agency",
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "role_request_submitted": false,
+      "send_now": false,
+      "state": "ACCOUNT_CREATED_EXACT_ROLE_NOT_YET_VERIFIED"
+    },
+    {
+      "account_action_required": true,
+      "conflicting_gmail_draft_count": 0,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "login_gov_new_device_signin",
+        "max_proactive_sends": 0,
+        "mode": "ACCOUNT_ACTION",
+        "not_before_utc": null,
+        "rationale": "Login.gov reported a new-device sign-in. The user must recognize it or secure the account directly; no email reply or automated credential action is appropriate."
+      },
+      "lane_id": "login_gov_new_device_signin",
+      "latest_event_type": "NEW_DEVICE_SIGNIN_SECURITY_NOTICE",
+      "latest_event_utc": "2026-07-27T00:20:25Z",
+      "new_device_signin_reported": true,
+      "next_action": "If the sign-in was yours, no action is needed. If it was not, navigate directly to Login.gov and immediately reset the password and authentication methods without using or exposing the email security token.",
+      "no_send_before": null,
+      "organization": "Login.gov",
+      "recognized_by_user": false,
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "security_link_and_token_omitted": true,
+      "send_now": false,
+      "state": "NEW_DEVICE_SIGNIN_REQUIRES_USER_RECOGNITION"
+    },
+    {
+      "all_parties_completed": true,
+      "canonical_logo_files_sent": true,
+      "completed_document_attached": true,
+      "completed_document_private_custody_required": true,
+      "conflicting_gmail_draft_count": 0,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -43,21 +191,111 @@
         "max_proactive_sends": 0,
         "mode": "INBOUND_ONLY",
         "not_before_utc": null,
-        "rationale": "Identity and routing facts were already supplied; wait for an MOU, correction request, or onboarding question."
+        "rationale": "The onboarding facts were sent and an MRC invitation was received. Verify the explicitly requested logo files and permitted-use boundary before one action-time reviewed asset reply; do not repeat the onboarding facts or expose meeting details."
       },
       "lane_id": "epri_open_power_ai_mou",
-      "latest_event_type": "AUTOMATIC_OUT_OF_OFFICE",
-      "latest_event_utc": "2026-07-17T03:51:16Z",
-      "next_action": "Wait for the MOU, a correction request, or an onboarding question; do not resend identity details.",
-      "no_send_before": "2026-07-23",
+      "latest_event_type": "CANONICAL_LOGO_PAIR_SENT_ONCE_POST_SEND_VERIFIED",
+      "latest_event_utc": "2026-07-29T19:45:31Z",
+      "logo_permission_sent": true,
+      "logo_response_matching_sent_count": 1,
+      "logo_response_post_send_verified": true,
+      "mrc_invite_observed": true,
+      "next_action": "Do not resend the logo pair. Monitor the existing EPRI Open Power AI thread for acceptance, a formatting request, or a substantive consortium contribution request. Keep the completed agreement in private custody and review its obligations without exposing signing links or private identifiers.",
+      "no_send_before": null,
+      "onboarding_obligations_reviewed": false,
+      "onboarding_request_observed": true,
+      "onboarding_response_sent": true,
       "organization": "EPRI Open Power AI Consortium",
-      "out_of_office_through": "2026-07-20",
+      "post_sign_finish_screen_observed": true,
+      "primary_contact_sent": true,
+      "requested_asset_template_id": "REQUESTED_ASSET_DELIVERY_REPLY",
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
-      "state": "MOU_ROUTING_SENT_OUT_OF_OFFICE_RECEIVED"
+      "state": "LOGO_PAIR_SENT_ONCE_POST_SEND_VERIFIED_DO_NOT_RESEND",
+      "user_reported_signing_complete": true,
+      "work_group_representatives_sent": true
     },
     {
+      "application_submitted": false,
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "eligibility_verified": false,
+      "email_reply_required": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "pathway_working_capital_inquiry",
+        "max_proactive_sends": 0,
+        "mode": "PORTAL_ACTION",
+        "not_before_utc": null,
+        "rationale": "The official reply directs the inquiry to a financing portal with eligibility conditions. Any application requires founder review of truthful eligibility, terms, consent, and repayment obligations; no email follow-up is due."
+      },
+      "lane_id": "pathway_working_capital_inquiry",
+      "latest_event_type": "OFFICIAL_FINANCING_PORTAL_ROUTE_RECEIVED",
+      "latest_event_utc": "2026-07-24T15:46:08Z",
+      "next_action": "Treat this as a founder-reviewed financing portal action, not economic relief already secured. Do not email another inquiry or begin an application without truthful eligibility and terms review.",
+      "no_send_before": null,
+      "organization": "Pathway Lending",
+      "portal_action_required": true,
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "OFFICIAL_PORTAL_ROUTE_PROVIDED_FOUNDER_REVIEW_REQUIRED"
+    },
+    {
+      "conflicting_gmail_draft_count": 0,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "darpa_dice_abstract_status",
+        "max_proactive_sends": 0,
+        "mode": "CLOSED",
+        "not_before_utc": null,
+        "rationale": "The official status discouraged a full proposal and requested no reply. Close without sending and retain only sanitized fit lessons."
+      },
+      "full_proposal_encouraged": false,
+      "lane_id": "darpa_dice_abstract_status",
+      "latest_event_type": "OFFICIAL_FULL_PROPOSAL_DISCOURAGED",
+      "latest_event_utc": "2026-07-24T19:49:43Z",
+      "next_action": "Do not reply or prepare a full proposal under this route. Preserve only non-sensitive fit lessons and reopen only on a new official opportunity.",
+      "no_send_before": null,
+      "organization": "DARPA DICE Program",
+      "reply_requested": false,
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "FULL_PROPOSAL_DISCOURAGED_ROUTE_CLOSED"
+    },
+    {
+      "conflicting_gmail_draft_count": 0,
+      "corrected_response_sent": true,
+      "correction_request_received": true,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "dhs_rfi_correction",
+        "max_proactive_sends": 0,
+        "mode": "INBOUND_ONLY",
+        "not_before_utc": null,
+        "rationale": "The agency correction request was answered with a corrected response. Monitor for a specific clarification or replacement request and do not duplicate either response."
+      },
+      "further_reply_requested": false,
+      "lane_id": "dhs_rfi_correction",
+      "latest_event_type": "CORRECTED_RESPONSE_SENT_AFTER_OFFICIAL_REQUEST",
+      "latest_event_utc": "2026-07-24T18:04:28Z",
+      "next_action": "Monitor the existing thread for a specific agency clarification or replacement request. Do not resend either response and do not expose submission contents.",
+      "no_send_before": null,
+      "organization": "U.S. Department of Homeland Security",
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "CORRECTION_REQUEST_RECEIVED_CORRECTED_RESPONSE_SENT_MONITOR_ONLY"
+    },
+    {
+      "conflicting_gmail_draft_count": 0,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -78,8 +316,59 @@
       "state": "SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION"
     },
     {
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "uspto_document_services_copy_route",
+        "max_proactive_sends": 0,
+        "mode": "PORTAL_ACTION",
+        "not_before_utc": null,
+        "rationale": "Document Services supplied the official copy-order portal route but did not confirm unpublished-record scope, identity requirements, fees, delivery time, or any controlling deadline."
+      },
+      "lane_id": "uspto_document_services_copy_route",
+      "latest_event_type": "OFFICIAL_COPY_PORTAL_ROUTE_PROVIDED",
+      "latest_event_utc": "2026-07-23T11:45:05Z",
+      "missing_fact_count": 5,
+      "next_action": "Use the official copy-order or customer-service route in a human-controlled session, confirm unpublished-record availability before payment, and continue the separate authenticated Patent Center and registered-practitioner paths. Do not send unpublished application content by ordinary email.",
+      "no_send_before": null,
+      "organization": "USPTO Document Services",
+      "portal_action_required": true,
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "OFFICIAL_COPY_PORTAL_ROUTE_PROVIDED_SCOPE_UNCONFIRMED"
+    },
+    {
+      "conflicting_gmail_draft_count": 0,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "nccu_ip_clinic_intake",
+        "max_proactive_sends": 0,
+        "mode": "CLOSED",
+        "not_before_utc": null,
+        "rationale": "The clinic is unavailable for summer and cannot accept matters with upcoming filing deadlines; close without reply and continue verified practitioner and official procedural routes."
+      },
+      "lane_id": "nccu_ip_clinic_intake",
+      "latest_event_type": "SERVICE_AVAILABILITY_DECLINE_RECEIVED",
+      "latest_event_utc": "2026-07-22T17:56:29Z",
+      "next_action": "Close this clinic route without reply. Continue the official-record retrieval, authenticated Patent Center, pro se procedural-support, and verified registered-practitioner referral paths.",
+      "no_send_before": null,
+      "organization": "North Carolina Central University IP Clinic",
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "SERVICE_UNAVAILABLE_SUMMER_AND_UPCOMING_DEADLINE_ROUTE_CLOSED"
+    },
+    {
+      "conflicting_gmail_draft_count": 0,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "follow_up_allowance_consumed": true,
       "follow_up_policy": {
         "eligible_template_id": "BOUNDED_REVIEW_FOLLOWUP",
         "lane_id": "lanl_vision_licensing_followup",
@@ -89,17 +378,19 @@
         "rationale": "One bounded review follow-up may be drafted after the hold only if a fresh mailbox check confirms no reply."
       },
       "lane_id": "lanl_vision_licensing_followup",
-      "latest_event_type": "OUTBOUND_PACKAGE_SENT",
-      "latest_event_utc": "2026-07-16T18:50:16Z",
-      "next_action": "Wait for LANL; use the single bounded follow-up only on or after July 23 if no reply arrives.",
-      "no_send_before": "2026-07-23",
+      "latest_event_type": "SINGLE_BOUNDED_FOLLOWUP_SENT",
+      "latest_event_utc": "2026-07-27T13:49:21Z",
+      "next_action": "Monitor the existing LANL thread for an inbound reply. The single bounded follow-up allowance is consumed; do not send again.",
+      "no_send_before": null,
       "organization": "Los Alamos National Laboratory",
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
-      "state": "PACKAGE_SENT_RESPONSE_PENDING"
+      "state": "BOUNDED_FOLLOWUP_SENT_RESPONSE_PENDING_INBOUND_ONLY"
     },
     {
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -121,9 +412,11 @@
     },
     {
       "attachment_count": 2,
+      "conflicting_gmail_draft_count": 0,
       "deadline_date": "2026-07-17",
       "deadline_time_compliance_claimed": false,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -145,9 +438,12 @@
     },
     {
       "component_poc_included_on_original_message": true,
-      "component_reply_observed": false,
+      "component_reply_observed": true,
+      "conflicting_gmail_draft_count": 0,
+      "deadline_elapsed": true,
       "deadline_utc": "2026-07-22T16:00:00Z",
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": "COMPONENT_INSTRUCTION_ESCALATION",
@@ -155,23 +451,31 @@
         "max_proactive_sends": 1,
         "mode": "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD",
         "not_before_utc": "2026-07-20T17:00:00Z",
-        "rationale": "DSIP Support redirected the Volume V DD Form 2345/JCP instruction question to the DLA component POC already included on the original message. Draft at most one component follow-up after the Monday hold and only after a fresh full-thread check confirms no component reply."
+        "rationale": "The one historical component-instruction follow-up is already recorded in the sealed ledger. A later official DSIP response directs status verification to the read-only Past Proposals portal view, so the allowance remains exhausted and no additional email may be drafted or sent."
       },
+      "formally_submitted": false,
       "lane_id": "missionweave_dsip_proposal",
-      "latest_event_type": "DSIP_SUPPORT_REDIRECTED_TO_DLA_COMPONENT_POC",
-      "latest_event_utc": "2026-07-18T15:35:55Z",
-      "next_action": "Continue the JCP portal and DSIP evidence work. Recheck the complete component thread after the Monday hold; only if no component reply exists may one bounded instruction follow-up be drafted. Do not resend the proposal package.",
-      "no_send_before": "2026-07-20T17:00:00Z",
+      "latest_event_type": "OFFICIAL_DSIP_NON_SUBMISSION_CONFIRMED",
+      "latest_event_utc": "2026-07-28T17:36:13Z",
+      "next_action": "Archive the official non-submission receipt, retain the failed gates for lessons learned, and do not resend, certify, upload, or represent the proposal as submitted.",
+      "no_send_before": null,
+      "official_status_route_provided": true,
       "open_gate_count": 14,
       "organization": "Defense SBIR/STTR Innovation Portal",
+      "portal_action_required": false,
+      "portal_status": "IN_PROGRESS",
+      "portal_status_observed": true,
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
-      "state": "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN",
+      "state": "OFFICIAL_DLA_CONFIRMED_PROPOSAL_IN_PROGRESS_NOT_SUBMITTED",
+      "submission_receipt_observed": false,
       "support_redirect_received": true
     },
     {
+      "conflicting_gmail_draft_count": 0,
       "deadline_utc": "2026-07-22T00:00:00Z",
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -183,7 +487,7 @@
       },
       "lane_id": "openai_build_week_prooflock",
       "latest_event_type": "PROJECT_CORE_VERIFIED_SUBMISSION_FIELDS_OPEN",
-      "latest_event_utc": "2026-07-18T07:43:23.212373+00:00",
+      "latest_event_utc": "2026-07-26T22:07:44.484325+00:00",
       "next_action": "Confirm model provenance and the /feedback session ID, deploy the public demo, record the required public video, complete Devpost registration, and obtain action-time approval before final submission.",
       "no_send_before": null,
       "organization": "OpenAI Build Week / Devpost",
@@ -192,7 +496,9 @@
       "state": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
     },
     {
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "embedded_rule_count": 10,
       "follow_up_policy": {
@@ -215,7 +521,9 @@
       "state": "REFERENCED_HANDOFF_UNAVAILABLE_EXECUTION_SCOPE_BOUNDED"
     },
     {
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -238,7 +546,78 @@
       "written_independent_review_confirmation": true
     },
     {
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "lvlup_warm_investor_intro",
+        "max_proactive_sends": 0,
+        "mode": "INBOUND_ONLY",
+        "not_before_utc": null,
+        "rationale": "One focused warm-introduction follow-up was sent on July 23. Monitor for a substantive introduction or question and do not send another proactive follow-up."
+      },
+      "lane_id": "lvlup_warm_investor_intro",
+      "latest_event_type": "BOUNDED_WARM_INTRO_FOLLOWUP_SENT",
+      "latest_event_utc": "2026-07-23T20:16:27Z",
+      "next_action": "Monitor the existing thread for a substantive introduction or question. Do not send another proactive introduction follow-up.",
+      "no_send_before": null,
+      "organization": "LvlUp Ventures",
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "OUTBOUND_FOLLOWUP_SENT_MONITOR_ONLY"
+    },
+    {
+      "conflicting_gmail_draft_count": 0,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "lvlup_application_review_status",
+        "max_proactive_sends": 0,
+        "mode": "INBOUND_ONLY",
+        "not_before_utc": null,
+        "rationale": "One application-status check was sent after the stated review window. Monitor for a substantive request or decision and do not send another proactive status check."
+      },
+      "lane_id": "lvlup_application_review_status",
+      "latest_event_type": "OFFICIAL_APPLICATION_REVIEW_STATUS_RECEIVED",
+      "latest_event_utc": "2026-07-23T20:48:10Z",
+      "next_action": "Monitor the existing thread for a substantive request or decision. Do not reply now and do not send additional materials unless LvlUp specifically requests them.",
+      "no_send_before": null,
+      "organization": "LvlUp Ventures",
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "APPLICATION_ACTIVE_COMMITTEE_REVIEW_NO_ADDITIONAL_MATERIALS"
+    },
+    {
+      "conflicting_gmail_draft_count": 0,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
+      "email_reply_required": false,
+      "follow_up_policy": {
+        "eligible_template_id": null,
+        "lane_id": "third_sphere_seedstrap_direct_review",
+        "max_proactive_sends": 0,
+        "mode": "INBOUND_ONLY",
+        "not_before_utc": null,
+        "rationale": "One public-safe initial review request was sent to a verified official contact route on July 23. Monitor for a substantive response or official application instruction and do not send another proactive initial request."
+      },
+      "lane_id": "third_sphere_seedstrap_direct_review",
+      "latest_event_type": "INITIAL_PUBLIC_SAFE_REVIEW_REQUEST_SENT",
+      "latest_event_utc": "2026-07-23T20:36:53Z",
+      "next_action": "Monitor the existing thread for a substantive response or official application instruction. Do not send another proactive initial request. Any portal submission, financing term, legal fact, attestation, or agreement remains founder-only.",
+      "no_send_before": null,
+      "organization": "Third Sphere",
+      "response_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "state": "INITIAL_PUBLIC_SAFE_REVIEW_REQUEST_SENT_MONITOR_ONLY"
+    },
+    {
+      "conflicting_gmail_draft_count": 1,
+      "do_not_duplicate_send": true,
+      "draft_quarantine_status": "QUARANTINED_NOT_SENDABLE",
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -251,19 +630,23 @@
       "lane_id": "terry_vynetic_followup",
       "latest_event_type": "TWO_NEAR_DUPLICATE_OUTBOUND_FOLLOWUPS",
       "latest_event_utc": "2026-07-16T16:58:56Z",
-      "next_action": "Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread.",
+      "next_action": "Do not send or revive this draft. The proactive follow-up allowance is exhausted; respond only if a substantive inbound message contains a specific ask.",
       "no_send_before": null,
       "organization": "Terry Anderton / Vynetic",
       "outbound_followup_count": 2,
       "outbound_spacing_seconds": 10,
+      "quarantined_draft_conflict_type": "PROACTIVE_FOLLOWUP_LIMIT_EXHAUSTED",
+      "quarantined_draft_observed_utc": "2026-07-23T21:25:52Z",
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
       "state": "OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY"
     },
     {
       "confirmed_delivery_count": 1,
+      "conflicting_gmail_draft_count": 0,
       "delivery_failure_count": 1,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "fit_check_confirmed_count": 0,
       "follow_up_policy": {
@@ -290,7 +673,9 @@
       "threaded_acknowledgment_send_count": 1
     },
     {
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": false,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -311,7 +696,11 @@
       "state": "NO_OFFICIAL_PROJECT_PITCH_INVITATION_VERIFIED"
     },
     {
+      "agency_reply_received": false,
+      "compliance_verified": false,
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -322,17 +711,20 @@
         "rationale": "A sent receipt exists; monitor for an agency clarification or replacement request."
       },
       "lane_id": "nasa_data_center_rfi",
-      "latest_event_type": "SENT_RECEIPT_RECONCILIATION",
-      "latest_event_utc": "2026-07-13T21:27:12Z",
-      "next_action": "Monitor for an agency clarification or replacement request.",
+      "latest_event_type": "FIRM_FIXED_PRICE_QUOTATION_SENT",
+      "latest_event_utc": "2026-07-24T18:13:34Z",
+      "next_action": "Monitor the existing thread for an agency clarification or replacement request. Do not resend the quotation or claim compliance, acceptance, selection, or award.",
       "no_send_before": null,
       "organization": "NASA",
+      "quotation_sent": true,
       "response_template_id": "NO_DUPLICATE_MONITOR",
       "send_now": false,
-      "state": "SENT_VERIFIED_RESPONSE_PENDING"
+      "state": "FIRM_FIXED_PRICE_QUOTATION_SENT_RESPONSE_PENDING"
     },
     {
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -353,7 +745,9 @@
       "state": "SENT_VERIFIED_RESPONSE_PENDING"
     },
     {
+      "conflicting_gmail_draft_count": 0,
       "do_not_duplicate_send": true,
+      "draft_quarantine_status": null,
       "email_reply_required": false,
       "follow_up_policy": {
         "eligible_template_id": null,
@@ -378,28 +772,79 @@
   "search_scope": [
     "Funding, grant, contract, SBIR/STTR, DSIP, NSF, SAM.gov, and Research.gov",
     "Patent routing and Georgia PATENTS",
+    "USPTO Document Services copy-route response and NCCU IP Clinic closure",
     "LANL VISION and licensing follow-up",
     "EPRI Open Power AI Consortium onboarding",
+    "Pathway Lending working-capital portal routing",
+    "DARPA DICE abstract status",
+    "DHS RFI correction request and corrected-response state",
+    "TSA Industry Portal capability routing",
+    "DLA AMPS account creation and application-role verification",
+    "Login.gov new-device sign-in security notice",
     "FHWA TSMO qualified-partner outreach",
     "Nashville EC Fall 2026 TakeOff deadline-support query",
     "Nashville EC Fall 2026 TakeOff portal-submission confirmation",
+    "Nashville EC cohort selection, onboarding, agreement, and deposit dates",
     "DARPA-SN-26-97 formal RFI response and agency-thread state",
     "MissionWeave DSIP and OpenAI Build Week portal deadlines",
     "OpenAI Build Week self-sent handoff attachment integrity",
+    "HHS Project Argos partner-outreach draft, duplicate, and deadline state",
     "CDC, NASA, Army, LvlUp, Terry Anderton, and Vynetic"
   ],
   "source_evidence": {
+    "argos_government_submission_status": {
+      "bytes": 2227,
+      "path": "grant_submissions/funding_sprint_20260709/ARGOS_GOVERNMENT_SUBMISSION_STATUS_2026-07-28.json",
+      "present": true,
+      "sha256": "55BD30EE3DD7A5A7CB5B3610D9CBA86DA71D07A2391BD1407A5ECB19BA7D8369"
+    },
+    "argos_partner_outreach_status": {
+      "bytes": 2989,
+      "path": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
+      "present": true,
+      "sha256": "62417E4BBCC0AD5BA2AB38C76398651EEFA89E443A9EF06C9ECFA3BA1452C95E"
+    },
     "darpa_sn_26_97_public_submission_receipt": {
       "bytes": 2834,
       "path": "grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json",
       "present": true,
       "sha256": "89B64A1A282AB72F0738E068952A14A82E38F5AEC4A78C1B7D2B4F4930410CB4"
     },
+    "dla_dsip_official_non_submission_receipt": {
+      "bytes": 2414,
+      "path": "grant_submissions/funding_sprint_20260709/DLA_DSIP_OFFICIAL_NON_SUBMISSION_RECEIPT_2026-07-28.json",
+      "present": true,
+      "sha256": "7F46CDA39FB48B66C0F2FB11878FC8C315A2217AC0DAE1D793523EE24B65C9D6"
+    },
+    "epri_opai_logo_response_send_status": {
+      "bytes": 2554,
+      "path": "grant_submissions/funding_sprint_20260709/EPRI_OPAI_LOGO_RESPONSE_SEND_STATUS_2026-07-29.json",
+      "present": true,
+      "sha256": "245C4D20DFBC8A51AE921E17AD88CE0431E07BA3572AA31764C3A7AA2E22FF2A"
+    },
+    "epri_open_power_ai_mou_signing_state": {
+      "bytes": 1630,
+      "path": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_SIGNING_STATE_2026-07-23.json",
+      "present": true,
+      "sha256": "39E878302B460187F635BF17FA3A5B5EFA991DBB63A5B295589B7BC03C43F1E6"
+    },
+    "lvlup_application_review_status_response_state": {
+      "bytes": 2051,
+      "path": "grant_submissions/funding_sprint_20260709/LVLUP_APPLICATION_REVIEW_STATUS_RESPONSE_STATE_2026-07-23.json",
+      "present": true,
+      "sha256": "511FA0802BDF6C71EF1201D5004B2FCA2AFC4FD3CD3D5F155449C990EB846A30"
+    },
     "lvlup_independent_review_confirmation": {
       "bytes": 1908,
       "path": "grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json",
       "present": true,
       "sha256": "F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC"
+    },
+    "lvlup_outreach_send_state": {
+      "bytes": 1434,
+      "path": "grant_submissions/funding_sprint_20260709/LVLUP_OUTREACH_SEND_STATE_2026-07-23.json",
+      "present": true,
+      "sha256": "39DF9BEF4596EE1DA159928E6A43C39E7B3B946C230ACA904837B4E688B53375"
     },
     "missionweave_dsip_action_gate": {
       "bytes": 13106,
@@ -419,6 +864,18 @@
       "present": true,
       "sha256": "E606530B0CCBAB06347BEF60DE527B4A76E5EE35BD7A15E71C3A0B49647BE505"
     },
+    "nccu_patent_clinic_route_closure": {
+      "bytes": 1352,
+      "path": "grant_submissions/funding_sprint_20260709/NCCU_PATENT_CLINIC_ROUTE_CLOSURE_STATE_2026-07-22.json",
+      "present": true,
+      "sha256": "6F4A972B395AC488682BF0692536ACB697DD4E7510DBADD0AF90ACD97CAFB7B8"
+    },
+    "official_inbound_status_event_register": {
+      "bytes": 23069,
+      "path": "grant_submissions/funding_sprint_20260709/OFFICIAL_INBOUND_STATUS_EVENT_REGISTER_2026-07-25.json",
+      "present": true,
+      "sha256": "320E8A6351C27A0A395DACDE7BBC1FE32D1ACEEB8E8A7596C77AECA485F39A6A"
+    },
     "openai_build_week_handoff_integrity_control": {
       "bytes": 3587,
       "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/BUILD_WEEK_HANDOFF_INTEGRITY_CONTROL_2026-07-17.json",
@@ -426,41 +883,63 @@
       "sha256": "26907C567B22D6AE1B34EE83B2C39E588BAE01CB1E21E19D7E187714993E8EF6"
     },
     "openai_build_week_readiness": {
-      "bytes": 10649,
+      "bytes": 10667,
       "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json",
       "present": true,
-      "sha256": "DAE0EF8377E3EFD60942CE9A61859C4E42CC2404917A06704A6B15B18F280E2A"
+      "sha256": "A363904809F993B8C8B82B55B79D82AFB87020F98CBCE9379B2149284A417833"
+    },
+    "outreach_draft_quarantine_state": {
+      "bytes": 1671,
+      "path": "grant_submissions/funding_sprint_20260709/OUTREACH_DRAFT_QUARANTINE_STATE_2026-07-23.json",
+      "present": true,
+      "sha256": "AD010FC23FD470B6771DB6528AF665828E0365C5B07AF947AFCB56EE7FBCA448"
     },
     "outreach_followup_policy_config": {
-      "bytes": 5670,
+      "bytes": 11032,
       "path": "config/outreach_followup_policies_v1.json",
       "present": true,
-      "sha256": "34F758D02549726463FCC1A3BFAE36542FBEB8D393991BD66037B870DBD1444C"
+      "sha256": "0BA1240BCCBFBD824768D1C22C91CD2C13A02598137DD7640802CB236778BAD2"
     },
     "outreach_response_template_registry": {
-      "bytes": 18275,
+      "bytes": 44664,
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
       "present": true,
-      "sha256": "A72FA6DF0B4F6626D43062FC96957647CFEECC0EE5E6270333E47DA16FB61789"
+      "sha256": "08689C993F98CB6EE19B25023A7F8D39AD2BE25C9E6450C9364A0DAC9ED41DF4"
+    },
+    "third_sphere_seedstrap_outreach_send_state": {
+      "bytes": 1849,
+      "path": "grant_submissions/funding_sprint_20260709/THIRD_SPHERE_SEEDSTRAP_OUTREACH_SEND_STATE_2026-07-23.json",
+      "present": true,
+      "sha256": "1F282AC64B7C01B125E8874CA125E924D796FB8A006300936AC3CE5182C584A1"
+    },
+    "uspto_document_services_routing_response": {
+      "bytes": 1906,
+      "path": "grant_submissions/funding_sprint_20260709/USPTO_DOCUMENT_SERVICES_ROUTING_RESPONSE_STATE_2026-07-23.json",
+      "present": true,
+      "sha256": "5191B00F2A3DF5190C2381D69EFBBCCC69CE94468BC8BC982F9AEF2A049BD382"
     }
   },
   "status": "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION",
   "summary": {
-    "duplicate_outbound_risk_count": 15,
+    "conflicting_gmail_draft_count": 1,
+    "conflicting_gmail_draft_lane_count": 1,
+    "deadline_action_required_count": 0,
+    "duplicate_outbound_risk_count": 27,
     "email_reply_required_count": 0,
     "external_send_allowed_without_human": false,
     "follow_up_mode_counts": {
-      "ACCOUNT_ACTION": 1,
-      "CLOSED": 2,
-      "INBOUND_ONLY": 8,
+      "ACCOUNT_ACTION": 4,
+      "CLOSED": 4,
+      "INBOUND_ONLY": 11,
       "ONE_BOUNDED_FOLLOW_UP_AFTER_HOLD": 2,
-      "PORTAL_ACTION": 2,
+      "ONE_BOUNDED_INITIAL_OUTREACH_BEFORE_DEADLINE": 1,
+      "PORTAL_ACTION": 5,
       "PRIVATE_RECONCILIATION": 1
     },
-    "human_account_action_count": 4,
-    "lane_count": 16,
-    "monitor_no_send_template_count": 15,
-    "out_of_office_count": 1,
+    "human_account_action_count": 10,
+    "lane_count": 28,
+    "monitor_no_send_template_count": 27,
+    "out_of_office_count": 0,
     "send_now_count": 0
   }
 }
