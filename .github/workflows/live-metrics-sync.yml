@@ -2,8 +2,8 @@ name: 🔄 Live Metrics Sync
 
 on:
   schedule:
-    # Probe every 30 minutes; commit only on material data changes or once per UTC day.
-    - cron: '*/30 * * * *'
+    # Survival mode: one preservation snapshot per UTC day.
+    - cron: '29 12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -24,7 +24,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch and compare live metrics
+      - name: Fetch daily metrics snapshot
         id: fetch
         shell: bash
         run: |
@@ -34,122 +34,59 @@ jobs:
           fetch_object_or_null() {
             local url=$1
             local body
-
             if body=$(curl --fail --silent --show-error --location --max-redirs 5 --max-time 10 "$url" 2>/dev/null); then
               if jq -e 'type == "object"' >/dev/null 2>&1 <<<"$body"; then
                 jq -cS . <<<"$body"
                 return
               fi
             fi
-
             echo 'null'
           }
 
-          LIVE_STATUS=$(fetch_object_or_null "https://lumen-core.ai/api/live_status.json")
-          FEDERAL_BRIEF=$(fetch_object_or_null "https://lumen-core.ai/api/federal_brief.json")
-          EVIDENCE_SUMMARY=$(fetch_object_or_null "https://lumen-core.ai/api/evidence_summary.json")
-          EXECUTOR_HB=$(fetch_object_or_null "https://lumen-core.ai/api/executor_heartbeat.json")
+          live_status=$(fetch_object_or_null "https://lumen-core.ai/api/live_status.json")
+          federal_brief=$(fetch_object_or_null "https://lumen-core.ai/api/federal_brief.json")
+          evidence_summary=$(fetch_object_or_null "https://lumen-core.ai/api/evidence_summary.json")
+          executor_heartbeat=$(fetch_object_or_null "https://lumen-core.ai/api/executor_heartbeat.json")
 
-          SITE_CODE=$(
-            curl \
-              --silent \
-              --show-error \
-              --location \
-              --max-redirs 5 \
-              --max-time 10 \
-              --output /dev/null \
-              --write-out "%{http_code}" \
-              "https://lumen-core.ai/" \
-              2>/dev/null
-          ) || SITE_CODE="000"
-          [[ "$SITE_CODE" =~ ^[0-9]{3}$ ]] || SITE_CODE="000"
+          site_code=$(curl --silent --show-error --location --max-redirs 5 --max-time 10 \
+            --output /dev/null --write-out "%{http_code}" "https://lumen-core.ai/" 2>/dev/null) || site_code="000"
+          [[ "$site_code" =~ ^[0-9]{3}$ ]] || site_code="000"
 
-          SNAPSHOT_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          TODAY=${SNAPSHOT_TS:0:10}
-          CANDIDATE="$RUNNER_TEMP/live_snapshot_candidate.json"
-
+          snapshot_ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           jq -n \
-            --arg snapshot_utc "$SNAPSHOT_TS" \
-            --arg site_status "$SITE_CODE" \
-            --argjson live_status "$LIVE_STATUS" \
-            --argjson federal_brief "$FEDERAL_BRIEF" \
-            --argjson evidence_summary "$EVIDENCE_SUMMARY" \
-            --argjson executor_heartbeat "$EXECUTOR_HB" \
-            '{
-              snapshot_utc: $snapshot_utc,
-              site_status: $site_status,
-              live_status: $live_status,
-              federal_brief: $federal_brief,
-              evidence_summary: $evidence_summary,
-              executor_heartbeat: $executor_heartbeat
-            }' > "$CANDIDATE"
+            --arg snapshot_utc "$snapshot_ts" \
+            --arg site_status "$site_code" \
+            --argjson live_status "$live_status" \
+            --argjson federal_brief "$federal_brief" \
+            --argjson evidence_summary "$evidence_summary" \
+            --argjson executor_heartbeat "$executor_heartbeat" \
+            '{snapshot_utc:$snapshot_utc,site_status:$site_status,live_status:$live_status,federal_brief:$federal_brief,evidence_summary:$evidence_summary,executor_heartbeat:$executor_heartbeat}' \
+            > data/live_snapshot.json
 
-          jq empty "$CANDIDATE"
-
-          CURRENT_STATE=$(jq -cS 'del(.snapshot_utc)' "$CANDIDATE")
-          PREV_STATE=$(jq -cS 'del(.snapshot_utc)' data/live_snapshot.json 2>/dev/null || echo '{}')
-          PREV_DATE=$(jq -r '.snapshot_utc // ""' data/live_snapshot.json 2>/dev/null | cut -c1-10 || true)
-
-          SHOULD_COMMIT="false"
-          REASON="no material metrics change"
-
-          if [[ "$CURRENT_STATE" != "$PREV_STATE" ]]; then
-            SHOULD_COMMIT="true"
-            REASON="material metrics changed"
-          elif [[ "$PREV_DATE" != "$TODAY" ]]; then
-            SHOULD_COMMIT="true"
-            REASON="daily snapshot"
+          status=$((10#$site_code))
+          status_msg=unreachable
+          status_color=red
+          if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then
+            status_msg=online
+            status_color=brightgreen
           fi
 
-          echo "site_status=${SITE_CODE}" >> "$GITHUB_OUTPUT"
-          echo "snapshot_ts=${SNAPSHOT_TS}" >> "$GITHUB_OUTPUT"
-          echo "should_commit=${SHOULD_COMMIT}" >> "$GITHUB_OUTPUT"
-          echo "commit_reason=${REASON}" >> "$GITHUB_OUTPUT"
-          echo "Live metrics: ${REASON}."
+          jq -n --arg message "$status_msg" --arg color "$status_color" \
+            '{schemaVersion:1,label:"lumen-core.ai",message:$message,color:$color,cacheSeconds:3600}' \
+            > data/site_health_badge.json
 
-      - name: Publish material metrics snapshot
-        if: steps.fetch.outputs.should_commit == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          SITE_CODE="${{ steps.fetch.outputs.site_status }}"
-          SITE_STATUS=$((10#$SITE_CODE))
+          jq empty data/live_snapshot.json data/site_health_badge.json
+          echo "snapshot_ts=$snapshot_ts" >> "$GITHUB_OUTPUT"
 
-          if [[ "$SITE_STATUS" -ge 200 && "$SITE_STATUS" -lt 300 ]]; then
-            STATUS_COLOR="brightgreen"
-            STATUS_MSG="online"
-          else
-            STATUS_COLOR="red"
-            STATUS_MSG="unreachable"
-          fi
-
-          cat > "$RUNNER_TEMP/site_health_badge.json" <<EOF
-          {
-            "schemaVersion": 1,
-            "label": "lumen-core.ai",
-            "message": "${STATUS_MSG}",
-            "color": "${STATUS_COLOR}",
-            "cacheSeconds": 300
-          }
-          EOF
-
-          jq empty "$RUNNER_TEMP/site_health_badge.json"
-          cp "$RUNNER_TEMP/live_snapshot_candidate.json" data/live_snapshot.json
-          cp "$RUNNER_TEMP/site_health_badge.json" data/site_health_badge.json
-          jq empty data/live_snapshot.json
-          jq empty data/site_health_badge.json
-
-      - name: Commit material metrics snapshot
-        if: steps.fetch.outputs.should_commit == 'true'
+      - name: Commit daily metrics snapshot
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "lumencore-bot"
           git config user.email "bot@lumen-core.ai"
           git add data/live_snapshot.json data/site_health_badge.json
-
           if ! git diff --cached --quiet; then
-            git commit -m "chore(metrics): ${{ steps.fetch.outputs.commit_reason }} @ ${{ steps.fetch.outputs.snapshot_ts }}"
+            git commit -m "chore(metrics): daily survival snapshot @ ${{ steps.fetch.outputs.snapshot_ts }}"
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
