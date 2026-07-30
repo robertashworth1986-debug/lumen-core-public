@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "label": "status",
-  "message": "degraded (5/6)",
-  "color": "yellow",
+  "message": "operational (6/6)",
+  "color": "brightgreen",
   "cacheSeconds": 60
 }
