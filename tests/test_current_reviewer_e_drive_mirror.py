@@ -33,11 +33,44 @@ def test_mirror_allowlist_is_current_and_excludes_private_inputs():
     assert "out/ops/source_native_family_baseline_ledger_latest.json" in paths
     assert "out/ops/market_signal_source_native_benchmark_latest.json" in paths
     assert "dashboard/data/market_signal_source_native_benchmark.json" in paths
+    assert "out/ops/market_signal_kraken_panel_benchmark_latest.json" in paths
+    assert (
+        "out/ops/market_signal_kraken_panel_benchmark_manifest_latest.json"
+        in paths
+    )
+    assert "dashboard/data/market_signal_kraken_panel_benchmark.json" in paths
+    assert (
+        "config/market_signal_kraken_panel_benchmark_protocol_v1.json" in paths
+    )
+    kraken_panel_snapshots = {
+        path
+        for path in paths
+        if path.startswith("data/kraken_hourly_history/ohlc_")
+        and path.endswith(".csv")
+    }
+    assert kraken_panel_snapshots == {
+        "data/kraken_hourly_history/ohlc_BTC_USD.csv",
+        "data/kraken_hourly_history/ohlc_ETH_USD.csv",
+        "data/kraken_hourly_history/ohlc_SOL_USD.csv",
+        "data/kraken_hourly_history/ohlc_XRP_USD.csv",
+        "data/kraken_hourly_history/ohlc_ADA_USD.csv",
+        "data/kraken_hourly_history/ohlc_HYPE_USD.csv",
+        "data/kraken_hourly_history/ohlc_SUI_USD.csv",
+        "data/kraken_hourly_history/ohlc_XMR_USD.csv",
+        "data/kraken_hourly_history/ohlc_LTC_USD.csv",
+        "data/kraken_hourly_history/ohlc_DOGE_USD.csv",
+        "data/kraken_hourly_history/ohlc_ZEC_USD.csv",
+        "data/kraken_hourly_history/ohlc_TAO_USD.csv",
+    }
     assert "dashboard/data/source_native_family_baseline_ledger.json" in paths
     assert (
         "output/pdf/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pdf"
     ) in paths
     assert "out/ops/PUBLIC_RELEASE_SYNC_PLAN_2026-07-18.json" in paths
+    assert "code/ops/BUILD_NEAR_DEADLINE_PACKAGE_DECISION_GATE.py" in paths
+    assert "tests/test_near_deadline_package_decision_gate.py" in paths
+    assert "code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py" in paths
+    assert "tests/test_live_funding_portal_handoff.py" in paths
     assert "deploy/REPAIR_LUMA_GATEWAY_MODULE.ps1" in paths
     assert "docs/VPS_GATEWAY_RECOVERY_2026-07-29.md" in paths
     assert "out/ops/live_domain_service_contract_latest.json" in paths
@@ -65,6 +98,28 @@ def test_mirror_allowlist_is_current_and_excludes_private_inputs():
         "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf"
     ) in paths
     assert (
+        "grant_submissions/funding_sprint_20260709/source_attachments/"
+        "W912HZ26SC005/SOURCE_CUSTODY_2026-07-29.json"
+    ) in paths
+    assert (
+        "grant_submissions/funding_sprint_20260709/"
+        "ERDC_SDC_INTERNAL_RED_TEAM_RECEIPT_2026-07-29.md"
+    ) in paths
+    assert (
+        "grant_submissions/funding_sprint_20260709/"
+        "ERDC_SDC_PRIVATE_FINAL_CANDIDATE_GATE_2026-07-29.json"
+    ) in paths
+    assert (
+        "grant_submissions/funding_sprint_20260709/"
+        "ERDC_SDC_PRIVATE_FINAL_CANDIDATE_GATE_2026-07-29.md"
+    ) in paths
+    assert (
+        "docs/ERDC_SDC_PRIVATE_FINAL_CANDIDATE_WORKFLOW_2026-07-29.md"
+    ) in paths
+    assert "config/erdc_sdc_private_final_template_v1.json" in paths
+    assert "code/ops/BUILD_ERDC_SDC_PRIVATE_FINAL_CANDIDATE.py" in paths
+    assert "tests/test_erdc_sdc_private_final_candidate.py" in paths
+    assert (
         "grant_submissions/LAUNCHTN_3686_PITCH_2026/"
         "LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-29.json"
     ) in paths
@@ -72,6 +127,12 @@ def test_mirror_allowlist_is_current_and_excludes_private_inputs():
         "grant_submissions/funding_sprint_20260709/"
         "DOE_FY26_GENESIS_PHASE1_PITCH_PACKET_2026-07-29.json"
     ) in paths
+    assert (
+        "grant_submissions/funding_sprint_20260709/"
+        "EPRI_OPAI_LOGO_RESPONSE_SEND_STATUS_2026-07-29.json"
+    ) in paths
+    assert "dashboard/brand/lumencore_logo_on_dark_1024.png" in paths
+    assert "dashboard/brand/lumencore_logo_on_light_1024.png" in paths
     assert "code/watchers/doe_fy26_watcher.py" in paths
     assert "out/grants/doe_fy26_watch.json" in paths
     assert not any("/private/" in f"/{path.lower()}/" for path in paths)

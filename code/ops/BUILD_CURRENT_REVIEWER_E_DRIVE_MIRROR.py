@@ -67,6 +67,16 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
         "submission_control",
     ),
     (
+        "code/ops/BUILD_NEAR_DEADLINE_PACKAGE_DECISION_GATE.py",
+        "auditable_builder",
+        "submission_control",
+    ),
+    (
+        "tests/test_near_deadline_package_decision_gate.py",
+        "verification_control",
+        "submission_control",
+    ),
+    (
         "grant_submissions/funding_sprint_20260709/SUBMISSION_CONFORMANCE_GATE_2026-07-25.md",
         "internal_control_human_review_required",
         "submission_control",
@@ -117,6 +127,16 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
         "submission_control",
     ),
     (
+        "code/ops/BUILD_LIVE_FUNDING_PORTAL_HANDOFF.py",
+        "auditable_builder",
+        "submission_control",
+    ),
+    (
+        "tests/test_live_funding_portal_handoff.py",
+        "verification_control",
+        "submission_control",
+    ),
+    (
         "grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_TAKEOFF_ONBOARDING_REVIEW_PACKET_2026-07-29.md",
         "internal_control_founder_review_required",
         "nashville_ec",
@@ -164,6 +184,21 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
     (
         "out/ops/PUBLIC_RELEASE_SYNC_PLAN_2026-07-18.json",
         "machine_readable_control",
+        "public_release",
+    ),
+    (
+        "config/public_release_sync_policy_v1.json",
+        "reproducibility_policy",
+        "public_release",
+    ),
+    (
+        "code/ops/BUILD_PUBLIC_RELEASE_SYNC_PLAN.py",
+        "reproducibility_source",
+        "public_release",
+    ),
+    (
+        "tests/test_public_release_sync_plan.py",
+        "reproducibility_test",
         "public_release",
     ),
     (
@@ -222,8 +257,83 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
         "erdc_sdc",
     ),
     (
+        "grant_submissions/funding_sprint_20260709/ERDC_SDC_PRIVATE_FINAL_CANDIDATE_GATE_2026-07-29.json",
+        "public_safe_machine_readable_control",
+        "erdc_sdc",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/ERDC_SDC_PRIVATE_FINAL_CANDIDATE_GATE_2026-07-29.md",
+        "public_safe_human_review_required",
+        "erdc_sdc",
+    ),
+    (
+        "docs/ERDC_SDC_PRIVATE_FINAL_CANDIDATE_WORKFLOW_2026-07-29.md",
+        "internal_control_human_review_required",
+        "erdc_sdc",
+    ),
+    (
+        "config/erdc_sdc_private_final_template_v1.json",
+        "empty_private_input_template",
+        "erdc_sdc",
+    ),
+    (
+        "code/ops/BUILD_ERDC_SDC_PRIVATE_FINAL_CANDIDATE.py",
+        "guarded_private_candidate_builder",
+        "erdc_sdc",
+    ),
+    (
+        "tests/test_erdc_sdc_private_final_candidate.py",
+        "guarded_private_candidate_regression_tests",
+        "erdc_sdc",
+    ),
+    (
+        "out/ops/erdc_sdc_evidence_ablation_latest.json",
+        "machine_readable_bounded_synthetic_evidence",
+        "erdc_sdc",
+    ),
+    (
+        "docs/ERDC_SDC_EVIDENCE_ABLATION_2026-07-29.md",
+        "public_safe_bounded_synthetic_evidence",
+        "erdc_sdc",
+    ),
+    (
+        "code/ops/BUILD_ERDC_SDC_EVIDENCE_ABLATION.py",
+        "reproducible_evidence_builder",
+        "erdc_sdc",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/ERDC_SDC_INTERNAL_RED_TEAM_RECEIPT_2026-07-29.md",
+        "internal_model_review_not_independent_validation",
+        "erdc_sdc",
+    ),
+    (
         "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-29.json",
         "official_source_receipt",
+        "erdc_sdc",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_CUSTODY_2026-07-29.json",
+        "official_source_custody_receipt",
+        "erdc_sdc",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_CUSTODY_2026-07-29.md",
+        "official_source_requirement_crosswalk",
+        "erdc_sdc",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.txt",
+        "official_source_extracted_text",
+        "erdc_sdc",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_20Jul2026.txt",
+        "official_source_extracted_text",
+        "erdc_sdc",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/ERDCWERX_SDC_LIVE_PAGE_2026-07-29.html",
+        "official_live_page_snapshot",
         "erdc_sdc",
     ),
     (
@@ -297,6 +407,41 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
         "doe_genesis",
     ),
     (
+        "grant_submissions/funding_sprint_20260709/EPRI_OPAI_LOGO_RESPONSE_SEND_STATUS_2026-07-29.json",
+        "machine_readable_external_action_receipt",
+        "epri_open_power_ai",
+    ),
+    (
+        "code/ops/BUILD_EPRI_OPAI_LOGO_RESPONSE_PACKET.py",
+        "reproducibility_source",
+        "epri_open_power_ai",
+    ),
+    (
+        "tests/test_epri_opai_logo_response_packet.py",
+        "reproducibility_test",
+        "epri_open_power_ai",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/EPRI_OPAI_LOGO_RESPONSE_PACKET_2026-07-25.json",
+        "machine_readable_control",
+        "epri_open_power_ai",
+    ),
+    (
+        "grant_submissions/funding_sprint_20260709/EPRI_OPAI_LOGO_RESPONSE_PACKET_2026-07-25.md",
+        "internal_control_human_review_required",
+        "epri_open_power_ai",
+    ),
+    (
+        "dashboard/brand/lumencore_logo_on_dark_1024.png",
+        "public_brand_asset",
+        "epri_open_power_ai",
+    ),
+    (
+        "dashboard/brand/lumencore_logo_on_light_1024.png",
+        "public_brand_asset",
+        "epri_open_power_ai",
+    ),
+    (
         "config/market_signal_source_native_benchmark_protocol_v1.json",
         "reproducibility_source",
         "source_native_research",
@@ -314,6 +459,111 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
     (
         "docs/MARKET_SIGNAL_SOURCE_NATIVE_BENCHMARK_2026-07-29.md",
         "public_safe_human_review_required",
+        "source_native_research",
+    ),
+    (
+        "code/ops/collect_kraken_hourly_history.py",
+        "reproducibility_source",
+        "source_native_research",
+    ),
+    (
+        "out/ops/kraken_history_collector_latest.json",
+        "machine_readable_source_receipt",
+        "source_native_research",
+    ),
+    (
+        "config/market_signal_kraken_panel_benchmark_protocol_v1.json",
+        "reproducibility_source",
+        "source_native_research",
+    ),
+    (
+        "code/ops/BUILD_MARKET_SIGNAL_KRAKEN_PANEL_BENCHMARK.py",
+        "reproducibility_source",
+        "source_native_research",
+    ),
+    (
+        "tests/test_market_signal_kraken_panel_benchmark.py",
+        "reproducibility_test",
+        "source_native_research",
+    ),
+    (
+        "docs/MARKET_SIGNAL_KRAKEN_PANEL_BENCHMARK_2026-07-29.md",
+        "public_safe_human_review_required",
+        "source_native_research",
+    ),
+    (
+        "out/ops/market_signal_kraken_panel_benchmark_latest.json",
+        "public_safe_machine_readable",
+        "source_native_research",
+    ),
+    (
+        "out/ops/market_signal_kraken_panel_benchmark_manifest_latest.json",
+        "machine_readable_control",
+        "source_native_research",
+    ),
+    (
+        "dashboard/data/market_signal_kraken_panel_benchmark.json",
+        "public_safe_machine_readable",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_BTC_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_ETH_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_SOL_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_XRP_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_ADA_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_HYPE_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_SUI_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_XMR_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_LTC_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_DOGE_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_ZEC_USD.csv",
+        "public_measured_source_snapshot",
+        "source_native_research",
+    ),
+    (
+        "data/kraken_hourly_history/ohlc_TAO_USD.csv",
+        "public_measured_source_snapshot",
         "source_native_research",
     ),
     (
@@ -383,6 +633,16 @@ EXTRA_ARTIFACTS: tuple[tuple[str, str, str], ...] = (
     ),
     (
         "tests/test_repair_luma_gateway_module.py",
+        "reproducibility_test",
+        "vps_recovery",
+    ),
+    (
+        "code/deploy/nginx/lumatrader.conf",
+        "deployment_configuration_human_unlock_required",
+        "vps_recovery",
+    ),
+    (
+        "tests/test_nginx_public_surface_security.py",
         "reproducibility_test",
         "vps_recovery",
     ),

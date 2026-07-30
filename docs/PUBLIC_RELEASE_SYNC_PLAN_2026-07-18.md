@@ -1,8 +1,8 @@
 # Public Release Sync Plan
 
-As of UTC: `2026-07-29T15:16:13Z`
+As of UTC: `2026-07-30T04:23:07Z`
 Plan state: `DRY_RUN_READY_HUMAN_UNLOCK_REQUIRED`
-Plan SHA-256: `7ae3fd9a41192d4b56e5fe499e6a147a57f9d050e93c72310d5d93f70986e047`
+Plan SHA-256: `c6d9d134631a076e0095ed671511ff5006179883ba38c2ae52224fc5c7e6088b`
 
 ## Decision
 
@@ -29,7 +29,7 @@ The dry-run plan passed local preflight. No files were copied and every network 
 | `model_geometry_evidence_ledger` | `docs/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER_2026-07-13.md` | `dashboard/evidence/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER.md` | `PROVENANCE_AND_REPRODUCIBILITY` | `PLAN_NEW_LOCAL_STAGE_COPY` | `none` | `b8af64d9a54ccf37` |
 | `quant_hub_reviewer_context_json` | `dashboard/data/quant_hub_reviewer_context.json` | `dashboard/data/quant_hub_reviewer_context.json` | `BOUNDED_INTERNAL_EVIDENCE` | `NOOP_EXACT_MATCH` | `none` | `ca7e01fd443a5bf5` |
 | `quant_hub_reviewer_context_markdown` | `docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md` | `dashboard/evidence/QUANT_HUB_REVIEWER_CONTEXT.md` | `BOUNDED_INTERNAL_EVIDENCE` | `PLAN_NEW_LOCAL_STAGE_COPY` | `none` | `ba3211de559ca42d` |
-| `source_native_benchmark_whitepaper_pdf` | `output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf` | `dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_2476B88BC8B4.pdf` | `PROVENANCE_AND_REPRODUCIBILITY` | `PLAN_NEW_LOCAL_STAGE_COPY` | `none` | `2476b88bc8b49d14` |
+| `source_native_benchmark_whitepaper_pdf` | `output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf` | `dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf` | `PROVENANCE_AND_REPRODUCIBILITY` | `PLAN_NEW_LOCAL_STAGE_COPY` | `none` | `e407897065ff0d69` |
 
 ## Public URL Verification
 
@@ -40,7 +40,7 @@ No URL was contacted. After an explicit human unlock and a separate publish acti
 - `model_geometry_evidence_ledger`: https://lumen-core.ai/evidence/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER.md (`PENDING_HUMAN_UNLOCK_AND_PUBLICATION`)
 - `quant_hub_reviewer_context_json`: https://lumen-core.ai/data/quant_hub_reviewer_context.json (`PENDING_HUMAN_UNLOCK_AND_PUBLICATION`)
 - `quant_hub_reviewer_context_markdown`: https://lumen-core.ai/evidence/QUANT_HUB_REVIEWER_CONTEXT.md (`PENDING_HUMAN_UNLOCK_AND_PUBLICATION`)
-- `source_native_benchmark_whitepaper_pdf`: https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_2476B88BC8B4.pdf (`PENDING_HUMAN_UNLOCK_AND_PUBLICATION`)
+- `source_native_benchmark_whitepaper_pdf`: https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf (`PENDING_HUMAN_UNLOCK_AND_PUBLICATION`)
 
 ## Claim Boundary
 
