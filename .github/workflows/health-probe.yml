@@ -2,8 +2,8 @@ name: 🔍 Site Health Probe
 
 on:
   schedule:
-    # Probe every 15 minutes, but only commit on an endpoint-state change or once per UTC day.
-    - cron: '*/15 * * * *'
+    # Survival mode: one preservation snapshot per UTC day.
+    - cron: '17 12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -24,7 +24,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Probe all production endpoints
+      - name: Probe production endpoints
         id: probe
         shell: bash
         env:
@@ -33,156 +33,73 @@ jobs:
           set -euo pipefail
           mkdir -p data
 
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          TODAY=$(date -u +"%Y-%m-%d")
-
-          PREV_OVERALL=$(jq -r '.overall // "unknown"' data/site_health.json 2>/dev/null || echo "unknown")
-          PREV_HEALTHY=$(jq -r '.healthy_count // -1' data/site_health.json 2>/dev/null || echo "-1")
-          PREV_DATE=$(jq -r '.checked_utc // ""' data/site_health.json 2>/dev/null | cut -c1-10 || true)
-          PREV_ENDPOINT_STATE=$(
-            jq -cS '
-              .endpoints // {}
-              | to_entries
-              | map({name: .key, status: .value.status, status_text: (.value.status_text // ""), ok: .value.ok})
-              | sort_by(.name)
-            ' data/site_health.json 2>/dev/null || echo '[]'
-          )
+          timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
           check_endpoint() {
             local name=$1
             local url=$2
             local code
-            local status
-            local ok
-
-            # HTTP errors such as 502 are valid probe results, so do not use curl
-            # --fail. Normalize transport failures to numeric 0 while preserving
-            # the conventional three-character status text "000".
-            code=$(
-              curl \
-                --silent \
-                --show-error \
-                --location \
-                --max-redirs 5 \
-                --max-time "$CURL_TIMEOUT_SECONDS" \
-                --output /dev/null \
-                --write-out "%{http_code}" \
-                "$url" \
-                2>/dev/null
-            ) || code="000"
+            code=$(curl --silent --show-error --location --max-redirs 5 \
+              --max-time "$CURL_TIMEOUT_SECONDS" --output /dev/null \
+              --write-out "%{http_code}" "$url" 2>/dev/null) || code="000"
             [[ "$code" =~ ^[0-9]{3}$ ]] || code="000"
-
-            status=$((10#$code))
-            if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then
-              ok="true"
-            else
-              ok="false"
-            fi
-
-            printf '  "%s": { "url": "%s", "status": %d, "status_text": "%s", "ok": %s }' \
-              "$name" "$url" "$status" "$code" "$ok"
+            local status=$((10#$code))
+            local ok=false
+            if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then ok=true; fi
+            jq -n --arg name "$name" --arg url "$url" --arg text "$code" \
+              --argjson status "$status" --argjson ok "$ok" \
+              '{key:$name,value:{url:$url,status:$status,status_text:$text,ok:$ok}}'
           }
 
-          PORTAL=$(check_endpoint "portal" "https://lumen-core.ai/")
-          EVIDENCE=$(check_endpoint "evidence" "https://lumen-core.ai/evidence/")
-          KRAKEN_DB=$(check_endpoint "kraken_dashboard" "https://lumen-core.ai/kraken_execution_dashboard.html")
-          MISSION=$(check_endpoint "mission_control" "https://lumen-core.ai/mission_control.html")
-          APPROVAL=$(check_endpoint "approval_hub" "https://lumen-core.ai/agent_approval_hub.html")
-          FORECAST=$(check_endpoint "forecast" "https://lumen-core.ai/forecast.html")
+          endpoints=$(printf '%s\n' \
+            "$(check_endpoint portal https://lumen-core.ai/)" \
+            "$(check_endpoint evidence https://lumen-core.ai/evidence/)" \
+            "$(check_endpoint kraken_dashboard https://lumen-core.ai/kraken_execution_dashboard.html)" \
+            "$(check_endpoint mission_control https://lumen-core.ai/mission_control.html)" \
+            "$(check_endpoint approval_hub https://lumen-core.ai/agent_approval_hub.html)" \
+            "$(check_endpoint forecast https://lumen-core.ai/forecast.html)" \
+            | jq -s 'from_entries')
 
-          ALL_UP=6
-          HEALTHY=$(printf '%s\n' "$PORTAL" "$EVIDENCE" "$KRAKEN_DB" "$MISSION" "$APPROVAL" "$FORECAST" | grep -c '"ok": true' || true)
-
-          if [[ "$HEALTHY" -eq "$ALL_UP" ]]; then
-            OVERALL="operational"
-            COLOR="brightgreen"
-          elif [[ "$HEALTHY" -gt 3 ]]; then
-            OVERALL="degraded"
-            COLOR="yellow"
-          else
-            OVERALL="outage"
-            COLOR="red"
+          healthy=$(jq '[.[] | select(.ok == true)] | length' <<<"$endpoints")
+          total=$(jq 'length' <<<"$endpoints")
+          overall=outage
+          color=red
+          if [[ "$healthy" -eq "$total" ]]; then
+            overall=operational
+            color=brightgreen
+          elif [[ "$healthy" -gt 3 ]]; then
+            overall=degraded
+            color=yellow
           fi
 
-          cat > data/site_health.json <<EOF
-          {
-            "checked_utc": "${TIMESTAMP}",
-            "overall": "${OVERALL}",
-            "healthy_count": ${HEALTHY},
-            "total_count": ${ALL_UP},
-            "endpoints": {
-          ${PORTAL},
-          ${EVIDENCE},
-          ${KRAKEN_DB},
-          ${MISSION},
-          ${APPROVAL},
-          ${FORECAST}
-            }
-          }
-          EOF
+          jq -n --arg checked_utc "$timestamp" --arg overall "$overall" \
+            --argjson healthy_count "$healthy" --argjson total_count "$total" \
+            --argjson endpoints "$endpoints" \
+            '{checked_utc:$checked_utc,overall:$overall,healthy_count:$healthy_count,total_count:$total_count,endpoints:$endpoints}' \
+            > data/site_health.json
 
-          jq empty data/site_health.json
+          jq -n --arg message "$overall ($healthy/$total)" --arg color "$color" \
+            '{schemaVersion:1,label:"status",message:$message,color:$color,cacheSeconds:3600}' \
+            > data/uptime_badge.json
 
-          CURRENT_ENDPOINT_STATE=$(
-            jq -cS '
-              .endpoints
-              | to_entries
-              | map({name: .key, status: .value.status, status_text: (.value.status_text // ""), ok: .value.ok})
-              | sort_by(.name)
-            ' data/site_health.json
-          )
+          jq empty data/site_health.json data/uptime_badge.json
+          echo "overall=$overall" >> "$GITHUB_OUTPUT"
+          echo "healthy=$healthy" >> "$GITHUB_OUTPUT"
+          echo "timestamp=$timestamp" >> "$GITHUB_OUTPUT"
 
-          cat > data/uptime_badge.json <<EOF
-          {
-            "schemaVersion": 1,
-            "label": "status",
-            "message": "${OVERALL} (${HEALTHY}/${ALL_UP})",
-            "color": "${COLOR}",
-            "cacheSeconds": 60
-          }
-          EOF
-
-          jq empty data/uptime_badge.json
-
-          SHOULD_COMMIT="false"
-          REASON="no material status change"
-
-          if [[ "$OVERALL" != "$PREV_OVERALL" ]] \
-            || [[ "$HEALTHY" != "$PREV_HEALTHY" ]] \
-            || [[ "$CURRENT_ENDPOINT_STATE" != "$PREV_ENDPOINT_STATE" ]]; then
-            SHOULD_COMMIT="true"
-            REASON="endpoint state changed"
-          elif [[ "$PREV_DATE" != "$TODAY" ]]; then
-            SHOULD_COMMIT="true"
-            REASON="daily snapshot"
-          fi
-
-          echo "overall=${OVERALL}" >> "$GITHUB_OUTPUT"
-          echo "healthy=${HEALTHY}" >> "$GITHUB_OUTPUT"
-          echo "timestamp=${TIMESTAMP}" >> "$GITHUB_OUTPUT"
-          echo "should_commit=${SHOULD_COMMIT}" >> "$GITHUB_OUTPUT"
-          echo "commit_reason=${REASON}" >> "$GITHUB_OUTPUT"
-
-          echo "Health result: ${OVERALL} (${HEALTHY}/${ALL_UP}); ${REASON}."
-
-      - name: Commit material health report
-        if: steps.probe.outputs.should_commit == 'true'
+      - name: Commit daily health snapshot
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "lumencore-bot"
           git config user.email "bot@lumen-core.ai"
           git add data/site_health.json data/uptime_badge.json
-
           if ! git diff --cached --quiet; then
-            git commit -m "chore(health): ${{ steps.probe.outputs.commit_reason }} — ${{ steps.probe.outputs.overall }} — ${{ steps.probe.outputs.healthy }}/6 @ ${{ steps.probe.outputs.timestamp }}"
+            git commit -m "chore(health): daily survival snapshot — ${{ steps.probe.outputs.overall }} — ${{ steps.probe.outputs.healthy }}/6 @ ${{ steps.probe.outputs.timestamp }}"
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
 
       - name: Warn on outage
         if: steps.probe.outputs.overall == 'outage'
-        shell: bash
-        run: |
-          echo "::warning::lumen-core.ai is reporting an outage — ${{ steps.probe.outputs.healthy }}/6 endpoints healthy"
-          # Non-fatal: preserve the status report for operator review.
+        run: echo "::warning::lumen-core.ai is reporting an outage — ${{ steps.probe.outputs.healthy }}/6 endpoints healthy"
