@@ -36,6 +36,8 @@ def test_public_release_workflow_never_broad_deletes_dashboard() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
 
     assert "rsync -avz --delete" not in text
+    assert "rsync -avz" not in text
+    assert "rsync -rlvz --no-times --omit-dir-times" in text
     assert "dashboard/ \\" not in text
     assert '"$STAGE_ROOT/dashboard/"' in text
     assert "/opt/lumencore/dashboard/" in text

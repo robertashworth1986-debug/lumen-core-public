@@ -80,7 +80,7 @@ jobs:
         run: |
           set -euo pipefail
           test -f "$STAGE_ROOT/manifest.json"
-          rsync -avz \
+          rsync -rlvz --no-times --omit-dir-times \
             -e "ssh -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
             "$STAGE_ROOT/dashboard/" \
             opc@${{ secrets.VPS_HOST }}:/opt/lumencore/dashboard/
