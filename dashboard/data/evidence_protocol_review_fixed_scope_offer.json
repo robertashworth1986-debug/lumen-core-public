@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.evidence_protocol_review_fixed_scope_offer.v1",
-  "generated_utc": "2026-07-30T05:39:17.224292Z",
+  "generated_utc": "2026-07-30T05:44:17.451834Z",
   "status": "DRAFT_FIXED_SCOPE_FOUNDER_PRICE_BUYER_AND_RECIPIENT_APPROVAL_REQUIRED",
   "product_id": "prooflock_evidence_protocol_review_sprint_v1",
   "product_name": "ProofLock Evidence Protocol Review Sprint",
@@ -56,7 +56,7 @@
     "The final memo distinguishes observed results from inference and unsupported claims"
   ],
   "exclusions": [
-    "Guaranteed performance, savings, revenue, funding, award, or acceptance",
+    "No promise of performance, savings, revenue, funding, award, or acceptance",
     "A claim that any geometry family or model is a current champion",
     "Production deployment, managed operations, or service-level agreement",
     "Credentials, signatures, certifications, payments, uploads, sends, or submissions",
@@ -88,5 +88,5 @@
   },
   "safest_next_action": "Select one real buyer and one authorized source, confirm the buyer's accepted baseline, then obtain founder approval for the exact fixed fee, recipient, data terms, and outreach.",
   "claim_boundary": "This is a draft fixed-scope professional-services offer supported by local protocol and receipt behavior. It is not a customer result, field validation, performance champion, realized savings estimate, contract, invoice, or outreach authorization.",
-  "payload_sha256": "0f22f2aedbedb6da3377a9d2dd24894e14cecb30b775a37d9a88361b961ec151"
+  "payload_sha256": "912b0d2fc5181afee7b89927a6d65af2d0c0e392fb4c4bd1b74c28a35c4a743f"
 }
