@@ -166,6 +166,17 @@ def test_source_drift_is_rejected(tmp_path: Path) -> None:
         )
 
 
+def test_stage_target_allowlist_includes_only_the_canonical_reviewer_page() -> None:
+    module = load_module()
+
+    assert (
+        module.safe_target("dashboard/proof_to_pilot.html")
+        == "dashboard/proof_to_pilot.html"
+    )
+    with pytest.raises(module.StageError, match="outside the release surface"):
+        module.safe_target("dashboard/admin.html")
+
+
 def test_current_plan_is_safe_for_local_stage_check() -> None:
     module = load_module()
 
@@ -175,7 +186,7 @@ def test_current_plan_is_safe_for_local_stage_check() -> None:
         deploy_stage=ROOT / ".deploy_stage",
     )
 
-    assert contract["summary"]["item_count"] == 6
+    assert contract["summary"]["item_count"] == 2
     assert contract["summary"]["stage_ready"] is True
     assert all(
         row["staged_relative_path"].startswith("dashboard/")

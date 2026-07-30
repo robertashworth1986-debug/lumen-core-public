@@ -22,6 +22,9 @@ ALLOWED_TARGET_ROOTS = {
     Path("dashboard/evidence"),
     Path("dashboard/data"),
 }
+ALLOWED_TARGET_FILES = {
+    Path("dashboard/proof_to_pilot.html"),
+}
 
 
 class StageError(ValueError):
@@ -82,7 +85,10 @@ def safe_target(value: Any) -> str:
     if relative.is_absolute() or ".." in relative.parts:
         raise StageError(f"target_path is unsafe: {value}")
     normalized = Path(relative.as_posix())
-    if not any(normalized == root or root in normalized.parents for root in ALLOWED_TARGET_ROOTS):
+    if normalized not in ALLOWED_TARGET_FILES and not any(
+        normalized == root or root in normalized.parents
+        for root in ALLOWED_TARGET_ROOTS
+    ):
         raise StageError(f"target_path is outside the release surface: {value}")
     return normalized.as_posix()
 

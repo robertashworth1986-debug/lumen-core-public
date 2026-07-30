@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-07-30T04:23:07Z",
+  "as_of_utc": "2026-07-30T05:42:55Z",
   "capability_boundary": {
     "allowlisted_candidate_bytes_scanned_locally": true,
     "api_key_source_accessed": false,
@@ -16,241 +16,15 @@
   "checkout_reproducibility": {
     "blocked_count": 0,
     "blocked_item_ids": [],
-    "generated_item_count": 3,
+    "generated_item_count": 0,
     "state": "CLEAN_CHECKOUT_VERIFIED",
-    "verified_count": 3
+    "verified_count": 0
   },
   "claim_boundary": "This plan is a local safety and provenance preflight. It is not proof that an artifact is public, externally validated, government approved, compliant, deployed, or accepted by a reviewer.",
   "human_gate": "HUMAN_UNLOCK_REQUIRED",
   "items": [
     {
       "artifact_receipt_ref": {
-        "binding_verified": true,
-        "checkout": {
-          "clean_at_head": true,
-          "state": "CLEAN_AT_HEAD"
-        },
-        "expected_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555",
-        "observed_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555",
-        "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "state": "VERIFIED"
-      },
-      "blockers": [],
-      "checkout_provenance": {
-        "required": true,
-        "source": {
-          "clean_at_head": true,
-          "state": "CLEAN_AT_HEAD"
-        },
-        "state": "VERIFIED"
-      },
-      "claim_boundary": "The deck reports bounded internal software, custody, and source-native benchmark state; it does not establish model superiority, alpha, field performance, savings, revenue, valuation, customer adoption, award, or contract status.",
-      "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
-      "content_scan": {
-        "bytes": 322466,
-        "extracted_text_scanned": true,
-        "findings": [],
-        "state": "PASS"
-      },
-      "copy_performed": false,
-      "expected_source_sha256": "d46096d88e3c2805cfff5a5f9f4e6e6e9c310e55e7e290c9f95cc8ca975d4aed",
-      "freshness": {
-        "age_hours": 0.085278,
-        "last_validated_utc": "2026-07-30T04:18:00Z",
-        "max_age_hours": 720.0,
-        "state": "FRESH"
-      },
-      "id": "current_evidence_to_pilot_deck_pdf",
-      "mime_type": "application/pdf",
-      "network_action_performed": false,
-      "planned_action": "PLAN_NEW_LOCAL_STAGE_COPY",
-      "provenance": {
-        "findings": [],
-        "mode": "GENERATED_RECEIPTS",
-        "source_commit": null,
-        "state": "VERIFIED"
-      },
-      "public_url_verification": {
-        "checks_after_unlock": [
-          "HTTPS_HEAD_STATUS_200",
-          "HTTPS_GET_CONTENT_TYPE_MATCH",
-          "HTTPS_GET_BODY_SHA256_MATCH",
-          "CACHE_BYPASS_REPEAT_HASH_MATCH"
-        ],
-        "expected_mime_type": "application/pdf",
-        "expected_sha256": "d46096d88e3c2805cfff5a5f9f4e6e6e9c310e55e7e290c9f95cc8ca975d4aed",
-        "network_request_performed": false,
-        "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-        "url": "https://lumen-core.ai/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_D46096D88E3C.pdf"
-      },
-      "source_bytes": 322466,
-      "source_path": "output/pdf/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pdf",
-      "source_sha256": "d46096d88e3c2805cfff5a5f9f4e6e6e9c310e55e7e290c9f95cc8ca975d4aed",
-      "target_path": "dashboard/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_D46096D88E3C.pdf",
-      "target_probe": {
-        "exact_hash_match": false,
-        "overwrite_allowed": false,
-        "sha256": null,
-        "state": "TARGET_ABSENT"
-      },
-      "test_receipt_refs": [
-        {
-          "checkout": {
-            "clean_at_head": true,
-            "state": "CLEAN_AT_HEAD"
-          },
-          "expected_sha256": "876deeaca05297b43016321f5782466a3300c62528113b18c0ec8ac6d3f58756",
-          "observed_sha256": "876deeaca05297b43016321f5782466a3300c62528113b18c0ec8ac6d3f58756",
-          "path": "code/ops/BUILD_PITCH_DECK_GOVERNANCE.py",
-          "state": "VERIFIED"
-        },
-        {
-          "checkout": {
-            "clean_at_head": true,
-            "state": "CLEAN_AT_HEAD"
-          },
-          "expected_sha256": "2693386c1eb0509c0603669a2c2cbc7c5a311015f05c75c9814b06fd6d488557",
-          "observed_sha256": "2693386c1eb0509c0603669a2c2cbc7c5a311015f05c75c9814b06fd6d488557",
-          "path": "tests/test_pitch_deck_governance.py",
-          "state": "VERIFIED"
-        },
-        {
-          "checkout": {
-            "clean_at_head": true,
-            "state": "CLEAN_AT_HEAD"
-          },
-          "expected_sha256": "4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a",
-          "observed_sha256": "4df644106ac2a4df146a09a9f04a08535c88983a5dce4ded48e2fb72c28ec55a",
-          "path": "output/pptx/LumenCore_Evidence_to_Pilot_Deck_CURRENT_REVIEW_REQUIRED.pptx",
-          "state": "VERIFIED"
-        }
-      ]
-    },
-    {
-      "artifact_receipt_ref": {
-        "binding_verified": true,
-        "checkout": {
-          "clean_at_head": true,
-          "state": "CLEAN_AT_HEAD"
-        },
-        "expected_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555",
-        "observed_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555",
-        "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "state": "VERIFIED"
-      },
-      "blockers": [],
-      "checkout_provenance": {
-        "required": true,
-        "source": {
-          "clean_at_head": true,
-          "state": "CLEAN_AT_HEAD"
-        },
-        "state": "VERIFIED"
-      },
-      "claim_boundary": "The capability statement describes current software, evidence controls, and bounded federal-use fit; it does not establish certification, government approval, award status, model superiority, field performance, or economic outcomes.",
-      "claim_state": "NO_PERFORMANCE_CLAIM",
-      "content_scan": {
-        "bytes": 890365,
-        "extracted_text_scanned": true,
-        "findings": [],
-        "state": "PASS"
-      },
-      "copy_performed": false,
-      "expected_source_sha256": "f7e9ed937196aedc4afdc22e2c51258dd0cf2225200d5eab931da9bfef16c03b",
-      "freshness": {
-        "age_hours": 0.085278,
-        "last_validated_utc": "2026-07-30T04:18:00Z",
-        "max_age_hours": 720.0,
-        "state": "FRESH"
-      },
-      "id": "federal_capability_statement_pdf",
-      "mime_type": "application/pdf",
-      "network_action_performed": false,
-      "planned_action": "PLAN_NEW_LOCAL_STAGE_COPY",
-      "provenance": {
-        "findings": [],
-        "mode": "GENERATED_RECEIPTS",
-        "source_commit": null,
-        "state": "VERIFIED"
-      },
-      "public_url_verification": {
-        "checks_after_unlock": [
-          "HTTPS_HEAD_STATUS_200",
-          "HTTPS_GET_CONTENT_TYPE_MATCH",
-          "HTTPS_GET_BODY_SHA256_MATCH",
-          "CACHE_BYPASS_REPEAT_HASH_MATCH"
-        ],
-        "expected_mime_type": "application/pdf",
-        "expected_sha256": "f7e9ed937196aedc4afdc22e2c51258dd0cf2225200d5eab931da9bfef16c03b",
-        "network_request_performed": false,
-        "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-        "url": "https://lumen-core.ai/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_F7E9ED937196.pdf"
-      },
-      "source_bytes": 890365,
-      "source_path": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf",
-      "source_sha256": "f7e9ed937196aedc4afdc22e2c51258dd0cf2225200d5eab931da9bfef16c03b",
-      "target_path": "dashboard/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_F7E9ED937196.pdf",
-      "target_probe": {
-        "exact_hash_match": false,
-        "overwrite_allowed": false,
-        "sha256": null,
-        "state": "TARGET_ABSENT"
-      },
-      "test_receipt_refs": [
-        {
-          "checkout": {
-            "clean_at_head": true,
-            "state": "CLEAN_AT_HEAD"
-          },
-          "expected_sha256": "592b10bc192bc20ed4aa62626eb341a8aa5f18c7427ed8c837623464503eed81",
-          "observed_sha256": "592b10bc192bc20ed4aa62626eb341a8aa5f18c7427ed8c837623464503eed81",
-          "path": "code/ops/BUILD_MONDAY_FEDERAL_ACTION_PACKET.py",
-          "state": "VERIFIED"
-        },
-        {
-          "checkout": {
-            "clean_at_head": true,
-            "state": "CLEAN_AT_HEAD"
-          },
-          "expected_sha256": "3d322e18b940f416710822d80f35a001662e93e12b65f5f0e4fb8f96a9d779e9",
-          "observed_sha256": "3d322e18b940f416710822d80f35a001662e93e12b65f5f0e4fb8f96a9d779e9",
-          "path": "config/monday_federal_action_packet_v1.json",
-          "state": "VERIFIED"
-        },
-        {
-          "checkout": {
-            "clean_at_head": true,
-            "state": "CLEAN_AT_HEAD"
-          },
-          "expected_sha256": "a70557332a303aae1e10865765f700f5ac9e8e4fda0ae04944cc74dc2f72b027",
-          "observed_sha256": "a70557332a303aae1e10865765f700f5ac9e8e4fda0ae04944cc74dc2f72b027",
-          "path": "tests/test_monday_federal_action_packet.py",
-          "state": "VERIFIED"
-        },
-        {
-          "checkout": {
-            "clean_at_head": true,
-            "state": "CLEAN_AT_HEAD"
-          },
-          "expected_sha256": "8cfb3394c87865817daa29433c0eaf1ee88ec6b5cd76375ad57ce201a6165581",
-          "observed_sha256": "8cfb3394c87865817daa29433c0eaf1ee88ec6b5cd76375ad57ce201a6165581",
-          "path": "code/ops/BUILD_CAPABILITY_STATEMENT_GOVERNANCE.py",
-          "state": "VERIFIED"
-        },
-        {
-          "checkout": {
-            "clean_at_head": true,
-            "state": "CLEAN_AT_HEAD"
-          },
-          "expected_sha256": "2e2d6089af70c4562ccedefb094dcecefbb09aadc0bb2bda3e1b9bd93e9230c7",
-          "observed_sha256": "2e2d6089af70c4562ccedefb094dcecefbb09aadc0bb2bda3e1b9bd93e9230c7",
-          "path": "tests/test_capability_statement_governance.py",
-          "state": "VERIFIED"
-        }
-      ]
-    },
-    {
-      "artifact_receipt_ref": {
         "binding_verified": false,
         "checkout": {
           "clean_at_head": false,
@@ -270,30 +44,30 @@
         },
         "state": "VERIFIED_BY_GIT_COMMIT"
       },
-      "claim_boundary": "The ledger inventories bounded internal evidence and reproducibility state; it does not establish external validation, government approval, field performance, or commercial value.",
-      "claim_state": "PROVENANCE_AND_REPRODUCIBILITY",
+      "claim_boundary": "The reviewer page exposes measured evidence, explicit claim gates, and a candidate fixed-scope protocol-review service; it does not establish external validation, model superiority, field performance, savings, revenue, award, contract, or agency endorsement.",
+      "claim_state": "NO_PERFORMANCE_CLAIM",
       "content_scan": {
-        "bytes": 7542,
+        "bytes": 72227,
         "extracted_text_scanned": false,
         "findings": [],
         "state": "PASS"
       },
       "copy_performed": false,
-      "expected_source_sha256": "b8af64d9a54ccf373b9e8e9c8a09f6188b77cf02388d9b1e6c0801cfa5360244",
+      "expected_source_sha256": "63471bd5f3f01f0d79ce851f9ff41b5864c5f5028304b53f0f725508d5ecb16f",
       "freshness": {
-        "age_hours": 390.691111,
-        "last_validated_utc": "2026-07-13T21:41:39Z",
+        "age_hours": 0.0,
+        "last_validated_utc": "2026-07-30T05:42:55Z",
         "max_age_hours": 720.0,
         "state": "FRESH"
       },
-      "id": "model_geometry_evidence_ledger",
-      "mime_type": "text/markdown",
+      "id": "proof_to_pilot_reviewer_page",
+      "mime_type": "text/html",
       "network_action_performed": false,
-      "planned_action": "PLAN_NEW_LOCAL_STAGE_COPY",
+      "planned_action": "NOOP_EXACT_MATCH",
       "provenance": {
         "findings": [],
         "mode": "GIT_COMMIT",
-        "source_commit": "27c84ae9467c513300a114664518aaf7e01ea048",
+        "source_commit": "1a6c3d30f192c2d8def2babf510b55b85925b242",
         "state": "VERIFIED"
       },
       "public_url_verification": {
@@ -303,33 +77,27 @@
           "HTTPS_GET_BODY_SHA256_MATCH",
           "CACHE_BYPASS_REPEAT_HASH_MATCH"
         ],
-        "expected_mime_type": "text/markdown",
-        "expected_sha256": "b8af64d9a54ccf373b9e8e9c8a09f6188b77cf02388d9b1e6c0801cfa5360244",
+        "expected_mime_type": "text/html",
+        "expected_sha256": "63471bd5f3f01f0d79ce851f9ff41b5864c5f5028304b53f0f725508d5ecb16f",
         "network_request_performed": false,
         "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-        "url": "https://lumen-core.ai/evidence/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER.md"
+        "url": "https://lumen-core.ai/proof_to_pilot.html"
       },
-      "source_bytes": 7542,
-      "source_path": "docs/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER_2026-07-13.md",
-      "source_sha256": "b8af64d9a54ccf373b9e8e9c8a09f6188b77cf02388d9b1e6c0801cfa5360244",
-      "target_path": "dashboard/evidence/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER.md",
+      "source_bytes": 72227,
+      "source_path": "dashboard/proof_to_pilot.html",
+      "source_sha256": "63471bd5f3f01f0d79ce851f9ff41b5864c5f5028304b53f0f725508d5ecb16f",
+      "target_path": "dashboard/proof_to_pilot.html",
       "target_probe": {
-        "exact_hash_match": false,
+        "exact_hash_match": true,
         "overwrite_allowed": false,
-        "sha256": null,
-        "state": "TARGET_ABSENT"
+        "sha256": "63471bd5f3f01f0d79ce851f9ff41b5864c5f5028304b53f0f725508d5ecb16f",
+        "state": "EXACT_HASH_MATCH"
       },
       "test_receipt_refs": [
         {
-          "expected_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9",
-          "observed_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9",
-          "path": "tests/test_quant_hub_reviewer_context.py",
-          "state": "VERIFIED"
-        },
-        {
-          "expected_sha256": "2a55297c369fac57062ba8bce975348e588d6589a882f6fb554a9ced5c0e3acb",
-          "observed_sha256": "2a55297c369fac57062ba8bce975348e588d6589a882f6fb554a9ced5c0e3acb",
-          "path": "out/reproducibility/reviewer_capsule_latest/reviewer_reproducibility_receipt.json",
+          "expected_sha256": "8e62e17d5b858fb176059b409d872ea1ed4bdadcebd468905cd2cf66161d3d9b",
+          "observed_sha256": "8e62e17d5b858fb176059b409d872ea1ed4bdadcebd468905cd2cf66161d3d9b",
+          "path": "tests/test_public_fixed_scope_offer_surface.py",
           "state": "VERIFIED"
         }
       ]
@@ -355,30 +123,30 @@
         },
         "state": "VERIFIED_BY_GIT_COMMIT"
       },
-      "claim_boundary": "The feed reports bounded internal measurement and provenance state with explicit limitations; it does not establish external validation, government approval, or realized economic outcomes.",
-      "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
+      "claim_boundary": "The feed presents candidate fixed-scope protocol-review terms with founder, buyer, recipient, data, and outreach gates still open; it does not establish a customer result, field validation, performance, savings, contract, or authorization to send.",
+      "claim_state": "NO_PERFORMANCE_CLAIM",
       "content_scan": {
-        "bytes": 35884,
+        "bytes": 4885,
         "extracted_text_scanned": false,
         "findings": [],
         "state": "PASS"
       },
       "copy_performed": false,
-      "expected_source_sha256": "ca7e01fd443a5bf57341a229d3dd881b528131ccded4f8b0108fddc50af76aaf",
+      "expected_source_sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
       "freshness": {
-        "age_hours": 337.466389,
-        "last_validated_utc": "2026-07-16T02:55:08Z",
+        "age_hours": 0.0,
+        "last_validated_utc": "2026-07-30T05:42:55Z",
         "max_age_hours": 720.0,
         "state": "FRESH"
       },
-      "id": "quant_hub_reviewer_context_json",
+      "id": "prooflock_fixed_scope_offer_json",
       "mime_type": "application/json",
       "network_action_performed": false,
       "planned_action": "NOOP_EXACT_MATCH",
       "provenance": {
         "findings": [],
         "mode": "GIT_COMMIT",
-        "source_commit": "3ef872e7f9e940c8ce5ebfefdc2b18b444b40910",
+        "source_commit": "27e529c16c8b550ff9c5d9727e2100976c0523ec",
         "state": "VERIFIED"
       },
       "public_url_verification": {
@@ -389,198 +157,26 @@
           "CACHE_BYPASS_REPEAT_HASH_MATCH"
         ],
         "expected_mime_type": "application/json",
-        "expected_sha256": "ca7e01fd443a5bf57341a229d3dd881b528131ccded4f8b0108fddc50af76aaf",
+        "expected_sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
         "network_request_performed": false,
         "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-        "url": "https://lumen-core.ai/data/quant_hub_reviewer_context.json"
+        "url": "https://lumen-core.ai/data/evidence_protocol_review_fixed_scope_offer.json"
       },
-      "source_bytes": 35884,
-      "source_path": "dashboard/data/quant_hub_reviewer_context.json",
-      "source_sha256": "ca7e01fd443a5bf57341a229d3dd881b528131ccded4f8b0108fddc50af76aaf",
-      "target_path": "dashboard/data/quant_hub_reviewer_context.json",
+      "source_bytes": 4885,
+      "source_path": "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
+      "source_sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
+      "target_path": "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
       "target_probe": {
         "exact_hash_match": true,
         "overwrite_allowed": false,
-        "sha256": "ca7e01fd443a5bf57341a229d3dd881b528131ccded4f8b0108fddc50af76aaf",
+        "sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
         "state": "EXACT_HASH_MATCH"
       },
       "test_receipt_refs": [
         {
-          "expected_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9",
-          "observed_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9",
-          "path": "tests/test_quant_hub_reviewer_context.py",
-          "state": "VERIFIED"
-        }
-      ]
-    },
-    {
-      "artifact_receipt_ref": {
-        "binding_verified": false,
-        "checkout": {
-          "clean_at_head": false,
-          "state": "NOT_CHECKED"
-        },
-        "expected_sha256": null,
-        "observed_sha256": null,
-        "path": null,
-        "state": "NOT_CHECKED"
-      },
-      "blockers": [],
-      "checkout_provenance": {
-        "required": false,
-        "source": {
-          "clean_at_head": false,
-          "state": "NOT_CHECKED"
-        },
-        "state": "VERIFIED_BY_GIT_COMMIT"
-      },
-      "claim_boundary": "The reviewer context summarizes bounded internal evidence and its limitations; it does not establish external validation, government approval, or realized economic outcomes.",
-      "claim_state": "BOUNDED_INTERNAL_EVIDENCE",
-      "content_scan": {
-        "bytes": 13392,
-        "extracted_text_scanned": false,
-        "findings": [],
-        "state": "PASS"
-      },
-      "copy_performed": false,
-      "expected_source_sha256": "ba3211de559ca42d8149913543e99e8b2cee7eae1e982b97ddd526b5825dd227",
-      "freshness": {
-        "age_hours": 337.466389,
-        "last_validated_utc": "2026-07-16T02:55:08Z",
-        "max_age_hours": 720.0,
-        "state": "FRESH"
-      },
-      "id": "quant_hub_reviewer_context_markdown",
-      "mime_type": "text/markdown",
-      "network_action_performed": false,
-      "planned_action": "PLAN_NEW_LOCAL_STAGE_COPY",
-      "provenance": {
-        "findings": [],
-        "mode": "GIT_COMMIT",
-        "source_commit": "3ef872e7f9e940c8ce5ebfefdc2b18b444b40910",
-        "state": "VERIFIED"
-      },
-      "public_url_verification": {
-        "checks_after_unlock": [
-          "HTTPS_HEAD_STATUS_200",
-          "HTTPS_GET_CONTENT_TYPE_MATCH",
-          "HTTPS_GET_BODY_SHA256_MATCH",
-          "CACHE_BYPASS_REPEAT_HASH_MATCH"
-        ],
-        "expected_mime_type": "text/markdown",
-        "expected_sha256": "ba3211de559ca42d8149913543e99e8b2cee7eae1e982b97ddd526b5825dd227",
-        "network_request_performed": false,
-        "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-        "url": "https://lumen-core.ai/evidence/QUANT_HUB_REVIEWER_CONTEXT.md"
-      },
-      "source_bytes": 13392,
-      "source_path": "docs/QUANT_HUB_REVIEWER_CONTEXT_2026-07-13.md",
-      "source_sha256": "ba3211de559ca42d8149913543e99e8b2cee7eae1e982b97ddd526b5825dd227",
-      "target_path": "dashboard/evidence/QUANT_HUB_REVIEWER_CONTEXT.md",
-      "target_probe": {
-        "exact_hash_match": false,
-        "overwrite_allowed": false,
-        "sha256": null,
-        "state": "TARGET_ABSENT"
-      },
-      "test_receipt_refs": [
-        {
-          "expected_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9",
-          "observed_sha256": "13b3e1d6b54a88e23d714903f0b640d6501dc99e9503e23a60a04cc3974a11a9",
-          "path": "tests/test_quant_hub_reviewer_context.py",
-          "state": "VERIFIED"
-        }
-      ]
-    },
-    {
-      "artifact_receipt_ref": {
-        "binding_verified": true,
-        "checkout": {
-          "clean_at_head": true,
-          "state": "CLEAN_AT_HEAD"
-        },
-        "expected_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555",
-        "observed_sha256": "f389aa0e12aa03d6826c017eba52515622ebc8767ae756087413b3d3d8b10555",
-        "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "state": "VERIFIED"
-      },
-      "blockers": [],
-      "checkout_provenance": {
-        "required": true,
-        "source": {
-          "clean_at_head": true,
-          "state": "CLEAN_AT_HEAD"
-        },
-        "state": "VERIFIED"
-      },
-      "claim_boundary": "The whitepaper documents source-native protocols, measured comparison coverage, limitations, and negative results; it does not establish universal superiority, external validation, field performance, or realized economic value.",
-      "claim_state": "PROVENANCE_AND_REPRODUCIBILITY",
-      "content_scan": {
-        "bytes": 896055,
-        "extracted_text_scanned": true,
-        "findings": [],
-        "state": "PASS"
-      },
-      "copy_performed": false,
-      "expected_source_sha256": "e407897065ff0d695eec240112ee4a54cd7bc6c3ab509245d2728b253ddcba59",
-      "freshness": {
-        "age_hours": 0.085278,
-        "last_validated_utc": "2026-07-30T04:18:00Z",
-        "max_age_hours": 720.0,
-        "state": "FRESH"
-      },
-      "id": "source_native_benchmark_whitepaper_pdf",
-      "mime_type": "application/pdf",
-      "network_action_performed": false,
-      "planned_action": "PLAN_NEW_LOCAL_STAGE_COPY",
-      "provenance": {
-        "findings": [],
-        "mode": "GENERATED_RECEIPTS",
-        "source_commit": null,
-        "state": "VERIFIED"
-      },
-      "public_url_verification": {
-        "checks_after_unlock": [
-          "HTTPS_HEAD_STATUS_200",
-          "HTTPS_GET_CONTENT_TYPE_MATCH",
-          "HTTPS_GET_BODY_SHA256_MATCH",
-          "CACHE_BYPASS_REPEAT_HASH_MATCH"
-        ],
-        "expected_mime_type": "application/pdf",
-        "expected_sha256": "e407897065ff0d695eec240112ee4a54cd7bc6c3ab509245d2728b253ddcba59",
-        "network_request_performed": false,
-        "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-        "url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf"
-      },
-      "source_bytes": 896055,
-      "source_path": "output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf",
-      "source_sha256": "e407897065ff0d695eec240112ee4a54cd7bc6c3ab509245d2728b253ddcba59",
-      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf",
-      "target_probe": {
-        "exact_hash_match": false,
-        "overwrite_allowed": false,
-        "sha256": null,
-        "state": "TARGET_ABSENT"
-      },
-      "test_receipt_refs": [
-        {
-          "checkout": {
-            "clean_at_head": true,
-            "state": "CLEAN_AT_HEAD"
-          },
-          "expected_sha256": "aa483df50d83d2f0ebea10f7466b0e1a3275245e3e331da987d6b862396f4d3e",
-          "observed_sha256": "aa483df50d83d2f0ebea10f7466b0e1a3275245e3e331da987d6b862396f4d3e",
-          "path": "code/ops/BUILD_SOURCE_NATIVE_RESEARCH_WHITEPAPER.py",
-          "state": "VERIFIED"
-        },
-        {
-          "checkout": {
-            "clean_at_head": true,
-            "state": "CLEAN_AT_HEAD"
-          },
-          "expected_sha256": "673ee84d6daed37b89c52b2da00e07d1fd65f606fcc7ed9346033c0183747bbf",
-          "observed_sha256": "673ee84d6daed37b89c52b2da00e07d1fd65f606fcc7ed9346033c0183747bbf",
-          "path": "tests/test_source_native_research_whitepaper.py",
+          "expected_sha256": "8e62e17d5b858fb176059b409d872ea1ed4bdadcebd468905cd2cf66161d3d9b",
+          "observed_sha256": "8e62e17d5b858fb176059b409d872ea1ed4bdadcebd468905cd2cf66161d3d9b",
+          "path": "tests/test_public_fixed_scope_offer_surface.py",
           "state": "VERIFIED"
         }
       ]
@@ -595,52 +191,24 @@
     "push": "HUMAN_UNLOCK_REQUIRED"
   },
   "overwrite_policy": "Never overwrite. Existing exact-hash targets are no-ops; mismatches are blocked.",
-  "plan_sha256": "c6d9d134631a076e0095ed671511ff5006179883ba38c2ae52224fc5c7e6088b",
-  "planner_sha256": "2645447022c02348a92d28593026dbe6c01d0112873740db4836450fa0a01d8a",
-  "policy_path": "config/public_release_sync_policy_v1.json",
-  "policy_sha256": "4c73e7ca1fb3665fe540126205e1677ead4c9ee7d73f762df2bdffc508c43bc4",
+  "plan_sha256": "e6510c2028daa5695daf0295c4b268f2017f0e7e1e302f0766de530ade1f3f83",
+  "planner_sha256": "59ca4b762587c12932b124f66f82962d818fec51b6c02298c6cdf3f50302e6e9",
+  "policy_path": "config/public_release_incremental_offer_policy_v1.json",
+  "policy_sha256": "1ab8b68d7ed9ba46d6347019fd2bba4de8c31a290b1a949f8a0c9a7ddb3f62a6",
   "public_url_verification_plan": [
     {
-      "expected_mime_type": "application/pdf",
-      "expected_sha256": "d46096d88e3c2805cfff5a5f9f4e6e6e9c310e55e7e290c9f95cc8ca975d4aed",
-      "id": "current_evidence_to_pilot_deck_pdf",
+      "expected_mime_type": "text/html",
+      "expected_sha256": "63471bd5f3f01f0d79ce851f9ff41b5864c5f5028304b53f0f725508d5ecb16f",
+      "id": "proof_to_pilot_reviewer_page",
       "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-      "url": "https://lumen-core.ai/evidence/LumenCore_Evidence_to_Pilot_Deck_2026-07-29_D46096D88E3C.pdf"
-    },
-    {
-      "expected_mime_type": "application/pdf",
-      "expected_sha256": "f7e9ed937196aedc4afdc22e2c51258dd0cf2225200d5eab931da9bfef16c03b",
-      "id": "federal_capability_statement_pdf",
-      "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-      "url": "https://lumen-core.ai/evidence/LumenCore_Federal_Capability_Statement_2026-07-29_F7E9ED937196.pdf"
-    },
-    {
-      "expected_mime_type": "text/markdown",
-      "expected_sha256": "b8af64d9a54ccf373b9e8e9c8a09f6188b77cf02388d9b1e6c0801cfa5360244",
-      "id": "model_geometry_evidence_ledger",
-      "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-      "url": "https://lumen-core.ai/evidence/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER.md"
+      "url": "https://lumen-core.ai/proof_to_pilot.html"
     },
     {
       "expected_mime_type": "application/json",
-      "expected_sha256": "ca7e01fd443a5bf57341a229d3dd881b528131ccded4f8b0108fddc50af76aaf",
-      "id": "quant_hub_reviewer_context_json",
+      "expected_sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
+      "id": "prooflock_fixed_scope_offer_json",
       "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-      "url": "https://lumen-core.ai/data/quant_hub_reviewer_context.json"
-    },
-    {
-      "expected_mime_type": "text/markdown",
-      "expected_sha256": "ba3211de559ca42d8149913543e99e8b2cee7eae1e982b97ddd526b5825dd227",
-      "id": "quant_hub_reviewer_context_markdown",
-      "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-      "url": "https://lumen-core.ai/evidence/QUANT_HUB_REVIEWER_CONTEXT.md"
-    },
-    {
-      "expected_mime_type": "application/pdf",
-      "expected_sha256": "e407897065ff0d695eec240112ee4a54cd7bc6c3ab509245d2728b253ddcba59",
-      "id": "source_native_benchmark_whitepaper_pdf",
-      "state": "PENDING_HUMAN_UNLOCK_AND_PUBLICATION",
-      "url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-07-29_E407897065FF.pdf"
+      "url": "https://lumen-core.ai/data/evidence_protocol_review_fixed_scope_offer.json"
     }
   ],
   "purpose": "Build a deterministic reviewer-safe public release sync plan without copying or performing network actions.",
@@ -650,22 +218,17 @@
     "blocked_item_ids": [],
     "clean_checkout_blocked_count": 0,
     "clean_checkout_blocked_item_ids": [],
-    "exact_match_noop_count": 1,
+    "exact_match_noop_count": 2,
     "exact_match_noop_item_ids": [
-      "quant_hub_reviewer_context_json"
+      "proof_to_pilot_reviewer_page",
+      "prooflock_fixed_scope_offer_json"
     ],
-    "item_count": 6,
+    "item_count": 2,
     "local_copy_performed": false,
     "network_action_performed": false,
     "plan_state": "DRY_RUN_READY_HUMAN_UNLOCK_REQUIRED",
-    "planned_new_local_stage_count": 5,
-    "planned_new_local_stage_item_ids": [
-      "current_evidence_to_pilot_deck_pdf",
-      "federal_capability_statement_pdf",
-      "model_geometry_evidence_ledger",
-      "quant_hub_reviewer_context_markdown",
-      "source_native_benchmark_whitepaper_pdf"
-    ],
+    "planned_new_local_stage_count": 0,
+    "planned_new_local_stage_item_ids": [],
     "public_release_completed": false
   }
 }

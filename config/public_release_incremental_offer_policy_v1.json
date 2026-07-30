@@ -1,0 +1,101 @@
+{
+  "schema": "lumencore.public_release_sync_policy.v1",
+  "status": "frozen",
+  "mode": "DRY_RUN_ONLY",
+  "purpose": "Publish only the canonical proof-to-pilot reviewer page and its bounded fixed-scope offer feed while prohibiting credentials, private material, unsupported claims, broad dashboard release, overwrites, and autonomous network actions.",
+  "allowed_source_roots": [
+    "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
+    "dashboard/proof_to_pilot.html"
+  ],
+  "allowed_target_roots": [
+    "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
+    "dashboard/proof_to_pilot.html"
+  ],
+  "allowed_extension_mime": {
+    ".html": "text/html",
+    ".json": "application/json"
+  },
+  "allowed_claim_states": [
+    "NO_PERFORMANCE_CLAIM"
+  ],
+  "denied_path_tokens": [
+    ".env",
+    ".git",
+    "api_key",
+    "apikey",
+    "credential",
+    "gmail",
+    "grant_submissions",
+    "inbox",
+    "mailbox",
+    "oauth",
+    "otp",
+    "patent",
+    "personally_identifiable",
+    "pii",
+    "portal",
+    "private",
+    "raw_email",
+    "registry",
+    "secret",
+    "session",
+    "token"
+  ],
+  "allowed_public_hosts": [
+    "lumen-core.ai",
+    "www.lumen-core.ai"
+  ],
+  "allowed_public_url_prefixes": [
+    "/data/evidence_protocol_review_fixed_scope_offer.json",
+    "/proof_to_pilot.html"
+  ],
+  "max_source_bytes": 500000,
+  "max_source_age_hours": 720,
+  "network_actions": {
+    "deploy": "HUMAN_UNLOCK_REQUIRED",
+    "email": "HUMAN_UNLOCK_REQUIRED",
+    "post": "HUMAN_UNLOCK_REQUIRED",
+    "publish": "HUMAN_UNLOCK_REQUIRED",
+    "push": "HUMAN_UNLOCK_REQUIRED"
+  },
+  "allowlist": [
+    {
+      "id": "prooflock_fixed_scope_offer_json",
+      "source_path": "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
+      "expected_source_sha256": "aca8e5fb8fe39b9989cb00f6398ca2af22426a2158ee6a24ae4579ec91738efb",
+      "target_path": "dashboard/data/evidence_protocol_review_fixed_scope_offer.json",
+      "public_url": "https://lumen-core.ai/data/evidence_protocol_review_fixed_scope_offer.json",
+      "mime_type": "application/json",
+      "claim_state": "NO_PERFORMANCE_CLAIM",
+      "claim_boundary": "The feed presents candidate fixed-scope protocol-review terms with founder, buyer, recipient, data, and outreach gates still open; it does not establish a customer result, field validation, performance, savings, contract, or authorization to send.",
+      "source_commit": "27e529c16c8b550ff9c5d9727e2100976c0523ec",
+      "last_validated_utc": "2026-07-30T05:42:55Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "tests/test_public_fixed_scope_offer_surface.py",
+          "expected_sha256": "8e62e17d5b858fb176059b409d872ea1ed4bdadcebd468905cd2cf66161d3d9b"
+        }
+      ]
+    },
+    {
+      "id": "proof_to_pilot_reviewer_page",
+      "source_path": "dashboard/proof_to_pilot.html",
+      "expected_source_sha256": "63471bd5f3f01f0d79ce851f9ff41b5864c5f5028304b53f0f725508d5ecb16f",
+      "target_path": "dashboard/proof_to_pilot.html",
+      "public_url": "https://lumen-core.ai/proof_to_pilot.html",
+      "mime_type": "text/html",
+      "claim_state": "NO_PERFORMANCE_CLAIM",
+      "claim_boundary": "The reviewer page exposes measured evidence, explicit claim gates, and a candidate fixed-scope protocol-review service; it does not establish external validation, model superiority, field performance, savings, revenue, award, contract, or agency endorsement.",
+      "source_commit": "1a6c3d30f192c2d8def2babf510b55b85925b242",
+      "last_validated_utc": "2026-07-30T05:42:55Z",
+      "max_age_hours": 720,
+      "test_receipt_refs": [
+        {
+          "path": "tests/test_public_fixed_scope_offer_surface.py",
+          "expected_sha256": "8e62e17d5b858fb176059b409d872ea1ed4bdadcebd468905cd2cf66161d3d9b"
+        }
+      ]
+    }
+  ]
+}

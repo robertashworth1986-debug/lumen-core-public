@@ -349,10 +349,10 @@ def test_unrelated_valid_receipt_cannot_bind_generated_pdf(tmp_path: Path):
     assert plan["items"][0]["provenance"]["state"] == "FAILED"
 
 
-def test_current_policy_keeps_three_reviewer_pdfs_artifact_bound_and_dry_run_only():
+def test_historical_policy_keeps_three_reviewer_pdfs_artifact_bound_and_dry_run_only():
     module = load_module()
     plan = module.build_plan(
-        module.DEFAULT_POLICY,
+        ROOT / "config" / "public_release_sync_policy_v1.json",
         root=ROOT,
         target_root=ROOT,
         as_of_utc="2026-07-29T12:58:04Z",
@@ -372,6 +372,27 @@ def test_current_policy_keeps_three_reviewer_pdfs_artifact_bound_and_dry_run_onl
         for row in pdf_items
         for blocker in row["blockers"]
     )
+    assert all(row["copy_performed"] is False for row in plan["items"])
+    assert all(row["network_action_performed"] is False for row in plan["items"])
+
+
+def test_current_policy_is_the_two_item_offer_and_route_repair_release():
+    module = load_module()
+    plan = module.build_plan(
+        module.DEFAULT_POLICY,
+        root=ROOT,
+        target_root=ROOT,
+        as_of_utc="2026-07-30T05:42:55Z",
+    )
+
+    assert plan["summary"]["item_count"] == 2
+    assert plan["summary"]["blocked_count"] == 0
+    assert plan["summary"]["plan_state"] == "DRY_RUN_READY_HUMAN_UNLOCK_REQUIRED"
+    assert {row["id"] for row in plan["items"]} == {
+        "prooflock_fixed_scope_offer_json",
+        "proof_to_pilot_reviewer_page",
+    }
+    assert all(row["claim_state"] == "NO_PERFORMANCE_CLAIM" for row in plan["items"])
     assert all(row["copy_performed"] is False for row in plan["items"])
     assert all(row["network_action_performed"] is False for row in plan["items"])
 

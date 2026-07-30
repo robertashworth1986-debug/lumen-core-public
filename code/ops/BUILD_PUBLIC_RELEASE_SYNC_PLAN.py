@@ -16,7 +16,7 @@ from pypdf import PdfReader
 
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_POLICY = ROOT / "config" / "public_release_sync_policy_v1.json"
+DEFAULT_POLICY = ROOT / "config" / "public_release_incremental_offer_policy_v1.json"
 DEFAULT_JSON = ROOT / "out" / "ops" / "PUBLIC_RELEASE_SYNC_PLAN_2026-07-18.json"
 DEFAULT_MD = ROOT / "docs" / "PUBLIC_RELEASE_SYNC_PLAN_2026-07-18.md"
 
