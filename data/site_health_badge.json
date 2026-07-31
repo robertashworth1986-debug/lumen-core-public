@@ -3,5 +3,5 @@
   "label": "lumen-core.ai",
   "message": "online",
   "color": "brightgreen",
-  "cacheSeconds": 300
+  "cacheSeconds": 3600
 }
