@@ -1,14 +1,44 @@
 {
-  "checked_utc": "2026-07-30T06:12:15Z",
+  "checked_utc": "2026-07-31T14:36:16Z",
   "overall": "operational",
   "healthy_count": 6,
   "total_count": 6,
   "endpoints": {
-  "portal": { "url": "https://lumen-core.ai/", "status": 200, "status_text": "200", "ok": true },
-  "evidence": { "url": "https://lumen-core.ai/evidence/", "status": 200, "status_text": "200", "ok": true },
-  "kraken_dashboard": { "url": "https://lumen-core.ai/kraken_execution_dashboard.html", "status": 200, "status_text": "200", "ok": true },
-  "mission_control": { "url": "https://lumen-core.ai/mission_control.html", "status": 200, "status_text": "200", "ok": true },
-  "approval_hub": { "url": "https://lumen-core.ai/agent_approval_hub.html", "status": 200, "status_text": "200", "ok": true },
-  "forecast": { "url": "https://lumen-core.ai/forecast.html", "status": 200, "status_text": "200", "ok": true }
+    "portal": {
+      "url": "https://lumen-core.ai/",
+      "status": 200,
+      "status_text": "200",
+      "ok": true
+    },
+    "evidence": {
+      "url": "https://lumen-core.ai/evidence/",
+      "status": 200,
+      "status_text": "200",
+      "ok": true
+    },
+    "kraken_dashboard": {
+      "url": "https://lumen-core.ai/kraken_execution_dashboard.html",
+      "status": 200,
+      "status_text": "200",
+      "ok": true
+    },
+    "mission_control": {
+      "url": "https://lumen-core.ai/mission_control.html",
+      "status": 200,
+      "status_text": "200",
+      "ok": true
+    },
+    "approval_hub": {
+      "url": "https://lumen-core.ai/agent_approval_hub.html",
+      "status": 200,
+      "status_text": "200",
+      "ok": true
+    },
+    "forecast": {
+      "url": "https://lumen-core.ai/forecast.html",
+      "status": 200,
+      "status_text": "200",
+      "ok": true
+    }
   }
 }

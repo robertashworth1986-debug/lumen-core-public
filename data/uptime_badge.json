@@ -3,5 +3,5 @@
   "label": "status",
   "message": "operational (6/6)",
   "color": "brightgreen",
-  "cacheSeconds": 60
+  "cacheSeconds": 3600
 }
