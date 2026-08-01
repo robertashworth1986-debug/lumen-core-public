@@ -5,6 +5,9 @@ param(
 
     [switch]$Once,
 
+    [ValidateRange(0, 1000000)]
+    [int]$MaxCycles = 0,
+
     [string]$PythonExe = ""
 )
 
@@ -25,6 +28,7 @@ if (-not (Test-Path -LiteralPath $Builder -PathType Leaf)) {
     throw "Paper-loop builder not found: $Builder"
 }
 
+$cycleCount = 0
 while ($true) {
     Write-Host ""
     Write-Host "=== PAPER TRADING SWEEP === $(Get-Date -Format s)" -ForegroundColor Cyan
@@ -60,7 +64,8 @@ while ($true) {
         }
     }
 
-    if ($Once) {
+    $cycleCount += 1
+    if ($Once -or ($MaxCycles -gt 0 -and $cycleCount -ge $MaxCycles)) {
         if (-not $cycleSucceeded) {
             exit 1
         }
