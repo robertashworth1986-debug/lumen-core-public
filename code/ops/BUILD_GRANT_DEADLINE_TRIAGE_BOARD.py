@@ -19,6 +19,12 @@ DSIP_TOPICS_JSON = OUT / "dod_dsip_official_topic_deadlines_latest.json"
 GEOMETRY_BRIDGE_JSON = OUT / "geometry_championship_bridge_latest.json"
 PUBLIC_VISIBILITY_JSON = OUT / "public_visibility_packet_latest.json"
 TOP5_LIVE_PROOF_JSON = OUT / "top5_live_proof_submission_board_latest.json"
+CURRENT_COMMAND_BOARD_JSON = OUT / "near_deadline_submission_command_board_latest.json"
+OFFICIAL_INBOUND_STATUS_EVENT_REGISTER = (
+    GRANTS
+    / "funding_sprint_20260709"
+    / "OFFICIAL_INBOUND_STATUS_EVENT_REGISTER_2026-07-25.json"
+)
 
 OUT_JSON = OUT / "grant_deadline_triage_latest.json"
 OUT_MD = GRANTS / "GRANT_DEADLINE_TRIAGE_2026-06-22.md"
@@ -42,24 +48,22 @@ PACKAGE_TOPIC_CODES = {
 PORTAL_ORDER = [
     {
         "portal": "DARPA BAAT",
-        "why": "DICE abstracts must go through BAAT; Grants.gov is not the submit path for that abstract.",
-        "user_state": "Needs user-visible confirmation inside BAAT.",
+        "why": "DICE was not a Grants.gov submit path, but the official abstract response discouraged a full proposal and closed this route.",
+        "user_state": "No BAAT sign-in, reply, upload, or full-proposal action is due.",
         "capture": [
-            "Account can access the BAAT proposer dashboard.",
-            "Organization is associated with the account.",
-            "DICE / HR001126S0010 opportunity is visible.",
-            "Upload/preview rules match the local abstract packet.",
+            "Preserve the sanitized official closure event and postmortem.",
+            "Do not revive the historical full-proposal package from an older board.",
+            "Reopen only for a genuinely new official opportunity.",
         ],
     },
     {
         "portal": "DoD SBIR/STTR DSIP",
-        "why": "NV063, NV065, and DLA26BZ03-NV011 are DSIP topic paths, not Grants.gov workspaces.",
-        "user_state": "Needs user-visible confirmation inside DSIP.",
+        "why": "The listed NV063, NV065, and DLA26BZ03-NV011 captures are historical DSIP topic paths, not current Grants.gov workspaces.",
+        "user_state": "The captured windows are closed or non-actionable; do not reopen an expired workspace.",
         "capture": [
-            "Organization linkage and submitter role are visible.",
-            "Topic workspace/forms are visible for each selected topic.",
-            "CMMC Level 2 (Self) language is reviewed without making unsupported certification claims.",
-            "Proposal window and due date are captured from the authenticated portal.",
+            "Preserve the official non-submission and topic-removal receipts.",
+            "Carry unresolved CMMC, JCP, eligibility, and authority gates into a new topic only after fresh official-source review.",
+            "Do not certify, upload, or represent any historical proposal as submitted.",
         ],
     },
     {
@@ -115,6 +119,131 @@ def read_json(path: Path) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
+def display_path(path: Path) -> str:
+    try:
+        value = path.relative_to(ROOT)
+    except ValueError:
+        value = path
+    return str(value).replace("\\", "/")
+
+
+def official_dice_closure() -> dict[str, Any]:
+    register = read_json(OFFICIAL_INBOUND_STATUS_EVENT_REGISTER)
+    events = register.get("events", []) if isinstance(register, dict) else []
+    event = next(
+        (
+            row
+            for row in events
+            if isinstance(row, dict)
+            and row.get("lane_id") == "darpa_dice_abstract_status"
+        ),
+        None,
+    )
+    if not isinstance(event, dict):
+        return {
+            "status": "OFFICIAL_STATUS_MISSING_REVERIFY_REQUIRED",
+            "source_received_utc": None,
+            "full_proposal_allowed": False,
+            "reply_required": False,
+            "do_not_duplicate": True,
+            "safest_next_action": (
+                "Reconcile the sanitized official inbound register before using any "
+                "historical DICE package; no reply or full proposal is authorized."
+            ),
+        }
+    evidence = event.get("evidence", {})
+    action = event.get("action", {})
+    valid = (
+        event.get("status") == "FULL_PROPOSAL_DISCOURAGED_ROUTE_CLOSED"
+        and evidence.get("official_status_received") is True
+        and evidence.get("full_proposal_encouraged") is False
+        and evidence.get("reply_requested") is False
+        and action.get("send_now") is False
+        and action.get("duplicate_send_decision")
+        == "CLOSE_WITHOUT_REPLY_OR_FULL_PROPOSAL"
+    )
+    if not valid:
+        raise ValueError("DARPA DICE official closure event is missing or unsafe")
+    return {
+        "status": event["status"],
+        "source_received_utc": event.get("source", {}).get("received_utc"),
+        "full_proposal_allowed": False,
+        "reply_required": False,
+        "do_not_duplicate": True,
+        "safest_next_action": action["safest_next_action"],
+    }
+
+
+def current_command_board_overlay() -> dict[str, Any]:
+    board = read_json(CURRENT_COMMAND_BOARD_JSON)
+    if board.get("schema") != "near_deadline_submission_command_board_v5":
+        return {
+            "available": False,
+            "status": "CURRENT_COMMAND_BOARD_MISSING_REVERIFY_REQUIRED",
+            "source_path": display_path(CURRENT_COMMAND_BOARD_JSON),
+            "stage_lanes": [],
+            "stage_candidate_count": 0,
+            "stage_ready_count": 0,
+            "all_final_actions_blocked_without_human": True,
+        }
+    summary = board.get("summary", {})
+    stage_lanes = []
+    for lane in board.get("stage_now", []):
+        if not isinstance(lane, dict):
+            continue
+        today_work = lane.get("today_work", [])
+        stage_lanes.append(
+            {
+                "opportunity_number": lane.get("opportunity_number"),
+                "title": lane.get("title"),
+                "deadline_date": lane.get("deadline_date"),
+                "deadline_utc": lane.get("deadline_utc"),
+                "command": lane.get("command"),
+                "first_safe_action": (
+                    today_work[0]
+                    if isinstance(today_work, list) and today_work
+                    else "Reverify the current official source before action."
+                ),
+                "submission_ready": lane.get("submission_ready") is True,
+                "human_gate_count": len(lane.get("human_gate", [])),
+            }
+        )
+    return {
+        "available": True,
+        "status": "CURRENT_COMMAND_BOARD_OVERLAY_APPLIED",
+        "source_path": display_path(CURRENT_COMMAND_BOARD_JSON),
+        "source_generated_utc": board.get("generated_utc"),
+        "source_sha256": board.get("command_board_sha256"),
+        "lane_count": summary.get("lane_count", 0),
+        "stage_candidate_count": summary.get("stage_candidate_count", 0),
+        "stage_ready_count": summary.get("stage_ready_count", 0),
+        "stage_lanes": stage_lanes,
+        "all_final_actions_blocked_without_human": (
+            summary.get("all_final_actions_blocked_without_human") is True
+        ),
+    }
+
+
+def current_action_order(overlay: dict[str, Any]) -> list[str]:
+    if overlay.get("available") is not True:
+        return [
+            "Rebuild and verify the current near-deadline command board before any portal or package action.",
+            "Do not use the historical June deadline extracts as current action authority.",
+        ]
+    actions = [
+        (
+            f"{lane['opportunity_number']}: {lane['first_safe_action']} "
+            f"Current command `{lane['command']}`; submission-ready `{lane['submission_ready']}`."
+        )
+        for lane in overlay.get("stage_lanes", [])
+    ]
+    actions.append(
+        "Stop at the complete human-review gate. No workspace creation, upload, "
+        "certification, signature, payment, or final submission is authorized by this board."
+    )
+    return actions
+
+
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
@@ -153,6 +282,7 @@ def parse_eastern_due(text: str, label: str) -> dict[str, Any]:
 
 def dice_deadlines() -> dict[str, Any]:
     text = DICE_DEADLINE_EXTRACT.read_text(encoding="utf-8", errors="ignore") if DICE_DEADLINE_EXTRACT.exists() else ""
+    closure = official_dice_closure()
     return {
         "opportunity": "DARPA DICE",
         "funding_opportunity_number": "HR001126S0010",
@@ -172,10 +302,13 @@ def dice_deadlines() -> dict[str, Any]:
         "proposal_due": parse_eastern_due(text, "Proposal Due Date"),
         "submission_channel": "DARPA BAAT",
         "channel_boundary": "The extract says abstracts must be submitted to BAAT and other channels/late submissions will not be accepted.",
-        "immediate_action": (
-            "Confirm BAAT account, organization association, DICE opportunity visibility, file requirements, "
-            "and preview behavior before any upload action."
-        ),
+        "historical_deadline_record_only": True,
+        "current_route_status": closure["status"],
+        "current_status_received_utc": closure["source_received_utc"],
+        "full_proposal_allowed": closure["full_proposal_allowed"],
+        "reply_required": closure["reply_required"],
+        "do_not_duplicate": closure["do_not_duplicate"],
+        "immediate_action": closure["safest_next_action"],
     }
 
 
@@ -242,8 +375,8 @@ def dsip_topics() -> dict[str, Any]:
         "official_source_url": DSIP_SEARCH_SOURCE,
         "local_capture": str(DSIP_TOPICS_JSON.relative_to(ROOT)).replace("\\", "/") if DSIP_TOPICS_JSON.exists() else "",
         "selected_topics": selected,
-        "near_term_window": "TPOC Q&A closes June 24, 2026 at 12:00 UTC for the selected pre-release topics in the public feed.",
-        "proposal_window_boundary": "Public topic rows show pre-release status and blank proposal due fields; verify proposal due dates inside DSIP.",
+        "near_term_window": "Historical capture: TPOC Q&A closed June 24, 2026 at 12:00 UTC for the selected pre-release topics.",
+        "proposal_window_boundary": "The captured topic rows are historical and do not authorize reopening an expired DSIP workspace; use a fresh official topic source for any new cycle.",
         "watchlist_pre_release_topics": watchlist,
     }
 
@@ -294,7 +427,9 @@ def geometry_summary(payload: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def live_proof_submission_gate(payload: dict[str, Any]) -> dict[str, Any]:
+def live_proof_submission_gate(
+    payload: dict[str, Any], *, dice_closed: bool = False
+) -> dict[str, Any]:
     if not payload:
         return {
             "available": False,
@@ -316,7 +451,7 @@ def live_proof_submission_gate(payload: dict[str, Any]) -> dict[str, Any]:
     action = payload.get("closest_action_gate", {})
     if not isinstance(action, dict):
         action = {}
-    return {
+    result = {
         "available": True,
         "active_start_package": str(active.get("package", "")),
         "active_start_deadline_utc": str(active.get("abstract_due_utc", "")),
@@ -329,6 +464,27 @@ def live_proof_submission_gate(payload: dict[str, Any]) -> dict[str, Any]:
         "ready_for_any_final_submit": bool(gate.get("ready_for_any_final_submit", False)),
         "rule": str(gate.get("rule", "")),
     }
+    if dice_closed:
+        result.update(
+            {
+                "status": "HISTORICAL_ACTIVE_START_SUPERSEDED_BY_OFFICIAL_CLOSURE",
+                "legacy_active_start_package": result["active_start_package"],
+                "legacy_active_start_deadline_utc": result[
+                    "active_start_deadline_utc"
+                ],
+                "active_start_package": "",
+                "active_start_deadline_utc": "",
+                "closest_action_gate_portal": "",
+                "closest_action_gate_utc": "",
+                "ready_for_any_final_submit": False,
+                "rule": (
+                    "The historical top-five proof board is retained for provenance only. "
+                    "Official DICE feedback closed the full-proposal route, and the captured "
+                    "DSIP gates have elapsed; use the current near-deadline command board."
+                ),
+            }
+        )
+    return result
 
 
 def discarded_workspaces(payload: dict[str, Any]) -> list[dict[str, str]]:
@@ -353,15 +509,22 @@ def build_board() -> dict[str, Any]:
     geometry = read_json(GEOMETRY_BRIDGE_JSON)
     visibility = read_json(PUBLIC_VISIBILITY_JSON)
     live_proof = read_json(TOP5_LIVE_PROOF_JSON)
+    overlay = current_command_board_overlay()
+    dice = dice_deadlines()
     return {
         "generated_utc": now_utc(),
         "schema": "grant_deadline_triage_board_v1",
-        "purpose": "Give the user a deadline-first, portal-safe action board for live grant work.",
+        "purpose": (
+            "Preserve historical deadline evidence while routing every current action "
+            "through the fail-closed near-deadline command board."
+        ),
         "readiness_source": str(READINESS_JSON.relative_to(ROOT)).replace("\\", "/"),
-        "source_posture": readiness.get("posture", "UNKNOWN"),
+        "source_posture": overlay["status"],
+        "legacy_source_posture": readiness.get("posture", "UNKNOWN"),
         "readiness_summary": readiness.get("summary", {}),
+        "current_command_board": overlay,
         "official_deadlines": {
-            "dice": dice_deadlines(),
+            "dice": dice,
             "dsip": dsip_topics(),
         },
         "package_readiness": package_summary(readiness),
@@ -371,19 +534,23 @@ def build_board() -> dict[str, Any]:
             "public_visibility_packet_claims": len(visibility.get("proof_claims", []) or []),
             "geometry_championship": geometry_summary(geometry),
         },
-        "live_proof_submission_gate": live_proof_submission_gate(live_proof),
+        "live_proof_submission_gate": live_proof_submission_gate(
+            live_proof,
+            dice_closed=(
+                dice["current_route_status"]
+                == "FULL_PROPOSAL_DISCOURAGED_ROUTE_CLOSED"
+            ),
+        ),
         "discarded_workspaces": discarded_workspaces(live_proof),
-        "tonight_action_order": [
-            "Inside DSIP: capture proposal-window fields and, if still open, any TPOC Q&A opportunity for NV063/NV065/DLA26BZ03-NV011 before the June 24 cutoff.",
-            "Inside BAAT: confirm DICE / HR001126S0010 opportunity visibility and attachment preview rules for the June 30 abstract deadline.",
-            "Inside SAM.gov: confirm Active Registration and expiration remain valid; do not expose identifiers or tax details in the packet.",
-            "Inside Grants.gov: confirm AOR/workspace authority only for packages that actually submit through Grants.gov.",
-            "Run final local package tests and render/manifest checks before any portal upload preview.",
-        ],
+        "tonight_action_order": current_action_order(overlay),
         "safety_boundaries": SAFETY_BOUNDARIES,
         "submit_gate": {
             "ready_for_submit": False,
-            "why": "Local artifacts are ready, but authenticated portal authority, compliance representations, preview checks, and action-time approval remain open.",
+            "why": (
+                "The current command board reports zero submission-ready lanes. "
+                "Applicant authority, eligibility, package, preview, certification, and "
+                "action-time approval gates remain open."
+            ),
             "required_user_phrase": "I approve this exact upload/submit action now.",
         },
     }
@@ -395,6 +562,11 @@ def render_markdown(board: dict[str, Any]) -> str:
     geometry = board["evidence_to_use"]["geometry_championship"]
     live_gate = board.get("live_proof_submission_gate", {})
     summary = board.get("readiness_summary", {})
+    overlay = board.get("current_command_board", {})
+    active_start_package = str(live_gate.get("active_start_package", "")).strip() or "N/A"
+    active_start_deadline = str(live_gate.get("active_start_deadline_utc", "")).strip() or "N/A"
+    closest_action_portal = str(live_gate.get("closest_action_gate_portal", "")).strip() or "N/A"
+    closest_action_deadline = str(live_gate.get("closest_action_gate_utc", "")).strip() or "N/A"
     lines = [
         "# Grant Deadline Triage Board",
         "",
@@ -404,9 +576,9 @@ def render_markdown(board: dict[str, Any]) -> str:
         "",
         "## Executive Read",
         "",
-        "- DICE is not a Grants.gov submit path for the abstract; it must be handled through DARPA BAAT.",
-        "- The DSIP topics are the closest time pressure because the public feed shows TPOC Q&A closing June 24, 2026 at 12:00 UTC.",
-        "- Local grant packets show no local blockers, but portal/user gates still block submit authority.",
+        "- DICE is not a Grants.gov submit path, and official feedback discouraged a full proposal; the route is closed with no reply or BAAT action due.",
+        "- The listed DSIP rows and June deadlines are historical evidence only; do not reopen an expired workspace.",
+        f"- The current command board tracks {overlay.get('lane_count', 0)} lanes, {overlay.get('stage_candidate_count', 0)} staging candidates, and {overlay.get('stage_ready_count', 0)} submission-ready lanes.",
         "- We can use the proof packets to strengthen reviewer confidence, but we cannot turn them into field, dollar, compliance, or award-guarantee claims.",
         "",
         "## Current Counts",
@@ -414,6 +586,8 @@ def render_markdown(board: dict[str, Any]) -> str:
         f"- Packages tracked: {summary.get('packages', 0)}",
         f"- Local blockers: {summary.get('local_blockers', 0)}",
         f"- Portal/user blockers: {summary.get('portal_user_blockers', 0)}",
+        f"- Current overlay: `{overlay.get('status', 'UNKNOWN')}`",
+        f"- Current command-board source: `{overlay.get('source_path', '')}`",
         "",
         "## Official Deadlines",
         "",
@@ -424,6 +598,9 @@ def render_markdown(board: dict[str, Any]) -> str:
         f"- Abstract due: {dice['abstract_due']['source_text']} ({dice['abstract_due']['central_iso']} Central / {dice['abstract_due']['utc_iso']} UTC)",
         f"- Full proposal due: {dice['proposal_due']['source_text']} ({dice['proposal_due']['central_iso']} Central / {dice['proposal_due']['utc_iso']} UTC)",
         f"- Submission channel: {dice['submission_channel']}",
+        f"- Historical deadline record only: `{dice['historical_deadline_record_only']}`",
+        f"- Current route status: `{dice['current_route_status']}`",
+        f"- Full proposal allowed: `{dice['full_proposal_allowed']}`",
         f"- Boundary: {dice['channel_boundary']}",
         f"- Immediate action: {dice['immediate_action']}",
         "",
@@ -505,9 +682,11 @@ def render_markdown(board: dict[str, Any]) -> str:
             "## Live-Proof Submission Gate",
             "",
             f"- Available: {live_gate.get('available', False)}",
-            f"- Active start package: {live_gate.get('active_start_package', '')}",
-            f"- Active start deadline UTC: {live_gate.get('active_start_deadline_utc', '')}",
-            f"- Closest action gate: {live_gate.get('closest_action_gate_portal', '')} / {live_gate.get('closest_action_gate_utc', '')}",
+            f"- Status: `{live_gate.get('status', 'CURRENT')}`",
+            f"- Active start package: {active_start_package}",
+            f"- Legacy active start package: {live_gate.get('legacy_active_start_package', '')}",
+            f"- Active start deadline UTC: {active_start_deadline}",
+            f"- Closest action gate: {closest_action_portal} / {closest_action_deadline}",
             f"- Proposal-specific live proof: {live_gate.get('proposal_specific_live_proof_count', 0)}/{live_gate.get('proposal_specific_live_proof_total', 0)}",
             f"- Missing live proof: {', '.join(live_gate.get('packages_missing_live_proof', []) or []) or 'none'}",
             f"- Ready for any final submit: `{live_gate.get('ready_for_any_final_submit', False)}`",
@@ -531,7 +710,7 @@ def render_markdown(board: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "## Tonight Action Order",
+            "## Current Action Order",
             "",
         ]
     )
@@ -569,7 +748,18 @@ def main() -> int:
                 "source_posture": board["source_posture"],
                 "local_blockers": board.get("readiness_summary", {}).get("local_blockers", 0),
                 "portal_user_blockers": board.get("readiness_summary", {}).get("portal_user_blockers", 0),
-                "dice_abstract_due_utc": board["official_deadlines"]["dice"]["abstract_due"]["utc_iso"],
+                "dice_current_route_status": board["official_deadlines"]["dice"][
+                    "current_route_status"
+                ],
+                "dice_historical_abstract_due_utc": board["official_deadlines"][
+                    "dice"
+                ]["abstract_due"]["utc_iso"],
+                "current_stage_candidates": board["current_command_board"][
+                    "stage_candidate_count"
+                ],
+                "current_stage_ready": board["current_command_board"][
+                    "stage_ready_count"
+                ],
                 "dsip_selected_topics": len(board["official_deadlines"]["dsip"]["selected_topics"]),
                 "json": str(OUT_JSON.relative_to(ROOT)).replace("\\", "/"),
                 "markdown": str(OUT_MD.relative_to(ROOT)).replace("\\", "/"),

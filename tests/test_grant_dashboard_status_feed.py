@@ -25,6 +25,20 @@ def test_dashboard_feed_exposes_acquisition_without_overclaiming():
     assert feed["summary"]["local_blockers"] == 0
     assert feed["summary"]["portal_user_blockers"] > 0
     assert feed["summary"]["submitted_by_feed"] == 0
+    freshness = feed["source_freshness"]
+    assert freshness["time_sensitive_source_count"] == 4
+    assert freshness["fresh_source_count"] + freshness["stale_or_missing_source_count"] == 4
+    assert feed["summary"]["current_opportunity_status_allowed"] is freshness[
+        "time_sensitive_sources_fresh"
+    ]
+    if freshness["time_sensitive_sources_fresh"]:
+        assert feed["summary"]["dashboard_signal"] != "STALE_SOURCE_ABSTAIN"
+        assert feed["top5_live_proof"]["current_status_allowed"] is True
+    else:
+        assert feed["summary"]["dashboard_signal"] == "STALE_SOURCE_ABSTAIN"
+        assert feed["summary"]["ready_local_not_portal"] is False
+        assert feed["top5_live_proof"]["snapshot_status"] == "HISTORICAL_STALE_ABSTAIN"
+        assert feed["top5_live_proof"]["active_start_package"] == ""
 
     harbor = feed["harbor"]
     acquisition = harbor["ais_acquisition"]
@@ -58,8 +72,12 @@ def test_dashboard_feed_exposes_acquisition_without_overclaiming():
     assert top5["available"] is True
     assert top5["proposal_specific_live_proof_count"] == 2
     assert top5["proposal_specific_live_proof_total"] == 5
-    assert top5["active_start_package"] == "DICE"
-    assert top5["closest_action_gate_portal"] == "DSIP"
+    if top5["current_status_allowed"]:
+        assert top5["active_start_package"] == "DICE"
+        assert top5["closest_action_gate_portal"] == "DSIP"
+    else:
+        assert top5["active_start_package"] == ""
+        assert top5["closest_action_gate_portal"] == ""
     assert top5["ready_for_any_final_submit"] is False
     assert any(row["status"] == "DISCARD_NO_SUBMIT" for row in top5["discarded_workspaces"])
     assert any(card["key"] == "Live Proof Gate" and card["value"] == "2/5" for card in feed["priority_cards"])

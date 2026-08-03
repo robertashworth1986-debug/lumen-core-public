@@ -36,6 +36,14 @@ BOUNDARIES = [
     "Trading, Kraken, live-breadth, or frozen-delta artifacts must not be cited as profit proof.",
 ]
 
+TIME_SENSITIVE_SOURCE_MAX_AGE_HOURS = 24.0
+TIME_SENSITIVE_SOURCES = (
+    "top_five_readiness_audit",
+    "dice_submission_lock_packet",
+    "grant_support_outreach",
+    "top5_live_proof_submission_board",
+)
+
 
 def now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -64,6 +72,50 @@ def parse_dt(value: Any) -> datetime | None:
         return datetime.fromisoformat(text.replace("Z", "+00:00")).astimezone(timezone.utc)
     except Exception:
         return None
+
+
+def build_source_freshness(
+    generated: list[tuple[str, datetime]],
+    at: datetime | None = None,
+) -> dict[str, Any]:
+    checked = (at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    timestamps = {name: ts.astimezone(timezone.utc) for name, ts in generated}
+    rows: list[dict[str, Any]] = []
+    for name in TIME_SENSITIVE_SOURCES:
+        timestamp = timestamps.get(name)
+        age_hours = (
+            round((checked - timestamp).total_seconds() / 3600.0, 3)
+            if timestamp is not None
+            else None
+        )
+        fresh = bool(
+            timestamp is not None
+            and age_hours is not None
+            and -1.0 <= age_hours <= TIME_SENSITIVE_SOURCE_MAX_AGE_HOURS
+        )
+        rows.append(
+            {
+                "source": name,
+                "generated_utc": timestamp.isoformat() if timestamp else None,
+                "age_hours": age_hours,
+                "max_age_hours": TIME_SENSITIVE_SOURCE_MAX_AGE_HOURS,
+                "fresh": fresh,
+            }
+        )
+    stale = [row["source"] for row in rows if not row["fresh"]]
+    return {
+        "checked_utc": checked.isoformat(),
+        "time_sensitive_sources_fresh": not stale,
+        "time_sensitive_source_count": len(rows),
+        "fresh_source_count": len(rows) - len(stale),
+        "stale_or_missing_source_count": len(stale),
+        "stale_or_missing_sources": stale,
+        "sources": rows,
+        "rule": (
+            "Current opportunity and submission-readiness language is allowed only "
+            "when every time-sensitive source is present and no more than 24 hours old."
+        ),
+    }
 
 
 def compact_package(package: dict[str, Any]) -> dict[str, Any]:
@@ -414,6 +466,11 @@ def build_feed() -> dict[str, Any]:
         if ts is not None:
             generated.append((name, ts))
 
+    source_freshness = build_source_freshness(generated)
+    current_status_allowed = bool(
+        source_freshness["time_sensitive_sources_fresh"]
+    )
+
     summary = readiness.get("summary", {}) if isinstance(readiness.get("summary"), dict) else {}
     local_blockers = int(summary.get("local_blockers", 0) or 0)
     portal_user_blockers = int(summary.get("portal_user_blockers", 0) or 0)
@@ -425,6 +482,30 @@ def build_feed() -> dict[str, Any]:
     support_summary = support_outreach_summary(support_outreach)
     top5_summary = top5_live_proof_summary(top5_live_proof)
 
+    if not current_status_allowed:
+        top5_summary = dict(top5_summary)
+        top5_summary.update(
+            {
+                "snapshot_status": "HISTORICAL_STALE_ABSTAIN",
+                "current_status_allowed": False,
+                "historical_snapshot_suppressed": True,
+                "active_start_package": "",
+                "active_start_deadline_utc": "",
+                "closest_action_gate_portal": "",
+                "closest_action_gate_utc": "",
+                "ready_for_any_final_submit": False,
+            }
+        )
+    else:
+        top5_summary = dict(top5_summary)
+        top5_summary.update(
+            {
+                "snapshot_status": "CURRENT_SOURCE_WINDOW",
+                "current_status_allowed": True,
+                "historical_snapshot_suppressed": False,
+            }
+        )
+
     return {
         "generated_utc": now_utc(),
         "schema": "grant_dashboard_status_feed_v1",
@@ -435,8 +516,17 @@ def build_feed() -> dict[str, Any]:
             "local_blockers": local_blockers,
             "portal_user_blockers": portal_user_blockers,
             "submitted_by_feed": 0,
-            "ready_local_not_portal": local_blockers == 0 and portal_user_blockers > 0,
-            "dashboard_signal": "LOCAL_READY_PORTAL_BLOCKED" if local_blockers == 0 else "LOCAL_BLOCKED",
+            "ready_local_not_portal": current_status_allowed
+            and local_blockers == 0
+            and portal_user_blockers > 0,
+            "current_opportunity_status_allowed": current_status_allowed,
+            "dashboard_signal": (
+                "STALE_SOURCE_ABSTAIN"
+                if not current_status_allowed
+                else "LOCAL_READY_PORTAL_BLOCKED"
+                if local_blockers == 0
+                else "LOCAL_BLOCKED"
+            ),
         },
         "priority_cards": [
             {
@@ -447,9 +537,17 @@ def build_feed() -> dict[str, Any]:
             },
             {
                 "key": "Top-Five Grants",
-                "value": f"{local_blockers} local / {portal_user_blockers} portal",
-                "sub": "Local packages are file-ready; submissions remain portal/user gated.",
-                "tone": "warn" if portal_user_blockers else "good",
+                "value": (
+                    "STALE_SOURCE_ABSTAIN"
+                    if not current_status_allowed
+                    else f"{local_blockers} local / {portal_user_blockers} portal"
+                ),
+                "sub": (
+                    "Re-run official-source and package-readiness checks before using any deadline or pursue status."
+                    if not current_status_allowed
+                    else "Local packages are file-ready; submissions remain portal/user gated."
+                ),
+                "tone": "warn" if portal_user_blockers or not current_status_allowed else "good",
             },
             {
                 "key": "Harbor AIS",
@@ -542,6 +640,7 @@ def build_feed() -> dict[str, Any]:
         },
         "support_outreach": support_summary,
         "top5_live_proof": top5_summary,
+        "source_freshness": source_freshness,
         "builder_velocity": artifact_velocity(generated),
         "claim_boundaries": BOUNDARIES,
         "source_files": {
