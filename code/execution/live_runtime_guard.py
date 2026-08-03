@@ -35,7 +35,7 @@ class LiveRuntimeGuard:
             "gate_override_enabled": False,
             "gate_override_min_confidence": 0.60,
             "gate_override_min_edge_bps": 12.0,
-            "auto_convert_collateral": True,
+            "auto_convert_collateral": False,
             "collateral_sell_fraction": 0.10,
             "collateral_convert_cooldown_sec": 120,
             "fallback_buying_power_usd": 0.0,
@@ -108,7 +108,7 @@ class LiveRuntimeGuard:
             "gate_override_enabled": self._coerce_bool(runtime.get("gate_override_enabled", False), False),
             "gate_override_min_confidence": self._clamp_float(runtime.get("gate_override_min_confidence", 0.60), 0.0, 1.0, 0.60),
             "gate_override_min_edge_bps": self._clamp_float(runtime.get("gate_override_min_edge_bps", 12.0), 0.0, 10_000.0, 12.0),
-            "auto_convert_collateral": self._coerce_bool(runtime.get("auto_convert_collateral", True), True),
+            "auto_convert_collateral": self._coerce_bool(runtime.get("auto_convert_collateral", False), False),
             "collateral_sell_fraction": self._clamp_float(runtime.get("collateral_sell_fraction", 0.10), 0.01, 0.50, 0.10),
             "collateral_convert_cooldown_sec": self._clamp_float(runtime.get("collateral_convert_cooldown_sec", 120), 5.0, 3600.0, 120.0),
             "fallback_buying_power_usd": self._clamp_float(runtime.get("fallback_buying_power_usd", 0.0), 0.0, 10_000_000.0, 0.0),
@@ -127,6 +127,17 @@ class LiveRuntimeGuard:
         # Keep min_position <= max_position regardless of user config order.
         if normalized["min_position_usd"] > normalized["max_position_usd"]:
             normalized["min_position_usd"] = normalized["max_position_usd"]
+
+        # Asset conversion is never a paper-mode convenience. It remains
+        # unavailable until the runtime is fully and explicitly live-armed.
+        fully_live_armed = (
+            normalized["mode"] == "live"
+            and normalized["allow_live_orders"]
+            and not normalized["paper_enabled"]
+            and not normalized["kill_switch"]
+        )
+        if not fully_live_armed:
+            normalized["auto_convert_collateral"] = False
 
         return normalized
 

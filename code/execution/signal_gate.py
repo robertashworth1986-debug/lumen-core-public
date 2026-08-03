@@ -6,7 +6,6 @@ import pandas as pd
 from datetime import datetime, timezone, timedelta
 from scipy import stats
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 
 Urgency = Literal["passive", "normal", "aggressive", "ultra_aggressive"]
 Direction = Literal["long", "short", "flat"]
@@ -51,25 +50,6 @@ class GateDecision:
     monte_carlo_probability: float
 
 class EvolutionarySignalGate:
-    def evaluate_kpis(self, context=None):
-        """
-        Returns a dict of KPIs for MetaEngine allocation logic.
-        KPIs: sharpe, max_drawdown, win_rate, total_decisions, avg_composite_score
-        """
-        stats = self.get_performance_stats() if hasattr(self, 'get_performance_stats') else {}
-        sharpe = stats.get('avg_composite_score', 0.0)
-        win_rate = stats.get('win_rate', 0.0)
-        total_decisions = stats.get('total_decisions', 0)
-        max_drawdown = 0.0  # Placeholder, add real drawdown if tracked
-        return {
-            'sharpe': sharpe,
-            'max_drawdown': max_drawdown,
-            'win_rate': win_rate,
-            'total_decisions': total_decisions,
-            'avg_composite_score': sharpe
-        }
-
-
     def evaluate_kpis(self, context=None):
         """
         Returns a dict of KPIs for MetaEngine allocation logic.
@@ -132,7 +112,9 @@ class EvolutionarySignalGate:
         max_onchain_gas_fee_usd: float = 50.0,
         min_onchain_whale_tx_count: int = 1,
         monte_carlo_simulations: int = 2000,
-        adaptation_window_days: int = 30
+        adaptation_window_days: int = 30,
+        adaptation_enabled: bool = False,
+        random_seed: int = 42,
     ):
         # Base thresholds (AGGRESSIVE MODE for faster compounding)
         self.base_thresholds = {
@@ -162,6 +144,10 @@ class EvolutionarySignalGate:
         self.adaptation_window = timedelta(days=adaptation_window_days)
         self.decision_history: List[Dict] = []
         self.monte_carlo_sims = monte_carlo_simulations
+        # Any adaptive thresholding is research-only until it is separately
+        # preregistered and evaluated on a forward-held-out window.
+        self.adaptation_enabled = bool(adaptation_enabled)
+        self.random_seed = int(random_seed)
         
         # ML model for threshold adaptation
         self.ml_model = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -203,15 +189,16 @@ class EvolutionarySignalGate:
         drift = returns.mean()
         
         positive_edge_count = 0
+        rng = np.random.default_rng(self.random_seed)
         
         for _ in range(self.monte_carlo_sims):
             # Simulate future price path (next 20 periods)
-            simulated_returns = np.random.normal(drift, vol, 20)
+            simulated_returns = rng.normal(drift, vol, 20)
             simulated_prices = price_series.iloc[-1] * np.cumprod(1 + simulated_returns)
             
             # Apply signal logic to simulated path
             signal_strength = input_data.expected_edge_bps / 10000  # Convert bps to decimal
-            noise = np.random.normal(0, vol * 0.5, 20)  # Add realistic noise
+            noise = rng.normal(0, vol * 0.5, 20)  # Add realistic noise
             
             simulated_signal = signal_strength + noise
             simulated_pnl = simulated_signal * simulated_returns
@@ -227,14 +214,24 @@ class EvolutionarySignalGate:
         
         Trains on past decisions and their outcomes to optimize thresholds.
         """
+        if not self.adaptation_enabled:
+            return self.base_thresholds.copy()
+
         if len(self.decision_history) < 50:
             return self.base_thresholds  # Need more data
         
         # Prepare training data
-        recent_decisions = [
-            d for d in self.decision_history
-            if datetime.fromisoformat(d["timestamp"]) > datetime.now(timezone.utc) - self.adaptation_window
-        ]
+        recent_decisions = []
+        window_start = datetime.now(timezone.utc) - self.adaptation_window
+        for decision in self.decision_history:
+            try:
+                observed_at = datetime.fromisoformat(str(decision["timestamp"]).replace("Z", "+00:00"))
+                if observed_at.tzinfo is None:
+                    observed_at = observed_at.replace(tzinfo=timezone.utc)
+            except (KeyError, TypeError, ValueError):
+                continue
+            if observed_at > window_start:
+                recent_decisions.append(decision)
         
         if len(recent_decisions) < 20:
             return self.base_thresholds
@@ -262,8 +259,12 @@ class EvolutionarySignalGate:
             X.append(features)
             y.append(1 if decision.get("profitable", False) else 0)
         
-        # Train model
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        # Preserve temporal order. Random splitting time series can leak future
+        # outcomes into the calibration window and inflate internal diagnostics.
+        split_at = max(1, int(len(X) * 0.8))
+        X_train, y_train = X[:split_at], y[:split_at]
+        if len(X_train) < 16 or len(set(y_train)) < 2:
+            return self.base_thresholds.copy()
         self.ml_model.fit(X_train, y_train)
         self.ml_trained = True
         
