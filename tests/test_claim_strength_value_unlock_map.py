@@ -23,19 +23,21 @@ def test_claim_strength_map_answers_current_money_question_safely():
     summary = payload["summary"]
     money_answer = payload["money_worth_answer"]
 
-    assert payload["schema"] == "claim_strength_value_unlock_map_v1"
-    assert summary["strongest_current_claim"] == "bounded_estimated_value_signal_and_paid_pilot_scoping"
-    assert summary["safe_estimated_hourly_value_usd"] >= 4500
-    assert summary["safe_estimated_annual_value_usd"] >= 39_000_000
-    assert summary["blocked_context_annual_value_usd"] > summary["safe_estimated_annual_value_usd"]
-    assert summary["measured_estimated_value_lane_count"] == 10
+    assert payload["schema"] == "claim_strength_value_unlock_map_v2"
+    assert summary["strongest_current_claim"] == "public_deployment_proof_and_bounded_workflow_pilot_scoping"
+    assert summary["safe_estimated_hourly_value_usd"] == 0
+    assert summary["safe_estimated_annual_value_usd"] == 0
+    assert summary["blocked_context_annual_value_usd"] == 0
+    assert summary["measured_estimated_value_lane_count"] == 0
+    assert summary["sellable_product_lane"] == "prooflock_opportunity_ops"
+    assert summary["current_model_benchmark_status"] == "NO_CROSS_SECTOR_EFFICIENCY_GAIN_PROVEN"
     assert summary["robust_repeat_candidate_count"] >= 1
     assert summary["manual_paid_pilot_outreach_rows"] == 12
     assert len(payload["claim_strength_sha256"]) == 64
 
-    assert "Worth money now as a paid technical evaluation" in money_answer["plain_answer"]
-    assert money_answer["defensible_value_signal"]["language"] == "bounded estimated value signal under stated assumptions"
-    assert money_answer["blocked_big_number"]["language"] == "context-only value surface; do not present as real savings or revenue"
+    assert "current monetizable unit is a scoped ProofLock workflow pilot" in money_answer["plain_answer"]
+    assert money_answer["defensible_value_signal"]["language"] == "no current dollar projection clears the gate"
+    assert money_answer["blocked_big_number"]["language"].startswith("suppressed input projection")
 
 
 def test_claim_strength_map_keeps_high_risk_claim_gates_closed():
@@ -44,7 +46,7 @@ def test_claim_strength_map_keeps_high_risk_claim_gates_closed():
     summary = payload["summary"]
     rendered = module.render_markdown(payload)
 
-    assert summary["bounded_estimated_value_claim_allowed"] is True
+    assert summary["bounded_estimated_value_claim_allowed"] is False
     assert summary["paid_evaluation_offer_allowed"] is True
     assert summary["buyer_authorized_pilot_scoping_ready"] is True
     assert summary["manual_reviewed_outreach_allowed"] is True
@@ -73,9 +75,9 @@ def test_claim_strength_map_preserves_current_repeat_winners_and_unlocks():
     assert candidates["kuramoto_phase_coupling"]["lane"] == "wave_resonance_timing"
     assert candidates["kuramoto_phase_coupling"]["repeat_window_evidence"]["wins"] >= 3
     assert candidates["kuramoto_phase_coupling"]["repeat_window_evidence"]["windows"] >= 3
-    assert "datacenter_cooling_optimization" in unlock_text
+    assert "grant_operations" in unlock_text
     assert "energy_forecasting" in unlock_text
-    assert "buyer-authorized constrained-routing replay" in unlock_text
+    assert "30-day design-partner pilot" in unlock_text
 
 
 def test_flower_of_life_note_is_accurate_and_testable():

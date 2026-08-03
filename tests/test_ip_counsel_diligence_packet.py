@@ -24,7 +24,8 @@ def test_ip_packet_is_ready_and_not_legal_advice():
     assert payload["status"] == "IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED"
     assert payload["summary"]["official_source_count"] >= 5
     assert payload["summary"]["invention_family_count"] == 6
-    assert payload["summary"]["reviewer_gate_clear"] is True
+    assert payload["summary"]["reviewer_packaging_gate_clear"] is True
+    assert payload["summary"]["submission_argument_gate_clear"] is False
     assert payload["summary"]["unsafe_secret_count"] == 0
     assert payload["summary"]["unsafe_claim_count"] == 0
     assert payload["summary"]["legal_advice_claimed"] is False

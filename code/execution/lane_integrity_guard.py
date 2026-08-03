@@ -5,12 +5,110 @@ import json
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Set, Tuple
 
 ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
 EXEC_OUT = ROOT / "out" / "execution"
 KEY_REPORT_FILE = EXEC_OUT / "api_key_registry_report.json"
 OUT_FILE = EXEC_OUT / "lane_integrity_report.json"
+
+KEY_TO_LANE: Dict[str, str] = {
+    # Trading/brokering
+    "APCA_API_KEY_ID": "trading_execution",
+    "APCA_API_SECRET_KEY": "trading_execution",
+    "ALPACA_KEY": "trading_execution",
+    "ALPACA_SECRET": "trading_execution",
+    "BINANCE_API_KEY": "trading_execution",
+    "BINANCE_API_SECRET": "trading_execution",
+    "KRAKEN_API_KEY": "trading_execution",
+    "KRAKEN_API_SECRET": "trading_execution",
+    "LUMA_MARKET_KEYS_FILE": "trading_execution",
+    "LUMA_ROLLING_CAPITAL_FILE": "trading_execution",
+    "LUMENCORE_TOTAL_CAPITAL_USD": "trading_execution",
+    "LUMENCORE_ROLLOUT_CAPITAL_USD": "trading_execution",
+    "LUMENCORE_CAPITAL_LEVERAGE_TARGET": "trading_execution",
+    "LUMENCORE_MAX_LEVERAGE": "trading_execution",
+    "LUMENCORE_DAILY_LOSS_LIMIT": "trading_execution",
+    "LUMENCORE_MAX_ALLOCATION_PCT": "trading_execution",
+    "LUMENCORE_MAX_POSITION_SIZE_USD": "trading_execution",
+    "LUMENCORE_MAX_DRAWDOWN_USD": "trading_execution",
+    "LUMENCORE_MAX_DRAWDOWN_PCT": "trading_execution",
+    "LUMA_LIVE_KEYS_FILE": "trading_execution",
+    # Market/data APIs
+    "POLYGON_API_KEY": "symbols_market_data",
+    "FINNHUB_API_KEY": "symbols_market_data",
+    "ALPHAVANTAGE_API_KEY": "symbols_market_data",
+    "ODDS_API_KEY": "symbols_market_data",
+    "SPORTS_ODDS_API_KEY": "symbols_market_data",
+    "THEODDS_API_KEY": "symbols_market_data",
+    "MASSIVE_API_KEY": "symbols_market_data",
+    "WEBSHARE_API_KEY": "symbols_market_data",
+    "SPOTIPY_CLIENT_SECRET": "symbols_market_data",
+    # Government/data-infra
+    "SAM_API_KEY": "gov_infra_data",
+    "SAM_GOV_API_KEY": "gov_infra_data",
+    "SAM_KEY": "gov_infra_data",
+    "GRANTS_API_KEY": "gov_infra_data",
+    "GRANTS_GOV_API_KEY": "gov_infra_data",
+    "GRANTS_GOV_KEY": "gov_infra_data",
+    # AI/observability
+    "OPENAI_WEBHOOK_SECRET": "payouts_webhooks",
+    "PAYOUT_WEBHOOK_AUTH_BEARER": "payouts_webhooks",
+    "AZURE_OPENAI_API_KEY": "ai_explainer",
+    # Communications
+    "EMAIL_IMAP_PASSWORD": "ops_communications",
+    "EMAIL_SMTP_PASSWORD": "ops_communications",
+    "LUMA_EMAIL_IMAP_PASSWORD": "ops_communications",
+    "LUMA_SMTP_PASSWORD": "ops_communications",
+    "LUMENCORE_SMTP_PASSWORD": "ops_communications",
+    "SMTP_PASSWORD": "ops_communications",
+    # Infrastructure/state
+    "PGPASSFILE": "platform_infra",
+    "PGPASSWORD": "platform_infra",
+    "PGSSLKEY": "platform_infra",
+    "PREFECT_API_KEY": "orchestration",
+    "PREFECT_API_TELEMETRY_ENVIRONMENT": "orchestration",
+    "PREFECT_SERVER_ENCRYPTION_KEY": "orchestration",
+    "PYZMQ_PARAMIKO_HOST_KEY_POLICY": "platform_infra",
+    "POLARS_AUTO_USE_AZURE_STORAGE_ACCOUNT_KEY": "platform_infra",
+    "POLARS_STORAGE_OPTIONS": "platform_infra",
+    # Security/credentials
+    "ORION_ENCRYPTION_KEY": "proof_audit",
+    # Operational endpoints/config
+    "LUMA_STALENESS_API_BASE": "platform_infra",
+    "LUMENCORE_STALENESS_API_BASE": "platform_infra",
+    "LUMA_EIA_BASE_URL": "platform_infra",
+    "LUMA_GOV_BASE_URL": "platform_infra",
+    # Misc
+    "BOKEH_COOKIE_SECRET": "dashboard_runtime",
+    "QT_API": "dashboard_runtime",
+    "SCIPY_ARRAY_API": "platform_infra",
+    "SSLKEYLOGFILE": "platform_infra",
+    "GOOGLE_API_USE_CLIENT_CERTIFICATE": "platform_infra",
+    "GOOGLE_API_USE_MTLS_ENDPOINT": "platform_infra",
+    "OAUTHLIB_RELAX_TOKEN_SCOPE": "platform_infra",
+    "OAUTHLIB_STRICT_TOKEN_TYPE": "platform_infra",
+    "_EP_MAGIC_TOKEN": "platform_infra",
+}
+
+KEY_PREFIX_HINTS: Tuple[Tuple[Tuple[str, ...], str], ...] = (
+    (("ALPACA", "ALPACA_", "KRAKEN", "BINANCE", "TRADE", "BROKER", "EXECUTOR", "ORDER"), "trading_execution"),
+    (("FRED", "EIA", "NOAA", "CENSUS", "BEA", "BLS", "NASA", "NREL", "AQS", "EPA", "USGS", "NCDC", "SAM", "GRANTS"), "gov_infra_data"),
+    (("FINNHUB", "ALPHAVANTAGE", "TWELVE", "POLYGON", "ODDS", "THEODDS", "WEBSHARE"), "symbols_market_data"),
+    (("OPENAI", "AZURE_OPENAI", "HARMONIC"), "ai_explainer"),
+    (("WEBHOOK", "PAYOUT", "HOOK"), "payouts_webhooks"),
+    (("PROOF", "AUDIT", "CHAIN", "CUSTODY", "DELTA"), "proof_audit"),
+    (("SYMBOL", "UNIVERSE", "REGISTRY"), "symbols_market_data"),
+    (("PANEL", "PREFECT"), "platform_infra"),
+)
+
+
+def _first_matching_lane(text: str, candidates: Tuple[Tuple[Tuple[str, ...], str], ...]) -> str | None:
+    for tokens, lane in candidates:
+        for token in tokens:
+            if token in text:
+                return lane
+    return None
 
 
 def now_utc() -> str:
@@ -41,18 +139,17 @@ def classify_lanes(row: Dict[str, Any]) -> Set[str]:
 
     lanes: Set[str] = set()
 
-    if any(token in blob for token in ["ALPACA", "KRAKEN", "BINANCE", "TRAD", "EXECUTOR", "ORDER"]):
-        lanes.add("trading_execution")
-    if any(token in blob for token in ["SYMBOL", "UNIVERSE", "REGISTRY", "FINNHUB", "ALPHAVANTAGE", "TWELVE_DATA"]):
-        lanes.add("symbols_market_data")
-    if any(token in blob for token in ["FRED", "EIA", "NOAA", "CENSUS", "BEA", "BLS", "NASA", "NREL", "AQS", "USGS"]):
-        lanes.add("gov_infra_data")
-    if any(token in blob for token in ["OPENAI", "AZURE_OPENAI", "EXPLAINER", "GUIDE"]):
-        lanes.add("ai_explainer")
-    if any(token in blob for token in ["WEBHOOK", "PAYOUT", "TOKEN", "AUTH_BEARER"]):
-        lanes.add("payouts_webhooks")
-    if any(token in blob for token in ["PROOF", "AUDIT", "CHAIN", "DELTA", "CUSTODY"]):
-        lanes.add("proof_audit")
+    if key in KEY_TO_LANE:
+        lanes.add(KEY_TO_LANE[key])
+    else:
+        explicit_lane = _first_matching_lane(key, KEY_PREFIX_HINTS)
+        if explicit_lane:
+            lanes.add(explicit_lane)
+        elif any(
+            token in blob
+            for token in ["TRADING", "PORTFOLIO", "SECTOR", "ALLOCATION", "RISK", "LIQUIDITY"]
+        ):
+            lanes.add("trading_execution")
 
     # If no lane detected, keep in a catch-all lane for manual classification.
     if not lanes:

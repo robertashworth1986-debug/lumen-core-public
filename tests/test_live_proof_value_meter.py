@@ -30,6 +30,7 @@ def test_value_meter_keeps_estimated_value_separate_from_realized_money(tmp_path
     live = tmp_path / "live.json"
     parity = tmp_path / "parity.json"
     geometry = tmp_path / "geometry.json"
+    cross_sector = tmp_path / "cross_sector.json"
 
     write_json(
         top5,
@@ -121,12 +122,26 @@ def test_value_meter_keeps_estimated_value_separate_from_realized_money(tmp_path
         },
     )
     write_json(geometry, {"promotion_gate": {"ready_for_real_dollar_claim": False}})
+    write_json(
+        cross_sector,
+        {
+            "status": "NO_CROSS_SECTOR_EFFICIENCY_GAIN_PROVEN",
+            "gates": {
+                "sector_gain_proven_count": 0,
+                "sector_count": 6,
+                "cross_sector_efficiency_claim_allowed": False,
+                "dollar_projection_from_forecast_error_allowed": False,
+            },
+            "claim_boundary": "No cross-sector or dollar claim.",
+        },
+    )
 
     monkeypatch.setattr(module, "TOP5_PROOF", top5)
     monkeypatch.setattr(module, "DOLLAR_GATE", dollar)
     monkeypatch.setattr(module, "LIVE_BREADTH", live)
     monkeypatch.setattr(module, "PARITY_AUDIT", parity)
     monkeypatch.setattr(module, "GEOMETRY_FRONTIER", geometry)
+    monkeypatch.setattr(module, "CROSS_SECTOR_BENCHMARK", cross_sector)
 
     payload = module.build_payload()
 
@@ -139,8 +154,10 @@ def test_value_meter_keeps_estimated_value_separate_from_realized_money(tmp_path
     assert one_billion["sector_or_loss_pool_usd"] == 1_000_000_000
     assert one_billion["capture_examples"][0]["improvement_or_capture_pct"] == 0.01
     assert one_billion["capture_examples"][0]["gross_value_usd"] == 100_000
-    assert payload["package_value_readiness"][0]["safe_value_language"].startswith("bounded")
-    assert "blocked until" in payload["package_value_readiness"][1]["safe_value_language"]
+    assert payload["package_value_readiness"][0]["safe_value_language"].startswith("proposal-specific")
+    assert "proof is blocked" in payload["package_value_readiness"][1]["safe_value_language"]
+    assert payload["current_model_benchmark"]["sector_gain_proven_count"] == 0
+    assert payload["current_model_benchmark"]["dollar_projection_from_forecast_error_allowed"] is False
 
 
 def test_value_meter_outputs_dashboard_json(tmp_path, monkeypatch):

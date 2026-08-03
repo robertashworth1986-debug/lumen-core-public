@@ -1,12 +1,15 @@
 {
   "claim_boundary": "This ledger counts only bounded proactive follow-up sends recorded by privacy-safe sent-message receipt hashes. It does not expose recipients, message IDs, thread IDs, subjects, bodies, attachments, credentials, or private proposal facts, and it does not prove delivery, receipt, endorsement, validation, selection, funding, or award.",
   "controls": {
+    "action_time_approval_required_after_utc": "2026-07-23T18:26:47Z",
     "append_only": true,
     "count_derived_from_receipts": true,
+    "exact_dispatch_binding_required_for_new_receipts": true,
+    "single_use_action_approval_required_for_new_receipts": true,
     "private_identifiers_prohibited": true
   },
   "initialized_utc": "2026-07-19T01:50:00Z",
-  "ledger_sha256": "1C56B710870F1DC45B902A6551F5A9B5BD2603103D7CB4F970D3E5509CF9A43D",
+  "ledger_sha256": "AD8D0239494BA40F85C802E90F85FD66EBF9B3E35031076795A515B1FFA863D9",
   "receipts": [
     {
       "delivery_state": "SENT",
@@ -14,6 +17,24 @@
       "sent_message_receipt_sha256": "6DC9E2D4DAD3D146AEB6A397FBED865B5B9C8A83AB66929F3F2D47A6153F8A16",
       "sent_utc": "2026-07-20T15:36:02Z",
       "template_id": "COMPONENT_INSTRUCTION_ESCALATION"
+    },
+    {
+      "authorization_verified": false,
+      "delivery_state": "SENT",
+      "governance_exception": "UNBOUND_SEND_OBSERVED",
+      "lane_id": "lanl_vision_licensing_followup",
+      "sent_message_receipt_sha256": "3AFE04C6A10595B52479654EB0FFDBF0AF0DBCC65E1E321E0FD95B7A3EADA5C7",
+      "sent_utc": "2026-07-27T13:49:21Z",
+      "template_id": "BOUNDED_REVIEW_FOLLOWUP"
+    },
+    {
+      "authorization_verified": false,
+      "delivery_state": "SENT",
+      "governance_exception": "UNBOUND_SEND_OBSERVED",
+      "lane_id": "argos_emi_teaming_inquiry",
+      "sent_message_receipt_sha256": "3D5BF547E19967A3333A895312821CFDDD85991966D4692E6B229DC332F4FCB1",
+      "sent_utc": "2026-07-28T15:39:34Z",
+      "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY"
     }
   ],
   "schema": "lumencore.outreach_followup_send_ledger.v1"

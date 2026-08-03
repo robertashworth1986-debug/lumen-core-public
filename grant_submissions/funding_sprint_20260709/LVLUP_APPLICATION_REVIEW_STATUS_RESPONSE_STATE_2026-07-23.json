@@ -1,0 +1,36 @@
+{
+  "schema": "lumencore.lvlup_application_review_status_response_state.v1",
+  "status": "APPLICATION_ACTIVE_COMMITTEE_REVIEW_NO_ADDITIONAL_MATERIALS",
+  "as_of_utc": "2026-07-23T20:48:10Z",
+  "lane_id": "lvlup_application_review_status",
+  "source": {
+    "sender": "Ana Rivera / LvlUp Ventures",
+    "sender_address_omitted": true,
+    "received_utc": "2026-07-23T20:48:10Z",
+    "subject": "Re: Thank You for Applying to LvlUp Ventures | Application Recap",
+    "subject_sha256": "B10081AA019DCF301095D0104CF967E050705E437109DA55E643D6B817C968F5",
+    "gmail_message_id_sha256": "2E2A297721BB4888D5CDB05EB2ADCC3B1658A0F75223213368CC03E46E551F49",
+    "gmail_thread_id_sha256": "9F383CB0539DA503308D799A1C909F1C9F4DF6195DE2FAAC19A8E110946B6987",
+    "message_body_omitted": true,
+    "full_thread_read": true,
+    "thread_truncated": false
+  },
+  "evidence": {
+    "application_active": true,
+    "application_remains_under_review": true,
+    "investment_committee_review_reported": true,
+    "high_application_volume_reported": true,
+    "additional_materials_requested": false,
+    "decision_or_timing_commitment_observed": false
+  },
+  "action": {
+    "key_ask": "No action requested. Wait for the review team to provide an update and do not submit additional materials unless specifically requested.",
+    "deadline": null,
+    "email_reply_required": false,
+    "send_now": false,
+    "selected_template_id": "NO_DUPLICATE_MONITOR",
+    "duplicate_send_decision": "BLOCK_FURTHER_PROACTIVE_STATUS_EMAIL",
+    "safest_next_action": "Monitor the existing thread for a substantive request or decision. Do not reply now and do not send additional materials unless LvlUp specifically requests them."
+  },
+  "claim_boundary": "This privacy-safe mailbox state records an observed LvlUp reply saying the application is active and remains under review, with no additional materials requested. It does not establish application completeness, diligence, selection, endorsement, investment, funding, valuation, an award, or any outcome or decision date."
+}

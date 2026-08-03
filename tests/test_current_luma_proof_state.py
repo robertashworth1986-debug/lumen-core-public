@@ -20,31 +20,88 @@ def test_current_luma_proof_state_merges_registry_ready_replay_and_repeat_eviden
     module = load_module()
     payload = module.build_payload()
 
-    assert payload["schema"] == "current_luma_proof_state.v1"
+    assert payload["schema"] == "current_luma_proof_state.v2"
     assert payload["registry"]["family_count"] >= 140
     assert payload["registry"]["natural_path_family_count"] >= 50
     assert payload["manifest"]["ready_for_benchmark_routes"] >= 300
-    assert payload["ready_source_replay"]["routes"] >= 10
-    assert payload["ready_source_replay"]["estimated_rows_replayed"] >= 2_000_000
-    assert payload["ready_source_replay"]["numeric_samples_read"] >= 30_000
-    assert payload["kuramoto_holdout_expansion"]["holdout_count"] >= 20
-    assert payload["kuramoto_holdout_expansion"]["wins_vs_kalman"] >= 16
-    assert payload["kuramoto_holdout_expansion"]["passes_internal_20_holdout_gate"] is True
+    assert payload["ready_source_replay"]["routes"] == 4
+    assert payload["ready_source_replay"]["direct_measured_replay_count"] == 2
+    assert (
+        payload["ready_source_replay"][
+            "source_conditioned_synthetic_stress_count"
+        ]
+        == 2
+    )
+    assert (
+        payload["ready_source_replay"][
+            "direct_all_baseline_global_holm_positive_count"
+        ]
+        == 0
+    )
+    assert (
+        payload["ready_source_replay"][
+            "legacy_ready_for_benchmark_rows_excluded"
+        ]
+        >= 300
+    )
+    assert payload["ready_source_replay"]["numeric_fallback_profile_count"] == 0
+    assert payload["ready_source_replay"]["estimated_rows_replayed"] > 0
+    assert payload["ready_source_replay"]["numeric_samples_read"] > 0
+    assert (
+        payload["ready_source_replay"]["candidate_wins"]
+        + payload["ready_source_replay"]["candidate_losses_or_ties"]
+        == payload["ready_source_replay"]["direct_measured_replay_count"]
+    )
+    assert len(payload["ready_source_replay"]["replay_chain_sha256"]) == 64
+    assert payload["kuramoto_holdout_expansion"]["holdout_count"] >= 1_500
+    assert (
+        payload["kuramoto_holdout_expansion"]["wins_vs_kalman"]
+        < payload["kuramoto_holdout_expansion"]["holdout_count"] / 2
+    )
+    assert payload["kuramoto_holdout_expansion"]["mean_delta_vs_kalman"] < 0
+    assert (
+        payload["kuramoto_holdout_expansion"][
+            "passes_internal_20_holdout_gate"
+        ]
+        is False
+    )
+    assert (
+        payload["kuramoto_holdout_expansion"]["candidate_was_protocol_selected"]
+        is False
+    )
+    assert (
+        payload["kuramoto_holdout_expansion"][
+            "candidate_beats_all_registered_baselines_after_holm"
+        ]
+        is False
+    )
+    assert (
+        payload["kuramoto_holdout_expansion"][
+            "legacy_source_conditioned_claim_superseded"
+        ]
+        is True
+    )
+    assert payload["kuramoto_cross_sector_benchmark"]["sector_gain_proven_count"] == 0
+    assert payload["kuramoto_cross_sector_benchmark"]["sector_count"] == 6
 
     by_family = {row["family_id"]: row for row in payload["champion_rankings"]}
     assert "brachistochrone_descent" in by_family
     assert "kuramoto_phase_coupling" in by_family
 
     brach = by_family["brachistochrone_descent"]
-    assert brach["evidence_stage"] == "robust_repeat_plus_current_replay"
-    assert brach["repeat_evidence"]["repeat_live_win_count"] >= 7
-    assert brach["source_conditioned_evidence"]["source_conditioned_replays"] >= 1
+    assert brach["evidence_stage"] == "no_compatible_direct_measured_replay"
+    assert brach["repeat_evidence"]["repeat_live_win_count"] == 0
+    assert (
+        brach["source_conditioned_evidence"]["source_conditioned_replays"] == 0
+    )
 
     kuramoto = by_family["kuramoto_phase_coupling"]
-    assert kuramoto["source_conditioned_evidence"]["source_conditioned_wins"] >= 4
-    assert kuramoto["kuramoto_holdout_evidence"]["holdout_count"] >= 20
-    assert "field validation" in kuramoto["safe_claim"].lower()
-    assert "buyer-authorized field replay request" in kuramoto["safe_claim"].lower()
+    assert kuramoto["source_conditioned_evidence"] == {}
+    assert kuramoto["kuramoto_holdout_evidence"]["holdout_count"] >= 1_500
+    assert kuramoto["kuramoto_holdout_evidence"]["mean_delta_vs_kalman"] < 0
+    assert kuramoto["evidence_stage"] == "negative_current_cross_sector_benchmark"
+    assert "0/6 proven kuramoto sector gains" in kuramoto["safe_claim"].lower()
+    assert "neither result supports performance marketing" in kuramoto["safe_claim"].lower()
 
 
 def test_current_luma_proof_state_keeps_money_and_execution_gates_closed():
@@ -60,8 +117,8 @@ def test_current_luma_proof_state_keeps_money_and_execution_gates_closed():
     assert gates["all_registered_families_live_benchmarked"] is False
 
     valuation = payload["valuation"]
-    assert valuation["safe_estimated_annual_value_usd"] >= 39_000_000
-    assert valuation["blocked_context_annual_value_usd"] > valuation["safe_estimated_annual_value_usd"]
+    assert valuation["safe_estimated_annual_value_usd"] == 0
+    assert valuation["blocked_context_annual_value_usd"] == 0
     assert len(payload["proof_state_sha256"]) == 64
 
 
@@ -75,5 +132,6 @@ def test_current_luma_proof_state_markdown_is_reviewer_safe():
     assert "real_dollar_savings_claim_allowed: `false`" in rendered
     assert "Fixed" not in rendered
     assert "guaranteed" not in rendered.lower()
-    assert "Strongest current delta" in rendered
-    assert "Kuramoto holdout expansion" in rendered
+    assert "Direct all-baseline globally corrected promotions: `0`" in rendered
+    assert "Kuramoto measured EIA holdout" in rendered
+    assert "NO_CROSS_SECTOR_EFFICIENCY_GAIN_PROVEN" in rendered

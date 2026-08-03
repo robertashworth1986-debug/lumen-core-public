@@ -14,11 +14,12 @@ This packet is preparation-only. It does not send email, schedule a meeting, acc
 - Fit score: `92`
 - Workstreams: `6`
 - Milestones: `5`
-- Reviewer gate clear: `true`
+- Reviewer packaging gate clear: `true`
+- Submission argument gate clear: `false`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
-- Registry enabled sources: `29`
-- Registry measured sources: `25`
+- Registry enabled sources: `17`
+- Registry measured sources: `11`
 - Current probe measured sources: `23`
 - Measured-source reconciliation required: `true`
 - Human terms required: `true`
@@ -33,7 +34,7 @@ This packet is preparation-only. It does not send email, schedule a meeting, acc
 - Services award claimed: `false`
 - Customer outcome value claimed: `false`
 - Production deployment claimed: `false`
-- Packet SHA-256: `c4bb5cad52a5eed0e0cf4b30ef6b9366f55086cd194d46a0217acd4bf35877b3`
+- Packet SHA-256: `cf8f3edb6986b81ebe1a679594a84230b7f7a53e830cad7e252e357004fc1abf`
 
 ## Positioning
 
@@ -133,13 +134,13 @@ The mailbox record proves only that two near-duplicate follow-ups were sent and 
 
 ## Evidence Sources
 
-- `out/ops/evtit_technical_sprint_scope_packet_latest.json` | present=`true` | bytes=`10148` | sha256=`c92cc4b3007f2ad0333c5629dffddd47d3d3def061e0bfa60a74827f6e5bed18`
-- `out/ops/traction_opportunity_intake_ledger_latest.json` | present=`true` | bytes=`85341` | sha256=`fb88ac9d2b61d3c07ef04eeaa33756dae839b64271c9d5dfd1893e8ad061f7b8`
+- `out/ops/evtit_technical_sprint_scope_packet_latest.json` | present=`true` | bytes=`11895` | sha256=`0c8097920208bd71ca943faafcc0f08e8cdde469796d70f81381bc136e38cd80`
+- `out/ops/traction_opportunity_intake_ledger_latest.json` | present=`true` | bytes=`88416` | sha256=`d06a06b44c4db3f802544101b71a9275fe8181ac6f40e39193828554b327af78`
 - `out/ops/traction_followup_packet_latest.json` | present=`true` | bytes=`12366` | sha256=`bf8f2f49c3b8662980a22c8935ec6ef3c9f5401b5a9080744ea4e7f53155d1c5`
-- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`73041` | sha256=`355a17d60db1ac7ca05e5442698eb34491ecdd4b97d30e2857b628c167e6c9ab`
-- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`49467` | sha256=`c92dd8bd0be7dbc8f7ab222a3a9590389b5dffa39b744460f90daf2abb8d84af`
-- `out/ops/measured_source_evidence_register_latest.json` | present=`true` | bytes=`42951` | sha256=`e12e23d62f60d2b677fa288a09c023e4a688cd6f395105030b9fc6544dcc3669`
-- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12389` | sha256=`dbf19b6dcb218b1beba9824e1da8178c59c41856b2c542839b5e6362e9fb1d88`
-- `out/ops/submission_authority_matrix_latest.json` | present=`true` | bytes=`33418` | sha256=`616519280f524711e6e11c43e059a90cb5490efbcd3f29f4e22530dd3f6fa1ca`
-- `out/ops/ip_counsel_diligence_packet_latest.json` | present=`true` | bytes=`13031` | sha256=`1c1e7133bd44e3bb568972c018b37406cb43ae4ca37d19278b8b5f191ae7b846`
-- `out/ops/autonomous_quant_governance_packet_latest.json` | present=`true` | bytes=`10038` | sha256=`fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81`
+- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`123836` | sha256=`e8f78f0a8794c348c78900eef551fd812cd9e4df62fb0e42229c6c74424ea190`
+- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`77725` | sha256=`24d6517bee4a94ddaed3282cccd952a3390d0a81e581d9379f78579d4e0e2711`
+- `out/ops/measured_source_evidence_register_latest.json` | present=`true` | bytes=`45290` | sha256=`363cad2b175ee6f155d1e1c68a13bef66ba1586da7da170abb72facb434c8853`
+- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12448` | sha256=`bad5334a73520a8f5d422e7ae16475ccc8068c16509773a8ac51d53b0aa4affd`
+- `out/ops/submission_authority_matrix_latest.json` | present=`true` | bytes=`51903` | sha256=`c02fda030889fb387cba67e7c15d13e219453b2700bea75ebfadbbba57b44d4c`
+- `out/ops/ip_counsel_diligence_packet_latest.json` | present=`true` | bytes=`13089` | sha256=`d1ef448f97a2360f191f3f07d2cf61627ff1c527ee5fe4a82c1455166ce54d41`
+- `out/ops/autonomous_quant_governance_packet_latest.json` | present=`true` | bytes=`10096` | sha256=`58cd3145ac2982918b96943dcb7ba0c20610492f21c608c2fbd87c9fa13e433c`

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -32,7 +33,7 @@ def read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
+        value = json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
         return {}
     return value if isinstance(value, dict) else {}
@@ -40,12 +41,19 @@ def read_json(path: Path) -> dict[str, Any]:
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
 
 
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    os.replace(temporary, path)
 
 
 def as_dict(value: Any) -> dict[str, Any]:
@@ -65,6 +73,8 @@ def load_inputs() -> dict[str, dict[str, Any]]:
         "champion_metric_gauntlet": read_json(DASHBOARD_DATA / "champion_metric_gauntlet.json"),
         "champion_expanded_metric_rollup": read_json(DASHBOARD_DATA / "champion_expanded_metric_rollup.json"),
         "locked_source_baseline_replay_sweep": read_json(DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"),
+        "geometry_ready_source_replay": read_json(DASHBOARD_DATA / "geometry_ready_source_replay.json"),
+        "geometry_live_wiring_matrix": read_json(DASHBOARD_DATA / "geometry_live_wiring_matrix.json"),
         "live_domain_deployment_feed": read_json(DASHBOARD_DATA / "live_domain_deployment_feed.json"),
         "live_domain_proof_feed_deploy_bundle": read_json(DASHBOARD_DATA / "live_domain_proof_feed_deploy_bundle.json"),
         "dollar_claim_gate": read_json(DASHBOARD_DATA / "dollar_claim_gate.json"),
@@ -135,6 +145,7 @@ def lane_scoreboard(sweep: dict[str, Any]) -> list[dict[str, Any]]:
         rows.append(
             {
                 "lane": lane.get("lane"),
+                "evidence_mode": lane.get("evidence_mode"),
                 "candidate_win_count": wins,
                 "baseline_comparison_count": comparisons,
                 "win_rate": round(wins / comparisons, 6) if comparisons else 0.0,
@@ -143,6 +154,10 @@ def lane_scoreboard(sweep: dict[str, Any]) -> list[dict[str, Any]]:
                 "routes_replayed": lane.get("routes_replayed"),
                 "mean_score_delta": lane.get("mean_score_delta"),
                 "best_score_delta": lane.get("best_score_delta"),
+                "global_holm_positive_count": int(
+                    lane.get("global_holm_positive_count") or 0
+                ),
+                "source_names": lane.get("source_names") or [],
                 "locked_baselines": lane.get("locked_baselines") or [],
                 "metric_names": lane.get("metric_names") or [],
             }
@@ -175,6 +190,9 @@ def outreach_snapshot(board: dict[str, Any]) -> dict[str, Any]:
     return {
         "recommended_first_buyer": summary.get("recommended_first_buyer"),
         "recommended_first_action": summary.get("recommended_first_action"),
+        "paid_protocol_review_scoping_allowed": bool(
+            summary.get("paid_protocol_review_scoping_allowed")
+        ),
         "manual_reviewed_outreach_allowed": bool(summary.get("manual_reviewed_outreach_allowed")),
         "send_without_user_review_allowed": bool(summary.get("send_without_user_review_allowed")),
         "top_contact_lane": {
@@ -182,20 +200,44 @@ def outreach_snapshot(board: dict[str, Any]) -> dict[str, Any]:
             "fit_score": first.get("fit_score"),
             "buyer_channel_type": first.get("buyer_channel_type"),
             "first_ask": first.get("first_ask"),
+            "routing_status": first.get("routing_status"),
+            "send_now_allowed": bool(first.get("send_now_allowed")),
             "source_refs": first.get("source_refs") or [],
         },
         "manual_email_subject": primary.get("subject"),
         "manual_email_body": primary.get("body"),
-        "send_gate": "Operator must review recipient, footer, opt-out text, and final page before sending.",
+        "send_gate": (
+            "No send is authorized. Verify the current official channel, reconcile "
+            "duplicate-send history, select a real recipient, and obtain exact "
+            "action-time approval."
+        ),
     }
 
 
 def build_payload() -> dict[str, Any]:
     inputs = load_inputs()
+    required_schemas = {
+        "champion_metric_gauntlet": "champion_metric_gauntlet_v2",
+        "champion_expanded_metric_rollup": "champion_expanded_metric_rollup_v2",
+        "locked_source_baseline_replay_sweep": "locked_source_baseline_replay_sweep_v2",
+        "geometry_ready_source_replay": "geometry_ready_source_replay_v2",
+        "geometry_live_wiring_matrix": "geometry_live_wiring_matrix_v3",
+        "first_buyer_target_board": "first_buyer_target_board_v2",
+    }
+    for name, expected in required_schemas.items():
+        actual = inputs[name].get("schema")
+        if actual != expected:
+            raise ValueError(f"{name} must use {expected}; found {actual!r}")
+
     champion = inputs["champion_metric_gauntlet"]
     champion_summary = as_dict(champion.get("summary"))
+    strongest = as_dict(champion.get("strongest_current"))
     expanded = inputs["champion_expanded_metric_rollup"]
     expanded_summary = as_dict(expanded.get("summary")) or expanded
+    sweep_summary = as_dict(
+        inputs["locked_source_baseline_replay_sweep"].get("summary")
+    )
+    wiring_summary = as_dict(inputs["geometry_live_wiring_matrix"].get("summary"))
     domain_summary = as_dict(inputs["live_domain_deployment_feed"].get("summary"))
     bundle_summary = as_dict(inputs["live_domain_proof_feed_deploy_bundle"].get("summary"))
     dollar_summary = as_dict(inputs["dollar_claim_gate"].get("summary"))
@@ -206,12 +248,20 @@ def build_payload() -> dict[str, Any]:
 
     payload: dict[str, Any] = {
         "generated_utc": now_utc(),
-        "schema": "luma_operator_context_v1",
+        "schema": "luma_operator_context_v2",
         "purpose": "Anti-drift memory and execution board for LumenCore proof-to-pilot work.",
         "boundary": BOUNDARY,
         "truth_state": {
-            "current_champion": champion_summary.get("champion_family"),
-            "champion_label": champion_summary.get("champion_label"),
+            "internal_performance_champion_present": False,
+            "current_champion": None,
+            "measured_reference_candidate": champion_summary.get("champion_family"),
+            "measured_reference_label": champion_summary.get("champion_label"),
+            "development_selected_candidate": strongest.get(
+                "development_selected_candidate"
+            ),
+            "candidate_was_protocol_selected": bool(
+                strongest.get("candidate_was_protocol_selected")
+            ),
             "named_baseline": champion_summary.get("named_baseline"),
             "holdout_wins": champion_summary.get("holdout_wins"),
             "holdout_count": champion_summary.get("holdout_count"),
@@ -220,19 +270,51 @@ def build_payload() -> dict[str, Any]:
             "min_delta_vs_named_baseline": champion_summary.get("min_delta_vs_named_baseline"),
             "estimated_rows_replayed": champion_summary.get("estimated_rows_replayed"),
             "source_system_count": champion_summary.get("source_system_count"),
-            "source_systems": as_dict(champion.get("strongest_current")).get("source_systems") or [],
-            "expanded_source_system_count": expanded_summary.get("source_system_count"),
-            "expanded_source_systems": expanded_summary.get("source_systems") or [],
-            "expanded_total_baseline_comparisons": expanded_summary.get("total_baseline_comparisons"),
-            "expanded_total_candidate_wins": expanded_summary.get("total_candidate_wins"),
-            "expanded_overall_locked_lane_win_rate_pct": expanded_summary.get("overall_locked_lane_win_rate_pct"),
-            "expanded_estimated_rows_replayed": expanded_summary.get("estimated_rows_replayed"),
-            "expanded_numeric_samples_read": expanded_summary.get("numeric_samples_read"),
-            "expanded_field_grade_source_hygiene_passed": bool(
-                expanded_summary.get("field_grade_source_hygiene_passed")
+            "source_systems": strongest.get("source_systems") or [],
+            "registered_baseline_count": strongest.get("registered_baseline_count"),
+            "registered_baseline_mean_win_count": strongest.get(
+                "registered_baseline_mean_win_count"
             ),
+            "candidate_beats_all_registered_baselines_after_holm": bool(
+                strongest.get("candidate_beats_all_registered_baselines_after_holm")
+            ),
+            "compatibility_route_count": expanded_summary.get("route_count"),
+            "direct_measured_route_count": expanded_summary.get(
+                "direct_measured_route_count"
+            ),
+            "conditioned_synthetic_route_count": expanded_summary.get(
+                "conditioned_synthetic_route_count"
+            ),
+            "baseline_comparison_count": expanded_summary.get(
+                "baseline_comparison_count"
+            ),
+            "raw_candidate_win_count": sweep_summary.get("candidate_win_count"),
+            "direct_all_baseline_global_holm_positive_count": expanded_summary.get(
+                "global_holm_positive_count"
+            ),
+            "performance_rows_reviewed": expanded_summary.get(
+                "performance_rows_reviewed"
+            ),
+            "legacy_ready_rows_excluded": expanded_summary.get(
+                "legacy_rows_excluded"
+            ),
+            "numeric_fallback_count": expanded_summary.get(
+                "numeric_fallback_count"
+            ),
+            "geometry_inventory_measured_source_count": wiring_summary.get(
+                "live_source_measured_count"
+            ),
+            "geometry_inventory_measured_row_count": wiring_summary.get(
+                "total_measured_rows"
+            ),
+            "geometry_inventory_is_performance_evidence": False,
             "expanded_plain_english": expanded_summary.get("plain_english_answer"),
-            "reviewer_safe_internal_claim_allowed": bool(champion_summary.get("reviewer_safe_internal_claim_allowed")),
+            "reviewer_safe_internal_claim_allowed": False,
+            "reviewer_safe_measured_nonpromotion_claim_allowed": bool(
+                champion_summary.get(
+                    "reviewer_safe_measured_nonpromotion_claim_allowed"
+                )
+            ),
             "buyer_authorized_field_replay_request_ready": bool(
                 champion_summary.get("buyer_authorized_field_replay_request_ready")
             ),
@@ -288,34 +370,41 @@ def build_payload() -> dict[str, Any]:
             "realized_savings_allowed": False,
             "field_validation_required_for_real_dollars": True,
             "safe_line": (
-                "Use bounded estimated avoided-cost signal language only; realized savings require a buyer-authorized "
-                "field replay with locked baseline, held-out data, acceptance metric, and economic conversion."
+                "The current priceable work is a bounded source-native benchmark "
+                "and evidence protocol review. Realized savings require a future "
+                "promoted candidate, buyer-authorized field replay, locked baseline, "
+                "held-out data, accepted metric, and approved economic conversion."
             ),
         },
         "outreach": outreach_snapshot(inputs["first_buyer_target_board"]),
         "next_10_actions": [
-            "Keep generated render-QA folders uncommitted unless a specific packet requires them.",
             "Run the focused proof tests before every commit.",
-            "Promote EIA, NASA, NREL, EPA_AQS, Alpaca, and Kraken provider rows only after their latest pings are measured.",
-            "Run direct phase-slip, circular error, and amplitude-error diagnostics for the Kuramoto champion.",
-            "Run residual autocorrelation and calibration checks on the promoted source-system holdouts.",
-            "Run leave-one-source-out replay before claiming broader source generalization.",
+            "Treat the 24-source geometry inventory as research capacity, not performance evidence.",
+            "Keep Kuramoto as measured negative evidence; do not call it a champion.",
+            "Select the next wave-family candidate on development data only.",
+            "Register every source-native baseline before opening the untouched holdout.",
+            "Require every baseline gate to pass after multiplicity correction.",
             "Keep live-domain hash verification green after every proof feed update.",
-            "Use EPRI AI for Power / Incubatenergy as the first manual paid-pilot outreach lane.",
-            "Ask for buyer-approved held-out data, incumbent baseline, pass/fail metric, and cost conversion.",
-            "Do not claim field validation, realized savings, live trading edge, or fixed frozen-delta price until external gates close.",
+            "Offer only a bounded paid protocol review while no candidate is promoted.",
+            "Do not open new EPRI outreach; that lane remains inbound-only.",
+            "Require exact action-time approval before any external send.",
         ],
         "operator_prompt": (
-            "Operate LumenCore as a measurement-first proof-to-pilot platform. The standard is not hype; the standard "
-            "is reviewer-safe proof that survives hostile reading. Every improvement claim must name its source data, "
-            "baseline, metric, replay rules, code commit, hashes, negative results, claim boundary, and next external "
-            "validation gate. Treat the current internal champion as a strong lead, not a universal law: Kuramoto phase "
-            "coupling is 24/24 on the locked champion holdouts, and the expanded sweep currently shows source-conditioned "
-            "strength across eight lanes/systems, while still preserving mixed and negative evidence. Prioritize one "
-            "narrow paid field replay over broad claims: buyer-approved held-out data, incumbent baseline, acceptance "
-            "metric, economic conversion, and a signed result. Ship only canonical, secret-free proof feeds to the public "
-            "domain, keep dashboards beautiful but honest, preserve this context after every pass, and convert the next "
-            "action toward a lab, agency, or system owner saying yes to a held-out replay."
+            "Operate LumenCore as a measurement-first evidence and benchmark "
+            "platform. The standard is reviewer-safe proof that survives hostile "
+            "reading. Every comparison must name its source task, native units, "
+            "registered baselines, chronology, metrics, multiplicity correction, "
+            "code commit, hashes, negative results, and claim boundary. No current "
+            "geometry family is a performance champion. Kuramoto is a useful direct "
+            "measured negative result: it was not development-selected, won 482 of "
+            "1,525 paired EIA days against the named Kalman baseline, and had mean "
+            "skill delta -0.508191. Keep direct measured and conditioned-synthetic "
+            "routes separate. Treat source breadth as adapter inventory. The "
+            "commercially honest near-term offer is a bounded source-native protocol "
+            "review or benchmark implementation, with no candidate-win, field, "
+            "savings, or live-execution claim. Publish only canonical secret-free "
+            "proof feeds, preserve failures, and require exact action-time approval "
+            "for every external send."
         ),
     }
     payload["context_sha256"] = stable_sha256(
@@ -345,17 +434,26 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Current Truth",
         "",
-        f"- Champion: `{truth.get('current_champion')}` vs `{truth.get('named_baseline')}`",
-        f"- Holdout wins: `{truth.get('holdout_wins')}/{truth.get('holdout_count')}`",
-        f"- Mean delta: `{truth.get('mean_delta_vs_named_baseline')}`",
-        f"- Weakest delta: `{truth.get('min_delta_vs_named_baseline')}`",
-        f"- Estimated rows replayed: `{truth.get('estimated_rows_replayed')}`",
-        f"- Source systems in champion replay: `{truth.get('source_system_count')}`",
-        f"- Expanded sweep source systems: `{truth.get('expanded_source_system_count')}`",
-        f"- Expanded sweep comparisons: `{truth.get('expanded_total_candidate_wins')}/{truth.get('expanded_total_baseline_comparisons')}` wins",
-        f"- Expanded sweep win rate: `{truth.get('expanded_overall_locked_lane_win_rate_pct')}%`",
-        f"- Expanded sweep rows/samples: `{truth.get('expanded_estimated_rows_replayed')}` rows / `{truth.get('expanded_numeric_samples_read')}` numeric samples",
-        f"- Expanded field-grade source hygiene passed: `{str(truth.get('expanded_field_grade_source_hygiene_passed')).lower()}`",
+        f"- Internal performance champion present: `{str(truth.get('internal_performance_champion_present')).lower()}`",
+        f"- Current performance champion: `{truth.get('current_champion') or 'none'}`",
+        f"- Measured reference candidate: `{truth.get('measured_reference_candidate')}`",
+        f"- Development-selected candidate: `{truth.get('development_selected_candidate')}`",
+        f"- Reference candidate was protocol-selected: `{str(truth.get('candidate_was_protocol_selected')).lower()}`",
+        f"- Named baseline: `{truth.get('named_baseline')}`",
+        f"- Paired-day wins: `{truth.get('holdout_wins')}/{truth.get('holdout_count')}`",
+        f"- Mean skill delta: `{truth.get('mean_delta_vs_named_baseline')}`",
+        f"- Registered baseline mean wins: `{truth.get('registered_baseline_mean_win_count')}/{truth.get('registered_baseline_count')}`",
+        f"- All-baseline Holm gate passed: `{str(truth.get('candidate_beats_all_registered_baselines_after_holm')).lower()}`",
+        f"- Compatible routes: `{truth.get('compatibility_route_count')}`",
+        f"- Direct measured routes: `{truth.get('direct_measured_route_count')}`",
+        f"- Conditioned-synthetic routes: `{truth.get('conditioned_synthetic_route_count')}`",
+        f"- Raw baseline comparison wins: `{truth.get('raw_candidate_win_count')}/{truth.get('baseline_comparison_count')}`",
+        f"- Direct all-baseline global promotions: `{truth.get('direct_all_baseline_global_holm_positive_count')}`",
+        f"- Performance rows reviewed: `{truth.get('performance_rows_reviewed')}`",
+        f"- Legacy ready rows excluded: `{truth.get('legacy_ready_rows_excluded')}`",
+        f"- Numeric fallbacks: `{truth.get('numeric_fallback_count')}`",
+        f"- Geometry source inventory: `{truth.get('geometry_inventory_measured_source_count')}` measured sources / `{truth.get('geometry_inventory_measured_row_count')}` rows",
+        f"- Geometry source inventory is performance evidence: `{str(truth.get('geometry_inventory_is_performance_evidence')).lower()}`",
         f"- Buyer field replay request ready: `{str(truth.get('buyer_authorized_field_replay_request_ready')).lower()}`",
         f"- Field validation claim allowed: `false`",
         f"- Real dollar savings claim allowed: `false`",
@@ -397,8 +495,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Replay Lanes",
             "",
-            "| Lane | Wins | Comparisons | Win Rate | Rows | Mean Delta |",
-            "|---|---:|---:|---:|---:|---:|",
+            "| Lane | Evidence Mode | Wins | Comparisons | Global Holm Positive | Samples | Mean Delta |",
+            "|---|---|---:|---:|---:|---:|---:|",
         ]
     )
     for row in as_list(payload.get("locked_replay_lanes")):
@@ -406,10 +504,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         lines.append(
             "| "
             f"`{lane.get('lane')}` | "
+            f"`{lane.get('evidence_mode')}` | "
             f"{lane.get('candidate_win_count')} | "
             f"{lane.get('baseline_comparison_count')} | "
-            f"{lane.get('win_rate')} | "
-            f"{lane.get('estimated_rows')} | "
+            f"{lane.get('global_holm_positive_count')} | "
+            f"{lane.get('numeric_samples')} | "
             f"{lane.get('mean_score_delta')} |"
         )
 
@@ -423,10 +522,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Blocked context-only annual surface: `${dollar_gate.get('blocked_context_only_annual_value_usd')}`",
             f"- Safe line: {dollar_gate.get('safe_line')}",
             "",
-            "## First Outreach Lane",
+            "## Protocol Review Lane",
             "",
-            f"- Buyer: `{outreach.get('recommended_first_buyer')}`",
+            f"- Recommended buyer: `{outreach.get('recommended_first_buyer') or 'none'}`",
             f"- Action: {outreach.get('recommended_first_action')}",
+            f"- Paid protocol-review scoping allowed: `{str(outreach.get('paid_protocol_review_scoping_allowed')).lower()}`",
+            f"- Manual reviewed outreach allowed: `{str(outreach.get('manual_reviewed_outreach_allowed')).lower()}`",
             f"- Send gate: {outreach.get('send_gate')}",
             "",
             "## Next 10 Actions",

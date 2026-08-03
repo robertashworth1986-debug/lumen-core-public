@@ -20,8 +20,8 @@ This packet is decision support only. It does not authorize external sends, fina
 - Defensible claims ready: `true`
 - Decision routes: `5`
 - SAM submit-ready human-gated lanes: `4`
-- Data-room Markdown artifacts: `51`
-- Data-room control artifacts: `52`
+- Data-room Markdown artifacts: `104`
+- Data-room control artifacts: `56`
 - Reviewer lanes: `19`
 - Top-ready reviewer lanes: `10`
 - Paid evaluation offer allowed: `true`
@@ -30,7 +30,8 @@ This packet is decision support only. It does not authorize external sends, fina
 - Realized savings claim allowed: `false`
 - Patent grant claimed: `false`
 - Legal advice claimed: `false`
-- Reviewer gate clear: `true`
+- Reviewer packaging gate clear: `true`
+- Submission argument gate clear: `false`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
 - All final actions blocked without human: `true`
@@ -40,7 +41,7 @@ This packet is decision support only. It does not authorize external sends, fina
 - Legal/IP action without human: `false`
 - Live trading allowed: `false`
 - Capital movement without human: `false`
-- Pack SHA-256: `b5d4ae5dba03cc6ebf0948e8d80f6c33cb7eee5a5aadf3c9747a07103d29f639`
+- Pack SHA-256: `84cf2c29406dfaf5ff9b35e88b90c5161d6e35724a5914c1cca781e0b95eb3ea`
 
 ## Defensible Claims
 
@@ -167,13 +168,13 @@ This packet is decision support only. It does not authorize external sends, fina
 
 ## Source Ledgers
 
-- `reviewer_decision` `out/ops/reviewer_decision_brief_latest.json` present=`true` bytes=`29699` sha256=`438cc9e9b9f330980b171e7268ad35c269fadd8f16dfdf8f98681d79c9537271`
+- `reviewer_decision` `out/ops/reviewer_decision_brief_latest.json` present=`true` bytes=`29965` sha256=`7adfc419c8b8ec7af50ddbf47406c6781d77cc5ee191f014132eb09ed23a3fe8`
 - `sam_rush` `out/ops/sam_rush_submission_board_latest.json` present=`true` bytes=`27651` sha256=`4c60072e0b0294de5e80f29f3af263c7fb00d07b0767bdf1357bcf84970c720d`
 - `technical_gov` `out/ops/technical_gov_reviewer_approval_stack_latest.json` present=`true` bytes=`11922` sha256=`079ed4ebe8762bf0ab93b76d4fe290b9b52000d7c1f45aa6de7ce39b0da22b77`
-- `ip_counsel` `out/ops/ip_counsel_diligence_packet_latest.json` present=`true` bytes=`11291` sha256=`d7904915f51386724c5e5740af9da7e7ed806eaaafe4e09ea04b9cb88fc53648`
-- `quant_governance` `out/ops/autonomous_quant_governance_packet_latest.json` present=`true` bytes=`10038` sha256=`fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81`
-- `proof_to_pilot` `out/ops/proof_to_pilot_control_room_latest.json` present=`true` bytes=`9936` sha256=`20fdcc50fae67e320217b71ca130b00c3dce8b0ba0327441b0cfded23aef9267`
+- `ip_counsel` `out/ops/ip_counsel_diligence_packet_latest.json` present=`true` bytes=`13089` sha256=`d1ef448f97a2360f191f3f07d2cf61627ff1c527ee5fe4a82c1455166ce54d41`
+- `quant_governance` `out/ops/autonomous_quant_governance_packet_latest.json` present=`true` bytes=`10096` sha256=`58cd3145ac2982918b96943dcb7ba0c20610492f21c608c2fbd87c9fa13e433c`
+- `proof_to_pilot` `out/ops/proof_to_pilot_control_room_latest.json` present=`true` bytes=`9934` sha256=`e36fc90626f97825330fe4c7499e02c6c846a275e07e0ce8569e5e7fe26b0ffa`
 - `live_value` `out/ops/live_proof_value_meter_latest.json` present=`true` bytes=`20352` sha256=`07c416189aba2ac78d2a341986bdcde7dd6f229c530785f6e418efce9e05c7c2`
 - `authority` `out/ops/submission_authority_matrix_latest.json` present=`true` bytes=`33418` sha256=`616519280f524711e6e11c43e059a90cb5490efbcd3f29f4e22530dd3f6fa1ca`
-- `reviewer_gate` `out/ops/funding_sprint_reviewer_gate_latest.json` present=`true` bytes=`44208` sha256=`f87df88b282493cf511e441a6272cc60e2131a27ca93add662691aeb0d27f49a`
-- `data_room` `out/ops/data_room_manifest_latest.json` present=`true` bytes=`49467` sha256=`c92dd8bd0be7dbc8f7ab222a3a9590389b5dffa39b744460f90daf2abb8d84af`
+- `reviewer_gate` `out/ops/funding_sprint_reviewer_gate_latest.json` present=`true` bytes=`107666` sha256=`ae50f0f8d570a105fc87d13cdf8732c1657d7ee3e1e1cf72eb591f3c0f8443ba`
+- `data_room` `out/ops/data_room_manifest_latest.json` present=`true` bytes=`73099` sha256=`6e95b708125d4a4ab81f730fa7c5e692505125106cf93f58b407d7f1f8346127`

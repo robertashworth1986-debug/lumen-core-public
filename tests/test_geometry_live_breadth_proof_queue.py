@@ -41,7 +41,7 @@ def test_queue_ranks_every_family_and_keeps_claim_gates_closed():
     assert queue["valuation_posture"]["safe_estimated_annual_value_usd"] == live_meter[
         "value_gate"
     ]["allowed_estimated_annual_value_usd"]
-    assert queue["valuation_posture"]["safe_estimated_annual_value_usd"] > 0
+    assert queue["valuation_posture"]["safe_estimated_annual_value_usd"] == 0
     assert "not company valuation" in queue["valuation_posture"]["boundary"]
 
 

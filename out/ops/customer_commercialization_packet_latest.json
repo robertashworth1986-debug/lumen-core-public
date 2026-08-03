@@ -103,7 +103,7 @@
       "segment_id": "ip_or_compliance_reviewer"
     }
   ],
-  "customer_commercialization_sha256": "790927905252b9d759f50dc3eff4a25213ec144c44b6a43c86991c5061cba029",
+  "customer_commercialization_sha256": "82e8492f71886a6f37fcd064b01412b43cd40af2045d956ecfe04b29e8127306",
   "evidence_artifacts": [
     {
       "bytes": 23864,
@@ -118,28 +118,28 @@
       "sha256": "4f7520b12da081b0395f4ea821fe2be7bb8c6dcec6f6926908d112fe9b16b262"
     },
     {
-      "bytes": 8029,
+      "bytes": 9479,
       "path": "grant_submissions/funding_sprint_20260709/MEASURED_SOURCE_EVIDENCE_REGISTER_2026-07-09.md",
       "present": true,
-      "sha256": "b6257f98e9cad35a244aa02264dec019204c5ede27357cdadba76a1019a9fac6"
+      "sha256": "d404933d689c24d7b233fe781aa6d3bdad9557c057438e84d117ab2461a5edb6"
     },
     {
-      "bytes": 8625,
+      "bytes": 8679,
       "path": "grant_submissions/funding_sprint_20260709/EVTIT_TECHNICAL_SPRINT_SCOPE_PACKET_2026-07-09.md",
       "present": true,
-      "sha256": "f21c4af99226e6cd2554dc626df51e02f1dd909bb6fdf7095fdbda1dacb1df78"
+      "sha256": "bceebf8737af31dffa451624233348c29cf0430ab3f34b9ec30e2cff16f34eba"
     },
     {
-      "bytes": 10709,
+      "bytes": 10765,
       "path": "grant_submissions/funding_sprint_20260709/FEDERAL_SUBMISSION_PROTOCOL_PACKET_2026-07-09.md",
       "present": true,
-      "sha256": "ae8a41916c20207d4a2732d58c0e09a9a089809496696dfd822543751d27c13c"
+      "sha256": "97306f1e38ca70eabb8c70e41582fff239cb07a0150755e98449b5d8e2bb6ab2"
     },
     {
-      "bytes": 24099,
+      "bytes": 37885,
       "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
       "present": true,
-      "sha256": "cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390"
+      "sha256": "4193b2e8c04cc05b2d7f6e25ca096f2a06e6ed700c1df629dc7b238096ccb4aa"
     }
   ],
   "executive_summary": "LumenCore sells proof-to-pilot infrastructure for reviewers who need complex R&D translated into inspectable, source-backed, human-gated decision material. The first money motion is a paid proof or replay-scope sprint; the expansion path is pilot support, agency submission preparation, partner diligence rooms, and eventually recurring proof portal access.",
@@ -150,7 +150,7 @@
     "Route investors and venture builders to the 30-day technical and commercialization sprint.",
     "Route pilot partners to a data-boundary and acceptance-standard discussion before any private data exchange."
   ],
-  "generated_utc": "2026-07-17T21:49:15.257862+00:00",
+  "generated_utc": "2026-07-29T14:28:21.782354+00:00",
   "human_gate": {
     "accept_terms_allowed_without_human": false,
     "quote_price_allowed_without_human": false,
@@ -223,17 +223,17 @@
     "reviewer_gate": "out/ops/funding_sprint_reviewer_gate_latest.json",
     "traction": "out/ops/traction_opportunity_intake_ledger_latest.json"
   },
-  "status": "CUSTOMER_COMMERCIALIZATION_PACKET_READY_HUMAN_TERMS_REQUIRED",
+  "status": "CUSTOMER_COMMERCIALIZATION_PACKET_BLOCKED",
   "summary": {
     "all_final_actions_blocked_without_human": true,
-    "authority_status": "SUBMISSION_AUTHORITY_MATRIX_READY",
+    "authority_status": "SUBMISSION_AUTHORITY_MATRIX_BLOCKED",
     "award_claimed": false,
     "buyer_proof_check_count": 8,
     "current_probe_measured_sources": 23,
     "customer_result_claimed": false,
     "customer_segment_count": 5,
-    "data_room_control_artifact_count": 52,
-    "data_room_markdown_count": 51,
+    "data_room_control_artifact_count": 56,
+    "data_room_markdown_count": 115,
     "decision_lane_count": 19,
     "evidence_artifacts_present": true,
     "evtit_workstream_count": 6,
@@ -248,9 +248,9 @@
     "pricing_commitment_allowed_without_human": false,
     "private_file_share_allowed_without_human": false,
     "production_deployment_claimed": false,
-    "registry_enabled_sources": 29,
-    "registry_measured_sources": 25,
-    "reviewer_gate_clear": true,
+    "registry_enabled_sources": 17,
+    "registry_measured_sources": 11,
+    "reviewer_gate_clear": false,
     "schedule_allowed_without_human": false,
     "traction_lane_count": 20,
     "unsafe_claim_count": 0,

@@ -1,0 +1,59 @@
+{
+  "schema": "lumencore.kuramoto_sector_external_evaluator_result_receipt.v1",
+  "template_version": 1,
+  "status": "TEMPLATE_NOT_EVIDENCE",
+  "protocol": {
+    "accepted_protocol_payload_sha256": null,
+    "signed_payload_sha256": null,
+    "protocol_acceptance_utc": null
+  },
+  "execution": {
+    "source_commit": null,
+    "runner_sha256": null,
+    "environment_manifest_sha256": null,
+    "clean_runner_receipt_sha256": null,
+    "dataset_or_query_manifest_sha256": null,
+    "first_target_utc": null,
+    "last_target_utc": null,
+    "evaluation_origin_count": null,
+    "candidate_or_baseline_failure_count": null,
+    "outcome_dependent_exclusion_count": null
+  },
+  "technical_result": {
+    "primary_metric": null,
+    "candidate_metric": null,
+    "buyer_incumbent_metric": null,
+    "declared_baseline_results": null,
+    "paired_native_unit_delta_vs_incumbent": null,
+    "relative_improvement_percent_vs_incumbent": null,
+    "paired_bootstrap_95_lower_bound": null,
+    "paired_bootstrap_95_upper_bound": null,
+    "holm_adjusted_p_values": null,
+    "adverse_subgroup_results": null,
+    "all_required_checks_pass": false,
+    "sector_signal_supported": false
+  },
+  "economic_result": {
+    "technical_gate_passed": false,
+    "buyer_cost_rule_document_sha256": null,
+    "validated_native_unit_error_reduction_per_period": null,
+    "validated_periods_per_year": null,
+    "buyer_approved_cost_per_native_error_unit_usd": null,
+    "buyer_approved_attribution_fraction": null,
+    "annual_value_usd": null,
+    "economic_conversion_complete": false,
+    "savings_claim_allowed": false
+  },
+  "evaluator_attestation": {
+    "organization": null,
+    "authority_basis": null,
+    "conflict_disclosure": null,
+    "completed_utc": null,
+    "signature_method": null,
+    "signed_result_payload_sha256": null,
+    "detached_signature_artifact_sha256": null
+  },
+  "negative_result_retained": true,
+  "external_action_performed_by_template": false,
+  "claim_boundary": "This unfilled template is not evidence. A completed receipt supports only the exact frozen sector, data contract, candidate, baselines, metric, holdout, uncertainty method, evaluator authority, and economic rule it records. It does not establish universal superiority, unrelated-sector performance, realized savings, safety, deployment authorization, or procurement acceptance."
+}

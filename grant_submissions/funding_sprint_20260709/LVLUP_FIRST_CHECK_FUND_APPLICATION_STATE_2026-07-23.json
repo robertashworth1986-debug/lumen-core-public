@@ -1,0 +1,19 @@
+{
+  "claim_boundary": "This record reflects the user's sent application update and a brief reply from the fund contact acknowledging the update. It is not a portal-issued submission receipt and does not establish application completeness, review status, investment, selection, endorsement, funding, valuation, or a future outcome.",
+  "controls": {
+    "builder_can_apply": false,
+    "builder_can_email": false,
+    "do_not_duplicate_application": true,
+    "inbound_only": true,
+    "private_identifiers_omitted": true
+  },
+  "evidence": {
+    "fund_contact_acknowledgment_received_utc": "2026-07-09T02:46:57Z",
+    "official_portal_receipt_observed": false,
+    "user_application_update_sent_utc": "2026-07-09T02:42:00Z"
+  },
+  "lane_id": "lvlup_first_check_fund_application",
+  "next_action": "Monitor the existing thread for a substantive request or decision. Do not submit another application or send another proactive follow-up.",
+  "schema": "lumencore.lvlup_first_check_fund_application_state.v1",
+  "status": "USER_REPORTED_APPLICATION_ACKNOWLEDGED_NO_PORTAL_RECEIPT"
+}

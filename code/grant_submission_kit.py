@@ -28,9 +28,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from submission_conformance_guard import assess_submission_conformance
+
 ROOT = Path(__file__).resolve().parent.parent
 GRANTS = ROOT / "out" / "grants"
 DATA = ROOT / "data"
+CONFORMANCE_GATE_PATH = ROOT / "out" / "ops" / "submission_conformance_gate_latest.json"
+CONFORMANCE_MAX_AGE_HOURS = 24.0
 
 # Per-agency submission portals + AOR-required steps. Keyed by program_id prefix
 # matching the grant_catalog. URLs are public landing pages (safe to open).
@@ -195,6 +199,42 @@ def _is_nsf_sbir(grant_id: str, app: dict[str, Any]) -> bool:
     return "nsf" in blob and (
         "sbir" in blob or "small business innovation research" in blob
     )
+
+
+def _submission_conformance_inputs(
+    grant_id: str,
+    app: dict[str, Any],
+    catalog_entry: dict[str, Any] | None,
+) -> tuple[list[Any], list[Any]]:
+    readiness = app.get("submission_readiness")
+    if not isinstance(readiness, dict):
+        readiness = {}
+    conformance = app.get("submission_conformance")
+    if not isinstance(conformance, dict):
+        conformance = {}
+    catalog = catalog_entry if isinstance(catalog_entry, dict) else {}
+
+    explicit_lane_ids = [
+        app.get("submission_conformance_lane_id"),
+        app.get("conformance_lane_id"),
+        readiness.get("submission_conformance_lane_id"),
+        readiness.get("conformance_lane_id"),
+        conformance.get("lane_id"),
+        catalog.get("submission_conformance_lane_id"),
+        catalog.get("conformance_lane_id"),
+    ]
+    identifiers = [
+        grant_id,
+        app.get("grant_id"),
+        app.get("program_id"),
+        app.get("opp_num"),
+        app.get("opportunity_id"),
+        catalog.get("grant_id"),
+        catalog.get("program_id"),
+        catalog.get("opp_num"),
+        catalog.get("opportunity_id"),
+    ]
+    return identifiers, explicit_lane_ids
 
 
 def _opportunity_window(
@@ -425,8 +465,19 @@ def build_preflight(grant_id: str, run_dir: Path,
     app_p = run_dir / "application.json"
     state_p = run_dir / "approval_state.json"
     if not app_p.exists():
-        return {"ready": False, "blockers": ["application.json missing"],
-                "grant_id": grant_id}
+        return {
+            "ready": False,
+            "content_unlock": False,
+            "action_unlock": False,
+            "content_blockers": ["technical submission content cannot be assessed"],
+            "action_blockers": ["application.json missing"],
+            "blockers": [
+                "technical submission content cannot be assessed",
+                "application.json missing",
+            ],
+            "external_action_allowed_without_human": False,
+            "grant_id": grant_id,
+        }
     app = json.loads(app_p.read_text(encoding="utf-8"))
     state = (json.loads(state_p.read_text(encoding="utf-8"))
              if state_p.exists() else {})
@@ -444,6 +495,19 @@ def build_preflight(grant_id: str, run_dir: Path,
         if nsf_sbir and not nsf_invitation_id
         else "full_proposal"
     )
+    conformance_identifiers, explicit_lane_ids = _submission_conformance_inputs(
+        grant_id,
+        app,
+        catalog_entry,
+    )
+    submission_conformance = assess_submission_conformance(
+        gate_path=CONFORMANCE_GATE_PATH,
+        repo_root=ROOT,
+        identifiers=conformance_identifiers,
+        explicit_lane_ids=explicit_lane_ids,
+        max_age_hours=CONFORMANCE_MAX_AGE_HOURS,
+    )
+    content_blockers = list(submission_conformance.get("blockers") or [])
 
     if target_stage == "project_pitch":
         required_files = [
@@ -478,34 +542,34 @@ def build_preflight(grant_id: str, run_dir: Path,
         or app.get("deadline_typical"))
     opportunity_window = _opportunity_window(app, catalog_entry, deadline)
 
-    blockers: list[str] = []
+    action_blockers: list[str] = []
     warnings: list[str] = []
 
     if state.get("state") not in ("approved", "submitted"):
-        blockers.append(f"approval_state is '{state.get('state')}' — must be 'approved' before submission")
+        action_blockers.append(f"approval_state is '{state.get('state')}' — must be 'approved' before submission")
     if missing_files:
-        blockers.append(f"package missing required files: {missing_files}")
+        action_blockers.append(f"package missing required files: {missing_files}")
     if missing_fields:
-        blockers.append(f"package contains unresolved TO_BE_FILLED fields: {missing_fields}")
+        action_blockers.append(f"package contains unresolved TO_BE_FILLED fields: {missing_fields}")
     if not opportunity_window.get("actionable"):
-        blockers.append(
+        action_blockers.append(
             "opportunity window is not verified open: "
             f"{opportunity_window.get('status')} "
             f"({opportunity_window.get('reason')})"
         )
     if deadline.get("risk") == "expired":
-        blockers.append(f"deadline expired ({deadline.get('deadline')})")
+        action_blockers.append(f"deadline expired ({deadline.get('deadline')})")
     elif deadline.get("risk") == "critical":
         warnings.append(f"deadline in {deadline.get('days_remaining')} days — submit immediately")
 
     # Eligibility from the package
     elig = (app.get("eligibility") or {})
     if not elig.get("eligible", False):
-        blockers.append(f"eligibility check failed: {elig.get('reasons', [])}")
+        action_blockers.append(f"eligibility check failed: {elig.get('reasons', [])}")
 
     budget = app.get("budget")
     if not isinstance(budget, dict):
-        blockers.append("budget is missing from application.json")
+        action_blockers.append("budget is missing from application.json")
     else:
         ceiling = (
             (catalog_entry or {}).get("ceiling_usd")
@@ -514,7 +578,7 @@ def build_preflight(grant_id: str, run_dir: Path,
         total = budget.get("total")
         try:
             if int(total) > int(ceiling):
-                blockers.append(
+                action_blockers.append(
                     f"budget total ({total}) exceeds award ceiling ({ceiling})"
                 )
             elif int(total) < int(ceiling):
@@ -522,7 +586,7 @@ def build_preflight(grant_id: str, run_dir: Path,
                     f"budget requests {total} of the {ceiling} maximum; confirm the requested amount is intentional"
                 )
         except Exception:
-            blockers.append("budget total/ceiling is not numeric")
+            action_blockers.append("budget total/ceiling is not numeric")
         structure = (
             (catalog_entry or {}).get("budget_structure")
             if isinstance((catalog_entry or {}).get("budget_structure"), dict)
@@ -544,7 +608,7 @@ def build_preflight(grant_id: str, run_dir: Path,
                     else {}
                 )
                 if not period:
-                    blockers.append(
+                    action_blockers.append(
                         f"budget is missing required {period_name} separation"
                     )
                     continue
@@ -552,22 +616,22 @@ def build_preflight(grant_id: str, run_dir: Path,
                     if int(period.get("ceiling_usd")) > int(
                         structure.get(amount_key)
                     ):
-                        blockers.append(
+                        action_blockers.append(
                             f"{period_name} exceeds its official ceiling"
                         )
                     if int(period.get("months")) != int(
                         structure.get(months_key)
                     ):
-                        blockers.append(
+                        action_blockers.append(
                             f"{period_name} must be exactly "
                             f"{structure.get(months_key)} months"
                         )
                 except Exception:
-                    blockers.append(
+                    action_blockers.append(
                         f"{period_name} amount/months are not numeric"
                     )
     if not bool(app.get("funding_cap_verified", True)):
-        blockers.append(
+        action_blockers.append(
             "official solicitation funding ceiling has not been verified"
         )
 
@@ -586,11 +650,11 @@ def build_preflight(grant_id: str, run_dir: Path,
             )
     else:
         if sam_status != "active":
-            blockers.append("SAM.gov registration is not marked active")
+            action_blockers.append("SAM.gov registration is not marked active")
         if sam_expiration is None:
-            blockers.append("SAM.gov expiration date has not been verified")
+            action_blockers.append("SAM.gov expiration date has not been verified")
         elif sam_expiration.date() < datetime.now(timezone.utc).date():
-            blockers.append(
+            action_blockers.append(
                 f"SAM.gov registration expired ({sam_expiration.date().isoformat()})"
             )
         elif (sam_expiration.date() - datetime.now(timezone.utc).date()).days <= 30:
@@ -599,33 +663,36 @@ def build_preflight(grant_id: str, run_dir: Path,
                 f"({sam_expiration.date().isoformat()})"
             )
         if sam_verified_utc is None:
-            blockers.append("SAM.gov status has no verification timestamp")
+            action_blockers.append("SAM.gov status has no verification timestamp")
 
         if nsf_sbir:
             if not nsf_invitation_id:
-                blockers.append("NSF Project Pitch invitation/case identifier is missing")
+                action_blockers.append("NSF Project Pitch invitation/case identifier is missing")
             if not readiness.get("research_gov_account_verified"):
-                blockers.append("Research.gov account is not verified")
+                action_blockers.append("Research.gov account is not verified")
             if not str(readiness.get("nsf_sbc_registration_id") or "").strip():
-                blockers.append("NSF small-business registration ID is missing")
+                action_blockers.append("NSF small-business registration ID is missing")
         elif dod_sbir:
             if not readiness.get("dsip_account_verified"):
-                blockers.append(
+                action_blockers.append(
                     "DSIP account and submitter permissions are not verified"
                 )
             if not readiness.get("dod_compliance_verified"):
-                blockers.append(
+                action_blockers.append(
                     "DoD compliance review is incomplete (CMMC Level 2 "
                     "self-assessment, ITAR/EAR, foreign ownership/foreign "
                     "nationals, and topic security requirements)"
                 )
         else:
             if not readiness.get("grants_gov_account_verified"):
-                blockers.append("Grants.gov account linkage is not verified")
+                action_blockers.append("Grants.gov account linkage is not verified")
             if not readiness.get("aor_authority_verified"):
-                blockers.append("AOR submission authority is not verified")
+                action_blockers.append("AOR submission authority is not verified")
 
     sf424 = {} if dod_sbir else _sf424_field_map(app)
+    content_unlock = bool(submission_conformance.get("content_unlock"))
+    action_unlock = content_unlock and not action_blockers
+    blockers = content_blockers + action_blockers
 
     return {
         "grant_id": grant_id,
@@ -641,9 +708,15 @@ def build_preflight(grant_id: str, run_dir: Path,
         "opportunity_window": opportunity_window,
         "portal": portal,
         "sf424_map": sf424,
+        "submission_conformance": submission_conformance,
+        "content_blockers": content_blockers,
+        "action_blockers": action_blockers,
         "blockers": blockers,
         "warnings": warnings,
-        "ready": len(blockers) == 0,
+        "content_unlock": content_unlock,
+        "action_unlock": action_unlock,
+        "ready": action_unlock,
+        "external_action_allowed_without_human": False,
         "ceiling_usd": (
             (catalog_entry or {}).get("ceiling_usd")
             or (app.get("budget") or {}).get("ceiling_usd")
@@ -683,6 +756,8 @@ def write_submission_kit(grant_id: str, run_dir: Path,
         md.append(f"**Deadline:** {deadline.get('deadline')} "
                   f"({deadline.get('days_remaining')} days, risk={deadline.get('risk')})  ")
     md.append("")
+    md.append(f"**CONTENT UNLOCK:** {'YES' if p.get('content_unlock') else 'NO'}  ")
+    md.append(f"**ACTION UNLOCK FOR HUMAN:** {'YES' if p.get('action_unlock') else 'NO'}  ")
     md.append(f"**READY TO SUBMIT:** {'✅ YES' if p.get('ready') else '❌ NO'}")
     md.append("")
 

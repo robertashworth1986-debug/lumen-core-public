@@ -47,6 +47,8 @@ def test_live_evidence_harvest_skip_network_keeps_claim_gates_closed() -> None:
     assert summary["ready_for_real_dollar_claim"] is False
     assert summary["requested_max_rows_per_source"] == 250
     assert summary["requested_source_timeout_seconds"] == 30
-    assert summary["paired_inference_card_count"] == 5
+    assert summary["paired_inference_card_count"] == 4
+    assert summary["energy_pressure_ready_for_proxy_claim"] is False
+    assert summary["energy_stress_proxy_description_allowed"] is True
     assert 0 <= summary["holm_positive_card_count"] <= summary["paired_inference_card_count"]
     assert len(payload["next_actions"]) >= 5

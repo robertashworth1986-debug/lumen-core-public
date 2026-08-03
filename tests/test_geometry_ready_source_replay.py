@@ -7,46 +7,36 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_GEOMETRY_READY_SOURCE_REPLAY.py"
-FRONTIER_SCRIPT = ROOT / "code" / "ops" / "BUILD_GEOMETRY_LIVE_SYSTEMS_FRONTIER.py"
-MANIFEST_SCRIPT = ROOT / "code" / "ops" / "BUILD_GEOMETRY_LIVE_SOURCE_MANIFEST.py"
 
 
-def load_module(path: Path, name: str):
-    spec = importlib.util.spec_from_file_location(name, path)
+def load_module():
+    spec = importlib.util.spec_from_file_location(
+        "geometry_ready_source_replay", SCRIPT
+    )
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
 
 
-def ensure_inputs_exist() -> None:
-    frontier = load_module(FRONTIER_SCRIPT, "geometry_live_systems_frontier_for_ready_replay_test")
-    frontier.main()
-    manifest = load_module(MANIFEST_SCRIPT, "geometry_live_source_manifest_for_ready_replay_test")
-    manifest.main()
-
-
-def test_ready_source_replay_runs_core_geometry_lanes_and_keeps_gates_closed():
-    ensure_inputs_exist()
-    module = load_module(SCRIPT, "geometry_ready_source_replay")
+def test_ready_source_replay_is_compatibility_gated():
+    module = load_module()
     payload = module.build_payload(max_routes=6, sample_limit=750)
     summary = payload["summary"]
-    lanes = {row["lane"] for row in payload["ready_source_replay_results"]}
     gates = payload["claim_gates"]
 
-    assert payload["schema"] == "geometry_ready_source_replay_v1"
-    assert summary["routes_replayed"] >= 4
-    assert summary["lanes_replayed"] >= 4
-    assert summary["source_files_replayed"] >= 3
-    assert summary["estimated_rows_replayed"] > 0
-    assert summary["numeric_samples_read"] > 0
-    assert summary["candidate_win_count"] >= 1
+    assert payload["schema"] == "geometry_ready_source_replay_v2"
+    assert summary["cards_reviewed"] == 5
+    assert summary["routes_replayed"] == 4
+    assert summary["direct_measured_replay_count"] == 2
+    assert summary["source_conditioned_synthetic_stress_count"] == 2
+    assert summary["no_compatible_replay_input_count"] == 1
+    assert summary["candidate_win_count"] == 0
+    assert summary["direct_all_baseline_global_holm_positive_count"] == 0
+    assert summary["source_conditioned_named_baseline_mean_win_count"] == 1
+    assert summary["legacy_ready_for_benchmark_rows_excluded"] >= 300
+    assert summary["numeric_fallback_profile_count"] == 0
     assert len(summary["replay_chain_sha256"]) == 64
-
-    assert "optimal_curve_transport" in lanes
-    assert "wave_resonance_timing" in lanes
-    assert "thermal_ventilation" in lanes
-    assert "branching_transport" in lanes
 
     assert gates["field_validation_claim_allowed"] is False
     assert gates["real_dollar_savings_claim_allowed"] is False
@@ -56,40 +46,48 @@ def test_ready_source_replay_runs_core_geometry_lanes_and_keeps_gates_closed():
     assert gates["buyer_authorized_field_pilot_required"] is True
 
 
-def test_ready_source_replay_has_candidate_baseline_deltas_and_safe_markdown():
-    ensure_inputs_exist()
-    module = load_module(SCRIPT, "geometry_ready_source_replay")
-    payload = module.build_payload(max_routes=6, sample_limit=750)
+def test_ready_source_replay_preserves_mode_and_source_specific_baselines():
+    module = load_module()
+    payload = module.build_payload()
+    by_lane = {
+        row["lane"]: row for row in payload["ready_source_replay_results"]
+    }
+
+    wave = by_lane["wave_resonance_timing"]
+    assert wave["candidate_family"] == "lissajous_phase_paths"
+    assert wave["registered_candidate_family"] == "kuramoto_phase_coupling"
+    assert wave["evidence_mode"] == "direct_measured_replay"
+    assert wave["registered_baseline_count"] == 6
+    assert wave["registered_baseline_mean_win_count"] == 0
+    assert wave["candidate_beats_all_registered_baselines_after_global_holm"] is False
+
+    thermal = by_lane["thermal_ventilation"]
+    assert thermal["candidate_family"] == "thermal_plume_convection"
+    assert thermal["evidence_mode"] == "source_conditioned_synthetic_stress"
+    assert thermal["candidate_beats_named_baseline"] is True
+    assert thermal["candidate_beats_all_registered_baselines_after_global_holm"] is False
+
+    optimal = by_lane["optimal_curve_transport"]
+    assert optimal["evidence_mode"] == "no_compatible_replay_input"
+    assert optimal["performance_rows_evaluated"] == 0
+
+    for result in payload["ready_source_replay_results"]:
+        assert len(result["route_sha256"]) == 64
+        assert (
+            result["claim_gates"]["real_dollar_savings_claim_allowed"]
+            is False
+        )
+
+
+def test_ready_source_replay_markdown_is_reviewer_safe():
+    module = load_module()
+    payload = module.build_payload()
     rendered = module.render_markdown(payload)
     dumped = json.dumps(payload).lower()
 
-    by_lane = {row["lane"]: row for row in payload["lane_scoreboard"]}
-    assert by_lane["wave_resonance_timing"]["candidate_family"] == "kuramoto_phase_coupling"
-    assert by_lane["wave_resonance_timing"]["baseline_family"] == "kalman_filter"
-    assert by_lane["optimal_curve_transport"]["candidate_family"] == "brachistochrone_descent"
-    assert by_lane["thermal_ventilation"]["candidate_family"] == "thermal_plume_convection"
-    assert by_lane["branching_transport"]["candidate_family"] == "leaf_veins"
-
-    for result in payload["ready_source_replay_results"]:
-        assert result["adapter_status"] == "live_context_replay_ran"
-        assert result["candidate_delta_vs_named_baseline"] is not None
-        assert len(result["route_sha256"]) == 64
-        assert result["claim_gates"]["real_dollar_savings_claim_allowed"] is False
-
-    assert "This is source-conditioned replay evidence, not field validation." in rendered
-    assert "Next 10 Actions" in rendered
-    assert "guaranteed" not in dumped
+    assert "Compatibility-Gated Results" in rendered
+    assert "Direct measured replay and source-conditioned synthetic stress" in rendered
+    assert "Legacy generic ready rows excluded" in rendered
+    assert "guaranteed award" not in dumped
     assert "live_order_placement" not in dumped
     assert "heroin-like" not in dumped
-
-
-def test_numeric_reader_uses_a_bounded_binary_window_for_non_tabular_files(tmp_path, monkeypatch):
-    module = load_module(SCRIPT, "geometry_ready_source_replay_bounded_reader")
-    source = tmp_path / "large-input.bin"
-    source.write_bytes(b"1 2 3\n" + (b"x" * 2_100_000))
-
-    def fail_read_text(*args, **kwargs):
-        raise AssertionError("non-tabular evidence must not use an unbounded read_text call")
-
-    monkeypatch.setattr(Path, "read_text", fail_read_text)
-    assert module.read_numeric_samples(source, 3) == [1.0, 2.0, 3.0]

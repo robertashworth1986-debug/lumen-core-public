@@ -1,0 +1,35 @@
+{
+  "as_of_utc": "2026-07-27T02:19:39Z",
+  "claim_boundary": "This privacy-safe state records the one currently observed unsent Gmail draft whose lane is follow-up-limit-reached. It does not prove sender intent, delivery, receipt, selection, funding, an award, or authority to send or delete a draft.",
+  "controls": {
+    "conflicting_drafts_fail_closed": true,
+    "draft_deletion_performed": false,
+    "meeting_credentials_omitted": true,
+    "message_bodies_omitted": true,
+    "raw_draft_ids_omitted": true,
+    "raw_thread_ids_omitted": true,
+    "recipient_routes_omitted": true
+  },
+  "draft_count": 1,
+  "drafts": [
+    {
+      "conflict_type": "PROACTIVE_FOLLOWUP_LIMIT_EXHAUSTED",
+      "detected_utc": "2026-07-23T21:25:52Z",
+      "draft_body_omitted": true,
+      "draft_label_confirmed": true,
+      "gmail_draft_deleted": false,
+      "gmail_draft_id_sha256": "D772DF0DD621DB69BDF35DAB1F62F8D058A77FE6C1CC5EC3213240081FF88BEB",
+      "gmail_thread_id_sha256": "EBC5BA2C312A2D33C739DD07A9C9882D460F124D260FEAFFB42D345B0EB4C7CB",
+      "lane_id": "terry_vynetic_followup",
+      "meeting_details_omitted": true,
+      "recipient_route_omitted": true,
+      "safest_next_action": "Do not send or revive this draft. The proactive follow-up allowance is exhausted; respond only if a substantive inbound message contains a specific ask.",
+      "selected_template_id": "NO_DUPLICATE_MONITOR",
+      "send_now": false,
+      "subject_sha256": "B196013512573877F81CFDE8271A7BB77CB6935D2A703529CD4F82157BBC0915"
+    }
+  ],
+  "lane_count": 1,
+  "schema": "lumencore.outreach_draft_quarantine_state.v1",
+  "status": "CONFLICTING_GMAIL_DRAFTS_QUARANTINED_NO_SEND"
+}

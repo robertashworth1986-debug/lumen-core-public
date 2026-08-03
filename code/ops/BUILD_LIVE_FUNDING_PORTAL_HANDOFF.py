@@ -39,6 +39,23 @@ def stable_sha256(payload: Any) -> str:
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
+def package_receipt(relative_path: str) -> dict[str, Any]:
+    path = ROOT / relative_path
+    if not path.is_file():
+        return {
+            "path": relative_path,
+            "exists": False,
+            "bytes": None,
+            "sha256": None,
+        }
+    return {
+        "path": relative_path,
+        "exists": True,
+        "bytes": path.stat().st_size,
+        "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+    }
+
+
 def load_command_board(scan_date: date) -> dict[str, Any]:
     spec = importlib.util.spec_from_file_location("near_deadline_board", BOARD_SCRIPT)
     if spec is None or spec.loader is None:
@@ -46,7 +63,7 @@ def load_command_board(scan_date: date) -> dict[str, Any]:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     payload = module.build_payload(scan_date=scan_date)
-    if payload.get("schema") != "near_deadline_submission_command_board_v4":
+    if payload.get("schema") != "near_deadline_submission_command_board_v5":
         raise ValueError("Near-deadline command board is missing or stale")
     return payload
 
@@ -66,6 +83,10 @@ def queue_item(
     next_safe_action: list[str],
     stop_conditions: list[str],
 ) -> dict[str, Any]:
+    receipts = [
+        package_receipt(relative_path)
+        for relative_path in lane.get("package_files", [])
+    ]
     item = {
         "priority": priority,
         "opportunity_number": lane["opportunity_number"],
@@ -76,6 +97,10 @@ def queue_item(
         "command": lane["command"],
         "portal_url": portal_url,
         "package_files": lane.get("package_files", []),
+        "package_receipts": receipts,
+        "all_package_files_present": all(
+            receipt["exists"] for receipt in receipts
+        ),
         "next_safe_action": next_safe_action,
         "stop_conditions": stop_conditions,
         "human_gate": lane.get("human_gate", []),
@@ -158,40 +183,72 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
     nsf = lane_by_number(board, "26-510")
     erdc = lane_by_number(board, "W912HZ26SC005")
     launchtn = lane_by_number(board, "LAUNCHTN-3686-2026")
+    nashville_submitted = (
+        nashville.get("action_gate_status") == "PORTAL_SUBMISSION_CONFIRMED"
+    )
+    nashville_onboarding_due = (
+        nashville.get("action_gate_status")
+        == "COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE"
+    )
+    nashville_next_safe_action = (
+        [
+            "Preserve the portal confirmation and matching receipt; do not reopen, edit, or duplicate the submitted application.",
+            "Monitor inbound-only through the recorded expected August 3 result window and respond only to a genuinely new official request after human review.",
+        ]
+        if nashville_submitted
+        else [
+            "Review the Takeoff onboarding packet against the current signed-in onboarding form and participation agreement.",
+            "Verify the attendance commitments, agreement terms, exact cutoff, and any requested private facts without accepting or submitting them.",
+            "Reach only the complete onboarding review screen; stop before agreement acceptance, signature, attestation, payment, or final confirmation.",
+            "Finish founder review before July 31 because the official message does not state a cutoff time or timezone.",
+        ]
+        if nashville_onboarding_due
+        else [
+            "If this is the current signed-in page, inspect the visible application state before navigating anywhere.",
+            "Run `python code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py` and answer the six hidden prompts; require the ignored 11-answer fill map to validate without publishing values.",
+            "Populate only the supported answers from that private map and reach the complete preview.",
+            "Use the confirmed 11:59 p.m. July 17 close as the outside bound and submit early; do not resend the deadline query and do not treat the support reply as an application.",
+        ]
+    )
+    nashville_stop_conditions = (
+        [
+            "Any duplicate application, resubmission, portal edit, or outreach before a genuinely new official request.",
+            "Any claim that portal confirmation establishes selection, funding, acceptance, or an award.",
+        ]
+        if nashville_submitted
+        else [
+            "Any participation-agreement acceptance, signature, attestation, deposit, fee payment, or final onboarding confirmation.",
+            "Any answer that conflicts with the founder-reviewed onboarding packet or current official message.",
+        ]
+        if nashville_onboarding_due
+        else [
+            "Any fee payment, financial-aid agreement, program terms, cohort acceptance, attestation, or final submission.",
+            "Any portal answer that conflicts with the founder-confirmation artifact.",
+        ]
+    )
+    nashville_queue_lane = (
+        {
+            **nashville,
+            "human_gate": [
+                "Human review is required before any response to a new official result or request; no duplicate application or proactive follow-up is authorized."
+            ],
+        }
+        if nashville_submitted
+        else nashville
+    )
+
+    nashville_queue_item = queue_item(
+        nashville_queue_lane,
+        priority=1,
+        portal_url=nashville["official_url"],
+        next_safe_action=nashville_next_safe_action,
+        stop_conditions=nashville_stop_conditions,
+    )
+    if nashville_onboarding_due:
+        nashville_queue_item.pop("deadline_support", None)
 
     queue = [
-        queue_item(
-            nashville,
-            priority=1,
-            portal_url=nashville["official_url"],
-            next_safe_action=[
-                "If this is the current signed-in page, inspect the visible application state before navigating anywhere.",
-                "Run `python code/ops/CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py` and answer the six hidden prompts; require the ignored 11-answer fill map to validate without publishing values.",
-                "Populate only the supported answers from that private map and reach the complete preview.",
-                "Use the confirmed 11:59 p.m. July 17 close as the outside bound and submit early; do not resend the deadline query and do not treat the support reply as an application.",
-            ],
-            stop_conditions=[
-                "Any fee payment, financial-aid agreement, program terms, cohort acceptance, attestation, or final submission.",
-                "Any portal answer that conflicts with the founder-confirmation artifact.",
-            ],
-        ),
-        queue_item(
-            missionweave,
-            priority=2,
-            portal_url=missionweave["secondary_url"],
-            next_safe_action=[
-                "Verify the live DSIP countdown, organization linkage, and generated proposal number.",
-                "Capture the proposal number only in the ignored record, run the guarded private Volume 2 finalizer, and require its assigned-header PDF QA receipt without changing the public 15-file manifest, which remains neutral.",
-                "Run the hidden sectioned MissionWeave collector for identity, proposal, and compliance; it accepts no Firm PIN or credential and keeps action-time approval separate.",
-                f"Use the generated seven-volume checklist and move the public gate beyond {missionweave['action_gate_passed_private_gate_count']}/{missionweave['action_gate_required_private_gate_count']} by resolving only supported portal facts without exposing values.",
-                "Populate Volumes 1-7 from the bounded package and reach the complete preview.",
-            ],
-            stop_conditions=[
-                "Any unsupported legal-entity, SAM, UEI, CAGE, PI-employment, cost, award-history, ITAR/JCP, CMMC, foreign-affiliation, foreign-citizen, data-rights, or support-overlap representation.",
-                "Fraud, Waste, and Abuse training certification, signature, attestation, or final DSIP submission.",
-                "A live DSIP deadline that conflicts with the cross-source July 22, 2026 record.",
-            ],
-        ),
+        nashville_queue_item,
         queue_item(
             nsf,
             priority=5,
@@ -211,7 +268,7 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
             portal_url=erdc["secondary_url"],
             next_safe_action=[
                 "Verify the live ERDCWERX questions, amendments, organization match, and current funding posture.",
-                "Use the QA-passed technical PDF only after a private Phase II ROM is approved and inserted without entering the public repository.",
+                "Finalize the current public draft privately only after the Phase II ROM, SAM identity, contact email, and portal terms are approved.",
             ],
             stop_conditions=[
                 "Any private price, rate, SAM legal fact, terms acceptance, certification, or final portal submission.",
@@ -223,11 +280,13 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
             priority=7,
             portal_url=launchtn["official_url"],
             next_safe_action=[
-                "Confirm the founder-controlled legal, Tennessee, employment, funding-history, pricing, and raise facts.",
-                "Upload only the two hash-verified QA-passed attachments and reach the complete preview.",
+                "Confirm the founder-controlled legal, Tennessee, employment, and funding-history facts.",
+                "Build and inspect the LaunchTN-specific deck; approve or replace every financial-model assumption.",
+                "Recheck the live field schema, file limits, terms, and attestations. No upload set is currently approved.",
             ],
             stop_conditions=[
                 "Any unsupported eligibility, pricing, funding, legal, or employment answer.",
+                "Any attachment upload before the manifest reports a nonempty safe upload set.",
                 "Terms acceptance, attestation, or final submission.",
             ],
         ),
@@ -236,7 +295,7 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
     patent = board["operational_controls"]["patent_deadline_evidence"]
     sam = board["operational_controls"]["sam_public_key_rotation"]
     payload: dict[str, Any] = {
-        "schema": "lumencore.live_funding_portal_handoff.v2",
+        "schema": "lumencore.live_funding_portal_handoff.v3",
         "generated_utc": now_utc(),
         "operational_date": operational_date.isoformat(),
         "status": "SESSION_BROWSER_RESERVED_FOR_USER_AUTHENTICATION",
@@ -250,15 +309,37 @@ def build_payload(operational_date: date | None = None) -> dict[str, Any]:
             "browser_navigation_performed_by_builder": False,
             "credential_collection_allowed": False,
             "first_action_after_resume_signal": (
-                "Inspect the current URL and visible page without navigating. Continue the "
-                "current authenticated portal to its next safe preview before switching lanes."
+                "Inspect the current URL and visible page without navigating. If the page is "
+                "a submitted or closed lane, do not edit it; otherwise continue only to the "
+                "next non-mutating preview before switching lanes."
             ),
         },
         "priority_rule": (
-            "Preserve any authentication already in progress. Once authenticated, finish the "
-            "current listed portal to its next safe preview; otherwise use deadline priority."
+            "Submitted and closed lanes are monitor-only. Preserve authentication for an "
+            "unresolved listed lane and continue only to a safe preview; otherwise use "
+            "deadline priority without duplicating prior submissions."
         ),
         "queue": queue,
+        "closed_lanes": [
+            {
+                "opportunity_number": missionweave["opportunity_number"],
+                "title": missionweave["title"],
+                "command": missionweave["command"],
+                "deadline_date": missionweave["deadline_date"],
+                "deadline_utc": missionweave.get("deadline_utc"),
+                "official_deadline_text": (
+                    "July 22, 2026 at 12:00 p.m. Eastern Time (expired)."
+                ),
+                "status": "EXPIRED_WITHOUT_VERIFIED_SUBMISSION_NO_PORTAL_ACTION",
+                "safest_next_action": (
+                    "Preserve the package and gate receipts as historical evidence. "
+                    "Do not reopen DSIP, edit volumes, certify, or submit."
+                ),
+                "source_lane_sha256": missionweave["lane_sha256"],
+                "external_send_allowed_without_human": False,
+                "final_submit_allowed_without_human": False,
+            }
+        ],
         "account_maintenance": [
             {
                 "priority": 3,
@@ -347,6 +428,23 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Command: `{item['command']}`",
                 f"- Deadline: {item.get('official_deadline_text') or item['deadline_date']}",
                 f"- Portal: {item['portal_url']}",
+                (
+                    "- Package files present: "
+                    f"`{str(item['all_package_files_present']).lower()}` "
+                    f"({sum(receipt['exists'] for receipt in item['package_receipts'])}/"
+                    f"{len(item['package_receipts'])})"
+                ),
+                "- Package receipts:",
+            ]
+        )
+        for receipt in item["package_receipts"]:
+            lines.append(
+                "  - "
+                f"`{receipt['path']}` | exists=`{str(receipt['exists']).lower()}` "
+                f"| bytes=`{receipt['bytes']}` | sha256=`{receipt['sha256']}`"
+            )
+        lines.extend(
+            [
                 "- Next safe action:",
             ]
         )
@@ -387,6 +485,23 @@ def render_markdown(payload: dict[str, Any]) -> str:
             lines.append(f"  - {gate}")
         lines.extend(
             [
+                f"- External send without human: `{str(item['external_send_allowed_without_human']).lower()}`",
+                f"- Final submit without human: `{str(item['final_submit_allowed_without_human']).lower()}`",
+                f"- Source lane SHA-256: `{item['source_lane_sha256']}`",
+                "",
+            ]
+        )
+
+    lines.extend(["## Closed Lanes - No Portal Action", ""])
+    for item in payload["closed_lanes"]:
+        lines.extend(
+            [
+                f"### {item['opportunity_number']} - {item['title']}",
+                "",
+                f"- Status: `{item['status']}`",
+                f"- Command: `{item['command']}`",
+                f"- Deadline: {item.get('official_deadline_text') or item['deadline_date']}",
+                f"- Safest next action: {item['safest_next_action']}",
                 f"- External send without human: `{str(item['external_send_allowed_without_human']).lower()}`",
                 f"- Final submit without human: `{str(item['final_submit_allowed_without_human']).lower()}`",
                 f"- Source lane SHA-256: `{item['source_lane_sha256']}`",

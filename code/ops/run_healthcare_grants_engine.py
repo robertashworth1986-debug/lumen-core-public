@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import html
 import json
 import math
@@ -513,12 +514,26 @@ def action_label(days: int | None) -> str:
     if days < 0:
         return "CLOSED_OR_EXPIRED"
     if days <= 7:
-        return "IMMEDIATE_SUBMIT"
+        return "URGENT_REVIEW"
     if days <= 14:
-        return "FAST_TRACK"
+        return "EXPEDITED_REVIEW"
     if days <= 30:
-        return "ACTIVE_PIPELINE"
+        return "ACTIVE_REVIEW"
     return "WATCHLIST"
+
+
+def source_identity_sha256(row: dict[str, Any]) -> str:
+    payload = {
+        "number": row.get("number"),
+        "url": row.get("url"),
+        "open_date": row.get("open_date"),
+        "close_date": row.get("close_date"),
+        "source_channels": row.get("source_channels", []),
+        "source_files": row.get("source_files", []),
+    }
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
 
 
 def build_engine(
@@ -576,6 +591,14 @@ def build_engine(
                 "doc_type": row.get("doc_type"),
                 "url": row.get("url"),
                 "action": action_label(close_days),
+                "eligibility_status": "UNVERIFIED_REQUIRES_OFFICIAL_SOURCE_REVIEW",
+                "deadline_verified_utc": None,
+                "submission_authorized": False,
+                "abstention_reason": (
+                    "Official-source eligibility, current deadline, amendments, "
+                    "submission route, and organization authority are not verified."
+                ),
+                "source_sha256": source_identity_sha256(row),
                 "scores": {
                     "composite": round(composite_score, 4),
                     "healthcare": healthcare_score,
@@ -651,6 +674,11 @@ def csv_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "completeness_score": scores.get("completeness"),
                 "days_to_close": row.get("days_to_close"),
                 "action": row.get("action"),
+                "eligibility_status": row.get("eligibility_status"),
+                "deadline_verified_utc": row.get("deadline_verified_utc"),
+                "submission_authorized": row.get("submission_authorized"),
+                "abstention_reason": row.get("abstention_reason"),
+                "source_sha256": row.get("source_sha256"),
                 "number": row.get("number"),
                 "title": row.get("title"),
                 "agency": row.get("agency"),
@@ -776,7 +804,7 @@ def run(
     }
 
     payload = {
-        "schema": "healthcare_grants_engine_v1",
+        "schema": "healthcare_grants_engine_v2",
         "generated_utc": generated_utc,
         "scope": scope,
         "evidence": {

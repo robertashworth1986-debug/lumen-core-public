@@ -1,20 +1,19 @@
 # Field Money Truth Sweep
 
-Generated UTC: `2026-07-01T06:18:06.797925+00:00`
+Generated UTC: `2026-07-29T03:39:49.206159+00:00`
 
 This sweep is a hard truth gate. It runs or reads the current live-evidence, geometry, proof, vault, and claim artifacts, then states which commercial claims are allowed. It does not turn field validation or real-dollar savings true unless buyer/agency-authorized field data, preregistered holdouts, named baselines, accepted economic conversion factors, and auditable result artifacts exist.
 
 ## Current Truth
 
 - Registered families: `140`
-- Live adapter replay count: `4`
-- Measured sources / rows: `18` / `571`
+- Live adapter replay count: `5`
+- Measured sources / rows: `25` / `2580`
 - Candidate beats named baseline count: `4`
 - Triple-source rolling champions: `4`
 - Triple-source candidates: `0`
 - Rolling champions: `5`
-- Safe estimated value signal: `$4,520.00/hour`, `$39,595,200.00/year`
-- Blocked context-only value surface: `$52,288,496,940.00/year`
+- Claimable estimated value signal: `$0.00/hour`, `$0.00/year`
 
 ## Gates
 
@@ -25,9 +24,9 @@ This sweep is a hard truth gate. It runs or reads the current live-evidence, geo
 - double_dataset_frozen_assets_present: `true`
 - triple_dataset_frozen_assets_present: `true`
 - rolling_champion_present: `true`
-- glyph_or_external_vault_routed: `false`
+- glyph_or_external_vault_routed: `true`
 - vps_domain_live_dashboard_routed: `false`
-- bounded_estimated_value_claim_allowed: `true`
+- bounded_estimated_value_claim_allowed: `false`
 - paid_pilot_scoping_allowed: `true`
 - field_validation_claim_allowed: `false`
 - real_dollar_savings_claim_allowed: `false`
@@ -36,14 +35,13 @@ This sweep is a hard truth gate. It runs or reads the current live-evidence, geo
 
 ## Allowed Claim Now
 
-bounded estimated value signal plus paid pilot scoping: $4,520.00 / $39,595,200.00 under stated assumptions.
+bounded workflow pilot scoping with no dollar projection: $0.00 / $0.00. Quote only a scoped pilot fee; do not infer savings or model-performance value.
 
 ## Blockers
 
-- Only 4 live adapter replay lanes are currently represented for 140 registered families. This blocks all-family validation language.
-- External/Glyph proof vault is not currently verified as staged with copied hashes in the latest manifest.
+- Only 5 live adapter replay lanes are currently represented for 140 registered families. This blocks all-family validation language.
 - Field validation requires buyer or agency authorized operational data, preregistered holdouts, named incumbent baselines, accepted economic conversion factors, and auditable signed or traceable results.
-- Real dollar savings require field validation plus accepted economics. Estimated value is allowed; realized savings is blocked.
+- No current lane clears the buyer-approved dollar-projection gate. Input projections remain suppressed.
 - VPS/domain proof routing requires a verified deployed dashboard URL and fresh hosted artifact hashes; local dashboard JSON alone is not enough.
 
 ## Commands
@@ -59,4 +57,4 @@ Fast run using existing snapshots:
 pwsh -ExecutionPolicy Bypass -File .\tools\Run-FieldMoneyTruthSweep.ps1 -StageGlyphVault
 ```
 
-Truth-sweep hash: `5e4f98a73207be26f05425f13fda026374fd41d1ccd150d939ea89843b3bf074`
+Truth-sweep hash: `e3b2f2bc1a629d36c44b7a74acf847ea6cc203508ec4e8eef9337f36daea0176`

@@ -10,12 +10,46 @@
   },
   "lane_policies": [
     {
+      "lane_id": "argos_emi_teaming_inquiry",
+      "mode": "ONE_BOUNDED_INITIAL_OUTREACH_BEFORE_DEADLINE",
+      "eligible_template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
+      "not_before_utc": "2026-07-27T19:34:27Z",
+      "deadline_utc": "2026-07-30T21:00:00Z",
+      "partner_interest_target_utc": "2026-07-28T17:00:00Z",
+      "max_proactive_sends": 1,
+      "rationale": "The one permitted no-attachment partner fit-check was sent once on 2026-07-28 and verified in Gmail SENT. The proactive allowance is exhausted. Monitor for a specific inbound reply and do not resend; complete the Government capability statement independently before the deadline."
+    },
+    {
       "lane_id": "nashville_ec_takeoff_fall_2026",
-      "mode": "INBOUND_ONLY",
+      "mode": "ACCOUNT_ACTION",
       "eligible_template_id": null,
       "not_before_utc": null,
       "max_proactive_sends": 0,
-      "rationale": "Portal submission is confirmed; monitor through the stated review date and answer only a specific inbound request."
+      "rationale": "The cohort invitation is confirmed and the thank-you was already sent. Nashville EC replaced an invalid TakeOff payment link and reconfirmed the onboarding form and participation agreement deadline of July 31 plus the deposit deadline of August 14. The agreement and payment both require founder review, and no duplicate email is due."
+    },
+    {
+      "lane_id": "tsa_industry_portal_capability",
+      "mode": "PORTAL_ACTION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "TSA directed capability and meeting requests to its Industry Portal. The email acknowledgment was already sent, so prepare only a founder-reviewed portal entry and do not repeat email outreach."
+    },
+    {
+      "lane_id": "dla_amps_application_access",
+      "mode": "ACCOUNT_ACTION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The AMPS account is created, but the exact DLA application and external-user role have not been verified. Request no role until the sponsoring program or application point of contact confirms the exact name and access need."
+    },
+    {
+      "lane_id": "login_gov_new_device_signin",
+      "mode": "ACCOUNT_ACTION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "Login.gov reported a new-device sign-in. The user must recognize it or secure the account directly; no email reply or automated credential action is appropriate."
     },
     {
       "lane_id": "epri_open_power_ai_mou",
@@ -23,7 +57,31 @@
       "eligible_template_id": null,
       "not_before_utc": null,
       "max_proactive_sends": 0,
-      "rationale": "Identity and routing facts were already supplied; wait for an MOU, correction request, or onboarding question."
+      "rationale": "The onboarding facts were sent and an MRC invitation was received. Verify the explicitly requested logo files and permitted-use boundary before one action-time reviewed asset reply; do not repeat the onboarding facts or expose meeting details."
+    },
+    {
+      "lane_id": "pathway_working_capital_inquiry",
+      "mode": "PORTAL_ACTION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The official reply directs the inquiry to a financing portal with eligibility conditions. Any application requires founder review of truthful eligibility, terms, consent, and repayment obligations; no email follow-up is due."
+    },
+    {
+      "lane_id": "darpa_dice_abstract_status",
+      "mode": "CLOSED",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The official status discouraged a full proposal and requested no reply. Close without sending and retain only sanitized fit lessons."
+    },
+    {
+      "lane_id": "dhs_rfi_correction",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The agency correction request was answered with a corrected response. Monitor for a specific clarification or replacement request and do not duplicate either response."
     },
     {
       "lane_id": "georgia_patents_pro_bono_intake",
@@ -32,6 +90,22 @@
       "not_before_utc": null,
       "max_proactive_sends": 0,
       "rationale": "The organization stated that it does not provide the requested service for an already-filed application."
+    },
+    {
+      "lane_id": "uspto_document_services_copy_route",
+      "mode": "PORTAL_ACTION",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "Document Services supplied the official copy-order portal route but did not confirm unpublished-record scope, identity requirements, fees, delivery time, or any controlling deadline."
+    },
+    {
+      "lane_id": "nccu_ip_clinic_intake",
+      "mode": "CLOSED",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "The clinic is unavailable for summer and cannot accept matters with upcoming filing deadlines; close without reply and continue verified practitioner and official procedural routes."
     },
     {
       "lane_id": "lanl_vision_licensing_followup",
@@ -63,7 +137,7 @@
       "eligible_template_id": "COMPONENT_INSTRUCTION_ESCALATION",
       "not_before_utc": "2026-07-20T17:00:00Z",
       "max_proactive_sends": 1,
-      "rationale": "DSIP Support redirected the Volume V DD Form 2345/JCP instruction question to the DLA component POC already included on the original message. Draft at most one component follow-up after the Monday hold and only after a fresh full-thread check confirms no component reply."
+      "rationale": "The one historical component-instruction follow-up is already recorded in the sealed ledger. A later official DSIP response directs status verification to the read-only Past Proposals portal view, so the allowance remains exhausted and no additional email may be drafted or sent."
     },
     {
       "lane_id": "openai_build_week_prooflock",
@@ -88,6 +162,30 @@
       "not_before_utc": null,
       "max_proactive_sends": 0,
       "rationale": "Independent review continuation is confirmed; reply only if the investment committee requests information."
+    },
+    {
+      "lane_id": "lvlup_warm_investor_intro",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "One focused warm-introduction follow-up was sent on July 23. Monitor for a substantive introduction or question and do not send another proactive follow-up."
+    },
+    {
+      "lane_id": "lvlup_application_review_status",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "One application-status check was sent after the stated review window. Monitor for a substantive request or decision and do not send another proactive status check."
+    },
+    {
+      "lane_id": "third_sphere_seedstrap_direct_review",
+      "mode": "INBOUND_ONLY",
+      "eligible_template_id": null,
+      "not_before_utc": null,
+      "max_proactive_sends": 0,
+      "rationale": "One public-safe initial review request was sent to a verified official contact route on July 23. Monitor for a substantive response or official application instruction and do not send another proactive initial request."
     },
     {
       "lane_id": "terry_vynetic_followup",

@@ -1,0 +1,41 @@
+{
+  "schema": "lumencore.external_reviewer_meeting_invite_state.v1",
+  "generated_utc": "2026-07-28T04:17:45Z",
+  "status": "MEETING_CONFIRMED_INVITE_ACCEPTED_PREP_REQUIRED",
+  "lane_id": "stan_herring_product_validation_meeting",
+  "source": {
+    "channel": "GMAIL_THREAD_AND_PRIMARY_CALENDAR",
+    "latest_inbound_utc": "2026-07-28T01:55:52Z",
+    "subject": "Re: Identity systems, signal processing, computational modeling",
+    "subject_sha256": "80C194AE516C4B0019C9C1038FC711EDD9DC118F816A9258A19E60A31A18A13F",
+    "private_mail_identifiers_omitted": true,
+    "contact_details_omitted": true
+  },
+  "meeting": {
+    "title": "LumenCore product and validation review",
+    "start": "2026-07-28T14:00:00-05:00",
+    "end": "2026-07-28T14:30:00-05:00",
+    "timezone": "America/Chicago",
+    "location": "Nashville Entrepreneur Center",
+    "calendar_invite_created": true,
+    "guest_response_status": "accepted",
+    "calendar_event_identifier_omitted": true,
+    "meeting_credentials_omitted": true
+  },
+  "action": {
+    "email_reply_required": false,
+    "send_now": false,
+    "create_another_invite": false,
+    "selected_template_id": "NO_DUPLICATE_MEETING_PREP",
+    "safest_next_action": "Prepare the concise evidence-first meeting brief and use the accepted calendar event. Do not create or send a duplicate invitation."
+  },
+  "controls": {
+    "builder_can_send_email": false,
+    "builder_can_create_calendar_event": false,
+    "final_send_performed": false,
+    "duplicate_invite_prohibited": true,
+    "private_identifiers_omitted": true,
+    "meeting_credentials_omitted": true
+  },
+  "claim_boundary": "This state proves only that the recipient confirmed the proposed meeting time, one calendar invitation exists, and the guest accepted it. It does not prove attendance, independent validation, endorsement, investment interest, funding, partnership, product acceptance, technical performance, or commercial value."
+}

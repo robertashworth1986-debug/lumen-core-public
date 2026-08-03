@@ -1,8 +1,8 @@
 # OpenAI Build Week - Devpost Completion Kit
 
 Deadline: `2026-07-21T19:00:00-05:00` (`2026-07-22T00:00:00Z`)
-Observed portal state: `SIGNED_OUT` / `NOT_JOINED` / `NO_PROJECT_OBSERVED` / `NONE_OBSERVED`
-Existing readiness: `5/10` gates pass; final submission remains blocked.
+Observed portal state: `SIGNED_IN_AT_OBSERVATION` / `REGISTERED_CONFIRMED` / `DRAFT_2_OF_5_CONFIRMED` / `NONE_OBSERVED`
+Base readiness: `5/10` gates pass. Verified portal progress raises effective readiness to `6/10`; final submission remains blocked.
 
 ## Field Registry
 
@@ -11,12 +11,12 @@ Existing readiness: `5/10` gates pass; final submission remains blocked.
 | 1_manage_team | `team_members` | Teammates | `true` | `false` | `OPTIONAL_NOT_SELECTED` |
 | 2_project_overview | `project_name` | Project name | `true` | `true` | `SOURCE_BACKED_READY` |
 | 2_project_overview | `project_tagline` | Project tagline | `true` | `true` | `SOURCE_BACKED_READY` |
-| 2_project_overview | `thumbnail_image` | Thumbnail image for the Project Gallery | `true` | `true` | `MISSING_PUBLIC_ASSET` |
-| 3_project_details | `project_story` | Project story | `true` | `true` | `PARTIAL_MODEL_PROVENANCE_OPEN` |
-| 3_project_details | `built_with_tags` | Built with tags | `true` | `true` | `PARTIAL_MODEL_PROVENANCE_OPEN` |
+| 2_project_overview | `thumbnail_image` | Thumbnail image for the Project Gallery | `true` | `true` | `SOURCE_BACKED_LOCAL_UPLOAD_READY_PUBLICATION_OPEN` |
+| 3_project_details | `project_story` | Project story | `true` | `true` | `SOURCE_BACKED_READY_FINAL_PREVIEW_RECHECK_REQUIRED` |
+| 3_project_details | `built_with_tags` | Built with tags | `true` | `true` | `SOURCE_BACKED_READY_FINAL_PREVIEW_RECHECK_REQUIRED` |
 | 3_project_details | `try_it_out_link` | Try it Out links | `true` | `true` | `SOURCE_BACKED_READY_FINAL_PREVIEW_RECHECK_REQUIRED` |
 | 3_project_details | `image_gallery` | Image Gallery | `true` | `false` | `OPTIONAL_PRIVACY_REVIEW_OPEN` |
-| 3_project_details | `video_demo_link` | Video demo link | `true` | `true` | `MISSING_PUBLIC_YOUTUBE_VIDEO` |
+| 3_project_details | `video_demo_link` | Video demo link | `true` | `true` | `LOCAL_VIDEO_VERIFIED_PUBLICATION_OPEN` |
 | 4_additional_details | `submitter_type` | Submitter Type | `true` | `true` | `MISSING_HUMAN_LEGAL_INPUT` |
 | 4_additional_details | `country_of_residence` | Countries of Residence | `true` | `true` | `MISSING_PRIVATE_HUMAN_INPUT` |
 | 4_additional_details | `category` | unobserved custom label | `false` | `true` | `SOURCE_BACKED_READY_PORTAL_LABEL_UNOBSERVED` |
@@ -24,7 +24,7 @@ Existing readiness: `5/10` gates pass; final submission remains blocked.
 | 4_additional_details | `repository_license` | unobserved custom label | `false` | `true` | `SOURCE_BACKED_READY_HUMAN_REPRESENTATION_REQUIRED` |
 | 4_additional_details | `new_or_existing_project` | unobserved custom label | `false` | `true` | `SOURCE_BACKED_READY_PORTAL_LABEL_UNOBSERVED` |
 | 4_additional_details | `hackathon_improvement_explanation` | unobserved custom label | `false` | `true` | `SOURCE_BACKED_READY_PORTAL_LABEL_UNOBSERVED` |
-| 4_additional_details | `confirmed_model_identity` | unobserved custom label | `false` | `true` | `MISSING_DIRECT_MODEL_PROVENANCE` |
+| 4_additional_details | `confirmed_model_identity` | unobserved custom label | `false` | `true` | `SOURCE_BACKED_READY_PORTAL_LABEL_UNOBSERVED` |
 | 4_additional_details | `feedback_session_id` | unobserved custom label | `false` | `true` | `MISSING_FEEDBACK_SESSION_ID` |
 | 4_additional_details | `representative_authorization` | unobserved custom label | `false` | `true` | `MISSING_CONDITIONAL_LEGAL_ATTESTATION` |
 | 5_submit | `official_rules_and_terms` | Agree to the hackathon terms and conditions | `true` | `true` | `HUMAN_LEGAL_ACCEPTANCE_REQUIRED` |
@@ -57,12 +57,11 @@ Existing readiness: `5/10` gates pass; final submission remains blocked.
 
 ## Hard Stop Conditions
 
-- Devpost is signed out and the hackathon is not joined.
-- No Devpost project or submission confirmation exists.
-- The exact required model label is not confirmed.
+- Challenge registration and a two-of-five project draft are confirmed; no final submission confirmation exists.
+- Project details and additional information remain incomplete.
 - The `/feedback` Session ID is not present.
-- No public, privacy-reviewed, under-three-minute YouTube demo exists.
-- The thumbnail, entrant type, residence, representative authority, rules, publicity/IP terms, and final certification require human review.
+- A verified local under-three-minute demo exists, but no public YouTube URL is recorded.
+- Entrant type, residence, representative authority, rules, publicity/IP terms, and final certification require human review.
 - Contest-specific portal labels must be captured from the joined form before field population is called exact.
 
 ## Actions Not Authorized By This Kit
@@ -79,4 +78,4 @@ Existing readiness: `5/10` gates pass; final submission remains blocked.
 
 ## Claim Boundary
 
-This kit prepares source-backed draft content and a field-by-field completion contract. It does not prove model identity, a /feedback Session ID, eligibility, ownership, legal acceptance, Devpost authentication or registration, project creation, video publication, final submission, judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value.
+This kit prepares source-backed draft content and a field-by-field completion contract. It confirms a bounded project draft and locally verified release assets. It does not prove a /feedback Session ID, eligibility, ownership, legal acceptance, video publication, final submission, judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value.

@@ -1,0 +1,43 @@
+{
+  "as_of_date": "2026-07-29",
+  "authenticated_portal_access_performed": false,
+  "claim_boundary": "This audit establishes only the current public instructions, field limits, invitation gate, and listed schedule. It does not establish applicant eligibility, portal state, invitation status, or authority to submit.",
+  "not_verified_by_public_source_review": [
+    "Authenticated MyWork Project Pitch form schema and title limit.",
+    "Whether a Project Pitch is pending for the applicant.",
+    "Whether an open invitation or Phase I proposal exists.",
+    "Legal entity, ownership, employee-count, and U.S.-performance facts.",
+    "Principal Investigator employment and effort eligibility.",
+    "Applicant representations, certifications, and submission authority."
+  ],
+  "schema": "lumencore.nsf_project_pitch_source_audit.v1",
+  "scope": "CURRENT_PUBLIC_OFFICIAL_SOURCES_ONLY",
+  "sources": {
+    "project_pitch_details": "https://seedfund.nsf.gov/apply/project-pitch/",
+    "project_pitch_overview": "https://seedfund.nsf.gov/project-pitch/",
+    "solicitation_26_510": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation",
+    "solicitation_26_511": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology-0/nsf26-511/solicitation",
+    "solicitation_schedule": "https://seedfund.nsf.gov/solicitations/"
+  },
+  "verified_public_facts": {
+    "deadline_time": "17:00",
+    "deadline_timezone_semantics": "SUBMITTING_ORGANIZATION_LOCAL_TIME",
+    "field_limits": {
+      "Company and Team": 1750,
+      "Market Opportunity": 1750,
+      "Technical Objectives and Challenges": 3500,
+      "Technology Innovation": 3500
+    },
+    "full_proposal_requires_official_invitation": true,
+    "listed_full_proposal_deadlines": [
+      "2026-07-27",
+      "2026-11-04",
+      "2027-03-04",
+      "2027-07-07"
+    ],
+    "next_listed_full_proposal_deadline": "2026-11-04",
+    "one_active_pitch_invitation_or_phase_i_proposal_constraint": true,
+    "project_pitch_has_no_standalone_calendar_deadline": true,
+    "project_pitch_is_rolling": true
+  }
+}

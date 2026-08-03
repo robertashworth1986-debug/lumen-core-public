@@ -239,7 +239,12 @@ def build_payload() -> dict[str, Any]:
     autonomy_status = str(autonomy.get("status") or "")
     ip_status = str(ip.get("status") or "")
 
-    gate_clear = bool(gate.get("reviewer_gate_clear")) and int(gate_summary.get("unsafe_secret_count") or 0) == 0 and int(gate_summary.get("unsafe_claim_count") or 0) == 0
+    submission_argument_gate_clear = bool(gate.get("reviewer_gate_clear"))
+    reviewer_packaging_gate_clear = (
+        bool(gate_summary.get("packaging_checks_clear"))
+        and int(gate_summary.get("unsafe_secret_count") or 0) == 0
+        and int(gate_summary.get("unsafe_claim_count") or 0) == 0
+    )
     all_final_actions_blocked = bool(authority_summary.get("all_final_actions_blocked_without_human"))
     evidence_present = all(row["present"] for row in evidence_status)
     human_protocol_required = readiness["blocked_readiness_count"] > 0
@@ -248,7 +253,9 @@ def build_payload() -> dict[str, Any]:
         "generated_utc": now_utc(),
         "schema": "federal_submission_protocol_packet_v1",
         "status": "FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED"
-        if gate_clear and all_final_actions_blocked and evidence_present
+        if reviewer_packaging_gate_clear
+        and all_final_actions_blocked
+        and evidence_present
         else "FEDERAL_SUBMISSION_PROTOCOL_BLOCKED",
         "official_sources": OFFICIAL_SOURCES,
         "protocol_rows": PROTOCOL_ROWS,
@@ -258,7 +265,8 @@ def build_payload() -> dict[str, Any]:
             "protocol_gate_count": len(PROTOCOL_ROWS),
             "blocked_readiness_count": readiness["blocked_readiness_count"],
             "ready_flag_count": readiness["ready_flag_count"],
-            "reviewer_gate_clear": gate_clear,
+            "reviewer_packaging_gate_clear": reviewer_packaging_gate_clear,
+            "submission_argument_gate_clear": submission_argument_gate_clear,
             "unsafe_secret_count": int(gate_summary.get("unsafe_secret_count") or 0),
             "unsafe_claim_count": int(gate_summary.get("unsafe_claim_count") or 0),
             "all_final_actions_blocked_without_human": all_final_actions_blocked,
@@ -315,7 +323,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Protocol gates: `{summary['protocol_gate_count']}`",
         f"- Blocked readiness flags: `{summary['blocked_readiness_count']}`",
         f"- Ready flags: `{summary['ready_flag_count']}`",
-        f"- Reviewer gate clear: `{str(summary['reviewer_gate_clear']).lower()}`",
+        f"- Reviewer packaging gate clear: `{str(summary['reviewer_packaging_gate_clear']).lower()}`",
+        f"- Submission argument gate clear: `{str(summary['submission_argument_gate_clear']).lower()}`",
         f"- Unsafe sensitive hits: `{summary['unsafe_secret_count']}`",
         f"- Unsafe claim hits: `{summary['unsafe_claim_count']}`",
         f"- All final actions blocked without human: `{str(summary['all_final_actions_blocked_without_human']).lower()}`",

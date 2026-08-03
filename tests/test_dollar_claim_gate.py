@@ -39,6 +39,11 @@ def test_dollar_claim_gate_promotes_only_live_measured_lanes(tmp_path, monkeypat
                         "estimated_annual_value_usd": 109500000,
                         "baseline_loss_rate_usd_per_hour": 250000,
                         "optimization_gain_pct": 5,
+                        "baseline_protocol_locked": True,
+                        "buyer_approved_economic_conversion": True,
+                        "economic_conversion_source": "buyer-approved avoided-cost schedule",
+                        "prospective_or_heldout_validation_passed": True,
+                        "uncertainty_bounds_complete": True,
                     },
                     {
                         "source": "SIM_ONLY",
@@ -86,10 +91,13 @@ def test_dollar_claim_gate_promotes_only_live_measured_lanes(tmp_path, monkeypat
     assert payload["summary"]["allowed_estimated_value_claims"] == 1
     assert payload["summary"]["large_estimated_signal_claims"] == 1
     assert payload["summary"]["allowed_estimated_hourly_value_usd"] == 12500
-    assert payload["summary"]["blocked_context_only_annual_value_usd"] == 26280000000
+    assert payload["summary"]["blocked_context_only_annual_value_usd"] == 0
+    assert payload["summary"]["suppressed_input_projection_count"] == 2
     assert payload["context_only_or_blocked_lanes"]
     assert "bounded estimated value" in payload["estimated_value_lanes"][0]["allowed_language"]
-    assert "Do not promote the context-only annual figure" in "\n".join(payload["blocked_claim_language"])
+    assert "Do not publish or aggregate suppressed input projections" in "\n".join(payload["blocked_claim_language"])
+    assert payload["context_only_or_blocked_lanes"][0]["input_projection_suppressed"] is True
+    assert payload["context_only_or_blocked_lanes"][0]["estimated_annual_value_usd"] == 0
 
 
 def test_market_and_sports_lanes_are_never_profit_or_wagering_claims():
@@ -122,7 +130,9 @@ def test_market_and_sports_lanes_are_never_profit_or_wagering_claims():
         }
     )
 
-    assert market["status"] == "estimated_value_signal"
-    assert sports["status"] == "estimated_value_signal"
-    assert "Do not present as trading profit" in market["allowed_language"]
-    assert "wagering edge" in sports["allowed_language"]
+    assert market["status"] == "blocked_context_only"
+    assert sports["status"] == "blocked_context_only"
+    assert market["input_projection_suppressed"] is True
+    assert sports["input_projection_suppressed"] is True
+    assert "trading profit proven" in market["blocked_language"]
+    assert "worth X dollars by itself" in sports["blocked_language"]

@@ -1,71 +1,50 @@
-# SAM Rush Submission Board - 2026-07-10
+# Historical SAM Rush Submission Board - Current Scan 2026-07-29
 
-Purpose: convert the July 10 SAM/federal opportunity sweep into a ranked submission board and draft packet map.
+Purpose: preserve the July 10 SAM/federal opportunity sweep as historical candidate context without treating a current rebuild as a current official-source verification.
 
-Direct answer: pursue the four submit-ready lanes first, keep partner-only lanes out of final submission until qualified partners or credentials are confirmed, and skip no-bid lanes that would fail compliance.
+Direct answer: zero lanes are submit-ready from this historical sweep. Reverify every still-date-open candidate against its current official notice, amendments, eligibility, deadline, and submission route before staging work.
 
 This board prepares submissions. It does not authorize final SAM.gov/portal submit, legal certification, pricing, signature, term acceptance, or agency-validation claims without human review.
 
 ## Status
 
-- Status: `SAM_RUSH_BOARD_READY_HUMAN_SUBMIT_REQUIRED`
-- Scan date: `2026-07-10`
+- Status: `SAM_RUSH_BOARD_HISTORICAL_SOURCE_REVERIFY_REQUIRED`
+- Scan date: `2026-07-29`
 - Opportunities reviewed: `10`
-- Submit-ready human-gated lanes: `4`
-- Partner/watch lanes: `4`
-- No-bid lanes: `2`
-- Urgent within 14 days: `7`
-- Top submission lane: `693JJ326R000012 FHWA TSMO Data Initiative`
-- Fastest RFI lane: `80TECH26RFI0020 NASA Data Center Infrastructure RFI`
-- Strongest CSO lane: `W912HZ26SC005 ERDC Sovereign Defense Cloud CSO`
-- Fast small-business lane: `15BCMS26Q70000005 DOJ/BOP Historical Medical Claims Data Analysis`
+- Submit-ready human-gated lanes: `0`
+- Still-date-open historical candidates requiring source reverify: `3`
+- Expired and closed: `7`
+- Source observed UTC: `2026-07-10T00:00:00Z`
+- Source fresh: `false`
+- Source age hours: `476.58`
+- Partner/watch lanes: `0`
+- No-bid lanes: `0`
+- Urgent within 14 days: `2`
+- Top submission lane: `none`
 - External send without human: `false`
 - Final submission without human: `false`
 - Pricing without human: `false`
 - Legal certification without human: `false`
 - Live trading allowed: `false`
-- Board SHA-256: `1f8153c80d1d1876d7957e9bcb9c0a231a1cb98a6f024eaefb9dfe709a3aaa1f`
+- Board SHA-256: `407499bd4b4db3ae8886a9e5ba51f9916d8eb03e12457b843a0b1b8419ea571f`
 
 ## Submit-Ready, Human-Gated
 
-### 1. Transportation Systems Management and Operations Data Initiative
+## Source Reverify Required
 
-- Solicitation: `693JJ326R000012`
-- Deadline UTC: `2026-08-03T13:00:00Z`
-- Posture: `PRIMARY_SUBMISSION_PACKAGE_READY_HUMAN_SUBMIT`
-- Submission route: SAM.gov / official solicitation instructions
-- Package files:
-  - `FHWA_TSMO_PHASE1_TECHNICAL_CAPABILITY_OUTLINE_2026-07-09.md`
-  - `LUMENCORE_FHWA_TSMO_CAPABILITY_NOTE_693JJ326R000012_2026-07-09.pdf`
-  - `FHWA_TSMO_PHASE1_SUBMISSION_STUB_2026-07-10.md`
+- `693JJ326R000012`: deadline `2026-08-03T13:00:00Z`; source `STALE_REVERIFY_REQUIRED`; actionable `false`; official URL: https://sam.gov/opp/82cfdcdb95ae40a7b70dba615c31f89b/view
+- `W912HZ26SC005`: deadline `2026-08-07T21:00:00Z`; source `STALE_REVERIFY_REQUIRED`; actionable `false`; official URL: https://sam.gov/opp/8e32f0dfcdee42eeb3b2b03819a6ed25/view
+- `W900KK-26-R-0001`: deadline `2026-08-15T21:00:00Z`; source `STALE_REVERIFY_REQUIRED`; actionable `false`; official URL: https://sam.gov/opp/e577d0eef9a84d51aa46bce6ed779233/view
 
-### 2. Strategic Partnerships for NASA Data Center Infrastructure
+## Expired And Closed
 
-- Solicitation: `80TECH26RFI0020`
-- Deadline UTC: `2026-07-17T21:00:00Z`
-- Posture: `RFI_RESPONSE_READY_HUMAN_SEND`
-- Submission route: Email response per RFI instructions
-- Package files:
-  - `NASA_DATA_CENTER_RFI_RESPONSE_OUTLINE_2026-07-09.md`
-  - `NASA_DATA_CENTER_RFI_RESPONSE_STUB_2026-07-10.md`
-
-### 3. Sovereign Defense Cloud for High-Performance Computing Commercial Solutions Opening
-
-- Solicitation: `W912HZ26SC005`
-- Deadline UTC: `2026-08-07T21:00:00Z`
-- Posture: `CSO_CONCEPT_READY_HUMAN_PORTAL_SUBMIT`
-- Submission route: ERDCWERX Commercial Solutions Opening portal
-- Package files:
-  - `ERDC_SOVEREIGN_DEFENSE_CLOUD_CSO_CONCEPT_STUB_2026-07-10.md`
-
-### 4. Historical Medical Claims Data Analysis
-
-- Solicitation: `15BCMS26Q70000005`
-- Deadline UTC: `2026-07-23T15:00:00Z`
-- Posture: `QUOTE_STUB_READY_PRICE_AND_COMPLIANCE_GATE`
-- Submission route: Email quote per solicitation instructions
-- Package files:
-  - `DOJ_BOP_MEDICAL_CLAIMS_ANALYSIS_QUOTE_STUB_2026-07-10.md`
+- `80TECH26RFI0020`: deadline `2026-07-17T21:00:00Z`; actionable `false`.
+- `15BCMS26Q70000005`: deadline `2026-07-23T15:00:00Z`; actionable `false`.
+- `1131PL26R0049`: deadline `2026-07-22T17:00:00Z`; actionable `false`.
+- `ACCAPGAIDPRFI4`: deadline `2026-07-15T21:00:00Z`; actionable `false`.
+- `693JJ3-26-BAA-0004`: deadline `2026-07-20T19:00:00Z`; actionable `false`.
+- `7571TE26R00004`: deadline `2026-07-14T21:00:00Z`; actionable `false`.
+- `FA460026Q0071`: deadline `2026-07-20T16:00:00Z`; actionable `false`.
 
 ## Full Opportunity Board
 
@@ -77,9 +56,12 @@ This board prepares submissions. It does not authorize final SAM.gov/portal subm
 - Notice type: `Solicitation`
 - Set-aside: `Full and open`
 - Deadline UTC: `2026-08-03T13:00:00Z`
-- Days from 2026-07-10: `24`
-- Deadline bucket: `thirty_day_sprint`
-- Action bucket: `submit_ready_human_gate`
+- Days to deadline from current scan: `5`
+- Deadline bucket: `seven_day_sprint`
+- Deadline state: `OPEN`
+- Source freshness: `STALE_REVERIFY_REQUIRED`
+- Action bucket: `source_reverify_required`
+- Actionable: `false`
 - Fit score: `97`
 - Urgency score: `70`
 - Posture: `PRIMARY_SUBMISSION_PACKAGE_READY_HUMAN_SUBMIT`
@@ -109,9 +91,12 @@ This board prepares submissions. It does not authorize final SAM.gov/portal subm
 - Notice type: `Sources Sought / RFI`
 - Set-aside: `Market research`
 - Deadline UTC: `2026-07-17T21:00:00Z`
-- Days from 2026-07-10: `7`
-- Deadline bucket: `seven_day_sprint`
-- Action bucket: `submit_ready_human_gate`
+- Days to deadline from current scan: `-12`
+- Deadline bucket: `past_due`
+- Deadline state: `EXPIRED`
+- Source freshness: `STALE_REVERIFY_REQUIRED`
+- Action bucket: `expired_closed`
+- Actionable: `false`
 - Fit score: `91`
 - Urgency score: `90`
 - Posture: `RFI_RESPONSE_READY_HUMAN_SEND`
@@ -139,9 +124,12 @@ This board prepares submissions. It does not authorize final SAM.gov/portal subm
 - Notice type: `Special Notice / CSO`
 - Set-aside: `Full and open`
 - Deadline UTC: `2026-08-07T21:00:00Z`
-- Days from 2026-07-10: `28`
-- Deadline bucket: `thirty_day_sprint`
-- Action bucket: `submit_ready_human_gate`
+- Days to deadline from current scan: `9`
+- Deadline bucket: `two_week_sprint`
+- Deadline state: `OPEN`
+- Source freshness: `STALE_REVERIFY_REQUIRED`
+- Action bucket: `source_reverify_required`
+- Actionable: `false`
 - Fit score: `88`
 - Urgency score: `64`
 - Posture: `CSO_CONCEPT_READY_HUMAN_PORTAL_SUBMIT`
@@ -168,9 +156,12 @@ This board prepares submissions. It does not authorize final SAM.gov/portal subm
 - Notice type: `Combined Synopsis/Solicitation`
 - Set-aside: `Total small business set-aside`
 - Deadline UTC: `2026-07-23T15:00:00Z`
-- Days from 2026-07-10: `13`
-- Deadline bucket: `two_week_sprint`
-- Action bucket: `submit_ready_human_gate`
+- Days to deadline from current scan: `-6`
+- Deadline bucket: `past_due`
+- Deadline state: `EXPIRED`
+- Source freshness: `STALE_REVERIFY_REQUIRED`
+- Action bucket: `expired_closed`
+- Actionable: `false`
 - Fit score: `78`
 - Urgency score: `82`
 - Posture: `QUOTE_STUB_READY_PRICE_AND_COMPLIANCE_GATE`
@@ -197,9 +188,12 @@ This board prepares submissions. It does not authorize final SAM.gov/portal subm
 - Notice type: `Combined Synopsis/Solicitation`
 - Set-aside: `Total small business set-aside`
 - Deadline UTC: `2026-07-22T17:00:00Z`
-- Days from 2026-07-10: `12`
-- Deadline bucket: `two_week_sprint`
-- Action bucket: `partner_or_watch`
+- Days to deadline from current scan: `-7`
+- Deadline bucket: `past_due`
+- Deadline state: `EXPIRED`
+- Source freshness: `STALE_REVERIFY_REQUIRED`
+- Action bucket: `expired_closed`
+- Actionable: `false`
 - Fit score: `72`
 - Urgency score: `84`
 - Posture: `PARTNER_OR_SCOPING_NOTE_ONLY`
@@ -225,9 +219,12 @@ This board prepares submissions. It does not authorize final SAM.gov/portal subm
 - Notice type: `Sources Sought / RFI`
 - Set-aside: `Market research`
 - Deadline UTC: `2026-07-15T21:00:00Z`
-- Days from 2026-07-10: `5`
-- Deadline bucket: `seven_day_sprint`
-- Action bucket: `partner_or_watch`
+- Days to deadline from current scan: `-14`
+- Deadline bucket: `past_due`
+- Deadline state: `EXPIRED`
+- Source freshness: `STALE_REVERIFY_REQUIRED`
+- Action bucket: `expired_closed`
+- Actionable: `false`
 - Fit score: `70`
 - Urgency score: `94`
 - Posture: `PARTNER_CAPABILITY_NOTE_ONLY`
@@ -253,9 +250,12 @@ This board prepares submissions. It does not authorize final SAM.gov/portal subm
 - Notice type: `Special Notice / RFI`
 - Set-aside: `Market research`
 - Deadline UTC: `2026-08-15T21:00:00Z`
-- Days from 2026-07-10: `36`
-- Deadline bucket: `watchlist`
-- Action bucket: `partner_or_watch`
+- Days to deadline from current scan: `17`
+- Deadline bucket: `thirty_day_sprint`
+- Deadline state: `OPEN`
+- Source freshness: `STALE_REVERIFY_REQUIRED`
+- Action bucket: `source_reverify_required`
+- Actionable: `false`
 - Fit score: `69`
 - Urgency score: `48`
 - Posture: `WATCH_AND_PARTNER_FEEDBACK`
@@ -278,9 +278,12 @@ This board prepares submissions. It does not authorize final SAM.gov/portal subm
 - Notice type: `Solicitation / BAA`
 - Set-aside: `Full and open`
 - Deadline UTC: `2026-07-20T19:00:00Z`
-- Days from 2026-07-10: `10`
-- Deadline bucket: `two_week_sprint`
-- Action bucket: `partner_or_watch`
+- Days to deadline from current scan: `-9`
+- Deadline bucket: `past_due`
+- Deadline state: `EXPIRED`
+- Source freshness: `STALE_REVERIFY_REQUIRED`
+- Action bucket: `expired_closed`
+- Actionable: `false`
 - Fit score: `66`
 - Urgency score: `86`
 - Posture: `PARTNER_ONLY_TESTBED_REQUIRED`
@@ -303,9 +306,12 @@ This board prepares submissions. It does not authorize final SAM.gov/portal subm
 - Notice type: `Combined Synopsis/Solicitation`
 - Set-aside: `Full and open`
 - Deadline UTC: `2026-07-14T21:00:00Z`
-- Days from 2026-07-10: `4`
-- Deadline bucket: `seven_day_sprint`
-- Action bucket: `no_bid`
+- Days to deadline from current scan: `-15`
+- Deadline bucket: `past_due`
+- Deadline state: `EXPIRED`
+- Source freshness: `STALE_REVERIFY_REQUIRED`
+- Action bucket: `expired_closed`
+- Actionable: `false`
 - Fit score: `52`
 - Urgency score: `96`
 - Posture: `NO_SOLO_BID_PLATFORM_GATE`
@@ -328,9 +334,12 @@ This board prepares submissions. It does not authorize final SAM.gov/portal subm
 - Notice type: `Combined Synopsis/Solicitation`
 - Set-aside: `Total small business set-aside`
 - Deadline UTC: `2026-07-20T16:00:00Z`
-- Days from 2026-07-10: `10`
-- Deadline bucket: `two_week_sprint`
-- Action bucket: `no_bid`
+- Days to deadline from current scan: `-9`
+- Deadline bucket: `past_due`
+- Deadline state: `EXPIRED`
+- Source freshness: `STALE_REVERIFY_REQUIRED`
+- Action bucket: `expired_closed`
+- Actionable: `false`
 - Fit score: `35`
 - Urgency score: `86`
 - Posture: `NO_BID_AWS_RESELLER_GATE`

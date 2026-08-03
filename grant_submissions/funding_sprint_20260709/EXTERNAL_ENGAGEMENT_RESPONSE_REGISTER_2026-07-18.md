@@ -1,79 +1,112 @@
-# External Engagement Response Register - 2026-07-18
+# External Engagement Response Register - 2026-07-28
 
-Nashville EC's portal displayed a submission confirmation before the operational July 17 close, and the follow-up email says rolling-review next steps are expected by August 3. Monitor without resubmitting or implying selection. DARPA-SN-26-97 received the formal two-attachment RFI package after inviting an instructions-aligned submission; monitor the thread without claiming deadline compliance or receipt acceptance. The Cambridge Systematics response lead then confirmed that its FHWA team is already set and will not add partners, so that route is closed with no follow-up. Georgia PATENTS also confirmed that it does not provide the requested already-filed prosecution support, so that route is closed. No additional email should be sent now. Complete the overdue SAM account-key action and keep the QA-passed LaunchTN 3686 package staged for founder facts, assumption approval, and final preview. DARPA, EPRI, CDC, LANL, Terry, NASA, and Army are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility.
+An external technical adviser prospect confirmed the July 28 product-and-validation meeting time, and the calendar invitation was accepted. Prepare the evidence-first brief and do not create a duplicate event. Nashville EC selected LumenCore for the Fall 2026 TakeOff cohort. The official onboarding form and participation agreement are due July 31, with a separate deposit date of August 14; both remain founder-reviewed account actions, and no duplicate acceptance email is needed. Four optional information sessions were offered, but the email did not state a timezone, so verify the official calendar event before saving one. DARPA-SN-26-97 received the formal two-attachment RFI package after inviting an instructions-aligned submission; monitor the thread without claiming deadline compliance or receipt acceptance. The Cambridge Systematics response lead then confirmed that its FHWA team is already set and will not add partners, so that route is closed with no follow-up. Georgia PATENTS also confirmed that it does not provide the requested already-filed prosecution support, so that route is closed. No additional email should be sent now. The LANL bounded follow-up is already recorded in the sealed ledger, so its proactive allowance is exhausted and the existing thread is monitor-only. EPRI confirmed that all parties completed the consortium MOU and attached the completed document. Archive it privately, hash it, and review any onboarding obligations without replying or exposing signing details. The separately requested logo files remain pending canonical-asset and permitted-use review. Complete the overdue SAM account-key action and keep the LaunchTN 3686 lane fail-closed while the venue deck, financial assumptions, founder facts, portal schema, and final preview remain open. DARPA, EPRI, CDC, Terry, NASA, and Army are monitor-only. LvlUp confirmed that declining its optional paid sponsor track does not affect the separate investment and accelerator review, so monitor that thread without spending or sending a duplicate packet; duplicate sends would reduce credibility.
 
 ## Control Summary
 
 - Status: `CURRENT_RESPONSE_CONTROL_HUMAN_GATED`
-- Engagement records: `13`
-- Immediate human actions: `1`
-- Monitor-only lanes: `9`
-- Do-not-duplicate lanes: `12`
+- Engagement records: `15`
+- Immediate human actions: `3`
+- Monitor-only lanes: `7`
+- Mailbox rechecks due: `0`
+- Conflicting Gmail drafts: `1`
+- Quarantined draft lanes: `1`
+- Do-not-duplicate lanes: `14`
 - Verified attachments: `6`
 - All attachment checks pass: `true`
 - Autonomous external send allowed: `false`
 - Autonomous final portal submit allowed: `false`
-- Register SHA-256: `723fb32f0666bd75abc57b6c67101f5199b38132ce220268101bd0aca59a2cc4`
+- Register SHA-256: `f8d40b7a5d95c26a73c9affa9ec543f52898926dff05c2b9d456fa744b32ac49`
 
 ## Response Queue
 
 | Organization | State | Decision | Deadline / Hold | Duplicate Send |
 |---|---|---|---|---:|
-| Nashville Entrepreneur Center | `PORTAL_SUBMISSION_CONFIRMED` | `MONITOR_REVIEW_RESULT_NO_DUPLICATE` | 2026-07-17T23:59:00-05:00 | `true` |
-| Launch Tennessee 3686 Pitch Competition | `PORTAL_PACKET_QA_PASSED_HUMAN_FACTS_AND_FOUNDER_APPROVAL_REQUIRED` | `STAGE_PORTAL_FINAL_PREVIEW_REQUIRED` | 2026-08-13T23:59:00-05:00 | `false` |
-| EPRI Open Power AI Consortium | `OUTBOUND_SENT_MOU_PENDING` | `MONITOR_FOR_MOU_NO_DUPLICATE` | 2026-07-23 | `true` |
+| External technical adviser prospect | `MEETING_CONFIRMED_INVITE_ACCEPTED_PREP_REQUIRED` | `HUMAN_MEETING_PREP` | 2026-07-28T14:00:00-05:00 | `true` |
+| EMI Advisors LLC | `SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY` | `MONITOR_EXISTING_THREAD_NO_RESEND` | 2026-07-30T21:00:00Z | `true` |
+| Nashville Entrepreneur Center | `COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE` | `HUMAN_ACCOUNT_ACTION_BEFORE_ONBOARDING_DEADLINE` | 2026-07-31 | `true` |
+| Launch Tennessee 3686 Pitch Competition | `NO_SAFE_UPLOAD_SET_PORTAL_FACTS_AND_ATTACHMENT_GATES_OPEN` | `BUILD_ATTACHMENTS_RECHECK_PORTAL_THEN_STAGE_PREVIEW` | 2026-08-13T23:59:00-05:00 | `false` |
+| EPRI Open Power AI Consortium | `MOU_COMPLETED_BY_ALL_PARTIES_PRIVATE_CUSTODY_REQUIRED` | `PRIVATE_CUSTODY_REVIEW_REQUESTED_ASSET_PENDING_NO_REPLY` | None | `true` |
 | Georgia PATENTS | `SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION` | `CLOSE_SERVICE_SCOPE_NO_GO_NO_DUPLICATE` | None | `true` |
 | LvlUp Ventures / Power of the Pitch Week | `WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED` | `MONITOR_INDEPENDENT_REVIEW_NO_DUPLICATE` | None | `true` |
 | SAM.gov account credential control | `ROTATION_OVERDUE_REPLACEMENT_NOT_DETECTED` | `HUMAN_ACCOUNT_ACTION_REQUIRED_NO_EMAIL_REPLY` | 2026-07-16 | `true` |
 | Centers for Disease Control and Prevention | `RECEIPT_CONFIRMED_FOLLOW_UP_PENDING` | `MONITOR_NO_REPLY_REQUIRED` | 2026-07-30T21:00:00Z | `true` |
-| Los Alamos National Laboratory | `OUTBOUND_SENT_RESPONSE_PENDING` | `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP` | 2026-07-23 | `true` |
+| Los Alamos National Laboratory | `BOUNDED_FOLLOWUP_SENT_RESPONSE_PENDING_INBOUND_ONLY` | `FOLLOWUP_LIMIT_REACHED_NO_SEND` | 2026-07-23T14:00:00Z | `true` |
 | Terry Anderton / Vynetic | `OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY` | `MONITOR_NO_FURTHER_FOLLOWUP` | None | `true` |
 | DARPA Multi X Office | `FORMAL_RFI_PACKAGE_SENT_AGENCY_RECEIPT_PENDING` | `MONITOR_FORMAL_PACKAGE_NO_DUPLICATE` | 2026-07-17 | `true` |
 | Cambridge Systematics | `RESPONSE_LEAD_DECLINED_ADDITIONAL_PARTNER_TEAM_SET` | `CLOSE_NO_GO_TEAM_SET_NO_DUPLICATE` | 2026-08-03T09:00:00-04:00 | `true` |
 | NASA | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | 2026-07-17T21:00:00Z | `true` |
 | U.S. Army | `SENT_VERIFIED_RESPONSE_PENDING` | `MONITOR_NO_DUPLICATE` | None | `true` |
 
+### External technical adviser prospect
+
+- Lane: `stan_herring_product_validation_meeting`
+- State: `MEETING_CONFIRMED_INVITE_ACCEPTED_PREP_REQUIRED`
+- Decision: `HUMAN_MEETING_PREP`
+- Response channel: `CALENDAR`
+- Response ready: `false`
+- Send now: `false`
+- Action gate: Prepare the concise evidence-first meeting brief and use the accepted calendar event. Do not create or send a duplicate invitation.
+- Next action: Prepare the concise evidence-first meeting brief and use the accepted calendar event. Do not create or send a duplicate invitation.
+- Response artifact: `grant_submissions/funding_sprint_20260709/STAN_HERRING_MEETING_INVITE_STATE_2026-07-27.json`
+- Claim boundary: This state proves only that the recipient confirmed the proposed meeting time, one calendar invitation exists, and the guest accepted it. It does not prove attendance, independent validation, endorsement, investment interest, funding, partnership, product acceptance, technical performance, or commercial value.
+- Record SHA-256: `07023b06dd096b27a7c9d5bf5c0ff843781edbf746ecc5c0181484acd99946b1`
+
+### EMI Advisors LLC
+
+- Lane: `argos_emi_teaming_inquiry`
+- State: `SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY`
+- Decision: `MONITOR_EXISTING_THREAD_NO_RESEND`
+- Response channel: `EMAIL`
+- Response ready: `false`
+- Send now: `false`
+- Action gate: Do not resend either the EMI teaming inquiry or the Government response. The Government response was sent once before the July 30 deadline and its sent copy was verified. Treat the out-of-office notice as informational only; monitor for a substantive reply.
+- Next action: The bounded proactive outreach allowance is exhausted. Monitor the existing thread and respond only to a specific inbound request.
+- Response artifact: `grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json`
+- Claim boundary: The recorded mailbox and queue state establishes only that one bounded partner inquiry was sent once and the proactive allowance is exhausted. It does not prove delivery, recipient review, partner interest, teaming authority, Government submission, award, funding, validation, or agency acceptance.
+- Record SHA-256: `f15e5e30101627de1ef0e7d37d49041065f1a73642cdf9fe9fac6606faa85a5a`
+
 ### Nashville Entrepreneur Center
 
 - Lane: `nashville_ec_takeoff_fall_2026`
-- State: `PORTAL_SUBMISSION_CONFIRMED`
-- Decision: `MONITOR_REVIEW_RESULT_NO_DUPLICATE`
-- Response channel: `EMAIL_MONITOR_ONLY`
+- State: `COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE`
+- Decision: `HUMAN_ACCOUNT_ACTION_BEFORE_ONBOARDING_DEADLINE`
+- Response channel: `OFFICIAL_ONBOARDING_ROUTE`
 - Response ready: `false`
 - Send now: `false`
-- Action gate: Wait for the rolling review result through August 3. Reply only if NEC asks a specific question or requests a correction.
-- Next action: Monitor the existing account through August 3. Do not resubmit or reply to the automated confirmation, and do not describe the application as accepted, selected, or funded.
-- Response artifact: `grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json`
-- Claim boundary: This receipt records the portal confirmation page observed after submission. It does not prove acceptance into a cohort, selection, funding, endorsement, validation, revenue, or an award.
-- Record SHA-256: `dbccd7c4d02841b9e78130ec9b629aa08f652cc9b7392f0eeef0d5f6c3272225`
+- Action gate: Review and complete the official onboarding form and participation agreement by July 31. Preserve the corrected TakeOff payment route for founder-controlled payment by August 14. An information session is optional; verify its timezone and calendar conflicts before saving one. Do not accept the agreement, make a payment, or send another acceptance email automatically.
+- Next action: Review and complete the official onboarding form and participation agreement by July 31. Preserve the corrected TakeOff payment route for founder-controlled payment by August 14. An information session is optional; verify its timezone and calendar conflicts before saving one. Do not accept the agreement, make a payment, or send another acceptance email automatically.
+- Response artifact: `grant_submissions/funding_sprint_20260709/OFFICIAL_INBOUND_STATUS_EVENT_REGISTER_2026-07-25.json`
+- Claim boundary: This privacy-safe register records observed official routing and status events only. It does not establish eligibility, selection, endorsement, funding, an award, a contract, independent validation, licensing, portal completion, or technical performance.
+- Record SHA-256: `d001a6f83eeb9039a09f7a60a2b833a70c3229de6ff91471a611b224a5719059`
 
 ### Launch Tennessee 3686 Pitch Competition
 
 - Lane: `launchtn_3686_pitch_2026`
-- State: `PORTAL_PACKET_QA_PASSED_HUMAN_FACTS_AND_FOUNDER_APPROVAL_REQUIRED`
-- Decision: `STAGE_PORTAL_FINAL_PREVIEW_REQUIRED`
+- State: `NO_SAFE_UPLOAD_SET_PORTAL_FACTS_AND_ATTACHMENT_GATES_OPEN`
+- Decision: `BUILD_ATTACHMENTS_RECHECK_PORTAL_THEN_STAGE_PREVIEW`
 - Response channel: `PORTAL`
-- Response ready: `true`
+- Response ready: `false`
 - Send now: `false`
-- Action gate: Founder enters the 11 private, legal, employment, Tennessee-eligibility, funding-history, and pricing confirmations; approves the $250,000 illustrative raise and pricing assumptions; verifies both attachment hashes; then reviews the complete live preview before final submission.
-- Next action: Keep the portal staged. After founder facts and assumptions are confirmed, attach the hash-verified deck and financial model, inspect the final rendered application, and obtain action-time approval before submitting by August 13 at 11:59 PM CDT.
-- Response artifact: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json`
+- Action gate: Founder verifies legal, employment, Tennessee-eligibility, and funding-history facts; approves or replaces every financial assumption; reviews the venue-specific deck, live portal schema, terms, and complete preview before submission.
+- Next action: Build and inspect the LaunchTN-specific deck, approve or replace every financial assumption, recheck the live form and file limits, then stop at the complete final preview for action-time approval before August 13 at 11:59 PM CDT.
+- Response artifact: `grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-29.json`
 - Claim boundary: This is an application-preparation artifact. It does not claim a paying customer, booked revenue, signed pilot, external or field validation, partnership, endorsement, award, realized savings, product-market fit, investment, competition selection, or permission to submit without a founder-reviewed final preview.
-- Record SHA-256: `c8bf0aadfd308ab93664a3c1d22d4b78182b4ad60cf4242f1b6520ceb155a2a8`
+- Record SHA-256: `3a2d7b49b3a7164c353b443a77d53e1b62c5df24b9c044bc77cfe265de2f80d8`
 
 ### EPRI Open Power AI Consortium
 
 - Lane: `epri_open_power_ai_mou`
-- State: `OUTBOUND_SENT_MOU_PENDING`
-- Decision: `MONITOR_FOR_MOU_NO_DUPLICATE`
+- State: `MOU_COMPLETED_BY_ALL_PARTIES_PRIVATE_CUSTODY_REQUIRED`
+- Decision: `PRIVATE_CUSTODY_REVIEW_REQUESTED_ASSET_PENDING_NO_REPLY`
 - Response channel: `EMAIL_REPLY`
 - Response ready: `false`
 - Send now: `false`
-- Action gate: Reply only when EPRI sends the MOU, requests a correction, or asks for additional onboarding information.
-- Next action: Monitor the existing thread for the DocuSign envelope or a clarification request; do not resend identity details.
-- Response artifact: `grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json`
-- Claim boundary: This receipt records MOU-routing information only. The Gmail SENT record proves transmission of the administrative reply only. It does not establish an executed MOU, consortium membership, EPRI endorsement, independent validation, a pilot, funding, procurement, a contract, deployment, realized savings, or technical performance.
-- Record SHA-256: `dc4d563f61332f4261e235bb738eac440d7b75f67af95a28206dc0ca5a020a7b`
+- Action gate: Verify both canonical PNG logo files, the attachment inventory, and the permitted-use boundary before one private action-time review. Do not repeat the onboarding facts or expose meeting details.
+- Next action: Archive the completed agreement to a private evidence location, record its hash, and review obligations without exposing signing links or private identifiers. Keep the separate canonical-logo request pending until the exact files and permitted-use boundary receive action-time review.
+- Response artifact: `grant_submissions/funding_sprint_20260709/OFFICIAL_INBOUND_STATUS_EVENT_REGISTER_2026-07-25.json`
+- Claim boundary: This privacy-safe register records observed official routing and status events only. It does not establish eligibility, selection, endorsement, funding, an award, a contract, independent validation, licensing, portal completion, or technical performance.
+- Record SHA-256: `cf825583507ac0ee13db06d038f485016b19153f45a5c9f7d9892accfc852e2c`
 
 ### Georgia PATENTS
 
@@ -134,28 +167,16 @@ Nashville EC's portal displayed a submission confirmation before the operational
 ### Los Alamos National Laboratory
 
 - Lane: `lanl_vision_licensing_followup`
-- State: `OUTBOUND_SENT_RESPONSE_PENDING`
-- Decision: `MONITOR_THEN_ONE_BOUNDED_FOLLOW_UP`
+- State: `BOUNDED_FOLLOWUP_SENT_RESPONSE_PENDING_INBOUND_ONLY`
+- Decision: `FOLLOWUP_LIMIT_REACHED_NO_SEND`
 - Response channel: `EMAIL`
-- Response ready: `true`
+- Response ready: `false`
 - Send now: `false`
-- Action gate: No follow-up before 2026-07-23 unless LANL replies first; any NDA, licensing term, export-control question, or disclosure remains human-reviewed.
-- Next action: Wait for LANL. If no reply by July 23, use the single bounded follow-up template in this register.
-- Response artifact: `grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json`
+- Action gate: The bounded proactive outreach allowance is exhausted. Monitor the existing thread and respond only to a specific inbound request. Any NDA, licensing term, export-control question, disclosure, or final dispatch remains action-time human-reviewed.
+- Next action: The bounded proactive outreach allowance is exhausted. Monitor the existing thread and respond only to a specific inbound request.
+- Response artifact: `grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json`
 - Claim boundary: The Gmail SENT record and attachment hash prove transmission only. They do not establish LANL receipt, evaluation, a license, endorsement, independent validation, a pilot, funding, deployment, or contract performance.
-- Record SHA-256: `b58d53ebda9f491c1411d2e6a883d9a1b12d793b7df656956b57333707ad454b`
-
-**Held follow-up subject:** Follow-up: LumenCore package for LANL VISION licensing discussion
-
-```text
-Michael and Neil,
-
-I am following up on the bounded LumenCore package sent July 16. Would a short Stage 0 diligence session be useful to decide whether a VISION evaluation or licensing discussion is warranted? I am not asserting a license, LANL endorsement, field validation, or production readiness. I would welcome your preferred next step and any confidentiality or data-boundary requirements.
-
-Best regards,
-Robert Ashworth
-LumenCore
-```
+- Record SHA-256: `cdbf8735043b9eadf7ce40ba747ed60d4f8eec33e48b40898827f3669e7fee5f`
 
 ### Terry Anderton / Vynetic
 
@@ -165,11 +186,11 @@ LumenCore
 - Response channel: `EMAIL_REPLY_ONLY_IF_INBOUND`
 - Response ready: `false`
 - Send now: `false`
-- Action gate: No additional outbound message. If Terry replies, read the complete thread and answer only the specific ask without sending another broad deck.
-- Next action: Send nothing further unless Terry replies with a specific ask; then answer only that ask in the existing thread.
+- Action gate: Do not send or revive this draft. The proactive follow-up allowance is exhausted; respond only if a substantive inbound message contains a specific ask.
+- Next action: Do not send or revive this draft. The proactive follow-up allowance is exhausted; respond only if a substantive inbound message contains a specific ask.
 - Response artifact: `grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json`
 - Claim boundary: The mailbox record proves only that two near-duplicate follow-ups were sent and no inbound reply was observed at reconciliation time. It does not prove interest, rejection, selection, funding, or validation.
-- Record SHA-256: `a173499c539126e7e4f0a6d7f617b405e1560cb6f8a55b15435a82fff235045b`
+- Record SHA-256: `7f943be6c0ed5168d30eee6ccb8deb87f7131e8533c4657da39f7e0e4b49931f`
 
 ### DARPA Multi X Office
 
@@ -243,6 +264,8 @@ LumenCore
 - `lanl_engagement_receipt`: present=`true` bytes=`1414` sha256=`74303CFC65C85D9EF73FB80CC8177E5D08DF43D03264FFCE73251ACD2CD9E9D0` path=`grant_submissions/funding_sprint_20260709/LANL_VISION_FOLLOWUP_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - `epri_response_template`: present=`true` bytes=`1840` sha256=`EFCF4FDDCED28472AA67F73B9B3D687F4DD317D42CF0162E57530B59A0114371` path=`grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md`
 - `epri_engagement_receipt`: present=`true` bytes=`1481` sha256=`EBAFA995EB6D0BBC3749315F1F41EAC1CB0A28E56AE2EC6439C2E69757752EE8` path=`grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_ENGAGEMENT_RECEIPT_2026-07-16.json`
+- `epri_mou_signing_state`: present=`true` bytes=`1630` sha256=`39E878302B460187F635BF17FA3A5B5EFA991DBB63A5B295589B7BC03C43F1E6` path=`grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_SIGNING_STATE_2026-07-23.json`
+- `official_inbound_status_event_register`: present=`true` bytes=`23069` sha256=`320E8A6351C27A0A395DACDE7BBC1FE32D1ACEEB8E8A7596C77AECA485F39A6A` path=`grant_submissions/funding_sprint_20260709/OFFICIAL_INBOUND_STATUS_EVENT_REGISTER_2026-07-25.json`
 - `georgia_patents_response_template`: present=`true` bytes=`2822` sha256=`1AFB40471C270B6DC7D69D2B07D7718D5D57DB8D16B1CB96F6B42FADE33D2A39` path=`grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_RESPONSE_2026-07-16.md`
 - `georgia_patents_engagement_receipt`: present=`true` bytes=`1595` sha256=`F7041E085AB62A100A41C35D8E056A0E7FE4F47FFC37D5C463FA68C5EF3C3F5F` path=`grant_submissions/funding_sprint_20260709/GEORGIA_PATENTS_PRO_BONO_INTAKE_ENGAGEMENT_RECEIPT_2026-07-16.json`
 - `patent_deadline_control`: present=`true` bytes=`6671` sha256=`096904E114457C56383E495CFAD6C6E3D0D31596D6B53E2920099608B2B7519B` path=`grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json`
@@ -257,13 +280,17 @@ LumenCore
 - `nashville_official_deadline_confirmation`: present=`true` bytes=`2272` sha256=`DAC4B3120D9B4EC2A822198426939B89FE96BF7294C0CC251D1A299BB76B00E2` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_OFFICIAL_DEADLINE_CONFIRMATION_2026-07-17.json`
 - `nashville_submission_receipt`: present=`true` bytes=`1347` sha256=`E606530B0CCBAB06347BEF60DE527B4A76E5EE35BD7A15E71C3A0B49647BE505` path=`grant_submissions/NASHVILLE_EC_FALL_2026/NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json`
 - `nashville_private_fill_map`: present=`true` bytes=`0` sha256=`None` path=`grant_submissions/NASHVILLE_EC_FALL_2026/private/nashville_ec_portal_fill_map.private.json`
-- `launchtn_application_manifest`: present=`true` bytes=`22736` sha256=`16FE4E214430055532F6FB7F57453E0F47DAA648EE3E3B92B6050E17C98E3DC8` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-17.json`
-- `launchtn_pitch_deck`: present=`true` bytes=`353970` sha256=`C607E94D8E072EC9D9F93DA0D8C372FD5592B01D2CA3B4F71C0A079417C18A69` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx`
+- `launchtn_application_manifest`: present=`true` bytes=`25856` sha256=`9669A06D9B2283BBA31A06C6BA05696CE5DEE2B6CA20AD8B279903FAAB21AB42` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-29.json`
+- `launchtn_pitch_deck`: present=`true` bytes=`356729` sha256=`F0EDEBDBCF0C29457B01A40A9D7238A441797E024D72404815F08F2191A23B3A` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx`
 - `launchtn_financial_model`: present=`true` bytes=`16166` sha256=`9DA46F8AD94FC53EF561EE33DCFA6DF907897CAEADF6AFBD08FB113FC6887D94` path=`grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_FINANCIAL_MODEL_2026-07-17.xlsx`
 - `lvlup_historical_application_draft`: present=`true` bytes=`12152` sha256=`F75EBF8FD60A40968484D6AE147FB6D02848CA109AB277337C5BAE5085CBA796` path=`docs/LVLUP_VENTURES_APPLICATION_DRAFT_2026-07-03.md`
 - `lvlup_independent_review_confirmation`: present=`true` bytes=`1908` sha256=`F0E26BB6FAA2960B937B83DA4246A7CC7FF648FAD27CFDAA39F9873FD7BE7CFC` path=`grant_submissions/funding_sprint_20260709/LVLUP_INDEPENDENT_REVIEW_CONFIRMATION_2026-07-17.json`
-- `sam_public_credential_rotation_control`: present=`true` bytes=`4544` sha256=`AAC20E903A5055E731DA65E5E5A82F08D5C34A7288AA6BED4D0ED78C4F0BE159` path=`grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
-- `email_action_reconciliation`: present=`true` bytes=`22013` sha256=`03A37247ADC69552E7B02E39E0A96A716B29E422D3AC2B62B133B11D920B06F1` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json`
+- `sam_public_credential_rotation_control`: present=`true` bytes=`4904` sha256=`716CF92B8DD10C20A088AB7265FB98EA913D0A26E5804F8C0E9DC086DDDD51CB` path=`grant_submissions/funding_sprint_20260709/SAM_PUBLIC_CREDENTIAL_ROTATION_CONTROL_2026-07-16.json`
+- `email_action_reconciliation`: present=`true` bytes=`47425` sha256=`573DBF74FF3699173654DEABC71B88E4A1F6A521CEF24BDAEE1A6EEE14B032BD` path=`grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json`
+- `outreach_followup_action_queue`: present=`true` bytes=`37493` sha256=`F0CEA3CED0592240745A06328118AB3B8A88B71692D5F5469B3D8D9818F18F57` path=`grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json`
+- `argos_partner_outreach_status`: present=`true` bytes=`2989` sha256=`62417E4BBCC0AD5BA2AB38C76398651EEFA89E443A9EF06C9ECFA3BA1452C95E` path=`grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json`
+- `stan_meeting_invite_state`: present=`true` bytes=`1942` sha256=`206D105AB1063914BE7EDB2481FC2BF7FD59EF260533D6DD55CD35535A2A402B` path=`grant_submissions/funding_sprint_20260709/STAN_HERRING_MEETING_INVITE_STATE_2026-07-27.json`
+- `outreach_draft_quarantine_state`: present=`true` bytes=`1671` sha256=`AD010FC23FD470B6771DB6528AF665828E0365C5B07AF947AFCB56EE7FBCA448` path=`grant_submissions/funding_sprint_20260709/OUTREACH_DRAFT_QUARANTINE_STATE_2026-07-23.json`
 - `darpa_sn_26_97_public_submission_receipt`: present=`true` bytes=`2834` sha256=`89B64A1A282AB72F0738E068952A14A82E38F5AEC4A78C1B7D2B4F4930410CB4` path=`grant_submissions/funding_sprint_20260709/DARPA_SN_26_97_PUBLIC_SUBMISSION_RECEIPT_2026-07-17.json`
 - `fhwa_teaming_template`: present=`true` bytes=`2114` sha256=`6614F9D452565F9E5F54B3E70B45E93F112DD1293A8845E43489E339D34B0819` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md`
 - `fhwa_partner_outreach_control`: present=`true` bytes=`12675` sha256=`39CBFE5F1C5DB55C33D249ADCFDE1F04AE3983D69D1737F00A97403E168AF364` path=`grant_submissions/funding_sprint_20260709/FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json`

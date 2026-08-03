@@ -1,71 +1,56 @@
 # LumenCore Business Plan and Investor Diligence Brief
 
-Updated: 2026-07-03
+## Current Contract
 
-## Core Position
+- Performance champion: **none**
+- Direct all-baseline global Holm promotions: **0**
+- Proven cross-sector gains: **0/6**
+- Kuramoto measured reference: **482/1525** paired holdouts against `kalman_local_linear_trend`
+- Kuramoto mean delta: **-0.508191**
+- Kuramoto selection status: measured negative reference, not development-selected
+- Development-selected candidate tracked separately: `lissajous_phase_paths`; not a champion
+- Claimable modeled dollar outcome: **$0**
+- Enterprise valuation: **not asserted**
 
-LumenCore is a hash-verified replay and benchmark platform for infrastructure AI. It turns live and approved data into locked baseline-vs-candidate evidence that can be inspected by buyers, labs, agencies, and investors.
+LumenCore does not currently claim performance superiority, sector efficiency, field performance, realized savings, buyer ROI, trading edge, or enterprise value from the geometry research lane.
 
-## Current Strongest Proof
+## Business Position
 
-- Champion: `kuramoto_phase_coupling`
-- Baseline: `kalman_filter`
-- Lane: `wave_resonance_timing`
-- Holdout result: `24/24` source-conditioned wins
-- Estimated champion replay rows: `2,506,267`
-- Numeric samples: `66,690`
-- Mean delta vs named baseline: `0.140668`
-- Minimum delta vs named baseline: `0.044697`
-- Wilson 95% lower bound: `0.862024`
+LumenCore is a governed evidence workflow for source-native benchmarking. It maps each source and task to appropriate incumbent baselines, freezes chronology and inputs, records positive and negative results, and keeps commercial language inside cleared evidence gates.
 
-Boundary: internal replay champion; not field validation and not realized savings.
+## Benchmark Coverage
 
-## Accepted-Metric Bridge
+- Compatibility-qualified routes: `4`
+- Named-baseline comparisons: `22`
+- Direct measured routes: `2`
+- Conditioned-synthetic routes: `2`
+- Performance rows inspected: `32608`
 
-LumenCore has an internal Kuramoto phase-coupling champion with accepted-metric proxy diagnostics ready for external replay discussion: order-parameter-like coherence and phase-bound stress proxies. Critical coupling and IEEE grid-case claims remain explicit next validation gates.
+Coverage, hashes, and custody improve reviewability. They do not establish superiority, savings, or enterprise value.
 
-- Proxy metrics ready: `2`
-- External/adaptor gates still blocked: `2`
-- Accepted metric proxy language allowed: `true`
-- Audit SHA-256: `a760f2a55c5c7390db9156f81feecbe2bf7c6b623be2afca3476969dc1777d8a`
+## Allowed Commercial Offers
 
-Boundary: order-parameter and phase-bound language is proxy-only; critical coupling and IEEE claims remain locked until implemented or supplied by an external owner.
+- Source-native protocol review: **$2,500-$7,500**
+- Optional benchmark implementation: **$7,500-$25,000** after data rights, native metrics, baselines, and acceptance criteria are locked
+- **ProofLock Opportunity Operations**: separately scopeable product-process discovery; pricing follows workflow discovery
 
-## Locked Baseline Sweep
+Service prices describe work. They are not modeled outcomes, ROI, realized savings, or enterprise valuation.
 
-- Routes replayed: `313`
-- Baseline comparisons: `1,969`
-- Candidate wins: `1,355`
-- Losses/ties: `614`
-- Estimated rows replayed: `7,152,253`
-- Numeric samples: `92,056`
-- Source count: `159`
+## ProofLock Boundary
 
-## Federal Validation And Contract Readiness
+This offer is for a human-controlled opportunity workflow. It does not inherit performance, savings, award, or field-validation claims from the geometry research lane.
 
-LumenCore's highest-value non-dilutive lane is a repeatable government-review package: technical abstract, proof annex, cost template, SAM/UEI readiness, and a reviewer-safe evidence boundary. DARPA-style opportunity assets and NIST/SBIR packet assets are available locally, but any submission should be promoted only after eligibility, deadline, and portal status are verified.
+ProofLock must be evaluated against the buyer's existing opportunity workflow. It inherits no geometry performance, savings, award, or field-validation claim.
 
-- DARPA-style assets include abstract, executive-summary, technical/management, cost, and accelerated-award templates.
-- NIST/SBIR packet assets include technical volume, commercialization plan, budget, cover letter, manifest, and submit instructions.
-- SAM.gov and agency scans should become a weekly opportunity pipeline, not a one-off scramble.
-- Investor value: a funded bridge improves the chance of external validation, paid evidence reviews, and non-dilutive award capture without overstating current proof.
+## Current Valuation Boundary
 
-## Valuation / Raise
+No enterprise valuation is asserted. Any financing valuation requires independent diligence, external validation, customer evidence, revenue evidence, and negotiation.
 
-- Raise target: `$250,000-$500,000` validation and pilot bridge
-- Target valuation: `$10M post-money SAFE valuation cap`
-- Negotiation band: `$8M-$12M` post-money cap
-- If pre-money is required: `$8M-$10M target pre-money`
-- Revenue stage: pre-revenue / pilot-stage unless a signed paid pilot is confirmed
+## Next Evidence Gates
 
-## Bounded Dollar Language
+1. Lock an external owner's source, incumbent baseline, native metric, holdout, and acceptance criteria.
+2. Preserve negative and null results alongside research leads.
+3. Require frozen source-specific all-baseline testing with multiplicity control before promotion.
+4. Measure ProofLock independently against a buyer's current workflow.
 
-Current internal dollar gate supports bounded estimated opportunity language up to approximately `$4,520/hour` or `$39,595,200/year` under stated assumptions. This is not realized savings.
-
-## AI-Assisted Execution Leverage
-
-Continuous GPT/Codex-assisted work supports valuation only through committed code, repeatable tests, proof hashes, evidence packets, outreach, and reproducible operating leverage. It is not a field-validation claim by itself.
-
-## First Commercial Ask
-
-Paid evidence reviews and buyer-authorized replay pilots first; annual platform licenses after independent validation; grant-funded validation where appropriate; optional success-fee structures only after the buyer locks the baseline, acceptance metric, and avoided-cost conversion.
+Contract validated: `2026-07-29T08:01:36.467874+00:00`

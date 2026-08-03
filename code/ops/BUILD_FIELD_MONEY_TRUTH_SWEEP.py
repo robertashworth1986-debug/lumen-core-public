@@ -324,7 +324,14 @@ def blockers(gates: dict[str, Any], summary: dict[str, Any]) -> list[str]:
     rows.append(
         "Field validation requires buyer or agency authorized operational data, preregistered holdouts, named incumbent baselines, accepted economic conversion factors, and auditable signed or traceable results."
     )
-    rows.append("Real dollar savings require field validation plus accepted economics. Estimated value is allowed; realized savings is blocked.")
+    if gates["bounded_estimated_value_claim_allowed"]:
+        rows.append(
+            "A bounded estimated value signal is available only for fully gated lanes; realized savings remains blocked."
+        )
+    else:
+        rows.append(
+            "No current lane clears the buyer-approved dollar-projection gate. Input projections remain suppressed."
+        )
     rows.append("VPS/domain proof routing requires a verified deployed dashboard URL and fresh hosted artifact hashes; local dashboard JSON alone is not enough.")
     return rows
 
@@ -341,7 +348,7 @@ def build_payload(
     summary = summarize_artifacts()
     gates = build_gates(summary)
     payload = {
-        "schema": "field_money_truth_sweep_v1",
+        "schema": "field_money_truth_sweep_v2",
         "generated_utc": now_utc(),
         "boundary": BOUNDARY,
         "mode": {
@@ -354,10 +361,18 @@ def build_payload(
         "gates": gates,
         "blockers": blockers(gates, summary),
         "allowed_claim_now": {
-            "claim": "bounded estimated value signal plus paid pilot scoping",
+            "claim": (
+                "bounded estimated value signal plus paid pilot scoping"
+                if gates["bounded_estimated_value_claim_allowed"]
+                else "bounded workflow pilot scoping with no dollar projection"
+            ),
             "estimated_hourly": money(summary.get("safe_estimated_hourly_value_usd")),
             "estimated_annual": money(summary.get("safe_estimated_annual_value_usd")),
-            "language": "Use estimated, bounded, under-assumptions language only.",
+            "language": (
+                "Use estimated, bounded, under-assumptions language only."
+                if gates["bounded_estimated_value_claim_allowed"]
+                else "Quote only a scoped pilot fee; do not infer savings or model-performance value."
+            ),
         },
         "blocked_claim_now": {
             "field_validated": False,
@@ -407,8 +422,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Triple-source rolling champions: `{summary.get('triple_source_champion_count')}`",
         f"- Triple-source candidates: `{summary.get('triple_source_candidate_count')}`",
         f"- Rolling champions: `{summary.get('rolling_champion_count')}`",
-        f"- Safe estimated value signal: `{money(summary.get('safe_estimated_hourly_value_usd'))}/hour`, `{money(summary.get('safe_estimated_annual_value_usd'))}/year`",
-        f"- Blocked context-only value surface: `{money(summary.get('blocked_context_annual_value_usd'))}/year`",
+        f"- Claimable estimated value signal: `{money(summary.get('safe_estimated_hourly_value_usd'))}/hour`, `{money(summary.get('safe_estimated_annual_value_usd'))}/year`",
         "",
         "## Gates",
         "",
@@ -418,7 +432,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.extend(["", "## Allowed Claim Now", ""])
     lines.append(
         f"{payload['allowed_claim_now']['claim']}: {payload['allowed_claim_now']['estimated_hourly']} / "
-        f"{payload['allowed_claim_now']['estimated_annual']} under stated assumptions."
+        f"{payload['allowed_claim_now']['estimated_annual']}. {payload['allowed_claim_now']['language']}"
     )
     lines.extend(["", "## Blockers", ""])
     lines.extend(f"- {item}" for item in payload["blockers"])

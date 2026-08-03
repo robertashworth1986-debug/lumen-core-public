@@ -16,19 +16,27 @@ def load_module():
     return module
 
 
-def test_assembly_gate_indexes_federal_and_ip_lanes():
+def test_assembly_gate_indexes_current_funding_and_ip_lanes():
     module = load_module()
     payload = module.build_payload()
     summary = payload["summary"]
 
-    assert payload["schema"] == "agency_submission_assembly_gate_v1"
-    assert payload["status"] == "AGENCY_SUBMISSION_ASSEMBLY_READY_HUMAN_GATED"
-    assert summary["assembly_lane_count"] == 15
+    assert payload["schema"] == "agency_submission_assembly_gate_v2"
+    assert payload["status"] == "AGENCY_SUBMISSION_ASSEMBLY_BLOCKED"
+    assert summary["assembly_lane_count"] == 19
     assert summary["first_artifacts_present"] is True
-    assert summary["reviewer_gate_clear"] is True
+    assert summary["reviewer_gate_clear"] is False
+    assert summary["submission_conformance_status"] == "SUBMISSION_CONFORMANCE_BLOCKED"
+    assert summary["submission_conformance_all_current_lanes_covered"] is True
+    assert summary["assembly_conformance_coverage_clear"] is True
+    assert summary["unrepresented_active_conformance_lane_count"] == 0
+    assert summary["active_submission_candidate_count"] == 3
+    assert summary["active_argument_pass_count"] == 0
+    assert summary["active_argument_blocked_count"] == 3
+    assert summary["argument_gate_clear"] is False
     assert summary["federal_protocol_status"] == "FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED"
     assert summary["agency_activation_status"] == "AGENCY_ACCOUNT_ACTIVATION_READY_HUMAN_PORTAL_REQUIRED"
-    assert summary["authority_lane_count"] == 19
+    assert summary["authority_lane_count"] == 26
     assert summary["all_final_actions_blocked_without_human"] is True
     assert summary["external_send_allowed_without_human"] is False
     assert summary["final_submission_allowed_without_human"] is False
@@ -54,22 +62,38 @@ def test_assembly_rows_have_components_blockers_and_hashes():
         "uspto_georgia_patents_route",
         "patent_deadline_counsel",
         "hhs_ai_power_user_pilot",
+        "cdc_ai_acquisition_rfi",
+        "erdc_sovereign_cloud_cso",
+        "darpa_falcon_dpa26bz04_dv016",
+        "launchtn_3686_pitch_2026",
     ]:
         assert lane_id in rows
 
-    assert status_counts["ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED"] == 5
-    assert status_counts["COUNSEL_PACKET_READY_LEGAL_ACTION_BLOCKED"] == 2
+    assert status_counts["ARGUMENT_CONFORMANCE_BLOCKED_BEFORE_REVIEW"] == 3
+    assert status_counts["CLOSED_OFFICIAL_DECISION_POSTMORTEM_ONLY"] == 1
+    assert status_counts["EXPIRED_NO_VERIFIED_SUBMISSION_REUSE_BLOCKED"] == 1
+    assert status_counts["MONITOR_ONLY_NO_DUPLICATE_SUBMISSION"] == 3
+    assert status_counts["NO_CURRENT_SUBMISSION_ROUTE"] == 5
     assert status_counts["PARTNER_OR_NO_SOLO_BLOCKED"] == 4
-    assert rows["sam_registration_external_validation_watch"]["package_status"] == "VALIDATION_WATCH_NOT_SUBMISSION"
-    assert rows["darpa_dice_full_submission"]["package_status"] == "ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED"
-    assert rows["dla_missionweave_sbir"]["package_status"] == "ASSEMBLED_FOR_REVIEW_FINAL_ACTION_BLOCKED"
+    assert status_counts["TECHNICAL_NO_GO_EVIDENCE_SPRINT_ONLY"] == 1
+    assert rows["sam_registration_external_validation_watch"]["package_status"] == "NO_CURRENT_SUBMISSION_ROUTE"
+    assert rows["darpa_dice_full_submission"]["package_status"] == "CLOSED_OFFICIAL_DECISION_POSTMORTEM_ONLY"
+    assert rows["darpa_dice_full_submission"]["submission_conformance_status"] == "CLOSED_OFFICIAL_DECISION_POSTMORTEM_ONLY"
+    assert rows["dla_missionweave_sbir"]["package_status"] == "EXPIRED_NO_VERIFIED_SUBMISSION_REUSE_BLOCKED"
+    assert rows["dla_missionweave_sbir"]["submission_conformance_status"] == "EXPIRED_NO_VERIFIED_SUBMISSION_REUSE_BLOCKED"
+    assert rows["dla_missionweave_sbir"]["argument_conformance_pass"] is False
+    assert rows["nsf_project_pitch"]["package_status"] == "ARGUMENT_CONFORMANCE_BLOCKED_BEFORE_REVIEW"
+    assert rows["nsf_project_pitch"]["argument_conformance_pass"] is False
     assert rows["dla_missionweave_sbir"]["status"] == "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN"
-    assert rows["uspto_georgia_patents_route"]["package_status"] == "COUNSEL_PACKET_READY_LEGAL_ACTION_BLOCKED"
+    assert rows["uspto_georgia_patents_route"]["package_status"] == "NO_CURRENT_SUBMISSION_ROUTE"
     assert rows["uspto_georgia_patents_route"]["status"] == "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING"
+    assert rows["erdc_sovereign_cloud_cso"]["package_status"] == "ARGUMENT_CONFORMANCE_BLOCKED_BEFORE_REVIEW"
+    assert rows["launchtn_3686_pitch_2026"]["package_status"] == "ARGUMENT_CONFORMANCE_BLOCKED_BEFORE_REVIEW"
+    assert rows["darpa_falcon_dpa26bz04_dv016"]["package_status"] == "TECHNICAL_NO_GO_EVIDENCE_SPRINT_ONLY"
 
     for row in payload["assembly_rows"]:
-        assert row["component_count"] == 8
-        assert row["review_ready_component_count"] == 8
+        assert row["component_count"] == 9
+        assert row["review_ready_component_count"] < row["component_count"]
         assert row["first_artifact"]["present"] is True
         assert row["first_artifact"]["bytes"] > 0
         assert len(row["first_artifact"]["sha256"]) == 64
@@ -90,6 +114,9 @@ def test_rendered_assembly_gate_is_public_safe_and_human_gated():
     lowered = rendered.lower()
 
     assert "Agency Submission Assembly Gate" in rendered
+    assert "Submission conformance status: `SUBMISSION_CONFORMANCE_BLOCKED`" in rendered
+    assert "Active argument blocks: `3`" in rendered
+    assert "Assembly represents every active conformance lane: `true`" in rendered
     assert "All final actions blocked without human: `true`" in rendered
     assert "Final submission without human: `false`" in rendered
     assert "Legal/certification action without human: `false`" in rendered

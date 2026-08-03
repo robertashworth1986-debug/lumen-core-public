@@ -57,15 +57,22 @@ def geometry_summary() -> dict[str, Any]:
     summary = audit.get("summary", {}) if isinstance(audit.get("summary"), dict) else {}
     if not summary:
         summary = {
-            "registered_family_count": 75,
-            "lane_count": 12,
-            "synthetic_benchmark_result_count": 4,
-            "proof_priority_candidate_count": 11,
-            "test_spec_ready_no_result_count": 57,
+            "registered_family_count": 0,
+            "lane_count": 0,
+            "implementation_present_count": 0,
+            "frozen_generated_executed_count": 0,
+            "source_conditioned_replay_count": 0,
+            "qualified_direct_source_link_count": 0,
+            "qualified_conditioning_source_link_count": 0,
+            "context_only_measured_source_link_count": 0,
+            "direct_source_replay_build_ready_lane_count": 0,
+            "synthetic_benchmark_result_count": 0,
+            "proof_priority_candidate_count": 0,
+            "test_spec_ready_no_result_count": 0,
             "field_validated_family_count": 0,
             "safe_answer_to_have_we_tested_all": (
-                "No. The registered universe is ranked and mostly test-spec-ready, "
-                "but only a small subset has generated benchmark evidence and none are field validated."
+                "No current geometry audit was available. All coverage, execution, replay, "
+                "validation, and value claims remain blocked."
             ),
         }
     return summary
@@ -78,12 +85,17 @@ def build_linkedin_profile(summary: dict[str, Any]) -> dict[str, str]:
     )
     about = (
         "I am building LumenCore, a proof-driven adaptive orchestration stack for complex systems. "
-        "The work is organized around a simple discipline: synthetic benchmarks discover candidates, "
-        "frozen live-data replay proves what survives, and field validation is required before real-world "
-        "performance or dollar claims.\n\n"
-        f"The current public geometry audit ranks {summary.get('registered_family_count', 0)} route/path "
-        f"families across {summary.get('lane_count', 0)} lanes. It identifies "
-        f"{summary.get('synthetic_benchmark_result_count', 0)} generated benchmark-result families, "
+        "The work is organized around a simple discipline: synthetic benchmarks discover candidates; "
+        "task-compatible frozen measured replay tests what survives; and field validation is required "
+        "before operational-performance or dollar claims.\n\n"
+        f"The current public geometry audit accounts for {summary.get('registered_family_count', 0)} "
+        f"route/path families across {summary.get('lane_count', 0)} lanes. It identifies "
+        f"{summary.get('implementation_present_count', 0)} implementations, "
+        f"{summary.get('frozen_generated_executed_count', 0)} frozen generated-benchmark executions, "
+        f"{summary.get('source_conditioned_replay_count', 0)} source-conditioned replay receipts, "
+        f"{summary.get('qualified_direct_source_link_count', 0)} qualified direct-source links, "
+        f"{summary.get('qualified_conditioning_source_link_count', 0)} conditioning-only links, "
+        f"{summary.get('direct_source_replay_build_ready_lane_count', 0)} lanes ready to build direct measured replay, "
         f"{summary.get('proof_priority_candidate_count', 0)} proof-priority candidates, and "
         f"{summary.get('test_spec_ready_no_result_count', 0)} test-spec-ready families still awaiting "
         "full benchmark execution.\n\n"
@@ -92,8 +104,8 @@ def build_linkedin_profile(summary: dict[str, Any]) -> dict[str, str]:
     )
     featured = (
         "Featured proof packet: LumenCore geometry synthetic/live coverage audit. "
-        "It separates controlled benchmark discovery from live replay and field validation, so reviewers "
-        "can see exactly what has been ranked, what has been tested, and what still needs validation."
+        "It separates controlled benchmark discovery, source-conditioned synthetic stress, direct measured "
+        "replay, and field validation so reviewers can see exactly what has run and what still needs validation."
     )
     return {"headline": headline, "about": about, "featured_link_caption": featured}
 
@@ -101,12 +113,16 @@ def build_linkedin_profile(summary: dict[str, Any]) -> dict[str, str]:
 def build_posts(summary: dict[str, Any]) -> list[dict[str, str]]:
     geometry_post = (
         "I published a bounded LumenCore geometry coverage audit.\n\n"
-        f"Current state: {summary.get('registered_family_count', 0)} route/path families ranked across "
+        f"Current state: {summary.get('registered_family_count', 0)} route/path families accounted for across "
         f"{summary.get('lane_count', 0)} lanes; "
-        f"{summary.get('synthetic_benchmark_result_count', 0)} have generated benchmark-result evidence; "
+        f"{summary.get('implementation_present_count', 0)} have implementations; "
+        f"{summary.get('frozen_generated_executed_count', 0)} have frozen generated-benchmark execution; "
+        f"{summary.get('source_conditioned_replay_count', 0)} have source-conditioned replay receipts; "
+        f"{summary.get('qualified_direct_source_link_count', 0)} direct-source links are semantically qualified; "
+        f"{summary.get('direct_source_replay_build_ready_lane_count', 0)} lanes are ready to build direct measured replay; "
         f"{summary.get('proof_priority_candidate_count', 0)} are proof-priority candidates; "
         f"{summary.get('field_validated_family_count', 0)} are field validated.\n\n"
-        "The core rule is: synthetic discovers, live proves, field validation wins trust.\n\n"
+        "The core rule is: synthetic discovers, direct measured replay tests, and field validation proves operational value.\n\n"
         "This is not a claim of field validation, realized savings, trading profit, or universal superiority. "
         "It is a public evidence map showing what has been ranked, what needs live replay, and what should "
         "be tested next."
@@ -143,7 +159,7 @@ def build_channel_plan() -> list[dict[str, Any]]:
             "priority": 1,
             "action": "Open pull request for the public-safe audit branch.",
             "url": GITHUB_PR_URL,
-            "approval_required": False,
+            "approval_required": True,
             "why": "Shows reproducible code, tests, and public-safe documentation.",
         },
         {
@@ -186,12 +202,14 @@ def build_reviewer_email(summary: dict[str, Any]) -> dict[str, str]:
     body = (
         "Hello,\n\n"
         "I am sharing a public-safe LumenCore proof artifact for technical review. The new geometry "
-        f"coverage audit ranks {summary.get('registered_family_count', 0)} route/path families across "
+        f"coverage audit accounts for {summary.get('registered_family_count', 0)} route/path families across "
         f"{summary.get('lane_count', 0)} lanes and separates generated benchmark evidence from live replay "
-        "and field validation.\n\n"
+        "and field validation. It also separates task-compatible direct measured inputs from sources that "
+        "can only condition synthetic stress.\n\n"
         "The purpose is not to claim final performance. The purpose is to make the evidence boundary "
-        "auditable: what has been ranked, what has synthetic benchmark evidence, what is queued for live "
-        "replay, and what still requires independent/field validation.\n\n"
+        "auditable: what has been ranked, what has synthetic benchmark evidence, which source links are "
+        "directly compatible, what is queued for measured replay, and what still requires independent or "
+        "field validation.\n\n"
         f"Public branch: {GITHUB_BRANCH}\n"
         f"Pull request draft URL: {GITHUB_PR_URL}\n"
         f"Public repo: {PUBLIC_REPO_URL}\n\n"
@@ -209,10 +227,11 @@ def build_payload() -> dict[str, Any]:
     posts = build_posts(summary)
     payload = {
         "generated_utc": now_utc(),
-        "schema": "publication_approval_packet_v1",
+        "schema": "publication_approval_packet_v3",
         "purpose": "Prepare exact public-safe publishing copy for user approval before LinkedIn/site/email actions.",
         "publication_policy": {
             "approval_required_before_live_profile_or_social_changes": True,
+            "action_time_approval_required_for_every_external_publication": True,
             "no_auto_posting": True,
             "no_private_grant_uploads": True,
             "no_secret_material": True,
@@ -226,7 +245,7 @@ def build_payload() -> dict[str, Any]:
             "branch": GITHUB_BRANCH,
             "pr_url": GITHUB_PR_URL,
             "public_repo": PUBLIC_REPO_URL,
-            "status": "public_branch_pushed_pr_not_opened",
+            "status": "historical_route_unverified_live_github_check_required",
         },
         "geometry_audit_summary": summary,
         "source_artifacts": {
@@ -261,13 +280,20 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Public branch: `{payload['github']['branch']}`",
         f"- PR URL: {payload['github']['pr_url']}",
+        f"- GitHub route status: `{payload['github']['status']}`",
         f"- Approval required before LinkedIn/site/email changes: `{payload['publication_policy']['approval_required_before_live_profile_or_social_changes']}`",
         "",
         "## Evidence Summary",
         "",
         f"- Registered geometry families: `{summary.get('registered_family_count', 0)}`",
         f"- Lanes: `{summary.get('lane_count', 0)}`",
-        f"- Generated benchmark-result families: `{summary.get('synthetic_benchmark_result_count', 0)}`",
+        f"- Implementations present: `{summary.get('implementation_present_count', 0)}`",
+        f"- Frozen generated-benchmark executions: `{summary.get('frozen_generated_executed_count', 0)}`",
+        f"- Source-conditioned replay receipt families: `{summary.get('source_conditioned_replay_count', 0)}`",
+        f"- Qualified direct-source links: `{summary.get('qualified_direct_source_link_count', 0)}`",
+        f"- Qualified conditioning-source links: `{summary.get('qualified_conditioning_source_link_count', 0)}`",
+        f"- Context-only measured-source links: `{summary.get('context_only_measured_source_link_count', 0)}`",
+        f"- Direct-source replay build-ready lanes: `{summary.get('direct_source_replay_build_ready_lane_count', 0)}`",
         f"- Proof-priority candidates: `{summary.get('proof_priority_candidate_count', 0)}`",
         f"- Field-validated families: `{summary.get('field_validated_family_count', 0)}`",
         "",

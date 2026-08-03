@@ -1,0 +1,797 @@
+{
+  "capability_boundary": {
+    "certification_performed": false,
+    "email_read_performed": false,
+    "email_send_performed": false,
+    "local_files_read_only_except_declared_outputs": true,
+    "network_access_performed": false,
+    "portal_action_performed": false,
+    "private_identifiers_recorded": false,
+    "purchase_performed": false,
+    "signature_performed": false,
+    "source_document_contents_embedded": false,
+    "submission_performed": false
+  },
+  "category_counts": {
+    "brand_identity_approval": 1,
+    "cybersecurity": 1,
+    "data_rights": 1,
+    "deployment_and_operations": 1,
+    "exact_solicitation_conformance": 1,
+    "external_action_authority": 1,
+    "independent_evidence": 1,
+    "legal_entity_registration": 1,
+    "naics_psc_set_aside_fit": 1,
+    "past_performance": 1,
+    "personnel_and_clearances": 1,
+    "staffing_price_schedule": 1,
+    "teaming_boundaries": 1,
+    "technical_baselines": 1
+  },
+  "claim_boundary": "This register is a skeptical reviewer control derived from the listed public-safe materials. It does not verify private entity facts, establish eligibility or responsibility, cure solicitation requirements, constitute legal or contracting advice, authorize external action, or convert software-pattern proof into operational or independent proof.",
+  "controls": {
+    "action_time_human_approval_required": true,
+    "autonomous_certification_allowed": false,
+    "autonomous_email_send_allowed": false,
+    "autonomous_portal_action_allowed": false,
+    "autonomous_submission_allowed": false,
+    "external_action_allowed": false,
+    "mandatory_requirement_fail_closed": true,
+    "operational_claim_requires_external_evidence": true,
+    "private_identifiers_allowed": false,
+    "software_pattern_proof_is_operational_proof": false
+  },
+  "current_evidence_class_counts": {
+    "BRAND_APPROVAL": 1,
+    "DOCUMENTARY_EVIDENCE": 4,
+    "HUMAN_APPROVAL": 1,
+    "INDEPENDENT_EVIDENCE": 1,
+    "OPERATIONAL_PROOF": 3,
+    "SOFTWARE_PATTERN_PROOF": 1,
+    "SOLICITATION_SOURCE": 2,
+    "TEAMING_EVIDENCE": 1
+  },
+  "current_state_counts": {
+    "ARC_SEAL_BOUND_AND_RENDER_VERIFIED": 1,
+    "DATA_RIGHTS_BOUNDARY_UNRESOLVED": 1,
+    "DEPLOYMENT_OPERATIONS_NOT_ESTABLISHED": 1,
+    "DOCUMENTARY_EVIDENCE_NOT_IN_REVIEW_SCOPE": 1,
+    "EXTERNAL_ACTION_HUMAN_GATED": 1,
+    "FEDERAL_PAST_PERFORMANCE_NOT_ESTABLISHED": 1,
+    "INDEPENDENT_OPERATIONAL_EVIDENCE_NOT_ESTABLISHED": 1,
+    "MANDATORY_PERSONNEL_NOT_ESTABLISHED": 1,
+    "MONDAY_PRIME_CONFORMANCE_BLOCKED": 1,
+    "SECURITY_AUTHORIZATION_NOT_ESTABLISHED": 1,
+    "SOFTWARE_PATTERN_PROOF_ONLY": 1,
+    "SOLICITATION_CLASSIFICATION_INCOMPLETE": 1,
+    "STAFFING_PRICE_SCHEDULE_NOT_ESTABLISHED": 1,
+    "TEAMING_BOUNDARY_ONLY": 1
+  },
+  "evidence_distinction": {
+    "conversion_rule": "Software-pattern proof never converts to operational proof, independent evidence, certification, clearance, past performance, or solicitation responsiveness by inference.",
+    "documentary_evidence": "Entity, registration, representations, set-aside, personnel, clearance, pricing, teaming, and submission facts require current authoritative records.",
+    "independent_evidence": "Outcome-independent evaluation requires a qualified external owner, frozen protocol, controlled data authority, results, limitations, and signed or otherwise attributable review receipts.",
+    "operational_proof": "Agency deployment, controlled-environment operation, service levels, mission outcomes, suitability, acceptance, and field performance require direct operational receipts.",
+    "operational_proof_objection_ids": [
+      "OBJ-PAST-001",
+      "OBJ-CYBER-001",
+      "OBJ-OPS-001"
+    ],
+    "software_pattern_proof": "Repository code, tests, schemas, hashes, replay controls, and human-gate patterns can establish bounded software behavior.",
+    "software_pattern_proof_objection_ids": [
+      "OBJ-BASELINE-001"
+    ],
+    "software_pattern_proof_satisfies_operational_proof": false
+  },
+  "gate_sha256": "B77C940ACFF5137F00F572DF67677CDC35E8FFF9FAE827D3268F24A2A09B27FE",
+  "generated_at_utc": "2026-07-26T22:33:49Z",
+  "material_blockers": [],
+  "material_receipts": [
+    {
+      "bytes": 890432,
+      "content_checks_valid": true,
+      "exists": true,
+      "expected_sha256": "C5CD72F62491688781EEC801BB9ED6A2C368EB9A7412754D476B25DE3EDE5967",
+      "format_valid": true,
+      "hash_matches": true,
+      "id": "capability_statement",
+      "kind": "pdf",
+      "path": "output/pdf/LumenCore_Federal_Capability_Statement_2026-07-26.pdf",
+      "required": true,
+      "sha256": "C5CD72F62491688781EEC801BB9ED6A2C368EB9A7412754D476B25DE3EDE5967"
+    },
+    {
+      "bytes": 3482,
+      "content_checks_valid": true,
+      "exists": true,
+      "expected_sha256": "DAB0E3CF3A1BE9185F3929E38C115E1C81E1F2D07E4ABB5B5A33A670CCB5B69A",
+      "format_valid": true,
+      "hash_matches": true,
+      "id": "csdr_partner_brief",
+      "kind": "markdown",
+      "path": "grant_submissions/funding_sprint_20260709/FA701426SCS01_PARTNER_ONLY_BRIEF_2026-07-26.md",
+      "required": true,
+      "required_text_check_count": 4,
+      "required_text_match_count": 4,
+      "sha256": "DAB0E3CF3A1BE9185F3929E38C115E1C81E1F2D07E4ABB5B5A33A670CCB5B69A"
+    },
+    {
+      "bytes": 219023,
+      "content_checks_valid": true,
+      "exists": true,
+      "expected_sha256": "0B899A7565115FDFC694A7ED163A751BA8A71A2DAA8D08175761C1D2EFAF8849",
+      "format_valid": true,
+      "hash_matches": true,
+      "id": "csdr_pws",
+      "kind": "pdf",
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/FA701426SCS01_PWS_CSDR_Support_and_Curation.pdf",
+      "required": true,
+      "sha256": "0B899A7565115FDFC694A7ED163A751BA8A71A2DAA8D08175761C1D2EFAF8849"
+    },
+    {
+      "bytes": 232275,
+      "content_checks_valid": true,
+      "exists": true,
+      "expected_sha256": "477A943F5813507CE6B36B612F1EEAFD005BD88EC1BED7F2D2F299AC5DC8DC91",
+      "format_valid": true,
+      "hash_matches": true,
+      "id": "csdr_solicitation",
+      "kind": "pdf",
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/FA701426SCS01_Amendment_2_CSO_Solicitation_2026-07-24.pdf",
+      "required": true,
+      "sha256": "477A943F5813507CE6B36B612F1EEAFD005BD88EC1BED7F2D2F299AC5DC8DC91"
+    },
+    {
+      "bytes": 24140,
+      "content_checks_valid": true,
+      "exists": true,
+      "expected_sha256": "CDCF02A5CA12C20B98E9E72168D8AA520FB47AD67EBD2E65432CA33C13C55695",
+      "format_valid": true,
+      "hash_matches": true,
+      "id": "monday_packet",
+      "kind": "json",
+      "observed_schema": "lumencore.monday_federal_action_packet.v1",
+      "path": "grant_submissions/funding_sprint_20260709/MONDAY_FEDERAL_ACTION_PACKET_2026-07-26.json",
+      "required": true,
+      "schema_matches": true,
+      "sha256": "CDCF02A5CA12C20B98E9E72168D8AA520FB47AD67EBD2E65432CA33C13C55695"
+    }
+  ],
+  "mode": "LOCAL_READ_ONLY_REVIEW_WITH_FAIL_CLOSED_OUTPUT",
+  "monday_packet_observation": {
+    "all_external_actions_blocked": true,
+    "all_partner_briefs_blocked": true,
+    "all_prime_blocked": true,
+    "decision_counts": {
+      "NO_GO_INTENDED_SOLE_SOURCE_EQUIVALENCE_NOT_ESTABLISHED": 2,
+      "NO_GO_PRIME_PARTNER_ROUTE_POSSIBLE_NOT_READY": 2,
+      "NO_READY_RESPONSE_FUTURE_PARTNER_ROUTE_BLOCKED": 1
+    },
+    "external_action_count": 0,
+    "failures": [],
+    "notice_ids": [
+      "140R4026R0021",
+      "80NSSC26938528Q",
+      "FA701426SCS01",
+      "HS002126QE046",
+      "HT003826SC004AOI1"
+    ],
+    "opportunity_count": 5,
+    "partner_brief_ready_count": 0,
+    "prime_submission_ready_count": 0,
+    "valid": true
+  },
+  "objections": [
+    {
+      "applies_to": [
+        "all_external_capability_uses",
+        "all_prime_submissions"
+      ],
+      "category": "legal_entity_registration",
+      "claim_boundary": "Absence from this public-safe review scope does not prove an inactive registration, but it blocks any claim that registration or offeror authority has been verified.",
+      "current_state": {
+        "basis": "The public-safe capability statement intentionally omits entity identifiers and directs the reviewer to current company and registration records. No current authoritative registration receipt is contained in the reviewed materials.",
+        "basis_refs": [
+          "capability_statement",
+          "monday_packet"
+        ],
+        "code": "DOCUMENTARY_EVIDENCE_NOT_IN_REVIEW_SCOPE",
+        "evidence_class": "DOCUMENTARY_EVIDENCE",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-LEGAL-001",
+      "objection_sha256": "6863EC988E62C197B055687E1AE5EFD4B7954AF2792C5C1C6D33872DEC5F8B8A",
+      "required_evidence": [
+        {
+          "description": "Current authoritative entity-registration status receipt reviewed at action time without reproducing private identifiers in this gate.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "current_entity_status"
+        },
+        {
+          "description": "Current internal authority record for the person making representations, certifications, and submissions.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "authorized_representative"
+        },
+        {
+          "description": "Solicitation-specific registration and portal prerequisites crosswalked to current authoritative records.",
+          "evidence_class": "SOLICITATION_SOURCE",
+          "id": "solicitation_registration_crosswalk"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "What current authoritative record proves the exact offeror is active, eligible, and authorized to make the contemplated representation?",
+      "safe_next_action": "At action time, have an authorized human compare the live official entity record and solicitation prerequisites; record only a pass or blocker and a source hash in the private submission file.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "all_prime_submissions",
+        "small_business_representations"
+      ],
+      "category": "naics_psc_set_aside_fit",
+      "claim_boundary": "Thematic fit or a notice label does not establish size eligibility, socioeconomic eligibility, responsibility, or compliance with subcontracting limits.",
+      "current_state": {
+        "basis": "The capability statement lists only broad routing categories and says to confirm NAICS, PSC, set-aside, and entity records per notice. The Monday packet records set-aside text but does not establish a complete classification and size-status crosswalk.",
+        "basis_refs": [
+          "capability_statement",
+          "monday_packet"
+        ],
+        "code": "SOLICITATION_CLASSIFICATION_INCOMPLETE",
+        "evidence_class": "SOLICITATION_SOURCE",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-CLASS-001",
+      "objection_sha256": "EFE6A619EDF7C736C1EF05285A5680327C0EB8E078F315330192D6A195F02A29",
+      "required_evidence": [
+        {
+          "description": "Current official notice or amendment showing the controlling NAICS, PSC, size standard, acquisition vehicle, and set-aside.",
+          "evidence_class": "SOLICITATION_SOURCE",
+          "id": "notice_classification"
+        },
+        {
+          "description": "Current authoritative entity and size-status evidence matched to the exact notice and proposed prime or subcontract role.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "entity_classification_match"
+        },
+        {
+          "description": "A role and workshare analysis covering applicable limitations on subcontracting and similarly situated entity rules.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "limitations_on_subcontracting"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "Which exact NAICS, PSC, size standard, and set-aside rule controls, and what current evidence proves the proposed role qualifies?",
+      "safe_next_action": "Build a notice-specific classification crosswalk from the current official notice and live entity record before drafting any representation or offer.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "prime_responsibility",
+        "experience_claims",
+        "comparative_capability_claims"
+      ],
+      "category": "past_performance",
+      "claim_boundary": "Repository maturity, outreach, a submitted document, an acceptance into a program, or a local test receipt is not contract past performance or customer acceptance.",
+      "current_state": {
+        "basis": "The capability statement expressly does not represent current federal past performance. The Monday packet records mandatory domain-experience gaps for every reviewed prime lane.",
+        "basis_refs": [
+          "capability_statement",
+          "monday_packet"
+        ],
+        "code": "FEDERAL_PAST_PERFORMANCE_NOT_ESTABLISHED",
+        "evidence_class": "OPERATIONAL_PROOF",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-PAST-001",
+      "objection_sha256": "FF4D26613D84E90C554D728B9B78A48B4DABD199675436D9354E2B4A030D8799",
+      "required_evidence": [
+        {
+          "description": "Attributable contract or customer record with scope, role, period, value band, and acceptance state.",
+          "evidence_class": "OPERATIONAL_PROOF",
+          "id": "relevant_contract_record"
+        },
+        {
+          "description": "Authorized reference or performance assessment supporting recency, relevance, and quality.",
+          "evidence_class": "INDEPENDENT_EVIDENCE",
+          "id": "performance_reference"
+        },
+        {
+          "description": "A source-bound mapping from proven prior work to each material solicitation requirement.",
+          "evidence_class": "SOLICITATION_SOURCE",
+          "id": "solicitation_relevance_mapping"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "What attributable contract, customer, scope, period, outcome, and reference proves relevant performance at the required scale?",
+      "safe_next_action": "Use only attributable, authorized project evidence; otherwise state no qualifying past performance and pursue a bounded subcontract role under a qualified prime.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "defense_prime_submissions",
+        "key_personnel_claims",
+        "controlled_environment_work"
+      ],
+      "category": "personnel_and_clearances",
+      "claim_boundary": "A proposed role, resume draft, collaborator discussion, or software capability does not establish committed personnel, availability, suitability, or clearance.",
+      "current_state": {
+        "basis": "The capability statement disclaims cleared personnel. The CSDR packet records missing Secret-cleared personnel and both mandatory ten-year leads; the other Monday lanes also lack required operational staffing evidence.",
+        "basis_refs": [
+          "capability_statement",
+          "monday_packet",
+          "csdr_pws"
+        ],
+        "code": "MANDATORY_PERSONNEL_NOT_ESTABLISHED",
+        "evidence_class": "DOCUMENTARY_EVIDENCE",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-PERSONNEL-001",
+      "objection_sha256": "0D49F8B996F0992949A008EE295F0A95CDBE205F358A0397F3D153BC6F83ED26",
+      "required_evidence": [
+        {
+          "description": "Named internal key-personnel matrix with resumes, years, direct domain experience, commitment, and availability, retained outside this public-safe gate.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "key_personnel_matrix"
+        },
+        {
+          "description": "Authoritative facility and personnel clearance verification for every required role and work location.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "clearance_verification"
+        },
+        {
+          "description": "Approved substitution, surge, and continuity plan consistent with solicitation restrictions.",
+          "evidence_class": "OPERATIONAL_PROOF",
+          "id": "staffing_contingency"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "Who will perform each key role, and what verified qualifications, availability, citizenship, suitability, and clearance evidence applies?",
+      "safe_next_action": "Do not name or imply personnel qualifications externally until an authorized human verifies documentary evidence and written commitment for the exact solicitation.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "controlled_data",
+        "production_deployment",
+        "federal_system_integration"
+      ],
+      "category": "cybersecurity",
+      "claim_boundary": "Secure coding patterns, local access controls, or a public website do not establish an authorization, certification, approved impact level, or permission to process controlled data.",
+      "current_state": {
+        "basis": "The capability statement expressly disclaims a production ATO, FedRAMP authorization, and CMMC certification. Monday requirements for IL5, isolated on-premises operation, and controlled Government-system access are not established.",
+        "basis_refs": [
+          "capability_statement",
+          "monday_packet",
+          "csdr_pws"
+        ],
+        "code": "SECURITY_AUTHORIZATION_NOT_ESTABLISHED",
+        "evidence_class": "OPERATIONAL_PROOF",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-CYBER-001",
+      "objection_sha256": "04617E2F60505DACEC5C70358720F476F2765F067A27004BC6CC2A4CBE8E39E9",
+      "required_evidence": [
+        {
+          "description": "Current system boundary, data types, impact level, hosting model, inherited controls, and responsible security owner.",
+          "evidence_class": "OPERATIONAL_PROOF",
+          "id": "authorization_boundary"
+        },
+        {
+          "description": "Current independent or authorized assessment evidence for all claimed security frameworks and contract clauses.",
+          "evidence_class": "INDEPENDENT_EVIDENCE",
+          "id": "control_assessment"
+        },
+        {
+          "description": "Tested incident response, logging, backup, restoration, continuity, and notification procedures for the proposed environment.",
+          "evidence_class": "OPERATIONAL_PROOF",
+          "id": "incident_and_continuity_plan"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "What authorization boundary, control implementation, assessment, incident process, and hosting environment supports the proposed data and mission impact level?",
+      "safe_next_action": "Keep work public-data or buyer-authorized and non-production until a qualified security owner approves the exact boundary and current assessment evidence.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "proposal_markings",
+        "controlled_or_proprietary_data",
+        "software_and_data_deliverables"
+      ],
+      "category": "data_rights",
+      "claim_boundary": "Hashing or possessing an artifact does not establish ownership, license, releasability, proposal-marking compliance, or Government-purpose rights.",
+      "current_state": {
+        "basis": "The CSDR partner brief correctly asks a future prime to define security, organizational-conflict, data-rights, and subcontracting boundaries, but no executed rights allocation or marking plan exists in the reviewed materials.",
+        "basis_refs": [
+          "csdr_partner_brief",
+          "csdr_solicitation",
+          "csdr_pws"
+        ],
+        "code": "DATA_RIGHTS_BOUNDARY_UNRESOLVED",
+        "evidence_class": "DOCUMENTARY_EVIDENCE",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-DATARIGHTS-001",
+      "objection_sha256": "FCAB0D81585414C10EC07D6DC22E5C9F1700598B86806AD96FB5710BDFFC568E",
+      "required_evidence": [
+        {
+          "description": "Source-by-source ownership, license, disclosure, retention, export, and derivative-use inventory.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "rights_inventory"
+        },
+        {
+          "description": "Solicitation-compliant proprietary-data and restrictive-marking plan reviewed by authorized counsel or contracts personnel.",
+          "evidence_class": "SOLICITATION_SOURCE",
+          "id": "proposal_marking_plan"
+        },
+        {
+          "description": "Contract-specific data-rights matrix for software, technical data, models, documentation, and subcontractor contributions.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "deliverable_rights_matrix"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "Who owns every input, model, transformation, output, and deliverable, and what license or restriction governs Government and contractor use?",
+      "safe_next_action": "Before sharing proprietary content or accepting a workshare, have authorized contracts or counsel personnel approve the rights inventory, markings, and flowdowns.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "technical_superiority_claims",
+        "performance_claims",
+        "acceptance_recommendations"
+      ],
+      "category": "technical_baselines",
+      "claim_boundary": "Reusable evaluation controls do not prove that a named candidate beats a named incumbent, meets a mission threshold, or generalizes to an agency environment.",
+      "current_state": {
+        "basis": "The capability statement describes source hashing, frozen plans, baseline replay, evidence states, adverse-result retention, and human gates. This review validates those as stated software-pattern capabilities only, not as a solicitation-specific benchmark or mission result.",
+        "basis_refs": [
+          "capability_statement",
+          "monday_packet"
+        ],
+        "code": "SOFTWARE_PATTERN_PROOF_ONLY",
+        "evidence_class": "SOFTWARE_PATTERN_PROOF",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-BASELINE-001",
+      "objection_sha256": "21DC99ADAC7CB81E42307B58A3AFE27B3994973DC2A82BAA3D07D30917371117",
+      "required_evidence": [
+        {
+          "description": "Frozen, named incumbent and candidate evaluated on the same authorized data, metric definitions, exclusions, and compute boundary.",
+          "evidence_class": "SOFTWARE_PATTERN_PROOF",
+          "id": "protocol_matched_baseline"
+        },
+        {
+          "description": "Outcome-independent holdout, negative controls, uncertainty treatment, adverse-result retention, and predetermined failure rules.",
+          "evidence_class": "SOFTWARE_PATTERN_PROOF",
+          "id": "holdout_and_failure_rules"
+        },
+        {
+          "description": "Reproducible execution receipt binding code, configuration, environment, inputs, outputs, deviations, and reviewer decision.",
+          "evidence_class": "SOFTWARE_PATTERN_PROOF",
+          "id": "replay_receipt"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "What exact incumbent, dataset, metric, threshold, holdout, negative control, and failure rule was frozen before evaluation?",
+      "safe_next_action": "For a future qualified lane, freeze one buyer-owned decision protocol and produce a solicitation-specific evidence bundle before making any comparative claim.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "field_performance_claims",
+        "best_in_class_claims",
+        "savings_or_outcome_claims"
+      ],
+      "category": "independent_evidence",
+      "claim_boundary": "Local tests, self-authored hashes, generated manifests, sealed predictions, or internal reviewer packets are not independent validation.",
+      "current_state": {
+        "basis": "The capability statement explicitly disclaims field validation and agency endorsement. The Monday controls require independent evidence before performance claims, but no external evaluator or accepted mission result is present in the reviewed materials.",
+        "basis_refs": [
+          "capability_statement",
+          "monday_packet"
+        ],
+        "code": "INDEPENDENT_OPERATIONAL_EVIDENCE_NOT_ESTABLISHED",
+        "evidence_class": "INDEPENDENT_EVIDENCE",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-INDEPENDENT-001",
+      "objection_sha256": "63254EB3737633423275216FF1294169BE9D371275F367845DEEC874E9876A37",
+      "required_evidence": [
+        {
+          "description": "Qualified external evaluator with no outcome-dependent incentive and authority over the frozen protocol.",
+          "evidence_class": "INDEPENDENT_EVIDENCE",
+          "id": "independent_protocol_owner"
+        },
+        {
+          "description": "Attributable external receipt covering execution, sample, limitations, negative results, uncertainty, and acceptance state.",
+          "evidence_class": "INDEPENDENT_EVIDENCE",
+          "id": "independent_result_receipt"
+        },
+        {
+          "description": "Independent replication or authorized field observation at the claimed operating boundary.",
+          "evidence_class": "OPERATIONAL_PROOF",
+          "id": "replication_or_field_observation"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "Which outcome-independent evaluator verified the protocol, execution, result, limitations, and chain of custody?",
+      "safe_next_action": "Fund and run an outcome-independent evaluation with a frozen protocol before using performance, savings, superiority, or operational-suitability language.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "quotes",
+        "offers",
+        "white_papers_with_price",
+        "responsibility_determinations"
+      ],
+      "category": "staffing_price_schedule",
+      "claim_boundary": "A capability list, proposed deliverable, or fit score is not a basis of estimate, binding schedule, fair price, or proof of capacity.",
+      "current_state": {
+        "basis": "The capability statement presents a bounded engagement concept, not a staffed or priced offer. The CSDR partner brief assigns staffing, price, and submission responsibility to a future qualified prime, and the Monday packet authorizes no prime response.",
+        "basis_refs": [
+          "capability_statement",
+          "monday_packet",
+          "csdr_partner_brief",
+          "csdr_pws"
+        ],
+        "code": "STAFFING_PRICE_SCHEDULE_NOT_ESTABLISHED",
+        "evidence_class": "DOCUMENTARY_EVIDENCE",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-DELIVERY-001",
+      "objection_sha256": "A3963734A1F04EE4730E1A46FE223966804B25E0168C400ABBC3F97EBA4F770B",
+      "required_evidence": [
+        {
+          "description": "Role-by-role staffing, availability, work location, labor category, qualifications, escalation, and continuity plan.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "staffing_plan"
+        },
+        {
+          "description": "Traceable work breakdown, hours, rates, materials, travel, indirects, assumptions, exclusions, and price reasonableness basis.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "basis_of_estimate"
+        },
+        {
+          "description": "Deliverable schedule with dependencies, Government-furnished inputs, acceptance criteria, risks, and recovery actions.",
+          "evidence_class": "OPERATIONAL_PROOF",
+          "id": "integrated_schedule"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "What complete labor mix, basis of estimate, price, assumptions, schedule, dependencies, and delivery risk supports the proposed scope?",
+      "safe_next_action": "Do not quote or commit delivery dates until the exact scope, labor, rates, dependencies, data access, security boundary, and acceptance criteria are reviewed and approved.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "production_readiness",
+        "service_level_claims",
+        "mission_suitability"
+      ],
+      "category": "deployment_and_operations",
+      "claim_boundary": "A live public domain, local service, demonstration, screenshot, or successful unit test is not evidence of agency deployment, SLA performance, mission suitability, or production acceptance.",
+      "current_state": {
+        "basis": "The capability statement limits a safe start to a bounded non-production review sprint and disclaims agency deployment and operational suitability. Monday notices require operational products, Government integrations, on-premises support, IL5 operation, or mission-database support that are not established.",
+        "basis_refs": [
+          "capability_statement",
+          "monday_packet"
+        ],
+        "code": "DEPLOYMENT_OPERATIONS_NOT_ESTABLISHED",
+        "evidence_class": "OPERATIONAL_PROOF",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-OPS-001",
+      "objection_sha256": "A9E09C7A4B0FE0A5475658EFEBA6AFF32D94CB0CF99EC1D343983BF450547BA0",
+      "required_evidence": [
+        {
+          "description": "Approved environment and deployment record at the claimed impact, connectivity, data, and mission boundary.",
+          "evidence_class": "OPERATIONAL_PROOF",
+          "id": "authorized_operating_environment"
+        },
+        {
+          "description": "Measured availability, latency, capacity, incident, restoration, monitoring, and support receipts over an adequate observation window.",
+          "evidence_class": "OPERATIONAL_PROOF",
+          "id": "service_operations_receipts"
+        },
+        {
+          "description": "Attributable buyer or Government acceptance record against predetermined operational criteria.",
+          "evidence_class": "INDEPENDENT_EVIDENCE",
+          "id": "buyer_acceptance"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "Where has the capability operated under the claimed constraints, and what service, recovery, support, observability, and acceptance receipts exist?",
+      "safe_next_action": "Keep claims at bounded prototype or evidence-readiness scope until an authorized buyer runs and accepts an operational pilot with measured service receipts.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "partner_only_lanes",
+        "subcontract_outreach",
+        "joint_capability_claims"
+      ],
+      "category": "teaming_boundaries",
+      "claim_boundary": "Partner-only positioning is a boundary, not evidence of a team, subcontract, sponsored role, prime endorsement, or authority to contact or submit.",
+      "current_state": {
+        "basis": "The CSDR partner brief states a defensible bounded subcontract role and correctly leaves mandatory qualifications and external representations with a qualified prime. No prime, executed workshare, conflict review, or flowdown package is established.",
+        "basis_refs": [
+          "monday_packet",
+          "csdr_partner_brief",
+          "csdr_pws"
+        ],
+        "code": "TEAMING_BOUNDARY_ONLY",
+        "evidence_class": "TEAMING_EVIDENCE",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-TEAM-001",
+      "objection_sha256": "1F2B39E6554C21C6832E682E6372B8EEF287C589A8617068F870395507B760CD",
+      "required_evidence": [
+        {
+          "description": "Identified qualified prime with documented mandatory experience, security posture, responsibility, and solicitation intent.",
+          "evidence_class": "TEAMING_EVIDENCE",
+          "id": "qualified_prime"
+        },
+        {
+          "description": "Written role, scope, deliverables, interfaces, acceptance, price responsibility, and prohibition on unsupported joint claims.",
+          "evidence_class": "TEAMING_EVIDENCE",
+          "id": "written_workshare"
+        },
+        {
+          "description": "Authorized review of organizational conflicts, associate-contractor boundaries, data sharing, cybersecurity, intellectual property, and required flowdowns.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "oci_and_flowdown_review"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "Which prime owns the mandatory qualifications, workshare, representations, security, OCI, data rights, price, and submission authority?",
+      "safe_next_action": "Reopen only after a qualified prime requests a specific contribution and authorized humans approve the recipient, workshare, conflicts, rights, security, claims, and action-time communication.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "all_monday_opportunities",
+        "all_submission_artifacts"
+      ],
+      "category": "exact_solicitation_conformance",
+      "claim_boundary": "A polished capability statement, email, partner brief, or high fit score cannot cure a mandatory experience, product, environment, personnel, format, or delivery-channel gap.",
+      "current_state": {
+        "basis": "The Monday packet records zero prime-ready submissions across five notices. Four are no-go and CSDR is partner-only because direct CSDR and FlexFile experience, cleared personnel, and both key leads are not established. The CSDR source also requires a direct Step 1 Word white paper with exact formatting and submission controls; the partner brief explicitly is not that paper.",
+        "basis_refs": [
+          "monday_packet",
+          "csdr_partner_brief",
+          "csdr_solicitation",
+          "csdr_pws"
+        ],
+        "code": "MONDAY_PRIME_CONFORMANCE_BLOCKED",
+        "evidence_class": "SOLICITATION_SOURCE",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-CONFORM-001",
+      "objection_sha256": "14428F034F45678FDEDB4FF09B307B1A580A779DADBDEBC761BBE3F5ADCE681C",
+      "required_evidence": [
+        {
+          "description": "Complete current official notice, amendments, attachments, questions and answers, clauses, and portal instructions frozen with hashes.",
+          "evidence_class": "SOLICITATION_SOURCE",
+          "id": "current_source_set"
+        },
+        {
+          "description": "Requirement-by-requirement matrix binding each instruction and evaluation factor to exact evidence and document location.",
+          "evidence_class": "SOLICITATION_SOURCE",
+          "id": "requirement_compliance_matrix"
+        },
+        {
+          "description": "Independent final check of file type, fonts, margins, page numbering, markings, attachments, deadline timezone, delivery path, and duplicate state.",
+          "evidence_class": "INDEPENDENT_EVIDENCE",
+          "id": "final_conformance_receipt"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "Does the response satisfy every current amendment, mandatory qualification, factor, format, file type, marking, deadline, delivery channel, and signature requirement?",
+      "safe_next_action": "Do not submit any reviewed Monday lane as prime. Preserve the CSDR partner brief only for a specific qualified-prime request and repeat the complete official-source conformance check at action time.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "external_capability_statement_distribution"
+      ],
+      "category": "brand_identity_approval",
+      "claim_boundary": "Binding the selected Arc Seal asset does not approve the rest of the capability statement, establish solicitation conformance, or authorize external distribution.",
+      "current_state": {
+        "asset_path": "assets/brand/lumaarc_eclipse_corona_concept_v1.png",
+        "asset_sha256": "1ED1C9B00E273AA9E781BD7FD0A4FCC3FC542257C6D294C8E8FBFADA500701AF",
+        "basis": "The owner selected the canonical Arc Seal asset. The capability statement was regenerated, both pages were rendered and visually inspected without clipping or overlap, and the exact asset and PDF hashes are recorded. External distribution remains separately blocked by the action-time authority objection.",
+        "basis_refs": [
+          "capability_statement"
+        ],
+        "code": "ARC_SEAL_BOUND_AND_RENDER_VERIFIED",
+        "evidence_class": "BRAND_APPROVAL",
+        "page_count": 2,
+        "rendered_pdf_sha256": "C5CD72F62491688781EEC801BB9ED6A2C368EB9A7412754D476B25DE3EDE5967",
+        "satisfies_objection": true,
+        "visual_inspection_utc": "2026-07-26T22:30:37Z"
+      },
+      "id": "OBJ-BRAND-001",
+      "objection_sha256": "DF2A7208F80E4CF32627708C8058A40DF35272B303A5A4C720DC5960AADE43A6",
+      "required_evidence": [
+        {
+          "description": "Human-approved canonical Arc Seal asset path and hash.",
+          "evidence_class": "BRAND_APPROVAL",
+          "id": "approved_arc_seal_asset"
+        },
+        {
+          "description": "Regenerated capability statement with final-page visual inspection and recorded artifact hash.",
+          "evidence_class": "BRAND_APPROVAL",
+          "id": "rendered_identity_receipt"
+        }
+      ],
+      "resolved": true,
+      "reviewer_question": "Is the exact approved Arc Seal asset bound to the capability statement, and has the final rendered artifact been visually approved?",
+      "safe_next_action": "Retain the recorded asset and PDF hashes; satisfy the separate action-time authority gate before any external use.",
+      "severity": "BLOCKING"
+    },
+    {
+      "applies_to": [
+        "email_send",
+        "portal_action",
+        "certification",
+        "submission",
+        "signature"
+      ],
+      "category": "external_action_authority",
+      "claim_boundary": "Internal preparation, prior broad approval, a due date, or a generated draft is not approval for an exact external action.",
+      "current_state": {
+        "basis": "The Monday packet reports zero external actions and disables autonomous email, portal, certification, and submission. The CSDR partner brief has no selected recipient and requires exact action-time approval.",
+        "basis_refs": [
+          "monday_packet",
+          "csdr_partner_brief"
+        ],
+        "code": "EXTERNAL_ACTION_HUMAN_GATED",
+        "evidence_class": "HUMAN_APPROVAL",
+        "satisfies_objection": false
+      },
+      "id": "OBJ-AUTH-001",
+      "objection_sha256": "D43739945C85520EA7D299EA33CDD53F85E7AB8D54C1E9907CF1FF5243638BBB",
+      "required_evidence": [
+        {
+          "description": "Current approval binding the exact recipient or portal, subject, body, attachments, hashes, claims, price, and legal representations.",
+          "evidence_class": "HUMAN_APPROVAL",
+          "id": "action_time_approval"
+        },
+        {
+          "description": "Current duplicate-send, live deadline, amendment, mailbox, and portal-state recheck.",
+          "evidence_class": "DOCUMENTARY_EVIDENCE",
+          "id": "duplicate_and_deadline_check"
+        }
+      ],
+      "resolved": false,
+      "reviewer_question": "Who approved this exact recipient, channel, artifact hash, claims, price, certification, and submission action at the time of action?",
+      "safe_next_action": "Keep all external actions blocked until an authorized human approves the exact current action after duplicate, source, deadline, claim, and artifact-hash review.",
+      "severity": "BLOCKING"
+    }
+  ],
+  "review_scope": {
+    "material_count": 5,
+    "register_sha256": "B5678AB0954197B41CC3CD9E5E816F18F0E3760C3146E40BF760640FD9DDD820",
+    "scope_date": "2026-07-26",
+    "title": "Cross-agency federal capability and Monday opportunity review"
+  },
+  "safest_next_action": "Do not distribute the current capability statement or submit any reviewed Monday lane as prime. Resolve each documentary, operational, independent, teaming, and solicitation-conformance objection that remains open with current authoritative evidence, then obtain exact action-time human approval.",
+  "schema": "lumencore.federal_reviewer_objection_gate.v1",
+  "severity_counts": {
+    "BLOCKING": 14
+  },
+  "summary": {
+    "blocking_objection_count": 13,
+    "external_action_count": 0,
+    "external_capability_distribution_allowed": false,
+    "material_blocker_count": 0,
+    "objection_count": 14,
+    "partner_outreach_allowed": true,
+    "prime_submission_allowed": false,
+    "resolved_objection_count": 1,
+    "status": "BLOCKED_UNRESOLVED_REVIEWER_OBJECTIONS",
+    "unresolved_objection_count": 13
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "claim_boundary": "This record captures one clinic's service-availability decision only. It is not a legal opinion, patent-status determination, verified deadline, finding about the merits of an application, or statement that no other representation route exists.",
+  "controls": {
+    "builder_can_email": false,
+    "builder_can_submit_intake": false,
+    "do_not_disclose_unpublished_application_content": true,
+    "do_not_duplicate_intake": true,
+    "private_identifiers_omitted": true
+  },
+  "deadline": {
+    "exact_deadline_stated_in_response": false,
+    "state": "UNVERIFIED_TIME_SENSITIVE"
+  },
+  "duplicate_send_decision": "CLOSE_WITHOUT_REPLY",
+  "key_ask": "Seek a registered patent attorney or patent agent promptly because the clinic is closed for summer and cannot accept matters with upcoming filing deadlines.",
+  "lane_id": "nccu_ip_clinic_intake",
+  "next_action": "Close this clinic route without reply. Continue the official-record retrieval, authenticated Patent Center, pro se procedural-support, and verified registered-practitioner referral paths.",
+  "official_response_received_utc": "2026-07-22T17:56:29Z",
+  "response_template_id": "NO_DUPLICATE_MONITOR",
+  "schema": "lumencore.patent_clinic_route_closure_state.v1",
+  "send_now": false,
+  "state": "SERVICE_UNAVAILABLE_SUMMER_AND_UPCOMING_DEADLINE_ROUTE_CLOSED"
+}

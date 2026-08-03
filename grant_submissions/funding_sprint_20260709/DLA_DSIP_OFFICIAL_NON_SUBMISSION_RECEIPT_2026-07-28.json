@@ -1,0 +1,53 @@
+{
+  "schema": "lumencore.dla_dsip_official_non_submission_receipt.v1",
+  "status": "OFFICIAL_DLA_CONFIRMED_PROPOSAL_IN_PROGRESS_NOT_SUBMITTED",
+  "as_of_utc": "2026-07-28T17:36:13Z",
+  "lane_id": "missionweave_dsip_proposal",
+  "topic": "DLA26BZ03-NV011",
+  "source": {
+    "sender": "DLA SBIR",
+    "received_utc": "2026-07-28T17:36:13Z",
+    "subject": "FW: [Non-DoD Source] Re: Deadline-critical clarification: DLA26BZ03-NV011 Volume V DD Form 2345/JCP evidence",
+    "subject_sha256": "DAB7E531AF85EA502A3765D6079E934E2B80F2D8B0AD060E82D67E6C988E2CDF",
+    "sender_address_omitted": true,
+    "recipient_identifiers_omitted": true,
+    "message_body_omitted": true,
+    "private_mail_identifiers_omitted": true,
+    "signature_and_contact_details_omitted": true,
+    "full_thread_read": true,
+    "thread_truncated": false
+  },
+  "evidence": {
+    "official_dla_response": true,
+    "official_portal_status_observed": true,
+    "portal_status": "IN_PROGRESS",
+    "portal_snapshot_reported": true,
+    "portal_snapshot_omitted": true,
+    "formally_submitted": false,
+    "submission_receipt_observed": false,
+    "deadline_elapsed": true,
+    "founder_portal_recheck_required": false
+  },
+  "action": {
+    "key_ask": "None. Preserve the authoritative negative receipt and close the expired proposal lane as not submitted.",
+    "missing_facts": [],
+    "deadline": null,
+    "email_reply_required": false,
+    "portal_action_required": false,
+    "send_now": false,
+    "do_not_duplicate_send": true,
+    "selected_template_id": "NO_DUPLICATE_MONITOR",
+    "duplicate_send_decision": "CLOSE_NOT_SUBMITTED_DO_NOT_RESEND",
+    "safest_next_action": "Archive the official non-submission receipt, retain the failed gates for lessons learned, and do not resend, certify, upload, or represent the proposal as submitted."
+  },
+  "controls": {
+    "builder_can_send_email": false,
+    "builder_can_access_authenticated_portal": false,
+    "builder_can_change_portal_state": false,
+    "credentials_omitted": true,
+    "private_identifiers_omitted": true,
+    "legal_or_compliance_claim_created": false,
+    "submission_claim_allowed": false
+  },
+  "claim_boundary": "This receipt records an official DLA email reporting that DSIP showed the proposal as In Progress and therefore not formally submitted. It does not prove a portal submission, receipt, acceptance, review, award, compliance status, or eligibility."
+}

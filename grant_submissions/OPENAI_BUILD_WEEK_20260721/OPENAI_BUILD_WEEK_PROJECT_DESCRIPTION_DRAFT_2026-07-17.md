@@ -24,7 +24,7 @@ Codex reviewed the official rules, narrowed the product to one judge-testable wo
 
 Repository: https://github.com/robertashworth1986-debug/lumen-core-public
 
-Scoped source: https://github.com/robertashworth1986-debug/lumen-core-public/tree/1578504204c429d7f05779897dc3d5430038f681/build_week/prooflock_console
+Scoped source: https://github.com/robertashworth1986-debug/lumen-core-public/tree/281b76fe20d281974a2e2b44670a6a63815fe421/build_week/prooflock_console
 
 Public demo: https://lumen-core.ai/build_week/prooflock_console/
 

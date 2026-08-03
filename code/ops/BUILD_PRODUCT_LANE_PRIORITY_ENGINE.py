@@ -18,6 +18,13 @@ MINDWISE_MD = ROOT / "docs" / "MINDWISE_PAID_DESIGN_PARTNER_PILOT_2026-07-18.md"
 MINDWISE_EMAIL = ROOT / "docs" / "MINDWISE_DESIGN_PARTNER_FOLLOWUP_EMAIL_2026-07-18.txt"
 BUNDLE_MANIFEST = ROOT / "docs" / "receipts" / "PRODUCT_LANE_PRIORITY_BUNDLE_MANIFEST_2026-07-18.json"
 MINDWISE_DEMO_FEED = ROOT / "dashboard" / "data" / "mindwise_healthcare_candidate_feed_20260718.json"
+PILOT_CONFIG = ROOT / "config" / "prooflock_opportunity_ops_pilot_v1.json"
+GOLDEN_REPLAY = (
+    ROOT
+    / "dashboard"
+    / "data"
+    / "prooflock_opportunity_ops_golden_replay_v1.json"
+)
 
 RUN_IDS = (
     "20260505T082948Z",
@@ -63,6 +70,145 @@ def stable_hash(payload: Any) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def load_pilot_config() -> dict[str, Any]:
+    config = read_json(PILOT_CONFIG)
+    if config.get("schema") != "prooflock_opportunity_ops_pilot_config_v1":
+        raise ValueError("ProofLock pilot config is missing or uses the wrong schema")
+    required_sections = {
+        "minimum_sample",
+        "permitted_sources",
+        "prohibited_inputs",
+        "deliverables",
+        "exclusions",
+        "event_schema",
+        "receipt_schema",
+        "acceptance_metrics",
+        "acceptance_thresholds",
+        "raci",
+        "retention_and_security",
+        "support_boundary",
+        "pricing",
+        "human_gates",
+    }
+    missing = sorted(required_sections - set(config))
+    if missing:
+        raise ValueError(f"ProofLock pilot config missing sections: {missing}")
+    if config["pricing"].get("founder_approved") is not False:
+        raise ValueError("Pilot pricing must remain unapproved until exact scope review")
+    return config
+
+
+def build_golden_replay(config: dict[str, Any]) -> dict[str, Any]:
+    genesis = "0" * 64
+    fixtures = [
+        {
+            "opportunity_id": "SYNTH-QUALIFIED",
+            "decision": "QUALIFIED_FOR_BUYER_REVIEW",
+            "blockers": [],
+            "evidence": {
+                "eligibility_rule": "synthetic_entity_type_allowed",
+                "deadline_state": "synthetic_open_verified",
+                "source_state": "synthetic_official_fixture",
+            },
+        },
+        {
+            "opportunity_id": "SYNTH-DISQUALIFIED",
+            "decision": "DISQUALIFIED",
+            "blockers": ["synthetic_entity_type_not_eligible"],
+            "evidence": {
+                "eligibility_rule": "synthetic_entity_type_excluded",
+                "deadline_state": "synthetic_open_verified",
+                "source_state": "synthetic_official_fixture",
+            },
+        },
+        {
+            "opportunity_id": "SYNTH-INSUFFICIENT",
+            "decision": "ABSTAIN_INSUFFICIENT_EVIDENCE",
+            "blockers": ["missing_synthetic_deadline_receipt"],
+            "evidence": {
+                "eligibility_rule": "synthetic_rule_present",
+                "deadline_state": "unverified",
+                "source_state": "synthetic_incomplete_fixture",
+            },
+        },
+    ]
+    events: list[dict[str, Any]] = []
+    previous = genesis
+    for index, fixture in enumerate(fixtures, start=1):
+        event = {
+            "event_id": f"GOLDEN-{index:03d}",
+            "event_utc": f"2026-07-18T00:0{index}:00Z",
+            "opportunity_id": fixture["opportunity_id"],
+            "source_id": "synthetic_fixture_v1",
+            "action_type": "eligibility_and_deadline_review",
+            "actor_role": "system_draft_for_human_review",
+            "evidence_sha256": stable_hash(fixture["evidence"]),
+            "decision": fixture["decision"],
+            "blockers": fixture["blockers"],
+            "human_authority_state": "not_requested",
+            "previous_event_sha256": previous,
+        }
+        event["event_sha256"] = stable_hash(event)
+        previous = event["event_sha256"]
+        events.append(event)
+
+    receipt = {
+        "protocol_id": config["protocol_id"],
+        "event_count": len(events),
+        "genesis_sha256": genesis,
+        "terminal_event_sha256": previous,
+        "chain_valid": True,
+    }
+    receipt["receipt_sha256"] = stable_hash(receipt)
+    replay = {
+        "schema": "prooflock_opportunity_ops_golden_replay_v1",
+        "protocol_id": config["protocol_id"],
+        "fixture_data_class": "synthetic_no_phi_no_credentials",
+        "events": events,
+        "receipt": receipt,
+        "boundary": (
+            "This replay proves deterministic decision-state and receipt-chain "
+            "behavior for synthetic fixtures only. It does not prove eligibility, "
+            "customer outcomes, awards, savings, or production readiness."
+        ),
+    }
+    replay["replay_sha256"] = stable_hash(replay)
+    return replay
+
+
+def verify_golden_replay(replay: dict[str, Any]) -> bool:
+    replay_without_hash = dict(replay)
+    observed_replay_hash = replay_without_hash.pop("replay_sha256", None)
+    if observed_replay_hash != stable_hash(replay_without_hash):
+        return False
+
+    events = replay.get("events")
+    receipt = replay.get("receipt")
+    if not isinstance(events, list) or not isinstance(receipt, dict):
+        return False
+    previous = str(receipt.get("genesis_sha256") or "")
+    if previous != "0" * 64:
+        return False
+    for event_value in events:
+        if not isinstance(event_value, dict):
+            return False
+        event = dict(event_value)
+        observed_hash = event.pop("event_sha256", None)
+        if event.get("previous_event_sha256") != previous:
+            return False
+        if observed_hash != stable_hash(event):
+            return False
+        previous = str(observed_hash)
+    receipt_without_hash = dict(receipt)
+    observed_receipt_hash = receipt_without_hash.pop("receipt_sha256", None)
+    return (
+        receipt.get("event_count") == len(events)
+        and receipt.get("terminal_event_sha256") == previous
+        and receipt.get("chain_valid") is True
+        and observed_receipt_hash == stable_hash(receipt_without_hash)
+    )
+
+
 def file_receipt(path: Path) -> dict[str, Any]:
     relative_path = str(path.relative_to(ROOT)).replace("\\", "/")
     if not path.is_file():
@@ -95,6 +241,8 @@ def build_bundle_manifest(payload: dict[str, Any]) -> dict[str, Any]:
         ROOT / "code" / "ops" / "HEALTHCARE_WEBSITE_EMBED_PLAYBOOK.md",
         ROOT / "tests" / "test_product_lane_priority_engine.py",
         MINDWISE_DEMO_FEED,
+        PILOT_CONFIG,
+        GOLDEN_REPLAY,
     )
     receipts = [file_receipt(path) for path in paths]
     manifest: dict[str, Any] = {
@@ -119,6 +267,194 @@ def parse_float(value: Any) -> float | None:
     except (TypeError, ValueError):
         return None
     return parsed if math.isfinite(parsed) else None
+
+
+def parse_utc_datetime(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def normalize_evidence_contract(value: Any) -> dict[str, Any]:
+    if isinstance(value, str):
+        return {
+            "path": value,
+            "required": True,
+            "kind": "legacy_untyped_artifact",
+            "claim_scope": "",
+            "min_bytes": 1,
+            "expected_schema": None,
+            "required_keys": [],
+            "max_age_hours": None,
+            "legacy_untyped": True,
+        }
+    if not isinstance(value, dict):
+        return {
+            "path": "",
+            "required": True,
+            "kind": "invalid_contract",
+            "claim_scope": "",
+            "min_bytes": 1,
+            "expected_schema": None,
+            "required_keys": [],
+            "max_age_hours": None,
+            "legacy_untyped": False,
+        }
+
+    required_keys = value.get("required_keys")
+    if not isinstance(required_keys, list):
+        required_keys = []
+    return {
+        "path": str(value.get("path") or "").strip(),
+        "required": bool(value.get("required", True)),
+        "kind": str(value.get("kind") or "artifact").strip(),
+        "claim_scope": str(value.get("claim_scope") or "").strip(),
+        "min_bytes": value.get("min_bytes", 1),
+        "expected_schema": value.get("expected_schema"),
+        "required_keys": [str(item) for item in required_keys if str(item).strip()],
+        "max_age_hours": value.get("max_age_hours"),
+        "legacy_untyped": False,
+    }
+
+
+def validate_evidence_contract(value: Any, at: datetime | None = None) -> dict[str, Any]:
+    at = (at or now_utc()).astimezone(timezone.utc)
+    contract = normalize_evidence_contract(value)
+    path_text = contract["path"]
+    reasons: list[str] = []
+
+    min_bytes = parse_float(contract["min_bytes"])
+    if min_bytes is None or min_bytes < 1:
+        reasons.append("contract_invalid_min_bytes")
+        min_bytes = 1.0
+    max_age_hours = parse_float(contract["max_age_hours"])
+    if contract["max_age_hours"] is not None and (
+        max_age_hours is None or max_age_hours <= 0
+    ):
+        reasons.append("contract_invalid_max_age_hours")
+        max_age_hours = None
+    expected_schema = contract["expected_schema"]
+    if expected_schema is not None and not isinstance(expected_schema, str):
+        reasons.append("contract_invalid_expected_schema")
+        expected_schema = None
+    if contract["legacy_untyped"]:
+        reasons.append("contract_legacy_untyped")
+    if not contract["claim_scope"]:
+        reasons.append("contract_missing_claim_scope")
+    if not path_text:
+        reasons.append("contract_missing_path")
+
+    target: Path | None = None
+    if path_text:
+        try:
+            target = (ROOT / path_text).resolve()
+            target.relative_to(ROOT.resolve())
+        except (OSError, ValueError):
+            reasons.append("contract_path_outside_root")
+            target = None
+
+    exists = bool(target and target.exists())
+    is_file = bool(target and target.is_file())
+    size = 0
+    modified_utc: str | None = None
+    sha256: str | None = None
+    age_hours: float | None = None
+    age_source: str | None = None
+    observed_schema: Any = None
+    observed_keys: list[str] = []
+    missing_keys: list[str] = []
+    json_payload: dict[str, Any] | None = None
+
+    if target is not None and not exists:
+        reasons.append("artifact_missing")
+    elif target is not None and not is_file:
+        reasons.append("artifact_not_file")
+    elif target is not None:
+        stat = target.stat()
+        size = stat.st_size
+        modified = datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc)
+        modified_utc = modified.isoformat()
+        age_reference = modified
+        age_source = "file_modified_utc"
+        if size < min_bytes:
+            reasons.append("artifact_below_min_bytes")
+
+        digest = hashlib.sha256()
+        with target.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+        sha256 = digest.hexdigest()
+
+        needs_json = (
+            expected_schema is not None
+            or bool(contract["required_keys"])
+            or target.suffix.lower() == ".json"
+        )
+        if needs_json:
+            try:
+                candidate = json.loads(target.read_text(encoding="utf-8-sig"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                reasons.append("artifact_invalid_json")
+            else:
+                if isinstance(candidate, dict):
+                    json_payload = candidate
+                    observed_schema = candidate.get("schema")
+                    observed_keys = sorted(str(key) for key in candidate)
+                    generated = parse_utc_datetime(candidate.get("generated_utc"))
+                    if generated is not None:
+                        age_reference = generated
+                        age_source = "json_generated_utc"
+                else:
+                    reasons.append("artifact_json_not_object")
+
+        if expected_schema is not None and json_payload is not None:
+            if observed_schema != expected_schema:
+                reasons.append("artifact_schema_mismatch")
+        if contract["required_keys"] and json_payload is not None:
+            missing_keys = sorted(set(contract["required_keys"]) - set(json_payload))
+            if missing_keys:
+                reasons.append("artifact_missing_required_keys")
+        else:
+            missing_keys = []
+
+        if max_age_hours is not None:
+            age_hours = (at - age_reference).total_seconds() / 3600
+            if age_hours < -0.25:
+                reasons.append("artifact_timestamp_in_future")
+            elif age_hours > max_age_hours:
+                reasons.append("artifact_stale")
+    contract_complete = not any(reason.startswith("contract_") for reason in reasons)
+    valid = not reasons
+    return {
+        "path": path_text,
+        "required": contract["required"],
+        "kind": contract["kind"],
+        "claim_scope": contract["claim_scope"],
+        "contract_complete": contract_complete,
+        "valid": valid,
+        "status": "valid" if valid else "invalid",
+        "reasons": reasons,
+        "exists": exists,
+        "is_file": is_file,
+        "bytes": size,
+        "min_bytes": int(min_bytes),
+        "sha256": sha256,
+        "modified_utc": modified_utc,
+        "expected_schema": expected_schema,
+        "observed_schema": observed_schema,
+        "required_keys": contract["required_keys"],
+        "missing_required_keys": missing_keys,
+        "observed_keys": observed_keys,
+        "max_age_hours": max_age_hours,
+        "age_hours": round(age_hours, 4) if age_hours is not None else None,
+        "age_source": age_source,
+    }
 
 
 def audit_run(run_id: str) -> dict[str, Any]:
@@ -223,10 +559,11 @@ def build_mindwise_demo_feed() -> dict[str, Any]:
         "summary": {
             "close_7_days": sum(1 for row in records if closes_within(row, 7)),
             "close_14_days": sum(1 for row in records if closes_within(row, 14)),
-            "immediate_or_fast": sum(
+            "urgent_or_expedited_review": sum(
                 1
                 for row in records
-                if str(row.get("action") or "").upper() in {"IMMEDIATE_SUBMIT", "FAST_TRACK"}
+                if str(row.get("action") or "").upper()
+                in {"URGENT_REVIEW", "EXPEDITED_REVIEW"}
             ),
             "snapshot_records": len(records),
         },
@@ -241,7 +578,11 @@ def build_mindwise_demo_feed() -> dict[str, Any]:
     return snapshot
 
 
-def rank_lanes(config: dict[str, Any]) -> list[dict[str, Any]]:
+def rank_lanes(
+    config: dict[str, Any],
+    at: datetime | None = None,
+) -> list[dict[str, Any]]:
+    at = at or now_utc()
     weights = config.get("weights") if isinstance(config.get("weights"), dict) else {}
     if round(sum(float(value) for value in weights.values()), 8) != 100:
         raise ValueError("product-lane weights must sum to 100")
@@ -255,22 +596,54 @@ def rank_lanes(config: dict[str, Any]) -> list[dict[str, Any]]:
         if missing_dimensions:
             raise ValueError(f"{lane.get('id')} missing score dimensions: {missing_dimensions}")
         weighted = sum(float(scores[key]) * float(weight) for key, weight in weights.items()) / 100
-        evidence_paths = [str(value) for value in lane.get("evidence_paths", [])]
         evidence_checks = [
-            {"path": path, "exists": (ROOT / path).exists()}
-            for path in evidence_paths
+            validate_evidence_contract(value, at)
+            for value in lane.get("evidence_paths", [])
         ]
+        required_checks = [item for item in evidence_checks if item["required"]]
+        validated_count = sum(1 for item in required_checks if item["valid"])
         evidence_coverage = (
-            sum(1 for item in evidence_checks if item["exists"]) / len(evidence_checks)
-            if evidence_checks
+            validated_count / len(required_checks)
+            if required_checks
             else 0.0
+        )
+        internal_evidence_gate_passed = bool(required_checks) and all(
+            item["valid"] for item in required_checks
+        )
+        evidence_blockers = [
+            {
+                "path": item["path"],
+                "reasons": item["reasons"],
+            }
+            for item in required_checks
+            if not item["valid"]
+        ]
+        buyer_gate_status = (
+            "requires_external_buyer_validation"
+            if internal_evidence_gate_passed
+            else "blocked_internal_evidence"
         )
         ranked.append(
             {
                 **lane,
                 "strategy_score": round(weighted, 2),
                 "evidence_coverage": round(evidence_coverage, 4),
+                "validated_evidence_coverage": round(evidence_coverage, 4),
+                "validated_evidence_count": validated_count,
+                "required_evidence_count": len(required_checks),
                 "evidence_checks": evidence_checks,
+                "internal_evidence_gate_passed": internal_evidence_gate_passed,
+                "buyer_readiness_gate": {
+                    "passed": False,
+                    "status": buyer_gate_status,
+                    "internal_evidence_gate_passed": internal_evidence_gate_passed,
+                    "evidence_blockers": evidence_blockers,
+                    "next_required_validation": lane.get("first_validation"),
+                    "boundary": (
+                        "Internal artifact validation cannot establish buyer acceptance, "
+                        "organizational eligibility, external validation, or commercial readiness."
+                    ),
+                },
             }
         )
     ranked.sort(key=lambda row: (-float(row["strategy_score"]), str(row["id"])))
@@ -279,17 +652,31 @@ def rank_lanes(config: dict[str, Any]) -> list[dict[str, Any]]:
     return ranked
 
 
-def mindwise_pilot() -> dict[str, Any]:
+def mindwise_pilot(config: dict[str, Any]) -> dict[str, Any]:
     return {
-        "name": "MindWise x ProofLock Opportunity Operations - 30-day design-partner pilot",
-        "buyer": "Kishore Tummala, CEO and Founder, MindWise Health",
-        "scope_boundary": "Phase 1 uses opportunity, workflow, and synthetic/sample organization data only; no PHI.",
-        "commercial_posture": "Paid design-partner pilot; credit the agreed pilot fee toward an annual subscription if acceptance gates pass.",
+        "name": "ProofLock Opportunity Operations - 30-day paid pilot",
+        "buyer_selected": False,
+        "buyer": None,
+        "status": config["status"],
+        "protocol_id": config["protocol_id"],
+        "duration_days": config["duration_days"],
+        "scope_boundary": config["scope_boundary"],
+        "minimum_sample": config["minimum_sample"],
+        "permitted_sources": config["permitted_sources"],
+        "prohibited_inputs": config["prohibited_inputs"],
+        "deliverables": config["deliverables"],
+        "exclusions": config["exclusions"],
+        "event_schema": config["event_schema"],
+        "receipt_schema": config["receipt_schema"],
+        "commercial_posture": (
+            "Paid pilot after exact buyer scope, baseline, acceptance thresholds, "
+            "data terms, price, and recipient are approved."
+        ),
         "week_1_baseline": [
             "Measure current time from opportunity discovery to pursue/no-pursue decision.",
             "Measure current time from pursue decision to reviewer-ready draft.",
             "Count eligibility reversals, missing attachments, and missed internal review dates.",
-            "Lock the source portals, eligibility rubric, roles, and final human approval gate.",
+            "Freeze source permissions, eligibility rules, metric denominators, thresholds, roles, and human gates.",
         ],
         "weeks_2_to_4": [
             "Refresh permitted opportunity sources and rank candidates with evidence links.",
@@ -297,32 +684,33 @@ def mindwise_pilot() -> dict[str, Any]:
             "Route unresolved facts to named owners; abstain instead of guessing.",
             "Emit a replayable receipt for every shortlist, draft, and preflight decision.",
         ],
-        "acceptance_metrics": [
-            {"metric": "qualified opportunity precision", "definition": "buyer-approved qualified matches / reviewed matches"},
-            {"metric": "time to pursue decision", "definition": "median elapsed time from discovery to documented decision"},
-            {"metric": "time to reviewer-ready draft", "definition": "median elapsed time from pursue decision to internal review state"},
-            {"metric": "preflight defect rate", "definition": "missing or contradictory required items per package at review"},
-            {"metric": "deadline reliability", "definition": "packages reaching internal review by the buyer-set cutoff / pursued packages"},
-            {"metric": "provenance completeness", "definition": "material claims with a traceable source / material claims reviewed"},
-        ],
-        "human_gates": [
-            "buyer confirms organizational eligibility",
-            "buyer approves claims and representations",
-            "authorized official certifies and submits",
-            "no system action bypasses portal attestations or signatures",
-        ],
-        "go_no_go": "Convert only if the buyer confirms a measured workflow improvement and the evidence/eligibility error rate remains within the agreed threshold.",
+        "acceptance_metrics": config["acceptance_metrics"],
+        "acceptance_thresholds": config["acceptance_thresholds"],
+        "raci": config["raci"],
+        "retention_and_security": config["retention_and_security"],
+        "support_boundary": config["support_boundary"],
+        "pricing": config["pricing"],
+        "human_gates": config["human_gates"],
+        "go_no_go": (
+            "Convert only when the frozen sample rule is met and the buyer confirms "
+            "that every accepted metric passes its prospectively approved threshold. "
+            "Otherwise stop, extend under a documented alternate sample rule, or abstain."
+        ),
     }
 
 
 def build_payload(at: datetime | None = None) -> dict[str, Any]:
     at = at or now_utc()
     config = read_json(CONFIG)
-    ranked = rank_lanes(config)
+    pilot_config = load_pilot_config()
+    golden_replay = build_golden_replay(pilot_config)
+    if not verify_golden_replay(golden_replay):
+        raise ValueError("ProofLock golden replay failed receipt-chain verification")
+    ranked = rank_lanes(config, at)
     run_audits = [audit_run(run_id) for run_id in RUN_IDS]
     comparable = [row for row in run_audits if row["all_models_complete"]]
     best_exploratory = max(comparable, key=lambda row: row["datasets_succeeded"], default={})
-    pilot = mindwise_pilot()
+    pilot = mindwise_pilot(pilot_config)
     feed_audit = audit_healthcare_feed(at)
     allowed_now = [
         "working grant-ranking, draft-assembly, preflight, and receipt components exist",
@@ -349,6 +737,7 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
         "schema": "product_lane_priority_engine_v1",
         "generated_utc": at.isoformat(),
         "boundary": BOUNDARY,
+        "evidence_contract_version": "typed_evidence_contract_v1",
         "weights": config.get("weights", {}),
         "ranking": ranked,
         "recommendation": {
@@ -360,10 +749,18 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
                 "uses train-only or source-available features, abstains when eligibility or evidence gates fail, "
                 "and emits replayable policy/source receipts. Patentability still requires a dedicated search."
             ),
-            "first_design_partner": "MindWise Health",
+            "first_design_partner": "unselected_requires_current_validated_target",
             "why_now": (
-                "A warm founder relationship, a working vertical demo, and a current candidate feed exist. "
-                "The feed still requires buyer-specific eligibility review and measured pilot acceptance gates."
+                (
+                    "Typed internal evidence contracts pass for the top lane. Buyer selection, "
+                    "workflow baseline, acceptance thresholds, eligibility review, and measured "
+                    "pilot outcomes remain external gates."
+                )
+                if ranked and ranked[0]["internal_evidence_gate_passed"]
+                else (
+                    "The top strategy lane has unresolved typed-evidence blockers. Repair those "
+                    "internal artifacts before selecting a buyer or describing the offer as ready."
+                )
             ),
         },
         "evidence_audit": {
@@ -399,7 +796,20 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
                 "eligibility, deterministic abstention, deadline controls, and replayable submission receipts."
             ),
         },
+        "prooflock_opportunity_ops_pilot": pilot,
         "mindwise_pilot": pilot,
+        "pilot_protocol_receipts": {
+            "config_path": str(PILOT_CONFIG.relative_to(ROOT)).replace("\\", "/"),
+            "config_sha256": stable_hash(pilot_config),
+            "golden_replay_path": str(GOLDEN_REPLAY.relative_to(ROOT)).replace("\\", "/"),
+            "golden_replay_sha256": golden_replay["replay_sha256"],
+            "golden_replay_verified": True,
+            "golden_replay_event_count": len(golden_replay["events"]),
+            "golden_replay_decisions": [
+                event["decision"] for event in golden_replay["events"]
+            ],
+            "boundary": golden_replay["boundary"],
+        },
         "claim_controls": {
             "allowed_now": allowed_now,
             "blocked_now": blocked_now,
@@ -423,13 +833,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Ranked Lanes",
         "",
-        "| Rank | Lane | Strategy score | Evidence present | First validation |",
-        "|---:|---|---:|---:|---|",
+        "| Rank | Lane | Strategy score | Validated evidence | Buyer gate | First validation |",
+        "|---:|---|---:|---:|---|---|",
     ]
     for lane in payload["ranking"]:
         lines.append(
             f"| {lane['rank']} | {lane['name']} | {lane['strategy_score']:.2f} | "
-            f"{lane['evidence_coverage'] * 100:.0f}% | {lane['first_validation']} |"
+            f"{lane['validated_evidence_coverage'] * 100:.0f}% | "
+            f"{lane['buyer_readiness_gate']['status']} | {lane['first_validation']} |"
         )
 
     audit = payload["evidence_audit"]
@@ -442,7 +853,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Best bounded exploratory run: `{audit['best_bounded_exploratory_run']}` with `{audit['best_bounded_exploratory_dataset_count']}` datasets.",
             f"- Latest-run blocker: {audit['latest_run_blocker']}",
             f"- Router blocker: {audit['router_risk']}",
-            f"- MindWise candidate feed: `{feed['status']}`; age `{feed['age_hours']}` hours; freshness label allowed `{str(feed['freshness_label_allowed']).lower()}`; eligibility label allowed `{str(feed['eligibility_label_allowed']).lower()}`.",
+            f"- Healthcare candidate feed: `{feed['status']}`; age `{feed['age_hours']}` hours; freshness label allowed `{str(feed['freshness_label_allowed']).lower()}`; eligibility label allowed `{str(feed['eligibility_label_allowed']).lower()}`.",
             f"- Feed boundary: {feed['boundary']}",
             "",
             "## Commercial Wedge",
@@ -451,7 +862,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "The first recurring product is an organization subscription for monitored opportunities, controlled collaboration, evidence storage, and preflight. Final certifications and submissions remain with the authorized human.",
             "",
-            "## MindWise Pilot",
+            "## Buyer-Neutral Pilot",
             "",
             f"- Scope: {payload['mindwise_pilot']['scope_boundary']}",
             f"- Commercial posture: {payload['mindwise_pilot']['commercial_posture']}",
@@ -461,7 +872,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         ]
     )
     for item in payload["mindwise_pilot"]["acceptance_metrics"]:
-        lines.append(f"- **{item['metric']}**: {item['definition']}")
+        lines.append(
+            f"- **{item['metric']}**: numerator = {item['numerator']}; "
+            f"denominator = {item['denominator']}"
+        )
     lines.extend(
         [
             "",
@@ -480,9 +894,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
 def render_mindwise_brief(payload: dict[str, Any]) -> str:
     pilot = payload["mindwise_pilot"]
     lines = [
-        "# MindWise x ProofLock Opportunity Operations",
+        "# ProofLock Opportunity Operations",
         "",
-        "## 30-Day Paid Design-Partner Pilot",
+        "## Buyer-Neutral 30-Day Paid Pilot Protocol",
         "",
         "### Objective",
         "",
@@ -492,6 +906,19 @@ def render_mindwise_brief(payload: dict[str, Any]) -> str:
         "",
         pilot["scope_boundary"],
         "",
+        "### Buyer And Commercial State",
+        "",
+        "- Buyer selected: `false`",
+        f"- Protocol status: `{pilot['status']}`",
+        f"- Pricing status: `{pilot['pricing']['status']}`",
+        "- No fee, subscription price, recipient, or external communication is approved by this document.",
+        "",
+        "### Minimum Sample",
+        "",
+        f"- Reviewed opportunities: `{pilot['minimum_sample']['reviewed_opportunities']}`",
+        f"- Pursued packages: `{pilot['minimum_sample']['pursued_packages']}`",
+        f"- Alternate rule: {pilot['minimum_sample']['alternate_sample_rule']}",
+        "",
         "### Week 1: Lock the Baseline",
         "",
     ]
@@ -499,7 +926,49 @@ def render_mindwise_brief(payload: dict[str, Any]) -> str:
     lines.extend(["", "### Weeks 2-4: Run the Pilot", ""])
     lines.extend(f"- {item}" for item in pilot["weeks_2_to_4"])
     lines.extend(["", "### Acceptance Metrics", ""])
-    lines.extend(f"- **{item['metric']}**: {item['definition']}" for item in pilot["acceptance_metrics"])
+    lines.extend(
+        (
+            f"- **{item['metric']}**: numerator = {item['numerator']}; "
+            f"denominator = {item['denominator']}"
+        )
+        for item in pilot["acceptance_metrics"]
+    )
+    lines.extend(
+        [
+            "",
+            "Threshold rule:",
+            "",
+            f"- {pilot['acceptance_thresholds']['rule']}",
+            "",
+            "### Permitted Sources",
+            "",
+        ]
+    )
+    lines.extend(f"- {item}" for item in pilot["permitted_sources"])
+    lines.extend(["", "### Prohibited Inputs", ""])
+    lines.extend(f"- {item}" for item in pilot["prohibited_inputs"])
+    lines.extend(["", "### Deliverables", ""])
+    lines.extend(f"- {item}" for item in pilot["deliverables"])
+    lines.extend(["", "### Exclusions", ""])
+    lines.extend(f"- {item}" for item in pilot["exclusions"])
+    lines.extend(["", "### RACI", ""])
+    lines.extend(f"- **{role}**: {duty}" for role, duty in pilot["raci"].items())
+    lines.extend(
+        [
+            "",
+            "### Retention And Security",
+            "",
+            f"- Default post-pilot retention: `{pilot['retention_and_security']['default_retention_days_after_pilot']}` days",
+            f"- Deletion: {pilot['retention_and_security']['deletion_rule']}",
+            f"- Access: {pilot['retention_and_security']['access_rule']}",
+            f"- Incident response: {pilot['retention_and_security']['incident_rule']}",
+            "",
+            "### Support Boundary",
+            "",
+            f"- Included: {pilot['support_boundary']['included']}",
+            f"- Excluded: {pilot['support_boundary']['excluded']}",
+        ]
+    )
     lines.extend(["", "### Human Authority Gates", ""])
     lines.extend(f"- {item}" for item in pilot["human_gates"])
     lines.extend(
@@ -509,26 +978,41 @@ def render_mindwise_brief(payload: dict[str, Any]) -> str:
             "",
             pilot["commercial_posture"],
             "",
-            "No value or savings figure is quoted until MindWise supplies or approves the baseline inputs and the pilot produces a traceable measurement.",
+            "No value, savings, performance, or price figure is quoted until a selected buyer approves the baseline inputs and prospective thresholds and the pilot produces a traceable measurement.",
+            "",
+            "### Golden Replay",
+            "",
+            f"- Verified: `{str(payload['pilot_protocol_receipts']['golden_replay_verified']).lower()}`",
+            f"- Synthetic events: `{payload['pilot_protocol_receipts']['golden_replay_event_count']}`",
+            f"- Replay SHA-256: `{payload['pilot_protocol_receipts']['golden_replay_sha256']}`",
+            f"- Boundary: {payload['pilot_protocol_receipts']['boundary']}",
         ]
     )
     return "\n".join(lines)
 
 
-def render_mindwise_email() -> str:
+def render_mindwise_email(payload: dict[str, Any]) -> str:
+    pilot = payload["mindwise_pilot"]
     return "\n".join(
         [
-            "Subject: MindWise x Luma: measurable 30-day grant-operations pilot",
+            "DRAFT ONLY - RECIPIENT NOT SELECTED - DO NOT SEND",
             "",
-            "Hi Kishore,",
+            "Subject: Bounded 30-day opportunity-operations pilot",
             "",
-            "I appreciated your earlier response to the MindWise grant-flow demo. I took a harder look at what is actually differentiated and ready to measure.",
+            "Hi [Name],",
+            "",
+            "I am reaching out only after confirming that your current workflow and source permissions fit a bounded pilot.",
             "",
             "The strongest next step is not another broad AI-writing demo. It is a bounded 30-day design-partner pilot for opportunity operations: permitted-source monitoring, evidence-linked eligibility review, reviewer-ready draft structure, attachment/blocker preflight, and a replayable receipt for every material decision. Final certifications and submissions remain with your authorized team.",
             "",
-            "In week one, we would measure your current workflow and lock the baseline. During the pilot we would track qualified-match precision, time to pursue/no-pursue, time to reviewer-ready draft, preflight defects, deadline reliability, and provenance completeness. Phase 1 would use no PHI.",
+            (
+                "In week one, we would freeze your baseline, denominators, thresholds, "
+                f"and cutoff. The default minimum sample is {pilot['minimum_sample']['reviewed_opportunities']} "
+                f"reviewed opportunities and {pilot['minimum_sample']['pursued_packages']} pursued packages. "
+                "The pilot excludes PHI, credentials, legal advice, and autonomous submission."
+            ),
             "",
-            "If the measured results do not justify continuing, we stop. If they do, we convert the proven workflow into a MindWise subscription or customer-facing add-on under terms we agree together.",
+            "If the prospectively approved metrics do not justify continuing, we stop or document why the sample was insufficient. If they do, we can discuss a separately approved subscription under terms agreed after measurement.",
             "",
             "Would you be open to a 20-minute scoping call next week to choose one workflow and one baseline?",
             "",
@@ -540,12 +1024,17 @@ def render_mindwise_email() -> str:
 
 def main() -> int:
     payload = build_payload()
+    pilot_config = load_pilot_config()
+    golden_replay = build_golden_replay(pilot_config)
+    if not verify_golden_replay(golden_replay):
+        raise ValueError("ProofLock golden replay failed before artifact write")
     demo_feed = build_mindwise_demo_feed()
     write_json(OUT_JSON, payload)
     write_text(OUT_MD, render_markdown(payload))
     write_text(MINDWISE_MD, render_mindwise_brief(payload))
-    write_text(MINDWISE_EMAIL, render_mindwise_email())
+    write_text(MINDWISE_EMAIL, render_mindwise_email(payload))
     write_json(MINDWISE_DEMO_FEED, demo_feed)
+    write_json(GOLDEN_REPLAY, golden_replay)
     manifest = build_bundle_manifest(payload)
     write_json(BUNDLE_MANIFEST, manifest)
     print(json.dumps({

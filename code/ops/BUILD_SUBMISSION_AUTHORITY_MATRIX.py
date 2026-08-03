@@ -259,6 +259,137 @@ AUTHORITY_BY_ACTION_TYPE: dict[str, dict[str, Any]] = {
             "Human approves the selected topic and response plan.",
         ],
     },
+    "account_credential_rotation": {
+        "required_authority": "Robert controls the official account, installs the replacement credential through the guarded private workflow, and verifies rotation.",
+        "readiness_mode": "ACCOUNT_CREDENTIAL_ROTATION_HUMAN_REQUIRED",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Use only the official account route and guarded hidden-input installer.",
+            "Never place credential values in logs, chat, repository files, or public receipts.",
+            "Human verifies changed fingerprint and a bounded live client probe.",
+        ],
+    },
+    "account_role_verification": {
+        "required_authority": "Robert signs in through the official account route and decides whether to request, accept, or change any application role.",
+        "readiness_mode": "ACCOUNT_ROLE_READ_ONLY_VERIFICATION_REQUIRED",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Verify the official domain and current session before reading role state.",
+            "Record role status without exposing identifiers or authentication material.",
+            "Stop before requesting or accepting a role unless the human approves that exact action.",
+        ],
+    },
+    "account_security_review": {
+        "required_authority": "Robert verifies whether the account-security event was expected and controls every sign-in, device, recovery, or session action.",
+        "readiness_mode": "ACCOUNT_SECURITY_EVENT_HUMAN_REVIEW_REQUIRED",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Use official account-security pages reached independently of message links.",
+            "Do not expose one-time codes, recovery data, device identifiers, or session details.",
+            "Human decides whether to revoke sessions or change account settings.",
+        ],
+    },
+    "cohort_onboarding": {
+        "required_authority": "Robert reviews cohort obligations, dates, publicity permissions, data terms, and any attendance or participation commitment.",
+        "readiness_mode": "COHORT_ONBOARDING_REVIEW_HUMAN_ACCEPTANCE_REQUIRED",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Verify the official onboarding source and current participation status.",
+            "Separate informational scheduling from binding terms or publicity consent.",
+            "Human approves any acceptance, signature, payment, or external response.",
+        ],
+    },
+    "developer_challenge_build": {
+        "required_authority": "Robert approves public claims, account terms, media rights, and the final challenge submission.",
+        "readiness_mode": "DEVELOPER_CHALLENGE_LOCAL_BUILD_FINAL_SUBMIT_BLOCKED",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Verify the current official challenge rules, deadline, and required disclosures.",
+            "Use only claim-bounded public artifacts and privacy-reviewed media.",
+            "Human reviews the final preview and performs any certification or submit action.",
+        ],
+    },
+    "human_review": {
+        "required_authority": "Robert reviews the current official evidence and decides whether this lane remains open, closed, inbound-only, or eligible for a separately approved action.",
+        "readiness_mode": "HUMAN_REVIEW_REQUIRED_NO_EXTERNAL_ACTION",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Reconcile the latest official source, deadline, route status, and duplicate-action history.",
+            "Do not infer send, submission, or partner authority from local package presence.",
+            "Human approves any change from review-only status.",
+        ],
+    },
+    "inbound_only_monitor": {
+        "required_authority": "Robert reviews any new inbound message and separately approves a response only if the lane policy permits one.",
+        "readiness_mode": "INBOUND_ONLY_MONITOR_NO_OUTBOUND_ACTION",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Monitor only the verified thread or official source.",
+            "Reconcile prior sends and lane-specific follow-up limits before drafting.",
+            "No outbound response is implied by an inbound-only monitor state.",
+        ],
+    },
+    "private_agreement_obligation_review": {
+        "required_authority": "Robert and qualified counsel, when needed, review the executed agreement, obligations, confidentiality, IP, export, and termination terms.",
+        "readiness_mode": "PRIVATE_AGREEMENT_CUSTODY_AND_OBLIGATION_REVIEW",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Keep executed agreements and sensitive terms in approved private custody.",
+            "Extract obligations without publishing signatures, identifiers, or confidential text.",
+            "Human and counsel approve any amendment, disclosure, or performance commitment.",
+        ],
+    },
+    "read_only_portal_verification": {
+        "required_authority": "Robert controls the authenticated session and permits only a read-only status check unless a separate exact action is approved.",
+        "readiness_mode": "PORTAL_READ_ONLY_STATUS_VERIFICATION",
+        "can_prepare_internal": True,
+        "can_send_external_without_human": False,
+        "can_submit_without_human": False,
+        "can_accept_terms_without_human": False,
+        "pre_action_checks": [
+            "Verify the official portal and read only the minimum status needed.",
+            "Do not change answers, upload, certify, sign, submit, or expose identifiers.",
+            "Record a bounded status receipt without authentication or controlled-content details.",
+        ],
+    },
+}
+
+UNMAPPED_AUTHORITY: dict[str, Any] = {
+    "required_authority": "Robert must classify this unknown action type before any preparation or external action.",
+    "readiness_mode": "UNMAPPED_ACTION_TYPE_BLOCKED",
+    "can_prepare_internal": False,
+    "can_send_external_without_human": False,
+    "can_submit_without_human": False,
+    "can_accept_terms_without_human": False,
+    "pre_action_checks": [
+        "Stop work on the lane until an explicit authority policy is registered.",
+        "Preserve source, deadline, duplicate-action, and package evidence.",
+        "Do not send, submit, accept terms, or change a portal state.",
+    ],
 }
 
 
@@ -297,7 +428,11 @@ def build_payload() -> dict[str, Any]:
     rows = []
     for item in sorted(docket_items, key=lambda row: int(row.get("priority", 999))):
         action_type = str(item.get("action_type", "human_review"))
-        authority = AUTHORITY_BY_ACTION_TYPE[action_type]
+        action_type_mapped = action_type in AUTHORITY_BY_ACTION_TYPE
+        authority = AUTHORITY_BY_ACTION_TYPE.get(
+            action_type,
+            UNMAPPED_AUTHORITY,
+        )
         row = {
             "lane_id": item.get("lane_id", ""),
             "name": item.get("name", ""),
@@ -305,6 +440,7 @@ def build_payload() -> dict[str, Any]:
             "channel": item.get("channel", ""),
             "status": item.get("status", ""),
             "action_type": action_type,
+            "action_type_mapped": action_type_mapped,
             "urgency": item.get("urgency", ""),
             "action_due": item.get("action_due"),
             "readiness_mode": authority["readiness_mode"],
@@ -333,6 +469,12 @@ def build_payload() -> dict[str, Any]:
 
     gate_clear = bool(gate.get("reviewer_gate_clear")) and int(gate["summary"]["unsafe_secret_count"]) == 0 and int(gate["summary"]["unsafe_claim_count"]) == 0
     all_artifacts_present = all(int(row["artifact_missing_count"]) == 0 for row in rows)
+    all_action_types_mapped = all(row["action_type_mapped"] for row in rows)
+    docket_lane_count = int(docket["summary"]["lane_count"])
+    concierge_lane_count = int(concierge["summary"]["lane_count"])
+    source_lane_counts_match = (
+        len(rows) == docket_lane_count == concierge_lane_count
+    )
     all_final_actions_blocked = all(
         not row["can_send_external_without_human"]
         and not row["can_submit_without_human"]
@@ -343,11 +485,33 @@ def build_payload() -> dict[str, Any]:
     payload = {
         "generated_utc": now_utc(),
         "schema": "submission_authority_matrix_v1",
-        "status": "SUBMISSION_AUTHORITY_MATRIX_READY" if gate_clear and all_artifacts_present and all_final_actions_blocked else "SUBMISSION_AUTHORITY_MATRIX_BLOCKED",
+        "status": (
+            "SUBMISSION_AUTHORITY_MATRIX_READY"
+            if gate_clear
+            and all_artifacts_present
+            and all_action_types_mapped
+            and source_lane_counts_match
+            and all_final_actions_blocked
+            else "SUBMISSION_AUTHORITY_MATRIX_BLOCKED"
+        ),
+        "control_integrity_status": (
+            "CONTROL_INTEGRITY_PASS_ACTION_BLOCKED"
+            if all_action_types_mapped and all_final_actions_blocked
+            else "CONTROL_INTEGRITY_BLOCKED"
+        ),
         "summary": {
             "lane_count": len(rows),
-            "docket_lane_count": int(docket["summary"]["lane_count"]),
-            "concierge_lane_count": int(concierge["summary"]["lane_count"]),
+            "docket_lane_count": docket_lane_count,
+            "concierge_lane_count": concierge_lane_count,
+            "source_lane_counts_match": source_lane_counts_match,
+            "all_action_types_mapped": all_action_types_mapped,
+            "unmapped_action_types": sorted(
+                {
+                    str(row["action_type"])
+                    for row in rows
+                    if not row["action_type_mapped"]
+                }
+            ),
             "all_artifacts_present": all_artifacts_present,
             "reviewer_gate_clear": gate_clear,
             "all_final_actions_blocked_without_human": all_final_actions_blocked,
@@ -360,6 +524,16 @@ def build_payload() -> dict[str, Any]:
             "live_trading_allowed": False,
             "readiness_counts": dict(sorted(readiness_counts.items())),
             "action_type_counts": dict(sorted(action_type_counts.items())),
+        },
+        "source_state": {
+            "docket_generated_utc": docket.get("generated_utc"),
+            "concierge_generated_utc": concierge.get("generated_utc"),
+            "reviewer_gate_generated_utc": gate.get("generated_utc"),
+            "boundary": (
+                "READY requires mapped authority policies, source lane-count parity, "
+                "present local artifacts, a clear reviewer gate, and all external "
+                "actions blocked behind the named human authority."
+            ),
         },
         "authority_rows": rows,
         "source_ledgers": {
@@ -392,7 +566,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Gate Status",
         "",
         f"- Status: `{payload['status']}`",
+        f"- Control integrity: `{payload['control_integrity_status']}`",
         f"- Lanes: `{summary['lane_count']}`",
+        f"- Source lane counts match: `{str(summary['source_lane_counts_match']).lower()}`",
+        f"- All action types mapped: `{str(summary['all_action_types_mapped']).lower()}`",
+        f"- Unmapped action types: `{', '.join(summary['unmapped_action_types']) or 'none'}`",
         f"- All artifacts present: `{str(summary['all_artifacts_present']).lower()}`",
         f"- Reviewer gate clear: `{str(summary['reviewer_gate_clear']).lower()}`",
         f"- All final actions blocked without human: `{str(summary['all_final_actions_blocked_without_human']).lower()}`",

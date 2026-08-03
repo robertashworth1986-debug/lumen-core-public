@@ -1,6 +1,6 @@
 # Submission Conformance Gate
 
-As of UTC: `2026-07-29T16:17:42.193907Z`
+As of UTC: `2026-07-29T21:24:51.841554Z`
 
 Require a source-bound objective, novelty, baseline, metric, experiment, evidence-applicability, execution, and independent-red-team trace before any technical submission can be called reviewer-ready.
 
@@ -20,7 +20,7 @@ No technical submission is reviewer-ready unless every required criterion passes
 - Expired without verified submission: `1`
 - Technical no-go lanes: `1`
 - Final submission without human: `false`
-- Gate SHA-256: `f4bcce7e7dceb2f8e8f9dd958cc400b1b7f66b4ea41ac5334976c98dbc49cd67`
+- Gate SHA-256: `0bb3a4bf1895565613410b3cbe5f479aaca6db958bbe8d9f3eb4320ddaa0c8c5`
 
 ## Lane Gates
 
@@ -209,22 +209,22 @@ Criteria:
 - Active candidate: `true`
 - Argument required: `true`
 - Argument pass: `false`
-- Criteria: pass `3`, partial `5`, fail `2`, unassessed `0`
+- Criteria: pass `3`, partial `7`, fail `0`, unassessed `0`
 - Separate red-team receipt pass: `false`
-- Next action: Name one current comparator, lock one HPCMP-representative experiment with quantitative thresholds and falsifiers, bind delivery roles and compute access, obtain an internal red-team receipt, then separately complete the private ROM, SAM all-awards, contact, Submittable, and final portal gates.
-- Boundary: Current-source and formatting conformance plus an explicit objective crosswalk do not establish applicant eligibility, reviewer readiness, pricing, SAM readiness, technical merit, independent validation, selection, award, deployment, savings, or Government validation.
+- Next action: Publish the reviewed exact evidence files, bind a trust root outside the mutable receipt, have ERDC or an approved reviewer select the integrated comparator and HPCMP-representative workflow, lock mission and overhead thresholds, bind team, compute, integration, support, evaluator, and transition commitments, obtain independent execution, then separately complete the private ROM, SAM all-awards, contact, Submittable, and final portal gates.
+- Boundary: Current-source custody, format and marker checks, a local synthetic ablation, and an explicit objective crosswalk do not establish applicant eligibility, reviewer readiness, public reproducibility, pricing, SAM readiness, technical merit, independent validation, selection, award, deployment, savings, or Government validation.
 
 Criteria:
-- `official_source_current` state=`PASS` passed=`true` - The current-source manifest binds the controlling CSO and July 20 FAQ, and the compliance gate preserves the current live-page deadline plus the original PDF text.
+- `official_source_current` state=`PASS` passed=`true` - The current-source manifest and custody receipt bind the controlling CSO, July 20 FAQ, extracted text, and a hashed July 29 live-page snapshot. The compliance gate preserves the current commercial-solution deadline plus the original PDF text.
 - `mandatory_format_and_route` state=`PASS` passed=`true` - The public draft has five counted body pages plus an excluded cover and acronym list, uses letter portrait format, one-inch margins, 12-point Times New Roman, physical and body page labels, a PDF under 20 MB, and the ERDCWERX portal route.
-- `program_objective_trace` state=`PASS` passed=`true` - The brief maps the evidence-control module to Unified Service Layer, AI-Powered Orchestration evidence, Secure Data Fabric metadata, and Vendor Lock-In Prevention, all of which the CSO permits as a focused subset.
-- `foundational_leap` state=`PARTIAL` passed=`false` - The brief identifies a new application of predeclared acceptance rules, append-only evidence, offline verification, and retained failures to hybrid HPC and AI orchestration, but it does not yet distinguish that module experimentally from modern provenance, policy, and observability stacks.
-- `named_sota_baseline` state=`FAIL` passed=`false` - The brief names open standards and architectural boundaries but does not name and protocol-match a current government or commercial evidence-control baseline.
-- `program_metric_trace` state=`PARTIAL` passed=`false` - Integrity, portability, failure visibility, reproducibility, capture latency, verification time, storage growth, and egress are identified, but no current-source baseline values or quantitative acceptance thresholds are locked.
-- `mission_specific_experiment` state=`PARTIAL` passed=`false` - The brief proposes a sixteen-week unclassified prototype with two replaceable adapters, two approved environments, shadow replay, Government-run verification, and rollback, but the actual HPCMP workflow, interfaces, data, workload scale, and comparator remain unlocked.
-- `evidence_applicability` state=`PARTIAL` passed=`false` - The public repository and source-native ledger support inspectable evidence-control and negative-result-retention patterns, but they do not exercise an HPCMP environment, SDC integration, classified boundary, or Government workload.
-- `team_compute_execution` state=`FAIL` passed=`false` - The public brief does not bind named delivery roles, a prime integration owner, an independent evaluator, HPC and cloud access, or a supportable execution budget.
-- `risk_transition_and_falsifier` state=`PARTIAL` passed=`false` - The brief identifies sensitive-data, performance, scale, accreditation, interoperability, rollback, and failure-visibility controls, but each core claim is not yet bound to a quantitative falsifier, transition owner, and Government decision threshold.
+- `program_objective_trace` state=`PASS` passed=`true` - The brief makes Unified Service Layer and Vendor Lock-In Prevention the primary scope and treats AI-Powered Orchestration evidence and Secure Data Fabric metadata as integration boundaries. The CSO permits a solution to address one or more focus areas.
+- `foundational_leap` state=`PARTIAL` passed=`false` - The brief defines a local mechanism and binds no-chain, no-predeclaration, and no-failure-retention ablations. OpenTelemetry 1.59.0 and SLSA 1.2/in-toto v1 are unranked interoperability contexts and are not scored. The result remains a local synthetic full-versus-ablation experiment, not evidence against a current integrated Government or commercial control plane.
+- `named_sota_baseline` state=`PARTIAL` passed=`false` - The brief names OpenTelemetry Logs Data Model 1.59.0 and SLSA Build Provenance 1.2 with in-toto Statement v1 as complementary context only. The local protocol does not score or attack them and does not represent either standard as an equivalent evidence-control product or Government-selected incumbent.
+- `program_metric_trace` state=`PARTIAL` passed=`false` - The brief now requires complete declared-attack detection, complete adverse-case retention, clean reviewer replay, and fixed-window measurement of bytes per event, capture and verify latency, storage per day, operator-review minutes, and egress bytes. Current baseline values and Government-approved workload and overhead thresholds remain unlocked.
+- `mission_specific_experiment` state=`PARTIAL` passed=`false` - The brief proposes a sixteen-week unclassified prototype with two replaceable adapters, two approved environments, shadow replay, Government-run verification, explicit stop rules, and a local 48-workflow precursor. The actual HPCMP workflow, interfaces, data, workload scale, selected comparator, and Government thresholds remain unlocked.
+- `evidence_applicability` state=`PARTIAL` passed=`false` - The bound local version-two ablation supports inspectable tamper detection, predeclaration, adverse-result retention, synthetic artifact-byte rehashing, adaptive re-chain attacks, and explicit negative controls relative to a separately supplied local anchor. The exact July 29 evidence is not yet represented as published in the public repository, and it does not exercise an HPCMP environment, SDC integration, classified boundary, Government workload, external trust root, or independent evaluator.
+- `team_compute_execution` state=`PARTIAL` passed=`false` - The brief identifies the founder as proposed technical lead and bounds local surrogate development to contractor-furnished commodity CPU, storage, and open software. It explicitly leaves Government or prime integration, evaluator commitment, production HPC or cloud access, staffing, support, transition ownership, and the execution budget uncommitted.
+- `risk_transition_and_falsifier` state=`PARTIAL` passed=`false` - The brief now binds the controlled experiment to stop and roll back on any declared attack miss, adverse-case omission, verifier mismatch, or Government-set overhead breach. The Government overhead threshold, transition owner, authorized interface owner, and security-boundary transition remain uncommitted.
 
 ### darpa_falcon_dpa26bz04_dv016
 

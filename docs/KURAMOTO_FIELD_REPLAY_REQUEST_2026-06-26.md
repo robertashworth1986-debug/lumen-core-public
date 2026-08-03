@@ -1,143 +1,62 @@
-# Kuramoto Field Replay Request
+# Kuramoto Nonpromotion and Protocol Redesign Brief
 
-Generated UTC: `2026-06-29T16:50:22.653142+00:00`
+Generated UTC: `2026-07-29T06:17:51.902760+00:00`
 
-Convert the strongest current internal replay result into a buyer-authorized field replay request. This is a validation ask, not a completed field-validation claim.
+The filename is retained for downstream compatibility. This artifact blocks the request and is not an outreach packet.
 
-## Summary
+Record the direct measured Kuramoto nonpromotion result, close the legacy field-replay narrative, and define the gates for a future source-specific wave-family benchmark.
+
+## Measured Result
 
 - Candidate: `kuramoto_phase_coupling`
-- Lane: `wave_resonance_timing`
-- Status: `ready_to_request_field_replay_not_yet_field_validated`
-- Internal holdout wins vs Kalman: `24/24`
-- Mean delta vs Kalman: `0.139875`
-- Estimated rows replayed: `2506267`
-- Source systems: `4`
-- Wilson lower 95% win-rate bound: `0.862024`
-- Holdout chain SHA-256: `b723b3cf65d3971b0492e41cc27fc82e1fba57a5e0d672a67e9818348313f2e6`
-- Manual outreach allowed: `true`
-- Bulk email allowed: `false`
+- Development-selected candidate: `lissajous_phase_paths`
+- Candidate was protocol-selected: `false`
+- Status: `field_replay_request_blocked_source_specific_baseline_gate_failed`
+- Direct measured wins vs Kalman: `482/1525`
+- Losses or ties vs Kalman: `1043`
+- Mean skill delta vs Kalman: `-0.508190706`
+- Best registered baseline: `autoregressive_ridge_p14`
+- Registered baseline mean wins: `0/6`
+- Registered baseline gate passes: `0/6`
+- All-baseline Holm gate passed: `false`
+- Panel rows: `14704`
+- Holdout chain SHA-256: `ffb3e4448ad393027791e3c582b2c8d0dde1e6cf0685fafd630727bb2477a9cb`
 
-## Why It Matters
+## Request Gate
 
-The evidence says this candidate is worth taking to a real owner-controlled replay. It does not say the candidate is already field validated. The next value step is to let a buyer or agency control the holdout data, accepted baseline, metrics, and result interpretation.
+- Request type: `not_a_field_replay_request`
+- Current status: `blocked`
+- Field-replay request allowed: `false`
+- Manual outreach allowed: `false`
+- Paid protocol-review scoping allowed: `true`
 
-## What We Can Ask For Now
+Do not ask an external owner to replay Kuramoto as a promoted candidate; preserve its direct measured nonpromotion result and redesign the next source-native wave benchmark.
 
-Authorize a field replay on pre-registered holdout windows so kuramoto_phase_coupling can be compared against the buyer's accepted incumbent baseline.
+Unlock conditions:
 
-Technical question: Can the Kuramoto-style candidate beat incumbent timing/forecast baselines on pre-registered buyer holdout windows?
-
-Buyer roles:
-- Energy Forecasting Lead
-- Grid Reliability Analytics Lead
-- Sensor Fusion Program Manager
-- Industrial Process Stability Lead
-- R&D Program Manager for Cyber-Physical Systems
-
-Data required:
-- timestamped oscillatory or cyclic measurements
-- incumbent forecast, filter, or timing-control baseline
-- measured downstream outcome such as error, drift, outage lead time, or intervention cost
-- known exogenous event markers where available
-- holdout windows selected before model scoring
-
-Baseline controls:
-- `kalman_filter`
-- `fft_peak_tracker`
-- `arima_or_ets_forecast`
-- `pll_phase_tracker`
-- `seasonal_naive_forecast`
-
-Primary KPIs:
-- `candidate_score_delta_vs_named_baseline`
-- `forecast_error_delta`
-- `phase_error_delta`
-- `lead_time_delta`
-- `false_alarm_or_missed_event_delta`
-
-## Evidence
-
-- Holdout count: `24`
-- Wins vs `kalman_filter`: `24`
-- Losses or ties vs `kalman_filter`: `0`
-- Estimated rows replayed: `2506267`
-- Numeric samples read: `66690`
-- Source systems: `energy_grid, macro_rates_labor, market_data, sports_market`
-- Chain SHA-256: `b723b3cf65d3971b0492e41cc27fc82e1fba57a5e0d672a67e9818348313f2e6`
-
-## Buyer Replay Protocol
-
-Acceptance gate:
-
-```json
-{
-  "maximum_constraint_violation_rate": "buyer_defined_before_pilot",
-  "minimum_candidate_win_rate": 0.6,
-  "minimum_holdout_windows": 20,
-  "minimum_independent_source_or_sensor_count": 3,
-  "minimum_lower_95_delta": 0.0,
-  "minimum_wilson_lower_95_win_rate": 0.5,
-  "required_result": "candidate must beat named baselines on pre-registered holdout windows without guardrail failure"
-}
-```
-
-Pre-call questions:
-- What operational decision or forecast would you want this to improve?
-- What incumbent baseline does your team trust today?
-- Can you provide at least 20 pre-registered holdout windows?
-- Which measured outcome would make the pilot worth continuing?
-- Which guardrail failure would stop the pilot immediately?
-- Who can approve use of field data and economic conversion factors?
-
-## Manual Email Copy
-
-Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot
-
-```text
-Hello [Name],
-
-I am Robert Ashworth, inventor of the LumenCore/NovaCore frozen evidence framework. I am reaching out because your team works near oscillatory or cyclic systems where earlier timing, lower phase error, or better drift detection can reduce missed events and manual review.
-
-The current evidence is not a field-validation or savings claim. It is a narrower pilot-scoping signal:
-- Candidate: kuramoto_phase_coupling
-- Lane: wave_resonance_timing
-- Repeat-window evidence: 24/24 positive frozen replay windows
-- Lower 95% score-margin estimate: 0.044697
-- Expanded internal holdout: 24/24 wins vs kalman_filter
-- Mean delta vs kalman_filter: 0.139875
-- Estimated rows replayed: 2506267
-- Holdout chain SHA-256: b723b3cf65d3971b0492e41cc27fc82e1fba57a5e0d672a67e9818348313f2e6
-- Current technical question: Can the Kuramoto-style candidate beat incumbent timing/forecast baselines on pre-registered buyer holdout windows?
-
-I am looking for one paid technical evaluation or buyer-authorized pilot where we replay the candidate against your incumbent baselines on pre-registered holdout windows. The output would be a claim-bounded evidence report: what improved, what failed, what cannot yet be claimed, and what would be required for a procurement-grade validation.
-
-Would you be open to a 20-minute technical fit call this week?
-
-Best,
-Robert Ashworth
-[Organization / LumenCore]
-[Website or proof portal link]
-[Physical mailing address]
-
-To stop further outreach, reply "remove."
-```
+- select the future candidate using development data only
+- freeze source-native baselines before opening the holdout
+- beat every registered baseline on the untouched holdout
+- pass multiplicity correction and independent frozen repeats
+- obtain exact action-time approval before any external request
 
 ## Claim Boundary
 
-The current result supports a manual request for buyer-authorized replay. It does not prove external operational performance until the buyer controls the data, baseline, holdout windows, logs, and result interpretation.
+Kuramoto was measured directly on the frozen EIA panel, was not selected by the development protocol, and lost on mean skill to the named Kalman baseline and every registered baseline. This is useful negative evidence, not a promoted candidate or field-performance result.
 
 - Field-validation claim allowed: `false`
 - Realized savings claim allowed: `false`
-- Fixed-dollar delta value claim allowed: `false`
-- Live trading claim allowed: `false`
+- Live execution allowed: `false`
 
-No-go claims:
-- `field validated`
-- `guaranteed savings`
-- `$10k per frozen delta`
-- `guaranteed trading edge`
-- `proven institutional profit`
-- `medical treatment claim`
+## Next Actions
 
-Packet SHA-256: `90ca642e99c8239d50907cc5576789c3f6f5cac46e94111f0007b09f5098952b`
+1. Keep the negative result and its chain hash in the reviewer room.
+2. Do not send the legacy field-replay request.
+3. Map each future wave family to the exact source task it can represent.
+4. Select the future candidate on development data only.
+5. Freeze all source-native baselines before opening the holdout.
+6. Require all-baseline success after multiplicity correction.
+7. Require independent frozen repeats before a field-replay request.
+8. Offer only a bounded protocol review while those gates remain closed.
+
+Packet SHA-256: `02ab6e066178fadd3bae69605da258cb1c4e55a318e8ebea914de087423e47a6`

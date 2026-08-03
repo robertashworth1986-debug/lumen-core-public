@@ -58,6 +58,11 @@ def lane_gate(row: dict[str, Any]) -> dict[str, Any]:
     gain = as_float(row.get("optimization_gain_pct"))
     measured = as_bool(row.get("measured_source")) and as_bool(row.get("primary_live_evidence"))
     generated = bool(str(row.get("generated_utc") or "").strip())
+    baseline_protocol_locked = as_bool(row.get("baseline_protocol_locked"))
+    buyer_approved_economic_conversion = as_bool(row.get("buyer_approved_economic_conversion"))
+    economic_conversion_source = str(row.get("economic_conversion_source") or "").strip()
+    prospective_or_heldout_validation_passed = as_bool(row.get("prospective_or_heldout_validation_passed"))
+    uncertainty_bounds_complete = as_bool(row.get("uncertainty_bounds_complete"))
     source = str(row.get("source") or "").strip()
     sector = str(row.get("sector") or "").strip()
     is_tradingish = any(token in (sector + " " + source).lower() for token in ("market", "kraken", "alpaca", "trading", "crypto", "odds"))
@@ -73,11 +78,22 @@ def lane_gate(row: dict[str, Any]) -> dict[str, Any]:
         missing.append("measured_delta_or_gain")
     if not generated:
         missing.append("generated_timestamp")
+    if not baseline_protocol_locked:
+        missing.append("baseline_protocol_locked")
+    if not buyer_approved_economic_conversion:
+        missing.append("buyer_approved_economic_conversion")
+    if not economic_conversion_source:
+        missing.append("economic_conversion_source")
+    if not prospective_or_heldout_validation_passed:
+        missing.append("prospective_or_heldout_validation_passed")
+    if not uncertainty_bounds_complete:
+        missing.append("uncertainty_bounds_complete")
 
     if missing:
         status = "blocked_context_only"
         allowed_language = (
-            "Use only as context or a test target. Do not present this as an avoided-cost, savings, ROI, or revenue claim."
+            "Use only as a test target. The input projection is suppressed and must not be presented as avoided cost, "
+            "savings, ROI, revenue, contract value, or government value."
         )
     else:
         status = "estimated_value_signal"
@@ -105,11 +121,20 @@ def lane_gate(row: dict[str, Any]) -> dict[str, Any]:
         "constraint": str(row.get("constraint") or "default"),
         "status": status,
         "claim_band": claim_band,
-        "estimated_hourly_value_usd": round(hourly, 4),
-        "estimated_daily_value_usd": round(as_float(row.get("estimated_daily_value_usd")), 4),
-        "estimated_annual_value_usd": round(annual, 4),
-        "baseline_loss_rate_usd_per_hour": round(baseline, 4),
-        "optimization_gain_pct": round(gain, 4),
+        "estimated_hourly_value_usd": round(hourly, 4) if status == "estimated_value_signal" else 0.0,
+        "estimated_daily_value_usd": (
+            round(as_float(row.get("estimated_daily_value_usd")), 4) if status == "estimated_value_signal" else 0.0
+        ),
+        "estimated_annual_value_usd": round(annual, 4) if status == "estimated_value_signal" else 0.0,
+        "baseline_loss_rate_usd_per_hour": round(baseline, 4) if status == "estimated_value_signal" else 0.0,
+        "optimization_gain_pct": round(gain, 4) if status == "estimated_value_signal" else 0.0,
+        "input_projection_present": hourly > 0 or annual > 0,
+        "input_projection_suppressed": status != "estimated_value_signal",
+        "baseline_protocol_locked": baseline_protocol_locked,
+        "buyer_approved_economic_conversion": buyer_approved_economic_conversion,
+        "economic_conversion_source": economic_conversion_source if status == "estimated_value_signal" else "",
+        "prospective_or_heldout_validation_passed": prospective_or_heldout_validation_passed,
+        "uncertainty_bounds_complete": uncertainty_bounds_complete,
         "missing_for_stronger_claim": missing,
         "allowed_language": allowed_language,
         "blocked_language": [
@@ -143,14 +168,12 @@ def build_payload() -> dict[str, Any]:
 
     allowed_hourly = sum(as_float(row.get("estimated_hourly_value_usd")) for row in allowed)
     allowed_annual = sum(as_float(row.get("estimated_annual_value_usd")) for row in allowed)
-    blocked_context_annual = sum(as_float(row.get("estimated_annual_value_usd")) for row in evaluated_context)
-
     panel_headline = panel.get("headline", {}) if isinstance(panel.get("headline"), dict) else {}
     key_summary = key_gate.get("summary", {}) if isinstance(key_gate.get("summary"), dict) else {}
 
     return {
         "generated_utc": now_utc(),
-        "schema": "dollar_claim_gate_v1",
+        "schema": "dollar_claim_gate_v2",
         "purpose": "Tell the system when dollar language is allowed, what language is safe, and what is still blocked.",
         "summary": {
             "allowed_estimated_value_claims": len(allowed),
@@ -158,10 +181,13 @@ def build_payload() -> dict[str, Any]:
             "blocked_context_only_claims": len(blocked),
             "allowed_estimated_hourly_value_usd": round(allowed_hourly, 2),
             "allowed_estimated_annual_value_usd": round(allowed_annual, 2),
-            "blocked_context_only_annual_value_usd": round(blocked_context_annual, 2),
+            "blocked_context_only_annual_value_usd": 0.0,
+            "suppressed_input_projection_count": sum(
+                1 for row in evaluated_live + evaluated_context if row.get("input_projection_suppressed")
+            ),
             "panel_primary_evidence_mode": panel_headline.get("primary_evidence_mode", ""),
             "live_measured_source_row_count": panel_headline.get("live_measured_source_row_count", 0),
-            "context_only_estimated_annual_value_usd": panel_headline.get("context_only_estimated_annual_value_usd", 0),
+            "context_only_estimated_annual_value_usd": 0.0,
             "key_gate_configured_providers": key_summary.get("configured_providers", 0),
             "proof_vault_note": "A terabyte of frozen deltas is storage capacity and provenance leverage, not a dollar claim by itself.",
         },
@@ -173,7 +199,10 @@ def build_payload() -> dict[str, Any]:
             },
             {
                 "level": "estimated_value_signal",
-                "when_allowed": "Live or authorized representative data, positive baseline loss/cost rate, positive measured delta, timestamped frozen run.",
+                "when_allowed": (
+                    "Live or authorized representative data, a locked buyer baseline, a buyer-approved economic "
+                    "conversion source, held-out or prospective validation, uncertainty bounds, and a timestamped frozen run."
+                ),
                 "safe_phrase": "This run produced an estimated avoided-cost signal of X under stated assumptions.",
             },
             {
@@ -187,19 +216,31 @@ def build_payload() -> dict[str, Any]:
                 "safe_phrase": "In the authorized pilot, measured avoided cost was X over Y period.",
             },
         ],
-        "allowed_claim_language": [
-            f"Current live-measured lanes support bounded estimated value language up to {money(allowed_hourly)} per hour / {money(allowed_annual)} per year under stated assumptions.",
-            "Use estimated, bounded, source-backed, and under-assumptions language.",
-            "Separate live-measured lanes from context-only lanes in every dashboard and submission.",
-        ],
+        "allowed_claim_language": (
+            [
+                (
+                    "Current fully gated lanes support bounded estimated value language up to "
+                    f"{money(allowed_hourly)} per hour / {money(allowed_annual)} per year under stated assumptions."
+                ),
+                "Use estimated, bounded, source-backed, and under-assumptions language.",
+                "Separate fully gated lanes from blocked test targets in every dashboard and submission.",
+            ]
+            if allowed
+            else [
+                "No current lane clears the dollar-projection gate.",
+                "Describe current value only as a buyer-measured pilot hypothesis, without a dollar amount.",
+                "Preserve input projections as suppressed test targets until every required gate is evidenced.",
+            ]
+        ),
         "blocked_claim_language": [
-            f"Do not promote the context-only annual figure of {money(blocked_context_annual)} as real value.",
+            "Do not publish or aggregate suppressed input projections as a product, contract, savings, or valuation claim.",
             "Do not say guaranteed funding, guaranteed savings, government value, customer ROI, or realized trading profit.",
             "Do not say a terabyte of frozen deltas is worth a fixed amount without reviewed source rights, validated deltas, and buyer relevance.",
         ],
         "next_actions_to_unlock_larger_claims": [
             "For each high-value context-only lane, attach a public/authorized source registry row and mark it measured only after fresh probe or file-hash evidence.",
             "Add uncertainty intervals and a paired baseline comparison for every lane promoted above estimated-value language.",
+            "Obtain a named buyer or system owner approval for the baseline and economic conversion before publishing dollars.",
             "Promote government/agency language only when the delta maps to a mission metric such as downtime, response time, false positives, missed detections, energy waste, or review burden.",
             "Keep market/sports lanes as calibration and paper/replay tests unless real-money results are separately audited and legally reviewable.",
             "Use the plugged-in terabyte drive as a proof vault: raw snapshots, manifests, hashes, rendered packets, and reproducible run directories.",
@@ -224,8 +265,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Answer",
         "",
         (
-            "Dollar claims are allowed only as bounded estimates until a lane has held-out validation, uncertainty bounds, "
-            "and source/legal review. The current safe language is estimated value signal, not guaranteed savings."
+            "Dollar projections are blocked unless a lane has a locked buyer baseline, buyer-approved economic conversion, "
+            "held-out or prospective validation, uncertainty bounds, and source/legal review."
         ),
         "",
         "## Current Gate",
@@ -234,7 +275,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Large estimated-value lanes: {summary['large_estimated_signal_claims']}",
         f"- Blocked/context-only lanes: {summary['blocked_context_only_claims']}",
         f"- Allowed estimated value: {money(summary['allowed_estimated_hourly_value_usd'])}/hour; {money(summary['allowed_estimated_annual_value_usd'])}/year",
-        f"- Context-only blocked annual value: {money(summary['blocked_context_only_annual_value_usd'])}",
+        f"- Suppressed input projections: {summary['suppressed_input_projection_count']}",
         f"- Proof vault note: {summary['proof_vault_note']}",
         "",
         "## Claim Levels",

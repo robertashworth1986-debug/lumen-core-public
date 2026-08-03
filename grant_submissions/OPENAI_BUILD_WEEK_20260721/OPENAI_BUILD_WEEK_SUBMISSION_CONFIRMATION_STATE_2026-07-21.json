@@ -1,0 +1,23 @@
+{
+  "claim_boundary": "The official Devpost email confirms that ProofLock Console was submitted to OpenAI Build Week. It does not establish eligibility, completeness beyond the accepted submission state, judging, endorsement, award, funding, external validation, patent rights, commercial value, or future performance.",
+  "controls": {
+    "builder_can_edit_submission": false,
+    "builder_can_submit": false,
+    "do_not_duplicate_submission": true,
+    "private_identifiers_omitted": true
+  },
+  "deadline": {
+    "local": "2026-07-21T17:00:00-07:00",
+    "timezone": "America/Los_Angeles",
+    "utc": "2026-07-22T00:00:00Z"
+  },
+  "evidence": {
+    "confirmation_email_received_utc": "2026-07-21T16:00:55Z",
+    "official_sender_domain": "devpost.com",
+    "submission_name": "ProofLock Console"
+  },
+  "lane_id": "openai_build_week_prooflock_console",
+  "next_action": "Monitor the existing Devpost account and official email for judging or organizer requests. Do not resubmit and do not describe the project as selected, endorsed, funded, or awarded.",
+  "schema": "lumencore.openai_build_week_submission_confirmation_state.v1",
+  "status": "OFFICIAL_SUBMISSION_CONFIRMATION_EMAIL_OBSERVED"
+}

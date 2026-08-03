@@ -1,0 +1,119 @@
+{
+  "schema": "lumencore.kuramoto_sector_external_evaluator_protocol.v1",
+  "template_version": 1,
+  "status": "TEMPLATE_BLOCKED_UNTIL_EXTERNAL_ACCEPTANCE",
+  "predecessor": {
+    "protocol_id": "KURAMOTO_CROSS_SECTOR_20260726",
+    "protocol_path": "config/kuramoto_cross_sector_benchmark_protocol_v1.json",
+    "protocol_sha256": "2f983c0acd93a8f72bda7f4565cc7e5fbbf06ae3435572e1b7458f76567f2989",
+    "evidence_chain_sha256": "5538aafe96b331bf3125f85e113bc2efb74a153fe81e507b5602187e4493f0a1",
+    "disposition": "negative_retrospective_results_retained",
+    "sector_gain_proven": false,
+    "economic_value_proven": false
+  },
+  "sector_contract": {
+    "sector_id": null,
+    "operational_decision": null,
+    "data_owner_or_publisher": null,
+    "target_variable": null,
+    "native_unit": null,
+    "forecast_cadence": null,
+    "forecast_horizon": null,
+    "decision_latency_limit": null,
+    "deployment_context": null
+  },
+  "evaluator": {
+    "organization": null,
+    "technical_role": null,
+    "independence_basis": null,
+    "conflict_of_interest_disclosure": null,
+    "authority_to_accept_protocol": null,
+    "identity_or_authority_evidence_sha256": null
+  },
+  "data_contract": {
+    "evaluator_custody_before_freeze": null,
+    "never_scored_by_lumencore_before_freeze": null,
+    "dataset_or_query_manifest_sha256": null,
+    "source_release_timing_rule": null,
+    "evaluation_start_utc": null,
+    "evaluation_end_utc": null,
+    "minimum_evaluation_origins": null,
+    "missing_data_rule": null,
+    "revision_policy": null,
+    "outcome_dependent_exclusion_allowed": false,
+    "backfill_allowed": false
+  },
+  "candidate_contract": {
+    "candidate_id": "kuramoto_phase_coupling",
+    "candidate_definition": "Fit frozen cadence-specific seasonal oscillators on history available before each origin, advance phases one step with the Kuramoto equation using Euler integration and fixed coupling K=0.01, then reconstruct the next value.",
+    "source_commit": null,
+    "runner_sha256": null,
+    "environment_manifest_sha256": null,
+    "container_or_clean_runner_receipt_sha256": null,
+    "post_freeze_tuning_allowed": false,
+    "fallback_or_substitution_allowed": false
+  },
+  "baseline_contract": {
+    "buyer_incumbent_baseline_id": null,
+    "buyer_incumbent_baseline_definition": null,
+    "buyer_incumbent_source_or_binary_sha256": null,
+    "additional_declared_baselines": null,
+    "identical_information_set_required": true,
+    "identical_forecast_origin_required": true,
+    "identical_target_required": true,
+    "silent_package_fallback_allowed": false
+  },
+  "statistical_contract": {
+    "primary_metric": "mean_absolute_error",
+    "metric_direction": "lower_is_better",
+    "minimum_effect_in_native_units": null,
+    "minimum_relative_improvement_percent": null,
+    "confidence_level": 0.95,
+    "uncertainty_method": "paired_moving_block_bootstrap",
+    "bootstrap_replications": 10000,
+    "bootstrap_seed": null,
+    "block_definition": null,
+    "multiple_comparison_correction": "holm",
+    "must_beat_buyer_incumbent": true,
+    "must_beat_every_declared_baseline": true,
+    "adverse_subgroup_limit": null,
+    "negative_result_retention_required": true
+  },
+  "economic_contract": {
+    "enabled_before_technical_gate": false,
+    "buyer_approved_cost_per_native_error_unit_usd": null,
+    "buyer_approved_periods_per_year": null,
+    "buyer_approved_attribution_fraction": null,
+    "buyer_approved_value_stream_usd_per_year": null,
+    "cost_rule_basis_document_sha256": null,
+    "required_formula": "annual_value_usd = validated_native_unit_error_reduction_per_period * validated_periods_per_year * buyer_approved_cost_per_native_error_unit_usd * buyer_approved_attribution_fraction",
+    "sensitivity_is_not_savings": true,
+    "projection_or_savings_claim_allowed": false
+  },
+  "acceptance_contract": {
+    "technical_gate_expression": "candidate_mean_absolute_error < every_declared_baseline_mean_absolute_error AND paired_bootstrap_95_lower_bound_vs_buyer_incumbent > minimum_effect_in_native_units AND holm_adjusted_p_value_vs_every_declared_baseline <= 0.05 AND adverse_subgroup_limit_pass",
+    "all_required_checks_must_pass": true,
+    "partial_pass_allowed": false,
+    "prospective_sector_signal_allowed_before_result_receipt": false,
+    "economic_conversion_allowed_before_result_receipt": false,
+    "field_claim_allowed": false,
+    "safety_claim_allowed": false,
+    "procurement_acceptance_claim_allowed": false,
+    "deployment_authorization_allowed": false
+  },
+  "freeze": {
+    "accepted_utc": null,
+    "accepted_protocol_payload_sha256": null,
+    "signature_method": null,
+    "signed_payload_sha256": null,
+    "detached_signature_artifact_sha256": null
+  },
+  "execution_controls": {
+    "external_action_requires_human_approval": true,
+    "portal_submission_allowed": false,
+    "email_send_allowed": false,
+    "credential_serialization_allowed": false,
+    "autonomous_control_allowed": false
+  },
+  "claim_boundary": "A completed and externally accepted protocol freezes a sector-specific evaluation before scoring. This template is not an accepted protocol, result, independent validation, efficiency claim, savings claim, safety claim, deployment authorization, procurement acceptance, or universal-superiority claim."
+}

@@ -26,8 +26,8 @@
       "patented"
     ]
   },
-  "gate_sha256": "7b07d17d2f5216d86f708b18d98ba67658d99a5d3dd55c88456dba0e108407be",
-  "generated_utc": "2026-07-29T16:17:42.921907+00:00",
+  "gate_sha256": "001ec2bc596e624b8d2abdfdda4d9940a3673015921d69f3c443522e488a07a0",
+  "generated_utc": "2026-07-29T21:24:59.369004+00:00",
   "manifest": [
     {
       "bytes": 12309,
@@ -44,11 +44,11 @@
       "sha256": "fa76de6bcef22a4eb33adf7558ac0f0f5a28f031da9c918fb4c26ac7ee6d9c82"
     },
     {
-      "bytes": 51734,
+      "bytes": 52346,
       "classification": "public_safe_markdown_review_required",
       "name": "AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/AGENCY_SUBMISSION_ASSEMBLY_GATE_2026-07-09.md",
-      "sha256": "92144b41199095ac7227f449e27b7b60decee8eab67046b65a391859c733621e"
+      "sha256": "d5834992472eef5c234d2b93aa5d530fe70744536e2c0f49784da3decb14a7a1"
     },
     {
       "bytes": 5710,
@@ -128,11 +128,11 @@
       "sha256": "c982dde7c868f4f9ac52829518edf2a3fe0bd87742e168cbbe3dfd409736a080"
     },
     {
-      "bytes": 4930,
+      "bytes": 5429,
       "classification": "public_safe_markdown_review_required",
       "name": "CURRENT_REVIEWER_FRONT_DOOR_2026-07-29.md",
       "path": "grant_submissions/funding_sprint_20260709/CURRENT_REVIEWER_FRONT_DOOR_2026-07-29.md",
-      "sha256": "885fbf053c58c96e68ab9e792f0be42f33d525767b57b3f2509dcc7e3536b051"
+      "sha256": "1ec68ec6a8e549159d5cd80fc70aad42b00684fb64b0aa8e6622ed852ef7d65d"
     },
     {
       "bytes": 11434,
@@ -153,7 +153,14 @@
       "classification": "public_safe_markdown_review_required",
       "name": "DATA_ROOM_MANIFEST_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
-      "sha256": "0f86f78ed59c2dcbf062aa34023f47db6bbc78b02045e5046151dc49fa0634b7"
+      "sha256": "b3a1398bd855a25f33407f9bf1425bc2a6a1b03c8c0229ebf6e9ddc9d36b2ecb"
+    },
+    {
+      "bytes": 15283,
+      "classification": "public_safe_markdown_review_required",
+      "name": "DOE_FY26_GENESIS_PHASE1_PITCH_PACKET_2026-07-29.md",
+      "path": "grant_submissions/funding_sprint_20260709/DOE_FY26_GENESIS_PHASE1_PITCH_PACKET_2026-07-29.md",
+      "sha256": "2f7928f8d6ed1352c5f41db8c714f4bc20f2a5e5776f7e33a6a7ffff6d27ad9a"
     },
     {
       "bytes": 1446,
@@ -205,11 +212,11 @@
       "sha256": "bd894e65d568ad0c87dd3725809e66c581b7408a25946188ed998751c06506ed"
     },
     {
-      "bytes": 3495,
+      "bytes": 3094,
       "classification": "public_safe_markdown_review_required",
       "name": "EPRI_OPAI_LOGO_RESPONSE_PACKET_2026-07-25.md",
       "path": "grant_submissions/funding_sprint_20260709/EPRI_OPAI_LOGO_RESPONSE_PACKET_2026-07-25.md",
-      "sha256": "7b2755c99ea3497cc96c57e19b71190df1a993c3e899fae6ca952895c32e69bf"
+      "sha256": "f51896df931f03b1e4d550529347cf1300255ac69b4be18ae3633b804d62c6db"
     },
     {
       "bytes": 1840,
@@ -217,6 +224,13 @@
       "name": "EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
       "path": "grant_submissions/funding_sprint_20260709/EPRI_OPEN_POWER_AI_MOU_RESPONSE_TEMPLATE_2026-07-16.md",
       "sha256": "efcf4fddced28472aa67f73b9b3d687f4dd317d42cf0162e57530b59a0114371"
+    },
+    {
+      "bytes": 2877,
+      "classification": "public_safe_markdown_review_required",
+      "name": "ERDC_SDC_INTERNAL_RED_TEAM_RECEIPT_2026-07-29.md",
+      "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_INTERNAL_RED_TEAM_RECEIPT_2026-07-29.md",
+      "sha256": "52b8bff3aba9218fee38cba12cb5115fe527843869a063a9d0acea108f56cb8a"
     },
     {
       "bytes": 2421,
@@ -254,11 +268,11 @@
       "sha256": "d1cddeee4cd7d2ace79c1c165f50b4de6a7d3058c6b9470b88bedcb0fb959ee2"
     },
     {
-      "bytes": 7397,
+      "bytes": 9753,
       "classification": "public_safe_markdown_review_required",
       "name": "ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md",
       "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md",
-      "sha256": "9bd2316fbbcc2a0768cee2281713792e8175b27281b1ffa49a559d4d28f93f93"
+      "sha256": "04d20b401221aecd07b78bb92e22eac4dc1d623d6ea4d948d0c3625bad783bf5"
     },
     {
       "bytes": 1534,
@@ -398,7 +412,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "HUMAN_ACTION_DOCKET_2026-07-09.md",
       "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
-      "sha256": "22df6ac5c43f1e9c6db0b2280eb909a17e861a4caf4b9fa01d0f7b83aacd4ed5"
+      "sha256": "7a774ae083d25027d92e14c6471c464d7128348d436833b97716b836b970fc86"
     },
     {
       "bytes": 14268,
@@ -478,11 +492,11 @@
       "sha256": "21a6dd2ebbe57e1d11c23da2bc9761216eb842ad262db0f6ba575fb3f9e7a7f6"
     },
     {
-      "bytes": 16506,
+      "bytes": 16593,
       "classification": "public_safe_markdown_review_required",
       "name": "LIVE_FUNDING_PORTAL_HANDOFF_2026-07-29.md",
       "path": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-29.md",
-      "sha256": "3c6ed476c1e90e93f9ceba0f7a7cc029a0f1f932c07d767aa70de76e5574eeda"
+      "sha256": "599900cbb911428c585d891205a8d9498e620833500e5fc053438284a4d50e47"
     },
     {
       "bytes": 14508,
@@ -618,11 +632,11 @@
       "sha256": "27435a4265da3c6275e1c4435bb2cef7ceae5944309238a0a490cf6179ecf706"
     },
     {
-      "bytes": 100904,
+      "bytes": 102048,
       "classification": "public_safe_markdown_review_required",
       "name": "NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-29.md",
       "path": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-29.md",
-      "sha256": "d3f363e254817a2e049fb8d111a310ca0f0dc9ed7affe5274cca8436c0ebdb0b"
+      "sha256": "66d5aaed3f9bb9a5b1609345f53ee8585045e91d9f68ed2e3a009fc04f6cd7a5"
     },
     {
       "bytes": 13217,
@@ -671,7 +685,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
       "path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.md",
-      "sha256": "67a1f5dea1d7525f931ed3604aaae5ed99b4b166b1c86845516be38842016eb2"
+      "sha256": "52ea0158b9d2a934752277aad529a1bcb30f166c0e2c5e66e4c24ae401674e2b"
     },
     {
       "bytes": 20733,
@@ -762,7 +776,7 @@
       "classification": "public_safe_markdown_review_required",
       "name": "SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md",
       "path": "grant_submissions/funding_sprint_20260709/SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md",
-      "sha256": "23c87f057a1e3eeaa42fb085dd443856ff29b0ad570c2a17fc22224b4d8efd7e"
+      "sha256": "1e6fd6ffac005a8d6a679f82f1683b699127637b0777e18e43fb3906de4bbd21"
     },
     {
       "bytes": 4583,
@@ -800,11 +814,11 @@
       "sha256": "4193b2e8c04cc05b2d7f6e25ca096f2a06e6ed700c1df629dc7b238096ccb4aa"
     },
     {
-      "bytes": 32254,
+      "bytes": 33513,
       "classification": "public_safe_markdown_review_required",
       "name": "SUBMISSION_CONFORMANCE_GATE_2026-07-25.md",
       "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_CONFORMANCE_GATE_2026-07-25.md",
-      "sha256": "5053fc2055ea88976fd540dd5a757707cdf24846c0b56ff33cfc8cd88e403875"
+      "sha256": "c75b1eec2ced60e11ffa76bfb13b1378a3c4df7db6698526b96a8aa2f49a4886"
     },
     {
       "bytes": 11353,
@@ -1027,8 +1041,8 @@
       "argument_conformance_declared_pass": false,
       "artifact": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json",
       "artifact_present": true,
-      "artifact_sha256": "4b572b18631ac9ec19571a35610c46de36584d913e1b51941e224c5e4f7062cb",
-      "card_sha256": "2163050dbd90f802b551cafb264129b67139c77a8e64cd3c6aac8b75a5f99856",
+      "artifact_sha256": "11fdbfec9044a8a5f23496dd9c3a642942c3ea83622b2e1d4c2ee31601d28389",
+      "card_sha256": "a0b59725cf3934931cd80c7e9b4c8a3ec5250a278b3a2af66dedb6dc4c15e43b",
       "claim_boundary": "Current-source public-draft conformance does not establish applicant eligibility, private-final readiness, technical merit, selection, funding, or award.",
       "conformance_lane_id": "erdc_sovereign_cloud_cso",
       "conformance_mapping_found": true,
@@ -1371,16 +1385,16 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md",
-        "line": 60,
+        "line": 67,
         "phrase": "guaranteed award",
         "text": "| `FUNDING_01` | `PASS` | Do not imply current funds or guaranteed award | Cover, compliance gate, and claim boundary state funding is not currently available and no award is guaranteed. |"
       },
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.md",
-        "line": 78,
+        "line": 86,
         "phrase": "realized savings",
-        "text": "This is a public-safe technical draft, not a submitted solution brief. It does not include the founder-approved Phase II price, private SAM-matched legal identity and address, a live SAM status verification, signature, certification, or portal confirmation. It does not claim ERDC selection, funding availability, a contract, Department of Defense deployment, an authorization to operate, classified-data handling, field validation, realized savings, or technical performance beyond the bounded repository evidence identified here."
+        "text": "This is a public-safe technical draft, not a submitted solution brief. It does not include the founder-approved Phase II price, private SAM-matched legal identity and address, a live SAM status verification, signature, certification, or portal confirmation. It does not claim ERDC selection, funding availability, a contract, Department of Defense deployment, an authorization to operate, classified-data handling, field validation, customers, revenue, or realized savings, or technical performance beyond the bounded repository evidence identified here."
       },
       {
         "classification": "blocked_or_boundary_claim_language",
@@ -1644,7 +1658,7 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/LIVE_FUNDING_PORTAL_HANDOFF_2026-07-29.md",
-        "line": 189,
+        "line": 190,
         "phrase": "realized savings",
         "text": "- Do not make unsupported claims of agency validation, award, customer deployment, realized savings, patent validity, field performance, CMMC status, or ITAR compliance."
       },
@@ -1847,7 +1861,7 @@
       {
         "classification": "blocked_or_boundary_claim_language",
         "file": "grant_submissions/funding_sprint_20260709/NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD_2026-07-29.md",
-        "line": 1464,
+        "line": 1465,
         "phrase": "realized savings",
         "text": "- claim of agency validation, award, realized savings, or customer ROI"
       },
@@ -2066,7 +2080,7 @@
   "submission_conformance": {
     "active_submission_candidate_count": 3,
     "all_current_lanes_covered": true,
-    "bytes": 144652,
+    "bytes": 148131,
     "document_valid": true,
     "gate_sha256_valid": true,
     "in_memory_override": false,
@@ -2086,7 +2100,7 @@
       "risk_transition_and_falsifier"
     ],
     "schema": "lumencore.submission_conformance_gate.v1",
-    "sha256": "8bf08b73b714c81d3fc95bd41c008d98dc9e89985b4db9c08f080ef4d06363a6",
+    "sha256": "d4bf0049c8b6043c2b40a76bccfe5bf39cc85bedc2da92730d51afa20fd430df",
     "status": "SUBMISSION_CONFORMANCE_BLOCKED",
     "stop_rule": "Packaging, hashes, rendering, safe wording, and portal facts never establish reviewer readiness. Every active technical packet must match a current candidate artifact and pass all source-bound criteria plus a separate red-team receipt.",
     "unrepresented_active_lane_ids": [],
@@ -2107,7 +2121,7 @@
     "expired_route_count": 1,
     "final_submission_allowed_without_human": false,
     "live_trading_allowed": false,
-    "markdown_file_count": 115,
+    "markdown_file_count": 117,
     "missing_conformance_mapping_count": 0,
     "packaging_checks_clear": true,
     "proof_card_count": 9,

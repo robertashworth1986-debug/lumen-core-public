@@ -21,14 +21,14 @@
     "best_bounded_exploratory_dataset_count": 673,
     "best_bounded_exploratory_run": "20260505T121657Z",
     "healthcare_feed": {
-      "age_hours": 0.4,
+      "age_hours": 0.11,
       "boundary": "Freshness applies only to the candidate source feed. Relevance scores do not establish applicant eligibility, current requirements, submission readiness, or award probability.",
       "eligibility_label_allowed": false,
       "freshness_label_allowed": true,
       "freshness_sla_hours": 24,
-      "generated_utc": "2026-07-18T06:24:37.230552+00:00",
+      "generated_utc": "2026-07-29T08:51:44.481162+00:00",
       "path": "out/ops/healthcare_grants_engine/healthcare_website_feed_latest.json",
-      "record_count": 12,
+      "record_count": 23,
       "status": "fresh",
       "submission_ready_label_allowed": false
     },
@@ -173,7 +173,8 @@
       }
     ]
   },
-  "generated_utc": "2026-07-18T06:48:29.081740+00:00",
+  "evidence_contract_version": "typed_evidence_contract_v1",
+  "generated_utc": "2026-07-29T08:58:11.424285+00:00",
   "market_boundary": {
     "crowded_features": [
       "grant matching and tracking",
@@ -192,46 +193,148 @@
   "mindwise_pilot": {
     "acceptance_metrics": [
       {
-        "definition": "buyer-approved qualified matches / reviewed matches",
-        "metric": "qualified opportunity precision"
+        "denominator": "all candidate matches reviewed by the buyer",
+        "metric": "qualified opportunity precision",
+        "numerator": "buyer-confirmed qualified matches"
       },
       {
-        "definition": "median elapsed time from discovery to documented decision",
-        "metric": "time to pursue decision"
+        "denominator": "opportunities receiving a documented pursue or no-pursue decision",
+        "metric": "time to pursue decision",
+        "numerator": "sum of elapsed hours from discovery to documented decision"
       },
       {
-        "definition": "median elapsed time from pursue decision to internal review state",
-        "metric": "time to reviewer-ready draft"
+        "denominator": "pursued packages reaching internal review",
+        "metric": "time to reviewer-ready draft",
+        "numerator": "sum of elapsed hours from pursue decision to buyer-defined internal review state"
       },
       {
-        "definition": "missing or contradictory required items per package at review",
-        "metric": "preflight defect rate"
+        "denominator": "required package items inspected at review",
+        "metric": "preflight defect rate",
+        "numerator": "missing, contradictory, stale, or ownerless required items found at review"
       },
       {
-        "definition": "packages reaching internal review by the buyer-set cutoff / pursued packages",
-        "metric": "deadline reliability"
+        "denominator": "pursued packages with an open verified deadline",
+        "metric": "deadline reliability",
+        "numerator": "pursued packages reaching internal review by the frozen buyer cutoff"
       },
       {
-        "definition": "material claims with a traceable source / material claims reviewed",
-        "metric": "provenance completeness"
+        "denominator": "material claims inspected",
+        "metric": "provenance completeness",
+        "numerator": "material claims carrying a traceable reviewed source"
       }
     ],
-    "buyer": "Kishore Tummala, CEO and Founder, MindWise Health",
-    "commercial_posture": "Paid design-partner pilot; credit the agreed pilot fee toward an annual subscription if acceptance gates pass.",
-    "go_no_go": "Convert only if the buyer confirms a measured workflow improvement and the evidence/eligibility error rate remains within the agreed threshold.",
-    "human_gates": [
-      "buyer confirms organizational eligibility",
-      "buyer approves claims and representations",
-      "authorized official certifies and submits",
-      "no system action bypasses portal attestations or signatures"
+    "acceptance_thresholds": {
+      "rule": "No metric is called improved or accepted until the buyer approves its baseline, threshold, denominator, exclusions, and cutoff before pilot measurement.",
+      "status": "BUYER_SUPPLIED_BEFORE_PILOT",
+      "values": {}
+    },
+    "buyer": null,
+    "buyer_selected": false,
+    "commercial_posture": "Paid pilot after exact buyer scope, baseline, acceptance thresholds, data terms, price, and recipient are approved.",
+    "deliverables": [
+      "signed-off baseline and acceptance memo",
+      "source and eligibility-rule register",
+      "review-only candidate queue with abstention reasons",
+      "attachment, owner, and blocker ledger",
+      "weekly hash-linked workflow receipt",
+      "final metric workbook and claim-bounded decision memo"
     ],
-    "name": "MindWise x ProofLock Opportunity Operations - 30-day design-partner pilot",
-    "scope_boundary": "Phase 1 uses opportunity, workflow, and synthetic/sample organization data only; no PHI.",
+    "duration_days": 30,
+    "event_schema": {
+      "required_fields": [
+        "event_id",
+        "event_utc",
+        "opportunity_id",
+        "source_id",
+        "action_type",
+        "actor_role",
+        "evidence_sha256",
+        "decision",
+        "blockers",
+        "human_authority_state",
+        "previous_event_sha256",
+        "event_sha256"
+      ],
+      "schema": "prooflock_opportunity_event_v1"
+    },
+    "exclusions": [
+      "legal or accounting advice",
+      "guaranteed eligibility, award, savings, or revenue",
+      "final certification, signature, upload, send, or submission",
+      "model-superiority or field-performance claims",
+      "production use of protected or controlled data"
+    ],
+    "go_no_go": "Convert only when the frozen sample rule is met and the buyer confirms that every accepted metric passes its prospectively approved threshold. Otherwise stop, extend under a documented alternate sample rule, or abstain.",
+    "human_gates": [
+      "buyer confirms organizational eligibility and source permissions",
+      "buyer approves claims, representations, thresholds, and package content",
+      "authorized official certifies, signs, uploads, sends, and submits",
+      "LumenCore cannot bypass portal attestations, account controls, or signatures",
+      "founder approves exact scope, price, recipient, and external communication"
+    ],
+    "minimum_sample": {
+      "alternate_sample_rule": "A lower sample is valid only when the buyer documents the expected source volume before the pilot and both parties approve the alternate denominator.",
+      "pursued_packages": 5,
+      "reviewed_opportunities": 30
+    },
+    "name": "ProofLock Opportunity Operations - 30-day paid pilot",
+    "permitted_sources": [
+      "buyer-approved official public opportunity pages and feeds",
+      "buyer-provided eligibility and workflow rules approved for pilot use",
+      "synthetic or de-identified sample organization records",
+      "buyer-approved internal timestamps and defect labels"
+    ],
+    "pricing": {
+      "annual_subscription_usd": null,
+      "founder_approved": false,
+      "pilot_fee_usd": null,
+      "rule": "No price is offered until buyer scope, source count, seat count, support level, data terms, and acceptance plan are approved.",
+      "status": "UNQUOTED_SCOPE_FIRST",
+      "subscription_credit_usd": null
+    },
+    "prohibited_inputs": [
+      "protected health information",
+      "account credentials or one-time codes",
+      "controlled unclassified or export-controlled material",
+      "unreleased proposal content unless a written private-data agreement permits it",
+      "payment data"
+    ],
+    "protocol_id": "PROOFLOCK_OPS_PILOT_V1",
+    "raci": {
+      "buyer_authorized_official": "accountable for every certification, signature, send, upload, and final submission",
+      "buyer_workflow_owner": "accountable for source permissions, eligibility rules, thresholds, and acceptance",
+      "legal_or_security_reviewer": "consulted when data, confidentiality, IP, export, or regulated-domain terms require review",
+      "lumencore_founder": "accountable for scope, pricing, public claims, and any external communication",
+      "lumencore_operator": "responsible for configured monitoring, draft assembly, blocker ledgers, and receipts"
+    },
+    "receipt_schema": {
+      "required_fields": [
+        "protocol_id",
+        "event_count",
+        "genesis_sha256",
+        "terminal_event_sha256",
+        "chain_valid",
+        "receipt_sha256"
+      ],
+      "schema": "prooflock_opportunity_receipt_chain_v1"
+    },
+    "retention_and_security": {
+      "access_rule": "Least-privilege named users only; no credentials or protected data in public artifacts.",
+      "default_retention_days_after_pilot": 30,
+      "deletion_rule": "Delete or return buyer data after the approved retention period unless a signed agreement specifies another period.",
+      "incident_rule": "Stop processing, preserve bounded logs, notify the named buyer owner, and follow the signed incident procedure."
+    },
+    "scope_boundary": "Opportunity, workflow, synthetic, sample, and buyer-authorized non-PHI organization data only. No credentials, final certifications, signatures, or autonomous submissions.",
+    "status": "DRAFT_SCOPE_BUYER_BASELINE_AND_FOUNDER_PRICING_REQUIRED",
+    "support_boundary": {
+      "excluded": "24-hour operations, legal representation, portal administration, managed submission, or production SLA unless separately contracted.",
+      "included": "One kickoff, one weekly review, asynchronous blocker triage during agreed business hours, and one final readout."
+    },
     "week_1_baseline": [
       "Measure current time from opportunity discovery to pursue/no-pursue decision.",
       "Measure current time from pursue decision to reviewer-ready draft.",
       "Count eligibility reversals, missing attachments, and missed internal review dates.",
-      "Lock the source portals, eligibility rubric, roles, and final human approval gate."
+      "Freeze source permissions, eligibility rules, metric denominators, thresholds, roles, and human gates."
     ],
     "weeks_2_to_4": [
       "Refresh permitted opportunity sources and rank candidates with evidence links.",
@@ -240,7 +343,174 @@
       "Emit a replayable receipt for every shortlist, draft, and preflight decision."
     ]
   },
-  "product_lane_priority_sha256": "380b3330e48562dd7d0bf2cc8fedc9afe6616e2a4a72dfa17a768b082bfb8b71",
+  "pilot_protocol_receipts": {
+    "boundary": "This replay proves deterministic decision-state and receipt-chain behavior for synthetic fixtures only. It does not prove eligibility, customer outcomes, awards, savings, or production readiness.",
+    "config_path": "config/prooflock_opportunity_ops_pilot_v1.json",
+    "config_sha256": "871ca07f65b348eb1892bf43d348d8db587f75262c36bd3b8e29d1f77a081e21",
+    "golden_replay_decisions": [
+      "QUALIFIED_FOR_BUYER_REVIEW",
+      "DISQUALIFIED",
+      "ABSTAIN_INSUFFICIENT_EVIDENCE"
+    ],
+    "golden_replay_event_count": 3,
+    "golden_replay_path": "dashboard/data/prooflock_opportunity_ops_golden_replay_v1.json",
+    "golden_replay_sha256": "2664168a3468bbd59f4e24f8ee787c5b6d686ee2ab89af2067a83ba4079630ff",
+    "golden_replay_verified": true
+  },
+  "product_lane_priority_sha256": "c1b498c742ee03f7fd6ad15767f5459978a4825e58757dd4a0d731b7042019df",
+  "prooflock_opportunity_ops_pilot": {
+    "acceptance_metrics": [
+      {
+        "denominator": "all candidate matches reviewed by the buyer",
+        "metric": "qualified opportunity precision",
+        "numerator": "buyer-confirmed qualified matches"
+      },
+      {
+        "denominator": "opportunities receiving a documented pursue or no-pursue decision",
+        "metric": "time to pursue decision",
+        "numerator": "sum of elapsed hours from discovery to documented decision"
+      },
+      {
+        "denominator": "pursued packages reaching internal review",
+        "metric": "time to reviewer-ready draft",
+        "numerator": "sum of elapsed hours from pursue decision to buyer-defined internal review state"
+      },
+      {
+        "denominator": "required package items inspected at review",
+        "metric": "preflight defect rate",
+        "numerator": "missing, contradictory, stale, or ownerless required items found at review"
+      },
+      {
+        "denominator": "pursued packages with an open verified deadline",
+        "metric": "deadline reliability",
+        "numerator": "pursued packages reaching internal review by the frozen buyer cutoff"
+      },
+      {
+        "denominator": "material claims inspected",
+        "metric": "provenance completeness",
+        "numerator": "material claims carrying a traceable reviewed source"
+      }
+    ],
+    "acceptance_thresholds": {
+      "rule": "No metric is called improved or accepted until the buyer approves its baseline, threshold, denominator, exclusions, and cutoff before pilot measurement.",
+      "status": "BUYER_SUPPLIED_BEFORE_PILOT",
+      "values": {}
+    },
+    "buyer": null,
+    "buyer_selected": false,
+    "commercial_posture": "Paid pilot after exact buyer scope, baseline, acceptance thresholds, data terms, price, and recipient are approved.",
+    "deliverables": [
+      "signed-off baseline and acceptance memo",
+      "source and eligibility-rule register",
+      "review-only candidate queue with abstention reasons",
+      "attachment, owner, and blocker ledger",
+      "weekly hash-linked workflow receipt",
+      "final metric workbook and claim-bounded decision memo"
+    ],
+    "duration_days": 30,
+    "event_schema": {
+      "required_fields": [
+        "event_id",
+        "event_utc",
+        "opportunity_id",
+        "source_id",
+        "action_type",
+        "actor_role",
+        "evidence_sha256",
+        "decision",
+        "blockers",
+        "human_authority_state",
+        "previous_event_sha256",
+        "event_sha256"
+      ],
+      "schema": "prooflock_opportunity_event_v1"
+    },
+    "exclusions": [
+      "legal or accounting advice",
+      "guaranteed eligibility, award, savings, or revenue",
+      "final certification, signature, upload, send, or submission",
+      "model-superiority or field-performance claims",
+      "production use of protected or controlled data"
+    ],
+    "go_no_go": "Convert only when the frozen sample rule is met and the buyer confirms that every accepted metric passes its prospectively approved threshold. Otherwise stop, extend under a documented alternate sample rule, or abstain.",
+    "human_gates": [
+      "buyer confirms organizational eligibility and source permissions",
+      "buyer approves claims, representations, thresholds, and package content",
+      "authorized official certifies, signs, uploads, sends, and submits",
+      "LumenCore cannot bypass portal attestations, account controls, or signatures",
+      "founder approves exact scope, price, recipient, and external communication"
+    ],
+    "minimum_sample": {
+      "alternate_sample_rule": "A lower sample is valid only when the buyer documents the expected source volume before the pilot and both parties approve the alternate denominator.",
+      "pursued_packages": 5,
+      "reviewed_opportunities": 30
+    },
+    "name": "ProofLock Opportunity Operations - 30-day paid pilot",
+    "permitted_sources": [
+      "buyer-approved official public opportunity pages and feeds",
+      "buyer-provided eligibility and workflow rules approved for pilot use",
+      "synthetic or de-identified sample organization records",
+      "buyer-approved internal timestamps and defect labels"
+    ],
+    "pricing": {
+      "annual_subscription_usd": null,
+      "founder_approved": false,
+      "pilot_fee_usd": null,
+      "rule": "No price is offered until buyer scope, source count, seat count, support level, data terms, and acceptance plan are approved.",
+      "status": "UNQUOTED_SCOPE_FIRST",
+      "subscription_credit_usd": null
+    },
+    "prohibited_inputs": [
+      "protected health information",
+      "account credentials or one-time codes",
+      "controlled unclassified or export-controlled material",
+      "unreleased proposal content unless a written private-data agreement permits it",
+      "payment data"
+    ],
+    "protocol_id": "PROOFLOCK_OPS_PILOT_V1",
+    "raci": {
+      "buyer_authorized_official": "accountable for every certification, signature, send, upload, and final submission",
+      "buyer_workflow_owner": "accountable for source permissions, eligibility rules, thresholds, and acceptance",
+      "legal_or_security_reviewer": "consulted when data, confidentiality, IP, export, or regulated-domain terms require review",
+      "lumencore_founder": "accountable for scope, pricing, public claims, and any external communication",
+      "lumencore_operator": "responsible for configured monitoring, draft assembly, blocker ledgers, and receipts"
+    },
+    "receipt_schema": {
+      "required_fields": [
+        "protocol_id",
+        "event_count",
+        "genesis_sha256",
+        "terminal_event_sha256",
+        "chain_valid",
+        "receipt_sha256"
+      ],
+      "schema": "prooflock_opportunity_receipt_chain_v1"
+    },
+    "retention_and_security": {
+      "access_rule": "Least-privilege named users only; no credentials or protected data in public artifacts.",
+      "default_retention_days_after_pilot": 30,
+      "deletion_rule": "Delete or return buyer data after the approved retention period unless a signed agreement specifies another period.",
+      "incident_rule": "Stop processing, preserve bounded logs, notify the named buyer owner, and follow the signed incident procedure."
+    },
+    "scope_boundary": "Opportunity, workflow, synthetic, sample, and buyer-authorized non-PHI organization data only. No credentials, final certifications, signatures, or autonomous submissions.",
+    "status": "DRAFT_SCOPE_BUYER_BASELINE_AND_FOUNDER_PRICING_REQUIRED",
+    "support_boundary": {
+      "excluded": "24-hour operations, legal representation, portal administration, managed submission, or production SLA unless separately contracted.",
+      "included": "One kickoff, one weekly review, asynchronous blocker triage during agreed business hours, and one final readout."
+    },
+    "week_1_baseline": [
+      "Measure current time from opportunity discovery to pursue/no-pursue decision.",
+      "Measure current time from pursue decision to reviewer-ready draft.",
+      "Count eligibility reversals, missing attachments, and missed internal review dates.",
+      "Freeze source permissions, eligibility rules, metric denominators, thresholds, roles, and human gates."
+    ],
+    "weeks_2_to_4": [
+      "Refresh permitted opportunity sources and rank candidates with evidence links.",
+      "Generate source-grounded draft structures and an attachment/blocker ledger.",
+      "Route unresolved facts to named owners; abstain instead of guessing.",
+      "Emit a replayable receipt for every shortlist, draft, and preflight decision."
+    ]
+  },
   "ranking": [
     {
       "blocked_claims": [
@@ -249,42 +519,250 @@
         "autonomous final certification or submission",
         "realized savings before a buyer baseline is measured"
       ],
+      "buyer_readiness_gate": {
+        "boundary": "Internal artifact validation cannot establish buyer acceptance, organizational eligibility, external validation, or commercial readiness.",
+        "evidence_blockers": [],
+        "internal_evidence_gate_passed": true,
+        "next_required_validation": "Run a paid 30-day design-partner pilot against the buyer's current grant workflow and lock the baseline before automation begins.",
+        "passed": false,
+        "status": "requires_external_buyer_validation"
+      },
       "evidence_checks": [
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 31025,
+          "claim_scope": "A local healthcare opportunity discovery and ranking implementation exists; this does not prove current source coverage or buyer eligibility.",
+          "contract_complete": true,
           "exists": true,
-          "path": "code/ops/run_healthcare_grants_engine.py"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "source_code",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-29T08:49:50.761661+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/ops/run_healthcare_grants_engine.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "50f09e9b47b5a0ff87cfbdd6d6810ea23682593cc1c9d29d61f4dda78bbd9b5e",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 11342,
+          "claim_scope": "A local source-to-website feed builder exists; this does not prove that any displayed record is current or eligible.",
+          "contract_complete": true,
           "exists": true,
-          "path": "code/ops/build_healthcare_website_feed.py"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "source_code",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-29T08:50:21.637210+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/ops/build_healthcare_website_feed.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "2ba59a65a298166f45c4f18109f3f8a20db042c98de165666c7c6db536f20cb5",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 34190,
+          "claim_scope": "A local fail-closed readiness audit implementation exists; only its current outputs can describe a package state.",
+          "contract_complete": true,
           "exists": true,
-          "path": "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "source_code",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-17T09:39:04.868695+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "02442394ea95e48c48a4ac9ea852cbf9c55ec6c6fdaee407c4e2c0c75d9471a6",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 167467,
+          "claim_scope": "A local deadline-control implementation exists; code presence is not a current deadline receipt.",
+          "contract_complete": true,
           "exists": true,
-          "path": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "source_code",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-29T08:45:18.249953+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "83969cdd1d8481ed7391b1915047a9659c0a791688541852029d2240d581d0a7",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": 0.2061,
+          "age_source": "json_generated_utc",
+          "bytes": 126668,
+          "claim_scope": "The deadline command board was rebuilt recently enough for internal triage; every official source and portal gate still requires action-time verification.",
+          "contract_complete": true,
           "exists": true,
-          "path": "dashboard/embed/mindwise_premium_flow_demo.html"
+          "expected_schema": "near_deadline_submission_command_board_v5",
+          "is_file": true,
+          "kind": "generated_control_receipt",
+          "max_age_hours": 24.0,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-29T08:45:49.498420+00:00",
+          "observed_keys": [
+            "as_of_utc",
+            "command_board_sha256",
+            "emergency_gate",
+            "expired_without_verified_send",
+            "freshness_blocked",
+            "generated_utc",
+            "lane_status_groups",
+            "lanes",
+            "no_bid_or_partner_only",
+            "operational_controls",
+            "outputs",
+            "scan_date",
+            "schema",
+            "sent_verified",
+            "source_freshness",
+            "source_ledgers",
+            "stage_now",
+            "stage_ready",
+            "status",
+            "submission_boundary",
+            "summary",
+            "zero_friction_pack_reported_status",
+            "zero_friction_pack_status"
+          ],
+          "observed_schema": "near_deadline_submission_command_board_v5",
+          "path": "out/ops/near_deadline_submission_command_board_latest.json",
+          "reasons": [],
+          "required": true,
+          "required_keys": [
+            "generated_utc",
+            "lanes",
+            "summary",
+            "command_board_sha256"
+          ],
+          "sha256": "008ed116ed80420c2337ab2640f97c278dc139681b293d8521c6c74f9a45b3e8",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 8286,
+          "claim_scope": "A buyer-facing workflow demonstration exists; it is not a production deployment, customer acceptance receipt, or measured outcome.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "interactive_demo",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-18T06:48:09.805752+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "dashboard/embed/mindwise_premium_flow_demo.html",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "80f82503ae5122ecf59819e1ca6847104eca47395fc4a67b08edf25c15ddf88c",
+          "status": "valid",
+          "valid": true
         }
       ],
       "evidence_coverage": 1.0,
       "evidence_paths": [
-        "code/ops/run_healthcare_grants_engine.py",
-        "code/ops/build_healthcare_website_feed.py",
-        "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
-        "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-        "dashboard/embed/mindwise_premium_flow_demo.html"
+        {
+          "claim_scope": "A local healthcare opportunity discovery and ranking implementation exists; this does not prove current source coverage or buyer eligibility.",
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "path": "code/ops/run_healthcare_grants_engine.py",
+          "required": true
+        },
+        {
+          "claim_scope": "A local source-to-website feed builder exists; this does not prove that any displayed record is current or eligible.",
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "path": "code/ops/build_healthcare_website_feed.py",
+          "required": true
+        },
+        {
+          "claim_scope": "A local fail-closed readiness audit implementation exists; only its current outputs can describe a package state.",
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "path": "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
+          "required": true
+        },
+        {
+          "claim_scope": "A local deadline-control implementation exists; code presence is not a current deadline receipt.",
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "path": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+          "required": true
+        },
+        {
+          "claim_scope": "The deadline command board was rebuilt recently enough for internal triage; every official source and portal gate still requires action-time verification.",
+          "expected_schema": "near_deadline_submission_command_board_v5",
+          "kind": "generated_control_receipt",
+          "max_age_hours": 24,
+          "min_bytes": 1024,
+          "path": "out/ops/near_deadline_submission_command_board_latest.json",
+          "required": true,
+          "required_keys": [
+            "generated_utc",
+            "lanes",
+            "summary",
+            "command_board_sha256"
+          ]
+        },
+        {
+          "claim_scope": "A buyer-facing workflow demonstration exists; it is not a production deployment, customer acceptance receipt, or measured outcome.",
+          "kind": "interactive_demo",
+          "min_bytes": 1024,
+          "path": "dashboard/embed/mindwise_premium_flow_demo.html",
+          "required": true
+        }
       ],
       "first_validation": "Run a paid 30-day design-partner pilot against the buyer's current grant workflow and lock the baseline before automation begins.",
       "id": "prooflock_opportunity_ops",
+      "internal_evidence_gate_passed": true,
       "name": "ProofLock Opportunity Operations",
       "offer": "Continuously find, qualify, assemble, preflight, and receipt funding opportunities while keeping final certifications and submissions human-controlled.",
       "rank": 1,
       "recurring_model": "Per-organization subscription with controlled seats, opportunity monitoring, evidence storage, and an optional managed preflight tier.",
+      "required_evidence_count": 6,
       "scores": {
         "buyer_pain": 92,
         "capital_efficiency": 96,
@@ -295,7 +773,9 @@
         "technical_defensibility": 82,
         "time_to_paid_pilot": 92
       },
-      "strategy_score": 89.6
+      "strategy_score": 89.6,
+      "validated_evidence_count": 6,
+      "validated_evidence_coverage": 1.0
     },
     {
       "blocked_claims": [
@@ -304,37 +784,186 @@
         "universal model superiority",
         "oracle-equivalent prospective performance"
       ],
+      "buyer_readiness_gate": {
+        "boundary": "Internal artifact validation cannot establish buyer acceptance, organizational eligibility, external validation, or commercial readiness.",
+        "evidence_blockers": [],
+        "internal_evidence_gate_passed": true,
+        "next_required_validation": "Rebuild router features from training windows only, add deterministic abstention, and evaluate prospectively against the best fixed family and a declared oracle boundary.",
+        "passed": false,
+        "status": "requires_external_buyer_validation"
+      },
       "evidence_checks": [
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 16907,
+          "claim_scope": "A historical routing implementation exists; its current feature construction is not cleared for prospective superiority claims.",
+          "contract_complete": true,
           "exists": true,
-          "path": "code/meta_router.py"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "source_code",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-05-05T14:06:13.168366+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/meta_router.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "a568fe351e4f5b87f231e26653e88ce3d331266f3e9c302cd04c47d44852fa86",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 23784,
+          "claim_scope": "A claim-bounded commercial packaging implementation exists; it does not establish demand, pricing acceptance, or revenue.",
+          "contract_complete": true,
           "exists": true,
-          "path": "code/ops/BUILD_PROOF_TO_REVENUE_ENGINE.py"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "source_code",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-29T08:35:34.455454+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/ops/BUILD_PROOF_TO_REVENUE_ENGINE.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "14e300f219f8c553290b069605bbfbfcc9efc1e7a98c977fd5b5de0ff672285d",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 148872,
+          "claim_scope": "A historical exploratory router evaluation exists; the known full-series feature leakage blocks prospective performance claims.",
+          "contract_complete": true,
           "exists": true,
-          "path": "dashboard/evidence/runs/20260505T121657Z/router/eval.json"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "historical_exploratory_evaluation",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-05-05T14:10:19.683325+00:00",
+          "observed_keys": [
+            "ds_idx",
+            "feat_cols",
+            "feature_importance",
+            "oracle_rmse",
+            "per_family_rmse",
+            "routed_family",
+            "routed_rmse",
+            "summary"
+          ],
+          "observed_schema": null,
+          "path": "dashboard/evidence/runs/20260505T121657Z/router/eval.json",
+          "reasons": [],
+          "required": true,
+          "required_keys": [
+            "summary",
+            "ds_idx",
+            "routed_family",
+            "per_family_rmse",
+            "oracle_rmse"
+          ],
+          "sha256": "e8559c3c736d3b32340ef4a7965c06191a3dac593f27b4c00e5dd052b884c681",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 1481,
+          "claim_scope": "A historical stacker evaluation receipt exists; it is bounded to its recorded design and is not external validation.",
+          "contract_complete": true,
           "exists": true,
-          "path": "dashboard/evidence/runs/20260505T121657Z/stacker/eval.json"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "historical_exploratory_evaluation",
+          "max_age_hours": null,
+          "min_bytes": 512,
+          "missing_required_keys": [],
+          "modified_utc": "2026-05-05T14:30:53.297588+00:00",
+          "observed_keys": [
+            "elapsed_s",
+            "run_utc",
+            "summary"
+          ],
+          "observed_schema": null,
+          "path": "dashboard/evidence/runs/20260505T121657Z/stacker/eval.json",
+          "reasons": [],
+          "required": true,
+          "required_keys": [
+            "summary",
+            "elapsed_s",
+            "run_utc"
+          ],
+          "sha256": "10c7cbcaae6b072bc1ffc09b4aabc39934072b495b62fb7606f11b64cf61a536",
+          "status": "valid",
+          "valid": true
         }
       ],
       "evidence_coverage": 1.0,
       "evidence_paths": [
-        "code/meta_router.py",
-        "code/ops/BUILD_PROOF_TO_REVENUE_ENGINE.py",
-        "dashboard/evidence/runs/20260505T121657Z/router/eval.json",
-        "dashboard/evidence/runs/20260505T121657Z/stacker/eval.json"
+        {
+          "claim_scope": "A historical routing implementation exists; its current feature construction is not cleared for prospective superiority claims.",
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "path": "code/meta_router.py",
+          "required": true
+        },
+        {
+          "claim_scope": "A claim-bounded commercial packaging implementation exists; it does not establish demand, pricing acceptance, or revenue.",
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "path": "code/ops/BUILD_PROOF_TO_REVENUE_ENGINE.py",
+          "required": true
+        },
+        {
+          "claim_scope": "A historical exploratory router evaluation exists; the known full-series feature leakage blocks prospective performance claims.",
+          "kind": "historical_exploratory_evaluation",
+          "min_bytes": 1024,
+          "path": "dashboard/evidence/runs/20260505T121657Z/router/eval.json",
+          "required": true,
+          "required_keys": [
+            "summary",
+            "ds_idx",
+            "routed_family",
+            "per_family_rmse",
+            "oracle_rmse"
+          ]
+        },
+        {
+          "claim_scope": "A historical stacker evaluation receipt exists; it is bounded to its recorded design and is not external validation.",
+          "kind": "historical_exploratory_evaluation",
+          "min_bytes": 512,
+          "path": "dashboard/evidence/runs/20260505T121657Z/stacker/eval.json",
+          "required": true,
+          "required_keys": [
+            "summary",
+            "elapsed_s",
+            "run_utc"
+          ]
+        }
       ],
       "first_validation": "Rebuild router features from training windows only, add deterministic abstention, and evaluate prospectively against the best fixed family and a declared oracle boundary.",
       "id": "prooflock_evidence_router_api",
+      "internal_evidence_gate_passed": true,
       "name": "ProofLock Evidence Router API",
       "offer": "Select a bounded model or workflow route, abstain when gates fail, and emit a replayable decision receipt with source and policy provenance.",
       "rank": 2,
       "recurring_model": "Usage-priced API plus enterprise policy packs and retained evidence storage.",
+      "required_evidence_count": 4,
       "scores": {
         "buyer_pain": 80,
         "capital_efficiency": 94,
@@ -345,7 +974,9 @@
         "technical_defensibility": 94,
         "time_to_paid_pilot": 75
       },
-      "strategy_score": 83.25
+      "strategy_score": 83.25,
+      "validated_evidence_count": 4,
+      "validated_evidence_coverage": 1.0
     },
     {
       "blocked_claims": [
@@ -353,32 +984,243 @@
         "realized outage savings",
         "universal harmonic superiority"
       ],
+      "buyer_readiness_gate": {
+        "boundary": "Internal artifact validation cannot establish buyer acceptance, organizational eligibility, external validation, or commercial readiness.",
+        "evidence_blockers": [],
+        "internal_evidence_gate_passed": true,
+        "next_required_validation": "Complete the preregistered prospective sample gates, obtain an independent reproduction receipt, and secure one operator-approved dataset, incumbent baseline, holdout policy, and economic conversion before discussing performance or dollar value.",
+        "passed": false,
+        "status": "requires_external_buyer_validation"
+      },
       "evidence_checks": [
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 24441,
+          "claim_scope": "A reproducibility-packet builder exists; its presence does not prove independent reproduction.",
+          "contract_complete": true,
           "exists": true,
-          "path": "code/ops/BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "source_code",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-16T04:54:43.772264+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/ops/BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "4d97c291528ce1b645e03d6988f61effcfb89ef1d36f97479a860df60e953887",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 113419,
+          "claim_scope": "An economic-conversion packet builder exists; realized savings remain blocked without buyer-authorized operational inputs.",
+          "contract_complete": true,
           "exists": true,
-          "path": "code/ops/BUILD_OUTAGE_SECOND_ECONOMIC_VALUE_PACKET.py"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "source_code",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-19T03:12:39.570126+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/ops/BUILD_OUTAGE_SECOND_ECONOMIC_VALUE_PACKET.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "3c552da1f48cb485925c0d4c63dc7617e267906f63c1f73b42b8f781aed9e9dd",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": 0.2833,
+          "age_source": "json_generated_utc",
+          "bytes": 1709,
+          "claim_scope": "The prospective EIA status was refreshed recently; its own settlement and promotion gates control any performance language.",
+          "contract_complete": true,
           "exists": true,
-          "path": "dashboard/evidence/runs/20260505T121657Z/summary.json"
+          "expected_schema": "eia_grid_prospective_hourly_router_status.v1",
+          "is_file": true,
+          "kind": "generated_prospective_status",
+          "max_age_hours": 24.0,
+          "min_bytes": 512,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-29T08:41:11.976790+00:00",
+          "observed_keys": [
+            "claim_boundary",
+            "common_settled_hour_count",
+            "current_best_fixed_candidate",
+            "first_common_settled_period",
+            "fixed_candidate_mean_scaled_absolute_error",
+            "generated_utc",
+            "latest_common_settled_period",
+            "operational_receipt_sha256",
+            "prediction_count",
+            "promotion_evaluation_complete",
+            "protocol_commit",
+            "protocol_sha256",
+            "router_mean_scaled_absolute_error",
+            "router_skill_vs_current_best_fixed",
+            "sample_gates",
+            "schema",
+            "settlement_count",
+            "state"
+          ],
+          "observed_schema": "eia_grid_prospective_hourly_router_status.v1",
+          "path": "out/eia_grid_prospective_hourly_router/prospective_status_latest.json",
+          "reasons": [],
+          "required": true,
+          "required_keys": [
+            "generated_utc",
+            "prediction_count",
+            "common_settled_hour_count",
+            "promotion_evaluation_complete",
+            "protocol_sha256"
+          ],
+          "sha256": "85d98d0182f3ca236c70ce4c720805ae46662a1859ee5fcb4ba8abf612e56546",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "json_generated_utc",
+          "bytes": 6981,
+          "claim_scope": "A bounded independent-review handoff exists; its recorded completion flags govern independent-validation claims.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": "eia_grid_hourly_independent_reproduction_handoff.v1",
+          "is_file": true,
+          "kind": "reviewer_handoff",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-22T03:04:25.286380+00:00",
+          "observed_keys": [
+            "claim_boundary",
+            "external_evaluator_protocol_template",
+            "frozen_snapshot",
+            "generated_utc",
+            "independent_reproduction_complete",
+            "integrity",
+            "next_valid_state",
+            "packet",
+            "performance_promotion_allowed",
+            "receipt_template",
+            "repository_source",
+            "schema",
+            "scientific_disclosures",
+            "status"
+          ],
+          "observed_schema": "eia_grid_hourly_independent_reproduction_handoff.v1",
+          "path": "out/reviewer_handoffs/EIA_GRID_HOURLY_INDEPENDENT_REPRODUCTION_HANDOFF_LATEST.json",
+          "reasons": [],
+          "required": true,
+          "required_keys": [
+            "independent_reproduction_complete",
+            "performance_promotion_allowed",
+            "claim_boundary",
+            "integrity"
+          ],
+          "sha256": "e9f5a8590d06eff02de597bf0156d4cb5b72e4f054cfc820aed0872c1cc1ba9c",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 5760,
+          "claim_scope": "A human-readable reproduction handoff exists; document presence does not prove evaluator completion or acceptance.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "reviewer_document",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-16T04:59:06.117958+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "docs/EIA_GRID_HOURLY_INDEPENDENT_REPRODUCTION_HANDOFF_2026-07-16.md",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "d9ec41387570092242e057e3d5b3383b6f58f925ed095040d0d8e6db884cc562",
+          "status": "valid",
+          "valid": true
         }
       ],
       "evidence_coverage": 1.0,
       "evidence_paths": [
-        "code/ops/BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py",
-        "code/ops/BUILD_OUTAGE_SECOND_ECONOMIC_VALUE_PACKET.py",
-        "dashboard/evidence/runs/20260505T121657Z/summary.json"
+        {
+          "claim_scope": "A reproducibility-packet builder exists; its presence does not prove independent reproduction.",
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "path": "code/ops/BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py",
+          "required": true
+        },
+        {
+          "claim_scope": "An economic-conversion packet builder exists; realized savings remain blocked without buyer-authorized operational inputs.",
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "path": "code/ops/BUILD_OUTAGE_SECOND_ECONOMIC_VALUE_PACKET.py",
+          "required": true
+        },
+        {
+          "claim_scope": "The prospective EIA status was refreshed recently; its own settlement and promotion gates control any performance language.",
+          "expected_schema": "eia_grid_prospective_hourly_router_status.v1",
+          "kind": "generated_prospective_status",
+          "max_age_hours": 24,
+          "min_bytes": 512,
+          "path": "out/eia_grid_prospective_hourly_router/prospective_status_latest.json",
+          "required": true,
+          "required_keys": [
+            "generated_utc",
+            "prediction_count",
+            "common_settled_hour_count",
+            "promotion_evaluation_complete",
+            "protocol_sha256"
+          ]
+        },
+        {
+          "claim_scope": "A bounded independent-review handoff exists; its recorded completion flags govern independent-validation claims.",
+          "expected_schema": "eia_grid_hourly_independent_reproduction_handoff.v1",
+          "kind": "reviewer_handoff",
+          "min_bytes": 1024,
+          "path": "out/reviewer_handoffs/EIA_GRID_HOURLY_INDEPENDENT_REPRODUCTION_HANDOFF_LATEST.json",
+          "required": true,
+          "required_keys": [
+            "independent_reproduction_complete",
+            "performance_promotion_allowed",
+            "claim_boundary",
+            "integrity"
+          ]
+        },
+        {
+          "claim_scope": "A human-readable reproduction handoff exists; document presence does not prove evaluator completion or acceptance.",
+          "kind": "reviewer_document",
+          "min_bytes": 1024,
+          "path": "docs/EIA_GRID_HOURLY_INDEPENDENT_REPRODUCTION_HANDOFF_2026-07-16.md",
+          "required": true
+        }
       ],
-      "first_validation": "Secure one operator-approved dataset, baseline, holdout policy, and economic conversion factor before discussing dollar value.",
+      "first_validation": "Complete the preregistered prospective sample gates, obtain an independent reproduction receipt, and secure one operator-approved dataset, incumbent baseline, holdout policy, and economic conversion before discussing performance or dollar value.",
       "id": "energy_forecast_validation",
+      "internal_evidence_gate_passed": true,
       "name": "Energy Forecast Validation Service",
       "offer": "Buyer-authorized forecast replay and evidence receipts for grid, facility, and energy-planning decisions.",
       "rank": 3,
       "recurring_model": "Monitoring and model-governance subscription after a scoped validation engagement.",
+      "required_evidence_count": 5,
       "scores": {
         "buyer_pain": 88,
         "capital_efficiency": 76,
@@ -389,7 +1231,9 @@
         "technical_defensibility": 84,
         "time_to_paid_pilot": 48
       },
-      "strategy_score": 75.6
+      "strategy_score": 75.6,
+      "validated_evidence_count": 5,
+      "validated_evidence_coverage": 1.0
     },
     {
       "blocked_claims": [
@@ -397,32 +1241,155 @@
         "label adoption",
         "cross-platform data rights not documented in source terms"
       ],
+      "buyer_readiness_gate": {
+        "boundary": "Internal artifact validation cannot establish buyer acceptance, organizational eligibility, external validation, or commercial readiness.",
+        "evidence_blockers": [
+          {
+            "path": "out/lumascout_summary.json",
+            "reasons": [
+              "artifact_stale"
+            ]
+          }
+        ],
+        "internal_evidence_gate_passed": false,
+        "next_required_validation": "Pre-register a shortlist and measure forward artist outcomes against a transparent popularity baseline using licensed or permitted data.",
+        "passed": false,
+        "status": "blocked_internal_evidence"
+      },
       "evidence_checks": [
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 45284,
+          "claim_scope": "A LumaScout dashboard implementation exists; it does not prove current licensed data coverage or predictive validity.",
+          "contract_complete": true,
           "exists": true,
-          "path": "dashboard/lumascout_dashboard.html"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "interactive_demo",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-29T08:57:23.673579+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "dashboard/lumascout_dashboard.html",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "5fe42750343cbd47cbe355e458c50a2d90b81b033d1b7984f6b2bf8f8ff132a8",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": 1550.6275,
+          "age_source": "json_generated_utc",
+          "bytes": 645,
+          "claim_scope": "A recent LumaScout status is required before describing active sources or current prospects.",
+          "contract_complete": true,
           "exists": true,
-          "path": "out/lumascout_summary.json"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "generated_product_status",
+          "max_age_hours": 168.0,
+          "min_bytes": 256,
+          "missing_required_keys": [],
+          "modified_utc": "2026-05-25T18:20:32.603229+00:00",
+          "observed_keys": [
+            "active_sources",
+            "champions",
+            "delta_history_path",
+            "delta_runs",
+            "generated_utc",
+            "hot_radar_count",
+            "last_checksum",
+            "previous_checksum",
+            "top_artist",
+            "top_live_artist",
+            "top_prospect_count",
+            "truth_summary_path",
+            "watchlist"
+          ],
+          "observed_schema": null,
+          "path": "out/lumascout_summary.json",
+          "reasons": [
+            "artifact_stale"
+          ],
+          "required": true,
+          "required_keys": [
+            "generated_utc",
+            "active_sources",
+            "champions",
+            "truth_summary_path"
+          ],
+          "sha256": "fae00687b77ccbf36d8f059e4ebf7fb2824b3574629342088d3a2d59475b4a45",
+          "status": "invalid",
+          "valid": false
         },
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 4065,
+          "claim_scope": "A claim-bounded commercialization map exists; it is planning evidence, not market validation.",
+          "contract_complete": true,
           "exists": true,
-          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "commercialization_map",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-06-12T16:00:24.930844+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957",
+          "status": "valid",
+          "valid": true
         }
       ],
-      "evidence_coverage": 1.0,
+      "evidence_coverage": 0.6667,
       "evidence_paths": [
-        "dashboard/lumascout_dashboard.html",
-        "out/lumascout_summary.json",
-        "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+        {
+          "claim_scope": "A LumaScout dashboard implementation exists; it does not prove current licensed data coverage or predictive validity.",
+          "kind": "interactive_demo",
+          "min_bytes": 1024,
+          "path": "dashboard/lumascout_dashboard.html",
+          "required": true
+        },
+        {
+          "claim_scope": "A recent LumaScout status is required before describing active sources or current prospects.",
+          "kind": "generated_product_status",
+          "max_age_hours": 168,
+          "min_bytes": 256,
+          "path": "out/lumascout_summary.json",
+          "required": true,
+          "required_keys": [
+            "generated_utc",
+            "active_sources",
+            "champions",
+            "truth_summary_path"
+          ]
+        },
+        {
+          "claim_scope": "A claim-bounded commercialization map exists; it is planning evidence, not market validation.",
+          "kind": "commercialization_map",
+          "min_bytes": 1024,
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "required": true
+        }
       ],
       "first_validation": "Pre-register a shortlist and measure forward artist outcomes against a transparent popularity baseline using licensed or permitted data.",
       "id": "lumascout_ar_intelligence",
+      "internal_evidence_gate_passed": false,
       "name": "LumaScout A&R Intelligence",
       "offer": "Cross-platform artist discovery shortlists with source receipts and forward outcome tracking.",
       "rank": 4,
       "recurring_model": "A&R team subscription with watchlists, alerts, and portfolio outcome tracking.",
+      "required_evidence_count": 3,
       "scores": {
         "buyer_pain": 68,
         "capital_efficiency": 88,
@@ -433,7 +1400,9 @@
         "technical_defensibility": 68,
         "time_to_paid_pilot": 54
       },
-      "strategy_score": 67.0
+      "strategy_score": 67.0,
+      "validated_evidence_count": 2,
+      "validated_evidence_coverage": 0.6667
     },
     {
       "blocked_claims": [
@@ -442,32 +1411,120 @@
         "institutional readiness",
         "live trading authorization"
       ],
+      "buyer_readiness_gate": {
+        "boundary": "Internal artifact validation cannot establish buyer acceptance, organizational eligibility, external validation, or commercial readiness.",
+        "evidence_blockers": [],
+        "internal_evidence_gate_passed": true,
+        "next_required_validation": "Pass a prospective after-fee paper protocol with reconciliation and risk gates before any live-capital discussion.",
+        "passed": false,
+        "status": "requires_external_buyer_validation"
+      },
       "evidence_checks": [
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 72516,
+          "claim_scope": "A paper-research dashboard exists; it is not live trading authorization, custody evidence, or a profitability receipt.",
+          "contract_complete": true,
           "exists": true,
-          "path": "dashboard/kraken_execution_dashboard.html"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "paper_research_dashboard",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-05T14:36:58.484195+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "dashboard/kraken_execution_dashboard.html",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "8ec3667583d69259ccef9c883e526e30a0fbf7c30bd12f6bb3e63bb8668fcb7d",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 40780,
+          "claim_scope": "A benchmark implementation exists; source-native baselines and prospective gates govern all comparative claims.",
+          "contract_complete": true,
           "exists": true,
-          "path": "code/master_universe_benchmark_v2.py"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "source_code",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-06-13T02:15:19.486296+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/master_universe_benchmark_v2.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "ca1d673deb8017ed9ff9c60611fbc474adc381ddc3f19683a1d0d538514f0c14",
+          "status": "valid",
+          "valid": true
         },
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 4065,
+          "claim_scope": "A claim-bounded commercialization map exists; it does not establish alpha, profitability, or institutional readiness.",
+          "contract_complete": true,
           "exists": true,
-          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "commercialization_map",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-06-12T16:00:24.930844+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957",
+          "status": "valid",
+          "valid": true
         }
       ],
       "evidence_coverage": 1.0,
       "evidence_paths": [
-        "dashboard/kraken_execution_dashboard.html",
-        "code/master_universe_benchmark_v2.py",
-        "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+        {
+          "claim_scope": "A paper-research dashboard exists; it is not live trading authorization, custody evidence, or a profitability receipt.",
+          "kind": "paper_research_dashboard",
+          "min_bytes": 1024,
+          "path": "dashboard/kraken_execution_dashboard.html",
+          "required": true
+        },
+        {
+          "claim_scope": "A benchmark implementation exists; source-native baselines and prospective gates govern all comparative claims.",
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "path": "code/master_universe_benchmark_v2.py",
+          "required": true
+        },
+        {
+          "claim_scope": "A claim-bounded commercialization map exists; it does not establish alpha, profitability, or institutional readiness.",
+          "kind": "commercialization_map",
+          "min_bytes": 1024,
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "required": true
+        }
       ],
       "first_validation": "Pass a prospective after-fee paper protocol with reconciliation and risk gates before any live-capital discussion.",
       "id": "guarded_market_research",
+      "internal_evidence_gate_passed": true,
       "name": "Guarded Market Research",
       "offer": "Paper-only signal research, model comparison, and evidence receipts for quantitative teams.",
       "rank": 5,
       "recurring_model": "Research subscription only after prospective evidence passes.",
+      "required_evidence_count": 3,
       "scores": {
         "buyer_pain": 86,
         "capital_efficiency": 46,
@@ -478,7 +1535,9 @@
         "technical_defensibility": 70,
         "time_to_paid_pilot": 28
       },
-      "strategy_score": 63.5
+      "strategy_score": 63.5,
+      "validated_evidence_count": 3,
+      "validated_evidence_coverage": 1.0
     },
     {
       "blocked_claims": [
@@ -487,22 +1546,209 @@
         "safety certification",
         "patentability"
       ],
+      "buyer_readiness_gate": {
+        "boundary": "Internal artifact validation cannot establish buyer acceptance, organizational eligibility, external validation, or commercial readiness.",
+        "evidence_blockers": [],
+        "internal_evidence_gate_passed": true,
+        "next_required_validation": "Build a non-medical software-only prototype and run an ethics-reviewed human-factors study with established cybersickness and task-performance measures.",
+        "passed": false,
+        "status": "requires_external_buyer_validation"
+      },
       "evidence_checks": [
         {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 4065,
+          "claim_scope": "A claim-bounded commercialization map exists; it is not validation of comfort, safety, or medical efficacy.",
+          "contract_complete": true,
           "exists": true,
-          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "commercialization_map",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-06-12T16:00:24.930844+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 5976,
+          "claim_scope": "A research-platform specification exists; it does not prove a built or certified device.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "research_specification",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-18T19:39:31.452707+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "docs/hardware/lumaskin_xr_research_platform/README.md",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "c41a80aa2c09739f629df5baaa7e73e9aec89d615e86c4f3a8bfaa8128499af3",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 12394,
+          "claim_scope": "A bounded test protocol exists; execution, ethics review, and human-factors outcomes remain separate gates.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": "lumencore.lumaskin_test_protocol.v1",
+          "is_file": true,
+          "kind": "test_protocol",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-18T20:47:05.119655+00:00",
+          "observed_keys": [
+            "authority_gates",
+            "canonical_paths",
+            "claim_boundary",
+            "effective_date",
+            "external_reference_basis",
+            "human_test_hold",
+            "preliminary_command_envelope",
+            "program_name",
+            "protocol_id",
+            "purpose",
+            "research_states",
+            "schema",
+            "status",
+            "test_families",
+            "v1_scope",
+            "version"
+          ],
+          "observed_schema": "lumencore.lumaskin_test_protocol.v1",
+          "path": "config/lumaskin_test_protocol_v1.json",
+          "reasons": [],
+          "required": true,
+          "required_keys": [
+            "claim_boundary",
+            "v1_scope",
+            "research_states"
+          ],
+          "sha256": "94d6cde3a2ed015b8cf3584064d44849c7c4edc024ebe4f04a83cedb5dd25147",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 16172,
+          "claim_scope": "A local safety-controller implementation exists; it is not safety certification or field evidence.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "source_code",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-18T20:46:21.819467+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/hardware/lumaskin_safety_controller.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "6247f855883bbdbed6b5bb49cb3e2bfe70284054c2aa095053c5fa87e52d4991",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 6801,
+          "claim_scope": "A software demonstration exists; it is not a hardware prototype or human-subject validation.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "interactive_demo",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-07-18T20:47:34.335904+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "build_week/lumaskin_lab/index.html",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "2cccd2387b715c2934f8289d7a6fdc1bdaec10cef00faeefcd0b622a6438f8ee",
+          "status": "valid",
+          "valid": true
         }
       ],
       "evidence_coverage": 1.0,
       "evidence_paths": [
-        "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+        {
+          "claim_scope": "A claim-bounded commercialization map exists; it is not validation of comfort, safety, or medical efficacy.",
+          "kind": "commercialization_map",
+          "min_bytes": 1024,
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "required": true
+        },
+        {
+          "claim_scope": "A research-platform specification exists; it does not prove a built or certified device.",
+          "kind": "research_specification",
+          "min_bytes": 1024,
+          "path": "docs/hardware/lumaskin_xr_research_platform/README.md",
+          "required": true
+        },
+        {
+          "claim_scope": "A bounded test protocol exists; execution, ethics review, and human-factors outcomes remain separate gates.",
+          "expected_schema": "lumencore.lumaskin_test_protocol.v1",
+          "kind": "test_protocol",
+          "min_bytes": 1024,
+          "path": "config/lumaskin_test_protocol_v1.json",
+          "required": true,
+          "required_keys": [
+            "claim_boundary",
+            "v1_scope",
+            "research_states"
+          ]
+        },
+        {
+          "claim_scope": "A local safety-controller implementation exists; it is not safety certification or field evidence.",
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "path": "code/hardware/lumaskin_safety_controller.py",
+          "required": true
+        },
+        {
+          "claim_scope": "A software demonstration exists; it is not a hardware prototype or human-subject validation.",
+          "kind": "interactive_demo",
+          "min_bytes": 1024,
+          "path": "build_week/lumaskin_lab/index.html",
+          "required": true
+        }
       ],
       "first_validation": "Build a non-medical software-only prototype and run an ethics-reviewed human-factors study with established cybersickness and task-performance measures.",
       "id": "xr_comfort_governor",
+      "internal_evidence_gate_passed": true,
       "name": "XR Comfort and Cue-Integrity Governor",
       "offer": "Adapt visual, vestibular, and haptic cue intensity to reduce discomfort while preserving training-task fidelity.",
       "rank": 6,
       "recurring_model": "SDK licensing after human-factors validation.",
+      "required_evidence_count": 5,
       "scores": {
         "buyer_pain": 76,
         "capital_efficiency": 24,
@@ -513,16 +1759,18 @@
         "technical_defensibility": 90,
         "time_to_paid_pilot": 18
       },
-      "strategy_score": 54.0
+      "strategy_score": 54.0,
+      "validated_evidence_count": 5,
+      "validated_evidence_coverage": 1.0
     }
   ],
   "recommendation": {
     "commercial_lane": "prooflock_opportunity_ops",
     "commercial_offer": "Continuously find, qualify, assemble, preflight, and receipt funding opportunities while keeping final certifications and submissions human-controlled.",
-    "first_design_partner": "MindWise Health",
+    "first_design_partner": "unselected_requires_current_validated_target",
     "technical_wedge": "prooflock_evidence_router_api",
     "technical_wedge_boundary": "The defensible target is not generic grant search or AI writing. It is a constrained router that uses train-only or source-available features, abstains when eligibility or evidence gates fail, and emits replayable policy/source receipts. Patentability still requires a dedicated search.",
-    "why_now": "A warm founder relationship, a working vertical demo, and a current candidate feed exist. The feed still requires buyer-specific eligibility review and measured pilot acceptance gates."
+    "why_now": "Typed internal evidence contracts pass for the top lane. Buyer selection, workflow baseline, acceptance thresholds, eligibility review, and measured pilot outcomes remain external gates."
   },
   "schema": "product_lane_priority_engine_v1",
   "weights": {

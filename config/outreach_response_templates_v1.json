@@ -1,7 +1,7 @@
 {
   "schema": "lumencore.outreach_response_templates.v1",
   "version": 1,
-  "source_effective_utc": "2026-07-19T02:06:25Z",
+  "source_effective_utc": "2026-07-25T22:53:44Z",
   "claim_boundary": "This response is a communication or routing artifact. It does not establish selection, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
@@ -11,6 +11,9 @@
     "Keep legal, signatory, address, account, and portal identifiers in private renderings only.",
     "Attach files only when the recipient or governing instructions explicitly require them.",
     "Escalate deadlines with the exact date, time, timezone, portal, and observed blocker.",
+    "Render the same canonical timezone-aware deadline_iso value that the urgency gate evaluates for every template that states a known deadline.",
+    "Use HTTPS-only public links without embedded credentials.",
+    "Reject rendered subject lines containing line breaks or other mail-header injection characters.",
     "Require action-time human review for every outbound response."
   ],
   "templates": [
@@ -38,6 +41,49 @@
       "optional_defaults": {},
       "subject": "",
       "body": ""
+    },
+    {
+      "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
+      "description": "Send one no-attachment fit-check to a verified public corporate route for an active opportunity that permits teaming, while preserving qualification and partner-authority boundaries.",
+      "inbound_states": [
+        "VERIFIED_PUBLIC_PARTNER_ROUTE_NO_PRIOR_THREAD"
+      ],
+      "reply_triggers": [
+        "ONE_INITIAL_BOUNDED_TEAMING_INQUIRY"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "attachment_policy": "NONE",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "agency_name",
+        "opportunity_name",
+        "notice_type",
+        "opportunity_summary",
+        "deadline_iso",
+        "teaming_basis",
+        "bounded_contribution",
+        "qualification_boundary",
+        "partner_fit_basis",
+        "requested_partner_role",
+        "authorization_request",
+        "duplicate_review_disclosure",
+        "source_opportunity_url",
+        "public_company_url",
+        "public_proof_url",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email"
+      ],
+      "sensitive_fields": [
+        "recipient_email"
+      ],
+      "optional_defaults": {},
+      "subject": "Time-sensitive teaming inquiry - {opportunity_name}",
+      "body": "Hello {recipient_name},\n\nI am {sender_name}, {sender_title} of {organization_name}. {agency_name} posted {opportunity_name}, a {notice_type}: {opportunity_summary}\n\nThe official response deadline is {deadline_iso}. {teaming_basis}\n\nOur bounded contribution is {bounded_contribution}\n\nQualification boundary: {qualification_boundary}\n\nPartner fit basis: {partner_fit_basis}\n\nWould your organization be open to a rapid fit check for the following role: {requested_partner_role}\n\nBefore either organization is named or any credential is used, we need written confirmation of: {authorization_request}\n\nDuplicate-send check: {duplicate_review_disclosure}\n\nThis inquiry requests a nonbinding fit check only. It does not request pricing, a commitment, or permission to represent an unverified qualification. No attachment is included. A prompt reply would preserve time for both parties to reconcile an accurate response before the official deadline.\n\nOfficial notice: {source_opportunity_url}\nCompany: {public_company_url}\nPublic proof: {public_proof_url}\n\nRespectfully,\n{sender_name}\n{sender_title}\n{organization_name}"
     },
     {
       "template_id": "DEADLINE_CLARIFICATION",
@@ -88,10 +134,9 @@
       "private_render_only": true,
       "required_fields": [
         "recipient_name",
-        "source_subject",
         "submission_name",
         "portal_name",
-        "deadline_local",
+        "deadline_iso",
         "portal_blocker",
         "steps_already_tried",
         "sender_name",
@@ -110,7 +155,7 @@
       ],
       "optional_defaults": {},
       "subject": "Time-sensitive portal support: {submission_name}",
-      "body": "Hello {recipient_name},\n\nI am attempting to complete {submission_name} in {portal_name} before {deadline_local}. The current blocker is: {portal_blocker}\n\nSteps already tried: {steps_already_tried}\n\nPlease confirm the safest supported path to preserve a timely submission. I am not asking for requirements to be waived; I need the official instructions for resolving this blocker before close.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
+      "body": "Hello {recipient_name},\n\nI am attempting to complete {submission_name} in {portal_name} before {deadline_iso}. The current blocker is: {portal_blocker}\n\nSteps already tried: {steps_already_tried}\n\nPlease confirm the safest supported path to preserve a timely submission. I am not asking for requirements to be waived; I need the official instructions for resolving this blocker before close.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
     },
     {
       "template_id": "REQUESTED_INFORMATION_REPLY",
@@ -145,6 +190,44 @@
       "optional_defaults": {},
       "subject": "Re: {source_subject}",
       "body": "Hello {recipient_name},\n\nThank you. Below is the requested information, limited to your question:\n\n{requested_information}\n\nPlease let me know if any item needs correction before it is placed into an agreement, portal record, or formal submission.\n\nBest regards,\n{sender_name}\n{sender_title}\n{organization_name}"
+    },
+    {
+      "template_id": "REQUESTED_ASSET_DELIVERY_REPLY",
+      "description": "Deliver only files explicitly requested in an inbound message, with a bounded inventory and permitted-use statement.",
+      "inbound_states": [
+        "ASSETS_EXPLICITLY_REQUESTED",
+        "REQUESTED_ASSETS_READY_FOR_REVIEW"
+      ],
+      "reply_triggers": [
+        "EXPLICIT_ASSET_DELIVERY_REQUEST"
+      ],
+      "send_policy": "REPLY_AFTER_FACT_REVIEW",
+      "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "requested_asset_summary",
+        "attachment_inventory",
+        "permitted_use_boundary",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id",
+        "requested_asset_summary",
+        "attachment_inventory",
+        "permitted_use_boundary"
+      ],
+      "optional_defaults": {},
+      "subject": "Re: {source_subject}",
+      "body": "Hello {recipient_name},\n\nAttached are only the materials explicitly requested in your message: {requested_asset_summary}\n\nAttachment inventory: {attachment_inventory}\n\nPermitted use: {permitted_use_boundary}\n\nThese materials do not imply endorsement, independent validation, licensing beyond the stated use, an award, or a performance claim. Please let me know if you need a different file format or dimensions.\n\nBest regards,\n{sender_name}\n{sender_title}\n{organization_name}"
     },
     {
       "template_id": "SUBMISSION_RECEIPT_FOLLOWUP",
@@ -200,7 +283,7 @@
         "recipient_name",
         "source_subject",
         "topic_or_notice",
-        "deadline_local",
+        "deadline_iso",
         "original_sent_local",
         "support_redirect_summary",
         "exact_instruction_question",
@@ -220,7 +303,7 @@
       ],
       "optional_defaults": {},
       "subject": "Re: {source_subject}",
-      "body": "Hello {recipient_name},\n\nI am following up once on the instruction question below for {topic_or_notice}, which closes {deadline_local}. The original component message was sent {original_sent_local}. {support_redirect_summary}\n\nQuestion requiring component guidance: {exact_instruction_question}\n\nI will not treat prerequisites-in-progress as completed evidence or represent an uncompleted certification. A response by {requested_reply_by_local} would leave time to follow the official instruction before close. No attachment is included, and I will not duplicate the proposal package by email.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
+      "body": "Hello {recipient_name},\n\nI am following up once on the instruction question below for {topic_or_notice}, which closes {deadline_iso}. The original component message was sent {original_sent_local}. {support_redirect_summary}\n\nQuestion requiring component guidance: {exact_instruction_question}\n\nI will not treat prerequisites-in-progress as completed evidence or represent an uncompleted certification. A response by {requested_reply_by_local} would leave time to follow the official instruction before close. No attachment is included, and I will not duplicate the proposal package by email.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
     },
     {
       "template_id": "BOUNDED_REVIEW_FOLLOWUP",
@@ -258,6 +341,116 @@
       "optional_defaults": {},
       "subject": "Re: {source_subject}",
       "body": "Hello {recipient_name},\n\nI am following up once on {package_name}, sent {sent_date_local}. Would {requested_next_step} be useful to decide whether a bounded review is warranted?\n\nProposed scope: {review_scope}\n\nThis note does not assert receipt, endorsement, independent validation, licensing, funding, deployment, or production readiness. No additional attachment is included. If this is not a fit, no response is required and I will not send another follow-up.\n\nBest regards,\n{sender_name}\n{sender_title}\n{organization_name}"
+    },
+    {
+      "template_id": "WARM_INVESTOR_INTRO_REQUEST",
+      "description": "Follow up once after a funding contact explicitly offered introductions, narrowing the request to one primary and one secondary fit without attaching another deck.",
+      "inbound_states": [
+        "WARM_INTRO_OFFER_NO_REPLY"
+      ],
+      "reply_triggers": [
+        "ONE_FOCUSED_INTRO_FOLLOWUP_AFTER_HOLD"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "attachment_policy": "NONE",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "current_raise_amount",
+        "current_raise_purpose",
+        "primary_fund_name",
+        "primary_fit_reason",
+        "secondary_fund_name",
+        "public_proof_url",
+        "current_stage_disclosure",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "optional_defaults": {},
+      "subject": "Re: {source_subject}",
+      "body": "Hello {recipient_name},\n\nI am following up once on your offer to make a targeted introduction. {organization_name}'s current ask is {current_raise_amount} for {current_raise_purpose}.\n\nIf you still see a fit, would you please introduce me to {primary_fund_name} first? {primary_fit_reason} {secondary_fund_name} would be my second choice.\n\nCurrent public proof: {public_proof_url}\n\nCurrent stage and claim boundary: {current_stage_disclosure}\n\nNo attachment is included. If this is no longer a fit, no response is required and I will not send another introduction follow-up.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
+    },
+    {
+      "template_id": "FUNDING_REVIEW_STATUS_CHECK",
+      "description": "Ask once whether a funding application remains active and complete after the review window stated by the recipient has passed.",
+      "inbound_states": [
+        "FUNDING_REVIEW_WINDOW_PASSED"
+      ],
+      "reply_triggers": [
+        "ONE_STATUS_CHECK_AFTER_STATED_WINDOW"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "attachment_policy": "NONE",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "source_subject",
+        "application_name",
+        "application_date_local",
+        "stated_review_window",
+        "duplicate_review_disclosure",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "sensitive_fields": [
+        "recipient_email",
+        "source_message_id"
+      ],
+      "optional_defaults": {},
+      "subject": "Re: {source_subject}",
+      "body": "Hello {recipient_name},\n\nI am following up once on {application_name}, submitted {application_date_local}. Your note stated a review window of {stated_review_window}. Could you confirm whether the application is still active and complete for review?\n\nDuplicate-send check: {duplicate_review_disclosure}\n\nThis is a status check only, not a duplicate application. No new attachment is included unless your team requests one.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
+    },
+    {
+      "template_id": "DIRECT_INVESTOR_REVIEW_REQUEST",
+      "description": "Send one public-safe request to a verified investor or program route when no prior outreach exists, with no attachment and an explicit stage boundary.",
+      "inbound_states": [
+        "VERIFIED_DIRECT_INVESTOR_ROUTE_NO_PRIOR_THREAD"
+      ],
+      "reply_triggers": [
+        "ONE_INITIAL_DIRECT_INVESTOR_REVIEW_REQUEST"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "attachment_policy": "NONE",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "investor_program_name",
+        "company_one_line",
+        "current_raise_amount",
+        "current_raise_purpose",
+        "six_month_milestone",
+        "climate_component",
+        "current_stage_disclosure",
+        "public_company_url",
+        "public_proof_url",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email"
+      ],
+      "sensitive_fields": [
+        "recipient_email"
+      ],
+      "optional_defaults": {},
+      "subject": "{organization_name} - {current_raise_amount} validation bridge for {investor_program_name}",
+      "body": "Hello {recipient_name},\n\nI am {sender_name}, {sender_title} of {organization_name}. {company_one_line}\n\nI am requesting a review for {investor_program_name}. Our current ask is {current_raise_amount} for {current_raise_purpose}. The six-month milestone is {six_month_milestone}\n\nClimate-positive component: {climate_component}\n\nCurrent stage and claim boundary: {current_stage_disclosure}\n\nCompany: {public_company_url}\nPublic proof: {public_proof_url}\n\nNo attachment is included. If this is not the correct route, would you please direct me to the official application channel? I will not send a duplicate initial request.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
     },
     {
       "template_id": "VALIDATION_PILOT_REQUEST",

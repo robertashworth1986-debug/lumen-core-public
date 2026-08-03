@@ -1,0 +1,71 @@
+{
+  "claim_boundary": "This public gate reports only whether a guarded private PDF candidate was built and whether bounded document checks passed. It does not publish the private price, identity, address, contact, input paths, private PDF path, or private fingerprints. The candidate is not submission-ready, has not been uploaded, and does not represent ERDC selection, available funding, an award, deployment, authorization to operate, classified handling, field validation, customers, revenue, realized savings, or independently validated performance.",
+  "controls": {
+    "browser_navigation_performed": false,
+    "external_send_allowed": false,
+    "final_portal_submit_allowed": false,
+    "private_values_allowed_in_public_output": false
+  },
+  "deadline": {
+    "question_submission_cutoff": "July 31, 2026",
+    "safest_operational_cutoff": "4:00 PM CT on August 7, 2026"
+  },
+  "error_code": null,
+  "gate_sha256": "b53e02e374634586ec833c3a8075034a98edf8cc5de7b0a4d9e3d02239243ece",
+  "generated_utc": "2026-07-29T21:50:21.530316+00:00",
+  "opportunity_number": "W912HZ26SC005",
+  "outputs": {
+    "json": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PRIVATE_FINAL_CANDIDATE_GATE_2026-07-29.json",
+    "markdown": "grant_submissions/funding_sprint_20260709/ERDC_SDC_PRIVATE_FINAL_CANDIDATE_GATE_2026-07-29.md"
+  },
+  "pdf": {
+    "active_content_absent": false,
+    "body_page_count": null,
+    "bytes": null,
+    "document_checks_pass": false,
+    "draft_watermark_absent": false,
+    "exactly_one_phase_ii_total": false,
+    "forbidden_final_markers_absent": false,
+    "physical_page_count": null,
+    "private_fingerprint_exposed": false,
+    "private_path_exposed": false
+  },
+  "private_final_candidate_built": false,
+  "private_inputs": {
+    "identity_input_present": false,
+    "private_fingerprints_exposed": false,
+    "private_paths_exposed": false,
+    "private_values_exposed": false,
+    "rom_input_present": false
+  },
+  "private_template": "config/erdc_sdc_private_final_template_v1.json",
+  "schema": "lumencore.erdc_sdc_private_final_candidate_gate.v1",
+  "status": "PRIVATE_FINAL_INPUTS_NOT_CAPTURED",
+  "submission_ready": false,
+  "unresolved_gates": [
+    "PRIVATE_IDENTITY_CAPTURE_AND_AUTHORIZATION",
+    "CURRENT_SAM_ALL_AWARDS_EXACT_MATCH",
+    "CURRENT_PROPOSAL_CONTACT",
+    "SUPPORTED_DELIVERY_BOUNDARIES",
+    "FOUNDER_PRIVATE_CANDIDATE_APPROVAL",
+    "APPROVED_PHASE_II_ONLY_ROM",
+    "CURRENT_OFFICIAL_SOURCE_INTEGRITY",
+    "BOUNDED_EVIDENCE_RECEIPT",
+    "PRIVATE_FINAL_CANDIDATE_BUILD",
+    "AUTHENTICATED_SUBMITTABLE_COMPLETE_FORM_REVIEW",
+    "CURRENT_AMENDMENTS_AND_QUESTIONS_RECHECK",
+    "HUMAN_FINAL_PDF_AND_PORTAL_FIELD_REVIEW",
+    "TERMS_REPRESENTATIONS_AND_CERTIFICATIONS_REVIEW",
+    "HUMAN_UPLOAD_AND_FINAL_CONFIRMATION"
+  ],
+  "validation": {
+    "bounded_evidence_receipt": false,
+    "delivery_boundaries_supported": false,
+    "founder_private_candidate_approval": false,
+    "no_invented_commitments": false,
+    "official_source_integrity": false,
+    "phase_ii_only_rom_ready": false,
+    "proposal_contact_current": false,
+    "sam_exact_match_current": false
+  }
+}

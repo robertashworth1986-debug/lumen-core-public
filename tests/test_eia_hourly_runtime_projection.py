@@ -141,13 +141,26 @@ def test_committed_projection_is_protocol_bound_and_public_safe() -> None:
     projection = MODULE.read_json(ROOT / MODULE.OUTPUT_RELATIVE)
     protocol_path = ROOT / MODULE.PROTOCOL_RELATIVE
     protocol = MODULE.read_json(protocol_path)
+    status = MODULE.read_json(ROOT / MODULE.STATUS_RELATIVE)
+    cycle = MODULE.read_json(ROOT / MODULE.CYCLE_RELATIVE)
 
     MODULE.validate_public_projection(
         projection,
         protocol,
         protocol_sha256=MODULE.sha256_file(protocol_path),
     )
-    assert projection["sample_state"]["prediction_count"] == 95
-    assert projection["sample_state"]["settlement_count"] == 84
-    assert projection["sample_state"]["common_settled_hour_count"] == 0
+    sample = projection["sample_state"]
+    assert sample["prediction_count"] == status["prediction_count"]
+    assert sample["settlement_count"] == status["settlement_count"]
+    assert sample["common_settled_hour_count"] == status["common_settled_hour_count"]
+    assert sample["prediction_count"] >= sample["settlement_count"]
+    assert sample["settlement_count"] >= sample["common_settled_hour_count"]
+    assert sample["prediction_count"] >= 95
+    assert sample["settlement_count"] >= 84
+    assert projection["chain_receipts"]["prediction_terminal_sha256"] == (
+        cycle["operational_receipt"]["prediction_terminal_sha256"]
+    )
+    assert projection["chain_receipts"]["settlement_terminal_sha256"] == (
+        cycle["operational_receipt"]["settlement_terminal_sha256"]
+    )
     assert projection["descriptive_metrics"]["sample_gate_open"] is False

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Run on Oracle VPS as opc user. Idempotent — safe to run multiple times.
 set -euo pipefail
+umask 077
 
 echo "=== [1/7] Installing Caddy ==="
 if ! command -v caddy >/dev/null 2>&1; then
@@ -20,9 +21,36 @@ sudo cp /tmp/lumen_index.html /var/www/lumen-core/index.html
 sudo chmod 644 /var/www/lumen-core/index.html
 
 echo "=== [4/7] Installing Caddyfile ==="
+AUTH_USER="${LUMA_CADDY_AUTH_USER:-}"
+AUTH_HASH="${LUMA_CADDY_AUTH_HASH:-}"
+
+if [[ -z "$AUTH_USER" || -z "$AUTH_HASH" ]]; then
+  echo "ERROR: protected subdomains require LUMA_CADDY_AUTH_USER and LUMA_CADDY_AUTH_HASH." >&2
+  echo "Generate a password verifier interactively with: caddy hash-password" >&2
+  exit 2
+fi
+
+if [[ ! "$AUTH_USER" =~ ^[A-Za-z0-9._-]{1,64}$ ]]; then
+  echo "ERROR: LUMA_CADDY_AUTH_USER contains unsupported characters." >&2
+  exit 2
+fi
+
+case "$AUTH_HASH" in
+  '$2a$'*|'$2b$'*|'$2y$'*) ;;
+  *)
+    echo "ERROR: LUMA_CADDY_AUTH_HASH must be a bcrypt verifier." >&2
+    exit 2
+    ;;
+esac
+
+AUTH_INCLUDE="$(mktemp)"
+trap 'rm -f "$AUTH_INCLUDE"' EXIT
+printf 'basicauth {\n    %s %s\n}\n' "$AUTH_USER" "$AUTH_HASH" > "$AUTH_INCLUDE"
+sudo install -o root -g caddy -m 0640 "$AUTH_INCLUDE" /etc/caddy/lumencore-auth.caddy
 sudo cp /tmp/Caddyfile /etc/caddy/Caddyfile
 sudo chown root:caddy /etc/caddy/Caddyfile
 sudo chmod 644 /etc/caddy/Caddyfile
+sudo caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 
 echo "=== [5/7] Opening firewall ports 80 + 443 ==="
 sudo firewall-cmd --permanent --add-service=http  || true

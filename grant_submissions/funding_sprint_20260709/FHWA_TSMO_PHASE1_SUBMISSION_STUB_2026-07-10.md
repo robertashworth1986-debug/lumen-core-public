@@ -1,7 +1,7 @@
 # FHWA TSMO Phase I Submission Stub - 2026-07-10
 
 - Opportunity: `693JJ326R000012`
-- Status: `DRAFT_READY_HUMAN_REVIEW_REQUIRED`
+- Status: `HISTORICAL_DRAFT_REVERIFY_BEFORE_USE`
 - External send without human: `false`
 - Final submission without human: `false`
 - Pricing/certification without human: `false`

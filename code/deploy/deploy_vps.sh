@@ -9,6 +9,20 @@
 # ============================================================
 set -euo pipefail
 
+if [[ "${LUMA_VPS_DEPLOY_APPLY:-0}" != "1" ]]; then
+   echo "PRECHECK ONLY: remote deployment mutation is disabled."
+   echo "No packages, files, proxies, or services were changed."
+   echo "Set LUMA_VPS_DEPLOY_APPLY=1 and provide a private HumanUnlock token to apply."
+   exit 0
+fi
+
+human_unlock_token="${LUMA_HUMAN_UNLOCK_TOKEN:-}"
+if [[ ${#human_unlock_token} -lt 32 ]]; then
+   echo "ERROR: apply requires LUMA_HUMAN_UNLOCK_TOKEN with at least 32 characters." >&2
+   exit 64
+fi
+unset human_unlock_token LUMA_HUMAN_UNLOCK_TOKEN
+
 DOMAIN="${LUMA_DOMAIN:-${1:-lumen-core.ai}}"
 if [[ -n "${LUMA_SERVICE_USER:-}" ]]; then
    SERVICE_USER="$LUMA_SERVICE_USER"
@@ -114,6 +128,7 @@ STRICT_PREMIUM_STACK="${LUMA_STRICT_PREMIUM_STACK:-0}"
 
 REQUIRED_PAGES=(
    "index.html"
+   "investor_command_room.html"
    "operator_home.html"
    "mission_control.html"
    "grants.html"

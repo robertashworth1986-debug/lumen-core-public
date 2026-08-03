@@ -1,0 +1,84 @@
+{
+  "applicant_fact_gates": {
+    "legal_business_name_verified": false,
+    "ownership_eligibility_verified": false,
+    "principal_investigator_employment_and_effort_verified": false,
+    "principal_investigator_verified": false,
+    "small_business_eligibility_verified": false,
+    "submission_authority_verified": false
+  },
+  "as_of_date": "2026-07-29",
+  "claim_boundary": [
+    "No NSF invitation is claimed.",
+    "No full-proposal authorization is claimed.",
+    "The past July 27 deadline is retained only as schedule history and is not represented as the current deadline.",
+    "The November 4 date is invitation-contingent planning, not a Project Pitch deadline or submission authorization.",
+    "No customer commitment, independent validation, award, or realized economic impact is claimed.",
+    "Portal state and legal company facts require human confirmation."
+  ],
+  "field_limits": {
+    "Company and Team": 1750,
+    "Market Opportunity": 1750,
+    "Technical Objectives and Challenges": 3500,
+    "Technology Innovation": 3500
+  },
+  "full_proposal": {
+    "access_state": "BLOCKED_NO_VERIFIED_PROJECT_PITCH_INVITATION",
+    "current_official_schedule_checked_on": "2026-07-29",
+    "deadline_time": "17:00",
+    "deadline_timezone_semantics": "SUBMITTING_ORGANIZATION_LOCAL_TIME",
+    "future_listed_deadlines": [
+      "2026-11-04",
+      "2027-03-04",
+      "2027-07-07"
+    ],
+    "invitation_required": true,
+    "invitation_verified": false,
+    "listed_deadlines": [
+      "2026-07-27",
+      "2026-11-04",
+      "2027-03-04",
+      "2027-07-07"
+    ],
+    "next_listed_deadline": "2026-11-04",
+    "next_listed_deadline_reachable": false,
+    "past_listed_deadlines": [
+      "2026-07-27"
+    ],
+    "planning_target": "2026-11-04",
+    "planning_target_semantics": "INVITATION_CONTINGENT_NOT_AUTHORIZATION_OR_GUARANTEE",
+    "submission_allowed": false
+  },
+  "official_sources": {
+    "project_pitch_details": "https://seedfund.nsf.gov/apply/project-pitch/",
+    "project_pitch_overview": "https://seedfund.nsf.gov/project-pitch/",
+    "solicitation_26_510": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation",
+    "solicitation_26_511": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology-0/nsf26-511/solicitation",
+    "solicitation_schedule": "https://seedfund.nsf.gov/solicitations/"
+  },
+  "portal_state": {
+    "full_proposal_under_review_verified": false,
+    "open_invitation_status_verified": false,
+    "pending_project_pitch_status_verified": false
+  },
+  "project_pitch": {
+    "authenticated_portal_state_verified": false,
+    "current_gate": true,
+    "deadline": null,
+    "deadline_semantics": "ROLLING_PREREQUISITE_NO_FIXED_DUE_DATE",
+    "final_submit_allowed_without_human": false,
+    "legal_eligibility_verified": false,
+    "one_active_pitch_invitation_or_proposal_at_a_time": true,
+    "portal_url": "https://seedfund.nsf.gov/project-pitch/",
+    "submission_allowed": false,
+    "typical_response_time": "1-2 months"
+  },
+  "routing": {
+    "alternate_solicitation": "NSF 26-511 only if NSF confirms scientific-instrumentation fit",
+    "primary_solicitation": "NSF 26-510",
+    "reason": "The current proposal is a trustworthy-AI software and validation platform; the general deep-technology solicitation is the cleaner documented fit."
+  },
+  "schema": "lumencore.nsf_project_pitch_routing.v2",
+  "source_audit": "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-29.json",
+  "source_scope": "CURRENT_PUBLIC_OFFICIAL_SOURCES_ONLY"
+}

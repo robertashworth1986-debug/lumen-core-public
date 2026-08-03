@@ -1,35 +1,47 @@
-# Champion Phase Proxy Diagnostics
+# Phase Proxy Diagnostic Nonpromotion Report
 
-Generated UTC: `2026-07-01T16:28:22.438111+00:00`
-Phase proxy SHA-256: `8e077551c6309e2106611dfffa858066f7f2c0ddb272260c5dcedabcd666c357`
+Generated UTC: `2026-07-29T07:39:13.148697+00:00`
+Phase proxy SHA-256: `bcd1801bfd61de3c36156f4d98baa067f107c057c8e1f0f399dc6246052c9492`
 
 ## Truth Line
 
-The champion now has replay-data phase proxy diagnostics across the current holdout set. Flat or low-variance numeric files are explicitly marked as degenerate so they cannot inflate the source-level phase means. These metrics support mechanism triage for the wave-resonance lane, but they do not prove hardware PLL behavior or external field validation.
+No performance champion is present. Kuramoto was not development-selected and is retained only as a negative measured reference: 482/1525 paired wins against kalman_local_linear_trend with mean delta -0.508191. The broader replay contains 2 direct measured routes, 2 conditioned-synthetic routes, 22 comparisons, 32,608 performance rows, and 0 direct all-baseline globally Holm-positive promotions. These file-level proxies are descriptive data diagnostics only; the 24-source / 17,081-row register is inventory, not performance evidence.
 
 ## Summary
 
-- Champion: `kuramoto_phase_coupling`
-- Named baseline: `kalman_filter`
-- Usable numeric holdouts: `23/24`
-- Non-degenerate numeric holdouts: `15`
-- Degenerate numeric holdouts excluded from source means: `8`
-- Mean phase coherence proxy: `0.515292`
-- Mean circular phase error proxy: `0.484708`
-- Mean phase slip proxy rate: `0.007775`
-- Mean spectral concentration proxy: `0.351751`
-- Mean absolute residual lag-1 autocorrelation proxy: `0.242831`
+- Internal performance champion: `false`
+- Champion family: `none`
+- Audited reference candidate: `kuramoto_phase_coupling`
+- Reference candidate status: `negative_measured_reference_not_selected_not_promoted`
+- Development-selected candidate: `lissajous_phase_paths`
+- Kuramoto paired wins: `482/1525`
+- Kuramoto mean delta vs named baseline: `-0.508191`
+- Named baseline: `kalman_local_linear_trend`
+- Direct measured routes: `2`
+- Conditioned-synthetic routes: `2`
+- Baseline comparisons: `22`
+- Performance rows reviewed: `32608`
+- Direct all-baseline globally Holm-positive promotions: `0`
+- Source inventory: `24` measured sources / `17081` rows
+- Source inventory is performance evidence: `false`
+- Usable numeric holdouts: `6/6`
+- Non-degenerate numeric holdouts: `6`
+- Degenerate numeric holdouts excluded from source means: `0`
+- Mean phase coherence proxy: `0.999339`
+- Mean circular phase error proxy: `0.000661`
+- Mean phase slip proxy rate: `0.000244`
+- Mean spectral concentration proxy: `0.03125`
+- Mean absolute residual lag-1 autocorrelation proxy: `0.5`
+- Phase measurement claim allowed: `false`
+- Performance promotion claim allowed: `false`
 - Hardware phase-lock claim allowed: `false`
 
 ## Source Summary
 
 | Source | Holdouts | Usable | Non-Degenerate | Degenerate | Phase Coherence | Slip Rate | Spectral Concentration | Abs Residual Lag1 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `energy_grid` | 2 | 2 | 2 | 0 | 0.996039 | 0.002335 | 0.031406 | 0.500002 |
-| `macro_rates_labor` | 1 | 1 | 1 | 0 | 0.077596 | 0.000489 | 0.51083 | 0.219651 |
-| `market_data` | 20 | 20 | 12 | 8 | 0.216035 | 0.014472 | 0.57398 | 0.354651 |
-| `sports_market` | 1 | 0 | 0 | 0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| `EIA_GRID_VALIDATION` | 6 | 6 | 6 | 0 | 0.999339 | 0.000244 | 0.03125 | 0.5 |
 
 ## Boundary
 
-Replay phase-proxy diagnostics for the current internal champion. These metrics are computed from source-conditioned holdout data and are useful for mechanism triage. They are not hardware PLL measurements, not field validation, not realized savings, and not proof of live trading edge.
+These are file-level numeric-sequence diagnostic proxies for a negative measured Kuramoto reference. They are not phase measurements, model-residual diagnostics, candidate-selection evidence, performance promotion evidence, hardware PLL measurements, field validation, realized savings, or proof of live trading edge. The 24-source / 17,081-row register is source inventory only.

@@ -1,0 +1,30 @@
+{
+  "schema": "lumencore.third_sphere_seedstrap_outreach_send_state.v1",
+  "status": "INITIAL_PUBLIC_SAFE_REVIEW_REQUEST_SENT_MONITOR_ONLY",
+  "as_of_utc": "2026-07-23T20:36:53Z",
+  "claim_boundary": "This hash-only Gmail sent-message receipt records one outbound transmission event to an official Third Sphere contact route. It does not establish recipient receipt, application submission, review, eligibility, endorsement, diligence, investment, funding, valuation, selection, or an award.",
+  "controls": {
+    "attachment_count": 0,
+    "cc_count": 0,
+    "do_not_repeat_without_substantive_inbound": true,
+    "private_message_and_thread_identifiers_omitted": true,
+    "recipient_address_omitted": true,
+    "subject_and_body_omitted": true
+  },
+  "receipt": {
+    "delivery_state": "SENT",
+    "lane_id": "third_sphere_seedstrap_direct_review",
+    "recipient_route_sha256": "FFA8EEBA7B1DA8DC6C28B40AA05C98971D32CDA8EE81DB0ECF5E159B0E328CED",
+    "subject_sha256": "7D37752E03F5486CE2304C2A55A94F7C5FFFDEDE1211833E05EB3C5B96833070",
+    "body_sha256": "B08FAEB44907AB256FBFC0049347937BFC389DE6FEE79CA224658ABF002C1FFA",
+    "gmail_message_id_sha256": "C7F19BF03891C112F3BF04837564A747DCA60F0B8D21DC9D990567E2FB841BFF",
+    "gmail_thread_id_sha256": "C7F19BF03891C112F3BF04837564A747DCA60F0B8D21DC9D990567E2FB841BFF",
+    "attachment_count": 0,
+    "cc_count": 0,
+    "bcc_count": 0,
+    "sent_message_receipt_sha256": "5ABD0718CC202EBA998D00CCA5DF7B93570893586E6B5D66C724D04F7E24D874",
+    "sent_utc": "2026-07-23T20:36:53Z",
+    "template_id": "DIRECT_INVESTOR_REVIEW_REQUEST"
+  },
+  "next_action": "Monitor the existing thread for a substantive response or official application instruction. Do not send another proactive initial request. Any portal submission, financing term, legal fact, attestation, or agreement remains founder-only."
+}

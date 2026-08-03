@@ -199,7 +199,12 @@ def build_payload() -> dict[str, Any]:
     measured_summary = measured.get("summary", {}) if isinstance(measured.get("summary"), dict) else {}
     authority_summary = authority.get("summary", {}) if isinstance(authority.get("summary"), dict) else {}
 
-    gate_clear = bool(gate.get("reviewer_gate_clear")) and int(gate_summary.get("unsafe_secret_count") or 0) == 0 and int(gate_summary.get("unsafe_claim_count") or 0) == 0
+    submission_argument_gate_clear = bool(gate.get("reviewer_gate_clear"))
+    reviewer_packaging_gate_clear = (
+        bool(gate_summary.get("packaging_checks_clear"))
+        and int(gate_summary.get("unsafe_secret_count") or 0) == 0
+        and int(gate_summary.get("unsafe_claim_count") or 0) == 0
+    )
     final_actions_blocked = bool(authority_summary.get("all_final_actions_blocked_without_human"))
     lane = find_evtit_lane(traction)
     current_control = followup.get("lane", {}).get("current_control", {})
@@ -224,9 +229,9 @@ def build_payload() -> dict[str, Any]:
         "schema": "evtit_technical_sprint_scope_packet_v1",
         "status": (
             "EVTIT_TECHNICAL_SPRINT_SCOPE_INTERNAL_ONLY_MONITOR_NO_SEND"
-            if gate_clear and final_actions_blocked and monitor_only
+            if reviewer_packaging_gate_clear and final_actions_blocked and monitor_only
             else "EVTIT_TECHNICAL_SPRINT_SCOPE_READY_HUMAN_TERMS_REQUIRED"
-            if gate_clear and final_actions_blocked
+            if reviewer_packaging_gate_clear and final_actions_blocked
             else "EVTIT_TECHNICAL_SPRINT_SCOPE_BLOCKED"
         ),
         "lane": {
@@ -253,7 +258,8 @@ def build_payload() -> dict[str, Any]:
         "summary": {
             "workstream_count": len(WORKSTREAMS),
             "milestone_count": len(MILESTONES),
-            "reviewer_gate_clear": gate_clear,
+            "reviewer_packaging_gate_clear": reviewer_packaging_gate_clear,
+            "submission_argument_gate_clear": submission_argument_gate_clear,
             "unsafe_secret_count": int(gate_summary.get("unsafe_secret_count") or 0),
             "unsafe_claim_count": int(gate_summary.get("unsafe_claim_count") or 0),
             "data_room_status": data_room.get("status", ""),
@@ -343,7 +349,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Fit score: `{lane['fit_score']}`",
         f"- Workstreams: `{summary['workstream_count']}`",
         f"- Milestones: `{summary['milestone_count']}`",
-        f"- Reviewer gate clear: `{str(summary['reviewer_gate_clear']).lower()}`",
+        f"- Reviewer packaging gate clear: `{str(summary['reviewer_packaging_gate_clear']).lower()}`",
+        f"- Submission argument gate clear: `{str(summary['submission_argument_gate_clear']).lower()}`",
         f"- Unsafe sensitive hits: `{summary['unsafe_secret_count']}`",
         f"- Unsafe claim hits: `{summary['unsafe_claim_count']}`",
         f"- Registry enabled sources: `{summary['registry_enabled_sources']}`",

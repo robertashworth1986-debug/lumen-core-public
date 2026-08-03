@@ -20,6 +20,7 @@ CONCIERGE_JSON = OUT_OPS / "reviewer_concierge_packet_latest.json"
 FEDERAL_JSON = OUT_OPS / "federal_submission_protocol_packet_latest.json"
 AGENCY_JSON = OUT_OPS / "agency_account_activation_docket_latest.json"
 REVIEWER_GATE_JSON = OUT_OPS / "funding_sprint_reviewer_gate_latest.json"
+CONFORMANCE_JSON = OUT_OPS / "submission_conformance_gate_latest.json"
 
 OUT_JSON = OUT_OPS / "agency_submission_assembly_gate_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "agency_submission_assembly_gate.json"
@@ -35,6 +36,13 @@ FEDERAL_AND_IP_CHANNELS = {
     "federal_market_research",
     "federal_sources_sought",
     "ip_readiness",
+}
+
+SUPPLEMENTAL_CHANNEL_BY_LANE_ID = {
+    "cdc_ai_acquisition_rfi": "federal_rfi",
+    "darpa_falcon_dpa26bz04_dv016": "federal_sbir",
+    "erdc_sovereign_cloud_cso": "federal_contract",
+    "launchtn_3686_pitch_2026": "venture_pitch",
 }
 
 SENSITIVE_MARKERS = [
@@ -69,6 +77,10 @@ COMMON_COMPONENTS = [
         "gate": "Evidence artifacts are present, hashed, and claim-bounded.",
     },
     {
+        "component": "program_fit_and_argument_trace",
+        "gate": "Official objectives, novelty, named baseline, metrics, mission experiment, evidence applicability, execution plan, and falsifiers pass a source-bound conformance review.",
+    },
+    {
         "component": "eligibility_account_and_signer_authority",
         "gate": "SAM/UEI/CAGE, portal account, organization linkage, role, and signer authority verified.",
     },
@@ -89,6 +101,16 @@ COMMON_COMPONENTS = [
         "gate": "Robert or named human authority approves send, upload, certification, filing, signature, pricing, or term action.",
     },
 ]
+
+COMPONENT_GATE_PASSED_STATES = {
+    "primary_artifact_ready",
+    "hashable_artifacts_claim_bounded",
+    "invention_family_summary_ready",
+    "not_applicable_for_current_route",
+    "not_primary_gate",
+    "source_bound_argument_conformance_pass",
+    "watch_only",
+}
 
 MODE_BLOCKERS = {
     "FEDERAL_REGISTRATION_SUBMITTED_VALIDATION_PENDING": [
@@ -216,6 +238,7 @@ def component_state(
     lane: dict[str, Any],
     authority: dict[str, Any],
     concierge: dict[str, Any],
+    conformance: dict[str, Any],
 ) -> str:
     channel = str(lane.get("channel", ""))
     override = COMPONENT_OVERRIDES.get(channel, {}).get(component)
@@ -229,6 +252,16 @@ def component_state(
         return "primary_artifact_ready" if int(concierge.get("artifact_missing_count", 0)) == 0 else "missing_primary_artifact"
     if component == "evidence_annex_and_proof_boundary":
         return "hashable_artifacts_claim_bounded" if int(concierge.get("artifact_missing_count", 0)) == 0 else "evidence_artifact_missing"
+    if component == "program_fit_and_argument_trace":
+        if not conformance:
+            return "missing_submission_conformance_record"
+        if str(conformance.get("status", "")) == "CLOSED_OFFICIAL_DECISION_POSTMORTEM_ONLY":
+            return "closed_official_decision_postmortem_only"
+        if not bool(conformance.get("technical_argument_required", False)):
+            return "not_applicable_for_current_route"
+        if bool(conformance.get("argument_conformance_pass", False)):
+            return "source_bound_argument_conformance_pass"
+        return "argument_conformance_blocked"
     if component == "eligibility_account_and_signer_authority":
         if channel == "federal_sbir":
             return "dsip_or_sbir_authority_required"
@@ -248,7 +281,29 @@ def component_state(
     return "review_required"
 
 
-def package_status(row: dict[str, Any]) -> str:
+def component_gate_passed(state: str) -> bool:
+    return state in COMPONENT_GATE_PASSED_STATES or state.startswith("not_required_")
+
+
+def package_status(row: dict[str, Any], conformance: dict[str, Any]) -> str:
+    conformance_status = str(conformance.get("status", ""))
+    if conformance_status == "CLOSED_OFFICIAL_DECISION_POSTMORTEM_ONLY":
+        return "CLOSED_OFFICIAL_DECISION_POSTMORTEM_ONLY"
+    if conformance_status == "EXPIRED_NO_VERIFIED_SUBMISSION_REUSE_BLOCKED":
+        return "EXPIRED_NO_VERIFIED_SUBMISSION_REUSE_BLOCKED"
+    if conformance_status == "TECHNICAL_NO_GO_EVIDENCE_SPRINT_ONLY":
+        return "TECHNICAL_NO_GO_EVIDENCE_SPRINT_ONLY"
+    if conformance_status == "MONITOR_ONLY_NO_DUPLICATE_SUBMISSION":
+        return "MONITOR_ONLY_NO_DUPLICATE_SUBMISSION"
+    if conformance_status in {
+        "NO_SUBMISSION_ARGUMENT_GATE_APPLICABLE",
+        "NON_SUBMISSION_ROUTE",
+    }:
+        return "NO_CURRENT_SUBMISSION_ROUTE"
+    if bool(conformance.get("submission_candidate_active", False)) and not bool(
+        conformance.get("argument_conformance_pass", False)
+    ):
+        return "ARGUMENT_CONFORMANCE_BLOCKED_BEFORE_REVIEW"
     readiness = str(row.get("readiness_mode", ""))
     if readiness == "FEDERAL_REGISTRATION_SUBMITTED_VALIDATION_PENDING":
         return "VALIDATION_WATCH_NOT_SUBMISSION"
@@ -267,25 +322,108 @@ def package_status(row: dict[str, Any]) -> str:
     return "REVIEW_PACKET_READY_HUMAN_ACTION_BLOCKED"
 
 
+def conformance_first_artifact(conformance: dict[str, Any]) -> str:
+    for field in ("candidate_artifact", "official_source", "postmortem"):
+        receipt = conformance.get(field)
+        if (
+            isinstance(receipt, dict)
+            and receipt.get("present") is True
+            and str(receipt.get("path") or "").strip()
+        ):
+            return str(receipt["path"])
+    return ""
+
+
 def build_rows() -> list[dict[str, Any]]:
     traction = read_json(TRACTION_JSON)
     authority_payload = read_json(AUTHORITY_JSON)
     docket_payload = read_json(DOCKET_JSON)
     concierge_payload = read_json(CONCIERGE_JSON)
+    conformance_payload = read_json(CONFORMANCE_JSON)
 
     authority_rows = by_lane(authority_payload.get("authority_rows", []))
     docket_rows = by_lane(docket_payload.get("docket_items", []))
     concierge_rows = by_lane(concierge_payload.get("concierge_cards", []))
+    conformance_rows = by_lane(conformance_payload.get("lanes", []))
+
+    traction_lanes = [
+        lane
+        for lane in traction.get("lanes", [])
+        if isinstance(lane, dict)
+        and str(lane.get("channel", "")) in FEDERAL_AND_IP_CHANNELS
+    ]
+    traction_lane_ids = {
+        str(lane.get("lane_id", ""))
+        for lane in traction_lanes
+        if str(lane.get("lane_id", "")).strip()
+    }
+    supplemental_lanes = []
+    for index, conformance in enumerate(
+        sorted(conformance_rows.values(), key=lambda item: str(item.get("lane_id", "")))
+    ):
+        lane_id = str(conformance.get("lane_id", ""))
+        if (
+            lane_id in traction_lane_ids
+            or conformance.get("technical_argument_required") is not True
+        ):
+            continue
+        official_source = conformance.get("official_source")
+        source_refs = []
+        if (
+            isinstance(official_source, dict)
+            and official_source.get("present") is True
+            and str(official_source.get("path") or "").strip()
+        ):
+            source_refs = [str(official_source["path"])]
+        supplemental_lanes.append(
+            {
+                "lane_id": lane_id,
+                "name": conformance.get("name", lane_id),
+                "priority": 900 + index,
+                "channel": SUPPLEMENTAL_CHANNEL_BY_LANE_ID.get(
+                    lane_id,
+                    "supplemental_technical_submission",
+                ),
+                "effective_status": conformance.get("status", ""),
+                "status": conformance.get("status", ""),
+                "effective_source": "submission_conformance_supplement",
+                "source_refs": source_refs,
+                "effective_claim_boundary": conformance.get("claim_boundary", ""),
+                "claim_boundary": conformance.get("claim_boundary", ""),
+                "_conformance_first_artifact": conformance_first_artifact(conformance),
+            }
+        )
 
     rows = []
-    for lane in sorted(traction.get("lanes", []), key=lambda item: int(item.get("priority", 999))):
-        if str(lane.get("channel", "")) not in FEDERAL_AND_IP_CHANNELS:
-            continue
+    for lane in sorted(
+        [*traction_lanes, *supplemental_lanes],
+        key=lambda item: int(item.get("priority", 999)),
+    ):
         lane_id = str(lane.get("lane_id", ""))
         authority = authority_rows.get(lane_id, {})
         docket = docket_rows.get(lane_id, {})
         concierge = concierge_rows.get(lane_id, {})
-        first_artifact = str(authority.get("first_artifact") or concierge.get("best_first_read") or "")
+        conformance = conformance_rows.get(lane_id, {})
+        first_artifact = str(
+            authority.get("first_artifact")
+            or concierge.get("best_first_read")
+            or lane.get("_conformance_first_artifact")
+            or ""
+        )
+        if not authority and lane.get("_conformance_first_artifact"):
+            authority = {
+                "readiness_mode": "CONFORMANCE_SUPPLEMENT_ONLY",
+                "first_artifact": first_artifact,
+                "can_prepare_internal": True,
+                "claim_boundary": lane.get("claim_boundary", ""),
+                "required_authority": "Human action-time authority",
+                "decision_question": conformance.get("next_action", ""),
+            }
+        if not concierge and first_artifact:
+            concierge = {
+                "artifact_missing_count": 0,
+                "best_first_read": first_artifact,
+            }
         artifact = artifact_status(first_artifact) if first_artifact else {
             "path": "",
             "present": False,
@@ -294,17 +432,40 @@ def build_rows() -> list[dict[str, Any]]:
         }
         components = []
         for component in COMMON_COMPONENTS:
-            state = component_state(component["component"], lane, authority, concierge)
+            state = component_state(component["component"], lane, authority, concierge, conformance)
             components.append(
                 {
                     **component,
                     "state": state,
-                    "ready_for_review": state
-                    not in {"missing_source_reference", "missing_primary_artifact", "evidence_artifact_missing"},
+                    "ready_for_review": component_gate_passed(state),
+                    "gate_passed": component_gate_passed(state),
                     "final_action_blocked": True,
                 }
             )
         blockers = list(MODE_BLOCKERS.get(str(authority.get("readiness_mode", "")), []))
+        conformance_status = str(conformance.get("status", "MISSING_SUBMISSION_CONFORMANCE_RECORD"))
+        if conformance_status == "CLOSED_OFFICIAL_DECISION_POSTMORTEM_ONLY":
+            blockers.insert(
+                0,
+                str(
+                    conformance.get(
+                        "next_action",
+                        "Preserve the closed route and postmortem; do not recycle the packet as an active submission.",
+                    )
+                ),
+            )
+        elif bool(conformance.get("technical_argument_required", False)) and not bool(
+            conformance.get("argument_conformance_pass", False)
+        ):
+            blockers.insert(
+                0,
+                str(
+                    conformance.get(
+                        "next_action",
+                        "Complete the source-bound submission conformance review before calling the package reviewer-ready.",
+                    )
+                ),
+            )
         if not blockers:
             blockers.append("Human approval remains required before external send, portal action, certification, filing, or term action.")
         row = {
@@ -316,7 +477,13 @@ def build_rows() -> list[dict[str, Any]]:
             "legacy_intake_status": lane.get("status", ""),
             "state_source": lane.get("effective_source", "legacy_intake_baseline"),
             "readiness_mode": authority.get("readiness_mode", ""),
-            "package_status": package_status(authority),
+            "package_status": package_status(authority, conformance),
+            "submission_conformance_status": conformance_status,
+            "submission_candidate_active": bool(conformance.get("submission_candidate_active", False)),
+            "technical_argument_required": bool(conformance.get("technical_argument_required", False)),
+            "argument_conformance_pass": bool(conformance.get("argument_conformance_pass", False)),
+            "argument_criterion_pass_count": int(conformance.get("criterion_pass_count", 0) or 0),
+            "argument_criterion_count": int(conformance.get("criterion_count", 0) or 0),
             "urgency": docket.get("urgency", ""),
             "action_due": docket.get("action_due"),
             "first_artifact": artifact,
@@ -346,6 +513,7 @@ def build_payload() -> dict[str, Any]:
     federal = read_json(FEDERAL_JSON)
     agency = read_json(AGENCY_JSON)
     authority = read_json(AUTHORITY_JSON)
+    conformance = read_json(CONFORMANCE_JSON)
     rows = build_rows()
 
     gate_clear = (
@@ -355,22 +523,69 @@ def build_payload() -> dict[str, Any]:
     )
     all_final_actions_blocked = bool(authority["summary"]["all_final_actions_blocked_without_human"])
     all_artifacts_present = all(row["first_artifact"]["present"] for row in rows)
+    active_submission_candidate_count = sum(1 for row in rows if row["submission_candidate_active"])
+    active_argument_pass_count = sum(
+        1 for row in rows if row["submission_candidate_active"] and row["argument_conformance_pass"]
+    )
+    active_argument_blocked_count = active_submission_candidate_count - active_argument_pass_count
+    argument_gate_clear = (
+        active_submission_candidate_count > 0
+        and active_submission_candidate_count == active_argument_pass_count
+    )
+    conformance_active_lane_ids = {
+        str(row.get("lane_id", ""))
+        for row in conformance.get("lanes", [])
+        if isinstance(row, dict)
+        and row.get("submission_candidate_active") is True
+        and row.get("technical_argument_required") is True
+    }
+    assembly_lane_ids = {str(row.get("lane_id", "")) for row in rows}
+    unrepresented_active_conformance_lane_ids = sorted(
+        conformance_active_lane_ids - assembly_lane_ids
+    )
+    assembly_conformance_coverage_clear = (
+        bool(conformance.get("summary", {}).get("all_current_lanes_covered", False))
+        and not unrepresented_active_conformance_lane_ids
+    )
     status_counts: dict[str, int] = {}
     for row in rows:
         status_counts[str(row["package_status"])] = status_counts.get(str(row["package_status"]), 0) + 1
 
     payload = {
         "generated_utc": now_utc(),
-        "schema": "agency_submission_assembly_gate_v1",
+        "schema": "agency_submission_assembly_gate_v2",
         "status": "AGENCY_SUBMISSION_ASSEMBLY_READY_HUMAN_GATED"
-        if gate_clear and all_final_actions_blocked and all_artifacts_present
+        if (
+            gate_clear
+            and all_final_actions_blocked
+            and all_artifacts_present
+            and argument_gate_clear
+            and assembly_conformance_coverage_clear
+        )
         else "AGENCY_SUBMISSION_ASSEMBLY_BLOCKED",
-        "purpose": "Convert near-term federal, SBIR, RFI, lab, and IP lanes into an assembly checklist showing what is review-ready, what remains blocked, and who must authorize final action.",
+        "purpose": "Convert near-term federal, SBIR, RFI, lab, and IP lanes into a fail-closed assembly checklist that separates artifact presence from source-bound argument conformance and human final authority.",
         "summary": {
             "assembly_lane_count": len(rows),
             "status_counts": dict(sorted(status_counts.items())),
             "first_artifacts_present": all_artifacts_present,
             "reviewer_gate_clear": gate_clear,
+            "submission_conformance_status": conformance.get("status", "MISSING"),
+            "submission_conformance_all_current_lanes_covered": bool(
+                conformance.get("summary", {}).get("all_current_lanes_covered", False)
+            ),
+            "assembly_conformance_coverage_clear": (
+                assembly_conformance_coverage_clear
+            ),
+            "unrepresented_active_conformance_lane_count": len(
+                unrepresented_active_conformance_lane_ids
+            ),
+            "unrepresented_active_conformance_lane_ids": (
+                unrepresented_active_conformance_lane_ids
+            ),
+            "active_submission_candidate_count": active_submission_candidate_count,
+            "active_argument_pass_count": active_argument_pass_count,
+            "active_argument_blocked_count": active_argument_blocked_count,
+            "argument_gate_clear": argument_gate_clear,
             "federal_protocol_status": federal.get("status", ""),
             "agency_activation_status": agency.get("status", ""),
             "agency_activation_item_count": int(agency["summary"]["activation_item_count"]),
@@ -395,6 +610,7 @@ def build_payload() -> dict[str, Any]:
             "federal_protocol": rel(FEDERAL_JSON),
             "agency_activation": rel(AGENCY_JSON),
             "reviewer_gate": rel(REVIEWER_GATE_JSON),
+            "submission_conformance": rel(CONFORMANCE_JSON),
         },
         "outputs": {
             "json": rel(OUT_JSON),
@@ -421,6 +637,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Assembly lanes: `{summary['assembly_lane_count']}`",
         f"- First artifacts present: `{str(summary['first_artifacts_present']).lower()}`",
         f"- Reviewer gate clear: `{str(summary['reviewer_gate_clear']).lower()}`",
+        f"- Submission conformance status: `{summary['submission_conformance_status']}`",
+        f"- Submission conformance covers all current lanes: `{str(summary['submission_conformance_all_current_lanes_covered']).lower()}`",
+        f"- Assembly represents every active conformance lane: `{str(summary['assembly_conformance_coverage_clear']).lower()}`",
+        f"- Unrepresented active conformance lanes: `{summary['unrepresented_active_conformance_lane_count']}`",
+        f"- Active submission candidates: `{summary['active_submission_candidate_count']}`",
+        f"- Active argument passes: `{summary['active_argument_pass_count']}`",
+        f"- Active argument blocks: `{summary['active_argument_blocked_count']}`",
+        f"- Argument gate clear: `{str(summary['argument_gate_clear']).lower()}`",
         f"- Federal protocol status: `{summary['federal_protocol_status']}`",
         f"- Agency activation status: `{summary['agency_activation_status']}`",
         f"- Agency activation items: `{summary['agency_activation_item_count']}`",
@@ -454,10 +678,13 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- State source: `{row['state_source']}`",
                 f"- Readiness mode: `{row['readiness_mode']}`",
                 f"- Package status: `{row['package_status']}`",
+                f"- Submission conformance: `{row['submission_conformance_status']}`",
+                f"- Argument conformance pass: `{str(row['argument_conformance_pass']).lower()}`",
+                f"- Argument criteria passed: `{row['argument_criterion_pass_count']}/{row['argument_criterion_count']}`",
                 f"- Urgency: `{row['urgency']}`",
                 f"- Action due: `{row['action_due']}`",
                 f"- First artifact: `{row['first_artifact']['path']}` sha256=`{row['first_artifact']['sha256']}`",
-                f"- Review-ready components: `{row['review_ready_component_count']}/{row['component_count']}`",
+                f"- Component gates passed: `{row['review_ready_component_count']}/{row['component_count']}`",
                 f"- Can prepare internally: `{str(row['can_prepare_internal']).lower()}`",
                 f"- External send without human: `{str(row['external_send_allowed_without_human']).lower()}`",
                 f"- Final submission without human: `{str(row['final_submission_allowed_without_human']).lower()}`",
@@ -472,7 +699,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         )
         for component in row["components"]:
             lines.append(
-                f"- `{component['component']}` state=`{component['state']}` review_ready=`{str(component['ready_for_review']).lower()}`"
+                f"- `{component['component']}` state=`{component['state']}` gate_passed=`{str(component['gate_passed']).lower()}`"
             )
         lines.extend(["", "Assembly blockers:"])
         for blocker in row["assembly_blockers"]:

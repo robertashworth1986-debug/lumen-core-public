@@ -29,7 +29,7 @@ def test_handoff_reserves_current_session_browser_and_uses_current_board() -> No
     module = load_module()
     payload = module.build_payload(date(2026, 7, 17))
 
-    assert payload["schema"] == "lumencore.live_funding_portal_handoff.v2"
+    assert payload["schema"] == "lumencore.live_funding_portal_handoff.v3"
     assert payload["status"] == "SESSION_BROWSER_RESERVED_FOR_USER_AUTHENTICATION"
     assert len(payload["source_command_board_sha256"]) == 64
     control = payload["browser_control"]
@@ -52,82 +52,56 @@ def test_handoff_prioritizes_current_deadlines_and_preserves_all_stop_gates() ->
 
     assert [row["opportunity_number"] for row in queue] == [
         "NASHVILLE-EC-FALL-2026",
-        "DLA26BZ03-NV011",
         "26-510",
         "W912HZ26SC005",
         "LAUNCHTN-3686-2026",
     ]
     nashville = queue[0]
-    assert nashville["deadline_date"] == "2026-07-17"
+    assert nashville["deadline_date"] == "2026-07-31"
     assert nashville["action_gate"] == {
-        "status": "READY_FOR_HIDDEN_FOUNDER_INPUT",
+        "status": "COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE",
         "submission_ready_for_human_click": False,
-        "required_private_gate_count": 15,
+        "required_private_gate_count": 3,
         "passed_private_gate_count": 0,
-        "open_gate_count": 15,
+        "open_gate_count": 3,
         "private_input_present": False,
         "private_values_exposed": False,
     }
-    assert nashville["deadline_support"] == {
-        "status": "OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED",
-        "sent_utc": "2026-07-17T12:05:34Z",
-        "do_not_duplicate_send": True,
-        "email_is_application": False,
-        "reply_required": False,
-        "timezone_explicit_in_message": False,
-        "operational_timezone": "America/Chicago",
-    }
     assert any(
-        path.endswith("CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py")
-        for path in nashville["package_files"]
+        "Takeoff onboarding packet" in action
+        for action in nashville["next_safe_action"]
     )
-    assert any(
+    assert "deadline_support" not in nashville
+    assert not any(
         "CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py" in action
         for action in nashville["next_safe_action"]
     )
-    missionweave = queue[1]
+    assert not any("July 17 close" in action for action in nashville["next_safe_action"])
+
+    assert len(payload["closed_lanes"]) == 1
+    missionweave = payload["closed_lanes"][0]
     assert missionweave["deadline_date"] == "2026-07-22"
     assert missionweave["deadline_utc"] == "2026-07-22T16:00:00Z"
-    assert "July 22, 2025" in missionweave["official_deadline_text"]
-    assert any("15-file manifest" in action for action in missionweave["next_safe_action"])
-    assert any("beyond 13/50" in action for action in missionweave["next_safe_action"])
-    assert missionweave["action_gate"] == {
-        "status": "PRIVATE_DSIP_FACTS_CAPTURED_GATES_OPEN",
-        "submission_ready_for_human_click": False,
-        "required_private_gate_count": 50,
-        "passed_private_gate_count": 13,
-        "open_gate_count": 37,
-        "private_input_present": True,
-        "private_values_exposed": False,
-        "private_capture_tool": (
-            "code/ops/CAPTURE_MISSIONWEAVE_DSIP_PRIVATE_INPUT.py"
-        ),
-        "private_input_sha256_exposed": False,
-        "private_volume2_finalizer": (
-            "code/ops/FINALIZE_MISSIONWEAVE_DSIP_VOLUME2_PRIVATE.py"
-        ),
-        "private_capture_workflow": (
-            "grant_submissions/DLA26BZ03_NV011_MissionWeave/"
-            "MISSIONWEAVE_DSIP_PRIVATE_CAPTURE_WORKFLOW_2026-07-17.md"
-        ),
-        "private_final_volume2_present": True,
-        "private_final_volume2_path_exposed": False,
-        "private_final_volume2_sha256_exposed": False,
-        "pre_submit_excludes_action_time_approval": True,
-        "credential_values_accepted": False,
-        "firm_pin_value_accepted": False,
-    }
-    assert any(
-        "hidden sectioned MissionWeave collector" in action
-        for action in missionweave["next_safe_action"]
+    assert missionweave["command"] == "EXPIRED_NO_SUBMISSION"
+    assert missionweave["status"] == (
+        "EXPIRED_WITHOUT_VERIFIED_SUBMISSION_NO_PORTAL_ACTION"
     )
-    assert any("ITAR/JCP" in stop for stop in missionweave["stop_conditions"])
-    assert any("final DSIP submission" in stop for stop in missionweave["stop_conditions"])
+    assert "Do not reopen DSIP" in missionweave["safest_next_action"]
+    assert missionweave["external_send_allowed_without_human"] is False
+    assert missionweave["final_submit_allowed_without_human"] is False
     for item in queue:
         assert item["external_send_allowed_without_human"] is False
         assert item["final_submit_allowed_without_human"] is False
         assert item["stop_conditions"]
         assert item["human_gate"]
+        assert item["all_package_files_present"] is True
+        assert len(item["package_receipts"]) == len(item["package_files"])
+        assert all(
+            receipt["exists"]
+            and receipt["bytes"] > 0
+            and len(receipt["sha256"]) == 64
+            for receipt in item["package_receipts"]
+        )
         assert len(item["source_lane_sha256"]) == 64
 
 
@@ -154,14 +128,15 @@ def test_rendered_handoff_is_public_safe_and_has_no_stale_send_state() -> None:
     assert "Live Funding Portal Handoff" in rendered
     assert "Navigation before resume signal: `false`" in rendered
     assert "DLA26BZ03-NV011" in rendered
-    assert "Passed: `0/15`" in rendered
-    assert "Status: `OFFICIAL_SUPPORT_CONFIRMED_CLOSE_TIME_APPLICATION_NOT_SUBMITTED`" in rendered
-    assert "Do not duplicate: `true`" in rendered
-    assert "Email is application: `false`" in rendered
-    assert "Reply required: `false`" in rendered
-    assert "Timezone explicit in message: `false`" in rendered
-    assert "Operational timezone: `America/Chicago`" in rendered
-    assert "Passed: `13/50`" in rendered
+    assert "Passed: `0/3`" in rendered
+    assert "Takeoff onboarding packet" in rendered
+    assert "Closed Lanes - No Portal Action" in rendered
+    assert "EXPIRED_WITHOUT_VERIFIED_SUBMISSION_NO_PORTAL_ACTION" in rendered
+    assert "Do not reopen DSIP" in rendered
+    assert "Passed: `15/15`" not in rendered
+    assert "Passed: `36/50`" not in rendered
+    assert "Use the confirmed 11:59 p.m. July 17 close" not in rendered
+    assert "Verify the live DSIP countdown" not in rendered
     assert "EPRI administrative onboarding was sent" in rendered
     assert "referred the request to the subject matter expert" in rendered
     assert "bounded acknowledgment is sent" in rendered

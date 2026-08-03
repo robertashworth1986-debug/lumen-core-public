@@ -1,6 +1,6 @@
 # Top-Five Grant Submission Readiness Audit
 
-Generated UTC: 2026-07-17T04:48:02.154244+00:00
+Generated UTC: 2026-07-29T20:34:31.577260+00:00
 
 Posture: LOCAL_READY_PORTAL_BLOCKED
 
@@ -72,21 +72,21 @@ Live-measured rows and frozen live replay are the promoted evidence lanes. Synth
 
 - portal: NSF Seed Fund Project Pitch portal
 - readiness: LOCAL_READY_PORTAL_BLOCKED_USER_GATES
-- required artifacts present: 4/4
+- required artifacts present: 5/5
 - evidence manifests matched: 0/0
 - NSF field counts:
-  - Technology Innovation: 3070/3500 (430 remaining)
-  - Technical Objectives and Challenges: 2419/3500 (1081 remaining)
-  - Market Opportunity: 1517/1750 (233 remaining)
-  - Company and Team: 1223/1750 (527 remaining)
+  - Technology Innovation: 3273/3500 (227 remaining)
+  - Technical Objectives and Challenges: 3030/3500 (470 remaining)
+  - Market Opportunity: 1674/1750 (76 remaining)
+  - Company and Team: 1602/1750 (148 remaining)
 - verified portal facts:
   - SAM.gov active registration verified from signed-in workspace: SAM entity identifiers recorded, purpose All Awards, expiration 2026-08-30.
 - local blockers:
   - none
 - portal/user blockers:
-  - Legal business name and PI/founder title must be confirmed.
+  - Legal business name, small-business eligibility, ownership, U.S.-performance facts, and PI employment and effort must be confirmed.
   - Duplicate-pitch/open-invitation/full-proposal status must be checked in the portal.
-  - Portal paste counts must be confirmed after the user logs in.
+  - Authenticated form prompts, title limit, topic selection, and portal paste counts must be confirmed after the user logs in.
   - An official NSF invitation is required before any Phase I full proposal.
   - Fresh action-time approval is required before final save/submit actions.
 

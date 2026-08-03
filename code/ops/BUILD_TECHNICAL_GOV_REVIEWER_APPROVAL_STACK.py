@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,9 @@ CURRENT_PROOF = OUT_OPS / "current_luma_proof_state_latest.json"
 CHAMPION = OUT_OPS / "geometry_champion_of_champions_latest.json"
 MANIFEST = OUT_OPS / "data_room_manifest_latest.json"
 SAM_SUBMISSION = OUT_OPS / "sam_submission_and_today_opportunity_push_latest.json"
+WIRING_MATRIX = DASHBOARD_DATA / "geometry_live_wiring_matrix.json"
+READY_REPLAY = DASHBOARD_DATA / "geometry_ready_source_replay.json"
+LOCKED_SWEEP = DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"
 
 OUT_JSON = OUT_OPS / "technical_gov_reviewer_approval_stack_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "technical_gov_reviewer_approval_stack.json"
@@ -94,7 +98,7 @@ def read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
         return {}
     return payload if isinstance(payload, dict) else {}
@@ -102,12 +106,19 @@ def read_json(path: Path) -> dict[str, Any]:
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
 
 
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(text, encoding="utf-8")
+    os.replace(temporary, path)
 
 
 def stable_sha256(payload: Any) -> str:
@@ -122,34 +133,89 @@ def as_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
 
 
-def metric_snapshot(current: dict[str, Any], champion: dict[str, Any], manifest: dict[str, Any]) -> dict[str, Any]:
-    current_manifest = as_dict(current.get("manifest"))
+def metric_snapshot(
+    current: dict[str, Any],
+    champion: dict[str, Any],
+    manifest: dict[str, Any],
+    wiring: dict[str, Any],
+    ready: dict[str, Any],
+    sweep: dict[str, Any],
+) -> dict[str, Any]:
     current_kuramoto = as_dict(current.get("kuramoto_holdout_expansion"))
     current_gates = as_dict(current.get("gates"))
     champ_summary = as_dict(champion.get("summary"))
-    strongest = as_dict(as_dict(champion.get("champion_of_champions")).get("strongest_current"))
-    strongest_holdout = as_dict(strongest.get("kuramoto_holdout_evidence"))
     data_room_summary = as_dict(manifest.get("summary"))
+    wiring_summary = as_dict(wiring.get("summary"))
+    ready_summary = as_dict(ready.get("summary"))
+    sweep_summary = as_dict(sweep.get("summary"))
 
     return {
-        "registered_geometry_family_count": current.get("registry", {}).get("family_count", 0),
-        "ready_benchmark_routes": current_manifest.get("ready_for_benchmark_routes", 0),
-        "unique_source_count": current_manifest.get("unique_source_count", 0),
-        "unique_source_estimated_rows": current_manifest.get("unique_source_estimated_rows", 0),
-        "kuramoto_holdout_count": current_kuramoto.get("holdout_count", strongest_holdout.get("holdout_count", 0)),
-        "kuramoto_wins_vs_kalman": current_kuramoto.get("wins_vs_kalman", strongest_holdout.get("wins_vs_kalman", 0)),
+        "registered_geometry_family_count": as_dict(current.get("registry")).get(
+            "family_count", 0
+        ),
+        "internal_performance_champion_present": bool(
+            champ_summary.get("internal_performance_champion_present")
+        ),
+        "compatible_adapter_route_count": ready_summary.get("routes_replayed", 0),
+        "direct_measured_route_count": ready_summary.get(
+            "direct_measured_replay_count", 0
+        ),
+        "conditioned_synthetic_route_count": ready_summary.get(
+            "source_conditioned_synthetic_stress_count", 0
+        ),
+        "baseline_comparison_count": sweep_summary.get(
+            "baseline_comparison_count", 0
+        ),
+        "direct_all_baseline_global_holm_positive_count": ready_summary.get(
+            "direct_all_baseline_global_holm_positive_count", 0
+        ),
+        "performance_rows_reviewed": ready_summary.get(
+            "performance_rows_reviewed", 0
+        ),
+        "legacy_ready_rows_excluded": ready_summary.get(
+            "legacy_ready_for_benchmark_rows_excluded", 0
+        ),
+        "numeric_fallback_count": ready_summary.get(
+            "numeric_fallback_profile_count", 0
+        ),
+        "source_inventory_measured_count": wiring_summary.get(
+            "live_source_measured_count", 0
+        ),
+        "source_inventory_measured_rows": wiring_summary.get(
+            "total_measured_rows", 0
+        ),
+        "source_inventory_is_performance_evidence": False,
+        "kuramoto_candidate_was_protocol_selected": bool(
+            current_kuramoto.get("candidate_was_protocol_selected")
+        ),
+        "kuramoto_development_selected_candidate": current_kuramoto.get(
+            "development_selected_candidate", ""
+        ),
+        "kuramoto_holdout_count": current_kuramoto.get("holdout_count", 0),
+        "kuramoto_wins_vs_kalman": current_kuramoto.get("wins_vs_kalman", 0),
+        "kuramoto_losses_or_ties_vs_kalman": current_kuramoto.get(
+            "losses_or_ties_vs_kalman", 0
+        ),
+        "kuramoto_mean_delta_vs_kalman": current_kuramoto.get(
+            "mean_delta_vs_kalman", 0
+        ),
         "kuramoto_estimated_rows_replayed": current_kuramoto.get(
-            "estimated_rows_replayed",
-            strongest_holdout.get("estimated_rows_replayed", 0),
+            "estimated_rows_replayed", 0
+        ),
+        "kuramoto_registered_baseline_count": current_kuramoto.get(
+            "registered_baseline_count", 0
+        ),
+        "kuramoto_registered_baseline_mean_win_count": current_kuramoto.get(
+            "registered_baseline_mean_win_count", 0
+        ),
+        "kuramoto_all_baseline_holm_gate_passed": bool(
+            current_kuramoto.get(
+                "candidate_beats_all_registered_baselines_after_holm"
+            )
         ),
         "kuramoto_one_sided_sign_test_p": current_kuramoto.get(
-            "one_sided_sign_test_p_value",
-            strongest_holdout.get("one_sided_sign_test_p_value"),
+            "one_sided_sign_test_p_value"
         ),
-        "live_measured_sources": champ_summary.get("live_measured_sources", 0),
-        "live_total_measured_rows": champ_summary.get("live_total_measured_rows", 0),
-        "safe_estimated_annual_value_usd": champ_summary.get("safe_estimated_annual_value_usd", 0),
-        "blocked_context_annual_value_usd": champ_summary.get("blocked_context_annual_value_usd", 0),
         "data_room_markdown_artifacts": data_room_summary.get("manifested_markdown_count", 0),
         "data_room_control_artifacts": data_room_summary.get("control_artifact_count", 0),
         "field_validation_claim_allowed": bool(current_gates.get("field_validation_claim_allowed")),
@@ -158,46 +224,63 @@ def metric_snapshot(current: dict[str, Any], champion: dict[str, Any], manifest:
     }
 
 
-def reviewer_tracks(metrics: dict[str, Any], sam_submitted: bool) -> list[dict[str, Any]]:
-    agency_status = "POST_SAM_AGENCY_REVIEWER_ROUTE" if sam_submitted else "ACCOUNT_RENEWAL_AND_REVIEWER_ROUTE"
+def reviewer_tracks(
+    metrics: dict[str, Any], historical_sam_receipt_present: bool
+) -> list[dict[str, Any]]:
+    agency_status = "CURRENT_SAM_STATUS_REVERIFY_BEFORE_ELIGIBILITY_CLAIM"
     agency_why = (
-        "SAM renewal submission is confirmed by portal state and email; federal opportunity review can continue while final active renewal status is monitored."
-        if sam_submitted
-        else "SAM, DSIP, FHWA, DARPA DICE, and federal protocol packets already exist; SAM renewal is now the active account blocker."
+        "A historical July 9 SAM submission and confirmation receipt is present, "
+        "but this artifact does not verify the entity's current active status."
+        if historical_sam_receipt_present
+        else "No historical SAM submission receipt was resolved by this builder."
     )
     agency_next = (
-        "Monitor SAM active-renewal status, then prioritize FHWA full proposal, DSIP MissionWeave, and NSF pitch/invitation gates under human authority."
-        if sam_submitted
-        else "Finish SAM renewal with human certifications, then use the agency radar to prioritize official reviewer-facing packages."
+        "Verify current entity status in SAM.gov read-only, then use the current "
+        "official opportunity queue; do not infer eligibility from the July 9 receipt."
     )
     return [
         {
             "track_id": "national_lab_or_technical_reviewer",
             "name": "National lab or independent technical reviewer",
-            "why_this_is_real": "LANL routed the VISION licensing inquiry to a named main contact returning next week.",
+            "why_this_is_real": (
+                "A historical LANL VISION licensing reply identified a routing "
+                "contact. Current mailbox state and routing freshness must be "
+                "reconciled before any follow-up."
+            ),
             "proof_to_show": [
-                "Kuramoto 24/24 internal source-conditioned holdout wins versus Kalman.",
-                "2,506,267 estimated replay rows for the harmonic holdout expansion.",
+                "Kuramoto direct measured nonpromotion: 482/1,525 paired-day wins and negative mean skill versus Kalman.",
+                "Zero complete source-specific all-baseline globally corrected promotions.",
+                "Four compatible routes: two direct measured and two conditioned-synthetic.",
                 "Current proof-state hash and data-room manifest hash.",
                 "Failure boundaries showing field validation and real-dollar claims are still locked.",
             ],
-            "next_action": "Prepare a no-hype technical review packet and ask for fit, validation route, or licensing pathway.",
+            "next_action": (
+                "Keep a no-hype technical review packet ready; reconcile the full "
+                "mail thread and duplicate-send history before proposing a bounded "
+                "protocol review."
+            ),
             "human_gate": "Human approves any LANL reply, licensing request, NDA, or disclosure.",
             "status": "REAL_TECHNICAL_REVIEW_ROUTE",
         },
         {
             "track_id": "patent_counsel_and_pro_bono",
-            "name": "Patent counsel / USPTO pro bono route",
-            "why_this_is_real": "USPTO Patent Pro Bono replied and identified Georgia PATENTS as the Tennessee-serving program, with Pro Se assistance as a deadline fallback.",
+            "name": "Historical patent counsel / pro bono route",
+            "why_this_is_real": (
+                "The prior Georgia PATENTS route is closed under the current "
+                "routing controls and must not be reopened by this packet."
+            ),
             "proof_to_show": [
                 "Claim-boundary register.",
                 "IP counsel diligence packet.",
                 "Technical invention map and proof-state boundaries.",
                 "No public expansion of claims until counsel review.",
             ],
-            "next_action": "Prepare Georgia PATENTS intake package and a Pro Se fallback checklist before the July 2026 deadline window.",
+            "next_action": (
+                "No outreach on the closed Georgia PATENTS route. Use current "
+                "official USPTO or licensed-counsel guidance for any live deadline."
+            ),
             "human_gate": "Human and licensed counsel decide all filings, claims, deadlines, continuations, PCT, and disclosures.",
-            "status": "URGENT_REAL_IP_ROUTE",
+            "status": "CLOSED_ROUTE_DO_NOT_REOPEN",
         },
         {
             "track_id": "agency_reviewer",
@@ -250,22 +333,49 @@ def build_payload() -> dict[str, Any]:
     champion = read_json(CHAMPION)
     manifest = read_json(MANIFEST)
     sam_submission = read_json(SAM_SUBMISSION)
+    wiring = read_json(WIRING_MATRIX)
+    ready = read_json(READY_REPLAY)
+    sweep = read_json(LOCKED_SWEEP)
+    required_schemas = {
+        "current_luma_proof_state.v2": current.get("schema"),
+        "geometry_champion_of_champions_v3": champion.get("schema"),
+        "geometry_live_wiring_matrix_v3": wiring.get("schema"),
+        "geometry_ready_source_replay_v2": ready.get("schema"),
+        "locked_source_baseline_replay_sweep_v2": sweep.get("schema"),
+    }
+    for expected, actual in required_schemas.items():
+        if actual != expected:
+            raise ValueError(f"{expected} is required; found {actual!r}")
+
     sam_summary = as_dict(sam_submission.get("summary"))
-    sam_submitted = bool(sam_summary.get("sam_registration_submitted")) and bool(
+    historical_sam_receipt_present = bool(
+        sam_summary.get("sam_registration_submitted")
+    ) and bool(
         sam_summary.get("sam_confirmation_email_received")
     )
-    metrics = metric_snapshot(current, champion, manifest)
-    tracks = reviewer_tracks(metrics, sam_submitted=sam_submitted)
+    historical_sam_receipt_generated_utc = sam_submission.get("generated_utc")
+    current_sam_active_status_verified = False
+    metrics = metric_snapshot(current, champion, manifest, wiring, ready, sweep)
+    tracks = reviewer_tracks(
+        metrics,
+        historical_sam_receipt_present=historical_sam_receipt_present,
+    )
 
     payload = {
-        "schema": "technical_gov_reviewer_approval_stack_v1",
+        "schema": "technical_gov_reviewer_approval_stack_v2",
         "generated_utc": now_utc(),
         "status": "TECHNICAL_GOV_REVIEWER_APPROVAL_STACK_READY_HUMAN_ACTION_REQUIRED",
         "summary": {
             "reviewer_track_count": len(tracks),
             "official_data_source_count": len(OFFICIAL_DATA_SOURCES),
-            "sam_submission_confirmed": sam_submitted,
-            "sam_renewal_status": "submitted_confirmation_received_monitor_active_status" if sam_submitted else "human_portal_renewal_required",
+            "sam_historical_submission_receipt_present": historical_sam_receipt_present,
+            "sam_historical_submission_receipt_generated_utc": historical_sam_receipt_generated_utc,
+            "sam_current_active_status_verified": current_sam_active_status_verified,
+            "sam_current_status": (
+                "historical_submission_receipt_present_current_active_status_not_verified"
+                if historical_sam_receipt_present
+                else "no_historical_submission_receipt_resolved_current_status_not_verified"
+            ),
             "venture_studio_deprioritized": True,
             "technical_reviewer_first": True,
             "human_action_required": True,
@@ -276,14 +386,20 @@ def build_payload() -> dict[str, Any]:
         },
         "core_truth": {
             "plain_english": (
-                "LumenCore's strongest current story is not a sales pitch. It is a measured proof stack with "
-                "internal holdout evidence, live-source breadth, and clear locks against unsupported field-validation, "
-                "revenue, award, or trading claims."
+                "LumenCore currently has a governed benchmark and evidence stack, "
+                "not a promoted performance champion. The strongest scientific "
+                "asset is the source-specific protocol, including preserved negative "
+                "results and explicit locks against unsupported field, savings, "
+                "award, or trading claims."
             ),
             "metrics": metrics,
             "safe_technical_claim": (
-                "Kuramoto phase coupling is ready for a buyer-authorized field replay request after internal "
-                "source-conditioned holdout evidence; it is not yet field validation or realized savings."
+                "Kuramoto phase coupling was measured directly on the frozen EIA "
+                "panel but was not development-selected, won 482 of 1,525 paired "
+                "days versus the named Kalman baseline, had mean skill delta "
+                "-0.508190706, and cleared zero registered-baseline promotion gates. "
+                "This supports a bounded source-native protocol review, not a "
+                "performance, field-replay, or savings claim."
             ),
             "blocked_claims": [
                 "external field-validation approval",
@@ -300,14 +416,13 @@ def build_payload() -> dict[str, Any]:
         "official_live_data_targets": OFFICIAL_DATA_SOURCES,
         "sam_renewal_support": {
             "current_browser_state": (
-                "SAM.gov displayed Entity Registration Submitted and a confirmation email was received."
-                if sam_submitted
-                else "SAM.gov redirected to the public home page and displayed a Terms of Use modal."
+                "Not inspected by this builder. A historical July 9 artifact records "
+                "Entity Registration Submitted and an email confirmation; current "
+                "active status is not verified."
             ),
             "human_next_step": (
-                "Monitor SAM active-renewal status and keep final portal actions human-approved."
-                if sam_submitted
-                else "Click Agree if you accept the SAM.gov terms, then complete login.gov/MFA."
+                "Open SAM.gov and verify current entity status read-only. Keep terms, "
+                "reps/certs, banking, role requests, and final submissions human-controlled."
             ),
             "codex_safe_support": [
                 "Record SAM submission evidence without exposing OTPs, bank data, or private portal fields.",
@@ -316,17 +431,17 @@ def build_payload() -> dict[str, Any]:
                 "Do not submit future reps/certs, pricing, or portal packages without human confirmation.",
             ],
             "known_email_context": [
-                "SAM.gov sent a confirmation email for the submitted entity registration.",
-                "SAM submission is evidence of renewal submission, not an award or source-selection event.",
+                "A July 9 artifact records a SAM confirmation email for a submitted entity registration.",
+                "The historical receipt is not proof of current active registration, eligibility, award, or source selection.",
                 "Any SAM account key rotation reminder should be handled separately from entity renewal.",
             ],
         },
         "email_signal_triage": {
             "real_signals": [
-                "USPTO Patent Pro Bono routed Tennessee inventors to Georgia PATENTS and noted the Pro Se Assistance Program as a deadline fallback.",
-                "LANL replied that Mike Erickson is the main contact for the VISION licensing opportunity when he returns.",
+                "The prior Georgia PATENTS route is closed and retained only as historical routing evidence.",
+                "A historical LANL reply identified a VISION licensing contact; current mailbox state must be reconciled before follow-up.",
                 "Login.gov confirms DSIP connection, which supports the federal submission route.",
-                "SAM.gov expiration notice confirms entity renewal is a real blocker before federal award eligibility.",
+                "The historical SAM submission receipt requires a fresh current-status check before any eligibility claim.",
             ],
             "deprioritized_signals": [
                 "Pitch-event or pay-before-pitch routes should not drive the proof stack.",
@@ -334,11 +449,11 @@ def build_payload() -> dict[str, Any]:
             ],
         },
         "next_48_hours": [
-            "Finish SAM renewal in the browser with human certification.",
-            "Prepare Georgia PATENTS intake packet and Pro Se fallback checklist.",
-            "Prepare LANL/VISION technical review packet with claim boundaries and current proof hashes.",
+            "Verify current SAM entity status read-only; do not infer active status from the July 9 receipt.",
+            "Keep the closed Georgia PATENTS route closed.",
+            "Reconcile the full LANL/VISION email thread before any bounded follow-up.",
             "Build FAA AWC Data API and FAA NASR source adapters as the next live-data expansion path.",
-            "Promote FHWA TSMO and Air Force AAC only as official reviewer packages, not broad sales pitches.",
+            "Use the current official opportunity queue; do not revive closed FHWA or expired lanes.",
         ],
         "outputs": {
             "json": "out/ops/technical_gov_reviewer_approval_stack_latest.json",
@@ -367,8 +482,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Official live-data targets: `{summary['official_data_source_count']}`",
         f"- Venture studio deprioritized: `{str(summary['venture_studio_deprioritized']).lower()}`",
         f"- Technical reviewer first: `{str(summary['technical_reviewer_first']).lower()}`",
-        f"- SAM submission confirmed: `{str(summary['sam_submission_confirmed']).lower()}`",
-        f"- SAM renewal status: `{summary['sam_renewal_status']}`",
+        f"- Historical SAM submission receipt present: `{str(summary['sam_historical_submission_receipt_present']).lower()}`",
+        f"- Historical SAM receipt generated UTC: `{summary['sam_historical_submission_receipt_generated_utc']}`",
+        f"- Current SAM active status verified: `{str(summary['sam_current_active_status_verified']).lower()}`",
+        f"- Current SAM status: `{summary['sam_current_status']}`",
         f"- External send without human: `{str(summary['external_send_allowed_without_human']).lower()}`",
         f"- Portal submission without human: `{str(summary['portal_submission_allowed_without_human']).lower()}`",
         f"- Live trading allowed: `{str(summary['live_trading_allowed']).lower()}`",
@@ -379,11 +496,24 @@ def render_markdown(payload: dict[str, Any]) -> str:
         payload["core_truth"]["plain_english"],
         "",
         f"- Registered geometry families: `{metrics['registered_geometry_family_count']}`",
-        f"- Ready benchmark routes: `{metrics['ready_benchmark_routes']}`",
-        f"- Unique source count: `{metrics['unique_source_count']}`",
-        f"- Unique source estimated rows: `{metrics['unique_source_estimated_rows']}`",
+        f"- Internal performance champion present: `{str(metrics['internal_performance_champion_present']).lower()}`",
+        f"- Compatible adapter routes: `{metrics['compatible_adapter_route_count']}`",
+        f"- Direct measured routes: `{metrics['direct_measured_route_count']}`",
+        f"- Conditioned-synthetic routes: `{metrics['conditioned_synthetic_route_count']}`",
+        f"- Baseline comparisons: `{metrics['baseline_comparison_count']}`",
+        f"- Direct all-baseline global promotions: `{metrics['direct_all_baseline_global_holm_positive_count']}`",
+        f"- Performance rows reviewed: `{metrics['performance_rows_reviewed']}`",
+        f"- Legacy ready rows excluded: `{metrics['legacy_ready_rows_excluded']}`",
+        f"- Numeric fallbacks: `{metrics['numeric_fallback_count']}`",
+        f"- Source inventory: `{metrics['source_inventory_measured_count']}` measured sources / `{metrics['source_inventory_measured_rows']}` rows",
+        f"- Source inventory is performance evidence: `{str(metrics['source_inventory_is_performance_evidence']).lower()}`",
+        f"- Kuramoto was protocol-selected: `{str(metrics['kuramoto_candidate_was_protocol_selected']).lower()}`",
+        f"- Development-selected candidate: `{metrics['kuramoto_development_selected_candidate']}`",
         f"- Kuramoto holdouts: `{metrics['kuramoto_holdout_count']}`",
         f"- Kuramoto wins vs Kalman: `{metrics['kuramoto_wins_vs_kalman']}`",
+        f"- Kuramoto losses or ties vs Kalman: `{metrics['kuramoto_losses_or_ties_vs_kalman']}`",
+        f"- Kuramoto mean skill delta vs Kalman: `{metrics['kuramoto_mean_delta_vs_kalman']}`",
+        f"- Kuramoto registered-baseline mean wins: `{metrics['kuramoto_registered_baseline_mean_win_count']}/{metrics['kuramoto_registered_baseline_count']}`",
         f"- Kuramoto estimated replay rows: `{metrics['kuramoto_estimated_rows_replayed']}`",
         f"- Data-room markdown artifacts: `{metrics['data_room_markdown_artifacts']}`",
         f"- Data-room control artifacts: `{metrics['data_room_control_artifacts']}`",
@@ -430,7 +560,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     sam = payload["sam_renewal_support"]
     lines.extend(
         [
-            "## SAM Renewal Support",
+            "## SAM Status Support",
             "",
             f"- Current browser state: {sam['current_browser_state']}",
             f"- Human next step: {sam['human_next_step']}",

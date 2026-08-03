@@ -1,0 +1,1833 @@
+{
+  "schema": "lumencore.cross_agency_capability_matrix.v1",
+  "version": 1,
+  "title": "LumenCore Cross-Agency Capability Statement Control",
+  "status": "READY_BOUNDED_CROSS_AGENCY_REUSE_NO_EXTERNAL_ACTION",
+  "as_of_utc": "2026-07-26T22:30:00Z",
+  "summary": {
+    "source_count": 10,
+    "freshness_counts": {
+      "DATED_CONTEXT": 5,
+      "FRESH": 4,
+      "TIMELESS_CONTROL": 1
+    },
+    "module_count": 10,
+    "declared_class_counts": {
+      "ACTION_TIME": 1,
+      "BOUNDED": 4,
+      "NOT_PROVEN": 3,
+      "PROVEN": 2
+    },
+    "effective_class_counts": {
+      "ACTION_TIME": 1,
+      "BOUNDED": 4,
+      "NOT_PROVEN": 3,
+      "PROVEN": 2
+    },
+    "reviewer_lane_count": 5,
+    "restricted_claim_count": 9,
+    "restricted_claim_allowed_count": 0,
+    "action_time_fact_count": 9,
+    "blocker_count": 0,
+    "external_action_count": 0
+  },
+  "controls": {
+    "action_time_human_confirmation_required": true,
+    "autonomous_certification_allowed": false,
+    "autonomous_email_send_allowed": false,
+    "autonomous_portal_action_allowed": false,
+    "autonomous_submission_allowed": false,
+    "autonomous_upload_allowed": false,
+    "external_action_count": 0,
+    "freshness_required": true,
+    "independent_evidence_required_for_restricted_claims": true,
+    "negative_and_inconclusive_results_preserved": true,
+    "source_reference_required": true,
+    "stale_or_missing_source_blocks_claim": true
+  },
+  "claim_classes": {
+    "PROVEN": "A direct local control or artifact property supported by present, hash-receipted, current sources. This class never establishes an external outcome.",
+    "BOUNDED": "A limited internal, dated, or proposed capability supported by named sources and an explicit non-promotion boundary.",
+    "NOT_PROVEN": "A conclusion that the current evidence does not establish. It remains blocked until the specified independent and, where applicable, official evidence exists.",
+    "ACTION_TIME": "A volatile legal, security, commercial, portal, or solicitation fact that must be checked against its current authoritative source immediately before use."
+  },
+  "source_manifest": [
+    {
+      "source_id": "air_force_capability_draft",
+      "path": "grant_submissions/funding_sprint_20260709/AIR_FORCE_AAC_RFI_CAPABILITY_STATEMENT_2026-07-09.md",
+      "format": "text",
+      "evidence_origin": "internal_statement",
+      "authority": "Prior capability-statement language and its explicit field, certification, and deployment boundaries.",
+      "required": true,
+      "present": true,
+      "bytes": 5710,
+      "sha256": "d2b7ad45e342462096f6bd0a6574978d99ccb1b45341a49ac62898ec6ad348d4",
+      "parse_state": "TEXT_READY",
+      "freshness_mode": "dated_context",
+      "freshness_state": "DATED_CONTEXT",
+      "generated_utc": "2026-07-09T00:00:00Z",
+      "age_hours": 430.5,
+      "max_age_hours": null
+    },
+    {
+      "source_id": "cmmc_export_evidence",
+      "path": "grant_submissions/compliance_evidence/CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json",
+      "format": "json",
+      "evidence_origin": "internal_receipt",
+      "authority": "Metadata-only inventory of missing or unresolved official CMMC, export, JCP, and program evidence.",
+      "required": true,
+      "present": true,
+      "bytes": 20408,
+      "sha256": "368124027ab3850c815049611ebfa13b19f95a9d64c2eb5d55e0ba10b75e3bf3",
+      "parse_state": "JSON_READY",
+      "freshness_mode": "dated_context",
+      "freshness_state": "DATED_CONTEXT",
+      "generated_utc": "2026-07-19T03:11:29Z",
+      "age_hours": 187.309,
+      "max_age_hours": null
+    },
+    {
+      "source_id": "control_assessment_boundary",
+      "path": "grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md",
+      "format": "text",
+      "evidence_origin": "internal_statement",
+      "authority": "Program-specific record of current capability limits and missing mission evidence.",
+      "required": true,
+      "present": true,
+      "bytes": 4717,
+      "sha256": "0f0e23da0ae7e72af5d179d3634f55e3b53e1cb0c8037ca35079f07c7a643247",
+      "parse_state": "TEXT_READY",
+      "freshness_mode": "dated_context",
+      "freshness_state": "DATED_CONTEXT",
+      "generated_utc": "2026-07-13T00:00:00Z",
+      "age_hours": 334.5,
+      "max_age_hours": null
+    },
+    {
+      "source_id": "funding_reviewer_gate",
+      "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
+      "format": "json",
+      "evidence_origin": "internal_receipt",
+      "authority": "Current local source-bound conformance, unsafe-claim, secret-scan, and external-action gate.",
+      "required": true,
+      "present": true,
+      "bytes": 107666,
+      "sha256": "ae50f0f8d570a105fc87d13cdf8732c1657d7ee3e1e1cf72eb591f3c0f8443ba",
+      "parse_state": "JSON_READY",
+      "freshness_mode": "max_age",
+      "freshness_state": "FRESH",
+      "generated_utc": "2026-07-26T22:06:44.050834Z",
+      "age_hours": 0.388,
+      "max_age_hours": 48
+    },
+    {
+      "source_id": "live_domain_service_contract",
+      "path": "out/ops/live_domain_service_contract_latest.json",
+      "format": "json",
+      "evidence_origin": "internal_receipt",
+      "authority": "Current fail-closed public service and redirect contract check.",
+      "required": true,
+      "present": true,
+      "bytes": 8470,
+      "sha256": "6fe58d44a6348b60e8ee9df7ddf033b75ef76540758f37366de3161d220c83d8",
+      "parse_state": "JSON_READY",
+      "freshness_mode": "max_age",
+      "freshness_state": "FRESH",
+      "generated_utc": "2026-07-26T22:10:27.310431Z",
+      "age_hours": 0.326,
+      "max_age_hours": 24
+    },
+    {
+      "source_id": "live_evidence_harvest",
+      "path": "out/ops/live_evidence_max_harvest_latest.json",
+      "format": "json",
+      "evidence_origin": "internal_receipt",
+      "authority": "Current internal source-intake, replay, baseline, and claim-gate receipt.",
+      "required": true,
+      "present": true,
+      "bytes": 10912,
+      "sha256": "8e83c9e4cc968352f2cfcd45a0d2de9ce7ea16b0a2224bd13295587c8c38c16f",
+      "parse_state": "JSON_READY",
+      "freshness_mode": "max_age",
+      "freshness_state": "FRESH",
+      "generated_utc": "2026-07-26T22:18:07.080957Z",
+      "age_hours": 0.198,
+      "max_age_hours": 48
+    },
+    {
+      "source_id": "monday_federal_action_packet",
+      "path": "grant_submissions/funding_sprint_20260709/MONDAY_FEDERAL_ACTION_PACKET_2026-07-26.json",
+      "format": "json",
+      "evidence_origin": "internal_receipt",
+      "authority": "Current source-reviewed Monday opportunity decision and mandatory-qualification gate.",
+      "required": true,
+      "present": true,
+      "bytes": 24140,
+      "sha256": "cdcf02a5ca12c20b98e9e72168d8aa520fb47ad67ebd2e65432ca33c13c55695",
+      "parse_state": "JSON_READY",
+      "freshness_mode": "max_age",
+      "freshness_state": "FRESH",
+      "generated_utc": "2026-07-26T22:28:21Z",
+      "age_hours": 0.028,
+      "max_age_hours": 48
+    },
+    {
+      "source_id": "noahs_architecture",
+      "path": "docs/NOAHS_REVIEWER_ARCHITECTURE_2026-07-25.md",
+      "format": "text",
+      "evidence_origin": "repository_control",
+      "authority": "Fail-closed evidence-custody architecture and current blocker taxonomy.",
+      "required": true,
+      "present": true,
+      "bytes": 6666,
+      "sha256": "42e718046f28fe3c3136389193147a137a4ad3ff8045f0b360492be59a613f04",
+      "parse_state": "TEXT_READY",
+      "freshness_mode": "dated_context",
+      "freshness_state": "DATED_CONTEXT",
+      "generated_utc": "2026-07-25T00:00:00Z",
+      "age_hours": 46.5,
+      "max_age_hours": null
+    },
+    {
+      "source_id": "repository_governance",
+      "path": "AGENTS.md",
+      "format": "text",
+      "evidence_origin": "repository_control",
+      "authority": "Repository operating rules for evidence maturity, HumanUnlock, external actions, and reviewer-safe claims.",
+      "required": true,
+      "present": true,
+      "bytes": 4576,
+      "sha256": "0e2e0b26572c3c915c4ee74ec5aeaa5ebd8be51ff1d1908ce26d0389cc2a5b80",
+      "parse_state": "TEXT_READY",
+      "freshness_mode": "timeless_control",
+      "freshness_state": "TIMELESS_CONTROL",
+      "generated_utc": null,
+      "age_hours": null,
+      "max_age_hours": null
+    },
+    {
+      "source_id": "reviewer_reproducibility_capsule",
+      "path": "out/ops/reviewer_reproducibility_capsule_latest.json",
+      "format": "json",
+      "evidence_origin": "internal_receipt",
+      "authority": "Dated bounded clean-runner reproducibility receipt tied to a specific branch and commit.",
+      "required": true,
+      "present": true,
+      "bytes": 26873,
+      "sha256": "ed2a1e6b15f95ff32fa57dc80eaf09711700b5eb06ab9f7771c95f541bd5067c",
+      "parse_state": "JSON_READY",
+      "freshness_mode": "dated_context",
+      "freshness_state": "DATED_CONTEXT",
+      "generated_utc": "2026-07-16T02:51:34.802696Z",
+      "age_hours": 259.64,
+      "max_age_hours": null
+    }
+  ],
+  "modules": [
+    {
+      "module_id": "action_time_authority",
+      "title": "Action-Time Authority and Fact Lock",
+      "declared_class": "ACTION_TIME",
+      "freshness_policy": "action_time_only",
+      "reusable_claim": "Recipient, official instructions, deadline, route, signer authority, representations, security facts, price, and commitments must be reverified immediately before use.",
+      "boundary": "No frozen matrix authorizes a send, upload, portal action, signature, certification, offer, or submission.",
+      "source_refs": [
+        "monday_federal_action_packet",
+        "repository_governance",
+        "cmmc_export_evidence"
+      ],
+      "reviewer_concerns": {
+        "civilian": [
+          "Current official source",
+          "Authorized submitter"
+        ],
+        "defense": [
+          "Security, export, clearance, and teaming facts"
+        ],
+        "energy_lab": [
+          "Data rights and evaluator authority"
+        ],
+        "acquisition": [
+          "Deadline, route, price, reps, and certifications"
+        ],
+        "regulated_industry": [
+          "Data, privacy, deployment, and acceptance authority"
+        ]
+      },
+      "deliverables": [
+        "Action-time checklist",
+        "Authoritative-source receipt",
+        "Human approval record"
+      ],
+      "effective_class": "ACTION_TIME",
+      "claim_usable": false,
+      "external_action_authorized": false,
+      "evidence_blockers": [],
+      "resolved_sources": [
+        {
+          "source_id": "monday_federal_action_packet",
+          "freshness_state": "FRESH",
+          "sha256": "cdcf02a5ca12c20b98e9e72168d8aa520fb47ad67ebd2e65432ca33c13c55695"
+        },
+        {
+          "source_id": "repository_governance",
+          "freshness_state": "TIMELESS_CONTROL",
+          "sha256": "0e2e0b26572c3c915c4ee74ec5aeaa5ebd8be51ff1d1908ce26d0389cc2a5b80"
+        },
+        {
+          "source_id": "cmmc_export_evidence",
+          "freshness_state": "DATED_CONTEXT",
+          "sha256": "368124027ab3850c815049611ebfa13b19f95a9d64c2eb5d55e0ba10b75e3bf3"
+        }
+      ]
+    },
+    {
+      "module_id": "baseline_replay_packaging",
+      "title": "Baseline and Candidate Replay Packaging",
+      "declared_class": "BOUNDED",
+      "freshness_policy": "dated_context_allowed",
+      "reusable_claim": "Repository artifacts can package named-baseline evaluation, retained failures, configuration identity, and bounded replay context for technical review.",
+      "boundary": "Existing results are internal replay evidence. They cannot be promoted into mission outcomes or external conclusions without a frozen independent evaluation.",
+      "source_refs": [
+        "live_evidence_harvest",
+        "noahs_architecture"
+      ],
+      "reviewer_concerns": {
+        "civilian": [
+          "Baseline discipline",
+          "Transparent limitations"
+        ],
+        "defense": [
+          "Mission-specific experiment design",
+          "Failure and falsifier visibility"
+        ],
+        "energy_lab": [
+          "Protocol freeze",
+          "Prospective evaluation path"
+        ],
+        "regulated_industry": [
+          "Validation plan custody",
+          "Adverse-result retention"
+        ]
+      },
+      "deliverables": [
+        "Locked evaluation plan",
+        "Baseline registry",
+        "Replay and deviation receipt"
+      ],
+      "effective_class": "BOUNDED",
+      "claim_usable": true,
+      "external_action_authorized": false,
+      "evidence_blockers": [],
+      "resolved_sources": [
+        {
+          "source_id": "live_evidence_harvest",
+          "freshness_state": "FRESH",
+          "sha256": "8e83c9e4cc968352f2cfcd45a0d2de9ce7ea16b0a2224bd13295587c8c38c16f"
+        },
+        {
+          "source_id": "noahs_architecture",
+          "freshness_state": "DATED_CONTEXT",
+          "sha256": "42e718046f28fe3c3136389193147a137a4ad3ff8045f0b360492be59a613f04"
+        }
+      ]
+    },
+    {
+      "module_id": "buyer_authorized_evidence_sprint",
+      "title": "Buyer-Authorized Evidence Sprint",
+      "declared_class": "BOUNDED",
+      "freshness_policy": "dated_context_allowed",
+      "reusable_claim": "LumenCore can propose a bounded evidence sprint around buyer-authorized data, frozen metrics, source custody, retained failures, and human-owned acceptance states.",
+      "boundary": "This is an engagement design, not proof of prior delivery, customer acceptance, deployment, or a promised result.",
+      "source_refs": [
+        "air_force_capability_draft",
+        "control_assessment_boundary",
+        "repository_governance"
+      ],
+      "reviewer_concerns": {
+        "civilian": [
+          "Low-risk pilot scope",
+          "Reviewer-owned acceptance"
+        ],
+        "defense": [
+          "Qualified-prime workstream boundary",
+          "Mission-data authorization"
+        ],
+        "energy_lab": [
+          "External evaluator design",
+          "Buyer-owned field replay"
+        ],
+        "acquisition": [
+          "Measurable deliverables",
+          "No substitute for mandatory qualifications"
+        ],
+        "regulated_industry": [
+          "Controlled validation sprint",
+          "Rollback and rejection criteria"
+        ]
+      },
+      "deliverables": [
+        "Authority and source registry",
+        "Frozen acceptance plan",
+        "Reviewer decision packet"
+      ],
+      "effective_class": "BOUNDED",
+      "claim_usable": true,
+      "external_action_authorized": false,
+      "evidence_blockers": [],
+      "resolved_sources": [
+        {
+          "source_id": "air_force_capability_draft",
+          "freshness_state": "DATED_CONTEXT",
+          "sha256": "d2b7ad45e342462096f6bd0a6574978d99ccb1b45341a49ac62898ec6ad348d4"
+        },
+        {
+          "source_id": "control_assessment_boundary",
+          "freshness_state": "DATED_CONTEXT",
+          "sha256": "0f0e23da0ae7e72af5d179d3634f55e3b53e1cb0c8037ca35079f07c7a643247"
+        },
+        {
+          "source_id": "repository_governance",
+          "freshness_state": "TIMELESS_CONTROL",
+          "sha256": "0e2e0b26572c3c915c4ee74ec5aeaa5ebd8be51ff1d1908ce26d0389cc2a5b80"
+        }
+      ]
+    },
+    {
+      "module_id": "current_submission_readiness",
+      "title": "Current Submission Readiness",
+      "declared_class": "NOT_PROVEN",
+      "freshness_policy": "current_required",
+      "reusable_claim": "A polished capability statement does not establish current opportunity conformance, mandatory qualifications, or upload readiness.",
+      "boundary": "The official notice, attachments, amendments, route, format, qualifications, representations, price, and authority must all pass independently.",
+      "source_refs": [
+        "monday_federal_action_packet",
+        "funding_reviewer_gate"
+      ],
+      "reviewer_concerns": {
+        "defense": [
+          "Topic-specific mandatory qualifications",
+          "Security and staffing facts"
+        ],
+        "acquisition": [
+          "Current official instructions",
+          "Responsive and responsible offeror evidence"
+        ]
+      },
+      "deliverables": [
+        "Requirement crosswalk",
+        "No-go and partner-only decision",
+        "Submission blocker register"
+      ],
+      "effective_class": "NOT_PROVEN",
+      "claim_usable": false,
+      "external_action_authorized": false,
+      "evidence_blockers": [],
+      "resolved_sources": [
+        {
+          "source_id": "monday_federal_action_packet",
+          "freshness_state": "FRESH",
+          "sha256": "cdcf02a5ca12c20b98e9e72168d8aa520fb47ad67ebd2e65432ca33c13c55695"
+        },
+        {
+          "source_id": "funding_reviewer_gate",
+          "freshness_state": "FRESH",
+          "sha256": "ae50f0f8d570a105fc87d13cdf8732c1657d7ee3e1e1cf72eb591f3c0f8443ba"
+        }
+      ]
+    },
+    {
+      "module_id": "external_outcome_validation",
+      "title": "Independent External Outcome Validation",
+      "declared_class": "NOT_PROVEN",
+      "freshness_policy": "dated_context_allowed",
+      "reusable_claim": "The current repository does not establish independently reproduced field outcomes, customer economics, or official acceptance.",
+      "boundary": "Local tests, hashes, internal replay, public-source breadth, and self-authored packets cannot substitute for a named outcome-independent evaluator and accepted external result.",
+      "source_refs": [
+        "noahs_architecture",
+        "funding_reviewer_gate"
+      ],
+      "reviewer_concerns": {
+        "civilian": [
+          "External validity"
+        ],
+        "defense": [
+          "Operational mission evidence"
+        ],
+        "energy_lab": [
+          "Independent reproduction",
+          "Field protocol"
+        ],
+        "acquisition": [
+          "Responsibility and substantiation"
+        ],
+        "regulated_industry": [
+          "Independent validation",
+          "Accepted outcome evidence"
+        ]
+      },
+      "deliverables": [
+        "Independent-evaluator protocol",
+        "Outcome receipt",
+        "Limitations statement"
+      ],
+      "effective_class": "NOT_PROVEN",
+      "claim_usable": false,
+      "external_action_authorized": false,
+      "evidence_blockers": [],
+      "resolved_sources": [
+        {
+          "source_id": "noahs_architecture",
+          "freshness_state": "DATED_CONTEXT",
+          "sha256": "42e718046f28fe3c3136389193147a137a4ad3ff8045f0b360492be59a613f04"
+        },
+        {
+          "source_id": "funding_reviewer_gate",
+          "freshness_state": "FRESH",
+          "sha256": "ae50f0f8d570a105fc87d13cdf8732c1657d7ee3e1e1cf72eb591f3c0f8443ba"
+        }
+      ]
+    },
+    {
+      "module_id": "fail_closed_review_control",
+      "title": "Fail-Closed Review and Action Control",
+      "declared_class": "PROVEN",
+      "freshness_policy": "current_required",
+      "reusable_claim": "The repository contains explicit controls that block autonomous external action and require source-bound conformance before reviewer-ready promotion.",
+      "boundary": "This proves a local control property and current gate state only. It does not prove that an agency, customer, assessor, or prime accepted the control.",
+      "source_refs": [
+        "repository_governance",
+        "funding_reviewer_gate"
+      ],
+      "reviewer_concerns": {
+        "civilian": [
+          "Human decision ownership",
+          "Claim-to-evidence traceability"
+        ],
+        "defense": [
+          "No autonomous certification or portal action",
+          "Missing mission and security facts remain blockers"
+        ],
+        "energy_lab": [
+          "Independent-review boundary",
+          "Negative-result retention"
+        ],
+        "acquisition": [
+          "Submission authority",
+          "Conformance before packaging"
+        ],
+        "regulated_industry": [
+          "Controlled promotion",
+          "Audit trail and exception retention"
+        ]
+      },
+      "deliverables": [
+        "Claim-state register",
+        "Human action gate",
+        "Conformance blocker list"
+      ],
+      "effective_class": "PROVEN",
+      "claim_usable": true,
+      "external_action_authorized": false,
+      "evidence_blockers": [],
+      "resolved_sources": [
+        {
+          "source_id": "repository_governance",
+          "freshness_state": "TIMELESS_CONTROL",
+          "sha256": "0e2e0b26572c3c915c4ee74ec5aeaa5ebd8be51ff1d1908ce26d0389cc2a5b80"
+        },
+        {
+          "source_id": "funding_reviewer_gate",
+          "freshness_state": "FRESH",
+          "sha256": "ae50f0f8d570a105fc87d13cdf8732c1657d7ee3e1e1cf72eb591f3c0f8443ba"
+        }
+      ]
+    },
+    {
+      "module_id": "full_live_domain_chain",
+      "title": "Full Live-Domain Service Chain",
+      "declared_class": "NOT_PROVEN",
+      "freshness_policy": "current_required",
+      "reusable_claim": "End-to-end public service health is not established by the current service-contract receipt.",
+      "boundary": "Individual reachable pages or feeds cannot be generalized into an all-endpoint availability or deployment-readiness statement.",
+      "source_refs": [
+        "live_domain_service_contract"
+      ],
+      "reviewer_concerns": {
+        "civilian": [
+          "Public evidence availability"
+        ],
+        "defense": [
+          "Environment readiness boundary"
+        ],
+        "energy_lab": [
+          "Reviewer access continuity"
+        ],
+        "acquisition": [
+          "Demo availability"
+        ],
+        "regulated_industry": [
+          "Operational monitoring and rollback"
+        ]
+      },
+      "deliverables": [
+        "Current endpoint contract receipt",
+        "Failure list",
+        "Recovery preflight"
+      ],
+      "effective_class": "NOT_PROVEN",
+      "claim_usable": false,
+      "external_action_authorized": false,
+      "evidence_blockers": [],
+      "resolved_sources": [
+        {
+          "source_id": "live_domain_service_contract",
+          "freshness_state": "FRESH",
+          "sha256": "6fe58d44a6348b60e8ee9df7ddf033b75ef76540758f37366de3161d220c83d8"
+        }
+      ]
+    },
+    {
+      "module_id": "measured_source_intake",
+      "title": "Measured Source Intake",
+      "declared_class": "BOUNDED",
+      "freshness_policy": "current_required",
+      "reusable_claim": "Current internal receipts can support source-availability, row-custody, and replay-scoping statements for the exact frozen intake.",
+      "boundary": "Internal source intake does not establish source authority, mission representativeness, external validation, or an operational outcome.",
+      "source_refs": [
+        "live_evidence_harvest"
+      ],
+      "reviewer_concerns": {
+        "civilian": [
+          "Public and official source identity",
+          "Freshness and row custody"
+        ],
+        "energy_lab": [
+          "Time-series intake",
+          "Frozen source windows"
+        ],
+        "regulated_industry": [
+          "Input lineage",
+          "Schema-aware intake"
+        ]
+      },
+      "deliverables": [
+        "Source inventory",
+        "Freshness receipt",
+        "Frozen input manifest"
+      ],
+      "effective_class": "BOUNDED",
+      "claim_usable": true,
+      "external_action_authorized": false,
+      "evidence_blockers": [],
+      "resolved_sources": [
+        {
+          "source_id": "live_evidence_harvest",
+          "freshness_state": "FRESH",
+          "sha256": "8e83c9e4cc968352f2cfcd45a0d2de9ce7ea16b0a2224bd13295587c8c38c16f"
+        }
+      ]
+    },
+    {
+      "module_id": "reproducibility_handoff",
+      "title": "Bounded Reproducibility Handoff",
+      "declared_class": "BOUNDED",
+      "freshness_policy": "dated_context_allowed",
+      "reusable_claim": "A dated reproducibility capsule can serve as a handoff template for a specific branch, commit, dependency lock, and known-gap record.",
+      "boundary": "The dated capsule is not proof that the current release reproduces. It must be rebuilt and independently run for the exact release under review.",
+      "source_refs": [
+        "reviewer_reproducibility_capsule",
+        "noahs_architecture"
+      ],
+      "reviewer_concerns": {
+        "civilian": [
+          "Environment identity",
+          "Known-gap disclosure"
+        ],
+        "defense": [
+          "Release-specific custody",
+          "Controlled dependency record"
+        ],
+        "energy_lab": [
+          "Independent reproduction handoff",
+          "Protocol identity"
+        ],
+        "regulated_industry": [
+          "Versioned validation package",
+          "Repeatable execution record"
+        ]
+      },
+      "deliverables": [
+        "Dependency lock",
+        "Release receipt",
+        "Independent-run handoff"
+      ],
+      "effective_class": "BOUNDED",
+      "claim_usable": true,
+      "external_action_authorized": false,
+      "evidence_blockers": [],
+      "resolved_sources": [
+        {
+          "source_id": "reviewer_reproducibility_capsule",
+          "freshness_state": "DATED_CONTEXT",
+          "sha256": "ed2a1e6b15f95ff32fa57dc80eaf09711700b5eb06ab9f7771c95f541bd5067c"
+        },
+        {
+          "source_id": "noahs_architecture",
+          "freshness_state": "DATED_CONTEXT",
+          "sha256": "42e718046f28fe3c3136389193147a137a4ad3ff8045f0b360492be59a613f04"
+        }
+      ]
+    },
+    {
+      "module_id": "source_receipt_and_claim_traceability",
+      "title": "Source Receipt and Claim Traceability",
+      "declared_class": "PROVEN",
+      "freshness_policy": "current_required",
+      "reusable_claim": "The repository can inventory local source artifacts with repository path, byte count, SHA-256, freshness state, and an explicit claim boundary.",
+      "boundary": "A local receipt establishes artifact identity and custody, not source authority, scientific validity, mission suitability, or external acceptance.",
+      "source_refs": [
+        "funding_reviewer_gate",
+        "repository_governance"
+      ],
+      "reviewer_concerns": {
+        "civilian": [
+          "Data provenance",
+          "Inspectable evidence lineage"
+        ],
+        "defense": [
+          "Artifact custody",
+          "Public-safe evidence separation"
+        ],
+        "energy_lab": [
+          "Protocol and data identity",
+          "Reproducible handoff"
+        ],
+        "acquisition": [
+          "Requirement-to-artifact mapping",
+          "Package integrity"
+        ],
+        "regulated_industry": [
+          "Change control",
+          "Auditability"
+        ]
+      },
+      "deliverables": [
+        "Source manifest",
+        "Hash receipt",
+        "Evidence-to-claim crosswalk"
+      ],
+      "effective_class": "PROVEN",
+      "claim_usable": true,
+      "external_action_authorized": false,
+      "evidence_blockers": [],
+      "resolved_sources": [
+        {
+          "source_id": "funding_reviewer_gate",
+          "freshness_state": "FRESH",
+          "sha256": "ae50f0f8d570a105fc87d13cdf8732c1657d7ee3e1e1cf72eb591f3c0f8443ba"
+        },
+        {
+          "source_id": "repository_governance",
+          "freshness_state": "TIMELESS_CONTROL",
+          "sha256": "0e2e0b26572c3c915c4ee74ec5aeaa5ebd8be51ff1d1908ce26d0389cc2a5b80"
+        }
+      ]
+    }
+  ],
+  "reviewer_lanes": [
+    {
+      "lane_id": "acquisition",
+      "label": "Acquisition and Contracting",
+      "reviewer_concerns": [
+        "Current official source, amendment, route, and deadline",
+        "Mandatory qualification and responsibility evidence",
+        "Past performance, staffing, teaming, and authority facts",
+        "Price, cost, offer, representations, and certifications",
+        "No substitution of polish, hashes, or packaging for responsiveness"
+      ],
+      "module_ids": [
+        "fail_closed_review_control",
+        "source_receipt_and_claim_traceability",
+        "buyer_authorized_evidence_sprint",
+        "full_live_domain_chain",
+        "current_submission_readiness",
+        "action_time_authority"
+      ],
+      "restricted_claim_ids": [
+        "agency_endorsement",
+        "federal_past_performance",
+        "personnel_or_facility_clearance",
+        "ato",
+        "fedramp_authorization",
+        "cmmc_status",
+        "field_validation",
+        "realized_savings",
+        "performance_or_superiority"
+      ],
+      "action_time_fact_ids": [
+        "official_opportunity_instructions",
+        "deadline_timezone_and_route",
+        "entity_and_submitter_authority",
+        "representations_and_certifications",
+        "security_clearance_cui_and_export",
+        "pricing_cost_and_offer_terms",
+        "partner_prime_commitments"
+      ],
+      "reusable_output": "A conformance-first capability appendix that is reusable only after the exact solicitation and offeror facts pass.",
+      "modules": [
+        {
+          "module_id": "fail_closed_review_control",
+          "effective_class": "PROVEN",
+          "claim_usable": true
+        },
+        {
+          "module_id": "source_receipt_and_claim_traceability",
+          "effective_class": "PROVEN",
+          "claim_usable": true
+        },
+        {
+          "module_id": "buyer_authorized_evidence_sprint",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "full_live_domain_chain",
+          "effective_class": "NOT_PROVEN",
+          "claim_usable": false
+        },
+        {
+          "module_id": "current_submission_readiness",
+          "effective_class": "NOT_PROVEN",
+          "claim_usable": false
+        },
+        {
+          "module_id": "action_time_authority",
+          "effective_class": "ACTION_TIME",
+          "claim_usable": false
+        }
+      ],
+      "restricted_claims": [
+        {
+          "claim_id": "agency_endorsement",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "federal_past_performance",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "personnel_or_facility_clearance",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "ato",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "fedramp_authorization",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "cmmc_status",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "field_validation",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "realized_savings",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "performance_or_superiority",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        }
+      ],
+      "action_time_facts": [
+        {
+          "fact_id": "official_opportunity_instructions",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "deadline_timezone_and_route",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "entity_and_submitter_authority",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "representations_and_certifications",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "security_clearance_cui_and_export",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "pricing_cost_and_offer_terms",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "partner_prime_commitments",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        }
+      ],
+      "external_action_authorized": false
+    },
+    {
+      "lane_id": "civilian",
+      "label": "Civilian Agency",
+      "reviewer_concerns": [
+        "Public-purpose fit and measurable decision use",
+        "Source authority, provenance, privacy, and freshness",
+        "Transparent baseline, limitations, and adverse results",
+        "Human decision authority and low-risk pilot scope",
+        "Current official instructions and entity authority"
+      ],
+      "module_ids": [
+        "fail_closed_review_control",
+        "source_receipt_and_claim_traceability",
+        "measured_source_intake",
+        "buyer_authorized_evidence_sprint",
+        "full_live_domain_chain",
+        "action_time_authority"
+      ],
+      "restricted_claim_ids": [
+        "agency_endorsement",
+        "federal_past_performance",
+        "field_validation",
+        "realized_savings",
+        "performance_or_superiority"
+      ],
+      "action_time_fact_ids": [
+        "official_opportunity_instructions",
+        "deadline_timezone_and_route",
+        "entity_and_submitter_authority",
+        "representations_and_certifications",
+        "data_rights_privacy_and_licensing"
+      ],
+      "reusable_output": "A source-bound evidence-readiness or acquisition-support module with explicit authority, privacy, and outcome limits.",
+      "modules": [
+        {
+          "module_id": "fail_closed_review_control",
+          "effective_class": "PROVEN",
+          "claim_usable": true
+        },
+        {
+          "module_id": "source_receipt_and_claim_traceability",
+          "effective_class": "PROVEN",
+          "claim_usable": true
+        },
+        {
+          "module_id": "measured_source_intake",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "buyer_authorized_evidence_sprint",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "full_live_domain_chain",
+          "effective_class": "NOT_PROVEN",
+          "claim_usable": false
+        },
+        {
+          "module_id": "action_time_authority",
+          "effective_class": "ACTION_TIME",
+          "claim_usable": false
+        }
+      ],
+      "restricted_claims": [
+        {
+          "claim_id": "agency_endorsement",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "federal_past_performance",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "field_validation",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "realized_savings",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "performance_or_superiority",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        }
+      ],
+      "action_time_facts": [
+        {
+          "fact_id": "official_opportunity_instructions",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "deadline_timezone_and_route",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "entity_and_submitter_authority",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "representations_and_certifications",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "data_rights_privacy_and_licensing",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        }
+      ],
+      "external_action_authorized": false
+    },
+    {
+      "lane_id": "defense",
+      "label": "Defense and National Security",
+      "reviewer_concerns": [
+        "Mission-specific experiment and transition path",
+        "Mandatory experience, staffing, facility, and clearance facts",
+        "CUI, FCI, export, JCP, ITAR, EAR, and CMMC boundaries",
+        "Qualified-prime and subcontract workshare",
+        "No autonomous certification, portal action, or unsupported operational claim"
+      ],
+      "module_ids": [
+        "fail_closed_review_control",
+        "source_receipt_and_claim_traceability",
+        "baseline_replay_packaging",
+        "reproducibility_handoff",
+        "buyer_authorized_evidence_sprint",
+        "current_submission_readiness",
+        "action_time_authority"
+      ],
+      "restricted_claim_ids": [
+        "agency_endorsement",
+        "federal_past_performance",
+        "personnel_or_facility_clearance",
+        "ato",
+        "fedramp_authorization",
+        "cmmc_status",
+        "field_validation",
+        "performance_or_superiority"
+      ],
+      "action_time_fact_ids": [
+        "official_opportunity_instructions",
+        "deadline_timezone_and_route",
+        "entity_and_submitter_authority",
+        "representations_and_certifications",
+        "security_clearance_cui_and_export",
+        "pricing_cost_and_offer_terms",
+        "partner_prime_commitments",
+        "deployment_environment_and_acceptance"
+      ],
+      "reusable_output": "A bounded evidence-engineering workstream for a qualified prime, with security and mission qualifications left to verified authorities.",
+      "modules": [
+        {
+          "module_id": "fail_closed_review_control",
+          "effective_class": "PROVEN",
+          "claim_usable": true
+        },
+        {
+          "module_id": "source_receipt_and_claim_traceability",
+          "effective_class": "PROVEN",
+          "claim_usable": true
+        },
+        {
+          "module_id": "baseline_replay_packaging",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "reproducibility_handoff",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "buyer_authorized_evidence_sprint",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "current_submission_readiness",
+          "effective_class": "NOT_PROVEN",
+          "claim_usable": false
+        },
+        {
+          "module_id": "action_time_authority",
+          "effective_class": "ACTION_TIME",
+          "claim_usable": false
+        }
+      ],
+      "restricted_claims": [
+        {
+          "claim_id": "agency_endorsement",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "federal_past_performance",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "personnel_or_facility_clearance",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "ato",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "fedramp_authorization",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "cmmc_status",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "field_validation",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "performance_or_superiority",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        }
+      ],
+      "action_time_facts": [
+        {
+          "fact_id": "official_opportunity_instructions",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "deadline_timezone_and_route",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "entity_and_submitter_authority",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "representations_and_certifications",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "security_clearance_cui_and_export",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "pricing_cost_and_offer_terms",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "partner_prime_commitments",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "deployment_environment_and_acceptance",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        }
+      ],
+      "external_action_authorized": false
+    },
+    {
+      "lane_id": "energy_lab",
+      "label": "Energy and National Laboratory",
+      "reviewer_concerns": [
+        "Measured source and protocol custody",
+        "Named baseline and prospective sample discipline",
+        "Independent evaluator and field-replay design",
+        "Data rights, licensing, and publication boundaries",
+        "No promotion from internal replay to field or economic outcome"
+      ],
+      "module_ids": [
+        "fail_closed_review_control",
+        "source_receipt_and_claim_traceability",
+        "measured_source_intake",
+        "baseline_replay_packaging",
+        "reproducibility_handoff",
+        "buyer_authorized_evidence_sprint",
+        "external_outcome_validation",
+        "action_time_authority"
+      ],
+      "restricted_claim_ids": [
+        "agency_endorsement",
+        "federal_past_performance",
+        "field_validation",
+        "realized_savings",
+        "performance_or_superiority"
+      ],
+      "action_time_fact_ids": [
+        "entity_and_submitter_authority",
+        "data_rights_privacy_and_licensing",
+        "deployment_environment_and_acceptance",
+        "partner_prime_commitments"
+      ],
+      "reusable_output": "A preregistration-ready external replay or licensing-evaluation workstream with independent acceptance gates.",
+      "modules": [
+        {
+          "module_id": "fail_closed_review_control",
+          "effective_class": "PROVEN",
+          "claim_usable": true
+        },
+        {
+          "module_id": "source_receipt_and_claim_traceability",
+          "effective_class": "PROVEN",
+          "claim_usable": true
+        },
+        {
+          "module_id": "measured_source_intake",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "baseline_replay_packaging",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "reproducibility_handoff",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "buyer_authorized_evidence_sprint",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "external_outcome_validation",
+          "effective_class": "NOT_PROVEN",
+          "claim_usable": false
+        },
+        {
+          "module_id": "action_time_authority",
+          "effective_class": "ACTION_TIME",
+          "claim_usable": false
+        }
+      ],
+      "restricted_claims": [
+        {
+          "claim_id": "agency_endorsement",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "federal_past_performance",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "field_validation",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "realized_savings",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "performance_or_superiority",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        }
+      ],
+      "action_time_facts": [
+        {
+          "fact_id": "entity_and_submitter_authority",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "data_rights_privacy_and_licensing",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "deployment_environment_and_acceptance",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "partner_prime_commitments",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        }
+      ],
+      "external_action_authorized": false
+    },
+    {
+      "lane_id": "regulated_industry",
+      "label": "Regulated Industry",
+      "reviewer_concerns": [
+        "Data provenance, privacy, rights, and retention",
+        "Versioned validation plan and change control",
+        "Adverse-case, incident, rollback, and human override",
+        "Deployment boundary and service health",
+        "Independent outcome evidence and accepted economic method"
+      ],
+      "module_ids": [
+        "fail_closed_review_control",
+        "source_receipt_and_claim_traceability",
+        "measured_source_intake",
+        "baseline_replay_packaging",
+        "reproducibility_handoff",
+        "buyer_authorized_evidence_sprint",
+        "full_live_domain_chain",
+        "external_outcome_validation",
+        "action_time_authority"
+      ],
+      "restricted_claim_ids": [
+        "ato",
+        "fedramp_authorization",
+        "cmmc_status",
+        "field_validation",
+        "realized_savings",
+        "performance_or_superiority"
+      ],
+      "action_time_fact_ids": [
+        "representations_and_certifications",
+        "security_clearance_cui_and_export",
+        "data_rights_privacy_and_licensing",
+        "deployment_environment_and_acceptance",
+        "pricing_cost_and_offer_terms"
+      ],
+      "reusable_output": "A controlled validation and evidence-custody module with current data, security, deployment, and acceptance facts supplied by the buyer.",
+      "modules": [
+        {
+          "module_id": "fail_closed_review_control",
+          "effective_class": "PROVEN",
+          "claim_usable": true
+        },
+        {
+          "module_id": "source_receipt_and_claim_traceability",
+          "effective_class": "PROVEN",
+          "claim_usable": true
+        },
+        {
+          "module_id": "measured_source_intake",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "baseline_replay_packaging",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "reproducibility_handoff",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "buyer_authorized_evidence_sprint",
+          "effective_class": "BOUNDED",
+          "claim_usable": true
+        },
+        {
+          "module_id": "full_live_domain_chain",
+          "effective_class": "NOT_PROVEN",
+          "claim_usable": false
+        },
+        {
+          "module_id": "external_outcome_validation",
+          "effective_class": "NOT_PROVEN",
+          "claim_usable": false
+        },
+        {
+          "module_id": "action_time_authority",
+          "effective_class": "ACTION_TIME",
+          "claim_usable": false
+        }
+      ],
+      "restricted_claims": [
+        {
+          "claim_id": "ato",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "fedramp_authorization",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "cmmc_status",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "field_validation",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "realized_savings",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        },
+        {
+          "claim_id": "performance_or_superiority",
+          "current_state": "NOT_PROVEN",
+          "claim_allowed": false
+        }
+      ],
+      "action_time_facts": [
+        {
+          "fact_id": "representations_and_certifications",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "security_clearance_cui_and_export",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "data_rights_privacy_and_licensing",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "deployment_environment_and_acceptance",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        },
+        {
+          "fact_id": "pricing_cost_and_offer_terms",
+          "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED"
+        }
+      ],
+      "external_action_authorized": false
+    }
+  ],
+  "restricted_claims": [
+    {
+      "claim_id": "agency_endorsement",
+      "label": "Agency endorsement or approval",
+      "current_state": "NOT_PROVEN",
+      "independent_evidence_required": true,
+      "official_authority_required": true,
+      "source_refs": [
+        "funding_reviewer_gate"
+      ],
+      "required_evidence": "A current written determination from the named agency with scope and authority verified.",
+      "current_boundary": "Repository receipts and correspondence do not establish endorsement.",
+      "claim_allowed": false,
+      "external_use_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "funding_reviewer_gate",
+          "freshness_state": "FRESH",
+          "evidence_origin": "internal_receipt"
+        }
+      ]
+    },
+    {
+      "claim_id": "ato",
+      "label": "Authority to Operate",
+      "current_state": "NOT_PROVEN",
+      "independent_evidence_required": true,
+      "official_authority_required": true,
+      "source_refs": [
+        "monday_federal_action_packet"
+      ],
+      "required_evidence": "A current signed authorization package from the responsible authorizing official for the exact system and boundary.",
+      "current_boundary": "Architecture, controls, and tests are not an ATO.",
+      "claim_allowed": false,
+      "external_use_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "monday_federal_action_packet",
+          "freshness_state": "FRESH",
+          "evidence_origin": "internal_receipt"
+        }
+      ]
+    },
+    {
+      "claim_id": "cmmc_status",
+      "label": "CMMC status",
+      "current_state": "NOT_PROVEN",
+      "independent_evidence_required": true,
+      "official_authority_required": true,
+      "source_refs": [
+        "cmmc_export_evidence"
+      ],
+      "required_evidence": "Current authoritative CMMC or SPRS evidence for the exact entity, level, scope, and affirmation requirement.",
+      "current_boundary": "The existing packet records missing official proof and unresolved applicability.",
+      "claim_allowed": false,
+      "external_use_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "cmmc_export_evidence",
+          "freshness_state": "DATED_CONTEXT",
+          "evidence_origin": "internal_receipt"
+        }
+      ]
+    },
+    {
+      "claim_id": "federal_past_performance",
+      "label": "Federal past performance",
+      "current_state": "NOT_PROVEN",
+      "independent_evidence_required": true,
+      "official_authority_required": true,
+      "source_refs": [
+        "monday_federal_action_packet"
+      ],
+      "required_evidence": "Verifiable contract identifiers, customer authority, scope, period, role, and accepted outcome records.",
+      "current_boundary": "Prepared packets and outreach are not contract performance.",
+      "claim_allowed": false,
+      "external_use_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "monday_federal_action_packet",
+          "freshness_state": "FRESH",
+          "evidence_origin": "internal_receipt"
+        }
+      ]
+    },
+    {
+      "claim_id": "fedramp_authorization",
+      "label": "FedRAMP authorization",
+      "current_state": "NOT_PROVEN",
+      "independent_evidence_required": true,
+      "official_authority_required": true,
+      "source_refs": [
+        "monday_federal_action_packet"
+      ],
+      "required_evidence": "Current official marketplace or agency authorization evidence for the exact cloud service and impact level.",
+      "current_boundary": "Cloud deployment or security design does not establish FedRAMP authorization.",
+      "claim_allowed": false,
+      "external_use_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "monday_federal_action_packet",
+          "freshness_state": "FRESH",
+          "evidence_origin": "internal_receipt"
+        }
+      ]
+    },
+    {
+      "claim_id": "field_validation",
+      "label": "Field validation",
+      "current_state": "NOT_PROVEN",
+      "independent_evidence_required": true,
+      "official_authority_required": false,
+      "source_refs": [
+        "live_evidence_harvest",
+        "noahs_architecture"
+      ],
+      "required_evidence": "A preregistered external protocol, buyer- or evaluator-owned held-out data, accepted baseline and metric, named outcome-independent evaluator, and signed result receipt.",
+      "current_boundary": "Internal replay and public-source breadth are not field validation.",
+      "claim_allowed": false,
+      "external_use_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "live_evidence_harvest",
+          "freshness_state": "FRESH",
+          "evidence_origin": "internal_receipt"
+        },
+        {
+          "source_id": "noahs_architecture",
+          "freshness_state": "DATED_CONTEXT",
+          "evidence_origin": "repository_control"
+        }
+      ]
+    },
+    {
+      "claim_id": "performance_or_superiority",
+      "label": "Operational performance or superiority",
+      "current_state": "NOT_PROVEN",
+      "independent_evidence_required": true,
+      "official_authority_required": false,
+      "source_refs": [
+        "live_evidence_harvest",
+        "noahs_architecture"
+      ],
+      "required_evidence": "A frozen externally accepted protocol, representative held-out data, named baselines, uncertainty and adverse-case analysis, and independent result receipt.",
+      "current_boundary": "Internal benchmark and replay records cannot be generalized into operational performance.",
+      "claim_allowed": false,
+      "external_use_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "live_evidence_harvest",
+          "freshness_state": "FRESH",
+          "evidence_origin": "internal_receipt"
+        },
+        {
+          "source_id": "noahs_architecture",
+          "freshness_state": "DATED_CONTEXT",
+          "evidence_origin": "repository_control"
+        }
+      ]
+    },
+    {
+      "claim_id": "personnel_or_facility_clearance",
+      "label": "Personnel or facility clearance",
+      "current_state": "NOT_PROVEN",
+      "independent_evidence_required": true,
+      "official_authority_required": true,
+      "source_refs": [
+        "cmmc_export_evidence"
+      ],
+      "required_evidence": "Current official clearance records from the responsible authority for the exact entity and personnel scope.",
+      "current_boundary": "No local statement can establish clearance.",
+      "claim_allowed": false,
+      "external_use_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "cmmc_export_evidence",
+          "freshness_state": "DATED_CONTEXT",
+          "evidence_origin": "internal_receipt"
+        }
+      ]
+    },
+    {
+      "claim_id": "realized_savings",
+      "label": "Realized savings or economic benefit",
+      "current_state": "NOT_PROVEN",
+      "independent_evidence_required": true,
+      "official_authority_required": false,
+      "source_refs": [
+        "live_evidence_harvest",
+        "funding_reviewer_gate"
+      ],
+      "required_evidence": "Audited before-and-after costs, accepted counterfactual, exclusions, denominator, period, and customer or independent verification.",
+      "current_boundary": "Modeled opportunity, replay deltas, and avoided-cost scenarios are not realized savings.",
+      "claim_allowed": false,
+      "external_use_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "live_evidence_harvest",
+          "freshness_state": "FRESH",
+          "evidence_origin": "internal_receipt"
+        },
+        {
+          "source_id": "funding_reviewer_gate",
+          "freshness_state": "FRESH",
+          "evidence_origin": "internal_receipt"
+        }
+      ]
+    }
+  ],
+  "action_time_facts": [
+    {
+      "fact_id": "data_rights_privacy_and_licensing",
+      "claim_class": "ACTION_TIME",
+      "fact": "Data rights, source terms, privacy, licensing, disclosure, and intellectual-property boundaries",
+      "source_refs": [
+        "repository_governance",
+        "control_assessment_boundary"
+      ],
+      "required_action_time_evidence": "Review the exact data, source terms, disclosure scope, rights allocation, and authorized legal position.",
+      "human_confirmation_required": true,
+      "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED",
+      "external_action_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "repository_governance",
+          "freshness_state": "TIMELESS_CONTROL"
+        },
+        {
+          "source_id": "control_assessment_boundary",
+          "freshness_state": "DATED_CONTEXT"
+        }
+      ]
+    },
+    {
+      "fact_id": "deadline_timezone_and_route",
+      "claim_class": "ACTION_TIME",
+      "fact": "Deadline, timezone, destination, naming, and transport method",
+      "source_refs": [
+        "monday_federal_action_packet"
+      ],
+      "required_action_time_evidence": "Capture the current official deadline and route, including amendments and portal state.",
+      "human_confirmation_required": true,
+      "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED",
+      "external_action_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "monday_federal_action_packet",
+          "freshness_state": "FRESH"
+        }
+      ]
+    },
+    {
+      "fact_id": "deployment_environment_and_acceptance",
+      "claim_class": "ACTION_TIME",
+      "fact": "Deployment environment, integrations, service levels, acceptance criteria, rollback, and operational authority",
+      "source_refs": [
+        "live_domain_service_contract",
+        "control_assessment_boundary"
+      ],
+      "required_action_time_evidence": "Verify the target environment and obtain buyer-owned acceptance, security, and rollback criteria.",
+      "human_confirmation_required": true,
+      "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED",
+      "external_action_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "live_domain_service_contract",
+          "freshness_state": "FRESH"
+        },
+        {
+          "source_id": "control_assessment_boundary",
+          "freshness_state": "DATED_CONTEXT"
+        }
+      ]
+    },
+    {
+      "fact_id": "entity_and_submitter_authority",
+      "claim_class": "ACTION_TIME",
+      "fact": "Entity status, account linkage, authorized submitter, and signer authority",
+      "source_refs": [
+        "repository_governance",
+        "funding_reviewer_gate"
+      ],
+      "required_action_time_evidence": "Verify current official entity and account state and obtain the authorized human decision.",
+      "human_confirmation_required": true,
+      "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED",
+      "external_action_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "repository_governance",
+          "freshness_state": "TIMELESS_CONTROL"
+        },
+        {
+          "source_id": "funding_reviewer_gate",
+          "freshness_state": "FRESH"
+        }
+      ]
+    },
+    {
+      "fact_id": "official_opportunity_instructions",
+      "claim_class": "ACTION_TIME",
+      "fact": "Official notice, attachments, amendments, mandatory requirements, format, and response route",
+      "source_refs": [
+        "monday_federal_action_packet"
+      ],
+      "required_action_time_evidence": "Open the current official notice and every controlling attachment immediately before package use.",
+      "human_confirmation_required": true,
+      "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED",
+      "external_action_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "monday_federal_action_packet",
+          "freshness_state": "FRESH"
+        }
+      ]
+    },
+    {
+      "fact_id": "partner_prime_commitments",
+      "claim_class": "ACTION_TIME",
+      "fact": "Prime, subcontractor, personnel, facility, data, and delivery commitments",
+      "source_refs": [
+        "monday_federal_action_packet"
+      ],
+      "required_action_time_evidence": "Obtain current written commitments and verify authority, conflicts, scope, and qualification coverage.",
+      "human_confirmation_required": true,
+      "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED",
+      "external_action_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "monday_federal_action_packet",
+          "freshness_state": "FRESH"
+        }
+      ]
+    },
+    {
+      "fact_id": "pricing_cost_and_offer_terms",
+      "claim_class": "ACTION_TIME",
+      "fact": "Price, cost basis, period, assumptions, rates, funding, and offer terms",
+      "source_refs": [
+        "funding_reviewer_gate"
+      ],
+      "required_action_time_evidence": "Complete current cost review and authorized offer approval for the exact scope.",
+      "human_confirmation_required": true,
+      "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED",
+      "external_action_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "funding_reviewer_gate",
+          "freshness_state": "FRESH"
+        }
+      ]
+    },
+    {
+      "fact_id": "representations_and_certifications",
+      "claim_class": "ACTION_TIME",
+      "fact": "Representations, certifications, attestations, consents, and legal declarations",
+      "source_refs": [
+        "repository_governance",
+        "funding_reviewer_gate"
+      ],
+      "required_action_time_evidence": "Review the exact current language and obtain truthful authorized human certification.",
+      "human_confirmation_required": true,
+      "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED",
+      "external_action_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "repository_governance",
+          "freshness_state": "TIMELESS_CONTROL"
+        },
+        {
+          "source_id": "funding_reviewer_gate",
+          "freshness_state": "FRESH"
+        }
+      ]
+    },
+    {
+      "fact_id": "security_clearance_cui_and_export",
+      "claim_class": "ACTION_TIME",
+      "fact": "Security boundary, clearance, CUI, FCI, export, JCP, ITAR, EAR, and CMMC applicability",
+      "source_refs": [
+        "cmmc_export_evidence"
+      ],
+      "required_action_time_evidence": "Obtain current official or qualified-reviewer evidence for the exact opportunity, entity, team, system, and data scope.",
+      "human_confirmation_required": true,
+      "resolved_state": "ACTION_TIME_REVERIFY_REQUIRED",
+      "external_action_authorized": false,
+      "resolved_sources": [
+        {
+          "source_id": "cmmc_export_evidence",
+          "freshness_state": "DATED_CONTEXT"
+        }
+      ]
+    }
+  ],
+  "blockers": [],
+  "claim_boundary": "This matrix is a source-bound control for reusing capability modules. It proves only the local controls and artifacts identified as PROVEN, keeps internal or dated evidence BOUNDED, keeps unsupported external conclusions NOT_PROVEN, and requires volatile facts to be reverified at ACTION_TIME. It is not an agency endorsement, past-performance record, clearance determination, ATO, FedRAMP authorization, CMMC status, field validation, savings finding, performance finding, offer, certification, upload, portal action, or submission.",
+  "integrity": {
+    "config_sha256": "5d424180b8fe1b35ebff6cbfee3732c1d7939607e56e3e6aa96fa75cd0e37a2e",
+    "builder_sha256": "eaef5c92bf3a56f5ea9cf4dfb6e831bd9c7b801ce535ddd1536b90e4463ef97e",
+    "source_chain_sha256": "2c5a85a3fe630f16a5328d6453e4eda3ef6f7dfb92204400400fc8de8b1a55b4",
+    "matrix_sha256": "89b9709ec9e749aa13f5e1c7eec01924bafb7b38c96fc5c8e9893fdf0b83a012"
+  },
+  "external_actions": {
+    "capabilities": [],
+    "performed": [],
+    "send_allowed": false,
+    "upload_allowed": false,
+    "portal_action_allowed": false,
+    "submission_allowed": false
+  }
+}

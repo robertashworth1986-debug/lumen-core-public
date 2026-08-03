@@ -203,10 +203,12 @@ def build_payload() -> dict[str, Any]:
     agent_rows = snapshot["agent_registry"]
     markers = snapshot["runtime_markers"]
 
-    gate_clear = (
-        bool(gate.get("reviewer_gate_clear"))
-        and int((gate.get("summary") or {}).get("unsafe_secret_count") or 0) == 0
-        and int((gate.get("summary") or {}).get("unsafe_claim_count") or 0) == 0
+    gate_summary = gate.get("summary") or {}
+    submission_argument_gate_clear = bool(gate.get("reviewer_gate_clear"))
+    reviewer_packaging_gate_clear = (
+        bool(gate_summary.get("packaging_checks_clear"))
+        and int(gate_summary.get("unsafe_secret_count") or 0) == 0
+        and int(gate_summary.get("unsafe_claim_count") or 0) == 0
     )
     authority_summary = authority.get("summary", {}) if isinstance(authority.get("summary"), dict) else {}
     all_final_actions_blocked = bool(authority_summary.get("all_final_actions_blocked_without_human"))
@@ -232,7 +234,7 @@ def build_payload() -> dict[str, Any]:
     evidence_present = all(row["present"] for row in evidence_status)
 
     ready = (
-        gate_clear
+        reviewer_packaging_gate_clear
         and all_final_actions_blocked
         and global_runtime_paper
         and global_live_orders_disabled
@@ -249,9 +251,10 @@ def build_payload() -> dict[str, Any]:
         if ready
         else "AUTONOMOUS_QUANT_GOVERNANCE_BLOCKED",
         "summary": {
-            "reviewer_gate_clear": gate_clear,
-            "unsafe_sensitive_count": int((gate.get("summary") or {}).get("unsafe_secret_count") or 0),
-            "unsafe_claim_count": int((gate.get("summary") or {}).get("unsafe_claim_count") or 0),
+            "reviewer_packaging_gate_clear": reviewer_packaging_gate_clear,
+            "submission_argument_gate_clear": submission_argument_gate_clear,
+            "unsafe_sensitive_count": int(gate_summary.get("unsafe_secret_count") or 0),
+            "unsafe_claim_count": int(gate_summary.get("unsafe_claim_count") or 0),
             "all_final_actions_blocked_without_human": all_final_actions_blocked,
             "global_runtime_paper": global_runtime_paper,
             "global_live_orders_disabled": global_live_orders_disabled,
@@ -308,7 +311,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Status",
         "",
         f"- Status: `{payload['status']}`",
-        f"- Reviewer gate clear: `{str(summary['reviewer_gate_clear']).lower()}`",
+        f"- Reviewer packaging gate clear: `{str(summary['reviewer_packaging_gate_clear']).lower()}`",
+        f"- Submission argument gate clear: `{str(summary['submission_argument_gate_clear']).lower()}`",
         f"- Unsafe sensitive hits: `{summary['unsafe_sensitive_count']}`",
         f"- Unsafe claim hits: `{summary['unsafe_claim_count']}`",
         f"- All final actions blocked without human: `{str(summary['all_final_actions_blocked_without_human']).lower()}`",

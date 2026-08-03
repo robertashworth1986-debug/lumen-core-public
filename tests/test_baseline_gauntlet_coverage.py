@@ -20,14 +20,31 @@ def test_baseline_gauntlet_coverage_reports_current_locked_replay_truth() -> Non
 
     assert payload["schema"] == "baseline_gauntlet_coverage_v1"
     assert payload["summary"]["requested_baselines"] == 29
-    assert payload["summary"]["executed_in_locked_replay"] >= 15
+    assert payload["summary"]["executed_in_locked_replay"] == 9
+    assert payload["summary"]["locked_replay_distinct_baseline_families"] == 21
     assert payload["summary"]["replay_proxy_ready_from_metric_audit"] >= 2
-    assert payload["summary"]["locked_replay_baseline_comparisons"] >= 1900
+    assert payload["summary"]["locked_replay_baseline_comparisons"] == 22
     assert payload["summary"]["field_validation_claim_allowed"] is False
     assert payload["summary"]["real_dollar_savings_claim_allowed"] is False
 
     for baseline_id in [
+        "persistence",
+        "rolling_mean",
+        "ewma",
         "holt_winters_ets",
+        "seasonal_naive",
+        "kalman_filter",
+        "min_cost_flow",
+        "dijkstra",
+        "a_star",
+    ]:
+        assert rows[baseline_id]["status"] == "EXECUTED_IN_LOCKED_REPLAY"
+        assert rows[baseline_id]["baseline_comparison_count"] > 0
+
+    assert rows["model_predictive_control"]["status"] == "REGISTERED_BASELINE_NOT_ADAPTER_EXECUTED"
+    assert rows["model_predictive_control"]["baseline_comparison_count"] == 0
+
+    for baseline_id in [
         "extended_kalman_filter",
         "unscented_kalman_filter",
         "particle_filter",
@@ -35,15 +52,6 @@ def test_baseline_gauntlet_coverage_reports_current_locked_replay_truth() -> Non
         "xgboost",
         "lightgbm",
         "random_forest_regression",
-    ]:
-        assert rows[baseline_id]["status"] == "EXECUTED_IN_LOCKED_REPLAY"
-        assert rows[baseline_id]["baseline_comparison_count"] > 0
-
-    for baseline_id in ["model_predictive_control", "dijkstra", "a_star"]:
-        assert rows[baseline_id]["status"] == "REGISTERED_BASELINE_NOT_ADAPTER_EXECUTED"
-        assert rows[baseline_id]["baseline_comparison_count"] == 0
-
-    for baseline_id in [
         "lstm",
         "tcn",
         "small_transformer_forecast",
@@ -60,6 +68,8 @@ def test_baseline_gauntlet_coverage_reports_current_locked_replay_truth() -> Non
     assert rows["kuramoto_critical_coupling"]["status"] == "EXTERNAL_TOPOLOGY_REQUIRED"
 
     rendered = doc_path.read_text(encoding="utf-8")
-    assert "MPC, Dijkstra, and A* are registered" in rendered
+    assert "Routing/control baseline status is generated from the replay rows" in rendered
+    assert "registered but not executed" in rendered
+    assert "must not be described as tested" in rendered
     assert "accepted-metric replay proxies" in rendered
     assert "does not authorize field-validation" in rendered

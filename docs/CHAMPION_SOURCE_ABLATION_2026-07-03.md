@@ -1,45 +1,40 @@
-# Champion Source Ablation
+# Source Ablation Nonpromotion Diagnostic
 
-Generated UTC: `2026-07-03T02:04:58.077252+00:00`
-Source ablation SHA-256: `c2c4b855f6869e076a4936f7f7a5a39d1c97e8850121dfc92dc819ab96979753`
+Generated UTC: `2026-07-29T07:39:19.881096+00:00`
+Diagnostic SHA-256: `88186f78b9e1609e9e2d5430f7c6c7fef4986b0e838e0ef6e5ab60b395ce6da2`
 
 ## Truth Line
 
-The champion is not being carried by a single current source system: each leave-one-source-out slice remains positive against the named Kalman baseline. This strengthens internal robustness and buyer-replay readiness, while still stopping short of field validation or realized dollars.
+No performance champion is present. Kuramoto is a negative measured reference: it won 482 of 1,525 paired holdouts against the named Kalman baseline with mean delta -0.508191, and it was not development-selected. Its measured audit uses one source system, so withholding that source leaves no evaluable replay and supports no promotion claim.
 
-## Summary
+## Canonical Evidence Contract
 
-- Champion: `kuramoto_phase_coupling`
-- Lane: `wave_resonance_timing`
-- Named baseline: `kalman_filter`
-- Holdout wins: `24/24`
-- Source systems: `4`
-- Leave-one-source-out passes: `4/4`
-- All leave-one-source-out passed: `true`
-- Mean delta vs named baseline: `0.140668`
-- Minimum delta vs named baseline: `0.044697`
-- Estimated rows replayed: `2506267`
-- Numeric samples read: `66690`
-- Field-validation claim allowed: `false`
+- Performance champion present: `false`
+- Direct measured routes: `2`
+- Conditioned-synthetic routes: `2`
+- Baseline comparisons: `22`
+- Performance rows: `32608`
+- Direct all-baseline globally Holm-positive promotions: `0`
+- Inventory measured sources: `24`
+- Inventory measured rows: `17081`
+- Inventory is performance evidence: `false`
 
-## Leave-One-Source-Out Table
+## Negative Measured Reference
 
-| Withheld Source | Kept Holdouts | Kept Wins | Min Delta | Mean Delta | Pass |
-|---|---:|---:|---:|---:|---|
-| `energy_grid` | 22 | 22 | 0.044697 | 0.136581 | `true` |
-| `macro_rates_labor` | 23 | 23 | 0.044697 | 0.139839 | `true` |
-| `market_data` | 4 | 4 | 0.068539 | 0.149882 | `true` |
-| `sports_market` | 23 | 23 | 0.044697 | 0.143804 | `true` |
+- Family: `kuramoto_phase_coupling`
+- Status: `negative_measured_reference_not_development_selected`
+- Development-selected: `false`
+- Development-selected candidate: `lissajous_phase_paths`
+- Wins vs named Kalman baseline: `482/1525`
+- Mean delta vs named Kalman baseline: `-0.508191`
+- Supports promotion: `false`
 
-## Source System Cards
+## Leave-One-Source-Out Diagnostic
 
-| Source | Holdouts | Wins | Rows | Samples | Mean Delta | Min Delta |
-|---|---:|---:|---:|---:|---:|---:|
-| `energy_grid` | 2 | 2 | 441505 | 3690 | 0.185622 | 0.168155 |
-| `macro_rates_labor` | 1 | 1 | 16044 | 3000 | 0.159744 | 0.159744 |
-| `market_data` | 20 | 20 | 2048718 | 60000 | 0.138825 | 0.044697 |
-| `sports_market` | 1 | 1 | 0 | 0 | 0.068539 | 0.068539 |
+| Withheld Source | Remaining Sources | Remaining Comparisons | Evaluable | Supports Promotion |
+|---|---:|---:|---|---|
+| `EIA_GRID_VALIDATION` | 0 | 0 | `false` | `false` |
 
 ## Boundary
 
-Champion source ablation. This artifact tests whether the current internal champion remains positive when each source system is withheld from the current holdout replay. It is internal source-conditioned evidence only. It is not field validation, not realized savings, not hardware validation, not a fixed dollar claim, and not live trading evidence.
+This is a nonpromotion source-ablation diagnostic. It audits source dependence and evidence coverage; it does not identify a performance champion. Direct measured replay, conditioned-synthetic replay, and source inventory are separate evidence classes. Inventory counts are inventory only. No field-validation, realized-savings, fixed-dollar, live-trading, or hardware performance claim is allowed.

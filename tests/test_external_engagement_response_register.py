@@ -42,30 +42,68 @@ def test_register_routes_current_actions_without_duplicate_sends():
     records = {row["lane_id"]: row for row in payload["records"]}
 
     assert payload["schema"] == "lumencore.external_engagement_response_register.v1"
-    assert payload["summary"]["record_count"] == 13
-    assert payload["summary"]["immediate_human_action_count"] == 1
-    assert payload["summary"]["monitor_only_count"] == 9
-    assert payload["summary"]["do_not_duplicate_send_count"] == 12
+    assert payload["summary"]["record_count"] == 15
+    assert payload["summary"]["immediate_human_action_count"] == 3
+    assert payload["summary"]["monitor_only_count"] == 7
+    assert payload["summary"]["mailbox_recheck_due_count"] == 0
+    assert payload["summary"]["conflicting_gmail_draft_count"] == 1
+    assert payload["summary"]["conflicting_gmail_draft_lane_count"] == 1
+    assert payload["summary"]["do_not_duplicate_send_count"] == 14
     assert payload["summary"]["email_action_reconciliation_status"] == (
         "NO_UNANSWERED_DEADLINE_CRITICAL_EMAIL_ACTION"
     )
     assert payload["summary"]["autonomous_external_send_allowed"] is False
     assert payload["summary"]["autonomous_final_portal_submission_allowed"] is False
 
-    assert records["nashville_ec_takeoff_fall_2026"]["deadline"] == (
-        "2026-07-17T23:59:00-05:00"
+    stan = records["stan_herring_product_validation_meeting"]
+    assert stan["state"] == (
+        "MEETING_CONFIRMED_INVITE_ACCEPTED_PREP_REQUIRED"
     )
-    assert "rolling review result through August 3" in records[
+    assert stan["deadline"] == "2026-07-28T14:00:00-05:00"
+    assert stan["decision"] == "HUMAN_MEETING_PREP"
+    assert stan["calendar_invite_created"] is True
+    assert stan["guest_response_status"] == "accepted"
+    assert stan["meeting_credentials_omitted"] is True
+    assert stan["send_now"] is False
+    assert stan["do_not_duplicate_send"] is True
+    assert "do not create or send a duplicate invitation" in stan[
+        "next_action"
+    ].lower()
+    assert payload["source_artifacts"]["stan_meeting_invite_state"][
+        "present"
+    ] is True
+
+    argos = records["argos_emi_teaming_inquiry"]
+    assert argos["decision"] == "MONITOR_EXISTING_THREAD_NO_RESEND"
+    assert argos["queue_action_state"] == (
+        "INITIAL_OUTREACH_LIMIT_REACHED_NO_SEND"
+    )
+    assert argos["current_draft_count"] == 0
+    assert argos["matching_sent_count"] == 1
+    assert argos["matching_inbound_count"] == 0
+    assert argos["prior_approval_binding_expired"] is True
+    assert argos["selected_template_id"] == "NO_DUPLICATE_MONITOR"
+    assert argos["eligible_template_id"] == "INITIAL_PARTNER_TEAMING_INQUIRY"
+    assert argos["do_not_duplicate_send"] is True
+    assert argos["attachment_count"] == 0
+    assert argos["send_now"] is False
+
+    assert records["nashville_ec_takeoff_fall_2026"]["deadline"] == "2026-07-31"
+    assert "participation agreement" in records[
         "nashville_ec_takeoff_fall_2026"
     ]["action_gate"]
     nashville = records["nashville_ec_takeoff_fall_2026"]
-    assert nashville["state"] == "PORTAL_SUBMISSION_CONFIRMED"
-    assert nashville["decision"] == "MONITOR_REVIEW_RESULT_NO_DUPLICATE"
+    assert nashville["state"] == (
+        "COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE"
+    )
+    assert nashville["decision"] == (
+        "HUMAN_ACCOUNT_ACTION_BEFORE_ONBOARDING_DEADLINE"
+    )
     assert nashville["do_not_duplicate_send"] is True
     assert nashville["deadline_support_sent_utc"] == "2026-07-17T12:05:34Z"
     assert nashville["deadline_support_email_is_application"] is False
     assert nashville["response_artifact"].endswith(
-        "NASHVILLE_EC_SUBMISSION_RECEIPT_2026-07-17.json"
+        "OFFICIAL_INBOUND_STATUS_EVENT_REGISTER_2026-07-25.json"
     )
     assert nashville["official_close_time_confirmed"] is True
     assert nashville["deadline_timezone_explicit_in_message"] is False
@@ -73,7 +111,23 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert nashville["private_fill_map_present"] is True
     assert nashville["private_fact_values_read_or_published"] is False
     assert nashville["portal_submission_verified"] is True
-    assert nashville["expected_next_steps_by"] == "2026-08-03"
+    assert nashville["conflicting_gmail_draft_count"] == 0
+    assert nashville["draft_quarantine_status"] is None
+    assert nashville["quarantined_draft_conflict_type"] is None
+    assert nashville["cohort_selected"] is True
+    assert nashville["onboarding_form_completed"] is False
+    assert nashville["participation_agreement_accepted"] is False
+    assert nashville["deposit_submitted"] is False
+    assert nashville["deposit_date"] == "2026-08-14"
+    assert nashville["onboarding_deadline_reconfirmed"] is True
+    assert nashville["optional_info_sessions_offered"] is True
+    assert nashville["prior_payment_link_invalidated"] is True
+    assert nashville["updated_takeoff_payment_route_provided"] is True
+    assert nashville["payment_link_omitted"] is True
+    assert nashville["optional_info_session_count"] == 3
+    assert nashville["optional_info_session_timezone_explicit"] is False
+    assert nashville["optional_info_session_selected"] is False
+    assert nashville["info_session_attendance_required"] is False
     assert any(
         path.endswith("CAPTURE_NASHVILLE_EC_PRIVATE_FACTS.py")
         for path in nashville["supporting_artifacts"]
@@ -82,8 +136,13 @@ def test_register_routes_current_actions_without_duplicate_sends():
         path.endswith("NASHVILLE_EC_DEADLINE_PRESERVATION_RESPONSE_CONTROL_2026-07-17.md")
         for path in nashville["supporting_artifacts"]
     )
-    assert "Do not resubmit" in nashville["next_action"]
-    assert "do not describe the application as accepted" in nashville["next_action"]
+    assert "do not accept the agreement" in nashville[
+        "next_action"
+    ].lower()
+    assert "make a payment" in nashville["next_action"].lower()
+    assert "or send another acceptance email automatically" in nashville[
+        "next_action"
+    ].lower()
     assert payload["source_artifacts"]["nashville_human_fact_resolution"]["present"] is True
     assert payload["source_artifacts"]["nashville_private_collector"]["present"] is True
     assert payload["source_artifacts"]["nashville_private_workflow"]["present"] is True
@@ -98,25 +157,48 @@ def test_register_routes_current_actions_without_duplicate_sends():
     launchtn = records["launchtn_3686_pitch_2026"]
     assert launchtn["deadline"] == "2026-08-13T23:59:00-05:00"
     assert launchtn["state"] == (
-        "PORTAL_PACKET_QA_PASSED_HUMAN_FACTS_AND_FOUNDER_APPROVAL_REQUIRED"
+        "NO_SAFE_UPLOAD_SET_PORTAL_FACTS_AND_ATTACHMENT_GATES_OPEN"
     )
-    assert launchtn["attachment_qa_passed_count"] == 2
+    assert launchtn["attachment_qa_passed_count"] == 0
+    assert launchtn["attachment_structural_qa_passed_count"] == 2
     assert launchtn["attachment_required_count"] == 2
+    assert launchtn["response_ready"] is False
+    assert launchtn["safe_upload_set"] == []
     assert launchtn["send_now"] is False
-    assert "final rendered application" in launchtn["next_action"]
+    assert "LaunchTN-specific deck" in launchtn["next_action"]
+    assert "complete final preview" in launchtn["next_action"]
     assert payload["source_artifacts"]["launchtn_application_manifest"]["present"] is True
     assert payload["source_artifacts"]["launchtn_pitch_deck"]["present"] is True
     assert payload["source_artifacts"]["launchtn_financial_model"]["present"] is True
-    assert records["epri_open_power_ai_mou"]["decision"] == "MONITOR_FOR_MOU_NO_DUPLICATE"
-    assert records["epri_open_power_ai_mou"]["state"] == "OUTBOUND_SENT_MOU_PENDING"
+    assert records["epri_open_power_ai_mou"]["decision"] == (
+        "PRIVATE_CUSTODY_REVIEW_REQUESTED_ASSET_PENDING_NO_REPLY"
+    )
+    assert records["epri_open_power_ai_mou"]["state"] == (
+        "MOU_COMPLETED_BY_ALL_PARTIES_PRIVATE_CUSTODY_REQUIRED"
+    )
+    assert records["epri_open_power_ai_mou"]["all_parties_completed"] is True
+    assert records["epri_open_power_ai_mou"]["completed_document_attached"] is True
+    assert records["epri_open_power_ai_mou"][
+        "completed_document_private_custody_required"
+    ] is True
+    assert records["epri_open_power_ai_mou"]["onboarding_obligations_reviewed"] is False
     assert records["epri_open_power_ai_mou"]["do_not_duplicate_send"] is True
-    assert records["epri_open_power_ai_mou"]["no_send_before"] == "2026-07-23"
+    assert records["epri_open_power_ai_mou"]["no_send_before"] is None
     assert records["epri_open_power_ai_mou"]["latest_mailbox_event"] == (
-        "AUTOMATIC_OUT_OF_OFFICE"
+        "MOU_COMPLETED_BY_ALL_PARTIES"
     )
-    assert records["epri_open_power_ai_mou"]["out_of_office_through"] == (
-        "2026-07-20"
+    assert records["epri_open_power_ai_mou"]["user_reported_signing_complete"] is True
+    assert records["epri_open_power_ai_mou"]["onboarding_request_observed"] is True
+    assert records["epri_open_power_ai_mou"]["onboarding_response_sent"] is True
+    assert records["epri_open_power_ai_mou"]["mrc_invite_observed"] is True
+    assert records["epri_open_power_ai_mou"]["canonical_logo_files_sent"] is False
+    assert records["epri_open_power_ai_mou"]["requested_asset_template_id"] == (
+        "REQUESTED_ASSET_DELIVERY_REPLY"
     )
+    assert payload["source_artifacts"]["epri_mou_signing_state"]["present"] is True
+    assert payload["source_artifacts"]["official_inbound_status_event_register"][
+        "present"
+    ] is True
     assert records["georgia_patents_pro_bono_intake"]["state"] == (
         "SERVICE_NOT_OFFERED_FOR_ALREADY_FILED_APPLICATION"
     )
@@ -154,7 +236,25 @@ def test_register_routes_current_actions_without_duplicate_sends():
     )
     assert records["sam_public_credential_rotation"]["send_now"] is False
     assert records["cdc_ai_acquisition_rfi"]["decision"] == "MONITOR_NO_REPLY_REQUIRED"
-    assert records["lanl_vision_licensing_followup"]["no_send_before"] == "2026-07-23"
+    lanl = records["lanl_vision_licensing_followup"]
+    assert lanl["state"] == (
+        "BOUNDED_FOLLOWUP_SENT_RESPONSE_PENDING_INBOUND_ONLY"
+    )
+    assert lanl["decision"] == "FOLLOWUP_LIMIT_REACHED_NO_SEND"
+    assert lanl["no_send_before"] == "2026-07-23T14:00:00Z"
+    assert lanl["queue_action_state"] == "FOLLOWUP_LIMIT_REACHED_NO_SEND"
+    assert lanl["inbox_recheck_required"] is False
+    assert lanl["draft_rendered"] is False
+    assert lanl["eligible_template_id"] == "BOUNDED_REVIEW_FOLLOWUP"
+    assert lanl["current_response_template_id"] == "NO_DUPLICATE_MONITOR"
+    assert lanl["recorded_proactive_send_count"] == 1
+    assert lanl["max_proactive_sends"] == 1
+    assert lanl["response_ready"] is False
+    assert lanl["response_artifact"].endswith(
+        "OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json"
+    )
+    assert "allowance is exhausted" in lanl["next_action"]
+    assert "follow_up_template" not in lanl
     assert records["terry_vynetic_followup"]["decision"] == (
         "MONITOR_NO_FURTHER_FOLLOWUP"
     )
@@ -162,7 +262,11 @@ def test_register_routes_current_actions_without_duplicate_sends():
     assert records["terry_vynetic_followup"]["outbound_spacing_seconds"] == 10
     assert records["terry_vynetic_followup"]["send_now"] is False
     assert records["terry_vynetic_followup"]["do_not_duplicate_send"] is True
-    assert "Send nothing further" in records["terry_vynetic_followup"][
+    assert records["terry_vynetic_followup"]["conflicting_gmail_draft_count"] == 1
+    assert records["terry_vynetic_followup"]["draft_quarantine_status"] == (
+        "QUARANTINED_NOT_SENDABLE"
+    )
+    assert "Do not send or revive this draft" in records["terry_vynetic_followup"][
         "next_action"
     ]
     darpa = records["darpa_sn_26_97_low_resource_computing_rfi"]
@@ -203,6 +307,10 @@ def test_register_routes_current_actions_without_duplicate_sends():
         for path in fhwa["supporting_artifacts"]
     )
     assert payload["source_artifacts"]["email_action_reconciliation"]["present"] is True
+    assert payload["source_artifacts"]["outreach_followup_action_queue"]["present"] is True
+    assert payload["source_artifacts"]["outreach_draft_quarantine_state"][
+        "present"
+    ] is True
     assert records["nasa_data_center_rfi"]["do_not_duplicate_send"] is True
     assert records["army_aidp_draft_cfs_feedback"]["do_not_duplicate_send"] is True
 
@@ -218,10 +326,10 @@ def test_all_transmitted_attachments_match_receipts():
         assert check["sha256_match"] is True
         assert check["bytes_match"] is True
     assert payload["attachment_checks"]["launchtn_pitch_deck"]["qa_status"] == (
-        "QA_PASSED_FOUNDER_APPROVAL_REQUIRED"
+        "VENUE_DECK_QA_PASSED_FOUNDER_FACTS_AND_FINAL_REVIEW_REQUIRED"
     )
     assert payload["attachment_checks"]["launchtn_financial_model"]["qa_status"] == (
-        "QA_PASSED_FOUNDER_APPROVAL_REQUIRED"
+        "PLANNING_MODEL_ARITHMETIC_QA_ONLY_FOUNDER_ASSUMPTION_APPROVAL_REQUIRED"
     )
 
 
@@ -232,10 +340,14 @@ def test_register_preserves_claim_and_privacy_boundaries():
     lowered = rendered.lower()
 
     assert "duplicate sends would reduce credibility" in payload["direct_answer"]
-    assert "portal displayed a submission confirmation" in payload["direct_answer"]
-    assert "without resubmitting or implying selection" in payload["direct_answer"]
+    assert "selected LumenCore for the Fall 2026 TakeOff cohort" in payload[
+        "direct_answer"
+    ]
+    assert "participation agreement are due July 31" in payload["direct_answer"]
+    assert "email did not state a timezone" in payload["direct_answer"]
     assert "do not resend" in lowered
-    assert "MOU-routing information only" in rendered
+    assert "mou_completed_by_all_parties_private_custody_required" in lowered
+    assert "does not establish eligibility" in rendered
     assert "does not prove" in payload["claim_boundary"]
     assert "do_not_treat_as_official_sam_notice" in lowered
     assert "full legal name:" not in lowered
@@ -316,18 +428,19 @@ def test_historical_response_state_mirror_remains_intact_on_e_drive():
     assert "does not prove" in receipt["claim_boundary"].lower()
 
 
-def test_lanl_followup_is_held_and_bounded():
+def test_lanl_followup_is_queue_derived_and_not_inlined():
     module = load_module()
     payload = module.build_payload("2026-07-16T23:59:00Z")
     lanl = next(row for row in payload["records"] if row["lane_id"] == "lanl_vision_licensing_followup")
-    body = lanl["follow_up_template"]["body"]
+    serialized = json.dumps(payload, sort_keys=True)
 
     assert lanl["send_now"] is False
     assert lanl["do_not_duplicate_send"] is True
-    assert "Stage 0 diligence session" in body
-    assert "not asserting a license" in body
-    assert "field validation" in body
-    assert "production readiness" in body
+    assert lanl["queue_action_state"] == "FOLLOWUP_LIMIT_REACHED_NO_SEND"
+    assert lanl["response_ready"] is False
+    assert "follow_up_template" not in lanl
+    assert "Michael and Neil" not in serialized
+    assert "Follow-up: LumenCore package for LANL VISION licensing discussion" not in serialized
 
 
 def test_mirror_receipt_matches_every_bounded_source():

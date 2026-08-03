@@ -17,24 +17,30 @@ def load_module():
     return module
 
 
-def test_gauntlet_surfaces_current_champion_without_field_claim():
+def test_gauntlet_surfaces_measured_nonpromotion_without_champion_claim():
     module = load_module()
     payload = module.build_payload()
     summary = payload["summary"]
     strongest = payload["strongest_current"]
 
-    assert payload["schema"] == "champion_metric_gauntlet_v1"
+    assert payload["schema"] == "champion_metric_gauntlet_v2"
     assert strongest["family"] == "kuramoto_phase_coupling"
-    assert strongest["named_baseline"] == "kalman_filter"
-    assert summary["holdout_count"] >= 20
-    assert summary["holdout_wins"] >= 20
-    assert summary["holdout_win_rate"] >= 0.8
-    assert summary["estimated_rows_replayed"] >= 1_000_000
-    assert summary["source_system_count"] >= 3
+    assert strongest["named_baseline"] == "kalman_local_linear_trend"
+    assert strongest["development_selected_candidate"] == "lissajous_phase_paths"
+    assert strongest["candidate_was_protocol_selected"] is False
+    assert summary["internal_champion"] is False
+    assert summary["protocol_grade_internal_champion"] is False
+    assert summary["holdout_count"] >= 1_500
+    assert summary["holdout_wins"] < summary["holdout_count"] / 2
+    assert summary["holdout_win_rate"] < 0.5
+    assert summary["mean_delta_vs_named_baseline"] < 0
+    assert summary["estimated_rows_replayed"] >= 15_000
+    assert summary["source_system_count"] == 1
     assert summary["broader_measured_provider_count"] >= summary["source_system_count"]
     assert summary["manifest_unique_source_count"] >= summary["source_system_count"]
-    assert summary["reviewer_safe_internal_claim_allowed"] is True
-    assert summary["buyer_authorized_field_replay_request_ready"] is True
+    assert summary["reviewer_safe_internal_claim_allowed"] is False
+    assert summary["reviewer_safe_measured_nonpromotion_claim_allowed"] is True
+    assert summary["buyer_authorized_field_replay_request_ready"] is False
     assert summary["field_validation_claim_allowed"] is False
     assert summary["real_dollar_savings_claim_allowed"] is False
     assert summary["live_trading_or_autonomous_execution_allowed"] is False
@@ -46,10 +52,13 @@ def test_gauntlet_has_passes_and_blockers():
     gates = {row["name"]: row for row in payload["metric_gauntlet"]}
 
     assert gates["holdout_depth"]["passed"] is True
-    assert gates["baseline_win_count"]["passed"] is True
-    assert gates["minimum_delta_positive"]["passed"] is True
-    assert gates["sign_test_strength"]["passed"] is True
-    assert gates["source_system_diversity"]["passed"] is True
+    assert gates["development_selection_frozen"]["passed"] is False
+    assert gates["development_selection_frozen"]["blocker"] is True
+    assert gates["baseline_win_rate"]["passed"] is False
+    assert gates["mean_skill_positive"]["passed"] is False
+    assert gates["all_source_specific_baselines_global_holm"]["passed"] is False
+    assert gates["all_source_specific_baselines_global_holm"]["blocker"] is True
+    assert gates["authority_coverage"]["passed"] is True
     assert gates["row_replay_depth"]["passed"] is True
     assert gates["field_validation"]["passed"] is False
     assert gates["field_validation"]["blocker"] is True
@@ -89,7 +98,7 @@ def test_markdown_answers_what_to_ask_and_refuses_overclaiming():
     assert "Metric Expansion Suite" in rendered
     assert "Field-validation claim allowed: `false`" in rendered
     assert "Real-dollar savings claim allowed: `false`" in rendered
-    assert "Buyer-authorized field replay request ready: `true`" in rendered
+    assert "Buyer-authorized field replay request ready: `false`" in rendered
     assert "guaranteed grant" not in dumped
     assert "guaranteed profit" not in dumped
     assert "money printer" not in dumped
@@ -110,7 +119,7 @@ def test_gauntlet_separates_champion_replay_from_broader_live_sources():
     assert manifest["unique_source_count"] >= replay["source_system_count"]
     assert manifest["ready_for_benchmark_row_count"] >= replay["source_system_count"]
     assert "not the same metric" in boundary
-    assert "not automatically part of the current champion win" in boundary
+    assert "do not imply a champion" in boundary
 
 
 def test_gauntlet_documents_hardware_and_fixed_dollar_blockers():

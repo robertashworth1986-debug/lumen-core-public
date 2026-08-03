@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -20,17 +21,32 @@ def test_evtit_sprint_scope_is_ready_but_human_terms_gated():
     module = load_module()
     payload = module.build_payload()
     summary = payload["summary"]
+    source_register = json.loads(
+        (
+            ROOT
+            / "out"
+            / "ops"
+            / "measured_source_evidence_register_latest.json"
+        ).read_text(encoding="utf-8")
+    )["summary"]
 
     assert payload["schema"] == "evtit_technical_sprint_scope_packet_v1"
     assert payload["status"] == "EVTIT_TECHNICAL_SPRINT_SCOPE_INTERNAL_ONLY_MONITOR_NO_SEND"
     assert summary["workstream_count"] == 6
     assert summary["milestone_count"] == 5
-    assert summary["reviewer_gate_clear"] is True
+    assert summary["reviewer_packaging_gate_clear"] is True
+    assert summary["submission_argument_gate_clear"] is False
     assert summary["unsafe_secret_count"] == 0
     assert summary["unsafe_claim_count"] == 0
-    assert summary["registry_enabled_sources"] == 29
-    assert summary["registry_measured_sources"] == 25
-    assert summary["current_probe_measured_sources"] == 23
+    assert summary["registry_enabled_sources"] == (
+        source_register["registry_enabled_sources"]
+    )
+    assert summary["registry_measured_sources"] == (
+        source_register["registry_measured_sources"]
+    )
+    assert summary["current_probe_measured_sources"] == (
+        source_register["current_probe_measured_sources"]
+    )
     assert summary["human_terms_required"] is True
     assert summary["monitor_only"] is True
     assert summary["do_not_duplicate_send"] is True

@@ -6,65 +6,40 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "code" / "ops" / "BUILD_GEOMETRY_REPEAT_UNCERTAINTY_REPORT.py"
+SCRIPT = (
+    ROOT / "code" / "ops" / "BUILD_GEOMETRY_REPEAT_UNCERTAINTY_REPORT.py"
+)
 
 
 def load_module():
-    spec = importlib.util.spec_from_file_location("geometry_repeat_uncertainty_report", SCRIPT)
+    spec = importlib.util.spec_from_file_location(
+        "geometry_repeat_uncertainty_report", SCRIPT
+    )
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
 
 
-def test_uncertainty_report_promotes_two_robust_repeat_candidates():
+def test_uncertainty_report_fail_closes_without_qualified_repeats():
     module = load_module()
     payload = module.build_payload()
     summary = payload["summary"]
-    by_family = {row["family_id"]: row for row in payload["analyses"]}
 
-    assert payload["schema"] == "geometry_repeat_uncertainty_report_v1"
-    assert summary["family_count"] >= 4
-    assert summary["robust_repeat_uncertainty_gate_passed_count"] == 2
-    assert summary["total_windows_analyzed"] >= 24
-    assert summary["total_winning_windows"] >= 21
+    assert payload["schema"] == "geometry_repeat_uncertainty_report_v2"
+    assert summary["family_count"] == 5
+    assert summary["robust_repeat_uncertainty_gate_passed_count"] == 0
+    assert summary["total_windows_analyzed"] == 0
+    assert summary["total_winning_windows"] == 0
+    assert summary["uncertainty_computable"] is False
+    assert summary["robust_candidates"] == []
     assert len(summary["uncertainty_chain_sha256"]) == 64
 
-    brach = by_family["brachistochrone_descent"]
-    assert brach["win_count"] == brach["window_count"] >= 12
-    assert brach["delta_stats"]["min_delta"] > 0.06
-    assert brach["delta_stats"]["normal_t_lower_95_delta"] > 0.06
-    assert brach["wilson_lower_95_win_rate"] > 0.6
-    assert brach["one_sided_sign_test_p_value"] < 0.001
-    assert brach["robust_repeat_uncertainty_gate_passed"] is True
-    assert brach["blockers"] == []
-
-    kuramoto = by_family["kuramoto_phase_coupling"]
-    assert kuramoto["win_count"] == kuramoto["window_count"] >= 5
-    assert kuramoto["delta_stats"]["min_delta"] > 0.10
-    assert kuramoto["delta_stats"]["normal_t_lower_95_delta"] > 0.10
-    assert kuramoto["wilson_lower_95_win_rate"] >= 0.5
-    assert kuramoto["one_sided_sign_test_p_value"] <= 0.05
-    assert kuramoto["robust_repeat_uncertainty_gate_passed"] is True
-    assert kuramoto["blockers"] == []
-
-
-def test_uncertainty_report_blocks_unstable_or_under_sourced_rows():
-    module = load_module()
-    payload = module.build_payload()
-    by_family = {row["family_id"]: row for row in payload["analyses"]}
-
-    leaf = by_family["leaf_veins"]
-    assert leaf["robust_repeat_uncertainty_gate_passed"] is False
-    assert "not_all_windows_positive" in leaf["blockers"]
-    assert "non_positive_min_delta" in leaf["blockers"]
-    assert "sign_test_not_below_0_05" in leaf["blockers"]
-
-    thermal = by_family["thermal_plume_convection"]
-    assert thermal["win_count"] == thermal["window_count"] >= 12
-    assert thermal["delta_stats"]["normal_t_lower_95_delta"] > 0
-    assert thermal["robust_repeat_uncertainty_gate_passed"] is False
-    assert "minimum_source_count_below_3" in thermal["blockers"]
+    for row in payload["analyses"]:
+        assert row["robust_repeat_uncertainty_gate_passed"] is False
+        assert row["window_count"] == 0
+        assert row["delta_stats"]["mean_delta"] is None
+        assert "independent_repeat_runs_missing" in row["blockers"]
 
 
 def test_uncertainty_report_keeps_sales_and_field_claim_gates_closed():
@@ -95,10 +70,8 @@ def test_uncertainty_report_markdown_is_reviewer_safe():
     rendered = module.render_markdown(module.build_payload())
 
     assert "Geometry Repeat Uncertainty Report" in rendered
-    assert "Robust repeat-window candidates: `2`" in rendered
+    assert "Robust repeat-window candidates: `0`" in rendered
+    assert "Uncertainty computable: `false`" in rendered
     assert "Ready for field-validation claim: `false`" in rendered
     assert "Ready for real-dollar claim: `false`" in rendered
-    assert "`brachistochrone_descent`" in rendered
-    assert "`kuramoto_phase_coupling`" in rendered
     assert "not a prospective field trial" in rendered
-    assert "Real-dollar claims require" in rendered

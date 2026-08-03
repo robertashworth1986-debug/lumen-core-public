@@ -1,23 +1,24 @@
 # Baseline Gauntlet Coverage
 
-Generated UTC: `2026-07-09T20:45:02.705272+00:00`
+Generated UTC: `2026-07-29T08:11:03.613121+00:00`
 
-Baseline coverage audit only. EXECUTED means present in the locked source-conditioned replay feed. REGISTERED means named in the benchmark registry but not run by the current adapter. Per-baseline comparison and win counts come from route-level comparison rows where available. Missing advanced adapters or IEEE cases must be added before those baselines can be claimed as tested. This is not field validation or realized savings.
+Compatibility-gated baseline coverage audit only. EXECUTED means a requested baseline category maps to a comparison family in the current locked replay. REGISTERED means named in the benchmark registry but not run by the current adapter. Context-only manifest rows and incompatible tasks are excluded. Missing advanced adapters or IEEE cases must be added before those baselines can be claimed as tested. This is not field validation, superiority, or realized savings.
 
 ## Summary
 
 - Requested baselines: `29`
-- Executed in locked replay: `17`
+- Requested categories executed in locked replay: `9`
+- Distinct comparison families in locked replay: `21`
 - Replay proxy ready from accepted-metric audit: `2`
-- Registered but not adapter-executed: `1`
+- Registered but not adapter-executed: `2`
 - Blocked by missing package/dataset: `0`
-- Implementation needed: `8`
-- Locked replay comparisons: `2303`
-- Locked replay candidate wins: `1540`
-- Locked replay estimated rows: `7154095`
-- Locked replay numeric samples: `98056`
-- Attribution scope: Per-baseline comparisons and candidate wins are counted from route-level comparison rows. Rows replayed are per-baseline exposure counts and should not be summed as unique global rows.
-- SHA-256: `809e7dd4e85a0e08d473fa2de0893d1156c6b72d9a1594ed64e05707e6f195d9`
+- Implementation needed: `15`
+- Locked replay comparisons: `22`
+- Locked replay candidate wins: `10`
+- Locked replay estimated rows: `0`
+- Locked replay numeric samples: `32608`
+- Attribution scope: Executed-in-locked-replay counts only the 29 reviewer-requested categories that map to a current comparison family. Distinct baseline families counts every source-native or domain-native comparison family. Row exposure is repeated per baseline and must not be summed as unique global rows.
+- SHA-256: `ce9c9a3f042ee94eb23b01b3eef7be47af5074a6bfbffb9982f1374bf7aac736`
 
 ## Package Status
 
@@ -35,27 +36,27 @@ Baseline coverage audit only. EXECUTED means present in the locked source-condit
 
 | Baseline | Status | Matched Replay Baselines | Route Comparisons | Candidate Wins | Row Exposure | Lanes | Missing Packages | Next Unlock |
 | --- | --- | --- | ---: | ---: | ---: | --- | --- | --- |
-| Persistence / last-value forecast | `EXECUTED_IN_LOCKED_REPLAY` | `persistence` | `97` | `79` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| Rolling mean | `EXECUTED_IN_LOCKED_REPLAY` | `rolling_mean` | `97` | `54` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| Exponential smoothing / EWMA | `EXECUTED_IN_LOCKED_REPLAY` | `ewma` | `97` | `41` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| ARIMA or SARIMAX | `EXECUTED_IN_LOCKED_REPLAY` | `arima` | `165` | `165` | `2881321` | `wave_resonance_timing` | `` |  |
-| Seasonal naive | `EXECUTED_IN_LOCKED_REPLAY` | `seasonal_naive` | `97` | `53` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| Holt-Winters / ETS | `EXECUTED_IN_LOCKED_REPLAY` | `holt_winters_ets` | `97` | `55` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| Kalman filter | `EXECUTED_IN_LOCKED_REPLAY` | `kalman_filter, scalar_kalman_filter` | `262` | `196` | `5156061` | `energy_price_pressure_proxy, wave_resonance_timing` | `` |  |
-| Extended Kalman filter | `EXECUTED_IN_LOCKED_REPLAY` | `extended_kalman_filter` | `97` | `29` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| Unscented Kalman filter | `EXECUTED_IN_LOCKED_REPLAY` | `unscented_kalman_filter` | `97` | `33` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| Particle filter | `EXECUTED_IN_LOCKED_REPLAY` | `particle_filter` | `97` | `79` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| Gaussian process regression | `EXECUTED_IN_LOCKED_REPLAY` | `gaussian_process_regression` | `97` | `48` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| Gradient boosting: XGBoost | `EXECUTED_IN_LOCKED_REPLAY` | `xgboost` | `97` | `50` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| Gradient boosting: LightGBM | `EXECUTED_IN_LOCKED_REPLAY` | `lightgbm` | `97` | `51` | `2274740` | `energy_price_pressure_proxy` | `` |  |
-| Random forest regression | `EXECUTED_IN_LOCKED_REPLAY` | `random_forest_regression` | `97` | `48` | `2274740` | `energy_price_pressure_proxy` | `` |  |
+| Persistence / last-value forecast | `EXECUTED_IN_LOCKED_REPLAY` | `naive_last` | `2` | `0` | `32548` | `time_series_model_routing, wave_resonance_timing` | `` |  |
+| Rolling mean | `EXECUTED_IN_LOCKED_REPLAY` | `moving_average` | `1` | `1` | `17298` | `time_series_model_routing` | `` |  |
+| Exponential smoothing / EWMA | `EXECUTED_IN_LOCKED_REPLAY` | `exponential_smoothing` | `1` | `1` | `17298` | `time_series_model_routing` | `` |  |
+| ARIMA or SARIMAX | `REGISTERED_BASELINE_NOT_ADAPTER_EXECUTED` | `arima` | `0` | `0` | `0` | `` | `` |  |
+| Seasonal naive | `EXECUTED_IN_LOCKED_REPLAY` | `seasonal_naive_7, seasonal_naive_source_period` | `2` | `1` | `32548` | `time_series_model_routing, wave_resonance_timing` | `` |  |
+| Holt-Winters / ETS | `EXECUTED_IN_LOCKED_REPLAY` | `damped_holt_ets` | `1` | `0` | `17298` | `time_series_model_routing` | `` |  |
+| Kalman filter | `EXECUTED_IN_LOCKED_REPLAY` | `kalman_local_linear_trend` | `1` | `0` | `15250` | `wave_resonance_timing` | `` |  |
+| Extended Kalman filter | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
+| Unscented Kalman filter | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
+| Particle filter | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
+| Gaussian process regression | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
+| Gradient boosting: XGBoost | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
+| Gradient boosting: LightGBM | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
+| Random forest regression | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
 | LSTM forecast | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
 | TCN forecast | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
 | Small transformer forecast | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
 | Model predictive control baseline | `REGISTERED_BASELINE_NOT_ADAPTER_EXECUTED` | `model_predictive_control` | `0` | `0` | `0` | `` | `` |  |
-| Dijkstra routing baseline | `EXECUTED_IN_LOCKED_REPLAY` | `dijkstra` | `11` | `11` | `695728` | `branching_transport` | `` |  |
-| A* routing baseline | `EXECUTED_IN_LOCKED_REPLAY` | `a_star` | `11` | `11` | `695728` | `branching_transport` | `` |  |
-| Min-cost flow routing baseline | `EXECUTED_IN_LOCKED_REPLAY` | `min_cost_flow` | `11` | `9` | `695728` | `branching_transport` | `` |  |
+| Dijkstra routing baseline | `EXECUTED_IN_LOCKED_REPLAY` | `dijkstra` | `1` | `1` | `42` | `branching_transport` | `` |  |
+| A* routing baseline | `EXECUTED_IN_LOCKED_REPLAY` | `a_star` | `1` | `1` | `42` | `branching_transport` | `` |  |
+| Min-cost flow routing baseline | `EXECUTED_IN_LOCKED_REPLAY` | `min_cost_flow` | `1` | `1` | `42` | `branching_transport` | `` |  |
 | DC power-flow baseline | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
 | OPF baseline | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
 | IEEE 39-bus grid benchmark case | `IMPLEMENTATION_NEEDED` | `` | `0` | `0` | `0` | `` | `` |  |
@@ -67,8 +68,9 @@ Baseline coverage audit only. EXECUTED means present in the locked source-condit
 
 ## Interpretation
 
-- Executed locked replay coverage now includes classical forecast baselines, ETS/Holt-Winters, ARIMA, scalar/standard Kalman plus EKF/UKF/particle filters, Gaussian process, random forest, XGBoost, LightGBM, and min-cost-flow routing.
+- Executed compatibility-gated coverage includes persistence, moving average, exponential smoothing, source-period seasonal naive, damped Holt/ETS, local-linear-trend Kalman, min-cost-flow, Dijkstra, and A* categories, plus additional source-native comparison families shown in the locked replay.
+- ARIMA/SARIMAX, EKF/UKF/particle filters, Gaussian process, random forest, XGBoost, and LightGBM are not currently executed by this compatibility-gated adapter and must not be described as tested.
 - Kuramoto order-parameter and phase-bound stress are now represented as accepted-metric replay proxies through the Kuramoto accepted metric audit; this improves reviewer language without claiming physical field validation.
-- MPC, Dijkstra, and A* are registered in the geometry registry but are not executed by this locked replay adapter yet.
+- Routing/control baseline status is generated from the replay rows: executed `dijkstra, a_star`; registered but not executed `model_predictive_control`.
 - LSTM/TCN/small-transformer forecasts, DC power-flow/OPF, IEEE 39/118/300 bus cases, and critical-coupling metrics still need adapters, accepted topology files, or buyer/agency-approved benchmark data.
 - This strengthens the technical validation story, but it still does not authorize field-validation, realized-savings, trading-profit, safety, medical, or certification claims.

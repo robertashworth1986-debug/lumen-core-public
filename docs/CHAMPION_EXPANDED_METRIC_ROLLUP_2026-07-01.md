@@ -1,11 +1,11 @@
 # Champion Expanded Metric Rollup
 
-Generated UTC: `2026-07-03T00:12:57.281477+00:00`
-Rollup SHA-256: `afddb05e3dbe5f04eb8513427866bcb026bea8fff8825d84bff4627ae062881e`
+Generated UTC: `2026-07-13T23:45:54.089608+00:00`
+Rollup SHA-256: `de1b489624442406cf74d76df0cdd5130a6cb5df45db1f018340b19ec74d02c9`
 
 ## Plain English
 
-The strongest current story is not 'everything wins.' It is that one champion family has a clear source-conditioned replay win, with the wave/resonance timing lane standing out as the cleanest high-volume internal lane. Energy price pressure is promising but mixed; branching is honest negative evidence where classic baselines still compete.
+The current story is not 'everything wins.' The wave/resonance timing lane is the cleanest source-conditioned timing result, but no lane currently clears the configured high-volume row gate. Energy price pressure and branching preserve substantial non-win evidence where classic baselines remain competitive.
 
 ## Evidence Summary
 
@@ -13,46 +13,48 @@ The strongest current story is not 'everything wins.' It is that one champion fa
 - Named baseline: `kalman_filter`
 - Holdout wins: `24/24`
 - Lanes: `5`
-- Strong lanes: `3`
-- Total baseline comparisons: `1224`
-- Total candidate wins: `975`
-- Overall locked-lane win rate: `79.66%`
-- Estimated rows replayed: `7152281`
-- Numeric samples read: `93596`
+- Strong lanes: `0`
+- Promising small-sample lanes: `3`
+- Total baseline comparisons: `2861`
+- Total candidate wins: `1458`
+- Total candidate non-wins: `1403`
+- Overall locked-lane win rate: `50.96%`
+- Estimated rows replayed: `96209`
+- Numeric samples read: `127053`
 - Source systems replayed: `8`
-- Source files replayed: `159`
-- Manifest source entries: `159`
+- Source files replayed: `202`
+- Manifest source entries: `202`
 - Field-grade source hygiene passed: `false`
-- Suspicious route results: `2`
+- Suspicious route results: `1`
 - Measured sources: `25/29`
-- Latest bounded measured rows: `823`
+- Latest bounded measured rows: `2580`
 
 ## Lane Scoreboard
 
 | Lane | Status | Wins | Comparisons | Win Rate | Rows | Claim Gate |
 |---|---|---:|---:|---:|---:|---|
-| `wave_resonance_timing` | `STRONG_INTERNAL_REPLAY_WIN` | `588` | `588` | `100.0%` | `2880414` | internal locked replay only; requires buyer-authorized holdout for field validation |
-| `thermal_ventilation` | `STRONG_INTERNAL_REPLAY_WIN` | `24` | `24` | `100.0%` | `441538` | internal locked replay only; requires buyer-authorized holdout for field validation |
-| `optimal_curve_transport` | `PROMISING_SMALL_SAMPLE` | `12` | `12` | `100.0%` | `254187` | internal locked replay only; requires buyer-authorized holdout for field validation |
-| `energy_price_pressure_proxy` | `MIXED_OR_BASELINE_STILL_COMPETITIVE` | `338` | `567` | `59.61%` | `2880414` | internal locked replay only; requires buyer-authorized holdout for field validation |
-| `branching_transport` | `MIXED_OR_BASELINE_STILL_COMPETITIVE` | `13` | `33` | `39.39%` | `695728` | internal locked replay only; requires buyer-authorized holdout for field validation |
+| `wave_resonance_timing` | `PROMISING_SMALL_SAMPLE` | `756` | `756` | `100.0%` | `46303` | internal locked replay only; requires buyer-authorized holdout for field validation |
+| `thermal_ventilation` | `PROMISING_SMALL_SAMPLE` | `42` | `42` | `100.0%` | `1631` | internal locked replay only; requires buyer-authorized holdout for field validation |
+| `optimal_curve_transport` | `PROMISING_SMALL_SAMPLE` | `4` | `4` | `100.0%` | `0` | internal locked replay only; requires buyer-authorized holdout for field validation |
+| `branching_transport` | `MIXED_SMALL_SAMPLE` | `47` | `75` | `62.67%` | `1973` | internal locked replay only; requires buyer-authorized holdout for field validation |
+| `energy_price_pressure_proxy` | `MIXED_SMALL_SAMPLE` | `609` | `1984` | `30.7%` | `46302` | internal locked replay only; requires buyer-authorized holdout for field validation |
 
 ## Top Dataset Champion Cards
 
 | System | Lane | Candidate | Wins | Comparisons | Win Rate | Rows | Source |
 |---|---|---|---:|---:|---:|---:|---|
-| `market_data` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `7` | `7` | `100.0%` | `50` | `alphavantage_20260701T060342Z.json` |
-| `market_data` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `7` | `7` | `100.0%` | `50` | `alphavantage_latest.json` |
-| `market_data` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `7` | `7` | `100.0%` | `48` | `fred_20260701T060342Z.json` |
-| `market_data` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `7` | `7` | `100.0%` | `48` | `fred_latest.json` |
-| `market_data` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `7` | `7` | `100.0%` | `4` | `finnhub_20260701T060342Z.csv` |
-| `maritime_ais` | `optimal_curve_transport` | `brachistochrone_descent` | `4` | `4` | `100.0%` | `249999` | `930-data-export.csv` |
-| `market_data` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `4` | `4` | `100.0%` | `249999` | `LumenLab__crawler_out_master_index.csv__4839a4e25d.csv` |
-| `market_data` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `4` | `4` | `100.0%` | `249999` | `full_beast_leaderboard.csv` |
-| `energy_grid` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `4` | `4` | `100.0%` | `249999` | `Net_generation_United_States_all_sectors_annual (1).csv` |
-| `energy_grid` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `4` | `4` | `100.0%` | `191506` | `Net_generation_for_all_sectors (1).csv` |
-| `market_data` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `4` | `4` | `100.0%` | `160080` | `LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__R.csv__06d36a49d5.csv` |
-| `market_data` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `4` | `4` | `100.0%` | `160080` | `LumenLab__crawler_out_timeseries_C_LumenHybrid_VAULT_WhiteHole__SOURCE_OF_TRUTH_The_master_master_dossier_LumenCore_KPI_Run_2000.csv__a.csv__11dbf13ef1.csv` |
+| `energy_grid` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `16` | `16` | `100.0%` | `369` | `Daily_U.S._nuclear_capacity_outage (1).csv` |
+| `energy_grid` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `16` | `16` | `100.0%` | `369` | `Daily_U.S._nuclear_capacity_outage.csv` |
+| `energy_grid` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `16` | `16` | `100.0%` | `369` | `Daily_U.S._nuclear_capacity_outage (1).csv` |
+| `energy_grid` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `16` | `16` | `100.0%` | `369` | `Daily_U.S._nuclear_capacity_outage.csv` |
+| `market_data` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `16` | `16` | `100.0%` | `100` | `alphavantage_20260713T192646Z.json` |
+| `market_data` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `16` | `16` | `100.0%` | `100` | `alphavantage_latest.json` |
+| `market_data` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `16` | `16` | `100.0%` | `29` | `Net_generation_United_States_all_sectors_annual.csv` |
+| `market_data` | `energy_price_pressure_proxy` | `phase_locked_residual_corrector` | `16` | `16` | `100.0%` | `1` | `930-data-export (1).json` |
+| `weather_climate` | `branching_transport` | `leaf_veins` | `5` | `5` | `100.0%` | `3` | `NOAA_ncdc api.txt` |
+| `water_hydrology` | `branching_transport` | `leaf_veins` | `5` | `5` | `100.0%` | `1` | `usgs_water_20260713T192646Z.csv` |
+| `maritime_ais` | `branching_transport` | `leaf_veins` | `5` | `5` | `100.0%` | `0` | `support_list.json` |
+| `macro_rates_labor` | `wave_resonance_timing` | `kuramoto_phase_coupling` | `4` | `4` | `100.0%` | `16042` | `fred_DGS10.csv` |
 
 ## Claim State
 

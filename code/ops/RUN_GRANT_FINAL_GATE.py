@@ -4,15 +4,24 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
+CODE_ROOT = ROOT / "code"
+if str(CODE_ROOT) not in sys.path:
+    sys.path.insert(0, str(CODE_ROOT))
+
+from submission_conformance_guard import assess_submission_conformance
+
 OUT_OPS = ROOT / "out" / "ops"
 OUT_GATE = OUT_OPS / "grant_final_gate"
 APP_PACKETS = ROOT / "out" / "grants" / "application_packets"
 APPROVED_ROOT = ROOT / "out" / "grants" / "_approved"
+CONFORMANCE_GATE_PATH = OUT_OPS / "submission_conformance_gate_latest.json"
+CONFORMANCE_MAX_AGE_HOURS = 24.0
 
 REQUIRED_DOCS = [
     "application.json",
@@ -67,6 +76,42 @@ def load_json(path: Path) -> Any:
         return None
 
 
+def current_active_submission_candidates() -> list[dict[str, str]]:
+    payload = load_json(CONFORMANCE_GATE_PATH)
+    if not isinstance(payload, dict):
+        return []
+
+    candidates: list[dict[str, str]] = []
+    lanes = payload.get("lanes")
+    if not isinstance(lanes, list):
+        return candidates
+
+    for lane in lanes:
+        if not isinstance(lane, dict):
+            continue
+        is_active = (
+            lane.get("submission_candidate_active") is True
+            or str(lane.get("disposition") or "") == "ACTIVE_SUBMISSION_CANDIDATE"
+        )
+        lane_id = str(lane.get("lane_id") or "").strip()
+        if not is_active or not lane_id:
+            continue
+        candidate = lane.get("candidate_artifact")
+        candidate_path = (
+            str(candidate.get("path") or "").strip()
+            if isinstance(candidate, dict)
+            else ""
+        )
+        candidates.append(
+            {
+                "lane_id": lane_id,
+                "status": str(lane.get("status") or "UNKNOWN"),
+                "candidate_artifact": candidate_path,
+            }
+        )
+    return sorted(candidates, key=lambda row: row["lane_id"])
+
+
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as fh:
@@ -113,6 +158,62 @@ def find_latest_application_packet(opp_num: str) -> Path | None:
 
 def normalize_opp_slug(opp_num: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", opp_num.strip().lower()).strip("_")
+
+
+def submission_conformance_inputs(
+    opp_num: str,
+    packet: dict[str, Any] | None,
+    application: dict[str, Any] | None,
+    submission_packet: dict[str, Any] | None,
+) -> tuple[list[Any], list[Any]]:
+    sources = [
+        source
+        for source in (packet, application, submission_packet)
+        if isinstance(source, dict)
+    ]
+    identifiers: list[Any] = [opp_num]
+    explicit_lane_ids: list[Any] = []
+    for source in sources:
+        identifiers.extend(
+            [
+                source.get("grant_id"),
+                source.get("program_id"),
+                source.get("opp_num"),
+                source.get("opportunity_id"),
+            ]
+        )
+        explicit_lane_ids.extend(
+            [
+                source.get("submission_conformance_lane_id"),
+                source.get("conformance_lane_id"),
+            ]
+        )
+        for nested_key in (
+            "opportunity",
+            "submission_readiness",
+            "submission_conformance",
+        ):
+            nested = source.get(nested_key)
+            if not isinstance(nested, dict):
+                continue
+            identifiers.extend(
+                [
+                    nested.get("grant_id"),
+                    nested.get("program_id"),
+                    nested.get("opp_num"),
+                    nested.get("opportunity_id"),
+                ]
+            )
+            explicit_lane_ids.extend(
+                [
+                    nested.get("submission_conformance_lane_id"),
+                    nested.get("conformance_lane_id"),
+                    nested.get("lane_id")
+                    if nested_key == "submission_conformance"
+                    else None,
+                ]
+            )
+    return identifiers, explicit_lane_ids
 
 
 def find_latest_approved_run(opp_num: str) -> Path | None:
@@ -229,15 +330,35 @@ def build_gate(opp_num: str) -> dict[str, Any]:
     packet_path = find_latest_application_packet(opp_num)
     run_dir = find_latest_approved_run(opp_num)
 
-    blockers: list[str] = []
+    action_blockers: list[str] = []
     warnings: list[str] = []
 
     if packet_path is None:
-        blockers.append(f"No application packet found for {opp_num}")
+        action_blockers.append(f"No application packet found for {opp_num}")
     if run_dir is None:
-        blockers.append(f"No approved run directory found for {opp_num}")
+        action_blockers.append(f"No approved run directory found for {opp_num}")
 
     packet = load_json(packet_path) if packet_path else None
+    application = load_json(run_dir / "application.json") if run_dir is not None else None
+    submission_packet = (
+        load_json(run_dir / "submission_packet.json")
+        if run_dir is not None
+        else None
+    )
+    identifiers, explicit_lane_ids = submission_conformance_inputs(
+        opp_num,
+        packet if isinstance(packet, dict) else None,
+        application if isinstance(application, dict) else None,
+        submission_packet if isinstance(submission_packet, dict) else None,
+    )
+    submission_conformance = assess_submission_conformance(
+        gate_path=CONFORMANCE_GATE_PATH,
+        repo_root=ROOT,
+        identifiers=identifiers,
+        explicit_lane_ids=explicit_lane_ids,
+        max_age_hours=CONFORMANCE_MAX_AGE_HOURS,
+    )
+    content_blockers = list(submission_conformance.get("blockers") or [])
 
     docs_review: list[dict[str, Any]] = []
     if run_dir is not None:
@@ -246,14 +367,14 @@ def build_gate(opp_num: str) -> dict[str, Any]:
 
     missing_docs = [r["path"] for r in docs_review if not r.get("exists")]
     if missing_docs:
-        blockers.append(f"Missing required packet docs: {missing_docs}")
+        action_blockers.append(f"Missing required packet docs: {missing_docs}")
 
     for row in docs_review:
         path_rel = str(row.get("path") or "")
         name = Path(path_rel).name if path_rel else ""
         hits = row.get("placeholder_hits", [])
         if name in CRITICAL_PLACEHOLDER_DOCS and isinstance(hits, list) and hits:
-            blockers.append(f"Placeholder tokens remain in {name}: {hits}")
+            action_blockers.append(f"Placeholder tokens remain in {name}: {hits}")
         elif isinstance(hits, list) and hits:
             warnings.append(f"Placeholder tokens remain in {name}: {hits}")
 
@@ -265,7 +386,7 @@ def build_gate(opp_num: str) -> dict[str, Any]:
 
     state = str(approval_state.get("state") or "").strip().lower()
     if state != "approved":
-        blockers.append(f"approval_state must be approved, found: {state or 'missing'}")
+        action_blockers.append(f"approval_state must be approved, found: {state or 'missing'}")
 
     manifest_check = verify_manifest(run_dir) if run_dir is not None else {
         "status": "FAIL",
@@ -274,9 +395,8 @@ def build_gate(opp_num: str) -> dict[str, Any]:
         "failures": ["run_dir missing"],
     }
     if manifest_check.get("status") != "PASS":
-        blockers.append(f"manifest verification failed: {manifest_check.get('failures', [])}")
+        action_blockers.append(f"manifest verification failed: {manifest_check.get('failures', [])}")
 
-    submission_packet = load_json(run_dir / "submission_packet.json") if run_dir is not None else None
     if isinstance(submission_packet, dict):
         pkt_state = str(submission_packet.get("approval_state") or "")
         if pkt_state and pkt_state.lower() != state:
@@ -295,7 +415,7 @@ def build_gate(opp_num: str) -> dict[str, Any]:
     else:
         days_remaining = (parsed_deadline.date() - datetime.now(timezone.utc).date()).days
         if days_remaining < 0:
-            blockers.append(f"Opportunity appears expired based on close_date {close_date}")
+            action_blockers.append(f"Opportunity appears expired based on close_date {close_date}")
         elif days_remaining == 0:
             warnings.append("Deadline appears to be today; submit immediately with AOR")
         elif days_remaining <= 2:
@@ -313,19 +433,28 @@ def build_gate(opp_num: str) -> dict[str, Any]:
         applicant_checks["sam_active"] = bool(org.get("sam_registered") is True)
 
     if not applicant_checks["uei_present"]:
-        blockers.append("UEI missing in organization block")
+        action_blockers.append("UEI missing in organization block")
     if not applicant_checks["ein_present"]:
-        blockers.append("EIN missing in organization block")
+        action_blockers.append("EIN missing in organization block")
     if not applicant_checks["sam_active"]:
-        blockers.append("SAM registration is not active in packet")
+        action_blockers.append("SAM registration is not active in packet")
 
-    decision = "APPROVED" if not blockers else "BLOCKED"
+    content_unlock = bool(submission_conformance.get("content_unlock"))
+    action_unlock = content_unlock and not action_blockers
+    blockers = content_blockers + action_blockers
+    decision = "APPROVED" if action_unlock else "BLOCKED"
     gate = {
         "generated_utc": now_iso(),
         "scope": "grant_final_gate",
-        "schema": "grant_final_gate_v1",
+        "schema": "grant_final_gate_v2",
         "opp_num": opp_num,
         "decision": decision,
+        "content_unlock": content_unlock,
+        "action_unlock": action_unlock,
+        "external_action_allowed_without_human": False,
+        "submission_conformance": submission_conformance,
+        "content_blockers": content_blockers,
+        "action_blockers": action_blockers,
         "blockers": blockers,
         "warnings": warnings,
         "application_packet_path": rel(packet_path) if packet_path else "",
@@ -347,6 +476,9 @@ def render_gate_markdown(payload: dict[str, Any]) -> str:
     lines.append(f"Generated UTC: {payload.get('generated_utc', '')}")
     lines.append(f"Opportunity: {payload.get('opp_num', '')}")
     lines.append(f"Decision: {payload.get('decision', '')}")
+    lines.append(f"Content unlock: {payload.get('content_unlock', False)}")
+    lines.append(f"Action unlock for human: {payload.get('action_unlock', False)}")
+    lines.append("External action allowed without human: False")
     lines.append(f"Gate Signature SHA256: {payload.get('final_gate_signature_sha256', '')}")
     lines.append("")
 
@@ -423,13 +555,30 @@ def write_outputs(payload: dict[str, Any]) -> dict[str, Path]:
     }
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run final gate review for a selected grant package.")
-    parser.add_argument("--opp-num", default="DE-FOA-0003539")
+    parser.add_argument(
+        "--opp-num",
+        help="Exact opportunity number to review. No opportunity is selected implicitly.",
+    )
     parser.add_argument("--strict", action="store_true", help="Return non-zero if decision is BLOCKED.")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
-    gate = build_gate(args.opp_num)
+    opp_num = str(args.opp_num or "").strip()
+    if not opp_num:
+        candidates = current_active_submission_candidates()
+        print("GRANT_FINAL_GATE_DECISION=BLOCKED_NO_EXPLICIT_OPPORTUNITY")
+        print(f"GRANT_FINAL_GATE_ACTIVE_CANDIDATE_COUNT={len(candidates)}")
+        for candidate in candidates:
+            print(
+                "GRANT_FINAL_GATE_ACTIVE_CANDIDATE="
+                f"{candidate['lane_id']}|{candidate['status']}|"
+                f"{candidate['candidate_artifact']}"
+            )
+        print("GRANT_FINAL_GATE_REQUIRED_INPUT=--opp-num <exact-opportunity-number>")
+        return 1
+
+    gate = build_gate(opp_num)
     paths = write_outputs(gate)
 
     print(f"GRANT_FINAL_GATE_DECISION={gate.get('decision', '')}")

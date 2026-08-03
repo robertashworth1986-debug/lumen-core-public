@@ -1,229 +1,55 @@
-# Paid Pilot Outreach Queue
+# Local Protocol-Review Scoping Queue
 
-Generated UTC: `2026-06-27T17:45:57.356152+00:00`
+Generated UTC: `2026-07-29T06:58:05.372260+00:00`
 
-This queue is a manual paid-pilot outreach worklist. It helps select reviewed buyer or agency technical contacts and match each contact to the strongest current proof card. It does not authorize bulk email, contact scraping, fixed-dollar frozen-delta claims, field-validation claims, realized-savings claims, live trading, or autonomous operational execution.
+This legacy-named artifact is a local protocol-review scoping queue only. It identifies bounded services that may be scoped after current-source, duplicate, recipient-authority, claim, and action-time approval checks. It does not identify a performance champion, select a recipient, create a send-ready target, authorize outreach, claim field validation or savings, or inherit any geometry performance claim.
 
-## Summary
+## Current State
 
-- Queue rows: `12`
-- Proof cards: `2`
-- Ready proof cards: `2`
-- Unique lanes: `optimal_curve_transport, wave_resonance_timing`
-- Top target: `utility_grid_analytics`
-- Manual reviewed outreach allowed: `true`
-- Bulk email allowed: `false`
-- Contact scraping allowed: `false`
-- Fixed-dollar delta claim allowed: `false`
+- Local scope records: `2`
+- Performance champions: `0`
+- Recipients selected: `0`
+- Send-ready targets: `0`
+- Manual outreach allowed: `false`
+- Bulk outreach allowed: `false`
 - Field-validation claim allowed: `false`
-- Realized-savings claim allowed: `false`
-- Queue chain SHA-256: `d7f3306646bfd73d210c7dd158a5fc79bd40e13b6927332b53657315c44d7c95`
+- Savings claim allowed: `false`
+- Geometry performance claim inherited: `false`
+- Queue chain SHA-256: `1447b6548764f2f290af3496013e34d22c867ff615b5e86c1486e7d1d6ec6973`
 
-## Commercial Offer Tiers
+## Allowed Service Ranges
 
-### `technical_fit_call`
+- Protocol review: `$2,500-$7,500`
+- Optional benchmark implementation: `$7,500-$25,000`
+- These are service fees only, not ROI, savings, value, or customer-benefit estimates.
 
-- Price posture: no_quote_until_fit
-- Deliverable: 20-minute fit call to decide whether a paid evidence review is worth scoping.
-- Claim boundary: No savings or field-validation claim.
+## Local Scope Records
 
-### `paid_evidence_review`
+### 1. Protocol review
 
-- Price posture: quote_after_scope; typical small paid review target 5000-15000 USD
-- Deliverable: Review 5-10 curated frozen proof packets, hashes, baselines, gates, and failure modes.
-- Claim boundary: Evidence review only; not a procurement-grade field pilot.
+- Status: `local_draft_only_not_send_ready`
+- Deliverable: A bounded review of the proposed task, source-native baselines, preregistration, holdout design, correction rules, reproducibility requirements, and claim limits.
+- Service range: `$2,500-$7,500`
+- Recipient selected: `false`
+- Send ready: `false`
+- Outreach allowed: `false`
+- Pricing boundary: Service price only; not ROI, savings, enterprise value, performance value, or an estimate of customer economic benefit.
 
-### `buyer_authorized_field_replay`
+### 2. Optional benchmark implementation
 
-- Price posture: quote_after_data_rights_baselines_and_holdouts
-- Deliverable: Replay candidate and incumbent baselines on buyer-approved holdout windows.
-- Claim boundary: Economic language only if buyer-provided conversion factors and results support it.
+- Status: `local_draft_only_not_send_ready`
+- Deliverable: An optional implementation of a buyer-approved benchmark protocol after data rights, source-native baselines, acceptance criteria, and scope are documented.
+- Service range: `$7,500-$25,000`
+- Recipient selected: `false`
+- Send ready: `false`
+- Outreach allowed: `false`
+- Pricing boundary: Service price only; not ROI, savings, enterprise value, performance value, or an estimate of customer economic benefit.
 
-## Ranked Queue
+## External Action Gate
 
-### 1. `utility_grid_analytics`
-
-- Family: `brachistochrone_descent`
-- Lane: `optimal_curve_transport`
-- Buyer role: Director of Grid Analytics
-- Fit score: `96`
-- Search phrase: `utility grid analytics innovation reliability pilot`
-- Pain: constraint-heavy routing, dispatch, restoration, and reliability decisions
-- Measured outcome: recovery time, dispatch quality, outage exposure, operator review burden
-- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
-- Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for utility grid analytics
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 2. `energy_forecasting`
-
-- Family: `kuramoto_phase_coupling`
-- Lane: `wave_resonance_timing`
-- Buyer role: Energy Forecasting Lead
-- Fit score: `95`
-- Search phrase: `energy forecasting grid load timing anomaly pilot`
-- Pain: cyclic load, generation, price, or anomaly timing where phase error matters
-- Measured outcome: forecast error, lead time, drift detection latency, missed-event rate
-- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
-- Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for energy forecasting
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 3. `datacenter_cooling_optimization`
-
-- Family: `brachistochrone_descent`
-- Lane: `optimal_curve_transport`
-- Buyer role: Datacenter Cooling Optimization Lead
-- Fit score: `93`
-- Search phrase: `datacenter cooling optimization airflow reliability analytics`
-- Pain: airflow routing and thermal constraint management under cost and uptime pressure
-- Measured outcome: energy use, hot-spot exposure, cooling response time, thermal guardrail violations
-- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
-- Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for datacenter cooling optimization
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 4. `grid_reliability_analytics`
-
-- Family: `kuramoto_phase_coupling`
-- Lane: `wave_resonance_timing`
-- Buyer role: Grid Reliability Analytics Lead
-- Fit score: `92`
-- Search phrase: `grid reliability analytics oscillation drift detection pilot`
-- Pain: oscillatory system drift and early warning across measured operating signals
-- Measured outcome: early warning lead time, false positives, missed events, phase error
-- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
-- Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for grid reliability analytics
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 5. `port_maritime_operations`
-
-- Family: `brachistochrone_descent`
-- Lane: `optimal_curve_transport`
-- Buyer role: Port Operations Analytics Lead
-- Fit score: `91`
-- Search phrase: `port operations analytics maritime anomaly routing pilot`
-- Pain: vessel, asset, and response routing under traffic, timing, and safety constraints
-- Measured outcome: route quality, response time, false-review burden, constraint violations
-- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
-- Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for port maritime operations
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 6. `sensor_fusion_defense`
-
-- Family: `kuramoto_phase_coupling`
-- Lane: `wave_resonance_timing`
-- Buyer role: Sensor Fusion Program Manager
-- Fit score: `90`
-- Search phrase: `sensor fusion timing drift anomaly detection defense pilot`
-- Pain: multi-sensor timing, drift, and cyclic-event alignment under noisy conditions
-- Measured outcome: timing error, drift detection, event alignment, operator review burden
-- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
-- Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for sensor fusion defense
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 7. `critical_infrastructure_resilience`
-
-- Family: `brachistochrone_descent`
-- Lane: `optimal_curve_transport`
-- Buyer role: R&D Program Manager for Critical Infrastructure
-- Fit score: `89`
-- Search phrase: `critical infrastructure resilience optimization pilot program manager`
-- Pain: resilience routing and recovery planning where small decision-quality gains matter
-- Measured outcome: time-to-recover, exposure reduction, baseline score delta, guardrail failure rate
-- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
-- Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for critical infrastructure resilience
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 8. `industrial_process_stability`
-
-- Family: `kuramoto_phase_coupling`
-- Lane: `wave_resonance_timing`
-- Buyer role: Industrial Process Stability Lead
-- Fit score: `88`
-- Search phrase: `industrial process stability oscillation timing analytics pilot`
-- Pain: process oscillations, resonance, and instability that cause manual intervention
-- Measured outcome: phase error, intervention count, stability alarms, false positives
-- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
-- Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for industrial process stability
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 9. `defense_cyber_physical_logistics`
-
-- Family: `brachistochrone_descent`
-- Lane: `optimal_curve_transport`
-- Buyer role: Cyber-Physical Systems Program Manager
-- Fit score: `87`
-- Search phrase: `defense cyber physical systems routing optimization pilot`
-- Pain: mission route, sensor, or response choices under changing constraints
-- Measured outcome: constraint violation rate, decision latency, baseline score delta, review burden
-- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
-- Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for defense cyber physical logistics
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 10. `national_lab_validation`
-
-- Family: `kuramoto_phase_coupling`
-- Lane: `wave_resonance_timing`
-- Buyer role: Technology Transfer or Validation Program Manager
-- Fit score: `85`
-- Search phrase: `national lab validation signal processing cyber physical systems`
-- Pain: independent validation of reproducible phase/timing benchmark evidence
-- Measured outcome: repeatability, baseline score delta, holdout performance, uncertainty report
-- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
-- Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for national lab validation
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 11. `industrial_maintenance_routing`
-
-- Family: `brachistochrone_descent`
-- Lane: `optimal_curve_transport`
-- Buyer role: Infrastructure Optimization Lead
-- Fit score: `84`
-- Search phrase: `industrial maintenance routing optimization analytics pilot`
-- Pain: maintenance and inspection path planning across assets with time and risk constraints
-- Measured outcome: coverage, time, exposure, energy, repeatability against incumbent path plans
-- Proof line: 8/8 positive frozen replay windows; lower 95 margin 0.071919; minimum source count 5
-- Subject: Paid pilot scoping: Constrained Transport / Routing Replay Pilot for industrial maintenance routing
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-### 12. `infrastructure_risk_analytics`
-
-- Family: `kuramoto_phase_coupling`
-- Lane: `wave_resonance_timing`
-- Buyer role: Operational Risk Analytics Lead
-- Fit score: `83`
-- Search phrase: `infrastructure risk analytics early warning drift detection pilot`
-- Pain: early warning, risk timing, and anomaly triage before operational losses grow
-- Measured outcome: lead time, review burden, false positives, missed-event rate
-- Proof line: 4/4 positive frozen replay windows; lower 95 margin 0.128296; minimum source count None
-- Subject: Paid pilot scoping: Wave / Resonance Timing Forecast Pilot for infrastructure risk analytics
-- Primary ask: Ask for a 20-minute technical fit call and permission to scope a paid evidence review or buyer-authorized field replay using pre-registered holdout windows.
-- Send now allowed: `false`
-- Why not send now: A human must identify and review the exact recipient, organization fit, physical address footer, and opt-out language before sending.
-
-## Send Gate
-
-- Send only one reviewed message per reviewed contact.
-- Do not scrape contacts or bulk-send.
-- Include a valid physical mailing address and an opt-out sentence.
-- Do not claim fixed dollar value, field validation, realized savings, guaranteed funding, or guaranteed alpha.
+- State: `blocked_local_scoping_only`
+- Verify the current official source before selecting any target.
+- Check the complete thread and Sent mail for duplicates.
+- Verify the exact recipient and their authority.
+- Revalidate scope, claims, pricing, data rights, and source-native baselines.
+- Obtain explicit action-time human approval before any external message.

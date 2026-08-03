@@ -252,10 +252,12 @@ def build_payload() -> dict[str, Any]:
     ]
     evidence_status = [artifact_status(path) for path in evidence_paths]
 
-    gate_clear = (
-        bool(gate.get("reviewer_gate_clear"))
-        and int((gate.get("summary") or {}).get("unsafe_secret_count") or 0) == 0
-        and int((gate.get("summary") or {}).get("unsafe_claim_count") or 0) == 0
+    gate_summary = gate.get("summary") or {}
+    submission_argument_gate_clear = bool(gate.get("reviewer_gate_clear"))
+    reviewer_packaging_gate_clear = (
+        bool(gate_summary.get("packaging_checks_clear"))
+        and int(gate_summary.get("unsafe_secret_count") or 0) == 0
+        and int(gate_summary.get("unsafe_claim_count") or 0) == 0
     )
     authority_summary = authority.get("summary", {}) if isinstance(authority.get("summary"), dict) else {}
     all_final_actions_blocked = bool(authority_summary.get("all_final_actions_blocked_without_human"))
@@ -265,7 +267,9 @@ def build_payload() -> dict[str, Any]:
         "generated_utc": now_utc(),
         "schema": "ip_counsel_diligence_packet_v1",
         "status": "IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED"
-        if gate_clear and all_final_actions_blocked and evidence_present
+        if reviewer_packaging_gate_clear
+        and all_final_actions_blocked
+        and evidence_present
         else "IP_COUNSEL_DILIGENCE_BLOCKED",
         "official_sources": OFFICIAL_SOURCES,
         "summary": {
@@ -275,9 +279,10 @@ def build_payload() -> dict[str, Any]:
             "intake_item_count": len(COUNSEL_INTAKE_ITEMS),
             "evidence_artifact_count": len(evidence_status),
             "missing_evidence_count": sum(1 for row in evidence_status if not row["present"]),
-            "reviewer_gate_clear": gate_clear,
-            "unsafe_secret_count": int((gate.get("summary") or {}).get("unsafe_secret_count") or 0),
-            "unsafe_claim_count": int((gate.get("summary") or {}).get("unsafe_claim_count") or 0),
+            "reviewer_packaging_gate_clear": reviewer_packaging_gate_clear,
+            "submission_argument_gate_clear": submission_argument_gate_clear,
+            "unsafe_secret_count": int(gate_summary.get("unsafe_secret_count") or 0),
+            "unsafe_claim_count": int(gate_summary.get("unsafe_claim_count") or 0),
             "all_final_actions_blocked_without_human": all_final_actions_blocked,
             "legal_advice_claimed": False,
             "patent_grant_claimed": False,
@@ -357,7 +362,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Intake items: `{summary['intake_item_count']}`",
         f"- Evidence artifacts: `{summary['evidence_artifact_count']}`",
         f"- Missing evidence: `{summary['missing_evidence_count']}`",
-        f"- Reviewer gate clear: `{str(summary['reviewer_gate_clear']).lower()}`",
+        f"- Reviewer packaging gate clear: `{str(summary['reviewer_packaging_gate_clear']).lower()}`",
+        f"- Submission argument gate clear: `{str(summary['submission_argument_gate_clear']).lower()}`",
         f"- Unsafe sensitive hits: `{summary['unsafe_secret_count']}`",
         f"- Unsafe claim hits: `{summary['unsafe_claim_count']}`",
         f"- All final actions blocked without human: `{str(summary['all_final_actions_blocked_without_human']).lower()}`",

@@ -9,7 +9,7 @@ Packaging checks and language scans are supporting controls only. They never est
 - Status: `REVIEWER_GATE_BLOCKED_SOURCE_BOUND_ARGUMENT_CONFORMANCE`
 - Reviewer gate clear: `false`
 - Packaging checks clear: `true`
-- Markdown files scanned: `115`
+- Markdown files scanned: `117`
 - Proof cards: `9`
 - Unsafe secret hits: `0`
 - Unsafe claim hits: `0`
@@ -28,7 +28,7 @@ Packaging checks and language scans are supporting controls only. They never est
 - Autonomous external action allowed: `false`
 - Live trading allowed: `false`
 - Final submission without human allowed: `false`
-- Gate SHA-256: `7b07d17d2f5216d86f708b18d98ba67658d99a5d3dd55c88456dba0e108407be`
+- Gate SHA-256: `001ec2bc596e624b8d2abdfdda4d9940a3673015921d69f3c443522e488a07a0`
 
 ## Submission Conformance Control
 
@@ -36,7 +36,7 @@ Packaging, hashes, rendering, safe wording, and portal facts never establish rev
 
 - Source: `out/ops/submission_conformance_gate_latest.json`
 - Source present: `true`
-- Source SHA-256: `8bf08b73b714c81d3fc95bd41c008d98dc9e89985b4db9c08f080ef4d06363a6`
+- Source SHA-256: `d4bf0049c8b6043c2b40a76bccfe5bf39cc85bedc2da92730d51afa20fd430df`
 - Source gate SHA-256 valid: `true`
 - Validation errors: `none`
 
@@ -181,7 +181,7 @@ Packaging, hashes, rendering, safe wording, and portal facts never establish rev
 - Source: current_official_cso_and_july_20_faq
 - Artifact: `grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json`
 - Artifact present: `true`
-- Artifact SHA-256: `4b572b18631ac9ec19571a35610c46de36584d913e1b51941e224c5e4f7062cb`
+- Artifact SHA-256: `11fdbfec9044a8a5f23496dd9c3a642942c3ea83622b2e1d4c2ee31601d28389`
 - Conformance mapping found: `true`
 - Conformance status: `BLOCKED_CRITERION_FAILURE`
 - Active technical candidate: `true`
@@ -194,7 +194,7 @@ Packaging, hashes, rendering, safe wording, and portal facts never establish rev
 - Next gate: Approve the private Phase II-only ROM, verify SAM and contact facts, build and validate the private final PDF, and stop at the complete portal preview.
 - Claim boundary: Current-source public-draft conformance does not establish applicant eligibility, private-final readiness, technical merit, selection, funding, or award.
 - Human gate: Human approval before pricing, representations, certification, upload, or final submit.
-- Card SHA-256: `2163050dbd90f802b551cafb264129b67139c77a8e64cd3c6aac8b75a5f99856`
+- Card SHA-256: `a0b59725cf3934931cd80c7e9b4c8a3ec5250a278b3a2af66dedb6dc4c15e43b`
 
 ### DARPA FALCON Direct to Phase II
 

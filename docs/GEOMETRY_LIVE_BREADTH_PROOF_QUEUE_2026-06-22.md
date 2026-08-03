@@ -1,6 +1,6 @@
 # Geometry Live-Breadth Proof Queue
 
-Generated UTC: `2026-07-01T11:24:50.078212+00:00`
+Generated UTC: `2026-07-29T05:35:04.084492+00:00`
 
 ## Why This Matters
 
@@ -8,9 +8,9 @@ This board turns the geometry registry into a proof factory: every family is ran
 
 ## Value Posture
 
-- Safe estimated annual value surface: `$39.60M`
-- Safe estimated hourly value surface: `$4.52K`
-- Blocked context-only annual surface: `$52.29B`
+- Safe estimated annual value surface: `$0.00`
+- Safe estimated hourly value surface: `$0.00`
+- Blocked context-only annual surface: `$0.00`
 - Ready for real-dollar claim: `false`
 - Boundary: This is a proof-build and estimated-value surface, not company valuation, realized savings, revenue, or award certainty.
 
@@ -21,18 +21,18 @@ This board turns the geometry registry into a proof factory: every family is ran
 - Fastest live-breadth adapter: `crack_propagation_paths` on `branching_transport`
 - Highest blocked context target: `crack_propagation_paths` on `branching_transport`
 - Market paper champion: `beast_strategy_breakout`
-- Strict rolling champion: `phase_locked_residual_corrector` on `energy_price_pressure_proxy`
-- Triple-source rolling champions: `4`
+- Strict rolling champion: `none` on `none`
+- Triple-source rolling champions: `0`
 - Triple-source candidates: `0`
 - Boundary: Champion categories are separated; generated, live-adapter, proof-value, blocked-context, and market-paper titles are not interchangeable.
 
 ## Strict Rolling Gate
 
-- Rolling champions: `5`
-- Triple-source rolling champions: `4`
+- Rolling champions: `0`
+- Triple-source rolling champions: `0`
 - Triple-source candidates: `0`
 - Single-run candidates: `0`
-- Boundary: A champion is not a one-off win. This gate promotes only repeat live-context wins with distinct frozen hashes, or labels a single-run multi-source result as a candidate. It is not field validation, not realized savings, not live trading permission, and not a grant award guarantee.
+- Boundary: A champion is not a one-off or context-derived win. This gate counts only v3 direct-measured, source-task-compatible replays that beat every registered source-specific baseline after global multiple-comparison correction. Historical live-context, source-conditioned synthetic, proxy, and fallback rows remain in the ledger but are excluded from promotion. This is not field validation, realized savings, live trading permission, or award certainty.
 
 ## Lane Leaders
 
@@ -51,26 +51,24 @@ This board turns the geometry registry into a proof factory: every family is ran
 
 ## Top Next Runs
 
-- 1. `optimal_curve_transport::brachistochrone_descent::live_breadth_replay_v1`: Strict rolling gate says this is the strongest candidate class to repeat next. Rolling gate: `rolling_champion`. Baselines: straight_line, cubic_spline, rrt_star, minimum_jerk_curve. Metrics: travel_time, path_energy_proxy, constraint_violation_rate, smoothness, runtime_ms.
-- 2. `branching_transport::leaf_veins::live_breadth_replay_v1`: Strict rolling gate says this is the strongest candidate class to repeat next. Rolling gate: `rolling_champion`. Baselines: minimum_spanning_tree, steiner_approximation, min_cost_flow. Metrics: delivered_flow, energy_proxy, material_proxy, failure_tolerance, runtime_ms.
-- 3. `thermal_ventilation::thermal_plume_convection::live_breadth_replay_v1`: Strict rolling gate says this is the strongest candidate class to repeat next. Rolling gate: `rolling_champion`. Baselines: straight_duct, conventional_hvac_network, cfd_reference. Metrics: temperature_uniformity, pressure_drop, energy_proxy, recovery_time, runtime_ms.
-- 4. `wave_resonance_timing::kuramoto_phase_coupling::live_breadth_replay_v1`: Strict rolling gate says this is the strongest candidate class to repeat next. Rolling gate: `rolling_champion`. Baselines: fft_filter, kalman_filter, arima, phase_locked_loop. Metrics: phase_error, noise_rejection, forecast_error, stability_margin, runtime_ms.
-- 5. `thermal_ventilation::rayleigh_benard_cells::live_breadth_replay_v1`: High proof/value fit and live sources are available for adapter work. Rolling gate: `not_in_rolling_gate`. Baselines: straight_duct, conventional_hvac_network, cfd_reference. Metrics: temperature_uniformity, pressure_drop, energy_proxy, recovery_time, runtime_ms.
-- 6. `branching_transport::crack_propagation_paths::live_breadth_replay_v1`: High proof/value fit and live sources are available for adapter work. Rolling gate: `not_in_rolling_gate`. Baselines: minimum_spanning_tree, steiner_approximation, min_cost_flow. Metrics: delivered_flow, energy_proxy, material_proxy, failure_tolerance, runtime_ms.
-- 7. `time_series_model_routing::beast_algo_echo_stack::live_breadth_replay_v1`: High proof/value fit and live sources are available for adapter work. Rolling gate: `not_in_rolling_gate`. Baselines: persistence, seasonal_naive, ridge_feature_baseline, mlp_budget_matched_baseline. Metrics: mae, rmse, calibration_error, abstention_rate, regime_failure_rate, runtime_ms.
-- 8. `market_signal_geometry::beast_strategy_breakout::live_breadth_replay_v1`: High proof/value fit and live sources are available for adapter work. Rolling gate: `not_in_rolling_gate`. Baselines: buy_and_hold, moving_average_cross, volatility_targeting, ridge_return_baseline. Metrics: walk_forward_sharpe, max_drawdown, turnover, hit_rate, slippage_sensitivity, runtime_ms.
+- 1. `optimal_curve_transport::brachistochrone_descent::live_breadth_replay_v1`: Generated champion needs live-breadth promotion. Rolling gate: `not_promoted`. Baselines: straight_line, cubic_spline, rrt_star, minimum_jerk_curve. Metrics: travel_time, path_energy_proxy, constraint_violation_rate, smoothness, runtime_ms.
+- 2. `wave_resonance_timing::kuramoto_phase_coupling::live_breadth_replay_v1`: Generated champion needs live-breadth promotion. Rolling gate: `not_promoted`. Baselines: fft_filter, kalman_filter, arima, phase_locked_loop. Metrics: phase_error, noise_rejection, forecast_error, stability_margin, runtime_ms.
+- 3. `thermal_ventilation::rayleigh_benard_cells::live_breadth_replay_v1`: High proof/value fit and live sources are available for adapter work. Rolling gate: `not_in_rolling_gate`. Baselines: straight_duct, conventional_hvac_network, cfd_reference. Metrics: temperature_uniformity, pressure_drop, energy_proxy, recovery_time, runtime_ms.
+- 4. `branching_transport::crack_propagation_paths::live_breadth_replay_v1`: High proof/value fit and live sources are available for adapter work. Rolling gate: `not_in_rolling_gate`. Baselines: minimum_spanning_tree, steiner_approximation, dijkstra, a_star, min_cost_flow. Metrics: delivered_flow, energy_proxy, material_proxy, failure_tolerance, runtime_ms.
+- 5. `time_series_model_routing::beast_algo_echo_stack::live_breadth_replay_v1`: High proof/value fit and live sources are available for adapter work. Rolling gate: `not_in_rolling_gate`. Baselines: persistence, seasonal_naive, ridge_feature_baseline, mlp_budget_matched_baseline. Metrics: mae, rmse, calibration_error, abstention_rate, regime_failure_rate, runtime_ms.
+- 6. `market_signal_geometry::beast_strategy_breakout::live_breadth_replay_v1`: High proof/value fit and live sources are available for adapter work. Rolling gate: `not_in_rolling_gate`. Baselines: buy_and_hold, moving_average_cross, volatility_targeting, ridge_return_baseline. Metrics: walk_forward_sharpe, max_drawdown, turnover, hit_rate, slippage_sensitivity, runtime_ms.
 
 ## Top 20 Family Queue
 
 - 1. `crack_propagation_paths` / `branching_transport`: score 100.0 | status `proof_value_candidate_not_performance_claim` | rolling `not_in_rolling_gate` | live `USGS_WATER, NOAA_NCEI`
-- 2. `leaf_veins` / `branching_transport`: score 100.0 | status `repeat_rolling_champion_claim_still_needs_field_validation` | rolling `rolling_champion` | live `USGS_WATER, NOAA_NCEI`
+- 2. `leaf_veins` / `branching_transport`: score 100.0 | status `generated_software_benchmark_only_needs_live_replay` | rolling `not_promoted` | live `USGS_WATER, NOAA_NCEI`
 - 3. `beast_algo_curvature_pressure` / `optimal_curve_transport`: score 100.0 | status `proof_value_candidate_not_performance_claim` | rolling `not_in_rolling_gate` | live `NOAA_NCEI, USGS_WATER`
-- 4. `brachistochrone_descent` / `optimal_curve_transport`: score 100.0 | status `repeat_rolling_champion_claim_still_needs_field_validation` | rolling `rolling_champion` | live `NOAA_NCEI, USGS_WATER`
+- 4. `brachistochrone_descent` / `optimal_curve_transport`: score 100.0 | status `generated_software_benchmark_only_needs_live_replay` | rolling `not_promoted` | live `NOAA_NCEI, USGS_WATER`
 - 5. `rayleigh_benard_cells` / `thermal_ventilation`: score 100.0 | status `proof_value_candidate_not_performance_claim` | rolling `not_in_rolling_gate` | live `NOAA_NCEI`
-- 6. `thermal_plume_convection` / `thermal_ventilation`: score 100.0 | status `repeat_rolling_champion_claim_still_needs_field_validation` | rolling `rolling_champion` | live `NOAA_NCEI`
+- 6. `thermal_plume_convection` / `thermal_ventilation`: score 100.0 | status `generated_software_benchmark_only_needs_live_replay` | rolling `not_promoted` | live `NOAA_NCEI`
 - 7. `beast_algo_echo_stack` / `time_series_model_routing`: score 100.0 | status `proof_value_candidate_not_performance_claim` | rolling `not_in_rolling_gate` | live `FRED, BEA, BLS, KRAKEN, MASSIVE`
 - 8. `beast_algo_cross_asset_resonance` / `wave_resonance_timing`: score 100.0 | status `proof_value_candidate_not_performance_claim` | rolling `not_in_rolling_gate` | live `FRED, BEA, KRAKEN`
-- 9. `kuramoto_phase_coupling` / `wave_resonance_timing`: score 100.0 | status `repeat_rolling_champion_claim_still_needs_field_validation` | rolling `rolling_champion` | live `FRED, BEA, KRAKEN`
+- 9. `kuramoto_phase_coupling` / `wave_resonance_timing`: score 100.0 | status `generated_software_benchmark_only_needs_live_replay` | rolling `not_promoted` | live `FRED, BEA, KRAKEN`
 - 10. `ant_trails` / `mission_network_routing`: score 99.305 | status `proof_value_candidate_not_performance_claim` | rolling `not_in_rolling_gate` | live `NOAA_NCEI, USGS_WATER, CENSUS`
 - 11. `atmospheric_jet_stream_paths` / `field_guided_control`: score 97.568 | status `proof_value_candidate_not_performance_claim` | rolling `not_in_rolling_gate` | live `NOAA_NCEI, USGS_WATER`
 - 12. `markov_blanket_boundaries` / `stability_diagnostic`: score 97.15 | status `proof_value_candidate_not_performance_claim` | rolling `not_in_rolling_gate` | live `FRED, BEA, KRAKEN, NOAA_NCEI`

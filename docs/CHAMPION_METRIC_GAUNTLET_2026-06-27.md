@@ -1,6 +1,6 @@
 # Champion Metric Gauntlet
 
-Generated UTC: `2026-07-11T13:27:51.907856+00:00`
+Generated UTC: `2026-07-29T05:52:38.173184+00:00`
 
 ## What To Ask Me
 
@@ -17,51 +17,51 @@ Ask questions that force evidence, gates, and next actions:
 
 ## Current Answer
 
-Kuramoto phase coupling is the current internal champion because it beat kalman_filter on 24/24 source-conditioned holdouts across 4 champion-replay source systems. The broader live-source universe currently shows 25 measured providers and 204 mapped source files/feeds available for additional benchmark promotion. That is strong enough to request a buyer-authorized field replay, but it is not field validation or realized dollar savings yet.
+No current geometry family is an internal performance champion. Kuramoto phase coupling was audited on 1525 paired measured EIA holdout days; it won 482 pairs against kalman_local_linear_trend but had a negative mean skill delta of -0.508191 and did not clear any complete source-specific all-baseline promotion gate. The broader source inventory is research capacity only, not performance evidence. The safe commercial ask is a paid protocol or evidence review, not a performance or savings claim.
 
 ## Strongest Current Candidate
 
 - Family: `kuramoto_phase_coupling`
 - Label: `Kuramoto phase coupling`
 - Lane: `wave_resonance_timing`
-- Named baseline: `kalman_filter`
-- Holdout wins: `24/24`
-- Mean delta vs baseline: `0.140668`
-- Min delta vs baseline: `0.044697`
-- Source systems: `4`
+- Named baseline: `kalman_local_linear_trend`
+- Holdout wins: `482/1525`
+- Mean delta vs baseline: `-0.508191`
+- Min delta vs baseline: `0.0`
+- Source systems: `1`
 - Broader measured providers: `25/29`
 - Manifest unique sources: `204`
-- Manifest ready benchmark rows: `349`
-- Estimated rows replayed: `2506267`
-- Sign-test p-value: `6e-08`
-- Wilson lower 95% win-rate bound: `0.862024`
-- Holdout chain SHA-256: `2227dd06869d292c82918d3f9cfab2b87cbe441cd44e398ec4a1024c6f5a655c`
+- Manifest ready benchmark rows: `358`
+- Estimated rows replayed: `15250`
+- Sign-test p-value: `1.0`
+- Wilson lower 95% win-rate bound: `0.293217`
+- Holdout chain SHA-256: `ffb3e4448ad393027791e3c582b2c8d0dde1e6cf0685fafd630727bb2477a9cb`
 
 ## Safe Claim State
 
-- Reviewer-safe internal claim allowed: `true`
-- Buyer-authorized field replay request ready: `true`
-- Bounded estimated value claim allowed: `true`
+- Reviewer-safe internal claim allowed: `false`
+- Buyer-authorized field replay request ready: `false`
+- Bounded estimated value claim allowed: `false`
 - Paid pilot scoping allowed: `true`
 - Field-validation claim allowed: `false`
 - Real-dollar savings claim allowed: `false`
 - Live trading or autonomous execution allowed: `false`
-- Safe estimated hourly value surface: `$4,520.00`
-- Safe estimated annual value surface: `$39,595,200.00`
+- Safe estimated hourly value surface: `$0.00`
+- Safe estimated annual value surface: `$0.00`
 
 ## Source Breadth Correction
 
-The champion replay source count and the broader live-source universe are intentionally not the same metric. The champion replay count only covers sources promoted into the current Kuramoto holdout expansion. The broader universe counts providers, local/live files, and manifest rows that are available for additional benchmarking but are not automatically part of the current champion win.
+The direct measured candidate source count and the broader live-source universe are intentionally not the same metric. The candidate count covers the frozen EIA holdout only. The broader universe counts providers, local/live files, and legacy manifest rows available for future compatibility work; those counts are not performance evidence and do not imply a champion.
 
-- Champion replay source systems: `4`
-- Champion replay source names: `energy_grid, macro_rates_labor, market_data, sports_market`
+- Champion replay source systems: `1`
+- Champion replay source names: `EIA_GRID_VALIDATION`
 - Fresh measured providers: `25` of `29`
-- Fresh measured rows in latest bounded pull: `2940`
+- Fresh measured rows in latest bounded pull: `2580`
 - Measured provider names: `AIRNOW, ALPACA, ALPHAVANTAGE, BEA, BLS, CENSUS, COINBASE_PUBLIC, COINGECKO_PUBLIC, EIA, FINNHUB, FRED, GRANTS_GOV, KRAKEN, KRAKEN_PUBLIC, MASSIVE, NASA, NOAA_NCEI, NWS_PUBLIC, OPEN_METEO_PUBLIC, SEC_PUBLIC, TREASURY_FISCAL_PUBLIC, TWELVE_DATA, USGS_WATER, WEBHOOK, WORLD_BANK_PUBLIC`
 - Failed or thin provider names: `BINANCE_PUBLIC, EPA_AQS, NREL, THE_ODDS_API`
 - Manifest unique source count: `204`
-- Manifest ready-for-benchmark row count: `349`
-- Manifest estimated rows mapped: `9848134`
+- Manifest ready-for-benchmark row count: `358`
+- Manifest estimated rows mapped: `7375785`
 
 ## Grid/RF/PLL Hardware Validation Gate
 
@@ -87,22 +87,23 @@ A fixed dollar or realized-savings claim stays blocked until a buyer, lab, utili
 
 ## Metric Gates
 
-- `holdout_depth`: `PASS` | actual `24` | threshold `>= 20 source-conditioned holdouts`
-- `baseline_win_count`: `PASS` | actual `24/24` | threshold `>= 16/20 and preferably all positive`
-- `baseline_win_rate`: `PASS` | actual `1.0` | threshold `>= 0.80`
-- `minimum_delta_positive`: `PASS` | actual `0.044697` | threshold `> 0`
-- `sign_test_strength`: `PASS` | actual `6e-08` | threshold `<= 0.001`
-- `wilson_lower_bound`: `PASS` | actual `0.862024` | threshold `>= 0.75`
-- `source_system_diversity`: `PASS` | actual `4` | threshold `>= 3 source systems`
-- `row_replay_depth`: `PASS` | actual `2506267` | threshold `>= 1,000,000 estimated rows replayed`
-- `hash_chain_present`: `PASS` | actual `2227dd06869d...` | threshold `64 hex characters`
+- `holdout_depth`: `PASS` | actual `1525` | threshold `>= 1,000 paired measured holdout days`
+- `development_selection_frozen`: `BLOCKED` | actual `False` | threshold `true`
+- `baseline_win_rate`: `NEEDS_WORK` | actual `0.316066` | threshold `> 0.50 with positive mean skill`
+- `mean_skill_positive`: `NEEDS_WORK` | actual `-0.508191` | threshold `> 0`
+- `all_source_specific_baselines_global_holm`: `BLOCKED` | actual `False` | threshold `true`
+- `authority_coverage`: `PASS` | actual `8` | threshold `>= 8 EIA balancing authorities`
+- `row_replay_depth`: `PASS` | actual `15250` | threshold `>= 10,000 evaluated strategy rows`
+- `hash_chain_present`: `PASS` | actual `ffb3e4448ad3...` | threshold `64 hex characters`
 - `vault_hashes_verified`: `PASS` | actual `True` | threshold `true`
 - `all_families_live_benchmarked`: `BLOCKED` | actual `False` | threshold `true before broad all-family claims`
-- `live_domain_feed_routed`: `BLOCKED` | actual `11/14 required hosted hashes match; 3 stale/missing` | threshold `all required hosted hashes match before hosted reviewer proof claim`
+- `live_domain_feed_routed`: `BLOCKED` | actual `9/14 required hosted hashes match; 5 stale/missing` | threshold `all required hosted hashes match before hosted reviewer proof claim`
 - `field_validation`: `BLOCKED` | actual `False` | threshold `true before field validated language`
 
 ## Blockers
 
+- `development_selection_frozen`: Kuramoto remains a post-selection audit, not the protocol candidate.
+- `all_source_specific_baselines_global_holm`: No internal performance champion is allowed.
 - `all_families_live_benchmarked`: Broad all-family language remains blocked.
 - `live_domain_feed_routed`: Hosted reviewer proof language is allowed once all required feed hashes match.
 - `field_validation`: Field-validation and realized-savings language remains blocked.
@@ -116,7 +117,7 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 - Status: `EVIDENCED_CORE_READY_TO_EXPAND`
 - Question: Does the champion reduce error against a named incumbent baseline?
 - Metrics: `MAE, RMSE, MAPE_or_SMAPE, WAPE, residual_bias, residual_autocorrelation`
-- Current evidence: 24/24 holdout wins vs kalman_filter with minimum delta 0.044697 and 2,506,267 estimated rows replayed.
+- Current evidence: 482/1525 holdout wins vs kalman_local_linear_trend with minimum delta 0.0 and 15,250 estimated rows replayed.
 - Next action: Add per-source residual health tables before promoting more live-breadth providers into the champion replay.
 - Claim gate: Internal champion claim allowed; field-performance language remains blocked.
 
@@ -125,7 +126,7 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 - Status: `EVIDENCED_CORE_NEEDS_DIRECT_PHASE_DIAGNOSTICS`
 - Question: Is the win specifically a phase/timing advantage rather than generic smoothing?
 - Metrics: `circular_phase_error, phase_slip_count, lock_duration, recovery_time, coherence, spectral_concentration`
-- Current evidence: Champion lane is wave_resonance_timing with sign-test p-value 6e-08; direct phase diagnostics are still the next strongest proof upgrade.
+- Current evidence: Champion lane is wave_resonance_timing with sign-test p-value 1.0; direct phase diagnostics are still the next strongest proof upgrade.
 - Next action: Run a dedicated phase-error distribution report for grid/EIA, market, macro, and sports-market source slices.
 - Claim gate: Phase-lock language is allowed as a hypothesis-backed internal finding, not as hardware or field validation.
 
@@ -143,7 +144,7 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 - Status: `READY_FOR_LIVE_BREADTH_PROMOTION`
 - Question: Does the champion generalize beyond the current four promoted replay systems?
 - Metrics: `leave_one_source_out, source_group_holdout, provider_promotion_rate, schema_normalization_success`
-- Current evidence: Current champion replay uses 4 promoted source systems; broader live breadth has 25/29 measured providers and 349 ready-for-benchmark manifest rows.
+- Current evidence: Current champion replay uses 1 promoted source systems; broader live breadth has 25/29 measured providers and 358 ready-for-benchmark manifest rows.
 - Next action: Promote one provider at a time only after a named baseline, schema adapter, and acceptance metric exist.
 - Claim gate: Broad live-breadth claims remain blocked until promoted sources pass locked benchmarks.
 
@@ -188,17 +189,17 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 - Status: `BLOCKED_REQUIRES_BUYER_OR_LAB`
 - Question: Will an external owner reproduce the win on their held-out data and baseline?
 - Metrics: `locked_holdout_window, incumbent_baseline, acceptance_metric, forbidden_tuning_rules, signed_result`
-- Current evidence: Current evidence is strong enough to request a replay, not to claim external field validation.
-- Next action: Use the OpenPOWER AI/EPRI/EPB/TVA/Tennessee lab outreach lane for one manually reviewed replay ask.
-- Claim gate: Field-validation language remains blocked until an external owner accepts or runs the protocol.
+- Current evidence: Current evidence is a direct measured nonpromotion result and is not ready for a performance replay request.
+- Next action: Use the next research cycle to freeze a development-selected candidate before any external performance ask.
+- Claim gate: Field-validation language remains blocked until an internally promoted candidate and an external owner accept the protocol.
 
 ### `all_family_championship`
 
 - Status: `BLOCKED_REQUIRES_FULL_REGISTRY_RUN`
-- Question: Is Kuramoto still champion after every registered family competes under the same metric budget?
+- Question: Can any development-selected wave family clear every source-specific baseline under the same metric budget?
 - Metrics: `family_count_tested, baseline_count, matched_budget, winner_by_lane, negative_results_logged`
-- Current evidence: The current champion is strongest in the promoted replay core; all-family live championship remains explicitly blocked.
-- Next action: Run family-by-family live benchmarks from the geometry registry with frozen budgets and publish losers too.
+- Current evidence: No current wave family cleared the measured EIA promotion gate; all-family live championship remains explicitly blocked.
+- Next action: Search families on development data, freeze one candidate per lane, then publish the untouched holdout result and losers.
 - Claim gate: Universal geometry-superiority language remains blocked.
 
 
@@ -217,6 +218,6 @@ This is the next flex layer: every promoted champion should be pressure-tested a
 
 ## Boundary
 
-Champion metric gauntlet only. This artifact explains the current internal winner, the tests it has passed, the tests it has not passed, and the safest claim language. It does not create field validation, realized savings, trading profit, medical efficacy, award certainty, or a fixed dollar price for frozen deltas.
+Measured candidate metric gauntlet only. This artifact records the current direct measured result, the tests it passed, the tests it failed, and the safest claim language. No current family is an internal performance champion. It does not create field validation, realized savings, trading profit, medical efficacy, award certainty, or a fixed dollar price for frozen deltas.
 
-Gauntlet SHA-256: `6b4ea45360c376f8d699de12ac70efd12ecf004b67286e5a859c4cc53d027daa`
+Gauntlet SHA-256: `913e152acca0efc2bf37027113e3e10e6e77d53c8a5eb70343a5c3e403787a8d`

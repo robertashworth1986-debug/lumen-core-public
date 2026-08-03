@@ -4,10 +4,26 @@ param(
   [string]$SshKeyPath = $env:LUMA_VPS_SSH_KEY,
   [string]$BundleRoot = "",
   [string[]]$RemoteWebRoots = @("/opt/lumencore/dashboard", "/var/www/lumatrader", "/var/www/lumen-core"),
-  [switch]$DryRun
+  [switch]$DryRun,
+  [switch]$Apply
 )
 
 $ErrorActionPreference = "Stop"
+
+if ($Apply -and $DryRun) {
+  throw "-Apply and -DryRun cannot be used together."
+}
+
+$humanUnlockToken = $null
+if ($Apply) {
+  $humanUnlockToken = [string]$env:LUMA_HUMAN_UNLOCK_TOKEN
+  if ([string]::IsNullOrWhiteSpace($humanUnlockToken) -or $humanUnlockToken.Length -lt 32) {
+    throw "Apply is blocked: LUMA_HUMAN_UNLOCK_TOKEN must be configured with at least 32 characters."
+  }
+
+  # Do not let native child processes inherit the HumanUnlock secret.
+  Remove-Item Env:LUMA_HUMAN_UNLOCK_TOKEN -ErrorAction SilentlyContinue
+}
 
 function Invoke-CheckedNative {
   param(
@@ -18,6 +34,19 @@ function Invoke-CheckedNative {
   & $FilePath @ArgumentList
   if ($LASTEXITCODE -ne 0) {
     throw "Native command failed with exit code ${LASTEXITCODE}: $FilePath $($ArgumentList -join ' ')"
+  }
+}
+
+function Invoke-CheckedNativeWithSecretStdin {
+  param(
+    [Parameter(Mandatory = $true)][string]$FilePath,
+    [Parameter(Mandatory = $true)][string[]]$ArgumentList,
+    [Parameter(Mandatory = $true)][string]$SecretInput
+  )
+
+  $SecretInput | & $FilePath @ArgumentList
+  if ($LASTEXITCODE -ne 0) {
+    throw "Native command failed with exit code ${LASTEXITCODE}: $FilePath"
   }
 }
 
@@ -115,14 +144,22 @@ function New-BundleArchive {
 $repoRoot = Resolve-RepoRoot
 $resolvedBundleRoot = Resolve-BundleRoot -ExplicitBundleRoot $BundleRoot -RepoRoot $repoRoot
 $manifest = Assert-BundleSafe -ResolvedBundleRoot $resolvedBundleRoot
-$sshKey = Resolve-SshKey -ExplicitPath $SshKeyPath
-$archive = New-BundleArchive -ResolvedBundleRoot $resolvedBundleRoot
 $remoteArchive = "/tmp/luma_proof_feeds.tar.gz"
 $remoteTmp = "/tmp/luma_proof_feeds"
 $rootArgs = ($RemoteWebRoots | ForEach-Object { "'$_'" }) -join " "
 
 $remoteScript = @"
 set -e
+if [ "`${LUMA_VPS_DEPLOY_APPLY:-0}" != "1" ]; then
+  echo "ERROR apply flag missing; proof-feed deploy refused." >&2
+  exit 64
+fi
+human_unlock_token="`${LUMA_HUMAN_UNLOCK_TOKEN:-}"
+if [ "`${#human_unlock_token}" -lt 32 ]; then
+  echo "ERROR HumanUnlock is not configured with at least 32 characters; proof-feed deploy refused." >&2
+  exit 65
+fi
+unset human_unlock_token LUMA_HUMAN_UNLOCK_TOKEN
 rm -rf "$remoteTmp"
 mkdir -p "$remoteTmp"
 tar -xzf "$remoteArchive" -C "$remoteTmp"
@@ -147,24 +184,26 @@ sudo systemctl reload nginx 2>/dev/null || sudo systemctl reload caddy 2>/dev/nu
 "@
 
 Write-Host "Feed-only bundle: $resolvedBundleRoot" -ForegroundColor Cyan
-Write-Host "Archive: $archive" -ForegroundColor Cyan
 Write-Host "Required ready: $($manifest.summary.required_ready_count)/$($manifest.summary.required_feed_count)" -ForegroundColor Cyan
 Write-Host "Target: $VpsUser@$VpsIp" -ForegroundColor Cyan
-Write-Host "SSH key: $sshKey" -ForegroundColor Cyan
 Write-Host "Remote web roots: $($RemoteWebRoots -join ', ')" -ForegroundColor Cyan
 
-if ($DryRun) {
-  Write-Host "DRY RUN: no files uploaded." -ForegroundColor Yellow
-  Write-Host "scp command:" -ForegroundColor Yellow
-  Write-Host "scp -i `"$sshKey`" `"$archive`" $VpsUser@$VpsIp`:$remoteArchive"
-  Write-Host "remote script:" -ForegroundColor Yellow
-  Write-Host $remoteScript
+if (-not $Apply) {
+  Write-Host "DRY RUN: local bundle checks passed; no archive was created and no network or remote mutation was attempted." -ForegroundColor Yellow
+  Write-Host "Use -Apply with a private LUMA_HUMAN_UNLOCK_TOKEN of at least 32 characters to deploy this bundle." -ForegroundColor Yellow
   exit 0
 }
 
+$sshKey = Resolve-SshKey -ExplicitPath $SshKeyPath
+$archive = New-BundleArchive -ResolvedBundleRoot $resolvedBundleRoot
+Write-Host "Archive: $archive" -ForegroundColor Cyan
+Write-Host "SSH key: $sshKey" -ForegroundColor Cyan
+
 Invoke-CheckedNative -FilePath scp -ArgumentList @("-i", $sshKey, $archive, "$VpsUser@$VpsIp`:$remoteArchive")
 $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($remoteScript))
-Invoke-CheckedNative -FilePath ssh -ArgumentList @("-i", $sshKey, "$VpsUser@$VpsIp", "echo $encoded | base64 -d | bash")
+$guardedRemoteCommand = "set -e; IFS= read -r LUMA_HUMAN_UNLOCK_TOKEN; export LUMA_HUMAN_UNLOCK_TOKEN; export LUMA_VPS_DEPLOY_APPLY=1; echo $encoded | base64 -d | bash"
+Invoke-CheckedNativeWithSecretStdin -FilePath ssh -ArgumentList @("-i", $sshKey, "$VpsUser@$VpsIp", $guardedRemoteCommand) -SecretInput $humanUnlockToken
+$humanUnlockToken = $null
 
 Write-Host "Feed-only deploy complete. Run verification:" -ForegroundColor Green
 Write-Host "python .\code\ops\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --timeout 8" -ForegroundColor Green

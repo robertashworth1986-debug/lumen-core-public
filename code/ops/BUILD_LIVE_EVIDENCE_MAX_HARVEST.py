@@ -197,8 +197,14 @@ def extract_summary() -> dict[str, Any]:
         "energy_pressure_hourly_grid_rows": energy_summary.get("hourly_grid_rows"),
         "energy_pressure_forecast_rows": energy_summary.get("forecast_rows"),
         "energy_pressure_max_band": energy_summary.get("max_pressure_band"),
-        "energy_pressure_phase_locked_improvement_pct": energy_summary.get("phase_locked_improvement_vs_best_named_baseline_pct"),
-        "energy_pressure_ready_for_proxy_claim": bool(energy_summary.get("ready_for_price_pressure_claim")),
+        "energy_pressure_phase_locked_improvement_pct": 0.0,
+        "energy_pressure_ready_for_proxy_claim": False,
+        "energy_demand_proxy_exploratory_improvement_pct": energy_summary.get(
+            "exploratory_demand_proxy_improvement_pct"
+        ),
+        "energy_stress_proxy_description_allowed": bool(
+            energy_summary.get("energy_stress_proxy_description_allowed")
+        ),
         "rolling_champion_count": rolling_summary.get("rolling_champion_count"),
         "triple_source_candidate_count": rolling_summary.get("triple_source_candidate_count"),
         "single_run_candidate_count": rolling_summary.get("single_run_candidate_count"),
@@ -262,7 +268,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Time-series measured sources/series: `{summary.get('time_series_measured_source_count')}` / `{summary.get('time_series_measured_series_count')}`",
         f"- Energy pressure rows/windows: `{summary.get('energy_pressure_hourly_grid_rows')}` / `{summary.get('energy_pressure_forecast_rows')}`",
         f"- Energy pressure max band: `{summary.get('energy_pressure_max_band')}`",
-        f"- Energy pressure phase-locked improvement: `{summary.get('energy_pressure_phase_locked_improvement_pct')}`%",
+        f"- Energy pressure promoted-model improvement: `{summary.get('energy_pressure_phase_locked_improvement_pct')}`%",
+        f"- Exploratory demand-proxy improvement: `{summary.get('energy_demand_proxy_exploratory_improvement_pct')}`%",
+        f"- Energy-stress proxy description allowed: `{str(bool(summary.get('energy_stress_proxy_description_allowed'))).lower()}`",
         f"- Rolling champions / triple-source candidates: `{summary.get('rolling_champion_count')}` / `{summary.get('triple_source_candidate_count')}`",
         f"- External drive files/candidates/hash-backed top files: `{summary.get('external_drive_files_scanned')}` / `{summary.get('external_drive_candidate_count')}` / `{summary.get('external_drive_content_hash_count')}`",
         f"- External live-frozen triple-threat candidates: `{summary.get('external_drive_live_frozen_triple_threat_candidate_count')}`",

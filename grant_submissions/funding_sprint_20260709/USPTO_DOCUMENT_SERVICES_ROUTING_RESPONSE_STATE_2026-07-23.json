@@ -1,0 +1,32 @@
+{
+  "claim_boundary": "This record captures an official procedural routing response only. It does not establish the contents or status of any unpublished application, a controlling deadline, abandonment, revival eligibility, legal advice, successful copy ordering, or authenticated Patent Center access.",
+  "controls": {
+    "builder_can_email": false,
+    "builder_can_log_in": false,
+    "builder_can_order_or_pay": false,
+    "builder_can_submit": false,
+    "do_not_disclose_unpublished_application_content": true,
+    "do_not_duplicate_email_request": true,
+    "private_identifiers_omitted": true
+  },
+  "deadline": {
+    "exact_deadline_stated_in_response": false,
+    "state": "UNVERIFIED"
+  },
+  "duplicate_send_decision": "DO_NOT_REPLY_OR_REPEAT_THE_EMAIL_REQUEST",
+  "key_ask": "Use the official Certified Copy Center storefront for certified or uncertified patent-copy requests and direct procedural questions to its customer-service route.",
+  "lane_id": "uspto_document_services_copy_route",
+  "missing_facts": [
+    "Whether the official storefront can supply the requested unpublished application file wrapper",
+    "Required identity and authorization evidence",
+    "Available document scope and delivery timing",
+    "Fees, if any",
+    "Current controlling response or preservation deadline"
+  ],
+  "next_action": "Use the official copy-order or customer-service route in a human-controlled session, confirm unpublished-record availability before payment, and continue the separate authenticated Patent Center and registered-practitioner paths. Do not send unpublished application content by ordinary email.",
+  "official_response_received_utc": "2026-07-23T11:45:05Z",
+  "response_template_id": "NO_DUPLICATE_MONITOR",
+  "schema": "lumencore.uspto_document_services_routing_response_state.v1",
+  "send_now": false,
+  "state": "OFFICIAL_COPY_PORTAL_ROUTE_PROVIDED_SCOPE_UNCONFIRMED"
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "lumencore.outreach_response_conformance_config.v1",
+  "version": 1,
+  "controls": {
+    "action_time_human_approval_required": true,
+    "autonomous_email_send_allowed": false,
+    "current_source_hashes_required": true,
+    "duplicate_suppression_required": true,
+    "exact_deadline_timezone_required": true,
+    "federal_reviewer_gate_required": true,
+    "full_thread_recheck_before_followup_draft": true,
+    "private_identifiers_omitted": true,
+    "submission_conformance_required": true,
+    "template_quality_pass_required": true
+  },
+  "materials": {
+    "email_reconciliation": {
+      "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
+      "schema": "lumencore.email_action_reconciliation.v1"
+    },
+    "followup_policy": {
+      "path": "config/outreach_followup_policies_v1.json",
+      "schema": "lumencore.outreach_followup_policies.v1"
+    },
+    "followup_queue": {
+      "path": "grant_submissions/funding_sprint_20260709/OUTREACH_FOLLOWUP_ACTION_QUEUE_2026-07-18.json",
+      "schema": "lumencore.outreach_followup_action_queue.v1"
+    },
+    "monday_packet": {
+      "path": "grant_submissions/funding_sprint_20260709/MONDAY_FEDERAL_ACTION_PACKET_2026-07-26.json",
+      "schema": "lumencore.monday_federal_action_packet.v1"
+    },
+    "response_template_registry": {
+      "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
+      "schema": "lumencore.outreach_response_template_registry.v1"
+    },
+    "reviewer_objection_gate": {
+      "path": "tmp/outreach_conformance_reviewer_relaxed.json",
+      "schema": "lumencore.federal_reviewer_objection_gate.v1"
+    },
+    "submission_conformance_gate": {
+      "path": "out/ops/submission_conformance_gate_latest.json",
+      "schema": "lumencore.submission_conformance_gate.v1"
+    }
+  },
+  "claim_boundary": "This gate proves bounded local conformance checks against the named current artifacts. It does not prove recipient identity, mailbox delivery, eligibility, responsiveness, legal authority, portal acceptance, award, agency endorsement, independent validation, or permission to send."
+}

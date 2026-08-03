@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import hashlib
-import importlib.util
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -14,12 +14,9 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 DOCS = ROOT / "docs"
 
 CHAMPION_BOARD_JSON = OUT_OPS / "geometry_champion_of_champions_latest.json"
-CHAMPION_BOARD_SCRIPT = ROOT / "code" / "ops" / "BUILD_GEOMETRY_CHAMPION_OF_CHAMPIONS.py"
-KURAMOTO_REQUEST_JSON = OUT_OPS / "kuramoto_field_replay_request_latest.json"
-KURAMOTO_REQUEST_SCRIPT = ROOT / "code" / "ops" / "BUILD_KURAMOTO_FIELD_REPLAY_REQUEST.py"
 BUYER_PACKET_JSON = OUT_OPS / "field_validation_buyer_pilot_packet_latest.json"
-BUYER_PACKET_SCRIPT = ROOT / "code" / "ops" / "BUILD_FIELD_VALIDATION_BUYER_PILOT_PACKET.py"
-CHAMPION_GAUNTLET_JSON = OUT_OPS / "champion_metric_gauntlet_latest.json"
+GAUNTLET_JSON = DASHBOARD_DATA / "champion_metric_gauntlet.json"
+VALUATION_JSON = OUT_OPS / "valuation_proposal_target_packet_latest.json"
 
 OUT_JSON = OUT_OPS / "field_validation_control_room_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "field_validation_control_room.json"
@@ -34,7 +31,7 @@ def read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
         return {}
     return payload if isinstance(payload, dict) else {}
@@ -42,557 +39,506 @@ def read_json(path: Path) -> dict[str, Any]:
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
 
 
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    os.replace(temporary, path)
 
 
 def stable_sha256(payload: Any) -> str:
-    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
 
 
-def as_dict(value: Any) -> dict[str, Any]:
+def summary(payload: dict[str, Any]) -> dict[str, Any]:
+    value = payload.get("summary", {})
     return value if isinstance(value, dict) else {}
 
 
-def as_list(value: Any) -> list[Any]:
-    return value if isinstance(value, list) else []
-
-
-def load_builder_payload(script: Path, module_name: str) -> dict[str, Any]:
-    spec = importlib.util.spec_from_file_location(module_name, script)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    payload = module.build_payload()
-    return payload if isinstance(payload, dict) else {}
-
-
-def load_or_build_json(path: Path, script: Path, schema: str, module_name: str) -> dict[str, Any]:
-    payload = read_json(path)
-    if payload.get("schema") == schema:
-        return payload
-    return load_builder_payload(script, module_name)
-
-
-def selected_family(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "family": row.get("family", ""),
-        "label": row.get("label", ""),
-        "lane": row.get("lane", ""),
-        "rank": row.get("rank", 0),
-        "asset_score": row.get("asset_score", 0),
-        "evidence_status": row.get("evidence_status", ""),
-        "claim_stage": row.get("claim_stage", ""),
-        "rolling_gate_status": row.get("rolling_gate_status", ""),
-        "rolling_gate_repeat_live_win_count": row.get("rolling_gate_repeat_live_win_count", 0),
-        "rolling_gate_distinct_run_hash_count": row.get("rolling_gate_distinct_run_hash_count", 0),
-        "natural_logic": row.get("natural_logic", ""),
-        "benchmark_hypothesis": row.get("benchmark_hypothesis", ""),
-        "promotion_metric": row.get("promotion_metric", ""),
-        "failure_mode": row.get("failure_mode", ""),
-        "paid_pilot_ready": bool(row.get("paid_pilot_ready", False)),
-        "manual_outreach_allowed": bool(row.get("manual_outreach_allowed", False)),
-        "ready_for_field_validation_claim": bool(row.get("ready_for_field_validation_claim", False)),
-        "ready_for_real_dollar_claim": bool(row.get("ready_for_real_dollar_claim", False)),
-        "kraken_live_execution_allowed": bool(row.get("kraken_live_execution_allowed", False)),
-    }
-
-
-def top_family_rows(champion_board: dict[str, Any], limit: int = 5) -> list[dict[str, Any]]:
-    rows = champion_board.get("family_asset_rankings", [])
-    if not isinstance(rows, list):
-        return []
-    selected: list[dict[str, Any]] = []
-    for row in rows[:limit]:
-        if isinstance(row, dict):
-            selected.append(selected_family(row))
-    return selected
-
-
-def select_packet(buyer_packet: dict[str, Any], family_id: str) -> dict[str, Any]:
-    packets = buyer_packet.get("packets", [])
-    if not isinstance(packets, list):
-        return {}
-    for packet in packets:
-        if isinstance(packet, dict) and packet.get("family_id") == family_id:
-            return packet
-    return {}
-
-
-def build_claim_ladder(kuramoto_request: dict[str, Any], champion_board: dict[str, Any]) -> list[dict[str, Any]]:
-    summary = kuramoto_request.get("summary", {})
-    if not isinstance(summary, dict):
-        summary = {}
-    truth_gates = champion_board.get("current_truth_gates", {})
-    if not isinstance(truth_gates, dict):
-        truth_gates = {}
-    return [
-        {
-            "stage": "internal_live_replay",
-            "status": "passed",
-            "evidence": (
-                f"{summary.get('wins_vs_kalman', 0)}/{summary.get('holdout_count', 0)} wins vs Kalman; "
-                f"{summary.get('estimated_rows_replayed', 0)} estimated rows replayed"
-            ),
-            "claim_allowed": "internal source-conditioned replay winner",
-        },
-        {
-            "stage": "buyer_authorized_field_replay_request",
-            "status": "ready",
-            "evidence": "request packet built with buyer data checklist, baselines, KPIs, acceptance gates, and manual email copy",
-            "claim_allowed": "ready to request buyer-authorized field replay",
-        },
-        {
-            "stage": "field_validation",
-            "status": "blocked_until_external_owner_replay",
-            "evidence": "missing buyer or agency controlled replay and result interpretation",
-            "claim_allowed": bool(truth_gates.get("field_validation_claim_allowed", False)),
-        },
-        {
-            "stage": "real_dollar_claim",
-            "status": "blocked_until_buyer_approved_economics",
-            "evidence": "missing buyer-approved cost factors and signed conversion from technical improvement to dollars",
-            "claim_allowed": bool(truth_gates.get("real_dollar_savings_claim_allowed", False)),
-        },
-        {
-            "stage": "live_execution_or_trading",
-            "status": "blocked",
-            "evidence": "research and buyer-pilot assets are not live autonomous execution authorization",
-            "claim_allowed": bool(truth_gates.get("live_trading_or_autonomous_execution_allowed", False)),
-        },
+def bounded_asset(row: dict[str, Any]) -> dict[str, Any]:
+    keys = [
+        "family",
+        "label",
+        "lane",
+        "rank",
+        "asset_score",
+        "evidence_status",
+        "claim_stage",
+        "rolling_gate_status",
+        "natural_logic",
+        "benchmark_hypothesis",
+        "promotion_metric",
+        "failure_mode",
+        "paid_pilot_ready",
+        "manual_outreach_allowed",
+        "ready_for_field_validation_claim",
+        "ready_for_real_dollar_claim",
+        "kraken_live_execution_allowed",
     ]
+    return {key: row.get(key) for key in keys}
 
 
-def build_external_validation_unlock(champion_gauntlet: dict[str, Any]) -> dict[str, Any]:
-    source_breadth = as_dict(champion_gauntlet.get("source_breadth_universe"))
-    fresh_sources = as_dict(source_breadth.get("fresh_provider_measurement"))
-    manifest = as_dict(source_breadth.get("geometry_manifest"))
-    return {
-        "status": "go_to_request_external_replay_not_go_to_field_claim",
-        "external_approval_received": False,
-        "field_validation_claim_allowed": False,
-        "real_dollar_savings_claim_allowed": False,
-        "fixed_dollar_delta_claim_allowed": False,
-        "what_is_ready_now": [
-            "internal champion replay evidence",
-            "hashable proof feeds",
-            "buyer/lab/agency validation request language",
-            "data intake checklist",
-            "grid/RF/PLL protocol templates",
-            "economic conversion worksheet template",
-        ],
-        "required_external_inputs": [
-            {
-                "input": "held_out_operational_data",
-                "owner": "buyer, agency, lab, utility, or system owner",
-                "why": "Prevents tuning to self-selected examples.",
-                "status": "missing_external_owner_supply_or_approval",
-            },
-            {
-                "input": "incumbent_baseline",
-                "owner": "external system owner",
-                "why": "Defines what must be beaten under equal constraints.",
-                "status": "missing_external_owner_supply_or_approval",
-            },
-            {
-                "input": "acceptance_metric",
-                "owner": "external technical reviewer or operator",
-                "why": "Pre-registers what counts as a win before replay.",
-                "status": "missing_external_owner_supply_or_approval",
-            },
-            {
-                "input": "economic_conversion_factor",
-                "owner": "buyer finance, operations, or program office",
-                "why": "Converts technical delta into an allowed dollar estimate.",
-                "status": "missing_external_owner_supply_or_approval",
-            },
-            {
-                "input": "data_rights_and_publication_boundary",
-                "owner": "buyer legal/security/data owner",
-                "why": "Determines what can be stored, sold, published, or cited.",
-                "status": "missing_external_owner_supply_or_approval",
-            },
-            {
-                "input": "signed_or_logged_result_acceptance",
-                "owner": "external lab, buyer, agency, or system owner",
-                "why": "Turns internal replay into externally traceable validation evidence.",
-                "status": "missing_external_owner_supply_or_approval",
-            },
-        ],
-        "minimum_acceptance_protocol": {
-            "holdout_windows": "20 or more pre-registered windows unless the buyer defines a stricter domain standard",
-            "baseline_execution": "candidate and incumbent run on identical inputs, clocks, missingness rules, and guardrails",
-            "failure_handling": "failed, tied, missing, and adverse windows remain in the ledger",
-            "hashing": "hash raw input pointers, normalized inputs, configs, outputs, logs, and interpretation memo",
-            "review": "external owner confirms whether the acceptance metric was met",
-        },
-        "current_live_source_estate": {
-            "measured_provider_count": fresh_sources.get("measured_provider_count", 0),
-            "enabled_provider_count": fresh_sources.get("enabled_provider_count", 0),
-            "manifest_unique_source_count": manifest.get("unique_source_count", 0),
-            "manifest_ready_for_benchmark_row_count": manifest.get("ready_for_benchmark_row_count", 0),
-            "claim_boundary": source_breadth.get("claim_boundary", ""),
-        },
-        "allowed_language": (
-            "We are ready to run a buyer-authorized replay against your held-out data, incumbent baseline, "
-            "acceptance metric, and agreed economic conversion."
-        ),
-        "blocked_language": (
-            "We have already field validated this, realized savings, or established a fixed dollar value per frozen delta."
-        ),
-    }
-
-
-def build_hardware_tracks(champion_gauntlet: dict[str, Any]) -> dict[str, Any]:
-    hardware = as_dict(champion_gauntlet.get("hardware_validation_unlock"))
-    if hardware:
-        return hardware
+def hardware_tracks() -> dict[str, Any]:
     return {
         "claim_boundary": (
-            "Grid, RF, and PLL hardware validation require an external owner-controlled replay or instrumented bench."
+            "Grid, RF, and PLL protocols may be designed now. They become field "
+            "evidence only after an authorized owner supplies instrumented data, "
+            "freezes the accepted baseline and metrics, and accepts the result."
         ),
-        "grid_validation": {"required_inputs": [], "acceptance_metrics": []},
-        "rf_validation": {"required_inputs": [], "acceptance_metrics": []},
-        "pll_validation": {"required_inputs": [], "acceptance_metrics": []},
+        "grid_validation": {
+            "required_inputs": [
+                "authorized PMU, load, forecast, dispatch, or outage windows",
+                "accepted incumbent forecast or control baseline",
+                "operator-approved untouched holdout",
+            ],
+            "acceptance_metrics": [
+                "forecast error",
+                "event lead time",
+                "false positive and false negative rate",
+                "latency under operational cadence",
+            ],
+        },
+        "rf_validation": {
+            "required_inputs": [
+                "authorized RF spectrum or IQ captures",
+                "calibrated instrument settings",
+                "accepted receiver or classifier baseline",
+            ],
+            "acceptance_metrics": [
+                "SNR or SINR",
+                "EVM and BER",
+                "reacquisition time",
+                "runtime budget",
+            ],
+        },
+        "pll_validation": {
+            "required_inputs": [
+                "reference oscillator and PLL configuration",
+                "jitter or drift injection profile",
+                "calibrated phase-noise or timestamp logs",
+            ],
+            "acceptance_metrics": [
+                "lock time",
+                "cycle slips",
+                "phase error",
+                "jitter transfer",
+            ],
+        },
         "fixed_dollar_claim_blockers": [
-            "External owner-controlled data and economics are missing.",
-        ],
-        "what_api_keys_do": [
-            "Pull fresh measured rows and populate hashable evidence snapshots.",
+            "no buyer-authorized accepted replay",
+            "no approved counterfactual baseline",
+            "no accepted economic conversion factor",
+            "no signed or traceable result acceptance",
+            "no contract pricing a validated technical output",
         ],
     }
 
 
 def build_payload() -> dict[str, Any]:
-    champion_board = load_or_build_json(
-        CHAMPION_BOARD_JSON,
-        CHAMPION_BOARD_SCRIPT,
-        "geometry_champion_of_champions_v1",
-        "champion_board_for_field_validation_control_room",
-    )
-    kuramoto_request = load_or_build_json(
-        KURAMOTO_REQUEST_JSON,
-        KURAMOTO_REQUEST_SCRIPT,
-        "kuramoto_field_replay_request_v1",
-        "kuramoto_request_for_field_validation_control_room",
-    )
-    buyer_packet = load_or_build_json(
-        BUYER_PACKET_JSON,
-        BUYER_PACKET_SCRIPT,
-        "field_validation_buyer_pilot_packet_v1",
-        "buyer_packet_for_field_validation_control_room",
-    )
-    champion_gauntlet = read_json(CHAMPION_GAUNTLET_JSON)
+    board = read_json(CHAMPION_BOARD_JSON)
+    buyer = read_json(BUYER_PACKET_JSON)
+    gauntlet = read_json(GAUNTLET_JSON)
+    valuation = read_json(VALUATION_JSON)
 
-    champion = champion_board.get("champion_of_champions", {})
-    if not isinstance(champion, dict):
-        champion = {}
-    strongest = selected_family(champion.get("strongest_current", {}) if isinstance(champion.get("strongest_current", {}), dict) else {})
-    buyer_card = selected_family(champion.get("best_buyer_pilot_card", {}) if isinstance(champion.get("best_buyer_pilot_card", {}), dict) else {})
-    kuramoto_summary = kuramoto_request.get("summary", {})
-    if not isinstance(kuramoto_summary, dict):
-        kuramoto_summary = {}
-    kuramoto_packet = select_packet(buyer_packet, "kuramoto_phase_coupling")
-    brach_packet = select_packet(buyer_packet, "brachistochrone_descent")
-    external_unlock = build_external_validation_unlock(champion_gauntlet)
-    hardware_tracks = build_hardware_tracks(champion_gauntlet)
+    required = {
+        "geometry_champion_of_champions_v3": board.get("schema"),
+        "field_validation_buyer_pilot_packet_v2": buyer.get("schema"),
+        "champion_metric_gauntlet_v2": gauntlet.get("schema"),
+        "valuation_proposal_target_packet_v3": valuation.get("schema"),
+    }
+    for expected, actual in required.items():
+        if actual != expected:
+            raise ValueError(f"{expected} is required; found {actual!r}")
 
-    control_room = {
-        "schema": "field_validation_control_room_v1",
+    board_summary = summary(board)
+    buyer_summary = summary(buyer)
+    gauntlet_summary = summary(gauntlet)
+    strongest = gauntlet.get("strongest_current", {})
+    if not isinstance(strongest, dict):
+        strongest = {}
+    section = board.get("champion_of_champions", {})
+    if not isinstance(section, dict):
+        section = {}
+    asset_priority = section.get("next_asset_build_priority", {})
+    if not isinstance(asset_priority, dict):
+        asset_priority = {}
+    family_rows = board.get("family_asset_rankings", [])
+    top_rows = [
+        bounded_asset(row)
+        for row in family_rows[:5]
+        if isinstance(row, dict)
+    ]
+
+    buyer_tracks = []
+    for packet in buyer.get("packets", []):
+        if not isinstance(packet, dict):
+            continue
+        buyer_tracks.append(
+            {
+                "family_id": packet.get("family_id"),
+                "protocol_review_name": packet.get("pilot_name"),
+                "evidence_stage": packet.get("evidence_stage"),
+                "priority_buyer_titles": packet.get("priority_buyer_titles", []),
+                "protocol_question": packet.get("protocol_question", ""),
+                "field_replay_status": packet.get("field_replay_request", {}).get(
+                    "current_status"
+                ),
+                "send_allowed": packet.get("claim_gate", {}).get(
+                    "send_manually_to_reviewed_contacts", False
+                ),
+            }
+        )
+
+    claim_ladder = [
+        {
+            "stage": "direct_measured_replay",
+            "status": "completed_nonpromotion",
+            "evidence": (
+                f"Kuramoto {gauntlet_summary.get('holdout_wins', 0)}/"
+                f"{gauntlet_summary.get('holdout_count', 0)} paired-day wins; "
+                f"mean skill {gauntlet_summary.get('mean_delta_vs_named_baseline', 0)}"
+            ),
+            "claim_allowed": "measured nonpromotion result",
+        },
+        {
+            "stage": "source_specific_candidate_promotion",
+            "status": "blocked_all_baseline_gate_failed",
+            "evidence": "zero direct all-baseline globally corrected promotions",
+            "claim_allowed": False,
+        },
+        {
+            "stage": "buyer_authorized_field_replay_request",
+            "status": "blocked_no_promoted_candidate",
+            "evidence": "current candidates are not eligible for a field-replay request",
+            "claim_allowed": False,
+        },
+        {
+            "stage": "field_validation",
+            "status": "blocked_until_external_owner_protocol_and_accepted_result",
+            "evidence": "no external owner-controlled accepted replay",
+            "claim_allowed": False,
+        },
+        {
+            "stage": "real_dollar_claim",
+            "status": "blocked_until_accepted_economics",
+            "evidence": "no accepted technical result or buyer-approved conversion",
+            "claim_allowed": False,
+        },
+        {
+            "stage": "live_execution_or_trading",
+            "status": "blocked",
+            "evidence": "benchmark evidence is not execution authorization",
+            "claim_allowed": False,
+        },
+    ]
+
+    required_external_inputs = [
+        {
+            "input": "held_out_operational_data",
+            "owner": "authorized system owner",
+            "status": "missing",
+        },
+        {
+            "input": "incumbent_baseline",
+            "owner": "system owner or technical reviewer",
+            "status": "missing",
+        },
+        {
+            "input": "acceptance_metric",
+            "owner": "technical reviewer or operator",
+            "status": "missing",
+        },
+        {
+            "input": "economic_conversion_factor",
+            "owner": "buyer operations or finance",
+            "status": "missing",
+        },
+        {
+            "input": "signed_or_logged_result_acceptance",
+            "owner": "external lab, buyer, agency, or operator",
+            "status": "missing",
+        },
+    ]
+
+    payload: dict[str, Any] = {
+        "schema": "field_validation_control_room_v2",
         "generated_utc": now_utc(),
         "purpose": (
-            "One reviewer/buyer control surface for the strongest geometry evidence, current claim gates, "
-            "field-validation blockers, and next validation actions."
+            "Separate source breadth, benchmark readiness, candidate promotion, "
+            "field validation, and commercial action gates."
         ),
         "summary": {
-            "strongest_current_family": strongest.get("family", ""),
-            "strongest_current_lane": strongest.get("lane", ""),
-            "strongest_current_asset_score": strongest.get("asset_score", 0),
-            "strongest_current_status": kuramoto_summary.get(
-                "current_status", "ready_to_request_field_replay_not_yet_field_validated"
+            "internal_performance_champion_present": False,
+            "strongest_current_family": "",
+            "strongest_current_lane": "",
+            "strongest_current_status": "no_current_performance_champion",
+            "next_asset_build_priority_family": asset_priority.get("family", ""),
+            "next_asset_build_priority_lane": asset_priority.get("lane", ""),
+            "kuramoto_holdout_wins_vs_kalman": int(
+                gauntlet_summary.get("holdout_wins") or 0
             ),
-            "kuramoto_holdout_wins_vs_kalman": kuramoto_summary.get("wins_vs_kalman", 0),
-            "kuramoto_holdout_count": kuramoto_summary.get("holdout_count", 0),
-            "kuramoto_estimated_rows_replayed": kuramoto_summary.get("estimated_rows_replayed", 0),
-            "kuramoto_source_system_count": kuramoto_summary.get("source_system_count", 0),
-            "best_buyer_pilot_family": buyer_card.get("family", ""),
-            "best_buyer_pilot_lane": buyer_card.get("lane", ""),
-            "manual_outreach_ready": True,
+            "kuramoto_holdout_count": int(
+                gauntlet_summary.get("holdout_count") or 0
+            ),
+            "kuramoto_mean_delta_vs_kalman": float(
+                gauntlet_summary.get("mean_delta_vs_named_baseline") or 0.0
+            ),
+            "kuramoto_estimated_rows_replayed": int(
+                gauntlet_summary.get("estimated_rows_replayed") or 0
+            ),
+            "kuramoto_source_system_count": int(
+                gauntlet_summary.get("source_system_count") or 0
+            ),
+            "direct_all_baseline_global_holm_positive_count": int(
+                board_summary.get(
+                    "direct_all_baseline_global_holm_positive_count"
+                )
+                or 0
+            ),
+            "best_buyer_pilot_family": "",
+            "manual_outreach_ready": False,
+            "paid_protocol_review_scoping_ready": True,
             "bulk_email_allowed": False,
-            "external_validation_unlock_packet_ready": True,
+            "external_validation_unlock_packet_ready": False,
             "external_approval_received": False,
-            "grid_rf_pll_protocols_ready": bool(hardware_tracks),
-            "broader_measured_provider_count": external_unlock["current_live_source_estate"][
-                "measured_provider_count"
-            ],
-            "manifest_unique_source_count": external_unlock["current_live_source_estate"]["manifest_unique_source_count"],
+            "grid_rf_pll_protocols_ready": True,
+            "broader_measured_provider_count": int(
+                board_summary.get("live_measured_sources") or 0
+            ),
+            "broader_measured_row_count": int(
+                board_summary.get("live_total_measured_rows") or 0
+            ),
+            "manifest_unique_source_count": int(
+                gauntlet_summary.get("manifest_unique_source_count") or 0
+            ),
+            "legacy_pilot_card_excluded_count": int(
+                board_summary.get("legacy_pilot_card_excluded_count") or 0
+            ),
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
             "fixed_dollar_delta_claim_allowed": False,
             "live_trading_or_autonomous_execution_allowed": False,
         },
         "top_assets": {
-            "strongest_current": strongest,
-            "best_buyer_pilot_card": buyer_card,
-            "top_family_asset_rankings": top_family_rows(champion_board, 5),
+            "strongest_current": {},
+            "next_asset_build_priority": bounded_asset(asset_priority),
+            "best_buyer_pilot_card": {},
+            "top_family_asset_rankings": top_rows,
         },
         "proof_bridge": {
-            "internal_replay_result": {
-                "candidate": kuramoto_summary.get("candidate", "kuramoto_phase_coupling"),
-                "named_baseline": "kalman_filter",
-                "wins": kuramoto_summary.get("wins_vs_kalman", 0),
-                "windows": kuramoto_summary.get("holdout_count", 0),
-                "mean_delta": kuramoto_summary.get("mean_delta_vs_kalman", 0),
-                "wilson_lower_95": kuramoto_summary.get("wilson_95_win_rate_lower", 0),
-                "estimated_rows_replayed": kuramoto_summary.get("estimated_rows_replayed", 0),
-                "source_systems": kuramoto_summary.get("source_systems", []),
-                "chain_sha256": kuramoto_summary.get("holdout_chain_sha256", ""),
+            "measured_nonpromotion_result": {
+                "candidate": strongest.get("family"),
+                "development_selected_candidate": strongest.get(
+                    "development_selected_candidate"
+                ),
+                "candidate_was_protocol_selected": strongest.get(
+                    "candidate_was_protocol_selected"
+                ),
+                "named_baseline": strongest.get("named_baseline"),
+                "wins": strongest.get("wins_vs_named_baseline"),
+                "windows": strongest.get("holdout_count"),
+                "mean_delta": strongest.get("mean_delta_vs_named_baseline"),
+                "all_baseline_gate_passed": strongest.get(
+                    "candidate_beats_all_registered_baselines_after_holm"
+                ),
+                "chain_sha256": strongest.get("holdout_chain_sha256"),
             },
-            "field_replay_request": kuramoto_request.get("request_packet", {}),
-            "claim_ladder": build_claim_ladder(kuramoto_request, champion_board),
+            "claim_ladder": claim_ladder,
         },
-        "external_validation_unlock": external_unlock,
-        "hardware_validation_tracks": hardware_tracks,
-        "buyer_tracks": [
-            {
-                "family_id": "kuramoto_phase_coupling",
-                "pilot_name": kuramoto_packet.get("pilot_name", ""),
-                "priority_buyer_titles": kuramoto_packet.get("priority_buyer_titles", []),
-                "technical_question": kuramoto_packet.get("pilot_question", ""),
-                "manual_email_subject": kuramoto_packet.get("email", {}).get("subject", "")
-                if isinstance(kuramoto_packet.get("email", {}), dict)
-                else "",
-            },
-            {
-                "family_id": "brachistochrone_descent",
-                "pilot_name": brach_packet.get("pilot_name", ""),
-                "priority_buyer_titles": brach_packet.get("priority_buyer_titles", []),
-                "technical_question": brach_packet.get("pilot_question", ""),
-                "manual_email_subject": brach_packet.get("email", {}).get("subject", "")
-                if isinstance(brach_packet.get("email", {}), dict)
-                else "",
-            },
-        ],
+        "external_validation_unlock": {
+            "status": "blocked_no_promoted_candidate",
+            "external_approval_received": False,
+            "field_validation_claim_allowed": False,
+            "real_dollar_savings_claim_allowed": False,
+            "what_is_ready_now": [
+                "source-native protocol review",
+                "source compatibility matrix",
+                "baseline registration",
+                "negative-result evidence packet",
+            ],
+            "required_external_inputs": required_external_inputs,
+            "allowed_language": (
+                "We can scope a source-native benchmark and evidence protocol review."
+            ),
+            "blocked_language": (
+                "We have a current champion, are ready to request field replay, "
+                "or have established field performance or savings."
+            ),
+        },
+        "hardware_validation_tracks": hardware_tracks(),
+        "buyer_tracks": buyer_tracks,
         "next_10_actions": [
-            "Use the Kuramoto field replay request as the primary buyer-facing validation ask.",
-            "Select one energy/grid, forecasting, sensor-fusion, or industrial-stability owner with real holdout data.",
-            "Ask for 20 pre-registered windows and their accepted incumbent baseline before any replay.",
-            "Ask the owner to approve the exact acceptance metric and economic conversion before any scoring.",
-            "Freeze the buyer baseline, metrics, pass/fail threshold, and forbidden tuning rules.",
-            "Run candidate and incumbent under identical constraints.",
-            "Hash inputs, logs, outputs, and the interpretation memo.",
-            "Record failures as first-class evidence rather than deleting them.",
-            "Keep brachistochrone as the second paid-pilot lane for constrained transport/routing.",
-            "Do not use field-validation or fixed-dollar language until the external replay passes.",
+            "Keep the current Kuramoto result as measured negative evidence.",
+            "Do not request a buyer field replay for Kuramoto or Brachistochrone.",
+            "Select future candidates on development data only.",
+            "Register every source-native baseline before scoring the holdout.",
+            "Reserve an untouched chronological holdout.",
+            "Require every baseline gate to pass after multiplicity correction.",
+            "Create independent repeat hashes only after direct promotion.",
+            "Use source breadth as adapter inventory, not performance evidence.",
+            "Offer a bounded paid protocol review without candidate-win language.",
+            "Require exact action-time approval before any external outreach.",
         ],
         "dashboard_cards": [
             {
-                "title": "Strongest Current Asset",
-                "metric": f"{kuramoto_summary.get('wins_vs_kalman', 0)}/{kuramoto_summary.get('holdout_count', 0)}",
-                "subtitle": "Kuramoto wins vs Kalman on internal source-conditioned holdouts",
-                "status": "request-field-replay",
+                "title": "Performance Champion",
+                "metric": "none",
+                "subtitle": "zero direct all-baseline global promotions",
+                "status": "blocked",
             },
             {
-                "title": "Claim Gate",
-                "metric": "not field validated",
-                "subtitle": "External owner-controlled replay still required",
-                "status": "blocked-until-buyer-replay",
+                "title": "Kuramoto Measured Read",
+                "metric": (
+                    f"{gauntlet_summary.get('holdout_wins', 0)}/"
+                    f"{gauntlet_summary.get('holdout_count', 0)}"
+                ),
+                "subtitle": (
+                    f"mean skill {gauntlet_summary.get('mean_delta_vs_named_baseline', 0)}"
+                ),
+                "status": "nonpromotion",
             },
             {
-                "title": "Rows Replayed",
-                "metric": str(kuramoto_summary.get("estimated_rows_replayed", 0)),
-                "subtitle": "Estimated internal replay rows across measured source systems",
-                "status": "internal-evidence",
-            },
-            {
-                "title": "Next Commercial Step",
-                "metric": "paid pilot",
-                "subtitle": "Manual outreach to one qualified owner, not bulk claims",
-                "status": "manual-outreach-only",
+                "title": "Commercially Ready",
+                "metric": "protocol review",
+                "subtitle": "bounded technical service, no performance claim",
+                "status": "draft-only",
             },
         ],
         "claim_controls": {
             "allowed": [
-                "internal source-conditioned replay evidence",
-                "ready to request buyer-authorized field replay",
-                "manual paid-pilot scoping outreach",
-                "bounded technical evaluation proposal",
+                "measured nonpromotion evidence",
+                "source-native protocol review scoping",
+                "benchmark implementation proposal",
             ],
             "blocked": [
+                "current internal champion",
+                "buyer field-replay request for current candidates",
+                "manual or bulk outreach without action-time approval",
                 "field validation already proven",
-                "realized dollar savings",
                 "fixed dollar value per frozen delta",
                 "guaranteed trading or institutional profit",
-                "medical or addiction treatment claims",
-                "bulk outreach",
             ],
         },
         "inputs": {
-            "champion_board": str(CHAMPION_BOARD_JSON.relative_to(ROOT)),
-            "kuramoto_field_replay_request": str(KURAMOTO_REQUEST_JSON.relative_to(ROOT)),
-            "buyer_pilot_packet": str(BUYER_PACKET_JSON.relative_to(ROOT)),
+            "champion_board": str(CHAMPION_BOARD_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "buyer_packet": str(BUYER_PACKET_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "gauntlet": str(GAUNTLET_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "valuation": str(VALUATION_JSON.relative_to(ROOT)).replace("\\", "/"),
         },
         "outputs": {
-            "json": str(OUT_JSON.relative_to(ROOT)),
-            "dashboard_json": str(DASHBOARD_JSON.relative_to(ROOT)),
-            "markdown": str(OUT_MD.relative_to(ROOT)),
+            "json": str(OUT_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "dashboard_json": str(DASHBOARD_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "markdown": str(OUT_MD.relative_to(ROOT)).replace("\\", "/"),
         },
     }
-    control_room["control_room_sha256"] = stable_sha256(control_room)
-    return control_room
+    payload["control_room_sha256"] = stable_sha256(
+        {
+            "summary": payload["summary"],
+            "proof_bridge": payload["proof_bridge"],
+            "external_validation_unlock": payload["external_validation_unlock"],
+            "buyer_tracks": payload["buyer_tracks"],
+            "claim_controls": payload["claim_controls"],
+        }
+    )
+    return payload
 
 
 def render_markdown(payload: dict[str, Any]) -> str:
-    summary = payload["summary"]
-    bridge = payload["proof_bridge"]["internal_replay_result"]
-    top_assets = payload["top_assets"]
-    external = payload["external_validation_unlock"]
-    hardware = payload["hardware_validation_tracks"]
+    info = payload["summary"]
+    evidence = payload["proof_bridge"]["measured_nonpromotion_result"]
     lines = [
         "# Field Validation Control Room",
         "",
         f"Generated UTC: `{payload['generated_utc']}`",
         "",
-        payload["purpose"],
+        "## Current Read",
         "",
-        "## Current Truth",
+        f"- Internal performance champion present: `{str(info['internal_performance_champion_present']).lower()}`",
+        f"- Current performance champion: `{info['strongest_current_family'] or 'none'}`",
+        f"- Next asset-build priority: `{info['next_asset_build_priority_family']}`",
+        f"- Kuramoto measured wins vs Kalman: `{info['kuramoto_holdout_wins_vs_kalman']}/{info['kuramoto_holdout_count']}`",
+        f"- Kuramoto mean skill delta: `{info['kuramoto_mean_delta_vs_kalman']}`",
+        f"- Direct all-baseline global promotions: `{info['direct_all_baseline_global_holm_positive_count']}`",
+        f"- Manual outreach ready: `{str(info['manual_outreach_ready']).lower()}`",
+        f"- Paid protocol-review scoping ready: `{str(info['paid_protocol_review_scoping_ready']).lower()}`",
+        f"- Field-validation claim allowed: `{str(info['field_validation_claim_allowed']).lower()}`",
+        f"- Real-dollar savings claim allowed: `{str(info['real_dollar_savings_claim_allowed']).lower()}`",
         "",
-        f"- Strongest current family: `{summary['strongest_current_family']}`",
-        f"- Lane: `{summary['strongest_current_lane']}`",
-        f"- Asset score: `{summary['strongest_current_asset_score']}`",
-        f"- Status: `{summary['strongest_current_status']}`",
-        f"- Internal wins vs Kalman: `{summary['kuramoto_holdout_wins_vs_kalman']}/{summary['kuramoto_holdout_count']}`",
-        f"- Estimated rows replayed: `{summary['kuramoto_estimated_rows_replayed']}`",
-        f"- Source systems: `{summary['kuramoto_source_system_count']}`",
-        f"- Best secondary buyer-pilot family: `{summary['best_buyer_pilot_family']}`",
+        "## Measured Nonpromotion",
         "",
-        "## Claim Gates",
-        "",
-        f"- Manual outreach ready: `{str(summary['manual_outreach_ready']).lower()}`",
-        f"- Bulk email allowed: `{str(summary['bulk_email_allowed']).lower()}`",
-        f"- External validation unlock packet ready: `{str(summary['external_validation_unlock_packet_ready']).lower()}`",
-        f"- External approval received: `{str(summary['external_approval_received']).lower()}`",
-        f"- Grid/RF/PLL protocols ready: `{str(summary['grid_rf_pll_protocols_ready']).lower()}`",
-        f"- Broader measured providers: `{summary['broader_measured_provider_count']}`",
-        f"- Manifest unique sources: `{summary['manifest_unique_source_count']}`",
-        f"- Field-validation claim allowed: `{str(summary['field_validation_claim_allowed']).lower()}`",
-        f"- Real-dollar savings claim allowed: `{str(summary['real_dollar_savings_claim_allowed']).lower()}`",
-        f"- Fixed-dollar delta claim allowed: `{str(summary['fixed_dollar_delta_claim_allowed']).lower()}`",
-        f"- Live autonomous execution allowed: `{str(summary['live_trading_or_autonomous_execution_allowed']).lower()}`",
-        "",
-        "## Strongest Proof Bridge",
-        "",
-        f"- Candidate: `{bridge['candidate']}`",
-        f"- Baseline: `{bridge['named_baseline']}`",
-        f"- Holdout result: `{bridge['wins']}/{bridge['windows']}`",
-        f"- Mean delta: `{bridge['mean_delta']}`",
-        f"- Wilson lower 95%: `{bridge['wilson_lower_95']}`",
-        f"- Chain SHA-256: `{bridge['chain_sha256']}`",
-        "",
-        "This supports a field-replay request. It does not establish field validation or a realized-dollar claim.",
+        f"- Candidate: `{evidence.get('candidate')}`",
+        f"- Development-selected candidate: `{evidence.get('development_selected_candidate')}`",
+        f"- Candidate was protocol-selected: `{str(evidence.get('candidate_was_protocol_selected')).lower()}`",
+        f"- All-baseline gate passed: `{str(evidence.get('all_baseline_gate_passed')).lower()}`",
         "",
         "## External Validation Unlock",
         "",
-        f"- Status: `{external['status']}`",
-        f"- External approval received: `{str(external['external_approval_received']).lower()}`",
-        f"- Allowed language: {external['allowed_language']}",
-        f"- Blocked language: {external['blocked_language']}",
-        "",
-        "Required external inputs before field-validation or dollar claims:",
-        "",
+        f"- Status: `{payload['external_validation_unlock']['status']}`",
     ]
-    for row in external["required_external_inputs"]:
-        lines.append(f"- `{row['input']}` from `{row['owner']}`: {row['why']} Status: `{row['status']}`")
-    lines.extend(
-        [
-            "",
-            "Minimum acceptance protocol:",
-            "",
-        ]
-    )
-    for key, value in external["minimum_acceptance_protocol"].items():
-        lines.append(f"- `{key}`: {value}")
+    for row in payload["external_validation_unlock"]["required_external_inputs"]:
+        lines.append(
+            f"- `{row['input']}`: `{row['status']}` ({row['owner']})"
+        )
     lines.extend(
         [
             "",
             "## Grid/RF/PLL Validation Tracks",
             "",
-            hardware.get("claim_boundary", ""),
+            payload["hardware_validation_tracks"]["claim_boundary"],
+            "",
+            "## Next 10 Actions",
             "",
         ]
     )
-    for track_name in ["grid_validation", "rf_validation", "pll_validation"]:
-        track = hardware.get(track_name, {})
-        label = track_name.replace("_", " ").title()
-        lines.extend([f"### {label}", "", "Required inputs:"])
-        for item in track.get("required_inputs", []):
-            lines.append(f"- {item}")
-        lines.append("")
-        lines.append("Acceptance metrics:")
-        for item in track.get("acceptance_metrics", []):
-            lines.append(f"- {item}")
-        lines.append("")
+    lines.extend(
+        f"{index}. {action}"
+        for index, action in enumerate(payload["next_10_actions"], start=1)
+    )
     lines.extend(
         [
-        "## Top Assets",
-        "",
+            "",
+            "## Boundary",
+            "",
+            payload["external_validation_unlock"]["blocked_language"],
+            "",
+            f"Control-room SHA-256: `{payload['control_room_sha256']}`",
         ]
     )
-    for row in top_assets.get("top_family_asset_rankings", []):
-        lines.extend(
-            [
-                f"### `{row['family']}`",
-                "",
-                f"- Lane: `{row['lane']}`",
-                f"- Asset score: `{row['asset_score']}`",
-                f"- Evidence status: `{row['evidence_status']}`",
-                f"- Claim stage: `{row['claim_stage']}`",
-                f"- Benchmark hypothesis: {row['benchmark_hypothesis']}",
-                "",
-            ]
-        )
-    lines.extend(["## Claim Ladder", ""])
-    for row in payload["proof_bridge"]["claim_ladder"]:
-        lines.extend(
-            [
-                f"- `{row['stage']}`: `{row['status']}`",
-                f"  Evidence: {row['evidence']}",
-                f"  Claim allowed: `{row['claim_allowed']}`",
-            ]
-        )
-    lines.extend(["", "## Next 10 Actions", ""])
-    lines.extend([f"{i}. {item}" for i, item in enumerate(payload["next_10_actions"], start=1)])
-    lines.extend(["", "## Dashboard Cards", ""])
-    for card in payload["dashboard_cards"]:
-        lines.extend(
-            [
-                f"- {card['title']}: `{card['metric']}`",
-                f"  {card['subtitle']} (`{card['status']}`)",
-            ]
-        )
-    lines.extend(["", "## Blocked Claims", ""])
-    lines.extend([f"- `{item}`" for item in payload["claim_controls"]["blocked"]])
-    lines.extend(["", f"Control room SHA-256: `{payload['control_room_sha256']}`"])
     return "\n".join(lines)
 
 
-def main() -> None:
+def main() -> int:
     payload = build_payload()
     write_json(OUT_JSON, payload)
     write_json(DASHBOARD_JSON, payload)
     write_text(OUT_MD, render_markdown(payload))
-    summary = payload["summary"]
     print(
-        "Field validation control room built: "
-        f"{summary['strongest_current_family']} "
-        f"{summary['kuramoto_holdout_wins_vs_kalman']}/{summary['kuramoto_holdout_count']} wins; "
-        f"field_validation_claim_allowed={summary['field_validation_claim_allowed']}"
+        json.dumps(
+            {
+                "schema": payload["schema"],
+                "performance_champion": payload["summary"][
+                    "internal_performance_champion_present"
+                ],
+                "manual_outreach_ready": payload["summary"][
+                    "manual_outreach_ready"
+                ],
+                "json": str(OUT_JSON.relative_to(ROOT)).replace("\\", "/"),
+            },
+            indent=2,
+        )
     )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

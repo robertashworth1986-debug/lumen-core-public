@@ -22,6 +22,19 @@ HARBOR_REVIEW_BURDEN_JSON = OUT / "harbor_ais_review_burden_profile_latest.json"
 HARBOR_REVIEW_BURDEN_ROOT = ROOT / "out" / "harbor_ais_review_burden"
 LOCAL_ICLOUD_INTAKE_JSON = OUT / "local_icloud_evidence_intake_latest.json"
 LOCAL_ICLOUD_INTAKE_MD = GRANTS / "LOCAL_ICLOUD_EVIDENCE_INTAKE_2026-06-21.md"
+NSF_DIR = GRANTS / "NSF_Project_Pitch"
+NSF_PORTAL_FIELDS = NSF_DIR / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-29.md"
+NSF_PASTE_CHECK = NSF_DIR / "PROJECT_PITCH_PASTE_CHECK_2026-07-29.md"
+NSF_ROUTING_MANIFEST = (
+    NSF_DIR / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-29.json"
+)
+NSF_SOURCE_AUDIT = NSF_DIR / "NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-29.json"
+NSF_READINESS = NSF_DIR / "PROJECT_PITCH_READINESS_2026-07-29.md"
+NSF_EVIDENCE_FILES = [
+    OUT / "source_native_family_baseline_ledger_latest.json",
+    OUT / "market_signal_source_native_benchmark_manifest_latest.json",
+    OUT / "source_native_research_whitepaper_manifest_latest.json",
+]
 
 TOP5 = {
     "DICE": {
@@ -108,18 +121,20 @@ TOP5 = {
     },
     "NSF Project Pitch": {
         "portal": "NSF Seed Fund Project Pitch portal",
-        "package": GRANTS / "NSF_Project_Pitch",
+        "package": NSF_DIR,
         "required_files": [
-            GRANTS / "NSF_Project_Pitch" / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md",
-            GRANTS / "NSF_Project_Pitch" / "PROJECT_PITCH_PASTE_CHECK_2026-07-16.md",
-            GRANTS / "NSF_Project_Pitch" / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json",
-            GRANTS / "NSF_Project_Pitch" / "PROJECT_PITCH_READINESS.md",
+            NSF_PORTAL_FIELDS,
+            NSF_PASTE_CHECK,
+            NSF_ROUTING_MANIFEST,
+            NSF_SOURCE_AUDIT,
+            NSF_READINESS,
         ],
         "evidence_dirs": [],
+        "evidence_files": NSF_EVIDENCE_FILES,
         "portal_blockers": [
-            "Legal business name and PI/founder title must be confirmed.",
+            "Legal business name, small-business eligibility, ownership, U.S.-performance facts, and PI employment and effort must be confirmed.",
             "Duplicate-pitch/open-invitation/full-proposal status must be checked in the portal.",
-            "Portal paste counts must be confirmed after the user logs in.",
+            "Authenticated form prompts, title limit, topic selection, and portal paste counts must be confirmed after the user logs in.",
             "An official NSF invitation is required before any Phase I full proposal.",
             "Fresh action-time approval is required before final save/submit actions.",
         ],
@@ -342,6 +357,7 @@ def file_status(path: Path) -> dict[str, Any]:
         "path": rel(path),
         "exists": exists,
         "bytes": path.stat().st_size if exists and path.is_file() else None,
+        "sha256": sha256_file(path) if exists and path.is_file() else None,
     }
 
 
@@ -438,6 +454,12 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
             evidence_dirs.append(latest_review_burden)
     required = [file_status(path) for path in cfg.get("required_files", [])]
     missing = [row["path"] for row in required if not row["exists"]]
+    evidence_receipts = [
+        file_status(path) for path in cfg.get("evidence_files", [])
+    ]
+    missing_evidence = [
+        row["path"] for row in evidence_receipts if not row["exists"]
+    ]
     manifests = [verify_manifest(path) for path in evidence_dirs]
     manifest_blockers = [
         f"{row['run_dir']}: {item}"
@@ -455,9 +477,7 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
     nsf_routing = {}
     nsf_blockers = []
     if name == "NSF Project Pitch":
-        nsf_fields = extract_nsf_fields(
-            cfg["package"] / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
-        )
+        nsf_fields = extract_nsf_fields(NSF_PORTAL_FIELDS)
         missing_fields = [field for field in NSF_LIMITS if field not in nsf_fields]
         nsf_blockers.extend(f"missing NSF field: {field}" for field in missing_fields)
         nsf_blockers.extend(
@@ -465,10 +485,8 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
             for field, row in nsf_fields.items()
             if not row["ok"]
         )
-        nsf_routing = read_json(
-            cfg["package"] / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json"
-        )
-        if nsf_routing.get("schema") != "lumencore.nsf_project_pitch_routing.v1":
+        nsf_routing = read_json(NSF_ROUTING_MANIFEST)
+        if nsf_routing.get("schema") != "lumencore.nsf_project_pitch_routing.v2":
             nsf_blockers.append("NSF routing manifest schema is missing or invalid")
         full_proposal = nsf_routing.get("full_proposal", {})
         project_pitch = nsf_routing.get("project_pitch", {})
@@ -476,12 +494,12 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
             nsf_blockers.append("NSF full-proposal invitation gate is not enforced")
         if full_proposal.get("submission_allowed") is not False:
             nsf_blockers.append("NSF full proposal is incorrectly marked submit-allowed")
-        if full_proposal.get("july_27_2026_reachable") is not False:
-            nsf_blockers.append("July 27 is incorrectly represented as reachable")
-        if full_proposal.get("july_27_2026_currently_listed") is not True:
-            nsf_blockers.append("July 27 is incorrectly represented as not listed")
-        if full_proposal.get("nearest_listed_deadline") != "2026-07-27":
-            nsf_blockers.append("NSF nearest listed full-proposal deadline is stale")
+        if full_proposal.get("past_listed_deadlines") != ["2026-07-27"]:
+            nsf_blockers.append("NSF past full-proposal deadline history is stale")
+        if full_proposal.get("next_listed_deadline") != "2026-11-04":
+            nsf_blockers.append("NSF next listed full-proposal deadline is stale")
+        if full_proposal.get("next_listed_deadline_reachable") is not False:
+            nsf_blockers.append("NSF invitation gate is not enforced for November 4")
         if full_proposal.get("listed_deadlines") != [
             "2026-07-27",
             "2026-11-04",
@@ -489,15 +507,28 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
             "2027-07-07",
         ]:
             nsf_blockers.append("NSF listed full-proposal schedule is stale")
-        if full_proposal.get("next_planning_target") != "2026-11-04":
+        if full_proposal.get("planning_target") != "2026-11-04":
             nsf_blockers.append("NSF invitation-contingent planning target is stale")
         if project_pitch.get("deadline") is not None:
             nsf_blockers.append("NSF Project Pitch incorrectly has a fixed due date")
+        if project_pitch.get("submission_allowed") is not False:
+            nsf_blockers.append("NSF Project Pitch is incorrectly marked submit-allowed")
         if project_pitch.get("final_submit_allowed_without_human") is not False:
             nsf_blockers.append("NSF Project Pitch final submit lacks a human gate")
+        source_audit = read_json(NSF_SOURCE_AUDIT)
+        if (
+            source_audit.get("schema")
+            != "lumencore.nsf_project_pitch_source_audit.v1"
+        ):
+            nsf_blockers.append("NSF current public-source audit is missing or invalid")
+        if source_audit.get("authenticated_portal_access_performed") is not False:
+            nsf_blockers.append("NSF public-source audit exceeds its allowed scope")
 
     local_blockers = []
     local_blockers.extend(f"missing required artifact: {path}" for path in missing)
+    local_blockers.extend(
+        f"missing evidence receipt: {path}" for path in missing_evidence
+    )
     local_blockers.extend(manifest_blockers)
     local_blockers.extend(render_blockers)
     local_blockers.extend(claim_blockers)
@@ -594,6 +625,7 @@ def package_audit(name: str, cfg: dict[str, Any]) -> dict[str, Any]:
         "readiness": readiness,
         "required_artifacts": required,
         "evidence_manifests": manifests,
+        "evidence_receipts": evidence_receipts,
         "render": render,
         "nsf_fields": nsf_fields,
         "nsf_routing": nsf_routing,

@@ -1,0 +1,133 @@
+{
+  "sourcePptx": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\grant_submissions\\LAUNCHTN_3686_PITCH_2026\\LUMENCORE_3686_PITCH_DECK_2026-07-17.pptx",
+  "mapPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-frame-map.json",
+  "output": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter.pptx",
+  "outputBytes": 354249,
+  "sourceSlideCount": 11,
+  "slideCount": 11,
+  "previewDir": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview",
+  "layoutDir": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout",
+  "slides": [
+    {
+      "outputSlide": 1,
+      "sourceSlide": 1,
+      "narrativeRole": "opening thesis",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-01.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-01.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-01.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-01.layout.json"
+    },
+    {
+      "outputSlide": 2,
+      "sourceSlide": 2,
+      "narrativeRole": "problem evidence",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-02.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-02.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-02.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-02.layout.json"
+    },
+    {
+      "outputSlide": 3,
+      "sourceSlide": 3,
+      "narrativeRole": "product workflow",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-03.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-03.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-03.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-03.layout.json"
+    },
+    {
+      "outputSlide": 4,
+      "sourceSlide": 4,
+      "narrativeRole": "customer hypothesis",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-04.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-04.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-04.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-04.layout.json"
+    },
+    {
+      "outputSlide": 5,
+      "sourceSlide": 5,
+      "narrativeRole": "current evidence and prospective gate",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-05.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-05.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-05.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-05.layout.json"
+    },
+    {
+      "outputSlide": 6,
+      "sourceSlide": 6,
+      "narrativeRole": "commercial offer sequence",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-06.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-06.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-06.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-06.layout.json"
+    },
+    {
+      "outputSlide": 7,
+      "sourceSlide": 7,
+      "narrativeRole": "competitive positioning hypothesis",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-07.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-07.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-07.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-07.layout.json"
+    },
+    {
+      "outputSlide": 8,
+      "sourceSlide": 8,
+      "narrativeRole": "go-to-market qualification gates",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-08.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-08.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-08.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-08.layout.json"
+    },
+    {
+      "outputSlide": 9,
+      "sourceSlide": 5,
+      "narrativeRole": "pilot acceptance contract",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-09.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-09.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-09.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-09.layout.json"
+    },
+    {
+      "outputSlide": 10,
+      "sourceSlide": 5,
+      "narrativeRole": "funding discipline",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-10.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-10.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-10.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-10.layout.json"
+    },
+    {
+      "outputSlide": 11,
+      "sourceSlide": 11,
+      "narrativeRole": "closing ask",
+      "reuseMode": "duplicate-slide",
+      "editTargetCount": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-preview\\starter-slide-11.png",
+      "previewRelativePath": "template-starter-preview/starter-slide-11.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\launchtn\\template-starter-layout\\starter-slide-11.layout.json",
+      "layoutRelativePath": "template-starter-layout/starter-slide-11.layout.json"
+    }
+  ]
+}

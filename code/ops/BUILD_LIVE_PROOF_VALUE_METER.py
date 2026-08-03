@@ -16,6 +16,7 @@ DOLLAR_GATE = OUT_OPS / "dollar_claim_gate_latest.json"
 LIVE_BREADTH = OUT_OPS / "live_breadth_value_panel_latest.json"
 PARITY_AUDIT = OUT_OPS / "luma_context_dashboard_parity_audit_latest.json"
 GEOMETRY_FRONTIER = OUT_OPS / "geometry_proof_frontier_board_latest.json"
+CROSS_SECTOR_BENCHMARK = OUT_OPS / "kuramoto_cross_sector_benchmark_latest.json"
 
 OUT_JSON = OUT_OPS / "live_proof_value_meter_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "live_proof_value_meter.json"
@@ -125,9 +126,9 @@ def package_rows(top5: dict[str, Any]) -> list[dict[str, Any]]:
                 "proof_status": str(proof.get("proof_status") or ""),
                 "ready_for_final_submit": bool(pkg.get("ready_for_final_submit")),
                 "safe_value_language": (
-                    "bounded evidence/value language allowed only under stated assumptions"
+                    "proposal-specific public evidence is present; this does not imply a dollar or savings claim"
                     if proof.get("proposal_specific_live_proof")
-                    else "blocked until proposal-specific live or authorized representative proof exists"
+                    else "proposal-specific proof is blocked; no value or submission-readiness claim follows"
                 ),
                 "blocked": str(pkg.get("final_submit_blocker") or ""),
             }
@@ -141,12 +142,16 @@ def build_payload() -> dict[str, Any]:
     live = read_json(LIVE_BREADTH)
     parity = read_json(PARITY_AUDIT)
     geometry = read_json(GEOMETRY_FRONTIER)
+    cross_sector = read_json(CROSS_SECTOR_BENCHMARK)
 
     proof_gate = top5.get("global_live_proof_gate", {}) if isinstance(top5.get("global_live_proof_gate"), dict) else {}
     dollar_summary = dollar.get("summary", {}) if isinstance(dollar.get("summary"), dict) else {}
     live_headline = live.get("headline", {}) if isinstance(live.get("headline"), dict) else {}
     live_domain = parity.get("live_domain_parity", {}) if isinstance(parity.get("live_domain_parity"), dict) else {}
     geometry_gate = geometry.get("promotion_gate", {}) if isinstance(geometry.get("promotion_gate"), dict) else {}
+    cross_sector_gates = (
+        cross_sector.get("gates", {}) if isinstance(cross_sector.get("gates"), dict) else {}
+    )
 
     allowed_lanes = [
         compact_lane(row)
@@ -162,9 +167,6 @@ def build_payload() -> dict[str, Any]:
     allowed_annual = as_float(dollar_summary.get("allowed_estimated_annual_value_usd"))
     allowed_hourly = as_float(dollar_summary.get("allowed_estimated_hourly_value_usd"))
     blocked_annual = as_float(dollar_summary.get("blocked_context_only_annual_value_usd"))
-    live_measured_raw_annual = as_float(live_headline.get("live_measured_estimated_annual_value_usd"))
-    context_only_raw_annual = as_float(live_headline.get("context_only_estimated_annual_value_usd"))
-
     proof_count = as_int(proof_gate.get("proposal_specific_live_proof_count"))
     proof_total = as_int(proof_gate.get("proposal_specific_live_proof_total"))
     feed_ok = as_int(live_domain.get("feed_ok"))
@@ -209,7 +211,7 @@ def build_payload() -> dict[str, Any]:
 
     payload = {
         "generated_utc": now_utc(),
-        "schema": "live_proof_value_meter_v1",
+        "schema": "live_proof_value_meter_v2",
         "purpose": "Connect live proof, grant readiness, live breadth, and safe economic-value language without inflating claims.",
         "answer": {
             "undeniable_live_proof_now": False,
@@ -218,8 +220,15 @@ def build_payload() -> dict[str, Any]:
                 "The system has useful evidence, but not yet an undeniable field-validated proof stack."
             ),
             "what_is_safe_now": (
-                f"Bounded estimated-value language up to {money(allowed_hourly)}/hour and "
-                f"{money(allowed_annual)}/year under stated assumptions."
+                (
+                    f"A fully gated estimated-value signal up to {money(allowed_hourly)}/hour and "
+                    f"{money(allowed_annual)}/year under stated assumptions."
+                )
+                if allowed_annual > 0 and allowed_lanes
+                else (
+                    "No dollar projection is currently claimable. Product value must be measured against a "
+                    "buyer-approved workflow or operational baseline in a bounded pilot."
+                )
             ),
             "what_is_not_safe": (
                 "Do not claim guaranteed funding, realized customer savings, government savings, field validation, "
@@ -238,8 +247,9 @@ def build_payload() -> dict[str, Any]:
             "allowed_estimated_value_claims": as_int(dollar_summary.get("allowed_estimated_value_claims")),
             "allowed_estimated_hourly_value_usd": round(allowed_hourly, 2),
             "allowed_estimated_annual_value_usd": round(allowed_annual, 2),
-            "live_breadth_raw_live_measured_annual_value_usd": round(live_measured_raw_annual, 2),
-            "blocked_context_only_annual_value_usd": round(max(blocked_annual, context_only_raw_annual), 2),
+            "live_breadth_raw_live_measured_annual_value_usd": 0.0,
+            "blocked_context_only_annual_value_usd": round(blocked_annual, 2),
+            "ungated_input_projections_suppressed": allowed_annual <= 0 or not allowed_lanes,
             "panel_primary_evidence_mode": str(dollar_summary.get("panel_primary_evidence_mode") or live_headline.get("primary_evidence_mode") or ""),
             "live_measured_source_rows": as_int(dollar_summary.get("live_measured_source_row_count") or live_headline.get("live_measured_source_row_count")),
             "safe_claim": safe_claim,
@@ -247,7 +257,7 @@ def build_payload() -> dict[str, Any]:
         "sector_capture_math": build_sector_capture_math(),
         "capture_from_allowed_signal": capture_from_allowed_signal,
         "proof_to_value_formula": proof_to_value_formula,
-        "money_printer_loop": [
+        "evidence_to_contract_workflow": [
             {"stage": "sense", "meaning": "Pull public/authorized live breadth and market/sector signals."},
             {"stage": "freeze", "meaning": "Hash raw rows, inputs, seeds, baselines, and replay windows."},
             {"stage": "beat", "meaning": "Run the method and baselines on the same frozen windows."},
@@ -271,6 +281,18 @@ def build_payload() -> dict[str, Any]:
             "live_domain_state": str(live_domain.get("parity_state") or "unknown"),
             "boundary": str(live_domain.get("boundary") or "Live-domain feed deployment must be verified before reviewer-facing live claims."),
         },
+        "current_model_benchmark": {
+            "status": str(cross_sector.get("status") or "CURRENT_CROSS_SECTOR_BENCHMARK_MISSING"),
+            "sector_gain_proven_count": as_int(cross_sector_gates.get("sector_gain_proven_count")),
+            "sector_count": as_int(cross_sector_gates.get("sector_count")),
+            "cross_sector_efficiency_claim_allowed": bool(
+                cross_sector_gates.get("cross_sector_efficiency_claim_allowed")
+            ),
+            "dollar_projection_from_forecast_error_allowed": bool(
+                cross_sector_gates.get("dollar_projection_from_forecast_error_allowed")
+            ),
+            "boundary": str(cross_sector.get("claim_boundary") or ""),
+        },
         "next_actions": [
             "Deploy or route fresh dashboard/data JSON feeds to the live domain so reviewer-facing pages hydrate with the same proof state.",
             "Promote high-value context-only lanes only after public/authorized source rows, hashes, and identical baseline replays exist.",
@@ -284,6 +306,7 @@ def build_payload() -> dict[str, Any]:
             "live_breadth": str(LIVE_BREADTH),
             "parity_audit": str(PARITY_AUDIT),
             "geometry_frontier": str(GEOMETRY_FRONTIER),
+            "cross_sector_benchmark": str(CROSS_SECTOR_BENCHMARK),
         },
     }
     return payload

@@ -2,64 +2,47 @@ from __future__ import annotations
 
 import hashlib
 import json
-import statistics
-from collections import Counter, defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT_OPS = ROOT / "out" / "ops"
-DOCS = ROOT / "docs"
 DASHBOARD_DATA = ROOT / "dashboard" / "data"
+DOCS = ROOT / "docs"
 
-HOLDOUT_JSON = OUT_OPS / "kuramoto_holdout_expansion_latest.json"
 GAUNTLET_JSON = OUT_OPS / "champion_metric_gauntlet_latest.json"
-GEOMETRY_JSON = OUT_OPS / "geometry_champion_of_champions_latest.json"
-REVENUE_JSON = OUT_OPS / "proof_to_revenue_engine_latest.json"
-LIVE_DOMAIN_JSON = OUT_OPS / "live_domain_deployment_feed_latest.json"
-PHASE_PROXY_JSON = OUT_OPS / "champion_phase_proxy_diagnostics_latest.json"
-SOURCE_ABLATION_JSON = OUT_OPS / "champion_source_ablation_latest.json"
+LOCKED_SWEEP_JSON = DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"
+READY_REPLAY_JSON = DASHBOARD_DATA / "geometry_ready_source_replay.json"
+KURAMOTO_JSON = OUT_OPS / "kuramoto_holdout_expansion_latest.json"
 
 OUT_JSON = OUT_OPS / "champion_stress_test_matrix_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "champion_stress_test_matrix.json"
-OUT_MD = DOCS / "CHAMPION_STRESS_TEST_MATRIX_2026-06-27.md"
+DOC_MD = DOCS / "CHAMPION_STRESS_TEST_MATRIX.md"
 
-BOUNDARY = (
-    "Champion stress-test matrix. This artifact compacts the current champion's source-conditioned "
-    "holdout replay evidence into a buyer/reviewer-safe test matrix. It does not create field "
-    "validation, realized savings, fixed frozen-delta pricing, live trading authorization, medical "
-    "efficacy, or universal geometry-superiority claims."
-)
+EXPECTED_SCHEMAS = {
+    "gauntlet": "champion_metric_gauntlet_v2",
+    "locked_sweep": "locked_source_baseline_replay_sweep_v2",
+    "ready_replay": "geometry_ready_source_replay_v2",
+    "kuramoto": "kuramoto_holdout_expansion_v2",
+}
 
 
 def now_utc() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
 
 def read_json(path: Path) -> dict[str, Any]:
-    if not path.exists():
-        return {}
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    return payload if isinstance(payload, dict) else {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected a JSON object in {path}")
+    return payload
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
-
-
-def write_text(path: Path, text: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
-
-
-def stable_sha256(payload: Any) -> str:
-    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def as_dict(value: Any) -> dict[str, Any]:
@@ -70,496 +53,314 @@ def as_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
 
 
-def as_float(value: Any, default: float = 0.0) -> float:
+def as_int(value: Any) -> int:
+    if isinstance(value, bool):
+        return int(value)
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
+
+
+def as_float(value: Any) -> float:
     try:
         return float(value)
     except (TypeError, ValueError):
-        return default
+        return 0.0
 
 
-def as_int(value: Any, default: int = 0) -> int:
-    try:
-        return int(float(value))
-    except (TypeError, ValueError):
-        return default
+def require_schema(name: str, payload: dict[str, Any]) -> None:
+    expected = EXPECTED_SCHEMAS[name]
+    actual = payload.get("schema")
+    if actual != expected:
+        raise ValueError(f"{name} schema must be {expected}; got {actual!r}")
 
 
-def mean(values: list[float]) -> float:
-    return round(statistics.mean(values), 6) if values else 0.0
+def canonical_sha256(payload: dict[str, Any]) -> str:
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
-def min_or_zero(values: list[float]) -> float:
-    return round(min(values), 6) if values else 0.0
+def load_inputs() -> dict[str, dict[str, Any]]:
+    inputs = {
+        "gauntlet": read_json(GAUNTLET_JSON),
+        "locked_sweep": read_json(LOCKED_SWEEP_JSON),
+        "ready_replay": read_json(READY_REPLAY_JSON),
+        "kuramoto": read_json(KURAMOTO_JSON),
+    }
+    for name, payload in inputs.items():
+        require_schema(name, payload)
+    return inputs
 
 
-def max_or_zero(values: list[float]) -> float:
-    return round(max(values), 6) if values else 0.0
+def route_status(row: dict[str, Any]) -> str:
+    mode = str(row.get("evidence_mode") or "")
+    if mode == "direct_measured_replay":
+        return "DIRECT_MEASURED_NONPROMOTION"
+    if mode == "source_conditioned_synthetic_stress":
+        return "CONDITIONED_SYNTHETIC_RESEARCH_LEAD"
+    return "NO_COMPATIBLE_REPLAY"
 
 
-def pass_gate(
+def build_route_matrix(ready_replay: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row_value in as_list(ready_replay.get("ready_source_replay_results")):
+        row = as_dict(row_value)
+        comparisons = as_list(row.get("baseline_comparisons"))
+        rows.append(
+            {
+                "lane": row.get("lane"),
+                "evidence_mode": row.get("evidence_mode"),
+                "status": route_status(row),
+                "registered_candidate_family": row.get("registered_candidate_family"),
+                "evaluated_candidate_family": row.get("candidate_family"),
+                "registered_baseline_count": as_int(row.get("registered_baseline_count")),
+                "baseline_mean_win_count": as_int(row.get("registered_baseline_mean_win_count")),
+                "global_holm_positive_count": as_int(
+                    row.get("registered_baseline_global_holm_positive_count")
+                ),
+                "performance_rows_evaluated": as_int(row.get("performance_rows_evaluated")),
+                "candidate_beats_all_registered_baselines_mean": bool(
+                    row.get("candidate_beats_all_registered_baselines_mean")
+                ),
+                "candidate_beats_all_registered_baselines_after_global_holm": bool(
+                    row.get("candidate_beats_all_registered_baselines_after_global_holm")
+                ),
+                "baseline_comparisons": [
+                    {
+                        "baseline_family_id": item.get("baseline_family_id"),
+                        "candidate_beats_baseline_mean": bool(
+                            item.get("candidate_beats_baseline_mean")
+                        ),
+                        "statistically_positive_after_global_holm": bool(
+                            item.get("statistically_positive_after_global_holm")
+                        ),
+                    }
+                    for item in comparisons
+                    if isinstance(item, dict)
+                ],
+                "claim_boundary": (
+                    "Direct measured routes can report the measured nonpromotion result only."
+                    if row.get("evidence_mode") == "direct_measured_replay"
+                    else (
+                        "Conditioned synthetic routes are research leads only and are not measured "
+                        "performance evidence."
+                        if row.get("evidence_mode") == "source_conditioned_synthetic_stress"
+                        else "No performance conclusion is available without a compatible replay input."
+                    )
+                ),
+            }
+        )
+    return rows
+
+
+def metric_gate(
     name: str,
     passed: bool,
     actual: Any,
     threshold: str,
-    why: str,
-    claim_effect: str,
-    blocker: bool = False,
-    status: str | None = None,
+    blocker: bool,
+    interpretation: str,
 ) -> dict[str, Any]:
-    gate_status = status or ("PASS" if passed else ("BLOCKED" if blocker else "FAIL"))
     return {
         "name": name,
-        "status": gate_status,
-        "passed": bool(passed),
-        "blocker": bool(blocker),
+        "status": "PASS" if passed else ("BLOCKED" if blocker else "NONPROMOTION"),
+        "passed": passed,
         "actual": actual,
         "threshold": threshold,
-        "why_it_matters": why,
-        "claim_effect": claim_effect,
+        "blocker": blocker,
+        "interpretation": interpretation,
     }
 
 
-def blocked_gate(name: str, why: str, unlock: str) -> dict[str, Any]:
-    return {
-        "name": name,
-        "status": "NOT_RUN_REQUIRES_NEXT_GATE",
-        "passed": False,
-        "blocker": True,
-        "actual": "not measured in current artifact",
-        "threshold": unlock,
-        "why_it_matters": why,
-        "claim_effect": "Blocks field-validation, realized-savings, and strongest technical superiority language.",
-    }
+def build_payload(inputs: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
+    inputs = inputs or load_inputs()
+    for name, input_payload in inputs.items():
+        require_schema(name, input_payload)
 
+    gauntlet_summary = as_dict(inputs["gauntlet"].get("summary"))
+    sweep_summary = as_dict(inputs["locked_sweep"].get("summary"))
+    ready_summary = as_dict(inputs["ready_replay"].get("summary"))
+    kuramoto_summary = as_dict(inputs["kuramoto"].get("summary"))
+    route_matrix = build_route_matrix(inputs["ready_replay"])
 
-def source_matrix(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for row in rows:
-        grouped[str(row.get("source_system") or "unknown")].append(row)
-
-    matrix: list[dict[str, Any]] = []
-    for source, source_rows in sorted(grouped.items()):
-        deltas = [as_float(row.get("delta_vs_kalman")) for row in source_rows]
-        best_deltas = [as_float(row.get("delta_vs_best_baseline")) for row in source_rows]
-        profiles = [as_dict(row.get("profile")) for row in source_rows]
-        matrix.append(
-            {
-                "source_system": source,
-                "holdout_count": len(source_rows),
-                "wins_vs_named_baseline": sum(bool(row.get("candidate_beats_kalman")) for row in source_rows),
-                "wins_vs_best_same_run_baseline": sum(
-                    bool(row.get("candidate_beats_best_baseline")) for row in source_rows
-                ),
-                "estimated_rows": sum(as_int(row.get("estimated_rows")) for row in source_rows),
-                "numeric_samples": sum(as_int(row.get("numeric_samples")) for row in source_rows),
-                "fallback_count": sum(bool(profile.get("fallback_used")) for profile in profiles),
-                "min_delta_vs_named_baseline": min_or_zero(deltas),
-                "mean_delta_vs_named_baseline": mean(deltas),
-                "max_delta_vs_named_baseline": max_or_zero(deltas),
-                "min_delta_vs_best_same_run_baseline": min_or_zero(best_deltas),
-                "mean_delta_vs_best_same_run_baseline": mean(best_deltas),
-                "max_delta_vs_best_same_run_baseline": max_or_zero(best_deltas),
-                "mean_stress_index": mean([as_float(profile.get("stress_index")) for profile in profiles]),
-                "max_shock_index": max_or_zero([as_float(profile.get("shock_index")) for profile in profiles]),
-                "mean_abs_trend_index": mean([abs(as_float(profile.get("trend_index"))) for profile in profiles]),
-                "mean_coefficient_of_variation": mean(
-                    [as_float(profile.get("coefficient_of_variation")) for profile in profiles]
-                ),
-                "representative_sources": sorted(
-                    {
-                        str(as_dict(row.get("profile")).get("source") or row.get("source_path") or "")
-                        for row in source_rows
-                        if as_dict(row.get("profile")).get("source") or row.get("source_path")
-                    }
-                )[:5],
-            }
-        )
-    return matrix
-
-
-def metric_matrix(
-    rows: list[dict[str, Any]],
-    gauntlet_summary: dict[str, Any],
-    geometry_summary: dict[str, Any],
-    live_summary: dict[str, Any],
-    phase_summary: dict[str, Any],
-    source_ablation_summary: dict[str, Any],
-) -> list[dict[str, Any]]:
-    holdout_count = len(rows)
-    wins_named = sum(bool(row.get("candidate_beats_kalman")) for row in rows)
-    wins_best = sum(bool(row.get("candidate_beats_best_baseline")) for row in rows)
-    deltas = [as_float(row.get("delta_vs_kalman")) for row in rows]
-    best_deltas = [as_float(row.get("delta_vs_best_baseline")) for row in rows]
-    ranks = [as_int(row.get("candidate_rank"), 999) for row in rows]
-    rank_1_share = (sum(1 for rank in ranks if rank == 1) / holdout_count) if holdout_count else 0.0
-    source_systems = {str(row.get("source_system") or "unknown") for row in rows}
-    estimated_rows = sum(as_int(row.get("estimated_rows")) for row in rows)
-    numeric_samples = sum(as_int(row.get("numeric_samples")) for row in rows)
-    profiles = [as_dict(row.get("profile")) for row in rows]
-    fallback_count = sum(bool(profile.get("fallback_used")) for profile in profiles)
-    fallback_rate = fallback_count / holdout_count if holdout_count else 1.0
-    stress_count = sum(as_float(profile.get("stress_index")) >= 0.5 for profile in profiles)
-    trend_count = sum(abs(as_float(profile.get("trend_index"))) >= 0.01 for profile in profiles)
-    shock_count = sum(as_float(profile.get("shock_index")) > 0.0 for profile in profiles)
-    all_family_gap = as_int(geometry_summary.get("benchmark_specified_family_gap_count"), default=999)
+    holdout_count = as_int(kuramoto_summary.get("holdout_count"))
+    wins_vs_kalman = as_int(kuramoto_summary.get("wins_vs_kalman"))
+    mean_skill_delta = round(as_float(kuramoto_summary.get("mean_delta_vs_kalman")), 6)
+    baseline_passes = as_int(kuramoto_summary.get("registered_baseline_gate_pass_count"))
+    baseline_count = as_int(kuramoto_summary.get("registered_baseline_count"))
+    direct_routes = as_int(ready_summary.get("direct_measured_replay_count"))
+    conditioned_routes = as_int(ready_summary.get("source_conditioned_synthetic_stress_count"))
+    comparisons = as_int(sweep_summary.get("baseline_comparison_count"))
+    global_holm_positives = as_int(sweep_summary.get("global_holm_positive_count"))
+    conditioned_named_wins = as_int(
+        ready_summary.get("source_conditioned_named_baseline_mean_win_count")
+    )
+    performance_rows = as_int(ready_summary.get("performance_rows_reviewed"))
+    legacy_rows_excluded = as_int(
+        ready_summary.get("legacy_ready_for_benchmark_rows_excluded")
+    )
+    numeric_fallbacks = as_int(ready_summary.get("numeric_fallback_profile_count"))
+    candidate_selected = bool(kuramoto_summary.get("candidate_was_protocol_selected"))
+    internal_champion = bool(gauntlet_summary.get("internal_champion")) and bool(
+        kuramoto_summary.get("protocol_grade_internal_champion")
+    )
 
     gates = [
-        pass_gate(
-            "source_conditioned_holdout_depth",
-            holdout_count >= 20,
-            holdout_count,
-            ">= 20 holdouts",
-            "Prevents one-good-run storytelling.",
-            "Supports current internal champion language.",
+        metric_gate(
+            "development_selection",
+            candidate_selected,
+            candidate_selected,
+            "candidate must be frozen on development data",
+            True,
+            "Kuramoto was not development-selected; Lissajous was selected.",
         ),
-        pass_gate(
-            "named_baseline_win_rate",
-            holdout_count > 0 and wins_named == holdout_count,
-            f"{wins_named}/{holdout_count}",
-            "all current holdouts beat the named baseline",
-            "Checks the champion against the explicit incumbent comparator.",
-            "Supports buyer-authorized field replay request language.",
+        metric_gate(
+            "paired_named_baseline_result",
+            wins_vs_kalman > holdout_count / 2 and mean_skill_delta > 0,
+            {
+                "wins": wins_vs_kalman,
+                "paired_days": holdout_count,
+                "mean_skill_delta": mean_skill_delta,
+            },
+            "majority paired-day wins and positive mean skill",
+            False,
+            "Kuramoto loses the named-baseline gate on both win rate and mean skill.",
         ),
-        pass_gate(
-            "best_same_run_baseline_win_rate",
-            holdout_count > 0 and wins_best == holdout_count,
-            f"{wins_best}/{holdout_count}",
-            "all current holdouts beat the best same-run baseline",
-            "Prevents only beating a weak selected baseline.",
-            "Supports stronger internal repeatability language.",
+        metric_gate(
+            "all_registered_source_baselines",
+            baseline_passes == baseline_count and baseline_count > 0,
+            f"{baseline_passes}/{baseline_count}",
+            "all registered source-specific baselines pass",
+            True,
+            "No registered EIA baseline clears its complete promotion gate.",
         ),
-        pass_gate(
-            "weakest_margin_positive",
-            bool(deltas) and min(deltas) > 0,
-            min_or_zero(deltas),
-            "> 0.0",
-            "Looks for any holdout where the claimed edge disappears.",
-            "Supports no-loss internal holdout language.",
+        metric_gate(
+            "global_holm_promotion",
+            global_holm_positives == comparisons and comparisons > 0,
+            f"{global_holm_positives}/{comparisons}",
+            "all required comparisons positive after global Holm correction",
+            True,
+            "There are no globally Holm-positive comparisons.",
         ),
-        pass_gate(
-            "best_baseline_weakest_margin_positive",
-            bool(best_deltas) and min(best_deltas) > 0,
-            min_or_zero(best_deltas),
-            "> 0.0",
-            "Looks for any holdout where another same-run family beats the champion.",
-            "Supports current champion rather than merely good-family language.",
+        metric_gate(
+            "direct_measured_route_coverage",
+            direct_routes == 2,
+            direct_routes,
+            "2 compatibility-qualified direct measured routes",
+            False,
+            "This is benchmark coverage, not proof of performance superiority.",
         ),
-        pass_gate(
-            "source_system_diversity",
-            len(source_systems) >= 4,
-            len(source_systems),
-            ">= 4 source systems",
-            "Checks whether the evidence is only one data family.",
-            "Supports multi-domain internal replay language.",
+        metric_gate(
+            "conditioned_synthetic_separation",
+            conditioned_routes == 2 and conditioned_named_wins == 1,
+            {
+                "conditioned_routes": conditioned_routes,
+                "named_baseline_mean_wins": conditioned_named_wins,
+            },
+            "conditioned results remain labeled research-only",
+            False,
+            "Thermal and branching can remain research leads only.",
         ),
-        pass_gate(
-            "estimated_row_depth",
-            estimated_rows >= 1_000_000,
-            estimated_rows,
-            ">= 1,000,000 estimated rows",
-            "Separates toy data from broad replay surface.",
-            "Supports broad measured-source replay language.",
+        metric_gate(
+            "compatibility_hygiene",
+            legacy_rows_excluded == 358 and numeric_fallbacks == 0,
+            {
+                "legacy_rows_excluded": legacy_rows_excluded,
+                "numeric_fallbacks": numeric_fallbacks,
+            },
+            "exclude incompatible legacy rows and use no numeric fallback profiles",
+            False,
+            "The v2 compatibility boundary is enforced.",
         ),
-        pass_gate(
-            "numeric_sample_depth",
-            numeric_samples >= 50_000,
-            numeric_samples,
-            ">= 50,000 numeric samples read",
-            "Checks that the scoring used actual numeric evidence.",
-            "Supports data-backed internal benchmark language.",
-        ),
-        pass_gate(
-            "fallback_rate_low",
-            fallback_rate <= 0.10,
-            round(fallback_rate, 6),
-            "<= 10% fallback-profile holdouts",
-            "Keeps nonnumeric or missing-source fallbacks from dominating the result.",
-            "Supports current artifact quality language.",
-        ),
-        pass_gate(
-            "rank_1_share",
-            rank_1_share >= 0.40,
-            round(rank_1_share, 6),
-            ">= 40% rank-1 holdouts",
-            "Checks whether the family is repeatedly first, not barely positive.",
-            "Supports champion but still acknowledges rank-2/rank-3 runs.",
-        ),
-        pass_gate(
-            "stress_profile_coverage",
-            stress_count >= 3,
-            stress_count,
-            ">= 3 stressed-profile holdouts",
-            "Checks whether the champion was evaluated under noisy or high-variation profiles.",
-            "Supports stress-tested internal replay language.",
-        ),
-        pass_gate(
-            "trend_profile_coverage",
-            trend_count >= 3,
-            trend_count,
-            ">= 3 nonflat-trend holdouts",
-            "Checks whether the replay includes moving signals, not only static snapshots.",
-            "Supports live-breadth style replay language.",
-        ),
-        pass_gate(
-            "shock_profile_coverage",
-            shock_count >= 3,
-            shock_count,
-            ">= 3 shock-bearing holdouts",
-            "Checks whether sudden changes exist in the stress surface.",
-            "Supports anomaly/drift evaluation language.",
-        ),
-        pass_gate(
-            "hosted_hash_verification",
-            bool(live_summary.get("live_domain_reviewer_ready")),
-            live_summary.get("domain_deployment_state") or False,
-            "LIVE_DOMAIN_HASH_VERIFIED",
-            "Confirms reviewer-facing public feeds match local hashes.",
-            "Supports public deployment verification language.",
-        ),
-        pass_gate(
-            "all_registry_families_have_benchmark_specs",
-            all_family_gap == 0,
-            all_family_gap,
-            "0 missing benchmark specs",
-            "Checks the family registry is no longer an unscored idea list.",
-            "Supports all-family registry coverage language, but not all-family superiority.",
-        ),
-        pass_gate(
-            "statistical_repeat_gate",
-            as_float(gauntlet_summary.get("one_sided_sign_test_p_value"), 1.0) <= 0.001,
-            gauntlet_summary.get("one_sided_sign_test_p_value"),
-            "<= 0.001",
-            "Checks repeat significance across current holdouts.",
-            "Supports strong internal repeatability language.",
-        ),
-        pass_gate(
-            "replay_phase_proxy_diagnostics",
-            bool(phase_summary.get("phase_proxy_claim_allowed")),
-            f"{phase_summary.get('usable_numeric_holdout_count')}/{phase_summary.get('holdout_count')} usable holdouts",
-            ">= 20 usable numeric holdouts with replay phase proxies",
-            "Adds direct replay-data phase/coherence/residual proxy diagnostics.",
-            "Supports mechanism-triage language, not hardware PLL or field-validation language.",
-        ),
-        pass_gate(
-            "leave_one_source_out_ablation",
-            bool(source_ablation_summary.get("all_leave_one_source_out_passed")),
-            f"{source_ablation_summary.get('source_ablation_pass_count')}/{source_ablation_summary.get('source_ablation_count')} source ablations",
-            "all source-system ablations remain positive against the named baseline",
-            "Checks whether the champion is being carried by one source system.",
-            "Supports internal robustness and buyer-replay readiness language.",
-        ),
-        blocked_gate(
-            "phase_slip_and_amplitude_error",
-            "Needed to claim hardware phase-locking behavior, not just replay-data phase proxy evidence.",
-            "instrument or replay logs with phase-slip count and amplitude error",
-        ),
-        blocked_gate(
-            "residual_autocorrelation_and_calibration",
-            "Needed to know whether remaining errors are structured and exploitable.",
-            "residual autocorrelation, calibration, and post-hoc leakage checks",
-        ),
-        blocked_gate(
-            "latency_runtime_budget",
-            "Needed for real-time operational claims.",
-            "measured latency under the target deployment workload",
-        ),
-        blocked_gate(
-            "buyer_authorized_field_replay",
-            "Needed before any field-validation or realized-dollar language.",
-            "external owner-approved holdout windows, baseline, metric, and cost conversion",
-        ),
-        blocked_gate(
-            "all_family_live_benchmark_execution",
-            "Needed before universal geometry-superiority claims.",
-            "execute the full 140-family registry on live measured rows under one locked protocol",
+        metric_gate(
+            "external_validation",
+            bool(gauntlet_summary.get("field_validation_claim_allowed")),
+            bool(gauntlet_summary.get("field_validation_claim_allowed")),
+            "independent owner-approved validation complete",
+            True,
+            "No field-validation or realized-savings claim is allowed.",
         ),
     ]
-    return gates
-
-
-def rank_histogram(rows: list[dict[str, Any]]) -> dict[str, int]:
-    counts = Counter(str(as_int(row.get("candidate_rank"), 999)) for row in rows)
-    return dict(sorted(counts.items(), key=lambda item: int(item[0])))
-
-
-def compact_holdouts(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    compact: list[dict[str, Any]] = []
-    for row in rows:
-        profile = as_dict(row.get("profile"))
-        compact.append(
-            {
-                "source_system": row.get("source_system"),
-                "source_path": row.get("source_path"),
-                "source_sha256_prefix": str(row.get("source_sha256") or "")[:16],
-                "candidate_rank": as_int(row.get("candidate_rank")),
-                "candidate_score": as_float(row.get("candidate_score")),
-                "kalman_score": as_float(row.get("kalman_score")),
-                "delta_vs_named_baseline": as_float(row.get("delta_vs_kalman")),
-                "delta_vs_best_same_run_baseline": as_float(row.get("delta_vs_best_baseline")),
-                "estimated_rows": as_int(row.get("estimated_rows")),
-                "numeric_samples": as_int(row.get("numeric_samples")),
-                "stress_index": as_float(profile.get("stress_index")),
-                "shock_index": as_float(profile.get("shock_index")),
-                "trend_index": as_float(profile.get("trend_index")),
-                "fallback_used": bool(profile.get("fallback_used")),
-                "holdout_sha256": row.get("holdout_sha256"),
-            }
-        )
-    return compact
-
-
-def build_payload() -> dict[str, Any]:
-    holdout_payload = read_json(HOLDOUT_JSON)
-    gauntlet = read_json(GAUNTLET_JSON)
-    geometry = read_json(GEOMETRY_JSON)
-    revenue = read_json(REVENUE_JSON)
-    live_domain = read_json(LIVE_DOMAIN_JSON)
-    phase_proxy = read_json(PHASE_PROXY_JSON)
-    source_ablation = read_json(SOURCE_ABLATION_JSON)
-
-    rows = [row for row in as_list(holdout_payload.get("holdout_results")) if isinstance(row, dict)]
-    gauntlet_summary = as_dict(gauntlet.get("summary"))
-    geometry_summary = as_dict(geometry.get("summary"))
-    revenue_summary = as_dict(revenue.get("summary"))
-    live_summary = as_dict(live_domain.get("summary"))
-    phase_summary = as_dict(phase_proxy.get("summary"))
-    source_ablation_summary = as_dict(source_ablation.get("summary"))
-    live_domain_hash_verified = bool(live_summary.get("live_domain_reviewer_ready"))
-    hosted_feed_phrase = (
-        "public hash-verified feeds"
-        if live_domain_hash_verified
-        else "locally hashable feeds staged for public hash verification"
-    )
-    evidence_stage = (
-        "internal_source_conditioned_replay_public_hash_verified_not_field_validated"
-        if live_domain_hash_verified
-        else "internal_source_conditioned_replay_public_hash_pending_not_field_validated"
-    )
-
-    deltas = [as_float(row.get("delta_vs_kalman")) for row in rows]
-    best_deltas = [as_float(row.get("delta_vs_best_baseline")) for row in rows]
-    holdout_count = len(rows)
-    wins_named = sum(bool(row.get("candidate_beats_kalman")) for row in rows)
-    wins_best = sum(bool(row.get("candidate_beats_best_baseline")) for row in rows)
-    estimated_rows = sum(as_int(row.get("estimated_rows")) for row in rows)
-    numeric_samples = sum(as_int(row.get("numeric_samples")) for row in rows)
-    source_systems = sorted({str(row.get("source_system") or "unknown") for row in rows})
-    profiles = [as_dict(row.get("profile")) for row in rows]
-    fallback_count = sum(bool(profile.get("fallback_used")) for profile in profiles)
-    gates = metric_matrix(
-        rows,
-        gauntlet_summary,
-        geometry_summary,
-        live_summary,
-        phase_summary,
-        source_ablation_summary,
-    )
-    passed_gates = [gate for gate in gates if gate["passed"]]
-    blocked_gates = [gate for gate in gates if gate["blocker"] and not gate["passed"]]
 
     payload: dict[str, Any] = {
         "generated_utc": now_utc(),
-        "schema": "champion_stress_test_matrix_v1",
-        "purpose": "Create a compact, hosted, reviewer-safe stress matrix for the current champion.",
-        "boundary": BOUNDARY,
+        "schema": "champion_stress_test_matrix_v2",
+        "purpose": (
+            "Stress-test the current canonical evidence without converting inventory, conditioned "
+            "simulation, or negative measured results into champion claims."
+        ),
         "summary": {
-            "champion_family": gauntlet_summary.get("champion_family") or "kuramoto_phase_coupling",
-            "champion_label": gauntlet_summary.get("champion_label") or "Kuramoto phase coupling",
-            "named_baseline": gauntlet_summary.get("named_baseline") or "kalman_filter",
-            "evidence_stage": evidence_stage,
-            "revenue_stage": revenue_summary.get("revenue_stage") or "manual_paid_pilot_scoping_ready",
-            "holdout_count": holdout_count,
-            "wins_vs_named_baseline": wins_named,
-            "wins_vs_best_same_run_baseline": wins_best,
-            "win_rate_vs_named_baseline": round(wins_named / holdout_count, 6) if holdout_count else 0.0,
-            "source_system_count": len(source_systems),
-            "source_systems": source_systems,
-            "estimated_rows_replayed": estimated_rows,
-            "numeric_samples_read": numeric_samples,
-            "fallback_count": fallback_count,
-            "fallback_rate": round(fallback_count / holdout_count, 6) if holdout_count else 1.0,
-            "min_delta_vs_named_baseline": min_or_zero(deltas),
-            "mean_delta_vs_named_baseline": mean(deltas),
-            "max_delta_vs_named_baseline": max_or_zero(deltas),
-            "min_delta_vs_best_same_run_baseline": min_or_zero(best_deltas),
-            "mean_delta_vs_best_same_run_baseline": mean(best_deltas),
-            "max_delta_vs_best_same_run_baseline": max_or_zero(best_deltas),
-            "rank_histogram": rank_histogram(rows),
-            "live_domain_hash_verified": live_domain_hash_verified,
-            "domain_deployment_state": live_summary.get("domain_deployment_state"),
-            "phase_proxy_diagnostics_ready": bool(phase_summary.get("phase_proxy_claim_allowed")),
-            "source_ablation_ready": bool(source_ablation_summary.get("all_leave_one_source_out_passed")),
-            "source_ablation_pass_count": source_ablation_summary.get("source_ablation_pass_count"),
-            "source_ablation_count": source_ablation_summary.get("source_ablation_count"),
-            "mean_phase_coherence_proxy": phase_summary.get("mean_phase_coherence_proxy"),
-            "mean_phase_slip_proxy_rate": phase_summary.get("mean_phase_slip_proxy_rate"),
-            "mean_spectral_concentration_proxy": phase_summary.get("mean_spectral_concentration_proxy"),
-            "metric_gate_pass_count": len(passed_gates),
-            "metric_gate_total_count": len(gates),
-            "blocked_gate_count": len(blocked_gates),
+            "internal_performance_champion": internal_champion,
+            "champion_family": None,
+            "audited_candidate_family": kuramoto_summary.get("candidate"),
+            "development_selected_candidate": kuramoto_summary.get(
+                "development_selected_candidate"
+            ),
+            "candidate_was_protocol_selected": candidate_selected,
+            "named_baseline": kuramoto_summary.get("named_baseline"),
+            "paired_day_wins_vs_named_baseline": wins_vs_kalman,
+            "paired_day_count": holdout_count,
+            "paired_day_win_rate": round(wins_vs_kalman / holdout_count, 6)
+            if holdout_count
+            else 0.0,
+            "mean_skill_delta_vs_named_baseline": mean_skill_delta,
+            "registered_baseline_gate_pass_count": baseline_passes,
+            "registered_baseline_count": baseline_count,
+            "direct_measured_route_count": direct_routes,
+            "conditioned_synthetic_route_count": conditioned_routes,
+            "baseline_comparison_count": comparisons,
+            "global_holm_positive_count": global_holm_positives,
+            "conditioned_named_baseline_mean_win_count": conditioned_named_wins,
+            "performance_rows_reviewed": performance_rows,
+            "legacy_rows_excluded": legacy_rows_excluded,
+            "numeric_fallback_count": numeric_fallbacks,
+            "source_inventory_measured_provider_count": as_int(
+                gauntlet_summary.get("broader_measured_provider_count")
+            ),
+            "source_inventory_is_performance_evidence": False,
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
-            "fixed_frozen_delta_price_claim_allowed": False,
             "live_trading_or_autonomous_execution_allowed": False,
-            "manual_paid_pilot_outreach_allowed": bool(revenue_summary.get("manual_reviewed_outreach_allowed")),
             "plain_english_answer": (
-                "This is the current money-printer truth line: Kuramoto phase coupling is a strong internal "
-                f"champion, with {wins_named}/{holdout_count} source-conditioned holdout wins against "
-                f"{gauntlet_summary.get('named_baseline') or 'kalman_filter'} across {len(source_systems)} "
-                f"source systems and {hosted_feed_phrase}. The next monetizable step is a paid, "
-                "buyer-authorized field replay, not an unverified realized-savings claim."
+                f"No internal performance champion is present. Kuramoto was not development-selected "
+                f"and won {wins_vs_kalman}/{holdout_count} paired measured days against "
+                f"{kuramoto_summary.get('named_baseline')} with mean skill delta "
+                f"{mean_skill_delta:.6f}. It cleared {baseline_passes}/{baseline_count} registered "
+                f"baselines, and the complete sweep produced {global_holm_positives}/{comparisons} "
+                "globally Holm-positive comparisons."
             ),
         },
-        "claim_controls": {
-            "allowed_now": [
-                "current internal champion",
-                "source-conditioned holdout winner",
-                (
-                    "public hash-verified reviewer feed"
-                    if live_domain_hash_verified
-                    else "local hashable reviewer feed staged for domain verification"
-                ),
-                "manual paid-pilot scoping candidate",
-                "buyer-authorized field replay request ready",
-            ],
-            "not_allowed_yet": [
-                "field validated",
-                "realized dollar savings",
-                "fixed dollar value per frozen delta",
-                "guaranteed grant award",
-                "live trading edge or autonomous execution",
-                "universal geometry superiority",
-            ],
-        },
-        "source_system_matrix": source_matrix(rows),
         "metric_stress_tests": gates,
-        "holdout_compact": compact_holdouts(rows),
-        "source_artifacts": {
-            "holdout_expansion": str(HOLDOUT_JSON.relative_to(ROOT)),
-            "champion_metric_gauntlet": str(GAUNTLET_JSON.relative_to(ROOT)),
-            "geometry_champion_of_champions": str(GEOMETRY_JSON.relative_to(ROOT)),
-            "proof_to_revenue_engine": str(REVENUE_JSON.relative_to(ROOT)),
-            "live_domain_deployment_feed": str(LIVE_DOMAIN_JSON.relative_to(ROOT)),
-            "champion_phase_proxy_diagnostics": str(PHASE_PROXY_JSON.relative_to(ROOT)),
-            "champion_source_ablation": str(SOURCE_ABLATION_JSON.relative_to(ROOT)),
-        },
-        "reviewer_urls": as_dict(live_domain.get("reviewer_urls")),
-        "what_to_ask_next": [
-            "Which buyer-controlled dataset can we replay under a locked incumbent baseline?",
-            "What operational cost factor converts metric improvement into dollars?",
-            "What pass/fail threshold would make a paid pilot worth expanding?",
-            "Which latency and residual tests must pass for production use?",
-            "Which narrow sector should receive the first manual paid-pilot outreach?",
+        "route_matrix": route_matrix,
+        "conditioned_research_leads": [
+            {
+                "lane": row["lane"],
+                "candidate_family": row["evaluated_candidate_family"],
+                "status": "RESEARCH_ONLY",
+                "performance_claim_allowed": False,
+            }
+            for row in route_matrix
+            if row["evidence_mode"] == "source_conditioned_synthetic_stress"
         ],
+        "claim_state": {
+            "measured_nonpromotion_result_claim_allowed": True,
+            "internal_performance_champion_claim_allowed": False,
+            "conditioned_synthetic_performance_claim_allowed": False,
+            "source_inventory_performance_claim_allowed": False,
+            "field_validation_claim_allowed": False,
+            "realized_savings_claim_allowed": False,
+        },
+        "inputs": {
+            "champion_metric_gauntlet": str(GAUNTLET_JSON.relative_to(ROOT)),
+            "locked_source_baseline_replay_sweep": str(
+                LOCKED_SWEEP_JSON.relative_to(ROOT)
+            ),
+            "geometry_ready_source_replay": str(READY_REPLAY_JSON.relative_to(ROOT)),
+            "kuramoto_holdout_expansion": str(KURAMOTO_JSON.relative_to(ROOT)),
+        },
     }
-    payload["stress_matrix_sha256"] = stable_sha256(
-        {
-            "summary": payload["summary"],
-            "source_system_matrix": payload["source_system_matrix"],
-            "metric_stress_tests": payload["metric_stress_tests"],
-            "holdout_compact": payload["holdout_compact"],
-        }
-    )
+    payload["stress_matrix_sha256"] = canonical_sha256(payload)
     return payload
 
 
@@ -568,106 +369,80 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
         "# Champion Stress Test Matrix",
         "",
-        f"Generated UTC: `{payload.get('generated_utc')}`",
-        f"Matrix SHA-256: `{payload.get('stress_matrix_sha256')}`",
-        "",
         "## Truth Line",
         "",
-        str(summary.get("plain_english_answer") or ""),
+        summary.get("plain_english_answer", ""),
         "",
-        "## Current Champion",
+        "## Canonical Result",
         "",
-        f"- Champion: `{summary.get('champion_family')}`",
+        f"- Internal performance champion: `{str(summary.get('internal_performance_champion')).lower()}`",
+        f"- Audited candidate: `{summary.get('audited_candidate_family')}`",
+        f"- Development-selected candidate: `{summary.get('development_selected_candidate')}`",
+        f"- Kuramoto protocol-selected: `{str(summary.get('candidate_was_protocol_selected')).lower()}`",
         f"- Named baseline: `{summary.get('named_baseline')}`",
-        f"- Holdout wins: `{summary.get('wins_vs_named_baseline')}/{summary.get('holdout_count')}`",
-        f"- Wins vs best same-run baseline: `{summary.get('wins_vs_best_same_run_baseline')}/{summary.get('holdout_count')}`",
-        f"- Source systems: `{summary.get('source_system_count')}`",
-        f"- Estimated rows replayed: `{summary.get('estimated_rows_replayed')}`",
-        f"- Numeric samples read: `{summary.get('numeric_samples_read')}`",
-        f"- Mean delta vs named baseline: `{summary.get('mean_delta_vs_named_baseline')}`",
-        f"- Weakest delta vs named baseline: `{summary.get('min_delta_vs_named_baseline')}`",
-        f"- Live-domain hash verified: `{str(summary.get('live_domain_hash_verified')).lower()}`",
+        (
+            f"- Paired-day wins: `{summary.get('paired_day_wins_vs_named_baseline')}/"
+            f"{summary.get('paired_day_count')}`"
+        ),
+        f"- Mean skill delta: `{summary.get('mean_skill_delta_vs_named_baseline')}`",
+        (
+            f"- Registered baseline gates: `{summary.get('registered_baseline_gate_pass_count')}/"
+            f"{summary.get('registered_baseline_count')}`"
+        ),
+        (
+            f"- Global Holm positives: `{summary.get('global_holm_positive_count')}/"
+            f"{summary.get('baseline_comparison_count')}`"
+        ),
         "",
-        "## Claim Boundary",
+        "## Evidence Modes",
         "",
-        "Allowed now:",
+        "| Lane | Mode | Status | Baselines | Mean wins | Global Holm positives | Rows |",
+        "|---|---|---|---:|---:|---:|---:|",
     ]
-    for item in as_list(as_dict(payload.get("claim_controls")).get("allowed_now")):
-        lines.append(f"- {item}")
-    lines.extend(["", "Not allowed yet:"])
-    for item in as_list(as_dict(payload.get("claim_controls")).get("not_allowed_yet")):
-        lines.append(f"- {item}")
-
-    lines.extend(
-        [
-            "",
-            "## Source System Matrix",
-            "",
-            "| Source | Holdouts | Rows | Numeric Samples | Wins | Mean Delta | Fallbacks |",
-            "|---|---:|---:|---:|---:|---:|---:|",
-        ]
-    )
-    for row in as_list(payload.get("source_system_matrix")):
-        source = as_dict(row)
+    for row_value in as_list(payload.get("route_matrix")):
+        row = as_dict(row_value)
         lines.append(
-            "| "
-            f"`{source.get('source_system')}` | "
-            f"{source.get('holdout_count')} | "
-            f"{source.get('estimated_rows')} | "
-            f"{source.get('numeric_samples')} | "
-            f"{source.get('wins_vs_named_baseline')} | "
-            f"{source.get('mean_delta_vs_named_baseline')} | "
-            f"{source.get('fallback_count')} |"
+            f"| `{row.get('lane')}` | `{row.get('evidence_mode')}` | `{row.get('status')}` | "
+            f"{row.get('registered_baseline_count')} | {row.get('baseline_mean_win_count')} | "
+            f"{row.get('global_holm_positive_count')} | {row.get('performance_rows_evaluated')} |"
         )
-
     lines.extend(
         [
             "",
-            "## Metric Battery",
+            "## Claim Boundary",
             "",
-            "| Test | Status | Actual | Threshold |",
-            "|---|---|---:|---|",
-        ]
-    )
-    for gate in as_list(payload.get("metric_stress_tests")):
-        row = as_dict(gate)
-        lines.append(
-            "| "
-            f"`{row.get('name')}` | "
-            f"`{row.get('status')}` | "
-            f"`{row.get('actual')}` | "
-            f"{row.get('threshold')} |"
-        )
-
-    lines.extend(
-        [
+            "- Direct measured routes support measured nonpromotion reporting only.",
+            "- Thermal and branching conditioned simulations are research leads only.",
+            "- Source breadth is inventory, not performance evidence.",
+            "- Field validation, realized savings, and autonomous execution remain disallowed.",
             "",
-            "## What This Unlocks",
-            "",
-            "- A clean paid-pilot conversation: we can show the hosted hash table, the champion matrix, and the blocked field-validation gates in one pass.",
-            "- A disciplined dollar path: dollars come only after a buyer locks the dataset, baseline, acceptance metric, and cost conversion.",
-            "- A stronger grant/supporting-data story: the proposal can say the proof stack is public, reproducible, and explicitly bounded.",
-            "",
-            "## What To Ask Next",
+            f"Stress matrix SHA-256: `{payload.get('stress_matrix_sha256')}`",
             "",
         ]
     )
-    for item in as_list(payload.get("what_to_ask_next")):
-        lines.append(f"- {item}")
     return "\n".join(lines)
 
 
-def main() -> int:
+def main() -> None:
     payload = build_payload()
     write_json(OUT_JSON, payload)
     write_json(DASHBOARD_JSON, payload)
-    write_text(OUT_MD, render_markdown(payload))
-    print(f"Wrote {OUT_JSON}")
-    print(f"Wrote {DASHBOARD_JSON}")
-    print(f"Wrote {OUT_MD}")
-    print(f"Champion stress matrix gates: {payload['summary']['metric_gate_pass_count']}/{payload['summary']['metric_gate_total_count']}")
-    return 0
+    DOC_MD.parent.mkdir(parents=True, exist_ok=True)
+    DOC_MD.write_text(render_markdown(payload), encoding="utf-8")
+    print(
+        json.dumps(
+            {
+                "schema": payload["schema"],
+                "internal_performance_champion": payload["summary"][
+                    "internal_performance_champion"
+                ],
+                "stress_matrix_sha256": payload["stress_matrix_sha256"],
+                "outputs": [str(OUT_JSON), str(DASHBOARD_JSON), str(DOC_MD)],
+            },
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

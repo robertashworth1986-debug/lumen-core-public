@@ -23,7 +23,8 @@ def test_gate_ranks_truthful_direct_fit_before_partner_dependent_bid():
     assert gate["decision"]["primary_lane"] == "NSF Project Pitch"
     assert gate["decision"]["secondary_lane"] == "ERDC Sovereign Defense Cloud CSO"
     assert gate["decision"]["partner_only_lane"] == "FHWA TSMO Data Initiative"
-    assert lanes["NSF Project Pitch"]["local_ready"] is True
+    assert lanes["NSF Project Pitch"]["local_ready"] is False
+    assert lanes["NSF Project Pitch"]["local_draft_complete"] is True
     assert lanes["FHWA TSMO Data Initiative"]["qualified_partner_evidence_present"] is False
     assert lanes["FHWA TSMO Data Initiative"]["qualified_target_contacted"] is True
     assert lanes["FHWA TSMO Data Initiative"]["delivery_failure_count"] == 1
@@ -59,19 +60,16 @@ def test_nsf_fields_and_current_schedule_are_bounded():
     assert all(item["passes"] for item in nsf["field_counts"].values())
 
     source = module.nsf_source_audit(gate)
-    assert source["official_facts"]["listed_full_proposal_deadlines"] == [
+    facts = source["verified_public_facts"]
+    assert facts["listed_full_proposal_deadlines"] == [
         "2026-07-27",
         "2026-11-04",
         "2027-03-04",
         "2027-07-07",
     ]
-    assert source["official_facts"]["nearest_listed_full_proposal_deadline"] == (
-        "2026-07-27"
-    )
-    assert source["official_facts"]["july_27_2026_currently_listed"] is True
-    assert source["official_facts"]["july_27_2026_reachable"] is False
-    assert source["official_facts"]["next_planning_target"] == "2026-11-04"
-    assert source["official_facts"]["full_proposal_requires_invitation"] is True
+    assert facts["next_listed_full_proposal_deadline"] == "2026-11-04"
+    assert facts["full_proposal_requires_official_invitation"] is True
+    assert source["authenticated_portal_access_performed"] is False
 
 
 def test_erdc_sources_are_present_hashed_and_claim_bounded():
@@ -79,11 +77,16 @@ def test_erdc_sources_are_present_hashed_and_claim_bounded():
     manifest = module.erdc_source_manifest()
 
     assert manifest["all_present"] is True
+    assert manifest["all_current_checks_pass"] is True
+    assert manifest["schema"] == "lumencore.erdc_sdc_source_manifest.v2"
+    assert manifest["as_of_date"] == "2026-07-29"
     assert len(manifest["files"]) == 2
     for item in manifest["files"]:
         assert item["exists"] is True
-        assert item["bytes"] > 0
-        assert len(item["sha256"]) == 64
+        assert item["actual_bytes"] > 0
+        assert len(item["actual_sha256"]) == 64
+        assert item["bytes_match"] is True
+        assert item["sha256_match"] is True
         assert item["official_url"].startswith("https://www.erdcwerx.org/")
     assert "do not establish selection" in manifest["claim_boundary"].lower()
 

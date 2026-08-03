@@ -27,8 +27,8 @@ DASHBOARD_JSON = DASHBOARD_DATA / "champion_metric_gauntlet.json"
 OUT_MD = DOCS / "CHAMPION_METRIC_GAUNTLET_2026-06-27.md"
 
 BOUNDARY = (
-    "Champion metric gauntlet only. This artifact explains the current internal winner, the tests it has "
-    "passed, the tests it has not passed, and the safest claim language. It does not create field validation, "
+    "Measured candidate metric gauntlet only. This artifact records the current direct measured result, the tests it "
+    "passed, the tests it failed, and the safest claim language. No current family is an internal performance champion. It does not create field validation, "
     "realized savings, trading profit, medical efficacy, award certainty, or a fixed dollar price for frozen deltas."
 )
 
@@ -150,40 +150,36 @@ def live_domain_deployment_status() -> dict[str, Any]:
 
 
 def strongest_current(champion: dict[str, Any], kuramoto: dict[str, Any]) -> dict[str, Any]:
-    board = as_dict(champion.get("champion_of_champions"))
-    strongest = as_dict(board.get("strongest_current"))
     summary = as_dict(kuramoto.get("summary"))
-    holdout = as_dict(strongest.get("kuramoto_holdout_evidence"))
-    evidence = summary or holdout
-    family = str(strongest.get("family") or evidence.get("candidate") or "kuramoto_phase_coupling")
-    label = str(strongest.get("label") or "Kuramoto phase coupling")
-    baseline = str(evidence.get("named_baseline") or "kalman_filter")
+    evidence = summary
+    family = str(evidence.get("candidate") or "kuramoto_phase_coupling")
+    label = "Kuramoto phase coupling"
+    baseline = str(
+        evidence.get("named_baseline") or "kalman_local_linear_trend"
+    )
+    mean_delta = as_float(evidence.get("mean_delta_vs_kalman"))
+    stability_ratio = 0.0
+    min_delta = as_float(evidence.get("min_delta_vs_kalman"))
+    if mean_delta > 0 and min_delta > 0:
+        stability_ratio = min_delta / mean_delta
 
     return {
         "family": family,
         "label": label,
-        "lane": strongest.get("lane", "wave_resonance_timing"),
-        "evidence_status": strongest.get(
-            "evidence_status",
-            "expanded_source_conditioned_holdout_winner_not_field_validated",
-        ),
-        "claim_stage": strongest.get(
-            "claim_stage",
-            "buyer_authorized_field_replay_request_ready_not_field_validated",
-        ),
+        "lane": "wave_resonance_timing",
+        "evidence_mode": evidence.get("evidence_mode", ""),
+        "evidence_status": "direct_measured_eia_nonpromotion_result",
+        "claim_stage": "direct_measured_source_specific_baseline_gate_failed",
         "named_baseline": baseline,
         "holdout_count": as_int(evidence.get("holdout_count")),
         "wins_vs_named_baseline": as_int(evidence.get("wins_vs_kalman") or evidence.get("wins_vs_best_baseline")),
         "wins_vs_best_baseline": as_int(evidence.get("wins_vs_best_baseline")),
         "losses_or_ties_vs_named_baseline": as_int(evidence.get("losses_or_ties_vs_kalman")),
         "win_rate_vs_named_baseline": round(as_float(evidence.get("win_rate_vs_kalman")), 6),
-        "mean_delta_vs_named_baseline": round(as_float(evidence.get("mean_delta_vs_kalman")), 6),
-        "min_delta_vs_named_baseline": round(as_float(evidence.get("min_delta_vs_kalman")), 6),
+        "mean_delta_vs_named_baseline": round(mean_delta, 6),
+        "min_delta_vs_named_baseline": round(min_delta, 6),
         "max_delta_vs_named_baseline": round(as_float(evidence.get("max_delta_vs_kalman")), 6),
-        "effect_stability_ratio_min_over_mean": round(
-            as_float(evidence.get("min_delta_vs_kalman")) / max(as_float(evidence.get("mean_delta_vs_kalman")), 1e-12),
-            6,
-        ),
+        "effect_stability_ratio_min_over_mean": round(stability_ratio, 6),
         "one_sided_sign_test_p_value": as_float(evidence.get("one_sided_sign_test_p_value"), 1.0),
         "wilson_95_win_rate_lower": round(as_float(evidence.get("wilson_95_win_rate_lower")), 6),
         "wilson_95_win_rate_upper": round(as_float(evidence.get("wilson_95_win_rate_upper")), 6),
@@ -191,10 +187,30 @@ def strongest_current(champion: dict[str, Any], kuramoto: dict[str, Any]) -> dic
         "numeric_samples_read": as_int(evidence.get("numeric_samples_read")),
         "source_system_count": as_int(evidence.get("source_system_count")),
         "source_systems": as_list(evidence.get("source_systems")),
+        "authority_count": as_int(evidence.get("authority_count")),
         "holdout_chain_sha256": str(evidence.get("holdout_chain_sha256", "")),
+        "development_selected_candidate": str(
+            evidence.get("development_selected_candidate", "")
+        ),
+        "candidate_was_protocol_selected": bool(
+            evidence.get("candidate_was_protocol_selected")
+        ),
+        "registered_baseline_count": as_int(
+            evidence.get("registered_baseline_count")
+        ),
+        "registered_baseline_mean_win_count": as_int(
+            evidence.get("registered_baseline_mean_win_count")
+        ),
+        "candidate_beats_all_registered_baselines_after_holm": bool(
+            evidence.get(
+                "candidate_beats_all_registered_baselines_after_holm"
+            )
+        ),
+        "protocol_grade_internal_champion": bool(
+            evidence.get("protocol_grade_internal_champion")
+        ),
         "ready_for_buyer_authorized_field_replay_request": bool(
             evidence.get("ready_for_buyer_authorized_field_replay_request")
-            or strongest.get("ready_for_buyer_authorized_field_replay_request")
         ),
         "passes_internal_20_holdout_gate": bool(evidence.get("passes_internal_20_holdout_gate")),
         "field_validation_claim_allowed": False,
@@ -211,12 +227,9 @@ def build_metric_gauntlet(
     live_domain_status: dict[str, Any],
 ) -> list[dict[str, Any]]:
     holdout_count = as_int(strongest.get("holdout_count"))
-    wins = as_int(strongest.get("wins_vs_named_baseline"))
     win_rate = as_float(strongest.get("win_rate_vs_named_baseline"))
-    min_delta = as_float(strongest.get("min_delta_vs_named_baseline"))
-    p_value = as_float(strongest.get("one_sided_sign_test_p_value"), 1.0)
-    wilson_lower = as_float(strongest.get("wilson_95_win_rate_lower"))
-    source_systems = as_int(strongest.get("source_system_count"))
+    mean_delta = as_float(strongest.get("mean_delta_vs_named_baseline"))
+    authorities = as_int(strongest.get("authority_count"))
     rows = as_int(strongest.get("estimated_rows_replayed"))
     chain = str(strongest.get("holdout_chain_sha256", ""))
     live_domain_ready = bool(live_domain_status.get("live_domain_reviewer_ready"))
@@ -228,66 +241,68 @@ def build_metric_gauntlet(
         metric_gate(
             "holdout_depth",
             holdout_count,
-            ">= 20 source-conditioned holdouts",
-            holdout_count >= 20,
-            "Prevents one-good-run storytelling.",
-            "Supports internal champion language.",
+            ">= 1,000 paired measured holdout days",
+            holdout_count >= 1_000,
+            "Confirms the direct measured result has adequate chronological depth.",
+            "Supports reporting the measured nonpromotion result, not champion language.",
         ),
         metric_gate(
-            "baseline_win_count",
-            f"{wins}/{holdout_count}",
-            ">= 16/20 and preferably all positive",
-            wins >= 16 and holdout_count >= 20,
-            "Shows the candidate beats a named incumbent across repeated holdouts.",
-            "Supports buyer-authorized field replay request language.",
+            "development_selection_frozen",
+            bool(strongest.get("candidate_was_protocol_selected")),
+            "true",
+            bool(strongest.get("candidate_was_protocol_selected")),
+            "Prevents substituting a candidate after inspecting the holdout.",
+            "Kuramoto remains a post-selection audit, not the protocol candidate.",
+            blocker=True,
         ),
         metric_gate(
             "baseline_win_rate",
             round(win_rate, 6),
-            ">= 0.80",
-            win_rate >= 0.80,
-            "Reviewers need a simple repeatability measure.",
-            "Supports strongest current candidate language.",
+            "> 0.50 with positive mean skill",
+            win_rate > 0.50 and mean_delta > 0,
+            "A paired win count must agree with the direction of the mean source-native metric.",
+            "Current named-baseline promotion remains blocked.",
         ),
         metric_gate(
-            "minimum_delta_positive",
-            round(min_delta, 6),
+            "mean_skill_positive",
+            round(mean_delta, 6),
             "> 0",
-            min_delta > 0,
-            "The weakest holdout still needs to beat the baseline.",
-            "Supports robust internal evidence language.",
+            mean_delta > 0,
+            "Positive skill means lower seasonal-MASE-7 than the named EIA baseline.",
+            "The current negative mean is a nonpromotion result.",
         ),
         metric_gate(
-            "sign_test_strength",
-            p_value,
-            "<= 0.001",
-            p_value <= 0.001,
-            "Separates repeated directional wins from noise.",
-            "Supports strong internal statistical evidence language.",
+            "all_source_specific_baselines_global_holm",
+            bool(
+                strongest.get(
+                    "candidate_beats_all_registered_baselines_after_holm"
+                )
+            ),
+            "true",
+            bool(
+                strongest.get(
+                    "candidate_beats_all_registered_baselines_after_holm"
+                )
+            ),
+            "Promotion requires beating every registered EIA baseline after global multiplicity correction.",
+            "No internal performance champion is allowed.",
+            blocker=True,
         ),
         metric_gate(
-            "wilson_lower_bound",
-            round(wilson_lower, 6),
-            ">= 0.75",
-            wilson_lower >= 0.75,
-            "Keeps the win-rate claim conservative under uncertainty.",
-            "Supports reviewer-safe confidence wording.",
-        ),
-        metric_gate(
-            "source_system_diversity",
-            source_systems,
-            ">= 3 source systems",
-            source_systems >= 3,
-            "Reduces the chance that one dataset family is carrying the result.",
-            "Supports multi-source internal replay language.",
+            "authority_coverage",
+            authorities,
+            ">= 8 EIA balancing authorities",
+            authorities >= 8,
+            "Checks that the measured result spans the complete frozen authority panel.",
+            "Supports bounded panel-coverage language only.",
         ),
         metric_gate(
             "row_replay_depth",
             rows,
-            ">= 1,000,000 estimated rows replayed",
-            rows >= 1_000_000,
-            "Shows the proof was not built on a toy-sized scrape.",
-            "Supports scale-of-evidence language.",
+            ">= 10,000 evaluated strategy rows",
+            rows >= 10_000,
+            "Shows the benchmark evaluated the complete frozen strategy panel.",
+            "Supports measured benchmark-depth language.",
         ),
         metric_gate(
             "hash_chain_present",
@@ -384,7 +399,7 @@ def dashboard_feed_status() -> dict[str, Any]:
 
 
 def source_breadth_universe(strongest: dict[str, Any]) -> dict[str, Any]:
-    """Separate the current champion replay scope from the broader live-source estate."""
+    """Separate the measured candidate scope from the broader source estate."""
     live_source = read_json(LIVE_SOURCE_MAX_JSON)
     live_summary = as_dict(live_source.get("summary"))
     manifest = read_json(GEOMETRY_SOURCE_MANIFEST_JSON)
@@ -398,10 +413,10 @@ def source_breadth_universe(strongest: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "claim_boundary": (
-            "The champion replay source count and the broader live-source universe are intentionally not the "
-            "same metric. The champion replay count only covers sources promoted into the current Kuramoto "
-            "holdout expansion. The broader universe counts providers, local/live files, and manifest rows that "
-            "are available for additional benchmarking but are not automatically part of the current champion win."
+            "The direct measured candidate source count and the broader live-source universe are intentionally not the "
+            "same metric. The candidate count covers the frozen EIA holdout only. The broader universe counts "
+            "providers, local/live files, and legacy manifest rows available for future compatibility work; those "
+            "counts are not performance evidence and do not imply a champion."
         ),
         "champion_replay": {
             "source_system_count": as_int(strongest.get("source_system_count")),
@@ -700,17 +715,17 @@ def metric_expansion_suite(
             "BLOCKED_REQUIRES_BUYER_OR_LAB",
             "Will an external owner reproduce the win on their held-out data and baseline?",
             ["locked_holdout_window", "incumbent_baseline", "acceptance_metric", "forbidden_tuning_rules", "signed_result"],
-            "Current evidence is strong enough to request a replay, not to claim external field validation.",
-            "Use the OpenPOWER AI/EPRI/EPB/TVA/Tennessee lab outreach lane for one manually reviewed replay ask.",
-            "Field-validation language remains blocked until an external owner accepts or runs the protocol.",
+            "Current evidence is a direct measured nonpromotion result and is not ready for a performance replay request.",
+            "Use the next research cycle to freeze a development-selected candidate before any external performance ask.",
+            "Field-validation language remains blocked until an internally promoted candidate and an external owner accept the protocol.",
         ),
         row(
             "all_family_championship",
             "BLOCKED_REQUIRES_FULL_REGISTRY_RUN",
-            "Is Kuramoto still champion after every registered family competes under the same metric budget?",
+            "Can any development-selected wave family clear every source-specific baseline under the same metric budget?",
             ["family_count_tested", "baseline_count", "matched_budget", "winner_by_lane", "negative_results_logged"],
-            "The current champion is strongest in the promoted replay core; all-family live championship remains explicitly blocked.",
-            "Run family-by-family live benchmarks from the geometry registry with frozen budgets and publish losers too.",
+            "No current wave family cleared the measured EIA promotion gate; all-family live championship remains explicitly blocked.",
+            "Search families on development data, freeze one candidate per lane, then publish the untouched holdout result and losers.",
             "Universal geometry-superiority language remains blocked.",
         ),
     ]
@@ -747,12 +762,15 @@ def build_payload() -> dict[str, Any]:
 
     payload: dict[str, Any] = {
         "generated_utc": generated,
-        "schema": "champion_metric_gauntlet_v1",
-        "purpose": "Reviewer-safe metric gauntlet for the current strongest geometry family.",
+        "schema": "champion_metric_gauntlet_v2",
+        "purpose": "Reviewer-safe metric gauntlet for the current direct measured geometry candidate result.",
         "boundary": BOUNDARY,
         "strongest_current": strongest,
         "summary": {
-            "internal_champion": True,
+            "internal_champion": False,
+            "protocol_grade_internal_champion": bool(
+                strongest["protocol_grade_internal_champion"]
+            ),
             "champion_family": strongest["family"],
             "champion_label": strongest["label"],
             "named_baseline": strongest["named_baseline"],
@@ -782,32 +800,30 @@ def build_payload() -> dict[str, Any]:
             "metric_expansion_blocked_count": sum(
                 1 for row in expansion_suite if "BLOCKED" in str(row.get("status", ""))
             ),
-            "reviewer_safe_internal_claim_allowed": True,
+            "reviewer_safe_internal_claim_allowed": False,
+            "reviewer_safe_measured_nonpromotion_claim_allowed": True,
             "buyer_authorized_field_replay_request_ready": bool(
                 strongest["ready_for_buyer_authorized_field_replay_request"]
             ),
-            "bounded_estimated_value_claim_allowed": bool(
-                truth_gates.get("bounded_estimated_value_claim_allowed")
-                or champion_summary.get("bounded_estimated_value_claim_allowed")
-            ),
+            "bounded_estimated_value_claim_allowed": False,
             "paid_pilot_scoping_allowed": bool(
                 truth_gates.get("paid_pilot_scoping_allowed") or champion_summary.get("paid_pilot_scoping_allowed")
             ),
-            "safe_estimated_hourly_value_usd": round(safe_hourly, 2),
-            "safe_estimated_annual_value_usd": round(safe_annual, 2),
+            "paid_protocol_review_scoping_allowed": True,
+            "safe_estimated_hourly_value_usd": 0.0,
+            "safe_estimated_annual_value_usd": 0.0,
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
             "live_trading_or_autonomous_execution_allowed": False,
             "live_domain_reviewer_ready": bool(feed_status["live_domain_routed"]),
             "plain_english_answer": (
-                f"{strongest['label']} is the current internal champion because it beat "
-                f"{strongest['named_baseline']} on {strongest['wins_vs_named_baseline']}/"
-                f"{strongest['holdout_count']} source-conditioned holdouts across "
-                f"{strongest['source_system_count']} champion-replay source systems. The broader live-source "
-                f"universe currently shows {source_breadth['fresh_provider_measurement']['measured_provider_count']} "
-                f"measured providers and {source_breadth['geometry_manifest']['unique_source_count']} mapped source "
-                "files/feeds available for additional benchmark promotion. That is strong enough to request "
-                "a buyer-authorized field replay, but it is not field validation or realized dollar savings yet."
+                f"No current geometry family is an internal performance champion. "
+                f"{strongest['label']} was audited on {strongest['holdout_count']} paired measured EIA holdout days; "
+                f"it won {strongest['wins_vs_named_baseline']} pairs against {strongest['named_baseline']} but had "
+                f"a negative mean skill delta of {strongest['mean_delta_vs_named_baseline']} and did not clear any "
+                "complete source-specific all-baseline promotion gate. The broader source inventory is research "
+                "capacity only, not performance evidence. The safe commercial ask is a paid protocol or evidence "
+                "review, not a performance or savings claim."
             ),
         },
         "source_breadth_universe": source_breadth,
@@ -833,13 +849,16 @@ def build_payload() -> dict[str, Any]:
         },
         "claim_language": {
             "allowed": [
-                "current internal champion",
-                "source-conditioned holdout winner against a named baseline",
-                "buyer-authorized field replay request ready",
-                "bounded estimated opportunity surface",
-                "paid pilot scoping candidate",
+                "direct measured nonpromotion result",
+                "source-specific baseline gauntlet",
+                "negative result preserved with hashes",
+                "paid protocol or evidence review scoping",
             ],
             "not_allowed": [
+                "current internal performance champion",
+                "source-conditioned holdout winner",
+                "buyer-authorized performance replay request ready",
+                "bounded estimated opportunity surface from the failed result",
                 "field validated",
                 "realized dollar savings",
                 "grant award certainty",

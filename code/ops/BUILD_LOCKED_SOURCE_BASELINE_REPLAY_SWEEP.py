@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import json
 import math
+import os
 import sys
 import time
 from datetime import datetime, timezone
@@ -19,6 +20,8 @@ DOCS = ROOT / "docs"
 
 REGISTRY_JSON = ROOT / "config" / "geometry_championship_v1_registry.json"
 MANIFEST_JSON = OUT_OPS / "geometry_live_source_manifest_latest.json"
+MATRIX_JSON = OUT_OPS / "geometry_live_wiring_matrix_latest.json"
+TOP_REPLAY_JSON = OUT_OPS / "top_geometry_live_replay_results_latest.json"
 MANIFEST_SCRIPT = ROOT / "code" / "ops" / "BUILD_GEOMETRY_LIVE_SOURCE_MANIFEST.py"
 READY_REPLAY_SCRIPT = ROOT / "code" / "ops" / "BUILD_GEOMETRY_READY_SOURCE_REPLAY.py"
 TOP_REPLAY_SCRIPT = ROOT / "code" / "ops" / "BUILD_TOP_GEOMETRY_LIVE_REPLAY_RESULTS.py"
@@ -73,12 +76,11 @@ ENERGY_PROXY_RULES = {
 }
 
 EVIDENCE_BOUNDARY = (
-    "Locked source baseline replay sweep. This runs every ready local/uploaded measured source row "
-    "from the geometry live source manifest through available source-conditioned replay adapters and "
-    "compares candidates against the locked baselines for their lane. It includes an energy price-pressure "
-    "proxy adapter so those rows are tested instead of blocked. This is source-conditioned replay evidence, "
-    "not field validation, not realized savings, not a fixed-dollar frozen-delta sales claim, not live trading, "
-    "and not a medical or addiction-treatment claim."
+    "Compatibility-gated locked-source replay audit. Legacy manifest readiness does not establish "
+    "source-task compatibility, so unjoined manifest rows are excluded. Only v3 matrix-qualified "
+    "direct measured replays and source-conditioned synthetic stress runs may appear. Context-only "
+    "sources, zero-numeric fallbacks, and generic local-file inventory cannot produce wins. This is "
+    "not field validation, realized savings, a fixed-dollar sales claim, live trading, or a medical claim."
 )
 
 
@@ -98,7 +100,12 @@ def read_json(path: Path) -> dict[str, Any]:
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    temporary.replace(path)
 
 
 def write_text(path: Path, text: str) -> None:
@@ -109,6 +116,14 @@ def write_text(path: Path, text: str) -> None:
 def stable_sha256(payload: Any) -> str:
     raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def rel(path: Path) -> str:
@@ -570,10 +585,20 @@ def forecast_metrics(actual: list[float], pred: list[float], prev: list[float], 
     }
 
 
-def run_energy_proxy_adapter(route: dict[str, Any], helpers: Any, *, sample_limit: int) -> dict[str, Any]:
+def energy_proxy_series(route: dict[str, Any], helpers: Any, *, sample_limit: int) -> list[float]:
     path = helpers.resolve_source_path(str(route.get("source_path", "")))
     values = helpers.read_numeric_samples(path, sample_limit) if path.exists() else []
-    series = normalize_series(values, max_points=min(sample_limit, 720))
+    return normalize_series(values, max_points=min(sample_limit, 720))
+
+
+def run_energy_proxy_adapter(
+    route: dict[str, Any],
+    helpers: Any,
+    *,
+    sample_limit: int,
+    series: list[float] | None = None,
+) -> dict[str, Any]:
+    series = energy_proxy_series(route, helpers, sample_limit=sample_limit) if series is None else series
     if len(series) < 32:
         return {
             "adapter_status": "insufficient_numeric_series",
@@ -685,9 +710,17 @@ def replay_energy_route(
     *,
     sample_limit: int,
 ) -> dict[str, Any]:
-    cache_key = f"{route.get('source_path', '')}|{sample_limit}"
+    series = energy_proxy_series(route, helpers, sample_limit=sample_limit)
+    series_sha256 = stable_sha256(series)
+    cache_key = f"{sample_limit}|{series_sha256}"
+    cache_hit = cache_key in energy_cache
     if cache_key not in energy_cache:
-        energy_cache[cache_key] = run_energy_proxy_adapter(route, helpers, sample_limit=sample_limit)
+        energy_cache[cache_key] = run_energy_proxy_adapter(
+            route,
+            helpers,
+            sample_limit=sample_limit,
+            series=series,
+        )
     replay = energy_cache[cache_key]
     return {
         "lane": "energy_price_pressure_proxy",
@@ -700,6 +733,8 @@ def replay_energy_route(
         "profile": {
             "numeric_count": replay.get("series_count", 0),
             "walk_forward_points": replay.get("walk_forward_points", 0),
+            "series_sha256": series_sha256,
+            "exact_series_cache_hit": cache_hit,
         },
         "metric_names": ENERGY_PROXY_RULES["metrics"],
         "locked_baselines": ENERGY_PROXY_RULES["baselines"],
@@ -768,65 +803,175 @@ def lane_scoreboard(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def build_payload(*, sample_limit: int = 720) -> dict[str, Any]:
-    registry = read_json(REGISTRY_JSON)
-    lanes = registry_lanes(registry)
+    del sample_limit
     manifest = ensure_manifest()
-    helpers = ready_replay_module()
-    replay = top_replay_module()
+    matrix = read_json(MATRIX_JSON)
+    replay_module = top_replay_module()
+    top_replay = replay_module.build_results()
     ready_rows = [
         row
         for row in manifest.get("manifest_rows", [])
-        if isinstance(row, dict) and row.get("ready_for_benchmark") and row.get("source_path")
+        if isinstance(row, dict)
+        and row.get("ready_for_benchmark")
+        and row.get("source_path")
     ]
-    ready_rows.sort(key=lambda row: (str(row.get("lane", "")), int(row.get("rank") or 0), str(row.get("source_path", ""))))
+    ready_by_lane: dict[str, int] = {}
+    for row in ready_rows:
+        lane = str(row.get("lane", ""))
+        ready_by_lane[lane] = ready_by_lane.get(lane, 0) + 1
 
-    profile_cache: dict[str, dict[str, Any]] = {}
-    energy_cache: dict[str, dict[str, Any]] = {}
-    results: list[dict[str, Any]] = []
-    unsupported_rows: list[dict[str, Any]] = []
-    for route in ready_rows:
-        lane = str(route.get("lane", ""))
-        if lane in ADAPTER_BACKED_GEOMETRY_LANES:
-            results.append(replay_geometry_route(route, replay, helpers, lanes, profile_cache, sample_limit=sample_limit))
-        elif lane == "energy_price_pressure_proxy":
-            results.append(replay_energy_route(route, helpers, energy_cache, sample_limit=sample_limit))
-        else:
-            unsupported_rows.append(
+    cards = [
+        row
+        for row in top_replay.get("replay_cards", [])
+        if isinstance(row, dict)
+    ]
+    qualified_cards = [
+        row for row in cards if str(row.get("adapter_status", "")).endswith("_ran")
+    ]
+    compact: list[dict[str, Any]] = []
+    for card in qualified_cards:
+        for comparison in card.get("baseline_comparisons", []):
+            compact.append(
                 {
-                    "lane": lane,
-                    "source_path": route.get("source_path", ""),
-                    "system": route.get("system", ""),
-                    "reason": "ready row has no locked source-conditioned adapter yet",
-                    "estimated_rows": int(route.get("estimated_rows") or 0),
-                    "candidate_family": route.get("candidate_family", ""),
-                    "baseline_family": route.get("baseline_family", ""),
+                    "lane": card.get("lane", ""),
+                    "evidence_mode": card.get("evidence_mode", ""),
+                    "candidate_family": card.get(
+                        "evaluated_candidate_family_id", ""
+                    ),
+                    "source_path": ",".join(
+                        sorted(
+                            set(card.get("direct_replay_source_names", []))
+                            | set(
+                                card.get(
+                                    "conditioned_stress_source_names", []
+                                )
+                            )
+                        )
+                    ),
+                    "baseline_family": comparison.get(
+                        "baseline_family_id", ""
+                    ),
+                    "score_delta": comparison.get("candidate_score_delta"),
+                    "candidate_beats_baseline": comparison.get(
+                        "candidate_beats_baseline_mean", False
+                    ),
+                    "statistically_positive_after_global_holm": comparison.get(
+                        "statistically_positive_after_global_holm", False
+                    ),
+                    "paired_unit_count": comparison.get(
+                        "paired_inference", {}
+                    ).get("paired_unit_count", 0),
                 }
             )
-
-    compact = [compact_comparison(result, comparison) for result in results for comparison in result.get("comparisons", [])]
-    positive = [row for row in compact if row.get("candidate_beats_baseline")]
-    deltas = [float(row["score_delta"]) for row in compact if safe_float(row.get("score_delta")) is not None]
-    scoreboard = lane_scoreboard(results)
-    top_wins = sorted(positive, key=lambda row: float(row.get("score_delta") or -999), reverse=True)[:25]
+    positive = [row for row in compact if row["candidate_beats_baseline"]]
+    deltas = [
+        float(row["score_delta"])
+        for row in compact
+        if safe_float(row.get("score_delta")) is not None
+    ]
+    scoreboard = [
+        {
+            "lane": card.get("lane", ""),
+            "evidence_mode": card.get("evidence_mode", ""),
+            "routes_replayed": 1,
+            "baseline_comparison_count": len(
+                card.get("baseline_comparisons", [])
+            ),
+            "candidate_win_count": int(
+                card.get("baseline_gauntlet", {}).get(
+                    "mean_score_win_count", 0
+                )
+                or 0
+            ),
+            "global_holm_positive_count": int(
+                card.get("baseline_gauntlet", {}).get(
+                    "global_holm_positive_count", 0
+                )
+                or 0
+            ),
+            "numeric_samples": int(card.get("performance_rows_evaluated", 0) or 0),
+            "locked_baselines": [
+                row.get("baseline_family_id", "")
+                for row in card.get("baseline_comparisons", [])
+            ],
+            "source_names": sorted(
+                set(card.get("direct_replay_source_names", []))
+                | set(card.get("conditioned_stress_source_names", []))
+            ),
+        }
+        for card in qualified_cards
+    ]
+    for row, card in zip(scoreboard, qualified_cards):
+        card_deltas = [
+            float(comparison["candidate_score_delta"])
+            for comparison in card.get("baseline_comparisons", [])
+            if safe_float(comparison.get("candidate_score_delta")) is not None
+        ]
+        row["estimated_rows"] = 0
+        row["mean_score_delta"] = (
+            round(mean(card_deltas), 6) if card_deltas else None
+        )
+        row["best_score_delta"] = (
+            round(max(card_deltas), 6) if card_deltas else None
+        )
+    top_wins = sorted(
+        positive,
+        key=lambda row: float(row.get("score_delta") or -999),
+        reverse=True,
+    )[:25]
+    conditioned_cards = [
+        row
+        for row in qualified_cards
+        if row.get("evidence_mode") == "source_conditioned_synthetic_stress"
+    ]
+    direct_cards = [
+        row
+        for row in qualified_cards
+        if row.get("evidence_mode") == "direct_measured_replay"
+    ]
+    source_names = {
+        source
+        for card in qualified_cards
+        for source in (
+            card.get("direct_replay_source_names", [])
+            + card.get("conditioned_stress_source_names", [])
+        )
+    }
     summary = {
         "manifest_rows": len(manifest.get("manifest_rows", [])),
         "ready_rows": len(ready_rows),
-        "adapter_backed_routes": len(results),
-        "unsupported_ready_rows": len(unsupported_rows),
-        "geometry_routes_replayed": sum(1 for row in results if row.get("lane") in ADAPTER_BACKED_GEOMETRY_LANES),
-        "energy_proxy_routes_replayed": sum(1 for row in results if row.get("lane") == "energy_price_pressure_proxy"),
-        "source_count": len({row.get("source_path", "") for row in results}),
-        "lane_count": len({row.get("lane", "") for row in results}),
+        "unclassified_manifest_rows_excluded": len(ready_rows),
+        "adapter_backed_routes": len(qualified_cards),
+        "unsupported_ready_rows": len(ready_rows),
+        "geometry_routes_replayed": len(qualified_cards),
+        "direct_measured_routes_replayed": len(direct_cards),
+        "source_conditioned_routes_replayed": len(conditioned_cards),
+        "energy_proxy_routes_replayed": 0,
+        "source_count": len(source_names),
+        "lane_count": len({row.get("lane", "") for row in qualified_cards}),
         "baseline_comparison_count": len(compact),
         "candidate_win_count": len(positive),
         "candidate_loss_or_tie_count": len(compact) - len(positive),
-        "estimated_rows_replayed": sum(int(row.get("estimated_rows") or 0) for row in results),
-        "numeric_samples_read": sum(int(row.get("profile", {}).get("numeric_count") or 0) for row in results),
-        "energy_proxy_unique_source_replays": len(energy_cache),
-        "energy_proxy_cache_reuses": max(0, sum(1 for row in results if row.get("lane") == "energy_price_pressure_proxy") - len(energy_cache)),
+        "global_holm_positive_count": sum(
+            1
+            for row in compact
+            if row["statistically_positive_after_global_holm"]
+        ),
+        "estimated_rows_replayed": 0,
+        "numeric_samples_read": sum(
+            int(row.get("performance_rows_evaluated", 0) or 0)
+            for row in qualified_cards
+        ),
+        "fallback_profiles_used": 0,
+        "energy_proxy_unique_source_replays": 0,
+        "energy_proxy_unique_series_replays": 0,
+        "energy_proxy_cache_reuses": 0,
         "mean_score_delta": round(mean(deltas), 6) if deltas else None,
         "best_score_delta": round(max(deltas), 6) if deltas else None,
-        "source_conditioned_replay_claim_allowed": True,
+        "source_conditioned_replay_claim_allowed": bool(conditioned_cards),
+        "direct_measured_replay_evidence_present": bool(direct_cards),
+        "broad_manifest_sweep_claim_allowed": False,
+        "performance_superiority_claim_allowed": False,
         "field_validation_claim_allowed": False,
         "real_dollar_savings_claim_allowed": False,
         "fixed_dollar_delta_sale_claim_allowed": False,
@@ -834,14 +979,20 @@ def build_payload(*, sample_limit: int = 720) -> dict[str, Any]:
         "medical_or_addiction_treatment_claim_allowed": False,
     }
     payload = {
-        "schema": "locked_source_baseline_replay_sweep_v1",
+        "schema": "locked_source_baseline_replay_sweep_v2",
         "generated_utc": now_utc(),
         "evidence_boundary": EVIDENCE_BOUNDARY,
         "inputs": {
             "registry": rel(REGISTRY_JSON),
             "manifest": rel(MANIFEST_JSON),
+            "manifest_sha256": file_sha256(MANIFEST_JSON),
+            "geometry_live_wiring_matrix": rel(MATRIX_JSON),
+            "geometry_live_wiring_matrix_sha256": file_sha256(MATRIX_JSON),
+            "top_geometry_live_replay_results": rel(TOP_REPLAY_JSON),
+            "top_replay_matrix_sha256": top_replay.get("inputs", {}).get(
+                "geometry_live_wiring_matrix_sha256", ""
+            ),
             "geometry_replay_adapter": rel(TOP_REPLAY_SCRIPT),
-            "ready_source_helpers": rel(READY_REPLAY_SCRIPT),
         },
         "outputs": {
             "json": rel(OUT_JSON),
@@ -851,10 +1002,23 @@ def build_payload(*, sample_limit: int = 720) -> dict[str, Any]:
         "summary": summary,
         "lane_scoreboard": scoreboard,
         "top_positive_comparisons": top_wins,
-        "unsupported_ready_rows": unsupported_rows,
-        "route_results": results,
+        "unsupported_ready_rows": [
+            {
+                "lane": lane,
+                "row_count": count,
+                "reason": (
+                    "legacy manifest row lacks an exact v3 source-task compatibility "
+                    "join and is excluded from performance"
+                ),
+            }
+            for lane, count in sorted(ready_by_lane.items())
+        ],
+        "route_results": qualified_cards,
         "claim_gates": {
-            "source_conditioned_replay_claim_allowed": True,
+            "source_conditioned_replay_claim_allowed": bool(conditioned_cards),
+            "direct_measured_replay_evidence_present": bool(direct_cards),
+            "broad_manifest_sweep_claim_allowed": False,
+            "performance_superiority_claim_allowed": False,
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
             "fixed_dollar_delta_sale_claim_allowed": False,
@@ -868,6 +1032,9 @@ def build_payload(*, sample_limit: int = 720) -> dict[str, Any]:
     }
     payload["summary"]["replay_chain_sha256"] = stable_sha256(
         {
+            "matrix_sha256": payload["inputs"][
+                "geometry_live_wiring_matrix_sha256"
+            ],
             "summary": payload["summary"],
             "lane_scoreboard": payload["lane_scoreboard"],
             "top_positive_comparisons": payload["top_positive_comparisons"],
@@ -889,7 +1056,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Manifest rows: `{summary['manifest_rows']}`",
         f"- Ready rows: `{summary['ready_rows']}`",
+        f"- Unclassified manifest rows excluded: `{summary['unclassified_manifest_rows_excluded']}`",
         f"- Adapter-backed routes replayed: `{summary['adapter_backed_routes']}`",
+        f"- Direct measured routes replayed: `{summary['direct_measured_routes_replayed']}`",
+        f"- Source-conditioned synthetic stress routes replayed: `{summary['source_conditioned_routes_replayed']}`",
         f"- Geometry routes replayed: `{summary['geometry_routes_replayed']}`",
         f"- Energy proxy routes replayed: `{summary['energy_proxy_routes_replayed']}`",
         f"- Baseline comparisons: `{summary['baseline_comparison_count']}`",
@@ -900,6 +1070,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Mean score delta: `{summary['mean_score_delta']}`",
         f"- Best score delta: `{summary['best_score_delta']}`",
         f"- Replay chain SHA-256: `{summary['replay_chain_sha256']}`",
+        f"- Broad manifest sweep claim allowed: `{str(summary['broad_manifest_sweep_claim_allowed']).lower()}`",
+        f"- Performance superiority claim allowed: `{str(summary['performance_superiority_claim_allowed']).lower()}`",
         f"- Field validation claim allowed: `{str(summary['field_validation_claim_allowed']).lower()}`",
         f"- Real-dollar savings claim allowed: `{str(summary['real_dollar_savings_claim_allowed']).lower()}`",
         "",
@@ -935,7 +1107,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Claim Boundaries",
             "",
-            "- Allowed: source-conditioned replay claims with hashes, baselines, and metric names.",
+            "- Allowed: bounded descriptions of compatibility-gated direct replay and source-conditioned synthetic stress, with hashes and source-specific baselines.",
+            "- Not allowed: treating legacy manifest readiness, context-only rows, or zero-numeric fallbacks as performance evidence.",
             "- Not allowed yet: field validation, realized savings, fixed-dollar frozen-delta value, live trading, or medical/addiction-treatment language.",
             "- Unlock path: buyer/agency/lab supplies held-out operational data, incumbent baseline, acceptance metric, and economic conversion.",
         ]
@@ -946,6 +1119,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
 def main() -> None:
     payload = build_payload()
     write_json(OUT_JSON, payload)
+    reloaded = read_json(OUT_JSON)
+    if reloaded.get("schema") != payload.get("schema"):
+        raise RuntimeError("locked source sweep JSON failed post-write validation")
     write_json(DASHBOARD_JSON, payload)
     write_text(OUT_MD, render_markdown(payload))
 

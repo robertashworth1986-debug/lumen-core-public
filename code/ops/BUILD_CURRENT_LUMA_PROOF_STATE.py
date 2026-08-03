@@ -21,6 +21,7 @@ SOURCE_MANIFEST_JSON = OUT_OPS / "geometry_live_source_manifest_latest.json"
 REPEAT_VALIDATION_JSON = OUT_OPS / "geometry_repeat_proof_validation_latest.json"
 UNCERTAINTY_JSON = OUT_OPS / "geometry_repeat_uncertainty_report_latest.json"
 KURAMOTO_HOLDOUT_JSON = OUT_OPS / "kuramoto_holdout_expansion_latest.json"
+KURAMOTO_CROSS_SECTOR_JSON = OUT_OPS / "kuramoto_cross_sector_benchmark_latest.json"
 VALUATION_JSON = OUT_OPS / "valuation_proposal_target_packet_latest.json"
 CLAIM_MAP_JSON = OUT_OPS / "claim_strength_value_unlock_map_latest.json"
 FIELD_MONEY_JSON = OUT_OPS / "field_money_truth_sweep_latest.json"
@@ -150,19 +151,18 @@ def repeat_candidates(
             mean_delta = mean(deltas)
         robust = bool(u.get("robust_repeat_uncertainty_gate_passed"))
         repeat_passed = bool(row.get("repeat_candidate_gate_passed"))
-        evidence_stage = (
-            "robust_repeat_champion_not_field_validated"
-            if robust
-            else "repeat_candidate_needs_more_holdouts"
-            if repeat_passed
-            else "repeat_replay_observed_not_promoted"
-        )
-        score = 82.0
-        score += 18.0 if robust else 0.0
-        score += min(safe_int(row.get("repeat_live_win_count")) * 2.2, 18.0)
-        score += min(safe_int(row.get("distinct_win_hash_count")) * 1.4, 12.0)
-        score += min(abs(mean_delta) * 90.0, 18.0)
-        score -= 12.0 if not repeat_passed else 0.0
+        evidence_mode = str(row.get("evidence_mode", ""))
+        evidence_stage = str(row.get("evidence_stage", "not_repeat_promoted"))
+        if robust:
+            score = 100.0
+        elif repeat_passed:
+            score = 70.0
+        elif evidence_mode == "direct_measured_replay":
+            score = 35.0
+        elif evidence_mode == "source_conditioned_synthetic_stress":
+            score = 20.0
+        else:
+            score = 8.0
         rows[family_id] = {
             "family_id": family_id,
             "label": families.get(family_id, {}).get("label", family_id),
@@ -170,6 +170,12 @@ def repeat_candidates(
             "named_baseline": row.get("named_baseline", ""),
             "evidence_stage": evidence_stage,
             "proof_score": round(score, 3),
+            "evidence_mode": evidence_mode,
+            "eligible_for_repeat_confirmation": bool(
+                row.get("eligible_for_repeat_confirmation")
+            ),
+            "repeat_candidate_gate_passed": repeat_passed,
+            "robust_repeat_uncertainty_gate_passed": robust,
             "repeat_live_win_count": safe_int(row.get("repeat_live_win_count")),
             "window_count": safe_int(row.get("available_window_count")),
             "distinct_win_hash_count": safe_int(row.get("distinct_win_hash_count")),
@@ -182,7 +188,11 @@ def repeat_candidates(
             ),
             "sign_test_p_value": u.get("one_sided_sign_test_p_value"),
             "wilson_lower_95_win_rate": u.get("wilson_lower_95_win_rate"),
-            "source_names": row.get("source_names", []),
+            "source_names": sorted(
+                set(row.get("direct_replay_source_names", []))
+                | set(row.get("conditioned_stress_source_names", []))
+            ),
+            "blockers": row.get("blockers", []),
             "claim_boundary": row.get("claim_boundary", ""),
         }
     return rows
@@ -202,30 +212,56 @@ def ready_source_candidates(
         replay_count = safe_int(row.get("replay_count"))
         wins = safe_int(row.get("candidate_win_count"))
         mean_delta = safe_float(row.get("mean_delta_vs_named_baseline"))
-        win_rate = wins / replay_count if replay_count else 0.0
-        if replay_count >= 3 and win_rate >= 1.0:
-            stage = "source_conditioned_multi_replay_winner_not_field_validated"
-            base = 76.0
-        elif wins > 0:
-            stage = "source_conditioned_candidate_needs_repeat"
-            base = 62.0
+        evidence_mode = str(row.get("evidence_mode", ""))
+        baseline_count = safe_int(row.get("baseline_comparison_count"))
+        global_positive = safe_int(row.get("global_holm_positive_count"))
+        if (
+            evidence_mode == "direct_measured_replay"
+            and baseline_count > 0
+            and global_positive == baseline_count
+        ):
+            stage = "direct_measured_all_baseline_internal_champion_not_field_validated"
+            base = 82.0
+        elif evidence_mode == "direct_measured_replay":
+            stage = "direct_measured_source_specific_nonpromotion"
+            base = 35.0
+        elif evidence_mode == "source_conditioned_synthetic_stress":
+            stage = "source_conditioned_synthetic_stress_research_lead"
+            base = 25.0 + min(wins * 2.0, 8.0)
         else:
-            stage = "negative_source_conditioned_replay_demote"
-            base = 22.0
-        score = base + min(win_rate * 12.0, 12.0) + min(max(mean_delta, 0.0) * 120.0, 24.0)
-        score += min(math.log10(max(safe_int(row.get("estimated_rows")), 1)) * 2.0, 14.0)
+            stage = "no_compatible_direct_measured_replay"
+            base = 8.0
         rows[family_id] = {
             "family_id": family_id,
             "label": families.get(family_id, {}).get("label", family_id),
             "lane": row.get("lane", ""),
             "named_baseline": row.get("baseline_family", ""),
             "evidence_stage": stage,
-            "proof_score": round(score, 3),
-            "source_conditioned_replays": replay_count,
-            "source_conditioned_wins": wins,
-            "source_conditioned_win_rate": round(win_rate, 6),
-            "estimated_rows": safe_int(row.get("estimated_rows")),
-            "numeric_samples": safe_int(row.get("numeric_samples")),
+            "proof_score": round(base, 3),
+            "evidence_mode": evidence_mode,
+            "direct_measured_replays": (
+                replay_count if evidence_mode == "direct_measured_replay" else 0
+            ),
+            "source_conditioned_replays": (
+                replay_count
+                if evidence_mode == "source_conditioned_synthetic_stress"
+                else 0
+            ),
+            "source_conditioned_wins": (
+                wins
+                if evidence_mode == "source_conditioned_synthetic_stress"
+                else 0
+            ),
+            "source_conditioned_win_rate": (
+                round(wins / baseline_count, 6)
+                if evidence_mode == "source_conditioned_synthetic_stress"
+                and baseline_count
+                else 0.0
+            ),
+            "baseline_comparison_count": baseline_count,
+            "global_holm_positive_count": global_positive,
+            "estimated_rows": safe_int(row.get("performance_rows")),
+            "numeric_samples": safe_int(row.get("performance_rows")),
             "mean_delta_vs_named_baseline": round(mean_delta, 6),
             "best_delta_vs_named_baseline": row.get("best_delta_vs_named_baseline"),
         }
@@ -244,17 +280,15 @@ def merge_candidates(
         ready = ready_rows.get(family_id, {})
         family = families.get(family_id, {})
         proof_score = max(safe_float(repeat.get("proof_score")), safe_float(ready.get("proof_score")))
-        if repeat and ready:
-            proof_score += 8.0
         stages = [str(item.get("evidence_stage", "")) for item in (repeat, ready) if item]
         if any(stage.startswith("robust_repeat") for stage in stages):
             stage = "robust_repeat_plus_current_replay" if ready else "robust_repeat_champion_not_field_validated"
-        elif any("negative" in stage for stage in stages):
-            stage = "negative_current_replay_demote"
-        elif any(stage.startswith("source_conditioned_multi") for stage in stages):
-            stage = "source_conditioned_multi_replay_winner_not_field_validated"
-        elif any(stage.startswith("source_conditioned_candidate") for stage in stages):
-            stage = "source_conditioned_candidate_needs_repeat"
+        elif any("direct_measured_source_specific_nonpromotion" in stage for stage in stages):
+            stage = "direct_measured_source_specific_nonpromotion"
+        elif any("source_conditioned_synthetic_stress" in stage for stage in stages):
+            stage = "source_conditioned_synthetic_stress_research_lead"
+        elif any("no_compatible" in stage for stage in stages):
+            stage = "no_compatible_direct_measured_replay"
         else:
             stage = stages[0] if stages else "registry_only"
         merged.append(
@@ -287,24 +321,37 @@ def apply_kuramoto_holdout_expansion(
     wins = safe_int(summary.get("wins_vs_kalman"))
     total = safe_int(summary.get("holdout_count"))
     mean_delta = safe_float(summary.get("mean_delta_vs_kalman"))
-    passed = bool(summary.get("passes_internal_20_holdout_gate"))
-    stage = (
-        "expanded_source_conditioned_holdout_winner_not_field_validated"
-        if passed
-        else "source_conditioned_holdout_needs_more_external_replay"
+    passed = bool(
+        holdout.get("schema") == "kuramoto_holdout_expansion_v2"
+        and summary.get("protocol_grade_internal_champion")
+        and summary.get("candidate_beats_all_registered_baselines_after_holm")
     )
-    holdout_score = 106.0
-    holdout_score += min(wins * 0.70, 17.0)
-    holdout_score += min(max(mean_delta, 0.0) * 70.0, 10.0)
-    holdout_score += min(math.log10(max(safe_int(summary.get("estimated_rows_replayed")), 1)) * 0.70, 5.0)
-    holdout_score += 4.0 if passed else 0.0
+    stage = (
+        "direct_measured_all_baseline_internal_champion_not_field_validated"
+        if passed
+        else "direct_measured_eia_nonpromotion_result"
+    )
 
+    matched = False
     for row in champion_rankings:
         if row.get("family_id") != "kuramoto_phase_coupling":
             continue
+        matched = True
         row["evidence_stage"] = stage
-        row["proof_score"] = round(max(safe_float(row.get("proof_score")), holdout_score), 3)
+        row["proof_score"] = round(
+            max(safe_float(row.get("proof_score")), 82.0)
+            if passed
+            else min(max(safe_float(row.get("proof_score")), 20.0), 35.0),
+            3,
+        )
         row["kuramoto_holdout_evidence"] = {
+            "evidence_mode": summary.get("evidence_mode", ""),
+            "development_selected_candidate": summary.get(
+                "development_selected_candidate", ""
+            ),
+            "candidate_was_protocol_selected": bool(
+                summary.get("candidate_was_protocol_selected")
+            ),
             "holdout_count": total,
             "wins_vs_kalman": wins,
             "losses_or_ties_vs_kalman": summary.get("losses_or_ties_vs_kalman", 0),
@@ -316,13 +363,131 @@ def apply_kuramoto_holdout_expansion(
             "numeric_samples_read": summary.get("numeric_samples_read", 0),
             "holdout_chain_sha256": summary.get("holdout_chain_sha256", ""),
             "passes_internal_20_holdout_gate": passed,
+            "registered_baseline_count": summary.get(
+                "registered_baseline_count", 0
+            ),
+            "registered_baseline_mean_win_count": summary.get(
+                "registered_baseline_mean_win_count", 0
+            ),
+            "candidate_beats_all_registered_baselines_after_holm": bool(
+                summary.get(
+                    "candidate_beats_all_registered_baselines_after_holm"
+                )
+            ),
+        }
+        if passed:
+            row["safe_claim"] = (
+                "Kuramoto cleared the frozen direct measured source-specific "
+                "baseline gate internally; independent replay is still required."
+            )
+        else:
+            row["safe_claim"] = (
+                "On the frozen measured EIA holdout, Kuramoto was not the "
+                "development-selected candidate and did not beat the registered "
+                f"baseline gauntlet; mean skill vs Kalman was {mean_delta}."
+            )
+        row["next_move"] = (
+            "Preserve this negative result. Search only on development data, "
+            "freeze one new wave candidate, then rerun the untouched EIA holdout."
+        )
+        break
+
+    if not matched:
+        champion_rankings.append(
+            {
+                "family_id": "kuramoto_phase_coupling",
+                "label": "Kuramoto Phase Coupling",
+                "lane": "wave_resonance_timing",
+                "evidence_stage": stage,
+                "proof_score": 20.0 if not passed else 82.0,
+                "repeat_evidence": {},
+                "source_conditioned_evidence": {},
+                "kuramoto_holdout_evidence": {
+                    "evidence_mode": summary.get("evidence_mode", ""),
+                    "development_selected_candidate": summary.get(
+                        "development_selected_candidate", ""
+                    ),
+                    "candidate_was_protocol_selected": bool(
+                        summary.get("candidate_was_protocol_selected")
+                    ),
+                    "holdout_count": total,
+                    "wins_vs_kalman": wins,
+                    "losses_or_ties_vs_kalman": summary.get(
+                        "losses_or_ties_vs_kalman", 0
+                    ),
+                    "win_rate_vs_kalman": summary.get(
+                        "win_rate_vs_kalman", 0.0
+                    ),
+                    "mean_delta_vs_kalman": mean_delta,
+                    "registered_baseline_count": summary.get(
+                        "registered_baseline_count", 0
+                    ),
+                    "registered_baseline_mean_win_count": summary.get(
+                        "registered_baseline_mean_win_count", 0
+                    ),
+                    "candidate_beats_all_registered_baselines_after_holm": bool(
+                        summary.get(
+                            "candidate_beats_all_registered_baselines_after_holm"
+                        )
+                    ),
+                    "holdout_chain_sha256": summary.get(
+                        "holdout_chain_sha256", ""
+                    ),
+                    "passes_internal_20_holdout_gate": passed,
+                },
+                "safe_claim": (
+                    "On the frozen measured EIA holdout, Kuramoto was not the "
+                    "development-selected candidate and did not beat any "
+                    "registered source-specific baseline on mean skill."
+                ),
+                "next_move": (
+                    "Preserve this negative result and search a new wave candidate "
+                    "on development data only."
+                ),
+            }
+        )
+
+    champion_rankings.sort(key=lambda item: (-safe_float(item.get("proof_score")), item.get("family_id", "")))
+    for rank, row in enumerate(champion_rankings, start=1):
+        row["rank"] = rank
+    return champion_rankings
+
+
+def apply_current_cross_sector_evidence(
+    champion_rankings: list[dict[str, Any]],
+    cross_sector: dict[str, Any],
+) -> list[dict[str, Any]]:
+    if cross_sector.get("candidate", {}).get("id") != "kuramoto_phase_coupling":
+        return champion_rankings
+
+    gates = cross_sector.get("gates", {}) if isinstance(cross_sector.get("gates"), dict) else {}
+    proven = safe_int(gates.get("sector_gain_proven_count"))
+    sector_count = safe_int(gates.get("sector_count"))
+    status = str(cross_sector.get("status") or "")
+    for row in champion_rankings:
+        if row.get("family_id") != "kuramoto_phase_coupling":
+            continue
+        row["evidence_stage"] = "negative_current_cross_sector_benchmark"
+        row["proof_score"] = min(safe_float(row.get("proof_score")), 20.0)
+        row["current_cross_sector_evidence"] = {
+            "status": status,
+            "sector_gain_proven_count": proven,
+            "sector_count": sector_count,
+            "evaluation_origin_count": safe_int(gates.get("total_evaluation_origin_count")),
+            "cross_sector_efficiency_claim_allowed": bool(
+                gates.get("cross_sector_efficiency_claim_allowed")
+            ),
+            "dollar_projection_from_forecast_error_allowed": bool(
+                gates.get("dollar_projection_from_forecast_error_allowed")
+            ),
+            "evidence_chain_sha256": cross_sector.get("evidence_chain_sha256", ""),
         }
         row["safe_claim"] = (
-            "kuramoto_phase_coupling passed an internal source-conditioned holdout expansion "
-            f"({wins}/{total} wins vs kalman_filter, mean delta {mean_delta}); this supports a "
-            "buyer-authorized field replay request, not field validation or dollar claims."
+            f"The current governed cross-sector benchmark found {proven}/{sector_count} proven Kuramoto sector gains. "
+            "The direct measured EIA audit also failed the source-specific baseline gauntlet. "
+            "Neither result supports performance marketing, cross-sector efficiency, field-validation, or dollar claims."
         )
-        row["next_move"] = "Use this as the first field-replay ask: external held-out data, incumbent baseline, accepted metric, and signoff."
+        row["next_move"] = str(cross_sector.get("safest_next_action") or "")
         break
 
     champion_rankings.sort(key=lambda item: (-safe_float(item.get("proof_score")), item.get("family_id", "")))
@@ -339,21 +504,28 @@ def safe_claim(stage: str, evidence: dict[str, Any]) -> str:
             f"{family} is a robust repeat-window benchmark candidate on {lane}; this supports paid technical "
             "evaluation scoping, not field validation or realized savings."
         )
-    if stage.startswith("source_conditioned_multi"):
+    if stage.startswith("direct_measured_source_specific_nonpromotion"):
         return (
-            f"{family} is the strongest current source-conditioned replay candidate on {lane}; it needs more "
-            "holdout windows, buyer-authorized baselines, and field validation before dollar claims."
+            f"{family} is a direct measured nonpromotion result on {lane}; it "
+            "failed at least one source-specific baseline gate and is not a winner claim."
         )
-    if "negative" in stage:
-        return f"{family} lost or tied in the current source-conditioned replay and should be rerouted or demoted."
+    if stage.startswith("source_conditioned_synthetic_stress"):
+        return (
+            f"{family} is a conditioned-synthetic research lead on {lane}; it "
+            "does not establish performance on the measured source."
+        )
+    if "negative" in stage or "nonpromotion" in stage:
+        return f"{family} is current negative or nonpromotion evidence and should not be pitched as a winner."
     return f"{family} remains a research candidate until it wins frozen replays against named baselines."
 
 
 def next_move(stage: str, evidence: dict[str, Any]) -> str:
     if stage.startswith("robust_repeat"):
         return "Package as a bounded appendix and ask for buyer-authorized holdout replay."
-    if stage.startswith("source_conditioned_multi"):
-        return "Run at least 20 pre-registered holdout windows and add accepted incumbent baselines."
+    if stage.startswith("direct_measured_source_specific_nonpromotion"):
+        return "Search on development data only, freeze one candidate, then rerun the untouched source-native holdout."
+    if stage.startswith("source_conditioned_synthetic_stress"):
+        return "Build a direct measured adapter and register source-native baselines."
     if "negative" in stage:
         return "Do not pitch this as a winner; use it as negative evidence and test alternate branching families."
     return "Wire to an adapter or leave as registry-only."
@@ -363,8 +535,8 @@ def top_next_actions(payload: dict[str, Any]) -> list[str]:
     best = payload["champion_rankings"][0] if payload["champion_rankings"] else {}
     return [
         f"Lead with {best.get('family_id', 'the top candidate')} only in bounded benchmark language.",
-        "Run Kuramoto phase-coupling on at least 20 more EIA/FRED/NOAA/NASA holdout windows.",
-        "Pull ISO/RTO LMP or accepted electricity-price settlement data before any real-dollar energy claim.",
+        "Do not market a Kuramoto efficiency gain; preserve the current negative cross-sector result.",
+        "Run a future model test only after an external owner locks the unseen window, incumbent baseline, native metric, and economic conversion.",
         "Move leaf-vein branching out of winner language until it beats minimum-spanning-tree on fresh source-conditioned routes.",
         "Attach the current proof-state JSON hash to grant and buyer packets so reviewers can reproduce the evidence boundary.",
     ]
@@ -377,6 +549,7 @@ def build_payload() -> dict[str, Any]:
     repeat = read_json(REPEAT_VALIDATION_JSON)
     uncertainty = read_json(UNCERTAINTY_JSON)
     kuramoto_holdout = read_json(KURAMOTO_HOLDOUT_JSON)
+    kuramoto_cross_sector = read_json(KURAMOTO_CROSS_SECTOR_JSON)
     valuation = read_json(VALUATION_JSON)
     claim_map = read_json(CLAIM_MAP_JSON)
     field_money = read_json(FIELD_MONEY_JSON)
@@ -386,10 +559,16 @@ def build_payload() -> dict[str, Any]:
     ready_rows = ready_source_candidates(ready, families)
     champion_rankings = merge_candidates(repeat_rows, ready_rows, families)
     champion_rankings = apply_kuramoto_holdout_expansion(champion_rankings, kuramoto_holdout)
+    champion_rankings = apply_current_cross_sector_evidence(champion_rankings, kuramoto_cross_sector)
 
     ready_summary = ready.get("summary", {}) if isinstance(ready.get("summary"), dict) else {}
     manifest_summary = manifest.get("summary", {}) if isinstance(manifest.get("summary"), dict) else {}
     kuramoto_summary = kuramoto_holdout.get("summary", {}) if isinstance(kuramoto_holdout.get("summary"), dict) else {}
+    cross_sector_gates = (
+        kuramoto_cross_sector.get("gates", {})
+        if isinstance(kuramoto_cross_sector.get("gates"), dict)
+        else {}
+    )
     valuation_state = valuation.get("valuation_state", {}) if isinstance(valuation.get("valuation_state"), dict) else {}
     claim_summary = claim_map.get("summary", {}) if isinstance(claim_map.get("summary"), dict) else {}
     field_summary = field_money.get("summary", {}) if isinstance(field_money.get("summary"), dict) else {}
@@ -405,7 +584,7 @@ def build_payload() -> dict[str, Any]:
     }
 
     payload = {
-        "schema": "current_luma_proof_state.v1",
+        "schema": "current_luma_proof_state.v2",
         "generated_utc": now_utc(),
         "boundary": BOUNDARY,
         "registry": registry_summary(registry),
@@ -413,12 +592,26 @@ def build_payload() -> dict[str, Any]:
             "routes": ready_summary.get("routes_replayed", 0),
             "candidate_wins": ready_summary.get("candidate_win_count", 0),
             "candidate_losses_or_ties": ready_summary.get("candidate_loss_or_tie_count", 0),
+            "direct_measured_replay_count": ready_summary.get(
+                "direct_measured_replay_count", 0
+            ),
+            "source_conditioned_synthetic_stress_count": ready_summary.get(
+                "source_conditioned_synthetic_stress_count", 0
+            ),
+            "source_conditioned_named_baseline_mean_win_count": ready_summary.get(
+                "source_conditioned_named_baseline_mean_win_count", 0
+            ),
+            "direct_all_baseline_global_holm_positive_count": ready_summary.get(
+                "direct_all_baseline_global_holm_positive_count", 0
+            ),
+            "legacy_ready_for_benchmark_rows_excluded": ready_summary.get(
+                "legacy_ready_for_benchmark_rows_excluded", 0
+            ),
+            "numeric_fallback_profile_count": ready_summary.get(
+                "numeric_fallback_profile_count", 0
+            ),
             "estimated_rows_replayed": ready_summary.get("estimated_rows_replayed", 0),
             "numeric_samples_read": ready_summary.get("numeric_samples_read", 0),
-            "mean_delta_vs_named_baseline": ready_summary.get("mean_delta_vs_named_baseline", 0.0),
-            "strongest_positive_family": ready_summary.get("strongest_positive_family", ""),
-            "strongest_positive_lane": ready_summary.get("strongest_positive_lane", ""),
-            "strongest_positive_delta": ready_summary.get("strongest_positive_delta", 0.0),
             "replay_chain_sha256": ready_summary.get("replay_chain_sha256", ""),
         },
         "manifest": {
@@ -437,10 +630,44 @@ def build_payload() -> dict[str, Any]:
             "estimated_rows_replayed": kuramoto_summary.get("estimated_rows_replayed", 0),
             "numeric_samples_read": kuramoto_summary.get("numeric_samples_read", 0),
             "passes_internal_20_holdout_gate": kuramoto_summary.get("passes_internal_20_holdout_gate", False),
+            "evidence_mode": kuramoto_summary.get("evidence_mode", ""),
+            "development_selected_candidate": kuramoto_summary.get(
+                "development_selected_candidate", ""
+            ),
+            "candidate_was_protocol_selected": bool(
+                kuramoto_summary.get("candidate_was_protocol_selected")
+            ),
+            "registered_baseline_count": kuramoto_summary.get(
+                "registered_baseline_count", 0
+            ),
+            "registered_baseline_mean_win_count": kuramoto_summary.get(
+                "registered_baseline_mean_win_count", 0
+            ),
+            "candidate_beats_all_registered_baselines_after_holm": bool(
+                kuramoto_summary.get(
+                    "candidate_beats_all_registered_baselines_after_holm"
+                )
+            ),
             "ready_for_buyer_authorized_field_replay_request": kuramoto_summary.get(
                 "ready_for_buyer_authorized_field_replay_request", False
             ),
             "holdout_chain_sha256": kuramoto_summary.get("holdout_chain_sha256", ""),
+            "historical_narrow_result_only": False,
+            "legacy_source_conditioned_claim_superseded": True,
+        },
+        "kuramoto_cross_sector_benchmark": {
+            "status": kuramoto_cross_sector.get("status"),
+            "sector_gain_proven_count": safe_int(cross_sector_gates.get("sector_gain_proven_count")),
+            "sector_count": safe_int(cross_sector_gates.get("sector_count")),
+            "evaluation_origin_count": safe_int(cross_sector_gates.get("total_evaluation_origin_count")),
+            "cross_sector_efficiency_claim_allowed": bool(
+                cross_sector_gates.get("cross_sector_efficiency_claim_allowed")
+            ),
+            "dollar_projection_from_forecast_error_allowed": bool(
+                cross_sector_gates.get("dollar_projection_from_forecast_error_allowed")
+            ),
+            "evidence_chain_sha256": kuramoto_cross_sector.get("evidence_chain_sha256", ""),
+            "claim_boundary": kuramoto_cross_sector.get("claim_boundary", ""),
         },
         "valuation": {
             "strongest_current_claim": claim_summary.get("strongest_current_claim", ""),
@@ -466,6 +693,7 @@ def build_payload() -> dict[str, Any]:
             "repeat_validation": str(REPEAT_VALIDATION_JSON.relative_to(ROOT)),
             "uncertainty": str(UNCERTAINTY_JSON.relative_to(ROOT)),
             "kuramoto_holdout_expansion": str(KURAMOTO_HOLDOUT_JSON.relative_to(ROOT)),
+            "kuramoto_cross_sector_benchmark": str(KURAMOTO_CROSS_SECTOR_JSON.relative_to(ROOT)),
             "valuation": str(VALUATION_JSON.relative_to(ROOT)),
         },
         "outputs": {
@@ -483,6 +711,7 @@ def build_payload() -> dict[str, Any]:
             "repeat_validation": payload["repeat_validation"],
             "uncertainty": payload["uncertainty"],
             "kuramoto_holdout_expansion": payload["kuramoto_holdout_expansion"],
+            "kuramoto_cross_sector_benchmark": payload["kuramoto_cross_sector_benchmark"],
             "valuation": payload["valuation"],
             "proposal_target": payload["proposal_target"],
             "champion_rankings": payload["champion_rankings"],
@@ -497,6 +726,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     ready = payload["ready_source_replay"]
     manifest = payload["manifest"]
     kuramoto = payload["kuramoto_holdout_expansion"]
+    cross_sector = payload["kuramoto_cross_sector_benchmark"]
     valuation = payload["valuation"]
     gates = payload["gates"]
     lines = [
@@ -514,15 +744,23 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Ready-for-benchmark manifest routes: `{manifest['ready_for_benchmark_routes']}`",
         f"- Unique source files in manifest: `{manifest['unique_source_count']}`",
         f"- Manifest estimated rows: `{manifest['unique_source_estimated_rows']}`",
-        f"- Current source-conditioned replay routes: `{ready['routes']}`",
-        f"- Current source-conditioned wins/losses: `{ready['candidate_wins']}` / `{ready['candidate_losses_or_ties']}`",
+        f"- Compatibility-gated adapters run: `{ready['routes']}`",
+        f"- Direct measured replays: `{ready['direct_measured_replay_count']}`",
+        f"- Source-conditioned synthetic stress cards: `{ready['source_conditioned_synthetic_stress_count']}`",
+        f"- Direct all-baseline globally corrected promotions: `{ready['direct_all_baseline_global_holm_positive_count']}`",
+        f"- Conditioned-synthetic named-baseline mean wins: `{ready['source_conditioned_named_baseline_mean_win_count']}`",
+        f"- Legacy generic ready rows excluded: `{ready['legacy_ready_for_benchmark_rows_excluded']}`",
+        f"- Numeric fallback profiles: `{ready['numeric_fallback_profile_count']}`",
         f"- Current replay estimated rows: `{ready['estimated_rows_replayed']}`",
         f"- Numeric samples read: `{ready['numeric_samples_read']}`",
-        f"- Mean replay delta vs named baselines: `{ready['mean_delta_vs_named_baseline']}`",
-        f"- Strongest current delta: `{ready['strongest_positive_delta']}` from `{ready['strongest_positive_family']}`",
-        f"- Kuramoto holdout expansion: `{kuramoto['wins_vs_kalman']}` / `{kuramoto['holdout_count']}` wins vs Kalman",
+        f"- Kuramoto measured EIA holdout: `{kuramoto['wins_vs_kalman']}` / `{kuramoto['holdout_count']}` paired-day wins vs Kalman",
         f"- Kuramoto holdout mean delta vs Kalman: `{kuramoto['mean_delta_vs_kalman']}`",
-        f"- Kuramoto internal 20-holdout gate passed: `{str(kuramoto['passes_internal_20_holdout_gate']).lower()}`",
+        f"- Kuramoto selected by frozen development protocol: `{str(kuramoto['candidate_was_protocol_selected']).lower()}`",
+        f"- Kuramoto source-specific all-baseline gate passed: `{str(kuramoto['candidate_beats_all_registered_baselines_after_holm']).lower()}`",
+        (
+            f"- Current Kuramoto cross-sector result: `{cross_sector['status']}` "
+            f"({cross_sector['sector_gain_proven_count']}/{cross_sector['sector_count']} proven sector gains)"
+        ),
         "",
         "## Champion Ranking",
         "",
@@ -540,10 +778,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "## Money State",
             "",
             f"- Strongest current commercial claim: `{valuation['strongest_current_claim']}`",
-            f"- Safe estimated hourly value signal: `{money(valuation['safe_estimated_hourly_value_usd'])}`",
-            f"- Safe estimated annual value signal: `{money(valuation['safe_estimated_annual_value_usd'])}`",
-            f"- Blocked context annual surface: `{money(valuation['blocked_context_annual_value_usd'])}`",
-            "- The blocked context surface is not a realized savings claim.",
+            f"- Claimable estimated hourly value signal: `{money(valuation['safe_estimated_hourly_value_usd'])}`",
+            f"- Claimable estimated annual value signal: `{money(valuation['safe_estimated_annual_value_usd'])}`",
+            "- No current dollar projection clears the buyer-approved gate.",
             "",
             "## First Proposal Target",
             "",

@@ -32,6 +32,15 @@ def test_manifest_maps_sources_to_core_geometry_lanes():
 
     assert payload["schema"] == "geometry_live_source_manifest_v1"
     assert summary["manifest_row_count"] > 0
+    assert summary["manifest_row_count"] == len(payload["manifest_rows"])
+    assert summary["discovered_manifest_row_count"] >= summary["manifest_row_count"]
+    assert summary["manifest_rows_omitted_count"] == (
+        summary["discovered_manifest_row_count"] - summary["manifest_row_count"]
+    )
+    assert summary["manifest_rows_truncated"] == (
+        summary["discovered_manifest_row_count"] > summary["manifest_row_count"]
+    )
+    assert summary["manifest_sha256"] == module.stable_sha256(payload["manifest_rows"])
     assert summary["ready_for_benchmark_row_count"] > 0
     assert summary["estimated_rows_mapped"] > 0
     assert summary["unique_source_count"] > 0

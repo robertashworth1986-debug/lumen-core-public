@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -12,8 +13,10 @@ OUT_OPS = ROOT / "out" / "ops"
 DASHBOARD_DATA = ROOT / "dashboard" / "data"
 DOCS = ROOT / "docs"
 
-CHAMPION_JSON = DASHBOARD_DATA / "champion_metric_gauntlet.json"
+GAUNTLET_JSON = DASHBOARD_DATA / "champion_metric_gauntlet.json"
 LOCKED_SWEEP_JSON = DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"
+READY_REPLAY_JSON = DASHBOARD_DATA / "geometry_ready_source_replay.json"
+KURAMOTO_JSON = DASHBOARD_DATA / "kuramoto_holdout_expansion.json"
 DOLLAR_GATE_JSON = DASHBOARD_DATA / "dollar_claim_gate.json"
 CLAIM_LADDER_JSON = DASHBOARD_DATA / "field_validated_dollar_claim_ladder.json"
 
@@ -21,16 +24,13 @@ OUT_JSON = OUT_OPS / "valuation_proposal_target_packet_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "valuation_proposal_target_packet.json"
 OUT_MD = DOCS / "VALUATION_PROPOSAL_TARGET_PACKET_2026-06-26.md"
 
-UPDATED_BUSINESS_PLAN_PDF = Path(
-    r"C:\Users\Novac\iCloudDrive\Business plan\LumenCore_Business_Plan_Investor_Ready_UPDATED_2026-07-03.pdf"
-)
-UPDATED_BUSINESS_PLAN_MD = DOCS / "LUMENCORE_BUSINESS_PLAN_INVESTOR_READY_UPDATED_2026-07-03.md"
-
 BOUNDARY = (
-    "Valuation and proposal target packet. This translates the current July 2026 frozen/source-conditioned replay "
-    "evidence into bounded business language, a first paid-pilot target, and reviewer-safe proposal numbers. It does "
-    "not authorize field-validation, realized-savings, fixed-dollar frozen-delta, medical, live-trading, grant-award, "
-    "or guaranteed ROI claims."
+    "This packet prices only a bounded technical service: source-task compatibility "
+    "review, evidence audit, source normalization, accepted-baseline registration, "
+    "and reproducible benchmark implementation. The current measured geometry "
+    "results contain no internal performance champion. This packet does not assert "
+    "enterprise value, field validation, realized savings, fixed-dollar algorithm "
+    "value, medical efficacy, trading edge, grant certainty, or buyer ROI."
 )
 
 
@@ -42,197 +42,297 @@ def read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        payload = json.loads(path.read_text(encoding="utf-8", errors="ignore"))
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
         return {}
     return payload if isinstance(payload, dict) else {}
 
 
+def stable_sha256(payload: Any) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def rel(path: Path) -> str:
+    return str(path.relative_to(ROOT)).replace("\\", "/")
+
+
+def safe_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def safe_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def money(value: Any) -> str:
+    return f"${safe_float(value):,.0f}"
+
+
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
+    read_json(path)
 
 
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
-
-
-def stable_sha256(payload: Any) -> str:
-    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
-
-
-def percent(value: Any) -> str:
-    try:
-        return f"{float(value) * 100:.1f}%"
-    except Exception:
-        return "n/a"
-
-
-def money(value: Any) -> str:
-    try:
-        return f"${float(value):,.0f}"
-    except Exception:
-        return "n/a"
-
-
-def rel(path: Path) -> str:
-    try:
-        return str(path.relative_to(ROOT)).replace("\\", "/")
-    except ValueError:
-        return str(path)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    os.replace(temporary, path)
 
 
 def lane_summary_rows(locked: dict[str, Any]) -> list[dict[str, Any]]:
-    rows = locked.get("lane_scoreboard", [])
-    if not isinstance(rows, list):
-        return []
     cleaned: list[dict[str, Any]] = []
-    for row in rows:
+    for row in locked.get("lane_scoreboard", []):
         if not isinstance(row, dict):
             continue
-        comparisons = int(row.get("baseline_comparison_count") or 0)
-        wins = int(row.get("candidate_win_count") or 0)
         cleaned.append(
             {
                 "lane": row.get("lane", ""),
-                "routes_replayed": int(row.get("routes_replayed") or 0),
-                "baseline_comparison_count": comparisons,
-                "candidate_win_count": wins,
-                "candidate_loss_or_tie_count": max(0, comparisons - wins),
-                "comparison_win_rate": round(wins / comparisons, 6) if comparisons else 0.0,
-                "estimated_rows": int(row.get("estimated_rows") or 0),
-                "numeric_samples": int(row.get("numeric_samples") or 0),
+                "evidence_mode": row.get("evidence_mode", ""),
+                "routes_replayed": safe_int(row.get("routes_replayed")),
+                "baseline_comparison_count": safe_int(
+                    row.get("baseline_comparison_count")
+                ),
+                "raw_mean_win_count": safe_int(
+                    row.get("candidate_win_count")
+                ),
+                "global_holm_positive_count": safe_int(
+                    row.get("global_holm_positive_count")
+                ),
+                "performance_rows": safe_int(row.get("numeric_samples")),
                 "mean_score_delta": row.get("mean_score_delta"),
                 "best_score_delta": row.get("best_score_delta"),
                 "locked_baselines": row.get("locked_baselines", []),
-                "evidence_status": "source_conditioned_replay_not_field_validation",
+                "source_names": row.get("source_names", []),
+                "performance_superiority_claim_allowed": False,
             }
         )
-    cleaned.sort(
-        key=lambda item: (
-            -float(item["comparison_win_rate"]),
-            -float(item.get("mean_score_delta") or -999),
-            -int(item["estimated_rows"]),
-        )
-    )
-    return cleaned
+    return sorted(cleaned, key=lambda row: row["lane"])
 
 
-def proposal_target(champion: dict[str, Any], locked_summary: dict[str, Any], lanes: list[dict[str, Any]]) -> dict[str, Any]:
-    wave_lane = next((row for row in lanes if row.get("lane") == "wave_resonance_timing"), lanes[0] if lanes else {})
+def proposal_target() -> dict[str, Any]:
     return {
-        "target_name": "Energy/Grid AI Field Replay and Paid Evidence Review",
-        "target_segment": "utility_grid_analytics_energy_forecasting_or_cyber_physical_validation",
-        "buyer_role": "Utility innovation lead, grid reliability analytics lead, national lab validation lead, or accelerator technical reviewer",
+        "target_name": "Source-Native Benchmark and Evidence Protocol Review",
+        "target_segment": (
+            "government_lab_utility_or_industrial_analytics_validation_team"
+        ),
+        "buyer_role": (
+            "Technical program manager, validation lead, data-science lead, "
+            "research software lead, or engineering assurance lead"
+        ),
         "why_this_first": (
-            "The strongest current proof is a narrow phase/timing result: "
-            f"{champion.get('champion_label', 'Kuramoto phase coupling')} beat "
-            f"{champion.get('named_baseline', 'kalman_filter')} on "
-            f"{champion.get('holdout_wins', 24)}/{champion.get('holdout_count', 24)} source-conditioned holdout checks. "
-            f"The broader locked sweep adds {locked_summary.get('baseline_comparison_count', 0)} baseline comparisons across "
-            f"{locked_summary.get('adapter_backed_routes', 0)} adapter-backed routes."
+            "LumenCore can sell the governed method it has now: map a measured "
+            "source to the correct task, normalize its schema, register accepted "
+            "incumbent baselines, freeze chronology and metrics, execute a "
+            "reproducible comparison, and preserve both positive and negative "
+            "results. The current EIA result demonstrates the method's ability "
+            "to reject an unsupported candidate rather than manufacture a win."
         ),
-        "strongest_lane": wave_lane.get("lane", "wave_resonance_timing"),
-        "proposal_ask": "20-minute technical fit call, then a paid evidence review or buyer-authorized replay.",
-        "paid_review_scope_usd": {"low": 5000, "high": 15000, "status": "scoping_range_not_value_claim"},
-        "validation_bridge_round": {
-            "raise_target_usd": {"low": 250000, "high": 500000},
-            "valuation_target": "$10M post-money SAFE cap, negotiable in an $8M-$12M band",
-            "use": "external validation, patent/legal support, proof-feed hardening, source expansion, and pilot delivery",
+        "proposal_ask": (
+            "20-minute technical fit call followed by a fixed-scope paid protocol "
+            "review or benchmark implementation."
+        ),
+        "paid_review_scope_usd": {
+            "low": 2500,
+            "high": 7500,
+            "status": "service_scoping_range_not_enterprise_value_or_roi_claim",
         },
-        "acceptance_metric": (
-            "pre-registered forecast residual, phase/timing error, drift-detection lead time, false positives, "
-            "missed events, runtime budget, and buyer-approved avoided-cost conversion"
-        ),
+        "optional_benchmark_build_usd": {
+            "low": 7500,
+            "high": 25000,
+            "status": "custom_scope_after_data_rights_and_acceptance_criteria",
+        },
+        "validation_bridge_budget": {
+            "planning_range_usd": {"low": 250000, "high": 500000},
+            "enterprise_valuation": None,
+            "valuation_status": (
+                "not_asserted_pending_independent_diligence_external_validation_and_revenue"
+            ),
+            "use": (
+                "independent evaluation, legal and IP support, source adapters, "
+                "reproducibility infrastructure, and first customer delivery"
+            ),
+        },
+        "acceptance_outputs": [
+            "signed source-task compatibility matrix",
+            "normalized source schema and data-quality report",
+            "registered incumbent baseline set",
+            "frozen development/holdout protocol",
+            "reproducible benchmark report with hashes and negative results",
+            "explicit claim and non-claim boundary",
+        ],
         "required_buyer_inputs": [
-            "authorized held-out historical windows",
-            "incumbent baseline chosen by the system owner",
-            "accepted replay metric and failure reporting rule",
-            "forbidden tuning rules",
-            "economic conversion factor approved before dollar language",
+            "authorized data or a public source approved for the engagement",
+            "the operational question and target outcome",
+            "incumbent or accepted baseline candidates",
+            "failure costs and decision cadence",
+            "reviewer or system-owner acceptance criteria",
         ],
     }
 
 
+def proposal_blurb(truth: dict[str, Any], overall: dict[str, Any]) -> str:
+    return (
+        "LumenCore offers a fixed-scope source-native benchmark and evidence "
+        "protocol review. The current stack has exercised four compatibility-gated "
+        f"adapters across {overall['baseline_comparison_count']} registered baseline "
+        f"comparisons and {overall['performance_rows_reviewed']:,} performance rows. "
+        "No direct measured candidate cleared every baseline after global correction, "
+        "and the system preserved that negative result. The engagement would map one "
+        "authorized source to the correct task, freeze chronology and accepted "
+        "baselines, run the comparison reproducibly, and deliver a reviewer-ready "
+        "evidence packet. This is a technical service offer, not a performance, "
+        "savings, enterprise-value, or award claim."
+    )
+
+
 def build_payload() -> dict[str, Any]:
-    champion_doc = read_json(CHAMPION_JSON)
-    locked_doc = read_json(LOCKED_SWEEP_JSON)
-    dollar_doc = read_json(DOLLAR_GATE_JSON)
-    ladder_doc = read_json(CLAIM_LADDER_JSON)
+    gauntlet = read_json(GAUNTLET_JSON)
+    locked = read_json(LOCKED_SWEEP_JSON)
+    ready = read_json(READY_REPLAY_JSON)
+    kuramoto = read_json(KURAMOTO_JSON)
+    dollar_gate = read_json(DOLLAR_GATE_JSON)
+    claim_ladder = read_json(CLAIM_LADDER_JSON)
 
-    champion = champion_doc.get("summary", {}) if isinstance(champion_doc.get("summary"), dict) else {}
-    strongest = champion_doc.get("strongest_current", {}) if isinstance(champion_doc.get("strongest_current"), dict) else {}
-    locked_summary = locked_doc.get("summary", {}) if isinstance(locked_doc.get("summary"), dict) else {}
-    dollar_summary = dollar_doc.get("summary", {}) if isinstance(dollar_doc.get("summary"), dict) else {}
-    ladder_truth = ladder_doc.get("current_truth", {}) if isinstance(ladder_doc.get("current_truth"), dict) else {}
-    lanes = lane_summary_rows(locked_doc)
+    if gauntlet.get("schema") != "champion_metric_gauntlet_v2":
+        raise ValueError("champion metric gauntlet v2 is required")
+    if locked.get("schema") != "locked_source_baseline_replay_sweep_v2":
+        raise ValueError("locked source baseline replay sweep v2 is required")
+    if ready.get("schema") != "geometry_ready_source_replay_v2":
+        raise ValueError("geometry ready source replay v2 is required")
+    if kuramoto.get("schema") != "kuramoto_holdout_expansion_v2":
+        raise ValueError("Kuramoto measured audit v2 is required")
 
-    comparisons = int(locked_summary.get("baseline_comparison_count") or 0)
-    wins = int(locked_summary.get("candidate_win_count") or 0)
+    gauntlet_summary = gauntlet.get("summary", {})
+    locked_summary = locked.get("summary", {})
+    ready_summary = ready.get("summary", {})
+    kuramoto_summary = kuramoto.get("summary", {})
+    lanes = lane_summary_rows(locked)
+    target = proposal_target()
+
     overall = {
-        "source_conditioned_route_count": int(locked_summary.get("adapter_backed_routes") or 0),
-        "baseline_comparison_count": comparisons,
-        "candidate_win_count": wins,
-        "candidate_loss_or_tie_count": int(locked_summary.get("candidate_loss_or_tie_count") or max(0, comparisons - wins)),
-        "comparison_win_rate": round(wins / comparisons, 6) if comparisons else 0.0,
-        "mean_score_delta": locked_summary.get("mean_score_delta"),
-        "best_score_delta": locked_summary.get("best_score_delta"),
-        "estimated_rows_replayed": int(locked_summary.get("estimated_rows_replayed") or 0),
-        "numeric_samples_read": int(locked_summary.get("numeric_samples_read") or 0),
-        "source_count": int(locked_summary.get("source_count") or 0),
-        "ready_rows": int(locked_summary.get("ready_rows") or 0),
-        "lane_count": int(locked_summary.get("lane_count") or len(lanes)),
-        "replay_chain_sha256": locked_summary.get("replay_chain_sha256", ""),
-        "evidence_status": "source_conditioned_replay_not_field_validation",
+        "adapter_backed_route_count": safe_int(
+            locked_summary.get("adapter_backed_routes")
+        ),
+        "source_conditioned_route_count": safe_int(
+            locked_summary.get("source_conditioned_routes_replayed")
+        ),
+        "direct_measured_route_count": safe_int(
+            locked_summary.get("direct_measured_routes_replayed")
+        ),
+        "baseline_comparison_count": safe_int(
+            locked_summary.get("baseline_comparison_count")
+        ),
+        "raw_mean_win_count": safe_int(
+            locked_summary.get("candidate_win_count")
+        ),
+        "global_holm_positive_count": safe_int(
+            locked_summary.get("global_holm_positive_count")
+        ),
+        "promoted_candidate_count": safe_int(
+            ready_summary.get(
+                "direct_all_baseline_global_holm_positive_count"
+            )
+        ),
+        "performance_rows_reviewed": safe_int(
+            locked_summary.get("numeric_samples_read")
+        ),
+        "source_count": safe_int(locked_summary.get("source_count")),
+        "legacy_ready_rows_excluded": safe_int(
+            locked_summary.get("unclassified_manifest_rows_excluded")
+        ),
+        "numeric_fallback_profiles_used": safe_int(
+            locked_summary.get("fallback_profiles_used")
+        ),
+        "replay_chain_sha256": locked_summary.get(
+            "replay_chain_sha256", ""
+        ),
+        "performance_superiority_claim_allowed": False,
     }
 
     current_truth = {
-        "champion_family": champion.get("champion_family") or strongest.get("family"),
-        "champion_label": champion.get("champion_label") or strongest.get("label"),
-        "champion_baseline": champion.get("named_baseline") or strongest.get("named_baseline"),
-        "champion_lane": strongest.get("lane", "wave_resonance_timing"),
-        "champion_holdout_wins": int(champion.get("holdout_wins") or strongest.get("wins_vs_named_baseline") or 0),
-        "champion_holdout_count": int(champion.get("holdout_count") or strongest.get("holdout_count") or 0),
-        "champion_holdout_win_rate": champion.get("holdout_win_rate") or strongest.get("win_rate_vs_named_baseline"),
-        "champion_mean_delta_vs_named_baseline": champion.get("mean_delta_vs_named_baseline") or strongest.get("mean_delta_vs_named_baseline"),
-        "champion_min_delta_vs_named_baseline": champion.get("min_delta_vs_named_baseline") or strongest.get("min_delta_vs_named_baseline"),
-        "champion_sign_test_p_value": champion.get("one_sided_sign_test_p_value") or strongest.get("one_sided_sign_test_p_value"),
-        "champion_wilson_95_lower": champion.get("wilson_95_win_rate_lower") or strongest.get("wilson_95_win_rate_lower"),
-        "champion_estimated_rows_replayed": int(champion.get("estimated_rows_replayed") or strongest.get("estimated_rows_replayed") or 0),
-        "champion_numeric_samples_read": int(champion.get("numeric_samples_read") or strongest.get("numeric_samples_read") or 0),
-        "champion_source_system_count": int(champion.get("source_system_count") or strongest.get("source_system_count") or 0),
-        "broader_measured_provider_count": champion.get("broader_measured_provider_count"),
-        "broader_enabled_provider_count": champion.get("broader_enabled_provider_count"),
-        "manifest_unique_source_count": champion.get("manifest_unique_source_count"),
-        "manifest_ready_for_benchmark_row_count": champion.get("manifest_ready_for_benchmark_row_count"),
-        "live_domain_reviewer_ready": bool(champion.get("live_domain_reviewer_ready")),
-        "buyer_authorized_field_replay_request_ready": bool(champion.get("buyer_authorized_field_replay_request_ready")),
+        "internal_performance_champion_present": False,
+        "reference_candidate": kuramoto_summary.get("candidate", ""),
+        "reference_candidate_label": "Kuramoto phase coupling",
+        "reference_lane": "wave_resonance_timing",
+        "reference_named_baseline": kuramoto_summary.get(
+            "named_baseline", ""
+        ),
+        "reference_holdout_wins": safe_int(
+            kuramoto_summary.get("wins_vs_kalman")
+        ),
+        "reference_holdout_count": safe_int(
+            kuramoto_summary.get("holdout_count")
+        ),
+        "reference_mean_delta_vs_named_baseline": safe_float(
+            kuramoto_summary.get("mean_delta_vs_kalman")
+        ),
+        "development_selected_candidate": kuramoto_summary.get(
+            "development_selected_candidate", ""
+        ),
+        "reference_candidate_was_protocol_selected": bool(
+            kuramoto_summary.get("candidate_was_protocol_selected")
+        ),
+        "reference_candidate_cleared_all_baselines": bool(
+            kuramoto_summary.get(
+                "candidate_beats_all_registered_baselines_after_holm"
+            )
+        ),
+        "buyer_authorized_field_replay_request_ready": False,
         "field_validation_claim_allowed": False,
         "real_dollar_savings_claim_allowed": False,
         "live_trading_or_autonomous_execution_allowed": False,
-        "bounded_estimated_value_claim_allowed": bool(
-            champion.get("bounded_estimated_value_claim_allowed")
-            or ladder_truth.get("bounded_estimated_value_claim_allowed_now")
-        ),
-        "safe_estimated_hourly_value_usd": dollar_summary.get("allowed_estimated_hourly_value_usd")
-        or ladder_truth.get("allowed_estimated_hourly_value_usd"),
-        "safe_estimated_annual_value_usd": dollar_summary.get("allowed_estimated_annual_value_usd")
-        or ladder_truth.get("allowed_estimated_annual_value_usd"),
+        "bounded_estimated_value_claim_allowed": False,
+        "safe_estimated_hourly_value_usd": 0.0,
+        "safe_estimated_annual_value_usd": 0.0,
     }
 
-    target = proposal_target(current_truth, locked_summary, lanes)
     payload = {
-        "schema": "valuation_proposal_target_packet_v2",
+        "schema": "valuation_proposal_target_packet_v3",
         "generated_utc": now_utc(),
         "evidence_boundary": BOUNDARY,
         "inputs": {
-            "champion_metric_gauntlet": rel(CHAMPION_JSON),
-            "locked_source_baseline_replay_sweep": rel(LOCKED_SWEEP_JSON),
-            "dollar_claim_gate": rel(DOLLAR_GATE_JSON),
-            "field_validated_dollar_claim_ladder": rel(CLAIM_LADDER_JSON),
-            "updated_business_plan_pdf": str(UPDATED_BUSINESS_PLAN_PDF),
-            "updated_business_plan_markdown": rel(UPDATED_BUSINESS_PLAN_MD),
+            "champion_metric_gauntlet": rel(GAUNTLET_JSON),
+            "locked_source_baseline_replay_sweep": rel(
+                LOCKED_SWEEP_JSON
+            ),
+            "geometry_ready_source_replay": rel(READY_REPLAY_JSON),
+            "kuramoto_measured_audit": rel(KURAMOTO_JSON),
+            "dollar_claim_gate_context_only": rel(DOLLAR_GATE_JSON),
+            "field_validated_dollar_claim_ladder_context_only": rel(
+                CLAIM_LADDER_JSON
+            ),
+        },
+        "input_sha256": {
+            rel(path): file_sha256(path)
+            for path in (
+                GAUNTLET_JSON,
+                LOCKED_SWEEP_JSON,
+                READY_REPLAY_JSON,
+                KURAMOTO_JSON,
+            )
         },
         "outputs": {
             "json": rel(OUT_JSON),
@@ -244,23 +344,39 @@ def build_payload() -> dict[str, Any]:
         "lane_stats": lanes,
         "recommended_first_proposal_target": target,
         "valuation_state": {
-            "current_evidence_stage": "source_conditioned_replay_with_live_domain_hash_verification",
-            "recommended_investor_target": target["validation_bridge_round"],
+            "current_evidence_stage": (
+                "direct_measured_nonpromotion_plus_conditioned_synthetic_research_leads"
+            ),
+            "enterprise_valuation_asserted": False,
+            "enterprise_valuation_status": target["validation_bridge_budget"][
+                "valuation_status"
+            ],
             "defensible_money_status": (
-                "Price paid technical evaluation, field replay, or validation pilot. Do not price fixed-value frozen deltas "
-                "or realized savings until an external owner locks data, baseline, metric, and economics."
+                "Price paid technical evaluation, protocol review, source "
+                "normalization, or reproducible benchmark implementation. Do not "
+                "price algorithmic performance, realized savings, or enterprise "
+                "value from the current negative result."
             ),
             "current_priceable_offer": {
-                "paid_evidence_review_usd": target["paid_review_scope_usd"],
-                "buyer_authorized_replay": "custom quote after data rights, baseline, metric, and replay window are locked",
-                "platform_license": "defer until external validation or first paid pilot",
+                "paid_protocol_review_usd": target[
+                    "paid_review_scope_usd"
+                ],
+                "benchmark_implementation_usd": target[
+                    "optional_benchmark_build_usd"
+                ],
+                "platform_license": (
+                    "defer until external validation or a paid customer accepts "
+                    "a productized evidence workflow"
+                ),
             },
         },
         "proposal_blurb": proposal_blurb(current_truth, overall),
         "claim_gates": {
-            "source_conditioned_replay_claim_allowed": True,
-            "buyer_authorized_field_replay_request_ready": current_truth["buyer_authorized_field_replay_request_ready"],
-            "bounded_estimated_value_claim_allowed": current_truth["bounded_estimated_value_claim_allowed"],
+            "source_conditioned_research_lead_language_allowed": True,
+            "measured_nonpromotion_language_allowed": True,
+            "paid_protocol_review_scoping_allowed": True,
+            "buyer_authorized_field_replay_request_ready": False,
+            "bounded_estimated_value_claim_allowed": False,
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
             "fixed_dollar_delta_sale_claim_allowed": False,
@@ -268,32 +384,29 @@ def build_payload() -> dict[str, Any]:
             "grant_award_certainty_allowed": False,
             "medical_or_treatment_claim_allowed": False,
         },
+        "context_artifacts_loaded": {
+            "dollar_gate": bool(dollar_gate),
+            "claim_ladder": bool(claim_ladder),
+            "gauntlet_internal_champion": bool(
+                gauntlet_summary.get("internal_champion")
+            ),
+        },
     }
     payload["packet_sha256"] = stable_sha256(
         {
             "current_truth": payload["current_truth"],
-            "overall_locked_sweep_stats": payload["overall_locked_sweep_stats"],
+            "overall_locked_sweep_stats": payload[
+                "overall_locked_sweep_stats"
+            ],
             "lane_stats": payload["lane_stats"],
-            "recommended_first_proposal_target": payload["recommended_first_proposal_target"],
+            "recommended_first_proposal_target": payload[
+                "recommended_first_proposal_target"
+            ],
+            "valuation_state": payload["valuation_state"],
             "claim_gates": payload["claim_gates"],
         }
     )
     return payload
-
-
-def proposal_blurb(truth: dict[str, Any], overall: dict[str, Any]) -> str:
-    return (
-        "LumenCore requests a technical fit call for a paid evidence review or buyer-authorized field replay. "
-        f"The current strongest internal result is narrow and reproducible: {truth.get('champion_label')} beat "
-        f"{truth.get('champion_baseline')} on {truth.get('champion_holdout_wins')}/"
-        f"{truth.get('champion_holdout_count')} source-conditioned holdout checks, with about "
-        f"{truth.get('champion_estimated_rows_replayed'):,} estimated rows replayed in the champion core. "
-        f"The broader locked-source sweep covers {overall.get('source_conditioned_route_count')} adapter-backed routes, "
-        f"{overall.get('baseline_comparison_count')} baseline comparisons, {overall.get('candidate_win_count')} wins, "
-        f"{overall.get('estimated_rows_replayed'):,} estimated rows, and {overall.get('source_count')} mapped sources. "
-        "These are internal replay results, not field validation or realized savings. The requested next step is external "
-        "held-out data, the buyer's incumbent baseline, pre-registered metrics, and an accepted economic conversion."
-    )
 
 
 def render_markdown(payload: dict[str, Any]) -> str:
@@ -308,89 +421,53 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         payload["evidence_boundary"],
         "",
-        "## Canonical July 2026 Proof Line",
+        "## Current Evidence State",
         "",
-        f"- Champion: `{truth['champion_label']}` (`{truth['champion_family']}`)",
-        f"- Lane: `{truth['champion_lane']}`",
-        f"- Named baseline: `{truth['champion_baseline']}`",
-        f"- Internal holdout result: `{truth['champion_holdout_wins']}/{truth['champion_holdout_count']}`",
-        f"- Internal holdout win rate: `{percent(truth['champion_holdout_win_rate'])}`",
-        f"- Wilson 95% lower bound: `{percent(truth['champion_wilson_95_lower'])}`",
-        f"- Mean delta vs named baseline: `{truth['champion_mean_delta_vs_named_baseline']}`",
-        f"- Minimum positive delta: `{truth['champion_min_delta_vs_named_baseline']}`",
-        f"- Sign-test p-value: `{truth['champion_sign_test_p_value']}`",
-        f"- Champion estimated rows replayed: `{truth['champion_estimated_rows_replayed']:,}`",
-        f"- Champion numeric samples read: `{truth['champion_numeric_samples_read']:,}`",
-        f"- Champion source systems: `{truth['champion_source_system_count']}`",
-        f"- Live-domain reviewer feed ready: `{str(truth['live_domain_reviewer_ready']).lower()}`",
+        f"- Internal performance champion present: `{str(truth['internal_performance_champion_present']).lower()}`",
+        f"- Measured reference candidate: `{truth['reference_candidate']}`",
+        f"- Frozen development-selected candidate: `{truth['development_selected_candidate']}`",
+        f"- Reference candidate selected by protocol: `{str(truth['reference_candidate_was_protocol_selected']).lower()}`",
+        f"- Paired-day result vs `{truth['reference_named_baseline']}`: `{truth['reference_holdout_wins']}/{truth['reference_holdout_count']}`",
+        f"- Mean source-native skill delta: `{truth['reference_mean_delta_vs_named_baseline']}`",
+        f"- Cleared every source-specific baseline: `{str(truth['reference_candidate_cleared_all_baselines']).lower()}`",
         "",
-        "## Broader Locked Sweep",
+        "## Compatibility-Gated Sweep",
         "",
-        f"- Adapter-backed routes: `{overall['source_conditioned_route_count']}`",
-        f"- Baseline comparisons: `{overall['baseline_comparison_count']}`",
-        f"- Candidate wins: `{overall['candidate_win_count']}`",
-        f"- Candidate losses/ties: `{overall['candidate_loss_or_tie_count']}`",
-        f"- Comparison win rate: `{percent(overall['comparison_win_rate'])}`",
-        f"- Mean score delta: `{overall['mean_score_delta']}`",
-        f"- Best score delta: `{overall['best_score_delta']}`",
-        f"- Estimated rows replayed: `{overall['estimated_rows_replayed']:,}`",
-        f"- Numeric samples read: `{overall['numeric_samples_read']:,}`",
-        f"- Mapped source count: `{overall['source_count']}`",
-        f"- Replay chain SHA-256: `{overall['replay_chain_sha256']}`",
+        f"- Adapter-backed routes: `{overall['adapter_backed_route_count']}`",
+        f"- Direct measured routes: `{overall['direct_measured_route_count']}`",
+        f"- Conditioned-synthetic routes: `{overall['source_conditioned_route_count']}`",
+        f"- Registered baseline comparisons: `{overall['baseline_comparison_count']}`",
+        f"- Raw positive mean comparisons: `{overall['raw_mean_win_count']}`",
+        f"- Globally corrected positive comparisons: `{overall['global_holm_positive_count']}`",
+        f"- Promoted direct candidates: `{overall['promoted_candidate_count']}`",
+        f"- Performance rows reviewed: `{overall['performance_rows_reviewed']}`",
+        f"- Legacy generic ready rows excluded: `{overall['legacy_ready_rows_excluded']}`",
+        f"- Numeric fallback profiles: `{overall['numeric_fallback_profiles_used']}`",
         "",
-        "## Lane Results",
+        "## Defensible Money State",
         "",
-        "| Lane | Routes | Comparisons | Wins | Win Rate | Mean Delta | Best Delta | Rows | Baselines |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+        f"- Evidence stage: `{valuation['current_evidence_stage']}`",
+        f"- Enterprise valuation asserted: `{str(valuation['enterprise_valuation_asserted']).lower()}`",
+        f"- Defensible money status: {valuation['defensible_money_status']}",
+        "",
+        "## First Proposal Target",
+        "",
+        f"- Target: {target['target_name']}",
+        f"- Buyer role: {target['buyer_role']}",
+        f"- Why this first: {target['why_this_first']}",
+        f"- Ask: {target['proposal_ask']}",
+        f"- Protocol review range: `{money(target['paid_review_scope_usd']['low'])}` to `{money(target['paid_review_scope_usd']['high'])}`",
+        f"- Benchmark build range: `{money(target['optional_benchmark_build_usd']['low'])}` to `{money(target['optional_benchmark_build_usd']['high'])}`",
+        "",
+        "## Reviewer-Safe Proposal Blurb",
+        "",
+        payload["proposal_blurb"],
+        "",
+        "## Boundaries",
+        "",
+        "- Do not state a current performance champion, field validation, realized savings, enterprise value, live trading edge, medical efficacy, or award certainty.",
+        "- Sell the bounded technical work that exists now: protocol, source compatibility, baseline registration, reproducibility, and reviewer-ready evidence.",
     ]
-    for row in payload["lane_stats"]:
-        baselines = ", ".join(str(item) for item in row.get("locked_baselines", []))
-        lines.append(
-            f"| `{row['lane']}` | `{row['routes_replayed']}` | `{row['baseline_comparison_count']}` | "
-            f"`{row['candidate_win_count']}` | `{percent(row['comparison_win_rate'])}` | "
-            f"`{row['mean_score_delta']}` | `{row['best_score_delta']}` | `{row['estimated_rows']:,}` | {baselines} |"
-        )
-
-    lines.extend(
-        [
-            "",
-            "## Honest Valuation State",
-            "",
-            f"- Evidence stage: `{valuation['current_evidence_stage']}`",
-            f"- Defensible money status: {valuation['defensible_money_status']}",
-            f"- Bounded estimated-value language allowed: `{str(truth['bounded_estimated_value_claim_allowed']).lower()}`",
-            f"- Safe estimated opportunity surface: `{money(truth['safe_estimated_hourly_value_usd'])}/hour` or `{money(truth['safe_estimated_annual_value_usd'])}/year` under stated assumptions.",
-            "- This is not realized savings, not a promise that a buyer will pay, and not a fixed price for a frozen delta.",
-            f"- Investor target: `{target['validation_bridge_round']['valuation_target']}`",
-            f"- Raise target: `{money(target['validation_bridge_round']['raise_target_usd']['low'])}` to `{money(target['validation_bridge_round']['raise_target_usd']['high'])}`",
-            "",
-            "## First Proposal Target",
-            "",
-            f"- Target: {target['target_name']}",
-            f"- Buyer role: {target['buyer_role']}",
-            f"- Why this first: {target['why_this_first']}",
-            f"- Ask: {target['proposal_ask']}",
-            f"- Paid review scope: `{money(target['paid_review_scope_usd']['low'])}` to `{money(target['paid_review_scope_usd']['high'])}`, scoping only.",
-            f"- Acceptance metric: {target['acceptance_metric']}",
-            "",
-            "## Reviewer-Safe Proposal Blurb",
-            "",
-            payload["proposal_blurb"],
-            "",
-            "## Best Current Investor Artifact",
-            "",
-            f"- Updated PDF: `{payload['inputs']['updated_business_plan_pdf']}`",
-            f"- Source markdown: `{payload['inputs']['updated_business_plan_markdown']}`",
-            "- Use the updated July 3 business plan for LvlUp/Black Dog and investor applications. Treat older April/May decks as background only unless manually claim-reviewed.",
-            "",
-            "## Boundaries",
-            "",
-            "- Do not state field validation, realized savings, fixed frozen-delta dollar value, live trading edge, medical efficacy, or award certainty.",
-            "- The strongest current claim is: internal source-conditioned replay winner plus live-domain hash-verified reviewer feed.",
-            "- The highest-value next proof is buyer-authorized holdout replay with accepted baseline, accepted metric, and accepted economics.",
-            f"- Packet SHA-256: `{payload['packet_sha256']}`",
-        ]
-    )
     return "\n".join(lines)
 
 

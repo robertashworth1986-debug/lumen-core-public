@@ -22,6 +22,12 @@ BLUEPRINT_VAULT_PATH = ROOT / "out" / "ops" / "gov_blueprint_vault" / "gov_bluep
 SITE_REACH_MISSION_PATH = ROOT / "out" / "ops" / "site_reach_mission" / "site_reach_mission_latest.json"
 SLIDES_JSON_PATH = ROOT / "out" / "INSTITUTIONAL_REVIEW_BUNDLE" / "nobel_tier_slides.json"
 NOBEL_DASHBOARD_PATH = ROOT / "dashboard" / "nobel_tier_command_center.html"
+SOURCE_NATIVE_LEDGER_PATH = (
+    ROOT / "out" / "ops" / "source_native_family_baseline_ledger_latest.json"
+)
+PROSPECTIVE_STATUS_PATH = (
+    ROOT / "out" / "ops" / "time_series_source_native_prospective_protocol_status.json"
+)
 
 HEARTBEAT_LATEST_PATH = OUT_DIR / "investor_mission_control_pack_heartbeat_latest.json"
 
@@ -171,65 +177,45 @@ def select_autonomous_grant_live_fill(fit_pack: dict[str, Any], queue_rows: list
 
     selected_opp_num = str(selected.get("opp_num") or "")
     ticket = _first_match(queue_rows, selected_opp_num) if selected_opp_num else {}
-
-    fit_status = str(selected.get("fit_status") or "").upper()
-    is_fit_likely = fit_status == "FIT_LIKELY"
-    has_ticket = bool(ticket)
-
-    if not selected:
-        status = "no_candidate"
-    elif is_fit_likely and has_ticket:
-        status = "ready_for_live_fill"
-    elif is_fit_likely and not has_ticket:
-        status = "fit_candidate_missing_ticket_context"
-    else:
-        status = "manual_review_required"
-
-    organization = ticket.get("organization") if isinstance(ticket, dict) else {}
-    contacts = ticket.get("contacts") if isinstance(ticket, dict) else {}
-
-    autofill_payload = {
-        "opportunity": {
-            "opp_num": selected.get("opp_num"),
-            "title": selected.get("title"),
-            "agency": selected.get("agency"),
-            "close_date": selected.get("close_date"),
-            "submit_url": selected.get("submit_url"),
-            "fit_status": selected.get("fit_status"),
-            "fit_reason": selected.get("fit_reason"),
-            "source_channel": selected.get("source_channel"),
-        },
-        "organization": organization if isinstance(organization, dict) else {},
-        "contacts": contacts if isinstance(contacts, dict) else {},
-        "answers": {
-            "abstract": str(ticket.get("abstract") or "") if isinstance(ticket, dict) else "",
-            "statement_of_need": str(ticket.get("statement_of_need") or "") if isinstance(ticket, dict) else "",
-            "expected_outcomes": ticket.get("expected_outcomes") if isinstance(ticket.get("expected_outcomes"), list) else [],
-            "budget_narrative": ticket.get("budget_narrative") if isinstance(ticket.get("budget_narrative"), dict) else {},
-            "budget_totals": ticket.get("budget_totals") if isinstance(ticket.get("budget_totals"), dict) else {},
-            "evaluation_criteria_responses": ticket.get("evaluation_criteria_responses") if isinstance(ticket.get("evaluation_criteria_responses"), list) else [],
-            "must_answer_fields": selected.get("must_answer_fields") if isinstance(selected.get("must_answer_fields"), list) else [],
-            "answer_strategy": selected.get("answer_strategy") if isinstance(selected.get("answer_strategy"), list) else [],
-        },
+    safe_selected = {
+        "opp_num": selected.get("opp_num"),
+        "title": selected.get("title"),
+        "agency": selected.get("agency"),
+        "close_date": selected.get("close_date"),
+        "source_channel": selected.get("source_channel"),
+        "local_fit_label": selected.get("fit_status"),
     }
+    if not selected:
+        status = "NO_CANDIDATE"
+    else:
+        status = "REVIEW_ONLY_OFFICIAL_SOURCE_REVERIFY_REQUIRED"
 
     return {
-        "selected_opportunity": selected,
+        "selected_opportunity": safe_selected if selected else {},
         "queue_ticket_id": str(ticket.get("ticket_id") or "") if isinstance(ticket, dict) else "",
         "status": status,
-        "grant_selected_automatically": bool(selected),
-        "autofill_packet_ready": has_ticket,
+        "grant_selected_automatically": False,
+        "autofill_packet_ready": False,
+        "review_only": True,
+        "deadline_actionable": False,
+        "submission_authorized": False,
         "human_submission_required": True,
-        "selection_policy": "FIT_LIKELY first, then grants_gov preference, then nearest deadline, then highest award ceiling",
-        "live_fill_steps": [
-            "Open submit_url for the selected opportunity and start the application workspace.",
-            "Paste organization, contact, and abstract fields from autofill_payload.",
-            "Paste statement_of_need, expected_outcomes, and budget_narrative sections.",
-            "Answer must_answer_fields in the same order and map answer_strategy bullets where required.",
-            "Capture submission confirmation id, timestamp, and receipt screenshot as evidence artifacts.",
-            "Mark submitted state only after confirmation evidence is saved.",
+        "selection_policy": (
+            "Legacy local ranking only. It cannot establish current status, eligibility, "
+            "deadline, responsiveness, or authority."
+        ),
+        "review_steps": [
+            "Open the current official notice and all amendments.",
+            "Verify deadline, timezone, status, eligibility, route, and mandatory attachments.",
+            "Reconcile the local candidate against the current authority and duplicate ledger.",
+            "Draft only after the notice-specific conformance gate passes.",
+            "Keep every certification, signature, upload, send, and submission with the authorized human.",
         ],
-        "autofill_payload": autofill_payload,
+        "autofill_payload": {},
+        "boundary": (
+            "No private organization, contact, budget, or proposal answer content is "
+            "included. This record is not a submission packet or portal instruction."
+        ),
     }
 
 
@@ -245,50 +231,78 @@ def build_three_minute_pitch(
     top_problem: str,
     grade_a_locks: int,
 ) -> dict[str, Any]:
+    source_native = load_json(SOURCE_NATIVE_LEDGER_PATH, {})
+    prospective = load_json(PROSPECTIVE_STATUS_PATH, {})
+    source_summary = (
+        source_native.get("summary", {}) if isinstance(source_native, dict) else {}
+    )
+    registered_families = safe_int(source_summary.get("registered_family_count"), 0)
+    implemented_families = safe_int(
+        source_summary.get("implementation_present_count"), 0
+    )
+    comparisons = safe_int(
+        source_summary.get("executed_direct_source_baseline_comparison_count"), 0
+    )
+    promotions = safe_int(
+        source_summary.get("internal_source_native_promotion_gate_pass_count"), 0
+    )
+    protocol_status = str(
+        prospective.get("protocol_status") or "UNVERIFIED"
+    )
     segments = [
         {
             "start_sec": 0,
             "end_sec": 30,
-            "title": "Why This Exists",
+            "title": "The Problem",
             "script": (
-                f"LumaTrader exists because critical systems still fail reactively. We built a government-grade decision platform that turns live telemetry into pre-failure action. "
-                f"Today the platform tracks {enabled_sources} enabled sources with {measured_sources} measured sources and a modeled annual preserved-value surface of {as_usd(annual_value_usd)}."
+                "Technical teams lose trust when source identity, baselines, failure "
+                "rules, and decision authority are not preserved. LumenCore is an "
+                "evidence-engineering repository built to make those controls visible "
+                "and replayable."
             ),
         },
         {
             "start_sec": 30,
             "end_sec": 65,
-            "title": "What Is Working Now",
+            "title": "What Exists",
             "script": (
-                f"The top live economic lane is {top_sector}. Routing edge currently measures {as_pct(router_edge_pct)} and harmonic win-rate telemetry reads {as_pct(harmonic_win_rate_pct)}. "
-                "The stack is already producing auditable artifacts, chain-of-custody records, and repeatable operations outputs."
+                f"The current source-native ledger registers {registered_families} "
+                f"candidate families, records {implemented_families} implementations, "
+                f"and contains {comparisons} direct source-baseline comparisons. "
+                "Hash-linked receipts and fail-closed claim states preserve both "
+                "positive and adverse evidence."
             ),
         },
         {
             "start_sec": 65,
             "end_sec": 100,
-            "title": "Why Investors Win",
+            "title": "What The Evidence Says",
             "script": (
-                f"Investors are not funding an idea slide. They are funding an operating system that now ranks real human problems, led by {top_problem or 'critical infrastructure instability'}. "
-                f"The latest alpha-edge run surfaces {grade_a_locks} grade-A lock candidates, so capital compounds into measurable execution edge rather than narrative-only milestones."
+                f"The strict promotion count is {promotions}. That means the current "
+                "contribution is the governed comparison protocol, not a performance "
+                f"champion. The prospective protocol is {protocol_status.lower()} and "
+                "will wait for future eligible observations."
             ),
         },
         {
             "start_sec": 100,
             "end_sec": 135,
-            "title": "Defensibility and Moat",
+            "title": "Commercial Wedge",
             "script": (
-                "The moat is execution integrity: lane-isolated pipelines, hash-linked evidence, and deterministic refresh routines. "
-                "That combination is difficult to replicate because it requires both technical depth and operational rigor."
+                "The first bounded offer is ProofLock Opportunity Operations: one "
+                "buyer-approved workflow, frozen denominators and thresholds, "
+                "evidence-linked review, blocker ledgers, and human-owned final action."
             ),
         },
         {
             "start_sec": 135,
             "end_sec": 165,
-            "title": "Autonomous Grant Engine",
+            "title": "Government And Prime Fit",
             "script": (
-                f"Our autonomous grant lane already picks high-fit opportunities and prepares submission packets. The current lead candidate is {selected_grant_title or 'the top fit opportunity in queue'}. "
-                "That means non-dilutive capital is not a side process - it is integrated into the mission-control loop."
+                "The credible federal posture is a bounded evidence-readiness sprint "
+                "or a specialized workstream under a qualified prime. Current notices, "
+                "eligibility, representations, pricing, certifications, and submissions "
+                "remain action-time human decisions."
             ),
         },
         {
@@ -296,8 +310,9 @@ def build_three_minute_pitch(
             "end_sec": 180,
             "title": "Close and Ask",
             "script": (
-                f"The current readiness state is {readiness_status}. With investor capital, we move from guarded proof mode into scaled live execution with the same governance discipline. "
-                "If you want a platform that can prove value before claiming value, this is that platform."
+                "The ask is specific: an independent protocol reviewer, one scoped "
+                "pilot buyer, or one qualified-prime teaming review. No valuation, "
+                "savings, award, or performance result is asserted."
             ),
         },
     ]
@@ -317,54 +332,33 @@ def build_three_minute_pitch(
         "total_seconds": 180,
         "segments": segments,
         "full_script": full_script,
+        "external_share_ready": False,
+        "recipient_selected": False,
+        "legacy_value_inputs_suppressed": True,
+        "boundary": (
+            "Internal draft. Source counts and local receipts do not establish "
+            "freshness, field performance, customer acceptance, value, or authority."
+        ),
     }
 
 
 def build_3d_graphics_pack(sector_matrix: dict[str, Any], top_n: int) -> dict[str, Any]:
-    rows = sector_matrix.get("sector_value_matrix", []) if isinstance(sector_matrix, dict) else []
-    if not isinstance(rows, list):
-        rows = []
-
-    ranked = [row for row in rows if isinstance(row, dict)]
-    ranked.sort(key=lambda row: safe_float(row.get("year", row.get("annual_exposure_usd", 0.0))), reverse=True)
-    ranked = ranked[: max(1, top_n)]
-
-    points: list[dict[str, Any]] = []
-    for idx, row in enumerate(ranked, start=1):
-        points.append(
-            {
-                "rank": idx,
-                "sector": str(row.get("sector") or "unknown"),
-                "x_rank": idx,
-                "y_hourly_usd": safe_float(row.get("hour"), 0.0),
-                "z_annual_usd": safe_float(row.get("year", row.get("annual_exposure_usd")), 0.0),
-                "modeled_upside_usd": safe_float(row.get("modeled_annual_upside_usd"), 0.0),
-                "basis": str(row.get("basis") or "unknown"),
-            }
-        )
-
     return {
         "generated_utc": now_iso(),
-        "title": "Mission Control 3D Sector Surface",
-        "chart_type": "3d_scatter_orbit",
-        "axes": {
-            "x": "sector rank",
-            "y": "hourly preserved value usd",
-            "z": "annual preserved value usd",
-        },
-        "camera": {"azimuth_deg": 38, "elevation_deg": 26, "distance": 2.4},
-        "style": {
-            "background": "#060d18",
-            "grid": "#2a3f61",
-            "accent_primary": "#5df3d0",
-            "accent_secondary": "#ffd873",
-        },
-        "points": points,
-        "powerpoint_guidance": [
-            "Use one orbit intro shot, one rotation pass, and one static close-up on top 3 sectors.",
-            "Annotate each point with sector, hourly usd, and annual usd.",
-            "Keep basis label visible to separate measured and estimated values.",
-        ],
+        "title": "Legacy Modeled Value Surface",
+        "status": "BLOCKED_FROM_INVESTOR_AND_REVIEWER_USE",
+        "chart_type": None,
+        "points": [],
+        "legacy_row_count": len(
+            sector_matrix.get("sector_value_matrix", [])
+            if isinstance(sector_matrix, dict)
+            and isinstance(sector_matrix.get("sector_value_matrix"), list)
+            else []
+        ),
+        "boundary": (
+            "Modeled sector-value rows are suppressed because they are not audited "
+            "realized outcomes, accepted counterfactuals, or enterprise valuation."
+        ),
     }
 
 
@@ -373,19 +367,18 @@ def render_pack_markdown(payload: dict[str, Any]) -> str:
     parity = payload.get("powerpoint_mirror_parity", {}) if isinstance(payload, dict) else {}
     live_fill = payload.get("autonomous_grant_live_fill", {}) if isinstance(payload, dict) else {}
     graphics = payload.get("graphics_3d_pack", {}) if isinstance(payload, dict) else {}
-    alpha_edge = payload.get("alpha_edge_lock_engine", {}) if isinstance(payload, dict) else {}
-    blueprints = payload.get("government_grade_blueprints", {}) if isinstance(payload, dict) else {}
-    site_reach = payload.get("site_reach_mission", {}) if isinstance(payload, dict) else {}
-    challenge_stack = payload.get("three_min_challenge_problem_stack", []) if isinstance(payload, dict) else []
     selected = live_fill.get("selected_opportunity", {}) if isinstance(live_fill, dict) else {}
 
     lines: list[str] = []
     lines.append("# Investor Mission Control Pack")
     lines.append("")
+    lines.append("**DRAFT ONLY - RECIPIENT NOT SELECTED - EXTERNAL CLAIM REVIEW REQUIRED**")
+    lines.append("")
     lines.append(f"Generated UTC: {payload.get('generated_utc', '')}")
     lines.append(f"Scope: {payload.get('scope', '')}")
+    lines.append(f"Boundary: {payload.get('boundary', '')}")
     lines.append("")
-    lines.append("## Three-Minute Nobel Pitch")
+    lines.append("## Three-Minute Evidence Pitch")
     lines.append(f"- Total seconds: {pitch.get('total_seconds', 0)}")
     lines.append("")
     for segment in pitch.get("segments", []) if isinstance(pitch, dict) else []:
@@ -394,31 +387,6 @@ def render_pack_markdown(payload: dict[str, Any]) -> str:
         lines.append(
             f"- {int(segment.get('start_sec', 0)):03d}-{int(segment.get('end_sec', 0)):03d}s | {segment.get('title', '')} | {segment.get('script', '')}"
         )
-    lines.append("")
-    lines.append("## 3-Minute Challenge Problem Stack")
-    lines.append(f"- grade_a_locks: {alpha_edge.get('grade_a_locks', 0)}")
-    lines.append(f"- top_problem: {alpha_edge.get('top_problem', '')}")
-    for row in challenge_stack[:10] if isinstance(challenge_stack, list) else []:
-        if not isinstance(row, dict):
-            continue
-        lines.append(
-            f"- rank {row.get('rank')}: {row.get('problem_statement', '')} | sector={row.get('sector', '')} | alpha={row.get('alpha_lock_score', 0)} edge={row.get('edge_lock_score', 0)} conf={row.get('confidence_live_lock_pct', 0)}%"
-        )
-    lines.append("")
-    lines.append("## Government-Grade Blueprint Vault")
-    lines.append(f"- asset_count: {blueprints.get('asset_count', 0)}")
-    lines.append(f"- focus_term_count: {blueprints.get('focus_term_count', 0)}")
-    lines.append(f"- highest_trl_target: {blueprints.get('highest_trl_target', 0)}")
-    lines.append(f"- engine_family: {blueprints.get('engine_family', '')}")
-    lines.append("- featured_assets:")
-    for item in blueprints.get("featured_assets", []) if isinstance(blueprints, dict) else []:
-        lines.append(f"  - {item}")
-    lines.append("")
-    lines.append("## Site Reach and Mission Push")
-    lines.append(f"- canonical_visitors_30d: {site_reach.get('canonical_visitors_30d')}")
-    lines.append(f"- canonical_source: {site_reach.get('canonical_visitors_source', '')}")
-    lines.append(f"- promotion_channels_ready: {site_reach.get('promotion_channels_ready', 0)}")
-    lines.append(f"- promotion_channels_blocked: {site_reach.get('promotion_channels_blocked', 0)}")
     lines.append("")
     lines.append("## PowerPoint Mirror Parity")
     lines.append(f"- parity_ok: {parity.get('parity_ok', False)}")
@@ -431,26 +399,22 @@ def render_pack_markdown(payload: dict[str, Any]) -> str:
             f"- {row.get('label', '')}: parity={row.get('parity', False)} root_exists={row.get('root_exists', False)} stack_exists={row.get('stack_exists', False)}"
         )
     lines.append("")
-    lines.append("## 3D Graphics Pack")
-    lines.append(f"- chart_type: {graphics.get('chart_type', '')}")
-    lines.append(f"- point_count: {len(graphics.get('points', [])) if isinstance(graphics, dict) else 0}")
-    for point in graphics.get("points", [])[:5] if isinstance(graphics, dict) else []:
-        if not isinstance(point, dict):
-            continue
-        lines.append(
-            f"- rank {point.get('rank')}: {point.get('sector')} | hourly={as_usd(point.get('y_hourly_usd'))} | annual={as_usd(point.get('z_annual_usd'))}"
-        )
+    lines.append("## Legacy Modeled-Value Graphic")
+    lines.append(f"- status: {graphics.get('status', '')}")
+    lines.append(f"- rendered point count: {len(graphics.get('points', [])) if isinstance(graphics, dict) else 0}")
+    lines.append(f"- boundary: {graphics.get('boundary', '')}")
     lines.append("")
-    lines.append("## Autonomous Grant Live Fill")
+    lines.append("## Review-Only Opportunity Candidate")
     lines.append(f"- status: {live_fill.get('status', '')}")
     lines.append(f"- selected_opp_num: {selected.get('opp_num', '')}")
     lines.append(f"- selected_title: {selected.get('title', '')}")
-    lines.append(f"- submit_url: {selected.get('submit_url', '')}")
     lines.append(f"- queue_ticket_id: {live_fill.get('queue_ticket_id', '')}")
     lines.append(f"- autofill_packet_ready: {live_fill.get('autofill_packet_ready', False)}")
+    lines.append(f"- submission_authorized: {live_fill.get('submission_authorized', False)}")
     lines.append(f"- human_submission_required: {live_fill.get('human_submission_required', True)}")
-    lines.append("- live_fill_steps:")
-    for step in live_fill.get("live_fill_steps", []) if isinstance(live_fill, dict) else []:
+    lines.append(f"- boundary: {live_fill.get('boundary', '')}")
+    lines.append("- review_steps:")
+    for step in live_fill.get("review_steps", []) if isinstance(live_fill, dict) else []:
         lines.append(f"  - {step}")
 
     return "\n".join(lines).rstrip() + "\n"
@@ -458,10 +422,13 @@ def render_pack_markdown(payload: dict[str, Any]) -> str:
 
 def render_pitch_markdown(pitch: dict[str, Any]) -> str:
     lines = [
-        "# Three-Minute Nobel Pitch",
+        "# Three-Minute LumenCore Evidence Pitch",
+        "",
+        "**DRAFT ONLY - RECIPIENT NOT SELECTED - EXTERNAL CLAIM REVIEW REQUIRED**",
         "",
         f"Generated UTC: {pitch.get('generated_utc', '')}",
         f"Total Seconds: {pitch.get('total_seconds', 180)}",
+        f"Boundary: {pitch.get('boundary', '')}",
         "",
     ]
     for segment in pitch.get("segments", []):
@@ -513,7 +480,12 @@ def write_heartbeat(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build investor mission-control pack with pitch, parity, 3D graphics, and autonomous grant live-fill payload.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Build an internal claim-bounded investor mission-control pack with "
+            "a review-only opportunity candidate."
+        )
+    )
     parser.add_argument("--top-sectors", type=int, default=10, help="Number of sectors to include in 3D graphics pack")
     args = parser.parse_args()
 
@@ -536,6 +508,8 @@ def main() -> int:
         blueprint_vault = load_json(BLUEPRINT_VAULT_PATH, {})
         site_reach_mission = load_json(SITE_REACH_MISSION_PATH, {})
         slides = load_json(SLIDES_JSON_PATH, {})
+        source_native = load_json(SOURCE_NATIVE_LEDGER_PATH, {})
+        prospective = load_json(PROSPECTIVE_STATUS_PATH, {})
 
         queue_rows = grant_queue if isinstance(grant_queue, list) else []
 
@@ -575,7 +549,16 @@ def main() -> int:
 
         payload = {
             "generated_utc": now_iso(),
-            "scope": "investor_mission_control_pack",
+            "scope": "internal_claim_bounded_investor_mission_control_pack",
+            "status": "INTERNAL_DRAFT_RECIPIENT_AND_CLAIM_REVIEW_REQUIRED",
+            "external_share_ready": False,
+            "recipient_selected": False,
+            "boundary": (
+                "Local artifacts can establish software, custody, protocol, and gate "
+                "behavior only. No valuation, savings, field performance, trading "
+                "alpha, customer acceptance, agency endorsement, award, or external "
+                "action is authorized."
+            ),
             "source_artifacts": {
                 "live_breadth_value_panel_latest": str(LIVE_BREADTH_PATH),
                 "investor_metric_readiness_latest": str(INVESTOR_READINESS_PATH),
@@ -587,41 +570,51 @@ def main() -> int:
                 "site_reach_mission_latest": str(SITE_REACH_MISSION_PATH),
                 "nobel_slides_json": str(SLIDES_JSON_PATH),
                 "nobel_dashboard_html": str(NOBEL_DASHBOARD_PATH),
+                "source_native_family_baseline_ledger": str(
+                    SOURCE_NATIVE_LEDGER_PATH
+                ),
+                "source_native_prospective_status": str(
+                    PROSPECTIVE_STATUS_PATH
+                ),
             },
             "headline": {
-                "annual_value_signal_usd": annual_value_usd,
-                "annual_value_signal_display": as_usd(annual_value_usd),
-                "top_sector": top_sector,
-                "measured_sources": measured_sources,
-                "enabled_sources": enabled_sources,
-                "router_edge_pct": router_edge_pct,
-                "harmonic_win_rate_pct": harmonic_win_rate_pct,
-                "readiness_status": readiness_status,
-                "canonical_visitors_30d": (
-                    (site_reach_mission.get("summary", {}) or {}).get("canonical_visitors_30d")
-                    if isinstance(site_reach_mission, dict)
+                "message": (
+                    "Evidence engineering for source-native technical review, "
+                    "replayable receipts, and human-authorized decisions."
+                ),
+                "legacy_value_metrics_suppressed": True,
+                "legacy_performance_metrics_suppressed": True,
+                "current_promotion_count": safe_int(
+                    (
+                        source_native.get("summary", {})
+                        if isinstance(source_native, dict)
+                        else {}
+                    ).get("internal_source_native_promotion_gate_pass_count"),
+                    0,
+                ),
+                "prospective_protocol_status": (
+                    prospective.get("protocol_status")
+                    if isinstance(prospective, dict)
                     else None
                 ),
-                "canonical_visitors_source": (
-                    (site_reach_mission.get("summary", {}) or {}).get("canonical_visitors_source")
-                    if isinstance(site_reach_mission, dict)
+                "prospective_promotion_decision": (
+                    prospective.get("promotion_decision")
+                    if isinstance(prospective, dict)
                     else None
                 ),
             },
             "three_min_nobel_pitch": pitch,
             "alpha_edge_lock_engine": {
-                "generated_utc": alpha_edge_lock.get("generated_utc") if isinstance(alpha_edge_lock, dict) else None,
-                "grade_a_locks": grade_a_locks,
-                "top_problem": top_problem,
-                "top_sector": alpha_summary.get("top_sector") if isinstance(alpha_summary, dict) else None,
-                "live_posture": alpha_edge_lock.get("live_posture") if isinstance(alpha_edge_lock, dict) else {},
+                "status": "LEGACY_RESEARCH_SCORE_SUPPRESSED",
+                "promotion_claim_allowed": False,
+                "field_performance_claim_allowed": False,
+                "boundary": (
+                    "Legacy alpha, edge, lock, and confidence labels are not "
+                    "external performance evidence."
+                ),
             },
-            "three_min_challenge_problem_stack": (
-                alpha_edge_lock.get("top_problem_stack", [])[:12]
-                if isinstance(alpha_edge_lock, dict) and isinstance(alpha_edge_lock.get("top_problem_stack"), list)
-                else []
-            ),
-            "government_grade_blueprints": {
+            "three_min_challenge_problem_stack": [],
+            "bounded_blueprint_inventory": {
                 "generated_utc": (
                     blueprint_vault.get("generated_utc")
                     if isinstance(blueprint_vault, dict)
@@ -634,11 +627,6 @@ def main() -> int:
                 ),
                 "focus_term_count": (
                     (blueprint_vault.get("summary", {}) or {}).get("focus_term_count")
-                    if isinstance(blueprint_vault, dict)
-                    else 0
-                ),
-                "highest_trl_target": (
-                    (blueprint_vault.get("summary", {}) or {}).get("highest_trl_target")
                     if isinstance(blueprint_vault, dict)
                     else 0
                 ),
@@ -656,33 +644,16 @@ def main() -> int:
                     if isinstance(blueprint_vault, dict)
                     else []
                 ),
+                "government_grade_claim_allowed": False,
+                "trl_claim_allowed": False,
+                "boundary": (
+                    "Local blueprint inventory does not establish agency acceptance, "
+                    "technical readiness level, certification, or deployment readiness."
+                ),
             },
             "site_reach_mission": {
-                "generated_utc": (
-                    site_reach_mission.get("generated_utc")
-                    if isinstance(site_reach_mission, dict)
-                    else None
-                ),
-                "canonical_visitors_30d": (
-                    (site_reach_mission.get("summary", {}) or {}).get("canonical_visitors_30d")
-                    if isinstance(site_reach_mission, dict)
-                    else None
-                ),
-                "canonical_visitors_source": (
-                    (site_reach_mission.get("summary", {}) or {}).get("canonical_visitors_source")
-                    if isinstance(site_reach_mission, dict)
-                    else None
-                ),
-                "promotion_channels_ready": (
-                    (site_reach_mission.get("summary", {}) or {}).get("promotion_channels_ready")
-                    if isinstance(site_reach_mission, dict)
-                    else 0
-                ),
-                "promotion_channels_blocked": (
-                    (site_reach_mission.get("summary", {}) or {}).get("promotion_channels_blocked")
-                    if isinstance(site_reach_mission, dict)
-                    else 0
-                ),
+                "status": "LEGACY_PROMOTION_METRICS_SUPPRESSED",
+                "external_promotion_authorized": False,
             },
             "powerpoint_mirror_parity": parity,
             "graphics_3d_pack": graphics_3d_pack,
@@ -693,6 +664,13 @@ def main() -> int:
                 "slides_deck_name": str(slides.get("deck_name") or "") if isinstance(slides, dict) else "",
                 "root_dashboard_dir": str(ROOT_DASH),
                 "institutional_dashboard_dir": str(STACK_DASH),
+            },
+            "claim_controls": {
+                "valuation_claim_allowed": False,
+                "savings_claim_allowed": False,
+                "performance_claim_allowed": False,
+                "autonomous_grant_claim_allowed": False,
+                "external_action_allowed": False,
             },
         }
 
@@ -726,7 +704,13 @@ def main() -> int:
                 "parity_ok": bool((payload.get("powerpoint_mirror_parity", {}) or {}).get("parity_ok", False)),
                 "selected_opp_num": str(((payload.get("autonomous_grant_live_fill", {}) or {}).get("selected_opportunity", {}) or {}).get("opp_num") or ""),
                 "grant_live_fill_status": str((payload.get("autonomous_grant_live_fill", {}) or {}).get("status") or ""),
-                "grade_a_locks": safe_int((payload.get("alpha_edge_lock_engine", {}) or {}).get("grade_a_locks"), 0),
+                "external_share_ready": False,
+                "current_promotion_count": safe_int(
+                    (payload.get("headline", {}) or {}).get(
+                        "current_promotion_count"
+                    ),
+                    0,
+                ),
             },
             artifacts={
                 "json_latest": str(pack_json_latest),

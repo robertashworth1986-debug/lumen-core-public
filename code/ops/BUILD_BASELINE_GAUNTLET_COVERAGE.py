@@ -55,13 +55,26 @@ REQUESTED_BASELINES: list[dict[str, Any]] = [
 
 
 ALIASES: dict[str, tuple[str, ...]] = {
-    "persistence": ("persistence",),
-    "rolling_mean": ("rolling_mean",),
-    "ewma": ("ewma",),
+    "persistence": ("persistence", "naive_last"),
+    "rolling_mean": ("rolling_mean", "moving_average"),
+    "ewma": ("ewma", "exponential_smoothing"),
     "arima": ("arima", "sarimax"),
-    "seasonal_naive": ("seasonal_naive",),
-    "holt_winters_ets": ("holt_winters_ets", "holt_winters", "ets"),
-    "kalman_filter": ("kalman_filter", "scalar_kalman_filter"),
+    "seasonal_naive": (
+        "seasonal_naive",
+        "seasonal_naive_7",
+        "seasonal_naive_source_period",
+    ),
+    "holt_winters_ets": (
+        "holt_winters_ets",
+        "holt_winters",
+        "ets",
+        "damped_holt_ets",
+    ),
+    "kalman_filter": (
+        "kalman_filter",
+        "scalar_kalman_filter",
+        "kalman_local_linear_trend",
+    ),
     "extended_kalman_filter": ("extended_kalman_filter", "ekf"),
     "unscented_kalman_filter": ("unscented_kalman_filter", "ukf"),
     "particle_filter": ("particle_filter",),
@@ -126,13 +139,22 @@ def collect_locked_baselines(sweep: dict[str, Any]) -> dict[str, dict[str, Any]]
     for route in sweep.get("route_results", []) or []:
         if not isinstance(route, dict):
             continue
-        comparisons = route.get("comparisons") or []
+        comparisons = (
+            route.get("baseline_comparisons")
+            or route.get("comparisons")
+            or []
+        )
         if not isinstance(comparisons, list):
             continue
         for comparison in comparisons:
             if not isinstance(comparison, dict):
                 continue
-            key = str(comparison.get("baseline_family") or "").strip()
+            key = str(
+                comparison.get("baseline_family_id")
+                or comparison.get("baseline_family")
+                or comparison.get("baseline")
+                or ""
+            ).strip()
             if not key:
                 continue
             item = out.setdefault(
@@ -148,9 +170,21 @@ def collect_locked_baselines(sweep: dict[str, Any]) -> dict[str, dict[str, Any]]
             )
             item["lanes"].add(str(route.get("lane", "")))
             item["baseline_comparison_count"] += 1
-            item["candidate_win_count"] += 1 if comparison.get("candidate_beats_baseline") else 0
-            item["estimated_rows"] += int(route.get("estimated_rows") or 0)
-            item["numeric_samples"] += int(route.get("numeric_samples") or 0)
+            candidate_win = comparison.get("candidate_beats_baseline_mean")
+            if candidate_win is None:
+                candidate_win = comparison.get("candidate_beats_baseline")
+            item["candidate_win_count"] += 1 if candidate_win else 0
+            route_rows = int(
+                route.get("performance_rows_evaluated")
+                or route.get("live_context_rows_evaluated")
+                or route.get("estimated_rows")
+                or 0
+            )
+            item["estimated_rows"] += route_rows
+            item["numeric_samples"] += int(
+                route.get("numeric_samples")
+                or route_rows
+            )
     for item in out.values():
         item["lanes"] = sorted(item["lanes"])
     return out
@@ -244,6 +278,7 @@ def build_payload() -> dict[str, Any]:
     summary = {
         "requested_baselines": len(rows),
         "executed_in_locked_replay": sum(1 for row in rows if row["status"] == "EXECUTED_IN_LOCKED_REPLAY"),
+        "locked_replay_distinct_baseline_families": len(locked),
         "replay_proxy_ready_from_metric_audit": sum(
             1 for row in rows if row["status"] == "REPLAY_PROXY_READY_FROM_ACCEPTED_METRIC_AUDIT"
         ),
@@ -261,19 +296,21 @@ def build_payload() -> dict[str, Any]:
         "field_validation_claim_allowed": False,
         "real_dollar_savings_claim_allowed": False,
         "attribution_scope": (
-            "Per-baseline comparisons and candidate wins are counted from route-level comparison rows. "
-            "Rows replayed are per-baseline exposure counts and should not be summed as unique global rows."
+            "Executed-in-locked-replay counts only the 29 reviewer-requested categories that map to a "
+            "current comparison family. Distinct baseline families counts every source-native or "
+            "domain-native comparison family. Row exposure is repeated per baseline and must not be "
+            "summed as unique global rows."
         ),
     }
     payload = {
         "schema": "baseline_gauntlet_coverage_v1",
         "generated_utc": now_utc(),
         "boundary": (
-            "Baseline coverage audit only. EXECUTED means present in the locked source-conditioned replay feed. "
-            "REGISTERED means named in the benchmark registry but not run by the current adapter. Per-baseline "
-            "comparison and win counts come from route-level comparison rows where available. Missing advanced "
-            "adapters or IEEE cases must be added before those baselines can be claimed as tested. This is not "
-            "field validation or realized savings."
+            "Compatibility-gated baseline coverage audit only. EXECUTED means a requested baseline category "
+            "maps to a comparison family in the current locked replay. REGISTERED means named in the benchmark "
+            "registry but not run by the current adapter. Context-only manifest rows and incompatible tasks are "
+            "excluded. Missing advanced adapters or IEEE cases must be added before those baselines can be "
+            "claimed as tested. This is not field validation, superiority, or realized savings."
         ),
         "inputs": {
             "locked_sweep": str(LOCKED_SWEEP.relative_to(ROOT)).replace("\\", "/"),
@@ -300,6 +337,18 @@ def build_payload() -> dict[str, Any]:
 
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
+    rows_by_id = {row["id"]: row for row in payload["baseline_rows"]}
+    routing_ids = ("model_predictive_control", "dijkstra", "a_star")
+    executed_routing = [
+        baseline_id
+        for baseline_id in routing_ids
+        if rows_by_id[baseline_id]["status"] == "EXECUTED_IN_LOCKED_REPLAY"
+    ]
+    registered_routing = [
+        baseline_id
+        for baseline_id in routing_ids
+        if rows_by_id[baseline_id]["status"] == "REGISTERED_BASELINE_NOT_ADAPTER_EXECUTED"
+    ]
     lines = [
         "# Baseline Gauntlet Coverage",
         "",
@@ -310,7 +359,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- Requested baselines: `{summary['requested_baselines']}`",
-        f"- Executed in locked replay: `{summary['executed_in_locked_replay']}`",
+        f"- Requested categories executed in locked replay: `{summary['executed_in_locked_replay']}`",
+        f"- Distinct comparison families in locked replay: `{summary['locked_replay_distinct_baseline_families']}`",
         f"- Replay proxy ready from accepted-metric audit: `{summary['replay_proxy_ready_from_metric_audit']}`",
         f"- Registered but not adapter-executed: `{summary['registered_not_adapter_executed']}`",
         f"- Blocked by missing package/dataset: `{summary['blocked_by_missing_package_or_dataset']}`",
@@ -350,9 +400,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Interpretation",
             "",
-            "- Executed locked replay coverage now includes classical forecast baselines, ETS/Holt-Winters, ARIMA, scalar/standard Kalman plus EKF/UKF/particle filters, Gaussian process, random forest, XGBoost, LightGBM, and min-cost-flow routing.",
+            "- Executed compatibility-gated coverage includes persistence, moving average, exponential smoothing, source-period seasonal naive, damped Holt/ETS, local-linear-trend Kalman, min-cost-flow, Dijkstra, and A* categories, plus additional source-native comparison families shown in the locked replay.",
+            "- ARIMA/SARIMAX, EKF/UKF/particle filters, Gaussian process, random forest, XGBoost, and LightGBM are not currently executed by this compatibility-gated adapter and must not be described as tested.",
             "- Kuramoto order-parameter and phase-bound stress are now represented as accepted-metric replay proxies through the Kuramoto accepted metric audit; this improves reviewer language without claiming physical field validation.",
-            "- MPC, Dijkstra, and A* are registered in the geometry registry but are not executed by this locked replay adapter yet.",
+            "- Routing/control baseline status is generated from the replay rows: "
+            f"executed `{', '.join(executed_routing) or 'none'}`; registered but not executed "
+            f"`{', '.join(registered_routing) or 'none'}`.",
             "- LSTM/TCN/small-transformer forecasts, DC power-flow/OPF, IEEE 39/118/300 bus cases, and critical-coupling metrics still need adapters, accepted topology files, or buyer/agency-approved benchmark data.",
             "- This strengthens the technical validation story, but it still does not authorize field-validation, realized-savings, trading-profit, safety, medical, or certification claims.",
         ]

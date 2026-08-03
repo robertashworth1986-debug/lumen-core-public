@@ -1,6 +1,6 @@
 # Sector Validation Priority Board
 
-Generated: `2026-07-13T19:46:27.710116+00:00`
+Generated: `2026-07-14T03:58:44.036960+00:00`
 
 ## Decision
 
@@ -98,7 +98,7 @@ Promotion sequence:
 
 ## Audit Receipt
 
-- Evidence-chain SHA-256: `e5a2e7509af7bb6287d7316b934b962b499f925ff704150d4613f28f4d403dc8`
+- Evidence-chain SHA-256: `ad30b9b3b91115823bc589d823e9e139139f8b310aee0b9ac65abff90dce3e65`
 - Snapshot-chain SHA-256: `851c1c807028ed20497b08220e77648e5c7bc315a2d87558a7dc5360403bd47e`
 
 > Claim boundary: The board prioritizes validation work. It does not prove market size, addressable revenue, realized savings, field performance, safety, procurement eligibility, grant award, patent scope, or trading performance.

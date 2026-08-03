@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "as_of_utc": "2026-07-23T20:53:33Z",
+  "status": "FOUNDER_ACTION_REQUIRED",
+  "packet_path": "grant_submissions/funding_sprint_20260709/NEAR_TERM_CAPITAL_AND_COMPUTE_RELIEF_PACKET_2026-07-23.md",
+  "official_source_evidence_path": "grant_submissions/funding_sprint_20260709/NEAR_TERM_CAPITAL_AND_COMPUTE_OFFICIAL_SOURCE_EVIDENCE_2026-07-23.json",
+  "source_refresh_required_before_new_external_action": true,
+  "selected_investor_route": "third_sphere_seedstrap",
+  "selected_compute_route": "microsoft_for_startups_no_referral",
+  "send_now_count": 0,
+  "portal_submit_now_count": 0,
+  "ranked_routes": [
+    {
+      "route_id": "microsoft_for_startups_no_referral",
+      "priority": 1,
+      "route_type": "COMPUTE_CREDIT",
+      "official_url": "https://learn.microsoft.com/en-us/startups/microsoft-for-startups/application",
+      "verified_utc": "2026-07-23T20:53:33Z",
+      "source_evidence_id": "microsoft_for_startups_official_20260723",
+      "published_value": "$1,000 starter Azure credits",
+      "published_timing": "Immediately available after account setup; displayed balance may take up to 24 hours to update",
+      "selection_reason": "Fastest verified compute-relief route",
+      "current_state": "READY_FOR_FOUNDER_ACCOUNT_SETUP",
+      "external_action_policy": "FOUNDER_ONLY_PORTAL_ACTION",
+      "private_or_legal_gates": [
+        "personal Microsoft account eligibility",
+        "identity and phone verification",
+        "registered startup name and address",
+        "customer agreement and individual-user terms",
+        "payment and billing information"
+      ],
+      "cost_risk": "Azure sponsorship converts automatically to pay-as-you-go when credits are used or expire",
+      "safest_next_action": "Founder completes account setup and configures budgets, alerts, and shutdown controls before moving workloads"
+    },
+    {
+      "route_id": "third_sphere_seedstrap",
+      "priority": 2,
+      "route_type": "INVESTOR_CAPITAL",
+      "official_url": "https://thirdsphere.com/csp/",
+      "verified_utc": "2026-07-23T20:53:33Z",
+      "source_evidence_id": "third_sphere_seedstrap_official_20260723",
+      "published_value": "Up to $1 million investment with up to $2 million earmarked for a later round",
+      "published_timing": "Very fast decision; no deadline visible on the reviewed official page",
+      "selection_reason": "Closest verified fit for a fast climate-positive validation bridge",
+      "current_state": "INITIAL_PUBLIC_SAFE_OUTREACH_SENT_PRIVATE_APPLICATION_FACTS_OPEN",
+      "external_action_policy": "FOUNDER_ONLY_PORTAL_SUBMISSION",
+      "send_receipt_path": "grant_submissions/funding_sprint_20260709/THIRD_SPHERE_SEEDSTRAP_OUTREACH_SEND_STATE_2026-07-23.json",
+      "private_or_legal_gates": [
+        "legal entity details",
+        "runway and monthly burn",
+        "financing and cap-table facts",
+        "founder attestations",
+        "agreement to investment or program terms"
+      ],
+      "claim_boundary": "LumenCore is pre-revenue and pilot-stage; engagement receipts are not endorsements, awards, contracts, or customer results",
+      "safest_next_action": "Monitor the existing outreach thread. Founder supplies private facts, reviews final financing language, and submits through the official application route if directed"
+    },
+    {
+      "route_id": "aws_activate_founders",
+      "priority": 3,
+      "route_type": "COMPUTE_CREDIT",
+      "official_url": "https://aws.amazon.com/startups/credits/",
+      "verified_utc": "2026-07-23T20:53:33Z",
+      "source_evidence_id": "aws_activate_official_20260723",
+      "published_value": "$1,000 starter credit with selected participants eligible for up to $5,000",
+      "published_timing": "5-10 business-day review",
+      "selection_reason": "Useful self-funded-founder fallback but slower than Microsoft",
+      "current_state": "PRIOR_BENEFIT_AND_ACCOUNT_CHECK_REQUIRED",
+      "external_action_policy": "FOUNDER_ONLY_PORTAL_ACTION",
+      "private_or_legal_gates": [
+        "AWS Builder ID",
+        "paid-tier AWS account",
+        "startup and funding facts",
+        "prior Activate credit history",
+        "account-link and submission confirmation"
+      ],
+      "safest_next_action": "Founder verifies prior Activate eligibility and linked-account status before applying"
+    },
+    {
+      "route_id": "nvidia_inception",
+      "priority": 4,
+      "route_type": "ECOSYSTEM_AND_COMPUTE_OFFERS",
+      "official_url": "https://www.nvidia.com/en-us/startups/",
+      "verified_utc": "2026-07-23T20:53:33Z",
+      "source_evidence_id": "nvidia_inception_official_20260723",
+      "published_value": "Free membership with access to partner offers, possible cloud credits, and eligible investor exposure",
+      "published_timing": "No application fees, deadlines, or cohorts; no review time promised",
+      "selection_reason": "Good parallel ecosystem route after incorporation is confirmed",
+      "current_state": "INCORPORATION_FACTS_REQUIRED",
+      "external_action_policy": "FOUNDER_ONLY_PORTAL_SUBMISSION",
+      "private_or_legal_gates": [
+        "official incorporation",
+        "incorporation date",
+        "company and product facts",
+        "funding status",
+        "pitch deck"
+      ],
+      "claim_boundary": "Cloud credits and investor exposure are possible benefits, not guaranteed awards",
+      "safest_next_action": "Founder confirms incorporation facts and submits a current bounded pitch deck"
+    }
+  ],
+  "global_claim_boundary": "Do not claim revenue, a signed customer, field validation, independent validation, endorsement, award, contract, measured climate impact, or guaranteed funding without current source evidence.",
+  "global_action_boundary": "Ordinary public-safe outreach may proceed after a fresh recipient and duplicate check. Portal submissions, agreements, legal attestations, certifications, identity verification, payment information, and financial commitments require founder action."
+}

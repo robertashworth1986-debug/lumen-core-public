@@ -321,7 +321,12 @@ def build_payload() -> dict[str, Any]:
     gate_summary = gate.get("summary", {}) if isinstance(gate.get("summary"), dict) else {}
     manifest_summary = manifest.get("summary", {}) if isinstance(manifest.get("summary"), dict) else {}
 
-    reviewer_gate_clear = bool(gate.get("reviewer_gate_clear")) and int(gate_summary.get("unsafe_secret_count") or 0) == 0 and int(gate_summary.get("unsafe_claim_count") or 0) == 0
+    submission_argument_gate_clear = bool(gate.get("reviewer_gate_clear"))
+    reviewer_packaging_gate_clear = (
+        bool(gate_summary.get("packaging_checks_clear"))
+        and int(gate_summary.get("unsafe_secret_count") or 0) == 0
+        and int(gate_summary.get("unsafe_claim_count") or 0) == 0
+    )
     blocked_rows = [row for row in rows if str(row["status"]).startswith("BLOCKED")]
     ready_rows = [row for row in rows if str(row["status"]).startswith("READY")]
     all_human_gated = all(
@@ -348,7 +353,7 @@ def build_payload() -> dict[str, Any]:
         "generated_utc": now_utc(),
         "schema": "agency_account_activation_docket_v1",
         "status": "AGENCY_ACCOUNT_ACTIVATION_READY_HUMAN_PORTAL_REQUIRED"
-        if reviewer_gate_clear and all_human_gated
+        if reviewer_packaging_gate_clear and all_human_gated
         else "AGENCY_ACCOUNT_ACTIVATION_BLOCKED",
         "summary": {
             "activation_item_count": len(rows),
@@ -359,7 +364,8 @@ def build_payload() -> dict[str, Any]:
             "ready_readiness_count": readiness["ready_readiness_count"],
             "sam_portal_active_registration_observed": readiness["sam_portal_active_registration_observed"],
             "sam_expiration_date_observed": readiness["sam_expiration_date_observed"],
-            "reviewer_gate_clear": reviewer_gate_clear,
+            "reviewer_packaging_gate_clear": reviewer_packaging_gate_clear,
+            "submission_argument_gate_clear": submission_argument_gate_clear,
             "unsafe_secret_count": int(gate_summary.get("unsafe_secret_count") or 0),
             "unsafe_claim_count": int(gate_summary.get("unsafe_claim_count") or 0),
             "data_room_markdown_count": int(manifest_summary.get("manifested_markdown_count") or 0),
@@ -415,7 +421,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Blocked readiness flags: `{summary['blocked_readiness_count']}`",
         f"- SAM active registration observed in private capture: `{str(summary['sam_portal_active_registration_observed']).lower()}`",
         f"- SAM expiration date observed: `{summary['sam_expiration_date_observed']}`",
-        f"- Reviewer gate clear: `{str(summary['reviewer_gate_clear']).lower()}`",
+        f"- Reviewer packaging gate clear: `{str(summary['reviewer_packaging_gate_clear']).lower()}`",
+        f"- Submission argument gate clear: `{str(summary['submission_argument_gate_clear']).lower()}`",
         f"- Unsafe sensitive hits: `{summary['unsafe_secret_count']}`",
         f"- Unsafe claim hits: `{summary['unsafe_claim_count']}`",
         f"- Data-room Markdown artifacts: `{summary['data_room_markdown_count']}`",

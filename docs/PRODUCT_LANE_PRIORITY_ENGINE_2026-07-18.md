@@ -1,6 +1,6 @@
 # Product Lane Priority Engine
 
-Generated: `2026-07-18T06:48:29.081740+00:00`
+Generated: `2026-07-29T08:58:11.424285+00:00`
 
 > Product-lane priority engine. Scores are a transparent founder strategy heuristic, not market valuation, patentability, customer acceptance, award probability, field validation, or guaranteed revenue.
 
@@ -10,21 +10,21 @@ Build and sell **ProofLock Opportunity Operations** first. Use the **ProofLock E
 
 ## Ranked Lanes
 
-| Rank | Lane | Strategy score | Evidence present | First validation |
-|---:|---|---:|---:|---|
-| 1 | ProofLock Opportunity Operations | 89.60 | 100% | Run a paid 30-day design-partner pilot against the buyer's current grant workflow and lock the baseline before automation begins. |
-| 2 | ProofLock Evidence Router API | 83.25 | 100% | Rebuild router features from training windows only, add deterministic abstention, and evaluate prospectively against the best fixed family and a declared oracle boundary. |
-| 3 | Energy Forecast Validation Service | 75.60 | 100% | Secure one operator-approved dataset, baseline, holdout policy, and economic conversion factor before discussing dollar value. |
-| 4 | LumaScout A&R Intelligence | 67.00 | 100% | Pre-register a shortlist and measure forward artist outcomes against a transparent popularity baseline using licensed or permitted data. |
-| 5 | Guarded Market Research | 63.50 | 100% | Pass a prospective after-fee paper protocol with reconciliation and risk gates before any live-capital discussion. |
-| 6 | XR Comfort and Cue-Integrity Governor | 54.00 | 100% | Build a non-medical software-only prototype and run an ethics-reviewed human-factors study with established cybersickness and task-performance measures. |
+| Rank | Lane | Strategy score | Validated evidence | Buyer gate | First validation |
+|---:|---|---:|---:|---|---|
+| 1 | ProofLock Opportunity Operations | 89.60 | 100% | requires_external_buyer_validation | Run a paid 30-day design-partner pilot against the buyer's current grant workflow and lock the baseline before automation begins. |
+| 2 | ProofLock Evidence Router API | 83.25 | 100% | requires_external_buyer_validation | Rebuild router features from training windows only, add deterministic abstention, and evaluate prospectively against the best fixed family and a declared oracle boundary. |
+| 3 | Energy Forecast Validation Service | 75.60 | 100% | requires_external_buyer_validation | Complete the preregistered prospective sample gates, obtain an independent reproduction receipt, and secure one operator-approved dataset, incumbent baseline, holdout policy, and economic conversion before discussing performance or dollar value. |
+| 4 | LumaScout A&R Intelligence | 67.00 | 67% | blocked_internal_evidence | Pre-register a shortlist and measure forward artist outcomes against a transparent popularity baseline using licensed or permitted data. |
+| 5 | Guarded Market Research | 63.50 | 100% | requires_external_buyer_validation | Pass a prospective after-fee paper protocol with reconciliation and risk gates before any live-capital discussion. |
+| 6 | XR Comfort and Cue-Integrity Governor | 54.00 | 100% | requires_external_buyer_validation | Build a non-medical software-only prototype and run an ethics-reviewed human-factors study with established cybersickness and task-performance measures. |
 
 ## Evidence Audit
 
 - Best bounded exploratory run: `20260505T121657Z` with `673` datasets.
 - Latest-run blocker: Run 20260526T050639Z is blocked from comparative headline use because i_sarima has no valid RMSE on all 1,118 datasets while the scorecard still describes a classical comparison.
 - Router blocker: The historical meta-router extracts features from each full series, including the benchmark test window. Cross-dataset CV does not remove that within-series look-ahead. Rebuild features from each training window as train-only inputs before making prospective routing claims.
-- MindWise candidate feed: `fresh`; age `0.4` hours; freshness label allowed `true`; eligibility label allowed `false`.
+- Healthcare candidate feed: `fresh`; age `0.11` hours; freshness label allowed `true`; eligibility label allowed `false`.
 - Feed boundary: Freshness applies only to the candidate source feed. Relevance scores do not establish applicant eligibility, current requirements, submission readiness, or award probability.
 
 ## Commercial Wedge
@@ -33,19 +33,19 @@ The defensible target is not generic grant search or AI writing. It is a constra
 
 The first recurring product is an organization subscription for monitored opportunities, controlled collaboration, evidence storage, and preflight. Final certifications and submissions remain with the authorized human.
 
-## MindWise Pilot
+## Buyer-Neutral Pilot
 
-- Scope: Phase 1 uses opportunity, workflow, and synthetic/sample organization data only; no PHI.
-- Commercial posture: Paid design-partner pilot; credit the agreed pilot fee toward an annual subscription if acceptance gates pass.
-- Go/no-go: Convert only if the buyer confirms a measured workflow improvement and the evidence/eligibility error rate remains within the agreed threshold.
+- Scope: Opportunity, workflow, synthetic, sample, and buyer-authorized non-PHI organization data only. No credentials, final certifications, signatures, or autonomous submissions.
+- Commercial posture: Paid pilot after exact buyer scope, baseline, acceptance thresholds, data terms, price, and recipient are approved.
+- Go/no-go: Convert only when the frozen sample rule is met and the buyer confirms that every accepted metric passes its prospectively approved threshold. Otherwise stop, extend under a documented alternate sample rule, or abstain.
 
 Acceptance metrics:
-- **qualified opportunity precision**: buyer-approved qualified matches / reviewed matches
-- **time to pursue decision**: median elapsed time from discovery to documented decision
-- **time to reviewer-ready draft**: median elapsed time from pursue decision to internal review state
-- **preflight defect rate**: missing or contradictory required items per package at review
-- **deadline reliability**: packages reaching internal review by the buyer-set cutoff / pursued packages
-- **provenance completeness**: material claims with a traceable source / material claims reviewed
+- **qualified opportunity precision**: numerator = buyer-confirmed qualified matches; denominator = all candidate matches reviewed by the buyer
+- **time to pursue decision**: numerator = sum of elapsed hours from discovery to documented decision; denominator = opportunities receiving a documented pursue or no-pursue decision
+- **time to reviewer-ready draft**: numerator = sum of elapsed hours from pursue decision to buyer-defined internal review state; denominator = pursued packages reaching internal review
+- **preflight defect rate**: numerator = missing, contradictory, stale, or ownerless required items found at review; denominator = required package items inspected at review
+- **deadline reliability**: numerator = pursued packages reaching internal review by the frozen buyer cutoff; denominator = pursued packages with an open verified deadline
+- **provenance completeness**: numerator = material claims carrying a traceable reviewed source; denominator = material claims inspected
 
 ## Claim Gates
 
@@ -66,4 +66,4 @@ Blocked now:
 
 ## Receipt
 
-SHA-256: `380b3330e48562dd7d0bf2cc8fedc9afe6616e2a4a72dfa17a768b082bfb8b71`
+SHA-256: `c1b498c742ee03f7fd6ad15767f5459978a4825e58757dd4a0d731b7042019df`

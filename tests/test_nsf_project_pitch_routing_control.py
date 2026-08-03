@@ -10,6 +10,18 @@ MANIFEST = (
     ROOT
     / "grant_submissions"
     / "NSF_Project_Pitch"
+    / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-29.json"
+)
+SOURCE_AUDIT = (
+    ROOT
+    / "grant_submissions"
+    / "NSF_Project_Pitch"
+    / "NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-29.json"
+)
+HISTORICAL_MANIFEST = (
+    ROOT
+    / "grant_submissions"
+    / "NSF_Project_Pitch"
     / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json"
 )
 MIRROR_RECEIPT = (
@@ -45,7 +57,18 @@ def test_manifest_matches_deterministic_routing_control():
     assert actual == expected
 
 
-def test_listed_deadline_is_separate_from_current_access():
+def test_source_audit_matches_current_public_controls():
+    module = load_module()
+    expected = module.build_source_audit()
+    actual = json.loads(SOURCE_AUDIT.read_text(encoding="utf-8"))
+
+    module.validate_source_audit(actual)
+    assert actual == expected
+    assert actual["authenticated_portal_access_performed"] is False
+    assert actual["scope"] == "CURRENT_PUBLIC_OFFICIAL_SOURCES_ONLY"
+
+
+def test_past_deadline_is_separate_from_current_schedule_and_access():
     module = load_module()
     manifest = module.build_manifest()
     full = manifest["full_proposal"]
@@ -56,12 +79,17 @@ def test_listed_deadline_is_separate_from_current_access():
         "2027-03-04",
         "2027-07-07",
     ]
-    assert full["nearest_listed_deadline"] == "2026-07-27"
-    assert full["july_27_2026_currently_listed"] is True
-    assert full["july_27_2026_reachable"] is False
+    assert full["past_listed_deadlines"] == ["2026-07-27"]
+    assert full["future_listed_deadlines"] == [
+        "2026-11-04",
+        "2027-03-04",
+        "2027-07-07",
+    ]
+    assert full["next_listed_deadline"] == "2026-11-04"
+    assert full["next_listed_deadline_reachable"] is False
     assert full["invitation_verified"] is False
     assert full["submission_allowed"] is False
-    assert full["next_planning_target"] == "2026-11-04"
+    assert full["planning_target"] == "2026-11-04"
 
 
 def test_project_pitch_remains_rolling_and_human_gated():
@@ -70,11 +98,12 @@ def test_project_pitch_remains_rolling_and_human_gated():
 
     assert pitch["deadline"] is None
     assert pitch["typical_response_time"] == "1-2 months"
-    assert pitch["one_active_pitch_at_a_time"] is True
+    assert pitch["one_active_pitch_invitation_or_proposal_at_a_time"] is True
+    assert pitch["submission_allowed"] is False
     assert pitch["final_submit_allowed_without_human"] is False
 
 
-def test_bounded_mirror_receipt_matches_local_sources():
+def test_historical_bounded_mirror_receipt_remains_unchanged():
     receipt = json.loads(MIRROR_RECEIPT.read_text(encoding="utf-8-sig"))
 
     assert receipt["schema"] == "lumencore.bounded_mirror_receipt.v1"
@@ -83,9 +112,12 @@ def test_bounded_mirror_receipt_matches_local_sources():
     assert receipt["browser_navigation_performed"] is False
     assert receipt["private_founder_values_mirrored"] is False
 
-    for artifact in receipt["artifacts"]:
-        source = ROOT / artifact["source"]
-        assert source.is_file(), artifact["source"]
-        assert source.stat().st_size == artifact["bytes"], artifact["source"]
-        assert sha256_file(source) == artifact["sha256"], artifact["source"]
-        assert artifact["copy_sha256_matched"] is True
+    assert HISTORICAL_MANIFEST.is_file()
+    builder_receipt = next(
+        artifact
+        for artifact in receipt["artifacts"]
+        if artifact["source"]
+        == "code/ops/BUILD_NSF_PROJECT_PITCH_ROUTING_CONTROL.py"
+    )
+    assert builder_receipt["copy_sha256_matched"] is True
+    assert sha256_file(SCRIPT) != builder_receipt["sha256"]

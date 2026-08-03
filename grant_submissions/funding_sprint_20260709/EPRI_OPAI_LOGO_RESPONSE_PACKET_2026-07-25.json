@@ -1,0 +1,174 @@
+{
+  "action_gates": {
+    "email_access_performed": true,
+    "email_draft_created": false,
+    "email_sent": true,
+    "exact_action_time_approval_required": false,
+    "external_action_performed": true,
+    "external_send_allowed_without_action_time_approval": false,
+    "fresh_full_thread_check_required": false,
+    "invitation_accepted": false,
+    "meeting_credentials_used": false
+  },
+  "assets": [
+    {
+      "blockers": [],
+      "exact_dimensions_valid": true,
+      "exists": true,
+      "expected_height": 1024,
+      "expected_width": 1024,
+      "file_bytes": 105408,
+      "filename": "lumencore_logo_on_dark_1024.png",
+      "height": 1024,
+      "ihdr_present": true,
+      "intended_background": "dark",
+      "path": "dashboard/brand/lumencore_logo_on_dark_1024.png",
+      "png_signature_hex": "89504e470d0a1a0a",
+      "png_signature_valid": true,
+      "ready": true,
+      "role": "dark_background_logo",
+      "sha256": "2829e259a38f1d3914f80a6a688f13ce0d80513278fccf869d47ff77d270a62c",
+      "width": 1024
+    },
+    {
+      "blockers": [],
+      "exact_dimensions_valid": true,
+      "exists": true,
+      "expected_height": 1024,
+      "expected_width": 1024,
+      "file_bytes": 105988,
+      "filename": "lumencore_logo_on_light_1024.png",
+      "height": 1024,
+      "ihdr_present": true,
+      "intended_background": "light",
+      "path": "dashboard/brand/lumencore_logo_on_light_1024.png",
+      "png_signature_hex": "89504e470d0a1a0a",
+      "png_signature_valid": true,
+      "ready": true,
+      "role": "light_background_logo",
+      "sha256": "7b14dcf7bb72c78eac7f73f6c0da76e229cb8329040160fcc9fcff4d3d2fe5e5",
+      "width": 1024
+    }
+  ],
+  "attachment_control": {
+    "additional_attachments_allowed": false,
+    "attachment_allowlist": [
+      "dashboard/brand/lumencore_logo_on_dark_1024.png",
+      "dashboard/brand/lumencore_logo_on_light_1024.png"
+    ],
+    "attachment_count": 2,
+    "explicit_request_recorded": true,
+    "only_allowed_attachments": "The two verified canonical LumenCore PNG logo files."
+  },
+  "bounded_reply": {
+    "body": "Hello Open Power AI team,\n\nAttached are only the materials explicitly requested in your message: the canonical LumenCore PNG logo pair for dark and light backgrounds\n\nAttachment inventory: lumencore_logo_on_dark_1024.png (dark-background PNG, 1024x1024); lumencore_logo_on_light_1024.png (light-background PNG, 1024x1024)\n\nPermitted use: [[CONFIRM EXACT PERMITTED-USE BOUNDARY FROM FRESH FULL-THREAD CHECK]]\n\nThese materials do not imply endorsement, independent validation, licensing beyond the stated use, an award, or a performance claim. Please let me know if you need a different file format or dimensions.\n\nBest regards,\nRobert Ashworth\nFounder\nLumenCore",
+    "recipient_addresses_embedded": false,
+    "render_status": "HISTORICAL_PRE_SEND_COPY_SUPERSEDED_BY_SEND_RECEIPT",
+    "routing_values_embedded": false,
+    "send_or_draft_performed": true,
+    "subject": "Re: [EXTERNAL] LumenCore Open Power AI onboarding follow-up",
+    "template_id": "REQUESTED_ASSET_DELIVERY_REPLY"
+  },
+  "claim_boundary": "This receipt establishes only that one bounded EPRI Open Power AI logo reply was sent once and observed in Gmail SENT with the two allowlisted PNG files. It does not prove delivery, publication, endorsement, technical validation, funding, licensing beyond the recorded use, deployment, or award.",
+  "duplicate_send_decision": {
+    "decision": "BLOCK_SEND_ALREADY_SENT_ONCE",
+    "do_not_repeat": [
+      "primary contact facts",
+      "work-group representative facts",
+      "logo permission answer"
+    ],
+    "fresh_full_thread_check_required": false,
+    "recorded_logo_files_sent": true
+  },
+  "evidence_checks": {
+    "lane_matches": true,
+    "light_and_dark_png_logos_explicitly_requested": true,
+    "logo_files_recorded_unsent": true,
+    "logo_permission_response_already_sent": true,
+    "primary_contact_response_already_sent": true,
+    "prior_full_thread_read_recorded": true,
+    "prior_thread_not_truncated": true,
+    "reconciliation_logo_files_recorded_unsent": true,
+    "reconciliation_state_matches": true,
+    "template_selection_matches": true,
+    "work_group_response_already_sent": true
+  },
+  "generated_utc": "2026-07-29T19:48:55.595904Z",
+  "lane_id": "epri_open_power_ai_mou",
+  "missing_facts": [],
+  "organization": "EPRI Open Power AI Consortium",
+  "packet_hash_scope": "SHA-256 of canonical JSON with packet_sha256 omitted.",
+  "packet_sha256": "e6daa1f5f9ea8eee001e367032448493defb27bb89e6cf75778ae1fce23bbd29",
+  "prior_response_state": {
+    "logo_files_sent_in_recorded_state": true,
+    "logo_permission_sent": true,
+    "onboarding_response_sent_utc": "2026-07-24T17:36:35Z",
+    "primary_contact_sent": true,
+    "repeat_prior_answers_in_reply": false,
+    "work_group_representatives_sent": true
+  },
+  "safest_next_action": "Do not resend the logo pair. Monitor the existing EPRI Open Power AI thread for acceptance, a formatting request, or a substantive consortium contribution request.",
+  "schema": "lumencore.epri_opai_logo_response_packet.v1",
+  "send_status_checks": {
+    "attachment_count_matches": true,
+    "attachment_hashes_match": true,
+    "bcc_absent": true,
+    "duplicate_send_prohibited": true,
+    "gmail_identifiers_omitted": true,
+    "lane_matches": true,
+    "one_matching_sent_copy": true,
+    "post_send_copy_verified": true,
+    "recipient_addresses_omitted": true,
+    "schema_matches": true,
+    "single_send_only": true,
+    "status_is_sent_once": true
+  },
+  "source_evidence": {
+    "email_action_reconciliation": {
+      "file_bytes": 47425,
+      "path": "grant_submissions/funding_sprint_20260709/EMAIL_ACTION_RECONCILIATION_2026-07-18.json",
+      "sha256": "573dbf74ff3699173654deabc71b88e4a1f6a521cef24bdaee1a6eee14b032bd"
+    },
+    "official_inbound_status_event_register": {
+      "file_bytes": 23069,
+      "path": "grant_submissions/funding_sprint_20260709/OFFICIAL_INBOUND_STATUS_EVENT_REGISTER_2026-07-25.json",
+      "sha256": "320e8a6351c27a0a395dacde7bbc1fe32d1aceeb8e8a7596c77aeca485f39a6a"
+    },
+    "outreach_response_template_registry": {
+      "file_bytes": 44664,
+      "path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
+      "sha256": "08689c993f98cb6ee19b25023a7f8d39ad2be25c9e6450c9364a0dac9ed41df4"
+    },
+    "public_identity_authority": {
+      "file_bytes": 9153,
+      "path": "docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md",
+      "sha256": "b7c5761b591588d7b97201a6aff2b62dff9de6ed87fd286bb10999bf0631ec1c"
+    },
+    "send_status": {
+      "file_bytes": 2554,
+      "path": "grant_submissions/funding_sprint_20260709/EPRI_OPAI_LOGO_RESPONSE_SEND_STATUS_2026-07-29.json",
+      "sha256": "245c4d20dfbc8a51ae921e17ad88ce0431e07ba3572aa31764c3a7aa2e22ff2a"
+    }
+  },
+  "status": "LOGO_PAIR_SENT_ONCE_POST_SEND_VERIFIED_DO_NOT_RESEND",
+  "summary": {
+    "asset_count": 2,
+    "builder_checks_pass": true,
+    "logo_pair_sent_verified": true,
+    "only_recorded_remaining_deliverable": "None. The requested canonical logo pair was sent once.",
+    "prior_contact_work_group_and_permission_response_sent": true,
+    "ready_asset_count": 2,
+    "send_authorized": false
+  },
+  "template_match": {
+    "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+    "expected_template_id": "REQUESTED_ASSET_DELIVERY_REPLY",
+    "match_status": "MATCHED",
+    "matching_template_exists": true,
+    "private_render_only": true,
+    "requested_template_id": "REQUESTED_ASSET_DELIVERY_REPLY",
+    "routing_values_embedded": false,
+    "send_policy": "REPLY_AFTER_FACT_REVIEW",
+    "template_gap": null
+  }
+}

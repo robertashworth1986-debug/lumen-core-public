@@ -1,0 +1,229 @@
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"LumenCore","textShapes":7}
+{"kind":"textbox","id":"sh/i1w3yp8f","slide":1,"text":"LumenCore","textPreview":"LumenCore","textChars":9,"textLines":1,"bbox":[42,62,620,86]}
+{"kind":"textbox","id":"sh/547294r6","slide":1,"text":"Proof-to-pilot infrastructure for credible AI validation","textPreview":"Proof-to-pilot infrastructure for credible AI validation","textChars":56,"textLines":1,"bbox":[42,164,780,44]}
+{"kind":"shape","id":"sh/k3yl0zql","slide":1,"bbox":[828,68,370,430]}
+{"kind":"textbox","id":"sh/7qp4be9c","slide":1,"text":"Built for reviewers who need evidence they can inspect, not claims they have to decode.","textPreview":"Built for reviewers who need evidence they can inspect, not claims they have to decode.","textChars":87,"textLines":1,"bbox":[864,112,295,172]}
+{"kind":"shape","id":"sh/65g3298r","slide":1,"bbox":[864,330,110,2]}
+{"kind":"textbox","id":"sh/ts7md4r2","slide":1,"text":"Send-safe pitch deck\nJuly 9, 2026","textPreview":"Send-safe pitch deck | July 9, 2026","textChars":33,"textLines":2,"bbox":[864,360,260,74]}
+{"kind":"textbox","id":"sh/sryl4zqx","slide":1,"text":"Current status: proof stack is reviewer-gated, human-controlled, and ready for a credibility sprint.","textPreview":"Current status: proof stack is reviewer-gated, human-controlled, and ready for a credibility sprint.","textChars":100,"textLines":1,"bbox":[42,548,850,62]}
+{"kind":"textbox","id":"sh/fu94fe98","slide":1,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/utg3698n","slide":1,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/y90nupkv","slide":1,"text":""}
+{"kind":"slide","id":"sl/hwbqtkby","slide":2,"title":"Reviewers cannot fund what they cannot verify","textShapes":13}
+{"kind":"textbox","id":"sh/mxgjm5s7","slide":2,"text":"Reviewers cannot fund what they cannot verify","textPreview":"Reviewers cannot fund what they cannot verify","textChars":45,"textLines":1,"bbox":[42,40,1020,82]}
+{"kind":"textbox","id":"sh/9072xkry","slide":2,"text":"The bottleneck is credibility, not imagination.","textPreview":"The bottleneck is credibility, not imagination.","textChars":47,"textLines":1,"bbox":[42,124,820,30]}
+{"kind":"shape","id":"sh/ozy1ofad","slide":2,"bbox":[42,166,1196,2]}
+{"kind":"textbox","id":"sh/b29kza94","slide":2,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/a10jqpsj","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"shape","id":"sh/x4r21kru","slide":2,"bbox":[42,212,358,280]}
+{"kind":"textbox","id":"sh/w3i1sfa9","slide":2,"text":"Claims move faster than evidence","textPreview":"Claims move faster than evidence","textChars":32,"textLines":1,"bbox":[64,230,314,36]}
+{"kind":"textbox","id":"sh/r65knqtk","slide":2,"text":"Advanced AI and R&D stories often arrive without source provenance, replayable results, or clear claim boundaries.","textPreview":"Advanced AI and R&D stories often arrive without source provenance, replayable results, or clear claim boundaries.","textChars":114,"textLines":1,"bbox":[64,276,314,198]}
+{"kind":"shape","id":"sh/q5wjelsz","slide":2,"bbox":[461,212,358,280]}
+{"kind":"textbox","id":"sh/ove9o7yd","slide":2,"text":"Review work is scattered","textPreview":"Review work is scattered","textChars":24,"textLines":1,"bbox":[483,230,314,36]}
+{"kind":"textbox","id":"sh/9wnqhczy","slide":2,"text":"A technical reviewer has to chase data, baselines, metrics, risks, portal status, and IP boundaries across too many files.","textPreview":"A technical reviewer has to chase data, baselines, metrics, risks, portal status, and IP boundaries across too many files.","textChars":122,"textLines":1,"bbox":[483,276,314,198]}
+{"kind":"shape","id":"sh/mtwrmxg7","slide":2,"bbox":[880,212,358,280]}
+{"kind":"textbox","id":"sh/nu58f2hs","slide":2,"text":"Terms can move too early","textPreview":"Terms can move too early","textChars":24,"textLines":1,"bbox":[902,230,314,36]}
+{"kind":"textbox","id":"sh/wjy9sry9","slide":2,"text":"Studios and investors may ask for equity before deliverables, cash burden, ownership, and validation milestones are written.","textPreview":"Studios and investors may ask for equity before deliverables, cash burden, ownership, and validation milestones are written.","textChars":124,"textLines":1,"bbox":[902,276,314,198]}
+{"kind":"textbox","id":"sh/xk7qlczu","slide":2,"text":"Luma's job is to make the next serious decision easier, faster, and safer.","textPreview":"Luma's job is to make the next serious decision easier, faster, and safer.","textChars":74,"textLines":1,"bbox":[42,548,870,42]}
+{"kind":"textbox","id":"sh/ahwrqhgj","slide":2,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/bip8jmho","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/hwbqtkby","slide":2,"text":""}
+{"kind":"slide","id":"sl/ofy9wn61","slide":3,"title":"LumenCore turns technical claims into decision-ready proof","textShapes":15}
+{"kind":"textbox","id":"sh/by1svqlc","slide":3,"text":"LumenCore turns technical claims into decision-ready proof","textPreview":"LumenCore turns technical claims into decision-ready proof","textChars":58,"textLines":1,"bbox":[42,40,1020,82]}
+{"kind":"textbox","id":"sh/cza94vmx","slide":3,"text":"The product is the evidence system around complex R&D.","textPreview":"The product is the evidence system around complex R&D.","textChars":54,"textLines":1,"bbox":[42,124,820,30]}
+{"kind":"shape","id":"sh/d0jax03i","slide":3,"bbox":[42,166,1196,2]}
+{"kind":"textbox","id":"sh/298ryl4v","slide":3,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/3ah8rqlg","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"shape","id":"sh/obq90bml","slide":3,"bbox":[42,214,270,250]}
+{"kind":"textbox","id":"sh/pcjqtg36","slide":3,"text":"Source validation","textPreview":"Source validation","textChars":17,"textLines":1,"bbox":[64,232,226,36]}
+{"kind":"textbox","id":"sh/m5cra54z","slide":3,"text":"Live-source registry, current measurement status, refresh gaps, and public-safe source boundaries.","textPreview":"Live-source registry, current measurement status, refresh gaps, and public-safe source boundaries.","textChars":98,"textLines":1,"bbox":[64,278,226,168]}
+{"kind":"shape","id":"sh/n6ls3alk","slide":3,"bbox":[342,214,270,250]}
+{"kind":"textbox","id":"sh/n2l4fq98","slide":3,"text":"Replay receipts","textPreview":"Replay receipts","textChars":15,"textLines":1,"bbox":[364,232,226,36]}
+{"kind":"textbox","id":"sh/m1c3mlsn","slide":3,"text":"Baseline-vs-candidate runs, holdout windows, metrics, failure slots, and SHA-256 receipts.","textPreview":"Baseline-vs-candidate runs, holdout windows, metrics, failure slots, and SHA-256 receipts.","textChars":90,"textLines":1,"bbox":[364,278,226,168]}
+{"kind":"shape","id":"sh/943mhgre","slide":3,"bbox":[642,214,270,250]}
+{"kind":"textbox","id":"sh/83ulovat","slide":3,"text":"Reviewer packets","textPreview":"Reviewer packets","textChars":16,"textLines":1,"bbox":[664,232,226,36]}
+{"kind":"textbox","id":"sh/v6l4jq94","slide":3,"text":"Decision brief, diligence Q&A, commercialization path, agency protocol, and data-room manifest.","textPreview":"Decision brief, diligence Q&A, commercialization path, agency protocol, and data-room manifest.","textChars":95,"textLines":1,"bbox":[664,278,226,168]}
+{"kind":"shape","id":"sh/a5c3ql8z","slide":3,"bbox":[942,214,270,250]}
+{"kind":"textbox","id":"sh/x8nml0ra","slide":3,"text":"Human gates","textPreview":"Human gates","textChars":11,"textLines":1,"bbox":[964,232,226,36]}
+{"kind":"textbox","id":"sh/w7ulsvqp","slide":3,"text":"No sends, submissions, price commitments, equity acceptance, IP actions, or file sharing without approval.","textPreview":"No sends, submissions, price commitments, equity acceptance, IP actions, or file sharing without approval.","textChars":106,"textLines":1,"bbox":[964,278,226,168]}
+{"kind":"textbox","id":"sh/ja54na9g","slide":3,"text":"The output is a cleaner yes, no, or next validation step.","textPreview":"The output is a cleaner yes, no, or next validation step.","textChars":57,"textLines":1,"bbox":[42,536,780,42]}
+{"kind":"textbox","id":"sh/i9w3u58v","slide":3,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/e10f2twf","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/ofy9wn61","slide":3,"text":""}
+{"kind":"slide","id":"sl/jyx0ra1s","slide":4,"title":"The first product is a paid credibility sprint","textShapes":13}
+{"kind":"textbox","id":"sh/e9sj2tsv","slide":4,"text":"The first product is a paid credibility sprint","textPreview":"The first product is a paid credibility sprint","textChars":46,"textLines":1,"bbox":[42,40,1020,82]}
+{"kind":"textbox","id":"sh/1cj2d8b6","slide":4,"text":"A practical entry point before big dilution or broad promises.","textPreview":"A practical entry point before big dilution or broad promises.","textChars":62,"textLines":1,"bbox":[42,124,820,30]}
+{"kind":"shape","id":"sh/0ba143al","slide":4,"bbox":[42,166,1196,2]}
+{"kind":"textbox","id":"sh/rm1k7yt4","slide":4,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/ql8jytsj","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"shape","id":"sh/doj29oba","slide":4,"bbox":[42,214,360,244]}
+{"kind":"textbox","id":"sh/sna103ap","slide":4,"text":"Reviewer proof sprint","textPreview":"Reviewer proof sprint","textChars":21,"textLines":1,"bbox":[64,232,316,36]}
+{"kind":"textbox","id":"sh/3ihk3et8","slide":4,"text":"5-10 business days\nProof-card index, source register, decision brief, reviewer Q&A, and claim-boundary map.","textPreview":"5-10 business days | Proof-card index, source register, decision brief, reviewer Q&A, and claim-boundary map.","textChars":107,"textLines":2,"bbox":[64,278,316,162]}
+{"kind":"shape","id":"sh/ih8ju9sn","slide":4,"bbox":[460,214,360,244]}
+{"kind":"textbox","id":"sh/kbm987y5","slide":4,"text":"Replay-scope package","textPreview":"Replay-scope package","textChars":20,"textLines":1,"bbox":[482,232,316,36]}
+{"kind":"textbox","id":"sh/5cva1cfq","slide":4,"text":"10-20 business days\nBaseline, metric, holdout window, data boundary, receipt schema, and dry-run report.","textPreview":"10-20 business days | Baseline, metric, holdout window, data boundary, receipt schema, and dry-run report.","textChars":104,"textLines":2,"bbox":[482,278,316,162]}
+{"kind":"shape","id":"sh/i94r6xgz","slide":4,"bbox":[878,214,360,244]}
+{"kind":"textbox","id":"sh/jadsz2xk","slide":4,"text":"Field-validation pilot","textPreview":"Field-validation pilot","textChars":22,"textLines":1,"bbox":[900,232,316,36]}
+{"kind":"textbox","id":"sh/w72947yt","slide":4,"text":"Sector owner supplies real loss context. Luma locks the baseline and shows whether the replay can reduce the loss.","textPreview":"Sector owner supplies real loss context. Luma locks the baseline and shows whether the replay can reduce the loss.","textChars":114,"textLines":1,"bbox":[900,278,316,162]}
+{"kind":"textbox","id":"sh/x8vaxsfe","slide":4,"text":"First money motion: paid proof or replay-scope sprint. Expansion: field validation pilots, agency submission support, and recurring proof portal access.","textPreview":"First money motion: paid proof or replay-scope sprint. Expansion: field validation pilots, agency submission support, and recurring proof...","textChars":152,"textLines":1,"bbox":[42,530,1100,60]}
+{"kind":"textbox","id":"sh/a5kr2xg3","slide":4,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/v6tsv2xo","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/jyx0ra1s","slide":4,"text":""}
+{"kind":"slide","id":"sl/i107q5of","slide":5,"title":"The proof stack is already measurable and gated","textShapes":23}
+{"kind":"textbox","id":"sh/qd0bahob","slide":5,"text":"The proof stack is already measurable and gated","textPreview":"The proof stack is already measurable and gated","textChars":47,"textLines":1,"bbox":[42,40,1020,82]}
+{"kind":"textbox","id":"sh/dgbulwnm","slide":5,"text":"Current packet evidence is stronger than a concept deck.","textPreview":"Current packet evidence is stronger than a concept deck.","textChars":56,"textLines":1,"bbox":[42,124,820,30]}
+{"kind":"shape","id":"sh/cf2tcr61","slide":5,"bbox":[42,166,1196,2]}
+{"kind":"textbox","id":"sh/z2tcnm5s","slide":5,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/yhkbe1o7","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"shape","id":"sh/l4bupwny","slide":5,"bbox":[42,220,180,130]}
+{"kind":"textbox","id":"sh/032tgr6d","slide":5,"text":"29","textPreview":"29","textChars":2,"textLines":1,"bbox":[64,242,136,54]}
+{"kind":"textbox","id":"sh/n6dcr65o","slide":5,"text":"registry-enabled sources","textPreview":"registry-enabled sources","textChars":24,"textLines":1,"bbox":[64,302,136,38]}
+{"kind":"shape","id":"sh/m5kbi1oj","slide":5,"bbox":[242,220,180,130]}
+{"kind":"textbox","id":"sh/w32dkbuh","slide":5,"text":"25","textPreview":"25","textChars":2,"textLines":1,"bbox":[264,242,136,54]}
+{"kind":"textbox","id":"sh/x4vedgvm","slide":5,"text":"measured registry sources","textPreview":"measured registry sources","textChars":25,"textLines":1,"bbox":[264,302,136,38]}
+{"kind":"shape","id":"sh/ahkvi1cb","slide":5,"bbox":[442,220,220,130]}
+{"kind":"textbox","id":"sh/v2twb6dw","slide":5,"text":"23","textPreview":"23","textChars":2,"textLines":1,"bbox":[464,242,176,54]}
+{"kind":"textbox","id":"sh/k7mxovud","slide":5,"text":"current hash-backed measured rows","textPreview":"current hash-backed measured rows","textChars":33,"textLines":1,"bbox":[464,302,176,38]}
+{"kind":"shape","id":"sh/58vehgvy","slide":5,"bbox":[688,220,210,130]}
+{"kind":"textbox","id":"sh/i54fmlc7","slide":5,"text":"35","textPreview":"35","textChars":2,"textLines":1,"bbox":[710,242,166,54]}
+{"kind":"textbox","id":"sh/j6dwfqds","slide":5,"text":"reviewer Markdown artifacts","textPreview":"reviewer Markdown artifacts","textChars":27,"textLines":1,"bbox":[710,302,166,38]}
+{"kind":"shape","id":"sh/sb6xsvu9","slide":5,"bbox":[918,220,210,130]}
+{"kind":"textbox","id":"sh/tcfel0vu","slide":5,"text":"34","textPreview":"34","textChars":2,"textLines":1,"bbox":[940,242,166,54]}
+{"kind":"textbox","id":"sh/hgrmpwj2","slide":5,"text":"machine control receipts","textPreview":"machine control receipts","textChars":24,"textLines":1,"bbox":[940,302,166,38]}
+{"kind":"shape","id":"sh/gfi5grih","slide":5,"bbox":[42,408,180,130]}
+{"kind":"textbox","id":"sh/fe94nm1w","slide":5,"text":"0","textPreview":"0","textChars":1,"textLines":1,"bbox":[64,430,136,54]}
+{"kind":"textbox","id":"sh/ud0ne10b","slide":5,"text":"unsafe sensitive or claim hits","textPreview":"unsafe sensitive or claim hits","textChars":30,"textLines":1,"bbox":[64,490,136,38]}
+{"kind":"shape","id":"sh/pkr6tgjy","slide":5,"bbox":[242,408,596,130]}
+{"kind":"textbox","id":"sh/4ji5kbid","slide":5,"text":"Why this matters","textPreview":"Why this matters","textChars":16,"textLines":1,"bbox":[264,426,552,36]}
+{"kind":"textbox","id":"sh/3i94r61s","slide":5,"text":"The deck is backed by a data-room manifest, reviewer gate, commercialization packet, and venture-studio terms guardrail. It is not just narrative.","textPreview":"The deck is backed by a data-room manifest, reviewer gate, commercialization packet, and venture-studio terms guardrail. It is not just n...","textChars":146,"textLines":1,"bbox":[264,472,552,48]}
+{"kind":"shape","id":"sh/2h0ni107","slide":5,"bbox":[868,408,370,130]}
+{"kind":"textbox","id":"sh/5o7mhcju","slide":5,"text":"Boundary","textPreview":"Boundary","textChars":8,"textLines":1,"bbox":[890,426,326,36]}
+{"kind":"textbox","id":"sh/kny587i9","slide":5,"text":"These are proof-stack readiness metrics. They are not agency approval, investment, field validation, realized savings, or accepted terms.","textPreview":"These are proof-stack readiness metrics. They are not agency approval, investment, field validation, realized savings, or accepted terms.","textChars":137,"textLines":1,"bbox":[890,472,326,48]}
+{"kind":"textbox","id":"sh/atcjidg7","slide":5,"text":"Source: LumenCore funding sprint data-room manifest and measured-source register generated July 9, 2026.","textPreview":"Source: LumenCore funding sprint data-room manifest and measured-source register generated July 9, 2026.","textChars":104,"textLines":1,"bbox":[42,650,1020,24]}
+{"kind":"textbox","id":"sh/vu5kbihc","slide":5,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/wve1knyx","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/i107q5of","slide":5,"text":""}
+{"kind":"slide","id":"sl/x8f69ofe","slide":6,"title":"The first customer is the technical decision-maker","textShapes":13}
+{"kind":"textbox","id":"sh/lkrqp4ra","slide":6,"text":"The first customer is the technical decision-maker","textPreview":"The first customer is the technical decision-maker","textChars":50,"textLines":1,"bbox":[42,40,1020,82]}
+{"kind":"textbox","id":"sh/yhg7epsj","slide":6,"text":"The buyer is the person who must trust evidence before funding or piloting.","textPreview":"The buyer is the person who must trust evidence before funding or piloting.","textChars":75,"textLines":1,"bbox":[42,124,820,30]}
+{"kind":"shape","id":"sh/zi98nu94","slide":6,"bbox":[42,166,1196,2]}
+{"kind":"textbox","id":"sh/87ipkzal","slide":6,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/98rqt4r6","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"shape","id":"sh/ml07i9sv","slide":6,"bbox":[42,214,360,220]}
+{"kind":"textbox","id":"sh/7m98ru9g","slide":6,"text":"Agency or SBIR reviewer","textPreview":"Agency or SBIR reviewer","textChars":23,"textLines":1,"bbox":[64,232,316,36]}
+{"kind":"textbox","id":"sh/oryp8fah","slide":6,"text":"Needs official-source fit, source-backed proof, and human authority gates before submission or routing.","textPreview":"Needs official-source fit, source-backed proof, and human authority gates before submission or routing.","textChars":103,"textLines":1,"bbox":[64,278,316,138]}
+{"kind":"shape","id":"sh/pc76hkr2","slide":6,"bbox":[460,214,360,220]}
+{"kind":"textbox","id":"sh/h4bupgn6","slide":6,"text":"Validation owner","textPreview":"Validation owner","textChars":16,"textLines":1,"bbox":[482,232,316,36]}
+{"kind":"textbox","id":"sh/w32twb6l","slide":6,"text":"Needs a repeatable receipt: data boundary, baseline, metric, holdout window, and replay path.","textPreview":"Needs a repeatable receipt: data boundary, baseline, metric, holdout window, and replay path.","textChars":93,"textLines":1,"bbox":[482,278,316,138]}
+{"kind":"shape","id":"sh/v2tcn650","slide":6,"bbox":[878,214,360,220]}
+{"kind":"textbox","id":"sh/u1kbu1ov","slide":6,"text":"Venture builder or investor","textPreview":"Venture builder or investor","textChars":27,"textLines":1,"bbox":[900,232,316,36]}
+{"kind":"textbox","id":"sh/5svutgni","slide":6,"text":"Needs a clean business model, first paid offer, diligence room, and no unsupported claims.","textPreview":"Needs a clean business model, first paid offer, diligence room, and no unsupported claims.","textChars":90,"textLines":1,"bbox":[900,278,316,138]}
+{"kind":"shape","id":"sh/47mt0b6x","slide":6,"bbox":[42,486,1196,86]}
+{"kind":"textbox","id":"sh/j6dcr65c","slide":6,"text":"Customer definition: serious reviewers who need inspectable proof before they spend money, issue invitations, or sponsor pilots.","textPreview":"Customer definition: serious reviewers who need inspectable proof before they spend money, issue invitations, or sponsor pilots.","textChars":128,"textLines":1,"bbox":[74,506,1040,46]}
+{"kind":"textbox","id":"sh/i54bylor","slide":6,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/twfux0ne","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/x8f69ofe","slide":6,"text":""}
+{"kind":"slide","id":"sl/gnmp4jqx","slide":7,"title":"Agent workspaces prove the market","textShapes":13}
+{"kind":"textbox","id":"sh/batcbq94","slide":7,"text":"Agent workspaces prove the market","textPreview":"Agent workspaces prove the market","textChars":33,"textLines":1,"bbox":[42,40,1020,82]}
+{"kind":"textbox","id":"sh/cb2tkvap","slide":7,"text":"Luma's wedge is validation, credibility, and proof-to-pilot packaging.","textPreview":"Luma's wedge is validation, credibility, and proof-to-pilot packaging.","textChars":70,"textLines":1,"bbox":[42,124,820,30]}
+{"kind":"shape","id":"sh/dcbud0ra","slide":7,"bbox":[42,166,1196,2]}
+{"kind":"textbox","id":"sh/ydkbm5sv","slide":7,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/zedcfa9g","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"shape","id":"sh/kzmdova1","slide":7,"bbox":[42,214,360,250]}
+{"kind":"textbox","id":"sh/l0vuh0rm","slide":7,"text":"Genspark signal","textPreview":"Genspark signal","textChars":15,"textLines":1,"bbox":[64,232,316,36]}
+{"kind":"textbox","id":"sh/eh0ba1sr","slide":7,"text":"General AI workspaces are training buyers to expect agents that create useful business outputs, not only chat responses.","textPreview":"General AI workspaces are training buyers to expect agents that create useful business outputs, not only chat responses.","textChars":120,"textLines":1,"bbox":[64,278,316,168]}
+{"kind":"shape","id":"sh/fi9c369c","slide":7,"bbox":[460,214,360,250]}
+{"kind":"textbox","id":"sh/baxkjqlk","slide":7,"text":"Luma wedge","textPreview":"Luma wedge","textChars":10,"textLines":1,"bbox":[482,232,316,36]}
+{"kind":"textbox","id":"sh/a9ojq5kz","slide":7,"text":"Luma focuses on proof-to-pilot work: evidence, replay receipts, source validation, reviewer packets, and funding readiness.","textPreview":"Luma focuses on proof-to-pilot work: evidence, replay receipts, source validation, reviewer packets, and funding readiness.","textChars":123,"textLines":1,"bbox":[482,278,316,168]}
+{"kind":"shape","id":"sh/xcz2l03q","slide":7,"bbox":[878,214,360,250]}
+{"kind":"textbox","id":"sh/cbq1sv25","slide":7,"text":"YC benchmark","textPreview":"YC benchmark","textChars":12,"textLines":1,"bbox":[900,232,316,36]}
+{"kind":"textbox","id":"sh/n6x0fqlo","slide":7,"text":"YC is a dilution and credibility benchmark. Any studio asking 20% must justify value beyond cash, brand, network, and speed.","textPreview":"YC is a dilution and credibility benchmark. Any studio asking 20% must justify value beyond cash, brand, network, and speed.","textChars":124,"textLines":1,"bbox":[900,278,316,168]}
+{"kind":"textbox","id":"sh/25ojml43","slide":7,"text":"Sources: genspark.ai, genspark.ai/business, openai.com/index/genspark, ycombinator.com/deal, ycombinator.com/apply.","textPreview":"Sources: genspark.ai, genspark.ai/business, openai.com/index/genspark, ycombinator.com/deal, ycombinator.com/apply.","textChars":115,"textLines":1,"bbox":[42,650,1020,24]}
+{"kind":"textbox","id":"sh/p8fih03e","slide":7,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/o761ov2t","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/gnmp4jqx","slide":7,"text":""}
+{"kind":"slide","id":"sl/fu1gfa1s","slide":8,"title":"Funding path combines non-dilutive and venture routes","textShapes":17}
+{"kind":"textbox","id":"sh/elkf2pg7","slide":8,"text":"Funding path combines non-dilutive and venture routes","textPreview":"Funding path combines non-dilutive and venture routes","textChars":53,"textLines":1,"bbox":[42,40,1020,82]}
+{"kind":"textbox","id":"sh/18byd4zy","slide":8,"text":"The near-term plan is traction, not a single all-or-nothing bet.","textPreview":"The near-term plan is traction, not a single all-or-nothing bet.","textChars":64,"textLines":1,"bbox":[42,124,820,30]}
+{"kind":"shape","id":"sh/g72x4zyd","slide":8,"bbox":[42,166,1196,2]}
+{"kind":"textbox","id":"sh/ri9g7uhw","slide":8,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/6h0fypgb","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"shape","id":"sh/tkby9kzm","slide":8,"bbox":[42,214,220,130]}
+{"kind":"textbox","id":"sh/sjix0zy1","slide":8,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[64,236,176,54]}
+{"kind":"textbox","id":"sh/je9g3ahk","slide":8,"text":"tracked opportunity lanes","textPreview":"tracked opportunity lanes","textChars":25,"textLines":1,"bbox":[64,296,176,38]}
+{"kind":"shape","id":"sh/id0fu50z","slide":8,"bbox":[302,214,220,130]}
+{"kind":"textbox","id":"sh/o7ydoret","slide":8,"text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[324,236,176,54]}
+{"kind":"textbox","id":"sh/98rehwve","slide":8,"text":"top-ready lanes","textPreview":"top-ready lanes","textChars":15,"textLines":1,"bbox":[324,296,176,38]}
+{"kind":"shape","id":"sh/m5gvmhwn","slide":8,"bbox":[562,214,220,130]}
+{"kind":"textbox","id":"sh/n6pwfmd8","slide":8,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[584,236,176,54]}
+{"kind":"textbox","id":"sh/0jydkreh","slide":8,"text":"urgent lanes","textPreview":"urgent lanes","textChars":12,"textLines":1,"bbox":[584,296,176,38]}
+{"kind":"shape","id":"sh/1k7edwv2","slide":8,"bbox":[832,214,406,130]}
+{"kind":"textbox","id":"sh/ehgvihwr","slide":8,"text":"Non-dilutive lanes","textPreview":"Non-dilutive lanes","textChars":18,"textLines":1,"bbox":[854,232,362,36]}
+{"kind":"textbox","id":"sh/zipwbmdc","slide":8,"text":"DARPA DICE, SBIR/STTR, NASA RFI, FHWA TSMO, and other official-source opportunities stay human-gated.","textPreview":"DARPA DICE, SBIR/STTR, NASA RFI, FHWA TSMO, and other official-source opportunities stay human-gated.","textChars":101,"textLines":1,"bbox":[854,278,362,48]}
+{"kind":"shape","id":"sh/kfixwbe1","slide":8,"bbox":[832,384,406,130]}
+{"kind":"textbox","id":"sh/lgbepgvm","slide":8,"text":"Venture lanes","textPreview":"Venture lanes","textChars":13,"textLines":1,"bbox":[854,402,362,36]}
+{"kind":"textbox","id":"sh/tw7e9gnq","slide":8,"text":"EVTit, soft-tech venture studios, YC, angels, and strategic partners are evaluated against dilution, cash burden, and deliverables.","textPreview":"EVTit, soft-tech venture studios, YC, angels, and strategic partners are evaluated against dilution, cash burden, and deliverables.","textChars":131,"textLines":1,"bbox":[854,448,362,48]}
+{"kind":"textbox","id":"sh/svydgb65","slide":8,"text":"Decision rule: use the path that creates the most credibility per dollar and per point of dilution.","textPreview":"Decision rule: use the path that creates the most credibility per dollar and per point of dilution.","textChars":99,"textLines":1,"bbox":[42,544,1040,42]}
+{"kind":"textbox","id":"sh/7u5w765k","slide":8,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/6twve1oz","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/fu1gfa1s","slide":8,"text":""}
+{"kind":"slide","id":"sl/udsvah03","slide":9,"title":"The money case comes from field validation","textShapes":13}
+{"kind":"textbox","id":"sh/eponml43","slide":9,"text":"The money case comes from field validation","textPreview":"The money case comes from field validation","textChars":42,"textLines":1,"bbox":[42,40,1020,82]}
+{"kind":"textbox","id":"sh/1cfmhgne","slide":9,"text":"Luma needs sectors with real losses, not more abstract applause.","textPreview":"Luma needs sectors with real losses, not more abstract applause.","textChars":64,"textLines":1,"bbox":[42,124,820,30]}
+{"kind":"shape","id":"sh/0b65obm9","slide":9,"bbox":[42,166,1196,2]}
+{"kind":"textbox","id":"sh/nex4jq5k","slide":9,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/mdonql4z","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"shape","id":"sh/9gzml0nq","slide":9,"bbox":[42,214,370,246]}
+{"kind":"textbox","id":"sh/ofq5svm5","slide":9,"text":"Locked internal baseline","textPreview":"Locked internal baseline","textChars":24,"textLines":1,"bbox":[64,232,326,36]}
+{"kind":"textbox","id":"sh/bih4na5w","slide":9,"text":"The current proof stack can compare candidate behavior against named baselines and preserve replay receipts.","textPreview":"The current proof stack can compare candidate behavior against named baselines and preserve replay receipts.","textChars":108,"textLines":1,"bbox":[64,278,326,164]}
+{"kind":"shape","id":"sh/ah8nu54b","slide":9,"bbox":[454,214,370,246]}
+{"kind":"textbox","id":"sh/oza1gfyh","slide":9,"text":"Real sector loss","textPreview":"Real sector loss","textChars":16,"textLines":1,"bbox":[476,232,326,36]}
+{"kind":"textbox","id":"sh/p0ji9kf2","slide":9,"text":"The next customer supplies the operating context: wasted energy, delayed response, failed routing, downtime, audit cost, or missed throughput.","textPreview":"The next customer supplies the operating context: wasted energy, delayed response, failed routing, downtime, audit cost, or missed throug...","textChars":142,"textLines":1,"bbox":[476,278,326,164]}
+{"kind":"shape","id":"sh/2xsjepgb","slide":9,"bbox":[866,214,370,246]}
+{"kind":"textbox","id":"sh/3y107axw","slide":9,"text":"Economic proof","textPreview":"Economic proof","textChars":14,"textLines":1,"bbox":[888,232,326,36]}
+{"kind":"textbox","id":"sh/cnu1kzyd","slide":9,"text":"A pilot locks the metric and conversion factor so savings can be shown conservatively after field validation.","textPreview":"A pilot locks the metric and conversion factor so savings can be shown conservatively after field validation.","textChars":109,"textLines":1,"bbox":[888,278,326,164]}
+{"kind":"textbox","id":"sh/do3id4fy","slide":9,"text":"This is why grants and SBIR matter: they fund validation without forcing the company to oversell before the field data is in.","textPreview":"This is why grants and SBIR matter: they fund validation without forcing the company to oversell before the field data is in.","textChars":125,"textLines":1,"bbox":[42,532,1080,44]}
+{"kind":"textbox","id":"sh/qlcjipgn","slide":9,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/bml0buxs","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/udsvah03","slide":9,"text":""}
+{"kind":"slide","id":"sl/m90b6t0r","slide":10,"title":"A studio deal must earn the dilution","textShapes":13}
+{"kind":"textbox","id":"sh/q9sn69kb","slide":10,"text":"A studio deal must earn the dilution","textPreview":"A studio deal must earn the dilution","textChars":36,"textLines":1,"bbox":[42,40,1020,82]}
+{"kind":"textbox","id":"sh/xc3mho32","slide":10,"text":"The 20% discussion is worth exploring, not accepting verbally.","textPreview":"The 20% discussion is worth exploring, not accepting verbally.","textChars":62,"textLines":1,"bbox":[42,124,820,30]}
+{"kind":"shape","id":"sh/cbu58j2h","slide":10,"bbox":[42,166,1196,2]}
+{"kind":"textbox","id":"sh/zelojyl8","slide":10,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/ydcnatkn","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"shape","id":"sh/l036l83y","slide":10,"bbox":[42,214,370,260]}
+{"kind":"textbox","id":"sh/kzu5c32t","slide":10,"text":"What must be written","textPreview":"What must be written","textChars":20,"textLines":1,"bbox":[64,232,326,36]}
+{"kind":"textbox","id":"sh/725onyl4","slide":10,"text":"Scope, deliverables, acceptance criteria, timeline, cash budget, IP ownership, vesting, termination, and conflicts.","textPreview":"Scope, deliverables, acceptance criteria, timeline, cash budget, IP ownership, vesting, termination, and conflicts.","textChars":115,"textLines":1,"bbox":[64,278,326,178]}
+{"kind":"shape","id":"sh/m1cnetkj","slide":10,"bbox":[454,214,370,260]}
+{"kind":"textbox","id":"sh/s7yt4b21","slide":10,"text":"What must be proven","textPreview":"What must be proven","textChars":19,"textLines":1,"bbox":[476,232,326,36]}
+{"kind":"textbox","id":"sh/d87uxg3m","slide":10,"text":"The studio should increase credibility through product packaging, validation workflow, customer access, funding support, and diligence readiness.","textPreview":"The studio should increase credibility through product packaging, validation workflow, customer access, funding support, and diligence re...","textChars":145,"textLines":1,"bbox":[476,278,326,178]}
+{"kind":"shape","id":"sh/q5gb21kb","slide":10,"bbox":[866,214,370,260]}
+{"kind":"textbox","id":"sh/r6pcv6lw","slide":10,"text":"Safer structures","textPreview":"Safer structures","textChars":16,"textLines":1,"bbox":[888,232,326,36]}
+{"kind":"textbox","id":"sh/0bit8b2d","slide":10,"text":"Paid credibility sprint, milestone equity option, smaller equity plus success fee, or YC-parallel process before accepting major dilution.","textPreview":"Paid credibility sprint, milestone equity option, smaller equity plus success fee, or YC-parallel process before accepting major dilution.","textChars":138,"textLines":1,"bbox":[888,278,326,178]}
+{"kind":"textbox","id":"sh/1cru1g3y","slide":10,"text":"Current posture: interested, not committed. Equity, cash, and IP terms require written review and counsel.","textPreview":"Current posture: interested, not committed. Equity, cash, and IP terms require written review and counsel.","textChars":106,"textLines":1,"bbox":[42,536,1030,42]}
+{"kind":"textbox","id":"sh/e9gb61k7","slide":10,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/fapcz6ls","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/m90b6t0r","slide":10,"text":""}
+{"kind":"slide","id":"sl/jetc3ut0","slide":11,"title":"The ask is a 30-day credibility sprint","textShapes":13}
+{"kind":"textbox","id":"sh/a90z21on","slide":11,"text":"The ask is a 30-day credibility sprint","textPreview":"The ask is a 30-day credibility sprint","textChars":38,"textLines":1,"bbox":[42,40,1020,82]}
+{"kind":"textbox","id":"sh/xcryxg7y","slide":11,"text":"Make Luma easier to fund, review, and pilot.","textPreview":"Make Luma easier to fund, review, and pilot.","textChars":44,"textLines":1,"bbox":[42,124,820,30]}
+{"kind":"shape","id":"sh/wbih4b6d","slide":11,"bbox":[42,166,1196,2]}
+{"kind":"textbox","id":"sh/n69grmpw","slide":11,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/250zy18b","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"shape","id":"sh/98rytw72","slide":11,"bbox":[42,214,360,240]}
+{"kind":"textbox","id":"sh/o7ih0r6h","slide":11,"text":"Build","textPreview":"Build","textChars":5,"textLines":1,"bbox":[64,232,316,36]}
+{"kind":"textbox","id":"sh/72t03qp0","slide":11,"text":"Send-safe pitch deck, reviewer portal front door, measured-source view, and proof-card navigation.","textPreview":"Send-safe pitch deck, reviewer portal front door, measured-source view, and proof-card navigation.","textChars":98,"textLines":1,"bbox":[64,278,316,158]}
+{"kind":"shape","id":"sh/61kzalof","slide":11,"bbox":[460,214,360,240]}
+{"kind":"textbox","id":"sh/ofqtgnyt","slide":11,"text":"Validate","textPreview":"Validate","textChars":8,"textLines":1,"bbox":[482,232,316,36]}
+{"kind":"textbox","id":"sh/9gza9sze","slide":11,"text":"Replay-scope template, baseline/metric lock, pilot intake flow, and acceptance-standard checklist.","textPreview":"Replay-scope template, baseline/metric lock, pilot intake flow, and acceptance-standard checklist.","textChars":98,"textLines":1,"bbox":[482,278,316,158]}
+{"kind":"shape","id":"sh/mdobedg3","slide":11,"bbox":[878,214,360,240]}
+{"kind":"textbox","id":"sh/nehs7iho","slide":11,"text":"Package","textPreview":"Package","textChars":7,"textLines":1,"bbox":[900,232,316,36]}
+{"kind":"textbox","id":"sh/0b6tc3yx","slide":11,"text":"Investor narrative, grant/SBIR packet refresh, terms guardrails, and partner diligence room.","textPreview":"Investor narrative, grant/SBIR packet refresh, terms guardrails, and partner diligence room.","textChars":92,"textLines":1,"bbox":[900,278,316,158]}
+{"kind":"shape","id":"sh/1cfa58zi","slide":11,"bbox":[42,500,1196,104]}
+{"kind":"textbox","id":"sh/epobatgr","slide":11,"text":"Next step: agree on written sprint scope, deliverables, budget, and decision rights before any equity or terms commitment.","textPreview":"Next step: agree on written sprint scope, deliverables, budget, and decision rights before any equity or terms commitment.","textChars":122,"textLines":1,"bbox":[74,520,1060,60]}
+{"kind":"textbox","id":"sh/zaxs3yhc","slide":11,"text":"Send-safe deck | July 9, 2026","textPreview":"Send-safe deck | July 9, 2026","textChars":29,"textLines":1,"bbox":[42,676,780,24]}
+{"kind":"textbox","id":"sh/cn6t83y1","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1186,676,52,24]}
+{"kind":"notes","id":"nt/jetc3ut0","slide":11,"text":""}

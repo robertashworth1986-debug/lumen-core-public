@@ -85,6 +85,8 @@ desktop.ini
 *.jpg
 *.jpeg
 *.gif
+!dashboard/brand/lumencore_logo_on_dark_1024.png
+!dashboard/brand/lumencore_logo_on_light_1024.png
 
 # Cache / temp
 .cache/
@@ -96,6 +98,11 @@ render_qa_*/
 
 # Counsel-only deliverables (mirrored to the private estate and E: vault)
 /output/pdf/LUMENCORE_PATENT_COUNSEL_BRIEF_*.pdf
+
+# Generated audiovisual render trees stay local unless deliberately released.
+/output/audio/
+/output/speech/
+/output/video/
 
 # Old / duplicate stack copies
 INSTITAL_STACK_V2/

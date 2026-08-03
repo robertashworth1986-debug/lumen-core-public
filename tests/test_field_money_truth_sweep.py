@@ -22,15 +22,15 @@ def test_field_money_truth_sweep_reports_current_value_without_overclaiming():
     summary = payload["summary"]
     gates = payload["gates"]
 
-    assert payload["schema"] == "field_money_truth_sweep_v1"
+    assert payload["schema"] == "field_money_truth_sweep_v2"
     assert summary["registered_family_count"] >= 140
     assert summary["measured_sources"] >= 3
     assert summary["total_measured_rows"] > 0
-    assert summary["safe_estimated_annual_value_usd"] >= 39_000_000
-    assert summary["blocked_context_annual_value_usd"] > summary["safe_estimated_annual_value_usd"]
+    assert summary["safe_estimated_annual_value_usd"] == 0
+    assert summary["blocked_context_annual_value_usd"] == 0
 
     assert gates["live_data_available_for_benchmarking"] is True
-    assert gates["bounded_estimated_value_claim_allowed"] is True
+    assert gates["bounded_estimated_value_claim_allowed"] is False
     assert gates["paid_pilot_scoping_allowed"] is True
     assert gates["field_validation_claim_allowed"] is False
     assert gates["real_dollar_savings_claim_allowed"] is False
@@ -55,7 +55,7 @@ def test_field_money_truth_sweep_defines_all_family_and_champion_blockers():
     assert gates["field_validation_claim_allowed"] is False
     assert "blocks all-family validation language" in blocker_text
     assert "Field validation requires buyer or agency authorized operational data" in blocker_text
-    assert "Real dollar savings require field validation" in blocker_text
+    assert "No current lane clears the buyer-approved dollar-projection gate" in blocker_text
 
 
 def test_field_money_truth_sweep_markdown_and_commands_are_safe():
@@ -66,7 +66,8 @@ def test_field_money_truth_sweep_markdown_and_commands_are_safe():
     assert "Field Money Truth Sweep" in rendered
     assert "field_validation_claim_allowed: `false`" in rendered
     assert "real_dollar_savings_claim_allowed: `false`" in rendered
-    assert "bounded_estimated_value_claim_allowed: `true`" in rendered
+    assert "bounded_estimated_value_claim_allowed: `false`" in rendered
+    assert "bounded workflow pilot scoping with no dollar projection" in rendered
     assert "Run-FieldMoneyTruthSweep.ps1" in rendered
     assert "-FreshLivePull -StageGlyphVault" in rendered
     assert ("api" + "_key") not in rendered.lower()

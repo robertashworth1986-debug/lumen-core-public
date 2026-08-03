@@ -25,7 +25,8 @@ def test_federal_submission_protocol_packet_is_human_gated_and_ready():
     assert payload["status"] == "FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED"
     assert summary["official_source_count"] >= 10
     assert summary["protocol_gate_count"] == 7
-    assert summary["reviewer_gate_clear"] is True
+    assert summary["reviewer_packaging_gate_clear"] is True
+    assert summary["submission_argument_gate_clear"] is False
     assert summary["unsafe_secret_count"] == 0
     assert summary["unsafe_claim_count"] == 0
     assert summary["all_final_actions_blocked_without_human"] is True

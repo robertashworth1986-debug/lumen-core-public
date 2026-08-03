@@ -22,16 +22,21 @@ def test_first_buyer_board_selects_manual_buyer_lane_not_overclaims():
     payload = module.build_payload()
     summary = payload["summary"]
 
-    assert payload["schema"] == "first_buyer_target_board_v1"
-    assert summary["recommended_first_buyer"] == "EPRI AI for Power / Incubatenergy Labs"
-    assert summary["manual_reviewed_outreach_allowed"] is True
+    assert payload["schema"] == "first_buyer_target_board_v2"
+    assert summary["recommended_first_buyer"] is None
+    assert summary["manual_reviewed_outreach_allowed"] is False
+    assert summary["paid_protocol_review_scoping_allowed"] is True
     assert summary["send_without_user_review_allowed"] is False
     assert summary["bulk_email_allowed"] is False
     assert summary["contact_scraping_allowed"] is False
     assert summary["field_validation_claim_allowed"] is False
     assert summary["realized_savings_claim_allowed"] is False
     assert summary["fixed_frozen_delta_price_claim_allowed"] is False
-    assert summary["proof_holdout_wins"] >= 20
+    assert summary["proof_internal_performance_champion_present"] is False
+    assert summary["proof_holdout_wins"] < summary["proof_holdout_count"] / 2
+    assert summary["proof_locked_global_holm_positive_count"] == 0
+    assert summary["proof_legacy_ready_rows_excluded"] >= 300
+    assert summary["proof_numeric_fallback_profile_count"] == 0
     assert len(payload["first_buyer_board_sha256"]) == 64
 
 
@@ -47,8 +52,10 @@ def test_first_buyer_board_has_ranked_sources_and_safe_manual_email():
     assert all(not candidate["send_now_allowed"] for candidate in candidates)
     assert any("EPB" in candidate["organization"] for candidate in candidates)
     assert any("TVA" in candidate["organization"] for candidate in candidates)
-    assert "field validation or realized savings yet" in email["body"]
-    assert email["send_mode"] == "manual_review_only"
+    assert "current measured result is deliberately a negative one" in email["body"]
+    assert "not a claim that this candidate wins" in email["body"]
+    assert email["send_mode"] == "draft_only_not_ready_to_send"
+    assert candidates[0]["routing_status"] == "inbound_only_no_new_outreach"
     dumped = json.dumps(payload).lower()
     assert "bulk_email_allowed" in dumped
     assert '"bulk_email_allowed": false' in dumped
@@ -66,4 +73,6 @@ def test_first_buyer_markdown_is_reviewer_safe():
     assert "Send without user review: `false`" in rendered
     assert "Field-validation claim allowed: `false`" in rendered
     assert "Realized-savings claim allowed: `false`" in rendered
-    assert "EPRI AI for Power / Incubatenergy Labs" in rendered
+    assert "First buyer channel: `None`" in rendered
+    assert "Internal performance champion present: `false`" in rendered
+    assert "current internal champion" not in rendered.lower()

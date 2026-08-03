@@ -34,6 +34,12 @@
     "What assignment, contributor, co-inventor, contractor, or prior-disclosure facts must be documented before investor or agency diligence?",
     "What exact wording may be used in grants and investor materials without implying patent grant, legal exclusivity, or clearance to operate?"
   ],
+  "deadline_posture": {
+    "filing_anniversary": "NOT_A_US_PROSECUTION_RESPONSE_DEADLINE_BY_ITSELF",
+    "foreign_pct_priority": "TIME_SENSITIVE_PRACTITIONER_REVIEW_REQUIRED_IF_FOREIGN_RIGHTS_DESIRED",
+    "priority_restoration": "LIMITED_JURISDICTION_DEPENDENT_NOT_ASSUMED",
+    "us_prosecution_deadline": "UNVERIFIED_REQUIRES_NEWEST_OFFICIAL_NOTICE"
+  },
   "evidence_status": [
     {
       "bytes": 7643,
@@ -51,7 +57,7 @@
       "bytes": 16206,
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
       "present": true,
-      "sha256": "4e8e5f65d25c69cb38af1ddc5ede9560a7cd32aaf3277cafd0caeec820b438b3"
+      "sha256": "b670cb506ec97a24910515a39a8987a2a6d1659bece6817912d1ed39f5ba1a18"
     },
     {
       "bytes": 24099,
@@ -60,31 +66,43 @@
       "sha256": "cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390"
     },
     {
-      "bytes": 20001,
+      "bytes": 23598,
       "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
       "present": true,
-      "sha256": "81a4f42d51f72e9c51e7cd645b804c3a47e64dbe65cf6ca02faa99d7b45419b6"
+      "sha256": "10f5206c8b65e329041c28caefec7f51c0744fcef70c0761b711470d62f13021"
     },
     {
-      "bytes": 9037,
+      "bytes": 9131,
       "path": "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md",
       "present": true,
-      "sha256": "95abdcb1dbc499f76eedeca90d75b3b0bbe78d5f68aebc293f5f703c71125762"
+      "sha256": "02da369cab53a8100837e493153de7ff7f1ff0a3d73f38dc227ee619d5b2c1da"
     },
     {
-      "bytes": 25708,
+      "bytes": 39846,
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
       "present": true,
-      "sha256": "5f75f6f5d698ae76c3794499b35efd43fa0c9be4258e08d8d0f3415fbca924f0"
+      "sha256": "24ef5bb644a01bb86fc6889298afe68b6be8fc9e44cd41f14a0fff2a8691eb6a"
     },
     {
-      "bytes": 6279,
+      "bytes": 17487,
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "present": true,
-      "sha256": "c56fed102e513a1373d9d23317b7ff20c51adc77faa1cc1c5e1dd88e255cdd95"
+      "sha256": "db8e56ed557b78bdd69fa27fddbc516eb4e00b2e4448fe24c030c393c52b9e1a"
+    },
+    {
+      "bytes": 6671,
+      "path": "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json",
+      "present": true,
+      "sha256": "096904e114457c56383e495cfad6c6e3d0d31596d6b53e2920099608b2b7519b"
+    },
+    {
+      "bytes": 5461,
+      "path": "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.md",
+      "present": true,
+      "sha256": "b548330bda92b8514ce25e8415b81740661c8a1e1620d9dd7fd5705e57aaae0c"
     }
   ],
-  "generated_utc": "2026-07-09T22:53:56.239164+00:00",
+  "generated_utc": "2026-07-26T22:11:34.658624+00:00",
   "human_gate": {
     "investor_ip_claim_expansion_allowed_without_human": false,
     "legal_filing_allowed_without_human": false,
@@ -130,13 +148,13 @@
       "reviewer_safe_summary": "Autonomous research and replay evaluation loops operate under human-gated execution controls and immutable audit logging."
     }
   ],
-  "ip_counsel_diligence_packet_sha256": "8141d3b37e71ff15d0228f6102d7bc87bd53ae3c719cd150fcceac0b3dceaaa4",
+  "ip_counsel_diligence_packet_sha256": "51f4b14ee64f2221926cabac358d8da9c6095b823db3e11a2186f3784371c236",
   "official_sources": [
     {
-      "label": "USPTO provisional application guidance",
-      "packet_use": "Confirm provisional pendency, nonprovisional timing, and provisional limits.",
-      "url": "https://www.uspto.gov/patents/basics/apply/provisional-application",
-      "verified_fact": "USPTO guidance says a provisional application cannot become a U.S. patent unless a nonprovisional filing or conversion occurs within the required 12-month period."
+      "label": "USPTO incomplete or missing application information",
+      "packet_use": "Identify the role of OPAP notices and the response period stated in the controlling notice.",
+      "url": "https://www.uspto.gov/patents/apply/when-patent-applications-are-incomplete-or-missing-information",
+      "verified_fact": "USPTO guidance says an OPAP notice identifies missing or deficient application items, the reply period, and any additional fees."
     },
     {
       "label": "USPTO nonprovisional utility filing guide",
@@ -157,16 +175,23 @@
       "verified_fact": "USPTO describes a nationwide network matching volunteer patent attorneys and agents with financially under-resourced inventors and small businesses."
     },
     {
-      "label": "USPTO restoration of provisional benefit",
-      "packet_use": "Counsel-only review if a deadline has passed or may be near.",
-      "url": "https://www.uspto.gov/patents/apply/petitions/restoration-benefit-provisional-application-or-priority-foreign-application",
-      "verified_fact": "USPTO describes petition-based restoration only in limited circumstances, including timing and unintentional-delay requirements."
+      "label": "WIPO PCT restoration of priority",
+      "packet_use": "Counsel-only review of any time-sensitive foreign or PCT priority strategy.",
+      "url": "https://www.wipo.int/en/web/pct-system/texts/restoration",
+      "verified_fact": "WIPO describes restoration of priority as limited, jurisdiction-dependent, and time-sensitive; availability must not be assumed."
     }
   ],
   "outputs": {
     "dashboard_json": "dashboard/data/ip_counsel_diligence_packet.json",
     "json": "out/ops/ip_counsel_diligence_packet_latest.json",
     "markdown": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md"
+  },
+  "patent_deadline_control": {
+    "application_identifier_published": false,
+    "control_artifact": "grant_submissions/funding_sprint_20260709/PATENT_DEADLINE_EVIDENCE_CONTROL_2026-07-16.json",
+    "direct_answer": "The local record proves a payment acknowledgement only. It does not prove a Filing Receipt, complete application, current status, verified claims, or an outstanding response deadline. The official Patent Center docket must be captured before any U.S. deadline claim. Foreign or PCT priority strategy is a separate, potentially time-sensitive counsel question.",
+    "private_paths_published": false,
+    "status": "PAYMENT_ACKNOWLEDGEMENT_ONLY_OFFICIAL_DOCKET_REQUIRED"
   },
   "public_rules": {
     "allowed": [
@@ -190,8 +215,9 @@
     "all_final_actions_blocked_without_human": true,
     "clearance_to_operate_claimed": false,
     "counsel_question_count": 6,
-    "data_room_markdown_count": 44,
-    "evidence_artifact_count": 8,
+    "data_room_markdown_count": 104,
+    "evidence_artifact_count": 10,
+    "foreign_pct_priority_review_time_sensitive": true,
     "human_patent_center_check_required": true,
     "intake_item_count": 5,
     "invention_family_count": 6,
@@ -200,11 +226,14 @@
     "linkedin_packet_ready": true,
     "missing_evidence_count": 0,
     "official_source_count": 5,
+    "patent_deadline_control_status": "PAYMENT_ACKNOWLEDGEMENT_ONLY_OFFICIAL_DOCKET_REQUIRED",
     "patent_grant_claimed": false,
     "public_disclosure_review_required": true,
     "qa_count": 14,
-    "reviewer_gate_clear": true,
+    "reviewer_packaging_gate_clear": true,
+    "submission_argument_gate_clear": false,
     "unsafe_claim_count": 0,
-    "unsafe_secret_count": 0
+    "unsafe_secret_count": 0,
+    "us_prosecution_deadline_verified": false
   }
 }

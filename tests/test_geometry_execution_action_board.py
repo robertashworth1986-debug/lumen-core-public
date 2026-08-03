@@ -34,7 +34,7 @@ def test_execution_action_board_builds_context_and_keeps_claim_gates_closed():
     assert summary["measured_rows"] >= 418
     assert len(summary["board_chain_sha256"]) == 64
 
-    assert summary["bounded_estimated_value_claim_allowed"] is True
+    assert summary["bounded_estimated_value_claim_allowed"] is False
     assert summary["paid_pilot_scoping_allowed"] is True
     assert summary["field_validation_claim_allowed"] is False
     assert summary["real_dollar_savings_claim_allowed"] is False

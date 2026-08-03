@@ -1,7 +1,7 @@
 # Kuramoto Accepted Metric Audit
 
-Generated UTC: `2026-07-04T01:07:41.847853+00:00`
-Audit SHA-256: `a760f2a55c5c7390db9156f81feecbe2bf7c6b623be2afca3476969dc1777d8a`
+Generated UTC: `2026-07-25T03:40:12.204459+00:00`
+Audit SHA-256: `8dbf874ca18cf04bd8a63146371da43d6539dcb3963d46fc5da42db0125cd28c`
 
 ## Truth Line
 
@@ -17,8 +17,8 @@ This is a bridge from internal replay evidence to reviewer-recognizable synchron
 - Mean delta vs named baseline: `0.140668`
 - Estimated rows replayed: `2506267`
 - Source systems: `4`
-- Executed named baselines in gauntlet: `15`
-- Locked replay comparisons: `1969`
+- Executed named baselines in gauntlet: `17`
+- Locked replay comparisons: `2449`
 - Accepted metric proxy language allowed: `true`
 - Field validation claim allowed: `false`
 

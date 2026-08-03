@@ -1,0 +1,1162 @@
+{
+  "schema": "lumencore.linkedin_growth_pack.config.v1",
+  "as_of_utc": "2026-07-23T18:49:37Z",
+  "owner_public_name": "Robert Ashworth",
+  "brand": "LumenCore",
+  "objective": "Present LumenCore as an evidence-first technical program, make the public reviewer path easy to inspect, and invite bounded evaluation, engineering, employment, consortium, and investment conversations without overstating the record.",
+  "action_controls": {
+    "linkedin_access_allowed": false,
+    "profile_edit_allowed": false,
+    "post_allowed": false,
+    "message_allowed": false,
+    "follow_action_allowed": false,
+    "external_send_allowed": false,
+    "human_review_required": true
+  },
+  "live_profile_snapshot": {
+    "source": "USER_SUPPLIED_READ_ONLY_LINKEDIN_FINDINGS",
+    "observed_utc": "2026-07-23T18:49:37Z",
+    "access_mode": "READ_ONLY_NO_MUTATION",
+    "current_profile": {
+      "headline_summary": "Long headline spanning systems architecture, harmonic AI, infrastructure, signal intelligence, energy-grid work, and modular compute.",
+      "about_summary": "One quoted paragraph describing read-only controlled experiments and cryptographic deltas.",
+      "visible_sections": {
+        "Experience": false,
+        "Featured": false,
+        "Projects": false,
+        "Education": false,
+        "Certifications": false
+      },
+      "services": [
+        "Data Reporting",
+        "Training",
+        "Information Management",
+        "iOS Development",
+        "Environmental Consulting"
+      ],
+      "recent_video_caption_summary": "Recent videos are visible, but their captions do not clearly state the hook, evidence class, boundary, and next action."
+    },
+    "metrics": {
+      "connections": 22,
+      "followers": 26,
+      "profile_views": 15,
+      "post_impressions_7d": 25,
+      "search_appearances": 3
+    }
+  },
+  "profile_gap_actions": [
+    {
+      "id": "A01",
+      "priority": 1,
+      "area": "Headline",
+      "current_state": "Broad and keyword-heavy across several technical domains.",
+      "draft_or_action": "Replace with the systems-automation and reproducible-evaluation headline in LINKEDIN_PROFILE_REWRITE.md.",
+      "human_gate": "Review the exact headline before editing the profile."
+    },
+    {
+      "id": "A02",
+      "priority": 2,
+      "area": "About",
+      "current_state": "One quoted paragraph does not explain the builder, proof method, evidence boundary, or partner ask.",
+      "draft_or_action": "Use the structured About draft with the Level 3 boundary and one bounded-evaluation invitation.",
+      "human_gate": "Verify every sentence against the current public record before editing."
+    },
+    {
+      "id": "A03",
+      "priority": 3,
+      "area": "Experience",
+      "current_state": "No visible Experience section.",
+      "draft_or_action": "Add the Founder and Systems Automation Engineer entry and five evidence-bounded bullets.",
+      "human_gate": "Keep existing dates and location only after the profile owner verifies them."
+    },
+    {
+      "id": "A04",
+      "priority": 4,
+      "area": "Featured",
+      "current_state": "No visible Featured section.",
+      "draft_or_action": "Add only the three HTTP-200 reviewer links in FEATURED_SECTION_PLAN.md; keep failed and high-risk routes held.",
+      "human_gate": "Recheck each URL and visible page copy immediately before adding it."
+    },
+    {
+      "id": "A05",
+      "priority": 5,
+      "area": "Projects",
+      "current_state": "No visible Projects section.",
+      "draft_or_action": "Add the two bounded project entries in this pack without inventing dates, collaborators, users, or outcomes.",
+      "human_gate": "Confirm project titles and public links before editing."
+    },
+    {
+      "id": "A06",
+      "priority": 6,
+      "area": "Services",
+      "current_state": "Visible services are poorly matched to the public technical record.",
+      "draft_or_action": "Remove services the owner does not actively offer. If LinkedIn presents exact truthful options, prefer Python automation, software systems, evidence engineering, technical due diligence, and technical writing.",
+      "human_gate": "Choose only catalog options that accurately describe services the profile owner is prepared to deliver."
+    },
+    {
+      "id": "A07",
+      "priority": 7,
+      "area": "Older trading post",
+      "current_state": "One older public post contains unsupported wealth or profit language.",
+      "draft_or_action": "Flag for human review and removal or evidence-bounded rewrite. Do not edit or delete it automatically.",
+      "human_gate": "The profile owner decides whether to remove, archive, or rewrite the post."
+    },
+    {
+      "id": "A08",
+      "priority": 8,
+      "area": "Recent video captions",
+      "current_state": "Visible captions are vague and do not orient a reviewer.",
+      "draft_or_action": "Use the matching post draft or storyboard caption structure: hook, evidence class, result, boundary, and one next action.",
+      "human_gate": "Review the exact video, caption, and linked evidence together before any repost."
+    },
+    {
+      "id": "A09",
+      "priority": 9,
+      "area": "Education",
+      "current_state": "No visible Education section and no qualifying education record was supplied for this pack.",
+      "draft_or_action": "Leave blank until the profile owner provides exact institution, credential, field, and dates.",
+      "human_gate": "Do not infer a degree from role requirements, experience, or technical work."
+    },
+    {
+      "id": "A10",
+      "priority": 10,
+      "area": "Certifications",
+      "current_state": "No visible Certifications section and no current credential receipt was supplied for this pack.",
+      "draft_or_action": "Leave blank until a current certificate name, issuer, date, and public credential URL are verified.",
+      "human_gate": "Do not turn training, registrations, or self-authored labels into certifications."
+    },
+    {
+      "id": "A11",
+      "priority": 11,
+      "area": "Measurement baseline",
+      "current_state": "The current profile has 22 connections, 26 followers, 15 views, 25 seven-day impressions, and 3 search appearances.",
+      "draft_or_action": "Preserve these as the pre-change baseline and compare later snapshots without attributing causality to a single edit.",
+      "human_gate": "Record future observations read-only; do not automate engagement or inflate the counts."
+    }
+  ],
+  "project_drafts": [
+    {
+      "id": "PRJ01",
+      "title": "LumenCore Proof Capsule",
+      "role": "Founder and Systems Automation Engineer",
+      "description": "Designed a public, reviewer-readable evidence unit that binds a named source, data-rights label, preselected comparator, locked metric, hashes, negative findings, and a bounded next decision. Built a fail-closed Python verifier and focused tests for malformed, unsafe, or tampered inputs.",
+      "evidence_link": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/QUICKSTART.md",
+      "boundary": "The public capsule verifies a bounded record; it does not reproduce private runs or establish outside acceptance."
+    },
+    {
+      "id": "PRJ02",
+      "title": "ProofLock Evidence and Authority Controls",
+      "role": "Systems Architect and Builder",
+      "description": "Built hash, manifest, provenance, negative-result, reproducibility, and human-authority controls that keep artifact integrity separate from permission to submit, certify, deploy, spend, message, or promote a claim.",
+      "evidence_link": "https://github.com/robertashworth1986-debug/lumen-core-public",
+      "boundary": "The controls are implemented technical artifacts; adoption, security acceptance, and operational outcomes remain separate review questions."
+    }
+  ],
+  "source_evidence": [
+    {
+      "path": "README.md",
+      "required": true,
+      "supports": [
+        "public technical record",
+        "evidence maturity vocabulary",
+        "implemented controls",
+        "claim boundaries",
+        "HumanUnlock policy"
+      ],
+      "public_use_note": "Use stable capability and boundary language; rebuild current snapshots before citing counts."
+    },
+    {
+      "path": "RESUME_LUMENCORE.md",
+      "required": true,
+      "supports": [
+        "founder role",
+        "principal systems engineering role",
+        "Python and operational-control experience"
+      ],
+      "public_use_note": "Identity fields, registration identifiers, and modeled impact figures are deliberately excluded."
+    },
+    {
+      "path": "docs/REVIEWER_START_HERE.md",
+      "required": true,
+      "supports": [
+        "Level 3 repository-wide evidence boundary",
+        "reviewer sequence",
+        "independent review roles",
+        "external evaluation gate"
+      ],
+      "public_use_note": "Use the current bounded answers, not broader platform claims."
+    },
+    {
+      "path": "config/quant_hub_lexicon_v1.json",
+      "required": true,
+      "supports": [
+        "LumenCore vocabulary",
+        "ProofLock definition",
+        "HumanUnlock definition",
+        "prohibited interpretations"
+      ],
+      "public_use_note": "Use exact bounded meanings for coined project terms."
+    },
+    {
+      "path": "lumen-core.ai site/public/index.html",
+      "required": true,
+      "supports": [
+        "public review-home positioning",
+        "Proof Capsule concept",
+        "bounded pilot call to action"
+      ],
+      "public_use_note": "The live root page was reachable when this configuration was frozen."
+    },
+    {
+      "path": "output/video/prooflock_console_build_week_v2/prooflock_console_openai_build_week_demo_v2.receipt.json",
+      "required": true,
+      "supports": [
+        "ProofLock demo video identity",
+        "video dimensions and duration",
+        "synthetic narration disclosure",
+        "local decode receipt"
+      ],
+      "public_use_note": "A local media receipt does not establish publication, judging, award, endorsement, or outside evaluation."
+    },
+    {
+      "path": "out/social/tiktok_truth_over_hype_v1_20260716/VALIDATION_RECEIPT.json",
+      "required": true,
+      "supports": [
+        "vertical video dimensions and duration",
+        "audio decode check",
+        "claim-safety checks"
+      ],
+      "public_use_note": "Use as a draft edit source; publication remains a human action."
+    },
+    {
+      "path": "out/social/the_stop_documentary_trailer_v1_20260716/VALIDATION_RECEIPT.json",
+      "required": true,
+      "supports": [
+        "landscape trailer dimensions and duration",
+        "synthetic narration disclosure",
+        "claim-safety checks"
+      ],
+      "public_use_note": "Use as a draft edit source; publication remains a human action."
+    }
+  ],
+  "profile": {
+    "headline": "Founder & Systems Automation Engineer, LumenCore | Python, FastAPI & PowerShell | Reproducible AI Evaluation, Infrastructure Data & Human-Gated Automation",
+    "headline_variants": [
+      "Founder & Principal Systems Engineer, LumenCore | Reproducible AI Evaluation, Evidence Receipts & Reviewer-Ready Decision Systems",
+      "Evidence-First AI Systems Builder | Public Proof Capsules, Baseline Comparisons, Negative Results & Human-Gated Pilots",
+      "Founder, LumenCore | Turning AI Claims into Reviewer-Readable Evidence and Bounded Pilot Decisions"
+    ],
+    "about": "I build LumenCore, an evidence-first systems automation and reproducible AI evaluation platform. My work spans Python, PowerShell, FastAPI, data pipelines, workflow controls, and reviewer-ready technical documentation.\n\nThe core question is simple: what does the evidence actually support, and what remains unproven? I design deterministic workflows that bind sources, baselines, metrics, code versions, hashes, negative results, and a bounded next decision. Human approval remains required before consequential actions.\n\nThe public record currently supports implemented controls, deterministic tests, synthetic benchmarks, and source-conditioned replay at Level 3. It does not yet establish independent validation, field performance, deployment approval, commercial results, or future performance.\n\nI am open to systems, platform, data, and AI infrastructure roles, as well as bounded collaborations with utilities, laboratories, agencies, consortia, infrastructure teams, and technical investors. A strong first project has authorized data, a named baseline, a locked metric and threshold, a test window, failure rules, and a reviewer-readable report.\n\nThe portfolio and public reviewer path are in Featured.",
+    "experience_title": "Founder & Systems Automation Engineer | LumenCore / LumaTrader",
+    "experience_intro": "Systems engineering focused on reproducible evaluation, evidence custody, data workflows, and human-gated operational decisions. Preserve the profile's existing dates and location only after verifying them manually.",
+    "experience_bullets": [
+      "Architect and maintain Python and PowerShell workflows that turn source artifacts, protocols, baselines, metrics, and results into deterministic reviewer packets.",
+      "Build FastAPI and dashboard surfaces that make operational state, source references, integrity metadata, and claim limits easier to inspect.",
+      "Designed reproducibility controls that preserve dependency records, manifests, checksums, test receipts, and the difference between a repeatable software result and outside acceptance.",
+      "Maintain source-conditioned replay and prospective-evaluation lanes that preserve non-wins, prohibit silent backfill, and keep promotion gates explicit.",
+      "Create reviewer start pages, diligence Q&A, authority matrices, handoff records, and evidence manifests for technical, public-sector, consortium, and investor review."
+    ],
+    "skills": [
+      "Python",
+      "PowerShell",
+      "Reproducible Evaluation",
+      "Evidence Engineering",
+      "AI Governance Controls",
+      "Baseline Benchmarking",
+      "Source Provenance",
+      "Deterministic Testing",
+      "Technical Due Diligence",
+      "Public-Sector Proposal Readiness",
+      "Data-Rights Gating",
+      "Human-in-the-Loop Systems",
+      "FastAPI",
+      "Operational Automation",
+      "Technical Writing"
+    ],
+    "use_notes": [
+      "Do not copy registration identifiers, personal contact details, or modeled financial figures from the old resume into public profile sections.",
+      "Do not use current sample counts, benchmark totals, or dynamic status values unless the authoritative builder is rerun immediately before posting.",
+      "Keep the Level 3 boundary and the outside-evaluation ask together.",
+      "Use Founder and Systems Automation Engineer unless a different title is independently supportable and intentionally selected by the profile owner."
+    ]
+  },
+  "featured_links": [
+    {
+      "decision": "FEATURE",
+      "position": 1,
+      "card_title": "LumenCore: One Proof Path, One Bounded Decision",
+      "url": "https://lumen-core.ai/",
+      "http_status": 200,
+      "verified_utc": "2026-07-23T18:41:53Z",
+      "purpose": "Give nontechnical and technical visitors the shortest explanation of the review method and its limits.",
+      "description": "A five-minute public reviewer path from source, baseline, and metric to hash, negative findings, and a bounded next decision.",
+      "thumbnail_copy": "MEASURE FIRST",
+      "visitor_action": "Read the Proof Capsule overview, then choose whether to reject, request information, rerun, seek outside review, or scope a pilot.",
+      "hold_reason": ""
+    },
+    {
+      "decision": "FEATURE",
+      "position": 2,
+      "card_title": "Run the LumenCore Proof Capsule Quick Start",
+      "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/QUICKSTART.md",
+      "http_status": 200,
+      "verified_utc": "2026-07-23T18:41:53Z",
+      "purpose": "Give engineering reviewers a direct, runnable path instead of a marketing claim.",
+      "description": "The shortest public path for checking one bounded replay capsule with Python, hashes, failure rules, and focused tests.",
+      "thumbnail_copy": "RUN THE RECEIPT",
+      "visitor_action": "Clone the public repository, run the verifier, inspect the negative results, and decide whether a bounded outside evaluation is warranted.",
+      "hold_reason": ""
+    },
+    {
+      "decision": "FEATURE",
+      "position": 3,
+      "card_title": "LumenCore Public Technical Record",
+      "url": "https://github.com/robertashworth1986-debug/lumen-core-public",
+      "http_status": 200,
+      "verified_utc": "2026-07-23T18:41:53Z",
+      "purpose": "Let reviewers inspect code, tests, protocols, evidence boundaries, and preserved failures.",
+      "description": "Public code and reviewer documentation for reproducible benchmarks, ProofLock receipts, bounded agents, and human-gated decisions.",
+      "thumbnail_copy": "INSPECT THE SYSTEM",
+      "visitor_action": "Start at the README and follow the reviewer sequence appropriate to the claim being evaluated.",
+      "hold_reason": ""
+    },
+    {
+      "decision": "HOLD",
+      "position": 0,
+      "card_title": "Proof-to-Pilot Control Room",
+      "url": "https://lumen-core.ai/proof_to_pilot.html",
+      "http_status": 502,
+      "verified_utc": "2026-07-23T18:41:53Z",
+      "purpose": "Potential future deep link after the hosted route is repaired and rechecked.",
+      "description": "",
+      "thumbnail_copy": "",
+      "visitor_action": "",
+      "hold_reason": "The hosted route returned HTTP 502 during this evidence cut. Do not feature it until it returns 200 and the visible copy passes a fresh claim review."
+    },
+    {
+      "decision": "HOLD",
+      "position": 0,
+      "card_title": "Evidence Index",
+      "url": "https://lumen-core.ai/evidence/",
+      "http_status": 502,
+      "verified_utc": "2026-07-23T18:41:53Z",
+      "purpose": "Potential future technical index after the hosted route is repaired and rechecked.",
+      "description": "",
+      "thumbnail_copy": "",
+      "visitor_action": "",
+      "hold_reason": "The hosted route returned HTTP 502 during this evidence cut. Use the public repository instead."
+    },
+    {
+      "decision": "HOLD",
+      "position": 0,
+      "card_title": "Mission Control",
+      "url": "https://lumen-core.ai/mission_control.html",
+      "http_status": 200,
+      "verified_utc": "2026-07-23T18:41:53Z",
+      "purpose": "Potential future product surface after visible status and claim language are reconciled.",
+      "description": "",
+      "thumbnail_copy": "",
+      "visitor_action": "",
+      "hold_reason": "The page is reachable but contains dynamic operational and promotional language that is not the cleanest first reviewer path."
+    }
+  ],
+  "calendar": [
+    {
+      "day": 1,
+      "date": "2026-07-27",
+      "action": "Publish after human review",
+      "pillar": "Proof Capsule",
+      "draft_id": "P01",
+      "format": "Text plus review-home link",
+      "objective": "Establish the core reviewer problem and vocabulary."
+    },
+    {
+      "day": 2,
+      "date": "2026-07-28",
+      "action": "Manual engagement only",
+      "pillar": "Reviewer listening",
+      "draft_id": "",
+      "format": "Two substantive public comments",
+      "objective": "Use R01 or R02 only after reading each source post."
+    },
+    {
+      "day": 3,
+      "date": "2026-07-29",
+      "action": "Publish after human review",
+      "pillar": "Negative results",
+      "draft_id": "P02",
+      "format": "Text post",
+      "objective": "Show that preserved failure is a useful engineering output."
+    },
+    {
+      "day": 4,
+      "date": "2026-07-30",
+      "action": "Prepare media",
+      "pillar": "Video",
+      "draft_id": "",
+      "format": "CapCut brief SB02",
+      "objective": "Cut captions and verify every visible claim before export."
+    },
+    {
+      "day": 5,
+      "date": "2026-07-31",
+      "action": "Publish after human review",
+      "pillar": "Baseline discipline",
+      "draft_id": "P03",
+      "format": "Text plus vertical clip",
+      "objective": "Explain why the strongest comparator can reverse a decision."
+    },
+    {
+      "day": 6,
+      "date": "2026-08-01",
+      "action": "No post",
+      "pillar": "Evidence maintenance",
+      "draft_id": "",
+      "format": "Private source check",
+      "objective": "Recheck Featured links and record any status change locally."
+    },
+    {
+      "day": 7,
+      "date": "2026-08-02",
+      "action": "No post",
+      "pillar": "Editorial review",
+      "draft_id": "",
+      "format": "Draft review",
+      "objective": "Choose next week's strongest question from real public comments."
+    },
+    {
+      "day": 8,
+      "date": "2026-08-03",
+      "action": "Publish after human review",
+      "pillar": "Authority",
+      "draft_id": "P04",
+      "format": "Text post",
+      "objective": "Separate artifact integrity from decision authority."
+    },
+    {
+      "day": 9,
+      "date": "2026-08-04",
+      "action": "Manual engagement only",
+      "pillar": "Technical dialogue",
+      "draft_id": "",
+      "format": "Two public comments",
+      "objective": "Use R03, R04, or R09 when context genuinely fits."
+    },
+    {
+      "day": 10,
+      "date": "2026-08-05",
+      "action": "Publish after human review",
+      "pillar": "Pilot design",
+      "draft_id": "P05",
+      "format": "Document-style checklist",
+      "objective": "Give buyers and reviewers five questions they can reuse."
+    },
+    {
+      "day": 11,
+      "date": "2026-08-06",
+      "action": "Prepare media",
+      "pillar": "Video",
+      "draft_id": "",
+      "format": "CapCut brief SB01",
+      "objective": "Cut the ProofLock authority sequence and add readable captions."
+    },
+    {
+      "day": 12,
+      "date": "2026-08-07",
+      "action": "Publish after human review",
+      "pillar": "Evidence maturity",
+      "draft_id": "P06",
+      "format": "Text plus public repository link",
+      "objective": "Explain Level 3 without inflating it into outside acceptance."
+    },
+    {
+      "day": 13,
+      "date": "2026-08-08",
+      "action": "No post",
+      "pillar": "Profile hygiene",
+      "draft_id": "",
+      "format": "Manual audit",
+      "objective": "Check headline, About, Featured order, and visible contact privacy."
+    },
+    {
+      "day": 14,
+      "date": "2026-08-09",
+      "action": "No post",
+      "pillar": "Editorial review",
+      "draft_id": "",
+      "format": "Draft review",
+      "objective": "Remove jargon and verify all next-week links."
+    },
+    {
+      "day": 15,
+      "date": "2026-08-10",
+      "action": "Publish after human review",
+      "pillar": "ProofLock",
+      "draft_id": "P07",
+      "format": "Native video plus short text",
+      "objective": "Show the difference between a valid receipt and an authorized decision."
+    },
+    {
+      "day": 16,
+      "date": "2026-08-11",
+      "action": "Manual engagement only",
+      "pillar": "Reviewer listening",
+      "draft_id": "",
+      "format": "Two substantive public comments",
+      "objective": "Use R05, R06, or R07 only where a real collaboration question exists."
+    },
+    {
+      "day": 17,
+      "date": "2026-08-12",
+      "action": "Publish after human review",
+      "pillar": "Prospective evaluation",
+      "draft_id": "P08",
+      "format": "Text post",
+      "objective": "Explain why post-freeze collection and no backfill matter."
+    },
+    {
+      "day": 18,
+      "date": "2026-08-13",
+      "action": "Prepare media",
+      "pillar": "Video",
+      "draft_id": "",
+      "format": "CapCut brief SB03",
+      "objective": "Cut the long trailer to a focused 60-second reviewer story."
+    },
+    {
+      "day": 19,
+      "date": "2026-08-14",
+      "action": "Publish after human review",
+      "pillar": "Public-sector review",
+      "draft_id": "P09",
+      "format": "Text checklist",
+      "objective": "Answer the first questions a cautious technical reviewer asks."
+    },
+    {
+      "day": 20,
+      "date": "2026-08-15",
+      "action": "No post",
+      "pillar": "Evidence maintenance",
+      "draft_id": "",
+      "format": "Private source check",
+      "objective": "Rerun the local builder and inspect any evidence or media drift."
+    },
+    {
+      "day": 21,
+      "date": "2026-08-16",
+      "action": "No post",
+      "pillar": "Editorial review",
+      "draft_id": "",
+      "format": "Comment synthesis",
+      "objective": "Turn one real question into a future post without naming the commenter."
+    },
+    {
+      "day": 22,
+      "date": "2026-08-17",
+      "action": "Publish after human review",
+      "pillar": "Partner invitation",
+      "draft_id": "P10",
+      "format": "Text plus review-home link",
+      "objective": "Invite one bounded evaluation with explicit inputs and gates."
+    },
+    {
+      "day": 23,
+      "date": "2026-08-18",
+      "action": "Manual engagement only",
+      "pillar": "Career and engineering",
+      "draft_id": "",
+      "format": "Two public comments",
+      "objective": "Use R08 or R10 where the technical context is genuine."
+    },
+    {
+      "day": 24,
+      "date": "2026-08-19",
+      "action": "Publish after human review",
+      "pillar": "Data rights",
+      "draft_id": "P11",
+      "format": "Text post",
+      "objective": "Show why authorized data is a first-order evaluation control."
+    },
+    {
+      "day": 25,
+      "date": "2026-08-20",
+      "action": "Prepare carousel",
+      "pillar": "Reviewer education",
+      "draft_id": "",
+      "format": "Five-slide outline from P05",
+      "objective": "Convert the pilot checklist into a clean visual document."
+    },
+    {
+      "day": 26,
+      "date": "2026-08-21",
+      "action": "Publish after human review",
+      "pillar": "Builder perspective",
+      "draft_id": "P12",
+      "format": "Founder reflection",
+      "objective": "Make the operating philosophy memorable and human."
+    },
+    {
+      "day": 27,
+      "date": "2026-08-22",
+      "action": "No post",
+      "pillar": "Content audit",
+      "draft_id": "",
+      "format": "Manual review",
+      "objective": "Identify which topics earned substantive questions rather than vanity reactions."
+    },
+    {
+      "day": 28,
+      "date": "2026-08-23",
+      "action": "No post",
+      "pillar": "Pipeline planning",
+      "draft_id": "",
+      "format": "Private planning",
+      "objective": "Select three next-month posts from verified questions and evidence changes."
+    },
+    {
+      "day": 29,
+      "date": "2026-08-24",
+      "action": "Manual engagement only",
+      "pillar": "Community",
+      "draft_id": "",
+      "format": "Three substantive public comments",
+      "objective": "Use R01, R02, or R12 and avoid generic praise."
+    },
+    {
+      "day": 30,
+      "date": "2026-08-25",
+      "action": "Review cycle",
+      "pillar": "Evidence and content",
+      "draft_id": "",
+      "format": "Local pack rebuild",
+      "objective": "Rebuild, compare hashes, retire stale copy, and plan the next evidence cut."
+    }
+  ],
+  "post_drafts": [
+    {
+      "id": "P01",
+      "title": "A result is not yet a decision",
+      "pillar": "Proof Capsule",
+      "body": "Most AI demos answer one question: can the system produce a result?\n\nA serious reviewer asks a harder sequence:\n\n1. What source was used?\n2. Who had the right to use it?\n3. Which incumbent baseline was selected before scoring?\n4. Which metric and threshold were locked?\n5. What failed?\n6. Can the evidence be rechecked?\n7. What decision is actually authorized?\n\nThat sequence is why I am building LumenCore around Proof Capsules: small, reviewer-readable records that connect source, baseline, metric, hash, negative finding, and bounded next action.\n\nThe goal is not to make a claim sound larger. It is to make the next decision easier to inspect.\n\n#AIGovernance #Reproducibility #EvidenceEngineering",
+      "asset": "LumenCore review-home card or a simple SOURCE > BASELINE > METRIC > HASH > DECISION graphic.",
+      "link": "https://lumen-core.ai/",
+      "boundary": "Describes the public method and does not assert outside acceptance or deployment."
+    },
+    {
+      "id": "P02",
+      "title": "A failed gate is useful evidence",
+      "pillar": "Negative results",
+      "body": "One of the most valuable outputs in technical work is a clean no.\n\nA candidate can look promising against a convenient comparator and still fail against the strongest relevant baseline. That failure should stay visible. It tells the next reviewer what not to assume, which comparator mattered, and where the method needs more work.\n\nI am building LumenCore so negative results are first-class artifacts: named, hashed, explained, and carried forward into the next decision.\n\nA failed gate is not a failed record. It is a record that prevented a weak claim from escaping.\n\n#MachineLearning #ModelEvaluation #TechnicalDueDiligence",
+      "asset": "Text only, or a neutral red HOLD card with no performance figures.",
+      "link": "",
+      "boundary": "Discusses engineering discipline without promoting a model or outcome."
+    },
+    {
+      "id": "P03",
+      "title": "The strongest baseline gets a vote",
+      "pillar": "Baseline discipline",
+      "body": "A model can appear to improve when the comparison is too easy.\n\nThe more useful question is: does the result survive the strongest relevant baseline for each case?\n\nIn one LumenCore review example, an encouraging diagnostic changed direction when the comparison moved to each pair's strongest baseline. The promotion gate stayed closed.\n\nThat is the behavior I want from an evaluation system. Baselines are not decoration added after a result. They are part of the decision contract before scoring begins.\n\nWhat comparator would you insist on before trusting an AI or control-system claim in your domain?\n\n#Benchmarking #AIEvaluation #Engineering",
+      "asset": "Use the SB02 vertical edit only after checking captions and the source receipt.",
+      "link": "https://github.com/robertashworth1986-debug/lumen-core-public",
+      "boundary": "The example is an internal, source-bounded review result; it is not a field or customer outcome."
+    },
+    {
+      "id": "P04",
+      "title": "Integrity and authority are different controls",
+      "pillar": "Authority",
+      "body": "A receipt can be hash-valid and still have no authority to approve a deployment, submission, or public claim.\n\nThat distinction is easy to lose in automated systems:\n\n- Integrity asks whether the artifact is intact.\n- Reproducibility asks whether the bounded procedure can be rerun.\n- Evaluation asks whether the metric and comparator are appropriate.\n- Authority asks who may make the consequential decision.\n\nProofLock handles evidence custody. HumanUnlock keeps the final decision with the person or organization that actually owns it.\n\nPassing one layer should never silently mint the next.\n\n#ResponsibleAI #SystemsEngineering #Governance",
+      "asset": "ProofLock authority frame or SB01 clip.",
+      "link": "https://lumen-core.ai/",
+      "boundary": "Describes system controls; it does not imply an external authority has accepted them."
+    },
+    {
+      "id": "P05",
+      "title": "Five questions before an AI pilot",
+      "pillar": "Pilot design",
+      "body": "Before an AI pilot starts, I want five answers written down:\n\n1. Who owns the data and authorizes this use?\n2. What incumbent process or model is the comparator?\n3. Which metric, threshold, and test window are locked before outcomes arrive?\n4. Which exclusions and failure rules cannot be changed after scoring?\n5. Who owns the final go, hold, rerun, or reject decision?\n\nIf those answers are missing, a polished demo can create more ambiguity than evidence.\n\nIf they are present, even a negative result can be valuable because everyone knows what was tested and what the result means.\n\n#AIPilots #DataGovernance #Procurement",
+      "asset": "Five-slide document: one question per slide, final slide with the bounded-review invitation.",
+      "link": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/QUICKSTART.md",
+      "boundary": "A reusable checklist, not a statement that any organization has approved a pilot."
+    },
+    {
+      "id": "P06",
+      "title": "What Level 3 means in the LumenCore record",
+      "pillar": "Evidence maturity",
+      "body": "The LumenCore public record uses a five-level evidence ladder.\n\nThe repository-wide supported boundary is Level 3: source-conditioned replay with hashed sources, named baselines, wins and non-wins, and explicit limitations.\n\nThat matters because Level 3 is not the finish line. A prospective post-freeze evaluation is a separate gate. A qualified outside evaluator working with held-out or field data is another gate.\n\nMaturity labels are useful only when they make the missing evidence obvious.\n\nMy current ask is simple: find a qualified reviewer or data owner willing to define one bounded evaluation without weakening the comparator, threshold, or failure rules after the result is known.\n\n#EvidenceBasedAI #Validation #TechnicalReview",
+      "asset": "Simple five-level ladder with Level 3 highlighted and Levels 4-5 clearly open.",
+      "link": "https://github.com/robertashworth1986-debug/lumen-core-public",
+      "boundary": "States the current repository-wide evidence boundary and keeps later gates open."
+    },
+    {
+      "id": "P07",
+      "title": "A valid receipt can still end in HOLD",
+      "pillar": "ProofLock",
+      "body": "I built a short ProofLock demo around a failure mode that matters in every automated evidence system:\n\nThe receipt passes.\nThe requested action says PROMOTE.\nThe effective decision remains HOLD.\n\nWhy? Because integrity does not create engineering, safety, legal, or organizational authority.\n\nThe interesting part is not the animation. It is the invariant: a self-authored success value cannot bypass the gates owned by other people.\n\nThat is the kind of automation I trust more: fast at checking facts, stubborn about authority.\n\n#DeveloperTools #AIControls #ReproducibleResearch",
+      "asset": "SB01 45-second ProofLock edit with computer-generated narration disclosed.",
+      "link": "https://github.com/robertashworth1986-debug/lumen-core-public",
+      "boundary": "The clip demonstrates a local control pattern, not outside testing or organizational adoption."
+    },
+    {
+      "id": "P08",
+      "title": "Prospective means no silent backfill",
+      "pillar": "Prospective evaluation",
+      "body": "A prospective evaluation should answer a narrow question with observations that arrive after the protocol is frozen.\n\nThat means:\n\n- no replacing missed predictions with later calculations;\n- no changing the eligible population after seeing outcomes;\n- no swapping the baseline or threshold midstream;\n- no treating an incomplete sample as a passed gate.\n\nThe discipline can feel slow because it removes convenient shortcuts. That is exactly why it is useful.\n\nThe point is not to manufacture a smooth chart. The point is to preserve a result that a reviewer can trust enough to make the next bounded decision.\n\n#Forecasting #MLOps #Reproducibility",
+      "asset": "Text post or a simple timeline showing protocol freeze, prediction seal, outcome, and settlement.",
+      "link": "https://lumen-core.ai/",
+      "boundary": "Explains the protocol rule without claiming that an open prospective gate has passed."
+    },
+    {
+      "id": "P09",
+      "title": "The first reviewer questions I design for",
+      "pillar": "Public-sector review",
+      "body": "When I prepare a technical packet for a cautious public-sector or institutional reviewer, I assume the first questions will be:\n\n- What exactly is implemented?\n- Which result is synthetic, replayed, prospective, or reviewed outside the operator?\n- Where did the data come from, and who authorized its use?\n- Which baseline, metric, threshold, and exclusions were fixed in advance?\n- What failed?\n- Can I reproduce the bounded result without private credentials?\n- What action remains reserved for an authorized human?\n\nA strong packet should answer those questions before the reviewer has to ask.\n\nThat is the standard I am building toward with LumenCore.\n\n#GovTech #TechnicalWriting #Auditability",
+      "asset": "Seven-question document post with a final reviewer-path slide.",
+      "link": "https://github.com/robertashworth1986-debug/lumen-core-public",
+      "boundary": "Describes reviewer-oriented design and does not imply procurement or agency acceptance."
+    },
+    {
+      "id": "P10",
+      "title": "A bounded partner invitation",
+      "pillar": "Partner invitation",
+      "body": "I am looking for one serious utility, laboratory, consortium, agency team, infrastructure operator, or engineering group willing to define a bounded evaluation with LumenCore.\n\nThe starting contract is intentionally small:\n\n- authorized data;\n- one named incumbent comparator;\n- one locked metric and threshold;\n- a fixed test window;\n- explicit exclusions and failure rules;\n- one reviewer-readable go, hold, rerun, or reject decision.\n\nNo broad adoption claim. No commercial result assumed in advance. No moving the gate after outcomes arrive.\n\nIf that is how your team prefers to evaluate technical work, the public reviewer path is ready for inspection.\n\n#Partnerships #Infrastructure #AppliedAI",
+      "asset": "Review-home card with a single BOUNDED REVIEW CTA.",
+      "link": "https://lumen-core.ai/",
+      "boundary": "An invitation to discuss evaluation scope, not a claim of an existing partnership."
+    },
+    {
+      "id": "P11",
+      "title": "Data rights come before model scores",
+      "pillar": "Data rights",
+      "body": "A model score is not useful evidence if the team cannot answer a prior question: were we authorized to use this data for this evaluation?\n\nData rights should be part of the protocol, not a footnote added after a promising result.\n\nFor a bounded review I want the source, owner, permitted use, retention boundary, exclusions, and publication boundary recorded before scoring. If the rights are unknown, the evaluation state should be unknown too.\n\nThat may close some exciting-looking paths. It also prevents a technical result from becoming a legal or trust problem later.\n\n#DataRights #AIGovernance #PrivacyEngineering",
+      "asset": "Minimal flow graphic: RIGHTS > SOURCE > BASELINE > METRIC > RESULT.",
+      "link": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/QUICKSTART.md",
+      "boundary": "A process principle, not legal advice or a conclusion about any specific dataset."
+    },
+    {
+      "id": "P12",
+      "title": "The kind of builder I am trying to become",
+      "pillar": "Builder perspective",
+      "body": "I am less interested in a system that always says yes than one that knows exactly when to stop.\n\nThe builder standard I am working toward is:\n\n- make the evidence easy to inspect;\n- preserve the failures;\n- separate integrity from authority;\n- state what remains unknown;\n- let the right human own the consequential decision.\n\nThat standard applies whether the audience is an engineer, a buyer, a public reviewer, an investor, or a future teammate.\n\nThe work is still evolving. The public record is there so the questions can get stronger as the system does.\n\n#BuildInPublic #EngineeringLeadership #ResponsibleInnovation",
+      "asset": "Founder text post or a clean portrait paired with one line: STRONGER QUESTIONS, BETTER DECISIONS.",
+      "link": "https://lumen-core.ai/",
+      "boundary": "A personal operating philosophy, not a capability or outcome claim."
+    }
+  ],
+  "reply_templates": [
+    {
+      "id": "R01",
+      "situation": "Thoughtful technical post",
+      "template": "The distinction you make between [A] and [B] is useful. The question I would add is: which comparator and failure rule would you lock before the result is observed? That choice often determines whether the output is evidence or only an interesting demo.",
+      "use_when": "The source post actually discusses evaluation, measurement, or technical decision quality.",
+      "do_not_use_when": "You have not read the full post or cannot name the specific distinction."
+    },
+    {
+      "id": "R02",
+      "situation": "Request for evidence",
+      "template": "A practical next artifact would be a small reviewer record with the source, data-rights label, incumbent baseline, preselected metric, threshold, negative findings, and allowed conclusion. That would make the claim much easier to inspect without asking readers to trust the summary.",
+      "use_when": "A public claim would benefit from a clearer evidence trail.",
+      "do_not_use_when": "The author has already supplied an equivalent record or the material is confidential."
+    },
+    {
+      "id": "R03",
+      "situation": "Question about outside evaluation",
+      "template": "The current public record supports source-conditioned replay and deterministic controls. A qualified outside evaluator using authorized held-out or field data remains a separate gate. I would be glad to compare protocols if the discussion is about one bounded dataset, comparator, metric, threshold, and test window.",
+      "use_when": "Someone directly asks what remains before broader validation language is justified.",
+      "do_not_use_when": "The question asks for confidential results or a conclusion beyond the public record."
+    },
+    {
+      "id": "R04",
+      "situation": "Question about immediate deployment",
+      "template": "I would separate technical evidence from deployment authority. The public artifacts can support a bounded review, but a real deployment decision still needs the data owner, domain reviewer, security and privacy review, acceptance metric, and authorized decision-maker.",
+      "use_when": "Someone asks whether the public technical work can be deployed immediately.",
+      "do_not_use_when": "You lack enough context to understand the proposed environment or consequences."
+    },
+    {
+      "id": "R05",
+      "situation": "Potential technical collaboration",
+      "template": "This looks potentially compatible with a bounded evaluation. The cleanest next step would be to define the authorized dataset, incumbent comparator, locked metric and threshold, test window, exclusions, and who owns the final decision. If those can be written down, the technical fit becomes much easier to assess.",
+      "use_when": "A public commenter explicitly raises a relevant collaboration or evaluation idea.",
+      "do_not_use_when": "There is no concrete technical overlap or the conversation would require sharing protected information."
+    },
+    {
+      "id": "R06",
+      "situation": "Public-sector or procurement relevance",
+      "template": "For a public-sector review I would lead with the authority and evidence boundaries: what is implemented, what was tested, which data use is permitted, which gates remain open, and which action still requires an authorized human. That makes the packet easier to evaluate without implying selection or approval.",
+      "use_when": "The post concerns public procurement, SBIR, pilots, or technical due diligence.",
+      "do_not_use_when": "It could be read as a claim that an agency is reviewing or supporting LumenCore."
+    },
+    {
+      "id": "R07",
+      "situation": "Investor asks what is defensible",
+      "template": "The strongest defensibility today is the evidence workflow: reproducible tests, named baselines, preserved non-wins, tamper-evident receipts, and explicit human gates. Market value and adoption are separate questions that need customer evidence rather than extrapolation from the technical record.",
+      "use_when": "A public discussion asks about technical defensibility or diligence.",
+      "do_not_use_when": "The conversation requests private financial details, terms, or an investment solicitation."
+    },
+    {
+      "id": "R08",
+      "situation": "Recruiter or engineering leader asks about fit",
+      "template": "My strongest fit is systems work where evidence quality and operational control matter: Python automation, reproducible evaluation, provenance, baseline testing, reviewer packets, and human-gated actions. I would be interested in the specific problem, success metric, team ownership, and decision boundary for the role.",
+      "use_when": "A recruiter or engineering leader publicly asks about relevant experience.",
+      "do_not_use_when": "The role is unrelated or the reply would disclose private application details."
+    },
+    {
+      "id": "R09",
+      "situation": "Respectful disagreement",
+      "template": "I read the evidence differently, mainly because [specific source or assumption]. What result would change your conclusion, and which baseline would you accept as the fair comparison? Naming those in advance could turn the disagreement into a useful test.",
+      "use_when": "You can identify the exact assumption or evidence point.",
+      "do_not_use_when": "The exchange is personal, hostile, or too underspecified for a constructive test."
+    },
+    {
+      "id": "R10",
+      "situation": "Metrics discussion",
+      "template": "That metric is informative, but I would want the denominator, eligible population, exclusions, strongest baseline, and uncertainty alongside it. A point estimate becomes much more useful when the decision rule and the non-wins are visible too.",
+      "use_when": "A post presents a metric without enough evaluation context.",
+      "do_not_use_when": "The full methodology already answers those questions."
+    },
+    {
+      "id": "R11",
+      "situation": "Data-rights question",
+      "template": "I would treat data rights as part of the protocol: source owner, permitted use, retention, exclusions, and publication boundary should be resolved before scoring. If any of those are unknown, the result should remain bounded until the rights question is answered.",
+      "use_when": "A conversation concerns datasets, scraping, sharing, or reuse.",
+      "do_not_use_when": "A legal conclusion is being requested; route that question to qualified counsel."
+    },
+    {
+      "id": "R12",
+      "situation": "A team shares a negative result",
+      "template": "Publishing the non-win is valuable. It narrows the claim, gives future teams a real comparator, and makes the next protocol stronger. The most useful follow-up would be the locked threshold, strongest baseline, and which result would justify a rerun rather than a promotion.",
+      "use_when": "The author openly shares a failed gate or null result.",
+      "do_not_use_when": "The result involves people, safety, or sensitive data that should not be discussed publicly."
+    }
+  ],
+  "message_action_drafts": [
+    {
+      "id": "M01",
+      "recipient_public_name": "Thomas Rackoff",
+      "status": "DRAFT_NOT_SENT",
+      "send_allowed": false,
+      "context_summary": "Benign Nashville networking note concerning IT asset recovery.",
+      "deadline": "No deadline observed in the supplied read-only findings.",
+      "risk_state": "LOW_RISK_NETWORKING",
+      "selected_action": "OPTIONAL_REPLY_AFTER_HUMAN_REVIEW",
+      "supported_fit": [
+        "Nashville location is supported by the existing resume.",
+        "LumenCore publicly emphasizes evidence custody, provenance, auditability, and human authority.",
+        "IT asset recovery can intersect with chain of custody, data handling, sanitization evidence, and disposition records."
+      ],
+      "missing_or_unverified_fit": [
+        "No client, asset, employer, referral, or commercial relationship is established by the message.",
+        "No service scope, meeting request, or transaction terms were supplied."
+      ],
+      "draft": "Hi Thomas, thanks for reaching out. I am based in Nashville and build evidence and operational-control systems through LumenCore. IT asset recovery touches several areas I care about, especially chain of custody, data handling, auditability, and clear human authority. I would be glad to learn more about the problems you are seeing and compare notes. To keep the conversation appropriately bounded, there is no need to share client, asset, or recovery details in LinkedIn messages.",
+      "safest_next_action": "The profile owner may send this as a short networking reply after confirming the sender and deciding that the conversation is useful. Keep any later discussion free of client, asset, credential, or disposition details until an appropriate channel and purpose are established."
+    },
+    {
+      "id": "M02",
+      "recipient_public_name": "Roberto Gomez Castro",
+      "status": "DRAFT_NOT_SENT",
+      "send_allowed": false,
+      "context_summary": "Verified recruiter message dated July 9 concerning an ITS Engineer role in Georgia; the user reports that public evidence shows the role is still circulating.",
+      "deadline": "No application deadline observed in the supplied findings; recheck the live posting before any response or application.",
+      "risk_state": "REAL_ROLE_POTENTIAL_FIT_GAPS",
+      "selected_action": "CLARIFY_MUST_HAVE_REQUIREMENTS_BEFORE_APPLYING",
+      "supported_fit": [
+        "Systems engineering and operational-control architecture.",
+        "Python and PowerShell automation.",
+        "Infrastructure and energy data workflows.",
+        "Evidence, testing, traceability, and reviewer documentation."
+      ],
+      "missing_or_unverified_fit": [
+        "A relevant bachelor's degree is not evidenced in the supplied public record.",
+        "Five to eight years of ITS construction or highway experience is not evidenced.",
+        "Direct CCTV, dynamic-message-sign, fiber, and field system-integration experience is not evidenced.",
+        "Georgia location, travel, field schedule, and compensation fit remain unknown."
+      ],
+      "draft": "Hi Roberto, thank you for reaching out about the ITS Engineer role in Georgia. My public record supports systems engineering, Python and PowerShell automation, evidence controls, and infrastructure-data workflows. I do not want to overstate the match: I have not yet documented a relevant bachelor's degree or five to eight years of ITS construction and highway experience across CCTV, dynamic-message signs, fiber, and field integration. If the hiring team is open to adjacent systems and evidence-engineering experience, could you clarify which requirements are mandatory and which are transferable? I would be glad to review the current scope before deciding whether a role-specific resume would be useful.",
+      "safest_next_action": "Do not submit a generic resume as a full-match application. First confirm that the role is active, obtain the current job description and deadline, and ask which degree and field-experience requirements are mandatory. Tailor and send a resume only if the recruiter confirms that adjacent experience will be considered."
+    }
+  ],
+  "content_risk_register": [
+    {
+      "id": "CR01",
+      "severity": "HIGH",
+      "item": "Older public trading post",
+      "risk": "The supplied read-only review found unsupported wealth or profit language that conflicts with the current evidence boundary.",
+      "human_action": "Review the exact post and choose removal, archival, or a complete evidence-bounded rewrite.",
+      "automation_action": "NONE"
+    },
+    {
+      "id": "CR02",
+      "severity": "MEDIUM",
+      "item": "Recent video captions",
+      "risk": "Vague captions make it hard to identify the evidence class, decision, limitation, and next action.",
+      "human_action": "Use the matching post or storyboard draft only after checking the exact video and source receipt.",
+      "automation_action": "NONE"
+    },
+    {
+      "id": "CR03",
+      "severity": "MEDIUM",
+      "item": "Current headline and About",
+      "risk": "Broad technical language and a single quoted paragraph make reviewer fit difficult to scan and can blur the strongest supported positioning.",
+      "human_action": "Replace only after reviewing the exact profile drafts and current public evidence.",
+      "automation_action": "NONE"
+    },
+    {
+      "id": "CR04",
+      "severity": "MEDIUM",
+      "item": "Current services list",
+      "risk": "Several visible services are not well aligned with the public technical record and may attract low-fit requests.",
+      "human_action": "Remove inaccurate offerings and select only exact catalog options the owner is prepared to provide.",
+      "automation_action": "NONE"
+    }
+  ],
+  "media": {
+    "scan_roots": [
+      "data",
+      "out/social",
+      "output/video",
+      "out/reviewer_handoffs"
+    ],
+    "primary_assets": [
+      {
+        "path": "output/video/prooflock_console_build_week_v2/prooflock_console_openai_build_week_demo_v2.mp4",
+        "media_class": "PRIMARY_RENDER",
+        "title": "ProofLock Console Build Week Demo V2",
+        "content_summary": "Landscape product demo showing receipt verification, authority separation, a guided promotion attack, restored gates, and reproducibility controls.",
+        "public_use_state": "DRAFT_EDIT_SOURCE_HUMAN_REVIEW_REQUIRED",
+        "claim_boundary": "Local demo assembly and decode evidence only; no publication, judging, award, endorsement, outside evaluation, safety, funding, or commercial-readiness conclusion.",
+        "storyboard_rank": 3,
+        "receipt_path": "output/video/prooflock_console_build_week_v2/prooflock_console_openai_build_week_demo_v2.receipt.json",
+        "receipt_schema": "lumencore.prooflock_build_week_demo_video_receipt.v1"
+      },
+      {
+        "path": "out/social/tiktok_truth_over_hype_v1_20260716/LumenCore_Truth_Over_Hype_TikTok_V1.mp4",
+        "media_class": "PRIMARY_RENDER",
+        "title": "Truth Over Hype Vertical Cut",
+        "content_summary": "Vertical 32-second evidence story showing a promising diagnostic rejected by the stronger reviewer gate.",
+        "public_use_state": "DRAFT_EDIT_SOURCE_HUMAN_REVIEW_REQUIRED",
+        "claim_boundary": "Internal source-bounded result with promotion closed; no outside evaluation, execution authority, or commercial result.",
+        "storyboard_rank": 2,
+        "receipt_path": "out/social/tiktok_truth_over_hype_v1_20260716/VALIDATION_RECEIPT.json",
+        "receipt_schema": "lumencore_tiktok_render_validation_v1"
+      },
+      {
+        "path": "out/social/the_stop_documentary_trailer_v1_20260716/LumenCore_The_Stop_Documentary_Trailer_V1.mp4",
+        "media_class": "PRIMARY_RENDER",
+        "title": "The Stop: When the Stronger Test Says No",
+        "content_summary": "Landscape 84-second mini-documentary about a stronger comparator closing a promotion gate and preserving the negative result.",
+        "public_use_state": "DRAFT_EDIT_SOURCE_HUMAN_REVIEW_REQUIRED",
+        "claim_boundary": "Internal source-bounded result with synthetic narration disclosed; no outside evaluation, deployment authority, or commercial result.",
+        "storyboard_rank": 1,
+        "receipt_path": "out/social/the_stop_documentary_trailer_v1_20260716/VALIDATION_RECEIPT.json",
+        "receipt_schema": "lumencore_the_stop_render_validation_v1"
+      },
+      {
+        "path": "data/IMG_2361.mov",
+        "media_class": "RAW_LOCAL_CLIP",
+        "title": "Control Hardware Close-Up 01",
+        "content_summary": "One-second portrait live-photo clip showing a relay and controller board.",
+        "public_use_state": "HOLD_CONTEXT_AND_RIGHTS_CONFIRMATION_REQUIRED",
+        "claim_boundary": "Do not imply ownership, customer use, partnership, deployment, provenance, or relationship to a LumenCore evaluation without separate evidence.",
+        "storyboard_rank": 0,
+        "receipt_path": "",
+        "receipt_schema": ""
+      },
+      {
+        "path": "data/IMG_2362.mov",
+        "media_class": "RAW_LOCAL_CLIP",
+        "title": "Control Hardware Close-Up 02",
+        "content_summary": "One-second portrait live-photo clip showing a populated industrial controller board.",
+        "public_use_state": "HOLD_CONTEXT_AND_RIGHTS_CONFIRMATION_REQUIRED",
+        "claim_boundary": "Do not imply ownership, customer use, partnership, deployment, provenance, or relationship to a LumenCore evaluation without separate evidence.",
+        "storyboard_rank": 0,
+        "receipt_path": "",
+        "receipt_schema": ""
+      },
+      {
+        "path": "data/IMG_0694.MOV",
+        "media_class": "RAW_LOCAL_CLIP",
+        "title": "Personal Vehicle Footage",
+        "content_summary": "Approximately 30 seconds of personal vehicle footage with identifiable people and visible surroundings.",
+        "public_use_state": "HOLD_PRIVACY_AND_CONSENT_REQUIRED",
+        "claim_boundary": "Do not use for professional content without reviewing the complete clip, confirming every visible person's consent, and removing private location or background details.",
+        "storyboard_rank": 0,
+        "receipt_path": "",
+        "receipt_schema": ""
+      },
+      {
+        "path": "data/IMG_2501.MOV",
+        "media_class": "RAW_LOCAL_CLIP",
+        "title": "Fabrication and 3D Workflow Footage",
+        "content_summary": "Approximately two minutes showing a fabrication machine and a computer-aided design workflow in a workspace.",
+        "public_use_state": "HOLD_CONTEXT_RIGHTS_AND_DETAIL_REVIEW_REQUIRED",
+        "claim_boundary": "Do not imply ownership, employer or customer work, project provenance, or LumenCore integration. Review the full frame and audio for private workspace details before any edit.",
+        "storyboard_rank": 0,
+        "receipt_path": "",
+        "receipt_schema": ""
+      },
+      {
+        "path": "data/Grants outreach_/Important documents_/IMG_5059.MOV",
+        "media_class": "RAW_LOCAL_CLIP",
+        "title": "Field Work Footage with Third Parties",
+        "content_summary": "Approximately two minutes of outdoor cable or hose handling with identifiable third parties.",
+        "public_use_state": "HOLD_THIRD_PARTY_CONSENT_AND_CONTEXT_REQUIRED",
+        "claim_boundary": "Do not use in public or professional content without documented consent from visible people, full audio review, and verified context and rights.",
+        "storyboard_rank": 0,
+        "receipt_path": "",
+        "receipt_schema": ""
+      }
+    ]
+  },
+  "storyboard_briefs": [
+    {
+      "id": "SB01",
+      "title": "A Valid Receipt Can Still End in HOLD",
+      "source_path": "output/video/prooflock_console_build_week_v2/prooflock_console_openai_build_week_demo_v2.mp4",
+      "target_format": "LinkedIn native video, 16:9 landscape",
+      "target_duration": "45 seconds",
+      "audience": "Engineering leaders, AI governance teams, technical investors, and reviewers",
+      "hook": "A valid receipt does not create authority.",
+      "cta": "Inspect the public Proof Capsule method and propose one bounded evaluation.",
+      "audio": "Keep the existing computer-generated narration only if the disclosure remains visible; otherwise use captions and a restrained original bed.",
+      "caption_style": "Two lines maximum, high-contrast white text, key control words in amber or red, safe margins for LinkedIn controls.",
+      "export_settings": "MP4, H.264, 1920x1080, 30 fps, AAC, target loudness near -16 LUFS, burned-in captions.",
+      "claim_boundary": "Demonstrates a local authority-control pattern; it does not show outside adoption, acceptance, or a field result.",
+      "scenes": [
+        {
+          "time": "00:00-00:03",
+          "visual": "Cold open on the effective HOLD state, then fast push toward the receipt panel.",
+          "on_screen_text": "A VALID RECEIPT CAN STILL END IN HOLD",
+          "voiceover_or_edit_note": "Open with the conclusion. No logo animation before the hook."
+        },
+        {
+          "time": "00:03-00:10",
+          "visual": "Show receipt verification and the PASS state.",
+          "on_screen_text": "INTEGRITY: VERIFIED",
+          "voiceover_or_edit_note": "A hash-valid receipt answers whether the artifact is intact."
+        },
+        {
+          "time": "00:10-00:20",
+          "visual": "Cut to the requested PROMOTE state and authority-attack panel.",
+          "on_screen_text": "REQUESTED ACTION: PROMOTE",
+          "voiceover_or_edit_note": "But a requested action is not the same as authorized action."
+        },
+        {
+          "time": "00:20-00:32",
+          "visual": "Hold on the four required gates and effective HOLD result.",
+          "on_screen_text": "4 GATES HELD. EFFECTIVE DECISION: HOLD.",
+          "voiceover_or_edit_note": "Integrity cannot mint engineering, safety, legal, or organizational authority."
+        },
+        {
+          "time": "00:32-00:40",
+          "visual": "Return to the restored console and evidence lattice.",
+          "on_screen_text": "PROOFLOCK PRESERVES FACTS. HUMANUNLOCK OWNS CONSEQUENCES.",
+          "voiceover_or_edit_note": "Keep product terms readable for at least two seconds."
+        },
+        {
+          "time": "00:40-00:45",
+          "visual": "Simple closing card with review-home URL.",
+          "on_screen_text": "ONE PROOF PATH. ONE BOUNDED DECISION.",
+          "voiceover_or_edit_note": "End on lumen-core.ai and the words Public review mode."
+        }
+      ]
+    },
+    {
+      "id": "SB02",
+      "title": "The Stronger Baseline Said No",
+      "source_path": "out/social/tiktok_truth_over_hype_v1_20260716/LumenCore_Truth_Over_Hype_TikTok_V1.mp4",
+      "target_format": "LinkedIn native video, 9:16 vertical",
+      "target_duration": "28-32 seconds",
+      "audience": "ML practitioners, technical buyers, and evidence-minded founders",
+      "hook": "The first score looked better. The stronger test rejected it.",
+      "cta": "Ask which comparator should be locked before the next result.",
+      "audio": "Use the original deterministic bed at low level; add a human-recorded voiceover only after separate review.",
+      "caption_style": "Large centered captions, one sentence per scene, preserve the existing teal/red decision contrast.",
+      "export_settings": "MP4, H.264, 1080x1920, 30 fps, AAC, burned-in captions, no platform watermark.",
+      "claim_boundary": "Shows an internal source-bounded non-promotion result; it is not a customer, field, savings, or future-performance result.",
+      "scenes": [
+        {
+          "time": "00:00-00:03",
+          "visual": "Open on the red REJECTED state before revealing the grid.",
+          "on_screen_text": "THE STRONGER TEST SAID NO",
+          "voiceover_or_edit_note": "Lead with tension, not the brand."
+        },
+        {
+          "time": "00:03-00:09",
+          "visual": "Show the initial encouraging diagnostic card.",
+          "on_screen_text": "ONE COMPARATOR LOOKED ENCOURAGING",
+          "voiceover_or_edit_note": "Avoid reading exact figures unless the source receipt is rechecked."
+        },
+        {
+          "time": "00:09-00:17",
+          "visual": "Transition to each pair's strongest baseline.",
+          "on_screen_text": "THEN EVERY CASE GOT ITS STRONGEST BASELINE",
+          "voiceover_or_edit_note": "Use a decisive wipe from teal to neutral."
+        },
+        {
+          "time": "00:17-00:24",
+          "visual": "Highlight the missed threshold and rejected result.",
+          "on_screen_text": "THE PROMOTION GATE STAYED CLOSED",
+          "voiceover_or_edit_note": "Hold long enough for silent viewers to read."
+        },
+        {
+          "time": "00:24-00:30",
+          "visual": "Closing card with question prompt.",
+          "on_screen_text": "WHAT BASELINE WOULD YOU REQUIRE?",
+          "voiceover_or_edit_note": "Use the question as the comment prompt."
+        }
+      ]
+    },
+    {
+      "id": "SB03",
+      "title": "The Stop: A 60-Second Reviewer Story",
+      "source_path": "out/social/the_stop_documentary_trailer_v1_20260716/LumenCore_The_Stop_Documentary_Trailer_V1.mp4",
+      "target_format": "LinkedIn native video, 16:9 landscape",
+      "target_duration": "55-60 seconds",
+      "audience": "Public-sector reviewers, consortium teams, engineers, and diligence leads",
+      "hook": "The most important result was the decision not to promote.",
+      "cta": "Use the public reviewer path to inspect how the gate was defined.",
+      "audio": "Retain the original bed and computer-generated narration disclosure; trim pauses before increasing playback speed.",
+      "caption_style": "Sentence case, lower-third captions, 42-56 px at 1080p, never cover metrics or boundary text.",
+      "export_settings": "MP4, H.264, 1920x1080, 24 or 30 fps, AAC, target loudness near -16 LUFS, burned-in captions.",
+      "claim_boundary": "A narrative edit of an internal non-promotion record; it does not show an outside evaluator, field use, or commercial result.",
+      "scenes": [
+        {
+          "time": "00:00-00:05",
+          "visual": "Open on the final reviewer gate and the word REJECTED.",
+          "on_screen_text": "THE MOST IMPORTANT RESULT WAS STOP",
+          "voiceover_or_edit_note": "Start at the consequence, then explain how it happened."
+        },
+        {
+          "time": "00:05-00:15",
+          "visual": "Show the original question and the first diagnostic view.",
+          "on_screen_text": "THE FIRST COMPARISON LOOKED PROMISING",
+          "voiceover_or_edit_note": "Use only the minimum context needed."
+        },
+        {
+          "time": "00:15-00:28",
+          "visual": "Introduce the stronger per-case comparator.",
+          "on_screen_text": "THE REVIEWER ASKED A HARDER QUESTION",
+          "voiceover_or_edit_note": "Emphasize that the comparator changed the interpretation, not the stored data."
+        },
+        {
+          "time": "00:28-00:40",
+          "visual": "Show the threshold miss and preserved negative result.",
+          "on_screen_text": "THE GATE FAILED. THE RESULT STAYED VISIBLE.",
+          "voiceover_or_edit_note": "Do not soften the failed gate."
+        },
+        {
+          "time": "00:40-00:52",
+          "visual": "Move through the evidence-record and boundary frames.",
+          "on_screen_text": "SOURCE. BASELINE. METRIC. HASH. DECISION.",
+          "voiceover_or_edit_note": "Keep each word on screen long enough to register."
+        },
+        {
+          "time": "00:52-00:60",
+          "visual": "Close on the review-home card.",
+          "on_screen_text": "STRONGER QUESTIONS. BETTER DECISIONS.",
+          "voiceover_or_edit_note": "End with lumen-core.ai and the outside-evaluation invitation."
+        }
+      ]
+    }
+  ]
+}

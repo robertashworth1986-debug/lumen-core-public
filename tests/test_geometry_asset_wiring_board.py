@@ -47,7 +47,7 @@ def test_asset_wiring_board_builds_reviewer_safe_summary():
     assert summary["field_validation"] is False
     assert summary["kraken_live_execution_allowed"] is False
     assert summary["mass_email_allowed"] is False
-    assert summary["bounded_estimated_value_claim_allowed"] is True
+    assert summary["bounded_estimated_value_claim_allowed"] is False
     assert summary["paid_pilot_scoping_allowed"] is True
     assert summary["vps_domain_live_dashboard_routed"] is False
     assert payload["send_gate"]["send_without_user_review"] is False
@@ -147,7 +147,7 @@ def test_next_actions_and_markdown_keep_claim_boundaries_visible():
     assert "Field-Validation Target Queue" in rendered
     assert "buyer-authorized" in rendered
     assert "High-Value Wiring Queue" in rendered
-    assert "Bounded estimated value claim allowed: `true`" in rendered
+    assert "Bounded estimated value claim allowed: `false`" in rendered
     assert "Ready for real-dollar claim: `false`" in rendered
     assert "Mass email allowed: `false`" in rendered
     assert "Do not say a packet is worth a fixed dollar amount as fact." in rendered

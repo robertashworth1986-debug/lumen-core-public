@@ -1,6 +1,8 @@
 import os, json, time, math, base64, hashlib, hmac, urllib.request, urllib.parse, urllib.error, re
 from datetime import datetime, timezone
 
+from safe_diagnostics import sanitize_diagnostic_text
+
 ROOT = r"C:\LumaTrader\INSTITUTIONAL_STACK_V2"
 CONF = os.path.join(ROOT, "config")
 OUT  = os.path.join(ROOT, "out")
@@ -42,20 +44,14 @@ def load_env_file(path):
     return env
 
 def sanitize_probe_note(note, env_names=None):
-    text = str(note or "")
-    if not text:
-        return text
-    text = re.sub(
-        r"(?i)(key|api_key|token|secret|password|pwd|email)=([^&\s\"]+)",
-        r"\1=[REDACTED]",
-        text,
-    )
     names = env_names or []
-    for env_name in names:
-        val = os.environ.get(env_name)
-        if val:
-            text = text.replace(str(val), "[REDACTED]")
-    return text
+    if isinstance(names, str):
+        names = [name for name in re.split(r"[\s,]+", names) if name]
+    secret_values = [
+        os.environ.get(str(env_name), "")
+        for env_name in names
+    ]
+    return sanitize_diagnostic_text(note, secret_values)
 
 def next_kraken_nonce(min_step=1_000_000):
     state = load_json(KRAKEN_NONCE_STATE_PATH, {})

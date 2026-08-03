@@ -27,7 +27,8 @@ def test_linkedin_universe_packet_is_ready_and_profile_bounded():
     assert "Proof-to-Pilot" in payload["profile_copy"]["recommended_headline"]
     assert payload["summary"]["headline_character_count"] <= 220
     assert payload["summary"]["about_character_count"] <= 2600
-    assert payload["summary"]["reviewer_gate_clear"] is True
+    assert payload["summary"]["reviewer_packaging_gate_clear"] is True
+    assert payload["summary"]["submission_argument_gate_clear"] is False
     assert payload["summary"]["all_final_actions_blocked_without_human"] is True
     assert payload["summary"]["linkedin_public_action_requires_human"] is True
 

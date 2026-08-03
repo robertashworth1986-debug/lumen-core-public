@@ -368,10 +368,14 @@ def build_payload() -> dict[str, Any]:
     )
     public_scan = scan_text(rendered_text)
 
-    gate_clear = (
-        bool(reviewer_gate.get("reviewer_gate_clear"))
-        and int((reviewer_gate.get("summary") or {}).get("unsafe_secret_count") or 0) == 0
-        and int((reviewer_gate.get("summary") or {}).get("unsafe_claim_count") or 0) == 0
+    gate_summary = reviewer_gate.get("summary") or {}
+    submission_argument_gate_clear = bool(
+        reviewer_gate.get("reviewer_gate_clear")
+    )
+    reviewer_packaging_gate_clear = (
+        bool(gate_summary.get("packaging_checks_clear"))
+        and int(gate_summary.get("unsafe_secret_count") or 0) == 0
+        and int(gate_summary.get("unsafe_claim_count") or 0) == 0
     )
     authority_summary = authority.get("summary", {}) if isinstance(authority.get("summary"), dict) else {}
     decision_summary = decision.get("summary", {}) if isinstance(decision.get("summary"), dict) else {}
@@ -386,7 +390,10 @@ def build_payload() -> dict[str, Any]:
         "schema": "linkedin_universe_profile_packet_v1",
         "status": (
             "LINKEDIN_UNIVERSE_PROFILE_READY_HUMAN_POST_REQUIRED"
-            if gate_clear and all_final_actions_blocked and evidence_present and public_safe
+            if reviewer_packaging_gate_clear
+            and all_final_actions_blocked
+            and evidence_present
+            and public_safe
             else "LINKEDIN_UNIVERSE_PROFILE_BLOCKED"
         ),
         "profile_url": profile_copy["profile_url"],
@@ -401,7 +408,8 @@ def build_payload() -> dict[str, Any]:
             "qa_count": int((qa.get("summary") or {}).get("qa_count") or 0),
             "manifested_markdown_count": int((manifest.get("summary") or {}).get("manifested_markdown_count") or 0),
             "control_artifact_count": int((manifest.get("summary") or {}).get("control_artifact_count") or 0),
-            "reviewer_gate_clear": gate_clear,
+            "reviewer_packaging_gate_clear": reviewer_packaging_gate_clear,
+            "submission_argument_gate_clear": submission_argument_gate_clear,
             "all_final_actions_blocked_without_human": all_final_actions_blocked,
             "public_copy_sensitive_count": public_scan["sensitive_count"],
             "public_copy_unsafe_count": public_scan["unsafe_public_count"],
@@ -456,7 +464,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Reviewer Q&A rows: `{summary['qa_count']}`",
         f"- Data-room Markdown artifacts: `{summary['manifested_markdown_count']}`",
         f"- Data-room control artifacts: `{summary['control_artifact_count']}`",
-        f"- Reviewer gate clear: `{str(summary['reviewer_gate_clear']).lower()}`",
+        f"- Reviewer packaging gate clear: `{str(summary['reviewer_packaging_gate_clear']).lower()}`",
+        f"- Submission argument gate clear: `{str(summary['submission_argument_gate_clear']).lower()}`",
         f"- All final actions blocked without human: `{str(summary['all_final_actions_blocked_without_human']).lower()}`",
         f"- Public copy sensitive hits: `{summary['public_copy_sensitive_count']}`",
         f"- Public copy unsafe hits: `{summary['public_copy_unsafe_count']}`",

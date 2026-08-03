@@ -48,7 +48,7 @@ def now_utc() -> str:
 
 
 def now_tag() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
 
 
 def sha256_file(path: Path) -> str:

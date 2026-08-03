@@ -10,57 +10,162 @@ SCRIPT = ROOT / "code" / "ops" / "BUILD_PROOF_TO_REVENUE_ENGINE.py"
 
 
 def load_module():
-    spec = importlib.util.spec_from_file_location("proof_to_revenue_engine", SCRIPT)
+    spec = importlib.util.spec_from_file_location(
+        "proof_to_revenue_engine", SCRIPT
+    )
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
 
 
-def test_proof_to_revenue_engine_promotes_manual_paid_pilot_not_overclaims():
+def test_engine_separates_product_process_offer_from_model_performance():
     module = load_module()
     payload = module.build_payload()
     summary = payload["summary"]
+    live_domain = json.loads(
+        (
+            ROOT
+            / "out"
+            / "ops"
+            / "live_domain_deployment_feed_latest.json"
+        ).read_text(encoding="utf-8")
+    )
+    live_summary = live_domain["summary"]
 
-    assert payload["schema"] == "proof_to_revenue_engine_v1"
+    assert payload["schema"] == "proof_to_revenue_engine_v3"
+    assert summary["revenue_stage"] == (
+        "bounded_offers_ready_local_only_domain_stale_no_recipient"
+    )
     assert summary["live_domain_hash_verified"] is False
-    assert summary["revenue_stage"] == "proof_stack_not_ready_for_outreach"
-    assert summary["manual_reviewed_outreach_allowed"] is True
+    assert summary["required_remote_hash_matches"] == (
+        live_summary["required_remote_hash_match_count"]
+    )
+    assert summary["required_feed_count"] == live_summary["required_feed_count"]
+    assert summary["sellable_product_lane"] == "prooflock_opportunity_ops"
+    assert summary["sellable_product_name"] == (
+        "ProofLock Opportunity Operations"
+    )
+    assert summary["product_internal_evidence_gate_passed"] is True
+    assert summary["product_buyer_readiness_gate_passed"] is False
+    assert summary["product_process_scoping_allowed"] is True
+    assert summary["internal_performance_champion_present"] is False
+    assert summary["measured_reference_candidate"] == (
+        "kuramoto_phase_coupling"
+    )
+    assert summary["development_selected_candidate"] == (
+        "lissajous_phase_paths"
+    )
+    assert summary["reference_candidate_was_protocol_selected"] is False
+    assert summary["internal_replay_holdout_wins"] == 482
+    assert summary["internal_replay_holdout_count"] == 1525
+    assert summary["internal_replay_mean_delta"] == -0.508191
+    assert summary["cross_sector_benchmark_status"] == (
+        "NO_CROSS_SECTOR_EFFICIENCY_GAIN_PROVEN"
+    )
+    assert summary["cross_sector_gain_proven_count"] == 0
+    assert summary["cross_sector_efficiency_claim_allowed"] is False
+    assert summary["model_performance_marketing_allowed"] is False
+
+
+def test_engine_prices_only_bounded_services_and_keeps_outreach_closed():
+    module = load_module()
+    payload = module.build_payload()
+    summary = payload["summary"]
+    offers = payload["commercial_offers"]
+    target = payload["target_status"]
+    template = payload["safe_draft_template"]
+
+    protocol = offers["source_native_protocol_review"]["price_usd"]
+    benchmark = offers["benchmark_implementation"]["price_usd"]
+    product = offers["product_process_discovery"]
+    assert protocol["low"] == 2500
+    assert protocol["high"] == 7500
+    assert benchmark["low"] == 7500
+    assert benchmark["high"] == 25000
+    assert product["product_process_scoping_allowed"] is True
+    assert product["internal_evidence_gate_passed"] is True
+    assert product["buyer_readiness_gate"]["passed"] is False
+    assert product["validated_evidence_count"] == product["required_evidence_count"]
+    assert product["external_outreach_ready"] is False
+    assert product["model_performance_dependency"] is False
+    assert product["pricing_status"] == "scope_before_quote_no_price_asserted"
+
+    assert summary["paid_protocol_review_scoping_allowed"] is True
+    assert summary["pilot_ready_count"] == 0
+    assert summary["manual_reviewed_outreach_allowed"] is False
+    assert summary["external_outreach_ready"] is False
     assert summary["send_without_user_review_allowed"] is False
     assert summary["bulk_email_allowed"] is False
     assert summary["field_validation_claim_allowed"] is False
     assert summary["realized_savings_claim_allowed"] is False
     assert summary["fixed_frozen_delta_price_claim_allowed"] is False
+    assert summary["enterprise_valuation_asserted"] is False
     assert summary["live_trading_or_autonomous_execution_allowed"] is False
-    assert summary["champion_family"] == "kuramoto_phase_coupling"
-    assert summary["holdout_wins"] >= 20
+    assert summary["safe_estimated_hourly_value_usd"] == 0
+    assert summary["safe_estimated_annual_value_usd"] == 0
+    assert summary["modeled_dollar_projection_allowed"] is False
+
+    assert target["recipient_selected"] is False
+    assert target["recommended_first_buyer"] is None
+    assert target["legacy_paid_pilot_queue_excluded"] is True
+    assert target["legacy_paid_pilot_queue_schema"] in {
+        "paid_pilot_outreach_queue_v1",
+        "paid_pilot_outreach_queue_v2",
+    }
+    assert payload["top_manual_targets"] == []
+    assert template["recipient_selected"] is False
+    assert template["send_allowed"] is False
+    assert template["status"] == "draft_only_no_recipient_not_ready_to_send"
     assert len(payload["proof_to_revenue_sha256"]) == 64
 
 
-def test_proof_to_revenue_engine_has_targets_and_safe_email_template():
+def test_engine_preserves_negative_model_evidence_and_safe_draft():
     module = load_module()
     payload = module.build_payload()
-    template = payload["safe_email_template"]
-
-    assert payload["top_manual_targets"]
-    assert "Reviewer URL:" in template["body"]
-    assert template["send_mode"] == "manual_review_only"
-    assert "field validation or realized savings yet" in template["body"]
+    evidence = payload["current_model_evidence"]
+    template = payload["safe_draft_template"]
     dumped = json.dumps(payload).lower()
+
+    assert evidence["candidate_family"] == "kuramoto_phase_coupling"
+    assert evidence["development_selected_candidate"] == (
+        "lissajous_phase_paths"
+    )
+    assert evidence["candidate_was_protocol_selected"] is False
+    assert "482/1525" in evidence["direct_measured_result"]
+    assert "mean skill -0.508191" in evidence["direct_measured_result"]
+    assert evidence["sector_gain_proven_count"] == 0
+    assert evidence["sector_count"] == 6
+    assert evidence["external_cross_sector_replication_complete"] is False
+    assert evidence["prospective_cross_sector_holdout_complete"] is False
+
+    assert "not claiming guaranteed awards, model superiority" in template["body"]
+    assert "human-controlled workflow" in template["body"]
     assert "realized savings" in dumped
     assert "fixed value per frozen delta" in dumped
-    assert "send_without_user_review_allowed" in dumped
-    assert '"send_without_user_review_allowed": false' in dumped
+    assert "cross-sector efficiency gain" in dumped
+    assert "24/24" not in dumped
+    assert "2,506,267" not in dumped
 
 
-def test_proof_to_revenue_markdown_answers_next_questions():
+def test_proof_to_revenue_markdown_answers_current_questions():
     module = load_module()
     payload = module.build_payload()
     rendered = module.render_markdown(payload)
 
     assert "Proof To Revenue Engine" in rendered
-    assert "Deployment Verification" in rendered
-    assert "Field Validation Unlock" in rendered
+    assert "Current Model Evidence" in rendered
+    assert "Bounded Commercial Offers" in rendered
+    assert "Target Gate" in rendered
+    assert "External Unlock" in rendered
     assert "What To Ask Next" in rendered
-    assert "Live domain hash verified: `false`" in rendered
-    assert "public hash verification is still pending" in rendered
+    assert "Proven sector gains: `0/6`" in rendered
+    assert "Internal performance champion present: `false`" in rendered
+    assert "Pilot-ready candidates: `0`" in rendered
+    assert "Manual reviewed outreach allowed: `false`" in rendered
+    assert "External outreach ready: `false`" in rendered
+    assert "Modeled dollar projection allowed: `false`" in rendered
+    assert "Source-native protocol review: `$2,500`-`$7,500`" in rendered
+    assert "Benchmark implementation: `$7,500`-`$25,000`" in rendered
+    assert "Recipient selected: `false`" in rendered
+    assert "Legacy paid-pilot queue excluded: `true`" in rendered

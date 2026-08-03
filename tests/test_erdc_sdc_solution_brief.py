@@ -41,6 +41,13 @@ def test_source_pdfs_match_the_official_manifest():
     assert sources["manifest_schema"] == "lumencore.erdc_sdc_source_manifest.v2"
     assert sources["manifest_as_of_date"] == "2026-07-29"
     assert sources["current_attachment_set_complete"] is True
+    assert sources["source_custody_schema"] == "lumencore.erdc_sdc_source_custody.v1"
+    assert sources["source_custody_checks_pass"] is True
+    assert len(sources["custody_sources"]) == 2
+    assert sources["live_page_snapshot"]["route"] == "COMMERCIAL_SOLUTION"
+    assert sources["live_page_snapshot"]["deadline_text"] == (
+        "4:00 pm CT on August 7, 2026"
+    )
     assert len(sources["files"]) == 2
     assert {row["actual_pages"] for row in sources["files"]} == {7, 13}
     for row in sources["files"]:
@@ -50,20 +57,23 @@ def test_source_pdfs_match_the_official_manifest():
         assert row["official_url"].startswith("https://www.erdcwerx.org/")
 
 
-def test_research_evidence_receipt_binds_current_source_native_ledger():
+def test_evidence_ablation_receipt_binds_current_bounded_experiment():
     module = load_module()
-    research = module.research_evidence_receipt()
+    evidence = module.evidence_ablation_receipt()
 
-    assert research["all_checks_pass"] is True
-    assert research["schema"] == "source_native_family_baseline_ledger_v1"
-    assert research["registered_family_count"] == 140
-    assert research["implementation_present_count"] == 35
-    assert research["executed_direct_source_baseline_comparison_count"] == 126
-    assert research["individual_comparison_global_holm_positive_count"] == 0
-    assert research["candidate_source_beats_every_baseline_global_holm_count"] == 0
-    assert research["public_performance_claim_allowed"] is False
-    assert research["real_dollar_savings_claim_allowed"] is False
-    assert len(research["sha256"]) == 64
+    assert evidence["receipt_checks_pass"] is True
+    assert evidence["schema"] == "lumencore.erdc_sdc_evidence_ablation.v2"
+    assert evidence["workflow_count"] == 48
+    assert evidence["full_attack_detected_count"] == 7
+    assert evidence["full_attack_case_count"] == 7
+    assert evidence["full_adverse_outcome_recall"] == 1.0
+    assert evidence["full_artifact_bytes_rehash_rate"] == 1.0
+    assert evidence["full_predeclared_gate_execution_pass"] is True
+    assert evidence["full_posthoc_promotion_change_detected"] is True
+    assert evidence["promotion_or_performance_claim_allowed"] is False
+    assert evidence["opentelemetry_version"] == "1.59.0"
+    assert evidence["slsa_version"] == "1.2"
+    assert len(evidence["sha256"]) == 64
 
 
 def test_generated_pdf_meets_body_page_font_size_and_file_controls():
@@ -86,7 +96,8 @@ def test_generated_pdf_meets_body_page_font_size_and_file_controls():
     assert pdf["body_page_labels_present"] is True
     assert pdf["draft_watermark_present_every_page"] is True
     assert pdf["required_content_markers_present"] is True
-    assert pdf["research_evidence_marker_present"] is True
+    assert pdf["required_acronym_entries_present"] is True
+    assert pdf["evidence_ablation_marker_present"] is True
     assert 0 < pdf["bytes"] < 20 * 1024 * 1024
     assert len(pdf["sha256"]) == 64
 
@@ -97,9 +108,10 @@ def test_compliance_gate_passes_document_controls_but_blocks_submission():
     rows = {row["id"]: row for row in payload["requirements"]}
 
     assert payload["status"] == (
-        "CURRENT_PUBLIC_DRAFT_PASS_PRIVATE_ROM_SAM_CONTACT_ACCOUNT_AND_PORTAL_FINALIZATION_REQUIRED"
+        "CURRENT_PUBLIC_DRAFT_FORMAT_AND_MARKER_CHECKS_PASS_SEMANTIC_EVIDENCE_AND_PRIVATE_FINALIZATION_REQUIRED"
     )
-    assert payload["technical_document_checks_pass"] is True
+    assert payload["format_and_marker_checks_pass"] is True
+    assert payload["semantic_review_complete"] is False
     assert payload["submission_ready"] is False
     assert payload["funding_currently_available"] is False
     assert payload["deadline"]["safest_operational_cutoff"] == (
@@ -113,6 +125,7 @@ def test_compliance_gate_passes_document_controls_but_blocks_submission():
     )
     assert payload["deadline"]["question_submission_cutoff"] == "July 31, 2026"
     assert rows["ROM_01"]["status"] == "PRIVATE_FINALIZATION_REQUIRED"
+    assert rows["EXEC_01"]["status"] == "PRIVATE_FINALIZATION_REQUIRED"
     assert rows["SAM_01"]["status"] == "PRIVATE_FINALIZATION_REQUIRED"
     assert rows["CONTACT_01"]["status"] == "PRIVATE_FINALIZATION_REQUIRED"
     assert rows["ACCOUNT_01"]["status"] == "HUMAN_ACCOUNT_ACCESS_REQUIRED"
@@ -126,7 +139,12 @@ def test_compliance_gate_passes_document_controls_but_blocks_submission():
     assert payload["summary"]["pricing_allowed_without_founder_approval"] is False
     assert payload["summary"]["legal_identity_publish_allowed"] is False
     assert payload["summary"]["browser_navigation_performed"] is False
-    assert payload["research_evidence"]["all_checks_pass"] is True
+    assert rows["BASELINE_01"]["status"] == "PASS_BOUNDED"
+    assert rows["ABLATION_01"]["status"] == "PASS_BOUNDED"
+    assert rows["TECH_03"]["status"] == "LOCAL_ONLY_EXTERNAL_REPRODUCIBILITY_REQUIRED"
+    assert rows["TRUST_01"]["status"] == "EXTERNAL_TRUST_ROOT_REQUIRED"
+    assert rows["METRIC_01"]["status"] == "PASS_BOUNDED"
+    assert payload["evidence_ablation"]["receipt_checks_pass"] is True
 
 
 def test_public_draft_contains_no_private_or_unsupported_claim_markers():
@@ -137,10 +155,16 @@ def test_public_draft_contains_no_private_or_unsupported_claim_markers():
 
     assert "funding is not currently available" in normalized
     assert "customers, revenue, or realized savings" in normalized
-    assert "140 registered families" in normalized
-    assert "35 family implementations present" in normalized
-    assert "126 direct comparisons" in normalized
-    assert "zero global holm-positive comparisons" in normalized
+    assert "48 deterministic synthetic workflows" in normalized
+    assert "detected 7/7 declared tamper cases" in normalized
+    assert "separately pinned local anchor" in normalized
+    assert "opentelemetry logs data model 1.59.0" in normalized
+    assert "slsa build provenance 1.2" in normalized
+    assert "complementary interoperability contexts, not ranked competitors" in normalized
+    assert "not an hpcmp workload" in normalized
+    assert "not a superiority claim" in normalized
+    assert "exact july 29 receipt remains local" in normalized
+    assert "140 registered families" not in normalized
     assert "no classified handling" in normalized
     assert "does not claim" in normalized
     assert "not for submission" in normalized
@@ -159,11 +183,11 @@ def test_written_gate_matches_current_pdf_and_is_claim_bounded():
 
     assert payload["pdf"]["sha256"] == module.sha256_file(module.OUT_PDF)
     assert payload["source_integrity"]["all_source_checks_pass"] is True
-    assert payload["research_evidence"]["all_checks_pass"] is True
-    assert payload["pdf"]["research_evidence_marker_present"] is True
+    assert payload["evidence_ablation"]["receipt_checks_pass"] is True
+    assert payload["pdf"]["evidence_ablation_marker_present"] is True
     assert payload["submission_ready"] is False
     assert "not submission-ready" in rendered
-    assert "Phase II-only price" in rendered
+    assert "Phase II price and execution commitments" in rendered
     assert "private SAM/contact facts" in rendered
     assert "authenticated portal form" in rendered
     assert "does not claim" in payload["claim_boundary"]

@@ -78,7 +78,7 @@
     },
     "verified": true
   },
-  "docket_sha256": "d549640da08f8fee3f3239d6276de4b146a0eec14778c1e083387e06ec0bb52f",
+  "docket_sha256": "343aa4ce55a3a06a2230d9771e8589f9320d1c6215c6a61b8935e455be4cec8f",
   "evaluator_acceptance": {
     "accepted_protocol_sha256": null,
     "accepted_utc": null,
@@ -181,7 +181,7 @@
     "source_publisher": "U.S. Energy Information Administration",
     "source_route": "https://api.eia.gov/v2/electricity/rto/daily-region-data/data/"
   },
-  "generated_utc": "2026-07-16T02:54:01.254030+00:00",
+  "generated_utc": "2026-07-26T22:07:30.585566+00:00",
   "maturity": {
     "current_supported_level": 3,
     "external_validation_complete": false,
@@ -236,7 +236,7 @@
       "remaining_gap": "No external organization has adopted an incident, escalation, or production-use decision process for this experiment."
     }
   ],
-  "portable_input_chain_sha256": "641989d3669015e871c287a81221d4087eebd0f9e80a4030d26b0b496d7d7350",
+  "portable_input_chain_sha256": "d883d9a030a28a01d6228a3e53f07ef2b5d99c2ff7079242e97bcf185744979f",
   "portable_inputs": [
     {
       "bytes": 9722,
@@ -257,16 +257,16 @@
       "sha256": "21a70dbd739219ab8058707c92cb17b57e9f72c09d64b7ea38db3f88ea52a4fe"
     },
     {
-      "bytes": 200,
+      "bytes": 742,
       "hash_mode": "utf8_lf",
       "path": ".gitattributes",
-      "sha256": "feb145de2f628925327f66bab9eb9da986b2c8b3a978938cff0c373ef4ab66fd"
+      "sha256": "6b902ababfe5a745608bccdb84c1c6b69bec86ac190823691b17ebfbff199440"
     },
     {
-      "bytes": 2618,
+      "bytes": 2884,
       "hash_mode": "utf8_lf",
       "path": ".gitignore",
-      "sha256": "c25c01afa309ecee57a768b3d4e5ca98cc0bcfb6d7afaaf861da113b2421adbb"
+      "sha256": "bfa45d7413aa6339f518cea38e730baeac47514d35770fc218569d67cd00fefc"
     },
     {
       "bytes": 4678,

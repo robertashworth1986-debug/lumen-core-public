@@ -1,11 +1,15 @@
 # Outreach Response Template Registry - 2026-07-18
 
-- Templates: `11`
-- Private-render templates: `7`
+- Templates: `16`
+- Private-render templates: `12`
 - Builder can send email: `false`
 - Duplicate-send gate: `FAIL_CLOSED`
 - Missing-fact gate: `FAIL_CLOSED`
 - Past-deadline gate: `FAIL_CLOSED`
+- Inserted-fact claim gate: `FAIL_CLOSED`
+- High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`
+- Static quality gate: `PASS`
+- Static quality checks: `192`
 - Unchanged rebuilds byte-stable: `true`
 
 ## Claim Boundary
@@ -21,19 +25,33 @@ This response is a communication or routing artifact. It does not establish sele
 - Keep legal, signatory, address, account, and portal identifiers in private renderings only.
 - Attach files only when the recipient or governing instructions explicitly require them.
 - Escalate deadlines with the exact date, time, timezone, portal, and observed blocker.
+- Render the same canonical timezone-aware deadline_iso value that the urgency gate evaluates for every template that states a known deadline.
+- Use HTTPS-only public links without embedded credentials.
+- Reject rendered subject lines containing line breaks or other mail-header injection characters.
 - Require action-time human review for every outbound response.
+
+## Quality Gate
+
+- All templates pass: `true`
+- Deadline-control templates: `COMPONENT_INSTRUCTION_ESCALATION, INITIAL_PARTNER_TEAMING_INQUIRY, PORTAL_SUPPORT_DEADLINE_RESCUE`
+- HTTPS public URL fields: `6`
 
 ## Decision Matrix
 
 | Template | Send policy | Attachment policy | Private render |
 |---|---|---|---:|
 | `NO_DUPLICATE_MONITOR` | `MONITOR_NO_SEND` | `NONE` | `false` |
+| `INITIAL_PARTNER_TEAMING_INQUIRY` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `DEADLINE_CLARIFICATION` | `HUMAN_ACTION_DUE` | `NONE` | `false` |
 | `PORTAL_SUPPORT_DEADLINE_RESCUE` | `HUMAN_ACTION_DUE` | `EXPLICIT_REQUEST_ONLY` | `true` |
 | `REQUESTED_INFORMATION_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `true` |
+| `REQUESTED_ASSET_DELIVERY_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `true` |
 | `SUBMISSION_RECEIPT_FOLLOWUP` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `true` |
 | `COMPONENT_INSTRUCTION_ESCALATION` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `BOUNDED_REVIEW_FOLLOWUP` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
+| `WARM_INVESTOR_INTRO_REQUEST` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
+| `FUNDING_REVIEW_STATUS_CHECK` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
+| `DIRECT_INVESTOR_REVIEW_REQUEST` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `VALIDATION_PILOT_REQUEST` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `false` |
 | `DECLINE_CLOSEOUT` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `false` |
 | `MOU_ONBOARDING_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `true` |
@@ -48,6 +66,47 @@ Use after a receipt, out-of-office notice, completed answer, or final decline wh
 - Required fields: `none`
 
 No message is rendered. Monitor the thread and do not duplicate-send.
+
+## INITIAL_PARTNER_TEAMING_INQUIRY
+
+Send one no-attachment fit-check to a verified public corporate route for an active opportunity that permits teaming, while preserving qualification and partner-authority boundaries.
+
+- Inbound states: `VERIFIED_PUBLIC_PARTNER_ROUTE_NO_PRIOR_THREAD`
+- Reply triggers: `ONE_INITIAL_BOUNDED_TEAMING_INQUIRY`
+- Required fields: `recipient_name, agency_name, opportunity_name, notice_type, opportunity_summary, deadline_iso, teaming_basis, bounded_contribution, qualification_boundary, partner_fit_basis, requested_partner_role, authorization_request, duplicate_review_disclosure, source_opportunity_url, public_company_url, public_proof_url, sender_name, sender_title, organization_name, recipient_email`
+
+```text
+Subject: Time-sensitive teaming inquiry - {opportunity_name}
+
+Hello {recipient_name},
+
+I am {sender_name}, {sender_title} of {organization_name}. {agency_name} posted {opportunity_name}, a {notice_type}: {opportunity_summary}
+
+The official response deadline is {deadline_iso}. {teaming_basis}
+
+Our bounded contribution is {bounded_contribution}
+
+Qualification boundary: {qualification_boundary}
+
+Partner fit basis: {partner_fit_basis}
+
+Would your organization be open to a rapid fit check for the following role: {requested_partner_role}
+
+Before either organization is named or any credential is used, we need written confirmation of: {authorization_request}
+
+Duplicate-send check: {duplicate_review_disclosure}
+
+This inquiry requests a nonbinding fit check only. It does not request pricing, a commitment, or permission to represent an unverified qualification. No attachment is included. A prompt reply would preserve time for both parties to reconcile an accurate response before the official deadline.
+
+Official notice: {source_opportunity_url}
+Company: {public_company_url}
+Public proof: {public_proof_url}
+
+Respectfully,
+{sender_name}
+{sender_title}
+{organization_name}
+```
 
 ## DEADLINE_CLARIFICATION
 
@@ -78,14 +137,14 @@ Request official support instructions for a concrete portal blocker before a kno
 
 - Inbound states: `PORTAL_BLOCKER, SUBMISSION_AT_RISK`
 - Reply triggers: `SUPPORT_ACTION_REQUIRED`
-- Required fields: `recipient_name, source_subject, submission_name, portal_name, deadline_local, portal_blocker, steps_already_tried, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Required fields: `recipient_name, submission_name, portal_name, deadline_iso, portal_blocker, steps_already_tried, sender_name, sender_title, organization_name, recipient_email, source_message_id`
 
 ```text
 Subject: Time-sensitive portal support: {submission_name}
 
 Hello {recipient_name},
 
-I am attempting to complete {submission_name} in {portal_name} before {deadline_local}. The current blocker is: {portal_blocker}
+I am attempting to complete {submission_name} in {portal_name} before {deadline_iso}. The current blocker is: {portal_blocker}
 
 Steps already tried: {steps_already_tried}
 
@@ -122,6 +181,33 @@ Best regards,
 {organization_name}
 ```
 
+## REQUESTED_ASSET_DELIVERY_REPLY
+
+Deliver only files explicitly requested in an inbound message, with a bounded inventory and permitted-use statement.
+
+- Inbound states: `ASSETS_EXPLICITLY_REQUESTED, REQUESTED_ASSETS_READY_FOR_REVIEW`
+- Reply triggers: `EXPLICIT_ASSET_DELIVERY_REQUEST`
+- Required fields: `recipient_name, source_subject, requested_asset_summary, attachment_inventory, permitted_use_boundary, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+
+```text
+Subject: Re: {source_subject}
+
+Hello {recipient_name},
+
+Attached are only the materials explicitly requested in your message: {requested_asset_summary}
+
+Attachment inventory: {attachment_inventory}
+
+Permitted use: {permitted_use_boundary}
+
+These materials do not imply endorsement, independent validation, licensing beyond the stated use, an award, or a performance claim. Please let me know if you need a different file format or dimensions.
+
+Best regards,
+{sender_name}
+{sender_title}
+{organization_name}
+```
+
 ## SUBMISSION_RECEIPT_FOLLOWUP
 
 Confirm delivery and readability after a required package was sent; this is not a duplicate submission.
@@ -151,14 +237,14 @@ Follow up once with the authoritative component POC after portal support redirec
 
 - Inbound states: `SUPPORT_REDIRECTED_TO_COMPONENT, DEADLINE_BLOCKER_UNANSWERED`
 - Reply triggers: `COMPONENT_POC_FOLLOWUP_AFTER_NO_REPLY`
-- Required fields: `recipient_name, source_subject, topic_or_notice, deadline_local, original_sent_local, support_redirect_summary, exact_instruction_question, requested_reply_by_local, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+- Required fields: `recipient_name, source_subject, topic_or_notice, deadline_iso, original_sent_local, support_redirect_summary, exact_instruction_question, requested_reply_by_local, sender_name, sender_title, organization_name, recipient_email, source_message_id`
 
 ```text
 Subject: Re: {source_subject}
 
 Hello {recipient_name},
 
-I am following up once on the instruction question below for {topic_or_notice}, which closes {deadline_local}. The original component message was sent {original_sent_local}. {support_redirect_summary}
+I am following up once on the instruction question below for {topic_or_notice}, which closes {deadline_iso}. The original component message was sent {original_sent_local}. {support_redirect_summary}
 
 Question requiring component guidance: {exact_instruction_question}
 
@@ -190,6 +276,92 @@ Proposed scope: {review_scope}
 This note does not assert receipt, endorsement, independent validation, licensing, funding, deployment, or production readiness. No additional attachment is included. If this is not a fit, no response is required and I will not send another follow-up.
 
 Best regards,
+{sender_name}
+{sender_title}
+{organization_name}
+```
+
+## WARM_INVESTOR_INTRO_REQUEST
+
+Follow up once after a funding contact explicitly offered introductions, narrowing the request to one primary and one secondary fit without attaching another deck.
+
+- Inbound states: `WARM_INTRO_OFFER_NO_REPLY`
+- Reply triggers: `ONE_FOCUSED_INTRO_FOLLOWUP_AFTER_HOLD`
+- Required fields: `recipient_name, source_subject, current_raise_amount, current_raise_purpose, primary_fund_name, primary_fit_reason, secondary_fund_name, public_proof_url, current_stage_disclosure, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+
+```text
+Subject: Re: {source_subject}
+
+Hello {recipient_name},
+
+I am following up once on your offer to make a targeted introduction. {organization_name}'s current ask is {current_raise_amount} for {current_raise_purpose}.
+
+If you still see a fit, would you please introduce me to {primary_fund_name} first? {primary_fit_reason} {secondary_fund_name} would be my second choice.
+
+Current public proof: {public_proof_url}
+
+Current stage and claim boundary: {current_stage_disclosure}
+
+No attachment is included. If this is no longer a fit, no response is required and I will not send another introduction follow-up.
+
+Thank you,
+{sender_name}
+{sender_title}
+{organization_name}
+```
+
+## FUNDING_REVIEW_STATUS_CHECK
+
+Ask once whether a funding application remains active and complete after the review window stated by the recipient has passed.
+
+- Inbound states: `FUNDING_REVIEW_WINDOW_PASSED`
+- Reply triggers: `ONE_STATUS_CHECK_AFTER_STATED_WINDOW`
+- Required fields: `recipient_name, source_subject, application_name, application_date_local, stated_review_window, duplicate_review_disclosure, sender_name, sender_title, organization_name, recipient_email, source_message_id`
+
+```text
+Subject: Re: {source_subject}
+
+Hello {recipient_name},
+
+I am following up once on {application_name}, submitted {application_date_local}. Your note stated a review window of {stated_review_window}. Could you confirm whether the application is still active and complete for review?
+
+Duplicate-send check: {duplicate_review_disclosure}
+
+This is a status check only, not a duplicate application. No new attachment is included unless your team requests one.
+
+Thank you,
+{sender_name}
+{sender_title}
+{organization_name}
+```
+
+## DIRECT_INVESTOR_REVIEW_REQUEST
+
+Send one public-safe request to a verified investor or program route when no prior outreach exists, with no attachment and an explicit stage boundary.
+
+- Inbound states: `VERIFIED_DIRECT_INVESTOR_ROUTE_NO_PRIOR_THREAD`
+- Reply triggers: `ONE_INITIAL_DIRECT_INVESTOR_REVIEW_REQUEST`
+- Required fields: `recipient_name, investor_program_name, company_one_line, current_raise_amount, current_raise_purpose, six_month_milestone, climate_component, current_stage_disclosure, public_company_url, public_proof_url, sender_name, sender_title, organization_name, recipient_email`
+
+```text
+Subject: {organization_name} - {current_raise_amount} validation bridge for {investor_program_name}
+
+Hello {recipient_name},
+
+I am {sender_name}, {sender_title} of {organization_name}. {company_one_line}
+
+I am requesting a review for {investor_program_name}. Our current ask is {current_raise_amount} for {current_raise_purpose}. The six-month milestone is {six_month_milestone}
+
+Climate-positive component: {climate_component}
+
+Current stage and claim boundary: {current_stage_disclosure}
+
+Company: {public_company_url}
+Public proof: {public_proof_url}
+
+No attachment is included. If this is not the correct route, would you please direct me to the official application channel? I will not send a duplicate initial request.
+
+Thank you,
 {sender_name}
 {sender_title}
 {organization_name}
@@ -302,4 +474,4 @@ Thank you,
 
 ## Operating Boundary
 
-This registry renders drafts and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review.
+This registry renders drafts and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A hash-bound receipt proves only that an exact inserted fact was reviewed against the listed source bytes; it does not by itself establish independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.

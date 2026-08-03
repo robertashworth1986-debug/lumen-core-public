@@ -1,0 +1,1821 @@
+{
+  "schema": "lumencore.gov_reviewer_question_matrix_config.v1",
+  "title": "Government Reviewer Question and Proof-Pack Matrix",
+  "snapshot_utc": "2026-07-23T19:47:30Z",
+  "claim_boundary": "This matrix answers only what the cited repository artifacts support at the frozen snapshot. It is not an agency endorsement, responsibility determination, eligibility decision, cybersecurity assessment, export classification, legal opinion, patent opinion, award record, license, independent evaluation, or authorization for an external action. Missing, stale, contradictory, and negative evidence remains visible.",
+  "roles": [
+    {
+      "role_id": "federal_reviewer",
+      "name": "Skeptical Federal Reviewer",
+      "mandate": "Determine what the repository proves, what it does not prove, whether failures are preserved, and whether the evidence is current enough for the bounded statement."
+    },
+    {
+      "role_id": "contracting_officer",
+      "name": "Contracting Officer",
+      "mandate": "Determine entity, authority, responsibility, package, pricing, certification, portal, and award-status readiness without relying on local labels alone."
+    },
+    {
+      "role_id": "technical_evaluator",
+      "name": "Technical Evaluator",
+      "mandate": "Determine protocol identity, baseline discipline, reproducibility, prospective sample state, negative results, and the exact evidence needed for promotion."
+    },
+    {
+      "role_id": "cybersecurity_reviewer",
+      "name": "Cybersecurity Reviewer",
+      "mandate": "Determine what security, privacy, dependency, CUI, CMMC, export, access-control, and human-authorization evidence is actually present."
+    },
+    {
+      "role_id": "licensing_officer",
+      "name": "Licensing Officer",
+      "mandate": "Determine the public-safe invention record, filing uncertainty, ownership and rights gaps, disclosure controls, and the authority required before license terms."
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "repo_readme",
+      "path": "README.md",
+      "format": "text",
+      "authority": "Current public repository claim boundary and evidence-maturity policy.",
+      "freshness": {
+        "mode": "timeless"
+      }
+    },
+    {
+      "source_id": "agent_rules",
+      "path": "AGENTS.md",
+      "format": "text",
+      "authority": "Repository operating contract for HumanUnlock, evidence custody, and reviewer-safe claims.",
+      "freshness": {
+        "mode": "timeless"
+      }
+    },
+    {
+      "source_id": "reviewer_context",
+      "path": "out/ops/quant_hub_reviewer_context_latest.json",
+      "format": "json",
+      "authority": "Machine-readable reviewer evidence snapshot; dated evidence whose current-state assertions require a refresh.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 24
+      }
+    },
+    {
+      "source_id": "live_eia_status",
+      "path": "out/eia_grid_prospective_hourly_router/prospective_status_latest.json",
+      "format": "json",
+      "authority": "Live frozen-protocol EIA hourly sample and promotion-gate status.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 2
+      }
+    },
+    {
+      "source_id": "reproducibility_receipt",
+      "path": "out/reproducibility/reviewer_capsule_latest/reviewer_reproducibility_receipt.json",
+      "format": "json",
+      "authority": "Dated bounded clean-runner reproducibility, dependency, privacy-scan, and known-gap receipt.",
+      "freshness": {
+        "mode": "dated_evidence",
+        "timestamp_pointer": "/generated_utc"
+      }
+    },
+    {
+      "source_id": "funding_reviewer_gate",
+      "path": "out/ops/funding_sprint_reviewer_gate_latest.json",
+      "format": "json",
+      "authority": "Scoped funding-package language and secret scan with human submission boundary.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 168
+      }
+    },
+    {
+      "source_id": "grant_readiness",
+      "path": "out/ops/grant_submission_readiness_audit_latest.json",
+      "format": "json",
+      "authority": "Dated local package and portal-user blocker audit.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 24
+      }
+    },
+    {
+      "source_id": "sam_entity",
+      "path": "out/ops/sam_gov_entity_status_capture_latest.json",
+      "format": "json",
+      "authority": "Dated public-safe SAM.gov registration-status capture; action-time status still requires a fresh official check.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 24
+      }
+    },
+    {
+      "source_id": "federal_protocol",
+      "path": "out/ops/federal_submission_protocol_packet_latest.json",
+      "format": "json",
+      "authority": "Dated federal portal, authority, certification, cost, and submission protocol gate.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 24
+      }
+    },
+    {
+      "source_id": "agency_assembly",
+      "path": "out/ops/agency_submission_assembly_gate_latest.json",
+      "format": "json",
+      "authority": "Dated agency package-assembly inventory and final-action stop rule.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 24
+      }
+    },
+    {
+      "source_id": "cmmc_export",
+      "path": "grant_submissions/compliance_evidence/CMMC_EXPORT_EVIDENCE_PACKET_2026-07-18.json",
+      "format": "json",
+      "authority": "Metadata-only CMMC, export, JCP, and program requirement evidence inventory.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 168
+      }
+    },
+    {
+      "source_id": "missionweave_gate",
+      "path": "grant_submissions/DLA26BZ03_NV011_MissionWeave/MISSIONWEAVE_DSIP_ACTION_GATE_2026-07-17.json",
+      "format": "json",
+      "authority": "Dated MissionWeave DSIP private-fact reconciliation and submission stop gate.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 24
+      }
+    },
+    {
+      "source_id": "ip_counsel",
+      "path": "out/ops/ip_counsel_diligence_packet_latest.json",
+      "format": "json",
+      "authority": "Dated public-safe patent deadline, invention-family, counsel, and disclosure-control packet.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 24
+      }
+    },
+    {
+      "source_id": "external_validation_sprint",
+      "path": "out/ops/external_validation_500_sprint_latest.json",
+      "format": "json",
+      "authority": "Dated independent-evaluator plan and frozen evidence-state receipt.",
+      "freshness": {
+        "mode": "max_age",
+        "timestamp_pointer": "/generated_utc",
+        "max_age_hours": 24
+      }
+    }
+  ],
+  "questions": [
+    {
+      "question_id": "FED-001",
+      "role_id": "federal_reviewer",
+      "priority": "critical",
+      "question": "What evidence maturity does the repository currently permit a reviewer to cite?",
+      "decision_use": "Caps the strongest permissible scientific or operational statement before any proposal narrative is reviewed.",
+      "answer_class": "SUPPORTED",
+      "answer": "Repository policy caps the cross-repository evidence posture at Level 3 source-conditioned replay. The dated reviewer snapshot agrees and records that Level 5 has not been attained.",
+      "missing_evidence": [],
+      "next_receipt": "A refreshed reviewer-context build is the next receipt for current numeric detail; a named external evaluator and dated result receipt would be required to change the Level 5 answer.",
+      "prohibited_claims": [
+        "Level 4 or Level 5 status from repository breadth alone",
+        "field performance",
+        "agency endorsement"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "readme_level_three",
+          "source_id": "repo_readme",
+          "selector": {
+            "type": "text",
+            "value": ""
+          },
+          "operator": "contains",
+          "expected": "Current repository-wide supported maturity: Level 3. Level 5 has not been attained.",
+          "meaning": "The current public policy states the maturity ceiling."
+        },
+        {
+          "assertion_id": "snapshot_level_three",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/current_evidence_posture/highest_repository_wide_supported_level"
+          },
+          "operator": "equals",
+          "expected": 3,
+          "meaning": "The machine snapshot records Level 3."
+        },
+        {
+          "assertion_id": "snapshot_level_five_false",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/current_evidence_posture/level_5_attained"
+          },
+          "operator": "is_false",
+          "meaning": "The machine snapshot does not record Level 5."
+        }
+      ]
+    },
+    {
+      "question_id": "FED-002",
+      "role_id": "federal_reviewer",
+      "priority": "critical",
+      "question": "Which high-impact claims are expressly blocked by the current evidence?",
+      "decision_use": "Prevents a reviewer from converting software, replay, or packaging evidence into unsupported mission outcomes.",
+      "answer_class": "SUPPORTED_NEGATIVE",
+      "answer": "The claim controls block external-validation, field, fixed-dollar savings, production, government-approval, universal-superiority, profitable-trading, and patent-scope conclusions without new evidence.",
+      "missing_evidence": [
+        "Claim-specific external or official receipts for any conclusion that is currently blocked"
+      ],
+      "next_receipt": "Use the named gate for the intended claim: evaluator receipt, buyer-owned field result, official agency decision, audited economic measurement, or counsel-controlled patent opinion.",
+      "prohibited_claims": [
+        "customer or government savings",
+        "universal superiority",
+        "patent validity or infringement"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "field_blocked",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/claim_controls/blocked_without_new_evidence/field_validation"
+          },
+          "operator": "is_true",
+          "meaning": "Field validation is blocked."
+        },
+        {
+          "assertion_id": "government_approval_blocked",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/claim_controls/blocked_without_new_evidence/government_or_regulatory_approval"
+          },
+          "operator": "is_true",
+          "meaning": "Government or regulatory approval is blocked."
+        },
+        {
+          "assertion_id": "patent_scope_blocked",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/claim_controls/blocked_without_new_evidence/patent_validity_scope_or_infringement"
+          },
+          "operator": "is_true",
+          "meaning": "Patent scope and infringement conclusions are blocked."
+        }
+      ]
+    },
+    {
+      "question_id": "FED-003",
+      "role_id": "federal_reviewer",
+      "priority": "critical",
+      "question": "Is there a completed independent external evaluation of the platform or live EIA lane?",
+      "decision_use": "Separates reproducibility evidence from evaluator-owned scientific or field authority.",
+      "answer_class": "SUPPORTED_NEGATIVE",
+      "answer": "No Level 5 result receipt is present. The bounded reproducibility receipt explicitly records external validation as incomplete, and the external-evaluator plan records no named evaluator.",
+      "missing_evidence": [
+        "Named independent evaluator",
+        "Accepted held-out or field protocol",
+        "Attributable dated result receipt",
+        "Preserved artifact and discrepancy hashes"
+      ],
+      "next_receipt": "Evaluator-signed protocol acceptance followed by an outcome-independent reproduction and result receipt.",
+      "prohibited_claims": [
+        "external scientific validation",
+        "field deployment success",
+        "independent endorsement"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "repro_external_false",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/external_validation_complete"
+          },
+          "operator": "is_false",
+          "meaning": "The reproducibility receipt does not close external validation."
+        },
+        {
+          "assertion_id": "evaluator_not_named",
+          "source_id": "external_validation_sprint",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/current_state/independent_evaluator_named"
+          },
+          "operator": "is_false",
+          "meaning": "The dated sprint packet names no evaluator."
+        },
+        {
+          "assertion_id": "level_five_false",
+          "source_id": "external_validation_sprint",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/current_state/level_5_attained"
+          },
+          "operator": "is_false",
+          "meaning": "The dated sprint packet records Level 5 as false."
+        }
+      ]
+    },
+    {
+      "question_id": "FED-004",
+      "role_id": "federal_reviewer",
+      "priority": "high",
+      "question": "Does the record preserve unfavorable results and non-wins?",
+      "decision_use": "Tests whether the evidence process is falsifiable rather than a success-only showcase.",
+      "answer_class": "SUPPORTED",
+      "answer": "Yes, within the bounded public record: the README preserves MDA promotion failures, a failed FAA SDR promotion gate, replay losses or ties, and the zero-prediction daily EIA predecessor.",
+      "missing_evidence": [],
+      "next_receipt": "A refreshed reviewer context should continue to carry every failed gate, exclusion, and non-win without deletion.",
+      "prohibited_claims": [
+        "universal model dominance",
+        "selection without failed-case disclosure",
+        "promotion from a positive point estimate alone"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "mda_failures_preserved",
+          "source_id": "repo_readme",
+          "selector": {
+            "type": "text",
+            "value": ""
+          },
+          "operator": "contains",
+          "expected": "Failed MDA promotion gates are retained as falsification evidence rather than relabeled as success.",
+          "meaning": "The public record requires preserved MDA failures."
+        },
+        {
+          "assertion_id": "faa_not_promoted",
+          "source_id": "repo_readme",
+          "selector": {
+            "type": "text",
+            "value": ""
+          },
+          "operator": "contains",
+          "expected": "The frozen FAA SDR holdout preserves a positive point delta that did not pass multiplicity-adjusted inference and therefore was not promoted.",
+          "meaning": "The public record preserves the failed FAA promotion gate."
+        },
+        {
+          "assertion_id": "daily_zero_preserved",
+          "source_id": "repo_readme",
+          "selector": {
+            "type": "text",
+            "value": ""
+          },
+          "operator": "contains",
+          "expected": "The daily EIA predecessor preserves its truthful zero-prediction result",
+          "meaning": "The public record preserves the zero-count predecessor."
+        }
+      ]
+    },
+    {
+      "question_id": "FED-005",
+      "role_id": "federal_reviewer",
+      "priority": "high",
+      "question": "What exactly can an independent reviewer reproduce from the current capsule?",
+      "decision_use": "Defines the bounded software and protocol claim while preserving portability and external-authority gaps.",
+      "answer_class": "PARTIAL_DATED",
+      "answer": "A dated capsule reports 31 of 31 bounded assertions, three suites, exact direct dependency versions, deterministic runtime controls, and a clean-runner replay. It also records that artifact hash locking across supported platforms is incomplete and that this is not an external result.",
+      "missing_evidence": [
+        "Complete cross-platform transitive artifact hash lock",
+        "Current clean-runner receipt at the reviewed commit",
+        "Independent evaluator-owned result"
+      ],
+      "next_receipt": "A current-commit clean-runner bundle with exact artifact hashes, SBOM, logs, and evaluator attribution.",
+      "prohibited_claims": [
+        "cybersecurity certification",
+        "agency certification",
+        "field outcome validation"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "bounded_repro_pass",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/status"
+          },
+          "operator": "equals",
+          "expected": "BOUNDED_REPRODUCIBILITY_PASS",
+          "meaning": "The capsule records a bounded reproducibility pass."
+        },
+        {
+          "assertion_id": "all_assertions_pass",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/assertion_pass_count"
+          },
+          "operator": "equals",
+          "expected": 31,
+          "meaning": "All 31 declared assertions passed in the dated receipt."
+        },
+        {
+          "assertion_id": "artifact_hash_lock_open",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/artifact_hash_lock_complete"
+          },
+          "operator": "is_false",
+          "meaning": "The artifact hash-lock gap remains explicit."
+        }
+      ]
+    },
+    {
+      "question_id": "FED-006",
+      "role_id": "federal_reviewer",
+      "priority": "critical",
+      "question": "Are the cited sources uniformly current enough for an action-time government decision?",
+      "decision_use": "Prevents old portal, patent, grant, or reviewer snapshots from being treated as current official state.",
+      "answer_class": "PARTIAL_DATED",
+      "answer": "No. The source set is intentionally mixed: the live EIA status is fresh at this snapshot, the reproducibility receipt is dated evidence, and several reviewer, registration, portal, and counsel packets are stale under their configured action-time windows.",
+      "missing_evidence": [
+        "Fresh SAM.gov status capture",
+        "Fresh portal and submission-authority audit",
+        "Fresh patent docket and counsel packet",
+        "Refreshed machine reviewer context"
+      ],
+      "next_receipt": "Rebuild or recapture every source marked STALE before any action-time reliance.",
+      "prohibited_claims": [
+        "current official status from a stale local capture",
+        "current deadline from an old docket summary",
+        "current eligibility from a local package label"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "eia_fresh",
+          "source_id": "live_eia_status",
+          "selector": {
+            "type": "source_metadata",
+            "value": "freshness_state"
+          },
+          "operator": "equals",
+          "expected": "FRESH",
+          "meaning": "The live EIA status meets its two-hour freshness rule."
+        },
+        {
+          "assertion_id": "reviewer_context_stale",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "source_metadata",
+            "value": "freshness_state"
+          },
+          "operator": "equals",
+          "expected": "STALE",
+          "meaning": "The machine reviewer context is stale for current numeric reliance."
+        },
+        {
+          "assertion_id": "sam_stale",
+          "source_id": "sam_entity",
+          "selector": {
+            "type": "source_metadata",
+            "value": "freshness_state"
+          },
+          "operator": "equals",
+          "expected": "STALE",
+          "meaning": "The SAM capture is stale for action-time entity status."
+        }
+      ]
+    },
+    {
+      "question_id": "CO-001",
+      "role_id": "contracting_officer",
+      "priority": "critical",
+      "question": "Is the entity's SAM.gov registration currently verified for an award action?",
+      "decision_use": "Determines whether the contracting officer may rely on entity-registration state without a fresh official lookup.",
+      "answer_class": "PARTIAL_DATED",
+      "answer": "A June 20 capture recorded one Active Registration with All Awards purpose and an August 30, 2026 expiration date. The capture is stale for action-time reliance, so current official status is not established by this matrix.",
+      "missing_evidence": [
+        "Fresh official SAM.gov entity-status capture at action time",
+        "Current exclusion and responsibility checks where applicable"
+      ],
+      "next_receipt": "Timestamped official SAM.gov status receipt captured for the exact procurement decision.",
+      "prohibited_claims": [
+        "current registration based only on the June capture",
+        "responsibility determination",
+        "award entitlement"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "dated_active_status",
+          "source_id": "sam_entity",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/registration_status"
+          },
+          "operator": "equals",
+          "expected": "Active Registration",
+          "meaning": "The dated capture recorded Active Registration."
+        },
+        {
+          "assertion_id": "dated_expiration",
+          "source_id": "sam_entity",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/expiration_date"
+          },
+          "operator": "equals",
+          "expected": "2026-08-30",
+          "meaning": "The dated capture recorded the expiration date."
+        },
+        {
+          "assertion_id": "capture_stale",
+          "source_id": "sam_entity",
+          "selector": {
+            "type": "source_metadata",
+            "value": "freshness_state"
+          },
+          "operator": "equals",
+          "expected": "STALE",
+          "meaning": "The capture fails the action-time freshness rule."
+        }
+      ]
+    },
+    {
+      "question_id": "CO-002",
+      "role_id": "contracting_officer",
+      "priority": "critical",
+      "question": "Are entity identifiers, portal registrations, and submitter authority fully reconciled?",
+      "decision_use": "Separates locally present identifiers from verified official authority to bind or submit for the entity.",
+      "answer_class": "BLOCKED",
+      "answer": "No. The dated federal protocol records entity identifiers as present locally but marks SAM verification required, zero ready flags, and six portal or authority readiness flags blocked.",
+      "missing_evidence": [
+        "Fresh official entity verification",
+        "Verified Grants.gov or Research.gov authority where used",
+        "Verified DSIP organization linkage and submitter authority",
+        "Current authorized organizational representative evidence"
+      ],
+      "next_receipt": "Portal-issued authority and organization-linkage receipts, recorded without publishing identifiers.",
+      "prohibited_claims": [
+        "submitter authority from local identifier presence",
+        "portal readiness from a draft package",
+        "entity eligibility from registration alone"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "sam_verification_required",
+          "source_id": "federal_protocol",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/submission_readiness/sam_gov_status"
+          },
+          "operator": "equals",
+          "expected": "verification_required",
+          "meaning": "The federal protocol requires fresh SAM verification."
+        },
+        {
+          "assertion_id": "zero_ready_flags",
+          "source_id": "federal_protocol",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/submission_readiness/ready_flag_count"
+          },
+          "operator": "equals",
+          "expected": 0,
+          "meaning": "No federal readiness flag was cleared."
+        },
+        {
+          "assertion_id": "six_blocked_flags",
+          "source_id": "federal_protocol",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/submission_readiness/blocked_readiness_count"
+          },
+          "operator": "equals",
+          "expected": 6,
+          "meaning": "Six portal or authority readiness flags remain blocked."
+        }
+      ]
+    },
+    {
+      "question_id": "CO-003",
+      "role_id": "contracting_officer",
+      "priority": "critical",
+      "question": "May an agent or local builder certify, upload, or submit a federal package?",
+      "decision_use": "Defines legal and operational authority for consequential procurement actions.",
+      "answer_class": "SUPPORTED_NEGATIVE",
+      "answer": "No. The repository operating contract and federal protocol require fresh human action-time authority; final submission, portal submission, certifications, pricing, and external sends are disabled without it.",
+      "missing_evidence": [
+        "Recipient-specific or portal-specific action-time human approval"
+      ],
+      "next_receipt": "A fresh HumanUnlock receipt bound to the exact package, portal, representation, price, and intended action.",
+      "prohibited_claims": [
+        "standing blanket authorization",
+        "automatic certification authority",
+        "unattended final submission"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "human_unlock_rule",
+          "source_id": "agent_rules",
+          "selector": {
+            "type": "text",
+            "value": ""
+          },
+          "operator": "contains",
+          "expected": "Fresh, action-time approval is required before any external message, submission, certification, publication, account change, credential change, spend, live order, money movement, NDA execution, patent filing, or other legal action.",
+          "meaning": "The repository contract requires action-time approval."
+        },
+        {
+          "assertion_id": "final_submit_false",
+          "source_id": "federal_protocol",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/final_submission_allowed_without_human"
+          },
+          "operator": "is_false",
+          "meaning": "Final submission is disabled without human authority."
+        },
+        {
+          "assertion_id": "certification_false",
+          "source_id": "federal_protocol",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/certification_allowed_without_human"
+          },
+          "operator": "is_false",
+          "meaning": "Certification is disabled without human authority."
+        }
+      ]
+    },
+    {
+      "question_id": "CO-004",
+      "role_id": "contracting_officer",
+      "priority": "critical",
+      "question": "Are price, cost basis, responsibility, and representations ready for reliance?",
+      "decision_use": "Stops a technical draft or ROM estimate from becoming a reviewed offer or responsibility representation.",
+      "answer_class": "BLOCKED",
+      "answer": "No action-time reliance is supported. The federal protocol disables pricing or cost submission without human review, and the grant audit remains portal-blocked despite having no local-file blockers.",
+      "missing_evidence": [
+        "Reviewed cost or price basis for the exact solicitation",
+        "Current responsibility and past-performance facts",
+        "Current representations and certifications",
+        "Human approval of the exact offer"
+      ],
+      "next_receipt": "Solicitation-bound price or cost review, responsibility checklist, representations receipt, and action-time approval.",
+      "prohibited_claims": [
+        "binding price from a ROM",
+        "responsibility from technical capability alone",
+        "current representations from an old local file"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "pricing_human_gate",
+          "source_id": "federal_protocol",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/human_gate/pricing_or_cost_submission_allowed_without_human"
+          },
+          "operator": "is_false",
+          "meaning": "Pricing or cost submission remains human-gated."
+        },
+        {
+          "assertion_id": "portal_blockers_present",
+          "source_id": "grant_readiness",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/portal_user_blockers"
+          },
+          "operator": "gte",
+          "expected": 1,
+          "meaning": "Portal and user-fact blockers remain."
+        },
+        {
+          "assertion_id": "grant_audit_stale",
+          "source_id": "grant_readiness",
+          "selector": {
+            "type": "source_metadata",
+            "value": "freshness_state"
+          },
+          "operator": "equals",
+          "expected": "STALE",
+          "meaning": "The readiness audit is stale for action-time use."
+        }
+      ]
+    },
+    {
+      "question_id": "CO-005",
+      "role_id": "contracting_officer",
+      "priority": "high",
+      "question": "Are proposal and outreach artifacts assembled for reviewer inspection?",
+      "decision_use": "Distinguishes local document assembly from a compliant, current, submitted offer.",
+      "answer_class": "PARTIAL_DATED",
+      "answer": "A dated assembly gate reports that first artifacts are present and fifteen lanes are inventoried, but all final actions remain human-blocked and the assembly source is stale for current procurement reliance.",
+      "missing_evidence": [
+        "Fresh solicitation and amendment reconciliation",
+        "Current compliance matrix",
+        "Final file-set and portal-preview receipt",
+        "Action-time approval"
+      ],
+      "next_receipt": "A fresh solicitation-bound assembly manifest with every mandatory attachment, hash, amendment, and final preview.",
+      "prohibited_claims": [
+        "compliant offer from artifact presence",
+        "submission from local assembly",
+        "agency acceptance"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "artifacts_present",
+          "source_id": "agency_assembly",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/first_artifacts_present"
+          },
+          "operator": "is_true",
+          "meaning": "The dated gate reports first artifacts present."
+        },
+        {
+          "assertion_id": "lane_count",
+          "source_id": "agency_assembly",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/assembly_lane_count"
+          },
+          "operator": "equals",
+          "expected": 15,
+          "meaning": "The dated gate inventories fifteen assembly lanes."
+        },
+        {
+          "assertion_id": "assembly_stale",
+          "source_id": "agency_assembly",
+          "selector": {
+            "type": "source_metadata",
+            "value": "freshness_state"
+          },
+          "operator": "equals",
+          "expected": "STALE",
+          "meaning": "The assembly gate is stale for action-time reliance."
+        }
+      ]
+    },
+    {
+      "question_id": "CO-006",
+      "role_id": "contracting_officer",
+      "priority": "critical",
+      "question": "Does this record establish an award, an accepted offer, or a completed MissionWeave submission?",
+      "decision_use": "Prevents draft, package, routing, or local gate labels from being presented as official outcomes.",
+      "answer_class": "SUPPORTED_NEGATIVE",
+      "answer": "No. The federal protocol explicitly avoids an award-eligibility conclusion. The MissionWeave action gate records that no portal submission occurred, the package was not ready for a human click, and its recorded deadline precedes this matrix snapshot.",
+      "missing_evidence": [
+        "Official portal submission receipt for any claimed submission",
+        "Agency acknowledgement or evaluation notice",
+        "Contract or assistance award document for any claimed award"
+      ],
+      "next_receipt": "Use only the official portal receipt, agency notice, or signed award instrument for the specific outcome.",
+      "prohibited_claims": [
+        "award from package readiness",
+        "accepted offer from sent outreach",
+        "MissionWeave submission from local preparation"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "award_not_claimed",
+          "source_id": "federal_protocol",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/award_eligibility_claimed"
+          },
+          "operator": "is_false",
+          "meaning": "The protocol does not claim award eligibility."
+        },
+        {
+          "assertion_id": "mission_not_submitted",
+          "source_id": "missionweave_gate",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/controls/portal_submit_performed"
+          },
+          "operator": "is_false",
+          "meaning": "The MissionWeave gate records no portal submission."
+        },
+        {
+          "assertion_id": "mission_not_ready",
+          "source_id": "missionweave_gate",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/submission_ready_for_human_click"
+          },
+          "operator": "is_false",
+          "meaning": "The MissionWeave package was not ready for final human action."
+        },
+        {
+          "assertion_id": "mission_deadline_precedes_snapshot",
+          "source_id": "missionweave_gate",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/deadline/expected_utc"
+          },
+          "operator": "before_snapshot",
+          "meaning": "The recorded MissionWeave deadline precedes the frozen matrix snapshot."
+        }
+      ]
+    },
+    {
+      "question_id": "TECH-001",
+      "role_id": "technical_evaluator",
+      "priority": "critical",
+      "question": "Is the live EIA prospective lane bound to a frozen protocol and commit?",
+      "decision_use": "Confirms protocol identity before any sample or score is interpreted.",
+      "answer_class": "SUPPORTED",
+      "answer": "Yes for the bounded live status: it records a protocol SHA-256, a full Git commit, active prospective collection, and a fresh status receipt.",
+      "missing_evidence": [],
+      "next_receipt": "Continue emitting hash-linked prediction, settlement, and operational receipts without route or backfill changes.",
+      "prohibited_claims": [
+        "promotion from protocol identity alone",
+        "field performance",
+        "utility outcome"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "protocol_hash",
+          "source_id": "live_eia_status",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/protocol_sha256"
+          },
+          "operator": "matches_regex",
+          "expected": "^[0-9a-f]{64}$",
+          "meaning": "The live status records a SHA-256 protocol identity."
+        },
+        {
+          "assertion_id": "protocol_commit",
+          "source_id": "live_eia_status",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/protocol_commit"
+          },
+          "operator": "matches_regex",
+          "expected": "^[0-9a-f]{40}$",
+          "meaning": "The live status records a full Git commit."
+        },
+        {
+          "assertion_id": "collection_active",
+          "source_id": "live_eia_status",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/state"
+          },
+          "operator": "equals",
+          "expected": "PROSPECTIVE_COLLECTION_ACTIVE",
+          "meaning": "The live lane remains in prospective collection."
+        },
+        {
+          "assertion_id": "status_fresh",
+          "source_id": "live_eia_status",
+          "selector": {
+            "type": "source_metadata",
+            "value": "freshness_state"
+          },
+          "operator": "equals",
+          "expected": "FRESH",
+          "meaning": "The live status is fresh at the frozen matrix snapshot."
+        }
+      ]
+    },
+    {
+      "question_id": "TECH-002",
+      "role_id": "technical_evaluator",
+      "priority": "high",
+      "question": "Are named baselines, wins, non-wins, and failed gates part of the review record?",
+      "decision_use": "Tests baseline adequacy and whether selection pressure is visible to an evaluator.",
+      "answer_class": "SUPPORTED",
+      "answer": "Yes at the repository-policy level. The reviewer path requires named baselines, wins and non-wins, and preserved failed promotion gates; the supported maturity remains source-conditioned replay rather than a field conclusion.",
+      "missing_evidence": [],
+      "next_receipt": "For any selected lane, provide its frozen source hash, split, baseline definitions, exclusions, metric, and complete comparison ledger.",
+      "prohibited_claims": [
+        "best-in-class without the complete baseline set",
+        "selective reporting",
+        "field outcome from replay"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "wins_nonwins_policy",
+          "source_id": "repo_readme",
+          "selector": {
+            "type": "text",
+            "value": ""
+          },
+          "operator": "contains",
+          "expected": "The locked replay records named baselines, positive comparisons, and non-wins.",
+          "meaning": "The public reviewer policy requires wins and non-wins."
+        },
+        {
+          "assertion_id": "failed_gates_policy",
+          "source_id": "repo_readme",
+          "selector": {
+            "type": "text",
+            "value": ""
+          },
+          "operator": "contains",
+          "expected": "Failed MDA promotion gates are retained as falsification evidence rather than relabeled as success.",
+          "meaning": "Failed promotion gates remain in the review record."
+        },
+        {
+          "assertion_id": "source_conditioned_level",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/current_evidence_posture/highest_repository_wide_supported_level"
+          },
+          "operator": "equals",
+          "expected": 3,
+          "meaning": "The machine snapshot limits the cross-repository posture to source-conditioned replay."
+        }
+      ]
+    },
+    {
+      "question_id": "TECH-003",
+      "role_id": "technical_evaluator",
+      "priority": "critical",
+      "question": "Has the live EIA prospective lane reached a sample or promotion gate?",
+      "decision_use": "Prevents counts or early settlements from being converted into a performance statement.",
+      "answer_class": "BLOCKED",
+      "answer": "No. The fresh live status records active collection but preliminary, confirmatory, and durability readiness as false, with promotion evaluation incomplete.",
+      "missing_evidence": [
+        "Required common settled hours under the frozen authority panel",
+        "Completed preregistered preliminary, confirmatory, and durability gates",
+        "Promotion evaluation under the unchanged protocol"
+      ],
+      "next_receipt": "Hash-linked gate output after the preregistered sample threshold is reached without backfill or route changes.",
+      "prohibited_claims": [
+        "prospective performance from raw count growth",
+        "grid reliability improvement",
+        "economic benefit"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "preliminary_false",
+          "source_id": "live_eia_status",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/sample_gates/preliminary_ready"
+          },
+          "operator": "is_false",
+          "meaning": "The preliminary sample gate remains closed."
+        },
+        {
+          "assertion_id": "confirmatory_false",
+          "source_id": "live_eia_status",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/sample_gates/confirmatory_ready"
+          },
+          "operator": "is_false",
+          "meaning": "The confirmatory sample gate remains closed."
+        },
+        {
+          "assertion_id": "durability_false",
+          "source_id": "live_eia_status",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/sample_gates/durability_ready"
+          },
+          "operator": "is_false",
+          "meaning": "The durability sample gate remains closed."
+        },
+        {
+          "assertion_id": "promotion_incomplete",
+          "source_id": "live_eia_status",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/promotion_evaluation_complete"
+          },
+          "operator": "is_false",
+          "meaning": "Promotion evaluation is incomplete."
+        }
+      ]
+    },
+    {
+      "question_id": "TECH-004",
+      "role_id": "technical_evaluator",
+      "priority": "critical",
+      "question": "Has an evaluator independently reproduced and accepted the current live protocol?",
+      "decision_use": "Separates operator-owned infrastructure from evaluator-owned authority.",
+      "answer_class": "BLOCKED",
+      "answer": "No evaluator-owned acceptance or reproduction receipt is present. The dated sprint packet records no named evaluator and no completed independent reproduction, and that packet is stale relative to the live sample state.",
+      "missing_evidence": [
+        "Conflict disclosure",
+        "Evaluator identity and authority",
+        "Protocol accept-or-decline memo",
+        "Independent environment and reproduction logs",
+        "Attributable result receipt"
+      ],
+      "next_receipt": "Evaluator-owned protocol acceptance and independent reproduction receipt tied to the live protocol hash.",
+      "prohibited_claims": [
+        "evaluator endorsement",
+        "independent reproduction",
+        "Level 5 evidence"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "no_evaluator",
+          "source_id": "external_validation_sprint",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/current_state/independent_evaluator_named"
+          },
+          "operator": "is_false",
+          "meaning": "No evaluator is named in the dated plan."
+        },
+        {
+          "assertion_id": "no_independent_reproduction",
+          "source_id": "external_validation_sprint",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/current_state/independent_reproduction_complete"
+          },
+          "operator": "is_false",
+          "meaning": "Independent reproduction is incomplete."
+        },
+        {
+          "assertion_id": "sprint_stale",
+          "source_id": "external_validation_sprint",
+          "selector": {
+            "type": "source_metadata",
+            "value": "freshness_state"
+          },
+          "operator": "equals",
+          "expected": "STALE",
+          "meaning": "The evaluator-plan snapshot is stale relative to live collection."
+        }
+      ]
+    },
+    {
+      "question_id": "TECH-005",
+      "role_id": "technical_evaluator",
+      "priority": "high",
+      "question": "Are environment, dependencies, and portability limits documented?",
+      "decision_use": "Determines whether a reviewer can distinguish a bounded replay receipt from universal portability.",
+      "answer_class": "PARTIAL_DATED",
+      "answer": "A dated receipt records exact direct dependency-version matches, deterministic runtime controls, an 18-component SBOM, and a passing bounded replay. It also records an open transitive artifact-hash and cross-platform portability gap.",
+      "missing_evidence": [
+        "Exact transitive artifact hashes for every supported operating system and architecture",
+        "Current-commit clean-runner receipt"
+      ],
+      "next_receipt": "Platform-specific locked dependency closure, SBOM, environment fingerprint, and replay receipt.",
+      "prohibited_claims": [
+        "universal portability",
+        "supply-chain certification",
+        "all-platform equivalence"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "dependency_versions_match",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/dependency_versions_exact_match"
+          },
+          "operator": "is_true",
+          "meaning": "Direct dependency versions matched in the dated receipt."
+        },
+        {
+          "assertion_id": "sbom_components",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/sbom_component_count"
+          },
+          "operator": "equals",
+          "expected": 18,
+          "meaning": "The dated SBOM contains eighteen components."
+        },
+        {
+          "assertion_id": "hash_lock_incomplete",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/artifact_hash_lock_complete"
+          },
+          "operator": "is_false",
+          "meaning": "Cross-platform artifact hash locking remains incomplete."
+        }
+      ]
+    },
+    {
+      "question_id": "TECH-006",
+      "role_id": "technical_evaluator",
+      "priority": "critical",
+      "question": "What evidence would unlock a stronger technical claim?",
+      "decision_use": "Turns an open gate into a falsifiable, receipt-based next evaluation rather than a marketing assertion.",
+      "answer_class": "BLOCKED",
+      "answer": "A stronger claim requires the frozen live sample gates to complete, an evaluator to accept the metric and protocol before outcomes, independent reproduction, and a dated result receipt that preserves exclusions and negative findings.",
+      "missing_evidence": [
+        "Completed preregistered common-hour gates",
+        "Evaluator protocol acceptance before scoring",
+        "Independent reproduction",
+        "Dated attributable outcome receipt"
+      ],
+      "next_receipt": "One evaluator-owned packet containing conflict disclosure, protocol acceptance, hashes, logs, discrepancy ledger, scores, failures, and final decision.",
+      "prohibited_claims": [
+        "promotion before sample gates",
+        "post-outcome protocol changes",
+        "positive-result-only reporting"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "sample_gate_open",
+          "source_id": "live_eia_status",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/sample_gates/preliminary_ready"
+          },
+          "operator": "is_false",
+          "meaning": "The first live sample gate is not ready."
+        },
+        {
+          "assertion_id": "external_result_open",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/external_validation_complete"
+          },
+          "operator": "is_false",
+          "meaning": "External validation remains incomplete."
+        },
+        {
+          "assertion_id": "level_five_open",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/current_evidence_posture/level_5_attained"
+          },
+          "operator": "is_false",
+          "meaning": "The machine reviewer snapshot records Level 5 as open."
+        }
+      ]
+    },
+    {
+      "question_id": "CYB-001",
+      "role_id": "cybersecurity_reviewer",
+      "priority": "critical",
+      "question": "Does the current evidence establish a CMMC conclusion for the reviewed programs?",
+      "decision_use": "Prevents local controls, self-authored packets, or portal observations from becoming a certification statement.",
+      "answer_class": "BLOCKED",
+      "answer": "No CMMC conclusion is supportable. The current metadata packet is EVIDENCE_INCOMPLETE, with zero authoritative requirements inventoried and all nineteen requirements open.",
+      "missing_evidence": [
+        "Authoritative program-specific CMMC requirement determination",
+        "Current assessment or official record where required",
+        "Entity, scope, date, and reviewer linkage",
+        "Named legal or contracting review for any not-applicable determination"
+      ],
+      "next_receipt": "Official or qualified-review evidence mapped requirement by requirement with scope, entity, date, and artifact hash.",
+      "prohibited_claims": [
+        "CMMC certification",
+        "award eligibility",
+        "not-applicable status without named review"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "packet_incomplete",
+          "source_id": "cmmc_export",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/packet_state"
+          },
+          "operator": "equals",
+          "expected": "EVIDENCE_INCOMPLETE",
+          "meaning": "The CMMC/export packet is incomplete."
+        },
+        {
+          "assertion_id": "zero_authoritative",
+          "source_id": "cmmc_export",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/authoritative_requirement_count"
+          },
+          "operator": "equals",
+          "expected": 0,
+          "meaning": "No authoritative requirement evidence is inventoried."
+        },
+        {
+          "assertion_id": "all_requirements_open",
+          "source_id": "cmmc_export",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/open_requirement_count"
+          },
+          "operator": "equals",
+          "expected": 19,
+          "meaning": "All nineteen requirements remain open."
+        }
+      ]
+    },
+    {
+      "question_id": "CYB-002",
+      "role_id": "cybersecurity_reviewer",
+      "priority": "critical",
+      "question": "Are ITAR, EAR, JCP, and DD2345 evidence gates cleared for MissionWeave?",
+      "decision_use": "Separates topic marking and local statements from official classification and access evidence.",
+      "answer_class": "BLOCKED",
+      "answer": "No. The dated MissionWeave gate keeps DD2345 or JCP application evidence unresolved and explicitly forbids clearing that gate with a bare checkbox. The packet is also stale for action-time reliance.",
+      "missing_evidence": [
+        "Official certified DD2345 or official JCP application receipt",
+        "Entity and scope match",
+        "Private artifact hash match",
+        "Current export and technology-control review"
+      ],
+      "next_receipt": "Official portal-issued evidence with private hash binding and qualified export or legal review.",
+      "prohibited_claims": [
+        "JCP approval from registration",
+        "export classification from topic labeling",
+        "access authorization from a local boolean"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "jcp_gate_unresolved",
+          "source_id": "missionweave_gate",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/gate_summary/unresolved_gates"
+          },
+          "operator": "contains",
+          "expected": "DD2345_OR_JCP_APPLICATION_EVIDENCE",
+          "meaning": "The official JCP or DD2345 evidence gate remains unresolved."
+        },
+        {
+          "assertion_id": "bare_checkbox_false",
+          "source_id": "missionweave_gate",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/controls/bare_jcp_checkbox_can_clear_gate"
+          },
+          "operator": "is_false",
+          "meaning": "A bare checkbox cannot clear the evidence gate."
+        },
+        {
+          "assertion_id": "mission_gate_stale",
+          "source_id": "missionweave_gate",
+          "selector": {
+            "type": "source_metadata",
+            "value": "freshness_state"
+          },
+          "operator": "equals",
+          "expected": "STALE",
+          "meaning": "The MissionWeave action gate is stale."
+        }
+      ]
+    },
+    {
+      "question_id": "CYB-003",
+      "role_id": "cybersecurity_reviewer",
+      "priority": "critical",
+      "question": "Does the federal packet claim authority to process CUI or a current CMMC status?",
+      "decision_use": "Keeps a federal capability packet from silently asserting regulated data-handling authority.",
+      "answer_class": "SUPPORTED_NEGATIVE",
+      "answer": "No. The dated federal protocol explicitly records both CUI-processing and CMMC-status claims as false and keeps cybersecurity representations human-gated.",
+      "missing_evidence": [
+        "Program-specific CUI handling authorization if required",
+        "Current CMMC evidence if required",
+        "Approved system boundary and security plan"
+      ],
+      "next_receipt": "Contract-specific security requirements determination followed by official or qualified-review evidence for the exact system boundary.",
+      "prohibited_claims": [
+        "CUI authorization",
+        "CMMC status",
+        "security authorization to operate"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "cui_claim_false",
+          "source_id": "federal_protocol",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/cui_processing_claimed"
+          },
+          "operator": "is_false",
+          "meaning": "The federal protocol makes no CUI-processing claim."
+        },
+        {
+          "assertion_id": "cmmc_claim_false",
+          "source_id": "federal_protocol",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/cmmc_status_claimed"
+          },
+          "operator": "is_false",
+          "meaning": "The federal protocol makes no CMMC-status claim."
+        },
+        {
+          "assertion_id": "cyber_rep_human_gate",
+          "source_id": "federal_protocol",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/human_gate/cybersecurity_representation_allowed_without_human"
+          },
+          "operator": "is_false",
+          "meaning": "Cybersecurity representations remain human-gated."
+        }
+      ]
+    },
+    {
+      "question_id": "CYB-004",
+      "role_id": "cybersecurity_reviewer",
+      "priority": "high",
+      "question": "What privacy and secret-scanning evidence is present?",
+      "decision_use": "Defines the scope of public-package hygiene evidence without treating it as a security assessment.",
+      "answer_class": "PARTIAL_DATED",
+      "answer": "The scoped funding scan reports zero configured secret hits, and the dated reproducibility capsule reports a passing privacy scan with zero configured pattern hits. These are bounded content scans, not a system security assessment.",
+      "missing_evidence": [
+        "Independent security review",
+        "Threat model and system boundary",
+        "Current secret scan at the reviewed commit",
+        "Access-control and incident-response evidence for the deployment scope"
+      ],
+      "next_receipt": "Current-commit scoped scan plus an independent findings and disposition record for the actual deployment boundary.",
+      "prohibited_claims": [
+        "absence of all secrets",
+        "privacy compliance",
+        "security certification"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "funding_secret_zero",
+          "source_id": "funding_reviewer_gate",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/unsafe_secret_count"
+          },
+          "operator": "equals",
+          "expected": 0,
+          "meaning": "The scoped funding-package scan recorded zero configured secret hits."
+        },
+        {
+          "assertion_id": "privacy_scan_pass",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/privacy_scan/passed"
+          },
+          "operator": "is_true",
+          "meaning": "The dated capsule privacy scan passed."
+        },
+        {
+          "assertion_id": "privacy_hits_zero",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/privacy_scan/configured_pattern_hit_count"
+          },
+          "operator": "equals",
+          "expected": 0,
+          "meaning": "The configured capsule privacy patterns recorded zero hits."
+        }
+      ]
+    },
+    {
+      "question_id": "CYB-005",
+      "role_id": "cybersecurity_reviewer",
+      "priority": "high",
+      "question": "Is software supply-chain evidence complete across supported environments?",
+      "decision_use": "Separates exact direct-version and SBOM evidence from a complete artifact provenance claim.",
+      "answer_class": "PARTIAL_DATED",
+      "answer": "The dated capsule has exact direct dependency versions, an 18-component SBOM, and deterministic runtime matching, but its own summary marks artifact hash locking incomplete.",
+      "missing_evidence": [
+        "Exact transitive artifact hashes per supported platform",
+        "Current vulnerability and license review",
+        "Signed build provenance for release artifacts"
+      ],
+      "next_receipt": "Platform-specific locked dependency closure, signed SBOM or provenance, and reviewed vulnerability disposition.",
+      "prohibited_claims": [
+        "complete supply-chain assurance",
+        "all-platform binary equivalence",
+        "security authorization"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "direct_versions_exact",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/dependency_versions_exact_match"
+          },
+          "operator": "is_true",
+          "meaning": "Direct dependency versions match the dated receipt."
+        },
+        {
+          "assertion_id": "runtime_match",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/deterministic_environment_match"
+          },
+          "operator": "is_true",
+          "meaning": "The recorded runtime controls matched."
+        },
+        {
+          "assertion_id": "artifact_lock_false",
+          "source_id": "reproducibility_receipt",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/artifact_hash_lock_complete"
+          },
+          "operator": "is_false",
+          "meaning": "Artifact hash locking remains incomplete."
+        }
+      ]
+    },
+    {
+      "question_id": "CYB-006",
+      "role_id": "cybersecurity_reviewer",
+      "priority": "critical",
+      "question": "Are consequential external and legal actions protected by a human-control boundary?",
+      "decision_use": "Evaluates whether automation can alter legal, account, security, submission, or financial state without a fresh decision.",
+      "answer_class": "SUPPORTED",
+      "answer": "Yes at the repository-control level. HumanUnlock requires a fresh action-time decision, and the machine policy disables final submissions, legal or IP action, account changes, external sends, spending, and live orders without a human.",
+      "missing_evidence": [],
+      "next_receipt": "For deployment assurance, provide the runtime enforcement and audit receipt showing the same controls at the consequential endpoint.",
+      "prohibited_claims": [
+        "runtime enforcement from policy text alone",
+        "standing approval",
+        "automatic legal authority"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "human_unlock_policy",
+          "source_id": "agent_rules",
+          "selector": {
+            "type": "text",
+            "value": ""
+          },
+          "operator": "contains",
+          "expected": "Fresh, action-time approval is required before any external message, submission, certification, publication, account change, credential change, spend, live order, money movement, NDA execution, patent filing, or other legal action.",
+          "meaning": "The repository contract defines the human-control boundary."
+        },
+        {
+          "assertion_id": "external_send_false",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/human_authority_policy/external_send_allowed_without_human"
+          },
+          "operator": "is_false",
+          "meaning": "External sends are disabled without a human."
+        },
+        {
+          "assertion_id": "legal_action_false",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/human_authority_policy/legal_or_ip_action_allowed_without_human"
+          },
+          "operator": "is_false",
+          "meaning": "Legal and IP actions are disabled without a human."
+        }
+      ]
+    },
+    {
+      "question_id": "LIC-001",
+      "role_id": "licensing_officer",
+      "priority": "critical",
+      "question": "Does the public-safe record verify patent grant status or a current prosecution deadline?",
+      "decision_use": "Prevents payment records or anniversary assumptions from becoming a patent-status or deadline representation.",
+      "answer_class": "BLOCKED",
+      "answer": "No. The dated counsel packet records no patent grant, an unverified U.S. prosecution deadline, and a payment-acknowledgement-only status that requires the newest official docket. The packet is stale for action-time reliance.",
+      "missing_evidence": [
+        "Newest official Patent Center docket",
+        "Official filing receipt and status",
+        "Current claims and specification",
+        "Licensed counsel deadline review"
+      ],
+      "next_receipt": "Counsel-reviewed official docket capture with public-safe metadata and a private artifact hash.",
+      "prohibited_claims": [
+        "issued patent",
+        "safe deadline",
+        "complete application status"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "patent_grant_false",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/patent_grant_claimed"
+          },
+          "operator": "is_false",
+          "meaning": "The counsel packet does not claim a patent grant."
+        },
+        {
+          "assertion_id": "deadline_unverified",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/us_prosecution_deadline_verified"
+          },
+          "operator": "is_false",
+          "meaning": "The U.S. prosecution deadline is unverified."
+        },
+        {
+          "assertion_id": "payment_only_status",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/patent_deadline_control_status"
+          },
+          "operator": "equals",
+          "expected": "PAYMENT_ACKNOWLEDGEMENT_ONLY_OFFICIAL_DOCKET_REQUIRED",
+          "meaning": "The current control requires an official docket."
+        },
+        {
+          "assertion_id": "ip_packet_stale",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "source_metadata",
+            "value": "freshness_state"
+          },
+          "operator": "equals",
+          "expected": "STALE",
+          "meaning": "The counsel packet is stale for action-time reliance."
+        }
+      ]
+    },
+    {
+      "question_id": "LIC-002",
+      "role_id": "licensing_officer",
+      "priority": "critical",
+      "question": "Does the record establish claim scope, validity, infringement, or clearance for commercial use?",
+      "decision_use": "Separates technical evidence from legal claim construction and third-party rights analysis.",
+      "answer_class": "BLOCKED",
+      "answer": "No. Patent scope and infringement conclusions are blocked by the reviewer controls, and the counsel packet explicitly records that clearance is not claimed and licensed counsel is required.",
+      "missing_evidence": [
+        "Official filed claims and specification",
+        "Counsel-controlled claim chart",
+        "Prior-art and third-party rights analysis",
+        "Current ownership and assignment review"
+      ],
+      "next_receipt": "Licensed-counsel opinion or issue matrix bound to the official record and relevant third-party rights search.",
+      "prohibited_claims": [
+        "claim validity",
+        "non-infringement",
+        "exclusive rights"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "scope_blocked",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/claim_controls/blocked_without_new_evidence/patent_validity_scope_or_infringement"
+          },
+          "operator": "is_true",
+          "meaning": "The reviewer controls block patent scope and infringement conclusions."
+        },
+        {
+          "assertion_id": "clearance_false",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/clearance_to_operate_claimed"
+          },
+          "operator": "is_false",
+          "meaning": "The counsel packet makes no clearance conclusion."
+        },
+        {
+          "assertion_id": "counsel_required",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/licensed_counsel_required"
+          },
+          "operator": "is_true",
+          "meaning": "Licensed counsel is required."
+        }
+      ]
+    },
+    {
+      "question_id": "LIC-003",
+      "role_id": "licensing_officer",
+      "priority": "high",
+      "question": "Is there a structured public-safe invention-family record for licensing triage?",
+      "decision_use": "Determines whether a licensing officer can identify discussion areas without receiving private claim charts or enabling details.",
+      "answer_class": "PARTIAL_DATED",
+      "answer": "A dated counsel packet inventories six public-safe invention families and is marked ready for human counsel review. It is a triage record, not a verified scope, ownership, novelty, or license-rights determination.",
+      "missing_evidence": [
+        "Current counsel-reviewed invention map",
+        "Official-claim support mapping",
+        "Ownership and assignment chain",
+        "Approved public disclosure scope"
+      ],
+      "next_receipt": "Counsel-approved invention-family index linked privately to official claims, inventors, assignments, and dated reduction-to-practice evidence.",
+      "prohibited_claims": [
+        "novelty from a family label",
+        "ownership from repository custody",
+        "licensable scope from technical similarity"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "family_count",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/invention_family_count"
+          },
+          "operator": "equals",
+          "expected": 6,
+          "meaning": "The dated packet inventories six invention families."
+        },
+        {
+          "assertion_id": "counsel_status",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/status"
+          },
+          "operator": "equals",
+          "expected": "IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED",
+          "meaning": "The packet remains counsel-controlled."
+        },
+        {
+          "assertion_id": "public_review_required",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/public_disclosure_review_required"
+          },
+          "operator": "is_true",
+          "meaning": "Public disclosure requires review."
+        }
+      ]
+    },
+    {
+      "question_id": "LIC-004",
+      "role_id": "licensing_officer",
+      "priority": "critical",
+      "question": "Are inventorship, ownership, assignments, and contributor rights established by the public packet?",
+      "decision_use": "Tests chain-of-title readiness before diligence, option, evaluation, or license terms.",
+      "answer_class": "BLOCKED",
+      "answer": "No public source in this matrix supplies a verified chain of title. The counsel packet remains human-and-counsel controlled, and legal filing or disclosure expansion is disabled without review.",
+      "missing_evidence": [
+        "Inventor and contributor list",
+        "Executed assignments",
+        "Employment or contractor IP agreements where applicable",
+        "Entity ownership and authority review",
+        "Counsel chain-of-title conclusion"
+      ],
+      "next_receipt": "Private counsel-controlled chain-of-title schedule with document hashes and a public-safe completeness receipt.",
+      "prohibited_claims": [
+        "sole ownership",
+        "clean title",
+        "exclusive licensing authority"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "counsel_controlled",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/status"
+          },
+          "operator": "equals",
+          "expected": "IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED",
+          "meaning": "The diligence packet remains counsel-controlled."
+        },
+        {
+          "assertion_id": "legal_filing_false",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/human_gate/legal_filing_allowed_without_human"
+          },
+          "operator": "is_false",
+          "meaning": "Legal filing is disabled without a human."
+        },
+        {
+          "assertion_id": "disclosure_expansion_false",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/human_gate/public_disclosure_expansion_allowed_without_human"
+          },
+          "operator": "is_false",
+          "meaning": "Public disclosure expansion is disabled without a human."
+        }
+      ]
+    },
+    {
+      "question_id": "LIC-005",
+      "role_id": "licensing_officer",
+      "priority": "high",
+      "question": "Does the repository define a public-private disclosure boundary for licensing discussions?",
+      "decision_use": "Allows bounded technical triage while protecting private patent, identity, credential, and privileged material.",
+      "answer_class": "SUPPORTED",
+      "answer": "Yes at the policy level. The public repository withholds filed-claim scope, private patent records, credentials, identifiers, and privileged communications; counsel must approve any expansion.",
+      "missing_evidence": [],
+      "next_receipt": "For a specific diligence room, use a counsel-approved disclosure schedule and access log with artifact hashes.",
+      "prohibited_claims": [
+        "complete disclosure",
+        "waiver of privilege",
+        "publication authority"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "public_private_boundary",
+          "source_id": "repo_readme",
+          "selector": {
+            "type": "text",
+            "value": ""
+          },
+          "operator": "contains",
+          "expected": "Private patent records, credentials, personal identifiers, and privileged communications are excluded from public builders and proof packets.",
+          "meaning": "The README defines the public-private boundary."
+        },
+        {
+          "assertion_id": "public_disclosure_review",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/public_disclosure_review_required"
+          },
+          "operator": "is_true",
+          "meaning": "The counsel packet requires disclosure review."
+        },
+        {
+          "assertion_id": "private_identifiers_blocked",
+          "source_id": "missionweave_gate",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/controls/private_identifiers_allowed_in_public_output"
+          },
+          "operator": "is_false",
+          "meaning": "The action gate blocks private identifiers from public output."
+        }
+      ]
+    },
+    {
+      "question_id": "LIC-006",
+      "role_id": "licensing_officer",
+      "priority": "critical",
+      "question": "Are data rights, evaluation rights, license scope, economics, and signing authority ready for a deal?",
+      "decision_use": "Stops a technical proof pack from becoming a binding option, evaluation agreement, MOU, or license.",
+      "answer_class": "BLOCKED",
+      "answer": "No binding rights or terms are established by this matrix. The counsel packet requires licensed-counsel and human review, and legal or IP actions remain disabled without a fresh decision.",
+      "missing_evidence": [
+        "Defined licensed subject matter and excluded matter",
+        "Ownership and chain-of-title review",
+        "Government and third-party data-rights analysis",
+        "Evaluation scope and confidentiality terms",
+        "Economics, field of use, territory, exclusivity, and diligence terms",
+        "Verified signing authority"
+      ],
+      "next_receipt": "Counsel-reviewed term sheet and authority matrix tied to the verified subject matter, rights schedule, and exact signatories.",
+      "prohibited_claims": [
+        "binding license",
+        "exclusive rights",
+        "approved economics",
+        "signature authority"
+      ],
+      "assertions": [
+        {
+          "assertion_id": "licensed_counsel_required",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/summary/licensed_counsel_required"
+          },
+          "operator": "is_true",
+          "meaning": "Licensed counsel is required for the IP lane."
+        },
+        {
+          "assertion_id": "legal_ip_human_gate",
+          "source_id": "reviewer_context",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/human_authority_policy/legal_or_ip_action_allowed_without_human"
+          },
+          "operator": "is_false",
+          "meaning": "Legal and IP action is disabled without a human."
+        },
+        {
+          "assertion_id": "counsel_packet_status",
+          "source_id": "ip_counsel",
+          "selector": {
+            "type": "json_pointer",
+            "value": "/status"
+          },
+          "operator": "equals",
+          "expected": "IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED",
+          "meaning": "The diligence packet remains a review artifact, not a deal instrument."
+        }
+      ]
+    }
+  ]
+}

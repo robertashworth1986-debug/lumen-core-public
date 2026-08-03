@@ -11,30 +11,45 @@ This artifact is a reviewer-readiness and action-control packet. It does not aut
 - Official live-data targets: `6`
 - Venture studio deprioritized: `true`
 - Technical reviewer first: `true`
-- SAM submission confirmed: `true`
-- SAM renewal status: `submitted_confirmation_received_monitor_active_status`
+- Historical SAM submission receipt present: `true`
+- Historical SAM receipt generated UTC: `2026-07-09T21:46:14.006778+00:00`
+- Current SAM active status verified: `false`
+- Current SAM status: `historical_submission_receipt_present_current_active_status_not_verified`
 - External send without human: `false`
 - Portal submission without human: `false`
 - Live trading allowed: `false`
-- Approval stack SHA-256: `d686faa3b4e436fb47cc219c78d4604088bd23df5621baeeb7c18c2c5efd6867`
+- Approval stack SHA-256: `0b22c379dd6196bddca4bdfaeee10ce3d21fcab4e723463bdfe78acd174e37e4`
 
 ## Core Truth
 
-LumenCore's strongest current story is not a sales pitch. It is a measured proof stack with internal holdout evidence, live-source breadth, and clear locks against unsupported field-validation, revenue, award, or trading claims.
+LumenCore currently has a governed benchmark and evidence stack, not a promoted performance champion. The strongest scientific asset is the source-specific protocol, including preserved negative results and explicit locks against unsupported field, savings, award, or trading claims.
 
 - Registered geometry families: `140`
-- Ready benchmark routes: `309`
-- Unique source count: `183`
-- Unique source estimated rows: `3751192`
-- Kuramoto holdouts: `24`
-- Kuramoto wins vs Kalman: `24`
-- Kuramoto estimated replay rows: `2506267`
-- Data-room markdown artifacts: `40`
-- Data-room control artifacts: `42`
+- Internal performance champion present: `false`
+- Compatible adapter routes: `4`
+- Direct measured routes: `2`
+- Conditioned-synthetic routes: `2`
+- Baseline comparisons: `22`
+- Direct all-baseline global promotions: `0`
+- Performance rows reviewed: `32608`
+- Legacy ready rows excluded: `358`
+- Numeric fallbacks: `0`
+- Source inventory: `24` measured sources / `17081` rows
+- Source inventory is performance evidence: `false`
+- Kuramoto was protocol-selected: `false`
+- Development-selected candidate: `lissajous_phase_paths`
+- Kuramoto holdouts: `1525`
+- Kuramoto wins vs Kalman: `482`
+- Kuramoto losses or ties vs Kalman: `1043`
+- Kuramoto mean skill delta vs Kalman: `-0.508190706`
+- Kuramoto registered-baseline mean wins: `0/6`
+- Kuramoto estimated replay rows: `15250`
+- Data-room markdown artifacts: `107`
+- Data-room control artifacts: `56`
 - Field validation claim allowed: `false`
 - Real-dollar savings claim allowed: `false`
 
-Safe technical claim: Kuramoto phase coupling is ready for a buyer-authorized field replay request after internal source-conditioned holdout evidence; it is not yet field validation or realized savings.
+Safe technical claim: Kuramoto phase coupling was measured directly on the frozen EIA panel but was not development-selected, won 482 of 1,525 paired days versus the named Kalman baseline, had mean skill delta -0.508190706, and cleared zero registered-baseline promotion gates. This supports a bounded source-native protocol review, not a performance, field-replay, or savings claim.
 
 Blocked claims:
 - `external field-validation approval`
@@ -51,38 +66,39 @@ Blocked claims:
 ### National lab or independent technical reviewer
 
 - Status: `REAL_TECHNICAL_REVIEW_ROUTE`
-- Why this is real: LANL routed the VISION licensing inquiry to a named main contact returning next week.
+- Why this is real: A historical LANL VISION licensing reply identified a routing contact. Current mailbox state and routing freshness must be reconciled before any follow-up.
 - Proof to show:
-  - Kuramoto 24/24 internal source-conditioned holdout wins versus Kalman.
-  - 2,506,267 estimated replay rows for the harmonic holdout expansion.
+  - Kuramoto direct measured nonpromotion: 482/1,525 paired-day wins and negative mean skill versus Kalman.
+  - Zero complete source-specific all-baseline globally corrected promotions.
+  - Four compatible routes: two direct measured and two conditioned-synthetic.
   - Current proof-state hash and data-room manifest hash.
   - Failure boundaries showing field validation and real-dollar claims are still locked.
-- Next action: Prepare a no-hype technical review packet and ask for fit, validation route, or licensing pathway.
+- Next action: Keep a no-hype technical review packet ready; reconcile the full mail thread and duplicate-send history before proposing a bounded protocol review.
 - Human gate: Human approves any LANL reply, licensing request, NDA, or disclosure.
 
-### Patent counsel / USPTO pro bono route
+### Historical patent counsel / pro bono route
 
-- Status: `URGENT_REAL_IP_ROUTE`
-- Why this is real: USPTO Patent Pro Bono replied and identified Georgia PATENTS as the Tennessee-serving program, with Pro Se assistance as a deadline fallback.
+- Status: `CLOSED_ROUTE_DO_NOT_REOPEN`
+- Why this is real: The prior Georgia PATENTS route is closed under the current routing controls and must not be reopened by this packet.
 - Proof to show:
   - Claim-boundary register.
   - IP counsel diligence packet.
   - Technical invention map and proof-state boundaries.
   - No public expansion of claims until counsel review.
-- Next action: Prepare Georgia PATENTS intake package and a Pro Se fallback checklist before the July 2026 deadline window.
+- Next action: No outreach on the closed Georgia PATENTS route. Use current official USPTO or licensed-counsel guidance for any live deadline.
 - Human gate: Human and licensed counsel decide all filings, claims, deadlines, continuations, PCT, and disclosures.
 
 ### Agency reviewer / contracting technical evaluator
 
-- Status: `POST_SAM_AGENCY_REVIEWER_ROUTE`
-- Why this is real: SAM renewal submission is confirmed by portal state and email; federal opportunity review can continue while final active renewal status is monitored.
+- Status: `CURRENT_SAM_STATUS_REVERIFY_BEFORE_ELIGIBILITY_CLAIM`
+- Why this is real: A historical July 9 SAM submission and confirmation receipt is present, but this artifact does not verify the entity's current active status.
 - Proof to show:
   - SAM submission and same-day opportunity push receipt.
   - Federal submission protocol packet.
   - Submission authority matrix.
   - Immediate federal AI opportunity radar.
   - Reviewer diligence QA matrix.
-- Next action: Monitor SAM active-renewal status, then prioritize FHWA full proposal, DSIP MissionWeave, and NSF pitch/invitation gates under human authority.
+- Next action: Verify current entity status in SAM.gov read-only, then use the current official opportunity queue; do not infer eligibility from the July 9 receipt.
 - Human gate: Human signs SAM terms, reps/certs, entity renewal, and portal submissions.
 
 ### FAA / aviation live-data expansion
@@ -159,27 +175,27 @@ Blocked claims:
 - Luma use: Candidate source for airport-data validation workflows after access boundaries are reviewed.
 - Integration posture: `human_account_required`
 
-## SAM Renewal Support
+## SAM Status Support
 
-- Current browser state: SAM.gov displayed Entity Registration Submitted and a confirmation email was received.
-- Human next step: Monitor SAM active-renewal status and keep final portal actions human-approved.
+- Current browser state: Not inspected by this builder. A historical July 9 artifact records Entity Registration Submitted and an email confirmation; current active status is not verified.
+- Human next step: Open SAM.gov and verify current entity status read-only. Keep terms, reps/certs, banking, role requests, and final submissions human-controlled.
 - Codex safe support:
   - Record SAM submission evidence without exposing OTPs, bank data, or private portal fields.
   - Monitor status and surface any follow-up notices.
   - Prepare next opportunity packages from official instructions.
   - Do not submit future reps/certs, pricing, or portal packages without human confirmation.
 - Known email context:
-  - SAM.gov sent a confirmation email for the submitted entity registration.
-  - SAM submission is evidence of renewal submission, not an award or source-selection event.
+  - A July 9 artifact records a SAM confirmation email for a submitted entity registration.
+  - The historical receipt is not proof of current active registration, eligibility, award, or source selection.
   - Any SAM account key rotation reminder should be handled separately from entity renewal.
 
 ## Email Signal Triage
 
 Real signals:
-- USPTO Patent Pro Bono routed Tennessee inventors to Georgia PATENTS and noted the Pro Se Assistance Program as a deadline fallback.
-- LANL replied that Mike Erickson is the main contact for the VISION licensing opportunity when he returns.
+- The prior Georgia PATENTS route is closed and retained only as historical routing evidence.
+- A historical LANL reply identified a VISION licensing contact; current mailbox state must be reconciled before follow-up.
 - Login.gov confirms DSIP connection, which supports the federal submission route.
-- SAM.gov expiration notice confirms entity renewal is a real blocker before federal award eligibility.
+- The historical SAM submission receipt requires a fresh current-status check before any eligibility claim.
 
 Deprioritized signals:
 - Pitch-event or pay-before-pitch routes should not drive the proof stack.
@@ -187,8 +203,8 @@ Deprioritized signals:
 
 ## Next 48 Hours
 
-- Finish SAM renewal in the browser with human certification.
-- Prepare Georgia PATENTS intake packet and Pro Se fallback checklist.
-- Prepare LANL/VISION technical review packet with claim boundaries and current proof hashes.
+- Verify current SAM entity status read-only; do not infer active status from the July 9 receipt.
+- Keep the closed Georgia PATENTS route closed.
+- Reconcile the full LANL/VISION email thread before any bounded follow-up.
 - Build FAA AWC Data API and FAA NASR source adapters as the next live-data expansion path.
-- Promote FHWA TSMO and Air Force AAC only as official reviewer packages, not broad sales pitches.
+- Use the current official opportunity queue; do not revive closed FHWA or expired lanes.

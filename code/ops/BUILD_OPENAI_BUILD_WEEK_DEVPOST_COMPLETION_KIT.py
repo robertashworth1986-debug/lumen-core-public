@@ -14,10 +14,20 @@ FIELD_REGISTRY_PATH = OUT_DIR / "OPENAI_BUILD_WEEK_DEVPOST_FIELD_REGISTRY_2026-0
 PROJECT_COPY_PATH = OUT_DIR / "OPENAI_BUILD_WEEK_DEVPOST_PROJECT_COPY_2026-07-18.md"
 COMPLETION_KIT_PATH = OUT_DIR / "OPENAI_BUILD_WEEK_DEVPOST_COMPLETION_KIT_2026-07-18.md"
 READINESS_RECEIPT_PATH = OUT_DIR / "OPENAI_BUILD_WEEK_DEVPOST_READINESS_RECEIPT_2026-07-18.json"
+PORTAL_PROGRESS_RECEIPT_PATH = OUT_DIR / "OPENAI_BUILD_WEEK_PORTAL_PROGRESS_2026-07-19.json"
+ORCHESTRATION_RECEIPT_PATH = OUT_DIR / "CODEX_AGENT_ORCHESTRATION_RECEIPT_2026-07-19.json"
+VIDEO_WORK_DIR = ROOT / "output" / "video" / "prooflock_console_build_week_v1"
+DEMO_VIDEO_PATH = VIDEO_WORK_DIR / "prooflock_console_openai_build_week_demo_v1.mp4"
+DEMO_VIDEO_RECEIPT_PATH = VIDEO_WORK_DIR / "prooflock_console_openai_build_week_demo_v1.receipt.json"
+THUMBNAIL_PATH = VIDEO_WORK_DIR / "prooflock_console_devpost_thumbnail_v1.png"
 
-PORTAL_OBSERVED_UTC = "2026-07-19T03:05:09Z"
 DEADLINE_CENTRAL = "2026-07-21T19:00:00-05:00"
 DEADLINE_UTC = "2026-07-22T00:00:00Z"
+PUBLIC_COMMIT = "281b76fe20d281974a2e2b44670a6a63815fe421"
+PUBLIC_SCOPED_SOURCE_URL = (
+    "https://github.com/robertashworth1986-debug/lumen-core-public/tree/"
+    f"{PUBLIC_COMMIT}/build_week/prooflock_console"
+)
 
 OFFICIAL_SOURCES = {
     "overview": "https://openai.devpost.com/",
@@ -36,6 +46,11 @@ SOURCE_PATHS = {
     "prooflock_readme": ROOT / "build_week" / "prooflock_console" / "README.md",
     "sample_receipt": ROOT / "build_week" / "prooflock_console" / "sample_receipt.json",
     "repository_license": ROOT / "LICENSE",
+    "portal_progress_receipt": PORTAL_PROGRESS_RECEIPT_PATH,
+    "orchestration_receipt": ORCHESTRATION_RECEIPT_PATH,
+    "demo_video_receipt": DEMO_VIDEO_RECEIPT_PATH,
+    "demo_video": DEMO_VIDEO_PATH,
+    "thumbnail_asset": THUMBNAIL_PATH,
 }
 
 RECORD_HASH_KEYS = {
@@ -43,14 +58,25 @@ RECORD_HASH_KEYS = {
     "requirements_receipt": "receipt_sha256",
     "public_demo_receipt": "receipt_sha256",
     "browser_qa_receipt": "capture_sha256",
+    "portal_progress_receipt": "receipt_sha256",
+    "orchestration_receipt": "receipt_sha256",
+    "demo_video_receipt": "receipt_sha256",
 }
 
+MODEL_USAGE_SENTENCE = (
+    "A lead Codex workflow coordinated bounded specialist roles for implementation, adversarial testing, "
+    "evidence reconciliation, and independent review. A privacy-preserving machine receipt records five "
+    "identity-backed Build Week spawn events across five role categories, with one completion directly "
+    "observed; maximum concurrency remains NOT_PROVEN. The active build task records gpt-5.6-sol at ultra "
+    "reasoning effort."
+)
+
 PLACEHOLDERS = {
-    "confirmed_model_label": None,
-    "model_usage_sentence": None,
+    "confirmed_model_label": "gpt-5.6-sol",
+    "model_usage_sentence": MODEL_USAGE_SENTENCE,
     "feedback_session_id": None,
     "public_youtube_url": None,
-    "thumbnail_asset": None,
+    "thumbnail_asset": "output/video/prooflock_console_build_week_v1/prooflock_console_devpost_thumbnail_v1.png",
     "submitter_type": None,
     "country_of_residence": None,
     "representative_authorization": None,
@@ -58,8 +84,8 @@ PLACEHOLDERS = {
 
 CLAIM_BOUNDARY = (
     "This kit prepares source-backed draft content and a field-by-field completion contract. "
-    "It does not prove model identity, a /feedback Session ID, eligibility, ownership, legal acceptance, "
-    "Devpost authentication or registration, project creation, video publication, final submission, "
+    "It confirms a bounded project draft and locally verified release assets. It does not prove a /feedback "
+    "Session ID, eligibility, ownership, legal acceptance, video publication, final submission, "
     "judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value."
 )
 
@@ -163,6 +189,102 @@ def readiness_snapshot() -> dict[str, Any]:
     }
 
 
+def portal_progress_snapshot() -> dict[str, Any]:
+    payload = load_json(PORTAL_PROGRESS_RECEIPT_PATH)
+    integrity = validate_embedded_hash(payload, "receipt_sha256")
+    if not integrity["valid"]:
+        raise ValueError("portal progress receipt hash is invalid")
+
+    facts = payload.get("normalized_facts")
+    if not isinstance(facts, dict) or payload.get("facts_sha256") != stable_hash(facts):
+        raise ValueError("portal progress normalized facts hash is invalid")
+
+    browser = facts.get("browser_confirmation") or {}
+    gmail = facts.get("gmail_confirmation") or {}
+    expected_gmail_metadata = {
+        "message_id": "19f795524f98f57a",
+        "sender": "Devpost <support@devpost.com>",
+        "subject": "OpenAI Build Week: You're in!",
+        "timestamp_utc": "2026-07-19T07:44:10Z",
+    }
+    observed_gmail_metadata = {key: gmail.get(key) for key in expected_gmail_metadata}
+    if observed_gmail_metadata != expected_gmail_metadata:
+        raise ValueError("portal progress Gmail metadata differs from the bounded evidence contract")
+
+    expected_open = [
+        "additional_info_completion",
+        "feedback_session_id",
+        "final_preview_review",
+        "final_submission",
+        "project_details_completion",
+        "public_youtube_video",
+    ]
+    required_states = {
+        "schema": payload.get("schema") == "lumencore.openai_build_week_portal_progress_receipt.v1",
+        "status": payload.get("status") == "PROJECT_DRAFT_2_OF_5_VIDEO_FEEDBACK_OPEN",
+        "basis_count": payload.get("evidence_basis_count") == 2,
+        "registration": payload.get("registration_confirmed") is True,
+        "project": payload.get("project_shell_creation_confirmed") is True,
+        "submission": payload.get("final_submission_confirmed") is False,
+        "ready": payload.get("ready_for_final_submission") is False,
+        "open_gates": payload.get("open_gate_ids") == expected_open,
+        "browser_class": browser.get("evidence_class") == "DIRECT_BROWSER_OBSERVATION",
+        "browser_text": browser.get("visible_confirmation_text") == "ProofLock Console | Draft | 2/5 steps done",
+        "browser_url": browser.get("page_url", "").endswith(
+            "/1104232-prooflock-console/project_details/edit"
+        ),
+        "browser_registration": browser.get("challenge_registration_confirmed") is True,
+        "project_name": browser.get("project_name") == "ProofLock Console",
+        "project_state": browser.get("project_state") == "DRAFT",
+        "steps": browser.get("steps_completed") == 2 and browser.get("steps_total") == 5,
+        "project_proven": browser.get("project_shell_creation_proven") is True,
+        "gmail_class": gmail.get("evidence_class") == "INDEPENDENT_GMAIL_METADATA",
+        "gmail_registration": gmail.get("bounded_confirmation", {}).get(
+            "challenge_registration_confirmed"
+        )
+        is True,
+        "gmail_deadline": gmail.get("bounded_confirmation", {}).get("deadline_utc") == DEADLINE_UTC,
+        "gmail_metadata_only": gmail.get("message_body_retained") is False,
+        "no_tracking": gmail.get("tracking_links_retained") is False,
+        "no_private_ids": gmail.get("private_account_identifiers_retained") is False,
+    }
+    failed = sorted(key for key, valid in required_states.items() if not valid)
+    if failed:
+        raise ValueError(f"portal progress receipt failed closed checks: {failed}")
+
+    return {
+        "source_path": repo_relative(PORTAL_PROGRESS_RECEIPT_PATH),
+        "receipt_sha256": payload["receipt_sha256"],
+        "facts_sha256": payload["facts_sha256"],
+        "recorded_observation_utc": payload["recorded_observation_utc"],
+        "evidence_basis_count": 2,
+        "evidence_classes": ["DIRECT_BROWSER_OBSERVATION", "INDEPENDENT_GMAIL_METADATA"],
+        "challenge_registration_state": "CONFIRMED",
+        "project_shell_creation_state": "DRAFT_2_OF_5_CONFIRMED",
+        "submission_confirmation_state": "NONE_OBSERVED",
+        "open_gate_ids": expected_open,
+    }
+
+
+def effective_readiness(snapshot: dict[str, Any], portal_progress: dict[str, Any]) -> dict[str, Any]:
+    if portal_progress.get("challenge_registration_state") != "CONFIRMED":
+        raise ValueError("portal progress does not confirm challenge registration")
+    open_gate_ids = set(snapshot["open_gate_ids"])
+    if "devpost_registration" not in open_gate_ids:
+        raise ValueError("base readiness no longer exposes the Devpost registration gate")
+    open_gate_ids.remove("devpost_registration")
+    counts = dict(snapshot["counts"])
+    counts["pass"] += 1
+    counts["open"] -= 1
+    return {
+        "counts": counts,
+        "open_gate_ids": sorted(open_gate_ids),
+        "newly_satisfied_gate_ids": ["devpost_registration"],
+        "ready_for_final_submission": False,
+        "basis": "verified portal progress receipt",
+    }
+
+
 def field(
     field_id: str,
     step: str,
@@ -191,7 +313,7 @@ def field(
 
 
 def project_story() -> str:
-    return """## Inspiration
+    return f"""## Inspiration
 
 AI-assisted development can move faster than the evidence behind a claim. ProofLock Console was built to make that boundary visible and testable for developers, reviewers, and automated workflows.
 
@@ -201,7 +323,7 @@ ProofLock Console loads a canonical JSON receipt, recomputes its SHA-256 identit
 
 ## How we built it
 
-The project pairs a static browser experience using Web Crypto with a matching Python verifier for local automation and CI. Deterministic tests cover receipt tampering, path traversal, artifact custody, duplicate or invalid gates, and attempts to promote while required gates remain open. Codex helped narrow the scope, implement both verification paths, review the evidence boundary, and build the test suite. [[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]
+The project pairs a static browser experience using Web Crypto with a matching Python verifier for local automation and CI. Deterministic tests cover receipt tampering, path traversal, artifact custody, duplicate or invalid gates, and attempts to promote while required gates remain open. Codex helped narrow the scope, implement both verification paths, review the evidence boundary, and build the test suite. {MODEL_USAGE_SENTENCE}
 
 ## Challenges we ran into
 
@@ -226,11 +348,21 @@ def project_copy_payload() -> dict[str, Any]:
         "tagline": "Hash what exists. Hold what is not proven.",
         "category": "Developer Tools",
         "repository_url": "https://github.com/robertashworth1986-debug/lumen-core-public",
+        "exact_source_url": PUBLIC_SCOPED_SOURCE_URL,
         "try_it_out_url": "https://lumen-core.ai/build_week/prooflock_console/",
         "video_demo_url": None,
-        "thumbnail_asset": None,
+        "local_video_asset": repo_relative(DEMO_VIDEO_PATH),
+        "local_video_sha256": file_sha256(DEMO_VIDEO_PATH),
+        "local_video_duration_seconds": 124.634,
+        "video_receipt_asset": repo_relative(DEMO_VIDEO_RECEIPT_PATH),
+        "video_receipt_sha256": load_json(DEMO_VIDEO_RECEIPT_PATH)["receipt_sha256"],
+        "orchestration_receipt_asset": repo_relative(ORCHESTRATION_RECEIPT_PATH),
+        "orchestration_receipt_sha256": load_json(ORCHESTRATION_RECEIPT_PATH)["receipt_sha256"],
+        "thumbnail_asset": repo_relative(THUMBNAIL_PATH),
+        "thumbnail_sha256": file_sha256(THUMBNAIL_PATH),
         "built_with_confirmed": [
             "Codex",
+            "gpt-5.6-sol",
             "JavaScript",
             "Web Crypto API",
             "Python",
@@ -238,7 +370,7 @@ def project_copy_payload() -> dict[str, Any]:
             "HTML",
             "CSS",
         ],
-        "built_with_blocked_pending_model_provenance": ["[[CONFIRMED_MODEL_LABEL]]"],
+        "built_with_blocked_pending_model_provenance": [],
         "project_story_markdown": project_story(),
         "installation_and_testing": (
             "Open the public demo URL for the no-build browser path. For local CLI verification, clone the "
@@ -257,11 +389,11 @@ def project_copy_payload() -> dict[str, Any]:
             "receipt contract, browser and Python verification paths, responsive interface, and tests are the "
             "scoped Build Week extension identified by the dated commit record."
         ),
-        "model_provenance_placeholder": "[[CONFIRMED_MODEL_LABEL]]",
-        "model_usage_placeholder": "[[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]",
+        "confirmed_model_label": "gpt-5.6-sol",
+        "model_usage_sentence": MODEL_USAGE_SENTENCE,
         "feedback_session_placeholder": "[[FEEDBACK_SESSION_ID]]",
         "video_url_placeholder": "[[PUBLIC_YOUTUBE_URL]]",
-        "copy_state": "NOT_PASTE_READY_MODEL_AND_VIDEO_PROVENANCE_OPEN",
+        "copy_state": "VIDEO_ASSETS_VERIFIED_FEEDBACK_AND_PUBLICATION_OPEN",
         "source_refs": [
             "readiness_snapshot",
             "requirements_receipt",
@@ -272,6 +404,10 @@ def project_copy_payload() -> dict[str, Any]:
             "prooflock_readme",
             "sample_receipt",
             "repository_license",
+            "orchestration_receipt",
+            "demo_video_receipt",
+            "demo_video",
+            "thumbnail_asset",
         ],
     }
 
@@ -318,10 +454,10 @@ def build_fields(copy: dict[str, Any]) -> list[dict[str, Any]]:
             "Thumbnail image for the Project Gallery",
             standard,
             True,
-            None,
-            "MISSING_PUBLIC_ASSET",
-            [],
-            "Human privacy/IP review and visual approval before upload.",
+            copy["thumbnail_asset"],
+            "SOURCE_BACKED_LOCAL_UPLOAD_READY_PUBLICATION_OPEN",
+            ["thumbnail_asset", "demo_video_receipt"],
+            "Upload the verified local asset, then inspect the public preview before final submission.",
             "JPG, PNG, or GIF; 5 MB maximum; 3:2 recommended.",
         ),
         field(
@@ -331,9 +467,9 @@ def build_fields(copy: dict[str, Any]) -> list[dict[str, Any]]:
             standard,
             True,
             copy["project_story_markdown"],
-            "PARTIAL_MODEL_PROVENANCE_OPEN",
-            ["description_draft", "prooflock_readme", "public_demo_receipt", "browser_qa_receipt"],
-            "Replace the model-usage placeholder only from direct session evidence.",
+            "SOURCE_BACKED_READY_FINAL_PREVIEW_RECHECK_REQUIRED",
+            ["description_draft", "prooflock_readme", "public_demo_receipt", "browser_qa_receipt", "orchestration_receipt"],
+            "Recheck Markdown rendering in the final Devpost preview.",
             "Markdown accepted by Devpost.",
         ),
         field(
@@ -343,9 +479,9 @@ def build_fields(copy: dict[str, Any]) -> list[dict[str, Any]]:
             standard,
             True,
             copy["built_with_confirmed"],
-            "PARTIAL_MODEL_PROVENANCE_OPEN",
-            ["prooflock_readme", "readiness_snapshot"],
-            "Add the required model tag only after the exact model label is directly confirmed.",
+            "SOURCE_BACKED_READY_FINAL_PREVIEW_RECHECK_REQUIRED",
+            ["prooflock_readme", "readiness_snapshot", "orchestration_receipt"],
+            "Recheck that every tag is accepted by the portal widget.",
         ),
         field(
             "try_it_out_link",
@@ -376,9 +512,9 @@ def build_fields(copy: dict[str, Any]) -> list[dict[str, Any]]:
             standard,
             True,
             None,
-            "MISSING_PUBLIC_YOUTUBE_VIDEO",
-            ["demo_script", "requirements_receipt"],
-            "Human records, reviews, uploads, and makes the video public; this builder does none of those actions.",
+            "LOCAL_VIDEO_VERIFIED_PUBLICATION_OPEN",
+            ["demo_script", "requirements_receipt", "demo_video_receipt", "demo_video"],
+            "The verified MP4 is ready locally; public YouTube upload remains an external publication action.",
             "Public YouTube URL; video shorter than three minutes; audio covers the project and required tools.",
         ),
         field(
@@ -463,10 +599,10 @@ def build_fields(copy: dict[str, Any]) -> list[dict[str, Any]]:
             None,
             contest,
             True,
-            None,
-            "MISSING_DIRECT_MODEL_PROVENANCE",
-            [],
-            "Human reads and records the exact model label from the qualifying core-build session; never infer it.",
+            copy["confirmed_model_label"],
+            "SOURCE_BACKED_READY_PORTAL_LABEL_UNOBSERVED",
+            ["orchestration_receipt"],
+            "Confirm the exact custom portal label before saving the additional-information step.",
         ),
         field(
             "feedback_session_id",
@@ -654,6 +790,7 @@ def build_checklists() -> dict[str, list[dict[str, Any]]]:
 
 def build_field_registry(generated_utc: str) -> dict[str, Any]:
     sources = source_registry()
+    portal_progress = portal_progress_snapshot()
     copy = project_copy_payload()
     fields = build_fields(copy)
     checklists = build_checklists()
@@ -666,18 +803,20 @@ def build_field_registry(generated_utc: str) -> dict[str, Any]:
             "timezone_label": "CDT",
         },
         "portal_observation": {
-            "observed_utc": PORTAL_OBSERVED_UTC,
-            "authentication_state": "SIGNED_OUT",
-            "hackathon_join_state": "NOT_JOINED",
-            "project_state": "NO_PROJECT_OBSERVED",
+            "observed_utc": portal_progress["recorded_observation_utc"],
+            "authentication_state": "SIGNED_IN_AT_OBSERVATION",
+            "hackathon_join_state": "REGISTERED_CONFIRMED",
+            "project_state": "DRAFT_2_OF_5_CONFIRMED",
             "submission_confirmation_state": "NONE_OBSERVED",
             "observation_basis": (
-                "Current task state and the unsigned public submission-manager page displayed Log in, Sign up, "
-                "Join hackathon, and Register for this hackathon."
+                "A direct browser observation displayed the ProofLock Console project draft at two of five "
+                "steps on the project-details page; independent bounded Gmail metadata confirms registration "
+                "and the deadline."
             ),
             "limitations": (
-                "No account, project, registration, or confirmation endpoint was opened or changed by this builder."
+                "Project details, additional information, final preview, and final submission remain incomplete."
             ),
+            "progress_receipt": portal_progress,
         },
         "official_sources": OFFICIAL_SOURCES,
         "field_registry_policy": {
@@ -709,6 +848,7 @@ def build_field_registry(generated_utc: str) -> dict[str, Any]:
             "submit",
             "contact_anyone",
         ],
+        "actions_observed_external_to_this_kit": ["challenge_registration", "project_shell_creation"],
         "claim_boundary": CLAIM_BOUNDARY,
     }
     registry["registry_sha256"] = stable_hash(registry)
@@ -740,7 +880,7 @@ Do not paste or submit this as final copy until every bracketed placeholder is r
 
 {built_with}
 
-Required model tag: `[[CONFIRMED_MODEL_LABEL]]`
+Required model tag: `{copy['confirmed_model_label']}`
 
 ## Project Story
 
@@ -753,6 +893,10 @@ Required model tag: `[[CONFIRMED_MODEL_LABEL]]`
 ## Repository
 
 {copy['repository_url']}
+
+Exact scoped source:
+
+{copy['exact_source_url']}
 
 ## Installation And Testing
 
@@ -770,13 +914,24 @@ Required model tag: `[[CONFIRMED_MODEL_LABEL]]`
 
 {copy['preexisting_project_boundary']}
 
-## Required Placeholders
+## Verified Local Release Assets
 
-- Exact model label: `[[CONFIRMED_MODEL_LABEL]]`
-- Source-backed model-use sentence: `[[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]`
+- Video: `{copy['local_video_asset']}`
+- Video duration: `{copy['local_video_duration_seconds']} seconds`
+- Video SHA-256: `{copy['local_video_sha256']}`
+- Thumbnail: `{copy['thumbnail_asset']}`
+- Thumbnail SHA-256: `{copy['thumbnail_sha256']}`
+- Video receipt: `{copy['video_receipt_asset']}`
+- Video receipt SHA-256: `{copy['video_receipt_sha256']}`
+- Orchestration receipt: `{copy['orchestration_receipt_asset']}`
+- Orchestration receipt SHA-256: `{copy['orchestration_receipt_sha256']}`
+
+These paths identify local upload candidates. They do not claim that either asset is public or accepted by Devpost.
+
+## Required External Placeholders
+
 - `/feedback` Session ID: `[[FEEDBACK_SESSION_ID]]`
 - Public YouTube URL: `[[PUBLIC_YOUTUBE_URL]]`
-- Privacy-reviewed thumbnail: `[[THUMBNAIL_PUBLIC_ASSET_PATH]]`
 
 ## Claim Boundary
 
@@ -786,14 +941,16 @@ Required model tag: `[[CONFIRMED_MODEL_LABEL]]`
 
 def render_completion_kit(registry: dict[str, Any], snapshot: dict[str, Any]) -> str:
     state = registry["portal_observation"]
+    effective = effective_readiness(snapshot, state["progress_receipt"])
     lines = [
         "# OpenAI Build Week - Devpost Completion Kit",
         "",
         f"Deadline: `{registry['deadline']['central']}` (`{registry['deadline']['utc']}`)",
         f"Observed portal state: `{state['authentication_state']}` / `{state['hackathon_join_state']}` / "
         f"`{state['project_state']}` / `{state['submission_confirmation_state']}`",
-        f"Existing readiness: `{snapshot['counts']['pass']}/{snapshot['counts']['gate_total']}` gates pass; "
-        "final submission remains blocked.",
+        f"Base readiness: `{snapshot['counts']['pass']}/{snapshot['counts']['gate_total']}` gates pass. "
+        f"Verified portal progress raises effective readiness to "
+        f"`{effective['counts']['pass']}/{effective['counts']['gate_total']}`; final submission remains blocked.",
         "",
         "## Field Registry",
         "",
@@ -819,12 +976,11 @@ def render_completion_kit(registry: dict[str, Any], snapshot: dict[str, Any]) ->
             "",
             "## Hard Stop Conditions",
             "",
-            "- Devpost is signed out and the hackathon is not joined.",
-            "- No Devpost project or submission confirmation exists.",
-            "- The exact required model label is not confirmed.",
+            "- Challenge registration and a two-of-five project draft are confirmed; no final submission confirmation exists.",
+            "- Project details and additional information remain incomplete.",
             "- The `/feedback` Session ID is not present.",
-            "- No public, privacy-reviewed, under-three-minute YouTube demo exists.",
-            "- The thumbnail, entrant type, residence, representative authority, rules, publicity/IP terms, and final certification require human review.",
+            "- A verified local under-three-minute demo exists, but no public YouTube URL is recorded.",
+            "- Entrant type, residence, representative authority, rules, publicity/IP terms, and final certification require human review.",
             "- Contest-specific portal labels must be captured from the joined form before field population is called exact.",
             "",
             "## Actions Not Authorized By This Kit",
@@ -851,6 +1007,8 @@ def build_readiness_receipt(
     output_artifacts: list[dict[str, Any]],
 ) -> dict[str, Any]:
     fields = registry["fields"]
+    portal_progress = registry["portal_observation"]["progress_receipt"]
+    effective = effective_readiness(snapshot, portal_progress)
     exact_label_count = sum(1 for row in fields if row["portal_label_exact"])
     source_ready_count = sum(1 for row in fields if row["completion_state"].startswith("SOURCE_BACKED_READY"))
     receipt: dict[str, Any] = {
@@ -860,6 +1018,7 @@ def build_readiness_receipt(
         "deadline": registry["deadline"],
         "portal_observation": registry["portal_observation"],
         "existing_readiness_snapshot": snapshot,
+        "effective_readiness_after_portal_progress": effective,
         "field_counts": {
             "total": len(fields),
             "required": sum(1 for row in fields if row["required"]),
@@ -868,22 +1027,20 @@ def build_readiness_receipt(
             "source_backed_ready_or_conditionally_ready": source_ready_count,
         },
         "model_and_session_provenance": {
-            "confirmed_model_label": None,
-            "model_usage_evidence": None,
+            "confirmed_model_label": "gpt-5.6-sol",
+            "model_usage_evidence": repo_relative(ORCHESTRATION_RECEIPT_PATH),
             "feedback_session_id": None,
-            "state": "MISSING_DIRECT_EVIDENCE",
+            "state": "MODEL_RECORDED_FEEDBACK_SESSION_OPEN",
             "inference_prohibited": True,
         },
         "submission_artifacts": output_artifacts,
         "hard_blockers": [
-            "DEVPOST_SIGNED_OUT",
-            "HACKATHON_NOT_JOINED",
-            "NO_DEVPOST_PROJECT",
             "NO_SUBMISSION_CONFIRMATION",
-            "MODEL_IDENTITY_UNCONFIRMED",
+            "PROJECT_DETAILS_INCOMPLETE",
+            "ADDITIONAL_INFO_INCOMPLETE",
             "FEEDBACK_SESSION_ID_MISSING",
             "PUBLIC_YOUTUBE_VIDEO_MISSING",
-            "THUMBNAIL_MISSING",
+            "FINAL_PREVIEW_REVIEW_OPEN",
             "CUSTOM_PORTAL_LABELS_UNOBSERVED",
             "PRIVACY_IP_REVIEW_OPEN",
             "LEGAL_ACCEPTANCE_OPEN",
@@ -892,6 +1049,7 @@ def build_readiness_receipt(
         "ready_for_portal_population": False,
         "ready_for_final_submission": False,
         "actions_performed": [],
+        "actions_observed_external_to_this_builder": ["challenge_registration", "project_shell_creation"],
         "actions_not_performed": registry["actions_prohibited_for_this_kit"],
         "claim_boundary": CLAIM_BOUNDARY,
     }

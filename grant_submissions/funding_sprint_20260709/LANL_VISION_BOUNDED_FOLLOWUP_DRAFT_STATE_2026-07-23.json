@@ -1,0 +1,21 @@
+{
+  "action_time_human_approval_present": false,
+  "attachment_authorized": false,
+  "body_sha256": "4E9947A0023A7F00047054A1998FCDB1BC0D1E8143B84679EDEEABB9A02022B6",
+  "claim_boundary": "This state proves only that one bounded follow-up and its exact recipient route were hash-bound after a fresh no-reply mailbox check. It does not prove receipt, endorsement, independent validation, licensing, funding, deployment, production readiness, or authorization to send.",
+  "dispatch_binding_artifact": "grant_submissions/funding_sprint_20260709/LANL_VISION_BOUNDED_FOLLOWUP_DISPATCH_BINDING_2026-07-23.json",
+  "dispatch_sha256": "1906E82924ABBC34290BD86830931836F81522F32189F89C0E933399190EFADA",
+  "draft_artifact": "grant_submissions/funding_sprint_20260709/LANL_VISION_BOUNDED_FOLLOWUP_DRAFT_2026-07-23.md",
+  "gmail_draft_created": false,
+  "lane_id": "lanl_vision_licensing_followup",
+  "mailbox_check_receipt_sha256": "D14FC3F4FBEF0096AC3E237E4C82A1B25DC9E95E7D9545B31822D951AA888281",
+  "mailbox_rechecked_utc": "2026-07-27T02:39:30.758256Z",
+  "max_proactive_sends": 1,
+  "prior_proactive_send_count": 0,
+  "recipient_route_bound": true,
+  "schema": "lumencore.outreach_bounded_followup_draft_state.v1",
+  "send_allowed_by_builder": false,
+  "send_now": false,
+  "status": "EXACT_DISPATCH_BOUND_ACTION_TIME_APPROVAL_REQUIRED_NOT_SENT",
+  "template_id": "BOUNDED_REVIEW_FOLLOWUP"
+}

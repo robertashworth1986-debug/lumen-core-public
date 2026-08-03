@@ -44,6 +44,108 @@ def test_ledger_accounts_for_every_family_and_direct_route(
     assert summary["implemented_family_in_direct_source_lane_count"] == 10
     assert len(payload["family_ledger"]) == 140
     assert len(payload["source_baseline_route_ledger"]) == 1848
+    assert summary["source_coverage_card_count"] == 10
+    assert summary["direct_lane_missing_family_implementation_count"] == 58
+    assert summary["benchmark_design_ready_adapter_backlog_count"] == 35
+    assert summary["legacy_transform_exploratory_backlog_count"] == 23
+
+
+def test_live_breadth_inventory_is_separate_from_source_native_scoring(
+    module_and_payload,
+):
+    _, payload = module_and_payload
+    separation = payload["registry_separation"]
+
+    assert separation["live_breadth_inventory_is_performance_evidence"] is False
+    assert separation["inventory_row_count_is_benchmark_sample_size"] is False
+    assert separation["cross_source_baseline_substitution_allowed"] is False
+    assert separation["cross_lane_ranking_allowed"] is False
+    assert separation["family_registry"].endswith(
+        "geometry_championship_v1_registry.json"
+    )
+    assert separation["source_and_baseline_contract_registry"].endswith(
+        "geometry_live_wiring_matrix_latest.json"
+    )
+
+
+def test_source_coverage_matrix_preserves_each_lane_native_baseline_contract(
+    module_and_payload,
+):
+    _, payload = module_and_payload
+    coverage = {
+        (row["lane"], row["source"]): row
+        for row in payload["source_coverage_matrix"]
+    }
+
+    assert len(coverage) == 10
+    assert {
+        source
+        for lane, source in coverage
+        if lane == "time_series_model_routing"
+    } == {
+        "EIA_GRID_VALIDATION",
+        "FRED",
+        "BLS",
+        "KRAKEN_PUBLIC",
+        "TWELVE_DATA",
+        "ALPHAVANTAGE",
+    }
+    assert (
+        coverage[
+            ("wave_resonance_timing", "EIA_GRID_VALIDATION")
+        ]["source_native_baseline_count"]
+        == 6
+    )
+    assert (
+        coverage[
+            ("market_signal_geometry", "KRAKEN_PUBLIC")
+        ]["source_native_baseline_ids"]
+        == [
+            "buy_and_hold",
+            "moving_average_cross",
+            "volatility_targeting",
+            "ridge_return_baseline",
+        ]
+    )
+    assert sum(
+        row["eligible_candidate_source_baseline_route_count"]
+        for row in coverage.values()
+    ) == 1848
+    assert sum(
+        row["executed_candidate_source_baseline_route_count"]
+        for row in coverage.values()
+    ) == 126
+    assert all(
+        row["cross_source_baseline_substitution_allowed"] is False
+        and row["cross_lane_ranking_allowed"] is False
+        and row["public_performance_claim_allowed"] is False
+        for row in coverage.values()
+    )
+
+
+def test_adapter_expansion_queue_is_development_only_and_fail_closed(
+    module_and_payload,
+):
+    _, payload = module_and_payload
+    queue = payload["adapter_expansion_queue"]
+
+    assert len(queue) == 58
+    assert [row["rank"] for row in queue] == list(range(1, 59))
+    assert sum(
+        row["registry_status"] == "benchmark_design_ready" for row in queue
+    ) == 35
+    assert sum(
+        row["registry_status"] == "legacy_transform_only" for row in queue
+    ) == 23
+    assert all(
+        row["development_sweep_allowed"] is True
+        and row["holdout_selection_allowed"] is False
+        and row["confirmatory_claim_allowed_after_development_sweep"] is False
+        and row["public_performance_claim_allowed"] is False
+        and "no_holdout_selected_candidate"
+        in row["required_adapter_tests"]
+        for row in queue
+    )
 
 
 def test_ledger_executes_every_current_adapter_without_promoting_subset_wins(
@@ -176,7 +278,13 @@ def test_rendered_ledger_states_no_alpha_and_preserves_claim_boundaries(
     text = rendered.lower()
 
     assert "current alpha or champion: `none`" in text
+    assert (
+        "the live-breadth registry and the source-native benchmark ledger "
+        "are not the same thing"
+    ) in text
+    assert "per-source native baseline coverage" in text
     assert "executed comparisons: `126`" in text
+    assert "direct-lane adapter backlog: `58`" in text
     assert "globally corrected individual subset wins: `0`" in text
     assert "full source-native gauntlet passes: `0`" in text
     assert "not a champion, alpha claim, field result, or dollar claim" in text

@@ -121,93 +121,78 @@ def as_float(value: Any, default: float = 0.0) -> float:
 
 
 def proof_snapshot() -> dict[str, Any]:
-    revenue = read_json(PROOF_REVENUE_JSON)
-    stress = read_json(STRESS_MATRIX_JSON)
     live = read_json(LIVE_DOMAIN_JSON)
     champion = read_json(CHAMPION_JSON)
     locked = read_json(LOCKED_SWEEP_JSON)
     valuation = read_json(VALUATION_JSON)
 
-    revenue_summary = as_dict(revenue.get("summary"))
-    stress_summary = as_dict(stress.get("summary"))
+    if champion.get("schema") != "champion_metric_gauntlet_v2":
+        raise ValueError("champion metric gauntlet v2 is required")
+    if locked.get("schema") != "locked_source_baseline_replay_sweep_v2":
+        raise ValueError("locked source baseline replay sweep v2 is required")
+    if valuation.get("schema") != "valuation_proposal_target_packet_v3":
+        raise ValueError("valuation proposal target packet v3 is required")
+
     live_summary = as_dict(live.get("summary"))
     reviewer_urls = as_dict(live.get("reviewer_urls"))
     champion_summary = as_dict(champion.get("summary"))
+    strongest = as_dict(champion.get("strongest_current"))
     locked_summary = as_dict(locked.get("summary"))
     valuation_truth = as_dict(valuation.get("current_truth"))
-    valuation_overall = as_dict(valuation.get("overall_locked_sweep"))
+    valuation_overall = as_dict(
+        valuation.get("overall_locked_sweep_stats")
+    )
 
-    holdout_wins = as_int(
-        champion_summary.get("holdout_wins")
-        or stress_summary.get("holdout_wins")
-        or revenue_summary.get("holdout_wins")
-    )
-    holdout_count = as_int(
-        champion_summary.get("holdout_count")
-        or stress_summary.get("holdout_count")
-        or revenue_summary.get("holdout_count")
-    )
-    champion_rows = as_int(
-        champion_summary.get("estimated_rows_replayed")
-        or stress_summary.get("estimated_rows_replayed")
-        or revenue_summary.get("estimated_rows_replayed")
-    )
-    champion_samples = as_int(
-        champion_summary.get("numeric_samples_read")
-        or stress_summary.get("numeric_samples_read")
-        or revenue_summary.get("numeric_samples_read")
-    )
+    holdout_wins = as_int(champion_summary.get("holdout_wins"))
+    holdout_count = as_int(champion_summary.get("holdout_count"))
+    champion_rows = as_int(champion_summary.get("estimated_rows_replayed"))
+    champion_samples = as_int(champion_summary.get("numeric_samples_read"))
     locked_comparisons = as_int(
         locked_summary.get("baseline_comparison_count")
-        or valuation_overall.get("baseline_comparison_count")
     )
-    locked_wins = as_int(locked_summary.get("candidate_win_count") or valuation_overall.get("candidate_win_count"))
+    locked_wins = as_int(locked_summary.get("candidate_win_count"))
     live_ready = bool(
-        revenue_summary.get("live_domain_hash_verified")
-        or live_summary.get("domain_deployment_state") == "LIVE_DOMAIN_HASH_VERIFIED"
-        or champion_summary.get("live_domain_reviewer_ready")
+        live_summary.get("domain_deployment_state")
+        == "LIVE_DOMAIN_HASH_VERIFIED"
+        and champion_summary.get("live_domain_reviewer_ready")
     )
-    revenue_stage = revenue_summary.get("revenue_stage", "")
-    if (
-        holdout_wins >= 20
-        and holdout_count >= holdout_wins
-        and live_ready
-        and not champion_summary.get("field_validation_claim_allowed", False)
-    ):
-        revenue_stage = "manual_paid_pilot_scoping_ready"
 
     return {
-        "revenue_stage": revenue_stage,
-        "champion_family": champion_summary.get("champion_family")
-        or stress_summary.get("champion_family")
-        or revenue_summary.get("champion_family")
-        or "kuramoto_phase_coupling",
-        "champion_label": champion_summary.get("champion_label")
-        or stress_summary.get("champion_label")
-        or revenue_summary.get("champion_label")
-        or "Kuramoto phase coupling",
-        "named_baseline": champion_summary.get("named_baseline")
-        or stress_summary.get("named_baseline")
-        or revenue_summary.get("named_baseline")
-        or "kalman_filter",
+        "revenue_stage": "paid_protocol_review_scoping_ready_draft_only",
+        "internal_performance_champion_present": False,
+        "reference_candidate": strongest.get(
+            "family", "kuramoto_phase_coupling"
+        ),
+        "reference_candidate_label": strongest.get(
+            "label", "Kuramoto phase coupling"
+        ),
+        "development_selected_candidate": strongest.get(
+            "development_selected_candidate", "lissajous_phase_paths"
+        ),
+        "reference_candidate_was_protocol_selected": bool(
+            strongest.get("candidate_was_protocol_selected")
+        ),
+        "named_baseline": strongest.get(
+            "named_baseline", "kalman_local_linear_trend"
+        ),
         "holdout_wins": holdout_wins,
         "holdout_count": holdout_count,
-        "holdout_win_rate": as_float(champion_summary.get("holdout_win_rate") or 0.0),
-        "wilson_95_win_rate_lower": as_float(champion_summary.get("wilson_95_win_rate_lower") or 0.0),
+        "holdout_win_rate": as_float(
+            champion_summary.get("holdout_win_rate")
+        ),
+        "mean_delta_vs_named_baseline": as_float(
+            champion_summary.get("mean_delta_vs_named_baseline")
+        ),
+        "candidate_beats_all_registered_baselines_after_holm": bool(
+            strongest.get(
+                "candidate_beats_all_registered_baselines_after_holm"
+            )
+        ),
         "source_system_count": as_int(
             champion_summary.get("source_system_count")
-            or stress_summary.get("source_system_count")
-            or revenue_summary.get("source_system_count")
         ),
         "estimated_rows_replayed": champion_rows,
         "numeric_samples_read": champion_samples,
-        "stress_gates_passed": as_int(stress_summary.get("stress_gates_passed") or champion_summary.get("gauntlet_pass_count")),
-        "stress_gates_total": as_int(stress_summary.get("stress_gates_total") or champion_summary.get("gauntlet_total_count")),
-        "mean_delta_vs_named_baseline": as_float(
-            champion_summary.get("mean_delta_vs_named_baseline") or stress_summary.get("mean_delta_vs_named_baseline")
-        ),
-        "min_delta_vs_named_baseline": as_float(champion_summary.get("min_delta_vs_named_baseline")),
-        "one_sided_sign_test_p_value": as_float(champion_summary.get("one_sided_sign_test_p_value")),
         "broader_enabled_provider_count": as_int(champion_summary.get("broader_enabled_provider_count")),
         "broader_measured_provider_count": as_int(champion_summary.get("broader_measured_provider_count")),
         "manifest_unique_source_count": as_int(champion_summary.get("manifest_unique_source_count")),
@@ -215,33 +200,38 @@ def proof_snapshot() -> dict[str, Any]:
             champion_summary.get("manifest_ready_for_benchmark_row_count")
         ),
         "locked_adapter_backed_routes": as_int(
-            locked_summary.get("adapter_backed_routes") or valuation_overall.get("source_conditioned_route_count")
+            locked_summary.get("adapter_backed_routes")
+        ),
+        "locked_direct_measured_routes": as_int(
+            locked_summary.get("direct_measured_routes_replayed")
+        ),
+        "locked_conditioned_synthetic_routes": as_int(
+            locked_summary.get("source_conditioned_routes_replayed")
         ),
         "locked_baseline_comparison_count": locked_comparisons,
-        "locked_candidate_win_count": locked_wins,
+        "locked_raw_mean_win_count": locked_wins,
+        "locked_global_holm_positive_count": as_int(
+            locked_summary.get("global_holm_positive_count")
+        ),
         "locked_candidate_loss_or_tie_count": as_int(
             locked_summary.get("candidate_loss_or_tie_count")
-            or valuation_overall.get("candidate_loss_or_tie_count")
             or max(0, locked_comparisons - locked_wins)
         ),
-        "locked_comparison_win_rate": round(locked_wins / locked_comparisons, 6) if locked_comparisons else 0.0,
-        "locked_estimated_rows_replayed": as_int(
-            locked_summary.get("estimated_rows_replayed") or valuation_overall.get("estimated_rows_replayed")
+        "locked_performance_rows_reviewed": as_int(
+            locked_summary.get("numeric_samples_read")
         ),
-        "locked_numeric_samples_read": as_int(
-            locked_summary.get("numeric_samples_read") or valuation_overall.get("numeric_samples_read")
+        "legacy_ready_rows_excluded": as_int(
+            locked_summary.get("unclassified_manifest_rows_excluded")
         ),
-        "locked_source_count": as_int(locked_summary.get("source_count") or valuation_overall.get("source_count")),
-        "locked_mean_score_delta": as_float(locked_summary.get("mean_score_delta") or valuation_overall.get("mean_score_delta")),
-        "locked_best_score_delta": as_float(locked_summary.get("best_score_delta") or valuation_overall.get("best_score_delta")),
+        "numeric_fallback_profile_count": as_int(
+            locked_summary.get("fallback_profiles_used")
+        ),
         "locked_replay_chain_sha256": locked_summary.get("replay_chain_sha256")
         or valuation_overall.get("replay_chain_sha256", ""),
-        "safe_estimated_hourly_value_usd": as_float(
-            valuation_truth.get("safe_estimated_hourly_value_usd") or revenue_summary.get("safe_estimated_hourly_value_usd")
-        ),
-        "safe_estimated_annual_value_usd": as_float(
-            valuation_truth.get("safe_estimated_annual_value_usd") or revenue_summary.get("safe_estimated_annual_value_usd")
-        ),
+        "safe_estimated_hourly_value_usd": 0.0,
+        "safe_estimated_annual_value_usd": 0.0,
+        "paid_protocol_review_scoping_allowed": True,
+        "field_replay_request_ready": False,
         "live_domain_hash_verified": live_ready,
         "live_domain_reviewer_ready": bool(
             live_summary.get("live_domain_reviewer_ready") or champion_summary.get("live_domain_reviewer_ready")
@@ -256,18 +246,20 @@ def proof_snapshot() -> dict[str, Any]:
 
 
 def make_candidates(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
-    champion = snapshot["champion_label"]
+    reference = snapshot["reference_candidate_label"]
     baseline = snapshot["named_baseline"]
     proof_line = (
-        f"{champion} currently shows {snapshot['holdout_wins']}/{snapshot['holdout_count']} internal "
-        f"source-conditioned holdout wins vs {baseline}, with {snapshot['estimated_rows_replayed']:,} estimated rows "
-        "replayed in the champion core. The broader locked sweep covers "
+        f"{reference} was audited on {snapshot['holdout_count']} paired measured "
+        f"EIA holdout days and won {snapshot['holdout_wins']} pairs versus {baseline}, "
+        f"but its mean skill delta was {snapshot['mean_delta_vs_named_baseline']:.6f} "
+        "and it did not clear the source-specific all-baseline gate. The "
+        "compatibility-gated sweep covers "
         f"{snapshot['locked_adapter_backed_routes']} adapter-backed routes, "
         f"{snapshot['locked_baseline_comparison_count']} baseline comparisons, "
-        f"{snapshot['locked_candidate_win_count']} candidate wins, "
-        f"{snapshot['locked_estimated_rows_replayed']:,} estimated rows, and "
-        f"{snapshot['locked_source_count']} mapped sources. This supports a buyer-authorized field replay request, "
-        "not a savings claim."
+        f"{snapshot['locked_global_holm_positive_count']} globally corrected "
+        f"positive direct comparisons, and {snapshot['locked_performance_rows_reviewed']:,} "
+        "performance rows. This supports a paid source-native benchmark or evidence "
+        "protocol review, not a candidate-performance, field, or savings claim."
     )
 
     candidates = [
@@ -303,7 +295,7 @@ def make_candidates(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
                 "May 2026 application window may be closed; use as immediate warm-review target and next-cycle channel.",
                 "Do not claim EPRI acceptance until they explicitly respond.",
             ],
-            "recommended_action_today": "Send one manually reviewed inquiry through the official challenge/contact path.",
+            "recommended_action_today": "Monitor the existing inbound-only EPRI channel; do not send a new inquiry.",
             "proof_line": proof_line,
         },
         {
@@ -448,6 +440,14 @@ def make_candidates(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
         candidate["source_refs"] = [SOURCE_REFS[key] for key in candidate["source_keys"]]
         candidate["manual_review_required"] = True
         candidate["send_now_allowed"] = False
+        candidate["routing_status"] = (
+            "inbound_only_no_new_outreach"
+            if candidate["organization"].startswith("EPRI")
+            else "official_source_duplicate_and_recipient_check_required"
+        )
+        candidate["source_freshness_status"] = (
+            "historical_reference_requires_action_time_official_verification"
+        )
         candidate["candidate_sha256"] = stable_sha256(
             {key: value for key, value in candidate.items() if key != "candidate_sha256"}
         )
@@ -455,24 +455,17 @@ def make_candidates(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def make_primary_email(snapshot: dict[str, Any], candidate: dict[str, Any]) -> dict[str, str]:
-    org = candidate["organization"]
-    champion = snapshot["champion_label"]
+    reference = snapshot["reference_candidate_label"]
     baseline = snapshot["named_baseline"]
-    body = f"""Hello,
+    body = f"""Hello [Name],
 
-I am Robert Ashworth, building LumenCore, a hash-verified evidence and benchmark framework for grid and infrastructure optimization.
+I am Robert Ashworth, building LumenCore, a source-native evidence and benchmark framework for infrastructure analytics.
 
-I am looking for the right technical reviewer for one bounded paid evidence review or buyer-authorized field replay. The current internal champion is {champion}; it shows {snapshot['holdout_wins']}/{snapshot['holdout_count']} source-conditioned holdout wins vs {baseline}, with the public proof feeds available for review.
+I am looking for the right technical reviewer for one bounded paid protocol review or benchmark implementation. The current measured result is deliberately a negative one: {reference} won {snapshot['holdout_wins']}/{snapshot['holdout_count']} paired EIA holdout days versus {baseline}, had a mean skill delta of {snapshot['mean_delta_vs_named_baseline']:.6f}, and did not clear the complete source-specific baseline gate.
 
-Important boundary: I am not claiming field validation or realized savings yet. The next step is narrower and safer: lock your approved baseline, choose pre-registered holdout windows, replay the candidate under identical constraints, and report what improved, what failed, and what still cannot be claimed.
+The offer is the governed method, not a claim that this candidate wins: map one authorized source to the correct task, register accepted incumbent baselines, freeze chronology and metrics, run the comparison reproducibly, and deliver a reviewer-ready packet that preserves positive and negative results.
 
-Why I think {org} is the right first fit:
-{candidate['why_this_buyer_first']}
-
-Reviewer proof feed: {snapshot['stress_matrix_feed']}
-Mission console: {snapshot['mission_control']}
-
-Would you be open to a 20-minute technical fit call, or could you route me to the person who owns AI/grid analytics validation pilots?
+Would you be open to a 20-minute technical fit call about a fixed-scope source-native benchmark and evidence protocol review?
 
 Respectfully,
 Robert Ashworth
@@ -481,10 +474,10 @@ Robert Ashworth
 To stop further outreach, reply "remove."
 """
     return {
-        "subject": f"Paid field-replay scoping: LumenCore proof feed for {org}",
+        "subject": "Source-native benchmark and evidence protocol review",
         "body": body,
-        "send_mode": "manual_review_only",
-        "why_not_autosend": "Recipient, title, organization fit, mailing footer, and opt-out wording must be reviewed before any message is sent.",
+        "send_mode": "draft_only_not_ready_to_send",
+        "why_not_autosend": "No recipient is selected. Official-source freshness, routing policy, duplicate-send history, recipient fit, and exact action-time approval are required first.",
     }
 
 
@@ -493,15 +486,20 @@ def build_payload() -> dict[str, Any]:
     candidates = make_candidates(snapshot)
     primary = candidates[0]
     payload = {
-        "schema": "first_buyer_target_board_v1",
+        "schema": "first_buyer_target_board_v2",
         "generated_utc": now_utc(),
         "boundary": BOUNDARY,
         "summary": {
-            "recommended_first_buyer": primary["organization"],
-            "recommended_first_buyer_type": primary["buyer_channel_type"],
-            "recommended_first_action": primary["recommended_action_today"],
+            "recommended_first_buyer": None,
+            "recommended_first_buyer_type": None,
+            "recommended_first_action": (
+                "Verify one current official channel, reconcile duplicate-send "
+                "history, select a real recipient, and obtain exact action-time "
+                "approval before outreach."
+            ),
             "candidate_count": len(candidates),
-            "manual_reviewed_outreach_allowed": True,
+            "manual_reviewed_outreach_allowed": False,
+            "paid_protocol_review_scoping_allowed": True,
             "send_without_user_review_allowed": False,
             "bulk_email_allowed": False,
             "contact_scraping_allowed": False,
@@ -510,6 +508,9 @@ def build_payload() -> dict[str, Any]:
             "realized_savings_claim_allowed": False,
             "live_trading_or_autonomous_execution_allowed": False,
             "proof_revenue_stage": snapshot["revenue_stage"],
+            "proof_internal_performance_champion_present": snapshot[
+                "internal_performance_champion_present"
+            ],
             "proof_live_domain_hash_verified": snapshot["live_domain_hash_verified"],
             "proof_holdout_wins": snapshot["holdout_wins"],
             "proof_holdout_count": snapshot["holdout_count"],
@@ -517,9 +518,18 @@ def build_payload() -> dict[str, Any]:
             "proof_broader_measured_provider_count": snapshot["broader_measured_provider_count"],
             "proof_locked_adapter_backed_routes": snapshot["locked_adapter_backed_routes"],
             "proof_locked_baseline_comparison_count": snapshot["locked_baseline_comparison_count"],
-            "proof_locked_candidate_win_count": snapshot["locked_candidate_win_count"],
-            "proof_locked_source_count": snapshot["locked_source_count"],
-            "proof_locked_estimated_rows_replayed": snapshot["locked_estimated_rows_replayed"],
+            "proof_locked_global_holm_positive_count": snapshot[
+                "locked_global_holm_positive_count"
+            ],
+            "proof_locked_performance_rows_reviewed": snapshot[
+                "locked_performance_rows_reviewed"
+            ],
+            "proof_legacy_ready_rows_excluded": snapshot[
+                "legacy_ready_rows_excluded"
+            ],
+            "proof_numeric_fallback_profile_count": snapshot[
+                "numeric_fallback_profile_count"
+            ],
         },
         "proof_snapshot": snapshot,
         "source_refs": SOURCE_REFS,
@@ -527,12 +537,16 @@ def build_payload() -> dict[str, Any]:
         "primary_manual_email": make_primary_email(snapshot, primary),
         "claim_controls": {
             "allowed_today": [
-                "manual inquiry to one reviewed buyer channel",
-                "paid evidence review ask",
-                "buyer-authorized field replay request",
-                "public hash-verified proof feed reference",
+                "draft a paid source-native protocol review offer",
+                "verify one current official buyer channel",
+                "reconcile sent history and routing controls",
+                "prepare a bounded benchmark implementation scope",
             ],
-            "blocked_until_buyer_replay": [
+            "blocked_until_action_time_clearance": [
+                "send any outreach",
+                "select or imply a current recipient",
+                "describe any family as a performance champion",
+                "request a field replay for the current Kuramoto result",
                 "field validated",
                 "realized savings",
                 "fixed price per frozen delta",
@@ -542,10 +556,11 @@ def build_payload() -> dict[str, Any]:
             ],
         },
         "next_30_minutes": [
-            "Open the EPRI AI for Power / Incubatenergy Labs path and check whether late review or next-cycle inquiry is available.",
-            "Prepare the EPB/ORNL-specific one-page replay ask as the direct field-validation target.",
-            "Use the Spark/TVA path as the warm regional bridge if EPRI is closed for this cycle.",
-            "Do not bulk-send; send one reviewed message at a time.",
+            "Keep EPRI inbound-only unless a genuinely new inbound message changes routing.",
+            "Refresh one non-EPRI candidate from its current official source.",
+            "Check Gmail Sent and the outreach reconciliation ledger for duplicates.",
+            "Select a recipient only after channel, fit, and routing checks pass.",
+            "Request exact action-time approval for the final recipient, subject, body, and attachments.",
         ],
     }
     payload["first_buyer_board_sha256"] = stable_sha256(
@@ -581,13 +596,17 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Proof Snapshot",
         "",
-        f"- Champion: `{snapshot['champion_label']}`",
+        f"- Internal performance champion present: `{str(snapshot['internal_performance_champion_present']).lower()}`",
+        f"- Measured reference candidate: `{snapshot['reference_candidate_label']}`",
+        f"- Development-selected candidate: `{snapshot['development_selected_candidate']}`",
+        f"- Reference candidate was protocol-selected: `{str(snapshot['reference_candidate_was_protocol_selected']).lower()}`",
         f"- Named baseline: `{snapshot['named_baseline']}`",
         f"- Holdout wins: `{snapshot['holdout_wins']}/{snapshot['holdout_count']}`",
-        f"- Champion-core estimated rows replayed: `{snapshot['estimated_rows_replayed']:,}`",
-        f"- Champion-core source systems: `{snapshot['source_system_count']}`",
+        f"- Mean skill delta: `{snapshot['mean_delta_vs_named_baseline']}`",
+        f"- Reference measured rows replayed: `{snapshot['estimated_rows_replayed']:,}`",
+        f"- Reference source systems: `{snapshot['source_system_count']}`",
         f"- Broader measured providers: `{snapshot['broader_measured_provider_count']}/{snapshot['broader_enabled_provider_count']}`",
-        f"- Broader locked sweep: `{snapshot['locked_adapter_backed_routes']}` routes, `{snapshot['locked_baseline_comparison_count']}` comparisons, `{snapshot['locked_candidate_win_count']}` wins, `{snapshot['locked_source_count']}` mapped sources, `{snapshot['locked_estimated_rows_replayed']:,}` estimated rows",
+        f"- Compatibility-gated sweep: `{snapshot['locked_adapter_backed_routes']}` routes, `{snapshot['locked_baseline_comparison_count']}` comparisons, `{snapshot['locked_global_holm_positive_count']}` global positives, `{snapshot['locked_performance_rows_reviewed']:,}` performance rows",
         f"- Live-domain hash verified: `{str(snapshot['live_domain_hash_verified']).lower()}`",
         f"- Business plan PDF: `{snapshot['business_plan_pdf']}`",
         f"- Stress matrix feed: {snapshot['stress_matrix_feed']}",
@@ -614,7 +633,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         lines.append("")
     lines.extend(
         [
-            "## Primary Manual Email",
+            "## Draft Email",
             "",
             f"Subject: {payload['primary_manual_email']['subject']}",
             "",
@@ -625,7 +644,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "## Claim Controls",
             "",
             "- Allowed today: " + ", ".join(payload["claim_controls"]["allowed_today"]),
-            "- Blocked until buyer replay: " + ", ".join(payload["claim_controls"]["blocked_until_buyer_replay"]),
+            "- Blocked until action-time clearance: "
+            + ", ".join(
+                payload["claim_controls"][
+                    "blocked_until_action_time_clearance"
+                ]
+            ),
             "",
             f"First-buyer board SHA-256: `{payload['first_buyer_board_sha256']}`",
         ]

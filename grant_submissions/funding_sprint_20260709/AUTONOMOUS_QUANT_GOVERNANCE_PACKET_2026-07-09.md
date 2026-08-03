@@ -7,7 +7,8 @@ This packet does not authorize order placement, capital movement, runtime escala
 ## Status
 
 - Status: `AUTONOMOUS_QUANT_GOVERNANCE_READY_HUMAN_RUNTIME_REQUIRED`
-- Reviewer gate clear: `true`
+- Reviewer packaging gate clear: `true`
+- Submission argument gate clear: `false`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
 - All final actions blocked without human: `true`
@@ -24,7 +25,7 @@ This packet does not authorize order placement, capital movement, runtime escala
 - Order placement allowed: `false`
 - External system action without human: `false`
 - Agency action without human: `false`
-- Packet SHA-256: `10827112918b87598de4c2c331a1e1f744994e42f4fc931bd3ea2a9df59f33da`
+- Packet SHA-256: `4216f91d6d6043f38a05675788ef5fe1ac45880a7f5e2d670f6574134c9c47aa`
 
 ## Runtime Snapshot
 
@@ -89,12 +90,12 @@ This packet does not authorize order placement, capital movement, runtime escala
 ## Evidence Sources
 
 - `grant_submissions/funding_sprint_20260709/AUTONOMOUS_QUANT_INNOVATION_SAFETY_PROTOCOL_2026-07-09.md` | present=`true` | bytes=`5263` | sha256=`050f64e5c86a866a3fd125e00911e4f3caeb387625f7c4386c355727ab3ac30a`
-- `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md` | present=`true` | bytes=`18765` | sha256=`f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd`
-- `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` | present=`true` | bytes=`13939` | sha256=`7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672`
-- `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` | present=`true` | bytes=`6279` | sha256=`ef70be49e4a5356a82bbd223dbcfdb565b6a6dd68d488847e2712cb8d6e52754`
+- `grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md` | present=`true` | bytes=`24099` | sha256=`cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390`
+- `grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md` | present=`true` | bytes=`23598` | sha256=`10f5206c8b65e329041c28caefec7f51c0744fcef70c0761b711470d62f13021`
+- `grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md` | present=`true` | bytes=`17487` | sha256=`db8e56ed557b78bdd69fa27fddbc516eb4e00b2e4448fe24c030c393c52b9e1a`
 - `config/runtime_control.json` | present=`true` | bytes=`14975` | sha256=`ad8cb516d3145d43e39300f35ae03304efc58070bd643a2bf8ee5b177909c448`
 - `out/execution_status.json` | present=`true` | bytes=`211` | sha256=`4c206c4c8120a23c496b6f0aa1a46cd8df723b947e490ff1bfa88ed9c9c0a64a`
-- `code/autonomous_agent_manifest.py` | present=`true` | bytes=`20076` | sha256=`4594995d9c16d8cee32acc8ef1056c0611ed93662a2e79a04fc8724f50c46112`
+- `code/autonomous_agent_manifest.py` | present=`true` | bytes=`24801` | sha256=`f74c0a5d09541ce5fe7e8a7f055220b99478f61d09a66715a651471e0ae3438f`
 - `config/accounts/KRAKEN_PRIMARY/runtime_control.json` | present=`true` | bytes=`489` | sha256=`341775322d161c6f7fe96dce4ecfe264c6694d60a1df1c19c1f54b32fedf0e39`
 - `config/accounts/ALPACA_PRIMARY/runtime_control.json` | present=`true` | bytes=`488` | sha256=`06381e2a555aa912c1d8c66f986a7a2ade78107cbfcba57cd8333d164ec7d708`
 - `control/LIVE.flag` | present=`true` | bytes=`5` | sha256=`3c1e6ffb9a2aa25c21bc68f118f83d2e8507a26578b5923d6430cc46a68b0217`

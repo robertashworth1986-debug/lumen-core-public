@@ -21,10 +21,12 @@ DASHBOARD_JSON = DASHBOARD_DATA / "rolling_champion_gate.json"
 OUT_MD = DOCS / "ROLLING_CHAMPION_GATE_2026-06-25.md"
 
 EVIDENCE_BOUNDARY = (
-    "A champion is not a one-off win. This gate promotes only repeat live-context wins with "
-    "distinct frozen hashes, or labels a single-run multi-source result as a candidate. It is "
-    "not field validation, not realized savings, not live trading permission, and not a grant "
-    "award guarantee."
+    "A champion is not a one-off or context-derived win. This gate counts only v3 "
+    "direct-measured, source-task-compatible replays that beat every registered "
+    "source-specific baseline after global multiple-comparison correction. Historical "
+    "live-context, source-conditioned synthetic, proxy, and fallback rows remain in the "
+    "ledger but are excluded from promotion. This is not field validation, realized "
+    "savings, live trading permission, or award certainty."
 )
 
 
@@ -89,13 +91,15 @@ def append_ledger(entries: list[dict[str, Any]], path: Path = LEDGER_JSONL) -> N
 
 
 def distinct_sources_from_card(card: dict[str, Any]) -> list[str]:
-    sources = []
-    for profile in card.get("source_profiles", []):
-        if isinstance(profile, dict):
-            source = str(profile.get("source", "")).strip().upper()
-            if source and source not in sources:
-                sources.append(source)
-    return sources
+    sources = [
+        str(source).strip().upper()
+        for source in (
+            card.get("direct_replay_source_names", [])
+            + card.get("conditioned_stress_source_names", [])
+        )
+        if str(source).strip()
+    ]
+    return sorted(set(sources))
 
 
 def entries_from_geometry_replay(payload: dict[str, Any]) -> list[dict[str, Any]]:
@@ -104,11 +108,25 @@ def entries_from_geometry_replay(payload: dict[str, Any]) -> list[dict[str, Any]
     for card in payload.get("replay_cards", []):
         if not isinstance(card, dict):
             continue
-        family = str(card.get("candidate_family_id", "")).strip()
+        family = str(
+            card.get("evaluated_candidate_family_id")
+            or card.get("candidate_family_id", "")
+        ).strip()
+        registered_family = str(card.get("candidate_family_id", "")).strip()
         lane = str(card.get("lane", "")).strip()
         if not family or not lane:
             continue
         candidate_beats = bool(card.get("candidate_beats_named_baseline"))
+        evidence_mode = str(card.get("evidence_mode", "unclassified"))
+        all_baselines_after_global_holm = bool(
+            card.get("baseline_gauntlet", {}).get(
+                "candidate_beats_all_registered_baselines_after_global_holm"
+            )
+        )
+        qualified_repeat_win = bool(
+            evidence_mode == "direct_measured_replay"
+            and all_baselines_after_global_holm
+        )
         sources = distinct_sources_from_card(card)
         run_hash = sha256_payload(
             {
@@ -122,13 +140,20 @@ def entries_from_geometry_replay(payload: dict[str, Any]) -> list[dict[str, Any]
         )
         entries.append(
             {
-                "schema": "rolling_champion_gate_entry.v1",
+                "schema": "rolling_champion_gate_entry.v2",
                 "generated_utc": now_utc(),
-                "domain": "geometry_live_context",
+                "domain": "geometry_compatibility_gated",
                 "lane": lane,
                 "entity_id": f"{lane}:{family}",
                 "family_id": family,
+                "registered_card_family_id": registered_family,
+                "compatibility_contract_version": "geometry_live_wiring_matrix_v3",
+                "evidence_mode": evidence_mode,
                 "candidate_beats_named_baseline": candidate_beats,
+                "candidate_beats_all_registered_baselines_after_global_holm": (
+                    all_baselines_after_global_holm
+                ),
+                "qualified_repeat_win": qualified_repeat_win,
                 "score_delta_vs_named_baseline": card.get("candidate_score_delta_vs_named_baseline"),
                 "source_count": len(sources),
                 "sources": sources,
@@ -181,7 +206,19 @@ def entries_from_energy_pressure(payload: dict[str, Any]) -> list[dict[str, Any]
             "entity_id": entity,
             "family_id": "phase_locked_residual_corrector",
             "candidate_beats_named_baseline": bool(summary.get("phase_locked_beats_best_named_baseline")),
-            "score_delta_vs_named_baseline": summary.get("phase_locked_improvement_vs_best_named_baseline_pct"),
+            "exploratory_mean_error_lower_than_named_baseline": bool(
+                summary.get(
+                    "exploratory_demand_proxy_mean_error_lower_than_best_named_baseline"
+                )
+            ),
+            "compatibility_contract_version": "legacy_energy_proxy",
+            "evidence_mode": "context_only_proxy",
+            "candidate_beats_all_registered_baselines_after_global_holm": False,
+            "qualified_repeat_win": False,
+            "score_delta_vs_named_baseline": 0.0,
+            "exploratory_improvement_vs_named_baseline_pct": summary.get(
+                "exploratory_demand_proxy_improvement_pct"
+            ),
             "source_count": len(sources),
             "sources": sources,
             "evidence_hash": evidence_hash,
@@ -204,6 +241,11 @@ def normalized_evidence_hash(entry: dict[str, Any]) -> str:
         "entity_id": entry.get("entity_id", ""),
         "family_id": entry.get("family_id", ""),
         "candidate_beats_named_baseline": bool(entry.get("candidate_beats_named_baseline")),
+        "qualified_repeat_win": bool(entry.get("qualified_repeat_win")),
+        "compatibility_contract_version": entry.get(
+            "compatibility_contract_version", "legacy_unclassified"
+        ),
+        "evidence_mode": entry.get("evidence_mode", "legacy_unclassified"),
         "score_delta_vs_named_baseline": entry.get("score_delta_vs_named_baseline"),
         "source_count": entry.get("source_count"),
         "sources": sorted(entry.get("sources", [])),
@@ -212,16 +254,30 @@ def normalized_evidence_hash(entry: dict[str, Any]) -> str:
         base["upstream_snapshot_chain_sha256"] = entry.get("upstream_snapshot_chain_sha256", "")
     return sha256_payload(base)
 def status_for_entries(entries: list[dict[str, Any]]) -> dict[str, Any]:
-    wins = [entry for entry in entries if bool(entry.get("candidate_beats_named_baseline"))]
+    qualified_entries = [
+        entry
+        for entry in entries
+        if entry.get("compatibility_contract_version")
+        == "geometry_live_wiring_matrix_v3"
+        and entry.get("evidence_mode") == "direct_measured_replay"
+    ]
+    wins = [
+        entry for entry in qualified_entries if bool(entry.get("qualified_repeat_win"))
+    ]
     distinct_win_hashes = sorted({normalized_evidence_hash(entry) for entry in wins})
-    all_sources = sorted({source for entry in entries for source in entry.get("sources", [])})
+    all_sources = sorted(
+        {
+            source
+            for entry in qualified_entries
+            for source in entry.get("sources", [])
+        }
+    )
     latest = entries[-1] if entries else {}
+    latest_qualified = qualified_entries[-1] if qualified_entries else {}
     repeat_live_wins = len(distinct_win_hashes)
     source_count = len(all_sources)
     if repeat_live_wins >= 2:
         status = "rolling_champion"
-    elif wins and source_count >= 3:
-        status = "triple_source_candidate"
     elif wins:
         status = "single_run_candidate"
     else:
@@ -233,16 +289,27 @@ def status_for_entries(entries: list[dict[str, Any]]) -> dict[str, Any]:
         "family_id": latest.get("family_id", ""),
         "status": status,
         "repeat_live_win_count": repeat_live_wins,
-        "distinct_run_hash_count": len({normalized_evidence_hash(entry) for entry in entries}),
+        "distinct_run_hash_count": len(
+            {normalized_evidence_hash(entry) for entry in qualified_entries}
+        ),
         "source_count": source_count,
         "sources": all_sources,
-        "latest_score_delta_vs_named_baseline": latest.get("score_delta_vs_named_baseline"),
+        "qualified_entry_count": len(qualified_entries),
+        "historical_unqualified_entry_count": len(entries) - len(qualified_entries),
+        "compatibility_contract_version": "geometry_live_wiring_matrix_v3",
+        "latest_score_delta_vs_named_baseline": latest_qualified.get(
+            "score_delta_vs_named_baseline"
+        ),
         "ready_for_real_dollar_claim": False,
         "field_validation": False,
         "claim_language": (
-            "Repeat live-context champion evidence."
+            "Repeat v3 compatibility-gated direct measured champion evidence."
             if status == "rolling_champion"
-            else "Promising candidate evidence only; keep gathering live frozen runs."
+            else (
+                "One compatibility-gated direct measured win; repeat on a distinct frozen source window."
+                if status == "single_run_candidate"
+                else "Not promoted under the v3 direct-measured source-specific baseline contract."
+            )
         ),
     }
 
@@ -281,9 +348,9 @@ def build_markdown(payload: dict[str, Any]) -> str:
             "## Rule",
             "",
             "- `rolling_champion`: at least two distinct live/frozen wins against a named baseline.",
-            "- `triple_source_candidate`: one live win with at least three distinct source families.",
-            "- `single_run_candidate`: one live win, not enough breadth yet.",
-            "- `not_promoted`: no current baseline win.",
+            "- `single_run_candidate`: one v3-qualified direct measured win against every registered baseline after global correction.",
+            "- `not_promoted`: no current v3-qualified direct measured win.",
+            "- Historical context-only, proxy, synthetic-conditioning, and fallback entries remain auditable but do not count.",
         ]
     )
     return "\n".join(lines)
@@ -320,14 +387,21 @@ def build_payload() -> dict[str, Any]:
         "ledger_entry_count": len(ledger),
         "entity_count": len(board),
         "rolling_champion_count": sum(1 for row in board if row["status"] == "rolling_champion"),
-        "triple_source_candidate_count": sum(1 for row in board if row["status"] == "triple_source_candidate"),
+        "triple_source_candidate_count": 0,
         "single_run_candidate_count": sum(1 for row in board if row["status"] == "single_run_candidate"),
         "not_promoted_count": sum(1 for row in board if row["status"] == "not_promoted"),
+        "qualified_v3_entry_count": sum(
+            int(row.get("qualified_entry_count", 0) or 0) for row in board
+        ),
+        "historical_unqualified_entry_count": sum(
+            int(row.get("historical_unqualified_entry_count", 0) or 0)
+            for row in board
+        ),
         "ready_for_real_dollar_claim": False,
         "kraken_live_execution_allowed": False,
     }
     payload = {
-        "schema": "rolling_champion_gate.v1",
+        "schema": "rolling_champion_gate.v2",
         "generated_utc": now_utc(),
         "evidence_boundary": EVIDENCE_BOUNDARY,
         "inputs": {

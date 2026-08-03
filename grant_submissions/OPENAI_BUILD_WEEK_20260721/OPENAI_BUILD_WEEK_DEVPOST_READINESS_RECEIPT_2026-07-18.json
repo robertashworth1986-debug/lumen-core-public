@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.openai_build_week_devpost_readiness_receipt.v1",
-  "generated_utc": "2026-07-19T03:05:09Z",
+  "generated_utc": "2026-07-19T09:02:41Z",
   "status": "NOT_READY_FOR_SUBMISSION",
   "deadline": {
     "central": "2026-07-21T19:00:00-05:00",
@@ -8,13 +8,35 @@
     "timezone_label": "CDT"
   },
   "portal_observation": {
-    "observed_utc": "2026-07-19T03:05:09Z",
-    "authentication_state": "SIGNED_OUT",
-    "hackathon_join_state": "NOT_JOINED",
-    "project_state": "NO_PROJECT_OBSERVED",
+    "observed_utc": "2026-07-19T08:57:50Z",
+    "authentication_state": "SIGNED_IN_AT_OBSERVATION",
+    "hackathon_join_state": "REGISTERED_CONFIRMED",
+    "project_state": "DRAFT_2_OF_5_CONFIRMED",
     "submission_confirmation_state": "NONE_OBSERVED",
-    "observation_basis": "Current task state and the unsigned public submission-manager page displayed Log in, Sign up, Join hackathon, and Register for this hackathon.",
-    "limitations": "No account, project, registration, or confirmation endpoint was opened or changed by this builder."
+    "observation_basis": "A direct browser observation displayed the ProofLock Console project draft at two of five steps on the project-details page; independent bounded Gmail metadata confirms registration and the deadline.",
+    "limitations": "Project details, additional information, final preview, and final submission remain incomplete.",
+    "progress_receipt": {
+      "source_path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PORTAL_PROGRESS_2026-07-19.json",
+      "receipt_sha256": "2a52ea053836c9f286a94e13c413aee1a9f735f1a19142fcc72652e142ecf062",
+      "facts_sha256": "49a49f197ed1af4afa9d1f3ebac9bea5d4c33c52f9b579126594f4679c186498",
+      "recorded_observation_utc": "2026-07-19T08:57:50Z",
+      "evidence_basis_count": 2,
+      "evidence_classes": [
+        "DIRECT_BROWSER_OBSERVATION",
+        "INDEPENDENT_GMAIL_METADATA"
+      ],
+      "challenge_registration_state": "CONFIRMED",
+      "project_shell_creation_state": "DRAFT_2_OF_5_CONFIRMED",
+      "submission_confirmation_state": "NONE_OBSERVED",
+      "open_gate_ids": [
+        "additional_info_completion",
+        "feedback_session_id",
+        "final_preview_review",
+        "final_submission",
+        "project_details_completion",
+        "public_youtube_video"
+      ]
+    }
   },
   "existing_readiness_snapshot": {
     "status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
@@ -36,46 +58,63 @@
     "packet_sha256": "d3d7917d70c1a4f81b5dae14fee5bbf73b44429400af46f0e32213b22b8c861b",
     "source_path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_SUBMISSION_READINESS_2026-07-17.json"
   },
+  "effective_readiness_after_portal_progress": {
+    "counts": {
+      "gate_total": 10,
+      "pass": 6,
+      "open": 4,
+      "fail": 0
+    },
+    "open_gate_ids": [
+      "feedback_session",
+      "final_submission",
+      "model_provenance",
+      "youtube_demo"
+    ],
+    "newly_satisfied_gate_ids": [
+      "devpost_registration"
+    ],
+    "ready_for_final_submission": false,
+    "basis": "verified portal progress receipt"
+  },
   "field_counts": {
     "total": 21,
     "required": 19,
     "exact_standard_labels": 13,
     "custom_labels_unobserved": 8,
-    "source_backed_ready_or_conditionally_ready": 8
+    "source_backed_ready_or_conditionally_ready": 11
   },
   "model_and_session_provenance": {
-    "confirmed_model_label": null,
-    "model_usage_evidence": null,
+    "confirmed_model_label": "gpt-5.6-sol",
+    "model_usage_evidence": "grant_submissions/OPENAI_BUILD_WEEK_20260721/CODEX_AGENT_ORCHESTRATION_RECEIPT_2026-07-19.json",
     "feedback_session_id": null,
-    "state": "MISSING_DIRECT_EVIDENCE",
+    "state": "MODEL_RECORDED_FEEDBACK_SESSION_OPEN",
     "inference_prohibited": true
   },
   "submission_artifacts": [
     {
       "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_FIELD_REGISTRY_2026-07-18.json",
-      "bytes": 31104,
-      "sha256": "462701d411cc7a328dfd35bd88526c24dc62f3bbdf37e2a52dcdd3e74d73852f"
+      "bytes": 37750,
+      "sha256": "2ba1f12df19bafc0a05d7e8856331dff0d320e98104fd8ff9aeb2edf2eab58e8"
     },
     {
       "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_PROJECT_COPY_2026-07-18.md",
-      "bytes": 4668,
-      "sha256": "540da965ade5934cf4b863355c5ea004b4bd605be155c6488a89166e935b9489"
+      "bytes": 6025,
+      "sha256": "e447a8638cb30d63c1278038b9569a1cbab9d8f47dcb389f03cd0d8566e02009"
     },
     {
       "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_DEVPOST_COMPLETION_KIT_2026-07-18.md",
-      "bytes": 6465,
-      "sha256": "1a991776967abb4fa2a5b42531c022dbfba91152c0917a6ae49080f7e16bc165"
+      "bytes": 6658,
+      "sha256": "f5c3fe82770723dd847082fcd60af6aec5a8dc0af792d6df62ecb9e536e057c3"
     }
   ],
   "hard_blockers": [
-    "DEVPOST_SIGNED_OUT",
-    "HACKATHON_NOT_JOINED",
-    "NO_DEVPOST_PROJECT",
     "NO_SUBMISSION_CONFIRMATION",
-    "MODEL_IDENTITY_UNCONFIRMED",
+    "PROJECT_DETAILS_INCOMPLETE",
+    "ADDITIONAL_INFO_INCOMPLETE",
     "FEEDBACK_SESSION_ID_MISSING",
     "PUBLIC_YOUTUBE_VIDEO_MISSING",
-    "THUMBNAIL_MISSING",
+    "FINAL_PREVIEW_REVIEW_OPEN",
     "CUSTOM_PORTAL_LABELS_UNOBSERVED",
     "PRIVACY_IP_REVIEW_OPEN",
     "LEGAL_ACCEPTANCE_OPEN",
@@ -84,6 +123,10 @@
   "ready_for_portal_population": false,
   "ready_for_final_submission": false,
   "actions_performed": [],
+  "actions_observed_external_to_this_builder": [
+    "challenge_registration",
+    "project_shell_creation"
+  ],
   "actions_not_performed": [
     "authenticate",
     "join_or_register",
@@ -95,6 +138,6 @@
     "submit",
     "contact_anyone"
   ],
-  "claim_boundary": "This kit prepares source-backed draft content and a field-by-field completion contract. It does not prove model identity, a /feedback Session ID, eligibility, ownership, legal acceptance, Devpost authentication or registration, project creation, video publication, final submission, judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value.",
-  "receipt_sha256": "94d061df31330d5230387cb32e7993fda067ac14f354d015aa8f637ee5415860"
+  "claim_boundary": "This kit prepares source-backed draft content and a field-by-field completion contract. It confirms a bounded project draft and locally verified release assets. It does not prove a /feedback Session ID, eligibility, ownership, legal acceptance, video publication, final submission, judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value.",
+  "receipt_sha256": "31f145a4b1cc6c2e68d67042f0da8eb3d3d0d8f5a693156bd6e6499c96cb6324"
 }

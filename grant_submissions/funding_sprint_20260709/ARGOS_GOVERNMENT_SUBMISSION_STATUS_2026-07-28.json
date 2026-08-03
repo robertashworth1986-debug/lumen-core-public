@@ -1,0 +1,53 @@
+{
+  "schema": "lumencore.argos_government_submission_status.v1",
+  "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+  "status": "SENT_ONCE_POST_SEND_VERIFIED_NO_DUPLICATE",
+  "recorded_utc": "2026-07-29T01:54:02Z",
+  "opportunity": {
+    "official_notice_active_at_send": true,
+    "government_deadline_utc": "2026-07-30T21:00:00Z",
+    "official_source_rechecked_utc": "2026-07-29T01:42:09Z",
+    "official_source_receipt_sha256": "BEF28A26AC6A496D3F1FC5F0A92AAA6E52CBC601B32D0BA831AA204533362414"
+  },
+  "authorization": {
+    "exact_action_time_phrase_received": true,
+    "approval_phrase_sha256": "3CBDFBB98DDD481BD0DE4905178C2B464B99E6292335492A484C0EF8894DD644",
+    "binding_generated_utc": "2026-07-29T01:43:38Z",
+    "binding_expires_utc": "2026-07-29T01:58:38Z",
+    "sent_within_binding_window": true
+  },
+  "mailbox_observation": {
+    "full_mailbox_duplicate_search_completed_before_send": true,
+    "matching_current_draft_count_before_send": 1,
+    "matching_sent_count_before_send": 0,
+    "matching_inbound_count_before_send": 0,
+    "sent_utc": "2026-07-29T01:52:18Z",
+    "post_send_sent_copy_verified": true,
+    "post_send_automatic_reply_observed": true,
+    "automatic_reply_utc": "2026-07-29T01:54:02Z",
+    "matching_current_draft_count_after_send": 0,
+    "matching_sent_count_after_send": 1,
+    "matching_inbound_count_after_send": 1,
+    "gmail_identifiers_omitted": true,
+    "message_body_omitted": true
+  },
+  "dispatch": {
+    "recipient_route_sha256": "592EFD70647BD5A34B3412C1DD55B193957FE7366D7FB404E740DC027B8037A2",
+    "subject_sha256": "A3773F279BD73B828617DE9F676C0DCD1C57583E88F325710D4B6A94F6F46BAA",
+    "body_sha256": "4D686F3C539EB8CFC1083783249007EAFCE5DCB30264CD0C6E91450CF9C82E9E",
+    "attachment_sha256": "459C92DB998CC6B7CB9C81064186CBB65DD897261CD3C7F1F1D69A3D38368CC1",
+    "attachment_bytes": 730579,
+    "attachment_count": 1,
+    "cc_count": 0,
+    "bcc_count": 0
+  },
+  "controls": {
+    "single_send_only": true,
+    "duplicate_send_prohibited": true,
+    "sent_copy_verified": true,
+    "automatic_reply_is_not_a_request_to_resend": true,
+    "private_cover_values_omitted": true,
+    "public_repository_link_included": false,
+    "external_action_performed": true
+  }
+}

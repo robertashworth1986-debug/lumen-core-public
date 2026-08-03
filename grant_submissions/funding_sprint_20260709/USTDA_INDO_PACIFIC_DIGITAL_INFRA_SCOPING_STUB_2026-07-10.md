@@ -1,7 +1,7 @@
 # USTDA Indo-Pacific Digital Infrastructure Scoping Stub - 2026-07-10
 
 - Opportunity: `1131PL26R0049`
-- Status: `DRAFT_READY_HUMAN_REVIEW_REQUIRED`
+- Status: `HISTORICAL_DRAFT_REVERIFY_BEFORE_USE`
 - External send without human: `false`
 - Final submission without human: `false`
 - Pricing/certification without human: `false`

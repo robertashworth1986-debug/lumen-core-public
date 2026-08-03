@@ -35,8 +35,12 @@ def build_html() -> Path:
 <head>
   <meta charset=\"UTF-8\" />
   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />
-  <title>Robert Ashworth - Elite Resume</title>
+  <title>Robert Ashworth - Resume</title>
   <style>
+    @page {{
+      size: Letter;
+      margin: 0.45in 0.55in;
+    }}
     :root {{
       --ink: #0f1c2f;
       --muted: #31445f;
@@ -50,7 +54,8 @@ def build_html() -> Path:
       background: var(--bg);
       color: var(--ink);
       font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-      line-height: 1.45;
+      font-size: 12.5px;
+      line-height: 1.28;
       padding: 24px;
     }}
     .page {{
@@ -59,33 +64,37 @@ def build_html() -> Path:
       background: #ffffff;
       border: 1px solid var(--line);
       box-shadow: 0 6px 24px rgba(8, 21, 44, 0.08);
-      padding: 34px 42px;
+      padding: 28px 34px;
     }}
     h1 {{
       margin: 0 0 8px;
-      font-size: 30px;
+      font-size: 25px;
       letter-spacing: 0.02em;
       color: var(--ink);
       border-bottom: 2px solid var(--accent);
       padding-bottom: 10px;
     }}
     h2 {{
-      margin: 18px 0 8px;
-      font-size: 15px;
+      margin: 13px 0 6px;
+      font-size: 13px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--accent);
       border-top: 1px solid var(--line);
-      padding-top: 10px;
+      padding-top: 7px;
+      break-after: avoid-page;
+      page-break-after: avoid;
     }}
     h3 {{
-      margin: 12px 0 6px;
-      font-size: 15px;
+      margin: 9px 0 4px;
+      font-size: 13px;
       color: var(--ink);
+      break-after: avoid-page;
+      page-break-after: avoid;
     }}
-    p {{ margin: 6px 0; color: var(--muted); }}
-    ul {{ margin: 8px 0 8px 20px; color: var(--muted); }}
-    li {{ margin: 5px 0; }}
+    p {{ margin: 4px 0; color: var(--muted); }}
+    ul {{ margin: 5px 0 6px 18px; color: var(--muted); }}
+    li {{ margin: 3px 0; }}
     code {{
       background: #eef3f9;
       border: 1px solid #d8e1ed;
@@ -118,6 +127,8 @@ def build_pdf(html_path: Path) -> bool:
         browser,
         "--headless",
         "--disable-gpu",
+        "--no-pdf-header-footer",
+        "--print-to-pdf-no-header",
         f"--print-to-pdf={str(PDF_OUT)}",
         html_path.resolve().as_uri(),
     ]

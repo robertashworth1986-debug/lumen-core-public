@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -14,18 +15,16 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 
 LIVE_DOMAIN_JSON = OUT_OPS / "live_domain_deployment_feed_latest.json"
 GAUNTLET_JSON = OUT_OPS / "champion_metric_gauntlet_latest.json"
-OUTREACH_JSON = OUT_OPS / "paid_pilot_outreach_queue_latest.json"
-VALUE_JSON = OUT_OPS / "live_proof_value_meter_latest.json"
+CROSS_SECTOR_JSON = OUT_OPS / "kuramoto_cross_sector_benchmark_latest.json"
+PROOF_TO_PILOT_JSON = OUT_OPS / "proof_to_pilot_control_room_latest.json"
+VALUATION_JSON = OUT_OPS / "valuation_proposal_target_packet_latest.json"
+PRODUCT_PRIORITY_JSON = DASHBOARD_DATA / "product_lane_priority_engine_20260718.json"
+FIRST_BUYER_JSON = DASHBOARD_DATA / "first_buyer_target_board.json"
+LEGACY_OUTREACH_JSON = OUT_OPS / "paid_pilot_outreach_queue_latest.json"
 
 OUT_JSON = OUT_OPS / "proof_to_revenue_engine_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "proof_to_revenue_engine.json"
 OUT_MD = DOCS / "PROOF_TO_REVENUE_ENGINE_2026-06-27.md"
-
-BOUNDARY = (
-    "Proof-to-revenue engine. This artifact turns verified public proof feeds and internal benchmark evidence into "
-    "manual paid-pilot actions. It does not authorize bulk email, fixed dollar claims, field-validation claims, "
-    "realized savings claims, live trading, or autonomous execution."
-)
 
 
 def now_utc() -> str:
@@ -36,7 +35,7 @@ def read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
         return {}
     return payload if isinstance(payload, dict) else {}
@@ -44,16 +43,25 @@ def read_json(path: Path) -> dict[str, Any]:
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
 
 
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    os.replace(temporary, path)
 
 
 def stable_sha256(payload: Any) -> str:
-    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
 
 
 def as_dict(value: Any) -> dict[str, Any]:
@@ -64,210 +72,363 @@ def as_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
 
 
-def as_float(value: Any, default: float = 0.0) -> float:
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return default
+def require_inputs() -> dict[str, dict[str, Any]]:
+    inputs = {
+        "live": read_json(LIVE_DOMAIN_JSON),
+        "gauntlet": read_json(GAUNTLET_JSON),
+        "cross_sector": read_json(CROSS_SECTOR_JSON),
+        "proof_to_pilot": read_json(PROOF_TO_PILOT_JSON),
+        "valuation": read_json(VALUATION_JSON),
+        "product_priority": read_json(PRODUCT_PRIORITY_JSON),
+        "first_buyer": read_json(FIRST_BUYER_JSON),
+        "legacy_outreach": read_json(LEGACY_OUTREACH_JSON),
+    }
+    expected = {
+        "live": "live_domain_deployment_feed_v1",
+        "gauntlet": "champion_metric_gauntlet_v2",
+        "cross_sector": "lumencore.kuramoto_cross_sector_benchmark.v1",
+        "proof_to_pilot": "proof_to_pilot_control_room_v2",
+        "valuation": "valuation_proposal_target_packet_v3",
+        "product_priority": "product_lane_priority_engine_v1",
+        "first_buyer": "first_buyer_target_board_v2",
+    }
+    for name, schema in expected.items():
+        actual = inputs[name].get("schema")
+        if actual != schema:
+            raise ValueError(f"{name} must use {schema}; found {actual!r}")
+    return inputs
 
 
-def as_int(value: Any, default: int = 0) -> int:
-    try:
-        return int(float(value))
-    except (TypeError, ValueError):
-        return default
-
-
-def money(value: Any) -> str:
-    return f"${as_float(value):,.2f}"
-
-
-def compact_target(row: dict[str, Any]) -> dict[str, Any]:
+def product_offer(product: dict[str, Any]) -> dict[str, Any]:
+    internal_gate = bool(product.get("internal_evidence_gate_passed"))
+    buyer_gate = as_dict(product.get("buyer_readiness_gate"))
     return {
-        "rank": as_int(row.get("rank")),
-        "target_segment": str(row.get("target_segment") or ""),
-        "buyer_role": str(row.get("buyer_role") or ""),
-        "family_id": str(row.get("family_id") or ""),
-        "lane": str(row.get("lane") or ""),
-        "fit_score": as_int(row.get("fit_score")),
-        "measured_outcome": str(row.get("measured_outcome") or ""),
-        "subject": str(row.get("subject") or ""),
-        "proof_line": str(row.get("proof_line") or ""),
-        "send_now_allowed": False,
-        "manual_review_required": True,
+        "product_lane_id": product.get("id"),
+        "name": product.get("name"),
+        "offer": product.get("offer"),
+        "recurring_model": product.get("recurring_model"),
+        "validated_evidence_coverage": product.get(
+            "validated_evidence_coverage"
+        ),
+        "validated_evidence_count": product.get("validated_evidence_count"),
+        "required_evidence_count": product.get("required_evidence_count"),
+        "internal_evidence_gate_passed": internal_gate,
+        "buyer_readiness_gate": buyer_gate,
+        "first_validation": product.get("first_validation"),
+        "pricing_status": "scope_before_quote_no_price_asserted",
+        "product_process_scoping_allowed": internal_gate,
+        "external_outreach_ready": False,
+        "model_performance_dependency": False,
+        "claim_boundary": (
+            "This offer is for a human-controlled opportunity workflow. It does "
+            "not inherit performance, savings, award, or field-validation claims "
+            "from the geometry research lane."
+        ),
     }
 
 
-def safe_email_template(top_target: dict[str, Any], champion: dict[str, Any], reviewer_urls: dict[str, Any]) -> dict[str, Any]:
-    family = champion.get("champion_label") or champion.get("champion_family") or top_target.get("family_id")
-    segment = top_target.get("target_segment", "technical evaluation").replace("_", " ")
+def safe_draft_template(product: dict[str, Any], proof_offer: dict[str, Any]) -> dict[str, Any]:
+    name = str(product.get("name") or "ProofLock Opportunity Operations")
     return {
-        "subject": f"Paid pilot scoping: verified proof feed for {segment}",
+        "recipient_selected": False,
+        "subject": f"Technical fit review: {name}",
         "body": "\n".join(
             [
-                "Hello,",
+                "Hello [Name],",
                 "",
                 (
-                    "I am looking for the right technical reviewer for a bounded paid evaluation of a "
-                    "hash-verified benchmark packet."
+                    f"I am seeking a technical fit review for {name}, a "
+                    "human-controlled workflow for opportunity discovery, evidence "
+                    "assembly, preflight, and receipts."
                 ),
                 "",
                 (
-                    f"The current internal champion is {family}. It has public proof-feed hashes available for review, "
-                    "but I am not claiming field validation or realized savings yet."
+                    "The request is a bounded workflow or evidence-protocol review. "
+                    "I am not claiming guaranteed awards, model superiority, field "
+                    "validation, realized savings, or autonomous final submission."
                 ),
                 "",
                 (
-                    "The ask is narrow: a 20-minute fit call to decide whether a buyer-authorized field replay is "
-                    "worth scoping, using your approved baseline, holdout windows, and economic conversion factors."
+                    "Would a 20-minute fit call be appropriate after we verify the "
+                    "official route, current recipient, workflow baseline, acceptance "
+                    "criteria, and human approval gates?"
                 ),
                 "",
-                f"Reviewer URL: {reviewer_urls.get('champion_feed_primary', '')}",
-                f"Mission console: {reviewer_urls.get('mission_control', '')}",
-                "",
-                "If you are not the right person, who owns analytics validation or pilot scoping for this area?",
+                (
+                    "The separate source-native protocol-review service is scoped at "
+                    f"${proof_offer.get('low'):,}-${proof_offer.get('high'):,}; "
+                    "product workflow pricing is quoted only after scope."
+                ),
                 "",
                 "Respectfully,",
                 "Robert Ashworth",
             ]
         ),
-        "send_mode": "manual_review_only",
-        "why_not_autosend": "Recipient, organization fit, physical mailing footer, and opt-out language must be reviewed by a human.",
+        "status": "draft_only_no_recipient_not_ready_to_send",
+        "send_allowed": False,
+        "why_not_ready": (
+            "Current official route, duplicate-send history, recipient fit, live "
+            "reviewer URL, and exact action-time approval are unresolved."
+        ),
     }
 
 
 def build_payload() -> dict[str, Any]:
-    live = read_json(LIVE_DOMAIN_JSON)
-    gauntlet = read_json(GAUNTLET_JSON)
-    outreach = read_json(OUTREACH_JSON)
-    value_meter = read_json(VALUE_JSON)
-
-    live_summary = as_dict(live.get("summary"))
-    gauntlet_summary = as_dict(gauntlet.get("summary"))
-    outreach_summary = as_dict(outreach.get("summary"))
-    value_answer = as_dict(value_meter.get("answer"))
-    reviewer_urls = as_dict(live.get("reviewer_urls"))
-
-    queue = [row for row in as_list(outreach.get("queue")) if isinstance(row, dict)]
-    top_targets = [compact_target(row) for row in queue[:5]]
-    top_target = top_targets[0] if top_targets else {}
-
-    live_hash_verified = live_summary.get("domain_deployment_state") == "LIVE_DOMAIN_HASH_VERIFIED" and bool(
-        live_summary.get("live_domain_reviewer_ready")
+    inputs = require_inputs()
+    live_summary = as_dict(inputs["live"].get("summary"))
+    gauntlet_summary = as_dict(inputs["gauntlet"].get("summary"))
+    strongest = as_dict(inputs["gauntlet"].get("strongest_current"))
+    cross_gates = as_dict(inputs["cross_sector"].get("gates"))
+    pilot_summary = as_dict(inputs["proof_to_pilot"].get("summary"))
+    valuation_state = as_dict(inputs["valuation"].get("valuation_state"))
+    current_priceable = as_dict(
+        valuation_state.get("current_priceable_offer")
     )
-    champion_ready = bool(gauntlet_summary.get("buyer_authorized_field_replay_request_ready"))
-    manual_outreach_ready = bool(outreach_summary.get("manual_reviewed_outreach_allowed"))
-    field_validation_allowed = False
-    realized_savings_allowed = False
+    first_summary = as_dict(inputs["first_buyer"].get("summary"))
+    ranking = [
+        as_dict(row)
+        for row in as_list(inputs["product_priority"].get("ranking"))
+        if as_dict(row)
+    ]
+    product = ranking[0] if ranking else {}
+    if not product:
+        raise ValueError("A ranked product-process lane is required")
 
+    live_hash_verified = (
+        live_summary.get("domain_deployment_state") == "LIVE_DOMAIN_HASH_VERIFIED"
+        and bool(live_summary.get("live_domain_reviewer_ready"))
+    )
+    external_outreach_ready = False
     revenue_stage = (
-        "manual_paid_pilot_scoping_ready"
-        if live_hash_verified and champion_ready and manual_outreach_ready
-        else "proof_stack_not_ready_for_outreach"
-    )
-    deployment_phrase = (
-        "public hashes match"
+        "bounded_product_and_protocol_discovery_draft_only_no_recipient"
         if live_hash_verified
-        else "public hash verification is still pending"
+        else "bounded_offers_ready_local_only_domain_stale_no_recipient"
     )
-    safest_first_offer = {
-        "name": "Paid evidence review / field replay scoping",
-        "pricing_posture": "quote after scope; no fixed delta price yet",
-        "deliverable": (
-            "Review the public proof feed, lock the buyer baseline, select holdout windows, and decide whether a "
-            "buyer-authorized field replay should be purchased."
-        ),
-        "allowed_today": revenue_stage == "manual_paid_pilot_scoping_ready",
-    }
+    protocol_price = as_dict(
+        current_priceable.get("paid_protocol_review_usd")
+    )
+    benchmark_price = as_dict(
+        current_priceable.get("benchmark_implementation_usd")
+    )
+    product_process_offer = product_offer(product)
 
-    payload = {
-        "schema": "proof_to_revenue_engine_v1",
+    payload: dict[str, Any] = {
+        "schema": "proof_to_revenue_engine_v3",
         "generated_utc": now_utc(),
-        "boundary": BOUNDARY,
+        "boundary": (
+            "This engine separates a product-process offer from geometry-model "
+            "performance evidence. It can scope a bounded protocol review or "
+            "human-controlled workflow product locally. It does not authorize "
+            "external outreach, pricing based on model gains, field or savings "
+            "claims, guaranteed awards, live trading, or autonomous submissions."
+        ),
         "summary": {
             "revenue_stage": revenue_stage,
             "live_domain_hash_verified": live_hash_verified,
-            "required_remote_hash_matches": as_int(live_summary.get("required_remote_hash_match_count")),
-            "required_feed_count": as_int(live_summary.get("required_feed_count")),
-            "champion_family": gauntlet_summary.get("champion_family"),
-            "champion_label": gauntlet_summary.get("champion_label"),
-            "named_baseline": gauntlet_summary.get("named_baseline"),
-            "holdout_wins": gauntlet_summary.get("holdout_wins"),
-            "holdout_count": gauntlet_summary.get("holdout_count"),
-            "source_system_count": gauntlet_summary.get("source_system_count"),
-            "estimated_rows_replayed": gauntlet_summary.get("estimated_rows_replayed"),
-            "safe_estimated_hourly_value_usd": round(as_float(gauntlet_summary.get("safe_estimated_hourly_value_usd")), 2),
-            "safe_estimated_annual_value_usd": round(as_float(gauntlet_summary.get("safe_estimated_annual_value_usd")), 2),
-            "manual_reviewed_outreach_allowed": manual_outreach_ready,
+            "required_remote_hash_matches": int(
+                live_summary.get("required_remote_hash_match_count") or 0
+            ),
+            "required_feed_count": int(
+                live_summary.get("required_feed_count") or 0
+            ),
+            "sellable_product_lane": product.get("id"),
+            "sellable_product_name": product.get("name"),
+            "product_internal_evidence_gate_passed": bool(
+                product_process_offer["internal_evidence_gate_passed"]
+            ),
+            "product_buyer_readiness_gate_passed": bool(
+                as_dict(
+                    product_process_offer.get("buyer_readiness_gate")
+                ).get("passed")
+            ),
+            "product_process_scoping_allowed": bool(
+                product_process_offer["product_process_scoping_allowed"]
+            ),
+            "internal_performance_champion_present": False,
+            "measured_reference_candidate": strongest.get("family"),
+            "development_selected_candidate": strongest.get(
+                "development_selected_candidate"
+            ),
+            "reference_candidate_was_protocol_selected": bool(
+                strongest.get("candidate_was_protocol_selected")
+            ),
+            "internal_replay_named_baseline": gauntlet_summary.get(
+                "named_baseline"
+            ),
+            "internal_replay_holdout_wins": gauntlet_summary.get(
+                "holdout_wins"
+            ),
+            "internal_replay_holdout_count": gauntlet_summary.get(
+                "holdout_count"
+            ),
+            "internal_replay_mean_delta": gauntlet_summary.get(
+                "mean_delta_vs_named_baseline"
+            ),
+            "cross_sector_benchmark_status": inputs["cross_sector"].get(
+                "status"
+            ),
+            "cross_sector_sector_count": int(
+                cross_gates.get("sector_count") or 0
+            ),
+            "cross_sector_gain_proven_count": int(
+                cross_gates.get("sector_gain_proven_count") or 0
+            ),
+            "cross_sector_efficiency_claim_allowed": False,
+            "model_performance_marketing_allowed": False,
+            "safe_estimated_hourly_value_usd": 0.0,
+            "safe_estimated_annual_value_usd": 0.0,
+            "modeled_dollar_projection_allowed": False,
+            "paid_protocol_review_scoping_allowed": bool(
+                pilot_summary.get("paid_protocol_review_scoping_allowed")
+            ),
+            "pilot_ready_count": int(
+                pilot_summary.get("pilot_ready_count") or 0
+            ),
+            "manual_reviewed_outreach_allowed": False,
+            "external_outreach_ready": external_outreach_ready,
             "send_without_user_review_allowed": False,
             "bulk_email_allowed": False,
-            "field_validation_claim_allowed": field_validation_allowed,
-            "realized_savings_claim_allowed": realized_savings_allowed,
+            "field_validation_claim_allowed": False,
+            "realized_savings_claim_allowed": False,
             "fixed_frozen_delta_price_claim_allowed": False,
+            "enterprise_valuation_asserted": bool(
+                valuation_state.get("enterprise_valuation_asserted")
+            ),
             "live_trading_or_autonomous_execution_allowed": False,
+            "recommended_first_buyer": first_summary.get(
+                "recommended_first_buyer"
+            ),
             "plain_english_answer": (
-                f"The proof stack has manually reviewable pilot material, but {deployment_phrase}. "
-                f"{gauntlet_summary.get('champion_label')} beat {gauntlet_summary.get('named_baseline')} on "
-                f"{gauntlet_summary.get('holdout_wins')}/{gauntlet_summary.get('holdout_count')} holdouts, and the "
-                "next money gate is buyer-authorized field replay. It is not yet a realized savings claim."
+                "LumenCore has two bounded commercial paths that do not depend on "
+                "a winning geometry model: a source-native benchmark and evidence "
+                "protocol review, and a human-controlled ProofLock opportunity "
+                "workflow discovery engagement. The top product lane passes its "
+                "typed internal artifact checks but remains blocked at buyer "
+                "validation and external outreach. No current geometry family is a "
+                "performance champion, the cross-sector benchmark found zero proven "
+                "sector gains, the live reviewer domain has stale hashes, and no "
+                "recipient is selected. Revenue scoping is local and draft-only."
             ),
         },
-        "reviewer_urls": reviewer_urls,
-        "safest_first_offer": safest_first_offer,
-        "top_manual_targets": top_targets,
-        "safe_email_template": safe_email_template(top_target, gauntlet_summary, reviewer_urls) if top_target else {},
-        "field_validation_unlock": [
-            "buyer-approved operational or representative field dataset",
-            "named incumbent baseline and locked evaluation metric",
-            "pre-registered holdout windows",
-            "same data, same time windows, same compute constraints for baseline and candidate",
-            "buyer-approved economic conversion factor",
-            "signed or otherwise traceable replay result artifact",
+        "commercial_offers": {
+            "source_native_protocol_review": {
+                "price_usd": protocol_price,
+                "status": "scope_ready_not_performance_pricing",
+                "offer": "source-task mapping, baseline registration, frozen chronology, reproducible execution, and claim-boundary review",
+            },
+            "benchmark_implementation": {
+                "price_usd": benchmark_price,
+                "status": "custom_scope_after_data_rights_and_acceptance_criteria",
+            },
+            "product_process_discovery": product_process_offer,
+        },
+        "safe_draft_template": safe_draft_template(product, protocol_price),
+        "top_manual_targets": [],
+        "target_status": {
+            "recipient_selected": False,
+            "recommended_first_buyer": None,
+            "legacy_paid_pilot_queue_excluded": bool(
+                inputs["legacy_outreach"]
+            ),
+            "legacy_paid_pilot_queue_schema": inputs["legacy_outreach"].get(
+                "schema"
+            ),
+            "legacy_paid_pilot_queue_generated_utc": inputs[
+                "legacy_outreach"
+            ].get("generated_utc"),
+            "exclusion_reason": (
+                "The June 27 queue predates the current nonpromotion and no-send "
+                "contracts and is not an action source."
+            ),
+        },
+        "current_model_evidence": {
+            "candidate_family": strongest.get("family"),
+            "development_selected_candidate": strongest.get(
+                "development_selected_candidate"
+            ),
+            "candidate_was_protocol_selected": strongest.get(
+                "candidate_was_protocol_selected"
+            ),
+            "direct_measured_result": (
+                f"{gauntlet_summary.get('holdout_wins')}/"
+                f"{gauntlet_summary.get('holdout_count')} paired EIA days "
+                f"against {gauntlet_summary.get('named_baseline')}; mean skill "
+                f"{gauntlet_summary.get('mean_delta_vs_named_baseline')}"
+            ),
+            "cross_sector_status": inputs["cross_sector"].get("status"),
+            "sector_gain_proven_count": int(
+                cross_gates.get("sector_gain_proven_count") or 0
+            ),
+            "sector_count": int(cross_gates.get("sector_count") or 0),
+            "external_cross_sector_replication_complete": bool(
+                cross_gates.get("external_cross_sector_replication_complete")
+            ),
+            "prospective_cross_sector_holdout_complete": bool(
+                cross_gates.get("prospective_cross_sector_holdout_complete")
+            ),
+            "safest_next_action": inputs["cross_sector"].get(
+                "safest_next_action"
+            ),
+            "claim_boundary": inputs["cross_sector"].get("claim_boundary"),
+        },
+        "external_unlock": [
+            "refresh and verify every required live-domain proof-feed hash",
+            "verify one current official channel",
+            "reconcile duplicate-send history",
+            "select a real recipient with authority over the relevant workflow",
+            "freeze the buyer's current workflow baseline and acceptance criteria",
+            "obtain exact action-time approval before external outreach",
         ],
         "what_to_ask_next": [
-            "Which reviewer URL should be used first?",
-            "Which current champion and named baseline are we claiming?",
-            "Which top target segment gets the first manual email?",
-            "What buyer-owned data would unlock field validation?",
-            "What exact metric converts this into a dollar claim?",
-            "Which statements are still blocked?",
-            "What price can be quoted only after scope?",
-            "What test would most increase valuation this week?",
-            "Which grant packet should cite this proof feed?",
-            "What proof should never be sent without human review?",
+            "Which product-process workflow has urgent pain independent of model performance?",
+            "What is the buyer's current time-to-pursue and package-quality baseline?",
+            "Which source portals and eligibility rules may the workflow use?",
+            "Which acceptance metrics and cutoff times will be frozen before work begins?",
+            "Who owns unresolved facts, attachments, certifications, and final submission?",
+            "Does the buyer need a protocol review, benchmark implementation, or workflow discovery engagement?",
+            "What current official route and recipient are verified?",
+            "What prior sends or packets must be reconciled before contact?",
+            "Which negative scientific results must remain visible?",
+            "Who gives exact action-time approval for any external send?",
         ],
         "claim_controls": {
             "allowed": [
-                "public hash-verified proof feed",
-                "internal champion against named baseline",
-                "bounded estimated value surface",
-                "manual paid-pilot scoping",
-                "buyer-authorized field replay request",
+                "bounded source-native protocol-review pricing",
+                "bounded benchmark-implementation pricing",
+                "human-controlled product-process discovery scoping",
+                "measured nonpromotion and negative cross-sector evidence",
             ],
             "blocked": [
-                "field validated",
+                "current geometry performance champion",
+                "cross-sector efficiency gain",
+                "modeled dollar projection from forecast error",
+                "field validation",
                 "realized savings",
                 "fixed value per frozen delta",
-                "guaranteed funding",
+                "enterprise valuation from current evidence",
+                "guaranteed funding or award",
                 "guaranteed trading profit",
-                "bulk email or scraped outreach",
+                "bulk or unapproved outreach",
             ],
         },
         "source_status": {
-            "live_domain_loaded": bool(live),
-            "gauntlet_loaded": bool(gauntlet),
-            "outreach_queue_loaded": bool(outreach),
-            "value_meter_loaded": bool(value_meter),
-            "value_meter_answer": value_answer,
+            "live_domain_loaded": bool(inputs["live"]),
+            "gauntlet_loaded": bool(inputs["gauntlet"]),
+            "cross_sector_benchmark_loaded": bool(inputs["cross_sector"]),
+            "proof_to_pilot_loaded": bool(inputs["proof_to_pilot"]),
+            "valuation_loaded": bool(inputs["valuation"]),
+            "product_priority_loaded": bool(inputs["product_priority"]),
+            "first_buyer_loaded": bool(inputs["first_buyer"]),
+            "legacy_outreach_queue_excluded": True,
         },
     }
     payload["proof_to_revenue_sha256"] = stable_sha256(
         {
             "summary": payload["summary"],
-            "reviewer_urls": payload["reviewer_urls"],
-            "safest_first_offer": payload["safest_first_offer"],
-            "top_manual_targets": payload["top_manual_targets"],
-            "field_validation_unlock": payload["field_validation_unlock"],
+            "commercial_offers": payload["commercial_offers"],
+            "target_status": payload["target_status"],
+            "current_model_evidence": payload["current_model_evidence"],
+            "external_unlock": payload["external_unlock"],
             "claim_controls": payload["claim_controls"],
         }
     )
@@ -275,97 +436,100 @@ def build_payload() -> dict[str, Any]:
 
 
 def render_markdown(payload: dict[str, Any]) -> str:
-    summary = as_dict(payload.get("summary"))
+    summary = payload["summary"]
+    offers = payload["commercial_offers"]
+    protocol = offers["source_native_protocol_review"]["price_usd"]
+    benchmark = offers["benchmark_implementation"]["price_usd"]
+    product = offers["product_process_discovery"]
+    evidence = payload["current_model_evidence"]
     lines = [
         "# Proof To Revenue Engine",
         "",
-        f"Generated UTC: `{payload.get('generated_utc')}`",
+        f"Generated UTC: `{payload['generated_utc']}`",
+        "",
+        payload["boundary"],
         "",
         "## Current State",
         "",
-        summary.get("plain_english_answer", ""),
+        summary["plain_english_answer"],
         "",
-        "## Deployment Verification",
+        f"- Revenue stage: `{summary['revenue_stage']}`",
+        f"- Live domain hash verified: `{str(summary['live_domain_hash_verified']).lower()}`",
+        f"- Required remote hash matches: `{summary['required_remote_hash_matches']}/{summary['required_feed_count']}`",
+        f"- Internal performance champion present: `{str(summary['internal_performance_champion_present']).lower()}`",
+        f"- Pilot-ready candidates: `{summary['pilot_ready_count']}`",
+        f"- Manual reviewed outreach allowed: `{str(summary['manual_reviewed_outreach_allowed']).lower()}`",
+        f"- External outreach ready: `{str(summary['external_outreach_ready']).lower()}`",
+        f"- Modeled dollar projection allowed: `{str(summary['modeled_dollar_projection_allowed']).lower()}`",
         "",
-        f"- Live domain hash verified: `{str(summary.get('live_domain_hash_verified')).lower()}`",
-        f"- Required remote hash matches: `{summary.get('required_remote_hash_matches')}/{summary.get('required_feed_count')}`",
-        f"- Reviewer champion feed: `{payload.get('reviewer_urls', {}).get('champion_feed_primary', '')}`",
-        f"- Mission control: `{payload.get('reviewer_urls', {}).get('mission_control', '')}`",
+        "## Current Model Evidence",
         "",
-        "## Champion Evidence",
+        f"- Measured reference candidate: `{evidence['candidate_family']}`",
+        f"- Development-selected candidate: `{evidence['development_selected_candidate']}`",
+        f"- Candidate was protocol-selected: `{str(evidence['candidate_was_protocol_selected']).lower()}`",
+        f"- Direct measured result: {evidence['direct_measured_result']}",
+        f"- Cross-sector status: `{evidence['cross_sector_status']}`",
+        f"- Proven sector gains: `{evidence['sector_gain_proven_count']}/{evidence['sector_count']}`",
         "",
-        f"- Champion: `{summary.get('champion_label')}`",
-        f"- Named baseline: `{summary.get('named_baseline')}`",
-        f"- Holdout wins: `{summary.get('holdout_wins')}/{summary.get('holdout_count')}`",
-        f"- Source systems: `{summary.get('source_system_count')}`",
-        f"- Estimated rows replayed: `{summary.get('estimated_rows_replayed')}`",
-        f"- Safe estimated hourly value surface: `{money(summary.get('safe_estimated_hourly_value_usd'))}`",
-        f"- Safe estimated annual value surface: `{money(summary.get('safe_estimated_annual_value_usd'))}`",
+        "## Bounded Commercial Offers",
         "",
-        "## What We Can Sell Today",
+        f"- Source-native protocol review: `${protocol.get('low'):,}`-`${protocol.get('high'):,}`",
+        f"- Benchmark implementation: `${benchmark.get('low'):,}`-`${benchmark.get('high'):,}`",
+        f"- Product-process lane: `{product['name']}`",
+        f"- Product-process pricing: `{product['pricing_status']}`",
+        f"- Product internal evidence gate passed: `{str(product['internal_evidence_gate_passed']).lower()}`",
+        f"- Product buyer-readiness gate passed: `{str(product['buyer_readiness_gate'].get('passed', False)).lower()}`",
+        f"- Product-process scoping allowed: `{str(product['product_process_scoping_allowed']).lower()}`",
+        f"- Product-process external outreach ready: `{str(product['external_outreach_ready']).lower()}`",
         "",
-        f"- Revenue stage: `{summary.get('revenue_stage')}`",
-        f"- Safest first offer: `{payload.get('safest_first_offer', {}).get('name', '')}`",
-        f"- Pricing posture: `{payload.get('safest_first_offer', {}).get('pricing_posture', '')}`",
-        f"- Manual reviewed outreach allowed: `{str(summary.get('manual_reviewed_outreach_allowed')).lower()}`",
-        f"- Send without user review allowed: `{str(summary.get('send_without_user_review_allowed')).lower()}`",
+        "## Target Gate",
         "",
-        "## Top Manual Targets",
+        f"- Recipient selected: `{str(payload['target_status']['recipient_selected']).lower()}`",
+        f"- Recommended first buyer: `{payload['target_status']['recommended_first_buyer'] or 'none'}`",
+        f"- Legacy paid-pilot queue excluded: `{str(payload['target_status']['legacy_paid_pilot_queue_excluded']).lower()}`",
+        f"- Exclusion reason: {payload['target_status']['exclusion_reason']}",
+        "",
+        "## External Unlock",
         "",
     ]
-    for row in as_list(payload.get("top_manual_targets")):
-        if not isinstance(row, dict):
-            continue
-        lines.append(
-            f"- `{row.get('rank')}` {row.get('target_segment')} -> {row.get('buyer_role')} "
-            f"({row.get('family_id')}, fit {row.get('fit_score')})"
-        )
+    lines.extend(f"- {item}" for item in payload["external_unlock"])
+    lines.extend(["", "## Blocked Claims", ""])
+    lines.extend(f"- {item}" for item in payload["claim_controls"]["blocked"])
+    lines.extend(["", "## What To Ask Next", ""])
     lines.extend(
-        [
-            "",
-            "## Field Validation Unlock",
-            "",
-        ]
+        f"{index}. {item}"
+        for index, item in enumerate(payload["what_to_ask_next"], start=1)
     )
-    for item in as_list(payload.get("field_validation_unlock")):
-        lines.append(f"- {item}")
     lines.extend(
         [
             "",
-            "## Blocked Claims",
-            "",
-        ]
-    )
-    for item in as_dict(payload.get("claim_controls")).get("blocked", []):
-        lines.append(f"- {item}")
-    lines.extend(
-        [
-            "",
-            "## What To Ask Next",
-            "",
-        ]
-    )
-    for i, item in enumerate(as_list(payload.get("what_to_ask_next")), 1):
-        lines.append(f"{i}. {item}")
-    lines.extend(
-        [
-            "",
-            f"Proof-to-revenue SHA-256: `{payload.get('proof_to_revenue_sha256')}`",
+            f"Proof-to-revenue SHA-256: `{payload['proof_to_revenue_sha256']}`",
         ]
     )
     return "\n".join(lines)
 
 
-def main() -> None:
+def main() -> int:
     payload = build_payload()
     write_json(OUT_JSON, payload)
     write_json(DASHBOARD_JSON, payload)
     write_text(OUT_MD, render_markdown(payload))
-    print(f"Wrote {OUT_JSON}")
-    print(f"Wrote {DASHBOARD_JSON}")
-    print(f"Wrote {OUT_MD}")
-    print(payload["summary"]["plain_english_answer"])
+    print(
+        json.dumps(
+            {
+                "schema": payload["schema"],
+                "revenue_stage": payload["summary"]["revenue_stage"],
+                "product_lane": payload["summary"]["sellable_product_lane"],
+                "external_outreach_ready": payload["summary"][
+                    "external_outreach_ready"
+                ],
+                "json": str(OUT_JSON.relative_to(ROOT)).replace("\\", "/"),
+            },
+            indent=2,
+        )
+    )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

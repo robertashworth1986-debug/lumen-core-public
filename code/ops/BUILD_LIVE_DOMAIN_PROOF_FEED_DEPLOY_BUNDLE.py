@@ -79,6 +79,8 @@ OPTIONAL_FEEDS = [
     "real_noise_evidence_boundary_breaker",
     "real_noise_promotion_sweep",
     "geometry_execution_context_audit",
+    "market_signal_source_native_benchmark",
+    "source_native_family_baseline_ledger",
 ]
 
 FORBIDDEN_NAME_FRAGMENTS = [
@@ -273,12 +275,19 @@ def build_bundle(include_optional: bool = True, remote_web_roots: list[str] | No
         },
         "safe_deploy_command": (
             ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 "
-            f"-BundleRoot \"{bundle_root}\""
+            f"-BundleRoot \"{bundle_root}\" -Apply"
         ),
         "dry_run_command": (
             ".\\deploy\\PUSH_PROOF_FEEDS_TO_VPS.ps1 "
             f"-BundleRoot \"{bundle_root}\" -DryRun"
         ),
+        "apply_requirements": {
+            "explicit_apply_switch_required": True,
+            "human_unlock_environment_variable": "LUMA_HUMAN_UNLOCK_TOKEN",
+            "human_unlock_minimum_characters": 32,
+            "human_unlock_must_be_action_time_and_private": True,
+            "external_action_authorized_by_bundle": False,
+        },
         "post_deploy_verify_command": "python .\\code\\ops\\BUILD_LIVE_DOMAIN_DEPLOYMENT_FEED.py --timeout 8",
     }
 
@@ -358,8 +367,16 @@ def render_markdown(manifest: dict[str, Any]) -> str:
             "## Commands",
             "",
             f"- Dry run: `{manifest['dry_run_command']}`",
-            f"- Deploy feeds: `{manifest['safe_deploy_command']}`",
+            (
+                "- Apply feeds after separate action-time HumanUnlock: "
+                f"`{manifest['safe_deploy_command']}`"
+            ),
             f"- Verify domain hashes: `{manifest['post_deploy_verify_command']}`",
+            (
+                "- Apply prerequisite: set `LUMA_HUMAN_UNLOCK_TOKEN` privately in the process environment "
+                f"with at least `{manifest['apply_requirements']['human_unlock_minimum_characters']}` characters."
+            ),
+            "- Building this bundle does not authorize deployment.",
             "",
             "## Remote Web Roots Tried By Deploy Script",
             "",

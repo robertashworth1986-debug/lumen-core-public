@@ -2,43 +2,43 @@
   "company_page_url": "https://www.linkedin.com/company/1337",
   "evidence_status": [
     {
-      "bytes": 18719,
+      "bytes": 23864,
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DECISION_BRIEF_2026-07-09.md",
       "present": true,
-      "sha256": "cd467e7b2119cbd5e77b19158d1efd6116dba66ea8cd2c8b5c3d2b435a3deeb1"
+      "sha256": "f08ff5e8314c58d9826f69ffdc6fcbf531808254402b3cdee9a3281fb1561e35"
     },
     {
-      "bytes": 13119,
+      "bytes": 16206,
       "path": "grant_submissions/funding_sprint_20260709/REVIEWER_DILIGENCE_QA_MATRIX_2026-07-09.md",
       "present": true,
-      "sha256": "ca7426b9764be2fcb4448abd07d823a260a42b906ad79bdfddd97c25cc41b677"
+      "sha256": "b670cb506ec97a24910515a39a8987a2a6d1659bece6817912d1ed39f5ba1a18"
     },
     {
-      "bytes": 18765,
+      "bytes": 24099,
       "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
       "present": true,
-      "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+      "sha256": "cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390"
     },
     {
-      "bytes": 13939,
+      "bytes": 23598,
       "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
       "present": true,
-      "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
+      "sha256": "10f5206c8b65e329041c28caefec7f51c0744fcef70c0761b711470d62f13021"
     },
     {
-      "bytes": 11607,
+      "bytes": 39846,
       "path": "grant_submissions/funding_sprint_20260709/DATA_ROOM_MANIFEST_2026-07-09.md",
       "present": true,
-      "sha256": "62574d49e95169d05589e95027bdadd7220d11b3c8ff929b08fb4225fad4513e"
+      "sha256": "24ef5bb644a01bb86fc6889298afe68b6be8fc9e44cd41f14a0fff2a8691eb6a"
     },
     {
-      "bytes": 6279,
+      "bytes": 17487,
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "present": true,
-      "sha256": "ae96b2e13137be82dd2e29661033930f09b29ed247e75b0fa708cf76f7a48ee7"
+      "sha256": "db8e56ed557b78bdd69fa27fddbc516eb4e00b2e4448fe24c030c393c52b9e1a"
     }
   ],
-  "generated_utc": "2026-07-09T13:26:52.779631+00:00",
+  "generated_utc": "2026-07-26T22:11:34.545966+00:00",
   "human_gate": {
     "company_page_change_allowed_without_human": false,
     "message_allowed_without_human": false,
@@ -54,14 +54,14 @@
     "status": "submission_ready",
     "status_reason": "ready"
   },
-  "linkedin_universe_profile_packet_sha256": "d44724b7cee6dbb223ea7af050b237df0a94c0d400a0c81c97ab1b37e8ff3ca5",
+  "linkedin_universe_profile_packet_sha256": "d77223b55b7fe350e0ba42fefae5cdc214263fb1b8a19c80769dd62ed28f7348",
   "outputs": {
     "dashboard_json": "dashboard/data/linkedin_universe_profile_packet.json",
     "json": "out/ops/linkedin_universe_profile_packet_latest.json",
     "markdown": "grant_submissions/funding_sprint_20260709/LINKEDIN_UNIVERSE_PROFILE_PACKET_2026-07-09.md"
   },
   "profile_copy": {
-    "about_full": "I build LumenCore, a proof-to-pilot platform for turning infrastructure, energy, environmental, market, and operational data into source-provenance records, baseline-vs-candidate replay plans, and reviewer-ready proof packets. The July 2026 proof room is organized around live-source measurement, replay evidence, claim-boundary gates, authority matrices, human action dockets, and E-drive custody mirrors. Current data-room posture: 26 public-safe Markdown artifacts and 16 machine-readable control receipts. The active universe includes EVTit/Black Dog meeting prep, LvlUp First Check review watch, DARPA DICE full-proposal sprint, FHWA TSMO, NASA data-center RFI, DSIP MissionWeave, NSF Project Pitch, and patent-counsel review. Boundary: this profile does not claim award, agency approval, production deployment, external field validation, trading performance, legal IP conclusions, or external operational savings results. The next milestone is buyer or agency authorized replay with held-out data, incumbent baseline, acceptance metric, replay window, and approved economic conversion. I am looking for utility, lab, agency, investor, and engineering partners who want disciplined measurement before they trust AI/control methods in infrastructure settings.",
+    "about_full": "I build LumenCore, a proof-to-pilot platform for turning infrastructure, energy, environmental, market, and operational data into source-provenance records, baseline-vs-candidate replay plans, and reviewer-ready proof packets. The July 2026 proof room is organized around live-source measurement, replay evidence, claim-boundary gates, authority matrices, human action dockets, and E-drive custody mirrors. Current data-room posture: 104 public-safe Markdown artifacts and 56 machine-readable control receipts. The active universe includes EVTit/Black Dog meeting prep, LvlUp First Check review watch, DARPA DICE full-proposal sprint, FHWA TSMO, NASA data-center RFI, DSIP MissionWeave, NSF Project Pitch, and patent-counsel review. Boundary: this profile does not claim award, agency approval, production deployment, external field validation, trading performance, legal IP conclusions, or external operational savings results. The next milestone is buyer or agency authorized replay with held-out data, incumbent baseline, acceptance metric, replay window, and approved economic conversion. I am looking for utility, lab, agency, investor, and engineering partners who want disciplined measurement before they trust AI/control methods in infrastructure settings.",
     "about_short": "I build LumenCore, a proof-to-pilot platform for source provenance, baseline-vs-candidate replay, hash-backed proof rooms, and human-gated agency and investor packets.",
     "experience": {
       "bullets": [
@@ -112,7 +112,7 @@
     ],
     "post_templates": [
       {
-        "text": "LumenCore July proof-room update: the platform now has a reviewer path that starts with a decision brief, moves through a diligence Q&A matrix, and lands in a data-room manifest with 26 public-safe artifacts and 16 machine-readable control receipts. The purpose is simple: make AI/control claims easier to inspect before a pilot, contract, or investment decision. This is not an award or deployment claim. It is a proof-to-pilot validation layer built for disciplined external review.",
+        "text": "LumenCore July proof-room update: the platform now has a reviewer path that starts with a decision brief, moves through a diligence Q&A matrix, and lands in a data-room manifest with 104 public-safe artifacts and 56 machine-readable control receipts. The purpose is simple: make AI/control claims easier to inspect before a pilot, contract, or investment decision. This is not an award or deployment claim. It is a proof-to-pilot validation layer built for disciplined external review.",
         "title": "Proof room upgrade"
       },
       {
@@ -151,12 +151,22 @@
       {
         "audience": "engineering partner",
         "claim_boundary": "Meeting and application evidence only; no investment, services award, or partnership has been accepted.",
-        "first_artifact": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "first_artifact": "grant_submissions/funding_sprint_20260709/EVTIT_TRACTION_FOLLOWUP_PACKET_2026-07-09.md",
         "human_gate": "Robert attends the meeting and approves any follow-up, build scope, or equity-for-services discussion.",
         "lane_id": "evtit_blackdog_inkind",
         "name": "EVTit / Black Dog in-kind engineering fund",
         "priority": 1,
         "readiness_mode": "MEETING_PREP_READY_FINAL_TERMS_BLOCKED"
+      },
+      {
+        "audience": "federal lab technology-transfer reviewer",
+        "claim_boundary": "This is a POC routing response only; no LANL license, partnership, endorsement, or technical validation is claimed.",
+        "first_artifact": "grant_submissions/funding_sprint_20260709/TRACTION_OPPORTUNITY_INTAKE_LEDGER_2026-07-09.md",
+        "human_gate": "Robert approves any lab POC reply, NDA, licensing discussion, export-control response, or disclosure packet.",
+        "lane_id": "lanl_vision_licensing_followup",
+        "name": "LANL VISION licensing opportunity follow-up",
+        "priority": 2,
+        "readiness_mode": "LAB_POC_FOLLOWUP_READY_HUMAN_SEND_REQUIRED"
       },
       {
         "audience": "early investor",
@@ -167,6 +177,16 @@
         "name": "LvlUp Ventures First Check Fund",
         "priority": 2,
         "readiness_mode": "INVESTOR_WATCH_READY_RESPONSE_BLOCKED"
+      },
+      {
+        "audience": "patent counsel",
+        "claim_boundary": "This is not legal advice and does not assert patentability, ownership, deadline sufficiency, or filing entitlement.",
+        "first_artifact": "grant_submissions/funding_sprint_20260709/IP_COUNSEL_DILIGENCE_PACKET_2026-07-09.md",
+        "human_gate": "Licensed patent counsel and Robert decide any filing, continuation, PCT, disclosure, or claim strategy action.",
+        "lane_id": "uspto_georgia_patents_route",
+        "name": "USPTO / Georgia PATENTS pro bono routing",
+        "priority": 3,
+        "readiness_mode": "IP_PACKET_READY_COUNSEL_REQUIRED"
       },
       {
         "audience": "technical program reviewer",
@@ -197,36 +217,24 @@
         "name": "NASA Data Center Infrastructure RFI",
         "priority": 5,
         "readiness_mode": "RFI_DRAFT_READY_SEND_BLOCKED"
-      },
-      {
-        "audience": "SBIR reviewer",
-        "claim_boundary": "No DLA integration, procurement, or certified readiness claim.",
-        "first_artifact": "grant_submissions/funding_sprint_20260709/DSIP_MISSIONWEAVE_FAST_SUBMISSION_PLAN_2026-07-09.md",
-        "human_gate": "Robert controls DSIP or SBIR portal login, Firm PIN, cost approval, certifications, and final submit.",
-        "lane_id": "dla_missionweave_sbir",
-        "name": "DLA MissionWeave DSIP SBIR",
-        "priority": 6,
-        "readiness_mode": "SBIR_DRAFT_READY_PORTAL_BLOCKED"
-      },
-      {
-        "audience": "SBIR reviewer",
-        "claim_boundary": "No NSF invitation or full-proposal eligibility is represented unless NSF issues it.",
-        "first_artifact": "grant_submissions/funding_sprint_20260709/NSF_PROJECT_PITCH_DRAFT_2026-07-09.md",
-        "human_gate": "Robert verifies account status, platform-specific rules, one-pending-pitch limits, and final content before submit.",
-        "lane_id": "nsf_project_pitch",
-        "name": "NSF SBIR/STTR Project Pitch",
-        "priority": 7,
-        "readiness_mode": "ROLLING_GATE_READY_RULE_CHECK_REQUIRED"
       }
     ],
     "urgent_docket_items": [
       {
         "action_due": "2026-07-09",
         "docket_action": "Prepare call packet and proof walkthrough.",
-        "human_gate": "Human attends meeting and decides any equity-for-services terms.",
+        "human_gate": "Human approves any follow-up send, scheduling, equity-for-services discussion, or services terms.",
         "name": "EVTit / Black Dog in-kind engineering fund",
         "priority": 1,
-        "status": "LIVE_MEETING_PREP"
+        "status": "OUTBOUND_FOLLOWUPS_SENT_NO_INBOUND_REPLY"
+      },
+      {
+        "action_due": "2026-07-13",
+        "docket_action": "Prepare concise licensing-fit note and technical questions for the named LANL POC return window.",
+        "human_gate": "Human approves any LANL reply, NDA, licensing discussion, export-control response, or disclosure package.",
+        "name": "LANL VISION licensing opportunity follow-up",
+        "priority": 2,
+        "status": "OUTBOUND_SENT_RESPONSE_PENDING"
       },
       {
         "action_due": "2026-07-16",
@@ -234,31 +242,23 @@
         "human_gate": "Human approves any diligence reply or investor terms.",
         "name": "LvlUp Ventures First Check Fund",
         "priority": 2,
-        "status": "WAITING_REVIEW"
+        "status": "WRITTEN_NO_SPONSOR_SPEND_INDEPENDENT_REVIEW_CONFIRMED"
       },
       {
-        "action_due": "2026-07-12",
-        "docket_action": "Build full-proposal compliance matrix and confirm controlling BAA instructions.",
-        "human_gate": "Human confirms BAA requirements, reps, budgets, and submission package before any portal action.",
-        "name": "DARPA DICE full proposal sprint",
+        "action_due": "2026-07-21",
+        "docket_action": "Confirm model/session provenance, deploy the public demo, record the public video, and populate the Devpost draft without final submission.",
+        "human_gate": "Human logs in or registers with Devpost, reviews publicity/IP terms and every populated field, and approves the final submission action.",
+        "name": "OpenAI Build Week - ProofLock Console",
+        "priority": 2,
+        "status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN"
+      },
+      {
+        "action_due": "2026-07-10",
+        "docket_action": "Prepare Georgia PATENTS intake packet and counsel questions.",
+        "human_gate": "Human and licensed counsel decide any filing, claim, continuation, PCT, disclosure, or legal strategy.",
+        "name": "USPTO / Georgia PATENTS pro bono routing",
         "priority": 3,
-        "status": "FULL_PROPOSAL_SPRINT"
-      },
-      {
-        "action_due": "2026-08-03",
-        "docket_action": "Convert the current outline into a human-review package with compliance checklist, pricing stop, and source attachment check.",
-        "human_gate": "Human verifies SAM attachments, terms, pricing, reps/certs, and final submission authority.",
-        "name": "FHWA TSMO Data Initiative",
-        "priority": 4,
-        "status": "PHASE_I_TECH_VOLUME"
-      },
-      {
-        "action_due": "2026-07-17",
-        "docket_action": "Prepare a bounded response draft and verify official response instructions before send.",
-        "human_gate": "Human verifies official response instructions, page limits, contacts, and final send.",
-        "name": "NASA Data Center Infrastructure RFI",
-        "priority": 5,
-        "status": "RFI_RESPONSE_PREP"
+        "status": "OUTBOUND_SENT_INTAKE_RESPONSE_PENDING"
       }
     ]
   },
@@ -271,19 +271,20 @@
   "schema": "linkedin_universe_profile_packet_v1",
   "status": "LINKEDIN_UNIVERSE_PROFILE_READY_HUMAN_POST_REQUIRED",
   "summary": {
-    "about_character_count": 1263,
+    "about_character_count": 1264,
     "all_final_actions_blocked_without_human": true,
-    "control_artifact_count": 16,
-    "decision_lane_count": 15,
+    "control_artifact_count": 56,
+    "decision_lane_count": 19,
     "featured_link_count": 3,
     "headline_character_count": 123,
     "linkedin_public_action_requires_human": true,
-    "manifested_markdown_count": 26,
+    "manifested_markdown_count": 104,
     "post_template_count": 3,
     "public_copy_sensitive_count": 0,
     "public_copy_unsafe_count": 0,
-    "qa_count": 12,
-    "reviewer_gate_clear": true,
-    "skill_count": 15
+    "qa_count": 14,
+    "reviewer_packaging_gate_clear": true,
+    "skill_count": 15,
+    "submission_argument_gate_clear": false
   }
 }

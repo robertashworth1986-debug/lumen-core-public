@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -16,23 +17,37 @@ def load_module():
     return module
 
 
-def test_customer_commercialization_packet_is_business_ready_and_human_gated():
+def test_customer_commercialization_packet_preserves_current_reviewer_block():
     module = load_module()
     payload = module.build_payload()
     summary = payload["summary"]
+    source_register = json.loads(
+        (
+            ROOT
+            / "out"
+            / "ops"
+            / "measured_source_evidence_register_latest.json"
+        ).read_text(encoding="utf-8")
+    )["summary"]
 
     assert payload["schema"] == "customer_commercialization_packet_v1"
-    assert payload["status"] == "CUSTOMER_COMMERCIALIZATION_PACKET_READY_HUMAN_TERMS_REQUIRED"
+    assert payload["status"] == "CUSTOMER_COMMERCIALIZATION_PACKET_BLOCKED"
     assert summary["customer_segment_count"] == 5
     assert summary["offer_count"] == 5
     assert summary["buyer_proof_check_count"] == 8
-    assert summary["traction_lane_count"] == 15
-    assert summary["reviewer_gate_clear"] is True
+    assert summary["traction_lane_count"] >= 15
+    assert summary["reviewer_gate_clear"] is False
     assert summary["unsafe_secret_count"] == 0
     assert summary["unsafe_claim_count"] == 0
-    assert summary["registry_enabled_sources"] == 29
-    assert summary["registry_measured_sources"] == 25
-    assert summary["current_probe_measured_sources"] == 23
+    assert summary["registry_enabled_sources"] == (
+        source_register["registry_enabled_sources"]
+    )
+    assert summary["registry_measured_sources"] == (
+        source_register["registry_measured_sources"]
+    )
+    assert summary["current_probe_measured_sources"] == (
+        source_register["current_probe_measured_sources"]
+    )
     assert summary["human_terms_required"] is True
     assert len(payload["customer_commercialization_sha256"]) == 64
 

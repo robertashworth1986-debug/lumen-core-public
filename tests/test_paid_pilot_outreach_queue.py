@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -16,101 +17,153 @@ def load_module():
     return module
 
 
-def test_paid_pilot_queue_builds_ranked_actionable_rows():
-    module = load_module()
-    payload = module.build_payload()
-    summary = payload["summary"]
-    queue = payload["queue"]
+def build_fixture_payload(module):
+    legacy_source = {
+        "schema": "proof_to_pilot_control_room_v2",
+        "top_cards": [
+            {
+                "family_id": "legacy_geometry_candidate",
+                "commercial_stage": "manual_paid_pilot_outreach_ready",
+                "recipient_email": "must-not-propagate@example.test",
+                "claimed_savings": 99_999_999,
+            }
+        ],
+    }
+    return module.build_payload(
+        control_room=legacy_source,
+        generated_utc="2026-07-29T12:00:00+00:00",
+    )
 
-    assert payload["schema"] == "paid_pilot_outreach_queue_v1"
-    assert summary["proof_card_count"] == 2
-    assert summary["ready_proof_card_count"] == 2
-    assert summary["queue_count"] == 12
-    assert summary["top_ranked_target"] == "utility_grid_analytics"
-    assert summary["unique_lanes"] == ["optimal_curve_transport", "wave_resonance_timing"]
+
+def test_v2_queue_is_local_protocol_review_scoping_only():
+    module = load_module()
+    payload = build_fixture_payload(module)
+    summary = payload["summary"]
+
+    assert payload["schema"] == "paid_pilot_outreach_queue_v2"
+    assert payload["inputs"]["source_schema_observed"] == "proof_to_pilot_control_room_v2"
+    assert payload["inputs"]["source_used_for_performance_claims"] is False
+    assert payload["inputs"]["source_used_for_target_or_recipient_selection"] is False
+
+    assert summary["queue_count"] == 2
+    assert summary["local_scope_count"] == 2
+    assert summary["performance_champion_count"] == 0
+    assert summary["recipient_selected_count"] == 0
+    assert summary["send_ready_target_count"] == 0
+    assert summary["manual_outreach_ready_count"] == 0
+    assert summary["manual_reviewed_outreach_allowed"] is False
+    assert summary["bulk_outreach_allowed"] is False
+    assert summary["geometry_performance_claim_inherited"] is False
     assert len(summary["queue_chain_sha256"]) == 64
 
-    ranks = [row["rank"] for row in queue]
-    assert ranks == list(range(1, 13))
-    assert queue[0]["family_id"] == "brachistochrone_descent"
-    assert queue[0]["buyer_role"] == "Director of Grid Analytics"
-    assert "20-minute technical fit call" in queue[0]["primary_ask"]
-    assert "positive frozen replay windows" in queue[0]["proof_line"]
-    assert len(queue[0]["row_sha256"]) == 64
 
-
-def test_paid_pilot_queue_has_both_current_champion_lanes():
+def test_service_ranges_are_exact_and_not_roi_value_or_savings():
     module = load_module()
-    payload = module.build_payload()
-    rows_by_family = {}
-    for row in payload["queue"]:
-        rows_by_family.setdefault(row["family_id"], []).append(row)
+    payload = build_fixture_payload(module)
+    pricing = payload["service_pricing_boundary"]
+    rows = {row["service_id"]: row for row in payload["queue"]}
 
-    assert set(rows_by_family) == {"brachistochrone_descent", "kuramoto_phase_coupling"}
-    assert len(rows_by_family["brachistochrone_descent"]) == 6
-    assert len(rows_by_family["kuramoto_phase_coupling"]) == 6
-    assert any(row["target_segment"] == "datacenter_cooling_optimization" for row in rows_by_family["brachistochrone_descent"])
-    assert any(row["target_segment"] == "energy_forecasting" for row in rows_by_family["kuramoto_phase_coupling"])
+    assert pricing["protocol_review_usd"] == {"min": 2500, "max": 7500}
+    assert pricing["optional_benchmark_implementation_usd"] == {
+        "min": 7500,
+        "max": 25000,
+    }
+    assert pricing["prices_are_service_fees_only"] is True
+    assert pricing["prices_are_roi_or_value"] is False
+    assert pricing["prices_are_savings_estimates"] is False
 
-    for row in payload["queue"]:
-        assert row["manual_review_required"] is True
-        assert row["send_now_allowed"] is False
-        assert row["organization_search_phrase"]
-        assert row["measured_outcome"]
-        assert row["data_room_artifacts"]
+    assert rows["protocol_review"]["price_min"] == 2500
+    assert rows["protocol_review"]["price_max"] == 7500
+    assert rows["optional_benchmark_implementation"]["price_min"] == 7500
+    assert rows["optional_benchmark_implementation"]["price_max"] == 25000
+
+    for row in rows.values():
+        assert row["roi_or_value_claim_allowed"] is False
+        assert row["savings_claim_allowed"] is False
+        assert row["field_validation_claim_allowed"] is False
+        assert row["performance_champion"] is False
+        assert row["geometry_performance_claim_inherited"] is False
+        assert "not ROI, savings, enterprise value" in row["pricing_boundary"]
 
 
-def test_paid_pilot_queue_blocks_bulk_outreach_and_overclaims():
+def test_every_external_action_and_claim_gate_fails_closed():
     module = load_module()
-    payload = module.build_payload()
-    summary = payload["summary"]
-    gate = payload["send_gate"]
+    payload = build_fixture_payload(module)
+    gate = payload["external_action_gate"]
 
-    assert summary["manual_reviewed_outreach_allowed"] is True
-    assert summary["bulk_email_allowed"] is False
-    assert summary["contact_scraping_allowed"] is False
-    assert summary["send_without_user_review_allowed"] is False
-    assert summary["fixed_dollar_delta_claim_allowed"] is False
-    assert summary["field_validation_claim_allowed"] is False
-    assert summary["realized_savings_claim_allowed"] is False
-    assert summary["live_trading_or_autonomous_execution_allowed"] is False
-
-    assert gate["manual_reviewed_outreach_allowed"] is True
-    assert gate["bulk_email_allowed"] is False
-    assert gate["contact_scraping_allowed"] is False
-    assert gate["send_without_user_review_allowed"] is False
-    assert gate["requires_valid_physical_address"] is True
-    assert gate["requires_opt_out_language"] is True
-    assert gate["requires_per_recipient_fit_review"] is True
+    assert gate["state"] == "blocked_local_scoping_only"
+    assert gate["outreach_allowed"] is False
+    assert gate["manual_outreach_allowed"] is False
+    assert gate["bulk_outreach_allowed"] is False
+    assert gate["send_without_action_time_approval_allowed"] is False
+    assert gate["current_official_source_verification_required"] is True
+    assert gate["full_thread_and_sent_mail_duplicate_check_required"] is True
+    assert gate["exact_recipient_and_authority_verification_required"] is True
+    assert gate["scope_claims_and_pricing_revalidation_required"] is True
+    assert gate["data_rights_and_baselines_confirmation_required"] is True
+    assert gate["action_time_human_approval_required"] is True
 
     for row in payload["queue"]:
-        blocked = " ".join(row["blocked_positioning"]).lower()
-        assert "guaranteed savings" in blocked
-        assert "field validated" in blocked
-        assert "$10k per frozen delta" in blocked
+        assert row["target_selected"] is False
+        assert row["target_organization"] == ""
+        assert row["recipient_selected"] is False
+        assert row["recipient_name"] == ""
+        assert row["recipient_email"] == ""
+        assert row["send_ready"] is False
+        assert row["outreach_allowed"] is False
+        assert row["bulk_or_manual_outreach_allowed"] is False
+        assert len(row["row_sha256"]) == 64
 
 
-def test_paid_pilot_queue_markdown_and_csv_are_safe_surfaces(tmp_path):
+def test_legacy_card_claims_and_recipient_do_not_propagate():
     module = load_module()
-    payload = module.build_payload()
-    rendered = module.render_markdown(payload)
+    payload = build_fixture_payload(module)
+    serialized = json.dumps(payload, sort_keys=True).lower()
+
+    assert "legacy_geometry_candidate" not in serialized
+    assert "must-not-propagate" not in serialized
+    assert "99999999" not in serialized
+    assert "positive frozen replay windows" not in serialized
+    assert "current champion" not in serialized
+    assert "send-ready" in serialized
+    assert "does not identify a performance champion" in serialized
+
+
+def test_writes_can_be_fully_redirected_to_temporary_outputs(tmp_path):
+    module = load_module()
+    payload = build_fixture_payload(module)
+    json_path = tmp_path / "queue.json"
     csv_path = tmp_path / "queue.csv"
-    module.write_csv(csv_path, payload["queue"])
+    markdown_path = tmp_path / "queue.md"
+    dashboard_path = tmp_path / "dashboard.json"
+
+    module.write_outputs(
+        payload,
+        json_path=json_path,
+        csv_path=csv_path,
+        markdown_path=markdown_path,
+        dashboard_json_path=dashboard_path,
+    )
+
+    assert json.loads(json_path.read_text(encoding="utf-8")) == payload
+    assert json.loads(dashboard_path.read_text(encoding="utf-8")) == payload
+
     csv_text = csv_path.read_text(encoding="utf-8")
+    rendered = markdown_path.read_text(encoding="utf-8")
+    assert "local_protocol_review_scope" in csv_text
+    assert "local_optional_benchmark_implementation_scope" in csv_text
+    assert "Local Protocol-Review Scoping Queue" in rendered
+    assert "Performance champions: `0`" in rendered
+    assert "Recipients selected: `0`" in rendered
+    assert "Send-ready targets: `0`" in rendered
+    assert "Manual outreach allowed: `false`" in rendered
+    assert "Bulk outreach allowed: `false`" in rendered
+    assert "Field-validation claim allowed: `false`" in rendered
+    assert "Savings claim allowed: `false`" in rendered
+    assert "action-time human approval" in rendered.lower()
+    assert "complete thread and Sent mail" in rendered
 
-    assert "Paid Pilot Outreach Queue" in rendered
-    assert "Queue rows: `12`" in rendered
-    assert "Bulk email allowed: `false`" in rendered
-    assert "Contact scraping allowed: `false`" in rendered
-    assert "Fixed-dollar delta claim allowed: `false`" in rendered
-    assert "Send now allowed: `false`" in rendered
-    assert "utility_grid_analytics" in csv_text
-    assert "energy_forecasting" in csv_text
-    assert "row_sha256" in csv_text
-
-    rendered_lower = rendered.lower()
-    assert "guaranteed alpha" in rendered_lower
-    assert "contact scraping" in rendered_lower
-    assert ("api" + "_key") not in rendered_lower
-    assert "client" + "_sec" + "ret" not in rendered_lower
-    assert "live_order_placement" not in rendered_lower
+    lowered = (csv_text + rendered).lower()
+    assert "must-not-propagate" not in lowered
+    assert ("api" + "_key") not in lowered
+    assert "client" + "_sec" + "ret" not in lowered

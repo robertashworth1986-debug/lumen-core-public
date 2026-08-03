@@ -16,6 +16,10 @@ REGISTRY_JSON = ROOT / "config" / "live_source_registry.json"
 MAXIMIZER_JSON = OUT_OPS / "live_source_measurement_maximizer_latest.json"
 GEOMETRY_MANIFEST_JSON = OUT_OPS / "geometry_live_source_manifest_latest.json"
 CLAIM_MAP_JSON = OUT_OPS / "claim_strength_value_unlock_map_latest.json"
+KURAMOTO_BENCHMARK_JSON = OUT_OPS / "kuramoto_cross_sector_benchmark_latest.json"
+KURAMOTO_BENCHMARK_MANIFEST_JSON = (
+    OUT_OPS / "kuramoto_cross_sector_benchmark_manifest_latest.json"
+)
 EDGE_INDEX_MD = SPRINT_DIR / "PROOF_STACK_EDGE_INDEX_2026-07-09.md"
 
 OUT_JSON = OUT_OPS / "measured_source_evidence_register_latest.json"
@@ -205,11 +209,60 @@ def reviewer_use(row: dict[str, Any]) -> str:
     return "Source inventory context for reviewer diligence."
 
 
+def kuramoto_benchmark_state(
+    benchmark: dict[str, Any], manifest: dict[str, Any]
+) -> dict[str, Any]:
+    gates = benchmark.get("gates", {}) if isinstance(benchmark.get("gates"), dict) else {}
+    anchors = rows_from(benchmark, "anchored_results")
+    evidence_sha = str(benchmark.get("evidence_chain_sha256") or "")
+    manifest_evidence_sha = str(manifest.get("evidence_chain_sha256") or "")
+    integrity_pass = (
+        benchmark.get("schema") == "lumencore.kuramoto_cross_sector_benchmark.v1"
+        and manifest.get("schema")
+        == "lumencore.kuramoto_cross_sector_benchmark_manifest.v1"
+        and len(evidence_sha) == 64
+        and evidence_sha == manifest_evidence_sha
+        and len(str(manifest.get("artifact_chain_sha256") or "")) == 64
+        and int(gates.get("admitted_source_count") or 0) > 0
+        and int(gates.get("total_evaluation_origin_count") or 0) > 0
+    )
+    anchor_negative = any(
+        row.get("status") == "NEGATIVE_KURAMOTO_EVIDENCE" for row in anchors
+    )
+    return {
+        "present": bool(benchmark) and bool(manifest),
+        "integrity_pass": integrity_pass,
+        "status": str(benchmark.get("status") or ""),
+        "evidence_chain_sha256": evidence_sha,
+        "artifact_chain_sha256": str(manifest.get("artifact_chain_sha256") or ""),
+        "admitted_source_count": int(gates.get("admitted_source_count") or 0),
+        "anchored_benchmark_count": int(gates.get("anchored_benchmark_count") or 0),
+        "evaluation_origin_count": int(gates.get("total_evaluation_origin_count") or 0),
+        "protocol_matched_strategy_count": int(
+            gates.get("protocol_matched_strategy_count") or 0
+        ),
+        "positive_exploratory_sector_count": int(
+            gates.get("positive_exploratory_sector_count") or 0
+        ),
+        "sector_gain_proven_count": int(gates.get("sector_gain_proven_count") or 0),
+        "frozen_eia_anchor_negative": anchor_negative,
+        "cross_sector_efficiency_claim_allowed": bool(
+            gates.get("cross_sector_efficiency_claim_allowed")
+        ),
+        "realized_savings_claim_allowed": bool(
+            gates.get("realized_savings_claim_allowed")
+        ),
+        "claim_boundary": str(benchmark.get("claim_boundary") or ""),
+    }
+
+
 def build_payload() -> dict[str, Any]:
     registry = read_json(REGISTRY_JSON)
     maximizer = read_json(MAXIMIZER_JSON)
     geometry = read_json(GEOMETRY_MANIFEST_JSON)
     claim_map = read_json(CLAIM_MAP_JSON)
+    kuramoto_benchmark = read_json(KURAMOTO_BENCHMARK_JSON)
+    kuramoto_manifest = read_json(KURAMOTO_BENCHMARK_MANIFEST_JSON)
 
     registry_rows = rows_from(registry, "rows")
     provider_rows = rows_from(maximizer, "provider_rows")
@@ -243,13 +296,22 @@ def build_payload() -> dict[str, Any]:
 
     geometry_summary = geometry.get("summary", {}) if isinstance(geometry.get("summary"), dict) else {}
     claim_summary = claim_map.get("summary", {}) if isinstance(claim_map.get("summary"), dict) else {}
+    kuramoto_state = kuramoto_benchmark_state(
+        kuramoto_benchmark, kuramoto_manifest
+    )
 
     payload = {
         "generated_utc": now_utc(),
         "schema": "measured_source_evidence_register_v1",
-        "status": "MEASURED_SOURCE_REGISTER_READY_RECONCILIATION_REQUIRED"
-        if reconciliation_required
-        else "MEASURED_SOURCE_REGISTER_READY",
+        "status": (
+            "MEASURED_SOURCE_REGISTER_BLOCKED_BENCHMARK_INTEGRITY"
+            if not kuramoto_state["integrity_pass"]
+            else (
+                "MEASURED_SOURCE_REGISTER_READY_RECONCILIATION_REQUIRED"
+                if reconciliation_required
+                else "MEASURED_SOURCE_REGISTER_READY"
+            )
+        ),
         "summary": {
             "registry_total_sources": registry_counts["total_sources"],
             "registry_enabled_sources": registry_counts["enabled_sources"],
@@ -277,7 +339,41 @@ def build_payload() -> dict[str, Any]:
             "current_probe_source_generated_utc": str(maximizer.get("generated_utc") or ""),
             "geometry_manifest_unique_source_count": int(geometry_summary.get("unique_source_count") or 0),
             "geometry_manifest_row_count": int(geometry_summary.get("manifest_row_count") or 0),
+            "geometry_manifest_discovered_row_count": int(
+                geometry_summary.get("discovered_manifest_row_count")
+                or geometry_summary.get("manifest_row_count")
+                or 0
+            ),
+            "geometry_manifest_omitted_row_count": int(
+                geometry_summary.get("manifest_rows_omitted_count") or 0
+            ),
             "claim_map_safe_estimated_annual_value_usd": float(claim_summary.get("safe_estimated_annual_value_usd") or 0.0),
+            "kuramoto_benchmark_integrity_pass": kuramoto_state["integrity_pass"],
+            "kuramoto_benchmark_status": kuramoto_state["status"],
+            "kuramoto_admitted_source_count": kuramoto_state[
+                "admitted_source_count"
+            ],
+            "kuramoto_evaluation_origin_count": kuramoto_state[
+                "evaluation_origin_count"
+            ],
+            "kuramoto_protocol_matched_strategy_count": kuramoto_state[
+                "protocol_matched_strategy_count"
+            ],
+            "kuramoto_positive_exploratory_sector_count": kuramoto_state[
+                "positive_exploratory_sector_count"
+            ],
+            "kuramoto_sector_gain_proven_count": kuramoto_state[
+                "sector_gain_proven_count"
+            ],
+            "kuramoto_frozen_eia_anchor_negative": kuramoto_state[
+                "frozen_eia_anchor_negative"
+            ],
+            "kuramoto_cross_sector_efficiency_claim_allowed": kuramoto_state[
+                "cross_sector_efficiency_claim_allowed"
+            ],
+            "kuramoto_realized_savings_claim_allowed": kuramoto_state[
+                "realized_savings_claim_allowed"
+            ],
             "field_validation_claim_allowed": False,
             "realized_savings_claim_allowed": False,
             "award_value_claim_allowed": False,
@@ -290,12 +386,21 @@ def build_payload() -> dict[str, Any]:
             "current_probe": sector_counts(provider_rows),
         },
         "source_rows": register_rows,
+        "kuramoto_benchmark": kuramoto_state,
         "claim_policy": {
             "allowed": [
-                "30-source registry inventory with 29 currently enabled sources",
+                (
+                    f"{registry_counts['total_sources']}-source canonical registry "
+                    f"with {registry_counts['enabled_sources']} currently enabled sources"
+                ),
+                (
+                    f"{len(register_rows)} merged source rows across the canonical "
+                    "registry and current probe"
+                ),
                 "current-probe measured source rows when snapshot hashes are present",
                 "bounded estimated-value context under stated assumptions",
                 "source coverage for reviewer diligence and benchmark routing",
+                "the current governed Kuramoto comparison reports zero proven sector gains",
             ],
             "blocked": [
                 "field validation",
@@ -304,6 +409,8 @@ def build_payload() -> dict[str, Any]:
                 "source authority",
                 "trading profit",
                 "autonomous execution approval",
+                "Kuramoto cross-sector efficiency",
+                "Kuramoto-attributable dollar savings",
             ],
             "reconciliation_note": (
                 "The registry is a merged continuity layer. The current probe array is the latest measurement run. "
@@ -316,6 +423,8 @@ def build_payload() -> dict[str, Any]:
             artifact_status(MAXIMIZER_JSON),
             artifact_status(GEOMETRY_MANIFEST_JSON),
             artifact_status(CLAIM_MAP_JSON),
+            artifact_status(KURAMOTO_BENCHMARK_JSON),
+            artifact_status(KURAMOTO_BENCHMARK_MANIFEST_JSON),
             artifact_status(EDGE_INDEX_MD),
         ],
         "outputs": {
@@ -360,7 +469,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Registry measured without snapshot hash: `{', '.join(summary['registry_measured_without_snapshot_hash'])}`",
         f"- Reconciliation required: `{str(summary['reconciliation_required']).lower()}`",
         f"- Geometry manifest unique sources: `{summary['geometry_manifest_unique_source_count']}`",
-        f"- Geometry manifest rows: `{summary['geometry_manifest_row_count']}`",
+        f"- Geometry manifest materialized rows: `{summary['geometry_manifest_row_count']}`",
+        f"- Geometry manifest discovered rows: `{summary['geometry_manifest_discovered_row_count']}`",
+        f"- Geometry manifest omitted rows disclosed: `{summary['geometry_manifest_omitted_row_count']}`",
         f"- Field validation claim allowed: `{str(summary['field_validation_claim_allowed']).lower()}`",
         f"- Customer outcome value claim allowed: `{str(summary['realized_savings_claim_allowed']).lower()}`",
         f"- Award value claim allowed: `{str(summary['award_value_claim_allowed']).lower()}`",
@@ -371,6 +482,23 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Reconciliation Note",
         "",
         payload["claim_policy"]["reconciliation_note"],
+        "",
+        "## Current Kuramoto Head-to-Head",
+        "",
+        f"- Integrity pass: `{str(summary['kuramoto_benchmark_integrity_pass']).lower()}`",
+        f"- Status: `{summary['kuramoto_benchmark_status']}`",
+        f"- Measured retrospective sources: `{summary['kuramoto_admitted_source_count']}`",
+        f"- Rolling evaluation origins: `{summary['kuramoto_evaluation_origin_count']}`",
+        f"- Protocol-matched strategies: `{summary['kuramoto_protocol_matched_strategy_count']}`",
+        f"- Positive exploratory sectors: `{summary['kuramoto_positive_exploratory_sector_count']}`",
+        f"- Proven sector gains: `{summary['kuramoto_sector_gain_proven_count']}`",
+        f"- Frozen EIA anchor is negative: `{str(summary['kuramoto_frozen_eia_anchor_negative']).lower()}`",
+        f"- Cross-sector efficiency claim allowed: `{str(summary['kuramoto_cross_sector_efficiency_claim_allowed']).lower()}`",
+        f"- Realized-savings claim allowed: `{str(summary['kuramoto_realized_savings_claim_allowed']).lower()}`",
+        f"- Evidence chain SHA-256: `{payload['kuramoto_benchmark']['evidence_chain_sha256']}`",
+        f"- Artifact chain SHA-256: `{payload['kuramoto_benchmark']['artifact_chain_sha256']}`",
+        "",
+        "The current result is negative evidence: it narrows the next external test and must not be rewritten as a performance or economic win.",
         "",
         "## Allowed Language",
         "",

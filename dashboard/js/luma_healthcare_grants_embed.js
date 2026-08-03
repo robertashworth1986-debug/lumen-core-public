@@ -17,6 +17,9 @@
   const ACTION_LABELS = {
     IMMEDIATE_SUBMIT: 'Urgent Review',
     FAST_TRACK: 'Priority Review',
+    URGENT_REVIEW: 'Urgent Review',
+    EXPEDITED_REVIEW: 'Priority Review',
+    ACTIVE_REVIEW: 'Review Queue',
     ACTIVE_PIPELINE: 'Review Queue',
     WATCHLIST: 'Watchlist',
     MANUAL_REVIEW: 'Manual Review',
@@ -462,7 +465,10 @@
     const summary = payload.summary || {};
     const close7 = toNum(summary.close_7_days, 0);
     const close14 = toNum(summary.close_14_days, 0);
-    const immediate = toNum(summary.immediate_or_fast, 0);
+    const immediate = toNum(
+      summary.urgent_or_expedited_review ?? summary.immediate_or_fast,
+      0,
+    );
     const headlineMetrics = `${close7} close <=7d | ${close14} close <=14d | ${immediate} urgent/priority review`;
     const linkTarget = opts.newTab ? '_blank' : '_self';
     const linkRel = opts.newTab ? 'noopener noreferrer' : '';
@@ -470,18 +476,19 @@
     const itemsHtml = rows.length
       ? rows.map((row, index) => {
           const links = row.links || {};
-          const submitUrl = String(links.primary_submit_url || '').trim();
-          const aiUrl = joinUrl(opts.consoleBase, links.ai_fill_query);
+          const reviewUrl = String(
+            links.official_source_review_url || links.source_url || '',
+          ).trim();
           const consoleUrl = joinUrl(opts.consoleBase, links.grant_console_query);
-          const route = labelForRoute(links.submit_route || 'route_unknown');
+          const route = labelForRoute(links.review_route || 'route_unknown');
           const score = toNum((row.scores || {}).composite, 0).toFixed(1);
           const days = toNum(row.days_to_close, 0);
           const action = labelForAction(row.action || 'manual_review');
           const number = String(row.number || '').trim();
           const rank = toNum(row.rank, index + 1);
           const close = closingWindow(days);
-          const submitDisabledClass = submitUrl ? '' : ' luma-hc-btn--disabled';
-          const submitHref = submitUrl || '#';
+          const reviewDisabledClass = reviewUrl ? '' : ' luma-hc-btn--disabled';
+          const reviewHref = reviewUrl || '#';
 
           return `
             <article class="luma-hc-item">
@@ -498,9 +505,8 @@
                 <span class="luma-hc-badge">${esc(route)}</span>
               </div>
               <div class="luma-hc-actions">
-                <a class="luma-hc-btn luma-hc-btn--primary${submitDisabledClass}" href="${esc(submitHref)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}" aria-disabled="${submitUrl ? 'false' : 'true'}">Review Official Source</a>
-                <a class="luma-hc-btn luma-hc-btn--ai" href="${esc(aiUrl)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}">Draft Workspace</a>
-                <a class="luma-hc-btn" href="${esc(consoleUrl)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}">Opportunity Console</a>
+                <a class="luma-hc-btn luma-hc-btn--primary${reviewDisabledClass}" href="${esc(reviewHref)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}" aria-disabled="${reviewUrl ? 'false' : 'true'}">Review Official Source</a>
+                <a class="luma-hc-btn luma-hc-btn--ai" href="${esc(consoleUrl)}" target="${esc(linkTarget)}" rel="${esc(linkRel)}">Draft Workspace</a>
               </div>
             </article>
           `;

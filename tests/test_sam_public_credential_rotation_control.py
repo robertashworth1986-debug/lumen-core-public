@@ -191,8 +191,12 @@ def test_live_probe_uses_recent_opportunity_window_to_avoid_no_data_false_negati
     result = module.probe_sam_api_key(
         "test-secret", as_of_date=module.date(2026, 7, 17), opener=opener
     )
-    query = urllib.parse.parse_qs(urllib.parse.urlsplit(captured["url"]).query)
+    parsed_url = urllib.parse.urlsplit(captured["url"])
+    query = urllib.parse.parse_qs(parsed_url.query)
 
+    assert parsed_url.scheme == "https"
+    assert parsed_url.netloc == "api.sam.gov"
+    assert parsed_url.path == "/opportunities/v2/search"
     assert query == {
         "api_key": ["test-secret"],
         "limit": ["1"],

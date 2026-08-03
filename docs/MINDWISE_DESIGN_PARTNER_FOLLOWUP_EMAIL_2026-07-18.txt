@@ -1,14 +1,16 @@
-Subject: MindWise x Luma: measurable 30-day grant-operations pilot
+DRAFT ONLY - RECIPIENT NOT SELECTED - DO NOT SEND
 
-Hi Kishore,
+Subject: Bounded 30-day opportunity-operations pilot
 
-I appreciated your earlier response to the MindWise grant-flow demo. I took a harder look at what is actually differentiated and ready to measure.
+Hi [Name],
+
+I am reaching out only after confirming that your current workflow and source permissions fit a bounded pilot.
 
 The strongest next step is not another broad AI-writing demo. It is a bounded 30-day design-partner pilot for opportunity operations: permitted-source monitoring, evidence-linked eligibility review, reviewer-ready draft structure, attachment/blocker preflight, and a replayable receipt for every material decision. Final certifications and submissions remain with your authorized team.
 
-In week one, we would measure your current workflow and lock the baseline. During the pilot we would track qualified-match precision, time to pursue/no-pursue, time to reviewer-ready draft, preflight defects, deadline reliability, and provenance completeness. Phase 1 would use no PHI.
+In week one, we would freeze your baseline, denominators, thresholds, and cutoff. The default minimum sample is 30 reviewed opportunities and 5 pursued packages. The pilot excludes PHI, credentials, legal advice, and autonomous submission.
 
-If the measured results do not justify continuing, we stop. If they do, we convert the proven workflow into a MindWise subscription or customer-facing add-on under terms we agree together.
+If the prospectively approved metrics do not justify continuing, we stop or document why the sample was insufficient. If they do, we can discuss a separately approved subscription under terms agreed after measurement.
 
 Would you be open to a 20-minute scoping call next week to choose one workflow and one baseline?
 

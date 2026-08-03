@@ -21,7 +21,7 @@
       "mode": "proof_factory"
     }
   ],
-  "autonomous_quant_governance_packet_sha256": "10827112918b87598de4c2c331a1e1f744994e42f4fc931bd3ea2a9df59f33da",
+  "autonomous_quant_governance_packet_sha256": "4216f91d6d6043f38a05675788ef5fe1ac45880a7f5e2d670f6574134c9c47aa",
   "evidence_status": [
     {
       "bytes": 5263,
@@ -30,22 +30,22 @@
       "sha256": "050f64e5c86a866a3fd125e00911e4f3caeb387625f7c4386c355727ab3ac30a"
     },
     {
-      "bytes": 18765,
+      "bytes": 24099,
       "path": "grant_submissions/funding_sprint_20260709/SUBMISSION_AUTHORITY_MATRIX_2026-07-09.md",
       "present": true,
-      "sha256": "f7da4c6d1ad107a018b334e2ccd3bb03402620030d870691709d3f62d5236dcd"
+      "sha256": "cbd2ebec0acc44b92b5b16b96973675c19f5435c6ad521f8f15fb2b6a888b390"
     },
     {
-      "bytes": 13939,
+      "bytes": 23598,
       "path": "grant_submissions/funding_sprint_20260709/HUMAN_ACTION_DOCKET_2026-07-09.md",
       "present": true,
-      "sha256": "7cc8efb12dab2f8587a002b6418d3ab8a968c16ea7c3a0d2be49b219827d6672"
+      "sha256": "10f5206c8b65e329041c28caefec7f51c0744fcef70c0761b711470d62f13021"
     },
     {
-      "bytes": 6279,
+      "bytes": 17487,
       "path": "grant_submissions/funding_sprint_20260709/FUNDING_SPRINT_REVIEWER_GATE_2026-07-09.md",
       "present": true,
-      "sha256": "ef70be49e4a5356a82bbd223dbcfdb565b6a6dd68d488847e2712cb8d6e52754"
+      "sha256": "db8e56ed557b78bdd69fa27fddbc516eb4e00b2e4448fe24c030c393c52b9e1a"
     },
     {
       "bytes": 14975,
@@ -60,10 +60,10 @@
       "sha256": "4c206c4c8120a23c496b6f0aa1a46cd8df723b947e490ff1bfa88ed9c9c0a64a"
     },
     {
-      "bytes": 20076,
+      "bytes": 24801,
       "path": "code/autonomous_agent_manifest.py",
       "present": true,
-      "sha256": "4594995d9c16d8cee32acc8ef1056c0611ed93662a2e79a04fc8724f50c46112"
+      "sha256": "f74c0a5d09541ce5fe7e8a7f055220b99478f61d09a66715a651471e0ae3438f"
     },
     {
       "bytes": 489,
@@ -96,7 +96,7 @@
       "sha256": "d97e05feffecfe9d5059954f0da44897b4155fdcc26986bcbd99b44673bb5a39"
     }
   ],
-  "generated_utc": "2026-07-09T19:00:20.807784+00:00",
+  "generated_utc": "2026-07-26T22:11:34.755640+00:00",
   "human_gate": {
     "agency_action_allowed_without_human": false,
     "capital_movement_allowed_without_human": false,
@@ -193,7 +193,7 @@
         "auto_fire": false,
         "channel": "kraken",
         "id": "trade_ticket",
-        "name": "Live Trade Executor",
+        "name": "Trade Ticket Stager",
         "queue_source": "execution_approval_queue.json",
         "requires_approval": true
       }
@@ -253,7 +253,7 @@
     "allowed_mode_count": 4,
     "auto_fire_enabled_count": 0,
     "capital_movement_allowed": false,
-    "data_room_markdown_count": 27,
+    "data_room_markdown_count": 104,
     "evidence_artifact_count": 12,
     "execution_status_paper": true,
     "external_system_action_allowed_without_human": false,
@@ -261,9 +261,10 @@
     "global_runtime_paper": true,
     "missing_evidence_count": 0,
     "order_placement_allowed": false,
-    "reviewer_gate_clear": true,
+    "reviewer_packaging_gate_clear": true,
     "runtime_marker_count": 3,
     "runtime_marker_reconciliation_count": 2,
+    "submission_argument_gate_clear": false,
     "unsafe_claim_count": 0,
     "unsafe_sensitive_count": 0
   }

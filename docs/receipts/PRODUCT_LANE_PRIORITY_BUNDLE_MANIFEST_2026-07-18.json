@@ -1,48 +1,48 @@
 {
   "all_artifacts_present": true,
-  "artifact_count": 12,
+  "artifact_count": 14,
   "artifacts": [
     {
-      "bytes": 7620,
+      "bytes": 16726,
       "exists": true,
       "path": "config/product_lane_priority_v1.json",
-      "sha256": "0111b96c809926c76dde9632bf913c564eccd9ba66c5eccde02791cb9bc11d4e"
+      "sha256": "6112d8d2558386d702d222dfa318e3a64ccac9581753f9b57cede8bfac5f1807"
     },
     {
-      "bytes": 25688,
+      "bytes": 44563,
       "exists": true,
       "path": "code/ops/BUILD_PRODUCT_LANE_PRIORITY_ENGINE.py",
-      "sha256": "2bc5b0b4b646a1f149f35675b6aa3e27f2b9d488da492da88841185f3dfed8cb"
+      "sha256": "71d12a838db1f477eb716217e93f1f383b5523f484278c2ba126f669fd763ef3"
     },
     {
-      "bytes": 22211,
+      "bytes": 77616,
       "exists": true,
       "path": "dashboard/data/product_lane_priority_engine_20260718.json",
-      "sha256": "46eefb7dba19fd2e456196f7eb4b03a15c09715cb8b8cd8c7cbfecd69d126732"
+      "sha256": "c2c90bae1bf7372547d94651144eec777ca5d8a120b8d38f5e8e782b9800f896"
     },
     {
-      "bytes": 5098,
+      "bytes": 6040,
       "exists": true,
       "path": "docs/PRODUCT_LANE_PRIORITY_ENGINE_2026-07-18.md",
-      "sha256": "1f31d1fd4c99fd3cc0e492ebac53455b46c14550df4991795d121f16d47ce0f1"
+      "sha256": "9bf0686206bc39b210d6dd17c983597866bfd22f30ea48f89a56cfcb846711d1"
     },
     {
-      "bytes": 2219,
+      "bytes": 6443,
       "exists": true,
       "path": "docs/MINDWISE_PAID_DESIGN_PARTNER_PILOT_2026-07-18.md",
-      "sha256": "a97ea27d66a9d7daec43fa3956754b0d53d6227b473a7b0644ad80c157457fdf"
+      "sha256": "3fb888199d0a4f93e20f87a69bae452c375d1f456429fc7d632747afe787577e"
     },
     {
-      "bytes": 1237,
+      "bytes": 1222,
       "exists": true,
       "path": "docs/MINDWISE_DESIGN_PARTNER_FOLLOWUP_EMAIL_2026-07-18.txt",
-      "sha256": "4d482e7b0e28ac54a01c01401d4b42f51ab66d69ee1354fa0fbbccf4f6c7be40"
+      "sha256": "37a4ba9eaffa7b08d689b19ce1d08ce663b2a1b49058e8dddb0adc056f35d80d"
     },
     {
-      "bytes": 20526,
+      "bytes": 20535,
       "exists": true,
       "path": "dashboard/js/luma_healthcare_grants_embed.js",
-      "sha256": "06bae338860291aa13cff7a4617811a50797c3404ac875753068ce97796add2e"
+      "sha256": "e0d6904ffbb169cc32150b646fb21f2fb580bcb9759c82fa69982145dddb79d7"
     },
     {
       "bytes": 2855,
@@ -63,21 +63,33 @@
       "sha256": "3dba1326959c23bd14e99aeb236c61fd677dff98dd2bab226a094691e1ab4283"
     },
     {
-      "bytes": 5566,
+      "bytes": 11241,
       "exists": true,
       "path": "tests/test_product_lane_priority_engine.py",
-      "sha256": "96712c6d702e963468b3b2c4c6645187a748b3a2969cedeca0a017de682b9d2c"
+      "sha256": "ade92567ef5e1bf1b0c07e3a46e483b85a07afbff0d584d4b786f19336fec3c2"
     },
     {
-      "bytes": 7682,
+      "bytes": 9861,
       "exists": true,
       "path": "dashboard/data/mindwise_healthcare_candidate_feed_20260718.json",
-      "sha256": "b210ccba41c4cea3cd56e4fac61e4d44a11d52e59aa0b5867ae6d92ff9008e3f"
+      "sha256": "8562988baad034e0031bcb4d5f5a2bf7a76e6d24ac186d45f2e7d38c80f4cc27"
+    },
+    {
+      "bytes": 6131,
+      "exists": true,
+      "path": "config/prooflock_opportunity_ops_pilot_v1.json",
+      "sha256": "739fc35093e6b98242a0b286d30097a34516f4650058c8e42cc111173a621ede"
+    },
+    {
+      "bytes": 3077,
+      "exists": true,
+      "path": "dashboard/data/prooflock_opportunity_ops_golden_replay_v1.json",
+      "sha256": "da928a8cf3e6b98667485b2ec41b3271fda0e2649e175db1d635ac6be9161de6"
     }
   ],
   "boundary": "File receipts prove byte identity and presence only. They do not prove eligibility, correctness, independent validation, customer acceptance, award probability, or commercial value.",
-  "generated_utc": "2026-07-18T06:48:29.081740+00:00",
-  "manifest_payload_sha256": "7050d2003a1b57c90cf18ed53b30ab871b0eadacc69816ccd469286d086aa250",
-  "product_lane_priority_sha256": "380b3330e48562dd7d0bf2cc8fedc9afe6616e2a4a72dfa17a768b082bfb8b71",
+  "generated_utc": "2026-07-29T08:58:11.424285+00:00",
+  "manifest_payload_sha256": "ad1ee735717b898e35eacff64ab770a76d58d4d1d1945273f3ce9666d163b838",
+  "product_lane_priority_sha256": "c1b498c742ee03f7fd6ad15767f5459978a4825e58757dd4a0d731b7042019df",
   "schema": "product_lane_priority_bundle_manifest_v1"
 }

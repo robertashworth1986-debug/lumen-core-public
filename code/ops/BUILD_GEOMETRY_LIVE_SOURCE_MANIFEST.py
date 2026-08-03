@@ -253,6 +253,7 @@ def build_payload() -> dict[str, Any]:
     frontier = read_json(FRONTIER_JSON)
     ledger = read_json(ACTION_LEDGER_JSON)
     rows = build_manifest_rows(frontier, ledger)
+    materialized_rows = rows[:500]
     ready = [row for row in rows if row.get("ready_for_benchmark")]
     unclassified = [row for row in rows if row.get("lane") == ""]
     unique_sources: dict[str, int] = {}
@@ -262,7 +263,10 @@ def build_payload() -> dict[str, Any]:
             continue
         unique_sources[source_path] = max(unique_sources.get(source_path, 0), int(row.get("estimated_rows") or 0))
     summary = {
-        "manifest_row_count": len(rows),
+        "manifest_row_count": len(materialized_rows),
+        "discovered_manifest_row_count": len(rows),
+        "manifest_rows_truncated": len(materialized_rows) < len(rows),
+        "manifest_rows_omitted_count": len(rows) - len(materialized_rows),
         "ready_for_benchmark_row_count": len(ready),
         "unclassified_row_count": len(unclassified),
         "lane_count": len({row.get("lane") for row in rows if row.get("lane")}),
@@ -273,7 +277,8 @@ def build_payload() -> dict[str, Any]:
         "real_dollar_savings_claim_allowed": False,
         "live_trading_or_autonomous_execution_allowed": False,
         "medical_or_addiction_treatment_claim_allowed": False,
-        "manifest_sha256": stable_sha256(rows[:400]),
+        "manifest_sha256": stable_sha256(materialized_rows),
+        "discovered_row_set_sha256": stable_sha256(rows),
     }
     return {
         "schema": "geometry_live_source_manifest_v1",
@@ -283,7 +288,7 @@ def build_payload() -> dict[str, Any]:
         "outputs": {"json": rel(OUT_JSON), "dashboard_json": rel(DASHBOARD_JSON), "markdown": rel(OUT_MD)},
         "summary": summary,
         "lane_summary": lane_summary(rows),
-        "manifest_rows": rows[:500],
+        "manifest_rows": materialized_rows,
         "claim_gates": {
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
@@ -306,6 +311,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- Manifest rows: `{summary['manifest_row_count']}`",
+        f"- Discovered source-lane routes: `{summary['discovered_manifest_row_count']}`",
+        f"- Manifest rows truncated: `{str(summary['manifest_rows_truncated']).lower()}`",
+        f"- Omitted source-lane routes: `{summary['manifest_rows_omitted_count']}`",
         f"- Ready-for-benchmark rows: `{summary['ready_for_benchmark_row_count']}`",
         f"- Unclassified rows: `{summary['unclassified_row_count']}`",
         f"- Mapped lanes: `{summary['lane_count']}`",
@@ -318,6 +326,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Live trading/autonomous execution allowed: `{str(summary['live_trading_or_autonomous_execution_allowed']).lower()}`",
         f"- Medical/addiction-treatment claim allowed: `{str(summary['medical_or_addiction_treatment_claim_allowed']).lower()}`",
         f"- Manifest SHA-256: `{summary['manifest_sha256']}`",
+        f"- Full discovered-row-set SHA-256: `{summary['discovered_row_set_sha256']}`",
         "",
         "## Lane Summary",
         "",

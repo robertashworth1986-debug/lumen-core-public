@@ -1,0 +1,27 @@
+{
+  "claim_boundary": "This state record combines an official EPRI DocuSign request, the user's action-time report that signing completed, and an observed post-sign finish screen. It does not establish EPRI countersignature, a fully executed agreement, consortium membership, access to consortium materials, endorsement, funding, licensing, deployment, or technical validation.",
+  "controls": {
+    "builder_can_email": false,
+    "builder_can_open_secure_signing_link": false,
+    "builder_can_sign": false,
+    "do_not_duplicate_signature": true,
+    "inbound_only_until_completion_or_access_confirmation": true,
+    "private_identifiers_omitted": true
+  },
+  "evidence": {
+    "completion_email_observed": false,
+    "consortium_materials_access_observed": false,
+    "countersignature_observed": false,
+    "official_signing_request_received_utc": "2026-07-23T13:00:20Z",
+    "official_sender_domain": "epri.com via docusign.net",
+    "post_sign_finish_screen_observed": true,
+    "user_reported_signing_complete": true
+  },
+  "exact_signature_time": null,
+  "key_ask": "Sign inside the DocuSign platform to preserve routing and initiate the access-granting workflow for consortium materials.",
+  "lane_id": "epri_open_power_ai_mou",
+  "next_action": "Monitor the existing EPRI and DocuSign threads for a completed-envelope, countersignature, onboarding, or materials-access confirmation. Do not sign again or send another proactive follow-up.",
+  "recorded_utc": "2026-07-23T19:03:38Z",
+  "schema": "lumencore.epri_open_power_ai_mou_signing_state.v1",
+  "status": "USER_SIGNATURE_REPORTED_COMPLETION_CONFIRMATION_PENDING"
+}

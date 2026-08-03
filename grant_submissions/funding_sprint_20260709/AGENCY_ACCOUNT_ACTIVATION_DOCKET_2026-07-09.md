@@ -14,18 +14,19 @@ This docket is preparation-only. It does not authorize credentials, certificatio
 - Blocked readiness flags: `6`
 - SAM active registration observed in private capture: `true`
 - SAM expiration date observed: `2026-08-30`
-- Reviewer gate clear: `true`
+- Reviewer packaging gate clear: `true`
+- Submission argument gate clear: `false`
 - Unsafe sensitive hits: `0`
 - Unsafe claim hits: `0`
-- Data-room Markdown artifacts: `44`
-- Data-room control artifacts: `50`
+- Data-room Markdown artifacts: `104`
+- Data-room control artifacts: `56`
 - Portal action without human: `false`
 - Credential entry without human: `false`
 - Certification without human: `false`
 - Final submission without human: `false`
 - External send without human: `false`
 - Live trading allowed: `false`
-- Docket SHA-256: `f9718f8d2f9758399240c8ba36e3beb1b310f7bab7d43308e8ca978027b68add`
+- Docket SHA-256: `de606ff3e392c634fd6416b1a5778187ac749ee7d2ca76a2f77dabd9091a2188`
 
 ## Local Readiness Signals
 
@@ -263,7 +264,7 @@ Blocks:
 - `federal_submission_protocol_packet`: `FEDERAL_SUBMISSION_PROTOCOL_READY_HUMAN_PORTAL_REQUIRED`
 - `submission_authority_matrix`: `SUBMISSION_AUTHORITY_MATRIX_READY`
 - `data_room_manifest`: `DATA_ROOM_MANIFEST_READY`
-- `funding_sprint_reviewer_gate`: `REVIEWER_GATE_CLEAR_HUMAN_SUBMISSION_REQUIRED`
+- `funding_sprint_reviewer_gate`: `REVIEWER_GATE_BLOCKED_SOURCE_BOUND_ARGUMENT_CONFORMANCE`
 - `ip_counsel_diligence_packet`: `IP_COUNSEL_DILIGENCE_READY_HUMAN_COUNSEL_REQUIRED`
 - `autonomous_quant_governance_packet`: `AUTONOMOUS_QUANT_GOVERNANCE_READY_HUMAN_RUNTIME_REQUIRED`
 
@@ -271,12 +272,12 @@ Blocks:
 
 - `data/company_profile.json` | present=`true` | bytes=`3682` | sha256=`16086b05d3d5e4af4910fec49cafefc8918ac05ed237f68f471a2834898efe55`
 - `out/ops/sam_gov_entity_status_capture_latest.json` | present=`true` | bytes=`1655` | sha256=`570ab86d35f12b860b4e7929f2b406fa09571c570b84b77c09c75f654ab66228`
-- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12389` | sha256=`dbf19b6dcb218b1beba9824e1da8178c59c41856b2c542839b5e6362e9fb1d88`
+- `out/ops/federal_submission_protocol_packet_latest.json` | present=`true` | bytes=`12448` | sha256=`bad5334a73520a8f5d422e7ae16475ccc8068c16509773a8ac51d53b0aa4affd`
 - `out/ops/submission_authority_matrix_latest.json` | present=`true` | bytes=`33418` | sha256=`616519280f524711e6e11c43e059a90cb5490efbcd3f29f4e22530dd3f6fa1ca`
-- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`45649` | sha256=`d0d2b35ea22b7e40c6d0d8825f0d3b2d233fdb9156fff035e8aef31b19f76594`
-- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`44208` | sha256=`7eb55a1d058a1aff3fd536988d8c4b4d2f51940daf126af9e8f2d311e8587ee0`
-- `out/ops/ip_counsel_diligence_packet_latest.json` | present=`true` | bytes=`11291` | sha256=`d7904915f51386724c5e5740af9da7e7ed806eaaafe4e09ea04b9cb88fc53648`
-- `out/ops/autonomous_quant_governance_packet_latest.json` | present=`true` | bytes=`10038` | sha256=`fb2fa17cfc4da39ec4c95659e679462fba202af881d2ebad4307419261a77c81`
+- `out/ops/data_room_manifest_latest.json` | present=`true` | bytes=`73099` | sha256=`6e95b708125d4a4ab81f730fa7c5e692505125106cf93f58b407d7f1f8346127`
+- `out/ops/funding_sprint_reviewer_gate_latest.json` | present=`true` | bytes=`107666` | sha256=`ae50f0f8d570a105fc87d13cdf8732c1657d7ee3e1e1cf72eb591f3c0f8443ba`
+- `out/ops/ip_counsel_diligence_packet_latest.json` | present=`true` | bytes=`13089` | sha256=`d1ef448f97a2360f191f3f07d2cf61627ff1c527ee5fe4a82c1455166ce54d41`
+- `out/ops/autonomous_quant_governance_packet_latest.json` | present=`true` | bytes=`10096` | sha256=`58cd3145ac2982918b96943dcb7ba0c20610492f21c608c2fbd87c9fa13e433c`
 
 ## Human Stop Rule
 

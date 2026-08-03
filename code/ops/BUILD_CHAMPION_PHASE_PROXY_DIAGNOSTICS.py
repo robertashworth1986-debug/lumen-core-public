@@ -24,10 +24,17 @@ OUT_MD = DOCS / "CHAMPION_PHASE_PROXY_DIAGNOSTICS_2026-07-01.md"
 
 MAX_NUMERIC_PER_HOLDOUT = 4096
 
+CANONICAL_SOURCE_INVENTORY = {
+    "measured_source_count": 24,
+    "measured_row_count": 17081,
+    "inventory_is_performance_evidence": False,
+}
+
 BOUNDARY = (
-    "Replay phase-proxy diagnostics for the current internal champion. These metrics are computed "
-    "from source-conditioned holdout data and are useful for mechanism triage. They are not hardware "
-    "PLL measurements, not field validation, not realized savings, and not proof of live trading edge."
+    "These are file-level numeric-sequence diagnostic proxies for a negative measured Kuramoto reference. "
+    "They are not phase measurements, model-residual diagnostics, candidate-selection evidence, performance "
+    "promotion evidence, hardware PLL measurements, field validation, realized savings, or proof of live "
+    "trading edge. The 24-source / 17,081-row register is source inventory only."
 )
 
 
@@ -220,6 +227,8 @@ def phase_proxy(values: list[float]) -> dict[str, Any]:
 def build_payload() -> dict[str, Any]:
     holdout = read_json(HOLDOUT_JSON)
     stress = read_json(STRESS_JSON)
+    holdout_summary = as_dict(holdout.get("summary"))
+    stress_summary = as_dict(stress.get("summary"))
     rows = [as_dict(row) for row in as_list(holdout.get("holdout_results"))]
     diagnostics: list[dict[str, Any]] = []
 
@@ -234,9 +243,10 @@ def build_payload() -> dict[str, Any]:
                 "source_sha256_prefix": str(row.get("source_sha256") or "")[:16],
                 "holdout_sha256": row.get("holdout_sha256"),
                 "candidate_family": row.get("candidate_family"),
-                "named_baseline": row.get("named_baseline"),
-                "delta_vs_named_baseline": row.get("delta_vs_kalman"),
-                "candidate_rank": row.get("candidate_rank"),
+                "named_baseline": row.get("baseline") or row.get("named_baseline"),
+                "delta_vs_named_baseline": row.get("mean_skill_delta") or row.get("delta_vs_kalman"),
+                "candidate_rank": row.get("candidate_rank") or holdout_summary.get("candidate_holdout_rank"),
+                "diagnostic_role": "file_level_numeric_sequence_proxy_only",
                 "metrics": metrics,
             }
         )
@@ -288,15 +298,67 @@ def build_payload() -> dict[str, Any]:
             }
         )
 
-    stress_summary = as_dict(stress.get("summary"))
+    canonical_contract = {
+        "internal_performance_champion": False,
+        "direct_measured_route_count": int(stress_summary.get("direct_measured_route_count") or 0),
+        "conditioned_synthetic_route_count": int(stress_summary.get("conditioned_synthetic_route_count") or 0),
+        "baseline_comparison_count": int(stress_summary.get("baseline_comparison_count") or 0),
+        "performance_rows_reviewed": int(stress_summary.get("performance_rows_reviewed") or 0),
+        "direct_all_baseline_globally_holm_positive_promotion_count": int(
+            stress_summary.get("global_holm_positive_count") or 0
+        ),
+        "source_inventory": dict(CANONICAL_SOURCE_INVENTORY),
+    }
+    canonical_contract_matches = (
+        stress_summary.get("internal_performance_champion") is False
+        and canonical_contract["direct_measured_route_count"] == 2
+        and canonical_contract["conditioned_synthetic_route_count"] == 2
+        and canonical_contract["baseline_comparison_count"] == 22
+        and canonical_contract["performance_rows_reviewed"] == 32608
+        and canonical_contract["direct_all_baseline_globally_holm_positive_promotion_count"] == 0
+        and holdout_summary.get("candidate") == "kuramoto_phase_coupling"
+        and holdout_summary.get("candidate_was_protocol_selected") is False
+        and int(holdout_summary.get("wins_vs_kalman") or 0) == 482
+        and int(holdout_summary.get("holdout_count") or 0) == 1525
+        and round(float(holdout_summary.get("mean_delta_vs_kalman") or 0.0), 6) == -0.508191
+    )
     payload: dict[str, Any] = {
         "generated_utc": now_utc(),
-        "schema": "champion_phase_proxy_diagnostics_v1",
-        "purpose": "Add direct replay-data phase/coherence/residual proxy diagnostics for the current champion.",
+        "schema": "champion_phase_proxy_diagnostics_v2",
+        "purpose": (
+            "Report bounded file-level numeric-sequence proxies for diagnostic review without inferring a "
+            "performance champion, phase lock, promotion, field result, or economic result."
+        ),
         "boundary": BOUNDARY,
+        "canonical_evidence_contract": canonical_contract,
         "summary": {
-            "champion_family": as_dict(holdout.get("summary")).get("candidate") or "kuramoto_phase_coupling",
-            "named_baseline": as_dict(holdout.get("summary")).get("named_baseline") or "kalman_filter",
+            "internal_performance_champion": False,
+            "champion_family": None,
+            "audited_reference_candidate": holdout_summary.get("candidate") or "kuramoto_phase_coupling",
+            "reference_candidate_status": "negative_measured_reference_not_selected_not_promoted",
+            "development_selected_candidate": (
+                holdout_summary.get("development_selected_candidate")
+                or stress_summary.get("development_selected_candidate")
+                or "lissajous_phase_paths"
+            ),
+            "candidate_was_development_selected": False,
+            "named_baseline": holdout_summary.get("named_baseline") or "kalman_local_linear_trend",
+            "kuramoto_wins_vs_named_baseline": int(holdout_summary.get("wins_vs_kalman") or 0),
+            "kuramoto_paired_holdout_count": int(holdout_summary.get("holdout_count") or 0),
+            "kuramoto_mean_delta_vs_named_baseline": round(
+                float(holdout_summary.get("mean_delta_vs_kalman") or 0.0), 6
+            ),
+            "direct_measured_route_count": canonical_contract["direct_measured_route_count"],
+            "conditioned_synthetic_route_count": canonical_contract["conditioned_synthetic_route_count"],
+            "baseline_comparison_count": canonical_contract["baseline_comparison_count"],
+            "performance_rows_reviewed": canonical_contract["performance_rows_reviewed"],
+            "direct_all_baseline_globally_holm_positive_promotion_count": canonical_contract[
+                "direct_all_baseline_globally_holm_positive_promotion_count"
+            ],
+            "source_inventory_measured_source_count": CANONICAL_SOURCE_INVENTORY["measured_source_count"],
+            "source_inventory_measured_row_count": CANONICAL_SOURCE_INVENTORY["measured_row_count"],
+            "source_inventory_is_performance_evidence": False,
+            "canonical_evidence_contract_matches_inputs": canonical_contract_matches,
             "holdout_count": len(rows),
             "usable_numeric_holdout_count": len(usable),
             "non_degenerate_numeric_holdout_count": len(non_degenerate_usable),
@@ -308,25 +370,42 @@ def build_payload() -> dict[str, Any]:
             "mean_spectral_concentration_proxy": mean(spectral),
             "mean_abs_residual_lag1_autocorrelation_proxy": mean(residual_auto),
             "live_domain_hash_verified": bool(stress_summary.get("live_domain_hash_verified")),
-            "phase_proxy_claim_allowed": len(non_degenerate_usable) >= 12,
+            "descriptive_file_proxy_reporting_allowed": canonical_contract_matches and bool(
+                non_degenerate_usable
+            ),
+            "phase_measurement_claim_allowed": False,
+            "model_residual_diagnostic_claim_allowed": False,
+            "performance_promotion_claim_allowed": False,
             "degenerate_series_excluded_from_source_means": True,
             "hardware_phase_lock_claim_allowed": False,
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
             "plain_english_answer": (
-                "The champion now has replay-data phase proxy diagnostics across the current holdout set. "
-                "Flat or low-variance numeric files are explicitly marked as degenerate so they cannot inflate "
-                "the source-level phase means. These metrics support mechanism triage for the wave-resonance "
-                "lane, but they do not prove hardware PLL behavior or external field validation."
+                "No performance champion is present. Kuramoto was not development-selected and is retained only "
+                "as a negative measured reference: 482/1525 paired wins against kalman_local_linear_trend with "
+                f"mean delta -0.508191. The broader replay contains "
+                f"{canonical_contract['direct_measured_route_count']} direct measured routes, "
+                f"{canonical_contract['conditioned_synthetic_route_count']} conditioned-synthetic routes, "
+                f"{canonical_contract['baseline_comparison_count']} comparisons, "
+                f"{canonical_contract['performance_rows_reviewed']:,} performance rows, and "
+                f"{canonical_contract['direct_all_baseline_globally_holm_positive_promotion_count']} direct "
+                "all-baseline globally Holm-positive promotions. These file-level proxies are descriptive data "
+                f"diagnostics only; the {CANONICAL_SOURCE_INVENTORY['measured_source_count']}-source / "
+                f"{CANONICAL_SOURCE_INVENTORY['measured_row_count']:,}-row register is inventory, not "
+                "performance evidence."
             ),
         },
         "claim_controls": {
             "allowed_now": [
-                "replay-data phase proxy diagnostics",
-                "source-conditioned mechanism triage",
-                "internal phase/coherence/residual proxy evidence",
+                "file-level numeric-sequence proxy diagnostics",
+                "negative measured Kuramoto reference reporting",
+                "nonpromotion evidence-contract reporting",
             ],
             "not_allowed_yet": [
+                "performance champion",
+                "phase measurement",
+                "model-residual diagnostic",
+                "candidate promotion",
                 "hardware PLL phase-lock validation",
                 "field validated",
                 "realized savings",
@@ -350,7 +429,7 @@ def build_payload() -> dict[str, Any]:
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = as_dict(payload.get("summary"))
     lines = [
-        "# Champion Phase Proxy Diagnostics",
+        "# Phase Proxy Diagnostic Nonpromotion Report",
         "",
         f"Generated UTC: `{payload.get('generated_utc')}`",
         f"Phase proxy SHA-256: `{payload.get('phase_proxy_sha256')}`",
@@ -361,8 +440,21 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Summary",
         "",
-        f"- Champion: `{summary.get('champion_family')}`",
+        f"- Internal performance champion: `{str(summary.get('internal_performance_champion')).lower()}`",
+        f"- Champion family: `{summary.get('champion_family') or 'none'}`",
+        f"- Audited reference candidate: `{summary.get('audited_reference_candidate')}`",
+        f"- Reference candidate status: `{summary.get('reference_candidate_status')}`",
+        f"- Development-selected candidate: `{summary.get('development_selected_candidate')}`",
+        f"- Kuramoto paired wins: `{summary.get('kuramoto_wins_vs_named_baseline')}/{summary.get('kuramoto_paired_holdout_count')}`",
+        f"- Kuramoto mean delta vs named baseline: `{summary.get('kuramoto_mean_delta_vs_named_baseline')}`",
         f"- Named baseline: `{summary.get('named_baseline')}`",
+        f"- Direct measured routes: `{summary.get('direct_measured_route_count')}`",
+        f"- Conditioned-synthetic routes: `{summary.get('conditioned_synthetic_route_count')}`",
+        f"- Baseline comparisons: `{summary.get('baseline_comparison_count')}`",
+        f"- Performance rows reviewed: `{summary.get('performance_rows_reviewed')}`",
+        f"- Direct all-baseline globally Holm-positive promotions: `{summary.get('direct_all_baseline_globally_holm_positive_promotion_count')}`",
+        f"- Source inventory: `{summary.get('source_inventory_measured_source_count')}` measured sources / `{summary.get('source_inventory_measured_row_count')}` rows",
+        f"- Source inventory is performance evidence: `{str(summary.get('source_inventory_is_performance_evidence')).lower()}`",
         f"- Usable numeric holdouts: `{summary.get('usable_numeric_holdout_count')}/{summary.get('holdout_count')}`",
         f"- Non-degenerate numeric holdouts: `{summary.get('non_degenerate_numeric_holdout_count')}`",
         f"- Degenerate numeric holdouts excluded from source means: `{summary.get('degenerate_numeric_holdout_count')}`",
@@ -371,6 +463,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Mean phase slip proxy rate: `{summary.get('mean_phase_slip_proxy_rate')}`",
         f"- Mean spectral concentration proxy: `{summary.get('mean_spectral_concentration_proxy')}`",
         f"- Mean absolute residual lag-1 autocorrelation proxy: `{summary.get('mean_abs_residual_lag1_autocorrelation_proxy')}`",
+        f"- Phase measurement claim allowed: `{str(summary.get('phase_measurement_claim_allowed')).lower()}`",
+        f"- Performance promotion claim allowed: `{str(summary.get('performance_promotion_claim_allowed')).lower()}`",
         f"- Hardware phase-lock claim allowed: `{str(summary.get('hardware_phase_lock_claim_allowed')).lower()}`",
         "",
         "## Source Summary",
@@ -403,11 +497,20 @@ def render_markdown(payload: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def write_outputs(
+    payload: dict[str, Any],
+    out_json: Path = OUT_JSON,
+    dashboard_json: Path = DASHBOARD_JSON,
+    out_md: Path = OUT_MD,
+) -> None:
+    write_json(out_json, payload)
+    write_json(dashboard_json, payload)
+    write_text(out_md, render_markdown(payload))
+
+
 def main() -> int:
     payload = build_payload()
-    write_json(OUT_JSON, payload)
-    write_json(DASHBOARD_JSON, payload)
-    write_text(OUT_MD, render_markdown(payload))
+    write_outputs(payload)
     print(f"Wrote {OUT_JSON}")
     print(f"Wrote {DASHBOARD_JSON}")
     print(f"Wrote {OUT_MD}")

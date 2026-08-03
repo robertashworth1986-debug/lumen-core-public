@@ -27,10 +27,10 @@ def test_champion_sample_expansion_bridge_keeps_economic_claims_disciplined() ->
     assert summary["field_validation_claim_allowed"] is False
     assert summary["real_dollar_savings_claim_allowed"] is False
 
-    assert lanes["wave_resonance_timing"]["status"] == "promising_but_underpowered"
+    assert lanes["wave_resonance_timing"]["status"] == "strong_internal_replay_champion"
     assert lanes["wave_resonance_timing"]["win_rate"] == 1.0
     assert lanes["wave_resonance_timing"]["baseline_comparison_count"] >= 576
-    assert lanes["wave_resonance_timing"]["comparison_gap_to_target"] > 0
+    assert lanes["wave_resonance_timing"]["comparison_gap_to_target"] == 0
     assert lanes["thermal_ventilation"]["status"] == "promising_but_underpowered"
     assert lanes["optimal_curve_transport"]["status"] == "promising_but_underpowered"
     assert lanes["field_guided_control"]["status"] == "adapter_needed_before_claim"

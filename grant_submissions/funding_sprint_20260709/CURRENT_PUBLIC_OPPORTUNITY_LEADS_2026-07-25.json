@@ -1,0 +1,297 @@
+{
+  "schema": "lumencore.public_opportunity_leads.v1",
+  "environment": "LIVE_PUBLIC",
+  "records": [
+    {
+      "record_id": "launchtn-3686-pitch-2026",
+      "lane": "venture_partner",
+      "lead_origin": "VERIFIED_PUBLIC_SOURCE",
+      "title": "3686 Pitch Competition 2026",
+      "organization": "Launch Tennessee",
+      "summary": "A dated first-party portal observation records a Tennessee startup pitch competition with a cash prize, a September 15 competition date, and an August 13 application deadline.",
+      "canonical_opportunity_url": "https://airtable.com/app6GRZNbU72OmaK1/pagudvfO1hH7SmzBl/form",
+      "source": {
+        "url": "https://airtable.com/app6GRZNbU72OmaK1/pagudvfO1hH7SmzBl/form",
+        "authority": "FIRST_PARTY",
+        "verification_state": "PUBLIC_SOURCE_OBSERVED",
+        "observed_utc": "2026-07-17T00:00:00Z",
+        "observed_precision": "DATE_ONLY",
+        "observed_date": "2026-07-17",
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "EXACT",
+        "at_utc": "2026-08-14T04:59:00Z",
+        "local": "2026-08-13T23:59:00-05:00",
+        "timezone": "America/Chicago",
+        "source_text": "The locally preserved first-party portal observation records an application deadline of August 13, 2026 at 11:59 PM CDT."
+      },
+      "compensation": {
+        "state": "NOT_APPLICABLE",
+        "source_text": "Employment compensation is not applicable to this pitch-competition route."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "The dated portal observation identifies a possible Tennessee startup fit, but applicant-specific legal, location, stage, and prior-support facts require founder confirmation.",
+        "unresolved_requirements": [
+          "Confirm the legal entity, formation year, employee count, and prior Launch Tennessee capital history.",
+          "Confirm the startup satisfies a stated Tennessee eligibility path.",
+          "Confirm the startup stage fits the current competition requirements.",
+          "Obtain founder approval for pricing, use-of-funds, and all application attestations."
+        ]
+      },
+      "fit": {
+        "score": 82,
+        "basis": "The public-safe application materials map to a Tennessee-based AI and energy software venture, subject to the unresolved applicant facts and a fresh source recheck."
+      },
+      "reviewer_answers": {
+        "mandate_fit": {
+          "status": "CONFIRMED",
+          "answer": "The dated first-party observation identifies a Tennessee startup pitch route and its stated competition format; applicant eligibility remains unresolved.",
+          "source_url": "https://airtable.com/app6GRZNbU72OmaK1/pagudvfO1hH7SmzBl/form"
+        },
+        "engagement_route": {
+          "status": "CONFIRMED",
+          "answer": "The observed route is the first-party application form, with no autonomous login, upload, certification, or submission authorized.",
+          "source_url": "https://airtable.com/app6GRZNbU72OmaK1/pagudvfO1hH7SmzBl/form"
+        },
+        "traction_evidence": {
+          "status": "UNRESOLVED",
+          "answer": "Only source-bound repository, product, and validation statements may be selected after founder review; no performance claim is established here.",
+          "source_url": null
+        },
+        "ask_use": {
+          "status": "UNRESOLVED",
+          "answer": "The bounded ask, pricing, use of funds, milestones, and risks require founder approval.",
+          "source_url": null
+        },
+        "conflict_terms": {
+          "status": "UNRESOLVED",
+          "answer": "Current confidentiality, disclosure, conflict, and portfolio-overlap terms require review before any submission.",
+          "source_url": null
+        }
+      },
+      "claim_boundary": "This dated route record does not establish current source freshness, applicant eligibility, portal completion, submission, receipt, finalist status, prize eligibility, selection, investment, funding, award, endorsement, or permission to disclose nonpublic information."
+    },
+    {
+      "record_id": "microsoft-for-startups-no-referral-2026",
+      "lane": "venture_partner",
+      "lead_origin": "VERIFIED_PUBLIC_SOURCE",
+      "title": "Microsoft for Startups No-Referral Path",
+      "organization": "Microsoft",
+      "summary": "Microsoft documents a no-referral path for eligible early-stage B2B software, AI, and technology startups, including starter Azure credits after account setup and a later program review.",
+      "canonical_opportunity_url": "https://learn.microsoft.com/en-us/startups/microsoft-for-startups/application",
+      "source": {
+        "url": "https://learn.microsoft.com/en-us/startups/microsoft-for-startups/application",
+        "authority": "OFFICIAL",
+        "verification_state": "PUBLIC_SOURCE_OBSERVED",
+        "observed_utc": "2026-07-25T21:58:33Z",
+        "observed_precision": "EXACT_TIME",
+        "observed_date": null,
+        "published_utc": null,
+        "updated_utc": "2026-06-18T00:00:00Z"
+      },
+      "deadline": {
+        "state": "NONE_STATED",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "The reviewed official application guide states no application deadline."
+      },
+      "compensation": {
+        "state": "NOT_APPLICABLE",
+        "source_text": "Employment compensation is not applicable to this startup program."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "The official guide states a qualifying startup profile, but applicant-specific entity, regional, product-readiness, account-history, agreement, and billing facts are not established by the public source.",
+        "unresolved_requirements": [
+          "Confirm the company is privately held, independent, and headquartered in an eligible region.",
+          "Confirm the company is an early-stage B2B software, AI, or technology startup working toward or at MVP.",
+          "Confirm the legal startup name, address, website, and other application facts against current records.",
+          "Confirm the required account history, identity verification, agreement acceptance, and payment method with the founder.",
+          "Review the automatic pay-as-you-go conversion and all billing controls before account setup."
+        ]
+      },
+      "fit": {
+        "score": 88,
+        "basis": "The documented B2B AI and technology profile and compute-credit route align with the current need to reduce cloud development cost, subject to eligibility and billing review."
+      },
+      "reviewer_answers": {
+        "mandate_fit": {
+          "status": "CONFIRMED",
+          "answer": "The official guide targets early-stage B2B startups building software, AI, or technology solutions and working toward or at MVP.",
+          "source_url": "https://learn.microsoft.com/en-us/startups/microsoft-for-startups/application"
+        },
+        "engagement_route": {
+          "status": "CONFIRMED",
+          "answer": "The official guide documents an application route with or without an investor referral code.",
+          "source_url": "https://learn.microsoft.com/en-us/startups/microsoft-for-startups/application"
+        },
+        "traction_evidence": {
+          "status": "UNRESOLVED",
+          "answer": "Product readiness and any traction or validation statements require a source-bound founder review; no performance claim is established here.",
+          "source_url": null
+        },
+        "ask_use": {
+          "status": "UNRESOLVED",
+          "answer": "A bounded compute-credit use plan and spending guardrails require founder approval before account setup.",
+          "source_url": null
+        },
+        "conflict_terms": {
+          "status": "UNRESOLVED",
+          "answer": "Customer agreements, individual-user terms, privacy choices, billing conversion, and prior-credit conflicts require action-time review.",
+          "source_url": null
+        }
+      },
+      "claim_boundary": "The official page observation does not establish LumenCore eligibility, application, approval, credit availability, credit amount beyond published program terms, account creation, billing authorization, partnership, investment, funding, award, endorsement, or technical validation."
+    },
+    {
+      "record_id": "aws-activate-founders-2026",
+      "lane": "venture_partner",
+      "lead_origin": "VERIFIED_PUBLIC_SOURCE",
+      "title": "AWS Activate Founders Package",
+      "organization": "Amazon Web Services",
+      "summary": "AWS documents an Activate Founders route for eligible early-stage startups, with published starter promotional credits and applicant, account, website, company-age, funding-stage, and prior-credit conditions.",
+      "canonical_opportunity_url": "https://aws.amazon.com/startups/credits/",
+      "source": {
+        "url": "https://aws.amazon.com/startups/credits/",
+        "authority": "OFFICIAL",
+        "verification_state": "PUBLIC_SOURCE_OBSERVED",
+        "observed_utc": "2026-07-25T21:58:33Z",
+        "observed_precision": "EXACT_TIME",
+        "observed_date": null,
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "NONE_STATED",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "The reviewed official credits page states no application deadline."
+      },
+      "compensation": {
+        "state": "NOT_APPLICABLE",
+        "source_text": "Employment compensation is not applicable to this startup credit program."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "AWS publishes general Founders eligibility conditions, but the applicant's current funding stage, entity age, website, paid-tier account, and prior promotional-credit history require confirmation.",
+        "unresolved_requirements": [
+          "Confirm the company was founded within the last 10 years and is self-funded or pre-Series B.",
+          "Confirm a fully functioning company website meets the current program condition.",
+          "Confirm a paid-tier AWS account and founder-approved billing controls.",
+          "Confirm prior AWS Activate credit history and requested tier eligibility.",
+          "Review current promotional-credit terms, covered services, expiration, and post-credit cost controls."
+        ]
+      },
+      "fit": {
+        "score": 86,
+        "basis": "The published cloud-credit route can reduce eligible infrastructure and AI development cost, subject to account, website, funding-stage, and prior-credit verification."
+      },
+      "reviewer_answers": {
+        "mandate_fit": {
+          "status": "CONFIRMED",
+          "answer": "The official page targets qualifying pre-Series B startups founded within 10 years and includes a direct Founders route for bootstrapped or self-funded companies.",
+          "source_url": "https://aws.amazon.com/startups/credits/"
+        },
+        "engagement_route": {
+          "status": "CONFIRMED",
+          "answer": "The official page provides a direct Founders application route and separately describes provider-backed routes.",
+          "source_url": "https://aws.amazon.com/startups/credits/"
+        },
+        "traction_evidence": {
+          "status": "UNRESOLVED",
+          "answer": "Website, product, and validation statements require source-bound review; no performance claim is established here.",
+          "source_url": null
+        },
+        "ask_use": {
+          "status": "UNRESOLVED",
+          "answer": "A bounded AWS service-use plan, credit-consumption policy, and post-credit spending controls require founder approval.",
+          "source_url": null
+        },
+        "conflict_terms": {
+          "status": "UNRESOLVED",
+          "answer": "Prior-credit history, account terms, promotional-credit restrictions, and billing exposure require action-time review.",
+          "source_url": null
+        }
+      },
+      "claim_boundary": "The official page observation does not establish LumenCore eligibility, application, approval, promotional-credit availability, award amount, account creation, billing authorization, partnership, investment, funding, endorsement, or technical validation."
+    },
+    {
+      "record_id": "nvidia-inception-2026",
+      "lane": "venture_partner",
+      "lead_origin": "VERIFIED_PUBLIC_SOURCE",
+      "title": "NVIDIA Inception",
+      "organization": "NVIDIA",
+      "summary": "NVIDIA documents a free startup program with developer resources, partner offers, possible cloud credits, and eligibility-dependent investor exposure, subject to incorporation, company-age, developer-employment, website, and organization-type criteria.",
+      "canonical_opportunity_url": "https://www.nvidia.com/en-us/startups/",
+      "source": {
+        "url": "https://www.nvidia.com/en-us/startups/",
+        "authority": "OFFICIAL",
+        "verification_state": "PUBLIC_SOURCE_OBSERVED",
+        "observed_utc": "2026-07-25T21:58:33Z",
+        "observed_precision": "EXACT_TIME",
+        "observed_date": null,
+        "published_utc": null,
+        "updated_utc": null
+      },
+      "deadline": {
+        "state": "NONE_STATED",
+        "at_utc": null,
+        "local": null,
+        "timezone": null,
+        "source_text": "The reviewed official page states there are no application deadlines or cohorts."
+      },
+      "compensation": {
+        "state": "NOT_APPLICABLE",
+        "source_text": "Employment compensation is not applicable to this startup program."
+      },
+      "eligibility": {
+        "state": "UNCERTAIN",
+        "basis": "The official page states membership criteria, but incorporation, company age, developer employment, website status, organization type, and application facts require confirmation.",
+        "unresolved_requirements": [
+          "Confirm the company is officially incorporated and less than 10 years old.",
+          "Confirm the company employs at least one developer.",
+          "Confirm the working public website and current company information.",
+          "Confirm the company is not within a listed ineligible organization category.",
+          "Confirm all pitch-deck and application facts with the founder before portal entry."
+        ]
+      },
+      "fit": {
+        "score": 80,
+        "basis": "The AI startup program, technical resources, partner offers, and possible compute relief align with current needs, but benefits are availability- and eligibility-dependent."
+      },
+      "reviewer_answers": {
+        "mandate_fit": {
+          "status": "CONFIRMED",
+          "answer": "The official page describes a free program for AI startups and publishes incorporation, company-age, developer, website, and organization-type criteria.",
+          "source_url": "https://www.nvidia.com/en-us/startups/"
+        },
+        "engagement_route": {
+          "status": "CONFIRMED",
+          "answer": "The official page provides an application route and states there are no application fees, deadlines, or cohorts.",
+          "source_url": "https://www.nvidia.com/en-us/startups/"
+        },
+        "traction_evidence": {
+          "status": "UNRESOLVED",
+          "answer": "Pitch-deck, product, and validation statements require source-bound founder review; no performance claim is established here.",
+          "source_url": null
+        },
+        "ask_use": {
+          "status": "UNRESOLVED",
+          "answer": "A bounded technical-resource, partner-offer, and compute-credit objective requires founder approval.",
+          "source_url": null
+        },
+        "conflict_terms": {
+          "status": "UNRESOLVED",
+          "answer": "Program terms, data-sharing choices, partner-offer conditions, and organization-category conflicts require review.",
+          "source_url": null
+        }
+      },
+      "claim_boundary": "The official page observation does not establish LumenCore eligibility, application, membership, benefit availability, cloud credits, investor introduction, partnership, investment, funding, award, endorsement, or technical validation."
+    }
+  ]
+}

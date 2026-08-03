@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import time
@@ -7,6 +8,8 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+
+from safe_diagnostics import sanitize_diagnostic_fields, sanitize_diagnostic_text
 
 ROOT = Path(
     os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
@@ -127,31 +130,13 @@ def redact_url(url: str) -> str:
 
 
 def redact_text_secrets(text: str) -> str:
-    if not text:
-        return text
-    redacted = text
-    patterns = (
-        "api_key",
-        "apikey",
-        "key",
-        "token",
-        "access_token",
-        "registrationkey",
-        "userid",
-        "user_id",
-    )
-    for token in patterns:
-        redacted = redacted.replace(f"{token}=", f"{token}=REDACTED_")
-        redacted = redacted.replace(f"{token.upper()}=", f"{token.upper()}=REDACTED_")
-    return redacted
+    return sanitize_diagnostic_text(text)
 
 
 def sanitize_check_row(row: dict) -> dict:
-    cleaned = dict(row)
+    cleaned = sanitize_diagnostic_fields(dict(row))
     if "url" in cleaned:
         cleaned["url"] = redact_url(str(cleaned.get("url", "")))
-    if "error" in cleaned:
-        cleaned["error"] = redact_text_secrets(str(cleaned.get("error", "")))
     return cleaned
 
 
@@ -181,6 +166,38 @@ def http_get_json(url: str, headers: dict | None = None, timeout: int = 25):
         return r.getcode(), json.loads(raw)
 
 
+def snapshot_bytes(data: object) -> bytes:
+    return (
+        json.dumps(
+            data,
+            indent=2,
+            sort_keys=True,
+            ensure_ascii=False,
+        )
+        + "\n"
+    ).encode("utf-8")
+
+
+def write_content_addressed_snapshot(prefix: str, data: object) -> dict:
+    SNAP_DIR.mkdir(parents=True, exist_ok=True)
+    payload = snapshot_bytes(data)
+    digest = hashlib.sha256(payload).hexdigest()
+    path = SNAP_DIR / f"{prefix}_{digest[:20]}.json"
+    created = not path.exists()
+    if created:
+        temp = SNAP_DIR / (
+            f".{path.name}.{os.getpid()}.{time.time_ns()}.tmp"
+        )
+        temp.write_bytes(payload)
+        os.replace(temp, path)
+    return {
+        "snapshot": str(path),
+        "snapshot_sha256": digest,
+        "snapshot_bytes": len(payload),
+        "snapshot_new": created,
+    }
+
+
 def fetch_fred(env: dict) -> dict:
     key = env.get("FRED_API_KEY", "")
     if not key:
@@ -196,9 +213,14 @@ def fetch_fred(env: dict) -> dict:
     try:
         code, data = http_get_json(url)
         rows = len(data.get("observations", []))
-        snap = SNAP_DIR / f"fred_unrate_{int(time.time())}.json"
-        snap.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        return {"source": "FRED", "ok": code == 200, "rows": rows, "snapshot": str(snap), "url": url}
+        snapshot = write_content_addressed_snapshot("fred_unrate", data)
+        return {
+            "source": "FRED",
+            "ok": code == 200,
+            "rows": rows,
+            **snapshot,
+            "url": url,
+        }
     except Exception as e:
         return {"source": "FRED", "ok": False, "rows": 0, "error": str(e), "url": url}
 
@@ -214,9 +236,14 @@ def fetch_usgs() -> dict:
         rows = 0
         for s in series:
             rows += len(s.get("values", [{}])[0].get("value", []))
-        snap = SNAP_DIR / f"usgs_iv_{int(time.time())}.json"
-        snap.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        return {"source": "USGS", "ok": code == 200, "rows": rows, "snapshot": str(snap), "url": url}
+        snapshot = write_content_addressed_snapshot("usgs_iv", data)
+        return {
+            "source": "USGS",
+            "ok": code == 200,
+            "rows": rows,
+            **snapshot,
+            "url": url,
+        }
     except Exception as e:
         return {"source": "USGS", "ok": False, "rows": 0, "error": str(e), "url": url}
 
@@ -231,9 +258,14 @@ def fetch_noaa(env: dict) -> dict:
     try:
         code, data = http_get_json(url, headers=headers)
         rows = len(data.get("results", []))
-        snap = SNAP_DIR / f"noaa_datasets_{int(time.time())}.json"
-        snap.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        return {"source": "NOAA", "ok": code == 200, "rows": rows, "snapshot": str(snap), "url": url}
+        snapshot = write_content_addressed_snapshot("noaa_datasets", data)
+        return {
+            "source": "NOAA",
+            "ok": code == 200,
+            "rows": rows,
+            **snapshot,
+            "url": url,
+        }
     except Exception as e:
         return {"source": "NOAA", "ok": False, "rows": 0, "error": str(e), "url": url}
 
@@ -260,9 +292,14 @@ def fetch_bls(env: dict) -> dict:
             data = json.loads(raw)
             series = data.get("Results", {}).get("series", [])
             rows = len(series[0].get("data", [])) if series else 0
-            snap = SNAP_DIR / f"bls_unrate_{int(time.time())}.json"
-            snap.write_text(json.dumps(data, indent=2), encoding="utf-8")
-            return {"source": "BLS", "ok": resp.getcode() == 200, "rows": rows, "snapshot": str(snap), "url": url}
+            snapshot = write_content_addressed_snapshot("bls_unrate", data)
+            return {
+                "source": "BLS",
+                "ok": resp.getcode() == 200,
+                "rows": rows,
+                **snapshot,
+                "url": url,
+            }
     except Exception as e:
         return {"source": "BLS", "ok": False, "rows": 0, "error": str(e), "url": url}
 
@@ -275,9 +312,14 @@ def fetch_nasa(env: dict) -> dict:
     try:
         code, data = http_get_json(url)
         rows = 1 if isinstance(data, dict) and data else 0
-        snap = SNAP_DIR / f"nasa_apod_{int(time.time())}.json"
-        snap.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        return {"source": "NASA", "ok": code == 200, "rows": rows, "snapshot": str(snap), "url": url}
+        snapshot = write_content_addressed_snapshot("nasa_apod", data)
+        return {
+            "source": "NASA",
+            "ok": code == 200,
+            "rows": rows,
+            **snapshot,
+            "url": url,
+        }
     except Exception as e:
         return {"source": "NASA", "ok": False, "rows": 0, "error": str(e), "url": url}
 
@@ -295,9 +337,14 @@ def fetch_nrel(env: dict) -> dict:
         code, data = http_get_json(url)
         outputs = data.get("outputs", {}) if isinstance(data, dict) else {}
         rows = len(outputs.keys()) if isinstance(outputs, dict) else 0
-        snap = SNAP_DIR / f"nrel_solar_{int(time.time())}.json"
-        snap.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        return {"source": "NREL", "ok": code == 200, "rows": rows, "snapshot": str(snap), "url": url}
+        snapshot = write_content_addressed_snapshot("nrel_solar", data)
+        return {
+            "source": "NREL",
+            "ok": code == 200,
+            "rows": rows,
+            **snapshot,
+            "url": url,
+        }
     except Exception as e:
         return {"source": "NREL", "ok": False, "rows": 0, "error": str(e), "url": url}
 
@@ -316,9 +363,14 @@ def fetch_epa_aqs(env: dict) -> dict:
     try:
         code, data = http_get_json(url)
         rows = len(data.get("Data", [])) if isinstance(data, dict) else 0
-        snap = SNAP_DIR / f"epa_aqs_states_{int(time.time())}.json"
-        snap.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        return {"source": "EPA_AQS", "ok": code == 200, "rows": rows, "snapshot": str(snap), "url": url}
+        snapshot = write_content_addressed_snapshot("epa_aqs_states", data)
+        return {
+            "source": "EPA_AQS",
+            "ok": code == 200,
+            "rows": rows,
+            **snapshot,
+            "url": url,
+        }
     except Exception as e:
         return {"source": "EPA_AQS", "ok": False, "rows": 0, "error": str(e), "url": url}
 
@@ -335,9 +387,14 @@ def fetch_bea(env: dict) -> dict:
     try:
         code, data = http_get_json(url)
         rows = len((data.get("BEAAPI", {}).get("Results", {}).get("Dataset", [])))
-        snap = SNAP_DIR / f"bea_dataset_list_{int(time.time())}.json"
-        snap.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        return {"source": "BEA", "ok": code == 200, "rows": rows, "snapshot": str(snap), "url": url}
+        snapshot = write_content_addressed_snapshot("bea_dataset_list", data)
+        return {
+            "source": "BEA",
+            "ok": code == 200,
+            "rows": rows,
+            **snapshot,
+            "url": url,
+        }
     except Exception as e:
         return {"source": "BEA", "ok": False, "rows": 0, "error": str(e), "url": url}
 
@@ -397,9 +454,14 @@ def fetch_census(env: dict) -> dict:
     try:
         code, data = http_get_json(url)
         rows = max(0, len(data) - 1) if isinstance(data, list) else 0
-        snap = SNAP_DIR / f"census_acs_{int(time.time())}.json"
-        snap.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        return {"source": "CENSUS", "ok": code == 200, "rows": rows, "snapshot": str(snap), "url": url}
+        snapshot = write_content_addressed_snapshot("census_acs", data)
+        return {
+            "source": "CENSUS",
+            "ok": code == 200,
+            "rows": rows,
+            **snapshot,
+            "url": url,
+        }
     except Exception as e:
         return {"source": "CENSUS", "ok": False, "rows": 0, "error": str(e), "url": url}
 
@@ -417,9 +479,14 @@ def fetch_eia(env: dict) -> dict:
     try:
         code, data = http_get_json(url)
         rows = len(data.get("response", {}).get("data", []))
-        snap = SNAP_DIR / f"eia_rto_{int(time.time())}.json"
-        snap.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        return {"source": "EIA", "ok": code == 200, "rows": rows, "snapshot": str(snap), "url": url}
+        snapshot = write_content_addressed_snapshot("eia_rto", data)
+        return {
+            "source": "EIA",
+            "ok": code == 200,
+            "rows": rows,
+            **snapshot,
+            "url": url,
+        }
     except Exception as e:
         return {"source": "EIA", "ok": False, "rows": 0, "error": str(e), "url": url}
 

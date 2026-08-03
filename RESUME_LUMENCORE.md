@@ -1,64 +1,60 @@
-# ROBERT BABYRAY ASHWORTH
+# ROBERT "BABY RAY" ASHWORTH
 
-Principal Quant Systems Engineer | Institutional Automation Architect | Government-Grade Evidence Lead
+Systems Automation Engineer | Python Platform Builder | Evidence and Reliability Workflows
 
-Location: Nashville, TN (Remote/Hybrid/Relocation)  
-Email: [robertashworth4444@gmail.com](mailto:robertashworth4444@gmail.com)  
-Phone: 615-438-2502  
-Website: [https://lumen-core.ai](https://lumen-core.ai)
+Nashville, Tennessee | Remote, Hybrid, or Relocation | [Email](mailto:robertashworth4444@gmail.com) | 615-438-2502  
+[Portfolio](https://lumen-core.ai) | [GitHub: lumen-core-public](https://github.com/robertashworth1986-debug/lumen-core-public)
 
-## EXECUTIVE PROFILE
+## PROFESSIONAL SUMMARY
 
-Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-end ownership of quant research, live execution controls, evidence-chain integrity, and investor/government reporting. Built and operated a production institutional stack that converts multi-source data into risk-gated actions with machine-readable proof artifacts.
+Founder-builder of LumaTrader and LumenCore, a Python-based platform for
+reproducible data workflows, risk-gated automation, and machine-readable
+evidence. Designs deterministic control planes, audit receipts, APIs, and
+review packets across energy, infrastructure, and market-data use cases.
+Strong focus on traceability, failure preservation, human approval boundaries,
+and practical Windows operations.
 
-## INSTITUTIONAL IMPACT SNAPSHOT
+## CORE SKILLS
 
-- Dataset benchmark breadth: 2312 datasets with reproducible artifacts and hash-linked evidence.
-- Annual modeled value signal: $52,331,333,340.00 ($52.33B).
-- Top sector and hourly signal: Financial Market Infra at $3,647,280.00 per hour.
-- Router edge and harmonic consistency: 49.48% edge, 24.51% harmonic win rate.
-- Live execution telemetry: 37 closed trades with auditable reason-code and PnL artifacts in the evidence lane.
+- Python, PowerShell, Git, JSON, REST APIs, and Windows Task Scheduler
+- FastAPI, Pydantic, pandas, NumPy, scikit-learn, DuckDB, Polars, and pytest
+- Data ingestion, validation, reporting, APIs, dashboards, and artifact packaging
+- Deterministic builders, SHA-256 receipts, tests, and human-in-the-loop controls
 
-## CORE COMPETENCIES
+## SELECTED ENGINEERING WORK
 
-- Mission-critical Python architecture for quant, routing, and operational control planes.
-- Risk-engineering guardrails: kill switch controls, cooldown logic, approval queues, and position sizing controls.
-- Government-grade traceability with SHA256 manifests, immutable ledgers, and reproducible run artifacts.
-- FastAPI gateway and dashboard API integration for investor, mission-control, and ops command surfaces.
-- Cross-sector data engineering across market, energy, macro, and infrastructure signal lanes.
+### Evidence and Reproducibility Platform
 
-## SELECTED PRODUCTION SYSTEMS
+- Built deterministic Python and FastAPI workflows that turn a shared source
+  state into JSON, Markdown or PDF, and dashboard review surfaces.
+- Added SHA-256 manifests and hash-linked receipts while preserving missing,
+  stale, failed, and negative evidence.
 
-- INSTITUTIONAL_STACK_V2 orchestration and runtime continuity controls.
-- Opportunity automation lanes for grants, funding, and outreach workflows.
-- LinkedIn evidence publishing lane and profile optimization automation.
-- Sports and market intelligence fusion lanes with explicit lane-boundary controls.
-- End-to-end evidence packaging pipelines for investor and federal reviews.
+### Safe Operational Automation
 
-## TECHNOLOGY STACK AND PROVEN PACKAGES
+- Implemented approval-gated queues with duplicate-action protection and exact
+  draft, recipient, attachment, and action-time authorization binding.
+- Created PowerShell monitoring and scheduled-task workflows with fail-closed
+  checks and explicit error and recovery receipts.
 
-pandas, numpy, requests, scikit-learn, FastAPI, matplotlib, joblib, reportlab, ccxt, pptx, yfinance, orjson, pydantic, symbol_registry_auto, PyYAML, lightgbm, pillow, polars, duckdb, fpdf
+### Energy and Infrastructure Data Workflows
+
+- Developed protocol-bound collection and prospective evaluation tooling for
+  public energy data, including sealed predictions and later settlement.
+- Built baseline, data-quality, and reproducibility surfaces that separate
+  software readiness from field or independent validation.
 
 ## PROFESSIONAL EXPERIENCE
 
-### Founder and Principal Systems Engineer | LumaTrader / LumenCore
+### Founder and Systems Engineer | LumaTrader / LumenCore
 
 2014 - Present
 
-- Architected and maintained a production quant platform spanning data ingestion, model routing, risk controls, execution, and evidence generation.
-- Built deterministic ops scripts and API endpoints to automate grant readiness, investor proof packs, and mission dashboards.
-- Designed resilient live-execution safeguards with configurable runtime controls and explicit reason-code telemetry.
-- Produced institutional artifacts for due diligence, including calibration summaries, anomaly scanners, and regime-shift reports.
-
-## GOVERNMENT AND INSTITUTIONAL POSITIONING
-
-- UEI: SQY2XW71ZM51 | CAGE: 14TM8 | SAM status: verification_required.
-- Track record generating federal-style submissions and preflight-ready package artifacts.
-- Operates with evidence-first discipline: every major claim maps to machine-readable outputs.
-
-## TARGET ROLES
-
-- Principal Quant Systems Engineer
-- Staff Platform Reliability Engineer (AI and Trading Infrastructure)
-- Mission Systems Software Engineer (Government and Defense-Adjacent)
-- Senior Technical Lead, AI Operations and Evidence Automation
+- Designed and maintained Python and PowerShell systems spanning data
+  ingestion, evaluation, workflow routing, controls, and evidence generation.
+- Converted ambiguous operational work into tested, repeatable builders with
+  structured configuration and deterministic outputs.
+- Added unit and regression coverage for shared controls, failure cases,
+  integrity checks, and human authorization boundaries.
+- Integrated public energy, infrastructure, economic, and market-data sources
+  into reproducible local workflows.

@@ -1,0 +1,489 @@
+{
+  "schema": "lumencore.official_inbound_status_event_register.v1",
+  "status": "TWELVE_OFFICIAL_EVENTS_RECONCILED_NO_SEND",
+  "as_of_utc": "2026-07-29T02:49:17Z",
+  "event_count": 12,
+  "controls": {
+    "action_time_human_review_required": true,
+    "builder_can_send_email": false,
+    "message_bodies_omitted": true,
+    "meeting_credentials_omitted": true,
+    "private_mail_identifiers_omitted": true,
+    "recipient_and_sender_addresses_omitted": true,
+    "patent_sensitive_contents_omitted": true,
+    "assessment_and_project_contents_omitted": true
+  },
+  "events": [
+    {
+      "lane_id": "epri_open_power_ai_mou",
+      "organization": "EPRI Open Power AI Consortium",
+      "status": "ONBOARDING_RESPONSE_SENT_MRC_INVITE_RECEIVED_LOGO_FILES_PENDING",
+      "source": {
+        "sender": "EPRI Open Power AI Consortium",
+        "received_utc": "2026-07-24T16:02:01Z",
+        "subject": "Re: [EXTERNAL] LumenCore Open Power AI onboarding follow-up",
+        "subject_sha256": "EB9AE6DE011FF4AB2FD2D764B4EAE8131F19554D943475165AB5DAE1A330749C",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "primary_contact_requested": true,
+        "work_group_representatives_requested": true,
+        "logo_permission_requested": true,
+        "light_and_dark_png_logos_requested": true,
+        "onboarding_response_sent_utc": "2026-07-24T17:36:35Z",
+        "primary_contact_sent": true,
+        "work_group_representatives_sent": true,
+        "logo_permission_sent": true,
+        "logo_files_sent": false,
+        "mrc_invite_received_utc": "2026-07-24T17:39:20Z",
+        "meeting_credentials_omitted": true
+      },
+      "action": {
+        "key_ask": "Provide the explicitly requested light-background and dark-background PNG logo files after verifying the canonical assets and permitted-use boundary.",
+        "missing_facts": [
+          "Canonical light-background PNG asset",
+          "Canonical dark-background PNG asset",
+          "Verified attachment inventory",
+          "Confirmed permitted-use boundary"
+        ],
+        "deadline": null,
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "REQUESTED_ASSET_DELIVERY_REPLY",
+        "duplicate_send_decision": "DO_NOT_REPEAT_CONTACT_WORKGROUP_OR_PERMISSION_FACTS",
+        "safest_next_action": "Verify the two canonical PNG assets and the permitted-use boundary, then render one private requested-asset reply for action-time review. Do not repeat the already-sent onboarding facts or expose meeting details."
+      }
+    },
+    {
+      "lane_id": "pathway_working_capital_inquiry",
+      "organization": "Pathway Lending",
+      "status": "OFFICIAL_PORTAL_ROUTE_PROVIDED_FOUNDER_REVIEW_REQUIRED",
+      "source": {
+        "sender": "Pathway Lending",
+        "received_utc": "2026-07-24T15:46:08Z",
+        "subject": "Re: $50,000 working-capital inquiry \u2014 LumenCore, Nashville",
+        "subject_sha256": "AB67169F6812348F3DB90A4AB3A8D6175026A304678026BA5E7D0E2F6B8F8400",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "official_portal_route_provided": true,
+        "tennessee_location_requirement_reported": true,
+        "minimum_one_year_operating_history_reported": true,
+        "eligibility_verified": false,
+        "application_submitted": false
+      },
+      "action": {
+        "key_ask": "Use the official application portal only after the founder verifies every financing, eligibility, consent, and repayment fact.",
+        "missing_facts": [
+          "Verified operating-history eligibility",
+          "Founder-reviewed financing terms",
+          "Founder authorization for portal application"
+        ],
+        "deadline": null,
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "DO_NOT_REPLY_TO_REPEAT_THE_INQUIRY",
+        "safest_next_action": "Treat this as a founder-reviewed financing portal action, not economic relief already secured. Do not email another inquiry or begin an application without truthful eligibility and terms review."
+      }
+    },
+    {
+      "lane_id": "darpa_dice_abstract_status",
+      "organization": "DARPA",
+      "status": "FULL_PROPOSAL_DISCOURAGED_ROUTE_CLOSED",
+      "source": {
+        "sender": "DARPA DICE Program",
+        "received_utc": "2026-07-24T19:49:43Z",
+        "subject": "HR001126S0010-DICE-PA-052",
+        "subject_sha256": "F9A479FEE44B0F41551758C746F7757DC1692FD1189F3472C7AD31129CD75D06",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "official_status_received": true,
+        "full_proposal_encouraged": false,
+        "reply_requested": false,
+        "deadline_observed": false,
+        "assessment_content_omitted": true
+      },
+      "action": {
+        "key_ask": "No action requested. Close this route and preserve only generalized, sanitized lessons for future fit screening.",
+        "missing_facts": [],
+        "deadline": null,
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "CLOSE_WITHOUT_REPLY_OR_FULL_PROPOSAL",
+        "safest_next_action": "Do not reply or prepare a full proposal under this route. Preserve only non-sensitive fit lessons and reopen only on a new official opportunity."
+      }
+    },
+    {
+      "lane_id": "dhs_rfi_correction",
+      "organization": "U.S. Department of Homeland Security",
+      "status": "CORRECTION_REQUEST_RECEIVED_CORRECTED_RESPONSE_SENT_MONITOR_ONLY",
+      "source": {
+        "sender": "DHS official acquisition route",
+        "received_utc": "2026-07-24T18:04:28Z",
+        "subject": "RE: 70RSAT26RFI000024 \u2014 LumenCore test-and-evaluation orchestration capability",
+        "subject_sha256": "399279BD1D340355DB0268C89AF960FDDF52D86EE0390184BFA1C84FF9448B79",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "official_correction_request_received": true,
+        "original_response_nonconforming": true,
+        "corrected_response_sent": true,
+        "corrected_response_contents_omitted": true,
+        "further_reply_requested": false
+      },
+      "action": {
+        "key_ask": "No additional action is currently requested because the corrected response was already sent.",
+        "missing_facts": [],
+        "deadline": null,
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "DO_NOT_REPEAT_THE_CORRECTED_RESPONSE",
+        "safest_next_action": "Monitor the existing thread for a specific agency clarification or replacement request. Do not resend either response and do not expose submission contents."
+      }
+    },
+    {
+      "lane_id": "nashville_ec_takeoff_fall_2026",
+      "organization": "Nashville Entrepreneur Center",
+      "status": "COHORT_SELECTED_ONBOARDING_AND_PARTICIPATION_AGREEMENT_DUE",
+      "source": {
+        "sender": "Nashville Entrepreneur Center",
+        "received_utc": "2026-07-24T17:44:11Z",
+        "subject": "\ud83c\udf89Welcome to the Fall 2026 TakeOff Cohort!",
+        "subject_sha256": "1488EB4AF36F576BEDC22AE0F4BE877D2DA0E203DE58AF8E1E3F640272739A15",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "cohort_selected": true,
+        "financial_assistance_reported": true,
+        "financial_assistance_amount_usd": 375,
+        "full_program_investment_usd": 500,
+        "discount_code_omitted": true,
+        "thank_you_and_acceptance_sent_utc": "2026-07-24T19:48:53Z",
+        "onboarding_form_completed": false,
+        "participation_agreement_accepted": false,
+        "deposit_submitted": false,
+        "program_start_date": "2026-09-01",
+        "program_end_date": "2026-12-03"
+      },
+      "action": {
+        "key_ask": "Review and complete the onboarding form, including the participation agreement, then separately review the remaining financial commitment before any deposit.",
+        "missing_facts": [
+          "Founder review of the program overview and participant expectations",
+          "Founder review and acceptance of the participation agreement",
+          "Founder confirmation of the remaining financial commitment and payment schedule"
+        ],
+        "deadline": {
+          "onboarding_form_and_participation_agreement_date": "2026-07-31",
+          "deposit_date": "2026-08-14",
+          "time_and_timezone_explicit": false
+        },
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "THANK_YOU_ALREADY_SENT_DO_NOT_REPEAT",
+        "safest_next_action": "Open the official onboarding route only for founder review. Do not accept the participation agreement or make a payment automatically, and do not send another acceptance email."
+      }
+    },
+    {
+      "lane_id": "tsa_industry_portal_capability",
+      "organization": "Transportation Security Administration",
+      "status": "OFFICIAL_INDUSTRY_PORTAL_ROUTE_PROVIDED",
+      "source": {
+        "sender": "TSA Small Business Program",
+        "received_utc": "2026-07-24T19:12:10Z",
+        "subject": "RE: LumenCore small-business capability \u2014 AI assurance, data provenance, and human-gated modernization",
+        "subject_sha256": "F553BEBB1B4E91CD143E2690A29C820900BEC0E0DF4EF5BCED6F7E422A78E26B",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "official_industry_portal_route_provided": true,
+        "capability_meeting_request_must_use_portal": true,
+        "acknowledgment_sent_utc": "2026-07-24T20:24:06Z",
+        "portal_submission_completed": false
+      },
+      "action": {
+        "key_ask": "Use the TSA Industry Portal for any capability inquiry or capability-meeting request.",
+        "missing_facts": [
+          "Founder-reviewed portal category and exact request",
+          "Portal preview confirming no unsupported claims or sensitive disclosure"
+        ],
+        "deadline": null,
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "DO_NOT_REPEAT_EMAIL_OUTREACH_USE_PORTAL",
+        "safest_next_action": "Prepare a bounded portal entry for human review. Do not send another email or submit the portal request without reviewing the exact fields and final claims."
+      }
+    },
+    {
+      "lane_id": "dla_amps_application_access",
+      "organization": "Defense Logistics Agency",
+      "status": "ACCOUNT_CREATED_EXACT_ROLE_NOT_YET_VERIFIED",
+      "source": {
+        "sender": "DLA AMPS",
+        "received_utc": "2026-07-27T02:04:34Z",
+        "subject": "Account Created for Robert Ashworth",
+        "subject_sha256": "DCC0659A431C7E4DE1AFF2ACAB2EC4CF7854DEB5FC1F583C410248E31B2F6160",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "account_created": true,
+        "account_identifier_omitted": true,
+        "exact_application_verified": false,
+        "exact_role_verified": false,
+        "role_request_submitted": false
+      },
+      "action": {
+        "key_ask": "Log into AMPS and request only the application role needed for the intended DLA workflow.",
+        "missing_facts": [
+          "Exact DLA application name",
+          "Exact external-user role name",
+          "Approving official or application point of contact",
+          "Truthful access justification"
+        ],
+        "deadline": null,
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "DO_NOT_REQUEST_AN_UNKNOWN_ROLE",
+        "safest_next_action": "Use the official AMPS site directly and verify the exact application and role with the sponsoring DLA program or application point of contact before submitting a role request."
+      }
+    },
+    {
+      "lane_id": "login_gov_new_device_signin",
+      "organization": "Login.gov",
+      "status": "NEW_DEVICE_SIGNIN_REQUIRES_USER_RECOGNITION",
+      "source": {
+        "sender": "Login.gov",
+        "received_utc": "2026-07-27T00:20:25Z",
+        "subject": "New sign-in and authentication with your Login.gov account",
+        "subject_sha256": "57093B5A4E96F2B849CFD2F413F3F7B4989AEDBA6904A0C8189E82981A3CCEB3",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "new_device_signin_reported": true,
+        "signin_local_utc_offset": "-04:00",
+        "signin_local_timestamp": "2026-07-26T20:20:00-04:00",
+        "approximate_location_reported": "Nashville, Tennessee",
+        "recognized_by_user": false,
+        "email_security_link_and_token_omitted": true
+      },
+      "action": {
+        "key_ask": "Confirm whether the new-device Login.gov sign-in was yours.",
+        "missing_facts": [
+          "User recognition of the reported sign-in"
+        ],
+        "deadline": null,
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "NO_EMAIL_REPLY_VERIFY_ACCOUNT_DIRECTLY",
+        "safest_next_action": "If the sign-in was yours, no action is needed. If it was not, navigate directly to Login.gov and immediately reset the password and authentication methods without using or exposing the email security token."
+      }
+    },
+    {
+      "lane_id": "dla_dsip_topic_status",
+      "organization": "Defense Logistics Agency / DLA SBIR",
+      "status": "OFFICIAL_DLA_CONFIRMED_PROPOSAL_IN_PROGRESS_NOT_SUBMITTED",
+      "source": {
+        "sender": "DLA SBIR",
+        "received_utc": "2026-07-28T17:36:13Z",
+        "subject": "FW: [Non-DoD Source] Re: Deadline-critical clarification: DLA26BZ03-NV011 Volume V DD Form 2345/JCP evidence",
+        "subject_sha256": "DAB7E531AF85EA502A3765D6079E934E2B80F2D8B0AD060E82D67E6C988E2CDF",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "official_status_route_provided": true,
+        "past_proposals_tab_named": true,
+        "official_portal_status_observed": true,
+        "portal_status": "IN_PROGRESS",
+        "portal_snapshot_reported": true,
+        "portal_snapshot_omitted": true,
+        "formally_submitted": false,
+        "submission_receipt_observed": false,
+        "deadline_elapsed": true,
+        "founder_portal_recheck_required": false
+      },
+      "action": {
+        "key_ask": "None. Preserve the authoritative negative receipt and close the expired proposal lane as not submitted.",
+        "missing_facts": [],
+        "deadline": null,
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "CLOSE_NOT_SUBMITTED_DO_NOT_RESEND",
+        "safest_next_action": "Archive the official non-submission receipt, retain the failed gates for lessons learned, and do not resend, certify, upload, or represent the proposal as submitted."
+      }
+    },
+    {
+      "lane_id": "epri_open_power_ai_mou_completed",
+      "organization": "EPRI Open Power AI Consortium",
+      "status": "MOU_COMPLETED_BY_ALL_PARTIES_PRIVATE_CUSTODY_REQUIRED",
+      "source": {
+        "sender": "DocuSign on behalf of EPRI",
+        "received_utc": "2026-07-27T17:03:01Z",
+        "subject": "Completed: EPRI Open Power AI Consortium MOU",
+        "subject_sha256": "CF2913EC48424EE5D9B9B409BD3385B5B071515793820512317B837129796E7A",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "all_parties_completed": true,
+        "completed_document_attached": true,
+        "document_contents_omitted": true,
+        "private_signing_identifiers_omitted": true,
+        "onboarding_obligations_reviewed": false
+      },
+      "action": {
+        "key_ask": "No email reply is requested; preserve the completed agreement in private custody and review its onboarding obligations.",
+        "missing_facts": [
+          "Private custody copy and hash",
+          "Founder review of onboarding obligations",
+          "Any dated deliverables or asset requests in the completed agreement"
+        ],
+        "deadline": null,
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "DO_NOT_SEND_A_COMPLETION_REPLY_UNLESS_EPRI_REQUESTS_ONE",
+        "safest_next_action": "Archive the completed agreement to a private evidence location, record its hash, and review obligations without exposing signing links or private identifiers."
+      }
+    },
+    {
+      "lane_id": "argos_government_automatic_reply",
+      "organization": "U.S. Department of Health and Human Services",
+      "status": "AUTOMATIC_OUT_OF_OFFICE_REPLY_OBSERVED_DELIVERY_ONLY_NO_DUPLICATE",
+      "source": {
+        "sender": "HHS contract specialist",
+        "received_utc": "2026-07-29T01:54:02Z",
+        "subject": "Automatic reply: Sources Sought Response - ONC-ARGOS-SSN-2026-OS351107 - Robert Ashworth",
+        "subject_sha256": "B441B7EF9FC02709703EC007511FDC64E52148D9A8BE33EFFAE9822F0369846F",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "automatic_reply": true,
+        "delivery_evidence_only": true,
+        "substantive_acknowledgment": false,
+        "acceptance_or_award": false,
+        "emails_not_forwarded_while_away": true,
+        "out_of_office_end_date": "2026-07-29",
+        "out_of_office_end_time_explicit": false
+      },
+      "action": {
+        "key_ask": "No action requested. The automatic reply is delivery evidence only and does not authorize a resend or establish review, acceptance, award, or contract status.",
+        "missing_facts": [
+          "Any substantive government response",
+          "Any clarification request",
+          "Any evaluation or award status"
+        ],
+        "deadline": null,
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "DO_NOT_REPLY_TO_THE_AUTOMATIC_MESSAGE_OR_RESEND_THE_ARGOS_PACKET",
+        "safest_next_action": "Monitor the existing thread for a substantive request. Do not duplicate the sent packet and do not characterize the automatic reply as government acknowledgment or acceptance."
+      }
+    },
+    {
+      "lane_id": "nashville_ec_accelerator_info_sessions",
+      "organization": "Nashville Entrepreneur Center",
+      "status": "UPDATED_PAYMENT_ROUTE_AND_OPTIONAL_INFO_SESSIONS_AVAILABLE",
+      "source": {
+        "sender": "Nashville Entrepreneur Center",
+        "received_utc": "2026-07-29T02:49:17Z",
+        "subject": "Updated Payment & Accelerator Info Session Links",
+        "subject_sha256": "2A394C44F3A143443AA38477AE4C4A8278DA93AF55362A9644543152C0F72D82",
+        "sender_address_omitted": true,
+        "message_body_omitted": true,
+        "private_mail_identifiers_omitted": true,
+        "full_thread_read": true,
+        "thread_truncated": false
+      },
+      "evidence": {
+        "fall_cohort_preparation_confirmed": true,
+        "prior_payment_link_invalidated": true,
+        "updated_takeoff_payment_route_provided": true,
+        "payment_link_omitted": true,
+        "deposit_deadline_date": "2026-08-14",
+        "deposit_deadline_time_explicit": false,
+        "optional_info_sessions_offered": true,
+        "session_count": 3,
+        "session_times_present": true,
+        "session_timezone_explicit": false,
+        "session_links_omitted": true,
+        "attendance_required": false,
+        "onboarding_deadline_date": "2026-07-31",
+        "onboarding_deadline_time_explicit": false,
+        "onboarding_form_submitted": false
+      },
+      "action": {
+        "key_ask": "Use the corrected TakeOff payment route only after founder review, submit the onboarding form by Friday, July 31, and optionally attend one information session.",
+        "missing_facts": [
+          "Founder review of the participation agreement and payment terms",
+          "Founder approval before any deposit",
+          "Founder preference for an optional session",
+          "Official session timezone",
+          "Calendar availability",
+          "Founder-reviewed onboarding answers and participation agreement"
+        ],
+        "deadline": {
+          "onboarding_form_date": "2026-07-31",
+          "time_and_timezone_explicit": false
+        },
+        "email_reply_required": false,
+        "send_now": false,
+        "selected_template_id": "NO_DUPLICATE_MONITOR",
+        "duplicate_send_decision": "DO_NOT_REPLY_OR_TREAT_OPTIONAL_SESSION_AS_REQUIRED",
+        "safest_next_action": "Complete the founder-reviewed onboarding form by July 31. Preserve the corrected TakeOff payment route for founder-controlled payment by August 14, and verify any optional session timezone before saving it; no email reply is needed."
+      }
+    }
+  ],
+  "claim_boundary": "This privacy-safe register records observed official routing and status events only. It does not establish eligibility, selection, endorsement, funding, an award, a contract, independent validation, licensing, portal completion, or technical performance."
+}

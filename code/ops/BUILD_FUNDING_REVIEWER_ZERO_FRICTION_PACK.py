@@ -270,7 +270,14 @@ def build_payload() -> dict[str, Any]:
             "realized_savings_claim_allowed": bool(live_value_gate.get("realized_customer_or_government_savings_allowed")),
             "patent_grant_claimed": bool(ip_summary.get("patent_grant_claimed")),
             "legal_advice_claimed": bool(ip_summary.get("legal_advice_claimed")),
-            "reviewer_gate_clear": bool(loaded["reviewer_gate"].get("reviewer_gate_clear")),
+            "reviewer_packaging_gate_clear": bool(
+                gate_summary.get("packaging_checks_clear")
+            )
+            and int(gate_summary.get("unsafe_secret_count", 0) or 0) == 0
+            and int(gate_summary.get("unsafe_claim_count", 0) or 0) == 0,
+            "submission_argument_gate_clear": bool(
+                loaded["reviewer_gate"].get("reviewer_gate_clear")
+            ),
             "unsafe_secret_count": int(gate_summary.get("unsafe_secret_count", 0) or 0),
             "unsafe_claim_count": int(gate_summary.get("unsafe_claim_count", 0) or 0),
             "all_final_actions_blocked_without_human": final_actions_blocked,
@@ -339,7 +346,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Realized savings claim allowed: `{str(summary['realized_savings_claim_allowed']).lower()}`",
         f"- Patent grant claimed: `{str(summary['patent_grant_claimed']).lower()}`",
         f"- Legal advice claimed: `{str(summary['legal_advice_claimed']).lower()}`",
-        f"- Reviewer gate clear: `{str(summary['reviewer_gate_clear']).lower()}`",
+        f"- Reviewer packaging gate clear: `{str(summary['reviewer_packaging_gate_clear']).lower()}`",
+        f"- Submission argument gate clear: `{str(summary['submission_argument_gate_clear']).lower()}`",
         f"- Unsafe sensitive hits: `{summary['unsafe_secret_count']}`",
         f"- Unsafe claim hits: `{summary['unsafe_claim_count']}`",
         f"- All final actions blocked without human: `{str(summary['all_final_actions_blocked_without_human']).lower()}`",

@@ -1,0 +1,288 @@
+{
+  "outputSlides": [
+    {
+      "outputSlide": 1,
+      "sourceSlide": 1,
+      "narrativeRole": "opening thesis",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/k3yl0zql",
+            "sh/7qp4be9c",
+            "sh/ts7md4r2",
+            "sh/fu94fe98",
+            "sh/utg3698n",
+            "sh/ul4vaxgb",
+            "sh/vmdcj2xw"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 2,
+      "sourceSlide": 2,
+      "narrativeRole": "problem evidence",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/9072xkry",
+            "sh/a10jqpsj",
+            "sh/x4r21kru",
+            "sh/9o7ulg3y"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 3,
+      "sourceSlide": 3,
+      "narrativeRole": "product workflow",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/cza94vmx",
+            "sh/3ah8rqlg",
+            "sh/sfix03y9",
+            "sh/tgry9ofu",
+            "sh/a9kfadwn"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 4,
+      "sourceSlide": 4,
+      "narrativeRole": "customer hypothesis",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/ql8jytsj",
+            "sh/sri9s7q9",
+            "sh/ilwf69kv"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 5,
+      "sourceSlide": 5,
+      "narrativeRole": "current evidence and prospective gate",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/qd0bahob",
+            "sh/dgbulwnm",
+            "sh/cf2tcr61",
+            "sh/032tgr6d",
+            "sh/n6dcr65o",
+            "sh/w32dkbuh",
+            "sh/x4vedgvm",
+            "sh/v2twb6dw",
+            "sh/k7mxovud",
+            "sh/i54fmlc7",
+            "sh/j6dwfqds",
+            "sh/tcfel0vu",
+            "sh/hgrmpwj2",
+            "sh/gfi5grih",
+            "sh/pkr6tgjy",
+            "sh/4ji5kbid",
+            "sh/2h0ni107",
+            "sh/5o7mhcju",
+            "sh/atcjidg7",
+            "sh/vu5kbihc",
+            "sh/xwn2dszi",
+            "sh/ihw3mxg3",
+            "sh/kjelony9",
+            "sh/5kn2hszu",
+            "sh/e1sjatgz",
+            "sh/zmlk3yhk",
+            "sh/fid07u98"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 6,
+      "sourceSlide": 6,
+      "narrativeRole": "commercial offer sequence",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/yhg7epsj",
+            "sh/98rqt4r6",
+            "sh/7m98ru9g",
+            "sh/oryp8fah",
+            "sh/pc76hkr2",
+            "sh/h4bupgn6",
+            "sh/w32twb6l",
+            "sh/u1kbu1ov",
+            "sh/5svutgni",
+            "sh/47mt0b6x",
+            "sh/j6dcr65c",
+            "sh/i54bylor",
+            "sh/svmt4v6t",
+            "sh/cbe5g3ih",
+            "sh/dcnm98zm",
+            "sh/qpwnet0b",
+            "sh/bq547yhw",
+            "sh/0fy5k3id",
+            "sh/lg76d8zy"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 7,
+      "sourceSlide": 7,
+      "narrativeRole": "competitive positioning hypothesis",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeId": "sh/s3ml0v61"
+        }
+      ]
+    },
+    {
+      "outputSlide": 8,
+      "sourceSlide": 8,
+      "narrativeRole": "go-to-market qualification gates",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/5sne5wne",
+            "sh/kredcr6t",
+            "sh/jq5w365o"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 9,
+      "sourceSlide": 5,
+      "narrativeRole": "pilot acceptance contract",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/qd0bahob",
+            "sh/dgbulwnm",
+            "sh/cf2tcr61",
+            "sh/032tgr6d",
+            "sh/n6dcr65o",
+            "sh/w32dkbuh",
+            "sh/x4vedgvm",
+            "sh/v2twb6dw",
+            "sh/k7mxovud",
+            "sh/i54fmlc7",
+            "sh/j6dwfqds",
+            "sh/tcfel0vu",
+            "sh/hgrmpwj2",
+            "sh/gfi5grih",
+            "sh/pkr6tgjy",
+            "sh/4ji5kbid",
+            "sh/2h0ni107",
+            "sh/5o7mhcju",
+            "sh/atcjidg7",
+            "sh/vu5kbihc",
+            "sh/xwn2dszi",
+            "sh/ihw3mxg3",
+            "sh/kjelony9",
+            "sh/5kn2hszu",
+            "sh/e1sjatgz",
+            "sh/zmlk3yhk",
+            "sh/fid07u98"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 10,
+      "sourceSlide": 5,
+      "narrativeRole": "funding discipline",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/qd0bahob",
+            "sh/dgbulwnm",
+            "sh/cf2tcr61",
+            "sh/032tgr6d",
+            "sh/n6dcr65o",
+            "sh/w32dkbuh",
+            "sh/x4vedgvm",
+            "sh/v2twb6dw",
+            "sh/k7mxovud",
+            "sh/i54fmlc7",
+            "sh/j6dwfqds",
+            "sh/tcfel0vu",
+            "sh/hgrmpwj2",
+            "sh/gfi5grih",
+            "sh/pkr6tgjy",
+            "sh/4ji5kbid",
+            "sh/2h0ni107",
+            "sh/5o7mhcju",
+            "sh/atcjidg7",
+            "sh/vu5kbihc",
+            "sh/xwn2dszi",
+            "sh/ihw3mxg3",
+            "sh/kjelony9",
+            "sh/5kn2hszu",
+            "sh/e1sjatgz",
+            "sh/zmlk3yhk",
+            "sh/fid07u98"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 11,
+      "sourceSlide": 11,
+      "narrativeRole": "closing ask",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/wbih4b6d",
+            "sh/n69grmpw",
+            "sh/98rytw72",
+            "sh/72t03qp0",
+            "sh/9gza9sze",
+            "sh/0b6tc3yx",
+            "sh/zaxs3yhc",
+            "sh/cn6t83y1",
+            "sh/dofa18z6",
+            "sh/tsnip0ny"
+          ]
+        }
+      ]
+    }
+  ],
+  "omittedSourceSlides": [
+    {
+      "sourceSlide": 9,
+      "reason": "Modeled revenue, margin, and EBITDA assumptions are not current externally shareable evidence."
+    },
+    {
+      "sourceSlide": 10,
+      "reason": "Illustrative funding amount and allocation are not approved current terms."
+    }
+  ]
+}

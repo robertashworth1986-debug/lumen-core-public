@@ -1,0 +1,137 @@
+{
+  "schema": "prooflock_opportunity_ops_pilot_config_v1",
+  "protocol_id": "PROOFLOCK_OPS_PILOT_V1",
+  "status": "DRAFT_SCOPE_BUYER_BASELINE_AND_FOUNDER_PRICING_REQUIRED",
+  "duration_days": 30,
+  "scope_boundary": "Opportunity, workflow, synthetic, sample, and buyer-authorized non-PHI organization data only. No credentials, final certifications, signatures, or autonomous submissions.",
+  "minimum_sample": {
+    "reviewed_opportunities": 30,
+    "pursued_packages": 5,
+    "alternate_sample_rule": "A lower sample is valid only when the buyer documents the expected source volume before the pilot and both parties approve the alternate denominator."
+  },
+  "permitted_sources": [
+    "buyer-approved official public opportunity pages and feeds",
+    "buyer-provided eligibility and workflow rules approved for pilot use",
+    "synthetic or de-identified sample organization records",
+    "buyer-approved internal timestamps and defect labels"
+  ],
+  "prohibited_inputs": [
+    "protected health information",
+    "account credentials or one-time codes",
+    "controlled unclassified or export-controlled material",
+    "unreleased proposal content unless a written private-data agreement permits it",
+    "payment data"
+  ],
+  "deliverables": [
+    "signed-off baseline and acceptance memo",
+    "source and eligibility-rule register",
+    "review-only candidate queue with abstention reasons",
+    "attachment, owner, and blocker ledger",
+    "weekly hash-linked workflow receipt",
+    "final metric workbook and claim-bounded decision memo"
+  ],
+  "exclusions": [
+    "legal or accounting advice",
+    "guaranteed eligibility, award, savings, or revenue",
+    "final certification, signature, upload, send, or submission",
+    "model-superiority or field-performance claims",
+    "production use of protected or controlled data"
+  ],
+  "event_schema": {
+    "schema": "prooflock_opportunity_event_v1",
+    "required_fields": [
+      "event_id",
+      "event_utc",
+      "opportunity_id",
+      "source_id",
+      "action_type",
+      "actor_role",
+      "evidence_sha256",
+      "decision",
+      "blockers",
+      "human_authority_state",
+      "previous_event_sha256",
+      "event_sha256"
+    ]
+  },
+  "receipt_schema": {
+    "schema": "prooflock_opportunity_receipt_chain_v1",
+    "required_fields": [
+      "protocol_id",
+      "event_count",
+      "genesis_sha256",
+      "terminal_event_sha256",
+      "chain_valid",
+      "receipt_sha256"
+    ]
+  },
+  "acceptance_metrics": [
+    {
+      "metric": "qualified opportunity precision",
+      "numerator": "buyer-confirmed qualified matches",
+      "denominator": "all candidate matches reviewed by the buyer"
+    },
+    {
+      "metric": "time to pursue decision",
+      "numerator": "sum of elapsed hours from discovery to documented decision",
+      "denominator": "opportunities receiving a documented pursue or no-pursue decision"
+    },
+    {
+      "metric": "time to reviewer-ready draft",
+      "numerator": "sum of elapsed hours from pursue decision to buyer-defined internal review state",
+      "denominator": "pursued packages reaching internal review"
+    },
+    {
+      "metric": "preflight defect rate",
+      "numerator": "missing, contradictory, stale, or ownerless required items found at review",
+      "denominator": "required package items inspected at review"
+    },
+    {
+      "metric": "deadline reliability",
+      "numerator": "pursued packages reaching internal review by the frozen buyer cutoff",
+      "denominator": "pursued packages with an open verified deadline"
+    },
+    {
+      "metric": "provenance completeness",
+      "numerator": "material claims carrying a traceable reviewed source",
+      "denominator": "material claims inspected"
+    }
+  ],
+  "acceptance_thresholds": {
+    "status": "BUYER_SUPPLIED_BEFORE_PILOT",
+    "values": {},
+    "rule": "No metric is called improved or accepted until the buyer approves its baseline, threshold, denominator, exclusions, and cutoff before pilot measurement."
+  },
+  "raci": {
+    "buyer_workflow_owner": "accountable for source permissions, eligibility rules, thresholds, and acceptance",
+    "buyer_authorized_official": "accountable for every certification, signature, send, upload, and final submission",
+    "lumencore_operator": "responsible for configured monitoring, draft assembly, blocker ledgers, and receipts",
+    "lumencore_founder": "accountable for scope, pricing, public claims, and any external communication",
+    "legal_or_security_reviewer": "consulted when data, confidentiality, IP, export, or regulated-domain terms require review"
+  },
+  "retention_and_security": {
+    "default_retention_days_after_pilot": 30,
+    "deletion_rule": "Delete or return buyer data after the approved retention period unless a signed agreement specifies another period.",
+    "access_rule": "Least-privilege named users only; no credentials or protected data in public artifacts.",
+    "incident_rule": "Stop processing, preserve bounded logs, notify the named buyer owner, and follow the signed incident procedure."
+  },
+  "support_boundary": {
+    "included": "One kickoff, one weekly review, asynchronous blocker triage during agreed business hours, and one final readout.",
+    "excluded": "24-hour operations, legal representation, portal administration, managed submission, or production SLA unless separately contracted."
+  },
+  "pricing": {
+    "status": "UNQUOTED_SCOPE_FIRST",
+    "founder_approved": false,
+    "pilot_fee_usd": null,
+    "subscription_credit_usd": null,
+    "annual_subscription_usd": null,
+    "rule": "No price is offered until buyer scope, source count, seat count, support level, data terms, and acceptance plan are approved."
+  },
+  "human_gates": [
+    "buyer confirms organizational eligibility and source permissions",
+    "buyer approves claims, representations, thresholds, and package content",
+    "authorized official certifies, signs, uploads, sends, and submits",
+    "LumenCore cannot bypass portal attestations, account controls, or signatures",
+    "founder approves exact scope, price, recipient, and external communication"
+  ]
+}

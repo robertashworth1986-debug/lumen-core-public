@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import hashlib
-import importlib.util
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -14,9 +14,7 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 DOCS = ROOT / "docs"
 
 BUYER_PACKET_JSON = OUT_OPS / "field_validation_buyer_pilot_packet_latest.json"
-BUYER_PACKET_SCRIPT = ROOT / "code" / "ops" / "BUILD_FIELD_VALIDATION_BUYER_PILOT_PACKET.py"
 CHAMPION_BOARD_JSON = OUT_OPS / "geometry_champion_of_champions_latest.json"
-CHAMPION_BOARD_SCRIPT = ROOT / "code" / "ops" / "BUILD_GEOMETRY_CHAMPION_OF_CHAMPIONS.py"
 KURAMOTO_HOLDOUT_JSON = OUT_OPS / "kuramoto_holdout_expansion_latest.json"
 
 OUT_JSON = OUT_OPS / "kuramoto_field_replay_request_latest.json"
@@ -32,7 +30,7 @@ def read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
         return {}
     return payload if isinstance(payload, dict) else {}
@@ -40,312 +38,363 @@ def read_json(path: Path) -> dict[str, Any]:
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
 
 
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    os.replace(temporary, path)
 
 
 def stable_sha256(payload: Any) -> str:
-    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
 
 
-def load_builder_payload(script: Path, module_name: str) -> dict[str, Any]:
-    spec = importlib.util.spec_from_file_location(module_name, script)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    payload = module.build_payload()
-    return payload if isinstance(payload, dict) else {}
-
-
-def load_buyer_packet_payload() -> dict[str, Any]:
-    payload = read_json(BUYER_PACKET_JSON)
-    if payload.get("schema") == "field_validation_buyer_pilot_packet_v1" and payload.get("packets"):
-        return payload
-    return load_builder_payload(BUYER_PACKET_SCRIPT, "field_validation_buyer_packet_for_kuramoto_request")
-
-
-def load_champion_board_payload() -> dict[str, Any]:
-    payload = read_json(CHAMPION_BOARD_JSON)
-    if payload.get("schema") == "geometry_champion_of_champions_v1":
-        return payload
-    if CHAMPION_BOARD_SCRIPT.exists():
-        return load_builder_payload(CHAMPION_BOARD_SCRIPT, "champion_board_for_kuramoto_request")
-    return {}
-
-
-def select_kuramoto_packet(payload: dict[str, Any]) -> dict[str, Any]:
+def select_packet(payload: dict[str, Any]) -> dict[str, Any]:
     packets = payload.get("packets", [])
     if not isinstance(packets, list):
         return {}
     for packet in packets:
-        if isinstance(packet, dict) and packet.get("family_id") == "kuramoto_phase_coupling":
+        if (
+            isinstance(packet, dict)
+            and packet.get("family_id") == "kuramoto_phase_coupling"
+        ):
             return packet
     return {}
 
 
-def select_kuramoto_champion(payload: dict[str, Any]) -> dict[str, Any]:
-    champion = payload.get("champion_of_champions", {})
-    if isinstance(champion, dict):
-        strongest = champion.get("strongest_current", {})
-        if isinstance(strongest, dict) and strongest.get("family") == "kuramoto_phase_coupling":
-            return strongest
-
-    for key in ("families", "ranked_families", "family_rankings"):
-        rows = payload.get(key, [])
-        if not isinstance(rows, list):
-            continue
-        for row in rows:
-            if isinstance(row, dict) and row.get("family") == "kuramoto_phase_coupling":
-                return row
-    return {}
+def require_inputs() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    buyer = read_json(BUYER_PACKET_JSON)
+    board = read_json(CHAMPION_BOARD_JSON)
+    holdout = read_json(KURAMOTO_HOLDOUT_JSON)
+    required = {
+        "field_validation_buyer_pilot_packet_v2": buyer.get("schema"),
+        "geometry_champion_of_champions_v3": board.get("schema"),
+        "kuramoto_holdout_expansion_v2": holdout.get("schema"),
+    }
+    for expected, actual in required.items():
+        if actual != expected:
+            raise ValueError(f"{expected} is required; found {actual!r}")
+    return buyer, board, holdout
 
 
-def make_summary(packet: dict[str, Any], champion: dict[str, Any]) -> dict[str, Any]:
-    holdout = packet.get("latest_holdout_evidence", {})
-    if not isinstance(holdout, dict):
-        holdout = {}
-    return {
+def build_payload() -> dict[str, Any]:
+    buyer, board, holdout = require_inputs()
+    packet = select_packet(buyer)
+    if not packet:
+        raise ValueError("Kuramoto protocol-review packet is required")
+
+    measured = holdout.get("summary", {})
+    if not isinstance(measured, dict):
+        measured = {}
+    board_summary = board.get("summary", {})
+    if not isinstance(board_summary, dict):
+        board_summary = {}
+
+    summary = {
         "candidate": "kuramoto_phase_coupling",
         "lane": packet.get("lane", "wave_resonance_timing"),
-        "pilot_name": packet.get("pilot_name", "Wave / Resonance Timing Forecast Pilot"),
-        "current_status": "ready_to_request_field_replay_not_yet_field_validated",
-        "manual_outreach_allowed": True,
+        "artifact_role": "nonpromotion_and_future_protocol_redesign_brief",
+        "current_status": (
+            "field_replay_request_blocked_source_specific_baseline_gate_failed"
+        ),
+        "internal_performance_champion_present": False,
+        "candidate_was_protocol_selected": bool(
+            measured.get("candidate_was_protocol_selected", False)
+        ),
+        "development_selected_candidate": measured.get(
+            "development_selected_candidate", ""
+        ),
+        "evidence_mode": measured.get("evidence_mode", ""),
+        "holdout_count": int(measured.get("holdout_count") or 0),
+        "wins_vs_kalman": int(measured.get("wins_vs_kalman") or 0),
+        "losses_or_ties_vs_kalman": int(
+            measured.get("losses_or_ties_vs_kalman") or 0
+        ),
+        "win_rate_vs_kalman": float(measured.get("win_rate_vs_kalman") or 0.0),
+        "mean_delta_vs_kalman": float(
+            measured.get("mean_delta_vs_kalman") or 0.0
+        ),
+        "wins_vs_best_baseline": int(
+            measured.get("wins_vs_best_baseline") or 0
+        ),
+        "mean_delta_vs_best_baseline": float(
+            measured.get("mean_delta_vs_best_baseline") or 0.0
+        ),
+        "named_baseline": measured.get("named_baseline", ""),
+        "best_registered_baseline": measured.get(
+            "best_registered_baseline", ""
+        ),
+        "registered_baseline_count": int(
+            measured.get("registered_baseline_count") or 0
+        ),
+        "registered_baseline_mean_win_count": int(
+            measured.get("registered_baseline_mean_win_count") or 0
+        ),
+        "registered_baseline_gate_pass_count": int(
+            measured.get("registered_baseline_gate_pass_count") or 0
+        ),
+        "candidate_beats_all_registered_baselines_after_holm": bool(
+            measured.get("candidate_beats_all_registered_baselines_after_holm")
+        ),
+        "estimated_rows_replayed": int(
+            measured.get("estimated_rows_replayed") or 0
+        ),
+        "panel_row_count": int(measured.get("panel_row_count") or 0),
+        "authority_count": int(measured.get("authority_count") or 0),
+        "source_system_count": int(measured.get("source_system_count") or 0),
+        "source_systems": measured.get("source_systems", []),
+        "holdout_chain_sha256": str(
+            measured.get("holdout_chain_sha256", "")
+        ),
+        "field_replay_request_allowed": False,
+        "manual_outreach_allowed": False,
         "bulk_email_allowed": False,
-        "minimum_holdout_windows_requested": 20,
-        "holdout_count": int(holdout.get("holdout_count") or 0),
-        "wins_vs_kalman": int(holdout.get("wins_vs_kalman") or 0),
-        "losses_or_ties_vs_kalman": int(holdout.get("losses_or_ties_vs_kalman") or 0),
-        "win_rate_vs_kalman": float(holdout.get("win_rate_vs_kalman") or 0.0),
-        "mean_delta_vs_kalman": float(holdout.get("mean_delta_vs_kalman") or 0.0),
-        "min_delta_vs_kalman": float(holdout.get("min_delta_vs_kalman") or 0.0),
-        "estimated_rows_replayed": int(holdout.get("estimated_rows_replayed") or 0),
-        "source_system_count": int(holdout.get("source_system_count") or 0),
-        "source_systems": holdout.get("source_systems", []),
-        "wilson_95_win_rate_lower": float(holdout.get("wilson_95_win_rate_lower") or 0.0),
-        "one_sided_sign_test_p_value": float(holdout.get("one_sided_sign_test_p_value") or 1.0),
-        "holdout_chain_sha256": str(holdout.get("holdout_chain_sha256", "")),
-        "champion_asset_score": champion.get("asset_score", 0),
-        "champion_rank": champion.get("rank", 0),
-        "champion_claim_stage": champion.get("claim_stage", ""),
+        "paid_protocol_review_scoping_allowed": True,
         "field_validation_claim_allowed": False,
         "real_dollar_savings_claim_allowed": False,
         "fixed_dollar_delta_sale_claim_allowed": False,
         "live_trading_or_autonomous_execution_allowed": False,
     }
 
-
-def build_payload() -> dict[str, Any]:
-    buyer_payload = load_buyer_packet_payload()
-    champion_payload = load_champion_board_payload()
-    packet = select_kuramoto_packet(buyer_payload)
-    champion = select_kuramoto_champion(champion_payload)
-    summary = make_summary(packet, champion)
-    holdout = packet.get("latest_holdout_evidence", {}) if isinstance(packet, dict) else {}
-    if not isinstance(holdout, dict):
-        holdout = {}
-
     request_packet = {
-        "one_sentence_ask": (
-            "Authorize a field replay on pre-registered holdout windows so "
-            "kuramoto_phase_coupling can be compared against the buyer's accepted incumbent baseline."
+        "request_type": "not_a_field_replay_request",
+        "current_status": "blocked",
+        "one_sentence_non_ask": (
+            "Do not ask an external owner to replay Kuramoto as a promoted "
+            "candidate; preserve its direct measured nonpromotion result and "
+            "redesign the next source-native wave benchmark."
         ),
-        "technical_question": packet.get(
-            "pilot_question",
-            "Can the Kuramoto-style candidate beat incumbent timing or forecast baselines on pre-registered buyer holdout windows?",
+        "protocol_review_question": packet.get("protocol_question", ""),
+        "reviewer_roles": packet.get("priority_buyer_titles", []),
+        "data_required_for_future_protocol": packet.get(
+            "buyer_data_checklist", []
         ),
-        "buyer_roles": packet.get("priority_buyer_titles", []),
-        "data_required": packet.get("buyer_data_checklist", []),
         "baseline_controls": packet.get("baseline_controls", []),
-        "primary_kpis": packet.get("primary_kpis", []),
-        "acceptance_gate": packet.get("acceptance_gate", {}),
-        "deliverables": packet.get("deliverables", []),
-        "pre_call_questions": packet.get("pre_call_questions", []),
-        "field_replay_request": packet.get("field_replay_request", {}),
+        "future_primary_kpis": packet.get("primary_kpis", []),
+        "protocol_review_deliverables": packet.get("deliverables", []),
+        "pre_review_questions": packet.get("pre_call_questions", []),
+        "current_field_replay_gate": packet.get("field_replay_request", {}),
+        "unlock_conditions": [
+            "select the future candidate using development data only",
+            "freeze source-native baselines before opening the holdout",
+            "beat every registered baseline on the untouched holdout",
+            "pass multiplicity correction and independent frozen repeats",
+            "obtain exact action-time approval before any external request",
+        ],
     }
 
-    payload = {
-        "schema": "kuramoto_field_replay_request_v1",
+    payload: dict[str, Any] = {
+        "schema": "kuramoto_field_replay_request_v2",
         "generated_utc": now_utc(),
+        "legacy_filename_notice": (
+            "The filename is retained for downstream compatibility. This "
+            "artifact blocks the request and is not an outreach packet."
+        ),
         "purpose": (
-            "Convert the strongest current internal replay result into a buyer-authorized field replay request. "
-            "This is a validation ask, not a completed field-validation claim."
+            "Record the direct measured Kuramoto nonpromotion result, close the "
+            "legacy field-replay narrative, and define the gates for a future "
+            "source-specific wave-family benchmark."
         ),
         "summary": summary,
         "request_packet": request_packet,
         "evidence": {
-            "latest_holdout_evidence": holdout,
-            "champion_board_status": {
-                "family": champion.get("family", "kuramoto_phase_coupling"),
-                "asset_score": champion.get("asset_score", 0),
-                "evidence_status": champion.get("evidence_status", ""),
-                "claim_stage": champion.get("claim_stage", ""),
-                "rank": champion.get("rank", 0),
-                "ready_for_buyer_authorized_field_replay_request": champion.get(
-                    "ready_for_buyer_authorized_field_replay_request", False
+            "holdout_summary": measured,
+            "board_status": {
+                "internal_performance_champion_present": bool(
+                    board_summary.get("internal_performance_champion_present")
+                ),
+                "direct_all_baseline_global_holm_positive_count": int(
+                    board_summary.get(
+                        "direct_all_baseline_global_holm_positive_count"
+                    )
+                    or 0
+                ),
+                "legacy_pilot_card_excluded_count": int(
+                    board_summary.get("legacy_pilot_card_excluded_count") or 0
                 ),
             },
             "source_artifacts": {
-                "buyer_packet_json": str(BUYER_PACKET_JSON.relative_to(ROOT)),
-                "champion_board_json": str(CHAMPION_BOARD_JSON.relative_to(ROOT)),
-                "kuramoto_holdout_json": str(KURAMOTO_HOLDOUT_JSON.relative_to(ROOT)),
-                "markdown": str(OUT_MD.relative_to(ROOT)),
+                "buyer_packet_json": str(
+                    BUYER_PACKET_JSON.relative_to(ROOT)
+                ).replace("\\", "/"),
+                "champion_board_json": str(
+                    CHAMPION_BOARD_JSON.relative_to(ROOT)
+                ).replace("\\", "/"),
+                "kuramoto_holdout_json": str(
+                    KURAMOTO_HOLDOUT_JSON.relative_to(ROOT)
+                ).replace("\\", "/"),
+                "markdown": str(OUT_MD.relative_to(ROOT)).replace("\\", "/"),
             },
         },
-        "email": packet.get("email", {}),
+        "commercial_boundary": {
+            "current_offer": packet.get("paid_offer", {}),
+            "offer_allowed": "source-native benchmark and evidence protocol review",
+            "performance_value_pricing_allowed": False,
+            "outreach": {
+                "recipient_selected": False,
+                "draft_generated": False,
+                "send_allowed": False,
+                "exact_action_time_approval_required": True,
+            },
+        },
         "claim_boundary": {
+            "not_a_current_champion": True,
+            "not_a_field_replay_request": True,
             "not_field_validation": True,
             "not_realized_savings": True,
             "not_fixed_dollar_delta_value": True,
             "not_live_trading": True,
-            "not_medical_or_addiction_treatment_evidence": True,
             "safe_statement": (
-                "The current result supports a manual request for buyer-authorized replay. "
-                "It does not prove external operational performance until the buyer controls the data, baseline, "
-                "holdout windows, logs, and result interpretation."
+                "Kuramoto was measured directly on the frozen EIA panel, was "
+                "not selected by the development protocol, and lost on mean "
+                "skill to the named Kalman baseline and every registered "
+                "baseline. This is useful negative evidence, not a promoted "
+                "candidate or field-performance result."
             ),
         },
         "next_actions": [
-            "Pick one external system owner with authority over a real operational or accepted historical holdout dataset.",
-            "Pre-register at least 20 windows, the incumbent baseline, metrics, and pass/fail thresholds.",
-            "Run the incumbent baseline and Kuramoto candidate under identical constraints with no tuning after seeing results.",
-            "Hash the inputs, replay logs, outputs, and reviewer interpretation.",
-            "Convert improvements to dollars only after the buyer approves the economic conversion factors.",
+            "Keep the negative result and its chain hash in the reviewer room.",
+            "Do not send the legacy field-replay request.",
+            "Map each future wave family to the exact source task it can represent.",
+            "Select the future candidate on development data only.",
+            "Freeze all source-native baselines before opening the holdout.",
+            "Require all-baseline success after multiplicity correction.",
+            "Require independent frozen repeats before a field-replay request.",
+            "Offer only a bounded protocol review while those gates remain closed.",
         ],
-        "no_go_claims": [
-            "field validated",
-            "guaranteed savings",
-            "$10k per frozen delta",
-            "guaranteed trading edge",
-            "proven institutional profit",
-            "medical treatment claim",
-        ],
+        "no_go_claims": packet.get(
+            "no_send_phrases",
+            [
+                "current performance champion",
+                "field replay ready",
+                "field validated",
+                "guaranteed savings",
+                "guaranteed trading edge",
+            ],
+        ),
         "outputs": {
-            "json": str(OUT_JSON.relative_to(ROOT)),
-            "dashboard_json": str(DASHBOARD_JSON.relative_to(ROOT)),
-            "markdown": str(OUT_MD.relative_to(ROOT)),
+            "json": str(OUT_JSON.relative_to(ROOT)).replace("\\", "/"),
+            "dashboard_json": str(DASHBOARD_JSON.relative_to(ROOT)).replace(
+                "\\", "/"
+            ),
+            "markdown": str(OUT_MD.relative_to(ROOT)).replace("\\", "/"),
         },
     }
-    payload["packet_sha256"] = stable_sha256(payload)
+    payload["packet_sha256"] = stable_sha256(
+        {
+            "summary": payload["summary"],
+            "request_packet": payload["request_packet"],
+            "commercial_boundary": payload["commercial_boundary"],
+            "claim_boundary": payload["claim_boundary"],
+        }
+    )
     return payload
 
 
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     request = payload["request_packet"]
-    evidence = payload["evidence"]["latest_holdout_evidence"]
-    email = payload.get("email", {})
-    claim_boundary = payload["claim_boundary"]
+    boundary = payload["claim_boundary"]
     lines = [
-        "# Kuramoto Field Replay Request",
+        "# Kuramoto Nonpromotion and Protocol Redesign Brief",
         "",
         f"Generated UTC: `{payload['generated_utc']}`",
         "",
+        payload["legacy_filename_notice"],
+        "",
         payload["purpose"],
         "",
-        "## Summary",
+        "## Measured Result",
         "",
         f"- Candidate: `{summary['candidate']}`",
-        f"- Lane: `{summary['lane']}`",
+        f"- Development-selected candidate: `{summary['development_selected_candidate']}`",
+        f"- Candidate was protocol-selected: `{str(summary['candidate_was_protocol_selected']).lower()}`",
         f"- Status: `{summary['current_status']}`",
-        f"- Internal holdout wins vs Kalman: `{summary['wins_vs_kalman']}/{summary['holdout_count']}`",
-        f"- Mean delta vs Kalman: `{summary['mean_delta_vs_kalman']}`",
-        f"- Estimated rows replayed: `{summary['estimated_rows_replayed']}`",
-        f"- Source systems: `{summary['source_system_count']}`",
-        f"- Wilson lower 95% win-rate bound: `{summary['wilson_95_win_rate_lower']}`",
+        f"- Direct measured wins vs Kalman: `{summary['wins_vs_kalman']}/{summary['holdout_count']}`",
+        f"- Losses or ties vs Kalman: `{summary['losses_or_ties_vs_kalman']}`",
+        f"- Mean skill delta vs Kalman: `{summary['mean_delta_vs_kalman']}`",
+        f"- Best registered baseline: `{summary['best_registered_baseline']}`",
+        f"- Registered baseline mean wins: `{summary['registered_baseline_mean_win_count']}/{summary['registered_baseline_count']}`",
+        f"- Registered baseline gate passes: `{summary['registered_baseline_gate_pass_count']}/{summary['registered_baseline_count']}`",
+        f"- All-baseline Holm gate passed: `{str(summary['candidate_beats_all_registered_baselines_after_holm']).lower()}`",
+        f"- Panel rows: `{summary['panel_row_count']}`",
         f"- Holdout chain SHA-256: `{summary['holdout_chain_sha256']}`",
+        "",
+        "## Request Gate",
+        "",
+        f"- Request type: `{request['request_type']}`",
+        f"- Current status: `{request['current_status']}`",
+        f"- Field-replay request allowed: `{str(summary['field_replay_request_allowed']).lower()}`",
         f"- Manual outreach allowed: `{str(summary['manual_outreach_allowed']).lower()}`",
-        f"- Bulk email allowed: `{str(summary['bulk_email_allowed']).lower()}`",
+        f"- Paid protocol-review scoping allowed: `{str(summary['paid_protocol_review_scoping_allowed']).lower()}`",
         "",
-        "## Why It Matters",
+        request["one_sentence_non_ask"],
         "",
-        "The evidence says this candidate is worth taking to a real owner-controlled replay. "
-        "It does not say the candidate is already field validated. The next value step is to let a buyer or agency "
-        "control the holdout data, accepted baseline, metrics, and result interpretation.",
+        "Unlock conditions:",
         "",
-        "## What We Can Ask For Now",
-        "",
-        request["one_sentence_ask"],
-        "",
-        f"Technical question: {request['technical_question']}",
-        "",
-        "Buyer roles:",
     ]
-    lines.extend([f"- {role}" for role in request.get("buyer_roles", [])])
-    lines.extend(["", "Data required:"])
-    lines.extend([f"- {item}" for item in request.get("data_required", [])])
-    lines.extend(["", "Baseline controls:"])
-    lines.extend([f"- `{item}`" for item in request.get("baseline_controls", [])])
-    lines.extend(["", "Primary KPIs:"])
-    lines.extend([f"- `{item}`" for item in request.get("primary_kpis", [])])
+    lines.extend(f"- {item}" for item in request["unlock_conditions"])
     lines.extend(
         [
-            "",
-            "## Evidence",
-            "",
-            f"- Holdout count: `{evidence.get('holdout_count', 0)}`",
-            f"- Wins vs `{evidence.get('named_baseline', 'kalman_filter')}`: `{evidence.get('wins_vs_kalman', 0)}`",
-            f"- Losses or ties vs `{evidence.get('named_baseline', 'kalman_filter')}`: `{evidence.get('losses_or_ties_vs_kalman', 0)}`",
-            f"- Estimated rows replayed: `{evidence.get('estimated_rows_replayed', 0)}`",
-            f"- Numeric samples read: `{evidence.get('numeric_samples_read', 0)}`",
-            f"- Source systems: `{', '.join(evidence.get('source_systems', []))}`",
-            f"- Chain SHA-256: `{evidence.get('holdout_chain_sha256', '')}`",
-            "",
-            "## Buyer Replay Protocol",
-            "",
-            "Acceptance gate:",
-            "",
-            "```json",
-            json.dumps(request.get("acceptance_gate", {}), indent=2, sort_keys=True, default=str),
-            "```",
-            "",
-            "Pre-call questions:",
-        ]
-    )
-    lines.extend([f"- {item}" for item in request.get("pre_call_questions", [])])
-    lines.extend(
-        [
-            "",
-            "## Manual Email Copy",
-            "",
-            f"Subject: {email.get('subject', '')}",
-            "",
-            "```text",
-            email.get("first_email", "").strip(),
-            "```",
             "",
             "## Claim Boundary",
             "",
-            claim_boundary["safe_statement"],
+            boundary["safe_statement"],
             "",
-            f"- Field-validation claim allowed: `{str(not claim_boundary['not_field_validation']).lower()}`",
-            f"- Realized savings claim allowed: `{str(not claim_boundary['not_realized_savings']).lower()}`",
-            f"- Fixed-dollar delta value claim allowed: `{str(not claim_boundary['not_fixed_dollar_delta_value']).lower()}`",
-            f"- Live trading claim allowed: `{str(not claim_boundary['not_live_trading']).lower()}`",
+            f"- Field-validation claim allowed: `{str(summary['field_validation_claim_allowed']).lower()}`",
+            f"- Realized savings claim allowed: `{str(summary['real_dollar_savings_claim_allowed']).lower()}`",
+            f"- Live execution allowed: `{str(summary['live_trading_or_autonomous_execution_allowed']).lower()}`",
             "",
-            "No-go claims:",
+            "## Next Actions",
+            "",
         ]
     )
-    lines.extend([f"- `{claim}`" for claim in payload["no_go_claims"]])
-    lines.extend(["", f"Packet SHA-256: `{payload['packet_sha256']}`"])
+    lines.extend(
+        f"{index}. {action}"
+        for index, action in enumerate(payload["next_actions"], start=1)
+    )
+    lines.extend(
+        [
+            "",
+            f"Packet SHA-256: `{payload['packet_sha256']}`",
+        ]
+    )
     return "\n".join(lines)
 
 
-def main() -> None:
+def main() -> int:
     payload = build_payload()
     write_json(OUT_JSON, payload)
     write_json(DASHBOARD_JSON, payload)
     write_text(OUT_MD, render_markdown(payload))
-    summary = payload["summary"]
     print(
-        "Kuramoto field replay request built: "
-        f"{summary['wins_vs_kalman']}/{summary['holdout_count']} wins vs Kalman; "
-        f"status={summary['current_status']}"
+        json.dumps(
+            {
+                "schema": payload["schema"],
+                "status": payload["summary"]["current_status"],
+                "field_replay_request_allowed": payload["summary"][
+                    "field_replay_request_allowed"
+                ],
+                "manual_outreach_allowed": payload["summary"][
+                    "manual_outreach_allowed"
+                ],
+                "json": str(OUT_JSON.relative_to(ROOT)).replace("\\", "/"),
+            },
+            indent=2,
+        )
     )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -5,6 +5,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from xml.sax.saxutils import escape
 
 import pdfplumber
 from pypdf import PdfReader
@@ -34,7 +35,10 @@ SOURCE_DIR = SPRINT_DIR / "source_attachments" / "W912HZ26SC005"
 CSO_PDF = SOURCE_DIR / "CSO_HPCMP_SDC_30April2026_FINAL.pdf"
 FAQ_PDF = SOURCE_DIR / "HPCMP_SDC_FAQ_20Jul2026.pdf"
 SOURCE_MANIFEST = SOURCE_DIR / "SOURCE_MANIFEST_2026-07-29.json"
-SOURCE_NATIVE_LEDGER = ROOT / "out" / "ops" / "source_native_family_baseline_ledger_latest.json"
+SOURCE_CUSTODY = SOURCE_DIR / "SOURCE_CUSTODY_2026-07-29.json"
+EVIDENCE_ABLATION = (
+    ROOT / "out" / "ops" / "erdc_sdc_evidence_ablation_latest.json"
+)
 OUT_PDF = (
     ROOT
     / "output"
@@ -61,19 +65,43 @@ OFFICIAL_SUBMISSION_URL = (
 )
 PUBLIC_WEBSITE = "https://lumen-core.ai"
 PUBLIC_REPOSITORY = "https://github.com/robertashworth1986-debug/lumen-core-public"
+ACRONYM_DEFINITIONS = (
+    ("AI", "Artificial Intelligence"),
+    ("API", "Application Programming Interface"),
+    ("CAC", "Common Access Card"),
+    ("CLI", "Command-Line Interface"),
+    ("CPU", "Central Processing Unit"),
+    ("CSO", "Commercial Solutions Opening"),
+    ("DoD", "Department of Defense"),
+    ("DSRC", "DoD Supercomputing Resource Center"),
+    ("ERDC", "Engineer Research and Development Center"),
+    ("GFE", "Government Furnished Equipment"),
+    ("HPC", "High Performance Computing"),
+    ("HPCMP", "High Performance Computing Modernization Program"),
+    ("HTTP", "Hypertext Transfer Protocol"),
+    ("JSON", "JavaScript Object Notation"),
+    ("ML", "Machine Learning"),
+    ("MOSA", "Modular Open Systems Approach"),
+    ("OpenAPI", "Open standard for describing HTTP application interfaces"),
+    ("ROM", "Rough Order of Magnitude"),
+    ("SAM", "System for Award Management"),
+    ("SDC", "Sovereign Defense Cloud"),
+    ("SHA-256", "Secure Hash Algorithm with a 256-bit digest"),
+    ("SLSA", "Supply-chain Levels for Software Artifacts"),
+    ("Zero Trust", "Security model that continuously verifies access decisions"),
+)
 CLAIM_BOUNDARY = (
     "This is a public-safe technical draft, not a submitted solution brief. It does not include "
     "the founder-approved Phase II price, private SAM-matched legal identity and address, a live "
     "SAM status verification, signature, certification, or portal confirmation. It does not claim "
     "ERDC selection, funding availability, a contract, Department of Defense deployment, an "
-    "authorization to operate, classified-data handling, field validation, realized savings, or "
-    "technical performance beyond the bounded repository evidence identified here."
+    "authorization to operate, classified-data handling, field validation, customers, revenue, "
+    "or realized savings, or technical performance beyond the bounded repository evidence identified here."
 )
 PDF_CLAIM_BOUNDARY = (
-    "Claim boundary: This draft does not claim ERDC selection, available funding, a contract "
-    "award, Department of Defense deployment, an authorization to operate, classified-data "
-    "handling, field validation, realized savings, or performance beyond the bounded evidence "
-    "identified here."
+    "Claim boundary: No ERDC selection, available funding, award, DoD deployment, authorization "
+    "to operate, classified handling, field validation, customers, revenue, or realized savings, "
+    "or performance beyond the bounded evidence is claimed."
 )
 
 
@@ -99,66 +127,87 @@ def stable_hash(payload: Any) -> str:
     ).hexdigest()
 
 
-def research_evidence_receipt() -> dict[str, Any]:
-    payload = json.loads(SOURCE_NATIVE_LEDGER.read_text(encoding="utf-8"))
-    summary = payload.get("summary", {})
-    if not isinstance(summary, dict):
-        summary = {}
-
+def evidence_ablation_receipt() -> dict[str, Any]:
+    payload = json.loads(EVIDENCE_ABLATION.read_text(encoding="utf-8"))
+    results = {
+        row.get("profile_id"): row
+        for row in payload.get("results", [])
+        if isinstance(row, dict)
+    }
+    full = results.get("lumencore_full", {})
+    attacks = full.get("control_attack_detection", {})
+    baseline_sources = {
+        row.get("id"): row
+        for row in payload.get("baseline_sources", [])
+        if isinstance(row, dict)
+    }
     receipt = {
-        "path": rel(SOURCE_NATIVE_LEDGER),
-        "sha256": sha256_file(SOURCE_NATIVE_LEDGER),
+        "path": rel(EVIDENCE_ABLATION),
+        "sha256": sha256_file(EVIDENCE_ABLATION),
         "schema": payload.get("schema"),
         "generated_utc": payload.get("generated_utc"),
-        "registered_family_count": summary.get("registered_family_count"),
-        "implementation_present_count": summary.get("implementation_present_count"),
-        "executed_direct_source_baseline_comparison_count": summary.get(
-            "executed_direct_source_baseline_comparison_count"
+        "status": payload.get("status"),
+        "protocol_sha256": payload.get("protocol_sha256"),
+        "workflow_count": payload.get("synthetic_workflows", {}).get("count"),
+        "adverse_count": payload.get("synthetic_workflows", {}).get(
+            "adverse_count"
         ),
-        "individual_comparison_global_holm_positive_count": summary.get(
-            "individual_comparison_global_holm_positive_count"
+        "artifact_count": payload.get("synthetic_workflows", {}).get(
+            "artifact_count"
         ),
-        "candidate_source_beats_every_baseline_global_holm_count": summary.get(
-            "candidate_source_beats_every_baseline_global_holm_count"
+        "full_attack_detected_count": attacks.get("detected_count"),
+        "full_attack_case_count": attacks.get("case_count"),
+        "full_adverse_outcome_recall": full.get("adverse_outcome_recall"),
+        "full_artifact_bytes_rehash_rate": full.get(
+            "artifact_bytes_rehash_rate"
         ),
-        "public_performance_claim_allowed": summary.get(
-            "public_performance_claim_allowed"
+        "full_predeclared_gate_execution_pass": full.get(
+            "predeclared_gate_execution_pass"
         ),
-        "real_dollar_savings_claim_allowed": summary.get(
-            "real_dollar_savings_claim_allowed"
+        "full_posthoc_promotion_change_detected": full.get(
+            "posthoc_promotion_change_detected"
         ),
-        "claim_boundary": summary.get("claim_boundary"),
+        "all_checks_pass": payload.get("all_checks_pass"),
+        "promotion_or_performance_claim_allowed": payload.get(
+            "promotion_or_performance_claim_allowed"
+        ),
+        "opentelemetry_version": baseline_sources.get(
+            "opentelemetry_logs_1_59", {}
+        ).get("version"),
+        "slsa_version": baseline_sources.get(
+            "slsa_build_provenance_1_2", {}
+        ).get("version"),
+        "claim_boundary": payload.get("claim_boundary"),
     }
-    count_fields = (
-        "registered_family_count",
-        "implementation_present_count",
-        "executed_direct_source_baseline_comparison_count",
-        "individual_comparison_global_holm_positive_count",
-        "candidate_source_beats_every_baseline_global_holm_count",
-    )
-    receipt["all_checks_pass"] = (
-        receipt["schema"] == "source_native_family_baseline_ledger_v1"
-        and all(
-            isinstance(receipt[field], int) and receipt[field] >= 0
-            for field in count_fields
-        )
-        and receipt["candidate_source_beats_every_baseline_global_holm_count"] == 0
-        and receipt["public_performance_claim_allowed"] is False
-        and receipt["real_dollar_savings_claim_allowed"] is False
+    receipt["receipt_checks_pass"] = (
+        receipt["schema"] == "lumencore.erdc_sdc_evidence_ablation.v2"
+        and receipt["status"]
+        == "SYNTHETIC_CONTROL_ABLATION_PASS_EXTERNAL_TRUST_ROOT_HPCMP_AND_INDEPENDENT_VALIDATION_REQUIRED"
+        and receipt["workflow_count"] == 48
+        and receipt["full_attack_detected_count"]
+        == receipt["full_attack_case_count"]
+        == 7
+        and receipt["full_adverse_outcome_recall"] == 1.0
+        and receipt["full_artifact_bytes_rehash_rate"] == 1.0
+        and receipt["full_predeclared_gate_execution_pass"] is True
+        and receipt["full_posthoc_promotion_change_detected"] is True
+        and receipt["all_checks_pass"] is True
+        and receipt["promotion_or_performance_claim_allowed"] is False
+        and receipt["opentelemetry_version"] == "1.59.0"
+        and receipt["slsa_version"] == "1.2"
         and isinstance(receipt["claim_boundary"], str)
         and bool(receipt["claim_boundary"].strip())
     )
     return receipt
 
 
-def research_evidence_sentence(receipt: dict[str, Any]) -> str:
-    holm_positive = receipt["individual_comparison_global_holm_positive_count"]
-    holm_text = "zero" if holm_positive == 0 else str(holm_positive)
+def evidence_ablation_sentence(receipt: dict[str, Any]) -> str:
     return (
-        f"{receipt['registered_family_count']} registered families; "
-        f"{receipt['implementation_present_count']} family implementations present; "
-        f"{receipt['executed_direct_source_baseline_comparison_count']} direct comparisons; "
-        f"{holm_text} global Holm-positive comparisons."
+        f"{receipt['workflow_count']} deterministic synthetic workflows; full controls "
+        f"detected {receipt['full_attack_detected_count']}/"
+        f"{receipt['full_attack_case_count']} declared tamper cases with complete adverse-case "
+        "retention and synthetic artifact-byte rehash; each ablation lost a declared control "
+        "relative to a separately pinned local anchor."
     )
 
 
@@ -378,16 +427,94 @@ def draw_page(canvas, doc) -> None:
     canvas.restoreState()
 
 
+def draw_private_page(canvas, doc) -> None:
+    page = canvas.getPageNumber()
+    canvas.saveState()
+    canvas.setFont("TimesNewRoman", 12)
+    canvas.setFillColor(colors.HexColor("#17212B"))
+    if page == 1:
+        footer = "1 of 7 pages - Cover page (excluded from five-page body)"
+    elif page == 2:
+        footer = "2 of 7 pages - Acronym list (excluded from five-page body)"
+    else:
+        footer = f"{page} of 7 pages - Body {page - 2} of 5"
+    canvas.drawCentredString(306, 78, footer)
+    canvas.restoreState()
+
+
 def build_story(
     s: dict[str, ParagraphStyle],
-    research: dict[str, Any] | None = None,
+    evidence: dict[str, Any] | None = None,
+    private_context: dict[str, Any] | None = None,
 ) -> list[Flowable]:
-    research = research or research_evidence_receipt()
+    evidence = evidence or evidence_ablation_receipt()
+    private_candidate = private_context is not None
+    private_context = private_context or {}
     p = lambda text: paragraph(text, s["body"])
     c = lambda text: paragraph(text, s["cell"])
     h1 = lambda text: paragraph(text, s["h1"])
     h2 = lambda text: paragraph(text, s["h2"])
     b = lambda text: bullet(text, s["bullet"])
+    cover_subtitle = (
+        "Private Final Candidate for the Sovereign Defense Cloud"
+        if private_candidate
+        else "Public-Safe Solution Brief Draft for the Sovereign Defense Cloud"
+    )
+    if private_candidate:
+        cover_alert = (
+            "PRIVATE FINAL CANDIDATE - HUMAN REVIEW REQUIRED"
+            f"<br/>Offeror: {escape(str(private_context['legal_entity_name']))}"
+            f"<br/>Address: {escape(str(private_context['solution_address']))}"
+            f"<br/>Contact: {escape(str(private_context['proposal_contact_name']))}"
+            f" | {escape(str(private_context['proposal_contact_email']))}"
+            "<br/>Phase II ROM: founder-approved estimate included in the body"
+        )
+        delivery_boundary = escape(str(private_context["delivery_statement"]))
+        rom_state = (
+            "Founder-approved Phase II estimated price is included in the dedicated "
+            "price-control section. Phase III and Phase IV costs are excluded."
+        )
+        identity_state = (
+            f"{escape(str(private_context['legal_entity_name']))}; "
+            f"{escape(str(private_context['solution_address']))}; "
+            f"{escape(str(private_context['proposal_contact_email']))}. "
+            "The private input records founder verification of the active SAM all-awards "
+            "contract registration and exact name/address match."
+        )
+        rom_control_text = (
+            "The Phase II prototype-development-only estimated price is "
+            f"{escape(str(private_context['rom_display']))}. The guarded private ROM workflow "
+            "verified the declared arithmetic, cost-basis controls, Phase III/IV exclusion, "
+            "and founder approval. This estimate is not a Government price determination or award."
+        )
+        closing_boundary = (
+            "Claim boundary: This private candidate has not been uploaded or submitted. No ERDC "
+            "selection, available funding, award, DoD deployment, authorization to operate, "
+            "classified handling, field validation, customers, revenue, realized savings, or "
+            "performance beyond the bounded evidence is claimed."
+        )
+    else:
+        cover_alert = (
+            "PUBLIC-SAFE DRAFT - REQUIRED PRICE AND PRIVATE SAM-MATCHED IDENTITY ARE NOT INCLUDED"
+        )
+        delivery_boundary = (
+            "The founder is the proposed technical lead for the evidence module and public code. The "
+            "Government or selected prime owns authorized interfaces, access, security, and integration; "
+            "an evaluator role is requested but no independent evaluator is committed. Surrogate development "
+            "uses contractor-furnished commodity CPU, local storage, and open software; no HPC allocation or "
+            "cloud capacity is claimed. Staffing, compute, support, and transition commitments must be bound "
+            "in the private Phase II price and accepted boundary before work begins."
+        )
+        rom_state = "No price is included; a reviewed private estimate is required."
+        identity_state = (
+            "Insert privately; verify exact match, all-awards status, and proposal email."
+        )
+        rom_control_text = (
+            "SUBMISSION BLOCKER: The CSO requires an estimated price for Phase II prototype development only. "
+            "This public draft includes no price. Labor, infrastructure, support, indirect cost, profit, payment "
+            "timing, and firm-fixed-price risk require review before one estimate is inserted privately."
+        )
+        closing_boundary = PDF_CLAIM_BOUNDARY
     story: list[Flowable] = []
 
     # Cover page - excluded by the FAQ.
@@ -395,25 +522,20 @@ def build_story(
         [
             Spacer(1, 92),
             paragraph("LumenCore Evidence Control Plane", s["title"]),
-            paragraph(
-                "Public-Safe Solution Brief Draft for the Sovereign Defense Cloud",
-                s["subtitle"],
-            ),
+            paragraph(cover_subtitle, s["subtitle"]),
             Spacer(1, 18),
             paragraph("Commercial Solutions Opening W912HZ26SC005", s["center"]),
             paragraph("U.S. Army Engineer Research and Development Center", s["center"]),
             paragraph("High Performance Computing Modernization Program", s["center"]),
             Spacer(1, 28),
             paragraph(
-                "Scope: Unified Service Layer, AI-Powered Orchestration evidence, Secure Data "
-                "Fabric metadata, and Vendor Lock-In Prevention.",
+                "Primary scope: Unified Service Layer and Vendor Lock-In Prevention. "
+                "Integration boundaries: AI-Powered Orchestration evidence and Secure Data "
+                "Fabric metadata.",
                 s["center"],
             ),
             Spacer(1, 24),
-            paragraph(
-                "PUBLIC-SAFE DRAFT - REQUIRED PRICE AND PRIVATE SAM-MATCHED IDENTITY ARE NOT INCLUDED",
-                s["alert"],
-            ),
+            paragraph(cover_alert, s["alert"]),
             Spacer(1, 18),
             paragraph(f"Website: {PUBLIC_WEBSITE}", s["center"]),
             paragraph(f"Public repository: {PUBLIC_REPOSITORY}", s["center"]),
@@ -425,21 +547,7 @@ def build_story(
     # Acronym list - excluded by the FAQ.
     acronym_rows = [
         [c("Acronym"), c("Meaning")],
-        [c("API"), c("Application Programming Interface")],
-        [c("CSO"), c("Commercial Solutions Opening")],
-        [c("DoD"), c("Department of Defense")],
-        [c("DSRC"), c("DoD Supercomputing Resource Center")],
-        [c("ERDC"), c("Engineer Research and Development Center")],
-        [c("GFE"), c("Government Furnished Equipment")],
-        [c("HPC"), c("High Performance Computing")],
-        [c("HPCMP"), c("High Performance Computing Modernization Program")],
-        [c("ML"), c("Machine Learning")],
-        [c("MOSA"), c("Modular Open Systems Approach")],
-        [c("OpenAPI"), c("Open standard for describing HTTP application interfaces")],
-        [c("ROM"), c("Rough Order of Magnitude")],
-        [c("SDC"), c("Sovereign Defense Cloud")],
-        [c("SHA-256"), c("Secure Hash Algorithm with a 256-bit digest")],
-        [c("Zero Trust"), c("Security model that continuously verifies access decisions")],
+        *[[c(acronym), c(meaning)] for acronym, meaning in ACRONYM_DEFINITIONS],
     ]
     story.extend(
         [
@@ -463,19 +571,19 @@ def build_story(
         [c("Focus area"), c("LumenCore contribution")],
         [
             c("Unified Service Layer"),
-            c("OpenAPI event and evidence interfaces spanning portal, command-line, and automation clients."),
+            c("Primary: OpenAPI event and evidence interfaces spanning portal, command-line, and automation clients."),
         ],
         [
             c("AI-Powered Orchestration"),
-            c("Policy-aware evidence hooks record orchestration decisions without replacing the selected scheduler."),
+            c("Integration boundary: policy-aware evidence hooks record orchestration decisions without replacing the selected scheduler."),
         ],
         [
             c("Secure Data Fabric"),
-            c("Schema, provenance, tag, policy-result, and integrity receipts; workload payloads remain outside the default evidence path."),
+            c("Integration boundary: schema, provenance, tag, policy-result, and integrity receipts; workload payloads remain outside the default evidence path."),
         ],
         [
             c("Vendor Lock-In Prevention"),
-            c("Replaceable adapters, portable schemas, offline verification, and no mandatory proprietary cloud service."),
+            c("Primary: replaceable adapters, portable schemas, offline verification, and no mandatory proprietary cloud service."),
         ],
     ]
     story.extend(
@@ -496,18 +604,19 @@ def build_story(
             ),
             h2("Mission effectiveness"),
             b("Give operators one evidence format across government-owned and commercial environments."),
-            b("Detect policy, configuration, adapter, and artifact drift before a result is promoted."),
+            b("Designed to flag policy, configuration, adapter, and artifact drift before a result is promoted."),
             b("Preserve adverse outcomes and abstentions instead of reporting only successful runs."),
             b("Allow reviewers to verify a receipt offline without access to the originating control plane."),
             h2("Focus-area alignment"),
             styled_table(focus_rows, [1.65 * inch, 4.85 * inch]),
             h2("Innovation"),
             p(
-                "The innovation is the application of predeclared acceptance rules, append-only evidence "
-                "chains, offline verification, and explicit failure retention to hybrid HPC and AI workflow "
-                "orchestration. The focused module uses Modular Open Systems Approach boundaries and "
-                "nonproprietary standards so it can integrate into a broader Sovereign Defense Cloud without "
-                "requiring one vendor to own the full evidence path."
+                "OpenTelemetry Logs Data Model 1.59.0 and SLSA Build Provenance 1.2 with in-toto "
+                "Statement v1 are complementary interoperability contexts, not ranked competitors. "
+                "The bounded LumenCore mechanism composes locally hash-linked event integrity, a "
+                "hashed predeclared gate set, adverse-outcome retention, and offline verification at "
+                "the workflow decision boundary. The local experiment scores only LumenCore full-control "
+                "and ablation profiles. This is a mechanism distinction, not a superiority claim."
             ),
             PageBreak(),
         ]
@@ -516,10 +625,10 @@ def build_story(
     # Body page 2 of 5.
     component_rows = [
         [c("Component"), c("Phase II behavior")],
-        [c("Open adapter layer"), c("Maps selected portal, command-line, scheduler, object-store, and observability events into versioned OpenAPI schemas.")],
+        [c("Open adapter layer"), c("Maps selected portal, command-line, scheduler, object-store, and observability events into versioned OpenAPI contracts and JSON event schemas.")],
         [c("Policy registry"), c("Records policy identifiers, versions, inputs, outcomes, and exception reasons; it does not replace Government authorization services.")],
-        [c("Receipt ledger"), c("Creates append-only SHA-256 chains for request, decision, artifact, and verification metadata.")],
-        [c("Offline verifier"), c("Checks schema, hashes, chain continuity, declared acceptance rules, and missing evidence without network access.")],
+        [c("Receipt ledger"), c("Builds locally hash-linked SHA-256 chains for request, decision, artifact, and verification metadata; the terminal root is supplied separately to the verifier.")],
+        [c("Offline verifier"), c("Checks schema, rehashes included artifact bytes, verifies chain continuity and declared rules, and reports missing evidence without network access.")],
         [c("Reviewer export"), c("Produces bounded machine-readable and human-readable packets with limitations and failed checks retained.")],
     ]
     story.extend(
@@ -558,10 +667,11 @@ def build_story(
     ]
     acceptance_rows = [
         [c("Acceptance dimension"), c("Proposed measurable check")],
-        [c("Integrity"), c("Every export verifies chain continuity and source-artifact hashes offline.")],
+        [c("Integrity"), c("Detect all declared policy, deletion, ordering, digest, and gate mutations; any miss fails the controlled experiment.")],
         [c("Portability"), c("One protocol and schema run through two replaceable environment adapters.")],
-        [c("Failure visibility"), c("Failed, abstained, missing-input, and policy-denied runs remain visible.")],
-        [c("Reproducibility"), c("A Government reviewer runs the delivered verifier and documented command.")],
+        [c("Failure visibility"), c("Retain 100% of required fail, abstain, missing-input, policy-denied, and override cases; any omission fails.")],
+        [c("Reproducibility"), c("A Government reviewer reruns the delivered verifier from a clean environment; any receipt mismatch fails.")],
+        [c("Cost efficiency"), c("Against one selected baseline and fixed window, report bytes/event, capture and verify latency, storage/day, review minutes, and egress bytes.")],
     ]
     story.extend(
         [
@@ -574,16 +684,17 @@ def build_story(
             styled_table(phase_rows, [1.0 * inch, 3.1 * inch, 2.4 * inch]),
             h2("Proposed acceptance protocol"),
             p(
-                "Final thresholds, workloads, exclusions, and test environments would be locked with the "
-                "Government before scoring. AI recommendations remain advisory with human approval; any bounded "
-                "low-risk administrative automation requires explicit parameters, manual override, and retained "
-                "decision evidence. No service level or performance threshold is invented in this draft."
+                "The local precursor uses 48 deterministic synthetic workflows and seven tamper cases across "
+                "one full-control and three ablation profiles, with a separate local anchor. OpenTelemetry 1.59.0 "
+                "and SLSA 1.2/in-toto v1 are unranked context. This is not an HPCMP workload, external trust root, "
+                "independent validation, or superiority evidence. Phase II would prelock the workflow, Government "
+                "comparator, exclusions, window, and overhead budget. AI remains advisory with manual override."
             ),
             styled_table(acceptance_rows, [1.45 * inch, 5.05 * inch]),
             h2("Government inputs and assumptions"),
-            b("One unclassified workflow, approved test data, interface documentation, identity context, endpoints, and security constraints."),
-            b("A Government reviewer to approve the protocol and execute the delivered offline verifier."),
-            b("No production access or specific Government Furnished Equipment is assumed before ERDC defines the boundary."),
+            b("One unclassified representative workflow, approved data and interfaces, identity context, endpoints, and security constraints."),
+            b("One approved comparator, two test environments, fixed window, and Government-controlled trust anchor or signing path."),
+            b("A Government reviewer approves the protocol and overhead budget and runs the verifier; no production access or GFE is assumed."),
             PageBreak(),
         ]
     )
@@ -594,7 +705,7 @@ def build_story(
         [c("Undefined legacy interfaces"), c("Use a versioned adapter contract and two bounded interfaces; isolate vendor-specific code.")],
         [c("Sensitive data exposure"), c("Store metadata and hashes by default; keep payloads in enclave; approve expanded flows.")],
         [c("Performance overhead"), c("Benchmark capture separately; permit asynchronous finalization where constraints require it.")],
-        [c("Unsupported scale claim"), c("Measure Phase II throughput and storage; do not extrapolate beyond observed bounds.")],
+        [c("Control or overhead failure"), c("Stop and roll back on any declared attack miss, adverse-case omission, verifier mismatch, or Government-set overhead breach.")],
         [c("Security accreditation"), c("Deliver review evidence; do not represent the prototype as authorized to operate.")],
     ]
     story.extend(
@@ -617,18 +728,13 @@ def build_story(
             h2("Scalability and cost control"),
             b("Partition receipts by enclave, mission, tenant, and retention policy without changing the verifier schema."),
             b("Use content hashes and locators instead of duplicating large HPC artifacts in the evidence ledger."),
-            b("Expose capture latency, verification time, storage growth, and egress as measured cost drivers."),
+            b("Report capture and verify latency, bytes per event, storage growth per day, operator-review minutes, and egress bytes over the same fixed window as the selected baseline."),
             b("Keep adapters and storage replaceable so the Government can compare lifecycle cost and portability."),
             b("Exercise both workload portability and bounded burst behavior without coupling the design to one cloud."),
             h2("Primary risks and controls"),
             styled_table(risk_rows, [1.55 * inch, 4.95 * inch]),
-            h2("Operational support boundary"),
-            p(
-                "The Phase II scope includes documented escalation, diagnostics, and expert engineering support "
-                "for the evidence component. Legacy HPC integration is a transition boundary, while the proposed "
-                "end state remains cloud-agnostic and modernized through phased, low-risk increments. A complete "
-                "Level 3 concierge service for the full Sovereign Defense Cloud is outside this focused module."
-            ),
+            h2("Delivery, compute, and support boundary"),
+            p(delivery_boundary),
             PageBreak(),
         ]
     )
@@ -636,20 +742,19 @@ def build_story(
     # Body page 5 of 5.
     evidence_rows = [
         [c("Evidence"), c("What it supports"), c("What it does not support")],
-        [c("Public repository"), c("Inspectable builders, tests, schemas, and hash-manifest patterns."), c("DoD deployment, production readiness, or field validation.")],
+        [c("Repository and local draft"), c("Public patterns; the exact July 29 receipt remains local pending publication."), c("External reproducibility, deployment, production readiness, or field validation.")],
         [c("Offline verifier pattern"), c("Offline receipt checks and explicit failure reporting."), c("Independent validation, Government acceptance, or classified accreditation.")],
         [
-            c("Source-native research ledger"),
-            c(research_evidence_sentence(research)),
-            c("SDC deployment, customer use, superiority, or field performance."),
+            c("Synthetic control ablation"),
+            c(evidence_ablation_sentence(evidence)),
+            c("An external trust root, HPCMP performance, Government acceptance, independent validation, or superiority over the purpose-bounded standards."),
         ],
-        [c("Public website"), c("Authentic project URL and public positioning."), c("Customers, revenue, or realized savings.")],
     ]
     gate_rows = [
         [c("Required finalization"), c("Current state")],
-        [c("Phase II Rough Order of Magnitude"), c("No price is included. Founder approval is required before private finalization.")],
-        [c("SAM identity, address, status, and contact"), c("Insert privately from the active SAM record; verify exact match, all-awards contract eligibility, and current proposal email.")],
-        [c("Portal, account, amendments, and authority"), c("Sign in to Submittable, recheck the live form and amendments, and have the founder review all terms and final confirmation.")],
+        [c("Phase II Rough Order of Magnitude"), c(rom_state)],
+        [c("SAM identity and contact"), c(identity_state)],
+        [c("Portal and authority"), c("Recheck Submittable, amendments, terms, and final confirmation.")],
     ]
     story.extend(
         [
@@ -657,19 +762,13 @@ def build_story(
             h2("Commercial approach"),
             p(
                 "LumenCore is modular software plus integration and verification services using commercial "
-                "technologies and open interfaces. The proposal applies proven commercial interface, container, "
-                "hashing, and observability patterns in a new evidence-control role; it does not claim that the "
-                "integrated SDC module is already proven. The CSO states that any resultant award is expected "
-                "to be firm-fixed price."
+                "technologies and open interfaces. It applies established interface, container, hashing, provenance, "
+                "and observability patterns in an evidence-control role. The named profiles are unranked contexts. "
+                "The SDC module is not proven; any resultant award is expected to be firm-fixed price."
             ),
             styled_table(evidence_rows, [1.35 * inch, 2.7 * inch, 2.45 * inch]),
             h2("Phase II Rough Order of Magnitude control"),
-            paragraph(
-                "SUBMISSION BLOCKER: The CSO requires an estimated price for Phase II prototype development only. "
-                "This public draft includes no price. Labor, infrastructure, subcontractor, travel, indirect cost, "
-                "profit, payment timing, and firm-fixed-price risk require review before one estimate is inserted privately.",
-                s["alert"],
-            ),
+            paragraph(rom_control_text, s["alert"]),
             h2("Final submission gates"),
             styled_table(gate_rows, [2.0 * inch, 4.5 * inch]),
             h2("Bounded next decision"),
@@ -680,7 +779,7 @@ def build_story(
             ),
             p(f"Official project source: {OFFICIAL_PROJECT_URL}"),
             p("Funding is not currently available; this market-research lane does not guarantee an award."),
-            p(PDF_CLAIM_BOUNDARY),
+            p(closing_boundary),
         ]
     )
     return story
@@ -688,9 +787,10 @@ def build_story(
 
 def build_pdf(
     path: Path = OUT_PDF,
-    research: dict[str, Any] | None = None,
+    evidence: dict[str, Any] | None = None,
+    private_context: dict[str, Any] | None = None,
 ) -> None:
-    research = research or research_evidence_receipt()
+    evidence = evidence or evidence_ablation_receipt()
     register_fonts()
     path.parent.mkdir(parents=True, exist_ok=True)
     doc = BaseDocTemplate(
@@ -700,9 +800,17 @@ def build_pdf(
         rightMargin=inch,
         topMargin=inch,
         bottomMargin=inch,
-        title="LumenCore ERDC Sovereign Defense Cloud Solution Brief - Public Draft",
+        title=(
+            "LumenCore ERDC Sovereign Defense Cloud Solution Brief - Private Final Candidate"
+            if private_context is not None
+            else "LumenCore ERDC Sovereign Defense Cloud Solution Brief - Public Draft"
+        ),
         author="LumenCore",
-        subject="W912HZ26SC005 public-safe solution brief draft",
+        subject=(
+            "W912HZ26SC005 private final solution brief candidate"
+            if private_context is not None
+            else "W912HZ26SC005 public-safe solution brief draft"
+        ),
     )
     frame = Frame(
         inch,
@@ -715,15 +823,25 @@ def build_pdf(
         bottomPadding=0,
         id="content",
     )
-    doc.addPageTemplates([PageTemplate(id="all", frames=[frame], onPage=draw_page)])
-    doc.build(build_story(styles(), research))
+    doc.addPageTemplates(
+        [
+            PageTemplate(
+                id="all",
+                frames=[frame],
+                onPage=draw_private_page if private_context is not None else draw_page,
+            )
+        ]
+    )
+    doc.build(build_story(styles(), evidence, private_context))
 
 
 def inspect_pdf(
     path: Path = OUT_PDF,
-    research: dict[str, Any] | None = None,
+    evidence: dict[str, Any] | None = None,
+    *,
+    document_mode: str = "PUBLIC_DRAFT",
 ) -> dict[str, Any]:
-    research = research or research_evidence_receipt()
+    evidence = evidence or evidence_ablation_receipt()
     reader = PdfReader(str(path))
     pages = reader.pages
     physical_pages = len(pages)
@@ -733,8 +851,8 @@ def inspect_pdf(
     ]
     texts = [(page.extract_text() or "") for page in pages]
     normalized_text = " ".join("\n".join(texts).split())
-    normalized_research_marker = " ".join(
-        research_evidence_sentence(research).split()
+    normalized_evidence_marker = " ".join(
+        evidence_ablation_sentence(evidence).split()
     )
     with pdfplumber.open(path) as document:
         content_chars_by_page = [
@@ -817,6 +935,14 @@ def inspect_pdf(
         "draft_watermark_present_every_page": all(
             "DRAFT - NOT FOR SUBMISSION" in text for text in texts
         ),
+        "draft_watermark_absent_every_page": all(
+            "DRAFT - NOT FOR SUBMISSION" not in text for text in texts
+        ),
+        "private_candidate_marker_present": (
+            bool(texts)
+            and "PRIVATE FINAL CANDIDATE - HUMAN REVIEW REQUIRED" in texts[0]
+        ),
+        "document_mode": document_mode,
         "required_content_markers_present": all(
             marker in "\n".join(texts)
             for marker in (
@@ -829,14 +955,22 @@ def inspect_pdf(
                 "Funding",
             )
         ),
-        "research_evidence_marker_present": (
-            normalized_research_marker in normalized_text
+        "required_acronym_entries_present": (
+            len(texts) >= 2
+            and all(
+                acronym in texts[1] and meaning in texts[1]
+                for acronym, meaning in ACRONYM_DEFINITIONS
+            )
+        ),
+        "evidence_ablation_marker_present": (
+            normalized_evidence_marker in normalized_text
         ),
     }
 
 
 def source_integrity() -> dict[str, Any]:
     manifest = json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8"))
+    custody = json.loads(SOURCE_CUSTODY.read_text(encoding="utf-8"))
     files = []
     for row in manifest["files"]:
         path = ROOT / row["path"]
@@ -858,6 +992,42 @@ def source_integrity() -> dict[str, Any]:
                 "official_url": row["official_url"],
             }
         )
+    custody_sources = []
+    for row in custody.get("source_documents", []):
+        pdf_path = ROOT / row["pdf_path"]
+        text_path = ROOT / row["text_path"]
+        custody_sources.append(
+            {
+                "pdf_path": row["pdf_path"],
+                "pdf_sha256_match": sha256_file(pdf_path) == row["pdf_sha256"],
+                "text_path": row["text_path"],
+                "text_exists": text_path.is_file(),
+                "text_sha256_match": (
+                    text_path.is_file()
+                    and sha256_file(text_path) == row["text_sha256"]
+                ),
+                "extraction": row.get("extraction"),
+            }
+        )
+    live_snapshot = custody.get("live_page_snapshot", {})
+    live_snapshot_path = ROOT / live_snapshot.get("path", "")
+    custody_checks_pass = (
+        custody.get("schema") == "lumencore.erdc_sdc_source_custody.v1"
+        and custody.get("opportunity_number") == "W912HZ26SC005"
+        and len(custody_sources) == 2
+        and all(
+            row["pdf_sha256_match"]
+            and row["text_exists"]
+            and row["text_sha256_match"]
+            and row["extraction"] == "pdftotext -layout"
+            for row in custody_sources
+        )
+        and live_snapshot_path.is_file()
+        and sha256_file(live_snapshot_path) == live_snapshot.get("sha256")
+        and live_snapshot.get("route") == "COMMERCIAL_SOLUTION"
+        and live_snapshot.get("deadline_text") == "4:00 pm CT on August 7, 2026"
+        and live_snapshot.get("question_cutoff_text") == "July 31, 2026"
+    )
     return {
         "manifest_schema": manifest.get("schema"),
         "manifest_as_of_date": manifest.get("as_of_date"),
@@ -866,6 +1036,12 @@ def source_integrity() -> dict[str, Any]:
         ),
         "manifest_path": rel(SOURCE_MANIFEST),
         "manifest_sha256": sha256_file(SOURCE_MANIFEST),
+        "source_custody_path": rel(SOURCE_CUSTODY),
+        "source_custody_sha256": sha256_file(SOURCE_CUSTODY),
+        "source_custody_schema": custody.get("schema"),
+        "source_custody_checks_pass": custody_checks_pass,
+        "custody_sources": custody_sources,
+        "live_page_snapshot": live_snapshot,
         "files": files,
         "all_source_checks_pass": all(
             row["sha256_match"] and row["bytes_match"] and row["page_count_match"]
@@ -873,7 +1049,8 @@ def source_integrity() -> dict[str, Any]:
         )
         and manifest.get("schema") == "lumencore.erdc_sdc_source_manifest.v2"
         and manifest.get("as_of_date") == "2026-07-29"
-        and manifest.get("current_attachment_set_complete") is True,
+        and manifest.get("current_attachment_set_complete") is True
+        and custody_checks_pass,
     }
 
 
@@ -886,8 +1063,13 @@ def requirements() -> list[dict[str, Any]]:
         {"id": "FORMAT_05", "requirement": "English PDF under 20 MB", "status": "PASS", "evidence": "Generated PDF is English, Acrobat-readable, and size-checked."},
         {"id": "DISCLOSURE_01", "requirement": "No classified or proprietary information", "status": "PASS", "evidence": "Public-safe architecture and boundaries only; no private identity, patent claims, credentials, or classified data."},
         {"id": "TECH_01", "requirement": "Describe solution and mission effectiveness", "status": "PASS", "evidence": "Body pages 1 and 2 define the evidence control plane, mission gap, components, and focus-area alignment."},
-        {"id": "TECH_02", "requirement": "Explain innovation and feasibility", "status": "PASS", "evidence": "Body pages 1, 3, and 4 define the new application, prototype plan, acceptance checks, risks, and controls."},
-        {"id": "TECH_03", "requirement": "Provide URL and convincing evidence", "status": "PASS_BOUNDED", "evidence": "Public website and repository are listed; evidence limitations explicitly reject field-validation claims."},
+        {"id": "TECH_02", "requirement": "Explain innovation and feasibility", "status": "PASS_BOUNDED", "evidence": "Body pages 1, 3, and 4 distinguish the mechanism, define the prototype, name acceptance checks and falsifiers, and preserve the HPCMP and independent-validation boundary."},
+        {"id": "TECH_03", "requirement": "Provide URL and convincing evidence", "status": "LOCAL_ONLY_EXTERNAL_REPRODUCIBILITY_REQUIRED", "evidence": "Public website and repository are listed, but the exact July 29 builder, receipt, and proposal gate remain local until a reviewed commit is published. Field validation is not claimed."},
+        {"id": "BASELINE_01", "requirement": "Name current purpose-matched interoperability contexts", "status": "PASS_BOUNDED", "evidence": "Body pages 1, 3, and 5 name OpenTelemetry Logs Data Model 1.59.0 and SLSA Build Provenance 1.2 with in-toto Statement v1 as unranked interoperability contexts and reject universal ranking."},
+        {"id": "ABLATION_01", "requirement": "Show the claimed control contribution through ablation", "status": "PASS_BOUNDED", "evidence": "The bound local surrogate covers 48 deterministic workflows and seven declared attacks; the full profile detects 7 of 7 relative to a separately supplied local anchor while each no-chain, no-predeclaration, or no-failure-retention profile loses a declared control. It is not an HPCMP or independent result."},
+        {"id": "TRUST_01", "requirement": "Bind the protocol and receipt to a trust root outside the mutable evidence packet", "status": "EXTERNAL_TRUST_ROOT_REQUIRED", "evidence": "The local experiment supplies an anchor separately from the receipt, but it is not a Government-controlled signature, timestamp, or external trust service."},
+        {"id": "METRIC_01", "requirement": "Define quantitative checks, cost denominators, and falsifiers", "status": "PASS_BOUNDED", "evidence": "Body pages 3 and 4 require complete declared-attack detection, complete adverse-case retention, clean reviewer replay, fixed-window baseline comparison, explicit cost drivers, and stop/rollback on a miss or Government-set overhead breach."},
+        {"id": "EXEC_01", "requirement": "Bind delivery roles, compute, support, and transition commitments", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Body page 4 identifies the founder as proposed technical lead and bounds commodity surrogate compute; Government or prime integration, evaluator commitment, production compute, staffing, support, and transition ownership remain to be bound in the private Phase II plan and price."},
         {"id": "ROM_01", "requirement": "One estimated price for Phase II prototype only", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Body page 5 preserves the required section but intentionally includes no unapproved amount."},
         {"id": "SAM_01", "requirement": "Active SAM all-awards contract registration and matching solution address", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Public draft withholds identity and address; live SAM all-awards status, contract eligibility, and exact match must be verified before upload."},
         {"id": "CONTACT_01", "requirement": "Current accurate proposal contact email", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Public draft intentionally omits private contact data; insert and verify in the private final copy."},
@@ -906,9 +1088,9 @@ def requirements() -> list[dict[str, Any]]:
 def build_payload(
     pdf: dict[str, Any],
     sources: dict[str, Any],
-    research: dict[str, Any] | None = None,
+    evidence: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    research = research or research_evidence_receipt()
+    evidence = evidence or evidence_ablation_receipt()
     rows = requirements()
     blockers = [
         row
@@ -918,9 +1100,11 @@ def build_payload(
             "PRIVATE_FINALIZATION_REQUIRED",
             "HUMAN_ACCOUNT_ACCESS_REQUIRED",
             "HUMAN_FINAL_ACTION_REQUIRED",
+            "LOCAL_ONLY_EXTERNAL_REPRODUCIBILITY_REQUIRED",
+            "EXTERNAL_TRUST_ROOT_REQUIRED",
         }
     ]
-    technical_checks_pass = all(
+    format_and_marker_checks_pass = all(
         (
             pdf["physical_page_count"] == 7,
             pdf["body_page_count"] == 5,
@@ -933,10 +1117,11 @@ def build_payload(
             pdf["body_page_labels_present"],
             pdf["draft_watermark_present_every_page"],
             pdf["required_content_markers_present"],
-            pdf["research_evidence_marker_present"],
+            pdf["evidence_ablation_marker_present"],
+            pdf["required_acronym_entries_present"],
             pdf["bytes"] < 20 * 1024 * 1024,
             sources["all_source_checks_pass"],
-            research["all_checks_pass"],
+            evidence["receipt_checks_pass"],
         )
     )
     payload: dict[str, Any] = {
@@ -957,17 +1142,18 @@ def build_payload(
             "live_page_reviewed_date": "2026-07-29",
         },
         "status": (
-            "CURRENT_PUBLIC_DRAFT_PASS_PRIVATE_ROM_SAM_CONTACT_ACCOUNT_AND_PORTAL_FINALIZATION_REQUIRED"
-            if technical_checks_pass
+            "CURRENT_PUBLIC_DRAFT_FORMAT_AND_MARKER_CHECKS_PASS_SEMANTIC_EVIDENCE_AND_PRIVATE_FINALIZATION_REQUIRED"
+            if format_and_marker_checks_pass
             else "CURRENT_PUBLIC_DRAFT_FAILED_REVIEW_REQUIRED"
         ),
         "submission_ready": False,
-        "technical_document_checks_pass": technical_checks_pass,
+        "format_and_marker_checks_pass": format_and_marker_checks_pass,
+        "semantic_review_complete": False,
         "funding_currently_available": False,
         "response_type": "RFI_STYLE_CSO_SOLUTION_BRIEF_EVALUATION_LANE",
         "pdf": pdf,
         "source_integrity": sources,
-        "research_evidence": research,
+        "evidence_ablation": evidence,
         "requirements": rows,
         "summary": {
             "requirement_count": len(rows),
@@ -981,9 +1167,12 @@ def build_payload(
             "pricing_allowed_without_founder_approval": False,
             "legal_identity_publish_allowed": False,
             "browser_navigation_performed": False,
+            "internal_red_team_only": True,
+            "independent_review_complete": False,
         },
         "required_private_finalization": [
             "Approve one Phase II-only firm-fixed-price Rough Order of Magnitude estimate.",
+            "Bind named Phase II delivery roles, staffing, production compute or cloud access, support, evaluator, integration, and transition ownership without inventing commitments.",
             "Insert the exact active SAM legal entity name and matching address in a private copy.",
             "Insert and verify the current proposal contact email in the private copy.",
             "Reverify active SAM all-awards contract registration and review current ERDCWERX questions and answers.",
@@ -1003,7 +1192,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
         "# ERDC SDC Solution Brief Compliance Gate - 2026-07-29",
         "",
-        "The substantive public-safe brief is complete and technically compliant, but it is not submission-ready until the founder approves a Phase II-only price, private SAM/contact facts are inserted and reverified, and the complete authenticated portal form is reviewed.",
+        "The public-safe brief now binds a purpose-bounded comparator, local control ablation, proposed quantitative falsifiers, cost denominators, and honest delivery boundaries. It is not submission-ready until the Phase II price and execution commitments are approved, private SAM/contact facts are inserted and reverified, and the complete authenticated portal form is reviewed.",
         "",
         "## Gate Summary",
         "",
@@ -1022,14 +1211,16 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Letter portrait: `{str(pdf['all_pages_letter_portrait']).lower()}`",
         f"- One-inch text margins: `{str(pdf['all_non_watermark_text_within_one_inch_margins']).lower()}`",
         f"- Body page labels present: `{str(pdf['body_page_labels_present']).lower()}`",
-        f"- Technical document checks pass: `{str(payload['technical_document_checks_pass']).lower()}`",
+        f"- Format and marker checks pass: `{str(payload['format_and_marker_checks_pass']).lower()}`",
+        f"- Semantic review complete: `{str(payload['semantic_review_complete']).lower()}`",
         f"- Source checks pass: `{str(payload['source_integrity']['all_source_checks_pass']).lower()}`",
-        f"- Research evidence checks pass: `{str(payload['research_evidence']['all_checks_pass']).lower()}`",
-        f"- Research evidence SHA-256: `{payload['research_evidence']['sha256']}`",
-        f"- Registered families: `{payload['research_evidence']['registered_family_count']}`",
-        f"- Family implementations present: `{payload['research_evidence']['implementation_present_count']}`",
-        f"- Direct comparisons: `{payload['research_evidence']['executed_direct_source_baseline_comparison_count']}`",
-        f"- Global Holm-positive comparisons: `{payload['research_evidence']['individual_comparison_global_holm_positive_count']}`",
+        f"- Evidence ablation checks pass: `{str(payload['evidence_ablation']['receipt_checks_pass']).lower()}`",
+        f"- Evidence ablation SHA-256: `{payload['evidence_ablation']['sha256']}`",
+        f"- Evidence protocol SHA-256: `{payload['evidence_ablation']['protocol_sha256']}`",
+        f"- Synthetic workflows: `{payload['evidence_ablation']['workflow_count']}`",
+        f"- Full-control attacks detected: `{payload['evidence_ablation']['full_attack_detected_count']}/{payload['evidence_ablation']['full_attack_case_count']}`",
+        f"- Adverse-outcome recall: `{payload['evidence_ablation']['full_adverse_outcome_recall']}`",
+        f"- Synthetic artifact byte rehash rate: `{payload['evidence_ablation']['full_artifact_bytes_rehash_rate']}`",
         f"- Finalization blockers: `{summary['finalization_blocker_count']}`",
         f"- External send without human: `{str(summary['external_send_allowed_without_human']).lower()}`",
         f"- Final portal submit without human: `{str(summary['final_portal_submit_allowed_without_human']).lower()}`",
@@ -1058,11 +1249,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
 
 
 def main() -> None:
-    research = research_evidence_receipt()
-    build_pdf(research=research)
-    pdf = inspect_pdf(research=research)
+    evidence = evidence_ablation_receipt()
+    build_pdf(evidence=evidence)
+    pdf = inspect_pdf(evidence=evidence)
     sources = source_integrity()
-    payload = build_payload(pdf, sources, research)
+    payload = build_payload(pdf, sources, evidence)
     OUT_JSON.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     OUT_MD.write_text(render_markdown(payload), encoding="utf-8")
     print(

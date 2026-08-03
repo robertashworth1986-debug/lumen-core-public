@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "This is a public-safe technical draft, not a submitted solution brief. It does not include the founder-approved Phase II price, private SAM-matched legal identity and address, a live SAM status verification, signature, certification, or portal confirmation. It does not claim ERDC selection, funding availability, a contract, Department of Defense deployment, an authorization to operate, classified-data handling, field validation, realized savings, or technical performance beyond the bounded repository evidence identified here.",
+  "claim_boundary": "This is a public-safe technical draft, not a submitted solution brief. It does not include the founder-approved Phase II price, private SAM-matched legal identity and address, a live SAM status verification, signature, certification, or portal confirmation. It does not claim ERDC selection, funding availability, a contract, Department of Defense deployment, an authorization to operate, classified-data handling, field validation, customers, revenue, or realized savings, or technical performance beyond the bounded repository evidence identified here.",
   "deadline": {
     "controlling_cso_pdf_text": "1700 EST, 07 AUG 2026",
     "current_live_page_text": "4:00 PM CT on August 7, 2026",
@@ -10,9 +10,33 @@
     "reconciliation_rule": "Preserve both source texts and complete before the current live page's earlier practical cutoff.",
     "safest_operational_cutoff": "4:00 PM CT on August 7, 2026"
   },
+  "evidence_ablation": {
+    "adverse_count": 30,
+    "all_checks_pass": true,
+    "artifact_count": 30,
+    "claim_boundary": "This is a deterministic synthetic, unclassified workflow-control ablation. It compares the complete LumenCore control profile only with its own no-chain, no-predeclaration, and no-failure-retention ablations. OpenTelemetry and SLSA are listed only as complementary interoperability contexts and are not ranked or attacked. The result is not an HPCMP workload, Government test, independent validation, security assessment, cost study, production benchmark, or proof of superiority. The local anchor is not an external trust root.",
+    "full_adverse_outcome_recall": 1.0,
+    "full_artifact_bytes_rehash_rate": 1.0,
+    "full_attack_case_count": 7,
+    "full_attack_detected_count": 7,
+    "full_posthoc_promotion_change_detected": true,
+    "full_predeclared_gate_execution_pass": true,
+    "generated_utc": "2026-07-29T21:06:50.742707Z",
+    "opentelemetry_version": "1.59.0",
+    "path": "out/ops/erdc_sdc_evidence_ablation_latest.json",
+    "promotion_or_performance_claim_allowed": false,
+    "protocol_sha256": "61337e3493f63f46a700152748d5a586635dfb9338fb5ba6766e084d6ae5a723",
+    "receipt_checks_pass": true,
+    "schema": "lumencore.erdc_sdc_evidence_ablation.v2",
+    "sha256": "0e17f27d4ea6c049b73e12664a6838c5ac0cb767e9a7a18ac2e1e8b108db2a7f",
+    "slsa_version": "1.2",
+    "status": "SYNTHETIC_CONTROL_ABLATION_PASS_EXTERNAL_TRUST_ROOT_HPCMP_AND_INDEPENDENT_VALIDATION_REQUIRED",
+    "workflow_count": 48
+  },
+  "format_and_marker_checks_pass": true,
   "funding_currently_available": false,
-  "gate_sha256": "8945d9ca505dcfddadde749d048764e5f95aa108cd8f69c31dc55eef4ed8778f",
-  "generated_utc": "2026-07-29T16:17:06.228308+00:00",
+  "gate_sha256": "ae818a96dd5518308e66fa64660fae6cb8dfc3b70c3268a50fb28ff3fbfcbff8",
+  "generated_utc": "2026-07-29T21:16:32.308368+00:00",
   "opportunity_number": "W912HZ26SC005",
   "outputs": {
     "json": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json",
@@ -28,12 +52,12 @@
     "all_physical_page_labels_present": true,
     "body_page_count": 5,
     "body_page_labels_present": true,
-    "bytes": 107754,
+    "bytes": 108736,
     "content_bounds_points_from_top_left": [
       {
         "bottom": 716.59,
         "left": 72.0,
-        "right": 540.0,
+        "right": 533.76,
         "top": 166.59
       },
       {
@@ -45,7 +69,7 @@
       {
         "bottom": 716.59,
         "left": 72.0,
-        "right": 535.7,
+        "right": 536.92,
         "top": 74.59
       },
       {
@@ -57,13 +81,13 @@
       {
         "bottom": 716.59,
         "left": 72.0,
-        "right": 533.42,
+        "right": 538.85,
         "top": 74.59
       },
       {
         "bottom": 716.59,
         "left": 72.0,
-        "right": 540.0,
+        "right": 538.86,
         "top": 74.59
       },
       {
@@ -79,6 +103,7 @@
       "AAAAAA+TimesNewRomanPS-BoldMT",
       "AAAAAA+TimesNewRomanPSMT"
     ],
+    "evidence_ablation_marker_present": true,
     "exists": true,
     "maximum_detected_content_font_size": 12.0,
     "minimum_detected_font_size": 12.0,
@@ -114,13 +139,14 @@
     ],
     "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
     "physical_page_count": 7,
+    "required_acronym_entries_present": true,
     "required_content_markers_present": true,
-    "research_evidence_marker_present": true,
-    "sha256": "69cdd44beb294a4d347a2d7ab3fbeab6e905cff91b60fe251c491ae2a9bf29b1",
+    "sha256": "f1135e0ce4564335d3d5fcc2a7ec2aa8c20e435e9a9bcae815a2619023ab0690",
     "times_new_roman_detected": true
   },
   "required_private_finalization": [
     "Approve one Phase II-only firm-fixed-price Rough Order of Magnitude estimate.",
+    "Bind named Phase II delivery roles, staffing, production compute or cloud access, support, evaluator, integration, and transition ownership without inventing commitments.",
     "Insert the exact active SAM legal entity name and matching address in a private copy.",
     "Insert and verify the current proposal contact email in the private copy.",
     "Reverify active SAM all-awards contract registration and review current ERDCWERX questions and answers.",
@@ -171,16 +197,46 @@
       "status": "PASS"
     },
     {
-      "evidence": "Body pages 1, 3, and 4 define the new application, prototype plan, acceptance checks, risks, and controls.",
+      "evidence": "Body pages 1, 3, and 4 distinguish the mechanism, define the prototype, name acceptance checks and falsifiers, and preserve the HPCMP and independent-validation boundary.",
       "id": "TECH_02",
       "requirement": "Explain innovation and feasibility",
-      "status": "PASS"
+      "status": "PASS_BOUNDED"
     },
     {
-      "evidence": "Public website and repository are listed; evidence limitations explicitly reject field-validation claims.",
+      "evidence": "Public website and repository are listed, but the exact July 29 builder, receipt, and proposal gate remain local until a reviewed commit is published. Field validation is not claimed.",
       "id": "TECH_03",
       "requirement": "Provide URL and convincing evidence",
+      "status": "LOCAL_ONLY_EXTERNAL_REPRODUCIBILITY_REQUIRED"
+    },
+    {
+      "evidence": "Body pages 1, 3, and 5 name OpenTelemetry Logs Data Model 1.59.0 and SLSA Build Provenance 1.2 with in-toto Statement v1 as unranked interoperability contexts and reject universal ranking.",
+      "id": "BASELINE_01",
+      "requirement": "Name current purpose-matched interoperability contexts",
       "status": "PASS_BOUNDED"
+    },
+    {
+      "evidence": "The bound local surrogate covers 48 deterministic workflows and seven declared attacks; the full profile detects 7 of 7 relative to a separately supplied local anchor while each no-chain, no-predeclaration, or no-failure-retention profile loses a declared control. It is not an HPCMP or independent result.",
+      "id": "ABLATION_01",
+      "requirement": "Show the claimed control contribution through ablation",
+      "status": "PASS_BOUNDED"
+    },
+    {
+      "evidence": "The local experiment supplies an anchor separately from the receipt, but it is not a Government-controlled signature, timestamp, or external trust service.",
+      "id": "TRUST_01",
+      "requirement": "Bind the protocol and receipt to a trust root outside the mutable evidence packet",
+      "status": "EXTERNAL_TRUST_ROOT_REQUIRED"
+    },
+    {
+      "evidence": "Body pages 3 and 4 require complete declared-attack detection, complete adverse-case retention, clean reviewer replay, fixed-window baseline comparison, explicit cost drivers, and stop/rollback on a miss or Government-set overhead breach.",
+      "id": "METRIC_01",
+      "requirement": "Define quantitative checks, cost denominators, and falsifiers",
+      "status": "PASS_BOUNDED"
+    },
+    {
+      "evidence": "Body page 4 identifies the founder as proposed technical lead and bounds commodity surrogate compute; Government or prime integration, evaluator commitment, production compute, staffing, support, and transition ownership remain to be bound in the private Phase II plan and price.",
+      "id": "EXEC_01",
+      "requirement": "Bind delivery roles, compute, support, and transition commitments",
+      "status": "PRIVATE_FINALIZATION_REQUIRED"
     },
     {
       "evidence": "Body page 5 preserves the required section but intentionally includes no unapproved amount.",
@@ -255,26 +311,30 @@
       "status": "PASS"
     }
   ],
-  "research_evidence": {
-    "all_checks_pass": true,
-    "candidate_source_beats_every_baseline_global_holm_count": 0,
-    "claim_boundary": "This ledger separates executable direct measured comparisons from source-conditioned synthetic stress, generated benchmarks, and context-only inventory. Individual baseline wins are exploratory research leads unless the same predeclared candidate beats every source-native baseline after the global multiple-comparison correction on a prospectively protected holdout. No current card passes that gate. Nothing here establishes field validation, realized savings, enterprise value, trading edge, or live-execution authority.",
-    "executed_direct_source_baseline_comparison_count": 126,
-    "generated_utc": "2026-07-29T14:59:45.081967+00:00",
-    "implementation_present_count": 35,
-    "individual_comparison_global_holm_positive_count": 0,
-    "path": "out/ops/source_native_family_baseline_ledger_latest.json",
-    "public_performance_claim_allowed": false,
-    "real_dollar_savings_claim_allowed": false,
-    "registered_family_count": 140,
-    "schema": "source_native_family_baseline_ledger_v1",
-    "sha256": "627d0add4d31514f7a47dbf8e8c51b0fa46df72635f336133f54abb85b00927a"
-  },
   "response_type": "RFI_STYLE_CSO_SOLUTION_BRIEF_EVALUATION_LANE",
   "schema": "lumencore.erdc_sdc_solution_brief_compliance_gate.v1",
+  "semantic_review_complete": false,
   "source_integrity": {
     "all_source_checks_pass": true,
     "current_attachment_set_complete": true,
+    "custody_sources": [
+      {
+        "extraction": "pdftotext -layout",
+        "pdf_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+        "pdf_sha256_match": true,
+        "text_exists": true,
+        "text_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.txt",
+        "text_sha256_match": true
+      },
+      {
+        "extraction": "pdftotext -layout",
+        "pdf_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_20Jul2026.pdf",
+        "pdf_sha256_match": true,
+        "text_exists": true,
+        "text_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_20Jul2026.txt",
+        "text_sha256_match": true
+      }
+    ],
     "files": [
       {
         "actual_bytes": 162903,
@@ -303,29 +363,46 @@
         "sha256_match": true
       }
     ],
+    "live_page_snapshot": {
+      "deadline_text": "4:00 pm CT on August 7, 2026",
+      "funding_text": "Funding is not currently available for this project.",
+      "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/ERDCWERX_SDC_LIVE_PAGE_2026-07-29.html",
+      "question_cutoff_text": "July 31, 2026",
+      "response_characterization": "RFI_ONLY_RESPONSE_IS_NOT_AN_OFFER",
+      "route": "COMMERCIAL_SOLUTION",
+      "sha256": "0438cb1186c0c29d472002b1b8f66c4acd24222fb478d44b8b349a70fdc74d5a"
+    },
     "manifest_as_of_date": "2026-07-29",
     "manifest_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-29.json",
     "manifest_schema": "lumencore.erdc_sdc_source_manifest.v2",
-    "manifest_sha256": "44a7d65cd214d97d691ecc66b3e731588fbac9cb6c22e0e4b2d221c337af56ce"
+    "manifest_sha256": "44a7d65cd214d97d691ecc66b3e731588fbac9cb6c22e0e4b2d221c337af56ce",
+    "source_custody_checks_pass": true,
+    "source_custody_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_CUSTODY_2026-07-29.json",
+    "source_custody_schema": "lumencore.erdc_sdc_source_custody.v1",
+    "source_custody_sha256": "77f389460650a00a938977b5ffee88a9d99eb5e97358fcf988ffd5247bd433bf"
   },
-  "status": "CURRENT_PUBLIC_DRAFT_PASS_PRIVATE_ROM_SAM_CONTACT_ACCOUNT_AND_PORTAL_FINALIZATION_REQUIRED",
+  "status": "CURRENT_PUBLIC_DRAFT_FORMAT_AND_MARKER_CHECKS_PASS_SEMANTIC_EVIDENCE_AND_PRIVATE_FINALIZATION_REQUIRED",
   "submission_ready": false,
   "summary": {
     "browser_navigation_performed": false,
     "external_send_allowed_without_human": false,
     "final_portal_submit_allowed_without_human": false,
-    "finalization_blocker_count": 5,
+    "finalization_blocker_count": 8,
     "finalization_blocker_ids": [
+      "TECH_03",
+      "TRUST_01",
+      "EXEC_01",
       "ROM_01",
       "SAM_01",
       "CONTACT_01",
       "ACCOUNT_01",
       "PORTAL_01"
     ],
+    "independent_review_complete": false,
+    "internal_red_team_only": true,
     "legal_identity_publish_allowed": false,
-    "pass_or_bounded_pass_count": 16,
+    "pass_or_bounded_pass_count": 18,
     "pricing_allowed_without_founder_approval": false,
-    "requirement_count": 21
-  },
-  "technical_document_checks_pass": true
+    "requirement_count": 26
+  }
 }

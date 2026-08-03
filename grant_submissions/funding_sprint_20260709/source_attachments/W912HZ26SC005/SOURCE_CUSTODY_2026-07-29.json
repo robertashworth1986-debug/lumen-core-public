@@ -1,0 +1,132 @@
+{
+  "schema": "lumencore.erdc_sdc_source_custody.v1",
+  "observed_utc": "2026-07-29T21:13:07Z",
+  "opportunity_number": "W912HZ26SC005",
+  "official_project_url": "https://www.erdcwerx.org/sovereign-defense-cloud-for-high-performance-computing/",
+  "live_page_snapshot": {
+    "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/ERDCWERX_SDC_LIVE_PAGE_2026-07-29.html",
+    "sha256": "0438cb1186c0c29d472002b1b8f66c4acd24222fb478d44b8b349a70fdc74d5a",
+    "route": "COMMERCIAL_SOLUTION",
+    "deadline_text": "4:00 pm CT on August 7, 2026",
+    "question_cutoff_text": "July 31, 2026",
+    "funding_text": "Funding is not currently available for this project.",
+    "response_characterization": "RFI_ONLY_RESPONSE_IS_NOT_AN_OFFER"
+  },
+  "source_documents": [
+    {
+      "pdf_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "pdf_sha256": "ea456c2057dbe40128038ffff3e1eb5c055d8cd36e8af24ecd2ec5e8e5cde209",
+      "pdf_pages": 7,
+      "text_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/CSO_HPCMP_SDC_30April2026_FINAL.txt",
+      "text_sha256": "b93587e4b57ef3f34713888fb2a0b79369b295b4bdaf5295f176d790c95d634f",
+      "extraction": "pdftotext -layout"
+    },
+    {
+      "pdf_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_20Jul2026.pdf",
+      "pdf_sha256": "797afb7489629f0eb3c1f476fa8f2ad6b27255888a8f293453bcd4ee18181df3",
+      "pdf_pages": 13,
+      "text_path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/HPCMP_SDC_FAQ_20Jul2026.txt",
+      "text_sha256": "b192a876dae43442a0dd76caf4c95a0d852f1bd2c66328da85831b06867d0ab0",
+      "extraction": "pdftotext -layout"
+    }
+  ],
+  "requirement_crosswalk": [
+    {
+      "id": "SCOPE_01",
+      "requirement": "A solution may address one or more named focus areas.",
+      "source": "CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "pdf_page": 2,
+      "text_line_anchors": [61, 76],
+      "current_handling": "Primary scope is Unified Service Layer and Vendor Lock-In Prevention; AI-Powered Orchestration and Secure Data Fabric are integration boundaries."
+    },
+    {
+      "id": "FUNDING_01",
+      "requirement": "Do not imply that funding is currently available.",
+      "source": "CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "pdf_page": 2,
+      "text_line_anchors": [81, 82],
+      "current_handling": "Public draft states that funding is not currently available and no award is guaranteed."
+    },
+    {
+      "id": "FORMAT_01",
+      "requirement": "Use 12-point Times New Roman and preserve the five-page proposal-body limit.",
+      "source": "CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "pdf_page": 3,
+      "text_line_anchors": [132],
+      "current_handling": "Generated PDF is inspected for 12-point Times New Roman, one-inch margins, and five counted body pages."
+    },
+    {
+      "id": "DISCLOSURE_01",
+      "requirement": "Do not include classified or proprietary information.",
+      "source": "CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "pdf_page": 3,
+      "text_line_anchors": [125],
+      "current_handling": "Artifact remains a public-safe draft with no private identity, credentials, classified data, or patent-sensitive content."
+    },
+    {
+      "id": "ROM_01",
+      "requirement": "Include one Phase II-only estimated price in the private final response.",
+      "source": "CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "pdf_page": 4,
+      "text_line_anchors": [160],
+      "current_handling": "Public draft contains no price and remains blocked pending a reviewed Phase II-only ROM."
+    },
+    {
+      "id": "SAM_01",
+      "requirement": "Maintain active SAM registration and exact identity/address alignment.",
+      "source": "CSO_HPCMP_SDC_30April2026_FINAL.pdf",
+      "pdf_page": 4,
+      "text_line_anchors": [165, 169],
+      "current_handling": "Private finalization must verify current all-awards registration and exact legal-entity and address match."
+    },
+    {
+      "id": "DEADLINE_01",
+      "requirement": "Use the current live commercial-solution deadline while preserving the original CSO text.",
+      "source": "ERDCWERX_SDC_LIVE_PAGE_2026-07-29.html",
+      "pdf_page": null,
+      "text_line_anchors": [],
+      "current_handling": "Operational cutoff is 4:00 PM Central on August 7, 2026; the original CSO text of 1700 EST is retained in the gate."
+    },
+    {
+      "id": "FAQ_SCOPE_01",
+      "requirement": "Cover and acronym pages do not count toward the five-page body limit.",
+      "source": "HPCMP_SDC_FAQ_20Jul2026.pdf",
+      "pdf_page": 4,
+      "text_line_anchors": [134, 136],
+      "current_handling": "The physical PDF has one cover page, one acronym page, and five counted body pages."
+    },
+    {
+      "id": "FAQ_ROM_01",
+      "requirement": "Exclude Phase III and Phase IV cost and activity from the Phase II ROM.",
+      "source": "HPCMP_SDC_FAQ_20Jul2026.pdf",
+      "pdf_page": 4,
+      "text_line_anchors": [150, 156],
+      "current_handling": "The private ROM workflow is constrained to Phase II prototype development."
+    },
+    {
+      "id": "FAQ_AI_01",
+      "requirement": "Keep AI advisory with a human in the loop and manual override.",
+      "source": "HPCMP_SDC_FAQ_20Jul2026.pdf",
+      "pdf_page": 11,
+      "text_line_anchors": [495, 499, 508],
+      "current_handling": "Proposal keeps AI advisory and requires explicit parameters, retained evidence, and manual override."
+    },
+    {
+      "id": "FAQ_DATA_01",
+      "requirement": "Preserve absolute data separation and cloud-agnostic portability.",
+      "source": "HPCMP_SDC_FAQ_20Jul2026.pdf",
+      "pdf_page": 12,
+      "text_line_anchors": [515, 516, 531, 536],
+      "current_handling": "Proposal uses separate enclave deployments, approved interfaces, and replaceable cloud and adapter boundaries."
+    },
+    {
+      "id": "FAQ_LEGACY_01",
+      "requirement": "Use incremental migration and maintain legacy interoperability.",
+      "source": "HPCMP_SDC_FAQ_20Jul2026.pdf",
+      "pdf_page": 13,
+      "text_line_anchors": [568, 595],
+      "current_handling": "Phase II plan uses shadow mode, bounded adapters, phased handoff, and rollback."
+    }
+  ],
+  "claim_boundary": "This custody receipt proves only which public source bytes and extracted text were reviewed and how proposal controls map to them. It does not prove eligibility, portal acceptance, technical performance, independent validation, selection, funding, or award."
+}

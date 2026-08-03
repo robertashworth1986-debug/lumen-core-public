@@ -25,31 +25,41 @@ def test_sector_math_uses_correct_basis_point_values():
     assert module.windowed_value(100_000, 3) == 25_000
 
 
-def test_claim_ladder_keeps_current_real_savings_gate_closed():
+def test_claim_ladder_zeros_every_current_model_outcome_value():
     module = load_module()
     payload = module.build_payload()
 
-    assert payload["schema"] == "field_validated_dollar_claim_ladder_v1"
+    assert payload["schema"] == "field_validated_dollar_claim_ladder_v2"
     assert payload["direct_answer"]["can_claim_real_savings_right_now"] is False
+    assert payload["direct_answer"]["can_claim_bounded_estimated_value_right_now"] is False
+    assert payload["direct_answer"]["can_publish_modeled_dollar_projection_right_now"] is False
+    assert payload["current_truth"]["current_performance_champion_present"] is False
+    assert payload["current_truth"]["modeled_dollar_projection_allowed_now"] is False
     assert payload["current_truth"]["field_validated_savings_claim_allowed_now"] is False
     assert payload["current_truth"]["realized_customer_or_government_savings_allowed_now"] is False
-    assert payload["current_truth"]["bounded_estimated_value_claim_allowed_now"] is True
-    assert payload["current_truth"]["allowed_estimated_annual_value_usd"] > 0
+    assert payload["current_truth"]["bounded_estimated_value_claim_allowed_now"] is False
+    assert payload["current_truth"]["allowed_estimated_hourly_value_usd"] == 0
+    assert payload["current_truth"]["allowed_estimated_annual_value_usd"] == 0
+    assert payload["current_truth"]["allowed_realized_savings_usd"] == 0
     assert len(payload["claim_ladder_sha256"]) == 64
 
 
-def test_capture_table_converts_current_safe_estimate_without_claiming_revenue():
+def test_service_pricing_is_separate_from_model_value_and_savings():
     module = load_module()
     payload = module.build_payload()
-    annual = payload["current_truth"]["allowed_estimated_annual_value_usd"]
-    rows = {row["capture_rate_pct"]: row for row in payload["capture_from_current_safe_estimate"]}
+    pricing = payload["service_pricing"]
 
-    assert rows[5.0]["annual_contract_surface_usd"] == round(annual * 0.05, 2)
-    assert rows[5.0]["first_3_months_contract_surface_usd"] == round(annual * 0.05 * 0.25, 2)
-    assert "revenue requires" in rows[5.0]["boundary"]
+    assert payload["capture_from_current_safe_estimate"] == []
+    assert pricing["paid_protocol_review_usd"]["low"] == 2500
+    assert pricing["paid_protocol_review_usd"]["high"] == 7500
+    assert pricing["benchmark_implementation_usd"]["low"] == 7500
+    assert pricing["benchmark_implementation_usd"]["high"] == 25000
+    assert pricing["service_price_is_model_outcome_value"] is False
+    assert pricing["service_price_is_realized_savings"] is False
+    assert pricing["service_price_is_enterprise_valuation"] is False
 
 
-def test_ladder_language_requires_field_validation_before_posting_savings_claims():
+def test_public_language_is_fail_closed_and_explains_hypothetical_math():
     module = load_module()
     payload = module.build_payload()
     rendered = module.render_markdown(payload)
@@ -57,19 +67,27 @@ def test_ladder_language_requires_field_validation_before_posting_savings_claims
 
     assert "real savings claim right now: `false`" in text
     assert "field validated savings allowed now: `false`" in text
-    assert "not realized savings" in text
-    assert "buyer-authorized" in text
-    assert "locked baseline" in text
-    assert "guaranteed roi" in text
-    assert "field-validated avoided-cost claim" in rendered
+    assert "modeled dollar projection allowed now: `false`" in text
+    assert "claimable annual model-outcome value: `$0.00`" in text
+    assert "one percent of $1 billion is $10 million" in text
+    assert "math only" in text
+    assert "hash identity is custody evidence, not performance evidence" in text
+    assert "$4,520" not in rendered
+    assert "$39,595,200" not in rendered
 
 
-def test_strongest_family_is_field_replay_request_not_customer_savings_claim():
+def test_reference_candidate_is_negative_evidence_not_a_champion_or_request():
     module = load_module()
     payload = module.build_payload()
-    family = payload["strongest_alpha_flow_family"]
+    family = payload["reference_candidate"]
 
-    assert family["family_id"]
+    assert family["family_id"] == "kuramoto_phase_coupling"
+    assert family["development_selected_candidate"] == "lissajous_phase_paths"
+    assert family["candidate_was_protocol_selected"] is False
+    assert family["wins_vs_named_baseline"] == 482
+    assert family["holdout_count"] == 1525
+    assert family["mean_delta_vs_named_baseline"] < 0
+    assert family["ready_for_buyer_authorized_field_replay_request"] is False
     assert family["field_validation_claim_allowed"] is False
     assert family["real_dollar_savings_claim_allowed"] is False
-    assert "not yet a customer savings claim" in family["plain_english"]
+    assert "not a performance champion" in family["plain_english"]

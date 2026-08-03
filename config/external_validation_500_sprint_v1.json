@@ -1,0 +1,132 @@
+{
+  "schema": "external_validation_500_sprint.v1",
+  "version": 1,
+  "prepared_date": "2026-07-16",
+  "budget_usd": 500,
+  "decision": "Use the entire innovation budget for one bounded, outcome-independent external evaluation of the frozen EIA hourly evidence lane.",
+  "status": "BUDGET_HELD_PENDING_HUMAN_SELECTION_OF_AN_INDEPENDENT_EVALUATOR",
+  "evidence_lane": {
+    "lane_id": "eia_grid_prospective_hourly_router_external_evaluation",
+    "runtime_projection_path": "evidence/external_validation/eia_grid_prospective_hourly_runtime_projection_20260716.json",
+    "independent_handoff_path": "evidence/external_validation/eia_grid_hourly_independent_reproduction_handoff_20260716.json",
+    "evaluator_protocol_template_path": "config/eia_grid_hourly_external_evaluator_protocol_template_v1.json",
+    "reproduction_receipt_template_path": "config/eia_grid_hourly_independent_reproduction_receipt_template_v1.json",
+    "handoff_guide_path": "docs/EIA_GRID_HOURLY_INDEPENDENT_REPRODUCTION_HANDOFF_2026-07-16.md"
+  },
+  "milestones": [
+    {
+      "id": "protocol_freeze",
+      "label": "Independent protocol review and freeze",
+      "amount_usd": 100,
+      "estimated_hours": 2,
+      "release_condition": "Evaluator returns an attributable accept-or-decline memo, completed conflict disclosure, and an evaluator-controlled protocol decision before scoring.",
+      "paid_if_evaluator_declines": true,
+      "paid_if_result_is_negative": true,
+      "result_contingent": false
+    },
+    {
+      "id": "clean_room_reproduction",
+      "label": "Reviewer-controlled clean-room reproduction",
+      "amount_usd": 300,
+      "estimated_hours": 6,
+      "release_condition": "Evaluator returns environment fingerprint, raw verifier logs, recomputed hashes and arithmetic, discrepancy ledger, and completed reproduction receipt.",
+      "paid_if_evaluator_declines": false,
+      "paid_if_result_is_negative": true,
+      "result_contingent": false
+    },
+    {
+      "id": "attributable_memo",
+      "label": "Attributable validation memo and final receipt",
+      "amount_usd": 100,
+      "estimated_hours": 2,
+      "release_condition": "Evaluator returns a dated decision memo stating the supported maturity level, all caveats, and the final receipt hash; publication of identity remains evaluator-controlled.",
+      "paid_if_evaluator_declines": false,
+      "paid_if_result_is_negative": true,
+      "result_contingent": false
+    }
+  ],
+  "evaluator_requirements": {
+    "required": [
+      "No prior role designing, tuning, or promoting the evaluated model.",
+      "Discloses compensation, relationships, and any financial or professional conflicts.",
+      "Can independently run Python and inspect time-series validation, error metrics, bootstrap uncertainty, and append-only hash chains.",
+      "Uses a reviewer-controlled machine or cloud account and preserves raw logs.",
+      "Agrees that missing authorities, failed gates, discrepancies, and negative results remain in the final record.",
+      "Accepts no bonus, success fee, equity, revenue share, or future work contingent on a positive result."
+    ],
+    "selection_score_weights": {
+      "independence_and_conflict_controls": 35,
+      "reproducibility_and_python": 25,
+      "statistics_and_time_series": 20,
+      "energy_or_forecasting_context": 10,
+      "clear_attributable_reporting": 10
+    },
+    "minimum_score": 75
+  },
+  "free_validation_rails": [
+    {
+      "name": "Public GitHub Actions standard runner",
+      "budget_usd": 0,
+      "purpose": "Independent clean-runner execution and preserved logs."
+    },
+    {
+      "name": "OSF registration",
+      "budget_usd": 0,
+      "purpose": "Time-stamped, read-only protocol registration before scoring."
+    },
+    {
+      "name": "Zenodo release archive",
+      "budget_usd": 0,
+      "purpose": "Public artifact archive and DOI for a reviewer-safe release."
+    },
+    {
+      "name": "GitHub Pages",
+      "budget_usd": 0,
+      "purpose": "Public read-only reviewer surface when the repository is public."
+    }
+  ],
+  "do_not_buy": [
+    "Live trading capital, exchange deposits, leverage, or paid signals.",
+    "More model training, GPUs, tuning runs, or candidate searches before the frozen evaluation completes.",
+    "Advertising, follower growth, press releases, or investor promotion before an attributable external receipt exists.",
+    "A positive-result bonus, success fee, equity grant, revenue share, or future contract promised for validation.",
+    "Generic cloud subscriptions when the public clean-runner, registration, archive, and reviewer page can be operated on free tiers.",
+    "A data subscription unless the evaluator documents why the public frozen packet cannot answer the registered reproduction question."
+  ],
+  "human_authority": {
+    "spending_automatically_authorized": false,
+    "external_contact_automatically_authorized": false,
+    "account_creation_automatically_authorized": false,
+    "operator_may_fill_evaluator_fields": false,
+    "operator_may_sign_for_evaluator": false
+  },
+  "success_definition": [
+    "A named evaluator independently accepts or declines the protocol before scoring.",
+    "The frozen packet is reproduced on a reviewer-controlled environment with raw logs and hashes.",
+    "The evaluator preserves adverse evidence and signs only the maturity level actually supported.",
+    "Any later economic claim is based on a buyer-owned metric and accepted conversion, not this receipt alone."
+  ],
+  "official_references": [
+    {
+      "name": "GitHub Actions billing",
+      "url": "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+      "use": "Standard GitHub-hosted runners are free for public repositories."
+    },
+    {
+      "name": "OSF registrations",
+      "url": "https://help.osf.io/article/330-welcome-to-registrations",
+      "use": "Registrations are time-stamped, read-only records of the study plan."
+    },
+    {
+      "name": "Zenodo GitHub integration",
+      "url": "https://help.zenodo.org/docs/github/",
+      "use": "GitHub releases can be archived and assigned a persistent research record."
+    },
+    {
+      "name": "Upwork data analyst rates",
+      "url": "https://www.upwork.com/hire/data-analysts/cost/",
+      "use": "A $500 fixed scope is roughly ten hours at the upper end of the cited analyst range; evaluator quality and independence still control selection."
+    }
+  ],
+  "claim_boundary": "This sprint is a budget and reviewer-engagement control. It does not hire an evaluator, authorize spending or external contact, prove independent validation, promote the evidence maturity level, establish model skill, create realized savings, authorize live trading, or guarantee revenue, funding, publication, or a positive result."
+}

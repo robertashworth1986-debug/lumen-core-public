@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+import math
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from textwrap import shorten
 
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import (
-    Flowable,
-    KeepTogether,
     ListFlowable,
     ListItem,
     PageBreak,
@@ -32,129 +30,391 @@ DOCS = ROOT / "docs"
 OUT_PDF = OUT_DIR / "LumenCore_Business_Plan_Investor_Ready_UPDATED_2026-07-03.pdf"
 OUT_MD = DOCS / "LUMENCORE_BUSINESS_PLAN_INVESTOR_READY_UPDATED_2026-07-03.md"
 
+INPUT_SCHEMAS = {
+    "champion": ("champion_metric_gauntlet.json", "champion_metric_gauntlet_v2"),
+    "locked": (
+        "locked_source_baseline_replay_sweep.json",
+        "locked_source_baseline_replay_sweep_v2",
+    ),
+    "dollar_ladder": (
+        "field_validated_dollar_claim_ladder.json",
+        "field_validated_dollar_claim_ladder_v2",
+    ),
+    "dollar_gate": ("dollar_claim_gate.json", "dollar_claim_gate_v2"),
+    "valuation": (
+        "valuation_proposal_target_packet.json",
+        "valuation_proposal_target_packet_v3",
+    ),
+    "revenue": ("proof_to_revenue_engine.json", "proof_to_revenue_engine_v3"),
+}
+
+
+class ContractError(RuntimeError):
+    """Raised when an input cannot support the current reviewer-safe contract."""
+
 
 def read_json(path: Path) -> dict:
+    if not path.is_file():
+        raise FileNotFoundError(f"Required business-plan input is missing: {path}")
     try:
-        return json.loads(path.read_text(encoding="utf-8", errors="ignore"))
-    except Exception:
-        return {}
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ContractError(f"Cannot read required JSON input {path}: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise ContractError(f"Required JSON input is not an object: {path}")
+    return payload
 
 
-def money(value: float | int | None) -> str:
-    if value is None:
-        return "n/a"
-    return f"${float(value):,.0f}"
-
-
-def pct(value: float | int | None) -> str:
-    if value is None:
-        return "n/a"
-    return f"{float(value) * 100:.1f}%"
-
-
-def num(value: float | int | None) -> str:
-    if value is None:
-        return "n/a"
-    if isinstance(value, float):
-        return f"{value:,.3f}"
-    return f"{int(value):,}"
-
-
-def get_data() -> dict:
-    champion = read_json(DASHBOARD_DATA / "champion_metric_gauntlet.json")
-    locked = read_json(DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json")
-    dollar = read_json(DASHBOARD_DATA / "field_validated_dollar_claim_ladder.json")
-    gate = read_json(DASHBOARD_DATA / "dollar_claim_gate.json")
-    accepted_metrics = read_json(DASHBOARD_DATA / "kuramoto_accepted_metric_audit.json")
+def get_data(data_dir: Path = DASHBOARD_DATA) -> dict[str, dict]:
     return {
-        "champion": champion,
-        "locked": locked,
-        "dollar": dollar,
-        "gate": gate,
-        "accepted_metrics": accepted_metrics,
+        key: read_json(data_dir / filename)
+        for key, (filename, _schema) in INPUT_SCHEMAS.items()
     }
 
 
-def safe_champion(data: dict) -> dict:
-    strongest = data.get("champion", {}).get("strongest_current", {})
+def _require(condition: bool, message: str) -> None:
+    if not condition:
+        raise ContractError(message)
+
+
+def _mapping(value: object, label: str) -> dict:
+    _require(isinstance(value, dict), f"{label} must be an object")
+    return value
+
+
+def _number(value: object, label: str) -> float:
+    _require(
+        isinstance(value, (int, float)) and not isinstance(value, bool),
+        f"{label} must be numeric",
+    )
+    result = float(value)
+    _require(math.isfinite(result), f"{label} must be finite")
+    return result
+
+
+def _integer(value: object, label: str) -> int:
+    result = _number(value, label)
+    _require(result.is_integer(), f"{label} must be an integer")
+    return int(result)
+
+
+def _utc_timestamp(value: object, label: str) -> datetime:
+    _require(isinstance(value, str) and value.strip(), f"{label} is missing")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ContractError(f"{label} is not an ISO-8601 timestamp") from exc
+    _require(parsed.tzinfo is not None, f"{label} must include a timezone")
+    return parsed.astimezone(timezone.utc)
+
+
+def _price_range(value: object, label: str) -> tuple[int, int]:
+    price = _mapping(value, label)
+    low = _integer(price.get("low"), f"{label}.low")
+    high = _integer(price.get("high"), f"{label}.high")
+    _require(low >= 0 and high >= low, f"{label} is not a valid price range")
+    return low, high
+
+
+def validate_contract(
+    data: dict[str, dict],
+    *,
+    now: datetime | None = None,
+    max_input_age: timedelta = timedelta(days=14),
+) -> dict:
+    """Validate and normalize the only claims this dated builder may publish."""
+
+    current_time = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    for key, (_filename, expected_schema) in INPUT_SCHEMAS.items():
+        artifact = _mapping(data.get(key), key)
+        _require(
+            artifact.get("schema") == expected_schema,
+            f"{key} has stale or unsupported schema {artifact.get('schema')!r}; "
+            f"expected {expected_schema!r}",
+        )
+        generated = _utc_timestamp(artifact.get("generated_utc"), f"{key}.generated_utc")
+        age = current_time - generated
+        _require(age >= timedelta(0), f"{key} is dated in the future")
+        _require(
+            age <= max_input_age,
+            f"{key} is stale ({age.days} days old; maximum is {max_input_age.days})",
+        )
+
+    champion = _mapping(data["champion"].get("summary"), "champion.summary")
+    locked = _mapping(data["locked"].get("summary"), "locked.summary")
+    ladder = _mapping(
+        data["dollar_ladder"].get("current_truth"),
+        "dollar_ladder.current_truth",
+    )
+    gate = _mapping(data["dollar_gate"].get("summary"), "dollar_gate.summary")
+    valuation_truth = _mapping(
+        data["valuation"].get("current_truth"),
+        "valuation.current_truth",
+    )
+    valuation_state = _mapping(
+        data["valuation"].get("valuation_state"),
+        "valuation.valuation_state",
+    )
+    revenue = _mapping(data["revenue"].get("summary"), "revenue.summary")
+    offers = _mapping(data["revenue"].get("commercial_offers"), "revenue.commercial_offers")
+    model_evidence = _mapping(
+        data["revenue"].get("current_model_evidence"),
+        "revenue.current_model_evidence",
+    )
+
+    false_gates = {
+        "champion.internal_champion": champion.get("internal_champion"),
+        "champion.protocol_grade_internal_champion": champion.get(
+            "protocol_grade_internal_champion"
+        ),
+        "champion.real_dollar_savings_claim_allowed": champion.get(
+            "real_dollar_savings_claim_allowed"
+        ),
+        "locked.performance_superiority_claim_allowed": locked.get(
+            "performance_superiority_claim_allowed"
+        ),
+        "locked.real_dollar_savings_claim_allowed": locked.get(
+            "real_dollar_savings_claim_allowed"
+        ),
+        "ladder.current_performance_champion_present": ladder.get(
+            "current_performance_champion_present"
+        ),
+        "ladder.modeled_dollar_projection_allowed_now": ladder.get(
+            "modeled_dollar_projection_allowed_now"
+        ),
+        "ladder.enterprise_valuation_asserted_now": ladder.get(
+            "enterprise_valuation_asserted_now"
+        ),
+        "valuation.internal_performance_champion_present": valuation_truth.get(
+            "internal_performance_champion_present"
+        ),
+        "valuation.enterprise_valuation_asserted": valuation_state.get(
+            "enterprise_valuation_asserted"
+        ),
+        "revenue.internal_performance_champion_present": revenue.get(
+            "internal_performance_champion_present"
+        ),
+        "revenue.cross_sector_efficiency_claim_allowed": revenue.get(
+            "cross_sector_efficiency_claim_allowed"
+        ),
+        "revenue.model_performance_marketing_allowed": revenue.get(
+            "model_performance_marketing_allowed"
+        ),
+        "revenue.modeled_dollar_projection_allowed": revenue.get(
+            "modeled_dollar_projection_allowed"
+        ),
+        "revenue.enterprise_valuation_asserted": revenue.get(
+            "enterprise_valuation_asserted"
+        ),
+    }
+    for label, value in false_gates.items():
+        _require(value is False, f"{label} must be explicitly false")
+
+    holm_promotions = _integer(
+        locked.get("global_holm_positive_count"),
+        "locked.summary.global_holm_positive_count",
+    )
+    _require(holm_promotions == 0, "Direct all-baseline global Holm promotions must be zero")
+    _require(
+        _integer(
+            ladder.get("direct_all_baseline_global_holm_positive_count"),
+            "dollar_ladder.current_truth.direct_all_baseline_global_holm_positive_count",
+        )
+        == holm_promotions,
+        "Dollar ladder disagrees with the locked sweep on global Holm promotions",
+    )
+
+    sector_count = _integer(revenue.get("cross_sector_sector_count"), "revenue sector count")
+    sector_gains = _integer(
+        revenue.get("cross_sector_gain_proven_count"),
+        "revenue proven sector gain count",
+    )
+    _require(
+        (sector_gains, sector_count) == (0, 6),
+        "Cross-sector contract must remain 0 proven gains across 6 sectors",
+    )
+    _require(
+        (
+            _integer(ladder.get("cross_sector_gain_proven_count"), "ladder sector gains"),
+            _integer(ladder.get("cross_sector_sector_count"), "ladder sector count"),
+        )
+        == (sector_gains, sector_count),
+        "Dollar ladder and revenue engine disagree on cross-sector results",
+    )
+
+    wins = _integer(champion.get("holdout_wins"), "champion holdout wins")
+    holdouts = _integer(champion.get("holdout_count"), "champion holdout count")
+    mean_delta = _number(
+        champion.get("mean_delta_vs_named_baseline"),
+        "champion mean delta",
+    )
+    baseline = champion.get("named_baseline")
+    _require((wins, holdouts) == (482, 1525), "Kuramoto reference must be 482/1525")
+    _require(
+        math.isclose(mean_delta, -0.508191, abs_tol=0.000001),
+        "Kuramoto reference mean delta must remain -0.508191",
+    )
+    _require(
+        champion.get("champion_family") == "kuramoto_phase_coupling",
+        "Measured reference candidate must be Kuramoto phase coupling",
+    )
+    _require(
+        revenue.get("measured_reference_candidate") == "kuramoto_phase_coupling"
+        and revenue.get("reference_candidate_was_protocol_selected") is False
+        and valuation_truth.get("reference_candidate_was_protocol_selected") is False,
+        "Kuramoto must remain a measured reference and not the development-selected candidate",
+    )
+    _require(
+        revenue.get("development_selected_candidate") == "lissajous_phase_paths",
+        "Development-selected candidate identity is missing or stale",
+    )
+    _require(
+        revenue.get("internal_replay_named_baseline") == baseline
+        and _integer(revenue.get("internal_replay_holdout_wins"), "revenue wins") == wins
+        and _integer(revenue.get("internal_replay_holdout_count"), "revenue holdouts")
+        == holdouts
+        and math.isclose(
+            _number(revenue.get("internal_replay_mean_delta"), "revenue mean delta"),
+            mean_delta,
+            abs_tol=0.000001,
+        ),
+        "Revenue engine disagrees with the measured Kuramoto reference",
+    )
+
+    zero_values = {
+        "champion.safe_estimated_hourly_value_usd": champion.get(
+            "safe_estimated_hourly_value_usd"
+        ),
+        "champion.safe_estimated_annual_value_usd": champion.get(
+            "safe_estimated_annual_value_usd"
+        ),
+        "ladder.allowed_estimated_hourly_value_usd": ladder.get(
+            "allowed_estimated_hourly_value_usd"
+        ),
+        "ladder.allowed_estimated_annual_value_usd": ladder.get(
+            "allowed_estimated_annual_value_usd"
+        ),
+        "gate.allowed_estimated_hourly_value_usd": gate.get(
+            "allowed_estimated_hourly_value_usd"
+        ),
+        "gate.allowed_estimated_annual_value_usd": gate.get(
+            "allowed_estimated_annual_value_usd"
+        ),
+        "valuation.safe_estimated_hourly_value_usd": valuation_truth.get(
+            "safe_estimated_hourly_value_usd"
+        ),
+        "valuation.safe_estimated_annual_value_usd": valuation_truth.get(
+            "safe_estimated_annual_value_usd"
+        ),
+        "revenue.safe_estimated_hourly_value_usd": revenue.get(
+            "safe_estimated_hourly_value_usd"
+        ),
+        "revenue.safe_estimated_annual_value_usd": revenue.get(
+            "safe_estimated_annual_value_usd"
+        ),
+    }
+    for label, value in zero_values.items():
+        _require(_number(value, label) == 0.0, f"{label} must be zero")
+
+    protocol_offer = _mapping(offers.get("source_native_protocol_review"), "protocol offer")
+    implementation_offer = _mapping(
+        offers.get("benchmark_implementation"),
+        "benchmark implementation offer",
+    )
+    protocol_low, protocol_high = _price_range(
+        protocol_offer.get("price_usd"),
+        "protocol offer price",
+    )
+    implementation_low, implementation_high = _price_range(
+        implementation_offer.get("price_usd"),
+        "implementation offer price",
+    )
+    _require(
+        (protocol_low, protocol_high) == (2500, 7500),
+        "Protocol-review service range must be $2,500-$7,500",
+    )
+    _require(
+        (implementation_low, implementation_high) == (7500, 25000),
+        "Benchmark-implementation range must be $7,500-$25,000",
+    )
+
+    prooflock = _mapping(
+        offers.get("product_process_discovery"),
+        "ProofLock product-process offer",
+    )
+    _require(
+        prooflock.get("name") == "ProofLock Opportunity Operations"
+        and prooflock.get("product_process_scoping_allowed") is True
+        and prooflock.get("model_performance_dependency") is False,
+        "ProofLock must remain separately scopeable without geometry performance dependency",
+    )
+    prooflock_boundary = prooflock.get("claim_boundary")
+    _require(
+        isinstance(prooflock_boundary, str)
+        and "does not inherit" in prooflock_boundary.lower(),
+        "ProofLock must explicitly reject inherited geometry performance claims",
+    )
+    _require(
+        model_evidence.get("candidate_family") == "kuramoto_phase_coupling"
+        and model_evidence.get("candidate_was_protocol_selected") is False,
+        "Revenue model evidence must identify Kuramoto as a non-selected reference",
+    )
+
     return {
-        "family": strongest.get("family", "kuramoto_phase_coupling"),
-        "label": strongest.get("label", "Kuramoto phase coupling"),
-        "lane": strongest.get("lane", "wave_resonance_timing"),
-        "baseline": strongest.get("named_baseline", "kalman_filter"),
-        "wins": int(strongest.get("wins_vs_named_baseline", 24) or 24),
-        "n": int(strongest.get("holdout_count", 24) or 24),
-        "rows": int(strongest.get("estimated_rows_replayed", 2506267) or 2506267),
-        "numeric": int(strongest.get("numeric_samples_read", 66690) or 66690),
-        "mean_delta": float(strongest.get("mean_delta_vs_named_baseline", 0.140668) or 0.140668),
-        "min_delta": float(strongest.get("min_delta_vs_named_baseline", 0.044697) or 0.044697),
-        "p_value": strongest.get("one_sided_sign_test_p_value", 6e-8),
-        "wilson_lower": float(strongest.get("wilson_95_win_rate_lower", 0.862024) or 0.862024),
-        "source_systems": strongest.get("source_systems", []),
+        "generated_utc": current_time.isoformat(),
+        "performance_champion": None,
+        "global_holm_promotions": holm_promotions,
+        "sector_gains": sector_gains,
+        "sector_count": sector_count,
+        "reference": {
+            "family": "kuramoto_phase_coupling",
+            "label": "Kuramoto phase coupling",
+            "wins": wins,
+            "holdouts": holdouts,
+            "mean_delta": mean_delta,
+            "baseline": str(baseline),
+            "development_selected": False,
+        },
+        "development_selected_candidate": "lissajous_phase_paths",
+        "locked": {
+            "routes": _integer(locked.get("adapter_backed_routes"), "locked route count"),
+            "comparisons": _integer(
+                locked.get("baseline_comparison_count"),
+                "locked comparison count",
+            ),
+            "direct_routes": _integer(
+                locked.get("direct_measured_routes_replayed"),
+                "locked direct route count",
+            ),
+            "conditioned_routes": _integer(
+                locked.get("source_conditioned_routes_replayed"),
+                "locked conditioned route count",
+            ),
+            "numeric_rows": _integer(
+                locked.get("numeric_samples_read"),
+                "locked numeric sample count",
+            ),
+        },
+        "claimable_modeled_dollar_outcome_usd": 0,
+        "enterprise_valuation_asserted": False,
+        "offers": {
+            "protocol_review": (protocol_low, protocol_high),
+            "benchmark_implementation": (implementation_low, implementation_high),
+            "prooflock_name": str(prooflock["name"]),
+            "prooflock_boundary": str(prooflock_boundary),
+        },
     }
 
 
-def locked_summary(data: dict) -> dict:
-    locked = data.get("locked", {})
-    summary = locked.get("summary", {}) if isinstance(locked.get("summary"), dict) else {}
-    lanes = locked.get("lane_scoreboard", []) if isinstance(locked.get("lane_scoreboard"), list) else []
-    return {
-        "routes": int(summary.get("adapter_backed_routes", summary.get("ready_rows", 313)) or 313),
-        "comparisons": int(summary.get("baseline_comparison_count", 1969) or 1969),
-        "wins": int(summary.get("candidate_win_count", 1355) or 1355),
-        "losses": int(summary.get("candidate_loss_or_tie_count", 614) or 614),
-        "rows": int(summary.get("estimated_rows_replayed", 7152253) or 7152253),
-        "numeric": int(summary.get("numeric_samples_read", 92056) or 92056),
-        "source_count": int(summary.get("source_count", 159) or 159),
-        "mean_delta": float(summary.get("mean_score_delta", 0.108251) or 0.108251),
-        "best_delta": float(summary.get("best_score_delta", 0.680913) or 0.680913),
-        "lanes": lanes,
-    }
-
-
-def dollar_summary(data: dict) -> dict:
-    gate = data.get("gate", {}).get("summary", {})
-    return {
-        "allowed_hourly": float(gate.get("allowed_estimated_hourly_value_usd", 4520) or 4520),
-        "allowed_annual": float(gate.get("allowed_estimated_annual_value_usd", 39595200) or 39595200),
-    }
-
-
-def accepted_metric_summary(data: dict) -> dict:
-    accepted = data.get("accepted_metrics", {})
-    summary = accepted.get("summary", {}) if isinstance(accepted.get("summary"), dict) else {}
-    return {
-        "proxy_allowed": bool(summary.get("accepted_metric_proxy_language_allowed")),
-        "proxy_ready": int(summary.get("proxy_metrics_ready", 0) or 0),
-        "blocked": int(summary.get("external_or_adapter_blocked_metrics", 0) or 0),
-        "business_plan_language": summary.get("business_plan_language", ""),
-        "audit_sha256": str(accepted.get("audit_sha256", "")),
-    }
-
-
-class HR(Flowable):
-    def __init__(self, width: float, color=colors.HexColor("#1E6FD9"), thickness: float = 1.0):
-        super().__init__()
-        self.width = width
-        self.color = color
-        self.thickness = thickness
-        self.height = 0.08 * inch
-
-    def draw(self):
-        self.canv.setStrokeColor(self.color)
-        self.canv.setLineWidth(self.thickness)
-        self.canv.line(0, self.height / 2, self.width, self.height / 2)
-
-
-def styles():
+def _styles() -> dict[str, ParagraphStyle]:
     base = getSampleStyleSheet()
     return {
         "title": ParagraphStyle(
             "Title",
             parent=base["Title"],
             fontName="Helvetica-Bold",
-            fontSize=30,
-            leading=34,
+            fontSize=28,
+            leading=32,
             alignment=TA_CENTER,
             textColor=colors.HexColor("#122A46"),
             spaceAfter=8,
@@ -162,12 +422,11 @@ def styles():
         "subtitle": ParagraphStyle(
             "Subtitle",
             parent=base["Normal"],
-            fontName="Helvetica",
-            fontSize=13,
-            leading=17,
+            fontSize=12,
+            leading=16,
             alignment=TA_CENTER,
             textColor=colors.HexColor("#44546A"),
-            spaceAfter=14,
+            spaceAfter=12,
         ),
         "h1": ParagraphStyle(
             "Heading1",
@@ -176,7 +435,7 @@ def styles():
             fontSize=15,
             leading=19,
             textColor=colors.HexColor("#122A46"),
-            spaceBefore=10,
+            spaceBefore=8,
             spaceAfter=6,
         ),
         "h2": ParagraphStyle(
@@ -186,87 +445,43 @@ def styles():
             fontSize=11.5,
             leading=15,
             textColor=colors.HexColor("#1E6FD9"),
-            spaceBefore=8,
-            spaceAfter=3,
+            spaceBefore=7,
+            spaceAfter=4,
         ),
         "body": ParagraphStyle(
             "Body",
             parent=base["BodyText"],
             fontName="Helvetica",
             fontSize=9.5,
-            leading=13.2,
-            textColor=colors.HexColor("#17202A"),
+            leading=13.5,
+            textColor=colors.HexColor("#24364B"),
             spaceAfter=6,
         ),
         "small": ParagraphStyle(
             "Small",
             parent=base["BodyText"],
-            fontName="Helvetica",
-            fontSize=8.3,
-            leading=11,
-            textColor=colors.HexColor("#3C4856"),
-            spaceAfter=4,
-        ),
-        "callout": ParagraphStyle(
-            "Callout",
-            parent=base["BodyText"],
-            fontName="Helvetica-Bold",
-            fontSize=10,
-            leading=13,
-            textColor=colors.HexColor("#122A46"),
-            leftIndent=7,
-            rightIndent=7,
-            spaceBefore=5,
-            spaceAfter=5,
-        ),
-        "table": ParagraphStyle(
-            "TableText",
-            parent=base["BodyText"],
-            fontName="Helvetica",
-            fontSize=8.0,
+            fontSize=7.5,
             leading=10,
-            textColor=colors.HexColor("#17202A"),
-        ),
-        "table_head": ParagraphStyle(
-            "TableHead",
-            parent=base["BodyText"],
-            fontName="Helvetica-Bold",
-            fontSize=8.0,
-            leading=10,
-            textColor=colors.white,
+            textColor=colors.HexColor("#667085"),
         ),
     }
 
 
-def P(text: str, style: ParagraphStyle) -> Paragraph:
-    return Paragraph(text.replace("&", "&amp;"), style)
+def _p(text: str, style: ParagraphStyle) -> Paragraph:
+    return Paragraph(text, style)
 
 
-def bullets(items: list[str], st: dict) -> ListFlowable:
-    return ListFlowable(
-        [ListItem(P(item, st["body"]), leftIndent=10) for item in items],
-        bulletType="bullet",
-        start="circle",
-        leftIndent=18,
-        bulletFontName="Helvetica",
-        bulletFontSize=7,
-    )
-
-
-def kv_table(rows: list[tuple[str, str]], st: dict, col_widths: list[float] | None = None) -> Table:
-    if col_widths is None:
-        col_widths = [1.85 * inch, 4.65 * inch]
-    data = [[P(k, st["table_head"]), P(v, st["table"])] for k, v in rows]
-    table = Table(data, colWidths=col_widths, hAlign="LEFT")
+def _table(rows: list[tuple[str, str]], st: dict[str, ParagraphStyle]) -> Table:
+    body = [[_p(f"<b>{label}</b>", st["body"]), _p(value, st["body"])] for label, value in rows]
+    table = Table(body, colWidths=[2.05 * inch, 4.35 * inch], hAlign="LEFT")
     table.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#122A46")),
-                ("BACKGROUND", (1, 0), (1, -1), colors.HexColor("#F3F7FB")),
-                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D9E3EF")),
-                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 7),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D7DEE8")),
+                ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#F2F6FA")),
+                ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 6),
                 ("TOPPADDING", (0, 0), (-1, -1), 5),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
             ]
@@ -275,510 +490,270 @@ def kv_table(rows: list[tuple[str, str]], st: dict, col_widths: list[float] | No
     return table
 
 
-def data_table(headers: list[str], rows: list[list[str]], st: dict, col_widths: list[float]) -> Table:
-    data = [[P(h, st["table_head"]) for h in headers]]
-    data.extend([[P(str(cell), st["table"]) for cell in row] for row in rows])
-    table = Table(data, colWidths=col_widths, hAlign="LEFT", repeatRows=1)
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#122A46")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#F7FAFD")),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#F7FAFD"), colors.HexColor("#FFFFFF")]),
-                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D7E2EF")),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 5),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ]
-        )
+def _bullets(items: list[str], st: dict[str, ParagraphStyle]) -> ListFlowable:
+    return ListFlowable(
+        [ListItem(_p(item, st["body"])) for item in items],
+        bulletType="bullet",
+        leftIndent=18,
+        bulletFontSize=7,
     )
-    return table
 
 
-def callout(text: str, st: dict) -> Table:
-    table = Table([[P(text, st["callout"])]], colWidths=[6.5 * inch], hAlign="LEFT")
-    table.setStyle(
-        TableStyle(
+def build_story(contract: dict) -> list:
+    st = _styles()
+    ref = contract["reference"]
+    locked = contract["locked"]
+    protocol_low, protocol_high = contract["offers"]["protocol_review"]
+    implementation_low, implementation_high = contract["offers"][
+        "benchmark_implementation"
+    ]
+
+    story: list = [
+        Spacer(1, 0.65 * inch),
+        _p("LumenCore", st["title"]),
+        _p("Business Plan and Investor Diligence Brief", st["subtitle"]),
+        _p("Fail-closed evidence edition", st["subtitle"]),
+        Spacer(1, 0.15 * inch),
+        _table(
             [
-                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EAF3FF")),
-                ("BOX", (0, 0), (-1, -1), 0.65, colors.HexColor("#66A6FF")),
-                ("LEFTPADDING", (0, 0), (-1, -1), 8),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-                ("TOPPADDING", (0, 0), (-1, -1), 6),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-            ]
-        )
-    )
-    return table
-
-
-def lane_rows(lanes: list[dict]) -> list[list[str]]:
-    rows = []
-    for lane in lanes:
-        baselines = lane.get("locked_baselines", [])
-        rows.append(
-            [
-                str(lane.get("lane", "")),
-                num(lane.get("routes_replayed")),
-                f"{num(lane.get('candidate_win_count'))}/{num(lane.get('baseline_comparison_count'))}",
-                num(lane.get("estimated_rows")),
-                f"{float(lane.get('mean_score_delta') or 0):.3f}",
-                shorten(", ".join(map(str, baselines)), width=88, placeholder="..."),
-            ]
-        )
-    return rows
-
-
-def build_story(data: dict) -> list:
-    st = styles()
-    champ = safe_champion(data)
-    locked = locked_summary(data)
-    dollars = dollar_summary(data)
-    accepted = accepted_metric_summary(data)
-
-    story: list = []
-    usable_width = 6.5 * inch
-
-    story.append(Spacer(1, 0.75 * inch))
-    story.append(P("LumenCore", st["title"]))
-    story.append(P("Business Plan and Investor Diligence Brief", st["subtitle"]))
-    story.append(P("Updated July 3, 2026 - reviewer-safe validation edition", st["subtitle"]))
-    story.append(Spacer(1, 0.18 * inch))
-    story.append(
-        kv_table(
-            [
-                ("Founder", "Robert Ashworth"),
-                ("Website", "https://lumen-core.ai"),
-                ("Stage", "Pre-seed / validation-stage infrastructure AI evidence platform"),
-                ("Raise", "$250,000-$500,000 validation and pilot bridge"),
-                ("Target valuation", "$10M post-money SAFE valuation cap; negotiable $8M-$12M band"),
-                ("Federal/IP posture", "SAM.gov / UEI / CAGE / USPTO details documented in diligence package"),
-                ("Primary wedge", "Buyer-authorized replay for grid, utility, infrastructure, and signal-method validation"),
+                ("Company", "LumenCore"),
+                ("Current evidence stage", "Measured nonpromotion plus conditioned-synthetic research leads"),
+                ("Performance champion", "None"),
+                ("Claimable modeled outcome", "$0"),
+                ("Enterprise valuation", "Not asserted"),
+                ("Commercial posture", "Price bounded technical work, not algorithmic performance"),
             ],
             st,
-        )
-    )
-    story.append(Spacer(1, 0.2 * inch))
-    story.append(
-        callout(
-            "Evidence boundary: this plan distinguishes internal replay results, modeled value signals, and externally validated outcomes. "
-            "LumenCore is ready to request buyer-authorized field replay; it is not yet claiming field validation, realized savings, live trading profits, or guaranteed ROI.",
-            st,
-        )
-    )
-
-    story.append(PageBreak())
-    story.append(P("Executive Summary", st["h1"]))
-    story.append(
-        P(
-            "LumenCore is a hash-verified replay and benchmark platform for infrastructure AI. It ingests live and approved data, freezes provenance, runs locked candidate-vs-baseline replays, and publishes reviewer-safe proof feeds so serious buyers can decide what actually works before pilots, procurement, or grant-funded validation.",
+        ),
+        Spacer(1, 0.2 * inch),
+        _p(
+            "<b>Evidence boundary:</b> No current geometry family is a performance champion. "
+            "LumenCore does not currently claim sector efficiency, field performance, realized "
+            "savings, buyer ROI, trading edge, or enterprise value from the research results.",
             st["body"],
-        )
-    )
-    story.append(
-        P(
-            "The business is not being framed as a magic optimizer or a realized-savings machine. The near-term product is a paid evidence review and buyer-authorized replay workflow: accepted data, accepted baseline, accepted metric, transparent scoring, and only then an economic conversion.",
+        ),
+        PageBreak(),
+        _p("Executive Summary", st["h1"]),
+        _p(
+            "LumenCore is building a governed evidence workflow for source-native benchmarking. "
+            "The platform maps each source and task to appropriate incumbent baselines, freezes "
+            "chronology and inputs, records positive and negative results, and keeps commercial "
+            "language inside the evidence that actually cleared its gates.",
             st["body"],
-        )
-    )
-    story.append(P("Current strongest internal proof", st["h2"]))
-    story.append(
-        kv_table(
-            [
-                ("Champion", f"{champ['label']} ({champ['family']})"),
-                ("Baseline", champ["baseline"]),
-                ("Lane", champ["lane"]),
-                ("Holdout result", f"{champ['wins']}/{champ['n']} source-conditioned wins"),
-                ("Replay depth", f"{num(champ['rows'])} estimated rows; {num(champ['numeric'])} numeric samples"),
-                ("Effect", f"Mean delta {champ['mean_delta']:.3f}; minimum delta {champ['min_delta']:.3f}; one-sided sign-test p={champ['p_value']}"),
-                ("Conservative interval", f"Wilson 95% lower bound {pct(champ['wilson_lower'])}"),
-                ("Boundary", "Internal replay champion. Not field validation. Not realized savings."),
-            ],
-            st,
-        )
-    )
-    story.append(P("Why this matters", st["h2"]))
-    story.append(
-        bullets(
-            [
-                "Infrastructure buyers need evidence that survives locked baselines and repeatable replay, not broad AI promises.",
-                "The platform already separates measured sources, generated evidence, claim gates, and dollar gates.",
-                "The next value unlock is not another dashboard; it is an external owner agreeing to held-out data, acceptance metrics, and economic conversion.",
-            ],
-            st,
-        )
-    )
-    story.append(P("Accepted-metric bridge", st["h2"]))
-    story.append(
-        P(
-            accepted["business_plan_language"]
-            or "Accepted-metric proxy diagnostics are staged as a bridge from internal replay to external validation.",
+        ),
+        _p(
+            "The current research result is a nonpromotion. That is useful diligence evidence, "
+            "not a performance product claim. The immediate commercial path is paid technical "
+            "review and reproducible benchmark implementation. ProofLock Opportunity Operations "
+            "is a separate product-process discovery lane and inherits no geometry performance claim.",
             st["body"],
-        )
-    )
-    story.append(
-        kv_table(
+        ),
+        _p("Canonical Evidence State", st["h1"]),
+        _table(
             [
-                ("Proxy metrics ready", f"{accepted['proxy_ready']} reviewer-recognizable proxy gates"),
-                ("External/adaptor gates", f"{accepted['blocked']} still require topology, instruments, IEEE cases, or buyer data"),
-                ("Audit SHA-256", accepted["audit_sha256"][:16] + "..." if accepted["audit_sha256"] else "n/a"),
-                ("Boundary", "Order-parameter and phase-bound language is proxy-only; critical coupling and IEEE claims remain locked until implemented."),
+                ("Performance champion", "None"),
+                (
+                    "Global promotion gate",
+                    f"{contract['global_holm_promotions']} direct all-baseline globally Holm-positive promotions",
+                ),
+                (
+                    "Cross-sector result",
+                    f"{contract['sector_gains']}/{contract['sector_count']} proven sector gains",
+                ),
+                (
+                    "Measured reference",
+                    f"{ref['label']}: {ref['wins']}/{ref['holdouts']} paired measured holdouts "
+                    f"against {ref['baseline']}; mean delta {ref['mean_delta']:.6f}",
+                ),
+                ("Selection status", "Kuramoto is a measured reference, not the development-selected candidate"),
+                (
+                    "Development selection",
+                    f"{contract['development_selected_candidate']} is tracked separately and is not a champion",
+                ),
+                ("Claimable modeled dollar outcome", "$0"),
+                ("Enterprise valuation", "Not asserted"),
             ],
             st,
-        )
-    )
-
-    story.append(PageBreak())
-    story.append(P("Current Evidence Stack", st["h1"]))
-    story.append(
-        P(
-            "The July locked sweep moves the plan beyond the older April measured-row table. It shows a broader replay estate with named baselines, source-conditioned lanes, explicit losses/ties, and gates that block field or dollar overclaims.",
+        ),
+        _p("Benchmark Coverage", st["h2"]),
+        _table(
+            [
+                ("Compatibility-qualified routes", f"{locked['routes']:,}"),
+                ("Named-baseline comparisons", f"{locked['comparisons']:,}"),
+                ("Direct measured routes", f"{locked['direct_routes']:,}"),
+                ("Conditioned-synthetic routes", f"{locked['conditioned_routes']:,}"),
+                ("Performance rows inspected", f"{locked['numeric_rows']:,}"),
+                (
+                    "Interpretation",
+                    "Coverage and custody support reviewability; they do not establish superiority or value",
+                ),
+            ],
+            st,
+        ),
+        PageBreak(),
+        _p("Commercial Model", st["h1"]),
+        _p(
+            "LumenCore can price the work required to make a source-native comparison reviewable. "
+            "These service ranges are not modeled savings, enterprise value, or proof that a geometry "
+            "method improves an operating system.",
             st["body"],
-        )
-    )
-    story.append(
-        kv_table(
+        ),
+        _table(
             [
-                ("Locked routes replayed", num(locked["routes"])),
-                ("Baseline comparisons", num(locked["comparisons"])),
-                ("Candidate wins", f"{num(locked['wins'])} wins; {num(locked['losses'])} losses or ties"),
-                ("Replay scale", f"{num(locked['rows'])} estimated rows; {num(locked['numeric'])} numeric samples"),
-                ("Source breadth", f"{num(locked['source_count'])} mapped sources in locked sweep; 24 measured live-source systems in latest public-safe provider probe"),
-                ("Score deltas", f"Mean score delta {locked['mean_delta']:.3f}; best score delta {locked['best_delta']:.3f}"),
+                (
+                    "Source-native protocol review",
+                    f"${protocol_low:,}-${protocol_high:,}: source-task mapping, baseline registration, "
+                    "chronology review, evidence audit, and claim-boundary review",
+                ),
+                (
+                    "Benchmark implementation",
+                    f"${implementation_low:,}-${implementation_high:,}: custom implementation after "
+                    "data rights, native metrics, baselines, and acceptance criteria are locked",
+                ),
+                (
+                    contract["offers"]["prooflock_name"],
+                    "Separately scopeable product-process discovery; pricing follows buyer workflow "
+                    "discovery and it inherits no geometry performance, savings, or award claim",
+                ),
             ],
             st,
-        )
-    )
-    story.append(P("Lane scoreboard", st["h2"]))
-    story.append(
-        data_table(
-            ["Lane", "Routes", "Wins / comps", "Rows", "Mean delta", "Locked baselines"],
-            lane_rows(locked["lanes"]),
-            st,
-            [1.25 * inch, 0.58 * inch, 0.88 * inch, 0.82 * inch, 0.7 * inch, 2.27 * inch],
-        )
-    )
-    story.append(Spacer(1, 0.1 * inch))
-    story.append(
-        callout(
-            "Honest read: wave resonance is the strongest current lane, energy price pressure is the most commercially relevant forecasting wedge, thermal and curve lanes look promising, and branching transport remains mixed. That honesty helps the platform look serious.",
-            st,
-        )
-    )
-
-    story.append(PageBreak())
-    story.append(P("Product and Workflow", st["h1"]))
-    story.append(P("The repeatable LumenCore workflow is designed to make claims auditable before they become sales language.", st["body"]))
-    story.append(
-        data_table(
-            ["Step", "What happens", "Why buyers care"],
-            [
-                ["1. Ingest", "Pull public, live, or buyer-approved data into a normalized source registry.", "Creates traceable coverage instead of anecdotal evidence."],
-                ["2. Freeze", "Hash files, manifests, run state, and replay inputs.", "Preserves provenance and reduces cherry-picking risk."],
-                ["3. Baseline", "Lock incumbent methods before scoring candidates.", "Makes comparisons fair and reviewable."],
-                ["4. Replay", "Run candidates against identical source windows and metrics.", "Shows where a method wins, loses, or fails."],
-                ["5. Publish", "Expose reviewer-safe proof feeds and claim gates.", "Lets technical reviewers inspect evidence without accepting hype."],
-                ["6. Validate", "Run buyer-authorized held-out data with accepted economic conversion.", "Unlocks field claims and potential paid pilots."],
-            ],
-            st,
-            [0.9 * inch, 2.8 * inch, 2.8 * inch],
-        )
-    )
-    story.append(P("Initial product package", st["h2"]))
-    story.append(
-        bullets(
-            [
-                "Paid evidence review: $5,000-$15,000 scoped review of a replay packet and buyer fit.",
-                "Buyer-authorized replay pilot: custom quote after data rights, baseline, holdout windows, and acceptance metric are locked.",
-                "Annual platform licensing: after repeatable validation, license the evidence workflow and proof feed to teams that need ongoing benchmark trust.",
-            ],
-            st,
-        )
-    )
-
-    story.append(PageBreak())
-    story.append(P("Market, Wedge, and Go-To-Market", st["h1"]))
-    story.append(
-        P(
-            "The first commercial wedge should stay narrow: infrastructure and utility teams that already track expensive drift, outages, forecast error, operational instability, or review burden. LumenCore should sell measurement and validation before autonomous control.",
+        ),
+        _p("ProofLock Opportunity Operations", st["h2"]),
+        _p(
+            "ProofLock can be evaluated as a human-controlled opportunity workflow for finding, "
+            "qualifying, assembling, preflighting, and receipting funding opportunities. Final "
+            "certifications and submissions remain human-controlled. Its product value must be "
+            "measured against the buyer's current workflow and does not depend on a geometry result.",
             st["body"],
-        )
-    )
-    story.append(
-        data_table(
-            ["Target lane", "Buyer / reviewer", "First ask", "Why now"],
-            [
-                ["Utility/grid AI", "Grid analytics lead, reliability lead, national lab reviewer", "Offline replay on approved historical windows", "AI adoption is rising, but operators need trusted validation before deployment."],
-                ["Energy forecasting", "Forecasting, planning, market intelligence teams", "Compare against incumbent forecast baselines", "Forecast error and timing drift have direct operating value."],
-                ["Defense/GovTech", "Program manager, SBIR/STTR reviewer, technical office", "Reviewer-safe proof feed plus bounded abstract", "Agencies need reproducible evidence and small-business innovation paths."],
-                ["Industrial / data center", "Ops analytics, reliability, energy manager", "Read-only diagnostic pilot", "High-cost systems pay for earlier drift detection if validated."],
-            ],
-            st,
-            [1.2 * inch, 1.7 * inch, 1.8 * inch, 1.8 * inch],
-        )
-    )
-    story.append(P("Current outreach status", st["h2"]))
-    story.append(
-        bullets(
-            [
-                "EPRI / Incubatenergy Labs responded and invited a fit discussion for a future utility validation cycle.",
-                "DARPA DICE abstract was submitted; follow-on full proposal path depends on portal status and invitation mechanics.",
-                "ORNL, EPB, Spark/TVA, Vanderbilt, LaunchTN, and patent/pro bono routes are staged for targeted validation outreach.",
-            ],
-            st,
-        )
-    )
-    story.append(P("Federal validation and contract-readiness lane", st["h2"]))
-    story.append(
-        P(
-            "The strongest non-dilutive path is not to scattershot applications; it is to convert LumenCore into a repeatable government-review package: technical abstract, proof annex, cost template, SAM/UEI readiness, and a reviewer-safe evidence boundary. The downloaded DARPA and NIST materials show real template lanes that can be reused when eligibility, deadline, and portal status are verified.",
+        ),
+        _p("Current Valuation Boundary", st["h1"]),
+        _p(
+            "No enterprise valuation is asserted in this plan. Any financing valuation requires "
+            "independent diligence, external validation, customer evidence, revenue evidence, and "
+            "negotiation. Repository volume, hashes, benchmark breadth, and service price ranges are "
+            "not substitutes for enterprise valuation.",
             st["body"],
-        )
-    )
-    story.append(
-        bullets(
+        ),
+        _p("Near-Term Evidence Milestones", st["h1"]),
+        _bullets(
             [
-                "DARPA-style opportunity assets include abstract, executive-summary, technical/management, cost, and accelerated-award templates.",
-                "NIST/SBIR packet assets include technical volume, commercialization plan, budget, cover letter, manifest, and submit instructions.",
-                "SAM.gov and agency opportunity scans should be treated as a weekly pipeline, with only coherent, deadline-valid opportunities promoted to submit-ready status.",
-                "Investor value: a funded bridge increases the odds of external validation, paid evidence reviews, and non-dilutive award capture without exaggerating current proof.",
+                "Obtain an external owner's source, incumbent baseline, native metric, holdout, and acceptance criteria before any prospective evaluation.",
+                "Preserve negative and null results alongside positive research leads.",
+                "Run future promotion tests only under frozen, source-specific, all-baseline protocols with multiplicity control.",
+                "Measure ProofLock against a buyer's existing opportunity workflow without importing geometry claims.",
+                "Treat hashes as custody evidence and software tests as implementation evidence, not performance evidence.",
             ],
             st,
-        )
-    )
-
-    story.append(PageBreak())
-    story.append(P("Business Model and Valuation", st["h1"]))
-    story.append(
-        P(
-            "The valuation target should be ambitious but not fantasy. The clean ask is a pre-seed validation bridge that funds external replay, legal/IP support, proof-feed hardening, and first paid pilots.",
-            st["body"],
-        )
-    )
-    story.append(
-        kv_table(
+        ),
+        _p("Reviewer Questions Answered", st["h1"]),
+        _table(
             [
-                ("Raise target", "$250,000-$500,000"),
-                ("Instrument", "SAFE or seed note, depending on investor preference"),
-                ("Target valuation", "$10M post-money SAFE cap"),
-                ("Negotiation band", "$8M-$12M post-money cap depending on check size and investor fit"),
-                ("If pre-money required", "$8M-$10M target pre-money"),
-                ("Revenue stage", "Pre-revenue / pilot-stage unless a signed paid pilot is confirmed"),
-                ("First priceable offer", "$5,000-$15,000 paid technical evidence review"),
-                ("Field claim gate", "Dollar savings only after external owner locks data, baseline, metric, and economic conversion"),
+                ("What is proven now?", "A governed benchmark and evidence workflow can be inspected and scoped"),
+                ("What is not proven?", "Performance superiority, sector gains, modeled value, realized savings, and enterprise value"),
+                ("What happened to Kuramoto?", "It remains a negative measured reference and was not development-selected"),
+                ("What can be sold now?", "Bounded protocol-review and benchmark-implementation work"),
+                ("What is separate?", "ProofLock Opportunity Operations product-process discovery"),
             ],
             st,
-        )
-    )
-    story.append(P("Bounded value language", st["h2"]))
-    story.append(
-        P(
-            f"The current dollar gate supports bounded estimated opportunity language up to approximately {money(dollars['allowed_hourly'])}/hour or {money(dollars['allowed_annual'])}/year under stated internal assumptions. This is useful for scoping a pilot conversation, but it is not realized savings, booked revenue, or a fixed-price claim for a frozen delta.",
-            st["body"],
-        )
-    )
-    story.append(P("AI-assisted execution leverage", st["h2"]))
-    story.append(
-        P(
-            "Continuous GPT/Codex-assisted development can support valuation as an execution-leverage story when it produces committed code, repeatable tests, proof hashes, outreach packets, and cleaner decision logs. It should not be priced as a standalone asset; it becomes valuable through the artifacts, speed, and reproducibility it leaves behind.",
-            st["body"],
-        )
-    )
-    story.append(
-        callout(
-            "Investor thesis: fund the bridge from internal replay evidence to external field validation. The platform becomes more valuable when buyers trust the process enough to supply held-out data and sign acceptance metrics.",
-            st,
-        )
-    )
-
-    story.append(PageBreak())
-    story.append(P("Use of Funds and Milestones", st["h1"]))
-    story.append(
-        data_table(
-            ["Use of funds", "Purpose", "Milestone"],
-            [
-                ["Field validation", "Run buyer/lab-approved held-out replay with accepted metrics.", "1-2 externally scoped replay pilots."],
-                ["Data partnerships", "Secure better live and historical datasets with permission.", "Broader, cleaner source registry with fewer thin providers."],
-                ["Security/compliance", "Harden proof feeds, secrets handling, and deployment hygiene.", "Reviewer-safe domain with stable feed hashes."],
-                ["Legal/IP", "Protect patent timeline, claims, licensing, and diligence materials.", "Counsel review and prosecution plan."],
-                ["Productization", "Convert scripts and dashboards into a buyer portal and operator workflow.", "Repeatable evidence-review package."],
-                ["Founder runway", "Keep the technical founder focused on validation and pilots.", "More execution time, less context switching."],
-            ],
-            st,
-            [1.35 * inch, 2.75 * inch, 2.4 * inch],
-        )
-    )
-    story.append(P("90-day milestones", st["h2"]))
-    story.append(
-        bullets(
-            [
-                "Book at least three field-replay fit calls with EPRI/utility/lab/agency-adjacent reviewers.",
-                "Convert one fit call into a scoped paid evidence review or no-cost technical validation plan.",
-                "Refresh live-source registry and remove stale claims from public materials.",
-                "Publish a clean proof-feed landing page that starts with boundaries, then evidence, then ask.",
-                "Complete LvlUp / Black Dog Ventures application and one SBIR/STTR-aligned grant package.",
-            ],
-            st,
-        )
-    )
-
-    story.append(PageBreak())
-    story.append(P("Risk Register and Claim Gates", st["h1"]))
-    story.append(
-        data_table(
-            ["Risk", "Current answer", "What unlocks stronger language"],
-            [
-                ["Field validation missing", "Internal replay is strong, but not externally authorized.", "External owner supplies or approves held-out data and baseline."],
-                ["Dollar claim risk", "Use bounded internal opportunity language only.", "Buyer accepts economic conversion before scoring."],
-                ["Source breadth drift", "24 public-safe measured systems; 29-source registry under refresh.", "Failed/thin sources pass fresh probes and locked replay."],
-                ["Trading overclaim", "Keep trading in guarded paper/replay mode for investor materials.", "Audited live execution record with strict controls."],
-                ["Deck sprawl", "Use this short plan as the primary investor artifact.", "Archive older pitch materials or mark as background only."],
-                ["Founder bandwidth", "Solo founder has produced a large evidence estate with limited resources.", "Bridge funding creates validation runway and legal support."],
-            ],
-            st,
-            [1.55 * inch, 2.55 * inch, 2.4 * inch],
-        )
-    )
-    story.append(P("Do not claim yet", st["h2"]))
-    story.append(
-        bullets(
-            [
-                "Field validated performance or realized savings.",
-                "Guaranteed ROI, grant award certainty, or fixed value per frozen delta.",
-                "Autonomous live trading performance or institutional-grade execution readiness.",
-                "Medical, addiction-treatment, safety, certification, RF, PLL hardware, or defense performance without external validation.",
-            ],
-            st,
-        )
-    )
-
-    story.append(PageBreak())
-    story.append(P("Stage Version and Closing Narrative", st["h1"]))
-    story.append(
-        P(
-            "LumenCore is best pitched as the measurement layer for serious AI and infrastructure claims. The company is not asking buyers to trust a slogan. It is asking them to lock a baseline, provide or approve data, run the replay, and let the evidence decide.",
-            st["body"],
-        )
-    )
-    story.append(P("One-minute investor version", st["h2"]))
-    story.append(
-        callout(
-            "LumenCore is a hash-verified evidence platform for infrastructure AI. It replays live and approved data against locked baselines, freezes the proof trail, and shows technical reviewers where a method wins or fails. Our current strongest internal champion is Kuramoto phase coupling beating a Kalman-filter baseline on 24/24 source-conditioned holdouts, with a broader locked sweep across 313 routes and 1,969 baseline comparisons. We are pre-field-validation, which is why the funding ask is focused: convert internal replay evidence into externally authorized validation, paid evidence reviews, and first pilots.",
-            st,
-        )
-    )
-    story.append(P("Investor questions this plan answers honestly", st["h2"]))
-    story.append(
-        bullets(
-            [
-                "What is proven today? Internal, hashable source-conditioned replay evidence and a live reviewer proof feed.",
-                "What is not proven? External field validation, realized savings, and guaranteed ROI.",
-                "What is the first paid product? Evidence review and buyer-authorized replay.",
-                "What is the wedge? Grid/utility/infrastructure validation where forecast error, drift, or instability matters.",
-                "What does the money unlock? Validation runway, source partnerships, legal/IP support, and productized buyer proof.",
-            ],
-            st,
-        )
-    )
-    story.append(Spacer(1, 0.1 * inch))
-    story.append(HR(usable_width, colors.HexColor("#1E6FD9")))
-    story.append(P(f"Generated from LumenCore proof feeds on {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}.", st["small"]))
+        ),
+        Spacer(1, 0.12 * inch),
+        _p(
+            f"Contract validated {contract['generated_utc']}. Inputs older than 14 days or inconsistent "
+            "with the canonical claim gates stop this build.",
+            st["small"],
+        ),
+    ]
     return story
 
 
-def write_markdown(data: dict) -> None:
-    champ = safe_champion(data)
-    locked = locked_summary(data)
-    dollars = dollar_summary(data)
-    accepted = accepted_metric_summary(data)
+def render_markdown(contract: dict) -> str:
+    ref = contract["reference"]
+    locked = contract["locked"]
+    protocol_low, protocol_high = contract["offers"]["protocol_review"]
+    implementation_low, implementation_high = contract["offers"][
+        "benchmark_implementation"
+    ]
     lines = [
         "# LumenCore Business Plan and Investor Diligence Brief",
         "",
-        "Updated: 2026-07-03",
+        "## Current Contract",
         "",
-        "## Core Position",
+        "- Performance champion: **none**",
+        f"- Direct all-baseline global Holm promotions: **{contract['global_holm_promotions']}**",
+        f"- Proven cross-sector gains: **{contract['sector_gains']}/{contract['sector_count']}**",
+        f"- Kuramoto measured reference: **{ref['wins']}/{ref['holdouts']}** paired holdouts against `{ref['baseline']}`",
+        f"- Kuramoto mean delta: **{ref['mean_delta']:.6f}**",
+        "- Kuramoto selection status: measured negative reference, not development-selected",
+        f"- Development-selected candidate tracked separately: `{contract['development_selected_candidate']}`; not a champion",
+        "- Claimable modeled dollar outcome: **$0**",
+        "- Enterprise valuation: **not asserted**",
         "",
-        "LumenCore is a hash-verified replay and benchmark platform for infrastructure AI. It turns live and approved data into locked baseline-vs-candidate evidence that can be inspected by buyers, labs, agencies, and investors.",
+        "LumenCore does not currently claim performance superiority, sector efficiency, field performance, realized savings, buyer ROI, trading edge, or enterprise value from the geometry research lane.",
         "",
-        "## Current Strongest Proof",
+        "## Business Position",
         "",
-        f"- Champion: `{champ['family']}`",
-        f"- Baseline: `{champ['baseline']}`",
-        f"- Lane: `{champ['lane']}`",
-        f"- Holdout result: `{champ['wins']}/{champ['n']}` source-conditioned wins",
-        f"- Estimated champion replay rows: `{champ['rows']:,}`",
-        f"- Numeric samples: `{champ['numeric']:,}`",
-        f"- Mean delta vs named baseline: `{champ['mean_delta']:.6f}`",
-        f"- Minimum delta vs named baseline: `{champ['min_delta']:.6f}`",
-        f"- Wilson 95% lower bound: `{champ['wilson_lower']:.6f}`",
+        "LumenCore is a governed evidence workflow for source-native benchmarking. It maps each source and task to appropriate incumbent baselines, freezes chronology and inputs, records positive and negative results, and keeps commercial language inside cleared evidence gates.",
         "",
-        "Boundary: internal replay champion; not field validation and not realized savings.",
+        "## Benchmark Coverage",
         "",
-        "## Accepted-Metric Bridge",
+        f"- Compatibility-qualified routes: `{locked['routes']}`",
+        f"- Named-baseline comparisons: `{locked['comparisons']}`",
+        f"- Direct measured routes: `{locked['direct_routes']}`",
+        f"- Conditioned-synthetic routes: `{locked['conditioned_routes']}`",
+        f"- Performance rows inspected: `{locked['numeric_rows']}`",
         "",
-        accepted["business_plan_language"]
-        or "Accepted-metric proxy diagnostics are staged as a bridge from internal replay to external validation.",
+        "Coverage, hashes, and custody improve reviewability. They do not establish superiority, savings, or enterprise value.",
         "",
-        f"- Proxy metrics ready: `{accepted['proxy_ready']}`",
-        f"- External/adaptor gates still blocked: `{accepted['blocked']}`",
-        f"- Accepted metric proxy language allowed: `{str(accepted['proxy_allowed']).lower()}`",
-        f"- Audit SHA-256: `{accepted['audit_sha256']}`",
+        "## Allowed Commercial Offers",
         "",
-        "Boundary: order-parameter and phase-bound language is proxy-only; critical coupling and IEEE claims remain locked until implemented or supplied by an external owner.",
+        f"- Source-native protocol review: **${protocol_low:,}-${protocol_high:,}**",
+        f"- Optional benchmark implementation: **${implementation_low:,}-${implementation_high:,}** after data rights, native metrics, baselines, and acceptance criteria are locked",
+        f"- **{contract['offers']['prooflock_name']}**: separately scopeable product-process discovery; pricing follows workflow discovery",
         "",
-        "## Locked Baseline Sweep",
+        "Service prices describe work. They are not modeled outcomes, ROI, realized savings, or enterprise valuation.",
         "",
-        f"- Routes replayed: `{locked['routes']:,}`",
-        f"- Baseline comparisons: `{locked['comparisons']:,}`",
-        f"- Candidate wins: `{locked['wins']:,}`",
-        f"- Losses/ties: `{locked['losses']:,}`",
-        f"- Estimated rows replayed: `{locked['rows']:,}`",
-        f"- Numeric samples: `{locked['numeric']:,}`",
-        f"- Source count: `{locked['source_count']:,}`",
+        "## ProofLock Boundary",
         "",
-        "## Federal Validation And Contract Readiness",
+        contract["offers"]["prooflock_boundary"],
         "",
-        "LumenCore's highest-value non-dilutive lane is a repeatable government-review package: technical abstract, proof annex, cost template, SAM/UEI readiness, and a reviewer-safe evidence boundary. DARPA-style opportunity assets and NIST/SBIR packet assets are available locally, but any submission should be promoted only after eligibility, deadline, and portal status are verified.",
+        "ProofLock must be evaluated against the buyer's existing opportunity workflow. It inherits no geometry performance, savings, award, or field-validation claim.",
         "",
-        "- DARPA-style assets include abstract, executive-summary, technical/management, cost, and accelerated-award templates.",
-        "- NIST/SBIR packet assets include technical volume, commercialization plan, budget, cover letter, manifest, and submit instructions.",
-        "- SAM.gov and agency scans should become a weekly opportunity pipeline, not a one-off scramble.",
-        "- Investor value: a funded bridge improves the chance of external validation, paid evidence reviews, and non-dilutive award capture without overstating current proof.",
+        "## Current Valuation Boundary",
         "",
-        "## Valuation / Raise",
+        "No enterprise valuation is asserted. Any financing valuation requires independent diligence, external validation, customer evidence, revenue evidence, and negotiation.",
         "",
-        "- Raise target: `$250,000-$500,000` validation and pilot bridge",
-        "- Target valuation: `$10M post-money SAFE valuation cap`",
-        "- Negotiation band: `$8M-$12M` post-money cap",
-        "- If pre-money is required: `$8M-$10M target pre-money`",
-        "- Revenue stage: pre-revenue / pilot-stage unless a signed paid pilot is confirmed",
+        "## Next Evidence Gates",
         "",
-        "## Bounded Dollar Language",
+        "1. Lock an external owner's source, incumbent baseline, native metric, holdout, and acceptance criteria.",
+        "2. Preserve negative and null results alongside research leads.",
+        "3. Require frozen source-specific all-baseline testing with multiplicity control before promotion.",
+        "4. Measure ProofLock independently against a buyer's current workflow.",
         "",
-        f"Current internal dollar gate supports bounded estimated opportunity language up to approximately `${dollars['allowed_hourly']:,.0f}/hour` or `${dollars['allowed_annual']:,.0f}/year` under stated assumptions. This is not realized savings.",
-        "",
-        "## AI-Assisted Execution Leverage",
-        "",
-        "Continuous GPT/Codex-assisted work supports valuation only through committed code, repeatable tests, proof hashes, evidence packets, outreach, and reproducible operating leverage. It is not a field-validation claim by itself.",
-        "",
-        "## First Commercial Ask",
-        "",
-        "Paid evidence reviews and buyer-authorized replay pilots first; annual platform licenses after independent validation; grant-funded validation where appropriate; optional success-fee structures only after the buyer locks the baseline, acceptance metric, and avoided-cost conversion.",
+        f"Contract validated: `{contract['generated_utc']}`",
         "",
     ]
-    OUT_MD.parent.mkdir(parents=True, exist_ok=True)
-    OUT_MD.write_text("\n".join(lines), encoding="utf-8")
+    return "\n".join(lines)
 
 
-def build_pdf() -> None:
-    data = get_data()
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    write_markdown(data)
+def write_markdown(contract: dict, output_path: Path = OUT_MD) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(render_markdown(contract), encoding="utf-8")
+
+
+def build_pdf(
+    *,
+    data_dir: Path = DASHBOARD_DATA,
+    output_pdf: Path = OUT_PDF,
+    output_md: Path = OUT_MD,
+    now: datetime | None = None,
+) -> tuple[Path, Path]:
+    data = get_data(data_dir)
+    contract = validate_contract(data, now=now)
+
+    output_pdf.parent.mkdir(parents=True, exist_ok=True)
+    write_markdown(contract, output_md)
     doc = SimpleDocTemplate(
-        str(OUT_PDF),
+        str(output_pdf),
         pagesize=letter,
         rightMargin=0.72 * inch,
         leftMargin=0.72 * inch,
@@ -792,14 +767,19 @@ def build_pdf() -> None:
         canvas.saveState()
         canvas.setFont("Helvetica", 7.5)
         canvas.setFillColor(colors.HexColor("#667085"))
-        canvas.drawString(0.72 * inch, 0.36 * inch, "LumenCore investor diligence brief - reviewer-safe validation edition")
+        canvas.drawString(
+            0.72 * inch,
+            0.36 * inch,
+            "LumenCore investor diligence brief - fail-closed evidence edition",
+        )
         canvas.drawRightString(7.78 * inch, 0.36 * inch, f"Page {doc_obj.page}")
         canvas.restoreState()
 
-    doc.build(build_story(data), onFirstPage=page, onLaterPages=page)
-    print(OUT_PDF)
-    print(OUT_MD)
+    doc.build(build_story(contract), onFirstPage=page, onLaterPages=page)
+    return output_pdf, output_md
 
 
 if __name__ == "__main__":
-    build_pdf()
+    pdf_path, markdown_path = build_pdf()
+    print(pdf_path)
+    print(markdown_path)

@@ -80,8 +80,8 @@ def test_live_registry_covers_current_federal_and_ip_lanes_and_fails_closed():
     erdc = lanes["erdc_sovereign_cloud_cso"]
     assert erdc["status"] == "BLOCKED_CRITERION_FAILURE"
     assert erdc["criterion_pass_count"] == 3
-    assert erdc["criterion_partial_count"] == 5
-    assert erdc["criterion_fail_count"] == 2
+    assert erdc["criterion_partial_count"] == 7
+    assert erdc["criterion_fail_count"] == 0
     assert erdc["criterion_unassessed_count"] == 0
     assert erdc["argument_conformance_pass"] is False
 

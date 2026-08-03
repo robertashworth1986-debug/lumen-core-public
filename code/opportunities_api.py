@@ -96,6 +96,8 @@ GRANT_SUBMIT_FIT_PACK_LATEST = ROOT / "out" / "ops" / "grant_submit_fit_pack" / 
 INVESTOR_MISSION_CONTROL_PACK_LATEST = ROOT / "out" / "ops" / "investor_mission_control" / "investor_mission_control_pack_latest.json"
 INVESTOR_3MIN_PITCH_LATEST = ROOT / "out" / "ops" / "investor_mission_control" / "investor_3min_nobel_pitch_latest.md"
 ALPHA_EDGE_LOCK_ENGINE_LATEST = ROOT / "out" / "ops" / "alpha_edge_lock" / "alpha_edge_lock_engine_latest.json"
+SOURCE_NATIVE_FAMILY_LEDGER_LATEST = ROOT / "out" / "ops" / "source_native_family_baseline_ledger_latest.json"
+SOURCE_NATIVE_PROSPECTIVE_STATUS_LATEST = ROOT / "out" / "ops" / "time_series_source_native_prospective_protocol_status.json"
 ALPHA_EDGE_LOCK_ENGINE_HEARTBEAT_LATEST = ROOT / "out" / "ops" / "alpha_edge_lock" / "alpha_edge_lock_engine_heartbeat_latest.json"
 INVESTOR_MISSION_CONTROL_HEARTBEAT_LATEST = ROOT / "out" / "ops" / "investor_mission_control" / "investor_mission_control_pack_heartbeat_latest.json"
 INVESTOR_PACKET_REFRESH_LATEST = ROOT / "out" / "ops" / "investor_packet_refresh_latest.json"
@@ -1960,22 +1962,70 @@ def grants_live_fill_latest() -> dict:
             hint="Rebuild with RUN_INVESTOR_PACKET_REFRESH",
             code="grant_live_fill_missing",
         )
+    if (
+        live_fill.get("submission_authorized") is not False
+        or live_fill.get("autofill_packet_ready") is not False
+    ):
+        return _not_ready(
+            error="legacy live-fill payload is not claim-safe",
+            hint="Rebuild the mission-control pack with the review-only generator",
+            code="legacy_grant_live_fill_blocked",
+        )
     return {
         "generated_utc": payload.get("generated_utc"),
+        "route_name_deprecated": True,
+        "action_allowed": False,
+        "submission_authorized": False,
+        "boundary": (
+            "Review-only local candidate. Reverify the current official source, "
+            "eligibility, deadline, route, amendments, and duplicate state before "
+            "drafting. No portal, send, upload, certification, or submission action "
+            "is authorized."
+        ),
         "live_fill": live_fill,
     }
 
 
 @router.get("/alpha-edge/latest")
 def alpha_edge_latest() -> dict:
-    payload = _read_json(ALPHA_EDGE_LOCK_ENGINE_LATEST)
-    if not payload:
+    ledger = _read_json(SOURCE_NATIVE_FAMILY_LEDGER_LATEST)
+    prospective = _read_json(SOURCE_NATIVE_PROSPECTIVE_STATUS_LATEST)
+    if not isinstance(ledger, dict) or not isinstance(prospective, dict):
         return _not_ready(
-            error="no alpha-edge lock engine artifact yet",
-            hint="Run RUN_INVESTOR_PACKET_REFRESH or POST /api/opportunities/autopilot-v2",
-            code="alpha_edge_not_ready",
+            error="source-native research receipts are not ready",
+            hint="Rebuild and verify the source-native ledger and prospective protocol",
+            code="source_native_research_not_ready",
         )
-    return payload
+    summary = ledger.get("summary")
+    if not isinstance(summary, dict):
+        summary = {}
+    return {
+        "schema": "claim_bounded_research_edge_status.v1",
+        "status": "NO_PROMOTED_CHAMPION",
+        "legacy_alpha_edge_artifact_suppressed": True,
+        "registered_family_count": summary.get("registered_family_count"),
+        "implemented_family_count": summary.get("implementation_present_count"),
+        "direct_comparison_count": summary.get(
+            "executed_direct_source_baseline_comparison_count"
+        ),
+        "promotion_gate_pass_count": summary.get(
+            "internal_source_native_promotion_gate_pass_count"
+        ),
+        "global_holm_positive_count": summary.get(
+            "individual_comparison_global_holm_positive_count"
+        ),
+        "prospective_protocol_status": prospective.get("protocol_status"),
+        "prospective_promotion_decision": prospective.get("promotion_decision"),
+        "prospective_protocol_sha256": prospective.get(
+            "protocol_payload_sha256"
+        ),
+        "performance_claim_allowed": False,
+        "field_validation_claim_allowed": False,
+        "trading_alpha_claim_allowed": False,
+        "live_execution_allowed": False,
+        "boundary": summary.get("claim_boundary")
+        or prospective.get("claim_boundary"),
+    }
 
 
 @router.get("/investor/pitch/latest")
@@ -1994,11 +2044,24 @@ def investor_pitch_latest() -> dict:
             hint="Rebuild with RUN_INVESTOR_PACKET_REFRESH",
             code="investor_pitch_missing",
         )
+    if (
+        pitch.get("external_share_ready") is not False
+        or pitch.get("recipient_selected") is not False
+        or pitch.get("legacy_value_inputs_suppressed") is not True
+    ):
+        return _not_ready(
+            error="legacy investor pitch is not claim-safe",
+            hint="Rebuild the mission-control pack with the claim-bounded generator",
+            code="legacy_investor_pitch_blocked",
+        )
     markdown = None
     if INVESTOR_3MIN_PITCH_LATEST.exists():
         markdown = INVESTOR_3MIN_PITCH_LATEST.read_text(encoding="utf-8", errors="ignore")
     return {
         "generated_utc": payload.get("generated_utc"),
+        "external_share_ready": False,
+        "recipient_selected": False,
+        "boundary": pitch.get("boundary"),
         "pitch": pitch,
         "pitch_markdown": markdown,
     }

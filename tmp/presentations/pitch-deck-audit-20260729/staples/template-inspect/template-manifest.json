@@ -1,0 +1,111 @@
+{
+  "sourcePptx": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\staples_upgrade_2026-05-21\\STAPLES_PITCH_DECK_ULTRA_2026-05-21.pptx",
+  "workspace": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples",
+  "outDir": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples\\template-inspect",
+  "generatedAt": "2026-07-29T09:32:36.416Z",
+  "slideCount": 4,
+  "slideArtifacts": [
+    {
+      "slide": 1,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples\\template-inspect\\source-slides\\source-slide-01.png",
+      "previewRelativePath": "template-inspect/source-slides/source-slide-01.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples\\template-inspect\\layouts\\source-slide-01.layout.json",
+      "layoutRelativePath": "template-inspect/layouts/source-slide-01.layout.json"
+    },
+    {
+      "slide": 2,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples\\template-inspect\\source-slides\\source-slide-02.png",
+      "previewRelativePath": "template-inspect/source-slides/source-slide-02.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples\\template-inspect\\layouts\\source-slide-02.layout.json",
+      "layoutRelativePath": "template-inspect/layouts/source-slide-02.layout.json"
+    },
+    {
+      "slide": 3,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples\\template-inspect\\source-slides\\source-slide-03.png",
+      "previewRelativePath": "template-inspect/source-slides/source-slide-03.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples\\template-inspect\\layouts\\source-slide-03.layout.json",
+      "layoutRelativePath": "template-inspect/layouts/source-slide-03.layout.json"
+    },
+    {
+      "slide": 4,
+      "previewPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples\\template-inspect\\source-slides\\source-slide-04.png",
+      "previewRelativePath": "template-inspect/source-slides/source-slide-04.png",
+      "layoutPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples\\template-inspect\\layouts\\source-slide-04.layout.json",
+      "layoutRelativePath": "template-inspect/layouts/source-slide-04.layout.json"
+    }
+  ],
+  "inspectPath": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\tmp\\presentations\\pitch-deck-audit-20260729\\staples\\template-inspect\\template-inspect.ndjson",
+  "inspectRelativePath": "template-inspect/template-inspect.ndjson",
+  "inspectTruncated": false,
+  "inspectMetadata": {
+    "revision": "arm3py",
+    "target": {
+      "id": "pr/x5udmf"
+    },
+    "kind": {
+      "requested": "slide,textbox,shape,image,table,chart",
+      "tokens": [
+        "slide",
+        "textbox",
+        "shape",
+        "image",
+        "table",
+        "chart"
+      ]
+    },
+    "include": {
+      "tokens": []
+    },
+    "exclude": {
+      "tokens": []
+    },
+    "notices": []
+  },
+  "extractedMedia": [],
+  "fonts": [
+    "+mj-cs",
+    "+mj-ea",
+    "+mj-lt",
+    "+mn-cs",
+    "+mn-ea",
+    "+mn-lt",
+    "Angsana New",
+    "Arial",
+    "Calibri",
+    "Cordia New",
+    "DaunPenh",
+    "DokChampa",
+    "Estrangelo Edessa",
+    "Euphemia",
+    "Gautami",
+    "Iskoola Pota",
+    "Kalinga",
+    "Kartika",
+    "Latha",
+    "MV Boli",
+    "Mangal",
+    "Microsoft Himalaya",
+    "Microsoft Uighur",
+    "Microsoft Yi Baiti",
+    "Mongolian Baiti",
+    "MoolBoran",
+    "Nyala",
+    "Plantagenet Cherokee",
+    "Raavi",
+    "Shruti",
+    "Sylfaen",
+    "Times New Roman",
+    "Tunga",
+    "Vrinda",
+    "宋体",
+    "新細明體",
+    "맑은 고딕",
+    "ＭＳ Ｐゴシック"
+  ],
+  "packageParts": {
+    "mediaCount": 0,
+    "slideXmlCount": 4,
+    "chartCount": 0,
+    "tableSlideCount": 0
+  }
+}

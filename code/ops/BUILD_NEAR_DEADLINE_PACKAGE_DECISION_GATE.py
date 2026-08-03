@@ -15,19 +15,19 @@ NSF = GRANTS / "NSF_Project_Pitch"
 OUT = ROOT / "out" / "ops"
 
 JSON_OUT = OUT / "near_deadline_package_decision_gate_latest.json"
-MD_OUT = SPRINT / "NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-16.md"
+MD_OUT = SPRINT / "NEAR_DEADLINE_PACKAGE_DECISION_GATE_2026-07-29.md"
 TEAMING_OUT = SPRINT / "FHWA_TSMO_QUALIFIED_TEAMING_REQUEST_2026-07-16.md"
-NSF_SOURCE_OUT = NSF / "NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-16.json"
+NSF_SOURCE_OUT = NSF / "NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-29.json"
 ERDC_SOURCE_DIR = SPRINT / "source_attachments" / "W912HZ26SC005"
-ERDC_SOURCE_OUT = ERDC_SOURCE_DIR / "SOURCE_MANIFEST_2026-07-16.json"
+ERDC_SOURCE_OUT = ERDC_SOURCE_DIR / "SOURCE_MANIFEST_2026-07-29.json"
 SAM_CAPTURE = OUT / "sam_gov_entity_status_capture_latest.json"
 FHWA_PARTNER_EVIDENCE = SPRINT / "FHWA_TSMO_QUALIFIED_PARTNER_EVIDENCE.json"
 FHWA_OUTREACH_CONTROL = (
     SPRINT / "FHWA_TSMO_PARTNER_OUTREACH_CONTROL_2026-07-17.json"
 )
 
-NSF_FIELDS = NSF / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
-NSF_ROUTING = NSF / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json"
+NSF_FIELDS = NSF / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-29.md"
+NSF_ROUTING = NSF / "NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-29.json"
 
 NSF_LIMITS = {
     "Technology Innovation": 3500,
@@ -41,9 +41,9 @@ ERDC_FILES = {
         "url": "https://www.erdcwerx.org/wp-content/uploads/2026/05/CSO-HPCMP-SDC-30April2026-FINAL.pdf",
         "expected_pages": 7,
     },
-    "HPCMP_SDC_FAQ_9June2026.pdf": {
-        "url": "https://www.erdcwerx.org/wp-content/uploads/2026/06/HPCMP-SDC-FAQ-Website-9June2026.pdf",
-        "expected_pages": 6,
+    "HPCMP_SDC_FAQ_20Jul2026.pdf": {
+        "url": "https://www.erdcwerx.org/wp-content/uploads/2026/07/HPCMP-SDC-FAQ-Website-20Jul2026.pdf",
+        "expected_pages": 13,
     },
 }
 
@@ -96,28 +96,38 @@ def extract_nsf_fields(path: Path = NSF_FIELDS) -> dict[str, dict[str, Any]]:
 
 
 def erdc_source_manifest() -> dict[str, Any]:
+    manifest = read_json(ERDC_SOURCE_OUT)
     files = []
-    for name, source in ERDC_FILES.items():
-        path = ERDC_SOURCE_DIR / name
+    for item in manifest.get("files", []):
+        path = ROOT / item["path"]
+        exists = path.is_file()
+        actual_bytes = path.stat().st_size if exists else None
+        actual_sha256 = sha256_file(path) if exists else None
         files.append(
             {
-                "path": rel(path),
-                "exists": path.exists(),
-                "bytes": path.stat().st_size if path.exists() else None,
-                "sha256": sha256_file(path) if path.exists() else None,
-                "expected_pages": source["expected_pages"],
-                "official_url": source["url"],
+                **item,
+                "exists": exists,
+                "actual_bytes": actual_bytes,
+                "actual_sha256": actual_sha256,
+                "bytes_match": actual_bytes == item.get("bytes"),
+                "sha256_match": actual_sha256 == item.get("sha256"),
             }
         )
     return {
-        "schema": "lumencore.erdc_sdc_source_manifest.v1",
-        "as_of_date": "2026-07-16",
-        "opportunity_number": "W912HZ26SC005",
+        **manifest,
         "files": files,
-        "all_present": all(item["exists"] for item in files),
-        "claim_boundary": (
-            "These files establish public solicitation requirements only; they do not "
-            "establish selection, funding availability, award, or technical validation."
+        "all_present": bool(files) and all(item["exists"] for item in files),
+        "all_current_checks_pass": (
+            manifest.get("schema") == "lumencore.erdc_sdc_source_manifest.v2"
+            and manifest.get("as_of_date") == "2026-07-29"
+            and manifest.get("current_attachment_set_complete") is True
+            and bool(files)
+            and all(
+                item["exists"]
+                and item["bytes_match"]
+                and item["sha256_match"]
+                for item in files
+            )
         ),
     }
 
@@ -142,14 +152,15 @@ def build_gate() -> dict[str, Any]:
     nsf_local_ready = (
         set(fields) == set(NSF_LIMITS)
         and all(row["passes"] for row in fields.values())
-        and routing.get("schema") == "lumencore.nsf_project_pitch_routing.v1"
+        and routing.get("schema") == "lumencore.nsf_project_pitch_routing.v2"
         and full_proposal.get("listed_deadlines")
         == ["2026-07-27", "2026-11-04", "2027-03-04", "2027-07-07"]
-        and full_proposal.get("july_27_2026_currently_listed") is True
-        and full_proposal.get("july_27_2026_reachable") is False
+        and full_proposal.get("past_listed_deadlines") == ["2026-07-27"]
+        and full_proposal.get("next_listed_deadline") == "2026-11-04"
+        and full_proposal.get("next_listed_deadline_reachable") is False
         and full_proposal.get("submission_allowed") is False
     )
-    erdc_source_ready = erdc_sources["all_present"]
+    erdc_source_ready = erdc_sources["all_current_checks_pass"]
     sam_all_awards = (
         sam["registration_status"] == "Active Registration"
         and sam["purpose_of_registration"] == "All Awards"
@@ -190,15 +201,17 @@ def build_gate() -> dict[str, Any]:
             "deadline": None,
             "deadline_semantics": "ROLLING_PROJECT_PITCH",
             "posture": (
-                "STAGE_IN_PORTAL_AFTER_DUPLICATE_GATE"
+                "LOCAL_DRAFT_COMPLETE_PORTAL_AND_ELIGIBILITY_GATES_OPEN"
                 if nsf_local_ready
                 else "LOCAL_REPAIR_REQUIRED"
             ),
-            "local_ready": nsf_local_ready,
+            "local_ready": False,
+            "local_draft_complete": nsf_local_ready,
             "quick_funding_fit": "BEST_DIRECT_FIT_OF_THESE_THREE",
             "hard_gates": [
                 "Confirm no pending Project Pitch, open invitation, or Phase I proposal under review.",
-                "Confirm the legal business name and founder/PI title shown in the account.",
+                "Confirm legal entity, ownership, U.S.-performance, PI employment and effort, and submission authority.",
+                "Confirm the authenticated prompts, title limit, and topic selection.",
                 "Human reviews the final portal preview and performs the final submit action.",
             ],
             "field_counts": fields,
@@ -214,7 +227,7 @@ def build_gate() -> dict[str, Any]:
             "opportunity_number": "W912HZ26SC005",
             "deadline": "2026-08-07T16:00:00-05:00",
             "posture": (
-                "BUILD_FIVE_PAGE_SOLUTION_BRIEF"
+                "CURRENT_SOURCES_READY_PRIVATE_FINAL_GATES_OPEN"
                 if erdc_source_ready and sam_all_awards
                 else "SOURCE_OR_REGISTRATION_REPAIR_REQUIRED"
             ),
@@ -225,6 +238,8 @@ def build_gate() -> dict[str, Any]:
                 "No classified or proprietary information.",
                 "ROM covers Phase II prototype development only.",
                 "Submission address must match the active SAM registration.",
+                "Current proposal contact email must be accurate.",
+                "A private final PDF must be validated against the July 20 FAQ.",
                 "The notice states that funding is not currently available.",
                 "Human confirms the ROM and performs the final portal submit action.",
             ],
@@ -233,7 +248,7 @@ def build_gate() -> dict[str, Any]:
             "official_sources": [
                 "https://www.erdcwerx.org/sovereign-defense-cloud-for-high-performance-computing/",
                 ERDC_FILES["CSO_HPCMP_SDC_30April2026_FINAL.pdf"]["url"],
-                ERDC_FILES["HPCMP_SDC_FAQ_9June2026.pdf"]["url"],
+                ERDC_FILES["HPCMP_SDC_FAQ_20Jul2026.pdf"]["url"],
             ],
         },
         {
@@ -304,7 +319,7 @@ def build_gate() -> dict[str, Any]:
     return {
         "schema": "lumencore.near_deadline_package_decision_gate.v1",
         "generated_utc": now_utc(),
-        "as_of_date": "2026-07-17",
+        "as_of_date": "2026-07-29",
         "decision": {
             "primary_lane": "NSF Project Pitch",
             "secondary_lane": "ERDC Sovereign Defense Cloud CSO",
@@ -330,32 +345,10 @@ def build_gate() -> dict[str, Any]:
 
 def nsf_source_audit(gate: dict[str, Any]) -> dict[str, Any]:
     nsf_lane = next(item for item in gate["lanes"] if item["lane"] == "NSF Project Pitch")
-    schedule = nsf_lane["full_proposal_schedule"]
+    source = read_json(NSF_SOURCE_OUT)
     return {
-        "schema": "lumencore.nsf_project_pitch_source_audit.v1",
-        "as_of_date": gate["as_of_date"],
-        "official_facts": {
-            "field_limits": NSF_LIMITS,
-            "typical_response_time": "1-2 months",
-            "only_one_pending_pitch": True,
-            "full_proposal_requires_invitation": True,
-            "listed_full_proposal_deadlines": schedule["listed_deadlines"],
-            "nearest_listed_full_proposal_deadline": schedule[
-                "nearest_listed_deadline"
-            ],
-            "july_27_2026_currently_listed": schedule[
-                "july_27_2026_currently_listed"
-            ],
-            "july_27_2026_reachable": schedule["july_27_2026_reachable"],
-            "july_27_2026_access_state": schedule["july_27_2026_access_state"],
-            "next_planning_target": schedule["next_planning_target"],
-        },
+        **source,
         "local_field_counts": nsf_lane["field_counts"],
-        "official_sources": nsf_lane["official_sources"],
-        "claim_boundary": (
-            "Official schedule and field controls do not prove portal eligibility, invitation, "
-            "submission, review, or award."
-        ),
     }
 
 
@@ -363,12 +356,12 @@ def render_markdown(gate: dict[str, Any]) -> str:
     lines = [
         "# Near-Deadline Package Decision Gate",
         "",
-        "As of: July 16, 2026",
+        "As of: July 29, 2026",
         "",
         "## Decision",
         "",
-        "1. **NSF Project Pitch** - stage first after checking the duplicate-pitch/open-invitation gate in the portal.",
-        "2. **ERDC Sovereign Defense Cloud** - build the compliant five-page solution brief as a validation and relationship lane; the notice says funding is not currently available.",
+        "1. **NSF Project Pitch** - the local draft is complete; verify applicant facts, authenticated prompts, and the duplicate-pitch/open-invitation gate before any final action.",
+        "2. **ERDC Sovereign Defense Cloud** - current sources and a conforming public draft exist, but only a separately validated private final PDF may become an upload candidate; the notice says funding is not currently available.",
         "3. **FHWA TSMO** - Cambridge Systematics confirmed its team was already set after the replacement route reached its response lead. Close that route without another follow-up. Do not submit as a solo prime unless a different qualified partner supplies written corporate-experience evidence.",
         "",
         gate["decision"]["reason"],
@@ -442,13 +435,6 @@ def write_outputs(gate: dict[str, Any]) -> None:
     ERDC_SOURCE_DIR.mkdir(parents=True, exist_ok=True)
     JSON_OUT.write_text(json.dumps(gate, indent=2) + "\n", encoding="utf-8")
     MD_OUT.write_text(render_markdown(gate), encoding="utf-8")
-    TEAMING_OUT.write_text(render_teaming_request(), encoding="utf-8")
-    NSF_SOURCE_OUT.write_text(
-        json.dumps(nsf_source_audit(gate), indent=2) + "\n", encoding="utf-8"
-    )
-    ERDC_SOURCE_OUT.write_text(
-        json.dumps(erdc_source_manifest(), indent=2) + "\n", encoding="utf-8"
-    )
 
 
 def main() -> int:

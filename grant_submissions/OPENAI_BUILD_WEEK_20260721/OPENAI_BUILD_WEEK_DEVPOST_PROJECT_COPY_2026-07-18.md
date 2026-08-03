@@ -1,6 +1,6 @@
 # ProofLock Console - Source-Backed Devpost Copy
 
-Copy state: `NOT_PASTE_READY_MODEL_AND_VIDEO_PROVENANCE_OPEN`
+Copy state: `VIDEO_ASSETS_VERIFIED_FEEDBACK_AND_PUBLICATION_OPEN`
 
 Do not paste or submit this as final copy until every bracketed placeholder is replaced from direct evidence and the privacy/IP checklist is approved.
 
@@ -18,9 +18,9 @@ Developer Tools
 
 ## Built With - Confirmed Components
 
-Codex, JavaScript, Web Crypto API, Python, pytest, HTML, CSS
+Codex, gpt-5.6-sol, JavaScript, Web Crypto API, Python, pytest, HTML, CSS
 
-Required model tag: `[[CONFIRMED_MODEL_LABEL]]`
+Required model tag: `gpt-5.6-sol`
 
 ## Project Story
 
@@ -34,7 +34,7 @@ ProofLock Console loads a canonical JSON receipt, recomputes its SHA-256 identit
 
 ## How we built it
 
-The project pairs a static browser experience using Web Crypto with a matching Python verifier for local automation and CI. Deterministic tests cover receipt tampering, path traversal, artifact custody, duplicate or invalid gates, and attempts to promote while required gates remain open. Codex helped narrow the scope, implement both verification paths, review the evidence boundary, and build the test suite. [[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]
+The project pairs a static browser experience using Web Crypto with a matching Python verifier for local automation and CI. Deterministic tests cover receipt tampering, path traversal, artifact custody, duplicate or invalid gates, and attempts to promote while required gates remain open. Codex helped narrow the scope, implement both verification paths, review the evidence boundary, and build the test suite. A lead Codex workflow coordinated bounded specialist roles for implementation, adversarial testing, evidence reconciliation, and independent review. A privacy-preserving machine receipt records five identity-backed Build Week spawn events across five role categories, with one completion directly observed; maximum concurrency remains NOT_PROVEN. The active build task records gpt-5.6-sol at ultra reasoning effort.
 
 ## Challenges we ran into
 
@@ -60,6 +60,10 @@ https://lumen-core.ai/build_week/prooflock_console/
 
 https://github.com/robertashworth1986-debug/lumen-core-public
 
+Exact scoped source:
+
+https://github.com/robertashworth1986-debug/lumen-core-public/tree/281b76fe20d281974a2e2b44670a6a63815fe421/build_week/prooflock_console
+
 ## Installation And Testing
 
 Open the public demo URL for the no-build browser path. For local CLI verification, clone the repository and run `python build_week/prooflock_console/verify_receipt.py`. Run the focused test with `python -m pytest -q tests/test_prooflock_console.py`.
@@ -76,14 +80,25 @@ The public demo requires no account, API key, paid service, rebuild, or test cre
 
 The larger repository and source concept assets predate the submission period. The focused console, receipt contract, browser and Python verification paths, responsive interface, and tests are the scoped Build Week extension identified by the dated commit record.
 
-## Required Placeholders
+## Verified Local Release Assets
 
-- Exact model label: `[[CONFIRMED_MODEL_LABEL]]`
-- Source-backed model-use sentence: `[[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]`
+- Video: `output/video/prooflock_console_build_week_v1/prooflock_console_openai_build_week_demo_v1.mp4`
+- Video duration: `124.634 seconds`
+- Video SHA-256: `376fd49b2a43d37fe0901b948e18c8eacf1532144a5d5459b0d5b67bc8e8e4e9`
+- Thumbnail: `output/video/prooflock_console_build_week_v1/prooflock_console_devpost_thumbnail_v1.png`
+- Thumbnail SHA-256: `f894e6f1d7e021869db45f45b5088286cc60a0057faf058c9656dbc949141d98`
+- Video receipt: `output/video/prooflock_console_build_week_v1/prooflock_console_openai_build_week_demo_v1.receipt.json`
+- Video receipt SHA-256: `cdbf4130dc0bdc4dda39f75b5d3fc84684a0916416babe15de0f260fb102ac30`
+- Orchestration receipt: `grant_submissions/OPENAI_BUILD_WEEK_20260721/CODEX_AGENT_ORCHESTRATION_RECEIPT_2026-07-19.json`
+- Orchestration receipt SHA-256: `bbe6b01af60162a2267d839d7a0f6aa4ed4f7683ac5a9d0419078eea0688cbd9`
+
+These paths identify local upload candidates. They do not claim that either asset is public or accepted by Devpost.
+
+## Required External Placeholders
+
 - `/feedback` Session ID: `[[FEEDBACK_SESSION_ID]]`
 - Public YouTube URL: `[[PUBLIC_YOUTUBE_URL]]`
-- Privacy-reviewed thumbnail: `[[THUMBNAIL_PUBLIC_ASSET_PATH]]`
 
 ## Claim Boundary
 
-This kit prepares source-backed draft content and a field-by-field completion contract. It does not prove model identity, a /feedback Session ID, eligibility, ownership, legal acceptance, Devpost authentication or registration, project creation, video publication, final submission, judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value.
+This kit prepares source-backed draft content and a field-by-field completion contract. It confirms a bounded project draft and locally verified release assets. It does not prove a /feedback Session ID, eligibility, ownership, legal acceptance, video publication, final submission, judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value.

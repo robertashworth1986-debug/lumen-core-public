@@ -1,6 +1,6 @@
 # Luma External Proof Vault Packet
 
-Generated UTC: `2026-07-13T21:54:14.620834+00:00`
+Generated UTC: `2026-07-13T22:41:55.384309+00:00`
 
 ## Purpose
 
@@ -8,10 +8,10 @@ Non-destructive staging manifest for high-value proof artifacts on external stor
 
 ## Summary
 
-- Artifacts ready: `120/120`
+- Artifacts ready: `156/156`
 - Missing required: `0`
-- Ready bytes: `47408199`
-- Drive free bytes at staging time: `412836573184`
+- Ready bytes: `47921604`
+- Drive free bytes at staging time: `412788584448`
 - Packet ready: `true`
 
 ## Boundary
@@ -74,27 +74,63 @@ A proof vault is provenance and reproducibility infrastructure. It does not crea
 - `config/eia_grid_prospective_hybrid_router_protocol_v1.json` -> `artifacts/routing/config/eia_grid_prospective_hybrid_router_protocol_v1.json` | sha256 `77a67f201884f70110c840d4d6b98b4194dca6f32a34c63c4a09c9dd786afb86`
 - `code/eia_grid_wave_champion_benchmark.py` -> `artifacts/routing/code/eia_grid_wave_champion_benchmark.py` | sha256 `b3586ddc568f6bd4aa6ae48bbb289ab579eab773699dba5ac32234d393627791`
 - `code/eia_grid_residual_moe_benchmark.py` -> `artifacts/routing/code/eia_grid_residual_moe_benchmark.py` | sha256 `1b67415b4fb6c3e40737f80d1b29a160b73a8f5fee4ccfacbb5756f8bbb0c100`
-- `code/eia_grid_prospective_hybrid_router.py` -> `artifacts/routing/code/eia_grid_prospective_hybrid_router.py` | sha256 `e35cc9b7e2c9a1e88e669b03e07f8e439e5f4c19d6d3a07b054d0fabe8968a40`
+- `code/eia_grid_prospective_hybrid_router.py` -> `artifacts/routing/code/eia_grid_prospective_hybrid_router.py` | sha256 `3994c51407fe1cbed0f2ebc5a4ce438cadb418744feafb2b141a07bf21b59d68`
+- `code/eia_grid_prospective_router_ops.py` -> `artifacts/routing/code/eia_grid_prospective_router_ops.py` | sha256 `554a268d1b507c271dd53fb3cabd5802202dcc3127ad577c45d6e0a14dcd85fc`
+- `tools/Run-EiaProspectiveRouterCycle.ps1` -> `artifacts/routing/tools/Run-EiaProspectiveRouterCycle.ps1` | sha256 `b8feaa331a4ea5b3c1e68e7f9c971bfacd9055455516b24e0b7c2c9f000a8ce3`
+- `tools/Register-EiaProspectiveRouterTask.ps1` -> `artifacts/routing/tools/Register-EiaProspectiveRouterTask.ps1` | sha256 `0182347860e679140684e659841b03294fc56c9a860f222035bdf6db2b9672ef`
 - `docs/EIA_GRID_WAVE_CHAMPION_BENCHMARK_2026-07-13.md` -> `artifacts/routing/docs/EIA_GRID_WAVE_CHAMPION_BENCHMARK_2026-07-13.md` | sha256 `2969d2aca025c376a6fd7395a2fc10436f72be2f078f7be0a5e6d31ee51746bf`
 - `docs/EIA_GRID_RESIDUAL_MOE_BENCHMARK_2026-07-13.md` -> `artifacts/routing/docs/EIA_GRID_RESIDUAL_MOE_BENCHMARK_2026-07-13.md` | sha256 `5aca894ad130d863b6431a46c47160105dee79fc027fa5c0b53dcff1b579e2f9`
 - `docs/EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_2026-07-13.md` -> `artifacts/routing/docs/EIA_GRID_PROSPECTIVE_HYBRID_ROUTER_2026-07-13.md` | sha256 `c69d4112442ed738a8c5d11b5cf260fce15f60fb764b738a91f0a1826a3d068f`
+- `docs/EIA_GRID_PROSPECTIVE_ROUTER_OPERATIONS_2026-07-13.md` -> `artifacts/routing/docs/EIA_GRID_PROSPECTIVE_ROUTER_OPERATIONS_2026-07-13.md` | sha256 `b37f087da2a97860a57bd999d698e0e6790f6b8849713c12d294b59ef8fae944`
 - `out/eia_grid_wave_champion/eia_grid_wave_champion_benchmark_latest.json` -> `artifacts/routing/out/eia_grid_wave_champion/eia_grid_wave_champion_benchmark_latest.json` | sha256 `5488b02b72abf4bf38a7777e19db1b8bd472a63c0103e208818ee48abbbc0dc6`
 - `out/eia_grid_wave_champion/eia_grid_wave_champion_manifest_latest.json` -> `artifacts/routing/out/eia_grid_wave_champion/eia_grid_wave_champion_manifest_latest.json` | sha256 `304244ff1b252e0b339feeec38cc3bd2854648a8b9409e936e4eac7a4fe98262`
 - `out/eia_grid_wave_champion/eia_grid_wave_champion_rows_latest.csv` -> `artifacts/routing/out/eia_grid_wave_champion/eia_grid_wave_champion_rows_latest.csv` | sha256 `dc125d2e843ed27aae910589b215791efedc048c2594e02cab06b28410dde8f3`
 - `out/eia_grid_residual_moe/eia_grid_residual_moe_benchmark_latest.json` -> `artifacts/routing/out/eia_grid_residual_moe/eia_grid_residual_moe_benchmark_latest.json` | sha256 `e2e0bc779823e543784c24675e18c12bcb821e65911168c2d3339b6da67ea744`
 - `out/eia_grid_residual_moe/eia_grid_residual_moe_manifest_latest.json` -> `artifacts/routing/out/eia_grid_residual_moe/eia_grid_residual_moe_manifest_latest.json` | sha256 `c0869b98b317d4783adc8406384a9b95b523e412c630f87916cac8cb3f643087`
 - `out/eia_grid_residual_moe/eia_grid_residual_moe_rows_latest.csv` -> `artifacts/routing/out/eia_grid_residual_moe/eia_grid_residual_moe_rows_latest.csv` | sha256 `3b2e130ed750878f893b59931dd55c4fef333f70710c19fbb60a696ac8a4000d`
+- `out/eia_grid_prospective_hybrid_router/operational_runs.jsonl` -> `artifacts/routing/out/eia_grid_prospective_hybrid_router/operational_runs.jsonl` | sha256 `285272d0063d060b7228330e7b09e6c02f5af588800b1764d318f08942f2d8e5`
+- `out/eia_grid_prospective_hybrid_router/prospective_status_latest.json` -> `artifacts/routing/out/eia_grid_prospective_hybrid_router/prospective_status_latest.json` | sha256 `411072168e93227ef861e10d85938af22f8077d27fe1079a6a127f4ff8b9f85b`
+- `out/eia_grid_prospective_hybrid_router/scheduler_cycle_latest.json` -> `artifacts/routing/out/eia_grid_prospective_hybrid_router/scheduler_cycle_latest.json` | sha256 `b731626a7d5f37a0ea660e4f821662e3b425842598bd56c2abc23e7b0a29f38f`
 - `tests/test_eia_grid_wave_champion_benchmark.py` -> `artifacts/routing/tests/test_eia_grid_wave_champion_benchmark.py` | sha256 `175010b5aa97951fe1770d4f67b1b9b4597baff113d55b34021a103ca04055bb`
 - `tests/test_eia_grid_residual_moe_benchmark.py` -> `artifacts/routing/tests/test_eia_grid_residual_moe_benchmark.py` | sha256 `0aa6af3aa74ecb561c15a1b9560ed80014bc692679e61e6c6fa93bb75cc8ba68`
-- `tests/test_eia_grid_prospective_hybrid_router.py` -> `artifacts/routing/tests/test_eia_grid_prospective_hybrid_router.py` | sha256 `97b39a2c71c55cc03c617c2b7975799357d6a1bdbeb9b9620113174643628eb7`
+- `tests/test_eia_grid_prospective_hybrid_router.py` -> `artifacts/routing/tests/test_eia_grid_prospective_hybrid_router.py` | sha256 `b3952342e4a6645ac6f4fe48e08f454f2ba5998de00ca4b493d3000f37b2d2db`
+- `tests/test_eia_grid_prospective_router_ops.py` -> `artifacts/routing/tests/test_eia_grid_prospective_router_ops.py` | sha256 `48a884763e72db6f1ff1400d7cc08584c7f73771aca2f6596c2d72bcf16ba827`
 - `config/ieee_acopf_routing_protocol_v1.json` -> `artifacts/opf/config/ieee_acopf_routing_protocol_v1.json` | sha256 `07774ce77f3b7ab95ffdc1a84ceecbe92b8ed3783cf9da34b3fddb60097b12b6`
 - `docs/IEEE_ACOPF_ROUTE_READINESS_2026-07-13.md` -> `artifacts/opf/docs/IEEE_ACOPF_ROUTE_READINESS_2026-07-13.md` | sha256 `9d83d795508ed08d75dd877625880478b095b44098e7ca70c9256ec2af64b5d7`
 - `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_SOURCE_MANIFEST_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_SOURCE_MANIFEST_2026-07-13.md` | sha256 `c3940d15240b63a65af95b0dd26f30d7abc26b63ba1b3237201bd375da495916`
 - `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_GO_NO_GO_AND_PROPOSAL_MAP_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_GO_NO_GO_AND_PROPOSAL_MAP_2026-07-13.md` | sha256 `05a49a798803946112537fdf7177f1b1d4c02133bb79c6d96b70c3d138b8be8f`
-- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_PHASE_I_TECHNICAL_VOLUME_SKELETON_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_PHASE_I_TECHNICAL_VOLUME_SKELETON_2026-07-13.md` | sha256 `7de562763c97591f4cab830de3bcc96cc04673deed78967ad8467b251ad96085`
+- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_PHASE_I_TECHNICAL_VOLUME_SKELETON_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_PHASE_I_TECHNICAL_VOLUME_SKELETON_2026-07-13.md` | sha256 `3226c9fcdccf318ea7831f12b335695abcc10bbec16f15462b53ef18c767b792`
 - `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_DSIP_ASSEMBLY_MAP_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_DSIP_ASSEMBLY_MAP_2026-07-13.md` | sha256 `e93ebfcc317663322c9a5fbb2ec60825ad09090bbff9b32501c9077cca3b6a9b`
-- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md` | sha256 `e3d6e225b41e0856b8f336aa29800385f175d7071b1adfe84157c065ec9a6431`
+- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_CURRENT_CAPABILITY_BOUNDARY_2026-07-13.md` | sha256 `57a9a8193bfbba1a0a261d3e4f7b118efe6b2775d49b69bfefd45e6917fd70c5`
 - `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_LAWFUL_CORPUS_AND_BENCHMARK_PLAN_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_LAWFUL_CORPUS_AND_BENCHMARK_PLAN_2026-07-13.md` | sha256 `a9edf476eba10786ce9348a1a3b28dda5fcdcb97d839c2539267a23fc77bf1f7`
+- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_VOLUME1_PUBLIC_TEXT_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_VOLUME1_PUBLIC_TEXT_2026-07-13.md` | sha256 `b2eb4339ab4f5dec08006b6c8253f4fd6c79ddcee75f7262af91e9757dcef6cc`
+- `grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_SYNTHETIC_FEASIBILITY_EVIDENCE_2026-07-13.md` -> `artifacts/mda/grant_submissions/MDA26BZ04_NV007_ControlAssessment/MDA26BZ04_NV007_SYNTHETIC_FEASIBILITY_EVIDENCE_2026-07-13.md` | sha256 `24f152049e00029b7395e58a5297b6e8799359846ff35a51870ed48c1dd0c8e8`
+- `config/mda_control_mapping_feasibility_protocol_v1.json` -> `artifacts/mda/config/mda_control_mapping_feasibility_protocol_v1.json` | sha256 `ff90f28246cc8331ac917f0fdc74dd61c90bb6746a4010ac323fb0decdf8066a`
+- `docs/MDA_CONTROL_MAPPING_FEASIBILITY_PREREGISTRATION_2026-07-13.md` -> `artifacts/mda/docs/MDA_CONTROL_MAPPING_FEASIBILITY_PREREGISTRATION_2026-07-13.md` | sha256 `dd9304e949ee2648609620dfb5e9b2b366f17275021ba84c1c23b6ef5113594d`
+- `docs/MDA_CONTROL_MAPPING_FEASIBILITY_RESULT_2026-07-13.md` -> `artifacts/mda/docs/MDA_CONTROL_MAPPING_FEASIBILITY_RESULT_2026-07-13.md` | sha256 `68f4b7a8df28cd5d13577d72b78eb7bcc550ad1b4d67ce844fd26f92db90216c`
+- `code/mda_control_mapping_feasibility.py` -> `artifacts/mda/code/mda_control_mapping_feasibility.py` | sha256 `7b9390a8b499ed75045a8425f6724ba886a244eddf2b6a98623d68cf8ed806f4`
+- `tests/test_mda_control_mapping_feasibility.py` -> `artifacts/mda/tests/test_mda_control_mapping_feasibility.py` | sha256 `9890833ac370650d0fa2313a33a834a6fe7a6b63236ed7d2ccc12098d89e8ff4`
+- `out/mda_control_mapping_feasibility/synthetic_fixtures_latest.jsonl` -> `artifacts/mda/out/mda_control_mapping_feasibility/synthetic_fixtures_latest.jsonl` | sha256 `c3201c0a79389b4184eb0491f408283e559d1c5ccebfc02751706042ae36d1ca`
+- `out/mda_control_mapping_feasibility/fixture_manifest_latest.json` -> `artifacts/mda/out/mda_control_mapping_feasibility/fixture_manifest_latest.json` | sha256 `8bc3abd486d5804c3cf5638256c0107661941409938a2e34a929d1d2aca2f1c7`
+- `out/mda_control_mapping_feasibility/split_manifest_latest.json` -> `artifacts/mda/out/mda_control_mapping_feasibility/split_manifest_latest.json` | sha256 `1d4a18ee72eb9405f84ec12905206a0fcc73563240681ce380dc49f38dc22163`
+- `out/mda_control_mapping_feasibility/threshold_selection_receipt_latest.json` -> `artifacts/mda/out/mda_control_mapping_feasibility/threshold_selection_receipt_latest.json` | sha256 `bb33351b7a393b16db0d5f6bfec888d5c41150ce88db2f7738f267d05d7ab94b`
+- `out/mda_control_mapping_feasibility/holdout_predictions_latest.jsonl` -> `artifacts/mda/out/mda_control_mapping_feasibility/holdout_predictions_latest.jsonl` | sha256 `e06afdaad468f482b8a0407be99af7a2f49f0dbe9b5e78894032ea2ad15b5d09`
+- `out/mda_control_mapping_feasibility/failure_and_abstention_log_latest.jsonl` -> `artifacts/mda/out/mda_control_mapping_feasibility/failure_and_abstention_log_latest.jsonl` | sha256 `b4993f9b53b3a9afcdd308952b7db6677b6a9c449640240e682878a033031f51`
+- `out/mda_control_mapping_feasibility/mda_control_mapping_feasibility_latest.json` -> `artifacts/mda/out/mda_control_mapping_feasibility/mda_control_mapping_feasibility_latest.json` | sha256 `49fbaf30f403fa0439cccf03908139f1772647f915cd1e4fe283b0b2454061ae`
+- `out/mda_control_mapping_feasibility/mda_control_mapping_feasibility_manifest_latest.json` -> `artifacts/mda/out/mda_control_mapping_feasibility/mda_control_mapping_feasibility_manifest_latest.json` | sha256 `9b9139ff26eb1d96a6f343d2a35640d57a426288c18cd4f67ac3459eee29034e`
+- `config/mda_control_mapping_open_set_protocol_v2.json` -> `artifacts/mda/config/mda_control_mapping_open_set_protocol_v2.json` | sha256 `9a694ed6f194137880c070e73355ef826a51d3fed438ccf65adf6d4726ca80f0`
+- `docs/MDA_CONTROL_MAPPING_OPEN_SET_PREREGISTRATION_2026-07-13.md` -> `artifacts/mda/docs/MDA_CONTROL_MAPPING_OPEN_SET_PREREGISTRATION_2026-07-13.md` | sha256 `9c808e31d687371b38843c05711534ce73a8eccc8d63e2fa31da1d26c59e25e2`
+- `docs/MDA_CONTROL_MAPPING_OPEN_SET_RESULT_2026-07-13.md` -> `artifacts/mda/docs/MDA_CONTROL_MAPPING_OPEN_SET_RESULT_2026-07-13.md` | sha256 `399ea85878a072f11f4164ee8897b8cabdfa981ef46978cdc3814807c32b28f1`
+- `code/mda_control_mapping_open_set_benchmark.py` -> `artifacts/mda/code/mda_control_mapping_open_set_benchmark.py` | sha256 `5346d8f4b66b7a19a6b0daf58bd4e983f4a2108346d6d51429ec0f387ab7ed8c`
+- `tests/test_mda_control_mapping_open_set_benchmark.py` -> `artifacts/mda/tests/test_mda_control_mapping_open_set_benchmark.py` | sha256 `0798b6a130f48b012c75877fd56d9aeb36be033b5620b974e89fc46b76585db8`
+- `out/mda_control_mapping_open_set_v2/synthetic_open_set_fixtures_latest.jsonl` -> `artifacts/mda/out/mda_control_mapping_open_set_v2/synthetic_open_set_fixtures_latest.jsonl` | sha256 `8f4a06100a903584304262fd66a189ce61913d4acb14d9d775051fb46b431869`
+- `out/mda_control_mapping_open_set_v2/fixture_manifest_latest.json` -> `artifacts/mda/out/mda_control_mapping_open_set_v2/fixture_manifest_latest.json` | sha256 `80db55717d3b21713d9121b4e3efd8c57aeb79ac91091e18a468b6f9417f3bfb`
+- `out/mda_control_mapping_open_set_v2/split_manifest_latest.json` -> `artifacts/mda/out/mda_control_mapping_open_set_v2/split_manifest_latest.json` | sha256 `e5b3f6fc4653c645067760e2c4b079ade5a2da739f40b5d505d53b72f8cbd1a3`
+- `out/mda_control_mapping_open_set_v2/threshold_selection_receipt_latest.json` -> `artifacts/mda/out/mda_control_mapping_open_set_v2/threshold_selection_receipt_latest.json` | sha256 `00c9f2f2f07f3bf2aa111308433b049890154c9ff9254d7dcb7ff1c794651618`
+- `out/mda_control_mapping_open_set_v2/holdout_predictions_latest.jsonl` -> `artifacts/mda/out/mda_control_mapping_open_set_v2/holdout_predictions_latest.jsonl` | sha256 `49bfcb5ca7a4905b2da9e9e2ff1cb1c9f1f18264fbbad6d6cac0b2b26292b6d2`
+- `out/mda_control_mapping_open_set_v2/failure_and_abstention_log_latest.jsonl` -> `artifacts/mda/out/mda_control_mapping_open_set_v2/failure_and_abstention_log_latest.jsonl` | sha256 `996e5bbe14c5ee46dd6d085c249b7d9440f21e78a46bc01b1b6c2abe3d4256e9`
+- `out/mda_control_mapping_open_set_v2/mda_control_mapping_open_set_latest.json` -> `artifacts/mda/out/mda_control_mapping_open_set_v2/mda_control_mapping_open_set_latest.json` | sha256 `d8c99f8b49171dd78e4586ba4f46be9e16e7faa2aeacfe6a484229d344a3d43a`
+- `out/mda_control_mapping_open_set_v2/mda_control_mapping_open_set_manifest_latest.json` -> `artifacts/mda/out/mda_control_mapping_open_set_v2/mda_control_mapping_open_set_manifest_latest.json` | sha256 `7f3400733e49ccf230d3b341634611aafa110644f215a65cfb8120e07e833937`
 - `grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md` -> `artifacts/estate/grant_submissions/funding_sprint_20260709/LUMENCORE_ESTATE_MASTER_INDEX_2026-07-13.md` | sha256 `fdbd657b52ba01d1967011f21ec24249de0ad13a6f32dd3aa2f2919eb02ffe53`
 - `out/ops/lumencore_estate_master_index_latest.json` -> `artifacts/estate/out/ops/lumencore_estate_master_index_latest.json` | sha256 `e073a44231045764739b5d4e74c263f07f30b50b971566b0c812aa152f81a233`
 - `out/ops/lumencore_estate_master_index_manifest_latest.json` -> `artifacts/estate/out/ops/lumencore_estate_master_index_manifest_latest.json` | sha256 `91b081fc876494737c2556480dce2fe88bd2de89abc2a783d08b1e41678936af`

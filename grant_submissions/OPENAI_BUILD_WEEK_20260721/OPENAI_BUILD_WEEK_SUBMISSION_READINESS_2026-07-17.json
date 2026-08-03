@@ -1,13 +1,13 @@
 {
   "schema": "lumencore.openai_build_week_submission_readiness.v1",
-  "generated_utc": "2026-07-18T07:43:23.212373+00:00",
+  "generated_utc": "2026-07-26T22:07:44.484325+00:00",
   "status": "PROJECT_CORE_VERIFIED_EXTERNAL_SUBMISSION_FIELDS_OPEN",
   "project": {
     "name": "ProofLock Console",
     "tagline": "Hash what exists. Hold what is not proven.",
     "category": "Developer Tools",
     "public_repo": "https://github.com/robertashworth1986-debug/lumen-core-public",
-    "scoped_tree": "https://github.com/robertashworth1986-debug/lumen-core-public/tree/1578504204c429d7f05779897dc3d5430038f681/build_week/prooflock_console",
+    "scoped_tree": "https://github.com/robertashworth1986-debug/lumen-core-public/tree/281b76fe20d281974a2e2b44670a6a63815fe421/build_week/prooflock_console",
     "app_path": "build_week/prooflock_console",
     "local_demo_url": "http://127.0.0.1:8088/build_week/prooflock_console/",
     "public_demo_url": "https://lumen-core.ai/build_week/prooflock_console/",
@@ -62,24 +62,24 @@
     "receipt_sha256": "6f20c120cc46d693fc9bebbaee6f8dc4dc232b42450432f615ad2999c99b6adc"
   },
   "new_work_evidence": {
-    "commit": "1578504204c429d7f05779897dc3d5430038f681",
-    "committed_at": "2026-07-17T16:37:51-05:00",
-    "subject": "Add Build Week ProofLock Console",
+    "commit": "281b76fe20d281974a2e2b44670a6a63815fe421",
+    "committed_at": "2026-07-19T03:29:22-05:00",
+    "subject": "Separate ProofLock integrity from promotion policy",
     "after_submission_start": true,
-    "github_tree_url": "https://github.com/robertashworth1986-debug/lumen-core-public/tree/1578504204c429d7f05779897dc3d5430038f681/build_week/prooflock_console"
+    "github_tree_url": "https://github.com/robertashworth1986-debug/lumen-core-public/tree/281b76fe20d281974a2e2b44670a6a63815fe421/build_week/prooflock_console"
   },
   "app_artifacts": [
     {
       "path": "build_week/prooflock_console/README.md",
       "present": true,
-      "bytes": 3191,
-      "sha256": "766ba2b64d477b21d443a673a60f83fb4a5ad0e5d46a3e215180c7f924bd3ede"
+      "bytes": 3261,
+      "sha256": "d29e8d6ac2bef68d199a58abe0515fa02591ad34cdf42450b4c1133336f0b215"
     },
     {
       "path": "build_week/prooflock_console/app.js",
       "present": true,
-      "bytes": 10846,
-      "sha256": "3a8aef62513533960c5f6fc891145016ef35a1b5eb759f0b1a3a7dde9259cad2"
+      "bytes": 11172,
+      "sha256": "9546311a99645fe48715070ccbdf1cab582964da9d0e80b11c32a354d7d0b4fb"
     },
     {
       "path": "build_week/prooflock_console/index.html",
@@ -102,8 +102,8 @@
     {
       "path": "build_week/prooflock_console/verify_receipt.py",
       "present": true,
-      "bytes": 6701,
-      "sha256": "358299d05a1658bacb4705d76fc9fe1fa28d94265120a3d22012887fd905cf84"
+      "bytes": 7111,
+      "sha256": "71508e9e688cf333e8a62ff9e72118515ff5922573851e17950437404d905433"
     }
   ],
   "sample_verification": {
@@ -144,7 +144,7 @@
       "label": "Post-start new work",
       "status": "PASS",
       "owner": "Git",
-      "basis": "First scoped evidence commit: 1578504204c429d7f05779897dc3d5430038f681 at 2026-07-17T16:37:51-05:00."
+      "basis": "First scoped evidence commit: 281b76fe20d281974a2e2b44670a6a63815fe421 at 2026-07-19T03:29:22-05:00."
     },
     {
       "gate_id": "public_repository",
@@ -226,5 +226,5 @@
     "requirements_receipt": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_REQUIREMENTS_RECEIPT_2026-07-17.json",
     "public_demo_receipt": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PUBLIC_DEMO_RECEIPT_2026-07-18.json"
   },
-  "packet_sha256": "d3d7917d70c1a4f81b5dae14fee5bbf73b44429400af46f0e32213b22b8c861b"
+  "packet_sha256": "a66459e8414de9a0332166d89ae6949d2cf25d5b507d7e26f551a5d9f6034e04"
 }

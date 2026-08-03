@@ -20,9 +20,15 @@ def test_packet_requires_approval_before_public_actions():
     module = load_module()
     payload = module.build_payload()
 
-    assert payload["schema"] == "publication_approval_packet_v1"
+    assert payload["schema"] == "publication_approval_packet_v3"
     assert payload["publication_policy"]["approval_required_before_live_profile_or_social_changes"] is True
     assert payload["publication_policy"]["no_auto_posting"] is True
+    assert (
+        payload["publication_policy"][
+            "action_time_approval_required_for_every_external_publication"
+        ]
+        is True
+    )
     assert payload["github"]["branch"] == "geometry-coverage-audit-20260623"
     assert "pull/new/geometry-coverage-audit-20260623" in payload["github"]["pr_url"]
 
@@ -37,6 +43,13 @@ def test_linkedin_copy_uses_bounded_evidence_numbers():
     assert "LumenCore" in profile["headline"]
     assert registered in profile["about"]
     assert "field validation" in profile["about"]
+    assert "qualified direct-source links" in profile["about"]
+    assert (
+        payload["geometry_audit_summary"][
+            "direct_source_replay_build_ready_lane_count"
+        ]
+        == 2
+    )
     assert any("synthetic discovers" in post["copy"].lower() for post in posts)
     assert all(post["status"] == "draft_needs_user_approval" for post in posts)
 
@@ -70,5 +83,5 @@ def test_channel_plan_prioritizes_github_site_then_linkedin():
     assert channels["GitHub"]["priority"] == 1
     assert channels["lumen-core.ai"]["priority"] == 2
     assert channels["LinkedIn"]["priority"] == 3
-    assert channels["GitHub"]["approval_required"] is False
+    assert channels["GitHub"]["approval_required"] is True
     assert channels["LinkedIn"]["approval_required"] is True

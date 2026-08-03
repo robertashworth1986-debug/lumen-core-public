@@ -403,8 +403,14 @@ def build_payload(
                 "Capture a private write-once fingerprint baseline before installing the replacement."
                 if not baseline
                 else (
-                    "Do not claim the SAM key is rotated yet. The current local aliases are consistent, but "
-                    "the private fingerprint has not changed and the API probe is inconclusive."
+                    (
+                        "Do not claim the SAM key is rotated yet. The current local aliases are consistent, "
+                        "but the private fingerprint has not changed and the API probe is inconclusive."
+                        if public_source_summary(records)["aliases_consistent"]
+                        else "Do not claim the SAM key is rotated yet. The current local aliases disagree, "
+                        "the selected private fingerprint has not changed, and the API probe cannot verify "
+                        "the replacement until the aliases are reconciled."
+                    )
                     if not fingerprint_changed
                     else "A replacement credential is detected locally; API acceptance remains bounded by the probe result."
                 )

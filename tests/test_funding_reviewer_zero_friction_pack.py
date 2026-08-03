@@ -29,7 +29,8 @@ def test_zero_friction_pack_ties_funding_claims_to_source_ledgers():
     assert payload["summary"]["decision_route_count"] == 5
     assert payload["summary"]["sam_submit_ready_human_gate_count"] == 4
     assert payload["summary"]["data_room_control_artifact_count"] >= 52
-    assert payload["summary"]["reviewer_gate_clear"] is True
+    assert payload["summary"]["reviewer_packaging_gate_clear"] is True
+    assert payload["summary"]["submission_argument_gate_clear"] is False
     assert payload["summary"]["unsafe_secret_count"] == 0
     assert payload["summary"]["unsafe_claim_count"] == 0
     assert len(payload["zero_friction_pack_sha256"]) == 64

@@ -1,10 +1,10 @@
 # ERDC SDC Solution Brief Compliance Gate - 2026-07-29
 
-The substantive public-safe brief is complete and technically compliant, but it is not submission-ready until the founder approves a Phase II-only price, private SAM/contact facts are inserted and reverified, and the complete authenticated portal form is reviewed.
+The public-safe brief now binds a purpose-bounded comparator, local control ablation, proposed quantitative falsifiers, cost denominators, and honest delivery boundaries. It is not submission-ready until the Phase II price and execution commitments are approved, private SAM/contact facts are inserted and reverified, and the complete authenticated portal form is reviewed.
 
 ## Gate Summary
 
-- Status: `CURRENT_PUBLIC_DRAFT_PASS_PRIVATE_ROM_SAM_CONTACT_ACCOUNT_AND_PORTAL_FINALIZATION_REQUIRED`
+- Status: `CURRENT_PUBLIC_DRAFT_FORMAT_AND_MARKER_CHECKS_PASS_SEMANTIC_EVIDENCE_AND_PRIVATE_FINALIZATION_REQUIRED`
 - Submission ready: `false`
 - Funding currently available: `false`
 - Safest operational deadline: `4:00 PM CT on August 7, 2026`
@@ -12,26 +12,28 @@ The substantive public-safe brief is complete and technically compliant, but it 
 - Current live page deadline text: `4:00 PM CT on August 7, 2026`
 - Question submission cutoff: `July 31, 2026`
 - PDF pages: `7` physical; `5` counted body pages
-- PDF bytes: `107754`
-- PDF SHA-256: `69cdd44beb294a4d347a2d7ab3fbeab6e905cff91b60fe251c491ae2a9bf29b1`
+- PDF bytes: `108736`
+- PDF SHA-256: `f1135e0ce4564335d3d5fcc2a7ec2aa8c20e435e9a9bcae815a2619023ab0690`
 - Minimum detected font size: `12.0`
 - Times New Roman detected: `true`
 - Letter portrait: `true`
 - One-inch text margins: `true`
 - Body page labels present: `true`
-- Technical document checks pass: `true`
+- Format and marker checks pass: `true`
+- Semantic review complete: `false`
 - Source checks pass: `true`
-- Research evidence checks pass: `true`
-- Research evidence SHA-256: `627d0add4d31514f7a47dbf8e8c51b0fa46df72635f336133f54abb85b00927a`
-- Registered families: `140`
-- Family implementations present: `35`
-- Direct comparisons: `126`
-- Global Holm-positive comparisons: `0`
-- Finalization blockers: `5`
+- Evidence ablation checks pass: `true`
+- Evidence ablation SHA-256: `0e17f27d4ea6c049b73e12664a6838c5ac0cb767e9a7a18ac2e1e8b108db2a7f`
+- Evidence protocol SHA-256: `61337e3493f63f46a700152748d5a586635dfb9338fb5ba6766e084d6ae5a723`
+- Synthetic workflows: `48`
+- Full-control attacks detected: `7/7`
+- Adverse-outcome recall: `1.0`
+- Synthetic artifact byte rehash rate: `1.0`
+- Finalization blockers: `8`
 - External send without human: `false`
 - Final portal submit without human: `false`
 - Session-browser navigation performed: `false`
-- Gate SHA-256: `8945d9ca505dcfddadde749d048764e5f95aa108cd8f69c31dc55eef4ed8778f`
+- Gate SHA-256: `ae818a96dd5518308e66fa64660fae6cb8dfc3b70c3268a50fb28ff3fbfcbff8`
 
 ## Compliance Matrix
 
@@ -44,8 +46,13 @@ The substantive public-safe brief is complete and technically compliant, but it 
 | `FORMAT_05` | `PASS` | English PDF under 20 MB | Generated PDF is English, Acrobat-readable, and size-checked. |
 | `DISCLOSURE_01` | `PASS` | No classified or proprietary information | Public-safe architecture and boundaries only; no private identity, patent claims, credentials, or classified data. |
 | `TECH_01` | `PASS` | Describe solution and mission effectiveness | Body pages 1 and 2 define the evidence control plane, mission gap, components, and focus-area alignment. |
-| `TECH_02` | `PASS` | Explain innovation and feasibility | Body pages 1, 3, and 4 define the new application, prototype plan, acceptance checks, risks, and controls. |
-| `TECH_03` | `PASS_BOUNDED` | Provide URL and convincing evidence | Public website and repository are listed; evidence limitations explicitly reject field-validation claims. |
+| `TECH_02` | `PASS_BOUNDED` | Explain innovation and feasibility | Body pages 1, 3, and 4 distinguish the mechanism, define the prototype, name acceptance checks and falsifiers, and preserve the HPCMP and independent-validation boundary. |
+| `TECH_03` | `LOCAL_ONLY_EXTERNAL_REPRODUCIBILITY_REQUIRED` | Provide URL and convincing evidence | Public website and repository are listed, but the exact July 29 builder, receipt, and proposal gate remain local until a reviewed commit is published. Field validation is not claimed. |
+| `BASELINE_01` | `PASS_BOUNDED` | Name current purpose-matched interoperability contexts | Body pages 1, 3, and 5 name OpenTelemetry Logs Data Model 1.59.0 and SLSA Build Provenance 1.2 with in-toto Statement v1 as unranked interoperability contexts and reject universal ranking. |
+| `ABLATION_01` | `PASS_BOUNDED` | Show the claimed control contribution through ablation | The bound local surrogate covers 48 deterministic workflows and seven declared attacks; the full profile detects 7 of 7 relative to a separately supplied local anchor while each no-chain, no-predeclaration, or no-failure-retention profile loses a declared control. It is not an HPCMP or independent result. |
+| `TRUST_01` | `EXTERNAL_TRUST_ROOT_REQUIRED` | Bind the protocol and receipt to a trust root outside the mutable evidence packet | The local experiment supplies an anchor separately from the receipt, but it is not a Government-controlled signature, timestamp, or external trust service. |
+| `METRIC_01` | `PASS_BOUNDED` | Define quantitative checks, cost denominators, and falsifiers | Body pages 3 and 4 require complete declared-attack detection, complete adverse-case retention, clean reviewer replay, fixed-window baseline comparison, explicit cost drivers, and stop/rollback on a miss or Government-set overhead breach. |
+| `EXEC_01` | `PRIVATE_FINALIZATION_REQUIRED` | Bind delivery roles, compute, support, and transition commitments | Body page 4 identifies the founder as proposed technical lead and bounds commodity surrogate compute; Government or prime integration, evaluator commitment, production compute, staffing, support, and transition ownership remain to be bound in the private Phase II plan and price. |
 | `ROM_01` | `PRIVATE_FINALIZATION_REQUIRED` | One estimated price for Phase II prototype only | Body page 5 preserves the required section but intentionally includes no unapproved amount. |
 | `SAM_01` | `PRIVATE_FINALIZATION_REQUIRED` | Active SAM all-awards contract registration and matching solution address | Public draft withholds identity and address; live SAM all-awards status, contract eligibility, and exact match must be verified before upload. |
 | `CONTACT_01` | `PRIVATE_FINALIZATION_REQUIRED` | Current accurate proposal contact email | Public draft intentionally omits private contact data; insert and verify in the private final copy. |
@@ -62,6 +69,7 @@ The substantive public-safe brief is complete and technically compliant, but it 
 ## Required Private Finalization
 
 - Approve one Phase II-only firm-fixed-price Rough Order of Magnitude estimate.
+- Bind named Phase II delivery roles, staffing, production compute or cloud access, support, evaluator, integration, and transition ownership without inventing commitments.
 - Insert the exact active SAM legal entity name and matching address in a private copy.
 - Insert and verify the current proposal contact email in the private copy.
 - Reverify active SAM all-awards contract registration and review current ERDCWERX questions and answers.
@@ -75,4 +83,4 @@ The substantive public-safe brief is complete and technically compliant, but it 
 
 ## Claim Boundary
 
-This is a public-safe technical draft, not a submitted solution brief. It does not include the founder-approved Phase II price, private SAM-matched legal identity and address, a live SAM status verification, signature, certification, or portal confirmation. It does not claim ERDC selection, funding availability, a contract, Department of Defense deployment, an authorization to operate, classified-data handling, field validation, realized savings, or technical performance beyond the bounded repository evidence identified here.
+This is a public-safe technical draft, not a submitted solution brief. It does not include the founder-approved Phase II price, private SAM-matched legal identity and address, a live SAM status verification, signature, certification, or portal confirmation. It does not claim ERDC selection, funding availability, a contract, Department of Defense deployment, an authorization to operate, classified-data handling, field validation, customers, revenue, or realized savings, or technical performance beyond the bounded repository evidence identified here.

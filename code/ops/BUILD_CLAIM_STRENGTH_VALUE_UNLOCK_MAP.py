@@ -20,6 +20,8 @@ CONTROL_ROOM_SCRIPT = ROOT / "code" / "ops" / "BUILD_PROOF_TO_PILOT_CONTROL_ROOM
 OUTREACH_QUEUE_JSON = OUT_OPS / "paid_pilot_outreach_queue_latest.json"
 OUTREACH_QUEUE_SCRIPT = ROOT / "code" / "ops" / "BUILD_PAID_PILOT_OUTREACH_QUEUE.py"
 ASSET_MAP_JSON = OUT_OPS / "geometry_champion_asset_map_latest.json"
+CROSS_SECTOR_JSON = OUT_OPS / "kuramoto_cross_sector_benchmark_latest.json"
+PROOF_REVENUE_JSON = OUT_OPS / "proof_to_revenue_engine_latest.json"
 
 OUT_JSON = OUT_OPS / "claim_strength_value_unlock_map_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "claim_strength_value_unlock_map.json"
@@ -27,9 +29,9 @@ OUT_MD = DOCS / "CLAIM_STRENGTH_VALUE_UNLOCK_MAP_2026-06-25.md"
 
 BOUNDARY = (
     "This artifact converts the current proof stack into the strongest defensible claim ladder. It supports "
-    "bounded estimated-value language, paid technical evaluation scoping, and buyer-authorized field replay. "
-    "It does not authorize realized-savings claims, fixed-dollar frozen-delta pricing, award certainty, "
-    "bulk outreach, live trading, or autonomous operational execution."
+    "public deployment verification, negative-result preservation, and bounded workflow-pilot scoping. It does not "
+    "authorize model-performance marketing, cross-sector efficiency claims, dollar projections without buyer-approved "
+    "conversion evidence, realized-savings claims, award certainty, bulk outreach, live trading, or autonomous execution."
 )
 
 
@@ -95,10 +97,13 @@ def build_claim_ladder(
     dollar_gate: dict[str, Any],
     control_room: dict[str, Any],
     outreach_queue: dict[str, Any],
+    cross_sector: dict[str, Any],
 ) -> list[dict[str, Any]]:
     summary = dollar_gate.get("summary", {}) if isinstance(dollar_gate.get("summary"), dict) else {}
     control_summary = control_room.get("summary", {}) if isinstance(control_room.get("summary"), dict) else {}
     queue_summary = outreach_queue.get("summary", {}) if isinstance(outreach_queue.get("summary"), dict) else {}
+    cross_gates = cross_sector.get("gates", {}) if isinstance(cross_sector.get("gates"), dict) else {}
+    dollar_claim_allowed = int(summary.get("allowed_estimated_value_claims", 0) or 0) > 0
 
     return [
         {
@@ -113,22 +118,31 @@ def build_claim_ladder(
         {
             "level": 2,
             "claim_stage": "bounded_estimated_value_signal",
-            "current_status": "allowed",
+            "current_status": "allowed" if dollar_claim_allowed else "blocked",
             "safe_claim": (
-                "Current live-measured lanes support bounded estimated-value language up to "
-                f"{money(summary.get('allowed_estimated_hourly_value_usd'))}/hour and "
-                f"{money(summary.get('allowed_estimated_annual_value_usd'))}/year under stated assumptions."
+                (
+                    "Current fully gated lanes support bounded estimated-value language up to "
+                    f"{money(summary.get('allowed_estimated_hourly_value_usd'))}/hour and "
+                    f"{money(summary.get('allowed_estimated_annual_value_usd'))}/year under stated assumptions."
+                )
+                if dollar_claim_allowed
+                else "No current lane clears the buyer-approved dollar-projection gate."
             ),
-            "money_language": "Estimated value signal only; not revenue, ROI, or realized savings.",
+            "money_language": (
+                "Estimated value signal only; not revenue, ROI, or realized savings."
+                if dollar_claim_allowed
+                else "No dollar amount is claimable."
+            ),
             "evidence_basis": (
-                f"{summary.get('allowed_estimated_value_claims', 0)} measured estimated-value lanes with "
-                f"{summary.get('live_measured_source_row_count', 0)} live-measured source rows."
+                f"{summary.get('allowed_estimated_value_claims', 0)} fully gated estimated-value lanes; "
+                f"{summary.get('suppressed_input_projection_count', 0)} input projections are suppressed."
             ),
             "blocked_until": [
-                "held-out validation",
+                "locked buyer baseline",
+                "buyer-approved economic conversion factors",
+                "held-out or prospective validation",
                 "uncertainty bounds per lane",
                 "source-rights review",
-                "buyer-approved economic conversion factors",
             ],
         },
         {
@@ -136,10 +150,11 @@ def build_claim_ladder(
             "claim_stage": "repeat_window_geometry_candidate",
             "current_status": "allowed",
             "safe_claim": (
-                "Two geometry families currently show repeat-window frozen replay strength: "
-                "brachistochrone_descent and kuramoto_phase_coupling."
+                "Historical narrow replay candidates remain inspectable, while the current governed Kuramoto "
+                f"cross-sector benchmark reports {cross_gates.get('sector_gain_proven_count', 0)} proven gains across "
+                f"{cross_gates.get('sector_count', 0)} sectors."
             ),
-            "money_language": "Can support technical evaluation value, not customer savings.",
+            "money_language": "Can support research scoping only; no performance or customer-savings claim.",
             "evidence_basis": (
                 f"{control_summary.get('robust_candidate_count', 0)} robust repeat candidates from the "
                 "proof-to-pilot control room."
@@ -154,8 +169,11 @@ def build_claim_ladder(
             "level": 4,
             "claim_stage": "paid_pilot_scoping",
             "current_status": "allowed",
-            "safe_claim": "The strongest current commercial offer is a paid technical evaluation or buyer-authorized field replay.",
-            "money_language": "Paid evaluation can be quoted after fit, scope, rights, and baseline review.",
+            "safe_claim": (
+                "The strongest current commercial offer is a human-controlled ProofLock Opportunity Operations "
+                "design-partner pilot measured against the buyer's current workflow."
+            ),
+            "money_language": "A scoped pilot fee can be quoted; performance gains and avoided cost cannot.",
             "evidence_basis": (
                 f"{queue_summary.get('queue_count', 0)} manual outreach rows matched to the two strongest proof cards."
             ),
@@ -222,21 +240,25 @@ def build_money_worth_answer(dollar_gate: dict[str, Any], control_room: dict[str
     control_summary = control_room.get("summary", {}) if isinstance(control_room.get("summary"), dict) else {}
     return {
         "plain_answer": (
-            "Worth money now as a paid technical evaluation or buyer-authorized pilot option, not yet as a fixed-value "
-            "asset sale or realized-savings claim."
+            "The current monetizable unit is a scoped ProofLock workflow pilot, not a model-performance, savings, "
+            "or fixed-value asset claim."
         ),
         "defensible_value_signal": {
             "estimated_hourly_value_usd": summary.get("allowed_estimated_hourly_value_usd", 0),
             "estimated_annual_value_usd": summary.get("allowed_estimated_annual_value_usd", 0),
-            "language": "bounded estimated value signal under stated assumptions",
+            "language": (
+                "fully gated estimated value signal under stated assumptions"
+                if int(summary.get("allowed_estimated_value_claims", 0) or 0) > 0
+                else "no current dollar projection clears the gate"
+            ),
         },
         "blocked_big_number": {
             "context_only_annual_value_usd": summary.get("blocked_context_only_annual_value_usd", 0),
-            "language": "context-only value surface; do not present as real savings or revenue",
+            "language": "suppressed input projection; do not present as savings, revenue, or contract value",
         },
         "most_defensible_offers": [
-            "paid evidence review",
-            "buyer-authorized field replay",
+            "ProofLock Opportunity Operations design-partner pilot",
+            "paid evidence-governance review",
             "grant or contract evidence appendix",
             "technical due-diligence data room",
         ],
@@ -248,17 +270,17 @@ def build_highest_value_unlocks() -> list[dict[str, Any]]:
     return [
         {
             "priority": 1,
-            "unlock": "Convert brachistochrone_descent into a buyer-authorized constrained-routing replay.",
-            "target_lanes": ["datacenter_cooling_optimization", "utility_grid_analytics", "port_maritime_operations"],
-            "why_it_matters": "It maps directly to route/path/constraint problems where small improvements can have measurable operating value.",
-            "proof_needed": "20 or more pre-registered holdout windows, incumbent baselines, buyer-approved conversion factors.",
+            "unlock": "Convert ProofLock Opportunity Operations into a measured 30-day design-partner pilot.",
+            "target_lanes": ["grant_operations", "contract_opportunity_operations", "evidence_governance"],
+            "why_it_matters": "It is the shortest current path to a paid engagement using capabilities already present on disk.",
+            "proof_needed": "Buyer workflow baseline, acceptance metrics, source permissions, named approvers, and a signed scope.",
         },
         {
             "priority": 2,
-            "unlock": "Convert kuramoto_phase_coupling into a timing/forecast/reliability replay.",
-            "target_lanes": ["energy_forecasting", "grid_reliability_analytics", "sensor_fusion_defense"],
-            "why_it_matters": "Phase, drift, and timing errors are easier to measure against incumbent baselines than broad platform claims.",
-            "proof_needed": "Forecast-error or early-warning metrics, false-positive accounting, held-out periods, uncertainty bounds.",
+            "unlock": "Run any future model candidate only under an external-owner-approved prospective protocol.",
+            "target_lanes": ["energy_forecasting", "grid_reliability_analytics", "operational_validation"],
+            "why_it_matters": "The current cross-sector Kuramoto benchmark is negative, so a new unseen window and incumbent baseline are required.",
+            "proof_needed": "External owner, frozen future window, native metric, incumbent baseline, uncertainty, and buyer-approved conversion.",
         },
         {
             "priority": 3,
@@ -282,6 +304,8 @@ def build_payload() -> dict[str, Any]:
     control_room = load_or_build(CONTROL_ROOM_JSON, CONTROL_ROOM_SCRIPT, "summary")
     outreach_queue = load_or_build(OUTREACH_QUEUE_JSON, OUTREACH_QUEUE_SCRIPT, "summary")
     asset_map = read_json(ASSET_MAP_JSON)
+    cross_sector = read_json(CROSS_SECTOR_JSON)
+    proof_revenue = read_json(PROOF_REVENUE_JSON)
 
     dollar_summary = dollar_gate.get("summary", {}) if isinstance(dollar_gate.get("summary"), dict) else {}
     control_summary = control_room.get("summary", {}) if isinstance(control_room.get("summary"), dict) else {}
@@ -290,7 +314,10 @@ def build_payload() -> dict[str, Any]:
     queue_rows = top_queue_rows(outreach_queue)
 
     gates = {
-        "bounded_estimated_value_claim_allowed": True,
+        "bounded_estimated_value_claim_allowed": int(
+            dollar_summary.get("allowed_estimated_value_claims", 0) or 0
+        )
+        > 0,
         "paid_evaluation_offer_allowed": bool(control_summary.get("paid_evaluation_offer_allowed")),
         "buyer_authorized_pilot_scoping_ready": bool(control_summary.get("buyer_authorized_pilot_scoping_ready")),
         "manual_reviewed_outreach_allowed": bool(control_summary.get("manual_reviewed_outreach_allowed")),
@@ -301,11 +328,11 @@ def build_payload() -> dict[str, Any]:
         "live_trading_or_autonomous_execution_allowed": False,
     }
     payload = {
-        "schema": "claim_strength_value_unlock_map_v1",
+        "schema": "claim_strength_value_unlock_map_v2",
         "generated_utc": now_utc(),
         "boundary": BOUNDARY,
         "summary": {
-            "strongest_current_claim": "bounded_estimated_value_signal_and_paid_pilot_scoping",
+            "strongest_current_claim": "public_deployment_proof_and_bounded_workflow_pilot_scoping",
             "safe_estimated_hourly_value_usd": dollar_summary.get("allowed_estimated_hourly_value_usd", 0),
             "safe_estimated_annual_value_usd": dollar_summary.get("allowed_estimated_annual_value_usd", 0),
             "blocked_context_annual_value_usd": dollar_summary.get("blocked_context_only_annual_value_usd", 0),
@@ -316,10 +343,16 @@ def build_payload() -> dict[str, Any]:
             "robust_repeat_candidate_count": control_summary.get("robust_candidate_count", 0),
             "manual_paid_pilot_outreach_rows": queue_summary.get("queue_count", 0),
             "current_commercial_stage": control_summary.get("current_commercial_stage", "unknown"),
+            "current_model_benchmark_status": cross_sector.get("status"),
+            "sellable_product_lane": (
+                proof_revenue.get("summary", {}).get("sellable_product_lane")
+                if isinstance(proof_revenue.get("summary"), dict)
+                else None
+            ),
             **gates,
         },
         "money_worth_answer": build_money_worth_answer(dollar_gate, control_room),
-        "claim_ladder": build_claim_ladder(dollar_gate, control_room, outreach_queue),
+        "claim_ladder": build_claim_ladder(dollar_gate, control_room, outreach_queue, cross_sector),
         "current_repeat_candidates": [
             {
                 "family_id": row.get("family_id", ""),
@@ -360,6 +393,8 @@ def build_payload() -> dict[str, Any]:
             "proof_to_pilot_control_room": str(CONTROL_ROOM_JSON.relative_to(ROOT)),
             "paid_pilot_outreach_queue": str(OUTREACH_QUEUE_JSON.relative_to(ROOT)),
             "geometry_champion_asset_map": str(ASSET_MAP_JSON.relative_to(ROOT)),
+            "kuramoto_cross_sector_benchmark": str(CROSS_SECTOR_JSON.relative_to(ROOT)),
+            "proof_to_revenue_engine": str(PROOF_REVENUE_JSON.relative_to(ROOT)),
         },
         "asset_map_summary": asset_map.get("summary", {}) if isinstance(asset_map.get("summary"), dict) else {},
     }
@@ -392,8 +427,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         money_answer["plain_answer"],
         "",
         f"- Strongest current claim: `{summary['strongest_current_claim']}`",
-        f"- Safe estimated value signal: `{money(summary['safe_estimated_hourly_value_usd'])}/hour` and `{money(summary['safe_estimated_annual_value_usd'])}/year` under stated assumptions",
-        f"- Blocked context-only value surface: `{money(summary['blocked_context_annual_value_usd'])}/year`",
+        f"- Claimable estimated value signal: `{money(summary['safe_estimated_hourly_value_usd'])}/hour` and `{money(summary['safe_estimated_annual_value_usd'])}/year`",
+        f"- Current model benchmark: `{summary['current_model_benchmark_status']}`",
         f"- Robust repeat candidates: `{summary['robust_repeat_candidate_count']}`",
         f"- Manual paid-pilot outreach rows: `{summary['manual_paid_pilot_outreach_rows']}`",
         "",

@@ -82,6 +82,8 @@ def test_bundle_contract_includes_expanded_bridge_and_domain_audit():
     assert "branching_live_breadth_replay" in module.OPTIONAL_FEEDS
     assert "rolling_champion_gate" in module.OPTIONAL_FEEDS
     assert "top_geometry_live_replay_results" in module.OPTIONAL_FEEDS
+    assert "market_signal_source_native_benchmark" in module.OPTIONAL_FEEDS
+    assert "source_native_family_baseline_ledger" in module.OPTIONAL_FEEDS
 
 
 def test_bundle_manifest_and_archive_exclude_secret_or_bulk_data_paths(tmp_path):
@@ -107,6 +109,15 @@ def test_bundle_manifest_and_archive_exclude_secret_or_bulk_data_paths(tmp_path)
     assert manifest["summary"]["publishes_config_or_secrets"] is False
     assert manifest["summary"]["broad_stack_deploy_allowed"] is False
     assert manifest["summary"]["service_restart_required"] is False
+    assert manifest["safe_deploy_command"].endswith(" -Apply")
+    assert manifest["dry_run_command"].endswith(" -DryRun")
+    assert manifest["apply_requirements"] == {
+        "explicit_apply_switch_required": True,
+        "human_unlock_environment_variable": "LUMA_HUMAN_UNLOCK_TOKEN",
+        "human_unlock_minimum_characters": 32,
+        "human_unlock_must_be_action_time_and_private": True,
+        "external_action_authorized_by_bundle": False,
+    }
 
 
 def test_missing_required_feed_blocks_deploy_ready(tmp_path):
@@ -134,6 +145,8 @@ def test_markdown_keeps_feed_deploy_separate_from_field_validation_and_money_cla
     assert "Field-validation claim allowed: `false`" in rendered
     assert "Real-dollar savings claim allowed: `false`" in rendered
     assert "not field validation" in rendered.lower()
+    assert "action-time HumanUnlock" in rendered
+    assert "does not authorize deployment" in rendered
     assert "guaranteed grant" not in dumped
     assert "guaranteed profit" not in dumped
     assert "money printer" not in dumped

@@ -1,0 +1,354 @@
+{"kind":"deck","id":"pr/s6feo9","name":"Deck"}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/igc58r","slide":1,"title":"LUMENCORE","textShapes":9}
+{"kind":"shape","id":"sh/cfi5wbmh","slide":1,"bbox":[56,44,78,5]}
+{"kind":"textbox","id":"sh/re9onq5w","slide":1,"text":"LUMENCORE","textPreview":"LUMENCORE","textChars":9,"textLines":1,"bbox":[56,66,420,74]}
+{"kind":"textbox","id":"sh/qd0nul4b","slide":1,"text":"Proof-to-pilot AI validation\nfor energy and infrastructure","textPreview":"Proof-to-pilot AI validation | for energy and infrastructure","textChars":58,"textLines":2,"bbox":[56,161,520,145]}
+{"kind":"textbox","id":"sh/1kb6t0ny","slide":1,"text":"Turn a promising model into a decision a serious buyer can audit, reproduce, and price.","textPreview":"Turn a promising model into a decision a serious buyer can audit, reproduce, and price.","textChars":87,"textLines":1,"bbox":[56,332,500,98]}
+{"kind":"shape","id":"sh/0j2p0vmd","slide":1,"bbox":[56,466,126,34]}
+{"kind":"textbox","id":"sh/zi9orq5s","slide":1,"text":"WORKING MVP","textPreview":"WORKING MVP","textChars":11,"textLines":1,"bbox":[56,466,126,34]}
+{"kind":"shape","id":"sh/eh07yl47","slide":1,"bbox":[196,466,210,34]}
+{"kind":"textbox","id":"sh/98b6x0nu","slide":1,"text":"EXTERNAL VALIDATION NEXT","textPreview":"EXTERNAL VALIDATION NEXT","textChars":24,"textLines":1,"bbox":[196,466,210,34]}
+{"kind":"textbox","id":"sh/on2p4vm9","slide":1,"text":"Robert Ashworth | Founder\nLaunch Tennessee 3686 | 2026","textPreview":"Robert Ashworth | Founder | Launch Tennessee 3686 | 2026","textChars":54,"textLines":2,"bbox":[56,550,430,70]}
+{"kind":"shape","id":"sh/i9gfm1kb","slide":1,"bbox":[610,62,614,550]}
+{"kind":"textbox","id":"sh/4byxor21","slide":1,"text":"Product proof room | local reviewer view","textPreview":"Product proof room | local reviewer view","textChars":40,"textLines":1,"bbox":[630,620,572,22]}
+{"kind":"textbox","id":"sh/5c7yxwjm","slide":1,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/6d0zq1k7","slide":1,"text":"1/11","textPreview":"1/11","textChars":4,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"image","id":"im/wri94neh","slide":1,"name":"","geometry":"roundRect","bbox":[626,78,582,518]}
+{"kind":"notes","id":"nt/igc58r","slide":1,"text":""}
+{"kind":"slide","id":"sl/gasjua","slide":2,"title":"PROBLEM","textShapes":24}
+{"kind":"textbox","id":"sh/rq18jydk","slide":2,"text":"PROBLEM","textPreview":"PROBLEM","textChars":7,"textLines":1,"bbox":[56,34,500,22]}
+{"kind":"textbox","id":"sh/sra9c3e5","slide":2,"text":"AI scores arrive faster than buyer trust","textPreview":"AI scores arrive faster than buyer trust","textChars":40,"textLines":1,"bbox":[56,64,1100,74]}
+{"kind":"textbox","id":"sh/tsjql8vq","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1184,35,40,24]}
+{"kind":"shape","id":"sh/il876tw3","slide":2,"bbox":[56,143,1168,2]}
+{"kind":"textbox","id":"sh/jmh8fydo","slide":2,"text":"In high-consequence operations, the buyer is not purchasing a score. The buyer is purchasing a defensible decision.","textPreview":"In high-consequence operations, the buyer is not purchasing a score. The buyer is purchasing a defensible decision.","textChars":115,"textLines":1,"bbox":[56,174,650,92]}
+{"kind":"textbox","id":"sh/4nq98je9","slide":2,"text":"A strong model can still fail procurement when the evidence trail cannot answer four basic questions.","textPreview":"A strong model can still fail procurement when the evidence trail cannot answer four basic questions.","textChars":101,"textLines":1,"bbox":[56,285,560,70]}
+{"kind":"shape","id":"sh/5ozqhove","slide":2,"bbox":[56,406,128,4]}
+{"kind":"textbox","id":"sh/uxo729wr","slide":2,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[56,422,128,46]}
+{"kind":"textbox","id":"sh/vih8bedc","slide":2,"text":"Dataset identity\nand allowed history","textPreview":"Dataset identity | and allowed history","textChars":36,"textLines":2,"bbox":[56,470,128,44]}
+{"kind":"shape","id":"sh/vm1kryhc","slide":2,"bbox":[202,406,128,4]}
+{"kind":"textbox","id":"sh/ulsjytgr","slide":2,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[202,422,128,46]}
+{"kind":"textbox","id":"sh/ho32t8z2","slide":2,"text":"Baseline and\nmetric lock","textPreview":"Baseline and | metric lock","textChars":24,"textLines":2,"bbox":[202,470,128,44]}
+{"kind":"shape","id":"sh/wna103yh","slide":2,"bbox":[348,406,128,4]}
+{"kind":"textbox","id":"sh/jqlkvih8","slide":2,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[348,422,128,46]}
+{"kind":"textbox","id":"sh/ipcj2dgn","slide":2,"text":"Negative results\nand uncertainty","textPreview":"Negative results | and uncertainty","textChars":32,"textLines":2,"bbox":[348,470,128,44]}
+{"kind":"shape","id":"sh/5c32x8ze","slide":2,"bbox":[494,406,128,4]}
+{"kind":"textbox","id":"sh/4ru143yt","slide":2,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[494,422,128,46]}
+{"kind":"textbox","id":"sh/zuh0zeh4","slide":2,"text":"Receipt, owner,\nand next action","textPreview":"Receipt, owner, | and next action","textChars":31,"textLines":2,"bbox":[494,470,128,44]}
+{"kind":"shape","id":"sh/yt8jq90j","slide":2,"bbox":[706,174,518,432]}
+{"kind":"textbox","id":"sh/29gnyh07","slide":2,"text":"WHAT BREAKS TRUST","textPreview":"WHAT BREAKS TRUST","textChars":17,"textLines":1,"bbox":[742,205,230,20]}
+{"kind":"shape","id":"sh/nap47m1c","slide":2,"bbox":[742,306,442,1]}
+{"kind":"textbox","id":"sh/oby50rix","slide":2,"text":"Data leakage","textPreview":"Data leakage","textChars":12,"textLines":1,"bbox":[742,246,160,30]}
+{"kind":"textbox","id":"sh/pc7m9wji","slide":2,"text":"Future information contaminates the test.","textPreview":"Future information contaminates the test.","textChars":41,"textLines":1,"bbox":[912,246,272,48]}
+{"kind":"shape","id":"sh/elwnuh0v","slide":2,"bbox":[742,388,442,1]}
+{"kind":"textbox","id":"sh/f654321g","slide":2,"text":"Moving goalposts","textPreview":"Moving goalposts","textChars":16,"textLines":1,"bbox":[742,328,160,30]}
+{"kind":"textbox","id":"sh/07y5w7i1","slide":2,"text":"Baselines or metrics change after results appear.","textPreview":"Baselines or metrics change after results appear.","textChars":49,"textLines":1,"bbox":[912,328,272,48]}
+{"kind":"shape","id":"sh/187m5cjm","slide":2,"bbox":[742,470,442,1]}
+{"kind":"textbox","id":"sh/6hw3qx0z","slide":2,"text":"Hidden negatives","textPreview":"Hidden negatives","textChars":16,"textLines":1,"bbox":[742,410,160,30]}
+{"kind":"textbox","id":"sh/ri54z21k","slide":2,"text":"Only favorable runs survive into the deck.","textPreview":"Only favorable runs survive into the deck.","textChars":42,"textLines":1,"bbox":[912,410,272,48]}
+{"kind":"shape","id":"sh/t8vyl47y","slide":2,"bbox":[742,552,442,1]}
+{"kind":"textbox","id":"sh/87mhsz6t","slide":2,"text":"No custody trail","textPreview":"No custody trail","textChars":16,"textLines":1,"bbox":[742,492,160,30]}
+{"kind":"textbox","id":"sh/7mdgjup8","slide":2,"text":"The artifact cannot be tied to code, data, or time.","textPreview":"The artifact cannot be tied to code, data, or time.","textChars":51,"textLines":1,"bbox":[912,492,272,48]}
+{"kind":"textbox","id":"sh/6l4zqpon","slide":2,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/lkvyhk72","slide":2,"text":"2/11","textPreview":"2/11","textChars":4,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"notes","id":"nt/gasjua","slide":2,"text":""}
+{"kind":"slide","id":"sl/tgwoqp","slide":3,"title":"PRODUCT","textShapes":20}
+{"kind":"textbox","id":"sh/czq587md","slide":3,"text":"PRODUCT","textPreview":"PRODUCT","textChars":7,"textLines":1,"bbox":[56,34,500,22]}
+{"kind":"textbox","id":"sh/byh4fmls","slide":3,"text":"One bounded workflow from claim to pilot","textPreview":"One bounded workflow from claim to pilot","textChars":40,"textLines":1,"bbox":[56,64,1100,74]}
+{"kind":"textbox","id":"sh/qx8n6h47","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1184,35,40,24]}
+{"kind":"shape","id":"sh/lojmlw3u","slide":3,"bbox":[56,143,1168,2]}
+{"kind":"textbox","id":"sh/03a5crm9","slide":3,"text":"LumenCore makes the evidence path explicit before it makes the claim louder.","textPreview":"LumenCore makes the evidence path explicit before it makes the claim louder.","textChars":76,"textLines":1,"bbox":[56,170,860,46]}
+{"kind":"shape","id":"sh/z214jmlo","slide":3,"bbox":[56,270,224,210]}
+{"kind":"shape","id":"sh/y1snah43","slide":3,"bbox":[352,270,224,210]}
+{"kind":"shape","id":"sh/1sfm9s3q","slide":3,"bbox":[648,270,224,210]}
+{"kind":"shape","id":"sh/g76lgnm5","slide":3,"bbox":[944,270,224,210]}
+{"kind":"shape","id":"sh/donils7a","slide":3,"bbox":[280,375,72,0]}
+{"kind":"shape","id":"sh/5wj21cbq","slide":3,"bbox":[576,375,72,0]}
+{"kind":"shape","id":"sh/4vq18ru5","slide":3,"bbox":[872,375,72,0]}
+{"kind":"textbox","id":"sh/9or6xgvi","slide":3,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[80,292,50,24]}
+{"kind":"textbox","id":"sh/a90n6lc3","slide":3,"text":"FREEZE","textPreview":"FREEZE","textChars":6,"textLines":1,"bbox":[80,333,176,42]}
+{"kind":"textbox","id":"sh/ba9ozqdo","slide":3,"text":"Dataset, baseline, metric, window","textPreview":"Dataset, baseline, metric, window","textChars":33,"textLines":1,"bbox":[80,392,176,68]}
+{"kind":"textbox","id":"sh/wbi58bu9","slide":3,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[376,292,50,24]}
+{"kind":"textbox","id":"sh/xcr61gbe","slide":3,"text":"REPLAY","textPreview":"REPLAY","textChars":6,"textLines":1,"bbox":[376,333,176,42]}
+{"kind":"textbox","id":"sh/yd0nalcz","slide":3,"text":"Past-only execution with held-out windows","textPreview":"Past-only execution with held-out windows","textChars":41,"textLines":1,"bbox":[376,392,176,68]}
+{"kind":"textbox","id":"sh/jeto3qtk","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[672,292,50,24]}
+{"kind":"textbox","id":"sh/vit4rq9s","slide":3,"text":"GATE","textPreview":"GATE","textChars":4,"textLines":1,"bbox":[672,333,176,42]}
+{"kind":"textbox","id":"sh/uhknils7","slide":3,"text":"Uncertainty, abstention, and negative-result checks","textPreview":"Uncertainty, abstention, and negative-result checks","textChars":51,"textLines":1,"bbox":[672,392,176,68]}
+{"kind":"textbox","id":"sh/hkbmt0ry","slide":3,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[968,292,50,24]}
+{"kind":"textbox","id":"sh/gj25kvad","slide":3,"text":"RECEIPT","textPreview":"RECEIPT","textChars":7,"textLines":1,"bbox":[968,333,176,42]}
+{"kind":"textbox","id":"sh/7et4nq9w","slide":3,"text":"Hash, custody record, owner, and pilot decision","textPreview":"Hash, custody record, owner, and pilot decision","textChars":47,"textLines":1,"bbox":[968,392,176,68]}
+{"kind":"shape","id":"sh/6d03elsb","slide":3,"bbox":[414,535,452,40]}
+{"kind":"textbox","id":"sh/tgbmpgrm","slide":3,"text":"HUMAN APPROVAL BEFORE EXTERNAL CLAIM","textPreview":"HUMAN APPROVAL BEFORE EXTERNAL CLAIM","textChars":36,"textLines":1,"bbox":[414,535,452,40]}
+{"kind":"textbox","id":"sh/8f2lgva1","slide":3,"text":"Output: a buyer-readable packet that can be reproduced, challenged, and converted into a scoped field pilot.","textPreview":"Output: a buyer-readable packet that can be reproduced, challenged, and converted into a scoped field pilot.","textChars":108,"textLines":1,"bbox":[208,598,864,44]}
+{"kind":"textbox","id":"sh/jq94j69k","slide":3,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/yp03a1sz","slide":3,"text":"3/11","textPreview":"3/11","textChars":4,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"notes","id":"nt/tgwoqp","slide":3,"text":""}
+{"kind":"slide","id":"sl/15hwqn","slide":4,"title":"CUSTOMER","textShapes":27}
+{"kind":"textbox","id":"sh/qdwjmlwn","slide":4,"text":"CUSTOMER","textPreview":"CUSTOMER","textChars":8,"textLines":1,"bbox":[56,34,500,22]}
+{"kind":"textbox","id":"sh/dg7ih0vy","slide":4,"text":"Start where one bad decision is expensive","textPreview":"Start where one bad decision is expensive","textChars":41,"textLines":1,"bbox":[56,64,1100,74]}
+{"kind":"textbox","id":"sh/sfe1ovud","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1184,35,40,24]}
+{"kind":"shape","id":"sh/fip0jqd4","slide":4,"bbox":[56,143,1168,2]}
+{"kind":"textbox","id":"sh/ehgjq5cj","slide":4,"text":"Initial wedge: organizations with costly reliability, planning, or forecasting errors and an existing baseline they already trust.","textPreview":"Initial wedge: organizations with costly reliability, planning, or forecasting errors and an existing baseline they already trust.","textChars":130,"textLines":1,"bbox":[56,174,1050,54]}
+{"kind":"shape","id":"sh/1k7il0va","slide":4,"bbox":[56,267,328,5]}
+{"kind":"textbox","id":"sh/0jy1svup","slide":4,"text":"UTILITY / GRID","textPreview":"UTILITY / GRID","textChars":14,"textLines":1,"bbox":[56,291,328,34]}
+{"kind":"textbox","id":"sh/nmpknad0","slide":4,"text":"BUYER","textPreview":"BUYER","textChars":5,"textLines":1,"bbox":[56,353,100,20]}
+{"kind":"textbox","id":"sh/2lgju5cf","slide":4,"text":"Analytics or operations lead","textPreview":"Analytics or operations lead","textChars":28,"textLines":1,"bbox":[56,377,328,42]}
+{"kind":"textbox","id":"sh/sjmxc3e5","slide":4,"text":"TRIGGER","textPreview":"TRIGGER","textChars":7,"textLines":1,"bbox":[56,447,100,20]}
+{"kind":"textbox","id":"sh/tkve58fq","slide":4,"text":"A planning or forecasting model cannot clear internal review.","textPreview":"A planning or forecasting model cannot clear internal review.","textChars":61,"textLines":1,"bbox":[56,471,328,70]}
+{"kind":"textbox","id":"sh/6hkfadwz","slide":4,"text":"PILOT OUTCOME","textPreview":"PILOT OUTCOME","textChars":13,"textLines":1,"bbox":[56,565,130,20]}
+{"kind":"textbox","id":"sh/ridw3yxk","slide":4,"text":"Decision receipt + replay package","textPreview":"Decision receipt + replay package","textChars":33,"textLines":1,"bbox":[56,589,328,42]}
+{"kind":"shape","id":"sh/g7mxgne1","slide":4,"bbox":[448,267,328,5]}
+{"kind":"textbox","id":"sh/18ve9sfm","slide":4,"text":"LAB / AGENCY","textPreview":"LAB / AGENCY","textChars":12,"textLines":1,"bbox":[448,291,328,34]}
+{"kind":"textbox","id":"sh/el4fedwb","slide":4,"text":"BUYER","textPreview":"BUYER","textChars":5,"textLines":1,"bbox":[448,353,100,20]}
+{"kind":"textbox","id":"sh/f6dw7ixg","slide":4,"text":"Program or technical lead","textPreview":"Program or technical lead","textChars":25,"textLines":1,"bbox":[448,377,328,42]}
+{"kind":"textbox","id":"sh/ob6xkned","slide":4,"text":"TRIGGER","textPreview":"TRIGGER","textChars":7,"textLines":1,"bbox":[448,447,100,20]}
+{"kind":"textbox","id":"sh/pcfydsvy","slide":4,"text":"A research result needs a reproducible route to a field partner.","textPreview":"A research result needs a reproducible route to a field partner.","textChars":64,"textLines":1,"bbox":[448,471,328,70]}
+{"kind":"textbox","id":"sh/dgr6hojq","slide":4,"text":"PILOT OUTCOME","textPreview":"PILOT OUTCOME","textChars":13,"textLines":1,"bbox":[448,565,130,20]}
+{"kind":"textbox","id":"sh/cfi58325","slide":4,"text":"Reviewer packet + validation plan","textPreview":"Reviewer packet + validation plan","textChars":33,"textLines":1,"bbox":[448,589,328,42]}
+{"kind":"shape","id":"sh/bu9ofy1k","slide":4,"bbox":[840,267,328,5]}
+{"kind":"textbox","id":"sh/qt0n6tkz","slide":4,"text":"INDUSTRIAL RELIABILITY","textPreview":"INDUSTRIAL RELIABILITY","textChars":22,"textLines":1,"bbox":[840,291,328,34]}
+{"kind":"textbox","id":"sh/lkb6l8jm","slide":4,"text":"BUYER","textPreview":"BUYER","textChars":5,"textLines":1,"bbox":[840,353,100,20]}
+{"kind":"textbox","id":"sh/0j25c321","slide":4,"text":"Reliability or asset lead","textPreview":"Reliability or asset lead","textChars":25,"textLines":1,"bbox":[840,377,328,42]}
+{"kind":"textbox","id":"sh/zitojy1w","slide":4,"text":"TRIGGER","textPreview":"TRIGGER","textChars":7,"textLines":1,"bbox":[840,447,100,20]}
+{"kind":"textbox","id":"sh/yh0natkb","slide":4,"text":"A failure-risk signal needs proof against the incumbent rule or model.","textPreview":"A failure-risk signal needs proof against the incumbent rule or model.","textChars":70,"textLines":1,"bbox":[840,471,328,70]}
+{"kind":"textbox","id":"sh/1o7m943i","slide":4,"text":"PILOT OUTCOME","textPreview":"PILOT OUTCOME","textChars":13,"textLines":1,"bbox":[840,565,130,20]}
+{"kind":"textbox","id":"sh/gny50j2x","slide":4,"text":"Scoped pilot + economic acceptance gate","textPreview":"Scoped pilot + economic acceptance gate","textChars":39,"textLines":1,"bbox":[840,589,328,42]}
+{"kind":"textbox","id":"sh/6tw3a50v","slide":4,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/ru5k3ahg","slide":4,"text":"4/11","textPreview":"4/11","textChars":4,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"notes","id":"nt/15hwqn","slide":4,"text":""}
+{"kind":"slide","id":"sl/1obl7i","slide":5,"title":"EVIDENCE POSTURE","textShapes":27}
+{"kind":"textbox","id":"sh/03ypknex","slide":5,"text":"EVIDENCE POSTURE","textPreview":"EVIDENCE POSTURE","textChars":16,"textLines":1,"bbox":[56,34,500,22]}
+{"kind":"textbox","id":"sh/z2p8bixs","slide":5,"text":"The MVP is real; the next value gate is external","textPreview":"The MVP is real; the next value gate is external","textChars":48,"textLines":1,"bbox":[56,64,1100,74]}
+{"kind":"textbox","id":"sh/ehg7idw7","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1184,35,40,24]}
+{"kind":"shape","id":"sh/dg7698fm","slide":5,"bbox":[56,143,1168,2]}
+{"kind":"shape","id":"sh/cfypg3e1","slide":5,"bbox":[56,174,540,442]}
+{"kind":"shape","id":"sh/repo7yxg","slide":5,"bbox":[86,202,238,32]}
+{"kind":"textbox","id":"sh/qdw7edwv","slide":5,"text":"PROVEN IN CURRENT ARTIFACTS","textPreview":"PROVEN IN CURRENT ARTIFACTS","textChars":27,"textLines":1,"bbox":[86,202,238,32]}
+{"kind":"textbox","id":"sh/pcn658fa","slide":5,"text":"Working review room","textPreview":"Working review room","textChars":19,"textLines":1,"bbox":[86,264,420,40]}
+{"kind":"shape","id":"sh/4bepc3e5","slide":5,"bbox":[86,331,18,18]}
+{"kind":"textbox","id":"sh/ut8bi90f","slide":5,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,331,18,18]}
+{"kind":"textbox","id":"sh/fuhcreh0","slide":5,"text":"Canonical review cards and evidence artifacts present","textPreview":"Canonical review cards and evidence artifacts present","textChars":53,"textLines":1,"bbox":[114,329,422,38]}
+{"kind":"shape","id":"sh/gvqtkjil","slide":5,"bbox":[86,387,18,18]}
+{"kind":"textbox","id":"sh/hwzutoz6","slide":5,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,387,18,18]}
+{"kind":"textbox","id":"sh/658be90j","slide":5,"text":"Claim gates separate outreach from field validation","textPreview":"Claim gates separate outreach from field validation","textChars":51,"textLines":1,"bbox":[114,385,422,38]}
+{"kind":"shape","id":"sh/76hcneh4","slide":5,"bbox":[86,443,18,18]}
+{"kind":"textbox","id":"sh/8rqtgjip","slide":5,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,443,18,18]}
+{"kind":"textbox","id":"sh/tszupoza","slide":5,"text":"Hashable packets and custody records are supported","textPreview":"Hashable packets and custody records are supported","textChars":50,"textLines":1,"bbox":[114,441,422,38]}
+{"kind":"shape","id":"sh/y1obap07","slide":5,"bbox":[86,499,18,18]}
+{"kind":"textbox","id":"sh/j2xcjuhs","slide":5,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,499,18,18]}
+{"kind":"textbox","id":"sh/n6d8rqxk","slide":5,"text":"Negative-result and abstention states remain visible","textPreview":"Negative-result and abstention states remain visible","textChars":52,"textLines":1,"bbox":[114,497,422,38]}
+{"kind":"textbox","id":"sh/m5kri5gz","slide":5,"text":"What this supports today: a bounded buyer conversation and a reproducible pilot design.","textPreview":"What this supports today: a bounded buyer conversation and a reproducible pilot design.","textChars":87,"textLines":1,"bbox":[86,557,454,48]}
+{"kind":"shape","id":"sh/98vqt0fq","slide":5,"bbox":[628,174,596,442]}
+{"kind":"shape","id":"sh/o7m9kvy5","slide":5,"bbox":[658,202,226,32]}
+{"kind":"textbox","id":"sh/bad8vaxw","slide":5,"text":"REQUIRES OUTSIDE EVIDENCE","textPreview":"REQUIRES OUTSIDE EVIDENCE","textChars":25,"textLines":1,"bbox":[658,202,226,32]}
+{"kind":"textbox","id":"sh/a94rm5gb","slide":5,"text":"Field validation","textPreview":"Field validation","textChars":16,"textLines":1,"bbox":[658,264,420,40]}
+{"kind":"shape","id":"sh/xcvaxkf2","slide":5,"bbox":[658,331,18,18]}
+{"kind":"textbox","id":"sh/wbm9ofyh","slide":5,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,331,18,18]}
+{"kind":"textbox","id":"sh/re98j6xc","slide":5,"text":"Buyer-controlled data and accepted incumbent baseline","textPreview":"Buyer-controlled data and accepted incumbent baseline","textChars":53,"textLines":1,"bbox":[686,329,472,38]}
+{"kind":"shape","id":"sh/qd0ra1g7","slide":5,"bbox":[658,387,18,18]}
+{"kind":"textbox","id":"sh/g7ex4nat","slide":5,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,387,18,18]}
+{"kind":"textbox","id":"sh/h8nexsry","slide":5,"text":"Independent reproduction by a named third party","textPreview":"Independent reproduction by a named third party","textChars":47,"textLines":1,"bbox":[686,385,472,38]}
+{"kind":"shape","id":"sh/u5wf2dsn","slide":5,"bbox":[658,443,18,18]}
+{"kind":"textbox","id":"sh/v65wvi98","slide":5,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,443,18,18]}
+{"kind":"textbox","id":"sh/83ex03ah","slide":5,"text":"Measured operational or economic outcome","textPreview":"Measured operational or economic outcome","textChars":40,"textLines":1,"bbox":[686,441,472,38]}
+{"kind":"shape","id":"sh/t4net8r2","slide":5,"bbox":[658,499,18,18]}
+{"kind":"textbox","id":"sh/m1cfydsb","slide":5,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,499,18,18]}
+{"kind":"textbox","id":"sh/725wry9w","slide":5,"text":"Reference customer, contract, or production deployment","textPreview":"Reference customer, contract, or production deployment","textChars":54,"textLines":1,"bbox":[686,497,472,38]}
+{"kind":"textbox","id":"sh/szyxc7al","slide":5,"text":"No claim in this deck crosses this boundary. The application asks for the introductions and discipline needed to cross it.","textPreview":"No claim in this deck crosses this boundary. The application asks for the introductions and discipline needed to cross it.","textChars":122,"textLines":1,"bbox":[658,557,520,48]}
+{"kind":"textbox","id":"sh/d07y5cr6","slide":5,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/pkjux47y","slide":5,"text":"5/11","textPreview":"5/11","textChars":4,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"notes","id":"nt/1obl7i","slide":5,"text":""}
+{"kind":"slide","id":"sl/slble8","slide":6,"title":"BUSINESS MODEL","textShapes":22}
+{"kind":"textbox","id":"sh/2pw3idsn","slide":6,"text":"BUSINESS MODEL","textPreview":"BUSINESS MODEL","textChars":14,"textLines":1,"bbox":[56,34,500,22]}
+{"kind":"textbox","id":"sh/ps7mdsbe","slide":6,"text":"Sell the proof path before the platform","textPreview":"Sell the proof path before the platform","textChars":39,"textLines":1,"bbox":[56,64,1100,74]}
+{"kind":"textbox","id":"sh/orylknat","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1184,35,40,24]}
+{"kind":"shape","id":"sh/fm547itc","slide":6,"bbox":[56,143,1168,2]}
+{"kind":"textbox","id":"sh/elw3edsr","slide":6,"text":"Three offers create a low-friction entry, a paid validation event, and a repeatable expansion path.","textPreview":"Three offers create a low-friction entry, a paid validation event, and a repeatable expansion path.","textChars":99,"textLines":1,"bbox":[56,174,950,48]}
+{"kind":"shape","id":"sh/1onm98b2","slide":6,"bbox":[56,263,328,6]}
+{"kind":"textbox","id":"sh/gnelg3ax","slide":6,"text":"1. EVIDENCE REVIEW","textPreview":"1. EVIDENCE REVIEW","textChars":18,"textLines":1,"bbox":[56,290,328,32]}
+{"kind":"textbox","id":"sh/zi94j2tg","slide":6,"text":"$5k-$10k","textPreview":"$5k-$10k","textChars":8,"textLines":1,"bbox":[56,343,328,54]}
+{"kind":"textbox","id":"sh/yhgnqxsv","slide":6,"text":"Planning range","textPreview":"Planning range","textChars":14,"textLines":1,"bbox":[56,401,328,22]}
+{"kind":"textbox","id":"sh/kvqhkn25","slide":6,"text":"Scope the decision, lock the incumbent baseline, and produce a reviewer-ready evidence packet.","textPreview":"Scope the decision, lock the incumbent baseline, and produce a reviewer-ready evidence packet.","textChars":94,"textLines":1,"bbox":[56,449,328,104]}
+{"kind":"textbox","id":"sh/5wzyds3q","slide":6,"text":"Buyer: Technical sponsor","textPreview":"Buyer: Technical sponsor","textChars":24,"textLines":1,"bbox":[56,584,328,30]}
+{"kind":"shape","id":"sh/it8zidkf","slide":6,"bbox":[448,263,328,6]}
+{"kind":"textbox","id":"sh/juhgbil0","slide":6,"text":"2. CONTROLLED PILOT","textPreview":"2. CONTROLLED PILOT","textChars":19,"textLines":1,"bbox":[448,290,328,32]}
+{"kind":"textbox","id":"sh/wrqhgn29","slide":6,"text":"$20k-$50k","textPreview":"$20k-$50k","textChars":9,"textLines":1,"bbox":[448,343,328,54]}
+{"kind":"textbox","id":"sh/xszy983u","slide":6,"text":"Planning range","textPreview":"Planning range","textChars":14,"textLines":1,"bbox":[448,401,328,22]}
+{"kind":"textbox","id":"sh/apofedk3","slide":6,"text":"Replay on buyer-controlled data, measure against a preregistered acceptance gate, and issue a receipt.","textPreview":"Replay on buyer-controlled data, measure against a preregistered acceptance gate, and issue a receipt.","textChars":102,"textLines":1,"bbox":[448,449,328,104]}
+{"kind":"textbox","id":"sh/vqhg7ilo","slide":6,"text":"Buyer: Design partner","textPreview":"Buyer: Design partner","textChars":21,"textLines":1,"bbox":[448,584,328,30]}
+{"kind":"shape","id":"sh/836xc32d","slide":6,"bbox":[840,263,328,6]}
+{"kind":"textbox","id":"sh/9ofy583i","slide":6,"text":"3. PLATFORM LICENSE","textPreview":"3. PLATFORM LICENSE","textChars":19,"textLines":1,"bbox":[840,290,328,32]}
+{"kind":"textbox","id":"sh/pk7e94vm","slide":6,"text":"$60k-$150k / yr","textPreview":"$60k-$150k / yr","textChars":15,"textLines":1,"bbox":[840,343,328,54]}
+{"kind":"textbox","id":"sh/ojydgzu1","slide":6,"text":"Planning range","textPreview":"Planning range","textChars":14,"textLines":1,"bbox":[840,401,328,22]}
+{"kind":"textbox","id":"sh/nipw7udg","slide":6,"text":"Automate repeatable reviews, evidence custody, governance, support, and approved operating workflows.","textPreview":"Automate repeatable reviews, evidence custody, governance, support, and approved operating workflows.","textChars":101,"textLines":1,"bbox":[840,449,328,104]}
+{"kind":"textbox","id":"sh/2hgvepcv","slide":6,"text":"Buyer: Program owner","textPreview":"Buyer: Program owner","textChars":20,"textLines":1,"bbox":[840,584,328,30]}
+{"kind":"textbox","id":"sh/1w7e5kva","slide":6,"text":"All pricing is a founder-review assumption. No paid pilot, customer commitment, or contract is claimed.","textPreview":"All pricing is a founder-review assumption. No paid pilot, customer commitment, or contract is claimed.","textChars":103,"textLines":1,"bbox":[56,640,1120,22]}
+{"kind":"textbox","id":"sh/0vydcfup","slide":6,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/fu5w3adk","slide":6,"text":"6/11","textPreview":"6/11","textChars":4,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"notes","id":"nt/slble8","slide":6,"text":""}
+{"kind":"slide","id":"sl/ul3tw7","slide":7,"title":"COMPETITIVE LANDSCAPE","textShapes":17}
+{"kind":"textbox","id":"sh/atsfetsb","slide":7,"text":"COMPETITIVE LANDSCAPE","textPreview":"COMPETITIVE LANDSCAPE","textChars":21,"textLines":1,"bbox":[56,34,500,22]}
+{"kind":"textbox","id":"sh/xg3epor2","slide":7,"text":"Positioned between model tooling and audit work","textPreview":"Positioned between model tooling and audit work","textChars":47,"textLines":1,"bbox":[56,64,1100,74]}
+{"kind":"textbox","id":"sh/wfuxgjah","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1184,35,40,24]}
+{"kind":"shape","id":"sh/nq1wje9k","slide":7,"bbox":[56,143,1168,2]}
+{"kind":"textbox","id":"sh/mpsfa9sf","slide":7,"text":"The wedge is not another model leaderboard. It is an evidence operating layer for decisions that must survive review.","textPreview":"The wedge is not another model leaderboard. It is an evidence operating layer for decisions that must survive review.","textChars":117,"textLines":1,"bbox":[56,174,1030,48]}
+{"kind":"shape","id":"sh/9sjelorq","slide":7,"bbox":[150,594,760,2]}
+{"kind":"shape","id":"sh/oraxcja5","slide":7,"bbox":[150,284,2,310]}
+{"kind":"shape","id":"sh/zm1wfu9o","slide":7,"bbox":[530,284,1,310]}
+{"kind":"shape","id":"sh/el8f69s3","slide":7,"bbox":[150,439,760,1]}
+{"kind":"textbox","id":"sh/wrylonih","slide":7,"text":"LOW AUDITABILITY","textPreview":"LOW AUDITABILITY","textChars":16,"textLines":1,"bbox":[150,608,180,22]}
+{"kind":"textbox","id":"sh/xs72hsj2","slide":7,"text":"HIGH AUDITABILITY","textPreview":"HIGH AUDITABILITY","textChars":17,"textLines":1,"bbox":[730,608,180,22]}
+{"kind":"textbox","id":"sh/apg3md0b","slide":7,"text":"REPEATABLE","textPreview":"REPEATABLE","textChars":10,"textLines":1,"bbox":[73,284,60,70]}
+{"kind":"textbox","id":"sh/bqpkfi1w","slide":7,"text":"BESPOKE","textPreview":"BESPOKE","textChars":7,"textLines":1,"bbox":[73,524,60,70]}
+{"kind":"shape","id":"sh/o3ylk3i5","slide":7,"bbox":[285,495,24,24]}
+{"kind":"textbox","id":"sh/9472d8jq","slide":7,"text":"AD HOC\nANALYSIS","textPreview":"AD HOC | ANALYSIS","textChars":15,"textLines":2,"bbox":[319,487,152,48]}
+{"kind":"shape","id":"sh/m1w3itkf","slide":7,"bbox":[458,352,24,24]}
+{"kind":"textbox","id":"sh/n2pkby1k","slide":7,"text":"GENERIC\nMLOPS","textPreview":"GENERIC | MLOPS","textChars":13,"textLines":2,"bbox":[492,344,152,48]}
+{"kind":"shape","id":"sh/8zilw7ip","slide":7,"bbox":[675,475,24,24]}
+{"kind":"textbox","id":"sh/t0rmpcju","slide":7,"text":"CONSULTING /\nAUDIT PROJECT","textPreview":"CONSULTING / | AUDIT PROJECT","textChars":26,"textLines":2,"bbox":[709,467,152,48]}
+{"kind":"shape","id":"sh/hg729sbe","slide":7,"bbox":[790,330,24,24]}
+{"kind":"textbox","id":"sh/gfelg7at","slide":7,"text":"LUMENCORE\nTARGET POSITION","textPreview":"LUMENCORE | TARGET POSITION","textChars":25,"textLines":2,"bbox":[824,322,152,48]}
+{"kind":"shape","id":"sh/fe5k72t8","slide":7,"bbox":[956,282,268,312]}
+{"kind":"textbox","id":"sh/udw3exsn","slide":7,"text":"DISTINCTIVE CONTROLS","textPreview":"DISTINCTIVE CONTROLS","textChars":20,"textLines":1,"bbox":[984,310,210,20]}
+{"kind":"textbox","id":"sh/tcn25sb2","slide":7,"text":"Past-only replay\n\nFrozen baseline and metric\n\nVisible negatives and abstention\n\nHashable custody receipt\n\nHuman release gate","textPreview":"Past-only replay |  | Frozen baseline and metric |  | Visible negatives and abstention |  | Hashable custody receipt |  | Human release gate","textChars":124,"textLines":9,"bbox":[984,350,212,220]}
+{"kind":"textbox","id":"sh/sbelcnah","slide":7,"text":"Positioning hypothesis; not a market-share or superiority claim.","textPreview":"Positioning hypothesis; not a market-share or superiority claim.","textChars":64,"textLines":1,"bbox":[956,612,268,36]}
+{"kind":"textbox","id":"sh/7a5k3itw","slide":7,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/6pwjadsr","slide":7,"text":"7/11","textPreview":"7/11","textChars":4,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"notes","id":"nt/ul3tw7","slide":7,"text":""}
+{"kind":"slide","id":"sl/47lymv","slide":8,"title":"GO-TO-MARKET","textShapes":20}
+{"kind":"textbox","id":"sh/d0vmdgv2","slide":8,"text":"GO-TO-MARKET","textPreview":"GO-TO-MARKET","textChars":12,"textLines":1,"bbox":[56,34,500,22]}
+{"kind":"textbox","id":"sh/qdk321cb","slide":8,"text":"Qualify one hard problem, prove it, then expand","textPreview":"Qualify one hard problem, prove it, then expand","textChars":47,"textLines":1,"bbox":[56,64,1100,74]}
+{"kind":"textbox","id":"sh/ret4b6dw","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1184,35,40,24]}
+{"kind":"shape","id":"sh/4b2l0ru5","slide":8,"bbox":[56,143,1168,2]}
+{"kind":"textbox","id":"sh/5cbm9wvq","slide":8,"text":"The near-term objective is one serious design partner with controlled data and an accepted incumbent baseline.","textPreview":"The near-term objective is one serious design partner with controlled data and an accepted incumbent baseline.","textChars":110,"textLines":1,"bbox":[56,174,1050,50]}
+{"kind":"shape","id":"sh/i9k3y1cf","slide":8,"bbox":[80,292,300,238]}
+{"kind":"shape","id":"sh/3at47md0","slide":8,"bbox":[440,292,300,238]}
+{"kind":"shape","id":"sh/o765cvup","slide":8,"bbox":[800,292,300,238]}
+{"kind":"shape","id":"sh/p8jy9cb2","slide":8,"bbox":[380,411,60,0]}
+{"kind":"shape","id":"sh/o7ah07ah","slide":8,"bbox":[740,411,60,0]}
+{"kind":"textbox","id":"sh/c32doji1","slide":8,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[104,314,50,24]}
+{"kind":"textbox","id":"sh/r2twve1w","slide":8,"text":"QUALIFY","textPreview":"QUALIFY","textChars":7,"textLines":1,"bbox":[104,350,250,38]}
+{"kind":"textbox","id":"sh/q1kvm90b","slide":8,"text":"Confirm the owner, decision, data rights, baseline, cost of error, and approval path.","textPreview":"Confirm the owner, decision, data rights, baseline, cost of error, and approval path.","textChars":85,"textLines":1,"bbox":[104,407,250,74]}
+{"kind":"textbox","id":"sh/pgbetojq","slide":8,"text":"Gate: written problem + baseline","textPreview":"Gate: written problem + baseline","textChars":32,"textLines":1,"bbox":[104,492,250,26]}
+{"kind":"textbox","id":"sh/4f2dkji5","slide":8,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[464,314,50,24]}
+{"kind":"textbox","id":"sh/3etwre1k","slide":8,"text":"PROVE","textPreview":"PROVE","textChars":5,"textLines":1,"bbox":[464,350,250,38]}
+{"kind":"textbox","id":"sh/2d0vi90z","slide":8,"text":"Run a preregistered replay on buyer-controlled data and preserve every favorable and unfavorable result.","textPreview":"Run a preregistered replay on buyer-controlled data and preserve every favorable and unfavorable result.","textChars":104,"textLines":1,"bbox":[464,407,250,74]}
+{"kind":"textbox","id":"sh/9cve58ju","slide":8,"text":"Gate: accepted evidence receipt","textPreview":"Gate: accepted evidence receipt","textChars":31,"textLines":1,"bbox":[464,492,250,26]}
+{"kind":"textbox","id":"sh/obmdw3i9","slide":8,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[824,314,50,24]}
+{"kind":"textbox","id":"sh/8fuxsrql","slide":8,"text":"EXPAND","textPreview":"EXPAND","textChars":6,"textLines":1,"bbox":[824,350,250,38]}
+{"kind":"textbox","id":"sh/tg3y1cr6","slide":8,"text":"Convert the accepted pilot into repeatable workflows, annual support, and adjacent decisions.","textPreview":"Convert the accepted pilot into repeatable workflows, annual support, and adjacent decisions.","textChars":93,"textLines":1,"bbox":[824,407,250,74]}
+{"kind":"textbox","id":"sh/mdcfqh8f","slide":8,"text":"Gate: paid renewal or license","textPreview":"Gate: paid renewal or license","textChars":29,"textLines":1,"bbox":[824,492,250,26]}
+{"kind":"shape","id":"sh/7elgzm90","slide":8,"bbox":[80,580,122,34]}
+{"kind":"textbox","id":"sh/kbuxo7qp","slide":8,"text":"90-DAY FOCUS","textPreview":"90-DAY FOCUS","textChars":12,"textLines":1,"bbox":[80,580,122,34]}
+{"kind":"textbox","id":"sh/lc3yxcru","slide":8,"text":"10 qualified conversations  |  3 controlled-data design sessions  |  1 paid or independently reproduced pilot","textPreview":"10 qualified conversations  |  3 controlled-data design sessions  |  1 paid or independently reproduced pilot","textChars":109,"textLines":1,"bbox":[222,580,858,34]}
+{"kind":"textbox","id":"sh/y9sfmx8j","slide":8,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/zalgv294","slide":8,"text":"8/11","textPreview":"8/11","textChars":4,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"notes","id":"nt/47lymv","slide":8,"text":""}
+{"kind":"slide","id":"sl/ujaifb","slide":9,"title":"EVIDENCE POSTURE","textShapes":27}
+{"kind":"textbox","id":"sh/po3ypsfy","slide":9,"text":"EVIDENCE POSTURE","textPreview":"EVIDENCE POSTURE","textChars":16,"textLines":1,"bbox":[56,34,500,22]}
+{"kind":"textbox","id":"sh/2lcfedgn","slide":9,"text":"The MVP is real; the next value gate is external","textPreview":"The MVP is real; the next value gate is external","textChars":48,"textLines":1,"bbox":[56,64,1100,74]}
+{"kind":"textbox","id":"sh/3mlgnix8","slide":9,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1184,35,40,24]}
+{"kind":"shape","id":"sh/crehknep","slide":9,"bbox":[56,143,1168,2]}
+{"kind":"shape","id":"sh/dsnytsfa","slide":9,"bbox":[56,174,540,442]}
+{"kind":"shape","id":"sh/qpczixgj","slide":9,"bbox":[86,202,238,32]}
+{"kind":"textbox","id":"sh/bq5grix4","slide":9,"text":"PROVEN IN CURRENT ARTIFACTS","textPreview":"PROVEN IN CURRENT ARTIFACTS","textChars":27,"textLines":1,"bbox":[86,202,238,32]}
+{"kind":"textbox","id":"sh/svax83yl","slide":9,"text":"Working review room","textPreview":"Working review room","textChars":19,"textLines":1,"bbox":[86,264,420,40]}
+{"kind":"shape","id":"sh/twjyh8fq","slide":9,"bbox":[86,331,18,18]}
+{"kind":"textbox","id":"sh/lgrutwje","slide":9,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,331,18,18]}
+{"kind":"textbox","id":"sh/kfit0r2t","slide":9,"text":"Canonical review cards and evidence artifacts present","textPreview":"Canonical review cards and evidence artifacts present","textChars":53,"textLines":1,"bbox":[114,329,422,38]}
+{"kind":"shape","id":"sh/je9srm18","slide":9,"bbox":[86,387,18,18]}
+{"kind":"textbox","id":"sh/ydgbyhkn","slide":9,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,387,18,18]}
+{"kind":"textbox","id":"sh/tkruxgja","slide":9,"text":"Claim gates separate outreach from field validation","textPreview":"Claim gates separate outreach from field validation","textChars":51,"textLines":1,"bbox":[114,385,422,38]}
+{"kind":"shape","id":"sh/8jit4b2p","slide":9,"bbox":[86,443,18,18]}
+{"kind":"textbox","id":"sh/7i9cv614","slide":9,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,443,18,18]}
+{"kind":"textbox","id":"sh/6h0b21kj","slide":9,"text":"Hashable packets and custody records are supported","textPreview":"Hashable packets and custody records are supported","textChars":50,"textLines":1,"bbox":[114,441,422,38]}
+{"kind":"shape","id":"sh/h8bu1gj6","slide":9,"bbox":[86,499,18,18]}
+{"kind":"textbox","id":"sh/g72t8b21","slide":9,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,499,18,18]}
+{"kind":"textbox","id":"sh/03u5kju9","slide":9,"text":"Negative-result and abstention states remain visible","textPreview":"Negative-result and abstention states remain visible","textChars":52,"textLines":1,"bbox":[114,497,422,38]}
+{"kind":"textbox","id":"sh/1o3mtovu","slide":9,"text":"What this supports today: a bounded buyer conversation and a reproducible pilot design.","textPreview":"What this supports today: a bounded buyer conversation and a reproducible pilot design.","textChars":87,"textLines":1,"bbox":[86,557,454,48]}
+{"kind":"shape","id":"sh/e1sni9c3","slide":9,"bbox":[628,174,596,442]}
+{"kind":"shape","id":"sh/f214redo","slide":9,"bbox":[658,202,226,32]}
+{"kind":"textbox","id":"sh/oru5o3u5","slide":9,"text":"REQUIRES OUTSIDE EVIDENCE","textPreview":"REQUIRES OUTSIDE EVIDENCE","textChars":25,"textLines":1,"bbox":[658,202,226,32]}
+{"kind":"textbox","id":"sh/ps3mxovq","slide":9,"text":"Field validation","textPreview":"Field validation","textChars":16,"textLines":1,"bbox":[658,264,420,40]}
+{"kind":"shape","id":"sh/2pcnmtcf","slide":9,"bbox":[658,331,18,18]}
+{"kind":"textbox","id":"sh/nql4vyd0","slide":9,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,331,18,18]}
+{"kind":"textbox","id":"sh/4valcze1","slide":9,"text":"Buyer-controlled data and accepted incumbent baseline","textPreview":"Buyer-controlled data and accepted incumbent baseline","textChars":53,"textLines":1,"bbox":[686,329,472,38]}
+{"kind":"shape","id":"sh/5wjml4vm","slide":9,"bbox":[658,387,18,18]}
+{"kind":"textbox","id":"sh/7qp8r2x4","slide":9,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,387,18,18]}
+{"kind":"textbox","id":"sh/6pg7yxwj","slide":9,"text":"Independent reproduction by a named third party","textPreview":"Independent reproduction by a named third party","textChars":47,"textLines":1,"bbox":[686,385,472,38]}
+{"kind":"shape","id":"sh/ts7qtcfa","slide":9,"bbox":[658,443,18,18]}
+{"kind":"textbox","id":"sh/8ryp07ep","slide":9,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,443,18,18]}
+{"kind":"textbox","id":"sh/jmp8n2x8","slide":9,"text":"Measured operational or economic outcome","textPreview":"Measured operational or economic outcome","textChars":40,"textLines":1,"bbox":[686,441,472,38]}
+{"kind":"shape","id":"sh/ylw7uxwn","slide":9,"bbox":[658,499,18,18]}
+{"kind":"textbox","id":"sh/lo7qpsfy","slide":9,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,499,18,18]}
+{"kind":"textbox","id":"sh/knypwned","slide":9,"text":"Reference customer, contract, or production deployment","textPreview":"Reference customer, contract, or production deployment","textChars":54,"textLines":1,"bbox":[686,497,472,38]}
+{"kind":"textbox","id":"sh/bi5ojixw","slide":9,"text":"No claim in this deck crosses this boundary. The application asks for the introductions and discipline needed to cross it.","textPreview":"No claim in this deck crosses this boundary. The application asks for the introductions and discipline needed to cross it.","textChars":122,"textLines":1,"bbox":[658,557,520,48]}
+{"kind":"textbox","id":"sh/axw7qdwb","slide":9,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/q5gbulcv","slide":9,"text":"5/11","textPreview":"5/11","textChars":4,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"notes","id":"nt/ujaifb","slide":9,"text":""}
+{"kind":"slide","id":"sl/uh3g6u","slide":10,"title":"EVIDENCE POSTURE","textShapes":27}
+{"kind":"textbox","id":"sh/8nah8ryt","slide":10,"text":"EVIDENCE POSTURE","textPreview":"EVIDENCE POSTURE","textChars":16,"textLines":1,"bbox":[56,34,500,22]}
+{"kind":"textbox","id":"sh/nm10fmxo","slide":10,"text":"The MVP is real; the next value gate is external","textPreview":"The MVP is real; the next value gate is external","textChars":48,"textLines":1,"bbox":[56,64,1100,74]}
+{"kind":"textbox","id":"sh/mlsz6hg3","slide":10,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1184,35,40,24]}
+{"kind":"shape","id":"sh/lkjidcfi","slide":10,"bbox":[56,143,1168,2]}
+{"kind":"shape","id":"sh/0zah47yx","slide":10,"bbox":[56,174,540,442]}
+{"kind":"shape","id":"sh/zyh0b2xc","slide":10,"bbox":[86,202,238,32]}
+{"kind":"textbox","id":"sh/yx8z2hgr","slide":10,"text":"PROVEN IN CURRENT ARTIFACTS","textPreview":"PROVEN IN CURRENT ARTIFACTS","textChars":27,"textLines":1,"bbox":[86,202,238,32]}
+{"kind":"textbox","id":"sh/5g3ipgfm","slide":10,"text":"Working review room","textPreview":"Working review room","textChars":19,"textLines":1,"bbox":[86,264,420,40]}
+{"kind":"shape","id":"sh/kvu1gby1","slide":10,"bbox":[86,331,18,18]}
+{"kind":"textbox","id":"sh/i5gzip8j","slide":10,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,331,18,18]}
+{"kind":"textbox","id":"sh/j6pgrupo","slide":10,"text":"Canonical review cards and evidence artifacts present","textPreview":"Canonical review cards and evidence artifacts present","textChars":53,"textLines":1,"bbox":[114,329,422,38]}
+{"kind":"shape","id":"sh/47yhkzq9","slide":10,"bbox":[86,387,18,18]}
+{"kind":"textbox","id":"sh/587ytk7u","slide":10,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,387,18,18]}
+{"kind":"textbox","id":"sh/u1wfe587","slide":10,"text":"Claim gates separate outreach from field validation","textPreview":"Claim gates separate outreach from field validation","textChars":51,"textLines":1,"bbox":[114,385,422,38]}
+{"kind":"shape","id":"sh/v2pgnaps","slide":10,"bbox":[86,443,18,18]}
+{"kind":"textbox","id":"sh/w3yhgfqd","slide":10,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,443,18,18]}
+{"kind":"textbox","id":"sh/h47ypk7y","slide":10,"text":"Hashable packets and custody records are supported","textPreview":"Hashable packets and custody records are supported","textChars":50,"textLines":1,"bbox":[114,441,422,38]}
+{"kind":"shape","id":"sh/ex0zq98r","slide":10,"bbox":[86,499,18,18]}
+{"kind":"textbox","id":"sh/fy9gzepw","slide":10,"text":"Y","textPreview":"Y","textChars":1,"textLines":1,"bbox":[86,499,18,18]}
+{"kind":"textbox","id":"sh/bi1wr65o","slide":10,"text":"Negative-result and abstention states remain visible","textPreview":"Negative-result and abstention states remain visible","textChars":52,"textLines":1,"bbox":[114,497,422,38]}
+{"kind":"textbox","id":"sh/qhsvi1o3","slide":10,"text":"What this supports today: a bounded buyer conversation and a reproducible pilot design.","textPreview":"What this supports today: a bounded buyer conversation and a reproducible pilot design.","textChars":87,"textLines":1,"bbox":[86,557,454,48]}
+{"kind":"shape","id":"sh/xk3etwne","slide":10,"bbox":[628,174,596,442]}
+{"kind":"shape","id":"sh/cjudkb6t","slide":10,"bbox":[658,202,226,32]}
+{"kind":"textbox","id":"sh/z6lwv65k","slide":10,"text":"REQUIRES OUTSIDE EVIDENCE","textPreview":"REQUIRES OUTSIDE EVIDENCE","textChars":25,"textLines":1,"bbox":[658,202,226,32]}
+{"kind":"textbox","id":"sh/y5cvm1oz","slide":10,"text":"Field validation","textPreview":"Field validation","textChars":16,"textLines":1,"bbox":[658,264,420,40]}
+{"kind":"shape","id":"sh/l83exgnq","slide":10,"bbox":[658,331,18,18]}
+{"kind":"textbox","id":"sh/k7udob65","slide":10,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,331,18,18]}
+{"kind":"textbox","id":"sh/7alwzq5g","slide":10,"text":"Buyer-controlled data and accepted incumbent baseline","textPreview":"Buyer-controlled data and accepted incumbent baseline","textChars":53,"textLines":1,"bbox":[686,329,472,38]}
+{"kind":"shape","id":"sh/m9cvqlob","slide":10,"bbox":[658,387,18,18]}
+{"kind":"textbox","id":"sh/4fedgv29","slide":10,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,387,18,18]}
+{"kind":"textbox","id":"sh/5gnu903u","slide":10,"text":"Independent reproduction by a named third party","textPreview":"Independent reproduction by a named third party","textChars":47,"textLines":1,"bbox":[686,385,472,38]}
+{"kind":"shape","id":"sh/idwvelk3","slide":10,"bbox":[658,443,18,18]}
+{"kind":"textbox","id":"sh/je5c7qlo","slide":10,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,443,18,18]}
+{"kind":"textbox","id":"sh/wbedcb2d","slide":10,"text":"Measured operational or economic outcome","textPreview":"Measured operational or economic outcome","textChars":40,"textLines":1,"bbox":[686,441,472,38]}
+{"kind":"shape","id":"sh/hcnu5g3y","slide":10,"bbox":[658,499,18,18]}
+{"kind":"textbox","id":"sh/u9cvalk7","slide":10,"text":"!","textPreview":"!","textChars":1,"textLines":1,"bbox":[658,499,18,18]}
+{"kind":"textbox","id":"sh/va5c36ls","slide":10,"text":"Reference customer, contract, or production deployment","textPreview":"Reference customer, contract, or production deployment","textChars":54,"textLines":1,"bbox":[686,497,472,38]}
+{"kind":"textbox","id":"sh/87ut8b21","slide":10,"text":"No claim in this deck crosses this boundary. The application asks for the introductions and discipline needed to cross it.","textPreview":"No claim in this deck crosses this boundary. The application asks for the introductions and discipline needed to cross it.","textChars":122,"textLines":1,"bbox":[658,557,520,48]}
+{"kind":"textbox","id":"sh/983u1g3m","slide":10,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/dsja9cje","slide":10,"text":"5/11","textPreview":"5/11","textChars":4,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"notes","id":"nt/uh3g6u","slide":10,"text":""}
+{"kind":"slide","id":"sl/1cgyaw","slide":11,"title":"THE ASK","textShapes":16}
+{"kind":"shape","id":"sh/ipwr2x47","slide":11,"bbox":[56,46,104,6]}
+{"kind":"textbox","id":"sh/5snaxc3y","slide":11,"text":"THE ASK","textPreview":"THE ASK","textChars":7,"textLines":1,"bbox":[56,76,200,28]}
+{"kind":"textbox","id":"sh/4re947md","slide":11,"text":"Help us earn the first\nindependent proof receipt.","textPreview":"Help us earn the first | independent proof receipt.","textChars":49,"textLines":2,"bbox":[56,128,720,152]}
+{"kind":"textbox","id":"sh/rupszmlo","slide":11,"text":"LumenCore is ready for the next disciplined step: one buyer, one accepted baseline, one controlled dataset, and one result that another party can reproduce.","textPreview":"LumenCore is ready for the next disciplined step: one buyer, one accepted baseline, one controlled dataset, and one result that another p...","textChars":156,"textLines":1,"bbox":[56,326,666,112]}
+{"kind":"shape","id":"sh/qtwr6h4j","slide":11,"bbox":[806,86,418,480]}
+{"kind":"textbox","id":"sh/dw7a1c3u","slide":11,"text":"WHAT WE NEED FROM LAUNCHTN","textPreview":"WHAT WE NEED FROM LAUNCHTN","textChars":26,"textLines":1,"bbox":[840,122,326,20]}
+{"kind":"textbox","id":"sh/svy98rm9","slide":11,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[840,184,38,24]}
+{"kind":"textbox","id":"sh/fyps3ml0","slide":11,"text":"Buyer introductions in energy and infrastructure","textPreview":"Buyer introductions in energy and infrastructure","textChars":48,"textLines":1,"bbox":[894,184,286,54]}
+{"kind":"shape","id":"sh/exgrah4f","slide":11,"bbox":[840,248,340,1]}
+{"kind":"textbox","id":"sh/wrm1w7yp","slide":11,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[840,266,38,24]}
+{"kind":"textbox","id":"sh/hsf2pcza","slide":11,"text":"Pricing and pilot-scope discipline","textPreview":"Pricing and pilot-scope discipline","textChars":34,"textLines":1,"bbox":[894,266,286,54]}
+{"kind":"shape","id":"sh/up4jux0j","slide":11,"bbox":[840,330,340,1]}
+{"kind":"textbox","id":"sh/vqdkn2h4","slide":11,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[840,348,38,24]}
+{"kind":"textbox","id":"sh/4f610ry1","slide":11,"text":"Pitch coaching grounded in evidence","textPreview":"Pitch coaching grounded in evidence","textChars":35,"textLines":1,"bbox":[894,348,286,54]}
+{"kind":"shape","id":"sh/5gf2twz6","slide":11,"bbox":[840,412,340,1]}
+{"kind":"textbox","id":"sh/itojyhgv","slide":11,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[840,430,38,24]}
+{"kind":"textbox","id":"sh/juxkrmhg","slide":11,"text":"3686 exposure to serious design partners","textPreview":"3686 exposure to serious design partners","textChars":40,"textLines":1,"bbox":[894,430,286,54]}
+{"kind":"textbox","id":"sh/sjql4ryx","slide":11,"text":"Robert Ashworth | Founder, LumenCore","textPreview":"Robert Ashworth | Founder, LumenCore","textChars":36,"textLines":1,"bbox":[56,544,560,34]}
+{"kind":"textbox","id":"sh/tkz2xwzi","slide":11,"text":"Working MVP. Honest boundaries. External validation next.","textPreview":"Working MVP. Honest boundaries. External validation next.","textChars":57,"textLines":1,"bbox":[56,590,640,34]}
+{"kind":"textbox","id":"sh/10v2hwrm","slide":11,"text":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textPreview":"LUMENCORE | 3686 PITCH APPLICATION | 2026-07-17","textChars":47,"textLines":1,"bbox":[56,683,600,18]}
+{"kind":"textbox","id":"sh/0zm1orq1","slide":11,"text":"11/11","textPreview":"11/11","textChars":5,"textLines":1,"bbox":[1162,683,62,18]}
+{"kind":"notes","id":"nt/1cgyaw","slide":11,"text":""}

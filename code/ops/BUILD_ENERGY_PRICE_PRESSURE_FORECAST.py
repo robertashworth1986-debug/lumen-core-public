@@ -35,11 +35,12 @@ DASHBOARD_JSON = DASHBOARD_DATA / "energy_price_pressure_forecast.json"
 OUT_MD = DOCS / "ENERGY_PRICE_PRESSURE_FORECAST_2026-06-25.md"
 
 EVIDENCE_BOUNDARY = (
-    "This is a live measured energy price-pressure proxy, not an actual wholesale power price "
-    "forecast and not a real-dollar savings claim. It uses EIA grid demand/generation, EIA "
-    "day-ahead demand snapshot rows, nuclear outage stress, FRED macro series, and current "
-    "geometry replay evidence. To unlock real price and dollar claims, connect ISO/RTO LMP "
-    "or other auditable electricity price settlement data and run walk-forward validation."
+    "This is a historical measured energy-system stress proxy, not a wholesale power-price "
+    "forecast, price-pressure validation, or real-dollar savings claim. It combines EIA grid "
+    "demand/generation, EIA day-ahead demand rows, nuclear-outage stress, FRED macro series, "
+    "and current geometry context. The demand-residual comparison is exploratory and has not "
+    "passed a registered all-baseline or multiplicity-controlled promotion gate. ISO/RTO LMP "
+    "or settlement data with auditable timestamps is required for any price claim."
 )
 
 
@@ -386,9 +387,21 @@ def walk_forward_backtest(rows: list[dict[str, Any]]) -> dict[str, Any]:
             },
         },
         "best_named_baseline": best_named_baseline[0],
-        "phase_locked_improvement_vs_best_named_baseline_pct": round(improvement_vs_best, 6),
-        "phase_locked_beats_best_named_baseline": improvement_vs_best > 0.0,
-        "claim_language": "Walk-forward demand/pressure proxy only; not actual LMP, not realized revenue.",
+        "exploratory_demand_proxy_improvement_vs_best_named_baseline_pct": round(
+            improvement_vs_best, 6
+        ),
+        "exploratory_demand_proxy_mean_error_lower_than_best_named_baseline": (
+            improvement_vs_best > 0.0
+        ),
+        "phase_locked_improvement_vs_best_named_baseline_pct": 0.0,
+        "phase_locked_beats_best_named_baseline": False,
+        "all_registered_baselines_evaluated": False,
+        "multiplicity_controlled_promotion_passed": False,
+        "promotion_eligible": False,
+        "claim_language": (
+            "Exploratory causal walk-forward demand-residual diagnostic only. "
+            "It is not an actual LMP forecast, a promoted model, or realized revenue."
+        ),
     }
 
 
@@ -512,9 +525,12 @@ def build_markdown(payload: dict[str, Any]) -> str:
         f"- Hourly grid rows: {summary['hourly_grid_rows']}",
         f"- Forecast rows generated: {summary['forecast_rows']}",
         f"- Price-pressure max band: {summary['max_pressure_band']}",
-        f"- Phase-locked model beats best named baseline: {summary['phase_locked_beats_best_named_baseline']}",
-        f"- Improvement vs best named baseline: {summary['phase_locked_improvement_vs_best_named_baseline_pct']}%",
+        f"- Promoted model beats best named baseline: {summary['phase_locked_beats_best_named_baseline']}",
+        f"- Exploratory demand-proxy MAE improvement: {summary['exploratory_demand_proxy_improvement_pct']}%",
+        f"- Multiplicity-controlled promotion passed: {summary['multiplicity_controlled_promotion_passed']}",
         f"- Actual electricity price series connected: {summary['actual_electricity_price_series_connected']}",
+        f"- Ready for price-pressure claim: {summary['ready_for_price_pressure_claim']}",
+        f"- Energy-stress proxy description allowed: {summary['energy_stress_proxy_description_allowed']}",
         f"- Ready for real dollar claim: {summary['ready_for_real_dollar_claim']}",
         "",
         "## Walk-Forward Demand Proxy Backtest",
@@ -537,8 +553,8 @@ def build_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Claim Gate",
             "",
-            "- Use now: measured live-breadth energy pressure proxy, dashboard signal, grant evidence artifact.",
-            "- Do not claim yet: realized savings, field validation, actual LMP price forecast, live trading alpha, or guaranteed award outcome.",
+            "- Use now: historical measured energy-system stress proxy and exploratory demand-residual diagnostic, with the limits stated beside it.",
+            "- Do not claim yet: a price forecast, price-pressure validation, promoted-model superiority, realized savings, field validation, live trading alpha, or guaranteed award outcome.",
             "- Unlock next: connect ISO/RTO LMP settlement data and run the same walk-forward harness against actual prices.",
         ]
     )
@@ -569,7 +585,10 @@ def build_payload() -> dict[str, Any]:
     payload: dict[str, Any] = {
         "schema": "energy_price_pressure_forecast.v1",
         "generated_utc": now_utc(),
-        "purpose": "Reviewer-safe live energy pressure prediction evidence bridge.",
+        "purpose": (
+            "Reviewer-safe historical energy-system stress proxy and exploratory "
+            "demand-residual diagnostic."
+        ),
         "evidence_boundary": EVIDENCE_BOUNDARY,
         "inputs": {
             "hourly_grid_csv": str(GRID_HOURLY_CSV.relative_to(ROOT)),
@@ -592,8 +611,24 @@ def build_payload() -> dict[str, Any]:
             "phase_locked_improvement_vs_best_named_baseline_pct": backtest.get(
                 "phase_locked_improvement_vs_best_named_baseline_pct", 0.0
             ),
+            "exploratory_demand_proxy_mean_error_lower_than_best_named_baseline": bool(
+                backtest.get(
+                    "exploratory_demand_proxy_mean_error_lower_than_best_named_baseline"
+                )
+            ),
+            "exploratory_demand_proxy_improvement_pct": backtest.get(
+                "exploratory_demand_proxy_improvement_vs_best_named_baseline_pct",
+                0.0,
+            ),
+            "all_registered_baselines_evaluated": False,
+            "multiplicity_controlled_promotion_passed": False,
             "actual_electricity_price_series_connected": False,
-            "ready_for_price_pressure_claim": bool(hourly_rows and forecast_rows),
+            "actual_price_forecast_row_count": 0,
+            "forecast_rows_are_actual_price_forecasts": False,
+            "ready_for_price_pressure_claim": False,
+            "energy_stress_proxy_description_allowed": bool(
+                hourly_rows and forecast_rows
+            ),
             "ready_for_real_dollar_claim": False,
             "ready_for_field_validation_claim": False,
             "kraken_live_execution_allowed": False,
@@ -609,16 +644,23 @@ def build_payload() -> dict[str, Any]:
         "forecast_rows": forecast_rows,
         "claim_gate": {
             "can_say": [
-                "The system runs a measured energy price-pressure proxy over EIA grid rows.",
-                "The system performs walk-forward demand/pressure error checks against named baselines.",
+                "The system computes a historical measured energy-system stress proxy over EIA grid rows.",
+                "The system performs an exploratory causal walk-forward demand-residual diagnostic against two named baselines.",
                 "The output is reproducible, timestamped, and hashable.",
             ],
             "cannot_say_yet": [
+                "The proxy is validated as a price-pressure forecast.",
                 "Actual wholesale electricity prices were predicted.",
+                "The residual corrector is a promoted champion or beats a complete baseline gauntlet.",
                 "Real customer savings were achieved.",
                 "The system is field validated.",
                 "The system is cleared for live trading or automated energy market execution.",
             ],
+            "energy_stress_proxy_description_allowed": bool(
+                hourly_rows and forecast_rows
+            ),
+            "price_forecast_claim_allowed": False,
+            "model_promotion_claim_allowed": False,
             "next_feed_to_unlock_dollar_claims": "ISO/RTO LMP or settlement price history with auditable timestamps.",
         },
     }

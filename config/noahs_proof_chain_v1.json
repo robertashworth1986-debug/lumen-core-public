@@ -1,0 +1,577 @@
+{
+  "schema": "noahs_proof_chain_config.v1",
+  "architecture_name": "NOAHS",
+  "version": 1,
+  "prepared_date": "2026-07-25",
+  "purpose": "Fail-closed reviewer control for the complete LumenCore proof chain. The control verifies custody and readiness only; it never converts internal evidence into a performance claim.",
+  "policies": {
+    "all_links_required": true,
+    "allow_network_access": false,
+    "allow_file_mutation": false,
+    "allow_external_action": false,
+    "allow_symlink_following": false,
+    "infer_performance_from_internal_receipts": false
+  },
+  "no_claim_boundaries": {
+    "performance_claim_allowed": false,
+    "field_validation_claim_allowed": false,
+    "realized_savings_claim_allowed": false,
+    "production_readiness_claim_allowed": false,
+    "government_or_customer_endorsement_claim_allowed": false,
+    "patent_validity_or_scope_claim_allowed": false,
+    "trading_edge_claim_allowed": false,
+    "universal_superiority_claim_allowed": false,
+    "statement": "NOAHS verifies evidence custody, freshness, consistency, preregistration, and independent-validation gates. It does not establish model skill, field performance, realized savings, deployment readiness, patent scope, trading results, an award, or endorsement."
+  },
+  "links": [
+    {
+      "id": "public_front_door",
+      "label": "Public front door",
+      "required": true,
+      "claim_boundary": "A local page and a prior reachability receipt do not prove that the current public endpoint is reachable or current.",
+      "artifacts": [
+        {
+          "id": "proof_to_pilot_page",
+          "path": "dashboard/proof_to_pilot.html",
+          "min_bytes": 1
+        },
+        {
+          "id": "live_domain_receipt",
+          "path": "out/ops/live_domain_deployment_feed_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 24,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        },
+        {
+          "id": "live_domain_service_contract",
+          "path": "out/ops/live_domain_service_contract_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 24,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "front_door_receipt_state",
+          "type": "json_fields",
+          "artifact": "out/ops/live_domain_deployment_feed_latest.json",
+          "requirements": [
+            {
+              "field": "live_check_performed",
+              "operator": "is_true"
+            },
+            {
+              "field": "summary.domain_deployment_state",
+              "operator": "equals",
+              "expected": "LIVE_DOMAIN_HASH_VERIFIED"
+            },
+            {
+              "field": "summary.required_remote_stale_or_missing_count",
+              "operator": "equals",
+              "expected": 0
+            }
+          ]
+        },
+        {
+          "id": "front_door_service_contract",
+          "type": "json_fields",
+          "artifact": "out/ops/live_domain_service_contract_latest.json",
+          "mismatch_code": "LIVE_DOMAIN_SERVICE_CONTRACT_BLOCKED",
+          "requirements": [
+            {
+              "field": "live_check_performed",
+              "operator": "is_true"
+            },
+            {
+              "field": "summary.contract_pass",
+              "operator": "is_true"
+            },
+            {
+              "field": "summary.failed_endpoint_count",
+              "operator": "equals",
+              "expected": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "publication_custody",
+      "label": "Publication custody",
+      "required": true,
+      "claim_boundary": "A historical deployment receipt expires when a required local feed changes or when current remote custody is not freshly verified.",
+      "artifacts": [
+        {
+          "id": "publication_manifest",
+          "path": "out/ops/live_domain_deployment_feed_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 24,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "required_publication_feed_hashes",
+          "type": "manifest_entries",
+          "artifact": "out/ops/live_domain_deployment_feed_latest.json",
+          "array_fields": [
+            "feeds"
+          ],
+          "path_field": "local_relative_path",
+          "sha256_field": "local_sha256",
+          "bytes_field": "local_bytes",
+          "required_field": "required",
+          "required_value": true,
+          "min_entries": 14,
+          "drift_code": "PUBLICATION_CUSTODY_DRIFT"
+        }
+      ]
+    },
+    {
+      "id": "current_source_breadth",
+      "label": "Current source breadth",
+      "required": true,
+      "claim_boundary": "Fresh source probes establish bounded intake breadth only. They do not establish source authority, model skill, or external validation.",
+      "artifacts": [
+        {
+          "id": "current_source_registry",
+          "path": "config/live_source_registry.json",
+          "min_bytes": 1,
+          "max_age_hours": 48,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "source_registry_semantics",
+          "type": "source_registry",
+          "artifact": "config/live_source_registry.json",
+          "min_enabled_sources": 1,
+          "min_measured_sources": 1,
+          "min_measured_rows": 1,
+          "min_measured_coverage": 0.5
+        }
+      ]
+    },
+    {
+      "id": "baseline_custody_completeness",
+      "label": "Baseline custody and completeness",
+      "required": true,
+      "claim_boundary": "A candidate cannot be described as clearing the named-baseline gate when the locked replay body is absent or the declared baseline set is incomplete.",
+      "artifacts": [
+        {
+          "id": "baseline_coverage",
+          "path": "out/ops/baseline_gauntlet_coverage_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 168,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        },
+        {
+          "id": "locked_replay_body",
+          "path": "out/ops/locked_source_baseline_replay_sweep_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 168,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "baseline_set_complete",
+          "type": "baseline_completeness",
+          "coverage_artifact": "out/ops/baseline_gauntlet_coverage_latest.json",
+          "replay_artifact": "out/ops/locked_source_baseline_replay_sweep_latest.json"
+        }
+      ]
+    },
+    {
+      "id": "champion_metric_custody",
+      "label": "Champion metric custody",
+      "required": true,
+      "claim_boundary": "A verified internal holdout chain supports only the declared internal comparison and proxy metrics. It does not establish field or economic performance.",
+      "artifacts": [
+        {
+          "id": "champion_holdouts",
+          "path": "out/ops/kuramoto_holdout_expansion_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 168,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        },
+        {
+          "id": "accepted_metric_audit",
+          "path": "out/ops/kuramoto_accepted_metric_audit_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 168,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "champion_embedded_seals",
+          "type": "champion_custody",
+          "holdout_artifact": "out/ops/kuramoto_holdout_expansion_latest.json",
+          "audit_artifact": "out/ops/kuramoto_accepted_metric_audit_latest.json"
+        }
+      ]
+    },
+    {
+      "id": "current_row_seal",
+      "label": "Current-row seal",
+      "required": true,
+      "claim_boundary": "Continuity-only rows and unhashed probes cannot be counted as current hash-backed measured rows.",
+      "artifacts": [
+        {
+          "id": "measurement_maximizer",
+          "path": "out/ops/live_source_measurement_maximizer_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 48,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        },
+        {
+          "id": "measured_source_register",
+          "path": "out/ops/measured_source_evidence_register_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 48,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "measured_snapshot_seals",
+          "type": "measurement_snapshot_seals",
+          "artifact": "out/ops/live_source_measurement_maximizer_latest.json"
+        },
+        {
+          "id": "register_reconciliation_closed",
+          "type": "json_fields",
+          "artifact": "out/ops/measured_source_evidence_register_latest.json",
+          "mismatch_code": "CURRENT_ROW_RECONCILIATION_OPEN",
+          "requirements": [
+            {
+              "field": "summary.reconciliation_required",
+              "operator": "is_false"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "preregistered_sample_gates",
+      "label": "Preregistered sample gates",
+      "required": true,
+      "claim_boundary": "Append-only predictions and settlements are collection evidence. No result is promoted until the frozen sample gate is satisfied.",
+      "artifacts": [
+        {
+          "id": "hourly_protocol",
+          "path": "config/eia_grid_prospective_hourly_router_protocol_v1.json",
+          "min_bytes": 1,
+          "expected_sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5",
+          "hash_mode": "utf8_lf"
+        },
+        {
+          "id": "hourly_status",
+          "path": "out/eia_grid_prospective_hourly_router/prospective_status_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 2,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        },
+        {
+          "id": "hourly_predictions",
+          "path": "out/eia_grid_prospective_hourly_router/sealed_predictions.jsonl",
+          "min_bytes": 1
+        },
+        {
+          "id": "hourly_settlements",
+          "path": "out/eia_grid_prospective_hourly_router/settlements.jsonl",
+          "min_bytes": 1
+        },
+        {
+          "id": "hourly_runs",
+          "path": "out/eia_grid_prospective_hourly_router/operational_runs.jsonl",
+          "min_bytes": 1
+        },
+        {
+          "id": "all_authority_protocol",
+          "path": "config/eia_grid_all_authority_direct_hourly_protocol_v2.json",
+          "min_bytes": 1,
+          "expected_sha256": "c10e0efb2b7d530728e36bac9a4a9293b4f9584d657c8058e30943d5d12a5abe",
+          "hash_mode": "utf8_lf"
+        },
+        {
+          "id": "all_authority_status",
+          "path": "out/eia_grid_all_authority_direct_hourly_router/prospective_status_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 2,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        },
+        {
+          "id": "all_authority_predictions",
+          "path": "out/eia_grid_all_authority_direct_hourly_router/sealed_prediction_panels.jsonl",
+          "min_bytes": 1
+        },
+        {
+          "id": "all_authority_settlements",
+          "path": "out/eia_grid_all_authority_direct_hourly_router/settlement_panels.jsonl",
+          "min_bytes": 1
+        },
+        {
+          "id": "all_authority_runs",
+          "path": "out/eia_grid_all_authority_direct_hourly_router/operational_runs.jsonl",
+          "min_bytes": 1
+        }
+      ],
+      "rules": [
+        {
+          "id": "frozen_prospective_lanes",
+          "type": "preregistered_lanes",
+          "lanes": [
+            {
+              "id": "hourly_router",
+              "protocol_path": "config/eia_grid_prospective_hourly_router_protocol_v1.json",
+              "protocol_sha256": "5398f17f57e02bdaadb1cef5b6dae20708146eaa0de534ebbe6ce36ab28952e5",
+              "protocol_commit": "8fd49772dbeec3664b9c83c1d46f5c8583772946",
+              "status_path": "out/eia_grid_prospective_hourly_router/prospective_status_latest.json",
+              "required_sample_gate": "preliminary_ready",
+              "chains": [
+                {
+                  "id": "predictions",
+                  "path": "out/eia_grid_prospective_hourly_router/sealed_predictions.jsonl",
+                  "status_count_field": "prediction_count",
+                  "require_protocol_fields": true
+                },
+                {
+                  "id": "settlements",
+                  "path": "out/eia_grid_prospective_hourly_router/settlements.jsonl",
+                  "status_count_field": "settlement_count"
+                },
+                {
+                  "id": "operational_runs",
+                  "path": "out/eia_grid_prospective_hourly_router/operational_runs.jsonl",
+                  "status_terminal_field": "operational_receipt_sha256"
+                }
+              ]
+            },
+            {
+              "id": "all_authority_direct_hourly_router",
+              "protocol_path": "config/eia_grid_all_authority_direct_hourly_protocol_v2.json",
+              "protocol_sha256": "c10e0efb2b7d530728e36bac9a4a9293b4f9584d657c8058e30943d5d12a5abe",
+              "protocol_commit": "14795d5dd7058e9e8283ee88dd065b6da7f3d1e0",
+              "status_path": "out/eia_grid_all_authority_direct_hourly_router/prospective_status_latest.json",
+              "required_sample_gate": "preliminary_ready",
+              "chains": [
+                {
+                  "id": "prediction_panels",
+                  "path": "out/eia_grid_all_authority_direct_hourly_router/sealed_prediction_panels.jsonl",
+                  "status_count_field": "prediction_panel_count",
+                  "require_protocol_fields": true
+                },
+                {
+                  "id": "settlement_panels",
+                  "path": "out/eia_grid_all_authority_direct_hourly_router/settlement_panels.jsonl",
+                  "status_count_field": "settlement_panel_count"
+                },
+                {
+                  "id": "operational_runs",
+                  "path": "out/eia_grid_all_authority_direct_hourly_router/operational_runs.jsonl",
+                  "status_terminal_field": "operational_receipt_sha256"
+                }
+              ],
+              "panel_multiplier_checks": [
+                {
+                  "panel_count_field": "prediction_panel_count",
+                  "expanded_count_field": "sealed_authority_prediction_count",
+                  "multiplier": 8
+                },
+                {
+                  "panel_count_field": "settlement_panel_count",
+                  "expanded_count_field": "settled_authority_prediction_count",
+                  "multiplier": 8
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reproducibility",
+      "label": "Reproducibility",
+      "required": true,
+      "claim_boundary": "A bounded clean-runner receipt applies only to the exact branch, commit, source chain, dependency lock, and environment it records.",
+      "artifacts": [
+        {
+          "id": "reproducibility_capsule",
+          "path": "out/ops/reviewer_reproducibility_capsule_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 72,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "capsule_self_hash",
+          "type": "self_hash",
+          "artifact": "out/ops/reviewer_reproducibility_capsule_latest.json",
+          "hash_field": "capsule_sha256"
+        },
+        {
+          "id": "capsule_source_hashes",
+          "type": "manifest_entries",
+          "artifact": "out/ops/reviewer_reproducibility_capsule_latest.json",
+          "array_fields": [
+            "source_artifacts"
+          ],
+          "path_field": "path",
+          "sha256_field": "sha256",
+          "bytes_field": "bytes",
+          "hash_mode_field": "hash_mode",
+          "min_entries": 1,
+          "drift_code": "REPRODUCIBILITY_SOURCE_DRIFT"
+        },
+        {
+          "id": "capsule_current_git",
+          "type": "reproducibility_current",
+          "artifact": "out/ops/reviewer_reproducibility_capsule_latest.json",
+          "required_true_fields": [
+            "summary.clean_runner_replay",
+            "summary.dependency_versions_exact_match",
+            "summary.artifact_hash_lock_complete",
+            "summary.cross_platform_artifact_hash_lock_complete"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "immutable_release_manifest",
+      "label": "Immutable release manifest",
+      "required": true,
+      "claim_boundary": "An intact historical vault is not a current release when source artifacts or the worktree have changed.",
+      "artifacts": [
+        {
+          "id": "data_room_manifest",
+          "path": "out/ops/data_room_manifest_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 72,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        },
+        {
+          "id": "proof_vault_manifest",
+          "path": "out/ops/external_proof_vault_manifest_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 72,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "data_room_hashes",
+          "type": "manifest_entries",
+          "artifact": "out/ops/data_room_manifest_latest.json",
+          "array_fields": [
+            "control_artifacts",
+            "markdown_artifacts"
+          ],
+          "path_field": "path",
+          "sha256_field": "sha256",
+          "bytes_field": "bytes",
+          "min_entries": 1,
+          "drift_code": "IMMUTABLE_MANIFEST_DRIFT"
+        },
+        {
+          "id": "proof_vault_source_hashes",
+          "type": "manifest_entries",
+          "artifact": "out/ops/external_proof_vault_manifest_latest.json",
+          "array_fields": [
+            "artifacts"
+          ],
+          "path_field": "relative_path",
+          "sha256_field": "sha256",
+          "bytes_field": "bytes",
+          "min_entries": 1,
+          "drift_code": "IMMUTABLE_MANIFEST_DRIFT"
+        },
+        {
+          "id": "release_worktree_clean",
+          "type": "git_clean"
+        }
+      ]
+    },
+    {
+      "id": "independent_validation",
+      "label": "Independent validation",
+      "required": true,
+      "claim_boundary": "A budget packet or evaluator template is not independent validation. A named, outcome-independent evaluator and completed reproduction receipt are required.",
+      "artifacts": [
+        {
+          "id": "external_validation_packet",
+          "path": "out/ops/external_validation_500_sprint_latest.json",
+          "min_bytes": 1,
+          "max_age_hours": 72,
+          "timestamp_fields": [
+            "generated_utc"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "external_packet_self_hash",
+          "type": "self_hash",
+          "artifact": "out/ops/external_validation_500_sprint_latest.json",
+          "hash_field": "packet_sha256"
+        },
+        {
+          "id": "external_packet_source_hashes",
+          "type": "manifest_entries",
+          "artifact": "out/ops/external_validation_500_sprint_latest.json",
+          "array_fields": [
+            "source_artifacts"
+          ],
+          "path_field": "path",
+          "sha256_field": "sha256",
+          "bytes_field": "bytes",
+          "min_entries": 1,
+          "drift_code": "INDEPENDENT_PACKET_SOURCE_DRIFT"
+        },
+        {
+          "id": "independent_receipt_complete",
+          "type": "independent_validation",
+          "artifact": "out/ops/external_validation_500_sprint_latest.json",
+          "required_true_fields": [
+            "current_state.independent_evaluator_named",
+            "current_state.independent_reproduction_complete",
+            "current_state.level_5_attained"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "schema": "lumencore.near_term_capital_compute_official_source_evidence.v1",
+  "recorded_utc": "2026-07-23T20:53:33Z",
+  "refresh_required_after_utc": "2026-07-30T20:53:33Z",
+  "capture_method": "Direct unauthenticated HTTPS GET of each official program page, followed by a public-safe fact review and SHA-256 of the returned UTF-8 page content.",
+  "claim_boundary": "These dated source hashes and reviewed facts establish what official pages returned during this check. They do not establish LumenCore eligibility, application submission, acceptance, credit availability, investment, funding, or unchanged future program terms.",
+  "sources": [
+    {
+      "source_evidence_id": "microsoft_for_startups_official_20260723",
+      "route_id": "microsoft_for_startups_no_referral",
+      "official_url": "https://learn.microsoft.com/en-us/startups/microsoft-for-startups/application",
+      "official_domain": "learn.microsoft.com",
+      "http_status": 200,
+      "content_type": "text/html",
+      "utf8_bytes": 61118,
+      "content_sha256": "911DD4D43A311570F7427CAF460FBD81BA40A7400501FF2BDCE38352A2C764C4",
+      "reviewed_fact_snapshot": {
+        "published_value": "$1,000 starter Azure credits",
+        "published_timing": "Immediately available after account setup; displayed balance may take up to 24 hours to update",
+        "eligibility_and_cost_notes": [
+          "Early-stage B2B software, AI, or technology startup working toward or at MVP",
+          "No-referral path proceeds to Azure account creation",
+          "Identity, address, agreement, and payment information are required",
+          "Subscription automatically converts to pay-as-you-go when credits are used or expire"
+        ]
+      },
+      "source_locator": "Eligibility Criteria; Applying without an investor referral code; Setting Up Your Azure Account; What Happens Next"
+    },
+    {
+      "source_evidence_id": "third_sphere_seedstrap_official_20260723",
+      "route_id": "third_sphere_seedstrap",
+      "official_url": "https://thirdsphere.com/csp/",
+      "official_domain": "thirdsphere.com",
+      "http_status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "utf8_bytes": 66464,
+      "content_sha256": "44BB5F85759BC26C7B9B97E1A113B9399C783B1B0149D73E83F07121DA9A7695",
+      "reviewed_fact_snapshot": {
+        "published_value": "Up to $1 million investment with up to $2 million earmarked for a later round",
+        "published_timing": "Very fast decision; no deadline visible on the reviewed official page",
+        "eligibility_and_fit_notes": [
+          "Climate or planet-positive component",
+          "Willingness to use AI to minimize burn",
+          "Company history and current distress do not automatically exclude consideration"
+        ]
+      },
+      "source_locator": "What are we offering; Here's what we're looking for; Apply to the Third Sphere Seedstrap Program"
+    },
+    {
+      "source_evidence_id": "aws_activate_official_20260723",
+      "route_id": "aws_activate_founders",
+      "official_url": "https://aws.amazon.com/startups/credits/",
+      "official_domain": "aws.amazon.com",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "utf8_bytes": 435042,
+      "content_sha256": "76F31C8DCA05B40C9F165B245F07F3AD38F82293A9E385D6CAB66DD174DA5B6A",
+      "reviewed_fact_snapshot": {
+        "published_value": "$1,000 starter credit with selected participants eligible for up to $5,000",
+        "published_timing": "5-10 business-day review",
+        "eligibility_and_account_notes": [
+          "Activate Founders is available for bootstrapped or self-funded startups",
+          "General eligibility includes pre-Series B, founded within 10 years, and a paid-tier AWS account",
+          "Prior Activate credit history affects eligibility"
+        ]
+      },
+      "source_locator": "Find the right tier for you; How to apply"
+    },
+    {
+      "source_evidence_id": "nvidia_inception_official_20260723",
+      "route_id": "nvidia_inception",
+      "official_url": "https://www.nvidia.com/en-us/startups/",
+      "official_domain": "nvidia.com",
+      "http_status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "utf8_bytes": 740303,
+      "content_sha256": "23F345A422741B4FC0067B3E56372110E41F44E6A86391D0F97095265C78CEF7",
+      "reviewed_fact_snapshot": {
+        "published_value": "Free membership with access to partner offers, possible cloud credits, and eligible investor exposure",
+        "published_timing": "No application fees, deadlines, or cohorts; no review time promised",
+        "eligibility_and_benefit_notes": [
+          "Startup must be officially incorporated and less than 10 years old",
+          "Startup must employ at least one developer and maintain a working website",
+          "Cloud credits and investor exposure are benefits subject to offer or eligibility, not guaranteed awards"
+        ]
+      },
+      "source_locator": "What Is NVIDIA Inception; Program Benefits; Get Started; Inception Program FAQ"
+    }
+  ]
+}

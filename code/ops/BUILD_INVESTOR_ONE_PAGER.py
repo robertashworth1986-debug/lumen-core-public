@@ -1,293 +1,462 @@
-"""BUILD_INVESTOR_ONE_PAGER.py
+"""Build a claim-bounded investor and partner evidence brief.
 
-Single, shareable investor artifact for handheld viewing in a meeting.
-Pulls latest:
-  - frozen_delta_truth_chain_latest.json (anchored metrics + entry SHA)
-  - infra_frozen_deltas.jsonl (multi-asset signal totals)
-  - grant_submit_now SUBMIT_NOW.json (active grant lanes + bundle SHAs)
-  - grant_evidence_packs EVIDENCE_INDEX_latest.json (per-ticket bundle status)
-
-Emits:
-  out/ops/investor_one_pager/INVESTOR_ONE_PAGER.md
-  out/ops/investor_one_pager/INVESTOR_ONE_PAGER.json
-  out/ops/investor_one_pager/INVESTOR_ONE_PAGER.html  (printable / phone-friendly)
+The builder intentionally excludes modeled valuations, projected savings,
+performance promotion, and stale opportunity calls. It reports current local
+evidence states and preserves external sharing as a human decision.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
-import sys
 from datetime import datetime, timezone
+from html import escape
 from pathlib import Path
+from typing import Any
+
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "out"
-OUT_OPS = OUT / "ops"
+DEST = ROOT / "out" / "ops" / "investor_one_pager"
 
-TRUTH_CHAIN = OUT_OPS / "frozen_delta_truth_chain" / "frozen_delta_truth_chain_latest.json"
-INFRA_DELTAS = OUT / "infra_frozen_deltas.jsonl"
-SUBMIT_NOW = OUT_OPS / "grant_submit_now" / "SUBMIT_NOW.json"
-EVIDENCE_INDEX = OUT_OPS / "grant_evidence_packs" / "EVIDENCE_INDEX_latest.json"
-MEMO = ROOT / "evidence" / "agency_alignment_memo.md"
+PRODUCT_PRIORITY = (
+    ROOT / "dashboard" / "data" / "product_lane_priority_engine_20260718.json"
+)
+PROOF_TO_REVENUE = ROOT / "out" / "ops" / "proof_to_revenue_engine_latest.json"
+SCIENCE_LEDGER = (
+    ROOT / "out" / "ops" / "source_native_family_baseline_ledger_latest.json"
+)
+PROSPECTIVE_STATUS = (
+    ROOT / "out" / "ops" / "time_series_source_native_prospective_protocol_status.json"
+)
+CAPABILITY_MATRIX = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "CROSS_AGENCY_CAPABILITY_MATRIX_2026-07-26.json"
+)
+PILOT_CONFIG = ROOT / "config" / "prooflock_opportunity_ops_pilot_v1.json"
 
-DEST = OUT_OPS / "investor_one_pager"
+OUTPUT_MD = DEST / "INVESTOR_ONE_PAGER.md"
+OUTPUT_JSON = DEST / "INVESTOR_ONE_PAGER.json"
+OUTPUT_HTML = DEST / "INVESTOR_ONE_PAGER.html"
+
+BOUNDARY = (
+    "Internal draft for recipient-specific review. Local artifacts and tests can "
+    "establish software, protocol, custody, and gate behavior only. They do not "
+    "establish valuation, customer acceptance, awards, agency endorsement, field "
+    "performance, realized savings, trading alpha, or production authorization."
+)
 
 
-def _load_json(p: Path) -> dict:
-    if not p.exists():
-        return {}
+def now_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def read_json(path: Path) -> dict[str, Any]:
     try:
-        return json.loads(p.read_text(encoding="utf-8"))
-    except Exception:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
         return {}
+    return payload if isinstance(payload, dict) else {}
 
 
-def _load_jsonl(p: Path) -> list[dict]:
-    if not p.exists():
-        return []
-    out: list[dict] = []
-    for line in p.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            out.append(json.loads(line))
-        except Exception:
-            continue
-    return out
+def stable_hash(payload: Any) -> str:
+    encoded = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
-def _fmt_usd(x) -> str:
+def artifact_receipt(path: Path) -> dict[str, Any]:
     try:
-        return f"${float(x):,.0f}"
-    except Exception:
-        return str(x)
+        relative = str(path.relative_to(ROOT)).replace("\\", "/")
+    except ValueError:
+        relative = str(path)
+    if not path.is_file():
+        return {
+            "path": relative,
+            "exists": False,
+            "bytes": 0,
+            "sha256": None,
+        }
+    content = path.read_bytes()
+    return {
+        "path": relative,
+        "exists": True,
+        "bytes": len(content),
+        "sha256": hashlib.sha256(content).hexdigest(),
+    }
+
+
+def build_payload(at: datetime | None = None) -> dict[str, Any]:
+    at = at or now_utc()
+    product = read_json(PRODUCT_PRIORITY)
+    revenue = read_json(PROOF_TO_REVENUE)
+    science = read_json(SCIENCE_LEDGER)
+    prospective = read_json(PROSPECTIVE_STATUS)
+    capability = read_json(CAPABILITY_MATRIX)
+    pilot = read_json(PILOT_CONFIG)
+
+    source_paths = (
+        PRODUCT_PRIORITY,
+        PROOF_TO_REVENUE,
+        SCIENCE_LEDGER,
+        PROSPECTIVE_STATUS,
+        CAPABILITY_MATRIX,
+        PILOT_CONFIG,
+    )
+    receipts = [artifact_receipt(path) for path in source_paths]
+    sources_complete = all(receipt["exists"] for receipt in receipts)
+
+    ranking = product.get("ranking")
+    top_lane = ranking[0] if isinstance(ranking, list) and ranking else {}
+    science_summary = science.get("summary")
+    if not isinstance(science_summary, dict):
+        science_summary = {}
+    capability_summary = capability.get("summary")
+    if not isinstance(capability_summary, dict):
+        capability_summary = {}
+
+    payload: dict[str, Any] = {
+        "schema": "lumen.investor_one_pager/v2",
+        "generated_utc": at.astimezone(timezone.utc).isoformat(),
+        "status": (
+            "INTERNAL_DRAFT_RECIPIENT_AND_CLAIM_REVIEW_REQUIRED"
+            if sources_complete
+            else "BLOCKED_MISSING_CANONICAL_EVIDENCE"
+        ),
+        "external_share_ready": False,
+        "recipient_selected": False,
+        "boundary": BOUNDARY,
+        "headline": (
+            "LumenCore is a governed evidence-engineering stack for reproducible "
+            "technical decisions, source-native evaluation, and human-authorized "
+            "opportunity operations."
+        ),
+        "product": {
+            "priority_lane": top_lane.get("id"),
+            "offer": top_lane.get("offer"),
+            "strategy_score_is_valuation": False,
+            "internal_evidence_gate_passed": top_lane.get(
+                "internal_evidence_gate_passed"
+            ),
+            "validated_evidence_count": top_lane.get("validated_evidence_count"),
+            "required_evidence_count": top_lane.get("required_evidence_count"),
+            "buyer_readiness_gate_passed": (
+                top_lane.get("buyer_readiness_gate") or {}
+            ).get("passed"),
+            "first_required_validation": top_lane.get("first_validation"),
+            "revenue_stage": revenue.get("revenue_stage"),
+            "external_outreach_ready": revenue.get("external_outreach_ready"),
+        },
+        "scientific_evidence": {
+            "registered_family_count": science_summary.get(
+                "registered_family_count"
+            ),
+            "implementation_present_count": science_summary.get(
+                "implementation_present_count"
+            ),
+            "implementation_required_count": science_summary.get(
+                "implementation_required_count"
+            ),
+            "executed_direct_source_baseline_comparison_count": science_summary.get(
+                "executed_direct_source_baseline_comparison_count"
+            ),
+            "internal_source_native_promotion_gate_pass_count": science_summary.get(
+                "internal_source_native_promotion_gate_pass_count"
+            ),
+            "global_holm_positive_count": science_summary.get(
+                "individual_comparison_global_holm_positive_count"
+            ),
+            "prospective_protocol_status": prospective.get("protocol_status"),
+            "prospective_promotion_decision": prospective.get(
+                "promotion_decision"
+            ),
+            "prospective_protocol_id": prospective.get("protocol_id"),
+            "prospective_protocol_sha256": prospective.get(
+                "protocol_payload_sha256"
+            ),
+            "eligible_future_observation_count": prospective.get(
+                "eligible_future_observation_count"
+            ),
+            "performance_claim_allowed": False,
+            "claim_boundary": science_summary.get(
+                "claim_boundary", prospective.get("claim_boundary")
+            ),
+        },
+        "government_readiness": {
+            "capability_matrix_status": capability.get("status"),
+            "proven_local_module_count": (
+                capability_summary.get("effective_class_counts") or {}
+            ).get("PROVEN"),
+            "bounded_module_count": (
+                capability_summary.get("effective_class_counts") or {}
+            ).get("BOUNDED"),
+            "restricted_claim_allowed_count": capability_summary.get(
+                "restricted_claim_allowed_count"
+            ),
+            "external_action_count": capability_summary.get(
+                "external_action_count"
+            ),
+            "posture": (
+                "Bounded evidence-readiness sprint or specialized workstream "
+                "under a qualified prime; notice-specific conformance remains "
+                "an action-time review."
+            ),
+        },
+        "pilot": {
+            "protocol_id": pilot.get("protocol_id"),
+            "status": pilot.get("status"),
+            "duration_days": pilot.get("duration_days"),
+            "buyer_selected": False,
+            "pricing_approved": bool((pilot.get("pricing") or {}).get(
+                "founder_approved"
+            )),
+            "minimum_sample": pilot.get("minimum_sample"),
+            "acceptance_metric_count": len(pilot.get("acceptance_metrics") or []),
+            "final_submission_automated": False,
+        },
+        "commercial_asks": [
+            {
+                "ask": "Independent protocol review",
+                "purpose": (
+                    "Review the frozen source-native prospective protocol before "
+                    "future observations become eligible."
+                ),
+                "price_or_value_claim": None,
+            },
+            {
+                "ask": "Buyer-scoped 30-day ProofLock pilot",
+                "purpose": (
+                    "Freeze one workflow baseline, denominators, thresholds, and "
+                    "human gates, then measure the bounded outcome."
+                ),
+                "price_or_value_claim": None,
+            },
+            {
+                "ask": "Qualified-prime teaming conversation",
+                "purpose": (
+                    "Evaluate a specialized evidence-engineering workstream against "
+                    "a current notice and the prime's delivery boundary."
+                ),
+                "price_or_value_claim": None,
+            },
+        ],
+        "claim_controls": {
+            "allowed_now": [
+                "The repository contains source hashing, replay, receipt, abstention, and human-gate software patterns.",
+                "A source-native benchmark ledger records positive, neutral, negative, and inconclusive results.",
+                "A prospective protocol is frozen and waiting for future eligible observations.",
+                "A buyer-neutral pilot protocol defines exact metrics, denominators, exclusions, RACI, and human authority.",
+            ],
+            "blocked_now": [
+                "valuation or enterprise-value statements",
+                "modeled or realized savings statements",
+                "customer, agency, or independent acceptance",
+                "field performance or universal superiority",
+                "trading alpha or live-capital readiness",
+                "autonomous grants, certification, signing, sending, uploading, or submission",
+                "guaranteed awards, revenue, or procurement outcomes",
+            ],
+        },
+        "economics": {
+            "valuation_stated": False,
+            "savings_stated": False,
+            "revenue_stated": False,
+            "rule": (
+                "Quantify value only after a named buyer approves the baseline, "
+                "counterfactual, denominator, period, exclusions, and validation owner."
+            ),
+        },
+        "source_receipts": receipts,
+        "all_canonical_sources_present": sources_complete,
+    }
+    payload["brief_payload_sha256"] = stable_hash(payload)
+    return payload
+
+
+def render_markdown(payload: dict[str, Any]) -> str:
+    product = payload["product"]
+    science = payload["scientific_evidence"]
+    government = payload["government_readiness"]
+    pilot = payload["pilot"]
+    lines = [
+        "# LumenCore Investor and Partner Evidence Brief",
+        "",
+        "**DRAFT ONLY - RECIPIENT NOT SELECTED - EXTERNAL CLAIM REVIEW REQUIRED**",
+        "",
+        f"- Generated UTC: `{payload['generated_utc']}`",
+        f"- Status: `{payload['status']}`",
+        f"- External share ready: `{str(payload['external_share_ready']).lower()}`",
+        "",
+        f"> {payload['boundary']}",
+        "",
+        "## What Exists Now",
+        "",
+        payload["headline"],
+        "",
+        f"- Priority product lane: `{product['priority_lane']}`",
+        f"- Offer: {product['offer']}",
+        (
+            f"- Typed internal evidence: `{product['validated_evidence_count']}` / "
+            f"`{product['required_evidence_count']}` required artifacts"
+        ),
+        f"- Buyer-readiness gate passed: `{str(product['buyer_readiness_gate_passed']).lower()}`",
+        f"- Required external validation: {product['first_required_validation']}",
+        "",
+        "## Scientific Status",
+        "",
+        (
+            f"- Registered families: `{science['registered_family_count']}`; "
+            f"implemented: `{science['implementation_present_count']}`; "
+            f"implementation gaps: `{science['implementation_required_count']}`"
+        ),
+        (
+            "- Direct source-native comparisons executed: "
+            f"`{science['executed_direct_source_baseline_comparison_count']}`"
+        ),
+        (
+            "- Promotion gates passed: "
+            f"`{science['internal_source_native_promotion_gate_pass_count']}`; "
+            f"global Holm-positive comparisons: `{science['global_holm_positive_count']}`"
+        ),
+        (
+            f"- Prospective protocol: `{science['prospective_protocol_status']}` / "
+            f"`{science['prospective_promotion_decision']}`"
+        ),
+        f"- Eligible future observations: `{science['eligible_future_observation_count']}`",
+        f"- Protocol SHA-256: `{science['prospective_protocol_sha256']}`",
+        "",
+        "The present scientific contribution is the governed comparison and evidence protocol, not a promoted performance champion.",
+        "",
+        "## Commercial Path",
+        "",
+        f"- Pilot protocol: `{pilot['protocol_id']}`",
+        f"- Buyer selected: `{str(pilot['buyer_selected']).lower()}`",
+        f"- Pricing approved: `{str(pilot['pricing_approved']).lower()}`",
+        f"- Acceptance metrics: `{pilot['acceptance_metric_count']}`",
+        "- Final submission automated: `false`",
+        "",
+    ]
+    for item in payload["commercial_asks"]:
+        lines.append(f"- **{item['ask']}**: {item['purpose']}")
+    lines.extend(
+        [
+            "",
+            "## Government and Prime Posture",
+            "",
+            f"- Capability matrix: `{government['capability_matrix_status']}`",
+            f"- Proven local modules: `{government['proven_local_module_count']}`",
+            f"- Bounded modules: `{government['bounded_module_count']}`",
+            f"- Restricted external claims allowed: `{government['restricted_claim_allowed_count']}`",
+            f"- External actions authorized: `{government['external_action_count']}`",
+            f"- Posture: {government['posture']}",
+            "",
+            "## Not Claimed",
+            "",
+        ]
+    )
+    lines.extend(
+        f"- {item}" for item in payload["claim_controls"]["blocked_now"]
+    )
+    lines.extend(
+        [
+            "",
+            "## Receipt",
+            "",
+            f"- Payload SHA-256: `{payload['brief_payload_sha256']}`",
+            f"- Canonical sources present: `{str(payload['all_canonical_sources_present']).lower()}`",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def render_html(payload: dict[str, Any]) -> str:
+    markdown = render_markdown(payload)
+    sections: list[str] = []
+    in_list = False
+    for raw_line in markdown.splitlines():
+        line = escape(raw_line)
+        if line.startswith("# "):
+            if in_list:
+                sections.append("</ul>")
+                in_list = False
+            sections.append(f"<h1>{line[2:]}</h1>")
+        elif line.startswith("## "):
+            if in_list:
+                sections.append("</ul>")
+                in_list = False
+            sections.append(f"<h2>{line[3:]}</h2>")
+        elif line.startswith("- "):
+            if not in_list:
+                sections.append("<ul>")
+                in_list = True
+            sections.append(f"<li>{line[2:]}</li>")
+        elif line.startswith("&gt; "):
+            if in_list:
+                sections.append("</ul>")
+                in_list = False
+            sections.append(f"<blockquote>{line[5:]}</blockquote>")
+        elif line:
+            if in_list:
+                sections.append("</ul>")
+                in_list = False
+            sections.append(f"<p>{line}</p>")
+    if in_list:
+        sections.append("</ul>")
+    body = "\n".join(sections)
+    return "\n".join(
+        [
+            "<!doctype html>",
+            "<html lang=\"en\">",
+            "<head>",
+            "<meta charset=\"utf-8\">",
+            "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">",
+            "<title>LumenCore Investor and Partner Evidence Brief</title>",
+            "<style>",
+            "body{font-family:Segoe UI,Arial,sans-serif;max-width:820px;margin:0 auto;padding:28px;color:#17202a;line-height:1.5}",
+            "h1{font-size:28px}h2{font-size:19px;margin-top:28px;border-bottom:1px solid #cbd5e1;padding-bottom:6px}",
+            "blockquote{border-left:4px solid #0f766e;margin:18px 0;padding:10px 16px;background:#f0fdfa}",
+            "li{margin:6px 0}code{font-family:Consolas,monospace}",
+            "</style>",
+            "</head>",
+            f"<body>{body}</body>",
+            "</html>",
+        ]
+    )
 
 
 def main() -> int:
     DEST.mkdir(parents=True, exist_ok=True)
-    now = datetime.now(timezone.utc)
-
-    chain = _load_json(TRUTH_CHAIN)
-    metrics = chain.get("metrics", {}) if chain else {}
-    deltas = _load_jsonl(INFRA_DELTAS)
-
-    # Per-sector latest
-    by_key: dict[str, dict] = {}
-    for r in deltas:
-        k = f"{r.get('sector','')}|{r.get('source','')}"
-        prior = by_key.get(k)
-        if prior is None or str(r.get("generated_utc", "")) >= str(prior.get("generated_utc", "")):
-            by_key[k] = r
-    by_sector = sorted(
-        by_key.values(),
-        key=lambda r: float(r.get("estimated_hourly_value_usd") or 0.0),
-        reverse=True,
+    payload = build_payload()
+    OUTPUT_JSON.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=True) + "\n",
+        encoding="utf-8",
     )
-    total_hourly = sum(float(r.get("estimated_hourly_value_usd") or 0.0) for r in by_sector)
-    total_avoided = sum(float(r.get("estimated_avoided_loss_usd") or 0.0) for r in by_sector)
-    sectors = sorted({r.get("sector", "") for r in by_sector if r.get("sector")})
-
-    submit = _load_json(SUBMIT_NOW)
-    evidence = _load_json(EVIDENCE_INDEX)
-    actionable = submit.get("actionable", []) if isinstance(submit, dict) else []
-    evidence_results = evidence.get("results", []) if isinstance(evidence, dict) else []
-    by_tid = {r.get("ticket_id"): r for r in evidence_results}
-
-    payload = {
-        "schema": "lumen.investor_one_pager/v1",
-        "generated_utc": now.isoformat(),
-        "truth_chain": {
-            "run_tag": chain.get("run_tag"),
-            "entry_sha256": chain.get("entry_sha256"),
-            "previous_entry_sha256": chain.get("previous_entry_sha256"),
-            "generated_utc": chain.get("generated_utc"),
-        },
-        "headline_metrics": {
-            "annual_value_signal_usd": metrics.get("annual_value_signal_usd"),
-            "valuation_proxy_usd": metrics.get("valuation_proxy_usd"),
-            "router_edge_pct": metrics.get("router_edge_pct"),
-            "harmonic_win_rate_pct": metrics.get("harmonic_win_rate_pct"),
-            "benchmark_prevented_pct": metrics.get("benchmark_prevented_pct"),
-            "measured_coverage_pct": metrics.get("measured_coverage_pct"),
-            "measured_sources": metrics.get("measured_sources"),
-            "enabled_sources": metrics.get("enabled_sources"),
-            "top_sector": metrics.get("top_sector"),
-            "top_sector_hourly_value_usd": metrics.get("top_sector_hourly_value_usd"),
-            "grants_queue_total": metrics.get("grants_queue_total"),
-            "public_truth_status": metrics.get("public_truth_status"),
-        },
-        "multi_asset_signal": {
-            "rows": len(deltas),
-            "sector_source_keys": len(by_key),
-            "sectors": sectors,
-            "total_hourly_value_usd": round(total_hourly, 2),
-            "total_avoided_loss_usd": round(total_avoided, 2),
-            "top10_per_sector": by_sector[:10],
-        },
-        "active_grant_lanes": [
+    OUTPUT_MD.write_text(render_markdown(payload) + "\n", encoding="utf-8")
+    OUTPUT_HTML.write_text(render_html(payload) + "\n", encoding="utf-8")
+    print(
+        json.dumps(
             {
-                "ticket_id": a.get("ticket_id"),
-                "title": a.get("title"),
-                "agency_match": (by_tid.get(a.get("ticket_id")) or {}).get("memo_label"),
-                "freshness": ((by_tid.get(a.get("ticket_id")) or {}).get("freshness") or {}).get("state"),
-                "bundle_sha256": (by_tid.get(a.get("ticket_id")) or {}).get("bundle_sha256"),
-                "days_left": a.get("days_left"),
-                "submit_url": a.get("submit_url"),
-            }
-            for a in actionable
-        ],
-    }
-
-    # Markdown
-    md = []
-    md.append("# LumenCore™ — Investor One-Pager")
-    md.append("")
-    md.append(f"**As of (UTC):** {now.isoformat(timespec='seconds')}")
-    if chain:
-        md.append(f"**Truth-chain anchor SHA:** `{chain.get('entry_sha256','')}`")
-        md.append(f"**Previous anchor SHA:** `{chain.get('previous_entry_sha256','')}`")
-    md.append("")
-    md.append("## Headline Metrics (anchored)")
-    md.append("")
-    hm = payload["headline_metrics"]
-    md.append(f"- **Annual value signal:** {_fmt_usd(hm.get('annual_value_signal_usd'))}")
-    md.append(f"- **Valuation proxy:** {_fmt_usd(hm.get('valuation_proxy_usd'))}")
-    md.append(f"- **Router edge:** {hm.get('router_edge_pct','—')}%  |  **Harmonic win rate:** {hm.get('harmonic_win_rate_pct','—')}%")
-    md.append(f"- **Benchmark prevented:** {hm.get('benchmark_prevented_pct','—')}%  |  **Measured coverage:** {hm.get('measured_coverage_pct','—')}%")
-    md.append(f"- **Measured sources:** {hm.get('measured_sources','—')}/{hm.get('enabled_sources','—')}")
-    md.append(f"- **Top sector:** {hm.get('top_sector','—')}  ({_fmt_usd(hm.get('top_sector_hourly_value_usd'))}/hr)")
-    md.append(f"- **Grants queue:** {hm.get('grants_queue_total','—')}  |  **Public truth:** {hm.get('public_truth_status','—')}")
-    md.append("")
-    md.append("## Live Multi-Asset Signal")
-    md.append("")
-    md.append(f"- **Rows:** {payload['multi_asset_signal']['rows']}  |  **Unique sector|source keys:** {payload['multi_asset_signal']['sector_source_keys']}")
-    md.append(f"- **Sectors covered:** {', '.join(sectors) or '—'}")
-    md.append(f"- **Aggregate hourly value:** {_fmt_usd(payload['multi_asset_signal']['total_hourly_value_usd'])}")
-    md.append(f"- **Aggregate avoided loss:** {_fmt_usd(payload['multi_asset_signal']['total_avoided_loss_usd'])}")
-    md.append("")
-    md.append("| Sector | Source | Constraint | Hourly Value | Avoided Loss |")
-    md.append("| --- | --- | --- | ---: | ---: |")
-    for r in by_sector[:10]:
-        md.append(
-            f"| {r.get('sector','')} | {r.get('source','')} | {r.get('constraint','')} "
-            f"| {_fmt_usd(r.get('estimated_hourly_value_usd',0))} "
-            f"| {_fmt_usd(r.get('estimated_avoided_loss_usd',0))} |"
+                "schema": payload["schema"],
+                "status": payload["status"],
+                "external_share_ready": payload["external_share_ready"],
+                "recipient_selected": payload["recipient_selected"],
+                "payload_sha256": payload["brief_payload_sha256"],
+                "outputs": [
+                    str(OUTPUT_JSON),
+                    str(OUTPUT_MD),
+                    str(OUTPUT_HTML),
+                ],
+            },
+            indent=2,
         )
-    md.append("")
-    md.append("## Active Federal Grant Lanes (with hash-chained evidence packs)")
-    md.append("")
-    md.append("| T- | Ticket | Agency | Freshness | Bundle SHA | Title |")
-    md.append("| --- | --- | --- | --- | --- | --- |")
-    for a in payload["active_grant_lanes"]:
-        days = a.get("days_left")
-        days_s = f"{days}d" if isinstance(days, int) else "?"
-        sha = (a.get("bundle_sha256") or "")[:16]
-        title = (a.get("title") or "")[:60].replace("|", "\\|")
-        md.append(
-            f"| {days_s} | `{a.get('ticket_id','')}` | {a.get('agency_match') or '—'} "
-            f"| {a.get('freshness') or '—'} | `{sha}` | {title} |"
-        )
-    md.append("")
-    md.append("## Architecture Position")
-    md.append("")
-    md.append("LumenCore™ is a measurement-first architecture: detect instability earlier, "
-              "quantify drift and coherence loss, translate behavior into operational and "
-              "economic impact, simulate recovery before failure. Aligned to current priorities "
-              "across DoD, DARPA, DOE, DHS/CISA, NSF, NIST, and NASA.")
-    md.append("")
-    md.append("_See `evidence/agency_alignment_memo.md` and per-ticket evidence packs under "
-              "`out/ops/grant_evidence_packs/<TICKET>/EVIDENCE_latest.md` for full chain-of-custody._")
-    md.append("")
-    md_text = "\n".join(md)
-
-    (DEST / "INVESTOR_ONE_PAGER.md").write_text(md_text, encoding="utf-8")
-    (DEST / "INVESTOR_ONE_PAGER.json").write_text(
-        json.dumps(payload, indent=2, ensure_ascii=False, default=str), encoding="utf-8"
     )
-
-    # Phone-friendly HTML
-    html = [
-        "<!doctype html><meta charset=utf-8>",
-        "<meta name=viewport content='width=device-width,initial-scale=1'>",
-        "<title>LumenCore Investor One-Pager</title>",
-        "<style>",
-        "body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;",
-        "padding:14px;max-width:760px;margin:auto;color:#111;background:#fff;line-height:1.45}",
-        "h1{font-size:22px;margin:0 0 6px}h2{font-size:17px;margin:18px 0 6px;color:#0a4}",
-        "code{background:#f3f3f3;padding:1px 5px;border-radius:3px;font-size:12px}",
-        "table{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0 12px}",
-        "th,td{border:1px solid #ddd;padding:5px 7px;text-align:left;vertical-align:top}",
-        "th{background:#fafafa}",
-        ".kpi{display:grid;grid-template-columns:1fr 1fr;gap:6px}",
-        ".kpi div{padding:6px 8px;background:#f7faf7;border-left:3px solid #0a4;border-radius:3px}",
-        "</style>",
-        f"<h1>LumenCore™ — Investor One-Pager</h1>",
-        f"<div><b>As of UTC:</b> {now.isoformat(timespec='seconds')}</div>",
-    ]
-    if chain:
-        html.append(f"<div><b>Truth-chain anchor:</b> <code>{chain.get('entry_sha256','')[:32]}…</code></div>")
-    html.append("<h2>Headline Metrics</h2><div class=kpi>")
-    kpi_pairs = [
-        ("Annual value signal", _fmt_usd(hm.get("annual_value_signal_usd"))),
-        ("Valuation proxy", _fmt_usd(hm.get("valuation_proxy_usd"))),
-        ("Router edge", f"{hm.get('router_edge_pct','—')}%"),
-        ("Harmonic win rate", f"{hm.get('harmonic_win_rate_pct','—')}%"),
-        ("Benchmark prevented", f"{hm.get('benchmark_prevented_pct','—')}%"),
-        ("Measured coverage", f"{hm.get('measured_coverage_pct','—')}%"),
-        ("Top sector", f"{hm.get('top_sector','—')} ({_fmt_usd(hm.get('top_sector_hourly_value_usd'))}/hr)"),
-        ("Public truth", str(hm.get("public_truth_status", "—"))),
-    ]
-    for label, val in kpi_pairs:
-        html.append(f"<div><b>{label}</b><br>{val}</div>")
-    html.append("</div>")
-
-    html.append("<h2>Live Multi-Asset Signal</h2>")
-    html.append(
-        f"<div><b>{payload['multi_asset_signal']['rows']}</b> rows · "
-        f"<b>{payload['multi_asset_signal']['sector_source_keys']}</b> sector|source keys · "
-        f"aggregate <b>{_fmt_usd(payload['multi_asset_signal']['total_hourly_value_usd'])}/hr</b>, "
-        f"avoided <b>{_fmt_usd(payload['multi_asset_signal']['total_avoided_loss_usd'])}</b></div>"
-    )
-    html.append("<table><tr><th>Sector</th><th>Source</th><th>Constraint</th><th>Hourly</th><th>Avoided</th></tr>")
-    for r in by_sector[:10]:
-        html.append(
-            f"<tr><td>{r.get('sector','')}</td><td>{r.get('source','')}</td>"
-            f"<td>{r.get('constraint','')}</td>"
-            f"<td>{_fmt_usd(r.get('estimated_hourly_value_usd',0))}</td>"
-            f"<td>{_fmt_usd(r.get('estimated_avoided_loss_usd',0))}</td></tr>"
-        )
-    html.append("</table>")
-
-    html.append("<h2>Active Federal Grant Lanes</h2>")
-    html.append("<table><tr><th>T-</th><th>Ticket</th><th>Agency</th><th>Fresh</th><th>Bundle SHA</th><th>Title</th></tr>")
-    for a in payload["active_grant_lanes"]:
-        days = a.get("days_left")
-        days_s = f"{days}d" if isinstance(days, int) else "?"
-        sha = (a.get("bundle_sha256") or "")[:12]
-        html.append(
-            f"<tr><td>{days_s}</td><td><code>{a.get('ticket_id','')[:18]}</code></td>"
-            f"<td>{a.get('agency_match') or '—'}</td>"
-            f"<td>{a.get('freshness') or '—'}</td>"
-            f"<td><code>{sha}</code></td>"
-            f"<td>{(a.get('title') or '')[:60]}</td></tr>"
-        )
-    html.append("</table>")
-    html.append("<h2>Architecture Position</h2>")
-    html.append(
-        "<p>LumenCore™ is a measurement-first architecture: detect instability earlier, "
-        "quantify drift and coherence loss, translate behavior into operational and economic "
-        "impact, simulate recovery before failure. Aligned across DoD, DARPA, DOE, DHS/CISA, "
-        "NSF, NIST, and NASA priorities.</p>"
-    )
-    (DEST / "INVESTOR_ONE_PAGER.html").write_text("\n".join(html), encoding="utf-8")
-
-    print(f"OK  one-pager written:")
-    print(f"  {DEST / 'INVESTOR_ONE_PAGER.md'}")
-    print(f"  {DEST / 'INVESTOR_ONE_PAGER.html'}")
-    print(f"  {DEST / 'INVESTOR_ONE_PAGER.json'}")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

@@ -1,19 +1,41 @@
 {
   "schema": "lumencore.openai_build_week_devpost_field_registry.v1",
-  "generated_utc": "2026-07-19T03:05:09Z",
+  "generated_utc": "2026-07-19T09:02:41Z",
   "deadline": {
     "central": "2026-07-21T19:00:00-05:00",
     "utc": "2026-07-22T00:00:00Z",
     "timezone_label": "CDT"
   },
   "portal_observation": {
-    "observed_utc": "2026-07-19T03:05:09Z",
-    "authentication_state": "SIGNED_OUT",
-    "hackathon_join_state": "NOT_JOINED",
-    "project_state": "NO_PROJECT_OBSERVED",
+    "observed_utc": "2026-07-19T08:57:50Z",
+    "authentication_state": "SIGNED_IN_AT_OBSERVATION",
+    "hackathon_join_state": "REGISTERED_CONFIRMED",
+    "project_state": "DRAFT_2_OF_5_CONFIRMED",
     "submission_confirmation_state": "NONE_OBSERVED",
-    "observation_basis": "Current task state and the unsigned public submission-manager page displayed Log in, Sign up, Join hackathon, and Register for this hackathon.",
-    "limitations": "No account, project, registration, or confirmation endpoint was opened or changed by this builder."
+    "observation_basis": "A direct browser observation displayed the ProofLock Console project draft at two of five steps on the project-details page; independent bounded Gmail metadata confirms registration and the deadline.",
+    "limitations": "Project details, additional information, final preview, and final submission remain incomplete.",
+    "progress_receipt": {
+      "source_path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PORTAL_PROGRESS_2026-07-19.json",
+      "receipt_sha256": "2a52ea053836c9f286a94e13c413aee1a9f735f1a19142fcc72652e142ecf062",
+      "facts_sha256": "49a49f197ed1af4afa9d1f3ebac9bea5d4c33c52f9b579126594f4679c186498",
+      "recorded_observation_utc": "2026-07-19T08:57:50Z",
+      "evidence_basis_count": 2,
+      "evidence_classes": [
+        "DIRECT_BROWSER_OBSERVATION",
+        "INDEPENDENT_GMAIL_METADATA"
+      ],
+      "challenge_registration_state": "CONFIRMED",
+      "project_shell_creation_state": "DRAFT_2_OF_5_CONFIRMED",
+      "submission_confirmation_state": "NONE_OBSERVED",
+      "open_gate_ids": [
+        "additional_info_completion",
+        "feedback_session_id",
+        "final_preview_review",
+        "final_submission",
+        "project_details_completion",
+        "public_youtube_video"
+      ]
+    }
   },
   "official_sources": {
     "overview": "https://openai.devpost.com/",
@@ -90,8 +112,8 @@
     "prooflock_readme": {
       "source_id": "prooflock_readme",
       "path": "build_week/prooflock_console/README.md",
-      "bytes": 3191,
-      "sha256": "766ba2b64d477b21d443a673a60f83fb4a5ad0e5d46a3e215180c7f924bd3ede"
+      "bytes": 3261,
+      "sha256": "d29e8d6ac2bef68d199a58abe0515fa02591ad34cdf42450b4c1133336f0b215"
     },
     "sample_receipt": {
       "source_id": "sample_receipt",
@@ -104,6 +126,54 @@
       "path": "LICENSE",
       "bytes": 1093,
       "sha256": "a2c01dae8f86b9d0bc5a1ec3d2baaa6818dfd67d6e89e1fd506eaf77d0c02a8b"
+    },
+    "portal_progress_receipt": {
+      "source_id": "portal_progress_receipt",
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/OPENAI_BUILD_WEEK_PORTAL_PROGRESS_2026-07-19.json",
+      "bytes": 3730,
+      "sha256": "0a26e91b3f4a72fad5ed489c8e11ffbe333aa4eb7476d39b1005eb4c46d098f7",
+      "embedded_integrity": {
+        "hash_key": "receipt_sha256",
+        "recorded": "2a52ea053836c9f286a94e13c413aee1a9f735f1a19142fcc72652e142ecf062",
+        "computed": "2a52ea053836c9f286a94e13c413aee1a9f735f1a19142fcc72652e142ecf062",
+        "valid": true
+      }
+    },
+    "orchestration_receipt": {
+      "source_id": "orchestration_receipt",
+      "path": "grant_submissions/OPENAI_BUILD_WEEK_20260721/CODEX_AGENT_ORCHESTRATION_RECEIPT_2026-07-19.json",
+      "bytes": 3025,
+      "sha256": "92d7a92cfd6982beebb88cf5b1e1579690f87e207f52627531d2ab9e405411f0",
+      "embedded_integrity": {
+        "hash_key": "receipt_sha256",
+        "recorded": "bbe6b01af60162a2267d839d7a0f6aa4ed4f7683ac5a9d0419078eea0688cbd9",
+        "computed": "bbe6b01af60162a2267d839d7a0f6aa4ed4f7683ac5a9d0419078eea0688cbd9",
+        "valid": true
+      }
+    },
+    "demo_video_receipt": {
+      "source_id": "demo_video_receipt",
+      "path": "output/video/prooflock_console_build_week_v1/prooflock_console_openai_build_week_demo_v1.receipt.json",
+      "bytes": 5835,
+      "sha256": "6fde5b0b8f462590c2f98eba03615fc6b330a158f974c4763d0e4873480d64db",
+      "embedded_integrity": {
+        "hash_key": "receipt_sha256",
+        "recorded": "cdbf4130dc0bdc4dda39f75b5d3fc84684a0916416babe15de0f260fb102ac30",
+        "computed": "cdbf4130dc0bdc4dda39f75b5d3fc84684a0916416babe15de0f260fb102ac30",
+        "valid": true
+      }
+    },
+    "demo_video": {
+      "source_id": "demo_video",
+      "path": "output/video/prooflock_console_build_week_v1/prooflock_console_openai_build_week_demo_v1.mp4",
+      "bytes": 6592936,
+      "sha256": "376fd49b2a43d37fe0901b948e18c8eacf1532144a5d5459b0d5b67bc8e8e4e9"
+    },
+    "thumbnail_asset": {
+      "source_id": "thumbnail_asset",
+      "path": "output/video/prooflock_console_build_week_v1/prooflock_console_devpost_thumbnail_v1.png",
+      "bytes": 64918,
+      "sha256": "f894e6f1d7e021869db45f45b5088286cc60a0057faf058c9656dbc949141d98"
     }
   },
   "project_copy": {
@@ -111,11 +181,21 @@
     "tagline": "Hash what exists. Hold what is not proven.",
     "category": "Developer Tools",
     "repository_url": "https://github.com/robertashworth1986-debug/lumen-core-public",
+    "exact_source_url": "https://github.com/robertashworth1986-debug/lumen-core-public/tree/281b76fe20d281974a2e2b44670a6a63815fe421/build_week/prooflock_console",
     "try_it_out_url": "https://lumen-core.ai/build_week/prooflock_console/",
     "video_demo_url": null,
-    "thumbnail_asset": null,
+    "local_video_asset": "output/video/prooflock_console_build_week_v1/prooflock_console_openai_build_week_demo_v1.mp4",
+    "local_video_sha256": "376fd49b2a43d37fe0901b948e18c8eacf1532144a5d5459b0d5b67bc8e8e4e9",
+    "local_video_duration_seconds": 124.634,
+    "video_receipt_asset": "output/video/prooflock_console_build_week_v1/prooflock_console_openai_build_week_demo_v1.receipt.json",
+    "video_receipt_sha256": "cdbf4130dc0bdc4dda39f75b5d3fc84684a0916416babe15de0f260fb102ac30",
+    "orchestration_receipt_asset": "grant_submissions/OPENAI_BUILD_WEEK_20260721/CODEX_AGENT_ORCHESTRATION_RECEIPT_2026-07-19.json",
+    "orchestration_receipt_sha256": "bbe6b01af60162a2267d839d7a0f6aa4ed4f7683ac5a9d0419078eea0688cbd9",
+    "thumbnail_asset": "output/video/prooflock_console_build_week_v1/prooflock_console_devpost_thumbnail_v1.png",
+    "thumbnail_sha256": "f894e6f1d7e021869db45f45b5088286cc60a0057faf058c9656dbc949141d98",
     "built_with_confirmed": [
       "Codex",
+      "gpt-5.6-sol",
       "JavaScript",
       "Web Crypto API",
       "Python",
@@ -123,19 +203,17 @@
       "HTML",
       "CSS"
     ],
-    "built_with_blocked_pending_model_provenance": [
-      "[[CONFIRMED_MODEL_LABEL]]"
-    ],
-    "project_story_markdown": "## Inspiration\n\nAI-assisted development can move faster than the evidence behind a claim. ProofLock Console was built to make that boundary visible and testable for developers, reviewers, and automated workflows.\n\n## What it does\n\nProofLock Console loads a canonical JSON receipt, recomputes its SHA-256 identity, resolves only repository-bounded artifact paths, rehashes the declared files, and evaluates required promotion gates separately from receipt integrity. The bundled example verifies four declared V2/V3 concept artifacts, then correctly keeps the decision at HOLD because engineering, prototype, safety, and human-release gates remain open.\n\n## How we built it\n\nThe project pairs a static browser experience using Web Crypto with a matching Python verifier for local automation and CI. Deterministic tests cover receipt tampering, path traversal, artifact custody, duplicate or invalid gates, and attempts to promote while required gates remain open. Codex helped narrow the scope, implement both verification paths, review the evidence boundary, and build the test suite. [[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]\n\n## Challenges we ran into\n\nThe hardest design problem was keeping integrity and truth distinct. A receipt can be internally intact without proving the underlying engineering claim, so the interface and verifier report `integrity_valid` and `promotion_allowed` as separate decisions and fail closed when evidence is missing.\n\n## Accomplishments that we're proud of\n\nThe public demo was observed with all ten required files returning HTTP 200 and matching their local SHA-256 identities. Desktop and mobile checks recorded zero horizontal overflow, and the bundled sample verified all four declared artifacts while preserving the HOLD decision.\n\n## What we learned\n\nAuditability improves when every important assertion names its evidence class, every artifact has a stable identity, and a missing human or technical gate cannot be converted into approval by polished prose.\n\n## What's next for ProofLock Console\n\nNext steps are an independent reproduction run, signed receipt adapters, CI integration, and additional schemas for evidence workflows. These are planned directions, not completed capabilities.",
+    "built_with_blocked_pending_model_provenance": [],
+    "project_story_markdown": "## Inspiration\n\nAI-assisted development can move faster than the evidence behind a claim. ProofLock Console was built to make that boundary visible and testable for developers, reviewers, and automated workflows.\n\n## What it does\n\nProofLock Console loads a canonical JSON receipt, recomputes its SHA-256 identity, resolves only repository-bounded artifact paths, rehashes the declared files, and evaluates required promotion gates separately from receipt integrity. The bundled example verifies four declared V2/V3 concept artifacts, then correctly keeps the decision at HOLD because engineering, prototype, safety, and human-release gates remain open.\n\n## How we built it\n\nThe project pairs a static browser experience using Web Crypto with a matching Python verifier for local automation and CI. Deterministic tests cover receipt tampering, path traversal, artifact custody, duplicate or invalid gates, and attempts to promote while required gates remain open. Codex helped narrow the scope, implement both verification paths, review the evidence boundary, and build the test suite. A lead Codex workflow coordinated bounded specialist roles for implementation, adversarial testing, evidence reconciliation, and independent review. A privacy-preserving machine receipt records five identity-backed Build Week spawn events across five role categories, with one completion directly observed; maximum concurrency remains NOT_PROVEN. The active build task records gpt-5.6-sol at ultra reasoning effort.\n\n## Challenges we ran into\n\nThe hardest design problem was keeping integrity and truth distinct. A receipt can be internally intact without proving the underlying engineering claim, so the interface and verifier report `integrity_valid` and `promotion_allowed` as separate decisions and fail closed when evidence is missing.\n\n## Accomplishments that we're proud of\n\nThe public demo was observed with all ten required files returning HTTP 200 and matching their local SHA-256 identities. Desktop and mobile checks recorded zero horizontal overflow, and the bundled sample verified all four declared artifacts while preserving the HOLD decision.\n\n## What we learned\n\nAuditability improves when every important assertion names its evidence class, every artifact has a stable identity, and a missing human or technical gate cannot be converted into approval by polished prose.\n\n## What's next for ProofLock Console\n\nNext steps are an independent reproduction run, signed receipt adapters, CI integration, and additional schemas for evidence workflows. These are planned directions, not completed capabilities.",
     "installation_and_testing": "Open the public demo URL for the no-build browser path. For local CLI verification, clone the repository and run `python build_week/prooflock_console/verify_receipt.py`. Run the focused test with `python -m pytest -q tests/test_prooflock_console.py`.",
     "supported_platforms": "Current desktop and mobile browsers with Web Crypto and Fetch support, plus Python 3 for the CLI.",
     "testing_access": "The public demo requires no account, API key, paid service, rebuild, or test credentials for the bundled verification path. Availability is proven only at the recorded observation time.",
     "preexisting_project_boundary": "The larger repository and source concept assets predate the submission period. The focused console, receipt contract, browser and Python verification paths, responsive interface, and tests are the scoped Build Week extension identified by the dated commit record.",
-    "model_provenance_placeholder": "[[CONFIRMED_MODEL_LABEL]]",
-    "model_usage_placeholder": "[[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]",
+    "confirmed_model_label": "gpt-5.6-sol",
+    "model_usage_sentence": "A lead Codex workflow coordinated bounded specialist roles for implementation, adversarial testing, evidence reconciliation, and independent review. A privacy-preserving machine receipt records five identity-backed Build Week spawn events across five role categories, with one completion directly observed; maximum concurrency remains NOT_PROVEN. The active build task records gpt-5.6-sol at ultra reasoning effort.",
     "feedback_session_placeholder": "[[FEEDBACK_SESSION_ID]]",
     "video_url_placeholder": "[[PUBLIC_YOUTUBE_URL]]",
-    "copy_state": "NOT_PASTE_READY_MODEL_AND_VIDEO_PROVENANCE_OPEN",
+    "copy_state": "VIDEO_ASSETS_VERIFIED_FEEDBACK_AND_PUBLICATION_OPEN",
     "source_refs": [
       "readiness_snapshot",
       "requirements_receipt",
@@ -145,15 +223,19 @@
       "demo_script",
       "prooflock_readme",
       "sample_receipt",
-      "repository_license"
+      "repository_license",
+      "orchestration_receipt",
+      "demo_video_receipt",
+      "demo_video",
+      "thumbnail_asset"
     ]
   },
   "model_and_session_placeholders": {
-    "confirmed_model_label": null,
-    "model_usage_sentence": null,
+    "confirmed_model_label": "gpt-5.6-sol",
+    "model_usage_sentence": "A lead Codex workflow coordinated bounded specialist roles for implementation, adversarial testing, evidence reconciliation, and independent review. A privacy-preserving machine receipt records five identity-backed Build Week spawn events across five role categories, with one completion directly observed; maximum concurrency remains NOT_PROVEN. The active build task records gpt-5.6-sol at ultra reasoning effort.",
     "feedback_session_id": null,
     "public_youtube_url": null,
-    "thumbnail_asset": null,
+    "thumbnail_asset": "output/video/prooflock_console_build_week_v1/prooflock_console_devpost_thumbnail_v1.png",
     "submitter_type": null,
     "country_of_residence": null,
     "representative_authorization": null
@@ -210,10 +292,13 @@
       "portal_label_exact": true,
       "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
       "required": true,
-      "proposed_value": null,
-      "completion_state": "MISSING_PUBLIC_ASSET",
-      "source_refs": [],
-      "human_gate": "Human privacy/IP review and visual approval before upload.",
+      "proposed_value": "output/video/prooflock_console_build_week_v1/prooflock_console_devpost_thumbnail_v1.png",
+      "completion_state": "SOURCE_BACKED_LOCAL_UPLOAD_READY_PUBLICATION_OPEN",
+      "source_refs": [
+        "thumbnail_asset",
+        "demo_video_receipt"
+      ],
+      "human_gate": "Upload the verified local asset, then inspect the public preview before final submission.",
       "format_rule": "JPG, PNG, or GIF; 5 MB maximum; 3:2 recommended."
     },
     {
@@ -223,15 +308,16 @@
       "portal_label_exact": true,
       "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
       "required": true,
-      "proposed_value": "## Inspiration\n\nAI-assisted development can move faster than the evidence behind a claim. ProofLock Console was built to make that boundary visible and testable for developers, reviewers, and automated workflows.\n\n## What it does\n\nProofLock Console loads a canonical JSON receipt, recomputes its SHA-256 identity, resolves only repository-bounded artifact paths, rehashes the declared files, and evaluates required promotion gates separately from receipt integrity. The bundled example verifies four declared V2/V3 concept artifacts, then correctly keeps the decision at HOLD because engineering, prototype, safety, and human-release gates remain open.\n\n## How we built it\n\nThe project pairs a static browser experience using Web Crypto with a matching Python verifier for local automation and CI. Deterministic tests cover receipt tampering, path traversal, artifact custody, duplicate or invalid gates, and attempts to promote while required gates remain open. Codex helped narrow the scope, implement both verification paths, review the evidence boundary, and build the test suite. [[SOURCE_BACKED_MODEL_USAGE_SENTENCE_REQUIRED]]\n\n## Challenges we ran into\n\nThe hardest design problem was keeping integrity and truth distinct. A receipt can be internally intact without proving the underlying engineering claim, so the interface and verifier report `integrity_valid` and `promotion_allowed` as separate decisions and fail closed when evidence is missing.\n\n## Accomplishments that we're proud of\n\nThe public demo was observed with all ten required files returning HTTP 200 and matching their local SHA-256 identities. Desktop and mobile checks recorded zero horizontal overflow, and the bundled sample verified all four declared artifacts while preserving the HOLD decision.\n\n## What we learned\n\nAuditability improves when every important assertion names its evidence class, every artifact has a stable identity, and a missing human or technical gate cannot be converted into approval by polished prose.\n\n## What's next for ProofLock Console\n\nNext steps are an independent reproduction run, signed receipt adapters, CI integration, and additional schemas for evidence workflows. These are planned directions, not completed capabilities.",
-      "completion_state": "PARTIAL_MODEL_PROVENANCE_OPEN",
+      "proposed_value": "## Inspiration\n\nAI-assisted development can move faster than the evidence behind a claim. ProofLock Console was built to make that boundary visible and testable for developers, reviewers, and automated workflows.\n\n## What it does\n\nProofLock Console loads a canonical JSON receipt, recomputes its SHA-256 identity, resolves only repository-bounded artifact paths, rehashes the declared files, and evaluates required promotion gates separately from receipt integrity. The bundled example verifies four declared V2/V3 concept artifacts, then correctly keeps the decision at HOLD because engineering, prototype, safety, and human-release gates remain open.\n\n## How we built it\n\nThe project pairs a static browser experience using Web Crypto with a matching Python verifier for local automation and CI. Deterministic tests cover receipt tampering, path traversal, artifact custody, duplicate or invalid gates, and attempts to promote while required gates remain open. Codex helped narrow the scope, implement both verification paths, review the evidence boundary, and build the test suite. A lead Codex workflow coordinated bounded specialist roles for implementation, adversarial testing, evidence reconciliation, and independent review. A privacy-preserving machine receipt records five identity-backed Build Week spawn events across five role categories, with one completion directly observed; maximum concurrency remains NOT_PROVEN. The active build task records gpt-5.6-sol at ultra reasoning effort.\n\n## Challenges we ran into\n\nThe hardest design problem was keeping integrity and truth distinct. A receipt can be internally intact without proving the underlying engineering claim, so the interface and verifier report `integrity_valid` and `promotion_allowed` as separate decisions and fail closed when evidence is missing.\n\n## Accomplishments that we're proud of\n\nThe public demo was observed with all ten required files returning HTTP 200 and matching their local SHA-256 identities. Desktop and mobile checks recorded zero horizontal overflow, and the bundled sample verified all four declared artifacts while preserving the HOLD decision.\n\n## What we learned\n\nAuditability improves when every important assertion names its evidence class, every artifact has a stable identity, and a missing human or technical gate cannot be converted into approval by polished prose.\n\n## What's next for ProofLock Console\n\nNext steps are an independent reproduction run, signed receipt adapters, CI integration, and additional schemas for evidence workflows. These are planned directions, not completed capabilities.",
+      "completion_state": "SOURCE_BACKED_READY_FINAL_PREVIEW_RECHECK_REQUIRED",
       "source_refs": [
         "description_draft",
         "prooflock_readme",
         "public_demo_receipt",
-        "browser_qa_receipt"
+        "browser_qa_receipt",
+        "orchestration_receipt"
       ],
-      "human_gate": "Replace the model-usage placeholder only from direct session evidence.",
+      "human_gate": "Recheck Markdown rendering in the final Devpost preview.",
       "format_rule": "Markdown accepted by Devpost."
     },
     {
@@ -243,6 +329,7 @@
       "required": true,
       "proposed_value": [
         "Codex",
+        "gpt-5.6-sol",
         "JavaScript",
         "Web Crypto API",
         "Python",
@@ -250,12 +337,13 @@
         "HTML",
         "CSS"
       ],
-      "completion_state": "PARTIAL_MODEL_PROVENANCE_OPEN",
+      "completion_state": "SOURCE_BACKED_READY_FINAL_PREVIEW_RECHECK_REQUIRED",
       "source_refs": [
         "prooflock_readme",
-        "readiness_snapshot"
+        "readiness_snapshot",
+        "orchestration_receipt"
       ],
-      "human_gate": "Add the required model tag only after the exact model label is directly confirmed.",
+      "human_gate": "Recheck that every tag is accepted by the portal widget.",
       "format_rule": null
     },
     {
@@ -295,12 +383,14 @@
       "label_authority": "DEVPOST_STANDARD_SUBMISSION_STEPS",
       "required": true,
       "proposed_value": null,
-      "completion_state": "MISSING_PUBLIC_YOUTUBE_VIDEO",
+      "completion_state": "LOCAL_VIDEO_VERIFIED_PUBLICATION_OPEN",
       "source_refs": [
         "demo_script",
-        "requirements_receipt"
+        "requirements_receipt",
+        "demo_video_receipt",
+        "demo_video"
       ],
-      "human_gate": "Human records, reviews, uploads, and makes the video public; this builder does none of those actions.",
+      "human_gate": "The verified MP4 is ready locally; public YouTube upload remains an external publication action.",
       "format_rule": "Public YouTube URL; video shorter than three minutes; audio covers the project and required tools."
     },
     {
@@ -419,10 +509,12 @@
       "portal_label_exact": false,
       "label_authority": "OPENAI_BUILD_WEEK_RULES_SEMANTIC_REQUIREMENT_PORTAL_LABEL_UNOBSERVED",
       "required": true,
-      "proposed_value": null,
-      "completion_state": "MISSING_DIRECT_MODEL_PROVENANCE",
-      "source_refs": [],
-      "human_gate": "Human reads and records the exact model label from the qualifying core-build session; never infer it.",
+      "proposed_value": "gpt-5.6-sol",
+      "completion_state": "SOURCE_BACKED_READY_PORTAL_LABEL_UNOBSERVED",
+      "source_refs": [
+        "orchestration_receipt"
+      ],
+      "human_gate": "Confirm the exact custom portal label before saving the additional-information step.",
       "format_rule": null
     },
     {
@@ -645,6 +737,10 @@
     "submit",
     "contact_anyone"
   ],
-  "claim_boundary": "This kit prepares source-backed draft content and a field-by-field completion contract. It does not prove model identity, a /feedback Session ID, eligibility, ownership, legal acceptance, Devpost authentication or registration, project creation, video publication, final submission, judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value.",
-  "registry_sha256": "6ce73050675b492a42ac222bdf42b9196f569e5fc30410e2c3bee9d54defd865"
+  "actions_observed_external_to_this_kit": [
+    "challenge_registration",
+    "project_shell_creation"
+  ],
+  "claim_boundary": "This kit prepares source-backed draft content and a field-by-field completion contract. It confirms a bounded project draft and locally verified release assets. It does not prove a /feedback Session ID, eligibility, ownership, legal acceptance, video publication, final submission, judging outcome, endorsement, award, external validation, patent rights, safety, funding, or value.",
+  "registry_sha256": "205fa66aee207a8e974d2ebc9bda72cad8aebf60fb83c7dbb734ad0d181382c1"
 }

@@ -3,24 +3,27 @@ param(
     [string]$VpsUser = "opc",
     [string]$VpsRoot = "/opt/lumencore",
     [string]$Root = "C:\LumaTrader\INSTITUTIONAL_STACK_V2",
-    [string]$SshKeyPath = $env:LUMA_VPS_SSH_KEY
+    [string]$SshKeyPath = $env:LUMA_VPS_SSH_KEY,
+    [switch]$Apply,
+    [switch]$DryRun
 )
 
 $ErrorActionPreference = "Stop"
 
-if (-not $SshKeyPath -or -not (Test-Path $SshKeyPath)) {
-    $keyCandidates = @(
-        $env:LUMA_VPS_SSH_KEY,
-        "C:\Users\Novac\Downloads\ssh-key-2026-04-23.key",
-        (Join-Path $env:USERPROFILE ".ssh\id_ed25519"),
-        (Join-Path $env:USERPROFILE ".ssh\id_rsa")
-    )
-    foreach ($candidate in $keyCandidates) {
-        if ($candidate -and (Test-Path $candidate)) {
-            $SshKeyPath = (Resolve-Path $candidate).Path
-            break
-        }
+if ($Apply -and $DryRun) {
+    throw "-Apply and -DryRun cannot be used together."
+}
+
+$humanUnlockToken = $null
+if ($Apply) {
+    $humanUnlockToken = [string]$env:LUMA_HUMAN_UNLOCK_TOKEN
+    if ([string]::IsNullOrWhiteSpace($humanUnlockToken) -or $humanUnlockToken.Length -lt 32) {
+        throw "Apply is blocked: LUMA_HUMAN_UNLOCK_TOKEN must be configured with at least 32 characters."
     }
+
+    # Keep the secret out of all child-process environments. It is sent only
+    # through SSH standard input when the guarded remote installer is invoked.
+    Remove-Item Env:LUMA_HUMAN_UNLOCK_TOKEN -ErrorAction SilentlyContinue
 }
 
 # =============================================================================
@@ -72,12 +75,40 @@ function Invoke-Ssh {
     }
 }
 
+function Invoke-SshWithHumanUnlock {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RemoteCommand,
+        [Parameter(Mandatory = $true)]
+        [string]$StepLabel,
+        [Parameter(Mandatory = $true)]
+        [string]$HumanUnlockToken
+    )
+
+    $sshArgs = @()
+    if ($SshKeyPath) {
+        $sshArgs += @("-i", $SshKeyPath)
+    }
+    $sshArgs += @("-o", "BatchMode=yes")
+
+    $guardedRemoteCommand = @(
+        "set -e"
+        "IFS= read -r LUMA_HUMAN_UNLOCK_TOKEN"
+        "export LUMA_HUMAN_UNLOCK_TOKEN"
+        "export LUMA_VPS_DEPLOY_APPLY=1"
+        $RemoteCommand
+    ) -join "; "
+    $sshArgs += @("${VpsUser}@${VpsIp}", $guardedRemoteCommand)
+
+    $HumanUnlockToken | & ssh @sshArgs
+    if ($LASTEXITCODE -ne 0) {
+        throw "[$StepLabel] ssh failed with exit code $LASTEXITCODE"
+    }
+}
+
 $deployScript = Join-Path $Root "code\deploy\deploy_vps.sh"
 $codeDir = Join-Path $Root "code"
 $lamaScoutDir = Join-Path $Root "LamaScout"
-$stamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
-$codeArchive = Join-Path $env:TEMP "lumencore_code_$stamp.tgz"
-$lamaArchive = Join-Path $env:TEMP "lumencore_lamascout_$stamp.tgz"
 
 if (-not (Test-Path $deployScript)) {
     throw "Deploy script not found: $deployScript"
@@ -88,17 +119,40 @@ if (-not (Test-Path $codeDir)) {
 if (-not (Test-Path $lamaScoutDir)) {
     throw "LamaScout directory not found: $lamaScoutDir"
 }
+
+Write-Host "=====================================================" -ForegroundColor Cyan
+Write-Host " LUMEN-CORE.AI — VPS STACK DEPLOYMENT" -ForegroundColor Cyan
+Write-Host " Target: ${VpsUser}@${VpsIp}:${VpsRoot}" -ForegroundColor Cyan
+Write-Host "=====================================================" -ForegroundColor Cyan
+
+if (-not $Apply) {
+    Write-Host "PRECHECK ONLY: local deployment inputs are present." -ForegroundColor Yellow
+    Write-Host "No network calls, archives, copies, remote extraction, proxy reloads, or service restarts were performed." -ForegroundColor Yellow
+    Write-Host "Use -Apply with a private LUMA_HUMAN_UNLOCK_TOKEN of at least 32 characters to run the existing deployment." -ForegroundColor Yellow
+    exit 0
+}
+
+if (-not $SshKeyPath -or -not (Test-Path $SshKeyPath)) {
+    $keyCandidates = @(
+        $env:LUMA_VPS_SSH_KEY,
+        "C:\Users\Novac\Downloads\ssh-key-2026-04-23.key",
+        $(if ($env:USERPROFILE) { Join-Path $env:USERPROFILE ".ssh\id_ed25519" }),
+        $(if ($env:USERPROFILE) { Join-Path $env:USERPROFILE ".ssh\id_rsa" })
+    )
+    foreach ($candidate in $keyCandidates) {
+        if ($candidate -and (Test-Path $candidate)) {
+            $SshKeyPath = (Resolve-Path $candidate).Path
+            break
+        }
+    }
+}
 if ($SshKeyPath -and -not (Test-Path $SshKeyPath)) {
     throw "SSH key path not found: $SshKeyPath"
 }
 
-Write-Host "=====================================================" -ForegroundColor Cyan
-Write-Host " LUMEN-CORE.AI — VPS STACK UPLOAD" -ForegroundColor Cyan
-Write-Host " Target: ${VpsUser}@${VpsIp}:${VpsRoot}" -ForegroundColor Cyan
-if ($SshKeyPath) {
-    Write-Host " Key: $SshKeyPath" -ForegroundColor Cyan
-}
-Write-Host "=====================================================" -ForegroundColor Cyan
+$stamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
+$codeArchive = Join-Path $env:TEMP "lumencore_code_$stamp.tgz"
+$lamaArchive = Join-Path $env:TEMP "lumencore_lamascout_$stamp.tgz"
 
 # Step 1: Verify the target before packaging or changing services.
 Write-Host "[1/5] Checking VPS connectivity and capacity..." -ForegroundColor Yellow
@@ -188,8 +242,9 @@ if (Test-Path $landingDir) {
 
 # Step 4: Install current units after current source is in place.
 Write-Host "[4/5] Installing and restarting canonical production services..." -ForegroundColor Yellow
-$installServicesCmd = 'set -e; sudo find ' + $VpsRoot + '/code/deploy -type f -name "*.sh" -exec sed -i "s/\r$//" {} +; sudo bash -n ' + $VpsRoot + '/code/deploy/deploy_vps.sh; sudo chown -R lumencore:lumencore ' + $VpsRoot + '; sudo env LUMA_SERVICE_USER=lumencore LUMA_DOMAIN=lumen-core.ai bash ' + $VpsRoot + '/code/deploy/deploy_vps.sh lumen-core.ai; sudo systemctl restart luma-gateway luma-dashboard-refresh luma-paper-ticker luma-symbol-awareness luma-kraken-history'
-Invoke-Ssh -StepLabel "4/5 Install services" -RemoteCommand $installServicesCmd
+$installServicesCmd = 'set -e; sudo find ' + $VpsRoot + '/code/deploy -type f -name "*.sh" -exec sed -i "s/\r$//" {} +; sudo bash -n ' + $VpsRoot + '/code/deploy/deploy_vps.sh; sudo chown -R lumencore:lumencore ' + $VpsRoot + '; sudo --preserve-env=LUMA_HUMAN_UNLOCK_TOKEN,LUMA_VPS_DEPLOY_APPLY env LUMA_SERVICE_USER=lumencore LUMA_DOMAIN=lumen-core.ai bash ' + $VpsRoot + '/code/deploy/deploy_vps.sh lumen-core.ai; sudo systemctl restart luma-gateway luma-dashboard-refresh luma-paper-ticker luma-symbol-awareness luma-kraken-history'
+Invoke-SshWithHumanUnlock -StepLabel "4/5 Install services" -RemoteCommand $installServicesCmd -HumanUnlockToken $humanUnlockToken
+$humanUnlockToken = $null
 
 # Step 5: Status check
 Write-Host "[5/5] Service status..." -ForegroundColor Yellow

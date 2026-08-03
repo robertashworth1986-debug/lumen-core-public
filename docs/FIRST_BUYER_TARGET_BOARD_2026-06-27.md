@@ -1,14 +1,14 @@
 # First Buyer Target Board
 
-Generated UTC: `2026-07-03T23:53:56.749789+00:00`
+Generated UTC: `2026-07-29T08:01:55.624742+00:00`
 
 First-buyer target board. This artifact selects named, source-verified buyer channels for a manual paid evidence review or buyer-authorized field replay. It does not authorize auto-send, bulk outreach, contact scraping, fixed frozen-delta pricing, field-validation claims, realized-savings claims, live trading, or autonomous operational execution.
 
 ## Decision
 
-- First buyer channel: `EPRI AI for Power / Incubatenergy Labs`
-- Channel type: `national_utility_demonstration_channel`
-- First action: Send one manually reviewed inquiry through the official challenge/contact path.
+- First buyer channel: `None`
+- Channel type: `None`
+- First action: Verify one current official channel, reconcile duplicate-send history, select a real recipient, and obtain exact action-time approval before outreach.
 - Send without user review: `false`
 - Bulk email allowed: `false`
 - Field-validation claim allowed: `false`
@@ -16,14 +16,18 @@ First-buyer target board. This artifact selects named, source-verified buyer cha
 
 ## Proof Snapshot
 
-- Champion: `Kuramoto phase coupling`
-- Named baseline: `kalman_filter`
-- Holdout wins: `24/24`
-- Champion-core estimated rows replayed: `2,506,267`
-- Champion-core source systems: `4`
+- Internal performance champion present: `false`
+- Measured reference candidate: `Kuramoto phase coupling`
+- Development-selected candidate: `lissajous_phase_paths`
+- Reference candidate was protocol-selected: `false`
+- Named baseline: `kalman_local_linear_trend`
+- Holdout wins: `482/1525`
+- Mean skill delta: `-0.508191`
+- Reference measured rows replayed: `15,250`
+- Reference source systems: `1`
 - Broader measured providers: `25/29`
-- Broader locked sweep: `313` routes, `1969` comparisons, `1355` wins, `159` mapped sources, `7,152,253` estimated rows
-- Live-domain hash verified: `true`
+- Compatibility-gated sweep: `4` routes, `22` comparisons, `0` global positives, `32,608` performance rows
+- Live-domain hash verified: `false`
 - Business plan PDF: `C:\Users\Novac\iCloudDrive\Business plan\LumenCore_Business_Plan_Investor_Ready_UPDATED_2026-07-03.pdf`
 - Stress matrix feed: https://lumen-core.ai/data/champion_stress_test_matrix.json
 
@@ -90,26 +94,20 @@ First-buyer target board. This artifact selects named, source-verified buyer cha
   - https://epri.brightidea.com/AIforPower2026 - AI for Power 2026 connects energy companies, technology providers, and utilities through real-world demonstration projects; pitch day is listed for August 5, 2026.
   - https://www.tva.com/energy/technology-innovation/future-grid-performance - TVA identifies future grid performance challenges tied to renewables, storage, weather-dependent resources, and inverter-based resources.
 
-## Primary Manual Email
+## Draft Email
 
-Subject: Paid field-replay scoping: LumenCore proof feed for EPRI AI for Power / Incubatenergy Labs
+Subject: Source-native benchmark and evidence protocol review
 
 ```text
-Hello,
+Hello [Name],
 
-I am Robert Ashworth, building LumenCore, a hash-verified evidence and benchmark framework for grid and infrastructure optimization.
+I am Robert Ashworth, building LumenCore, a source-native evidence and benchmark framework for infrastructure analytics.
 
-I am looking for the right technical reviewer for one bounded paid evidence review or buyer-authorized field replay. The current internal champion is Kuramoto phase coupling; it shows 24/24 source-conditioned holdout wins vs kalman_filter, with the public proof feeds available for review.
+I am looking for the right technical reviewer for one bounded paid protocol review or benchmark implementation. The current measured result is deliberately a negative one: Kuramoto phase coupling won 482/1525 paired EIA holdout days versus kalman_local_linear_trend, had a mean skill delta of -0.508191, and did not clear the complete source-specific baseline gate.
 
-Important boundary: I am not claiming field validation or realized savings yet. The next step is narrower and safer: lock your approved baseline, choose pre-registered holdout windows, replay the candidate under identical constraints, and report what improved, what failed, and what still cannot be claimed.
+The offer is the governed method, not a claim that this candidate wins: map one authorized source to the correct task, register accepted incumbent baselines, freeze chronology and metrics, run the comparison reproducibly, and deliver a reviewer-ready packet that preserves positive and negative results.
 
-Why I think EPRI AI for Power / Incubatenergy Labs is the right first fit:
-Highest leverage: one accepted demo path can expose the proof stack to multiple utilities and AI/power decision makers without pretending LumenCore is field validated already.
-
-Reviewer proof feed: https://lumen-core.ai/data/champion_stress_test_matrix.json
-Mission console: https://lumen-core.ai/mission_control.html
-
-Would you be open to a 20-minute technical fit call, or could you route me to the person who owns AI/grid analytics validation pilots?
+Would you be open to a 20-minute technical fit call about a fixed-scope source-native benchmark and evidence protocol review?
 
 Respectfully,
 Robert Ashworth
@@ -120,7 +118,7 @@ To stop further outreach, reply "remove."
 
 ## Claim Controls
 
-- Allowed today: manual inquiry to one reviewed buyer channel, paid evidence review ask, buyer-authorized field replay request, public hash-verified proof feed reference
-- Blocked until buyer replay: field validated, realized savings, fixed price per frozen delta, award certainty, alpha certainty, live operational control
+- Allowed today: draft a paid source-native protocol review offer, verify one current official buyer channel, reconcile sent history and routing controls, prepare a bounded benchmark implementation scope
+- Blocked until action-time clearance: send any outreach, select or imply a current recipient, describe any family as a performance champion, request a field replay for the current Kuramoto result, field validated, realized savings, fixed price per frozen delta, award certainty, alpha certainty, live operational control
 
-First-buyer board SHA-256: `0e17c89353f5e33ef7fc7d9a8d5e013b87903c4bf692d3893e5248dafeeab17c`
+First-buyer board SHA-256: `510f08dea896fae8bfd82d664eea4f1aedc938cf56aa67cff3e2a347b9ad2625`

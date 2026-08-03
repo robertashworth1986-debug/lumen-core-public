@@ -1,0 +1,15 @@
+{
+  "full_thread_read": true,
+  "inbound_after_source_count": 0,
+  "lane_id": "lanl_vision_licensing_followup",
+  "latest_observed_message_utc": "2026-07-16T18:50:16Z",
+  "mailbox_rechecked_utc": "2026-07-27T02:39:30.758256Z",
+  "no_reply_confirmed": true,
+  "observed_message_count": 2,
+  "receipt_sha256": "D14FC3F4FBEF0096AC3E237E4C82A1B25DC9E95E7D9545B31822D951AA888281",
+  "schema": "lumencore.mailbox_recheck_receipt.v1",
+  "source_message_id_sha256": "BC198A0A9C1AAD778B43FDB472B9B3E2C2BF752421E0D9E2E02292988DD52A20",
+  "source_sent_utc": "2026-07-16T18:50:16Z",
+  "thread_id_sha256": "256779C996BDFE28ADE73C40E91410E287B8B6CDCDD82365E2F6DB22DB5FDDBF",
+  "thread_truncated": false
+}

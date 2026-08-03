@@ -128,36 +128,46 @@ def test_nsf_pitch_fields_stay_under_portal_limits():
     for field, row in nsf["nsf_fields"].items():
         assert row["ok"], field
         assert row["characters"] <= row["limit"], field
-    assert nsf["nsf_fields"]["Technology Innovation"]["characters"] == 3070
+    assert nsf["nsf_fields"]["Technology Innovation"]["characters"] == 3273
+    assert nsf["nsf_fields"]["Technical Objectives and Challenges"]["characters"] == 3030
+    assert nsf["nsf_fields"]["Market Opportunity"]["characters"] == 1674
+    assert nsf["nsf_fields"]["Company and Team"]["characters"] == 1602
 
     required = {row["path"] for row in nsf["required_artifacts"]}
     assert (
-        "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
+        "grant_submissions/NSF_Project_Pitch/PROJECT_PITCH_PORTAL_FIELDS_2026-07-29.md"
         in required
     )
     assert (
-        "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-16.json"
+        "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_ROUTING_MANIFEST_2026-07-29.json"
         in required
     )
+    assert (
+        "grant_submissions/NSF_Project_Pitch/NSF_PROJECT_PITCH_SOURCE_AUDIT_2026-07-29.json"
+        in required
+    )
+    assert len(nsf["evidence_receipts"]) == 3
+    assert all(row["exists"] and row["sha256"] for row in nsf["evidence_receipts"])
 
     routing = nsf["nsf_routing"]
-    assert routing["schema"] == "lumencore.nsf_project_pitch_routing.v1"
+    assert routing["schema"] == "lumencore.nsf_project_pitch_routing.v2"
     assert routing["project_pitch"]["deadline"] is None
+    assert routing["project_pitch"]["submission_allowed"] is False
     assert routing["project_pitch"]["final_submit_allowed_without_human"] is False
     assert routing["full_proposal"]["invitation_required"] is True
     assert routing["full_proposal"]["invitation_verified"] is False
     assert routing["full_proposal"]["submission_allowed"] is False
-    assert routing["full_proposal"]["july_27_2026_reachable"] is False
-    assert routing["full_proposal"]["july_27_2026_currently_listed"] is True
-    assert routing["full_proposal"]["current_official_schedule_checked_on"] == "2026-07-17"
-    assert routing["full_proposal"]["nearest_listed_deadline"] == "2026-07-27"
+    assert routing["full_proposal"]["past_listed_deadlines"] == ["2026-07-27"]
+    assert routing["full_proposal"]["current_official_schedule_checked_on"] == "2026-07-29"
+    assert routing["full_proposal"]["next_listed_deadline"] == "2026-11-04"
+    assert routing["full_proposal"]["next_listed_deadline_reachable"] is False
     assert routing["full_proposal"]["listed_deadlines"] == [
         "2026-07-27",
         "2026-11-04",
         "2027-03-04",
         "2027-07-07",
     ]
-    assert routing["full_proposal"]["next_planning_target"] == "2026-11-04"
+    assert routing["full_proposal"]["planning_target"] == "2026-11-04"
 
 
 def test_nsf_pitch_is_claim_bounded_and_contains_required_reviewer_content():
@@ -165,7 +175,7 @@ def test_nsf_pitch_is_claim_bounded_and_contains_required_reviewer_content():
         ROOT
         / "grant_submissions"
         / "NSF_Project_Pitch"
-        / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-16.md"
+        / "PROJECT_PITCH_PORTAL_FIELDS_2026-07-29.md"
     ).read_text(encoding="utf-8")
     lowered = packet.lower()
 
@@ -186,6 +196,8 @@ def test_nsf_pitch_is_claim_bounded_and_contains_required_reviewer_content():
 
     assert "does not claim an NSF invitation" in packet
     assert "does not claim" in lowered
-    assert "july 27 is a full-proposal deadline" in lowered
-    assert "july 27 full-proposal deadline is not currently reachable" in lowered
-    assert "july 27 is not listed on the current schedule" not in lowered
+    assert "july 27, 2026 is now a past listed full-proposal deadline" in lowered
+    assert "next listed full-proposal deadline is november 4, 2026" in lowered
+    assert "no full-proposal deadline is currently reachable" in lowered
+    assert "u.s.-owned small business" not in lowered
+    assert "will serve as principal investigator" not in lowered

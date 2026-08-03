@@ -27,11 +27,56 @@
         "capital_efficiency": 96
       },
       "evidence_paths": [
-        "code/ops/run_healthcare_grants_engine.py",
-        "code/ops/build_healthcare_website_feed.py",
-        "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
-        "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
-        "dashboard/embed/mindwise_premium_flow_demo.html"
+        {
+          "path": "code/ops/run_healthcare_grants_engine.py",
+          "required": true,
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "claim_scope": "A local healthcare opportunity discovery and ranking implementation exists; this does not prove current source coverage or buyer eligibility."
+        },
+        {
+          "path": "code/ops/build_healthcare_website_feed.py",
+          "required": true,
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "claim_scope": "A local source-to-website feed builder exists; this does not prove that any displayed record is current or eligible."
+        },
+        {
+          "path": "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
+          "required": true,
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "claim_scope": "A local fail-closed readiness audit implementation exists; only its current outputs can describe a package state."
+        },
+        {
+          "path": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
+          "required": true,
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "claim_scope": "A local deadline-control implementation exists; code presence is not a current deadline receipt."
+        },
+        {
+          "path": "out/ops/near_deadline_submission_command_board_latest.json",
+          "required": true,
+          "kind": "generated_control_receipt",
+          "min_bytes": 1024,
+          "expected_schema": "near_deadline_submission_command_board_v5",
+          "required_keys": [
+            "generated_utc",
+            "lanes",
+            "summary",
+            "command_board_sha256"
+          ],
+          "max_age_hours": 24,
+          "claim_scope": "The deadline command board was rebuilt recently enough for internal triage; every official source and portal gate still requires action-time verification."
+        },
+        {
+          "path": "dashboard/embed/mindwise_premium_flow_demo.html",
+          "required": true,
+          "kind": "interactive_demo",
+          "min_bytes": 1024,
+          "claim_scope": "A buyer-facing workflow demonstration exists; it is not a production deployment, customer acceptance receipt, or measured outcome."
+        }
       ],
       "first_validation": "Run a paid 30-day design-partner pilot against the buyer's current grant workflow and lock the baseline before automation begins.",
       "recurring_model": "Per-organization subscription with controlled seats, opportunity monitoring, evidence storage, and an optional managed preflight tier.",
@@ -57,10 +102,46 @@
         "capital_efficiency": 94
       },
       "evidence_paths": [
-        "code/meta_router.py",
-        "code/ops/BUILD_PROOF_TO_REVENUE_ENGINE.py",
-        "dashboard/evidence/runs/20260505T121657Z/router/eval.json",
-        "dashboard/evidence/runs/20260505T121657Z/stacker/eval.json"
+        {
+          "path": "code/meta_router.py",
+          "required": true,
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "claim_scope": "A historical routing implementation exists; its current feature construction is not cleared for prospective superiority claims."
+        },
+        {
+          "path": "code/ops/BUILD_PROOF_TO_REVENUE_ENGINE.py",
+          "required": true,
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "claim_scope": "A claim-bounded commercial packaging implementation exists; it does not establish demand, pricing acceptance, or revenue."
+        },
+        {
+          "path": "dashboard/evidence/runs/20260505T121657Z/router/eval.json",
+          "required": true,
+          "kind": "historical_exploratory_evaluation",
+          "min_bytes": 1024,
+          "required_keys": [
+            "summary",
+            "ds_idx",
+            "routed_family",
+            "per_family_rmse",
+            "oracle_rmse"
+          ],
+          "claim_scope": "A historical exploratory router evaluation exists; the known full-series feature leakage blocks prospective performance claims."
+        },
+        {
+          "path": "dashboard/evidence/runs/20260505T121657Z/stacker/eval.json",
+          "required": true,
+          "kind": "historical_exploratory_evaluation",
+          "min_bytes": 512,
+          "required_keys": [
+            "summary",
+            "elapsed_s",
+            "run_utc"
+          ],
+          "claim_scope": "A historical stacker evaluation receipt exists; it is bounded to its recorded design and is not external validation."
+        }
       ],
       "first_validation": "Rebuild router features from training windows only, add deterministic abstention, and evaluate prospectively against the best fixed family and a declared oracle boundary.",
       "recurring_model": "Usage-priced API plus enterprise policy packs and retained evidence storage.",
@@ -86,11 +167,59 @@
         "capital_efficiency": 76
       },
       "evidence_paths": [
-        "code/ops/BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py",
-        "code/ops/BUILD_OUTAGE_SECOND_ECONOMIC_VALUE_PACKET.py",
-        "dashboard/evidence/runs/20260505T121657Z/summary.json"
+        {
+          "path": "code/ops/BUILD_EIA_GRID_HOURLY_REPRODUCTION_PACKET.py",
+          "required": true,
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "claim_scope": "A reproducibility-packet builder exists; its presence does not prove independent reproduction."
+        },
+        {
+          "path": "code/ops/BUILD_OUTAGE_SECOND_ECONOMIC_VALUE_PACKET.py",
+          "required": true,
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "claim_scope": "An economic-conversion packet builder exists; realized savings remain blocked without buyer-authorized operational inputs."
+        },
+        {
+          "path": "out/eia_grid_prospective_hourly_router/prospective_status_latest.json",
+          "required": true,
+          "kind": "generated_prospective_status",
+          "min_bytes": 512,
+          "expected_schema": "eia_grid_prospective_hourly_router_status.v1",
+          "required_keys": [
+            "generated_utc",
+            "prediction_count",
+            "common_settled_hour_count",
+            "promotion_evaluation_complete",
+            "protocol_sha256"
+          ],
+          "max_age_hours": 24,
+          "claim_scope": "The prospective EIA status was refreshed recently; its own settlement and promotion gates control any performance language."
+        },
+        {
+          "path": "out/reviewer_handoffs/EIA_GRID_HOURLY_INDEPENDENT_REPRODUCTION_HANDOFF_LATEST.json",
+          "required": true,
+          "kind": "reviewer_handoff",
+          "min_bytes": 1024,
+          "expected_schema": "eia_grid_hourly_independent_reproduction_handoff.v1",
+          "required_keys": [
+            "independent_reproduction_complete",
+            "performance_promotion_allowed",
+            "claim_boundary",
+            "integrity"
+          ],
+          "claim_scope": "A bounded independent-review handoff exists; its recorded completion flags govern independent-validation claims."
+        },
+        {
+          "path": "docs/EIA_GRID_HOURLY_INDEPENDENT_REPRODUCTION_HANDOFF_2026-07-16.md",
+          "required": true,
+          "kind": "reviewer_document",
+          "min_bytes": 1024,
+          "claim_scope": "A human-readable reproduction handoff exists; document presence does not prove evaluator completion or acceptance."
+        }
       ],
-      "first_validation": "Secure one operator-approved dataset, baseline, holdout policy, and economic conversion factor before discussing dollar value.",
+      "first_validation": "Complete the preregistered prospective sample gates, obtain an independent reproduction receipt, and secure one operator-approved dataset, incumbent baseline, holdout policy, and economic conversion before discussing performance or dollar value.",
       "recurring_model": "Monitoring and model-governance subscription after a scoped validation engagement.",
       "blocked_claims": [
         "field validation without an operator receipt",
@@ -113,9 +242,34 @@
         "capital_efficiency": 88
       },
       "evidence_paths": [
-        "dashboard/lumascout_dashboard.html",
-        "out/lumascout_summary.json",
-        "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+        {
+          "path": "dashboard/lumascout_dashboard.html",
+          "required": true,
+          "kind": "interactive_demo",
+          "min_bytes": 1024,
+          "claim_scope": "A LumaScout dashboard implementation exists; it does not prove current licensed data coverage or predictive validity."
+        },
+        {
+          "path": "out/lumascout_summary.json",
+          "required": true,
+          "kind": "generated_product_status",
+          "min_bytes": 256,
+          "required_keys": [
+            "generated_utc",
+            "active_sources",
+            "champions",
+            "truth_summary_path"
+          ],
+          "max_age_hours": 168,
+          "claim_scope": "A recent LumaScout status is required before describing active sources or current prospects."
+        },
+        {
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "required": true,
+          "kind": "commercialization_map",
+          "min_bytes": 1024,
+          "claim_scope": "A claim-bounded commercialization map exists; it is planning evidence, not market validation."
+        }
       ],
       "first_validation": "Pre-register a shortlist and measure forward artist outcomes against a transparent popularity baseline using licensed or permitted data.",
       "recurring_model": "A&R team subscription with watchlists, alerts, and portfolio outcome tracking.",
@@ -140,9 +294,27 @@
         "capital_efficiency": 46
       },
       "evidence_paths": [
-        "dashboard/kraken_execution_dashboard.html",
-        "code/master_universe_benchmark_v2.py",
-        "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+        {
+          "path": "dashboard/kraken_execution_dashboard.html",
+          "required": true,
+          "kind": "paper_research_dashboard",
+          "min_bytes": 1024,
+          "claim_scope": "A paper-research dashboard exists; it is not live trading authorization, custody evidence, or a profitability receipt."
+        },
+        {
+          "path": "code/master_universe_benchmark_v2.py",
+          "required": true,
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "claim_scope": "A benchmark implementation exists; source-native baselines and prospective gates govern all comparative claims."
+        },
+        {
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "required": true,
+          "kind": "commercialization_map",
+          "min_bytes": 1024,
+          "claim_scope": "A claim-bounded commercialization map exists; it does not establish alpha, profitability, or institutional readiness."
+        }
       ],
       "first_validation": "Pass a prospective after-fee paper protocol with reconciliation and risk gates before any live-capital discussion.",
       "recurring_model": "Research subscription only after prospective evidence passes.",
@@ -168,7 +340,47 @@
         "capital_efficiency": 24
       },
       "evidence_paths": [
-        "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+        {
+          "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "required": true,
+          "kind": "commercialization_map",
+          "min_bytes": 1024,
+          "claim_scope": "A claim-bounded commercialization map exists; it is not validation of comfort, safety, or medical efficacy."
+        },
+        {
+          "path": "docs/hardware/lumaskin_xr_research_platform/README.md",
+          "required": true,
+          "kind": "research_specification",
+          "min_bytes": 1024,
+          "claim_scope": "A research-platform specification exists; it does not prove a built or certified device."
+        },
+        {
+          "path": "config/lumaskin_test_protocol_v1.json",
+          "required": true,
+          "kind": "test_protocol",
+          "min_bytes": 1024,
+          "expected_schema": "lumencore.lumaskin_test_protocol.v1",
+          "required_keys": [
+            "claim_boundary",
+            "v1_scope",
+            "research_states"
+          ],
+          "claim_scope": "A bounded test protocol exists; execution, ethics review, and human-factors outcomes remain separate gates."
+        },
+        {
+          "path": "code/hardware/lumaskin_safety_controller.py",
+          "required": true,
+          "kind": "source_code",
+          "min_bytes": 1024,
+          "claim_scope": "A local safety-controller implementation exists; it is not safety certification or field evidence."
+        },
+        {
+          "path": "build_week/lumaskin_lab/index.html",
+          "required": true,
+          "kind": "interactive_demo",
+          "min_bytes": 1024,
+          "claim_scope": "A software demonstration exists; it is not a hardware prototype or human-subject validation."
+        }
       ],
       "first_validation": "Build a non-medical software-only prototype and run an ethics-reviewed human-factors study with established cybersickness and task-performance measures.",
       "recurring_model": "SDK licensing after human-factors validation.",

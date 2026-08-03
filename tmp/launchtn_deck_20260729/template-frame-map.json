@@ -1,0 +1,174 @@
+{
+  "outputSlides": [
+    {
+      "outputSlide": 1,
+      "sourceSlide": 1,
+      "narrativeRole": "competition opening thesis",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/k3yl0zql",
+            "sh/7qp4be9c",
+            "sh/ts7md4r2",
+            "sh/fu94fe98",
+            "sh/utg3698n",
+            "sh/vmdcj2xw"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 2,
+      "sourceSlide": 2,
+      "narrativeRole": "problem evidence",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeId": "sh/9o7ulg3y"
+        }
+      ]
+    },
+    {
+      "outputSlide": 3,
+      "sourceSlide": 3,
+      "narrativeRole": "product workflow",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeId": "sh/a9kfadwn"
+        }
+      ]
+    },
+    {
+      "outputSlide": 4,
+      "sourceSlide": 4,
+      "narrativeRole": "customer hypothesis",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeId": "sh/ilwf69kv"
+        }
+      ]
+    },
+    {
+      "outputSlide": 5,
+      "sourceSlide": 5,
+      "narrativeRole": "current evidence and prospective gate",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeId": "sh/zmlk3yhk"
+        }
+      ]
+    },
+    {
+      "outputSlide": 6,
+      "sourceSlide": 6,
+      "narrativeRole": "commercial offer sequence",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeId": "sh/lg76d8zy"
+        }
+      ]
+    },
+    {
+      "outputSlide": 7,
+      "sourceSlide": 7,
+      "narrativeRole": "competitive positioning hypothesis",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeId": "sh/s3ml0v61"
+        }
+      ]
+    },
+    {
+      "outputSlide": 8,
+      "sourceSlide": 8,
+      "narrativeRole": "go-to-market qualification gates",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeId": "sh/jq5w365o"
+        }
+      ]
+    },
+    {
+      "outputSlide": 9,
+      "sourceSlide": 9,
+      "narrativeRole": "pilot acceptance contract",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeId": "sh/rutwv65w"
+        }
+      ]
+    },
+    {
+      "outputSlide": 10,
+      "sourceSlide": 10,
+      "narrativeRole": "team and prize-use plan",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/algfy50n",
+            "sh/xc3mho32",
+            "sh/kzu5c32t",
+            "sh/725onyl4",
+            "sh/d87uxg3m",
+            "sh/0bit8b2d",
+            "sh/fapcz6ls",
+            "sh/xwnupgvy",
+            "sh/wvetgbud",
+            "sh/lk7ut0va",
+            "sh/kjytkvup",
+            "sh/1o3ahwvq",
+            "sh/ru18r2to",
+            "sh/exsrmhsf",
+            "sh/103qxcbq",
+            "sh/u187adsv",
+            "sh/f2h8jitg"
+          ]
+        }
+      ]
+    },
+    {
+      "outputSlide": 11,
+      "sourceSlide": 11,
+      "narrativeRole": "competition closing ask",
+      "reuseMode": "duplicate-slide",
+      "editTargets": [
+        {
+          "action": "rewrite",
+          "shapeIds": [
+            "sh/xcryxg7y",
+            "sh/wbih4b6d",
+            "sh/n69grmpw",
+            "sh/98rytw72",
+            "sh/72t03qp0",
+            "sh/9gza9sze",
+            "sh/0b6tc3yx",
+            "sh/zaxs3yhc",
+            "sh/cn6t83y1",
+            "sh/dofa18z6",
+            "sh/tsnip0ny"
+          ]
+        }
+      ]
+    }
+  ],
+  "omittedSourceSlides": []
+}

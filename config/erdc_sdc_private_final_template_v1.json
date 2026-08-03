@@ -1,0 +1,43 @@
+{
+  "approval_utc": null,
+  "certifications": {
+    "delivery_boundaries_supported": false,
+    "facts_current": false,
+    "founder_approved_private_pdf_candidate": false,
+    "no_invented_commitments": false,
+    "private_identity_authorized_for_proposal": false
+  },
+  "delivery": {
+    "classified_work_proposed": false,
+    "evaluator_status": "REQUESTED_NOT_COMMITTED",
+    "government_or_prime_integration_owner": true,
+    "production_cloud_capacity_committed": false,
+    "production_hpc_allocation_committed": false,
+    "support_boundary": "BOUNDED_PHASE_II_PROTOTYPE_SUPPORT_ONLY",
+    "technical_lead_role": "Founder / Principal Investigator",
+    "technical_lead_status": "PROPOSED",
+    "transition_owner": "GOVERNMENT_OR_SELECTED_PRIME"
+  },
+  "legal_entity_name": null,
+  "opportunity_number": "W912HZ26SC005",
+  "proposal_contact": {
+    "email": null,
+    "name": null,
+    "verified_current": false
+  },
+  "sam_verification": {
+    "all_awards_registration_active": false,
+    "exact_legal_name_match": false,
+    "exact_solution_address_match": false,
+    "verified_utc": null
+  },
+  "schema": "lumencore.erdc_sdc_private_final.v1",
+  "solution_address": {
+    "country": "United States",
+    "lines": [],
+    "locality": null,
+    "postal_code": null,
+    "region": null
+  },
+  "template_only": true
+}

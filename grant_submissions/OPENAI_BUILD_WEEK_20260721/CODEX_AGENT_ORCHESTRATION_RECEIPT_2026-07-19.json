@@ -1,0 +1,72 @@
+{
+  "claim_boundary": "This receipt attests only to metadata-level Codex orchestration events recorded in the bounded local session window. A spawn event means a tool result exposed an opaque agent identity; it does not establish autonomous operation, current activity, task success, correctness, external validation, an award, endorsement, or a seven-agent lineup. Maximum concurrency is not claimed.",
+  "facts": {
+    "model_provenance": {
+      "records": [
+        {
+          "directly_recorded": true,
+          "effort": "ultra",
+          "model": "gpt-5.6-sol",
+          "scope": "coordinator_turn_context_nearest_preceding_spawn_call",
+          "spawn_event_count": 5
+        }
+      ],
+      "spawn_events_without_direct_model_context": 0,
+      "subagent_model_claimed": false
+    },
+    "observation_window": {
+      "cutoff_utc": "2026-07-17T00:00:00.000Z",
+      "observed_utc": "2026-07-19T08:26:23.517Z",
+      "scope": "OpenAI Build Week task markers in Codex tool-event metadata"
+    },
+    "orchestration": {
+      "ambiguous_build_week_agent_identity_output_count": 0,
+      "attempt_role_category_counts": {
+        "build_week_support_other": 1,
+        "devpost_submission_readiness": 2,
+        "orchestration_receipt": 1,
+        "package_integrity_review": 1,
+        "portal_progress_receipt": 2
+      },
+      "concurrency_evidence_complete": false,
+      "concurrency_reason": "The session does not provide a complete gap-free lifecycle ledger for every Build Week spawn, close, and completion transition.",
+      "maximum_concurrent_open_agents": "NOT_PROVEN",
+      "role_category_counts": {
+        "build_week_support_other": 1,
+        "devpost_submission_readiness": 1,
+        "orchestration_receipt": 1,
+        "package_integrity_review": 1,
+        "portal_progress_receipt": 1
+      },
+      "spawn_attempt_count": 7,
+      "spawn_attempts_without_agent_identity_evidence": 2,
+      "spawn_event_definition": "spawn tool result with opaque agent identity evidence",
+      "spawn_events_without_terminal_status": 4,
+      "terminal_status_counts": {
+        "completed": 1
+      },
+      "total_spawn_events": 5,
+      "unresolved_build_week_spawn_tool_call_count": 0
+    },
+    "privacy": {
+      "agent_identifiers_emitted": false,
+      "credentials_emitted": false,
+      "messages_emitted": false,
+      "private_urls_emitted": false,
+      "source_path_emitted": false,
+      "task_text_retained": false
+    },
+    "source": {
+      "in_window_record_count": 48048,
+      "kind": "local_codex_session_jsonl",
+      "parse_mode": "metadata_and_tool_events_only",
+      "path_emitted": false,
+      "raw_lines_emitted": false
+    }
+  },
+  "generated_utc": "2026-07-19T08:26:23.517Z",
+  "normalized_facts_sha256": "7053737d01ea488ad4afe2490195705b58fe1b843d51c6aa0ad5826f5fec7277",
+  "receipt_sha256": "bbe6b01af60162a2267d839d7a0f6aa4ed4f7683ac5a9d0419078eea0688cbd9",
+  "receipt_status": "RECORDED_METADATA_ONLY",
+  "schema": "lumencore.codex_agent_orchestration_receipt.v1"
+}

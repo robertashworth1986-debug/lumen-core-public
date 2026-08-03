@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 from datetime import datetime, timezone
@@ -79,7 +80,13 @@ def unique_urls(values: list[str]) -> list[str]:
     return out
 
 
-def choose_primary_submit_url(number: str, source_url: str) -> tuple[str, list[str], str]:
+def stable_sha256(payload: Any) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
+
+
+def choose_official_review_url(number: str, source_url: str) -> tuple[str, list[str], str]:
     token = normalize_text(number)
     src = normalize_text(source_url)
 
@@ -146,14 +153,38 @@ def build_record(rank: int, row: dict[str, Any]) -> dict[str, Any]:
     if not number:
         number = parse_opp_from_grants_url(source_url)
 
-    primary_submit_url, alternate_urls, submit_route = choose_primary_submit_url(number, source_url)
+    official_review_url, alternate_urls, review_route = choose_official_review_url(
+        number,
+        source_url,
+    )
 
     grant_console_query = ""
-    ai_fill_query = ""
     if number:
         safe_number = quote(number)
         grant_console_query = f"?opp={safe_number}"
-        ai_fill_query = f"?opp={safe_number}&auto_fill=1"
+
+    raw_action = normalize_text(row.get("action")).upper()
+    action = {
+        "IMMEDIATE_SUBMIT": "URGENT_REVIEW",
+        "FAST_TRACK": "EXPEDITED_REVIEW",
+        "ACTIVE_PIPELINE": "ACTIVE_REVIEW",
+    }.get(raw_action, raw_action or "MANUAL_REVIEW")
+    eligibility_status = normalize_text(row.get("eligibility_status")) or (
+        "UNVERIFIED_REQUIRES_OFFICIAL_SOURCE_REVIEW"
+    )
+    deadline_verified_utc = row.get("deadline_verified_utc")
+    source_sha256 = normalize_text(row.get("source_sha256")) or stable_sha256(
+        {
+            "number": number,
+            "source_url": source_url,
+            "close_date": row.get("close_date"),
+            "source_files": row.get("source_files", []),
+        }
+    )
+    abstention_reason = normalize_text(row.get("abstention_reason")) or (
+        "Official-source eligibility, current deadline, amendments, submission "
+        "route, and organization authority are not verified."
+    )
 
     return {
         "rank": int(rank),
@@ -162,8 +193,14 @@ def build_record(rank: int, row: dict[str, Any]) -> dict[str, Any]:
         "title": normalize_text(row.get("title")),
         "agency": normalize_text(row.get("agency")),
         "status": normalize_text(row.get("status")),
-        "action": normalize_text(row.get("action")),
+        "action": action,
         "days_to_close": int(float(row.get("days_to_close") or 0)),
+        "eligibility_status": eligibility_status,
+        "deadline_verified_utc": deadline_verified_utc,
+        "source_sha256": source_sha256,
+        "submission_authorized": False,
+        "deadline_actionable": False,
+        "abstention_reason": abstention_reason,
         "scores": {
             "composite": float(scores.get("composite") or 0.0),
             "healthcare": float(scores.get("healthcare") or 0.0),
@@ -172,12 +209,11 @@ def build_record(rank: int, row: dict[str, Any]) -> dict[str, Any]:
             "funding": float(scores.get("funding") or 0.0),
         },
         "links": {
-            "submit_route": submit_route,
-            "primary_submit_url": primary_submit_url,
-            "alternate_urls": alternate_urls,
+            "review_route": review_route,
+            "official_source_review_url": official_review_url,
+            "alternate_review_urls": alternate_urls,
             "source_url": source_url,
             "grant_console_query": grant_console_query,
-            "ai_fill_query": ai_fill_query,
         },
     }
 
@@ -192,7 +228,7 @@ def build_feed(payload: dict[str, Any], top_n: int) -> dict[str, Any]:
 
     generated_utc = now_utc_iso()
     out = {
-        "schema": "healthcare_website_feed_v1",
+        "schema": "healthcare_website_feed_v2",
         "generated_utc": generated_utc,
         "source": {
             "healthcare_engine_generated_utc": normalize_text(payload.get("generated_utc")),
@@ -209,15 +245,24 @@ def build_feed(payload: dict[str, Any], top_n: int) -> dict[str, Any]:
             "n_records": len(feed_records),
             "close_7_days": sum(1 for row in feed_records if row.get("days_to_close", 9999) <= 7),
             "close_14_days": sum(1 for row in feed_records if row.get("days_to_close", 9999) <= 14),
-            "immediate_or_fast": sum(
+            "urgent_or_expedited_review": sum(
                 1
                 for row in feed_records
-                if str(row.get("action") or "").upper() in {"IMMEDIATE_SUBMIT", "FAST_TRACK"}
+                if str(row.get("action") or "").upper()
+                in {"URGENT_REVIEW", "EXPEDITED_REVIEW"}
             ),
+            "submission_authorized_count": 0,
+            "deadline_actionable_count": 0,
         },
         "notes": {
-            "submission_warning": "Some grants require login/workspace creation before final apply; open submit route first, then complete in Grants.gov or program portal.",
-            "ai_fill_hint": "Set grants console base URL in widget config so AI Fill opens grants.html with auto_fill=1.",
+            "review_warning": (
+                "Discovery candidates only. Review the current official source, "
+                "eligibility, amendments, deadline, and route before deciding to pursue."
+            ),
+            "draft_workspace_boundary": (
+                "The local workspace may stage a draft but cannot certify, sign, "
+                "authorize, or submit an application."
+            ),
         },
     }
     return out
@@ -256,7 +301,12 @@ def run(top_n: int) -> dict[str, Any]:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Build website-ready healthcare grants feed with click-through submission links.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Build a review-only healthcare opportunity feed with official-source "
+            "links and a local draft-workspace route."
+        )
+    )
     parser.add_argument("--top-n", type=int, default=30, help="How many ranked healthcare opportunities to include.")
     return parser.parse_args()
 

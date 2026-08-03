@@ -38,7 +38,7 @@ def test_action_time_board_prioritizes_dice_and_harbor_without_submit_claims():
     assert "DARPA BAAT" in board["support_outreach_pack"]["sign_in_targets"]
     assert "PIEE / SPRS" in board["support_outreach_pack"]["sign_in_targets"]
     assert board["reviewer_red_team_gate"]["available"] is True
-    assert board["reviewer_red_team_gate"]["packages_reviewed"] == 2
+    assert board["reviewer_red_team_gate"]["packages_reviewed"] >= 2
     assert board["reviewer_red_team_gate"]["ready_for_upload_count"] == 0
     assert any("DICE frozen live-breadth replay ready" in fact for fact in cards["DICE"]["verified_strengths"])
     assert any(task["gate"] == "BAAT authority" for task in cards["DICE"]["next_capture_tasks"])

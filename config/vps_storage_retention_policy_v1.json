@@ -1,0 +1,267 @@
+{
+  "schema": "luma.vps_storage_retention_policy.v1",
+  "policy_version": "2026-07-25",
+  "status": "PLANNING_ONLY_UNAPPROVED",
+  "scope": {
+    "source_mode": "existing_local_evidence_only",
+    "observation_only": true,
+    "external_actions_authorized": false,
+    "current_vps_state_claimed": false
+  },
+  "evidence_sources": [
+    {
+      "id": "historical_storage_incident",
+      "path": "docs/VPS_DOMAIN_DASHBOARD_RECOVERY_2026-06-19.md",
+      "sha256": "5952ab6d6766e340b9df979d848920f3765e64ffea80c7e8252871a50cfd964a",
+      "role": "historical_observation"
+    },
+    {
+      "id": "production_context",
+      "path": "docs/LUMA_PRODUCTION_CONTEXT.md",
+      "sha256": "4d68aab4aa20835a256ac178f19dad8b24b716232bcf78b537774b73df95c383",
+      "role": "historical_recovery_and_headroom_policy"
+    },
+    {
+      "id": "government_snapshot_collector",
+      "path": "code/CANONICAL_GOV_DATA_COLLECTOR.py",
+      "sha256": "ddb50ca9f716213fec73a858e81424807d32ff49a1448eba86d1e3b1ea29ced1",
+      "role": "directory_producer_definition"
+    },
+    {
+      "id": "dashboard_snapshot_consumer",
+      "path": "code/dashboard_unified_refresh.py",
+      "sha256": "d6f2c438fb2f6ac1eb9cfe39ec276bdc380cab14d25c397261a16c57e16a65a2",
+      "role": "directory_consumer_definition"
+    },
+    {
+      "id": "windows_full_deploy_entrypoint",
+      "path": "deploy/PUSH_TO_VPS.ps1",
+      "sha256": "f05af07b94e256d134673506a8b1b403e12aa574f1cbf2e0b086fe9cc4d2b721",
+      "role": "deployment_mutation_surface"
+    },
+    {
+      "id": "windows_feed_deploy_entrypoint",
+      "path": "deploy/PUSH_PROOF_FEEDS_TO_VPS.ps1",
+      "sha256": "75dea8a648f2eecf41b2afd0597f877ae660db29f4a1961e0ff2beccc68f9353",
+      "role": "deployment_mutation_surface"
+    },
+    {
+      "id": "linux_deploy_installer",
+      "path": "code/deploy/deploy_vps.sh",
+      "sha256": "f5cae18d15f56f6579004d84115a2579e1177c2c7a90be7a88ee0f12010b1de2",
+      "role": "deployment_and_runtime_directory_definition"
+    }
+  ],
+  "known_candidate_directories": [
+    {
+      "path_alias": "government_snapshot_batches",
+      "path_token": "application_root/out/gov_live_snapshots",
+      "content_class": "snapshots",
+      "size_accounting_group": "government_snapshots",
+      "review_candidate": true,
+      "default_decision": "RETAIN_PENDING_BACKUP_RETENTION_AND_DEPENDENCY_EVIDENCE",
+      "evidence_source_ids": [
+        "government_snapshot_collector",
+        "dashboard_snapshot_consumer"
+      ]
+    },
+    {
+      "path_alias": "service_outputs",
+      "path_token": "application_root/out/ops",
+      "content_class": "outputs",
+      "size_accounting_group": "service_outputs",
+      "review_candidate": true,
+      "default_decision": "RETAIN_PENDING_BACKUP_RETENTION_AND_DEPENDENCY_EVIDENCE",
+      "evidence_source_ids": [
+        "linux_deploy_installer",
+        "windows_full_deploy_entrypoint"
+      ]
+    },
+    {
+      "path_alias": "execution_outputs",
+      "path_token": "application_root/out/execution",
+      "content_class": "outputs",
+      "size_accounting_group": "execution_outputs",
+      "review_candidate": true,
+      "default_decision": "RETAIN_PENDING_BACKUP_RETENTION_AND_DEPENDENCY_EVIDENCE",
+      "evidence_source_ids": [
+        "historical_storage_incident",
+        "linux_deploy_installer"
+      ]
+    },
+    {
+      "path_alias": "paper_ticker_ledger",
+      "path_token": "application_root/out/execution/paper_ticker_ledger",
+      "content_class": "logs",
+      "size_accounting_group": "execution_outputs",
+      "review_candidate": true,
+      "default_decision": "RETAIN_PENDING_BACKUP_RETENTION_AND_DEPENDENCY_EVIDENCE",
+      "evidence_source_ids": [
+        "historical_storage_incident",
+        "production_context"
+      ]
+    },
+    {
+      "path_alias": "archive_outputs",
+      "path_token": "application_root/out/archive",
+      "content_class": "archives",
+      "size_accounting_group": "archive_outputs",
+      "review_candidate": false,
+      "default_decision": "RETAIN_AS_ARCHIVE_PENDING_VERIFIED_RESTORE_AND_RETENTION_REVIEW",
+      "evidence_source_ids": [
+        "historical_storage_incident",
+        "production_context"
+      ]
+    },
+    {
+      "path_alias": "application_runtime",
+      "path_token": "application_root/python_runtime",
+      "content_class": "runtime",
+      "size_accounting_group": "application_runtime",
+      "review_candidate": false,
+      "default_decision": "REDEPLOY_REVIEW_ONLY_NEVER_DELETE_AS_STORAGE_RECOVERY",
+      "evidence_source_ids": [
+        "windows_full_deploy_entrypoint",
+        "linux_deploy_installer"
+      ]
+    },
+    {
+      "path_alias": "system_logs",
+      "path_token": "system_log_root/lumencore",
+      "content_class": "logs",
+      "size_accounting_group": "system_logs",
+      "review_candidate": true,
+      "default_decision": "RETAIN_PENDING_BACKUP_RETENTION_AND_DEPENDENCY_EVIDENCE",
+      "evidence_source_ids": [
+        "historical_storage_incident"
+      ]
+    }
+  ],
+  "historical_observations": [
+    {
+      "fact_id": "root_pressure_2026_06_19",
+      "observed_date": "2026-06-19",
+      "fact": "root_filesystem_reported_full_with_about_20_kb_free",
+      "current_state_claim_allowed": false,
+      "evidence_source_id": "historical_storage_incident"
+    },
+    {
+      "fact_id": "paper_ledger_2026_06_19",
+      "observed_date": "2026-06-19",
+      "path_alias": "paper_ticker_ledger",
+      "observed_size_text": "about 9.8 GB",
+      "numeric_bytes_intentionally_omitted": true,
+      "current_state_claim_allowed": false,
+      "evidence_source_id": "historical_storage_incident"
+    },
+    {
+      "fact_id": "root_recovery_2026_07_05",
+      "observed_date": "2026-07-05",
+      "fact": "root_filesystem_was_reported_recovered_to_about_70_percent_used",
+      "current_state_claim_allowed": false,
+      "evidence_source_id": "production_context"
+    }
+  ],
+  "retention_rules": [
+    {
+      "rule_id": "preserve_government_and_reviewer_evidence",
+      "content_classes": [
+        "snapshots",
+        "outputs",
+        "archives"
+      ],
+      "default": "RETAIN",
+      "release_requires": [
+        "verified_backup_and_restore_evidence",
+        "retention_owner_authority",
+        "legal_grant_audit_settlement_and_reproducibility_hold_review",
+        "dependency_review",
+        "exact_action_time_human_unlock"
+      ]
+    },
+    {
+      "rule_id": "runtime_is_redeploy_not_cleanup",
+      "content_classes": [
+        "runtime"
+      ],
+      "default": "RETAIN",
+      "release_requires": [
+        "reproducible_locked_build",
+        "rollback_plan",
+        "capacity_headroom",
+        "exact_action_time_human_unlock"
+      ]
+    },
+    {
+      "rule_id": "logs_require_custody_review",
+      "content_classes": [
+        "logs"
+      ],
+      "default": "RETAIN",
+      "release_requires": [
+        "retention_window_evidence",
+        "incident_and_audit_hold_review",
+        "verified_backup_and_restore_evidence",
+        "exact_action_time_human_unlock"
+      ]
+    }
+  ],
+  "decision_requirements": {
+    "archive": {
+      "planner_may_authorize": false,
+      "requires_human_unlock": true,
+      "required_evidence": [
+        "verified_backup_and_restore_evidence",
+        "retention_owner_authority",
+        "hold_and_dependency_review",
+        "destination_capacity_and_integrity_plan",
+        "rollback_plan"
+      ]
+    },
+    "delete": {
+      "planner_may_authorize": false,
+      "requires_human_unlock": true,
+      "required_evidence": [
+        "verified_backup_and_restore_evidence",
+        "retention_owner_authority",
+        "hold_and_dependency_review",
+        "exact_object_manifest",
+        "post_action_verification_plan"
+      ]
+    },
+    "resize": {
+      "planner_may_authorize": false,
+      "requires_human_unlock": true,
+      "required_evidence": [
+        "provider_and_filesystem_compatibility",
+        "capacity_and_cost_decision",
+        "backup_and_rollback_plan",
+        "maintenance_window"
+      ]
+    },
+    "redeploy": {
+      "planner_may_authorize": false,
+      "requires_human_unlock": true,
+      "required_evidence": [
+        "verified_storage_headroom",
+        "locked_package_hash",
+        "service_dependency_inventory",
+        "rollback_and_smoke_test_plan"
+      ]
+    }
+  },
+  "reclaim_estimation": {
+    "confirmed_reclaimable_bytes_default": 0,
+    "candidate_observed_bytes_are_not_safe_delete_bytes": true,
+    "candidate_groups_are_non_additive": true,
+    "missing_current_measurement_means_unknown": true
+  },
+  "human_unlock": {
+    "required_for_every_mutation": true,
+    "environment_variable_name": "LUMA_HUMAN_UNLOCK_TOKEN",
+    "minimum_length": 32,
+    "value_must_never_be_logged_or_persisted": true,
+    "planner_can_grant": false
+  },
+  "policy_payload_sha256": "080d84b327f53924c801e4727d6e9bc9987d406ec110eb3273b3e98344402de4"
+}

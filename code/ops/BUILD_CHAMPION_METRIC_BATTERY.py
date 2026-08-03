@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -13,171 +13,80 @@ DASHBOARD_DATA = ROOT / "dashboard" / "data"
 DOCS = ROOT / "docs"
 
 GAUNTLET_JSON = OUT_OPS / "champion_metric_gauntlet_latest.json"
-STRESS_JSON = OUT_OPS / "champion_stress_test_matrix_latest.json"
-PHASE_JSON = OUT_OPS / "champion_phase_proxy_diagnostics_latest.json"
-SOURCE_JSON = OUT_OPS / "live_source_measurement_maximizer_latest.json"
-DOMAIN_JSON = OUT_OPS / "live_domain_deployment_feed_latest.json"
-DOLLAR_GATE_JSON = DASHBOARD_DATA / "dollar_claim_gate.json"
 LOCKED_SWEEP_JSON = DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"
+READY_REPLAY_JSON = DASHBOARD_DATA / "geometry_ready_source_replay.json"
+KURAMOTO_JSON = OUT_OPS / "kuramoto_holdout_expansion_latest.json"
 
 OUT_JSON = OUT_OPS / "champion_metric_battery_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "champion_metric_battery.json"
-OUT_MD = DOCS / "CHAMPION_METRIC_BATTERY_2026-07-01.md"
+DOC_MD = DOCS / "CHAMPION_METRIC_BATTERY.md"
 
-BOUNDARY = (
-    "Champion metric battery only. This artifact consolidates internal replay evidence, live-source breadth, "
-    "phase proxy diagnostics, hosted hash verification, and remaining blockers. It does not prove field "
-    "validation, realized savings, fixed frozen-delta pricing, medical efficacy, grant award certainty, or live "
-    "trading performance."
-)
+EXPECTED_SCHEMAS = {
+    "gauntlet": "champion_metric_gauntlet_v2",
+    "locked_sweep": "locked_source_baseline_replay_sweep_v2",
+    "ready_replay": "geometry_ready_source_replay_v2",
+    "kuramoto": "kuramoto_holdout_expansion_v2",
+}
 
 
 def now_utc() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
 
 def read_json(path: Path) -> dict[str, Any]:
-    if not path.exists():
-        return {}
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    return data if isinstance(data, dict) else {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected a JSON object in {path}")
+    return payload
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
-
-
-def write_text(path: Path, text: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text.rstrip("\r\n") + "\n", encoding="utf-8")
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def as_dict(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
-def as_list(value: Any) -> list[Any]:
-    return value if isinstance(value, list) else []
-
-
-def as_int(value: Any, default: int = 0) -> int:
+def as_int(value: Any) -> int:
+    if isinstance(value, bool):
+        return int(value)
     try:
-        return int(float(value))
+        return int(value)
     except (TypeError, ValueError):
-        return default
+        return 0
 
 
-def as_float(value: Any, default: float = 0.0) -> float:
+def as_float(value: Any) -> float:
     try:
         return float(value)
     except (TypeError, ValueError):
-        return default
+        return 0.0
 
 
-def first_present(row: dict[str, Any], *keys: str) -> Any:
-    for key in keys:
-        if key in row and row.get(key) is not None:
-            return row.get(key)
-    return None
+def require_schema(name: str, payload: dict[str, Any]) -> None:
+    expected = EXPECTED_SCHEMAS[name]
+    actual = payload.get("schema")
+    if actual != expected:
+        raise ValueError(f"{name} schema must be {expected}; got {actual!r}")
 
 
-def stable_sha256(payload: Any) -> str:
-    encoded = json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
+def canonical_sha256(payload: dict[str, Any]) -> str:
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
 
-def percentile(values: list[float], p: float) -> float | None:
-    if not values:
-        return None
-    ordered = sorted(values)
-    if len(ordered) == 1:
-        return round(ordered[0], 6)
-    idx = (len(ordered) - 1) * p
-    lo = int(idx)
-    hi = min(lo + 1, len(ordered) - 1)
-    frac = idx - lo
-    value = ordered[lo] * (1.0 - frac) + ordered[hi] * frac
-    return round(value, 6)
-
-
-def collect_named_numbers(value: Any, name: str) -> list[float]:
-    found: list[float] = []
-    stack: list[Any] = [value]
-    while stack:
-        current = stack.pop()
-        if isinstance(current, dict):
-            for key, child in current.items():
-                if key == name:
-                    try:
-                        found.append(float(child))
-                    except (TypeError, ValueError):
-                        pass
-                if isinstance(child, (dict, list)):
-                    stack.append(child)
-        elif isinstance(current, list):
-            stack.extend(current)
-    return found
-
-
-def number_stats(values: list[float]) -> dict[str, Any]:
-    if not values:
-        return {"count": 0}
-    return {
-        "count": len(values),
-        "min": round(min(values), 6),
-        "p50": percentile(values, 0.50),
-        "p95": percentile(values, 0.95),
-        "max": round(max(values), 6),
-        "mean": round(sum(values) / len(values), 6),
+def load_inputs() -> dict[str, dict[str, Any]]:
+    inputs = {
+        "gauntlet": read_json(GAUNTLET_JSON),
+        "locked_sweep": read_json(LOCKED_SWEEP_JSON),
+        "ready_replay": read_json(READY_REPLAY_JSON),
+        "kuramoto": read_json(KURAMOTO_JSON),
     }
-
-
-def locked_sweep_evidence(locked_sweep: dict[str, Any]) -> dict[str, Any]:
-    summary = as_dict(locked_sweep.get("summary"))
-    route_results = [row for row in as_list(locked_sweep.get("route_results")) if isinstance(row, dict)]
-    systems = sorted({str(row.get("system")) for row in route_results if row.get("system")})
-    lanes = sorted({str(row.get("lane")) for row in route_results if row.get("lane")})
-    runtime_values = collect_named_numbers(route_results, "runtime_ms")
-    calibration_values = collect_named_numbers(route_results, "calibration_error")
-    lane_scoreboard = [
-        row
-        for row in as_list(locked_sweep.get("lane_scoreboard"))
-        if isinstance(row, dict)
-    ]
-    return {
-        "adapter_backed_routes": summary.get("adapter_backed_routes"),
-        "baseline_comparison_count": summary.get("baseline_comparison_count"),
-        "candidate_win_count": summary.get("candidate_win_count"),
-        "candidate_loss_or_tie_count": summary.get("candidate_loss_or_tie_count"),
-        "estimated_rows_replayed": summary.get("estimated_rows_replayed"),
-        "geometry_routes_replayed": summary.get("geometry_routes_replayed"),
-        "energy_proxy_routes_replayed": summary.get("energy_proxy_routes_replayed"),
-        "lane_count": summary.get("lane_count"),
-        "lanes": lanes,
-        "numeric_samples_read": summary.get("numeric_samples_read"),
-        "ready_rows": summary.get("ready_rows"),
-        "replay_chain_sha256": summary.get("replay_chain_sha256"),
-        "route_result_count": len(route_results),
-        "manifest_source_count": summary.get("source_count"),
-        "source_system_count": len(systems),
-        "source_systems": systems,
-        "source_conditioned_replay_claim_allowed": summary.get("source_conditioned_replay_claim_allowed"),
-        "runtime_ms": number_stats(runtime_values),
-        "calibration_error": number_stats(calibration_values),
-        "lane_scoreboard": lane_scoreboard,
-    }
-
-
-def status_from_pass(passed: bool, blocked: bool = False) -> str:
-    if passed:
-        return "PASS"
-    if blocked:
-        return "BLOCKED_REQUIRES_EXTERNAL_INPUT"
-    return "READY_TO_RUN_OR_EXPAND"
+    for name, payload in inputs.items():
+        require_schema(name, payload)
+    return inputs
 
 
 def category(
@@ -185,378 +94,286 @@ def category(
     label: str,
     status: str,
     evidence: dict[str, Any],
-    metrics: list[str],
+    interpretation: str,
     next_action: str,
-    claim_gate: str,
 ) -> dict[str, Any]:
     return {
         "category_id": category_id,
         "label": label,
         "status": status,
         "evidence": evidence,
-        "metrics": metrics,
+        "interpretation": interpretation,
         "next_action": next_action,
-        "claim_gate": claim_gate,
     }
 
 
-def build_categories(inputs: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
-    gauntlet = inputs["gauntlet"]
-    stress = inputs["stress"]
-    phase = inputs["phase"]
-    sources = inputs["sources"]
-    domain = inputs["domain"]
-    dollar_gate = inputs["dollar_gate"]
-    locked_sweep = inputs["locked_sweep"]
+def build_payload(inputs: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
+    inputs = inputs or load_inputs()
+    for name, input_payload in inputs.items():
+        require_schema(name, input_payload)
 
-    g_summary = as_dict(gauntlet.get("summary"))
-    s_summary = as_dict(stress.get("summary"))
-    p_summary = as_dict(phase.get("summary"))
-    src_summary = as_dict(sources.get("summary"))
-    domain_summary = as_dict(domain.get("summary"))
-    dollar_summary = as_dict(dollar_gate.get("summary"))
-    enabled_sources = first_present(src_summary, "enabled_source_count", "enabled_sources")
-    measured_sources = first_present(src_summary, "measured_source_count", "measured_sources")
-    failed_or_thin_sources = first_present(src_summary, "failed_or_thin_source_count", "failed_or_thin_sources")
-    coverage_percent = first_present(src_summary, "coverage_percent", "coverage_pct")
+    gauntlet_summary = as_dict(inputs["gauntlet"].get("summary"))
+    sweep_summary = as_dict(inputs["locked_sweep"].get("summary"))
+    ready_summary = as_dict(inputs["ready_replay"].get("summary"))
+    kuramoto_summary = as_dict(inputs["kuramoto"].get("summary"))
 
-    stress_gates = {str(row.get("name")): row for row in as_list(stress.get("metric_stress_tests")) if isinstance(row, dict)}
-    gauntlet_gates = {str(row.get("name")): row for row in as_list(gauntlet.get("metric_gauntlet")) if isinstance(row, dict)}
-    sweep_evidence = locked_sweep_evidence(locked_sweep)
-
-    live_domain_ok = bool(
-        s_summary.get("live_domain_hash_verified")
-        or g_summary.get("live_domain_reviewer_ready")
-        or domain_summary.get("live_domain_reviewer_ready")
+    holdout_count = as_int(kuramoto_summary.get("holdout_count"))
+    holdout_wins = as_int(kuramoto_summary.get("wins_vs_kalman"))
+    mean_skill_delta = round(as_float(kuramoto_summary.get("mean_delta_vs_kalman")), 6)
+    baseline_passes = as_int(kuramoto_summary.get("registered_baseline_gate_pass_count"))
+    baseline_count = as_int(kuramoto_summary.get("registered_baseline_count"))
+    direct_routes = as_int(ready_summary.get("direct_measured_replay_count"))
+    conditioned_routes = as_int(ready_summary.get("source_conditioned_synthetic_stress_count"))
+    comparisons = as_int(sweep_summary.get("baseline_comparison_count"))
+    global_holm_positives = as_int(sweep_summary.get("global_holm_positive_count"))
+    conditioned_named_wins = as_int(
+        ready_summary.get("source_conditioned_named_baseline_mean_win_count")
     )
-    field_allowed = bool(
-        g_summary.get("field_validation_claim_allowed")
-        or s_summary.get("field_validation_claim_allowed")
-        or dollar_summary.get("field_validation_claim_allowed")
+    performance_rows = as_int(ready_summary.get("performance_rows_reviewed"))
+    legacy_rows_excluded = as_int(
+        ready_summary.get("legacy_ready_for_benchmark_rows_excluded")
     )
-    savings_allowed = bool(
-        g_summary.get("real_dollar_savings_claim_allowed")
-        or s_summary.get("real_dollar_savings_claim_allowed")
-        or dollar_summary.get("real_dollar_savings_claim_allowed")
+    numeric_fallbacks = as_int(ready_summary.get("numeric_fallback_profile_count"))
+    candidate_selected = bool(kuramoto_summary.get("candidate_was_protocol_selected"))
+    internal_champion = bool(gauntlet_summary.get("internal_champion")) and bool(
+        kuramoto_summary.get("protocol_grade_internal_champion")
     )
 
-    return [
+    categories = [
         category(
-            "source_conditioned_replay",
-            "Source-conditioned replay versus named baseline",
-            status_from_pass(bool(gauntlet_gates.get("baseline_win_count", {}).get("passed"))),
+            "development_selection",
+            "Frozen development selection",
+            "BLOCKED",
             {
-                "champion_family": g_summary.get("champion_family"),
-                "named_baseline": g_summary.get("named_baseline"),
-                "holdout_wins": g_summary.get("holdout_wins"),
-                "holdout_count": g_summary.get("holdout_count"),
-                "mean_delta_vs_named_baseline": g_summary.get("mean_delta_vs_named_baseline"),
-                "min_delta_vs_named_baseline": g_summary.get("min_delta_vs_named_baseline"),
+                "audited_candidate": kuramoto_summary.get("candidate"),
+                "development_selected_candidate": kuramoto_summary.get(
+                    "development_selected_candidate"
+                ),
+                "candidate_was_protocol_selected": candidate_selected,
             },
-            ["holdout_win_rate", "mean_delta", "minimum_delta", "sign_test", "wilson_lower_bound"],
-            "Keep frozen replay rows and rerun when new source systems are promoted.",
-            "Allows internal champion language only.",
+            "Kuramoto is a post-selection audit and cannot inherit the selected candidate's status.",
+            "Keep candidate selection frozen before any future holdout is opened.",
         ),
         category(
-            "best_same_run_baseline",
-            "Best same-run baseline pressure test",
-            status_from_pass(bool(stress_gates.get("best_same_run_baseline_win_rate", {}).get("passed"))),
+            "direct_measured_named_baseline",
+            "Direct measured named-baseline result",
+            "MEASURED_NONPROMOTION",
             {
-                "wins_vs_best_same_run_baseline": s_summary.get("wins_vs_best_same_run_baseline"),
-                "holdout_count": s_summary.get("holdout_count"),
-                "mean_delta_vs_best_same_run_baseline": s_summary.get("mean_delta_vs_best_same_run_baseline"),
-                "min_delta_vs_best_same_run_baseline": s_summary.get("min_delta_vs_best_same_run_baseline"),
+                "named_baseline": kuramoto_summary.get("named_baseline"),
+                "paired_day_wins": holdout_wins,
+                "paired_day_count": holdout_count,
+                "mean_skill_delta": mean_skill_delta,
             },
-            ["best_baseline_win_rate", "best_baseline_margin", "rank_histogram"],
-            "Add a leave-one-family-out control so no single baseline family is too easy.",
-            "Supports stronger internal benchmark language, not field validation.",
+            "The paired win rate is below one half and mean skill is negative.",
+            "Report the negative result and redesign on development data only.",
         ),
         category(
-            "phase_resonance_proxy",
-            "Phase/coherence proxy diagnostics",
-            status_from_pass(bool(s_summary.get("phase_proxy_diagnostics_ready"))),
+            "source_specific_baseline_gauntlet",
+            "All registered source-specific baselines",
+            "BLOCKED",
             {
-                "mean_phase_coherence_proxy": s_summary.get("mean_phase_coherence_proxy"),
-                "mean_phase_slip_proxy_rate": s_summary.get("mean_phase_slip_proxy_rate"),
-                "mean_spectral_concentration_proxy": s_summary.get("mean_spectral_concentration_proxy"),
-                "phase_proxy_claim_allowed": p_summary.get("phase_proxy_claim_allowed"),
+                "gate_pass_count": baseline_passes,
+                "registered_baseline_count": baseline_count,
             },
-            ["phase_coherence", "phase_slip_rate", "spectral_concentration", "circular_phase_error"],
-            "Run the same proxy metrics on each newly promoted live-source lane.",
-            "Allows replay-data phase-proxy language only; hardware PLL claims require instruments.",
+            "No registered EIA baseline clears the complete candidate promotion gate.",
+            "Require every source-native baseline gate to pass before promotion.",
         ),
         category(
-            "live_source_breadth",
-            "Live-source breadth and provider measurement",
-            status_from_pass(as_int(measured_sources) >= 18),
+            "global_holm_promotion",
+            "Global multiplicity-corrected promotion",
+            "BLOCKED",
             {
-                "enabled_sources": enabled_sources,
-                "measured_sources": measured_sources,
-                "failed_or_thin_sources": failed_or_thin_sources,
-                "failed_or_thin_source_names": src_summary.get("failed_or_thin_source_names"),
-                "total_measured_rows": src_summary.get("total_measured_rows"),
-                "coverage_percent": coverage_percent,
+                "global_holm_positive_count": global_holm_positives,
+                "baseline_comparison_count": comparisons,
             },
-            ["provider_ping", "bounded_row_pull", "snapshot_hash", "coverage_percent"],
-            "Fix or replace the remaining failed/thin sources: EPA AQS, NREL, odds, and restricted exchange feed.",
-            "Live breadth is evidence inventory until promoted into locked benchmark replay.",
+            "No comparison is positive after the global Holm correction.",
+            "Freeze the family set and rerun the global correction on new held-out data.",
         ),
         category(
-            "public_domain_hash_verification",
-            "Hosted reviewer feed hash verification",
-            status_from_pass(live_domain_ok),
+            "direct_measured_route_coverage",
+            "Compatibility-qualified direct measured routes",
+            "PASS_COVERAGE_ONLY",
             {
-                "domain_deployment_state": domain_summary.get("domain_deployment_state")
-                or as_dict(domain.get("summary")).get("domain_deployment_state"),
-                "required_feed_count": domain_summary.get("required_feed_count"),
-                "required_remote_hash_match_count": domain_summary.get("required_remote_hash_match_count"),
-                "required_remote_stale_or_missing_count": domain_summary.get("required_remote_stale_or_missing_count"),
+                "direct_measured_routes": direct_routes,
+                "performance_rows_reviewed": performance_rows,
             },
-            ["local_sha256", "remote_sha256", "required_feed_match_count", "stale_feed_count"],
-            "Deploy this battery feed as an optional proof feed, then verify hosted hash parity.",
-            "Allows public proof-feed deployment language.",
+            "Route and row depth describe benchmark coverage, not superiority.",
+            "Add task-compatible measured sources without reusing holdouts for tuning.",
         ),
         category(
-            "residual_calibration",
-            "Residual, calibration, and error-distribution checks",
-            status_from_pass(as_int(as_dict(sweep_evidence.get("calibration_error")).get("count")) >= 100),
+            "conditioned_synthetic_research",
+            "Conditioned synthetic research leads",
+            "RESEARCH_ONLY",
             {
-                "current_gate": stress_gates.get("residual_autocorrelation_and_calibration", {}),
-                "numeric_samples_read": s_summary.get("numeric_samples_read"),
-                "locked_sweep_calibration_error": sweep_evidence.get("calibration_error"),
-                "locked_sweep_candidate_loss_or_tie_count": sweep_evidence.get("candidate_loss_or_tie_count"),
+                "conditioned_synthetic_routes": conditioned_routes,
+                "conditioned_named_baseline_mean_win_count": conditioned_named_wins,
+                "lead_lanes": ["thermal_ventilation", "branching_transport"],
             },
-            ["residual_autocorrelation", "calibration_curve", "coverage_error", "error_tail_risk"],
-            "Add residual autocorrelation next; keep calibration/error-tail metrics visible beside the winners.",
-            "Supports internal error-distribution language, not field or realized-savings language.",
+            "Thermal and branching can guide experiments but are not measured performance evidence.",
+            "Create source-native measured tasks before considering either lane for promotion.",
         ),
         category(
-            "source_generalization",
-            "Source generalization and live-breadth promotion",
-            status_from_pass(
-                as_int(sweep_evidence.get("source_system_count")) >= 8
-                and as_int(sweep_evidence.get("lane_count")) >= 5
-                and as_int(sweep_evidence.get("baseline_comparison_count")) >= 1_000
-                and as_int(sweep_evidence.get("route_result_count")) >= 300
-            ),
+            "compatibility_hygiene",
+            "Compatibility and fallback hygiene",
+            "PASS",
             {
-                "champion_replay_source_systems": s_summary.get("source_systems"),
-                "broader_measured_provider_count": g_summary.get("broader_measured_provider_count"),
-                "manifest_unique_source_count": g_summary.get("manifest_unique_source_count"),
-                "manifest_ready_for_benchmark_row_count": g_summary.get("manifest_ready_for_benchmark_row_count"),
-                "locked_sweep_manifest_source_count": sweep_evidence.get("manifest_source_count"),
-                "locked_sweep_source_system_count": sweep_evidence.get("source_system_count"),
-                "locked_sweep_source_systems": sweep_evidence.get("source_systems"),
-                "locked_sweep_lanes": sweep_evidence.get("lanes"),
-                "locked_sweep_baseline_comparison_count": sweep_evidence.get("baseline_comparison_count"),
-                "locked_sweep_estimated_rows_replayed": sweep_evidence.get("estimated_rows_replayed"),
+                "legacy_rows_excluded": legacy_rows_excluded,
+                "numeric_fallback_count": numeric_fallbacks,
             },
-            ["leave_one_source_out", "source_group_holdout", "provider_promotion_rate", "schema_normalization_success"],
-            "Run leave-one-source-out and source-group holdout so this graduates from broad replay to stronger generalization.",
-            "Allows multi-system internal replay language; still blocks external field claims.",
+            "Incompatible legacy rows are excluded and numeric fallback profiles are absent.",
+            "Preserve this fail-closed boundary in every downstream artifact.",
         ),
         category(
-            "runtime_operational_budget",
-            "Runtime, latency, and production-budget checks",
-            status_from_pass(as_int(as_dict(sweep_evidence.get("runtime_ms")).get("count")) >= 100),
+            "source_inventory",
+            "Broader source inventory",
+            "INVENTORY_ONLY",
             {
-                "current_gate": stress_gates.get("latency_runtime_budget", {}),
-                "fallback_rate": s_summary.get("fallback_rate"),
-                "locked_sweep_runtime_ms": sweep_evidence.get("runtime_ms"),
+                "measured_provider_count": as_int(
+                    gauntlet_summary.get("broader_measured_provider_count")
+                ),
+                "enabled_provider_count": as_int(
+                    gauntlet_summary.get("broader_enabled_provider_count")
+                ),
+                "is_performance_evidence": False,
             },
-            ["p50_latency", "p95_latency", "memory_budget", "fallback_rate", "throughput"],
-            "Repeat timed replays under fixed laptop and VPS budgets before using production-readiness language.",
-            "Supports internal runtime-budget evidence, not production SLA claims.",
+            "Source breadth is research inventory, not performance evidence.",
+            "Qualify each source against a task-specific adapter and baseline registry.",
         ),
         category(
-            "hardware_grid_rf_pll",
-            "Grid/RF/PLL hardware validation",
-            "BLOCKED_REQUIRES_INSTRUMENTED_DATA",
+            "external_validation",
+            "Independent external validation",
+            "BLOCKED_EXTERNAL",
             {
-                "grid_needed": "buyer/operator SCADA, PMU, outage, forecast, or dispatch holdout",
-                "rf_needed": "recorded RF spectrum/IQ or lab instrument traces",
-                "pll_needed": "jitter, phase-noise, lock-time, and bandwidth measurements",
+                "field_validation_claim_allowed": False,
+                "independent_replication_complete": False,
             },
-            ["PMU_replay", "RF_IQ_replay", "PLL_jitter", "phase_noise", "lock_time"],
-            "Ask a lab or system owner for a held-out dataset and their acceptance metric.",
-            "Blocks hardware field-validation language.",
+            "No independent owner-approved validation is complete.",
+            "Use an outcome-independent evaluator and a preregistered acceptance protocol.",
         ),
         category(
             "economic_conversion",
-            "Avoided-cost and dollar conversion",
-            status_from_pass(savings_allowed, blocked=not savings_allowed),
+            "Economic conversion",
+            "BLOCKED_EXTERNAL",
             {
-                "safe_estimated_hourly_value_usd": g_summary.get("safe_estimated_hourly_value_usd"),
-                "safe_estimated_annual_value_usd": g_summary.get("safe_estimated_annual_value_usd"),
-                "real_dollar_savings_claim_allowed": savings_allowed,
+                "real_dollar_savings_claim_allowed": False,
+                "safe_estimated_annual_value_usd": 0.0,
             },
-            ["owner_cost_factor", "counterfactual_baseline", "acceptance_threshold", "avoided_cost_formula"],
-            "Get an external owner to approve the baseline and cost conversion before naming realized savings.",
-            "Blocks realized dollar savings and fixed frozen-delta pricing.",
-        ),
-        category(
-            "buyer_authorized_field_replay",
-            "Buyer-authorized field replay",
-            status_from_pass(field_allowed, blocked=not field_allowed),
-            {
-                "buyer_authorized_field_replay_request_ready": g_summary.get(
-                    "buyer_authorized_field_replay_request_ready"
-                ),
-                "field_validation_claim_allowed": field_allowed,
-                "manual_paid_pilot_outreach_allowed": s_summary.get("manual_paid_pilot_outreach_allowed"),
-            },
-            ["pre_registered_holdout", "incumbent_baseline", "buyer_metric", "signed_result"],
-            "Send the reviewer-safe outreach and ask for one 20-minute fit call.",
-            "This is the unlock for field validation.",
-        ),
-        category(
-            "all_family_live_championship",
-            "All-family live championship",
-            "BLOCKED_REQUIRES_FULL_REGISTRY_RUN",
-            {
-                "current_champion_family": g_summary.get("champion_family"),
-                "current_registry_gate": stress_gates.get("all_registry_families_have_benchmark_specs", {}),
-            },
-            ["family_count_tested", "matched_budget", "negative_results_logged", "winner_by_lane"],
-            "Run every registered family under matched budgets and publish the losers too.",
-            "Blocks universal geometry superiority claims.",
+            "No owner-approved cost model or realized-savings evidence exists.",
+            "Price protocol and evidence-review work only; do not price unproven savings.",
         ),
     ]
 
-
-def build_payload() -> dict[str, Any]:
-    inputs = {
-        "gauntlet": read_json(GAUNTLET_JSON),
-        "stress": read_json(STRESS_JSON),
-        "phase": read_json(PHASE_JSON),
-        "sources": read_json(SOURCE_JSON),
-        "domain": read_json(DOMAIN_JSON),
-        "dollar_gate": read_json(DOLLAR_GATE_JSON),
-        "locked_sweep": read_json(LOCKED_SWEEP_JSON),
-    }
-    categories = build_categories(inputs)
-    pass_count = sum(1 for row in categories if row["status"] == "PASS")
-    ready_count = sum(1 for row in categories if row["status"] == "READY_TO_RUN_OR_EXPAND")
-    blocked_count = sum(1 for row in categories if row["status"].startswith("BLOCKED"))
-    gauntlet_summary = as_dict(inputs["gauntlet"].get("summary"))
-    stress_summary = as_dict(inputs["stress"].get("summary"))
-    source_summary = as_dict(inputs["sources"].get("summary"))
-    sweep_evidence = locked_sweep_evidence(inputs["locked_sweep"])
-    measured_sources = first_present(source_summary, "measured_source_count", "measured_sources")
-    enabled_sources = first_present(source_summary, "enabled_source_count", "enabled_sources")
+    pass_count = sum(row["status"] in {"PASS", "PASS_COVERAGE_ONLY"} for row in categories)
+    blocked_count = sum(row["status"].startswith("BLOCKED") for row in categories)
+    research_only_count = sum(
+        row["status"] in {"RESEARCH_ONLY", "INVENTORY_ONLY"} for row in categories
+    )
 
     payload: dict[str, Any] = {
         "generated_utc": now_utc(),
-        "schema": "champion_metric_battery_v1",
-        "purpose": "One reviewer-safe board that shows every major champion test lane and blocker.",
-        "boundary": BOUNDARY,
+        "schema": "champion_metric_battery_v2",
+        "purpose": (
+            "Consolidate the canonical v2 evidence gates while keeping negative measured results, "
+            "conditioned research leads, and source inventory semantically separate."
+        ),
         "summary": {
-            "evidence_stage": "internal_replay_metric_battery_not_field_validated",
-            "champion_family": gauntlet_summary.get("champion_family") or stress_summary.get("champion_family"),
-            "champion_label": gauntlet_summary.get("champion_label") or stress_summary.get("champion_label"),
-            "named_baseline": gauntlet_summary.get("named_baseline") or stress_summary.get("named_baseline"),
-            "holdout_wins": gauntlet_summary.get("holdout_wins") or stress_summary.get("wins_vs_named_baseline"),
-            "holdout_count": gauntlet_summary.get("holdout_count") or stress_summary.get("holdout_count"),
-            "estimated_rows_replayed": gauntlet_summary.get("estimated_rows_replayed")
-            or stress_summary.get("estimated_rows_replayed"),
-            "locked_sweep_estimated_rows_replayed": sweep_evidence.get("estimated_rows_replayed"),
-            "locked_sweep_numeric_samples_read": sweep_evidence.get("numeric_samples_read"),
-            "locked_sweep_baseline_comparison_count": sweep_evidence.get("baseline_comparison_count"),
-            "locked_sweep_candidate_win_count": sweep_evidence.get("candidate_win_count"),
-            "locked_sweep_candidate_loss_or_tie_count": sweep_evidence.get("candidate_loss_or_tie_count"),
-            "locked_sweep_manifest_source_count": sweep_evidence.get("manifest_source_count"),
-            "locked_sweep_source_system_count": sweep_evidence.get("source_system_count"),
-            "locked_sweep_lane_count": sweep_evidence.get("lane_count"),
-            "locked_sweep_replay_chain_sha256": sweep_evidence.get("replay_chain_sha256"),
-            "champion_replay_source_system_count": gauntlet_summary.get("source_system_count")
-            or stress_summary.get("source_system_count"),
-            "source_system_count": gauntlet_summary.get("source_system_count") or stress_summary.get("source_system_count"),
-            "broader_measured_provider_count": measured_sources or gauntlet_summary.get("broader_measured_provider_count"),
-            "broader_enabled_provider_count": enabled_sources or gauntlet_summary.get("broader_enabled_provider_count"),
-            "total_measured_rows_latest_pull": source_summary.get("total_measured_rows"),
+            "internal_performance_champion": internal_champion,
+            "champion_family": None,
+            "audited_candidate_family": kuramoto_summary.get("candidate"),
+            "development_selected_candidate": kuramoto_summary.get(
+                "development_selected_candidate"
+            ),
+            "candidate_was_protocol_selected": candidate_selected,
+            "named_baseline": kuramoto_summary.get("named_baseline"),
+            "paired_day_wins_vs_named_baseline": holdout_wins,
+            "paired_day_count": holdout_count,
+            "mean_skill_delta_vs_named_baseline": mean_skill_delta,
+            "registered_baseline_gate_pass_count": baseline_passes,
+            "registered_baseline_count": baseline_count,
+            "direct_measured_route_count": direct_routes,
+            "conditioned_synthetic_route_count": conditioned_routes,
+            "baseline_comparison_count": comparisons,
+            "global_holm_positive_count": global_holm_positives,
+            "conditioned_named_baseline_mean_win_count": conditioned_named_wins,
+            "performance_rows_reviewed": performance_rows,
+            "legacy_rows_excluded": legacy_rows_excluded,
+            "numeric_fallback_count": numeric_fallbacks,
             "metric_category_count": len(categories),
             "metric_pass_count": pass_count,
-            "metric_ready_to_run_count": ready_count,
-            "metric_blocked_external_count": blocked_count,
+            "metric_blocked_count": blocked_count,
+            "metric_research_or_inventory_only_count": research_only_count,
+            "source_inventory_is_performance_evidence": False,
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
-            "fixed_frozen_delta_price_claim_allowed": False,
             "live_trading_or_autonomous_execution_allowed": False,
-            "manual_paid_pilot_outreach_allowed": bool(stress_summary.get("manual_paid_pilot_outreach_allowed")),
             "plain_english_answer": (
-                "The current platform is strongest as an internal, hash-verifiable replay and benchmark engine. "
-                "It has a clear champion, an 8-system locked replay sweep, and growing broader live-source breadth. "
-                "The next money unlock is an external buyer-authorized replay with a locked baseline, not a "
-                "premature realized-savings claim."
+                f"No internal performance champion exists. Kuramoto was not development-selected, "
+                f"won {holdout_wins}/{holdout_count} paired days against "
+                f"{kuramoto_summary.get('named_baseline')}, and recorded mean skill delta "
+                f"{mean_skill_delta:.6f}. It cleared {baseline_passes}/{baseline_count} registered "
+                f"baselines; the full {comparisons}-comparison sweep has "
+                f"{global_holm_positives} global Holm positives."
             ),
         },
-        "claim_controls": {
-            "allowed_now": [
-                "internal champion",
-                "source-conditioned replay winner",
-                "public proof-feed deployment if hosted hashes match",
-                "paid-pilot scoping candidate",
-                "buyer-authorized field replay request",
-            ],
-            "not_allowed_yet": [
-                "field validated",
-                "realized savings",
-                "fixed frozen-delta price",
-                "grant award certainty",
-                "autonomous live trading edge",
-                "hardware PLL/RF/grid validation",
-                "universal geometry superiority",
-            ],
-        },
         "metric_categories": categories,
-        "best_next_source_families": [
+        "reviewer_safe_claims": [
+            (
+                f"Kuramoto produced a measured nonpromotion result of {holdout_wins}/{holdout_count} "
+                f"paired-day wins and mean skill delta {mean_skill_delta:.6f} against "
+                f"{kuramoto_summary.get('named_baseline')}."
+            ),
+            (
+                f"The compatibility-qualified stack currently includes {direct_routes} direct measured "
+                f"routes and {conditioned_routes} conditioned synthetic research routes."
+            ),
+            (
+                f"The current artifacts review {performance_rows} performance rows, exclude "
+                f"{legacy_rows_excluded} incompatible legacy rows, and use {numeric_fallbacks} numeric "
+                "fallback profiles."
+            ),
+        ],
+        "prohibited_claims": [
+            "current internal performance champion",
+            "performance superiority inferred from conditioned simulation",
+            "field validation complete",
+            "realized dollar savings",
+            "source inventory proves performance",
+        ],
+        "best_next_work": [
             {
-                "family": "ISO/RTO grid operations",
-                "examples": ["PJM", "MISO", "ERCOT", "CAISO", "SPP", "NYISO", "ISO-NE", "BPA", "TVA"],
-                "why": "Directly strengthens grid field-replay credibility and avoided-cost math.",
+                "priority": 1,
+                "work": "Independent protocol and evidence review",
+                "why": "This can be sold truthfully without asserting performance or savings.",
             },
             {
-                "family": "utility outage and reliability",
-                "examples": ["DOE OE-417", "utility outage maps", "EPRI or utility-held outage/event windows"],
-                "why": "Turns abstract improvement into incident detection, response time, and avoided outage cost.",
+                "priority": 2,
+                "work": "Development-only candidate redesign",
+                "why": "Kuramoto and Lissajous both fail the current direct measured EIA promotion gate.",
             },
             {
-                "family": "energy market and plant operations",
-                "examples": ["EIA EBA", "EIA 860", "EIA 923", "nuclear outage daily status"],
-                "why": "Connects forecasts, outages, generation mix, and operational pressure.",
-            },
-            {
-                "family": "weather and environmental operations",
-                "examples": ["NOAA", "NWS", "SWPC", "OpenAQ", "AirNow", "EPA AQS"],
-                "why": "Adds exogenous drivers for load, outage, air-quality, and risk forecasts.",
-            },
-            {
-                "family": "maritime and critical infrastructure movement",
-                "examples": ["MarineCadastre AIS", "NOAA PORTS", "USCG public feeds"],
-                "why": "Supports HarborSentinel/NV063 style validation lanes.",
+                "priority": 3,
+                "work": "Measured adapters for thermal and branching tasks",
+                "why": "Conditioned synthetic leads need source-native tasks and accepted baselines.",
             },
         ],
-        "reviewer_safe_outreach_instruction": (
-            "Do not claim realized savings. Ask for a paid or sponsored field replay using the buyer's held-out data, "
-            "incumbent baseline, acceptance metric, and approved economic conversion."
-        ),
-        "source_artifacts": {
+        "claim_state": {
+            "measured_nonpromotion_result_claim_allowed": True,
+            "internal_performance_champion_claim_allowed": False,
+            "conditioned_synthetic_performance_claim_allowed": False,
+            "source_inventory_performance_claim_allowed": False,
+            "field_validation_claim_allowed": False,
+            "realized_savings_claim_allowed": False,
+        },
+        "inputs": {
             "champion_metric_gauntlet": str(GAUNTLET_JSON.relative_to(ROOT)),
-            "champion_stress_test_matrix": str(STRESS_JSON.relative_to(ROOT)),
-            "champion_phase_proxy_diagnostics": str(PHASE_JSON.relative_to(ROOT)),
-            "live_source_measurement_maximizer": str(SOURCE_JSON.relative_to(ROOT)),
-            "live_domain_deployment_feed": str(DOMAIN_JSON.relative_to(ROOT)),
-            "dollar_claim_gate": str(DOLLAR_GATE_JSON.relative_to(ROOT)),
-            "locked_source_baseline_replay_sweep": str(LOCKED_SWEEP_JSON.relative_to(ROOT)),
+            "locked_source_baseline_replay_sweep": str(
+                LOCKED_SWEEP_JSON.relative_to(ROOT)
+            ),
+            "geometry_ready_source_replay": str(READY_REPLAY_JSON.relative_to(ROOT)),
+            "kuramoto_holdout_expansion": str(KURAMOTO_JSON.relative_to(ROOT)),
         },
     }
-    payload["metric_battery_sha256"] = stable_sha256(
-        {
-            "summary": payload["summary"],
-            "metric_categories": payload["metric_categories"],
-            "claim_controls": payload["claim_controls"],
-        }
-    )
+    payload["metric_battery_sha256"] = canonical_sha256(payload)
     return payload
 
 
@@ -565,75 +382,54 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
         "# Champion Metric Battery",
         "",
-        f"Generated UTC: `{payload.get('generated_utc')}`",
-        f"Metric battery SHA-256: `{payload.get('metric_battery_sha256')}`",
-        "",
-        "## Plain English",
-        "",
-        str(summary.get("plain_english_answer") or ""),
-        "",
-        "## Current Champion",
-        "",
-        f"- Champion: `{summary.get('champion_family')}`",
-        f"- Named baseline: `{summary.get('named_baseline')}`",
-        f"- Holdout wins: `{summary.get('holdout_wins')}/{summary.get('holdout_count')}`",
-        f"- Estimated rows replayed: `{summary.get('estimated_rows_replayed')}`",
-        f"- Locked sweep estimated rows: `{summary.get('locked_sweep_estimated_rows_replayed')}`",
-        f"- Locked sweep baseline comparisons: `{summary.get('locked_sweep_baseline_comparison_count')}`",
-        f"- Locked sweep candidate wins/losses-or-ties: `{summary.get('locked_sweep_candidate_win_count')}/"
-        f"{summary.get('locked_sweep_candidate_loss_or_tie_count')}`",
-        f"- Locked sweep source systems/lanes: `{summary.get('locked_sweep_source_system_count')}/"
-        f"{summary.get('locked_sweep_lane_count')}`",
-        f"- Locked sweep manifest source rows: `{summary.get('locked_sweep_manifest_source_count')}`",
-        f"- Locked sweep replay chain: `{summary.get('locked_sweep_replay_chain_sha256')}`",
-        f"- Champion replay source systems: `{summary.get('champion_replay_source_system_count')}` "
-        "(narrow original champion lane, not total platform breadth)",
-        f"- Broader measured providers: `{summary.get('broader_measured_provider_count')}/"
-        f"{summary.get('broader_enabled_provider_count')}`",
-        f"- Latest bounded measured rows: `{summary.get('total_measured_rows_latest_pull')}`",
-        "",
         "## Battery Status",
         "",
-        f"- Metric categories: `{summary.get('metric_category_count')}`",
-        f"- Passed: `{summary.get('metric_pass_count')}`",
-        f"- Ready to run or expand: `{summary.get('metric_ready_to_run_count')}`",
-        f"- Blocked by external input: `{summary.get('metric_blocked_external_count')}`",
+        summary.get("plain_english_answer", ""),
+        "",
+        f"- Internal performance champion: `{str(summary.get('internal_performance_champion')).lower()}`",
+        f"- Audited candidate: `{summary.get('audited_candidate_family')}`",
+        f"- Development-selected candidate: `{summary.get('development_selected_candidate')}`",
+        f"- Named baseline: `{summary.get('named_baseline')}`",
+        (
+            f"- Paired-day wins: `{summary.get('paired_day_wins_vs_named_baseline')}/"
+            f"{summary.get('paired_day_count')}`"
+        ),
+        f"- Mean skill delta: `{summary.get('mean_skill_delta_vs_named_baseline')}`",
+        (
+            f"- Registered baseline gates: `{summary.get('registered_baseline_gate_pass_count')}/"
+            f"{summary.get('registered_baseline_count')}`"
+        ),
+        (
+            f"- Global Holm positives: `{summary.get('global_holm_positive_count')}/"
+            f"{summary.get('baseline_comparison_count')}`"
+        ),
+        f"- Performance rows reviewed: `{summary.get('performance_rows_reviewed')}`",
+        f"- Legacy rows excluded: `{summary.get('legacy_rows_excluded')}`",
+        f"- Numeric fallbacks: `{summary.get('numeric_fallback_count')}`",
         f"- Field-validation claim allowed: `{str(summary.get('field_validation_claim_allowed')).lower()}`",
         f"- Real-dollar savings claim allowed: `{str(summary.get('real_dollar_savings_claim_allowed')).lower()}`",
         "",
         "## Metric Categories",
         "",
+        "| Category | Status | Interpretation |",
+        "|---|---|---|",
     ]
-    for row in as_list(payload.get("metric_categories")):
-        if not isinstance(row, dict):
-            continue
-        lines.extend(
-            [
-                f"### {row.get('label')}",
-                "",
-                f"- Status: `{row.get('status')}`",
-                f"- Metrics: `{', '.join(str(metric) for metric in as_list(row.get('metrics')))}`",
-                f"- Next action: {row.get('next_action')}",
-                f"- Claim gate: {row.get('claim_gate')}",
-                "",
-            ]
+    for row_value in payload.get("metric_categories", []):
+        row = as_dict(row_value)
+        lines.append(
+            f"| `{row.get('category_id')}` | `{row.get('status')}` | "
+            f"{row.get('interpretation')} |"
         )
     lines.extend(
         [
-            "## Best Next Source Families",
             "",
-        ]
-    )
-    for row in as_list(payload.get("best_next_source_families")):
-        if not isinstance(row, dict):
-            continue
-        lines.append(f"- `{row.get('family')}`: {row.get('why')}")
-    lines.extend(
-        [
+            "## Claim Boundary",
             "",
-            "## Boundary",
+            "- Thermal and branching conditioned simulations are research leads only.",
+            "- Source breadth is inventory, not performance evidence.",
+            "- The safe commercial scope is protocol and evidence review, not performance or savings.",
             "",
-            BOUNDARY,
+            f"Metric battery SHA-256: `{payload.get('metric_battery_sha256')}`",
             "",
         ]
     )
@@ -644,10 +440,21 @@ def main() -> None:
     payload = build_payload()
     write_json(OUT_JSON, payload)
     write_json(DASHBOARD_JSON, payload)
-    write_text(OUT_MD, render_markdown(payload))
-    print(f"Wrote {OUT_JSON}")
-    print(f"Wrote {DASHBOARD_JSON}")
-    print(f"Wrote {OUT_MD}")
+    DOC_MD.parent.mkdir(parents=True, exist_ok=True)
+    DOC_MD.write_text(render_markdown(payload), encoding="utf-8")
+    print(
+        json.dumps(
+            {
+                "schema": payload["schema"],
+                "internal_performance_champion": payload["summary"][
+                    "internal_performance_champion"
+                ],
+                "metric_battery_sha256": payload["metric_battery_sha256"],
+                "outputs": [str(OUT_JSON), str(DASHBOARD_JSON), str(DOC_MD)],
+            },
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

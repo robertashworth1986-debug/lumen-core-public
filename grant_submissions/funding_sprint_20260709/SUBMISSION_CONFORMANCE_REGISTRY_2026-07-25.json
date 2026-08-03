@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.submission_conformance_registry.v1",
-  "as_of_utc": "2026-07-29T12:06:41Z",
+  "as_of_utc": "2026-07-29T21:01:35Z",
   "required_criteria": [
     "official_source_current",
     "mandatory_format_and_route",
@@ -332,20 +332,24 @@
       "disposition": "ACTIVE_SUBMISSION_CANDIDATE",
       "technical_argument_required": true,
       "submission_candidate_active": true,
-      "current_state": "The current public-safe brief passes source, formatting, route, and objective-trace checks. It remains blocked on a named current comparator, quantitative mission thresholds, a locked HPCMP-representative experiment, team and compute commitments, independent red-team review, Phase II pricing, SAM all-awards facts, Submittable access, and final portal review.",
+      "current_state": "The public-safe brief passes local source-custody, format, marker, route, and objective-trace checks. The version-two local surrogate binds 48 deterministic workflows, seven declared attacks, synthetic artifact-byte rehashing, and a separately supplied local anchor while treating OpenTelemetry and SLSA as unranked interoperability contexts. It remains blocked on publication of the exact current evidence files, an external trust root, a Government-selected integrated comparator, a locked HPCMP-representative workflow and thresholds, committed team, production compute, integration and evaluator roles, independent review, Phase II pricing, SAM all-awards facts, Submittable access, and final portal review.",
       "candidate_artifact": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json",
-      "official_source": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-29.json",
+      "official_source": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_CUSTODY_2026-07-29.json",
       "postmortem": null,
       "criteria": [
         {
           "criterion_id": "official_source_current",
           "state": "PASS",
-          "finding": "The current-source manifest binds the controlling CSO and July 20 FAQ, and the compliance gate preserves the current live-page deadline plus the original PDF text.",
+          "finding": "The current-source manifest and custody receipt bind the controlling CSO, July 20 FAQ, extracted text, and a hashed July 29 live-page snapshot. The compliance gate preserves the current commercial-solution deadline plus the original PDF text.",
           "missing_evidence": [],
           "source_refs": [
             {
               "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_MANIFEST_2026-07-29.json",
               "anchor": "Current attachment set, official URLs, hashes, bytes, and supersession"
+            },
+            {
+              "path": "grant_submissions/funding_sprint_20260709/source_attachments/W912HZ26SC005/SOURCE_CUSTODY_2026-07-29.json",
+              "anchor": "Extracted-text hashes, requirement crosswalk, and live-page snapshot"
             },
             {
               "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_SOLUTION_BRIEF_COMPLIANCE_GATE_2026-07-29.json",
@@ -372,7 +376,7 @@
         {
           "criterion_id": "program_objective_trace",
           "state": "PASS",
-          "finding": "The brief maps the evidence-control module to Unified Service Layer, AI-Powered Orchestration evidence, Secure Data Fabric metadata, and Vendor Lock-In Prevention, all of which the CSO permits as a focused subset.",
+          "finding": "The brief makes Unified Service Layer and Vendor Lock-In Prevention the primary scope and treats AI-Powered Orchestration evidence and Secure Data Fabric metadata as integration boundaries. The CSO permits a solution to address one or more focus areas.",
           "missing_evidence": [],
           "source_refs": [
             {
@@ -388,43 +392,51 @@
         {
           "criterion_id": "foundational_leap",
           "state": "PARTIAL",
-          "finding": "The brief identifies a new application of predeclared acceptance rules, append-only evidence, offline verification, and retained failures to hybrid HPC and AI orchestration, but it does not yet distinguish that module experimentally from modern provenance, policy, and observability stacks.",
+          "finding": "The brief defines a local mechanism and binds no-chain, no-predeclaration, and no-failure-retention ablations. OpenTelemetry 1.59.0 and SLSA 1.2/in-toto v1 are unranked interoperability contexts and are not scored. The result remains a local synthetic full-versus-ablation experiment, not evidence against a current integrated Government or commercial control plane.",
           "missing_evidence": [
-            "Named incumbent evidence or observability architecture",
-            "Mechanism-level differentiation from that comparator",
-            "Ablation showing the value of predeclaration, failure retention, and offline verification"
+            "Government-selected or equivalent integrated incumbent control-plane comparator",
+            "Protocol-matched execution against that integrated comparator",
+            "Government-controlled or independently operated trust root or signing path",
+            "Independent reproduction within an approved mission-representative boundary"
           ],
           "source_refs": [
             {
               "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
               "anchor": "Body page 1, Innovation"
+            },
+            {
+              "path": "out/ops/erdc_sdc_evidence_ablation_latest.json",
+              "anchor": "baseline_sources, results, checks, and claim_boundary"
             }
           ]
         },
         {
           "criterion_id": "named_sota_baseline",
-          "state": "FAIL",
-          "finding": "The brief names open standards and architectural boundaries but does not name and protocol-match a current government or commercial evidence-control baseline.",
+          "state": "PARTIAL",
+          "finding": "The brief names OpenTelemetry Logs Data Model 1.59.0 and SLSA Build Provenance 1.2 with in-toto Statement v1 as complementary context only. The local protocol does not score or attack them and does not represent either standard as an equivalent evidence-control product or Government-selected incumbent.",
           "missing_evidence": [
-            "Named current provenance, policy, or observability baseline with version",
-            "Protocol-matched baseline implementation or documented comparison plan",
-            "Ablations for each claimed novel control"
+            "Government-approved comparator selection",
+            "Protocol-matched profile for an integrated incumbent evidence-control stack",
+            "Independent execution of the selected comparator and LumenCore verifier"
           ],
           "source_refs": [
             {
               "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
-              "anchor": "Body pages 1, 2, and 5"
+              "anchor": "Body pages 1, 3, and 5"
+            },
+            {
+              "path": "out/ops/erdc_sdc_evidence_ablation_latest.json",
+              "anchor": "baseline_sources marked INTEROPERABILITY_CONTEXT_NOT_RANKED"
             }
           ]
         },
         {
           "criterion_id": "program_metric_trace",
           "state": "PARTIAL",
-          "finding": "Integrity, portability, failure visibility, reproducibility, capture latency, verification time, storage growth, and egress are identified, but no current-source baseline values or quantitative acceptance thresholds are locked.",
+          "finding": "The brief now requires complete declared-attack detection, complete adverse-case retention, clean reviewer replay, and fixed-window measurement of bytes per event, capture and verify latency, storage per day, operator-review minutes, and egress bytes. Current baseline values and Government-approved workload and overhead thresholds remain unlocked.",
           "missing_evidence": [
             "Baseline capture latency, verification time, storage growth, and egress measurements",
-            "Government-approved acceptance threshold for each metric",
-            "Cost-efficiency denominator and measurement window"
+            "Government-approved mission workload, acceptance threshold, and overhead budget for each metric"
           ],
           "source_refs": [
             {
@@ -436,12 +448,12 @@
         {
           "criterion_id": "mission_specific_experiment",
           "state": "PARTIAL",
-          "finding": "The brief proposes a sixteen-week unclassified prototype with two replaceable adapters, two approved environments, shadow replay, Government-run verification, and rollback, but the actual HPCMP workflow, interfaces, data, workload scale, and comparator remain unlocked.",
+          "finding": "The brief proposes a sixteen-week unclassified prototype with two replaceable adapters, two approved environments, shadow replay, Government-run verification, explicit stop rules, and a local 48-workflow precursor. The actual HPCMP workflow, interfaces, data, workload scale, selected comparator, and Government thresholds remain unlocked.",
           "missing_evidence": [
             "One named HPCMP-representative unclassified workflow",
             "Approved interface and test-data boundary",
-            "Named comparator and workload-scale profile",
-            "Predeclared acceptance and stop thresholds"
+            "Government-selected comparator and workload-scale profile",
+            "Government-approved acceptance and overhead thresholds"
           ],
           "source_refs": [
             {
@@ -453,33 +465,39 @@
         {
           "criterion_id": "evidence_applicability",
           "state": "PARTIAL",
-          "finding": "The public repository and source-native ledger support inspectable evidence-control and negative-result-retention patterns, but they do not exercise an HPCMP environment, SDC integration, classified boundary, or Government workload.",
+          "finding": "The bound local version-two ablation supports inspectable tamper detection, predeclaration, adverse-result retention, synthetic artifact-byte rehashing, adaptive re-chain attacks, and explicit negative controls relative to a separately supplied local anchor. The exact July 29 evidence is not yet represented as published in the public repository, and it does not exercise an HPCMP environment, SDC integration, classified boundary, Government workload, external trust root, or independent evaluator.",
           "missing_evidence": [
+            "Reviewed public commit containing the exact current builder, receipt, tests, and claim boundary",
             "HPCMP-representative workload trace or Government-approved surrogate",
             "Two-environment adapter demonstration",
+            "External trust root or independently controlled signing path",
             "Independent execution of the delivered verifier",
             "Measured security, scale, and cost results within the proposed boundary"
           ],
           "source_refs": [
             {
-              "path": "out/ops/source_native_family_baseline_ledger_latest.json",
-              "anchor": "summary and claim boundary"
+              "path": "out/ops/erdc_sdc_evidence_ablation_latest.json",
+              "anchor": "Version-two 48-workflow surrogate, seven attacks, separately supplied local anchor, ablations, and claim boundary"
             },
             {
               "path": "output/pdf/LumenCore_ERDC_SDC_Solution_Brief_PUBLIC_DRAFT_2026-07-29.pdf",
               "anchor": "Body page 5, Evidence"
+            },
+            {
+              "path": "grant_submissions/funding_sprint_20260709/ERDC_SDC_INTERNAL_RED_TEAM_RECEIPT_2026-07-29.md",
+              "anchor": "Internal findings and remediation state; explicitly not independent validation"
             }
           ]
         },
         {
           "criterion_id": "team_compute_execution",
-          "state": "FAIL",
-          "finding": "The public brief does not bind named delivery roles, a prime integration owner, an independent evaluator, HPC and cloud access, or a supportable execution budget.",
+          "state": "PARTIAL",
+          "finding": "The brief identifies the founder as proposed technical lead and bounds local surrogate development to contractor-furnished commodity CPU, storage, and open software. It explicitly leaves Government or prime integration, evaluator commitment, production HPC or cloud access, staffing, support, transition ownership, and the execution budget uncommitted.",
           "missing_evidence": [
-            "Named technical lead and delivery roles",
+            "Committed delivery roles and staffing basis",
             "Prime or integration owner for HPCMP interfaces",
             "Independent evaluator commitment",
-            "Compute, storage, software, and access plan",
+            "Production compute, storage, software, and access commitment",
             "Supported Phase II price and staffing basis"
           ],
           "source_refs": [
@@ -496,11 +514,10 @@
         {
           "criterion_id": "risk_transition_and_falsifier",
           "state": "PARTIAL",
-          "finding": "The brief identifies sensitive-data, performance, scale, accreditation, interoperability, rollback, and failure-visibility controls, but each core claim is not yet bound to a quantitative falsifier, transition owner, and Government decision threshold.",
+          "finding": "The brief now binds the controlled experiment to stop and roll back on any declared attack miss, adverse-case omission, verifier mismatch, or Government-set overhead breach. The Government overhead threshold, transition owner, authorized interface owner, and security-boundary transition remain uncommitted.",
           "missing_evidence": [
-            "Per-claim falsification threshold",
+            "Government-approved workload and overhead thresholds",
             "Government transition owner or prime integration owner",
-            "Failure-triggered stop and rollback rules",
             "Authorization and security-boundary transition plan"
           ],
           "source_refs": [
@@ -512,8 +529,8 @@
         }
       ],
       "independent_red_team_receipt": null,
-      "next_action": "Name one current comparator, lock one HPCMP-representative experiment with quantitative thresholds and falsifiers, bind delivery roles and compute access, obtain an internal red-team receipt, then separately complete the private ROM, SAM all-awards, contact, Submittable, and final portal gates.",
-      "claim_boundary": "Current-source and formatting conformance plus an explicit objective crosswalk do not establish applicant eligibility, reviewer readiness, pricing, SAM readiness, technical merit, independent validation, selection, award, deployment, savings, or Government validation."
+      "next_action": "Publish the reviewed exact evidence files, bind a trust root outside the mutable receipt, have ERDC or an approved reviewer select the integrated comparator and HPCMP-representative workflow, lock mission and overhead thresholds, bind team, compute, integration, support, evaluator, and transition commitments, obtain independent execution, then separately complete the private ROM, SAM all-awards, contact, Submittable, and final portal gates.",
+      "claim_boundary": "Current-source custody, format and marker checks, a local synthetic ablation, and an explicit objective crosswalk do not establish applicant eligibility, reviewer readiness, public reproducibility, pricing, SAM readiness, technical merit, independent validation, selection, award, deployment, savings, or Government validation."
     },
     {
       "lane_id": "darpa_falcon_dpa26bz04_dv016",

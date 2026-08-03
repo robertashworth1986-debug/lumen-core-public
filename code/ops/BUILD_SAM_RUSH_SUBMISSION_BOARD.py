@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -16,7 +16,9 @@ OUT_JSON = OUT_OPS / "sam_rush_submission_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "sam_rush_submission_board.json"
 OUT_MD = SPRINT_DIR / "SAM_RUSH_SUBMISSION_BOARD_2026-07-10.md"
 
-SCAN_DATE = date(2026, 7, 10)
+SCAN_DATE = date.today()
+SOURCE_OBSERVED_UTC = "2026-07-10T00:00:00Z"
+SOURCE_TTL_HOURS = 24.0
 
 SENSITIVE_MARKERS = [
     "password",
@@ -478,8 +480,15 @@ def write_text(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def days_to_deadline(deadline_utc: str) -> int:
-    return (datetime.fromisoformat(deadline_utc.replace("Z", "+00:00")).date() - SCAN_DATE).days
+def parse_utc(value: str) -> datetime:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def days_to_deadline(deadline_utc: str, scan_date: date) -> int:
+    return (parse_utc(deadline_utc).date() - scan_date).days
 
 
 def classify_deadline(days: int) -> str:
@@ -508,12 +517,41 @@ def action_bucket(posture: str) -> str:
     return "review"
 
 
-def enrich_opportunity(opp: dict[str, Any]) -> dict[str, Any]:
+def enrich_opportunity(
+    opp: dict[str, Any],
+    *,
+    scan_date: date,
+    as_of: datetime,
+    source_fresh: bool,
+) -> dict[str, Any]:
     row = dict(opp)
-    days = days_to_deadline(str(row["deadline_utc"]))
+    deadline = parse_utc(str(row["deadline_utc"]))
+    days = days_to_deadline(str(row["deadline_utc"]), scan_date)
+    deadline_open = deadline > as_of
+    legacy_bucket = action_bucket(str(row["posture"]))
+    if not deadline_open:
+        effective_bucket = "expired_closed"
+    elif not source_fresh:
+        effective_bucket = "source_reverify_required"
+    else:
+        effective_bucket = legacy_bucket
+
+    row["days_to_deadline"] = days
     row["days_to_deadline_from_2026_07_10"] = days
     row["deadline_bucket"] = classify_deadline(days)
-    row["action_bucket"] = action_bucket(str(row["posture"]))
+    row["deadline_open"] = deadline_open
+    row["deadline_state"] = "OPEN" if deadline_open else "EXPIRED"
+    row["legacy_action_bucket"] = legacy_bucket
+    row["action_bucket"] = effective_bucket
+    row["source_observed_utc"] = SOURCE_OBSERVED_UTC
+    row["source_freshness_status"] = (
+        "FRESH" if source_fresh else "STALE_REVERIFY_REQUIRED"
+    )
+    row["actionable"] = (
+        deadline_open
+        and source_fresh
+        and effective_bucket == "submit_ready_human_gate"
+    )
     row["human_gate_required"] = True
     row["external_send_allowed_without_human"] = False
     row["final_submission_allowed_without_human"] = False
@@ -522,29 +560,75 @@ def enrich_opportunity(opp: dict[str, Any]) -> dict[str, Any]:
     return row
 
 
-def build_payload() -> dict[str, Any]:
-    opportunities = [enrich_opportunity(opp) for opp in OPPORTUNITIES]
+def build_payload(
+    *,
+    scan_date: date | None = None,
+    generated_utc: str | None = None,
+) -> dict[str, Any]:
+    scan_date = scan_date or SCAN_DATE
+    generated = parse_utc(generated_utc) if generated_utc else datetime.now(timezone.utc)
+    source_observed = parse_utc(SOURCE_OBSERVED_UTC)
+    source_age_hours = (generated - source_observed).total_seconds() / 3600
+    source_fresh = 0 <= source_age_hours <= SOURCE_TTL_HOURS
+    opportunities = [
+        enrich_opportunity(
+            opp,
+            scan_date=scan_date,
+            as_of=generated,
+            source_fresh=source_fresh,
+        )
+        for opp in OPPORTUNITIES
+    ]
     opportunities = sorted(opportunities, key=lambda row: (row["rank"], -int(row["fit_score"])))
     submit_ready = [row for row in opportunities if row["action_bucket"] == "submit_ready_human_gate"]
     partner_watch = [row for row in opportunities if row["action_bucket"] == "partner_or_watch"]
     no_bid = [row for row in opportunities if row["action_bucket"] == "no_bid"]
-    urgent = [row for row in opportunities if 0 <= row["days_to_deadline_from_2026_07_10"] <= 14]
+    source_reverify = [
+        row
+        for row in opportunities
+        if row["action_bucket"] == "source_reverify_required"
+    ]
+    expired = [
+        row for row in opportunities if row["action_bucket"] == "expired_closed"
+    ]
+    urgent = [
+        row
+        for row in opportunities
+        if row["deadline_open"] and 0 <= row["days_to_deadline"] <= 14
+    ]
 
     payload = {
         "schema": "sam_rush_submission_board_v1",
-        "generated_utc": now_utc(),
-        "scan_date": SCAN_DATE.isoformat(),
-        "status": "SAM_RUSH_BOARD_READY_HUMAN_SUBMIT_REQUIRED",
+        "generated_utc": generated.isoformat(),
+        "source_observed_utc": SOURCE_OBSERVED_UTC,
+        "source_fresh_until_utc": (
+            source_observed + timedelta(hours=SOURCE_TTL_HOURS)
+        ).isoformat(),
+        "scan_date": scan_date.isoformat(),
+        "status": (
+            "SAM_RUSH_BOARD_READY_HUMAN_SUBMIT_REQUIRED"
+            if source_fresh and submit_ready
+            else "SAM_RUSH_BOARD_HISTORICAL_SOURCE_REVERIFY_REQUIRED"
+        ),
         "summary": {
             "opportunity_count": len(opportunities),
             "submit_ready_human_gate_count": len(submit_ready),
             "partner_or_watch_count": len(partner_watch),
             "no_bid_count": len(no_bid),
+            "deadline_open_count": sum(
+                1 for row in opportunities if row["deadline_open"]
+            ),
+            "expired_closed_count": len(expired),
+            "source_reverify_required_count": len(source_reverify),
+            "source_fresh": source_fresh,
+            "source_age_hours": round(source_age_hours, 2),
             "urgent_14_day_count": len(urgent),
-            "top_submission_lane": "693JJ326R000012 FHWA TSMO Data Initiative",
-            "fastest_rfi_lane": "80TECH26RFI0020 NASA Data Center Infrastructure RFI",
-            "strongest_cso_lane": "W912HZ26SC005 ERDC Sovereign Defense Cloud CSO",
-            "fast_small_business_lane": "15BCMS26Q70000005 DOJ/BOP Historical Medical Claims Data Analysis",
+            "top_submission_lane": (
+                submit_ready[0]["solicitation_number"] if submit_ready else None
+            ),
+            "historical_candidate_lanes": [
+                row["solicitation_number"] for row in source_reverify
+            ],
             "human_action_required": True,
             "external_send_allowed_without_human": False,
             "final_submission_allowed_without_human": False,
@@ -565,6 +649,31 @@ def build_payload() -> dict[str, Any]:
                 "package_files": row["package_files"],
             }
             for row in submit_ready
+        ],
+        "source_reverify_required": [
+            {
+                "rank": row["rank"],
+                "title": row["title"],
+                "solicitation_number": row["solicitation_number"],
+                "deadline_utc": row["deadline_utc"],
+                "deadline_state": row["deadline_state"],
+                "source_observed_utc": row["source_observed_utc"],
+                "source_freshness_status": row["source_freshness_status"],
+                "official_url": row["official_url"],
+                "actionable": False,
+            }
+            for row in source_reverify
+        ],
+        "expired_closed": [
+            {
+                "rank": row["rank"],
+                "title": row["title"],
+                "solicitation_number": row["solicitation_number"],
+                "deadline_utc": row["deadline_utc"],
+                "deadline_state": row["deadline_state"],
+                "actionable": False,
+            }
+            for row in expired
         ],
         "partner_or_watch": [
             {
@@ -616,7 +725,7 @@ def render_stub(filename: str, stub: dict[str, Any]) -> str:
         f"# {stub['title']} - 2026-07-10",
         "",
         f"- Opportunity: `{stub['opportunity']}`",
-        "- Status: `DRAFT_READY_HUMAN_REVIEW_REQUIRED`",
+        "- Status: `HISTORICAL_DRAFT_REVERIFY_BEFORE_USE`",
         "- External send without human: `false`",
         "- Final submission without human: `false`",
         "- Pricing/certification without human: `false`",
@@ -644,11 +753,11 @@ def render_stub(filename: str, stub: dict[str, Any]) -> str:
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     lines = [
-        "# SAM Rush Submission Board - 2026-07-10",
+        f"# Historical SAM Rush Submission Board - Current Scan {payload['scan_date']}",
         "",
-        "Purpose: convert the July 10 SAM/federal opportunity sweep into a ranked submission board and draft packet map.",
+        "Purpose: preserve the July 10 SAM/federal opportunity sweep as historical candidate context without treating a current rebuild as a current official-source verification.",
         "",
-        "Direct answer: pursue the four submit-ready lanes first, keep partner-only lanes out of final submission until qualified partners or credentials are confirmed, and skip no-bid lanes that would fail compliance.",
+        "Direct answer: zero lanes are submit-ready from this historical sweep. Reverify every still-date-open candidate against its current official notice, amendments, eligibility, deadline, and submission route before staging work.",
         "",
         "This board prepares submissions. It does not authorize final SAM.gov/portal submit, legal certification, pricing, signature, term acceptance, or agency-validation claims without human review.",
         "",
@@ -658,13 +767,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Scan date: `{payload['scan_date']}`",
         f"- Opportunities reviewed: `{summary['opportunity_count']}`",
         f"- Submit-ready human-gated lanes: `{summary['submit_ready_human_gate_count']}`",
+        f"- Still-date-open historical candidates requiring source reverify: `{summary['source_reverify_required_count']}`",
+        f"- Expired and closed: `{summary['expired_closed_count']}`",
+        f"- Source observed UTC: `{payload['source_observed_utc']}`",
+        f"- Source fresh: `{str(summary['source_fresh']).lower()}`",
+        f"- Source age hours: `{summary['source_age_hours']}`",
         f"- Partner/watch lanes: `{summary['partner_or_watch_count']}`",
         f"- No-bid lanes: `{summary['no_bid_count']}`",
         f"- Urgent within 14 days: `{summary['urgent_14_day_count']}`",
-        f"- Top submission lane: `{summary['top_submission_lane']}`",
-        f"- Fastest RFI lane: `{summary['fastest_rfi_lane']}`",
-        f"- Strongest CSO lane: `{summary['strongest_cso_lane']}`",
-        f"- Fast small-business lane: `{summary['fast_small_business_lane']}`",
+        f"- Top submission lane: `{summary['top_submission_lane'] or 'none'}`",
         f"- External send without human: `{str(summary['external_send_allowed_without_human']).lower()}`",
         f"- Final submission without human: `{str(summary['final_submission_allowed_without_human']).lower()}`",
         f"- Pricing without human: `{str(summary['pricing_allowed_without_human']).lower()}`",
@@ -691,6 +802,22 @@ def render_markdown(payload: dict[str, Any]) -> str:
             lines.append(f"  - `{file}`")
         lines.append("")
 
+    lines.extend(["## Source Reverify Required", ""])
+    for row in payload["source_reverify_required"]:
+        lines.extend(
+            [
+                f"- `{row['solicitation_number']}`: deadline `{row['deadline_utc']}`; "
+                f"source `{row['source_freshness_status']}`; actionable `false`; "
+                f"official URL: {row['official_url'] or 'unresolved'}",
+            ]
+        )
+    lines.extend(["", "## Expired And Closed", ""])
+    for row in payload["expired_closed"]:
+        lines.append(
+            f"- `{row['solicitation_number']}`: deadline `{row['deadline_utc']}`; actionable `false`."
+        )
+    lines.append("")
+
     lines.extend(["## Full Opportunity Board", ""])
     for opp in payload["opportunities"]:
         lines.extend(
@@ -703,9 +830,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Notice type: `{opp['notice_type']}`",
                 f"- Set-aside: `{opp['set_aside']}`",
                 f"- Deadline UTC: `{opp['deadline_utc']}`",
-                f"- Days from 2026-07-10: `{opp['days_to_deadline_from_2026_07_10']}`",
+                f"- Days to deadline from current scan: `{opp['days_to_deadline']}`",
                 f"- Deadline bucket: `{opp['deadline_bucket']}`",
+                f"- Deadline state: `{opp['deadline_state']}`",
+                f"- Source freshness: `{opp['source_freshness_status']}`",
                 f"- Action bucket: `{opp['action_bucket']}`",
+                f"- Actionable: `{str(opp['actionable']).lower()}`",
                 f"- Fit score: `{opp['fit_score']}`",
                 f"- Urgency score: `{opp['urgency_score']}`",
                 f"- Posture: `{opp['posture']}`",

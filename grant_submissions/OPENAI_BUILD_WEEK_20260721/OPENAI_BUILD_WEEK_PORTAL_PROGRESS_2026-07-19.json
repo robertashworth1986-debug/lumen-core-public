@@ -1,0 +1,90 @@
+{
+  "schema": "lumencore.openai_build_week_portal_progress_receipt.v1",
+  "recorded_observation_utc": "2026-07-19T08:57:50Z",
+  "status": "PROJECT_DRAFT_2_OF_5_VIDEO_FEEDBACK_OPEN",
+  "challenge": {
+    "challenge_id": "30223-openai-build-week",
+    "deadline_central": "2026-07-21T19:00:00-05:00",
+    "deadline_utc": "2026-07-22T00:00:00Z"
+  },
+  "normalized_facts": {
+    "browser_confirmation": {
+      "evidence_id": "devpost_browser_project_draft_confirmation",
+      "evidence_class": "DIRECT_BROWSER_OBSERVATION",
+      "recorded_utc": "2026-07-19T08:57:50Z",
+      "event_timestamp_utc": null,
+      "event_time_state": "NOT_RECORDED_SEPARATELY",
+      "challenge_id": "30223-openai-build-week",
+      "page_url": "https://devpost.com/submit-to/30223-openai-build-week/manage/submissions/1104232-prooflock-console/project_details/edit",
+      "visible_confirmation_text": "ProofLock Console | Draft | 2/5 steps done",
+      "challenge_registration_confirmed": true,
+      "signed_in_portal_observed": true,
+      "project_name": "ProofLock Console",
+      "project_state": "DRAFT",
+      "steps_completed": 2,
+      "steps_total": 5,
+      "current_section": "Project details",
+      "project_shell_creation_proven": true,
+      "final_submission_proven": false
+    },
+    "gmail_confirmation": {
+      "evidence_id": "devpost_gmail_registration_confirmation",
+      "evidence_class": "INDEPENDENT_GMAIL_METADATA",
+      "message_id": "19f795524f98f57a",
+      "sender": "Devpost <support@devpost.com>",
+      "subject": "OpenAI Build Week: You're in!",
+      "timestamp_utc": "2026-07-19T07:44:10Z",
+      "bounded_confirmation": {
+        "challenge_registration_confirmed": true,
+        "deadline_central": "2026-07-21T19:00:00-05:00",
+        "deadline_utc": "2026-07-22T00:00:00Z"
+      },
+      "message_body_retained": false,
+      "tracking_links_retained": false,
+      "private_account_identifiers_retained": false
+    }
+  },
+  "facts_sha256": "49a49f197ed1af4afa9d1f3ebac9bea5d4c33c52f9b579126594f4679c186498",
+  "derived_states": {
+    "challenge_registration": {
+      "state": "CONFIRMED",
+      "classification": "EVIDENCE_SUPPORTED_DERIVATION",
+      "basis_ids": [
+        "devpost_browser_project_draft_confirmation",
+        "devpost_gmail_registration_confirmation"
+      ]
+    },
+    "project_shell_creation": {
+      "state": "CONFIRMED",
+      "classification": "DIRECT_BROWSER_OBSERVATION",
+      "basis_ids": [
+        "devpost_browser_project_draft_confirmation"
+      ]
+    },
+    "final_submission": {
+      "state": "NOT_PROVEN",
+      "classification": "FAIL_CLOSED_STATUS",
+      "basis_ids": []
+    }
+  },
+  "evidence_basis_count": 2,
+  "registration_confirmed": true,
+  "project_shell_creation_confirmed": true,
+  "final_submission_confirmed": false,
+  "ready_for_final_submission": false,
+  "open_gate_ids": [
+    "additional_info_completion",
+    "feedback_session_id",
+    "final_preview_review",
+    "final_submission",
+    "project_details_completion",
+    "public_youtube_video"
+  ],
+  "privacy_controls": {
+    "gmail_metadata_only": true,
+    "tracking_links_excluded": true,
+    "private_account_identifiers_excluded": true
+  },
+  "claim_boundary": "Two independent evidence bases confirm challenge registration and the stated deadline, and a direct browser observation confirms a ProofLock Console project draft at two of five portal steps. They do not prove completed project details, completed additional information, a /feedback Session ID, a public video, final preview approval, final submission, judging, endorsement, award, external validation, funding, patent rights, or value.",
+  "receipt_sha256": "2a52ea053836c9f286a94e13c413aee1a9f735f1a19142fcc72652e142ecf062"
+}

@@ -31,13 +31,13 @@ lumen-core.ai, www.lumen-core.ai {
     }
 }
 
+# The auth include is created at deploy time from operator-supplied values.
+# Keeping it outside the repository prevents reusable access material from
+# becoming part of source history.
+
 # === INVESTOR / APP DASHBOARD (Panel app on :5016) ===
 app.lumen-core.ai {
-    # Basic auth — change the hash below with: caddy hash-password
-    # Default credentials baked in: user=investor / pass=lumen2026
-    basicauth {
-        investor JDJhJDE0JG13RGFKNlNUZjFZbk1uM2Z6VC9PTk9Va3R3WTlvOFF0cXhpUTlTSFlsRy9yelV6Tll0VnNh
-    }
+    import /etc/caddy/lumencore-auth.caddy
 
     encode gzip zstd
     reverse_proxy 127.0.0.1:5016 {
@@ -55,9 +55,7 @@ app.lumen-core.ai {
 
 # === RESEARCH / SCOUT (Panel app on :5017) ===
 research.lumen-core.ai {
-    basicauth {
-        investor JDJhJDE0JG13RGFKNlNUZjFZbk1uM2Z6VC9PTk9Va3R3WTlvOFF0cXhpUTlTSFlsRy9yelV6Tll0VnNh
-    }
+    import /etc/caddy/lumencore-auth.caddy
 
     encode gzip zstd
     reverse_proxy 127.0.0.1:5017 {

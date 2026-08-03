@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import ipaddress
 import json
 import re
 import string
@@ -9,10 +10,14 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "config" / "outreach_response_templates_v1.json"
+CLAIM_EVIDENCE_TEMPLATE = (
+    ROOT / "config" / "outreach_claim_evidence_receipt_template_v1.json"
+)
 SPRINT_DIR = ROOT / "grant_submissions" / "funding_sprint_20260709"
 OUT_OPS = ROOT / "out" / "ops"
 OUT_JSON = SPRINT_DIR / "OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json"
@@ -36,6 +41,15 @@ UUID_RE = re.compile(
     r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
     r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"
 )
+CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+SENDABLE_IDENTITY_FIELDS = {
+    "recipient_name",
+    "sender_name",
+    "sender_title",
+    "organization_name",
+}
+MAX_RENDERED_SUBJECT_CHARS = 200
+MAX_RENDERED_BODY_CHARS = 5000
 POSITIVE_CLAIM_MARKERS = (
     "guaranteed funding",
     "guaranteed savings",
@@ -44,6 +58,68 @@ POSITIVE_CLAIM_MARKERS = (
     "field-proven performance",
     "certified safe",
     "will save",
+)
+CLAIM_EVIDENCE_RECEIPT_SCHEMA = (
+    "lumencore.outreach_claim_evidence_receipt.v1"
+)
+CLAIM_EVIDENCE_RECEIPT_FIELDS = {
+    "claim_allowed",
+    "fact_field",
+    "fact_value_sha256",
+    "receipt_sha256",
+    "review_basis",
+    "reviewed_utc",
+    "risk_codes",
+    "schema",
+    "source_artifacts",
+}
+CLAIM_RISK_PATTERNS = {
+    "UNSUPPORTED_GUARANTEE": re.compile(r"\bguarantee(?:d|s)?\b", re.IGNORECASE),
+    "UNSUPPORTED_SUPERLATIVE": re.compile(
+        r"(?:\bbest[- ]in[- ]class\b|\bworld(?:'s)?[- ]best\b|"
+        r"\bunbeatable\b|#\s*1\b|\bsuperior to all\b)",
+        re.IGNORECASE,
+    ),
+    "UNSUPPORTED_EXTERNAL_VALIDATION": re.compile(
+        r"\b(?:independently|externally)\s+"
+        r"(?:reproduced|validated|verified)\b",
+        re.IGNORECASE,
+    ),
+    "UNSUPPORTED_FIELD_PERFORMANCE": re.compile(
+        r"\b(?:field|production)[- ](?:proven|validated)\b|"
+        r"\bdeployed in production\b",
+        re.IGNORECASE,
+    ),
+    "UNSUPPORTED_ECONOMIC_OUTCOME": re.compile(
+        r"\b(?:realized|validated|proven)\s+(?:annual\s+)?savings\b|"
+        r"\bwill save\b|\bsaved\s+\$|"
+        r"\$[\d,.]+\s*(?:million|billion|m|b)?\s+"
+        r"(?:in\s+)?(?:annual\s+)?(?:savings|value)\b",
+        re.IGNORECASE,
+    ),
+    "UNSUPPORTED_AGENCY_ACCEPTANCE": re.compile(
+        r"\b(?:government|federal|agency)[- ](?:approved|accepted)\b|"
+        r"\baccepted by (?:darpa|dod|doe|nasa|nsf|epri|lanl)\b",
+        re.IGNORECASE,
+    ),
+    "UNSUPPORTED_AWARD_OR_CONTRACT": re.compile(
+        r"\b(?:won|received|awarded)\s+(?:an?\s+)?"
+        r"(?:grant|contract|award)\b",
+        re.IGNORECASE,
+    ),
+    "UNSUPPORTED_CUSTOMER_TRACTION": re.compile(
+        r"\b(?:paying customer|customer revenue|commercial deployment)\b",
+        re.IGNORECASE,
+    ),
+    "UNSUPPORTED_BASELINE_SUPERIORITY": re.compile(
+        r"\b(?:outperforms?|beats?)\s+"
+        r"(?:all|every|the incumbent|the baseline)\b",
+        re.IGNORECASE,
+    ),
+}
+NEGATION_WINDOW_RE = re.compile(
+    r"\b(?:no|not|never|without|unverified|unproven)\b",
+    re.IGNORECASE,
 )
 
 
@@ -60,6 +136,124 @@ def read_registry(path: Path = CONFIG) -> dict[str, Any]:
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest().upper()
+
+
+def canonical_object_sha256(
+    payload: dict[str, Any], *, omit: set[str] | None = None
+) -> str:
+    bounded = {
+        key: value
+        for key, value in payload.items()
+        if key not in (omit or set())
+    }
+    return sha256_bytes(
+        json.dumps(
+            bounded, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+    )
+
+
+def _rooted_artifact(path_value: Any) -> Path:
+    if not isinstance(path_value, str) or not path_value.strip():
+        raise OutreachRegistryError("CLAIM_EVIDENCE_PATH_INVALID")
+    path = Path(path_value)
+    if path.is_absolute():
+        raise OutreachRegistryError("CLAIM_EVIDENCE_PATH_MUST_BE_RELATIVE")
+    resolved = (ROOT / path).resolve()
+    try:
+        resolved.relative_to(ROOT.resolve())
+    except ValueError as exc:
+        raise OutreachRegistryError("CLAIM_EVIDENCE_PATH_OUTSIDE_ROOT") from exc
+    if not resolved.is_file():
+        raise OutreachRegistryError("CLAIM_EVIDENCE_FILE_MISSING")
+    return resolved
+
+
+def _assertion_is_negated(text: str, match_start: int) -> bool:
+    window = text[max(0, match_start - 40) : match_start]
+    boundary = max(window.rfind("."), window.rfind(";"), window.rfind("\n"))
+    if boundary >= 0:
+        window = window[boundary + 1 :]
+    return bool(NEGATION_WINDOW_RE.search(window))
+
+
+def claim_fact_risks(facts: dict[str, Any]) -> dict[str, list[str]]:
+    risks: dict[str, list[str]] = {}
+    for field, raw_value in facts.items():
+        if field in {"attachment_files"} or field.endswith("_email"):
+            continue
+        if not isinstance(raw_value, str) or not raw_value.strip():
+            continue
+        codes = []
+        for code, pattern in CLAIM_RISK_PATTERNS.items():
+            matches = [
+                match
+                for match in pattern.finditer(raw_value)
+                if not _assertion_is_negated(raw_value, match.start())
+            ]
+            if matches:
+                codes.append(code)
+        if codes:
+            risks[field] = sorted(codes)
+    return dict(sorted(risks.items()))
+
+
+def validate_claim_evidence_receipt(
+    receipt_path: str,
+    *,
+    fact_field: str,
+    fact_value: str,
+    risk_codes: list[str],
+) -> str:
+    path = _rooted_artifact(receipt_path)
+    try:
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise OutreachRegistryError("CLAIM_EVIDENCE_RECEIPT_INVALID_JSON") from exc
+    if not isinstance(receipt, dict):
+        raise OutreachRegistryError("CLAIM_EVIDENCE_RECEIPT_NOT_OBJECT")
+    if set(receipt) != CLAIM_EVIDENCE_RECEIPT_FIELDS:
+        raise OutreachRegistryError("CLAIM_EVIDENCE_RECEIPT_FIELDS_INVALID")
+    if receipt.get("schema") != CLAIM_EVIDENCE_RECEIPT_SCHEMA:
+        raise OutreachRegistryError("CLAIM_EVIDENCE_RECEIPT_SCHEMA_INVALID")
+    if receipt.get("claim_allowed") is not True:
+        raise OutreachRegistryError("CLAIM_EVIDENCE_NOT_APPROVED")
+    if receipt.get("fact_field") != fact_field:
+        raise OutreachRegistryError("CLAIM_EVIDENCE_FIELD_MISMATCH")
+    expected_value_sha = sha256_bytes(fact_value.strip().encode("utf-8"))
+    if receipt.get("fact_value_sha256") != expected_value_sha:
+        raise OutreachRegistryError("CLAIM_EVIDENCE_VALUE_MISMATCH")
+    if sorted(receipt.get("risk_codes") or []) != sorted(risk_codes):
+        raise OutreachRegistryError("CLAIM_EVIDENCE_RISK_MISMATCH")
+    if not isinstance(receipt.get("review_basis"), str) or not receipt[
+        "review_basis"
+    ].strip():
+        raise OutreachRegistryError("CLAIM_EVIDENCE_REVIEW_BASIS_MISSING")
+    try:
+        parse_aware_datetime(str(receipt.get("reviewed_utc") or ""))
+    except OutreachRegistryError as exc:
+        raise OutreachRegistryError(
+            "CLAIM_EVIDENCE_REVIEWED_UTC_INVALID"
+        ) from exc
+
+    sources = receipt.get("source_artifacts")
+    if not isinstance(sources, list) or not sources:
+        raise OutreachRegistryError("CLAIM_EVIDENCE_SOURCES_MISSING")
+    for source in sources:
+        if not isinstance(source, dict) or set(source) != {"path", "sha256"}:
+            raise OutreachRegistryError("CLAIM_EVIDENCE_SOURCE_INVALID")
+        source_path = _rooted_artifact(source["path"])
+        if source_path == path:
+            raise OutreachRegistryError("CLAIM_EVIDENCE_SOURCE_IS_RECEIPT")
+        if sha256_bytes(source_path.read_bytes()) != source["sha256"]:
+            raise OutreachRegistryError("CLAIM_EVIDENCE_SOURCE_HASH_MISMATCH")
+
+    expected_receipt_sha = canonical_object_sha256(
+        receipt, omit={"receipt_sha256"}
+    )
+    if receipt.get("receipt_sha256") != expected_receipt_sha:
+        raise OutreachRegistryError("CLAIM_EVIDENCE_RECEIPT_HASH_MISMATCH")
+    return expected_receipt_sha
 
 
 def template_placeholders(text: str) -> set[str]:
@@ -80,6 +274,136 @@ def _string_list(value: Any, code: str) -> list[str]:
     ):
         raise OutreachRegistryError(code)
     return value
+
+
+def deadline_control_required(row: dict[str, Any]) -> bool:
+    return any(
+        field in {"deadline_iso", "deadline_local"}
+        or field.endswith("_deadline_local")
+        for field in row["required_fields"]
+    )
+
+
+def template_quality_profile(row: dict[str, Any]) -> dict[str, Any]:
+    template_id = str(row["template_id"])
+    required_list = list(row["required_fields"])
+    routing_list = list(row["routing_fields"])
+    sensitive_list = list(row["sensitive_fields"])
+    default_fields = set(row["optional_defaults"])
+    required = set(required_list)
+    routing = set(routing_list)
+    sensitive = set(sensitive_list)
+    placeholders = template_placeholders(row["subject"] + "\n" + row["body"])
+    sendable = row["send_policy"] != "MONITOR_NO_SEND"
+    deadline_required = deadline_control_required(row)
+    url_fields = sorted(field for field in required if field.endswith("_url"))
+
+    checks = {
+        "field_lists_have_no_duplicates": all(
+            len(values) == len(set(values))
+            for values in (required_list, routing_list, sensitive_list)
+        ),
+        "field_declarations_are_disjoint": not (
+            required.intersection(routing)
+            or required.intersection(default_fields)
+            or routing.intersection(default_fields)
+        ),
+        "all_required_fields_are_rendered": not (required - placeholders),
+        "all_routing_fields_are_sensitive": routing.issubset(sensitive),
+        "nonrouting_sensitive_fields_force_private_render": (
+            not (sensitive - routing) or row["private_render_only"] is True
+        ),
+        "sendable_identity_fields_are_required": (
+            not sendable or SENDABLE_IDENTITY_FIELDS.issubset(required)
+        ),
+        "sendable_recipient_route_is_required": (
+            not sendable or "recipient_email" in routing
+        ),
+        "sendable_template_has_greeting_and_signature": (
+            not sendable
+            or (
+                row["body"].startswith("Hello {recipient_name},")
+                and "{sender_name}" in row["body"]
+                and "{sender_title}" in row["body"]
+                and "{organization_name}" in row["body"]
+            )
+        ),
+        "monitor_template_is_content_free": (
+            sendable
+            or (
+                not row["subject"]
+                and not row["body"]
+                and not required
+                and not routing
+                and not sensitive
+                and not default_fields
+                and row["attachment_policy"] == "NONE"
+            )
+        ),
+        "template_subject_is_single_line": (
+            "\r" not in row["subject"] and "\n" not in row["subject"]
+        ),
+        "template_text_is_within_render_limits": (
+            len(row["subject"]) <= MAX_RENDERED_SUBJECT_CHARS
+            and len(row["body"]) <= MAX_RENDERED_BODY_CHARS
+        ),
+        "known_deadline_uses_single_structured_value": (
+            not deadline_required
+            or (
+                "deadline_iso" in required
+                and "deadline_iso" in placeholders
+                and not any(
+                    field == "deadline_local"
+                    or field.endswith("_deadline_local")
+                    for field in required
+                )
+            )
+        ),
+    }
+    failures = sorted(name for name, passed in checks.items() if not passed)
+    return {
+        "template_id": template_id,
+        "status": "PASS" if not failures else "FAIL",
+        "checks": checks,
+        "failed_checks": failures,
+        "deadline_iso_control_required": deadline_required,
+        "https_public_url_fields": url_fields,
+    }
+
+
+def is_public_https_url(value: Any) -> bool:
+    if not isinstance(value, str) or not value.strip() or any(
+        char.isspace() for char in value
+    ):
+        return False
+    try:
+        parsed = urlsplit(value)
+        port = parsed.port
+    except ValueError:
+        return False
+    if (
+        parsed.scheme.lower() != "https"
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.fragment
+        or port not in (None, 443)
+    ):
+        return False
+    hostname = parsed.hostname.lower().rstrip(".")
+    if hostname == "localhost" or hostname.endswith(".local"):
+        return False
+    try:
+        address = ipaddress.ip_address(hostname)
+    except ValueError:
+        return True
+    return not (
+        address.is_private
+        or address.is_loopback
+        or address.is_link_local
+        or address.is_reserved
+        or address.is_unspecified
+    )
 
 
 def validate_registry(payload: dict[str, Any]) -> dict[str, Any]:
@@ -167,6 +491,12 @@ def validate_registry(payload: dict[str, Any]) -> dict[str, Any]:
             raise OutreachRegistryError(f"DESCRIPTION_MISSING:{template_id}")
         if not isinstance(row.get("private_render_only"), bool):
             raise OutreachRegistryError(f"PRIVATE_FLAG_INVALID:{template_id}")
+        quality = template_quality_profile(row)
+        if quality["status"] != "PASS":
+            raise OutreachRegistryError(
+                f"QUALITY_GATE_FAILED:{template_id}:"
+                f"{','.join(quality['failed_checks'])}"
+            )
 
     return payload
 
@@ -239,6 +569,7 @@ def render_response(
     already_sent: bool = False,
     inbound_requires_response: bool = True,
     explicit_attachment_request: bool = False,
+    claim_evidence_receipts: dict[str, str] | None = None,
     current_utc: str | None = None,
     registry: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -271,6 +602,8 @@ def render_response(
         return result
 
     required = list(row["required_fields"]) + list(row["routing_fields"])
+    if deadline_control_required(row) and "deadline_iso" not in required:
+        required.append("deadline_iso")
     missing = sorted(
         field
         for field in required
@@ -302,6 +635,70 @@ def render_response(
                 "body": None,
                 "missing_fields": [],
                 "invalid_email_fields": invalid_emails,
+            }
+        )
+        return result
+
+    invalid_urls = sorted(
+        field
+        for field in required
+        if field.endswith("_url") and not is_public_https_url(facts[field])
+    )
+    if invalid_urls:
+        result = _base_result(payload, row, "BLOCKED_INVALID_PUBLIC_URL", deadline)
+        result.update(
+            {
+                "duplicate_send_blocked": False,
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+                "invalid_url_fields": invalid_urls,
+            }
+        )
+        return result
+
+    fact_risks = claim_fact_risks(facts)
+    evidence_receipts = claim_evidence_receipts or {}
+    if not isinstance(evidence_receipts, dict) or not all(
+        isinstance(field, str) and isinstance(path, str)
+        for field, path in evidence_receipts.items()
+    ):
+        raise OutreachRegistryError("CLAIM_EVIDENCE_RECEIPT_MAP_INVALID")
+    invalid_evidence_fields: dict[str, str] = {}
+    evidence_receipt_sha256s: dict[str, str] = {}
+    for field, risk_codes in fact_risks.items():
+        receipt_path = evidence_receipts.get(field)
+        if not receipt_path:
+            invalid_evidence_fields[field] = "MISSING_EVIDENCE_RECEIPT"
+            continue
+        try:
+            evidence_receipt_sha256s[field] = validate_claim_evidence_receipt(
+                receipt_path,
+                fact_field=field,
+                fact_value=str(facts[field]),
+                risk_codes=risk_codes,
+            )
+        except OutreachRegistryError as exc:
+            invalid_evidence_fields[field] = str(exc)
+    if invalid_evidence_fields:
+        result = _base_result(
+            payload, row, "BLOCKED_UNSUPPORTED_CLAIM_FACTS", deadline
+        )
+        result.update(
+            {
+                "duplicate_send_blocked": False,
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+                "claim_risk_fields": sorted(fact_risks),
+                "claim_risk_codes": sorted(
+                    {
+                        code
+                        for codes in fact_risks.values()
+                        for code in codes
+                    }
+                ),
+                "invalid_claim_evidence_fields": invalid_evidence_fields,
             }
         )
         return result
@@ -345,17 +742,40 @@ def render_response(
 
     values = dict(row["optional_defaults"])
     values.update(facts)
+    if deadline["provided"]:
+        values["deadline_iso"] = canonical_utc(str(facts["deadline_iso"]))
     try:
         subject = row["subject"].format_map(values)
         body = row["body"].format_map(values)
     except KeyError as exc:
         raise OutreachRegistryError(f"UNRESOLVED_PLACEHOLDER:{exc.args[0]}") from exc
 
-    remaining = template_placeholders(subject + "\n" + body)
-    if remaining:
-        raise OutreachRegistryError(
-            f"UNRESOLVED_PLACEHOLDER_AFTER_RENDER:{','.join(sorted(remaining))}"
+    unsafe_reasons: list[str] = []
+    if "\r" in subject or "\n" in subject:
+        unsafe_reasons.append("SUBJECT_LINE_BREAK")
+    if CONTROL_CHAR_RE.search(subject):
+        unsafe_reasons.append("SUBJECT_CONTROL_CHARACTER")
+    if CONTROL_CHAR_RE.search(body):
+        unsafe_reasons.append("BODY_CONTROL_CHARACTER")
+    if len(subject) > MAX_RENDERED_SUBJECT_CHARS:
+        unsafe_reasons.append("SUBJECT_TOO_LONG")
+    if len(body) > MAX_RENDERED_BODY_CHARS:
+        unsafe_reasons.append("BODY_TOO_LONG")
+    if unsafe_reasons:
+        result = _base_result(
+            payload, row, "BLOCKED_UNSAFE_RENDERED_CONTENT", deadline
         )
+        result.update(
+            {
+                "duplicate_send_blocked": False,
+                "subject": None,
+                "body": None,
+                "missing_fields": [],
+                "unsafe_reasons": sorted(set(unsafe_reasons)),
+            }
+        )
+        return result
+
     lowered = (subject + "\n" + body).lower()
     for marker in POSITIVE_CLAIM_MARKERS:
         if marker in lowered:
@@ -382,6 +802,11 @@ def render_response(
             "private_render": private_render,
             "public_safe": not private_render,
             "sensitive_field_names": sensitive_present,
+            "rendered_deadline_iso": (
+                values["deadline_iso"] if deadline["provided"] else None
+            ),
+            "claim_risk_fields": sorted(fact_risks),
+            "claim_evidence_receipt_sha256s": evidence_receipt_sha256s,
         }
     )
     return result
@@ -393,6 +818,10 @@ def build_public_payload(
     payload = validate_registry(registry or read_registry())
     policy_counts = Counter(row["send_policy"] for row in payload["templates"])
     private_count = sum(bool(row["private_render_only"]) for row in payload["templates"])
+    quality_rows = [
+        template_quality_profile(row) for row in payload["templates"]
+    ]
+    quality_check_count = sum(len(row["checks"]) for row in quality_rows)
     source_effective_utc = canonical_utc(payload["source_effective_utc"])
     result = {
         "schema": PUBLIC_SCHEMA,
@@ -400,18 +829,51 @@ def build_public_payload(
         "source_effective_utc": source_effective_utc,
         "source_schema": payload["schema"],
         "source_config": CONFIG.relative_to(ROOT).as_posix(),
-        "source_config_sha256": sha256_bytes(CONFIG.read_bytes()),
+        "source_config_sha256": canonical_object_sha256(payload),
+        "source_config_hash_basis": "SORTED_COMPACT_JSON_UTF8",
         "template_count": len(payload["templates"]),
         "send_policy_counts": dict(sorted(policy_counts.items())),
         "private_render_template_count": private_count,
         "claim_boundary": payload["claim_boundary"],
         "global_rules": payload["global_rules"],
         "templates": payload["templates"],
+        "quality_gate": {
+            "status": "PASS",
+            "all_templates_pass": all(
+                row["status"] == "PASS" for row in quality_rows
+            ),
+            "template_count": len(quality_rows),
+            "check_count": quality_check_count,
+            "deadline_control_template_ids": sorted(
+                row["template_id"]
+                for row in quality_rows
+                if row["deadline_iso_control_required"]
+            ),
+            "https_public_url_field_count": sum(
+                len(row["https_public_url_fields"]) for row in quality_rows
+            ),
+            "template_results": quality_rows,
+        },
         "controls": {
             "duplicate_send_fail_closed": True,
             "missing_fact_fail_closed": True,
             "past_deadline_fail_closed": True,
             "attachment_requires_explicit_request": True,
+            "unused_required_field_fail_closed": True,
+            "overlapping_field_declaration_fail_closed": True,
+            "known_deadline_requires_aware_iso_control": True,
+            "rendered_deadline_matches_evaluated_deadline": True,
+            "public_url_requires_https_without_credentials": True,
+            "rendered_subject_header_injection_fail_closed": True,
+            "rendered_length_limits_fail_closed": True,
+            "rendered_fact_claim_guard_fail_closed": True,
+            "high_risk_claim_requires_hash_bound_evidence_receipt": True,
+            "claim_evidence_source_artifacts_rehashed": True,
+            "claim_evidence_receipt_schema": CLAIM_EVIDENCE_RECEIPT_SCHEMA,
+            "claim_evidence_receipt_template": (
+                CLAIM_EVIDENCE_TEMPLATE.relative_to(ROOT).as_posix()
+            ),
+            "source_config_hash_cross_platform_canonical_json": True,
             "builder_can_send_email": False,
             "action_time_human_review_required": True,
             "unchanged_rebuild_byte_stable": True,
@@ -433,6 +895,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Duplicate-send gate: `FAIL_CLOSED`",
         "- Missing-fact gate: `FAIL_CLOSED`",
         "- Past-deadline gate: `FAIL_CLOSED`",
+        "- Inserted-fact claim gate: `FAIL_CLOSED`",
+        "- High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`",
+        f"- Static quality gate: `{payload['quality_gate']['status']}`",
+        f"- Static quality checks: `{payload['quality_gate']['check_count']}`",
         "- Unchanged rebuilds byte-stable: `true`",
         "",
         "## Claim Boundary",
@@ -445,6 +911,12 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.extend(f"- {rule}" for rule in payload["global_rules"])
     lines.extend(
         [
+            "",
+            "## Quality Gate",
+            "",
+            f"- All templates pass: `{str(payload['quality_gate']['all_templates_pass']).lower()}`",
+            f"- Deadline-control templates: `{', '.join(payload['quality_gate']['deadline_control_template_ids']) or 'none'}`",
+            f"- HTTPS public URL fields: `{payload['quality_gate']['https_public_url_field_count']}`",
             "",
             "## Decision Matrix",
             "",
@@ -488,7 +960,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Operating Boundary",
             "",
-            "This registry renders drafts and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review.",
+            "This registry renders drafts and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A hash-bound receipt proves only that an exact inserted fact was reviewed against the listed source bytes; it does not by itself establish independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.",
             "",
         ]
     )
@@ -530,6 +1002,8 @@ def main() -> None:
                 "builder_can_send_email": payload["controls"][
                     "builder_can_send_email"
                 ],
+                "quality_gate_status": payload["quality_gate"]["status"],
+                "quality_check_count": payload["quality_gate"]["check_count"],
                 "outputs_written": not args.check,
             },
             indent=2,

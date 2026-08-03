@@ -1,19 +1,22 @@
 # Energy Price-Pressure Forecast Evidence
 
-Generated UTC: 2026-07-13T19:42:26.355897+00:00
+Generated UTC: 2026-07-29T08:11:23.945412+00:00
 
 ## Boundary
 
-This is a live measured energy price-pressure proxy, not an actual wholesale power price forecast and not a real-dollar savings claim. It uses EIA grid demand/generation, EIA day-ahead demand snapshot rows, nuclear outage stress, FRED macro series, and current geometry replay evidence. To unlock real price and dollar claims, connect ISO/RTO LMP or other auditable electricity price settlement data and run walk-forward validation.
+This is a historical measured energy-system stress proxy, not a wholesale power-price forecast, price-pressure validation, or real-dollar savings claim. It combines EIA grid demand/generation, EIA day-ahead demand rows, nuclear-outage stress, FRED macro series, and current geometry context. The demand-residual comparison is exploratory and has not passed a registered all-baseline or multiplicity-controlled promotion gate. ISO/RTO LMP or settlement data with auditable timestamps is required for any price claim.
 
 ## Summary
 
 - Hourly grid rows: 190
 - Forecast rows generated: 24
 - Price-pressure max band: high
-- Phase-locked model beats best named baseline: True
-- Improvement vs best named baseline: 36.387422%
+- Promoted model beats best named baseline: False
+- Exploratory demand-proxy MAE improvement: 36.387422%
+- Multiplicity-controlled promotion passed: False
 - Actual electricity price series connected: False
+- Ready for price-pressure claim: False
+- Energy-stress proxy description allowed: True
 - Ready for real dollar claim: False
 
 ## Walk-Forward Demand Proxy Backtest
@@ -39,6 +42,6 @@ This is a live measured energy price-pressure proxy, not an actual wholesale pow
 
 ## Claim Gate
 
-- Use now: measured live-breadth energy pressure proxy, dashboard signal, grant evidence artifact.
-- Do not claim yet: realized savings, field validation, actual LMP price forecast, live trading alpha, or guaranteed award outcome.
+- Use now: historical measured energy-system stress proxy and exploratory demand-residual diagnostic, with the limits stated beside it.
+- Do not claim yet: a price forecast, price-pressure validation, promoted-model superiority, realized savings, field validation, live trading alpha, or guaranteed award outcome.
 - Unlock next: connect ISO/RTO LMP settlement data and run the same walk-forward harness against actual prices.

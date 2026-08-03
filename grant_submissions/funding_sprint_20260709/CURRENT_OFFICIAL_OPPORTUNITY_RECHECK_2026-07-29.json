@@ -1,0 +1,125 @@
+{
+  "schema": "lumencore.current_official_opportunity_recheck.v1",
+  "status": "OFFICIAL_PUBLIC_SOURCES_RECHECKED_READ_ONLY",
+  "generated_utc": "2026-07-29T10:16:16Z",
+  "source_rechecked_utc": "2026-07-29T10:16:16Z",
+  "scope": "Public, unsigned official pages only. No sign-in, submission, upload, certification, agreement acceptance, payment, or file mutation occurred during source review.",
+  "opportunities": [
+    {
+      "opportunity_number": "ONC-ARGOS-SSN-2026-OS351107",
+      "title": "HHS Project Argos Sources Sought",
+      "official_url": "https://sam.gov/workspace/contract/opp/062cef11f5384443bfd84bf123404026/view",
+      "status": "ACTIVE_MARKET_RESEARCH_NOT_A_SOLICITATION",
+      "amendment_status": "NO_AMENDMENT_VERSION_SHOWN",
+      "deadline_local": "2026-07-30 5:00 PM EDT",
+      "deadline_utc": "2026-07-30T21:00:00Z",
+      "submission_channel": "Email to the named HHS contact in the notice",
+      "local_action_state": "SENT_ONCE_MONITOR_ONLY_DO_NOT_DUPLICATE"
+    },
+    {
+      "opportunity_number": "75D301-26-RFI-73483",
+      "title": "CDC AI Acquisition Sources Sought",
+      "official_url": "https://sam.gov/workspace/contract/opp/b8fc8fffe3524fba9bb79f16573ba2e5/view",
+      "status": "ACTIVE_MARKET_RESEARCH_NOT_A_SOLICITATION",
+      "amendment_status": "NO_AMENDMENT_VERSION_SHOWN",
+      "deadline_local": "2026-07-30 5:00 PM EDT",
+      "deadline_utc": "2026-07-30T21:00:00Z",
+      "submission_channel": "Email a maximum two-page capability statement to the named CDC contact",
+      "local_action_state": "SENT_AND_AGENCY_RECEIPT_ACKNOWLEDGED_MONITOR_ONLY"
+    },
+    {
+      "opportunity_number": "693JJ326R000012",
+      "title": "FHWA TSMO Data Initiative",
+      "official_url": "https://sam.gov/workspace/contract/opp/44587f4034284fd6ac6868efcf869d68/view",
+      "status": "ACTIVE_AMENDED",
+      "amendment_status": "AMENDMENT_1_AND_GOVERNMENT_QA_POSTED_2026-07-24",
+      "deadline_local": "2026-08-03 9:00 AM EDT",
+      "deadline_utc": "2026-08-03T13:00:00Z",
+      "submission_channel": "Exact delivery method is in the RFP Section L attachment behind SAM attachment access",
+      "local_action_state": "SOLO_ROUTE_CLOSED_TEAM_SET_NO_DUPLICATE_FOLLOWUP"
+    },
+    {
+      "opportunity_number": "W912HZ26SC005",
+      "title": "Sovereign Defense Cloud for High-Performance Computing",
+      "official_url": "https://www.erdcwerx.org/sovereign-defense-cloud-for-high-performance-computing/",
+      "status": "COMMERCIAL_SOLUTION_PATHWAY_OPEN_RFI_ONLY",
+      "amendment_status": "NOT_MARKED_AMENDED",
+      "deadline_local": "2026-08-07 4:00 PM CT",
+      "deadline_utc": "2026-08-07T21:00:00Z",
+      "submission_channel": "ERDCWERX online submission form linked from the official announcement",
+      "funding_currently_available": false,
+      "tech_challenge_status": "CLOSED",
+      "local_action_state": "TECHNICAL_DRAFT_EXISTS_PRIVATE_ROM_SAM_AND_PORTAL_GATES_OPEN"
+    },
+    {
+      "opportunity_number": "LAUNCHTN-3686-2026",
+      "title": "LaunchTN 3686 Pitch Competition",
+      "official_url": "https://airtable.com/app6GRZNbU72OmaK1/pagudvfO1hH7SmzBl/form",
+      "secondary_url": "https://www.attend3686.com/",
+      "status": "APPLICATION_FORM_OPEN_PITCH_COMPETITION",
+      "amendment_status": "NO_AMENDMENT_MARKER",
+      "deadline_local": "2026-08-13 11:59 PM CDT",
+      "deadline_utc": "2026-08-14T04:59:00Z",
+      "submission_channel": "Program-hosted Airtable application with deck and financial-document uploads",
+      "local_action_state": "CURRENT_DECK_READY_FINANCIAL_AND_FOUNDER_FACTS_REQUIRE_REVIEW"
+    },
+    {
+      "opportunity_number": "W900KK-26-R-0001",
+      "title": "Army RFI / Special Notice",
+      "official_url": "https://sam.gov/workspace/contract/opp/60b3c5f359a94ac0a1932d7655f36c88/view",
+      "status": "ACTIVE_REVISED_MARKET_RESEARCH_NOT_A_SOLICITATION",
+      "amendment_status": "LATEST_2026-07-09_VERSION_EXTENDED_PRIOR_DEADLINE",
+      "deadline_local": "2026-08-15 5:00 PM EDT",
+      "deadline_utc": "2026-08-15T21:00:00Z",
+      "submission_channel": "Current instructions are in SAM attachments behind Request Access",
+      "local_action_state": "AUTHENTICATED_ATTACHMENT_REVIEW_REQUIRED_BEFORE_BID_DECISION"
+    },
+    {
+      "opportunity_number": "MDA26BZ04-NV007",
+      "title": "Universal Automated Control Assessment, Validation and Risk Correlation Platform",
+      "official_url": "https://www.dodsbirsttr.mil/submissions/solicitation-documents/active-solicitations",
+      "secondary_url": "https://www.dodsbirsttr.mil/topics-app/?baa=DOD_SBIR_2026_P1_CBZ&release=4",
+      "status": "TOPIC_REMOVED_BY_COMPONENT_NOT_SUBMITTABLE",
+      "amendment_status": "2026-07-27_FULL_RELEASE_SKIPS_NV007",
+      "deadline_local": null,
+      "deadline_utc": null,
+      "submission_channel": null,
+      "local_action_state": "ARCHIVE_PACKAGE_DO_NOT_APPLY_GENERAL_RELEASE_DEADLINE"
+    },
+    {
+      "opportunity_number": "DPA26BZ04-DV016",
+      "title": "DARPA FALCON",
+      "official_url": "https://www.darpa.mil/work-with-us/opportunities/dpa26bz04-dv016",
+      "secondary_url": "https://www.darpa.mil/work-with-us/communities/small-business/sbir-sttr-topics",
+      "status": "OPEN",
+      "amendment_status": "NOT_MARKED_AMENDED",
+      "deadline_local": "2026-08-19 12:00 PM ET",
+      "deadline_utc": "2026-08-19T16:00:00Z",
+      "submission_channel": "DSIP authenticated proposal submission",
+      "local_action_state": "TECHNICAL_NO_GO_CURRENT_NULL_RESULTS_AND_DP2_GAPS"
+    },
+    {
+      "opportunity_number": "26-510",
+      "title": "NSF SBIR/STTR Phase I",
+      "official_url": "https://seedfund.nsf.gov/apply/project-pitch/",
+      "secondary_url": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation",
+      "status": "ACTIVE_PROJECT_PITCH_ROLLING_INVITATION_REQUIRED_FOR_FULL_PROPOSAL",
+      "amendment_status": "CURRENT_SOLICITATION_VERSION",
+      "deadline_local": "Next listed full-proposal deadline is 2026-11-04 at 5:00 PM submitting organization local time",
+      "deadline_utc": null,
+      "submission_channel": "Project Pitch through NSF MyWork; invited full proposal through Research.gov",
+      "local_action_state": "PROJECT_PITCH_DRAFT_REVIEW_AND_AUTHENTICATED_PORTAL_STATE_CHECK_REQUIRED"
+    }
+  ],
+  "controls": {
+    "official_source_recheck_does_not_authorize_submission": true,
+    "authenticated_attachment_access_requires_human_session": true,
+    "duplicate_send_suppression_required": true,
+    "legal_certification_human_only": true,
+    "agreement_acceptance_human_only": true,
+    "payment_human_only": true,
+    "external_send_allowed_without_human": false,
+    "final_submit_allowed_without_human": false
+  },
+  "claim_boundary": "This receipt records a bounded read-only review of official public opportunity pages. It does not establish eligibility, attachment completeness, proposal conformance, submission, evaluation, selection, funding, award, contract, endorsement, or agency validation."
+}

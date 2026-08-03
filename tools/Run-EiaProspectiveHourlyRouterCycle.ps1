@@ -63,7 +63,23 @@ try {
 }
 catch {
     $Stamp = [DateTime]::UtcNow.ToString("o")
-    "[$Stamp] $($_ | Out-String)" | Out-File -FilePath $SchedulerErrors -Encoding utf8 -Append
+    $FailureExitCode = if ($null -ne $LASTEXITCODE) { $LASTEXITCODE } else { "unavailable" }
+    $FailureDetails = ($_ | Out-String).Trim()
+    $CapturedStderr = ""
+    if (Test-Path -LiteralPath $SchedulerStderrTemp) {
+        $CapturedStderr = (Get-Content -LiteralPath $SchedulerStderrTemp -Raw).Trim()
+    }
+    $FailureRecord = @(
+        "[$Stamp] prospective hourly router cycle failed"
+        "exit_code=$FailureExitCode"
+        $FailureDetails
+    )
+    if (-not [string]::IsNullOrWhiteSpace($CapturedStderr)) {
+        $FailureRecord += "--- captured stderr ---"
+        $FailureRecord += $CapturedStderr
+    }
+    ($FailureRecord -join [Environment]::NewLine) |
+        Out-File -FilePath $SchedulerErrors -Encoding utf8 -Append
     throw
 }
 finally {

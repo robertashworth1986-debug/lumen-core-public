@@ -29,7 +29,8 @@ def test_agency_account_activation_docket_is_ready_and_human_gated():
     assert summary["ready_item_count"] >= 1
     assert summary["blocked_item_count"] >= 5
     assert summary["blocked_readiness_count"] == 6
-    assert summary["reviewer_gate_clear"] is True
+    assert summary["reviewer_packaging_gate_clear"] is True
+    assert summary["submission_argument_gate_clear"] is False
     assert summary["unsafe_secret_count"] == 0
     assert summary["unsafe_claim_count"] == 0
     assert summary["portal_action_allowed_without_human"] is False

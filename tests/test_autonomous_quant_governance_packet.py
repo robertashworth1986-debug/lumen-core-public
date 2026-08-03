@@ -23,7 +23,8 @@ def test_autonomous_quant_governance_packet_is_ready_and_human_gated():
 
     assert payload["schema"] == "autonomous_quant_governance_packet_v1"
     assert payload["status"] == "AUTONOMOUS_QUANT_GOVERNANCE_READY_HUMAN_RUNTIME_REQUIRED"
-    assert summary["reviewer_gate_clear"] is True
+    assert summary["reviewer_packaging_gate_clear"] is True
+    assert summary["submission_argument_gate_clear"] is False
     assert summary["unsafe_sensitive_count"] == 0
     assert summary["unsafe_claim_count"] == 0
     assert summary["all_final_actions_blocked_without_human"] is True

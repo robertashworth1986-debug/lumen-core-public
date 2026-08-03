@@ -96,6 +96,7 @@ def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():
     assert receipt["artifact_count"] == len(receipt["artifacts"]) == 25
     assert receipt["all_sha256_matched_after_copy"] is True
     assert receipt["destination_root"].startswith("E:/LumaProofVault/")
+    assert "at the recorded time only" in receipt["claim_boundary"]
     assert "does not prove email transmission" in receipt["claim_boundary"]
     destination = Path(receipt["destination_root"])
     for artifact in receipt["artifacts"]:
@@ -105,9 +106,7 @@ def test_action_control_packet_has_a_bounded_e_drive_integrity_receipt():
         assert mirror.is_file(), str(mirror)
         assert artifact["bytes"] > 0
         assert re.fullmatch(r"[0-9A-F]{64}", artifact["sha256"])
-        assert source.stat().st_size == artifact["bytes"]
         assert mirror.stat().st_size == artifact["bytes"]
-        assert hashlib.sha256(source.read_bytes()).hexdigest().upper() == artifact["sha256"]
         assert hashlib.sha256(mirror.read_bytes()).hexdigest().upper() == artifact["sha256"]
 
     mirrored_sources = {artifact["source"] for artifact in receipt["artifacts"]}

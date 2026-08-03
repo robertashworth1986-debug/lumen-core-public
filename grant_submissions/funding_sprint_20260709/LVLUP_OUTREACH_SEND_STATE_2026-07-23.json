@@ -1,0 +1,31 @@
+{
+  "schema": "lumencore.lvlup_outreach_send_state.v1",
+  "status": "TWO_BOUNDED_FOLLOWUPS_SENT_MONITOR_ONLY",
+  "as_of_utc": "2026-07-23T20:20:48Z",
+  "claim_boundary": "These hash-only Gmail sent-message receipts establish outbound transmission events only. They do not establish recipient receipt, an introduction, application review, endorsement, investment, funding, valuation, selection, or an award.",
+  "controls": {
+    "attachment_count": 0,
+    "cc_count": 0,
+    "do_not_repeat_without_substantive_inbound": true,
+    "private_message_and_thread_identifiers_omitted": true,
+    "recipient_addresses_omitted": true,
+    "subject_and_body_omitted": true
+  },
+  "receipts": [
+    {
+      "delivery_state": "SENT",
+      "lane_id": "lvlup_warm_investor_intro",
+      "sent_message_receipt_sha256": "B60827978455EAD19E4ED36A762442CD438F79B01EEB7BDA7277ED41536C5F89",
+      "sent_utc": "2026-07-23T20:16:27Z",
+      "template_id": "WARM_INVESTOR_INTRO_REQUEST"
+    },
+    {
+      "delivery_state": "SENT",
+      "lane_id": "lvlup_application_review_status",
+      "sent_message_receipt_sha256": "D7F9631638840B586CBD4DBBB6B9AAFB8DA8AFE64969BFDA010CFFB19866C9F2",
+      "sent_utc": "2026-07-23T20:16:33Z",
+      "template_id": "FUNDING_REVIEW_STATUS_CHECK"
+    }
+  ],
+  "next_action": "Monitor both existing threads. Reply only to a substantive request or decision, and do not send another proactive follow-up on either lane."
+}

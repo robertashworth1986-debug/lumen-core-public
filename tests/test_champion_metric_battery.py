@@ -17,84 +17,77 @@ def load_module():
     return module
 
 
-def test_metric_battery_consolidates_champion_without_overclaiming():
+def test_metric_battery_enforces_canonical_v2_evidence_categories():
     module = load_module()
     payload = module.build_payload()
     summary = payload["summary"]
 
-    assert payload["schema"] == "champion_metric_battery_v1"
-    assert summary["champion_family"] == "kuramoto_phase_coupling"
-    assert summary["named_baseline"] == "kalman_filter"
-    assert summary["holdout_count"] >= 20
-    assert summary["holdout_wins"] >= 20
-    assert summary["estimated_rows_replayed"] >= 1_000_000
-    assert summary["metric_category_count"] >= 10
-    assert summary["metric_pass_count"] >= 3
-    assert summary["metric_ready_to_run_count"] >= 0
-    assert summary["metric_blocked_external_count"] >= 3
-    assert summary["locked_sweep_estimated_rows_replayed"] >= 7_000_000
-    assert summary["locked_sweep_baseline_comparison_count"] >= 1_000
-    assert summary["locked_sweep_candidate_win_count"] > summary["locked_sweep_candidate_loss_or_tie_count"]
-    assert summary["locked_sweep_source_system_count"] >= 8
-    assert summary["locked_sweep_manifest_source_count"] >= 100
-    assert summary["locked_sweep_lane_count"] >= 5
-    assert len(summary["locked_sweep_replay_chain_sha256"]) == 64
-    assert summary["field_validation_claim_allowed"] is False
-    assert summary["real_dollar_savings_claim_allowed"] is False
-    assert summary["fixed_frozen_delta_price_claim_allowed"] is False
-    assert summary["live_trading_or_autonomous_execution_allowed"] is False
+    assert payload["schema"] == "champion_metric_battery_v2"
+    assert summary["internal_performance_champion"] is False
+    assert summary["champion_family"] is None
+    assert summary["audited_candidate_family"] == "kuramoto_phase_coupling"
+    assert summary["development_selected_candidate"] == "lissajous_phase_paths"
+    assert summary["candidate_was_protocol_selected"] is False
+    assert summary["named_baseline"] == "kalman_local_linear_trend"
+    assert summary["paired_day_wins_vs_named_baseline"] == 482
+    assert summary["paired_day_count"] == 1525
+    assert summary["mean_skill_delta_vs_named_baseline"] == -0.508191
+    assert summary["registered_baseline_gate_pass_count"] == 0
+    assert summary["registered_baseline_count"] == 6
+    assert summary["direct_measured_route_count"] == 2
+    assert summary["conditioned_synthetic_route_count"] == 2
+    assert summary["baseline_comparison_count"] == 22
+    assert summary["global_holm_positive_count"] == 0
+    assert summary["conditioned_named_baseline_mean_win_count"] == 1
+    assert summary["performance_rows_reviewed"] == 32608
+    assert summary["legacy_rows_excluded"] == 358
+    assert summary["numeric_fallback_count"] == 0
+    assert summary["source_inventory_is_performance_evidence"] is False
+
+    categories = {row["category_id"]: row for row in payload["metric_categories"]}
+    assert categories["development_selection"]["status"] == "BLOCKED"
+    assert categories["direct_measured_named_baseline"]["status"] == "MEASURED_NONPROMOTION"
+    assert categories["source_specific_baseline_gauntlet"]["evidence"] == {
+        "gate_pass_count": 0,
+        "registered_baseline_count": 6,
+    }
+    assert categories["global_holm_promotion"]["evidence"] == {
+        "global_holm_positive_count": 0,
+        "baseline_comparison_count": 22,
+    }
+    conditioned = categories["conditioned_synthetic_research"]
+    assert conditioned["status"] == "RESEARCH_ONLY"
+    assert conditioned["evidence"]["lead_lanes"] == [
+        "thermal_ventilation",
+        "branching_transport",
+    ]
+    assert categories["source_inventory"]["status"] == "INVENTORY_ONLY"
+    assert categories["source_inventory"]["evidence"]["is_performance_evidence"] is False
     assert len(payload["metric_battery_sha256"]) == 64
 
 
-def test_metric_battery_names_real_test_lanes_and_blockers():
+def test_metric_battery_renderer_and_main_emit_only_reviewer_safe_v2(
+    tmp_path: Path, monkeypatch
+):
     module = load_module()
-    payload = module.build_payload()
-    lanes = {row["category_id"]: row for row in payload["metric_categories"]}
+    out_json = tmp_path / "out.json"
+    dashboard_json = tmp_path / "dashboard.json"
+    doc_md = tmp_path / "battery.md"
+    monkeypatch.setattr(module, "OUT_JSON", out_json)
+    monkeypatch.setattr(module, "DASHBOARD_JSON", dashboard_json)
+    monkeypatch.setattr(module, "DOC_MD", doc_md)
 
-    assert lanes["source_conditioned_replay"]["status"] == "PASS"
-    assert lanes["best_same_run_baseline"]["status"] == "PASS"
-    assert lanes["phase_resonance_proxy"]["status"] == "PASS"
-    assert lanes["live_source_breadth"]["status"] == "PASS"
-    assert lanes["residual_calibration"]["status"] == "PASS"
-    assert lanes["source_generalization"]["status"] == "PASS"
-    assert lanes["runtime_operational_budget"]["status"] == "PASS"
-    assert lanes["live_source_breadth"]["evidence"]["enabled_sources"] >= 20
-    assert lanes["live_source_breadth"]["evidence"]["measured_sources"] >= 18
-    assert lanes["live_source_breadth"]["evidence"]["coverage_percent"] >= 75
-    assert lanes["residual_calibration"]["evidence"]["locked_sweep_calibration_error"]["count"] >= 100
-    assert lanes["runtime_operational_budget"]["evidence"]["locked_sweep_runtime_ms"]["count"] >= 100
-    assert lanes["source_generalization"]["evidence"]["locked_sweep_baseline_comparison_count"] >= 1_000
-    assert lanes["source_generalization"]["evidence"]["locked_sweep_source_system_count"] >= 8
-    assert lanes["hardware_grid_rf_pll"]["status"].startswith("BLOCKED")
-    assert lanes["economic_conversion"]["status"].startswith("BLOCKED")
-    assert lanes["buyer_authorized_field_replay"]["status"].startswith("BLOCKED")
-    assert "external owner" in lanes["economic_conversion"]["next_action"].lower()
-    assert "held-out dataset" in lanes["hardware_grid_rf_pll"]["next_action"].lower()
+    module.main()
 
-
-def test_metric_battery_recommends_high_value_source_families():
-    module = load_module()
-    payload = module.build_payload()
-    families = {row["family"] for row in payload["best_next_source_families"]}
-
-    assert "ISO/RTO grid operations" in families
-    assert "utility outage and reliability" in families
-    assert "energy market and plant operations" in families
-    assert "weather and environmental operations" in families
-    assert "maritime and critical infrastructure movement" in families
-
-
-def test_metric_battery_markdown_is_reviewer_safe():
-    module = load_module()
-    payload = module.build_payload()
-    rendered = module.render_markdown(payload)
+    payload = json.loads(out_json.read_text(encoding="utf-8"))
+    rendered = doc_md.read_text(encoding="utf-8")
     dumped = json.dumps(payload).lower()
-
-    assert "Champion Metric Battery" in rendered
-    assert "Battery Status" in rendered
-    assert "Field-validation claim allowed: `false`" in rendered
-    assert "Real-dollar savings claim allowed: `false`" in rendered
-    assert "realized savings" in dumped
-    assert "guaranteed profit" not in dumped
-    assert "guaranteed grant" not in dumped
-    assert "money printer" not in dumped
+    assert payload["schema"] == "champion_metric_battery_v2"
+    assert json.loads(dashboard_json.read_text(encoding="utf-8")) == payload
+    assert "no internal performance champion exists" in rendered.lower()
+    assert "thermal and branching conditioned simulations are research leads only" in rendered.lower()
+    assert "source breadth is inventory, not performance evidence" in rendered.lower()
+    assert "24/24" not in dumped
+    assert "broad source-conditioned performance winner" not in dumped
+    assert "buyer-authorized field replay request ready" not in dumped
+    assert "current internal champion" not in dumped

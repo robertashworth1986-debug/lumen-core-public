@@ -17,69 +17,69 @@ def load_module():
     return module
 
 
-def test_champion_stress_matrix_summarizes_current_internal_champion():
+def test_stress_matrix_enforces_canonical_v2_nonpromotion_truth():
     module = load_module()
     payload = module.build_payload()
     summary = payload["summary"]
 
-    assert payload["schema"] == "champion_stress_test_matrix_v1"
-    assert summary["champion_family"] == "kuramoto_phase_coupling"
-    assert summary["named_baseline"] == "kalman_filter"
-    assert summary["holdout_count"] >= 24
-    assert summary["wins_vs_named_baseline"] == summary["holdout_count"]
-    assert summary["wins_vs_best_same_run_baseline"] == summary["holdout_count"]
-    assert summary["source_system_count"] >= 4
-    assert summary["estimated_rows_replayed"] >= 1_000_000
-    assert summary["numeric_samples_read"] >= 50_000
-    assert isinstance(summary["live_domain_hash_verified"], bool)
-    assert summary["phase_proxy_diagnostics_ready"] is True
-    assert summary["source_ablation_ready"] is True
-    assert summary["source_ablation_pass_count"] == summary["source_ablation_count"]
+    assert payload["schema"] == "champion_stress_test_matrix_v2"
+    assert summary["internal_performance_champion"] is False
+    assert summary["champion_family"] is None
+    assert summary["audited_candidate_family"] == "kuramoto_phase_coupling"
+    assert summary["development_selected_candidate"] == "lissajous_phase_paths"
+    assert summary["candidate_was_protocol_selected"] is False
+    assert summary["named_baseline"] == "kalman_local_linear_trend"
+    assert summary["paired_day_wins_vs_named_baseline"] == 482
+    assert summary["paired_day_count"] == 1525
+    assert summary["mean_skill_delta_vs_named_baseline"] == -0.508191
+    assert summary["registered_baseline_gate_pass_count"] == 0
+    assert summary["registered_baseline_count"] == 6
+    assert summary["direct_measured_route_count"] == 2
+    assert summary["conditioned_synthetic_route_count"] == 2
+    assert summary["baseline_comparison_count"] == 22
+    assert summary["global_holm_positive_count"] == 0
+    assert summary["conditioned_named_baseline_mean_win_count"] == 1
+    assert summary["performance_rows_reviewed"] == 32608
+    assert summary["legacy_rows_excluded"] == 358
+    assert summary["numeric_fallback_count"] == 0
+    assert summary["source_inventory_is_performance_evidence"] is False
+
+    gates = {row["name"]: row for row in payload["metric_stress_tests"]}
+    assert gates["development_selection"]["passed"] is False
+    assert gates["all_registered_source_baselines"]["actual"] == "0/6"
+    assert gates["global_holm_promotion"]["actual"] == "0/22"
+    assert gates["external_validation"]["passed"] is False
+
+    routes = {row["lane"]: row for row in payload["route_matrix"]}
+    assert routes["wave_resonance_timing"]["status"] == "DIRECT_MEASURED_NONPROMOTION"
+    assert routes["time_series_model_routing"]["status"] == "DIRECT_MEASURED_NONPROMOTION"
+    assert routes["thermal_ventilation"]["status"] == "CONDITIONED_SYNTHETIC_RESEARCH_LEAD"
+    assert routes["branching_transport"]["status"] == "CONDITIONED_SYNTHETIC_RESEARCH_LEAD"
+    assert all(row["performance_claim_allowed"] is False for row in payload["conditioned_research_leads"])
     assert len(payload["stress_matrix_sha256"]) == 64
 
 
-def test_champion_stress_matrix_keeps_money_claims_bounded():
+def test_stress_matrix_renderer_and_main_emit_only_reviewer_safe_v2(
+    tmp_path: Path, monkeypatch
+):
     module = load_module()
-    payload = module.build_payload()
-    summary = payload["summary"]
+    out_json = tmp_path / "out.json"
+    dashboard_json = tmp_path / "dashboard.json"
+    doc_md = tmp_path / "stress.md"
+    monkeypatch.setattr(module, "OUT_JSON", out_json)
+    monkeypatch.setattr(module, "DASHBOARD_JSON", dashboard_json)
+    monkeypatch.setattr(module, "DOC_MD", doc_md)
 
-    assert summary["manual_paid_pilot_outreach_allowed"] is True
-    assert summary["field_validation_claim_allowed"] is False
-    assert summary["real_dollar_savings_claim_allowed"] is False
-    assert summary["fixed_frozen_delta_price_claim_allowed"] is False
-    assert summary["live_trading_or_autonomous_execution_allowed"] is False
+    module.main()
 
+    payload = json.loads(out_json.read_text(encoding="utf-8"))
+    rendered = doc_md.read_text(encoding="utf-8")
     dumped = json.dumps(payload).lower()
-    assert "field validated" in dumped
-    assert "realized dollar savings" in dumped
-    assert "buyer-authorized field replay" in dumped
-
-
-def test_champion_stress_matrix_has_source_and_blocked_metric_detail():
-    module = load_module()
-    payload = module.build_payload()
-    summary = payload["summary"]
-
-    sources = {row["source_system"] for row in payload["source_system_matrix"]}
-    assert {"energy_grid", "market_data"}.issubset(sources)
-
-    gate_by_name = {row["name"]: row for row in payload["metric_stress_tests"]}
-    assert gate_by_name["source_conditioned_holdout_depth"]["passed"] is True
-    assert gate_by_name["hosted_hash_verification"]["passed"] is summary["live_domain_hash_verified"]
-    assert gate_by_name["replay_phase_proxy_diagnostics"]["passed"] is True
-    assert gate_by_name["leave_one_source_out_ablation"]["passed"] is True
-    assert gate_by_name["buyer_authorized_field_replay"]["blocker"] is True
-    assert gate_by_name["phase_slip_and_amplitude_error"]["blocker"] is True
-    assert gate_by_name["residual_autocorrelation_and_calibration"]["blocker"] is True
-
-
-def test_champion_stress_matrix_markdown_answers_next_money_step():
-    module = load_module()
-    payload = module.build_payload()
-    rendered = module.render_markdown(payload)
-
-    assert "Champion Stress Test Matrix" in rendered
-    assert "Truth Line" in rendered
-    assert "Metric Battery" in rendered
-    assert f"Live-domain hash verified: `{str(payload['summary']['live_domain_hash_verified']).lower()}`" in rendered
-    assert "buyer locks the dataset" in rendered
+    assert payload["schema"] == "champion_stress_test_matrix_v2"
+    assert json.loads(dashboard_json.read_text(encoding="utf-8")) == payload
+    assert "no internal performance champion is present" in rendered.lower()
+    assert "source breadth is inventory, not performance evidence" in rendered.lower()
+    assert "24/24" not in dumped
+    assert "source-conditioned replay winner" not in dumped
+    assert "buyer-authorized field replay request ready" not in dumped
+    assert "current internal champion" not in dumped

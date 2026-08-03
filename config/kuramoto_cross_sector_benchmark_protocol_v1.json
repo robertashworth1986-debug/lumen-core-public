@@ -1,0 +1,297 @@
+{
+  "schema": "lumencore.kuramoto_cross_sector_benchmark_protocol.v1",
+  "protocol_id": "KURAMOTO_CROSS_SECTOR_20260726",
+  "version": 1,
+  "frozen_date_utc": "2026-07-26",
+  "purpose": "Measure an implemented Kuramoto seasonal-oscillator forecast against protocol-matched one-step baselines on explicit public-data snapshots, then identify where additional prospective validation is justified.",
+  "candidate": {
+    "id": "kuramoto_phase_coupling",
+    "definition": "Fit fixed cadence-specific seasonal oscillators on history available before each origin, advance their phases one step with the Kuramoto equation using Euler integration, and reconstruct the next value.",
+    "coupling": 0.01,
+    "ridge": 0.0001,
+    "post_result_tuning_allowed": false
+  },
+  "baseline_scope": {
+    "statement": "Every dependency-free, univariate, one-step numeric baseline currently implemented in the governed runner and able to consume the identical history window is executed. Domain-specific operator, topology, multivariate, or package-fallback methods are excluded unless they have an exact protocol-matched implementation.",
+    "not_a_global_all_algorithms_claim": true,
+    "excluded_classes": [
+      "operator or buyer incumbent not present in the local snapshot",
+      "power-flow, OPF, routing, CFD, and other domain-specific solvers",
+      "multivariate methods without the same covariate contract",
+      "package-dependent methods that silently substitute a different estimator",
+      "neural models without a frozen compute and tuning budget"
+    ]
+  },
+  "baselines": [
+    {
+      "id": "naive_last",
+      "definition": "Forecast the most recent observed value."
+    },
+    {
+      "id": "seasonal_naive",
+      "definition": "Forecast the value at the cadence-specific seasonal lag."
+    },
+    {
+      "id": "rolling_mean_season",
+      "definition": "Forecast the mean of the most recent cadence-specific seasonal window."
+    },
+    {
+      "id": "ewma_0_2",
+      "definition": "Forecast the terminal exponentially weighted mean with fixed alpha 0.2."
+    },
+    {
+      "id": "linear_trend",
+      "definition": "Fit an ordinary least-squares line to the most recent two seasonal windows and extrapolate one step."
+    },
+    {
+      "id": "kalman_local_linear_trend",
+      "definition": "Use the existing deterministic two-state local-level/local-trend Kalman implementation."
+    },
+    {
+      "id": "autoregressive_ridge",
+      "definition": "Fit the existing history-only standardized ridge autoregression with lag min(14, seasonal lag) and lambda 1.0."
+    },
+    {
+      "id": "fft_extrapolation_top5",
+      "definition": "Use history-only detrending and the five largest nonzero Fourier modes."
+    },
+    {
+      "id": "uncoupled_harmonic",
+      "definition": "Use the same fixed oscillators, history, scaling, and ridge fit as the candidate but advance each phase independently with coupling K=0."
+    }
+  ],
+  "anchored_benchmarks": [
+    {
+      "id": "eia_grid_wave_champion_20260713",
+      "sector": "electric_grid_demand",
+      "protocol_path": "config/eia_grid_wave_champion_protocol_v1.json",
+      "panel_path": "data/live_measured/eia_grid_validation/eia_grid_validation_panel_latest.json",
+      "result_path": "out/eia_grid_wave_champion/eia_grid_wave_champion_benchmark_latest.json",
+      "rerun_command": "python code/eia_grid_wave_champion_benchmark.py --skip-network",
+      "evidence_class": "protocol_frozen_measured_public_data",
+      "required_candidate_id": "kuramoto_phase_coupling",
+      "required_external_replication": true
+    }
+  ],
+  "retrospective_sources": [
+    {
+      "id": "fred_dgs10_business_daily",
+      "sector": "macro_rates",
+      "publisher": "Federal Reserve Bank of St. Louis",
+      "source_url": "https://fred.stlouisfed.org/series/DGS10",
+      "path": "data/fred_DGS10.csv",
+      "format": "csv",
+      "skip_rows": 0,
+      "date_column": "date",
+      "value_column": "value",
+      "cadence": "business_daily",
+      "seasonal_lag": 5,
+      "oscillator_periods": [
+        5.0,
+        21.0,
+        252.0
+      ],
+      "minimum_history": 252,
+      "maximum_history": 1260,
+      "evaluation_points": 252,
+      "origin_stride": 1,
+      "native_unit": "percent"
+    },
+    {
+      "id": "fred_cpiaucsl_monthly",
+      "sector": "macro_prices_labor",
+      "publisher": "Federal Reserve Bank of St. Louis",
+      "source_url": "https://fred.stlouisfed.org/series/CPIAUCSL",
+      "path": "data/fred_CPIAUCSL.csv",
+      "format": "csv",
+      "skip_rows": 0,
+      "date_column": "date",
+      "value_column": "value",
+      "cadence": "monthly",
+      "seasonal_lag": 12,
+      "oscillator_periods": [
+        3.0,
+        6.0,
+        12.0
+      ],
+      "minimum_history": 120,
+      "maximum_history": 600,
+      "evaluation_points": 120,
+      "origin_stride": 1,
+      "native_unit": "index"
+    },
+    {
+      "id": "fred_unrate_monthly",
+      "sector": "macro_prices_labor",
+      "publisher": "Federal Reserve Bank of St. Louis",
+      "source_url": "https://fred.stlouisfed.org/series/UNRATE",
+      "path": "data/fred_UNRATE.csv",
+      "format": "csv",
+      "skip_rows": 0,
+      "date_column": "date",
+      "value_column": "value",
+      "cadence": "monthly",
+      "seasonal_lag": 12,
+      "oscillator_periods": [
+        3.0,
+        6.0,
+        12.0
+      ],
+      "minimum_history": 120,
+      "maximum_history": 600,
+      "evaluation_points": 120,
+      "origin_stride": 1,
+      "native_unit": "percent"
+    },
+    {
+      "id": "eia_us_generation_monthly",
+      "sector": "electric_generation",
+      "publisher": "U.S. Energy Information Administration",
+      "source_url": "https://www.eia.gov/electricity/data/browser/",
+      "path": "data/Net_generation_United_States_all_sectors_monthly.csv",
+      "format": "csv",
+      "skip_rows": 4,
+      "date_column": "Month",
+      "value_column": "all fuels (utility-scale) thousand megawatthours",
+      "cadence": "monthly",
+      "seasonal_lag": 12,
+      "oscillator_periods": [
+        3.0,
+        6.0,
+        12.0
+      ],
+      "minimum_history": 120,
+      "maximum_history": 240,
+      "evaluation_points": 60,
+      "origin_stride": 1,
+      "native_unit": "thousand_megawatthours"
+    },
+    {
+      "id": "eia_nuclear_outage_daily_2025",
+      "sector": "nuclear_outage",
+      "publisher": "U.S. Energy Information Administration",
+      "source_url": "https://www.eia.gov/nuclear/outages/",
+      "path": "data/Daily_U.S._nuclear_capacity_outage.csv",
+      "format": "csv",
+      "skip_rows": 4,
+      "date_column": "Day",
+      "value_column": "2025 gigawatts (GW)",
+      "date_year_override": 2025,
+      "cadence": "daily",
+      "seasonal_lag": 7,
+      "oscillator_periods": [
+        7.0,
+        30.4375,
+        91.3125
+      ],
+      "minimum_history": 180,
+      "maximum_history": 365,
+      "evaluation_points": 90,
+      "origin_stride": 1,
+      "native_unit": "gigawatts"
+    },
+    {
+      "id": "kraken_btc_minute_public",
+      "sector": "market_telemetry_research_only",
+      "publisher": "Kraken public market data",
+      "source_url": "https://docs.kraken.com/api/docs/rest-api/get-ohlc-data/",
+      "path": "data/kraken_live_5000.csv",
+      "format": "csv",
+      "skip_rows": 0,
+      "date_column": "time",
+      "value_column": "close",
+      "cadence": "minute",
+      "seasonal_lag": 60,
+      "oscillator_periods": [
+        5.0,
+        30.0,
+        60.0
+      ],
+      "minimum_history": 240,
+      "maximum_history": 720,
+      "evaluation_points": 144,
+      "origin_stride": 1,
+      "native_unit": "usd_per_btc",
+      "trading_claim_allowed": false
+    }
+  ],
+  "source_admission": {
+    "explicit_allowlist_only": true,
+    "minimum_numeric_rows": 270,
+    "reject_duplicate_timestamps": true,
+    "reject_nonfinite_values": true,
+    "reject_nonmonotonic_after_sort": true,
+    "reject_manifest_only_or_named_only_sources": true,
+    "excluded_live_breadth_systems_until_repaired": [
+      "air_quality",
+      "maritime_ais",
+      "sports_market",
+      "water_hydrology",
+      "weather_climate"
+    ],
+    "exclusion_reason": "Current local snapshots are too thin, contaminated by unrelated files, duplicated, or lack a protocol-matched time-series contract."
+  },
+  "evaluation": {
+    "task": "one_step_ahead_univariate_forecast",
+    "history_only_at_each_origin": true,
+    "candidate_identity_fixed_before_execution": true,
+    "retrospective_sources_are_not_untouched_holdouts": true,
+    "primary_metric": "mean_absolute_error",
+    "secondary_metrics": [
+      "root_mean_squared_error",
+      "seasonal_mase",
+      "directional_accuracy",
+      "runtime_ms"
+    ],
+    "paired_delta_direction": "baseline_absolute_error_minus_candidate_absolute_error",
+    "bootstrap_draws": 4000,
+    "bootstrap_seed": 20260726,
+    "bootstrap_block_length_rule": "max(2, min(seasonal_lag, floor(sqrt(evaluation_points))))",
+    "sign_test_unit": "nonoverlapping block mean paired deltas",
+    "multiple_comparison_control": "Holm correction within each source across all declared baselines"
+  },
+  "promotion_gate": {
+    "minimum_evaluation_points": 60,
+    "must_beat_every_declared_baseline_on_mean_absolute_error": true,
+    "require_positive_block_bootstrap_lower_bound_against_best_baseline": true,
+    "require_holm_adjusted_p_at_most": 0.05,
+    "minimum_source_wins_for_sector_signal": 2,
+    "external_replication_required_for_sector_claim": true,
+    "prospective_holdout_required_for_sector_claim": true
+  },
+  "economic_translation": {
+    "reference_value_stream_usd_per_year": 1000000000,
+    "sensitivity_only": [
+      {
+        "improvement_percent": 0.001,
+        "reference_value_usd_per_year": 10000
+      },
+      {
+        "improvement_percent": 0.01,
+        "reference_value_usd_per_year": 100000
+      },
+      {
+        "improvement_percent": 0.1,
+        "reference_value_usd_per_year": 1000000
+      },
+      {
+        "improvement_percent": 1.0,
+        "reference_value_usd_per_year": 10000000
+      }
+    ],
+    "realized_savings_claim_allowed": false,
+    "dollar_projection_from_forecast_error_allowed": false,
+    "buyer_approved_cost_of_error_required": true,
+    "required_formula": "annual_value = validated_native_unit_error_reduction_per_period * validated_periods_per_year * buyer_approved_cost_per_native_unit"
+  },
+  "execution_controls": {
+    "read_only_source_access": true,
+    "network_access_required": false,
+    "maximum_total_forecast_origins": 10000,
+    "trading_execution_allowed": false,
+    "external_submission_allowed": false,
+    "autonomous_control_allowed": false,
+    "credential_serialization_allowed": false
+  },
+  "claim_boundary": "This protocol can produce retrospective local-snapshot software evidence and reproduce the separately frozen EIA public-data benchmark. It cannot by itself establish cross-sector efficiency, field performance, realized savings, safety, procurement acceptance, external validation, trading edge, or an unbeatable claim."
+}
