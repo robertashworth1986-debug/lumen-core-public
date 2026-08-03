@@ -24,6 +24,10 @@ SECRET_MARKERS = re.compile(
     rb"(?:-----BEGIN [A-Z ]+PRIVATE KEY-----|api[_-]?key\s*[:=]|client[_-]?secret\s*[:=]|password\s*[:=]|token\s*[:=])",
     re.IGNORECASE,
 )
+CONTACT_MARKERS = re.compile(
+    rb"(?<![A-Z0-9._%+-])[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}(?![A-Z0-9.-])",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -179,7 +183,12 @@ def content_risk_tags(repo_root: Path, change: WorktreeChange) -> set[str]:
         sample = candidate.read_bytes()
     except OSError:
         return {"UNREADABLE_FILE"}
-    return {"SECRET_MARKER_REVIEW_REQUIRED"} if SECRET_MARKERS.search(sample) else set()
+    tags: set[str] = set()
+    if SECRET_MARKERS.search(sample):
+        tags.add("SECRET_MARKER_REVIEW_REQUIRED")
+    if CONTACT_MARKERS.search(sample):
+        tags.add("CONTACT_MARKER_REVIEW_REQUIRED")
+    return tags
 
 
 def review_state(categories: set[str]) -> str:
@@ -193,7 +202,12 @@ def review_state(categories: set[str]) -> str:
         "SECRET_MARKER_REVIEW_REQUIRED",
         "UNREADABLE_FILE",
     }
-    guarded = {"DEPLOYMENT_OR_WORKFLOW", "RUNTIME_OR_POLICY_CONFIG", "PUBLIC_SURFACE"}
+    guarded = {
+        "CONTACT_MARKER_REVIEW_REQUIRED",
+        "DEPLOYMENT_OR_WORKFLOW",
+        "RUNTIME_OR_POLICY_CONFIG",
+        "PUBLIC_SURFACE",
+    }
     if blockers & categories:
         return "EXCLUDE_FROM_AUTOMATIC_RELEASE"
     if guarded & categories:
@@ -275,7 +289,8 @@ def build_plan_from_changes(
         },
         "claim_boundary": (
             "This plan classifies paths and bounded file metadata. It does not prove content correctness, public safety, test coverage, "
-            "remote parity, or authorize a commit, push, deployment, or publication."
+            "remote parity, or authorize a commit, push, deployment, or publication. Contact-marker detection is heuristic and requires "
+            "human scope review before releasing a matching file."
         ),
         "safest_next_action": (
             "Review each bounded group, run its relevant tests, commit only the exact reviewed paths, push that commit, then use the "

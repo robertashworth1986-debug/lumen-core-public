@@ -43,11 +43,15 @@ def test_plan_groups_bounded_source_separately_from_private_and_deploy_paths(tmp
     (tmp_path / "deploy").mkdir()
     (tmp_path / "grant_submissions").mkdir()
     (tmp_path / "code" / "feature.py").write_text("VALUE = 1\n", encoding="utf-8")
+    (tmp_path / "code" / "recipient.py").write_text(
+        "RECIPIENT = 'reviewer@example.org'\n", encoding="utf-8"
+    )
     (tmp_path / "tests" / "test_feature.py").write_text("def test_value():\n    assert True\n", encoding="utf-8")
     (tmp_path / "deploy" / "service.conf").write_text("server {}\n", encoding="utf-8")
     (tmp_path / "grant_submissions" / "draft.md").write_text("private scope\n", encoding="utf-8")
     changes = [
         module.WorktreeChange(" ", "M", "code/feature.py"),
+        module.WorktreeChange(" ", "M", "code/recipient.py"),
         module.WorktreeChange("?", "?", "tests/test_feature.py"),
         module.WorktreeChange(" ", "M", "deploy/service.conf"),
         module.WorktreeChange("?", "?", "grant_submissions/draft.md"),
@@ -62,6 +66,7 @@ def test_plan_groups_bounded_source_separately_from_private_and_deploy_paths(tmp
 
     states = {row["path"]: row["review_state"] for row in plan["changes"]}
     assert states["code/feature.py"] == "BOUNDED_COMMIT_CANDIDATE"
+    assert states["code/recipient.py"] == "HUMAN_SCOPE_REVIEW_REQUIRED"
     assert states["tests/test_feature.py"] == "BOUNDED_COMMIT_CANDIDATE"
     assert states["deploy/service.conf"] == "HUMAN_SCOPE_REVIEW_REQUIRED"
     assert states["grant_submissions/draft.md"] == "EXCLUDE_FROM_AUTOMATIC_RELEASE"
