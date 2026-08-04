@@ -166,15 +166,28 @@ def test_source_drift_is_rejected(tmp_path: Path) -> None:
         )
 
 
-def test_current_plan_is_safe_for_local_stage_check() -> None:
+def test_current_plan_is_safe_for_local_stage_check_or_rejected_fail_closed() -> None:
     module = load_module()
+    plan = json.loads(module.DEFAULT_PLAN.read_text(encoding="utf-8"))
+    summary = plan.get("summary", {})
+
+    if summary.get("plan_state") != "DRY_RUN_READY_HUMAN_UNLOCK_REQUIRED":
+        with pytest.raises(
+            module.StageError,
+            match="not a fail-closed dry-run-ready contract",
+        ):
+            module.build_stage_contract(
+                module.DEFAULT_PLAN,
+                root=ROOT,
+                deploy_stage=ROOT / ".deploy_stage",
+            )
+        return
 
     contract = module.build_stage_contract(
         module.DEFAULT_PLAN,
         root=ROOT,
         deploy_stage=ROOT / ".deploy_stage",
     )
-
     assert contract["summary"]["item_count"] == 6
     assert contract["summary"]["stage_ready"] is True
     assert all(

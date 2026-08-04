@@ -8,7 +8,7 @@
 
 # === MAIN PUBLIC LANDING ===
 lumen-core.ai, www.lumen-core.ai {
-    root * /var/www/lumen-core
+    root * /opt/lumencore/dashboard
     encode gzip zstd
     file_server
 

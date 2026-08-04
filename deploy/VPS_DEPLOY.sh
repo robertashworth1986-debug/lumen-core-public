@@ -311,7 +311,7 @@ echo "[6/9] Services installed and enabled."
 echo "[7/9] Configuring nginx for lumen-core.ai..."
 
 mkdir -p /var/www/html
-mkdir -p /var/www/lumatrader
+mkdir -p /opt/lumencore/dashboard
 systemctl enable --now nginx || true
 
 cat > /etc/nginx/conf.d/lumatrader.conf << 'EOF'
