@@ -35,7 +35,7 @@ def test_engine_separates_product_process_offer_from_model_performance():
 
     assert payload["schema"] == "proof_to_revenue_engine_v3"
     assert summary["revenue_stage"] == (
-        "bounded_offers_ready_local_only_domain_stale_no_recipient"
+        "bounded_offers_ready_local_only_domain_stale_recipient_selected_send_blocked"
     )
     assert summary["live_domain_hash_verified"] is False
     assert summary["required_remote_hash_matches"] == (
@@ -79,8 +79,12 @@ def test_engine_prices_only_bounded_services_and_keeps_outreach_closed():
     protocol = offers["source_native_protocol_review"]["price_usd"]
     benchmark = offers["benchmark_implementation"]["price_usd"]
     product = offers["product_process_discovery"]
-    assert protocol["low"] == 2500
-    assert protocol["high"] == 7500
+    assert protocol["low"] == 3500
+    assert protocol["high"] == 3500
+    assert protocol["duration_business_days"] == 10
+    assert protocol["status"] == "candidate_not_committed"
+    assert protocol["founder_approved"] is False
+    assert protocol["buyer_accepted"] is False
     assert benchmark["low"] == 7500
     assert benchmark["high"] == 25000
     assert product["product_process_scoping_allowed"] is True
@@ -90,6 +94,9 @@ def test_engine_prices_only_bounded_services_and_keeps_outreach_closed():
     assert product["external_outreach_ready"] is False
     assert product["model_performance_dependency"] is False
     assert product["pricing_status"] == "scope_before_quote_no_price_asserted"
+    assert "$3,500-$3,500" not in template["body"]
+    assert "candidate fee of $3,500" in template["body"]
+    assert "subject to founder approval and written scope confirmation" in template["body"]
 
     assert summary["paid_protocol_review_scoping_allowed"] is True
     assert summary["pilot_ready_count"] == 0
@@ -106,14 +113,30 @@ def test_engine_prices_only_bounded_services_and_keeps_outreach_closed():
     assert summary["safe_estimated_annual_value_usd"] == 0
     assert summary["modeled_dollar_projection_allowed"] is False
 
-    assert target["recipient_selected"] is False
-    assert target["recommended_first_buyer"] is None
+    assert target["recipient_selected"] is True
+    assert target["recommended_first_buyer"] == "PG&E Research and Development"
+    assert target["packet_send_ready"] is False
+    assert target["packet_send_gate"] == (
+        "BLOCKED_BUSINESS_ADDRESS_AND_EXACT_ACTION_TIME_APPROVAL_REQUIRED"
+    )
     assert target["legacy_paid_pilot_queue_excluded"] is True
     assert target["legacy_paid_pilot_queue_schema"] in {
         "paid_pilot_outreach_queue_v1",
         "paid_pilot_outreach_queue_v2",
     }
-    assert payload["top_manual_targets"] == []
+    assert payload["top_manual_targets"] == [
+        {
+            "organization": "PG&E Research and Development",
+            "buyer_channel_type": "regulated_utility_research_and_innovation_channel",
+            "routing_status": "verified_clean_route_action_time_approval_required",
+            "send_now_allowed": False,
+        }
+    ]
+    selected_packet = payload["selected_protocol_review_packet"]
+    assert selected_packet["recipient_email"] == "innovation@pge.com"
+    assert selected_packet["attachment_count"] == 0
+    assert selected_packet["send_ready"] is False
+    assert selected_packet["hashes_cover_placeholder_draft_only"] is True
     assert template["recipient_selected"] is False
     assert template["send_allowed"] is False
     assert template["status"] == "draft_only_no_recipient_not_ready_to_send"
@@ -165,7 +188,12 @@ def test_proof_to_revenue_markdown_answers_current_questions():
     assert "Manual reviewed outreach allowed: `false`" in rendered
     assert "External outreach ready: `false`" in rendered
     assert "Modeled dollar projection allowed: `false`" in rendered
-    assert "Source-native protocol review: `$2,500`-`$7,500`" in rendered
+    assert (
+        "Source-native protocol review candidate: `$3,500` fixed for `10` business days"
+        in rendered
+    )
     assert "Benchmark implementation: `$7,500`-`$25,000`" in rendered
-    assert "Recipient selected: `false`" in rendered
+    assert "Recipient selected: `true`" in rendered
+    assert "Recommended first buyer: `PG&E Research and Development`" in rendered
+    assert "Selected packet send ready: `false`" in rendered
     assert "Legacy paid-pilot queue excluded: `true`" in rendered

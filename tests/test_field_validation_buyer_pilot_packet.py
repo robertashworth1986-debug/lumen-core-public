@@ -63,7 +63,11 @@ def test_protocol_packets_have_bounded_service_scope_and_review_outputs():
             offer["offer_type"]
             == "paid source-native benchmark and evidence protocol review"
         )
-        assert offer["price_range_usd"] == {"low": 2500, "high": 7500}
+        assert offer["price_range_usd"] == {"low": 3500, "high": 3500}
+        assert offer["duration_business_days"] == 10
+        assert offer["fee_status"] == "candidate_not_committed"
+        assert offer["founder_approved"] is False
+        assert offer["buyer_accepted"] is False
         assert "Do not sell a winning candidate" in offer["safe_positioning"]
         assert len(packet["deliverables"]) >= 6
         assert len(packet["data_room_artifacts"]) >= 5

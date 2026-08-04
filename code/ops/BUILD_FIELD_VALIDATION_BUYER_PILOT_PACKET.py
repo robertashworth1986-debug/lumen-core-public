@@ -142,6 +142,8 @@ def common_packet(
     blockers: list[str],
     review_low: int,
     review_high: int,
+    review_duration_business_days: int,
+    review_fee_status: str,
 ) -> dict[str, Any]:
     packet = {
         "family_id": family_id,
@@ -166,6 +168,10 @@ def common_packet(
             "offer_type": "paid source-native benchmark and evidence protocol review",
             "pricing_status": "bounded_service_scoping_not_performance_value",
             "price_range_usd": {"low": review_low, "high": review_high},
+            "duration_business_days": review_duration_business_days,
+            "fee_status": review_fee_status,
+            "founder_approved": False,
+            "buyer_accepted": False,
             "safe_positioning": (
                 "Sell source-task mapping, baseline registration, frozen chronology, "
                 "reproducible execution, and claim-boundary review. Do not sell a "
@@ -261,8 +267,12 @@ def build_payload() -> dict[str, Any]:
 
     valuation_target = valuation_payload.get("recommended_first_proposal_target", {})
     review_range = valuation_target.get("paid_review_scope_usd", {})
-    review_low = int(review_range.get("low") or 2500)
-    review_high = int(review_range.get("high") or 7500)
+    review_low = int(review_range["low"])
+    review_high = int(review_range["high"])
+    review_duration_business_days = int(review_range["duration_business_days"])
+    review_fee_status = str(review_range["status"])
+    if review_low != review_high or review_duration_business_days <= 0:
+        raise ValueError("Current protocol-review offer must be fixed-fee and time-bounded")
 
     brach_repeat = repeat_card(repeat_payload, "brachistochrone_descent")
     kuramoto = kuramoto_evidence(kuramoto_payload)
@@ -288,6 +298,8 @@ def build_payload() -> dict[str, Any]:
         ],
         review_low=review_low,
         review_high=review_high,
+        review_duration_business_days=review_duration_business_days,
+        review_fee_status=review_fee_status,
     )
     brach["latest_repeat_evidence"] = brach_repeat
 
@@ -313,6 +325,8 @@ def build_payload() -> dict[str, Any]:
         ],
         review_low=review_low,
         review_high=review_high,
+        review_duration_business_days=review_duration_business_days,
+        review_fee_status=review_fee_status,
     )
     wave["latest_holdout_evidence"] = kuramoto
 

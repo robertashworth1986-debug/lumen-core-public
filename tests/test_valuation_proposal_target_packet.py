@@ -56,8 +56,21 @@ def test_valuation_packet_prices_service_not_failed_candidate_performance():
     assert "paid protocol" in target["proposal_ask"]
     assert (
         target["paid_review_scope_usd"]["status"]
-        == "service_scoping_range_not_enterprise_value_or_roi_claim"
+        == "candidate_not_committed"
     )
+    assert target["paid_review_scope_usd"]["low"] == 3500
+    assert target["paid_review_scope_usd"]["high"] == 3500
+    assert target["paid_review_scope_usd"]["duration_business_days"] == 10
+    assert target["paid_review_scope_usd"]["founder_approved"] is False
+    assert target["paid_review_scope_usd"]["buyer_accepted"] is False
+    assert target["optional_benchmark_build_usd"]["low"] == 7500
+    assert target["optional_benchmark_build_usd"]["high"] == 25000
+    assert payload["inputs"]["hypercore_v8_commercial_boundary"] == (
+        "config/hypercore_v8_validation_protocol_v1.json"
+    )
+    assert len(
+        payload["input_sha256"]["config/hypercore_v8_validation_protocol_v1.json"]
+    ) == 64
 
 
 def test_valuation_packet_closes_performance_and_value_claims():

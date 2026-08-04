@@ -18,6 +18,7 @@ LIVE_DOMAIN_JSON = OUT_OPS / "live_domain_deployment_feed_latest.json"
 CHAMPION_JSON = DASHBOARD_DATA / "champion_metric_gauntlet.json"
 LOCKED_SWEEP_JSON = DASHBOARD_DATA / "locked_source_baseline_replay_sweep.json"
 VALUATION_JSON = DASHBOARD_DATA / "valuation_proposal_target_packet.json"
+HYPERCORE_PROTOCOL_JSON = ROOT / "config" / "hypercore_v8_validation_protocol_v1.json"
 
 OUT_JSON = OUT_OPS / "first_buyer_target_board_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "first_buyer_target_board.json"
@@ -27,49 +28,41 @@ UPDATED_BUSINESS_PLAN_PDF = Path(
 )
 
 BOUNDARY = (
-    "First-buyer target board. This artifact selects named, source-verified buyer channels for a manual paid "
-    "evidence review or buyer-authorized field replay. It does not authorize auto-send, bulk outreach, contact "
-    "scraping, fixed frozen-delta pricing, field-validation claims, realized-savings claims, live trading, or "
-    "autonomous operational execution."
+    "First-buyer target board. This artifact ranks current official buyer or capital channels and prepares one "
+    "bounded protocol-review inquiry. It does not authorize auto-send, bulk outreach, contact scraping, field-"
+    "validation claims, realized-savings claims, live trading, or autonomous operational execution."
 )
 
+SOURCE_VERIFIED_UTC = "2026-08-04T11:52:54Z"
 
 SOURCE_REFS: dict[str, dict[str, str]] = {
-    "epri_iel": {
-        "url": "https://epri.brightidea.com/community/iel",
-        "fact": "Incubatenergy Labs, powered by EPRI, runs quick paid demonstrations with leading utilities, typically within 16 weeks.",
+    "southern_new_ventures": {
+        "url": "https://www.southerncompany.com/future-of-energy/new-ventures.html",
+        "fact": (
+            "Southern Company New Ventures says it introduces novel technology pilots and solutions, and lists "
+            "AI, data-driven tools, grid optimization, AI models, and grid operations among its current focus areas."
+        ),
+        "public_contact": "https://www.southerncompany.com/contact-us.html",
+        "verified_utc": SOURCE_VERIFIED_UTC,
     },
-    "epri_ai_power": {
-        "url": "https://epri.brightidea.com/AIforPower2026",
-        "fact": "AI for Power 2026 connects energy companies, technology providers, and utilities through real-world demonstration projects; pitch day is listed for August 5, 2026.",
+    "pge_research_and_development": {
+        "url": "https://www.pge.com/en/about/pge-systems/research-and-development.html",
+        "fact": (
+            "PG&E says it needs ideas from broad external sources, publishes AI-centered R&D priorities, invites "
+            "collaborative problem solving, and publishes innovation@pge.com for questions and requests."
+        ),
+        "public_contact": "innovation@pge.com",
+        "verified_utc": SOURCE_VERIFIED_UTC,
     },
-    "opai": {
-        "url": "https://openpowerai.org/",
-        "fact": "Open Power AI describes the AI for Power Challenge as a pathway for utilities, EPRI, and technology providers to collaborate, test, validate, and de-risk AI solutions.",
-    },
-    "epb_grid": {
-        "url": "https://epb.com/energy/automated-grid/",
-        "fact": "EPB reports an Automated Grid with outage-minute reduction, real-time usage data, microgrid research, and seconds-scale rerouting.",
-    },
-    "epb_ornl": {
-        "url": "https://epb.com/newsroom/press-releases/microgrid-research-partnership/",
-        "fact": "EPB and ORNL describe a long-running partnership to test and deploy innovative controls, sensor systems, building energy models, security, and quantum/supercomputing grid platforms.",
-    },
-    "tva_future_grid": {
-        "url": "https://www.tva.com/energy/technology-innovation/future-grid-performance",
-        "fact": "TVA identifies future grid performance challenges tied to renewables, storage, weather-dependent resources, and inverter-based resources.",
-    },
-    "tva_spark": {
-        "url": "https://www.tnresearchpark.org/tva-%F0%9F%A4%9D-spark-cleantech-accelerator/",
-        "fact": "TVA sponsors Spark Cleantech Accelerator activity aligned with future grid performance, regional grid transformation, storage integration, and pilot commercialization.",
-    },
-    "spark_accelerator": {
-        "url": "https://www.tnresearchpark.org/spark/accelerator/",
-        "fact": "Spark Accelerator offers mentorship, prototyping, customer and partner connections, and partnership opportunities including TVA and ORNL.",
-    },
-    "doe_grip": {
-        "url": "https://www.energy.gov/oe/grid-resilience-and-innovation-partnerships-grip",
-        "fact": "DOE's GRIP program targets grid flexibility, reliability, resilience, disruptive events, load growth, cybersecurity, and transformational grid projects.",
+    "exelon_2c2i": {
+        "url": "https://www.exeloncorp.com/community/foundation",
+        "fact": (
+            "Exelon's 2c2i program is accepting applications through September 27, 2026 for climate-focused "
+            "startups; it describes $100,000-$300,000 investments and requires measurable climate, territory, "
+            "community, product, market, team, and traction fit."
+        ),
+        "public_contact": "exelonfoundation@exeloncorp.com",
+        "verified_utc": SOURCE_VERIFIED_UTC,
     },
 }
 
@@ -100,6 +93,10 @@ def write_text(path: Path, text: str) -> None:
 
 def stable_sha256(payload: Any) -> str:
     return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+
+
+def text_sha256(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 def as_dict(value: Any) -> dict[str, Any]:
@@ -245,7 +242,35 @@ def proof_snapshot() -> dict[str, Any]:
     }
 
 
-def make_candidates(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
+def commercial_offer_snapshot() -> dict[str, Any]:
+    payload = read_json(HYPERCORE_PROTOCOL_JSON)
+    if payload.get("schema") != "hypercore_v8_validation_protocol_v1":
+        raise ValueError("Hypercore V8 validation protocol is required")
+    commercial = as_dict(payload.get("commercial_boundary"))
+    if commercial.get("fee_status") != "candidate_not_committed":
+        raise ValueError("Hypercore fee must remain candidate and uncommitted")
+    if commercial.get("external_send_allowed") is not False:
+        raise ValueError("Hypercore commercial boundary must remain fail-closed")
+    if commercial.get("contract_or_price_acceptance_proven") is not False:
+        raise ValueError("Buyer price acceptance cannot be inferred")
+    return {
+        "service": "source-native benchmark and evidence protocol review",
+        "candidate_fee_usd": as_int(commercial.get("candidate_fee_usd")),
+        "candidate_duration_business_days": as_int(
+            commercial.get("candidate_duration_business_days")
+        ),
+        "fee_status": commercial.get("fee_status"),
+        "founder_approved": False,
+        "buyer_accepted": False,
+        "external_send_allowed": False,
+        "contract_or_price_acceptance_proven": False,
+        "source": str(HYPERCORE_PROTOCOL_JSON.relative_to(ROOT)).replace("\\", "/"),
+    }
+
+
+def make_candidates(
+    snapshot: dict[str, Any], commercial: dict[str, Any]
+) -> list[dict[str, Any]]:
     reference = snapshot["reference_candidate_label"]
     baseline = snapshot["named_baseline"]
     proof_line = (
@@ -262,176 +287,160 @@ def make_candidates(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
         "protocol review, not a candidate-performance, field, or savings claim."
     )
 
+    offer_line = (
+        f"${commercial['candidate_fee_usd']:,} candidate fixed fee for "
+        f"{commercial['candidate_duration_business_days']} business days, subject to written "
+        "scope confirmation; no fee acceptance is inferred."
+    )
     candidates = [
         {
-            "rank": 1,
-            "organization": "EPRI AI for Power / Incubatenergy Labs",
-            "buyer_channel_type": "national_utility_demonstration_channel",
-            "best_buyer_role": "AI for Power / Incubatenergy Labs program reviewer",
+            "rank": 2,
+            "organization": "Southern Company New Ventures",
+            "buyer_channel_type": "utility_new_ventures_pilot_channel",
+            "best_buyer_role": "New Ventures innovation intake team",
             "why_this_buyer_first": (
-                "Highest leverage: one accepted demo path can expose the proof stack to multiple utilities and AI/power "
-                "decision makers without pretending LumenCore is field validated already."
+                "The current official page explicitly invites external technology collaboration, pilots, AI and "
+                "data-driven tools, grid optimization, AI models, and grid operations. Its visible Contact Us control "
+                "now resolves to a general contact page rather than a named New Ventures inbox, so the recipient "
+                "must be verified before any draft can be addressed."
             ),
-            "fit_score": 98,
+            "fit_score": 95,
             "proof_fit": [
-                "energy forecasting",
-                "grid reliability analytics",
-                "power-sector AI validation",
-                "field replay and demo scoping",
+                "AI model evidence review",
+                "grid analytics benchmark governance",
+                "pilot acceptance criteria",
+                "positive and negative result custody",
             ],
             "first_ask": (
-                "Request a late technical fit review or next-cycle demo intake: a paid evidence review that uses "
-                "EPRI/utility-approved baseline, holdout windows, and pass/fail metrics."
+                "Request a 20-minute fit call for one fixed-scope source-native benchmark and evidence protocol "
+                f"review. Candidate commercial scope: {offer_line}"
             ),
             "buyer_data_needed": [
-                "utility-owned time-series operating data",
-                "incumbent forecast/filter baseline",
-                "pre-registered holdout windows",
-                "accepted reliability or forecast-error metric",
-                "economic conversion factors only after technical replay passes",
+                "one authorized analytics use case and source",
+                "accepted incumbent baselines",
+                "pre-registered chronology and metrics",
+                "data-use and no-production-write boundaries",
             ],
-            "source_keys": ["epri_iel", "epri_ai_power", "opai"],
+            "source_keys": ["southern_new_ventures"],
+            "public_contact_route": {
+                "type": "official_web_contact_route_recipient_unresolved",
+                "address": SOURCE_REFS["southern_new_ventures"]["public_contact"],
+                "authority": "The official New Ventures page links its Contact Us control to the official Southern Company contact page; no named New Ventures email was visible in the current source review.",
+            },
+            "duplicate_check": {
+                "checked_utc": SOURCE_VERIFIED_UTC,
+                "scope": "Gmail all mail and Sent for Southern Company and official Southern domains",
+                "relevant_prior_outbound_count": 0,
+                "relevant_prior_inbound_count": 0,
+                "duplicate_send_decision": "recipient_unresolved_no_email_send",
+            },
             "risk_notes": [
-                "May 2026 application window may be closed; use as immediate warm-review target and next-cycle channel.",
-                "Do not claim EPRI acceptance until they explicitly respond.",
+                "The visible official route does not establish a named recipient, budget, procurement authority, or buyer acceptance.",
+                "Do not use the historical direct address without a fresh official-source confirmation.",
             ],
-            "recommended_action_today": "Monitor the existing inbound-only EPRI channel; do not send a new inquiry.",
+            "recommended_action_today": (
+                "Use the official contact route only to obtain the correct intake owner; do not address or send the "
+                "protocol-review draft through this lane until a named official recipient is verified."
+            ),
             "proof_line": proof_line,
         },
         {
-            "rank": 2,
-            "organization": "EPB Chattanooga / ORNL grid resilience research path",
-            "buyer_channel_type": "direct_grid_owner_and_research_partner",
-            "best_buyer_role": "Grid reliability analytics or microgrid research lead",
+            "rank": 1,
+            "organization": "PG&E Research and Development",
+            "buyer_channel_type": "regulated_utility_research_and_innovation_channel",
+            "best_buyer_role": "Utility Partnerships and Innovation / R&D intake team",
             "why_this_buyer_first": (
-                "Most concrete field-validation fit: EPB has an automated grid, microgrid research, real-time usage data, "
-                "and a stated history of testing controls and sensor systems with ORNL."
+                "PG&E's current official R&D page invites external ideas, publishes AI-centered challenge areas, "
+                "and currently publishes a direct innovation inbox. That makes it the best prepared one-message "
+                "draft lane for the governed-review service, subject to the action-time route and duplicate checks."
             ),
-            "fit_score": 96,
+            "fit_score": 93,
             "proof_fit": [
-                "seconds-scale grid rerouting",
-                "outage lead-time and restoration analytics",
-                "microgrid reliability",
-                "sensor/control data replay",
+                "AI investment evidence",
+                "model and data collaboration",
+                "grid planning benchmark governance",
+                "wildfire and asset-risk analytics review",
             ],
             "first_ask": (
-                "Ask for a 20-minute local technical fit call to scope a sealed replay on historical outage, reroute, "
-                "or microgrid time-series windows."
+                "Request routing to the owner of AI/model validation for one bounded source-native protocol review. "
+                f"Candidate commercial scope: {offer_line}"
             ),
             "buyer_data_needed": [
-                "historical feeder/microgrid event windows",
-                "current automated-grid decision or forecast baseline",
-                "outage-minute, reroute-time, or false-alarm metric",
-                "guardrails for no operational control",
-                "approved anonymization and data-use terms",
+                "one PG&E-priority analytics question",
+                "authorized historical source",
+                "accepted incumbent baselines and decision metric",
+                "procurement or R&D sponsorship route",
             ],
-            "source_keys": ["epb_grid", "epb_ornl"],
+            "source_keys": ["pge_research_and_development"],
+            "public_contact_route": {
+                "type": "official_public_innovation_inbox",
+                "address": SOURCE_REFS["pge_research_and_development"]["public_contact"],
+                "authority": "Published in the Contact us section of PG&E's official R&D page",
+            },
+            "duplicate_check": {
+                "checked_utc": SOURCE_VERIFIED_UTC,
+                "scope": "Gmail all mail and Sent for PG&E and official PG&E domains",
+                "relevant_prior_outbound_count": 0,
+                "relevant_prior_inbound_count": 0,
+                "duplicate_send_decision": "clean_new_route_one_message_max_after_action_time_approval",
+            },
             "risk_notes": [
-                "Likely needs a partner/intro route; do not approach as if EPB has purchased anything.",
-                "Keep ask to replay and report, not live control.",
+                "PG&E may route external work through a formal bid, pitch-fest, or regulated R&D process.",
+                "No current budget, data access, or procurement authority is proven by the public contact page.",
             ],
-            "recommended_action_today": "Prepare a one-page EPB/ORNL-specific field replay ask and request the right reviewer.",
+            "recommended_action_today": (
+                "Prepare one no-attachment technical fit inquiry; do not send until the compliance placeholder, "
+                "fresh duplicate check, and exact action-time approval gates are cleared."
+            ),
             "proof_line": proof_line,
         },
         {
             "rank": 3,
-            "organization": "TVA / Spark Cleantech Accelerator bridge",
-            "buyer_channel_type": "regional_commercialization_and_utility_partner_bridge",
-            "best_buyer_role": "TVA ecosystem partnerships, future grid performance, or Spark accelerator reviewer",
+            "organization": "Exelon Foundation 2c2i",
+            "buyer_channel_type": "equity_bearing_climate_startup_capital_channel",
+            "best_buyer_role": "2c2i application and program review team",
             "why_this_buyer_first": (
-                "Strong regional fit: TVA's technology priorities include future grid performance and regional grid "
-                "transformation, while Spark offers customer, partner, TVA, and ORNL connections."
+                "This is a current capital route rather than a buyer. It offers a meaningful investment range and "
+                "an Impact Project, but LumenCore must first prove a measurable climate tie, an Exelon-territory "
+                "deployment plan, community benefit, and traction without inventing those facts."
             ),
-            "fit_score": 94,
+            "fit_score": 68,
             "proof_fit": [
-                "future grid performance",
-                "regional grid transformation",
-                "storage and variable-resource planning",
-                "cleantech commercialization",
+                "grid resilience evidence",
+                "climate adaptation decision support",
+                "Impact Project measurement governance",
             ],
             "first_ask": (
-                "Ask Spark/TVA for a technical mentor review and a route to one buyer-approved replay dataset or "
-                "pilot sponsor."
+                "Do not send the paid-review sales email. Audit the official application against climate, territory, "
+                "community, traction, and equity-structure gates before deciding whether to apply by September 27, 2026."
             ),
             "buyer_data_needed": [
-                "regional grid planning or forecasting dataset",
-                "current planning/forecast baseline",
-                "accepted operational KPI",
-                "pilot sponsor and data-rights path",
+                "measurable climate mitigation or adaptation pathway",
+                "specific Exelon-market operating plan",
+                "community and environmental-justice benefit",
+                "truthful traction and financing facts",
+                "founder acceptance of equity, debt, or SAFE terms",
             ],
-            "source_keys": ["tva_future_grid", "tva_spark", "spark_accelerator"],
+            "source_keys": ["exelon_2c2i"],
+            "public_contact_route": {
+                "type": "official_application_and_program_inbox",
+                "address": SOURCE_REFS["exelon_2c2i"]["public_contact"],
+                "authority": "Published on Exelon's official 2c2i application page",
+            },
+            "duplicate_check": {
+                "checked_utc": SOURCE_VERIFIED_UTC,
+                "scope": "Gmail all mail and Sent for Exelon and official Exelon domains",
+                "relevant_prior_outbound_count": 0,
+                "relevant_prior_inbound_count": 0,
+                "duplicate_send_decision": "no_sales_email_application_fit_audit_required",
+            },
             "risk_notes": [
-                "Accelerator timing may not match today's cash deadline.",
-                "Use it as the warmest regional bridge, not the only revenue path.",
+                "The program is equity-bearing and may use common equity, preferred shares, debt, or a SAFE.",
+                "Current LumenCore evidence does not by itself prove climate impact, local deployment, or traction fit.",
             ],
-            "recommended_action_today": "Draft a Spark/TVA proof-to-pilot message and ask for the right technical reviewer.",
-            "proof_line": proof_line,
-        },
-        {
-            "rank": 4,
-            "organization": "DOE GRIP ecosystem partner",
-            "buyer_channel_type": "federal_grid_resilience_partner_channel",
-            "best_buyer_role": "Utility, local government, or grid-resilience project lead seeking software evidence",
-            "why_this_buyer_first": (
-                "GRIP is not a direct buyer, but it points to the exact class of utilities and public-sector partners "
-                "funded for grid flexibility, resilience, reliability, and early measurable impacts."
+            "recommended_action_today": (
+                "Preserve as a separate capital application lane; do not conflate it with the paid buyer outreach."
             ),
-            "fit_score": 88,
-            "proof_fit": [
-                "grid resilience",
-                "reliability evidence",
-                "forecasting and early warning",
-                "grant-backed field validation",
-            ],
-            "first_ask": (
-                "Use the proof stack as a subcontractor/pilot module in a utility or local-government GRIP-style "
-                "resilience project."
-            ),
-            "buyer_data_needed": [
-                "project-owned grid reliability dataset",
-                "grant-recognized resilience metric",
-                "field replay authorization",
-                "awardee or applicant partner signoff",
-            ],
-            "source_keys": ["doe_grip"],
-            "risk_notes": [
-                "This is a funding and partner channel, not an immediate cash customer.",
-                "Requires partner eligibility and procurement compliance.",
-            ],
-            "recommended_action_today": "Search current GRIP awardees or applicants for one local grid-resilience partner.",
-            "proof_line": proof_line,
-        },
-        {
-            "rank": 5,
-            "organization": "Data center power/cooling operations partner",
-            "buyer_channel_type": "secondary_private_infrastructure_buyer",
-            "best_buyer_role": "Data center energy, cooling, or reliability optimization lead",
-            "why_this_buyer_first": (
-                "High potential value, but weaker immediate access. Use after the grid buyer lane because private "
-                "data-center validation usually requires trust, procurement, and data-rights maturity."
-            ),
-            "fit_score": 81,
-            "proof_fit": [
-                "thermal/cooling optimization",
-                "energy forecasting",
-                "anomaly lead time",
-                "load and uptime risk",
-            ],
-            "first_ask": (
-                "Ask for an offline replay against historical load/cooling event windows; no live operations access."
-            ),
-            "buyer_data_needed": [
-                "historical load, cooling, and temperature telemetry",
-                "current cooling-control baseline",
-                "energy and uptime metrics",
-                "security review and NDA",
-            ],
-            "source_keys": ["epri_ai_power", "tva_future_grid"],
-            "risk_notes": [
-                "Large buyers are slow without a warm intro.",
-                "Keep as second wave unless a direct contact already exists.",
-            ],
-            "recommended_action_today": "Hold until after one utility/research-channel inquiry is sent.",
             "proof_line": proof_line,
         },
     ]
@@ -440,64 +449,135 @@ def make_candidates(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
         candidate["source_refs"] = [SOURCE_REFS[key] for key in candidate["source_keys"]]
         candidate["manual_review_required"] = True
         candidate["send_now_allowed"] = False
-        candidate["routing_status"] = (
-            "inbound_only_no_new_outreach"
-            if candidate["organization"].startswith("EPRI")
-            else "official_source_duplicate_and_recipient_check_required"
-        )
+        if candidate["organization"].startswith("Exelon"):
+            candidate["routing_status"] = "application_only_fit_gates_unresolved"
+        elif candidate["organization"].startswith("Southern"):
+            candidate["routing_status"] = "official_contact_route_recipient_unresolved_no_email_send"
+        else:
+            candidate["routing_status"] = "verified_clean_route_action_time_approval_required"
         candidate["source_freshness_status"] = (
-            "historical_reference_requires_action_time_official_verification"
+            "official_route_reviewed_2026_08_04_action_time_refresh_required"
         )
         candidate["candidate_sha256"] = stable_sha256(
             {key: value for key, value in candidate.items() if key != "candidate_sha256"}
         )
-    return candidates
+    return sorted(candidates, key=lambda candidate: int(candidate["rank"]))
 
 
-def make_primary_email(snapshot: dict[str, Any], candidate: dict[str, Any]) -> dict[str, str]:
-    reference = snapshot["reference_candidate_label"]
-    baseline = snapshot["named_baseline"]
-    body = f"""Hello [Name],
+def make_primary_email(
+    snapshot: dict[str, Any],
+    candidate: dict[str, Any],
+    commercial: dict[str, Any],
+) -> dict[str, Any]:
+    subject = "Fixed-scope evidence review for utility AI and grid analytics"
+    route = as_dict(candidate.get("public_contact_route"))
+    body = f"""Hello {candidate['organization']} team,
 
-I am Robert Ashworth, building LumenCore, a source-native evidence and benchmark framework for infrastructure analytics.
+I am Robert Ashworth, founder of LumenCore. I am reaching out because your official innovation page describes a route for external ideas and collaboration. I am asking only whether this fixed-scope evidence-review service belongs with your team or should be routed to the appropriate owner.
 
-I am looking for the right technical reviewer for one bounded paid protocol review or benchmark implementation. The current measured result is deliberately a negative one: {reference} won {snapshot['holdout_wins']}/{snapshot['holdout_count']} paired EIA holdout days versus {baseline}, had a mean skill delta of {snapshot['mean_delta_vs_named_baseline']:.6f}, and did not clear the complete source-specific baseline gate.
+LumenCore offers a fixed-scope, {commercial['candidate_duration_business_days']}-business-day source-native benchmark and evidence protocol review. For one authorized analytics use case, the review registers accepted incumbent baselines and metrics before comparison, preserves chronology, runs reproducible holdouts under identical constraints, and delivers a reviewer-ready packet that retains both positive and negative results.
 
-The offer is the governed method, not a claim that this candidate wins: map one authorized source to the correct task, register accepted incumbent baselines, freeze chronology and metrics, run the comparison reproducibly, and deliver a reviewer-ready packet that preserves positive and negative results.
+The candidate fee is ${commercial['candidate_fee_usd']:,}, subject to written scope confirmation. This is a service-fee proposal, not a claim of field performance, savings, return on investment, or production control. No operational write access is required.
 
-Would you be open to a 20-minute technical fit call about a fixed-scope source-native benchmark and evidence protocol review?
+Would your team be open to a 20-minute fit call, or route me to the person responsible for AI, model validation, or grid-analytics pilot evaluation?
+
+Reviewer surface: {snapshot['mission_control']}
 
 Respectfully,
 Robert Ashworth
-[physical mailing address]
+LumenCore
+[FOUNDER-APPROVED BUSINESS MAILING ADDRESS REQUIRED]
 
-To stop further outreach, reply "remove."
+This is a one-time technical fit inquiry. Reply "remove" and no further outreach will be sent.
 """
-    return {
-        "subject": "Source-native benchmark and evidence protocol review",
+    missing_facts = [
+        "founder-approved business mailing address for the commercial-email footer",
+        "founder approval of the exact recipient, candidate fee, subject, and final body hash",
+        "confirmation that the official public route remains current at action time",
+    ]
+    packet = {
+        "recipient_name": f"{candidate['organization']} team",
+        "recipient_email": route.get("address", ""),
+        "recipient_authority": route.get("authority", ""),
+        "recipient_route_verified_utc": SOURCE_VERIFIED_UTC,
+        "subject": subject,
         "body": body,
-        "send_mode": "draft_only_not_ready_to_send",
-        "why_not_autosend": "No recipient is selected. Official-source freshness, routing policy, duplicate-send history, recipient fit, and exact action-time approval are required first.",
+        "subject_sha256": text_sha256(subject),
+        "body_sha256": text_sha256(body),
+        "hashes_cover_placeholder_draft_only": True,
+        "attachments": [],
+        "attachment_count": 0,
+        "cc": [],
+        "bcc": [],
+        "candidate_fee_usd": commercial["candidate_fee_usd"],
+        "candidate_duration_business_days": commercial[
+            "candidate_duration_business_days"
+        ],
+        "fee_status": commercial["fee_status"],
+        "founder_approved": False,
+        "buyer_accepted": False,
+        "duplicate_check": candidate["duplicate_check"],
+        "duplicate_send_decision": candidate["duplicate_check"][
+            "duplicate_send_decision"
+        ],
+        "missing_facts": missing_facts,
+        "send_ready": False,
+        "send_mode": "draft_only_missing_compliance_fact_and_action_time_approval",
+        "send_gate": "BLOCKED_BUSINESS_ADDRESS_AND_EXACT_ACTION_TIME_APPROVAL_REQUIRED",
+        "why_not_autosend": (
+            "The official public route is documented, but the final commercial footer, action-time duplicate check, "
+            "and exact approval are missing. The current hashes cover a placeholder draft and cannot authorize a send."
+        ),
     }
+    packet["packet_sha256"] = stable_sha256(
+        {key: value for key, value in packet.items() if key != "packet_sha256"}
+    )
+    return packet
 
 
 def build_payload() -> dict[str, Any]:
     snapshot = proof_snapshot()
-    candidates = make_candidates(snapshot)
+    commercial = commercial_offer_snapshot()
+    candidates = make_candidates(snapshot, commercial)
     primary = candidates[0]
+    excluded_historical_routes = [
+        {
+            "organization": "EPRI Open Power AI",
+            "decision": "inbound_only_no_new_outreach",
+            "basis": "Current local outreach policy records the completed onboarding and logo response; no resend is allowed.",
+        },
+        {
+            "organization": "EPB Chattanooga",
+            "decision": "exclude_duplicate_risk_no_new_outreach",
+            "basis": "Full-thread mailbox check found four separate outbound messages and no inbound reply.",
+            "relevant_prior_outbound_count": 4,
+            "relevant_prior_inbound_count": 0,
+        },
+        {
+            "organization": "TVA / Spark Cleantech",
+            "decision": "exclude_duplicate_risk_no_new_outreach",
+            "basis": "Full-thread mailbox check found three separate outbound messages across the TVA/Spark route and no inbound reply.",
+            "relevant_prior_outbound_count": 3,
+            "relevant_prior_inbound_count": 0,
+        },
+    ]
     payload = {
-        "schema": "first_buyer_target_board_v2",
+        "schema": "first_buyer_target_board_v3",
         "generated_utc": now_utc(),
         "boundary": BOUNDARY,
         "summary": {
-            "recommended_first_buyer": None,
-            "recommended_first_buyer_type": None,
+            "recommended_first_buyer": primary["organization"],
+            "recommended_first_buyer_type": primary["buyer_channel_type"],
             "recommended_first_action": (
-                "Verify one current official channel, reconcile duplicate-send "
-                "history, select a real recipient, and obtain exact action-time "
-                "approval before outreach."
+                "Insert and approve a business mailing address, refresh the official route and duplicate check at "
+                "action time, then request exact approval for one no-attachment message."
             ),
             "candidate_count": len(candidates),
+            "current_official_source_verified_count": len(candidates),
+            "recipient_selected_count": 1,
+            "exact_packet_prepared_count": 1,
+            "send_ready_target_count": 0,
+            "historical_duplicate_risk_route_count": 2,
             "manual_reviewed_outreach_allowed": False,
             "paid_protocol_review_scoping_allowed": True,
             "send_without_user_review_allowed": False,
@@ -532,9 +612,21 @@ def build_payload() -> dict[str, Any]:
             ],
         },
         "proof_snapshot": snapshot,
+        "commercial_offer": commercial,
         "source_refs": SOURCE_REFS,
+        "current_route_verification": {
+            "verified_utc": SOURCE_VERIFIED_UTC,
+            "official_source_count": len(SOURCE_REFS),
+            "gmail_scope": (
+                "All Mail and Sent checks for Southern Company, PG&E, and Exelon names and official domains; "
+                "full-thread checks for excluded EPB and TVA/Spark histories."
+            ),
+            "official_route_refresh_required_at_action_time": True,
+            "mailbox_duplicate_refresh_required_at_action_time": True,
+        },
+        "excluded_historical_routes": excluded_historical_routes,
         "candidates": candidates,
-        "primary_manual_email": make_primary_email(snapshot, primary),
+        "primary_manual_email": make_primary_email(snapshot, primary, commercial),
         "claim_controls": {
             "allowed_today": [
                 "draft a paid source-native protocol review offer",
@@ -544,7 +636,7 @@ def build_payload() -> dict[str, Any]:
             ],
             "blocked_until_action_time_clearance": [
                 "send any outreach",
-                "select or imply a current recipient",
+                "treat a selected public route as proof of buyer or procurement authority",
                 "describe any family as a performance champion",
                 "request a field replay for the current Kuramoto result",
                 "field validated",
@@ -556,18 +648,23 @@ def build_payload() -> dict[str, Any]:
             ],
         },
         "next_30_minutes": [
-            "Keep EPRI inbound-only unless a genuinely new inbound message changes routing.",
-            "Refresh one non-EPRI candidate from its current official source.",
-            "Check Gmail Sent and the outreach reconciliation ledger for duplicates.",
-            "Select a recipient only after channel, fit, and routing checks pass.",
-            "Request exact action-time approval for the final recipient, subject, body, and attachments.",
+            "Keep EPRI inbound-only and exclude the over-contacted EPB and TVA/Spark routes.",
+            "Obtain or approve a non-residential LumenCore business mailing address for the one-time inquiry footer.",
+            "Refresh the Southern Company official route and Gmail duplicate check immediately before any send.",
+            "Recompute the final body hash after the footer is complete.",
+            "Request exact action-time approval for the recipient, subject hash, body hash, zero attachments, and no CC/BCC.",
         ],
     }
     payload["first_buyer_board_sha256"] = stable_sha256(
         {
             "summary": payload["summary"],
             "proof_snapshot": payload["proof_snapshot"],
+            "commercial_offer": payload["commercial_offer"],
             "candidates": payload["candidates"],
+            "excluded_historical_routes": payload[
+                "excluded_historical_routes"
+            ],
+            "primary_manual_email": payload["primary_manual_email"],
             "claim_controls": payload["claim_controls"],
         }
     )
@@ -577,6 +674,9 @@ def build_payload() -> dict[str, Any]:
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     snapshot = payload["proof_snapshot"]
+    commercial = payload["commercial_offer"]
+    route_verification = payload["current_route_verification"]
+    email = payload["primary_manual_email"]
     lines = [
         "# First Buyer Target Board",
         "",
@@ -589,6 +689,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- First buyer channel: `{summary['recommended_first_buyer']}`",
         f"- Channel type: `{summary['recommended_first_buyer_type']}`",
         f"- First action: {summary['recommended_first_action']}",
+        f"- Current official sources verified: `{summary['current_official_source_verified_count']}`",
+        f"- Exact packets prepared: `{summary['exact_packet_prepared_count']}`",
+        f"- Send-ready packets: `{summary['send_ready_target_count']}`",
         f"- Send without user review: `{str(summary['send_without_user_review_allowed']).lower()}`",
         f"- Bulk email allowed: `{str(summary['bulk_email_allowed']).lower()}`",
         f"- Field-validation claim allowed: `{str(summary['field_validation_claim_allowed']).lower()}`",
@@ -611,6 +714,23 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Business plan PDF: `{snapshot['business_plan_pdf']}`",
         f"- Stress matrix feed: {snapshot['stress_matrix_feed']}",
         "",
+        "## Commercial Boundary",
+        "",
+        f"- Service: {commercial['service']}",
+        f"- Candidate fee: `${commercial['candidate_fee_usd']:,}`",
+        f"- Candidate duration: `{commercial['candidate_duration_business_days']}` business days",
+        f"- Fee status: `{commercial['fee_status']}`",
+        f"- Buyer accepted: `{str(commercial['buyer_accepted']).lower()}`",
+        f"- External send allowed by source protocol: `{str(commercial['external_send_allowed']).lower()}`",
+        "",
+        "## Route Verification",
+        "",
+        f"- Verified UTC: `{route_verification['verified_utc']}`",
+        f"- Official sources checked: `{route_verification['official_source_count']}`",
+        f"- Mailbox scope: {route_verification['gmail_scope']}",
+        f"- Refresh official route at action time: `{str(route_verification['official_route_refresh_required_at_action_time']).lower()}`",
+        f"- Refresh duplicate check at action time: `{str(route_verification['mailbox_duplicate_refresh_required_at_action_time']).lower()}`",
+        "",
         "## Ranked Buyer Targets",
         "",
     ]
@@ -624,6 +744,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Why first: {candidate['why_this_buyer_first']}",
                 f"- First ask: {candidate['first_ask']}",
                 f"- Data needed: {', '.join(candidate['buyer_data_needed'])}",
+                f"- Routing status: `{candidate['routing_status']}`",
+                f"- Public route type: `{candidate['public_contact_route']['type']}`",
+                f"- Public route: `{candidate['public_contact_route']['address']}`",
+                f"- Duplicate decision: `{candidate['duplicate_check']['duplicate_send_decision']}`",
+                f"- Prior relevant outbound/inbound: `{candidate['duplicate_check']['relevant_prior_outbound_count']}/{candidate['duplicate_check']['relevant_prior_inbound_count']}`",
                 f"- Send now allowed: `{str(candidate['send_now_allowed']).lower()}`",
                 "- Sources:",
             ]
@@ -633,12 +758,43 @@ def render_markdown(payload: dict[str, Any]) -> str:
         lines.append("")
     lines.extend(
         [
-            "## Draft Email",
+            "## Excluded Historical Routes",
             "",
-            f"Subject: {payload['primary_manual_email']['subject']}",
+        ]
+    )
+    for excluded in payload["excluded_historical_routes"]:
+        counts = ""
+        if "relevant_prior_outbound_count" in excluded:
+            counts = (
+                " Prior relevant outbound/inbound: "
+                f"`{excluded['relevant_prior_outbound_count']}/{excluded['relevant_prior_inbound_count']}`."
+            )
+        lines.append(
+            f"- **{excluded['organization']}**: `{excluded['decision']}`. {excluded['basis']}{counts}"
+        )
+    lines.extend(
+        [
+            "",
+            "## Selected Draft Packet",
+            "",
+            f"- Recipient: {email['recipient_name']} `<{email['recipient_email']}>`",
+            f"- Recipient authority: {email['recipient_authority']}",
+            f"- Route verified UTC: `{email['recipient_route_verified_utc']}`",
+            f"- Candidate fee/duration: `${email['candidate_fee_usd']:,}` / `{email['candidate_duration_business_days']}` business days",
+            f"- Attachments: `{email['attachment_count']}`",
+            f"- CC/BCC: `{len(email['cc'])}/{len(email['bcc'])}`",
+            f"- Subject SHA-256: `{email['subject_sha256']}`",
+            f"- Body SHA-256: `{email['body_sha256']}`",
+            f"- Packet SHA-256: `{email['packet_sha256']}`",
+            f"- Placeholder-draft hashes only: `{str(email['hashes_cover_placeholder_draft_only']).lower()}`",
+            f"- Send ready: `{str(email['send_ready']).lower()}`",
+            f"- Send gate: `{email['send_gate']}`",
+            f"- Missing facts: {', '.join(email['missing_facts'])}",
+            "",
+            f"Subject: {email['subject']}",
             "",
             "```text",
-            payload["primary_manual_email"]["body"].rstrip(),
+            email["body"].rstrip(),
             "```",
             "",
             "## Claim Controls",

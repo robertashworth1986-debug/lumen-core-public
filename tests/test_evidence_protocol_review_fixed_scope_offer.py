@@ -40,6 +40,14 @@ def test_offer_is_fixed_scope_and_within_existing_bounded_range():
     assert limits["authorized_source_systems"] == 1
     assert limits["production_access"] is False
     assert len(payload["deliverables"]) == 6
+    metrics = payload["acceptance_metrics"]
+    assert metrics["deliverable_coverage_required"] == 1.0
+    assert metrics["replay_hash_verification_required"] == 1.0
+    assert metrics["undocumented_post_freeze_change_count_max"] == 0
+    assert metrics["known_omitted_result_class_count_max"] == 0
+    assert metrics["unsupported_external_claim_count_max"] == 0
+    assert metrics["candidate_method_win_required"] is False
+    assert metrics["decision_memo_required"] is True
     assert len(payload["payload_sha256"]) == 64
 
 
@@ -59,6 +67,7 @@ def test_offer_does_not_convert_local_protocol_evidence_into_performance_claims(
     assert controls["savings_claim_allowed"] is False
     assert controls["field_validation_claim_allowed"] is False
     assert "not a customer result" in payload["claim_boundary"].lower()
+    assert "not predictive-performance" in payload["acceptance_metrics"]["metric_boundary"]
 
 
 def test_published_offer_matches_stable_rebuild():

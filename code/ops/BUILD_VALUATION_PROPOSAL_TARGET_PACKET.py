@@ -19,6 +19,7 @@ READY_REPLAY_JSON = DASHBOARD_DATA / "geometry_ready_source_replay.json"
 KURAMOTO_JSON = DASHBOARD_DATA / "kuramoto_holdout_expansion.json"
 DOLLAR_GATE_JSON = DASHBOARD_DATA / "dollar_claim_gate.json"
 CLAIM_LADDER_JSON = DASHBOARD_DATA / "field_validated_dollar_claim_ladder.json"
+HYPERCORE_PROTOCOL_JSON = ROOT / "config" / "hypercore_v8_validation_protocol_v1.json"
 
 OUT_JSON = OUT_OPS / "valuation_proposal_target_packet_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "valuation_proposal_target_packet.json"
@@ -132,7 +133,29 @@ def lane_summary_rows(locked: dict[str, Any]) -> list[dict[str, Any]]:
     return sorted(cleaned, key=lambda row: row["lane"])
 
 
-def proposal_target() -> dict[str, Any]:
+def hypercore_commercial_boundary() -> dict[str, Any]:
+    payload = read_json(HYPERCORE_PROTOCOL_JSON)
+    if payload.get("schema") != "hypercore_v8_validation_protocol_v1":
+        raise ValueError("Hypercore V8 validation protocol is required")
+    commercial = payload.get("commercial_boundary")
+    if not isinstance(commercial, dict):
+        raise ValueError("Hypercore V8 commercial boundary is invalid")
+    if commercial.get("fee_status") != "candidate_not_committed":
+        raise ValueError("Hypercore review fee must remain candidate and uncommitted")
+    if commercial.get("external_send_allowed") is not False:
+        raise ValueError("Hypercore commercial boundary must remain fail-closed")
+    if commercial.get("contract_or_price_acceptance_proven") is not False:
+        raise ValueError("Hypercore price acceptance cannot be inferred")
+    return commercial
+
+
+def proposal_target(commercial: dict[str, Any] | None = None) -> dict[str, Any]:
+    commercial = commercial or hypercore_commercial_boundary()
+    review_fee = safe_int(commercial.get("candidate_fee_usd"))
+    review_days = safe_int(commercial.get("candidate_duration_business_days"))
+    extension = commercial.get("implementation_extension_range_usd", {})
+    if not isinstance(extension, dict):
+        raise ValueError("Hypercore implementation extension range is invalid")
     return {
         "target_name": "Source-Native Benchmark and Evidence Protocol Review",
         "target_segment": (
@@ -155,14 +178,20 @@ def proposal_target() -> dict[str, Any]:
             "review or benchmark implementation."
         ),
         "paid_review_scope_usd": {
-            "low": 2500,
-            "high": 7500,
-            "status": "service_scoping_range_not_enterprise_value_or_roi_claim",
+            "low": review_fee,
+            "high": review_fee,
+            "duration_business_days": review_days,
+            "offer_name": commercial.get("first_offer"),
+            "status": commercial.get("fee_status"),
+            "founder_approved": False,
+            "buyer_accepted": False,
         },
         "optional_benchmark_build_usd": {
-            "low": 7500,
-            "high": 25000,
+            "low": safe_int(extension.get("low")),
+            "high": safe_int(extension.get("high")),
             "status": "custom_scope_after_data_rights_and_acceptance_criteria",
+            "founder_approved": False,
+            "buyer_accepted": False,
         },
         "validation_bridge_budget": {
             "planning_range_usd": {"low": 250000, "high": 500000},
@@ -215,6 +244,7 @@ def build_payload() -> dict[str, Any]:
     kuramoto = read_json(KURAMOTO_JSON)
     dollar_gate = read_json(DOLLAR_GATE_JSON)
     claim_ladder = read_json(CLAIM_LADDER_JSON)
+    commercial = hypercore_commercial_boundary()
 
     if gauntlet.get("schema") != "champion_metric_gauntlet_v2":
         raise ValueError("champion metric gauntlet v2 is required")
@@ -230,7 +260,7 @@ def build_payload() -> dict[str, Any]:
     ready_summary = ready.get("summary", {})
     kuramoto_summary = kuramoto.get("summary", {})
     lanes = lane_summary_rows(locked)
-    target = proposal_target()
+    target = proposal_target(commercial)
 
     overall = {
         "adapter_backed_route_count": safe_int(
@@ -324,6 +354,7 @@ def build_payload() -> dict[str, Any]:
             "field_validated_dollar_claim_ladder_context_only": rel(
                 CLAIM_LADDER_JSON
             ),
+            "hypercore_v8_commercial_boundary": rel(HYPERCORE_PROTOCOL_JSON),
         },
         "input_sha256": {
             rel(path): file_sha256(path)
@@ -332,6 +363,7 @@ def build_payload() -> dict[str, Any]:
                 LOCKED_SWEEP_JSON,
                 READY_REPLAY_JSON,
                 KURAMOTO_JSON,
+                HYPERCORE_PROTOCOL_JSON,
             )
         },
         "outputs": {
@@ -456,7 +488,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Buyer role: {target['buyer_role']}",
         f"- Why this first: {target['why_this_first']}",
         f"- Ask: {target['proposal_ask']}",
-        f"- Protocol review range: `{money(target['paid_review_scope_usd']['low'])}` to `{money(target['paid_review_scope_usd']['high'])}`",
+        f"- Protocol review candidate: `{money(target['paid_review_scope_usd']['low'])}` fixed for `{target['paid_review_scope_usd']['duration_business_days']}` business days; status `{target['paid_review_scope_usd']['status']}`",
         f"- Benchmark build range: `{money(target['optional_benchmark_build_usd']['low'])}` to `{money(target['optional_benchmark_build_usd']['high'])}`",
         "",
         "## Reviewer-Safe Proposal Blurb",

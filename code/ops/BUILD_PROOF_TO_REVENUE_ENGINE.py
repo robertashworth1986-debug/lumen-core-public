@@ -72,6 +72,16 @@ def as_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
 
 
+def format_usd_range(price: dict[str, Any]) -> str:
+    low = int(price.get("low") or 0)
+    high = int(price.get("high") or 0)
+    if low <= 0 or high <= 0:
+        return "price pending"
+    if low == high:
+        return f"${low:,}"
+    return f"${low:,}-${high:,}"
+
+
 def require_inputs() -> dict[str, dict[str, Any]]:
     inputs = {
         "live": read_json(LIVE_DOMAIN_JSON),
@@ -90,7 +100,7 @@ def require_inputs() -> dict[str, dict[str, Any]]:
         "proof_to_pilot": "proof_to_pilot_control_room_v2",
         "valuation": "valuation_proposal_target_packet_v3",
         "product_priority": "product_lane_priority_engine_v1",
-        "first_buyer": "first_buyer_target_board_v2",
+        "first_buyer": "first_buyer_target_board_v3",
     }
     for name, schema in expected.items():
         actual = inputs[name].get("schema")
@@ -155,9 +165,10 @@ def safe_draft_template(product: dict[str, Any], proof_offer: dict[str, Any]) ->
                 ),
                 "",
                 (
-                    "The separate source-native protocol-review service is scoped at "
-                    f"${proof_offer.get('low'):,}-${proof_offer.get('high'):,}; "
-                    "product workflow pricing is quoted only after scope."
+                    "The separate source-native protocol-review service has a "
+                    f"candidate fee of {format_usd_range(proof_offer)}, subject to "
+                    "founder approval and written scope confirmation; product "
+                    "workflow pricing is quoted only after scope."
                 ),
                 "",
                 "Respectfully,",
@@ -185,6 +196,14 @@ def build_payload() -> dict[str, Any]:
         valuation_state.get("current_priceable_offer")
     )
     first_summary = as_dict(inputs["first_buyer"].get("summary"))
+    first_packet = as_dict(inputs["first_buyer"].get("primary_manual_email"))
+    first_candidates = [
+        as_dict(row)
+        for row in as_list(inputs["first_buyer"].get("candidates"))
+        if as_dict(row)
+    ]
+    first_candidate = first_candidates[0] if first_candidates else {}
+    recipient_selected = bool(first_packet.get("recipient_email"))
     ranking = [
         as_dict(row)
         for row in as_list(inputs["product_priority"].get("ranking"))
@@ -200,9 +219,9 @@ def build_payload() -> dict[str, Any]:
     )
     external_outreach_ready = False
     revenue_stage = (
-        "bounded_product_and_protocol_discovery_draft_only_no_recipient"
+        "bounded_product_and_protocol_discovery_recipient_selected_send_blocked"
         if live_hash_verified
-        else "bounded_offers_ready_local_only_domain_stale_no_recipient"
+        else "bounded_offers_ready_local_only_domain_stale_recipient_selected_send_blocked"
     )
     protocol_price = as_dict(
         current_priceable.get("paid_protocol_review_usd")
@@ -307,7 +326,9 @@ def build_payload() -> dict[str, Any]:
                 "validation and external outreach. No current geometry family is a "
                 "performance champion, the cross-sector benchmark found zero proven "
                 "sector gains, the live reviewer domain has stale hashes, and no "
-                "recipient is selected. Revenue scoping is local and draft-only."
+                "buyer acceptance is proven. One current public route and bounded "
+                "protocol-review draft are selected, but the footer, action-time "
+                "route refresh, and exact packet approval remain unresolved."
             ),
         },
         "commercial_offers": {
@@ -323,10 +344,37 @@ def build_payload() -> dict[str, Any]:
             "product_process_discovery": product_process_offer,
         },
         "safe_draft_template": safe_draft_template(product, protocol_price),
-        "top_manual_targets": [],
+        "top_manual_targets": [
+            {
+                "organization": first_candidate.get("organization"),
+                "buyer_channel_type": first_candidate.get("buyer_channel_type"),
+                "routing_status": first_candidate.get("routing_status"),
+                "send_now_allowed": False,
+            }
+        ]
+        if first_candidate
+        else [],
+        "selected_protocol_review_packet": {
+            "recipient_name": first_packet.get("recipient_name"),
+            "recipient_email": first_packet.get("recipient_email"),
+            "subject": first_packet.get("subject"),
+            "subject_sha256": first_packet.get("subject_sha256"),
+            "body_sha256": first_packet.get("body_sha256"),
+            "packet_sha256": first_packet.get("packet_sha256"),
+            "attachment_count": int(first_packet.get("attachment_count") or 0),
+            "send_ready": bool(first_packet.get("send_ready")),
+            "send_gate": first_packet.get("send_gate"),
+            "hashes_cover_placeholder_draft_only": bool(
+                first_packet.get("hashes_cover_placeholder_draft_only")
+            ),
+        },
         "target_status": {
-            "recipient_selected": False,
-            "recommended_first_buyer": None,
+            "recipient_selected": recipient_selected,
+            "recommended_first_buyer": first_summary.get(
+                "recommended_first_buyer"
+            ),
+            "packet_send_ready": bool(first_packet.get("send_ready")),
+            "packet_send_gate": first_packet.get("send_gate"),
             "legacy_paid_pilot_queue_excluded": bool(
                 inputs["legacy_outreach"]
             ),
@@ -373,9 +421,9 @@ def build_payload() -> dict[str, Any]:
         },
         "external_unlock": [
             "refresh and verify every required live-domain proof-feed hash",
-            "verify one current official channel",
-            "reconcile duplicate-send history",
-            "select a real recipient with authority over the relevant workflow",
+            "refresh the selected current official route at action time",
+            "reconcile duplicate-send history again at action time",
+            "replace the business-mailing-address placeholder with founder-approved footer text",
             "freeze the buyer's current workflow baseline and acceptance criteria",
             "obtain exact action-time approval before external outreach",
         ],
@@ -473,7 +521,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Bounded Commercial Offers",
         "",
-        f"- Source-native protocol review: `${protocol.get('low'):,}`-`${protocol.get('high'):,}`",
+        f"- Source-native protocol review candidate: `${protocol.get('low'):,}` fixed for `{protocol.get('duration_business_days')}` business days; status `{protocol.get('status')}`",
         f"- Benchmark implementation: `${benchmark.get('low'):,}`-`${benchmark.get('high'):,}`",
         f"- Product-process lane: `{product['name']}`",
         f"- Product-process pricing: `{product['pricing_status']}`",
@@ -486,6 +534,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Recipient selected: `{str(payload['target_status']['recipient_selected']).lower()}`",
         f"- Recommended first buyer: `{payload['target_status']['recommended_first_buyer'] or 'none'}`",
+        f"- Selected packet send ready: `{str(payload['target_status']['packet_send_ready']).lower()}`",
+        f"- Selected packet gate: `{payload['target_status']['packet_send_gate']}`",
         f"- Legacy paid-pilot queue excluded: `{str(payload['target_status']['legacy_paid_pilot_queue_excluded']).lower()}`",
         f"- Exclusion reason: {payload['target_status']['exclusion_reason']}",
         "",

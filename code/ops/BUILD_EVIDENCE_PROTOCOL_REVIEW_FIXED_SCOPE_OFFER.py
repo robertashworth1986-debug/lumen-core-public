@@ -154,12 +154,27 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
             "One final readout and buyer decision memo",
         ],
         "acceptance_criteria": [
-            "All six deliverables are present and readable",
+            "All six deliverables are present and readable, for 100% deliverable coverage",
             "The buyer-approved source, task, baselines, windows, metrics, and exclusions are frozen before evaluation",
-            "The supplied replay verifies against the delivered hashes on the agreed environment",
-            "Failures, abstentions, and negative results are retained rather than omitted",
-            "The final memo distinguishes observed results from inference and unsupported claims",
+            "The supplied replay achieves 100% hash verification on the agreed environment",
+            "Every post-freeze change has a versioned amendment; undocumented post-freeze changes equal zero",
+            "Failures, abstentions, and negative results are retained, with zero known omitted result classes",
+            "The final memo distinguishes observed results from inference, with zero unsupported external claims",
+            "A candidate-method win is not required; the required outcome is a reproducible buyer go/no-go decision",
         ],
+        "acceptance_metrics": {
+            "deliverable_coverage_required": 1.0,
+            "replay_hash_verification_required": 1.0,
+            "undocumented_post_freeze_change_count_max": 0,
+            "known_omitted_result_class_count_max": 0,
+            "unsupported_external_claim_count_max": 0,
+            "candidate_method_win_required": False,
+            "decision_memo_required": True,
+            "metric_boundary": (
+                "These are process-integrity and decision-readiness gates, not predictive-performance, "
+                "savings, field-validation, or buyer-acceptance claims."
+            ),
+        },
         "exclusions": [
             "No promise of performance, savings, revenue, funding, award, or acceptance",
             "A claim that any geometry family or model is a current champion",
@@ -212,6 +227,7 @@ def build_payload(generated_utc: str | None = None) -> dict[str, Any]:
 def render_markdown(payload: dict[str, Any]) -> str:
     terms = payload["commercial_terms"]
     limits = payload["scope_limits"]
+    metrics = payload["acceptance_metrics"]
     lines = [
         "# ProofLock Evidence Protocol Review Sprint",
         "",
@@ -247,6 +263,16 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "## Acceptance",
         "",
         *[f"- {item}" for item in payload["acceptance_criteria"]],
+        "",
+        "### Numeric Process Gates",
+        "",
+        f"- Deliverable coverage required: `{metrics['deliverable_coverage_required']:.0%}`",
+        f"- Replay hash verification required: `{metrics['replay_hash_verification_required']:.0%}`",
+        f"- Undocumented post-freeze changes allowed: `{metrics['undocumented_post_freeze_change_count_max']}`",
+        f"- Known omitted result classes allowed: `{metrics['known_omitted_result_class_count_max']}`",
+        f"- Unsupported external claims allowed: `{metrics['unsupported_external_claim_count_max']}`",
+        f"- Candidate-method win required: `{str(metrics['candidate_method_win_required']).lower()}`",
+        f"- Boundary: {metrics['metric_boundary']}",
         "",
         "## Exclusions",
         "",
