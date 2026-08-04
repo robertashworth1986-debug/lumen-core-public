@@ -1,0 +1,314 @@
+{
+  "schema": "time_series_source_native_prospective_protocol.v2",
+  "protocol_id": "LUMENCORE_TS_SOURCE_NATIVE_20260802_V2",
+  "status": "FROZEN_AWAITING_FIRST_SEAL",
+  "supersession": {
+    "prior_protocol_id": "LUMENCORE_TS_SOURCE_NATIVE_20260729_V1",
+    "prior_protocol_path": "config/time_series_source_native_prospective_protocol_v1.json",
+    "prior_protocol_file_sha256": "ede86cb35b5edebbeccdc318336148b9b6ab83d1ad15907e241e3086e5b00800",
+    "prior_protocol_payload_sha256": "980ebaa821212965bffe04334df8c19f1a03e12acac7d9d04f38f21f03b0e1e5",
+    "prior_eligible_future_observation_count": 0,
+    "outcome_dependent_change": false,
+    "reason": "Version 1 bound the scientific hypothesis but did not operationally bind horizons, target identity, first-vintage custody, append-only settlement, overlap counting, or external timestamp requirements. It is preserved unchanged and retired before any eligible future observation."
+  },
+  "freeze": {
+    "freeze_utc": "2026-08-02T01:07:23Z",
+    "freeze_basis": "Operational custody contract frozen before the first version 2 source snapshot, prediction seal, settlement, score, or external anchor.",
+    "outcome_dependent_changes_allowed": false,
+    "interim_leaderboard_allowed": false,
+    "optional_stopping_allowed": false,
+    "backfill_into_confirmatory_set_allowed": false,
+    "replacement_predictions_allowed": false
+  },
+  "candidate": {
+    "registered_family_id": "fractal_brownian_surface",
+    "scientific_estimator_id": "hurst_conditioned_multiscale_increment_heuristic_v1",
+    "entrypoint": "forecast_fractal_brownian_surface",
+    "description": "Hurst-conditioned weighted multiscale increment heuristic using lags 1, 2, 4, and 8 with a bounded persistence multiplier.",
+    "universal_superiority_claim_allowed": false,
+    "trading_alpha_claim_allowed": false
+  },
+  "sources": [
+    {
+      "source": "FRED",
+      "source_contract_id": "fred_initial_release_output_type_4_v1",
+      "publisher": "Federal Reserve Bank of St. Louis",
+      "endpoint": "https://api.stlouisfed.org/fred/series/observations",
+      "vintage_dates_endpoint": "https://api.stlouisfed.org/fred/series/vintagedates",
+      "credential_environment_names": [
+        "FRED_API_KEY"
+      ],
+      "request_contract": {
+        "file_type": "json",
+        "output_type": 4,
+        "sort_order": "asc",
+        "realtime_start_rule": "provider-reported first available ALFRED vintage, rechecked against the bound series value each cycle, then advanced in non-overlapping fixed windows",
+        "realtime_chunk_days": 1460,
+        "realtime_end_rule": "Each historical window ends after 1460 calendar dates; the final recent window uses FRED real-time max date 9999-12-31 to avoid local/provider date skew while remaining under the 2000-vintage JSON limit.",
+        "credential_serialization_allowed": false
+      },
+      "polling_contract": {
+        "minimum_frequency": "once_per_utc_day",
+        "raw_response_retention_required": true,
+        "forecast_backfill_allowed": false,
+        "missed_poll_settlement_policy": "Provider-authenticated output_type=4 initial-release values may settle a prediction after a missed poll only when the prediction seal predates first_vintage_date under the conservative UTC-boundary rule; no later value may replace that initial release.",
+        "first_vintage_field": "observation.realtime_start",
+        "eligible_release_order_rule": "sealed_at_utc must be strictly before 00:00 UTC on first_vintage_date; this conservative rule does not infer an intraday release time"
+      },
+      "target_contract": {
+        "target_selection_rule": "For horizon h, select the h-th new observation period strictly after the sealed origin period.",
+        "target_id_at_settlement": "FRED:{series_id}:{observation_date}:first_vintage",
+        "value_field": "value",
+        "period_field": "date",
+        "revision_policy": "Only output_type=4 initial-release values enter primary settlement. Revisions may be appended in a separate sensitivity ledger and never replace primary actuals."
+      },
+      "series": [
+        {
+          "series_id": "DGS2",
+          "cadence": "business_daily_observation_sequence",
+          "unit": "percent",
+          "transform": "level",
+          "observation_start": "1990-01-01",
+          "alfred_initial_release_start": "2005-06-28",
+          "horizons": [1, 3, 5],
+          "minimum_history_count": 260,
+          "seasonal_period": 5,
+          "autoregressive_lag": 5
+        },
+        {
+          "series_id": "DGS10",
+          "cadence": "business_daily_observation_sequence",
+          "unit": "percent",
+          "transform": "level",
+          "observation_start": "1990-01-01",
+          "alfred_initial_release_start": "2005-06-28",
+          "horizons": [1, 3, 5],
+          "minimum_history_count": 260,
+          "seasonal_period": 5,
+          "autoregressive_lag": 5
+        },
+        {
+          "series_id": "CPIAUCSL",
+          "cadence": "monthly_release_sequence",
+          "unit": "index_1982_1984_100",
+          "transform": "level",
+          "observation_start": "1947-01-01",
+          "alfred_initial_release_start": "1972-07-21",
+          "horizons": [1, 3, 5],
+          "minimum_history_count": 120,
+          "seasonal_period": 12,
+          "autoregressive_lag": 12
+        },
+        {
+          "series_id": "UNRATE",
+          "cadence": "monthly_release_sequence",
+          "unit": "percent",
+          "transform": "level",
+          "observation_start": "1948-01-01",
+          "alfred_initial_release_start": "1960-03-15",
+          "horizons": [1, 3, 5],
+          "minimum_history_count": 120,
+          "seasonal_period": 12,
+          "autoregressive_lag": 12
+        }
+      ]
+    },
+    {
+      "source": "TWELVE_DATA",
+      "source_contract_id": "twelve_data_aapl_exchange_daily_close_v1",
+      "publisher": "Twelve Data",
+      "endpoint": "https://api.twelvedata.com/time_series",
+      "credential_environment_names": [
+        "TWELVE_DATA_API_KEY",
+        "TWELVEDATA_API_KEY",
+        "TWELVE_DATA_KEY"
+      ],
+      "exchange_timezone": "America/New_York",
+      "request_contract": {
+        "interval": "1day",
+        "order": "asc",
+        "format": "JSON",
+        "adjust": "splits",
+        "daily_timezone_rule": "exchange_local_time",
+        "credential_serialization_allowed": false
+      },
+      "polling_contract": {
+        "minimum_frequency": "once_per_exchange_session_after_close",
+        "raw_response_retention_required": true,
+        "not_before_exchange_local_time": "18:00:00",
+        "same_session_first_seen_required": true,
+        "missed_poll_backfill_allowed": false,
+        "eligible_release_order_rule": "sealed exchange-local calendar date must be strictly before the target bar exchange-local session date; same-date seals are invalid even if the provider has not yet published the bar"
+      },
+      "target_contract": {
+        "target_selection_rule": "For horizon h, select the h-th new exchange daily bar strictly after the sealed origin bar.",
+        "target_id_at_settlement": "TWELVE_DATA:{symbol}:{session_date}:split_adjusted_close_v1",
+        "value_field": "close",
+        "period_field": "datetime_date_component",
+        "adjustment_policy": "Twelve Data time_series adjust=splits daily close; daily periods are exchange-local and the provider metadata must report America/New_York",
+        "revision_policy": "The first retained post-close provider response is primary. Later changed values append as revisions and never replace primary actuals."
+      },
+      "series": [
+        {
+          "series_id": "AAPL",
+          "cadence": "exchange_business_daily_bar_sequence",
+          "unit": "usd_split_adjusted_close",
+          "transform": "level",
+          "history_request_count": 5000,
+          "horizons": [1, 3, 5],
+          "minimum_history_count": 260,
+          "seasonal_period": 5,
+          "autoregressive_lag": 5
+        }
+      ]
+    }
+  ],
+  "registered_baselines": [
+    "naive_last",
+    "drift",
+    "moving_average",
+    "exponential_smoothing",
+    "linear_trend",
+    "seasonal_naive_source_period",
+    "damped_holt_ets",
+    "autoregressive_ridge_source_lag"
+  ],
+  "forecast_contract": {
+    "horizons": [1, 3, 5],
+    "prediction_decimal_places": 10,
+    "step_unit": "new_native_source_observations_after_origin",
+    "issuance_rule": "One immutable forecast envelope per source, series, observed origin period, and horizon whenever a new complete snapshot becomes the latest origin.",
+    "prediction_key": "{source}|{series_id}|{origin_period}|{horizon}",
+    "history_only_features_required": true,
+    "runtime_parameter_overrides_allowed": false,
+    "unregistered_fallback_allowed": false,
+    "nonfinite_prediction_rule": "INVALID_COMPLETE_CELL",
+    "target_actual_may_be_used_at_seal": false
+  },
+  "implementation_bindings": {
+    "model_path": "code/geometry_time_series_model_routing_benchmark.py",
+    "model_file_sha256": "2e7241ce62ae553fca28b695e98d3879080123e31639c3f930018cd0f90a925e",
+    "collector_path": "code/time_series_source_native_prospective_collector.py",
+    "collector_file_sha256": "acd79dffc196a4bab8181ad18570e4370ccd7ca191098d96c747c51ab4a25eb7",
+    "candidate_entrypoint": "forecast_fractal_brownian_surface",
+    "execution_entrypoint": "forecast_strategy",
+    "strategy_registry": "STRATEGIES",
+    "baseline_parameters_by_series": "bound in sources[].series[]",
+    "algorithm_parameter_contract": {
+      "moving_average_window": 8,
+      "exponential_smoothing_alpha": 0.3,
+      "linear_trend_window": 20,
+      "damped_holt_alpha_grid": [0.2, 0.5, 0.8],
+      "damped_holt_beta_grid": [0.1, 0.3, 0.6],
+      "damped_holt_phi_grid": [0.8, 0.9, 0.98],
+      "autoregressive_ridge_penalty": 1.0,
+      "candidate_lags": [1, 2, 4, 8],
+      "candidate_hurst_bounds": [0.05, 0.95],
+      "candidate_persistence_bounds": [-0.5, 1.0],
+      "authoritative_binding": "The model artifact SHA-256 is authoritative; these fields are a human-readable audit map and must agree with that artifact."
+    },
+    "seed_changes_allowed": false
+  },
+  "vintage_contract": {
+    "normalized_snapshot_schema": "time_series_source_native_source_snapshot.v2",
+    "raw_provider_response_retention_required": true,
+    "content_addressed_snapshot_required": true,
+    "production_custody_mode": "LIVE_PROVIDER_RESPONSE",
+    "test_fixture_admission_to_production_ledger_allowed": false,
+    "first_poll_missed_rule": "INVALID_NOT_SCOREABLE_NO_BACKFILL",
+    "provider_schema_change_rule": "INVALID_AFFECTED_ARM",
+    "calendar_or_cadence_change_rule": "INVALID_AFFECTED_ARM",
+    "revision_replacement_allowed": false
+  },
+  "ledger_contract": {
+    "prediction_schema": "time_series_source_native_sealed_prediction.v2",
+    "settlement_schema": "time_series_source_native_settlement.v2",
+    "operational_cycle_schema": "time_series_source_native_operational_cycle.v2",
+    "append_only": true,
+    "atomic_append_and_fsync_required": true,
+    "semantic_preflight_before_append_required": true,
+    "immediate_external_anchor_request_required": true,
+    "duplicate_prediction_key_allowed": false,
+    "replacement_allowed": false,
+    "settlement_must_reference_prediction_record_sha256": true,
+    "external_anchor_required": true,
+    "external_anchor_policy": "A local chain is collection custody only. Primary confirmatory scoring remains ineligible until each pre-release terminal hash has a verified independent timestamp or immutable external inclusion receipt.",
+    "local_seal_without_external_anchor_state": "SEALED_LOCAL_ONLY_NOT_CONFIRMATORY"
+  },
+  "analysis_contract": {
+    "contrast_count": 16,
+    "contrast_construction": "Candidate versus each of eight baselines separately within FRED and TWELVE_DATA source arms.",
+    "correction": "one_sided_holm_familywise",
+    "familywise_alpha": 0.05,
+    "forecast_cell": "source_series_horizon",
+    "target_counting_unit": "unique source, series, target period",
+    "overlap_policy": "Overlapping origins remain preserved. Inference synchronizes resampling by unique target period within source-series and never treats overlapping forecast rows as independent.",
+    "cell_weighting": "equal weight across eligible source-series-horizon cells after each cell aggregates unique targets",
+    "missing_target_rule": "Retain as missing and ineligible; no silent row compression or backfill.",
+    "fully_verified_join_only": true
+  },
+  "primary_endpoint": {
+    "metric": "relative_mean_absolute_error",
+    "formula": "rMAE = MAE_candidate / MAE_baseline",
+    "aggregation": "equal_weight_mean_log_ratio_across_source_series_horizon_cells",
+    "effect_floor": {
+      "maximum_rMAE": 0.95,
+      "minimum_relative_improvement": 0.05
+    },
+    "uncertainty_method": "synchronized_moving_block_bootstrap",
+    "bootstrap_replications": 20000,
+    "bootstrap_seed": 2026072901,
+    "confidence_level": 0.95,
+    "minimum_daily_block_sessions": 20,
+    "minimum_monthly_block_releases": 6
+  },
+  "sample_gates": {
+    "daily_arm": {
+      "minimum_future_eligible_sessions_per_series": 520,
+      "minimum_nonoverlapping_five_session_blocks": 104
+    },
+    "monthly_arm": {
+      "minimum_future_releases_per_series": 60
+    },
+    "coverage": {
+      "minimum_expected_calendar_fraction": 0.95,
+      "forward_fill_targets_allowed": false,
+      "silent_row_compression_allowed": false,
+      "duplicate_timestamps_allowed": false
+    },
+    "sample_gate_reduction_after_freeze_allowed": false
+  },
+  "decision_rule": {
+    "replicated_lead": "A source winner must repeat under the unchanged protocol in a second independently anchored prospective period before any bounded promotion claim.",
+    "source_winner": "The candidate must beat all eight source baselines after familywise correction, clear the five percent effect floor, have no source-series-horizon cell worse by more than five percent, and keep the p95 error ratio at or below 1.10.",
+    "cross_source_promotion": "A source winner must repeat in a second independent prospective period.",
+    "external_anchor_missing": "INVALID_NOT_SCOREABLE",
+    "first_vintage_missing": "INVALID_NOT_SCOREABLE",
+    "integrity_failure": "INVALID",
+    "insufficient_sample": "INCONCLUSIVE_WAITING_FOR_NEW_SOURCE_ROWS",
+    "primary_failure": "CORRESPONDING_CLAIM_FALSIFIED"
+  },
+  "frozen_artifacts": [
+    {
+      "path": "code/geometry_time_series_model_routing_benchmark.py",
+      "sha256": "2e7241ce62ae553fca28b695e98d3879080123e31639c3f930018cd0f90a925e"
+    },
+    {
+      "path": "code/time_series_source_native_prospective_collector.py",
+      "sha256": "acd79dffc196a4bab8181ad18570e4370ccd7ca191098d96c747c51ab4a25eb7"
+    }
+  ],
+  "current_state": {
+    "eligible_future_observation_count": 0,
+    "prediction_count": 0,
+    "settlement_count": 0,
+    "external_anchor_count": 0,
+    "promotion_decision": "WAITING_FOR_FIRST_SEAL",
+    "performance_claim_allowed": false,
+    "field_validation_claim_allowed": false,
+    "real_dollar_claim_allowed": false,
+    "live_execution_allowed": false
+  },
+  "claim_boundary": "A future complete pass would support only bounded prospective forecasting accuracy for the named sources, series, horizons, first-vintage rules, and periods. Local seals without an independently verified external timestamp remain non-confirmatory. Nothing here establishes trading alpha, field performance, realized savings, enterprise value, universal superiority, government approval, or deployment authority.",
+  "protocol_payload_sha256": "2f82f02cc3fb4f70f2ab51e6f896f559af1f6b03bb415ba6eaf29344fc45c2fc"
+}

@@ -1,0 +1,144 @@
+{
+  "schema": "eia_grid_hourly_hybrid_confirmation_protocol.v3",
+  "protocol_id": "EIA_GRID_HOURLY_HYBRID_CONFIRMATION_V3_20260802",
+  "version": 3,
+  "created_utc": "2026-08-02T09:24:17Z",
+  "status": "frozen_before_first_eligible_v3_prediction",
+  "purpose": "Prospectively test one constrained convex hybrid of the six already-sealed v2 direct-demand candidates on atomic eight-authority EIA-930 hourly panels.",
+  "design_disclosure": "The v3 experiment was initiated after observing that the existing v2 hard router had reached its preliminary sample count without a promotion result. No v2 prospective outcome is used to fit, weight, select, or alter the v3 formula. All v3 scoring targets begin strictly after this freeze.",
+  "design_boundary": "The v3 candidate, weight rule, issuance window, comparators, population, metrics, analysis suppression, gates, and v4-v5 succession rules are frozen before the first eligible v3 seal. Any prediction-affecting change starts a new protocol and a new future window.",
+  "parent_v2": {
+    "protocol_id": "EIA_GRID_ALL_AUTHORITY_DIRECT_HOURLY_20260716",
+    "protocol_path": "config/eia_grid_all_authority_direct_hourly_protocol_v2.json",
+    "protocol_sha256": "c10e0efb2b7d530728e36bac9a4a9293b4f9584d657c8058e30943d5d12a5abe",
+    "protocol_commit": "14795d5dd7058e9e8283ee88dd065b6da7f3d1e0",
+    "prediction_panel_chain_path": "out/eia_grid_all_authority_direct_hourly_router/sealed_prediction_panels.jsonl",
+    "settlement_panel_chain_path": "out/eia_grid_all_authority_direct_hourly_router/settlement_panels.jsonl",
+    "reuse_rule": "Consume only a hash-verified complete v2 panel that was sealed before its target interval, remains inside the v3 issuance window, and has no target actual at seal. Never backfill an earlier v2 panel."
+  },
+  "historical_design": {
+    "artifact_path": "evidence/external_validation/eia_grid_all_authority_direct_hourly_design_benchmark_20260716.json",
+    "artifact_sha256": "97f21742f1664af0fb7eacc50539e706919f5f731f7e8200f9eaade88e5a407f",
+    "validation_end_period_end_utc": "2026-07-13T23",
+    "permitted_use": "Use only the per-authority frozen validation mean scaled absolute errors to derive v3 weights.",
+    "outcome_exclusions": "Do not use any v2 or v3 prospective outcome, current leaderboard, or settlement count to choose or update weights."
+  },
+  "prospective_window": {
+    "first_allowed_period_end_utc": "2026-08-02T12",
+    "minimum_seal_lead_seconds": 3600,
+    "maximum_seal_lead_seconds": 7200,
+    "operational_shakeout_common_hours": 168,
+    "preliminary_common_hours": 720,
+    "confirmatory_common_hours": 2160,
+    "minimum_complete_utc_days": 90,
+    "target_end_period_end_utc": null,
+    "backfilled_predictions_allowed": false
+  },
+  "balancing_authorities": [
+    "CISO",
+    "ERCO",
+    "ISNE",
+    "MISO",
+    "NYIS",
+    "PJM",
+    "SWPP",
+    "TVA"
+  ],
+  "candidate": {
+    "id": "constrained_historical_inverse_square_blend_v3",
+    "input_candidates": [
+      "seasonal_naive_24",
+      "seasonal_naive_168",
+      "seasonal_blend_24_168",
+      "ridge_direct",
+      "xgboost_direct",
+      "lightgbm_direct"
+    ],
+    "weight_rule": "For each authority and declared input candidate, compute raw_weight=1/(frozen_historical_validation_mase^2), then normalize the six raw weights to sum to one.",
+    "constraints": {
+      "nonnegative_weights": true,
+      "weights_sum_to_one": true,
+      "authority_specific": true,
+      "prospective_weight_updates_allowed": false,
+      "dynamic_regime_switching_allowed": false,
+      "post_target_override_allowed": false
+    }
+  },
+  "comparators": {
+    "co_primary": [
+      "xgboost_direct",
+      "parent_v2_router"
+    ],
+    "secondary_fixed_candidates": [
+      "seasonal_naive_24",
+      "seasonal_naive_168",
+      "seasonal_blend_24_168",
+      "ridge_direct",
+      "lightgbm_direct"
+    ],
+    "comparison_population": "The same complete v3 authority-hour records only.",
+    "claim_rule": "A statement that v3 beats every baseline requires Holm correction across the full seven-comparator family."
+  },
+  "primary_estimand": {
+    "loss": "scaled_absolute_error using the parent v2 lag-only error scale frozen at prediction time",
+    "paired_delta": "comparator loss minus v3 loss; positive favors v3",
+    "aggregation": "Aggregate within authority and complete UTC day, then weight the eight authority-day means equally.",
+    "primary_population": "All eight declared authorities on complete 24-hour UTC days only, with no imputation or authority exclusion."
+  },
+  "inference": {
+    "scores_suppressed_before_confirmatory_window_close": true,
+    "bootstrap_draws": 20000,
+    "bootstrap_seed": 20260802,
+    "bootstrap_method": "Synchronized circular seven-day moving-block bootstrap over complete UTC days, preserving all authorities and comparator contrasts in each draw.",
+    "confidence_level": 0.95,
+    "multiplicity": "Holm adjustment across the two co-primary comparator contrasts.",
+    "minimum_relative_improvement": 0.01,
+    "minimum_authority_mean_wins": 6,
+    "minimum_utc_day_win_rate": 0.6,
+    "maximum_single_authority_scaled_error_regression": 0.05,
+    "maximum_tail_error_ratio": 1.1
+  },
+  "promotion_gates": {
+    "operational_shakeout": {
+      "minimum_common_hours": 168,
+      "promotion_allowed": false,
+      "performance_reporting_allowed": false
+    },
+    "preliminary": {
+      "minimum_common_hours": 720,
+      "promotion_allowed": false,
+      "performance_reporting_allowed": false
+    },
+    "confirmatory": {
+      "minimum_common_hours": 2160,
+      "minimum_complete_utc_days": 90,
+      "require_all_eight_authorities": true,
+      "require_zero_chain_failures": true,
+      "require_all_inference_thresholds": true,
+      "automatic_promotion_allowed": false
+    }
+  },
+  "custody": {
+    "require_atomic_all_authority_panel": true,
+    "require_verified_parent_prediction_chain": true,
+    "require_verified_parent_settlement_chain": true,
+    "bind_protocol_sha256": true,
+    "bind_runtime_sha256": true,
+    "bind_design_artifact_sha256": true,
+    "bind_parent_record_sha256": true,
+    "append_only": true,
+    "replacement_allowed": false,
+    "raw_provider_bytes_retained_by_v3": false,
+    "known_limitation": "v3 inherits parent source receipt and panel hashes but cannot reconstruct provider bytes that the parent did not retain. Independent v5 replication must retain content-addressed raw provider responses."
+  },
+  "succession": {
+    "v2": "Existing development and operational baseline; already active and preserved unchanged.",
+    "v3": "This newly frozen prospective confirmation of one constrained convex candidate.",
+    "v4": "Deferred temporal replication on the next disjoint 2160 common hours using the identical v3 executable and weights. It may start only after the v3 window closes and its result is frozen.",
+    "v5": "Deferred independent replication controlled by a named evaluator, with retained raw provider bytes, independent timestamps, accepted metrics, and a dated receipt.",
+    "v4_start_allowed_now": false,
+    "v5_start_allowed_now": false
+  },
+  "automatic_promotion_allowed": false,
+  "claim_boundary": "The existing v2 and new v3 are model protocol versions, not evidence maturity levels. V3 collection does not establish an improvement until the frozen future window and all confirmatory gates close. V4 requires a disjoint temporal replication and V5 requires an independent evaluator; neither can be truthfully completed now. No result establishes field performance, realized savings, grid reliability improvement, production readiness, trading edge, patent scope, or universal superiority."
+}
