@@ -215,8 +215,9 @@ function Refresh-MasterContextSnapshot {
     }
 }
 
-# 1) Hard reset swing hunter runtime to exactly one process
-Write-Host "[AUTO] Killing any duplicate swing hunter processes..."
+# 1) Stop any leftover legacy swing hunter process. The script is quarantined
+# and must not be restarted by this legacy autopilot.
+Write-Host "[AUTO] Stopping any leftover quarantined swing hunter process..."
 Get-CimInstance Win32_Process |
     Where-Object { $_.Name -eq "python.exe" -and $_.CommandLine -like "*kraken_swing_hunter.py*" } |
     ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
@@ -225,9 +226,7 @@ if (Test-Path $LOCK_FILE) {
     Remove-Item $LOCK_FILE -Force -ErrorAction SilentlyContinue
 }
 
-Write-Host "[AUTO] Starting one swing hunter process..."
-$bot = Start-Process -FilePath $PY -ArgumentList ".\kraken_swing_hunter.py" -WorkingDirectory $CODE -WindowStyle Minimized -PassThru
-Write-Host "[AUTO] Swing hunter PID: $($bot.Id)"
+Write-Warning "[AUTO] Legacy swing hunter is quarantined and will not be launched. Paper/replay safe-spine controls remain authoritative."
 
 # 1b) Ensure institutional crypto paper ticker is alive for elite presentation artifacts
 Ensure-InstitutionalTickerRunning
