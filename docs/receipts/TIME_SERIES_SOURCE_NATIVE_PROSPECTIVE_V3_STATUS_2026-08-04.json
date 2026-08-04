@@ -1,0 +1,56 @@
+{
+  "claim_boundary": "Version 2 is a nonconfirmatory pilot and supplies no performance evidence. A future complete version 3 pass would support only bounded prospective forecasting accuracy for the named sources, series, horizons, periods, custody rules, and decision rule. It would not establish trading alpha, field performance, realized savings, enterprise value, universal superiority, government approval, or deployment authority.",
+  "counts_by_series": {
+    "FRED:CPIAUCSL": {
+      "prediction_count": 3,
+      "settlement_count": 0,
+      "unique_target_period_count": 0
+    },
+    "FRED:DGS10": {
+      "prediction_count": 3,
+      "settlement_count": 0,
+      "unique_target_period_count": 0
+    },
+    "FRED:DGS2": {
+      "prediction_count": 3,
+      "settlement_count": 0,
+      "unique_target_period_count": 0
+    },
+    "FRED:UNRATE": {
+      "prediction_count": 3,
+      "settlement_count": 0,
+      "unique_target_period_count": 0
+    },
+    "TWELVE_DATA:AAPL": {
+      "prediction_count": 3,
+      "settlement_count": 0,
+      "unique_target_period_count": 0
+    }
+  },
+  "eligible_future_observation_count": 0,
+  "external_anchor_count": 0,
+  "externally_anchored_prediction_count": 0,
+  "field_validation_claim_allowed": false,
+  "generated_at_utc": "2026-08-04T11:50:51.576208Z",
+  "pending_external_anchor_request_count": 1,
+  "performance_claim_allowed": false,
+  "prediction_count": 15,
+  "prediction_terminal_sha256": "14d0d386cc1de6b6389826cbc4b0cd7c49f6becea600842ceac2e1cc234dd6d4",
+  "primary_inference_complete": false,
+  "primary_scoring_eligible_prediction_count": 0,
+  "promotion_decision": "INCONCLUSIVE_WAITING_FOR_NEW_SOURCE_ROWS",
+  "protocol_commit": "47380e82d9acb45dd5ca3401bf8611a6b431fddf",
+  "protocol_id": "LUMENCORE_TS_SOURCE_NATIVE_20260802_V3",
+  "protocol_payload_sha256": "8477ca6f94cfbf9233b9a7ec1cb68a8d8736862384540b4a0166a552fd8b55c3",
+  "real_dollar_claim_allowed": false,
+  "sample_gate_ready": false,
+  "schema": "time_series_source_native_prospective_status.v3",
+  "settlement_count": 0,
+  "settlement_terminal_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "state": "SEALED_AWAITING_FUTURE_OBSERVATIONS",
+  "status_sha256": "fbfb430f564941b7b1d75d16e2c41573127edfa35334e2f8949ad7341cfea1c8",
+  "terminal_anchor_request_present": true,
+  "trading_alpha_claim_allowed": false,
+  "unsettled_prediction_count": 15,
+  "verified_external_anchor_receipt_count": 0
+}

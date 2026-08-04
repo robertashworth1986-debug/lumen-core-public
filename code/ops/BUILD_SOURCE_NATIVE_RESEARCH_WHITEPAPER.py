@@ -18,9 +18,26 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 LEDGER_PATH = ROOT / "out" / "ops" / "source_native_family_baseline_ledger_latest.json"
-PROTOCOL_PATH = ROOT / "config" / "time_series_source_native_prospective_protocol_v1.json"
+PROTOCOL_PATH = ROOT / "config" / "time_series_source_native_prospective_protocol_v3.json"
 PROTOCOL_STATUS_PATH = (
-    ROOT / "out" / "ops" / "time_series_source_native_prospective_protocol_status.json"
+    ROOT
+    / "docs"
+    / "receipts"
+    / "TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_V3_STATUS_2026-08-04.json"
+)
+CUSTODY_METHOD_PATH = (
+    ROOT / "docs" / "TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_CUSTODY_V3_2026-08-02.md"
+)
+COLLECTOR_PATH = ROOT / "code" / "time_series_source_native_prospective_collector_v3.py"
+ANALYSIS_PATH = ROOT / "code" / "time_series_source_native_confirmatory_analysis_v3.py"
+ANALYSIS_REPORT_PATH = (
+    ROOT
+    / "out"
+    / "time_series_source_native_prospective_v3"
+    / "confirmatory_analysis_latest.json"
+)
+V2_CUSTODY_METHOD_PATH = (
+    ROOT / "docs" / "TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_CUSTODY_V2_2026-08-02.md"
 )
 MARKET_SIGNAL_KRAKEN_PANEL_PATH = (
     ROOT / "out" / "ops" / "market_signal_kraken_panel_benchmark_latest.json"
@@ -133,6 +150,82 @@ def file_receipt(path: Path) -> dict[str, Any]:
     }
 
 
+def verify_protocol(protocol: dict[str, Any]) -> bool:
+    expected = protocol.get("protocol_payload_sha256")
+    unsigned = {
+        key: value
+        for key, value in protocol.items()
+        if key != "protocol_payload_sha256"
+    }
+    if expected != stable_hash(unsigned):
+        return False
+    artifacts = protocol.get("frozen_artifacts")
+    if not isinstance(artifacts, list) or not artifacts:
+        return False
+    return all(
+        isinstance(item, dict)
+        and (ROOT / str(item.get("path", ""))).is_file()
+        and file_receipt(ROOT / str(item["path"]))["sha256"]
+        == item.get("sha256")
+        for item in artifacts
+    )
+
+
+def verify_protocol_status(status: dict[str, Any], protocol: dict[str, Any]) -> bool:
+    if status.get("schema") != "time_series_source_native_prospective_status.v3":
+        return False
+    expected = status.get("status_sha256")
+    unsigned = {key: value for key, value in status.items() if key != "status_sha256"}
+    if expected != stable_hash(unsigned):
+        return False
+    if status.get("protocol_id") != protocol.get("protocol_id"):
+        return False
+    if status.get("protocol_payload_sha256") != protocol.get("protocol_payload_sha256"):
+        return False
+    if status.get("state") != "SEALED_AWAITING_FUTURE_OBSERVATIONS":
+        return False
+    if status.get("primary_inference_complete") is not False:
+        return False
+    return all(
+        status.get(key) is False
+        for key in (
+            "performance_claim_allowed",
+            "trading_alpha_claim_allowed",
+            "field_validation_claim_allowed",
+            "real_dollar_claim_allowed",
+        )
+    )
+
+
+def load_protocol_status(protocol: dict[str, Any]) -> dict[str, Any]:
+    if PROTOCOL_STATUS_PATH.is_file():
+        status = read_json(PROTOCOL_STATUS_PATH)
+        if (
+            status.get("protocol_id") == protocol.get("protocol_id")
+            and status.get("protocol_payload_sha256")
+            == protocol.get("protocol_payload_sha256")
+        ):
+            return {
+                **status,
+                "verification_passed": (
+                    verify_protocol(protocol)
+                    and verify_protocol_status(status, protocol)
+                ),
+            }
+    current = protocol.get("current_state", {})
+    return {
+        "protocol_id": protocol.get("protocol_id"),
+        "protocol_payload_sha256": protocol.get("protocol_payload_sha256"),
+        "protocol_status": protocol.get("status"),
+        "state": protocol.get("status"),
+        "promotion_decision": current.get("promotion_decision"),
+        "eligible_future_observation_count": current.get(
+            "eligible_future_observation_count"
+        ),
+        "verification_passed": verify_protocol(protocol),
+    }
+
+
 def verify_ledger_hash(ledger: dict[str, Any]) -> bool:
     expected = ledger.get("ledger_sha256")
     material = {
@@ -156,7 +249,7 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
     at = at or now_utc()
     ledger = read_json(LEDGER_PATH)
     protocol = read_json(PROTOCOL_PATH)
-    protocol_status = read_json(PROTOCOL_STATUS_PATH)
+    protocol_status = load_protocol_status(protocol)
     market_panel = read_json(MARKET_SIGNAL_KRAKEN_PANEL_PATH)
     summary = ledger.get("summary")
     if not isinstance(summary, dict):
@@ -268,7 +361,7 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
 
     candidate = protocol.get("candidate")
     endpoint = protocol.get("primary_endpoint")
-    hypothesis = protocol.get("primary_hypothesis_family")
+    hypothesis = protocol.get("analysis_contract")
     sample_gates = protocol.get("sample_gates")
     if not all(
         isinstance(value, dict)
@@ -283,7 +376,7 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
         archived.append({**item, **receipt, "external_release_authorized": False})
 
     payload: dict[str, Any] = {
-        "schema": "lumencore.source_native_research_whitepaper.v1",
+        "schema": "lumencore.source_native_research_whitepaper.v2",
         "generated_utc": at.astimezone(timezone.utc).isoformat(),
         "title": (
             "Source-Native Benchmarking for Nature-Inspired Time-Series Families: "
@@ -294,6 +387,56 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
         "independently_validated": False,
         "external_release_authorized": False,
         "boundary": BOUNDARY,
+        "authorship": {
+            "responsible_author": "Robert Ashworth",
+            "affiliation": "LumenCore",
+            "responsibility_statement": (
+                "Robert Ashworth is responsible for the research question, protocol "
+                "ownership, interpretation, release decisions, and all scientific claims."
+            ),
+            "ai_assistance_disclosure": (
+                "Luma (OpenAI Codex) assisted with software implementation, test "
+                "scaffolding, literature lookup, quality assurance, and document "
+                "production. AI assistance is not evidence, is not listed as authorship, "
+                "and does not assume responsibility for the work."
+            ),
+        },
+        "research_integrity": {
+            "data_availability": (
+                "Raw provider responses, normalized snapshots, prediction ledgers, and "
+                "operational receipts are retained locally under append-only custody. "
+                "Public availability is not claimed."
+            ),
+            "code_availability": (
+                "Canonical code and protocol artifacts are identified by filename, byte "
+                "count, and SHA-256 receipt. A clean public release remains human-review "
+                "gated."
+            ),
+            "declaration_gate": (
+                "Funding and competing-interest declarations require responsible-author "
+                "confirmation before external release."
+            ),
+        },
+        "references": [
+            (
+                "Holm, S. (1979). A Simple Sequentially Rejective Multiple Test "
+                "Procedure. Scandinavian Journal of Statistics, 6(2), 65-70."
+            ),
+            (
+                "Kunsch, H. R. (1989). The Jackknife and the Bootstrap for General "
+                "Stationary Observations. The Annals of Statistics, 17(3), 1217-1241. "
+                "https://doi.org/10.1214/aos/1176347265"
+            ),
+            (
+                "White, H. (2000). A Reality Check for Data Snooping. Econometrica, "
+                "68(5), 1097-1126. https://doi.org/10.1111/1468-0262.00152"
+            ),
+            (
+                "Hyndman, R. J., and Koehler, A. B. (2006). Another Look at Measures "
+                "of Forecast Accuracy. International Journal of Forecasting, 22(4), "
+                "679-688. https://doi.org/10.1016/j.ijforecast.2006.03.001"
+            ),
+        ],
         "abstract": (
             "LumenCore registers candidate computational families inspired by natural "
             "forms, but does not treat inspiration as evidence. This note reports a "
@@ -456,7 +599,9 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
         },
         "prospective_protocol": {
             "protocol_id": protocol.get("protocol_id"),
-            "protocol_status": protocol_status.get("protocol_status"),
+            "protocol_status": protocol_status.get(
+                "state", protocol_status.get("protocol_status")
+            ),
             "promotion_decision": protocol_status.get("promotion_decision"),
             "eligible_future_observation_count": protocol_status.get(
                 "eligible_future_observation_count"
@@ -468,22 +613,40 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
                 "scientific_estimator_id"
             ),
             "candidate_description": candidate.get("description"),
-            "primary_sources": protocol.get("primary_sources"),
+            "primary_sources": [
+                {
+                    "source": source.get("source"),
+                    "series_ids": [
+                        series.get("series_id")
+                        for series in source.get("series", [])
+                    ],
+                }
+                for source in protocol.get("sources", [])
+                if isinstance(source, dict)
+            ],
             "contrast_count": hypothesis.get("contrast_count"),
             "correction": hypothesis.get("correction"),
             "familywise_alpha": hypothesis.get("familywise_alpha"),
             "primary_metric": endpoint.get("metric"),
-            "primary_metric_formula": endpoint.get("formula"),
+            "primary_metric_formula": endpoint.get(
+                "arm_contrast_estimate", endpoint.get("formula")
+            ),
             "effect_floor": endpoint.get("effect_floor"),
-            "uncertainty_method": endpoint.get("uncertainty_method"),
+            "uncertainty_method": endpoint.get(
+                "one_sided_upper_ci", endpoint.get("uncertainty_method")
+            ),
             "bootstrap_replications": endpoint.get("bootstrap_replications"),
             "sample_gates": sample_gates,
             "decision_rule": protocol.get("decision_rule"),
             "protocol_payload_sha256": protocol.get("protocol_payload_sha256"),
+            "external_anchor_required": protocol.get("ledger_contract", {}).get(
+                "external_anchor_required"
+            ),
         },
         "scientific_contribution": [
             "A source-native baseline contract that prevents cross-source or cadence-mismatched promotion.",
             "A custody gate that binds exact source snapshots before benchmark acceptance.",
+            "An append-only prediction-to-settlement chain with immediate external-anchor requests and fail-closed admission until an independent timestamp is verified.",
             "A clustered inference rule that avoids pseudoreplication from overlapping forecast origins and horizons.",
             "A full-family multiple-testing rule that prevents cherry-picking isolated wins.",
             "A future-only protocol with fixed endpoints, effect floor, sample gates, ablations, and falsification states.",
@@ -525,6 +688,10 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
                 "cannot yet support a prospective accuracy conclusion."
             ),
             (
+                "No independent timestamp receipt is present for Version 3; its 15 "
+                "local seals and pending RFC 3161 query remain non-confirmatory."
+            ),
+            (
                 "No result establishes universal superiority, field performance, "
                 "trading alpha, realized savings, customer acceptance, or deployment "
                 "authority."
@@ -533,7 +700,12 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
         "canonical_source_receipts": [
             file_receipt(LEDGER_PATH),
             file_receipt(PROTOCOL_PATH),
+            file_receipt(COLLECTOR_PATH),
+            file_receipt(ANALYSIS_PATH),
             file_receipt(PROTOCOL_STATUS_PATH),
+            file_receipt(ANALYSIS_REPORT_PATH),
+            file_receipt(CUSTODY_METHOD_PATH),
+            file_receipt(V2_CUSTODY_METHOD_PATH),
             file_receipt(MARKET_SIGNAL_KRAKEN_PANEL_PATH),
             file_receipt(ARC_SEAL_LOGO),
         ],
@@ -580,6 +752,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
         f"# {payload['title']}",
         "",
+        f"- Responsible author: **{payload['authorship']['responsible_author']}**",
+        f"- Affiliation: **{payload['authorship']['affiliation']}**",
         f"- Generated UTC: `{payload['generated_utc']}`",
         f"- Status: `{payload['status']}`",
         "- Peer reviewed: `false`",
@@ -648,6 +822,27 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Formula: `{prospective['primary_metric_formula']}`",
             f"- Contrasts: `{prospective['contrast_count']}`",
             f"- Correction: `{prospective['correction']}`",
+            (
+                "- Effect floor: arm-level geometric rMAE "
+                f"`<= {prospective['decision_rule']['effect_floor_max_rmae']}`; "
+                f"every cell rMAE `<= {prospective['decision_rule']['cell_rmae_max']}`; "
+                "candidate-to-baseline p95 absolute-error ratio "
+                f"`<= {prospective['decision_rule']['p95_error_ratio_max']}`"
+            ),
+            (
+                "- FRED gate: all 12 registered cells and at least "
+                f"`{prospective['sample_gates']['FRED']['minimum_joint_calendar_month_clusters']}` "
+                "joint calendar-month clusters"
+            ),
+            (
+                "- Twelve Data gate: all 3 registered cells and at least "
+                f"`{prospective['sample_gates']['TWELVE_DATA']['minimum_joint_exchange_week_clusters']}` "
+                "joint exchange-week clusters"
+            ),
+            (
+                "- Expected-calendar coverage: at least "
+                f"`{prospective['sample_gates']['minimum_expected_calendar_fraction'] * 100:.0f}%`"
+            ),
             f"- Protocol SHA-256: `{prospective['protocol_payload_sha256']}`",
             "",
             "## Scientific Contribution",
@@ -657,6 +852,26 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.extend(f"- {item}" for item in payload["scientific_contribution"])
     lines.extend(["", "## Limitations", ""])
     lines.extend(f"- {item}" for item in payload["limitations"])
+    lines.extend(
+        [
+            "",
+            "## Authorship and Research Integrity",
+            "",
+            payload["authorship"]["responsibility_statement"],
+            "",
+            f"**AI assistance disclosure.** {payload['authorship']['ai_assistance_disclosure']}",
+            "",
+            f"**Data availability.** {payload['research_integrity']['data_availability']}",
+            "",
+            f"**Code availability.** {payload['research_integrity']['code_availability']}",
+            "",
+            f"**Declaration gate.** {payload['research_integrity']['declaration_gate']}",
+            "",
+            "## Method References",
+            "",
+        ]
+    )
+    lines.extend(f"- {reference}" for reference in payload["references"])
     lines.extend(
         [
             "",
@@ -848,8 +1063,9 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
         topMargin=0.55 * inch,
         bottomMargin=0.7 * inch,
         title=payload["title"],
-        author="LumenCore",
+        author="Robert Ashworth, LumenCore",
         subject="Source-native benchmark and prospective validation protocol",
+        invariant=1,
     )
 
     snapshot = payload["current_snapshot"]
@@ -875,6 +1091,7 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
             "LumenCore Technical Note - Current Public-Safe Review Draft",
             styles["SubtitleLC"],
         ),
+        Paragraph("Robert Ashworth | LumenCore", styles["SubtitleLC"]),
         Table(
             [[Paragraph(payload["boundary"], styles["BodyLC"])]],
             colWidths=[6.9 * inch],
@@ -986,6 +1203,14 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
             ]
         )
     )
+    decision_rule = prospective["decision_rule"]
+    effect_floor_max_rmae = float(decision_rule["effect_floor_max_rmae"])
+    fred_gate = prospective["sample_gates"]["FRED"]
+    twelve_gate = prospective["sample_gates"]["TWELVE_DATA"]
+    minimum_expected_calendar_fraction = float(
+        prospective["sample_gates"]["minimum_expected_calendar_fraction"]
+    )
+
     story.extend(
         [
             snapshot_table,
@@ -1088,31 +1313,39 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
                     f"clear {prospective['contrast_count']} predeclared contrasts under "
                     f"{prospective['correction']} at familywise alpha "
                     f"{prospective['familywise_alpha']}. The maximum accepted rMAE is "
-                    f"{prospective['effect_floor']['maximum_rMAE']}, corresponding to "
-                    f"at least {prospective['effect_floor']['minimum_relative_improvement'] * 100:.0f} "
-                    "percent relative improvement."
+                    f"{effect_floor_max_rmae:.2f}, corresponding to at least "
+                    f"{(1.0 - effect_floor_max_rmae) * 100:.0f} percent relative "
+                    "improvement. Every cell must remain at or below rMAE "
+                    f"{float(decision_rule['cell_rmae_max']):.2f}, and the arm-level "
+                    "candidate-to-baseline p95 absolute-error ratio must remain at or "
+                    f"below {float(decision_rule['p95_error_ratio_max']):.2f}."
                 ),
                 styles["BodyLC"],
             ),
             Paragraph("Future-only sample gates", styles["H1LC"]),
         ]
     )
-    daily = prospective["sample_gates"]["daily_arm"]
-    monthly = prospective["sample_gates"]["monthly_arm"]
     for item in (
         (
-            f"Daily arm: at least {daily['minimum_future_eligible_sessions_per_series']} "
-            "future eligible sessions per series and "
-            f"{daily['minimum_nonoverlapping_five_session_blocks']} nonoverlapping "
-            "five-session blocks."
+            "FRED arm: all 12 registered source-series-horizon cells must be complete, "
+            f"with at least {fred_gate['minimum_joint_calendar_month_clusters']} joint "
+            "calendar-month clusters."
         ),
         (
-            f"Monthly arm: at least {monthly['minimum_future_releases_per_series']} "
-            "future releases per series."
+            "Twelve Data arm: all 3 registered AAPL horizon cells must be complete, "
+            f"with at least {twelve_gate['minimum_joint_exchange_week_clusters']} joint "
+            "exchange-week clusters."
         ),
         (
-            f"Uncertainty: {prospective['uncertainty_method']} with "
-            f"{prospective['bootstrap_replications']} frozen replications."
+            "Each arm must retain at least "
+            f"{minimum_expected_calendar_fraction * 100:.0f} percent of its expected "
+            "calendar; forward filling, silent row compression, and duplicate "
+            "timestamps are prohibited."
+        ),
+        (
+            "Uncertainty: synchronized circular moving-block bootstrap with "
+            f"{prospective['bootstrap_replications']} frozen replications and a "
+            "one-sided 95 percent basic-bootstrap upper confidence bound."
         ),
         "Sample gates cannot be reduced after freeze.",
     ):
@@ -1168,17 +1401,24 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
             Paragraph("Decision states", styles["H1LC"]),
         ]
     )
-    decision_rule = prospective["decision_rule"]
-    for key in (
-        "replicated_lead",
-        "source_winner",
-        "cross_source_promotion",
-        "integrity_failure",
-        "insufficient_sample",
-        "primary_failure",
-    ):
+    decision_states = (
+        ("First-period result", decision_rule["first_period_result"]),
+        ("Independent replication", decision_rule["replicated_result"]),
+        ("Cross-source promotion", decision_rule["cross_source_promotion"]),
+        (
+            "Fail-closed outcomes",
+            "missing external anchor = "
+            f"{decision_rule['external_anchor_missing']}; integrity failure = "
+            f"{decision_rule['integrity_failure']}; insufficient sample or incomplete "
+            f"arm = {decision_rule['incomplete_arm']}; primary failure = "
+            f"{decision_rule['primary_failure']}.",
+        ),
+    )
+    for label, description in decision_states:
         story.append(
-            Paragraph(f"- <b>{key}</b>: {decision_rule[key]}", styles["BulletLC"])
+            Paragraph(
+                f"- <b>{label}</b>: {description}", styles["BulletLC"]
+            )
         )
 
     story.extend(
@@ -1198,20 +1438,20 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
             Paragraph("Reproducibility receipts", styles["H1LC"]),
             Paragraph(
                 (
-                    "The ledger, prospective configuration, prospective status, and "
-                    "retrospective market panel are bound below. Hashes establish byte "
-                    "identity and custody only; they do not establish scientific "
-                    "correctness or external acceptance."
+                    "The ledger, frozen protocol, collector, confirmatory analysis, "
+                    "current status, and current analysis receipt are bound below. "
+                    "Hashes establish byte identity and custody only; they do not "
+                    "establish scientific correctness or external acceptance."
                 ),
                 styles["BodyLC"],
             ),
         ]
     )
     receipt_rows = []
-    for receipt in payload["canonical_source_receipts"][:4]:
+    for receipt in payload["canonical_source_receipts"][:6]:
         receipt_rows.append(
             [
-                Paragraph(receipt["path"], styles["ReceiptLC"]),
+                Paragraph(Path(receipt["path"]).name, styles["ReceiptLC"]),
                 Paragraph(str(receipt["bytes"]), styles["ReceiptLC"]),
                 Paragraph(receipt["sha256"], styles["ReceiptLC"]),
             ]
@@ -1244,6 +1484,42 @@ def build_pdf(payload: dict[str, Any], output_path: Path) -> None:
     story.extend(
         [
             receipt_table,
+            PageBreak(),
+            Paragraph("4. Authorship and Research Integrity", styles["TitleLC"]),
+            Paragraph("Responsible author", styles["H1LC"]),
+            Paragraph(
+                (
+                    f"<b>{payload['authorship']['responsible_author']}</b>, "
+                    f"{payload['authorship']['affiliation']}. "
+                    f"{payload['authorship']['responsibility_statement']}"
+                ),
+                styles["BodyLC"],
+            ),
+            Paragraph("AI assistance disclosure", styles["H1LC"]),
+            Paragraph(
+                payload["authorship"]["ai_assistance_disclosure"],
+                styles["BodyLC"],
+            ),
+            Paragraph("Availability and declarations", styles["H1LC"]),
+            Paragraph(
+                f"<b>Data.</b> {payload['research_integrity']['data_availability']}",
+                styles["BodyLC"],
+            ),
+            Paragraph(
+                f"<b>Code.</b> {payload['research_integrity']['code_availability']}",
+                styles["BodyLC"],
+            ),
+            Paragraph(
+                f"<b>Declarations.</b> {payload['research_integrity']['declaration_gate']}",
+                styles["BodyLC"],
+            ),
+            Paragraph("Method references", styles["H1LC"]),
+        ]
+    )
+    for reference in payload["references"]:
+        story.append(Paragraph(f"- {reference}", styles["BulletLC"]))
+    story.extend(
+        [
             Paragraph("Legacy concept-paper disposition", styles["H1LC"]),
             Paragraph(
                 (
@@ -1314,18 +1590,85 @@ def write_outputs(payload: dict[str, Any]) -> None:
     )
 
 
+def verify_outputs() -> dict[str, Any]:
+    manifest = read_json(OUTPUT_MANIFEST)
+    stored_manifest_sha256 = manifest.get("manifest_sha256")
+    unsealed_manifest = dict(manifest)
+    unsealed_manifest.pop("manifest_sha256", None)
+    if not isinstance(stored_manifest_sha256, str) or stable_hash(
+        unsealed_manifest
+    ) != stored_manifest_sha256:
+        raise WhitepaperError("Whitepaper manifest hash mismatch")
+
+    generated_utc = manifest.get("generated_utc")
+    if not isinstance(generated_utc, str):
+        raise WhitepaperError("Whitepaper manifest lacks generated_utc")
+    try:
+        generated_at = datetime.fromisoformat(generated_utc.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise WhitepaperError("Whitepaper manifest generated_utc is invalid") from exc
+
+    expected_payload = build_payload(generated_at)
+    stored_payload = {
+        key: value
+        for key, value in manifest.items()
+        if key not in {"generated_artifacts", "manifest_sha256"}
+    }
+    if stored_payload != expected_payload:
+        raise WhitepaperError("Whitepaper payload no longer matches canonical sources")
+
+    expected_paths = {
+        path.relative_to(ROOT).as_posix()
+        for path in (OUTPUT_MD, OUTPUT_PDF, UPLOAD_PDF, UPLOAD_README)
+    }
+    artifact_receipts = manifest.get("generated_artifacts")
+    if not isinstance(artifact_receipts, list):
+        raise WhitepaperError("Whitepaper manifest lacks generated artifact receipts")
+    observed_paths = {
+        item.get("path") for item in artifact_receipts if isinstance(item, dict)
+    }
+    if observed_paths != expected_paths:
+        raise WhitepaperError("Whitepaper generated artifact set mismatch")
+    for stored_receipt in artifact_receipts:
+        relative_path = stored_receipt.get("path")
+        if not isinstance(relative_path, str):
+            raise WhitepaperError("Whitepaper artifact receipt path is invalid")
+        artifact_path = (ROOT / relative_path).resolve()
+        try:
+            artifact_path.relative_to(ROOT.resolve())
+        except ValueError as exc:
+            raise WhitepaperError("Whitepaper artifact escapes the repository") from exc
+        current_receipt = file_receipt(artifact_path)
+        if current_receipt != stored_receipt:
+            raise WhitepaperError(
+                f"Whitepaper artifact receipt mismatch: {relative_path}"
+            )
+
+    expected_markdown = render_markdown(expected_payload) + "\n"
+    if OUTPUT_MD.read_text(encoding="utf-8") != expected_markdown:
+        raise WhitepaperError("Rendered Markdown does not match the sealed payload")
+    expected_readme = render_upload_readme(expected_payload) + "\n"
+    if UPLOAD_README.read_text(encoding="utf-8") != expected_readme:
+        raise WhitepaperError("Upload governance note does not match the sealed payload")
+    if OUTPUT_PDF.read_bytes() != UPLOAD_PDF.read_bytes():
+        raise WhitepaperError("Upload PDF is not byte-identical to the canonical PDF")
+    return expected_payload
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--as-of-utc")
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    at = (
-        datetime.fromisoformat(args.as_of_utc.replace("Z", "+00:00"))
-        if args.as_of_utc
-        else now_utc()
-    )
-    payload = build_payload(at)
-    if not args.check:
+    if args.check:
+        payload = verify_outputs()
+    else:
+        at = (
+            datetime.fromisoformat(args.as_of_utc.replace("Z", "+00:00"))
+            if args.as_of_utc
+            else now_utc()
+        )
+        payload = build_payload(at)
         write_outputs(payload)
     print(
         json.dumps(

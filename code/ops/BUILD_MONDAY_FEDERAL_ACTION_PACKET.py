@@ -28,8 +28,14 @@ ARC_SEAL_LOGO = ROOT / "assets" / "brand" / "lumaarc_eclipse_corona_concept_v1.p
 SOURCE_NATIVE_LEDGER = (
     ROOT / "out" / "ops" / "source_native_family_baseline_ledger_latest.json"
 )
+PROSPECTIVE_PROTOCOL = (
+    ROOT / "config" / "time_series_source_native_prospective_protocol_v3.json"
+)
 PROSPECTIVE_PROTOCOL_STATUS = (
-    ROOT / "out" / "ops" / "time_series_source_native_prospective_protocol_status.json"
+    ROOT
+    / "docs"
+    / "receipts"
+    / "TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_V3_STATUS_2026-08-04.json"
 )
 SCHEMA = "lumencore.monday_federal_action_packet.v1"
 CONFIG_SCHEMA = "lumencore.monday_federal_action_packet_config.v1"
@@ -125,6 +131,10 @@ def validate_config(config: dict[str, Any]) -> None:
     if not isinstance(profile, dict):
         raise PacketError("company_profile must be an object")
     validate_public_url(profile.get("public_domain", ""), "company public_domain")
+    validate_public_url(
+        profile.get("public_repository", ""),
+        "company public_repository",
+    )
     if not profile.get("truthful_prime_boundary"):
         raise PacketError("truthful_prime_boundary is required")
 
@@ -253,12 +263,53 @@ def validate_config(config: dict[str, Any]) -> None:
 
 def build_current_evidence_snapshot() -> dict[str, Any]:
     ledger = read_json(SOURCE_NATIVE_LEDGER)
+    protocol = read_json(PROSPECTIVE_PROTOCOL)
     prospective = read_json(PROSPECTIVE_PROTOCOL_STATUS)
     summary = ledger.get("summary")
     if not isinstance(summary, dict):
         raise PacketError("Source-native ledger summary is missing")
-    if prospective.get("verification_passed") is not True:
-        raise PacketError("Prospective protocol verification is not passing")
+    expected_protocol_hash = canonical_sha256(
+        {
+            key: value
+            for key, value in protocol.items()
+            if key != "protocol_payload_sha256"
+        }
+    )
+    if str(protocol.get("protocol_payload_sha256", "")).lower() != (
+        expected_protocol_hash.lower()
+    ):
+        raise PacketError("Version 3 prospective protocol hash is stale")
+    expected_status_hash = canonical_sha256(
+        {
+            key: value
+            for key, value in prospective.items()
+            if key != "status_sha256"
+        }
+    )
+    if str(prospective.get("status_sha256", "")).lower() != (
+        expected_status_hash.lower()
+    ):
+        raise PacketError("Version 3 prospective status hash is stale")
+    if prospective.get("schema") != "time_series_source_native_prospective_status.v3":
+        raise PacketError("Unexpected Version 3 prospective status schema")
+    if prospective.get("protocol_id") != protocol.get("protocol_id"):
+        raise PacketError("Version 3 prospective protocol id is stale")
+    if prospective.get("protocol_payload_sha256") != protocol.get(
+        "protocol_payload_sha256"
+    ):
+        raise PacketError("Version 3 prospective protocol receipt is stale")
+    if prospective.get("state") != "SEALED_AWAITING_FUTURE_OBSERVATIONS":
+        raise PacketError("Version 3 prospective status is not sealed")
+    if prospective.get("primary_inference_complete") is not False:
+        raise PacketError("Version 3 prospective inference state is unsafe")
+    for key in (
+        "performance_claim_allowed",
+        "trading_alpha_claim_allowed",
+        "field_validation_claim_allowed",
+        "real_dollar_claim_allowed",
+    ):
+        if prospective.get(key) is not False:
+            raise PacketError(f"Version 3 prospective claim control is unsafe: {key}")
 
     snapshot = {
         "registered_family_count": summary.get("registered_family_count"),
@@ -271,6 +322,12 @@ def build_current_evidence_snapshot() -> dict[str, Any]:
         "executed_direct_source_baseline_comparison_count": summary.get(
             "executed_direct_source_baseline_comparison_count"
         ),
+        "exploratory_direct_comparison_count": summary.get(
+            "exploratory_direct_comparison_count"
+        ),
+        "confirmatory_protocol_comparison_count": summary.get(
+            "confirmatory_protocol_comparison_count"
+        ),
         "promotion_gate_pass_count": summary.get(
             "internal_source_native_promotion_gate_pass_count"
         ),
@@ -278,13 +335,15 @@ def build_current_evidence_snapshot() -> dict[str, Any]:
             "individual_comparison_global_holm_positive_count"
         ),
         "prospective_protocol_id": prospective.get("protocol_id"),
-        "prospective_protocol_status": prospective.get("protocol_status"),
+        "prospective_protocol_status": prospective.get("state"),
         "prospective_promotion_decision": prospective.get(
             "promotion_decision"
         ),
         "eligible_future_observation_count": prospective.get(
             "eligible_future_observation_count"
         ),
+        "source_native_ledger_generated_utc": ledger.get("generated_utc"),
+        "prospective_protocol_generated_utc": prospective.get("generated_at_utc"),
         "performance_claim_allowed": False,
         "field_validation_claim_allowed": False,
         "real_dollar_claim_allowed": False,
@@ -293,6 +352,11 @@ def build_current_evidence_snapshot() -> dict[str, Any]:
                 "path": SOURCE_NATIVE_LEDGER.relative_to(ROOT).as_posix(),
                 "bytes": SOURCE_NATIVE_LEDGER.stat().st_size,
                 "sha256": sha256_file(SOURCE_NATIVE_LEDGER),
+            },
+            {
+                "path": PROSPECTIVE_PROTOCOL.relative_to(ROOT).as_posix(),
+                "bytes": PROSPECTIVE_PROTOCOL.stat().st_size,
+                "sha256": sha256_file(PROSPECTIVE_PROTOCOL),
             },
             {
                 "path": PROSPECTIVE_PROTOCOL_STATUS.relative_to(ROOT).as_posix(),
@@ -308,12 +372,21 @@ def build_current_evidence_snapshot() -> dict[str, Any]:
         "implementation_present_count",
         "implementation_required_count",
         "executed_direct_source_baseline_comparison_count",
+        "exploratory_direct_comparison_count",
+        "confirmatory_protocol_comparison_count",
         "promotion_gate_pass_count",
         "global_holm_positive_count",
         "eligible_future_observation_count",
     )
     if any(not isinstance(snapshot.get(key), int) for key in required_counts):
         raise PacketError("Current evidence snapshot has non-integer counts")
+    for key in (
+        "source_native_ledger_generated_utc",
+        "prospective_protocol_generated_utc",
+    ):
+        value = snapshot.get(key)
+        if not isinstance(value, str) or not value:
+            raise PacketError(f"Current evidence snapshot is missing {key}")
     return snapshot
 
 
@@ -973,16 +1046,21 @@ def build_capability_pdf(payload: dict[str, Any], output_path: Path) -> None:
             Paragraph("Fast Reviewer Questions", styles["H1LC"]),
         ]
     )
+    evidence = payload["current_evidence_snapshot"]
+    ledger_date = evidence["source_native_ledger_generated_utc"][:10]
+    prospective_date = evidence["prospective_protocol_generated_utc"][:10]
     qa_rows = [
         (
             "What is proven now?",
             (
-                "Reusable source, replay, receipt, conformance, and human-gate "
-                "software patterns; "
-                f"{payload['current_evidence_snapshot']['executed_direct_source_baseline_comparison_count']} "
-                "direct source-native comparisons are recorded with "
-                f"{payload['current_evidence_snapshot']['promotion_gate_pass_count']} "
-                "promoted champions."
+                "Present now: reusable source, replay, receipt, conformance, and "
+                f"human-gate software patterns. Snapshot {ledger_date}: "
+                f"{evidence['executed_direct_source_baseline_comparison_count']} "
+                "direct comparisons "
+                f"({evidence['exploratory_direct_comparison_count']} exploratory; "
+                f"{evidence['confirmatory_protocol_comparison_count']} confirmatory), "
+                f"{evidence['promotion_gate_pass_count']} internal promotion passes, "
+                f"and {evidence['global_holm_positive_count']} global Holm positives."
             ),
         ),
         (
@@ -992,9 +1070,10 @@ def build_capability_pdf(payload: dict[str, Any], output_path: Path) -> None:
         (
             "What can start safely?",
             (
-                "A bounded review sprint using public or buyer-authorized data, no "
-                "production control, and a frozen evaluation plan. The prospective "
-                "protocol is frozen and waiting for future observations."
+                "A bounded public or buyer-authorized data review with a frozen plan "
+                "and no production control. Named protocol snapshot "
+                f"{prospective_date}: {evidence['eligible_future_observation_count']} "
+                "eligible future observations; waiting for new source rows."
             ),
         ),
         (
@@ -1035,11 +1114,14 @@ def build_capability_pdf(payload: dict[str, Any], output_path: Path) -> None:
         [
             Paragraph("Contact and Action Boundary", styles["H1LC"]),
             Paragraph(
-                f"<b>Public domain:</b> {profile['public_domain']} | "
-                "<b>Identifiers:</b> use current reviewed company and SAM records.<br/>"
+                f"<b>Public repository:</b> {profile['public_repository']}<br/>"
+                f"<b>Public domain:</b> {profile['public_domain']} "
+                "(verify availability at action time; use the repository as the "
+                "stable code entry point).<br/>"
+                "<b>Identifiers:</b> use current reviewed company and SAM records; "
+                "private identifiers are omitted.<br/>"
                 "<b>External use:</b> requires a current notice check, source-bound "
-                "claim and duplicate review, and authorized human approval. This "
-                "public-safe statement omits private identifiers and is not an offer.",
+                "claim and duplicate review, and authorized human approval.",
                 styles["BodyLC"],
             ),
         ]

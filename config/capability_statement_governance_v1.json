@@ -90,10 +90,11 @@
       "dependencies": [
         "code/ops/BUILD_MONDAY_FEDERAL_ACTION_PACKET.py",
         "config/monday_federal_action_packet_v1.json",
+        "config/time_series_source_native_prospective_protocol_v3.json",
         "assets/brand/lumaarc_eclipse_corona_concept_v1.png",
         "tests/test_monday_federal_action_packet.py",
         "out/ops/source_native_family_baseline_ledger_latest.json",
-        "out/ops/time_series_source_native_prospective_protocol_status.json"
+        "docs/receipts/TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_V3_STATUS_2026-08-04.json"
       ]
     }
   ],

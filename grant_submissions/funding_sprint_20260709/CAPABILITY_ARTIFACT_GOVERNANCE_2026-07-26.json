@@ -23,7 +23,7 @@
       "artifact_type": "historical_capture_outline",
       "bytes": 6358,
       "claim_snapshot_refresh_required": true,
-      "deadline_closed": false,
+      "deadline_closed": true,
       "deadline_utc": "2026-08-03T23:59:59Z",
       "dependencies": [],
       "external_release_authorized": false,
@@ -42,7 +42,7 @@
       "artifact_type": "historical_pdf",
       "bytes": 3333,
       "claim_snapshot_refresh_required": true,
-      "deadline_closed": false,
+      "deadline_closed": true,
       "deadline_utc": "2026-08-03T23:59:59Z",
       "dependencies": [],
       "external_release_authorized": false,
@@ -91,20 +91,25 @@
     },
     {
       "artifact_type": "current_public_safe_pdf",
-      "bytes": 890365,
+      "bytes": 890573,
       "claim_snapshot_refresh_required": false,
       "deadline_closed": false,
       "deadline_utc": "",
       "dependencies": [
         {
-          "bytes": 44691,
+          "bytes": 48317,
           "path": "code/ops/BUILD_MONDAY_FEDERAL_ACTION_PACKET.py",
-          "sha256": "592B10BC192BC20ED4AA62626EB341A8AA5F18C7427ED8C837623464503EED81"
+          "sha256": "77315FE49FE5AE2704AE34EC029209D2F0D6BC324DA59DB25FD8AB3EAD3C063D"
         },
         {
-          "bytes": 19754,
+          "bytes": 19844,
           "path": "config/monday_federal_action_packet_v1.json",
-          "sha256": "3D322E18B940F416710822D80F35A001662E93E12B65F5F0E4FB8F96A9D779E9"
+          "sha256": "B2D3F8C3B56DBD3198E41A948DDE7305606958D5C7C4FCA7E60795D2C699807B"
+        },
+        {
+          "bytes": 24737,
+          "path": "config/time_series_source_native_prospective_protocol_v3.json",
+          "sha256": "824A6E6C9D1C22F54705BCAB651B1A675D72FCE5444864F8659BBD1C04972E8D"
         },
         {
           "bytes": 696635,
@@ -112,9 +117,9 @@
           "sha256": "1ED1C9B00E273AA9E781BD7FD0A4FCC3FC542257C6D294C8E8FBFADA500701AF"
         },
         {
-          "bytes": 9069,
+          "bytes": 10055,
           "path": "tests/test_monday_federal_action_packet.py",
-          "sha256": "A70557332A303AAE1E10865765F700F5AC9E8E4FDA0AE04944CC74DC2F72B027"
+          "sha256": "44BD897FF5E57A85875F230E78A454A86A863BB580F675BE2E684A6D85BA4C75"
         },
         {
           "bytes": 2244585,
@@ -122,9 +127,9 @@
           "sha256": "627D0ADD4D31514F7A47DBF8E8C51B0FA46DF72635F336133F54ABB85B00927A"
         },
         {
-          "bytes": 1108,
-          "path": "out/ops/time_series_source_native_prospective_protocol_status.json",
-          "sha256": "535F8494CAA6EF409E44BDC901B0423C287FF578BBC5876A2B48EC96D5F7E37D"
+          "bytes": 2452,
+          "path": "docs/receipts/TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_V3_STATUS_2026-08-04.json",
+          "sha256": "93A0F18D084B9AF4F3DD6D53A860514C5CBA75708FCFFF4AEEC0B411DE56C1C9"
         }
       ],
       "external_release_authorized": false,
@@ -133,11 +138,11 @@
       "path": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf",
       "required_text_markers": [],
       "send_eligible": false,
-      "sha256": "F7E9ED937196AEDC4AFDC22E2C51258DD0CF2225200D5EAB931DA9BFEF16C03B",
+      "sha256": "4B3F8BB48FAC7191388617262CDDE9C48C74B274A83BBE3BDF6F612EBE142DC1",
       "status": "CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED"
     }
   ],
-  "as_of_utc": "2026-07-30T04:05:04.890145Z",
+  "as_of_utc": "2026-08-04T11:50:51Z",
   "blockers": {
     "marker_failures": [],
     "missing_artifacts": [],
@@ -145,7 +150,7 @@
     "unregistered_artifacts": []
   },
   "claim_boundary": "This registry governs local capability artifacts and detects stale or unregistered packets. It does not establish eligibility, responsiveness, agency trust, certification, past performance, independent validation, submission, receipt, selection, award, or authority to contact an external party.",
-  "control_sha256": "347338C3386BB62DC6C31363373EBF6C88EC8AE8C9858CCB6F8A2DBD1F87E82C",
+  "control_sha256": "320563293E92652538102242B1262E36AE645256457BE1AF917B6644ACFBA80B",
   "controls": {
     "action_time_human_approval_required": true,
     "autonomous_email_send_allowed": false,

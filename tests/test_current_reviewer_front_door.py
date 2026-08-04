@@ -52,8 +52,17 @@ def test_current_reviewer_front_door_is_fail_closed_and_hash_backed():
     assert summary["market_signal_panel_promoted_candidate_count"] == 0
     assert summary["promoted_champion_count"] == 0
     assert summary["eligible_future_observation_count"] == 0
-    assert summary["artifact_count"] == 13
+    assert summary["artifact_count"] == 16
     assert summary["external_release_authorized_count"] == 0
+    assert summary["product_lane_count"] == 7
+    assert summary["buyer_ready_product_lane_count"] == 0
+    assert summary["commercial_lane_id"] == "prooflock_opportunity_ops"
+    assert summary["commercial_lane_internal_strategy_score"] == 89.6
+    assert summary["hypercore_rank"] == 4
+    assert summary["hypercore_internal_strategy_score"] == 69.7
+    assert summary["public_endpoint_count"] == 4
+    assert summary["public_endpoint_passed_count"] == 0
+    assert summary["public_release_allowed"] is False
     assert summary["public_artifact_upstream_dependency_fresh_count"] == 4
     assert summary["human_release_review_required"] is True
 
@@ -66,6 +75,7 @@ def test_current_reviewer_front_door_is_fail_closed_and_hash_backed():
 
     controls = payload["release_controls"]
     assert controls["external_release_authorized"] is False
+    assert controls["vps_public_release_allowed"] is False
     assert controls["autonomous_send_or_submit_allowed"] is False
     assert len(payload["front_door_sha256"]) == 64
     assert payload["outputs"]["public_artifact_manifest"].startswith(
@@ -77,6 +87,10 @@ def test_current_reviewer_front_door_is_fail_closed_and_hash_backed():
         "lumencore.current_reviewer_public_artifact_manifest.v1"
     )
     assert manifest["artifact_count"] == 4
+    assert manifest["receipt_time_semantics"] == (
+        "artifact_set_only_observation_time_excluded"
+    )
+    assert "as_of_utc" not in manifest
     assert manifest["all_upstream_dependencies_fresh"] is True
     assert manifest["external_release_authorized"] is False
     assert manifest["network_action_performed"] is False
@@ -107,6 +121,19 @@ def test_current_reviewer_front_door_is_fail_closed_and_hash_backed():
     assert len(manifest["manifest_sha256"]) == 64
 
 
+def test_public_artifact_manifest_is_stable_across_observation_times():
+    module = load_module()
+    first = module.build_public_artifact_manifest(
+        module.build_payload("2026-08-02T17:00:00Z")
+    )
+    second = module.build_public_artifact_manifest(
+        module.build_payload("2026-08-02T18:00:00Z")
+    )
+
+    assert first == second
+    assert "as_of_utc" not in first
+
+
 def test_current_reviewer_front_door_renders_only_bounded_claims():
     module = load_module()
     payload = module.build_payload("2026-07-29T10:20:00Z")
@@ -126,6 +153,12 @@ def test_current_reviewer_front_door_renders_only_bounded_claims():
     assert "Kraken-panel all-baseline mean winners: `0`" in rendered
     assert "Promoted champions: `0`" in rendered
     assert "Eligible future observations: `0`" in rendered
+    assert "First commercial lane: `prooflock_opportunity_ops`" in rendered
+    assert "Buyer-ready product lanes: `0`" in rendered
+    assert "HyperCore rank: `4`" in rendered
+    assert "Public endpoints passing: `0` of `4`" in rendered
+    assert "Public release allowed: `false`" in rendered
+    assert "WhiteHole posture: historical archive" in rendered
     assert "External release authorized: `false`" in rendered
     assert "does not establish model superiority, alpha, field performance" in rendered
 

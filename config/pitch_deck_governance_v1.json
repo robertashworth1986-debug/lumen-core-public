@@ -72,6 +72,7 @@
         "0 global Holm-positive comparisons",
         "0 promoted champions",
         "Zero eligible future observations today",
+        "V3 protocol LUMENCORE_TS_SOURCE_NATIVE_20260802_V3 is sealed and awaiting future observations.",
         "No pricing, paid customer, savings, or contract is claimed."
       ],
       "banned_text_markers": [
@@ -83,12 +84,15 @@
         "$60k-$150k / yr",
         "Modeled positive EBITDA",
         "Launch Tennessee",
-        "3686"
+        "3686",
+        "LUMENCORE_TS_SOURCE_NATIVE_20260729_V1"
       ],
       "dependencies": [
         "docs/LUMENCORE_SOURCE_NATIVE_BENCHMARK_WHITEPAPER_CURRENT.md",
+        "out/ops/source_native_research_whitepaper_manifest_latest.json",
         "config/prooflock_opportunity_ops_pilot_v1.json",
-        "config/time_series_source_native_prospective_protocol_v1.json",
+        "config/time_series_source_native_prospective_protocol_v3.json",
+        "docs/TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_CUSTODY_V3_2026-08-02.md",
         "out/ops/market_signal_source_native_benchmark_latest.json",
         "out/ops/source_native_family_baseline_ledger_latest.json",
         "out/ops/time_series_source_native_prospective_protocol_status.json"
@@ -105,15 +109,39 @@
       "dependencies": []
     },
     {
-      "id": "launchtn_3686_current_review_deck",
+      "id": "launchtn_3686_20260729_review_deck",
       "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-07-29_REVIEW_REQUIRED.pptx",
-      "status": "APPLICATION_SPECIFIC_REVIEW_REQUIRED_DO_NOT_SEND",
+      "status": "HISTORICAL_APPLICATION_SPECIFIC_DO_NOT_SEND",
       "external_release_authorized": false,
       "send_eligible": false,
       "required_text_markers": [],
       "banned_text_markers": [],
       "dependencies": [
         "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-07-29.json"
+      ]
+    },
+    {
+      "id": "launchtn_3686_current_review_deck",
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-08-02_REVIEW_REQUIRED.pptx",
+      "status": "APPLICATION_SPECIFIC_REVIEW_REQUIRED_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false,
+      "required_text_markers": [],
+      "banned_text_markers": [],
+      "dependencies": [
+        "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-08-02.json"
+      ]
+    },
+    {
+      "id": "launchtn_3686_current_unmarked_duplicate",
+      "path": "grant_submissions/LAUNCHTN_3686_PITCH_2026/LUMENCORE_3686_PITCH_DECK_2026-08-02.pptx",
+      "status": "APPLICATION_SPECIFIC_REVIEW_REQUIRED_DO_NOT_SEND",
+      "external_release_authorized": false,
+      "send_eligible": false,
+      "required_text_markers": [],
+      "banned_text_markers": [],
+      "dependencies": [
+        "grant_submissions/LAUNCHTN_3686_PITCH_2026/LAUNCHTN_3686_APPLICATION_MANIFEST_2026-08-02.json"
       ]
     },
     {
@@ -139,6 +167,16 @@
     {
       "id": "darpa_quad_chart_template",
       "path": "grant_submissions/DPA26BZ04_DV016_FALCON/source_attachments/DARPA_TECHNICAL_SUMMARY_QUAD_CHART_TEMPLATE_2025-01.pptx",
+      "status": "SOURCE_TEMPLATE_NOT_A_LUMENCORE_DECK",
+      "external_release_authorized": false,
+      "send_eligible": false,
+      "required_text_markers": [],
+      "banned_text_markers": [],
+      "dependencies": []
+    },
+    {
+      "id": "darpa_dice_proposal_summary_template",
+      "path": "grant_submissions/DARPA_DICE_2026/OFFICIAL/P3_-_DICE_Proposal_Summary_Slide_Template.pptx",
       "status": "SOURCE_TEMPLATE_NOT_A_LUMENCORE_DECK",
       "external_release_authorized": false,
       "send_eligible": false,

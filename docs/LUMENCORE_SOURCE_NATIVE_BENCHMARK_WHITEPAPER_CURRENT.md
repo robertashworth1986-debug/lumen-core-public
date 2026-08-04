@@ -1,6 +1,8 @@
 # Source-Native Benchmarking for Nature-Inspired Time-Series Families: A Fail-Closed Experimental Protocol
 
-- Generated UTC: `2026-07-30T03:32:40+00:00`
+- Responsible author: **Robert Ashworth**
+- Affiliation: **LumenCore**
+- Generated UTC: `2026-08-04T11:50:51.576208+00:00`
 - Status: `CURRENT_PUBLIC_SAFE_HUMAN_REVIEW_REQUIRED`
 - Peer reviewed: `false`
 - Independently validated: `false`
@@ -58,22 +60,27 @@ The former FRED and TWELVE_DATA subset leads are retired because they do not sur
 
 ## Frozen Prospective Protocol
 
-- Protocol: `LUMENCORE_TS_SOURCE_NATIVE_20260729_V1`
-- Status: `FROZEN_AWAITING_FUTURE_OBSERVATIONS`
-- Decision: `WAITING_FOR_NEW_SOURCE_ROWS`
+- Protocol: `LUMENCORE_TS_SOURCE_NATIVE_20260802_V3`
+- Status: `SEALED_AWAITING_FUTURE_OBSERVATIONS`
+- Decision: `INCONCLUSIVE_WAITING_FOR_NEW_SOURCE_ROWS`
 - Eligible future observations: `0`
 - Candidate label: `fractal_brownian_surface`
 - Scientific estimator: `hurst_conditioned_multiscale_increment_heuristic_v1`
-- Metric: `relative_mean_absolute_error`
-- Formula: `rMAE = MAE_candidate / MAE_baseline`
+- Metric: `equal_cell_mean_log_relative_mean_absolute_error`
+- Formula: `theta_hat(s,b) = arithmetic mean over all fixed cells c in source arm s of log(rMAE(c,b)); every cell has equal weight.`
 - Contrasts: `16`
-- Correction: `one_sided_holm_familywise`
-- Protocol SHA-256: `980ebaa821212965bffe04334df8c19f1a03e12acac7d9d04f38f21f03b0e1e5`
+- Correction: `Holm step-down across all 16 raw one-sided p-values`
+- Effect floor: arm-level geometric rMAE `<= 0.95`; every cell rMAE `<= 1.05`; candidate-to-baseline p95 absolute-error ratio `<= 1.1`
+- FRED gate: all 12 registered cells and at least `60` joint calendar-month clusters
+- Twelve Data gate: all 3 registered cells and at least `104` joint exchange-week clusters
+- Expected-calendar coverage: at least `95%`
+- Protocol SHA-256: `8477ca6f94cfbf9233b9a7ec1cb68a8d8736862384540b4a0166a552fd8b55c3`
 
 ## Scientific Contribution
 
 - A source-native baseline contract that prevents cross-source or cadence-mismatched promotion.
 - A custody gate that binds exact source snapshots before benchmark acceptance.
+- An append-only prediction-to-settlement chain with immediate external-anchor requests and fail-closed admission until an independent timestamp is verified.
 - A clustered inference rule that avoids pseudoreplication from overlapping forecast origins and horizons.
 - A full-family multiple-testing rule that prevents cherry-picking isolated wins.
 - A future-only protocol with fixed endpoints, effect floor, sample gates, ablations, and falsification states.
@@ -89,7 +96,27 @@ The former FRED and TWELVE_DATA subset leads are retired because they do not sur
 - The 12-pair Kraken panel meets the exploratory pair-count floor, but pair-level signs share one exchange and overlapping market timestamps. Independence is therefore unconfirmed, and its one narrow Holm-positive comparison is not confirmatory alpha or edge.
 - The panel's narrow trend-versus-ridge result is not a promotion: the same candidate loses on mean to the other three registered baselines, and no candidate clears the complete four-baseline set.
 - The prospective protocol has zero eligible future observations and cannot yet support a prospective accuracy conclusion.
+- No independent timestamp receipt is present for Version 3; its 15 local seals and pending RFC 3161 query remain non-confirmatory.
 - No result establishes universal superiority, field performance, trading alpha, realized savings, customer acceptance, or deployment authority.
+
+## Authorship and Research Integrity
+
+Robert Ashworth is responsible for the research question, protocol ownership, interpretation, release decisions, and all scientific claims.
+
+**AI assistance disclosure.** Luma (OpenAI Codex) assisted with software implementation, test scaffolding, literature lookup, quality assurance, and document production. AI assistance is not evidence, is not listed as authorship, and does not assume responsibility for the work.
+
+**Data availability.** Raw provider responses, normalized snapshots, prediction ledgers, and operational receipts are retained locally under append-only custody. Public availability is not claimed.
+
+**Code availability.** Canonical code and protocol artifacts are identified by filename, byte count, and SHA-256 receipt. A clean public release remains human-review gated.
+
+**Declaration gate.** Funding and competing-interest declarations require responsible-author confirmation before external release.
+
+## Method References
+
+- Holm, S. (1979). A Simple Sequentially Rejective Multiple Test Procedure. Scandinavian Journal of Statistics, 6(2), 65-70.
+- Kunsch, H. R. (1989). The Jackknife and the Bootstrap for General Stationary Observations. The Annals of Statistics, 17(3), 1217-1241. https://doi.org/10.1214/aos/1176347265
+- White, H. (2000). A Reality Check for Data Snooping. Econometrica, 68(5), 1097-1126. https://doi.org/10.1111/1468-0262.00152
+- Hyndman, R. J., and Koehler, A. B. (2006). Another Look at Measures of Forecast Accuracy. International Journal of Forecasting, 22(4), 679-688. https://doi.org/10.1016/j.ijforecast.2006.03.001
 
 ## Legacy Concept-Paper Disposition
 
@@ -97,4 +124,4 @@ The prior BioGeometry, scalar-field, bioresonance, cooling-savings, zero-point, 
 
 ## Receipt
 
-- Whitepaper payload SHA-256: `df603bae68cc4d053f0956d44eda0a4997e5c2a2cf8b992cd7871e2cf424e3a2`
+- Whitepaper payload SHA-256: `54473978deec35e4fa61c68eb7d5c71521316fab1e1d637b4de11f90fa284aa6`

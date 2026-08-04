@@ -43,6 +43,9 @@ def test_config_is_fail_closed_and_uses_official_sources():
     assert (
         config["controls"]["source_set_completeness_required_for_ready_state"] is True
     )
+    assert config["company_profile"]["public_repository"] == (
+        "https://github.com/robertashworth1986-debug/lumen-core-public"
+    )
     assert len(config["opportunities"]) == 5
     for opportunity in config["opportunities"]:
         assert opportunity["official_url"].startswith("https://sam.gov/")
@@ -87,13 +90,29 @@ def test_packet_has_no_ready_prime_or_partner_response():
     assert snapshot["registered_family_count"] == 140
     assert snapshot["implementation_present_count"] == 35
     assert snapshot["executed_direct_source_baseline_comparison_count"] == 126
+    assert snapshot["exploratory_direct_comparison_count"] == 120
+    assert snapshot["confirmatory_protocol_comparison_count"] == 6
     assert snapshot["promotion_gate_pass_count"] == 0
     assert snapshot["global_holm_positive_count"] == 0
+    assert snapshot["source_native_ledger_generated_utc"].startswith("2026-07-29")
+    assert snapshot["prospective_protocol_generated_utc"].startswith("2026-08-04")
     assert snapshot["prospective_protocol_status"] == (
-        "FROZEN_AWAITING_FUTURE_OBSERVATIONS"
+        "SEALED_AWAITING_FUTURE_OBSERVATIONS"
     )
     assert snapshot["performance_claim_allowed"] is False
     assert all(len(receipt["sha256"]) == 64 for receipt in snapshot["source_receipts"])
+
+
+def test_packet_rejects_a_tampered_v3_prospective_status(tmp_path, monkeypatch):
+    module = load_module()
+    status = json.loads(module.PROSPECTIVE_PROTOCOL_STATUS.read_text(encoding="utf-8"))
+    status["status_sha256"] = "0" * 64
+    stale = tmp_path / "prospective_status_latest.json"
+    stale.write_text(json.dumps(status), encoding="utf-8")
+    monkeypatch.setattr(module, "PROSPECTIVE_PROTOCOL_STATUS", stale)
+
+    with pytest.raises(module.PacketError, match="status hash is stale"):
+        module.build_current_evidence_snapshot()
 
 
 def test_csdr_future_partner_route_is_blocked_with_frozen_source_receipts():

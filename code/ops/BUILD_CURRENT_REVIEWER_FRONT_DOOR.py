@@ -56,7 +56,10 @@ MARKET_SIGNAL_KRAKEN_PANEL = (
     ROOT / "out" / "ops" / "market_signal_kraken_panel_benchmark_latest.json"
 )
 PROSPECTIVE_STATUS = (
-    ROOT / "out" / "ops" / "time_series_source_native_prospective_protocol_status.json"
+    ROOT
+    / "docs"
+    / "receipts"
+    / "TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_V3_STATUS_2026-08-04.json"
 )
 COMMAND_BOARD = (
     ROOT / "out" / "ops" / "near_deadline_submission_command_board_latest.json"
@@ -67,6 +70,11 @@ EXTERNAL_ACTION_LEDGER = (
     / "portfolio_external_action_ledger"
     / "portfolio_external_action_ledger_latest.json"
 )
+PRODUCT_PRIORITY = ROOT / "out" / "ops" / "product_lane_priority_engine_latest.json"
+VPS_PUBLIC_RELEASE_AUDIT = (
+    ROOT / "out" / "ops" / "vps_public_release_security_audit_latest.json"
+)
+WHITEHOLE_AUDIT = ROOT / "docs" / "WHITEHOLE_WHITEHOLELAB_AUDIT_2026-08-02.md"
 
 SCHEMA = "lumencore.current_reviewer_front_door.v1"
 STATUS = "CURRENT_REVIEWER_FRONT_DOOR_READY_HUMAN_RELEASE_REQUIRED"
@@ -285,6 +293,8 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
     prospective = read_json(PROSPECTIVE_STATUS)
     command_board = read_json(COMMAND_BOARD)
     external_actions = read_json(EXTERNAL_ACTION_LEDGER)
+    product_priority = read_json(PRODUCT_PRIORITY)
+    vps_public_release = read_json(VPS_PUBLIC_RELEASE_AUDIT)
 
     if capability.get("schema") != "lumencore.capability_statement_governance.v1":
         raise FrontDoorError("Capability-statement governance schema mismatch")
@@ -330,7 +340,7 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
         label="pitch_deck_governance",
     )
 
-    if whitepaper.get("schema") != "lumencore.source_native_research_whitepaper.v1":
+    if whitepaper.get("schema") != "lumencore.source_native_research_whitepaper.v2":
         raise FrontDoorError("Whitepaper manifest schema mismatch")
     whitepaper_artifact = next(
         (
@@ -380,7 +390,20 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
     if (
         source_native.get("summary", {}).get("public_performance_claim_allowed")
         is not False
+        or prospective.get("schema")
+        != "time_series_source_native_prospective_status.v3"
+        or prospective.get("state") != "SEALED_AWAITING_FUTURE_OBSERVATIONS"
         or prospective.get("eligible_future_observation_count") != 0
+        or prospective.get("primary_inference_complete") is not False
+        or any(
+            prospective.get(key) is not False
+            for key in (
+                "performance_claim_allowed",
+                "trading_alpha_claim_allowed",
+                "field_validation_claim_allowed",
+                "real_dollar_claim_allowed",
+            )
+        )
     ):
         raise FrontDoorError("Evidence boundary is not fail closed")
     market_negative = market_signal.get("negative_result_summary", {})
@@ -453,6 +476,66 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
     ):
         raise FrontDoorError("External-action ledger is not reconciled")
 
+    ranking = product_priority.get("ranking")
+    recommendation = product_priority.get("recommendation")
+    if (
+        product_priority.get("schema") != "product_lane_priority_engine_v1"
+        or not isinstance(ranking, list)
+        or len(ranking) < 2
+        or not isinstance(recommendation, dict)
+    ):
+        raise FrontDoorError("Product-lane priority evidence is missing or stale")
+    ranked_by_id = {
+        str(row.get("id")): row
+        for row in ranking
+        if isinstance(row, dict)
+    }
+    commercial_lane = ranked_by_id.get("prooflock_opportunity_ops")
+    hypercore_lane = ranked_by_id.get(
+        "hypercore_readonly_resilience_evaluation"
+    )
+    if (
+        commercial_lane is None
+        or commercial_lane.get("rank") != 1
+        or recommendation.get("commercial_lane")
+        != "prooflock_opportunity_ops"
+        or hypercore_lane is None
+        or hypercore_lane.get("rank") != 4
+    ):
+        raise FrontDoorError("Product-lane ranking no longer matches the review contract")
+    buyer_ready_lane_count = sum(
+        row.get("buyer_readiness_gate", {}).get("passed") is True
+        for row in ranking
+        if isinstance(row, dict)
+    )
+    if buyer_ready_lane_count != 0:
+        raise FrontDoorError(
+            "A buyer-ready product claim requires a new external validation review"
+        )
+
+    release_summary = vps_public_release.get("summary")
+    if (
+        vps_public_release.get("schema")
+        != "lumencore.vps_public_release_security_audit.v1"
+        or not isinstance(release_summary, dict)
+        or release_summary.get("public_release_allowed") is not False
+        or release_summary.get("vps_mutation_allowed") is not False
+        or release_summary.get("status") != "BLOCKED"
+    ):
+        raise FrontDoorError(
+            "VPS public-release state requires a new release-authority review"
+        )
+    if not WHITEHOLE_AUDIT.is_file():
+        raise FrontDoorError("WhiteHole archive-boundary audit is missing")
+    whitehole_text = WHITEHOLE_AUDIT.read_text(encoding="utf-8")
+    for marker in (
+        "WhiteHole is useful as historical custody",
+        "Neither currently establishes forecasting",
+        "Keep WhiteHole frozen as an archive.",
+    ):
+        if marker not in whitehole_text:
+            raise FrontDoorError("WhiteHole archive-boundary audit is stale")
+
     artifacts = [
         artifact_row(
             "current_capability_statement",
@@ -500,7 +583,7 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             "prospective_protocol_status",
             "future_only_validation_gate",
             PROSPECTIVE_STATUS,
-            str(prospective.get("protocol_status", "UNKNOWN")),
+            str(prospective.get("state", "UNKNOWN")),
         ),
         artifact_row(
             "near_deadline_submission_command_board",
@@ -532,6 +615,24 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             WHITEPAPER_MANIFEST,
             str(whitepaper.get("status", "UNKNOWN")),
         ),
+        artifact_row(
+            "product_lane_priority_engine",
+            "commercialization_priority_and_buyer_gate",
+            PRODUCT_PRIORITY,
+            "INTERNAL_PRIORITY_ONLY_EXTERNAL_BUYER_VALIDATION_REQUIRED",
+        ),
+        artifact_row(
+            "vps_public_release_security_audit",
+            "publication_and_transport_gate",
+            VPS_PUBLIC_RELEASE_AUDIT,
+            str(release_summary.get("status", "UNKNOWN")),
+        ),
+        artifact_row(
+            "whitehole_archive_boundary_audit",
+            "historical_archive_and_claim_boundary",
+            WHITEHOLE_AUDIT,
+            "HISTORICAL_ARCHIVE_ONLY_DO_NOT_PROMOTE",
+        ),
     ]
     release_bindings = public_release_bindings(artifacts)
     upstream_dependency_freshness = {
@@ -558,6 +659,23 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             "promoted_champion_count": 0,
             "artifact_count": len(artifacts),
             "external_release_authorized_count": 0,
+            "product_lane_count": len(ranking),
+            "buyer_ready_product_lane_count": buyer_ready_lane_count,
+            "commercial_lane_id": commercial_lane["id"],
+            "commercial_lane_internal_strategy_score": commercial_lane[
+                "strategy_score"
+            ],
+            "hypercore_rank": hypercore_lane["rank"],
+            "hypercore_internal_strategy_score": hypercore_lane[
+                "strategy_score"
+            ],
+            "public_endpoint_count": release_summary.get(
+                "public_endpoint_count"
+            ),
+            "public_endpoint_passed_count": release_summary.get(
+                "public_endpoint_passed_count"
+            ),
+            "public_release_allowed": False,
             "public_artifact_upstream_dependency_fresh_count": sum(
                 result["all_fresh"]
                 for result in upstream_dependency_freshness.values()
@@ -575,6 +693,9 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             "current_evidence_to_pilot_deck",
             "current_evidence_to_pilot_deck_pdf",
             "current_source_native_whitepaper",
+            "product_lane_priority_engine",
+            "vps_public_release_security_audit",
+            "whitehole_archive_boundary_audit",
             "source_native_family_baseline_ledger",
             "market_signal_source_native_benchmark",
             "market_signal_kraken_panel_benchmark",
@@ -598,6 +719,7 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             "duplicate_send_check_required": True,
             "legal_identity_and_certification_human_only": True,
             "pricing_and_payment_human_only": True,
+            "vps_public_release_allowed": False,
             "external_release_authorized": False,
             "autonomous_send_or_submit_allowed": False,
         },
@@ -605,7 +727,9 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             "Select only the artifacts required by a verified recipient or official "
             "notice, recheck the current requirements and duplicate-send ledger, and "
             "obtain action-time founder review before any upload, send, certification, "
-            "agreement acceptance, or payment."
+            "agreement acceptance, payment, gateway mutation, or publication. The "
+            "current minimum honest commercial offer is a fixed-scope ProofLock "
+            "Opportunity Operations proof sprint with buyer-owned acceptance gates."
         ),
         "outputs": {
             "json": rel(OUT_JSON),
@@ -646,6 +770,27 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Eligible future observations: `{summary['eligible_future_observation_count']}`",
         f"- Stage-ready opportunity lanes: `{summary['open_stage_ready_lane_count']}`",
         f"- Human actions due: `{summary['human_action_due_count']}`",
+        "",
+        "## Commercialization State",
+        "",
+        f"- Ranked product lanes: `{summary['product_lane_count']}`",
+        f"- Buyer-ready product lanes: `{summary['buyer_ready_product_lane_count']}`",
+        f"- First commercial lane: `{summary['commercial_lane_id']}`",
+        "- Internal strategy score: "
+        f"`{summary['commercial_lane_internal_strategy_score']}` "
+        "(prioritization only; not valuation or buyer acceptance)",
+        f"- HyperCore rank: `{summary['hypercore_rank']}`",
+        "- HyperCore internal strategy score: "
+        f"`{summary['hypercore_internal_strategy_score']}` "
+        "(read-only evaluation candidate; not a promoted champion)",
+        "",
+        "## Publication State",
+        "",
+        f"- Public endpoints passing: `{summary['public_endpoint_passed_count']}` "
+        f"of `{summary['public_endpoint_count']}`",
+        f"- Public release allowed: `{str(summary['public_release_allowed']).lower()}`",
+        "- WhiteHole posture: historical archive and provenance only; do not deploy "
+        "the legacy site or promote its heuristic ranks.",
         "",
         "## Reading Order",
         "",
@@ -725,7 +870,7 @@ def build_public_artifact_manifest(payload: dict[str, Any]) -> dict[str, Any]:
         )
     manifest: dict[str, Any] = {
         "schema": PUBLIC_ARTIFACT_MANIFEST_SCHEMA,
-        "as_of_utc": payload["as_of_utc"],
+        "receipt_time_semantics": "artifact_set_only_observation_time_excluded",
         "status": "SEALED_LOCAL_ARTIFACT_MANIFEST_HUMAN_RELEASE_REQUIRED",
         "artifact_count": len(artifacts),
         "artifacts": artifacts,

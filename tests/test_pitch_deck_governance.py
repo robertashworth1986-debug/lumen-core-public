@@ -64,11 +64,11 @@ def test_registry_blocks_release_and_separates_legacy_decks():
 
     assert payload["status"] == "GOVERNED_CURRENT_DECK_WITH_ARCHIVED_LEGACY"
     assert payload["summary"]["registered_pptx_count"] >= 30
-    assert payload["summary"]["registered_exact_pptx_count"] == 6
+    assert payload["summary"]["registered_exact_pptx_count"] == 9
     assert payload["summary"]["legacy_collection_file_count"] >= 24
     assert payload["summary"]["current_deck_count"] == 1
     assert payload["summary"]["current_pdf_companion_count"] == 1
-    assert payload["summary"]["historical_or_template_count"] >= 29
+    assert payload["summary"]["historical_or_template_count"] >= 30
     assert payload["summary"]["external_release_authorized_count"] == 0
     assert payload["summary"]["send_eligible_count"] == 0
     assert not any(payload["blockers"].values())
@@ -80,8 +80,29 @@ def test_registry_blocks_release_and_separates_legacy_decks():
     assert launchtn["status"] == (
         "APPLICATION_SPECIFIC_REVIEW_REQUIRED_DO_NOT_SEND"
     )
+    assert launchtn["path"] == (
+        "grant_submissions/LAUNCHTN_3686_PITCH_2026/"
+        "LUMENCORE_3686_PITCH_DECK_2026-08-02_REVIEW_REQUIRED.pptx"
+    )
+    assert [row["path"] for row in launchtn["dependencies"]] == [
+        "grant_submissions/LAUNCHTN_3686_PITCH_2026/"
+        "LAUNCHTN_3686_APPLICATION_MANIFEST_2026-08-02.json"
+    ]
     assert launchtn["send_eligible"] is False
     assert launchtn["external_release_authorized"] is False
+    duplicate = next(
+        row
+        for row in payload["artifacts"]
+        if row["id"] == "launchtn_3686_current_unmarked_duplicate"
+    )
+    assert duplicate["status"] == "APPLICATION_SPECIFIC_REVIEW_REQUIRED_DO_NOT_SEND"
+    assert duplicate["sha256"] == launchtn["sha256"]
+    assert duplicate["send_eligible"] is False
+    assert any(
+        row["id"] == "darpa_dice_proposal_summary_template"
+        and row["status"] == "SOURCE_TEMPLATE_NOT_A_LUMENCORE_DECK"
+        for row in payload["artifacts"]
+    )
 
 
 def test_current_deck_has_current_evidence_and_source_notes():
@@ -94,7 +115,17 @@ def test_current_deck_has_current_evidence_and_source_notes():
     assert current["missing_text_markers"] == []
     assert current["present_banned_text_markers"] == []
     assert len(current["sha256"]) == 64
-    assert len(current["dependencies"]) == 6
+    assert len(current["dependencies"]) == 8
+    assert any(
+        receipt["path"]
+        == "docs/TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_CUSTODY_V3_2026-08-02.md"
+        for receipt in current["dependencies"]
+    )
+    assert any(
+        receipt["path"]
+        == "config/time_series_source_native_prospective_protocol_v3.json"
+        for receipt in current["dependencies"]
+    )
     assert any(
         receipt["path"] == "out/ops/market_signal_source_native_benchmark_latest.json"
         for receipt in current["dependencies"]

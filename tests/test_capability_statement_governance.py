@@ -91,7 +91,7 @@ def test_current_pdf_is_bound_to_arc_seal_builder_and_science_receipts():
     assert "code/ops/BUILD_MONDAY_FEDERAL_ACTION_PACKET.py" in dependency_paths
     assert "out/ops/source_native_family_baseline_ledger_latest.json" in dependency_paths
     assert (
-        "out/ops/time_series_source_native_prospective_protocol_status.json"
+        "docs/receipts/TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_V3_STATUS_2026-08-04.json"
         in dependency_paths
     )
     assert len(current["sha256"]) == 64

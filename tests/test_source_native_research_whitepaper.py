@@ -27,8 +27,14 @@ def test_whitepaper_reports_current_negative_result_and_seals_payload():
         datetime(2026, 7, 29, 12, tzinfo=timezone.utc)
     )
 
-    assert payload["schema"] == "lumencore.source_native_research_whitepaper.v1"
+    assert payload["schema"] == "lumencore.source_native_research_whitepaper.v2"
     assert payload["external_release_authorized"] is False
+    assert payload["authorship"]["responsible_author"] == "Robert Ashworth"
+    assert payload["authorship"]["affiliation"] == "LumenCore"
+    assert "AI assistance is not evidence" in payload["authorship"][
+        "ai_assistance_disclosure"
+    ]
+    assert len(payload["references"]) >= 4
     assert payload["peer_reviewed"] is False
     assert payload["independently_validated"] is False
     assert payload["current_snapshot"]["registered_family_count"] == 140
@@ -107,8 +113,43 @@ def test_whitepaper_reports_current_negative_result_and_seals_payload():
         for item in payload["canonical_source_receipts"]
     )
     assert payload["prospective_protocol"]["eligible_future_observation_count"] == 0
+    assert payload["prospective_protocol"]["protocol_id"] == (
+        "LUMENCORE_TS_SOURCE_NATIVE_20260802_V3"
+    )
+    assert module.PROTOCOL_STATUS_PATH == (
+        ROOT
+        / "docs"
+        / "receipts"
+        / "TIME_SERIES_SOURCE_NATIVE_PROSPECTIVE_V3_STATUS_2026-08-04.json"
+    )
+    status = module.read_json(module.PROTOCOL_STATUS_PATH)
+    assert module.verify_protocol_status(
+        status,
+        module.read_json(module.PROTOCOL_PATH),
+    ) is True
+    assert payload["prospective_protocol"]["external_anchor_required"] is True
+    assert (
+        payload["prospective_protocol"]["decision_rule"]["effect_floor_max_rmae"]
+        == 0.95
+    )
+    assert (
+        payload["prospective_protocol"]["sample_gates"]["FRED"]
+        ["minimum_joint_calendar_month_clusters"]
+        == 60
+    )
+    assert (
+        payload["prospective_protocol"]["sample_gates"]["TWELVE_DATA"]
+        ["minimum_joint_exchange_week_clusters"]
+        == 104
+    )
     assert payload["prospective_protocol"]["candidate_scientific_estimator_id"] == (
         "hurst_conditioned_multiscale_increment_heuristic_v1"
+    )
+    assert any(
+        item["path"]
+        == "out/time_series_source_native_prospective_v3/confirmatory_analysis_latest.json"
+        and item["exists"] is True
+        for item in payload["canonical_source_receipts"]
     )
     assert all(
         item["status"] == "HISTORICAL_SPECULATIVE_DO_NOT_UPLOAD"
@@ -148,6 +189,20 @@ def test_whitepaper_copy_is_claim_bounded():
     assert "weather control" not in rendered
     assert "wormhole-adjacent" in rendered
     assert "blocked from upload" in rendered
+
+
+def test_whitepaper_pdf_is_byte_stable_for_a_sealed_payload(tmp_path: Path):
+    module = load_module()
+    payload = module.build_payload(
+        datetime(2026, 8, 3, 21, 30, tzinfo=timezone.utc)
+    )
+    first = tmp_path / "first.pdf"
+    second = tmp_path / "second.pdf"
+
+    module.build_pdf(payload, first)
+    module.build_pdf(payload, second)
+
+    assert first.read_bytes() == second.read_bytes()
 
 
 def test_ledger_hash_is_verified():

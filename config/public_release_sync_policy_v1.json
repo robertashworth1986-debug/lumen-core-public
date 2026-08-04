@@ -139,7 +139,7 @@
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "7fa6140b0c7e45deb029b156ca06c9e2c3850d9233ea3a69c4e82350ab15abd4"
+        "expected_sha256": "503b694dc7ffc963072d15f5a17a3f522c0dc6d8f101a75df8b633f6f9411d18"
       },
       "last_validated_utc": "2026-08-03T21:30:00Z",
       "max_age_hours": 720,
@@ -161,50 +161,50 @@
     {
       "id": "source_native_benchmark_whitepaper_pdf",
       "source_path": "output/pdf/LumenCore_Source_Native_Benchmark_Whitepaper_CURRENT.pdf",
-      "expected_source_sha256": "8bd764408eb35fbe3cc334ee8171050e3b576e5619a8f243cd4bd4863ec3c35f",
-      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-08-03_8BD764408EB3.pdf",
-      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-08-03_8BD764408EB3.pdf",
+      "expected_source_sha256": "26dd5105af95b93781505698336d83edf9d267ee312e9eb5b14f7f733b96d25a",
+      "target_path": "dashboard/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-08-04_26DD5105AF95.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Source_Native_Benchmark_Whitepaper_2026-08-04_26DD5105AF95.pdf",
       "mime_type": "application/pdf",
       "claim_state": "PROVENANCE_AND_REPRODUCIBILITY",
       "claim_boundary": "The whitepaper documents source-native protocols, measured comparison coverage, limitations, and negative results; it does not establish universal superiority, external validation, field performance, or realized economic value.",
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "7fa6140b0c7e45deb029b156ca06c9e2c3850d9233ea3a69c4e82350ab15abd4"
+        "expected_sha256": "503b694dc7ffc963072d15f5a17a3f522c0dc6d8f101a75df8b633f6f9411d18"
       },
-      "last_validated_utc": "2026-08-03T21:30:00Z",
+      "last_validated_utc": "2026-08-04T11:50:51Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
           "path": "code/ops/BUILD_SOURCE_NATIVE_RESEARCH_WHITEPAPER.py",
-          "expected_sha256": "7d3298a7551021a348d401ad6ea21bbf95da409e1425e1f1e4278b10a00edf1c"
+          "expected_sha256": "9f06ec7c96ca0fe850bc26ec821fa4a86e79a4916de7700567aded113054c2b9"
         },
         {
           "path": "tests/test_source_native_research_whitepaper.py",
-          "expected_sha256": "3752f9933dc6f8d3c4557bf387ce6a8b56c9a264f2b7fdd768f6d2d9c486ec40"
+          "expected_sha256": "1aa4d555fa9827813089f4f3323b79e3a1bfa7ab203790361aeb26795cf69dba"
         }
       ]
     },
     {
       "id": "federal_capability_statement_pdf",
       "source_path": "output/pdf/LumenCore_Federal_Capability_Statement_CURRENT.pdf",
-      "expected_source_sha256": "2a11888e3e0ece48db249ad6424a78c21de6b7ca093b8a79aae5c1d778a47812",
-      "target_path": "dashboard/evidence/LumenCore_Federal_Capability_Statement_2026-08-02_2A11888E3E0E.pdf",
-      "public_url": "https://lumen-core.ai/evidence/LumenCore_Federal_Capability_Statement_2026-08-02_2A11888E3E0E.pdf",
+      "expected_source_sha256": "4b3f8bb48fac7191388617262cdde9c48c74b274a83bbe3bdf6f612ebe142dc1",
+      "target_path": "dashboard/evidence/LumenCore_Federal_Capability_Statement_2026-08-04_4B3F8BB48FAC.pdf",
+      "public_url": "https://lumen-core.ai/evidence/LumenCore_Federal_Capability_Statement_2026-08-04_4B3F8BB48FAC.pdf",
       "mime_type": "application/pdf",
       "claim_state": "NO_PERFORMANCE_CLAIM",
       "claim_boundary": "The capability statement describes current software, evidence controls, and bounded federal-use fit; it does not establish certification, government approval, award status, model superiority, field performance, or economic outcomes.",
       "provenance_mode": "GENERATED_RECEIPTS",
       "artifact_receipt_ref": {
         "path": "docs/receipts/CURRENT_REVIEWER_PUBLIC_ARTIFACT_MANIFEST_2026-07-29.json",
-        "expected_sha256": "7fa6140b0c7e45deb029b156ca06c9e2c3850d9233ea3a69c4e82350ab15abd4"
+        "expected_sha256": "503b694dc7ffc963072d15f5a17a3f522c0dc6d8f101a75df8b633f6f9411d18"
       },
-      "last_validated_utc": "2026-08-02T21:51:47Z",
+      "last_validated_utc": "2026-08-04T11:50:51Z",
       "max_age_hours": 720,
       "test_receipt_refs": [
         {
           "path": "code/ops/BUILD_MONDAY_FEDERAL_ACTION_PACKET.py",
-          "expected_sha256": "de9f7ef0a4dd66a4359a9782a897eca8adeeb1d026cdf36dffd3ba70b8df7df3"
+          "expected_sha256": "77315fe49fe5ae2704ae34ec029209d2f0d6bc324da59db25fd8ab3ead3c063d"
         },
         {
           "path": "config/monday_federal_action_packet_v1.json",
@@ -212,7 +212,7 @@
         },
         {
           "path": "tests/test_monday_federal_action_packet.py",
-          "expected_sha256": "235fd3f738b4de4be92f4511b4bf3f93a1776d9bcf9376e053ece78ccc735b76"
+          "expected_sha256": "44bd897ff5e57a85875f230e78a454a86a863bb580f675be2e684a6d85ba4c75"
         },
         {
           "path": "code/ops/BUILD_CAPABILITY_STATEMENT_GOVERNANCE.py",
