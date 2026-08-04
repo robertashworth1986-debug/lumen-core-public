@@ -100,6 +100,7 @@ def test_generated_pdf_meets_body_page_font_size_and_file_controls():
     assert pdf["evidence_ablation_marker_present"] is True
     assert 0 < pdf["bytes"] < 20 * 1024 * 1024
     assert len(pdf["sha256"]) == 64
+    assert len(pdf["semantic_sha256"]) == 64
 
 
 def test_compliance_gate_passes_document_controls_but_blocks_submission():
@@ -108,10 +109,12 @@ def test_compliance_gate_passes_document_controls_but_blocks_submission():
     rows = {row["id"]: row for row in payload["requirements"]}
 
     assert payload["status"] == (
-        "CURRENT_PUBLIC_DRAFT_FORMAT_AND_MARKER_CHECKS_PASS_SEMANTIC_EVIDENCE_AND_PRIVATE_FINALIZATION_REQUIRED"
+        "CURRENT_PUBLIC_DRAFT_INTERNAL_SEMANTIC_REVIEW_PASS_PRIVATE_FINALIZATION_REQUIRED"
     )
     assert payload["format_and_marker_checks_pass"] is True
-    assert payload["semantic_review_complete"] is False
+    assert payload["semantic_review_complete"] is True
+    assert payload["semantic_review"]["valid_for_current_artifacts"] is True
+    assert payload["semantic_review"]["independent_review"] is False
     assert payload["submission_ready"] is False
     assert payload["funding_currently_available"] is False
     assert payload["deadline"]["safest_operational_cutoff"] == (
@@ -130,7 +133,7 @@ def test_compliance_gate_passes_document_controls_but_blocks_submission():
     assert rows["CONTACT_01"]["status"] == "PRIVATE_FINALIZATION_REQUIRED"
     assert rows["ACCOUNT_01"]["status"] == "HUMAN_ACCOUNT_ACCESS_REQUIRED"
     assert rows["PORTAL_01"]["status"] == "HUMAN_FINAL_ACTION_REQUIRED"
-    for row_id in ("FAQ_03", "FAQ_04", "FAQ_05", "FAQ_06"):
+    for row_id in ("FAQ_03", "FAQ_04", "FAQ_05", "FAQ_06", "FAQ_07"):
         assert rows[row_id]["status"] == "PASS_BOUNDED"
     assert rows["FORMAT_04"]["status"] == "PASS"
     assert rows["DISCLOSURE_01"]["status"] == "PASS"
@@ -144,7 +147,24 @@ def test_compliance_gate_passes_document_controls_but_blocks_submission():
     assert rows["TECH_03"]["status"] == "LOCAL_ONLY_EXTERNAL_REPRODUCIBILITY_REQUIRED"
     assert rows["TRUST_01"]["status"] == "EXTERNAL_TRUST_ROOT_REQUIRED"
     assert rows["METRIC_01"]["status"] == "PASS_BOUNDED"
+    assert rows["EVAL_01"]["status"] == "PASS_BOUNDED"
+    assert "operator/reviewer workflow" in rows["EVAL_01"]["evidence"]
     assert payload["evidence_ablation"]["receipt_checks_pass"] is True
+
+
+def test_semantic_review_lock_fails_closed_on_document_drift():
+    module = load_module()
+    pdf = module.inspect_pdf()
+    sources = module.source_integrity()
+    evidence = module.evidence_ablation_receipt()
+
+    assert module.semantic_review_lock(pdf, sources, evidence)[
+        "valid_for_current_artifacts"
+    ] is True
+    drifted_pdf = dict(pdf, semantic_sha256="0" * 64)
+    assert module.semantic_review_lock(drifted_pdf, sources, evidence)[
+        "valid_for_current_artifacts"
+    ] is False
 
 
 def test_public_draft_contains_no_private_or_unsupported_claim_markers():
@@ -163,6 +183,14 @@ def test_public_draft_contains_no_private_or_unsupported_claim_markers():
     assert "complementary interoperability contexts, not ranked competitors" in normalized
     assert "not an hpcmp workload" in normalized
     assert "not a superiority claim" in normalized
+    assert "commercial readiness and operator utility" in normalized
+    assert "offline reviewer packet" in normalized
+    assert "evaluation alignment" in normalized
+    assert "fewer unverifiable promotions is the proposed mission effect" in normalized
+    assert "no savings are claimed" in normalized
+    assert "excludes user experience modernization" in normalized
+    assert "level 3 concierge support" in normalized
+    assert "http interfaces would be described with openapi" in normalized
     assert "exact july 29 receipt remains local" in normalized
     assert "140 registered families" not in normalized
     assert "no classified handling" in normalized

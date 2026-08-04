@@ -1,0 +1,28 @@
+{
+  "schema": "lumencore.erdc_sdc_internal_semantic_review.v1",
+  "reviewed_utc": "2026-08-02T11:27:56.2390035Z",
+  "classification": "INTERNAL_MODEL_ASSISTED_NOT_INDEPENDENT",
+  "opportunity_number": "W912HZ26SC005",
+  "reviewed_document_semantic_sha256": "69cec6622ef96910e4a91f9f6dced8be40f8bba0906c8ac924eb1c6d321b986b",
+  "reviewed_source_manifest_sha256": "44a7d65cd214d97d691ecc66b3e731588fbac9cb6c22e0e4b2d221c337af56ce",
+  "reviewed_source_custody_sha256": "77f389460650a00a938977b5ffee88a9d99eb5e97358fcf988ffd5247bd433bf",
+  "reviewed_evidence_ablation_sha256": "0e17f27d4ea6c049b73e12664a6838c5ac0cb767e9a7a18ac2e1e8b108db2a7f",
+  "checks": {
+    "official_cso_and_faq_crosswalk_complete": true,
+    "all_seven_pages_visually_reviewed": true,
+    "claims_bounded_to_evidence": true,
+    "openapi_language_is_prospective": true,
+    "level_3_concierge_scope_is_explicitly_excluded": true,
+    "five_body_page_limit_confirmed": true,
+    "private_and_human_submission_gates_preserved": true
+  },
+  "open_boundaries": [
+    "Exact July 29 evidence is not yet externally reproducible from the public repository.",
+    "No Government-controlled or independent external trust root is bound.",
+    "No HPCMP-representative workload or Government comparator has been run.",
+    "Phase II delivery resources and one founder-approved price remain private finalization gates.",
+    "Current SAM all-awards identity and address match, proposal contact, authenticated form, terms, upload, and final confirmation remain human gates.",
+    "Funding is not currently available for this market-research lane."
+  ],
+  "claim_boundary": "This lock records an internal model-assisted source crosswalk and visual review of one exact document-text fingerprint. It is not independent validation, Government review, proposal approval, eligibility verification, portal acceptance, selection, funding, contract award, deployment evidence, or authorization to submit."
+}

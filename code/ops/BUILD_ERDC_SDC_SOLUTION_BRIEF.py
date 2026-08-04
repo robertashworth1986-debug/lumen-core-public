@@ -36,6 +36,9 @@ CSO_PDF = SOURCE_DIR / "CSO_HPCMP_SDC_30April2026_FINAL.pdf"
 FAQ_PDF = SOURCE_DIR / "HPCMP_SDC_FAQ_20Jul2026.pdf"
 SOURCE_MANIFEST = SOURCE_DIR / "SOURCE_MANIFEST_2026-07-29.json"
 SOURCE_CUSTODY = SOURCE_DIR / "SOURCE_CUSTODY_2026-07-29.json"
+SEMANTIC_REVIEW_LOCK = (
+    SPRINT_DIR / "ERDC_SDC_INTERNAL_SEMANTIC_REVIEW_LOCK_2026-08-02.json"
+)
 EVIDENCE_ABLATION = (
     ROOT / "out" / "ops" / "erdc_sdc_evidence_ablation_latest.json"
 )
@@ -99,9 +102,8 @@ CLAIM_BOUNDARY = (
     "or realized savings, or technical performance beyond the bounded repository evidence identified here."
 )
 PDF_CLAIM_BOUNDARY = (
-    "Claim boundary: No ERDC selection, available funding, award, DoD deployment, authorization "
-    "to operate, classified handling, field validation, customers, revenue, or realized savings, "
-    "or performance beyond the bounded evidence is claimed."
+    "Claim boundary: No ERDC award, authorization, classified handling, field validation, "
+    "customers, revenue, or realized savings; no performance beyond this bounded evidence is claimed."
 )
 
 
@@ -471,27 +473,22 @@ def build_story(
         )
         delivery_boundary = escape(str(private_context["delivery_statement"]))
         rom_state = (
-            "Founder-approved Phase II estimated price is included in the dedicated "
-            "price-control section. Phase III and Phase IV costs are excluded."
+            "Founder-approved Phase II estimate included below; Phase III and IV are excluded."
         )
         identity_state = (
-            f"{escape(str(private_context['legal_entity_name']))}; "
-            f"{escape(str(private_context['solution_address']))}; "
-            f"{escape(str(private_context['proposal_contact_email']))}. "
-            "The private input records founder verification of the active SAM all-awards "
-            "contract registration and exact name/address match."
+            "Private input records a current proposal contact and founder-verified active "
+            "SAM all-awards legal-name and solution-address match."
         )
         rom_control_text = (
-            "The Phase II prototype-development-only estimated price is "
-            f"{escape(str(private_context['rom_display']))}. The guarded private ROM workflow "
-            "verified the declared arithmetic, cost-basis controls, Phase III/IV exclusion, "
-            "and founder approval. This estimate is not a Government price determination or award."
+            "Phase II prototype-development-only estimated price: "
+            f"{escape(str(private_context['rom_display']))}. The private gate verified arithmetic, "
+            "declared cost-basis controls, Phase III/IV exclusion, and founder approval. "
+            "This is not a Government price determination or award."
         )
         closing_boundary = (
-            "Claim boundary: This private candidate has not been uploaded or submitted. No ERDC "
-            "selection, available funding, award, DoD deployment, authorization to operate, "
-            "classified handling, field validation, customers, revenue, realized savings, or "
-            "performance beyond the bounded evidence is claimed."
+            "Claim boundary: Not uploaded or submitted; no ERDC selection, funding, award, "
+            "deployment, authorization to operate, classified handling, field validation, "
+            "customers, revenue, savings, or performance beyond bounded evidence is claimed."
         )
     else:
         cover_alert = (
@@ -503,7 +500,9 @@ def build_story(
             "an evaluator role is requested but no independent evaluator is committed. Surrogate development "
             "uses contractor-furnished commodity CPU, local storage, and open software; no HPC allocation or "
             "cloud capacity is claimed. Staffing, compute, support, and transition commitments must be bound "
-            "in the private Phase II price and accepted boundary before work begins."
+            "in the private Phase II price and accepted boundary before work begins. This module excludes User "
+            "Experience Modernization and Level 3 concierge support; either addition requires committed domain "
+            "experts and priced scope."
         )
         rom_state = "No price is included; a reviewed private estimate is required."
         identity_state = (
@@ -571,7 +570,7 @@ def build_story(
         [c("Focus area"), c("LumenCore contribution")],
         [
             c("Unified Service Layer"),
-            c("Primary: OpenAPI event and evidence interfaces spanning portal, command-line, and automation clients."),
+            c("Primary proposed pattern: versioned event and evidence contracts for portal, command-line, and automation clients; HTTP interfaces would be described with OpenAPI."),
         ],
         [
             c("AI-Powered Orchestration"),
@@ -618,6 +617,11 @@ def build_story(
                 "the workflow decision boundary. The local experiment scores only LumenCore full-control "
                 "and ablation profiles. This is a mechanism distinction, not a superiority claim."
             ),
+            h2("Evaluation alignment"),
+            b("Innovation and feasibility: predeclared gates, adverse-case retention, offline verification, and a sixteen-week plan with measurable exits."),
+            b("Scalability and vendor lock-in prevention: partitioned receipts, open contracts, and replaceable adapters with no mandatory proprietary cloud."),
+            b("Commercial readiness and cost efficiency: commercial software and bounded services with fixed-window cost denominators; no savings are claimed."),
+            b("Impact and utility: fewer unverifiable promotions is the proposed mission effect; the user path is one evidence flow plus an offline reviewer packet."),
             PageBreak(),
         ]
     )
@@ -625,7 +629,7 @@ def build_story(
     # Body page 2 of 5.
     component_rows = [
         [c("Component"), c("Phase II behavior")],
-        [c("Open adapter layer"), c("Maps selected portal, command-line, scheduler, object-store, and observability events into versioned OpenAPI contracts and JSON event schemas.")],
+        [c("Open adapter layer"), c("Would map selected portal, command-line, scheduler, object-store, and observability events into versioned JSON event contracts; HTTP interfaces would be described with OpenAPI.")],
         [c("Policy registry"), c("Records policy identifiers, versions, inputs, outcomes, and exception reasons; it does not replace Government authorization services.")],
         [c("Receipt ledger"), c("Builds locally hash-linked SHA-256 chains for request, decision, artifact, and verification metadata; the terminal root is supplied separately to the verifier.")],
         [c("Offline verifier"), c("Checks schema, rehashes included artifact bytes, verifies chain continuity and declared rules, and reports missing evidence without network access.")],
@@ -646,7 +650,7 @@ def build_story(
             ),
             h2("Open replacement boundary"),
             p(
-                "Adapters implement versioned contracts around Kubernetes, OpenStack, workload schedulers, "
+                "Proposed adapters would implement versioned contracts around Kubernetes, OpenStack, workload schedulers, "
                 "storage, and observability systems using widely adopted protocols such as OpenAPI and "
                 "Government-selected storage interfaces. A component or cloud may be replaced while the "
                 "evidence contract, workload portability, and offline verifier remain stable. Government-selected "
@@ -759,12 +763,12 @@ def build_story(
     story.extend(
         [
             h1("5. Commercial Readiness, Phase II Price Gate, and Evidence"),
-            h2("Commercial approach"),
+            h2("Commercial readiness and operator utility"),
             p(
-                "LumenCore is modular software plus integration and verification services using commercial "
-                "technologies and open interfaces. It applies established interface, container, hashing, provenance, "
-                "and observability patterns in an evidence-control role. The named profiles are unranked contexts. "
-                "The SDC module is not proven; any resultant award is expected to be firm-fixed price."
+                "LumenCore is modular software plus integration and verification services built from commercial "
+                "technologies and open interfaces. Operator utility is one portal, command-line, or application "
+                "interface evidence workflow plus an offline reviewer packet. The named profiles are unranked "
+                "contexts, the SDC module is unproven, and any resultant award is expected to be firm-fixed price."
             ),
             styled_table(evidence_rows, [1.35 * inch, 2.7 * inch, 2.45 * inch]),
             h2("Phase II Rough Order of Magnitude control"),
@@ -851,6 +855,7 @@ def inspect_pdf(
     ]
     texts = [(page.extract_text() or "") for page in pages]
     normalized_text = " ".join("\n".join(texts).split())
+    normalized_page_text = [" ".join(text.split()) for text in texts]
     normalized_evidence_marker = " ".join(
         evidence_ablation_sentence(evidence).split()
     )
@@ -891,6 +896,12 @@ def inspect_pdf(
         "exists": path.is_file(),
         "bytes": path.stat().st_size,
         "sha256": sha256_file(path),
+        "semantic_sha256": stable_hash(
+            {
+                "page_sizes_points": page_sizes,
+                "normalized_page_text": normalized_page_text,
+            }
+        ),
         "physical_page_count": physical_pages,
         "cover_pages": 1,
         "acronym_pages": 1,
@@ -1069,6 +1080,7 @@ def requirements() -> list[dict[str, Any]]:
         {"id": "ABLATION_01", "requirement": "Show the claimed control contribution through ablation", "status": "PASS_BOUNDED", "evidence": "The bound local surrogate covers 48 deterministic workflows and seven declared attacks; the full profile detects 7 of 7 relative to a separately supplied local anchor while each no-chain, no-predeclaration, or no-failure-retention profile loses a declared control. It is not an HPCMP or independent result."},
         {"id": "TRUST_01", "requirement": "Bind the protocol and receipt to a trust root outside the mutable evidence packet", "status": "EXTERNAL_TRUST_ROOT_REQUIRED", "evidence": "The local experiment supplies an anchor separately from the receipt, but it is not a Government-controlled signature, timestamp, or external trust service."},
         {"id": "METRIC_01", "requirement": "Define quantitative checks, cost denominators, and falsifiers", "status": "PASS_BOUNDED", "evidence": "Body pages 3 and 4 require complete declared-attack detection, complete adverse-case retention, clean reviewer replay, fixed-window baseline comparison, explicit cost drivers, and stop/rollback on a miss or Government-set overhead breach."},
+        {"id": "EVAL_01", "requirement": "Address innovation, feasibility, scalability, vendor lock-in prevention, commercial readiness, cost efficiency, impact, and utility", "status": "PASS_BOUNDED", "evidence": "Body pages 1 through 5 map the proposed mechanism, prototype plan, scaling controls, replaceable interfaces, commercial components, fixed-window cost denominators, mission-effectiveness checks, and operator/reviewer workflow. No demonstrated HPCMP savings or return on investment is claimed."},
         {"id": "EXEC_01", "requirement": "Bind delivery roles, compute, support, and transition commitments", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Body page 4 identifies the founder as proposed technical lead and bounds commodity surrogate compute; Government or prime integration, evaluator commitment, production compute, staffing, support, and transition ownership remain to be bound in the private Phase II plan and price."},
         {"id": "ROM_01", "requirement": "One estimated price for Phase II prototype only", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Body page 5 preserves the required section but intentionally includes no unapproved amount."},
         {"id": "SAM_01", "requirement": "Active SAM all-awards contract registration and matching solution address", "status": "PRIVATE_FINALIZATION_REQUIRED", "evidence": "Public draft withholds identity and address; live SAM all-awards status, contract eligibility, and exact match must be verified before upload."},
@@ -1081,8 +1093,63 @@ def requirements() -> list[dict[str, Any]]:
         {"id": "FAQ_04", "requirement": "AI remains human-in-the-loop with manual override", "status": "PASS_BOUNDED", "evidence": "Body page 3 keeps AI advisory and requires explicit parameters, manual override, and retained evidence for bounded administrative automation."},
         {"id": "FAQ_05", "requirement": "Absolute data separation and cloud-agnostic portability", "status": "PASS_BOUNDED", "evidence": "Body pages 2 and 4 define separate enclave deployment, absolute data separation, replaceable clouds, workload portability, and bounded burst behavior."},
         {"id": "FAQ_06", "requirement": "Legacy interoperability with phased low-risk migration", "status": "PASS_BOUNDED", "evidence": "Body pages 3 and 4 define shadow-mode prototype work, rollback evidence, legacy transition boundaries, and phased handoff."},
+        {"id": "FAQ_07", "requirement": "Do not imply uncommitted Level 3 concierge support", "status": "PASS_BOUNDED", "evidence": "The primary scope excludes User Experience Modernization; body page 4 states that any Level 3 concierge scope requires committed domain experts and corresponding Phase II pricing."},
         {"id": "FUNDING_01", "requirement": "Do not imply current funds or guaranteed award", "status": "PASS", "evidence": "Cover, compliance gate, and claim boundary state funding is not currently available and no award is guaranteed."},
     ]
+
+
+def semantic_review_lock(
+    pdf: dict[str, Any],
+    sources: dict[str, Any],
+    evidence: dict[str, Any],
+) -> dict[str, Any]:
+    if not SEMANTIC_REVIEW_LOCK.is_file():
+        return {
+            "path": rel(SEMANTIC_REVIEW_LOCK),
+            "present": False,
+            "valid_for_current_artifacts": False,
+            "classification": "INTERNAL_MODEL_ASSISTED_NOT_INDEPENDENT",
+        }
+
+    lock = json.loads(SEMANTIC_REVIEW_LOCK.read_text(encoding="utf-8"))
+    checks = lock.get("checks", {})
+    required_checks = (
+        "official_cso_and_faq_crosswalk_complete",
+        "all_seven_pages_visually_reviewed",
+        "claims_bounded_to_evidence",
+        "openapi_language_is_prospective",
+        "level_3_concierge_scope_is_explicitly_excluded",
+        "five_body_page_limit_confirmed",
+        "private_and_human_submission_gates_preserved",
+    )
+    valid = (
+        lock.get("schema") == "lumencore.erdc_sdc_internal_semantic_review.v1"
+        and lock.get("opportunity_number") == "W912HZ26SC005"
+        and lock.get("classification")
+        == "INTERNAL_MODEL_ASSISTED_NOT_INDEPENDENT"
+        and lock.get("reviewed_document_semantic_sha256")
+        == pdf.get("semantic_sha256")
+        and lock.get("reviewed_source_manifest_sha256")
+        == sources.get("manifest_sha256")
+        and lock.get("reviewed_source_custody_sha256")
+        == sources.get("source_custody_sha256")
+        and lock.get("reviewed_evidence_ablation_sha256")
+        == evidence.get("sha256")
+        and all(checks.get(name) is True for name in required_checks)
+    )
+    return {
+        "path": rel(SEMANTIC_REVIEW_LOCK),
+        "sha256": sha256_file(SEMANTIC_REVIEW_LOCK),
+        "present": True,
+        "schema": lock.get("schema"),
+        "reviewed_utc": lock.get("reviewed_utc"),
+        "classification": lock.get("classification"),
+        "valid_for_current_artifacts": valid,
+        "independent_review": False,
+        "reviewed_document_semantic_sha256": lock.get(
+            "reviewed_document_semantic_sha256"
+        ),
+    }
 
 
 def build_payload(
@@ -1092,6 +1159,7 @@ def build_payload(
 ) -> dict[str, Any]:
     evidence = evidence or evidence_ablation_receipt()
     rows = requirements()
+    semantic_review = semantic_review_lock(pdf, sources, evidence)
     blockers = [
         row
         for row in rows
@@ -1142,13 +1210,17 @@ def build_payload(
             "live_page_reviewed_date": "2026-07-29",
         },
         "status": (
-            "CURRENT_PUBLIC_DRAFT_FORMAT_AND_MARKER_CHECKS_PASS_SEMANTIC_EVIDENCE_AND_PRIVATE_FINALIZATION_REQUIRED"
+            "CURRENT_PUBLIC_DRAFT_INTERNAL_SEMANTIC_REVIEW_PASS_PRIVATE_FINALIZATION_REQUIRED"
+            if format_and_marker_checks_pass
+            and semantic_review["valid_for_current_artifacts"]
+            else "CURRENT_PUBLIC_DRAFT_FORMAT_AND_MARKER_CHECKS_PASS_SEMANTIC_EVIDENCE_AND_PRIVATE_FINALIZATION_REQUIRED"
             if format_and_marker_checks_pass
             else "CURRENT_PUBLIC_DRAFT_FAILED_REVIEW_REQUIRED"
         ),
         "submission_ready": False,
         "format_and_marker_checks_pass": format_and_marker_checks_pass,
-        "semantic_review_complete": False,
+        "semantic_review_complete": semantic_review["valid_for_current_artifacts"],
+        "semantic_review": semantic_review,
         "funding_currently_available": False,
         "response_type": "RFI_STYLE_CSO_SOLUTION_BRIEF_EVALUATION_LANE",
         "pdf": pdf,
@@ -1213,6 +1285,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Body page labels present: `{str(pdf['body_page_labels_present']).lower()}`",
         f"- Format and marker checks pass: `{str(payload['format_and_marker_checks_pass']).lower()}`",
         f"- Semantic review complete: `{str(payload['semantic_review_complete']).lower()}`",
+        f"- Semantic review classification: `{payload['semantic_review']['classification']}`",
+        f"- Semantic review lock: `{payload['semantic_review']['path']}`",
         f"- Source checks pass: `{str(payload['source_integrity']['all_source_checks_pass']).lower()}`",
         f"- Evidence ablation checks pass: `{str(payload['evidence_ablation']['receipt_checks_pass']).lower()}`",
         f"- Evidence ablation SHA-256: `{payload['evidence_ablation']['sha256']}`",

@@ -446,6 +446,8 @@ def build_private_candidate(
         "rom_gate_pass": True,
         "source_gate_pass": True,
         "evidence_gate_pass": True,
+        "public_preflight_checked": True,
+        "public_preflight_error_code": None,
         "pdf_checks": checks,
     }
 
@@ -461,12 +463,44 @@ def baseline_result() -> dict[str, Any]:
         "rom_gate_pass": False,
         "source_gate_pass": False,
         "evidence_gate_pass": False,
+        "public_preflight_checked": False,
+        "public_preflight_error_code": None,
         "pdf_checks": {
             "all_checks_pass": False,
             "private_path_exposed": False,
             "private_fingerprint_exposed": False,
         },
     }
+
+
+def public_preflight_result() -> dict[str, Any]:
+    result = baseline_result()
+    try:
+        public_builder = load_module(
+            "erdc_sdc_solution_brief_public_preflight",
+            PUBLIC_BUILDER_PATH,
+        )
+        sources = public_builder.source_integrity()
+        evidence = public_builder.evidence_ablation_receipt()
+    except Exception:
+        result["public_preflight_checked"] = True
+        result["public_preflight_error_code"] = (
+            "PUBLIC_PREFLIGHT_DEPENDENCY_CHECK_FAILED"
+        )
+        return result
+
+    result["source_gate_pass"] = bool(sources.get("all_source_checks_pass"))
+    result["evidence_gate_pass"] = bool(evidence.get("receipt_checks_pass"))
+    result["public_preflight_checked"] = True
+    if not result["source_gate_pass"]:
+        result["public_preflight_error_code"] = (
+            "CURRENT_OFFICIAL_SOURCE_INTEGRITY_FAILED"
+        )
+    elif not result["evidence_gate_pass"]:
+        result["public_preflight_error_code"] = (
+            "BOUNDED_EVIDENCE_RECEIPT_FAILED"
+        )
+    return result
 
 
 def unresolved_gates(result: dict[str, Any]) -> list[str]:
@@ -525,6 +559,12 @@ def build_public_payload(
             "private_fingerprints_exposed": False,
         },
         "validation": {
+            "public_preflight_checked": bool(
+                result.get("public_preflight_checked")
+            ),
+            "public_preflight_error_code": result.get(
+                "public_preflight_error_code"
+            ),
             "sam_exact_match_current": bool(result.get("sam_gate_pass")),
             "proposal_contact_current": bool(result.get("contact_gate_pass")),
             "delivery_boundaries_supported": bool(result.get("delivery_gate_pass")),
@@ -617,6 +657,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Private values exposed: `{str(payload['private_inputs']['private_values_exposed']).lower()}`",
         f"- Private paths exposed: `{str(payload['private_inputs']['private_paths_exposed']).lower()}`",
         f"- Private fingerprints exposed: `{str(payload['private_inputs']['private_fingerprints_exposed']).lower()}`",
+        f"- Public preflight checked: `{str(payload['validation']['public_preflight_checked']).lower()}`",
+        f"- Official source integrity: `{str(payload['validation']['official_source_integrity']).lower()}`",
+        f"- Bounded evidence receipt: `{str(payload['validation']['bounded_evidence_receipt']).lower()}`",
         f"- Safest operational cutoff: `{payload['deadline']['safest_operational_cutoff']}`",
         f"- Question cutoff: `{payload['deadline']['question_submission_cutoff']}`",
         f"- Gate SHA-256: `{payload['gate_sha256']}`",
@@ -724,8 +767,9 @@ def main() -> None:
             raise SystemExit(1) from None
 
     if not args.build_private_candidate:
+        result = public_preflight_result()
         payload = build_public_payload(
-            baseline_result(),
+            result,
             status="PRIVATE_FINAL_INPUTS_NOT_CAPTURED",
         )
         write_public_outputs(payload)
@@ -777,8 +821,9 @@ def main() -> None:
         )
     except ValueError as exc:
         error_code = getattr(exc, "code", "PRIVATE_FINAL_BUILD_FAILED")
+        result = public_preflight_result()
         payload = build_public_payload(
-            baseline_result(),
+            result,
             status="PRIVATE_FINAL_CANDIDATE_BLOCKED",
             error_code=error_code,
         )
