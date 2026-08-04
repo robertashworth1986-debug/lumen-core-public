@@ -1,0 +1,259 @@
+{
+  "schema": "hypercore_v8_validation_protocol_v1",
+  "protocol_id": "HYPERCORE-V8-OFFLINE-RESILIENCE-REVIEW-001",
+  "status": "draft_runner_implemented_synthetic_preflight_only_buyer_source_required",
+  "product_name": "HyperCore Read-Only Resilience Evaluation",
+  "lineage": {
+    "v7_role": "historical architecture and outer-custody anchor only; not an executable metric or non-regression baseline",
+    "v8_role": "implemented offline evaluation runner with a deterministic synthetic preflight; no buyer or field evaluation has been completed",
+    "v9_role": "planned confidence-bounded risk-window forecasting",
+    "historical_bundle_sha256": "1aaa7eb2b2a4ac7669659122d0282a5811cc1a31d69e42e5a91acfe51c3b9cb4",
+    "historical_bundle_status": "outer_hash_verified_inner_custody_mismatches_quarantined"
+  },
+  "claim_boundary": {
+    "allowed_now": [
+      "A historical read-only EchoLock and HyperCore architecture exists.",
+      "The historical code provides a read-only API shell, telemetry logging, file hashing, and no-actuation controls.",
+      "A buyer-scoped offline validation protocol can be prepared without touching production controls.",
+      "The V8 offline runner passes deterministic, source-tamper, null-floor, chronology, baseline, and fail-closed tests on a synthetic fixture."
+    ],
+    "blocked_now": [
+      "measured energy efficiency improvement",
+      "realized cost or outage savings",
+      "field-validated early warning",
+      "production readiness",
+      "cross-layer causal attribution",
+      "universal phase locking or coherence superiority",
+      "automatic infrastructure control"
+    ]
+  },
+  "current_evidence_limits": [
+    "The historical V7 coherence score is derived from CPU and memory utilization rather than a validated cross-layer operational target.",
+    "The historical ROI conversion uses assumed load, energy price, and efficiency-per-coherence-point constants.",
+    "The archived validation note does not record a dataset, sampling rates, null-model result, ablation result, or V7 non-regression result.",
+    "The outer V7 archive hash matches its manifest, but inner log bytes, inner hashes, README claims, and freeze self-hashes do not reconcile.",
+    "Historical LumenLab V6 and V13 headlines are quarantined because their evaluation is in-sample or leaks holdout information.",
+    "Historical tournament results are quarantined when missing features are replaced with random values.",
+    "Broad live-breadth counts are not evidence while source manifests include virtual-environment test datasets.",
+    "The V8 synthetic preflight validates runner mechanics only; it is not external validation, buyer acceptance, or evidence of operational or economic benefit.",
+    "V9 remains a roadmap definition, not a completed evaluation.",
+    "The historical freeze contains large environment and duplicate payloads that must not become the reviewer package."
+  ],
+  "scope": {
+    "mode": "offline_read_only_replay",
+    "one_buyer_workflow": true,
+    "one_authorized_source_bundle": true,
+    "production_actuation": false,
+    "live_control_writes": false,
+    "economic_claims": false
+  },
+  "required_source_contract": {
+    "required_fields": [
+      "source_owner",
+      "authorization_receipt",
+      "retrieval_utc",
+      "timezone",
+      "sampling_interval",
+      "signal_units",
+      "sensor_calibration",
+      "signal_dictionary",
+      "missingness_and_gap_policy",
+      "operator_interventions",
+      "independently_adjudicated_incident_episodes",
+      "operating_day_denominator",
+      "eligible_population",
+      "exclusions",
+      "source_sha256",
+      "data_path",
+      "coherence_window_rows",
+      "coherence_frequency_band_hz",
+      "seasonal_period_rows",
+      "incident_lookback_rows",
+      "buyer_false_alert_ceiling_per_operating_day"
+    ],
+    "preferred_signal_groups": [
+      "power",
+      "cooling_or_thermal",
+      "compute_load",
+      "environmental_context",
+      "operator_incident_or_intervention"
+    ],
+    "cross_layer_rule": "A cross-layer claim requires synchronized power, cooling or thermal, and compute signals. A single-layer bundle permits only a single-layer detector claim.",
+    "prohibited_inputs": [
+      "credentials",
+      "personal self-regulation configuration",
+      "unapproved controlled data",
+      "post-holdout labels used during model selection"
+    ]
+  },
+  "chronology": {
+    "split_type": "strict_chronological",
+    "development_window": "buyer_selected_before_outcomes_are_reviewed",
+    "calibration_window": "frozen_after_development",
+    "holdout_window": "untouched until the protocol and artifact hashes are sealed",
+    "minimum_blocked_walk_forward_folds": 5,
+    "leakage_controls": [
+      "features use only information available at decision time",
+      "normalization is fit on development data only",
+      "thresholds are frozen before holdout scoring",
+      "all excluded periods are declared before scoring",
+      "negative and inconclusive outcomes remain in the result packet"
+    ]
+  },
+  "frozen_metric_formulas": {
+    "coherence_c": "Welch magnitude-squared coherence on preregistered signal pairs, frequency bands, windows, and lags",
+    "distance_omega": "regularized Mahalanobis distance fit on development data only",
+    "delta_omega": "past-only change in omega over a preregistered horizon",
+    "stability_s": "recovery time and recovery-area measures after independently adjudicated incidents",
+    "efficiency_e": "measured CPU seconds and peak memory for the replay; facility energy requires a synchronized meter",
+    "formula_gate": "Every formula, band, lag, normalization, and threshold is frozen before holdout outcomes are observed."
+  },
+  "registered_baselines": [
+    {
+      "id": "persistence_or_last_value",
+      "role": "minimum forecasting reference"
+    },
+    {
+      "id": "seasonal_naive",
+      "role": "time-conditioned forecasting reference"
+    },
+    {
+      "id": "ewma_or_cusum",
+      "role": "accepted statistical drift reference"
+    },
+    {
+      "id": "fixed_univariate_thresholds",
+      "role": "simple buyer-approved alarm reference"
+    },
+    {
+      "id": "seasonal_or_time_conditioned_thresholds",
+      "role": "time-conditioned alert reference"
+    },
+    {
+      "id": "regularized_multivariate_distance",
+      "role": "simple multivariate anomaly reference"
+    },
+    {
+      "id": "operator_incumbent",
+      "role": "buyer-named operational reference required when one exists"
+    }
+  ],
+  "required_metrics": {
+    "event_detection": [
+      "event_recall",
+      "false_alerts_per_operating_day",
+      "median_lead_time",
+      "lead_time_distribution",
+      "precision_recall_auc"
+    ],
+    "risk_forecast_v9_only_unless_v8_emits_probabilities": [
+      "brier_score",
+      "calibration_error",
+      "reliability_curve",
+      "coverage_by_confidence_band"
+    ],
+    "operational": [
+      "decision_latency",
+      "cpu_time",
+      "peak_memory",
+      "abstention_rate",
+      "missing_signal_rate"
+    ]
+  },
+  "required_falsification": {
+    "minimum_seeded_replicates_per_null": 999,
+    "null_families": [
+      "independent phase scrambling",
+      "circular or block time shifts",
+      "event-label permutation"
+    ],
+    "ablations": [
+      "power only",
+      "cooling or thermal only",
+      "compute only",
+      "every pairwise cross-layer combination"
+    ],
+    "stress_tests": [
+      "missing signal",
+      "constant signal",
+      "irregular sampling",
+      "timestamp jitter",
+      "threshold sensitivity",
+      "sensor dropout",
+      "distribution shift",
+      "incident-label uncertainty"
+    ],
+    "additional_checks": [
+    "single-layer ablations for power, cooling, and compute",
+      "legacy V7 parity only after an executable formula and reference data are frozen",
+      "no future-data access",
+      "no network or control writes"
+    ],
+    "multiplicity_rule": "Apply Holm adjustment across registered bands, lags, endpoints, baselines, and candidates."
+  },
+  "promotion_gates": {
+    "threshold_owner": "buyer_and_independent_reviewer",
+    "thresholds_frozen_before_holdout": true,
+    "all_registered_baselines_required": true,
+    "multiplicity_adjustment_required": true,
+    "null_model_must_not_support_the_claim": true,
+    "buyer_set_false_alert_ceiling_required": true,
+    "noninferiority_to_incumbent_required": true,
+    "incident_clustered_bootstrap_confidence_level": 0.95,
+    "claimed_improvement_interval_must_exclude_zero": true,
+    "holm_adjusted_p_value_max": 0.05,
+    "minimum_positive_fold_fraction": 0.7,
+    "maximum_single_fold_gain_fraction": 0.4,
+    "power_analysis_target": 0.8,
+    "underpowered_result_status": "descriptive_only",
+    "independent_reproduction_required_for_external_validation": true,
+    "economic_conversion_requires_buyer_owned_counterfactual": true
+  },
+  "deliverables": [
+    "source and authorization receipt",
+    "registered baseline and metric specification",
+    "chronology and leakage audit",
+    "offline replay with wins, non-wins, and abstentions",
+    "null and ablation report",
+    "seed ledger, split manifest, and threshold receipt",
+    "per-incident outputs and incident-clustered confidence intervals",
+    "resource measurements, failures, abstentions, and negative results",
+    "hash manifest and reproducibility instructions",
+    "claim-boundary and next-gate decision memo"
+  ],
+  "runner_test_contract": [
+    "deterministic rerun produces matching hashes",
+    "metrics remain bounded where their contracts declare bounds",
+    "missing, constant, and irregular signals fail or abstain explicitly",
+    "features and thresholds never access future or holdout data",
+    "runner performs no network or control writes",
+    "thresholds remain immutable after calibration freeze",
+    "source whitelist and authorization receipt are enforced",
+    "golden fixture hashes verify",
+    "baseline outputs reproduce independently",
+    "null and ablation outcomes are retained",
+    "incident-clustered confidence intervals use incident episodes rather than rows as independent units",
+    "resource limits are measured",
+    "independent reproduction remains a separate external gate"
+  ],
+  "commercial_boundary": {
+    "first_offer": "ProofLock evidence protocol review",
+    "candidate_fee_usd": 3500,
+    "candidate_duration_business_days": 10,
+    "fee_status": "candidate_not_committed",
+    "implementation_extension_range_usd": {
+      "low": 7500,
+      "high": 25000
+    },
+    "external_send_allowed": false,
+    "contract_or_price_acceptance_proven": false
+  },
+  "human_gates": [
+    "Buyer identity and recipient fit are reviewed before outreach.",
+    "Buyer authorizes every source and defines protected-data handling.",
+    "Buyer and reviewer approve baselines, metrics, exclusions, and thresholds before holdout scoring.",
+    "Founder approves exact price, contract terms, recipient, and external send.",
+    "No production connection, control write, public performance claim, or economic claim occurs without a separate action-time approval and receipt."
+  ],
+  "next_required_artifact": "buyer_authorized_source_bundle_and_prospectively_approved_threshold_authority_receipt"
+}
