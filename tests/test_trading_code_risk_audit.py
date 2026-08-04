@@ -36,7 +36,21 @@ def test_withdrawal_and_validate_false_paths_are_not_marked_safe():
 
     auto_withdraw = by_path.get("code/kraken_auto_withdraw_btc.py")
     if auto_withdraw:
-        assert auto_withdraw["classification"] == "critical_legacy_quarantine"
+        assert auto_withdraw["classification"] == "guarded_review"
+        assert {"execute_confirm", "runtime_gate", "human_approval"}.issubset(auto_withdraw["protections"])
+
+    liquidate = by_path.get("code/ops/LIQUIDATE_ALL_TO_USD.py")
+    if liquidate:
+        assert liquidate["classification"] == "guarded_review"
+        assert {"execute_confirm", "runtime_gate", "human_approval"}.issubset(liquidate["protections"])
+
+    assert "code/micro_position_kraken_bot.py" not in by_path
+    assert "code/kraken_swing_hunter.py" not in by_path
+
+    history_reader = by_path.get("code/ops/LEARN_FROM_TRADE_HISTORY.py")
+    if history_reader:
+        assert history_reader["classification"] == "guarded_review"
+        assert history_reader["signals"] == ["validate_false"]
 
     risky_validate_false = [
         row for row in audit["files"]

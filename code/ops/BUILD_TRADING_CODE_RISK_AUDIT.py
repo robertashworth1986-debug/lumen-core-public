@@ -40,7 +40,7 @@ PROTECTION_PATTERNS: dict[str, re.Pattern[str]] = {
     "dry_run": re.compile(r"dry[-_ ]?run|DRY RUN|status_only|no_orders", re.IGNORECASE),
     "execute_confirm": re.compile(r"--execute|CONFIRM_PHRASE|confirm\s*[!=]=|confirmation", re.IGNORECASE),
     "validate_only": re.compile(r"validate_only|submit_order_validate_only|validate\s*[:=]\s*(?:True|true)", re.IGNORECASE),
-    "human_approval": re.compile(r"PENDING_HUMAN_APPROVAL|approval_queue|approved_by|operator approval", re.IGNORECASE),
+    "human_approval": re.compile(r"PENDING_HUMAN_APPROVAL|approval_queue|approved_by|operator approval|human action-time approval|HUMAN_APPROVAL_ENV|LUMA_HUMAN_UNLOCK_TOKEN", re.IGNORECASE),
     "runtime_gate": re.compile(r"LiveRuntimeGuard|allow_live_orders|kill_switch|SAFE_DRY_RUN|paper_enabled", re.IGNORECASE),
 }
 
@@ -99,10 +99,10 @@ def classify_file(hits: dict[str, list[dict[str, Any]]], guards: list[str]) -> t
     has_runtime = "runtime_gate" in guards
     has_human = "human_approval" in guards
 
-    if {"withdrawal_path", "liquidation_path"} & signals and not has_confirm:
-        return "critical_legacy_quarantine", "withdraw/liquidation path lacks explicit execute confirmation"
-    if "validate_false" in signals and not has_human:
-        return "high_review", "validate=false path lacks a clear human approval gate"
+    if {"withdrawal_path", "liquidation_path"} & signals and not (has_confirm and has_runtime and has_human):
+        return "critical_legacy_quarantine", "withdraw/liquidation path lacks exact execute confirmation, runtime gate, or human action-time approval"
+    if "validate_false" in signals and "kraken_add_order" in signals and not has_human:
+        return "high_review", "validate=false order path lacks a clear human approval gate"
     if "kraken_add_order" in signals and not (has_validate or has_runtime or has_human):
         return "high_review", "direct order path lacks validate/runtime/human gate"
     if "cancel_all_orders" in signals and not has_confirm:
