@@ -60,8 +60,22 @@ foreach ($f in $files) {
     $sameHash = ($rootHash -eq $stackHash)
   }
 
+  $parityStatus = if (-not $rootExists -and -not $stackExists) {
+    'NOT_TRACKED'
+  }
+  elseif (-not $rootExists -or -not $stackExists) {
+    'MISSING_ONE_SIDE'
+  }
+  elseif ($sameHash) {
+    'IN_SYNC'
+  }
+  else {
+    'DRIFT'
+  }
+
   $rows += [PSCustomObject]@{
     file = $f
+    parity_status = $parityStatus
     root_exists = $rootExists
     stack_exists = $stackExists
     same_hash = $sameHash
@@ -79,8 +93,9 @@ foreach ($f in $files) {
 $csvPath = Join-Path $OutputRoot 'dashboard_mirror_parity_audit.csv'
 $rows | Export-Csv -NoTypeInformation -Path $csvPath -Encoding UTF8
 
-$drift = @($rows | Where-Object { $_.root_exists -and $_.stack_exists -and -not $_.same_hash }).Count
-$missing = @($rows | Where-Object { -not $_.root_exists -or -not $_.stack_exists }).Count
+$drift = @($rows | Where-Object { $_.parity_status -eq 'DRIFT' }).Count
+$missingOneSide = @($rows | Where-Object { $_.parity_status -eq 'MISSING_ONE_SIDE' }).Count
+$notTracked = @($rows | Where-Object { $_.parity_status -eq 'NOT_TRACKED' }).Count
 $risk = @($rows | Where-Object { $_.root_abs_windows_refs -gt 0 -or $_.stack_abs_windows_refs -gt 0 }).Count
 
 $mdPath = Join-Path $OutputRoot 'dashboard_mirror_parity_audit.md'
@@ -89,17 +104,18 @@ $md += '# Dashboard Mirror Parity Audit'
 $md += "Generated UTC: $((Get-Date).ToUniversalTime().ToString('o'))"
 $md += ''
 $md += "- Compared files: $($rows.Count)"
-$md += "- Hash drift pairs: $drift"
-$md += "- Missing-side files: $missing"
+$md += "- Hash drift pairs (both present): $drift"
+$md += "- Missing-one-side files: $missingOneSide"
+$md += "- Not-tracked files (absent both sides): $notTracked"
 $md += "- Files with absolute Windows-path refs: $risk"
 $md += ''
-$md += '| File | Root Exists | Stack Exists | Same Hash | Root Abs Win Refs | Stack Abs Win Refs | Root ./ refs | Stack ./ refs |'
-$md += '|---|---|---|---|---:|---:|---:|---:|'
+$md += '| File | Parity Status | Root Exists | Stack Exists | Same Hash | Root Abs Win Refs | Stack Abs Win Refs | Root ./ refs | Stack ./ refs |'
+$md += '|---|---|---|---|---|---:|---:|---:|---:|'
 foreach ($r in $rows) {
-  $md += "| $($r.file) | $($r.root_exists) | $($r.stack_exists) | $($r.same_hash) | $($r.root_abs_windows_refs) | $($r.stack_abs_windows_refs) | $($r.root_relative_refs) | $($r.stack_relative_refs) |"
+  $md += "| $($r.file) | $($r.parity_status) | $($r.root_exists) | $($r.stack_exists) | $($r.same_hash) | $($r.root_abs_windows_refs) | $($r.stack_abs_windows_refs) | $($r.root_relative_refs) | $($r.stack_relative_refs) |"
 }
 Set-Content -Path $mdPath -Value ($md -join [Environment]::NewLine) -Encoding UTF8
 
 Write-Output "PARITY_CSV=$csvPath"
 Write-Output "PARITY_MD=$mdPath"
-Write-Output "DRIFT=$drift MISSING=$missing ABSWIN=$risk"
+Write-Output "DRIFT=$drift MISSING_ONE_SIDE=$missingOneSide NOT_TRACKED=$notTracked ABSWIN=$risk"
