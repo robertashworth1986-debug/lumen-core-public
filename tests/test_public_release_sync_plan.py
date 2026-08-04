@@ -266,6 +266,72 @@ def test_plan_is_deterministic_for_same_inputs(tmp_path: Path):
     assert first["plan_sha256"] == second["plan_sha256"]
 
 
+def test_explicit_frozen_subset_preserves_deferred_items(tmp_path: Path):
+    module = load_module()
+    root, target, policy = fixture_repo(tmp_path)
+    second_source = root / "docs" / "other.md"
+    second_source.write_text(
+        "Bounded internal evidence only. No external validation is asserted.\n",
+        encoding="utf-8",
+    )
+    run_git(root, "add", "docs/other.md")
+    run_git(root, "commit", "-m", "add second allowlisted artifact")
+    head = run_git(root, "rev-parse", "HEAD")
+    policy["allowlist"][0]["source_commit"] = head
+    second = dict(policy["allowlist"][0])
+    second.update(
+        {
+            "id": "other_fixture",
+            "source_path": "docs/other.md",
+            "expected_source_sha256": sha256(second_source),
+            "target_path": "public/evidence/other.md",
+            "public_url": "https://example.test/evidence/other.md",
+        }
+    )
+    policy["allowlist"].append(second)
+
+    plan = module.build_plan(
+        write_policy(root, policy),
+        root=root,
+        target_root=target,
+        as_of_utc="2026-07-18T00:00:00Z",
+        item_ids={"public_fixture"},
+    )
+
+    assert plan["summary"]["item_count"] == 1
+    assert plan["summary"]["policy_item_count"] == 2
+    assert plan["summary"]["blocked_count"] == 0
+    assert plan["summary"]["plan_state"] == (
+        "DRY_RUN_READY_HUMAN_UNLOCK_REQUIRED"
+    )
+    assert plan["selection_scope"] == {
+        "mode": "EXPLICIT_FROZEN_ALLOWLIST_SUBSET",
+        "policy_item_count": 2,
+        "selected_item_count": 1,
+        "selected_item_ids": ["public_fixture"],
+        "deferred_item_count": 1,
+        "deferred_item_ids": ["other_fixture"],
+        "partial_release": True,
+    }
+    assert [row["id"] for row in plan["items"]] == ["public_fixture"]
+    assert plan["capability_boundary"]["files_copied"] is False
+    assert plan["summary"]["public_release_completed"] is False
+
+
+def test_explicit_subset_rejects_ids_outside_frozen_allowlist(tmp_path: Path):
+    module = load_module()
+    root, target, policy = fixture_repo(tmp_path)
+
+    with pytest.raises(module.PolicyError, match="outside the frozen allowlist"):
+        module.build_plan(
+            write_policy(root, policy),
+            root=root,
+            target_root=target,
+            as_of_utc="2026-07-18T00:00:00Z",
+            item_ids={"not_allowlisted"},
+        )
+
+
 def test_generated_pdf_is_scanned_and_receipt_gated(tmp_path: Path):
     module = load_module()
     source_rel = "output/pdf/public.pdf"

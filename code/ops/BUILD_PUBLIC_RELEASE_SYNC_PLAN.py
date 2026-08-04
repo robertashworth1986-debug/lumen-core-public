@@ -880,6 +880,7 @@ def build_plan(
     root: Path = ROOT,
     target_root: Path | None = None,
     as_of_utc: str,
+    item_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     root = Path(root)
     target_root = Path(target_root) if target_root is not None else root
@@ -910,13 +911,37 @@ def build_plan(
     ):
         raise PolicyError("max_source_age_hours is invalid")
 
-    item_ids = [entry.get("id") for entry in policy["allowlist"] if isinstance(entry, dict)]
-    if len(item_ids) != len(policy["allowlist"]) or len(item_ids) != len(set(item_ids)):
+    policy_item_ids = [
+        entry.get("id") for entry in policy["allowlist"] if isinstance(entry, dict)
+    ]
+    if (
+        len(policy_item_ids) != len(policy["allowlist"])
+        or len(policy_item_ids) != len(set(policy_item_ids))
+    ):
         raise PolicyError("allowlist items must be objects with unique ids")
+
+    requested_item_ids = None if item_ids is None else {str(value) for value in item_ids}
+    if requested_item_ids is not None:
+        if not requested_item_ids:
+            raise PolicyError("item_ids must be nonempty when provided")
+        unknown_item_ids = sorted(requested_item_ids - set(policy_item_ids))
+        if unknown_item_ids:
+            raise PolicyError(
+                "item_ids contains values outside the frozen allowlist: "
+                + ", ".join(unknown_item_ids)
+            )
+
+    selected_entries = [
+        entry
+        for entry in policy["allowlist"]
+        if requested_item_ids is None or entry["id"] in requested_item_ids
+    ]
+    selected_item_ids = sorted(str(entry["id"]) for entry in selected_entries)
+    deferred_item_ids = sorted(set(policy_item_ids) - set(selected_item_ids))
 
     items = [
         evaluate_item(entry, root=root, target_root=target_root, policy=policy, as_of=as_of)
-        for entry in sorted(policy["allowlist"], key=lambda row: str(row["id"]))
+        for entry in sorted(selected_entries, key=lambda row: str(row["id"]))
     ]
     blocked = [row["id"] for row in items if row["blockers"]]
     exact = [row["id"] for row in items if row["planned_action"] == "NOOP_EXACT_MATCH"]
@@ -950,7 +975,8 @@ def build_plan(
         "purpose": "Build a deterministic reviewer-safe public release sync plan without copying or performing network actions.",
         "claim_boundary": (
             "This plan is a local safety and provenance preflight. It is not proof that an artifact is public, "
-            "externally validated, government approved, compliant, deployed, or accepted by a reviewer."
+            "externally validated, government approved, compliant, deployed, or accepted by a reviewer. "
+            "An explicit allowlist subset does not clear, supersede, or publish deferred policy items."
         ),
         "policy_path": policy_rel,
         "policy_sha256": stable_sha256(clean_policy),
@@ -971,6 +997,19 @@ def build_plan(
         "network_actions": {action: HUMAN_GATE for action in NETWORK_ACTIONS},
         "human_gate": HUMAN_GATE,
         "overwrite_policy": "Never overwrite. Existing exact-hash targets are no-ops; mismatches are blocked.",
+        "selection_scope": {
+            "mode": (
+                "FULL_FROZEN_ALLOWLIST"
+                if requested_item_ids is None
+                else "EXPLICIT_FROZEN_ALLOWLIST_SUBSET"
+            ),
+            "policy_item_count": len(policy_item_ids),
+            "selected_item_count": len(selected_item_ids),
+            "selected_item_ids": selected_item_ids,
+            "deferred_item_count": len(deferred_item_ids),
+            "deferred_item_ids": deferred_item_ids,
+            "partial_release": bool(deferred_item_ids),
+        },
         "checkout_reproducibility": {
             "generated_item_count": len(generated_items),
             "verified_count": len(generated_items) - len(checkout_blocked),
@@ -986,6 +1025,10 @@ def build_plan(
         "public_url_verification_plan": public_url_plan,
         "summary": {
             "item_count": len(items),
+            "policy_item_count": len(policy_item_ids),
+            "deferred_item_count": len(deferred_item_ids),
+            "deferred_item_ids": deferred_item_ids,
+            "partial_release": bool(deferred_item_ids),
             "blocked_count": len(blocked),
             "blocked_item_ids": blocked,
             "exact_match_noop_count": len(exact),
@@ -1032,6 +1075,9 @@ def render_markdown(plan: dict[str, Any]) -> str:
         "- Overwrite behavior: exact-hash targets are no-ops; mismatches are blocked",
         f"- Clean-checkout generated artifacts verified: `{plan['checkout_reproducibility']['verified_count']}`",
         f"- Clean-checkout generated artifacts blocked: `{plan['checkout_reproducibility']['blocked_count']}`",
+        f"- Selection mode: `{plan['selection_scope']['mode']}`",
+        f"- Selected policy items: `{plan['selection_scope']['selected_item_count']}/{plan['selection_scope']['policy_item_count']}`",
+        f"- Deferred policy items: `{plan['selection_scope']['deferred_item_count']}`",
         "",
         "## Candidates",
         "",
@@ -1092,15 +1138,29 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--target-root", type=Path, default=ROOT)
     parser.add_argument("--as-of-utc", required=True, help="Explicit ISO-8601 evaluation instant for deterministic freshness checks.")
+    parser.add_argument(
+        "--item-id",
+        action="append",
+        dest="item_ids",
+        help="Select an existing frozen allowlist item. Repeat for a bounded subset.",
+    )
+    parser.add_argument("--output-json", type=Path, default=DEFAULT_JSON)
+    parser.add_argument("--output-markdown", type=Path, default=DEFAULT_MD)
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    plan = build_plan(args.policy, root=args.root, target_root=args.target_root, as_of_utc=args.as_of_utc)
-    write_outputs(plan)
-    print(f"Wrote {DEFAULT_JSON}")
-    print(f"Wrote {DEFAULT_MD}")
+    plan = build_plan(
+        args.policy,
+        root=args.root,
+        target_root=args.target_root,
+        as_of_utc=args.as_of_utc,
+        item_ids=None if args.item_ids is None else set(args.item_ids),
+    )
+    write_outputs(plan, args.output_json, args.output_markdown)
+    print(f"Wrote {args.output_json}")
+    print(f"Wrote {args.output_markdown}")
     print(f"Plan state: {plan['summary']['plan_state']}")
     print(f"Human gate: {plan['human_gate']}")
     return 0 if plan["summary"]["blocked_count"] == 0 else 2
