@@ -56,12 +56,22 @@ jobs:
 
           mkdir -p out/ci/site-health
 
+          REVIEWER_RELEASE="blocked"
+          if python code/ops/CHECK_PUBLIC_REVIEWER_RELEASE.py \
+            --output out/ci/site-health/reviewer_release_canary.json; then
+            REVIEWER_RELEASE="pass"
+          else
+            OVERALL="outage"
+            COLOR="red"
+          fi
+
           cat > out/ci/site-health/site_health.json << EOF
           {
             "checked_utc": "${TIMESTAMP}",
             "overall": "${OVERALL}",
             "healthy_count": ${HEALTHY},
             "total_count": ${ALL_UP},
+            "reviewer_release": "${REVIEWER_RELEASE}",
             "endpoints": {
           ${PORTAL},
           ${EVIDENCE},
@@ -87,6 +97,7 @@ jobs:
           echo "overall=${OVERALL}" >> $GITHUB_OUTPUT
           echo "healthy=${HEALTHY}" >> $GITHUB_OUTPUT
           echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
+          echo "reviewer_release=${REVIEWER_RELEASE}" >> $GITHUB_OUTPUT
 
       - name: Publish workflow evidence
         uses: actions/upload-artifact@v4
@@ -103,6 +114,7 @@ jobs:
             echo ""
             echo "- Overall: ${{ steps.probe.outputs.overall }}"
             echo "- Healthy endpoints: ${{ steps.probe.outputs.healthy }}/6"
+            echo "- Reviewer release: ${{ steps.probe.outputs.reviewer_release }}"
             echo "- Checked: ${{ steps.probe.outputs.timestamp }}"
             echo ""
             echo "The workflow is read-only. It does not commit generated state to the repository."
@@ -113,3 +125,9 @@ jobs:
         run: |
           echo "::warning::lumen-core.ai is reporting an outage — ${{ steps.probe.outputs.healthy }}/6 endpoints healthy"
           # Non-fatal: keep the report available for incident review.
+
+      - name: Fail closed on reviewer release mismatch
+        if: steps.probe.outputs.reviewer_release != 'pass'
+        run: |
+          echo "::error::Public reviewer files do not match the checked-out release."
+          exit 1

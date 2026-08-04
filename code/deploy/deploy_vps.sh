@@ -36,7 +36,7 @@ if ! id -u "$SERVICE_USER" >/dev/null 2>&1; then
 fi
 SERVICE_GROUP="$(id -gn "$SERVICE_USER" 2>/dev/null || echo "$SERVICE_USER")"
 
-WWW_ROOT="/var/www/lumatrader"
+WWW_ROOT="${LUMA_PUBLIC_WEB_ROOT:-/opt/lumencore/dashboard}"
 if [[ -d "/etc/nginx/sites-available" ]]; then
    NGINX_SITE="/etc/nginx/sites-available/lumatrader"
 else
@@ -602,6 +602,20 @@ else
 fi
 
 echo "==> Running post-deploy smoke checks..."
+REVIEWER_STATIC_PATHS=(
+   "/proof_to_pilot.html"
+   "/data/quant_hub_reviewer_context.json"
+   "/evidence/QUANT_HUB_REVIEWER_CONTEXT.md"
+   "/evidence/PUBLIC_SAFE_MODEL_AND_GEOMETRY_EVIDENCE_LEDGER.md"
+)
+for p in "${REVIEWER_STATIC_PATHS[@]}"; do
+   local_file="$WWW_ROOT/${p#/}"
+   if [[ ! -f "$local_file" ]]; then
+      echo "ERROR: required reviewer artifact missing from canonical web root: $p" >&2
+      exit 4
+   fi
+done
+
 for p in "/api/snapshot" "/api/unity/unified-edge" "/health"; do
    code="$(curl -sS -o /dev/null -w "%{http_code}" "http://127.0.0.1:8787$p")"
    if [[ "$code" != "200" ]]; then
@@ -642,6 +656,16 @@ for p in "${SMOKE_PATHS[@]}"; do
    fi
    echo "  PASS $p (HTTP $code)"
 done
+
+REVIEWER_CANARY="$ROOT_DIR/code/ops/CHECK_PUBLIC_REVIEWER_RELEASE.py"
+if [[ ! -f "$REVIEWER_CANARY" ]]; then
+   echo "ERROR: public reviewer release canary is missing." >&2
+   exit 4
+fi
+"$PYTHON_BIN" "$REVIEWER_CANARY" \
+   --base-url "https://$DOMAIN" \
+   --output "$ROOT_DIR/out/ops/public_reviewer_release_canary_latest.json" \
+   --timeout-seconds 30
 
 NR_POST_CODE="$(curl -sS -o /dev/null -w "%{http_code}" -X POST "http://127.0.0.1:8787/api/nodered/ingest" -H "Content-Type: application/json" -d '{"source":"deploy_smoke","alive":true}')"
 if [[ "$NR_POST_CODE" == "200" ]]; then
