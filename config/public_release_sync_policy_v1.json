@@ -220,7 +220,7 @@
         },
         {
           "path": "tests/test_capability_statement_governance.py",
-          "expected_sha256": "2e2d6089af70c4562ccedefb094dcecefbb09aadc0bb2bda3e1b9bd93e9230c7"
+          "expected_sha256": "5a5ff77ce8b40a3948d4d03d22a3aef895754ba5cf435cb0effac94c149e26e6"
         }
       ]
     }
