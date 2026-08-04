@@ -155,7 +155,10 @@ def _require_api_token(
 ) -> None:
     expected = _expected_api_tokens()
     if not expected:
-        return
+        raise HTTPException(
+            status_code=503,
+            detail="api authentication is not configured",
+        )
 
     provided = (x_luma_token or "").strip() or _extract_bearer(authorization)
     if not provided:
