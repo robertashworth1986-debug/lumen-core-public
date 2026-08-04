@@ -95,22 +95,24 @@
       },
       "source_binding": {
         "kind": "REPOSITORY_GATE_WITH_OUTREACH_STATUS",
-        "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
-        "deadline_field": "opportunity.government_deadline_utc",
-        "status_field": "decision",
-        "required_status": "GMAIL_DRAFT_READY_SEND_BLOCKED",
+        "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
+        "deadline_field": "opportunity.deadline_utc",
+        "status_field": "send_gate.decision",
+        "required_status": "BLOCK_SEND",
         "outreach_status_path": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
-        "required_lane_id": "argos_emi_teaming_inquiry"
+        "required_lane_id": "argos_emi_teaming_inquiry",
+        "required_outreach_status": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY"
       },
       "external_action_type": "EMAIL_RESPONSE",
       "completion_evidence_present": false,
       "blockers": [
-        "One matching Gmail draft and zero sent or inbound copies were observed at the recorded full-mailbox check.",
-        "The latest five-minute dispatch binding expired and its approval cannot be reused.",
-        "A fresh full-mailbox duplicate search, exact draft readback, private HumanUnlock, and new exact action-time approval are still required.",
-        "Written partner authority is required before using the partner name or qualifications in a Government response."
+        "One bounded partner inquiry was sent once; the fresh mailbox check found zero current drafts and zero inbound replies, so it must not be resent.",
+        "The Government capability response itself has not been sent.",
+        "Provider credential rotation and reachable public Git-history remediation remain required before linking the public repository or sending the final response.",
+        "Private SAM cover facts, authorized team facts, a final duplicate search, exact dispatch binding, and exact action-time approval remain required.",
+        "Written partner authority is required before using any partner name, role, qualification, or prior performance in the Government response."
       ],
-      "safest_next_action": "Before the partner-interest target, repeat the full-mailbox duplicate search and exact draft readback, rebuild the five-minute dispatch binding, and obtain one new exact action-time approval. Do not send from the expired binding."
+      "safest_next_action": "Do not resend the partner inquiry. Complete credential rotation and public-history remediation, verify the minimum private SAM cover facts, preserve the no-unauthorized-partner boundary, and then build one final Government email-and-attachment binding for exact action-time approval."
     },
     {
       "id": "NASHVILLE_ONBOARDING_20260731",

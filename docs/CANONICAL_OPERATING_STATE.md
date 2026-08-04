@@ -38,7 +38,7 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 | CDC `75D301-26-RFI-73483` | CDC confirmed receipt and said it would follow up. | Wait. |
 | DARPA DICE proposal abstract | The IPTO submission-finalization confirmation establishes receipt. | Inspect BAAT or new inbound status; do not send the stray Gmail draft or a duplicate abstract. |
 | DARPA `SN-26-97` | The package was sent after DARPA confirmed that compliant submissions were welcome. | Wait for substantive contact; do not send the existing reply draft. |
-| DLA MissionWeave `L26BZ-NV011-1380` | Proposal creation is confirmed; final submission is not. The July 22 noon ET deadline passed. | Preserve the packet. Do not claim submission or send a late receipt request. |
+| DLA MissionWeave `DLA26BZ03-NV011` | DLA SBIR/STTR Program Operations confirmed on July 28 that DSIP showed the proposal as `In Progress`, so it was not formally submitted. The July 22 noon ET deadline passed. | Preserve the packet. Do not claim submission or send another status request without a new official ask. |
 | Navy HarborSentinel `DON26BZ03-NV063` | No final-submission receipt was found. The July 22 noon ET deadline passed. | Preserve the packet. Do not claim submission or start late-submission outreach. |
 
 A receipt proves delivery only. It does not prove selection, technical validation, award, contract, deployment, or government endorsement.

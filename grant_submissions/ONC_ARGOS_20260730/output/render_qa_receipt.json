@@ -1,8 +1,8 @@
 {
   "schema": "lumencore.argos_render_qa.v1",
-  "inspected_utc": "2026-07-27T20:37:03.5116538Z",
-  "docx_sha256": "7d17d228d88acbd06b5fb5d8aaff513bf476dd31920e9a5660ff71147145dea5",
-  "pdf_sha256": "6260617bb2ae0de6d6b6817c70d3146351889db16d1c288a6edb48c8c19d0c04",
+  "inspected_utc": "2026-07-28T20:16:11Z",
+  "docx_sha256": "8ab5c890db2abb04e6dfcd877ccc546518840e023529810ae48902e9a38eb392",
+  "pdf_sha256": "cea08cd755b27f464d761b5eb92af675597fcda434fbf9a80ae316ae985cda00",
   "total_pages": 10,
   "cover_pages": 1,
   "content_pages": 9,
@@ -25,13 +25,13 @@
   "split_table_rows_found": false,
   "required_logo_sha256": "1ed1c9b00e273aa9e781bd7fd0a4fcc3fc542257c6d294c8e8fbfada500701af",
   "company_name": "LumenCore",
-  "seal_name": "LumaArc seal of approval",
+  "seal_name": "Founder-selected LumaArc brand mark",
   "submission_authorized": false,
   "notes": [
-    "All ten rendered pages were visually inspected at full resolution.",
-      "The inspection used the local output/rendered_v5 render set; the tracked review artifacts are the DOCX, PDF, and their hashes.",
-    "The cover identifies LumenCore as the company and LumaArc only as the seal of approval.",
+    "All ten rendered pages were visually inspected through the full contact sheet, with content pages 6 and 9 rechecked at original resolution.",
+    "The inspection used the local tmp_argos_render6 render set; the tracked review artifacts are the DOCX, PDF, and their hashes.",
+    "The cover identifies LumenCore as the company and LumaArc only as a founder-selected brand mark.",
     "Cover placeholders are explicitly labeled pending action-time facts.",
-    "The response remains blocked pending private facts, named teaming qualifications, duplicate recheck, final review, and exact action-time approval."
+    "The response remains blocked pending private facts, Government duplicate recheck, final dispatch binding, and exact action-time approval."
   ]
 }

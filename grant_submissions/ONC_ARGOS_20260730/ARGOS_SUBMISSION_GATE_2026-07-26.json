@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.opportunity_submission_gate.v1",
-  "generated_utc": "2026-07-27T19:12:10Z",
+  "generated_utc": "2026-07-28T19:45:00Z",
   "opportunity": {
     "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
     "title": "Project Argos Agentic AI Proof of Concept",
@@ -15,8 +15,16 @@
   },
   "response": {
     "company_name": "LumenCore",
-    "strategy": "PARTNER_FIRST_EVIDENCE_ASSURANCE_WORKSTREAM",
-    "template_id": "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_V1",
+    "strategy": "STANDALONE_BOUNDED_EVIDENCE_MANAGEMENT_RESPONSE",
+    "template_id": "ARGOS_STANDALONE_BOUNDED_CAPABILITY_RESPONSE_V2",
+    "response_mode": "STANDALONE_RESPONDENT",
+    "capability_posture": "BOUNDED_COMPONENT_CAPABILITY",
+    "teaming_proposed": false,
+    "subcontracting_proposed": false,
+    "proposed_team_organizations": [],
+    "team_disclosure_status": "RESOLVED_NO_EXTERNAL_TEAM_PROPOSED",
+    "full_scope_prime_readiness_claimed": false,
+    "full_scope_capability_status": "NOT_DEMONSTRATED",
     "status": "DRAFT_REVIEW_READY_NOT_SEND_READY",
     "page_limit": {
       "content_pages_max": 10,
@@ -49,25 +57,36 @@
     "decision": "NO_DUPLICATE_FOUND_BUT_RECHECK_AT_ACTION_TIME"
   },
   "official_notice_recheck": {
-    "checked_utc": "2026-07-27T19:08:00Z",
+    "checked_utc": "2026-07-28T17:21:48Z",
+    "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
     "notice_active": true,
     "deadline_utc": "2026-07-30T21:00:00Z",
     "submission_channel": "EMAIL_TO_OFFICIAL_PRIMARY_POINT_OF_CONTACT",
     "primary_point_of_contact_name": "Donna Sykes",
     "primary_point_of_contact_address_stored_in_public_gate": false,
     "teaming_permitted": true,
-    "named_team_members_and_roles_required": true,
-    "official_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view"
+    "team_required_for_response": false,
+    "team_identification_required_if_teaming_proposed": true,
+    "teaming_clause_semantic_normalization": "TEAMING_PERMITTED_IDENTIFY_ALL_PROPOSED_TEAM_MEMBERS_AND_ORGANIZATIONAL_ROLES_IF_ANY",
+    "teaming_clause_semantic_sha256": "593271c5404e03377c6da1ede6a24d8f21db55ec7f2f33c822ee0f5c0323fdd8",
+    "official_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
+    "amendment_observed": false,
+    "action_time_recheck_required": true
   },
   "partner_search": {
-    "status": "PRIMARY_GMAIL_DRAFT_CREATED_NOT_SENT",
+    "status": "PRIMARY_INQUIRY_SENT_ONCE_WAITING_FOR_REPLY",
     "candidate_register": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_CANDIDATE_REGISTER_2026-07-27.json",
     "outreach_drafts": "grant_submissions/ONC_ARGOS_20260730/ARGOS_TEAMING_OUTREACH_DRAFTS_2026-07-27.md",
     "candidate_count": 3,
     "candidate_interest_confirmed_count": 0,
     "candidate_name_use_authorized_count": 0,
-    "outreach_sent_count": 0,
-    "gmail_draft_count": 1,
+    "outreach_sent_count": 1,
+    "gmail_draft_count": 0,
+    "matching_inbound_count": 0,
+    "sent_copy_verified": true,
+    "sent_utc": "2026-07-28T15:39:34Z",
+    "duplicate_send_prohibited": true,
+    "current_status_receipt": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
     "primary_dispatch_gate": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
     "primary_partner_interest_target_utc": "2026-07-28T17:00:00Z"
   },
@@ -82,7 +101,8 @@
     "small_business_designations",
     "sam_registration_status_and_expiration"
   ],
-  "required_teaming_facts": [
+  "required_teaming_facts": [],
+  "teamed_response_conditional_facts": [
     "qualified_health_it_or_fhir_prime_or_partner",
     "federal_health_regulatory_subject_matter_lead",
     "hhs_ato_and_fips_199_security_lead",
@@ -113,10 +133,14 @@
     "final_body_verified": false,
     "final_attachments_verified": false,
     "all_private_facts_resolved": false,
-    "all_teaming_facts_resolved": false,
+    "all_teaming_facts_resolved": true,
+    "team_disclosure_resolved": true,
+    "public_repository_security_gate_clear": false,
+    "sanitized_external_response_path_selected": true,
+    "official_notice_rechecked_at_action_time": false,
     "duplicate_send_rechecked": false,
     "exact_action_time_human_approval_required": true,
     "decision": "BLOCK_SEND"
   },
-  "safest_next_action": "Review the primary EMI Advisors teaming inquiry, perform a fresh mailbox duplicate check, and request exact approval for that one recipient and body. Continue final response work only after a qualified team authorizes its names, roles, credentials, and relevant references."
+  "safest_next_action": "Do not resend the optional partner inquiry. Complete the private SAM cover facts and build a self-contained private attachment with no repository or live-site route. Keep provider credential rotation and public-history remediation open as public-promotion blockers. Immediately before any Government email, recheck the official notice and full mailbox, inspect and hash the exact attachment set, bind recipient, subject, and body, and request one exact action-time approval."
 }

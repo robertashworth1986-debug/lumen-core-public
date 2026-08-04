@@ -4,18 +4,23 @@
 
 **Government response deadline:** July 30, 2026 at 5:00 PM Eastern
 
-**Status:** `READY_FOR_REVIEW - NOT SENT`
+**Status:** `PRIMARY_SENT_ONCE - NO CURRENT DRAFT - WAITING_FOR_REPLY`
 
-These drafts are for one-at-a-time outreach. Before any send, recheck the full
-mailbox for a prior message or response and obtain exact approval for the named
-recipient, subject, body, and any attachment. Do not attach the unfinished HHS
-response on first contact.
+The primary EMI inquiry was sent once at `2026-07-28T15:39:34Z` with no
+attachment, CC, or BCC. Do not resend it. The text below is retained as a
+historical planning artifact, not a current send instruction. Before considering
+any fallback, recheck the full mailbox and rebuild a route-specific,
+single-use action packet.
+
+**Current Government-response posture:** standalone. Teaming is permitted but
+not required. No fallback partner outreach is needed to submit the truthful
+standalone response, and no outreach in this file should delay that response.
 
 ## 1. Primary Route - EMI Advisors
 
-**Use:** First contact because EMI Advisors publicly reports both ONC/FHIR work
-and an existing small-business consortium relationship with BookZurman and
-Digital HIE.
+**Use:** Historical primary route. Sent once; do not resend. EMI Advisors
+publicly reports both ONC/FHIR work and an existing small-business consortium
+relationship with BookZurman and Digital HIE.
 
 **Subject:** Time-sensitive teaming inquiry - HHS Project Argos sources sought
 
@@ -53,7 +58,8 @@ deadline.
 
 Public reviewer surface: https://lumen-core.ai/
 
-Public evidence repository: https://github.com/robertashworth1986-debug/lumen-core-public
+Public evidence repository: withheld from new outreach pending credential
+rotation and public-history remediation
 
 Respectfully,
 
@@ -94,7 +100,8 @@ without written authorization and documentary support.
 
 Public reviewer surface: https://lumen-core.ai/
 
-Public evidence repository: https://github.com/robertashworth1986-debug/lumen-core-public
+Public evidence repository: withheld pending credential rotation and
+public-history remediation
 
 Respectfully,
 
@@ -131,7 +138,8 @@ approval and supporting evidence.
 
 Public reviewer surface: https://lumen-core.ai/
 
-Public evidence repository: https://github.com/robertashworth1986-debug/lumen-core-public
+Public evidence repository: withheld pending credential rotation and
+public-history remediation
 
 Respectfully,
 
@@ -142,9 +150,11 @@ Founder, LumenCore
 ## Send Boundary
 
 - First-contact attachment set: none.
+- The EMI primary route was sent once and must not be resent.
 - Primary route and fallback route are not sent in parallel by default.
 - Candidate identification is not authorization to name a partner in the HHS
   response.
-- A Government response is not sent until private cover facts, authorized team
-  roles, relevant references, rendered-file QA, duplicate checks, and exact
-  action-time approval all pass.
+- A Government response is not sent until private cover facts, response-mode
+  consistency, rendered-file QA, duplicate checks, and exact action-time
+  approval all pass. Written team authority is additionally required only if
+  the response is deliberately changed from standalone to teamed.

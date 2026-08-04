@@ -30,16 +30,16 @@ EXPECTED_ASSERTION_PASS_COUNT = 31
 TEXT_SUFFIXES = {".json", ".md", ".py"}
 
 MATERIAL_CLAIMS = {
-    "BOUNDED_REPRODUCIBILITY_COUNTS": (
-        "31 of 31 declared assertions and 3 of 3 suites reproduced in the packaged "
-        "clean-run workflow, with dependency and source-state checks."
+    "FIRST_PARTY_REPRODUCIBILITY_PACKAGE": (
+        "A named package and SHA-256 receipt record successful execution of its declared "
+        "checks under an identified source state."
     ),
     "CUSTODY_AND_VALIDATION_CONTROLS": (
         "Versioned manifests, SHA-256 receipts, schema checks, duplicate-action locks, "
         "and fail-closed gate records support an inspectable evidence workflow."
     ),
     "ADVERSE_RESULT_RETENTION": (
-        "Public records preserve failed promotion gates, negative findings, and "
+        "Named first-party records preserve failed promotion gates, negative findings, and "
         "unresolved authorities instead of converting them into favorable claims."
     ),
 }
@@ -219,13 +219,13 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
 
     claim_entries = [
         {
-            "claim_id": "BOUNDED_REPRODUCIBILITY_COUNTS",
+            "claim_id": "FIRST_PARTY_REPRODUCIBILITY_PACKAGE",
             "response_fragment_sha256": fragment_sha256(
-                MATERIAL_CLAIMS["BOUNDED_REPRODUCIBILITY_COUNTS"]
+                MATERIAL_CLAIMS["FIRST_PARTY_REPRODUCIBILITY_PACKAGE"]
             ),
             "evidence_level": "FIRST_PARTY_REPRODUCED_NAMED_PACKAGE",
             "supported": (
-                response_fragments_present["BOUNDED_REPRODUCIBILITY_COUNTS"]
+                response_fragments_present["FIRST_PARTY_REPRODUCIBILITY_PACKAGE"]
                 and receipt_counts_hold
                 and source_identity_hold
                 and receipt_boundaries_hold
@@ -291,14 +291,14 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
     ]
     all_claims_supported = all(row["supported"] for row in claim_entries)
     status = (
-        "VERIFIED_BOUNDED_CLAIM_MAP"
+        "VERIFIED_BOUNDED_INTERNAL_CLAIM_MAP"
         if all(checks.values()) and all_claims_supported
         else "FAIL_CLAIM_TRACEABILITY"
     )
     sources = (RESPONSE_MARKDOWN, EVIDENCE_GRAPH, EVIDENCE_INDEX, REVIEWER_RECEIPT)
 
     return {
-        "schema": "lumencore.argos_claim_evidence_map.v1",
+        "schema": "lumencore.argos_claim_evidence_map.v2",
         "generated_utc": evaluated.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
         "status": status,
@@ -323,10 +323,12 @@ def build_payload(as_of_utc: str) -> dict[str, Any]:
             "must be checked separately at action time."
         ),
         "claim_boundary": (
-            "This map binds three affirmative engineering statements in the Argos "
-            "response to named public evidence. It does not establish health IT prior "
-            "performance, partner authority, HHS authorization, external validation, "
-            "field performance, submission, acceptance, selection, award, or funding."
+            "This internal map binds three affirmative engineering statements in the "
+            "Argos response to named first-party evidence. The response exposes no "
+            "repository or live-site route and offers artifacts only for authorized "
+            "review after security screening. This map does not establish health IT "
+            "prior performance, HHS authorization, external validation, field "
+            "performance, submission, acceptance, selection, award, or funding."
         ),
         "external_action_performed": False,
         "submission_authorized": False,
@@ -377,7 +379,7 @@ def main() -> int:
     return (
         0
         if status != "STALE"
-        and payload["status"] == "VERIFIED_BOUNDED_CLAIM_MAP"
+        and payload["status"] == "VERIFIED_BOUNDED_INTERNAL_CLAIM_MAP"
         else 1
     )
 

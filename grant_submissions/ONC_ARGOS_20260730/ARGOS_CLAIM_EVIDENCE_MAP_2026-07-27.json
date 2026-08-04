@@ -8,10 +8,10 @@
     "reviewer_receipt_counts_hold": true,
     "reviewer_receipt_source_identity_hold": true
   },
-  "claim_boundary": "This map binds three affirmative engineering statements in the Argos response to named public evidence. It does not establish health IT prior performance, partner authority, HHS authorization, external validation, field performance, submission, acceptance, selection, award, or funding.",
+  "claim_boundary": "This internal map binds three affirmative engineering statements in the Argos response to named first-party evidence. The response exposes no repository or live-site route and offers artifacts only for authorized review after security screening. This map does not establish health IT prior performance, HHS authorization, external validation, field performance, submission, acceptance, selection, award, or funding.",
   "claims": [
     {
-      "claim_id": "BOUNDED_REPRODUCIBILITY_COUNTS",
+      "claim_id": "FIRST_PARTY_REPRODUCIBILITY_PACKAGE",
       "does_not_support": [
         "independent_reproduction",
         "external_validation",
@@ -28,7 +28,7 @@
         "suite_pass_count": 3
       },
       "evidence_level": "FIRST_PARTY_REPRODUCED_NAMED_PACKAGE",
-      "response_fragment_sha256": "f0f10059faecd463d3f0ea0962461496c5f221547864811eb8e0cb230342f85b",
+      "response_fragment_sha256": "9ad9401101f30f22792f55b18aaaa5dee01154c2426787db69e18aade99543e3",
       "supported": true
     },
     {
@@ -63,30 +63,30 @@
         "protocol_amendment_present": true
       },
       "evidence_level": "FIRST_PARTY_REPRODUCED_WITH_NEGATIVE_RESULTS",
-      "response_fragment_sha256": "b6d66edd852c27bda6b9bbe6e452afc037e6e6c9cc46351a4f15f8ea1d148800",
+      "response_fragment_sha256": "62f3fa66168128a2abc59f68046ef8bb5601dd0f19774c638478f4ad60833a9c",
       "supported": true
     }
   ],
   "external_action_performed": false,
-  "generated_utc": "2026-07-27T20:30:00Z",
+  "generated_utc": "2026-07-28T20:16:29Z",
   "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
   "response": {
     "material_claim_count": 3,
     "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md",
-    "sha256": "0d7cfc14fb52eb0df75dea32f29c55d825f253c357ae75f1641c6d17c3a070c1"
+    "sha256": "7dc0a1a622ba6d78de3d1734200d9cba104d62b9833997f51519f0aff3e32dfe"
   },
   "response_fragment_checks": {
     "ADVERSE_RESULT_RETENTION": true,
-    "BOUNDED_REPRODUCIBILITY_COUNTS": true,
-    "CUSTODY_AND_VALIDATION_CONTROLS": true
+    "CUSTODY_AND_VALIDATION_CONTROLS": true,
+    "FIRST_PARTY_REPRODUCIBILITY_PACKAGE": true
   },
   "runtime_observation_boundary": "This offline map does not assert live-domain availability. Runtime routes must be checked separately at action time.",
-  "schema": "lumencore.argos_claim_evidence_map.v1",
+  "schema": "lumencore.argos_claim_evidence_map.v2",
   "source_custody": [
     {
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md",
-      "sha256": "0d7cfc14fb52eb0df75dea32f29c55d825f253c357ae75f1641c6d17c3a070c1"
+      "sha256": "7dc0a1a622ba6d78de3d1734200d9cba104d62b9833997f51519f0aff3e32dfe"
     },
     {
       "hash_mode": "TEXT_UTF8_LF",
@@ -104,6 +104,6 @@
       "sha256": "3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d"
     }
   ],
-  "status": "VERIFIED_BOUNDED_CLAIM_MAP",
+  "status": "VERIFIED_BOUNDED_INTERNAL_CLAIM_MAP",
   "submission_authorized": false
 }

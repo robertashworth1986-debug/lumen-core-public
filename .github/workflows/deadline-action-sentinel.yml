@@ -81,6 +81,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -90,7 +92,7 @@ jobs:
       - name: Install focused test dependency
         run: >-
           python -m pip install --disable-pip-version-check
-          pytest python-docx==1.2.0
+          pytest python-docx==1.2.0 pypdf==6.14.2
 
       - name: Compile builder and tests
         run: |
@@ -105,8 +107,45 @@ jobs:
       - name: Verify the Argos claim-to-evidence map
         run: python grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py --check
 
-      - name: Verify the Argos teaming dispatch binding
-        run: python grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py --check
+      - name: Verify the historical Argos teaming binding is exact and expired
+        run: |
+          python grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py --check \
+            > "${RUNNER_TEMP}/argos-historical-binding-check.json"
+          set +e
+          python grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py --action-time-check \
+            > "${RUNNER_TEMP}/argos-historical-binding-action-time.json"
+          action_time_status=$?
+          set -e
+          test "${action_time_status}" -eq 3
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          check_receipt = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "argos-historical-binding-check.json")
+              .read_text(encoding="utf-8")
+          )
+          assert check_receipt == {
+              "status": "CURRENT",
+              "decision": "VERIFIED_SNAPSHOT_READY_FOR_SINGLE_USE_ACTION_TIME_APPROVAL",
+              "check_count": 12,
+              "pass_count": 12,
+              "fail_count": 0,
+              "send_authorized": False,
+              "send_performed": False,
+          }
+          action_time = json.loads(
+              (
+                  Path(os.environ["RUNNER_TEMP"])
+                  / "argos-historical-binding-action-time.json"
+              ).read_text(encoding="utf-8")
+          )
+          assert action_time["approval_window_current"] is False
+          assert action_time["decision"] == "EXPIRED_OR_BLOCKED_REBUILD_REQUIRED"
+          assert action_time["send_authorized"] is False
+          assert action_time["send_performed"] is False
+          PY
 
       - name: Verify the Argos response conformance gate
         run: python grant_submissions/ONC_ARGOS_20260730/build_argos_conformance_gate.py --check

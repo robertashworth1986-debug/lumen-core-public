@@ -45,28 +45,31 @@ def write_config(path: Path, payload: dict) -> None:
 
 
 def test_argos_exact_deadline_is_bound_to_gate_and_fail_closed():
-    payload = SENTINEL.build_sentinel(CONFIG, as_of("2026-07-28T04:50:00Z"))
+    payload = SENTINEL.build_sentinel(CONFIG, as_of("2026-07-28T20:20:00Z"))
     argos = lane(payload, "ONC_ARGOS_20260730")
 
-    assert argos["state"] == "DRAFT_ONLY_APPROVAL_EXPIRED_HUMAN_ACTION_DUE"
+    assert argos["state"] == "PARTNER_OUTREACH_SENT_ONCE_GOVERNMENT_RESPONSE_DUE"
     assert argos["urgency"] == "WITHIN_72_HOURS"
     assert argos["deadline"]["iso_utc"] == "2026-07-30T21:00:00Z"
-    assert argos["deadline"]["hours_until_deadline"] == 64.17
+    assert argos["deadline"]["hours_until_deadline"] == 48.67
     assert argos["deadline"]["deadline_passed"] is False
     assert (
         argos["source_receipt"]["observed_status"]
-        == "GMAIL_DRAFT_READY_SEND_BLOCKED"
+        == "BLOCK_SEND"
     )
     assert len(argos["source_receipt"]["sha256"]) == 64
     assert argos["external_action_authorized"] is False
     assert argos["send_now"] is False
     assert argos["external_action_executed"] is False
     outreach = argos["outreach_status"]
-    assert outreach["current_state_as_of_evaluation"] == "PARTNER_TARGET_OPEN"
-    assert outreach["seconds_until_partner_target"] == 43800
+    assert (
+        outreach["current_state_as_of_evaluation"]
+        == "PARTNER_TARGET_PASSED_WAITING_FOR_REPLY"
+    )
+    assert outreach["seconds_until_partner_target"] == -12000
     assert outreach["mailbox_state_as_of_record"] == {
-        "current_draft_count": 1,
-        "sent_count": 0,
+        "current_draft_count": 0,
+        "sent_count": 1,
         "inbound_count": 0,
         "attachment_count": 0,
         "cc_count": 0,
@@ -75,8 +78,15 @@ def test_argos_exact_deadline_is_bound_to_gate_and_fail_closed():
     assert outreach["selected_template_id"] == "INITIAL_PARTNER_TEAMING_INQUIRY"
     assert outreach["prior_binding_expired"] is True
     assert outreach["prior_approval_reusable"] is False
-    assert outreach["fresh_recheck_required"] is True
-    assert outreach["new_exact_approval_required"] is True
+    assert outreach["binding_match_status"] == (
+        "MISMATCH_RETAINED_AS_UNRECONCILED_PUBLIC_AUDIT_GAP"
+    )
+    assert outreach["public_authorization_chain_reconciled"] is False
+    assert outreach["sent_content_source_bound_by_post_send_hashes"] is True
+    assert outreach["fresh_recheck_required"] is False
+    assert outreach["new_exact_approval_required"] is False
+    assert outreach["duplicate_send_prohibited"] is True
+    assert outreach["government_response_action_time_gates_required"] is True
 
 
 @pytest.mark.parametrize(
@@ -103,11 +113,11 @@ def test_exact_deadline_turns_past_without_authorizing_late_action(
 
 def test_argos_status_cannot_be_used_before_its_record_time():
     with pytest.raises(ValueError, match="before its record time"):
-        SENTINEL.build_sentinel(CONFIG, as_of("2026-07-28T04:47:44Z"))
+        SENTINEL.build_sentinel(CONFIG, as_of("2026-07-28T16:45:48Z"))
 
 
 def test_monday_deadline_lanes_are_reconciled_without_new_action():
-    payload = SENTINEL.build_sentinel(CONFIG, as_of("2026-07-28T04:50:00Z"))
+    payload = SENTINEL.build_sentinel(CONFIG, as_of("2026-07-28T20:20:00Z"))
     csdr = lane(payload, "DAF_CSDR_20260727")
     nsf = lane(payload, "NSF_26_510_20260727")
 
@@ -193,7 +203,7 @@ def test_source_deadline_mismatch_is_rejected(tmp_path: Path):
     write_config(tampered, changed)
 
     with pytest.raises(ValueError, match="does not match the repository gate"):
-        SENTINEL.build_sentinel(tampered, as_of("2026-07-28T04:50:00Z"))
+        SENTINEL.build_sentinel(tampered, as_of("2026-07-28T16:50:00Z"))
 
 
 @pytest.mark.parametrize(
@@ -201,7 +211,7 @@ def test_source_deadline_mismatch_is_rejected(tmp_path: Path):
     [
         (
             ("mailbox_observation", "matching_sent_count"),
-            1,
+            0,
             "mailbox count changed",
         ),
         (
@@ -213,6 +223,11 @@ def test_source_deadline_mismatch_is_rejected(tmp_path: Path):
             ("prior_binding", "prior_approval_reusable"),
             True,
             "prior approval must remain nonreusable",
+        ),
+        (
+            ("prior_binding", "historical_snapshot_binding_sha256"),
+            "0" * 64,
+            "no longer matches the historical binding snapshot",
         ),
     ],
 )
@@ -236,7 +251,7 @@ def test_argos_status_tampering_is_rejected(
     with pytest.raises(ValueError, match=error):
         SENTINEL.build_sentinel(
             CONFIG,
-            as_of("2026-07-28T04:50:00Z"),
+            as_of("2026-07-28T16:50:00Z"),
         )
 
 
@@ -257,7 +272,7 @@ def test_argos_status_rejects_private_identifier_fields(
     with pytest.raises(ValueError, match="private field is not permitted"):
         SENTINEL.build_sentinel(
             CONFIG,
-            as_of("2026-07-28T04:50:00Z"),
+            as_of("2026-07-28T16:50:00Z"),
         )
 
 
@@ -293,8 +308,8 @@ def test_snapshot_is_current_private_safe_and_action_free():
         "`NSF_26_510_20260727`: private official-event metadata only"
         not in markdown
     )
-    assert "DRAFT_ONLY_APPROVAL_EXPIRED_DEADLINE_OPEN" in markdown
-    assert "1 draft, 0 sent, and 0 inbound" in markdown
+    assert "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY" in markdown
+    assert "0 draft, 1 sent, and 0 inbound" in markdown
     assert snapshot["summary"]["autonomous_external_action_count"] == 0
     assert snapshot["summary"]["external_actions_executed_count"] == 0
     assert all(item["send_now"] is False for item in snapshot["lanes"])

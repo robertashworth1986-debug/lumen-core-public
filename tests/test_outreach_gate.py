@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import unittest
 from pathlib import Path
 
@@ -11,6 +12,12 @@ SPEC = importlib.util.spec_from_file_location(
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
+DLA_NV011_STATUS_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "DLA_NV011_OFFICIAL_STATUS_RECEIPT_2026-07-28.json"
+)
 
 
 class OutreachGateTests(unittest.TestCase):
@@ -115,6 +122,54 @@ class OutreachGateTests(unittest.TestCase):
         )
         self.assertFalse(result["allowed"])
         self.assertIn("receipt_confirmed_waiting", result["reason"])
+
+    def test_project_argos_allows_drafting_but_codex_cannot_send(self) -> None:
+        draft = MODULE.evaluate(
+            self.registry,
+            "hhs-project-argos-sources-sought",
+            actor="codex",
+            action="draft",
+            mode="new",
+        )
+        self.assertTrue(draft["allowed"])
+        self.assertIn("sending is not implied", draft["reason"])
+
+        send = MODULE.evaluate(
+            self.registry,
+            "hhs-project-argos-sources-sought",
+            actor="codex",
+            action="send",
+            mode="new",
+            explicit_approval=True,
+            gmail_preflight_complete=True,
+        )
+        self.assertFalse(send["allowed"])
+        self.assertIn("Codex is draft-only", send["reason"])
+
+    def test_dla_nv011_is_authoritatively_closed_without_private_identifiers(
+        self,
+    ) -> None:
+        campaign = next(
+            row
+            for row in self.registry["campaigns"]
+            if row["outreach_id"] == "LC-DLA-MISSIONWEAVE-NV011-001"
+        )
+        receipt = json.loads(DLA_NV011_STATUS_RECEIPT.read_text(encoding="utf-8"))
+
+        self.assertEqual(campaign["status"], "closed")
+        self.assertEqual(campaign["outbound_sequence"], 3)
+        self.assertEqual(receipt["decision"], "CLOSED_NOT_FORMALLY_SUBMITTED")
+        self.assertEqual(
+            receipt["official_message"]["key_determination"],
+            "The DSIP record shows the proposal as In Progress, so it was not "
+            "formally submitted.",
+        )
+        self.assertFalse(receipt["official_message"]["reply_requested"])
+        self.assertEqual(receipt["selected_template_id"], "NO_DUPLICATE_MONITOR")
+        self.assertTrue(
+            all(not value for value in receipt["privacy_controls"].values())
+        )
+        self.assertFalse(receipt["external_action_performed"])
 
 
 if __name__ == "__main__":

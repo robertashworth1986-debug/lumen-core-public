@@ -4,7 +4,7 @@
   "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
   "source_config": "config/external_technical_review_packet_v1.json",
   "source_config_sha256": "8a65aa172beee81e25854ead23e07cb223a236886f9dc37fb3667bb570a12a87",
-  "template_config_sha256": "cbe13ccc77bafa44f75394970dfb80fea5ba17d67665a486892a4b6cff6372e3",
+  "template_config_sha256": "0cfbda7dfd68aff39eab6a07676b0b44b13fb4455a0530fb3b3663f05a19e148",
   "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
   "controls": {
     "builder_can_send_email": false,

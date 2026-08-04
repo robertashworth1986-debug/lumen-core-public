@@ -11,7 +11,7 @@
 
 | Check | Status | Requirement | Evidence |
 | --- | --- | --- | --- |
-| `REGISTRY_BINDING` | `PASS` | The selected teaming template and registry hashes are current. | template_id=INITIAL_PARTNER_TEAMING_INQUIRY; template_matches=1 |
+| `REGISTRY_BINDING` | `PASS` | The selected teaming template is unchanged and the historical registry snapshot hash is preserved. | template_id=INITIAL_PARTNER_TEAMING_INQUIRY; template_matches=1; historical_registry_snapshot_preserved=True |
 | `PUBLIC_RECIPIENT_ROUTE` | `PASS` | The named organization route is public, verified, and address-redacted. | organization=EMI Advisors LLC; public_route_verified=True |
 | `SUBJECT_SAFETY` | `PASS` | The exact subject is nonempty, bounded, and header-safe. | subject_chars=65; subject_sha256=80FEEDC1540F859AC970FD32A3F9DFF0E03C5B347130C7FFF2E4E24382C5993B |
 | `BODY_CUSTODY` | `PASS` | The declared body bytes and SHA-256 match the committed source. | body_bytes=2067; body_sha256=A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2 |

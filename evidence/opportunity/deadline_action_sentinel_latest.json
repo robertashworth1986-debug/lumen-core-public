@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.deadline_action_sentinel.v1",
-  "evaluated_utc": "2026-07-28T04:53:42Z",
+  "evaluated_utc": "2026-07-28T20:19:49Z",
   "posture": "HUMAN_ACTION_REQUIRED_FAIL_CLOSED",
   "controls": {
     "read_only_builder": true,
@@ -35,9 +35,9 @@
     "autonomous_external_action_count": 0,
     "external_actions_executed_count": 0,
     "state_counts": {
-      "DRAFT_ONLY_APPROVAL_EXPIRED_HUMAN_ACTION_DUE": 1,
       "HUMAN_DATE_ONLY_ACTION_OPEN": 2,
       "HUMAN_DATE_ONLY_RECONCILIATION_REQUIRED": 1,
+      "PARTNER_OUTREACH_SENT_ONCE_GOVERNMENT_RESPONSE_DUE": 1,
       "PAST_DEADLINE_NO_EXTERNAL_ACTION_AUTHORIZED": 1
     }
   },
@@ -78,8 +78,8 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": true,
-        "seconds_until_deadline": -42822,
-        "hours_until_deadline": -11.89
+        "seconds_until_deadline": -98389,
+        "hours_until_deadline": -27.33
       }
     },
     {
@@ -125,32 +125,35 @@
       "external_action_type": "EMAIL_RESPONSE",
       "completion_evidence_present": false,
       "blockers": [
-        "One matching Gmail draft and zero sent or inbound copies were observed at the recorded full-mailbox check.",
-        "The latest five-minute dispatch binding expired and its approval cannot be reused.",
-        "A fresh full-mailbox duplicate search, exact draft readback, private HumanUnlock, and new exact action-time approval are still required.",
-        "Written partner authority is required before using the partner name or qualifications in a Government response."
+        "One bounded partner inquiry was sent once; the fresh mailbox check found zero current drafts and zero inbound replies, so it must not be resent.",
+        "The Government capability response itself has not been sent.",
+        "Provider credential rotation and reachable public Git-history remediation remain required before linking the public repository or sending the final response.",
+        "Private SAM cover facts, authorized team facts, a final duplicate search, exact dispatch binding, and exact action-time approval remain required.",
+        "Written partner authority is required before using any partner name, role, qualification, or prior performance in the Government response."
       ],
-      "blocker_count": 4,
+      "blocker_count": 5,
       "requires_human_attention": true,
       "external_action_authorized": false,
       "send_now": false,
       "external_action_executed": false,
-      "safest_next_action": "Before the partner-interest target, repeat the full-mailbox duplicate search and exact draft readback, rebuild the five-minute dispatch binding, and obtain one new exact action-time approval. Do not send from the expired binding.",
+      "safest_next_action": "Do not resend the partner inquiry. Complete credential rotation and public-history remediation, verify the minimum private SAM cover facts, preserve the no-unauthorized-partner boundary, and then build one final Government email-and-attachment binding for exact action-time approval.",
       "source_receipt": {
         "kind": "REPOSITORY_GATE_WITH_OUTREACH_STATUS",
-        "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
-        "sha256": "bcbcee8d16010724439024d2811ba78adf991e4787439de8c9e33f06e0e990ea",
-        "bound_deadline_field": "opportunity.government_deadline_utc",
-        "observed_status": "GMAIL_DRAFT_READY_SEND_BLOCKED",
+        "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
+        "sha256": "a5732b70547091a146f51f70456946834b3c34e1917c0efa2f11057d73ff1a89",
+        "bound_deadline_field": "opportunity.deadline_utc",
+        "observed_status": "BLOCK_SEND",
         "outreach_status": {
           "path": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
-          "sha256": "aecc207538e990905450bb3eeb417f98dd500dfbee635b221bdee00d1613f4a6",
-          "recorded_utc": "2026-07-28T04:47:45Z",
-          "observed_state": "DRAFT_ONLY_APPROVAL_EXPIRED_DEADLINE_OPEN",
+          "sha256": "f1185a5187038b62ccb8d28628ad3860a03e8efb73c47aede6f29566c5389191",
+          "recorded_utc": "2026-07-28T20:19:34Z",
+          "observed_state": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
           "partner_interest_target_utc": "2026-07-28T17:00:00Z",
+          "mailbox_checked_utc": "2026-07-28T20:19:34Z",
+          "sent_utc": "2026-07-28T15:39:34Z",
           "mailbox_state": {
-            "current_draft_count": 1,
-            "sent_count": 0,
+            "current_draft_count": 0,
+            "sent_count": 1,
             "inbound_count": 0,
             "attachment_count": 0,
             "cc_count": 0,
@@ -161,15 +164,19 @@
           "body_sha256": "A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2",
           "selected_template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
           "prior_binding": {
-            "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json",
-            "binding_sha256": "D363D349B1E9D99F3DE3981192FB7AE4F5FE63DA3B07268E742354CF626D5B27",
+            "historical_snapshot_path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json",
+            "historical_snapshot_binding_sha256": "D363D349B1E9D99F3DE3981192FB7AE4F5FE63DA3B07268E742354CF626D5B27",
+            "observed_action_time_binding_sha256": "9BEB7538450C9B35D7738D2215D9F4E2D51E2E2B25682D2E69C4029610A63E32",
+            "binding_match_status": "MISMATCH_RETAINED_AS_UNRECONCILED_PUBLIC_AUDIT_GAP",
+            "public_authorization_chain_reconciled": false,
+            "sent_content_source_bound_by_post_send_hashes": true,
             "expires_utc": "2026-07-27T23:33:38Z",
             "expired_at_record_time": true,
             "prior_approval_reusable": false
           }
         }
       },
-      "state": "DRAFT_ONLY_APPROVAL_EXPIRED_HUMAN_ACTION_DUE",
+      "state": "PARTNER_OUTREACH_SENT_ONCE_GOVERNMENT_RESPONSE_DUE",
       "urgency": "WITHIN_72_HOURS",
       "deadline": {
         "precision": "EXACT",
@@ -180,18 +187,18 @@
         "timezone_known": true,
         "exact_countdown_available": true,
         "deadline_passed": false,
-        "seconds_until_deadline": 230778,
-        "hours_until_deadline": 64.11
+        "seconds_until_deadline": 175211,
+        "hours_until_deadline": 48.67
       },
       "outreach_status": {
-        "observed_state": "DRAFT_ONLY_APPROVAL_EXPIRED_DEADLINE_OPEN",
-        "recorded_utc": "2026-07-28T04:47:45Z",
-        "current_state_as_of_evaluation": "PARTNER_TARGET_OPEN",
+        "observed_state": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
+        "recorded_utc": "2026-07-28T20:19:34Z",
+        "current_state_as_of_evaluation": "PARTNER_TARGET_PASSED_WAITING_FOR_REPLY",
         "partner_interest_target_utc": "2026-07-28T17:00:00Z",
-        "seconds_until_partner_target": 43578,
+        "seconds_until_partner_target": -11989,
         "mailbox_state_as_of_record": {
-          "current_draft_count": 1,
-          "sent_count": 0,
+          "current_draft_count": 0,
+          "sent_count": 1,
           "inbound_count": 0,
           "attachment_count": 0,
           "cc_count": 0,
@@ -202,8 +209,13 @@
         "body_sha256": "A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2",
         "prior_binding_expired": true,
         "prior_approval_reusable": false,
-        "fresh_recheck_required": true,
-        "new_exact_approval_required": true
+        "binding_match_status": "MISMATCH_RETAINED_AS_UNRECONCILED_PUBLIC_AUDIT_GAP",
+        "public_authorization_chain_reconciled": false,
+        "sent_content_source_bound_by_post_send_hashes": true,
+        "fresh_recheck_required": false,
+        "new_exact_approval_required": false,
+        "duplicate_send_prohibited": true,
+        "government_response_action_time_gates_required": true
       }
     },
     {

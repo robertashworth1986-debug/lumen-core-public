@@ -1,8 +1,8 @@
 {
   "schema": "lumencore.argos_partner_outreach_status.v1",
-  "recorded_utc": "2026-07-28T04:47:45Z",
+  "recorded_utc": "2026-07-28T20:19:34Z",
   "lane_id": "argos_emi_teaming_inquiry",
-  "status": "DRAFT_ONLY_APPROVAL_EXPIRED_DEADLINE_OPEN",
+  "status": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
   "opportunity": {
     "name": "HHS Project Argos sources sought",
     "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
@@ -19,12 +19,16 @@
     "address_omitted": true
   },
   "mailbox_observation": {
+    "checked_utc": "2026-07-28T20:19:34Z",
     "full_mailbox_search_completed": true,
     "search_scope": "ALL_MAIL_EXACT_SUBJECT_OR_RECIPIENT_OR_NOTICE",
-    "matching_current_draft_count": 1,
-    "matching_sent_count": 0,
+    "matching_current_draft_count": 0,
+    "matching_sent_count": 1,
     "matching_inbound_count": 0,
-    "current_draft_only": true,
+    "matching_thread_message_count": 1,
+    "current_draft_only": false,
+    "sent_copy_present": true,
+    "sent_utc": "2026-07-28T15:39:34Z",
     "gmail_identifiers_omitted": true,
     "message_body_omitted": true,
     "subject_sha256": "80FEEDC1540F859AC970FD32A3F9DFF0E03C5B347130C7FFF2E4E24382C5993B",
@@ -34,7 +38,11 @@
     "bcc_count": 0
   },
   "prior_binding": {
-    "binding_sha256": "D363D349B1E9D99F3DE3981192FB7AE4F5FE63DA3B07268E742354CF626D5B27",
+    "observed_action_time_binding_sha256": "9BEB7538450C9B35D7738D2215D9F4E2D51E2E2B25682D2E69C4029610A63E32",
+    "historical_snapshot_binding_sha256": "D363D349B1E9D99F3DE3981192FB7AE4F5FE63DA3B07268E742354CF626D5B27",
+    "binding_match_status": "MISMATCH_RETAINED_AS_UNRECONCILED_PUBLIC_AUDIT_GAP",
+    "public_authorization_chain_reconciled": false,
+    "sent_content_source_bound_by_post_send_hashes": true,
     "expires_utc": "2026-07-27T23:33:38Z",
     "expired_at_record_time": true,
     "prior_approval_reusable": false
@@ -48,13 +56,16 @@
   "controls": {
     "builder_can_send_email": false,
     "draft_creation_authorizes_send": false,
-    "fresh_full_mailbox_recheck_required": true,
-    "fresh_draft_readback_required": true,
-    "new_five_minute_exact_approval_required": true,
+    "fresh_full_mailbox_recheck_completed_before_send": true,
+    "fresh_draft_readback_completed_before_send": true,
+    "action_time_human_approval_received": true,
+    "public_action_time_binding_reconciled": false,
     "private_human_unlock_required": true,
+    "final_send_performed": true,
+    "post_send_sent_copy_verified": true,
     "duplicate_send_prohibited": true,
     "partner_name_use_requires_written_authority": true
   },
-  "next_action": "Before the partner-interest target, repeat the full-mailbox duplicate search and exact draft readback, rebuild the five-minute dispatch binding, and obtain one new exact action-time approval. Do not send from the expired binding.",
-  "claim_boundary": "This record establishes only that one bounded partner inquiry was observed as a current Gmail draft with no matching sent or inbound message at the recorded check. It does not send email, authorize partner-name use, establish submission, award, funding, selection, validation, performance, or savings."
+  "next_action": "Do not resend. Preserve the disclosed public authorization-chain mismatch as an audit gap, monitor for a reply, and independently complete the HHS capability statement before the July 30 deadline. Use EMI or any other organization as a named team member only after written role confirmation.",
+  "claim_boundary": "This record establishes only that one bounded partner inquiry was sent once and observed in Gmail SENT with no attachment, CC, or BCC, and that its subject and body match committed source hashes. The public action-time binding does not reconcile to the historical snapshot and is not claimed as source-bound authorization evidence. This record does not prove delivery, recipient review or response, teaming authority, Government submission, award, funding, selection, validation, performance, or savings."
 }

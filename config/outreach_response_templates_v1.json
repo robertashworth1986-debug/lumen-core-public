@@ -1,7 +1,7 @@
 {
   "schema": "lumencore.outreach_response_templates.v1",
   "version": 1,
-  "source_effective_utc": "2026-07-25T22:53:44Z",
+  "source_effective_utc": "2026-07-28T16:24:00Z",
   "claim_boundary": "This response is a communication or routing artifact. It does not establish selection, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
@@ -621,6 +621,47 @@
       "optional_defaults": {},
       "subject": "Re: {source_subject}",
       "body": "Hello {recipient_name},\n\nI apologize for the scheduling mistake regarding {meeting_context}. {scheduling_correction}\n\nI remain interested and can meet during: {availability_windows}. Please use whichever available slot is easiest, or send the correct rebooking link.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
+    },
+    {
+      "template_id": "FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE",
+      "description": "Transmit one capability response explicitly requested by an official sources-sought or market-research notice, with a source-bound deadline, attachment inventory, information-handling disclosure, and exact action-time review.",
+      "inbound_states": [
+        "OFFICIAL_MARKET_RESEARCH_NOTICE_OPEN",
+        "CAPABILITY_RESPONSE_READY_FOR_ACTION_TIME_REVIEW"
+      ],
+      "reply_triggers": [
+        "OFFICIAL_CAPABILITY_RESPONSE_REQUIRED"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "agency_name",
+        "notice_title",
+        "notice_id",
+        "official_source_url",
+        "official_source_checked_utc",
+        "official_source_receipt_sha256",
+        "deadline_iso",
+        "legal_entity_name",
+        "attachment_inventory",
+        "information_handling_disclosure",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email"
+      ],
+      "sensitive_fields": [
+        "recipient_email",
+        "legal_entity_name",
+        "attachment_inventory"
+      ],
+      "optional_defaults": {},
+      "subject": "Sources Sought Response - {notice_id} - {legal_entity_name}",
+      "body": "Hello {recipient_name},\n\nAttached is {legal_entity_name}'s capability response to {notice_title} ({notice_id}) for {agency_name}. The official response deadline is {deadline_iso}.\n\nOfficial notice: {official_source_url}\nOfficial source rechecked: {official_source_checked_utc}\nSource receipt SHA-256: {official_source_receipt_sha256}\n\nAttachment inventory: {attachment_inventory}\n\nThis response is provided solely for market research. It does not include a price proposal and does not imply a solicitation, reimbursement, Government commitment, selection, or award.\n\nInformation-handling disclosure: {information_handling_disclosure}\n\nPlease confirm receipt only if your process normally provides one; no duplicate response will be sent without a new request.\n\nRespectfully,\n{sender_name}\n{sender_title}\n{organization_name}"
     }
   ]
 }

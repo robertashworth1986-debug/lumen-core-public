@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from xml.etree import ElementTree
 from zipfile import ZipFile
+
+from pypdf import PdfReader
 
 
 ARGOS_DIR = Path(__file__).resolve().parent
@@ -21,17 +25,68 @@ PARTNER_DISPATCH_GATE = ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.
 PARTNER_DISPATCH_BINDING = (
     ARGOS_DIR / "ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json"
 )
+PARTNER_STATUS = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json"
+)
 CLAIM_EVIDENCE_MAP = ARGOS_DIR / "ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
 RESPONSE_MARKDOWN = ARGOS_DIR / "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md"
 BUILD_RECEIPT = OUTPUT_DIR / "build_receipt.json"
 RENDER_RECEIPT = OUTPUT_DIR / "render_qa_receipt.json"
 DOCX = OUTPUT_DIR / "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.docx"
 PDF = OUTPUT_DIR / "ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.pdf"
+OFFICIAL_SOW = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "source_attachments"
+    / "Project Argos SOW - SSN.pdf"
+)
+OFFICIAL_SOW_SHA256 = (
+    "6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354"
+)
+OFFICIAL_SOW_BYTES = 174359
+OFFICIAL_SOW_SOURCE_RECEIPT = (
+    ROOT
+    / "grant_submissions"
+    / "funding_sprint_20260709"
+    / "source_attachments"
+    / "PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json"
+)
+SECURITY_GATE = (
+    ARGOS_DIR / "ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json"
+)
+SECURITY_STATUS = ROOT / "config" / "public_credential_remediation_status_v1.json"
+PUBLIC_CREDENTIAL_CONFIG = ROOT / "LamaScout" / "config" / "api_registry.yaml"
+SECURITY_VERIFIER = (
+    ROOT / "code" / "ops" / "VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py"
+)
+OFFICIAL_NOTICE_MAX_AGE_SECONDS = 24 * 60 * 60
 
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 NS = {"w": W_NS}
 PRIVATE_PLACEHOLDER = "ACTION_TIME_PRIVATE_FACT_REQUIRED"
-UNAUTHORIZED_PARTNER_NAMES = ("EMI Advisors", "Index Analytics", "BookZurman")
+TEAMING_SEMANTIC_NORMALIZATION = (
+    "TEAMING_PERMITTED_IDENTIFY_ALL_PROPOSED_TEAM_MEMBERS_AND_ORGANIZATIONAL_ROLES_IF_ANY"
+)
+TEAMED_RESPONSE_PHRASES = (
+    "partner-led",
+    "pending partner",
+    "participant in a named team",
+    "with partner review",
+    "with fhir partner",
+    "with security partner",
+    "with domain partner",
+)
+FORBIDDEN_EXTERNAL_ROUTE_TOKENS = (
+    "https://github.com/robertashworth1986-debug/lumen-core-public",
+    "https://lumen-core.ai/",
+    "github.com",
+    "lumen-core-public",
+    "robertashworth1986-debug",
+)
 FORBIDDEN_PROMOTION_PHRASES = (
     "agency approved",
     "hhs authorized",
@@ -40,7 +95,21 @@ FORBIDDEN_PROMOTION_PHRASES = (
     "guaranteed savings",
     "full-prime ready",
 )
-TEXT_CUSTODY_SUFFIXES = {".json", ".md", ".py"}
+TEXT_CUSTODY_SUFFIXES = {".json", ".md", ".py", ".yaml", ".yml"}
+ENTITY_LEGAL_SUFFIXES = {
+    "co",
+    "company",
+    "corp",
+    "corporation",
+    "inc",
+    "incorporated",
+    "limited",
+    "llc",
+    "llp",
+    "lp",
+    "ltd",
+    "pllc",
+}
 
 
 def sha256(path: Path) -> str:
@@ -65,6 +134,23 @@ def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def current_security_payload(committed: dict) -> tuple[dict, bool]:
+    spec = importlib.util.spec_from_file_location(
+        "argos_conformance_credential_hygiene",
+        SECURITY_VERIFIER,
+    )
+    if spec is None or spec.loader is None:
+        raise ValueError("public repository security verifier cannot be loaded")
+    verifier = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(verifier)
+    current = verifier.build_payload()
+    receipt_current = (
+        verifier.canonical_json_bytes(committed)
+        == verifier.canonical_json_bytes(current)
+    )
+    return current, receipt_current
+
+
 def rel(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
 
@@ -74,6 +160,39 @@ def parse_utc(value: str) -> datetime:
     if parsed.tzinfo is None:
         raise ValueError("Timestamp must include a timezone")
     return parsed.astimezone(timezone.utc)
+
+
+def normalized_entity_text(value: str) -> str:
+    return " ".join(re.findall(r"[a-z0-9]+", value.lower()))
+
+
+def entity_name_aliases(value: str) -> set[str]:
+    tokens = normalized_entity_text(value).split()
+    aliases = {" ".join(tokens)} if tokens else set()
+    while tokens and tokens[-1] in ENTITY_LEGAL_SUFFIXES:
+        tokens.pop()
+    if len(tokens) >= 2:
+        aliases.add(" ".join(tokens))
+    return aliases
+
+
+def unauthorized_candidate_names(team: dict, response: str) -> list[str]:
+    normalized_response = normalized_entity_text(response)
+    found: set[str] = set()
+    for candidate in team["candidates"]:
+        if candidate["verification"]["authorization_to_name_in_response"]:
+            continue
+        organization = candidate["organization"]
+        principal = candidate["named_principal"]
+        if any(
+            alias and alias in normalized_response
+            for alias in entity_name_aliases(organization)
+        ):
+            found.add(organization)
+        normalized_principal = normalized_entity_text(principal)
+        if normalized_principal and normalized_principal in normalized_response:
+            found.add(principal)
+    return sorted(found)
 
 
 def inspect_docx_format(path: Path) -> dict:
@@ -116,18 +235,103 @@ def inspect_docx_format(path: Path) -> dict:
     }
 
 
+def inspect_template_external_routes(
+    response_text: str,
+    docx_path: Path,
+    pdf_path: Path,
+) -> dict:
+    found: list[str] = []
+    lowered_response = response_text.lower()
+    for token in FORBIDDEN_EXTERNAL_ROUTE_TOKENS:
+        if token.lower() in lowered_response:
+            found.append(f"markdown:{token}")
+    for phrase in (
+        "public repository",
+        "public reviewer surface",
+        "supported by public code",
+    ):
+        if phrase in lowered_response:
+            found.append(f"markdown_narrative:{phrase}")
+
+    docx_external_relationships = 0
+    with ZipFile(docx_path) as archive:
+        for member in archive.infolist():
+            data = archive.read(member).lower()
+            for token in FORBIDDEN_EXTERNAL_ROUTE_TOKENS:
+                if token.lower().encode("utf-8") in data:
+                    found.append(f"docx:{member.filename}:{token}")
+            if (
+                member.filename.endswith(".rels")
+                and b'targetmode="external"' in data
+            ):
+                docx_external_relationships += 1
+
+    reader = PdfReader(pdf_path)
+    pdf_text = "\n".join(page.extract_text() or "" for page in reader.pages)
+    lowered_pdf_text = pdf_text.lower()
+    for token in FORBIDDEN_EXTERNAL_ROUTE_TOKENS:
+        if token.lower() in lowered_pdf_text:
+            found.append(f"pdf_text:{token}")
+
+    pdf_actions: list[str] = []
+    for page_number, page in enumerate(reader.pages, start=1):
+        for annotation_ref in page.get("/Annots", []):
+            annotation = annotation_ref.get_object()
+            action = annotation.get("/A")
+            if action is None:
+                continue
+            action = action.get_object()
+            action_kind = str(action.get("/S", "UNKNOWN"))
+            target = str(
+                action.get("/URI")
+                or action.get("/F")
+                or action.get("/D")
+                or ""
+            )
+            pdf_actions.append(
+                f"page={page_number};kind={action_kind};target={target}"
+            )
+            lowered_target = target.lower()
+            for token in FORBIDDEN_EXTERNAL_ROUTE_TOKENS:
+                if token.lower() in lowered_target:
+                    found.append(f"pdf_action:page={page_number}:{token}")
+
+    root = reader.trailer["/Root"]
+    pdf_open_action = root.get("/OpenAction") is not None
+    pdf_embedded_files = False
+    names = root.get("/Names")
+    if names is not None:
+        names = names.get_object()
+        pdf_embedded_files = names.get("/EmbeddedFiles") is not None
+    return {
+        "isolated": not found
+        and docx_external_relationships == 0
+        and not pdf_actions
+        and not pdf_open_action
+        and not pdf_embedded_files,
+        "found_routes": sorted(set(found)),
+        "docx_external_relationship_count": docx_external_relationships,
+        "pdf_actions": pdf_actions,
+        "pdf_open_action": pdf_open_action,
+        "pdf_embedded_files": pdf_embedded_files,
+    }
+
+
 def result(
     check_id: str,
     requirement: str,
     status: str,
     evidence: str,
     blocker: str | None = None,
+    *,
+    blocks_send: bool = True,
 ) -> dict:
     row = {
         "check_id": check_id,
         "requirement": requirement,
         "status": status,
         "evidence": evidence,
+        "blocks_send": blocks_send,
     }
     if blocker:
         row["blocker"] = blocker
@@ -135,23 +339,101 @@ def result(
 
 
 def build_payload(as_of_utc: str) -> dict:
-    evaluated = parse_utc(as_of_utc)
+    evaluated = parse_utc(as_of_utc).replace(microsecond=0)
     evaluated_utc = evaluated.strftime("%Y-%m-%dT%H:%M:%SZ")
     gate = read_json(SUBMISSION_GATE)
     team = read_json(TEAM_REGISTER)
     partner_dispatch = read_json(PARTNER_DISPATCH_GATE)
     partner_binding = read_json(PARTNER_DISPATCH_BINDING)
+    partner_status = read_json(PARTNER_STATUS)
     claim_evidence_map = read_json(CLAIM_EVIDENCE_MAP)
+    security_gate = read_json(SECURITY_GATE)
+    security_state, security_receipt_current = current_security_payload(
+        security_gate
+    )
+    official_sow_source = read_json(OFFICIAL_SOW_SOURCE_RECEIPT)
     build = read_json(BUILD_RECEIPT)
     render = read_json(RENDER_RECEIPT)
     response = RESPONSE_MARKDOWN.read_text(encoding="utf-8")
     docx_format = inspect_docx_format(DOCX)
 
     deadline = parse_utc(gate["opportunity"]["deadline_utc"])
+    notice_checked = parse_utc(gate["official_notice_recheck"]["checked_utc"])
+    notice_age_seconds = (evaluated - notice_checked).total_seconds()
+    official_notice_current = (
+        0 <= notice_age_seconds <= OFFICIAL_NOTICE_MAX_AGE_SECONDS
+        and gate["official_notice_recheck"]["notice_active"] is True
+        and gate["official_notice_recheck"]["deadline_utc"]
+        == gate["opportunity"]["deadline_utc"]
+        and gate["official_notice_recheck"]["official_url"]
+        == gate["opportunity"]["official_url"]
+        and gate["official_notice_recheck"]["notice_id"]
+        == gate["opportunity"]["notice_id"]
+        and gate["official_notice_recheck"]["amendment_observed"] is False
+    )
     placeholders = response.count(PRIVATE_PLACEHOLDER)
-    unauthorized_names = [
-        name for name in UNAUTHORIZED_PARTNER_NAMES if name.lower() in response.lower()
+    candidate_authorizations = sum(
+        int(candidate["verification"]["authorization_to_name_in_response"])
+        for candidate in team["candidates"]
+    )
+    unauthorized_names = unauthorized_candidate_names(team, response)
+    teamed_phrases_found = [
+        phrase for phrase in TEAMED_RESPONSE_PHRASES if phrase in response.lower()
     ]
+    response_mode = gate["response"]["response_mode"]
+    proposed_team_organizations = gate["response"][
+        "proposed_team_organizations"
+    ]
+    standalone_disclosure_present = all(
+        fragment in response
+        for fragment in (
+            "LumenCore is the sole respondent.",
+            "No teaming arrangement, joint venture, or subcontracting relationship is proposed.",
+            "No other organization or individual is proposed as a team member.",
+            "this response does not represent another organization's commitment, qualifications, past performance, or authority.",
+        )
+    )
+    standalone_mode_consistent = (
+        response_mode == "STANDALONE_RESPONDENT"
+        and gate["response"]["teaming_proposed"] is False
+        and gate["response"]["subcontracting_proposed"] is False
+        and proposed_team_organizations == []
+        and gate["response"]["team_disclosure_status"]
+        == "RESOLVED_NO_EXTERNAL_TEAM_PROPOSED"
+        and gate["send_gate"]["team_disclosure_resolved"] is True
+        and gate["send_gate"]["all_teaming_facts_resolved"] is True
+        and gate["required_teaming_facts"] == []
+        and candidate_authorizations == 0
+        and not unauthorized_names
+        and not teamed_phrases_found
+        and standalone_disclosure_present
+    )
+    teamed_mode_consistent = (
+        response_mode == "TEAMED_RESPONSE"
+        and gate["response"]["teaming_proposed"] is True
+        and bool(proposed_team_organizations)
+        and gate["send_gate"]["all_teaming_facts_resolved"] is True
+        and candidate_authorizations >= len(proposed_team_organizations)
+    )
+    response_mode_consistent = (
+        standalone_mode_consistent or teamed_mode_consistent
+    )
+    notice_teaming_semantics_hold = (
+        gate["official_notice_recheck"]["teaming_permitted"] is True
+        and gate["official_notice_recheck"]["team_required_for_response"] is False
+        and gate["official_notice_recheck"][
+            "team_identification_required_if_teaming_proposed"
+        ]
+        is True
+        and gate["official_notice_recheck"][
+            "teaming_clause_semantic_normalization"
+        ]
+        == TEAMING_SEMANTIC_NORMALIZATION
+        and gate["official_notice_recheck"]["teaming_clause_semantic_sha256"]
+        == hashlib.sha256(
+            TEAMING_SEMANTIC_NORMALIZATION.encode("utf-8")
+        ).hexdigest()
+    )
     forbidden_phrases = [
         phrase for phrase in FORBIDDEN_PROMOTION_PHRASES if phrase in response.lower()
     ]
@@ -199,9 +481,17 @@ def build_payload(as_of_utc: str) -> dict:
             RENDER_RECEIPT,
         )
     )
-    candidate_authorizations = sum(
-        int(candidate["verification"]["authorization_to_name_in_response"])
-        for candidate in team["candidates"]
+    external_route_isolation = (
+        inspect_template_external_routes(response, DOCX, PDF)
+        if all_files_present
+        else {
+            "isolated": False,
+            "found_routes": ["required_artifact_missing"],
+            "docx_external_relationship_count": 0,
+            "pdf_actions": [],
+            "pdf_open_action": False,
+            "pdf_embedded_files": False,
+        }
     )
     claim_map_sources_hold = all(
         (ROOT / row["path"]).is_file()
@@ -211,7 +501,8 @@ def build_payload(as_of_utc: str) -> dict:
         for row in claim_evidence_map["source_custody"]
     )
     claim_evidence_traceability = (
-        claim_evidence_map["status"] == "VERIFIED_BOUNDED_CLAIM_MAP"
+        claim_evidence_map["status"]
+        == "VERIFIED_BOUNDED_INTERNAL_CLAIM_MAP"
         and claim_evidence_map["response"]["sha256"] == sha256(RESPONSE_MARKDOWN)
         and claim_evidence_map["response"]["material_claim_count"]
         == len(claim_evidence_map["claims"])
@@ -220,17 +511,202 @@ def build_payload(as_of_utc: str) -> dict:
         and claim_evidence_map["external_action_performed"] is False
         and claim_evidence_map["submission_authorized"] is False
     )
+    official_sow_custody = (
+        OFFICIAL_SOW.is_file()
+        and OFFICIAL_SOW.stat().st_size == OFFICIAL_SOW_BYTES
+        and sha256(OFFICIAL_SOW) == OFFICIAL_SOW_SHA256
+        and official_sow_source.get("schema")
+        == "lumencore.official_source_attachment_receipt.v1"
+        and official_sow_source["notice"]["notice_id"]
+        == gate["opportunity"]["notice_id"]
+        and official_sow_source["notice"]["official_url"]
+        == gate["opportunity"]["official_url"]
+        and official_sow_source["attachment"]["document_name"]
+        == OFFICIAL_SOW.name
+        and official_sow_source["attachment"]["access"] == "PUBLIC"
+        and official_sow_source["local_copy"]["path"] == rel(OFFICIAL_SOW)
+        and official_sow_source["local_copy"]["bytes"] == OFFICIAL_SOW_BYTES
+        and official_sow_source["local_copy"]["sha256"]
+        == OFFICIAL_SOW_SHA256
+        and official_sow_source["remote_refresh"]["http_status"] == 200
+        and official_sow_source["remote_refresh"]["downloaded_bytes"]
+        == OFFICIAL_SOW_BYTES
+        and official_sow_source["remote_refresh"]["sha256"]
+        == OFFICIAL_SOW_SHA256
+        and official_sow_source["remote_refresh"]["matches_local_copy"] is True
+        and all(official_sow_source["checks"].values())
+    )
+    security_receipt_current = (
+        security_receipt_current
+        and security_state.get("schema")
+        == "lumencore.public_repository_security_gate.v1"
+        and security_state.get("target_path")
+        == PUBLIC_CREDENTIAL_CONFIG.relative_to(ROOT).as_posix()
+        and security_state.get("target_sha256")
+        == hashlib.sha256(
+            custody_bytes(PUBLIC_CREDENTIAL_CONFIG)
+        ).hexdigest()
+        and security_state["current_file"]["placeholder_only"] is True
+        and security_state["current_file"]["non_placeholder_value_count"] == 0
+        and security_state["current_file"][
+            "required_environment_references_present"
+        ]
+        is True
+        and security_state["history"]["scan_complete"] is True
+        and security_state["history"]["scan_failure_count"] == 0
+        and security_state.get("external_action_performed") is False
+    )
+    security_rotation_and_history_clear = (
+        security_receipt_current
+        and all(
+            row["confirmed"]
+            for row in security_state["provider_rotation"].values()
+        )
+        and security_state["history"]["remediation_confirmed"] is True
+        and security_state["history"][
+            "remote_public_history_verification_confirmed"
+        ]
+        is True
+        and security_state["history"]["historical_exposure_detected"] is False
+        and security_state["decision"]
+        == "PASS_TARGETED_CREDENTIAL_AND_REMOTE_HISTORY_GATE"
+        and security_state["public_repository_link_allowed"] is True
+        and security_state["final_argos_send_allowed_by_security_gate"] is True
+    )
+    security_sanitized_external_response_clear = (
+        security_receipt_current
+        and security_state["current_file"]["placeholder_only"] is True
+        and security_state["current_file"][
+            "required_environment_references_present"
+        ]
+        is True
+        and security_state["history"]["scan_complete"] is True
+        and security_state["history"]["scan_failure_count"] == 0
+        and security_state["sanitized_external_response_allowed"] is True
+        and security_state["final_argos_send_allowed_by_security_gate"] is True
+        and external_route_isolation["isolated"] is True
+    )
+    partner_outreach_sent_once = (
+        partner_status.get("schema")
+        == "lumencore.argos_partner_outreach_status.v1"
+        and partner_status.get("status")
+        == "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY"
+        and partner_status["mailbox_observation"]["matching_current_draft_count"] == 0
+        and partner_status["mailbox_observation"]["matching_sent_count"] == 1
+        and partner_status["mailbox_observation"]["matching_inbound_count"] == 0
+        and partner_status["mailbox_observation"]["sent_copy_present"] is True
+        and partner_status["mailbox_observation"]["attachment_count"] == 0
+        and partner_status["mailbox_observation"]["cc_count"] == 0
+        and partner_status["mailbox_observation"]["bcc_count"] == 0
+        and partner_status["controls"]["final_send_performed"] is True
+        and partner_status["controls"]["post_send_sent_copy_verified"] is True
+        and partner_status["controls"]["duplicate_send_prohibited"] is True
+        and partner_status["controls"]["partner_name_use_requires_written_authority"]
+        is True
+    )
 
     checks = [
         result(
             "OFFICIAL_NOTICE_CURRENT",
             "The official notice is active and its identity and deadline are explicit.",
-            "PASS"
-            if gate["official_notice_recheck"]["notice_active"]
-            and gate["official_notice_recheck"]["deadline_utc"]
-            == gate["opportunity"]["deadline_utc"]
-            else "FAIL",
-            gate["opportunity"]["official_url"],
+            "PASS" if official_notice_current else "FAIL",
+            (
+                f"{gate['opportunity']['official_url']}; "
+                f"checked_utc={gate['official_notice_recheck']['checked_utc']}; "
+                f"age_seconds={int(notice_age_seconds)}; "
+                "amendment_observed="
+                f"{gate['official_notice_recheck']['amendment_observed']}"
+            ),
+        ),
+        result(
+            "OFFICIAL_SOW_SOURCE_CUSTODY",
+            "The official four-page draft SOW attachment is preserved with exact binary custody.",
+            "PASS" if official_sow_custody else "FAIL",
+            (
+                f"bytes={OFFICIAL_SOW.stat().st_size if OFFICIAL_SOW.is_file() else 0}; "
+                f"sha256={sha256(OFFICIAL_SOW) if OFFICIAL_SOW.is_file() else 'MISSING'}; "
+                f"source_receipt_sha256={sha256(OFFICIAL_SOW_SOURCE_RECEIPT)}"
+            ),
+        ),
+        result(
+            "OFFICIAL_NOTICE_TEAMING_SEMANTICS",
+            "The notice permits teaming but requires names and roles only when a team is proposed.",
+            "PASS" if notice_teaming_semantics_hold else "FAIL",
+            (
+                "teaming_permitted="
+                f"{gate['official_notice_recheck']['teaming_permitted']}; "
+                "team_required_for_response="
+                f"{gate['official_notice_recheck']['team_required_for_response']}; "
+                "identify_if_proposed="
+                f"{gate['official_notice_recheck']['team_identification_required_if_teaming_proposed']}; "
+                "semantic_sha256="
+                f"{gate['official_notice_recheck']['teaming_clause_semantic_sha256']}"
+            ),
+        ),
+        result(
+            "PUBLIC_REPOSITORY_CREDENTIAL_RECEIPT",
+            "The current public credential configuration contains environment references only and its receipt matches the current file.",
+            "PASS" if security_receipt_current else "FAIL",
+            (
+                "placeholder_only="
+                f"{security_state['current_file']['placeholder_only']}; "
+                "non_placeholder_value_count="
+                f"{security_state['current_file']['non_placeholder_value_count']}; "
+                "required_environment_references_present="
+                f"{security_state['current_file']['required_environment_references_present']}; "
+                f"scan_complete={security_state['history']['scan_complete']}; "
+                f"scan_failure_count={security_state['history']['scan_failure_count']}"
+            ),
+        ),
+        result(
+            "PUBLIC_REPOSITORY_ROTATION_AND_HISTORY",
+            "Previously exposed provider credentials are rotated and prior public Git objects are remediated before the repository is linked or promoted.",
+            "PASS" if security_rotation_and_history_clear else "BLOCKED",
+            (
+                "provider_rotations_confirmed="
+                f"{all(row['confirmed'] for row in security_state['provider_rotation'].values())}; "
+                "history_remediation_confirmed="
+                f"{security_state['history']['remediation_confirmed']}; "
+                "remote_public_history_verification_confirmed="
+                f"{security_state['history']['remote_public_history_verification_confirmed']}; "
+                "historical_exposure_detected="
+                f"{security_state['history']['historical_exposure_detected']}; "
+                "public_repository_link_allowed="
+                f"{security_state['public_repository_link_allowed']}"
+            ),
+            (
+                "Rotate the affected provider credentials, record non-secret "
+                "receipts, remediate reachable public Git history, and verify "
+                "the remote before linking or promoting the repository."
+            ),
+            blocks_send=False,
+        ),
+        result(
+            "SANITIZED_EXTERNAL_RESPONSE_SECURITY_PATH",
+            "The Government response is self-contained, link-free, and allowed by the current targeted security gate.",
+            "PASS" if security_sanitized_external_response_clear else "FAIL",
+            (
+                "security_receipt_current="
+                f"{security_receipt_current}; "
+                "sanitized_external_response_allowed="
+                f"{security_state.get('sanitized_external_response_allowed')}; "
+                "final_argos_send_allowed_by_security_gate="
+                f"{security_state.get('final_argos_send_allowed_by_security_gate')}; "
+                "attachment_repo_isolated="
+                f"{external_route_isolation['isolated']}; "
+                "found_routes="
+                f"{external_route_isolation['found_routes']}; "
+                "docx_external_relationship_count="
+                f"{external_route_isolation['docx_external_relationship_count']}; "
+                f"pdf_actions={external_route_isolation['pdf_actions']}; "
+                f"pdf_open_action={external_route_isolation['pdf_open_action']}; "
+                f"pdf_embedded_files={external_route_isolation['pdf_embedded_files']}"
+            ),
+            (
+                "Rebuild the current security receipt and remove every repository, "
+                "live-site, hyperlink, external relationship, PDF action, and embedded "
+                "file from the Government attachment set."
+            ),
         ),
         result(
             "DEADLINE_OPEN",
@@ -303,17 +779,23 @@ def build_payload(as_of_utc: str) -> dict:
             "Insert only currently verified private entity and contact facts in the private final copy.",
         ),
         result(
-            "AUTHORIZED_NAMED_TEAM",
-            "Every named team role, credential, and reference is documented and authorized.",
-            "PASS"
-            if gate["send_gate"]["all_teaming_facts_resolved"]
-            and candidate_authorizations > 0
-            else "BLOCKED",
+            "RESPONSE_MODE_AND_TEAM_DISCLOSURE",
+            "The response mode, proposed-team state, and documentary disclosure are mutually consistent.",
+            "PASS" if response_mode_consistent else "FAIL",
             (
+                f"response_mode={response_mode}; "
+                f"teaming_proposed={gate['response']['teaming_proposed']}; "
+                f"subcontracting_proposed={gate['response']['subcontracting_proposed']}; "
+                f"proposed_team_organizations={proposed_team_organizations}; "
                 f"required_teaming_fact_count={len(gate['required_teaming_facts'])}; "
-                f"candidate_name_authorizations={candidate_authorizations}"
+                f"candidate_name_authorizations={candidate_authorizations}; "
+                f"teamed_phrases_found={teamed_phrases_found}; "
+                f"standalone_disclosure_present={standalone_disclosure_present}"
             ),
-            "Obtain written partner role, name, credential, and reference authorization.",
+            (
+                "Use a truthful standalone disclosure with no outside names or roles, "
+                "or bind every proposed team member and role to written authority."
+            ),
         ),
         result(
             "NO_UNAUTHORIZED_PARTNER_NAME",
@@ -339,7 +821,7 @@ def build_payload(as_of_utc: str) -> dict:
         ),
         result(
             "CLAIM_EVIDENCE_TRACEABILITY",
-            "Each affirmative engineering proof statement is bound to named public evidence and explicit non-claims.",
+            "Each affirmative engineering proof statement is bound to named first-party evidence and explicit non-claims.",
             "PASS" if claim_evidence_traceability else "FAIL",
             (
                 f"claim_count={len(claim_evidence_map['claims'])}; "
@@ -348,26 +830,22 @@ def build_payload(as_of_utc: str) -> dict:
             ),
         ),
         result(
-            "PARTNER_DRAFT_UNSENT",
-            "The bounded partner inquiry remains an unsent, no-attachment draft.",
-            "PASS"
-            if partner_dispatch["gmail_draft_receipt"]["draft_present"]
-            and not partner_dispatch["gmail_draft_receipt"]["sent"]
-            and partner_dispatch["message"]["attachment_count"] == 0
-            and partner_binding["summary"]["pass_count"]
-            == partner_binding["summary"]["check_count"]
-            and partner_binding["summary"]["fail_count"] == 0
-            and not partner_binding["summary"]["send_authorized"]
-            and not partner_binding["summary"]["send_performed"]
-            else "FAIL",
+            "PARTNER_OUTREACH_SENT_ONCE",
+            "The bounded partner inquiry was sent exactly once without attachments, CC, or BCC and is now duplicate-locked while awaiting a reply.",
+            "PASS" if partner_outreach_sent_once else "FAIL",
             (
-                f"draft_present={partner_dispatch['gmail_draft_receipt']['draft_present']}; "
-                f"sent={partner_dispatch['gmail_draft_receipt']['sent']}; "
-                f"attachments={partner_dispatch['message']['attachment_count']}; "
-                f"binding_checks="
-                f"{partner_binding['summary']['pass_count']}/"
-                f"{partner_binding['summary']['check_count']}"
+                "drafts="
+                f"{partner_status['mailbox_observation']['matching_current_draft_count']}; "
+                "sent="
+                f"{partner_status['mailbox_observation']['matching_sent_count']}; "
+                "inbound="
+                f"{partner_status['mailbox_observation']['matching_inbound_count']}; "
+                "sent_copy_verified="
+                f"{partner_status['controls']['post_send_sent_copy_verified']}; "
+                "duplicate_send_prohibited="
+                f"{partner_status['controls']['duplicate_send_prohibited']}"
             ),
+            blocks_send=False,
         ),
         result(
             "GOVERNMENT_DUPLICATE_RECHECK",
@@ -394,7 +872,7 @@ def build_payload(as_of_utc: str) -> dict:
                 "recipient={final_recipient_verified}; subject={final_subject_verified}; "
                 "body={final_body_verified}; attachments={final_attachments_verified}"
             ).format(**gate["send_gate"]),
-            "Build and inspect the private final action packet after the cover and team gates pass.",
+            "Build and inspect the private final action packet after the cover and response-mode gates pass.",
         ),
         result(
             "ACTION_TIME_APPROVAL",
@@ -417,11 +895,24 @@ def build_payload(as_of_utc: str) -> dict:
         status: sum(row["status"] == status for row in checks)
         for status in ("PASS", "BLOCKED", "FAIL")
     }
+    send_blocking_rows = [
+        row for row in checks if row["blocks_send"] and row["status"] != "PASS"
+    ]
+    send_fail_count = sum(
+        row["status"] == "FAIL" for row in send_blocking_rows
+    )
+    send_blocked_count = sum(
+        row["status"] == "BLOCKED" for row in send_blocking_rows
+    )
+    advisory_blocked_count = sum(
+        row["status"] == "BLOCKED" and not row["blocks_send"]
+        for row in checks
+    )
     decision = (
         "FAIL_CONFORMANCE"
-        if counts["FAIL"]
+        if send_fail_count
         else "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY"
-        if counts["BLOCKED"]
+        if send_blocked_count
         else "READY_FOR_ACTION_TIME_REVIEW"
     )
     source_paths = (
@@ -429,15 +920,22 @@ def build_payload(as_of_utc: str) -> dict:
         TEAM_REGISTER,
         PARTNER_DISPATCH_GATE,
         PARTNER_DISPATCH_BINDING,
+        PARTNER_STATUS,
         CLAIM_EVIDENCE_MAP,
         RESPONSE_MARKDOWN,
         BUILD_RECEIPT,
         RENDER_RECEIPT,
         DOCX,
         PDF,
+        OFFICIAL_SOW,
+        OFFICIAL_SOW_SOURCE_RECEIPT,
+        SECURITY_GATE,
+        SECURITY_STATUS,
+        PUBLIC_CREDENTIAL_CONFIG,
+        SECURITY_VERIFIER,
     )
     return {
-        "schema": "lumencore.argos_response_conformance_gate.v1",
+        "schema": "lumencore.argos_response_conformance_gate.v2",
         "evaluated_utc": evaluated_utc,
         "notice_id": gate["opportunity"]["notice_id"],
         "deadline_utc": gate["opportunity"]["deadline_utc"],
@@ -447,6 +945,9 @@ def build_payload(as_of_utc: str) -> dict:
             "pass_count": counts["PASS"],
             "blocked_count": counts["BLOCKED"],
             "fail_count": counts["FAIL"],
+            "send_blocked_count": send_blocked_count,
+            "send_fail_count": send_fail_count,
+            "advisory_blocked_count": advisory_blocked_count,
             "submission_authorized": gate["send_gate"]["submission_authorized"],
             "external_action_performed": False,
         },
@@ -462,15 +963,20 @@ def build_payload(as_of_utc: str) -> dict:
         ],
         "claim_boundary": (
             "PASS means the named documentary or formatting requirement is supported. "
-            "BLOCKED means the current artifact is intentionally not send-ready. "
+            "BLOCKED with blocks_send=true means the current artifact is intentionally "
+            "not send-ready. BLOCKED with blocks_send=false is a separately tracked "
+            "promotion or operational-control gap that does not prevent a self-contained "
+            "link-free Government response. "
             "Neither passing checks nor a polished packet establishes submission, "
             "acceptance, selection, award, authorization, certification, external "
             "validation, field performance, or savings."
         ),
         "safest_next_action": (
-            "Resolve the private cover and authorized-team blockers first. Then rebuild "
-            "the private final copy, rerun this gate, repeat the official-notice and "
-            "full-mailbox duplicate checks, and request exact action-time approval."
+            "Resolve the private cover facts, build and inspect the self-contained "
+            "private final copy, rerun this gate, repeat the official-notice and "
+            "full-mailbox duplicate checks, bind the exact dispatch, and request exact "
+            "action-time approval. Continue provider credential rotation and public-history "
+            "remediation before any repository link or public promotion."
         ),
     }
 
@@ -488,22 +994,28 @@ def render_markdown(payload: dict) -> str:
         f"- Pass: `{payload['summary']['pass_count']}`",
         f"- Blocked: `{payload['summary']['blocked_count']}`",
         f"- Fail: `{payload['summary']['fail_count']}`",
+        f"- Send-blocking blocked: `{payload['summary']['send_blocked_count']}`",
+        f"- Send-blocking fail: `{payload['summary']['send_fail_count']}`",
+        f"- Advisory blocked: `{payload['summary']['advisory_blocked_count']}`",
         f"- Submission authorized: `{str(payload['summary']['submission_authorized']).lower()}`",
         f"- External action performed: `{str(payload['summary']['external_action_performed']).lower()}`",
         "",
         "## Requirement Matrix",
         "",
-        "| Check | Status | Requirement | Evidence |",
-        "| --- | --- | --- | --- |",
+        "| Check | Status | Blocks send | Requirement | Evidence |",
+        "| --- | --- | --- | --- | --- |",
     ]
     for row in payload["checks"]:
         evidence = row["evidence"].replace("|", "\\|").replace("\n", " ")
         requirement = row["requirement"].replace("|", "\\|")
         lines.append(
-            f"| `{row['check_id']}` | `{row['status']}` | {requirement} | {evidence} |"
+            f"| `{row['check_id']}` | `{row['status']}` | "
+            f"`{str(row['blocks_send']).lower()}` | {requirement} | {evidence} |"
         )
         if row.get("blocker"):
-            lines.append(f"|  |  | **Blocker action** | {row['blocker']} |")
+            lines.append(
+                f"|  |  |  | **Blocker action** | {row['blocker']} |"
+            )
     lines.extend(
         [
             "",
@@ -558,6 +1070,16 @@ def main() -> int:
                 "status": status,
                 "decision": payload["decision"],
                 **payload["summary"],
+                "failed_checks": [
+                    row["check_id"]
+                    for row in payload["checks"]
+                    if row["status"] == "FAIL"
+                ],
+                "blocked_checks": [
+                    row["check_id"]
+                    for row in payload["checks"]
+                    if row["status"] == "BLOCKED"
+                ],
                 "json_output": str(args.json_output),
                 "markdown_output": str(args.markdown_output),
             },
