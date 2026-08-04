@@ -1,7 +1,8 @@
 param(
-  [string]$VpsIp = $(if ($env:LUMA_VPS_HOST) { $env:LUMA_VPS_HOST } else { "157.151.148.234" }),
-  [string]$VpsUser = $(if ($env:LUMA_VPS_USER) { $env:LUMA_VPS_USER } else { "opc" }),
+  [string]$VpsIp = $env:LUMA_VPS_HOST,
+  [string]$VpsUser = $env:LUMA_VPS_USER,
   [string]$SshKeyPath = $env:LUMA_VPS_SSH_KEY,
+  [string]$KnownHostsPath = $env:LUMA_SSH_KNOWN_HOSTS,
   [string]$BundleRoot = "",
   [string[]]$RemoteWebRoots = @("/opt/lumencore/dashboard", "/var/www/lumatrader", "/var/www/lumen-core"),
   [switch]$DryRun,
@@ -58,23 +59,24 @@ function Resolve-RepoRoot {
 function Resolve-SshKey {
   param([string]$ExplicitPath)
 
-  $candidates = @()
-  if ($ExplicitPath) { $candidates += $ExplicitPath }
-  if ($env:USERPROFILE) {
-    $candidates += (Join-Path $env:USERPROFILE "Downloads\ssh-key-2026-04-23.key")
-    $candidates += (Join-Path $env:USERPROFILE "Downloads\oracle_new")
-    $candidates += (Join-Path $env:USERPROFILE ".ssh\luma_vps")
-    $candidates += (Join-Path $env:USERPROFILE ".ssh\id_rsa")
-    $candidates += (Join-Path $env:USERPROFILE ".ssh\id_ed25519")
-  }
-
-  foreach ($candidate in $candidates) {
-    if ($candidate -and (Test-Path -LiteralPath $candidate)) {
-      return (Resolve-Path -LiteralPath $candidate).Path
-    }
+  if (-not [string]::IsNullOrWhiteSpace($ExplicitPath) -and (Test-Path -LiteralPath $ExplicitPath -PathType Leaf)) {
+    return (Resolve-Path -LiteralPath $ExplicitPath).Path
   }
 
   throw "No SSH key found. Set LUMA_VPS_SSH_KEY or pass -SshKeyPath."
+}
+
+function Resolve-KnownHosts {
+  param([string]$ExplicitPath)
+
+  if ([string]::IsNullOrWhiteSpace($ExplicitPath) -and $env:USERPROFILE) {
+    $ExplicitPath = Join-Path $env:USERPROFILE ".ssh\known_hosts"
+  }
+  if (-not [string]::IsNullOrWhiteSpace($ExplicitPath) -and (Test-Path -LiteralPath $ExplicitPath -PathType Leaf)) {
+    return (Resolve-Path -LiteralPath $ExplicitPath).Path
+  }
+
+  throw "No known-hosts file found. Set LUMA_SSH_KNOWN_HOSTS or pass -KnownHostsPath."
 }
 
 function Resolve-BundleRoot {
@@ -185,7 +187,6 @@ sudo systemctl reload nginx 2>/dev/null || sudo systemctl reload caddy 2>/dev/nu
 
 Write-Host "Feed-only bundle: $resolvedBundleRoot" -ForegroundColor Cyan
 Write-Host "Required ready: $($manifest.summary.required_ready_count)/$($manifest.summary.required_feed_count)" -ForegroundColor Cyan
-Write-Host "Target: $VpsUser@$VpsIp" -ForegroundColor Cyan
 Write-Host "Remote web roots: $($RemoteWebRoots -join ', ')" -ForegroundColor Cyan
 
 if (-not $Apply) {
@@ -194,15 +195,27 @@ if (-not $Apply) {
   exit 0
 }
 
+if ([string]::IsNullOrWhiteSpace($VpsIp)) {
+  throw "Apply blocked: set LUMA_VPS_HOST or pass -VpsIp."
+}
+if ([string]::IsNullOrWhiteSpace($VpsUser)) {
+  throw "Apply blocked: set LUMA_VPS_USER or pass -VpsUser."
+}
 $sshKey = Resolve-SshKey -ExplicitPath $SshKeyPath
+$knownHosts = Resolve-KnownHosts -ExplicitPath $KnownHostsPath
+$sshSecurityArgs = @(
+  "-o", "BatchMode=yes",
+  "-o", "StrictHostKeyChecking=yes",
+  "-o", "UserKnownHostsFile=$knownHosts"
+)
 $archive = New-BundleArchive -ResolvedBundleRoot $resolvedBundleRoot
 Write-Host "Archive: $archive" -ForegroundColor Cyan
-Write-Host "SSH key: $sshKey" -ForegroundColor Cyan
+Write-Host "Apply transport inputs validated; host and key values are not echoed." -ForegroundColor Cyan
 
-Invoke-CheckedNative -FilePath scp -ArgumentList @("-i", $sshKey, $archive, "$VpsUser@$VpsIp`:$remoteArchive")
+Invoke-CheckedNative -FilePath scp -ArgumentList ($sshSecurityArgs + @("-i", $sshKey, $archive, "$VpsUser@$VpsIp`:$remoteArchive"))
 $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($remoteScript))
 $guardedRemoteCommand = "set -e; IFS= read -r LUMA_HUMAN_UNLOCK_TOKEN; export LUMA_HUMAN_UNLOCK_TOKEN; export LUMA_VPS_DEPLOY_APPLY=1; echo $encoded | base64 -d | bash"
-Invoke-CheckedNativeWithSecretStdin -FilePath ssh -ArgumentList @("-i", $sshKey, "$VpsUser@$VpsIp", $guardedRemoteCommand) -SecretInput $humanUnlockToken
+Invoke-CheckedNativeWithSecretStdin -FilePath ssh -ArgumentList ($sshSecurityArgs + @("-i", $sshKey, "$VpsUser@$VpsIp", $guardedRemoteCommand)) -SecretInput $humanUnlockToken
 $humanUnlockToken = $null
 
 Write-Host "Feed-only deploy complete. Run verification:" -ForegroundColor Green

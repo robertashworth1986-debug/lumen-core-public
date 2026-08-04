@@ -1,14 +1,16 @@
 param(
-    [string]$VpsIp = $(if ($env:LUMA_VPS_HOST) { $env:LUMA_VPS_HOST } else { "157.151.148.234" }),
-    [string]$VpsUser = "opc",
+    [string]$VpsIp = $env:LUMA_VPS_HOST,
+    [string]$VpsUser = $env:LUMA_VPS_USER,
     [string]$VpsRoot = "/opt/lumencore",
     [string]$Root = "C:\LumaTrader\INSTITUTIONAL_STACK_V2",
     [string]$SshKeyPath = $env:LUMA_VPS_SSH_KEY,
+    [string]$KnownHostsPath = $env:LUMA_SSH_KNOWN_HOSTS,
     [switch]$Apply,
     [switch]$DryRun
 )
 
 $ErrorActionPreference = "Stop"
+$sshSecurityArgs = @()
 
 if ($Apply -and $DryRun) {
     throw "-Apply and -DryRun cannot be used together."
@@ -28,7 +30,6 @@ if ($Apply) {
 
 # =============================================================================
 # LUMEN-CORE.AI — Push Stack to VPS
-# VPS IP:     157.151.148.234
 # Domain:     lumen-core.ai
 # Stack root: /opt/lumencore
 # =============================================================================
@@ -45,7 +46,7 @@ function Invoke-Scp {
     if ($SshKeyPath) {
         $scpArgs += @("-i", $SshKeyPath)
     }
-    $scpArgs += @("-o", "BatchMode=yes")
+    $scpArgs += $sshSecurityArgs
     $scpArgs += $Args
 
     & scp @scpArgs
@@ -66,7 +67,7 @@ function Invoke-Ssh {
     if ($SshKeyPath) {
         $sshArgs += @("-i", $SshKeyPath)
     }
-    $sshArgs += @("-o", "BatchMode=yes")
+    $sshArgs += $sshSecurityArgs
     $sshArgs += @("${VpsUser}@${VpsIp}", $RemoteCommand)
 
     & ssh @sshArgs
@@ -89,7 +90,7 @@ function Invoke-SshWithHumanUnlock {
     if ($SshKeyPath) {
         $sshArgs += @("-i", $SshKeyPath)
     }
-    $sshArgs += @("-o", "BatchMode=yes")
+    $sshArgs += $sshSecurityArgs
 
     $guardedRemoteCommand = @(
         "set -e"
@@ -122,7 +123,6 @@ if (-not (Test-Path $lamaScoutDir)) {
 
 Write-Host "=====================================================" -ForegroundColor Cyan
 Write-Host " LUMEN-CORE.AI — VPS STACK DEPLOYMENT" -ForegroundColor Cyan
-Write-Host " Target: ${VpsUser}@${VpsIp}:${VpsRoot}" -ForegroundColor Cyan
 Write-Host "=====================================================" -ForegroundColor Cyan
 
 if (-not $Apply) {
@@ -132,23 +132,29 @@ if (-not $Apply) {
     exit 0
 }
 
-if (-not $SshKeyPath -or -not (Test-Path $SshKeyPath)) {
-    $keyCandidates = @(
-        $env:LUMA_VPS_SSH_KEY,
-        "C:\Users\Novac\Downloads\ssh-key-2026-04-23.key",
-        $(if ($env:USERPROFILE) { Join-Path $env:USERPROFILE ".ssh\id_ed25519" }),
-        $(if ($env:USERPROFILE) { Join-Path $env:USERPROFILE ".ssh\id_rsa" })
-    )
-    foreach ($candidate in $keyCandidates) {
-        if ($candidate -and (Test-Path $candidate)) {
-            $SshKeyPath = (Resolve-Path $candidate).Path
-            break
-        }
-    }
+if ([string]::IsNullOrWhiteSpace($VpsIp)) {
+    throw "Apply blocked: set LUMA_VPS_HOST or pass -VpsIp."
 }
-if ($SshKeyPath -and -not (Test-Path $SshKeyPath)) {
-    throw "SSH key path not found: $SshKeyPath"
+if ([string]::IsNullOrWhiteSpace($VpsUser)) {
+    throw "Apply blocked: set LUMA_VPS_USER or pass -VpsUser."
 }
+if ([string]::IsNullOrWhiteSpace($SshKeyPath) -or -not (Test-Path -LiteralPath $SshKeyPath -PathType Leaf)) {
+    throw "Apply blocked: set LUMA_VPS_SSH_KEY or pass an existing -SshKeyPath."
+}
+if ([string]::IsNullOrWhiteSpace($KnownHostsPath) -and $env:USERPROFILE) {
+    $KnownHostsPath = Join-Path $env:USERPROFILE ".ssh\known_hosts"
+}
+if ([string]::IsNullOrWhiteSpace($KnownHostsPath) -or -not (Test-Path -LiteralPath $KnownHostsPath -PathType Leaf)) {
+    throw "Apply blocked: set LUMA_SSH_KNOWN_HOSTS or pass an existing -KnownHostsPath."
+}
+$SshKeyPath = (Resolve-Path -LiteralPath $SshKeyPath).Path
+$KnownHostsPath = (Resolve-Path -LiteralPath $KnownHostsPath).Path
+$sshSecurityArgs = @(
+    "-o", "BatchMode=yes",
+    "-o", "StrictHostKeyChecking=yes",
+    "-o", "UserKnownHostsFile=$KnownHostsPath"
+)
+Write-Host "Apply transport inputs validated; host and key values are not echoed." -ForegroundColor Cyan
 
 $stamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
 $codeArchive = Join-Path $env:TEMP "lumencore_code_$stamp.tgz"
@@ -255,9 +261,8 @@ Write-Host ""
 Write-Host "=====================================================" -ForegroundColor Green
 Write-Host " UPLOAD COMPLETE" -ForegroundColor Green
 Write-Host ""
-Write-Host " DNS: Point lumen-core.ai A record -> $VpsIp" -ForegroundColor Cyan
-Write-Host " Then run SSL cert:"
-Write-Host "   ssh ${VpsUser}@${VpsIp}"
+Write-Host " Verify DNS separately against the operator-approved host." -ForegroundColor Cyan
+Write-Host " Then run the operator-reviewed SSL command from a verified SSH session:"
 Write-Host "   sudo certbot --nginx -d lumen-core.ai -d www.lumen-core.ai -d app.lumen-core.ai -d research.lumen-core.ai --non-interactive --agree-tos -m admin@lumen-core.ai"
 Write-Host ""
 Write-Host " Live endpoints (after SSL):"

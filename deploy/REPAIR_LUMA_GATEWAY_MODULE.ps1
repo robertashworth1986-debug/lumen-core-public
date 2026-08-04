@@ -1,8 +1,9 @@
 param(
-    [string]$VpsIp = $(if ($env:LUMA_VPS_HOST) { $env:LUMA_VPS_HOST } else { "157.151.148.234" }),
-    [string]$VpsUser = $(if ($env:LUMA_VPS_USER) { $env:LUMA_VPS_USER } else { "opc" }),
+    [string]$VpsIp = $env:LUMA_VPS_HOST,
+    [string]$VpsUser = $env:LUMA_VPS_USER,
     [string]$SshKeyPath = $env:LUMA_VPS_SSH_KEY,
-    [string]$ModulePath = "C:\LumaTrader\INSTITUTIONAL_STACK_V2\code\booth_public_contract.py",
+    [string]$KnownHostsPath = $env:LUMA_SSH_KNOWN_HOSTS,
+    [string]$ModulePath = "",
     [string]$RemoteCodeRoot = "/opt/lumencore/code",
     [string]$ApprovedModuleSha256 = "",
     [switch]$Apply,
@@ -11,6 +12,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+if ([string]::IsNullOrWhiteSpace($ModulePath)) {
+    $ModulePath = Join-Path $PSScriptRoot "..\code\booth_public_contract.py"
+}
+
 if ($Apply -and $DryRun) {
     throw "-Apply and -DryRun cannot be used together."
 }
@@ -18,25 +23,24 @@ if ($Apply -and $DryRun) {
 function Resolve-SshKey {
     param([string]$ExplicitPath)
 
-    $candidates = @()
-    if ($ExplicitPath) {
-        $candidates += $ExplicitPath
-    }
-    if ($env:USERPROFILE) {
-        $candidates += (Join-Path $env:USERPROFILE "Downloads\ssh-key-2026-04-23.key")
-        $candidates += (Join-Path $env:USERPROFILE "Downloads\oracle_new")
-        $candidates += (Join-Path $env:USERPROFILE ".ssh\luma_vps")
-        $candidates += (Join-Path $env:USERPROFILE ".ssh\id_ed25519")
-        $candidates += (Join-Path $env:USERPROFILE ".ssh\id_rsa")
-    }
-
-    foreach ($candidate in $candidates) {
-        if ($candidate -and (Test-Path -LiteralPath $candidate)) {
-            return (Resolve-Path -LiteralPath $candidate).Path
-        }
+    if (-not [string]::IsNullOrWhiteSpace($ExplicitPath) -and (Test-Path -LiteralPath $ExplicitPath -PathType Leaf)) {
+        return (Resolve-Path -LiteralPath $ExplicitPath).Path
     }
 
     throw "No SSH key found. Set LUMA_VPS_SSH_KEY or pass -SshKeyPath."
+}
+
+function Resolve-KnownHosts {
+    param([string]$ExplicitPath)
+
+    if ([string]::IsNullOrWhiteSpace($ExplicitPath) -and $env:USERPROFILE) {
+        $ExplicitPath = Join-Path $env:USERPROFILE ".ssh\known_hosts"
+    }
+    if (-not [string]::IsNullOrWhiteSpace($ExplicitPath) -and (Test-Path -LiteralPath $ExplicitPath -PathType Leaf)) {
+        return (Resolve-Path -LiteralPath $ExplicitPath).Path
+    }
+
+    throw "No known-hosts file found. Set LUMA_SSH_KNOWN_HOSTS or pass -KnownHostsPath."
 }
 
 function Invoke-CheckedNative {
@@ -102,7 +106,19 @@ if ([string]::IsNullOrWhiteSpace($humanUnlockToken) -or $humanUnlockToken.Length
 # Do not let native child processes inherit the HumanUnlock secret.
 Remove-Item Env:LUMA_HUMAN_UNLOCK_TOKEN -ErrorAction SilentlyContinue
 
+if ([string]::IsNullOrWhiteSpace($VpsIp)) {
+    throw "Apply blocked: set LUMA_VPS_HOST or pass -VpsIp."
+}
+if ([string]::IsNullOrWhiteSpace($VpsUser)) {
+    throw "Apply blocked: set LUMA_VPS_USER or pass -VpsUser."
+}
 $sshKey = Resolve-SshKey -ExplicitPath $SshKeyPath
+$knownHosts = Resolve-KnownHosts -ExplicitPath $KnownHostsPath
+$sshSecurityArgs = @(
+    "-o", "BatchMode=yes",
+    "-o", "StrictHostKeyChecking=yes",
+    "-o", "UserKnownHostsFile=$knownHosts"
+)
 $remoteStage = "/tmp/lumencore_gateway_repair_$($moduleSha256.Substring(0, 16)).py"
 $remoteDestination = "$RemoteCodeRoot/$moduleName"
 
@@ -111,6 +127,7 @@ set -eu
 test -d '$RemoteCodeRoot'
 test -x /opt/lumencore/.venv/bin/python
 test -f '$RemoteCodeRoot/luma_experience_gateway.py'
+sudo -n true
 if [ -f '$remoteDestination' ]; then
   sha256sum '$remoteDestination' | awk '{print "REMOTE_MODULE_SHA256=" `$1}'
 else
@@ -119,21 +136,19 @@ fi
 systemctl show luma-gateway -p LoadState -p ActiveState -p SubState -p NRestarts --no-pager
 "@
 
-Invoke-CheckedNative -FilePath "ssh" -ArgumentList @(
-    "-o", "BatchMode=yes",
+Invoke-CheckedNative -FilePath "ssh" -ArgumentList ($sshSecurityArgs + @(
     "-o", "ConnectTimeout=12",
     "-i", $sshKey,
     "$VpsUser@$VpsIp",
     $remotePreflight
-)
+))
 
-Invoke-CheckedNative -FilePath "scp" -ArgumentList @(
-    "-o", "BatchMode=yes",
+Invoke-CheckedNative -FilePath "scp" -ArgumentList ($sshSecurityArgs + @(
     "-o", "ConnectTimeout=12",
     "-i", $sshKey,
     $resolvedModulePath,
     "$VpsUser@$VpsIp`:$remoteStage"
-)
+))
 
 $remoteApply = @"
 set -euo pipefail
@@ -159,13 +174,13 @@ if [ -f "`$destination" ]; then
   fi
   echo 'MODULE_ACTION=NOOP_EXACT_MATCH'
 else
-  sudo install -o lumencore -g lumencore -m 0644 "`$stage" "`$destination"
+  sudo -n install -o lumencore -g lumencore -m 0644 "`$stage" "`$destination"
   echo 'MODULE_ACTION=INSTALLED_MISSING_MODULE'
 fi
 rm -f "`$stage"
 cd '$RemoteCodeRoot'
 /opt/lumencore/.venv/bin/python -B -c 'import booth_public_contract; from booth_public_contract import public_booth_projection; assert callable(public_booth_projection)'
-sudo systemctl restart luma-gateway
+sudo -n systemctl restart luma-gateway
 healthy=0
 for attempt in `$(seq 1 30); do
   if systemctl is-active --quiet luma-gateway && curl -fsS http://127.0.0.1:8787/health >/dev/null; then
@@ -185,13 +200,12 @@ systemctl show luma-gateway -p ActiveState -p SubState -p Result -p NRestarts --
 echo 'LOCAL_GATEWAY_HEALTH=PASS'
 "@
 
-Invoke-CheckedNativeWithSecretStdin -FilePath "ssh" -ArgumentList @(
-    "-o", "BatchMode=yes",
+Invoke-CheckedNativeWithSecretStdin -FilePath "ssh" -ArgumentList ($sshSecurityArgs + @(
     "-o", "ConnectTimeout=12",
     "-i", $sshKey,
     "$VpsUser@$VpsIp",
     $remoteApply
-) -SecretInput $humanUnlockToken
+)) -SecretInput $humanUnlockToken
 
 $humanUnlockToken = $null
 
