@@ -1,42 +1,42 @@
 {
   "all_artifacts_present": true,
-  "artifact_count": 14,
+  "artifact_count": 17,
   "artifacts": [
     {
-      "bytes": 16726,
+      "bytes": 21768,
       "exists": true,
       "path": "config/product_lane_priority_v1.json",
-      "sha256": "6112d8d2558386d702d222dfa318e3a64ccac9581753f9b57cede8bfac5f1807"
+      "sha256": "40a7b1a341971906b7a710157787808be08bff84b70ae2c05c88c0e0637e8dbe"
     },
     {
-      "bytes": 44563,
+      "bytes": 71595,
       "exists": true,
       "path": "code/ops/BUILD_PRODUCT_LANE_PRIORITY_ENGINE.py",
-      "sha256": "71d12a838db1f477eb716217e93f1f383b5523f484278c2ba126f669fd763ef3"
+      "sha256": "6382af065d22365643c7eee0c0870258cafcf390f3982b58e596a3548a31278d"
     },
     {
-      "bytes": 77616,
+      "bytes": 111620,
       "exists": true,
       "path": "dashboard/data/product_lane_priority_engine_20260718.json",
-      "sha256": "c2c90bae1bf7372547d94651144eec777ca5d8a120b8d38f5e8e782b9800f896"
+      "sha256": "34a95115d8ab611cc0885a2c5d1213d19ff311f20467a01543ea33b0c2a2765d"
     },
     {
-      "bytes": 6040,
+      "bytes": 10099,
       "exists": true,
       "path": "docs/PRODUCT_LANE_PRIORITY_ENGINE_2026-07-18.md",
-      "sha256": "9bf0686206bc39b210d6dd17c983597866bfd22f30ea48f89a56cfcb846711d1"
+      "sha256": "539901567dbf72360c0ced755bef980fad743f39919a5a2f17268d6b8238ab91"
     },
     {
-      "bytes": 6443,
+      "bytes": 7419,
       "exists": true,
       "path": "docs/MINDWISE_PAID_DESIGN_PARTNER_PILOT_2026-07-18.md",
-      "sha256": "3fb888199d0a4f93e20f87a69bae452c375d1f456429fc7d632747afe787577e"
+      "sha256": "d302f3f851d2445cf0123f5b864ba12075a44778a71d83d5a5565501b4060499"
     },
     {
-      "bytes": 1222,
+      "bytes": 1546,
       "exists": true,
       "path": "docs/MINDWISE_DESIGN_PARTNER_FOLLOWUP_EMAIL_2026-07-18.txt",
-      "sha256": "37a4ba9eaffa7b08d689b19ce1d08ce663b2a1b49058e8dddb0adc056f35d80d"
+      "sha256": "925b1bed6430dba763d1912a1ae0248ac39d370d34b037599cf28c8da574a264"
     },
     {
       "bytes": 20535,
@@ -63,16 +63,16 @@
       "sha256": "3dba1326959c23bd14e99aeb236c61fd677dff98dd2bab226a094691e1ab4283"
     },
     {
-      "bytes": 11241,
+      "bytes": 24895,
       "exists": true,
       "path": "tests/test_product_lane_priority_engine.py",
-      "sha256": "ade92567ef5e1bf1b0c07e3a46e483b85a07afbff0d584d4b786f19336fec3c2"
+      "sha256": "5d30ac0f584bcc53961946f22f0b83a08f63552f1acc293a3339c5dc87d0fc8d"
     },
     {
-      "bytes": 9861,
+      "bytes": 9842,
       "exists": true,
       "path": "dashboard/data/mindwise_healthcare_candidate_feed_20260718.json",
-      "sha256": "8562988baad034e0031bcb4d5f5a2bf7a76e6d24ac186d45f2e7d38c80f4cc27"
+      "sha256": "d9e8177ba7ae439b8453946c5204eab6a4a99ee8c5744e5fbe6a65a438b6dadc"
     },
     {
       "bytes": 6131,
@@ -81,15 +81,41 @@
       "sha256": "739fc35093e6b98242a0b286d30097a34516f4650058c8e42cc111173a621ede"
     },
     {
+      "bytes": 11281,
+      "exists": true,
+      "path": "config/hypercore_v8_validation_protocol_v1.json",
+      "sha256": "a70608007ea8ef579fc69c1aab5d218efd4a3570eede64688d671a020df9f2c8"
+    },
+    {
+      "bytes": 23952,
+      "exists": true,
+      "path": "dashboard/evidence/hypercore/HYPERCORE_V8_SYNTHETIC_PREFLIGHT_2026-08-02.json",
+      "sha256": "90a92b9e81cd0808aa449dc8c8fd94d7fbd06978c09d89f5e9e7a9a428f53063"
+    },
+    {
       "bytes": 3077,
       "exists": true,
       "path": "dashboard/data/prooflock_opportunity_ops_golden_replay_v1.json",
       "sha256": "da928a8cf3e6b98667485b2ec41b3271fda0e2649e175db1d635ac6be9161de6"
+    },
+    {
+      "bytes": 6519,
+      "exists": true,
+      "path": "docs/WHITEHOLE_WHITEHOLELAB_AUDIT_2026-08-02.md",
+      "sha256": "7085a309d574d6cadfa8fcffb192e08cf607a15a0d341fd8572b5b10e0df954e"
     }
   ],
   "boundary": "File receipts prove byte identity and presence only. They do not prove eligibility, correctness, independent validation, customer acceptance, award probability, or commercial value.",
-  "generated_utc": "2026-07-29T08:58:11.424285+00:00",
-  "manifest_payload_sha256": "ad1ee735717b898e35eacff64ab770a76d58d4d1d1945273f3ce9666d163b838",
-  "product_lane_priority_sha256": "c1b498c742ee03f7fd6ad15767f5459978a4825e58757dd4a0d731b7042019df",
+  "excluded_local_only_inputs": [
+    "clean_data/LumenLab__reports_benchmark_scores_v6.csv__14afe85295.csv",
+    "clean_data/LumenLab__reports_harmonic_wins_v6.csv__eef2674289.csv",
+    "data/World model lab script/Harmonic vs backprop script.txt",
+    "out/fair_benchmark/summary.json",
+    "out/real_data_fair_benchmark/20260505T072405Z/summary.json"
+  ],
+  "generated_utc": "2026-08-04T11:42:32.870060+00:00",
+  "manifest_payload_sha256": "514de394791a5df27d8f0e59359e982c592bf9cb5b67cee4a5d1ded8c2bb4771",
+  "product_lane_priority_sha256": "aab40ec152e6dc9ec7f6063132e3595db9b0c70f96062f5b380d00466d20279e",
+  "public_reproducibility_status": "The public bundle excludes non-versioned local historical inputs. They cannot be treated as reproducible public evidence.",
   "schema": "product_lane_priority_bundle_manifest_v1"
 }

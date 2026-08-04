@@ -1,0 +1,713 @@
+{
+  "claim_boundary": {
+    "allowed": [
+      "The local runner enforced source authorization, source hashing, chronological splits, calibration freeze, registered baseline execution, null retention, ablations, and explicit abstention controls for this bounded replay.",
+      "The deterministic result hash permits local byte-level rerun comparison."
+    ],
+    "blocked": [
+      "measured energy efficiency improvement",
+      "realized cost or outage savings",
+      "field-validated early warning",
+      "production readiness",
+      "cross-layer causal attribution",
+      "universal phase locking or coherence superiority",
+      "automatic infrastructure control",
+      "external validation",
+      "buyer acceptance",
+      "economic value from a synthetic fixture"
+    ]
+  },
+  "deterministic_result": {
+    "ablation_results": [
+      {
+        "layer_count": 1,
+        "metrics": {
+          "abstention_rate": 0.0,
+          "event_recall": 0.5,
+          "false_alerts_per_operating_day": 0.0,
+          "incident_episode_count": 2,
+          "lead_time_distribution_seconds": [
+            0.0
+          ],
+          "median_lead_time_seconds": 0.0,
+          "per_incident": [
+            {
+              "detected": false,
+              "end_utc": "2026-01-01T21:45:00+00:00",
+              "episode_index": 0,
+              "lead_time_seconds": null,
+              "start_utc": "2026-01-01T20:50:00+00:00"
+            },
+            {
+              "detected": true,
+              "end_utc": "2026-01-02T00:15:00+00:00",
+              "episode_index": 1,
+              "lead_time_seconds": 0.0,
+              "start_utc": "2026-01-01T23:20:00+00:00"
+            }
+          ],
+          "precision_recall_auc": 0.49223631,
+          "scored_row_count": 60
+        },
+        "signals": [
+          "compute_pct"
+        ],
+        "threshold": 1.8028420083
+      },
+      {
+        "layer_count": 1,
+        "metrics": {
+          "abstention_rate": 0.0,
+          "event_recall": 1.0,
+          "false_alerts_per_operating_day": 0.0,
+          "incident_episode_count": 2,
+          "lead_time_distribution_seconds": [
+            0.0,
+            0.0
+          ],
+          "median_lead_time_seconds": 0.0,
+          "per_incident": [
+            {
+              "detected": true,
+              "end_utc": "2026-01-01T21:45:00+00:00",
+              "episode_index": 0,
+              "lead_time_seconds": 0.0,
+              "start_utc": "2026-01-01T20:50:00+00:00"
+            },
+            {
+              "detected": true,
+              "end_utc": "2026-01-02T00:15:00+00:00",
+              "episode_index": 1,
+              "lead_time_seconds": 0.0,
+              "start_utc": "2026-01-01T23:20:00+00:00"
+            }
+          ],
+          "precision_recall_auc": 0.88331817,
+          "scored_row_count": 60
+        },
+        "signals": [
+          "thermal_c"
+        ],
+        "threshold": 2.5307121566
+      },
+      {
+        "layer_count": 1,
+        "metrics": {
+          "abstention_rate": 0.0,
+          "event_recall": 1.0,
+          "false_alerts_per_operating_day": 0.0,
+          "incident_episode_count": 2,
+          "lead_time_distribution_seconds": [
+            0.0,
+            0.0
+          ],
+          "median_lead_time_seconds": 0.0,
+          "per_incident": [
+            {
+              "detected": true,
+              "end_utc": "2026-01-01T21:45:00+00:00",
+              "episode_index": 0,
+              "lead_time_seconds": 0.0,
+              "start_utc": "2026-01-01T20:50:00+00:00"
+            },
+            {
+              "detected": true,
+              "end_utc": "2026-01-02T00:15:00+00:00",
+              "episode_index": 1,
+              "lead_time_seconds": 0.0,
+              "start_utc": "2026-01-01T23:20:00+00:00"
+            }
+          ],
+          "precision_recall_auc": 0.6604137,
+          "scored_row_count": 60
+        },
+        "signals": [
+          "power_kw"
+        ],
+        "threshold": 1.9395526257
+      },
+      {
+        "layer_count": 2,
+        "metrics": {
+          "abstention_rate": 0.0,
+          "event_recall": 0.0,
+          "false_alerts_per_operating_day": 0.5,
+          "incident_episode_count": 2,
+          "lead_time_distribution_seconds": [],
+          "median_lead_time_seconds": null,
+          "per_incident": [
+            {
+              "detected": false,
+              "end_utc": "2026-01-01T21:45:00+00:00",
+              "episode_index": 0,
+              "lead_time_seconds": null,
+              "start_utc": "2026-01-01T20:50:00+00:00"
+            },
+            {
+              "detected": false,
+              "end_utc": "2026-01-02T00:15:00+00:00",
+              "episode_index": 1,
+              "lead_time_seconds": null,
+              "start_utc": "2026-01-01T23:20:00+00:00"
+            }
+          ],
+          "precision_recall_auc": 0.38943425,
+          "scored_row_count": 60
+        },
+        "signals": [
+          "compute_pct",
+          "thermal_c"
+        ],
+        "threshold": 0.0
+      },
+      {
+        "layer_count": 2,
+        "metrics": {
+          "abstention_rate": 0.0,
+          "event_recall": 0.5,
+          "false_alerts_per_operating_day": 0.5,
+          "incident_episode_count": 2,
+          "lead_time_distribution_seconds": [
+            1200.0
+          ],
+          "median_lead_time_seconds": 1200.0,
+          "per_incident": [
+            {
+              "detected": false,
+              "end_utc": "2026-01-01T21:45:00+00:00",
+              "episode_index": 0,
+              "lead_time_seconds": null,
+              "start_utc": "2026-01-01T20:50:00+00:00"
+            },
+            {
+              "detected": true,
+              "end_utc": "2026-01-02T00:15:00+00:00",
+              "episode_index": 1,
+              "lead_time_seconds": 1200.0,
+              "start_utc": "2026-01-01T23:20:00+00:00"
+            }
+          ],
+          "precision_recall_auc": 0.46168569,
+          "scored_row_count": 60
+        },
+        "signals": [
+          "compute_pct",
+          "power_kw"
+        ],
+        "threshold": 0.0
+      },
+      {
+        "layer_count": 2,
+        "metrics": {
+          "abstention_rate": 0.0,
+          "event_recall": 0.0,
+          "false_alerts_per_operating_day": 0.0,
+          "incident_episode_count": 2,
+          "lead_time_distribution_seconds": [],
+          "median_lead_time_seconds": null,
+          "per_incident": [
+            {
+              "detected": false,
+              "end_utc": "2026-01-01T21:45:00+00:00",
+              "episode_index": 0,
+              "lead_time_seconds": null,
+              "start_utc": "2026-01-01T20:50:00+00:00"
+            },
+            {
+              "detected": false,
+              "end_utc": "2026-01-02T00:15:00+00:00",
+              "episode_index": 1,
+              "lead_time_seconds": null,
+              "start_utc": "2026-01-01T23:20:00+00:00"
+            }
+          ],
+          "precision_recall_auc": 0.36501866,
+          "scored_row_count": 60
+        },
+        "signals": [
+          "thermal_c",
+          "power_kw"
+        ],
+        "threshold": 0.0
+      }
+    ],
+    "authorization_receipt_sha256": "4b90a230002aa086fe3e6073c9537e83144503f73fd91f175533ac660bccaea2",
+    "metrics": {
+      "ewma_or_cusum": {
+        "abstention_rate": 0.0,
+        "event_recall": 1.0,
+        "false_alerts_per_operating_day": 0.0,
+        "incident_episode_count": 2,
+        "lead_time_distribution_seconds": [
+          0.0,
+          0.0
+        ],
+        "median_lead_time_seconds": 0.0,
+        "per_incident": [
+          {
+            "detected": true,
+            "end_utc": "2026-01-01T21:45:00+00:00",
+            "episode_index": 0,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T20:50:00+00:00"
+          },
+          {
+            "detected": true,
+            "end_utc": "2026-01-02T00:15:00+00:00",
+            "episode_index": 1,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T23:20:00+00:00"
+          }
+        ],
+        "precision_recall_auc": 0.89022954,
+        "scored_row_count": 60
+      },
+      "fixed_univariate_thresholds": {
+        "abstention_rate": 0.0,
+        "event_recall": 1.0,
+        "false_alerts_per_operating_day": 0.0,
+        "incident_episode_count": 2,
+        "lead_time_distribution_seconds": [
+          0.0,
+          0.0
+        ],
+        "median_lead_time_seconds": 0.0,
+        "per_incident": [
+          {
+            "detected": true,
+            "end_utc": "2026-01-01T21:45:00+00:00",
+            "episode_index": 0,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T20:50:00+00:00"
+          },
+          {
+            "detected": true,
+            "end_utc": "2026-01-02T00:15:00+00:00",
+            "episode_index": 1,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T23:20:00+00:00"
+          }
+        ],
+        "precision_recall_auc": 0.94144472,
+        "scored_row_count": 60
+      },
+      "hypercore_cross_layer_coherence": {
+        "abstention_rate": 0.0,
+        "event_recall": 0.0,
+        "false_alerts_per_operating_day": 0.0,
+        "incident_episode_count": 2,
+        "lead_time_distribution_seconds": [],
+        "median_lead_time_seconds": null,
+        "per_incident": [
+          {
+            "detected": false,
+            "end_utc": "2026-01-01T21:45:00+00:00",
+            "episode_index": 0,
+            "lead_time_seconds": null,
+            "start_utc": "2026-01-01T20:50:00+00:00"
+          },
+          {
+            "detected": false,
+            "end_utc": "2026-01-02T00:15:00+00:00",
+            "episode_index": 1,
+            "lead_time_seconds": null,
+            "start_utc": "2026-01-01T23:20:00+00:00"
+          }
+        ],
+        "precision_recall_auc": 0.37981352,
+        "scored_row_count": 60
+      },
+      "operator_incumbent": {
+        "abstention_rate": 0.0,
+        "event_recall": 1.0,
+        "false_alerts_per_operating_day": 0.0,
+        "incident_episode_count": 2,
+        "lead_time_distribution_seconds": [
+          0.0,
+          0.0
+        ],
+        "median_lead_time_seconds": 0.0,
+        "per_incident": [
+          {
+            "detected": true,
+            "end_utc": "2026-01-01T21:45:00+00:00",
+            "episode_index": 0,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T20:50:00+00:00"
+          },
+          {
+            "detected": true,
+            "end_utc": "2026-01-02T00:15:00+00:00",
+            "episode_index": 1,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T23:20:00+00:00"
+          }
+        ],
+        "precision_recall_auc": 0.65734439,
+        "scored_row_count": 60
+      },
+      "persistence_or_last_value": {
+        "abstention_rate": 0.0,
+        "event_recall": 1.0,
+        "false_alerts_per_operating_day": 0.0,
+        "incident_episode_count": 2,
+        "lead_time_distribution_seconds": [
+          0.0,
+          0.0
+        ],
+        "median_lead_time_seconds": 0.0,
+        "per_incident": [
+          {
+            "detected": true,
+            "end_utc": "2026-01-01T21:45:00+00:00",
+            "episode_index": 0,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T20:50:00+00:00"
+          },
+          {
+            "detected": true,
+            "end_utc": "2026-01-02T00:15:00+00:00",
+            "episode_index": 1,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T23:20:00+00:00"
+          }
+        ],
+        "precision_recall_auc": 0.97497557,
+        "scored_row_count": 60
+      },
+      "regularized_multivariate_distance": {
+        "abstention_rate": 0.0,
+        "event_recall": 1.0,
+        "false_alerts_per_operating_day": 0.0,
+        "incident_episode_count": 2,
+        "lead_time_distribution_seconds": [
+          0.0,
+          0.0
+        ],
+        "median_lead_time_seconds": 0.0,
+        "per_incident": [
+          {
+            "detected": true,
+            "end_utc": "2026-01-01T21:45:00+00:00",
+            "episode_index": 0,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T20:50:00+00:00"
+          },
+          {
+            "detected": true,
+            "end_utc": "2026-01-02T00:15:00+00:00",
+            "episode_index": 1,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T23:20:00+00:00"
+          }
+        ],
+        "precision_recall_auc": 0.98291301,
+        "scored_row_count": 60
+      },
+      "seasonal_naive": {
+        "abstention_rate": 0.0,
+        "event_recall": 1.0,
+        "false_alerts_per_operating_day": 0.0,
+        "incident_episode_count": 2,
+        "lead_time_distribution_seconds": [
+          0.0,
+          0.0
+        ],
+        "median_lead_time_seconds": 0.0,
+        "per_incident": [
+          {
+            "detected": true,
+            "end_utc": "2026-01-01T21:45:00+00:00",
+            "episode_index": 0,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T20:50:00+00:00"
+          },
+          {
+            "detected": true,
+            "end_utc": "2026-01-02T00:15:00+00:00",
+            "episode_index": 1,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T23:20:00+00:00"
+          }
+        ],
+        "precision_recall_auc": 0.83765802,
+        "scored_row_count": 60
+      },
+      "seasonal_or_time_conditioned_thresholds": {
+        "abstention_rate": 0.0,
+        "event_recall": 1.0,
+        "false_alerts_per_operating_day": 0.0,
+        "incident_episode_count": 2,
+        "lead_time_distribution_seconds": [
+          0.0,
+          0.0
+        ],
+        "median_lead_time_seconds": 0.0,
+        "per_incident": [
+          {
+            "detected": true,
+            "end_utc": "2026-01-01T21:45:00+00:00",
+            "episode_index": 0,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T20:50:00+00:00"
+          },
+          {
+            "detected": true,
+            "end_utc": "2026-01-02T00:15:00+00:00",
+            "episode_index": 1,
+            "lead_time_seconds": 0.0,
+            "start_utc": "2026-01-01T23:20:00+00:00"
+          }
+        ],
+        "precision_recall_auc": 0.94144472,
+        "scored_row_count": 60
+      }
+    },
+    "null_results": [
+      {
+        "family": "circular_or_block_time_shifts",
+        "holm_adjusted_p_value": 1.0,
+        "null_quantiles": {
+          "q025": 0.0,
+          "q500": 0.0,
+          "q975": 0.0
+        },
+        "null_statistics_sha256": "bf55e1a634009005d471f2cf3da1daf9f7e73a52fb607ca3c3bca5e3dda870aa",
+        "observed_effect": 0.0,
+        "p_value": 1.0,
+        "replicate_count": 999,
+        "seed": 20261802
+      },
+      {
+        "family": "event_label_permutation",
+        "holm_adjusted_p_value": 1.0,
+        "null_quantiles": {
+          "q025": 0.0,
+          "q500": 0.0,
+          "q975": 0.0
+        },
+        "null_statistics_sha256": "bf55e1a634009005d471f2cf3da1daf9f7e73a52fb607ca3c3bca5e3dda870aa",
+        "observed_effect": 0.0,
+        "p_value": 1.0,
+        "replicate_count": 999,
+        "seed": 20262802
+      },
+      {
+        "family": "independent_phase_scrambling",
+        "holm_adjusted_p_value": 0.006,
+        "null_quantiles": {
+          "q025": 0.0831115566,
+          "q500": 0.2114660089,
+          "q975": 0.3608264096
+        },
+        "null_statistics_sha256": "4d48841ec9777b172ae5036a596e458b8e3ef4072c374473a5b8fa6fcacd28bc",
+        "observed_effect": 0.4663574577,
+        "p_value": 0.002,
+        "replicate_count": 999,
+        "seed": 20263802,
+        "statistic": "mean_absolute_pairwise_pearson_phase_alignment"
+      }
+    ],
+    "promotion_gate_results": {
+      "all_registered_baselines_executed": true,
+      "candidate_false_alert_ceiling_met": true,
+      "economic_counterfactual_complete": false,
+      "independent_reproduction_complete": false,
+      "maximum_single_fold_gain_fraction_met": false,
+      "minimum_positive_fold_fraction_met": false,
+      "multiplicity_adjustment_applied": true,
+      "noninferiority_to_selected_baseline": false,
+      "sample_power_status": "descriptive_only",
+      "thresholds_frozen_before_holdout": true
+    },
+    "protocol_sha256": "a70608007ea8ef579fc69c1aab5d218efd4a3570eede64688d671a020df9f2c8",
+    "source_mode": "synthetic_fixture",
+    "source_sha256": "aeacdc2137cac0fb483dd26adffd628c5276988964f606c8c8389d92dd681762",
+    "split_manifest": {
+      "calibration": {
+        "end_utc": "2026-01-01T19:55:00+00:00",
+        "rows": 60,
+        "start_utc": "2026-01-01T15:00:00+00:00"
+      },
+      "development": {
+        "end_utc": "2026-01-01T14:55:00+00:00",
+        "rows": 180,
+        "start_utc": "2026-01-01T00:00:00+00:00"
+      },
+      "holdout": {
+        "end_utc": "2026-01-02T00:55:00+00:00",
+        "rows": 60,
+        "start_utc": "2026-01-01T20:00:00+00:00"
+      },
+      "holdout_accessed_after_threshold_receipt_sha256": "b463b4c0c555ded4fdbc384dd436990e064c7ae0fc7eeaf329693654f1d87948",
+      "split_type": "strict_chronological",
+      "walk_forward_fold_count": 5
+    },
+    "stress_results": [
+      {
+        "expected": true,
+        "status": "ABSTAIN_MISSING_SIGNAL",
+        "test": "missing_signal"
+      },
+      {
+        "expected": true,
+        "status": "ABSTAIN_CONSTANT_SIGNAL",
+        "test": "constant_signal"
+      },
+      {
+        "expected": true,
+        "status": "ABSTAIN_IRREGULAR_SAMPLING",
+        "test": "irregular_sampling"
+      },
+      {
+        "expected": true,
+        "status": "ABSTAIN_TIMESTAMP_JITTER",
+        "test": "timestamp_jitter",
+        "tolerance_seconds": 3.0
+      },
+      {
+        "alerts_at_0_9x": 0,
+        "alerts_at_1_1x": 0,
+        "status": "RETAINED_DESCRIPTIVE",
+        "test": "threshold_sensitivity"
+      },
+      {
+        "missing_signal_rate": 0.03333333,
+        "status": "ABSTAIN_ROWS_WITH_MISSING_SIGNAL",
+        "test": "sensor_dropout"
+      },
+      {
+        "claim_allowed": false,
+        "status": "REQUIRES_SEPARATE_BUYER_DEFINED_SHIFT",
+        "test": "distribution_shift"
+      },
+      {
+        "claim_allowed": false,
+        "status": "REQUIRES_INDEPENDENT_ADJUDICATOR_RANGE",
+        "test": "incident_label_uncertainty"
+      },
+      {
+        "column": "timestamp_utc",
+        "status": "PASS",
+        "test": "timestamp_column_contract"
+      }
+    ],
+    "threshold_receipt": {
+      "calibration_rows": 60,
+      "coherence_frequency_band_hz": [
+        0.000104166667,
+        0.001666666667
+      ],
+      "coherence_window_rows": 32,
+      "development_rows": 180,
+      "false_alert_ceiling_per_operating_day": 12.0,
+      "holdout_rows_committed": 60,
+      "holdout_start_utc": "2026-01-01T20:00:00+00:00",
+      "schema": "hypercore_v8_threshold_receipt_v1",
+      "selected_baseline_from_calibration_only": "regularized_multivariate_distance",
+      "source_sha256": "aeacdc2137cac0fb483dd26adffd628c5276988964f606c8c8389d92dd681762",
+      "threshold_receipt_sha256": "b463b4c0c555ded4fdbc384dd436990e064c7ae0fc7eeaf329693654f1d87948",
+      "thresholds": {
+        "ewma_or_cusum": 1.8702257891,
+        "fixed_univariate_thresholds": 2.6655086048,
+        "hypercore_cross_layer_coherence": 0.0,
+        "operator_incumbent": 1.8458322179,
+        "persistence_or_last_value": 2.1573754699,
+        "regularized_multivariate_distance": 5.1493659234,
+        "seasonal_naive": 2.6834945344,
+        "seasonal_or_time_conditioned_thresholds": 2.6655086048
+      },
+      "thresholds_frozen_before_holdout": true
+    },
+    "walk_forward_folds": [
+      {
+        "best_registered_baseline_precision_recall_auc": 0.89583333,
+        "candidate_gain": 0.10416667,
+        "candidate_precision_recall_auc": 1.0,
+        "fold": 1,
+        "status": "EVALUATED",
+        "test_end_utc": "2026-01-01T07:10:00+00:00",
+        "test_rows": 23,
+        "test_start_utc": "2026-01-01T05:20:00+00:00",
+        "train_end_utc": "2026-01-01T05:15:00+00:00",
+        "train_rows": 64
+      },
+      {
+        "best_registered_baseline_precision_recall_auc": null,
+        "candidate_gain": null,
+        "candidate_precision_recall_auc": null,
+        "fold": 2,
+        "status": "INCONCLUSIVE_NO_POSITIVE_EPISODE",
+        "test_end_utc": "2026-01-01T09:05:00+00:00",
+        "test_rows": 23,
+        "test_start_utc": "2026-01-01T07:15:00+00:00",
+        "train_end_utc": "2026-01-01T07:10:00+00:00",
+        "train_rows": 87
+      },
+      {
+        "best_registered_baseline_precision_recall_auc": 1.0,
+        "candidate_gain": -0.63487083,
+        "candidate_precision_recall_auc": 0.36512917,
+        "fold": 3,
+        "status": "EVALUATED",
+        "test_end_utc": "2026-01-01T11:00:00+00:00",
+        "test_rows": 23,
+        "test_start_utc": "2026-01-01T09:10:00+00:00",
+        "train_end_utc": "2026-01-01T09:05:00+00:00",
+        "train_rows": 110
+      },
+      {
+        "best_registered_baseline_precision_recall_auc": null,
+        "candidate_gain": null,
+        "candidate_precision_recall_auc": null,
+        "fold": 4,
+        "status": "INCONCLUSIVE_NO_POSITIVE_EPISODE",
+        "test_end_utc": "2026-01-01T12:55:00+00:00",
+        "test_rows": 23,
+        "test_start_utc": "2026-01-01T11:05:00+00:00",
+        "train_end_utc": "2026-01-01T11:00:00+00:00",
+        "train_rows": 133
+      },
+      {
+        "best_registered_baseline_precision_recall_auc": null,
+        "candidate_gain": null,
+        "candidate_precision_recall_auc": null,
+        "fold": 5,
+        "status": "INCONCLUSIVE_NO_POSITIVE_EPISODE",
+        "test_end_utc": "2026-01-01T14:55:00+00:00",
+        "test_rows": 24,
+        "test_start_utc": "2026-01-01T13:00:00+00:00",
+        "train_end_utc": "2026-01-01T12:55:00+00:00",
+        "train_rows": 156
+      }
+    ]
+  },
+  "deterministic_result_sha256": "196e7f72ec365504a8d779584948dabce708631974e8c8905f4a8a265e0a1cf7",
+  "execution_controls": {
+    "control_write_performed": false,
+    "credentials_read": false,
+    "holdout_outcomes_used_for_threshold_selection": false,
+    "network_access_performed": false,
+    "production_connection_performed": false,
+    "source_rows_persisted_in_receipt": false
+  },
+  "generated_utc": "2026-08-02T10:30:00Z",
+  "mode": "OFFLINE_READ_ONLY_REPLAY",
+  "protocol_id": "HYPERCORE-V8-OFFLINE-RESILIENCE-REVIEW-001",
+  "receipt_sha256": "2f235c14aeb5599808faed45075cc3b794db52971fc445b8e46eeffff6c610f5",
+  "resource_measurements": {
+    "cpu_time_seconds": 7.34375,
+    "decision_latency_seconds_per_holdout_row": 0.1223958333,
+    "peak_memory_bytes": 1592063
+  },
+  "result_classification": "DESCRIPTIVE_ONLY",
+  "runtime": {
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "python": "3.11.9",
+    "scipy": "1.16.3"
+  },
+  "safest_next_action": "Obtain one buyer-authorized source bundle, buyer-owned incident labels, an incumbent baseline decision, and prospectively approved thresholds. Re-run without changing the protocol, then require independent reproduction before any external performance claim.",
+  "schema": "hypercore_v8_offline_replay_receipt_v1",
+  "status": "SYNTHETIC_PREFLIGHT_COMPLETE_NOT_EXTERNAL_VALIDATION"
+}

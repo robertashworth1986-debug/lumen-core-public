@@ -1,12 +1,12 @@
 # Product Lane Priority Engine
 
-Generated: `2026-07-29T08:58:11.424285+00:00`
+Generated: `2026-08-04T11:42:32.870060+00:00`
 
 > Product-lane priority engine. Scores are a transparent founder strategy heuristic, not market valuation, patentability, customer acceptance, award probability, field validation, or guaranteed revenue.
 
 ## Decision
 
-Build and sell **ProofLock Opportunity Operations** first. Use the **ProofLock Evidence Router API** as the narrower technical wedge. Keep LumaScout as a later vertical after a forward outcome study.
+Package **ProofLock Opportunity Operations** as the first human-approved paid proof-sprint candidate. Use the **ProofLock Evidence Router API** as a narrower technical co-design wedge. No lane is product-ready or authorized for external send by this artifact.
 
 ## Ranked Lanes
 
@@ -15,17 +15,49 @@ Build and sell **ProofLock Opportunity Operations** first. Use the **ProofLock E
 | 1 | ProofLock Opportunity Operations | 89.60 | 100% | requires_external_buyer_validation | Run a paid 30-day design-partner pilot against the buyer's current grant workflow and lock the baseline before automation begins. |
 | 2 | ProofLock Evidence Router API | 83.25 | 100% | requires_external_buyer_validation | Rebuild router features from training windows only, add deterministic abstention, and evaluate prospectively against the best fixed family and a declared oracle boundary. |
 | 3 | Energy Forecast Validation Service | 75.60 | 100% | requires_external_buyer_validation | Complete the preregistered prospective sample gates, obtain an independent reproduction receipt, and secure one operator-approved dataset, incumbent baseline, holdout policy, and economic conversion before discussing performance or dollar value. |
-| 4 | LumaScout A&R Intelligence | 67.00 | 67% | blocked_internal_evidence | Pre-register a shortlist and measure forward artist outcomes against a transparent popularity baseline using licensed or permitted data. |
-| 5 | Guarded Market Research | 63.50 | 100% | requires_external_buyer_validation | Pass a prospective after-fee paper protocol with reconciliation and risk gates before any live-capital discussion. |
-| 6 | XR Comfort and Cue-Integrity Governor | 54.00 | 100% | requires_external_buyer_validation | Build a non-medical software-only prototype and run an ethics-reviewed human-factors study with established cybersickness and task-performance measures. |
+| 4 | HyperCore Read-Only Resilience Evaluation | 69.70 | 100% | requires_external_buyer_validation | Freeze one buyer-authorized telemetry source, accepted baselines, buyer-owned incident labels, chronology, calibration metrics, and holdout thresholds before observing outcomes; then require independent reproduction before any external performance claim. |
+| 5 | LumaScout A&R Intelligence | 67.00 | 67% | blocked_internal_evidence | Pre-register a shortlist and measure forward artist outcomes against a transparent popularity baseline using licensed or permitted data. |
+| 6 | Guarded Market Research | 63.50 | 100% | requires_external_buyer_validation | Repair the documented WhiteHoleLab alias, manifest, and state-consistency defects in a governed working copy, then pass a preregistered prospective after-fee paper protocol against named baselines with reconciliation and risk gates before any live-capital discussion. |
+| 7 | XR Comfort and Cue-Integrity Governor | 54.00 | 100% | requires_external_buyer_validation | Build a non-medical software-only prototype and run an ethics-reviewed human-factors study with established cybersickness and task-performance measures. |
+
+## Productization Matrix
+
+| Rank | Lane | Current stage | Internal evidence | Product ready | External send | Next gate |
+|---:|---|---|---|---|---|---|
+| 1 | ProofLock Opportunity Operations | `PAID_PROOF_SPRINT_SCOPE_READY_HUMAN_APPROVAL_REQUIRED` | true | false | false | Buyer approves the workflow, permitted sources, baseline, sample rule, acceptance criteria, price, recipient, and exact outbound message. |
+| 2 | ProofLock Evidence Router API | `TECHNICAL_CO_DESIGN_ONLY` | true | false | false | Rebuild every feature from information available at decision time, preregister the comparison, and pass prospective abstention and receipt tests. |
+| 3 | Energy Forecast Validation Service | `VALIDATION_SETUP_ONLY` | true | false | false | Complete the preregistered prospective sample, settle actuals, compare frozen baselines, and obtain independent protocol-matched reproduction. |
+| 4 | HyperCore Read-Only Resilience Evaluation | `OFFLINE_EVALUATION_SETUP_ONLY` | true | false | false | Run the frozen chronology-safe protocol on buyer-authorized data, pass falsification and power gates, and obtain independent reproduction before external validation language. |
+| 5 | LumaScout A&R Intelligence | `INTERNAL_EVIDENCE_REPAIR_REQUIRED` | false | false | false | Repair internal evidence coverage, then complete a prospectively frozen forward outcome study. |
+| 6 | Guarded Market Research | `PAPER_RESEARCH_PROTOCOL_ONLY` | true | false | false | Repair the WhiteHoleLab ticker-alias, manifest-completeness, and state-consistency defects in a governed working copy, then pass a prospectively frozen, leakage-controlled, cost-aware comparison against named baselines and independent review. |
+| 7 | XR Comfort and Cue-Integrity Governor | `RESEARCH_PROTOCOL_ONLY` | true | false | false | Complete ethics-appropriate prospective usability testing with predefined outcomes and exclusions. |
 
 ## Evidence Audit
 
 - Best bounded exploratory run: `20260505T121657Z` with `673` datasets.
 - Latest-run blocker: Run 20260526T050639Z is blocked from comparative headline use because i_sarima has no valid RMSE on all 1,118 datasets while the scorecard still describes a classical comparison.
 - Router blocker: The historical meta-router extracts features from each full series, including the benchmark test window. Cross-dataset CV does not remove that within-series look-ahead. Rebuild features from each training window as train-only inputs before making prospective routing claims.
-- Healthcare candidate feed: `fresh`; age `0.11` hours; freshness label allowed `true`; eligibility label allowed `false`.
+- Healthcare candidate feed: `stale_or_unverifiable`; age `48.13` hours; freshness label allowed `false`; eligibility label allowed `false`.
 - Feed boundary: Freshness applies only to the candidate source feed. Relevance scores do not establish applicant eligibility, current requirements, submission readiness, or award probability.
+
+## Legacy Harmonic/Backprop Claim Gate
+
+- Historical internal result: `362` harmonic wins in `400` comparisons.
+- Claim status: `HISTORICAL_EXPLORATORY_ONLY_NOT_CLAIM_READY`.
+- External claim allowed: `false`.
+- Protocol finding: `318` negative backprop R-squared rows and `186` rows where the estimated period equals the full series length.
+- Boundary: Do not present 362/400 as current, prospective, independently validated, or general harmonic superiority over backpropagation.
+- Next gate: Preregister and run a chronology-safe, capacity-matched, target-scaled prospective comparison against frozen naive, statistical, and neural baselines, then obtain independent reproduction.
+
+## WhiteHoleLab Remediation Gate
+
+- Status: `REMEDIATION_SPEC_READY_ARCHIVE_FROZEN`.
+- Product lane: `guarded_market_research`.
+- Frozen archive mutation allowed: `false`.
+- Legacy site deployment allowed: `false`.
+- Performance or alpha claim allowed: `false`.
+- Documented implementation defects: `3`.
+- Current use: Historical custody, reproducibility context, and descriptive diagnostic lineage only.
 
 ## Commercial Wedge
 
@@ -54,16 +86,20 @@ Allowed now:
 - five historical benchmark runs and raw source directories exist
 - the 673-dataset run is a bounded exploratory single-holdout reference
 - a paid design-partner pilot can measure workflow improvement
-- the healthcare candidate feed was refreshed within its 24-hour SLA; freshness does not establish eligibility
+- WhiteHole provides historical custody context and WhiteHoleLab provides descriptive diagnostic lineage only
 
 Blocked now:
+- current-feed language until the candidate feed is refreshed within the freshness SLA
 - organizational eligibility from relevance scores alone
 - urgent or priority labels as authorization to apply or submit
 - prospective router superiority until train-only features pass
 - field validation or realized savings
 - guaranteed awards or autonomous final submission
 - patentability
+- the historical 362/400 harmonic-versus-backprop result as current, prospective, independently validated, or general superiority evidence
+- WhiteHoleLab coherence scores or watchlist ranks as alpha, expected return, forecasting skill, or buyer outcome evidence
+- deployment of the historical WhiteHoleLab website or mutation of the frozen WhiteHole archive
 
 ## Receipt
 
-SHA-256: `c1b498c742ee03f7fd6ad15767f5459978a4825e58757dd4a0d731b7042019df`
+SHA-256: `aab40ec152e6dc9ec7f6063132e3595db9b0c70f96062f5b380d00466d20279e`

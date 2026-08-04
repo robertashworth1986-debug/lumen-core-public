@@ -1,0 +1,63 @@
+{
+  "boundary": "This replay proves deterministic decision-state and receipt-chain behavior for synthetic fixtures only. It does not prove eligibility, customer outcomes, awards, savings, or production readiness.",
+  "events": [
+    {
+      "action_type": "eligibility_and_deadline_review",
+      "actor_role": "system_draft_for_human_review",
+      "blockers": [],
+      "decision": "QUALIFIED_FOR_BUYER_REVIEW",
+      "event_id": "GOLDEN-001",
+      "event_sha256": "5406bfa798f6da5d8e87719231a6a2d18c6c5118c6a7aa0ae6b4185d1cec2eaf",
+      "event_utc": "2026-07-18T00:01:00Z",
+      "evidence_sha256": "ddb21001586e00a9884599317179bd71470cb12c38cec232e8b617d13510ee3f",
+      "human_authority_state": "not_requested",
+      "opportunity_id": "SYNTH-QUALIFIED",
+      "previous_event_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "source_id": "synthetic_fixture_v1"
+    },
+    {
+      "action_type": "eligibility_and_deadline_review",
+      "actor_role": "system_draft_for_human_review",
+      "blockers": [
+        "synthetic_entity_type_not_eligible"
+      ],
+      "decision": "DISQUALIFIED",
+      "event_id": "GOLDEN-002",
+      "event_sha256": "f0e25e43d45067f2ef9b5115c87e3f6d7c70fda4776850073947f5f8079cbf9f",
+      "event_utc": "2026-07-18T00:02:00Z",
+      "evidence_sha256": "6845a8d7a1353e6f47a8cd7eeefe5e2a3315a1d74ef0add530d0319484770439",
+      "human_authority_state": "not_requested",
+      "opportunity_id": "SYNTH-DISQUALIFIED",
+      "previous_event_sha256": "5406bfa798f6da5d8e87719231a6a2d18c6c5118c6a7aa0ae6b4185d1cec2eaf",
+      "source_id": "synthetic_fixture_v1"
+    },
+    {
+      "action_type": "eligibility_and_deadline_review",
+      "actor_role": "system_draft_for_human_review",
+      "blockers": [
+        "missing_synthetic_deadline_receipt"
+      ],
+      "decision": "ABSTAIN_INSUFFICIENT_EVIDENCE",
+      "event_id": "GOLDEN-003",
+      "event_sha256": "bdf1022826d59c4b39bb02e3be11ae33dea4cfdb956ed33ae074f6dd8368df1b",
+      "event_utc": "2026-07-18T00:03:00Z",
+      "evidence_sha256": "888467330a8d91244ce5b7a07c7fcd1f27f65ba44365c5aa364e0f7fd3be7d00",
+      "human_authority_state": "not_requested",
+      "opportunity_id": "SYNTH-INSUFFICIENT",
+      "previous_event_sha256": "f0e25e43d45067f2ef9b5115c87e3f6d7c70fda4776850073947f5f8079cbf9f",
+      "source_id": "synthetic_fixture_v1"
+    }
+  ],
+  "fixture_data_class": "synthetic_no_phi_no_credentials",
+  "protocol_id": "PROOFLOCK_OPS_PILOT_V1",
+  "receipt": {
+    "chain_valid": true,
+    "event_count": 3,
+    "genesis_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "protocol_id": "PROOFLOCK_OPS_PILOT_V1",
+    "receipt_sha256": "ceecf48eb163f884ef7be0c46c66ea4d07856aa6b925baad1647d6b8557d74f4",
+    "terminal_event_sha256": "bdf1022826d59c4b39bb02e3be11ae33dea4cfdb956ed33ae074f6dd8368df1b"
+  },
+  "replay_sha256": "2664168a3468bbd59f4e24f8ee787c5b6d686ee2ab89af2067a83ba4079630ff",
+  "schema": "prooflock_opportunity_ops_golden_replay_v1"
+}

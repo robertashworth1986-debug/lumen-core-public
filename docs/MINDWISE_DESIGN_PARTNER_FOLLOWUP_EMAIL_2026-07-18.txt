@@ -1,18 +1,20 @@
-DRAFT ONLY - RECIPIENT NOT SELECTED - DO NOT SEND
+DRAFT ONLY - VERIFIED WARM REACTIVATION ROUTE - EXACT SEND AND PRICE APPROVAL REQUIRED
 
-Subject: Bounded 30-day opportunity-operations pilot
+Subject: MindWise x LumenCore: 10-day paid grant-operations proof sprint
 
-Hi [Name],
+Hi [Authorized MindWise contact],
 
-I am reaching out only after confirming that your current workflow and source permissions fit a bounded pilot.
+I appreciated your positive response to the MindWise grant-flow demo. I have since narrowed the first step so it is smaller, measurable, and easier to evaluate before either side commits to a larger implementation.
 
-The strongest next step is not another broad AI-writing demo. It is a bounded 30-day design-partner pilot for opportunity operations: permitted-source monitoring, evidence-linked eligibility review, reviewer-ready draft structure, attachment/blocker preflight, and a replayable receipt for every material decision. Final certifications and submissions remain with your authorized team.
+I propose a paid proof sprint lasting 10 business days on one MindWise opportunity workflow. The deliverables would be: source and eligibility register for one buyer-selected workflow, pursue/no-pursue decision brief with unresolved facts named, reviewer-ready package outline, attachment and blocker ledger, replayable receipt for each material decision.
 
-In week one, we would freeze your baseline, denominators, thresholds, and cutoff. The default minimum sample is 30 reviewed opportunities and 5 pursued packages. The pilot excludes PHI, credentials, legal advice, and autonomous submission.
+The candidate fixed fee is $3,500, split into a $1,750 kickoff deposit and $1,750 on delivery. The price is not committed until we both approve the written scope.
 
-If the prospectively approved metrics do not justify continuing, we stop or document why the sample was insufficient. If they do, we can discuss a separately approved subscription under terms agreed after measurement.
+Before work starts, we would agree the permitted sources, current baseline, acceptance criteria, deliverables, and fixed price. This first sprint would use no PHI or credentials, provide no legal advice, and make no autonomous certifications or submissions.
 
-Would you be open to a 20-minute scoping call next week to choose one workflow and one baseline?
+If the sprint produces enough evidence to justify a larger test, the next step would be the buyer-approved 30-day pilot with prospectively frozen metrics. If it does not, we stop with the completed proof packet.
+
+Would you be open to a 20-minute call to choose one workflow and scope the proof sprint?
 
 Respectfully,
 Robert Ashworth

@@ -6,30 +6,103 @@
       "five historical benchmark runs and raw source directories exist",
       "the 673-dataset run is a bounded exploratory single-holdout reference",
       "a paid design-partner pilot can measure workflow improvement",
-      "the healthcare candidate feed was refreshed within its 24-hour SLA; freshness does not establish eligibility"
+      "WhiteHole provides historical custody context and WhiteHoleLab provides descriptive diagnostic lineage only"
     ],
     "blocked_now": [
+      "current-feed language until the candidate feed is refreshed within the freshness SLA",
       "organizational eligibility from relevance scores alone",
       "urgent or priority labels as authorization to apply or submit",
       "prospective router superiority until train-only features pass",
       "field validation or realized savings",
       "guaranteed awards or autonomous final submission",
-      "patentability"
+      "patentability",
+      "the historical 362/400 harmonic-versus-backprop result as current, prospective, independently validated, or general superiority evidence",
+      "WhiteHoleLab coherence scores or watchlist ranks as alpha, expected return, forecasting skill, or buyer outcome evidence",
+      "deployment of the historical WhiteHoleLab website or mutation of the frozen WhiteHole archive"
     ]
   },
   "evidence_audit": {
     "best_bounded_exploratory_dataset_count": 673,
     "best_bounded_exploratory_run": "20260505T121657Z",
+    "harmonic_backprop_legacy_claim": {
+      "allowed_description": "A historical internal exploratory artifact records 362 harmonic wins in 400 comparisons; a source audit found protocol defects that block external performance use.",
+      "blocked_description": "Do not present 362/400 as current, prospective, independently validated, or general harmonic superiority over backpropagation.",
+      "bounded_corrective_runs": {
+        "boundary": "The corrective summaries are self-authored bounded diagnostics over four synthetic datasets and four EIA series. They do not establish general superiority or independent validation.",
+        "real_eia_series_count": 4,
+        "synthetic_dataset_count": 4
+      },
+      "comparison": "harmonic_vs_backprop",
+      "external_claim_allowed": false,
+      "historical_result": {
+        "benchmark_rows": 400,
+        "harmonic_beats_backprop_rows": 362,
+        "harmonic_beats_baseline_rows": 383,
+        "harmonic_beats_both_rows": 354,
+        "historical_result_consistent": true,
+        "negative_backprop_r2_rows": 318,
+        "period_est_equals_series_length_rows": 186,
+        "wins_file_rows": 362
+      },
+      "protocol_findings": {
+        "capacity_matched_comparator_documented": false,
+        "chronology_safe_out_of_sample_evaluation": false,
+        "full_series_refit_before_holdout_scoring_detected": true,
+        "independent_reproduction": false,
+        "issues": [
+          "Models are refit on the full series before the final segment is scored, so the labeled holdout is not chronology-safe out-of-sample evidence.",
+          "The backprop MLP normalizes time inputs but does not scale the target, and comparator capacity parity is not documented.",
+          "Negative backprop R-squared values and period estimates equal to full series length require comparator and feature audits."
+        ],
+        "target_scaling_detected_for_mlp": false,
+        "train_only_predictions_unused_for_test_scoring_detected": true
+      },
+      "required_next_gate": "Preregister and run a chronology-safe, capacity-matched, target-scaled prospective comparison against frozen naive, statistical, and neural baselines, then obtain independent reproduction.",
+      "schema": "harmonic_backprop_legacy_claim_audit_v1",
+      "source_receipts": [
+        {
+          "bytes": 93512,
+          "exists": true,
+          "path": "clean_data/LumenLab__reports_benchmark_scores_v6.csv__14afe85295.csv",
+          "sha256": "7a3bccac8b2c2681baa9a715931052794bdcb2f07785f0a8be286f4edd8fd9c3"
+        },
+        {
+          "bytes": 84678,
+          "exists": true,
+          "path": "clean_data/LumenLab__reports_harmonic_wins_v6.csv__eef2674289.csv",
+          "sha256": "90ecf78ba30235c7181fab03d39f3f2a86d15086a200be2348f47008aadea2b9"
+        },
+        {
+          "bytes": 23151,
+          "exists": true,
+          "path": "data/World model lab script/Harmonic vs backprop script.txt",
+          "sha256": "99f73217c1feb71a9179b819c262460030702f5f5c67014365affc0a6a353e64"
+        },
+        {
+          "bytes": 2116,
+          "exists": true,
+          "path": "out/fair_benchmark/summary.json",
+          "sha256": "b12686dc61c67389842738c217dd21c92fc606f4f7c3506952007e546d073754"
+        },
+        {
+          "bytes": 2923,
+          "exists": true,
+          "path": "out/real_data_fair_benchmark/20260505T072405Z/summary.json",
+          "sha256": "cdd4a76e7abdfd4838e26dcebea576bbeebaed1985956265f09173c6009296c7"
+        }
+      ],
+      "status": "HISTORICAL_EXPLORATORY_ONLY_NOT_CLAIM_READY"
+    },
     "healthcare_feed": {
-      "age_hours": 0.11,
+      "age_hours": 48.13,
       "boundary": "Freshness applies only to the candidate source feed. Relevance scores do not establish applicant eligibility, current requirements, submission readiness, or award probability.",
       "eligibility_label_allowed": false,
-      "freshness_label_allowed": true,
+      "freshness_label_allowed": false,
       "freshness_sla_hours": 24,
-      "generated_utc": "2026-07-29T08:51:44.481162+00:00",
+      "generated_utc": "2026-08-02T11:34:40.762536+00:00",
       "path": "out/ops/healthcare_grants_engine/healthcare_website_feed_latest.json",
-      "record_count": 23,
-      "status": "fresh",
+      "record_count": 38,
+      "status": "stale_or_unverifiable",
       "submission_ready_label_allowed": false
     },
     "latest_run_blocker": "Run 20260526T050639Z is blocked from comparative headline use because i_sarima has no valid RMSE on all 1,118 datasets while the scorecard still describes a classical comparison.",
@@ -171,10 +244,73 @@
         "run_id": "20260526T050639Z",
         "scorecard_calls_method_walk_forward": true
       }
-    ]
+    ],
+    "whiteholelab_remediation": {
+      "alpha_claim_allowed": false,
+      "archive_mutation_allowed": false,
+      "audit_current": true,
+      "audit_marker_checks": {
+        "Keep WhiteHole frozen as an archive.": true,
+        "Neither currently establishes forecasting": true,
+        "WhiteHole is useful as historical custody": true,
+        "ignores the emitted fracture state": true,
+        "manifest.json": true,
+        "ticker-key fallback": true
+      },
+      "audit_receipt": {
+        "bytes": 6519,
+        "exists": true,
+        "path": "docs/WHITEHOLE_WHITEHOLELAB_AUDIT_2026-08-02.md",
+        "sha256": "7085a309d574d6cadfa8fcffb192e08cf607a15a0d341fd8572b5b10e0df954e"
+      },
+      "current_product_lane": "guarded_market_research",
+      "current_use": "Historical custody, reproducibility context, and descriptive diagnostic lineage only.",
+      "defect_count": 3,
+      "defects": [
+        {
+          "historical_source": "C:/WhiteHoleLab/engine/whitehole_universe.py:185",
+          "id": "ticker_alias_fallback_noop",
+          "observed_behavior": "A missing exact Kraken ticker key enters a no-op loop and the instrument is silently skipped.",
+          "required_fix": "Resolve aliases from the AssetPairs metadata and emit an explicit unmapped-pair receipt instead of silently continuing.",
+          "required_test": "Fixture exact, aliased, and unmapped ticker keys and assert deterministic coverage accounting.",
+          "severity": "high"
+        },
+        {
+          "historical_source": "C:/WhiteHoleLab/engine/whitehole_universe.py:285",
+          "id": "universe_manifest_omits_report",
+          "observed_behavior": "The saved manifest is written before report.pdf and therefore omits the report receipt.",
+          "required_fix": "Generate every output before sealing the manifest, then verify every packaged file against the saved manifest.",
+          "required_test": "Build a temporary proof pack and assert exact manifest-to-archive file and SHA-256 parity.",
+          "severity": "high"
+        },
+        {
+          "historical_source": "C:/WhiteHoleLab/engine/whitehole_universe.py:213",
+          "id": "current_state_ignores_fracture_flag",
+          "observed_behavior": "The current state is recomputed from coherence alone even when the metric function marks the observation FRACTURE.",
+          "required_fix": "Use the emitted regime state as the single classification source and fail closed on contradictory labels.",
+          "required_test": "Fixture a high-coherence fractured observation and require FRACTURE rather than FLOW.",
+          "severity": "high"
+        }
+      ],
+      "external_send_allowed": false,
+      "historical_archive_root": "C:/WhiteHoleLab/WhiteHole",
+      "historical_engine_root": "C:/WhiteHoleLab/engine",
+      "implementation_target": "A governed working copy with source/hash lineage; never the frozen archive.",
+      "legacy_site_deploy_allowed": false,
+      "performance_claim_allowed": false,
+      "promotion_gate_passed": false,
+      "required_validation": [
+        "freeze metric definitions and calibration data before examining holdout outcomes",
+        "compare next-window realized volatility or drawdown against named naive and EWMA baselines",
+        "settle a preregistered prospective sample with multiple-testing control and after-cost reporting",
+        "obtain independent protocol-matched reproduction before external performance language"
+      ],
+      "schema": "whiteholelab_remediation_gate_v1",
+      "status": "REMEDIATION_SPEC_READY_ARCHIVE_FROZEN"
+    }
   },
   "evidence_contract_version": "typed_evidence_contract_v1",
-  "generated_utc": "2026-07-29T08:58:11.424285+00:00",
+  "generated_utc": "2026-08-04T11:42:32.870060+00:00",
   "market_boundary": {
     "crowded_features": [
       "grant matching and tracking",
@@ -230,6 +366,28 @@
     },
     "buyer": null,
     "buyer_selected": false,
+    "commercial_entry_offer": {
+      "boundary": "The sprint is a bounded paid service offer, not evidence of buyer acceptance, customer outcomes, award probability, savings, or production readiness.",
+      "buyer_price_acceptance_proven": false,
+      "buyer_state": "historical_warm_reactivation_candidate_recent_interest_unconfirmed",
+      "candidate_delivery_balance_usd": 1750,
+      "candidate_fixed_fee_usd": 3500,
+      "candidate_kickoff_deposit_usd": 1750,
+      "commercial_gate": "Scope, source permissions, baseline, acceptance criteria, candidate fixed price, payment terms, recipient, and exact outbound message require written approval before kickoff or send.",
+      "deliverables": [
+        "source and eligibility register for one buyer-selected workflow",
+        "pursue/no-pursue decision brief with unresolved facts named",
+        "reviewer-ready package outline",
+        "attachment and blocker ledger",
+        "replayable receipt for each material decision"
+      ],
+      "duration": "10 business days",
+      "duration_business_days": 10,
+      "external_send_allowed": false,
+      "name": "Opportunity-operations proof sprint",
+      "price_status": "candidate_not_committed",
+      "source_protocol": "config/hypercore_v8_validation_protocol_v1.json"
+    },
     "commercial_posture": "Paid pilot after exact buyer scope, baseline, acceptance thresholds, data terms, price, and recipient are approved.",
     "deliverables": [
       "signed-off baseline and acceptance memo",
@@ -357,7 +515,156 @@
     "golden_replay_sha256": "2664168a3468bbd59f4e24f8ee787c5b6d686ee2ab89af2067a83ba4079630ff",
     "golden_replay_verified": true
   },
-  "product_lane_priority_sha256": "c1b498c742ee03f7fd6ad15767f5459978a4825e58757dd4a0d731b7042019df",
+  "product_lane_priority_sha256": "aab40ec152e6dc9ec7f6063132e3595db9b0c70f96062f5b380d00466d20279e",
+  "productization_matrix": [
+    {
+      "blocked_claims": [
+        "guaranteed awards",
+        "automatic eligibility without source review",
+        "autonomous final certification or submission",
+        "realized savings before a buyer baseline is measured"
+      ],
+      "buyer_acceptance_proven": false,
+      "current_stage": "PAID_PROOF_SPRINT_SCOPE_READY_HUMAN_APPROVAL_REQUIRED",
+      "external_send_allowed": false,
+      "internal_evidence_gate_passed": true,
+      "lane_id": "prooflock_opportunity_ops",
+      "lane_name": "ProofLock Opportunity Operations",
+      "minimum_honest_sale": "A fixed-scope proof sprint measuring one buyer-selected opportunity workflow; no eligibility guarantee, legal advice, certification, send, or final submission.",
+      "next_gate": "Buyer approves the workflow, permitted sources, baseline, sample rule, acceptance criteria, price, recipient, and exact outbound message.",
+      "next_owner_action": "Select one truthful buyer workflow and approve or reject the bounded proof-sprint scope.",
+      "product_ready": false,
+      "rank": 1,
+      "strategy_score": 89.6,
+      "validated_evidence_coverage": 1.0
+    },
+    {
+      "blocked_claims": [
+        "patentability",
+        "leakage-free performance until the train-only rerun passes",
+        "universal model superiority",
+        "oracle-equivalent prospective performance"
+      ],
+      "buyer_acceptance_proven": false,
+      "current_stage": "TECHNICAL_CO_DESIGN_ONLY",
+      "external_send_allowed": false,
+      "internal_evidence_gate_passed": true,
+      "lane_id": "prooflock_evidence_router_api",
+      "lane_name": "ProofLock Evidence Router API",
+      "minimum_honest_sale": "A paid receipt-schema, abstention-contract, and train-only feature design sprint; no routing-superiority or award-probability promise.",
+      "next_gate": "Rebuild every feature from information available at decision time, preregister the comparison, and pass prospective abstention and receipt tests.",
+      "next_owner_action": "Choose a buyer-authorized decision workflow and freeze its source and abstention contract.",
+      "product_ready": false,
+      "rank": 2,
+      "strategy_score": 83.25,
+      "validated_evidence_coverage": 1.0
+    },
+    {
+      "blocked_claims": [
+        "field validation without an operator receipt",
+        "realized outage savings",
+        "universal harmonic superiority"
+      ],
+      "buyer_acceptance_proven": false,
+      "current_stage": "VALIDATION_SETUP_ONLY",
+      "external_send_allowed": false,
+      "internal_evidence_gate_passed": true,
+      "lane_id": "energy_forecast_validation",
+      "lane_name": "Energy Forecast Validation Service",
+      "minimum_honest_sale": "A paid protocol-freeze and independent-reproduction setup for a buyer-selected energy forecasting question; no superiority, savings, or deployment claim.",
+      "next_gate": "Complete the preregistered prospective sample, settle actuals, compare frozen baselines, and obtain independent protocol-matched reproduction.",
+      "next_owner_action": "Keep collecting sealed predictions and actuals without tuning on prospective outcomes.",
+      "product_ready": false,
+      "rank": 3,
+      "strategy_score": 75.6,
+      "validated_evidence_coverage": 1.0
+    },
+    {
+      "blocked_claims": [
+        "measured efficiency improvement from the historical coherence proxy",
+        "realized energy, outage, or operating savings",
+        "field-validated early warning",
+        "production readiness or autonomous control",
+        "cross-layer causal attribution",
+        "universal phase-lock or coherence superiority"
+      ],
+      "buyer_acceptance_proven": false,
+      "current_stage": "OFFLINE_EVALUATION_SETUP_ONLY",
+      "external_send_allowed": false,
+      "internal_evidence_gate_passed": true,
+      "lane_id": "hypercore_readonly_resilience_evaluation",
+      "lane_name": "HyperCore Read-Only Resilience Evaluation",
+      "minimum_honest_sale": "A buyer-authorized offline resilience-evaluation design using approved historical data; no production actuation, outage reduction, or realized-savings claim.",
+      "next_gate": "Run the frozen chronology-safe protocol on buyer-authorized data, pass falsification and power gates, and obtain independent reproduction before external validation language.",
+      "next_owner_action": "Identify a lawful read-only dataset owner and approve only the offline evaluation scope.",
+      "product_ready": false,
+      "rank": 4,
+      "strategy_score": 69.7,
+      "validated_evidence_coverage": 1.0
+    },
+    {
+      "blocked_claims": [
+        "hit prediction",
+        "label adoption",
+        "cross-platform data rights not documented in source terms"
+      ],
+      "buyer_acceptance_proven": false,
+      "current_stage": "INTERNAL_EVIDENCE_REPAIR_REQUIRED",
+      "external_send_allowed": false,
+      "internal_evidence_gate_passed": false,
+      "lane_id": "lumascout_ar_intelligence",
+      "lane_name": "LumaScout A&R Intelligence",
+      "minimum_honest_sale": "No external offer until all required typed-evidence contracts pass.",
+      "next_gate": "Repair internal evidence coverage, then complete a prospectively frozen forward outcome study.",
+      "next_owner_action": "Repair the failing typed-evidence contracts before buyer outreach.",
+      "product_ready": false,
+      "rank": 5,
+      "strategy_score": 67.0,
+      "validated_evidence_coverage": 0.6667
+    },
+    {
+      "blocked_claims": [
+        "alpha",
+        "profitability",
+        "institutional readiness",
+        "live trading authorization"
+      ],
+      "buyer_acceptance_proven": false,
+      "current_stage": "PAPER_RESEARCH_PROTOCOL_ONLY",
+      "external_send_allowed": false,
+      "internal_evidence_gate_passed": true,
+      "lane_id": "guarded_market_research",
+      "lane_name": "Guarded Market Research",
+      "minimum_honest_sale": "A paper-only regime-diagnostics protocol and replay report using permitted buyer data; historical WhiteHoleLab ranks are excluded from alpha, profitability, live-capital, or investment-advice claims.",
+      "next_gate": "Repair the WhiteHoleLab ticker-alias, manifest-completeness, and state-consistency defects in a governed working copy, then pass a prospectively frozen, leakage-controlled, cost-aware comparison against named baselines and independent review.",
+      "next_owner_action": "Keep capital disconnected, preserve the historical archive, and freeze one buyer-authorized paper-regime research question before any rerun.",
+      "product_ready": false,
+      "rank": 6,
+      "strategy_score": 63.5,
+      "validated_evidence_coverage": 1.0
+    },
+    {
+      "blocked_claims": [
+        "prevention of motion sickness",
+        "medical efficacy",
+        "safety certification",
+        "patentability"
+      ],
+      "buyer_acceptance_proven": false,
+      "current_stage": "RESEARCH_PROTOCOL_ONLY",
+      "external_send_allowed": false,
+      "internal_evidence_gate_passed": true,
+      "lane_id": "xr_comfort_governor",
+      "lane_name": "XR Comfort and Cue-Integrity Governor",
+      "minimum_honest_sale": "A non-medical research protocol or usability-study design; no clinical, safety, or comfort-improvement claim.",
+      "next_gate": "Complete ethics-appropriate prospective usability testing with predefined outcomes and exclusions.",
+      "next_owner_action": "Define the non-medical study population, outcomes, and stop conditions.",
+      "product_ready": false,
+      "rank": 7,
+      "strategy_score": 54.0,
+      "validated_evidence_coverage": 1.0
+    }
+  ],
   "prooflock_opportunity_ops_pilot": {
     "acceptance_metrics": [
       {
@@ -398,6 +705,28 @@
     },
     "buyer": null,
     "buyer_selected": false,
+    "commercial_entry_offer": {
+      "boundary": "The sprint is a bounded paid service offer, not evidence of buyer acceptance, customer outcomes, award probability, savings, or production readiness.",
+      "buyer_price_acceptance_proven": false,
+      "buyer_state": "historical_warm_reactivation_candidate_recent_interest_unconfirmed",
+      "candidate_delivery_balance_usd": 1750,
+      "candidate_fixed_fee_usd": 3500,
+      "candidate_kickoff_deposit_usd": 1750,
+      "commercial_gate": "Scope, source permissions, baseline, acceptance criteria, candidate fixed price, payment terms, recipient, and exact outbound message require written approval before kickoff or send.",
+      "deliverables": [
+        "source and eligibility register for one buyer-selected workflow",
+        "pursue/no-pursue decision brief with unresolved facts named",
+        "reviewer-ready package outline",
+        "attachment and blocker ledger",
+        "replayable receipt for each material decision"
+      ],
+      "duration": "10 business days",
+      "duration_business_days": 10,
+      "external_send_allowed": false,
+      "name": "Opportunity-operations proof sprint",
+      "price_status": "candidate_not_committed",
+      "source_protocol": "config/hypercore_v8_validation_protocol_v1.json"
+    },
     "commercial_posture": "Paid pilot after exact buyer scope, baseline, acceptance thresholds, data terms, price, and recipient are approved.",
     "deliverables": [
       "signed-off baseline and acceptance memo",
@@ -579,7 +908,7 @@
         {
           "age_hours": null,
           "age_source": "file_modified_utc",
-          "bytes": 34190,
+          "bytes": 35684,
           "claim_scope": "A local fail-closed readiness audit implementation exists; only its current outputs can describe a package state.",
           "contract_complete": true,
           "exists": true,
@@ -589,21 +918,21 @@
           "max_age_hours": null,
           "min_bytes": 1024,
           "missing_required_keys": [],
-          "modified_utc": "2026-07-17T09:39:04.868695+00:00",
+          "modified_utc": "2026-07-29T11:10:14.910081+00:00",
           "observed_keys": [],
           "observed_schema": null,
           "path": "code/ops/BUILD_GRANT_SUBMISSION_READINESS_AUDIT.py",
           "reasons": [],
           "required": true,
           "required_keys": [],
-          "sha256": "02442394ea95e48c48a4ac9ea852cbf9c55ec6c6fdaee407c4e2c0c75d9471a6",
+          "sha256": "178b0082aff4ef78b9c1b88e7b676d0f2aa0ab9499a9dc96b9f2736775e7bf88",
           "status": "valid",
           "valid": true
         },
         {
           "age_hours": null,
           "age_source": "file_modified_utc",
-          "bytes": 167467,
+          "bytes": 337636,
           "claim_scope": "A local deadline-control implementation exists; code presence is not a current deadline receipt.",
           "contract_complete": true,
           "exists": true,
@@ -613,21 +942,21 @@
           "max_age_hours": null,
           "min_bytes": 1024,
           "missing_required_keys": [],
-          "modified_utc": "2026-07-29T08:45:18.249953+00:00",
+          "modified_utc": "2026-08-04T09:45:34.671112+00:00",
           "observed_keys": [],
           "observed_schema": null,
           "path": "code/ops/BUILD_NEAR_DEADLINE_SUBMISSION_COMMAND_BOARD.py",
           "reasons": [],
           "required": true,
           "required_keys": [],
-          "sha256": "83969cdd1d8481ed7391b1915047a9659c0a791688541852029d2240d581d0a7",
+          "sha256": "2eefa84086c848660e5feac276164d9fb1cca84beb3bd31672bba6c3e7ec6ba4",
           "status": "valid",
           "valid": true
         },
         {
-          "age_hours": 0.2061,
+          "age_hours": 0.3189,
           "age_source": "json_generated_utc",
-          "bytes": 126668,
+          "bytes": 225107,
           "claim_scope": "The deadline command board was rebuilt recently enough for internal triage; every official source and portal gate still requires action-time verification.",
           "contract_complete": true,
           "exists": true,
@@ -637,7 +966,7 @@
           "max_age_hours": 24.0,
           "min_bytes": 1024,
           "missing_required_keys": [],
-          "modified_utc": "2026-07-29T08:45:49.498420+00:00",
+          "modified_utc": "2026-08-04T11:23:26.498058+00:00",
           "observed_keys": [
             "as_of_utc",
             "command_board_sha256",
@@ -645,6 +974,7 @@
             "expired_without_verified_send",
             "freshness_blocked",
             "generated_utc",
+            "human_action_due",
             "lane_status_groups",
             "lanes",
             "no_bid_or_partner_only",
@@ -673,7 +1003,7 @@
             "summary",
             "command_board_sha256"
           ],
-          "sha256": "008ed116ed80420c2337ab2640f97c278dc139681b293d8521c6c74f9a45b3e8",
+          "sha256": "f3ad031c5949c006d1e18fae8b1f4ca2ffd8ae4e3877acf33a17d784e123809c",
           "status": "valid",
           "valid": true
         },
@@ -820,7 +1150,7 @@
         {
           "age_hours": null,
           "age_source": "file_modified_utc",
-          "bytes": 23784,
+          "bytes": 26346,
           "claim_scope": "A claim-bounded commercial packaging implementation exists; it does not establish demand, pricing acceptance, or revenue.",
           "contract_complete": true,
           "exists": true,
@@ -830,14 +1160,14 @@
           "max_age_hours": null,
           "min_bytes": 1024,
           "missing_required_keys": [],
-          "modified_utc": "2026-07-29T08:35:34.455454+00:00",
+          "modified_utc": "2026-08-02T20:54:18.959272+00:00",
           "observed_keys": [],
           "observed_schema": null,
           "path": "code/ops/BUILD_PROOF_TO_REVENUE_ENGINE.py",
           "reasons": [],
           "required": true,
           "required_keys": [],
-          "sha256": "14e300f219f8c553290b069605bbfbfcc9efc1e7a98c977fd5b5de0ff672285d",
+          "sha256": "1d82c682bf460ed73b36fe1b1952e987d666748e5e0be6b7cb3456773613b3e0",
           "status": "valid",
           "valid": true
         },
@@ -1042,9 +1372,9 @@
           "valid": true
         },
         {
-          "age_hours": 0.2833,
+          "age_hours": 0.0165,
           "age_source": "json_generated_utc",
-          "bytes": 1709,
+          "bytes": 1710,
           "claim_scope": "The prospective EIA status was refreshed recently; its own settlement and promotion gates control any performance language.",
           "contract_complete": true,
           "exists": true,
@@ -1054,7 +1384,7 @@
           "max_age_hours": 24.0,
           "min_bytes": 512,
           "missing_required_keys": [],
-          "modified_utc": "2026-07-29T08:41:11.976790+00:00",
+          "modified_utc": "2026-08-04T11:41:33.682123+00:00",
           "observed_keys": [
             "claim_boundary",
             "common_settled_hour_count",
@@ -1086,7 +1416,7 @@
             "promotion_evaluation_complete",
             "protocol_sha256"
           ],
-          "sha256": "85d98d0182f3ca236c70ce4c720805ae46662a1859ee5fcb4ba8abf612e56546",
+          "sha256": "edb82deb20bf051bf472ab33ac711e187022de9e673de3795c2a3590c6075ed1",
           "status": "valid",
           "valid": true
         },
@@ -1237,6 +1567,325 @@
     },
     {
       "blocked_claims": [
+        "measured efficiency improvement from the historical coherence proxy",
+        "realized energy, outage, or operating savings",
+        "field-validated early warning",
+        "production readiness or autonomous control",
+        "cross-layer causal attribution",
+        "universal phase-lock or coherence superiority"
+      ],
+      "buyer_readiness_gate": {
+        "boundary": "Internal artifact validation cannot establish buyer acceptance, organizational eligibility, external validation, or commercial readiness.",
+        "evidence_blockers": [],
+        "internal_evidence_gate_passed": true,
+        "next_required_validation": "Freeze one buyer-authorized telemetry source, accepted baselines, buyer-owned incident labels, chronology, calibration metrics, and holdout thresholds before observing outcomes; then require independent reproduction before any external performance claim.",
+        "passed": false,
+        "status": "requires_external_buyer_validation"
+      },
+      "evidence_checks": [
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 11281,
+          "claim_scope": "A claim-bounded V8 offline validation protocol exists; the protocol is not an executed benchmark or buyer acceptance receipt.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": "hypercore_v8_validation_protocol_v1",
+          "is_file": true,
+          "kind": "validation_protocol",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-08-02T10:34:44.992397+00:00",
+          "observed_keys": [
+            "chronology",
+            "claim_boundary",
+            "commercial_boundary",
+            "current_evidence_limits",
+            "deliverables",
+            "frozen_metric_formulas",
+            "human_gates",
+            "lineage",
+            "next_required_artifact",
+            "product_name",
+            "promotion_gates",
+            "protocol_id",
+            "registered_baselines",
+            "required_falsification",
+            "required_metrics",
+            "required_source_contract",
+            "runner_test_contract",
+            "schema",
+            "scope",
+            "status"
+          ],
+          "observed_schema": "hypercore_v8_validation_protocol_v1",
+          "path": "config/hypercore_v8_validation_protocol_v1.json",
+          "reasons": [],
+          "required": true,
+          "required_keys": [
+            "claim_boundary",
+            "current_evidence_limits",
+            "registered_baselines",
+            "required_metrics",
+            "required_falsification",
+            "promotion_gates",
+            "commercial_boundary"
+          ],
+          "sha256": "a70608007ea8ef579fc69c1aab5d218efd4a3570eede64688d671a020df9f2c8",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": 49.1086,
+          "age_source": "json_generated_utc",
+          "bytes": 31267,
+          "claim_scope": "The current reviewer gate classifies EchoLock material as concept positioning only; it does not support numeric or operational claims.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": "reviewer_evidence_gate_v1",
+          "is_file": true,
+          "kind": "reviewer_claim_gate",
+          "max_age_hours": 168.0,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-08-02T10:36:01.930895+00:00",
+          "observed_keys": [
+            "claim_boundary",
+            "generated_utc",
+            "geometry",
+            "outputs",
+            "promote",
+            "quarantine",
+            "ready_for_reviewer_packet",
+            "schema",
+            "summary"
+          ],
+          "observed_schema": "reviewer_evidence_gate_v1",
+          "path": "dashboard/data/reviewer_evidence_gate.json",
+          "reasons": [],
+          "required": true,
+          "required_keys": [
+            "claim_boundary",
+            "promote",
+            "quarantine"
+          ],
+          "sha256": "47b2ee70f6bc2267b462316bc590b2401de52b59e9c7d9e8eeaa6bcf7aa758e2",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 24853,
+          "claim_scope": "A historical evidence bridge identifies the read-only pilot scaffold; it does not prove current runtime health, field validity, or economic value.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "evidence_bridge",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-08-02T16:40:21.896759+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "docs/ROOT_EVIDENCE_VALUATION_BRIDGE_2026-06-22.md",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "690f778c99380235a69bed88ce536ad31b0d2ab132be1321a4a38949653a175e",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 27396,
+          "claim_scope": "A local intake implementation can locate EchoLock and HyperCore artifacts; intake and hashing do not establish model performance.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "custody_intake_source",
+          "max_age_hours": null,
+          "min_bytes": 1024,
+          "missing_required_keys": [],
+          "modified_utc": "2026-08-02T16:39:08.738236+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/ops/BUILD_LOCAL_ICLOUD_EVIDENCE_INTAKE.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "3c79c269205c271832fb1943c5dd0a9f937993ad018818788e16aed520420396",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 46882,
+          "claim_scope": "A deterministic offline runner with chronology, baseline, null, ablation, and receipt controls is required before HyperCore is internally product-ready.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "offline_replay_runner",
+          "max_age_hours": null,
+          "min_bytes": 4096,
+          "missing_required_keys": [],
+          "modified_utc": "2026-08-02T10:31:21.152498+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "code/ops/run_hypercore_v8_offline_replay.py",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "b168177a724b7b3137eaf5ec41a30bef77fa578f5b3733aaeb593b91746b0015",
+          "status": "valid",
+          "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "json_generated_utc",
+          "bytes": 23952,
+          "claim_scope": "The synthetic receipt validates bounded offline runner mechanics and fail-closed controls only; it is not buyer, field, economic, or independent validation.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": "hypercore_v8_offline_replay_receipt_v1",
+          "is_file": true,
+          "kind": "synthetic_preflight_receipt",
+          "max_age_hours": null,
+          "min_bytes": 4096,
+          "missing_required_keys": [],
+          "modified_utc": "2026-08-04T11:38:04.870291+00:00",
+          "observed_keys": [
+            "claim_boundary",
+            "deterministic_result",
+            "deterministic_result_sha256",
+            "execution_controls",
+            "generated_utc",
+            "mode",
+            "protocol_id",
+            "receipt_sha256",
+            "resource_measurements",
+            "result_classification",
+            "runtime",
+            "safest_next_action",
+            "schema",
+            "status"
+          ],
+          "observed_schema": "hypercore_v8_offline_replay_receipt_v1",
+          "path": "dashboard/evidence/hypercore/HYPERCORE_V8_SYNTHETIC_PREFLIGHT_2026-08-02.json",
+          "reasons": [],
+          "required": true,
+          "required_keys": [
+            "status",
+            "result_classification",
+            "deterministic_result_sha256",
+            "execution_controls",
+            "claim_boundary"
+          ],
+          "sha256": "90a92b9e81cd0808aa449dc8c8fd94d7fbd06978c09d89f5e9e7a9a428f53063",
+          "status": "valid",
+          "valid": true
+        }
+      ],
+      "evidence_coverage": 1.0,
+      "evidence_paths": [
+        {
+          "claim_scope": "A claim-bounded V8 offline validation protocol exists; the protocol is not an executed benchmark or buyer acceptance receipt.",
+          "expected_schema": "hypercore_v8_validation_protocol_v1",
+          "kind": "validation_protocol",
+          "min_bytes": 1024,
+          "path": "config/hypercore_v8_validation_protocol_v1.json",
+          "required": true,
+          "required_keys": [
+            "claim_boundary",
+            "current_evidence_limits",
+            "registered_baselines",
+            "required_metrics",
+            "required_falsification",
+            "promotion_gates",
+            "commercial_boundary"
+          ]
+        },
+        {
+          "claim_scope": "The current reviewer gate classifies EchoLock material as concept positioning only; it does not support numeric or operational claims.",
+          "expected_schema": "reviewer_evidence_gate_v1",
+          "kind": "reviewer_claim_gate",
+          "max_age_hours": 168,
+          "min_bytes": 1024,
+          "path": "dashboard/data/reviewer_evidence_gate.json",
+          "required": true,
+          "required_keys": [
+            "claim_boundary",
+            "promote",
+            "quarantine"
+          ]
+        },
+        {
+          "claim_scope": "A historical evidence bridge identifies the read-only pilot scaffold; it does not prove current runtime health, field validity, or economic value.",
+          "kind": "evidence_bridge",
+          "min_bytes": 1024,
+          "path": "docs/ROOT_EVIDENCE_VALUATION_BRIDGE_2026-06-22.md",
+          "required": true
+        },
+        {
+          "claim_scope": "A local intake implementation can locate EchoLock and HyperCore artifacts; intake and hashing do not establish model performance.",
+          "kind": "custody_intake_source",
+          "min_bytes": 1024,
+          "path": "code/ops/BUILD_LOCAL_ICLOUD_EVIDENCE_INTAKE.py",
+          "required": true
+        },
+        {
+          "claim_scope": "A deterministic offline runner with chronology, baseline, null, ablation, and receipt controls is required before HyperCore is internally product-ready.",
+          "kind": "offline_replay_runner",
+          "min_bytes": 4096,
+          "path": "code/ops/run_hypercore_v8_offline_replay.py",
+          "required": true
+        },
+        {
+          "claim_scope": "The synthetic receipt validates bounded offline runner mechanics and fail-closed controls only; it is not buyer, field, economic, or independent validation.",
+          "expected_schema": "hypercore_v8_offline_replay_receipt_v1",
+          "kind": "synthetic_preflight_receipt",
+          "min_bytes": 4096,
+          "path": "dashboard/evidence/hypercore/HYPERCORE_V8_SYNTHETIC_PREFLIGHT_2026-08-02.json",
+          "required": true,
+          "required_keys": [
+            "status",
+            "result_classification",
+            "deterministic_result_sha256",
+            "execution_controls",
+            "claim_boundary"
+          ]
+        }
+      ],
+      "first_validation": "Freeze one buyer-authorized telemetry source, accepted baselines, buyer-owned incident labels, chronology, calibration metrics, and holdout thresholds before observing outcomes; then require independent reproduction before any external performance claim.",
+      "id": "hypercore_readonly_resilience_evaluation",
+      "internal_evidence_gate_passed": true,
+      "name": "HyperCore Read-Only Resilience Evaluation",
+      "offer": "Freeze and replay one buyer-authorized power, cooling, and compute telemetry workflow against registered operational baselines, with no production actuation or savings claim.",
+      "rank": 4,
+      "recurring_model": "Read-only monitoring and evidence-governance subscription only after a scoped offline evaluation and buyer acceptance.",
+      "required_evidence_count": 6,
+      "scores": {
+        "buyer_pain": 88,
+        "capital_efficiency": 88,
+        "compliance_ease": 80,
+        "data_access": 38,
+        "evidence_on_disk": 50,
+        "recurring_revenue_fit": 82,
+        "technical_defensibility": 74,
+        "time_to_paid_pilot": 60
+      },
+      "strategy_score": 69.7,
+      "validated_evidence_count": 6,
+      "validated_evidence_coverage": 1.0
+    },
+    {
+      "blocked_claims": [
         "hit prediction",
         "label adoption",
         "cross-platform data rights not documented in source terms"
@@ -1270,19 +1919,19 @@
           "max_age_hours": null,
           "min_bytes": 1024,
           "missing_required_keys": [],
-          "modified_utc": "2026-07-29T08:57:23.673579+00:00",
+          "modified_utc": "2026-08-04T11:41:57.725535+00:00",
           "observed_keys": [],
           "observed_schema": null,
           "path": "dashboard/lumascout_dashboard.html",
           "reasons": [],
           "required": true,
           "required_keys": [],
-          "sha256": "5fe42750343cbd47cbe355e458c50a2d90b81b033d1b7984f6b2bf8f8ff132a8",
+          "sha256": "0649b3439380531fd66e455c8f7a6b81c50acebf49d582872893f95de074be41",
           "status": "valid",
           "valid": true
         },
         {
-          "age_hours": 1550.6275,
+          "age_hours": 1697.3667,
           "age_source": "json_generated_utc",
           "bytes": 645,
           "claim_scope": "A recent LumaScout status is required before describing active sources or current prospects.",
@@ -1387,7 +2036,7 @@
       "internal_evidence_gate_passed": false,
       "name": "LumaScout A&R Intelligence",
       "offer": "Cross-platform artist discovery shortlists with source receipts and forward outcome tracking.",
-      "rank": 4,
+      "rank": 5,
       "recurring_model": "A&R team subscription with watchlists, alerts, and portfolio outcome tracking.",
       "required_evidence_count": 3,
       "scores": {
@@ -1415,7 +2064,7 @@
         "boundary": "Internal artifact validation cannot establish buyer acceptance, organizational eligibility, external validation, or commercial readiness.",
         "evidence_blockers": [],
         "internal_evidence_gate_passed": true,
-        "next_required_validation": "Pass a prospective after-fee paper protocol with reconciliation and risk gates before any live-capital discussion.",
+        "next_required_validation": "Repair the documented WhiteHoleLab alias, manifest, and state-consistency defects in a governed working copy, then pass a preregistered prospective after-fee paper protocol against named baselines with reconciliation and risk gates before any live-capital discussion.",
         "passed": false,
         "status": "requires_external_buyer_validation"
       },
@@ -1491,6 +2140,30 @@
           "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957",
           "status": "valid",
           "valid": true
+        },
+        {
+          "age_hours": null,
+          "age_source": "file_modified_utc",
+          "bytes": 6519,
+          "claim_scope": "The WhiteHole audit preserves custody value while classifying WhiteHoleLab ranks as historical descriptive diagnostics; it does not establish alpha, forecasting skill, outage prevention, savings, or field performance.",
+          "contract_complete": true,
+          "exists": true,
+          "expected_schema": null,
+          "is_file": true,
+          "kind": "historical_research_boundary_audit",
+          "max_age_hours": null,
+          "min_bytes": 4096,
+          "missing_required_keys": [],
+          "modified_utc": "2026-08-02T20:51:45.066613+00:00",
+          "observed_keys": [],
+          "observed_schema": null,
+          "path": "docs/WHITEHOLE_WHITEHOLELAB_AUDIT_2026-08-02.md",
+          "reasons": [],
+          "required": true,
+          "required_keys": [],
+          "sha256": "7085a309d574d6cadfa8fcffb192e08cf607a15a0d341fd8572b5b10e0df954e",
+          "status": "valid",
+          "valid": true
         }
       ],
       "evidence_coverage": 1.0,
@@ -1515,16 +2188,23 @@
           "min_bytes": 1024,
           "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
           "required": true
+        },
+        {
+          "claim_scope": "The WhiteHole audit preserves custody value while classifying WhiteHoleLab ranks as historical descriptive diagnostics; it does not establish alpha, forecasting skill, outage prevention, savings, or field performance.",
+          "kind": "historical_research_boundary_audit",
+          "min_bytes": 4096,
+          "path": "docs/WHITEHOLE_WHITEHOLELAB_AUDIT_2026-08-02.md",
+          "required": true
         }
       ],
-      "first_validation": "Pass a prospective after-fee paper protocol with reconciliation and risk gates before any live-capital discussion.",
+      "first_validation": "Repair the documented WhiteHoleLab alias, manifest, and state-consistency defects in a governed working copy, then pass a preregistered prospective after-fee paper protocol against named baselines with reconciliation and risk gates before any live-capital discussion.",
       "id": "guarded_market_research",
       "internal_evidence_gate_passed": true,
       "name": "Guarded Market Research",
       "offer": "Paper-only signal research, model comparison, and evidence receipts for quantitative teams.",
-      "rank": 5,
+      "rank": 6,
       "recurring_model": "Research subscription only after prospective evidence passes.",
-      "required_evidence_count": 3,
+      "required_evidence_count": 4,
       "scores": {
         "buyer_pain": 86,
         "capital_efficiency": 46,
@@ -1536,7 +2216,7 @@
         "time_to_paid_pilot": 28
       },
       "strategy_score": 63.5,
-      "validated_evidence_count": 3,
+      "validated_evidence_count": 4,
       "validated_evidence_coverage": 1.0
     },
     {
@@ -1746,7 +2426,7 @@
       "internal_evidence_gate_passed": true,
       "name": "XR Comfort and Cue-Integrity Governor",
       "offer": "Adapt visual, vestibular, and haptic cue intensity to reduce discomfort while preserving training-task fidelity.",
-      "rank": 6,
+      "rank": 7,
       "recurring_model": "SDK licensing after human-factors validation.",
       "required_evidence_count": 5,
       "scores": {
@@ -1767,7 +2447,9 @@
   "recommendation": {
     "commercial_lane": "prooflock_opportunity_ops",
     "commercial_offer": "Continuously find, qualify, assemble, preflight, and receipt funding opportunities while keeping final certifications and submissions human-controlled.",
+    "commercial_stage": "PAID_PROOF_SPRINT_SCOPE_READY_HUMAN_APPROVAL_REQUIRED",
     "first_design_partner": "unselected_requires_current_validated_target",
+    "minimum_honest_sale": "A fixed-scope proof sprint measuring one buyer-selected opportunity workflow; no eligibility guarantee, legal advice, certification, send, or final submission.",
     "technical_wedge": "prooflock_evidence_router_api",
     "technical_wedge_boundary": "The defensible target is not generic grant search or AI writing. It is a constrained router that uses train-only or source-available features, abstains when eligibility or evidence gates fail, and emits replayable policy/source receipts. Patentability still requires a dedicated search.",
     "why_now": "Typed internal evidence contracts pass for the top lane. Buyer selection, workflow baseline, acceptance thresholds, eligibility review, and measured pilot outcomes remain external gates."

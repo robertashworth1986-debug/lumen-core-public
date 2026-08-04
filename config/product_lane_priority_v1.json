@@ -228,6 +228,100 @@
       ]
     },
     {
+      "id": "hypercore_readonly_resilience_evaluation",
+      "name": "HyperCore Read-Only Resilience Evaluation",
+      "offer": "Freeze and replay one buyer-authorized power, cooling, and compute telemetry workflow against registered operational baselines, with no production actuation or savings claim.",
+      "scores": {
+        "buyer_pain": 88,
+        "time_to_paid_pilot": 60,
+        "evidence_on_disk": 50,
+        "recurring_revenue_fit": 82,
+        "technical_defensibility": 74,
+        "data_access": 38,
+        "compliance_ease": 80,
+        "capital_efficiency": 88
+      },
+      "evidence_paths": [
+        {
+          "path": "config/hypercore_v8_validation_protocol_v1.json",
+          "required": true,
+          "kind": "validation_protocol",
+          "min_bytes": 1024,
+          "expected_schema": "hypercore_v8_validation_protocol_v1",
+          "required_keys": [
+            "claim_boundary",
+            "current_evidence_limits",
+            "registered_baselines",
+            "required_metrics",
+            "required_falsification",
+            "promotion_gates",
+            "commercial_boundary"
+          ],
+          "claim_scope": "A claim-bounded V8 offline validation protocol exists; the protocol is not an executed benchmark or buyer acceptance receipt."
+        },
+        {
+          "path": "dashboard/data/reviewer_evidence_gate.json",
+          "required": true,
+          "kind": "reviewer_claim_gate",
+          "min_bytes": 1024,
+          "max_age_hours": 168,
+          "expected_schema": "reviewer_evidence_gate_v1",
+          "required_keys": [
+            "claim_boundary",
+            "promote",
+            "quarantine"
+          ],
+          "claim_scope": "The current reviewer gate classifies EchoLock material as concept positioning only; it does not support numeric or operational claims."
+        },
+        {
+          "path": "docs/ROOT_EVIDENCE_VALUATION_BRIDGE_2026-06-22.md",
+          "required": true,
+          "kind": "evidence_bridge",
+          "min_bytes": 1024,
+          "claim_scope": "A historical evidence bridge identifies the read-only pilot scaffold; it does not prove current runtime health, field validity, or economic value."
+        },
+        {
+          "path": "code/ops/BUILD_LOCAL_ICLOUD_EVIDENCE_INTAKE.py",
+          "required": true,
+          "kind": "custody_intake_source",
+          "min_bytes": 1024,
+          "claim_scope": "A local intake implementation can locate EchoLock and HyperCore artifacts; intake and hashing do not establish model performance."
+        },
+        {
+          "path": "code/ops/run_hypercore_v8_offline_replay.py",
+          "required": true,
+          "kind": "offline_replay_runner",
+          "min_bytes": 4096,
+          "claim_scope": "A deterministic offline runner with chronology, baseline, null, ablation, and receipt controls is required before HyperCore is internally product-ready."
+        },
+        {
+          "path": "dashboard/evidence/hypercore/HYPERCORE_V8_SYNTHETIC_PREFLIGHT_2026-08-02.json",
+          "required": true,
+          "kind": "synthetic_preflight_receipt",
+          "min_bytes": 4096,
+          "expected_schema": "hypercore_v8_offline_replay_receipt_v1",
+          "required_keys": [
+            "status",
+            "result_classification",
+            "deterministic_result_sha256",
+            "execution_controls",
+            "claim_boundary"
+          ],
+          "claim_scope": "The synthetic receipt validates bounded offline runner mechanics and fail-closed controls only; it is not buyer, field, economic, or independent validation."
+        }
+      ],
+      "first_validation": "Freeze one buyer-authorized telemetry source, accepted baselines, buyer-owned incident labels, chronology, calibration metrics, and holdout thresholds before observing outcomes; then require independent reproduction before any external performance claim.",
+      "recurring_model": "Read-only monitoring and evidence-governance subscription only after a scoped offline evaluation and buyer acceptance.",
+      "blocked_claims": [
+        "measured efficiency improvement from the historical coherence proxy",
+        "realized energy, outage, or operating savings",
+        "field-validated early warning",
+        "production readiness or autonomous control",
+        "cross-layer causal attribution",
+        "universal phase-lock or coherence superiority"
+      ]
+    },
+    {
       "id": "lumascout_ar_intelligence",
       "name": "LumaScout A&R Intelligence",
       "offer": "Cross-platform artist discovery shortlists with source receipts and forward outcome tracking.",
@@ -314,9 +408,16 @@
           "kind": "commercialization_map",
           "min_bytes": 1024,
           "claim_scope": "A claim-bounded commercialization map exists; it does not establish alpha, profitability, or institutional readiness."
+        },
+        {
+          "path": "docs/WHITEHOLE_WHITEHOLELAB_AUDIT_2026-08-02.md",
+          "required": true,
+          "kind": "historical_research_boundary_audit",
+          "min_bytes": 4096,
+          "claim_scope": "The WhiteHole audit preserves custody value while classifying WhiteHoleLab ranks as historical descriptive diagnostics; it does not establish alpha, forecasting skill, outage prevention, savings, or field performance."
         }
       ],
-      "first_validation": "Pass a prospective after-fee paper protocol with reconciliation and risk gates before any live-capital discussion.",
+      "first_validation": "Repair the documented WhiteHoleLab alias, manifest, and state-consistency defects in a governed working copy, then pass a preregistered prospective after-fee paper protocol against named baselines with reconciliation and risk gates before any live-capital discussion.",
       "recurring_model": "Research subscription only after prospective evidence passes.",
       "blocked_claims": [
         "alpha",

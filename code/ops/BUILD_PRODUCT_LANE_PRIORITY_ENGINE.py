@@ -13,17 +13,62 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "config" / "product_lane_priority_v1.json"
 OUT_JSON = ROOT / "dashboard" / "data" / "product_lane_priority_engine_20260718.json"
+LATEST_OUT_JSON = ROOT / "out" / "ops" / "product_lane_priority_engine_latest.json"
 OUT_MD = ROOT / "docs" / "PRODUCT_LANE_PRIORITY_ENGINE_2026-07-18.md"
 MINDWISE_MD = ROOT / "docs" / "MINDWISE_PAID_DESIGN_PARTNER_PILOT_2026-07-18.md"
 MINDWISE_EMAIL = ROOT / "docs" / "MINDWISE_DESIGN_PARTNER_FOLLOWUP_EMAIL_2026-07-18.txt"
 BUNDLE_MANIFEST = ROOT / "docs" / "receipts" / "PRODUCT_LANE_PRIORITY_BUNDLE_MANIFEST_2026-07-18.json"
+LATEST_BUNDLE_MANIFEST = (
+    ROOT / "out" / "ops" / "product_lane_priority_bundle_manifest_latest.json"
+)
 MINDWISE_DEMO_FEED = ROOT / "dashboard" / "data" / "mindwise_healthcare_candidate_feed_20260718.json"
 PILOT_CONFIG = ROOT / "config" / "prooflock_opportunity_ops_pilot_v1.json"
+HYPERCORE_PROTOCOL = ROOT / "config" / "hypercore_v8_validation_protocol_v1.json"
+HYPERCORE_SYNTHETIC_PREFLIGHT = (
+    ROOT
+    / "dashboard"
+    / "evidence"
+    / "hypercore"
+    / "HYPERCORE_V8_SYNTHETIC_PREFLIGHT_2026-08-02.json"
+)
+HARMONIC_V6_BENCHMARK = (
+    ROOT
+    / "clean_data"
+    / "LumenLab__reports_benchmark_scores_v6.csv__14afe85295.csv"
+)
+HARMONIC_V6_WINS = (
+    ROOT
+    / "clean_data"
+    / "LumenLab__reports_harmonic_wins_v6.csv__eef2674289.csv"
+)
+HARMONIC_V6_SOURCE = (
+    ROOT
+    / "data"
+    / "World model lab script"
+    / "Harmonic vs backprop script.txt"
+)
+HARMONIC_FAIR_SYNTHETIC_SUMMARY = ROOT / "out" / "fair_benchmark" / "summary.json"
+HARMONIC_FAIR_REAL_SUMMARY = (
+    ROOT
+    / "out"
+    / "real_data_fair_benchmark"
+    / "20260505T072405Z"
+    / "summary.json"
+)
+WHITEHOLE_AUDIT = ROOT / "docs" / "WHITEHOLE_WHITEHOLELAB_AUDIT_2026-08-02.md"
 GOLDEN_REPLAY = (
     ROOT
     / "dashboard"
     / "data"
     / "prooflock_opportunity_ops_golden_replay_v1.json"
+)
+
+LOCAL_ONLY_HISTORICAL_INPUTS = (
+    HARMONIC_V6_BENCHMARK,
+    HARMONIC_V6_WINS,
+    HARMONIC_V6_SOURCE,
+    HARMONIC_FAIR_SYNTHETIC_SUMMARY,
+    HARMONIC_FAIR_REAL_SUMMARY,
 )
 
 RUN_IDS = (
@@ -41,6 +86,104 @@ BOUNDARY = (
     "Product-lane priority engine. Scores are a transparent founder strategy heuristic, not market valuation, "
     "patentability, customer acceptance, award probability, field validation, or guaranteed revenue."
 )
+
+PRODUCTIZATION_PROFILES: dict[str, dict[str, str]] = {
+    "prooflock_opportunity_ops": {
+        "stage": "PAID_PROOF_SPRINT_SCOPE_READY_HUMAN_APPROVAL_REQUIRED",
+        "minimum_honest_sale": (
+            "A fixed-scope proof sprint measuring one buyer-selected opportunity workflow; "
+            "no eligibility guarantee, legal advice, certification, send, or final submission."
+        ),
+        "next_gate": (
+            "Buyer approves the workflow, permitted sources, baseline, sample rule, acceptance "
+            "criteria, price, recipient, and exact outbound message."
+        ),
+        "next_owner_action": (
+            "Select one truthful buyer workflow and approve or reject the bounded proof-sprint scope."
+        ),
+    },
+    "prooflock_evidence_router_api": {
+        "stage": "TECHNICAL_CO_DESIGN_ONLY",
+        "minimum_honest_sale": (
+            "A paid receipt-schema, abstention-contract, and train-only feature design sprint; "
+            "no routing-superiority or award-probability promise."
+        ),
+        "next_gate": (
+            "Rebuild every feature from information available at decision time, preregister the "
+            "comparison, and pass prospective abstention and receipt tests."
+        ),
+        "next_owner_action": (
+            "Choose a buyer-authorized decision workflow and freeze its source and abstention contract."
+        ),
+    },
+    "energy_forecast_validation": {
+        "stage": "VALIDATION_SETUP_ONLY",
+        "minimum_honest_sale": (
+            "A paid protocol-freeze and independent-reproduction setup for a buyer-selected energy "
+            "forecasting question; no superiority, savings, or deployment claim."
+        ),
+        "next_gate": (
+            "Complete the preregistered prospective sample, settle actuals, compare frozen baselines, "
+            "and obtain independent protocol-matched reproduction."
+        ),
+        "next_owner_action": (
+            "Keep collecting sealed predictions and actuals without tuning on prospective outcomes."
+        ),
+    },
+    "hypercore_readonly_resilience_evaluation": {
+        "stage": "OFFLINE_EVALUATION_SETUP_ONLY",
+        "minimum_honest_sale": (
+            "A buyer-authorized offline resilience-evaluation design using approved historical data; "
+            "no production actuation, outage reduction, or realized-savings claim."
+        ),
+        "next_gate": (
+            "Run the frozen chronology-safe protocol on buyer-authorized data, pass falsification and "
+            "power gates, and obtain independent reproduction before external validation language."
+        ),
+        "next_owner_action": (
+            "Identify a lawful read-only dataset owner and approve only the offline evaluation scope."
+        ),
+    },
+    "lumascout_ar_intelligence": {
+        "stage": "FORWARD_OUTCOME_STUDY_REQUIRED",
+        "minimum_honest_sale": (
+            "No product offer yet; at most a buyer-approved forward study protocol with explicit "
+            "abstention and outcome definitions."
+        ),
+        "next_gate": (
+            "Repair internal evidence coverage, then complete a prospectively frozen forward outcome study."
+        ),
+        "next_owner_action": "Repair the failing typed-evidence contracts before buyer outreach.",
+    },
+    "guarded_market_research": {
+        "stage": "PAPER_RESEARCH_PROTOCOL_ONLY",
+        "minimum_honest_sale": (
+            "A paper-only regime-diagnostics protocol and replay report using permitted buyer data; "
+            "historical WhiteHoleLab ranks are excluded from alpha, profitability, live-capital, or "
+            "investment-advice claims."
+        ),
+        "next_gate": (
+            "Repair the WhiteHoleLab ticker-alias, manifest-completeness, and state-consistency defects "
+            "in a governed working copy, then pass a prospectively frozen, leakage-controlled, "
+            "cost-aware comparison against named baselines and independent review."
+        ),
+        "next_owner_action": (
+            "Keep capital disconnected, preserve the historical archive, and freeze one buyer-authorized "
+            "paper-regime research question before any rerun."
+        ),
+    },
+    "xr_comfort_governor": {
+        "stage": "RESEARCH_PROTOCOL_ONLY",
+        "minimum_honest_sale": (
+            "A non-medical research protocol or usability-study design; no clinical, safety, or "
+            "comfort-improvement claim."
+        ),
+        "next_gate": (
+            "Complete ethics-appropriate prospective usability testing with predefined outcomes and exclusions."
+        ),
+        "next_owner_action": "Define the non-medical study population, outcomes, and stop conditions.",
+    },
+}
 
 
 def now_utc() -> datetime:
@@ -63,6 +206,13 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
 def write_text(path: Path, value: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(value.rstrip() + "\n", encoding="utf-8")
+
+
+def write_latest_aliases(
+    payload: dict[str, Any], manifest: dict[str, Any]
+) -> None:
+    write_json(LATEST_OUT_JSON, payload)
+    write_json(LATEST_BUNDLE_MANIFEST, manifest)
 
 
 def stable_hash(payload: Any) -> str:
@@ -96,6 +246,39 @@ def load_pilot_config() -> dict[str, Any]:
     if config["pricing"].get("founder_approved") is not False:
         raise ValueError("Pilot pricing must remain unapproved until exact scope review")
     return config
+
+
+def load_candidate_commercial_terms() -> dict[str, Any]:
+    protocol = read_json(HYPERCORE_PROTOCOL)
+    boundary = protocol.get("commercial_boundary")
+    if not isinstance(boundary, dict):
+        raise ValueError("HyperCore protocol is missing its commercial boundary")
+
+    fee = boundary.get("candidate_fee_usd")
+    duration = boundary.get("candidate_duration_business_days")
+    if not isinstance(fee, int) or fee <= 0:
+        raise ValueError("Candidate fee must be a positive integer")
+    if not isinstance(duration, int) or duration <= 0:
+        raise ValueError("Candidate duration must be a positive integer")
+    if fee % 2:
+        raise ValueError("Candidate fee must support exact 50/50 payment terms")
+    if boundary.get("fee_status") != "candidate_not_committed":
+        raise ValueError("Candidate fee must remain uncommitted")
+    if boundary.get("external_send_allowed") is not False:
+        raise ValueError("Commercial boundary must fail closed for external send")
+    if boundary.get("contract_or_price_acceptance_proven") is not False:
+        raise ValueError("Commercial boundary cannot imply buyer price acceptance")
+
+    return {
+        "candidate_fixed_fee_usd": fee,
+        "candidate_kickoff_deposit_usd": fee // 2,
+        "candidate_delivery_balance_usd": fee // 2,
+        "duration_business_days": duration,
+        "price_status": str(boundary["fee_status"]),
+        "external_send_allowed": False,
+        "buyer_price_acceptance_proven": False,
+        "source_protocol": str(HYPERCORE_PROTOCOL.relative_to(ROOT)).replace("\\", "/"),
+    }
 
 
 def build_golden_replay(config: dict[str, Any]) -> dict[str, Any]:
@@ -227,6 +410,79 @@ def file_receipt(path: Path) -> dict[str, Any]:
     }
 
 
+def build_whiteholelab_remediation_gate() -> dict[str, Any]:
+    required_markers = (
+        "WhiteHole is useful as historical custody",
+        "Neither currently establishes forecasting",
+        "ticker-key fallback",
+        "manifest.json",
+        "ignores the emitted fracture state",
+        "Keep WhiteHole frozen as an archive.",
+    )
+    try:
+        text = WHITEHOLE_AUDIT.read_text(encoding="utf-8")
+    except OSError:
+        text = ""
+    marker_checks = {marker: marker in text for marker in required_markers}
+    audit_current = WHITEHOLE_AUDIT.is_file() and all(marker_checks.values())
+    defects = [
+        {
+            "id": "ticker_alias_fallback_noop",
+            "severity": "high",
+            "historical_source": "C:/WhiteHoleLab/engine/whitehole_universe.py:185",
+            "observed_behavior": "A missing exact Kraken ticker key enters a no-op loop and the instrument is silently skipped.",
+            "required_fix": "Resolve aliases from the AssetPairs metadata and emit an explicit unmapped-pair receipt instead of silently continuing.",
+            "required_test": "Fixture exact, aliased, and unmapped ticker keys and assert deterministic coverage accounting.",
+        },
+        {
+            "id": "universe_manifest_omits_report",
+            "severity": "high",
+            "historical_source": "C:/WhiteHoleLab/engine/whitehole_universe.py:285",
+            "observed_behavior": "The saved manifest is written before report.pdf and therefore omits the report receipt.",
+            "required_fix": "Generate every output before sealing the manifest, then verify every packaged file against the saved manifest.",
+            "required_test": "Build a temporary proof pack and assert exact manifest-to-archive file and SHA-256 parity.",
+        },
+        {
+            "id": "current_state_ignores_fracture_flag",
+            "severity": "high",
+            "historical_source": "C:/WhiteHoleLab/engine/whitehole_universe.py:213",
+            "observed_behavior": "The current state is recomputed from coherence alone even when the metric function marks the observation FRACTURE.",
+            "required_fix": "Use the emitted regime state as the single classification source and fail closed on contradictory labels.",
+            "required_test": "Fixture a high-coherence fractured observation and require FRACTURE rather than FLOW.",
+        },
+    ]
+    return {
+        "schema": "whiteholelab_remediation_gate_v1",
+        "status": (
+            "REMEDIATION_SPEC_READY_ARCHIVE_FROZEN"
+            if audit_current
+            else "BLOCKED_AUDIT_MISSING_OR_STALE"
+        ),
+        "audit_current": audit_current,
+        "audit_receipt": file_receipt(WHITEHOLE_AUDIT),
+        "audit_marker_checks": marker_checks,
+        "historical_archive_root": "C:/WhiteHoleLab/WhiteHole",
+        "historical_engine_root": "C:/WhiteHoleLab/engine",
+        "archive_mutation_allowed": False,
+        "legacy_site_deploy_allowed": False,
+        "current_product_lane": "guarded_market_research",
+        "current_use": "Historical custody, reproducibility context, and descriptive diagnostic lineage only.",
+        "implementation_target": "A governed working copy with source/hash lineage; never the frozen archive.",
+        "defect_count": len(defects),
+        "defects": defects,
+        "required_validation": [
+            "freeze metric definitions and calibration data before examining holdout outcomes",
+            "compare next-window realized volatility or drawdown against named naive and EWMA baselines",
+            "settle a preregistered prospective sample with multiple-testing control and after-cost reporting",
+            "obtain independent protocol-matched reproduction before external performance language",
+        ],
+        "performance_claim_allowed": False,
+        "alpha_claim_allowed": False,
+        "external_send_allowed": False,
+        "promotion_gate_passed": False,
+    }
+
+
 def build_bundle_manifest(payload: dict[str, Any]) -> dict[str, Any]:
     paths = (
         CONFIG,
@@ -242,7 +498,10 @@ def build_bundle_manifest(payload: dict[str, Any]) -> dict[str, Any]:
         ROOT / "tests" / "test_product_lane_priority_engine.py",
         MINDWISE_DEMO_FEED,
         PILOT_CONFIG,
+        HYPERCORE_PROTOCOL,
+        HYPERCORE_SYNTHETIC_PREFLIGHT,
         GOLDEN_REPLAY,
+        WHITEHOLE_AUDIT,
     )
     receipts = [file_receipt(path) for path in paths]
     manifest: dict[str, Any] = {
@@ -252,6 +511,14 @@ def build_bundle_manifest(payload: dict[str, Any]) -> dict[str, Any]:
         "all_artifacts_present": all(receipt["exists"] for receipt in receipts),
         "artifact_count": len(receipts),
         "artifacts": receipts,
+        "excluded_local_only_inputs": [
+            str(path.relative_to(ROOT)).replace("\\", "/")
+            for path in LOCAL_ONLY_HISTORICAL_INPUTS
+        ],
+        "public_reproducibility_status": (
+            "The public bundle excludes non-versioned local historical inputs. "
+            "They cannot be treated as reproducible public evidence."
+        ),
         "boundary": (
             "File receipts prove byte identity and presence only. They do not prove eligibility, correctness, "
             "independent validation, customer acceptance, award probability, or commercial value."
@@ -267,6 +534,218 @@ def parse_float(value: Any) -> float | None:
     except (TypeError, ValueError):
         return None
     return parsed if math.isfinite(parsed) else None
+
+
+def read_csv_rows(path: Path) -> list[dict[str, str]]:
+    if not path.is_file():
+        return []
+    try:
+        with path.open("r", encoding="utf-8-sig", newline="") as handle:
+            return [dict(row) for row in csv.DictReader(handle)]
+    except (OSError, csv.Error):
+        return []
+
+
+def audit_harmonic_backprop_claim() -> dict[str, Any]:
+    benchmark_rows = read_csv_rows(HARMONIC_V6_BENCHMARK)
+    wins_rows = read_csv_rows(HARMONIC_V6_WINS)
+    try:
+        source = HARMONIC_V6_SOURCE.read_text(encoding="utf-8")
+    except OSError:
+        source = ""
+    source_lower = source.lower()
+
+    harmonic_wins = sum(
+        1
+        for row in benchmark_rows
+        if parse_float(row.get("harmonic_beats_backprop")) == 1.0
+    )
+    harmonic_beats_baseline = sum(
+        1
+        for row in benchmark_rows
+        if parse_float(row.get("harmonic_beats_baseline")) == 1.0
+    )
+    harmonic_beats_both = sum(
+        1
+        for row in benchmark_rows
+        if parse_float(row.get("harmonic_beats_backprop")) == 1.0
+        and parse_float(row.get("harmonic_beats_baseline")) == 1.0
+    )
+    negative_backprop_r2 = sum(
+        1
+        for row in benchmark_rows
+        if (parse_float(row.get("r2_backprop")) or 0.0) < 0.0
+    )
+    period_equals_series_length = sum(
+        1
+        for row in benchmark_rows
+        if (
+            parse_float(row.get("period_est")) is not None
+            and parse_float(row.get("n_points")) is not None
+            and math.isclose(
+                float(parse_float(row.get("period_est"))),
+                float(parse_float(row.get("n_points"))),
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+        )
+    )
+
+    full_series_refit = all(
+        marker in source_lower
+        for marker in (
+            "fit full and evaluate last holdout segment",
+            "hm_full = harmonic_fit_predict(y)",
+            "bp_full = backprop_fit_predict(y)",
+            "hm_test = hm_full[-split:]",
+            "bp_test = bp_full[-split:]",
+        )
+    )
+    train_predictions_unused_for_scoring = all(
+        marker in source_lower
+        for marker in (
+            "hm_train = harmonic_fit_predict(train_y)",
+            "bp_train = backprop_fit_predict(train_y)",
+            "hm_test = hm_full[-split:]",
+            "bp_test = bp_full[-split:]",
+        )
+    )
+    target_scaling_detected = any(
+        marker in source_lower
+        for marker in (
+            "standardscaler().fit_transform(y",
+            "minmaxscaler().fit_transform(y",
+            "y_scaler",
+        )
+    )
+
+    synthetic_fair = read_json(HARMONIC_FAIR_SYNTHETIC_SUMMARY)
+    real_fair = read_json(HARMONIC_FAIR_REAL_SUMMARY)
+    required_files_present = all(
+        path.is_file()
+        for path in (
+            HARMONIC_V6_BENCHMARK,
+            HARMONIC_V6_WINS,
+            HARMONIC_V6_SOURCE,
+            HARMONIC_FAIR_SYNTHETIC_SUMMARY,
+            HARMONIC_FAIR_REAL_SUMMARY,
+        )
+    )
+    historical_result_consistent = (
+        len(benchmark_rows) == 400
+        and harmonic_wins == 362
+        and len(wins_rows) == 362
+    )
+    status = (
+        "HISTORICAL_EXPLORATORY_ONLY_NOT_CLAIM_READY"
+        if required_files_present and historical_result_consistent
+        else "MISSING_OR_INCONSISTENT_SOURCE_FAIL_CLOSED"
+    )
+
+    return {
+        "schema": "harmonic_backprop_legacy_claim_audit_v1",
+        "status": status,
+        "comparison": "harmonic_vs_backprop",
+        "historical_result": {
+            "benchmark_rows": len(benchmark_rows),
+            "harmonic_beats_backprop_rows": harmonic_wins,
+            "wins_file_rows": len(wins_rows),
+            "harmonic_beats_baseline_rows": harmonic_beats_baseline,
+            "harmonic_beats_both_rows": harmonic_beats_both,
+            "negative_backprop_r2_rows": negative_backprop_r2,
+            "period_est_equals_series_length_rows": period_equals_series_length,
+            "historical_result_consistent": historical_result_consistent,
+        },
+        "protocol_findings": {
+            "full_series_refit_before_holdout_scoring_detected": full_series_refit,
+            "train_only_predictions_unused_for_test_scoring_detected": (
+                train_predictions_unused_for_scoring
+            ),
+            "target_scaling_detected_for_mlp": target_scaling_detected,
+            "capacity_matched_comparator_documented": False,
+            "chronology_safe_out_of_sample_evaluation": False,
+            "independent_reproduction": False,
+            "issues": [
+                "Models are refit on the full series before the final segment is scored, so the labeled holdout is not chronology-safe out-of-sample evidence.",
+                "The backprop MLP normalizes time inputs but does not scale the target, and comparator capacity parity is not documented.",
+                "Negative backprop R-squared values and period estimates equal to full series length require comparator and feature audits.",
+            ],
+        },
+        "bounded_corrective_runs": {
+            "synthetic_dataset_count": len(synthetic_fair.get("datasets", [])),
+            "real_eia_series_count": len(real_fair.get("datasets", {})),
+            "boundary": (
+                "The corrective summaries are self-authored bounded diagnostics over four synthetic "
+                "datasets and four EIA series. They do not establish general superiority or independent validation."
+            ),
+        },
+        "external_claim_allowed": False,
+        "allowed_description": (
+            "A historical internal exploratory artifact records 362 harmonic wins in 400 comparisons; "
+            "a source audit found protocol defects that block external performance use."
+        ),
+        "blocked_description": (
+            "Do not present 362/400 as current, prospective, independently validated, or general "
+            "harmonic superiority over backpropagation."
+        ),
+        "required_next_gate": (
+            "Preregister and run a chronology-safe, capacity-matched, target-scaled prospective comparison "
+            "against frozen naive, statistical, and neural baselines, then obtain independent reproduction."
+        ),
+        "source_receipts": [
+            file_receipt(path)
+            for path in (
+                HARMONIC_V6_BENCHMARK,
+                HARMONIC_V6_WINS,
+                HARMONIC_V6_SOURCE,
+                HARMONIC_FAIR_SYNTHETIC_SUMMARY,
+                HARMONIC_FAIR_REAL_SUMMARY,
+            )
+        ],
+    }
+
+
+def build_productization_matrix(ranked: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    matrix: list[dict[str, Any]] = []
+    for lane in ranked:
+        lane_id = str(lane.get("id") or "")
+        profile = PRODUCTIZATION_PROFILES.get(lane_id)
+        internal_gate = bool(lane.get("internal_evidence_gate_passed"))
+        if profile is None:
+            stage = "UNMAPPED_FAIL_CLOSED"
+            minimum_honest_sale = "No external offer; this lane has no approved productization profile."
+            next_gate = "Define and review a claim-bounded productization profile."
+            next_owner_action = "Keep the lane internal until its profile and evidence gates are reviewed."
+        elif not internal_gate:
+            stage = "INTERNAL_EVIDENCE_REPAIR_REQUIRED"
+            minimum_honest_sale = "No external offer until all required typed-evidence contracts pass."
+            next_gate = str(profile["next_gate"])
+            next_owner_action = str(profile["next_owner_action"])
+        else:
+            stage = str(profile["stage"])
+            minimum_honest_sale = str(profile["minimum_honest_sale"])
+            next_gate = str(profile["next_gate"])
+            next_owner_action = str(profile["next_owner_action"])
+
+        matrix.append(
+            {
+                "rank": lane.get("rank"),
+                "lane_id": lane_id,
+                "lane_name": lane.get("name"),
+                "strategy_score": lane.get("strategy_score"),
+                "internal_evidence_gate_passed": internal_gate,
+                "validated_evidence_coverage": lane.get("validated_evidence_coverage"),
+                "current_stage": stage,
+                "minimum_honest_sale": minimum_honest_sale,
+                "next_gate": next_gate,
+                "next_owner_action": next_owner_action,
+                "blocked_claims": list(lane.get("blocked_claims") or []),
+                "buyer_acceptance_proven": False,
+                "product_ready": False,
+                "external_send_allowed": False,
+            }
+        )
+    return matrix
 
 
 def parse_utc_datetime(value: Any) -> datetime | None:
@@ -653,10 +1132,33 @@ def rank_lanes(
 
 
 def mindwise_pilot(config: dict[str, Any]) -> dict[str, Any]:
+    commercial_terms = load_candidate_commercial_terms()
     return {
         "name": "ProofLock Opportunity Operations - 30-day paid pilot",
         "buyer_selected": False,
         "buyer": None,
+        "commercial_entry_offer": {
+            "name": "Opportunity-operations proof sprint",
+            "duration": f"{commercial_terms['duration_business_days']} business days",
+            "buyer_state": "historical_warm_reactivation_candidate_recent_interest_unconfirmed",
+            **commercial_terms,
+            "deliverables": [
+                "source and eligibility register for one buyer-selected workflow",
+                "pursue/no-pursue decision brief with unresolved facts named",
+                "reviewer-ready package outline",
+                "attachment and blocker ledger",
+                "replayable receipt for each material decision",
+            ],
+            "commercial_gate": (
+                "Scope, source permissions, baseline, acceptance criteria, candidate fixed price, "
+                "payment terms, recipient, and exact outbound message require written approval "
+                "before kickoff or send."
+            ),
+            "boundary": (
+                "The sprint is a bounded paid service offer, not evidence of buyer acceptance, "
+                "customer outcomes, award probability, savings, or production readiness."
+            ),
+        },
         "status": config["status"],
         "protocol_id": config["protocol_id"],
         "duration_days": config["duration_days"],
@@ -712,6 +1214,9 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
     best_exploratory = max(comparable, key=lambda row: row["datasets_succeeded"], default={})
     pilot = mindwise_pilot(pilot_config)
     feed_audit = audit_healthcare_feed(at)
+    harmonic_backprop_audit = audit_harmonic_backprop_claim()
+    whiteholelab_remediation = build_whiteholelab_remediation_gate()
+    productization_matrix = build_productization_matrix(ranked)
     allowed_now = [
         "working grant-ranking, draft-assembly, preflight, and receipt components exist",
         "five historical benchmark runs and raw source directories exist",
@@ -722,6 +1227,10 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
         allowed_now.append(
             "the healthcare candidate feed was refreshed within its 24-hour SLA; freshness does not establish eligibility"
         )
+    if whiteholelab_remediation["audit_current"]:
+        allowed_now.append(
+            "WhiteHole provides historical custody context and WhiteHoleLab provides descriptive diagnostic lineage only"
+        )
     blocked_now = [
         "organizational eligibility from relevance scores alone",
         "urgent or priority labels as authorization to apply or submit",
@@ -729,6 +1238,9 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
         "field validation or realized savings",
         "guaranteed awards or autonomous final submission",
         "patentability",
+        "the historical 362/400 harmonic-versus-backprop result as current, prospective, independently validated, or general superiority evidence",
+        "WhiteHoleLab coherence scores or watchlist ranks as alpha, expected return, forecasting skill, or buyer outcome evidence",
+        "deployment of the historical WhiteHoleLab website or mutation of the frozen WhiteHole archive",
     ]
     if not feed_audit["freshness_label_allowed"]:
         blocked_now.insert(0, "current-feed language until the candidate feed is refreshed within the freshness SLA")
@@ -740,9 +1252,20 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
         "evidence_contract_version": "typed_evidence_contract_v1",
         "weights": config.get("weights", {}),
         "ranking": ranked,
+        "productization_matrix": productization_matrix,
         "recommendation": {
             "commercial_lane": ranked[0]["id"] if ranked else None,
             "commercial_offer": ranked[0]["offer"] if ranked else None,
+            "commercial_stage": (
+                productization_matrix[0]["current_stage"]
+                if productization_matrix
+                else "NO_LANE_FAIL_CLOSED"
+            ),
+            "minimum_honest_sale": (
+                productization_matrix[0]["minimum_honest_sale"]
+                if productization_matrix
+                else "No external offer."
+            ),
             "technical_wedge": "prooflock_evidence_router_api",
             "technical_wedge_boundary": (
                 "The defensible target is not generic grant search or AI writing. It is a constrained router that "
@@ -777,6 +1300,8 @@ def build_payload(at: datetime | None = None) -> dict[str, Any]:
                 "on all 1,118 datasets while the scorecard still describes a classical comparison."
             ),
             "healthcare_feed": feed_audit,
+            "harmonic_backprop_legacy_claim": harmonic_backprop_audit,
+            "whiteholelab_remediation": whiteholelab_remediation,
         },
         "market_boundary": {
             "crowded_features": [
@@ -829,7 +1354,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Decision",
         "",
-        "Build and sell **ProofLock Opportunity Operations** first. Use the **ProofLock Evidence Router API** as the narrower technical wedge. Keep LumaScout as a later vertical after a forward outcome study.",
+        "Package **ProofLock Opportunity Operations** as the first human-approved paid proof-sprint candidate. Use the **ProofLock Evidence Router API** as a narrower technical co-design wedge. No lane is product-ready or authorized for external send by this artifact.",
         "",
         "## Ranked Lanes",
         "",
@@ -843,8 +1368,28 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"{lane['buyer_readiness_gate']['status']} | {lane['first_validation']} |"
         )
 
+    lines.extend(
+        [
+            "",
+            "## Productization Matrix",
+            "",
+            "| Rank | Lane | Current stage | Internal evidence | Product ready | External send | Next gate |",
+            "|---:|---|---|---|---|---|---|",
+        ]
+    )
+    for lane in payload["productization_matrix"]:
+        lines.append(
+            f"| {lane['rank']} | {lane['lane_name']} | `{lane['current_stage']}` | "
+            f"{str(lane['internal_evidence_gate_passed']).lower()} | "
+            f"{str(lane['product_ready']).lower()} | "
+            f"{str(lane['external_send_allowed']).lower()} | {lane['next_gate']} |"
+        )
+
     audit = payload["evidence_audit"]
     feed = audit["healthcare_feed"]
+    harmonic = audit["harmonic_backprop_legacy_claim"]
+    whitehole = audit["whiteholelab_remediation"]
+    historical = harmonic["historical_result"]
     lines.extend(
         [
             "",
@@ -855,6 +1400,25 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- Router blocker: {audit['router_risk']}",
             f"- Healthcare candidate feed: `{feed['status']}`; age `{feed['age_hours']}` hours; freshness label allowed `{str(feed['freshness_label_allowed']).lower()}`; eligibility label allowed `{str(feed['eligibility_label_allowed']).lower()}`.",
             f"- Feed boundary: {feed['boundary']}",
+            "",
+            "## Legacy Harmonic/Backprop Claim Gate",
+            "",
+            f"- Historical internal result: `{historical['harmonic_beats_backprop_rows']}` harmonic wins in `{historical['benchmark_rows']}` comparisons.",
+            f"- Claim status: `{harmonic['status']}`.",
+            f"- External claim allowed: `{str(harmonic['external_claim_allowed']).lower()}`.",
+            f"- Protocol finding: `{historical['negative_backprop_r2_rows']}` negative backprop R-squared rows and `{historical['period_est_equals_series_length_rows']}` rows where the estimated period equals the full series length.",
+            f"- Boundary: {harmonic['blocked_description']}",
+            f"- Next gate: {harmonic['required_next_gate']}",
+            "",
+            "## WhiteHoleLab Remediation Gate",
+            "",
+            f"- Status: `{whitehole['status']}`.",
+            f"- Product lane: `{whitehole['current_product_lane']}`.",
+            f"- Frozen archive mutation allowed: `{str(whitehole['archive_mutation_allowed']).lower()}`.",
+            f"- Legacy site deployment allowed: `{str(whitehole['legacy_site_deploy_allowed']).lower()}`.",
+            f"- Performance or alpha claim allowed: `{str(whitehole['performance_claim_allowed']).lower()}`.",
+            f"- Documented implementation defects: `{whitehole['defect_count']}`.",
+            f"- Current use: {whitehole['current_use']}",
             "",
             "## Commercial Wedge",
             "",
@@ -893,6 +1457,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
 
 def render_mindwise_brief(payload: dict[str, Any]) -> str:
     pilot = payload["mindwise_pilot"]
+    entry_offer = pilot["commercial_entry_offer"]
     lines = [
         "# ProofLock Opportunity Operations",
         "",
@@ -913,6 +1478,23 @@ def render_mindwise_brief(payload: dict[str, Any]) -> str:
         f"- Pricing status: `{pilot['pricing']['status']}`",
         "- No fee, subscription price, recipient, or external communication is approved by this document.",
         "",
+        "### Commercial Entry Offer",
+        "",
+        f"- Offer: {entry_offer['name']}",
+        f"- Duration: {entry_offer['duration']}",
+        f"- Candidate fixed fee: `${entry_offer['candidate_fixed_fee_usd']:,}`",
+        f"- Candidate kickoff deposit: `${entry_offer['candidate_kickoff_deposit_usd']:,}`",
+        f"- Candidate delivery balance: `${entry_offer['candidate_delivery_balance_usd']:,}`",
+        f"- Price status: `{entry_offer['price_status']}`",
+        f"- Buyer state: `{entry_offer['buyer_state']}`",
+        f"- Gate: {entry_offer['commercial_gate']}",
+        f"- Boundary: {entry_offer['boundary']}",
+        "- Deliverables:",
+    ]
+    lines.extend(f"  - {item}" for item in entry_offer["deliverables"])
+    lines.extend(
+        [
+        "",
         "### Minimum Sample",
         "",
         f"- Reviewed opportunities: `{pilot['minimum_sample']['reviewed_opportunities']}`",
@@ -921,7 +1503,8 @@ def render_mindwise_brief(payload: dict[str, Any]) -> str:
         "",
         "### Week 1: Lock the Baseline",
         "",
-    ]
+        ]
+    )
     lines.extend(f"- {item}" for item in pilot["week_1_baseline"])
     lines.extend(["", "### Weeks 2-4: Run the Pilot", ""])
     lines.extend(f"- {item}" for item in pilot["weeks_2_to_4"])
@@ -993,28 +1576,39 @@ def render_mindwise_brief(payload: dict[str, Any]) -> str:
 
 def render_mindwise_email(payload: dict[str, Any]) -> str:
     pilot = payload["mindwise_pilot"]
+    entry_offer = pilot["commercial_entry_offer"]
+    deliverables = ", ".join(entry_offer["deliverables"])
     return "\n".join(
         [
-            "DRAFT ONLY - RECIPIENT NOT SELECTED - DO NOT SEND",
+            "DRAFT ONLY - VERIFIED WARM REACTIVATION ROUTE - EXACT SEND AND PRICE APPROVAL REQUIRED",
             "",
-            "Subject: Bounded 30-day opportunity-operations pilot",
+            "Subject: MindWise x LumenCore: 10-day paid grant-operations proof sprint",
             "",
-            "Hi [Name],",
+            "Hi [Authorized MindWise contact],",
             "",
-            "I am reaching out only after confirming that your current workflow and source permissions fit a bounded pilot.",
-            "",
-            "The strongest next step is not another broad AI-writing demo. It is a bounded 30-day design-partner pilot for opportunity operations: permitted-source monitoring, evidence-linked eligibility review, reviewer-ready draft structure, attachment/blocker preflight, and a replayable receipt for every material decision. Final certifications and submissions remain with your authorized team.",
+            "I appreciated your positive response to the MindWise grant-flow demo. I have since narrowed the first step so it is smaller, measurable, and easier to evaluate before either side commits to a larger implementation.",
             "",
             (
-                "In week one, we would freeze your baseline, denominators, thresholds, "
-                f"and cutoff. The default minimum sample is {pilot['minimum_sample']['reviewed_opportunities']} "
-                f"reviewed opportunities and {pilot['minimum_sample']['pursued_packages']} pursued packages. "
-                "The pilot excludes PHI, credentials, legal advice, and autonomous submission."
+                f"I propose a paid proof sprint lasting {entry_offer['duration']} on one MindWise "
+                f"opportunity workflow. The deliverables would be: {deliverables}."
             ),
             "",
-            "If the prospectively approved metrics do not justify continuing, we stop or document why the sample was insufficient. If they do, we can discuss a separately approved subscription under terms agreed after measurement.",
+            (
+                f"The candidate fixed fee is ${entry_offer['candidate_fixed_fee_usd']:,}, split "
+                f"into a ${entry_offer['candidate_kickoff_deposit_usd']:,} kickoff deposit and "
+                f"${entry_offer['candidate_delivery_balance_usd']:,} on delivery. The price is "
+                "not committed until we both approve the written scope."
+            ),
             "",
-            "Would you be open to a 20-minute scoping call next week to choose one workflow and one baseline?",
+            "Before work starts, we would agree the permitted sources, current baseline, acceptance criteria, deliverables, and fixed price. This first sprint would use no PHI or credentials, provide no legal advice, and make no autonomous certifications or submissions.",
+            "",
+            (
+                "If the sprint produces enough evidence to justify a larger test, the next step would be the "
+                f"buyer-approved {pilot['duration_days']}-day pilot with prospectively frozen metrics. "
+                "If it does not, we stop with the completed proof packet."
+            ),
+            "",
+            "Would you be open to a 20-minute call to choose one workflow and scope the proof sprint?",
             "",
             "Respectfully,",
             "Robert Ashworth",
@@ -1037,6 +1631,7 @@ def main() -> int:
     write_json(GOLDEN_REPLAY, golden_replay)
     manifest = build_bundle_manifest(payload)
     write_json(BUNDLE_MANIFEST, manifest)
+    write_latest_aliases(payload, manifest)
     print(json.dumps({
         "output_json": str(OUT_JSON),
         "output_markdown": str(OUT_MD),

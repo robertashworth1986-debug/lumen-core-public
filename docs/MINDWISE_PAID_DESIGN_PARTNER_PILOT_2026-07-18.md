@@ -17,6 +17,24 @@ Opportunity, workflow, synthetic, sample, and buyer-authorized non-PHI organizat
 - Pricing status: `UNQUOTED_SCOPE_FIRST`
 - No fee, subscription price, recipient, or external communication is approved by this document.
 
+### Commercial Entry Offer
+
+- Offer: Opportunity-operations proof sprint
+- Duration: 10 business days
+- Candidate fixed fee: `$3,500`
+- Candidate kickoff deposit: `$1,750`
+- Candidate delivery balance: `$1,750`
+- Price status: `candidate_not_committed`
+- Buyer state: `historical_warm_reactivation_candidate_recent_interest_unconfirmed`
+- Gate: Scope, source permissions, baseline, acceptance criteria, candidate fixed price, payment terms, recipient, and exact outbound message require written approval before kickoff or send.
+- Boundary: The sprint is a bounded paid service offer, not evidence of buyer acceptance, customer outcomes, award probability, savings, or production readiness.
+- Deliverables:
+  - source and eligibility register for one buyer-selected workflow
+  - pursue/no-pursue decision brief with unresolved facts named
+  - reviewer-ready package outline
+  - attachment and blocker ledger
+  - replayable receipt for each material decision
+
 ### Minimum Sample
 
 - Reviewed opportunities: `30`

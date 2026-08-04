@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_PRODUCT_LANE_PRIORITY_ENGINE.py"
+HYPERCORE_RUNNER = ROOT / "code" / "ops" / "run_hypercore_v8_offline_replay.py"
 
 
 def load_module():
@@ -17,6 +18,55 @@ def load_module():
     assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
+
+
+def load_hypercore_runner():
+    spec = importlib.util.spec_from_file_location(
+        "hypercore_v8_offline_replay_for_product_lane_test", HYPERCORE_RUNNER
+    )
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def stage_hypercore_evidence(tmp_path: Path, *, include_preflight_receipt: bool) -> None:
+    relative_paths = (
+        "config/hypercore_v8_validation_protocol_v1.json",
+        "dashboard/data/reviewer_evidence_gate.json",
+        "docs/ROOT_EVIDENCE_VALUATION_BRIDGE_2026-06-22.md",
+        "code/ops/BUILD_LOCAL_ICLOUD_EVIDENCE_INTAKE.py",
+        "code/ops/run_hypercore_v8_offline_replay.py",
+    )
+    for relative_path in relative_paths:
+        source = ROOT / relative_path
+        destination = tmp_path / relative_path
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(source.read_bytes())
+
+    if not include_preflight_receipt:
+        return
+
+    # Produce the generated receipt in the isolated test root, never from an ignored local output.
+    runner = load_hypercore_runner()
+    protocol = tmp_path / "config" / "hypercore_v8_validation_protocol_v1.json"
+    bundle = runner.build_synthetic_fixture(tmp_path / "fixture", seed=20260802)
+    receipt = (
+        tmp_path
+        / "dashboard"
+        / "evidence"
+        / "hypercore"
+        / "HYPERCORE_V8_SYNTHETIC_PREFLIGHT_2026-08-02.json"
+    )
+    result = runner.run_replay(
+        protocol_path=protocol,
+        bundle_path=bundle,
+        output_path=receipt,
+        generated_utc="2026-08-02T10:30:00Z",
+        seed=20260802,
+        null_replicates=None,
+    )
+    assert result["status"] == "SYNTHETIC_PREFLIGHT_COMPLETE_NOT_EXTERNAL_VALIDATION"
 
 
 def test_priority_engine_ranks_sellable_grant_lane_first():
@@ -186,6 +236,119 @@ def test_priority_engine_exposes_router_and_feed_gates():
     assert "prospective router superiority until train-only features pass" in payload["claim_controls"]["blocked_now"]
 
 
+def test_harmonic_backprop_legacy_claim_is_audited_and_blocked():
+    module = load_module()
+    payload = module.build_payload(datetime(2026, 8, 2, tzinfo=timezone.utc))
+    audit = payload["evidence_audit"]["harmonic_backprop_legacy_claim"]
+    result = audit["historical_result"]
+
+    assert audit["comparison"] == "harmonic_vs_backprop"
+    assert audit["status"] == "HISTORICAL_EXPLORATORY_ONLY_NOT_CLAIM_READY"
+    assert result["benchmark_rows"] == 400
+    assert result["harmonic_beats_backprop_rows"] == 362
+    assert result["wins_file_rows"] == 362
+    assert result["harmonic_beats_baseline_rows"] == 383
+    assert result["harmonic_beats_both_rows"] == 354
+    assert result["negative_backprop_r2_rows"] == 318
+    assert result["period_est_equals_series_length_rows"] == 186
+    assert result["historical_result_consistent"] is True
+    assert audit["protocol_findings"][
+        "full_series_refit_before_holdout_scoring_detected"
+    ] is True
+    assert audit["protocol_findings"][
+        "train_only_predictions_unused_for_test_scoring_detected"
+    ] is True
+    assert audit["protocol_findings"]["target_scaling_detected_for_mlp"] is False
+    assert audit["external_claim_allowed"] is False
+    assert audit["bounded_corrective_runs"]["synthetic_dataset_count"] == 4
+    assert audit["bounded_corrective_runs"]["real_eia_series_count"] == 4
+    assert all(item["exists"] for item in audit["source_receipts"])
+    assert any(
+        "362/400 harmonic-versus-backprop" in claim
+        for claim in payload["claim_controls"]["blocked_now"]
+    )
+
+
+def test_productization_matrix_is_complete_and_fail_closed():
+    module = load_module()
+    payload = module.build_payload(datetime.now(timezone.utc))
+    matrix = payload["productization_matrix"]
+
+    assert len(matrix) == len(payload["ranking"])
+    assert {row["lane_id"] for row in matrix} == {
+        row["id"] for row in payload["ranking"]
+    }
+    assert all(row["product_ready"] is False for row in matrix)
+    assert all(row["external_send_allowed"] is False for row in matrix)
+    assert all(row["buyer_acceptance_proven"] is False for row in matrix)
+
+    top = matrix[0]
+    assert top["lane_id"] == "prooflock_opportunity_ops"
+    assert top["current_stage"] == (
+        "PAID_PROOF_SPRINT_SCOPE_READY_HUMAN_APPROVAL_REQUIRED"
+    )
+    assert "fixed-scope proof sprint" in top["minimum_honest_sale"]
+
+    lumascout = next(row for row in matrix if row["lane_id"] == "lumascout_ar_intelligence")
+    assert lumascout["internal_evidence_gate_passed"] is False
+    assert lumascout["current_stage"] == "INTERNAL_EVIDENCE_REPAIR_REQUIRED"
+    assert lumascout["minimum_honest_sale"].startswith("No external offer")
+
+    markdown = module.render_markdown(payload)
+    assert "Build and sell" not in markdown
+    assert "first human-approved paid proof-sprint candidate" in markdown
+    assert "Legacy Harmonic/Backprop Claim Gate" in markdown
+    assert "362" in markdown
+    assert "WhiteHoleLab Remediation Gate" in markdown
+
+
+def test_whiteholelab_remediation_is_fail_closed_and_archive_preserving():
+    module = load_module()
+    payload = module.build_payload(datetime(2026, 8, 2, 23, tzinfo=timezone.utc))
+    gate = payload["evidence_audit"]["whiteholelab_remediation"]
+
+    assert gate["status"] == "REMEDIATION_SPEC_READY_ARCHIVE_FROZEN"
+    assert gate["audit_current"] is True
+    assert gate["archive_mutation_allowed"] is False
+    assert gate["legacy_site_deploy_allowed"] is False
+    assert gate["performance_claim_allowed"] is False
+    assert gate["alpha_claim_allowed"] is False
+    assert gate["external_send_allowed"] is False
+    assert gate["promotion_gate_passed"] is False
+    assert {defect["id"] for defect in gate["defects"]} == {
+        "ticker_alias_fallback_noop",
+        "universe_manifest_omits_report",
+        "current_state_ignores_fracture_flag",
+    }
+    assert gate["audit_marker_checks"]["ignores the emitted fracture state"] is True
+
+    guarded = next(
+        row for row in payload["ranking"] if row["id"] == "guarded_market_research"
+    )
+    audit_check = next(
+        check
+        for check in guarded["evidence_checks"]
+        if check["path"] == "docs/WHITEHOLE_WHITEHOLELAB_AUDIT_2026-08-02.md"
+    )
+    assert audit_check["valid"] is True
+    assert "alpha" in audit_check["claim_scope"]
+
+
+def test_whiteholelab_remediation_rejects_stale_audit(tmp_path, monkeypatch):
+    module = load_module()
+    audit = tmp_path / "docs" / "WHITEHOLE_WHITEHOLELAB_AUDIT_2026-08-02.md"
+    audit.parent.mkdir(parents=True)
+    audit.write_text("incomplete audit", encoding="utf-8")
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    monkeypatch.setattr(module, "WHITEHOLE_AUDIT", audit)
+
+    gate = module.build_whiteholelab_remediation_gate()
+
+    assert gate["status"] == "BLOCKED_AUDIT_MISSING_OR_STALE"
+    assert gate["audit_current"] is False
+    assert gate["promotion_gate_passed"] is False
+
+
 def test_priority_engine_blocks_stale_feed_language():
     module = load_module()
     module.HEALTHCARE_FEED = module.MINDWISE_DEMO_FEED
@@ -199,6 +362,97 @@ def test_priority_engine_blocks_stale_feed_language():
     assert feed["status"] == "stale_or_unverifiable"
     assert feed["freshness_label_allowed"] is False
     assert "current-feed language until the candidate feed is refreshed within the freshness SLA" in payload["claim_controls"]["blocked_now"]
+
+
+def test_hypercore_lane_is_registered_and_requires_external_buyer_validation(
+    tmp_path, monkeypatch
+):
+    module = load_module()
+    stage_hypercore_evidence(tmp_path, include_preflight_receipt=True)
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    config = module.read_json(ROOT / "config" / "product_lane_priority_v1.json")
+    lane_config = next(
+        row
+        for row in config["lanes"]
+        if row["id"] == "hypercore_readonly_resilience_evaluation"
+    )
+    ranked = module.rank_lanes(
+        {"weights": config["weights"], "lanes": [lane_config]},
+        datetime(2026, 8, 2, 12, tzinfo=timezone.utc),
+    )
+    lane = next(
+        row
+        for row in ranked
+        if row["id"] == "hypercore_readonly_resilience_evaluation"
+    )
+
+    assert lane["internal_evidence_gate_passed"] is True
+    assert lane["buyer_readiness_gate"]["passed"] is False
+    assert (
+        lane["buyer_readiness_gate"]["status"]
+        == "requires_external_buyer_validation"
+    )
+    assert lane["validated_evidence_count"] == 6
+    assert lane["required_evidence_count"] == 6
+    assert lane["validated_evidence_coverage"] == 1.0
+    assert (
+        lane["evidence_checks"][-1]["path"]
+        == "dashboard/evidence/hypercore/HYPERCORE_V8_SYNTHETIC_PREFLIGHT_2026-08-02.json"
+    )
+    assert lane["evidence_checks"][-1]["valid"] is True
+    assert "realized energy, outage, or operating savings" in lane["blocked_claims"]
+
+    protocol = json.loads(
+        (tmp_path / "config" / "hypercore_v8_validation_protocol_v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert protocol["schema"] == "hypercore_v8_validation_protocol_v1"
+    assert protocol["status"] == (
+        "draft_runner_implemented_synthetic_preflight_only_buyer_source_required"
+    )
+    assert "custody anchor only" in protocol["lineage"]["v7_role"]
+    assert protocol["chronology"]["minimum_blocked_walk_forward_folds"] == 5
+    assert (
+        protocol["required_falsification"]["minimum_seeded_replicates_per_null"]
+        == 999
+    )
+    assert (
+        "risk_forecast_v9_only_unless_v8_emits_probabilities"
+        in protocol["required_metrics"]
+    )
+    assert (
+        protocol["promotion_gates"][
+            "incident_clustered_bootstrap_confidence_level"
+        ]
+        == 0.95
+    )
+    assert protocol["promotion_gates"]["underpowered_result_status"] == (
+        "descriptive_only"
+    )
+    assert protocol["commercial_boundary"]["external_send_allowed"] is False
+    assert protocol["promotion_gates"]["independent_reproduction_required_for_external_validation"] is True
+
+
+def test_hypercore_lane_fails_closed_without_preflight_receipt(tmp_path, monkeypatch):
+    module = load_module()
+    stage_hypercore_evidence(tmp_path, include_preflight_receipt=False)
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    config = module.read_json(ROOT / "config" / "product_lane_priority_v1.json")
+    lane_config = next(
+        row
+        for row in config["lanes"]
+        if row["id"] == "hypercore_readonly_resilience_evaluation"
+    )
+
+    lane = module.rank_lanes(
+        {"weights": config["weights"], "lanes": [lane_config]},
+        datetime(2026, 8, 2, 12, tzinfo=timezone.utc),
+    )[0]
+
+    assert lane["internal_evidence_gate_passed"] is False
+    assert lane["evidence_checks"][-1]["valid"] is False
+    assert "artifact_missing" in lane["evidence_checks"][-1]["reasons"]
 
 
 def test_mindwise_pilot_keeps_final_submission_human_controlled():
@@ -223,6 +477,58 @@ def test_mindwise_pilot_keeps_final_submission_human_controlled():
     )
     assert payload["pilot_protocol_receipts"]["golden_replay_verified"] is True
     assert "guaranteed awards or autonomous final submission" in payload["claim_controls"]["blocked_now"]
+
+
+def test_mindwise_reactivation_draft_uses_bounded_paid_entry_offer():
+    module = load_module()
+    payload = module.build_payload(datetime(2026, 8, 2, tzinfo=timezone.utc))
+    pilot = payload["mindwise_pilot"]
+    offer = pilot["commercial_entry_offer"]
+    draft = module.render_mindwise_email(payload)
+
+    assert offer["duration"] == "10 business days"
+    assert offer["candidate_fixed_fee_usd"] == 3500
+    assert offer["candidate_kickoff_deposit_usd"] == 1750
+    assert offer["candidate_delivery_balance_usd"] == 1750
+    assert offer["price_status"] == "candidate_not_committed"
+    assert offer["external_send_allowed"] is False
+    assert offer["buyer_price_acceptance_proven"] is False
+    assert offer["buyer_state"] == (
+        "historical_warm_reactivation_candidate_recent_interest_unconfirmed"
+    )
+    assert len(offer["deliverables"]) == 5
+    assert "EXACT SEND AND PRICE APPROVAL REQUIRED" in draft
+    assert "Hi [Authorized MindWise contact]" in draft
+    assert "paid proof sprint lasting 10 business days" in draft
+    assert "candidate fixed fee is $3,500" in draft
+    assert "$1,750 kickoff deposit" in draft
+    assert "$1,750 on delivery" in draft
+    assert "not committed" in draft
+    assert "no PHI or credentials" in draft
+    assert "no autonomous certifications or submissions" in draft
+    assert "30-day pilot" in draft
+    assert "next week" not in draft.lower()
+    assert "guaranteed" not in draft.lower()
+
+
+def test_candidate_commercial_terms_fail_closed(monkeypatch):
+    module = load_module()
+    valid = module.read_json(module.HYPERCORE_PROTOCOL)
+
+    monkeypatch.setattr(module, "read_json", lambda path: valid)
+    terms = module.load_candidate_commercial_terms()
+    assert terms["candidate_fixed_fee_usd"] == 3500
+    assert terms["external_send_allowed"] is False
+
+    unsafe = deepcopy(valid)
+    unsafe["commercial_boundary"]["external_send_allowed"] = True
+    monkeypatch.setattr(module, "read_json", lambda path: unsafe)
+    try:
+        module.load_candidate_commercial_terms()
+    except ValueError as exc:
+        assert "fail closed" in str(exc)
+    else:
+        raise AssertionError("Unsafe external-send state must fail closed")
 
 
 def test_golden_replay_is_deterministic_and_tamper_evident():
@@ -269,13 +575,41 @@ def test_bundle_manifest_receipts_are_complete_and_bounded():
     manifest = module.build_bundle_manifest(payload)
 
     assert manifest["schema"] == "product_lane_priority_bundle_manifest_v1"
-    assert manifest["artifact_count"] == 14
+    assert manifest["artifact_count"] == 17
     assert manifest["all_artifacts_present"] is True
     assert all(len(item["sha256"]) == 64 for item in manifest["artifacts"])
+    assert any(
+        item["path"]
+        == "dashboard/evidence/hypercore/HYPERCORE_V8_SYNTHETIC_PREFLIGHT_2026-08-02.json"
+        for item in manifest["artifacts"]
+    )
+    assert all(
+        not item["path"].startswith(("out/", "clean_data/", "data/"))
+        for item in manifest["artifacts"]
+    )
+    assert len(manifest["excluded_local_only_inputs"]) == 5
+    assert "non-versioned local historical inputs" in manifest[
+        "public_reproducibility_status"
+    ]
     assert "byte identity and presence only" in manifest["boundary"]
     unsealed = dict(manifest)
     receipt = unsealed.pop("manifest_payload_sha256")
     assert module.stable_hash(unsealed) == receipt
+
+
+def test_latest_aliases_match_current_payload_and_manifest(tmp_path, monkeypatch):
+    module = load_module()
+    latest_payload = tmp_path / "out" / "ops" / "priority_latest.json"
+    latest_manifest = tmp_path / "out" / "ops" / "manifest_latest.json"
+    monkeypatch.setattr(module, "LATEST_OUT_JSON", latest_payload)
+    monkeypatch.setattr(module, "LATEST_BUNDLE_MANIFEST", latest_manifest)
+    payload = {"schema": "product_lane_priority_engine_v1", "rank": 1}
+    manifest = {"schema": "product_lane_priority_bundle_manifest_v1", "count": 1}
+
+    module.write_latest_aliases(payload, manifest)
+
+    assert json.loads(latest_payload.read_text(encoding="utf-8")) == payload
+    assert json.loads(latest_manifest.read_text(encoding="utf-8")) == manifest
 
 
 def test_mindwise_demo_feed_is_frozen_and_claim_bounded():

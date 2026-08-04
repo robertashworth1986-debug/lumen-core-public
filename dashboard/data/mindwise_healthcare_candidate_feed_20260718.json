@@ -1,12 +1,45 @@
 {
   "boundary": "Frozen demonstration snapshot from a source-linked candidate feed. Scores and queue labels reflect configured relevance and urgency only; they do not establish organizational eligibility, current requirements, submission readiness, or award probability.",
-  "generated_utc": "2026-07-29T08:51:44.481162+00:00",
+  "generated_utc": "2026-08-02T11:34:40.762536+00:00",
   "records": [
     {
       "abstention_reason": "Official-source eligibility, current deadline, amendments, submission route, and organization authority are not verified.",
       "action": "URGENT_REVIEW",
+      "agency": "Health Resources and Services Administration",
+      "days_to_close": 4,
+      "deadline_actionable": false,
+      "deadline_verified_utc": null,
+      "eligibility_status": "UNVERIFIED_REQUIRES_OFFICIAL_SOURCE_REVIEW",
+      "id": "362831",
+      "links": {
+        "alternate_review_urls": [
+          "https://simpler.grants.gov/search?query=HRSA-26-046",
+          "https://www.grants.gov/search-results-detail/362831"
+        ],
+        "grant_console_query": "?opp=HRSA-26-046",
+        "official_source_review_url": "https://www.grants.gov/search-results-detail/362831",
+        "review_route": "grants_gov_detail",
+        "source_url": "https://www.grants.gov/search-results-detail/362831"
+      },
+      "number": "HRSA-26-046",
+      "rank": 1,
+      "scores": {
+        "composite": 86.95,
+        "funding": 100.0,
+        "healthcare": 100.0,
+        "scientific": 33.0,
+        "urgency": 90.0
+      },
+      "source_sha256": "a918dbb4efe3feeaa478684f9db2e6971647427922dee29cf8c43e5349d38d40",
+      "status": "posted",
+      "submission_authorized": false,
+      "title": "Small Health Care Provider Quality Improvement Program"
+    },
+    {
+      "abstention_reason": "Official-source eligibility, current deadline, amendments, submission route, and organization authority are not verified.",
+      "action": "URGENT_REVIEW",
       "agency": "Administration for Community Living",
-      "days_to_close": 7,
+      "days_to_close": 3,
       "deadline_actionable": false,
       "deadline_verified_utc": null,
       "eligibility_status": "UNVERIFIED_REQUIRES_OFFICIAL_SOURCE_REVIEW",
@@ -22,15 +55,15 @@
         "source_url": "https://www.grants.gov/search-results-detail/362021"
       },
       "number": "HHS-2026-ACL-NIDILRR-DPHF-0225",
-      "rank": 1,
+      "rank": 2,
       "scores": {
-        "composite": 80.25,
+        "composite": 83.25,
         "funding": 100.0,
         "healthcare": 88.2,
         "scientific": 19.8,
-        "urgency": 90.0
+        "urgency": 100.0
       },
-      "source_sha256": "ad2a6e7f73721834427c98553f3dbb08c8b57ee5878084ae247ad096c8e96351",
+      "source_sha256": "d2c6d798aa877834d7716b48632571531985b0f680792ae173a56bbe0de8ed85",
       "status": "posted",
       "submission_authorized": false,
       "title": "Disability and Rehabilitation Research Projects (DRRP) Program: Research on Resilience and Positive Mental Health Outcomes Among People with Spinal Cord Injury"
@@ -39,7 +72,7 @@
       "abstention_reason": "Official-source eligibility, current deadline, amendments, submission route, and organization authority are not verified.",
       "action": "URGENT_REVIEW",
       "agency": "Centers for Disease Control - NCCDPHP",
-      "days_to_close": 5,
+      "days_to_close": 1,
       "deadline_actionable": false,
       "deadline_verified_utc": null,
       "eligibility_status": "UNVERIFIED_REQUIRES_OFFICIAL_SOURCE_REVIEW",
@@ -55,24 +88,57 @@
         "source_url": "https://www.grants.gov/search-results-detail/363051"
       },
       "number": "CDC-RFA-DP-26-0233",
-      "rank": 2,
+      "rank": 3,
       "scores": {
-        "composite": 72.77,
-        "funding": 20.0,
-        "healthcare": 98.8,
+        "composite": 77.875,
+        "funding": 28.75,
+        "healthcare": 100.0,
         "scientific": 0.0,
-        "urgency": 90.0
+        "urgency": 100.0
       },
-      "source_sha256": "76c4f325ce44233c05d3fc88bbdc2fef2e7dd3cd8ab9f6e32728586dc6ed461a",
+      "source_sha256": "f7f8c53ae1066a9878a616ae14b64c35d9f8019cdc4a393c086cad8685226fcc",
       "status": "posted",
       "submission_authorized": false,
       "title": "Great Health for America"
     },
     {
       "abstention_reason": "Official-source eligibility, current deadline, amendments, submission route, and organization authority are not verified.",
+      "action": "ACTIVE_REVIEW",
+      "agency": "Administration for Children & Families - ACYF/FYSB",
+      "days_to_close": 15,
+      "deadline_actionable": false,
+      "deadline_verified_utc": null,
+      "eligibility_status": "UNVERIFIED_REQUIRES_OFFICIAL_SOURCE_REVIEW",
+      "id": "361987",
+      "links": {
+        "alternate_review_urls": [
+          "https://simpler.grants.gov/search?query=HHS-2026-ACF-ACYF-AT-0015",
+          "https://www.grants.gov/search-results-detail/361987"
+        ],
+        "grant_console_query": "?opp=HHS-2026-ACF-ACYF-AT-0015",
+        "official_source_review_url": "https://www.grants.gov/search-results-detail/361987",
+        "review_route": "grants_gov_detail",
+        "source_url": "https://www.grants.gov/search-results-detail/361987"
+      },
+      "number": "HHS-2026-ACF-ACYF-AT-0015",
+      "rank": 4,
+      "scores": {
+        "composite": 76.945,
+        "funding": 100.0,
+        "healthcare": 100.0,
+        "scientific": 36.3,
+        "urgency": 55.0
+      },
+      "source_sha256": "1763b146581bcadbd3113f0c555344206e3e0462ba1d36b8e8f266c8b78375d6",
+      "status": "posted",
+      "submission_authorized": false,
+      "title": "Tribal Personal Responsibility Education Program (Tribal PREP)"
+    },
+    {
+      "abstention_reason": "Official-source eligibility, current deadline, amendments, submission route, and organization authority are not verified.",
       "action": "URGENT_REVIEW",
       "agency": "Administration for Community Living",
-      "days_to_close": 5,
+      "days_to_close": 1,
       "deadline_actionable": false,
       "deadline_verified_utc": null,
       "eligibility_status": "UNVERIFIED_REQUIRES_OFFICIAL_SOURCE_REVIEW",
@@ -88,127 +154,61 @@
         "source_url": "https://www.grants.gov/search-results-detail/362111"
       },
       "number": "HHS-2026-ACL-AOA-ADPI-0031",
-      "rank": 3,
+      "rank": 5,
       "scores": {
-        "composite": 66.37,
+        "composite": 69.37,
         "funding": 20.0,
         "healthcare": 82.8,
         "scientific": 0.0,
-        "urgency": 90.0
+        "urgency": 100.0
       },
-      "source_sha256": "cfa73378477631156e34401a23ae97c3e3f60ad8c016737c31fddf063a680ec4",
+      "source_sha256": "f9eba4d11b0a45b1eae8b4e7751220052f417f54cd8a251dd3096e4f144c1f27",
       "status": "posted",
       "submission_authorized": false,
       "title": "Alzheimer's Disease Programs Initiative (ADPI) - Dementia Capable Community Health Worker Programs"
     },
     {
       "abstention_reason": "Official-source eligibility, current deadline, amendments, submission route, and organization authority are not verified.",
-      "action": "URGENT_REVIEW",
-      "agency": "Administration for Community Living",
-      "days_to_close": 0,
-      "deadline_actionable": false,
-      "deadline_verified_utc": null,
-      "eligibility_status": "UNVERIFIED_REQUIRES_OFFICIAL_SOURCE_REVIEW",
-      "id": "360506",
-      "links": {
-        "alternate_review_urls": [
-          "https://simpler.grants.gov/search?query=HHS-2026-ACL-AOA-FPSG-0004",
-          "https://www.grants.gov/search-results-detail/360506"
-        ],
-        "grant_console_query": "?opp=HHS-2026-ACL-AOA-FPSG-0004",
-        "official_source_review_url": "https://www.grants.gov/search-results-detail/360506",
-        "review_route": "grants_gov_detail",
-        "source_url": "https://www.grants.gov/search-results-detail/360506"
-      },
-      "number": "HHS-2026-ACL-AOA-FPSG-0004",
-      "rank": 4,
-      "scores": {
-        "composite": 65.475,
-        "funding": 100.0,
-        "healthcare": 45.0,
-        "scientific": 16.5,
-        "urgency": 100.0
-      },
-      "source_sha256": "ffb8c3db60c69d002ce71b458273888592a1ef006e9175cfde55779fa4b0e47c",
-      "status": "posted",
-      "submission_authorized": false,
-      "title": "Scaling Evidence-Based Falls Prevention Programs"
-    },
-    {
-      "abstention_reason": "Official-source eligibility, current deadline, amendments, submission route, and organization authority are not verified.",
       "action": "ACTIVE_REVIEW",
-      "agency": "Centers for Disease Control-GHC",
-      "days_to_close": 16,
+      "agency": "Administration for Children & Families - ACYF/FYSB",
+      "days_to_close": 15,
       "deadline_actionable": false,
       "deadline_verified_utc": null,
       "eligibility_status": "UNVERIFIED_REQUIRES_OFFICIAL_SOURCE_REVIEW",
-      "id": "360341",
+      "id": "361929",
       "links": {
         "alternate_review_urls": [
-          "https://simpler.grants.gov/search?query=CDC-RFA-JG-26-0055",
-          "https://www.grants.gov/search-results-detail/360341"
+          "https://simpler.grants.gov/search?query=HHS-2026-ACF-ACYF-AK-0014",
+          "https://www.grants.gov/search-results-detail/361929"
         ],
-        "grant_console_query": "?opp=CDC-RFA-JG-26-0055",
-        "official_source_review_url": "https://www.grants.gov/search-results-detail/360341",
+        "grant_console_query": "?opp=HHS-2026-ACF-ACYF-AK-0014",
+        "official_source_review_url": "https://www.grants.gov/search-results-detail/361929",
         "review_route": "grants_gov_detail",
-        "source_url": "https://www.grants.gov/search-results-detail/360341"
+        "source_url": "https://www.grants.gov/search-results-detail/361929"
       },
-      "number": "CDC-RFA-JG-26-0055",
-      "rank": 5,
-      "scores": {
-        "composite": 64.375,
-        "funding": 28.75,
-        "healthcare": 100.0,
-        "scientific": 0.0,
-        "urgency": 55.0
-      },
-      "source_sha256": "f4739e3e79bdf28a8cee874f87295edec429710e3440ca73cb6f76c1f1bdbb7c",
-      "status": "posted",
-      "submission_authorized": false,
-      "title": "Sustaining Global Health Security to protect and improve public health in Kenya"
-    },
-    {
-      "abstention_reason": "Official-source eligibility, current deadline, amendments, submission route, and organization authority are not verified.",
-      "action": "ACTIVE_REVIEW",
-      "agency": "Centers for Disease Control-GHC",
-      "days_to_close": 16,
-      "deadline_actionable": false,
-      "deadline_verified_utc": null,
-      "eligibility_status": "UNVERIFIED_REQUIRES_OFFICIAL_SOURCE_REVIEW",
-      "id": "360331",
-      "links": {
-        "alternate_review_urls": [
-          "https://simpler.grants.gov/search?query=CDC-RFA-JG-26-0044",
-          "https://www.grants.gov/search-results-detail/360331"
-        ],
-        "grant_console_query": "?opp=CDC-RFA-JG-26-0044",
-        "official_source_review_url": "https://www.grants.gov/search-results-detail/360331",
-        "review_route": "grants_gov_detail",
-        "source_url": "https://www.grants.gov/search-results-detail/360331"
-      },
-      "number": "CDC-RFA-JG-26-0044",
+      "number": "HHS-2026-ACF-ACYF-AK-0014",
       "rank": 6,
       "scores": {
-        "composite": 62.75,
-        "funding": 20.0,
-        "healthcare": 100.0,
+        "composite": 68.94,
+        "funding": 100.0,
+        "healthcare": 93.6,
         "scientific": 0.0,
         "urgency": 55.0
       },
-      "source_sha256": "aa8d1824ace993589e906c8e586f3183f9616a9d103b4b3440bccf9a7501758d",
+      "source_sha256": "24789cef78613309c77c2fe39f960cd2b4b24a5b12c8b5277cfd8faf673a9cff",
       "status": "posted",
       "submission_authorized": false,
-      "title": "Strengthening public health efforts to protect and improve health in the Democratic Republic of the Congo (DRC)"
+      "title": "Competitive Personal Responsibility Education Program"
     }
   ],
   "schema": "mindwise_healthcare_candidate_feed_demo_v1",
-  "snapshot_payload_sha256": "6851b763d7a7d602978ca78887a50d704673b0bccbc9644c275bb4889be9a96b",
+  "snapshot_payload_sha256": "0eddeb31334201b8849a095d42259df20114905836954bc420221e1679e87885",
   "source": {
-    "healthcare_engine_generated_utc": "2026-07-29T08:51:44.345135+00:00",
+    "healthcare_engine_generated_utc": "2026-08-02T11:34:40.531677+00:00",
     "healthcare_engine_metrics": {
-      "n_scanned": 496,
-      "n_scored": 23,
-      "n_selected": 23
+      "n_scanned": 497,
+      "n_scored": 38,
+      "n_selected": 38
     },
     "healthcare_engine_scope": {
       "expiring_within_days": 45,
