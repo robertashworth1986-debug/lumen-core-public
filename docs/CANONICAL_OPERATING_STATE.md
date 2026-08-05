@@ -102,3 +102,13 @@ Otherwise, update the backlog note and stop.
 ## Immediate decision
 
 The next founder-facing action is review of the **issued EPRI Open Power AI Consortium MOU**. The next repository action is a bounded independent execution of the **PR #64** package followed by an immutable third-party receipt. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized.
+
+## Clean-checkout protocol gate
+
+The repository-wide test harness distinguishes ordinary clean-checkout checks
+from four explicitly named publication or retained-artifact checks. Missing
+generated evidence is never treated as a passing validation result: those four
+checks are marked artifact-dependent only until their declared files exist.
+The authoritative reviewer workflow still generates its publications and then
+runs the same checks without skips. The 30-file frozen CODECHECK source identity
+remains byte-identical to the reviewed commit.
