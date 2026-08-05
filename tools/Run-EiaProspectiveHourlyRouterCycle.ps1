@@ -10,9 +10,11 @@ $RepoRoot = Split-Path -Parent $PSScriptRoot
 $Runner = Join-Path $RepoRoot "code\eia_grid_prospective_hourly_router.py"
 $OutputDir = Join-Path $RepoRoot "out\eia_grid_prospective_hourly_router"
 $SchedulerOutput = Join-Path $OutputDir "scheduler_cycle_latest.json"
-$SchedulerOutputTemp = Join-Path $OutputDir "scheduler_cycle_latest.json.tmp"
-$SchedulerStderrTemp = Join-Path $OutputDir "scheduler_stderr_latest.log.tmp"
+$SchedulerStderr = Join-Path $OutputDir "scheduler_stderr_latest.log"
 $SchedulerErrors = Join-Path $OutputDir "scheduler_errors.log"
+$RunToken = "{0}_{1}" -f [DateTime]::UtcNow.ToString("yyyyMMddTHHmmssfffZ"), $PID
+$SchedulerOutputTemp = Join-Path $OutputDir ("scheduler_cycle_latest.json.{0}.tmp" -f $RunToken)
+$SchedulerStderrTemp = Join-Path $OutputDir ("scheduler_stderr_latest.log.{0}.tmp" -f $RunToken)
 $Arguments = @($Runner, "--timeout", $TimeoutSeconds)
 
 $UserEiaKey = [Environment]::GetEnvironmentVariable("EIA_API_KEY", "User")
@@ -40,8 +42,6 @@ New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 Push-Location $RepoRoot
 try {
     if ($Quiet) {
-        Remove-Item -LiteralPath $SchedulerOutputTemp -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath $SchedulerStderrTemp -Force -ErrorAction SilentlyContinue
         & $PythonExe @Arguments 1> $SchedulerOutputTemp 2> $SchedulerStderrTemp
         $ExitCode = $LASTEXITCODE
         if ($ExitCode -eq 0) {
@@ -68,6 +68,7 @@ catch {
     $CapturedStderr = ""
     if (Test-Path -LiteralPath $SchedulerStderrTemp) {
         $CapturedStderr = (Get-Content -LiteralPath $SchedulerStderrTemp -Raw).Trim()
+        Copy-Item -LiteralPath $SchedulerStderrTemp -Destination $SchedulerStderr -Force -ErrorAction SilentlyContinue
     }
     $FailureRecord = @(
         "[$Stamp] prospective hourly router cycle failed"
@@ -78,10 +79,17 @@ catch {
         $FailureRecord += "--- captured stderr ---"
         $FailureRecord += $CapturedStderr
     }
-    ($FailureRecord -join [Environment]::NewLine) |
-        Out-File -FilePath $SchedulerErrors -Encoding utf8 -Append
+    try {
+        ($FailureRecord -join [Environment]::NewLine) |
+            Out-File -FilePath $SchedulerErrors -Encoding utf8 -Append
+    }
+    catch {
+        [Console]::Error.WriteLine("Unable to append the router failure receipt: $($_.Exception.Message)")
+    }
     throw
 }
 finally {
     Pop-Location
+    Remove-Item -LiteralPath $SchedulerOutputTemp -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $SchedulerStderrTemp -Force -ErrorAction SilentlyContinue
 }

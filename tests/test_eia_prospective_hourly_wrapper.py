@@ -12,8 +12,9 @@ def wrapper_text() -> str:
 def test_quiet_run_uses_atomic_success_output_and_separate_stderr() -> None:
     text = wrapper_text()
 
-    assert 'scheduler_cycle_latest.json.tmp' in text
-    assert 'scheduler_stderr_latest.log.tmp' in text
+    assert '$RunToken =' in text
+    assert 'scheduler_cycle_latest.json.{0}.tmp' in text
+    assert 'scheduler_stderr_latest.log.{0}.tmp' in text
     assert '1> $SchedulerOutputTemp 2> $SchedulerStderrTemp' in text
     assert (
         'Move-Item -LiteralPath $SchedulerOutputTemp '
@@ -29,6 +30,10 @@ def test_failure_preserves_last_good_cycle_and_logs_captured_stderr() -> None:
 
     failure_block = text[text.index('if ($ExitCode -ne 0)') :]
     assert 'Get-Content -LiteralPath $SchedulerStderrTemp -Raw' in failure_block
+    assert (
+        'Copy-Item -LiteralPath $SchedulerStderrTemp -Destination $SchedulerStderr '
+        '-Force -ErrorAction SilentlyContinue'
+    ) in failure_block
     assert 'failed with exit code $ExitCode. $Stderr' in failure_block
     assert 'Move-Item -LiteralPath $SchedulerOutputTemp' not in failure_block.split(
         'catch {'
@@ -42,3 +47,11 @@ def test_python_path_is_validated_before_execution() -> None:
     execution = '& $PythonExe @Arguments'
     assert validation in text
     assert text.index(validation) < text.index(execution)
+
+
+def test_failure_logging_cannot_hide_the_original_error() -> None:
+    text = wrapper_text()
+
+    assert 'Unable to append the router failure receipt' in text
+    assert 'Remove-Item -LiteralPath $SchedulerOutputTemp -Force -ErrorAction SilentlyContinue' in text
+    assert 'Remove-Item -LiteralPath $SchedulerStderrTemp -Force -ErrorAction SilentlyContinue' in text
