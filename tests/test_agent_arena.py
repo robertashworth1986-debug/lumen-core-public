@@ -11,105 +11,159 @@ if str(CODE) not in sys.path:
 
 from agent_arena import (
     EVIDENCE_BOUNDARY,
+    _floor_from_config,
     canonical_json,
     load_config,
+    merkle_root,
+    paired_statistics,
     run_arena,
     run_floor,
+    select_champion,
     sha256_text,
     verify_bundle,
 )
 
 
-class AgentArenaTests(unittest.TestCase):
+class AgentArenaV5Tests(unittest.TestCase):
     def setUp(self):
-        self.config = ROOT / "config" / "agent_arena_v1.json"
+        self.config_path = ROOT / "config" / "agent_arena_v5.json"
 
-    def test_config_is_locked_and_has_one_holdout(self):
-        config = load_config(self.config)
-        self.assertEqual(config["evidence_boundary"], EVIDENCE_BOUNDARY)
-        self.assertEqual(sum(bool(x["holdout"]) for x in config["floors"]), 1)
-        self.assertEqual(len(config["agent_roles"]), 5)
-        self.assertGreaterEqual(len(config["seeds"]), 10)
+    def test_v2_to_v5_capabilities_are_locked(self):
+        cfg = load_config(self.config_path)
+        self.assertEqual(cfg["evidence_boundary"], EVIDENCE_BOUNDARY)
+        self.assertEqual(set(cfg["capability_stages"]), {"v2", "v3", "v4", "v5"})
+        self.assertEqual(len(cfg["agent_roles"]), 7)
+        self.assertGreaterEqual(len(cfg["candidate_profiles"]), 4)
+        self.assertGreaterEqual(sum(bool(x["holdout"]) for x in cfg["floors"]), 2)
+        self.assertTrue(set(cfg["selection_seeds"]).isdisjoint(cfg["holdout_seeds"]))
 
-    def test_arena_writes_and_verifies_hash_chained_bundle(self):
+    def test_full_arena_writes_and_verifies_v5_bundle(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             out = Path(temp_dir)
-            result = run_arena(
+            summary = run_arena(
                 out_dir=out,
-                config_path=self.config,
-                generated_utc="2026-08-06T00:00:00+00:00",
+                config_path=self.config_path,
+                generated_utc="2026-08-06T23:00:00+00:00",
             )
-            self.assertEqual(result["evidence_boundary"], EVIDENCE_BOUNDARY)
-            self.assertIn("locked_baseline", result["aggregate"])
-            self.assertIn("specialist_team_with_red_team", result["aggregate"])
-            self.assertEqual(len(result["event_chain_root_sha256"]), 64)
-            self.assertTrue((out / "manifest.sha256.json").is_file())
+            self.assertIn(summary["champion_profile"], summary["selection_summary"])
+            self.assertEqual(summary["holdout_statistics"]["paired_trials"], 16)
+            self.assertEqual(len(summary["event_chain_root_sha256"]), 64)
+            self.assertEqual(len(summary["event_merkle_root_sha256"]), 64)
+            self.assertTrue((out / "execution_receipt.json").is_file())
             verified = verify_bundle(out)
             self.assertEqual(verified["status"], "VERIFIED")
-            self.assertGreater(verified["event_lines"], 10)
+            self.assertEqual(verified["champion_profile"], summary["champion_profile"])
+            self.assertGreaterEqual(summary["oracle_regret"]["score_regret_mean"], 0.0)
 
-    def test_same_lock_and_timestamp_are_reproducible_except_git_identity(self):
+    def test_deterministic_core_replays_identically(self):
         with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
             a = run_arena(
-                out_dir=Path(first),
-                config_path=self.config,
-                generated_utc="2026-08-06T00:00:00+00:00",
+                Path(first),
+                self.config_path,
+                generated_utc="2026-08-06T23:00:00+00:00",
             )
             b = run_arena(
-                out_dir=Path(second),
-                config_path=self.config,
-                generated_utc="2026-08-06T00:00:00+00:00",
+                Path(second),
+                self.config_path,
+                generated_utc="2026-08-06T23:00:00+00:00",
             )
-            a = dict(a)
-            b = dict(b)
-            a.pop("git_commit", None)
-            b.pop("git_commit", None)
-            self.assertEqual(canonical_json(a), canonical_json(b))
-            self.assertEqual(
-                (Path(first) / "events.jsonl").read_bytes(),
-                (Path(second) / "events.jsonl").read_bytes(),
-            )
+            self.assertEqual(a["champion_profile"], b["champion_profile"])
+            self.assertEqual(a["event_chain_root_sha256"], b["event_chain_root_sha256"])
+            self.assertEqual(a["event_merkle_root_sha256"], b["event_merkle_root_sha256"])
+            self.assertEqual((Path(first) / "events.jsonl").read_bytes(), (Path(second) / "events.jsonl").read_bytes())
 
-    def test_tampering_fails_closed(self):
+    def test_manifest_tampering_fails_closed(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             out = Path(temp_dir)
-            run_arena(
-                out_dir=out,
-                config_path=self.config,
-                generated_utc="2026-08-06T00:00:00+00:00",
-            )
+            run_arena(out, self.config_path, generated_utc="2026-08-06T23:00:00+00:00")
             summary = out / "summary.json"
             summary.write_text(summary.read_text(encoding="utf-8") + " ", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "byte-count mismatch|sha256 mismatch"):
                 verify_bundle(out)
 
-    def test_malformed_external_agent_proposal_fails_closed(self):
-        config = load_config(self.config)
-        from agent_arena import _floor_from_config
+    def test_execution_receipt_tampering_fails_closed(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            out = Path(temp_dir)
+            run_arena(out, self.config_path, generated_utc="2026-08-06T23:00:00+00:00")
+            receipt_path = out / "execution_receipt.json"
+            receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+            receipt["champion_profile"] = "forged"
+            receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "execution receipt hash mismatch|custody mismatch"):
+                verify_bundle(out)
 
-        floor = _floor_from_config(config["floors"][0])
+    def test_nan_agent_proposal_fails_closed(self):
+        cfg = load_config(self.config_path)
+        floor = _floor_from_config(next(x for x in cfg["floors"] if not x["holdout"]))
 
         def malicious(role, observation, bounds):
-            if role == "router":
-                return {"routing": float("nan")}
-            return {}
+            return {"routing": float("nan")} if role == "router" else {}
 
         with self.assertRaisesRegex(ValueError, "must be finite"):
-            run_floor(floor, config["seeds"][0], config, malicious)
+            run_floor(floor, cfg["selection_seeds"][0], cfg, "balanced", malicious)
 
     def test_undeclared_agent_control_fails_closed(self):
-        config = load_config(self.config)
-        from agent_arena import _floor_from_config
-
-        floor = _floor_from_config(config["floors"][0])
+        cfg = load_config(self.config_path)
+        floor = _floor_from_config(next(x for x in cfg["floors"] if not x["holdout"]))
 
         def malicious(role, observation, bounds):
             return {"secret_override": 999.0}
 
         with self.assertRaisesRegex(ValueError, "undeclared controls"):
-            run_floor(floor, config["seeds"][0], config, malicious)
+            run_floor(floor, cfg["selection_seeds"][0], cfg, "balanced", malicious)
 
-    def test_event_hash_definition_is_unambiguous(self):
+    def test_champion_selection_cannot_see_holdout(self):
+        cfg = load_config(self.config_path)
+        selection_floor = _floor_from_config(next(x for x in cfg["floors"] if not x["holdout"]))
+        rows = []
+        for profile in cfg["candidate_profiles"]:
+            for seed in cfg["selection_seeds"][:3]:
+                result, _ = run_floor(selection_floor, seed, cfg, profile)
+                rows.append(result)
+        champion_a, summary_a = select_champion(rows, cfg)
+        mutated = json.loads(json.dumps(cfg))
+        for floor in mutated["floors"]:
+            if floor["holdout"]:
+                floor["demand"] = 999.0
+                floor["failure_rate"] = 0.95
+        champion_b, summary_b = select_champion(rows, mutated)
+        self.assertEqual(champion_a, champion_b)
+        self.assertEqual(canonical_json(summary_a), canonical_json(summary_b))
+
+    def test_byzantine_floor_records_trust_and_accepted_roles(self):
+        cfg = load_config(self.config_path)
+        floor = _floor_from_config(next(x for x in cfg["floors"] if x["attack_mode"] == "byzantine_controls" and not x["holdout"]))
+        result, trace = run_floor(floor, cfg["selection_seeds"][0], cfg, "robust_consensus")
+        self.assertEqual(result.attack_mode, "byzantine_controls")
+        self.assertTrue(trace["trust_scores"])
+        self.assertTrue(trace["accepted_roles"])
+        self.assertLessEqual(set(trace["accepted_roles"]), set(cfg["agent_roles"]))
+
+    def test_bootstrap_statistics_are_deterministic_and_ordered(self):
+        cfg = load_config(self.config_path)
+        floors = [_floor_from_config(x) for x in cfg["floors"] if x["holdout"]]
+        baseline = []
+        candidate = []
+        from agent_arena import baseline_result
+
+        for seed in cfg["holdout_seeds"][:3]:
+            for floor in floors:
+                baseline.append(baseline_result(floor, seed, cfg))
+                row, _ = run_floor(floor, seed, cfg, "robust_consensus")
+                candidate.append(row)
+        first = paired_statistics(baseline, candidate, cfg)
+        second = paired_statistics(baseline, candidate, cfg)
+        self.assertEqual(canonical_json(first), canonical_json(second))
+        low, high = first["score_delta"]["bootstrap_ci"]
+        self.assertLessEqual(low, high)
+
+    def test_merkle_root_is_order_sensitive(self):
+        a = [sha256_text("a"), sha256_text("b"), sha256_text("c")]
+        b = [a[1], a[0], a[2]]
+        self.assertNotEqual(merkle_root(a), merkle_root(b))
+        self.assertEqual(merkle_root(a), merkle_root(list(a)))
+
+    def test_event_hash_definition_remains_canonical(self):
         event = {"z": 1, "a": "x", "previous_event_sha256": "0" * 64}
         self.assertEqual(
             sha256_text(canonical_json(event)),
