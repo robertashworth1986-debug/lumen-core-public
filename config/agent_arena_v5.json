@@ -1,0 +1,261 @@
+{
+  "schema": "lumencore.agent_arena.v5",
+  "evidence_boundary": "Synthetic/replay software evidence only. The Arena evaluates bounded agent proposals inside a deterministic abstract infrastructure model under predeclared selection, holdout, scoring, adversarial, and custody rules. It can establish software behavior, replay reproducibility, provenance, and performance inside the declared model only; it does not establish field performance, production safety, customer savings, external validation, certification, agency endorsement, or universal superiority.",
+  "purpose": "Adversarial multi-agent validation sub-harness inside LumenCore proof-to-pilot.",
+  "capability_stages": {
+    "v2": "Adversarial telemetry corruption, role dropout, Byzantine proposal corruption, trust-weighted synthesis, and deterministic red-team challenge.",
+    "v3": "Predeclared multi-profile tournament on selection floors only, with champion lock before any holdout result is observed.",
+    "v4": "Bootstrap confidence intervals, CVaR/worst-tail statistics, win rates, and attack-mode robustness breakdowns.",
+    "v5": "Engine/provider identity hashing, SHA-256 event chain, event Merkle root, manifest verification, and self-hashed execution receipt."
+  },
+  "agent_roles": [
+    "router",
+    "thermal",
+    "resilience",
+    "efficiency",
+    "telemetry_skeptic",
+    "anomaly_hunter",
+    "planner"
+  ],
+  "selection_seeds": [
+    726001,
+    726002,
+    726003,
+    726004,
+    726005,
+    726006,
+    726007,
+    726008
+  ],
+  "holdout_seeds": [
+    827101,
+    827102,
+    827103,
+    827104,
+    827105,
+    827106,
+    827107,
+    827108
+  ],
+  "control_bounds": {
+    "routing": [1.0, 1.9],
+    "cooling": [0.1, 0.85],
+    "redundancy": [1.0, 3.2],
+    "reserve": [0.05, 0.55]
+  },
+  "baseline_plan": {
+    "routing": 1.0,
+    "cooling": 0.2,
+    "redundancy": 1.0,
+    "reserve": 0.1
+  },
+  "constraints": {
+    "service_rate_min": 0.97,
+    "latency_index_max": 1.25,
+    "energy_index_max": 1.42,
+    "thermal_index_max": 0.8,
+    "resilience_index_min": 0.93
+  },
+  "score_weights": {
+    "service_rate": 45.0,
+    "resilience_index": 25.0,
+    "latency_index": 12.0,
+    "energy_index": 8.0,
+    "thermal_index": 10.0,
+    "violation_penalty": 35.0
+  },
+  "candidate_profiles": {
+    "balanced": {
+      "trim_threshold": 0.18,
+      "deviation_sensitivity": 2.1,
+      "safety_margin": 0.025,
+      "reserve_bias": 0.0,
+      "red_team": true
+    },
+    "robust_consensus": {
+      "trim_threshold": 0.36,
+      "deviation_sensitivity": 2.9,
+      "safety_margin": 0.065,
+      "reserve_bias": 0.025,
+      "red_team": true
+    },
+    "defensive": {
+      "trim_threshold": 0.42,
+      "deviation_sensitivity": 3.2,
+      "safety_margin": 0.1,
+      "reserve_bias": 0.045,
+      "red_team": true
+    },
+    "efficiency_guarded": {
+      "trim_threshold": 0.2,
+      "deviation_sensitivity": 2.3,
+      "safety_margin": 0.01,
+      "reserve_bias": -0.01,
+      "red_team": true
+    },
+    "no_red_team_ablation": {
+      "trim_threshold": 0.18,
+      "deviation_sensitivity": 2.1,
+      "safety_margin": 0.025,
+      "reserve_bias": 0.0,
+      "red_team": false
+    }
+  },
+  "champion_selection": {
+    "mean_score_weight": 1.0,
+    "cvar10_weight": 0.25,
+    "violation_weight": 4.0
+  },
+  "statistics": {
+    "bootstrap_samples": 1200,
+    "confidence": 0.95,
+    "bootstrap_seed": 91173
+  },
+  "provider_descriptor": {
+    "provider_id": "lumencore-reference-policy",
+    "provider_type": "deterministic_rules",
+    "version": "5.0.0",
+    "temperature": 0.0,
+    "external_network": false
+  },
+  "floors": [
+    {
+      "floor_id": "F01_CONGESTION",
+      "label": "Demand congestion",
+      "demand": 96.0,
+      "capacity_loss": 0.0,
+      "ambient_heat": 0.02,
+      "failure_rate": 0.01,
+      "telemetry_noise": 0.02,
+      "attack_mode": "none",
+      "attack_strength": 0.0,
+      "compromised_roles": [],
+      "dropout_roles": [],
+      "holdout": false
+    },
+    {
+      "floor_id": "F02_THERMAL_DECEPTION",
+      "label": "Thermal pressure with heat-blind telemetry",
+      "demand": 88.0,
+      "capacity_loss": 0.02,
+      "ambient_heat": 0.22,
+      "failure_rate": 0.015,
+      "telemetry_noise": 0.035,
+      "attack_mode": "heat_blindness",
+      "attack_strength": 0.55,
+      "compromised_roles": ["efficiency", "planner"],
+      "dropout_roles": [],
+      "holdout": false
+    },
+    {
+      "floor_id": "F03_CAPACITY_DECEPTION",
+      "label": "Partial capacity loss with underreported loss",
+      "demand": 90.0,
+      "capacity_loss": 0.19,
+      "ambient_heat": 0.06,
+      "failure_rate": 0.03,
+      "telemetry_noise": 0.045,
+      "attack_mode": "hide_capacity_loss",
+      "attack_strength": 0.58,
+      "compromised_roles": ["router", "planner"],
+      "dropout_roles": [],
+      "holdout": false
+    },
+    {
+      "floor_id": "F04_ROLE_DROPOUT",
+      "label": "Fault pressure with specialist dropout",
+      "demand": 92.0,
+      "capacity_loss": 0.09,
+      "ambient_heat": 0.08,
+      "failure_rate": 0.065,
+      "telemetry_noise": 0.07,
+      "attack_mode": "hide_failures",
+      "attack_strength": 0.48,
+      "compromised_roles": ["router"],
+      "dropout_roles": ["resilience"],
+      "holdout": false
+    },
+    {
+      "floor_id": "F05_BYZANTINE",
+      "label": "Byzantine control proposal attack",
+      "demand": 98.0,
+      "capacity_loss": 0.11,
+      "ambient_heat": 0.1,
+      "failure_rate": 0.055,
+      "telemetry_noise": 0.08,
+      "attack_mode": "byzantine_controls",
+      "attack_strength": 0.88,
+      "compromised_roles": ["efficiency", "planner"],
+      "dropout_roles": [],
+      "holdout": false
+    },
+    {
+      "floor_id": "F06_MIXED_SELECTION",
+      "label": "Mixed adversarial selection floor",
+      "demand": 101.0,
+      "capacity_loss": 0.14,
+      "ambient_heat": 0.13,
+      "failure_rate": 0.07,
+      "telemetry_noise": 0.1,
+      "attack_mode": "mixed_cascade",
+      "attack_strength": 0.5,
+      "compromised_roles": ["efficiency", "planner"],
+      "dropout_roles": ["thermal"],
+      "holdout": false
+    },
+    {
+      "floor_id": "F07_HOLDOUT_CASCADE",
+      "label": "Cascading multi-constraint holdout boss",
+      "demand": 109.0,
+      "capacity_loss": 0.2,
+      "ambient_heat": 0.17,
+      "failure_rate": 0.085,
+      "telemetry_noise": 0.11,
+      "attack_mode": "mixed_cascade",
+      "attack_strength": 0.62,
+      "compromised_roles": ["router", "efficiency", "planner"],
+      "dropout_roles": ["thermal"],
+      "holdout": true
+    },
+    {
+      "floor_id": "F08_HOLDOUT_BYZANTINE",
+      "label": "Byzantine and dropout holdout boss",
+      "demand": 104.0,
+      "capacity_loss": 0.17,
+      "ambient_heat": 0.14,
+      "failure_rate": 0.09,
+      "telemetry_noise": 0.13,
+      "attack_mode": "byzantine_controls",
+      "attack_strength": 0.92,
+      "compromised_roles": ["efficiency", "anomaly_hunter", "planner"],
+      "dropout_roles": ["resilience"],
+      "holdout": true
+    }
+  ],
+  "claim_boundary": {
+    "evidence_type": "synthetic",
+    "permitted": [
+      "deterministic software behavior",
+      "replay reproducibility",
+      "hash-verifiable event provenance",
+      "holdout discipline inside the declared abstract model",
+      "performance and robustness statistics inside the declared abstract model"
+    ],
+    "not_proven": [
+      "field performance",
+      "external validation",
+      "production safety",
+      "customer savings",
+      "agency endorsement",
+      "certification",
+      "universal superiority"
+    ]
+  },
+  "next_validation_gate": "A qualified non-author evaluator pins the commit, scenario, provider identity and run protocol, independently executes and verifies the evidence bundle, and returns an immutable receipt; a paid pilot may replace the abstract environment with a buyer-approved dataset or simulator while preserving the prelocked baseline, metric, threshold, selection rule, holdout split, failure definitions and prohibited claims.",
+  "oracle_grid": {
+    "routing": 5,
+    "cooling": 5,
+    "redundancy": 5,
+    "reserve": 5
+  }
+}
