@@ -38,10 +38,22 @@
     827108
   ],
   "control_bounds": {
-    "routing": [1.0, 1.9],
-    "cooling": [0.1, 0.85],
-    "redundancy": [1.0, 3.2],
-    "reserve": [0.05, 0.55]
+    "routing": [
+      1.0,
+      1.9
+    ],
+    "cooling": [
+      0.1,
+      0.85
+    ],
+    "redundancy": [
+      1.0,
+      3.2
+    ],
+    "reserve": [
+      0.05,
+      0.55
+    ]
   },
   "baseline_plan": {
     "routing": 1.0,
@@ -143,7 +155,10 @@
       "telemetry_noise": 0.035,
       "attack_mode": "heat_blindness",
       "attack_strength": 0.55,
-      "compromised_roles": ["efficiency", "planner"],
+      "compromised_roles": [
+        "efficiency",
+        "planner"
+      ],
       "dropout_roles": [],
       "holdout": false
     },
@@ -157,7 +172,10 @@
       "telemetry_noise": 0.045,
       "attack_mode": "hide_capacity_loss",
       "attack_strength": 0.58,
-      "compromised_roles": ["router", "planner"],
+      "compromised_roles": [
+        "router",
+        "planner"
+      ],
       "dropout_roles": [],
       "holdout": false
     },
@@ -171,8 +189,12 @@
       "telemetry_noise": 0.07,
       "attack_mode": "hide_failures",
       "attack_strength": 0.48,
-      "compromised_roles": ["router"],
-      "dropout_roles": ["resilience"],
+      "compromised_roles": [
+        "router"
+      ],
+      "dropout_roles": [
+        "resilience"
+      ],
       "holdout": false
     },
     {
@@ -185,7 +207,10 @@
       "telemetry_noise": 0.08,
       "attack_mode": "byzantine_controls",
       "attack_strength": 0.88,
-      "compromised_roles": ["efficiency", "planner"],
+      "compromised_roles": [
+        "efficiency",
+        "planner"
+      ],
       "dropout_roles": [],
       "holdout": false
     },
@@ -199,8 +224,13 @@
       "telemetry_noise": 0.1,
       "attack_mode": "mixed_cascade",
       "attack_strength": 0.5,
-      "compromised_roles": ["efficiency", "planner"],
-      "dropout_roles": ["thermal"],
+      "compromised_roles": [
+        "efficiency",
+        "planner"
+      ],
+      "dropout_roles": [
+        "thermal"
+      ],
       "holdout": false
     },
     {
@@ -213,8 +243,14 @@
       "telemetry_noise": 0.11,
       "attack_mode": "mixed_cascade",
       "attack_strength": 0.62,
-      "compromised_roles": ["router", "efficiency", "planner"],
-      "dropout_roles": ["thermal"],
+      "compromised_roles": [
+        "router",
+        "efficiency",
+        "planner"
+      ],
+      "dropout_roles": [
+        "thermal"
+      ],
       "holdout": true
     },
     {
@@ -227,8 +263,14 @@
       "telemetry_noise": 0.13,
       "attack_mode": "byzantine_controls",
       "attack_strength": 0.92,
-      "compromised_roles": ["efficiency", "anomaly_hunter", "planner"],
-      "dropout_roles": ["resilience"],
+      "compromised_roles": [
+        "efficiency",
+        "anomaly_hunter",
+        "planner"
+      ],
+      "dropout_roles": [
+        "resilience"
+      ],
       "holdout": true
     }
   ],
