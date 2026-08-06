@@ -1,102 +1,175 @@
-# LumenCore Agent Arena
+# LumenCore Agent Arena V5
 
-## Role in the canonical product
+## Canonical role
 
-Agent Arena is **not a separate LumenCore product**. It is an adversarial multi-agent validation harness inside the existing proof-to-pilot architecture. Its purpose is to make an agentic system face locked scenarios, constraints, baselines, holdouts, and failure rules while a deterministic referee produces reviewer-readable evidence.
+Agent Arena is **not a separate LumenCore product**. It is the adversarial multi-agent validation sub-harness inside the existing proof-to-pilot architecture. Its job is to make an agentic candidate compete under predeclared rules while the scenario, selection split, holdout floors, baseline, referee, score function, evidence boundary, and custody system remain outside agent control.
 
-It advances the single active external-validation / paid-pilot outcome by making agent behavior testable without asking a reviewer to trust the agents' own explanations.
+The reference implementation is intentionally provider-agnostic: a deterministic policy ships with the repository for reproducibility, while the `ProposalProvider` interface can later wrap a pinned LLM, local model, optimizer, or buyer-supplied agent without granting that provider authority over scoring or evidence.
 
-## Architecture
+## V2 → V5 capability chain
 
-The reference arena separates six authorities:
+### V2 — adversarial multi-agent floor
 
-1. **Scenario lock** — freezes floors, seeds, baseline, control bounds, metric thresholds, scoring weights, claim boundary, and the holdout boss before execution.
-2. **Specialist agents** — router, thermal, resilience, efficiency, and telemetry-skeptic agents propose bounded controls from the same observation.
-3. **Synthesizer** — uses bounded median-style fusion so no single specialist can dominate the plan.
-4. **Red team** — challenges obvious under-provisioning and applies deterministic fail-closed mitigations.
-5. **Referee / environment** — evaluates both the locked baseline and candidate against ground truth. Agents cannot alter the model, constraints, weights, or result calculation.
-6. **Evidence ledger** — writes an event-level SHA-256 chain, summary, scorecard, frozen scenario copy, and manifest.
+V2 adds failure modes that are closer to real distributed-agent evaluation than a cooperative demo:
+
+- role-specific noisy telemetry;
+- underreported demand, heat, capacity loss, or failures;
+- Byzantine control proposals;
+- specialist dropout;
+- per-role trust scoring based on normalized disagreement;
+- trust-threshold filtering and weighted-median synthesis;
+- deterministic red-team checks over a robust median observation.
+
+Every attack type, strength, compromised role, and dropout role is frozen in the scenario before execution.
+
+### V3 — tournament with leakage control
+
+V3 introduces predeclared candidate profiles. All profiles compete on **selection floors and selection seeds only**. The tournament computes a locked objective from mean score, worst-tail CVaR, and violation rate, then emits a `champion_selected` event with `holdout_results_observed=false`.
+
+Only after that event is written does the harness execute the champion on the disjoint holdout seeds and holdout boss floors. This prevents post-hoc champion selection using the final test set.
+
+The reference tournament also includes a `no_red_team_ablation` profile so the contribution of the red-team stage can be compared during selection instead of merely assumed.
+
+### V4 — robustness statistics
+
+V4 makes the result distribution visible instead of promoting one favorable run:
+
+- deterministic bootstrap confidence intervals;
+- median, p10, and CVaR10 / worst-tail statistics;
+- candidate score win rate;
+- no-worse constraint-violation rate;
+- attack-mode breakdowns;
+- separate selection and holdout seed populations.
+
+The default V5 scenario uses eight selection seeds, eight disjoint holdout seeds, six selection floors, and two holdout bosses.
+
+### V5 — evidence and referee ceiling
+
+V5 binds the run to machine-verifiable identities:
+
+- exact scenario lock SHA-256;
+- engine source SHA-256;
+- provider descriptor SHA-256;
+- event-by-event predecessor hash chain;
+- event Merkle root for the complete ordered event set;
+- exact-file manifest with byte counts and SHA-256 values;
+- execution receipt containing runtime identity and manifest binding;
+- self-hash over the receipt body;
+- fail-closed verifier for manifest, event chain, Merkle root, summary custody, and execution receipt.
+
+V5 also computes a **referee-only bounded oracle ceiling** on each holdout floor. The oracle sees ground truth and searches the frozen control grid; candidate agents never see it. The report therefore shows not only candidate-vs-baseline improvement but also remaining score regret relative to a bounded ground-truth search ceiling. That prevents “better than a weak baseline” from being mistaken for “near optimal.”
+
+## Execution sequence
 
 ```text
-frozen scenario + seeds
-          |
-          v
-  noisy observation ------------------------------+
-          |                                        |
-          v                                        |
-  specialist proposals                             |
-          |                                        |
-          v                                        |
- bounded synthesizer                               |
-          |                                        |
-          v                                        |
-     red-team gate                                 |
-          |                                        |
-          +------------> candidate plan            |
-                                                   v
-locked baseline ----------------------------> deterministic referee
-                                                   |
-                                                   v
-                                       metrics + violations + score
-                                                   |
-                                                   v
-                              hash-chained events + manifest + scorecard
+                 FROZEN V5 SCENARIO
+  controls • constraints • attacks • seed split • weights
+                          |
+                          v
+              SELECTION FLOORS / SEEDS
+                          |
+       +------------------+------------------+
+       |                  |                  |
+   profile A          profile B          profile ...
+       |                  |                  |
+       +-------- adversarial agents ----------+
+                          |
+                   trust synthesis
+                          |
+                    red-team gate
+                          |
+                          v
+               deterministic referee
+                          |
+                  selection objective
+                          |
+                          v
+              CHAMPION LOCKED EVENT
+              holdout_observed = false
+                          |
+                          v
+                HOLDOUT BOSS FLOORS
+                          |
+             +------------+------------+
+             |                         |
+      locked baseline             champion
+             |                         |
+             +------------+------------+
+                          |
+                  deterministic referee
+                          |
+                          +---- referee-only oracle ceiling
+                          |
+                          v
+            bootstrap / CVaR / attack analysis
+                          |
+                          v
+       SHA-256 chain + Merkle + manifest + receipt
 ```
 
-## Dungeon progression
+## Scenario progression
 
-The v1 scenario deliberately escalates instead of using one easy benchmark:
+The frozen reference scenario currently contains six selection floors and two holdout bosses:
 
-- **F01 — Congestion:** high demand.
-- **F02 — Thermal:** demand plus ambient heat pressure.
-- **F03 — Capacity loss:** partial infrastructure loss.
-- **F04 — Telemetry:** noisy observations plus higher fault pressure.
-- **F05 — Cascade holdout boss:** demand, capacity loss, thermal pressure, faults, and telemetry uncertainty combined. This is the only holdout floor.
+1. congestion;
+2. thermal pressure with heat-blind telemetry;
+3. partial capacity loss with underreported loss;
+4. specialist dropout plus hidden fault pressure;
+5. Byzantine control proposal attack;
+6. mixed cascade selection floor;
+7. cascading multi-constraint holdout boss;
+8. Byzantine + dropout holdout boss.
 
-The holdout label is fixed in the scenario file before the run. It is not used as a post-hoc cherry-picked success case.
+The point is not to make every candidate win. The point is to make failure measurable, attributable, replayable, and difficult to explain away after the fact.
 
-## Evidence boundary
+## Evidence artifacts
 
-**Synthetic/replay software evidence only.** The Arena can support claims about deterministic software behavior, reproducibility, hash-verifiable provenance, and performance inside the declared abstract model. It does **not** establish field performance, production safety, customer savings, external validation, certification, agency endorsement, or universal superiority.
+Running the arena emits:
 
-A positive candidate delta is not a field-performance claim. It means only that the reference policy scored differently inside the locked abstract model.
+- `scenario.lock.json` — exact scenario bytes used by the run;
+- `events.jsonl` — ordered, hash-linked selection, champion-lock, holdout, and completion events;
+- `summary.json` — tournament state, holdout statistics, attack breakdown, oracle regret, identities, and claim boundary;
+- `SCORECARD.md` — compact reviewer-readable result;
+- `manifest.sha256.json` — exact byte counts and hashes for the evidence set;
+- `execution_receipt.json` — manifest-bound runtime receipt with a self-hash over its body.
 
-## Run
+## Run and verify
 
 From the repository root:
 
 ```bash
-python code/agent_arena.py run --config config/agent_arena_v1.json --out out/agent_arena
+python code/agent_arena.py run --config config/agent_arena_v5.json --out out/agent_arena
 python code/agent_arena.py verify --out out/agent_arena
 ```
 
-Outputs:
+A verifier failure is a failed evidence bundle. The implementation does not silently downgrade a broken chain, mismatched manifest, altered receipt, unexpected scenario schema, non-finite proposal, or undeclared agent control into a warning.
 
-- `scenario.lock.json` — exact scenario bytes used for the run.
-- `events.jsonl` — event-by-event hash chain with observations, proposals, red-team findings, referee ground truth, baseline result, and candidate result.
-- `summary.json` — locked configuration, aggregate metrics, paired deltas, evidence boundary, and next validation gate.
-- `SCORECARD.md` — compact reviewer-readable result.
-- `manifest.sha256.json` — byte counts and SHA-256 for every evidence artifact plus the event-chain root.
+## Provider integration contract
 
-## Model-provider integration
-
-The scoring path is provider agnostic. `run_arena()` accepts a `ProposalProvider` callable with this contract:
+The scoring path accepts a provider callable:
 
 ```text
 (role, observation, control_bounds) -> proposal mapping
 ```
 
-That provider may later wrap an LLM, local model, rules engine, optimizer, or buyer-supplied agent. The provider controls only proposed controls. It does not control scenario ground truth, bounds, constraints, score weights, hashing, the baseline, or verification.
+The provider may propose only declared control values. The engine rejects undeclared controls and non-finite values before synthesis. A future external-model run should freeze at least provider/model identity, version, inference settings, prompt or policy hash, and relevant adapter hash in the provider descriptor before execution. API keys, private prompts, credentials, and private buyer data must not be placed in the public evidence bundle.
 
-For an external-model experiment, freeze the provider identity and inference settings in a new scenario revision or an execution receipt before running. Never put API keys or private prompts in the public evidence bundle.
+## Claim boundary
 
-## Promotion path
+**Synthetic/replay software evidence only.** Agent Arena can establish deterministic software behavior, replay reproducibility, hash-verifiable provenance, holdout discipline, and performance/robustness statistics inside the declared abstract model.
 
-The high-value next step is **not** adding more dungeon floors. It is independent execution:
+It does **not** establish field performance, production safety, customer savings, certification, agency endorsement, external validation, or universal superiority.
 
-1. qualified non-author evaluator checks out the pinned commit;
-2. evaluator runs the frozen scenario and `verify` command;
-3. evaluator returns an immutable receipt with commit, scenario SHA-256, manifest SHA-256, runtime identity, and result;
-4. for a paid pilot, replace or supplement the abstract environment with the buyer's accepted dataset / simulator while keeping the baseline, metric, threshold, holdout rule, failure definitions, and prohibited claims prelocked.
+A positive holdout delta means only that the locked champion scored differently from the locked baseline inside this model. A large oracle regret is equally important evidence: it means the candidate still leaves substantial performance on the table under the same referee.
 
-Only that later evidence can promote the claim category beyond internal synthetic/replay evidence.
+## Promotion gate
+
+The next meaningful promotion is external execution, not V6 naming:
+
+1. pin the commit, V5 scenario, provider identity, and run protocol;
+2. have a qualified non-author evaluator execute the arena;
+3. have that evaluator run the verifier independently;
+4. return an immutable receipt with commit, scenario hash, engine hash, provider hash, event roots, manifest hash, runtime identity, and result;
+5. for a paid pilot, replace or supplement the abstract referee with a buyer-approved dataset or simulator while preserving the accepted baseline, locked metric, threshold, selection rule, holdout discipline, failure definitions, and prohibited claims.
+
+That is the boundary between a strong internal agent benchmark and externally validated proof.
