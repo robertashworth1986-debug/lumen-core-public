@@ -1,6 +1,6 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-07-23 UTC
+**State date:** 2026-08-06 UTC
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
@@ -22,6 +22,8 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 ### 2. One external validation or paid-pilot conversion
 
 **Reviewer doorway:** PR #66 was merged on July 23 at `aed61134407426114148e3201cd357099d155864`. It is the canonical human-and-machine evidence-navigation layer. Route a qualified non-author evaluator through that doorway to the pinned PR #64 package. Do not create another platform or validation package.
+
+**Agent Arena sub-harness:** The August 6 Agent Arena branch adds a bounded adversarial multi-agent synthetic/replay harness under the canonical proof-to-pilot architecture. It freezes scenario floors, seeds, baseline, constraints, scoring weights, one holdout boss, agent-control bounds, and claim boundaries before execution; keeps the deterministic referee outside agent control; and emits hash-chained events plus a manifest-verifiable evidence bundle. It is not a new top-level product and does not replace PR #64 as the primary independent-execution target. Positive Agent Arena deltas remain synthetic/model evidence until a qualified non-author evaluator executes the frozen harness or a buyer supplies an accepted dataset/simulator and baseline.
 
 **LANL VISION:** A bounded non-proprietary follow-up package was sent after the July 16 meeting connection was not completed. Wait for a reschedule, a specific information request, an agreement-path owner, or a no-fit decision.
 
@@ -59,6 +61,7 @@ A receipt proves delivery only. It does not prove selection, technical validatio
 |---|---|
 | `QUICKSTART.md`, Proof Capsule verifier, public EIA/DICE capsule, and focused CI | **Canonical product surface. Keep and maintain.** |
 | External evaluator acceptance handoff and portable validation docket | **Keep as the controlled outside-review protocol.** |
+| Agent Arena adversarial multi-agent harness | **Keep as a bounded synthetic/replay sub-harness for agentic validation; do not promote it as a separate platform or as external proof.** |
 | Patent Examination Review Matrix and customer-number association draft | **Keep in the protected patent lane. No public expansion.** |
 | CDC AI Acquisition RFI package and artifact manifest | **Submitted; receipt confirmed. Freeze and wait.** |
 | LANL VISION follow-up package | **Sent; freeze and wait.** |
@@ -101,4 +104,4 @@ Otherwise, update the backlog note and stop.
 
 ## Immediate decision
 
-The next founder-facing action is review of the **issued EPRI Open Power AI Consortium MOU**. The next repository action is a bounded independent execution of the **PR #64** package followed by an immutable third-party receipt. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized.
+The next founder-facing action is review of the **issued EPRI Open Power AI Consortium MOU**. The next repository action remains a bounded independent execution of the **PR #64** package followed by an immutable third-party receipt; Agent Arena is available as a secondary agentic test harness when a reviewer or buyer needs that lane. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized.
