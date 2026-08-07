@@ -1,0 +1,36 @@
+{
+  "schema": "lumencore.official_submission_status_receipt.v1",
+  "recorded_utc": "2026-07-28T17:38:17Z",
+  "lane": {
+    "agency": "Defense Logistics Agency",
+    "program": "DLA SBIR/STTR",
+    "topic_id": "DLA26BZ03-NV011",
+    "deadline_utc": "2026-07-22T16:00:00Z",
+    "deadline_timezone": "America/New_York"
+  },
+  "official_message": {
+    "received_utc": "2026-07-28T17:36:13Z",
+    "sender_organization": "DLA SBIR/STTR Program Operations",
+    "sender_domain": "dla.mil",
+    "subject": "FW: [Non-DoD Source] Re: Deadline-critical clarification: DLA26BZ03-NV011 Volume V DD Form 2345/JCP evidence",
+    "key_determination": "The DSIP record shows the proposal as In Progress, so it was not formally submitted.",
+    "reply_requested": false,
+    "deadline_or_remediation_window_offered": false,
+    "smime_attachment_observed": true,
+    "cryptographic_signature_verified": false
+  },
+  "decision": "CLOSED_NOT_FORMALLY_SUBMITTED",
+  "selected_template_id": "NO_DUPLICATE_MONITOR",
+  "duplicate_send_decision": "DO_NOT_REPLY_OR_RESEND_WITHOUT_A_NEW_OFFICIAL_REQUEST",
+  "privacy_controls": {
+    "proposal_identifier_included": false,
+    "gmail_message_identifier_included": false,
+    "sender_address_included": false,
+    "phone_number_included": false,
+    "inline_image_included": false,
+    "attachment_content_included": false
+  },
+  "external_action_performed": false,
+  "claim_boundary": "This receipt records the official status statement and its public-safe metadata. It does not prove why submission was incomplete, authorize a late submission, establish eligibility, or imply evaluation, selection, award, funding, or agency endorsement.",
+  "safest_next_action": "Preserve the packet for a future matching topic, keep the lane closed, and do not send another status request or represent the proposal as submitted."
+}

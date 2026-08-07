@@ -12,8 +12,8 @@ Trading, grants, scouting, geometry, swarm, aviation, maritime, sensor, and othe
 
 Only three founder outcomes may be active at once:
 
-1. **EPRI / Open Power AI Consortium onboarding** — one reply in the existing MOU thread after Robert reviews the saved draft.
-2. **One external validation or paid-pilot conversion** — LANL and EVTit are waiting lanes; do not send another message until a substantive inbound response arrives.
+1. **EPRI / Open Power AI Consortium onboarding** — keep agreement status, dates, and legal terms in the private controlling record. One bounded reply supplied requested logo assets with limited-use language; EPRI/OPAI later said presence and contributions to MRC and Work Group meetings are enough. Do not send another onboarding or contribution-path follow-up, and make no endorsement, validation, award, utility-adoption, or performance claim.
+2. **One external validation or paid-pilot conversion** — one private-review follow-up is active. Keep the counterparty identity and shared materials out of the public repository; the exchange does not establish a partnership, customer, pilot, endorsement, or validation. LANL and EVTit remain waiting lanes.
 3. **Patent official-record protection** — retrieve and review the official Patent Center record, notices, and deadlines before creating more public patent packages.
 
 Funding opportunities remain a deadline queue, not a product-development queue. Do not build a new package unless it is already in the canonical funding handoff, the verified deadline is near, and no existing package can be updated.

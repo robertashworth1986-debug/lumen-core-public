@@ -1,0 +1,29 @@
+{
+  "schema": "lumencore.brand_asset_receipt.v1",
+  "asset_id": "lumaarc_seal_of_approval_v1",
+  "asset_path": "assets/brand/lumaarc_arc_seal_v1.png",
+  "source_asset_name": "lumaarc_eclipse_corona_concept_v1.png",
+  "sha256": "1ed1c9b00e273aa9e781bd7fd0a4fcc3fc542257c6d294c8e8fbfada500701af",
+  "bytes": 696635,
+  "founder_selection_observed_utc": "2026-07-27T01:08:35Z",
+  "status": "FOUNDER_CONFIRMED_LUMAARC_SEAL_FOR_LUMENCORE_MATERIALS",
+  "company_name": "LumenCore",
+  "seal_name": "LumaArc seal of approval",
+  "allowed_use": [
+    "current LumenCore capability statements",
+    "current LumenCore reviewer packets",
+    "current LumenCore opportunity response drafts"
+  ],
+  "claim_boundary": {
+    "seal_selection_confirmed": true,
+    "company_rename_claim_allowed": false,
+    "trademark_registration_claim_allowed": false,
+    "legal_entity_name_inferred_from_seal": false,
+    "founder_approval_required_for_material_seal_edits": true
+  },
+  "notes": [
+    "This receipt preserves the exact founder-selected LumaArc seal bitmap without re-drawing it or substituting the separate LumenCore wave mark.",
+    "LumenCore remains the company name; LumaArc identifies this seal of approval and is not a company rename.",
+    "Exact legal entity name, trademark status, and submission authority remain separate action-time facts."
+  ]
+}

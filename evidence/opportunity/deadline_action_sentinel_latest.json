@@ -1,0 +1,351 @@
+{
+  "schema": "lumencore.deadline_action_sentinel.v1",
+  "evaluated_utc": "2026-08-03T14:34:14Z",
+  "posture": "HUMAN_ACTION_REQUIRED_FAIL_CLOSED",
+  "controls": {
+    "read_only_builder": true,
+    "autonomous_email_send_allowed": false,
+    "autonomous_portal_action_allowed": false,
+    "autonomous_agreement_acceptance_allowed": false,
+    "autonomous_payment_allowed": false,
+    "autonomous_signature_allowed": false,
+    "autonomous_certification_allowed": false,
+    "authenticated_portal_session_use_allowed": false,
+    "action_time_human_approval_required": true,
+    "unknown_deadline_time_fail_closed": true,
+    "duplicate_recheck_required_before_external_send": true
+  },
+  "prohibited_actions": [
+    "SEND_EMAIL",
+    "OPEN_AUTHENTICATED_PORTAL",
+    "CHANGE_PORTAL_ANSWER",
+    "UPLOAD_FILE",
+    "ACCEPT_AGREEMENT",
+    "SIGN",
+    "CERTIFY",
+    "SUBMIT",
+    "PAY"
+  ],
+  "alert_window_hours": 120,
+  "summary": {
+    "lane_count": 5,
+    "human_attention_count": 4,
+    "exact_deadline_count": 2,
+    "date_only_deadline_count": 3,
+    "autonomous_external_action_count": 0,
+    "external_actions_executed_count": 0,
+    "state_counts": {
+      "COMPLETION_EVIDENCE_RECORDED_NO_EXTERNAL_ACTION_REQUIRED": 1,
+      "HUMAN_DATE_ONLY_ACTION_OPEN": 1,
+      "HUMAN_DATE_ONLY_RECONCILIATION_REQUIRED": 1,
+      "PAST_DEADLINE_NO_EXTERNAL_ACTION_AUTHORIZED": 2
+    }
+  },
+  "lanes": [
+    {
+      "id": "DAF_CSDR_20260727",
+      "title": "DAF CSDR Support and Curation CSO",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "external_action_type": "CAPABILITY_OUTREACH_OR_STEP_1_WHITE_PAPER",
+      "completion_evidence_present": false,
+      "blockers": [
+        "The exact Government deadline has passed.",
+        "No formal Step 1 white-paper receipt is present.",
+        "Direct CSDR and FlexFile delivery experience, qualified cost-data leadership, key personnel, and security qualifications are not established.",
+        "A prior bounded capability email must not be duplicated."
+      ],
+      "blocker_count": 4,
+      "requires_human_attention": true,
+      "external_action_authorized": false,
+      "send_now": false,
+      "external_action_executed": false,
+      "safest_next_action": "Do not submit late or duplicate the prior capability email. Monitor only for an inbound request from the Government or a qualified prime.",
+      "source_receipt": {
+        "kind": "REPOSITORY_GATE",
+        "path": "evidence/opportunity/csdr_deadline_gate_2026-07-27.json",
+        "sha256": "cc578d67d891a1bed326331433af5d6b2d3d36c7078e71bb333ef17c4300d23b",
+        "bound_deadline_field": "opportunity.deadline_utc",
+        "observed_status": "PAST_DEADLINE_NO_LATE_OR_DUPLICATE_ACTION"
+      },
+      "state": "PAST_DEADLINE_NO_EXTERNAL_ACTION_AUTHORIZED",
+      "urgency": "PAST",
+      "deadline": {
+        "precision": "EXACT",
+        "iso_utc": "2026-07-27T17:00:00Z",
+        "local_display": "July 27, 2026 at 1:00 PM EDT",
+        "timezone": "America/New_York",
+        "cutoff_time_known": true,
+        "timezone_known": true,
+        "exact_countdown_available": true,
+        "deadline_passed": true,
+        "seconds_until_deadline": -596054,
+        "hours_until_deadline": -165.57
+      }
+    },
+    {
+      "id": "NSF_26_510_20260727",
+      "title": "NSF SBIR/STTR 26-510 full-proposal cycle",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "external_action_type": "RESEARCH_GOV_FULL_PROPOSAL",
+      "completion_evidence_present": false,
+      "blockers": [
+        "No official Phase I or Fast-Track Project Pitch invitation was found.",
+        "No eligible full-proposal route or submission receipt is present.",
+        "The submitting organization's controlling local timezone is not bound in the public evidence."
+      ],
+      "blocker_count": 3,
+      "requires_human_attention": true,
+      "external_action_authorized": false,
+      "send_now": false,
+      "external_action_executed": false,
+      "safest_next_action": "Do not attempt a July 27 full proposal. Select one bounded research lane and prepare a truthful Project Pitch for the November 4, 2026 cycle.",
+      "source_receipt": {
+        "kind": "REPOSITORY_DATE_GATE",
+        "path": "evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json",
+        "sha256": "6c4ee6bab204851a3e1b83063e7f9e43b9e0ef41c01c67aa87d8ad7a8bd41a94",
+        "bound_deadline_field": "opportunity.deadline_date",
+        "observed_status": "BLOCKED_NO_OFFICIAL_PROJECT_PITCH_INVITATION"
+      },
+      "state": "HUMAN_DATE_ONLY_RECONCILIATION_REQUIRED",
+      "urgency": "UNKNOWN_EXACT_CUTOFF_FAIL_CLOSED",
+      "deadline": {
+        "precision": "DATE_ONLY",
+        "date": "2026-07-27",
+        "cutoff_time_known": false,
+        "timezone_known": false,
+        "exact_countdown_available": false,
+        "deadline_passed": null,
+        "calendar_relation": "AFTER_DATE_BY_UTC_CALENDAR_ONLY"
+      }
+    },
+    {
+      "id": "ONC_ARGOS_20260730",
+      "title": "HHS Project Argos Sources Sought",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "external_action_type": "EMAIL_RESPONSE",
+      "completion_evidence_present": false,
+      "blockers": [
+        "One bounded partner inquiry was sent once; the fresh mailbox check found zero current drafts and zero inbound replies, so it must not be resent.",
+        "Exactly one Government capability response was transmitted before the deadline; the automatic reply establishes mailbox-system reach only, not formal receipt or review.",
+        "Provider credential rotation and reachable public Git-history remediation remain required before linking or promoting the public repository.",
+        "No substantive HHS or EMI reply is recorded.",
+        "Written partner authority remains required before using any partner name, role, qualification, or prior performance in a future response."
+      ],
+      "blocker_count": 5,
+      "requires_human_attention": true,
+      "external_action_authorized": false,
+      "send_now": false,
+      "external_action_executed": false,
+      "safest_next_action": "Do not resend either Argos message. Wait for a substantive HHS or EMI request, preserve the no-unauthorized-partner and no-public-repository-promotion boundaries, and reply only in the existing thread after a fresh duplicate check and exact action-time approval.",
+      "source_receipt": {
+        "kind": "REPOSITORY_GATE_WITH_OUTREACH_STATUS",
+        "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
+        "sha256": "a5732b70547091a146f51f70456946834b3c34e1917c0efa2f11057d73ff1a89",
+        "bound_deadline_field": "opportunity.deadline_utc",
+        "observed_status": "BLOCK_SEND",
+        "outreach_status": {
+          "path": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
+          "sha256": "f1185a5187038b62ccb8d28628ad3860a03e8efb73c47aede6f29566c5389191",
+          "recorded_utc": "2026-07-28T20:19:34Z",
+          "observed_state": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
+          "partner_interest_target_utc": "2026-07-28T17:00:00Z",
+          "mailbox_checked_utc": "2026-07-28T20:19:34Z",
+          "sent_utc": "2026-07-28T15:39:34Z",
+          "mailbox_state": {
+            "current_draft_count": 0,
+            "sent_count": 1,
+            "inbound_count": 0,
+            "attachment_count": 0,
+            "cc_count": 0,
+            "bcc_count": 0
+          },
+          "subject_sha256": "80FEEDC1540F859AC970FD32A3F9DFF0E03C5B347130C7FFF2E4E24382C5993B",
+          "body_path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_INQUIRY_BODY.md",
+          "body_sha256": "A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2",
+          "selected_template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
+          "prior_binding": {
+            "historical_snapshot_path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json",
+            "historical_snapshot_binding_sha256": "D363D349B1E9D99F3DE3981192FB7AE4F5FE63DA3B07268E742354CF626D5B27",
+            "observed_action_time_binding_sha256": "9BEB7538450C9B35D7738D2215D9F4E2D51E2E2B25682D2E69C4029610A63E32",
+            "binding_match_status": "MISMATCH_RETAINED_AS_UNRECONCILED_PUBLIC_AUDIT_GAP",
+            "public_authorization_chain_reconciled": false,
+            "sent_content_source_bound_by_post_send_hashes": true,
+            "expires_utc": "2026-07-27T23:33:38Z",
+            "expired_at_record_time": true,
+            "prior_approval_reusable": false
+          }
+        },
+        "government_response_status": {
+          "path": "grant_submissions/funding_sprint_20260709/ARGOS_GOVERNMENT_RESPONSE_STATUS_2026-07-29.json",
+          "sha256": "98c572aa43eb48aaefe311d3114811176bad8799e7c9ebf6695014f6055ee598",
+          "recorded_utc": "2026-07-29T01:54:02Z",
+          "observed_state": "SENT_ONCE_AUTOMATIC_MAILBOX_ACK_WAITING_FOR_SUBSTANTIVE_REPLY",
+          "sent_utc": "2026-07-29T01:52:18Z",
+          "automatic_acknowledgment_utc": "2026-07-29T01:54:02Z",
+          "mailbox_state": {
+            "sent_count": 1,
+            "automatic_acknowledgment_count": 1,
+            "formal_receipt_count": 0,
+            "substantive_inbound_count": 0,
+            "attachment_count": 1,
+            "cc_count": 0,
+            "bcc_count": 0
+          },
+          "official_source_rechecked_utc": "2026-07-29T01:42:09Z",
+          "official_source_receipt_path": "grant_submissions/funding_sprint_20260709/source_attachments/PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json",
+          "official_source_receipt_sha256": "5479D7DB1DC3777D9E6C177F92800BD198392105D46A2CF78C56554C86B8820D",
+          "attachment_filename": "ARGOS_PRIVATE_ACTION_COPY.docx",
+          "attachment_size_bytes": 730579,
+          "attachment_sha256": "459C92DB998CC6B7CB9C81064186CBB65DD897261CD3C7F1F1D69A3D38368CC1",
+          "duplicate_send_prohibited": true,
+          "automatic_acknowledgment_is_formal_receipt": false,
+          "automatic_acknowledgment_is_substantive_review": false,
+          "automatic_acknowledgment_authorizes_follow_up": false,
+          "action_time_provenance_reconciled": false,
+          "sent_event_cryptographically_anchored_at_action_time": false
+        }
+      },
+      "state": "PAST_DEADLINE_NO_EXTERNAL_ACTION_AUTHORIZED",
+      "urgency": "PAST",
+      "deadline": {
+        "precision": "EXACT",
+        "iso_utc": "2026-07-30T21:00:00Z",
+        "local_display": "July 30, 2026 at 5:00 PM EDT",
+        "timezone": "America/New_York",
+        "cutoff_time_known": true,
+        "timezone_known": true,
+        "exact_countdown_available": true,
+        "deadline_passed": true,
+        "seconds_until_deadline": -322454,
+        "hours_until_deadline": -89.57
+      },
+      "outreach_status": {
+        "observed_state": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
+        "recorded_utc": "2026-07-28T20:19:34Z",
+        "current_state_as_of_evaluation": "OFFICIAL_DEADLINE_PASSED_NO_SEND",
+        "partner_interest_target_utc": "2026-07-28T17:00:00Z",
+        "seconds_until_partner_target": -509654,
+        "mailbox_state_as_of_record": {
+          "current_draft_count": 0,
+          "sent_count": 1,
+          "inbound_count": 0,
+          "attachment_count": 0,
+          "cc_count": 0,
+          "bcc_count": 0
+        },
+        "selected_template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
+        "subject_sha256": "80FEEDC1540F859AC970FD32A3F9DFF0E03C5B347130C7FFF2E4E24382C5993B",
+        "body_sha256": "A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2",
+        "prior_binding_expired": true,
+        "prior_approval_reusable": false,
+        "binding_match_status": "MISMATCH_RETAINED_AS_UNRECONCILED_PUBLIC_AUDIT_GAP",
+        "public_authorization_chain_reconciled": false,
+        "sent_content_source_bound_by_post_send_hashes": true,
+        "fresh_recheck_required": false,
+        "new_exact_approval_required": false,
+        "duplicate_send_prohibited": true,
+        "government_response_action_time_gates_required": false
+      },
+      "government_response_status": {
+        "observed_state": "SENT_ONCE_AUTOMATIC_MAILBOX_ACK_WAITING_FOR_SUBSTANTIVE_REPLY",
+        "recorded_utc": "2026-07-29T01:54:02Z",
+        "sent_utc": "2026-07-29T01:52:18Z",
+        "automatic_acknowledgment_utc": "2026-07-29T01:54:02Z",
+        "mailbox_state_as_of_record": {
+          "sent_count": 1,
+          "automatic_acknowledgment_count": 1,
+          "formal_receipt_count": 0,
+          "substantive_inbound_count": 0,
+          "attachment_count": 1,
+          "cc_count": 0,
+          "bcc_count": 0
+        },
+        "official_source_rechecked_utc": "2026-07-29T01:42:09Z",
+        "official_source_receipt_path": "grant_submissions/funding_sprint_20260709/source_attachments/PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json",
+        "official_source_receipt_sha256": "5479D7DB1DC3777D9E6C177F92800BD198392105D46A2CF78C56554C86B8820D",
+        "attachment_filename": "ARGOS_PRIVATE_ACTION_COPY.docx",
+        "attachment_size_bytes": 730579,
+        "attachment_sha256": "459C92DB998CC6B7CB9C81064186CBB65DD897261CD3C7F1F1D69A3D38368CC1",
+        "duplicate_send_prohibited": true,
+        "automatic_acknowledgment_is_formal_receipt": false,
+        "automatic_acknowledgment_is_substantive_review": false,
+        "automatic_acknowledgment_authorizes_follow_up": false,
+        "action_time_provenance_reconciled": false,
+        "sent_event_cryptographically_anchored_at_action_time": false
+      }
+    },
+    {
+      "id": "NASHVILLE_ONBOARDING_20260731",
+      "title": "Nashville cohort onboarding milestone",
+      "visibility": "PRIVATE_METADATA_ONLY",
+      "external_action_type": "ONBOARDING_OR_AGREEMENT_ACTION",
+      "completion_evidence_present": true,
+      "blockers": [
+        "The onboarding receipt does not establish payment of the separate 125 USD deposit or that the cohort spot has been secured."
+      ],
+      "blocker_count": 1,
+      "requires_human_attention": false,
+      "external_action_authorized": false,
+      "send_now": false,
+      "external_action_executed": false,
+      "safest_next_action": "Do not resend the onboarding materials or send another acknowledgment. Keep the separate deposit lane founder-controlled and wait for a specific EC request.",
+      "source_receipt": {
+        "kind": "PRIVATE_OFFICIAL_INBOUND_STATUS_EVENT",
+        "private_source_excluded": true,
+        "identifiers_excluded": true
+      },
+      "completion_evidence_recorded_utc": "2026-08-03T14:19:08Z",
+      "state": "COMPLETION_EVIDENCE_RECORDED_NO_EXTERNAL_ACTION_REQUIRED",
+      "urgency": "COMPLETED",
+      "deadline": {
+        "precision": "DATE_ONLY",
+        "date": "2026-07-31",
+        "cutoff_time_known": false,
+        "timezone_known": false,
+        "exact_countdown_available": false,
+        "deadline_passed": null,
+        "calendar_relation": "AFTER_DATE_BY_UTC_CALENDAR_ONLY"
+      }
+    },
+    {
+      "id": "NASHVILLE_DEPOSIT_20260814",
+      "title": "Nashville cohort deposit milestone",
+      "visibility": "PRIVATE_METADATA_ONLY",
+      "external_action_type": "PAYMENT_OR_CONFIRMATION_ACTION",
+      "completion_evidence_present": false,
+      "blockers": [
+        "The exact cutoff time and controlling timezone are not established in the retained metadata.",
+        "Payment terms and the official destination require direct human verification.",
+        "No payment or completion receipt is present."
+      ],
+      "blocker_count": 3,
+      "requires_human_attention": true,
+      "external_action_authorized": false,
+      "send_now": false,
+      "external_action_executed": false,
+      "safest_next_action": "After onboarding terms are accepted by the user, verify the official payment terms and destination with the user present. Do not enter payment details or pay autonomously.",
+      "source_receipt": {
+        "kind": "PRIVATE_OFFICIAL_INBOUND_STATUS_EVENT",
+        "private_source_excluded": true,
+        "identifiers_excluded": true
+      },
+      "state": "HUMAN_DATE_ONLY_ACTION_OPEN",
+      "urgency": "UNKNOWN_EXACT_CUTOFF_FAIL_CLOSED",
+      "deadline": {
+        "precision": "DATE_ONLY",
+        "date": "2026-08-14",
+        "cutoff_time_known": false,
+        "timezone_known": false,
+        "exact_countdown_available": false,
+        "deadline_passed": null,
+        "calendar_relation": "FUTURE_BY_UTC_CALENDAR_DATE"
+      }
+    }
+  ],
+  "claim_boundaries": [
+    "This sentinel is a read-only deadline and blocker view.",
+    "A warning is not authority to send, open a signed-in portal, upload, accept terms, sign, certify, submit, or pay.",
+    "Date-only milestones never receive an invented cutoff time, timezone, exact countdown, or definitive overdue label.",
+    "Drafted, sent, submitted, accepted, and paid remain distinct evidence states."
+  ]
+}

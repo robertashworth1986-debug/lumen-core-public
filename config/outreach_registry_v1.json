@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_outreach_registry.v1",
-  "updated_utc": "2026-07-23T16:58:01Z",
+  "updated_utc": "2026-08-04T20:34:17Z",
   "policy": {
     "send_authority": "Robert Ashworth",
     "codex_send_allowed": false,
@@ -14,16 +14,16 @@
     {
       "campaign_key": "epri-opai-membership-mou",
       "organization": "EPRI / Open Power AI Consortium",
-      "status": "blocked",
+      "status": "closed",
       "thread_mode": "existing_thread_only",
-      "outbound_sequence": 3,
-      "last_outbound_utc": "2026-07-22T22:42:01Z",
+      "outbound_sequence": 6,
+      "last_outbound_utc": "2026-08-03T22:28:19Z",
       "duplicate_detected": true,
       "duplicate_count": 1,
       "inbound_since_last_outbound": true,
-      "next_allowed_action": "founder_review_and_signature_decision_in_docusign_no_email_reply_required",
+      "next_allowed_action": "attend_mrc_and_work_group_meetings_or_share_thoughts_during_calls_no_email_followup",
       "outreach_id": "LC-EPRI-OPAI-MOU-001",
-      "notes": "EPRI issued the MOU on 2026-07-23. A second standalone membership request exists. Do not start another thread or send an acknowledgment before founder review."
+      "notes": "Agreement status and terms remain in the private controlling record. The MOU was completed by all parties; LumenCore provided its primary contact, initial Work Group representatives, and the requested logo variants, and received the recurring Member Representative Committee invitation. On 2026-08-03 one existing-thread follow-up requested the single best bounded contribution step. On 2026-08-04 EPRI/OPAI replied that Robert does not have to do extra work to contribute and that presence and contributions to Member Representative Committee and Work Group meetings are enough; optional additional thoughts or suggestions can be shared during those calls. These records support onboarding and bounded meeting participation only; they do not establish EPRI or OPAI endorsement, independent validation, an award, funding, broader licensing, utility adoption, approval of a specific claim, or performance. A duplicate standalone membership request already exists. Do not start another thread or send another follow-up unless EPRI or OPAI sends a new substantive request or Robert explicitly authorizes a later action after a fresh duplicate check."
     },
     {
       "campaign_key": "evtit-productization-review",
@@ -84,16 +84,30 @@
     {
       "campaign_key": "nashville-ec-fall-2026",
       "organization": "Nashville Entrepreneur Center",
+      "status": "receipt_confirmed_waiting",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 6,
+      "last_outbound_utc": "2026-07-31T20:32:22Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": true,
+      "next_allowed_action": "no_onboarding_resend_founder_decides_on_separate_125_usd_deposit_due_2026_08_14_then_wait_for_specific_ec_request",
+      "outreach_id": "LC-NEC-FALL-2026-001",
+      "notes": "EC confirmed receipt of the authorization, electronic signature, and onboarding responses, confirmed that everything was received on time, and said the materials would be included with the onboarding submission. EC said no further onboarding action is needed for now unless it requests something specific. This establishes timely receipt of the onboarding materials only. It does not establish payment of the separate 125 USD deposit, a secured cohort spot, program completion, funding beyond the stated financial-aid award, a contract, endorsement, or independent validation. Do not resend or send another acknowledgment."
+    },
+    {
+      "campaign_key": "launchtn-sbir-sttr-support-microgrant",
+      "organization": "Launch Tennessee",
       "status": "waiting_for_reply",
       "thread_mode": "existing_thread_only",
       "outbound_sequence": 1,
-      "last_outbound_utc": "2026-07-21T22:59:20Z",
+      "last_outbound_utc": "2026-07-30T18:33:55Z",
       "duplicate_detected": false,
       "duplicate_count": 0,
       "inbound_since_last_outbound": false,
-      "next_allowed_action": "verify_financial_aid_form_status_outside_email_then_wait_for_review",
-      "outreach_id": "LC-NEC-FALL-2026-001",
-      "notes": "Christopher Smith was already told the form would be completed. Do not send another assurance or application summary unless EC asks."
+      "next_allowed_action": "wait_for_specific_launchtn_intake_support_or_webinar_response_do_not_resend_or_create_an_alias_campaign",
+      "outreach_id": "LC-LAUNCHTN-SBIR-STTR-SUPPORT-001",
+      "notes": "Exactly one request for no-cost SBIR/STTR application support and information about the consultant microgrant of up to 2500 USD was sent. No reply was found. The request is not an award, funding, eligibility confirmation, acceptance, or independent validation."
     },
     {
       "campaign_key": "uspto-application-record-19281546",
@@ -167,13 +181,13 @@
       "organization": "Defense Logistics Agency / DSIP",
       "status": "closed",
       "thread_mode": "existing_thread_only",
-      "outbound_sequence": 0,
+      "outbound_sequence": 3,
       "duplicate_detected": false,
       "duplicate_count": 0,
       "inbound_since_last_outbound": true,
-      "next_allowed_action": "preserve_packet_and_reuse_only_for_a_new_matching_topic",
+      "next_allowed_action": "preserve_packet_monitor_only_and_reuse_only_for_a_new_matching_topic",
       "outreach_id": "LC-DLA-MISSIONWEAVE-NV011-001",
-      "notes": "DSIP confirmed proposal creation, not final submission. No final-submission receipt was found before the 2026-07-22 noon ET deadline. Do not represent this lane as submitted and do not send a late receipt request."
+      "notes": "Official DLA SBIR/STTR Program Operations confirmed on 2026-07-28 that DSIP showed the proposal as In Progress and therefore not formally submitted. The 2026-07-22 noon ET deadline passed. Public-safe receipt: grant_submissions/funding_sprint_20260709/DLA_NV011_OFFICIAL_STATUS_RECEIPT_2026-07-28.json. Do not represent this lane as submitted and do not send another status request without a new official ask."
     },
     {
       "campaign_key": "navy-harborsentinel-don26bz03-nv063",
@@ -187,6 +201,34 @@
       "next_allowed_action": "preserve_packet_and_reuse_only_for_a_new_matching_topic_or_named_partner",
       "outreach_id": "LC-NAVY-HARBORSENTINEL-NV063-001",
       "notes": "No final-submission receipt was found before the 2026-07-22 noon ET deadline. Do not represent this lane as submitted and do not initiate late-submission outreach."
+    },
+    {
+      "campaign_key": "hhs-project-argos-emi-teaming",
+      "organization": "EMI Advisors LLC",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "last_outbound_utc": "2026-07-28T15:39:34Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_substantive_emi_reply_do_not_resend_or_start_a_fallback_partner_route_without_a_new_deliberate_decision",
+      "outreach_id": "LC-HHS-ARGOS-EMI-001",
+      "notes": "Exactly one no-attachment teaming inquiry was observed in Gmail Sent. No EMI reply was found. The committed post-send receipt preserves public_authorization_chain_reconciled=false. Transmission is not delivery, partner interest, teaming authority, validation, or Government submission. Do not resend."
+    },
+    {
+      "campaign_key": "hhs-project-argos-sources-sought",
+      "organization": "U.S. Department of Health and Human Services / Project Argos",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "last_outbound_utc": "2026-07-29T01:52:18Z",
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": true,
+      "next_allowed_action": "wait_for_substantive_hhs_request_do_not_resend_or_claim_formal_receipt_review_selection_award_funding_or_validation",
+      "outreach_id": "LC-HHS-ARGOS-SSN-2026-001",
+      "notes": "Exactly one response email was transmitted at 2026-07-29T01:52:18Z before the 2026-07-30T17:00:00-04:00 deadline. An automatic out-of-office reply at 2026-07-29T01:54:02Z proves mailbox-system reach only; formal receipt and agency review are not confirmed. Do not resend or create a new campaign key. Do not claim receipt, review, acceptance, selection, award, funding, endorsement, or validation."
     }
   ]
 }

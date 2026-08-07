@@ -87,6 +87,9 @@ desktop.ini
 .cache/
 __MACOSX/
 
+# Local Argos visual-QA render workspaces (tracked outputs live one level up)
+grant_submissions/ONC_ARGOS_20260730/output/rendered_*/
+
 # Old / duplicate stack copies
 INSTITAL_STACK_V2/
 INSTITUTIONAL_STACK/

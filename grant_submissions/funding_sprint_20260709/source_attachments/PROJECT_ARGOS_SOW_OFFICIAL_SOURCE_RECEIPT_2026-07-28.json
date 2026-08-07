@@ -1,0 +1,46 @@
+{
+  "schema": "lumencore.official_source_attachment_receipt.v1",
+  "recorded_utc": "2026-07-28T17:21:48Z",
+  "observation_method": "READ_ONLY_PUBLIC_SAM_NOTICE_AND_DIRECT_PUBLIC_ATTACHMENT_REFRESH",
+  "notice": {
+    "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+    "official_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
+    "status_observed": "ACTIVE",
+    "response_due_utc": "2026-07-30T21:00:00Z",
+    "response_due_display": "Jul 30, 2026 05:00 pm EDT",
+    "amendment_observed": false
+  },
+  "attachment": {
+    "document_name": "Project Argos SOW - SSN.pdf",
+    "resource_id": "bf3611eb77f345abbc8f166beb0fd874",
+    "resource_path": "/api/prod/opps/v3/opportunities/resources/files/bf3611eb77f345abbc8f166beb0fd874/download",
+    "displayed_size": "170 KB",
+    "access": "PUBLIC",
+    "updated_date": "2026-07-23"
+  },
+  "remote_refresh": {
+    "retrieved_utc": "2026-07-28T17:21:48Z",
+    "http_status": 200,
+    "content_type": "application/octet-stream",
+    "downloaded_bytes": 174359,
+    "sha256": "6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354",
+    "matches_local_copy": true
+  },
+  "local_copy": {
+    "path": "grant_submissions/funding_sprint_20260709/source_attachments/Project Argos SOW - SSN.pdf",
+    "bytes": 174359,
+    "sha256": "6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354",
+    "hash_mode": "BINARY_RAW"
+  },
+  "checks": {
+    "official_notice_active": true,
+    "notice_id_exact": true,
+    "response_deadline_exact": true,
+    "public_attachment_listing_observed": true,
+    "direct_public_refresh_http_200": true,
+    "remote_byte_count_exact": true,
+    "remote_and_local_sha256_equal": true
+  },
+  "external_action_performed": false,
+  "claim_boundary": "This receipt binds the named local PDF to a read-only observation of the active public SAM notice and a direct public attachment refresh at the recorded time. It does not prove future notice status, absence of later amendments, submission, agency acceptance, or award."
+}

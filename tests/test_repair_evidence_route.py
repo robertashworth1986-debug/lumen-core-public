@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "code" / "ops" / "repair_evidence_route.py"
 SPEC = importlib.util.spec_from_file_location("repair_evidence_route", MODULE_PATH)
@@ -73,8 +74,20 @@ class RepairEvidenceRouteTests(unittest.TestCase):
             MODULE.repair_config(PROXIED + PROXIED, ROOT)
 
     def test_refuses_unsafe_document_root(self) -> None:
-        with self.assertRaises(MODULE.RouteRepairError):
-            MODULE.repair_config(PROXIED, "/opt/lumencore/dashboard; return 200")
+        unsafe_roots = (
+            "/opt/lumencore/dashboard; return 200",
+            "/opt/lumencore/../etc",
+            "/opt/lumencore//dashboard",
+            "relative/dashboard",
+            r"\\server\share\dashboard",
+            r"C:\lumencore\dashboard",
+            "C:/Program Files/dashboard",
+            "C:/dashboard\nreturn 200",
+        )
+        for root in unsafe_roots:
+            with self.subTest(root=root):
+                with self.assertRaises(MODULE.RouteRepairError):
+                    MODULE.repair_config(PROXIED, root)
 
     def test_preserves_unrelated_config(self) -> None:
         result = MODULE.repair_config(PROXIED, ROOT)
@@ -91,21 +104,24 @@ class RepairEvidenceRouteTests(unittest.TestCase):
             index.write_text("bounded evidence\n", encoding="utf-8")
             config.write_text(PROXIED, encoding="utf-8")
 
-            check_code = MODULE.main([
-                "--config", str(config),
-                "--document-root", str(dashboard),
-            ])
-            self.assertEqual(1, check_code)
-            self.assertEqual(PROXIED, config.read_text(encoding="utf-8"))
+            # Inspect a platform-native temporary tree while preserving the
+            # Linux-only nginx document-root contract used in production.
+            with mock.patch.object(MODULE, "_safe_document_root", return_value=ROOT):
+                check_code = MODULE.main([
+                    "--config", str(config),
+                    "--document-root", str(dashboard),
+                ])
+                self.assertEqual(1, check_code)
+                self.assertEqual(PROXIED, config.read_text(encoding="utf-8"))
 
-            apply_code = MODULE.main([
-                "--config", str(config),
-                "--document-root", str(dashboard),
-                "--apply",
-            ])
+                apply_code = MODULE.main([
+                    "--config", str(config),
+                    "--document-root", str(dashboard),
+                    "--apply",
+                ])
             self.assertEqual(0, apply_code)
             MODULE.validate_repaired_config(
-                config.read_text(encoding="utf-8"), dashboard
+                config.read_text(encoding="utf-8"), ROOT
             )
             backups = list(root.glob("lumatrader.conf.pre-evidence-repair.*"))
             self.assertEqual(1, len(backups))

@@ -10,6 +10,7 @@ on:
       - "CITATION.cff"
       - "LICENSE"
       - "README.md"
+      - "conftest.py"
       - "codecheck.yml"
       - "code/eia_grid_*_benchmark.py"
       - "code/mda_control_mapping_open_set_benchmark.py"
@@ -37,6 +38,7 @@ on:
       - "tests/test_faa_sdr_10k_benchmark.py"
       - "tests/test_mda_control_mapping_open_set_benchmark.py"
       - "tests/test_reviewer_*.py"
+      - "tests/test_clean_checkout_artifact_policy.py"
   push:
     paths:
       - ".github/workflows/reviewer-reproducibility.yml"
@@ -45,6 +47,7 @@ on:
       - "CITATION.cff"
       - "LICENSE"
       - "README.md"
+      - "conftest.py"
       - "codecheck.yml"
       - "code/eia_grid_*_benchmark.py"
       - "code/mda_control_mapping_open_set_benchmark.py"
@@ -72,6 +75,7 @@ on:
       - "tests/test_faa_sdr_10k_benchmark.py"
       - "tests/test_mda_control_mapping_open_set_benchmark.py"
       - "tests/test_reviewer_*.py"
+      - "tests/test_clean_checkout_artifact_policy.py"
 
 permissions:
   contents: read
@@ -125,6 +129,7 @@ jobs:
             tests/test_codecheck_reviewer_runtime.py \
             tests/test_reviewer_dependency_lock.py \
             tests/test_reviewer_reproducibility_capsule.py \
+            tests/test_clean_checkout_artifact_policy.py \
             -k "not published_receipt_reconciles_hashes_assertions_and_public_projection and not sbom_has_scoped_component_identity_and_dependency_relationships and not markdown_reports_failures_and_unmet_external_gates_plainly"
 
       - name: Replay the frozen evidence and fixture gates

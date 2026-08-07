@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import inspect
 import json
 import math
 import platform
@@ -27,8 +28,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / "config" / "agent_arena_v5.json"
 DEFAULT_OUT = ROOT / "out" / "agent_arena"
 SCHEMA = "lumencore.agent_arena.v5"
-MANIFEST_SCHEMA = "lumencore.agent_arena.manifest.v2"
-RECEIPT_SCHEMA = "lumencore.agent_arena.execution_receipt.v1"
+MANIFEST_SCHEMA = "lumencore.agent_arena.manifest.v3"
+RECEIPT_SCHEMA = "lumencore.agent_arena.execution_receipt.v2"
 EVIDENCE_BOUNDARY = (
     "Synthetic/replay software evidence only. The Arena evaluates bounded agent "
     "proposals inside a deterministic abstract infrastructure model under predeclared "
@@ -142,16 +143,38 @@ def clamp(value: float, low: float, high: float) -> float:
     return max(low, min(high, value))
 
 
-def _git_commit() -> str:
+def _git_state() -> tuple[str, str]:
+    """Return the committed source identity and reject dirty executions.
+
+    A HEAD hash is meaningful custody only when the working tree and index match
+    that commit. Ignored output files are intentionally excluded by Git.
+    """
     try:
-        return subprocess.check_output(
+        status = subprocess.check_output(
+            ["git", "status", "--porcelain=v1", "--untracked-files=all"],
+            cwd=ROOT,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+        if status:
+            raise ValueError("arena execution requires a clean Git worktree")
+        commit = subprocess.check_output(
             ["git", "rev-parse", "HEAD"],
             cwd=ROOT,
             text=True,
             stderr=subprocess.DEVNULL,
         ).strip()
-    except Exception:
-        return "unknown"
+        tree = subprocess.check_output(
+            ["git", "rev-parse", "HEAD^{tree}"],
+            cwd=ROOT,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+        return commit, tree
+    except ValueError:
+        raise
+    except Exception as exc:
+        raise ValueError("arena execution requires an identifiable Git commit") from exc
 
 
 def _engine_sha256() -> str:
@@ -163,8 +186,7 @@ def _validate_exact_keys(mapping: Mapping[str, Any], expected: Sequence[str], na
         raise ValueError(f"{name} lock mismatch")
 
 
-def load_config(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
-    cfg = json.loads(path.read_text(encoding="utf-8"))
+def _validate_config(cfg: dict[str, Any]) -> dict[str, Any]:
     if cfg.get("schema") != SCHEMA:
         raise ValueError("unexpected scenario schema")
     if cfg.get("evidence_boundary") != EVIDENCE_BOUNDARY:
@@ -180,6 +202,14 @@ def load_config(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
             raise ValueError(f"invalid bounds for {name}")
     _validate_exact_keys(cfg.get("constraints", {}), CONSTRAINTS, "constraint")
     _validate_exact_keys(cfg.get("score_weights", {}), WEIGHTS, "score-weight")
+    for name, raw in cfg["constraints"].items():
+        value = _finite(raw, f"constraints.{name}")
+        if value < 0.0 or (name.endswith("_min") and value > 1.0):
+            raise ValueError(f"invalid constraint: {name}")
+    for name, raw in cfg["score_weights"].items():
+        if _finite(raw, f"score_weights.{name}") < 0.0:
+            raise ValueError(f"score weight must be nonnegative: {name}")
+    _validate_exact_keys(cfg.get("baseline_plan", {}), CONTROLS, "baseline plan")
     roles = cfg.get("agent_roles", [])
     if len(roles) < 5 or len(set(roles)) != len(roles):
         raise ValueError("agent roles must be unique and contain at least five entries")
@@ -214,6 +244,8 @@ def load_config(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
             raise ValueError(f"candidate profile lock mismatch: {profile_name}")
         for key in required - {"red_team"}:
             _finite(profile[key], f"candidate_profiles.{profile_name}.{key}")
+        if not isinstance(profile["red_team"], bool):
+            raise ValueError(f"candidate_profiles.{profile_name}.red_team must be boolean")
     selection = cfg.get("champion_selection", {})
     if set(selection) != {"mean_score_weight", "cvar10_weight", "violation_weight"}:
         raise ValueError("champion selection lock mismatch")
@@ -233,7 +265,44 @@ def load_config(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     provider = cfg.get("provider_descriptor", {})
     if not isinstance(provider, dict) or not provider.get("provider_id"):
         raise ValueError("provider descriptor must include provider_id")
+    gate = cfg.get("acceptance_gate", {})
+    if set(gate) != {"min_score_mean", "max_constraint_violations_total"}:
+        raise ValueError("acceptance gate lock mismatch")
+    _finite(gate["min_score_mean"], "acceptance_gate.min_score_mean")
+    if not isinstance(gate["max_constraint_violations_total"], int) or gate["max_constraint_violations_total"] < 0:
+        raise ValueError("acceptance_gate.max_constraint_violations_total must be a nonnegative integer")
+    allowed_attacks = {
+        "none",
+        "underreport_demand",
+        "hide_capacity_loss",
+        "heat_blindness",
+        "hide_failures",
+        "byzantine_controls",
+        "mixed_cascade",
+    }
+    role_set = set(roles)
+    for index, floor in enumerate(floors):
+        if not isinstance(floor.get("holdout"), bool):
+            raise ValueError(f"floors[{index}].holdout must be boolean")
+        attack = floor.get("attack_mode", "none")
+        if attack not in allowed_attacks:
+            raise ValueError(f"floors[{index}].attack_mode is not declared")
+        strength = _finite(floor.get("attack_strength", 0.0), f"floors[{index}].attack_strength")
+        if not 0.0 <= strength <= 0.95:
+            raise ValueError(f"floors[{index}].attack_strength must be in [0, 0.95]")
+        compromised = floor.get("compromised_roles", [])
+        dropped = floor.get("dropout_roles", [])
+        if len(compromised) != len(set(compromised)) or len(dropped) != len(set(dropped)):
+            raise ValueError(f"floors[{index}] role lists must be unique")
+        if not set(compromised).issubset(role_set) or not set(dropped).issubset(role_set):
+            raise ValueError(f"floors[{index}] references an undeclared role")
+        if set(compromised) & set(dropped):
+            raise ValueError(f"floors[{index}] cannot compromise and drop the same role")
     return cfg
+
+
+def load_config(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
+    return _validate_config(json.loads(path.read_text(encoding="utf-8")))
 
 
 def _bounds(cfg: Mapping[str, Any]) -> dict[str, tuple[float, float]]:
@@ -250,7 +319,7 @@ def _floor_from_config(x: Mapping[str, Any]) -> FloorSpec:
         failure_rate=_finite(x["failure_rate"], "failure_rate"),
         telemetry_noise=_finite(x["telemetry_noise"], "telemetry_noise"),
         attack_mode=str(x.get("attack_mode", "none")),
-        attack_strength=clamp(_finite(x.get("attack_strength", 0.0), "attack_strength"), 0.0, 0.95),
+        attack_strength=_finite(x.get("attack_strength", 0.0), "attack_strength"),
         compromised_roles=tuple(str(r) for r in x.get("compromised_roles", [])),
         dropout_roles=tuple(str(r) for r in x.get("dropout_roles", [])),
         holdout=bool(x.get("holdout")),
@@ -258,6 +327,9 @@ def _floor_from_config(x: Mapping[str, Any]) -> FloorSpec:
 
 
 def _plan(values: Mapping[str, Any], bounds: Mapping[str, tuple[float, float]]) -> ControlPlan:
+    unknown = set(values) - set(CONTROLS)
+    if unknown:
+        raise ValueError(f"plan contains undeclared controls: {sorted(unknown)}")
     base = asdict(ControlPlan())
     for name in CONTROLS:
         low, high = bounds[name]
@@ -282,17 +354,11 @@ def observe_floor(floor: FloorSpec, seed: int, role: str) -> dict[str, Any]:
         return value * (1.0 + rng.uniform(-n, n))
 
     observation = {
-        "floor_id": floor.floor_id,
-        "label": floor.label,
-        "holdout": floor.holdout,
-        "seed": seed,
-        "role": role,
         "demand": sensed(floor.demand),
         "capacity_loss": clamp(sensed(floor.capacity_loss), 0.0, 0.95),
         "ambient_heat": max(0.0, sensed(floor.ambient_heat)),
         "failure_rate": clamp(sensed(floor.failure_rate), 0.0, 0.95),
         "telemetry_noise": n,
-        "attack_mode": floor.attack_mode,
     }
     if role not in floor.compromised_roles:
         return observation
@@ -305,7 +371,6 @@ def observe_floor(floor: FloorSpec, seed: int, role: str) -> dict[str, Any]:
         observation["ambient_heat"] *= 1.0 - strength
     if floor.attack_mode in {"hide_failures", "mixed_cascade"}:
         observation["failure_rate"] *= 1.0 - strength
-    observation["compromised_observation"] = True
     return observation
 
 
@@ -630,9 +695,8 @@ def oracle_result(
     floor: FloorSpec,
     seed: int,
     cfg: Mapping[str, Any],
-    include_plan: ControlPlan | None = None,
 ) -> FloorResult:
-    """Referee-only bounded search ceiling. Never exposed to candidate agents."""
+    """Return the referee-only best plan found on the predeclared finite grid."""
     bounds = _bounds(cfg)
     grid = cfg["oracle_grid"]
     axes = {name: _grid_axis(*bounds[name], int(grid[name])) for name in CONTROLS}
@@ -646,14 +710,10 @@ def oracle_result(
                     metrics = evaluate_plan(floor, plan, cfg["constraints"], cfg["score_weights"])
                     if best_metrics is None or (metrics.score, -metrics.violations, -metrics.energy_index) > (best_metrics.score, -best_metrics.violations, -best_metrics.energy_index):
                         best_plan, best_metrics = plan, metrics
-    if include_plan is not None:
-        include_metrics = evaluate_plan(floor, include_plan, cfg["constraints"], cfg["score_weights"])
-        if best_metrics is None or (include_metrics.score, -include_metrics.violations, -include_metrics.energy_index) > (best_metrics.score, -best_metrics.violations, -best_metrics.energy_index):
-            best_plan, best_metrics = include_plan, include_metrics
     assert best_plan is not None and best_metrics is not None
     return FloorResult(
-        architecture="referee_oracle",
-        profile="referee_oracle",
+        architecture="referee_grid_reference",
+        profile="referee_grid_reference",
         seed=seed,
         floor_id=floor.floor_id,
         attack_mode=floor.attack_mode,
@@ -689,12 +749,17 @@ def _percentile(values: Sequence[float], probability: float) -> float:
     return ordered[lower] * (1.0 - fraction) + ordered[upper] * fraction
 
 
-def _cvar(values: Sequence[float], tail_probability: float = 0.10) -> float:
+def _cvar(
+    values: Sequence[float],
+    tail_probability: float = 0.10,
+    *,
+    upper: bool = False,
+) -> float:
     ordered = sorted(float(v) for v in values)
     if not ordered:
         return 0.0
     count = max(1, math.ceil(len(ordered) * tail_probability))
-    return mean(ordered[:count])
+    return mean(ordered[-count:] if upper else ordered[:count])
 
 
 def _profile_selection_summary(rows: Sequence[FloorResult], cfg: Mapping[str, Any]) -> dict[str, Any]:
@@ -793,13 +858,13 @@ def paired_statistics(
     samples = int(stats_cfg["bootstrap_samples"])
     confidence = float(stats_cfg["confidence"])
     base_seed = int(stats_cfg["bootstrap_seed"])
-    metrics: dict[str, list[float]] = {
-        "score_delta": [c.metrics.score - b.metrics.score for b, c in pairs],
-        "service_rate_delta_points": [100.0 * (c.metrics.service_rate - b.metrics.service_rate) for b, c in pairs],
-        "resilience_delta_points": [100.0 * (c.metrics.resilience_index - b.metrics.resilience_index) for b, c in pairs],
-        "energy_delta": [c.metrics.energy_index - b.metrics.energy_index for b, c in pairs],
-        "latency_delta": [c.metrics.latency_index - b.metrics.latency_index for b, c in pairs],
-        "violation_delta": [float(c.metrics.violations - b.metrics.violations) for b, c in pairs],
+    metrics: dict[str, tuple[list[float], bool]] = {
+        "score_delta": ([c.metrics.score - b.metrics.score for b, c in pairs], False),
+        "service_rate_delta_points": ([100.0 * (c.metrics.service_rate - b.metrics.service_rate) for b, c in pairs], False),
+        "resilience_delta_points": ([100.0 * (c.metrics.resilience_index - b.metrics.resilience_index) for b, c in pairs], False),
+        "energy_delta": ([c.metrics.energy_index - b.metrics.energy_index for b, c in pairs], True),
+        "latency_delta": ([c.metrics.latency_index - b.metrics.latency_index for b, c in pairs], True),
+        "violation_delta": ([float(c.metrics.violations - b.metrics.violations) for b, c in pairs], True),
     }
     output: dict[str, Any] = {
         "paired_trials": len(pairs),
@@ -808,29 +873,44 @@ def paired_statistics(
         "candidate_score_win_rate": mean(float(c.metrics.score > b.metrics.score) for b, c in pairs) if pairs else 0.0,
         "candidate_no_worse_violation_rate": mean(float(c.metrics.violations <= b.metrics.violations) for b, c in pairs) if pairs else 0.0,
     }
-    for index, (name, values) in enumerate(metrics.items()):
+    floor_ids = sorted({candidate.floor_id for _, candidate in pairs})
+    for index, (name, (values, upper_is_adverse)) in enumerate(metrics.items()):
+        by_floor = {
+            floor_id: [
+                value
+                for value, (_, candidate) in zip(values, pairs)
+                if candidate.floor_id == floor_id
+            ]
+            for floor_id in floor_ids
+        }
+        floor_cluster_means = [mean(by_floor[floor_id]) for floor_id in floor_ids]
         output[name] = {
             "mean": mean(values) if values else 0.0,
             "median": median(values) if values else 0.0,
-            "p10": _percentile(values, 0.10),
-            "cvar10": _cvar(values, 0.10),
-            "bootstrap_ci": _bootstrap_ci(values, samples, confidence, base_seed + index * 97),
+            "adverse_tail": "upper" if upper_is_adverse else "lower",
+            "adverse_tail_cvar10": _cvar(values, 0.10, upper=upper_is_adverse),
+            "floor_cluster_bootstrap_ci": _bootstrap_ci(
+                floor_cluster_means,
+                samples,
+                confidence,
+                base_seed + index * 97,
+            ),
         }
     return output
 
 
-def oracle_regret_statistics(
+def grid_reference_statistics(
     candidate: Sequence[FloorResult],
-    oracle: Sequence[FloorResult],
+    reference: Sequence[FloorResult],
 ) -> dict[str, Any]:
-    pairs = _paired_rows(candidate, oracle)
-    regrets = [o.metrics.score - c.metrics.score for c, o in pairs]
+    pairs = _paired_rows(candidate, reference)
+    deltas = [r.metrics.score - c.metrics.score for c, r in pairs]
     return {
         "paired_trials": len(pairs),
-        "score_regret_mean": mean(regrets) if regrets else 0.0,
-        "score_regret_median": median(regrets) if regrets else 0.0,
-        "score_regret_max": max(regrets) if regrets else 0.0,
-        "candidate_fraction_within_5_score_points": mean(float(regret <= 5.0) for regret in regrets) if regrets else 0.0,
+        "reference_minus_candidate_score_mean": mean(deltas) if deltas else 0.0,
+        "reference_minus_candidate_score_median": median(deltas) if deltas else 0.0,
+        "reference_minus_candidate_score_max": max(deltas) if deltas else 0.0,
+        "candidate_fraction_within_5_score_points": mean(float(delta <= 5.0) for delta in deltas) if deltas else 0.0,
     }
 
 
@@ -873,6 +953,38 @@ def merkle_root(event_hashes: Sequence[str]) -> str:
     return layer[0]
 
 
+def _provider_implementation_sha256(provider: ProposalProvider) -> str:
+    """Bind the executing callable, not just its human-written descriptor."""
+    target: Any = provider
+    if not inspect.isfunction(target) and not inspect.ismethod(target):
+        target = getattr(target, "__call__", None)
+    if target is None:
+        raise ValueError("provider implementation is not inspectable")
+    try:
+        source = inspect.getsource(target)
+    except (OSError, TypeError) as exc:
+        raise ValueError("provider implementation source is not inspectable") from exc
+    identity = {
+        "module": getattr(target, "__module__", None),
+        "qualname": getattr(target, "__qualname__", None),
+        "source": source,
+    }
+    return sha256_text(canonical_json(identity))
+
+
+def _bound_provider_descriptor(
+    descriptor: Mapping[str, Any],
+    provider: ProposalProvider,
+) -> dict[str, Any]:
+    bound = dict(descriptor)
+    actual = _provider_implementation_sha256(provider)
+    declared = bound.get("implementation_sha256")
+    if declared is not None and declared != actual:
+        raise ValueError("provider implementation hash does not match descriptor")
+    bound["implementation_sha256"] = actual
+    return bound
+
+
 def _provider_descriptor_hash(descriptor: Mapping[str, Any]) -> str:
     return sha256_text(canonical_json(descriptor))
 
@@ -881,6 +993,8 @@ def _scorecard(summary: Mapping[str, Any]) -> str:
     holdout = summary["holdout_statistics"]
     score = holdout["score_delta"]
     violations = holdout["violation_delta"]
+    candidate = summary["holdout_aggregate"][summary["champion_profile"]]
+    gate = summary["acceptance_gate"]
     return "\n".join(
         [
             "# LumenCore Agent Arena V5 — Synthetic Scorecard",
@@ -890,6 +1004,8 @@ def _scorecard(summary: Mapping[str, Any]) -> str:
             f"- Scenario lock SHA-256: `{summary['scenario_sha256']}`",
             f"- Engine SHA-256: `{summary['engine_sha256']}`",
             f"- Provider descriptor SHA-256: `{summary['provider_descriptor_sha256']}`",
+            f"- Provider implementation SHA-256: `{summary['provider_descriptor']['implementation_sha256']}`",
+            f"- Git tree: `{summary['git_tree']}`",
             f"- Event-chain root SHA-256: `{summary['event_chain_root_sha256']}`",
             f"- Event Merkle root SHA-256: `{summary['event_merkle_root_sha256']}`",
             f"- Selected champion: `{summary['champion_profile']}`",
@@ -897,21 +1013,25 @@ def _scorecard(summary: Mapping[str, Any]) -> str:
             "",
             "## Holdout result",
             "",
+            f"- Absolute gate: **{gate['status']}**",
+            f"- Candidate mean score: {candidate['score_mean']:.6f} (required >= {gate['required']['min_score_mean']:.6f})",
+            f"- Candidate constraint violations: {candidate['constraint_violations_total']} (required <= {gate['required']['max_constraint_violations_total']})",
             f"- Mean score delta: {score['mean']:.6f}",
-            f"- Score-delta bootstrap CI: [{score['bootstrap_ci'][0]:.6f}, {score['bootstrap_ci'][1]:.6f}]",
+            f"- Score-delta floor-cluster bootstrap CI: [{score['floor_cluster_bootstrap_ci'][0]:.6f}, {score['floor_cluster_bootstrap_ci'][1]:.6f}]",
             f"- Candidate score win rate: {100.0 * holdout['candidate_score_win_rate']:.2f}%",
             f"- Mean violation delta: {violations['mean']:.6f}",
             f"- Candidate no-worse violation rate: {100.0 * holdout['candidate_no_worse_violation_rate']:.2f}%",
-            f"- Mean referee-oracle score regret: {summary['oracle_regret']['score_regret_mean']:.6f}",
+            f"- Mean referee-grid-minus-candidate score: {summary['grid_reference_comparison']['reference_minus_candidate_score_mean']:.6f}",
+            f"- Trust-assurance status: {summary['trust_assurance']['status']}",
             "",
             "## V2 → V5 capability chain",
             "",
             "- V2: role-specific corrupted telemetry, role dropout, Byzantine control corruption, trust-weighted synthesis, deterministic red-team gate.",
             "- V3: multiple predeclared candidate profiles compete only on non-holdout floors; the champion is locked before holdout execution.",
-            "- V4: deterministic bootstrap confidence intervals, CVaR/worst-tail metrics, win rates, and attack-mode breakdowns.",
-            "- V5: engine/provider identity hashes, event hash chain, event Merkle root, manifest verification, and execution receipt.",
+            "- V4: floor-cluster bootstrap intervals, direction-aware adverse-tail metrics, win rates, and attack-mode breakdowns.",
+            "- V5: engine/provider implementation hashes, clean-tree custody, event hash chain, event Merkle root, manifest verification, and an unsigned internally consistent receipt.",
             "",
-            "A positive holdout result is still synthetic/model evidence. Promotion requires qualified non-author execution or a buyer-approved dataset/simulator and accepted baseline under the same prelocked rules.",
+            "Completion is not acceptance. A positive relative delta does not override a failed absolute gate or establish Byzantine tolerance. The unsigned receipt requires an independently pinned digest or signature for authenticity. Promotion requires qualified non-author execution or a buyer-approved dataset/simulator and accepted baseline under the same prelocked rules.",
             "",
         ]
     )
@@ -926,6 +1046,7 @@ def _execution_receipt_body(
         "schema": RECEIPT_SCHEMA,
         "generated_utc": generated_utc,
         "git_commit": summary["git_commit"],
+        "git_tree": summary["git_tree"],
         "python_version": platform.python_version(),
         "platform": platform.platform(),
         "scenario_sha256": summary["scenario_sha256"],
@@ -935,7 +1056,9 @@ def _execution_receipt_body(
         "event_merkle_root_sha256": summary["event_merkle_root_sha256"],
         "manifest_sha256": manifest_sha256,
         "champion_profile": summary["champion_profile"],
+        "evaluation_status": summary["acceptance_gate"]["status"],
         "evidence_boundary": EVIDENCE_BOUNDARY,
+        "authentication": "UNSIGNED_REQUIRES_EXTERNAL_PIN_OR_SIGNATURE",
     }
 
 
@@ -946,16 +1069,22 @@ def run_arena(
     generated_utc: str | None = None,
     provider_descriptor: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    cfg = load_config(config_path)
+    git_commit, git_tree = _git_state()
+    raw = config_path.read_bytes()
+    cfg = _validate_config(json.loads(raw.decode("utf-8")))
+    if out_dir.exists() and any(out_dir.iterdir()):
+        raise ValueError("arena output directory must be absent or empty")
     out_dir.mkdir(parents=True, exist_ok=True)
     generated_utc = generated_utc or datetime.now(timezone.utc).isoformat()
-    raw = config_path.read_bytes()
     scenario_sha = hashlib.sha256(raw).hexdigest()
     (out_dir / "scenario.lock.json").write_bytes(raw)
     floors = [_floor_from_config(x) for x in cfg["floors"]]
     selection_floors = [floor for floor in floors if not floor.holdout]
     holdout_floors = [floor for floor in floors if floor.holdout]
-    descriptor = dict(provider_descriptor or cfg["provider_descriptor"])
+    descriptor = _bound_provider_descriptor(
+        provider_descriptor or cfg["provider_descriptor"],
+        provider,
+    )
     descriptor_hash = _provider_descriptor_hash(descriptor)
     event_path = out_dir / "events.jsonl"
     root = "0" * 64
@@ -964,6 +1093,7 @@ def run_arena(
     holdout_candidate_rows: list[FloorResult] = []
     holdout_baseline_rows: list[FloorResult] = []
     holdout_oracle_rows: list[FloorResult] = []
+    trust_audit: list[dict[str, Any]] = []
     with event_path.open("w", encoding="utf-8", newline="\n") as handle:
         root, event_hash = _write_event(
             handle,
@@ -973,6 +1103,8 @@ def run_arena(
                 "evidence_boundary": EVIDENCE_BOUNDARY,
                 "scenario_sha256": scenario_sha,
                 "engine_sha256": _engine_sha256(),
+                "git_commit": git_commit,
+                "git_tree": git_tree,
                 "provider_descriptor_sha256": descriptor_hash,
                 "selection_seeds": cfg["selection_seeds"],
                 "holdout_seeds": cfg["holdout_seeds"],
@@ -1018,10 +1150,21 @@ def run_arena(
             for floor in holdout_floors:
                 baseline = baseline_result(floor, seed, cfg)
                 candidate, trace = run_floor(floor, seed, cfg, champion, provider)
-                oracle = oracle_result(floor, seed, cfg, candidate.plan)
+                oracle = oracle_result(floor, seed, cfg)
                 holdout_baseline_rows.append(baseline)
                 holdout_oracle_rows.append(oracle)
                 holdout_candidate_rows.append(candidate)
+                accepted = set(trace["accepted_roles"])
+                compromised = set(floor.compromised_roles)
+                trust_audit.append(
+                    {
+                        "seed": seed,
+                        "floor_id": floor.floor_id,
+                        "accepted_roles": sorted(accepted),
+                        "accepted_compromised_roles": sorted(accepted & compromised),
+                        "only_compromised_roles_accepted": bool(accepted) and accepted <= compromised,
+                    }
+                )
                 root, event_hash = _write_event(
                     handle,
                     {
@@ -1033,7 +1176,7 @@ def run_arena(
                         "trace": trace,
                         "baseline": _result(baseline),
                         "candidate": _result(candidate),
-                        "referee_oracle": _result(oracle),
+                        "referee_grid_reference": _result(oracle),
                     },
                     root,
                 )
@@ -1051,11 +1194,34 @@ def run_arena(
         event_hashes.append(event_hash)
     merkle = merkle_root(event_hashes)
     holdout_stats = paired_statistics(holdout_baseline_rows, holdout_candidate_rows, cfg)
+    candidate_aggregate = _aggregate(holdout_candidate_rows)[champion]
+    gate_required = cfg["acceptance_gate"]
+    gate_checks = {
+        "score_mean": candidate_aggregate["score_mean"] >= float(gate_required["min_score_mean"]),
+        "constraint_violations_total": candidate_aggregate["constraint_violations_total"] <= int(gate_required["max_constraint_violations_total"]),
+    }
+    acceptance_gate = {
+        "status": "PASS" if all(gate_checks.values()) else "FAIL",
+        "required": gate_required,
+        "checks": gate_checks,
+    }
+    trust_assurance = {
+        "status": "NOT_DEMONSTRATED" if any(row["accepted_compromised_roles"] for row in trust_audit) else "NO_COMPROMISED_ROLE_ACCEPTED_IN_LOCKED_RUN",
+        "holdout_trials": len(trust_audit),
+        "trials_accepting_compromised_roles": sum(bool(row["accepted_compromised_roles"]) for row in trust_audit),
+        "trials_accepting_only_compromised_roles": sum(row["only_compromised_roles_accepted"] for row in trust_audit),
+        "audit": trust_audit,
+    }
     summary = {
         "schema": SCHEMA,
         "generated_utc": generated_utc,
+        "execution_environment": {
+            "python_version": platform.python_version(),
+            "platform": platform.platform(),
+        },
         "evidence_boundary": EVIDENCE_BOUNDARY,
-        "git_commit": _git_commit(),
+        "git_commit": git_commit,
+        "git_tree": git_tree,
         "engine_sha256": _engine_sha256(),
         "scenario_sha256": scenario_sha,
         "provider_descriptor": descriptor,
@@ -1066,11 +1232,13 @@ def run_arena(
         "selection_summary": selection_summary,
         "holdout_aggregate": {
             "locked_baseline": _aggregate(holdout_baseline_rows)["locked_baseline"],
-            champion: _aggregate(holdout_candidate_rows)[champion],
-            "referee_oracle": _aggregate(holdout_oracle_rows)["referee_oracle"],
+            champion: candidate_aggregate,
+            "referee_grid_reference": _aggregate(holdout_oracle_rows)["referee_grid_reference"],
         },
         "holdout_statistics": holdout_stats,
-        "oracle_regret": oracle_regret_statistics(holdout_candidate_rows, holdout_oracle_rows),
+        "grid_reference_comparison": grid_reference_statistics(holdout_candidate_rows, holdout_oracle_rows),
+        "acceptance_gate": acceptance_gate,
+        "trust_assurance": trust_assurance,
         "holdout_attack_breakdown": _attack_breakdown(holdout_baseline_rows, holdout_candidate_rows),
         "configuration": {
             "capability_stages": cfg["capability_stages"],
@@ -1087,6 +1255,7 @@ def run_arena(
             "champion_selection": cfg["champion_selection"],
             "oracle_grid": cfg["oracle_grid"],
             "statistics": cfg["statistics"],
+            "acceptance_gate": cfg["acceptance_gate"],
         },
         "claim_boundary": cfg["claim_boundary"],
         "next_validation_gate": cfg["next_validation_gate"],
@@ -1101,6 +1270,8 @@ def run_arena(
         "evidence_boundary": EVIDENCE_BOUNDARY,
         "scenario_sha256": scenario_sha,
         "engine_sha256": summary["engine_sha256"],
+        "git_commit": git_commit,
+        "git_tree": git_tree,
         "provider_descriptor_sha256": descriptor_hash,
         "event_chain_root_sha256": root,
         "event_merkle_root_sha256": merkle,
@@ -1125,12 +1296,17 @@ def run_arena(
 
 
 def verify_bundle(out_dir: Path) -> dict[str, Any]:
+    current_commit, current_tree = _git_state()
     manifest_path = out_dir / "manifest.sha256.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if manifest.get("schema") != MANIFEST_SCHEMA:
         raise ValueError("manifest schema mismatch")
     if manifest.get("evidence_boundary") != EVIDENCE_BOUNDARY:
         raise ValueError("manifest evidence boundary mismatch")
+    if manifest.get("engine_sha256") != _engine_sha256():
+        raise ValueError("verifier engine does not match bundle engine")
+    if manifest.get("git_commit") != current_commit or manifest.get("git_tree") != current_tree:
+        raise ValueError("verifier Git source does not match bundle source")
     expected = {"scenario.lock.json", "events.jsonl", "summary.json", "SCORECARD.md"}
     if set(manifest.get("files", {})) != expected:
         raise ValueError("manifest file set mismatch")
@@ -1169,6 +1345,8 @@ def verify_bundle(out_dir: Path) -> dict[str, Any]:
         raise ValueError("arena_start scenario mismatch")
     if first.get("engine_sha256") != manifest.get("engine_sha256"):
         raise ValueError("arena_start engine mismatch")
+    if first.get("git_commit") != manifest.get("git_commit") or first.get("git_tree") != manifest.get("git_tree"):
+        raise ValueError("arena_start Git source mismatch")
     if not last or last.get("event_type") != "arena_complete":
         raise ValueError("arena_complete mismatch")
     if previous != manifest.get("event_chain_root_sha256"):
@@ -1180,6 +1358,8 @@ def verify_bundle(out_dir: Path) -> dict[str, Any]:
     for key, expected_value in {
         "scenario_sha256": scenario_sha,
         "engine_sha256": manifest["engine_sha256"],
+        "git_commit": manifest["git_commit"],
+        "git_tree": manifest["git_tree"],
         "provider_descriptor_sha256": manifest["provider_descriptor_sha256"],
         "event_chain_root_sha256": previous,
         "event_merkle_root_sha256": calculated_merkle,
@@ -1202,24 +1382,35 @@ def verify_bundle(out_dir: Path) -> dict[str, Any]:
         raise ValueError("execution receipt hash mismatch")
     if receipt.get("manifest_sha256") != sha256_file(manifest_path):
         raise ValueError("execution receipt manifest mismatch")
-    for key in (
-        "scenario_sha256",
-        "engine_sha256",
-        "provider_descriptor_sha256",
-        "event_chain_root_sha256",
-        "event_merkle_root_sha256",
-        "champion_profile",
-    ):
-        if receipt.get(key) != summary.get(key):
+    receipt_expectations = {
+        "generated_utc": summary["generated_utc"],
+        "git_commit": summary["git_commit"],
+        "git_tree": summary["git_tree"],
+        "python_version": summary["execution_environment"]["python_version"],
+        "platform": summary["execution_environment"]["platform"],
+        "scenario_sha256": summary["scenario_sha256"],
+        "engine_sha256": summary["engine_sha256"],
+        "provider_descriptor_sha256": summary["provider_descriptor_sha256"],
+        "event_chain_root_sha256": summary["event_chain_root_sha256"],
+        "event_merkle_root_sha256": summary["event_merkle_root_sha256"],
+        "champion_profile": summary["champion_profile"],
+        "evaluation_status": summary["acceptance_gate"]["status"],
+        "evidence_boundary": EVIDENCE_BOUNDARY,
+        "authentication": "UNSIGNED_REQUIRES_EXTERNAL_PIN_OR_SIGNATURE",
+    }
+    for key, expected_value in receipt_expectations.items():
+        if receipt.get(key) != expected_value:
             raise ValueError(f"execution receipt custody mismatch: {key}")
     return {
-        "status": "VERIFIED",
+        "status": "INTEGRITY_VERIFIED_UNSIGNED",
         "event_lines": count,
         "event_chain_root_sha256": previous,
         "event_merkle_root_sha256": calculated_merkle,
         "manifest_sha256": sha256_file(manifest_path),
         "execution_receipt_sha256": claimed_receipt_hash,
         "champion_profile": summary["champion_profile"],
+        "evaluation_status": summary["acceptance_gate"]["status"],
+        "authentication": "UNSIGNED_REQUIRES_EXTERNAL_PIN_OR_SIGNATURE",
         "files_verified": sorted(manifest["files"]),
         "evidence_boundary": EVIDENCE_BOUNDARY,
     }
@@ -1240,6 +1431,7 @@ def main(argv: list[str] | None = None) -> int:
             json.dumps(
                 {
                     "status": "COMPLETE",
+                    "evaluation_status": summary["acceptance_gate"]["status"],
                     "out": str(args.out),
                     "champion_profile": summary["champion_profile"],
                     "event_chain_root_sha256": summary["event_chain_root_sha256"],

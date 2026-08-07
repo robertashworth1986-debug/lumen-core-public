@@ -3,6 +3,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 CODE = ROOT / "code"
@@ -11,6 +12,7 @@ if str(CODE) not in sys.path:
 
 from agent_arena import (
     EVIDENCE_BOUNDARY,
+    _git_state,
     _floor_from_config,
     canonical_json,
     load_config,
@@ -51,9 +53,11 @@ class AgentArenaV5Tests(unittest.TestCase):
             self.assertEqual(len(summary["event_merkle_root_sha256"]), 64)
             self.assertTrue((out / "execution_receipt.json").is_file())
             verified = verify_bundle(out)
-            self.assertEqual(verified["status"], "VERIFIED")
+            self.assertEqual(verified["status"], "INTEGRITY_VERIFIED_UNSIGNED")
             self.assertEqual(verified["champion_profile"], summary["champion_profile"])
-            self.assertGreaterEqual(summary["oracle_regret"]["score_regret_mean"], 0.0)
+            self.assertEqual(summary["acceptance_gate"]["status"], "FAIL")
+            self.assertGreater(summary["holdout_aggregate"][summary["champion_profile"]]["constraint_violations_total"], 0)
+            self.assertEqual(summary["trust_assurance"]["status"], "NOT_DEMONSTRATED")
 
     def test_deterministic_core_replays_identically(self):
         with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
@@ -91,6 +95,57 @@ class AgentArenaV5Tests(unittest.TestCase):
             receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "execution receipt hash mismatch|custody mismatch"):
                 verify_bundle(out)
+
+    def test_self_rehashed_forged_receipt_fails_custody(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            out = Path(temp_dir)
+            run_arena(out, self.config_path, generated_utc="2026-08-06T23:00:00+00:00")
+            receipt_path = out / "execution_receipt.json"
+            receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+            receipt["git_commit"] = "0" * 40
+            receipt["platform"] = "forged-platform"
+            receipt["evidence_boundary"] = "External validation established."
+            body = {key: value for key, value in receipt.items() if key != "receipt_sha256"}
+            receipt["receipt_sha256"] = sha256_text(canonical_json(body))
+            receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "execution receipt custody mismatch"):
+                verify_bundle(out)
+
+    def test_provider_identity_is_bound_to_executing_callable(self):
+        def substitute_provider(role, observation, bounds):
+            return {name: high for name, (_, high) in bounds.items()}
+
+        with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
+            reference = run_arena(Path(first), self.config_path, generated_utc="2026-08-06T23:00:00+00:00")
+            substitute = run_arena(
+                Path(second),
+                self.config_path,
+                provider=substitute_provider,
+                generated_utc="2026-08-06T23:00:00+00:00",
+            )
+            self.assertNotEqual(
+                reference["provider_descriptor_sha256"],
+                substitute["provider_descriptor_sha256"],
+            )
+
+    def test_provider_observation_blinds_holdout_and_attack_metadata(self):
+        cfg = load_config(self.config_path)
+        floor = _floor_from_config(next(x for x in cfg["floors"] if x["holdout"]))
+        seen = []
+
+        def inspecting_provider(role, observation, bounds):
+            seen.append(set(observation))
+            return {}
+
+        run_floor(floor, cfg["holdout_seeds"][0], cfg, "balanced", inspecting_provider)
+        forbidden = {"floor_id", "label", "holdout", "seed", "attack_mode", "compromised_observation"}
+        self.assertTrue(seen)
+        self.assertTrue(all(keys.isdisjoint(forbidden) for keys in seen))
+
+    def test_dirty_git_source_fails_closed(self):
+        with mock.patch("agent_arena.subprocess.check_output", return_value=" M code/agent_arena.py\n"):
+            with self.assertRaisesRegex(ValueError, "clean Git worktree"):
+                _git_state()
 
     def test_nan_agent_proposal_fails_closed(self):
         cfg = load_config(self.config_path)
@@ -154,8 +209,10 @@ class AgentArenaV5Tests(unittest.TestCase):
         first = paired_statistics(baseline, candidate, cfg)
         second = paired_statistics(baseline, candidate, cfg)
         self.assertEqual(canonical_json(first), canonical_json(second))
-        low, high = first["score_delta"]["bootstrap_ci"]
+        low, high = first["score_delta"]["floor_cluster_bootstrap_ci"]
         self.assertLessEqual(low, high)
+        self.assertEqual(first["energy_delta"]["adverse_tail"], "upper")
+        self.assertEqual(first["score_delta"]["adverse_tail"], "lower")
 
     def test_merkle_root_is_order_sensitive(self):
         a = [sha256_text("a"), sha256_text("b"), sha256_text("c")]

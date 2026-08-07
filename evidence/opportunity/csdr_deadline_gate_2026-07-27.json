@@ -1,0 +1,27 @@
+{
+  "schema": "lumencore.public_deadline_gate.v1",
+  "evaluated_utc": "2026-07-27T20:12:08Z",
+  "opportunity": {
+    "notice_id": "FA701426SCS01",
+    "title": "DAF CSDR Support and Curation CSO",
+    "official_url": "https://sam.gov/opp/a7d2947ffb4e43e28cf136925e59e580/view",
+    "deadline_utc": "2026-07-27T17:00:00Z",
+    "deadline_display": "July 27, 2026 at 1:00 PM EDT"
+  },
+  "mailbox_reconciliation": {
+    "sent_capability_outreach_count": 1,
+    "sent_utc": "2026-07-24T17:48:11Z",
+    "inbound_reply_count": 0,
+    "checked_utc": "2026-07-27T20:12:08Z",
+    "private_identifiers_excluded": true
+  },
+  "submission_state": "OUTREACH_SENT_NO_FORMAL_STEP_1_WHITE_PAPER_RECEIPT",
+  "decision": "PAST_DEADLINE_NO_LATE_OR_DUPLICATE_ACTION",
+  "external_action_authorized": false,
+  "claim_boundaries": [
+    "The July 24 no-attachment capability email is not a formal Step 1 white-paper receipt.",
+    "No inbound response or formal submission receipt was found in the reconciled mailbox.",
+    "The deadline has passed; this receipt does not authorize a late or duplicate response."
+  ],
+  "safest_next_action": "Do not submit late or duplicate the prior capability email. Monitor only for an inbound request from the Government or a qualified prime."
+}

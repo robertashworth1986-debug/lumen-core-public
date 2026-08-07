@@ -1,7 +1,7 @@
 {
   "schema": "lumencore.outreach_response_templates.v1",
   "version": 1,
-  "source_effective_utc": "2026-07-25T22:53:44Z",
+  "source_effective_utc": "2026-07-28T16:24:00Z",
   "claim_boundary": "This response is a communication or routing artifact. It does not establish selection, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
@@ -31,6 +31,29 @@
         "CORRECTION_REQUEST",
         "MOU_RECEIVED",
         "PORTAL_INSTRUCTION"
+      ],
+      "send_policy": "MONITOR_NO_SEND",
+      "attachment_policy": "NONE",
+      "private_render_only": false,
+      "required_fields": [],
+      "routing_fields": [],
+      "sensitive_fields": [],
+      "optional_defaults": {},
+      "subject": "",
+      "body": ""
+    },
+    {
+      "template_id": "NO_DUPLICATE_MEETING_PREP",
+      "description": "Use when one calendar invitation already exists and the meeting is confirmed or accepted; prepare evidence and monitor the existing event without sending another reply or invitation.",
+      "inbound_states": [
+        "MEETING_CONFIRMED",
+        "CALENDAR_INVITE_ACCEPTED",
+        "MEETING_PREP_DUE"
+      ],
+      "reply_triggers": [
+        "SCHEDULE_CHANGE",
+        "NEW_MEETING_QUESTION",
+        "ATTENDANCE_PROBLEM"
       ],
       "send_policy": "MONITOR_NO_SEND",
       "attachment_policy": "NONE",
@@ -410,6 +433,49 @@
       "body": "Hello {recipient_name},\n\nI am {sender_name}, {sender_title} of {organization_name}. {company_one_line}\n\nI am requesting a review for {investor_program_name}. Our current ask is {current_raise_amount} for {current_raise_purpose}. The six-month milestone is {six_month_milestone}\n\nClimate-positive component: {climate_component}\n\nCurrent stage and claim boundary: {current_stage_disclosure}\n\nCompany: {public_company_url}\nPublic proof: {public_proof_url}\n\nNo attachment is included. If this is not the correct route, would you please direct me to the official application channel? I will not send a duplicate initial request.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
     },
     {
+      "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
+      "description": "Send one no-attachment fit-check to a verified public corporate route for an active opportunity that permits teaming, while preserving qualification and partner-authority boundaries.",
+      "inbound_states": [
+        "VERIFIED_PUBLIC_PARTNER_ROUTE_NO_PRIOR_THREAD"
+      ],
+      "reply_triggers": [
+        "ONE_INITIAL_BOUNDED_TEAMING_INQUIRY"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "attachment_policy": "NONE",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "agency_name",
+        "opportunity_name",
+        "notice_type",
+        "opportunity_summary",
+        "deadline_iso",
+        "teaming_basis",
+        "bounded_contribution",
+        "qualification_boundary",
+        "partner_fit_basis",
+        "requested_partner_role",
+        "authorization_request",
+        "duplicate_review_disclosure",
+        "source_opportunity_url",
+        "public_company_url",
+        "public_proof_url",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email"
+      ],
+      "sensitive_fields": [
+        "recipient_email"
+      ],
+      "optional_defaults": {},
+      "subject": "Time-sensitive teaming inquiry - {opportunity_name}",
+      "body": "Hello {recipient_name},\n\nI am {sender_name}, {sender_title} of {organization_name}. {agency_name} posted {opportunity_name}, a {notice_type}: {opportunity_summary}\n\nThe official response deadline is {deadline_iso}. {teaming_basis}\n\nOur bounded contribution is {bounded_contribution}\n\nQualification boundary: {qualification_boundary}\n\nPartner fit basis: {partner_fit_basis}\n\nWould your organization be open to a rapid fit check for the following role: {requested_partner_role}\n\nBefore either organization is named or any credential is used, we need written confirmation of: {authorization_request}\n\nDuplicate-send check: {duplicate_review_disclosure}\n\nThis inquiry requests a nonbinding fit check only. It does not request pricing, a commitment, or permission to represent an unverified qualification. No attachment is included. A prompt reply would preserve time for both parties to reconcile an accurate response before the official deadline.\n\nOfficial notice: {source_opportunity_url}\nCompany: {public_company_url}\nPublic proof: {public_proof_url}\n\nRespectfully,\n{sender_name}\n{sender_title}\n{organization_name}"
+    },
+    {
       "template_id": "VALIDATION_PILOT_REQUEST",
       "description": "Invite a qualified reviewer to define a bounded, independently reproducible evaluation rather than endorse a broad platform claim.",
       "inbound_states": [
@@ -555,6 +621,47 @@
       "optional_defaults": {},
       "subject": "Re: {source_subject}",
       "body": "Hello {recipient_name},\n\nI apologize for the scheduling mistake regarding {meeting_context}. {scheduling_correction}\n\nI remain interested and can meet during: {availability_windows}. Please use whichever available slot is easiest, or send the correct rebooking link.\n\nThank you,\n{sender_name}\n{sender_title}\n{organization_name}"
+    },
+    {
+      "template_id": "FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE",
+      "description": "Transmit one capability response explicitly requested by an official sources-sought or market-research notice, with a source-bound deadline, attachment inventory, information-handling disclosure, and exact action-time review.",
+      "inbound_states": [
+        "OFFICIAL_MARKET_RESEARCH_NOTICE_OPEN",
+        "CAPABILITY_RESPONSE_READY_FOR_ACTION_TIME_REVIEW"
+      ],
+      "reply_triggers": [
+        "OFFICIAL_CAPABILITY_RESPONSE_REQUIRED"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+      "private_render_only": true,
+      "required_fields": [
+        "recipient_name",
+        "agency_name",
+        "notice_title",
+        "notice_id",
+        "official_source_url",
+        "official_source_checked_utc",
+        "official_source_receipt_sha256",
+        "deadline_iso",
+        "legal_entity_name",
+        "attachment_inventory",
+        "information_handling_disclosure",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email"
+      ],
+      "sensitive_fields": [
+        "recipient_email",
+        "legal_entity_name",
+        "attachment_inventory"
+      ],
+      "optional_defaults": {},
+      "subject": "Sources Sought Response - {notice_id} - {legal_entity_name}",
+      "body": "Hello {recipient_name},\n\nAttached is {legal_entity_name}'s capability response to {notice_title} ({notice_id}) for {agency_name}. The official response deadline is {deadline_iso}.\n\nOfficial notice: {official_source_url}\nOfficial source rechecked: {official_source_checked_utc}\nSource receipt SHA-256: {official_source_receipt_sha256}\n\nAttachment inventory: {attachment_inventory}\n\nThis response is provided solely for market research. It does not include a price proposal and does not imply a solicitation, reimbursement, Government commitment, selection, or award.\n\nInformation-handling disclosure: {information_handling_disclosure}\n\nPlease confirm receipt only if your process normally provides one; no duplicate response will be sent without a new request.\n\nRespectfully,\n{sender_name}\n{sender_title}\n{organization_name}"
     }
   ]
 }

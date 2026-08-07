@@ -12,7 +12,9 @@ The public repository is a review surface. It is not a certification, an audited
 
 **[Open the Canonical Evidence Index](EVIDENCE_INDEX.md)**
 
-The index identifies:
+**[Open the Reviewer Start Here page](docs/REVIEWER_START_HERE.md)**
+
+The index is the canonical evidence map. The reviewer page gives the shortest human path. The index identifies:
 
 - what is merged into the default branch;
 - what is a deployed demonstration;

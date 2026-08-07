@@ -1,15 +1,53 @@
 # Outreach Response Template Registry - 2026-07-18
 
-- Templates: `15`
-- Private-render templates: `11`
+- Templates: `18`
+- Private-render templates: `13`
 - Builder can send email: `false`
 - Duplicate-send gate: `FAIL_CLOSED`
 - Missing-fact gate: `FAIL_CLOSED`
 - Past-deadline gate: `FAIL_CLOSED`
 - Inserted-fact claim gate: `FAIL_CLOSED`
+- Static-template full claim taxonomy: `FAIL_CLOSED`
+- Rendered-output full claim taxonomy: `FAIL_CLOSED`
+- Evidence-authorized rendered claim codes: `EXPLICITLY_BOUNDED`
+- Unicode format-character gate: `FAIL_CLOSED`
+- Mixed-script confusable gate: `FAIL_CLOSED`
+- Claim scan normalization: `UNICODE_NFKD_DIACRITIC_FOLD`
+- Bounded Greek/Cyrillic confusable skeleton scan: `enabled`
+- Claim negation scope: `DIRECT_OR_EXPLICIT_CLAIM_GRAMMAR`
+- Unrelated earlier negation suppresses claim gate: `false`
+- Positive-marker fallback: `STRUCTURED_FAIL_CLOSED`
+- Guarantees and superlatives authorizable by receipt: `false`
 - High-risk claim evidence: `EXACT_VALUE_AND_SOURCE_HASH_BOUND`
+- Ready-render dispatch scope: `RECIPIENT_THREAD_BODY_DEADLINE_EVIDENCE_HASH_BOUND`
+- Attachment content required for exact approval: `true`
+- Draft binding is send authorization: `false`
+- Action-time mailbox receipt: `REQUIRED`
+- Action-time mailbox freshness: `15_MINUTES_MAX`
+- Exact approval phrase: `BINDING_SCOPED_SINGLE_USE`
+- Exact approval window: `5_MINUTES_MAX`
+- Action-time authorization builder: `code/ops/BUILD_OUTREACH_ACTION_TIME_AUTHORIZATION.py`
+- Authorization builder can approve or send email: `false`
+- Private HumanUnlock: `REQUIRED_AT_RUNTIME`
+- Dispatch handoff keyed authentication: `HMAC-SHA256`
+- Consumption revalidates private HumanUnlock: `true`
+- Dispatch handoff production clock: `SYSTEM_UTC_ONLY`
+- Approval expiry bounded by mailbox freshness: `true`
+- Consumption directory filesystem object bound: `true`
+- Consumption directory reparse points allowed: `false`
+- Dispatch handoff can send email: `false`
+- Post-send observation: `FRESH_EXACT_SENT_COPY_REQUIRED`
+- Consumed binding duplicate send allowed: `false`
+- Dispatch consumption builder: `code/ops/CAPTURE_OUTREACH_DISPATCH_CONSUMPTION.py`
+- Consumption receipt builder can send email: `false`
+- Canonical consumption directory: `REQUIRED_FOR_HANDOFF`
+- Consumption directory identity: `HASH_BOUND_IN_EXACT_APPROVAL`
+- Dispatch handoff reservation: `ATOMIC_EXCLUSIVE_REQUIRED`
+- Competing handoff reservation: `FAIL_CLOSED`
+- Consumption finalizes exact reservation: `true`
+- Consumption receipt filename: `DISPATCH_BINDING_SHA256`
 - Static quality gate: `PASS`
-- Static quality checks: `180`
+- Static quality checks: `270`
 - Unchanged rebuilds byte-stable: `true`
 
 ## Claim Boundary
@@ -33,14 +71,15 @@ This response is a communication or routing artifact. It does not establish sele
 ## Quality Gate
 
 - All templates pass: `true`
-- Deadline-control templates: `COMPONENT_INSTRUCTION_ESCALATION, PORTAL_SUPPORT_DEADLINE_RESCUE`
-- HTTPS public URL fields: `3`
+- Deadline-control templates: `COMPONENT_INSTRUCTION_ESCALATION, FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE, INITIAL_PARTNER_TEAMING_INQUIRY, PORTAL_SUPPORT_DEADLINE_RESCUE`
+- HTTPS public URL fields: `7`
 
 ## Decision Matrix
 
 | Template | Send policy | Attachment policy | Private render |
 |---|---|---|---:|
 | `NO_DUPLICATE_MONITOR` | `MONITOR_NO_SEND` | `NONE` | `false` |
+| `NO_DUPLICATE_MEETING_PREP` | `MONITOR_NO_SEND` | `NONE` | `false` |
 | `DEADLINE_CLARIFICATION` | `HUMAN_ACTION_DUE` | `NONE` | `false` |
 | `PORTAL_SUPPORT_DEADLINE_RESCUE` | `HUMAN_ACTION_DUE` | `EXPLICIT_REQUEST_ONLY` | `true` |
 | `REQUESTED_INFORMATION_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `true` |
@@ -51,10 +90,12 @@ This response is a communication or routing artifact. It does not establish sele
 | `WARM_INVESTOR_INTRO_REQUEST` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `FUNDING_REVIEW_STATUS_CHECK` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `DIRECT_INVESTOR_REVIEW_REQUEST` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
+| `INITIAL_PARTNER_TEAMING_INQUIRY` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
 | `VALIDATION_PILOT_REQUEST` | `REPLY_AFTER_FACT_REVIEW` | `EXPLICIT_REQUEST_ONLY` | `false` |
 | `DECLINE_CLOSEOUT` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `false` |
 | `MOU_ONBOARDING_REPLY` | `REPLY_AFTER_FACT_REVIEW` | `NONE` | `true` |
 | `MEETING_REBOOK_REQUEST` | `HUMAN_ACTION_DUE` | `NONE` | `true` |
+| `FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE` | `HUMAN_ACTION_DUE` | `EXPLICIT_REQUEST_ONLY` | `true` |
 
 ## NO_DUPLICATE_MONITOR
 
@@ -62,6 +103,16 @@ Use after a receipt, out-of-office notice, completed answer, or final decline wh
 
 - Inbound states: `RECEIPT_CONFIRMED, OUT_OF_OFFICE, ALREADY_ANSWERED, DECLINE_FINAL`
 - Reply triggers: `NEW_FACT_REQUEST, CORRECTION_REQUEST, MOU_RECEIVED, PORTAL_INSTRUCTION`
+- Required fields: `none`
+
+No message is rendered. Monitor the thread and do not duplicate-send.
+
+## NO_DUPLICATE_MEETING_PREP
+
+Use when one calendar invitation already exists and the meeting is confirmed or accepted; prepare evidence and monitor the existing event without sending another reply or invitation.
+
+- Inbound states: `MEETING_CONFIRMED, CALENDAR_INVITE_ACCEPTED, MEETING_PREP_DUE`
+- Reply triggers: `SCHEDULE_CHANGE, NEW_MEETING_QUESTION, ATTENDANCE_PROBLEM`
 - Required fields: `none`
 
 No message is rendered. Monitor the thread and do not duplicate-send.
@@ -325,6 +376,47 @@ Thank you,
 {organization_name}
 ```
 
+## INITIAL_PARTNER_TEAMING_INQUIRY
+
+Send one no-attachment fit-check to a verified public corporate route for an active opportunity that permits teaming, while preserving qualification and partner-authority boundaries.
+
+- Inbound states: `VERIFIED_PUBLIC_PARTNER_ROUTE_NO_PRIOR_THREAD`
+- Reply triggers: `ONE_INITIAL_BOUNDED_TEAMING_INQUIRY`
+- Required fields: `recipient_name, agency_name, opportunity_name, notice_type, opportunity_summary, deadline_iso, teaming_basis, bounded_contribution, qualification_boundary, partner_fit_basis, requested_partner_role, authorization_request, duplicate_review_disclosure, source_opportunity_url, public_company_url, public_proof_url, sender_name, sender_title, organization_name, recipient_email`
+
+```text
+Subject: Time-sensitive teaming inquiry - {opportunity_name}
+
+Hello {recipient_name},
+
+I am {sender_name}, {sender_title} of {organization_name}. {agency_name} posted {opportunity_name}, a {notice_type}: {opportunity_summary}
+
+The official response deadline is {deadline_iso}. {teaming_basis}
+
+Our bounded contribution is {bounded_contribution}
+
+Qualification boundary: {qualification_boundary}
+
+Partner fit basis: {partner_fit_basis}
+
+Would your organization be open to a rapid fit check for the following role: {requested_partner_role}
+
+Before either organization is named or any credential is used, we need written confirmation of: {authorization_request}
+
+Duplicate-send check: {duplicate_review_disclosure}
+
+This inquiry requests a nonbinding fit check only. It does not request pricing, a commitment, or permission to represent an unverified qualification. No attachment is included. A prompt reply would preserve time for both parties to reconcile an accurate response before the official deadline.
+
+Official notice: {source_opportunity_url}
+Company: {public_company_url}
+Public proof: {public_proof_url}
+
+Respectfully,
+{sender_name}
+{sender_title}
+{organization_name}
+```
+
 ## VALIDATION_PILOT_REQUEST
 
 Invite a qualified reviewer to define a bounded, independently reproducible evaluation rather than endorse a broad platform claim.
@@ -430,6 +522,39 @@ Thank you,
 {organization_name}
 ```
 
+## FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE
+
+Transmit one capability response explicitly requested by an official sources-sought or market-research notice, with a source-bound deadline, attachment inventory, information-handling disclosure, and exact action-time review.
+
+- Inbound states: `OFFICIAL_MARKET_RESEARCH_NOTICE_OPEN, CAPABILITY_RESPONSE_READY_FOR_ACTION_TIME_REVIEW`
+- Reply triggers: `OFFICIAL_CAPABILITY_RESPONSE_REQUIRED`
+- Required fields: `recipient_name, agency_name, notice_title, notice_id, official_source_url, official_source_checked_utc, official_source_receipt_sha256, deadline_iso, legal_entity_name, attachment_inventory, information_handling_disclosure, sender_name, sender_title, organization_name, recipient_email`
+
+```text
+Subject: Sources Sought Response - {notice_id} - {legal_entity_name}
+
+Hello {recipient_name},
+
+Attached is {legal_entity_name}'s capability response to {notice_title} ({notice_id}) for {agency_name}. The official response deadline is {deadline_iso}.
+
+Official notice: {official_source_url}
+Official source rechecked: {official_source_checked_utc}
+Source receipt SHA-256: {official_source_receipt_sha256}
+
+Attachment inventory: {attachment_inventory}
+
+This response is provided solely for market research. It does not include a price proposal and does not imply a solicitation, reimbursement, Government commitment, selection, or award.
+
+Information-handling disclosure: {information_handling_disclosure}
+
+Please confirm receipt only if your process normally provides one; no duplicate response will be sent without a new request.
+
+Respectfully,
+{sender_name}
+{sender_title}
+{organization_name}
+```
+
 ## Operating Boundary
 
-This registry renders drafts and routing decisions only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A hash-bound receipt proves only that an exact inserted fact was reviewed against the listed source bytes; it does not by itself establish independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.
+This registry renders drafts, immutable dispatch bindings, action-time authorization records, routing decisions, and privacy-safe post-send consumption receipts only. It does not access Gmail, transmit a message, certify facts, authorize an attachment, or replace action-time human review. A ready render receives a binding over the recipient route, source thread, exact subject and body, deadline, evidence receipts, and attachment set, but that draft binding is not send authorization. An exact approval phrase is withheld until every attachment content hash is bound and a fresh full-mailbox search plus exact draft readback confirm one current unsent draft, no matching sent copy, no later inbound response, and no CC or BCC. The resulting exact phrase is hash-bound, single-use, and valid for no more than five minutes, the remaining mailbox-evidence freshness, or the deadline, whichever comes first. The production handoff CLI uses the system UTC wall clock and exposes no clock override. Dispatch authorization additionally requires a private HumanUnlock checked only at runtime; an authorized handoff is authenticated with HMAC-SHA256 under that private unlock, while the token and expected hash remain omitted from receipts and the evaluator cannot send. The HMAC provides tamper evidence only while the private unlock is unavailable to the artifact editor; it does not establish OS-level caller identity or provider provenance. The consumption ledger identity binds both its canonical path and filesystem object and rejects reparse points. After a connected sender acts, consumption revalidates the private unlock and keyed handoff, then requires a fresh private Gmail observation with exactly one matching SENT copy, no current draft, no route, body, subject, attachment, CC, or BCC drift, and a send timestamp inside the approval window and before the deadline. The resulting redacted receipt marks the binding consumed and prohibits duplicate send, but it does not prove delivery or recipient response. A binding or receipt is not proof of content truth, independent validation, agency acceptance, field performance, savings, an award, or any other real-world outcome.
