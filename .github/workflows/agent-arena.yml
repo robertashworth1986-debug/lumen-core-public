@@ -1,0 +1,32 @@
+name: Agent Arena V5 Gate
+
+on:
+  pull_request:
+    paths:
+      - "code/agent_arena.py"
+      - "config/agent_arena_v5.json"
+      - "tests/test_agent_arena.py"
+      - "docs/AGENT_ARENA.md"
+      - ".github/workflows/agent-arena.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-arena-v5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile
+        run: python -m py_compile code/agent_arena.py tests/test_agent_arena.py
+      - name: Unit, leakage, adversarial, custody, and tamper tests
+        run: python -m unittest -v tests.test_agent_arena
+      - name: Generate locked V5 evidence bundle
+        run: python code/agent_arena.py run --config config/agent_arena_v5.json --out /tmp/agent-arena-v5
+      - name: Verify locked V5 evidence bundle
+        run: python code/agent_arena.py verify --out /tmp/agent-arena-v5
