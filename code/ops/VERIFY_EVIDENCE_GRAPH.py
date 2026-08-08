@@ -366,9 +366,17 @@ def verify_graph(graph: dict[str, Any]) -> dict[str, Any]:
         raise ValueError(
             "PR #34 must remain represented as the merged assurance foundation"
         )
-    if "pr-64" not in by_id or by_id["pr-64"]["state"] != "externally_executable":
+    if "pr-74" not in by_id or by_id["pr-74"]["state"] != "merged_capability":
         raise ValueError(
-            "PR #64 must remain externally executable, not externally complete"
+            "PR #74 must remain represented as the merged CODECHECK implementation"
+        )
+    if "externally_executable_package" not in by_id["pr-74"]["supports"]:
+        raise ValueError(
+            "PR #74 must retain the bounded externally-executable package support"
+        )
+    if "pr-101" not in by_id or by_id["pr-101"]["state"] != "merged_capability":
+        raise ValueError(
+            "PR #101 must remain represented as the merged Proof Capsule v3 standard"
         )
 
     echolock = by_id.get("echolock-pilot")

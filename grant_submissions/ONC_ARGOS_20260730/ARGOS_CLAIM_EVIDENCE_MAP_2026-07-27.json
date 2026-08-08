@@ -40,7 +40,7 @@
         "commercial_value"
       ],
       "evidence": {
-        "canonical_role": "current_default_branch_proof_capsule_standard",
+        "canonical_role": "merged_proof_capsule_v2_foundation",
         "evidence_graph_node": "pr-34",
         "evidence_graph_path": "config/evidence_graph_v1.json"
       },
@@ -68,7 +68,7 @@
     }
   ],
   "external_action_performed": false,
-  "generated_utc": "2026-07-28T20:16:29Z",
+  "generated_utc": "2026-08-08T04:46:38Z",
   "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
   "response": {
     "material_claim_count": 3,
@@ -91,12 +91,12 @@
     {
       "hash_mode": "TEXT_UTF8_LF",
       "path": "config/evidence_graph_v1.json",
-      "sha256": "571899d2188ed504040446a2d4e0b8cc959a77e4665fbd35acd2a7d1365d32c8"
+      "sha256": "ccea3fdea616778cc8f228422a9a063242b23229e00e8f0ab550cee828909ffe"
     },
     {
       "hash_mode": "TEXT_UTF8_LF",
       "path": "EVIDENCE_INDEX.md",
-      "sha256": "cbf37b586de8833771bda5a1320fd2ef5e52341d0718068cefa8d1605a9f437a"
+      "sha256": "f38db66d177592d7e59e955cb23c53e330eabc437dc14ba0519e5a5f8055d615"
     },
     {
       "hash_mode": "TEXT_UTF8_LF",
