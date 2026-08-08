@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>ProofLock Console</title>
+  <link rel="icon" href="prooflock_favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css?v=20260721.2">
+  <link rel="stylesheet" href="prooflock_lattice.css?v=20260721.2">
+</head>
+<body>
+  <header class="appbar">
+    <div class="brand-block">
+      <span class="brand-mark" aria-hidden="true">PL</span>
+      <div>
+        <p class="brand-name">ProofLock Console</p>
+        <p class="brand-meta">LumenCore / Developer Tools</p>
+      </div>
+    </div>
+    <div class="appbar-status">
+      <span class="status-dot" id="headerStatusDot" aria-hidden="true"></span>
+      <span id="headerStatus">Awaiting verification</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="command-band" aria-label="Receipt controls">
+      <div>
+        <h1>Artifact verification</h1>
+        <p id="receiptIdentity">No receipt loaded</p>
+      </div>
+      <div class="command-row">
+        <button type="button" id="guidedProofButton" class="guided">Run guided proof</button>
+        <button type="button" id="loadSampleButton">Load sample</button>
+        <button type="button" id="verifyButton" class="primary">Verify receipt</button>
+        <button type="button" id="exportButton" disabled>Export report</button>
+      </div>
+    </section>
+
+    <section class="metric-strip" aria-label="Verification summary">
+      <div class="metric">
+        <span class="metric-label">Integrity</span>
+        <strong id="integrityMetric">Pending</strong>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Artifacts</span>
+        <strong id="artifactMetric">0 / 0</strong>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Required gates</span>
+        <strong id="gateMetric">0 open</strong>
+      </div>
+      <div class="metric decision-metric">
+        <span class="metric-label">Effective decision</span>
+        <strong id="decisionMetric">Pending</strong>
+      </div>
+    </section>
+
+    <section class="lattice-band" aria-labelledby="latticeHeading">
+      <canvas id="evidenceLattice" aria-hidden="true"></canvas>
+      <div class="lattice-copy">
+        <p class="lattice-kicker">Macro-to-micro deterministic state</p>
+        <h2 id="latticeHeading">Custody hyperlattice</h2>
+        <p id="latticeStatus" aria-live="polite">Awaiting canonical verification.</p>
+      </div>
+      <div class="lattice-axis" aria-hidden="true">
+        <span>Source</span>
+        <i></i>
+        <span>Receipt</span>
+        <i></i>
+        <span>Authority</span>
+        <i></i>
+        <span>Decision</span>
+      </div>
+      <div class="lattice-scale" aria-hidden="true">
+        <span>Macro</span><i></i><span>Meso</span><i></i><span>Micro</span>
+      </div>
+      <p class="lattice-boundary">Visual state represents receipt integrity and authority gates, not engineering performance or certification.</p>
+    </section>
+
+    <section class="workspace-grid">
+      <div class="editor-pane">
+        <div class="section-heading">
+          <h2>Receipt JSON</h2>
+          <span id="receiptHashLabel">SHA-256 pending</span>
+        </div>
+        <label class="sr-only" for="receiptEditor">Receipt JSON</label>
+        <textarea id="receiptEditor" spellcheck="false" autocomplete="off"></textarea>
+      </div>
+
+      <aside class="preview-pane">
+        <div class="asset-frame evidence-purpose">
+          <span class="purpose-kicker">One buyer-owned decision</span>
+          <strong>Candidate vs accepted baseline</strong>
+          <p>Same source. Same frozen metric. Same held-out rules. Failures retained.</p>
+        </div>
+        <div class="asset-caption">
+          <span>PROOFLOCK</span>
+          <strong>Decision-control verifier</strong>
+        </div>
+        <div class="boundary-block">
+          <h2>Claim boundary</h2>
+          <p id="claimBoundary">Load and verify a receipt.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="results-section" aria-labelledby="artifactHeading">
+      <div class="section-heading">
+        <h2 id="artifactHeading">Artifact matrix</h2>
+        <span id="artifactSummary">No results</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Artifact</th>
+              <th>Role</th>
+              <th>Observed SHA-256</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="artifactRows">
+            <tr><td colspan="4" class="empty-cell">No receipt verified</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="results-section" aria-labelledby="gateHeading">
+      <div class="section-heading">
+        <h2 id="gateHeading">Authority gates</h2>
+        <span id="gateSummary">Fail closed</span>
+      </div>
+      <div class="gate-grid" id="gateGrid"></div>
+    </section>
+
+    <section class="event-log" aria-labelledby="eventHeading">
+      <div class="section-heading">
+        <h2 id="eventHeading">Verification log</h2>
+        <span id="verificationTime">Not run</span>
+      </div>
+      <pre id="eventLog">Ready.</pre>
+    </section>
+    <p id="verificationLive" class="sr-only" aria-live="polite">Awaiting verification.</p>
+    <section class="results-section purpose-note" aria-labelledby="purposeHeading">
+      <div class="section-heading">
+        <h2 id="purposeHeading">What ProofLock solves</h2>
+        <span>Evidence before promotion</span>
+      </div>
+      <p>ProofLock verifies custody and enforces authority gates so an internally authored receipt cannot turn a demo, replay, or self-asserted PASS into a promotion decision. It does not decide whether the underlying technology performs well; that requires the named baseline and held-out evaluation.</p>
+      <p><a href="/proof_to_pilot.html">See the bounded validation engagement</a></p>
+    </section>
+  </main>
+
+  <script src="bootstrap.js?v=20260721.2" type="module"></script>
+</body>
+</html>

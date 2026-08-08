@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ProofLock">
+  <rect width="64" height="64" rx="8" fill="#07131b"/>
+  <path d="M16 45V19h17c8 0 13 4 13 11s-5 11-13 11h-8v4zm9-12h8c3 0 5-1 5-3s-2-3-5-3h-8z" fill="#49d9e8"/>
+  <circle cx="49" cy="48" r="6" fill="#f3b84b"/>
+</svg>

@@ -1,0 +1,7 @@
+{
+  "schema": "lumencore.validation_protocol_manifest.v1",
+  "asset_id": "bounded_validation_protocol_v1",
+  "title": "Bounded Validation Protocol V1",
+  "status": "superseded_demo_protocol",
+  "claim_boundary": "This demonstration manifest defines a protocol lineage example only. It is not a buyer result, external validation, certification, or performance claim."
+}
