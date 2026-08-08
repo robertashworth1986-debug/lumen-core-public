@@ -441,7 +441,11 @@ function runArtifactUrl(relativePath) {
   if (!isRunUtc(utc) || !isSafeArtifactPath(path)) {
     throw new Error('invalid evidence artifact path');
   }
-  return `${base}/${utc}/${path}`;
+  const candidate = new URL(`${base}/${utc}/${path}`, document.baseURI);
+  if (!['https:', 'http:'].includes(candidate.protocol) || candidate.origin !== window.location.origin) {
+    throw new Error('cross-origin evidence artifact blocked');
+  }
+  return candidate.href;
 }
 
 async function findLatestRun() {

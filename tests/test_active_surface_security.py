@@ -128,6 +128,8 @@ def test_active_dashboards_use_fail_closed_url_and_dom_boundaries() -> None:
     assert "RUN_URL" not in evidence
     assert "unapproved evidence artifact" in evidence
     assert 'case "summary.json"' in evidence
+    assert "candidate.origin !== window.location.origin" in evidence
+    assert "cross-origin evidence artifact blocked" in evidence
     assert "document.getElementById('af').innerHTML" not in sector
     assert "document.getElementById('srs').innerHTML" not in sector
     assert "document.getElementById('tti').innerHTML" not in sector
