@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - "docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md"
+      - "docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md"
+      - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md"
+      - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md"
       - "config/strategic_transaction_packet_v2.json"
       - "config/evidence_graph_v1.json"
       - "code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py"
@@ -13,6 +16,9 @@ on:
     branches: [main]
     paths:
       - "docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md"
+      - "docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md"
+      - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md"
+      - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md"
       - "config/strategic_transaction_packet_v2.json"
       - "config/evidence_graph_v1.json"
       - "code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py"

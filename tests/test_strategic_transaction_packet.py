@@ -9,6 +9,9 @@ VERIFIER_PATH = Path("code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py")
 PACKET_PATH = Path("config/strategic_transaction_packet_v2.json")
 GRAPH_PATH = Path("config/evidence_graph_v1.json")
 BRIEF_PATH = Path("docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md")
+INTAKE_PATH = Path("docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md")
+OFFER_PATH = Path("docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md")
+SOW_PATH = Path("docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md")
 WORKFLOW_PATH = Path(".github/workflows/strategic-transaction-packet.yml")
 
 spec = importlib.util.spec_from_file_location(
@@ -154,10 +157,31 @@ class StrategicTransactionPacketTests(unittest.TestCase):
         )
         self.assertNotIn("externally executable reviewer-package records", brief)
 
+    def test_scope_to_signature_path_is_explicit_and_non_binding(self):
+        brief = BRIEF_PATH.read_text(encoding="utf-8")
+        intake = INTAKE_PATH.read_text(encoding="utf-8")
+        normalized_intake = " ".join(intake.lower().split())
+
+        self.assertIn(INTAKE_PATH.name, brief)
+        self.assertIn(OFFER_PATH.name, brief)
+        self.assertIn(SOW_PATH.name, brief)
+        self.assertIn("not a contract, invoice, commitment", normalized_intake)
+        self.assertIn("scope_candidate", intake)
+        self.assertIn("needs_facts", intake)
+        self.assertIn("needs_separate_controls", intake)
+        self.assertIn("no_fit", intake)
+        self.assertIn("a favorable performance result is not promised", normalized_intake)
+        self.assertIn("raw or confidential datasets", normalized_intake)
+        self.assertIn("credentials, tokens, private keys", normalized_intake)
+        self.assertIn("work begins only under an accepted written scope", normalized_intake)
+
     def test_workflow_is_pinned_and_targets_v2_contract(self):
         workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
         self.assertIn("config/strategic_transaction_packet_v2.json", workflow)
         self.assertIn("docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md", workflow)
+        self.assertIn("docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md", workflow)
+        self.assertIn("docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md", workflow)
+        self.assertIn("docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md", workflow)
         self.assertNotIn("strategic_transaction_packet_v1.json", workflow)
         self.assertNotIn("actions/checkout@v4", workflow)
         self.assertNotIn("actions/setup-python@v5", workflow)
