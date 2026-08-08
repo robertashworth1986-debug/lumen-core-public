@@ -157,17 +157,13 @@ def build_payload() -> dict[str, Any]:
         {
             "claim": "Live-breadth frozen-delta evidence is now provenance-gated.",
             "evidence": (
-                f"Public-safe local gate reports {provenance_metrics.get('enabled_live_sources', 17)} enabled live sources, "
+                f"The historical public-safe snapshot reports {provenance_metrics.get('enabled_live_sources', 17)} enabled live sources, "
                 f"{provenance_metrics.get('measured_live_sources', 12)} measured sources, "
                 f"{float(provenance_metrics.get('measured_coverage_pct', 70.59)):.2f}% measured coverage, "
                 f"{provenance_metrics.get('promoted_live_measured_source_rows', 11)} promoted live-measured source rows, "
                 f"and {provenance_metrics.get('context_only_source_rows', 8)} context-only rows. "
-                "The promoted live-measured value signal is "
-                f"${float(provenance_metrics.get('promoted_live_measured_hourly_value_signal_usd', 8435.0)):,.0f}/hour "
-                f"(${float(provenance_metrics.get('promoted_live_measured_annual_value_signal_usd', 73890600.0)):,.0f}/year); "
-                f"the larger ${float(provenance_metrics.get('context_only_annual_surface_usd', 52257442740.0)):,.0f}/year "
-                "context-only surface is explicitly not promoted. "
-                f"Truth-chain interpretation: {truth_chain_interpretation.get('interpretation', 'promoted annual value is live-measured only.')}"
+                "Economic estimates are omitted, and this historical snapshot does not establish current feed availability or freshness. "
+                f"Truth-chain interpretation: {truth_chain_interpretation.get('interpretation', 'source coverage is not economic or performance proof.')}"
             ),
             "boundary": (
                 "This is a provenance and claim-discipline gate. It does not prove actual customer savings, revenue, "

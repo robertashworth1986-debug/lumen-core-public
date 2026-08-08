@@ -1,6 +1,6 @@
 # Public Visibility and Source Authority Packet
 
-Generated UTC: 2026-06-21T07:50:23.848638+00:00
+Generated UTC: 2026-08-08T09:54:11.295210+00:00
 
 ## Identity
 
@@ -48,7 +48,7 @@ Boundary: Controlled kinematic injections on public AIS validation data are not 
 
 ### Live-breadth frozen-delta evidence is now provenance-gated.
 
-Evidence: Public-safe local gate reports 17 enabled live sources, 12 measured sources, 70.59% measured coverage, 11 promoted live-measured source rows, and 8 context-only rows. The promoted live-measured value signal is $8,435/hour ($73,890,600/year); the larger $52,257,442,740/year context-only surface is explicitly not promoted. Truth-chain interpretation: The public annual value signal should be read as the promoted live-measured measurement surface only. The larger context-only surface is retained for research prioritization and must not be described as live proof.
+Evidence: The historical public-safe snapshot reports 17 enabled live sources, 12 measured sources, 70.59% measured coverage, 11 promoted live-measured source rows, and 8 context-only rows. Economic estimates are omitted, and this historical snapshot does not establish current feed availability or freshness. Truth-chain interpretation: This artifact reports historical source coverage and provenance buckets only. It does not convert source breadth into economic, performance, or current-runtime claims.
 
 Boundary: This is a provenance and claim-discipline gate. It does not prove actual customer savings, revenue, trading profit, grant merit, valuation, or field performance.
 

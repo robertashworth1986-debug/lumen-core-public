@@ -35,7 +35,12 @@ def test_public_support_packet_is_bounded_and_source_backed():
     assert "does not prove portal authority" in payload["boundary"]
     assert any("HarborSentinel" in item for item in payload["strong_public_evidence"])
     assert any("provenance-gated" in item for item in payload["strong_public_evidence"])
-    assert any("truth-chain promoted annual value signal" in item for item in payload["strong_public_evidence"])
+    breadth_claims = [
+        item for item in payload["strong_public_evidence"] if "provenance-gated" in item
+    ]
+    assert breadth_claims
+    assert "Economic estimates are omitted" in breadth_claims[0]
+    assert "$" not in breadth_claims[0]
     assert payload["source_artifacts"]["live_breadth_provenance_gate"].endswith(
         "LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md"
     )
