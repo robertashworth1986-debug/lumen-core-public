@@ -24,6 +24,19 @@ def test_runtime_diagnostic_is_read_only_and_host_key_strict() -> None:
     assert "journalctl --vacuum" not in text
 
 
+def test_pull_request_validation_cannot_enter_the_production_diagnostic_job() -> None:
+    text = _workflow_text()
+
+    assert "pull_request:" in text
+    assert "- 'tests/test_vps_runtime_diagnostic_workflow.py'" in text
+    assert "if: github.event_name != 'pull_request'" in text
+    assert "needs: validate" in text
+    assert "permissions:\n      contents: read\n      statuses: write" in text
+    assert "persist-credentials: false" in text
+    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803" in text
+    assert "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1" in text
+
+
 def test_runtime_diagnostic_covers_gateway_failure_chain() -> None:
     text = _workflow_text()
 
@@ -34,6 +47,10 @@ def test_runtime_diagnostic_covers_gateway_failure_chain() -> None:
         "loopback_gateway_via_nginx",
         "loopback_gateway_direct",
         "http://127.0.0.1:8787/health",
+        "probe_loopback_tls loopback_nginx_health /nginx-health",
+        "probe_loopback_tls loopback_gateway_via_nginx /health",
+        '--resolve "lumen-core.ai:443:127.0.0.1"',
+        "--noproxy lumen-core.ai",
         "show_unit \"$unit\"",
         "luma-gateway",
         "ExecMainStatus",
@@ -46,6 +63,24 @@ def test_runtime_diagnostic_covers_gateway_failure_chain() -> None:
     )
     for marker in required:
         assert marker in text, marker
+
+    assert "http://127.0.0.1/nginx-health" not in text
+    assert "http://127.0.0.1/health" not in text
+    assert "--insecure" not in text
+    assert "--no-check-certificate" not in text
+
+
+def test_loopback_nginx_probe_preserves_hostname_and_tls_identity() -> None:
+    text = _workflow_text()
+    function = text.split("probe_loopback_tls() {", 1)[1].split("show_unit() {", 1)[0]
+
+    assert '--resolve "lumen-core.ai:443:127.0.0.1"' in function
+    assert '"https://lumen-core.ai$path"' in function
+    assert "--noproxy lumen-core.ai" in function
+    assert "--output /dev/null" in function
+    assert "--max-redirs 0" in function
+    assert "--location" not in function
+    assert "--insecure" not in function
 
 
 def test_runtime_diagnostic_does_not_publish_bodies_or_unfiltered_logs() -> None:
