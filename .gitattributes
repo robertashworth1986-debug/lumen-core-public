@@ -78,6 +78,7 @@ examples/proof_capsule/** text eol=lf
 /grant_submissions/ONC_ARGOS_20260730/output/*.docx binary
 /grant_submissions/ONC_ARGOS_20260730/output/*.pdf binary
 /grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json text eol=lf
+/grant_submissions/funding_sprint_20260709/source_attachments/PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json text eol=lf
 /tests/test_current_opportunity_and_argos_packet.py text eol=lf
 /tests/test_deadline_action_sentinel.py text eol=lf
 

@@ -39,6 +39,15 @@ ARGOS_OFFICIAL_SOURCE_RECEIPT = (
     / "PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json"
 )
 
+
+def test_argos_official_source_receipt_has_lf_custody():
+    attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8")
+    assert (
+        "/grant_submissions/funding_sprint_20260709/source_attachments/"
+        "PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json text eol=lf"
+        in attributes
+    )
+
 SPEC = importlib.util.spec_from_file_location("deadline_action_sentinel", SCRIPT)
 assert SPEC and SPEC.loader
 SENTINEL = importlib.util.module_from_spec(SPEC)
