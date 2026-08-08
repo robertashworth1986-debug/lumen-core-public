@@ -55,6 +55,27 @@ if hasattr(app, "add_middleware"):
     install_operator_api_access(app)
 
 
+def _operator_health() -> dict[str, Any]:
+    """Retain detailed legacy health behind the operator API boundary."""
+
+    return _legacy.health()
+
+
+if hasattr(app, "add_api_route") and not any(
+    getattr(route, "path", "") == "/api/operator/health"
+    for route in getattr(app, "routes", ())
+):
+    app.add_api_route(
+        "/api/operator/health",
+        _operator_health,
+        methods=["GET"],
+        include_in_schema=False,
+    )
+    # The legacy app ends with a catch-all static mount. Move this protected
+    # route ahead of that mount so it cannot be shadowed as a static 404.
+    app.router.routes.insert(0, app.router.routes.pop())
+
+
 def main() -> int:
     import uvicorn
 

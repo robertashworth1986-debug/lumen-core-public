@@ -1,0 +1,234 @@
+name: Repair exact gateway dependency closure on VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_commit:
+        description: Full main-branch commit SHA selected for gateway recovery
+        required: true
+        type: string
+      approval:
+        description: Explicit production gateway-recovery gate
+        required: true
+        type: choice
+        default: HOLD
+        options:
+          - HOLD
+          - REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lumencore-production-gateway
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      source_commit: ${{ steps.gate.outputs.source_commit }}
+    steps:
+      - name: Fail closed unless this exact workflow commit is approved
+        id: gate
+        shell: bash
+        env:
+          APPROVAL: ${{ inputs.approval }}
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_COMMIT: ${{ inputs.release_commit }}
+          WORKFLOW_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EVENT_NAME" == "workflow_dispatch" ]]
+          [[ "$APPROVAL" == "REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE" ]]
+          [[ "$RELEASE_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]
+          printf 'source_commit=%s\n' "$RELEASE_COMMIT" >> "$GITHUB_OUTPUT"
+
+  repair:
+    needs: authorize
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: https://lumen-core.ai/health
+    env:
+      APPROVAL: ${{ inputs.approval }}
+      RELEASE_COMMIT: ${{ needs.authorize.outputs.source_commit }}
+      REMOTE_STAGE: /tmp/lumencore-gateway-repair-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Checkout the approved commit
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ needs.authorize.outputs.source_commit }}
+
+      - name: Require the approved commit to be current main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          [[ "$(git rev-parse HEAD)" == "$RELEASE_COMMIT" ]]
+          [[ "$(git rev-parse origin/main)" == "$RELEASE_COMMIT" ]]
+
+      - name: Package exact gateway source closure
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_root=/tmp/gateway-repair
+          source_root="$package_root/source"
+          install -d -m 0700 "$source_root"
+          mapfile -t files < <(
+            bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --print-files
+          )
+          [[ "${#files[@]}" -eq 20 ]]
+          for relative in "${files[@]}"; do
+            [[ -f "code/$relative" && ! -L "code/$relative" ]]
+            install -D -m 0644 "code/$relative" "$source_root/$relative"
+          done
+          bundle_sha=$(
+            LUMENCORE_GATEWAY_SOURCE_ROOT="$source_root" \
+              bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --bundle-sha
+          )
+          [[ "$bundle_sha" =~ ^[0-9a-f]{64}$ ]]
+          tar -C "$source_root" -cf "$package_root/gateway-source.tar" .
+          install -m 0755 code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh \
+            "$package_root/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh"
+          {
+            printf 'source_commit=%s\n' "$RELEASE_COMMIT"
+            printf 'bundle_sha256=%s\n' "$bundle_sha"
+            printf 'file_count=%s\n' "${#files[@]}"
+            printf '%s\n' "${files[@]}"
+          } > "$package_root/gateway-repair-manifest.txt"
+          printf 'bundle_sha=%s\n' "$bundle_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Stage private HumanUnlock without printing it
+        shell: bash
+        env:
+          HUMAN_UNLOCK: ${{ secrets.LUMA_HUMAN_UNLOCK_TOKEN }}
+        run: |
+          set -euo pipefail
+          [[ ${#HUMAN_UNLOCK} -ge 32 ]]
+          install -m 0600 /dev/null /tmp/gateway-repair/human-unlock
+          printf '%s' "$HUMAN_UNLOCK" > /tmp/gateway-repair/human-unlock
+          unset HUMAN_UNLOCK
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+
+      - name: Verify bounded remote prerequisites
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "opc@$VPS_HOST" '
+            set -eu
+            sudo -n true
+            sudo -n test -d /opt/lumencore/code
+            sudo -n test -x /opt/lumencore/.venv/bin/python
+            sudo -n systemctl cat luma-gateway >/dev/null
+            for command_name in python3 sha256sum realpath install cp stat mktemp curl systemctl tar; do
+              command -v "$command_name" >/dev/null
+            done
+          '
+
+      - name: Upload bounded gateway repair package
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-gateway-repair-[0-9]+-[0-9]+$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "opc@$VPS_HOST" \
+            "test ! -e '$REMOTE_STAGE' && install -d -m 0700 '$REMOTE_STAGE'"
+          scp -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            /tmp/gateway-repair/gateway-source.tar \
+            /tmp/gateway-repair/gateway-repair-manifest.txt \
+            /tmp/gateway-repair/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh \
+            /tmp/gateway-repair/human-unlock \
+            "opc@$VPS_HOST:$REMOTE_STAGE/"
+
+      - name: Apply exact gateway closure with rollback
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          BUNDLE_SHA: ${{ steps.package.outputs.bundle_sha }}
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "opc@$VPS_HOST" \
+            "set -eu
+             [[ '$REMOTE_STAGE' =~ ^/tmp/lumencore-gateway-repair-[0-9]+-[0-9]+$ ]]
+             install -d -m 0700 '$REMOTE_STAGE/source'
+             tar -C '$REMOTE_STAGE/source' -xf '$REMOTE_STAGE/gateway-source.tar'
+             sudo -n env \
+               LUMA_HUMAN_UNLOCK_TOKEN=\"\$(cat '$REMOTE_STAGE/human-unlock')\" \
+               LUMENCORE_GATEWAY_SOURCE_ROOT='$REMOTE_STAGE/source' \
+               LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256='$BUNDLE_SHA' \
+               LUMENCORE_GATEWAY_SOURCE_COMMIT='$RELEASE_COMMIT' \
+               bash '$REMOTE_STAGE/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh' --apply" \
+            | tee /tmp/gateway-repair/gateway-repair-receipt.txt
+
+      - name: Verify public gateway contracts after repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          health_body=$(mktemp)
+          status_body=$(mktemp)
+          trap 'rm -f -- "$health_body" "$status_body"' EXIT
+          health_code=$(curl --fail-with-body -sS --max-time 15 \
+            -o "$health_body" -w '%{http_code}' https://lumen-core.ai/health)
+          status_code=$(curl --fail-with-body -sS --max-time 15 \
+            -o "$status_body" -w '%{http_code}' https://lumen-core.ai/api/public/status)
+          [[ "$health_code" == 200 ]]
+          [[ "$status_code" == 200 ]]
+          for body in "$health_body" "$status_body"; do
+            jq -e '
+            .status == "ok" and
+            .service == "luma-experience-gateway" and
+            .access_boundary == "operator_api_v1" and
+            .public_surface == "minimal"
+            ' "$body" >/dev/null
+          done
+          printf 'source_commit=%s\nhealth_http=%s\npublic_status_http=%s\n' \
+            "$RELEASE_COMMIT" "$health_code" "$status_code" \
+            > /tmp/gateway-repair/public-verification-receipt.txt
+
+      - name: Remove local private unlock staging
+        if: always()
+        shell: bash
+        run: rm -f -- /tmp/gateway-repair/human-unlock
+
+      - name: Remove remote repair staging
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-gateway-repair-[0-9]+-[0-9]+$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "opc@$VPS_HOST" \
+            "resolved=\$(realpath -m -- '$REMOTE_STAGE'); \
+             [[ \"\$resolved\" =~ ^/tmp/lumencore-gateway-repair-[0-9]+-[0-9]+$ ]]; \
+             rm -rf -- \"\$resolved\""
+
+      - name: Upload bounded repair receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gateway-repair-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            /tmp/gateway-repair/gateway-repair-manifest.txt
+            /tmp/gateway-repair/gateway-repair-receipt.txt
+            /tmp/gateway-repair/public-verification-receipt.txt
+          if-no-files-found: warn
+          retention-days: 30
