@@ -406,8 +406,21 @@ const RUN_BASES = RUN_PARAM_BASE && SAFE_RUN_BASES.includes(RUN_PARAM_BASE)
 let ACTIVE_RUN_BASE = RUN_BASES[0];
 let ACTIVE_RUN_UTC = "";
 
+function canonicalRunUtc(value) {
+  const raw = String(value || '').trim();
+  const match = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(raw);
+  if (!match) return null;
+  const [year, month, day, hour, minute, second] = match.slice(1).map(Number);
+  if (year < 2000 || year > 2200 || month < 1 || month > 12 || day < 1 || day > 31
+      || hour > 23 || minute > 59 || second > 59) return null;
+  const canonical = `${String(year).padStart(4, "0")}${String(month).padStart(2, "0")}`
+    + `${String(day).padStart(2, "0")}T${String(hour).padStart(2, "0")}`
+    + `${String(minute).padStart(2, "0")}${String(second).padStart(2, "0")}Z`;
+  return canonical === raw ? canonical : null;
+}
+
 function isRunUtc(value) {
-  return /^\d{8}T\d{6}Z$/.test(String(value || '').trim());
+  return canonicalRunUtc(value) !== null;
 }
 
 function isSafeArtifactPath(value) {
@@ -450,8 +463,9 @@ function runArtifactUrl(relativePath) {
 
 async function findLatestRun() {
   // Try a passed ?run=...&utc=... pair first.
-  const utc = (new URLSearchParams(location.search)).get("utc");
-  if (isRunUtc(utc)) {
+  const rawUtc = (new URLSearchParams(location.search)).get("utc");
+  const utc = canonicalRunUtc(rawUtc);
+  if (utc !== null) {
     for (const base of RUN_BASES) {
       try {
         const probe = await fetch(base + "/" + utc + "/summary.json", { cache: "no-store" });
@@ -471,8 +485,8 @@ async function findLatestRun() {
     try {
       const r = await fetch(base + "/latest.txt", { cache: "no-store" });
       if (r.ok) {
-        const t = (await r.text()).trim();
-        if (isRunUtc(t)) {
+        const t = canonicalRunUtc((await r.text()).trim());
+        if (t !== null) {
           ACTIVE_RUN_BASE = base;
           ACTIVE_RUN_UTC = t;
           return true;

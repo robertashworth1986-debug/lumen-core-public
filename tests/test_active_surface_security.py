@@ -126,6 +126,9 @@ def test_active_dashboards_use_fail_closed_url_and_dom_boundaries() -> None:
     assert 'document.getElementById("figs").innerHTML' not in evidence
     assert 'body.innerHTML = rows.map' not in evidence
     assert "RUN_URL" not in evidence
+    assert "function canonicalRunUtc(value)" in evidence
+    assert "match.slice(1).map(Number)" in evidence
+    assert "ACTIVE_RUN_UTC = rawUtc" not in evidence
     assert "unapproved evidence artifact" in evidence
     assert 'case "summary.json"' in evidence
     assert "candidate.origin !== window.location.origin" in evidence
