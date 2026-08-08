@@ -29,6 +29,8 @@ deliverable.
 
 **[Open the Reviewer Start Here page](docs/REVIEWER_START_HERE.md)**
 
+**[Open the Institutional Readiness Dossier](docs/INSTITUTIONAL_READINESS_DOSSIER.md)**
+
 The index is the canonical evidence map. The reviewer page gives the shortest human path. The index identifies:
 
 - what is merged into the default branch;
@@ -39,6 +41,13 @@ The index is the canonical evidence map. The reviewer page gives the shortest hu
 - which external, field, and commercial gates remain open.
 
 A reviewer should not infer current truth by reading every historical or draft pull request independently.
+
+The readiness dossier is the procurement and assurance control map. It says
+which controls are implemented first-party, which are only documented or
+prepared, which require buyer-specific terms, and which remain open production
+blockers. Its machine register and verifier keep the current decision bounded
+to non-confidential fit review and buyer-specific scoping; production remains
+on `HOLD`.
 
 ## Five-minute technical path
 

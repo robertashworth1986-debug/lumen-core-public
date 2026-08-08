@@ -1,0 +1,93 @@
+name: Institutional readiness gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'README.md'
+      - 'EVIDENCE_INDEX.md'
+      - 'SECURITY.md'
+      - 'CONTRIBUTING.md'
+      - 'QUICKSTART.md'
+      - 'requirements-reviewer-ubuntu-py311.lock'
+      - 'code/proof_capsule_verifier.py'
+      - 'code/operator_api_access.py'
+      - 'code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py'
+      - 'code/ops/VERIFY_INSTITUTIONAL_READINESS.py'
+      - 'config/institutional_readiness_register_v1.json'
+      - 'docs/**'
+      - 'evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json'
+      - 'tests/test_institutional_readiness.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'README.md'
+      - 'EVIDENCE_INDEX.md'
+      - 'SECURITY.md'
+      - 'CONTRIBUTING.md'
+      - 'QUICKSTART.md'
+      - 'requirements-reviewer-ubuntu-py311.lock'
+      - 'code/proof_capsule_verifier.py'
+      - 'code/operator_api_access.py'
+      - 'code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py'
+      - 'code/ops/VERIFY_INSTITUTIONAL_READINESS.py'
+      - 'config/institutional_readiness_register_v1.json'
+      - 'docs/**'
+      - 'evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json'
+      - 'tests/test_institutional_readiness.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: institutional-readiness-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout without retained credentials
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+
+      - name: Compile bounded verifier and tests
+        run: |
+          python -m py_compile code/ops/VERIFY_INSTITUTIONAL_READINESS.py
+          python -m py_compile tests/test_institutional_readiness.py
+
+      - name: Verify readiness register and emit receipt
+        run: |
+          mkdir -p out/institutional-readiness
+          python code/ops/VERIFY_INSTITUTIONAL_READINESS.py \
+            --verified-utc 2026-08-08T00:00:00Z \
+            --json-out out/institutional-readiness/receipt.json
+
+      - name: Run adversarial readiness tests
+        run: python -m unittest discover -s tests -p 'test_institutional_readiness.py' -v
+
+      - name: Upload bounded readiness receipt
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: institutional-readiness-${{ github.sha }}
+          path: out/institutional-readiness/receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Reject whitespace errors
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          git cat-file -e "${BASE_SHA}^{commit}"
+          git diff --check "${BASE_SHA}...HEAD"

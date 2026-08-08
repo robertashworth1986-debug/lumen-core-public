@@ -1,0 +1,196 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-08-08T00:00:00Z",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "register_scope": "public_repository_and_bounded_validation_sprint",
+  "current_decision": "ready_for_non_confidential_fit_review_and_buyer_specific_scoping",
+  "production_decision": "HOLD",
+  "live_exact_snapshot_status": "not_established_for_checked_out_commit",
+  "status_counts": {
+    "implemented_first_party": 2,
+    "documented_control": 2,
+    "prepared_not_executed": 4,
+    "buyer_specific_gate": 2,
+    "open_gap": 2,
+    "not_applicable_to_bounded_sprint": 0
+  },
+  "assurance_domains": [
+    {
+      "id": "source_and_reproducibility",
+      "title": "Source identity and reproducibility",
+      "status": "implemented_first_party",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "QUICKSTART.md",
+        "requirements-reviewer-ubuntu-py311.lock",
+        "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md"
+      ],
+      "proves": "The named public capsule and pinned reviewer computation have bounded source, dependency, and replay instructions with first-party verification targets.",
+      "does_not_prove": "Independent execution, scientific validity, field performance, or fitness for a buyer's production environment.",
+      "next_gate": "Obtain and verify one protocol-matched non-author execution receipt."
+    },
+    {
+      "id": "evidence_custody_and_claim_governance",
+      "title": "Evidence custody and claim governance",
+      "status": "implemented_first_party",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "docs/PROOF_CAPSULE_SCHEMA.md",
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "code/proof_capsule_verifier.py"
+      ],
+      "proves": "The public verifier checks declared capsule structure, custody, manifests, resource boundaries, and bounded claim states.",
+      "does_not_prove": "That a self-authored input is substantively true, independently validated, safe, or authorized for release.",
+      "next_gate": "Bind a buyer-owned source, baseline, metric, and decision owner to a signed sprint scope."
+    },
+    {
+      "id": "security_reporting",
+      "title": "Security reporting and disclosure",
+      "status": "documented_control",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "SECURITY.md",
+        "CONTRIBUTING.md"
+      ],
+      "proves": "The public repository defines a private vulnerability-reporting route, supported-version boundary, and best-effort response process.",
+      "does_not_prove": "A response-time guarantee, bug bounty, penetration test, security certification, or independently audited security program.",
+      "next_gate": "Agree buyer-specific severity, notification, remediation, and disclosure terms before handling confidential data."
+    },
+    {
+      "id": "repository_supply_chain",
+      "title": "Repository and reviewer-suite supply chain",
+      "status": "documented_control",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        ".github/workflows/repository-trust.yml",
+        "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
+        "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+        "requirements-reviewer-ubuntu-py311.lock"
+      ],
+      "proves": "The named reviewer suite generates a scoped CycloneDX inventory, has hash-locked dependencies and a first-party receipt, and the repository trust workflow uses pinned action revisions.",
+      "does_not_prove": "A complete product SBOM, continuous vulnerability management, signed release provenance, or production dependency approval.",
+      "next_gate": "Generate and govern a complete product and deployment SBOM for the exact buyer-approved release."
+    },
+    {
+      "id": "public_deployment",
+      "title": "Public deployment identity",
+      "status": "prepared_not_executed",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md",
+        ".github/workflows/public-site-exact-snapshot-ci.yml",
+        ".github/workflows/deploy-public-site-release.yml"
+      ],
+      "proves": "A fail-closed exact-snapshot release and audit protocol exists in source.",
+      "does_not_prove": "That lumen-core.ai currently matches the checked-out commit or that its runtime and gateway are production-certified.",
+      "next_gate": "Run the human-gated exact-snapshot release and retain a successful current-commit live audit receipt."
+    },
+    {
+      "id": "data_rights_and_handling",
+      "title": "Buyer data rights and handling",
+      "status": "buyer_specific_gate",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md",
+        "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md",
+        "docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md"
+      ],
+      "proves": "The bounded sprint templates require source authorization, handling terms, retention, access, and acceptance details to be agreed before work.",
+      "does_not_prove": "An executed data-processing agreement, universal license to buyer data, regulated-data authorization, or legal sufficiency.",
+      "next_gate": "Complete buyer-specific data classification, rights confirmation, handling schedule, retention plan, and legal review."
+    },
+    {
+      "id": "identity_access_and_runtime",
+      "title": "Identity, access, and runtime activation",
+      "status": "prepared_not_executed",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "code/operator_api_access.py",
+        "tests/test_operator_api_access.py",
+        ".github/workflows/repair-gateway-dependency-closure.yml"
+      ],
+      "proves": "Source and tests define a default-deny operator API boundary and a separately gated gateway repair path.",
+      "does_not_prove": "That production secrets are installed, the live gateway is repaired, identity is enterprise-federated, or access controls were independently tested.",
+      "next_gate": "Execute the separately authorized runtime repair, verify secret ownership, and retain current live negative-access tests."
+    },
+    {
+      "id": "incident_response_and_continuity",
+      "title": "Incident response, continuity, and recovery",
+      "status": "open_gap",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "SECURITY.md",
+        "docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md"
+      ],
+      "proves": "A best-effort security-reporting process and bounded public-site rollback protocol are documented.",
+      "does_not_prove": "A tested incident-response plan, business-continuity plan, disaster-recovery objective, customer notification SLA, or recovery exercise.",
+      "next_gate": "Adopt a buyer-appropriate incident, continuity, backup, restoration, and notification plan and run a recorded exercise."
+    },
+    {
+      "id": "legal_certification_and_insurance",
+      "title": "Legal, certification, and insurance review",
+      "status": "open_gap",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md",
+        "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md"
+      ],
+      "proves": "The public materials preserve founder IP and separate technical evidence from legal, patent, and certification conclusions.",
+      "does_not_prove": "SOC 2, ISO 27001, FedRAMP, regulatory approval, legal approval of the offer, patent scope, or adequate commercial insurance.",
+      "next_gate": "Obtain buyer-specific legal, IP, insurance, regulatory, and certification review before any production or regulated engagement."
+    },
+    {
+      "id": "commercial_delivery",
+      "title": "Commercial scope and delivery",
+      "status": "prepared_not_executed",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md",
+        "docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md",
+        "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md"
+      ],
+      "proves": "One bounded offer, non-confidential fit intake, proposed price bands, delivery boundaries, and a buyer-specific SOW template exist.",
+      "does_not_prove": "Buyer acceptance, a signed paid scope, cleared payment, booked revenue, successful delivery, or market-tested pricing.",
+      "next_gate": "Secure one qualified buyer, signed scope, authorized source, accepted baseline and metric, and cleared initial payment."
+    },
+    {
+      "id": "external_validation",
+      "title": "Independent execution and external validation",
+      "status": "prepared_not_executed",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "docs/CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md",
+        "config/codecheck_independent_execution_receipt_template_v1.json",
+        "config/external_replication_docket_v1.json"
+      ],
+      "proves": "A bounded non-author execution handoff, receipt contract, and external replication docket are prepared.",
+      "does_not_prove": "Evaluator assignment, evaluator independence, completed non-author execution, scientific validation, certification, or field validation.",
+      "next_gate": "A qualified non-author evaluator must execute the locked protocol and return a verifiable completed receipt."
+    },
+    {
+      "id": "privacy_and_regulated_data",
+      "title": "Privacy and regulated-data boundary",
+      "status": "buyer_specific_gate",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "SECURITY.md",
+        "docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md"
+      ],
+      "proves": "The public repository excludes private records and the sprint schedule requires buyer-specific data classification and handling decisions.",
+      "does_not_prove": "HIPAA, GDPR, CCPA, export-control, classified-data, CUI, or other regulated-data authorization or compliance.",
+      "next_gate": "Keep the first fit review non-confidential; obtain applicable privacy, jurisdiction, export, and regulated-data approval before intake."
+    }
+  ],
+  "claim_boundaries": [
+    "no_independent_validation",
+    "no_field_validation",
+    "no_customer_or_signed_paid_scope",
+    "no_cleared_payment_or_revenue",
+    "no_soc2_iso27001_fedramp_certification",
+    "no_penetration_test",
+    "no_enterprise_sla",
+    "no_executed_dpa_or_legal_review",
+    "no_complete_product_sbom",
+    "no_exact_live_snapshot_established_for_checked_out_commit"
+  ]
+}
