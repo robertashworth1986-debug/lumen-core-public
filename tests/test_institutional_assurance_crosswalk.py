@@ -179,7 +179,7 @@ class InstitutionalAssuranceCrosswalkTests(unittest.TestCase):
 
     def test_missing_claim_boundary_is_rejected(self) -> None:
         payload = self.canonical_payload()
-        payload["claim_boundaries"].remove("not_a_penetration_test")
+        payload["claim_boundaries"].remove("not_a_slsa_level_or_complete_product_provenance")
         with self.assertRaisesRegex(MODULE.AssuranceCrosswalkError, "claim boundary"):
             self.verify_payload(payload)
 

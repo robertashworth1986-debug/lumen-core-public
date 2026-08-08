@@ -25,6 +25,10 @@ The repository does **not** currently establish independent scientific validatio
 - Incident response and continuity plan: [`docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md`](docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)
 - Public-release incident classifier: [`code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py`](code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py)
 - Machine incident policy: [`config/incident_response_and_continuity_v1.json`](config/incident_response_and_continuity_v1.json)
+- Public-site supply-chain assurance: [`docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md`](docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)
+- Deterministic exact-release SBOM builder: [`code/deploy/build_public_site_supply_chain.py`](code/deploy/build_public_site_supply_chain.py)
+- Exact-release supply-chain verifier: [`code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py`](code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py)
+- Main-only signed-attestation workflow: [`.github/workflows/public-site-supply-chain.yml`](.github/workflows/public-site-supply-chain.yml)
 - Machine-sealed offer packet: [`config/strategic_transaction_packet_v2.json`](config/strategic_transaction_packet_v2.json)
 - Governed portfolio audit: [`docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md`](docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
 - Machine-readable portfolio receipt: [`dashboard/data/lumencore_engine_portfolio_audit.json`](dashboard/data/lumencore_engine_portfolio_audit.json)
@@ -40,6 +44,13 @@ OWASP, and SLSA framework themes. It names implemented, documented, scoped,
 prepared, buyer-specific, and open-gap states. It does not claim certification,
 full framework conformance, external audit, penetration testing, or production
 authorization.
+
+The public-site supply-chain lane inventories all 30 exact-release files in a
+deterministic CycloneDX 1.6 document. Pull-request artifacts remain unsigned;
+the separate `main` job is authorized to create GitHub OIDC/Sigstore build and
+SBOM attestations and verify them against the repository, workflow, ref, source
+digest, and GitHub-hosted runner. This is not a complete product or VPS SBOM,
+a SLSA level, or proof that the live domain matches the archive.
 
 ## Evidence-state legend
 

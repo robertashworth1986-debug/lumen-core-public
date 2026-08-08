@@ -28,6 +28,9 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
 - Every installed file is re-hashed before the deployment can succeed.
 - Every canonical public URL is downloaded and compared byte-for-byte with the
   release manifest after installation.
+- The separate public-site supply-chain workflow inventories every allowlisted
+  release file and, on `main`, signs and verifies build-provenance and SBOM
+  attestations for the release archive before any human deployment decision.
 
 ## Public release surfaces
 
@@ -52,3 +55,7 @@ A successful release receipt establishes byte identity between the selected Git
 snapshot and the checked public URLs. It does not establish external validation,
 field performance, savings, endorsement, certification, customer acceptance, or
 deployment of any trading or infrastructure-control system.
+
+Signed build provenance establishes workflow and artifact identity for the
+archive. It does not establish a SLSA level, whole-product security, or that the
+archive was deployed.

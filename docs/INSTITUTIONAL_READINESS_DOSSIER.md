@@ -33,7 +33,7 @@ deliverable.
 | Source and reproducibility | Implemented first-party | Public capsule verifier, pinned reviewer runtime, dependency lock, replay instructions | Protocol-matched non-author execution receipt |
 | Evidence custody and claim governance | Implemented first-party | Proof Capsule v3, claim-boundary register, fail-closed verifier | Buyer-owned source/baseline/metric binding |
 | Security reporting | Documented control | Private advisory route, supported-version boundary, best-effort response process | Buyer-specific severity, notice, and remediation terms |
-| Repository supply chain | Documented control | Pinned workflow actions, hash-locked reviewer dependencies, scoped reviewer-suite CycloneDX inventory | Complete product/deployment SBOM and vulnerability process |
+| Repository supply chain | Partial/scoped implementation | Pinned workflow actions, hash-locked reviewer dependencies, scoped reviewer inventory, deterministic CycloneDX 1.6 coverage for the exact 30-file public release, and a main-only signed-attestation lane | Complete VPS/runtime inventory, vulnerability process, retained successful attestation verification, and any separately assessed SLSA level |
 | Public deployment | Prepared, not executed for this commit | Exact-snapshot build, deploy, and live-audit protocol | Successful current-commit live audit receipt |
 | Data rights and handling | Buyer-specific gate | Intake, SOW, and handling schedule templates | Executed rights, classification, retention, access, and legal terms |
 | Identity, access, and runtime | Prepared, not executed | Default-deny operator boundary and separately gated repair path | Authorized live repair and retained negative-access evidence |
@@ -66,7 +66,7 @@ The public evidence does not currently establish:
 - a penetration test or independently audited security program;
 - an enterprise support, response, recovery, or availability SLA;
 - an executed data-processing agreement or legal approval of the offer;
-- a complete product and deployment SBOM;
+- a complete product, VPS, gateway, container, and deployment-runtime SBOM;
 - a tested live incident-response or recovery exercise, business-continuity or disaster-recovery certification, or customer-notification performance;
 - privacy or regulated-data authorization; or
 - an exact live-domain snapshot matching the checked-out commit.
@@ -82,8 +82,9 @@ schema conformance, custody, deterministic replay, or claim-gate behavior. It
 does not turn a self-authored claim into an independent finding and does not
 establish safety, legal sufficiency, production fitness, performance, or value.
 
-The scoped CycloneDX inventory covers the reviewer suite. It is deliberately
-not described as a complete product SBOM.
+The reviewer-suite inventory and exact-public-release CycloneDX inventory cover
+their declared scopes. Neither is described as a complete product, VPS,
+gateway, container, or organization-wide SBOM.
 
 ## Recommended first engagement boundary
 

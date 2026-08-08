@@ -18,7 +18,7 @@ tabletop. Those controls make a non-confidential technical fit review credible.
 
 They do **not** establish certification, full framework conformance, an
 external audit, a penetration test, a complete product or deployment SBOM,
-signed SLSA provenance, an executed DPA, regulated-data authorization,
+a SLSA level or complete-product provenance, an executed DPA, regulated-data authorization,
 independent or field validation, customer acceptance, revenue, or production
 authorization. Production remains `HOLD`.
 
@@ -51,7 +51,7 @@ statements.
 | [NIST SSDF](https://csrc.nist.gov/pubs/sp/800/218/final) | SSDF 1.1 / SP 800-218 final, 2022-02-03 | Secure-development vocabulary and outcomes | Full SSDF implementation is not claimed; SSDF 1.2 remains draft as of 2026-08-08. |
 | [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/) | ASVS 5.0.0, 2025-05-30 | Web and API security verification orientation | No ASVS level, requirement-complete assessment, OWASP endorsement, or penetration test is claimed. |
 | [OWASP LLMSVS](https://owasp.org/www-project-llm-verification-standard/LLMSVS-v2.0-en.html) | LLMSVS 2.0, 2026-06-15 | LLM, agent, tool, dependency, and monitoring orientation | No LLMSVS level, complete AI threat assessment, or OWASP endorsement is claimed. |
-| [SLSA](https://slsa.dev/spec/v1.2/) | approved specification 1.2, 2025-11-24 | Source, build, artifact, and provenance orientation | No Source or Build level, signed provenance, or hardened-builder guarantee is claimed. |
+| [SLSA](https://slsa.dev/spec/v1.2/) | approved specification 1.2, 2025-11-24 | Source, build, artifact, and provenance orientation | No Source or Build level, complete-product provenance, or hardened-builder guarantee is claimed. |
 
 ## Control-to-evidence map
 
@@ -61,8 +61,8 @@ statements.
 | AC-02 | Measurement, evaluation, reproducibility | Implemented first-party | Pinned dependencies, replay requirements, failure retention, and first-party receipts for named experiments. | Obtain a protocol-matched non-author execution and buyer-owned baseline run. |
 | AC-03 | Source authorization and data rights | Buyer-specific gate | Templates require rights, purpose, classification, handling, acceptance, and authority before intake. | Execute buyer-specific rights, handling, retention, deletion, and legal terms. |
 | AC-04 | Secure development and repository change | Partial or scoped | Selected pinned CI, read-only workflow permissions, credential-free checkout, tests, and diff checks. | Complete a practice-level SSDF assessment and retain repository-setting evidence. |
-| AC-05 | Dependency inventory and SBOM | Partial or scoped | One reviewer computation has a hash lock and scoped CycloneDX inventory. | Produce and govern complete product and exact-release SBOMs. |
-| AC-06 | Build provenance and release integrity | Partial or scoped | Static release files bind to Git identity and SHA-256 with fail-closed live comparison. | Emit and verify standards-compatible signed provenance from an assessed builder. |
+| AC-05 | Dependency inventory and SBOM | Partial or scoped | The reviewer computation has a scoped inventory; the exact 30-file public release has deterministic CycloneDX 1.6 file coverage and a main-only signing lane. | Retain a successful signed SBOM bundle, inventory runtime layers, and add vulnerability governance. |
+| AC-06 | Build provenance and release integrity | Partial or scoped | Static release files bind to Git identity and SHA-256; the main-only hosted workflow signs and immediately verifies provenance and SBOM predicates. | Retain and independently re-verify a successful bundle, assess any SLSA level separately, and close live deployment drift. |
 | AC-07 | Identity, access, secrets, activation | Partial or scoped | Default-deny operator source and negative tests exist; consequential repair is separately gated. | Verify live secret ownership, identity controls, rotation, and negative access. |
 | AC-08 | Vulnerability reporting | Documented control | Private reporting, supported-version, and best-effort response boundaries are public. | Agree buyer-specific severity, notice, remediation, and disclosure terms. |
 | AC-09 | Incident response and recovery | Documented control | Severity, authority, containment, recovery, CI tabletop, and receipt rules exist. | Execute a separately authorized live recovery exercise and negotiate objectives. |

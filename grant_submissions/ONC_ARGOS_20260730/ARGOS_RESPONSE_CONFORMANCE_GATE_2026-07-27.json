@@ -3,7 +3,7 @@
     {
       "blocks_send": true,
       "check_id": "OFFICIAL_NOTICE_CURRENT",
-      "evidence": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view; checked_utc=2026-07-28T17:21:48Z; age_seconds=927012; amendment_observed=False",
+      "evidence": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view; checked_utc=2026-07-28T17:21:48Z; age_seconds=934092; amendment_observed=False",
       "requirement": "The official notice is active and its identity and deadline are explicit.",
       "status": "FAIL"
     },
@@ -47,7 +47,7 @@
     {
       "blocks_send": true,
       "check_id": "DEADLINE_OPEN",
-      "evidence": "evaluated=2026-08-08T10:52:00Z; deadline=2026-07-30T21:00:00Z",
+      "evidence": "evaluated=2026-08-08T12:50:00Z; deadline=2026-07-30T21:00:00Z",
       "requirement": "The response is evaluated before the exact Government deadline.",
       "status": "FAIL"
     },
@@ -179,7 +179,7 @@
   "claim_boundary": "PASS means the named documentary or formatting requirement is supported. BLOCKED with blocks_send=true means the current artifact is intentionally not send-ready. BLOCKED with blocks_send=false is a separately tracked promotion or operational-control gap that does not prevent a self-contained link-free Government response. Neither passing checks nor a polished packet establishes submission, acceptance, selection, award, authorization, certification, external validation, field performance, or savings.",
   "deadline_utc": "2026-07-30T21:00:00Z",
   "decision": "FAIL_CONFORMANCE",
-  "evaluated_utc": "2026-08-08T10:52:00Z",
+  "evaluated_utc": "2026-08-08T12:50:00Z",
   "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
   "safest_next_action": "Resolve the private cover facts, build and inspect the self-contained private final copy, rerun this gate, repeat the official-notice and full-mailbox duplicate checks, bind the exact dispatch, and request exact action-time approval. Continue provider credential rotation and public-history remediation before any repository link or public promotion.",
   "schema": "lumencore.argos_response_conformance_gate.v2",
@@ -218,7 +218,7 @@
       "bytes": 4677,
       "hash_mode": "TEXT_UTF8_LF",
       "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json",
-      "sha256": "e647d72d8740ff4c51be4a8e71aafa4687a23c8229a8abcdbcbbf18e64b05d20"
+      "sha256": "8fa4bf119223cd36bfb68a7c9f56652d0ae5a347d90a0a27e00257c428c73c03"
     },
     {
       "bytes": 14807,

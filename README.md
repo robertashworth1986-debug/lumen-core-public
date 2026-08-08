@@ -35,6 +35,8 @@ deliverable.
 
 **[Open the Incident Response and Continuity Plan](docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)**
 
+**[Open the Public Site Supply-Chain Assurance guide](docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)**
+
 The index is the canonical evidence map. The reviewer page gives the shortest human path. The index identifies:
 
 - what is merged into the default branch;
@@ -63,6 +65,12 @@ The incident plan converts exact-snapshot drift into a bounded machine receipt
 with severity, affected surfaces, containment, recovery, and explicit human
 authorization boundaries. It is a documented first-party control with CI
 exercises—not proof of a completed live restoration or an enterprise SLA.
+
+The public-release supply-chain lane creates deterministic CycloneDX 1.6
+coverage for all 30 allowlisted site files. Pull requests produce unsigned
+verification artifacts; successful `main` builds separately create and verify
+GitHub OIDC/Sigstore provenance and SBOM attestations for the exact archive.
+This is not a whole-product or VPS SBOM, a SLSA level, or deployment proof.
 
 ## Five-minute technical path
 
@@ -137,6 +145,7 @@ LumenCore emphasizes fail-closed decisions: missing rights, ambiguous provenance
 | ProofLock Console | Deployed bounded demonstration; verifies receipt integrity and refuses unauthorized promotion. |
 | EIA benchmark package | First-party reproducible for the named pinned package; prepared for non-author execution. |
 | External replication docket | Draft protocol for preregistration, evaluator independence, frozen inputs, deviations, and negative results. |
+| Exact public-release supply chain | Deterministic 30-file CycloneDX 1.6 inventory plus a main-only GitHub OIDC/Sigstore provenance and SBOM-attestation lane; no whole-product SBOM, SLSA level, or deployment-parity claim. |
 | Buyer-Owned Baseline Validation Sprint | Sole primary paid offer; proposed tiers are $7,500, $15,000, and from $25,000. Pricing is not buyer-tested, and no signed scope, cleared payment, or delivery is claimed. ProofLock supplies the evidence and custody layer. |
 
 ## Evidence-state definitions
@@ -203,6 +212,7 @@ review. Action-time HumanUnlock remains outside machine verification.
 - Buyer-owned validation intake: [docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md](docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md)
 - Statement-of-work template: [docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md](docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md)
 - Secondary funding-workflow data boundary: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md)
+- Exact public-release SBOM and signed-attestation boundary: [docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md](docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)
 
 ## Intellectual-property boundary
 

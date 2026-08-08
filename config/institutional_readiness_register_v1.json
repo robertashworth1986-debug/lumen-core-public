@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_utc": "2026-08-08T00:00:00Z",
+  "generated_utc": "2026-08-08T12:50:00Z",
   "repository": "robertashworth1986-debug/lumen-core-public",
   "register_scope": "public_repository_and_bounded_validation_sprint",
   "current_decision": "ready_for_non_confidential_fit_review_and_buyer_specific_scoping",
@@ -65,11 +65,15 @@
         ".github/workflows/repository-trust.yml",
         "code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py",
         "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
-        "requirements-reviewer-ubuntu-py311.lock"
+        "requirements-reviewer-ubuntu-py311.lock",
+        "code/deploy/build_public_site_supply_chain.py",
+        "code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py",
+        "docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md",
+        ".github/workflows/public-site-supply-chain.yml"
       ],
-      "proves": "The named reviewer suite generates a scoped CycloneDX inventory, has hash-locked dependencies and a first-party receipt, and the repository trust workflow uses pinned action revisions.",
-      "does_not_prove": "A complete product SBOM, continuous vulnerability management, signed release provenance, or production dependency approval.",
-      "next_gate": "Generate and govern a complete product and deployment SBOM for the exact buyer-approved release."
+      "proves": "The named reviewer suite has hash-locked dependencies and a scoped inventory; the exact 30-file public release has deterministic CycloneDX 1.6 file coverage, pinned workflow actions, and a main-only GitHub OIDC/Sigstore attestation lane.",
+      "does_not_prove": "A complete product SBOM, VPS operating-system or gateway inventory, continuous vulnerability management, a successful signed release attestation until the main workflow completes, a SLSA level, or production dependency approval.",
+      "next_gate": "Retain a successful signed main-branch provenance and SBOM verification bundle, inventory the deployment runtime, and establish vulnerability triage and exception handling."
     },
     {
       "id": "public_deployment",
