@@ -31,6 +31,8 @@ deliverable.
 
 **[Open the Institutional Readiness Dossier](docs/INSTITUTIONAL_READINESS_DOSSIER.md)**
 
+**[Open the Institutional Assurance Crosswalk](docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md)**
+
 **[Open the Incident Response and Continuity Plan](docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)**
 
 The index is the canonical evidence map. The reviewer page gives the shortest human path. The index identifies:
@@ -50,6 +52,12 @@ prepared, which require buyer-specific terms, and which remain open production
 blockers. Its machine register and verifier keep the current decision bounded
 to non-confidential fit review and buyer-specific scoping; production remains
 on `HOLD`.
+
+The assurance crosswalk maps named first-party evidence to current NIST AI
+RMF, NIST GenAI Profile, NIST CSF, NIST SSDF, OWASP ASVS, OWASP LLMSVS, and
+SLSA reference themes. It is an informative reviewer aid—not certification,
+full conformance, an external audit, or a penetration test—and it exposes the
+remaining buyer-specific and external-assurance gates.
 
 The incident plan converts exact-snapshot drift into a bounded machine receipt
 with severity, affected surfaces, containment, recovery, and explicit human
