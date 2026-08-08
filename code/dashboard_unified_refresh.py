@@ -2,6 +2,8 @@ from pathlib import Path
 from datetime import datetime, timezone
 import json, math, statistics, time, os, traceback, sys, shutil, subprocess
 
+from gov_snapshot_guard import claim_persistent_lease, snapshot_capacity_status
+
 def _pick_existing_path(candidates):
     resolved = [Path(p).expanduser() for p in candidates if p]
     for cand in resolved:
@@ -91,6 +93,7 @@ GOV_SNAP_DIR = OUT / "gov_live_snapshots"
 
 GOV_COLLECTOR_CACHE = {"last_epoch": 0.0, "min_interval_sec": 900.0}
 GOV_COLLECTOR_TIMEOUT_SEC = 45
+GOV_COLLECTOR_LEASE_PATH = OUT / "gov_collector_lease.json"
 LOOP_LOCK_PATH = OUT / "dashboard_unified_refresh.loop.lock"
 
 PAPER_DASH_PATH     = DASH / "alpaca_paper_live_dashboard.html"
@@ -737,6 +740,18 @@ def run_canonical_gov_collector_throttled():
     if now - GOV_COLLECTOR_CACHE["last_epoch"] < GOV_COLLECTOR_CACHE["min_interval_sec"]:
         return {"status": "skipped", "reason": "throttled"}
 
+    capacity = snapshot_capacity_status(GOV_SNAP_DIR)
+    if not capacity.get("allowed"):
+        return {"status": "blocked", **capacity}
+
+    lease = claim_persistent_lease(
+        GOV_COLLECTOR_LEASE_PATH,
+        min_interval_sec=GOV_COLLECTOR_CACHE["min_interval_sec"],
+        now_epoch=now,
+    )
+    if not lease.get("claimed"):
+        return {"status": "skipped", **lease}
+
     if not CANONICAL_GOV_COLLECTOR_PATH.exists():
         return {
             "status": "skipped",
@@ -987,9 +1002,12 @@ def pid_is_running(pid) -> bool:
 
 def acquire_loop_lock() -> bool:
     """Prevent duplicate loop workers from writing dashboards simultaneously."""
+    fd = None
+    created = False
     try:
         LOOP_LOCK_PATH.parent.mkdir(parents=True, exist_ok=True)
         fd = os.open(str(LOOP_LOCK_PATH), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        created = True
         payload = {
             "pid": os.getpid(),
             "created_utc": now_iso(),
@@ -997,6 +1015,7 @@ def acquire_loop_lock() -> bool:
         }
         os.write(fd, json.dumps(payload).encode("utf-8"))
         os.close(fd)
+        fd = None
         return True
     except FileExistsError:
         # Recycle stale locks when the owner PID is gone or the file is too old.
@@ -1015,6 +1034,16 @@ def acquire_loop_lock() -> bool:
             pass
         return False
     except Exception:
+        if fd is not None:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        if created:
+            try:
+                LOOP_LOCK_PATH.unlink(missing_ok=True)
+            except OSError:
+                pass
         return False
 
 
