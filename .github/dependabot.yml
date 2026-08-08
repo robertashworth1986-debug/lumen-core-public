@@ -1,0 +1,49 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:40'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns:
+          - '*'
+
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:50'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    groups:
+      reviewer-python:
+        patterns:
+          - '*'
+
+  - package-ecosystem: npm
+    directory: /dashboard
+    schedule:
+      interval: weekly
+      day: monday
+      time: '07:00'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+    groups:
+      dashboard-javascript:
+        patterns:
+          - '*'
+
+  - package-ecosystem: docker
+    directory: /containers/codecheck-reviewer
+    schedule:
+      interval: weekly
+      day: monday
+      time: '07:10'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
