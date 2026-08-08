@@ -43,11 +43,25 @@ A reviewer should not infer current truth by reading every historical or draft p
 
 ## Five-minute technical path
 
-1. Read the [Canonical Evidence Index](EVIDENCE_INDEX.md).
-2. Inspect the merged [Proof Capsule verifier v2 PR](https://github.com/robertashworth1986-debug/lumen-core-public/pull/34).
-3. Inspect the deployed [ProofLock Console PR](https://github.com/robertashworth1986-debug/lumen-core-public/pull/36) and its bounded claim boundary.
-4. Inspect the [CODECHECK executable-computation note](docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md) and [author review checklist](docs/CODECHECK_AUTHOR_REVIEW_CHECKLIST_2026-07-21.md).
-5. Review the proposed [30-Day Bounded Validation Sprint PR](https://github.com/robertashworth1986-debug/lumen-core-public/pull/35).
+1. Open [Reviewer Start Here](docs/REVIEWER_START_HERE.md) and the
+   [Canonical Evidence Index](EVIDENCE_INDEX.md).
+2. Run the dependency-free current-checkout verifier in [QUICKSTART.md](QUICKSTART.md).
+3. Inspect the current [Proof Capsule v3 standard](https://github.com/robertashworth1986-debug/lumen-core-public/pull/101)
+   and [ProofLock bounded release and buyer path](https://github.com/robertashworth1986-debug/lumen-core-public/pull/98).
+4. For the stronger pinned computation, follow the
+   [CODECHECK executable-computation note](docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md)
+   and [independent-executor handoff](docs/CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md).
+5. If the evidence is relevant to a buyer decision, review the current
+   [ProofLock Opportunity Sprint scope](docs/PROOFLOCK_OPPORTUNITY_SPRINT_SCOPE.md)
+   and [data-handling schedule](docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md).
+
+These are two different verification levels. The quick verifier checks the
+current public capsule's schema, file custody, and claim gates on Python 3.10+
+without third-party packages. The CODECHECK target recreates a frozen
+computation at immutable commit `1c0eb51754beffac6f4df484914e35efc21c253f`
+under Ubuntu 24.04 x86-64, CPython 3.11.9, and the hash-locked dependency set.
+Neither path by itself establishes scientific validity, field performance, or
+independent validation.
 
 ### Independent execution target
 
@@ -95,7 +109,7 @@ LumenCore emphasizes fail-closed decisions: missing rights, ambiguous provenance
 
 | Capability | Current bounded state |
 |---|---|
-| Proof Capsule verifier | Version 2 foundation merged; validates evidence structure, custody, manifests, resource limits, and claim boundaries. |
+| Proof Capsule verifier | Version 3 current standard merged; validates strict evidence structure, custody, manifests, resource limits, external-report binding, and claim boundaries. |
 | ProofLock Console | Deployed bounded demonstration; verifies receipt integrity and refuses unauthorized promotion. |
 | EIA benchmark package | First-party reproducible for the named pinned package; prepared for non-author execution. |
 | External replication docket | Draft protocol for preregistration, evaluator independence, frozen inputs, deviations, and negative results. |
