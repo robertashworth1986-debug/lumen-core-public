@@ -86,9 +86,49 @@ jobs:
                 --property=ExecMainCode \
                 --property=ExecMainStatus \
                 --property=NRestarts \
+                --property=Restart \
+                --property=RestartUSec \
+                --property=StartLimitBurst \
+                --property=StartLimitIntervalUSec \
+                --property=ExecMainStartTimestamp \
+                --property=StateChangeTimestamp \
                 --property=MainPID \
                 --property=FragmentPath \
                 2>&1 || true
+            }
+
+            show_process_identity() {
+              local label="$1"
+              local pid="$2"
+              local expected_marker="$3"
+              local cmdline=""
+              echo "--- $label pid=$pid ---"
+              if ! [[ "$pid" =~ ^[1-9][0-9]*$ ]]; then
+                echo "valid_pid=false"
+                return
+              fi
+              if ! kill -0 "$pid" 2>/dev/null; then
+                echo "process_exists=false"
+                return
+              fi
+              echo "process_exists=true"
+              ps -p "$pid" -o pid=,ppid=,etimes=,stat=,comm= 2>&1 || true
+              if [[ -r "/proc/$pid/cmdline" ]]; then
+                cmdline=$(tr "\\000" " " < "/proc/$pid/cmdline" 2>/dev/null || true)
+              fi
+              if [[ -n "$cmdline" && "$cmdline" == *"$expected_marker"* ]]; then
+                echo "expected_identity=true"
+              else
+                echo "expected_identity=false"
+              fi
+              if [[ -r "/proc/$pid/exe" ]]; then
+                printf "executable="
+                readlink "/proc/$pid/exe" 2>&1 || true
+              fi
+              if [[ -r "/proc/$pid/cwd" ]]; then
+                printf "working_directory="
+                readlink "/proc/$pid/cwd" 2>&1 || true
+              fi
             }
 
             echo "=== identity ==="
@@ -128,6 +168,25 @@ jobs:
             systemctl list-units --all --type=service --no-legend \
               "luma*.service" "lumencore*.service" "lamascout*.service" \
               2>&1 || true
+
+            echo "=== gateway singleton-lock identity ==="
+            gateway_main_pid=$(systemctl show luma-gateway --property=MainPID --value 2>/dev/null || true)
+            show_process_identity gateway_systemd_main "$gateway_main_pid" "luma_experience_gateway:app"
+            gateway_lock=/opt/lumencore/run/luma_experience_gateway.lock
+            if [[ -f "$gateway_lock" ]]; then
+              echo "lock_exists=true"
+              stat --printf="lock_mode=%a lock_owner=%U:%G lock_bytes=%s lock_modified=%y\n" "$gateway_lock" 2>&1 || true
+              gateway_lock_pid=$(tr -cd "0-9" < "$gateway_lock" 2>/dev/null | head -c 20 || true)
+              echo "lock_pid=$gateway_lock_pid"
+              if [[ -n "$gateway_main_pid" && "$gateway_lock_pid" == "$gateway_main_pid" ]]; then
+                echo "lock_pid_matches_systemd_main=true"
+              else
+                echo "lock_pid_matches_systemd_main=false"
+              fi
+              show_process_identity gateway_lock_owner "$gateway_lock_pid" "luma_experience_gateway:app"
+            else
+              echo "lock_exists=false"
+            fi
 
             echo "=== expected listeners (address and port only) ==="
             ss -ltnH 2>&1 \
