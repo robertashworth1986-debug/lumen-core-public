@@ -101,11 +101,22 @@ def _bounded_direct_child(root: Path, name: str, *, label: str) -> Path:
     pattern = _RUN_UTC_RE if label == "run UTC" else _PROGRAM_ID_RE
     if value in {".", ".."} or pattern.fullmatch(value) is None:
         raise ValueError(f"invalid {label}")
-    resolved_root = root.resolve()
-    candidate = (resolved_root / value).resolve()
-    if candidate.parent != resolved_root:
+    # Normalize before constructing a Path object.  Besides making the
+    # containment check explicit to static analysis, realpath protects an
+    # existing destination from escaping through a symlink below the trusted
+    # root.  The trailing separator prevents sibling-prefix confusion such as
+    # ``grants-escape`` being accepted for a ``grants`` root.
+    resolved_root = os.path.realpath(os.fspath(root))
+    candidate = os.path.realpath(
+        os.path.normpath(os.path.join(resolved_root, value))
+    )
+    root_prefix = resolved_root.rstrip(os.sep) + os.sep
+    if (
+        not candidate.startswith(root_prefix)
+        or os.path.dirname(candidate) != resolved_root
+    ):
         raise ValueError(f"invalid {label}")
-    return candidate
+    return Path(candidate)
 
 
 def _named_direct_child(root: Path, name: str) -> Path | None:
