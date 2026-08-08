@@ -70,6 +70,22 @@ The daily health workflow classifies the static reviewer surface and dynamic
 gateway independently; a healthy static page can no longer conceal a failed
 control plane.
 
+Manual health run `31247095241` recorded the first current-contract snapshot at
+commit `0ff614be`: all six static reviewer endpoints passed, while both dynamic
+gateway contracts returned HTTP 502, so the public state is explicitly
+`degraded`, with `static_surface_state=operational` and
+`dynamic_gateway_state=outage`.
+
+Read-only runtime run `31247114240` also showed two worker restart histories
+that require diagnosis before any service change: `luma-paper-ticker` was in
+`auto-restart` with `NRestarts=179423`, and `luma-symbol-awareness` was running
+with `NRestarts=205076`. These counts do not establish a current root cause or
+performance defect by themselves. The bounded VPS diagnostic now captures only
+allowlisted, redacted failure signatures from five-minute windows for those two
+workers, alongside the existing two-minute gateway window. It remains
+observation-only: no restart, stop, deletion, log vacuum, or configuration
+change is permitted by that workflow.
+
 ### Receipt reconciliation
 
 | Lane | Verified state | Next action |
