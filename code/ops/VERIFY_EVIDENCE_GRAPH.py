@@ -378,6 +378,22 @@ def verify_graph(graph: dict[str, Any]) -> dict[str, Any]:
         raise ValueError(
             "PR #101 must remain represented as the merged Proof Capsule v3 standard"
         )
+    if "pr-131" not in by_id or by_id["pr-131"]["state"] != "merged_capability":
+        raise ValueError(
+            "PR #131 must remain represented as the merged buyer-owned validation offer"
+        )
+    if "single_primary_offer" not in by_id["pr-131"]["supports"]:
+        raise ValueError(
+            "PR #131 must retain the single-primary-offer support boundary"
+        )
+    if "pr-132" not in by_id or by_id["pr-132"]["state"] != "merged_capability":
+        raise ValueError(
+            "PR #132 must remain represented as the merged engine portfolio audit"
+        )
+    if "one_platform_one_offer_positioning" not in by_id["pr-132"]["supports"]:
+        raise ValueError(
+            "PR #132 must retain the one-platform-one-offer support boundary"
+        )
 
     echolock = by_id.get("echolock-pilot")
     if (

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_utc": "2026-08-08T04:45:00Z",
+  "generated_utc": "2026-08-08T10:40:00Z",
   "repository": "robertashworth1986-debug/lumen-core-public",
   "purpose": "Machine-readable navigation of evidence, claims, pull-request lineage, and promotion gates without flattening technical depth.",
   "evidence_states": [
@@ -287,6 +287,30 @@
       "files_of_interest": ["code/proof_capsule_verifier.py", "docs/PROOF_CAPSULE_SCHEMA.md", "tests/test_proof_capsule_verifier.py", ".github/workflows/proof-capsule-ci.yml", "code/ops/run_public_assurance_suite.py"]
     },
     {
+      "id": "pr-131",
+      "type": "pull_request",
+      "title": "Buyer-owned validation offer and sealed strategic packet",
+      "pr_number": 131,
+      "state": "merged_capability",
+      "merged": true,
+      "canonical_role": "current_buyer_owned_validation_offer_contract",
+      "supports": ["single_primary_offer", "buyer_problem_definition", "buyer_input_contract", "bounded_decision_set", "strategic_packet_integrity", "evidence_graph_binding", "founder_authority_locks"],
+      "does_not_support": ["buyer_commitment", "signed_paid_scope", "executed_buyer_pilot", "revenue", "external_validation", "transaction_valuation"],
+      "files_of_interest": ["config/strategic_transaction_packet_v2.json", "code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py", "docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md", "tests/test_strategic_transaction_packet.py", ".github/workflows/strategic-transaction-packet.yml"]
+    },
+    {
+      "id": "pr-132",
+      "type": "pull_request",
+      "title": "Governed 15-lane engine portfolio audit",
+      "pr_number": 132,
+      "state": "merged_capability",
+      "merged": true,
+      "canonical_role": "current_one_platform_one_offer_portfolio_audit",
+      "supports": ["one_platform_one_offer_positioning", "priority_validation_lane", "tracked_repository_evidence_inventory", "cross_platform_git_blob_hashing", "portfolio_claim_boundaries", "machine_readable_portfolio_receipt"],
+      "does_not_support": ["subscription_readiness", "direct_engine_sales", "buyer_commitment", "signed_paid_scope", "executed_buyer_pilot", "revenue", "external_validation"],
+      "files_of_interest": ["config/lumencore_engine_portfolio_v2.json", "code/ops/BUILD_LUMENCORE_ENGINE_PORTFOLIO_AUDIT.py", "dashboard/data/lumencore_engine_portfolio_audit.json", "docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md", "tests/test_lumencore_engine_portfolio_audit.py", ".github/workflows/engine-portfolio-audit.yml"]
+    },
+    {
       "id": "eia-frozen-benchmark",
       "type": "evidence_package",
       "title": "Frozen EIA reviewer reproducibility package",
@@ -351,6 +375,9 @@
     {"from": "pr-74", "to": "codecheck-reviewer-package", "relationship": "packages"},
     {"from": "pr-98", "to": "prooflock-console", "relationship": "deploys"},
     {"from": "pr-98", "to": "pr-101", "relationship": "commercially_uses"},
+    {"from": "pr-98", "to": "pr-131", "relationship": "consolidated_into"},
+    {"from": "pr-131", "to": "pr-101", "relationship": "commercially_uses"},
+    {"from": "pr-132", "to": "pr-131", "relationship": "commercially_uses"},
     {"from": "pr-99", "to": "external-replication-docket", "relationship": "packages"},
     {"from": "pr-38", "to": "pr-98", "relationship": "presents"},
     {"from": "pr-50", "to": "pr-38", "relationship": "portability_dependency_for_related_route_tests"},
@@ -359,6 +386,8 @@
     {"from": "pr-66", "to": "pr-99", "relationship": "indexes"},
     {"from": "pr-66", "to": "pr-100", "relationship": "indexes"},
     {"from": "pr-66", "to": "pr-101", "relationship": "indexes"},
+    {"from": "pr-66", "to": "pr-131", "relationship": "indexes"},
+    {"from": "pr-66", "to": "pr-132", "relationship": "indexes"},
     {"from": "pr-66", "to": "echolock-pilot", "relationship": "holds_until_discoverable"}
   ],
   "promotion_rules": [
