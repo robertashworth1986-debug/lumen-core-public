@@ -1,25 +1,53 @@
 name: Diagnose LumenCore VPS runtime and capacity
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/vps-storage-diagnostic.yml'
+      - 'tests/test_vps_runtime_diagnostic_workflow.py'
   push:
     branches: [main]
     paths:
       - '.github/workflows/vps-storage-diagnostic.yml'
+      - 'tests/test_vps_runtime_diagnostic_workflow.py'
   workflow_dispatch:
 
 permissions:
   contents: read
-  statuses: write
 
 concurrency:
   group: lumencore-vps-runtime-diagnostic
   cancel-in-progress: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+      - name: Install bounded test dependency
+        run: python -m pip install --disable-pip-version-check pytest==9.1.0
+      - name: Verify the read-only diagnostic contract
+        run: python -m pytest -q tests/test_vps_runtime_diagnostic_workflow.py
+
   diagnose:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
+    needs: validate
+    permissions:
+      contents: read
+      statuses: write
 
     steps:
       - name: Mark runtime diagnostic pending
@@ -68,6 +96,20 @@ jobs:
                 --connect-timeout 5 --max-time 10 --output /dev/null \
                 --write-out "code=%{http_code} remote=%{remote_ip} connect_s=%{time_connect} total_s=%{time_total} content_type=%{content_type}" \
                 "$url" 2>&1) || rc=$?
+              printf "%s rc=%s %s\n" "$name" "$rc" "$result"
+            }
+
+            probe_loopback_tls() {
+              local name="$1"
+              local path="$2"
+              local rc=0
+              local result
+              result=$(curl --silent --show-error --max-redirs 0 \
+                --noproxy lumen-core.ai \
+                --resolve "lumen-core.ai:443:127.0.0.1" \
+                --connect-timeout 5 --max-time 10 --output /dev/null \
+                --write-out "code=%{http_code} remote=%{remote_ip} connect_s=%{time_connect} total_s=%{time_total} content_type=%{content_type}" \
+                "https://lumen-core.ai$path" 2>&1) || rc=$?
               printf "%s rc=%s %s\n" "$name" "$rc" "$result"
             }
 
@@ -207,8 +249,8 @@ jobs:
             probe public_nginx_health https://lumen-core.ai/nginx-health
             probe public_gateway_health https://lumen-core.ai/health
             probe public_gateway_snapshot https://lumen-core.ai/api/snapshot
-            probe loopback_nginx_health http://127.0.0.1/nginx-health
-            probe loopback_gateway_via_nginx http://127.0.0.1/health
+            probe_loopback_tls loopback_nginx_health /nginx-health
+            probe_loopback_tls loopback_gateway_via_nginx /health
             probe loopback_gateway_direct http://127.0.0.1:8787/health
 
             echo "=== canonical and related service states ==="
