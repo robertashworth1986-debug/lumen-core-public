@@ -316,7 +316,9 @@ jobs:
           [[ "$OFFER" == "200" ]]
           [[ "$PROOFLOCK" == "200" ]]
           [[ "$EXTERNAL_REVIEW" == "200" ]]
-          grep -Fq 'One proof path. One bounded decision.' "$tmp_root"
+          grep -Fq 'name="lumencore-surface" content="proof-to-pilot-home-v1"' "$tmp_root"
+          grep -Fq 'Turn complex system claims into bounded decisions.' "$tmp_root"
+          grep -Fq 'without converting internal evidence into an external-validation claim' "$tmp_root"
           grep -Fq 'name="lumencore-surface" content="proof-to-pilot-evidence-v1"' "$tmp_evidence"
           python3 -m json.tool "$tmp_data" >/dev/null
           grep -Fq 'name="lumencore-surface" content="bounded-validation-offer-v1"' "$tmp_offer"
