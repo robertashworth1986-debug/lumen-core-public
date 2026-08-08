@@ -1,6 +1,6 @@
 # Project Argos Response Conformance Gate
 
-Evaluated UTC: `2026-08-08T04:46:39Z`
+Evaluated UTC: `2026-08-08T07:00:41Z`
 Decision: `FAIL_CONFORMANCE`
 
 ## Summary
@@ -19,7 +19,7 @@ Decision: `FAIL_CONFORMANCE`
 
 | Check | Status | Blocks send | Requirement | Evidence |
 | --- | --- | --- | --- | --- |
-| `OFFICIAL_NOTICE_CURRENT` | `FAIL` | `true` | The official notice is active and its identity and deadline are explicit. | https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view; checked_utc=2026-07-28T17:21:48Z; age_seconds=905091; amendment_observed=False |
+| `OFFICIAL_NOTICE_CURRENT` | `FAIL` | `true` | The official notice is active and its identity and deadline are explicit. | https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view; checked_utc=2026-07-28T17:21:48Z; age_seconds=913133; amendment_observed=False |
 | `OFFICIAL_SOW_SOURCE_CUSTODY` | `PASS` | `true` | The official four-page draft SOW attachment is preserved with exact binary custody. | bytes=174359; sha256=6a1608c024bd87b0204370baab58b0a218c044d403bce6dbe0cfb5164faf6354; source_receipt_sha256=5479d7db1dc3777d9e6c177f92800bd198392105d46a2cf78c56554c86b8820d |
 | `OFFICIAL_NOTICE_TEAMING_SEMANTICS` | `PASS` | `true` | The notice permits teaming but requires names and roles only when a team is proposed. | teaming_permitted=True; team_required_for_response=False; identify_if_proposed=True; semantic_sha256=593271c5404e03377c6da1ede6a24d8f21db55ec7f2f33c822ee0f5c0323fdd8 |
 | `PUBLIC_REPOSITORY_CREDENTIAL_RECEIPT` | `PASS` | `true` | The current public credential configuration contains environment references only and its receipt matches the current file. | placeholder_only=True; non_placeholder_value_count=0; required_environment_references_present=True; scan_complete=True; scan_failure_count=0 |
@@ -27,7 +27,7 @@ Decision: `FAIL_CONFORMANCE`
 |  |  |  | **Blocker action** | Rotate the affected provider credentials, record non-secret receipts, remediate reachable public Git history, and verify the remote before linking or promoting the repository. |
 | `SANITIZED_EXTERNAL_RESPONSE_SECURITY_PATH` | `PASS` | `true` | The Government response is self-contained, link-free, and allowed by the current targeted security gate. | security_receipt_current=True; sanitized_external_response_allowed=True; final_argos_send_allowed_by_security_gate=True; attachment_repo_isolated=True; found_routes=[]; docx_external_relationship_count=0; pdf_actions=[]; pdf_open_action=False; pdf_embedded_files=False |
 |  |  |  | **Blocker action** | Rebuild the current security receipt and remove every repository, live-site, hyperlink, external relationship, PDF action, and embedded file from the Government attachment set. |
-| `DEADLINE_OPEN` | `FAIL` | `true` | The response is evaluated before the exact Government deadline. | evaluated=2026-08-08T04:46:39Z; deadline=2026-07-30T21:00:00Z |
+| `DEADLINE_OPEN` | `FAIL` | `true` | The response is evaluated before the exact Government deadline. | evaluated=2026-08-08T07:00:41Z; deadline=2026-07-30T21:00:00Z |
 | `ACCEPTED_FILES_PRESENT` | `PASS` | `true` | Both accepted review formats and their receipts are present. | docx=True; pdf=True; receipts=True |
 | `ARTIFACT_HASH_CUSTODY` | `PASS` | `true` | Markdown, DOCX, and PDF hashes reconcile to the current receipts. | docx_sha256=8ab5c890db2abb04e6dfcd877ccc546518840e023529810ae48902e9a38eb392; pdf_sha256=cea08cd755b27f464d761b5eb92af675597fcda434fbf9a80ae316ae985cda00 |
 | `US_LETTER_SIZE` | `PASS` | `true` | Every DOCX section uses US Letter dimensions. | sections=2; expected_twips=12240x15840 |
