@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "build_live_breadth_value_panel.py"
+WORKFLOW = ROOT / ".github" / "workflows" / "live-breadth-claim-gate.yml"
 
 
 def load_module():
@@ -145,3 +146,22 @@ def test_current_planning_docs_retire_the_unfrozen_29_25_target() -> None:
     assert "not current proof" in combined
     assert "dataset fitness" in combined
     assert "numeric breadth headline" in combined
+
+
+def test_live_breadth_claim_gate_runs_the_exact_focused_suite() -> None:
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+
+    assert "Live Breadth Claim Gate" in workflow
+    assert "permissions:\n  contents: read" in workflow
+    assert "persist-credentials: false" in workflow
+    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803" in workflow
+    assert "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1" in workflow
+    assert "pytest==9.1.0" in workflow
+    for test_path in (
+        "tests/test_public_live_breadth_provenance_gate.py",
+        "tests/test_public_visibility_packet.py",
+        "tests/test_public_support_readiness_packet.py",
+        "tests/test_live_breadth_claim_safety.py",
+        "tests/test_canonical_surface_design.py",
+    ):
+        assert test_path in workflow
