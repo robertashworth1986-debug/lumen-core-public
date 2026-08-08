@@ -14,8 +14,8 @@ Use GitHub's private security-advisory channel:
 
 Or contact:
 
-**Robert Ashworth**  
-Founder / Systems Architect, LumenCore  
+**Robert Ashworth**<br>
+Founder / Systems Architect, LumenCore<br>
 `robertashworth4444@gmail.com`
 
 Suggested subject:
