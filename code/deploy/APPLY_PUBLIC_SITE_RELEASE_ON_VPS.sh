@@ -13,6 +13,7 @@ readonly -a RELEASE_FILES=(
   "opportunity_sprint.html"
   "proof_to_pilot.html"
   "external_review.html"
+  "reviewer_docket.json"
   "mission_control.html"
   "evidence/index_bounded.html"
   "robots.txt"

@@ -166,6 +166,10 @@ class PublicExternalReviewSurfaceTests(unittest.TestCase):
         self.assertIn("Current state: HOLD / template unassigned", page)
         self.assertIn("No external evaluator", page)
         self.assertIn("run_public_assurance_suite_strict.py", page)
+        self.assertIn("/reviewer_docket.json", page)
+        self.assertIn("Agent Arena V5", page)
+        self.assertIn("Synthetic replay only", page)
+        self.assertIn("fails its absolute zero-violation gate", page)
         self.assertNotIn("independently validated", page.casefold())
 
     def test_paid_offer_routes_to_external_review_protocol(self) -> None:
@@ -174,12 +178,18 @@ class PublicExternalReviewSurfaceTests(unittest.TestCase):
         )
         self.assertIn('href="/external_review.html"', page)
 
-    def test_deploy_smoke_requires_external_review_surface(self) -> None:
+    def test_live_audit_requires_external_review_surface(self) -> None:
         workflow = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
             encoding="utf-8"
         )
-        self.assertIn("lumen-core.ai/external_review.html", workflow)
-        self.assertIn("external-replication-docket-v1", workflow)
+        packager = (
+            ROOT / "code" / "deploy" / "package_public_site_release.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn('"dashboard/external_review.html"', workflow)
+        self.assertIn('"dashboard/reviewer_docket.json"', workflow)
+        self.assertIn("VERIFY_PUBLIC_SITE_LIVE_RELEASE.py", workflow)
+        self.assertIn('"dashboard/external_review.html"', packager)
+        self.assertIn('"dashboard/reviewer_docket.json"', packager)
 
 
 if __name__ == "__main__":

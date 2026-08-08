@@ -98,14 +98,52 @@ class PublicDiscoveryTests(unittest.TestCase):
         self.assertNotIn("<script", text.casefold())
         self.assertIn("LumenCore mark", text)
 
-    def test_deploy_gate_requires_canonical_manifest_and_safe_mime_type(self):
-        workflow = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
+    def test_reviewer_docket_is_strict_bounded_and_machine_readable(self):
+        path = DASHBOARD / "reviewer_docket.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(payload["schema"], "lumencore.public_reviewer_docket.v1")
+        self.assertEqual(payload["current_decision"], "HOLD")
+        self.assertEqual(
+            payload["primary_paid_offer"]["commercial_state"],
+            "offer_defined_no_signed_scope_no_payment",
+        )
+        self.assertEqual(payload["primary_paid_offer"]["price_usd"], 3500)
+        statuses = {
+            item["id"]: item["status"] for item in payload["review_instruments"]
+        }
+        self.assertEqual(statuses["agent_arena_v5"], "synthetic_replay_only")
+        self.assertEqual(
+            statuses["external_replication_docket"], "template_unassigned"
+        )
+        self.assertTrue(payload["claim_gates"])
+        self.assertFalse(any(payload["claim_gates"].values()))
+        self.assertIn("do not establish", payload["claim_boundary"])
+
+        review_page = (DASHBOARD / "external_review.html").read_text(
             encoding="utf-8"
         )
-        self.assertIn("dashboard/manifest.json", workflow)
-        self.assertIn("https://lumen-core.ai/manifest.json", workflow)
-        self.assertIn('[[ "$MANIFEST_TYPE" == application/json*', workflow)
-        self.assertIn("application/manifest+json*", workflow)
+        self.assertIn(
+            'rel="alternate" type="application/json" href="/reviewer_docket.json"',
+            review_page,
+        )
+
+    def test_deploy_gate_requires_canonical_manifest_and_safe_mime_type(self):
+        audit = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
+            encoding="utf-8"
+        )
+        exact_release = (
+            ROOT / ".github" / "workflows" / "deploy-public-site-release.yml"
+        ).read_text(encoding="utf-8")
+        verifier = (ROOT / "code" / "ops" / "VERIFY_PUBLIC_SITE_LIVE_RELEASE.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("dashboard/manifest.json", audit)
+        self.assertIn("dashboard/reviewer_docket.json", audit)
+        self.assertIn("https://lumen-core.ai", audit)
+        self.assertIn("VERIFY_PUBLIC_SITE_LIVE_RELEASE.py", audit)
+        self.assertIn("VERIFY_PUBLIC_SITE_LIVE_RELEASE.py", exact_release)
+        self.assertIn('"application/json", "application/manifest+json"', verifier)
+        self.assertIn('content_type == "application/json"', verifier)
 
 
 if __name__ == "__main__":

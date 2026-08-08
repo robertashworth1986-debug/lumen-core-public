@@ -10,6 +10,7 @@
   <link rel="canonical" href="https://lumen-core.ai/external_review.html">
   <link rel="icon" href="/assets/lumencore-mark.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
+  <link rel="alternate" type="application/json" href="/reviewer_docket.json" title="LumenCore machine-readable reviewer docket">
   <style>
     :root{--ink:#10233d;--muted:#52657d;--line:#d7e0eb;--blue:#145da0;--pale:#f2f6fb;--amber:#8a4b00;--max:1080px}
     *{box-sizing:border-box}body{margin:0;font:16px/1.62 Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}a{color:var(--blue)}
@@ -18,7 +19,7 @@
     .hero{padding:72px 0 58px;background:linear-gradient(145deg,#eef5fc,#fff 68%)}.eyebrow{font-size:.78rem;font-weight:850;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
     h1{font-size:clamp(2.2rem,6vw,4.5rem);line-height:1.03;max-width:920px;margin:.24em 0}.lead{font-size:1.17rem;color:var(--muted);max-width:800px}
     section{padding:52px 0}.tint{background:var(--pale)}h2{font-size:clamp(1.55rem,3vw,2.3rem);margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px}.card{border:1px solid var(--line);border-radius:12px;padding:22px;background:#fff}.card h3{margin:0 0 8px}.card p{color:var(--muted)}
-    .state{border-left:5px solid var(--amber);background:#fff8ed;padding:20px 24px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.button{display:inline-block;padding:12px 18px;border:1px solid var(--ink);border-radius:8px;text-decoration:none;font-weight:800}.primary{background:var(--ink);color:#fff}.steps{counter-reset:s;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:24px}.step{border-top:3px solid var(--blue);padding-top:12px}.step:before{counter-increment:s;content:counter(s);display:block;color:var(--blue);font-weight:900}.step strong{display:block}
+    .state{border-left:5px solid var(--amber);background:#fff8ed;padding:20px 24px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.button{display:inline-block;padding:12px 18px;border:1px solid var(--ink);border-radius:8px;text-decoration:none;font-weight:800}.primary{background:var(--ink);color:#fff}.steps{counter-reset:s;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:24px}.step{border-top:3px solid var(--blue);padding-top:12px}.step:before{counter-increment:s;content:counter(s);display:block;color:var(--blue);font-weight:900}.step strong{display:block}.status{display:inline-block;margin-bottom:10px;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--pale);font-size:.74rem;font-weight:850;letter-spacing:.06em;text-transform:uppercase}
     footer{padding:28px 0;border-top:1px solid var(--line);color:var(--muted)}@media(max-width:800px){.grid,.steps{grid-template-columns:1fr}nav{align-items:flex-start;padding:16px 0}}
   </style>
 </head>
@@ -40,11 +41,22 @@
       </div>
     </div></section>
     <section class="tint"><div class="wrap">
+      <div class="eyebrow">Review instruments</div>
+      <h2>Three levels, three different conclusions.</h2>
+      <p class="lead">The public docket separates internal custody checks, executable-computation review, and adversarial synthetic testing so one passing layer cannot be presented as a broader validation result.</p>
+      <div class="grid">
+        <article class="card"><span class="status">First-party replay</span><h3>Proof Capsule v3</h3><p>Checks strict fields, exact source bytes, hashes, resource bounds, and machine receipts. It establishes only the declared local software and custody properties.</p><p><a href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PUBLIC_ASSURANCE_QUICKSTART.md">Run the public quickstart</a></p></article>
+        <article class="card"><span class="status">External target unassigned</span><h3>CODECHECK package</h3><p>Freezes one executable-computation target at commit <code>1c0eb517…</code>. No codechecker assignment, independent execution, report, or certificate is claimed.</p><p><a href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/codecheck.yml">Inspect the frozen target</a></p></article>
+        <article class="card"><span class="status">Synthetic replay only</span><h3>Agent Arena V5</h3><p>Runs a locked adversarial holdout harness with custody receipts. The reference run fails its absolute zero-violation gate and is not field proof, production-safety proof, or external validation.</p><p><a href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/AGENT_ARENA.md">Inspect V5</a> · <a href="https://github.com/robertashworth1986-debug/lumen-core-public/pull/94">Merged PR #94</a></p></article>
+      </div>
+      <div class="actions"><a class="button primary" href="/reviewer_docket.json">Open machine-readable reviewer docket</a></div>
+    </div></section>
+    <section><div class="wrap">
       <h2>The reviewer sequence</h2>
       <div class="steps"><div class="step"><strong>Qualify</strong><span>identity, conflict, source rights</span></div><div class="step"><strong>Freeze</strong><span>protocol, holdout, code, environment</span></div><div class="step"><strong>Execute</strong><span>evaluator-controlled run</span></div><div class="step"><strong>Challenge</strong><span>rerun, deviations, failures</span></div><div class="step"><strong>Report</strong><span>all outcomes and boundaries</span></div></div>
       <div class="actions"><a class="button" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/external_replication_docket_v1.json">Inspect the machine-readable docket</a><a class="button" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/ops/run_public_assurance_suite_strict.py">Inspect the strict runner</a></div>
     </div></section>
-    <section><div class="wrap">
+    <section class="tint"><div class="wrap">
       <h2>What a passing local receipt means</h2>
       <p>A passing receipt means only that the listed public validators ran against the listed source bytes, returned their bounded contracts, and matched before and after execution. It does not authenticate an evaluator, reproduce a private experiment, or establish external validation.</p>
       <div class="actions"><a class="button primary" href="/proof_to_pilot.html">Scope a buyer-controlled comparison</a><a class="button" href="/evidence/">Review existing evidence boundaries</a></div>

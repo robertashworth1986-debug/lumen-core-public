@@ -38,10 +38,12 @@ FILE_KEYS = {
 
 
 def content_type_allowed(archive_name: str, content_type: str) -> bool:
-    """Require standards-safe MIME types for the canonical discovery manifest."""
-    if archive_name != "manifest.json":
+    """Require standards-safe MIME types for public JSON review contracts."""
+    if archive_name not in {"manifest.json", "reviewer_docket.json"}:
         return True
-    return content_type in {"application/json", "application/manifest+json"}
+    if archive_name == "manifest.json":
+        return content_type in {"application/json", "application/manifest+json"}
+    return content_type == "application/json"
 
 
 def _strict_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
