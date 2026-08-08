@@ -6,6 +6,12 @@
 
 **Machine register:** [`config/institutional_readiness_register_v1.json`](../config/institutional_readiness_register_v1.json)
 
+**Current standards map:** [`docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md`](INSTITUTIONAL_ASSURANCE_CROSSWALK.md)
+
+The standards map is a first-party informative crosswalk to selected current
+NIST, OWASP, and SLSA themes. It is not certification, full conformance, an
+external audit, or a penetration test.
+
 ## Decision
 
 LumenCore is ready for a **non-confidential buyer fit review and buyer-specific

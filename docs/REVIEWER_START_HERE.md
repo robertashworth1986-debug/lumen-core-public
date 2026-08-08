@@ -13,18 +13,20 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 1. [Canonical Evidence Index](../EVIDENCE_INDEX.md)
 2. [Current buyer-owned validation offer](STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md)
 3. [Institutional readiness and production-blocker dossier](INSTITUTIONAL_READINESS_DOSSIER.md)
-4. [Machine-readable readiness register](../config/institutional_readiness_register_v1.json)
-5. [Incident response and continuity plan](INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)
-6. [Non-confidential buyer fit intake](LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md)
-7. [Buyer-specific SOW template](LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md)
-8. [Governed engine portfolio audit](LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
-9. [Proof Capsule schema](PROOF_CAPSULE_SCHEMA.md)
-10. [Claim Boundary Register](CLAIM_BOUNDARY_REGISTER.md)
-11. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
-12. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
-13. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
-14. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
-15. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
+4. [Institutional assurance crosswalk](INSTITUTIONAL_ASSURANCE_CROSSWALK.md)
+5. [Machine-readable assurance register](../config/institutional_assurance_crosswalk_v1.json)
+6. [Machine-readable readiness register](../config/institutional_readiness_register_v1.json)
+7. [Incident response and continuity plan](INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)
+8. [Non-confidential buyer fit intake](LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md)
+9. [Buyer-specific SOW template](LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md)
+10. [Governed engine portfolio audit](LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
+11. [Proof Capsule schema](PROOF_CAPSULE_SCHEMA.md)
+12. [Claim Boundary Register](CLAIM_BOUNDARY_REGISTER.md)
+13. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
+14. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
+15. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
+16. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
+17. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
 
 The repository docket is the reviewable state bound to the checked-out commit.
 The live docket is a convenience projection and may lag the default branch or
@@ -50,6 +52,12 @@ the current decision is non-confidential fit review and buyer-specific scoping;
 production remains `HOLD`. It does not claim SOC 2, ISO 27001, FedRAMP,
 penetration testing, a complete product SBOM, an enterprise SLA, legal approval,
 or an exact live-domain snapshot for the checked-out commit.
+
+The assurance crosswalk gives a reviewer a current first-party evidence map to
+selected NIST AI RMF, NIST GenAI Profile, NIST CSF, NIST SSDF, OWASP ASVS,
+OWASP LLMSVS, and SLSA themes. It is not certification, full conformance, an
+external audit, or a penetration test; its machine verifier fails closed if a
+status is promoted or a required limitation disappears.
 
 The documented incident control classifies public-release drift and preserves
 containment and recovery gates. Its CI tabletop is not a completed live

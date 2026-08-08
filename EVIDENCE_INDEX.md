@@ -19,6 +19,9 @@ The repository does **not** currently establish independent scientific validatio
 - Institutional readiness dossier: [`docs/INSTITUTIONAL_READINESS_DOSSIER.md`](docs/INSTITUTIONAL_READINESS_DOSSIER.md)
 - Machine readiness register: [`config/institutional_readiness_register_v1.json`](config/institutional_readiness_register_v1.json)
 - Fail-closed readiness verifier: [`code/ops/VERIFY_INSTITUTIONAL_READINESS.py`](code/ops/VERIFY_INSTITUTIONAL_READINESS.py)
+- Institutional assurance crosswalk: [`docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md`](docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md)
+- Machine assurance register: [`config/institutional_assurance_crosswalk_v1.json`](config/institutional_assurance_crosswalk_v1.json)
+- Fail-closed assurance verifier: [`code/ops/VERIFY_INSTITUTIONAL_ASSURANCE_CROSSWALK.py`](code/ops/VERIFY_INSTITUTIONAL_ASSURANCE_CROSSWALK.py)
 - Incident response and continuity plan: [`docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md`](docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)
 - Public-release incident classifier: [`code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py`](code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py)
 - Machine incident policy: [`config/incident_response_and_continuity_v1.json`](config/incident_response_and_continuity_v1.json)
@@ -31,6 +34,12 @@ The repository does **not** currently establish independent scientific validatio
 - Geometry protocol verifier: [`code/ops/VERIFY_GEOMETRY_EVALUATION_PROTOCOL.py`](code/ops/VERIFY_GEOMETRY_EVALUATION_PROTOCOL.py)
 
 The machine graph is an index over detailed source records, not a replacement for them. CI verifies that upper evidence states retain their required support markers and that the reviewer-facing documents do not silently omit indexed pull requests.
+
+The assurance crosswalk is a first-party mapping to selected current NIST,
+OWASP, and SLSA framework themes. It names implemented, documented, scoped,
+prepared, buyer-specific, and open-gap states. It does not claim certification,
+full framework conformance, external audit, penetration testing, or production
+authorization.
 
 ## Evidence-state legend
 

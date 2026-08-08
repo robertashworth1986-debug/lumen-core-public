@@ -1,0 +1,351 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-08-08T00:00:00Z",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "scope": "public_repository_and_bounded_validation_sprint",
+  "assessment_type": "first_party_informative_crosswalk",
+  "assurance_statement": "This register maps current public first-party evidence to selected framework themes for reviewer orientation. It is not a certification, attestation, audit opinion, penetration test, or claim of full framework conformance.",
+  "status_vocabulary": {
+    "implemented_first_party": "Implemented in the public repository and supported by named first-party tests or machine evidence.",
+    "documented_control": "A documented policy or control boundary exists; operating effectiveness is not independently established.",
+    "partial_or_scoped": "Selected controls or a bounded scope are implemented; the framework or product-wide requirement is not fully assessed.",
+    "prepared_not_executed": "A protocol or handoff exists, but the independent, live, or buyer-owned execution has not occurred.",
+    "buyer_specific_gate": "The control must be completed for the buyer, data, jurisdiction, and deployment context.",
+    "open_gap": "Required external, legal, commercial, security, or operational evidence is absent."
+  },
+  "status_counts": {
+    "implemented_first_party": 2,
+    "documented_control": 2,
+    "partial_or_scoped": 6,
+    "prepared_not_executed": 1,
+    "buyer_specific_gate": 2,
+    "open_gap": 1
+  },
+  "frameworks": [
+    {
+      "id": "nist_ai_rmf_1_0",
+      "title": "NIST Artificial Intelligence Risk Management Framework",
+      "version": "AI RMF 1.0 / NIST AI 100-1",
+      "publication_date": "2023-01-26",
+      "official_url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10",
+      "reference_use": "Voluntary risk-management orientation across GOVERN, MAP, MEASURE, and MANAGE. NIST states that AI RMF 1.0 is being revised.",
+      "not_claimed": "Does not claim NIST approval, complete AI RMF implementation, or an assessed organizational profile."
+    },
+    {
+      "id": "nist_ai_600_1",
+      "title": "NIST AI RMF Generative Artificial Intelligence Profile",
+      "version": "NIST AI 600-1",
+      "publication_date": "2024-07-26",
+      "official_url": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf",
+      "reference_use": "Companion GenAI risk orientation for governance, content provenance, measurement, incident disclosure, and third-party risk.",
+      "not_claimed": "Does not claim complete coverage of the profile's risks or recommended actions, model evaluation, or deployment authorization."
+    },
+    {
+      "id": "nist_csf_2_0",
+      "title": "NIST Cybersecurity Framework",
+      "version": "CSF 2.0 / NIST CSWP 29",
+      "publication_date": "2024-02-26",
+      "official_url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+      "reference_use": "Voluntary cybersecurity risk orientation across GOVERN, IDENTIFY, PROTECT, DETECT, RESPOND, and RECOVER.",
+      "not_claimed": "Does not claim a complete CSF Current or Target Profile, maturity rating, external assessment, or risk acceptance."
+    },
+    {
+      "id": "nist_ssdf_1_1",
+      "title": "NIST Secure Software Development Framework",
+      "version": "SSDF 1.1 / NIST SP 800-218 final",
+      "publication_date": "2022-02-03",
+      "official_url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "reference_use": "Secure-development orientation across Prepare the Organization, Protect the Software, Produce Well-Secured Software, and Respond to Vulnerabilities.",
+      "not_claimed": "Does not claim full SSDF implementation. NIST SP 800-218 Revision 1, which would define SSDF 1.2, remains draft as of this register date."
+    },
+    {
+      "id": "owasp_asvs_5_0_0",
+      "title": "OWASP Application Security Verification Standard",
+      "version": "ASVS 5.0.0",
+      "publication_date": "2025-05-30",
+      "official_url": "https://owasp.org/www-project-application-security-verification-standard/",
+      "reference_use": "Application-security verification orientation for architecture, access control, validation, configuration, data protection, and logging.",
+      "not_claimed": "Does not claim an ASVS level, requirement-by-requirement assessment, penetration test, or OWASP certification or endorsement."
+    },
+    {
+      "id": "owasp_llmsvs_2_0",
+      "title": "OWASP Large Language Model Security Verification Standard",
+      "version": "LLMSVS 2.0",
+      "publication_date": "2026-06-15",
+      "official_url": "https://owasp.org/www-project-llm-verification-standard/LLMSVS-v2.0-en.html",
+      "reference_use": "LLM-system security orientation for configuration, lifecycle, integration, agents and tools, dependencies, and monitoring.",
+      "not_claimed": "Does not claim an LLMSVS level, complete control assessment, complete AI threat model, or OWASP certification or endorsement."
+    },
+    {
+      "id": "slsa_1_2",
+      "title": "Supply-chain Levels for Software Artifacts",
+      "version": "SLSA 1.2 approved specification",
+      "publication_date": "2025-11-24",
+      "official_url": "https://slsa.dev/spec/v1.2/",
+      "reference_use": "Software supply-chain orientation for source controls, build provenance, artifact identity, and provenance verification.",
+      "not_claimed": "Does not claim any SLSA Source or Build level, signed provenance, hosted-builder assessment, or hardened-build guarantee."
+    }
+  ],
+  "controls": [
+    {
+      "id": "AC-01",
+      "topic": "Governance, roles, claims, and decision authority",
+      "status": "implemented_first_party",
+      "framework_mappings": [
+        {"framework_id": "nist_ai_rmf_1_0", "reference_points": ["GOVERN", "MANAGE"]},
+        {"framework_id": "nist_ai_600_1", "reference_points": ["governance", "risk ownership", "incident disclosure"]},
+        {"framework_id": "nist_csf_2_0", "reference_points": ["GOVERN"]}
+      ],
+      "evidence_paths": [
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "docs/PROOF_CAPSULE_SCHEMA.md",
+        "code/proof_capsule_verifier.py"
+      ],
+      "evidence_establishes": "The public evidence protocol assigns bounded artifact roles, distinguishes evidence states, rejects authority escalation, and preserves human release and decision gates.",
+      "evidence_does_not_establish": "An enterprise governance program, board oversight, independent control assessment, legal authority, or production authorization.",
+      "next_gate": "Name buyer-side risk, data, technical, security, and decision owners in an executed sprint scope."
+    },
+    {
+      "id": "AC-02",
+      "topic": "Measurement, evaluation, reproducibility, and failure retention",
+      "status": "implemented_first_party",
+      "framework_mappings": [
+        {"framework_id": "nist_ai_rmf_1_0", "reference_points": ["MAP", "MEASURE", "MANAGE"]},
+        {"framework_id": "nist_ai_600_1", "reference_points": ["measurement", "evaluation", "content provenance"]}
+      ],
+      "evidence_paths": [
+        "config/reviewer_reproducibility_protocol_v1.json",
+        "requirements-reviewer-ubuntu-py311.lock",
+        "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+        "docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md"
+      ],
+      "evidence_establishes": "Named public experiments have bounded source identity, pinned reviewer dependencies, replay requirements, failure retention, and first-party receipts.",
+      "evidence_does_not_establish": "Independent scientific validation, correctness of every input, generalization, field performance, or buyer fitness.",
+      "next_gate": "Obtain one protocol-matched non-author execution and one buyer-owned baseline run with pre-accepted metrics."
+    },
+    {
+      "id": "AC-03",
+      "topic": "Source authorization, data rights, and intended use",
+      "status": "buyer_specific_gate",
+      "framework_mappings": [
+        {"framework_id": "nist_ai_rmf_1_0", "reference_points": ["GOVERN", "MAP"]},
+        {"framework_id": "nist_ai_600_1", "reference_points": ["data privacy", "intellectual property", "third-party risk"]},
+        {"framework_id": "nist_csf_2_0", "reference_points": ["GOVERN", "IDENTIFY"]}
+      ],
+      "evidence_paths": [
+        "docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md",
+        "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md",
+        "docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md"
+      ],
+      "evidence_establishes": "Templates require written source authorization, intended use, data classification, handling, acceptance, and decision authority before buyer work.",
+      "evidence_does_not_establish": "An executed license, data-processing agreement, legal sufficiency, regulated-data authorization, or consent for any particular dataset.",
+      "next_gate": "Execute buyer-specific rights, purpose, handling, retention, deletion, and legal terms before data intake."
+    },
+    {
+      "id": "AC-04",
+      "topic": "Secure development and repository change controls",
+      "status": "partial_or_scoped",
+      "framework_mappings": [
+        {"framework_id": "nist_ssdf_1_1", "reference_points": ["PO", "PS", "PW", "RV"]},
+        {"framework_id": "nist_csf_2_0", "reference_points": ["GOVERN", "PROTECT", "DETECT"]},
+        {"framework_id": "slsa_1_2", "reference_points": ["Source track", "Build track"]}
+      ],
+      "evidence_paths": [
+        ".github/workflows/repository-trust.yml",
+        "SECURITY.md",
+        "CONTRIBUTING.md"
+      ],
+      "evidence_establishes": "Selected repository workflows use pinned actions, read-only permissions, credential-free checkout, automated tests, and diff checks; contribution and security boundaries are documented.",
+      "evidence_does_not_establish": "Full SSDF practice coverage, protected-branch configuration, required independent review for every change, whole-history security, or audited operating effectiveness.",
+      "next_gate": "Complete a practice-level SSDF assessment and retain repository-setting, review, vulnerability-management, and remediation evidence."
+    },
+    {
+      "id": "AC-05",
+      "topic": "Dependency inventory and scoped software bill of materials",
+      "status": "partial_or_scoped",
+      "framework_mappings": [
+        {"framework_id": "nist_ssdf_1_1", "reference_points": ["PS.3", "PW.4"]},
+        {"framework_id": "slsa_1_2", "reference_points": ["artifact identity", "resolved dependencies"]},
+        {"framework_id": "owasp_asvs_5_0_0", "reference_points": ["dependency and component security"]}
+      ],
+      "evidence_paths": [
+        "config/reviewer_reproducibility_protocol_v1.json",
+        "requirements-reviewer-ubuntu-py311.lock",
+        "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json"
+      ],
+      "evidence_establishes": "The named reviewer computation has hash-locked Python dependencies and a receipt containing a scoped CycloneDX inventory.",
+      "evidence_does_not_establish": "A complete product, runtime, container, operating-system, frontend, or deployment SBOM, continuous vulnerability monitoring, or dependency approval.",
+      "next_gate": "Generate, review, and govern complete product and exact-release SBOMs with vulnerability and exception handling."
+    },
+    {
+      "id": "AC-06",
+      "topic": "Build provenance and release integrity",
+      "status": "partial_or_scoped",
+      "framework_mappings": [
+        {"framework_id": "slsa_1_2", "reference_points": ["Build provenance", "Build track"]},
+        {"framework_id": "nist_ssdf_1_1", "reference_points": ["PS.2", "PS.3"]}
+      ],
+      "evidence_paths": [
+        "docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md",
+        ".github/workflows/public-site-exact-snapshot-ci.yml",
+        ".github/workflows/deploy-public-site-release.yml"
+      ],
+      "evidence_establishes": "The public-site release protocol binds files to Git object identity and SHA-256 digests and defines fail-closed packaging and live comparison.",
+      "evidence_does_not_establish": "SLSA Build L1 or higher, signed provenance, builder authenticity, hardened or isolated builds, or a currently matching live deployment.",
+      "next_gate": "Emit standards-compatible signed provenance from an assessed hosted build and verify it before deployment."
+    },
+    {
+      "id": "AC-07",
+      "topic": "Identity, access control, secrets, and runtime activation",
+      "status": "partial_or_scoped",
+      "framework_mappings": [
+        {"framework_id": "nist_csf_2_0", "reference_points": ["PROTECT"]},
+        {"framework_id": "owasp_asvs_5_0_0", "reference_points": ["authentication", "access control", "configuration", "secret management"]},
+        {"framework_id": "owasp_llmsvs_2_0", "reference_points": ["V1 secure configuration", "V5 secure LLM integration", "V6 agents and tools"]}
+      ],
+      "evidence_paths": [
+        "code/operator_api_access.py",
+        "tests/test_operator_api_access.py",
+        ".github/workflows/repair-gateway-dependency-closure.yml"
+      ],
+      "evidence_establishes": "Source and negative tests define a default-deny operator boundary; consequential runtime repair remains separately phrase- and secret-gated.",
+      "evidence_does_not_establish": "Production secret installation, enterprise federation, least privilege across every component, independent access-control testing, or a repaired live gateway.",
+      "next_gate": "Verify secret ownership and rotation, deploy buyer-approved identity controls, and retain current live negative-access evidence."
+    },
+    {
+      "id": "AC-08",
+      "topic": "Vulnerability reporting and remediation boundary",
+      "status": "documented_control",
+      "framework_mappings": [
+        {"framework_id": "nist_ssdf_1_1", "reference_points": ["RV"]},
+        {"framework_id": "nist_csf_2_0", "reference_points": ["DETECT", "RESPOND"]}
+      ],
+      "evidence_paths": [
+        "SECURITY.md",
+        "CONTRIBUTING.md"
+      ],
+      "evidence_establishes": "The repository publishes a private vulnerability-reporting route, supported-version boundary, and best-effort handling process.",
+      "evidence_does_not_establish": "A response or remediation SLA, bug bounty, continuous scanning program, penetration test, or historical remediation performance.",
+      "next_gate": "Agree severity, notification, remediation, disclosure, and evidence-retention terms for the buyer engagement."
+    },
+    {
+      "id": "AC-09",
+      "topic": "Incident response, continuity, and recovery",
+      "status": "documented_control",
+      "framework_mappings": [
+        {"framework_id": "nist_csf_2_0", "reference_points": ["DETECT", "RESPOND", "RECOVER"]},
+        {"framework_id": "nist_ai_600_1", "reference_points": ["incident disclosure", "monitoring"]}
+      ],
+      "evidence_paths": [
+        "config/incident_response_and_continuity_v1.json",
+        "docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md",
+        "code/ops/VERIFY_INCIDENT_RESPONSE_AND_CONTINUITY.py",
+        ".github/workflows/incident-response-readiness.yml"
+      ],
+      "evidence_establishes": "A first-party severity model, containment and recovery boundaries, deterministic CI tabletop, and machine-verifiable incident policy exist.",
+      "evidence_does_not_establish": "A completed live recovery exercise, customer notification performance, business-continuity certification, recovery objective achievement, or external audit.",
+      "next_gate": "Run a separately authorized live restoration exercise and negotiate buyer-specific response, notification, backup, and recovery objectives."
+    },
+    {
+      "id": "AC-10",
+      "topic": "Application and API security verification",
+      "status": "partial_or_scoped",
+      "framework_mappings": [
+        {"framework_id": "owasp_asvs_5_0_0", "reference_points": ["architecture", "access control", "validation", "API and web service", "logging"]},
+        {"framework_id": "nist_csf_2_0", "reference_points": ["PROTECT", "DETECT"]}
+      ],
+      "evidence_paths": [
+        "code/operator_api_access.py",
+        "tests/test_operator_api_access.py",
+        "code/proof_capsule_verifier.py"
+      ],
+      "evidence_establishes": "Selected public interfaces have strict parsing, path and schema defenses, default-deny access behavior, and adversarial unit tests.",
+      "evidence_does_not_establish": "An ASVS level, requirement-by-requirement verification, dynamic application test, penetration test, infrastructure assessment, or absence of vulnerabilities.",
+      "next_gate": "Define the exact buyer-facing application scope and commission requirement-level ASVS verification and independent penetration testing."
+    },
+    {
+      "id": "AC-11",
+      "topic": "Generative-AI, agent, and external-model boundaries",
+      "status": "partial_or_scoped",
+      "framework_mappings": [
+        {"framework_id": "nist_ai_rmf_1_0", "reference_points": ["GOVERN", "MAP", "MEASURE", "MANAGE"]},
+        {"framework_id": "nist_ai_600_1", "reference_points": ["confabulation", "data privacy", "information integrity", "human-AI configuration", "third-party risk"]},
+        {"framework_id": "owasp_llmsvs_2_0", "reference_points": ["V1 secure configuration", "V2 model lifecycle", "V5 secure integration", "V6 agents and tools", "V7 dependencies", "V8 monitoring"]}
+      ],
+      "evidence_paths": [
+        "docs/AGENT_ARENA.md",
+        "docs/DICE_SAFETY_BOUNDARY_MEMO_V0_1.md",
+        "docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md"
+      ],
+      "evidence_establishes": "The documented research and buyer boundaries separate deterministic evidence from custom-model runs, limit tool and action authority, prohibit unapproved confidential-data submission to external AI, and retain human gates.",
+      "evidence_does_not_establish": "An LLMSVS level, full GenAI threat model, prompt-injection resistance, provider assurance, model safety, continuous AI monitoring, or production agent authorization.",
+      "next_gate": "Inventory each production model, tool, provider, data flow, memory path, and authority; then execute a scoped LLMSVS and adversarial AI-security assessment."
+    },
+    {
+      "id": "AC-12",
+      "topic": "Privacy and regulated-data boundary",
+      "status": "buyer_specific_gate",
+      "framework_mappings": [
+        {"framework_id": "nist_ai_rmf_1_0", "reference_points": ["GOVERN", "MAP"]},
+        {"framework_id": "nist_ai_600_1", "reference_points": ["data privacy"]},
+        {"framework_id": "nist_csf_2_0", "reference_points": ["GOVERN", "IDENTIFY", "PROTECT"]}
+      ],
+      "evidence_paths": [
+        "SECURITY.md",
+        "docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md"
+      ],
+      "evidence_establishes": "Public artifacts exclude private records by policy, and sprint templates require buyer-specific classification, access, transfer, retention, deletion, incident, and provider decisions.",
+      "evidence_does_not_establish": "HIPAA, GDPR, CCPA, CUI, export-control, classified-data, records-management, or other regulated-data compliance or authorization.",
+      "next_gate": "Complete legal and security review for the actual data, people, sector, geography, and deployment before intake."
+    },
+    {
+      "id": "AC-13",
+      "topic": "Independent execution and external validation",
+      "status": "prepared_not_executed",
+      "framework_mappings": [
+        {"framework_id": "nist_ai_rmf_1_0", "reference_points": ["MEASURE", "MANAGE"]},
+        {"framework_id": "nist_ai_600_1", "reference_points": ["measurement", "evaluation"]}
+      ],
+      "evidence_paths": [
+        "docs/CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md",
+        "config/codecheck_independent_execution_receipt_template_v1.json",
+        "config/external_replication_docket_v1.json"
+      ],
+      "evidence_establishes": "A bounded non-author execution handoff, receipt contract, and external replication docket are prepared.",
+      "evidence_does_not_establish": "Evaluator assignment or independence, completed non-author execution, external validation, field validation, certification, or buyer acceptance.",
+      "next_gate": "A qualified non-author evaluator must execute the locked protocol and return a complete verifiable receipt."
+    },
+    {
+      "id": "AC-14",
+      "topic": "External assurance, legal, insurance, and production acceptance",
+      "status": "open_gap",
+      "framework_mappings": [
+        {"framework_id": "nist_csf_2_0", "reference_points": ["GOVERN"]},
+        {"framework_id": "owasp_asvs_5_0_0", "reference_points": ["independent application verification scope"]},
+        {"framework_id": "owasp_llmsvs_2_0", "reference_points": ["open-book LLM-system assessment scope"]}
+      ],
+      "evidence_paths": [
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md",
+        "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md",
+        "config/institutional_readiness_register_v1.json"
+      ],
+      "evidence_establishes": "The public materials explicitly separate first-party technical evidence from legal, certification, insurance, customer, and production conclusions.",
+      "evidence_does_not_establish": "SOC 2, ISO 27001, FedRAMP, OWASP certification, NIST conformance, penetration testing, legal approval, adequate insurance, signed customer acceptance, cleared payment, or production approval.",
+      "next_gate": "Obtain buyer-specific legal, IP, insurance, security, regulatory, independent-testing, and production-acceptance review."
+    }
+  ],
+  "claim_boundaries": [
+    "not_a_certification_or_attestation",
+    "not_full_framework_conformance",
+    "not_an_external_audit",
+    "not_a_penetration_test",
+    "not_a_complete_product_or_deployment_sbom",
+    "not_signed_slsa_provenance_or_a_slsa_level",
+    "not_a_live_recovery_exercise",
+    "not_an_executed_dpa_or_legal_review",
+    "not_regulated_data_authorization",
+    "not_independent_or_field_validation",
+    "not_customer_acceptance_or_revenue",
+    "not_production_authorization"
+  ]
+}
