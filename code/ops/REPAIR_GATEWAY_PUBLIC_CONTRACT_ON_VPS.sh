@@ -60,15 +60,28 @@ from booth_public_contract import public_booth_projection
 
 projected = public_booth_projection(
     {
+        "generated_utc": "2026-08-08T00:00:00Z",
+        "indexing": {
+            "files_indexed": 42,
+            "roots_present": 2,
+            "roots_total": 3,
+            "scan_capped": False,
+        },
+        "catalog": {"engine_count": 7, "assets_source_rows": 11},
         "founder_profile": {"ein": "12-3456789"},
         "live_execution": {"recent_trades": [{"txid": "OABCDE-FGHIJK-LMNOPQ"}]},
     }
 )
+assert projected["schema"] == "lumencore.public_booth_contract.v2"
 assert projected["supported_maturity_level"] == 3
 assert projected["live_execution_authority"] is False
 assert projected["profit_claim_allowed"] is False
-assert "ein" not in projected["founder_profile"]
-assert projected["live_execution"]["recent_trades"] == []
+assert projected["indexing"]["files_indexed"] == 42
+assert projected["catalog"]["engine_count"] == 7
+assert "founder_profile" not in projected
+assert "live_execution" not in projected
+assert "12-3456789" not in repr(projected)
+assert "OABCDE-FGHIJK-LMNOPQ" not in repr(projected)
 PY
 
 SOURCE_SHA="$(sha256sum "$SOURCE" | awk '{print $1}')"
