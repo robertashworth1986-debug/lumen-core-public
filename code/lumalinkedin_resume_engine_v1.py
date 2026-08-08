@@ -337,37 +337,14 @@ def _build_resume_markdown(profile: dict[str, Any], metrics: dict[str, Any], pac
     phone = str(company.get("phone") or "615-438-2502")
     website = str(company.get("website") or "https://lumen-core.ai")
     location = f"{company.get('city', 'Nashville')}, {company.get('state', 'TN')}"
-    dataset_count = metrics.get("dataset_count") or 673
     package_names = _dedupe_keep_order([str(row.get("package", "")) for row in packages if row.get("package")])
 
     tech_display = [_display_package_name(pkg) for pkg in package_names[:20] if _display_package_name(pkg)]
     tech_line = ", ".join(tech_display) if tech_display else "FastAPI, pandas, numpy, scipy, scikit-learn, requests"
 
-    annual_value_num = _safe_float(metrics.get("annual_value_usd"))
-    annual_value_full = _fmt_money(annual_value_num)
-    annual_value_compact = _fmt_money_compact(annual_value_num)
-    annual_value_line = annual_value_full if annual_value_full == annual_value_compact else f"{annual_value_full} ({annual_value_compact})"
-
-    top_sector = _humanize_sector_name(metrics.get("top_sector"))
-    closed_trades = _safe_int(metrics.get("closed_live_trades"), 0)
-    win_rate = _safe_float(metrics.get("win_rate_pct"), 0.0)
-    realized_net = _safe_float(metrics.get("realized_net_usd"), 0.0)
-    if closed_trades > 0 and win_rate > 0.0:
-        live_telemetry_line = (
-            f"Live execution telemetry: {closed_trades} closed trades, {_fmt_pct(win_rate)} win rate, "
-            f"realized net {_fmt_money(realized_net)}."
-        )
-    elif closed_trades > 0:
-        live_telemetry_line = (
-            f"Live execution telemetry: {closed_trades} closed trades with auditable reason-code and PnL artifacts "
-            "in the evidence lane."
-        )
-    else:
-        live_telemetry_line = "Live execution telemetry: runtime controls and proof capture active."
-
     return f"""# {name.upper()}
 
-Principal Quant Systems Engineer | Institutional Automation Architect | Government-Grade Evidence Lead
+Software Infrastructure & AI Evaluation Specialist | Python Systems | Reliability Engineering
 
 Location: {location} (Remote/Hybrid/Relocation)  
 Email: [{email}](mailto:{email})  
@@ -376,35 +353,24 @@ Website: [{website}]({website})
 
 ## EXECUTIVE PROFILE
 
-Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-end ownership of quant research, live execution controls, evidence-chain integrity, and investor/government reporting. Built and operated a production institutional stack that converts multi-source data into risk-gated actions with machine-readable proof artifacts.
+Founder and hands-on systems engineer building Python automation, API services, evaluation harnesses, and evidence controls across the LumenCore and LumaTrader codebases. Designs fail-closed workflows that preserve source provenance, negative findings, exact artifacts, and human authority instead of turning internal results into unsupported claims. Seeking remote contract work in software infrastructure, AI evaluation, platform reliability, and quality engineering.
 
-## INSTITUTIONAL IMPACT SNAPSHOT
+## ENGINEERING STRENGTHS
 
-- Dataset benchmark breadth: {dataset_count} datasets with reproducible artifacts and hash-linked evidence.
-- Annual modeled value signal: {annual_value_line}.
-- Top sector and hourly signal: {top_sector} at {_fmt_money(_safe_float(metrics.get('top_sector_hourly_value_usd')))} per hour.
-- Router edge and harmonic consistency: {_fmt_pct(_safe_float(metrics.get('router_edge_pct')))} edge, {_fmt_pct(_safe_float(metrics.get('harmonic_win_rate_pct')))} harmonic win rate.
-- {live_telemetry_line}
+- Python architecture for verification, orchestration, data pipelines, APIs, and operator tooling.
+- Infrastructure reasoning across dependency closure, deployment workflows, environment isolation, state ownership, failure handling, and recovery controls.
+- AI evaluation workflows with fixed inputs, locked comparators, retained failures, reproducible commands, and machine-readable receipts.
+- Reliability and quality controls including immutable dependency pinning, path safety, resource budgets, deterministic builds, and cross-platform CI.
+- Clear technical communication for skeptical reviewers, program teams, buyers, and engineering stakeholders.
 
-## CORE COMPETENCIES
+## SELECTED ENGINEERING WORK
 
-- Mission-critical Python architecture for quant, routing, and operational control planes.
-- Risk-engineering guardrails: kill switch controls, cooldown logic, approval queues, and position sizing controls.
-- Government-grade traceability with SHA256 manifests, immutable ledgers, and reproducible run artifacts.
-- FastAPI gateway and dashboard API integration for investor, mission-control, and ops command surfaces.
-- Cross-sector data engineering across market, energy, macro, and infrastructure signal lanes.
-
-## SELECTED PRODUCTION SYSTEMS
-
-- INSTITUTIONAL_STACK_V2 orchestration and runtime continuity controls.
-- Opportunity automation lanes for grants, funding, and outreach workflows.
-- LinkedIn evidence publishing lane and profile optimization automation.
-- Sports and market intelligence fusion lanes with explicit lane-boundary controls.
-- End-to-end evidence packaging pipelines for investor and federal reviews.
-
-## TECHNOLOGY STACK AND PROVEN PACKAGES
-
-{tech_line}
+- Built Proof Capsule validators that distinguish exact-byte custody, canonical JSON identity, policy state, and external authority.
+- Added repository-wide GitHub Actions supply-chain controls that require immutable external-action commits and readable version annotations.
+- Developed fail-closed order-safety, gateway-contract, deadline, outreach, and public-release checks that do not grant execution or submission authority.
+- Built FastAPI and dashboard integration surfaces for bounded review, telemetry, and operator decision support.
+- Created buyer-owned baseline-validation templates that lock the source, comparator, metric, threshold, holdout, failure policy, and claim boundary before scoring.
+- Maintained Windows and Linux CI paths for evidence portability, deterministic packet generation, and reviewer reproduction.
 
 ## PROFESSIONAL EXPERIENCE
 
@@ -412,23 +378,33 @@ Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-
 
 2014 - Present
 
-- Architected and maintained a production quant platform spanning data ingestion, model routing, risk controls, execution, and evidence generation.
-- Built deterministic ops scripts and API endpoints to automate grant readiness, investor proof packs, and mission dashboards.
-- Designed resilient live-execution safeguards with configurable runtime controls and explicit reason-code telemetry.
-- Produced institutional artifacts for due diligence, including calibration summaries, anomaly scanners, and regime-shift reports.
+- Architected Python services and automation spanning ingestion, evaluation, routing, runtime controls, audit receipts, and reviewer-facing outputs.
+- Implemented human-gated controls, kill switches, cooldowns, bounded notional policies, and explicit no-order/no-submit execution paths.
+- Built reproducible evidence packages with SHA-256 manifests, deterministic JSON, fixed schemas, and retained negative results.
+- Diagnosed and hardened deployment, filesystem ownership, stale-state, API-authentication, and dependency-closure failures.
+- Produced technical briefs, statements of work, grant preflight materials, and public reviewer documentation with explicit proven/not-proven limits.
 
-## GOVERNMENT AND INSTITUTIONAL POSITIONING
+## TECHNOLOGY STACK
 
-- UEI: {company.get('duns_or_uei', 'SQY2XW71ZM51')} | CAGE: {company.get('cage_code', '14TM8')} | SAM status: {company.get('sam_gov_status', 'active')}.
-- Track record generating federal-style submissions and preflight-ready package artifacts.
-- Operates with evidence-first discipline: every major claim maps to machine-readable outputs.
+{tech_line}
 
-## TARGET ROLES
+Additional tools: Git, GitHub Actions, PowerShell, Linux, FastAPI, REST/WebSocket APIs, JSON/JSONL, HTML/CSS/JavaScript, pytest, unittest, Playwright, SHA-256 manifests.
 
-- Principal Quant Systems Engineer
-- Staff Platform Reliability Engineer (AI and Trading Infrastructure)
-- Mission Systems Software Engineer (Government and Defense-Adjacent)
-- Senior Technical Lead, AI Operations and Evidence Automation
+## PUBLIC EVIDENCE BOUNDARY
+
+- Public repository: [github.com/robertashworth1986-debug/lumen-core-public](https://github.com/robertashworth1986-debug/lumen-core-public)
+- Reviewer entry point: [lumen-core.ai](https://lumen-core.ai)
+- The public materials demonstrate first-party code, tests, reproducibility controls, bounded demonstrations, and claim governance.
+- Independent validation, field performance, customer adoption, audited revenue, certification, and guaranteed savings are not established by the public repository.
+- Live-order authority and final external submission authority are not granted by résumé claims, dashboards, or passing CI.
+
+## TARGET ENGAGEMENTS
+
+- SWE Infrastructure Specialist / AI Trainer
+- Python Platform or Reliability Engineer
+- AI Evaluation and Quality Engineer
+- Technical Evidence and Reproducibility Engineer
+- Contract Systems Architect for bounded validation and reviewer tooling
 """
 
 
@@ -436,16 +412,14 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
     company = profile.get("company", {}) if isinstance(profile, dict) else {}
     pi = profile.get("pi", {}) if isinstance(profile, dict) else {}
     name = str(pi.get("name") or company.get("founder_pi") or "Robert BabyRay Ashworth")
-    dataset_count = metrics.get("dataset_count") or 673
-
     package_names = _dedupe_keep_order([str(row.get("package", "")) for row in packages if row.get("package")])
     skill_seed = [
         "Python",
         "FastAPI",
-        "Risk Controls",
-        "Quant Systems",
-        "Time-Series Forecasting",
-        "Government-Grade Evidence",
+        "Reliability Engineering",
+        "AI Evaluation",
+        "Reproducible Systems",
+        "Runtime Controls",
         "Operational Automation",
         "PowerShell",
     ]
@@ -456,37 +430,31 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
 
     skills = _dedupe_keep_order(skill_seed)
 
-    annual_value_num = _safe_float(metrics.get("annual_value_usd"))
-    annual_value = _fmt_money(annual_value_num)
-    annual_value_compact = _fmt_money_compact(annual_value_num)
-    top_sector = _humanize_sector_name(metrics.get("top_sector"))
-    router_edge = _fmt_pct(_safe_float(metrics.get("router_edge_pct")))
     headline_variants = [
-        "Principal Quant Systems Engineer | Institutional Automation | Government-Grade Evidence",
-        "Founder, LumaTrader/LumenCore | Quant Infrastructure | Risk-Gated Execution",
-        "AI + Quant Platform Architect | Production Trading and Mission-Critical Ops",
-        "Staff-Level Python Systems Engineer | Runtime Controls | Evidence Chains",
-        "Institutional and Federal-Ready Technical Lead | Forecasting | Control Planes",
+        "Software Infrastructure & AI Evaluation Specialist | Python Systems | Reliability Engineering",
+        "Founder, LumaTrader/LumenCore | Reproducible Systems | Runtime Controls",
+        "Python Platform Engineer | AI Evaluation | Evidence and Reliability",
+        "Systems Engineer | Deterministic Pipelines | Human-Gated Automation",
+        "Technical Evidence & Reproducibility Engineer | APIs | CI | Audit Receipts",
     ]
 
     about_short = (
-        f"I build institutional-grade quant and operations systems that move from signal to action with explicit risk controls and auditable evidence. "
-        f"Current benchmark breadth: {dataset_count} datasets with reproducible outputs across LumaTrader and LumenCore."
+        "I build Python infrastructure and AI-evaluation workflows with explicit controls, reproducible outputs, and reviewer-readable evidence. "
+        "My work spans APIs, automation, runtime safety, CI, deterministic artifacts, and failure analysis."
     )
     about_long = (
-        f"I build institutional-grade quant and operational intelligence systems that move from signal to action with explicit risk controls and verifiable evidence. "
-        f"My platform work spans LumaTrader and LumenCore, where I operate a {dataset_count}-dataset benchmark and produce reproducible artifacts for investors and federal-style reviews. "
-        f"Current modeled annual value signal: {annual_value_compact}. Top impact lane: {top_sector} with hourly signal value of "
-        f"{_fmt_money(_safe_float(metrics.get('top_sector_hourly_value_usd')))}. "
-        f"I specialize in Python control planes, FastAPI services, runtime guardrails, and proof-grade reporting that keeps technical claims auditable."
+        "I build and review Python systems where behavior must be observable, bounded, and reproducible. "
+        "Across LumaTrader and LumenCore, I have implemented ingestion and evaluation pipelines, API services, runtime guardrails, audit receipts, CI checks, and reviewer-facing evidence packages. "
+        "I retain negative results and separate first-party software verification from claims that require independent field validation. "
+        "I am seeking infrastructure, AI-evaluation, reliability, and technical-evidence engagements where careful engineering and clear failure analysis matter."
     )
 
     experience = [
-        "Built and operate INSTITUTIONAL_STACK_V2 for end-to-end quant execution, risk controls, and evidence packaging.",
-        "Shipped mission-control and investor dashboards with API-driven telemetry and deterministic fallback behavior.",
-        "Implemented approval queues, kill-switch semantics, and pacing guardrails to enforce safe runtime posture.",
-        "Automated grant and opportunity workflows with prefilled artifacts, submission checklists, and queue tracking.",
-        "Maintained lane-boundary governance across trading, sector, and sports intelligence pipelines.",
+        "Architected Python services and automation spanning ingestion, evaluation, routing, runtime controls, audit receipts, and reviewer-facing outputs.",
+        "Implemented human-gated controls, kill switches, cooldowns, bounded notional policies, and explicit no-order/no-submit paths.",
+        "Built reproducible evidence packages with SHA-256 manifests, deterministic JSON, fixed schemas, and retained negative results.",
+        "Diagnosed deployment, filesystem ownership, stale-state, authentication, and dependency-closure failures.",
+        "Produced technical briefs, statements of work, grant preflight materials, and public documentation with explicit proven/not-proven limits.",
     ]
     experience_roles = [
         {
@@ -506,18 +474,17 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
 
     post_templates = [
         {
-            "title": "LumaLinkedIn Edition V1 launch",
+            "title": "Evidence-first engineering update",
             "text": (
-                f"LumaLinkedIn Edition V1 is live. I just refreshed my production resume and opportunity stack using evidence-first automation: "
-                f"{dataset_count} benchmark datasets, {router_edge} router edge, "
-                f"and a modeled annual value signal of {annual_value_compact}. Building systems where every claim maps to artifacts."
+                "I refreshed LumenCore's public technical surface around a simple rule: show the code, controls, reproducible command, and limits of the evidence. "
+                "First-party verification is visible; independent field validation remains a separate gate."
             ),
         },
         {
-            "title": "Government-grade AI ops",
+            "title": "Bounded AI operations",
             "text": (
-                "Working at the intersection of quant infrastructure and government-grade evidence discipline. "
-                "Focus: deterministic pipelines, risk-gated runtime controls, and machine-readable proof bundles."
+                "Working at the intersection of Python infrastructure, AI evaluation, and evidence discipline. "
+                "Focus: deterministic pipelines, human-gated controls, failure receipts, and machine-readable proof bundles."
             ),
         },
     ]
@@ -526,19 +493,19 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
     live_order_mode = "ON" if bool(metrics.get("allow_live_orders")) else "OFF"
     impact_snapshot = [
         {
-            "label": "Dataset Breadth",
-            "value": f"{_safe_int(dataset_count):,}",
-            "hint": "Reproducible benchmark scope",
+            "label": "Evidence",
+            "value": "REPLAYABLE",
+            "hint": "Deterministic artifacts and commands",
         },
         {
-            "label": "Annual Signal",
-            "value": annual_value_compact,
-            "hint": "Modeled value lane",
+            "label": "Integrity",
+            "value": "SHA-256",
+            "hint": "Canonical manifests and receipts",
         },
         {
-            "label": "Router Edge",
-            "value": router_edge,
-            "hint": "Decision uplift signal",
+            "label": "Validation",
+            "value": "NOT ESTABLISHED",
+            "hint": "Independent field validation is a separate gate",
         },
         {
             "label": "Runtime Mode",
@@ -551,7 +518,7 @@ def _build_linkedin_payload(profile: dict[str, Any], metrics: dict[str, Any], pa
         "Use About (Short) for mobile summary and About (Full) for the main profile section.",
         "Create Experience entry from Experience Pack bullets.",
         "Add Featured Links and top skills for profile credibility.",
-        "Use Post Templates to publish launch and operating updates.",
+        "Use Post Templates only after checking every statement against a public artifact.",
     ]
 
     return {
@@ -590,17 +557,12 @@ def _build_linkedin_audience_variants(
     metrics: dict[str, Any],
     company: dict[str, Any],
 ) -> dict[str, dict[str, Any]]:
-    dataset_count = _safe_int(metrics.get("dataset_count"), 0)
-    annual_signal = _fmt_money_compact(_safe_float(metrics.get("annual_value_usd")))
-    avoided_cost = _fmt_money_compact(_safe_float(metrics.get("cross_sector_avoided_cost_usd")))
-    router_edge = _fmt_pct(_safe_float(metrics.get("router_edge_pct")))
-    top_sector = _humanize_sector_name(metrics.get("top_sector"))
     runtime_mode = str(metrics.get("runtime_mode") or "paper").upper()
     live_orders = "ON" if bool(metrics.get("allow_live_orders")) else "OFF"
 
     uei = str(company.get("duns_or_uei") or "SQY2XW71ZM51")
     cage = str(company.get("cage_code") or "14TM8")
-    sam = str(company.get("sam_gov_status") or "active").upper()
+    registration_note = "VERIFY CURRENT STATUS"
 
     def _mk_variant(
         audience_id: str,
@@ -652,68 +614,65 @@ def _build_linkedin_audience_variants(
     investor = _mk_variant(
         audience_id="investor",
         audience_label="Investor Positioning",
-        headline="Founder | Institutional Quant Infrastructure | Evidence-Backed Growth Systems",
+        headline="Founder | Buyer-Owned Baseline Validation | Reproducible Technical Evidence",
         about_short=(
-            f"I build monetizable quant and AI infrastructure with deterministic controls and investor-grade proof artifacts. "
-            f"Current platform benchmark: {dataset_count:,} datasets with reproducible evidence."
+            "I build bounded validation sprints that turn a buyer's baseline, test protocol, and operational data into reproducible evidence and an explicit go/no-go result."
         ),
         about_full=(
-            f"I architect and operate LumaTrader and LumenCore as an evidence-first infrastructure platform designed for institutional and strategic growth partners. "
-            f"Current modeled annual signal is {annual_signal}, with router edge at {router_edge} and top value lane in {top_sector}. "
-            f"Cross-sector recommended avoided cost currently tracks at {avoided_cost}. "
-            "Every material claim maps to machine-readable artifacts, enabling diligence-ready investor review."
+            "LumenCore's primary offer is a Buyer-Owned Baseline Validation Sprint. The buyer defines the system, metric, data-access boundary, and acceptance rule. "
+            "We produce a frozen baseline, bounded comparison, failure report, reproducible command, and integrity manifest. "
+            "The public repository demonstrates first-party software controls; customer outcomes, independent validation, and commercial adoption are not established by those materials."
         ),
-        role_title="Founder and Principal Quant Infrastructure Engineer",
+        role_title="Founder and Technical Validation Systems Engineer",
         experience=[
-            "Scaled an institutional quant stack from research to production with auditable execution and evidence packaging.",
-            "Built investor-facing mission-control surfaces that expose signal, control posture, and outcome telemetry.",
-            "Designed repeatable valuation and readiness pipelines for funding and strategic-partner diligence.",
-            "Integrated risk-gated runtime controls to protect capital pathways while preserving deployment speed.",
-            "Established artifact-first reporting discipline so each milestone is traceable and reviewable.",
+            "Designed buyer-owned validation protocols with frozen inputs, explicit acceptance rules, and retained failure evidence.",
+            "Built reviewer surfaces exposing control posture, artifact provenance, and known evidence limits.",
+            "Implemented deterministic outputs and SHA-256 manifests for repeatable technical review.",
+            "Separated software verification from independent field and commercial validation claims.",
+            "Created bounded pilot statements of work that preserve customer control over data and deployment.",
         ],
         quick_apply_steps=[
             "Use investor headline for profile identity.",
-            "Use investor about copy with annual signal + avoided cost metrics.",
+            "Use investor about copy without unverified financial or performance metrics.",
             "Pin evidence and mission links in featured section.",
-            "Use investor post templates for launch and update cadence.",
+            "Use investor post templates only when the linked evidence is public and current.",
         ],
         post_templates=[
             {
                 "title": "Investor brief: infrastructure signal",
                 "text": (
-                    f"LumaTrader/LumenCore now tracks {dataset_count:,} reproducible datasets with {router_edge} router edge and {annual_signal} modeled annual signal. "
-                    "Built for diligence-ready, evidence-backed institutional scaling."
+                    "LumenCore is packaging buyer-owned baseline validation: a frozen baseline, bounded test, failure report, and reproducible evidence pack. "
+                    "The next commercial gate is a paid, independently reviewable pilot—not a larger claim."
                 ),
             },
             {
                 "title": "Evidence-first growth update",
                 "text": (
-                    f"Cross-sector avoided cost now sits at {avoided_cost} with fully auditable runtime and reporting artifacts. "
-                    "Scaling with discipline: performance, controls, and proof in one operating surface."
+                    "We are looking for one infrastructure operator with a measurable baseline and a narrow validation question. "
+                    "The buyer keeps control of data, acceptance criteria, and deployment authority."
                 ),
             },
         ],
         impact_snapshot=[
-            {"label": "Annual Signal", "value": annual_signal, "hint": "Modeled value lane"},
-            {"label": "Avoided Cost", "value": avoided_cost, "hint": "Cross-sector optimization"},
-            {"label": "Router Edge", "value": router_edge, "hint": "Decision uplift"},
-            {"label": "Evidence", "value": "HASH-CHAINED", "hint": "Diligence-ready artifacts"},
+            {"label": "Offer", "value": "BASELINE SPRINT", "hint": "One bounded customer question"},
+            {"label": "Control", "value": "BUYER-OWNED", "hint": "Data, criteria, and deployment"},
+            {"label": "Evidence", "value": "REPLAYABLE", "hint": "Commands, artifacts, and limits"},
+            {"label": "Validation", "value": "PILOT NEEDED", "hint": "Independent result not yet established"},
         ],
     )
 
     government = _mk_variant(
         audience_id="government",
         audience_label="Government Positioning",
-        headline="Mission Systems Architect | Government-Grade Evidence | Risk-Controlled AI Ops",
+        headline="Mission Systems Architect | Reproducible Evidence | Human-Gated AI Operations",
         about_short=(
-            f"I deliver mission-oriented software and quant infrastructure with deterministic controls, auditable chains, and federal-ready evidence packaging. "
-            f"UEI {uei} | CAGE {cage} | SAM {sam}."
+            "I build mission-oriented software with deterministic controls, auditable receipts, and explicit human approval gates. "
+            f"Documented identifiers: UEI {uei} | CAGE {cage}; verify current registration status before use."
         ),
         about_full=(
             "I design mission systems that prioritize reliability, traceability, and defensible operations. "
-            f"Across LumaTrader and LumenCore, the platform currently operates across {dataset_count:,} benchmark datasets with reproducible outputs and risk-gated execution. "
-            f"Government identifiers: UEI {uei}, CAGE {cage}, SAM {sam}. "
-            "The operating model emphasizes deterministic pipelines, reason-code telemetry, and machine-readable artifacts suitable for technical and programmatic review."
+            "Across LumaTrader and LumenCore, first-party demonstrations use reproducible outputs, reason-code telemetry, human-gated execution, and machine-readable evidence. "
+            f"Documented identifiers: UEI {uei}, CAGE {cage}. Current registration, eligibility, and solicitation fit must be verified against official sources at engagement time."
         ),
         role_title="Founder and Mission Systems Software Architect",
         experience=[
@@ -724,7 +683,7 @@ def _build_linkedin_audience_variants(
             "Aligned engineering decisions to mission reliability, control assurance, and audit readiness.",
         ],
         quick_apply_steps=[
-            "Set government headline and short about with UEI/CAGE/SAM identifiers.",
+            "Set government headline and short about with documented identifiers and a current-status verification note.",
             "Use full about to emphasize deterministic controls and evidence posture.",
             "Highlight mission links and evidence runs in featured section.",
             "Use government post templates for capability updates.",
@@ -733,22 +692,22 @@ def _build_linkedin_audience_variants(
             {
                 "title": "Mission systems readiness update",
                 "text": (
-                    f"Mission-oriented platform update: {dataset_count:,} benchmark datasets under deterministic control lanes, runtime mode {runtime_mode}, live-order posture {live_orders}. "
-                    "All key claims mapped to machine-readable evidence artifacts."
+                    f"Mission-oriented engineering update: deterministic control lanes, runtime mode {runtime_mode}, live-order posture {live_orders}. "
+                    "Public claims remain bounded to linked first-party artifacts."
                 ),
             },
             {
                 "title": "Evidence and control assurance",
                 "text": (
-                    f"Operating with government-grade traceability: UEI {uei}, CAGE {cage}, SAM {sam}. "
-                    "Focus remains on reliability, control integrity, and auditable execution pathways."
+                    f"Documented entity identifiers: UEI {uei}, CAGE {cage}. Current registration and opportunity eligibility require official-source verification. "
+                    "Engineering focus: reliability, control integrity, and auditable execution pathways."
                 ),
             },
         ],
         impact_snapshot=[
             {"label": "UEI", "value": uei, "hint": "Entity identifier"},
             {"label": "CAGE", "value": cage, "hint": "Government contract code"},
-            {"label": "SAM", "value": sam, "hint": "Registration posture"},
+            {"label": "Registration", "value": registration_note, "hint": "Check official source at engagement time"},
             {"label": "Runtime", "value": runtime_mode, "hint": f"Live orders: {live_orders}"},
         ],
     )
@@ -756,15 +715,14 @@ def _build_linkedin_audience_variants(
     recruiting = _mk_variant(
         audience_id="recruiting",
         audience_label="Recruiting Positioning",
-        headline="Staff/Principal Python Platform Engineer | AI + Quant Infrastructure | Production Reliability",
+        headline="Python Infrastructure & AI Evaluation Engineer | Reliability | Reproducible Systems",
         about_short=(
-            f"I build and operate production Python platforms that combine AI, quant workflows, and reliability engineering. "
-            f"Current operating scope: {dataset_count:,} datasets with end-to-end evidence automation."
+            "I build Python infrastructure, AI-evaluation workflows, and reviewer tooling with deterministic behavior, explicit safety gates, and reproducible evidence."
         ),
         about_full=(
             "I am a hands-on builder who ships across architecture, backend systems, automation, and operator-facing dashboards. "
-            f"In the current platform, I own signal pipelines, control planes, and reporting surfaces supporting {dataset_count:,} benchmark datasets with {router_edge} router edge. "
-            "I focus on clear interfaces, deterministic behavior, and high-leverage execution so teams can move quickly without sacrificing production quality."
+            "My work includes signal and data pipelines, control planes, APIs, CI policy, deterministic reporting, deployment diagnostics, and failure analysis. "
+            "I focus on clear interfaces, bounded behavior, and evidence that a skeptical reviewer can replay. Public materials do not establish independent field performance or customer adoption."
         ),
         role_title="Founder and Staff-Level Platform Engineer",
         experience=[
@@ -775,7 +733,7 @@ def _build_linkedin_audience_variants(
             "Maintained delivery speed while preserving reproducibility, testability, and operational integrity.",
         ],
         quick_apply_steps=[
-            "Use recruiting headline to signal role level and platform depth.",
+            "Use recruiting headline to signal infrastructure, AI-evaluation, and reliability depth.",
             "Use short about for recruiter scan and full about for hiring-manager depth.",
             "Paste experience bullets into one role entry and add featured links.",
             "Use recruiting post templates when sharing build or hiring updates.",
@@ -784,8 +742,8 @@ def _build_linkedin_audience_variants(
             {
                 "title": "Platform engineering snapshot",
                 "text": (
-                    f"Staff-level platform engineering update: {dataset_count:,} datasets, {router_edge} router edge, and full-stack evidence automation from runtime to reporting. "
-                    "Building systems that are fast, auditable, and production-ready."
+                    "Platform engineering update: deterministic artifacts, human-gated runtime controls, cross-platform CI, and evidence automation from runtime to reviewer output. "
+                    "The next gate is independent validation, not a stronger adjective."
                 ),
             },
             {
@@ -797,9 +755,9 @@ def _build_linkedin_audience_variants(
             },
         ],
         impact_snapshot=[
-            {"label": "Dataset Breadth", "value": f"{dataset_count:,}", "hint": "Production benchmark scope"},
-            {"label": "Stack Depth", "value": f"{len(master_payload.get('skills', []))}", "hint": "Core skills captured"},
-            {"label": "Router Edge", "value": router_edge, "hint": "System decision quality"},
+            {"label": "Focus", "value": "PYTHON + AI EVAL", "hint": "Infrastructure and evidence systems"},
+            {"label": "Controls", "value": "HUMAN-GATED", "hint": "Explicit execution authority"},
+            {"label": "Evidence", "value": "REPRODUCIBLE", "hint": "Commands, receipts, and failure reports"},
             {"label": "Runtime", "value": runtime_mode, "hint": f"Live orders: {live_orders}"},
         ],
     )

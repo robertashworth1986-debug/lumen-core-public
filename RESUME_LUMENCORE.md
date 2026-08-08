@@ -1,6 +1,6 @@
 # ROBERT BABYRAY ASHWORTH
 
-Principal Quant Systems Engineer | Institutional Automation Architect | Government-Grade Evidence Lead
+Software Infrastructure & AI Evaluation Specialist | Python Systems | Reliability Engineering
 
 Location: Nashville, TN (Remote/Hybrid/Relocation)  
 Email: [robertashworth4444@gmail.com](mailto:robertashworth4444@gmail.com)  
@@ -9,35 +9,24 @@ Website: [https://lumen-core.ai](https://lumen-core.ai)
 
 ## EXECUTIVE PROFILE
 
-Founder-operator of the LumaTrader and LumenCore platform ecosystem with end-to-end ownership of quant research, live execution controls, evidence-chain integrity, and investor/government reporting. Built and operated a production institutional stack that converts multi-source data into risk-gated actions with machine-readable proof artifacts.
+Founder and hands-on systems engineer building Python automation, API services, evaluation harnesses, and evidence controls across the LumenCore and LumaTrader codebases. Designs fail-closed workflows that preserve source provenance, negative findings, exact artifacts, and human authority instead of turning internal results into unsupported claims. Seeking remote contract work in software infrastructure, AI evaluation, platform reliability, and quality engineering.
 
-## INSTITUTIONAL IMPACT SNAPSHOT
+## ENGINEERING STRENGTHS
 
-- Dataset benchmark breadth: 1212 datasets with reproducible artifacts and hash-linked evidence.
-- Annual modeled value signal: $52,331,333,340.00 ($52.33B).
-- Top sector and hourly signal: Financial Market Infra at $3,647,280.00 per hour.
-- Router edge and harmonic consistency: 49.48% edge, 24.51% harmonic win rate.
-- Live execution telemetry: 37 closed trades with auditable reason-code and PnL artifacts in the evidence lane.
+- Python architecture for verification, orchestration, data pipelines, APIs, and operator tooling.
+- Infrastructure reasoning across dependency closure, deployment workflows, environment isolation, state ownership, failure handling, and recovery controls.
+- AI evaluation workflows with fixed inputs, locked comparators, retained failures, reproducible commands, and machine-readable receipts.
+- Reliability and quality controls including immutable dependency pinning, path safety, resource budgets, deterministic builds, and cross-platform CI.
+- Clear technical communication for skeptical reviewers, program teams, buyers, and engineering stakeholders.
 
-## CORE COMPETENCIES
+## SELECTED ENGINEERING WORK
 
-- Mission-critical Python architecture for quant, routing, and operational control planes.
-- Risk-engineering guardrails: kill switch controls, cooldown logic, approval queues, and position sizing controls.
-- Government-grade traceability with SHA256 manifests, immutable ledgers, and reproducible run artifacts.
-- FastAPI gateway and dashboard API integration for investor, mission-control, and ops command surfaces.
-- Cross-sector data engineering across market, energy, macro, and infrastructure signal lanes.
-
-## SELECTED PRODUCTION SYSTEMS
-
-- INSTITUTIONAL_STACK_V2 orchestration and runtime continuity controls.
-- Opportunity automation lanes for grants, funding, and outreach workflows.
-- LinkedIn evidence publishing lane and profile optimization automation.
-- Sports and market intelligence fusion lanes with explicit lane-boundary controls.
-- End-to-end evidence packaging pipelines for investor and federal reviews.
-
-## TECHNOLOGY STACK AND PROVEN PACKAGES
-
-pandas, numpy, requests, scikit-learn, FastAPI, matplotlib, joblib, ccxt, pptx, yfinance, orjson, pydantic, symbol_registry_auto, PyYAML, pillow, polars, duckdb, fpdf, win32com, lightgbm
+- Built Proof Capsule validators that distinguish exact-byte custody, canonical JSON identity, policy state, and external authority.
+- Added repository-wide GitHub Actions supply-chain controls that require immutable external-action commits and readable version annotations.
+- Developed fail-closed order-safety, gateway-contract, deadline, outreach, and public-release checks that do not grant execution or submission authority.
+- Built FastAPI and dashboard integration surfaces for bounded review, telemetry, and operator decision support.
+- Created buyer-owned baseline-validation templates that lock the source, comparator, metric, threshold, holdout, failure policy, and claim boundary before scoring.
+- Maintained Windows and Linux CI paths for evidence portability, deterministic packet generation, and reviewer reproduction.
 
 ## PROFESSIONAL EXPERIENCE
 
@@ -45,20 +34,28 @@ pandas, numpy, requests, scikit-learn, FastAPI, matplotlib, joblib, ccxt, pptx, 
 
 2014 - Present
 
-- Architected and maintained a production quant platform spanning data ingestion, model routing, risk controls, execution, and evidence generation.
-- Built deterministic ops scripts and API endpoints to automate grant readiness, investor proof packs, and mission dashboards.
-- Designed resilient live-execution safeguards with configurable runtime controls and explicit reason-code telemetry.
-- Produced institutional artifacts for due diligence, including calibration summaries, anomaly scanners, and regime-shift reports.
+- Architected Python services and automation spanning ingestion, evaluation, routing, runtime controls, audit receipts, and reviewer-facing outputs.
+- Implemented human-gated controls, kill switches, cooldowns, bounded notional policies, and explicit no-order/no-submit execution paths.
+- Built reproducible evidence packages with SHA-256 manifests, deterministic JSON, fixed schemas, and retained negative results.
+- Diagnosed and hardened deployment, filesystem ownership, stale-state, API-authentication, and dependency-closure failures.
+- Produced technical briefs, statements of work, grant preflight materials, and public reviewer documentation with explicit proven/not-proven limits.
 
-## GOVERNMENT AND INSTITUTIONAL POSITIONING
+## TECHNOLOGY STACK
 
-- UEI: SQY2XW71ZM51 | CAGE: 14TM8 | SAM status: active.
-- Track record generating federal-style submissions and preflight-ready package artifacts.
-- Operates with evidence-first discipline: every major claim maps to machine-readable outputs.
+Python, pandas, NumPy, FastAPI, scikit-learn, SciPy, Matplotlib, Pydantic, Polars, DuckDB, LightGBM, Git, GitHub Actions, PowerShell, Linux, REST/WebSocket APIs, JSON/JSONL, HTML/CSS/JavaScript, pytest, unittest, Playwright, SHA-256 manifests.
 
-## TARGET ROLES
+## PUBLIC EVIDENCE BOUNDARY
 
-- Principal Quant Systems Engineer
-- Staff Platform Reliability Engineer (AI and Trading Infrastructure)
-- Mission Systems Software Engineer (Government and Defense-Adjacent)
-- Senior Technical Lead, AI Operations and Evidence Automation
+- Public repository: [github.com/robertashworth1986-debug/lumen-core-public](https://github.com/robertashworth1986-debug/lumen-core-public)
+- Reviewer entry point: [lumen-core.ai](https://lumen-core.ai)
+- The public materials demonstrate first-party code, tests, reproducibility controls, bounded demonstrations, and claim governance.
+- Independent validation, field performance, customer adoption, audited revenue, certification, and guaranteed savings are not established by the public repository.
+- Live-order authority and final external submission authority are not granted by resume claims, dashboards, or passing CI.
+
+## TARGET ENGAGEMENTS
+
+- SWE Infrastructure Specialist / AI Trainer
+- Python Platform or Reliability Engineer
+- AI Evaluation and Quality Engineer
+- Technical Evidence and Reproducibility Engineer
+- Contract Systems Architect for bounded validation and reviewer tooling
