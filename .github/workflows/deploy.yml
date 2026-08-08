@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - 'dashboard/**/*.html'
+      - 'dashboard/robots.txt'
+      - 'dashboard/sitemap.xml'
+      - 'dashboard/site.webmanifest'
+      - 'dashboard/assets/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'dashboard/assets/prooflock/**'
       - 'assets/**'
@@ -293,7 +297,10 @@ jobs:
           tmp_offer="$(mktemp)"
           tmp_prooflock="$(mktemp)"
           tmp_external_review="$(mktemp)"
-          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data" "$tmp_offer" "$tmp_prooflock" "$tmp_external_review"' EXIT
+          tmp_robots="$(mktemp)"
+          tmp_sitemap="$(mktemp)"
+          tmp_manifest="$(mktemp)"
+          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data" "$tmp_offer" "$tmp_prooflock" "$tmp_external_review" "$tmp_robots" "$tmp_sitemap" "$tmp_manifest"' EXIT
 
           status() {
             local url="$1"
@@ -307,8 +314,11 @@ jobs:
           OFFER="$(status "https://lumen-core.ai/proof_to_pilot.html?deploy=${GITHUB_SHA}" "$tmp_offer")"
           PROOFLOCK="$(status "https://lumen-core.ai/build_week/prooflock_console/?deploy=${GITHUB_SHA}" "$tmp_prooflock")"
           EXTERNAL_REVIEW="$(status "https://lumen-core.ai/external_review.html?deploy=${GITHUB_SHA}" "$tmp_external_review")"
+          ROBOTS="$(status "https://lumen-core.ai/robots.txt?deploy=${GITHUB_SHA}" "$tmp_robots")"
+          SITEMAP="$(status "https://lumen-core.ai/sitemap.xml?deploy=${GITHUB_SHA}" "$tmp_sitemap")"
+          MANIFEST="$(status "https://lumen-core.ai/site.webmanifest?deploy=${GITHUB_SHA}" "$tmp_manifest")"
 
-          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000} | Offer: ${OFFER:-000} | ProofLock: ${PROOFLOCK:-000} | External review: ${EXTERNAL_REVIEW:-000}"
+          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000} | Offer: ${OFFER:-000} | ProofLock: ${PROOFLOCK:-000} | External review: ${EXTERNAL_REVIEW:-000} | Robots: ${ROBOTS:-000} | Sitemap: ${SITEMAP:-000} | Manifest: ${MANIFEST:-000}"
 
           [[ "$ROOT" == "200" ]]
           [[ "$EVIDENCE" == "200" ]]
@@ -316,6 +326,9 @@ jobs:
           [[ "$OFFER" == "200" ]]
           [[ "$PROOFLOCK" == "200" ]]
           [[ "$EXTERNAL_REVIEW" == "200" ]]
+          [[ "$ROBOTS" == "200" ]]
+          [[ "$SITEMAP" == "200" ]]
+          [[ "$MANIFEST" == "200" ]]
           grep -Fq 'name="lumencore-surface" content="proof-to-pilot-home-v1"' "$tmp_root"
           grep -Fq 'Turn complex system claims into bounded decisions.' "$tmp_root"
           grep -Fq 'without converting internal evidence into an external-validation claim' "$tmp_root"
@@ -324,8 +337,11 @@ jobs:
           grep -Fq 'name="lumencore-surface" content="bounded-validation-offer-v1"' "$tmp_offer"
           grep -Fq 'What ProofLock solves' "$tmp_prooflock"
           grep -Fq 'name="lumencore-surface" content="external-replication-docket-v1"' "$tmp_external_review"
+          grep -Fq 'Sitemap: https://lumen-core.ai/sitemap.xml' "$tmp_robots"
+          grep -Fq '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' "$tmp_sitemap"
+          python3 -m json.tool "$tmp_manifest" >/dev/null
 
-          echo "Production root, bounded evidence page, health JSON, offer, ProofLock, and external-review docket are live."
+          echo "Production proof/review surfaces and public discovery metadata are live."
 
       - name: Publish production deployment receipt
         if: always()

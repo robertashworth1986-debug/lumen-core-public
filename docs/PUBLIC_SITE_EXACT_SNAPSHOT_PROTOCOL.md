@@ -13,7 +13,7 @@ maintenance workflow; it does not authorize a deployment by itself.
   executed.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
-- Only the 21 files in `RELEASE_PATHS` are packaged.
+- Only the 25 files in `RELEASE_PATHS` are packaged.
 - Package bytes are read from immutable Git blobs, not from mutable worktree
   files.
 - The manifest binds the source commit, Git blob IDs, byte counts, file hashes,
@@ -32,8 +32,8 @@ maintenance workflow; it does not authorize a deployment by itself.
 
 The allowlist covers the proof-first homepage, bounded engagement page,
 external-review docket, public status page, bounded evidence page, shared
-styles/command fabric, and the ProofLock browser verifier with its protocol
-fixtures.
+styles/command fabric, crawl metadata and public mark, and the ProofLock browser
+verifier with its protocol fixtures.
 
 It deliberately excludes credentials, runtime logs, live order controls,
 private evidence, grant packets, identity documents, and mutable data feeds.

@@ -68,6 +68,7 @@ profit_lock_peaks.json
 logs/
 *.log
 *.txt
+!dashboard/robots.txt
 
 # VS Code
 .vscode/

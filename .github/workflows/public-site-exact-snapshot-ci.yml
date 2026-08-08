@@ -13,12 +13,17 @@ on:
       - 'dashboard/external_review.html'
       - 'dashboard/mission_control.html'
       - 'dashboard/evidence/index_bounded.html'
+      - 'dashboard/robots.txt'
+      - 'dashboard/sitemap.xml'
+      - 'dashboard/site.webmanifest'
+      - 'dashboard/assets/lumencore-mark.svg'
       - 'dashboard/assets/lumencore.css'
       - 'dashboard/assets/luma_command_fabric.css'
       - 'dashboard/assets/luma_command_fabric.js'
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'tests/test_public_site_deploy_hardening.py'
+      - 'tests/test_public_discovery.py'
   push:
     branches: [main]
     paths:
@@ -32,12 +37,17 @@ on:
       - 'dashboard/external_review.html'
       - 'dashboard/mission_control.html'
       - 'dashboard/evidence/index_bounded.html'
+      - 'dashboard/robots.txt'
+      - 'dashboard/sitemap.xml'
+      - 'dashboard/site.webmanifest'
+      - 'dashboard/assets/lumencore-mark.svg'
       - 'dashboard/assets/lumencore.css'
       - 'dashboard/assets/luma_command_fabric.css'
       - 'dashboard/assets/luma_command_fabric.js'
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'tests/test_public_site_deploy_hardening.py'
+      - 'tests/test_public_discovery.py'
 
 permissions:
   contents: read
@@ -64,4 +74,4 @@ jobs:
         run: bash -n code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh
 
       - name: Run exact-snapshot protocol tests
-        run: python -m pytest tests/test_public_site_deploy_hardening.py -q
+        run: python -m pytest tests/test_public_site_deploy_hardening.py tests/test_public_discovery.py -q

@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+Allow: /proof_to_pilot.html
+Allow: /evidence/
+Allow: /external_review.html
+Allow: /build_week/prooflock_console/
+Allow: /assets/lumencore-mark.svg
+Disallow: /api/
+Disallow: /auth/
+Disallow: /ws/
+Disallow: /out/
+Disallow: /proof/
+Disallow: /data/
+Disallow: /mission_control.html
+Disallow: /quant_lab.html
+Disallow: /kraken_execution_dashboard.html
+Disallow: /grants.html
+Disallow: /forecast.html
+Disallow: /explain.html
+Disallow: /anomalies.html
+Disallow: /lab.html
+Disallow: /lumascout.html
+Disallow: /agent_approval_hub.html
+
+Sitemap: https://lumen-core.ai/sitemap.xml
