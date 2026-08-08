@@ -6,6 +6,14 @@ This protocol lets LumenCore evaluate Euclidean, curved, manifold, graph, topolo
 
 The geometry is a candidate component of a bounded experiment. It is not a product identity and it receives no evidentiary credit until it beats matched baselines on a named task.
 
+## Candidate labels receive zero credit
+
+The registry may name candidate inspirations before they have a task-specific result. Current zero-credit labels include brachistochrone and spiral paths; helix, gyroid, Voronoi, and phyllotactic structures; mycelium, slime-mold, root, leaf-vein, vascular, bronchial, and termite-ventilation networks; bird formations and flocking; magnetic or toroidal field-line parameterizations; and a circle-packing interpretation of the “Flower of Life” label.
+
+These names are search labels, not findings. A biological analogy does not establish self-healing, a field-line drawing does not establish electromagnetic performance, and circle packing does not establish resonance. Each candidate must still enter one named task lane with the declarations, controls, baselines, and acceptance rule below.
+
+Frobenius series are classified separately as a local solution-analysis method for suitable differential equations. “Frobenius” is not treated as a geometry, a stability guarantee, or evidence that a physical implementation exists. Stability, boundedness, convergence, and residual claims require their own measured checks.
+
 ## Core rule
 
 > No geometry is sacred until it wins under frozen conditions—and a simpler baseline wins a tie.
@@ -99,3 +107,5 @@ The following claims are prohibited without their named evidence:
 ## Relationship to LumenCore
 
 The protocol strengthens LumenCore’s core lane: inspecting whether a technical claim is reproducible, bounded, and ready for the next evidence gate. It does not make LumenCore a general geometry laboratory, physics simulator, foundation-model company, or field-certification authority.
+
+Adoption of this protocol is not a result promotion. At adoption, the machine-readable state records zero registered task-specific experiments and zero experimentally validated results. Those counts can change only through a separately reviewed, frozen experiment record.

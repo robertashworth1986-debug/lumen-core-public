@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_utc": "2026-07-24T06:12:00Z",
+  "generated_utc": "2026-08-08T04:57:20Z",
   "repository": "robertashworth1986-debug/lumen-core-public",
-  "status": "protocol_only_no_result_promotion",
+  "status": "adopted_protocol_no_result_promotion",
   "purpose": "Evaluate Euclidean, curved, manifold, graph, topology-aware, and parametric geometry methods under task-specific frozen scientific protocols without inventing a universal champion.",
   "governing_rule": "No geometry is sacred until it wins under a named task, matched baselines, frozen data and seeds, declared physical assumptions, retained negative results, and an approved evidence gate.",
   "geometry_models": [
@@ -12,6 +12,31 @@
     "graph_geodesic",
     "topology_aware",
     "parametric_spiral_helix_branching_gyroid_phyllotactic"
+  ],
+  "zero_credit_candidate_labels": [
+    "brachistochrone",
+    "logarithmic_spiral",
+    "helix",
+    "gyroid",
+    "voronoi_partition",
+    "phyllotactic_packing",
+    "mycelium_inspired_network",
+    "slime_mold_inspired_network",
+    "root_and_leaf_venation_network",
+    "vascular_or_bronchial_branching",
+    "termite_ventilation_inspired_network",
+    "bird_v_formation",
+    "schooling_or_flocking_formation",
+    "magnetic_field_line_parameterization",
+    "toroidal_field_parameterization",
+    "circle_packing_flower_of_life_label"
+  ],
+  "related_analysis_methods_not_geometry": [
+    "frobenius_series_local_solution_analysis",
+    "dimensional_analysis",
+    "stability_and_boundedness_analysis",
+    "conservation_or_balance_residual_analysis",
+    "mesh_or_resolution_convergence_analysis"
   ],
   "claim_levels": [
     "visualization_only",
@@ -295,7 +320,7 @@
     "experimentally_validated_without_external_record"
   ],
   "current_result_state": {
-    "protocol_adopted": false,
+    "protocol_adopted": true,
     "task_specific_experiments_registered": 0,
     "experimentally_validated_results": 0,
     "universal_champion": false
