@@ -32,7 +32,7 @@ RELEASE_PATHS: Final = (
     "dashboard/sitemap.xml",
     "dashboard/site.webmanifest",
     "dashboard/manifest.json",
-    "dashboard/assets/lumencore-mark.svg",
+    "dashboard/assets/lumaarc_arc_seal_v1.png",
     "dashboard/assets/lumencore.css",
     "dashboard/assets/luma_command_fabric.css",
     "dashboard/assets/luma_command_fabric.js",

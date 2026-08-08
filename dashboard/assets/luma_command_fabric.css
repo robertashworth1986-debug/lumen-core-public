@@ -54,8 +54,11 @@
 
 .lcf-brand img {
   display: block;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  border-radius: 8px;
+  filter: drop-shadow(0 0 8px rgba(102, 246, 223, 0.2));
 }
 
 .lcf-brand:hover {

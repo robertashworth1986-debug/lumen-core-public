@@ -36,8 +36,8 @@
   var ROUTES = isOperatorSurface ? OPERATOR_ROUTES : PUBLIC_ROUTES;
   var scriptUrl = document.currentScript && document.currentScript.src;
   var markHref = scriptUrl
-    ? new URL("./lumencore-mark.svg", scriptUrl).href
-    : "/assets/lumencore-mark.svg";
+    ? new URL("./lumaarc_arc_seal_v1.png", scriptUrl).href
+    : "/assets/lumaarc_arc_seal_v1.png";
   var apiBase = typeof window.LUMA_API_BASE === "string"
     ? window.LUMA_API_BASE.trim().replace(/\/$/, "")
     : "";

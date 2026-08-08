@@ -22,9 +22,34 @@ def test_five_canonical_surfaces_share_identity_and_runtime_layer():
     for surface in PAGES:
         body = page(surface)
         assert f'data-luma-surface="{surface}"' in body
+        assert '/assets/lumaarc_arc_seal_v1.png' in body
         assert "assets/luma_institutional_surface.css" in body
         assert "assets/luma_institutional_surface.js" in body
         assert "assets/luma_command_fabric.js" in body
+
+
+def test_founder_confirmed_lumaarc_is_the_shared_dashboard_mark():
+    asset_name = "lumaarc_arc_seal_v1.png"
+    public_mark = DASHBOARD / "assets" / asset_name
+    brand_master = ROOT / "assets" / "brand" / asset_name
+    assert public_mark.read_bytes() == brand_master.read_bytes()
+
+    shared_css = (DASHBOARD / "assets" / "luma_institutional_surface.css").read_text(
+        encoding="utf-8"
+    )
+    shared_fabric = (DASHBOARD / "assets" / "luma_command_fabric.js").read_text(
+        encoding="utf-8"
+    )
+    assert asset_name in shared_css
+    assert asset_name in shared_fabric
+    assert "lumencore-mark.svg" not in shared_css
+    assert "lumencore-mark.svg" not in shared_fabric
+
+    assert "LUMEN<span>CORE</span>" in page("home")
+    assert "<h1>LUMENCORE</h1>" in page("mission")
+    assert "LUMENCORE / QUANT LAB" in page("quant")
+    assert "Lumen<span>Core</span>" in page("trade")
+    assert "LUMENCORE / GRANTS" in page("grants")
 
 
 def test_operator_surfaces_are_not_search_index_targets():

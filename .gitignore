@@ -85,6 +85,7 @@ desktop.ini
 *.jpg
 *.jpeg
 *.gif
+!dashboard/assets/lumaarc_arc_seal_v1.png
 
 # Cache / temp
 .cache/

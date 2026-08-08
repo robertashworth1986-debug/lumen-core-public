@@ -20,7 +20,7 @@ readonly -a RELEASE_FILES=(
   "sitemap.xml"
   "site.webmanifest"
   "manifest.json"
-  "assets/lumencore-mark.svg"
+  "assets/lumaarc_arc_seal_v1.png"
   "assets/lumencore.css"
   "assets/luma_command_fabric.css"
   "assets/luma_command_fabric.js"

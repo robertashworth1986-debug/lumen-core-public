@@ -127,7 +127,7 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert "sitemap.xml" in names
     assert "site.webmanifest" in names
     assert "manifest.json" in names
-    assert "assets/lumencore-mark.svg" in names
+    assert "assets/lumaarc_arc_seal_v1.png" in names
     assert "assets/lumencore.css" in names
     assert "assets/luma_command_fabric.js" in names
     assert "assets/luma_institutional_surface.css" in names

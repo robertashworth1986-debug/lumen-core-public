@@ -9,10 +9,10 @@
   "theme_color": "#04060f",
   "icons": [
     {
-      "src": "/assets/lumencore-mark.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/assets/lumaarc_arc_seal_v1.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
