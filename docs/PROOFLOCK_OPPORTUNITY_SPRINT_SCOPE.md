@@ -61,6 +61,14 @@ The client personally retains final review, certification, signature, upload, se
 
 Only sources authorized in writing are inspected. Secrets, credentials, controlled data, legal correspondence, private identity records, and unrelated materials are excluded unless a separate written handling protocol is accepted. Public examples do not include client-confidential material.
 
+Before any non-public source is inspected, both parties complete the
+[ProofLock Opportunity Sprint Data Handling Schedule](PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md).
+It names the accepted and prohibited data classes, approved operators and
+systems, external-AI/service-provider boundary, retention and deletion rules,
+incident channel, and final disposition receipt. The template is not a security
+certification and becomes binding only when incorporated into the controlling
+written agreement.
+
 ## Start condition
 
 Work starts only after both parties accept the written scope, the client supplies the official source and required permissions, and the kickoff deposit clears.

@@ -163,6 +163,7 @@ review. Action-time HumanUnlock remains outside machine verification.
 - Pilot report template: [docs/PILOT_REPORT_TEMPLATE.md](docs/PILOT_REPORT_TEMPLATE.md)
 - Opportunity Sprint scope: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_SCOPE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_SCOPE.md)
 - Opportunity Sprint intake: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_INTAKE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_INTAKE.md)
+- Opportunity Sprint data handling schedule: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md)
 
 ## Intellectual-property boundary
 

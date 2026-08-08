@@ -2,6 +2,14 @@
 
 Complete this intake before scope confirmation. Unknown facts should be marked `UNKNOWN`; do not guess.
 
+For the first fit check, send only the official public opportunity link and the
+non-confidential facts below. Do **not** email credentials, bank or tax details,
+government identity numbers, protected health information, classified/CUI or
+export-controlled material, privileged legal communications, or confidential
+technical material. Non-public sources are accepted only after the parties
+complete the
+[Data Handling Schedule](PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md).
+
 ## Opportunity
 
 - Official opportunity title:
@@ -41,6 +49,9 @@ Complete this intake before scope confirmation. Unknown facts should be marked `
 - Sources LumenCore may inspect:
 - Sources LumenCore must not inspect:
 - Confidentiality or handling restrictions:
+- Approved external AI/model/service providers, or `NONE`:
+- Required retention, return, and deletion dates:
+- Incident contact and notification window:
 - Person who will perform final legal/portal review and submission:
 
 ## Success definition
