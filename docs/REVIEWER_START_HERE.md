@@ -16,7 +16,39 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 4. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
 5. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
 6. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
-7. [Machine-readable public reviewer docket](https://lumen-core.ai/reviewer_docket.json)
+7. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
+8. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
+
+The repository docket is the reviewable state bound to the checked-out commit.
+The live docket is a convenience projection and may lag the default branch or
+be unavailable while a deployment or gateway gate is open. Record any mismatch
+as live-release drift; do not silently substitute one source for the other.
+
+## Clean-checkout verification
+
+On any platform with Python 3.10 or newer, run the current public capsule check
+from the repository root. It requires no API key, private data, live service, or
+third-party Python package:
+
+```bash
+python code/proof_capsule_verifier.py examples/proof_capsule/dice_eia_public_capsule.json --root .
+python -m unittest discover -s tests -p "test_proof_capsule_verifier.py" -v
+```
+
+The first command must return `"valid": true`. This establishes only current
+capsule schema, custody, and claim-gate behavior. It does not independently
+reproduce or validate the underlying experiment.
+
+## Stronger pinned computation
+
+The externally executable computation is frozen at commit
+`1c0eb51754beffac6f4df484914e35efc21c253f`. It requires Ubuntu 24.04 x86-64,
+CPython 3.11.9, and `requirements-reviewer-ubuntu-py311.lock`; a Windows or
+different-Python run is not protocol-matched evidence. Use the
+[executable-computation note](CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md)
+and [independent-executor handoff](CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md),
+and preserve every failure or deviation. No non-author execution receipt or
+CODECHECK certificate is currently claimed.
 
 ## Bounded utility-AI pilot concept
 
@@ -68,7 +100,8 @@ Use these terms when referring to this work:
 - Proof-to-pilot page: https://lumen-core.ai/proof_to_pilot.html
 - Evidence surface: https://lumen-core.ai/evidence/
 - External-review page: https://lumen-core.ai/external_review.html
-- Machine-readable reviewer docket: https://lumen-core.ai/reviewer_docket.json
+- Commit-bound reviewer docket: https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/dashboard/reviewer_docket.json
+- Live reviewer docket: https://lumen-core.ai/reviewer_docket.json
 
 ---
 
