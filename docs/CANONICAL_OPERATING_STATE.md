@@ -86,6 +86,16 @@ workers, alongside the existing two-minute gateway window. It remains
 observation-only: no restart, stop, deletion, log vacuum, or configuration
 change is permitted by that workflow.
 
+Post-merge diagnostic run `31247338156` isolated the paper ticker's current
+failure signature to `PermissionError` while opening
+`/opt/lumencore/out/execution/multi_exchange_paper_ticker_ledger.jsonl`. The
+same bounded run found no allowlisted symbol-awareness failure in its five-
+minute window. This narrows the paper-ticker incident to an output-path access
+problem but does not yet identify which parent or file ownership/mode is wrong.
+The read-only diagnostic therefore records metadata and service-account
+read/write/traverse predicates for only the exact ledger and its three known
+parents; it does not list directory contents or modify permissions.
+
 ### Receipt reconciliation
 
 | Lane | Verified state | Next action |

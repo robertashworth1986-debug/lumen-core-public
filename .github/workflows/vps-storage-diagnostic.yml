@@ -165,6 +165,38 @@ jobs:
                 || true
             }
 
+            show_allowlisted_path_access() {
+              local label="$1"
+              local path="$2"
+
+              case "$path" in
+                /opt/lumencore|/opt/lumencore/out|/opt/lumencore/out/execution|/opt/lumencore/out/execution/multi_exchange_paper_ticker_ledger.jsonl) ;;
+                *)
+                  echo "refused_unapproved_access_path=$label"
+                  return 2
+                  ;;
+              esac
+
+              echo "--- $label ---"
+              if [[ -L "$path" ]]; then
+                echo "symlink=true"
+              else
+                echo "symlink=false"
+              fi
+              if [[ -e "$path" ]]; then
+                stat --printf="exists=true type=%F mode=%a owner=%U group=%G bytes=%s modified=%y\n" "$path" 2>&1 || true
+              else
+                echo "exists=false"
+              fi
+              for permission in e r w x; do
+                if sudo -n -u lumencore test "-$permission" "$path" 2>/dev/null; then
+                  echo "lumencore_test_$permission=true"
+                else
+                  echo "lumencore_test_$permission=false"
+                fi
+              done
+            }
+
             echo "=== identity ==="
             id
             hostname
@@ -242,6 +274,12 @@ jobs:
                 /opt/lumencore/.venv/bin/python -c "import importlib.util; print(\"uvicorn_spec=\" + str(importlib.util.find_spec(\"uvicorn\") is not None)); print(\"fastapi_spec=\" + str(importlib.util.find_spec(\"fastapi\") is not None))" \
                 2>&1 || true
             fi
+
+            echo "=== paper ticker output-path access (metadata only) ==="
+            show_allowlisted_path_access stack_root /opt/lumencore
+            show_allowlisted_path_access output_root /opt/lumencore/out
+            show_allowlisted_path_access execution_output /opt/lumencore/out/execution
+            show_allowlisted_path_access paper_ticker_ledger /opt/lumencore/out/execution/multi_exchange_paper_ticker_ledger.jsonl
 
             echo "=== runtime allowlisted failure signatures (redacted) ==="
             show_allowlisted_failure_signatures luma-gateway "2 minutes ago" 80
