@@ -50,6 +50,12 @@ jobs:
       statuses: write
 
     steps:
+      - name: Check out the exact diagnostic source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+
       - name: Mark runtime diagnostic pending
         env:
           GH_TOKEN: ${{ github.token }}
@@ -364,6 +370,93 @@ jobs:
               | tail -n 100 \
               || true
           ' | tee /tmp/lumencore-vps-runtime-diagnostic.txt
+
+      - name: Compare the approved gateway closure with the VPS
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          repair_script=code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
+          expected_manifest=/tmp/lumencore-approved-gateway-closure.txt
+          mapfile -t files < <(bash "$repair_script" --print-files)
+          [[ "${#files[@]}" -eq 20 ]]
+          : > "$expected_manifest"
+          for relative in "${files[@]}"; do
+            [[ "$relative" =~ ^[A-Za-z0-9_./-]+\.py$ ]]
+            [[ -f "code/$relative" && ! -L "code/$relative" ]]
+            printf '%s  %s\n' "$(sha256sum "code/$relative" | awk '{print $1}')" "$relative" \
+              >> "$expected_manifest"
+          done
+          approved_bundle_sha=$(
+            LUMENCORE_GATEWAY_SOURCE_ROOT=code \
+              bash "$repair_script" --bundle-sha
+          )
+          [[ "$approved_bundle_sha" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$approved_bundle_sha" == "$(sha256sum "$expected_manifest" | awk '{print $1}')" ]]
+
+          {
+            printf '\n=== approved gateway closure comparison ===\n'
+            printf 'source_commit=%s\n' "$SOURCE_COMMIT"
+            printf 'approved_gateway_bundle_sha256=%s\n' "$approved_bundle_sha"
+            printf 'expected_file_count=%s\n' "${#files[@]}"
+          } | tee -a /tmp/lumencore-vps-runtime-diagnostic.txt
+
+          {
+            cat <<'REMOTE_SCRIPT'
+          set -euo pipefail
+          target_root=/opt/lumencore/code
+          closure_match_count=0
+          closure_mismatch_count=0
+          closure_missing_count=0
+          closure_symbolic_count=0
+          closure_unreadable_count=0
+
+          audit_gateway_file() {
+            local expected_sha="$1"
+            local relative="$2"
+            local target="$target_root/$relative"
+            local resolved
+            local actual_sha
+            resolved=$(realpath -m -- "$target")
+            [[ "$resolved" == "$target_root/"* ]]
+            if [[ -L "$target" ]]; then
+              printf 'closure_file status=symbolic expected_sha256=%s path=%s\n' \
+                "$expected_sha" "$relative"
+              closure_symbolic_count=$((closure_symbolic_count + 1))
+            elif [[ ! -f "$target" ]]; then
+              printf 'closure_file status=missing expected_sha256=%s path=%s\n' \
+                "$expected_sha" "$relative"
+              closure_missing_count=$((closure_missing_count + 1))
+            elif ! actual_sha=$(sha256sum "$target" 2>/dev/null | awk '{print $1}'); then
+              printf 'closure_file status=unreadable expected_sha256=%s path=%s\n' \
+                "$expected_sha" "$relative"
+              closure_unreadable_count=$((closure_unreadable_count + 1))
+            elif [[ "$actual_sha" == "$expected_sha" ]]; then
+              printf 'closure_file status=match expected_sha256=%s actual_sha256=%s path=%s\n' \
+                "$expected_sha" "$actual_sha" "$relative"
+              closure_match_count=$((closure_match_count + 1))
+            else
+              printf 'closure_file status=mismatch expected_sha256=%s actual_sha256=%s path=%s\n' \
+                "$expected_sha" "$actual_sha" "$relative"
+              closure_mismatch_count=$((closure_mismatch_count + 1))
+            fi
+          }
+          REMOTE_SCRIPT
+            while read -r expected_sha relative; do
+              printf 'audit_gateway_file %q %q\n' "$expected_sha" "$relative"
+            done < "$expected_manifest"
+            cat <<'REMOTE_SCRIPT'
+          printf 'closure_match_count=%s\n' "$closure_match_count"
+          printf 'closure_mismatch_count=%s\n' "$closure_mismatch_count"
+          printf 'closure_missing_count=%s\n' "$closure_missing_count"
+          printf 'closure_symbolic_count=%s\n' "$closure_symbolic_count"
+          printf 'closure_unreadable_count=%s\n' "$closure_unreadable_count"
+          REMOTE_SCRIPT
+          } | ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes \
+            "opc@$VPS_HOST" 'bash -s' \
+            | tee -a /tmp/lumencore-vps-runtime-diagnostic.txt
 
       - name: Upload runtime diagnostic
         if: always()
