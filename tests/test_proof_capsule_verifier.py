@@ -448,11 +448,20 @@ class ProofCapsuleVerifierTests(unittest.TestCase):
         home = (ROOT / "dashboard" / "operator_home.html").read_text(
             encoding="utf-8"
         )
-        self.assertIn("One proof path. One bounded decision.", home)
         self.assertIn(
-            "Internal replay evidence is not external validation.",
+            'name="lumencore-surface" content="proof-to-pilot-home-v1"',
             home,
         )
+        self.assertIn("Turn complex system claims into bounded decisions.", home)
+        self.assertIn(
+            "without converting internal evidence into an external-validation claim",
+            home,
+        )
+        self.assertIn("Proof-backed decision infrastructure", home)
+        self.assertIn("Claim Register", home)
+        self.assertIn("Concept Boundary", home)
+        self.assertIn("No membership, endorsement, savings", home)
+        self.assertIn("Public artifacts do not imply deployment", home)
         self.assertNotIn("One platform. Four products. One truth layer.", home)
         self.assertNotIn(
             "Finish and submit the current NSF Project Pitch.",
