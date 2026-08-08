@@ -16,7 +16,10 @@ def test_root_five_minute_path_uses_current_canonical_implementations():
     assert "pull/98" in path
     assert "QUICKSTART.md" in path
     assert "CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md" in path
-    assert "PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md" in path
+    assert "LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md" in path
+    assert "LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md" in path
+    assert "LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md" in path
+    assert "PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md" not in path
     assert "pull/34" not in path
     assert "pull/35" not in path
     assert "pull/36" not in path

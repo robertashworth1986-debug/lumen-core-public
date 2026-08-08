@@ -8,9 +8,18 @@ on:
       - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md"
       - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md"
       - "config/strategic_transaction_packet_v2.json"
+      - "config/bounded_validation_sprint_v1.json"
       - "config/evidence_graph_v1.json"
       - "code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py"
+      - "code/ops/VERIFY_PUBLIC_OFFER_CONSISTENCY.py"
       - "tests/test_strategic_transaction_packet.py"
+      - "tests/test_public_offer_consistency.py"
+      - "README.md"
+      - "docs/REVIEWER_START_HERE.md"
+      - "dashboard/operator_home.html"
+      - "dashboard/proof_to_pilot.html"
+      - "dashboard/opportunity_sprint.html"
+      - "dashboard/reviewer_docket.json"
       - ".github/workflows/strategic-transaction-packet.yml"
   push:
     branches: [main]
@@ -20,9 +29,18 @@ on:
       - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md"
       - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md"
       - "config/strategic_transaction_packet_v2.json"
+      - "config/bounded_validation_sprint_v1.json"
       - "config/evidence_graph_v1.json"
       - "code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py"
+      - "code/ops/VERIFY_PUBLIC_OFFER_CONSISTENCY.py"
       - "tests/test_strategic_transaction_packet.py"
+      - "tests/test_public_offer_consistency.py"
+      - "README.md"
+      - "docs/REVIEWER_START_HERE.md"
+      - "dashboard/operator_home.html"
+      - "dashboard/proof_to_pilot.html"
+      - "dashboard/opportunity_sprint.html"
+      - "dashboard/reviewer_docket.json"
       - ".github/workflows/strategic-transaction-packet.yml"
 
 permissions:
@@ -48,19 +66,31 @@ jobs:
         run: |
           python -m py_compile \
             code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py \
-            tests/test_strategic_transaction_packet.py
+            code/ops/VERIFY_PUBLIC_OFFER_CONSISTENCY.py \
+            tests/test_strategic_transaction_packet.py \
+            tests/test_public_offer_consistency.py
       - name: Verify transaction packet against evidence graph
         run: |
           mkdir -p out/strategic-transaction
           python code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py --json \
             | tee out/strategic-transaction/verification.json
           python -m json.tool out/strategic-transaction/verification.json >/dev/null
+      - name: Verify one public primary offer
+        run: |
+          python code/ops/VERIFY_PUBLIC_OFFER_CONSISTENCY.py --json \
+            | tee out/strategic-transaction/public-offer-consistency.json
+          python -m json.tool out/strategic-transaction/public-offer-consistency.json >/dev/null
       - name: Run adversarial regression tests
-        run: python -m unittest tests.test_strategic_transaction_packet -v
+        run: |
+          python -m unittest \
+            tests.test_strategic_transaction_packet \
+            tests.test_public_offer_consistency -v
       - name: Upload verification receipt
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: strategic-transaction-verification-${{ github.sha }}
-          path: out/strategic-transaction/verification.json
+          path: |
+            out/strategic-transaction/verification.json
+            out/strategic-transaction/public-offer-consistency.json
           if-no-files-found: error
           retention-days: 30

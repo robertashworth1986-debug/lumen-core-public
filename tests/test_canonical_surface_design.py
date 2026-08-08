@@ -77,13 +77,14 @@ def test_public_home_sells_one_bounded_assurance_sequence():
     assert 'href="/evidence/"' not in home
     assert "one problem, one baseline, and one decision" in home.lower()
     assert "external validation, field savings, production deployment, or agency endorsement" in home.lower()
-    assert "ProofLock Opportunity Sprint" in home
-    assert "$3,500" in home
-    assert "50% kickoff deposit" in home
-    assert "ten business days after source permissions" in home
-    assert "No guaranteed eligibility, award, legal advice, certification" in home
-    assert "final submission" in home
-    assert 'href="/opportunity_sprint.html"' in home
+    assert "Buyer-Owned Baseline Validation Sprint" in home
+    assert "$7,500" in home
+    assert "50% at signed scope and 50% at delivery" in home
+    assert "30 calendar days maximum" in home
+    assert "Pricing is not buyer-tested" in home
+    assert "No favorable result, savings, ROI, certification" in home
+    assert 'href="/proof_to_pilot.html"' in home
+    assert "ProofLock Opportunity Sprint" not in home
 
 
 def test_public_browser_path_uses_only_minimal_public_runtime_contracts():
@@ -114,12 +115,13 @@ def test_public_browser_path_uses_only_minimal_public_runtime_contracts():
     assert 'surface: "operator"' in operator_update
 
 
-def test_opportunity_sprint_is_buyable_bounded_and_human_gated():
+def test_opportunity_sprint_is_secondary_bounded_and_human_gated():
     body = (DASHBOARD / "opportunity_sprint.html").read_text(encoding="utf-8")
-    assert "ProofLock Opportunity Sprint" in body
-    assert "$3,500" in body
-    assert "50% kickoff deposit" in body
-    assert "ten business days" in body
+    assert "Secondary funding-workflow variant" in body
+    assert "not the primary public offer" in body
+    assert "No active standalone public price" in body
+    assert "former $3,500 launch price" in body
+    assert 'href="/proof_to_pilot.html"' in body
     assert "pursue, revise, hold, or stop" in body
     assert "AI can draft. ProofLock governs the decision." in body
     assert "A named person accountable for the agreed deliverables" in body
