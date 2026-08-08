@@ -75,6 +75,23 @@ The daily health workflow classifies the static reviewer surface and dynamic
 gateway independently; a healthy static page can no longer conceal a failed
 control plane.
 
+The reviewed public browser contract is now separated from the operator
+runtime contract. Public pages request only `/health` and
+`/api/public/status`, validate the fixed minimal response fields, and display
+gateway liveness without probing `/api/snapshot` or inferring execution state.
+The canonical homepage no longer links directly into the no-index operator
+mission surface. Operator pages retain their separate protected runtime path.
+This repository change is not evidence that the current VPS gateway is healthy,
+and it has not been released through the exact public-static-site deployment
+gate in this recorded state.
+
+Manual gateway-repair run `31248779848` accepted the exact current-main commit
+and exact approval phrase, then failed closed before SSH because repository
+secret `LUMA_HUMAN_UNLOCK_TOKEN` was not configured. No VPS change was
+attempted. The paper-ticker repair was not dispatched because it depends on the
+same missing private action-time control. Both workflows now emit a specific
+non-secret error for this precondition while retaining the existing gate.
+
 Manual health run `31247095241` recorded the first current-contract snapshot at
 commit `0ff614be`: all six static reviewer endpoints passed, while both dynamic
 gateway contracts returned HTTP 502, so the public state is explicitly

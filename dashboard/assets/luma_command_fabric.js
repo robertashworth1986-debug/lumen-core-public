@@ -32,7 +32,8 @@
   var isFile = location.protocol === "file:";
   var currentFile = (location.pathname.replace(/\\/g, "/").split("/").pop() || "").toLowerCase();
   var operatorFiles = ["mission_control.html", "quant_lab.html", "kraken_execution_dashboard.html", "grants.html"];
-  var ROUTES = operatorFiles.indexOf(currentFile) >= 0 ? OPERATOR_ROUTES : PUBLIC_ROUTES;
+  var isOperatorSurface = operatorFiles.indexOf(currentFile) >= 0;
+  var ROUTES = isOperatorSurface ? OPERATOR_ROUTES : PUBLIC_ROUTES;
   var scriptUrl = document.currentScript && document.currentScript.src;
   var markHref = scriptUrl
     ? new URL("./lumencore-mark.svg", scriptUrl).href
@@ -46,6 +47,7 @@
     freshness: "checking",
     freshnessTone: "warn",
     health: null,
+    publicStatus: null,
     snapshot: null,
   };
 
@@ -116,7 +118,9 @@
     document.querySelectorAll(".lc-live, [data-runtime-mode]").forEach(function (badge) {
       badge.textContent = state.mode;
       badge.dataset.mode = state.mode.toLowerCase();
-      badge.title = "Execution mode from the public runtime safety gate";
+      badge.title = isOperatorSurface
+        ? "Execution mode from the protected operator runtime"
+        : "Public reviewer boundary; no live-execution authority is exposed";
     });
   }
 
@@ -134,12 +138,51 @@
     syncLegacyModeBadges();
   }
 
-  function updateStatus() {
+  function updatePublicStatus() {
+    return Promise.allSettled([
+      fetchJson("/health"),
+      fetchJson("/api/public/status"),
+    ]).then(function (results) {
+      state.health = results[0].status === "fulfilled" ? results[0].value : null;
+      state.publicStatus = results[1].status === "fulfilled" ? results[1].value : null;
+      state.snapshot = null;
+
+      var gatewayOnline = Boolean(
+        state.health &&
+        state.publicStatus &&
+        state.health.status === "ok" &&
+        state.publicStatus.status === "ok" &&
+        state.health.access_boundary === "operator_api_v1" &&
+        state.publicStatus.access_boundary === "operator_api_v1" &&
+        state.health.public_surface === "minimal" &&
+        state.publicStatus.public_surface === "minimal"
+      );
+      state.mode = "PUBLIC";
+      state.modeTone = "good";
+      state.freshness = gatewayOnline ? "GATEWAY ONLINE" : "GATEWAY OFFLINE";
+      state.freshnessTone = gatewayOnline ? "good" : "bad";
+      renderStatus();
+
+      window.dispatchEvent(new CustomEvent("luma:fabric-status", {
+        detail: {
+          surface: "public",
+          mode: state.mode,
+          freshness: state.freshness,
+          health: state.health,
+          publicStatus: state.publicStatus,
+          snapshot: null,
+        },
+      }));
+    });
+  }
+
+  function updateOperatorStatus() {
     return Promise.allSettled([
       fetchJson("/health"),
       fetchJson("/api/snapshot"),
     ]).then(function (results) {
       state.health = results[0].status === "fulfilled" ? results[0].value : null;
+      state.publicStatus = null;
       state.snapshot = results[1].status === "fulfilled" ? results[1].value : null;
 
       var mode = state.snapshot
@@ -154,13 +197,19 @@
 
       window.dispatchEvent(new CustomEvent("luma:fabric-status", {
         detail: {
+          surface: "operator",
           mode: state.mode,
           freshness: state.freshness,
           health: state.health,
+          publicStatus: null,
           snapshot: state.snapshot,
         },
       }));
     });
+  }
+
+  function updateStatus() {
+    return isOperatorSurface ? updateOperatorStatus() : updatePublicStatus();
   }
 
   function buildRail() {

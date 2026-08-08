@@ -104,7 +104,10 @@ jobs:
           HUMAN_UNLOCK: ${{ secrets.LUMA_HUMAN_UNLOCK_TOKEN }}
         run: |
           set -euo pipefail
-          [[ ${#HUMAN_UNLOCK} -ge 32 ]]
+          if (( ${#HUMAN_UNLOCK} < 32 )); then
+            echo "::error::Repository secret LUMA_HUMAN_UNLOCK_TOKEN is missing or shorter than 32 characters; no VPS change was attempted."
+            exit 1
+          fi
           install -m 0600 /dev/null /tmp/paper-ticker-repair/human-unlock
           printf '%s' "$HUMAN_UNLOCK" > /tmp/paper-ticker-repair/human-unlock
           unset HUMAN_UNLOCK
