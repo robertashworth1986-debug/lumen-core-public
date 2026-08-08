@@ -1,0 +1,999 @@
+{
+  "schema": "lumencore_engine_portfolio_audit_v2",
+  "generated_at_utc": "2026-08-08T10:30:00Z",
+  "source_registry": "config/lumencore_engine_portfolio_v2.json",
+  "source_registry_sha256": "bb877daf2a1032955c0c890f5301aed42ee251ed69c15bc24295e3925b11aec0",
+  "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
+  "source_note": "The 15 founder engine names are audited as internal platform lanes, not 15 finished products or 15 separate offers. Only repository evidence is scored.",
+  "primary_offer_binding": {
+    "platform": "LumenCore",
+    "evidence_layer": "ProofLock",
+    "primary_offer_id": "buyer-owned-baseline-validation-sprint",
+    "customer_problem": "Technical buyers lack a reproducible, authority-bounded way to decide whether an AI, analytics, or engineering claim deserves pilot capital.",
+    "public_contact_path": "https://lumen-core.ai/proof_to_pilot.html",
+    "priority_lane_id": "lumen_infrastructure_sentinel",
+    "direct_engine_sales_authorized": false,
+    "strategic_packet_sha256": "ec1a13ca95dbf5c75ca2c4c064fc146915771b7abff60c6f7c3e9ffc4c8b01c6",
+    "evidence_graph_sha256": "a2a829467b6a29bdd9c5ed7019b6b2b8af1cfece195f4e74dabcf977a338e65d"
+  },
+  "summary": {
+    "portfolio_lane_count": 15,
+    "primary_offer_count": 1,
+    "priority_lane_id": "lumen_infrastructure_sentinel",
+    "priority_lane_maturity": "runnable_component",
+    "priority_lane_scoping_candidate": true,
+    "maturity_counts": {
+      "component_only": 2,
+      "concept_only": 2,
+      "runnable_component": 8,
+      "tested_implementation": 3
+    },
+    "lane_counts": {
+      "concept_lane": 2,
+      "priority_validation_lane": 1,
+      "research_lane": 10,
+      "workflow_module": 2
+    },
+    "subscription_ready_count": 0,
+    "direct_engine_sales_authorized": false,
+    "buyer_commitment_evidenced": false,
+    "signed_paid_scope_evidenced": false,
+    "executed_buyer_pilot_evidenced": false,
+    "revenue_evidenced": false,
+    "external_validation_evidenced": false,
+    "missing_evidence_path_count": 1,
+    "untracked_evidence_path_count": 0
+  },
+  "engines": [
+    {
+      "id": "lumen_infrastructure_sentinel",
+      "name": "Lumen Infrastructure Sentinel",
+      "lane": "priority_validation_lane",
+      "safe_description": "Infrastructure baseline, drift, anomaly, and evidence-packet tooling.",
+      "buyer_profile": "Data-center, utility, hospital IT, telecom, and managed-service operators with an authorized historical or replay dataset.",
+      "scoping_use": "Test one declared infrastructure claim against an accepted incumbent baseline and return replayable decision evidence.",
+      "acceptance_gate": "Detect declared injected or historical failure modes at an agreed false-alert rate on buyer-authorized data.",
+      "claim_boundary": "No outage prevention, realized savings, field validation, safety control, or production deployment claim.",
+      "observed_maturity": "runnable_component",
+      "evidence_classes_present": 5,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/institutional_harmonic_infrastructure.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "a7bdd7c3a1e57ecc9f5a9a9a4fb5dd36f7fbe129",
+            "bytes": 9849,
+            "sha256": "e7092c5abd500245a8eb08e4f068a182205732263904a42014cf775645f18e73"
+          },
+          {
+            "path": "code/execution/infra_constraint_monitor.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8143c65be10734ccc7457d3215c68dff0499ee8b",
+            "bytes": 63993,
+            "sha256": "e05a39b6622a4546bb13b5578d9901b14a658203e9966c98ac4a8eff8afa1d8e"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/institutional_harmonic_infrastructure.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "a7bdd7c3a1e57ecc9f5a9a9a4fb5dd36f7fbe129",
+            "bytes": 9849,
+            "sha256": "e7092c5abd500245a8eb08e4f068a182205732263904a42014cf775645f18e73"
+          }
+        ],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
+            "bytes": 3968,
+            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+          }
+        ],
+        "artifact": [
+          {
+            "path": "institutional_harmonic_infrastructure_proof.json",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "27fdf1e2235cdd9b7c6d6271bf14bc1457e211fa",
+            "bytes": 1975,
+            "sha256": "d809a67123e87e8db1bd41a715afac6eb2e5efb89c530ed8b099f47b72f3037f"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "code/execution/build_infra_audit_dashboard.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8aa2e9310babdff497b4f28a1e4ab0841279b956",
+            "bytes": 46056,
+            "sha256": "2abf314b9097eec45f4e9a83ebe27692f9a3c922d4da30770c8fe108ba28075a"
+          }
+        ]
+      }
+    },
+    {
+      "id": "echoform_identity_engine",
+      "name": "EchoForm Identity Engine",
+      "lane": "concept_lane",
+      "safe_description": "Identity-consistent digital-twin architecture concept.",
+      "buyer_profile": "Future privacy-preserving personal-AI and simulation research partners.",
+      "scoping_use": "Requirements workshop only after privacy, consent, threat-model, and minimization rules are defined.",
+      "acceptance_gate": "A consent-first prototype passes deletion, provenance, revocation, and identity-consistency tests.",
+      "claim_boundary": "No biometric certification, medical inference, identity proof, or continuity-of-person claim.",
+      "observed_maturity": "concept_only",
+      "evidence_classes_present": 1,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [],
+        "entrypoint": [],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "3256bf2eaa2e21289075290702bd2a68e37642a2",
+            "bytes": 5146,
+            "sha256": "dd42ad96883f9be86aef26b5e64b35f6a64baf6647eafad446769bec29eb9342"
+          },
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "smart_city_node_engine",
+      "name": "Smart City Node Engine",
+      "lane": "concept_lane",
+      "safe_description": "Smart-city and telecom edge-routing concept.",
+      "buyer_profile": "Future municipal, utility, and telecom research partners.",
+      "scoping_use": "Requirements and simulation-scoping workshop only.",
+      "acceptance_gate": "A deterministic simulator beats a named baseline on a locked latency, resilience, or allocation metric.",
+      "claim_boundary": "No city deployment, critical-infrastructure control, latency, resilience, or savings claim.",
+      "observed_maturity": "concept_only",
+      "evidence_classes_present": 1,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [],
+        "entrypoint": [],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "crowdfund_radar",
+      "name": "CrowdFund Radar",
+      "lane": "research_lane",
+      "safe_description": "Campaign discovery and evidence-linked research queue tooling.",
+      "buyer_profile": "Product scouts, trend-research teams, and analyst groups.",
+      "scoping_use": "Compare a pre-registered campaign ranking with a simple popularity baseline.",
+      "acceptance_gate": "Forward labels show useful lift over the named baseline using permitted sources.",
+      "claim_boundary": "No investment recommendation, campaign quality guarantee, or return claim.",
+      "observed_maturity": "component_only",
+      "evidence_classes_present": 1,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/crowdfunding_engine.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "ce59436e9f719227092c9e6d3c43546ba20cad69",
+            "bytes": 22125,
+            "sha256": "76e6de120f7dd293a0e4cc9f30aebc4cae62483c394fdb7b06f785f54423445c"
+          }
+        ],
+        "entrypoint": [],
+        "test": [],
+        "documentation": [],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "cyber_forensics_assist",
+      "name": "Cyber Forensics Assist",
+      "lane": "research_lane",
+      "safe_description": "Prototype evidence-component scoring and investigation chronology support.",
+      "buyer_profile": "Incident-response, legal-support, and internal security research teams using approved synthetic cases.",
+      "scoping_use": "Measure chronology completeness and reviewer agreement without modifying source evidence.",
+      "acceptance_gate": "A blinded synthetic-case review meets a locked completeness and agreement threshold.",
+      "claim_boundary": "No forensic conclusion, chain-of-custody certification, legal admissibility, or autonomous response claim.",
+      "observed_maturity": "component_only",
+      "evidence_classes_present": 3,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/cold_case_engine.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "b8697c5e56ed2ff1abdb71843f65ae57f5fe29a7",
+            "bytes": 6715,
+            "sha256": "be85d81c53da8f2454715fb5c4224aa7bcd0c763c8a8ec1956f9565f8bd04e23"
+          }
+        ],
+        "entrypoint": [],
+        "test": [],
+        "documentation": [],
+        "artifact": [
+          {
+            "path": "code/output/cold_case_summary.json",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "adeb4313f7cbd0c463e4309907ab9c74ab608525",
+            "bytes": 1108,
+            "sha256": "fab7ccea5b286d4781b9dd612fc5a3c9e2ad78d27f282a3fea4ed4d710e6ebe6"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "code/build_cold_case_dashboard.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "6b477087b8e2feaa227cef2a6474c326bd4ccd09",
+            "bytes": 7136,
+            "sha256": "cc030a0a1f56e78b08ec337707f8bd16e2ab85a17b2b44a0511eb7c6e41cadde"
+          }
+        ]
+      }
+    },
+    {
+      "id": "energy_harmonization_engine",
+      "name": "Energy Harmonization Engine",
+      "lane": "research_lane",
+      "safe_description": "Energy-data evidence pipeline and simulation research component.",
+      "buyer_profile": "Utilities, facility operators, energy researchers, and government laboratories with authorized data.",
+      "scoping_use": "Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision.",
+      "acceptance_gate": "Meet locked accuracy, calibration, timeliness, and economic-conversion rules against a named baseline.",
+      "claim_boundary": "No nuclear control, field validation, outage savings, or universal harmonic-superiority claim.",
+      "observed_maturity": "runnable_component",
+      "evidence_classes_present": 3,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/ops/run_sector_energy_evidence_pipeline.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "b3a06b0ac59b46bc5297863cc49dba4afd297f41",
+            "bytes": 16330,
+            "sha256": "fc16700b7b8f01ab6e73f9f9a3799cdcca459dbe5b7e74a55caec525aa018efa"
+          },
+          {
+            "path": "code/institutional_harmonic_infrastructure.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "a7bdd7c3a1e57ecc9f5a9a9a4fb5dd36f7fbe129",
+            "bytes": 9849,
+            "sha256": "e7092c5abd500245a8eb08e4f068a182205732263904a42014cf775645f18e73"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/ops/run_sector_energy_evidence_pipeline.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "b3a06b0ac59b46bc5297863cc49dba4afd297f41",
+            "bytes": 16330,
+            "sha256": "fc16700b7b8f01ab6e73f9f9a3799cdcca459dbe5b7e74a55caec525aa018efa"
+          }
+        ],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "flowform_hardware_engine",
+      "name": "FlowForm Hardware Engine",
+      "lane": "research_lane",
+      "safe_description": "Simulation and audit tooling for geometry-informed routing concepts.",
+      "buyer_profile": "Aerospace, robotics, EV, and electronics R&D teams with a declared comparator.",
+      "scoping_use": "Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan.",
+      "acceptance_gate": "Pre-registered simulation and independent bench tests beat named baselines on declared measures.",
+      "claim_boundary": "No physical thermal, electromagnetic, battery, structural, manufacturing, or field-performance claim.",
+      "observed_maturity": "runnable_component",
+      "evidence_classes_present": 3,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/ops/flowform_phase_lock_audit.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "5cd68742258efca9bd20161b306e5fd9248468b5",
+            "bytes": 13431,
+            "sha256": "f82d402eadc8542c34a25375d3a890028ee999e26ce811032bb00f77aa1f0f66"
+          },
+          {
+            "path": "code/ops/harmonic_flowform_impact_explainer.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "5517e338dbc10e0925c82c91f9786d345c3c251c",
+            "bytes": 24975,
+            "sha256": "a5d4d166ecf72d2d578dfa5ccc5b5f3b9aead29e8afcdc50ea6d49d2205b6dd0"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/ops/flowform_phase_lock_audit.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "5cd68742258efca9bd20161b306e5fd9248468b5",
+            "bytes": 13431,
+            "sha256": "f82d402eadc8542c34a25375d3a890028ee999e26ce811032bb00f77aa1f0f66"
+          }
+        ],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "kraken_sentinel_lumasniper",
+      "name": "Kraken Sentinel / LumaSniper",
+      "lane": "research_lane",
+      "safe_description": "Crypto-market telemetry, guarded signal research, and paper-execution controls.",
+      "buyer_profile": "Digital-asset research and model-governance teams.",
+      "scoping_use": "Review read-only telemetry and paper-ledger controls under a frozen protocol.",
+      "acceptance_gate": "Prospective after-fee paper results, deterministic kill controls, and complete ledger reconciliation.",
+      "claim_boundary": "No live trading authority, profit, return, signal service, or investment-advice claim.",
+      "observed_maturity": "tested_implementation",
+      "evidence_classes_present": 5,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/kraken_execution.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "1c704111b73f224101828658640ccb8f44dbe12d",
+            "bytes": 4780,
+            "sha256": "985860a84269c29a1a81ff906d53fb9c4f76d529964b464cd4c88646aa483b10"
+          },
+          {
+            "path": "code/kraken_swing_hunter.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "666f8bfd41224fdc728bd96ada95346001b46ca7",
+            "bytes": 2226,
+            "sha256": "50f882ce49cfb154fe73198402560000aabf0fef030c44e8b119b7aa227151ba"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/kraken_swing_hunter.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "666f8bfd41224fdc728bd96ada95346001b46ca7",
+            "bytes": 2226,
+            "sha256": "50f882ce49cfb154fe73198402560000aabf0fef030c44e8b119b7aa227151ba"
+          }
+        ],
+        "test": [
+          {
+            "path": "tests/test_order_safety_gate.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "dc2197adea3d0699e387a4e9217e078fa98dd8ab",
+            "bytes": 6043,
+            "sha256": "657e2f7ed8e5e6b766c48d52376a178446740f0d320c4c6b7d7b8f8d4b6fd658"
+          }
+        ],
+        "documentation": [
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
+            "bytes": 3968,
+            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+          }
+        ],
+        "artifact": [],
+        "public_surface": [
+          {
+            "path": "dashboard/kraken_execution_dashboard.html",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "59d7681da1baa74b31d298d36d66d32719a583ae",
+            "bytes": 71303,
+            "sha256": "602c6e947c8921660e206eb24e6730fd9388e8a3d41af675bc74e3c73b27eb29"
+          }
+        ]
+      }
+    },
+    {
+      "id": "luma_xr_command_room",
+      "name": "Luma XR Command Room",
+      "lane": "research_lane",
+      "safe_description": "Prototype launch and interface assets for immersive system-state visualization.",
+      "buyer_profile": "Simulation, training, museum, and enterprise demonstration teams.",
+      "scoping_use": "Test declared monitoring tasks using non-sensitive sample telemetry.",
+      "acceptance_gate": "Users complete declared tasks within locked error, latency, and comfort thresholds.",
+      "claim_boundary": "No operational command authority, training efficacy, comfort, or safety certification claim.",
+      "observed_maturity": "runnable_component",
+      "evidence_classes_present": 3,
+      "evidence_classes_total": 6,
+      "missing_paths": [
+        "dashboard/alpha_burst_lab_holo_3d.html"
+      ],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/START_IMMERSIVE_STACK.ps1",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "751c0034125948032a96768fb76f9511a0926e30",
+            "bytes": 627,
+            "sha256": "d6986be05cbccc1d01ff27eeb54191b3fa793e64ab041c139b1e4bf5d8319e22"
+          },
+          {
+            "path": "code/unity_bridge/INSTALL_UNITY_BRIDGE.ps1",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "f7241e74f039800e50540bb4f956399e96ebf994",
+            "bytes": 1387,
+            "sha256": "8fe0a704eab1391fe5f49c3c4f8a07802d8052295dcf8ad9f13d9b2840002a51"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/START_IMMERSIVE_STACK.ps1",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "751c0034125948032a96768fb76f9511a0926e30",
+            "bytes": 627,
+            "sha256": "d6986be05cbccc1d01ff27eeb54191b3fa793e64ab041c139b1e4bf5d8319e22"
+          }
+        ],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          }
+        ],
+        "artifact": [],
+        "public_surface": [
+          {
+            "path": "dashboard/alpha_burst_lab_holo_3d.html",
+            "exists": false,
+            "tracked": false,
+            "git_blob_sha": null,
+            "bytes": null,
+            "sha256": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "lumascout",
+      "name": "LumaScout",
+      "lane": "research_lane",
+      "safe_description": "Source-receipted creator discovery shortlists with forward outcome tracking.",
+      "buyer_profile": "Artist-management, agency, label, and creator-research teams with permitted data.",
+      "scoping_use": "Compare a pre-registered shortlist with a transparent popularity baseline.",
+      "acceptance_gate": "Forward outcomes improve on a declared baseline using licensed or permitted data.",
+      "claim_boundary": "No hit prediction, label adoption, revenue lift, or undocumented data-rights claim.",
+      "observed_maturity": "runnable_component",
+      "evidence_classes_present": 4,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "LamaScout/src/pipeline.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "12aad2ecd18001878daaae6c9eb88fa26304576d",
+            "bytes": 3161,
+            "sha256": "7536d644de178a5571cdacc7100085ddd92f9f9c8f76ae5de6d8535a134fcbd8"
+          },
+          {
+            "path": "LamaScout/src/scoring.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "d819702e2df180e4659b65c862c2e9deeea63cd0",
+            "bytes": 19728,
+            "sha256": "8ea84c7a0c90bc49c6c9a2810d70157ea48dcd29bb7b8ac1f53bd694479ea1d2"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "LamaScout/src/artist_scout_engine.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "d110aad4d1c0a1b5418dfff8e1f99e4b3050de98",
+            "bytes": 153,
+            "sha256": "e043cabbd4573670766b9904e78f4c8beaa091b60db1b20386900919694ad963"
+          }
+        ],
+        "test": [],
+        "documentation": [
+          {
+            "path": "LamaScout/README.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "511773c4632c936fa6699d0d2cf9bbfaf423d921",
+            "bytes": 6359,
+            "sha256": "0fde5a289484a66eec14e410945cd795cf926b154ecd22d85549b3e228d98ec1"
+          },
+          {
+            "path": "LamaScout/ARCHITECTURE.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "d02d23c39c8888915d41ac550feca0ecbf07bb2d",
+            "bytes": 3526,
+            "sha256": "bc1615e0e2d9162ff3c163365d3b64235f37fca02cb9e8c39dcc966183d70235"
+          }
+        ],
+        "artifact": [],
+        "public_surface": [
+          {
+            "path": "dashboard/lumascout.html",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "fcdedb990f044805439bebd03c29e66de8a55ba8",
+            "bytes": 376,
+            "sha256": "8bbb7c36a44938a3922ad871290bb47f1b70ed79c631c30d3d2fe28f796956f8"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lumatrader",
+      "name": "LumaTrader",
+      "lane": "research_lane",
+      "safe_description": "Paper-only market research, model comparison, runtime controls, and replayable decision evidence.",
+      "buyer_profile": "Quant research, fintech research, and model-governance teams.",
+      "scoping_use": "Compare a frozen paper or replay protocol with a declared baseline after costs and abstention rules.",
+      "acceptance_gate": "Prospective paper results meet a locked after-cost threshold without breaching risk or reconciliation gates.",
+      "claim_boundary": "No alpha, profitability, institutional readiness, investment advice, or live-capital claim.",
+      "observed_maturity": "tested_implementation",
+      "evidence_classes_present": 6,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/execution/execution_orchestrator.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "ea5fed65e726aa1b2307378707e77b3d5955470c",
+            "bytes": 8789,
+            "sha256": "724542006a93f202994ed7b8e78706c9dcf5c86df9d0972965165ee6785ebe87"
+          },
+          {
+            "path": "code/institutional_harmonic_suite.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "70c54e036476d09fe05d7eb79842c5a5380abd98",
+            "bytes": 27537,
+            "sha256": "fd806f18cd2974c09a0265771d62d4ba49373b22022c269076d1e57a70589866"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/execution/execution_orchestrator.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "ea5fed65e726aa1b2307378707e77b3d5955470c",
+            "bytes": 8789,
+            "sha256": "724542006a93f202994ed7b8e78706c9dcf5c86df9d0972965165ee6785ebe87"
+          }
+        ],
+        "test": [
+          {
+            "path": "tests/test_order_safety_alpaca_paper_boundary.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "b53d76597e0096ba197e3663394eeeab5805eb5a",
+            "bytes": 5107,
+            "sha256": "fe69da2abe53702112894edaecba1bc38edc5efb52ceae90de0a2b10f323c759"
+          }
+        ],
+        "documentation": [
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
+            "bytes": 3968,
+            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+          }
+        ],
+        "artifact": [
+          {
+            "path": "dashboard/data/public_live_breadth_manifest.json",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "550a48e567930c8341168c4cff450075cfa98514",
+            "bytes": 16918,
+            "sha256": "0b878d7839662098548bd71de1aad5cac8fbd8852fb64a527dc2c6f390a916f1"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "dashboard/quant_lab.html",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "9014124b2c7436206fc7e0745c06453cb853d62f",
+            "bytes": 106108,
+            "sha256": "0fd3e325d1e500e82306bad6d96945dfc29edf68be18caf0aac9d0b8af7c6296"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sports_harmonic_edge",
+      "name": "Sports Harmonic Edge",
+      "lane": "research_lane",
+      "safe_description": "Sports-odds ingestion and research scoring under explicit uncertainty and paper-only controls.",
+      "buyer_profile": "Sports media research and analytics teams with licensed data.",
+      "scoping_use": "Compare historical and prospective research scoring with simple declared market baselines.",
+      "acceptance_gate": "Prospective calibration and ranking metrics beat declared baselines without hidden selection.",
+      "claim_boundary": "No betting advice, guaranteed edge, profit, or consumer wagering automation.",
+      "observed_maturity": "runnable_component",
+      "evidence_classes_present": 3,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/sports_odds_engine.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "d8ea08bb47b931706282e851039cfab4743c7f55",
+            "bytes": 20627,
+            "sha256": "719de09853bba01447a7c8778bcd8b3dfdcef6bc137d05489736a4f5dc416f1e"
+          },
+          {
+            "path": "code/sports_intelligence_layer.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "11747257b027414c04c9fc25fb91a9a01d6923c1",
+            "bytes": 42077,
+            "sha256": "166f64dc3ab5c9f917f19ea0ed64757921a0383ba4d2cc7c860da3fcbd523639"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/sports_odds_engine.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "d8ea08bb47b931706282e851039cfab4743c7f55",
+            "bytes": 20627,
+            "sha256": "719de09853bba01447a7c8778bcd8b3dfdcef6bc137d05489736a4f5dc416f1e"
+          }
+        ],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "world_model_engine",
+      "name": "World Model Engine",
+      "lane": "research_lane",
+      "safe_description": "Cross-sector data-normalization and scenario-analysis prototype.",
+      "buyer_profile": "Enterprise strategy, research, and government analytics teams.",
+      "scoping_use": "Model one buyer-owned decision using a declared source set, baseline, and uncertainty register.",
+      "acceptance_gate": "Reproduce declared scenarios and meet a locked decision metric without hidden data or hindsight.",
+      "claim_boundary": "No complete world model, operational prediction, policy authority, or cross-sector-superiority claim.",
+      "observed_maturity": "runnable_component",
+      "evidence_classes_present": 3,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/execution/cross_sector_intel_pipeline.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "196ebc847e28f2801e94962feadee64f975a13db",
+            "bytes": 18801,
+            "sha256": "cfaf77f0e0b926f13770b2c2afd4528baa721cd6aed0c3c8a80117124dbcd9b7"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/execution/cross_sector_intel_pipeline.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "196ebc847e28f2801e94962feadee64f975a13db",
+            "bytes": 18801,
+            "sha256": "cfaf77f0e0b926f13770b2c2afd4528baa721cd6aed0c3c8a80117124dbcd9b7"
+          }
+        ],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "lumacore_orchestrator",
+      "name": "LumaCore Orchestrator",
+      "lane": "workflow_module",
+      "safe_description": "Routing, sequencing, health, and evidence-pack assembly across bounded subsystems.",
+      "buyer_profile": "Enterprise evidence, workflow, and trustworthy-AI teams after gateway health is restored.",
+      "scoping_use": "Compare a declared governed workflow with the buyer's existing process while preserving approvals and abstentions.",
+      "acceptance_gate": "Complete the workflow with fewer verified defects or less preparation time and no approval-boundary breach.",
+      "claim_boundary": "No autonomous legal, procurement, financial, trading, safety-critical, or production-gateway authority.",
+      "observed_maturity": "runnable_component",
+      "evidence_classes_present": 5,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "e8636a475e3da9fdf62007067ac5020094260d97",
+            "bytes": 31135,
+            "sha256": "3d6fce1aeca66ffc577f7fe5013cca0f22506cd5722d0550c89f7b2af88537a0"
+          },
+          {
+            "path": "code/run_universal_meta_orchestrator.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "894920e38c667e46f77f516af32d7e1c01fed1d0",
+            "bytes": 25775,
+            "sha256": "60c0a31bb8fe936cbfdb7ceee36ca87b199cd5757ae483afef03e24ab74e2750"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "e8636a475e3da9fdf62007067ac5020094260d97",
+            "bytes": 31135,
+            "sha256": "3d6fce1aeca66ffc577f7fe5013cca0f22506cd5722d0550c89f7b2af88537a0"
+          },
+          {
+            "path": "code/run_universal_meta_orchestrator.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "894920e38c667e46f77f516af32d7e1c01fed1d0",
+            "bytes": 25775,
+            "sha256": "60c0a31bb8fe936cbfdb7ceee36ca87b199cd5757ae483afef03e24ab74e2750"
+          }
+        ],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
+            "bytes": 3968,
+            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+          }
+        ],
+        "artifact": [
+          {
+            "path": "truth_orchestrator_status.json",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "c28627071a5b31140c9d370117e90b254800435f",
+            "bytes": 4970,
+            "sha256": "c0e277a28f7127a755ea33d0673534987700e221ca306dc37c606c8e454201c9"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "dashboard/mission_control.html",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "a279d22c9c41a1daf4ad224cfadba53ff3534708",
+            "bytes": 130679,
+            "sha256": "69c5b1c253c01f88d07ff9250d9662e1ce184ddd84175f1e2c6988d60dc7fdd1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lumengov_grant_factory",
+      "name": "LumenGov Grant Factory",
+      "lane": "workflow_module",
+      "safe_description": "Opportunity qualification, evidence assembly, conformance checks, and human-controlled submission preflight.",
+      "buyer_profile": "Small businesses, research teams, grant consultants, and government contractors.",
+      "scoping_use": "Measure preparation latency and conformance defects against the buyer's existing human-controlled workflow.",
+      "acceptance_gate": "Reduce verified preparation latency or conformance defects while preserving source and approval controls.",
+      "claim_boundary": "No guaranteed eligibility, submission, award, savings, certification, signature, or portal authority.",
+      "observed_maturity": "tested_implementation",
+      "evidence_classes_present": 6,
+      "evidence_classes_total": 6,
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [
+          {
+            "path": "code/grant_submission_kit.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "817d00dc2b053815be0f79d4a6b2fb9fcc7f6ae2",
+            "bytes": 28088,
+            "sha256": "be1c8aa24dd89c229da0693bc7ef05348fa4f590dcf5d93447c0c10cef7789b2"
+          },
+          {
+            "path": "code/grant_application_factory.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "372eb7e690b7e568c4b00ca3203c7194e67c30a1",
+            "bytes": 97822,
+            "sha256": "b09a70ca86bc47a4b98e14fdf44512ddbcd32c343af55465ee9977624634bb28"
+          }
+        ],
+        "entrypoint": [
+          {
+            "path": "code/grant_submission_kit.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "817d00dc2b053815be0f79d4a6b2fb9fcc7f6ae2",
+            "bytes": 28088,
+            "sha256": "be1c8aa24dd89c229da0693bc7ef05348fa4f590dcf5d93447c0c10cef7789b2"
+          }
+        ],
+        "test": [
+          {
+            "path": "tests/test_grant_submission_readiness_audit.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "35dd1ccae1337ce8e88d0f21f283b758fc66c702",
+            "bytes": 2709,
+            "sha256": "99d72ace0ddc27043a4cf728bbbaec4ced4cdaddde1041404e089cc9286405c7"
+          },
+          {
+            "path": "tests/test_grant_dashboard_status_feed.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "019d4bb9c7e2cf8cb101cee36055db9e744fa018",
+            "bytes": 4109,
+            "sha256": "b746f297ec9deecd3c7bb57ee377476599029c98aadfcc635a37743be17ce124"
+          }
+        ],
+        "documentation": [
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
+            "bytes": 3968,
+            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+          }
+        ],
+        "artifact": [
+          {
+            "path": "dashboard/data/grant_readiness_status.json",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "9b95cc930195231458891971adb6d8b9feec8759",
+            "bytes": 16550,
+            "sha256": "c4064700755304b64742f825a6a51b77e4ca24621386fec38a8ff20a30198fb3"
+          }
+        ],
+        "public_surface": [
+          {
+            "path": "dashboard/grants.html",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "a0d7e106015a894abe35c82b1273679d49200f4d",
+            "bytes": 84494,
+            "sha256": "1f91e70e1b00a6243e434918e59676c8aeb73475ffb31f3a172780b79a1d1769"
+          }
+        ]
+      }
+    }
+  ],
+  "boundaries": [
+    "A present file proves only that a repository artifact exists; it does not prove deployment, external validation, customer adoption, revenue, or economic value.",
+    "The only primary commercial offer is the buyer-owned baseline validation sprint bound to the canonical strategic transaction packet.",
+    "Every engagement requires buyer-authorized data, an accepted baseline, a locked metric and threshold, and a signed paid scope.",
+    "Trading and sports lanes remain research and paper-only.",
+    "Hardware, identity, energy, and smart-city performance claims remain simulation-bound or conceptual until independent domain validation exists.",
+    "Final government certifications, signatures, prices, uploads, submissions, and binding commitments remain human-controlled."
+  ],
+  "integrity": {
+    "algorithm": "sha256",
+    "canonicalization": "utf8-json-sort-keys-compact",
+    "hash_scope": "entire payload excluding integrity",
+    "payload_sha256": "f9f13757c0b003d85a937820c4354c6437a16d7e12a39189a82dcdb138bcbf4b"
+  }
+}
