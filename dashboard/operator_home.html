@@ -59,11 +59,12 @@
   @media(max-width:1100px){.grid,.usecases{grid-template-columns:repeat(2,1fr)}.hero,.three{grid-template-columns:1fr}.footer-cta{grid-template-columns:1fr}}
   @media(max-width:700px){.grid,.usecases,.stats{grid-template-columns:1fr}.home{padding:18px 14px 120px}.nav{align-items:flex-start}.navlinks{justify-content:flex-end}.hero-main{padding:24px}}
 </style>
+<link rel="stylesheet" href="./assets/luma_institutional_surface.css">
 </head>
-<body>
+<body data-luma-surface="home">
 <main class="home">
   <nav class="nav" aria-label="Primary">
-    <div class="brand">LUMEN<span>CORE</span></div>
+    <div class="brand lis-home-brand"><img src="./assets/lumencore-mark.svg" alt="">LUMEN<span>CORE</span></div>
     <div class="navlinks">
       <a class="btn" href="/proof_to_pilot.html">Proof</a>
       <a class="btn" href="/mission_control.html">Status</a>
@@ -99,6 +100,37 @@
         <li>Choose the next controlled gate.</li>
       </ol>
       <div class="stamp" id="stamp">No membership, endorsement, savings, deployment, or field-validation claim is implied.</div>
+    </aside>
+  </section>
+
+  <nav class="lis-surface-map" aria-label="ProofLock assurance sequence">
+    <a href="/proof_to_pilot.html"><span>01 · Scope</span><strong>One buyer-selected opportunity workflow and one decision owner.</strong></a>
+    <a href="/proof_to_pilot.html"><span>02 · Lock</span><strong>Source rights, eligibility rules, baseline, thresholds, and cutoff.</strong></a>
+    <a href="/proof_to_pilot.html"><span>03 · Run</span><strong>Qualify, assemble, and preflight while abstaining on unresolved facts.</strong></a>
+    <a href="/build_week/prooflock_console/"><span>04 · ProofLock</span><strong>Source receipts, decision chain, limitations, manifest, and replay steps.</strong></a>
+    <a href="/opportunity_sprint.html"><span>05 · Decide</span><strong>Pursue, revise, hold, or stop—with a reviewable record.</strong></a>
+  </nav>
+
+  <section class="panel lis-offer" id="prooflock-assurance">
+    <div>
+      <div class="label">Fixed-scope paid service</div>
+      <h2>ProofLock Opportunity Sprint</h2>
+      <p class="truth">One buyer-selected funding-opportunity workflow is converted into a source-grounded, preflighted, replayable decision system.</p>
+      <ul class="lis-offer-list">
+        <li>Official-source and eligibility-rule register for one workflow</li>
+        <li>Evidence-linked pursue / no-pursue decision brief</li>
+        <li>Reviewer-ready package outline and attachment / blocker ledger</li>
+        <li>Replayable receipt for every material shortlist and preflight decision</li>
+        <li>Final readout with measured workflow deltas and unresolved facts retained</li>
+      </ul>
+      <div class="fine">No guaranteed eligibility, award, legal advice, certification, signature, upload, send, or final submission.</div>
+    </div>
+    <aside class="lis-offer-commercial" aria-label="ProofLock Assurance commercial terms">
+      <span>Fixed-fee pilot</span>
+      <strong>$3,500</strong>
+      <b>50% kickoff deposit · one workflow</b>
+      <p>Target delivery: ten business days after source permissions, baseline, acceptance rules, scope, and deposit are accepted in writing.</p>
+      <a class="btn primary" href="/opportunity_sprint.html">Open the fixed-scope offer</a>
     </aside>
   </section>
 
@@ -192,9 +224,10 @@
       <p>We will define the evidence boundary before scoring and return a reviewer-readable result without converting internal evidence into an external-validation claim.</p>
       <div class="fine">LumenCore is presented as a controlled review and pilot-design architecture. Public artifacts do not imply deployment, endorsement, or guaranteed performance.</div>
     </div>
-    <a class="btn primary" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20pilot%20scope">Scope a Pilot</a>
+    <a class="btn primary" href="/opportunity_sprint.html">Open the fixed-scope offer</a>
   </section>
 </main>
+<script src="./assets/luma_institutional_surface.js"></script>
 <script src="./assets/luma_command_fabric.js"></script>
 <script>
 async function updateRuntimeStamp() {

@@ -22,6 +22,7 @@ SCHEMA: Final = "lumencore.public_site_release_manifest.v1"
 FULL_COMMIT = re.compile(r"[0-9a-fA-F]{40}")
 RELEASE_PATHS: Final = (
     "dashboard/operator_home.html",
+    "dashboard/opportunity_sprint.html",
     "dashboard/proof_to_pilot.html",
     "dashboard/external_review.html",
     "dashboard/mission_control.html",
@@ -34,6 +35,8 @@ RELEASE_PATHS: Final = (
     "dashboard/assets/lumencore.css",
     "dashboard/assets/luma_command_fabric.css",
     "dashboard/assets/luma_command_fabric.js",
+    "dashboard/assets/luma_institutional_surface.css",
+    "dashboard/assets/luma_institutional_surface.js",
     "dashboard/assets/prooflock/bounded_validation_protocol_v1.json",
     "dashboard/assets/prooflock/bounded_validation_protocol_v2.json",
     "dashboard/build_week/prooflock_console/app.js",

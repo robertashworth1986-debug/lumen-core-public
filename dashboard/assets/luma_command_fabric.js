@@ -10,18 +10,33 @@
     return;
   }
 
-  var ROUTES = [
-    { label: "Home", href: "/operator_home.html", hint: "Plain-English platform, proof, and readiness map" },
+  var OPERATOR_ROUTES = [
+    { label: "Home", href: "/", hint: "Problem, method, evidence boundary, and review path" },
     { label: "Mission", href: "/mission_control.html", hint: "System health and evidence control" },
     { label: "Quant", href: "/quant_lab.html", hint: "Unified research and operator cockpit" },
-    { label: "Trade", href: "/kraken_execution_dashboard.html", hint: "Kraken paper and execution evidence" },
-    { label: "Grants", href: "/grants.html", hint: "Grant readiness and submission factory" },
-    { label: "Forecast", href: "/forecast.html", hint: "Forecast and scenario console" },
-    { label: "Explain", href: "/explain.html", hint: "Router and evidence explainer" },
+    { label: "Trade", href: "/kraken_execution_dashboard.html", hint: "Read-only paper, shadow, and receipt evidence" },
+    { label: "Grants", href: "/grants.html", hint: "Opportunity evidence, drafts, receipts, and authority" },
+    { label: "Proof", href: "/proof_to_pilot.html", hint: "One problem, one baseline, one bounded decision" },
+    { label: "Evidence", href: "/evidence/", hint: "Public-safe evidence and claim boundaries" },
+  ];
+
+  var PUBLIC_ROUTES = [
+    { label: "Home", href: "/", hint: "ProofLock Assurance" },
+    { label: "Opportunity Sprint", href: "/opportunity_sprint.html", hint: "One fixed-scope funding decision workflow" },
+    { label: "Proof", href: "/proof_to_pilot.html", hint: "Scope one bounded paid review" },
+    { label: "Evidence", href: "/evidence/", hint: "Inspect public-safe evidence and boundaries" },
+    { label: "External Review", href: "/external_review.html", hint: "Independent execution and review path" },
+    { label: "ProofLock", href: "/build_week/prooflock_console/", hint: "Verify a bounded receipt" },
   ];
 
   var isFile = location.protocol === "file:";
   var currentFile = (location.pathname.replace(/\\/g, "/").split("/").pop() || "").toLowerCase();
+  var operatorFiles = ["mission_control.html", "quant_lab.html", "kraken_execution_dashboard.html", "grants.html"];
+  var ROUTES = operatorFiles.indexOf(currentFile) >= 0 ? OPERATOR_ROUTES : PUBLIC_ROUTES;
+  var scriptUrl = document.currentScript && document.currentScript.src;
+  var markHref = scriptUrl
+    ? new URL("./lumencore-mark.svg", scriptUrl).href
+    : "/assets/lumencore-mark.svg";
   var apiBase = typeof window.LUMA_API_BASE === "string"
     ? window.LUMA_API_BASE.trim().replace(/\/$/, "")
     : "";
@@ -36,6 +51,7 @@
 
   function hrefFor(path) {
     if (!isFile) return path;
+    if (path === "/") return "./operator_home.html";
     return "." + path;
   }
 
@@ -152,12 +168,21 @@
     rail.className = "lcf-rail";
     rail.setAttribute("aria-label", "Luma command fabric");
 
+    var brand = document.createElement("a");
+    brand.className = "lcf-brand";
+    brand.href = hrefFor("/");
+    brand.setAttribute("aria-label", "LumenCore home");
+    brand.innerHTML = '<img src="' + escapeHtml(markHref) + '" alt=""><span>LUMENCORE</span>';
+
     var nav = document.createElement("nav");
     nav.className = "lcf-nav";
     ROUTES.forEach(function (route) {
       var link = document.createElement("a");
       var file = route.href.split("/").pop().toLowerCase();
-      link.className = "lcf-link" + (file === currentFile ? " active" : "");
+      var active = route.href === "/"
+        ? (currentFile === "" || currentFile === "operator_home.html")
+        : file === currentFile;
+      link.className = "lcf-link" + (active ? " active" : "");
       link.href = hrefFor(route.href);
       link.textContent = route.label;
       link.title = route.hint;
@@ -172,6 +197,7 @@
       '<button class="lcf-command-button" id="lcf-open" type="button">Command <kbd>Ctrl K</kbd></button>',
     ].join("");
 
+    rail.appendChild(brand);
     rail.appendChild(nav);
     rail.appendChild(status);
     document.body.appendChild(rail);
