@@ -125,7 +125,40 @@ def test_opportunity_sprint_is_buyable_bounded_and_human_gated():
     assert "A named person accountable for the agreed deliverables" in body
     assert "No signatures, certifications, or final submit" in body
     assert "does not guarantee eligibility, award, legal compliance" in body
+    assert "Start with the public opportunity link—not your confidential files." in body
+    assert "PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md" in body
+    assert "approved operators, systems, external AI or service providers" in body
     assert 'rel="canonical" href="https://lumen-core.ai/opportunity_sprint.html"' in body
+
+
+def test_opportunity_sprint_data_handling_schedule_is_fail_closed():
+    schedule = (
+        ROOT / "docs" / "PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md"
+    ).read_text(encoding="utf-8")
+    scope = (ROOT / "docs" / "PROOFLOCK_OPPORTUNITY_SPRINT_SCOPE.md").read_text(
+        encoding="utf-8"
+    )
+    intake = (ROOT / "docs" / "PROOFLOCK_OPPORTUNITY_SPRINT_INTAKE.md").read_text(
+        encoding="utf-8"
+    )
+
+    for required in (
+        "Prohibited by default",
+        "External AI and service-provider rule",
+        "Retention and deletion register",
+        "Incident and exception handling",
+        "Publicity and evidence boundary",
+        "No source, system, person, or service is authorized merely because it is",
+        "Client-confidential content must not be submitted to an external AI",
+        "A hash proves byte identity",
+        "outside the operator's\ncontrol",
+        "does not by itself establish endorsement, external validation",
+    ):
+        assert required in schedule
+
+    assert "PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md" in scope
+    assert "PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md" in intake
+    assert "Do **not** email credentials" in intake
 
 
 def test_quant_visible_navigation_contains_only_canonical_routes():
