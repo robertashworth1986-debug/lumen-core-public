@@ -4,7 +4,7 @@ This is the shortest institutional review path for the canonical public evidence
 
 It runs two independent fail-closed checks from one command:
 
-1. the merged Proof Capsule verifier v2 against the public replay capsule; and
+1. the merged Proof Capsule verifier v3 against the public replay capsule; and
 2. the External Replication Docket validator against the canonical unassigned `HOLD` template.
 
 The runner then records the exact public result from each validator plus SHA-256 and byte counts for every listed source file.
@@ -36,8 +36,10 @@ The aggregate receipt must report:
 
 - `valid: true`;
 - two completed checks;
-- Proof Capsule verifier version `2.0`;
+- Proof Capsule verifier version `3.0` with exact-file custody;
 - public replay evidence with decision `external_review`;
+- declared external-validation state `not_established`;
+- external validator identity, independence, conclusion, and release authority unevaluated;
 - replication docket state `template_unassigned`;
 - replication docket decision `hold`;
 - `safe_for_external_validation_claim: false`;

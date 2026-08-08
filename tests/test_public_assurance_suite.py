@@ -130,6 +130,23 @@ class PublicAssuranceSuiteTests(unittest.TestCase):
         self.assertIsInstance(MODULE.DEFAULT_CHECKS[0]["command"], tuple)
         self.assertEqual(MODULE.DEFAULT_CHECKS[0]["command"][0], "{python}")
 
+    def test_default_capsule_contract_requires_v3_custody_boundaries(self) -> None:
+        capsule = MODULE.DEFAULT_CHECKS[0]
+        self.assertEqual(capsule["check_id"], "proof_capsule_v3")
+        expected = capsule["expected"]
+        self.assertEqual(expected["receipt_schema"], "proof-capsule-receipt-v3")
+        self.assertEqual(expected["verifier_version"], "3.0")
+        self.assertTrue(expected["capsule_file_custody_complete"])
+        self.assertEqual(
+            expected["declared_external_validation_status"],
+            "not_established",
+        )
+        self.assertFalse(expected["external_validator_identity_evaluated"])
+        self.assertFalse(expected["external_validator_independence_evaluated"])
+        self.assertFalse(expected["external_validation_conclusion_evaluated"])
+        self.assertFalse(expected["release_authorization_evaluated"])
+        self.assertTrue(expected["human_unlock_required"])
+
     def test_strict_json_rejects_duplicate_keys(self) -> None:
         with self.assertRaisesRegex(MODULE.AssuranceError, "duplicate JSON key"):
             MODULE._strict_json(
