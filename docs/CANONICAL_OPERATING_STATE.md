@@ -15,9 +15,9 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 **State:** Consortium onboarding is active under a private controlling agreement. Exact agreement status, dates, named-party terms, IP terms, and publicity terms remain in the private legal record. This lane is not funding, an award, an endorsement, independent validation, or permission to make broader public claims.
 
-**Existing asset:** The private agreement and existing Gmail thread are the controlling records. One bounded reply supplied the two requested logo variants with permission limited to the described consortium-material use. On August 4, EPRI/OPAI replied that no extra contribution packet is required and that Robert's presence and contributions to Member Representative Committee and Work Group meetings are enough; optional thoughts or suggestions can be shared during those calls.
+**Existing asset:** The private agreement and existing Gmail thread are the controlling records. The July 29 reply supplied two harmonic-ring files that the founder identified on August 8 as the wrong consortium mark. The founder-confirmed replacement is `assets/brand/lumaarc_arc_seal_v1.png`, SHA-256 `1ed1c9b00e273aa9e781bd7fd0a4fcc3fc542257c6d294c8e8fbfada500701af`. LumenCore remains the member and company name; LumaArc is the seal name, not a company rename. On August 8, one corrective reply was sent in the existing thread with that exact asset attached and instructions to disregard the two July 29 files; Gmail sent-message ID `19fe0959c4875700` is the transmission receipt. On August 4, EPRI/OPAI replied that no extra contribution packet is required and that Robert's presence and contributions to Member Representative Committee and Work Group meetings are enough; optional thoughts or suggestions can be shared during those calls.
 
-**Next allowed action:** Attend the recurring Member Representative Committee and selected Work Group meetings, review public/non-proprietary materials, and share bounded thoughts during those calls when useful. Keep IP and publicity actions separately agreement-gated; do not send another onboarding acknowledgment or contribution-path follow-up.
+**Next allowed action:** Return to the no-duplicate hold. Attend the recurring Member Representative Committee and selected Work Group meetings, review public/non-proprietary materials, and share bounded thoughts during those calls when useful. Keep IP and publicity actions separately agreement-gated; do not send another logo correction, onboarding acknowledgment, or contribution-path follow-up unless EPRI/OPAI asks.
 
 ### 2. One external validation or paid-pilot conversion
 
@@ -75,6 +75,23 @@ The daily health workflow classifies the static reviewer surface and dynamic
 gateway independently; a healthy static page can no longer conceal a failed
 control plane.
 
+The reviewed public browser contract is now separated from the operator
+runtime contract. Public pages request only `/health` and
+`/api/public/status`, validate the fixed minimal response fields, and display
+gateway liveness without probing `/api/snapshot` or inferring execution state.
+The canonical homepage no longer links directly into the no-index operator
+mission surface. Operator pages retain their separate protected runtime path.
+This repository change is not evidence that the current VPS gateway is healthy,
+and it has not been released through the exact public-static-site deployment
+gate in this recorded state.
+
+Manual gateway-repair run `31248779848` accepted the exact current-main commit
+and exact approval phrase, then failed closed before SSH because repository
+secret `LUMA_HUMAN_UNLOCK_TOKEN` was not configured. No VPS change was
+attempted. The paper-ticker repair was not dispatched because it depends on the
+same missing private action-time control. Both workflows now emit a specific
+non-secret error for this precondition while retaining the existing gate.
+
 Manual health run `31247095241` recorded the first current-contract snapshot at
 commit `0ff614be`: all six static reviewer endpoints passed, while both dynamic
 gateway contracts returned HTTP 502, so the public state is explicitly
@@ -126,7 +143,7 @@ symbol-awareness restart storms.
 | DLA MissionWeave `DLA26BZ03-NV011` | DLA SBIR/STTR Program Operations confirmed on July 28 that DSIP showed the proposal as `In Progress`, so it was not formally submitted. The July 22 noon ET deadline passed. | Preserve the packet. Do not claim submission or send another status request without a new official ask. |
 | Navy HarborSentinel `DON26BZ03-NV063` | No final-submission receipt was found. The July 22 noon ET deadline passed. | Preserve the packet. Do not claim submission or start late-submission outreach. |
 | HHS Project Argos `ONC-ARGOS-SSN-2026-OS351107` | Exactly one response email was transmitted before the July 30 deadline. An automatic out-of-office reply proves mailbox-system reach only; formal receipt and agency review are not confirmed. | Do not resend. Wait for a substantive HHS request; do not claim receipt, review, selection, award, funding, or validation. |
-| EPRI / Open Power AI Consortium | The MOU was completed by all parties; LumenCore provided its primary contact, initial Work Group representatives, and requested logo variants, and received the recurring Member Representative Committee invitation. EPRI/OPAI replied August 4 that no extra contribution packet is required and that presence and contributions to MRC and Work Group meetings are enough. | Attend meetings and share bounded thoughts during calls when useful; do not follow up again or start another thread. These records support onboarding and bounded meeting participation only, not endorsement, independent validation, an award, funding, broader licensing, utility adoption, approval of a specific claim, or performance. |
+| EPRI / Open Power AI Consortium | The MOU was completed by all parties; LumenCore provided its primary contact and initial Work Group representatives and received the recurring Member Representative Committee invitation. The founder identified the two July 29 harmonic-ring logo attachments as the wrong consortium mark. One corrective reply was sent August 8 in the existing thread with the founder-confirmed LumaArc seal attached and a statement that the member/company name remains LumenCore; Gmail sent-message ID `19fe0959c4875700` is the transmission receipt. EPRI/OPAI replied August 4 that no extra contribution packet is required and that presence and contributions to MRC and Work Group meetings are enough. | Return to the no-duplicate hold and attend meetings. Do not send another logo correction or onboarding follow-up unless EPRI/OPAI asks. These records support onboarding and bounded meeting participation only, not endorsement, independent validation, an award, funding, broader licensing, utility adoption, approval of a specific claim, or performance. |
 | Nashville EC Fall 2026 TakeOff | EC confirmed receipt of the authorization, electronic signature, and onboarding responses; confirmed everything was received on time; and said the materials would be included with the onboarding submission. EC said Robert is all set for now unless it needs something further. | Do not resend or send another acknowledgment. This confirms timely onboarding-material receipt only. It does not establish payment, a secured spot, program completion, a contract, endorsement, or validation. The separate $125 deposit remains founder-controlled and is due August 14. |
 | Launch Tennessee SBIR/STTR support | Exactly one request for no-cost application support and information about the consultant microgrant was sent July 30. No reply was found. | Wait. Do not treat the request as funding, an award, eligibility confirmation, acceptance, or validation, and do not create a duplicate campaign. |
 

@@ -12,7 +12,9 @@
   "allowed_use": [
     "current LumenCore capability statements",
     "current LumenCore reviewer packets",
-    "current LumenCore opportunity response drafts"
+    "current LumenCore opportunity response drafts",
+    "canonical LumenCore public and operator dashboard identity",
+    "correction of previously supplied consortium logo files"
   ],
   "claim_boundary": {
     "seal_selection_confirmed": true,

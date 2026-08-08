@@ -5,7 +5,7 @@ Allow: /proof_to_pilot.html
 Allow: /evidence/
 Allow: /external_review.html
 Allow: /build_week/prooflock_console/
-Allow: /assets/lumencore-mark.svg
+Allow: /assets/lumaarc_arc_seal_v1.png
 Disallow: /api/
 Disallow: /auth/
 Disallow: /ws/

@@ -22,9 +22,34 @@ def test_five_canonical_surfaces_share_identity_and_runtime_layer():
     for surface in PAGES:
         body = page(surface)
         assert f'data-luma-surface="{surface}"' in body
+        assert '/assets/lumaarc_arc_seal_v1.png' in body
         assert "assets/luma_institutional_surface.css" in body
         assert "assets/luma_institutional_surface.js" in body
         assert "assets/luma_command_fabric.js" in body
+
+
+def test_founder_confirmed_lumaarc_is_the_shared_dashboard_mark():
+    asset_name = "lumaarc_arc_seal_v1.png"
+    public_mark = DASHBOARD / "assets" / asset_name
+    brand_master = ROOT / "assets" / "brand" / asset_name
+    assert public_mark.read_bytes() == brand_master.read_bytes()
+
+    shared_css = (DASHBOARD / "assets" / "luma_institutional_surface.css").read_text(
+        encoding="utf-8"
+    )
+    shared_fabric = (DASHBOARD / "assets" / "luma_command_fabric.js").read_text(
+        encoding="utf-8"
+    )
+    assert asset_name in shared_css
+    assert asset_name in shared_fabric
+    assert "lumencore-mark.svg" not in shared_css
+    assert "lumencore-mark.svg" not in shared_fabric
+
+    assert "LUMEN<span>CORE</span>" in page("home")
+    assert "<h1>LUMENCORE</h1>" in page("mission")
+    assert "LUMENCORE / QUANT LAB" in page("quant")
+    assert "Lumen<span>Core</span>" in page("trade")
+    assert "LUMENCORE / GRANTS" in page("grants")
 
 
 def test_operator_surfaces_are_not_search_index_targets():
@@ -59,6 +84,34 @@ def test_public_home_sells_one_bounded_assurance_sequence():
     assert "No guaranteed eligibility, award, legal advice, certification" in home
     assert "final submission" in home
     assert 'href="/opportunity_sprint.html"' in home
+
+
+def test_public_browser_path_uses_only_minimal_public_runtime_contracts():
+    home = page("home")
+    assert "/api/public/status" in home
+    assert "/api/snapshot" not in home
+    assert 'href="/mission_control.html"' not in home
+    assert 'href="/external_review.html"' in home
+    assert "LIVE ORDERS NOT AUTHORIZED" in home
+    assert "operational detail remains token-protected" in home
+
+    fabric = (DASHBOARD / "assets" / "luma_command_fabric.js").read_text(
+        encoding="utf-8"
+    )
+    assert "var isOperatorSurface" in fabric
+    public_update = fabric.split("function updatePublicStatus()", 1)[1].split(
+        "function updateOperatorStatus()", 1
+    )[0]
+    operator_update = fabric.split("function updateOperatorStatus()", 1)[1].split(
+        "function updateStatus()", 1
+    )[0]
+    assert 'fetchJson("/health")' in public_update
+    assert 'fetchJson("/api/public/status")' in public_update
+    assert "/api/snapshot" not in public_update
+    assert 'surface: "public"' in public_update
+    assert 'snapshot: null' in public_update
+    assert 'fetchJson("/api/snapshot")' in operator_update
+    assert 'surface: "operator"' in operator_update
 
 
 def test_opportunity_sprint_is_buyable_bounded_and_human_gated():

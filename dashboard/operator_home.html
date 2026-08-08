@@ -8,7 +8,7 @@
 <meta name="robots" content="index,follow,max-image-preview:large">
 <title>LumenCore | Proof-Backed Decision Infrastructure</title>
 <link rel="canonical" href="https://lumen-core.ai/">
-<link rel="icon" href="/assets/lumencore-mark.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/lumaarc_arc_seal_v1.png" type="image/png">
 <link rel="manifest" href="/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,10 +64,10 @@
 <body data-luma-surface="home">
 <main class="home">
   <nav class="nav" aria-label="Primary">
-    <div class="brand lis-home-brand"><img src="./assets/lumencore-mark.svg" alt="">LUMEN<span>CORE</span></div>
+    <div class="brand lis-home-brand"><img src="./assets/lumaarc_arc_seal_v1.png" alt="LumaArc seal">LUMEN<span>CORE</span></div>
     <div class="navlinks">
       <a class="btn" href="/proof_to_pilot.html">Proof</a>
-      <a class="btn" href="/mission_control.html">Status</a>
+      <a class="btn" href="/external_review.html">External Review</a>
       <a class="btn primary" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20bounded%20technical%20review">Request Review</a>
     </div>
   </nav>
@@ -230,27 +230,29 @@
 <script src="./assets/luma_institutional_surface.js"></script>
 <script src="./assets/luma_command_fabric.js"></script>
 <script>
-async function updateRuntimeStamp() {
+async function updatePublicGatewayStamp() {
+  const mode = document.getElementById('mode');
+  mode.textContent = 'PUBLIC REVIEW MODE · LIVE ORDERS NOT AUTHORIZED';
   try {
-    const response = await fetch('/api/snapshot', {cache: 'no-store'});
+    const response = await fetch('/api/public/status', {cache: 'no-store'});
     if (!response.ok) throw new Error(String(response.status));
-    const snapshot = await response.json();
-    const gate = snapshot.runtime?.execution_gate || {};
-    const live = gate.execution_authorized === true;
-    const mode = document.getElementById('mode');
-    mode.textContent = live
-      ? 'RUNTIME REPORTS LIVE EXECUTION AUTHORIZED · REVIEW CLAIM BOUNDARIES'
-      : 'PUBLIC REVIEW MODE · LIVE ORDERS NOT AUTHORIZED';
-    mode.className = 'mode ' + (live ? 'warn' : 'good');
+    const status = await response.json();
+    if (
+      status.status !== 'ok' ||
+      status.service !== 'luma-experience-gateway' ||
+      status.access_boundary !== 'operator_api_v1' ||
+      status.public_surface !== 'minimal'
+    ) throw new Error('unexpected public status contract');
+    mode.className = 'mode good';
     document.getElementById('stamp').textContent =
-      'runtime snapshot ' + String(snapshot.generated_utc || 'timestamp unavailable') +
-      ' · public evidence remains bounded by its capsule';
+      'public gateway liveness confirmed · operational detail remains token-protected';
   } catch (error) {
+    mode.className = 'mode warn';
     document.getElementById('stamp').textContent =
-      'runtime API unavailable · static Proof Capsule review remains available';
+      'dynamic gateway unavailable · static Proof Capsule review remains available';
   }
 }
-updateRuntimeStamp();
+updatePublicGatewayStamp();
 </script>
 </body>
 </html>

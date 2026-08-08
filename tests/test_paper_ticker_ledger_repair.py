@@ -121,6 +121,8 @@ def test_repair_workflow_is_manual_current_main_and_secret_gated() -> None:
     assert '[[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]' in text
     assert '[[ "$(git rev-parse origin/main)" == "$RELEASE_COMMIT" ]]' in text
     assert "secrets.LUMA_HUMAN_UNLOCK_TOKEN" in text
+    assert "Repository secret LUMA_HUMAN_UNLOCK_TOKEN is missing" in text
+    assert "no VPS change was attempted" in text
     assert "LUMENCORE_HUMAN_UNLOCK_FILE='$REMOTE_STAGE/human-unlock'" in text
     assert 'LUMA_HUMAN_UNLOCK_TOKEN="$(cat' not in text
     assert "StrictHostKeyChecking=yes" in text

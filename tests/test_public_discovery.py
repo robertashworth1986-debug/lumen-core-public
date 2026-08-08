@@ -67,7 +67,7 @@ class PublicDiscoveryTests(unittest.TestCase):
         self.assertTrue(pairs_seen)
         self.assertEqual(payload["start_url"], "/")
         self.assertEqual(payload["scope"], "/")
-        self.assertEqual(payload["icons"][0]["src"], "/assets/lumencore-mark.svg")
+        self.assertEqual(payload["icons"][0]["src"], "/assets/lumaarc_arc_seal_v1.png")
         self.assertNotIn("screenshots", payload)
         self.assertEqual(
             payload,
@@ -88,15 +88,13 @@ class PublicDiscoveryTests(unittest.TestCase):
                 text = (DASHBOARD / relative).read_text(encoding="utf-8")
                 self.assertIn('name="robots" content="index,follow,max-image-preview:large"', text)
                 self.assertIn(f'rel="canonical" href="{canonical}"', text)
-                self.assertIn('rel="icon" href="/assets/lumencore-mark.svg"', text)
+                self.assertIn('rel="icon" href="/assets/lumaarc_arc_seal_v1.png"', text)
                 self.assertIn('rel="manifest" href="/manifest.json"', text)
 
-    def test_public_mark_is_accessible_svg_without_script(self):
-        text = (DASHBOARD / "assets" / "lumencore-mark.svg").read_text(encoding="utf-8")
-        root = ET.fromstring(text)
-        self.assertTrue(root.tag.endswith("svg"))
-        self.assertNotIn("<script", text.casefold())
-        self.assertIn("LumenCore mark", text)
+    def test_public_mark_is_exact_founder_confirmed_lumaarc_asset(self):
+        public_mark = DASHBOARD / "assets" / "lumaarc_arc_seal_v1.png"
+        brand_master = ROOT / "assets" / "brand" / "lumaarc_arc_seal_v1.png"
+        self.assertEqual(public_mark.read_bytes(), brand_master.read_bytes())
 
     def test_reviewer_docket_is_strict_bounded_and_machine_readable(self):
         path = DASHBOARD / "reviewer_docket.json"

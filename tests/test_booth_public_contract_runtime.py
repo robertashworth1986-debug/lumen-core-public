@@ -293,6 +293,8 @@ def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None
     assert "VPS_KNOWN_HOSTS" in workflow
     assert "StrictHostKeyChecking=yes" in workflow
     assert "secrets.LUMA_HUMAN_UNLOCK_TOKEN" in workflow
+    assert "Repository secret LUMA_HUMAN_UNLOCK_TOKEN is missing" in workflow
+    assert "no VPS change was attempted" in workflow
     assert "LUMENCORE_HUMAN_UNLOCK_FILE='$REMOTE_STAGE/human-unlock'" in workflow
     assert 'LUMA_HUMAN_UNLOCK_TOKEN="$(cat' not in workflow
     assert "LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256" in workflow

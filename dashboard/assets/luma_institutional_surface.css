@@ -91,7 +91,7 @@ body[data-luma-surface] :is(.lis-brand-mark, .brand .logo, .ql-logo, .lc-brand .
   flex: 0 0 42px;
   border: 1px solid rgba(102, 246, 223, 0.28) !important;
   border-radius: 13px !important;
-  background: rgba(4, 12, 25, 0.9) url("./lumencore-mark.svg") center / 31px 31px no-repeat !important;
+  background: #000 url("./lumaarc_arc_seal_v1.png") center / 40px 40px no-repeat !important;
   box-shadow: 0 0 0 1px rgba(114, 170, 255, 0.06), 0 13px 36px rgba(0, 0, 0, 0.32), 0 0 24px rgba(102, 246, 223, 0.08) !important;
   animation: none !important;
 }
@@ -108,8 +108,11 @@ body[data-luma-surface] :is(.brand .logo, .ql-logo, .lc-brand .lc-logo, .luma-lo
 
 .lis-home-brand img {
   display: block;
-  width: 30px;
-  height: 30px;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 11px;
+  filter: drop-shadow(0 0 12px rgba(102, 246, 223, 0.2));
 }
 
 /* Shared evidence posture rail */
