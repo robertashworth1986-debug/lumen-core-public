@@ -1,0 +1,27 @@
+{
+  "schema": "lumencore.public_deadline_gate.v1",
+  "evaluated_utc": "2026-07-27T20:12:08Z",
+  "opportunity": {
+    "solicitation_id": "NSF 26-510",
+    "title": "NSF SBIR/STTR Phase I, Phase II, and Fast-Track Programs",
+    "official_url": "https://www.nsf.gov/funding/opportunities/small-business-innovation-research-small-business-technology/nsf26-510/solicitation",
+    "deadline_date": "2026-07-27",
+    "official_cutoff_rule": "5:00 PM submitting organization's local time",
+    "next_deadline_date": "2026-11-04"
+  },
+  "mailbox_reconciliation": {
+    "official_project_pitch_invitation_count": 0,
+    "checked_utc": "2026-07-27T20:12:08Z",
+    "private_identifiers_excluded": true
+  },
+  "submission_state": "NO_ELIGIBLE_FULL_PROPOSAL_ROUTE",
+  "decision": "BLOCKED_NO_OFFICIAL_PROJECT_PITCH_INVITATION",
+  "external_action_authorized": false,
+  "claim_boundaries": [
+    "The official solicitation requires a Phase I or Fast-Track Project Pitch invitation before a full proposal.",
+    "No official Project Pitch invitation was found in the full-mailbox reconciliation.",
+    "The submitting organization's controlling local timezone is not recorded in this public receipt.",
+    "Document readiness cannot cure the missing invitation gate."
+  ],
+  "safest_next_action": "Do not attempt a July 27 full proposal. Select one bounded research lane and prepare a truthful Project Pitch for the November 4, 2026 cycle."
+}

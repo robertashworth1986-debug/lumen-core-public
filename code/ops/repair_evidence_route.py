@@ -42,10 +42,15 @@ class RepairResult:
 
 def _safe_document_root(path: Path | str) -> str:
     value = str(path)
-    if not SAFE_ROOT_PATTERN.fullmatch(value):
+    segments = value.split("/")
+    if (
+        not SAFE_ROOT_PATTERN.fullmatch(value)
+        or "//" in value
+        or any(segment in {".", ".."} for segment in segments)
+    ):
         raise RouteRepairError(
-            "document root must be an absolute path containing only "
-            "letters, digits, dot, underscore, slash, or hyphen"
+            "document root must be a traversal-free absolute POSIX path "
+            "containing only letters, digits, dot, underscore, slash, or hyphen"
         )
     return value.rstrip("/") or "/"
 

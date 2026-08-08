@@ -1,0 +1,90 @@
+{
+  "schema": "lumencore.argos_partner_dispatch_gate.v1",
+  "generated_utc": "2026-07-27T23:28:38Z",
+  "opportunity": {
+    "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+    "official_notice_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
+    "government_deadline_utc": "2026-07-30T21:00:00Z",
+    "partner_interest_target_utc": "2026-07-28T17:00:00Z"
+  },
+  "template_selection": {
+    "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY",
+    "registry_path": "grant_submissions/funding_sprint_20260709/OUTREACH_RESPONSE_TEMPLATE_REGISTRY_2026-07-18.json",
+    "registry_source_config_sha256": "CBE13CCC77BAFA44F75394970DFB80FEA5BA17D67665A486892A4B6CFF6372E3",
+    "template_canonical_sha256": "79D3C96AFF6D9D0C68CF665A499EBD819E7BA66ED10B1A3C094ED2D20C907A6E",
+    "relationship": "OPPORTUNITY_SPECIFIC_SPECIALIZATION",
+    "exact_template_render_used": false,
+    "message_body_independently_hash_bound": true,
+    "required_controls_preserved": [
+      "VERIFIED_PUBLIC_PARTNER_ROUTE",
+      "OFFICIAL_OPPORTUNITY_URL",
+      "OFFICIAL_TIMEZONE_AWARE_DEADLINE",
+      "EXPLICIT_QUALIFICATION_BOUNDARY",
+      "WRITTEN_PARTNER_AUTHORITY_REQUIRED",
+      "NO_ATTACHMENTS",
+      "FRESH_DUPLICATE_RECHECK_BEFORE_SEND",
+      "SINGLE_USE_ACTION_TIME_APPROVAL"
+    ]
+  },
+  "recipient_route": {
+    "organization": "EMI Advisors LLC",
+    "named_addressee": "Evelyn Gallego",
+    "route_type": "PUBLIC_CORPORATE_PARTNERSHIP_CONTACT",
+    "official_contact_source": "https://www.emiadvisors.net/contact-us",
+    "official_partnership_source": "https://www.emiadvisors.net/",
+    "public_route_verified": true,
+    "recipient_address_stored_in_public_gate": false
+  },
+  "message": {
+    "subject": "Time-sensitive teaming inquiry - HHS Project Argos sources sought",
+    "body_path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_INQUIRY_BODY.md",
+    "body_sha256": "a102bbd27e2bafba744d0fd1ade40565f2d8a97b970a0962344e5e70776ec6e2",
+    "body_bytes": 2067,
+    "official_notice_link_present": true,
+    "duplicate_disclosure_present": true,
+    "attachment_count": 0,
+    "cc_count": 0,
+    "bcc_count": 0
+  },
+  "mailbox_duplicate_preflight": {
+    "checked_utc": "2026-07-27T19:34:13Z",
+    "search_scope": "ALL_MAIL_EXACT_SUBJECT_OR_RECIPIENT_OR_NOTICE",
+    "matching_messages_before_draft": 0,
+    "decision": "NO_DUPLICATE_FOUND"
+  },
+  "fresh_duplicate_recheck": {
+    "checked_utc": "2026-07-27T23:28:38Z",
+    "search_scope": "ALL_MAIL_EXACT_SUBJECT_OR_RECIPIENT_OR_NOTICE",
+    "matching_message_count": 1,
+    "matching_current_draft_count": 1,
+    "matching_sent_or_received_count": 0,
+    "decision": "NO_DUPLICATE_ONLY_CURRENT_DRAFT"
+  },
+  "gmail_draft_receipt": {
+    "created_utc": "2026-07-27T19:34:27Z",
+    "updated_utc": "2026-07-27T22:37:57Z",
+    "readback_checked_utc": "2026-07-27T23:28:38Z",
+    "draft_present": true,
+    "subject_matches": true,
+    "body_matches_source_after_newline_normalization": true,
+    "recipient_route_matches": true,
+    "attachment_count": 0,
+    "cc_count": 0,
+    "bcc_count": 0,
+    "gmail_identifiers_stored_in_public_gate": false,
+    "sent": false
+  },
+  "controls": {
+    "draft_creation_authorizes_send": false,
+    "single_use_action_time_approval_required": true,
+    "fresh_duplicate_recheck_required_before_send": true,
+    "final_subject_body_recipient_and_attachment_set_must_match": true,
+    "partner_name_use_in_government_response_requires_written_authorization": true,
+    "approval_binding_required": true,
+    "approval_window_seconds": 300,
+    "dispatch_binding_path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json",
+    "builder_can_send": false
+  },
+  "decision": "GMAIL_DRAFT_READY_SEND_BLOCKED",
+  "safest_next_action": "Review the exact Gmail draft. Before sending, repeat the full-mailbox duplicate search and draft readback, rebuild the companion dispatch binding, verify its five-minute window is current, and obtain single-use action-time approval for the displayed recipient route, exact subject, exact body SHA-256, and zero-attachment set."
+}

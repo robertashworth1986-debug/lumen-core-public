@@ -1,6 +1,6 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-08-06 UTC
+**State date:** 2026-08-07 UTC
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
@@ -13,17 +13,19 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 ### 1. EPRI / Open Power AI Consortium onboarding
 
-**State:** EPRI issued the Open Power AI Consortium MOU through DocuSign on July 23. The agreement is not yet reviewed, signed, or executed.
+**State:** Consortium onboarding is active under a private controlling agreement. Exact agreement status, dates, named-party terms, IP terms, and publicity terms remain in the private legal record. This lane is not funding, an award, an endorsement, independent validation, or permission to make broader public claims.
 
-**Existing asset:** The existing Gmail thread contains the legal-party and signatory information, EPRI's issuance confirmation, and the DocuSign routing notice.
+**Existing asset:** The private agreement and existing Gmail thread are the controlling records. One bounded reply supplied the two requested logo variants with permission limited to the described consortium-material use. On August 4, EPRI/OPAI replied that no extra contribution packet is required and that Robert's presence and contributions to Member Representative Committee and Work Group meetings are enough; optional thoughts or suggestions can be shared during those calls.
 
-**Next allowed action:** Robert reviews the agreement and decides whether to sign it in DocuSign. No email reply, new standalone message, consortium application, crawler expansion, deck, or technical packet is needed unless the agreement raises a question or EPRI asks for something specific. ChatGPT and Codex must not sign or accept the agreement for Robert.
+**Next allowed action:** Attend the recurring Member Representative Committee and selected Work Group meetings, review public/non-proprietary materials, and share bounded thoughts during those calls when useful. Keep IP and publicity actions separately agreement-gated; do not send another onboarding acknowledgment or contribution-path follow-up.
 
 ### 2. One external validation or paid-pilot conversion
 
-**Reviewer doorway:** PR #66 was merged on July 23 at `aed61134407426114148e3201cd357099d155864`. It is the canonical human-and-machine evidence-navigation layer. Route a qualified non-author evaluator through that doorway to the pinned PR #64 package. Do not create another platform or validation package.
+**Reviewer doorway:** PR #66 was merged on July 23 at `aed61134407426114148e3201cd357099d155864`. It is the canonical human-and-machine evidence-navigation layer. PR #74 is the current merged CODECHECK/reviewer package. Route a qualified non-author evaluator through those existing surfaces; do not create another platform or validation package.
 
-**Agent Arena sub-harness:** The August 6 Agent Arena branch now carries one canonical V5 adversarial multi-agent synthetic/replay harness under the proof-to-pilot architecture. V2 adds corrupted telemetry, role dropout, Byzantine proposals, trust-weighted synthesis, and deterministic red-team checks. V3 runs a predeclared candidate-profile tournament only on selection floors/seeds and writes the champion lock before any disjoint holdout result is observed. V4 adds bootstrap confidence intervals, CVaR/worst-tail statistics, win rates, and attack-mode breakdowns. V5 binds scenario, engine, provider, event-chain and Merkle identities into a fail-closed manifest plus execution receipt, and reports remaining regret against a referee-only bounded oracle ceiling. The frozen reference scenario uses six selection floors, two holdout bosses, eight selection seeds, eight disjoint holdout seeds, and a no-red-team ablation. It remains a sub-harness, not a new top-level product, and does not replace PR #64 as the primary independent-execution target. Any positive delta remains synthetic/model evidence until a qualified non-author evaluator independently executes the frozen harness or a buyer supplies an accepted dataset/simulator and baseline.
+**Private external-review follow-up:** After a private technical review, a prospective collaborator shared private product documentation, requested LumenCore's thoughts, and proposed another discussion. Keep the counterparty identity and materials out of the public repository. This is not a partnership, customer, paid pilot, endorsement, validation, or permission to publish the material. Reduce any follow-up to one buyer-owned workflow, baseline, metric, data-rights boundary, and go/no-go decision.
+
+**Agent Arena sub-harness:** PR #94 merged the single canonical V5 adversarial multi-agent synthetic/replay harness into `main`. It tests seven specialist roles under corrupted telemetry, hidden faults, role dropout, Byzantine proposals, predeclared selection-versus-holdout separation, deterministic robustness statistics, and hash-bound custody. The frozen reference scenario uses six selection floors, two holdout bosses, eight selection seeds, eight disjoint holdout seeds, and a no-red-team ablation. It is a secondary stress/holdout harness inside the proof-to-pilot architecture, not a separate product or a replacement for the PR #74 independent-execution target. Positive results remain synthetic/model evidence until a qualified non-author independently executes the frozen harness or a buyer supplies an accepted dataset or simulator, baseline, metric, threshold, and failure rules.
 
 **LANL VISION:** A bounded non-proprietary follow-up package was sent after the July 16 meeting connection was not completed. Wait for a reschedule, a specific information request, an agreement-path owner, or a no-fit decision.
 
@@ -40,8 +42,12 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 | CDC `75D301-26-RFI-73483` | CDC confirmed receipt and said it would follow up. | Wait. |
 | DARPA DICE proposal abstract | The IPTO submission-finalization confirmation establishes receipt. | Inspect BAAT or new inbound status; do not send the stray Gmail draft or a duplicate abstract. |
 | DARPA `SN-26-97` | The package was sent after DARPA confirmed that compliant submissions were welcome. | Wait for substantive contact; do not send the existing reply draft. |
-| DLA MissionWeave `L26BZ-NV011-1380` | Proposal creation is confirmed; final submission is not. The July 22 noon ET deadline passed. | Preserve the packet. Do not claim submission or send a late receipt request. |
+| DLA MissionWeave `DLA26BZ03-NV011` | DLA SBIR/STTR Program Operations confirmed on July 28 that DSIP showed the proposal as `In Progress`, so it was not formally submitted. The July 22 noon ET deadline passed. | Preserve the packet. Do not claim submission or send another status request without a new official ask. |
 | Navy HarborSentinel `DON26BZ03-NV063` | No final-submission receipt was found. The July 22 noon ET deadline passed. | Preserve the packet. Do not claim submission or start late-submission outreach. |
+| HHS Project Argos `ONC-ARGOS-SSN-2026-OS351107` | Exactly one response email was transmitted before the July 30 deadline. An automatic out-of-office reply proves mailbox-system reach only; formal receipt and agency review are not confirmed. | Do not resend. Wait for a substantive HHS request; do not claim receipt, review, selection, award, funding, or validation. |
+| EPRI / Open Power AI Consortium | The MOU was completed by all parties; LumenCore provided its primary contact, initial Work Group representatives, and requested logo variants, and received the recurring Member Representative Committee invitation. EPRI/OPAI replied August 4 that no extra contribution packet is required and that presence and contributions to MRC and Work Group meetings are enough. | Attend meetings and share bounded thoughts during calls when useful; do not follow up again or start another thread. These records support onboarding and bounded meeting participation only, not endorsement, independent validation, an award, funding, broader licensing, utility adoption, approval of a specific claim, or performance. |
+| Nashville EC Fall 2026 TakeOff | EC confirmed receipt of the authorization, electronic signature, and onboarding responses; confirmed everything was received on time; and said the materials would be included with the onboarding submission. EC said Robert is all set for now unless it needs something further. | Do not resend or send another acknowledgment. This confirms timely onboarding-material receipt only. It does not establish payment, a secured spot, program completion, a contract, endorsement, or validation. The separate $125 deposit remains founder-controlled and is due August 14. |
+| Launch Tennessee SBIR/STTR support | Exactly one request for no-cost application support and information about the consultant microgrant was sent July 30. No reply was found. | Wait. Do not treat the request as funding, an award, eligibility confirmation, acceptance, or validation, and do not create a duplicate campaign. |
 
 A receipt proves delivery only. It does not prove selection, technical validation, award, contract, deployment, or government endorsement.
 
@@ -84,7 +90,9 @@ A receipt proves delivery only. It does not prove selection, technical validatio
 - **PR #34** — merged Proof Capsule v2 assurance foundation.
 - **PR #57** — merged public-copy correction; wording cleanup is not technical validation.
 - **PR #66** — merged canonical reviewer and agent doorway; exact-head evidence-graph and order-safety gates passed.
-- **PR #64** — preferred externally executable EIA/CODECHECK consolidation target; no independent execution receipt is present.
+- **PR #74** — merged externally executable EIA/CODECHECK reviewer package; no independent execution receipt is present.
+- **PR #94** — merged Agent Arena V5 synthetic/replay stress and holdout harness; it does not establish field or external validation.
+- **PR #64** — superseded by PR #74 and remains conflicted; do not promote it as the current reviewer target.
 - **PR #49** — focused external-evaluation protocol candidate.
 - **PR #35** — bounded commercial validation-sprint candidate; pricing and traction remain unvalidated.
 
@@ -102,6 +110,16 @@ A new artifact is allowed only when all answers are yes:
 
 Otherwise, update the backlog note and stop.
 
+## Clean-checkout protocol gate
+
+The repository-wide test harness distinguishes ordinary clean-checkout checks
+from four explicitly named publication or retained-artifact checks. Missing
+generated evidence is never treated as a passing validation result: those four
+checks are marked artifact-dependent only until their declared files exist.
+The authoritative reviewer workflow generates its publications and then runs
+the same checks without skips. The frozen CODECHECK source identity remains
+byte-identical to its reviewed commit.
+
 ## Immediate decision
 
-The next founder-facing action is review of the **issued EPRI Open Power AI Consortium MOU**. The next repository action remains a bounded independent execution of the **PR #64** package followed by an immutable third-party receipt; Agent Arena V5 is available as the secondary agentic stress/holdout harness when a reviewer or buyer needs that lane. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized.
+The next founder-facing actions are to attend the **EPRI / Open Power AI** Member Representative Committee and selected Work Group meetings, make the separate founder-controlled EC deposit decision due August 14, and privately review the active external-review material to define one measurable evaluation decision. The EPRI / OPAI contribution-path follow-up is complete and closed to further email; EC has confirmed the onboarding materials were received on time, so neither lane authorizes another acknowledgment or follow-up. The next repository actions are to finish consolidation of the current outreach/Argos stack against merged PR #74 and current `main`, then pursue bounded independent execution through the existing reviewer surface. Agent Arena V5 is only a secondary synthetic fault-injection harness: its locked reference run improves on the weak baseline but fails the absolute zero-violation gate and does not demonstrate Byzantine tolerance. PR #67's duplicate locks and claim boundaries must remain intact. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized; in particular, no duplicate or unsolicited message is authorized.

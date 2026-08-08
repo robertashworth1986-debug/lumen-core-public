@@ -1,0 +1,47 @@
+{
+  "schema": "lumencore.argos_government_response_status.v1",
+  "recorded_utc": "2026-07-29T01:54:02Z",
+  "lane_id": "hhs_project_argos_sources_sought",
+  "status": "SENT_ONCE_AUTOMATIC_MAILBOX_ACK_WAITING_FOR_SUBSTANTIVE_REPLY",
+  "opportunity": {
+    "name": "HHS Project Argos sources sought",
+    "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+    "government_deadline_utc": "2026-07-30T21:00:00Z",
+    "notice_type": "SOURCES_SOUGHT_MARKET_RESEARCH"
+  },
+  "mailbox_observation": {
+    "sent_count": 1,
+    "automatic_acknowledgment_count": 1,
+    "formal_receipt_count": 0,
+    "substantive_inbound_count": 0,
+    "sent_utc": "2026-07-29T01:52:18Z",
+    "automatic_acknowledgment_utc": "2026-07-29T01:54:02Z",
+    "gmail_identifiers_omitted": true,
+    "recipient_address_omitted": true,
+    "message_body_omitted": true,
+    "attachment_count": 1,
+    "cc_count": 0,
+    "bcc_count": 0
+  },
+  "source_and_attachment_binding": {
+    "official_source_rechecked_utc": "2026-07-29T01:42:09Z",
+    "official_source_receipt_sha256": "5479d7db1dc3777d9e6c177f92800bd198392105d46a2cf78c56554c86b8820d",
+    "attachment_filename": "ARGOS_PRIVATE_ACTION_COPY.docx",
+    "attachment_size_bytes": 730579,
+    "attachment_sha256": "459c92db998cc6b7cb9c81064186cbb65dd897261cd3c7f1f1d69a3d38368cc1"
+  },
+  "controls": {
+    "duplicate_send_prohibited": true,
+    "new_campaign_key_prohibited": true,
+    "automatic_acknowledgment_is_formal_receipt": false,
+    "automatic_acknowledgment_is_substantive_review": false,
+    "automatic_acknowledgment_authorizes_follow_up": false,
+    "formal_receipt_confirmed": false,
+    "agency_review_confirmed": false,
+    "selection_award_funding_or_validation_confirmed": false,
+    "action_time_provenance_reconciled": false,
+    "sent_event_cryptographically_anchored_at_action_time": false
+  },
+  "next_action": "Do not resend. Wait for a substantive HHS request and answer only in the existing thread after a fresh duplicate check and exact action-time approval.",
+  "claim_boundary": "This public-safe post-send observation records one Sent copy and one automatic mailbox-system acknowledgment, with the attachment bound to the named official-source receipt. It does not establish immutable action-time provenance, formal receipt, agency review, acceptance, selection, award, funding, endorsement, or independent validation."
+}

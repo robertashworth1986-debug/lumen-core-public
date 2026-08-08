@@ -1,0 +1,133 @@
+{
+  "approval_window": {
+    "current_wall_clock_evaluation_required": true,
+    "expires_utc": "2026-07-27T23:33:38Z",
+    "fresh_mailbox_and_draft_readback_required_for_each_new_window": true,
+    "opened_utc": "2026-07-27T23:28:38Z",
+    "window_seconds": 300
+  },
+  "checks": [
+    {
+      "check_id": "REGISTRY_BINDING",
+      "evidence": "template_id=INITIAL_PARTNER_TEAMING_INQUIRY; template_matches=1; historical_registry_snapshot_preserved=True",
+      "requirement": "The selected teaming template is unchanged and the historical registry snapshot hash is preserved.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "PUBLIC_RECIPIENT_ROUTE",
+      "evidence": "organization=EMI Advisors LLC; public_route_verified=True",
+      "requirement": "The named organization route is public, verified, and address-redacted.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "SUBJECT_SAFETY",
+      "evidence": "subject_chars=65; subject_sha256=80FEEDC1540F859AC970FD32A3F9DFF0E03C5B347130C7FFF2E4E24382C5993B",
+      "requirement": "The exact subject is nonempty, bounded, and header-safe.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "BODY_CUSTODY",
+      "evidence": "body_bytes=2067; body_sha256=A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2",
+      "requirement": "The declared body bytes and SHA-256 match the committed source.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "BODY_BOUNDARIES",
+      "evidence": "required_markers_present=True; official_notice_present=True; forbidden_promotion_phrase_count=0",
+      "requirement": "The body preserves the notice, qualification, no-attachment, duplicate, and nonbinding controls.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "DEADLINE_ORDER",
+      "evidence": "generated_utc=2026-07-27T23:28:38Z; partner_target_utc=2026-07-28T17:00:00Z; government_deadline_utc=2026-07-30T21:00:00Z",
+      "requirement": "The snapshot precedes the partner target, which precedes the Government deadline.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "PRE_DRAFT_DUPLICATE_CHECK",
+      "evidence": "checked_utc=2026-07-27T19:34:13Z; matching_before_draft=0",
+      "requirement": "The full-mailbox preflight found no pre-existing matching message.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "FRESH_DUPLICATE_RECHECK",
+      "evidence": "age_seconds=0; current_drafts=1; sent_or_received=0",
+      "requirement": "The snapshot has one current draft and no sent or received duplicate.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "FRESH_DRAFT_READBACK",
+      "evidence": "age_seconds=0; draft_present=True; sent=False",
+      "requirement": "The current Gmail draft readback matches the exact route, subject, body, and empty attachment set.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ZERO_ATTACHMENT_SET",
+      "evidence": "attachments=0; cc=0; bcc=0",
+      "requirement": "The message, CC, BCC, and attachment counts are all zero.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "MESSAGE_DECLARATIONS",
+      "evidence": "official_notice=True; duplicate_disclosure=True",
+      "requirement": "The public gate records the official-link and duplicate disclosures.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "FAIL_CLOSED_CONTROLS",
+      "evidence": "builder_can_send=False; approval_window_seconds=300",
+      "requirement": "The builder cannot send and the exact approval is binding-scoped and time-limited.",
+      "status": "PASS"
+    }
+  ],
+  "claim_boundary": "This artifact validates one historical draft snapshot and derives a time-limited binding. It does not send email, prove current mailbox state, authorize partner-name use, certify qualifications, submit a Government response, prove receipt, or establish selection, award, funding, field performance, validation, or savings.",
+  "controls": {
+    "approval_phrase_authorizes_send_without_current_validation": false,
+    "builder_can_send": false,
+    "draft_creation_authorizes_send": false,
+    "recipient_route_must_be_reverified_at_send": true,
+    "single_use_action_time_approval_required": true,
+    "subject_body_and_empty_attachment_set_must_match": true
+  },
+  "decision": "VERIFIED_SNAPSHOT_READY_FOR_SINGLE_USE_ACTION_TIME_APPROVAL",
+  "dispatch_binding": {
+    "approval_window_expires_utc": "2026-07-27T23:33:38Z",
+    "approval_window_opened_utc": "2026-07-27T23:28:38Z",
+    "attachment_count": 0,
+    "attachment_set_sha256": "EBD556927E470484600924709BAA4E88A21379E9163BC37AB00E4AAD4886BEA8",
+    "bcc_count": 0,
+    "binding_sha256": "D363D349B1E9D99F3DE3981192FB7AE4F5FE63DA3B07268E742354CF626D5B27",
+    "body_bytes": 2067,
+    "body_sha256": "A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2",
+    "cc_count": 0,
+    "gmail_route_readback_receipt_sha256": "30AAE30AC10956C5B708F1961643CE2F68BDFF7A3D33C41B1F702FE95F558808",
+    "government_deadline_utc": "2026-07-30T21:00:00Z",
+    "mailbox_duplicate_receipt_sha256": "381391BE09CC88FE30D53CAD3014C3DCC6FEF90CDD701CF67A8342FA43F1A731",
+    "official_notice_url_sha256": "9655DC0EB06A53B7D4387A84FDF57A6DD312C60F2236A2962ACEDDAFF38973DB",
+    "partner_interest_target_utc": "2026-07-28T17:00:00Z",
+    "recipient_route_sha256": "9F6DD46B05DE97D56576B7A128511E61FA9F00F73275D2E15DFB1B286BF6ADCE",
+    "registry_source_config_sha256": "CBE13CCC77BAFA44F75394970DFB80FEA5BA17D67665A486892A4B6CFF6372E3",
+    "schema": "lumencore.initial_outreach_dispatch_binding_core.v1",
+    "single_use": true,
+    "subject_sha256": "80FEEDC1540F859AC970FD32A3F9DFF0E03C5B347130C7FFF2E4E24382C5993B",
+    "template_canonical_sha256": "79D3C96AFF6D9D0C68CF665A499EBD819E7BA66ED10B1A3C094ED2D20C907A6E",
+    "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY"
+  },
+  "exact_action_time_approval_phrase": "APPROVE ONE ARGOS TEAMING DISPATCH: recipient EMI Advisors LLC / Evelyn Gallego; template INITIAL_PARTNER_TEAMING_INQUIRY; binding SHA-256 D363D349B1E9D99F3DE3981192FB7AE4F5FE63DA3B07268E742354CF626D5B27; subject SHA-256 80FEEDC1540F859AC970FD32A3F9DFF0E03C5B347130C7FFF2E4E24382C5993B; body SHA-256 A102BBD27E2BAFBA744D0FD1ADE40565F2D8A97B970A0962344E5E70776EC6E2; attachment set SHA-256 EBD556927E470484600924709BAA4E88A21379E9163BC37AB00E4AAD4886BEA8; expires 2026-07-27T23:33:38Z.",
+  "failed_checks": [],
+  "generated_utc": "2026-07-27T23:28:38Z",
+  "safest_next_action": "At action time, repeat the full-mailbox duplicate search and Gmail draft readback, update the duplicate counts and the separate readback_checked_utc receipt, rebuild this binding, then accept only the newly displayed unexpired exact approval phrase. Do not send if any bound field changes.",
+  "schema": "lumencore.initial_outreach_dispatch_binding.v1",
+  "source_gate": "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json",
+  "source_gate_sha256": "BCBCEE8D16010724439024D2811BA78ADF991E4787439DE8C9E33F06E0E990EA",
+  "summary": {
+    "approval_received": false,
+    "check_count": 12,
+    "external_action_performed": false,
+    "fail_count": 0,
+    "pass_count": 12,
+    "send_authorized": false,
+    "send_performed": false,
+    "snapshot_ready_for_exact_approval": true
+  }
+}

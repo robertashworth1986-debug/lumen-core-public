@@ -1,0 +1,177 @@
+{
+  "schema": "lumencore.external_technical_review_packet_config.v1",
+  "generated_at_utc": "2026-07-28T03:21:15Z",
+  "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
+  "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
+  "controls": {
+    "builder_can_send_email": false,
+    "builder_can_create_calendar_event": false,
+    "builder_can_accept_terms": false,
+    "duplicate_invite_prohibited": true,
+    "meeting_credentials_omitted": true,
+    "recipient_identity_omitted": true,
+    "private_identifiers_omitted": true
+  },
+  "meeting": {
+    "duration_minutes": 30,
+    "objective": "Obtain specific product, evidence, deployment, and go-to-market criticism and define one bounded external evaluation if the reviewer sees a credible fit.",
+    "invite_state": "ACCEPTED",
+    "selected_template_id": "NO_DUPLICATE_MEETING_PREP",
+    "opening_statement": "LumenCore is a proof-to-pilot infrastructure layer for turning complex technical work into inspectable evidence packages. The immediate question is not whether the whole platform is proven; it is which narrow buyer problem and evaluation would be credible enough to test next.",
+    "requested_outcome": "A written recommendation naming the strongest first buyer, the narrowest valuable problem, the incumbent baseline, the acceptance metric, the evidence still missing, and one practical next introduction or experiment."
+  },
+  "evidence_assets": [
+    {
+      "path": "QUICKSTART.md",
+      "purpose": "Five-minute public reproduction entry point."
+    },
+    {
+      "path": "docs/PROOF_CAPSULE_SCHEMA.md",
+      "purpose": "Proof Capsule field, hash, and verification contract."
+    },
+    {
+      "path": "examples/proof_capsule/dice_eia_public_capsule.json",
+      "purpose": "Concrete bounded public-data capsule example."
+    },
+    {
+      "path": "code/proof_capsule_verifier.py",
+      "purpose": "Local verifier used to inspect capsule integrity."
+    },
+    {
+      "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+      "purpose": "Bounded first-party reproducibility receipt.",
+      "required_status": "BOUNDED_REPRODUCIBILITY_PASS"
+    },
+    {
+      "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/runtime_receipt.json",
+      "purpose": "Recorded first-party reviewer runtime receipt.",
+      "required_status": "AUTHORITATIVE_RUNTIME_PASS"
+    },
+    {
+      "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/container_rebuild_receipt.json",
+      "purpose": "Operator-controlled container rebuild receipt.",
+      "required_status": "OPERATOR_CONTAINER_REBUILD_PASS"
+    }
+  ],
+  "public_surfaces": [
+    {
+      "label": "Reviewer home",
+      "url": "https://lumen-core.ai/",
+      "observed_http_status": 200,
+      "verified_at_utc": "2026-07-28T03:21:15Z",
+      "demo": true,
+      "limitation": "A successful HTTP response proves reachability at the observation time, not uptime, adoption, or product acceptance."
+    },
+    {
+      "label": "ProofLock Console",
+      "url": "https://lumen-core.ai/build_week/prooflock_console/",
+      "observed_http_status": 200,
+      "verified_at_utc": "2026-07-28T03:21:15Z",
+      "demo": true,
+      "limitation": "The public console is a demonstrator and does not prove external validation or production readiness."
+    },
+    {
+      "label": "Mission Control",
+      "url": "https://lumen-core.ai/mission_control.html",
+      "observed_http_status": 200,
+      "verified_at_utc": "2026-07-28T03:21:15Z",
+      "demo": false,
+      "limitation": "The page is a public status surface; its existence is not evidence that every underlying service is healthy."
+    },
+    {
+      "label": "Funding dashboard",
+      "url": "https://lumen-core.ai/grants.html",
+      "observed_http_status": 200,
+      "verified_at_utc": "2026-07-28T03:21:15Z",
+      "demo": false,
+      "limitation": "The dashboard reports workflow state and does not establish eligibility, submission, selection, or award."
+    },
+    {
+      "label": "Dynamic health endpoint",
+      "url": "https://lumen-core.ai/health",
+      "observed_http_status": 502,
+      "verified_at_utc": "2026-07-28T03:21:15Z",
+      "demo": false,
+      "limitation": "The dynamic gateway is currently degraded and must not be represented as healthy."
+    }
+  ],
+  "draft_references": [
+    {
+      "label": "Engine commercialization audit",
+      "url": "https://github.com/robertashworth1986-debug/lumen-core-public/pull/77",
+      "state": "DRAFT_PR_NOT_MERGED",
+      "use": "Optional discussion aid for product-lane prioritization; do not describe it as main-branch state."
+    }
+  ],
+  "agenda": [
+    {
+      "minutes": "0-3",
+      "purpose": "Frame the decision",
+      "content": "State the narrow review request, current limitations, and desired written outcome."
+    },
+    {
+      "minutes": "3-10",
+      "purpose": "Show the evidence path",
+      "content": "Walk through the reviewer home, Quickstart, one Proof Capsule, and its verifier."
+    },
+    {
+      "minutes": "10-18",
+      "purpose": "Stress-test product fit",
+      "content": "Ask which buyer problem is urgent enough to fund and which platform claims are still too broad."
+    },
+    {
+      "minutes": "18-25",
+      "purpose": "Define a bounded evaluation",
+      "content": "Lock one authorized dataset, one named incumbent baseline, metrics, exclusions, stop rules, and a negative-result policy."
+    },
+    {
+      "minutes": "25-30",
+      "purpose": "Commit the next step",
+      "content": "Record one owner, one deliverable, one due date, and whether a relevant introduction is appropriate."
+    }
+  ],
+  "reviewer_questions": [
+    "Which single buyer and problem should LumenCore pursue first, and why would that buyer act now?",
+    "What is the strongest current proof, and what evidence would you refuse to rely on?",
+    "Which incumbent workflow or named baseline should a first evaluation compare against?",
+    "What acceptance metric and minimum improvement would make the evaluation decision-relevant?",
+    "Which security, deployment, data-rights, support, or procurement gap blocks a paid pilot today?",
+    "What should be removed or de-emphasized because it distracts from the first credible offer?",
+    "Who is the right independent evaluator or design partner for the resulting narrow scope?"
+  ],
+  "bounded_next_steps": [
+    "Reviewer supplies written red-team notes only.",
+    "Reviewer helps define one preregistered evaluation using authorized data and a named baseline.",
+    "Reviewer introduces one qualified design partner after reviewing the evidence boundary.",
+    "No fit is found; record why and close the lane without implying endorsement."
+  ],
+  "known_gaps": [
+    "The dynamic public health endpoint returned HTTP 502 at the recorded observation time.",
+    "The reproducibility receipts are first-party or operator-controlled, not independent external validation.",
+    "The engine commercialization inventory is in a draft pull request and is not main-branch state.",
+    "No recurring subscription, buyer acceptance, field deployment, realized savings, or valuation is established."
+  ],
+  "claims_not_to_make": [
+    "institutional grade",
+    "production ready",
+    "independently validated",
+    "proven savings",
+    "accepted by agencies",
+    "subscription ready",
+    "best in class",
+    "guaranteed contract or investment"
+  ],
+  "note_capture_fields": [
+    "reviewer_observation",
+    "evidence_cited",
+    "evidence_rejected",
+    "buyer_and_problem",
+    "baseline",
+    "acceptance_metric",
+    "blocking_gap",
+    "next_action",
+    "owner",
+    "due_date",
+    "permission_to_follow_up"
+  ]
+}

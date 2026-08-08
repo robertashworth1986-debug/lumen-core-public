@@ -1,0 +1,173 @@
+{
+  "schema": "lumencore.deadline_action_sentinel_config.v1",
+  "controls": {
+    "read_only_builder": true,
+    "autonomous_email_send_allowed": false,
+    "autonomous_portal_action_allowed": false,
+    "autonomous_agreement_acceptance_allowed": false,
+    "autonomous_payment_allowed": false,
+    "autonomous_signature_allowed": false,
+    "autonomous_certification_allowed": false,
+    "authenticated_portal_session_use_allowed": false,
+    "action_time_human_approval_required": true,
+    "unknown_deadline_time_fail_closed": true,
+    "duplicate_recheck_required_before_external_send": true
+  },
+  "prohibited_actions": [
+    "SEND_EMAIL",
+    "OPEN_AUTHENTICATED_PORTAL",
+    "CHANGE_PORTAL_ANSWER",
+    "UPLOAD_FILE",
+    "ACCEPT_AGREEMENT",
+    "SIGN",
+    "CERTIFY",
+    "SUBMIT",
+    "PAY"
+  ],
+  "alert_window_hours": 120,
+  "lanes": [
+    {
+      "id": "DAF_CSDR_20260727",
+      "title": "DAF CSDR Support and Curation CSO",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "deadline": {
+        "precision": "EXACT",
+        "iso_utc": "2026-07-27T17:00:00Z",
+        "local_display": "July 27, 2026 at 1:00 PM EDT",
+        "timezone": "America/New_York",
+        "cutoff_time_known": true,
+        "timezone_known": true
+      },
+      "source_binding": {
+        "kind": "REPOSITORY_GATE",
+        "path": "evidence/opportunity/csdr_deadline_gate_2026-07-27.json",
+        "deadline_field": "opportunity.deadline_utc",
+        "status_field": "decision",
+        "required_status": "PAST_DEADLINE_NO_LATE_OR_DUPLICATE_ACTION"
+      },
+      "external_action_type": "CAPABILITY_OUTREACH_OR_STEP_1_WHITE_PAPER",
+      "completion_evidence_present": false,
+      "blockers": [
+        "The exact Government deadline has passed.",
+        "No formal Step 1 white-paper receipt is present.",
+        "Direct CSDR and FlexFile delivery experience, qualified cost-data leadership, key personnel, and security qualifications are not established.",
+        "A prior bounded capability email must not be duplicated."
+      ],
+      "safest_next_action": "Do not submit late or duplicate the prior capability email. Monitor only for an inbound request from the Government or a qualified prime."
+    },
+    {
+      "id": "NSF_26_510_20260727",
+      "title": "NSF SBIR/STTR 26-510 full-proposal cycle",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "deadline": {
+        "precision": "DATE_ONLY",
+        "date": "2026-07-27",
+        "cutoff_time_known": false,
+        "timezone_known": false
+      },
+      "source_binding": {
+        "kind": "REPOSITORY_DATE_GATE",
+        "path": "evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json",
+        "deadline_field": "opportunity.deadline_date",
+        "status_field": "decision",
+        "required_status": "BLOCKED_NO_OFFICIAL_PROJECT_PITCH_INVITATION"
+      },
+      "external_action_type": "RESEARCH_GOV_FULL_PROPOSAL",
+      "completion_evidence_present": false,
+      "blockers": [
+        "No official Phase I or Fast-Track Project Pitch invitation was found.",
+        "No eligible full-proposal route or submission receipt is present.",
+        "The submitting organization's controlling local timezone is not bound in the public evidence."
+      ],
+      "safest_next_action": "Do not attempt a July 27 full proposal. Select one bounded research lane and prepare a truthful Project Pitch for the November 4, 2026 cycle."
+    },
+    {
+      "id": "ONC_ARGOS_20260730",
+      "title": "HHS Project Argos Sources Sought",
+      "visibility": "PUBLIC_OPPORTUNITY",
+      "deadline": {
+        "precision": "EXACT",
+        "iso_utc": "2026-07-30T21:00:00Z",
+        "local_display": "July 30, 2026 at 5:00 PM EDT",
+        "timezone": "America/New_York",
+        "cutoff_time_known": true,
+        "timezone_known": true
+      },
+      "source_binding": {
+        "kind": "REPOSITORY_GATE_WITH_OUTREACH_STATUS",
+        "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
+        "deadline_field": "opportunity.deadline_utc",
+        "status_field": "send_gate.decision",
+        "required_status": "BLOCK_SEND",
+        "outreach_status_path": "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json",
+        "required_lane_id": "argos_emi_teaming_inquiry",
+        "required_outreach_status": "SENT_ONCE_POST_SEND_VERIFIED_WAITING_FOR_REPLY",
+        "government_response_status_path": "grant_submissions/funding_sprint_20260709/ARGOS_GOVERNMENT_RESPONSE_STATUS_2026-07-29.json",
+        "required_government_lane_id": "hhs_project_argos_sources_sought",
+        "required_government_response_status": "SENT_ONCE_AUTOMATIC_MAILBOX_ACK_WAITING_FOR_SUBSTANTIVE_REPLY",
+        "required_official_source_receipt_path": "grant_submissions/funding_sprint_20260709/source_attachments/PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json",
+        "required_official_source_receipt_sha256": "5479d7db1dc3777d9e6c177f92800bd198392105d46a2cf78c56554c86b8820d",
+        "required_government_attachment_filename": "ARGOS_PRIVATE_ACTION_COPY.docx",
+        "required_government_attachment_size_bytes": 730579,
+        "required_government_attachment_sha256": "459c92db998cc6b7cb9c81064186cbb65dd897261cd3c7f1f1d69a3d38368cc1"
+      },
+      "external_action_type": "EMAIL_RESPONSE",
+      "completion_evidence_present": false,
+      "blockers": [
+        "One bounded partner inquiry was sent once; the fresh mailbox check found zero current drafts and zero inbound replies, so it must not be resent.",
+        "Exactly one Government capability response was transmitted before the deadline; the automatic reply establishes mailbox-system reach only, not formal receipt or review.",
+        "Provider credential rotation and reachable public Git-history remediation remain required before linking or promoting the public repository.",
+        "No substantive HHS or EMI reply is recorded.",
+        "Written partner authority remains required before using any partner name, role, qualification, or prior performance in a future response."
+      ],
+      "safest_next_action": "Do not resend either Argos message. Wait for a substantive HHS or EMI request, preserve the no-unauthorized-partner and no-public-repository-promotion boundaries, and reply only in the existing thread after a fresh duplicate check and exact action-time approval."
+    },
+    {
+      "id": "NASHVILLE_ONBOARDING_20260731",
+      "title": "Nashville cohort onboarding milestone",
+      "visibility": "PRIVATE_METADATA_ONLY",
+      "deadline": {
+        "precision": "DATE_ONLY",
+        "date": "2026-07-31",
+        "cutoff_time_known": false,
+        "timezone_known": false
+      },
+      "source_binding": {
+        "kind": "PRIVATE_OFFICIAL_INBOUND_STATUS_EVENT",
+        "private_source_excluded": true,
+        "identifiers_excluded": true
+      },
+      "external_action_type": "ONBOARDING_OR_AGREEMENT_ACTION",
+      "completion_evidence_present": true,
+      "completion_evidence_recorded_utc": "2026-08-03T14:19:08Z",
+      "blockers": [
+        "The onboarding receipt does not establish payment of the separate 125 USD deposit or that the cohort spot has been secured."
+      ],
+      "safest_next_action": "Do not resend the onboarding materials or send another acknowledgment. Keep the separate deposit lane founder-controlled and wait for a specific EC request."
+    },
+    {
+      "id": "NASHVILLE_DEPOSIT_20260814",
+      "title": "Nashville cohort deposit milestone",
+      "visibility": "PRIVATE_METADATA_ONLY",
+      "deadline": {
+        "precision": "DATE_ONLY",
+        "date": "2026-08-14",
+        "cutoff_time_known": false,
+        "timezone_known": false
+      },
+      "source_binding": {
+        "kind": "PRIVATE_OFFICIAL_INBOUND_STATUS_EVENT",
+        "private_source_excluded": true,
+        "identifiers_excluded": true
+      },
+      "external_action_type": "PAYMENT_OR_CONFIRMATION_ACTION",
+      "completion_evidence_present": false,
+      "blockers": [
+        "The exact cutoff time and controlling timezone are not established in the retained metadata.",
+        "Payment terms and the official destination require direct human verification.",
+        "No payment or completion receipt is present."
+      ],
+      "safest_next_action": "After onboarding terms are accepted by the user, verify the official payment terms and destination with the user present. Do not enter payment details or pay autonomously."
+    }
+  ]
+}

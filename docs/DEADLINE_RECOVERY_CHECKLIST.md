@@ -1,6 +1,6 @@
 # Deadline Recovery Checklist
 
-Updated: June 11, 2026 (America/Chicago)
+Updated: July 27, 2026 (America/Chicago)
 
 ## Immediate Priority
 
@@ -50,16 +50,23 @@ Status: `BLOCKED_ON_AUTHENTICATED_ENTITY_RECORD`
 
 ### 3. NSF SBIR/STTR
 
-Current path: Project Pitch.
+Current path: Project Pitch for the next full-proposal cycle.
+
+Verified July 27 reconciliation:
+
+- NSF 26-510 requires an official Project Pitch invitation for a Phase I or
+  Fast-Track full proposal.
+- No official invitation was found in the full-mailbox audit.
+- The July 27 full-proposal route is therefore closed by eligibility, not by
+  document quality.
 
 Required action:
 
-1. Complete the Project Pitch with specific customer problem, innovation,
-   technical risk, market, team, and company impact.
+1. Select one bounded research lane and prepare a truthful Project Pitch.
 2. Run the grant preflight and remove every placeholder.
-3. Submit the pitch after final human review.
-4. If invited, prepare the full proposal against the earliest feasible
-   deadline.
+3. Submit the pitch only after final human review.
+4. If invited, prepare the full proposal for the earliest deadline covered by
+   the invitation.
 
 Known full-proposal deadlines:
 
@@ -69,7 +76,7 @@ Known full-proposal deadlines:
 
 The full proposal requires an invitation and active SAM registration.
 
-Status: `ACTIONABLE_NOW`
+Status: `TARGET_NEXT_CYCLE_BLOCKED_NO_INVITATION`
 
 ## Grant Queue Rules
 

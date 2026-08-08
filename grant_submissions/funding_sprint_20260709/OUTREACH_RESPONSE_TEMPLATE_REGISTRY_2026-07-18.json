@@ -1,28 +1,85 @@
 {
   "claim_boundary": "This response is a communication or routing artifact. It does not establish selection, endorsement, independent validation, funding, an award, a contract, deployment, realized savings, or technical performance.",
   "controls": {
+    "action_time_approval_expiry_bounded_by_mailbox_freshness": true,
+    "action_time_approval_window_seconds": 300,
+    "action_time_authorization_builder": "code/ops/BUILD_OUTREACH_ACTION_TIME_AUTHORIZATION.py",
+    "action_time_authorization_builder_can_approve": false,
+    "action_time_authorization_builder_can_send_email": false,
     "action_time_human_review_required": true,
+    "action_time_mailbox_max_age_seconds": 900,
+    "action_time_mailbox_receipt_required": true,
+    "action_time_mailbox_receipt_schema": "lumencore.outreach_action_time_mailbox_receipt.v1",
+    "action_time_mailbox_receipt_template": "config/outreach_action_time_mailbox_receipt_template_v1.json",
+    "action_time_mailbox_receipt_template_sha256": "70FB936BC512465EED9052D833035E22BF6A741B3011DA2B42AC1935D61434DE",
+    "attachment_content_hash_required_for_exact_approval": true,
     "attachment_requires_explicit_request": true,
+    "bounded_confusable_skeleton_scan": true,
     "builder_can_send_email": false,
     "claim_evidence_receipt_schema": "lumencore.outreach_claim_evidence_receipt.v1",
     "claim_evidence_receipt_template": "config/outreach_claim_evidence_receipt_template_v1.json",
     "claim_evidence_source_artifacts_rehashed": true,
+    "claim_negation_requires_direct_scope": true,
+    "claim_scan_diacritic_fold": true,
+    "competing_handoff_reservation_fail_closed": true,
+    "consumed_binding_duplicate_send_allowed": false,
+    "consumption_finalizes_exact_reservation": true,
+    "consumption_receipt_name_bound_to_dispatch_sha256": true,
+    "dispatch_consumption_directory_filesystem_object_bound": true,
+    "dispatch_consumption_directory_identity_hash_bound": true,
+    "dispatch_consumption_directory_reparse_points_prohibited": true,
+    "dispatch_consumption_directory_required": true,
+    "dispatch_consumption_receipt_builder": "code/ops/CAPTURE_OUTREACH_DISPATCH_CONSUMPTION.py",
+    "dispatch_consumption_receipt_builder_can_send_email": false,
+    "dispatch_consumption_receipt_schema": "lumencore.outreach_dispatch_consumption_receipt.v3",
+    "dispatch_consumption_revalidates_private_human_unlock": true,
+    "dispatch_handoff_can_send_email": false,
+    "dispatch_handoff_checks_consumption_directory": true,
+    "dispatch_handoff_cli_clock_override_allowed": false,
+    "dispatch_handoff_cli_uses_system_wall_clock_only": true,
+    "dispatch_handoff_keyed_authentication_algorithm": "HMAC-SHA256",
+    "dispatch_handoff_keyed_authentication_required": true,
+    "dispatch_handoff_requires_exclusive_reservation": true,
+    "dispatch_reservation_schema": "lumencore.outreach_dispatch_reservation.v1",
+    "draft_binding_is_not_send_authorization": true,
+    "duplicate_json_key_fail_closed": true,
     "duplicate_send_fail_closed": true,
+    "evidence_authorized_claim_codes_explicitly_bounded": true,
+    "exact_approval_expires": true,
+    "exact_approval_phrase_is_binding_scoped": true,
+    "guarantee_and_superlative_claims_never_authorizable": true,
     "high_risk_claim_requires_hash_bound_evidence_receipt": true,
     "known_deadline_requires_aware_iso_control": true,
     "missing_fact_fail_closed": true,
+    "mixed_script_confusable_fail_closed": true,
     "overlapping_field_declaration_fail_closed": true,
     "past_deadline_fail_closed": true,
+    "positive_claim_marker_structured_fail_closed": true,
+    "post_send_mailbox_max_age_seconds": 900,
+    "post_send_observation_required_for_consumption": true,
+    "post_send_observation_schema": "lumencore.outreach_post_send_observation.private.v1",
+    "post_send_observation_template": "config/outreach_post_send_observation_template_v1.json",
+    "post_send_observation_template_sha256": "BF233A2ECDD8E379AE01A8EF2129711C2A0E0F4482ACA6250916666765AD1045",
+    "private_human_unlock_required_for_dispatch": true,
     "public_url_requires_https_without_credentials": true,
+    "ready_render_has_dispatch_binding": true,
+    "recipient_route_and_source_thread_hash_bound": true,
     "rendered_deadline_matches_evaluated_deadline": true,
     "rendered_fact_claim_guard_fail_closed": true,
+    "rendered_full_claim_taxonomy_fail_closed": true,
     "rendered_length_limits_fail_closed": true,
     "rendered_subject_header_injection_fail_closed": true,
+    "single_use_action_time_binding": true,
     "source_config_hash_cross_platform_canonical_json": true,
+    "static_template_full_claim_taxonomy_fail_closed": true,
+    "subject_body_deadline_and_attachment_set_hash_bound": true,
     "unchanged_rebuild_byte_stable": true,
+    "unicode_format_character_fail_closed": true,
+    "unicode_nfkd_claim_scan": true,
+    "unrelated_negation_cannot_suppress_claim_gate": true,
     "unused_required_field_fail_closed": true
   },
-  "generated_utc": "2026-07-25T22:53:44Z",
+  "generated_utc": "2026-07-28T16:24:00Z",
   "global_rules": [
     "Ground every reply in the latest inbound message and preserve its thread identifier.",
     "Answer only the question asked; do not append an unrelated pitch or attachment.",
@@ -36,17 +93,19 @@
     "Reject rendered subject lines containing line breaks or other mail-header injection characters.",
     "Require action-time human review for every outbound response."
   ],
-  "private_render_template_count": 11,
+  "private_render_template_count": 13,
   "quality_gate": {
     "all_templates_pass": true,
-    "check_count": 180,
+    "check_count": 270,
     "deadline_control_template_ids": [
       "COMPONENT_INSTRUCTION_ESCALATION",
+      "FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE",
+      "INITIAL_PARTNER_TEAMING_INQUIRY",
       "PORTAL_SUPPORT_DEADLINE_RESCUE"
     ],
-    "https_public_url_field_count": 3,
+    "https_public_url_field_count": 7,
     "status": "PASS",
-    "template_count": 15,
+    "template_count": 18,
     "template_results": [
       {
         "checks": {
@@ -54,6 +113,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -61,6 +121,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -75,6 +137,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -82,6 +145,32 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
+          "template_text_is_within_render_limits": true
+        },
+        "deadline_iso_control_required": false,
+        "failed_checks": [],
+        "https_public_url_fields": [],
+        "status": "PASS",
+        "template_id": "NO_DUPLICATE_MEETING_PREP"
+      },
+      {
+        "checks": {
+          "all_required_fields_are_rendered": true,
+          "all_routing_fields_are_sensitive": true,
+          "field_declarations_are_disjoint": true,
+          "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
+          "known_deadline_uses_single_structured_value": true,
+          "monitor_template_is_content_free": true,
+          "nonrouting_sensitive_fields_force_private_render": true,
+          "sendable_identity_fields_are_required": true,
+          "sendable_recipient_route_is_required": true,
+          "sendable_template_has_greeting_and_signature": true,
+          "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -96,6 +185,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -103,6 +193,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": true,
@@ -117,6 +209,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -124,6 +217,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -138,6 +233,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -145,6 +241,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -159,6 +257,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -166,6 +265,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -180,6 +281,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -187,6 +289,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": true,
@@ -201,6 +305,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -208,6 +313,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -222,6 +329,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -229,6 +337,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -245,6 +355,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -252,6 +363,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -266,6 +379,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -273,6 +387,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -290,6 +406,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -297,6 +414,36 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
+          "template_text_is_within_render_limits": true
+        },
+        "deadline_iso_control_required": true,
+        "failed_checks": [],
+        "https_public_url_fields": [
+          "public_company_url",
+          "public_proof_url",
+          "source_opportunity_url"
+        ],
+        "status": "PASS",
+        "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY"
+      },
+      {
+        "checks": {
+          "all_required_fields_are_rendered": true,
+          "all_routing_fields_are_sensitive": true,
+          "field_declarations_are_disjoint": true,
+          "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
+          "known_deadline_uses_single_structured_value": true,
+          "monitor_template_is_content_free": true,
+          "nonrouting_sensitive_fields_force_private_render": true,
+          "sendable_identity_fields_are_required": true,
+          "sendable_recipient_route_is_required": true,
+          "sendable_template_has_greeting_and_signature": true,
+          "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -311,6 +458,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -318,6 +466,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -332,6 +482,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -339,6 +490,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -353,6 +506,7 @@
           "all_routing_fields_are_sensitive": true,
           "field_declarations_are_disjoint": true,
           "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
           "known_deadline_uses_single_structured_value": true,
           "monitor_template_is_content_free": true,
           "nonrouting_sensitive_fields_force_private_render": true,
@@ -360,6 +514,8 @@
           "sendable_recipient_route_is_required": true,
           "sendable_template_has_greeting_and_signature": true,
           "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
           "template_text_is_within_render_limits": true
         },
         "deadline_iso_control_required": false,
@@ -367,21 +523,47 @@
         "https_public_url_fields": [],
         "status": "PASS",
         "template_id": "MEETING_REBOOK_REQUEST"
+      },
+      {
+        "checks": {
+          "all_required_fields_are_rendered": true,
+          "all_routing_fields_are_sensitive": true,
+          "field_declarations_are_disjoint": true,
+          "field_lists_have_no_duplicates": true,
+          "field_names_are_ascii_identifiers": true,
+          "known_deadline_uses_single_structured_value": true,
+          "monitor_template_is_content_free": true,
+          "nonrouting_sensitive_fields_force_private_render": true,
+          "sendable_identity_fields_are_required": true,
+          "sendable_recipient_route_is_required": true,
+          "sendable_template_has_greeting_and_signature": true,
+          "template_subject_is_single_line": true,
+          "template_text_has_no_unsafe_unicode": true,
+          "template_text_has_no_unsupported_claims": true,
+          "template_text_is_within_render_limits": true
+        },
+        "deadline_iso_control_required": true,
+        "failed_checks": [],
+        "https_public_url_fields": [
+          "official_source_url"
+        ],
+        "status": "PASS",
+        "template_id": "FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE"
       }
     ]
   },
   "schema": "lumencore.outreach_response_template_registry.v1",
   "send_policy_counts": {
-    "HUMAN_ACTION_DUE": 8,
-    "MONITOR_NO_SEND": 1,
+    "HUMAN_ACTION_DUE": 10,
+    "MONITOR_NO_SEND": 2,
     "REPLY_AFTER_FACT_REVIEW": 6
   },
   "source_config": "config/outreach_response_templates_v1.json",
   "source_config_hash_basis": "SORTED_COMPACT_JSON_UTF8",
-  "source_config_sha256": "62DA3B3CAF054B312FB3811DEEB6D5671C275C853037CFCA733B2590475D5034",
-  "source_effective_utc": "2026-07-25T22:53:44Z",
+  "source_config_sha256": "0CFBDA7DFD68AFF39EAB6A07676B0B44B13FB4455A0530FB3B3663F05A19E148",
+  "source_effective_utc": "2026-07-28T16:24:00Z",
   "source_schema": "lumencore.outreach_response_templates.v1",
-  "template_count": 15,
+  "template_count": 18,
   "templates": [
     {
       "attachment_policy": "NONE",
@@ -407,6 +589,29 @@
       "sensitive_fields": [],
       "subject": "",
       "template_id": "NO_DUPLICATE_MONITOR"
+    },
+    {
+      "attachment_policy": "NONE",
+      "body": "",
+      "description": "Use when one calendar invitation already exists and the meeting is confirmed or accepted; prepare evidence and monitor the existing event without sending another reply or invitation.",
+      "inbound_states": [
+        "MEETING_CONFIRMED",
+        "CALENDAR_INVITE_ACCEPTED",
+        "MEETING_PREP_DUE"
+      ],
+      "optional_defaults": {},
+      "private_render_only": false,
+      "reply_triggers": [
+        "SCHEDULE_CHANGE",
+        "NEW_MEETING_QUESTION",
+        "ATTENDANCE_PROBLEM"
+      ],
+      "required_fields": [],
+      "routing_fields": [],
+      "send_policy": "MONITOR_NO_SEND",
+      "sensitive_fields": [],
+      "subject": "",
+      "template_id": "NO_DUPLICATE_MEETING_PREP"
     },
     {
       "attachment_policy": "NONE",
@@ -776,6 +981,49 @@
       "template_id": "DIRECT_INVESTOR_REVIEW_REQUEST"
     },
     {
+      "attachment_policy": "NONE",
+      "body": "Hello {recipient_name},\n\nI am {sender_name}, {sender_title} of {organization_name}. {agency_name} posted {opportunity_name}, a {notice_type}: {opportunity_summary}\n\nThe official response deadline is {deadline_iso}. {teaming_basis}\n\nOur bounded contribution is {bounded_contribution}\n\nQualification boundary: {qualification_boundary}\n\nPartner fit basis: {partner_fit_basis}\n\nWould your organization be open to a rapid fit check for the following role: {requested_partner_role}\n\nBefore either organization is named or any credential is used, we need written confirmation of: {authorization_request}\n\nDuplicate-send check: {duplicate_review_disclosure}\n\nThis inquiry requests a nonbinding fit check only. It does not request pricing, a commitment, or permission to represent an unverified qualification. No attachment is included. A prompt reply would preserve time for both parties to reconcile an accurate response before the official deadline.\n\nOfficial notice: {source_opportunity_url}\nCompany: {public_company_url}\nPublic proof: {public_proof_url}\n\nRespectfully,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Send one no-attachment fit-check to a verified public corporate route for an active opportunity that permits teaming, while preserving qualification and partner-authority boundaries.",
+      "inbound_states": [
+        "VERIFIED_PUBLIC_PARTNER_ROUTE_NO_PRIOR_THREAD"
+      ],
+      "optional_defaults": {},
+      "private_render_only": true,
+      "reply_triggers": [
+        "ONE_INITIAL_BOUNDED_TEAMING_INQUIRY"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "agency_name",
+        "opportunity_name",
+        "notice_type",
+        "opportunity_summary",
+        "deadline_iso",
+        "teaming_basis",
+        "bounded_contribution",
+        "qualification_boundary",
+        "partner_fit_basis",
+        "requested_partner_role",
+        "authorization_request",
+        "duplicate_review_disclosure",
+        "source_opportunity_url",
+        "public_company_url",
+        "public_proof_url",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "sensitive_fields": [
+        "recipient_email"
+      ],
+      "subject": "Time-sensitive teaming inquiry - {opportunity_name}",
+      "template_id": "INITIAL_PARTNER_TEAMING_INQUIRY"
+    },
+    {
       "attachment_policy": "EXPLICIT_REQUEST_ONLY",
       "body": "Hello {recipient_name},\n\nThank you for considering {problem_lane}. We are requesting a bounded review, not an endorsement. The current evidence is internal and has not been independently reproduced.\n\nProposed evaluation scope: {validation_scope}\nProtocol: {protocol_summary}\n\nThe evaluation should lock the incumbent baseline and acceptance metrics before scoring, use reviewer-controlled or authorized data, retain negative results, and separate receipt integrity from substantive performance.\n\nRequested next step: {requested_next_step}\n\nBest regards,\n{sender_name}\n{sender_title}\n{organization_name}",
       "description": "Invite a qualified reviewer to define a bounded, independently reproducible evaluation rather than endorse a broad platform claim.",
@@ -921,6 +1169,47 @@
       ],
       "subject": "Re: {source_subject}",
       "template_id": "MEETING_REBOOK_REQUEST"
+    },
+    {
+      "attachment_policy": "EXPLICIT_REQUEST_ONLY",
+      "body": "Hello {recipient_name},\n\nAttached is {legal_entity_name}'s capability response to {notice_title} ({notice_id}) for {agency_name}. The official response deadline is {deadline_iso}.\n\nOfficial notice: {official_source_url}\nOfficial source rechecked: {official_source_checked_utc}\nSource receipt SHA-256: {official_source_receipt_sha256}\n\nAttachment inventory: {attachment_inventory}\n\nThis response is provided solely for market research. It does not include a price proposal and does not imply a solicitation, reimbursement, Government commitment, selection, or award.\n\nInformation-handling disclosure: {information_handling_disclosure}\n\nPlease confirm receipt only if your process normally provides one; no duplicate response will be sent without a new request.\n\nRespectfully,\n{sender_name}\n{sender_title}\n{organization_name}",
+      "description": "Transmit one capability response explicitly requested by an official sources-sought or market-research notice, with a source-bound deadline, attachment inventory, information-handling disclosure, and exact action-time review.",
+      "inbound_states": [
+        "OFFICIAL_MARKET_RESEARCH_NOTICE_OPEN",
+        "CAPABILITY_RESPONSE_READY_FOR_ACTION_TIME_REVIEW"
+      ],
+      "optional_defaults": {},
+      "private_render_only": true,
+      "reply_triggers": [
+        "OFFICIAL_CAPABILITY_RESPONSE_REQUIRED"
+      ],
+      "required_fields": [
+        "recipient_name",
+        "agency_name",
+        "notice_title",
+        "notice_id",
+        "official_source_url",
+        "official_source_checked_utc",
+        "official_source_receipt_sha256",
+        "deadline_iso",
+        "legal_entity_name",
+        "attachment_inventory",
+        "information_handling_disclosure",
+        "sender_name",
+        "sender_title",
+        "organization_name"
+      ],
+      "routing_fields": [
+        "recipient_email"
+      ],
+      "send_policy": "HUMAN_ACTION_DUE",
+      "sensitive_fields": [
+        "recipient_email",
+        "legal_entity_name",
+        "attachment_inventory"
+      ],
+      "subject": "Sources Sought Response - {notice_id} - {legal_entity_name}",
+      "template_id": "FORMAL_GOVERNMENT_MARKET_RESEARCH_RESPONSE"
     }
   ]
 }

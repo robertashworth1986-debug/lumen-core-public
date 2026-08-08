@@ -1,0 +1,70 @@
+name: Evidence route portability gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'code/ops/repair_evidence_route.py'
+      - 'tests/test_repair_evidence_route.py'
+      - 'conftest.py'
+      - 'tests/test_clean_checkout_artifact_policy.py'
+      - '.github/workflows/evidence-route-portability.yml'
+  pull_request:
+    paths:
+      - 'code/ops/repair_evidence_route.py'
+      - 'tests/test_repair_evidence_route.py'
+      - 'conftest.py'
+      - 'tests/test_clean_checkout_artifact_policy.py'
+      - '.github/workflows/evidence-route-portability.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evidence-route-portability-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  focused-test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.11', '3.13']
+
+    steps:
+      - name: Checkout without retained credentials
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: ''
+
+      - name: Install the pinned test runner
+        run: python -m pip install --disable-pip-version-check pytest==9.1.0
+
+      - name: Compile the bounded repair utility and tests
+        run: >-
+          python -m py_compile
+          code/ops/repair_evidence_route.py
+          tests/test_repair_evidence_route.py
+          conftest.py
+          tests/test_clean_checkout_artifact_policy.py
+
+      - name: Run the focused portability suite
+        run: >-
+          python -m unittest discover
+          -s tests
+          -p "test_repair_evidence_route.py"
+          -v
+
+      - name: Verify the exact clean-checkout policy
+        run: python -m pytest -q tests/test_clean_checkout_artifact_policy.py

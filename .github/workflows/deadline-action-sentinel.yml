@@ -1,0 +1,179 @@
+name: Deadline Action Sentinel Gate
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/deadline-action-sentinel.yml"
+      - ".gitattributes"
+      - "code/ops/BUILD_DEADLINE_ACTION_SENTINEL.py"
+      - "code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py"
+      - "config/deadline_action_sentinel_v1.json"
+      - "config/public_credential_remediation_status_v1.json"
+      - "docs/CURRENT_FEDERAL_OPPORTUNITY_GATE_MAP_2026-07-26.md"
+      - "docs/DEADLINE_RECOVERY_CHECKLIST.md"
+      - "docs/DEADLINE_ACTION_SENTINEL.md"
+      - "evidence/opportunity/csdr_deadline_gate_2026-07-27.json"
+      - "evidence/opportunity/deadline_action_sentinel_latest.json"
+      - "evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json"
+      - "evidence/opportunity/official_status_events_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.md"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_INQUIRY_BODY.md"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.md"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json"
+      - "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json"
+      - "grant_submissions/funding_sprint_20260709/ARGOS_GOVERNMENT_RESPONSE_STATUS_2026-07-29.json"
+      - "grant_submissions/funding_sprint_20260709/source_attachments/PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json"
+      - "grant_submissions/ONC_ARGOS_20260730/README.md"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_conformance_gate.py"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_private_action_copy.py"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py"
+      - "tests/test_current_opportunity_and_argos_packet.py"
+      - "tests/test_deadline_action_sentinel.py"
+      - "tests/test_public_repo_credential_hygiene.py"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/deadline-action-sentinel.yml"
+      - ".gitattributes"
+      - "code/ops/BUILD_DEADLINE_ACTION_SENTINEL.py"
+      - "code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py"
+      - "config/deadline_action_sentinel_v1.json"
+      - "config/public_credential_remediation_status_v1.json"
+      - "docs/CURRENT_FEDERAL_OPPORTUNITY_GATE_MAP_2026-07-26.md"
+      - "docs/DEADLINE_RECOVERY_CHECKLIST.md"
+      - "docs/DEADLINE_ACTION_SENTINEL.md"
+      - "evidence/opportunity/csdr_deadline_gate_2026-07-27.json"
+      - "evidence/opportunity/deadline_action_sentinel_latest.json"
+      - "evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json"
+      - "evidence/opportunity/official_status_events_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FACTS_SCHEMA_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PRIVATE_FINALIZER_READINESS_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_CLAIM_EVIDENCE_MAP_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_BINDING_2026-07-27.md"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_DISPATCH_GATE_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_EMI_TEAMING_INQUIRY_BODY.md"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.json"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_RESPONSE_CONFORMANCE_GATE_2026-07-27.md"
+      - "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json"
+      - "grant_submissions/funding_sprint_20260709/ARGOS_PARTNER_OUTREACH_STATUS_2026-07-28.json"
+      - "grant_submissions/funding_sprint_20260709/ARGOS_GOVERNMENT_RESPONSE_STATUS_2026-07-29.json"
+      - "grant_submissions/funding_sprint_20260709/source_attachments/PROJECT_ARGOS_SOW_OFFICIAL_SOURCE_RECEIPT_2026-07-28.json"
+      - "grant_submissions/ONC_ARGOS_20260730/README.md"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_conformance_gate.py"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_private_action_copy.py"
+      - "grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py"
+      - "tests/test_current_opportunity_and_argos_packet.py"
+      - "tests/test_deadline_action_sentinel.py"
+      - "tests/test_public_repo_credential_hygiene.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deadline-action-sentinel-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fail-closed-deadline-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install focused test dependency
+        run: >-
+          python -m pip install --disable-pip-version-check
+          pytest python-docx==1.2.0 pypdf==6.14.2
+
+      - name: Compile builder and tests
+        run: |
+          python -m py_compile \
+            code/ops/BUILD_DEADLINE_ACTION_SENTINEL.py \
+            code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py \
+            grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py \
+            grant_submissions/ONC_ARGOS_20260730/build_argos_conformance_gate.py \
+            grant_submissions/ONC_ARGOS_20260730/build_argos_private_action_copy.py \
+            grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py \
+            tests/test_deadline_action_sentinel.py \
+            tests/test_public_repo_credential_hygiene.py
+
+      - name: Verify the Argos claim-to-evidence map
+        run: python grant_submissions/ONC_ARGOS_20260730/build_argos_claim_evidence_map.py --check
+
+      - name: Verify the historical Argos teaming binding is exact and expired
+        run: |
+          python grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py --check \
+            > "${RUNNER_TEMP}/argos-historical-binding-check.json"
+          set +e
+          python grant_submissions/ONC_ARGOS_20260730/build_argos_teaming_dispatch_binding.py --action-time-check \
+            > "${RUNNER_TEMP}/argos-historical-binding-action-time.json"
+          action_time_status=$?
+          set -e
+          test "${action_time_status}" -eq 3
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          check_receipt = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "argos-historical-binding-check.json")
+              .read_text(encoding="utf-8")
+          )
+          assert check_receipt == {
+              "status": "CURRENT",
+              "decision": "VERIFIED_SNAPSHOT_READY_FOR_SINGLE_USE_ACTION_TIME_APPROVAL",
+              "check_count": 12,
+              "pass_count": 12,
+              "fail_count": 0,
+              "send_authorized": False,
+              "send_performed": False,
+          }
+          action_time = json.loads(
+              (
+                  Path(os.environ["RUNNER_TEMP"])
+                  / "argos-historical-binding-action-time.json"
+              ).read_text(encoding="utf-8")
+          )
+          assert action_time["approval_window_current"] is False
+          assert action_time["decision"] == "EXPIRED_OR_BLOCKED_REBUILD_REQUIRED"
+          assert action_time["send_authorized"] is False
+          assert action_time["send_performed"] is False
+          PY
+
+      - name: Verify the Argos response conformance gate
+        run: python grant_submissions/ONC_ARGOS_20260730/build_argos_conformance_gate.py --check
+
+      - name: Verify the public-repository credential gate
+        run: python code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py --check
+
+      - name: Verify the committed snapshot is current
+        run: python code/ops/BUILD_DEADLINE_ACTION_SENTINEL.py --check
+
+      - name: Run fail-closed deadline tests
+        run: |
+          python -m pytest \
+            tests/test_current_opportunity_and_argos_packet.py \
+            tests/test_deadline_action_sentinel.py \
+            tests/test_public_repo_credential_hygiene.py \
+            -q

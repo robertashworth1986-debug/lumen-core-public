@@ -1,0 +1,30 @@
+{
+  "schema": "lumencore.public_official_status_events.v1",
+  "evaluated_utc": "2026-07-27T20:12:08Z",
+  "events": [
+    {
+      "lane": "EPRI_OPEN_POWER_AI",
+      "observed_utc": "2026-07-27T17:03:01Z",
+      "event": "MOU_COMPLETED_BY_ALL_PARTIES",
+      "attachment_present": true,
+      "new_deadline_present": false,
+      "reply_required": false,
+      "duplicate_send_allowed": false,
+      "private_identifiers_excluded": true,
+      "safest_next_action": "Preserve the completed document in private legal records and monitor for the separate access-granting or onboarding message. Do not sign or resend the MOU again."
+    },
+    {
+      "lane": "DLA26BZ03_NV011",
+      "observed_utc": "2026-07-27T17:04:49Z",
+      "event": "DSIP_SUPPORT_DIRECTED_AUTHORITATIVE_STATUS_CHECK_TO_PAST_PROPOSALS",
+      "new_deadline_present": false,
+      "reply_required": false,
+      "duplicate_send_allowed": false,
+      "portal_status_verified": false,
+      "private_identifiers_excluded": true,
+      "safest_next_action": "With the user present, perform one read-only check of the DSIP Past Proposals tab and preserve the displayed submission status or receipt. Do not change, upload, certify, or submit anything."
+    }
+  ],
+  "external_action_performed": false,
+  "claim_boundary": "These redacted events preserve official-message status only. They do not prove consortium access, proposal submission, acceptance, selection, award, or portal completion."
+}

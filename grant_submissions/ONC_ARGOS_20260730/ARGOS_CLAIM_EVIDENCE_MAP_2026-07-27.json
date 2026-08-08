@@ -1,0 +1,109 @@
+{
+  "checks": {
+    "material_response_fragments_present": true,
+    "merged_custody_graph_node_hold": true,
+    "negative_result_graph_node_hold": true,
+    "no_unverified_runtime_promotion": true,
+    "reviewer_receipt_boundaries_hold": true,
+    "reviewer_receipt_counts_hold": true,
+    "reviewer_receipt_source_identity_hold": true
+  },
+  "claim_boundary": "This internal map binds three affirmative engineering statements in the Argos response to named first-party evidence. The response exposes no repository or live-site route and offers artifacts only for authorized review after security screening. This map does not establish health IT prior performance, HHS authorization, external validation, field performance, submission, acceptance, selection, award, or funding.",
+  "claims": [
+    {
+      "claim_id": "FIRST_PARTY_REPRODUCIBILITY_PACKAGE",
+      "does_not_support": [
+        "independent_reproduction",
+        "external_validation",
+        "agency_certification",
+        "field_performance",
+        "health_it_prior_performance"
+      ],
+      "evidence": {
+        "assertion_pass_count": 31,
+        "evidence_graph_node": "eia-frozen-benchmark",
+        "receipt_path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+        "receipt_sha256": "3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d",
+        "source_commit": "1c0eb51754beffac6f4df484914e35efc21c253f",
+        "suite_pass_count": 3
+      },
+      "evidence_level": "FIRST_PARTY_REPRODUCED_NAMED_PACKAGE",
+      "response_fragment_sha256": "9ad9401101f30f22792f55b18aaaa5dee01154c2426787db69e18aade99543e3",
+      "supported": true
+    },
+    {
+      "claim_id": "CUSTODY_AND_VALIDATION_CONTROLS",
+      "does_not_support": [
+        "underlying_experiment_truth",
+        "external_independence",
+        "field_performance",
+        "commercial_value"
+      ],
+      "evidence": {
+        "canonical_role": "current_default_branch_proof_capsule_standard",
+        "evidence_graph_node": "pr-34",
+        "evidence_graph_path": "config/evidence_graph_v1.json"
+      },
+      "evidence_level": "MERGED_CAPABILITY",
+      "response_fragment_sha256": "ae6b0868b4c10c77ed963b2ca0d00b215fb106116abe4512c967eff414456c02",
+      "supported": true
+    },
+    {
+      "claim_id": "ADVERSE_RESULT_RETENTION",
+      "does_not_support": [
+        "favorable_performance_promotion",
+        "external_validation",
+        "health_domain_correctness"
+      ],
+      "evidence": {
+        "evidence_graph_node": "eia-frozen-benchmark",
+        "evidence_graph_path": "config/evidence_graph_v1.json",
+        "evidence_index_path": "EVIDENCE_INDEX.md",
+        "negative_result_count": 2,
+        "protocol_amendment_present": true
+      },
+      "evidence_level": "FIRST_PARTY_REPRODUCED_WITH_NEGATIVE_RESULTS",
+      "response_fragment_sha256": "62f3fa66168128a2abc59f68046ef8bb5601dd0f19774c638478f4ad60833a9c",
+      "supported": true
+    }
+  ],
+  "external_action_performed": false,
+  "generated_utc": "2026-07-28T20:16:29Z",
+  "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+  "response": {
+    "material_claim_count": 3,
+    "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md",
+    "sha256": "7dc0a1a622ba6d78de3d1734200d9cba104d62b9833997f51519f0aff3e32dfe"
+  },
+  "response_fragment_checks": {
+    "ADVERSE_RESULT_RETENTION": true,
+    "CUSTODY_AND_VALIDATION_CONTROLS": true,
+    "FIRST_PARTY_REPRODUCIBILITY_PACKAGE": true
+  },
+  "runtime_observation_boundary": "This offline map does not assert live-domain availability. Runtime routes must be checked separately at action time.",
+  "schema": "lumencore.argos_claim_evidence_map.v2",
+  "source_custody": [
+    {
+      "hash_mode": "TEXT_UTF8_LF",
+      "path": "grant_submissions/ONC_ARGOS_20260730/ARGOS_PARTNER_FIRST_CAPABILITY_RESPONSE_DRAFT.md",
+      "sha256": "7dc0a1a622ba6d78de3d1734200d9cba104d62b9833997f51519f0aff3e32dfe"
+    },
+    {
+      "hash_mode": "TEXT_UTF8_LF",
+      "path": "config/evidence_graph_v1.json",
+      "sha256": "571899d2188ed504040446a2d4e0b8cc959a77e4665fbd35acd2a7d1365d32c8"
+    },
+    {
+      "hash_mode": "TEXT_UTF8_LF",
+      "path": "EVIDENCE_INDEX.md",
+      "sha256": "cbf37b586de8833771bda5a1320fd2ef5e52341d0718068cefa8d1605a9f437a"
+    },
+    {
+      "hash_mode": "TEXT_UTF8_LF",
+      "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+      "sha256": "3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d"
+    }
+  ],
+  "status": "VERIFIED_BOUNDED_INTERNAL_CLAIM_MAP",
+  "submission_authorized": false
+}

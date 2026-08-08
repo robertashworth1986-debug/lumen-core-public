@@ -1,0 +1,152 @@
+{
+  "schema": "lumencore.argos_teaming_candidate_register.v1",
+  "generated_utc": "2026-07-27T19:12:10Z",
+  "updated_utc": "2026-07-28T16:45:49Z",
+  "opportunity": {
+    "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
+    "official_url": "https://sam.gov/opp/062cef11f5384443bfd84bf123404026/view",
+    "deadline_utc": "2026-07-30T21:00:00Z",
+    "teaming_permitted": true,
+    "named_team_members_and_roles_required": true
+  },
+  "status": "PRIMARY_INQUIRY_SENT_ONCE_WAITING_FOR_REPLY",
+  "selection_strategy": {
+    "primary_route": "EMI_ADVISORS_AS_CONSORTIUM_CONVENER",
+    "fallback_route": "INDEX_ANALYTICS_AS_FEDERAL_HEALTH_INTEGRATION_LEAD",
+    "specialist_route": "BOOKZURMAN_DIRECT_ONLY_IF_EMI_ROUTE_IS_UNAVAILABLE",
+    "contact_sequence": "ONE_ROUTE_AT_A_TIME_WITH_FRESH_DUPLICATE_CHECK",
+    "reason": "EMI Advisors, BookZurman, and Digital HIE publicly report an existing small-business consortium relationship, reducing avoidable teaming friction."
+  },
+  "internal_control_dates": {
+    "primary_partner_interest_target_utc": "2026-07-28T17:00:00Z",
+    "named_team_and_reference_target_utc": "2026-07-29T17:00:00Z",
+    "final_action_packet_target_utc": "2026-07-30T15:00:00Z"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "candidate_id": "EMI_ADVISORS",
+      "organization": "EMI Advisors LLC",
+      "named_principal": "Evelyn Gallego",
+      "public_role": "Chief Executive Officer and Founder",
+      "proposed_argos_role": "Health IT, ONC policy, interoperability, and regulatory lead; potential small-business team convener",
+      "fit_basis": [
+        "Publicly documented ONC and IHE USA cooperative-agreement work involving HL7 FHIR profiles",
+        "Publicly documented health IT policy, interoperability, and standards expertise",
+        "Publicly documented consortium relationship with BookZurman and Digital HIE"
+      ],
+      "primary_sources": [
+        "https://www.emiadvisors.net/evelyn-gallego",
+        "https://www.emiadvisors.net/news/emi-advisors-partners-with-integrating-the-health-enterprise-on-onc/ihe-usa-cooperative-agreement",
+        "https://www.emiadvisors.net/news/emi-advisors-book-zurman-and-digital-hie-awarded-gsa-oasis-small-business-contract"
+      ],
+      "linkedin_profile": "https://www.linkedin.com/in/evelyngallego",
+      "verification": {
+        "public_capability_evidence_found": true,
+        "current_leadership_evidence_found": true,
+        "current_sam_entity_and_size_status_verified": false,
+        "interest_confirmed": false,
+        "authorization_to_name_in_response": false,
+        "authorization_to_use_credentials_or_references": false
+      },
+      "outreach": {
+        "mailbox_duplicate_check_utc": "2026-07-28T16:45:49Z",
+        "matching_prior_or_draft_outreach_found": true,
+        "draft_ready": false,
+        "gmail_draft_created": false,
+        "historical_gmail_draft_observed_utc": "2026-07-27T19:34:27Z",
+        "gmail_identifiers_stored_public": false,
+        "sent": true,
+        "sent_utc": "2026-07-28T15:39:34Z",
+        "sent_copy_verified": true,
+        "attachment_count": 0,
+        "cc_count": 0,
+        "bcc_count": 0,
+        "duplicate_send_prohibited": true
+      }
+    },
+    {
+      "rank": 2,
+      "candidate_id": "INDEX_ANALYTICS",
+      "organization": "Index Analytics LLC",
+      "named_principal": "Raghu Akkapeddi",
+      "public_role": "Founder and Chief Executive Officer",
+      "proposed_argos_role": "Federal health prime or program integration lead; validate availability of HHS security and ATO personnel",
+      "fit_basis": [
+        "Publicly self-described Baltimore small business focused on federal health IT",
+        "Publicly documented CMS, FDA, HRSA, CDC, HHS, and ACF experience",
+        "Publicly documented CMS SPARC service coverage including testing, Security Control Assessment, and Independent Verification and Validation",
+        "Publicly documented federal-health integration, DevOps, and software-development contract vehicles"
+      ],
+      "primary_sources": [
+        "https://index-analytics.com/",
+        "https://index-analytics.com/about/page/4/",
+        "https://index-analytics.com/contract-vehicles/"
+      ],
+      "linkedin_profile": "https://www.linkedin.com/in/raghu-akkapeddi-pmp-97538613",
+      "verification": {
+        "public_capability_evidence_found": true,
+        "current_leadership_evidence_found": true,
+        "current_sam_entity_and_size_status_verified": false,
+        "interest_confirmed": false,
+        "authorization_to_name_in_response": false,
+        "authorization_to_use_credentials_or_references": false,
+        "named_hhs_ato_lead_verified": false
+      },
+      "outreach": {
+        "mailbox_duplicate_check_utc": "2026-07-27T19:05:00Z",
+        "matching_prior_or_draft_outreach_found": false,
+        "draft_ready": true,
+        "sent": false
+      }
+    },
+    {
+      "rank": 3,
+      "candidate_id": "BOOKZURMAN",
+      "organization": "BookZurman, Inc.",
+      "named_principal": "Ioana Singureanu",
+      "public_role": "Chief Innovation Officer",
+      "proposed_argos_role": "FHIR R4, USCDI, standards conformance, and federal-health interoperability technical lead",
+      "fit_basis": [
+        "Publicly documented FHIR Version 4 and USCDI implementation capability",
+        "Publicly documented federal health IT standards work and ONC-related expertise",
+        "Public contact page welcomes partnering discussions and describes the firm as SDVOSB"
+      ],
+      "primary_sources": [
+        "https://www.bookzurman.com/care-management-solutions",
+        "https://www.bookzurman.com/blog/ioana-singureanu-impact-award-2021",
+        "https://www.bookzurman.com/contact-us"
+      ],
+      "linkedin_profile": "https://www.linkedin.com/in/ioana-singureanu-85691",
+      "verification": {
+        "public_capability_evidence_found": true,
+        "current_leadership_evidence_found": true,
+        "current_sam_entity_and_size_status_verified": false,
+        "interest_confirmed": false,
+        "authorization_to_name_in_response": false,
+        "authorization_to_use_credentials_or_references": false
+      },
+      "outreach": {
+        "mailbox_duplicate_check_utc": "2026-07-27T19:05:00Z",
+        "matching_prior_or_draft_outreach_found": false,
+        "draft_ready": true,
+        "sent": false,
+        "sequence_gate": "CONTACT_DIRECTLY_ONLY_IF_EMI_CONSORTIUM_ROUTE_IS_UNAVAILABLE_OR_EMI_AUTHORIZES_PARALLEL_CONTACT"
+      }
+    }
+  ],
+  "independent_assessment_path": {
+    "status": "OPEN_GATE",
+    "requirement": "Identify an independent assessment path after the system boundary and applicable HHS authorization approach are confirmed.",
+    "official_reference": "https://www.fedramp.gov/marketplace/assessors/",
+    "constraint": "Do not imply that an assessor is a team member, committed, or conflict-free until independence, scope, availability, and authorization are documented."
+  },
+  "claim_boundaries": {
+    "candidate_listing_is_not_a_commitment": true,
+    "public_company_claims_are_not_government_verification": true,
+    "no_partner_name_may_enter_the_hhs_response_without_written_authorization": true,
+    "no_prior_performance_reference_may_be_used_without_documentary_support_and_permission": true,
+    "no_outreach_send_is_authorized_by_this_register": true
+  },
+  "safest_next_action": "Do not resend the primary EMI Advisors inquiry. Monitor for a reply, preserve the public binding mismatch as an audit gap, and continue the Government response independently. Review any fallback route only after a fresh mailbox check and a new route-specific decision."
+}

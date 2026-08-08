@@ -10,6 +10,7 @@ The repository does **not** currently establish independent scientific validatio
 
 ## Human and machine entrypoints
 
+- Reviewer start page: [`docs/REVIEWER_START_HERE.md`](docs/REVIEWER_START_HERE.md)
 - Human evidence index: `EVIDENCE_INDEX.md`
 - Machine graph: [`config/evidence_graph_v1.json`](config/evidence_graph_v1.json)
 - Fail-closed verifier: [`code/ops/VERIFY_EVIDENCE_GRAPH.py`](code/ops/VERIFY_EVIDENCE_GRAPH.py)
@@ -128,7 +129,7 @@ A pilot or external engagement must be listed here only when the repository cont
 |---|---|---|
 | Bounded Validation Sprint | Proposed product/SOW package | Not a signed customer pilot. |
 | LANL VISION | Follow-up packet after missed connection | Not a meeting outcome, partnership, license, or pilot. |
-| EPRI / Open Power AI | Interest/onboarding correspondence tracked | Not membership acceptance, utility participation, or validation. |
+| EPRI / Open Power AI | Completed MOU and bounded onboarding/participation correspondence tracked; EPRI/OPAI replied August 4 that no extra contribution packet is required and that presence and contributions to MRC and Work Group meetings are enough | Not endorsement, independent validation, an award, funding, broader licensing, utility adoption, approval of a specific claim, or performance. |
 | ProofLock Build Week | Deployed demo and submission confirmation | Not an award or outside technical validation. |
 | EchoLock | **Not yet indexed in this public reviewer path** | Do not claim a completed pilot here until its report and evidence capsule are linked. |
 
