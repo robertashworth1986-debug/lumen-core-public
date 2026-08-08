@@ -15,6 +15,7 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 3. [Claim Boundary Register](CLAIM_BOUNDARY_REGISTER.md)
 4. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
 5. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
+6. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
 
 ## Bounded utility-AI pilot concept
 

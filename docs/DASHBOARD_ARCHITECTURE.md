@@ -52,6 +52,16 @@ that overwrite a canonical page are responsible for emitting those references.
 The deployment copies the dashboard directory to the public web root, so a
 generated page that omits the shared layer can create visual and truth drift.
 
+## Exact-Snapshot Release Lane
+
+For reviewer-facing releases that require byte-level custody, use the manual
+`Deploy exact public-site snapshot to VPS` workflow documented in
+[`PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md`](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md).
+That lane packages only its public allowlist from immutable Git blobs, records
+per-file SHA-256 identities, captures bounded rollback material, and verifies
+the canonical live URLs byte-for-byte. It complements the automatic site
+maintenance workflow and does not authorize itself.
+
 ## Storage
 
 - Source code and canonical dashboard assets remain in the Git repository on C:.
