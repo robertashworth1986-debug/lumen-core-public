@@ -92,6 +92,30 @@ attempted. The paper-ticker repair was not dispatched because it depends on the
 same missing private action-time control. Both workflows now emit a specific
 non-secret error for this precondition while retaining the existing gate.
 
+PR #125 corrected the read-only loopback probe so it preserves the public TLS
+hostname while pinning the connection to `127.0.0.1`. Post-merge run
+[`31251081800`](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31251081800)
+then established the complete request path without disabling certificate
+validation: nginx itself returned HTTP 200 on loopback, the gateway route
+through nginx returned HTTP 502, and the direct gateway port refused the
+connection. The public root, opportunity-sprint page, and nginx health surface
+returned HTTP 200 in the same observation window. This isolates the outage
+behind nginx rather than at DNS, TLS, or the static web tier.
+
+PR #126 bound the runtime diagnostic to the exact `main` commit and compared
+the deterministic twenty-file gateway source closure with the deployed VPS by
+path and SHA-256 without reading or publishing file contents. Post-merge run
+[`31251277886`](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31251277886)
+recorded source commit `4348ff77ef5731221c7116dfa7674b4feda63803`,
+approved bundle SHA-256
+`af63196219884e7c8d122231dc1aa6e7a919018778082ed0ff4794919ea51c05`,
+zero matching files, sixteen mismatched files, and four missing files. The
+missing files were `booth_public_contract.py`,
+`execution/order_safety_gate.py`, `luma_experience_gateway_legacy.py`, and
+`operator_api_access.py`; no symbolic or unreadable targets were found. This
+proves whole-closure deployment drift, not a one-file patch condition. It does
+not prove that the guarded repair has run or that the live gateway is healthy.
+
 Manual health run `31247095241` recorded the first current-contract snapshot at
 commit `0ff614be`: all six static reviewer endpoints passed, while both dynamic
 gateway contracts returned HTTP 502, so the public state is explicitly
