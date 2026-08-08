@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.external_technical_review_packet_config.v1",
-  "generated_at_utc": "2026-07-28T03:21:15Z",
+  "generated_at_utc": "2026-08-08T07:07:49Z",
   "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
   "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
   "controls": {
@@ -51,6 +51,18 @@
       "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/container_rebuild_receipt.json",
       "purpose": "Operator-controlled container rebuild receipt.",
       "required_status": "OPERATOR_CONTAINER_REBUILD_PASS"
+    },
+    {
+      "path": "docs/EXTERNAL_REPLICATION_DOCKET_V1.md",
+      "purpose": "Controlled non-author execution, independence, deviation, and negative-result protocol."
+    },
+    {
+      "path": "docs/AGENT_ARENA.md",
+      "purpose": "Synthetic adversarial holdout harness and explicit non-field-performance boundary."
+    },
+    {
+      "path": "dashboard/build_week/prooflock_console/THREAT_MODEL.md",
+      "purpose": "ProofLock trust assumptions, covered attacks, authority boundary, and non-guarantees."
     }
   ],
   "public_surfaces": [
@@ -58,7 +70,7 @@
       "label": "Reviewer home",
       "url": "https://lumen-core.ai/",
       "observed_http_status": 200,
-      "verified_at_utc": "2026-07-28T03:21:15Z",
+      "verified_at_utc": "2026-08-08T07:07:49Z",
       "demo": true,
       "limitation": "A successful HTTP response proves reachability at the observation time, not uptime, adoption, or product acceptance."
     },
@@ -66,7 +78,7 @@
       "label": "ProofLock Console",
       "url": "https://lumen-core.ai/build_week/prooflock_console/",
       "observed_http_status": 200,
-      "verified_at_utc": "2026-07-28T03:21:15Z",
+      "verified_at_utc": "2026-08-08T07:07:49Z",
       "demo": true,
       "limitation": "The public console is a demonstrator and does not prove external validation or production readiness."
     },
@@ -74,7 +86,7 @@
       "label": "Mission Control",
       "url": "https://lumen-core.ai/mission_control.html",
       "observed_http_status": 200,
-      "verified_at_utc": "2026-07-28T03:21:15Z",
+      "verified_at_utc": "2026-08-08T07:07:49Z",
       "demo": false,
       "limitation": "The page is a public status surface; its existence is not evidence that every underlying service is healthy."
     },
@@ -82,7 +94,7 @@
       "label": "Funding dashboard",
       "url": "https://lumen-core.ai/grants.html",
       "observed_http_status": 200,
-      "verified_at_utc": "2026-07-28T03:21:15Z",
+      "verified_at_utc": "2026-08-08T07:07:49Z",
       "demo": false,
       "limitation": "The dashboard reports workflow state and does not establish eligibility, submission, selection, or award."
     },
@@ -90,7 +102,7 @@
       "label": "Dynamic health endpoint",
       "url": "https://lumen-core.ai/health",
       "observed_http_status": 502,
-      "verified_at_utc": "2026-07-28T03:21:15Z",
+      "verified_at_utc": "2026-08-08T07:07:49Z",
       "demo": false,
       "limitation": "The dynamic gateway is currently degraded and must not be represented as healthy."
     }
@@ -139,8 +151,97 @@
     "What should be removed or de-emphasized because it distracts from the first credible offer?",
     "Who is the right independent evaluator or design partner for the resulting narrow scope?"
   ],
+  "assurance_exercise": {
+    "schema": "lumencore.external_review_assurance_exercise.v1",
+    "mode": "REVIEWER_CONTROLLED_LOCAL_REPLAY_ONLY",
+    "objective": "Test whether declared controls detect or block bounded artifact, policy, holdout, agent, API, and external-action failures, then record failures and retest results without touching production or private systems.",
+    "authority_boundary": {
+      "active_targeting_allowed": false,
+      "private_system_access_allowed": false,
+      "production_load_testing_allowed": false,
+      "external_action_allowed": false
+    },
+    "roles": {
+      "red_team": "Selects only a declared local replay scenario and attempts the documented mutation or bypass inside an isolated copy.",
+      "blue_team": "Runs the named control, records detection or rejection evidence, and proposes remediation when the control misses.",
+      "purple_team": "Replays the same frozen scenario after remediation and records whether the original attack is now blocked without hiding negative results."
+    },
+    "scenarios": [
+      {
+        "scenario_id": "RB-01-PROOFLOCK-TAMPER",
+        "target": "ProofLock receipt and artifact custody",
+        "test_path": "tests/test_prooflock_bounded_review_path.py",
+        "red_team_action": "Mutate artifact bytes or self-reseal a receipt that promotes an unsupported authority gate.",
+        "expected_blue_control": "Exact-byte verification detects substitution; policy evaluation keeps unsupported authority gates open and promotion blocked.",
+        "pass_condition": "The verifier rejects the mutation or reports policy failure and promotion_allowed=false.",
+        "boundary": "This tests local verifier behavior only; it does not authenticate an external approver or prove the underlying experiment true."
+      },
+      {
+        "scenario_id": "RB-02-CAPSULE-INPUT",
+        "target": "Proof Capsule parser and resource boundary",
+        "test_path": "tests/test_proof_capsule_verifier.py",
+        "red_team_action": "Supply malformed schema, traversal paths, role confusion, duplicate keys, or over-budget resources.",
+        "expected_blue_control": "Strict parsing, allowlisted roles, path containment, and resource budgets fail closed.",
+        "pass_condition": "Every adversarial fixture is rejected without converting malformed input into a passing capsule.",
+        "boundary": "Parser rejection is software assurance, not field validation, authorship proof, or safety certification."
+      },
+      {
+        "scenario_id": "RB-03-REPLICATION-PROMOTION",
+        "target": "External replication promotion gate",
+        "test_path": "tests/test_external_replication_docket.py",
+        "red_team_action": "Attempt to promote an internal replay using missing evaluator identity, independence, deviations, negative results, or custody fields.",
+        "expected_blue_control": "The acceptance and assurance gates remain fail closed until every predeclared external-execution requirement is present.",
+        "pass_condition": "Incomplete or internally authored records cannot become external_complete or external validation.",
+        "boundary": "A passing local protocol test does not mean a non-author evaluator has executed or accepted the package."
+      },
+      {
+        "scenario_id": "RB-04-AGENT-ARENA",
+        "target": "Agent Arena adversarial holdout harness",
+        "test_path": "tests/test_agent_arena.py",
+        "red_team_action": "Exercise frozen telemetry corruption, hidden faults, role dropout, Byzantine proposals, and receipt tampering.",
+        "expected_blue_control": "Trust-weighted synthesis, red-team gates, holdout separation, custody checks, and negative-result retention remain deterministic.",
+        "pass_condition": "The bundle replays identically, tampering fails closed, and a failed absolute safety floor cannot be promoted.",
+        "boundary": "The Arena is synthetic/replay evidence and does not establish real-world Byzantine tolerance or operational security."
+      },
+      {
+        "scenario_id": "RB-05-OPERATOR-API",
+        "target": "Public operator API authorization boundary",
+        "test_path": "tests/test_operator_api_access.py",
+        "red_team_action": "Attempt anonymous, malformed, ambiguous, or unauthorized HTTP and WebSocket access.",
+        "expected_blue_control": "The gateway defaults to deny, validates the runtime bearer, minimizes public status, and rejects ambiguous credentials.",
+        "pass_condition": "Unauthorized requests cannot reach protected operator functionality.",
+        "boundary": "Local integration tests do not establish production identity-provider integration, penetration-test completion, or certification."
+      },
+      {
+        "scenario_id": "RB-06-EXTERNAL-ACTION",
+        "target": "Deadline and outreach action controls",
+        "test_path": "tests/test_deadline_action_sentinel.py",
+        "red_team_action": "Tamper with deadline, approval, opportunity, or external-action control state to force a stale or unauthorized action.",
+        "expected_blue_control": "The sentinel rejects changed authority, expired windows, and unbound action state while retaining the human approval gate.",
+        "pass_condition": "No altered or expired record becomes send, submit, sign, pay, trade, or deploy authority.",
+        "boundary": "The test performs no external action and does not prove delivery, acceptance, selection, award, or funding."
+      }
+    ],
+    "receipt_fields": [
+      "evaluator_identity_or_pseudonymous_identifier",
+      "independence_disclosure",
+      "source_commit",
+      "environment_fingerprint",
+      "scenario_ids",
+      "commands_executed",
+      "started_utc",
+      "completed_utc",
+      "observed_results",
+      "deviations",
+      "negative_results",
+      "remediation",
+      "retest_results",
+      "reviewer_recommendation"
+    ],
+    "claim_boundary": "Completion supports only the observed local attack-and-defense behaviors for the pinned source and environment. It does not establish penetration testing, production security, adversarial security, certification, field validation, or external validation unless a qualified non-author evaluator independently controls and signs the execution record."
+  },
   "bounded_next_steps": [
-    "Reviewer supplies written red-team notes only.",
+    "Reviewer runs or observes one declared local replay scenario and supplies written red-team, blue-team, and retest notes.",
     "Reviewer helps define one preregistered evaluation using authorized data and a named baseline.",
     "Reviewer introduces one qualified design partner after reviewing the evidence boundary.",
     "No fit is found; record why and close the lane without implying endorsement."
@@ -148,6 +249,7 @@
   "known_gaps": [
     "The dynamic public health endpoint returned HTTP 502 at the recorded observation time.",
     "The reproducibility receipts are first-party or operator-controlled, not independent external validation.",
+    "The adversarial scenarios are bounded local replays, not active penetration testing or proof of production security.",
     "The engine commercialization inventory is in a draft pull request and is not main-branch state.",
     "No recurring subscription, buyer acceptance, field deployment, realized savings, or valuation is established."
   ],
@@ -155,6 +257,8 @@
     "institutional grade",
     "production ready",
     "independently validated",
+    "penetration tested",
+    "adversarially secure",
     "proven savings",
     "accepted by agencies",
     "subscription ready",
@@ -165,6 +269,11 @@
     "reviewer_observation",
     "evidence_cited",
     "evidence_rejected",
+    "scenario_results",
+    "detected_controls",
+    "undetected_failures",
+    "remediation",
+    "retest_results",
     "buyer_and_problem",
     "baseline",
     "acceptance_metric",

@@ -82,6 +82,89 @@ def _nonempty_list(payload: dict[str, Any], key: str) -> list[Any]:
     return value
 
 
+def validate_assurance_exercise(config: dict[str, Any]) -> dict[str, Any]:
+    exercise = config.get("assurance_exercise")
+    if not isinstance(exercise, dict):
+        raise ReviewPacketError("ASSURANCE_EXERCISE_MISSING")
+    if exercise.get("schema") != "lumencore.external_review_assurance_exercise.v1":
+        raise ReviewPacketError("ASSURANCE_EXERCISE_SCHEMA_INVALID")
+    if exercise.get("mode") != "REVIEWER_CONTROLLED_LOCAL_REPLAY_ONLY":
+        raise ReviewPacketError("ASSURANCE_EXERCISE_MODE_INVALID")
+
+    authority = exercise.get("authority_boundary")
+    expected_authority = {
+        "active_targeting_allowed": False,
+        "private_system_access_allowed": False,
+        "production_load_testing_allowed": False,
+        "external_action_allowed": False,
+    }
+    if authority != expected_authority:
+        raise ReviewPacketError("ASSURANCE_AUTHORITY_BOUNDARY_INVALID")
+
+    roles = exercise.get("roles")
+    if not isinstance(roles, dict) or set(roles) != {
+        "red_team",
+        "blue_team",
+        "purple_team",
+    }:
+        raise ReviewPacketError("ASSURANCE_ROLES_INVALID")
+    if any(not str(value).strip() for value in roles.values()):
+        raise ReviewPacketError("ASSURANCE_ROLE_DESCRIPTION_MISSING")
+
+    scenarios = _nonempty_list(exercise, "scenarios")
+    if len(scenarios) < 6:
+        raise ReviewPacketError("ASSURANCE_SCENARIO_SET_INCOMPLETE")
+    scenario_ids: set[str] = set()
+    required_fields = {
+        "scenario_id",
+        "target",
+        "test_path",
+        "red_team_action",
+        "expected_blue_control",
+        "pass_condition",
+        "boundary",
+    }
+    for scenario in scenarios:
+        if not isinstance(scenario, dict) or set(scenario) != required_fields:
+            raise ReviewPacketError("ASSURANCE_SCENARIO_INVALID")
+        scenario_id = str(scenario["scenario_id"])
+        if not scenario_id.startswith("RB-") or scenario_id in scenario_ids:
+            raise ReviewPacketError("ASSURANCE_SCENARIO_ID_INVALID")
+        scenario_ids.add(scenario_id)
+        if any(not str(scenario[field]).strip() for field in required_fields):
+            raise ReviewPacketError(f"ASSURANCE_SCENARIO_FIELD_MISSING:{scenario_id}")
+        test_path = str(scenario["test_path"])
+        if not test_path.startswith("tests/") or not test_path.endswith(".py"):
+            raise ReviewPacketError(f"ASSURANCE_TEST_PATH_INVALID:{scenario_id}")
+        if not safe_repo_path(test_path).is_file():
+            raise ReviewPacketError(f"ASSURANCE_TEST_MISSING:{scenario_id}")
+
+    receipt_fields = _nonempty_list(exercise, "receipt_fields")
+    required_receipt_fields = {
+        "evaluator_identity_or_pseudonymous_identifier",
+        "independence_disclosure",
+        "source_commit",
+        "environment_fingerprint",
+        "scenario_ids",
+        "commands_executed",
+        "started_utc",
+        "completed_utc",
+        "observed_results",
+        "deviations",
+        "negative_results",
+        "remediation",
+        "retest_results",
+        "reviewer_recommendation",
+    }
+    if set(receipt_fields) != required_receipt_fields:
+        raise ReviewPacketError("ASSURANCE_RECEIPT_FIELDS_INVALID")
+    if not str(exercise.get("objective") or "").strip():
+        raise ReviewPacketError("ASSURANCE_OBJECTIVE_MISSING")
+    if not str(exercise.get("claim_boundary") or "").strip():
+        raise ReviewPacketError("ASSURANCE_CLAIM_BOUNDARY_MISSING")
+    return exercise
+
+
 def validate_config(config: dict[str, Any]) -> dict[str, Any]:
     if config.get("schema") != CONFIG_SCHEMA:
         raise ReviewPacketError("CONFIG_SCHEMA_INVALID")
@@ -114,6 +197,8 @@ def validate_config(config: dict[str, Any]) -> dict[str, Any]:
         raise ReviewPacketError("MEETING_TEMPLATE_INVALID")
     if meeting.get("duration_minutes") != 30:
         raise ReviewPacketError("MEETING_DURATION_INVALID")
+
+    validate_assurance_exercise(config)
 
     templates = read_json(TEMPLATE_CONFIG).get("templates")
     selected = next(
@@ -187,9 +272,27 @@ def evidence_record(item: dict[str, Any]) -> dict[str, Any]:
     return record
 
 
+def assurance_exercise_record(config: dict[str, Any]) -> dict[str, Any]:
+    exercise = validate_assurance_exercise(config)
+    scenarios = []
+    for item in exercise["scenarios"]:
+        test_path = str(item["test_path"])
+        path = safe_repo_path(test_path)
+        scenarios.append(
+            {
+                **item,
+                "test_bytes": len(canonical_file_bytes(path)),
+                "test_sha256": sha256_file(path),
+                "verification_command": f"python -m pytest -q {test_path}",
+            }
+        )
+    return {**exercise, "scenarios": scenarios}
+
+
 def build_payload(config: dict[str, Any]) -> dict[str, Any]:
     config = validate_config(config)
     evidence = [evidence_record(item) for item in config["evidence_assets"]]
+    assurance_exercise = assurance_exercise_record(config)
     return {
         "schema": OUTPUT_SCHEMA,
         "generated_at_utc": config["generated_at_utc"],
@@ -212,6 +315,10 @@ def build_payload(config: dict[str, Any]) -> dict[str, Any]:
                 if row["observed_http_status"] >= 400
             ),
             "reviewer_question_count": len(config["reviewer_questions"]),
+            "assurance_scenario_count": len(assurance_exercise["scenarios"]),
+            "active_targeting_allowed": assurance_exercise["authority_boundary"][
+                "active_targeting_allowed"
+            ],
             "known_gap_count": len(config["known_gaps"]),
             "duplicate_invite_blocked": True,
         },
@@ -221,6 +328,7 @@ def build_payload(config: dict[str, Any]) -> dict[str, Any]:
         "draft_references": config["draft_references"],
         "agenda": config["agenda"],
         "reviewer_questions": config["reviewer_questions"],
+        "assurance_exercise": assurance_exercise,
         "bounded_next_steps": config["bounded_next_steps"],
         "known_gaps": config["known_gaps"],
         "claims_not_to_make": config["claims_not_to_make"],
@@ -283,6 +391,46 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.extend(
         f"{index}. {question}"
         for index, question in enumerate(payload["reviewer_questions"], start=1)
+    )
+
+    exercise = payload["assurance_exercise"]
+    lines.extend(
+        [
+            "",
+            "## Reviewer-Controlled Red / Blue Assurance Exercise",
+            "",
+            f"Mode: `{exercise['mode']}`",
+            "",
+            exercise["objective"],
+            "",
+            f"- **Red team:** {exercise['roles']['red_team']}",
+            f"- **Blue team:** {exercise['roles']['blue_team']}",
+            f"- **Purple team:** {exercise['roles']['purple_team']}",
+            "",
+            "Active targeting, private-system access, production load testing, and external actions are prohibited.",
+            "",
+            "| Scenario | Target | Red-team action | Expected blue control | Replay command |",
+            "|---|---|---|---|---|",
+        ]
+    )
+    for row in exercise["scenarios"]:
+        lines.append(
+            f"| `{row['scenario_id']}` | {row['target']} | {row['red_team_action']} | "
+            f"{row['expected_blue_control']} | `{row['verification_command']}` |"
+        )
+        lines.append(
+            f"|  | **Pass condition** | {row['pass_condition']} | **Boundary** | {row['boundary']} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "### Assurance Receipt Fields",
+            "",
+            ", ".join(f"`{field}`" for field in exercise["receipt_fields"]),
+            "",
+            f"**Exercise boundary:** {exercise['claim_boundary']}",
+        ]
     )
 
     lines.extend(["", "## Bounded Next Steps", ""])

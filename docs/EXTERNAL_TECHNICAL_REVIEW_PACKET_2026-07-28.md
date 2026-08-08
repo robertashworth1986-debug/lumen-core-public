@@ -23,6 +23,9 @@ One calendar invitation already exists and is accepted. Do not send another repl
 | `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json` | Bounded first-party reproducibility receipt. | `BOUNDED_REPRODUCIBILITY_PASS` | `3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d` |
 | `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/runtime_receipt.json` | Recorded first-party reviewer runtime receipt. | `AUTHORITATIVE_RUNTIME_PASS` | `6908148d421a10f9592c7a9a5ccd4283cd66f3147b33b6381e27ddae9577ab8c` |
 | `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/container_rebuild_receipt.json` | Operator-controlled container rebuild receipt. | `OPERATOR_CONTAINER_REBUILD_PASS` | `188d62b4b36d1dc417801d630782632a542de64312ce77e796a1517282c8a916` |
+| `docs/EXTERNAL_REPLICATION_DOCKET_V1.md` | Controlled non-author execution, independence, deviation, and negative-result protocol. | `FILE_PRESENT` | `3151940f4852af1d22d0ac7d0ccb387310b48e278995012a6014714e4bc0bdcd` |
+| `docs/AGENT_ARENA.md` | Synthetic adversarial holdout harness and explicit non-field-performance boundary. | `FILE_PRESENT` | `38e7ccd5c97edc4c95c281a06536beb403ccc214f09850cbcb160b2037f31452` |
+| `dashboard/build_week/prooflock_console/THREAT_MODEL.md` | ProofLock trust assumptions, covered attacks, authority boundary, and non-guarantees. | `FILE_PRESENT` | `13995a40cf5e1ef7dfcee3d9995a31cb4fa9c07ec9a86c5334079473bda16388` |
 
 The receipt statuses above are bounded first-party or operator-controlled evidence. Their own claim boundaries remain controlling.
 
@@ -54,9 +57,42 @@ The receipt statuses above are bounded first-party or operator-controlled eviden
 6. What should be removed or de-emphasized because it distracts from the first credible offer?
 7. Who is the right independent evaluator or design partner for the resulting narrow scope?
 
+## Reviewer-Controlled Red / Blue Assurance Exercise
+
+Mode: `REVIEWER_CONTROLLED_LOCAL_REPLAY_ONLY`
+
+Test whether declared controls detect or block bounded artifact, policy, holdout, agent, API, and external-action failures, then record failures and retest results without touching production or private systems.
+
+- **Red team:** Selects only a declared local replay scenario and attempts the documented mutation or bypass inside an isolated copy.
+- **Blue team:** Runs the named control, records detection or rejection evidence, and proposes remediation when the control misses.
+- **Purple team:** Replays the same frozen scenario after remediation and records whether the original attack is now blocked without hiding negative results.
+
+Active targeting, private-system access, production load testing, and external actions are prohibited.
+
+| Scenario | Target | Red-team action | Expected blue control | Replay command |
+|---|---|---|---|---|
+| `RB-01-PROOFLOCK-TAMPER` | ProofLock receipt and artifact custody | Mutate artifact bytes or self-reseal a receipt that promotes an unsupported authority gate. | Exact-byte verification detects substitution; policy evaluation keeps unsupported authority gates open and promotion blocked. | `python -m pytest -q tests/test_prooflock_bounded_review_path.py` |
+|  | **Pass condition** | The verifier rejects the mutation or reports policy failure and promotion_allowed=false. | **Boundary** | This tests local verifier behavior only; it does not authenticate an external approver or prove the underlying experiment true. |
+| `RB-02-CAPSULE-INPUT` | Proof Capsule parser and resource boundary | Supply malformed schema, traversal paths, role confusion, duplicate keys, or over-budget resources. | Strict parsing, allowlisted roles, path containment, and resource budgets fail closed. | `python -m pytest -q tests/test_proof_capsule_verifier.py` |
+|  | **Pass condition** | Every adversarial fixture is rejected without converting malformed input into a passing capsule. | **Boundary** | Parser rejection is software assurance, not field validation, authorship proof, or safety certification. |
+| `RB-03-REPLICATION-PROMOTION` | External replication promotion gate | Attempt to promote an internal replay using missing evaluator identity, independence, deviations, negative results, or custody fields. | The acceptance and assurance gates remain fail closed until every predeclared external-execution requirement is present. | `python -m pytest -q tests/test_external_replication_docket.py` |
+|  | **Pass condition** | Incomplete or internally authored records cannot become external_complete or external validation. | **Boundary** | A passing local protocol test does not mean a non-author evaluator has executed or accepted the package. |
+| `RB-04-AGENT-ARENA` | Agent Arena adversarial holdout harness | Exercise frozen telemetry corruption, hidden faults, role dropout, Byzantine proposals, and receipt tampering. | Trust-weighted synthesis, red-team gates, holdout separation, custody checks, and negative-result retention remain deterministic. | `python -m pytest -q tests/test_agent_arena.py` |
+|  | **Pass condition** | The bundle replays identically, tampering fails closed, and a failed absolute safety floor cannot be promoted. | **Boundary** | The Arena is synthetic/replay evidence and does not establish real-world Byzantine tolerance or operational security. |
+| `RB-05-OPERATOR-API` | Public operator API authorization boundary | Attempt anonymous, malformed, ambiguous, or unauthorized HTTP and WebSocket access. | The gateway defaults to deny, validates the runtime bearer, minimizes public status, and rejects ambiguous credentials. | `python -m pytest -q tests/test_operator_api_access.py` |
+|  | **Pass condition** | Unauthorized requests cannot reach protected operator functionality. | **Boundary** | Local integration tests do not establish production identity-provider integration, penetration-test completion, or certification. |
+| `RB-06-EXTERNAL-ACTION` | Deadline and outreach action controls | Tamper with deadline, approval, opportunity, or external-action control state to force a stale or unauthorized action. | The sentinel rejects changed authority, expired windows, and unbound action state while retaining the human approval gate. | `python -m pytest -q tests/test_deadline_action_sentinel.py` |
+|  | **Pass condition** | No altered or expired record becomes send, submit, sign, pay, trade, or deploy authority. | **Boundary** | The test performs no external action and does not prove delivery, acceptance, selection, award, or funding. |
+
+### Assurance Receipt Fields
+
+`evaluator_identity_or_pseudonymous_identifier`, `independence_disclosure`, `source_commit`, `environment_fingerprint`, `scenario_ids`, `commands_executed`, `started_utc`, `completed_utc`, `observed_results`, `deviations`, `negative_results`, `remediation`, `retest_results`, `reviewer_recommendation`
+
+**Exercise boundary:** Completion supports only the observed local attack-and-defense behaviors for the pinned source and environment. It does not establish penetration testing, production security, adversarial security, certification, field validation, or external validation unless a qualified non-author evaluator independently controls and signs the execution record.
+
 ## Bounded Next Steps
 
-- Reviewer supplies written red-team notes only.
+- Reviewer runs or observes one declared local replay scenario and supplies written red-team, blue-team, and retest notes.
 - Reviewer helps define one preregistered evaluation using authorized data and a named baseline.
 - Reviewer introduces one qualified design partner after reviewing the evidence boundary.
 - No fit is found; record why and close the lane without implying endorsement.
@@ -65,6 +101,7 @@ The receipt statuses above are bounded first-party or operator-controlled eviden
 
 - The dynamic public health endpoint returned HTTP 502 at the recorded observation time.
 - The reproducibility receipts are first-party or operator-controlled, not independent external validation.
+- The adversarial scenarios are bounded local replays, not active penetration testing or proof of production security.
 - The engine commercialization inventory is in a draft pull request and is not main-branch state.
 - No recurring subscription, buyer acceptance, field deployment, realized savings, or valuation is established.
 
@@ -73,6 +110,8 @@ The receipt statuses above are bounded first-party or operator-controlled eviden
 - `institutional grade`
 - `production ready`
 - `independently validated`
+- `penetration tested`
+- `adversarially secure`
 - `proven savings`
 - `accepted by agencies`
 - `subscription ready`
@@ -86,6 +125,11 @@ The receipt statuses above are bounded first-party or operator-controlled eviden
 | `reviewer_observation` | |
 | `evidence_cited` | |
 | `evidence_rejected` | |
+| `scenario_results` | |
+| `detected_controls` | |
+| `undetected_failures` | |
+| `remediation` | |
+| `retest_results` | |
 | `buyer_and_problem` | |
 | `baseline` | |
 | `acceptance_metric` | |
