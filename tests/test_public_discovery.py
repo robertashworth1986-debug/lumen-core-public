@@ -99,13 +99,24 @@ class PublicDiscoveryTests(unittest.TestCase):
     def test_reviewer_docket_is_strict_bounded_and_machine_readable(self):
         path = DASHBOARD / "reviewer_docket.json"
         payload = json.loads(path.read_text(encoding="utf-8"))
-        self.assertEqual(payload["schema"], "lumencore.public_reviewer_docket.v1")
+        self.assertEqual(payload["schema"], "lumencore.public_reviewer_docket.v2")
         self.assertEqual(payload["current_decision"], "HOLD")
         self.assertEqual(
             payload["primary_paid_offer"]["commercial_state"],
             "offer_defined_no_signed_scope_no_payment",
         )
-        self.assertEqual(payload["primary_paid_offer"]["price_usd"], 3500)
+        self.assertEqual(
+            payload["primary_paid_offer"]["id"],
+            "buyer-owned-baseline-validation-sprint",
+        )
+        self.assertEqual(
+            payload["primary_paid_offer"]["public_url"],
+            "https://lumen-core.ai/proof_to_pilot.html",
+        )
+        self.assertEqual(
+            [tier["proposed_price_usd"] for tier in payload["primary_paid_offer"]["tiers"]],
+            [7500, 15000, 25000],
+        )
         statuses = {
             item["id"]: item["status"] for item in payload["review_instruments"]
         }

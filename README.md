@@ -10,19 +10,18 @@ The public repository is a review surface. It is not a certification, an audited
 
 ## Commercial entry offer
 
-**ProofLock Opportunity Sprint** converts one buyer-selected funding-opportunity
-workflow into a source-grounded, preflighted, replayable decision system. The
-fixed fee is **$3,500** with a 50% kickoff deposit and a target of ten business
-days after source permissions, baseline, acceptance rules, scope, and payment
-terms are accepted in writing.
+The sole primary paid entry point is the **Buyer-Owned Baseline Validation
+Sprint**: one authorized source, one accepted incumbent baseline, one primary
+metric locked before scoring, and one bounded decision—promote, rerun, external
+review, hold, or reject.
 
-The deliverables are an official-source and eligibility register, an
-evidence-linked pursue/no-pursue brief, a reviewer-ready package outline, an
-attachment and blocker ledger, and replayable decision receipts. This is not a
-guarantee of eligibility or award, legal advice, certification, signature,
-upload, send, or final submission. Price acceptance, counterparty demand, and
-service delivery remain commercial gates until evidenced by a signed scope and
-payment.
+The founder-approved launch tiers are proposed at **$7,500**, **$15,000**, and
+**from $25,000**, with a maximum 30-calendar-day schedule and a commercial
+default of 50% at signed scope and 50% at delivery. These prices are an untested
+offer hypothesis, not booked revenue, buyer acceptance, or company valuation.
+Work begins only after written agreement on data rights, scope, acceptance,
+payment, IP, and decision authority. A neutral or failed result remains a valid
+deliverable.
 
 ## Start here
 
@@ -52,8 +51,9 @@ A reviewer should not infer current truth by reading every historical or draft p
    [CODECHECK executable-computation note](docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md)
    and [independent-executor handoff](docs/CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md).
 5. If the evidence is relevant to a buyer decision, review the current
-   [ProofLock Opportunity Sprint scope](docs/PROOFLOCK_OPPORTUNITY_SPRINT_SCOPE.md)
-   and [data-handling schedule](docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md).
+   [bounded validation offer](docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md),
+   [buyer-owned intake](docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md), and
+   [statement-of-work template](docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md).
 
 These are two different verification levels. The quick verifier checks the
 current public capsule's schema, file custody, and claim gates on Python 3.10+
@@ -113,7 +113,7 @@ LumenCore emphasizes fail-closed decisions: missing rights, ambiguous provenance
 | ProofLock Console | Deployed bounded demonstration; verifies receipt integrity and refuses unauthorized promotion. |
 | EIA benchmark package | First-party reproducible for the named pinned package; prepared for non-author execution. |
 | External replication docket | Draft protocol for preregistration, evaluator independence, frozen inputs, deviations, and negative results. |
-| ProofLock Opportunity Sprint | Fixed-fee offer defined at $3,500 with a 50% kickoff deposit; price acceptance, signed scope, payment, and delivery remain unverified commercial gates. |
+| Buyer-Owned Baseline Validation Sprint | Sole primary paid offer; proposed tiers are $7,500, $15,000, and from $25,000. Pricing is not buyer-tested, and no signed scope, cleared payment, or delivery is claimed. ProofLock supplies the evidence and custody layer. |
 
 ## Evidence-state definitions
 
@@ -165,8 +165,8 @@ review. Action-time HumanUnlock remains outside machine verification.
 ## Public review surfaces
 
 - Website: <https://lumen-core.ai/>
-- ProofLock Opportunity Sprint: <https://lumen-core.ai/opportunity_sprint.html>
-- Proof-to-pilot: <https://lumen-core.ai/proof_to_pilot.html>
+- Primary offer — Buyer-Owned Baseline Validation Sprint: <https://lumen-core.ai/proof_to_pilot.html>
+- Secondary funding-workflow variant (not the primary offer): <https://lumen-core.ai/opportunity_sprint.html>
 - Evidence surface: <https://lumen-core.ai/evidence/>
 - ProofLock Console: <https://lumen-core.ai/build_week/prooflock_console/>
 - Proof Capsule schema: [docs/PROOF_CAPSULE_SCHEMA.md](docs/PROOF_CAPSULE_SCHEMA.md)
@@ -175,9 +175,10 @@ review. Action-time HumanUnlock remains outside machine verification.
 - Private asset quarantine and redaction checklist: [docs/PRIVATE_ASSET_QUARANTINE_AND_REDACTION_CHECKLIST.md](docs/PRIVATE_ASSET_QUARANTINE_AND_REDACTION_CHECKLIST.md)
 - Founder/IP boundary: [docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md](docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
 - Pilot report template: [docs/PILOT_REPORT_TEMPLATE.md](docs/PILOT_REPORT_TEMPLATE.md)
-- Opportunity Sprint scope: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_SCOPE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_SCOPE.md)
-- Opportunity Sprint intake: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_INTAKE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_INTAKE.md)
-- Opportunity Sprint data handling schedule: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md)
+- Primary bounded validation offer: [docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md](docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md)
+- Buyer-owned validation intake: [docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md](docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md)
+- Statement-of-work template: [docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md](docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md)
+- Secondary funding-workflow data boundary: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md)
 
 ## Intellectual-property boundary
 

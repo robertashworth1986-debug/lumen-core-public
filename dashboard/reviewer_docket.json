@@ -1,18 +1,42 @@
 {
-  "schema": "lumencore.public_reviewer_docket.v1",
+  "schema": "lumencore.public_reviewer_docket.v2",
   "updated_utc": "2026-08-08T00:00:00Z",
   "canonical_repository": "https://github.com/robertashworth1986-debug/lumen-core-public",
   "public_base_url": "https://lumen-core.ai",
   "current_decision": "HOLD",
   "primary_customer_problem": "Technical and funding decisions are delayed or rejected when the source, eligibility rules, baseline, metric, holdout, evidence lineage, limitations, and decision authority are not locked into one inspectable record.",
-  "primary_positioning": "ProofLock is a buyer-controlled opportunity-assurance workflow that converts one funding opportunity into a source-grounded pursue-or-stop decision and a replayable package plan without promising eligibility, award, acceptance, or submission.",
+  "primary_positioning": "LumenCore provides buyer-controlled baseline validation for one bounded technical decision. ProofLock is the evidence, custody, and claim-gating layer; it is not a separate claim of performance or external validation.",
   "primary_paid_offer": {
-    "name": "ProofLock Opportunity Sprint",
-    "price_usd": 3500,
-    "kickoff_deposit_percent": 50,
-    "target_delivery_business_days": 10,
+    "id": "buyer-owned-baseline-validation-sprint",
+    "name": "LumenCore 30-Day Bounded Validation Sprint",
+    "duration_calendar_days_max": 30,
     "commercial_state": "offer_defined_no_signed_scope_no_payment",
-    "public_url": "https://lumen-core.ai/opportunity_sprint.html"
+    "pricing_status": "founder_approved_hypothesis_not_buyer_tested",
+    "commercial_default": "50 percent at signed scope; 50 percent at delivery of the agreed evidence packet.",
+    "public_url": "https://lumen-core.ai/proof_to_pilot.html",
+    "tiers": [
+      {
+        "tier_id": "launch_replay",
+        "name": "Launch Replay",
+        "proposed_price_usd": 7500,
+        "price_basis": "fixed",
+        "deposit_percent": 50
+      },
+      {
+        "tier_id": "standard_sprint",
+        "name": "Standard Sprint",
+        "proposed_price_usd": 15000,
+        "price_basis": "fixed",
+        "deposit_percent": 50
+      },
+      {
+        "tier_id": "institutional_sprint",
+        "name": "Institutional Sprint",
+        "proposed_price_usd": 25000,
+        "price_basis": "starting_at",
+        "deposit_percent": 50
+      }
+    ]
   },
   "review_instruments": [
     {
