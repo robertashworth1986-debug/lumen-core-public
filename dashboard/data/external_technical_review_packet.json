@@ -36,8 +36,8 @@
     {
       "path": "QUICKSTART.md",
       "purpose": "Five-minute public reproduction entry point.",
-      "bytes": 3410,
-      "sha256": "f83d2a48137e36e3d8d238064f74f21b452e77c2bc7b9db9c917525412a16089",
+      "bytes": 4783,
+      "sha256": "25c607878d731a5c36cba4866d352e318e5c4f4c11b5a64279942b35ca7f12db",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -45,8 +45,8 @@
     {
       "path": "docs/PROOF_CAPSULE_SCHEMA.md",
       "purpose": "Proof Capsule field, hash, and verification contract.",
-      "bytes": 5334,
-      "sha256": "5d53383ac483047621649e94d69ce26048b9434df9ac4bbecbb797830c33617a",
+      "bytes": 8389,
+      "sha256": "a9a6aeafbcef4a7386070c069a9bc71b0a9891e16372c8df0beda81cbc09f973",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -54,8 +54,8 @@
     {
       "path": "examples/proof_capsule/dice_eia_public_capsule.json",
       "purpose": "Concrete bounded public-data capsule example.",
-      "bytes": 3285,
-      "sha256": "73c1c5c6efd9b615c9f28a6c2d3eb83e24f5bd903952a56b43d329e69dfd6f9d",
+      "bytes": 3593,
+      "sha256": "8376af18ca354d25b34cdd08d15a0df1d814fc5a0915f981b06318ca2e9bf250",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -63,8 +63,8 @@
     {
       "path": "code/proof_capsule_verifier.py",
       "purpose": "Local verifier used to inspect capsule integrity.",
-      "bytes": 21168,
-      "sha256": "019b9e54322c97f49c46bcc6605c9c2ea7330cea4e6b068127676152a0220d41",
+      "bytes": 37092,
+      "sha256": "1213f995ab87bb371452296e95f9213a64e5d5e3cb8b52d61979563c35997351",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
