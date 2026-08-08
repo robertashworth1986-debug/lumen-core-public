@@ -8,6 +8,7 @@ on:
       - 'dashboard/robots.txt'
       - 'dashboard/sitemap.xml'
       - 'dashboard/site.webmanifest'
+      - 'dashboard/manifest.json'
       - 'dashboard/assets/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'dashboard/assets/prooflock/**'
@@ -300,7 +301,8 @@ jobs:
           tmp_robots="$(mktemp)"
           tmp_sitemap="$(mktemp)"
           tmp_manifest="$(mktemp)"
-          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data" "$tmp_offer" "$tmp_prooflock" "$tmp_external_review" "$tmp_robots" "$tmp_sitemap" "$tmp_manifest"' EXIT
+          tmp_manifest_headers="$(mktemp)"
+          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data" "$tmp_offer" "$tmp_prooflock" "$tmp_external_review" "$tmp_robots" "$tmp_sitemap" "$tmp_manifest" "$tmp_manifest_headers"' EXIT
 
           status() {
             local url="$1"
@@ -316,9 +318,10 @@ jobs:
           EXTERNAL_REVIEW="$(status "https://lumen-core.ai/external_review.html?deploy=${GITHUB_SHA}" "$tmp_external_review")"
           ROBOTS="$(status "https://lumen-core.ai/robots.txt?deploy=${GITHUB_SHA}" "$tmp_robots")"
           SITEMAP="$(status "https://lumen-core.ai/sitemap.xml?deploy=${GITHUB_SHA}" "$tmp_sitemap")"
-          MANIFEST="$(status "https://lumen-core.ai/site.webmanifest?deploy=${GITHUB_SHA}" "$tmp_manifest")"
+          MANIFEST="$(curl -sS --max-time 15 -D "$tmp_manifest_headers" -o "$tmp_manifest" -w '%{http_code}' "https://lumen-core.ai/manifest.json?deploy=${GITHUB_SHA}" || true)"
+          MANIFEST_TYPE="$(awk 'BEGIN { IGNORECASE=1 } /^Content-Type:/ { value=$0 } END { sub(/^[^:]+:[[:space:]]*/, "", value); sub(/[[:space:]\r]+$/, "", value); print tolower(value) }' "$tmp_manifest_headers")"
 
-          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000} | Offer: ${OFFER:-000} | ProofLock: ${PROOFLOCK:-000} | External review: ${EXTERNAL_REVIEW:-000} | Robots: ${ROBOTS:-000} | Sitemap: ${SITEMAP:-000} | Manifest: ${MANIFEST:-000}"
+          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000} | Offer: ${OFFER:-000} | ProofLock: ${PROOFLOCK:-000} | External review: ${EXTERNAL_REVIEW:-000} | Robots: ${ROBOTS:-000} | Sitemap: ${SITEMAP:-000} | Manifest: ${MANIFEST:-000} (${MANIFEST_TYPE:-missing-content-type})"
 
           [[ "$ROOT" == "200" ]]
           [[ "$EVIDENCE" == "200" ]]
@@ -329,6 +332,7 @@ jobs:
           [[ "$ROBOTS" == "200" ]]
           [[ "$SITEMAP" == "200" ]]
           [[ "$MANIFEST" == "200" ]]
+          [[ "$MANIFEST_TYPE" == application/json* || "$MANIFEST_TYPE" == application/manifest+json* ]]
           grep -Fq 'name="lumencore-surface" content="proof-to-pilot-home-v1"' "$tmp_root"
           grep -Fq 'Turn complex system claims into bounded decisions.' "$tmp_root"
           grep -Fq 'without converting internal evidence into an external-validation claim' "$tmp_root"

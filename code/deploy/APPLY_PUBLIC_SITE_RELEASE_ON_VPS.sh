@@ -17,6 +17,7 @@ readonly -a RELEASE_FILES=(
   "robots.txt"
   "sitemap.xml"
   "site.webmanifest"
+  "manifest.json"
   "assets/lumencore-mark.svg"
   "assets/lumencore.css"
   "assets/luma_command_fabric.css"

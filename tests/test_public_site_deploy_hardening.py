@@ -112,7 +112,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 25
+    assert len(names) == len(set(names)) == 26
     assert names[:3] == [
         "operator_home.html",
         "proof_to_pilot.html",
@@ -123,6 +123,7 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert "robots.txt" in names
     assert "sitemap.xml" in names
     assert "site.webmanifest" in names
+    assert "manifest.json" in names
     assert "assets/lumencore-mark.svg" in names
     assert "assets/lumencore.css" in names
     assert "assets/luma_command_fabric.js" in names
@@ -131,6 +132,16 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert "build_week/prooflock_console/three.module.min.js" in names
     assert "grants.html" not in names
     assert not any(name.startswith("data/") for name in names)
+
+    apply_script = APPLY_SCRIPT.read_text(encoding="utf-8")
+    match = re.search(
+        r"readonly -a RELEASE_FILES=\(\n(?P<body>.*?)\n\)",
+        apply_script,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    root_allowlist = re.findall(r'^\s+"([^"]+)"$', match.group("body"), re.MULTILINE)
+    assert root_allowlist == names
 
 
 def test_package_rejects_unpinned_or_executable_sources(tmp_path):
@@ -197,6 +208,16 @@ def test_live_verifier_maps_canonical_routes_and_assets_to_exact_paths():
     assert verifier.live_url(
         "https://lumen-core.ai", "assets/lumencore.css", commit
     ) == f"https://lumen-core.ai/assets/lumencore.css?release={commit}"
+    assert verifier.content_type_allowed("manifest.json", "application/json")
+    assert verifier.content_type_allowed(
+        "manifest.json", "application/manifest+json"
+    )
+    assert not verifier.content_type_allowed(
+        "manifest.json", "application/octet-stream"
+    )
+    assert verifier.content_type_allowed(
+        "site.webmanifest", "application/octet-stream"
+    )
 
 
 def test_live_verifier_rejects_duplicate_json_keys(tmp_path):

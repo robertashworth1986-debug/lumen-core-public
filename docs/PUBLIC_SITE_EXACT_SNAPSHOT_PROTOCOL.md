@@ -13,7 +13,7 @@ maintenance workflow; it does not authorize a deployment by itself.
   executed.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
-- Only the 25 files in `RELEASE_PATHS` are packaged.
+- Only the 26 files in `RELEASE_PATHS` are packaged.
 - Package bytes are read from immutable Git blobs, not from mutable worktree
   files.
 - The manifest binds the source commit, Git blob IDs, byte counts, file hashes,
