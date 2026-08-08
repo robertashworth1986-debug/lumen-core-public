@@ -351,10 +351,20 @@ if [[ -e "$LOCK_FILE" ]]; then
   echo "Removed verified dead-PID gateway singleton lock."
 fi
 
+POST_APPLY_HASH_MATCHES=0
+printf '%-64s  %-64s  %s\n' "POST_APPLY_SOURCE_SHA256" "POST_APPLY_TARGET_SHA256" "RELATIVE_PATH"
 for rel in "${BUNDLE_FILES[@]}"; do
   install -D -o root -g root -m 0644 -- "$STAGE_DIR/$rel" "$TARGET_ROOT/$rel"
-  [[ "$(sha256sum "$TARGET_ROOT/$rel" | awk '{print $1}')" == "$(sha256sum "$SOURCE_ROOT/$rel" | awk '{print $1}')" ]]
+  post_apply_source_sha="$(sha256sum "$SOURCE_ROOT/$rel" | awk '{print $1}')"
+  post_apply_target_sha="$(sha256sum "$TARGET_ROOT/$rel" | awk '{print $1}')"
+  printf '%-64s  %-64s  %s\n' "$post_apply_source_sha" "$post_apply_target_sha" "$rel"
+  [[ "$post_apply_source_sha" == "$post_apply_target_sha" ]] || {
+    echo "ERROR: post-apply source/target SHA-256 mismatch: $rel" >&2
+    exit 17
+  }
+  POST_APPLY_HASH_MATCHES=$((POST_APPLY_HASH_MATCHES + 1))
 done
+printf 'POST_APPLY_HASH_PARITY=%s/%s\n' "$POST_APPLY_HASH_MATCHES" "${#BUNDLE_FILES[@]}"
 
 systemctl reset-failed "$SERVICE" >/dev/null 2>&1 || true
 systemctl start "$SERVICE"

@@ -56,6 +56,73 @@ class NonTtyInput(io.StringIO):
 
 
 class PromotionLaneSafetyTests(unittest.TestCase):
+    def test_universal_orchestrator_is_fail_closed_paper_only(self) -> None:
+        source = (ROOT / "code" / "run_universal_meta_orchestrator.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('PAPER_ONLY_POLICY = "live_order_submission_disabled"', source)
+        self.assertIn("live_mode_requested", source)
+        self.assertIn("LIVE_REQUEST_BLOCKED", source)
+        self.assertIn("return 2", source)
+        self.assertNotIn("/api/v3/order", source)
+        self.assertNotIn("_private_post(ADD_ORDER_PATH", source)
+        self.assertNotIn("requests.post", source)
+        self.assertNotIn("\n_hydrate_live_keys()\n", source)
+
+    def test_policy_covers_binance_and_private_kraken_transports(self) -> None:
+        policy = json.loads(
+            (ROOT / "config" / "order_submission_path_policy.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertIn("binance_orders_endpoint", policy["patterns"])
+        self.assertIn("kraken_private_add_order_call", policy["patterns"])
+        self.assertTrue(
+            any(
+                rule.get("path") == "code/run_universal_meta_orchestrator.py"
+                and rule.get("classification") == "paper_only_orchestrator"
+                and rule.get("required") is True
+                for rule in policy["rules"]
+            )
+        )
+
+    def test_auditor_rejects_new_binance_and_private_kraken_order_paths(self) -> None:
+        module = load_path(
+            "expanded_order_path_audit_test",
+            ROOT / "code" / "ops" / "AUDIT_ORDER_SUBMISSION_PATHS.py",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "code").mkdir()
+            (root / "code" / "binance_live.py").write_text(
+                'endpoint = "/api/v3/order"\n', encoding="utf-8"
+            )
+            (root / "code" / "kraken_live.py").write_text(
+                "result = _private_post(ADD_ORDER_PATH, payload)\n", encoding="utf-8"
+            )
+            policy = {
+                "version": "test",
+                "promotion_stage": "live_data_no_orders",
+                "patterns": {
+                    "binance_orders_endpoint": r"/api/v3/order\b",
+                    "kraken_private_add_order_call": (
+                        r"_private_post\s*\(\s*ADD_ORDER_PATH\b"
+                    ),
+                },
+                "rules": [],
+            }
+            report = module.audit_repository(root, policy)
+        self.assertEqual(report["status"], "fail")
+        self.assertEqual(report["active_unclassified_count"], 2)
+        self.assertEqual(
+            {
+                pattern
+                for match in report["matches"]
+                for pattern in match["patterns"]
+            },
+            {"binance_orders_endpoint", "kraken_private_add_order_call"},
+        )
+
     def test_read_only_orchestrator_has_no_submission_transport(self) -> None:
         path = ROOT / "code" / "execution" / "execution_orchestrator.py"
         source = path.read_text(encoding="utf-8")

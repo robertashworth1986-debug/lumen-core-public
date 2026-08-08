@@ -156,16 +156,16 @@ def _env(name: str) -> str:
 
 def verify_env_only() -> Dict[str, Any]:
     _hydrate_live_keys()
-    api_key_present = bool(os.getenv("KRAKEN_API_KEY", "").strip())
-    api_secret_present = bool(os.getenv("KRAKEN_API_SECRET", "").strip())
+    configured = bool(
+        os.getenv("KRAKEN_API_KEY", "").strip()
+        and os.getenv("KRAKEN_API_SECRET", "").strip()
+    )
     status = {
         "timestamp": _now_iso(),
-        "api_key_present": api_key_present,
-        "api_secret_present": api_secret_present,
-        "env_only": True
+        "credential_state": "configured" if configured else "missing",
+        "env_only": True,
+        "network_contacted": False,
     }
-    _append_jsonl(EVENTS_FILE, {"event": "verify_env_only", **status})
-    _write_json(LAST_RESULT_FILE, status)
     return status
 
 

@@ -211,6 +211,10 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     assert "/opt/lumencore/code" in script
     assert "singleton lock owner is still alive; refusing removal" in script
     assert "Removed verified dead-PID gateway singleton lock" in script
+    assert "POST_APPLY_SOURCE_SHA256" in script
+    assert "POST_APPLY_TARGET_SHA256" in script
+    assert "POST_APPLY_HASH_PARITY=" in script
+    assert "post-apply source/target SHA-256 mismatch" in script
     assert "GATEWAY_DEPENDENCY_CLOSURE_REPAIR_OK" in script
     assert "rm -rf -- \"$TARGET_ROOT\"" not in script
     assert '[[ "$STAGE_DIR" =~ ^/tmp/lumencore-gateway-stage\\.' in script
