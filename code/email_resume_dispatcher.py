@@ -21,6 +21,7 @@ Environment (primary source, no secrets committed):
 Safety:
   - Does not resend the same opportunity id once marked sent.
   - Supports --dry-run for non-destructive validation.
+  - Requires --once --send-approved on the current invocation before any message can leave the machine.
 """
 
 from __future__ import annotations
@@ -277,35 +278,35 @@ def build_body(profile: dict[str, Any], truth: dict[str, Any], row: dict[str, An
     pi = profile.get("pi", {}) if isinstance(profile, dict) else {}
 
     name = str(pi.get("name") or company.get("founder_pi") or "Robert BabyRay Ashworth")
-    title = str(pi.get("title") or company.get("founder_role") or "Principal Quant Systems Engineer")
+    title = str(
+        pi.get("title")
+        or company.get("founder_role")
+        or "Software Infrastructure & AI Evaluation Specialist"
+    )
     email = str(company.get("email") or "robertashworth4444@gmail.com")
     phone = str(company.get("phone") or "615-438-2502")
     website = str(company.get("website") or "https://lumen-core.ai")
 
-    opp_type = str(row.get("opportunity_type") or "opportunity")
-    opp_score = safe_float(row.get("fit_score"), safe_float(row.get("raw_score"), 0.0) / 15.0)
+    opp_type = normalize_text(row.get("opportunity_type")) or "software engineering opportunity"
 
     lines = [
         "Hello,",
         "",
-        "I am sharing my updated resume package in response to this opportunity.",
+        f"I am sharing my resume in response to the {opp_type}.",
         "",
-        f"Opportunity type: {opp_type}",
-        f"Opportunity fit score: {opp_score:.2f}",
+        "I build and review Python infrastructure, AI-evaluation workflows, APIs, runtime controls, and reproducible technical evidence. My work emphasizes deterministic behavior, explicit human authority, retained failure results, and clear engineering documentation.",
         "",
-        "Current production truth snapshot:",
-        f"- Policy: {truth.get('policy', 'current_production_truth_only')}",
-        f"- Status: {truth.get('status', 'UNKNOWN')}",
-        f"- Chain entry SHA256: {truth.get('entry_sha256', '')}",
-        f"- Master valuation proxy USD: {truth.get('master_valuation_proxy_usd', 0.0):,.2f}",
-        f"- Valuation increment USD: {truth.get('valuation_increment_usd', 0.0):,.2f}",
-        f"- Opportunities total: {truth.get('opportunities_total', 0)}",
+        "Relevant strengths:",
+        "- Python platform and reliability engineering",
+        "- AI evaluation, quality controls, and failure analysis",
+        "- FastAPI, automation, CI, and operator-facing tooling",
+        "- Deterministic artifacts, SHA-256 manifests, and reproducible review commands",
         "",
-        "Attached:",
-        "- Resume (markdown)",
-        "- Resume (pdf, when available)",
+        "My public materials document first-party code and verification controls; they do not claim external certification or guaranteed performance. I would welcome a technical conversation about the role and its evaluation criteria.",
         "",
-        "Thank you for your time.",
+        "Attached: resume in Markdown and, when available, PDF format.",
+        "",
+        "Thank you for your consideration.",
         "",
         f"{name}",
         title,
@@ -379,7 +380,13 @@ def render_markdown(summary: dict[str, Any], queue_rows: list[dict[str, Any]]) -
     return "\n".join(lines)
 
 
-def run_cycle(*, min_fit_score: float, limit: int, dry_run: bool) -> dict[str, Any]:
+def run_cycle(
+    *,
+    min_fit_score: float,
+    limit: int,
+    dry_run: bool,
+    send_approved: bool = False,
+) -> dict[str, Any]:
     OUT_EMAIL.mkdir(parents=True, exist_ok=True)
     OUT_OPS.mkdir(parents=True, exist_ok=True)
 
@@ -401,6 +408,8 @@ def run_cycle(*, min_fit_score: float, limit: int, dry_run: bool) -> dict[str, A
     outlook_ready = bool(smtp_cfg.get("use_outlook", False))
     if dry_run:
         dispatch_mode = "dry_run"
+    elif not send_approved:
+        dispatch_mode = "human_send_approval_required"
     elif smtp_ready:
         dispatch_mode = "smtp_live"
     elif outlook_ready:
@@ -450,6 +459,10 @@ def run_cycle(*, min_fit_score: float, limit: int, dry_run: bool) -> dict[str, A
                 if dry_run:
                     outcome = "dry_run"
                     dry_run_count += 1
+                elif not send_approved:
+                    outcome = "skipped"
+                    note = "human_send_approval_required"
+                    skipped_count += 1
                 elif smtp_ready:
                     smtp_send(msg, smtp_cfg)
                     outcome = "sent"
@@ -520,7 +533,9 @@ def run_cycle(*, min_fit_score: float, limit: int, dry_run: bool) -> dict[str, A
     write_json(QUEUE_PATH, queue_payload)
 
     status = "ok"
-    if not dry_run and not smtp_ready and not outlook_ready:
+    if not dry_run and not send_approved:
+        status = "human_send_approval_required"
+    elif not dry_run and not smtp_ready and not outlook_ready:
         status = "no_transport_configured"
 
     summary = {
@@ -528,6 +543,7 @@ def run_cycle(*, min_fit_score: float, limit: int, dry_run: bool) -> dict[str, A
         "scope": "email_resume_dispatch_cycle",
         "status": status,
         "dispatch_mode": dispatch_mode,
+        "send_approved_for_this_run": bool(send_approved),
         "smtp_configured": smtp_ready,
         "outlook_com_enabled": outlook_ready,
         "sender": sender,
@@ -592,10 +608,22 @@ def main() -> int:
     parser.add_argument("--min-fit-score", type=float, default=0.42, help="Minimum opportunity fit score to dispatch.")
     parser.add_argument("--limit", type=int, default=20, help="Max opportunities to evaluate per cycle.")
     parser.add_argument("--dry-run", action="store_true", help="Build dispatch candidates but do not send SMTP mail.")
+    parser.add_argument(
+        "--send-approved",
+        action="store_true",
+        help="Confirm human approval for outbound messages on this invocation only.",
+    )
     args = parser.parse_args()
+    if args.send_approved and not args.once:
+        parser.error("--send-approved requires --once so approval cannot persist across polling cycles")
 
     if args.once:
-        summary = run_cycle(min_fit_score=args.min_fit_score, limit=args.limit, dry_run=args.dry_run)
+        summary = run_cycle(
+            min_fit_score=args.min_fit_score,
+            limit=args.limit,
+            dry_run=args.dry_run,
+            send_approved=args.send_approved,
+        )
         print(f"EMAIL_RESUME_DISPATCH_LATEST={LATEST_PATH}")
         print(f"EMAIL_RESUME_DISPATCH_QUEUE={QUEUE_PATH}")
         print(f"EMAIL_RESUME_DISPATCH_MANIFEST={MANIFEST_LATEST}")
@@ -604,7 +632,12 @@ def main() -> int:
 
     while True:
         try:
-            summary = run_cycle(min_fit_score=args.min_fit_score, limit=args.limit, dry_run=args.dry_run)
+            summary = run_cycle(
+                min_fit_score=args.min_fit_score,
+                limit=args.limit,
+                dry_run=args.dry_run,
+                send_approved=args.send_approved,
+            )
             print(
                 json.dumps(
                     {

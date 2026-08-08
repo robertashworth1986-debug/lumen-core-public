@@ -35,7 +35,7 @@ def build_html() -> Path:
 <head>
   <meta charset=\"UTF-8\" />
   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />
-  <title>Robert Ashworth - Elite Resume</title>
+  <title>Robert Ashworth - Infrastructure and AI Evaluation Resume</title>
   <style>
     :root {{
       --ink: #0f1c2f;
