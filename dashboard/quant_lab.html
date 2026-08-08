@@ -1888,17 +1888,39 @@ let cpCursor = 0;
 
 function cpRender() {
   if (!cpFiltered.length) {
-    cpList.innerHTML = '<div class="cp-empty">no matches — try a pane name or "verify", "share", "voice"</div>';
+    const empty = document.createElement('div');
+    empty.className = 'cp-empty';
+    empty.textContent = 'no matches — try a pane name or "verify", "share", "voice"';
+    cpList.replaceChildren(empty);
     return;
   }
-  cpList.innerHTML = cpFiltered.map((r, i) => {
+  const rows = cpFiltered.map((r, i) => {
     const ico = r.kind === 'action' ? '⚡' : '◉';
-    return `<div class="cp-row ${i===cpCursor?'active':''}" data-i="${i}">
-      <div class="ico">${ico}</div>
-      <div class="body"><div class="ttl">${r.title}</div><div class="sub">${r.hint||''}</div></div>
-      <div class="kind ${r.kind}">${r.kind}</div>
-    </div>`;
-  }).join('');
+    const row = document.createElement('div');
+    row.className = `cp-row ${i === cpCursor ? 'active' : ''}`.trim();
+    row.dataset.i = String(i);
+
+    const icon = document.createElement('div');
+    icon.className = 'ico';
+    icon.textContent = ico;
+
+    const body = document.createElement('div');
+    body.className = 'body';
+    const title = document.createElement('div');
+    title.className = 'ttl';
+    title.textContent = String(r.title || '');
+    const hint = document.createElement('div');
+    hint.className = 'sub';
+    hint.textContent = String(r.hint || '');
+    body.append(title, hint);
+
+    const kind = document.createElement('div');
+    kind.className = `kind ${r.kind === 'action' ? 'action' : 'pane'}`;
+    kind.textContent = r.kind === 'action' ? 'action' : 'pane';
+    row.append(icon, body, kind);
+    return row;
+  });
+  cpList.replaceChildren(...rows);
   cpList.querySelectorAll('.cp-row').forEach(el =>
     el.addEventListener('click', () => { cpCursor = +el.dataset.i; cpRun(); }));
   const a = cpList.querySelector('.cp-row.active');
@@ -2348,71 +2370,135 @@ async function printProof() {
   const derbyDesc = derbyPick
     ? `${String(derbyPick.label || 'Derby pick')} · ${String(derbyPick.game || derbyPick.sport_key || '').trim() || 'race pending'} · edge ${derbyEdgeText}`
     : 'No Derby/horse-racing paper candidate in current Sports Alpha board';
-  const evRows = events.map(ev => `<tr><td>${(ev.ts||'').replace('T',' ').slice(0,19)}Z</td><td>${(ev.side||'').toUpperCase()}</td><td>${ev.pair||''}</td><td>${ev.volume||''}</td><td style="font-family:monospace">${ev.txid||''}</td></tr>`).join('') || '<tr><td colspan="5" style="color:#5b6585">no events</td></tr>';
-  let posBlock = '';
+  function heading(level, text) {
+    const el = document.createElement(level);
+    el.textContent = String(text || '');
+    host.appendChild(el);
+  }
+
+  function textBlock(className, text) {
+    const el = document.createElement('div');
+    if (className) el.className = className;
+    el.textContent = String(text || '');
+    host.appendChild(el);
+    return el;
+  }
+
+  function dataTable(headers, rows, emptyMessage = 'no rows') {
+    const table = document.createElement('table');
+    const headRow = document.createElement('tr');
+    headers.forEach((header) => {
+      const th = document.createElement('th');
+      th.textContent = String(header);
+      headRow.appendChild(th);
+    });
+    table.appendChild(headRow);
+    if (!rows.length) {
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = headers.length;
+      cell.style.color = '#5b6585';
+      cell.textContent = emptyMessage;
+      row.appendChild(cell);
+      table.appendChild(row);
+    } else {
+      rows.forEach((values) => {
+        const row = document.createElement('tr');
+        values.forEach((value, index) => {
+          const cell = document.createElement('td');
+          if (headers[index] === 'TXID') cell.style.fontFamily = 'monospace';
+          cell.textContent = String(value ?? '');
+          row.appendChild(cell);
+        });
+        table.appendChild(row);
+      });
+    }
+    host.appendChild(table);
+  }
+
+  host.replaceChildren();
+  heading('h1', 'LUMA QUANT LAB · INVESTOR EVIDENCE BUNDLE');
+  textBlock('meta', `Generated ${ts} · Active pane: ${pane} · Benchmark run: ${benchmarkRun} · Manifest hash: ${hashShort}`);
+  heading('h2', 'Live Pulse Snapshot');
+  dataTable(['KPI', 'Value'], [
+    ['Paper Equity', eq],
+    ['Net PnL', `${pnl} · ${trades}`],
+    ['Edge Verdict', `${edge} · ${sharpe}`],
+    ['Top Signal', sig],
+    ['Kentucky Derby Paper Lane', derbyDesc],
+    ['FlowForm Geometry Proof Lane', '/harmonic_proofpack_mission.html · phase/harmonic routing evidence'],
+    ['Active Lane', lane],
+    ['Package Usage', `${pkg} · ${pkgSub}`],
+    ['High-Perf Engines', `${engines} · ${enginesSub}`],
+    ['Runtime Safety', runtime],
+    ['Approval Queue', approvals],
+    ['TXID Cadence', txCadence],
+    ['Realized Net', realized],
+  ]);
+
+  heading('h2', 'Last 10 Execution Events (live ledger)');
+  dataTable(
+    ['Timestamp', 'Side', 'Pair', 'Volume', 'TXID'],
+    events.map(ev => [
+      `${String(ev?.ts || '').replace('T', ' ').slice(0, 19)}Z`,
+      String(ev?.side || '').toUpperCase(),
+      ev?.pair || '',
+      ev?.volume || '',
+      ev?.txid || '',
+    ]),
+    'no events',
+  );
+
   if (pos) {
     const pt = pos.totals || {};
-    const lots = (pos.lots_open || []).map(l => `<tr><td>${(l.ts||'').replace('T',' ').slice(0,19)}Z</td><td>${l.pair||''}</td><td>${(l.side||'').toUpperCase()}</td><td>${(l.volume||0)}</td><td style="font-family:monospace">${l.txid||''}</td></tr>`).join('') || '<tr><td colspan="5" style="color:#5b6585">no open lots</td></tr>';
-    const disclosure = (pt.real_sells === 0 && (pt.open_lot_count || 0) > 0)
-      ? `<div style="margin:8px 0 0; padding:10px; border:1px solid #f59e0b; border-left-width:4px; background:#fff7ed; color:#92400e; font-size:11px"><b>Disclosure:</b> live Kraken ledger shows ${pt.real_buys||0} buys and ${pt.real_sells||0} sells. ${pt.open_lot_count||0} open lot(s) have not yet been closed; mark-to-market is paper-engine simulation until matching sells appear.</div>`
-      : '';
-    posBlock = `
-    <h2>Live Kraken Ledger Truth</h2>
-    <table>
-      <tr><th>Metric</th><th>Value</th></tr>
-      <tr><td>Real buys / sells</td><td>${pt.real_buys||0} / ${pt.real_sells||0}</td></tr>
-      <tr><td>Open lots</td><td>${pt.open_lot_count||0}</td></tr>
-      <tr><td>Closed round-trips</td><td>${pt.closed_round_trips||0}</td></tr>
-      <tr><td>Total ledger events</td><td>${pt.events_total||0}</td></tr>
-    </table>
-    ${disclosure}
-    <h2>Open Lots (real Kraken TXIDs)</h2>
-    <table>
-      <tr><th>Opened</th><th>Pair</th><th>Side</th><th>Volume</th><th>TXID</th></tr>
-      ${lots}
-    </table>`;
+    heading('h2', 'Live Kraken Ledger Truth');
+    dataTable(['Metric', 'Value'], [
+      ['Real buys / sells', `${Number(pt.real_buys) || 0} / ${Number(pt.real_sells) || 0}`],
+      ['Open lots', Number(pt.open_lot_count) || 0],
+      ['Closed round-trips', Number(pt.closed_round_trips) || 0],
+      ['Total ledger events', Number(pt.events_total) || 0],
+    ]);
+    if (Number(pt.real_sells) === 0 && Number(pt.open_lot_count) > 0) {
+      const disclosure = textBlock('', `Disclosure: live Kraken ledger shows ${Number(pt.real_buys) || 0} buys and ${Number(pt.real_sells) || 0} sells. ${Number(pt.open_lot_count) || 0} open lot(s) have not yet been closed; mark-to-market is paper-engine simulation until matching sells appear.`);
+      disclosure.style.cssText = 'margin:8px 0 0; padding:10px; border:1px solid #f59e0b; border-left-width:4px; background:#fff7ed; color:#92400e; font-size:11px';
+    }
+    heading('h2', 'Open Lots (real Kraken TXIDs)');
+    dataTable(
+      ['Opened', 'Pair', 'Side', 'Volume', 'TXID'],
+      (pos.lots_open || []).map(lot => [
+        `${String(lot?.ts || '').replace('T', ' ').slice(0, 19)}Z`,
+        lot?.pair || '',
+        String(lot?.side || '').toUpperCase(),
+        Number(lot?.volume) || 0,
+        lot?.txid || '',
+      ]),
+      'no open lots',
+    );
   }
-  host.innerHTML = `
-    <h1>LUMA QUANT LAB · INVESTOR EVIDENCE BUNDLE</h1>
-    <div class="meta">Generated ${ts} · Active pane: <b>${pane}</b> · Benchmark run: ${benchmarkRun} · Manifest hash: ${hashShort}</div>
-    <h2>Live Pulse Snapshot</h2>
-    <table>
-      <tr><th>KPI</th><th>Value</th></tr>
-      <tr><td>Paper Equity</td><td>${eq}</td></tr>
-      <tr><td>Net PnL</td><td>${pnl} · ${trades}</td></tr>
-      <tr><td>Edge Verdict</td><td>${edge} · ${sharpe}</td></tr>
-      <tr><td>Top Signal</td><td>${sig}</td></tr>
-      <tr><td>Kentucky Derby Paper Lane</td><td>${derbyDesc}</td></tr>
-      <tr><td>FlowForm Geometry Proof Lane</td><td>/harmonic_proofpack_mission.html · phase/harmonic routing evidence</td></tr>
-      <tr><td>Active Lane</td><td>${lane}</td></tr>
-      <tr><td>Package Usage</td><td>${pkg} · ${pkgSub}</td></tr>
-      <tr><td>High-Perf Engines</td><td>${engines} · ${enginesSub}</td></tr>
-      <tr><td>Runtime Safety</td><td>${runtime}</td></tr>
-      <tr><td>Approval Queue</td><td>${approvals}</td></tr>
-      <tr><td>TXID Cadence</td><td>${txCadence}</td></tr>
-      <tr><td>Realized Net</td><td>${realized}</td></tr>
-    </table>
-    <h2>Last 10 Execution Events (live ledger)</h2>
-    <table>
-      <tr><th>Timestamp</th><th>Side</th><th>Pair</th><th>Volume</th><th>Kraken TXID</th></tr>
-      ${evRows}
-    </table>
-    ${posBlock}
-    <h2>Cockpit URL</h2>
-    <div class="meta">${cockpitBaseHref()}#${paneHash}?ts=${encodeURIComponent(ts)}&run=${encodeURIComponent(benchmarkRun)}</div>
-    <div class="seal">
-      <b>AUDIT-READY · INVESTOR-SAFE · CHAIN-OF-CUSTODY VERIFIED</b><br>
-      Benchmark dataset scope (succeeded/universe, evidence-run only): ${benchmarkScope} · Hash: ${hashFull}<br>
-      Investor packet scope: measured financial/runtime evidence only (paper/advisory mode, no control-write execution).<br>
-      Evidence gate: narrative-only claims are excluded from this packet.<br>
-      Build: LumaTrader / LumenCore / NovaCore — Robert BabyRay Ashworth<br>
-      This document is reproducible by replaying the cockpit URL above against the same frozen run.
-    </div>
-    <div class="actions">
-      <button onclick="window.print()">PRINT / SAVE PDF</button>
-      <button class="ghost" onclick="document.getElementById('proof-print').classList.remove('show')">CLOSE</button>
-    </div>
-  `;
+
+  heading('h2', 'Cockpit URL');
+  textBlock('meta', `${cockpitBaseHref()}#${paneHash}?ts=${encodeURIComponent(ts)}&run=${encodeURIComponent(benchmarkRun)}`);
+  const seal = textBlock('seal', [
+    'AUDIT-READY · INVESTOR-SAFE · CHAIN-OF-CUSTODY VERIFIED',
+    `Benchmark dataset scope (succeeded/universe, evidence-run only): ${benchmarkScope} · Hash: ${hashFull}`,
+    'Investor packet scope: measured financial/runtime evidence only (paper/advisory mode, no control-write execution).',
+    'Evidence gate: narrative-only claims are excluded from this packet.',
+    'Build: LumaTrader / LumenCore / NovaCore — Robert BabyRay Ashworth',
+    'This document is reproducible by replaying the cockpit URL above against the same frozen run.',
+  ].join('\n'));
+  seal.style.whiteSpace = 'pre-line';
+
+  const actions = document.createElement('div');
+  actions.className = 'actions';
+  const printButton = document.createElement('button');
+  printButton.textContent = 'PRINT / SAVE PDF';
+  printButton.addEventListener('click', () => window.print());
+  const closeButton = document.createElement('button');
+  closeButton.className = 'ghost';
+  closeButton.textContent = 'CLOSE';
+  closeButton.addEventListener('click', () => host.classList.remove('show'));
+  actions.append(printButton, closeButton);
+  host.appendChild(actions);
   host.classList.add('show');
 }
 $('#ql-proof').addEventListener('click', printProof);

@@ -29,6 +29,7 @@ Mount in luma_experience_gateway.py:
 """
 from __future__ import annotations
 
+import logging
 import sys
 import time
 from pathlib import Path
@@ -63,6 +64,7 @@ class _State:
 
 
 _S = _State()
+log = logging.getLogger(__name__)
 
 
 def _load_state() -> None:
@@ -122,6 +124,23 @@ def _load_state() -> None:
 def _ensure_loaded() -> None:
     if _S.clf is None:
         _load_state()
+
+
+def _dataset_source(dataset_id: str) -> Path:
+    """Select a server-owned CSV by stem without joining route input to a path."""
+    raw_dir = _S.raw_dir
+    if raw_dir is None:
+        raise HTTPException(status_code=503, detail="forecast service is unavailable")
+    try:
+        source = next(
+            (candidate for candidate in raw_dir.glob("*.csv") if candidate.stem == dataset_id),
+            None,
+        )
+    except OSError:
+        source = None
+    if source is None:
+        raise HTTPException(status_code=404, detail="dataset not found")
+    return source
 
 
 # ---------------------------------------------------------------------------
@@ -184,8 +203,8 @@ def _bootstrap_bands(y_train: np.ndarray, point: np.ndarray,
 def list_datasets(limit: int = Query(default=200, ge=1, le=2000)) -> JSONResponse:
     try:
         _ensure_loaded()
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except RuntimeError:
+        raise HTTPException(status_code=503, detail="forecast service is unavailable")
 
     items: list[dict] = []
     for p in sorted(_S.raw_dir.glob("*.csv")):
@@ -214,18 +233,17 @@ def forecast(dataset_id: str,
              h: int = Query(default=12, ge=1, le=120)) -> JSONResponse:
     try:
         _ensure_loaded()
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except RuntimeError:
+        raise HTTPException(status_code=503, detail="forecast service is unavailable")
 
-    src = _S.raw_dir / f"{dataset_id}.csv"
-    if not src.exists():
-        raise HTTPException(status_code=404, detail=f"dataset not found: {dataset_id}")
+    src = _dataset_source(dataset_id)
 
     try:
         df = pd.read_csv(src)
         y = df["value"].to_numpy(dtype=float)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"read error: {e}")
+    except Exception:
+        log.exception("forecast dataset read failed")
+        raise HTTPException(status_code=500, detail="dataset read failed")
     if len(y) < 30:
         raise HTTPException(status_code=400,
                             detail=f"series too short ({len(y)} obs)")
@@ -241,8 +259,9 @@ def forecast(dataset_id: str,
             proba = {c: round(float(p[i]), 4) for i, c in enumerate(classes)}
         except Exception:
             proba = None
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"router failed: {e}")
+    except Exception:
+        log.exception("forecast router evaluation failed")
+        raise HTTPException(status_code=500, detail="router evaluation failed")
 
     # 2) Forecast with chosen family champion
     model_fn = _S.family_models.get(chosen)
@@ -250,9 +269,9 @@ def forecast(dataset_id: str,
         raise HTTPException(status_code=500, detail=f"no model for family {chosen!r}")
     try:
         point = np.asarray(model_fn(y, h), dtype=float)
-    except Exception as e:
-        raise HTTPException(status_code=500,
-                            detail=f"family model {chosen} failed: {e}")
+    except Exception:
+        log.exception("forecast family model failed")
+        raise HTTPException(status_code=500, detail="forecast model failed")
     if not np.isfinite(point).all():
         point = np.nan_to_num(point, nan=float(np.mean(y)))
 
@@ -302,12 +321,12 @@ def anomalies(limit: int = Query(default=50, ge=1, le=500),
     """Return ranked anomaly scanner output for the latest run."""
     try:
         _ensure_loaded()
-    except RuntimeError as e:
+    except RuntimeError:
         return JSONResponse({
             "run_utc": None,
             "summary": {
                 "available": False,
-                "reason": str(e),
+                "reason": "forecast service is unavailable",
             },
             "n_returned": 0,
             "ranked": [],
@@ -353,12 +372,12 @@ def evidence_overview() -> JSONResponse:
     """Aggregate the headline numbers from every innovation pack."""
     try:
         _ensure_loaded()
-    except RuntimeError as e:
+    except RuntimeError:
         return JSONResponse({
             "run_utc": None,
             "router_run": None,
             "available": False,
-            "reason": str(e),
+            "reason": "forecast service is unavailable",
             "v2": {},
             "router": {},
             "stacker": {},
@@ -419,18 +438,17 @@ def explain(dataset_id: str) -> JSONResponse:
     """
     try:
         _ensure_loaded()
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except RuntimeError:
+        raise HTTPException(status_code=503, detail="forecast service is unavailable")
 
-    src = _S.raw_dir / f"{dataset_id}.csv"
-    if not src.exists():
-        raise HTTPException(status_code=404, detail=f"dataset not found: {dataset_id}")
+    src = _dataset_source(dataset_id)
 
     try:
         df = pd.read_csv(src)
         y = df["value"].to_numpy(dtype=float)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"read error: {e}")
+    except Exception:
+        log.exception("forecast explanation dataset read failed")
+        raise HTTPException(status_code=500, detail="dataset read failed")
     if len(y) < 30:
         raise HTTPException(status_code=400, detail=f"series too short ({len(y)} obs)")
 
@@ -512,8 +530,8 @@ def regime(limit: int = Query(default=100, ge=1, le=1000),
     """Regime-shift scanner output for the latest run."""
     try:
         _ensure_loaded()
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except RuntimeError:
+        raise HTTPException(status_code=503, detail="forecast service is unavailable")
 
     rg_dir = ROOT / "out" / "regime_shift_scanner" / _S.run_utc
     summary_p = rg_dir / "summary.json"
@@ -544,9 +562,9 @@ def index() -> JSONResponse:
         _ensure_loaded()
         ready = True
         msg = None
-    except RuntimeError as e:
+    except RuntimeError:
         ready = False
-        msg = str(e)
+        msg = "forecast service is unavailable"
     return JSONResponse({
         "service": "LumenCore Forecast API",
         "ready": ready,

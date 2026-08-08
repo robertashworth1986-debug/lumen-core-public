@@ -1509,7 +1509,42 @@ function normOpp(value) {
 }
 
 function isHttpUrl(value) {
-  return /^https?:\/\//i.test(String(value || ''));
+  try {
+    return new URL(String(value || '').trim()).protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+const TRUSTED_GRANT_DOMAINS = Object.freeze([
+  'grants.gov',
+  'helloskip.com',
+  'smartsimple.com',
+  'science.osti.gov',
+  'nist.gov',
+  'nsf.gov',
+  'sbir.nasa.gov',
+  'nasa.gov',
+  'afwerx.com',
+  'arpa-e.energy.gov',
+  'techpartnerships.noaa.gov',
+  'darpa.mil',
+  'energy.gov',
+]);
+
+function isTrustedGrantHost(hostname) {
+  const host = String(hostname || '').toLowerCase().replace(/\.$/, '');
+  return TRUSTED_GRANT_DOMAINS.some(domain => host === domain || host.endsWith(`.${domain}`));
+}
+
+function trustedGrantUrl(value) {
+  try {
+    const parsed = new URL(String(value || '').trim());
+    if (parsed.protocol !== 'https:' || !isTrustedGrantHost(parsed.hostname)) return '';
+    return parsed.href;
+  } catch {
+    return '';
+  }
 }
 
 function isUuid(value) {
@@ -1532,7 +1567,8 @@ async function loadGrantSubmitFitPack() {
   opps.forEach((op) => {
     const key = normOpp(op?.opp_num);
     const url = String(op?.submit_url || '').trim();
-    if (key && isHttpUrl(url)) grantSubmitUrlByOpp.set(key, url);
+    const trustedUrl = trustedGrantUrl(url);
+    if (key && trustedUrl) grantSubmitUrlByOpp.set(key, trustedUrl);
   });
 }
 
@@ -2330,12 +2366,19 @@ function renderHelmyerPane(helmyerPayload, providerPackPayload, readinessPayload
 
   const host = $('helmyer-list');
   if (host) {
-    host.innerHTML = qaItems.slice(0, 6).map((item) => `
-      <div class="helmyer-row">
-        <div class="q">${escHTML(item.q)}</div>
-        <div class="a">${escHTML(item.a)}</div>
-      </div>
-    `).join('');
+    const rows = qaItems.slice(0, 6).map((item) => {
+      const row = document.createElement('div');
+      row.className = 'helmyer-row';
+      const question = document.createElement('div');
+      question.className = 'q';
+      question.textContent = String(item.q || '');
+      const answer = document.createElement('div');
+      answer.className = 'a';
+      answer.textContent = String(item.a || '');
+      row.append(question, answer);
+      return row;
+    });
+    host.replaceChildren(...rows);
   }
 
   const note = $('helmyer-note');
@@ -3051,16 +3094,18 @@ function isInformationalGrantLanding(url) {
   const host = parsed.hostname.toLowerCase();
   const path = parsed.pathname.toLowerCase();
 
-  if (host.includes('grants.gov') || host.includes('simpler.grants.gov')) return false;
-  if (host.includes('helloskip.com') || host.includes('smartsimple')) return false;
+  if (!isTrustedGrantHost(host)) return false;
+  if (host === 'grants.gov' || host.endsWith('.grants.gov')) return false;
+  if (host === 'helloskip.com' || host.endsWith('.helloskip.com')) return false;
+  if (host === 'smartsimple.com' || host.endsWith('.smartsimple.com')) return false;
 
-  if (host.includes('science.osti.gov') && /^\/sbir\/?$/.test(path)) return true;
-  if (host.includes('nist.gov') && /\/sbir\/?$/.test(path)) return true;
-  if (host.includes('seedfund.nsf.gov')) return true;
-  if (host.includes('sbir.nasa.gov')) return true;
-  if (host.includes('afwerx.com')) return true;
-  if (host.includes('arpa-e.energy.gov')) return true;
-  if (host.includes('techpartnerships.noaa.gov')) return true;
+  if (host === 'science.osti.gov' && /^\/sbir\/?$/.test(path)) return true;
+  if ((host === 'nist.gov' || host.endsWith('.nist.gov')) && /^\/sbir\/?$/.test(path)) return true;
+  if (host === 'seedfund.nsf.gov' || host === 'new.nsf.gov') return true;
+  if (host === 'sbir.nasa.gov') return true;
+  if (host === 'afwerx.com' || host.endsWith('.afwerx.com')) return true;
+  if (host === 'arpa-e.energy.gov') return true;
+  if (host === 'techpartnerships.noaa.gov') return true;
 
   if ((path === '/' || path === '') && /(sbir|sttr|grant|funding|opportun)/i.test(target)) return true;
   return false;
@@ -3071,9 +3116,10 @@ function buildGrantSubmitUrl(item) {
   const opp = normOpp(item?.opp_num || parseOppNumFromGrantUrl(sourceUrl) || '');
 
   const explicit = String(item?.submit_url || item?.portal_url || item?.submission_url || '').trim();
-  if (isHttpUrl(explicit)) {
-    if (!isInformationalGrantLanding(explicit)) {
-      return explicit;
+  const trustedExplicit = trustedGrantUrl(explicit);
+  if (trustedExplicit) {
+    if (!isInformationalGrantLanding(trustedExplicit)) {
+      return trustedExplicit;
     }
     return buildGrantConsoleUrl(item, true);
   }
@@ -3082,28 +3128,28 @@ function buildGrantSubmitUrl(item) {
     return String(grantSubmitUrlByOpp.get(opp) || '');
   }
 
-  if (/grants\.gov\/search-results-detail\//i.test(sourceUrl)) {
-    return sourceUrl;
-  }
-
-  if (/simpler\.grants\.gov\/opportunity\//i.test(sourceUrl)) {
-    return sourceUrl;
-  }
-
-  if (/smartsimple/i.test(sourceUrl)) {
-    return sourceUrl;
+  const trustedSourceUrl = trustedGrantUrl(sourceUrl);
+  if (trustedSourceUrl) {
+    const parsedSource = new URL(trustedSourceUrl);
+    const sourceHost = parsedSource.hostname.toLowerCase();
+    const sourcePath = parsedSource.pathname.toLowerCase();
+    const isGrantsListing = (sourceHost === 'grants.gov' || sourceHost.endsWith('.grants.gov'))
+      && sourcePath.startsWith('/search-results-detail/');
+    const isSimplerListing = sourceHost === 'simpler.grants.gov'
+      && sourcePath.startsWith('/opportunity/');
+    const isSmartSimple = sourceHost === 'smartsimple.com' || sourceHost.endsWith('.smartsimple.com');
+    if (isGrantsListing || isSimplerListing || isSmartSimple) return trustedSourceUrl;
   }
 
   if (opp) {
     return grantSearchUrl(opp);
   }
 
-  const src = String(item?.url || '').trim();
-  if (/^https?:\/\//i.test(src)) {
-    if (isInformationalGrantLanding(src)) {
+  if (trustedSourceUrl) {
+    if (isInformationalGrantLanding(trustedSourceUrl)) {
       return buildGrantConsoleUrl(item, true);
     }
-    return src;
+    return trustedSourceUrl;
   }
   return 'grants.html';
 }
@@ -3111,14 +3157,19 @@ function buildGrantSubmitUrl(item) {
 function grantRouteLabel(url) {
   const target = String(url || '').trim();
   if (!target) return 'route: none';
-  if (/grants\.gov\/search-results-detail\//i.test(target)) return 'route: grants.gov listing';
-  if (/simpler\.grants\.gov\/opportunity\//i.test(target)) return 'route: simpler listing';
-  if (/simpler\.grants\.gov\/search/i.test(target)) return 'route: simpler search';
-  if (/helloskip\.com/i.test(target)) return 'route: hello skip';
-  if (/smartsimple/i.test(target)) return 'route: SmartSimple';
-  if (/grants\.html/i.test(target)) return 'route: grant console';
+  if (target === 'grants.html' || target.startsWith('grants.html?')) return 'route: grant console';
   try {
-    return `route: ${(new URL(target)).hostname}`;
+    const trusted = trustedGrantUrl(target);
+    if (!trusted) return 'route: blocked external';
+    const parsed = new URL(trusted);
+    const host = parsed.hostname.toLowerCase();
+    const path = parsed.pathname.toLowerCase();
+    if ((host === 'grants.gov' || host.endsWith('.grants.gov')) && path.startsWith('/search-results-detail/')) return 'route: grants.gov listing';
+    if (host === 'simpler.grants.gov' && path.startsWith('/opportunity/')) return 'route: simpler listing';
+    if (host === 'simpler.grants.gov' && path.startsWith('/search')) return 'route: simpler search';
+    if (host === 'helloskip.com' || host.endsWith('.helloskip.com')) return 'route: hello skip';
+    if (host === 'smartsimple.com' || host.endsWith('.smartsimple.com')) return 'route: SmartSimple';
+    return `route: ${host}`;
   } catch {
     return 'route: external';
   }
@@ -3146,7 +3197,12 @@ function openGrantSubmit(url) {
     openGrantsConsole();
     return;
   }
-  window.open(target, '_blank', 'noopener');
+  const trusted = trustedGrantUrl(target);
+  if (!trusted) {
+    openGrantsConsole();
+    return;
+  }
+  window.open(trusted, '_blank', 'noopener');
 }
 
 function openGrantsConsole() {

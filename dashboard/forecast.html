@@ -250,7 +250,10 @@ let latestRun = null;
 function log(line) {
   const li = document.createElement("li");
   const stamp = new Date().toISOString().slice(11, 19);
-  li.innerHTML = `<span class="t">${stamp}</span>${line}`;
+  const time = document.createElement("span");
+  time.className = "t";
+  time.textContent = stamp;
+  li.append(time, document.createTextNode(String(line || "")));
   telemetry.prepend(li);
   while (telemetry.children.length > 14) telemetry.lastChild.remove();
 }

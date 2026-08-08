@@ -401,23 +401,36 @@ function setGauge(i,sec,val,maxv,col){
   document.getElementById('g'+i+'l').textContent=sec.replace(/_/g,' ').toUpperCase();
 }
 
-// Sparkline SVG
+// Sparkline SVG built with DOM APIs so streamed values are never interpreted as markup.
 function spk(data,col){
-  if(!data||data.length<2)return'<svg></svg>';
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox','0 0 200 32');
+  svg.setAttribute('preserveAspectRatio','none');
+  if(!data||data.length<2)return svg;
   const W=200,H=32,PAD=2,mn=Math.min(...data),mx=Math.max(...data),rng=mx-mn||1e-12;
   const pts=data.map((v,i)=>[PAD+(i/(data.length-1))*(W-PAD*2),(H-PAD)-((v-mn)/rng)*(H-PAD*2)]);
   const line='M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L');
   const fill=line+`L${pts[pts.length-1][0].toFixed(1)},${H}L${pts[0][0].toFixed(1)},${H}Z`;
   const gid='sg'+col.replace('#','').replace(/[^a-zA-Z0-9]/g,'');
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${col}" stop-opacity=".3"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><path d="${fill}" fill="url(#${gid})"/><path d="${line}" stroke="${col}" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+  const gradient=document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
+  gradient.id=gid;gradient.setAttribute('x1','0');gradient.setAttribute('y1','0');gradient.setAttribute('x2','0');gradient.setAttribute('y2','1');
+  [['0%',col,'.3'],['100%',col,'0']].forEach(([offset,color,opacity])=>{const stop=document.createElementNS('http://www.w3.org/2000/svg','stop');stop.setAttribute('offset',offset);stop.setAttribute('stop-color',color);stop.setAttribute('stop-opacity',opacity);gradient.appendChild(stop)});
+  defs.appendChild(gradient);svg.appendChild(defs);
+  const area=document.createElementNS('http://www.w3.org/2000/svg','path');area.setAttribute('d',fill);area.setAttribute('fill',`url(#${gid})`);svg.appendChild(area);
+  const stroke=document.createElementNS('http://www.w3.org/2000/svg','path');stroke.setAttribute('d',line);stroke.setAttribute('stroke',col);stroke.setAttribute('stroke-width','1.5');stroke.setAttribute('fill','none');stroke.setAttribute('stroke-linecap','round');stroke.setAttribute('stroke-linejoin','round');svg.appendChild(stroke);
+  return svg;
 }
 
 // Toasts
 const TC=document.getElementById('tc'),seen=new Set();
 function toast(a){
   const k=a.sector+a.msg;if(seen.has(k))return;seen.add(k);setTimeout(()=>seen.delete(k),30000);
-  const el=document.createElement('div');el.className=`toast ${a.severity}`;
-  el.innerHTML=`<div class="th">${a.severity} · ${a.sector.replace(/_/g,' ').toUpperCase()}</div><div class="tb">${a.msg}</div>`;
+  const severity=['HIGH','MEDIUM','LOW'].includes(String(a.severity||'').toUpperCase())?String(a.severity).toUpperCase():'LOW';
+  const el=document.createElement('div');el.className=`toast ${severity}`;
+  const head=document.createElement('div');head.className='th';head.textContent=`${severity} · ${String(a.sector||'').replace(/_/g,' ').toUpperCase()}`;
+  const body=document.createElement('div');body.className='tb';body.textContent=String(a.msg||'');
+  el.append(head,body);
   TC.prepend(el);setTimeout(()=>{el.style.cssText='opacity:0;transform:translateX(40px);transition:all .4s';setTimeout(()=>el.remove(),400)},5000);
 }
 
@@ -443,10 +456,16 @@ function tick(d){
     // ROI grid
     if(s.length){
       const maxAnn=s[0].annual_usd;
-      document.getElementById('roi-grid').innerHTML=s.map((r,i)=>{
+      const roiCells=s.map((r,i)=>{
         const pct=Math.round((r.annual_usd/maxAnn)*100);
-        return `<div class="roi-cell"><div class="rc-bar" style="width:${pct}%"></div><div class="rc-s" title="${r.sector}">${r.sector.replace(/_/g,' ')}</div><div class="rc-v">${fu(r.annual_usd)}<span style="font-size:9px;color:var(--muted);font-weight:400">/yr</span></div></div>`;
-      }).join('');
+        const cell=document.createElement('div');cell.className='roi-cell';
+        const bar=document.createElement('div');bar.className='rc-bar';bar.style.width=`${Math.max(0,Math.min(100,pct))}%`;
+        const sector=document.createElement('div');sector.className='rc-s';sector.title=String(r.sector||'');sector.textContent=String(r.sector||'').replace(/_/g,' ');
+        const value=document.createElement('div');value.className='rc-v';value.append(document.createTextNode(fu(r.annual_usd)));
+        const unit=document.createElement('span');unit.style.cssText='font-size:9px;color:var(--muted);font-weight:400';unit.textContent='/yr';value.appendChild(unit);
+        cell.append(bar,sector,value);return cell;
+      });
+      document.getElementById('roi-grid').replaceChildren(...roiCells);
     }
   const t=ts();
   document.getElementById('k0').textContent=fp(d.total_per_sec_usd);
@@ -467,27 +486,41 @@ function tick(d){
   // Alerts
   const al=d.alerts||[];
   document.getElementById('acb').textContent=al.length;
-  if(al.length)document.getElementById('af').innerHTML=al.slice(0,15).map(a=>`<div class="ai ${a.severity}"><span class="asev">${a.severity}</span><div><div class="amsg">${a.msg}</div><div class="ats">${a.ts?new Date(a.ts).toLocaleTimeString():''}</div></div></div>`).join('');
+  if(al.length){
+    const alertRows=al.slice(0,15).map(a=>{const severity=['HIGH','MEDIUM','LOW'].includes(String(a.severity||'').toUpperCase())?String(a.severity).toUpperCase():'LOW';const row=document.createElement('div');row.className=`ai ${severity}`;const sev=document.createElement('span');sev.className='asev';sev.textContent=severity;const wrap=document.createElement('div');const msg=document.createElement('div');msg.className='amsg';msg.textContent=String(a.msg||'');const stamp=document.createElement('div');stamp.className='ats';stamp.textContent=a.ts?new Date(a.ts).toLocaleTimeString():'';wrap.append(msg,stamp);row.append(sev,wrap);return row});
+    document.getElementById('af').replaceChildren(...alertRows);
+  } else document.getElementById('af').replaceChildren();
   al.filter(a=>a.severity==='HIGH').forEach(toast);
 
   // Sharpe table
-  document.getElementById('stb').innerHTML=s.slice(0,14).map((r,i)=>{
+  const sharpeRows=s.slice(0,14).map((r,i)=>{
     const cl=r.live_sharpe>=r.base_sharpe?'shg':r.live_sharpe>=r.base_sharpe*.8?'shw':'shl';
-    const rs=r.rolling_sharpe!=null?`<span class="rst">${r.rolling_sharpe.toFixed(2)}</span>`:'<span style="color:var(--muted);font-size:9px">—</span>';
-    return `<tr><td style="color:${pc(i)};font-weight:800">${r.sector.replace(/_/g,' ')}</td><td style="color:var(--muted)">${r.base_sharpe.toFixed(2)}</td><td class="${cl}">${r.live_sharpe.toFixed(2)}</td><td>${rs}</td><td class="${r.opp_gain_pct>=0?'shg':'shl'}" style="text-align:right">${fc(r.opp_gain_pct)}</td></tr>`;
-  }).join('');
+    const row=document.createElement('tr');
+    const cells=[String(r.sector||'').replace(/_/g,' '),Number(r.base_sharpe||0).toFixed(2),Number(r.live_sharpe||0).toFixed(2),r.rolling_sharpe!=null?Number(r.rolling_sharpe).toFixed(2):'—',fc(r.opp_gain_pct)];
+    cells.forEach((value,index)=>{const cell=document.createElement('td');cell.textContent=value;if(index===0){cell.style.color=pc(i);cell.style.fontWeight='800'}if(index===1)cell.style.color='var(--muted)';if(index===2)cell.className=cl;if(index===3&&r.rolling_sharpe!=null)cell.className='rst';if(index===4){cell.className=r.opp_gain_pct>=0?'shg':'shl';cell.style.textAlign='right'}row.appendChild(cell)});return row;
+  });
+  document.getElementById('stb').replaceChildren(...sharpeRows);
 
   // Sector grid
-  document.getElementById('srs').innerHTML=s.map((r,i)=>{
+  const sectorRows=s.map((r,i)=>{
     const cls=['sr',r.live_sharpe>=r.base_sharpe?'beat':'',Math.abs(r.zscore)>1.8?'zs':''].filter(Boolean).join(' ');
     const ma=r.momentum==='up'?'▲':r.momentum==='down'?'▼':'▶';
     const zc=Math.abs(r.zscore)>2?'var(--red)':Math.abs(r.zscore)>1.5?'var(--amber)':'var(--muted)';
-    return `<div class="${cls}"><div class="sn" style="color:${pc(i)}" title="${r.sector}">${r.sector.replace(/_/g,' ')}</div><div class="sp" style="color:${pc(i)}">${fp(r.per_sec_usd)}</div><div class="sw">${spk(r.sparkline,pc(i))}</div><div class="sg ${r.opp_gain_pct>=0?'pos':'neg'}">${fc(r.opp_gain_pct)}</div><div class="mb ${r.momentum}">${ma} ${r.momentum_pct>=0?'+':''}${r.momentum_pct.toFixed(2)}%</div><div class="lb ${r.confidence_lane}">${r.confidence_lane}</div><div style="text-align:right;font-size:11px;font-weight:700;color:${zc}">${r.zscore>=0?'+':''}${r.zscore.toFixed(2)}σ</div></div>`;
-  }).join('');
+    const row=document.createElement('div');row.className=cls;
+    const sector=document.createElement('div');sector.className='sn';sector.style.color=pc(i);sector.title=String(r.sector||'');sector.textContent=String(r.sector||'').replace(/_/g,' ');
+    const perSec=document.createElement('div');perSec.className='sp';perSec.style.color=pc(i);perSec.textContent=fp(r.per_sec_usd);
+    const spark=document.createElement('div');spark.className='sw';spark.appendChild(spk(r.sparkline,pc(i)));
+    const gain=document.createElement('div');gain.className=`sg ${r.opp_gain_pct>=0?'pos':'neg'}`;gain.textContent=fc(r.opp_gain_pct);
+    const momentum=String(r.momentum||'flat');const movement=document.createElement('div');movement.className=`mb ${['up','down','flat'].includes(momentum)?momentum:'flat'}`;movement.textContent=`${ma} ${r.momentum_pct>=0?'+':''}${Number(r.momentum_pct||0).toFixed(2)}%`;
+    const confidence=String(r.confidence_lane||'unknown');const lane=document.createElement('div');lane.className=`lb ${['high','medium','low'].includes(confidence)?confidence:'unknown'}`;lane.textContent=confidence;
+    const zscore=document.createElement('div');zscore.style.cssText=`text-align:right;font-size:11px;font-weight:700;color:${zc}`;zscore.textContent=`${r.zscore>=0?'+':''}${Number(r.zscore||0).toFixed(2)}σ`;
+    row.append(sector,perSec,spark,gain,movement,lane,zscore);return row;
+  });
+  document.getElementById('srs').replaceChildren(...sectorRows);
 
   // Ticker
-  const ti=s.map(r=>`<span class="ti-i"><span class="tn">${r.sector.replace(/_/g,'·').toUpperCase()}</span><span class="ts">·</span><span class="tv">${fp(r.per_sec_usd)}</span><span class="ts">·</span><span class="${r.opp_gain_pct>=0?'tg':'tr'}">${fc(r.opp_gain_pct)}</span></span>`);
-  document.getElementById('tti').innerHTML=ti.join('')+ti.join('');
+  const tickerItems=s.map(r=>{const item=document.createElement('span');item.className='ti-i';[['tn',String(r.sector||'').replace(/_/g,'·').toUpperCase()],['ts','·'],['tv',fp(r.per_sec_usd)],['ts','·'],[r.opp_gain_pct>=0?'tg':'tr',fc(r.opp_gain_pct)]].forEach(([className,text])=>{const span=document.createElement('span');span.className=className;span.textContent=text;item.appendChild(span)});return item});
+  document.getElementById('tti').replaceChildren(...tickerItems,...tickerItems.map(item=>item.cloneNode(true)));
 
   // Bottom
   if(s[0])document.getElementById('b0').textContent=fu(s[0].annual_usd);

@@ -361,7 +361,43 @@ function isUuid(v) {
 }
 
 function isHttpUrl(v) {
-  return /^https?:\/\//i.test(String(v || ''));
+  try {
+    const parsed = new URL(String(v || '').trim());
+    return parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+const TRUSTED_GRANT_DOMAINS = Object.freeze([
+  'grants.gov',
+  'helloskip.com',
+  'smartsimple.com',
+  'science.osti.gov',
+  'nist.gov',
+  'nsf.gov',
+  'sbir.nasa.gov',
+  'nasa.gov',
+  'afwerx.com',
+  'arpa-e.energy.gov',
+  'techpartnerships.noaa.gov',
+  'darpa.mil',
+  'energy.gov',
+]);
+
+function isTrustedGrantHost(hostname) {
+  const host = String(hostname || '').toLowerCase().replace(/\.$/, '');
+  return TRUSTED_GRANT_DOMAINS.some(domain => host === domain || host.endsWith(`.${domain}`));
+}
+
+function trustedGrantUrl(value) {
+  try {
+    const parsed = new URL(String(value || '').trim());
+    if (parsed.protocol !== 'https:' || !isTrustedGrantHost(parsed.hostname)) return '';
+    return parsed.href;
+  } catch {
+    return '';
+  }
 }
 
 function parseOppFromGrantUrl(url) {
@@ -396,16 +432,18 @@ function isInformationalGrantLanding(url) {
   const host = parsed.hostname.toLowerCase();
   const path = parsed.pathname.toLowerCase();
 
-  if (host.includes('grants.gov') || host.includes('simpler.grants.gov')) return false;
-  if (host.includes('helloskip.com') || host.includes('smartsimple')) return false;
+  if (!isTrustedGrantHost(host)) return false;
+  if (host === 'grants.gov' || host.endsWith('.grants.gov')) return false;
+  if (host === 'helloskip.com' || host.endsWith('.helloskip.com')) return false;
+  if (host === 'smartsimple.com' || host.endsWith('.smartsimple.com')) return false;
 
-  if (host.includes('science.osti.gov') && /^\/sbir\/?$/.test(path)) return true;
-  if (host.includes('nist.gov') && /\/sbir\/?$/.test(path)) return true;
-  if (host.includes('seedfund.nsf.gov')) return true;
-  if (host.includes('sbir.nasa.gov')) return true;
-  if (host.includes('afwerx.com')) return true;
-  if (host.includes('arpa-e.energy.gov')) return true;
-  if (host.includes('techpartnerships.noaa.gov')) return true;
+  if (host === 'science.osti.gov' && /^\/sbir\/?$/.test(path)) return true;
+  if ((host === 'nist.gov' || host.endsWith('.nist.gov')) && /^\/sbir\/?$/.test(path)) return true;
+  if (host === 'seedfund.nsf.gov' || host === 'new.nsf.gov') return true;
+  if (host === 'sbir.nasa.gov') return true;
+  if (host === 'afwerx.com' || host.endsWith('.afwerx.com')) return true;
+  if (host === 'arpa-e.energy.gov') return true;
+  if (host === 'techpartnerships.noaa.gov') return true;
 
   if ((path === '/' || path === '') && /(sbir|sttr|grant|funding|opportun)/i.test(target)) return true;
   return false;
@@ -437,7 +475,8 @@ async function loadGrantSubmitFitPack() {
     (pack.opportunities || []).forEach((op) => {
       const key = normOpp(op.opp_num);
       const url = String(op.submit_url || '').trim();
-      if (key && isHttpUrl(url)) submitUrlByOpp.set(key, url);
+      const trustedUrl = trustedGrantUrl(url);
+      if (key && trustedUrl) submitUrlByOpp.set(key, trustedUrl);
     });
     if (submitUrlByOpp.size) {
       return;
@@ -447,7 +486,8 @@ async function loadGrantSubmitFitPack() {
 
 function grantSubmitUrl(item, detail, submissionPacket) {
   const portalUrl = submissionPacket?.portal?.portal_url;
-  if (isHttpUrl(portalUrl)) return portalUrl;
+  const trustedPortalUrl = trustedGrantUrl(portalUrl);
+  if (trustedPortalUrl) return trustedPortalUrl;
 
   const appUrl = detail?.application?.url;
   const itemUrl = item?.url;
@@ -464,8 +504,10 @@ function grantSubmitUrl(item, detail, submissionPacket) {
   if (oppFromFields) {
     return grantSearchUrl(oppFromFields);
   }
-  if (isHttpUrl(appUrl)) return appUrl;
-  if (isHttpUrl(itemUrl)) return itemUrl;
+  const trustedAppUrl = trustedGrantUrl(appUrl);
+  if (trustedAppUrl) return trustedAppUrl;
+  const trustedItemUrl = trustedGrantUrl(itemUrl);
+  if (trustedItemUrl) return trustedItemUrl;
   return 'https://www.grants.gov/';
 }
 
@@ -1166,8 +1208,10 @@ async function loadQueue() {
       if (preferred?.program_id) await loadDetail(preferred.program_id);
     }
   } catch (e) {
-    $('grant-list').innerHTML =
-      `<li class="err">Failed: ${e.message}</li>`;
+    const row = document.createElement('li');
+    row.className = 'err';
+    row.textContent = `Failed: ${String(e?.message || 'request failed')}`;
+    $('grant-list').replaceChildren(row);
     renderMissionPulse();
   }
 }
@@ -1445,7 +1489,10 @@ async function loadDetail(id) {
     renderDetail(d);
     loadMarkdown(activeTab);
   } catch (e) {
-    $('detail').innerHTML = `<div class="err">${e.message}</div>`;
+    const message = document.createElement('div');
+    message.className = 'err';
+    message.textContent = String(e?.message || 'request failed');
+    $('detail').replaceChildren(message);
   }
 }
 
@@ -1543,7 +1590,7 @@ function renderDetail(d) {
          style="background:var(--panel-2);border:1px solid var(--border);color:var(--ink);
                 border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;
                 text-decoration:none">${bundleLabel}</a>
-      ${(app.url && app.url !== submitUrl) ? `<a href="${escHTML(app.url)}" target="_blank" rel="noopener"
+      ${(trustedGrantUrl(app.url) && trustedGrantUrl(app.url) !== submitUrl) ? `<a href="${escAttr(trustedGrantUrl(app.url))}" target="_blank" rel="noopener"
                      style="margin-left: auto; color: var(--accent-2);
                             text-decoration: none; align-self: center; font-size: 12px">
                      program page ↗</a>` : ''}
@@ -1650,7 +1697,7 @@ async function loadMarkdown(tab) {
           </div>
         </div>
         <h3>Submission Readiness: ${p.ready ? '<span style="color:var(--neon-g)">READY</span>' : '<span style="color:var(--neon-a)">BLOCKED</span>'}</h3>
-        <p><b>Portal:</b> <a href="${escHTML(portal.portal_url || '#')}" target="_blank" rel="noopener" style="color:var(--accent-2)">${escHTML(portal.portal_url || 'n/a')}</a></p>
+        <p><b>Portal:</b> <a href="${escAttr(trustedGrantUrl(portal.portal_url) || '#')}" target="_blank" rel="noopener" style="color:var(--accent-2)">${escHTML(trustedGrantUrl(portal.portal_url) || 'n/a')}</a></p>
         <p><b>System:</b> ${escHTML(portal.submission_system || 'n/a')}</p>
         <p><b>Approval state:</b> ${escHTML(String(p.approval_state || 'draft'))}</p>
         <p><b>Package complete:</b> ${p.package_complete ? 'yes' : 'no'}</p>

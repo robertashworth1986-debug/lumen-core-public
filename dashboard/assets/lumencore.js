@@ -584,15 +584,24 @@
       color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 12px;
       min-width: 280px; animation: lc-toast-in 0.3s;
       transform-origin: right;`;
-    t.innerHTML = `
-      <div style="font-family:'Orbitron',sans-serif; font-size:10px; letter-spacing:2px;
-                  color: ${isApprove ? 'var(--neon-c)' : 'var(--neon-g)'}; margin-bottom: 4px">
-        ${m.type.replace('grants_', 'GRANT ').toUpperCase()}
-      </div>
-      <div><b>${m.grant_id || ''}</b></div>
-      ${m.queue_summary ? `<div style="color:var(--ink-dim); margin-top:4px; font-size:11px">
-        ${m.queue_summary.n_draft || 0} draft · ${m.queue_summary.n_approved || 0} approved · ${m.queue_summary.n_submitted || 0} submitted
-      </div>` : ''}`;
+    const heading = document.createElement('div');
+    heading.style.cssText = `font-family:'Orbitron',sans-serif; font-size:10px; letter-spacing:2px;
+                             color:${isApprove ? 'var(--neon-c)' : 'var(--neon-g)'}; margin-bottom:4px`;
+    heading.textContent = String(m.type || '').replace('grants_', 'GRANT ').toUpperCase();
+    t.appendChild(heading);
+
+    const grant = document.createElement('div');
+    const grantStrong = document.createElement('b');
+    grantStrong.textContent = String(m.grant_id || '');
+    grant.appendChild(grantStrong);
+    t.appendChild(grant);
+
+    if (m.queue_summary) {
+      const summary = document.createElement('div');
+      summary.style.cssText = 'color:var(--ink-dim); margin-top:4px; font-size:11px';
+      summary.textContent = `${Number(m.queue_summary.n_draft) || 0} draft · ${Number(m.queue_summary.n_approved) || 0} approved · ${Number(m.queue_summary.n_submitted) || 0} submitted`;
+      t.appendChild(summary);
+    }
     host.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; t.style.transition = 'all 0.4s'; }, 5000);
     setTimeout(() => t.remove(), 5500);
