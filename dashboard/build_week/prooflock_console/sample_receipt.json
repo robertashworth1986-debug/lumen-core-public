@@ -12,13 +12,13 @@
       "artifact_id": "bounded_validation_protocol_v2_manifest",
       "role": "current_protocol_manifest",
       "repo_relative_path": "assets/prooflock/bounded_validation_protocol_v2.json",
-      "expected_sha256": "a5be86d225fd166f8802f0e97f82e95a8589e40e839c798bf8ac521623f9bef1"
+      "expected_sha256": "420d61c93af4f1cd292b279e4f31e05d716f69dcabe4ac1e751946373be24348"
     },
     {
       "artifact_id": "bounded_validation_protocol_v1_manifest",
       "role": "predecessor_protocol_manifest",
       "repo_relative_path": "assets/prooflock/bounded_validation_protocol_v1.json",
-      "expected_sha256": "8757f2182ea76d46a3a409cd2160c6b4fab269a4ad0ef6c25ee1cbc2396f4fda"
+      "expected_sha256": "086324eade453b7b68de58b1f9fa21c02a9e303b608ebbd6f12845aaa10596cb"
     }
   ],
   "lineage": {
@@ -77,5 +77,5 @@
   ],
   "decision": "HOLD",
   "claim_boundary": "This receipt demonstrates repository artifact custody, SHA-256 identity, declared protocol lineage, and fail-closed authority gates. It does not prove candidate performance, external validation, realized savings, certification, deployment readiness, or buyer acceptance.",
-  "receipt_sha256": "a7509f90f65dfc024e1918b984a0c963811512c040df47ab22d9ea2b51195576"
+  "receipt_sha256": "ac4747c040d7689b6093f69afb15634fcc6ef5433dee6c465eb3f4ef31e0d114"
 }

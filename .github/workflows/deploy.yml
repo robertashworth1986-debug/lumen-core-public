@@ -292,7 +292,8 @@ jobs:
           tmp_data="$(mktemp)"
           tmp_offer="$(mktemp)"
           tmp_prooflock="$(mktemp)"
-          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data" "$tmp_offer" "$tmp_prooflock"' EXIT
+          tmp_external_review="$(mktemp)"
+          trap 'rm -f "$tmp_root" "$tmp_evidence" "$tmp_data" "$tmp_offer" "$tmp_prooflock" "$tmp_external_review"' EXIT
 
           status() {
             local url="$1"
@@ -305,21 +306,24 @@ jobs:
           DATA="$(status "https://lumen-core.ai/data/site_health.json?deploy=${GITHUB_SHA}" "$tmp_data")"
           OFFER="$(status "https://lumen-core.ai/proof_to_pilot.html?deploy=${GITHUB_SHA}" "$tmp_offer")"
           PROOFLOCK="$(status "https://lumen-core.ai/build_week/prooflock_console/?deploy=${GITHUB_SHA}" "$tmp_prooflock")"
+          EXTERNAL_REVIEW="$(status "https://lumen-core.ai/external_review.html?deploy=${GITHUB_SHA}" "$tmp_external_review")"
 
-          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000} | Offer: ${OFFER:-000} | ProofLock: ${PROOFLOCK:-000}"
+          echo "Root: ${ROOT:-000} | Evidence: ${EVIDENCE:-000} | Site health data: ${DATA:-000} | Offer: ${OFFER:-000} | ProofLock: ${PROOFLOCK:-000} | External review: ${EXTERNAL_REVIEW:-000}"
 
           [[ "$ROOT" == "200" ]]
           [[ "$EVIDENCE" == "200" ]]
           [[ "$DATA" == "200" ]]
           [[ "$OFFER" == "200" ]]
           [[ "$PROOFLOCK" == "200" ]]
+          [[ "$EXTERNAL_REVIEW" == "200" ]]
           grep -Fq 'One proof path. One bounded decision.' "$tmp_root"
           grep -Fq 'name="lumencore-surface" content="proof-to-pilot-evidence-v1"' "$tmp_evidence"
           python3 -m json.tool "$tmp_data" >/dev/null
           grep -Fq 'name="lumencore-surface" content="bounded-validation-offer-v1"' "$tmp_offer"
           grep -Fq 'What ProofLock solves' "$tmp_prooflock"
+          grep -Fq 'name="lumencore-surface" content="external-replication-docket-v1"' "$tmp_external_review"
 
-          echo "Production root, bounded evidence page, health JSON, offer, and ProofLock are live."
+          echo "Production root, bounded evidence page, health JSON, offer, ProofLock, and external-review docket are live."
 
       - name: Publish production deployment receipt
         if: always()
