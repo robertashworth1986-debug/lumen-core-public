@@ -8,6 +8,8 @@ on:
       - 'tests/test_booth_public_contract_runtime.py'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
+      - '.github/workflows/vps-storage-diagnostic.yml'
+      - 'tests/test_vps_runtime_diagnostic_workflow.py'
   push:
     branches: [main]
     paths:
@@ -16,6 +18,8 @@ on:
       - 'tests/test_booth_public_contract_runtime.py'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
+      - '.github/workflows/vps-storage-diagnostic.yml'
+      - 'tests/test_vps_runtime_diagnostic_workflow.py'
   workflow_dispatch:
 
 permissions:
@@ -40,7 +44,8 @@ jobs:
           set -euo pipefail
           python -m py_compile \
             code/booth_public_contract.py \
-            tests/test_booth_public_contract_runtime.py
+            tests/test_booth_public_contract_runtime.py \
+            tests/test_vps_runtime_diagnostic_workflow.py
 
       - name: Run public contract tests without third-party dependencies
         run: |
@@ -49,7 +54,10 @@ jobs:
           import runpy
 
           tests = []
-          for path in ("tests/test_booth_public_contract_runtime.py",):
+          for path in (
+              "tests/test_booth_public_contract_runtime.py",
+              "tests/test_vps_runtime_diagnostic_workflow.py",
+          ):
               namespace = runpy.run_path(path)
               tests.extend(
                   (f"{path}:{name}", value)

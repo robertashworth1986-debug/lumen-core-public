@@ -1,4 +1,4 @@
-name: Diagnose LumenCore VPS storage pressure
+name: Diagnose LumenCore VPS runtime and capacity
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
   statuses: write
 
 concurrency:
-  group: lumencore-vps-storage-diagnostic
+  group: lumencore-vps-runtime-diagnostic
   cancel-in-progress: false
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
     environment: production
 
     steps:
-      - name: Mark storage diagnostic pending
+      - name: Mark runtime diagnostic pending
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
@@ -30,13 +30,13 @@ jobs:
           TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          python3 - <<'PY' > /tmp/storage-diagnostic-status.json
+          python3 - <<'PY' > /tmp/runtime-diagnostic-status.json
           import json, os
           print(json.dumps({
               "state": "pending",
               "target_url": os.environ["TARGET_URL"],
-              "description": "Read-only VPS storage diagnostic is running",
-              "context": "diagnostic/lumencore-vps-storage",
+              "description": "Read-only VPS runtime diagnostic is running",
+              "context": "diagnostic/lumencore-vps-runtime",
           }))
           PY
           curl --fail-with-body -sS \
@@ -45,7 +45,7 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
-            --data-binary @/tmp/storage-diagnostic-status.json
+            --data-binary @/tmp/runtime-diagnostic-status.json
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
@@ -53,14 +53,96 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
 
-      - name: Capture storage and inode hotspots
+      - name: Capture runtime, gateway, and capacity evidence
         shell: bash
         run: |
           set -euo pipefail
-          ssh -o StrictHostKeyChecking=no "opc@${{ secrets.VPS_HOST }}" '
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes "opc@${{ secrets.VPS_HOST }}" '
             set -u
+            probe() {
+              local name="$1"
+              local url="$2"
+              local rc=0
+              local result
+              result=$(curl --silent --show-error --location --max-redirs 3 \
+                --connect-timeout 5 --max-time 10 --output /dev/null \
+                --write-out "code=%{http_code} remote=%{remote_ip} connect_s=%{time_connect} total_s=%{time_total} content_type=%{content_type}" \
+                "$url" 2>&1) || rc=$?
+              printf "%s rc=%s %s\n" "$name" "$rc" "$result"
+            }
+
+            show_unit() {
+              local unit="$1"
+              echo "--- $unit ---"
+              printf "active="
+              systemctl is-active "$unit" 2>&1 || true
+              printf "enabled="
+              systemctl is-enabled "$unit" 2>&1 || true
+              systemctl show "$unit" --no-pager \
+                --property=LoadState \
+                --property=ActiveState \
+                --property=SubState \
+                --property=Result \
+                --property=ExecMainCode \
+                --property=ExecMainStatus \
+                --property=NRestarts \
+                --property=MainPID \
+                --property=FragmentPath \
+                2>&1 || true
+            }
+
             echo "=== identity ==="
             id
+            hostname
+            date -u +"%Y-%m-%dT%H:%M:%SZ"
+
+            echo "=== public and loopback endpoint probes (status only; no bodies) ==="
+            probe public_root https://lumen-core.ai/
+            probe public_nginx_health https://lumen-core.ai/nginx-health
+            probe public_gateway_health https://lumen-core.ai/health
+            probe public_gateway_snapshot https://lumen-core.ai/api/snapshot
+            probe loopback_nginx_health http://127.0.0.1/nginx-health
+            probe loopback_gateway_via_nginx http://127.0.0.1/health
+            probe loopback_gateway_direct http://127.0.0.1:8787/health
+
+            echo "=== canonical and related service states ==="
+            for unit in \
+              nginx \
+              caddy \
+              luma-gateway \
+              luma-dashboard-refresh \
+              luma-paper-ticker \
+              luma-symbol-awareness \
+              luma-kraken-history \
+              luma-dashboard \
+              luma-intel-api \
+              luma-node-red \
+              luma-nodered-flow-sync \
+              lamascout-api \
+              lamascout-loop
+            do
+              show_unit "$unit"
+            done
+
+            echo "=== discovered LumenCore service units ==="
+            systemctl list-units --all --type=service --no-legend \
+              "luma*.service" "lumencore*.service" "lamascout*.service" \
+              2>&1 || true
+
+            echo "=== expected listeners (address and port only) ==="
+            ss -ltnH 2>&1 \
+              | grep -E "(:80|:443|:1880|:5016|:5017|:7700|:7701|:8000|:8001|:8787)[[:space:]]" \
+              || true
+
+            echo "=== nginx configuration validation ==="
+            sudo -n nginx -t 2>&1 || true
+
+            echo "=== nginx gateway route summary (allowlisted directives only) ==="
+            sudo -n nginx -T 2>&1 \
+              | grep -E "^[[:space:]]*(upstream luma_gateway|server 127\\.0\\.0\\.1:8787;|location = /health|proxy_pass[[:space:]]+http://luma_gateway)" \
+              | sed -E "s/^[[:space:]]+/ /" \
+              || true
+
             echo "=== filesystem capacity ==="
             df -hP / /opt /var /home /tmp 2>&1 || true
             echo "=== filesystem inodes ==="
@@ -82,18 +164,18 @@ jobs:
               | sort -n \
               | tail -n 100 \
               || true
-          ' | tee /tmp/lumencore-vps-storage-diagnostic.txt
+          ' | tee /tmp/lumencore-vps-runtime-diagnostic.txt
 
-      - name: Upload storage diagnostic
+      - name: Upload runtime diagnostic
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lumencore-vps-storage-${{ github.run_id }}
-          path: /tmp/lumencore-vps-storage-diagnostic.txt
+          name: lumencore-vps-runtime-${{ github.run_id }}
+          path: /tmp/lumencore-vps-runtime-diagnostic.txt
           if-no-files-found: error
           retention-days: 7
 
-      - name: Publish storage diagnostic receipt
+      - name: Publish runtime diagnostic receipt
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
@@ -106,25 +188,25 @@ jobs:
           case "$JOB_STATUS" in
             success)
               STATE=success
-              DESCRIPTION="Read-only VPS storage diagnostic completed"
+              DESCRIPTION="Read-only VPS runtime diagnostic completed"
               ;;
             cancelled)
               STATE=error
-              DESCRIPTION="VPS storage diagnostic was cancelled"
+              DESCRIPTION="VPS runtime diagnostic was cancelled"
               ;;
             *)
               STATE=failure
-              DESCRIPTION="VPS storage diagnostic failed"
+              DESCRIPTION="VPS runtime diagnostic failed"
               ;;
           esac
           export STATE DESCRIPTION
-          python3 - <<'PY' > /tmp/storage-diagnostic-status.json
+          python3 - <<'PY' > /tmp/runtime-diagnostic-status.json
           import json, os
           print(json.dumps({
               "state": os.environ["STATE"],
               "target_url": os.environ["TARGET_URL"],
               "description": os.environ["DESCRIPTION"],
-              "context": "diagnostic/lumencore-vps-storage",
+              "context": "diagnostic/lumencore-vps-runtime",
           }))
           PY
           curl --fail-with-body -sS \
@@ -133,4 +215,4 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
-            --data-binary @/tmp/storage-diagnostic-status.json
+            --data-binary @/tmp/runtime-diagnostic-status.json
