@@ -1,0 +1,18 @@
+{
+  "name": "LumenCore Proof-to-Pilot Assurance",
+  "short_name": "LumenCore",
+  "description": "Proof-backed decision infrastructure for bounded technical review.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#04060f",
+  "theme_color": "#04060f",
+  "icons": [
+    {
+      "src": "/assets/lumencore-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -112,7 +112,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 21
+    assert len(names) == len(set(names)) == 25
     assert names[:3] == [
         "operator_home.html",
         "proof_to_pilot.html",
@@ -120,6 +120,10 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     ]
     assert "evidence/index_bounded.html" in names
     assert "mission_control.html" in names
+    assert "robots.txt" in names
+    assert "sitemap.xml" in names
+    assert "site.webmanifest" in names
+    assert "assets/lumencore-mark.svg" in names
     assert "assets/lumencore.css" in names
     assert "assets/luma_command_fabric.js" in names
     assert "assets/prooflock/bounded_validation_protocol_v2.json" in names
