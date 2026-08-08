@@ -1,0 +1,60 @@
+name: Strategic Transaction Packet Gate
+
+on:
+  pull_request:
+    paths:
+      - "docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md"
+      - "config/strategic_transaction_packet_v2.json"
+      - "config/evidence_graph_v1.json"
+      - "code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py"
+      - "tests/test_strategic_transaction_packet.py"
+      - ".github/workflows/strategic-transaction-packet.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md"
+      - "config/strategic_transaction_packet_v2.json"
+      - "config/evidence_graph_v1.json"
+      - "code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py"
+      - "tests/test_strategic_transaction_packet.py"
+      - ".github/workflows/strategic-transaction-packet.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: strategic-transaction-packet-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+      - name: Compile verifier and tests
+        run: |
+          python -m py_compile \
+            code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py \
+            tests/test_strategic_transaction_packet.py
+      - name: Verify transaction packet against evidence graph
+        run: |
+          mkdir -p out/strategic-transaction
+          python code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py --json \
+            | tee out/strategic-transaction/verification.json
+          python -m json.tool out/strategic-transaction/verification.json >/dev/null
+      - name: Run adversarial regression tests
+        run: python -m unittest tests.test_strategic_transaction_packet -v
+      - name: Upload verification receipt
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: strategic-transaction-verification-${{ github.sha }}
+          path: out/strategic-transaction/verification.json
+          if-no-files-found: error
+          retention-days: 30
