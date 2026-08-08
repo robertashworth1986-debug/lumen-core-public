@@ -1,0 +1,473 @@
+/*
+ * LumenCore canonical surface system.
+ *
+ * A restrained shared visual layer for the five canonical operator/reviewer
+ * surfaces. It intentionally does not replace the underlying dashboards or
+ * their data contracts. The layer standardizes hierarchy, navigation,
+ * evidence posture, accessibility, and responsive behavior.
+ */
+
+:root {
+  --lis-void: #030711;
+  --lis-void-2: #07101f;
+  --lis-panel: rgba(8, 17, 34, 0.88);
+  --lis-panel-strong: rgba(9, 20, 40, 0.96);
+  --lis-line: rgba(126, 163, 204, 0.2);
+  --lis-line-strong: rgba(94, 234, 212, 0.42);
+  --lis-text: #edf7ff;
+  --lis-muted: #91a5bb;
+  --lis-cyan: #66f6df;
+  --lis-blue: #72aaff;
+  --lis-violet: #bd8cff;
+  --lis-green: #4adea3;
+  --lis-amber: #ffc96b;
+  --lis-red: #ff7f8f;
+  --lis-shadow: 0 24px 78px rgba(0, 0, 0, 0.34);
+}
+
+body[data-luma-surface] {
+  color-scheme: dark;
+  background:
+    radial-gradient(900px 520px at 9% -12%, rgba(102, 246, 223, 0.09), transparent 66%),
+    radial-gradient(820px 580px at 94% 4%, rgba(114, 170, 255, 0.09), transparent 62%),
+    linear-gradient(145deg, var(--lis-void), var(--lis-void-2) 52%, #040917) !important;
+}
+
+body[data-luma-surface] [data-luma-legacy="true"] {
+  display: none !important;
+}
+
+body[data-luma-surface]::before {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgba(126, 163, 204, 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126, 163, 204, 0.13) 1px, transparent 1px);
+  background-size: 54px 54px;
+  -webkit-mask-image: radial-gradient(circle at 50% 12%, #000 0, transparent 72%);
+  mask-image: radial-gradient(circle at 50% 12%, #000 0, transparent 72%);
+}
+
+body[data-luma-surface]::after {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  top: -230px;
+  right: -180px;
+  width: 620px;
+  height: 620px;
+  border: 1px solid rgba(102, 246, 223, 0.11);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 78px rgba(114, 170, 255, 0.025),
+    0 0 0 156px rgba(189, 140, 255, 0.018);
+}
+
+body[data-luma-surface] ::selection {
+  color: #021019;
+  background: var(--lis-cyan);
+}
+
+body[data-luma-surface] :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--lis-cyan) !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(102, 246, 223, 0.13) !important;
+}
+
+body[data-luma-surface] :is(.home, .stage, .ql-shell, .lc-stage, .luma-page) {
+  position: relative;
+  z-index: 2;
+}
+
+/* Canonical identity marks */
+body[data-luma-surface] :is(.lis-brand-mark, .brand .logo, .ql-logo, .lc-brand .lc-logo, .luma-logo-mark) {
+  width: 42px !important;
+  height: 42px !important;
+  flex: 0 0 42px;
+  border: 1px solid rgba(102, 246, 223, 0.28) !important;
+  border-radius: 13px !important;
+  background: rgba(4, 12, 25, 0.9) url("./lumencore-mark.svg") center / 31px 31px no-repeat !important;
+  box-shadow: 0 0 0 1px rgba(114, 170, 255, 0.06), 0 13px 36px rgba(0, 0, 0, 0.32), 0 0 24px rgba(102, 246, 223, 0.08) !important;
+  animation: none !important;
+}
+
+body[data-luma-surface] :is(.brand .logo, .ql-logo, .lc-brand .lc-logo, .luma-logo-mark)::after {
+  display: none !important;
+}
+
+.lis-home-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lis-home-brand img {
+  display: block;
+  width: 30px;
+  height: 30px;
+}
+
+/* Shared evidence posture rail */
+.lis-proofline {
+  position: relative;
+  z-index: 6;
+  display: grid;
+  grid-template-columns: auto repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 1px;
+  margin: 0 0 14px;
+  overflow: hidden;
+  color: var(--lis-text);
+  border: 1px solid var(--lis-line);
+  border-radius: 13px;
+  background: rgba(3, 8, 19, 0.82);
+  box-shadow: var(--lis-shadow);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  backdrop-filter: blur(16px) saturate(130%);
+}
+
+.lis-proofline > span {
+  min-width: 0;
+  padding: 10px 13px;
+  border-left: 1px solid rgba(126, 163, 204, 0.13);
+}
+
+.lis-proofline > span:first-child {
+  display: flex;
+  align-items: center;
+  border-left: 0;
+  color: #031016;
+  background: linear-gradient(135deg, var(--lis-cyan), #64d6ff);
+  font: 900 9px/1.25 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 1.25px;
+  text-transform: uppercase;
+}
+
+.lis-proofline small,
+.lis-proofline strong {
+  display: block;
+}
+
+.lis-proofline small {
+  margin-bottom: 3px;
+  color: var(--lis-muted);
+  font: 700 8px/1.2 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 1.15px;
+  text-transform: uppercase;
+}
+
+.lis-proofline strong {
+  overflow-wrap: anywhere;
+  color: var(--lis-text);
+  font: 700 11px/1.35 "Inter", "Segoe UI", sans-serif;
+}
+
+.lis-proofline [data-tone="good"] strong { color: var(--lis-green); }
+.lis-proofline [data-tone="warn"] strong { color: var(--lis-amber); }
+.lis-proofline [data-tone="paper"] strong { color: var(--lis-blue); }
+
+.lis-compact-boundary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 5px 9px;
+  color: var(--lis-blue);
+  border: 1px solid rgba(114, 170, 255, 0.32);
+  border-radius: 999px;
+  background: rgba(114, 170, 255, 0.075);
+  font: 800 8px/1.2 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lis-compact-boundary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* Shared surface map: one platform, five bounded workspaces. */
+.lis-surface-map {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.lis-surface-map a {
+  position: relative;
+  min-height: 92px;
+  padding: 15px 14px 13px;
+  overflow: hidden;
+  color: var(--lis-text);
+  text-decoration: none;
+  border: 1px solid var(--lis-line);
+  border-radius: 13px;
+  background: linear-gradient(155deg, rgba(12, 25, 47, 0.92), rgba(5, 12, 26, 0.9));
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.2);
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.lis-surface-map a::after {
+  content: "";
+  position: absolute;
+  right: -24px;
+  bottom: -34px;
+  width: 92px;
+  height: 92px;
+  border: 1px solid rgba(102, 246, 223, 0.13);
+  border-radius: 50%;
+  box-shadow: 0 0 0 18px rgba(114, 170, 255, 0.025);
+}
+
+.lis-surface-map a:hover {
+  transform: translateY(-2px);
+  border-color: var(--lis-line-strong);
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.3), 0 0 28px rgba(102, 246, 223, 0.06);
+}
+
+.lis-surface-map span,
+.lis-surface-map strong {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.lis-surface-map span {
+  margin-bottom: 8px;
+  color: var(--lis-cyan);
+  font: 800 9px/1 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.lis-surface-map strong {
+  max-width: 16ch;
+  color: var(--lis-muted);
+  font: 600 11px/1.45 "Inter", "Segoe UI", sans-serif;
+}
+
+/* Fixed-scope entry offer: a buyer can understand the unit before contacting. */
+.lis-offer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.38fr);
+  gap: 24px;
+  margin-bottom: 16px;
+  border-color: rgba(102, 246, 223, 0.3) !important;
+  background:
+    linear-gradient(115deg, rgba(102, 246, 223, 0.055), transparent 38%),
+    linear-gradient(160deg, rgba(11, 24, 47, 0.96), rgba(5, 12, 27, 0.94)) !important;
+}
+
+.lis-offer h2 {
+  margin: 10px 0 8px;
+  color: var(--lis-text);
+  font: 900 clamp(1.6rem, 3vw, 2.65rem)/1.08 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.lis-offer-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 18px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lis-offer-list li {
+  position: relative;
+  padding-left: 17px;
+  color: var(--lis-muted);
+}
+
+.lis-offer-list li::before {
+  content: "";
+  position: absolute;
+  top: 0.65em;
+  left: 0;
+  width: 7px;
+  height: 2px;
+  background: var(--lis-cyan);
+  box-shadow: 0 0 10px rgba(102, 246, 223, 0.45);
+}
+
+.lis-offer-commercial {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  border: 1px solid rgba(114, 170, 255, 0.22);
+  border-radius: 14px;
+  background: rgba(3, 9, 21, 0.7);
+}
+
+.lis-offer-commercial span,
+.lis-offer-commercial b {
+  color: var(--lis-muted);
+  font: 800 9px/1.3 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.lis-offer-commercial strong {
+  margin: 8px 0 4px;
+  color: var(--lis-cyan);
+  font: 900 clamp(2.5rem, 5vw, 4.3rem)/1 "Orbitron", "Segoe UI", sans-serif;
+}
+
+.lis-offer-commercial p {
+  margin: 13px 0 16px;
+  color: var(--lis-muted);
+  font-size: 0.84rem;
+}
+
+/* Elevate existing chrome without changing application semantics. */
+body[data-luma-surface] :is(.nav, .top-bar, .ql-bar, .lc-topbar, .luma-header) {
+  border-color: var(--lis-line) !important;
+  background:
+    linear-gradient(110deg, rgba(102, 246, 223, 0.045), transparent 34%),
+    linear-gradient(180deg, rgba(11, 23, 45, 0.96), rgba(5, 12, 26, 0.9)) !important;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.27), inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
+body[data-luma-surface] :is(.panel, .lc-panel, .luma-card, .ql-card, .ql-continuity, .ql-welcome-shell > *) {
+  border-color: var(--lis-line) !important;
+  background:
+    linear-gradient(145deg, rgba(13, 27, 51, 0.88), rgba(6, 14, 29, 0.9)) !important;
+  box-shadow: 0 17px 54px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.025) !important;
+}
+
+body[data-luma-surface] :is(.panel, .lc-panel, .luma-card, .ql-card):hover {
+  border-color: rgba(102, 246, 223, 0.29) !important;
+}
+
+body[data-luma-surface] :is(.brand h1, .ql-title, .lc-brand h1, .luma-logo-text, .home h1) {
+  letter-spacing: -0.025em !important;
+  text-wrap: balance;
+}
+
+body[data-luma-surface] :is(.brand .sub, .ql-sub, .lc-brand .lc-sub, .luma-logo-sub, .num-label, .luma-stat-sub) {
+  color: var(--lis-muted) !important;
+}
+
+body[data-luma-surface] :is(.btn, .lc-btn, .ql-voice, .growth-link, .lcf-link, .lcf-command-button) {
+  min-height: 36px;
+}
+
+body[data-luma-surface] :is(.btn, .lc-btn, .ql-voice, .growth-link) {
+  border-radius: 9px !important;
+}
+
+/* Page-specific alignment. */
+body[data-luma-surface="home"] .nav {
+  padding: 12px 15px !important;
+  margin-bottom: 14px;
+  border: 1px solid var(--lis-line);
+  border-radius: 14px;
+}
+
+body[data-luma-surface="home"] .hero-main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, rgba(102, 246, 223, 0.035), transparent 45%);
+}
+
+body[data-luma-surface="mission"] .top-bar,
+body[data-luma-surface="trade"] .luma-header {
+  border: 1px solid var(--lis-line) !important;
+  border-radius: 14px !important;
+}
+
+body[data-luma-surface="quant"] .ql-side,
+body[data-luma-surface="quant"] .ql-main,
+body[data-luma-surface="quant"] .ql-pulse {
+  border-color: var(--lis-line) !important;
+  background: rgba(4, 11, 24, 0.88) !important;
+}
+
+body[data-luma-surface="grants"] .lc-stage > .lis-proofline {
+  margin-top: 12px;
+}
+
+body[data-luma-surface="trade"] .lis-proofline {
+  margin-top: 12px;
+}
+
+/* Public review is deliberately non-operational. Backend auth remains the
+   security boundary; these rules make that boundary visible in the UI. */
+html.luma-public-review body[data-luma-surface="grants"] :is(
+  #draft-all,
+  #opps-autopilot,
+  #regenerate,
+  #approve-btn,
+  #regen-btn,
+  #prepare-btn,
+  #autofill-btn,
+  #submitted-btn,
+  .operator-actions
+) {
+  display: none !important;
+}
+
+html.luma-public-review body[data-luma-surface="grants"] .lc-live {
+  color: var(--lis-amber) !important;
+  border-color: rgba(255, 201, 107, 0.38) !important;
+  background: rgba(255, 201, 107, 0.08) !important;
+}
+
+html.luma-public-review body[data-luma-surface="trade"] [data-runtime-mode] {
+  text-transform: uppercase;
+}
+
+@media (max-width: 1040px) {
+  .lis-surface-map { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lis-proofline { grid-template-columns: auto repeat(2, minmax(0, 1fr)); }
+  .lis-proofline > span:last-child { grid-column: 2 / -1; }
+  .lis-offer { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 1180px) {
+  body[data-luma-surface="quant"] .lis-compact-boundary { display: none; }
+}
+
+@media (max-width: 720px) {
+  body[data-luma-surface]::before { background-size: 38px 38px; }
+  .lis-surface-map { grid-template-columns: 1fr 1fr; }
+  .lis-proofline { grid-template-columns: 1fr; }
+  .lis-proofline > span,
+  .lis-proofline > span:last-child { grid-column: auto; border-left: 0; border-top: 1px solid rgba(126, 163, 204, 0.13); }
+  .lis-proofline > span:first-child { border-top: 0; }
+  .lis-offer-list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .lis-surface-map { grid-template-columns: 1fr; }
+  .lis-surface-map a { min-height: 78px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-luma-surface] *,
+  body[data-luma-surface] *::before,
+  body[data-luma-surface] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

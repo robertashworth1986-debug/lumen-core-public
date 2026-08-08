@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LumenCore - Kraken Execution Mission Control</title>
+<title>LumenCore Trade Operations | Read-Only Evidence</title>
+<meta name="description" content="Read-only LumenCore trading evidence surface for runtime posture, paper/shadow controls, historical receipts, and bounded performance context.">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="canonical" href="https://lumen-core.ai/kraken_execution_dashboard.html">
+<link rel="icon" href="/assets/lumencore-mark.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.json">
 <script src="js/luma_design_system.js"></script>
 <script src="js/luma_path_resolver.js"></script>
 <script src="js/cinematic_telemetry_layer.js"></script>
@@ -427,8 +432,9 @@ body::after {
   .growth-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 </style>
+<link rel="stylesheet" href="./assets/luma_institutional_surface.css">
 </head>
-<body>
+<body data-luma-surface="trade">
 <div id="kraken-cinematic-host" aria-hidden="true"></div>
 <div class="luma-page">
 
@@ -437,7 +443,7 @@ body::after {
       <div class="luma-logo-mark"></div>
       <div>
         <div class="luma-logo-text">Luma<span>Core</span></div>
-        <div class="luma-logo-sub">Kraken Execution Mission Control</div>
+        <div class="luma-logo-sub">Trade Evidence Operations</div>
       </div>
     </div>
     <div class="luma-header-right">
@@ -569,7 +575,7 @@ body::after {
     </div>
   </div>
 
-  <div class="luma-section-title">Real TXID Proof Rail</div>
+  <div class="luma-section-title">TXID Receipt Evidence Rail</div>
   <div class="luma-card gold">
     <div class="proof-strip">
       <span class="proof-chip">Last refresh: <b id="proofStamp">-</b></span>
@@ -602,7 +608,7 @@ body::after {
     </div>
   </div>
 
-  <div class="luma-section-title">Open Lots - Ledger Truth</div>
+  <div class="luma-section-title">Open Lots - Ledger Report</div>
   <div class="luma-card">
     <div class="luma-table-wrap">
       <table class="luma-table">
@@ -656,7 +662,7 @@ body::after {
       source refresh <strong id="vpsRefreshUtc" style="color:var(--teal)">-</strong>
       <span style="margin-left:8px">controller <strong id="vpsCtrlMeta" style="color:var(--teal)">-</strong></span>
     </div>
-    <a class="growth-link" href="vps_growth_proof_3d.html">Open 3D VPS Growth Proof Room</a>
+    <a class="growth-link" href="evidence/">Open bounded evidence room</a>
   </div>
 
   <div class="luma-footer">
@@ -1109,14 +1115,16 @@ async function loadLocalExecutionBundle() {
           }
         : null,
       summary: {
-        mode: String(heartbeat?.runtime_mode || 'LIVE').toUpperCase(),
-        status: String(heartbeat?.status || 'running').toLowerCase(),
+        mode: String(heartbeat?.runtime_mode || 'OFFLINE').toUpperCase(),
+        status: String(heartbeat?.status || 'offline').toLowerCase(),
       },
       queue: {
         tickets,
         control_flags: {
-          live_enabled: Boolean(heartbeat?.live_orders_armed ?? true),
-          kill_switch: Boolean(String(heartbeat?.reason || '').toLowerCase().includes('kill')),
+          live_enabled: heartbeat?.live_orders_armed === true,
+          kill_switch: !heartbeat
+            || heartbeat?.kill_switch === true
+            || String(heartbeat?.reason || '').toLowerCase().includes('kill'),
           max_notional_per_trade_usd: Number(heartbeat?.quote_usd_hint || 0),
           deadman_timeout_seconds: Number(heartbeat?.deadman_timeout_seconds || 0),
         },
@@ -1395,7 +1403,7 @@ function setWsBanner(state) {
     el.textContent = 'WS LIVE';
   } else {
     el.className = 'luma-badge warn';
-    el.textContent = 'WS RECONNECTING';
+    el.textContent = 'FEED OFFLINE / RETRYING';
   }
 }
 
@@ -1662,7 +1670,7 @@ async function refreshDashboard() {
       if (realBuys + realSells === 0) reasonBits.push('real_fills=0');
       if (txEvents.length === 0) reasonBits.push('verified_txid=0');
       if (weakCount > 0) reasonBits.push('weak_txid=' + weakCount);
-      setStat('truthVal', 'PAPER / NOT VERIFIED', 'warn');
+      setStat('truthVal', mode === 'OFFLINE' ? 'OFFLINE / DISARMED' : 'NO LIVE EXECUTION VERIFIED', 'warn');
       setText('truthSub', 'No confirmed live execution evidence. ' + reasonBits.join(' | '));
     }
 
@@ -1750,7 +1758,7 @@ async function refreshDashboard() {
     lastRefreshUtc = nowIso;
   } catch (err) {
     refreshFailureCount += 1;
-    const mode = 'DEGRADED';
+    const mode = 'OFFLINE';
     const ageMs = lastRefreshUtc ? (Date.now() - Date.parse(lastRefreshUtc)) : 0;
     const runtimeRail = {
       mode,
@@ -1763,7 +1771,7 @@ async function refreshDashboard() {
       confidence: 18,
       anomaly: 78,
       running: false,
-      killSwitch: false,
+      killSwitch: true,
     };
     renderTelemetryRail(runtimeRail);
     updateCinematicTelemetry(runtimeRail);
@@ -2000,6 +2008,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(initKrakenGlobe, 1200);
 })();
 </script>
+<script src="./assets/luma_institutional_surface.js"></script>
 <script src="./assets/luma_command_fabric.js"></script>
 </body>
 </html>

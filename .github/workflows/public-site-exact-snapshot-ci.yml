@@ -9,6 +9,7 @@ on:
       - 'code/deploy/package_public_site_release.py'
       - 'code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py'
       - 'dashboard/operator_home.html'
+      - 'dashboard/opportunity_sprint.html'
       - 'dashboard/proof_to_pilot.html'
       - 'dashboard/external_review.html'
       - 'dashboard/mission_control.html'
@@ -20,10 +21,13 @@ on:
       - 'dashboard/assets/lumencore.css'
       - 'dashboard/assets/luma_command_fabric.css'
       - 'dashboard/assets/luma_command_fabric.js'
+      - 'dashboard/assets/luma_institutional_surface.css'
+      - 'dashboard/assets/luma_institutional_surface.js'
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'tests/test_public_site_deploy_hardening.py'
       - 'tests/test_public_discovery.py'
+      - 'tests/test_canonical_surface_design.py'
   push:
     branches: [main]
     paths:
@@ -33,6 +37,7 @@ on:
       - 'code/deploy/package_public_site_release.py'
       - 'code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py'
       - 'dashboard/operator_home.html'
+      - 'dashboard/opportunity_sprint.html'
       - 'dashboard/proof_to_pilot.html'
       - 'dashboard/external_review.html'
       - 'dashboard/mission_control.html'
@@ -44,10 +49,13 @@ on:
       - 'dashboard/assets/lumencore.css'
       - 'dashboard/assets/luma_command_fabric.css'
       - 'dashboard/assets/luma_command_fabric.js'
+      - 'dashboard/assets/luma_institutional_surface.css'
+      - 'dashboard/assets/luma_institutional_surface.js'
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'tests/test_public_site_deploy_hardening.py'
       - 'tests/test_public_discovery.py'
+      - 'tests/test_canonical_surface_design.py'
 
 permissions:
   contents: read
@@ -74,4 +82,4 @@ jobs:
         run: bash -n code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh
 
       - name: Run exact-snapshot protocol tests
-        run: python -m pytest tests/test_public_site_deploy_hardening.py tests/test_public_discovery.py -q
+        run: python -m pytest tests/test_public_site_deploy_hardening.py tests/test_public_discovery.py tests/test_canonical_surface_design.py -q

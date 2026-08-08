@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>LumenCore — Grants Console</title>
+<title>LumenCore Grant Lab | Funding Evidence</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="LumenCore funding evidence workspace: source-checked opportunity discovery, draft packages, receipts, blockers, and human submission authority.">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="canonical" href="https://lumen-core.ai/grants.html">
+<link rel="icon" href="/assets/lumencore-mark.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -147,11 +152,12 @@
   table th { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--ink-dim);
               text-transform: uppercase; letter-spacing: 1.5px; text-align: left; }
 </style>
+<link rel="stylesheet" href="./assets/luma_institutional_surface.css">
 </head>
-<body>
-<script>window.LC_CONFIG = { title: 'GRANTS', subtitle: 'Submission console · draft to submit-ready · $3.53M addressable',
-  bootLines: ['> handshake: grants api','> drafting submit-ready packages',
-              '> scanning contracts + loans + sbir + pilot ops','> preflight blockers + SF-424 map','> ready'] };</script>
+<body data-luma-surface="grants">
+<script>window.LC_CONFIG = { title: 'GRANTS', subtitle: 'Funding evidence · source checks · human submission authority',
+  bootLines: ['> handshake: funding evidence','> loading public-safe opportunity records',
+              '> separating discovery, draft, receipt, and award states','> final submission gate: human only','> ready'] };</script>
 
 <div id="grants-cinematic-host" aria-hidden="true"></div>
 
@@ -832,17 +838,17 @@ function renderMissionPulse() {
     const fastest = drapers.fastest50;
     const at10 = drapers.at10Pct;
     drapersRoot.innerHTML = `
-      <div class="topline">Meet Drapers Projection Lane</div>
-      <div class="headline">$50K → $1M in ${Number((at10 || fastest)?.months_to_target || 0).toFixed(1)} months (modeled)</div>
-      <div class="detail">10% monthly scenario ${at10 ? `${(Number(at10.annualized_return || 0) * 100).toFixed(2)}% annualized` : 'n/a'}</div>
-      <div class="detail">Fastest modeled: ${(Number(fastest?.monthly_return || 0) * 100).toFixed(0)}% monthly in ${Number(fastest?.months_to_target || 0).toFixed(1)} months</div>
+      <div class="topline">Archived Capital Scenario</div>
+      <div class="headline">Modeled projection retained for provenance—not presented as expected return</div>
+      <div class="detail">Scenario inputs and outputs remain available for audit; they are not a forecast, award, valuation, or revenue claim.</div>
+      <div class="detail">Commercial decisions require current source evidence, explicit assumptions, and independent review.</div>
       ${drapersHref ? `<div style="margin-top:6px"><a class="btn-link" href="${escAttr(drapersHref)}" target="_blank" rel="noopener" style="padding:6px 10px;font-size:10px;border-color:var(--neon-a);color:var(--neon-a)">Open projection deck ↗</a></div>` : ''}
     `;
   } else {
     drapersRoot.innerHTML = `
-      <div class="topline">Meet Drapers Projection Lane</div>
-      <div class="headline">Projection pack offline</div>
-      <div class="detail">Generate out/ops/meet_drapers_capital_projection to hydrate this panel.</div>
+      <div class="topline">Archived Capital Scenario</div>
+      <div class="headline">No current source-bound projection loaded</div>
+      <div class="detail">This panel remains intentionally neutral until a reviewed scenario artifact is available.</div>
     `;
   }
 
@@ -2000,6 +2006,7 @@ ensureCinematicLayer();
 renderMissionPulse();
 loadQueue();
 </script>
+<script src="./assets/luma_institutional_surface.js"></script>
 <script src="./assets/luma_command_fabric.js"></script>
 </body>
 </html>

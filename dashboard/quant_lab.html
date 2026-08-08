@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Luma Quant Lab — Unified Cockpit</title>
+<title>LumenCore Quant Lab | Bounded Research Cockpit</title>
+<meta name="description" content="LumenCore Quant Lab: source-labeled replay, benchmark, model comparison, paper execution, and evidence-custody workspace.">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="canonical" href="https://lumen-core.ai/quant_lab.html">
+<link rel="icon" href="/assets/lumencore-mark.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -697,13 +702,14 @@
     }
   }
 </style>
+<link rel="stylesheet" href="./assets/luma_institutional_surface.css">
 </head>
-<body>
+<body data-luma-surface="quant">
 <script>
   // Skip the auto-injected boot overlay text — we have our own welcome
   window.LC_CONFIG = {
     title: 'LUMA QUANT LAB',
-    subtitle: 'Unified cockpit · Luma QHI face agent · 1 chain of evidence',
+    subtitle: 'Bounded research cockpit · replay · provenance · paper controls',
     bootLines: [
       '> establishing webgl harmonic field …',
       '> mounting evidence chain (sha-256) …',
@@ -712,7 +718,7 @@
       '> handshake: meta-router · stacker · blender …',
       '> calibration · anomaly · regime channels online',
       '> kraken paper/shadow execution gate verified',
-      '> grants pipeline ready · 8 programs · $3.53M',
+      '> funding evidence map ready · final submission remains human-gated',
       '> alpha scanner · Kalisha scoring · explainer linked',
       '> entering quant lab',
     ]
@@ -732,6 +738,7 @@
       </div>
     </div>
     <div class="ql-status">
+      <span class="lis-compact-boundary" aria-label="Evidence posture: replay, paper, modeled; no live order authority">Replay · paper · bounded</span>
       <span><span class="dot"></span><b data-runtime-mode>CHECKING</b></span>
       <span>UTC · <b id="ql-clock">—</b></span>
       <span>FROZEN · <b id="ql-frozen-run">—</b></span>
@@ -753,15 +760,15 @@
     <span class="kpi"><span class="k">Net PnL</span><span class="v" id="px-pnl">—</span><span class="sub" id="px-pnl-trades"></span></span>
     <span class="kpi"><span class="k">Edge Verdict</span><span class="v" id="px-edge">—</span><span class="sub" id="px-edge-sharpe"></span></span>
     <span class="kpi"><span class="k">Top Signal</span><span class="v amber" id="px-signal">—</span><span class="sub" id="px-signal-action"></span></span>
-    <span class="kpi"><span class="k">Top Artist</span><span class="v purple" id="px-artist">—</span><span class="sub" id="px-artist-count"></span></span>
+    <span class="kpi"><span class="k">Aux Signal</span><span class="v purple" id="px-artist">—</span><span class="sub" id="px-artist-count"></span></span>
     <span class="kpi"><span class="k">Active Lane</span><span class="v" id="px-lane">—</span><span class="sub" id="px-lane-surface"></span></span>
-    <span class="kpi"><span class="k">Pkg Usage</span><span class="v cyan" id="px-pkg">—</span><span class="sub" id="px-pkg-sub"></span></span>
+    <span class="kpi"><span class="k">Compute Stack</span><span class="v cyan" id="px-pkg">—</span><span class="sub" id="px-pkg-sub"></span></span>
     <span class="kpi"><span class="k">Data Engines</span><span class="v cyan" id="px-engines">—</span><span class="sub" id="px-engines-sub"></span></span>
-    <span class="kpi"><span class="k">Live Crypto</span><span class="v" id="px-crypto" title="Real Kraken ledger: opens / closes (click → Live Positions)">—</span><span class="sub" id="px-crypto-pairs"></span></span>
+    <span class="kpi"><span class="k">Trade Evidence</span><span class="v" id="px-crypto" title="Read-only ledger summary: historical receipts and paper/shadow posture">—</span><span class="sub" id="px-crypto-pairs"></span></span>
     <span class="kpi"><span class="k">Runtime</span><span class="v" id="px-mode">—</span><span class="sub" id="px-mode-sub"></span></span>
-    <span class="kpi"><span class="k">Approvals</span><span class="v amber" id="px-approvals">—</span><span class="sub" id="px-approvals-sub"></span></span>
-    <span class="kpi"><span class="k">TXID Cadence</span><span class="v purple" id="px-txid">—</span><span class="sub" id="px-txid-sub"></span></span>
-    <span class="kpi"><span class="k">Realized Net</span><span class="v" id="px-realized">—</span><span class="sub" id="px-realized-sub"></span></span>
+    <span class="kpi"><span class="k">Human Gates</span><span class="v amber" id="px-approvals">—</span><span class="sub" id="px-approvals-sub"></span></span>
+    <span class="kpi"><span class="k">Receipt Cadence</span><span class="v purple" id="px-txid">—</span><span class="sub" id="px-txid-sub"></span></span>
+    <span class="kpi"><span class="k">Ledger Net</span><span class="v" id="px-realized">—</span><span class="sub" id="px-realized-sub"></span></span>
     <span class="pulse-meta">refresh · <b id="px-stamp">—</b> · age <b id="px-age">—</b></span>
   </section>
 
@@ -773,37 +780,9 @@
     <div class="ql-tab" data-src="/mission_control.html" data-title="Core Mission Control">
       <span class="ico"></span>Core Mission <span class="meta new">new</span>
     </div>
-    <div class="ql-tab" data-src="/investor_command_room.html" data-title="Investor Command Room">
-      <span class="ico"></span>Investor Room <span class="meta live">app</span>
-    </div>
-    <div class="ql-tab" data-src="/lumaq_brain_command_center.html" data-title="Luma Agent QHI · Pitch · Valuation · Mayor Handoff">
-      <span class="ico"></span>Luma Agent <span class="meta new">face</span>
-    </div>
-    <div class="ql-tab" data-src="/lumaq_brain_command_center.html#docker_intel_panel" data-title="Docker Mission Intelligence · Capacity · Build Definitions · Optimization">
-      <span class="ico"></span>Docker Mission <span class="meta new">ops</span>
-    </div>
-    <div class="ql-tab" data-src="/lumencore_master_v2.html" data-title="Master Intelligence · Package Leverage + Sector Data Engines">
-      <span class="ico"></span>Master Intelligence <span class="meta new">pkg</span>
-    </div>
-
     <h3>Trading</h3>
-    <div class="ql-tab" data-src="/kraken_execution_dashboard.html" data-title="Kraken Execution · click-Approve">
-      <span class="ico"></span>Kraken Execution <span class="meta live">paper</span>
-    </div>
-    <div class="ql-tab" data-src="/live_positions.html" data-title="Live Positions · Real Kraken TXIDs (truth)">
-      <span class="ico"></span>Live Positions <span class="meta new">truth</span>
-    </div>
-    <div class="ql-tab" data-src="/alpaca_paper_live_dashboard.html" data-title="Alpaca Paper · live TXIDs">
-      <span class="ico"></span>Alpaca Paper <span class="meta live">paper</span>
-    </div>
-    <div class="ql-tab" data-src="/dashboard_analytics.html" data-title="Sports +EV · LumaAlpha">
-      <span class="ico"></span>Sports +EV <span class="meta live">edge</span>
-    </div>
-    <div class="ql-tab" data-src="/dashboard_analytics.html#paper_derby_lane" data-title="Kentucky Derby Paper Picks · edge-ranked paper lane">
-      <span class="ico"></span>Derby Paper <span class="meta new">lane</span>
-    </div>
-    <div class="ql-tab" data-src="/lumascout.html" data-title="LumaScout · Artist Intelligence (v3)">
-      <span class="ico"></span>LumaScout <span class="meta new">v3</span>
+    <div class="ql-tab" data-src="/kraken_execution_dashboard.html" data-title="Trade Operations · read-only evidence">
+      <span class="ico"></span>Trade Operations <span class="meta live">bounded</span>
     </div>
 
     <h3>Forecast Suite</h3>
@@ -820,46 +799,17 @@
       <span class="ico"></span>Family Bench <span class="meta new">v3</span>
     </div>
 
-    <h3>Capital</h3>
-    <div class="ql-tab" data-src="/grants.html" data-title="Grants Console · click-Approve">
-      <span class="ico"></span>Grants <span class="meta new">v3</span>
-    </div>
-    <div class="ql-tab" data-src="/investor_wallboard.html" data-title="Investor Wallboard">
-      <span class="ico"></span>Wallboard <span class="meta live">board</span>
+    <h3>Funding</h3>
+    <div class="ql-tab" data-src="/grants.html" data-title="Grant Lab · evidence and human-gated drafts">
+      <span class="ico"></span>Grant Lab <span class="meta new">human gate</span>
     </div>
 
-    <h3>Proof &amp; Ops</h3>
-    <div class="ql-tab" data-src="/ensemble_walkforward_results.html" data-title="Walk-Forward · benchmark scope">
-      <span class="ico"></span>Walk-Forward <span class="meta new">proof</span>
+    <h3>Proof</h3>
+    <div class="ql-tab" data-src="/proof_to_pilot.html" data-title="Proof-to-Pilot · bounded commercial review">
+      <span class="ico"></span>Proof-to-Pilot <span class="meta new">offer</span>
     </div>
-    <div class="ql-tab" data-src="/infra_audit_dashboard.html" data-title="Infrastructure Audit">
-      <span class="ico"></span>Infrastructure <span class="meta live">audit</span>
-    </div>
-    <div class="ql-tab" data-src="/seed_validation_readout.html" data-title="Seed Validation">
-      <span class="ico"></span>Seed Validation <span class="meta new">proof</span>
-    </div>
-    <div class="ql-tab" data-src="/audit_derivation_pack.html" data-title="Chain of Custody">
-      <span class="ico"></span>Chain of Custody <span class="meta new">legal</span>
-    </div>
-    <div class="ql-tab" data-src="/master_evidence.html" data-title="Master Evidence Bundle">
-      <span class="ico"></span>Master Evidence <span class="meta new">proof</span>
-    </div>
-    <div class="ql-tab" data-src="/harmonic_proofpack_mission.html" data-title="Harmonic Proof-Pack Mission · Benchmark + Chain Telemetry">
-      <span class="ico"></span>Harmonic Proof-Pack <span class="meta new">mission</span>
-    </div>
-    <div class="ql-tab" data-src="/staleness_command_center.html" data-title="End-to-End Staleness Command Center">
-      <span class="ico"></span>Staleness Center <span class="meta new">ops</span>
-    </div>
-
-    <h3>External</h3>
-    <div class="ql-tab" data-src="/evidence/" data-title="Evidence Bundle (LinkedIn-shared)">
+    <div class="ql-tab" data-src="/evidence/" data-title="Public-safe evidence bundle">
       <span class="ico"></span>Evidence Bundle <span class="meta new">public</span>
-    </div>
-    <div class="ql-tab" data-src="/scenario_mission.html" data-title="Scenario Ops · Cinematic Sequence">
-      <span class="ico"></span>Scenario Ops <span class="meta new">ops</span>
-    </div>
-    <div class="ql-tab" data-src="/luma_experience.html" data-title="Luma Experience · Gateway (v3)">
-      <span class="ico"></span>Experience <span class="meta new">v3</span>
     </div>
   </aside>
 
@@ -919,8 +869,8 @@
       <div class="row"><span>This cheat sheet</span><kbd>?</kbd></div>
       <div class="row"><span>Jump to first tabs</span><kbd>Alt+1..9</kbd></div>
       <div class="row"><span>Refresh current pane</span><kbd>palette · refresh</kbd></div>
-      <div class="row"><span>Print investor wallboard</span><kbd>palette · print</kbd></div>
-      <div class="row"><span>Verify benchmark manifest hash</span><kbd>palette · verify</kbd></div>
+      <div class="row"><span>Print current review surface</span><kbd>palette · print</kbd></div>
+      <div class="row"><span>Open bounded evidence bundle</span><kbd>palette · evidence</kbd></div>
       <div class="row"><span>Open in tab (popout)</span><kbd>↗ corner</kbd></div>
       <div class="row"><span>Close any overlay</span><kbd>esc</kbd></div>
     </div>
@@ -980,6 +930,7 @@ const dashboardCandidates = (rel) => (pathResolver && typeof pathResolver.dashbo
 
 let localContextCache = null;
 let localContextTs = 0;
+let localContextPromise = null;
 let benchmarkContextCache = null;
 let benchmarkContextTs = 0;
 
@@ -1372,12 +1323,19 @@ async function buildLocalContext() {
 
 async function getLocalContext(force = false) {
   const now = Date.now();
-  if (!force && localContextCache && (now - localContextTs) < 6000) {
+  if (!force && localContextTs && (now - localContextTs) < 6000) {
     return localContextCache;
   }
-  localContextCache = await buildLocalContext();
-  localContextTs = now;
-  return localContextCache;
+  if (!force && localContextPromise) return localContextPromise;
+
+  localContextPromise = buildLocalContext();
+  try {
+    localContextCache = await localContextPromise;
+    localContextTs = Date.now();
+    return localContextCache;
+  } finally {
+    localContextPromise = null;
+  }
 }
 
 function tick() {
@@ -1449,35 +1407,21 @@ function renderOverview() {
       <div class="stats">
         <div class="stat"><div class="v" id="ql-stat-datasets">—</div><div class="k">Benchmark Scope (S/U)</div></div>
         <div class="stat"><div class="v" id="ql-stat-live-sources">—</div><div class="k">Live Measured Sources</div></div>
-        <div class="stat"><div class="v">94.2%</div><div class="k">80% coverage</div></div>
-        <div class="stat"><div class="v">63.4%</div><div class="k">Stacker wins</div></div>
-        <div class="stat"><div class="v">155</div><div class="k">Blender wins</div></div>
+        <div class="stat"><div class="v">FROZEN</div><div class="k">Evaluation Window</div></div>
+        <div class="stat"><div class="v">LOCKED</div><div class="k">Comparator + Metric</div></div>
+        <div class="stat"><div class="v">HASHED</div><div class="k">Result Manifest</div></div>
         <div class="stat"><div class="v" id="ql-stat-hp-engines">—</div><div class="k">HP Data Engines</div></div>
-        <div class="stat"><div class="v">$3.53M</div><div class="k">Grants pipeline</div></div>
-        <div class="stat"><div class="v">3 / 8</div><div class="k">Approved</div></div>
+        <div class="stat"><div class="v">SOURCE</div><div class="k">Funding Evidence</div></div>
+        <div class="stat"><div class="v">HUMAN</div><div class="k">Final Authority</div></div>
       </div>
     </div>
 
-    ${card('Core Mission Control', '/mission_control.html',
-      'Cinematic command center — 7 evidence layers, KPIs, grants pipeline, anomaly stream, regime breaks.', ['new','live'])}
-    ${card('Luma Agent QHI', '/lumaq_brain_command_center.html',
-      'Frontline showcase interface for pitch, valuation framing, mayor handoff, and deterministic evidence-grounded responses.', ['new','live','critical'])}
-    ${card('Unified Investor Narration Board', '/combined_master_dashboard.html',
-      'Narrated investor/operator walkthrough with section-by-section explainability for mission-control coherence.', ['new','live'])}
-    ${card('Docker Mission Intelligence', '/lumaq_brain_command_center.html#docker_intel_panel',
-      'Live Docker footprint, reclaimable capacity, WSL disk pressure, and high-value build-definition visibility in one ops lane.', ['new','live'])}
-    ${card('Master Intelligence · Package Leverage', '/lumencore_master_v2.html',
-      'Full package-leverage pane: active vs installed packages, top active stack, and sector data-engine utilization.', ['new','live'])}
-    ${card('Kraken Execution · click-Approve', '/kraken_execution_dashboard.html',
+    ${card('Mission Control', '/mission_control.html',
+      'System health, evidence freshness, claim state, and operator attention in one review surface.', ['live'])}
+    ${card('Trade Operations', '/kraken_execution_dashboard.html',
       'Paper/shadow intent review with a fail-closed human gate. Live submission remains disabled until explicit production authorization.', ['live','critical'])}
-    ${card('Grants Console', '/grants.html',
-      '8 federal programs, 3 approved, $3.53M addressable. Click-Approve drafts, print/PDF, ZIP bundle, run-over-run diff.', ['new','live'])}
-    ${card('Sports +EV · LumaAlpha', '/dashboard_analytics.html',
-      'Live Pinnacle no-vig fair-pricing + Kalisha prediction score engine. Kelly-sized stakes, FlowForm α-score fusion. Distinct from time-series math — sports betting domain.', ['live','new'])}
-    ${card('Kentucky Derby Paper Picks', '/dashboard_analytics.html#paper_derby_lane',
-      'Horse-racing and Derby-filtered paper lane derived from Sports Alpha rows, ranked by edge for paper-pick review.', ['new','live'])}
-    ${card('LumaScout · Artist Intelligence', '/lumascout.html',
-      'Top-10 unsigned breakout candidates across 4 platforms. φ-weighted Fibonacci lattice scoring · cross-platform velocity · posting consistency.', ['new','live'])}
+    ${card('Grant Lab', '/grants.html',
+      'Opportunity sources, drafts, receipts, and readiness boundaries. Legal certification and final submission remain human-only.', ['new'])}
     ${card('Router Explainer', '/explain.html',
       'Per-series decision rationale: which family the meta-router picked, why, and which population features carried weight.', ['new'])}
     ${card('Family Bench', '/lab.html',
@@ -1486,20 +1430,10 @@ function renderOverview() {
       'Pick a dataset, set horizon, get calibrated 80%/95% bands and family confidences from the meta-router.', ['new'])}
     ${card('Anomalies', '/anomalies.html',
       'Latest anomaly ladder with ≥2σ / ≥3σ counts from the active benchmark run. Filter by min |z| / family.', ['new'])}
-    ${card('Walk-Forward Proof', '/ensemble_walkforward_results.html',
-      'Frozen benchmark ensemble walk-forward results. The proof lane for federal/investor review.', ['new'])}
-    ${card('Infrastructure Audit', '/infra_audit_dashboard.html',
-      'Fleet coherence, harmonic edge, lane integrity, risk-regime gauges across the institutional bridge.', ['live'])}
-    ${card('Investor Command Room', '/investor_command_room.html',
-      'KPI grid, leaderboard, sector heat, harmonic right-rail. Investor-facing, printable.', ['live'])}
-    ${card('Investor Wallboard', '/investor_wallboard.html',
-      'Golden-spiral hero and boardroom-scale KPIs with evidence freshness and runtime truth.', ['live'])}
-    ${card('Chain of Custody', '/audit_derivation_pack.html',
-      'SHA-256 hash chain, audit ledger, frozen deltas — for legal, compliance, federal submission.', ['new'])}
-    ${card('Alpaca Paper · Live TXIDs', '/alpaca_paper_live_dashboard.html',
-      'Alpaca paper-trading telemetry: TXIDs, equity curve, top candidates, and runtime status.', ['live'])}
+    ${card('Proof-to-Pilot', '/proof_to_pilot.html',
+      'The commercial method: scope one problem, lock one baseline, run one bounded evaluation, and return one decision packet.', ['critical'])}
     ${card('Public Evidence Bundle', '/evidence/',
-      'The LinkedIn-shareable evidence pack — meta-router benchmark + grants summary + chain of custody.', ['new'])}
+      'Public-safe evidence, limitations, replay instructions, and claim boundaries for skeptical review.', ['new'])}
   `;
 }
 function card(title, src, desc, badges) {
@@ -1896,11 +1830,11 @@ async function pollPositions() {
     const eqTxt = (bal && bal.ok) ? '$' + Number(bal.usd_equity).toLocaleString(undefined,{maximumFractionDigits:2}) : (buys + 'B/' + sells + 'S');
     el.textContent = eqTxt;
     el.className = 'v ' + ((bal && bal.ok && bal.usd_equity > 0) ? ((open > 0 && sells === 0) ? 'amber' : 'cyan') : '');
-    el.title = (bal && bal.ok ? ('Real Kraken USD equity = $' + bal.usd_equity.toFixed(2) + ' across ' + bal.asset_count + ' assets · ') : '')
-             + buys + ' buys, ' + sells + ' sells, ' + open + ' open lot(s) · click → Live Positions';
+    el.title = (bal && bal.ok ? ('Ledger-reported Kraken equity = $' + bal.usd_equity.toFixed(2) + ' across ' + bal.asset_count + ' assets · ') : '')
+             + buys + ' buys, ' + sells + ' sells, ' + open + ' open lot(s) · click → Trade Operations';
     document.getElementById('px-crypto-pairs').textContent = buys + 'B/' + sells + 'S · ' + open + ' open lot' + (open === 1 ? '' : 's');
     el.style.cursor = 'pointer';
-    el.onclick = () => goPane('/live_positions.html');
+    el.onclick = () => goPane('/kraken_execution_dashboard.html');
   } catch (e) {
     document.getElementById('px-crypto').textContent = 'offline';
   }
@@ -1928,21 +1862,15 @@ const CP_ACTIONS = [
   { kind:'action', title:'Open current pane in new tab', hint:'pop out',           run: () => { const t = document.querySelector('.ql-tab.active'); if (t && t.dataset.src) window.open(resolvePaneSrc(t.dataset.src), '_blank'); } },
   { kind:'action', title:'Copy share link of current cockpit state', hint:'S',     run: () => doShare() },
   { kind:'action', title:'Toggle voice navigation',  hint:'V · say "open <pane>"', run: () => toggleVoice() },
-  { kind:'action', title:'Verify benchmark manifest', hint:'master_evidence',     run: () => goPane('/master_evidence.html') },
-  { kind:'action', title:'Open Luma Agent QHI interface', hint:'pitch + valuation', run: () => goPane('/lumaq_brain_command_center.html') },
-  { kind:'action', title:'Open Docker mission intelligence', hint:'capacity + optimize', run: () => goPane('/lumaq_brain_command_center.html#docker_intel_panel') },
-  { kind:'action', title:'Open package intelligence pane', hint:'all high-perf packages', run: () => goPane('/lumencore_master_v2.html') },
-  { kind:'action', title:'Open Kentucky Derby paper picks lane', hint:'sports alpha filter', run: () => goPane('/dashboard_analytics.html#paper_derby_lane') },
-  { kind:'action', title:'Print investor wallboard',   hint:'TV mode',             run: () => { goPane('/investor_wallboard.html'); setTimeout(() => frame.contentWindow && frame.contentWindow.print && frame.contentWindow.print(), 1200); } },
-  { kind:'action', title:'Print grants pack',          hint:'8 programs',          run: () => { goPane('/grants.html'); setTimeout(() => frame.contentWindow && frame.contentWindow.print && frame.contentWindow.print(), 1200); } },
-  { kind:'action', title:'Open public Evidence Bundle', hint:'LinkedIn share',     run: () => goPane('/evidence/') },
+  { kind:'action', title:'Open Proof-to-Pilot offer', hint:'one claim · one decision', run: () => goPane('/proof_to_pilot.html') },
+  { kind:'action', title:'Open public Evidence Bundle', hint:'claim boundaries',  run: () => goPane('/evidence/') },
+  { kind:'action', title:'Print grants review pack',   hint:'human-gated',         run: () => { goPane('/grants.html'); setTimeout(() => frame.contentWindow && frame.contentWindow.print && frame.contentWindow.print(), 1200); } },
   { kind:'action', title:'Toggle dark / light theme',   hint:'T',                   run: () => toggleTheme() },
-  { kind:'action', title:'Start investor auto-tour cycle', hint:'D · 12s rotate',   run: () => toggleDemo() },
+  { kind:'action', title:'Start operator auto-tour cycle', hint:'D · 12s rotate',   run: () => toggleDemo() },
   { kind:'action', title:'Show keyboard cheat sheet',   hint:'?',                   run: () => toggleHelp() },
   { kind:'action', title:'Toggle split view (right-click any tab)', hint:'X',       run: () => toggleSplit() },
   { kind:'action', title:'Print audit-ready proof bundle', hint:'P',                run: () => printProof() },
   { kind:'action', title:'Mute / unmute anomaly beep',  hint:'M',                   run: () => toggleMute() },
-  { kind:'action', title:'Open Live Positions (real Kraken ledger truth)', hint:'pair / TXID truth', run: () => goPane('/live_positions.html') },
 ];
 
 function buildCommandIndex() {
@@ -2160,57 +2088,20 @@ function toggleVoice() {
 voiceBtn.addEventListener('click', toggleVoice);
 
 const VOICE_MAP = [
-  ['docker',   '/lumaq_brain_command_center.html#docker_intel_panel'],
-  ['container','/lumaq_brain_command_center.html#docker_intel_panel'],
-  ['compose',  '/lumaq_brain_command_center.html#docker_intel_panel'],
-  ['cache',    '/lumaq_brain_command_center.html#docker_intel_panel'],
-  ['package',  '/lumencore_master_v2.html'],
-  ['packages', '/lumencore_master_v2.html'],
-  ['engine',   '/lumencore_master_v2.html'],
-  ['polars',   '/lumencore_master_v2.html'],
-  ['duckdb',   '/lumencore_master_v2.html'],
-  ['xgboost',  '/lumencore_master_v2.html'],
-  ['lightgbm', '/lumencore_master_v2.html'],
   ['mission',  '/mission_control.html'],
   ['kraken',   '/kraken_execution_dashboard.html'],
   ['execution','/kraken_execution_dashboard.html'],
-  ['position', '/live_positions.html'],
-  ['ledger',   '/live_positions.html'],
-  ['truth',    '/live_positions.html'],
-  ['alpaca',   '/alpaca_paper_live_dashboard.html'],
-  ['paper',    '/alpaca_paper_live_dashboard.html'],
-  ['derby',    '/dashboard_analytics.html#paper_derby_lane'],
-  ['horse',    '/dashboard_analytics.html#paper_derby_lane'],
-  ['racing',   '/dashboard_analytics.html#paper_derby_lane'],
-  ['sport',    '/dashboard_analytics.html'],
-  ['alpha',    '/dashboard_analytics.html'],
-  ['scout',    '/lumascout.html'],
-  ['artist',   '/lumascout.html'],
+  ['trade',    '/kraken_execution_dashboard.html'],
+  ['ledger',   '/kraken_execution_dashboard.html'],
+  ['paper',    '/kraken_execution_dashboard.html'],
   ['forecast', '/forecast.html'],
   ['anomal',   '/anomalies.html'],
   ['explain',  '/explain.html'],
   ['family',   '/lab.html'],
   ['bench',    '/lab.html'],
   ['grant',    '/grants.html'],
-  ['walkforward','/ensemble_walkforward_results.html'],
-  ['walk',     '/ensemble_walkforward_results.html'],
-  ['infra',    '/infra_audit_dashboard.html'],
-  ['seed',     '/seed_validation_readout.html'],
-  ['custody',  '/audit_derivation_pack.html'],
-  ['evidence', '/master_evidence.html'],
-  ['investor', '/investor_command_room.html'],
-  ['wallboard','/investor_wallboard.html'],
-  ['command',  '/investor_command_room.html'],
-  ['lumaq',    '/lumaq_brain_command_center.html'],
-  ['luma',     '/lumaq_brain_command_center.html'],
-  ['qhi',      '/lumaq_brain_command_center.html'],
-  ['valuation','/lumaq_brain_command_center.html'],
-  ['mayor',    '/lumaq_brain_command_center.html'],
-  ['brain',    '/lumaq_brain_command_center.html'],
-  ['micro',    '/lumaq_brain_command_center.html'],
-  ['macro',    '/lumaq_brain_command_center.html'],
-  ['gateway',  '/luma_experience.html'],
-  ['experience','/luma_experience.html'],
+  ['proof',    '/proof_to_pilot.html'],
+  ['evidence', '/evidence/'],
   ['overview', ''],
   ['home',     ''],
 ];
@@ -2223,18 +2114,6 @@ function handleVoiceCommand(text) {
     showToast('refreshed', 1200); return;
   }
   if (/palette|command/.test(text)) { cpOpen(); return; }
-  if (/docker|container|compose|build cache|wsl disk/.test(text)) {
-    goPane('/lumaq_brain_command_center.html#docker_intel_panel');
-    return;
-  }
-  if (/package|packages|engine|polars|duckdb|xgboost|lightgbm|package leverage/.test(text)) {
-    goPane('/lumencore_master_v2.html');
-    return;
-  }
-  if (/derby|horse|racing|churchill|preakness|belmont/.test(text)) {
-    goPane('/dashboard_analytics.html#paper_derby_lane');
-    return;
-  }
   // Pane navigation
   for (const [kw, src] of VOICE_MAP) {
     if (text.includes(kw)) {
@@ -2282,7 +2161,7 @@ const demoPill = $('#demo-pill');
 const demoCd   = $('#demo-cd');
 let demoTimer = null, demoTick = null, demoIdx = 0, demoCountdown = 12;
 const DEMO_PERIOD = 12;
-const DEMO_TABS = ['/lumaq_brain_command_center.html','/lumaq_brain_command_center.html#docker_intel_panel','/lumencore_master_v2.html','/mission_control.html','/staleness_command_center.html','/investor_command_room.html','/kraken_execution_dashboard.html','/lumascout.html','/forecast.html','/grants.html','/investor_wallboard.html','/master_evidence.html'];
+const DEMO_TABS = ['/mission_control.html','/kraken_execution_dashboard.html','/forecast.html','/anomalies.html','/explain.html','/lab.html','/grants.html','/proof_to_pilot.html','/evidence/'];
 function demoStep() {
   const src = DEMO_TABS[demoIdx % DEMO_TABS.length];
   demoIdx++;
@@ -2385,12 +2264,12 @@ function closeSplit() {
 }
 function toggleSplit() {
   if (main2.classList.contains('split')) { closeSplit(); return; }
-  // Default: open the next sidebar tab in split (or master_evidence as fallback)
+  // Default: open the next canonical sidebar tab in split.
   const active = document.querySelector('.ql-tab.active');
   const all = Array.from(tabs).filter(t => t.dataset.src);
   const idx = active ? all.indexOf(active) : -1;
   const next = all[(idx + 1) % all.length] || all[0];
-  openSplit(next ? next.dataset.src : '/master_evidence.html');
+  openSplit(next ? next.dataset.src : '/evidence/');
 }
 $('#ql-split').addEventListener('click', toggleSplit);
 $('#ql-split-close').addEventListener('click', closeSplit);
@@ -2538,6 +2417,7 @@ async function printProof() {
 }
 $('#ql-proof').addEventListener('click', printProof);
 </script>
+<script src="./assets/luma_institutional_surface.js"></script>
 <script src="./assets/luma_command_fabric.js"></script>
 </body>
 </html>

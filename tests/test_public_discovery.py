@@ -14,6 +14,7 @@ class PublicDiscoveryTests(unittest.TestCase):
     def test_robots_exposes_only_bounded_review_routes(self):
         text = (DASHBOARD / "robots.txt").read_text(encoding="utf-8")
         for route in (
+            "Allow: /opportunity_sprint.html",
             "Allow: /proof_to_pilot.html",
             "Allow: /evidence/",
             "Allow: /external_review.html",
@@ -39,6 +40,7 @@ class PublicDiscoveryTests(unittest.TestCase):
             locations,
             [
                 "https://lumen-core.ai/",
+                "https://lumen-core.ai/opportunity_sprint.html",
                 "https://lumen-core.ai/proof_to_pilot.html",
                 "https://lumen-core.ai/evidence/",
                 "https://lumen-core.ai/external_review.html",
@@ -76,6 +78,7 @@ class PublicDiscoveryTests(unittest.TestCase):
     def test_indexed_pages_declare_canonical_routes_and_public_mark(self):
         pages = {
             "operator_home.html": "https://lumen-core.ai/",
+            "opportunity_sprint.html": "https://lumen-core.ai/opportunity_sprint.html",
             "proof_to_pilot.html": "https://lumen-core.ai/proof_to_pilot.html",
             "external_review.html": "https://lumen-core.ai/external_review.html",
             "evidence/index_bounded.html": "https://lumen-core.ai/evidence/",

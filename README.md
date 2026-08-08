@@ -8,6 +8,22 @@ LumenCore turns complex-system claims into bounded, inspectable evidence package
 
 The public repository is a review surface. It is not a certification, an audited revenue report, a field-savings claim, or an outside grant of rights to founder-owned intellectual property.
 
+## Commercial entry offer
+
+**ProofLock Opportunity Sprint** converts one buyer-selected funding-opportunity
+workflow into a source-grounded, preflighted, replayable decision system. The
+fixed fee is **$3,500** with a 50% kickoff deposit and a target of ten business
+days after source permissions, baseline, acceptance rules, scope, and payment
+terms are accepted in writing.
+
+The deliverables are an official-source and eligibility register, an
+evidence-linked pursue/no-pursue brief, a reviewer-ready package outline, an
+attachment and blocker ledger, and replayable decision receipts. This is not a
+guarantee of eligibility or award, legal advice, certification, signature,
+upload, send, or final submission. Price acceptance, counterparty demand, and
+service delivery remain commercial gates until evidenced by a signed scope and
+payment.
+
 ## Start here
 
 **[Open the Canonical Evidence Index](EVIDENCE_INDEX.md)**
@@ -83,7 +99,7 @@ LumenCore emphasizes fail-closed decisions: missing rights, ambiguous provenance
 | ProofLock Console | Deployed bounded demonstration; verifies receipt integrity and refuses unauthorized promotion. |
 | EIA benchmark package | First-party reproducible for the named pinned package; prepared for non-author execution. |
 | External replication docket | Draft protocol for preregistration, evaluator independence, frozen inputs, deviations, and negative results. |
-| Bounded Validation Sprint | Proposed fixed-scope commercial package; pricing and legal approval remain unvalidated gates. |
+| ProofLock Opportunity Sprint | Fixed-fee offer defined at $3,500 with a 50% kickoff deposit; price acceptance, signed scope, payment, and delivery remain unverified commercial gates. |
 
 ## Evidence-state definitions
 
@@ -135,6 +151,7 @@ review. Action-time HumanUnlock remains outside machine verification.
 ## Public review surfaces
 
 - Website: <https://lumen-core.ai/>
+- ProofLock Opportunity Sprint: <https://lumen-core.ai/opportunity_sprint.html>
 - Proof-to-pilot: <https://lumen-core.ai/proof_to_pilot.html>
 - Evidence surface: <https://lumen-core.ai/evidence/>
 - ProofLock Console: <https://lumen-core.ai/build_week/prooflock_console/>
@@ -144,6 +161,8 @@ review. Action-time HumanUnlock remains outside machine verification.
 - Private asset quarantine and redaction checklist: [docs/PRIVATE_ASSET_QUARANTINE_AND_REDACTION_CHECKLIST.md](docs/PRIVATE_ASSET_QUARANTINE_AND_REDACTION_CHECKLIST.md)
 - Founder/IP boundary: [docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md](docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
 - Pilot report template: [docs/PILOT_REPORT_TEMPLATE.md](docs/PILOT_REPORT_TEMPLATE.md)
+- Opportunity Sprint scope: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_SCOPE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_SCOPE.md)
+- Opportunity Sprint intake: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_INTAKE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_INTAKE.md)
 
 ## Intellectual-property boundary
 

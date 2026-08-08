@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Allow: /opportunity_sprint.html
 Allow: /proof_to_pilot.html
 Allow: /evidence/
 Allow: /external_review.html

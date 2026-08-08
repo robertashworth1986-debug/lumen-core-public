@@ -4,6 +4,11 @@
 <meta charset="utf-8" />
 <title>LumenCore — Mission Control</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="LumenCore mission control: source-labeled system health, evidence maturity, freshness, and human decision gates.">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="canonical" href="https://lumen-core.ai/mission_control.html">
+<link rel="icon" href="/assets/lumencore-mark.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -917,8 +922,9 @@
     .health-poc-dial { width: 150px; }
   }
 </style>
+<link rel="stylesheet" href="./assets/luma_institutional_surface.css">
 </head>
-<body>
+<body data-luma-surface="mission">
 <canvas id="bg-canvas"></canvas>
 <div id="grid-overlay"></div>
 <div id="scanlines"></div>
@@ -941,15 +947,14 @@
     </div>
     <nav class="nav">
       <a href="grants.html">Grants</a>
-      <a href="social_pro_dashboard.html">Social Pro</a>
-      <a href="lumaq_brain_command_center.html">Helmyer QA</a>
+      <a href="proof_to_pilot.html">Proof</a>
       <a href="forecast.html">Forecast</a>
       <a href="anomalies.html">Anomalies</a>
       <a href="explain.html">Explain</a>
       <a href="lab.html">Lab</a>
       <a href="quant_lab.html">Quant Lab</a>
       <a href="kraken_execution_dashboard.html">Kraken</a>
-      <a href="vps_growth_proof_3d.html">VPS Proof</a>
+      <a href="evidence/">Evidence</a>
     </nav>
     <div class="clock">
       <div><span class="label">UTC Now</span><span class="val" id="clock-utc">—</span></div>
@@ -973,20 +978,20 @@
       <svg class="spark" id="spark-2" viewBox="0 0 100 30" preserveAspectRatio="none"></svg>
     </div>
     <div class="panel col-3">
-      <h3>Router Win-Rate</h3>
+      <h3>Development Win Rate</h3>
       <div class="big-num" id="kpi-router">—</div>
-      <div class="num-label">vs every fixed family</div>
+      <div class="num-label">internal replay · not a promotion gate</div>
       <svg class="spark" id="spark-3" viewBox="0 0 100 30" preserveAspectRatio="none"></svg>
     </div>
     <div class="panel col-3">
-      <h3>Kalisha Composite</h3>
+      <h3>Composite Diagnostic</h3>
       <div class="big-num" id="kpi-stacker">—</div>
       <div class="num-label" id="kpi-stacker-label">Router-aware confidence blend</div>
       <div class="num-delta" id="kpi-stacker-band">K-BAND —</div>
       <svg class="spark" id="spark-4" viewBox="0 0 100 30" preserveAspectRatio="none"></svg>
     </div>
 
-    <div class="panel col-12">
+    <div class="panel col-12" data-luma-legacy="true">
       <h3>VPS Kraken Growth Evidence Rail</h3>
       <div class="vps-proof-grid">
         <div class="vps-proof-tile"><div class="k">Proof Score</div><div id="vps-score" class="v">—</div></div>
@@ -1003,10 +1008,10 @@
         <div class="vps-proof-tile"><div class="k">Guard Reasons</div><div id="vps-ctrl-reasons" class="v">—</div></div>
       </div>
       <div class="vps-proof-note" id="vps-proof-note">Loading VPS growth proof telemetry...</div>
-      <a class="vps-proof-link" href="vps_growth_proof_3d.html">Open 3D VPS Growth Proof Room</a>
+      <a class="vps-proof-link" href="evidence/">Open bounded evidence room</a>
     </div>
 
-    <div class="panel col-12">
+    <div class="panel col-12" data-luma-legacy="true">
       <h3>Gov-Grade Alpha Coherence</h3>
       <div class="coh-grid">
         <div class="coh-tile"><div class="k">Coherence Score</div><div id="coh-score" class="v">—</div></div>
@@ -1021,29 +1026,29 @@
     </div>
 
     <div class="panel col-12">
-      <h3>Cross-Sector Live Breadth Value</h3>
+      <h3>Live Evidence Breadth</h3>
       <div class="lbv-grid">
-        <div class="lbv-tile"><div class="k">Annual Preserved Value</div><div id="lbv-total-annual" class="v">—</div></div>
-        <div class="lbv-tile"><div class="k">Hourly Preserved Value</div><div id="lbv-hourly" class="v">—</div></div>
-        <div class="lbv-tile"><div class="k">Measured Coverage</div><div id="lbv-coverage" class="v">—</div></div>
-        <div class="lbv-tile"><div class="k">Top Sector</div><div id="lbv-top-sector" class="v">—</div></div>
-        <div class="lbv-tile"><div class="k">Router Edge</div><div id="lbv-router" class="v">—</div></div>
-        <div class="lbv-tile"><div class="k">Kalisha Score</div><div id="lbv-kalisha" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">Dollar Claim Gate</div><div id="lbv-total-annual" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">Claimable Savings</div><div id="lbv-hourly" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">Source Coverage</div><div id="lbv-coverage" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">Top Source Lane</div><div id="lbv-top-sector" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">Performance Gate</div><div id="lbv-router" class="v">—</div></div>
+        <div class="lbv-tile"><div class="k">Evidence State</div><div id="lbv-kalisha" class="v">—</div></div>
       </div>
       <div class="lbv-lanes" id="lbv-lanes"></div>
       <div class="lbv-toplist" id="lbv-toplist"></div>
-      <div class="lbv-note" id="lbv-note">Loading cross-sector live breadth value chain...</div>
+      <div class="lbv-note" id="lbv-note">Loading forward-only source coverage and claim gates...</div>
     </div>
 
     <div class="panel col-12">
-      <h3>Live Rolling Opportunity and Stability</h3>
+      <h3>Live Collection and Runtime Boundary</h3>
       <div class="coh-grid">
-        <div class="coh-tile"><div class="k">Rolling Opportunity</div><div id="roll-opp-hourly" class="v">—</div></div>
-        <div class="coh-tile"><div class="k">Annualized Opportunity</div><div id="roll-opp-annual" class="v">—</div></div>
-        <div class="coh-tile"><div class="k">Stability Index</div><div id="roll-stability" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Prospective Collection</div><div id="roll-opp-hourly" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Model Claim Gate</div><div id="roll-opp-annual" class="v">—</div></div>
+        <div class="coh-tile"><div class="k">Evidence Progress</div><div id="roll-stability" class="v">—</div></div>
         <div class="coh-tile"><div class="k">Runtime Truth</div><div id="roll-runtime" class="v">—</div></div>
       </div>
-      <div class="vps-proof-note" id="roll-note">Loading rolling opportunity and stability metrics from live artifact chain...</div>
+      <div class="vps-proof-note" id="roll-note">Loading collection coverage, promotion boundary, and runtime controls...</div>
     </div>
 
     <!-- Row 2: Evidence layers + Pipeline -->
@@ -1062,11 +1067,11 @@
       </div>
       <div style="margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim);">
         <span style="color: var(--neon-c)">$</span><span id="pipe-tap" style="color: var(--ink); font-weight: 700">—</span>
-        <span> total addressable across federal programs</span>
+        <span> program ceiling inventory · not an award or revenue claim</span>
       </div>
     </div>
 
-    <div class="panel col-12">
+    <div class="panel col-12" data-luma-legacy="true">
       <h3>Sports Alpha Elite Pane</h3>
       <div class="coh-grid">
         <div class="coh-tile"><div class="k">Candidates</div><div id="sports-candidate-count" class="v">—</div></div>
@@ -1080,7 +1085,7 @@
       <div class="vps-proof-note" id="sports-note">Loading institutional sports Monte Carlo edge artifact...</div>
     </div>
 
-    <div class="panel col-12">
+    <div class="panel col-12" data-luma-legacy="true">
       <h3>Healthcare PoC Forecast Dial</h3>
       <div class="health-poc-layout">
         <div class="health-poc-dial-shell">
@@ -1121,7 +1126,7 @@
       <a class="vps-proof-link" id="hc-poc-link" href="#" target="_blank" rel="noopener">Open Healthcare PoC Report</a>
     </div>
 
-    <div class="panel col-6">
+    <div class="panel col-6" data-luma-legacy="true">
       <h3>LinkedIn Institutional Proof Rail</h3>
       <div class="linkedin-grid">
         <div class="linkedin-tile"><div class="k">Connection</div><div id="li-connection" class="v amber">—</div></div>
@@ -1139,7 +1144,7 @@
       </div>
     </div>
 
-    <div class="panel col-6">
+    <div class="panel col-6" data-luma-legacy="true">
       <h3>Helmyer Investor Q/A Pane</h3>
       <div class="helmyer-list" id="helmyer-list"></div>
       <div class="linkedin-note" id="helmyer-note">Loading mission Q/A synthesis from live evidence...</div>
@@ -1220,14 +1225,14 @@
     <!-- Row 5: Footer / chain of custody -->
     <div class="panel col-12" style="text-align: center">
       <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim); letter-spacing: 1px">
-        <span style="color: var(--neon-g)">●</span> ALL EVIDENCE SHA-256 HASH-CHAINED
+        <span style="color: var(--neon-g)">●</span> SHA-256 RECEIPTS WHERE DECLARED
         <span style="margin: 0 12px">·</span>
-        <span style="color: var(--neon-c)">●</span> REPRODUCIBLE FROM FROZEN BENCHMARK
+        <span style="color: var(--neon-c)">●</span> REPLAYABLE FROM NAMED FROZEN PACKAGES
         <span style="margin: 0 12px">·</span>
-        <span style="color: var(--neon-p)">●</span> FEDERAL EVIDENCE-CHAIN GRADE
+        <span style="color: var(--neon-p)">●</span> HUMAN-AUTHORIZED EXTERNAL ACTIONS
       </div>
       <div style="font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: 4px; color: var(--ink-dim); margin-top: 10px">
-        BUILT SOLO · EVIDENCE-FIRST · INSTITUTIONAL READY
+        BUILT SOLO · EVIDENCE-FIRST · REVIEW BOUNDARIES EXPLICIT
       </div>
     </div>
   </div>
@@ -1987,28 +1992,23 @@ function renderLiveBreadthPanel(panel, readinessPayload) {
     : readinessFromPanel;
   const topSectors = (panel && Array.isArray(panel.top_sectors)) ? panel.top_sectors : [];
 
-  const annual = toFinite(headline.total_estimated_annual_value_usd, 0);
-  const hourly = toFinite(headline.total_estimated_hourly_value_usd, 0);
   const measured = toFinite(headline.measured_sources, 0);
   const enabled = toFinite(headline.enabled_sources, 0);
   const coverage = toFinite(headline.measured_coverage_pct, 0);
   const topSector = String(headline.top_sector || 'n/a');
-  const topSectorHourly = toFinite(headline.top_sector_hourly_value_usd, 0);
-  const routerEdge = toFinite(headline.router_edge_pct, 0);
-  const kalisha = toFinite(headline.kalisha_prediction_score, 0);
 
   const annualEl = $('lbv-total-annual');
-  if (annualEl) annualEl.textContent = fmtUsdCompact(annual);
+  if (annualEl) annualEl.textContent = 'BLOCKED';
   const hourlyEl = $('lbv-hourly');
-  if (hourlyEl) hourlyEl.textContent = fmtUsdCompact(hourly) + '/h';
+  if (hourlyEl) hourlyEl.textContent = '$0 CLAIMABLE';
   const coverageEl = $('lbv-coverage');
   if (coverageEl) coverageEl.textContent = `${Math.round(measured)}/${Math.round(enabled)} · ${coverage.toFixed(1)}%`;
   const topSectorEl = $('lbv-top-sector');
-  if (topSectorEl) topSectorEl.textContent = `${topSector} · ${fmtUsdCompact(topSectorHourly)}/h`;
+  if (topSectorEl) topSectorEl.textContent = topSector;
   const routerEl = $('lbv-router');
-  if (routerEl) routerEl.textContent = routerEdge.toFixed(2) + '%';
+  if (routerEl) routerEl.textContent = 'NOT PROMOTED';
   const kalishaEl = $('lbv-kalisha');
-  if (kalishaEl) kalishaEl.textContent = kalisha.toFixed(2);
+  if (kalishaEl) kalishaEl.textContent = 'INTERNAL / LIVE-PULLED';
 
   const laneHost = $('lbv-lanes');
   if (laneHost) {
@@ -2043,27 +2043,27 @@ function renderLiveBreadthPanel(panel, readinessPayload) {
     const laneRows = [
       {
         name: 'cross-sector',
-        val: `${toFinite(cross.recommended_prevented_pct, 0).toFixed(1)}% prevented · avoided ${fmtUsdCompact(toFinite(cross.recommended_avoided_cost_usd, 0))}`,
+        val: `${String(cross.status || 'internal replay')} · no field or savings claim`,
       },
       {
         name: 'live translation',
-        val: `${Math.round(toFinite(live.measured_sources, measured))}/${Math.round(toFinite(live.enabled_sources, enabled))} measured · ${fmtUsdCompact(toFinite(live.translated_annual_value_usd, 0))}/yr`,
+        val: `${Math.round(toFinite(live.measured_sources, measured))}/${Math.round(toFinite(live.enabled_sources, enabled))} measured · source coverage only`,
       },
       {
         name: 'flowform router',
-        val: `${toFinite(flow.router_edge_pct, routerEdge).toFixed(2)}% edge · harmonic ${toFinite(flow.harmonic_win_rate_pct, 0).toFixed(2)}% · K ${toFinite(flow.kalisha_prediction_score, kalisha).toFixed(2)}`,
+        val: `${String(flow.status || 'development')} · no prospective promotion`,
       },
       {
         name: 'trader lane',
-        val: `${String(trader.sector || 'market_execution')} · ${fmtUsdCompact(toFinite(trader.hourly_value_usd, 0))}/h · ${toFinite(trader.weighted_gain_pct, 0).toFixed(2)}%`,
+        val: `${String(trader.sector || 'market_execution')} · paper/shadow evidence only`,
       },
       {
         name: 'lumascout',
-        val: `${Math.round(toFinite(scout.active_sources, 0))} active sources · ${Math.round(toFinite(scout.champions, 0))} champions`,
+        val: `${Math.round(toFinite(scout.active_sources, 0))} active sources · ${Math.round(toFinite(scout.champions, 0))} internal candidates`,
       },
       {
         name: 'perf readiness',
-        val: `${String(perf.status || 'unknown')} · trades ${Math.round(toFinite(perf.closed_live_trades, 0))}/${Math.round(toFinite(perf.metrics_stable_threshold, 0))} · cap ${fmtUsdCompact(toFinite(perf.portfolio_est_usd, 0))} · live ${Boolean(perf.allow_live_orders) ? 'on' : 'off'} / kill ${Boolean(perf.kill_switch) ? 'on' : 'off'}`,
+        val: `${String(perf.status || 'unknown')} · observations ${Math.round(toFinite(perf.closed_live_trades, 0))}/${Math.round(toFinite(perf.metrics_stable_threshold, 0))} · live ${Boolean(perf.allow_live_orders) ? 'on' : 'off'} / kill ${Boolean(perf.kill_switch) ? 'on' : 'off'}`,
       },
     ];
 
@@ -2082,8 +2082,8 @@ function renderLiveBreadthPanel(panel, readinessPayload) {
         <div class="row">
           <span class="rank">#${Math.round(toFinite(row.rank, 0))}</span>
           <span class="sector">${escHTML(String(row.sector || 'unknown'))}</span>
-          <span class="gain">${toFinite(row.weighted_optimization_gain_pct, 0).toFixed(2)}%</span>
-          <span class="value">${fmtUsdCompact(toFinite(row.total_estimated_hourly_value_usd, 0))}/h</span>
+          <span class="gain">internal ${toFinite(row.weighted_optimization_gain_pct, 0).toFixed(2)}%</span>
+          <span class="value">value claim blocked</span>
         </div>
       `).join('');
     } else {
@@ -2093,7 +2093,7 @@ function renderLiveBreadthPanel(panel, readinessPayload) {
 
   const noteEl = $('lbv-note');
   if (noteEl) {
-    const investorMsg = String(bridge.investor_message || bridge.thesis || '');
+    const investorMsg = String(bridge.claim_boundary || bridge.thesis || '');
     const legal = String(bridge.legal_note || '');
     const readinessStatus = String(readiness.status || headline.performance_metrics_status || 'unknown');
     const readinessExplain = String(readiness.explanation || '');
@@ -2120,9 +2120,6 @@ function renderRollingTruthStrip(panel, readinessPayload, summaryPayload, queueP
     : {};
   const status = String(readinessSummary.status || readinessPanel.status || headline.performance_metrics_status || 'unknown');
 
-  const hourly = toFinite(headline.total_estimated_hourly_value_usd, 0);
-  const annual = toFinite(headline.total_estimated_annual_value_usd, 0);
-
   const stabilityFromSummary = toFinite(liveMetrics.stability_progress_pct, NaN);
   const stabilityFromPanel = toFinite(readinessPanel.stability_progress_pct, NaN);
   const stabilityPct = Number.isFinite(stabilityFromSummary)
@@ -2138,14 +2135,14 @@ function renderRollingTruthStrip(panel, readinessPayload, summaryPayload, queueP
   const liveArm = !!flags.live_enabled;
   const kill = !!flags.kill_switch;
 
-  $('roll-opp-hourly').textContent = fmtUsdCompact(hourly) + '/h';
-  $('roll-opp-annual').textContent = fmtUsdCompact(annual) + '/yr';
+  $('roll-opp-hourly').textContent = status.toUpperCase();
+  $('roll-opp-annual').textContent = 'NOT PROMOTED';
   $('roll-stability').textContent = stabilityPct.toFixed(1) + '%';
   $('roll-runtime').textContent = `${mode} · ${running ? 'RUNNING' : 'IDLE'} · ARM ${liveArm ? 'ON' : 'OFF'} · KILL ${kill ? 'ON' : 'OFF'}`;
 
   const explain = String(readinessSummary.explanation || readinessPanel.explanation || '').trim();
   $('roll-note').textContent =
-    `status ${status} | coverage ${toFinite(headline.measured_coverage_pct, 0).toFixed(2)}% (${Math.round(toFinite(headline.measured_sources, 0))}/${Math.round(toFinite(headline.enabled_sources, 0))}) | router ${toFinite(headline.router_edge_pct, 0).toFixed(2)}% | ${explain || 'live stability tracks institutional threshold progress from frozen delta evidence chain.'}`;
+    `status ${status} | coverage ${toFinite(headline.measured_coverage_pct, 0).toFixed(2)}% (${Math.round(toFinite(headline.measured_sources, 0))}/${Math.round(toFinite(headline.enabled_sources, 0))}) | model-performance and dollar claims remain blocked until the declared prospective and external gates pass | ${explain || 'live breadth is an evidence collection rail, not proof of alpha or field savings.'}`;
 }
 
 function toHref(path) {
@@ -2292,7 +2289,7 @@ function renderHelmyerPane(helmyerPayload, providerPackPayload, readinessPayload
       },
       {
         q: 'What is current grant submission readiness?',
-        a: `${submitted}/${total} submitted with ${fmtUsdCompact(grantsTAM)} total addressable ceiling.`,
+        a: `${submitted}/${total} submission receipts with ${fmtUsdCompact(grantsTAM)} in listed program ceilings; this is not an award or revenue total.`,
       },
     ];
   }
@@ -3166,6 +3163,7 @@ setInterval(tickClock, 1000); tickClock();
 loadAll();
 setInterval(loadAll, 8000);
 </script>
+<script src="./assets/luma_institutional_surface.js"></script>
 <script src="./assets/luma_command_fabric.js"></script>
 </body>
 </html>
