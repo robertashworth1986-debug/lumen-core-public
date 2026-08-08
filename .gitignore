@@ -57,6 +57,7 @@ audit_chain.jsonl
 run/
 out/
 code/out/
+output/pdf/
 *.lock
 !requirements-reviewer-ubuntu-py311.lock
 

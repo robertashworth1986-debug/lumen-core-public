@@ -73,6 +73,10 @@ class RepositoryTrustPolicyTests(unittest.TestCase):
         self.assertIn("-approvedsend requires -once", runner)
         self.assertIn("--send-approved", runner)
         self.assertNotIn("elite resume</title>", pdf_builder)
+        self.assertNotIn(r"c:\lumatrader\institutional_stack_v2", pdf_builder)
+        self.assertIn("path(__file__).resolve().parents[1]", pdf_builder)
+        self.assertIn('root / "output" / "pdf"', pdf_builder)
+        self.assertIn("--no-legacy-copy", pdf_builder)
 
     def test_security_policy_is_bounded_and_has_private_reporting(self):
         text = (ROOT / "SECURITY.md").read_text(encoding="utf-8")
