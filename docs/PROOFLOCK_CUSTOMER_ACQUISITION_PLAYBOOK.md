@@ -6,6 +6,14 @@
 
 Do not lead with the full LumenCore ecosystem, harmonic theory, dashboard count, or internal trading results. Lead with one expensive buyer problem: teams waste days on opportunities that later fail an eligibility, evidence, attachment, authority, or submission gate.
 
+## Competitive answer
+
+If a prospect asks, "Why not have our AI review it?", answer plainly:
+
+> Use your AI for drafting. ProofLock is the governed layer around the draft: exact official sources and amendments, client-confirmed facts, evidence-to-claim mapping, missing-fact abstention, package and authority gates, acceptance criteria, and a replayable decision receipt. You are buying an accountable bounded handoff, not access to a chatbot.
+
+Do not claim this is better until buyer evidence exists. The first three completed sprints must measure hours to decision, late blockers found, rework avoided, and whether the resulting record was usable by the buyer's reviewer.
+
 ## Ideal first buyers
 
 1. U.S. small technology firms with prior SBIR/STTR or federal R&D awards and a small proposal team.

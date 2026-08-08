@@ -8,6 +8,10 @@ A small technology firm, consultant, or research team is considering one real fu
 
 ProofLock converts that opportunity workflow into a source-grounded, preflighted, replayable decision: **pursue, revise, hold, or stop**.
 
+## Why this is not a generic AI review
+
+A general AI can summarize a solicitation or draft proposal language. The paid unit is the governed decision record around that assistance: locked official sources and amendments, client-confirmed facts, eligibility and authority gates, evidence-to-claim mapping, missing-fact abstention, acceptance rules, and replayable receipts. A named person is accountable for delivering the agreed artifacts. No claim is made that this method is superior until buyer pilots measure the actual workflow outcome.
+
 ## Fixed fee and timing
 
 - Fixed fee: **$3,500 USD**

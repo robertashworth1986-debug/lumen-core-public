@@ -68,6 +68,8 @@ def test_opportunity_sprint_is_buyable_bounded_and_human_gated():
     assert "50% kickoff deposit" in body
     assert "ten business days" in body
     assert "pursue, revise, hold, or stop" in body
+    assert "AI can draft. ProofLock governs the decision." in body
+    assert "A named person accountable for the agreed deliverables" in body
     assert "No signatures, certifications, or final submit" in body
     assert "does not guarantee eligibility, award, legal compliance" in body
     assert 'rel="canonical" href="https://lumen-core.ai/opportunity_sprint.html"' in body
