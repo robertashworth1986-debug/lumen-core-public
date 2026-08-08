@@ -1,0 +1,293 @@
+{
+  "schema_version": "2.0",
+  "company_name": "LumenCore",
+  "market_position": {
+    "platform": "LumenCore",
+    "evidence_layer": "ProofLock",
+    "canonical_offer_packet": "config/strategic_transaction_packet_v2.json",
+    "primary_offer_id": "buyer-owned-baseline-validation-sprint",
+    "priority_lane_id": "lumen_infrastructure_sentinel",
+    "direct_engine_sales_authorized": false
+  },
+  "source_note": "The 15 founder engine names are audited as internal platform lanes, not 15 finished products or 15 separate offers. Only repository evidence is scored.",
+  "boundaries": [
+    "A present file proves only that a repository artifact exists; it does not prove deployment, external validation, customer adoption, revenue, or economic value.",
+    "The only primary commercial offer is the buyer-owned baseline validation sprint bound to the canonical strategic transaction packet.",
+    "Every engagement requires buyer-authorized data, an accepted baseline, a locked metric and threshold, and a signed paid scope.",
+    "Trading and sports lanes remain research and paper-only.",
+    "Hardware, identity, energy, and smart-city performance claims remain simulation-bound or conceptual until independent domain validation exists.",
+    "Final government certifications, signatures, prices, uploads, submissions, and binding commitments remain human-controlled."
+  ],
+  "engines": [
+    {
+      "id": "lumen_infrastructure_sentinel",
+      "name": "Lumen Infrastructure Sentinel",
+      "lane": "priority_validation_lane",
+      "safe_description": "Infrastructure baseline, drift, anomaly, and evidence-packet tooling.",
+      "buyer_profile": "Data-center, utility, hospital IT, telecom, and managed-service operators with an authorized historical or replay dataset.",
+      "scoping_use": "Test one declared infrastructure claim against an accepted incumbent baseline and return replayable decision evidence.",
+      "acceptance_gate": "Detect declared injected or historical failure modes at an agreed false-alert rate on buyer-authorized data.",
+      "claim_boundary": "No outage prevention, realized savings, field validation, safety control, or production deployment claim.",
+      "evidence": {
+        "source": ["code/institutional_harmonic_infrastructure.py", "code/execution/infra_constraint_monitor.py"],
+        "entrypoint": ["code/institutional_harmonic_infrastructure.py"],
+        "test": [],
+        "documentation": ["docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"],
+        "artifact": ["institutional_harmonic_infrastructure_proof.json"],
+        "public_surface": ["code/execution/build_infra_audit_dashboard.py"]
+      }
+    },
+    {
+      "id": "lumatrader",
+      "name": "LumaTrader",
+      "lane": "research_lane",
+      "safe_description": "Paper-only market research, model comparison, runtime controls, and replayable decision evidence.",
+      "buyer_profile": "Quant research, fintech research, and model-governance teams.",
+      "scoping_use": "Compare a frozen paper or replay protocol with a declared baseline after costs and abstention rules.",
+      "acceptance_gate": "Prospective paper results meet a locked after-cost threshold without breaching risk or reconciliation gates.",
+      "claim_boundary": "No alpha, profitability, institutional readiness, investment advice, or live-capital claim.",
+      "evidence": {
+        "source": ["code/execution/execution_orchestrator.py", "code/institutional_harmonic_suite.py"],
+        "entrypoint": ["code/execution/execution_orchestrator.py"],
+        "test": ["tests/test_order_safety_alpaca_paper_boundary.py"],
+        "documentation": ["docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"],
+        "artifact": ["dashboard/data/public_live_breadth_manifest.json"],
+        "public_surface": ["dashboard/quant_lab.html"]
+      }
+    },
+    {
+      "id": "kraken_sentinel_lumasniper",
+      "name": "Kraken Sentinel / LumaSniper",
+      "lane": "research_lane",
+      "safe_description": "Crypto-market telemetry, guarded signal research, and paper-execution controls.",
+      "buyer_profile": "Digital-asset research and model-governance teams.",
+      "scoping_use": "Review read-only telemetry and paper-ledger controls under a frozen protocol.",
+      "acceptance_gate": "Prospective after-fee paper results, deterministic kill controls, and complete ledger reconciliation.",
+      "claim_boundary": "No live trading authority, profit, return, signal service, or investment-advice claim.",
+      "evidence": {
+        "source": ["code/kraken_execution.py", "code/kraken_swing_hunter.py"],
+        "entrypoint": ["code/kraken_swing_hunter.py"],
+        "test": ["tests/test_order_safety_gate.py"],
+        "documentation": ["docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"],
+        "artifact": [],
+        "public_surface": ["dashboard/kraken_execution_dashboard.html"]
+      }
+    },
+    {
+      "id": "lumengov_grant_factory",
+      "name": "LumenGov Grant Factory",
+      "lane": "workflow_module",
+      "safe_description": "Opportunity qualification, evidence assembly, conformance checks, and human-controlled submission preflight.",
+      "buyer_profile": "Small businesses, research teams, grant consultants, and government contractors.",
+      "scoping_use": "Measure preparation latency and conformance defects against the buyer's existing human-controlled workflow.",
+      "acceptance_gate": "Reduce verified preparation latency or conformance defects while preserving source and approval controls.",
+      "claim_boundary": "No guaranteed eligibility, submission, award, savings, certification, signature, or portal authority.",
+      "evidence": {
+        "source": ["code/grant_submission_kit.py", "code/grant_application_factory.py"],
+        "entrypoint": ["code/grant_submission_kit.py"],
+        "test": ["tests/test_grant_submission_readiness_audit.py", "tests/test_grant_dashboard_status_feed.py"],
+        "documentation": ["docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"],
+        "artifact": ["dashboard/data/grant_readiness_status.json"],
+        "public_surface": ["dashboard/grants.html"]
+      }
+    },
+    {
+      "id": "lumascout",
+      "name": "LumaScout",
+      "lane": "research_lane",
+      "safe_description": "Source-receipted creator discovery shortlists with forward outcome tracking.",
+      "buyer_profile": "Artist-management, agency, label, and creator-research teams with permitted data.",
+      "scoping_use": "Compare a pre-registered shortlist with a transparent popularity baseline.",
+      "acceptance_gate": "Forward outcomes improve on a declared baseline using licensed or permitted data.",
+      "claim_boundary": "No hit prediction, label adoption, revenue lift, or undocumented data-rights claim.",
+      "evidence": {
+        "source": ["LamaScout/src/pipeline.py", "LamaScout/src/scoring.py"],
+        "entrypoint": ["LamaScout/src/artist_scout_engine.py"],
+        "test": [],
+        "documentation": ["LamaScout/README.md", "LamaScout/ARCHITECTURE.md"],
+        "artifact": [],
+        "public_surface": ["dashboard/lumascout.html"]
+      }
+    },
+    {
+      "id": "sports_harmonic_edge",
+      "name": "Sports Harmonic Edge",
+      "lane": "research_lane",
+      "safe_description": "Sports-odds ingestion and research scoring under explicit uncertainty and paper-only controls.",
+      "buyer_profile": "Sports media research and analytics teams with licensed data.",
+      "scoping_use": "Compare historical and prospective research scoring with simple declared market baselines.",
+      "acceptance_gate": "Prospective calibration and ranking metrics beat declared baselines without hidden selection.",
+      "claim_boundary": "No betting advice, guaranteed edge, profit, or consumer wagering automation.",
+      "evidence": {
+        "source": ["code/sports_odds_engine.py", "code/sports_intelligence_layer.py"],
+        "entrypoint": ["code/sports_odds_engine.py"],
+        "test": [],
+        "documentation": ["docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "crowdfund_radar",
+      "name": "CrowdFund Radar",
+      "lane": "research_lane",
+      "safe_description": "Campaign discovery and evidence-linked research queue tooling.",
+      "buyer_profile": "Product scouts, trend-research teams, and analyst groups.",
+      "scoping_use": "Compare a pre-registered campaign ranking with a simple popularity baseline.",
+      "acceptance_gate": "Forward labels show useful lift over the named baseline using permitted sources.",
+      "claim_boundary": "No investment recommendation, campaign quality guarantee, or return claim.",
+      "evidence": {
+        "source": ["code/crowdfunding_engine.py"],
+        "entrypoint": [],
+        "test": [],
+        "documentation": [],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "cyber_forensics_assist",
+      "name": "Cyber Forensics Assist",
+      "lane": "research_lane",
+      "safe_description": "Prototype evidence-component scoring and investigation chronology support.",
+      "buyer_profile": "Incident-response, legal-support, and internal security research teams using approved synthetic cases.",
+      "scoping_use": "Measure chronology completeness and reviewer agreement without modifying source evidence.",
+      "acceptance_gate": "A blinded synthetic-case review meets a locked completeness and agreement threshold.",
+      "claim_boundary": "No forensic conclusion, chain-of-custody certification, legal admissibility, or autonomous response claim.",
+      "evidence": {
+        "source": ["code/cold_case_engine.py"],
+        "entrypoint": [],
+        "test": [],
+        "documentation": [],
+        "artifact": ["code/output/cold_case_summary.json"],
+        "public_surface": ["code/build_cold_case_dashboard.py"]
+      }
+    },
+    {
+      "id": "echoform_identity_engine",
+      "name": "EchoForm Identity Engine",
+      "lane": "concept_lane",
+      "safe_description": "Identity-consistent digital-twin architecture concept.",
+      "buyer_profile": "Future privacy-preserving personal-AI and simulation research partners.",
+      "scoping_use": "Requirements workshop only after privacy, consent, threat-model, and minimization rules are defined.",
+      "acceptance_gate": "A consent-first prototype passes deletion, provenance, revocation, and identity-consistency tests.",
+      "claim_boundary": "No biometric certification, medical inference, identity proof, or continuity-of-person claim.",
+      "evidence": {
+        "source": [],
+        "entrypoint": [],
+        "test": [],
+        "documentation": ["docs/CLAIM_BOUNDARY_REGISTER.md", "docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "luma_xr_command_room",
+      "name": "Luma XR Command Room",
+      "lane": "research_lane",
+      "safe_description": "Prototype launch and interface assets for immersive system-state visualization.",
+      "buyer_profile": "Simulation, training, museum, and enterprise demonstration teams.",
+      "scoping_use": "Test declared monitoring tasks using non-sensitive sample telemetry.",
+      "acceptance_gate": "Users complete declared tasks within locked error, latency, and comfort thresholds.",
+      "claim_boundary": "No operational command authority, training efficacy, comfort, or safety certification claim.",
+      "evidence": {
+        "source": ["code/START_IMMERSIVE_STACK.ps1", "code/unity_bridge/INSTALL_UNITY_BRIDGE.ps1"],
+        "entrypoint": ["code/START_IMMERSIVE_STACK.ps1"],
+        "test": [],
+        "documentation": ["docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
+        "artifact": [],
+        "public_surface": ["dashboard/alpha_burst_lab_holo_3d.html"]
+      }
+    },
+    {
+      "id": "smart_city_node_engine",
+      "name": "Smart City Node Engine",
+      "lane": "concept_lane",
+      "safe_description": "Smart-city and telecom edge-routing concept.",
+      "buyer_profile": "Future municipal, utility, and telecom research partners.",
+      "scoping_use": "Requirements and simulation-scoping workshop only.",
+      "acceptance_gate": "A deterministic simulator beats a named baseline on a locked latency, resilience, or allocation metric.",
+      "claim_boundary": "No city deployment, critical-infrastructure control, latency, resilience, or savings claim.",
+      "evidence": {
+        "source": [],
+        "entrypoint": [],
+        "test": [],
+        "documentation": ["docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "flowform_hardware_engine",
+      "name": "FlowForm Hardware Engine",
+      "lane": "research_lane",
+      "safe_description": "Simulation and audit tooling for geometry-informed routing concepts.",
+      "buyer_profile": "Aerospace, robotics, EV, and electronics R&D teams with a declared comparator.",
+      "scoping_use": "Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan.",
+      "acceptance_gate": "Pre-registered simulation and independent bench tests beat named baselines on declared measures.",
+      "claim_boundary": "No physical thermal, electromagnetic, battery, structural, manufacturing, or field-performance claim.",
+      "evidence": {
+        "source": ["code/ops/flowform_phase_lock_audit.py", "code/ops/harmonic_flowform_impact_explainer.py"],
+        "entrypoint": ["code/ops/flowform_phase_lock_audit.py"],
+        "test": [],
+        "documentation": ["docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "energy_harmonization_engine",
+      "name": "Energy Harmonization Engine",
+      "lane": "research_lane",
+      "safe_description": "Energy-data evidence pipeline and simulation research component.",
+      "buyer_profile": "Utilities, facility operators, energy researchers, and government laboratories with authorized data.",
+      "scoping_use": "Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision.",
+      "acceptance_gate": "Meet locked accuracy, calibration, timeliness, and economic-conversion rules against a named baseline.",
+      "claim_boundary": "No nuclear control, field validation, outage savings, or universal harmonic-superiority claim.",
+      "evidence": {
+        "source": ["code/ops/run_sector_energy_evidence_pipeline.py", "code/institutional_harmonic_infrastructure.py"],
+        "entrypoint": ["code/ops/run_sector_energy_evidence_pipeline.py"],
+        "test": [],
+        "documentation": ["docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "world_model_engine",
+      "name": "World Model Engine",
+      "lane": "research_lane",
+      "safe_description": "Cross-sector data-normalization and scenario-analysis prototype.",
+      "buyer_profile": "Enterprise strategy, research, and government analytics teams.",
+      "scoping_use": "Model one buyer-owned decision using a declared source set, baseline, and uncertainty register.",
+      "acceptance_gate": "Reproduce declared scenarios and meet a locked decision metric without hidden data or hindsight.",
+      "claim_boundary": "No complete world model, operational prediction, policy authority, or cross-sector-superiority claim.",
+      "evidence": {
+        "source": ["code/execution/cross_sector_intel_pipeline.py"],
+        "entrypoint": ["code/execution/cross_sector_intel_pipeline.py"],
+        "test": [],
+        "documentation": ["docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "lumacore_orchestrator",
+      "name": "LumaCore Orchestrator",
+      "lane": "workflow_module",
+      "safe_description": "Routing, sequencing, health, and evidence-pack assembly across bounded subsystems.",
+      "buyer_profile": "Enterprise evidence, workflow, and trustworthy-AI teams after gateway health is restored.",
+      "scoping_use": "Compare a declared governed workflow with the buyer's existing process while preserving approvals and abstentions.",
+      "acceptance_gate": "Complete the workflow with fewer verified defects or less preparation time and no approval-boundary breach.",
+      "claim_boundary": "No autonomous legal, procurement, financial, trading, safety-critical, or production-gateway authority.",
+      "evidence": {
+        "source": ["code/FULL_TRUTH_ORCHESTRATOR.py", "code/run_universal_meta_orchestrator.py"],
+        "entrypoint": ["code/FULL_TRUTH_ORCHESTRATOR.py", "code/run_universal_meta_orchestrator.py"],
+        "test": [],
+        "documentation": ["docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"],
+        "artifact": ["truth_orchestrator_status.json"],
+        "public_surface": ["dashboard/mission_control.html"]
+      }
+    }
+  ]
+}
