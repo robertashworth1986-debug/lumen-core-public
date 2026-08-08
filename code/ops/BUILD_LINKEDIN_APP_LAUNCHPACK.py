@@ -434,15 +434,29 @@ def _google_drive_file_id(url: str) -> str:
     text = _safe_text(url)
     if not text:
         return ""
-    patterns = [
-        r"/file/d/([A-Za-z0-9_-]+)",
-        r"[?&]id=([A-Za-z0-9_-]+)",
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, text)
-        if match:
-            return _safe_text(match.group(1))
+    try:
+        parsed = urllib.parse.urlsplit(text)
+    except ValueError:
+        return ""
+    if (
+        parsed.scheme.lower() != "https"
+        or (parsed.hostname or "").lower() != "drive.google.com"
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.port is not None
+    ):
+        return ""
+    path_match = re.fullmatch(r"/file/d/([A-Za-z0-9_-]+)(?:/[^?#]*)?", parsed.path)
+    if path_match:
+        return _safe_text(path_match.group(1))
+    query_ids = urllib.parse.parse_qs(parsed.query, keep_blank_values=False).get("id", [])
+    if len(query_ids) == 1 and re.fullmatch(r"[A-Za-z0-9_-]+", query_ids[0]):
+        return _safe_text(query_ids[0])
     return ""
+
+
+def _is_google_drive_file_url(url: str) -> bool:
+    return bool(_google_drive_file_id(url))
 
 
 def _google_asset_bundle(url: str) -> dict[str, Any]:
@@ -457,7 +471,7 @@ def _google_asset_bundle(url: str) -> dict[str, Any]:
             "download_url": "",
             "thumbnail_url": "",
         }
-    is_google_drive = "drive.google.com" in source.lower() and bool(file_id)
+    is_google_drive = bool(file_id)
     view_url = f"https://drive.google.com/file/d/{file_id}/view" if file_id else ""
     download_url = f"https://drive.google.com/uc?export=download&id={file_id}" if file_id else ""
     thumbnail_url = f"https://drive.google.com/thumbnail?id={file_id}&sz=w1600" if file_id else ""
@@ -720,7 +734,7 @@ def build_launchpack(
     company_page_url = _safe_text(company_page_url) or _safe_text(env_map.get("LINKEDIN_COMPANY_PAGE_URL"))
     brand_asset_url = _safe_text(brand_asset_url) or _safe_text(env_map.get("LINKEDIN_BRAND_ASSET_URL"))
     google_drive_file_url = _safe_text(google_drive_file_url)
-    if (not google_drive_file_url) and ("drive.google.com" in brand_asset_url.lower()):
+    if (not google_drive_file_url) and _is_google_drive_file_url(brand_asset_url):
         google_drive_file_url = brand_asset_url
     redirect_uri = _safe_text(redirect_uri) or _safe_text(env_map.get("LINKEDIN_REDIRECT_URI")) or "http://127.0.0.1:8787/auth/linkedin/callback"
     google_asset = _google_asset_bundle(brand_asset_url)

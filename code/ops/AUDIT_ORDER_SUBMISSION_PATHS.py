@@ -14,10 +14,19 @@ from typing import Any
 
 SCAN_SUFFIXES = {".py", ".ps1", ".sh"}
 SKIP_PARTS = {".git", ".venv", "venv", "node_modules", "out", "dist", "build", "__pycache__"}
+PRODUCTION_ALPACA_ORIGIN_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9.-])https://api\.alpaca\.markets(?=[:/\"']|\s|$)"
+)
 
 
 def _git_blob_sha(data: bytes) -> str:
-    return hashlib.sha1(f"blob {len(data)}\0".encode("ascii") + data).hexdigest()
+    # Git's text filter stores LF bytes even when a Windows checkout presents
+    # CRLF. These policy pins describe repository blobs, not host checkout
+    # formatting, so normalize the scannable text before computing the blob ID.
+    normalized = data.replace(b"\r\n", b"\n")
+    return hashlib.sha1(
+        f"blob {len(normalized)}\0".encode("ascii") + normalized
+    ).hexdigest()
 
 
 def _matching_rule(path: str, rules: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -89,7 +98,7 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
             })
 
         if classification == "paper_sandbox":
-            if "https://api.alpaca.markets" in text:
+            if PRODUCTION_ALPACA_ORIGIN_PATTERN.search(text):
                 errors.append({"path": relative, "code": "paper_path_contains_production_alpaca_host"})
             if "https://paper-api.alpaca.markets" not in text:
                 errors.append({"path": relative, "code": "paper_path_missing_paper_host"})
@@ -130,6 +139,27 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
             missing = [value for value in required_values if value not in text]
             if missing:
                 errors.append({"path": rule_path, "code": "read_only_monitor_invariant_missing", "missing": missing})
+
+        if classification == "paper_only_orchestrator":
+            required_values = (
+                "PAPER_ONLY_POLICY",
+                "live_order_submission_disabled",
+                "LIVE_REQUEST_BLOCKED",
+            )
+            missing = [value for value in required_values if value not in text]
+            if missing:
+                errors.append({
+                    "path": rule_path,
+                    "code": "paper_only_orchestrator_invariant_missing",
+                    "missing": missing,
+                })
+            hits = sorted(name for name, pattern in patterns.items() if pattern.search(text))
+            if hits:
+                errors.append({
+                    "path": rule_path,
+                    "code": "paper_only_orchestrator_contains_order_path",
+                    "patterns": hits,
+                })
 
         if classification == "manual_emergency_facade":
             required_values = ("LIQUIDATE_ALL_TO_USD", "isatty", "--reason")

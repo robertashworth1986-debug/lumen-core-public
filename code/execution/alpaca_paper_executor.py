@@ -23,10 +23,18 @@ for _path in (_CODE_DIR, _HERE):
     if str(_path) not in sys.path:
         sys.path.insert(0, str(_path))
 
+_IMPORT_PATH_BEFORE_LEGACY = list(sys.path)
 try:
-    from . import alpaca_paper_executor_legacy as _legacy
-except ImportError:  # Direct script execution.
-    import alpaca_paper_executor_legacy as _legacy
+    try:
+        from . import alpaca_paper_executor_legacy as _legacy
+    except ImportError:  # Direct script execution.
+        import alpaca_paper_executor_legacy as _legacy
+finally:
+    # The historical implementation prepends its fixed production code root.
+    # Keep that compatibility inside the import only; never let it redirect
+    # later imports in tests or the guarded paper process.
+    sys.path[:] = _IMPORT_PATH_BEFORE_LEGACY
+del _IMPORT_PATH_BEFORE_LEGACY
 
 
 PAPER_TRADING_ORIGIN = "https://paper-api.alpaca.markets"
