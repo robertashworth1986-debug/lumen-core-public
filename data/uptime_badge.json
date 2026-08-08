@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "label": "status",
-  "message": "operational (6/6)",
-  "color": "brightgreen",
+  "message": "degraded · static=operational · gateway=outage",
+  "color": "yellow",
   "cacheSeconds": 3600
 }

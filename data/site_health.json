@@ -1,44 +1,101 @@
 {
-  "checked_utc": "2026-08-07T12:31:41Z",
-  "overall": "operational",
+  "checked_utc": "2026-08-08T07:51:18Z",
+  "overall": "degraded",
+  "static_surface_state": "operational",
+  "dynamic_gateway_state": "outage",
   "healthy_count": 6,
-  "total_count": 6,
+  "total_count": 8,
+  "static_healthy_count": 6,
+  "static_total_count": 6,
+  "dynamic_healthy_count": 0,
+  "dynamic_total_count": 2,
+  "dynamic_reachable_count": 0,
   "endpoints": {
     "portal": {
+      "surface": "static",
       "url": "https://lumen-core.ai/",
       "status": 200,
       "status_text": "200",
+      "http_ok": true,
+      "reachable": true,
+      "contract_ok": true,
       "ok": true
     },
     "evidence": {
+      "surface": "static",
       "url": "https://lumen-core.ai/evidence/",
       "status": 200,
       "status_text": "200",
+      "http_ok": true,
+      "reachable": true,
+      "contract_ok": true,
       "ok": true
     },
     "kraken_dashboard": {
+      "surface": "static",
       "url": "https://lumen-core.ai/kraken_execution_dashboard.html",
       "status": 200,
       "status_text": "200",
+      "http_ok": true,
+      "reachable": true,
+      "contract_ok": true,
       "ok": true
     },
     "mission_control": {
+      "surface": "static",
       "url": "https://lumen-core.ai/mission_control.html",
       "status": 200,
       "status_text": "200",
+      "http_ok": true,
+      "reachable": true,
+      "contract_ok": true,
       "ok": true
     },
     "approval_hub": {
+      "surface": "static",
       "url": "https://lumen-core.ai/agent_approval_hub.html",
       "status": 200,
       "status_text": "200",
+      "http_ok": true,
+      "reachable": true,
+      "contract_ok": true,
       "ok": true
     },
     "forecast": {
+      "surface": "static",
       "url": "https://lumen-core.ai/forecast.html",
       "status": 200,
       "status_text": "200",
+      "http_ok": true,
+      "reachable": true,
+      "contract_ok": true,
       "ok": true
+    },
+    "gateway_public_status": {
+      "surface": "dynamic",
+      "url": "https://lumen-core.ai/api/public/status",
+      "status": 502,
+      "status_text": "502",
+      "content_type": "text/html",
+      "contract": "public_status",
+      "http_ok": false,
+      "reachable": false,
+      "json_ok": false,
+      "contract_ok": false,
+      "ok": false
+    },
+    "gateway_health": {
+      "surface": "dynamic",
+      "url": "https://lumen-core.ai/health",
+      "status": 502,
+      "status_text": "502",
+      "content_type": "text/html",
+      "contract": "gateway_health",
+      "http_ok": false,
+      "reachable": false,
+      "json_ok": false,
+      "contract_ok": false,
+      "ok": false
     }
   }
 }
