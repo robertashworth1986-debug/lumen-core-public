@@ -1,4 +1,4 @@
-import os, json, html
+import json, html
 from pathlib import Path
 import pandas as pd
 
@@ -38,8 +38,6 @@ runtime = read_json(runtime_path, {
 })
 
 source = read_json(source_path, {})
-kraken_key_present = bool(os.environ.get("KRAKEN_API_KEY","").strip())
-kraken_secret_present = bool(os.environ.get("KRAKEN_API_SECRET","").strip())
 
 try:
     cred = pd.read_csv(cred_path) if cred_path.exists() else pd.DataFrame()
@@ -97,8 +95,9 @@ exec_status = {
     "execution_mode": runtime.get("mode","SHADOW"),
     "kill_switch": runtime.get("kill_switch","ON"),
     "live_arm": runtime.get("live_arm","OFF"),
-    "kraken_api_key_present": kraken_key_present,
-    "kraken_api_secret_present": kraken_secret_present,
+    "credential_material_inspected": False,
+    "credential_state_published": False,
+    "network_submission_authorized": False,
     "shadow_intents_count": 0 if intents.empty else int(len(intents)),
     "execution_tickets_count": 0 if tickets.empty else int(len(tickets)),
     "note": "Shadow + ticketing only. No autonomous live order submission."
@@ -194,8 +193,8 @@ th {{ color:#bcd0f4; font-size:12px; text-transform:uppercase; }}
 <div class="wrap">
 
 <div class="hero">
-  <h1>⚡ LumenCore — Kraken Execution Layer</h1>
-  <p>Institutional shadow execution, intent generation, human approval queue, and kill-switch visibility.</p>
+  <h1>⚡ LumenCore — Kraken Paper Evaluation Layer</h1>
+  <p>Paper-only intent generation, human-review queue, and fail-closed control visibility. No credential inspection or order submission occurs here.</p>
 </div>
 
 <div class="grid4">
@@ -223,14 +222,14 @@ th {{ color:#bcd0f4; font-size:12px; text-transform:uppercase; }}
 
 <div class="grid4">
   <div class="card">
-    <div class="kicker">Kraken API Key</div>
-    <div class="big">{'YES' if kraken_key_present else 'NO'}</div>
-    <div class="sub">Environment presence only</div>
+    <div class="kicker">Credential Boundary</div>
+    <div class="big">PRIVATE</div>
+    <div class="sub">Credential state is neither inspected nor published</div>
   </div>
   <div class="card">
-    <div class="kicker">Kraken Secret</div>
-    <div class="big">{'YES' if kraken_secret_present else 'NO'}</div>
-    <div class="sub">Environment presence only</div>
+    <div class="kicker">Submission Authority</div>
+    <div class="big">DISABLED</div>
+    <div class="sub">This dashboard cannot submit or cancel orders</div>
   </div>
   <div class="card">
     <div class="kicker">Execution Tickets</div>

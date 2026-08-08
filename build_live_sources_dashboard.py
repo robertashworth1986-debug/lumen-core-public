@@ -1,4 +1,4 @@
-import os, json, html
+import json, html
 from pathlib import Path
 import pandas as pd
 
@@ -43,6 +43,45 @@ eia = sources.get("eia", {})
 def yesno(v):
     return "YES" if v else "NO"
 
+
+def public_probe_state(source):
+    """Return a bounded public status without credential or error disclosure."""
+    if not isinstance(source, dict):
+        return "NOT_REPORTED"
+    try:
+        rows = int(source.get("rows_written", source.get("rows", 0)) or 0)
+    except (TypeError, ValueError):
+        rows = 0
+    if rows > 0:
+        return "MEASURED_ROWS_PRESENT"
+    if source.get("error"):
+        return "SOURCE_UNAVAILABLE"
+    if bool(source.get("enabled")):
+        return "AWAITING_MEASUREMENT"
+    return "DISABLED"
+
+
+def public_proof_rows(payload):
+    """Allow only bounded integrity metadata onto the public dashboard."""
+    if not isinstance(payload, dict):
+        return []
+    allowed = (
+        "generated_utc",
+        "status",
+        "valid",
+        "verified",
+        "file_count",
+        "files_hashed",
+        "manifest_sha256",
+        "sha256",
+    )
+    rows = []
+    for key in allowed:
+        value = payload.get(key)
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            rows.append((key, value))
+    return rows
+
 top_html = ""
 if not lb.empty:
     cols = [c for c in ["file","flow","algo","strategy","metric_profile","test_sharpe_clean","test_vs_baseline_clean","test_max_dd_clean","investor_score_clean"] if c in lb.columns]
@@ -58,7 +97,7 @@ else:
     top_html = "<tr><td colspan='9'>No credible leaderboard found yet.</td></tr>"
 
 proof_html = ""
-for k, v in proof.items():
+for k, v in public_proof_rows(proof):
     proof_html += f"<tr><td>{esc(k)}</td><td class='mono'>{esc(v)}</td></tr>"
 
 eia_files = eia.get("files_written", []) or []
@@ -156,9 +195,9 @@ th {{ color:#bcd0f4; font-size:12px; text-transform:uppercase; }}
     <div class="sub">Config gate</div>
   </div>
   <div class="card">
-    <div class="kicker">EIA API Key Present</div>
-    <div class="big">{yesno(eia.get("api_key_present", False))}</div>
-    <div class="sub">Environment gate</div>
+    <div class="kicker">Credential Boundary</div>
+    <div class="big">PRIVATE</div>
+    <div class="sub">Credential presence is neither inspected nor published</div>
   </div>
   <div class="card">
     <div class="kicker">EIA Rows Written</div>
@@ -178,9 +217,8 @@ th {{ color:#bcd0f4; font-size:12px; text-transform:uppercase; }}
     <table>
       <tbody>
         <tr><td>EIA enabled</td><td class="mono">{esc(eia.get("enabled", False))}</td></tr>
-        <tr><td>EIA key present</td><td class="mono">{esc(eia.get("api_key_present", False))}</td></tr>
         <tr><td>EIA rows written</td><td class="mono">{esc(eia.get("rows_written", 0))}</td></tr>
-        <tr><td>EIA error</td><td class="mono">{esc(eia.get("error", ""))}</td></tr>
+        <tr><td>EIA public probe state</td><td class="mono">{public_probe_state(eia)}</td></tr>
       </tbody>
     </table>
     <div class="title" style="margin-top:16px;">EIA files written</div>
@@ -190,10 +228,10 @@ th {{ color:#bcd0f4; font-size:12px; text-transform:uppercase; }}
   <div class="card">
     <div class="title">Other source gates</div>
     <table>
-      <thead><tr><th>Source</th><th>Enabled</th><th>Key Present</th><th>Status</th></tr></thead>
+      <thead><tr><th>Source</th><th>Enabled</th><th>Rows</th><th>Public Probe State</th></tr></thead>
       <tbody>
         {''.join(
-          f"<tr><td>{esc(name)}</td><td>{esc(src.get('enabled', False))}</td><td>{esc(src.get('api_key_present', False))}</td><td class='mono'>{esc(src.get('error', ''))}</td></tr>"
+          f"<tr><td>{esc(name)}</td><td>{esc(src.get('enabled', False))}</td><td>{esc(src.get('rows_written', src.get('rows', 0)))}</td><td class='mono'>{public_probe_state(src)}</td></tr>"
           for name, src in sources.items() if name != 'eia'
         )}
       </tbody>
@@ -229,7 +267,7 @@ th {{ color:#bcd0f4; font-size:12px; text-transform:uppercase; }}
 </div>
 
 <div class="footer">
-  Source files: {esc(str(status_path))} | {esc(str(summary_path))} | {esc(str(registry_path))}
+  Public projection sources: {esc(status_path.name)} | {esc(summary_path.name)} | {esc(registry_path.name)}. Credential details and raw provider errors are intentionally omitted.
 </div>
 
 </div>

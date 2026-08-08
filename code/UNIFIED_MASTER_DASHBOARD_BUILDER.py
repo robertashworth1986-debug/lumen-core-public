@@ -88,6 +88,16 @@ def html_escape(value: Any) -> str:
     return html.escape(str(value), quote=True)
 
 
+def json_for_script(value: Any) -> str:
+    """Serialize data for an inline script without permitting tag termination."""
+    return (
+        json.dumps(value, ensure_ascii=True)
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("&", "\\u0026")
+    )
+
+
 def normalize_speech_text(text: str) -> str:
     lines: List[str] = []
     for raw in text.splitlines():
@@ -130,12 +140,18 @@ def source_is_measured(row: Dict[str, Any]) -> bool:
 def source_is_active(row: Dict[str, Any]) -> bool:
   status = str(row.get("status", "")).upper()
   basis = str(row.get("basis", row.get("value_basis", ""))).upper()
-  rows = int(row.get("rows", 0) or 0)
+  try:
+    rows = int(row.get("rows", 0) or 0)
+  except (TypeError, ValueError):
+    rows = 0
+  if rows <= 0:
+    return False
   if source_is_measured(row):
     return True
-  return bool(row.get("enabled")) and rows > 0 and (
-    status in {"LIVE_KEY_PRESENT", "LIVE", "OK"} or basis == "ESTIMATED"
-  )
+  return bool(row.get("enabled")) and status in {"OBSERVED", "OK"} and basis in {
+    "OBSERVED",
+    "EXTERNAL_OBSERVATION",
+  }
 
 
 def build_validation_rows(validations: List[Dict[str, Any]]) -> str:
@@ -147,9 +163,10 @@ def build_validation_rows(validations: List[Dict[str, Any]]) -> str:
     savings = safe_float(v.get("avg_savings_pct", 0.0)) * 100.0
     baseline = safe_float(v.get("baseline_annual_loss", 0.0))
     recoverable = baseline * (savings / 100.0)
+    safe_sector = html_escape(sector)
     rows.append(
-      f'<tr class="clickable-sector" data-sector="{sector}" data-sharpe="{sharpe:.2f}" data-savings="{savings:.1f}" data-recoverable="{fmt_usd(recoverable)}">'
-      f"<td>{sector.replace('_', ' ').title()}</td>"
+      f'<tr class="clickable-sector" data-sector="{safe_sector}" data-sharpe="{sharpe:.2f}" data-savings="{savings:.1f}" data-recoverable="{fmt_usd(recoverable)}">'
+      f"<td>{html_escape(sector.replace('_', ' ').title())}</td>"
       f"<td>{sharpe:.2f}</td>"
       f"<td>{sortino:.2f}</td>"
       f"<td>{savings:.1f}%</td>"
@@ -166,23 +183,23 @@ def build_truth_rows(rows: List[Dict[str, Any]], mode: str) -> str:
     if mode == "failures":
       html_rows.append(
         "<tr>"
-        f"<td>{row.get('source', 'n/a')}</td>"
-        f"<td>{row.get('sector', 'n/a')}</td>"
-        f"<td>{row.get('failure_reason', row.get('status', 'UNKNOWN'))}</td>"
+        f"<td>{html_escape(row.get('source', 'n/a'))}</td>"
+        f"<td>{html_escape(row.get('sector', 'n/a'))}</td>"
+        f"<td>{html_escape(row.get('failure_reason', row.get('status', 'UNKNOWN')))}</td>"
         f"<td>{fmt_usd(annualized_source_value(row))}</td>"
         f"<td>{fmt_usd(safe_float(row.get('exposure_20y_usd', annualized_source_value(row) * 20.0)))}</td>"
-        f"<td>{row.get('last_probe_utc', '')}</td>"
+        f"<td>{html_escape(row.get('last_probe_utc', ''))}</td>"
         "</tr>"
       )
     else:
       html_rows.append(
         "<tr>"
-        f"<td>{row.get('source', 'n/a')}</td>"
-        f"<td>{row.get('sector', 'n/a')}</td>"
+        f"<td>{html_escape(row.get('source', 'n/a'))}</td>"
+        f"<td>{html_escape(row.get('sector', 'n/a'))}</td>"
         f"<td>{int(row.get('rows', 0) or 0)}</td>"
         f"<td>{fmt_usd(safe_float(row.get('estimated_hour_value', 0.0)))}</td>"
         f"<td>{fmt_usd(annualized_source_value(row))}</td>"
-        f"<td>{row.get('last_probe_utc', '')}</td>"
+        f"<td>{html_escape(row.get('last_probe_utc', ''))}</td>"
         "</tr>"
       )
   return "\n".join(html_rows)
@@ -228,14 +245,7 @@ def collect_data() -> Dict[str, Any]:
     }
 
     fill_rows = [r for r in ledger_rows if str(r.get("event_type", "")).lower().endswith("paper_fill")]
-    proof_ids = []
-    seen_ids = set()
-    for row in fill_rows[-20:]:
-      tid = str(row.get("ledger_hash") or row.get("trade_id") or row.get("txid") or "").strip()
-      if tid and tid not in seen_ids:
-        proof_ids.append(tid)
-        seen_ids.add(tid)
-    proof_ids = proof_ids[-5:]
+    proof_event_count = len(fill_rows)
 
     paper_equity = safe_float(scorecard.get("current_equity_usd", rolling.get("current_equity", 0.0)))
     paper_profit = safe_float(scorecard.get("net_pnl_usd", rolling.get("paper_profit", 0.0)))
@@ -390,8 +400,8 @@ def collect_data() -> Dict[str, Any]:
         "paper_mdd": paper_mdd,
         "paper_cagr": paper_cagr,
         "paper_pf": paper_pf,
-        "proof_txid_count": len(proof_ids),
-        "proof_txid_tail": " | ".join(proof_ids) if proof_ids else "n/a",
+        "proof_event_count": proof_event_count,
+        "proof_identifier_policy": "Raw transaction, order, and ledger identifiers withheld from public output",
         "validations": validations,
         "top_failed_sources": failed_sources[:8],
         "top_live_sources": active_sources[:8],
@@ -441,7 +451,7 @@ def collect_data() -> Dict[str, Any]:
             "chips": [
               f"Equity: {fmt_usd(paper_equity)}",
               f"{paper_pnl_label}: {fmt_usd(paper_profit)}",
-              f"Proof IDs: {len(proof_ids)}",
+              f"Paper event records: {proof_event_count}",
             ],
           },
         },
@@ -875,13 +885,13 @@ TEMPLATE = """<!DOCTYPE html>
         <div class="hero-stage">
           <div class="eyebrow">Luma Command Surface</div>
           <h1 class="hero-title">LumenCore Platform Intelligence</h1>
-          <p class="hero-subtitle">A live command center for measured lanes, economic exposure, strategy proof, and operator-grade narration. This is the investor-safe board plus an on-demand explainer layer.</p>
+          <p class="hero-subtitle">A reviewer-safe evidence board for measured lanes, modeled economic exposure, paper strategy results, and bounded operator narration.</p>
           <div class="hero-pills">
             <span class="pill">20-year analysis window</span>
             <span class="pill">Multi-sector outage attribution</span>
             <span class="pill">Monte Carlo revalidation</span>
             <span class="pill">Chain-of-custody ready</span>
-            <span class="pill">Live-measured source truth</span>
+            <span class="pill">Measured-source truth</span>
           </div>
           <div class="hero-actions">
             <button class="primary-btn" id="playPitch">Read Master Pitch</button>
@@ -896,7 +906,7 @@ TEMPLATE = """<!DOCTYPE html>
           </div>
           <div class="signal-strip">
             <div class="signal-card">
-              <div class="signal-label">Active source lanes</div>
+              <div class="signal-label">Measured source lanes</div>
               <div class="signal-value" data-kpi-key="live_measured_sources">__SOURCES_OK__</div>
             </div>
             <div class="signal-card">
@@ -904,7 +914,7 @@ TEMPLATE = """<!DOCTYPE html>
               <div class="signal-value" data-kpi-key="infra_upside">__INFRA_UPSIDE__</div>
             </div>
             <div class="signal-card">
-              <div class="signal-label">Pitch-ready lead sector</div>
+              <div class="signal-label">Internal scenario lead sector</div>
               <div class="signal-value">__TOP_LIVE_SECTOR__</div>
             </div>
           </div>
@@ -933,17 +943,17 @@ TEMPLATE = """<!DOCTYPE html>
       </div>
       <div class="grid">
         <div class="kpi"><div class="label">Records Ingested</div><div class="value">__RECORDS__</div><div class="sub">Measured events in outage corpus</div></div>
-        <div class="kpi"><div class="label">Active Sources</div><div class="value" data-kpi-key="live_measured_sources">__SOURCES_OK__</div><div class="sub">Live keys with current rows</div></div>
+        <div class="kpi"><div class="label">Measured Sources</div><div class="value" data-kpi-key="live_measured_sources">__SOURCES_OK__</div><div class="sub">Rows plus measured or observed basis; credentials never qualify</div></div>
         <div class="kpi"><div class="label">Failed / Missing Sources</div><div class="value" data-kpi-key="failing_enabled_sources">__FAILING_SOURCES__</div><div class="sub">Enabled lanes without active rows</div></div>
         <div class="kpi"><div class="label">Sectors Analyzed</div><div class="value">__SECTORS__</div><div class="sub">Cross-domain resilience map</div></div>
-        <div class="kpi"><div class="label">20Y Historical Loss</div><div class="value">__HIST_LOSS__</div><div class="sub">Attributed outage impact</div></div>
-        <div class="kpi"><div class="label">Annual Recoverable</div><div class="value">__RECOVERABLE__</div><div class="sub">Read-only measurement-first savings</div></div>
+        <div class="kpi"><div class="label">Modeled 20Y Historical Loss</div><div class="value">__HIST_LOSS__</div><div class="sub">Scenario attribution; not a realized customer loss</div></div>
+        <div class="kpi"><div class="label">Modeled Annual Recoverable</div><div class="value">__RECOVERABLE__</div><div class="sub">Scenario output; independent validation not yet claimed</div></div>
         <div class="kpi"><div class="label">Infra Annual Exposure</div><div class="value" data-kpi-key="infra_annual_exposure">__INFRA_ANNUAL__</div><div class="sub">Enabled-source opportunity surface</div></div>
         <div class="kpi"><div class="label">Infra 20Y Exposure</div><div class="value" data-kpi-key="infra_20y">__INFRA_20Y__</div><div class="sub">Long-window unresolved cost</div></div>
         <div class="kpi"><div class="label">Modeled Annual Upside</div><div class="value" data-kpi-key="infra_upside">__INFRA_UPSIDE__</div><div class="sub">Transparent capture-rate model</div></div>
         <div class="kpi"><div class="label">Avg Sharpe</div><div class="value" data-kpi-key="avg_sharpe">__AVG_SHARPE__</div><div class="sub">Monte Carlo validation output</div></div>
         <div class="kpi"><div class="label">Avg Savings</div><div class="value" data-kpi-key="avg_savings_pct">__AVG_SAVINGS__</div><div class="sub">Expected relative reduction</div></div>
-        <div class="kpi"><div class="label">Top Live Sector</div><div class="value">__TOP_LIVE_SECTOR__</div><div class="sub">Current hourly value: __TOP_LIVE_SECTOR_HOUR__</div></div>
+        <div class="kpi"><div class="label">Top Observed Sector</div><div class="value">__TOP_LIVE_SECTOR__</div><div class="sub">Modeled hourly value: __TOP_LIVE_SECTOR_HOUR__</div></div>
         <div class="kpi"><div class="label">Enabled Sources</div><div class="value">__ENABLED_SOURCES__</div><div class="sub">Registry rows under watch</div></div>
         <div class="kpi"><div class="label">Compute Runtime</div><div class="value">__RUNTIME__</div><div class="sub">Latest validation run duration</div></div>
       </div>
@@ -951,7 +961,7 @@ TEMPLATE = """<!DOCTYPE html>
 
     <section class="section" id="drilldown">
       <div class="section-head">
-        <h2 style="margin:0;font-family:Syne,sans-serif;">Live Drilldown Card</h2>
+        <h2 style="margin:0;font-family:Syne,sans-serif;">Evidence Drilldown Card</h2>
         <div class="section-tools">
           <button class="section-action" id="resetDrilldown">Reset Drilldown</button>
           <button class="section-action" data-explain-target="opportunity">Narrate Drilldown</button>
@@ -965,7 +975,7 @@ TEMPLATE = """<!DOCTYPE html>
         </div>
         <div class="drilldown-metrics">
           <div class="metric-stack">
-            <div class="metric-line"><span class="metric-name">Active sources</span><span class="metric-value" data-kpi-key="live_measured_sources">__SOURCES_OK__</span></div>
+            <div class="metric-line"><span class="metric-name">Measured sources</span><span class="metric-value" data-kpi-key="live_measured_sources">__SOURCES_OK__</span></div>
             <div class="metric-line"><span class="metric-name">Failed / missing sources</span><span class="metric-value" data-kpi-key="failing_enabled_sources">__FAILING_SOURCES__</span></div>
             <div class="metric-line"><span class="metric-name">Annual modeled upside</span><span class="metric-value" data-kpi-key="infra_upside">__INFRA_UPSIDE__</span></div>
             <div class="metric-line"><span class="metric-name">Avg Sharpe</span><span class="metric-value" data-kpi-key="avg_sharpe">__AVG_SHARPE__</span></div>
@@ -1069,7 +1079,7 @@ TEMPLATE = """<!DOCTYPE html>
           </div>
         </div>
         <div>
-          <h2 style="margin-top:0;font-family:Syne,sans-serif;">Active Production Sources</h2>
+          <h2 style="margin-top:0;font-family:Syne,sans-serif;">Measured Source Rows</h2>
           <div class="table-wrap">
             <table>
               <thead>
@@ -1101,13 +1111,13 @@ TEMPLATE = """<!DOCTYPE html>
       <div class="grid">
         <div class="kpi"><div class="label">Paper Equity</div><div class="value" data-kpi-key="paper_equity">__PAPER_EQUITY__</div><div class="sub">Measured runtime state</div></div>
         <div class="kpi"><div class="label">__PAPER_PNL_LABEL__</div><div class="value" data-kpi-key="paper_profit">__PAPER_PROFIT__</div><div class="sub">__PAPER_PNL_SUB__</div></div>
-        <div class="kpi"><div class="label">Rolling Sharpe</div><div class="value" data-kpi-key="paper_sharpe">__PAPER_SHARPE__</div><div class="sub">Live score stream</div></div>
+        <div class="kpi"><div class="label">Rolling Sharpe</div><div class="value" data-kpi-key="paper_sharpe">__PAPER_SHARPE__</div><div class="sub">Paper or replay score stream</div></div>
         <div class="kpi"><div class="label">Rolling Sortino</div><div class="value">__PAPER_SORTINO__</div><div class="sub">Downside-adjusted score</div></div>
         <div class="kpi"><div class="label">Max Drawdown</div><div class="value">__PAPER_MDD__</div><div class="sub">Peak-to-trough loss</div></div>
         <div class="kpi"><div class="label">CAGR</div><div class="value">__PAPER_CAGR__</div><div class="sub">Annualized growth proxy</div></div>
         <div class="kpi"><div class="label">Profit Factor</div><div class="value">__PAPER_PF__</div><div class="sub">Gross wins / gross losses</div></div>
         <div class="kpi"><div class="label">__PAPER_TRADES_LABEL__</div><div class="value">__PAPER_TRADES__ / __PAPER_WR__</div><div class="sub">__PAPER_TRADES_SUB__</div></div>
-        <div class="kpi"><div class="label">Proof IDs (Tail)</div><div class="value">__PROOF_TXID_COUNT__</div><div class="sub">__PROOF_TXID_TAIL__</div></div>
+        <div class="kpi"><div class="label">Paper Event Records</div><div class="value">__PROOF_EVENT_COUNT__</div><div class="sub">__PROOF_IDENTIFIER_POLICY__</div></div>
       </div>
       <div class="foot" style="margin-top:12px;">
         <span>Generated: <span class="mono">__GENERATED__</span></span>
@@ -1338,9 +1348,14 @@ TEMPLATE = """<!DOCTYPE html>
     function renderDrilldown(key) {
       const block = drilldown[key] || drilldown.opportunity;
       if (!block) return;
-      drilldownTitleEl.textContent = block.title || 'Live Drilldown';
+      drilldownTitleEl.textContent = block.title || 'Evidence Drilldown';
       drilldownCopyEl.textContent = block.text || '';
-      drilldownChipsEl.innerHTML = (block.chips || []).map((chip) => `<span class="drilldown-chip">${chip}</span>`).join('');
+      drilldownChipsEl.replaceChildren(...(block.chips || []).map((chip) => {
+        const element = document.createElement('span');
+        element.className = 'drilldown-chip';
+        element.textContent = String(chip);
+        return element;
+      }));
     }
 
     function formatAnimatedValue(value, kind) {
@@ -1524,7 +1539,7 @@ TEMPLATE = """<!DOCTYPE html>
     function updateClock() {
       if (!clockEl) return;
       const now = new Date();
-      clockEl.textContent = 'Live · ' + now.toLocaleTimeString('en-US', { hour12: false });
+      clockEl.textContent = 'Viewed · ' + now.toLocaleTimeString('en-US', { hour12: false });
     }
     updateClock();
     setInterval(updateClock, 1000);
@@ -1690,16 +1705,16 @@ def render_html(data: Dict[str, Any]) -> str:
         "__PAPER_TRADES__": str(data["paper_trades"]),
         "__PAPER_WR__": f"{data['paper_win_rate']:.1f}%",
         "__PAPER_TRADES_SUB__": html_escape(data["paper_trades_sub"]),
-        "__PROOF_TXID_COUNT__": str(data["proof_txid_count"]),
-        "__PROOF_TXID_TAIL__": html_escape(data["proof_txid_tail"]),
+        "__PROOF_EVENT_COUNT__": str(data["proof_event_count"]),
+        "__PROOF_IDENTIFIER_POLICY__": html_escape(data["proof_identifier_policy"]),
         "__GENERATED__": now_utc(),
         "__TABLE_ROWS__": build_validation_rows(data["validations"]),
         "__FAILURE_ROWS__": build_truth_rows(data["top_failed_sources"], "failures"),
         "__LIVE_ROWS__": build_truth_rows(data["top_live_sources"], "live"),
-        "__CHART_JSON__": json.dumps(data["chart"]),
-        "__EXPLAINER_JSON__": json.dumps(data["explainer"]),
-        "__KPI_ANIM_JSON__": json.dumps(data["kpi_anim"]),
-        "__DRILLDOWN_JSON__": json.dumps(data["drilldown"]),
+        "__CHART_JSON__": json_for_script(data["chart"]),
+        "__EXPLAINER_JSON__": json_for_script(data["explainer"]),
+        "__KPI_ANIM_JSON__": json_for_script(data["kpi_anim"]),
+        "__DRILLDOWN_JSON__": json_for_script(data["drilldown"]),
         "__PITCH_PREVIEW__": html_escape(data["explainer"].get("pitch_preview", "")),
         "__DRILLDOWN_TITLE__": html_escape(data["drilldown"]["opportunity"]["title"]),
         "__DRILLDOWN_TEXT__": html_escape(data["drilldown"]["opportunity"]["text"]),

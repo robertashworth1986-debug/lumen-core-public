@@ -120,3 +120,123 @@ def test_paper_facade_does_not_leak_legacy_production_import_path() -> None:
         check=False,
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_public_dashboard_activity_requires_rows_and_measured_evidence(monkeypatch) -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        stack = Path(tmp)
+        monkeypatch.setenv("LUMA_STACK_ROOT", str(stack))
+        monkeypatch.setenv("LUMA_DASHBOARD_DIR", str(stack / "dashboard"))
+        monkeypatch.setenv("LUMA_TWIN_SEED_PATH", str(stack / "missing_twin_seed.json"))
+        module = load_path(
+            "unified_dashboard_boundary_test",
+            ROOT / "code" / "UNIFIED_MASTER_DASHBOARD_BUILDER.py",
+        )
+
+    assert module.source_is_active(
+        {
+            "enabled": True,
+            "rows": 10,
+            "status": "LIVE_KEY_PRESENT",
+            "basis": "ESTIMATED",
+        }
+    ) is False
+    assert module.source_is_active(
+        {"enabled": True, "rows": 10, "status": "OK", "basis": "OBSERVED"}
+    ) is True
+    assert module.source_is_active(
+        {"enabled": True, "rows": 0, "status": "LIVE_MEASURED", "basis": "MEASURED"}
+    ) is False
+
+
+def test_public_dashboard_withholds_private_execution_identifiers(monkeypatch) -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        stack = Path(tmp)
+        execution = stack / "out" / "execution"
+        execution.mkdir(parents=True)
+        raw_identifier = "PRIVATE-TXID-DO-NOT-PUBLISH"
+        (execution / "binanceus_paper_ledger.jsonl").write_text(
+            json.dumps(
+                {
+                    "event_type": "binanceus_paper_fill",
+                    "txid": raw_identifier,
+                    "trade_id": "PRIVATE-TRADE-ID",
+                    "ledger_hash": "PRIVATE-LEDGER-HASH",
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setenv("LUMA_STACK_ROOT", str(stack))
+        monkeypatch.setenv("LUMA_DASHBOARD_DIR", str(stack / "dashboard"))
+        monkeypatch.setenv("LUMA_TWIN_SEED_PATH", str(stack / "missing_twin_seed.json"))
+        module = load_path(
+            "unified_dashboard_identifier_test",
+            ROOT / "code" / "UNIFIED_MASTER_DASHBOARD_BUILDER.py",
+        )
+        data = module.collect_data()
+        rendered = module.render_html(data)
+
+    assert data["proof_event_count"] == 1
+    assert raw_identifier not in rendered
+    assert "PRIVATE-TRADE-ID" not in rendered
+    assert "PRIVATE-LEDGER-HASH" not in rendered
+    assert "identifiers withheld from public output" in rendered
+
+
+def test_public_dashboard_serialization_and_links_fail_closed(monkeypatch) -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        stack = Path(tmp)
+        monkeypatch.setenv("LUMA_STACK_ROOT", str(stack))
+        monkeypatch.setenv("LUMA_DASHBOARD_DIR", str(stack / "dashboard"))
+        monkeypatch.setenv("LUMA_TWIN_SEED_PATH", str(stack / "missing_twin_seed.json"))
+        unified = load_path(
+            "unified_dashboard_serialization_test",
+            ROOT / "code" / "UNIFIED_MASTER_DASHBOARD_BUILDER.py",
+        )
+        combined = load_path(
+            "combined_dashboard_link_test",
+            ROOT / "code" / "execution" / "build_combined_dashboard.py",
+        )
+
+    serialized = unified.json_for_script({"value": "</script><script>alert(1)</script>"})
+    assert "</script>" not in serialized
+    assert "\\u003c" in serialized
+    assert combined.safe_dashboard_href("reviewer_evidence.html") == "reviewer_evidence.html"
+    assert combined.safe_dashboard_href("javascript:alert.html") == "#"
+    assert combined.safe_dashboard_href("https://evil.example/report.html") == "#"
+    fallback_html = combined.build_dashboard(
+        {
+            "trade_log": [{"txid": "PRIVATE-FALLBACK-TXID"}],
+            "dashboard_links": ["javascript:alert.html"],
+            "watchdog": ["RAW WATCHDOG DETAIL"],
+            "level2_summary": ["RAW LEVEL 2 DETAIL"],
+        }
+    )
+    assert "PRIVATE-FALLBACK-TXID" not in fallback_html
+    assert "RAW WATCHDOG DETAIL" not in fallback_html
+    assert "RAW LEVEL 2 DETAIL" not in fallback_html
+    assert "href='#'" in fallback_html
+
+
+def test_public_dashboard_builders_do_not_publish_credential_state_or_raw_ids() -> None:
+    kraken_source = (ROOT / "build_kraken_execution_dashboard.py").read_text(
+        encoding="utf-8"
+    )
+    live_source = (ROOT / "build_live_sources_dashboard.py").read_text(
+        encoding="utf-8"
+    )
+    combined_source = (
+        ROOT / "code" / "execution" / "build_combined_dashboard.py"
+    ).read_text(encoding="utf-8")
+    unified_source = (ROOT / "code" / "UNIFIED_MASTER_DASHBOARD_BUILDER.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'os.environ.get("KRAKEN_API_KEY"' not in kraken_source
+    assert "api_key_present" not in live_source
+    assert '"api_keys":' not in combined_source
+    assert "load_trade_txids" not in combined_source
+    assert "proof_txid_tail" not in unified_source
+    assert 'row.get("ledger_hash") or row.get("trade_id")' not in unified_source
+    assert "drilldownChipsEl.innerHTML" not in unified_source
