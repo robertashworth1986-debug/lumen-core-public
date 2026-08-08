@@ -37,6 +37,8 @@ deliverable.
 
 **[Open the Public Site Supply-Chain Assurance guide](docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)**
 
+**[Open the retained Signed-Attestation Receipt](docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)**
+
 The index is the canonical evidence map. The reviewer page gives the shortest human path. The index identifies:
 
 - what is merged into the default branch;
@@ -70,7 +72,10 @@ The public-release supply-chain lane creates deterministic CycloneDX 1.6
 coverage for all 30 allowlisted site files. Pull requests produce unsigned
 verification artifacts; successful `main` builds separately create and verify
 GitHub OIDC/Sigstore provenance and SBOM attestations for the exact archive.
-This is not a whole-product or VPS SBOM, a SLSA level, or deployment proof.
+The first retained successful set is bound to commit
+`5fff567c11bee65b5b1de5415d8b8935cd2dfab0` and can be reconstructed and
+checked with the repository verifier. This is not a whole-product or VPS SBOM,
+a SLSA level, or deployment proof; the live domain remains on `HOLD`.
 
 ## Five-minute technical path
 
@@ -213,6 +218,7 @@ review. Action-time HumanUnlock remains outside machine verification.
 - Statement-of-work template: [docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md](docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md)
 - Secondary funding-workflow data boundary: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md)
 - Exact public-release SBOM and signed-attestation boundary: [docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md](docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)
+- Retained exact-release attestation receipt: [docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md](docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)
 
 ## Intellectual-property boundary
 

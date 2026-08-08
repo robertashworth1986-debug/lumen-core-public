@@ -46,6 +46,14 @@ The signed bundles are verified in the workflow against the repository,
 signer workflow, `refs/heads/main`, source digest, GitHub OIDC issuer, and a
 GitHub-hosted runner requirement before they are retained as artifacts.
 
+The first retained successful set is documented in
+[`PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md`](PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md).
+It binds the exact archive to source commit
+`5fff567c11bee65b5b1de5415d8b8935cd2dfab0`, workflow run `31259179162`, the
+two predicate types, constrained verification results, and founder-controlled
+private bundle custody. The public receipt is a first-party custody record; it
+is not itself a signature or external validation.
+
 ## Consumer verification
 
 After downloading `public-site-release.tar`, verify signed build provenance:
@@ -69,6 +77,16 @@ Verify the signed CycloneDX predicate by adding:
 The repository, workflow path, commit, and expected predicate type are policy
 inputs, not facts to infer from the artifact itself.
 
+For the retained set, also run the repository-local receipt verifier:
+
+```bash
+python code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py
+```
+
+It reconstructs the exact deterministic archive from immutable Git blobs and
+checks the public receipt's identities and `HOLD`. It does not replace the
+constrained online `gh attestation verify` signature check.
+
 ## Production boundary
 
 The live site remains `HOLD` until the separately gated exact-snapshot workflow
@@ -83,6 +101,6 @@ the archive; it does not prove that the archive was deployed.
 - inventory and govern the VPS OS, gateway, runtime services, and external
   dependencies in their own deployment scope;
 - add vulnerability triage and time-bounded exception handling;
-- retain and periodically re-verify attestation bundles and trusted roots; and
+- periodically re-verify retained attestation bundles and trusted roots; and
 - obtain buyer-specific security, legal, data, insurance, and acceptance
   review.

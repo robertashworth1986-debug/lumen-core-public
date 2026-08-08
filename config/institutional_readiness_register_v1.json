@@ -68,12 +68,16 @@
         "requirements-reviewer-ubuntu-py311.lock",
         "code/deploy/build_public_site_supply_chain.py",
         "code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py",
+        "code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py",
         "docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md",
-        ".github/workflows/public-site-supply-chain.yml"
+        "docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md",
+        ".github/workflows/public-site-supply-chain.yml",
+        ".github/workflows/public-site-signed-attestation-receipt.yml",
+        "evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json"
       ],
-      "proves": "The named reviewer suite has hash-locked dependencies and a scoped inventory; the exact 30-file public release has deterministic CycloneDX 1.6 file coverage, pinned workflow actions, and a main-only GitHub OIDC/Sigstore attestation lane.",
-      "does_not_prove": "A complete product SBOM, VPS operating-system or gateway inventory, continuous vulnerability management, a successful signed release attestation until the main workflow completes, a SLSA level, or production dependency approval.",
-      "next_gate": "Retain a successful signed main-branch provenance and SBOM verification bundle, inventory the deployment runtime, and establish vulnerability triage and exception handling."
+      "proves": "The named reviewer suite has hash-locked dependencies and a scoped inventory; the exact 30-file public release has deterministic CycloneDX 1.6 file coverage, pinned workflow actions, and one retained successfully verified GitHub OIDC/Sigstore provenance and SBOM attestation set for commit 5fff567c11bee65b5b1de5415d8b8935cd2dfab0.",
+      "does_not_prove": "A complete product SBOM, VPS operating-system or gateway inventory, continuous vulnerability management, vulnerability status, a SLSA level, production dependency approval, or live deployment parity.",
+      "next_gate": "Inventory the deployment runtime, establish vulnerability triage and exception handling, periodically re-verify trusted roots, and assess any SLSA level separately."
     },
     {
       "id": "public_deployment",
