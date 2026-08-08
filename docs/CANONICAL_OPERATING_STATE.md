@@ -90,11 +90,24 @@ Post-merge diagnostic run `31247338156` isolated the paper ticker's current
 failure signature to `PermissionError` while opening
 `/opt/lumencore/out/execution/multi_exchange_paper_ticker_ledger.jsonl`. The
 same bounded run found no allowlisted symbol-awareness failure in its five-
-minute window. This narrows the paper-ticker incident to an output-path access
-problem but does not yet identify which parent or file ownership/mode is wrong.
-The read-only diagnostic therefore records metadata and service-account
-read/write/traverse predicates for only the exact ledger and its three known
-parents; it does not list directory contents or modify permissions.
+minute window. Follow-up read-only run `31247505265` proved that the stack root
+was traversable and both output parents were `lumencore:lumencore` mode `755`
+and writable, while the exact zero-byte ledger was `opc:opc` mode `644` and not
+writable by `lumencore`. No symbolic path was present. This identifies the
+current paper-ticker crash cause without reading ledger contents.
+
+The repository now contains a manual-only, rollback-capable repair for that
+exact incident. It binds the empty-ledger SHA-256, `opc:opc:644` pre-state, one
+repair-script SHA-256, and a full current-main commit; requires both the exact
+phrase `REPAIR_PAPER_TICKER_LEDGER_OWNERSHIP` and the private HumanUnlock; stops
+and starts only `luma-paper-ticker`; changes only the exact ledger to
+`lumencore:lumencore:640`; and installs one bounded restart-policy drop-in. It
+refuses symlinks, multiple hard links, path or metadata drift, an unexpected
+service identity, or a missing paper-only preflight, and rolls the metadata and
+drop-in back if service stability fails. The repair has not been dispatched in
+this recorded state. Future full deployments explicitly preserve the ledger,
+set least-privilege ownership/mode, and bound both paper-ticker and shadow
+symbol-awareness restart storms.
 
 ### Receipt reconciliation
 
