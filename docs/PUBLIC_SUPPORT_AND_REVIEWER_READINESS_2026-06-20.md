@@ -1,6 +1,6 @@
 # Public Support And Reviewer Readiness
 
-Generated UTC: 2026-08-08T09:54:11.394712+00:00
+Generated UTC: 2026-08-08T10:07:02.744065+00:00
 
 ## Boundary
 
@@ -28,6 +28,7 @@ This is a public coordination packet for reviewers and support organizations. It
 
 - DICE local package hygiene is tracked, and a public-safe live-breadth replay capsule summarizes 6 live-source files and 14 deterministic replay windows without publishing private portal materials.
 - The historical live-breadth snapshot is provenance-gated: 12/17 live sources are measured, 11 rows are promoted, and 8 rows remain context-only. Economic estimates are omitted; the snapshot is not current-runtime or performance proof.
+- The August 6 first-party registry is now bound to a public-safe SHA-256 manifest: 14 explicit probe successes are separated from 0 review-ready sources. Missing accepted row-depth, freshness, rights, relevance, and dataset-hash gates remain visible; no alpha, savings, or current-runtime claim is promoted.
 - HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.
 - HarborSentinel controlled-injection benchmark is available as bounded detector-vs-baseline evidence with posture PUBLIC_AIS_INJECTION_BENCHMARK_READY.
 - HarborSentinel public AIS review-burden profile estimates natural validation queue load without claiming precision or false-positive rates.
@@ -90,6 +91,8 @@ This is a public coordination packet for reviewers and support organizations. It
 - dice_public_live_breadth_replay: `docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md`
 - live_breadth_provenance_gate: `docs/LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md`
 - live_breadth_provenance_gate_json: `dashboard/data/live_breadth_provenance_gate.json`
+- current_live_breadth_manifest: `docs/PUBLIC_LIVE_BREADTH_MANIFEST_2026-08-08.md`
+- current_live_breadth_manifest_json: `dashboard/data/public_live_breadth_manifest.json`
 - public_submission_gate_map: `docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md`
 - harbor_public_ais_packet: `docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md`
 - harbor_public_ais_review_burden: `docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md`

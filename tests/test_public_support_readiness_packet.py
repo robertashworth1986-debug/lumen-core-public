@@ -47,6 +47,18 @@ def test_public_support_packet_is_bounded_and_source_backed():
     assert payload["source_artifacts"]["live_breadth_provenance_gate_json"].endswith(
         "live_breadth_provenance_gate.json"
     )
+    current_manifest_claims = [
+        item
+        for item in payload["strong_public_evidence"]
+        if "public-safe SHA-256 manifest" in item
+    ]
+    assert current_manifest_claims
+    assert "14 explicit probe successes" in current_manifest_claims[0]
+    assert "0 review-ready sources" in current_manifest_claims[0]
+    assert "no alpha, savings, or current-runtime claim" in current_manifest_claims[0]
+    assert payload["source_artifacts"]["current_live_breadth_manifest"].endswith(
+        "PUBLIC_LIVE_BREADTH_MANIFEST_2026-08-08.md"
+    )
 
 
 def test_public_support_markdown_and_snapshot_avoid_private_claims():
@@ -60,6 +72,7 @@ def test_public_support_markdown_and_snapshot_avoid_private_claims():
     assert "do not claim" in markdown.lower()
     assert "provenance-gated" in serialized
     assert "context-only" in serialized
+    assert "0 review-ready sources" in serialized
     assert "submitted by public feed: 0" in markdown.lower()
     assert "uei" in serialized
     assert "cage" in serialized

@@ -1,0 +1,13 @@
+{
+  "schema": "public_live_breadth_governance_v1",
+  "registry_max_age_hours": 1,
+  "sources": {
+    "SOURCE_A": {
+      "rights_status": "unknown",
+      "relevance_status": "unknown",
+      "minimum_rows": 100,
+      "max_age_hours": 1,
+      "dataset_snapshot_sha256": null
+    }
+  }
+}

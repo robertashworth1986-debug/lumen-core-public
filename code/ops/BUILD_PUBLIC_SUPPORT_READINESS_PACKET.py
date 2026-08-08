@@ -16,6 +16,7 @@ PUBLIC_GRANT_FEED_JSON = DASHBOARD_DATA / "grant_readiness_status.json"
 PUBLIC_VISIBILITY_JSON = OUT_OPS / "public_visibility_packet_latest.json"
 PUBLIC_VISIBILITY_DASHBOARD_JSON = DASHBOARD_DATA / "public_visibility_packet.json"
 PROVENANCE_GATE_JSON = DASHBOARD_DATA / "live_breadth_provenance_gate.json"
+CURRENT_BREADTH_MANIFEST_JSON = DASHBOARD_DATA / "public_live_breadth_manifest.json"
 
 OUT_JSON = OUT_OPS / "public_support_readiness_packet_latest.json"
 DASHBOARD_JSON = DASHBOARD_DATA / "public_support_readiness_packet.json"
@@ -131,6 +132,7 @@ def build_payload(
         or read_json(PUBLIC_VISIBILITY_DASHBOARD_JSON)
     )
     provenance_gate = read_json(PROVENANCE_GATE_JSON)
+    current_breadth_manifest = read_json(CURRENT_BREADTH_MANIFEST_JSON)
     provenance_metrics = (
         provenance_gate.get("public_safe_metrics", {})
         if isinstance(provenance_gate.get("public_safe_metrics"), dict)
@@ -139,6 +141,11 @@ def build_payload(
     truth_chain = (
         provenance_gate.get("truth_chain_interpretation", {})
         if isinstance(provenance_gate.get("truth_chain_interpretation"), dict)
+        else {}
+    )
+    current_breadth_summary = (
+        current_breadth_manifest.get("summary", {})
+        if isinstance(current_breadth_manifest.get("summary"), dict)
         else {}
     )
     summary = grant_feed.get("summary", {}) if isinstance(grant_feed.get("summary"), dict) else {}
@@ -167,6 +174,13 @@ def build_payload(
                 f"and {provenance_metrics.get('context_only_source_rows', 8)} rows remain context-only. "
                 "Economic estimates are omitted; the snapshot is not current-runtime or performance proof."
             ),
+            (
+                "The August 6 first-party registry is now bound to a public-safe SHA-256 manifest: "
+                f"{current_breadth_summary.get('probe_success_sources', 0)} explicit probe successes are separated "
+                f"from {current_breadth_summary.get('review_ready_sources', 0)} review-ready sources. "
+                "Missing accepted row-depth, freshness, rights, relevance, and dataset-hash gates remain visible; "
+                "no alpha, savings, or current-runtime claim is promoted."
+            ),
             "HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.",
             (
                 "HarborSentinel controlled-injection benchmark is available as bounded detector-vs-baseline evidence "
@@ -192,6 +206,8 @@ def build_payload(
             "dice_public_live_breadth_replay": "docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md",
             "live_breadth_provenance_gate": "docs/LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md",
             "live_breadth_provenance_gate_json": "dashboard/data/live_breadth_provenance_gate.json",
+            "current_live_breadth_manifest": "docs/PUBLIC_LIVE_BREADTH_MANIFEST_2026-08-08.md",
+            "current_live_breadth_manifest_json": "dashboard/data/public_live_breadth_manifest.json",
             "public_submission_gate_map": "docs/PUBLIC_SUBMISSION_GATE_MAP_2026-06-20.md",
             "harbor_public_ais_packet": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
             "harbor_public_ais_review_burden": "docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md",

@@ -162,6 +162,7 @@ def test_live_breadth_claim_gate_runs_the_exact_focused_suite() -> None:
         "tests/test_public_visibility_packet.py",
         "tests/test_public_support_readiness_packet.py",
         "tests/test_live_breadth_claim_safety.py",
+        "tests/test_public_live_breadth_manifest.py",
         "tests/test_canonical_surface_design.py",
     ):
         assert test_path in workflow
