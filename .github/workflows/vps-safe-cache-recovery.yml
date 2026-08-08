@@ -48,7 +48,7 @@ jobs:
             --data-binary @/tmp/capacity-recovery-status.json
 
       - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
+        uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
         with:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
@@ -137,7 +137,7 @@ jobs:
 
       - name: Upload capacity recovery receipt
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: lumencore-vps-capacity-recovery-${{ github.run_id }}
           path: /tmp/lumencore-vps-capacity-recovery.txt
