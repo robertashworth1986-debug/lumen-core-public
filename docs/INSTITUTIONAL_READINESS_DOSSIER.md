@@ -31,7 +31,7 @@ deliverable.
 | Public deployment | Prepared, not executed for this commit | Exact-snapshot build, deploy, and live-audit protocol | Successful current-commit live audit receipt |
 | Data rights and handling | Buyer-specific gate | Intake, SOW, and handling schedule templates | Executed rights, classification, retention, access, and legal terms |
 | Identity, access, and runtime | Prepared, not executed | Default-deny operator boundary and separately gated repair path | Authorized live repair and retained negative-access evidence |
-| Incident response and continuity | Open gap | Best-effort security process and public-site rollback | Adopted and exercised incident, continuity, backup, and restoration plan |
+| Incident response and continuity | Documented control | Bounded policy, severity model, deterministic CI tabletop, and read-only live release classification | Separately authorized live restoration exercise and buyer-specific incident, continuity, backup, restoration, and notice terms |
 | Legal, certification, and insurance | Open gap | IP and claim boundaries; buyer-specific SOW template | Legal, IP, insurance, regulatory, and certification review |
 | Commercial delivery | Prepared, not executed | One offer, fit intake, proposed pricing, and SOW template | Qualified buyer, signed scope, authorized source, and cleared initial payment |
 | External validation | Prepared, not executed | CODECHECK handoff, receipt template, and replication docket | Completed qualified non-author execution receipt |
@@ -61,7 +61,7 @@ The public evidence does not currently establish:
 - an enterprise support, response, recovery, or availability SLA;
 - an executed data-processing agreement or legal approval of the offer;
 - a complete product and deployment SBOM;
-- a tested incident-response, business-continuity, or disaster-recovery program;
+- a tested live incident-response or recovery exercise, business-continuity or disaster-recovery certification, or customer-notification performance;
 - privacy or regulated-data authorization; or
 - an exact live-domain snapshot matching the checked-out commit.
 

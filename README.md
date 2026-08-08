@@ -31,6 +31,8 @@ deliverable.
 
 **[Open the Institutional Readiness Dossier](docs/INSTITUTIONAL_READINESS_DOSSIER.md)**
 
+**[Open the Incident Response and Continuity Plan](docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)**
+
 The index is the canonical evidence map. The reviewer page gives the shortest human path. The index identifies:
 
 - what is merged into the default branch;
@@ -48,6 +50,11 @@ prepared, which require buyer-specific terms, and which remain open production
 blockers. Its machine register and verifier keep the current decision bounded
 to non-confidential fit review and buyer-specific scoping; production remains
 on `HOLD`.
+
+The incident plan converts exact-snapshot drift into a bounded machine receipt
+with severity, affected surfaces, containment, recovery, and explicit human
+authorization boundaries. It is a documented first-party control with CI
+exercises—not proof of a completed live restoration or an enterprise SLA.
 
 ## Five-minute technical path
 

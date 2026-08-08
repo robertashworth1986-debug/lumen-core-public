@@ -14,16 +14,17 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 2. [Current buyer-owned validation offer](STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md)
 3. [Institutional readiness and production-blocker dossier](INSTITUTIONAL_READINESS_DOSSIER.md)
 4. [Machine-readable readiness register](../config/institutional_readiness_register_v1.json)
-5. [Non-confidential buyer fit intake](LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md)
-6. [Buyer-specific SOW template](LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md)
-7. [Governed engine portfolio audit](LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
-8. [Proof Capsule schema](PROOF_CAPSULE_SCHEMA.md)
-9. [Claim Boundary Register](CLAIM_BOUNDARY_REGISTER.md)
-10. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
-11. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
-12. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
-13. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
-14. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
+5. [Incident response and continuity plan](INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)
+6. [Non-confidential buyer fit intake](LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md)
+7. [Buyer-specific SOW template](LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md)
+8. [Governed engine portfolio audit](LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
+9. [Proof Capsule schema](PROOF_CAPSULE_SCHEMA.md)
+10. [Claim Boundary Register](CLAIM_BOUNDARY_REGISTER.md)
+11. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
+12. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
+13. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
+14. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
+15. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
 
 The repository docket is the reviewable state bound to the checked-out commit.
 The live docket is a convenience projection and may lag the default branch or
@@ -49,6 +50,11 @@ the current decision is non-confidential fit review and buyer-specific scoping;
 production remains `HOLD`. It does not claim SOC 2, ISO 27001, FedRAMP,
 penetration testing, a complete product SBOM, an enterprise SLA, legal approval,
 or an exact live-domain snapshot for the checked-out commit.
+
+The documented incident control classifies public-release drift and preserves
+containment and recovery gates. Its CI tabletop is not a completed live
+restoration exercise, business-continuity certification, external audit, or
+customer-notification SLA.
 
 ## Clean-checkout verification
 
