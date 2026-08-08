@@ -1,6 +1,6 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-08-07 UTC
+**State date:** 2026-08-08 UTC
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
@@ -32,6 +32,43 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 **EVTit / Vynetic:** Two near-duplicate follow-ups were sent in the same thread. The lane is locked. Wait for a substantive reply; do not send another update, deck, or scope packet.
 
 **Selection rule:** The first qualified party that agrees to a controlled dataset, incumbent baseline, prelocked metric and threshold, reporting format, failure rules, and one go/no-go decision becomes the single active external-validation lane. All other pilot outreach pauses.
+
+### Public runtime incident and recovery boundary
+
+On August 8, read-only current-state probes established that DNS, TLS, nginx,
+the static reviewer surface, VPS storage, and filesystem inodes were available,
+while the dynamic gateway returned HTTP 502 and had no listener on loopback port
+8787. The storage diagnostic recorded about 109 GiB free and no inode pressure,
+so capacity was ruled out as the cause.
+
+PRs #114, #115, and #116 progressively hardened the existing read-only VPS
+diagnostic. The post-merge runs `31246089227`, `31246224480`, and
+`31246373528` established a restart storm, a dead-PID singleton lock, and the
+allowlisted failure signature `ModuleNotFoundError: No module named
+'booth_public_contract'`. The deployed gateway source was a stale monolithic
+file; the reviewed `main` entrypoint is a fail-closed facade whose local import
+closure was not deployed. This is deployment drift and an incomplete runtime
+bundle, not evidence of a storage failure or a defect in nginx routing.
+
+The repository now contains a deterministic gateway-closure repair path. It is
+inspect-only by default, binds twenty explicit local Python files to one bundle
+SHA-256 and a full current-main commit, validates the staged entrypoint and live
+order block before installation, refuses symbolic targets, removes only a
+verified dead-PID gateway lock, restarts only `luma-gateway`, validates minimal
+public health/status contracts, and rolls back every affected file on failure.
+The corresponding workflow is manual-only and requires both the exact phrase
+`REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE` and the private HumanUnlock secret.
+It has not been dispatched in this recorded state. The separate public-static-
+site release gate remains unchanged and cannot authorize gateway repair.
+
+The public health contract is intentionally minimal: it reports liveness,
+service identity, the operator-access boundary, and a UTC timestamp, but no
+process IDs, internal artifact freshness, service inventory, or operator data.
+Detailed health remains available only at the token-protected
+`/api/operator/health` route.
+The daily health workflow classifies the static reviewer surface and dynamic
+gateway independently; a healthy static page can no longer conceal a failed
+control plane.
 
 ### Receipt reconciliation
 
@@ -122,4 +159,4 @@ byte-identical to its reviewed commit.
 
 ## Immediate decision
 
-The next founder-facing actions are to attend the **EPRI / Open Power AI** Member Representative Committee and selected Work Group meetings, make the separate founder-controlled EC deposit decision due August 14, and privately review the active external-review material to define one measurable evaluation decision. The EPRI / OPAI contribution-path follow-up is complete and closed to further email; EC has confirmed the onboarding materials were received on time, so neither lane authorizes another acknowledgment or follow-up. The next repository actions are to finish consolidation of the current outreach/Argos stack against merged PR #74 and current `main`, then pursue bounded independent execution through the existing reviewer surface. Agent Arena V5 is only a secondary synthetic fault-injection harness: its locked reference run improves on the weak baseline but fails the absolute zero-violation gate and does not demonstrate Byzantine tolerance. PR #67's duplicate locks and claim boundaries must remain intact. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized; in particular, no duplicate or unsolicited message is authorized.
+The next founder-facing actions are to attend the **EPRI / Open Power AI** Member Representative Committee and selected Work Group meetings, make the separate founder-controlled EC deposit decision due August 14, and privately review the active external-review material to define one measurable evaluation decision. The EPRI / OPAI contribution-path follow-up is complete and closed to further email; EC has confirmed the onboarding materials were received on time, so neither lane authorizes another acknowledgment or follow-up. The next runtime action is a separately approved execution of the exact current-main gateway dependency-closure repair followed by read-only public verification; until that occurs, the dynamic gateway remains degraded and must continue to be reported as HTTP 502. The next product action is bounded independent execution through the existing PR #74 reviewer surface, not another dashboard or platform. Agent Arena V5 is only a secondary synthetic fault-injection harness: its locked reference run improves on the weak baseline but fails the absolute zero-violation gate and does not demonstrate Byzantine tolerance. PR #67's duplicate locks and claim boundaries must remain intact. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized; in particular, no duplicate or unsolicited message is authorized.

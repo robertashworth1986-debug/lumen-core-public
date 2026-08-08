@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import sys
 import unittest
@@ -21,10 +22,12 @@ if str(CODE) not in sys.path:
 
 from operator_api_access import (  # noqa: E402
     OperatorApiAccessMiddleware,
+    PUBLIC_HEALTH_PATH,
     PUBLIC_STATUS_PATH,
     expected_operator_tokens,
     install_operator_api_access,
     presented_operator_token,
+    public_health_payload,
     public_status_payload,
 )
 
@@ -101,6 +104,7 @@ class OperatorApiAccessTests(unittest.TestCase):
             "/api/funding/approval-queue",
             "/api/grants",
             "/api/snapshot",
+            "/api/operator/health",
         ):
             with self.subTest(path=path):
                 app = _ProbeApp()
@@ -160,7 +164,7 @@ class OperatorApiAccessTests(unittest.TestCase):
         )
         self.assertEqual(presented_operator_token(scope), "")
 
-    def test_public_status_and_non_api_health_remain_open(self) -> None:
+    def test_public_status_and_health_are_minimal_liveness_only(self) -> None:
         app = _ProbeApp()
         middleware = OperatorApiAccessMiddleware(app, token_provider=lambda: ())
         public = _invoke(middleware, _scope(PUBLIC_STATUS_PATH))
@@ -168,7 +172,11 @@ class OperatorApiAccessTests(unittest.TestCase):
             middleware,
             _scope(PUBLIC_STATUS_PATH, method="HEAD"),
         )
-        health = _invoke(middleware, _scope("/health"))
+        health = _invoke(middleware, _scope(PUBLIC_HEALTH_PATH))
+        health_head = _invoke(
+            middleware,
+            _scope(PUBLIC_HEALTH_PATH, method="HEAD"),
+        )
         public_post = _invoke(middleware, _scope(PUBLIC_STATUS_PATH, method="POST"))
         public_prefix_smuggle = _invoke(
             middleware,
@@ -178,16 +186,28 @@ class OperatorApiAccessTests(unittest.TestCase):
         self.assertEqual(_status(public), 200)
         self.assertEqual(_status(public_head), 200)
         self.assertEqual(_body(public_head), b"")
-        self.assertEqual(_status(health), 204)
+        self.assertEqual(_status(health), 200)
+        self.assertEqual(_status(health_head), 200)
+        self.assertEqual(_body(health_head), b"")
         self.assertEqual(_status(public_post), 503)
         self.assertEqual(_status(public_prefix_smuggle), 503)
-        self.assertEqual(len(app.calls), 1)
+        self.assertEqual(len(app.calls), 0)
         self.assertEqual(
             _body(public),
             b'{"status":"ok","service":"luma-experience-gateway",'
             b'"access_boundary":"operator_api_v1","public_surface":"minimal"}',
         )
         self.assertEqual(public_status_payload()["public_surface"], "minimal")
+        health_payload = json.loads(_body(health))
+        self.assertEqual(health_payload["status"], "ok")
+        self.assertEqual(health_payload["service"], "luma-experience-gateway")
+        self.assertEqual(health_payload["access_boundary"], "operator_api_v1")
+        self.assertEqual(health_payload["public_surface"], "minimal")
+        self.assertRegex(
+            health_payload["generated_utc"],
+            r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$",
+        )
+        self.assertEqual(set(public_health_payload()), set(health_payload))
 
     def test_preflight_passes_but_does_not_bypass_actual_request_auth(self) -> None:
         app = _ProbeApp()
@@ -290,11 +310,18 @@ class RealGatewayAccessIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 base_url="http://gateway-test",
             ) as client:
                 public = await client.get(PUBLIC_STATUS_PATH)
+                health = await client.get(PUBLIC_HEALTH_PATH)
+                operator_health = await client.get("/api/operator/health")
                 balance = await client.get("/api/kraken/balance")
                 approval_queue = await client.get("/api/master/approval-queue")
 
         self.assertEqual(public.status_code, 200)
         self.assertEqual(public.json(), public_status_payload())
+        self.assertEqual(health.status_code, 200)
+        self.assertEqual(health.json()["public_surface"], "minimal")
+        self.assertNotIn("services", health.json())
+        self.assertNotIn("supervisor_pid", health.json())
+        self.assertEqual(operator_health.status_code, 503)
         self.assertEqual(balance.status_code, 503)
         self.assertEqual(approval_queue.status_code, 503)
 
@@ -321,9 +348,15 @@ class RealGatewayAccessIntegrationTests(unittest.IsolatedAsyncioTestCase):
                     "/api/not-a-route",
                     headers={"Authorization": f"Bearer {secret}"},
                 )
+                detailed_health = await client.get(
+                    "/api/operator/health",
+                    headers={"Authorization": f"Bearer {secret}"},
+                )
 
         self.assertEqual(missing.status_code, 401)
         self.assertEqual(valid.status_code, 404)
+        self.assertEqual(detailed_health.status_code, 200)
+        self.assertIn("artifacts", detailed_health.json())
 
 
 if __name__ == "__main__":

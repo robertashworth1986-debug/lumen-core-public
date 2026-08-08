@@ -13,6 +13,7 @@ import json
 import os
 import re
 from collections.abc import Awaitable, Callable, Iterable, Mapping
+from datetime import datetime, timezone
 from typing import Any
 
 
@@ -31,6 +32,7 @@ OPERATOR_TOKEN_ENV_NAMES = (
     "LUMA_OPERATOR_API_TOKENS",
 )
 PUBLIC_STATUS_PATH = "/api/public/status"
+PUBLIC_HEALTH_PATH = "/health"
 PUBLIC_API_READ_PATHS = frozenset({PUBLIC_STATUS_PATH})
 PROTECTED_WEBSOCKET_PATHS = frozenset({"/ws", "/ws/live"})
 MIN_OPERATOR_TOKEN_CHARS = 32
@@ -158,6 +160,32 @@ async def _public_status_response(
     )
 
 
+async def _public_health_response(
+    send: Callable[..., Awaitable[Any]],
+    *,
+    head_only: bool,
+) -> None:
+    body = json.dumps(public_health_payload(), separators=(",", ":")).encode("utf-8")
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 200,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"content-length", str(len(body)).encode("ascii")),
+                (b"cache-control", b"no-store"),
+            ],
+        }
+    )
+    await send(
+        {
+            "type": "http.response.body",
+            "body": b"" if head_only else body,
+            "more_body": False,
+        }
+    )
+
+
 class OperatorApiAccessMiddleware:
     """Require runtime authentication for operator HTTP and WebSocket routes."""
 
@@ -181,6 +209,9 @@ class OperatorApiAccessMiddleware:
 
         if scope_type == "http":
             method = str(scope.get("method", "")).upper()
+            if path == PUBLIC_HEALTH_PATH and method in {"GET", "HEAD"}:
+                await _public_health_response(send, head_only=method == "HEAD")
+                return
             if is_public_api_read(scope):
                 await _public_status_response(send, head_only=method == "HEAD")
                 return
@@ -222,6 +253,24 @@ def public_status_payload() -> dict[str, str]:
         "service": "luma-experience-gateway",
         "access_boundary": "operator_api_v1",
         "public_surface": "minimal",
+    }
+
+
+def public_health_payload() -> dict[str, str]:
+    """Public liveness only; omit internal process and artifact state."""
+
+    generated_utc = (
+        datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+    return {
+        "status": "ok",
+        "service": "luma-experience-gateway",
+        "access_boundary": "operator_api_v1",
+        "public_surface": "minimal",
+        "generated_utc": generated_utc,
     }
 
 

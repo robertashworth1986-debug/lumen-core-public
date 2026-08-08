@@ -323,12 +323,14 @@ cat > "$GATEWAY_SERVICE" <<EOF
 [Unit]
 Description=Luma Experience Gateway (FastAPI)
 After=network.target
+StartLimitIntervalSec=300
+StartLimitBurst=10
 
 [Service]
 Type=simple
 WorkingDirectory=$CODE_DIR
 ExecStart=$PYTHON_BIN -m uvicorn luma_experience_gateway:app --app-dir $CODE_DIR --host 127.0.0.1 --port 8787
-Restart=always
+Restart=on-failure
 RestartSec=3
 Environment=PYTHONUNBUFFERED=1
 Environment=LUMA_STACK_ROOT=$STACK_ROOT

@@ -4,8 +4,28 @@ on:
   pull_request:
     paths:
       - 'code/booth_public_contract.py'
+      - 'code/luma_experience_gateway.py'
+      - 'code/luma_experience_gateway_legacy.py'
+      - 'code/operator_api_access.py'
+      - 'code/execution/order_safety_gate.py'
+      - 'code/application_context_resolver.py'
+      - 'code/autonomous_agent_manifest.py'
+      - 'code/forecast_api.py'
+      - 'code/grant_application_factory.py'
+      - 'code/grant_hunter_v2.py'
+      - 'code/grant_submission_kit.py'
+      - 'code/grants_api.py'
+      - 'code/linkedin_oauth.py'
+      - 'code/linkedin_router.py'
+      - 'code/master_universe_benchmark.py'
+      - 'code/master_universe_benchmark_v2.py'
+      - 'code/meta_router.py'
+      - 'code/opportunities_api.py'
+      - 'code/universe_v2_fetchers.py'
+      - 'code/deploy/deploy_vps.sh'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
       - 'tests/test_booth_public_contract_runtime.py'
+      - '.github/workflows/repair-gateway-dependency-closure.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
       - '.github/workflows/vps-storage-diagnostic.yml'
@@ -14,8 +34,28 @@ on:
     branches: [main]
     paths:
       - 'code/booth_public_contract.py'
+      - 'code/luma_experience_gateway.py'
+      - 'code/luma_experience_gateway_legacy.py'
+      - 'code/operator_api_access.py'
+      - 'code/execution/order_safety_gate.py'
+      - 'code/application_context_resolver.py'
+      - 'code/autonomous_agent_manifest.py'
+      - 'code/forecast_api.py'
+      - 'code/grant_application_factory.py'
+      - 'code/grant_hunter_v2.py'
+      - 'code/grant_submission_kit.py'
+      - 'code/grants_api.py'
+      - 'code/linkedin_oauth.py'
+      - 'code/linkedin_router.py'
+      - 'code/master_universe_benchmark.py'
+      - 'code/master_universe_benchmark_v2.py'
+      - 'code/meta_router.py'
+      - 'code/opportunities_api.py'
+      - 'code/universe_v2_fetchers.py'
+      - 'code/deploy/deploy_vps.sh'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
       - 'tests/test_booth_public_contract_runtime.py'
+      - '.github/workflows/repair-gateway-dependency-closure.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
       - '.github/workflows/vps-storage-diagnostic.yml'
@@ -42,8 +82,12 @@ jobs:
       - name: Compile gateway dependency closure
         run: |
           set -euo pipefail
-          python -m py_compile \
-            code/booth_public_contract.py \
+          mapfile -t gateway_files < <(
+            bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --print-files
+          )
+          printf -v gateway_paths 'code/%s ' "${gateway_files[@]}"
+          # shellcheck disable=SC2086
+          python -m py_compile $gateway_paths \
             tests/test_booth_public_contract_runtime.py \
             tests/test_vps_runtime_diagnostic_workflow.py
 
@@ -77,16 +121,24 @@ jobs:
         run: |
           set -euo pipefail
           bash -n code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
-          LUMENCORE_LOCAL_HEALTH_URL=http://127.0.0.1:9/health \
+          inspect_target=$(mktemp -d)
+          trap 'rm -rf -- "$inspect_target"' EXIT
+          first_sha=$(bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --bundle-sha)
+          second_sha=$(bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --bundle-sha)
+          [[ "$first_sha" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$first_sha" == "$second_sha" ]]
+          [[ "$(bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --print-files | wc -l)" -eq 20 ]]
+          LUMENCORE_GATEWAY_TARGET_ROOT="$inspect_target" \
             bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
 
           set +e
-          LUMENCORE_EXPECTED_PUBLIC_CONTRACT_SHA256=0000000000000000000000000000000000000000000000000000000000000000 \
+          LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256=0000000000000000000000000000000000000000000000000000000000000000 \
+            LUMENCORE_GATEWAY_TARGET_ROOT="$inspect_target" \
             bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
           rc=$?
           set -e
-          if [[ "$rc" -ne 6 ]]; then
-            echo "ERROR: wrong-hash check returned $rc instead of 6" >&2
+          if [[ "$rc" -ne 7 ]]; then
+            echo "ERROR: wrong-hash check returned $rc instead of 7" >&2
             exit 1
           fi
           echo "WRONG_HASH_FAIL_CLOSED_OK"

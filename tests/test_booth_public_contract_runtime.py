@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import copy
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -131,25 +132,154 @@ def test_public_contract_module_is_syntax_valid_and_fixed_schema() -> None:
     assert projected["public_claim_allowed"] is False
 
 
-def test_deployment_repairs_only_the_public_contract_dependency() -> None:
-    script = (
+EXPECTED_GATEWAY_CLOSURE = {
+    "application_context_resolver.py",
+    "autonomous_agent_manifest.py",
+    "booth_public_contract.py",
+    "execution/__init__.py",
+    "execution/order_safety_gate.py",
+    "forecast_api.py",
+    "grant_application_factory.py",
+    "grant_hunter_v2.py",
+    "grant_submission_kit.py",
+    "grants_api.py",
+    "linkedin_oauth.py",
+    "linkedin_router.py",
+    "luma_experience_gateway.py",
+    "luma_experience_gateway_legacy.py",
+    "master_universe_benchmark.py",
+    "master_universe_benchmark_v2.py",
+    "meta_router.py",
+    "operator_api_access.py",
+    "opportunities_api.py",
+    "universe_v2_fetchers.py",
+}
+
+
+def _repair_script() -> str:
+    return (
         ROOT / "code" / "ops" / "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh"
     ).read_text(encoding="utf-8")
 
+
+def _declared_gateway_closure(script: str) -> set[str]:
+    match = re.search(
+        r"^BUNDLE_FILES=\(\n(?P<body>.*?)^\)\n",
+        script,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    assert match is not None
+    return set(re.findall(r'^\s+"([^"]+)"$', match.group("body"), re.MULTILINE))
+
+
+def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
+    script = _repair_script()
+
     assert "Inspect-only by default" in script
     assert "--apply" in script
+    assert "--print-files" in script
+    assert "--bundle-sha" in script
     assert "LUMA_HUMAN_UNLOCK_TOKEN" in script
     assert "${#human_unlock_token} -lt 32" in script
     assert "unset human_unlock_token LUMA_HUMAN_UNLOCK_TOKEN" in script
-    assert "booth_public_contract.py" in script
-    assert "LUMENCORE_EXPECTED_PUBLIC_CONTRACT_SHA256" in script
+    assert _declared_gateway_closure(script) == EXPECTED_GATEWAY_CLOSURE
+    assert "LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256" in script
+    assert "source closure does not match the approved bundle SHA-256" in script
+    assert '[[ "$SOURCE_COMMIT" =~ ^[0-9a-f]{40}$ ]]' in script
     assert "PYTHONDONTWRITEBYTECODE=1" in script
+    assert 'PYTHONPATH="$STAGE_DIR:$TARGET_ROOT"' in script
+    assert "blocked_live_order" in script
     assert "luma-gateway" in script
-    assert "systemctl restart \"$SERVICE\"" in script
-    assert "Rolling back gateway public-contract dependency" in script
-    assert "/opt/lumencore/code/booth_public_contract.py" in script
-    assert "luma_experience_gateway.py" not in script
-    assert "luma_experience_gateway_legacy.py" not in script
+    assert 'systemctl stop "$SERVICE"' in script
+    assert 'systemctl start "$SERVICE"' in script
+    assert "Rolling back the complete gateway dependency closure" in script
+    assert "/opt/lumencore/code" in script
+    assert "singleton lock owner is still alive; refusing removal" in script
+    assert "Removed verified dead-PID gateway singleton lock" in script
+    assert "GATEWAY_DEPENDENCY_CLOSURE_REPAIR_OK" in script
+    assert "rm -rf -- \"$TARGET_ROOT\"" not in script
+    assert "systemctl restart" not in script
+
+
+def test_declared_gateway_closure_covers_recursive_local_imports() -> None:
+    declared = _declared_gateway_closure(_repair_script())
+    local_modules: dict[str, str] = {}
+    for path in CODE.rglob("*.py"):
+        relative = path.relative_to(CODE).as_posix()
+        if path.name == "__init__.py":
+            module = ".".join(path.relative_to(CODE).parent.parts)
+        else:
+            module = ".".join(path.relative_to(CODE).with_suffix("").parts)
+        local_modules[module] = relative
+
+    pending = ["luma_experience_gateway.py"]
+    visited: set[str] = set()
+    while pending:
+        relative = pending.pop()
+        if relative in visited:
+            continue
+        visited.add(relative)
+        tree = ast.parse((CODE / relative).read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            imported: list[str] = []
+            if isinstance(node, ast.Import):
+                imported = [alias.name for alias in node.names]
+            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                imported = [node.module]
+            for module in imported:
+                candidate = local_modules.get(module)
+                if candidate and candidate not in visited:
+                    pending.append(candidate)
+
+    assert visited <= declared
+
+
+def test_gateway_service_restart_policy_is_bounded() -> None:
+    deploy = (ROOT / "code" / "deploy" / "deploy_vps.sh").read_text(
+        encoding="utf-8"
+    )
+    match = re.search(
+        r"cat > \"\$GATEWAY_SERVICE\" <<EOF\n(?P<body>.*?)\nEOF",
+        deploy,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    service = match.group("body")
+    assert "Restart=on-failure" in service
+    assert "Restart=always" not in service
+    assert "StartLimitIntervalSec=300" in service
+    assert "StartLimitBurst=10" in service
+
+
+def test_health_probe_classifies_static_and_dynamic_surfaces() -> None:
+    health = (ROOT / ".github" / "workflows" / "health-probe.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "https://lumen-core.ai/api/public/status" in health
+    assert "https://lumen-core.ai/health" in health
+    assert "https://lumen-core.ai/api/snapshot" not in health
+    assert "static_surface_state" in health
+    assert "dynamic_gateway_state" in health
+    assert "contract_ok" in health
+    assert "luma-experience-gateway" in health
+    assert "operator_api_v1" in health
+
+
+def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None:
+    workflow = (
+        ROOT / ".github" / "workflows" / "repair-gateway-dependency-closure.yml"
+    ).read_text(encoding="utf-8")
+    assert "REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE" in workflow
+    assert '[[ "$APPROVAL" == "REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE" ]]' in workflow
+    assert '[[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]' in workflow
+    assert '[[ "$(git rev-parse origin/main)" == "$RELEASE_COMMIT" ]]' in workflow
+    assert "VPS_KNOWN_HOSTS" in workflow
+    assert "StrictHostKeyChecking=yes" in workflow
+    assert "LUMA_HUMAN_UNLOCK_TOKEN" in workflow
+    assert "LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256" in workflow
+    assert "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh" in workflow
+    assert "--apply" in workflow
+    assert "Remove remote repair staging" in workflow
 
     workflow = (
         ROOT / ".github" / "workflows" / "gateway-public-contract-ci.yml"

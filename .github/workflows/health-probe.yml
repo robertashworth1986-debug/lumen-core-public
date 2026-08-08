@@ -35,7 +35,7 @@ jobs:
 
           timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-          check_endpoint() {
+          check_static_endpoint() {
             local name=$1
             local url=$2
             local code
@@ -48,43 +48,134 @@ jobs:
             if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then ok=true; fi
             jq -n --arg name "$name" --arg url "$url" --arg text "$code" \
               --argjson status "$status" --argjson ok "$ok" \
-              '{key:$name,value:{url:$url,status:$status,status_text:$text,ok:$ok}}'
+              '{key:$name,value:{surface:"static",url:$url,status:$status,status_text:$text,http_ok:$ok,reachable:$ok,contract_ok:$ok,ok:$ok}}'
+          }
+
+          check_json_endpoint() {
+            local name=$1
+            local url=$2
+            local contract=$3
+            local body
+            local result
+            local code=000
+            local content_type=""
+            local status=0
+            local http_ok=false
+            local json_ok=false
+            local contract_ok=false
+            local reachable=false
+            local ok=false
+
+            body=$(mktemp)
+            result=$(curl --silent --show-error --location --max-redirs 5 \
+              --max-time "$CURL_TIMEOUT_SECONDS" --output "$body" \
+              --write-out $'%{http_code}\t%{content_type}' "$url" 2>/dev/null) || result=$'000\t'
+            IFS=$'\t' read -r code content_type <<<"$result"
+            [[ "$code" =~ ^[0-9]{3}$ ]] || code=000
+            status=$((10#$code))
+            if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then http_ok=true; fi
+            if [[ "$http_ok" == true ]] && jq empty "$body" >/dev/null 2>&1; then
+              json_ok=true
+              reachable=true
+              case "$contract" in
+                public_status)
+                  if jq -e '
+                    .status == "ok" and
+                    .service == "luma-experience-gateway" and
+                    .access_boundary == "operator_api_v1" and
+                    .public_surface == "minimal"
+                  ' "$body" >/dev/null; then contract_ok=true; fi
+                  ;;
+                gateway_health)
+                  if jq -e '
+                    .status == "ok" and
+                    .service == "luma-experience-gateway" and
+                    .access_boundary == "operator_api_v1" and
+                    .public_surface == "minimal" and
+                    (.generated_utc | type == "string" and length > 0)
+                  ' "$body" >/dev/null; then contract_ok=true; fi
+                  ;;
+                *)
+                  echo "ERROR: unknown JSON endpoint contract: $contract" >&2
+                  rm -f -- "$body"
+                  return 2
+                  ;;
+              esac
+            fi
+            if [[ "$http_ok" == true && "$json_ok" == true && "$contract_ok" == true ]]; then ok=true; fi
+            rm -f -- "$body"
+            jq -n --arg name "$name" --arg url "$url" --arg text "$code" \
+              --arg content_type "$content_type" --arg contract "$contract" \
+              --argjson status "$status" --argjson http_ok "$http_ok" \
+              --argjson reachable "$reachable" --argjson json_ok "$json_ok" \
+              --argjson contract_ok "$contract_ok" --argjson ok "$ok" \
+              '{key:$name,value:{surface:"dynamic",url:$url,status:$status,status_text:$text,content_type:$content_type,contract:$contract,http_ok:$http_ok,reachable:$reachable,json_ok:$json_ok,contract_ok:$contract_ok,ok:$ok}}'
           }
 
           endpoints=$(printf '%s\n' \
-            "$(check_endpoint portal https://lumen-core.ai/)" \
-            "$(check_endpoint evidence https://lumen-core.ai/evidence/)" \
-            "$(check_endpoint kraken_dashboard https://lumen-core.ai/kraken_execution_dashboard.html)" \
-            "$(check_endpoint mission_control https://lumen-core.ai/mission_control.html)" \
-            "$(check_endpoint approval_hub https://lumen-core.ai/agent_approval_hub.html)" \
-            "$(check_endpoint forecast https://lumen-core.ai/forecast.html)" \
+            "$(check_static_endpoint portal https://lumen-core.ai/)" \
+            "$(check_static_endpoint evidence https://lumen-core.ai/evidence/)" \
+            "$(check_static_endpoint kraken_dashboard https://lumen-core.ai/kraken_execution_dashboard.html)" \
+            "$(check_static_endpoint mission_control https://lumen-core.ai/mission_control.html)" \
+            "$(check_static_endpoint approval_hub https://lumen-core.ai/agent_approval_hub.html)" \
+            "$(check_static_endpoint forecast https://lumen-core.ai/forecast.html)" \
+            "$(check_json_endpoint gateway_public_status https://lumen-core.ai/api/public/status public_status)" \
+            "$(check_json_endpoint gateway_health https://lumen-core.ai/health gateway_health)" \
             | jq -s 'from_entries')
 
           healthy=$(jq '[.[] | select(.ok == true)] | length' <<<"$endpoints")
           total=$(jq 'length' <<<"$endpoints")
+          static_healthy=$(jq '[.[] | select(.surface == "static" and .ok == true)] | length' <<<"$endpoints")
+          static_total=$(jq '[.[] | select(.surface == "static")] | length' <<<"$endpoints")
+          dynamic_healthy=$(jq '[.[] | select(.surface == "dynamic" and .ok == true)] | length' <<<"$endpoints")
+          dynamic_total=$(jq '[.[] | select(.surface == "dynamic")] | length' <<<"$endpoints")
+          dynamic_reachable=$(jq '[.[] | select(.surface == "dynamic" and .reachable == true)] | length' <<<"$endpoints")
+
+          static_surface_state=degraded
+          if [[ "$static_healthy" -eq "$static_total" ]]; then
+            static_surface_state=operational
+          elif [[ "$static_healthy" -eq 0 ]]; then
+            static_surface_state=outage
+          fi
+
+          dynamic_gateway_state=degraded
+          if [[ "$dynamic_healthy" -eq "$dynamic_total" ]]; then
+            dynamic_gateway_state=operational
+          elif [[ "$dynamic_reachable" -eq 0 ]]; then
+            dynamic_gateway_state=outage
+          fi
+
           overall=outage
           color=red
-          if [[ "$healthy" -eq "$total" ]]; then
+          if [[ "$static_surface_state" == operational && "$dynamic_gateway_state" == operational ]]; then
             overall=operational
             color=brightgreen
-          elif [[ "$healthy" -gt 3 ]]; then
+          elif [[ "$static_surface_state" != outage || "$dynamic_gateway_state" != outage ]]; then
             overall=degraded
             color=yellow
           fi
 
           jq -n --arg checked_utc "$timestamp" --arg overall "$overall" \
+            --arg static_surface_state "$static_surface_state" \
+            --arg dynamic_gateway_state "$dynamic_gateway_state" \
             --argjson healthy_count "$healthy" --argjson total_count "$total" \
+            --argjson static_healthy_count "$static_healthy" --argjson static_total_count "$static_total" \
+            --argjson dynamic_healthy_count "$dynamic_healthy" --argjson dynamic_total_count "$dynamic_total" \
+            --argjson dynamic_reachable_count "$dynamic_reachable" \
             --argjson endpoints "$endpoints" \
-            '{checked_utc:$checked_utc,overall:$overall,healthy_count:$healthy_count,total_count:$total_count,endpoints:$endpoints}' \
+            '{checked_utc:$checked_utc,overall:$overall,static_surface_state:$static_surface_state,dynamic_gateway_state:$dynamic_gateway_state,healthy_count:$healthy_count,total_count:$total_count,static_healthy_count:$static_healthy_count,static_total_count:$static_total_count,dynamic_healthy_count:$dynamic_healthy_count,dynamic_total_count:$dynamic_total_count,dynamic_reachable_count:$dynamic_reachable_count,endpoints:$endpoints}' \
             > data/site_health.json
 
-          jq -n --arg message "$overall ($healthy/$total)" --arg color "$color" \
+          jq -n --arg message "$overall · static=$static_surface_state · gateway=$dynamic_gateway_state" --arg color "$color" \
             '{schemaVersion:1,label:"status",message:$message,color:$color,cacheSeconds:3600}' \
             > data/uptime_badge.json
 
           jq empty data/site_health.json data/uptime_badge.json
           echo "overall=$overall" >> "$GITHUB_OUTPUT"
           echo "healthy=$healthy" >> "$GITHUB_OUTPUT"
+          echo "total=$total" >> "$GITHUB_OUTPUT"
+          echo "static_surface_state=$static_surface_state" >> "$GITHUB_OUTPUT"
+          echo "dynamic_gateway_state=$dynamic_gateway_state" >> "$GITHUB_OUTPUT"
           echo "timestamp=$timestamp" >> "$GITHUB_OUTPUT"
 
       - name: Commit daily health snapshot
@@ -95,11 +186,11 @@ jobs:
           git config user.email "bot@lumen-core.ai"
           git add data/site_health.json data/uptime_badge.json
           if ! git diff --cached --quiet; then
-            git commit -m "chore(health): daily survival snapshot — ${{ steps.probe.outputs.overall }} — ${{ steps.probe.outputs.healthy }}/6 @ ${{ steps.probe.outputs.timestamp }}"
+            git commit -m "chore(health): daily survival snapshot — ${{ steps.probe.outputs.overall }} — ${{ steps.probe.outputs.healthy }}/${{ steps.probe.outputs.total }} @ ${{ steps.probe.outputs.timestamp }}"
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
 
-      - name: Warn on outage
-        if: steps.probe.outputs.overall == 'outage'
-        run: echo "::warning::lumen-core.ai is reporting an outage — ${{ steps.probe.outputs.healthy }}/6 endpoints healthy"
+      - name: Warn on degraded or outage state
+        if: steps.probe.outputs.overall != 'operational'
+        run: echo "::warning::lumen-core.ai is ${{ steps.probe.outputs.overall }} — static=${{ steps.probe.outputs.static_surface_state }}, gateway=${{ steps.probe.outputs.dynamic_gateway_state }}, ${{ steps.probe.outputs.healthy }}/${{ steps.probe.outputs.total }} endpoint contracts healthy"
