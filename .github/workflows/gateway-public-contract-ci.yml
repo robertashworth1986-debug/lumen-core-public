@@ -1,0 +1,84 @@
+name: Gateway Public Contract Gate
+
+on:
+  pull_request:
+    paths:
+      - 'code/booth_public_contract.py'
+      - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
+      - 'tests/test_booth_public_contract_runtime.py'
+      - '.github/workflows/gateway-public-contract-ci.yml'
+      - '.github/workflows/health-probe.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'code/booth_public_contract.py'
+      - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
+      - 'tests/test_booth_public_contract_runtime.py'
+      - '.github/workflows/gateway-public-contract-ci.yml'
+      - '.github/workflows/health-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Compile gateway dependency closure
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            code/booth_public_contract.py \
+            tests/test_booth_public_contract_runtime.py
+
+      - name: Run public contract tests without third-party dependencies
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import runpy
+
+          tests = []
+          for path in ("tests/test_booth_public_contract_runtime.py",):
+              namespace = runpy.run_path(path)
+              tests.extend(
+                  (f"{path}:{name}", value)
+                  for name, value in namespace.items()
+                  if name.startswith("test_") and callable(value)
+              )
+          if not tests:
+              raise SystemExit("no public-contract tests discovered")
+          for name, test in sorted(tests):
+              test()
+              print(f"PASS {name}")
+          print(f"PASS_COUNT={len(tests)}")
+          PY
+
+      - name: Verify inspect-only and exact-hash controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
+          LUMENCORE_LOCAL_HEALTH_URL=http://127.0.0.1:9/health \
+            bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
+
+          set +e
+          LUMENCORE_EXPECTED_PUBLIC_CONTRACT_SHA256=0000000000000000000000000000000000000000000000000000000000000000 \
+            bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
+          rc=$?
+          set -e
+          if [[ "$rc" -ne 6 ]]; then
+            echo "ERROR: wrong-hash check returned $rc instead of 6" >&2
+            exit 1
+          fi
+          echo "WRONG_HASH_FAIL_CLOSED_OK"
