@@ -16,6 +16,7 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 4. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
 5. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
 6. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
+7. [Machine-readable public reviewer docket](https://lumen-core.ai/reviewer_docket.json)
 
 ## Bounded utility-AI pilot concept
 
@@ -66,6 +67,8 @@ Use these terms when referring to this work:
 - Website: https://lumen-core.ai
 - Proof-to-pilot page: https://lumen-core.ai/proof_to_pilot.html
 - Evidence surface: https://lumen-core.ai/evidence/
+- External-review page: https://lumen-core.ai/external_review.html
+- Machine-readable reviewer docket: https://lumen-core.ai/reviewer_docket.json
 
 ---
 

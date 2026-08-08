@@ -1,0 +1,65 @@
+{
+  "schema": "lumencore.public_reviewer_docket.v1",
+  "updated_utc": "2026-08-08T00:00:00Z",
+  "canonical_repository": "https://github.com/robertashworth1986-debug/lumen-core-public",
+  "public_base_url": "https://lumen-core.ai",
+  "current_decision": "HOLD",
+  "primary_customer_problem": "Technical and funding decisions are delayed or rejected when the source, eligibility rules, baseline, metric, holdout, evidence lineage, limitations, and decision authority are not locked into one inspectable record.",
+  "primary_positioning": "ProofLock is a buyer-controlled opportunity-assurance workflow that converts one funding opportunity into a source-grounded pursue-or-stop decision and a replayable package plan without promising eligibility, award, acceptance, or submission.",
+  "primary_paid_offer": {
+    "name": "ProofLock Opportunity Sprint",
+    "price_usd": 3500,
+    "kickoff_deposit_percent": 50,
+    "target_delivery_business_days": 10,
+    "commercial_state": "offer_defined_no_signed_scope_no_payment",
+    "public_url": "https://lumen-core.ai/opportunity_sprint.html"
+  },
+  "review_instruments": [
+    {
+      "id": "proof_capsule_v3",
+      "title": "Proof Capsule verifier v3",
+      "status": "public_first_party_replay",
+      "purpose": "Strict schema, source identity, exact-file custody, resource limits, and bounded machine receipt.",
+      "source_url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PUBLIC_ASSURANCE_QUICKSTART.md",
+      "claim_boundary": "A passing local replay establishes only the declared first-party software and custody checks."
+    },
+    {
+      "id": "codecheck_eia",
+      "title": "CODECHECK executable-computation target",
+      "status": "external_execution_target_unassigned",
+      "purpose": "Recreate the six declared outputs from one immutable public source commit.",
+      "source_commit": "1c0eb51754beffac6f4df484914e35efc21c253f",
+      "source_url": "https://github.com/robertashworth1986-debug/lumen-core-public/commit/1c0eb51754beffac6f4df484914e35efc21c253f",
+      "claim_boundary": "No codechecker assignment, independent execution receipt, report, or certificate is claimed."
+    },
+    {
+      "id": "agent_arena_v5",
+      "title": "Agent Arena V5 adversarial holdout harness",
+      "status": "synthetic_replay_only",
+      "purpose": "Measure bounded agent proposals under frozen selection, holdout, adversarial, scoring, and custody rules.",
+      "source_url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/AGENT_ARENA.md",
+      "merged_pull_request_url": "https://github.com/robertashworth1986-debug/lumen-core-public/pull/94",
+      "claim_boundary": "The reference run is synthetic software evidence, fails its zero-violation absolute gate, and does not establish Byzantine tolerance, field performance, production safety, savings, or external validation."
+    },
+    {
+      "id": "external_replication_docket",
+      "title": "External replication docket",
+      "status": "template_unassigned",
+      "purpose": "Give a qualified non-author evaluator control of source access, held-out execution, analysis, deviations, and reporting.",
+      "source_url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/external_replication_docket_v1.json",
+      "claim_boundary": "No evaluator, external result, field validation, certification, savings, deployment, or endorsement is claimed."
+    }
+  ],
+  "claim_gates": {
+    "signed_customer_scope": false,
+    "cleared_customer_payment": false,
+    "independent_evaluator_assigned": false,
+    "independent_execution_completed": false,
+    "external_validation": false,
+    "field_validation": false,
+    "customer_savings": false,
+    "certification": false,
+    "agency_or_customer_endorsement": false
+  },
+  "claim_boundary": "This docket is an author-maintained navigation and status record. Repository checks, deterministic replays, hashes, and deployment receipts establish only their declared software, custody, and byte-identity properties. They do not establish scientific validation, field performance, customer value, eligibility, award, certification, endorsement, or commercial acceptance."
+}

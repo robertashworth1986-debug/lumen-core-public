@@ -3,8 +3,9 @@
 ## Purpose
 
 This protocol provides a manual, fail-closed release lane for the bounded public
-review surfaces at `lumen-core.ai`. It complements the existing automatic site
-maintenance workflow; it does not authorize a deployment by itself.
+review surfaces at `lumen-core.ai`. It is the only repository workflow allowed
+to mutate production site files; it does not authorize a deployment by itself.
+The legacy `deploy.yml` path is now a read-only exact-byte audit.
 
 ## Security and custody properties
 
@@ -13,7 +14,7 @@ maintenance workflow; it does not authorize a deployment by itself.
   executed.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
-- Only the 26 files in `RELEASE_PATHS` are packaged.
+- Only the 30 files in `RELEASE_PATHS` are packaged.
 - Package bytes are read from immutable Git blobs, not from mutable worktree
   files.
 - The manifest binds the source commit, Git blob IDs, byte counts, file hashes,
@@ -31,7 +32,7 @@ maintenance workflow; it does not authorize a deployment by itself.
 ## Public release surfaces
 
 The allowlist covers the proof-first homepage, bounded engagement page,
-external-review docket, public status page, bounded evidence page, shared
+external-review page and machine-readable reviewer docket, public status page, bounded evidence page, shared
 styles/command fabric, crawl metadata and public mark, and the ProofLock browser
 verifier with its protocol fixtures.
 

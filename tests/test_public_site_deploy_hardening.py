@@ -19,6 +19,7 @@ PACKAGER_PATH = ROOT / "code" / "deploy" / "package_public_site_release.py"
 APPLY_SCRIPT = ROOT / "code" / "deploy" / "APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh"
 VERIFY_PATH = ROOT / "code" / "ops" / "VERIFY_PUBLIC_SITE_LIVE_RELEASE.py"
 PUBLIC_WORKFLOW = ROOT / ".github" / "workflows" / "deploy-public-site-release.yml"
+LIVE_AUDIT_WORKFLOW = ROOT / ".github" / "workflows" / "deploy.yml"
 
 
 def load_module(path: Path, name: str):
@@ -112,12 +113,13 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 29
-    assert names[:4] == [
+    assert len(names) == len(set(names)) == 30
+    assert names[:5] == [
         "operator_home.html",
         "opportunity_sprint.html",
         "proof_to_pilot.html",
         "external_review.html",
+        "reviewer_docket.json",
     ]
     assert "evidence/index_bounded.html" in names
     assert "mission_control.html" in names
@@ -196,6 +198,28 @@ def test_exact_snapshot_workflow_is_manual_commit_pinned_and_non_destructive():
     assert "rm -rf -- \"$target_root\"" not in apply_script
 
 
+def test_legacy_auto_deploy_is_replaced_by_read_only_exact_live_audit():
+    audit = LIVE_AUDIT_WORKFLOW.read_text(encoding="utf-8")
+    trigger = audit.split("permissions:", maxsplit=1)[0]
+    assert "push:" in trigger
+    assert "schedule:" in trigger
+    assert "permissions:\n  contents: read" in audit
+    assert "package_public_site_release.py" in audit
+    assert "VERIFY_PUBLIC_SITE_LIVE_RELEASE.py" in audit
+    assert "reviewer_docket.json" in audit
+    for forbidden in (
+        "VPS_SSH_PRIVATE_KEY",
+        "VPS_HOST",
+        "ssh ",
+        "scp ",
+        "rsync",
+        "--delete",
+        "sudo ",
+    ):
+        assert forbidden not in audit
+    assert "deploy-public-site-release.yml" in audit
+
+
 def test_live_verifier_maps_canonical_routes_and_assets_to_exact_paths():
     verifier = load_module(VERIFY_PATH, "verify_public_site_live_release")
     commit = "a" * 40
@@ -217,6 +241,10 @@ def test_live_verifier_maps_canonical_routes_and_assets_to_exact_paths():
     )
     assert not verifier.content_type_allowed(
         "manifest.json", "application/octet-stream"
+    )
+    assert verifier.content_type_allowed("reviewer_docket.json", "application/json")
+    assert not verifier.content_type_allowed(
+        "reviewer_docket.json", "application/octet-stream"
     )
     assert verifier.content_type_allowed(
         "site.webmanifest", "application/octet-stream"

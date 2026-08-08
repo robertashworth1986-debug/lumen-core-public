@@ -25,6 +25,7 @@ RELEASE_PATHS: Final = (
     "dashboard/opportunity_sprint.html",
     "dashboard/proof_to_pilot.html",
     "dashboard/external_review.html",
+    "dashboard/reviewer_docket.json",
     "dashboard/mission_control.html",
     "dashboard/evidence/index_bounded.html",
     "dashboard/robots.txt",

@@ -138,12 +138,14 @@ def test_public_pages_present_one_problem_and_explicit_boundaries():
             assert phrase.lower() not in normalized
 
 
-def test_deploy_gate_requires_offer_and_prooflock_to_be_live():
+def test_exact_live_audit_requires_offer_and_prooflock_bytes():
     workflow = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
         encoding="utf-8"
     )
     assert "dashboard/build_week/prooflock_console/**" in workflow
-    assert '[[ "$OFFER" == "200" ]]' in workflow
-    assert '[[ "$PROOFLOCK" == "200" ]]' in workflow
-    assert "bounded-validation-offer-v1" in workflow
-    assert "What ProofLock solves" in workflow
+    assert '"dashboard/opportunity_sprint.html"' in workflow
+    assert '"dashboard/proof_to_pilot.html"' in workflow
+    assert "package_public_site_release.py" in workflow
+    assert "VERIFY_PUBLIC_SITE_LIVE_RELEASE.py" in workflow
+    assert "VPS_SSH_PRIVATE_KEY" not in workflow
+    assert "rsync" not in workflow
