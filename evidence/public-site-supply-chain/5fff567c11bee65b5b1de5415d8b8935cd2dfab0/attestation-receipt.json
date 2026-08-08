@@ -1,0 +1,87 @@
+{
+  "attestations": [
+    {
+      "independent_verification_sha256": "e2ec2d55ff683ec6b00e97d556bc7566dfd577d54eb58287fcb196d3280a23fe",
+      "name": "build_provenance",
+      "predicate_type": "https://slsa.dev/provenance/v1",
+      "sigstore_bundle_sha256": "9ed7cffc70e2878920647f51d280676516aa742d2c9eb5cc07c58e2d844a3f69",
+      "verification_state": "VERIFIED",
+      "verified_timestamp_count": 1,
+      "workflow_verification_sha256": "80bdeb6caff833c4074fad016b515320688a4b82a9147daa5996ae5235e299fd"
+    },
+    {
+      "independent_verification_sha256": "647250b6b94382b813a542987571b09af3145ef3a247b63b059d89c02b412aa8",
+      "name": "cyclonedx_sbom",
+      "predicate_type": "https://cyclonedx.org/bom",
+      "sigstore_bundle_sha256": "461de8b8ecaf4fbd5b94ca79e84fdcaf43329e5345b2600b4f2828c8f6faed8f",
+      "verification_state": "VERIFIED",
+      "verified_timestamp_count": 1,
+      "workflow_verification_sha256": "6d1e8cded80ad579cf101a45d63f9300a0956a62c494016d0177cd94d8f5698d"
+    }
+  ],
+  "claim_boundaries": [
+    "This first-party receipt records successful cryptographic verification of two GitHub/Sigstore attestations; it is not itself a signature or independent technical validation.",
+    "The attestations bind the named archive to the named GitHub workflow and source commit; they do not establish a SLSA level, whole-product provenance, vulnerability status, certification, or security assurance.",
+    "The signed archive has not been proven deployed. The live domain remains on HOLD until a separately authorized exact-snapshot deployment passes the 30-file live-byte audit."
+  ],
+  "generated_utc": "2026-08-08T13:19:03.735783Z",
+  "live_domain_audit": {
+    "checked_utc": "2026-08-08T13:19:03.735783Z",
+    "error_count": 2,
+    "expected_file_count": 30,
+    "incident_receipt_sha256": "47abc451f2037739953fd7b34d68bffa4e2aab84732e7c969498e087059055b9",
+    "incident_state": "ACTIVE_PUBLIC_RELEASE_INTEGRITY_INCIDENT",
+    "matched_file_count": 16,
+    "mismatch_count": 12,
+    "production_decision": "HOLD_PUBLIC_RELEASE_PROMOTION",
+    "release_verified": false,
+    "severity": "SEV-2"
+  },
+  "private_custody": {
+    "bundle_storage": "FOUNDER_CONTROLLED_E_DRIVE_VAULT",
+    "preserved_sha256_manifest_sha256": "8cdc29f577c233d47f0b6e2a797f972dc4a48b5ca3a60c167961a23c67751f44",
+    "repository_contains_private_bundle_bytes": false
+  },
+  "production_decision": "HOLD_UNTIL_EXPLICIT_DEPLOYMENT_AND_EXACT_LIVE_VERIFICATION",
+  "public_verification": {
+    "cli": "gh attestation verify",
+    "oidc_issuer_bound": true,
+    "online_lookup_verified": true,
+    "repository_bound": true,
+    "self_hosted_runners_denied": true,
+    "signer_workflow_bound": true,
+    "source_commit_bound": true,
+    "source_ref_bound": true
+  },
+  "receipt_sha256": "06fbff15295cc4ea3094b91a7babf5b05a6c4bd1898346a765b51733b8831220",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "schema": "lumencore.public_site_signed_attestation_receipt.v1",
+  "signer_identity": {
+    "certificate_issuer": "CN=sigstore-intermediate,O=sigstore.dev",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "runner_environment": "github-hosted",
+    "source_repository_ref": "refs/heads/main",
+    "subject_alternative_name": "https://github.com/robertashworth1986-debug/lumen-core-public/.github/workflows/public-site-supply-chain.yml@refs/heads/main",
+    "workflow_trigger": "push"
+  },
+  "source_commit": "5fff567c11bee65b5b1de5415d8b8935cd2dfab0",
+  "subject": {
+    "bytes": 1802240,
+    "cyclonedx_component_count": 30,
+    "cyclonedx_spec_version": "1.6",
+    "name": "public-site-release.tar",
+    "release_file_count": 30,
+    "sha256": "b771bf57367cec2f17db56a512b25eca1313539e4a2f8300adf045887449db7f"
+  },
+  "workflow_run": {
+    "attempt": 1,
+    "completed_utc": "2026-08-08T13:17:39Z",
+    "conclusion": "success",
+    "created_utc": "2026-08-08T13:16:56Z",
+    "event": "push",
+    "id": 31259179162,
+    "url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31259179162",
+    "workflow_name": "Public site supply-chain assurance",
+    "workflow_path": ".github/workflows/public-site-supply-chain.yml"
+  }
+}

@@ -29,6 +29,10 @@ The repository does **not** currently establish independent scientific validatio
 - Deterministic exact-release SBOM builder: [`code/deploy/build_public_site_supply_chain.py`](code/deploy/build_public_site_supply_chain.py)
 - Exact-release supply-chain verifier: [`code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py`](code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py)
 - Main-only signed-attestation workflow: [`.github/workflows/public-site-supply-chain.yml`](.github/workflows/public-site-supply-chain.yml)
+- Retained signed-attestation receipt: [`docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md`](docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)
+- Machine signed-attestation receipt: [`evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json`](evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json)
+- Signed-attestation receipt verifier: [`code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py`](code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py)
+- Signed-attestation receipt CI: [`.github/workflows/public-site-signed-attestation-receipt.yml`](.github/workflows/public-site-signed-attestation-receipt.yml)
 - Machine-sealed offer packet: [`config/strategic_transaction_packet_v2.json`](config/strategic_transaction_packet_v2.json)
 - Governed portfolio audit: [`docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md`](docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
 - Machine-readable portfolio receipt: [`dashboard/data/lumencore_engine_portfolio_audit.json`](dashboard/data/lumencore_engine_portfolio_audit.json)
@@ -50,7 +54,11 @@ deterministic CycloneDX 1.6 document. Pull-request artifacts remain unsigned;
 the separate `main` job is authorized to create GitHub OIDC/Sigstore build and
 SBOM attestations and verify them against the repository, workflow, ref, source
 digest, and GitHub-hosted runner. This is not a complete product or VPS SBOM,
-a SLSA level, or proof that the live domain matches the archive.
+a SLSA level, or proof that the live domain matches the archive. The first
+retained successful attestation set is bound to merge commit
+`5fff567c11bee65b5b1de5415d8b8935cd2dfab0`; its public receipt records the
+successful provenance and SBOM verification while preserving the live-domain
+`HOLD` after a 16-match, 12-mismatch, 2-error exact-path audit.
 
 ## Evidence-state legend
 

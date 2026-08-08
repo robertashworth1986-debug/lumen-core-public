@@ -174,12 +174,16 @@
         "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
         "code/deploy/build_public_site_supply_chain.py",
         "code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py",
+        "code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py",
         "docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md",
-        ".github/workflows/public-site-supply-chain.yml"
+        "docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md",
+        ".github/workflows/public-site-supply-chain.yml",
+        ".github/workflows/public-site-signed-attestation-receipt.yml",
+        "evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json"
       ],
-      "evidence_establishes": "The named reviewer computation has hash-locked Python dependencies and a scoped CycloneDX inventory; the exact 30-file public release has a deterministic CycloneDX 1.6 inventory with one component per allowlisted file and a main-only signed-SBOM workflow.",
-      "evidence_does_not_establish": "A complete product, VPS operating-system, gateway, container, private-stack, or organization-wide SBOM, continuous vulnerability monitoring, dependency approval, or a successful signed attestation until the main workflow completes.",
-      "next_gate": "Complete and retain a successful main-branch signed SBOM attestation, then inventory deployment runtime layers and add vulnerability triage and exception handling."
+      "evidence_establishes": "The named reviewer computation has hash-locked Python dependencies and a scoped CycloneDX inventory; the exact 30-file public release has a deterministic CycloneDX 1.6 inventory with one component per allowlisted file and one retained, successfully verified main-branch signed-SBOM set for commit 5fff567c11bee65b5b1de5415d8b8935cd2dfab0.",
+      "evidence_does_not_establish": "A complete product, VPS operating-system, gateway, container, private-stack, or organization-wide SBOM, continuous vulnerability monitoring, dependency approval, vulnerability status, or production deployment.",
+      "next_gate": "Inventory deployment runtime layers, add vulnerability triage and exception handling, and periodically re-verify the retained bundles and trusted roots."
     },
     {
       "id": "AC-06",
@@ -194,13 +198,17 @@
         ".github/workflows/public-site-exact-snapshot-ci.yml",
         ".github/workflows/deploy-public-site-release.yml",
         "docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md",
+        "docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md",
         ".github/workflows/public-site-supply-chain.yml",
+        ".github/workflows/public-site-signed-attestation-receipt.yml",
         "code/deploy/build_public_site_supply_chain.py",
-        "code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py"
+        "code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py",
+        "code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py",
+        "evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json"
       ],
-      "evidence_establishes": "The public-site release protocol binds files to Git object identity and SHA-256 digests; a separate main-only GitHub-hosted workflow creates and immediately verifies Sigstore-signed build provenance and an SBOM attestation for the exact release archive.",
-      "evidence_does_not_establish": "SLSA Build L1 or higher, signed provenance for any commit whose main workflow has not succeeded, whole-product provenance, hardened or isolated builds, or a currently matching live deployment.",
-      "next_gate": "Retain and independently re-verify a successful main-branch attestation bundle, assess the hosted build against an explicit SLSA level, and deploy only through the exact human release gate."
+      "evidence_establishes": "The public-site release protocol binds files to Git object identity and SHA-256 digests; one retained main-branch GitHub-hosted run binds the exact release archive to Sigstore-signed build provenance and an SBOM attestation, with repository, workflow, ref, source digest, OIDC issuer, and runner constraints verified.",
+      "evidence_does_not_establish": "SLSA Build L1 or higher, signed provenance for any other commit, whole-product or deployment-runtime provenance, hardened or isolated builds, vulnerability status, or a currently matching live deployment.",
+      "next_gate": "Assess the hosted build against an explicit SLSA level, extend provenance to deployment runtime layers, periodically re-verify trusted roots, and deploy only through the exact human release gate."
     },
     {
       "id": "AC-07",

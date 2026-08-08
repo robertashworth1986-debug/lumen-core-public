@@ -26,8 +26,9 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 14. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
 15. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
 16. [Public-site supply-chain assurance](PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)
-17. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
-18. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
+17. [Retained signed-attestation receipt](PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)
+18. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
+19. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
 
 The repository docket is the reviewable state bound to the checked-out commit.
 The live docket is a convenience projection and may lag the default branch or
@@ -64,7 +65,11 @@ The exact public release has a deterministic 30-file CycloneDX 1.6 inventory
 and a separate `main`-only GitHub OIDC/Sigstore signing lane. Reviewers should
 verify the downloaded archive against the repository, workflow, ref, source
 digest, and predicate type. This does not establish a complete product or VPS
-SBOM, a SLSA level, or live-domain parity.
+SBOM, a SLSA level, or live-domain parity. The retained receipt for commit
+`5fff567c11bee65b5b1de5415d8b8935cd2dfab0` records a successful GitHub-hosted
+provenance and SBOM attestation set. Its local verifier reconstructs the exact
+archive from Git; remote signature verification remains a separate constrained
+`gh attestation verify` step. The post-run live audit remains `HOLD`.
 
 The documented incident control classifies public-release drift and preserves
 containment and recovery gates. Its CI tabletop is not a completed live

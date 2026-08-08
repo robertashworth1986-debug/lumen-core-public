@@ -33,7 +33,7 @@ deliverable.
 | Source and reproducibility | Implemented first-party | Public capsule verifier, pinned reviewer runtime, dependency lock, replay instructions | Protocol-matched non-author execution receipt |
 | Evidence custody and claim governance | Implemented first-party | Proof Capsule v3, claim-boundary register, fail-closed verifier | Buyer-owned source/baseline/metric binding |
 | Security reporting | Documented control | Private advisory route, supported-version boundary, best-effort response process | Buyer-specific severity, notice, and remediation terms |
-| Repository supply chain | Partial/scoped implementation | Pinned workflow actions, hash-locked reviewer dependencies, scoped reviewer inventory, deterministic CycloneDX 1.6 coverage for the exact 30-file public release, and a main-only signed-attestation lane | Complete VPS/runtime inventory, vulnerability process, retained successful attestation verification, and any separately assessed SLSA level |
+| Repository supply chain | Partial/scoped implementation | Pinned workflow actions, hash-locked reviewer dependencies, deterministic CycloneDX 1.6 coverage for the exact 30-file public release, and one retained successful GitHub OIDC/Sigstore provenance and SBOM attestation set for commit `5fff567c` | Complete VPS/runtime inventory, vulnerability process, periodic trusted-root re-verification, and any separately assessed SLSA level |
 | Public deployment | Prepared, not executed for this commit | Exact-snapshot build, deploy, and live-audit protocol | Successful current-commit live audit receipt |
 | Data rights and handling | Buyer-specific gate | Intake, SOW, and handling schedule templates | Executed rights, classification, retention, access, and legal terms |
 | Identity, access, and runtime | Prepared, not executed | Default-deny operator boundary and separately gated repair path | Authorized live repair and retained negative-access evidence |
@@ -85,6 +85,13 @@ establish safety, legal sufficiency, production fitness, performance, or value.
 The reviewer-suite inventory and exact-public-release CycloneDX inventory cover
 their declared scopes. Neither is described as a complete product, VPS,
 gateway, container, or organization-wide SBOM.
+
+The retained signed-attestation receipt proves only that the exact named
+archive was bound to the named GitHub-hosted workflow, source commit, and two
+verified predicate types. It is not itself a signature and does not establish
+a SLSA level, vulnerability status, complete-product provenance, or live
+deployment. The corresponding live audit remains a `SEV-2` integrity incident
+with production promotion on `HOLD`.
 
 ## Recommended first engagement boundary
 

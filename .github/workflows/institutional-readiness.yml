@@ -15,10 +15,13 @@ on:
       - 'code/operator_api_access.py'
       - 'code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py'
       - 'code/ops/VERIFY_INSTITUTIONAL_READINESS.py'
+      - 'code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py'
       - 'config/institutional_readiness_register_v1.json'
       - 'docs/**'
       - 'evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json'
       - 'tests/test_institutional_readiness.py'
+      - 'tests/test_public_site_signed_attestation_receipt.py'
+      - 'evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json'
   push:
     branches: [main]
     paths:
@@ -33,10 +36,13 @@ on:
       - 'code/operator_api_access.py'
       - 'code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py'
       - 'code/ops/VERIFY_INSTITUTIONAL_READINESS.py'
+      - 'code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py'
       - 'config/institutional_readiness_register_v1.json'
       - 'docs/**'
       - 'evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json'
       - 'tests/test_institutional_readiness.py'
+      - 'tests/test_public_site_signed_attestation_receipt.py'
+      - 'evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json'
 
 permissions:
   contents: read
