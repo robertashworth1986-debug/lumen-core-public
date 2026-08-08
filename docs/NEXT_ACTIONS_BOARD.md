@@ -6,7 +6,7 @@
 |---|---|---|
 | 1 | Public claim cleanup | Keep README, PRs, and proof docs aligned with founder-owned proof-to-pilot language |
 | 2 | EVTit / Black Dog | Use founder-protected call agenda; ask for review/routing/scoped support, not ownership transfer |
-| 3 | Current proof status | Freeze and promote the newer 29-enabled / 25-measured live-source manifest before using it as headline proof |
+| 3 | Current proof status | Export a current definition-bound source manifest with probe time, row depth, freshness, rights/relevance, and hashes; use no numeric breadth headline before that gate passes |
 | 4 | LumaJet | Promote synthetic baseline evidence only as simulation/synthetic proof; no aircraft or autonomous-control claim |
 | 5 | LumaSuit / LumaSkin | Promote non-actuating smart-skin/digital-twin Phase I evidence; no powered armor, medical, flight, or certified-safety claim |
 | 6 | DICE | Build full submission packet around abstract ID HR001126S0010-DICE-PA-052 with bounded simulation/replay language |

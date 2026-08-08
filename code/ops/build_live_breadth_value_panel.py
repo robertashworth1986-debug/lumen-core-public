@@ -640,9 +640,9 @@ def build_metric_readiness(
         status = "limited_live_safety_mode"
 
     explanation = (
-        "PnL and risk-adjusted metrics are intentionally flagged as provisional while capital and safety "
-        "guardrails constrain notional and live sample depth. Signal quality is validated through breadth "
-        "coverage, routing edge, and cross-sector preserved-value evidence."
+        "PnL and risk-adjusted metrics are provisional because the observed sample does not meet the "
+        "predeclared stability gate. Breadth coverage, routing scores, and cross-sector estimates are "
+        "first-party diagnostics; they do not validate alpha, savings, or field performance."
     )
     if closed_live_trades < metrics_stable_threshold:
         explanation += (
@@ -686,10 +686,10 @@ def build_metric_readiness(
             "portfolio_est_usd": controller_portfolio_est,
         },
         "thursday_plan": [
-            "fund incremental capital allocation to exit micro-notional constraint",
-            "switch runtime from guarded safety mode to funded live window under risk limits",
-            "capture expanded closed-trade sample and publish Sharpe, MDD, CAGR, Sortino with confidence bands",
-            "update investor command room and mission control with refreshed risk-adjusted metrics",
+            "keep execution in paper/replay mode and preserve the current safety gates",
+            "freeze the source registry, dataset window, baseline, metrics, costs, and failure rules",
+            "obtain non-author execution or buyer-owned data before promoting performance claims",
+            "publish risk-adjusted metrics only after the sample and independence gates pass",
         ],
         "evidence_refs": {
             "runtime_control_json": str(runtime_control_path),
@@ -741,13 +741,14 @@ def build_investor_metric_readiness_payload(
             "status": str(readiness.get("status") or "unknown"),
             "provisional_label": str(readiness.get("provisional_label") or "unknown"),
             "investor_position": (
-                "Current PnL, Sharpe, CAGR, Sortino, and MDD remain provisional while intentional capital and risk "
-                "guardrails constrain live notional and sample depth. This reflects staged deployment discipline and "
-                "funding-readiness sequencing, not signal failure."
+                "Current PnL, Sharpe, CAGR, Sortino, and MDD are not decision-grade. Source breadth and routing "
+                "scores are first-party diagnostics only; they do not establish alpha, savings, or a reason to "
+                "increase capital."
             ),
             "signal_evidence": {
-                "annual_value_usd": round(to_float(headline.get("total_estimated_annual_value_usd"), 0.0), 2),
-                "translated_annual_value_usd": round(to_float(headline.get("translated_source_annual_value_usd"), 0.0), 2),
+                "evidence_class": "first_party_diagnostic_not_performance_validation",
+                "economic_estimates_included": False,
+                "performance_validated": False,
                 "measured_sources": to_int(headline.get("measured_sources"), 0),
                 "enabled_sources": to_int(headline.get("enabled_sources"), 0),
                 "measured_coverage_pct": round(to_float(headline.get("measured_coverage_pct"), 0.0), 2),
@@ -755,7 +756,6 @@ def build_investor_metric_readiness_payload(
                 "harmonic_win_rate_pct": round(to_float(headline.get("harmonic_win_rate_pct"), 0.0), 2),
                 "kalisha_prediction_score": round(to_float(headline.get("kalisha_prediction_score"), 0.0), 2),
                 "top_sector": str(headline.get("top_sector") or "n/a"),
-                "top_sector_hourly_value_usd": round(to_float(headline.get("top_sector_hourly_value_usd"), 0.0), 2),
             },
             "capital_and_risk_gate_evidence": {
                 "runtime_mode": str(runtime_gates.get("runtime_mode") or ""),
@@ -837,10 +837,11 @@ def render_investor_metric_readiness_markdown(payload: dict[str, Any]) -> str:
     lines.append("")
     lines.append(str(summary.get("investor_position") or ""))
     lines.append("")
-    lines.append("Signal evidence remains strong:")
+    lines.append("First-party diagnostic coverage:")
     lines.append("")
-    lines.append(f"- Estimated annual preserved value: {signal.get('annual_value_usd', 0)} USD")
-    lines.append(f"- Translated measured annual value: {signal.get('translated_annual_value_usd', 0)} USD")
+    lines.append(f"- Evidence class: {signal.get('evidence_class', '')}")
+    lines.append(f"- Economic estimates included: {signal.get('economic_estimates_included', False)}")
+    lines.append(f"- Performance validated: {signal.get('performance_validated', False)}")
     lines.append(f"- Measured coverage: {signal.get('measured_sources', 0)} of {signal.get('enabled_sources', 0)} enabled sources ({signal.get('measured_coverage_pct', 0)}%)")
     lines.append(f"- Router edge: {signal.get('router_edge_pct', 0)}%")
     lines.append(f"- Harmonic win rate: {signal.get('harmonic_win_rate_pct', 0)}%")
@@ -875,12 +876,12 @@ def render_investor_metric_readiness_markdown(payload: dict[str, Any]) -> str:
     lines.append("Interpretation:")
     lines.append(str(summary.get("explanation") or ""))
     lines.append("")
-    lines.append("## Thursday Readiness Plan")
+    lines.append("## Evidence Readiness Plan")
     lines.append("")
     for idx, item in enumerate(thursday_plan, start=1):
         lines.append(f"{idx}. {item}")
     lines.append("")
-    lines.append("First Thursday action:")
+    lines.append("First bounded action:")
     lines.append("")
     lines.append(f"- {summary.get('first_thursday_action', '')}")
     lines.append("")
@@ -901,9 +902,8 @@ def render_investor_metric_readiness_markdown(payload: dict[str, Any]) -> str:
     lines.append("## Investor Talk Track (Short)")
     lines.append("")
     lines.append(
-        '"The signal engine is already proving breadth, routing edge, and cross-sector preserved value. '
-        'The missing mature Sharpe/CAGR/Sortino profile is a temporary capital-and-risk-gating artifact, '
-        'not an alpha discovery failure. Thursday is the transition window from guarded proof mode to funded metric maturation."'
+        '"The system currently provides source-coverage and routing diagnostics. Performance, savings, and alpha '
+        'remain unvalidated until a frozen protocol passes adequate-sample and non-author execution gates."'
     )
     lines.append("")
     return "\n".join(lines)
@@ -1015,13 +1015,16 @@ def build_panel(
         "performance_metrics_status": str(metric_readiness.get("status") or "unknown"),
         "performance_metrics_explanation": str(metric_readiness.get("explanation") or ""),
         "first_thursday_action": first_thursday_action,
+        "economic_estimates_public_claim_allowed": False,
+        "trading_performance_validated": False,
+        "external_validation_status": "not_performed",
     }
 
     patent_bridge = {
         "attribution_model": "substrate_to_value_chain",
         "thesis": (
-            "Original harmonic flowform substrate drives the capture of high-value opportunities by linking "
-            "live breadth sensing, adaptive routing, execution discipline, and proof-backed measurement."
+            "The proposed harmonic flowform substrate links source sensing, routing, execution controls, and "
+            "evidence capture as a testable architecture hypothesis."
         ),
         "stages": [
             {
@@ -1049,10 +1052,7 @@ def build_panel(
                 "mechanism": "trader/execution lane preservation",
                 "headline_metric": {
                     "market_lane_sector": str(market_lane.get("sector") or "market_execution"),
-                    "market_lane_hourly_value_usd": round(
-                        to_float(market_lane.get("total_estimated_hourly_value_usd"), 0.0),
-                        2,
-                    ),
+                    "market_lane_source_count": to_int(market_lane.get("source_count"), 0),
                     "cross_sector_prevented_pct": headline["cross_sector_recommended_prevented_pct"],
                 },
                 "evidence_ref": rel_path(frozen_deltas_path, workspace_root),
@@ -1061,16 +1061,16 @@ def build_panel(
                 "stage": "prove",
                 "mechanism": "frozen delta and optimization proof chain",
                 "headline_metric": {
-                    "total_estimated_annual_value_usd": headline["total_estimated_annual_value_usd"],
+                    "economic_estimates_public_claim_allowed": False,
                     "top_sector": headline["top_sector"],
-                    "top_sector_hourly_value_usd": headline["top_sector_hourly_value_usd"],
+                    "external_validation_status": "not_performed",
                 },
                 "evidence_ref": rel_path(optimization_report_path, workspace_root),
             },
         ],
         "investor_message": (
-            "The substrate explains why the system can repeatedly discover and preserve large cross-sector value, "
-            "not as a one-off signal but as a repeatable loop."
+            "The substrate is a testable architecture hypothesis. Economic or performance claims require a "
+            "frozen protocol, accepted baseline, and non-author or buyer-owned validation."
         ),
         "legal_note": (
             "Investor attribution framing only. Final claim-family assignment and new-matter classification require patent counsel."
@@ -1095,6 +1095,13 @@ def build_panel(
             "frozen_deltas_records_latest": len(frozen_latest),
             "reference_rows": len(reference_rows),
             "registry_generated_utc": str(registry_summary.get("generated_utc") or ""),
+        },
+        "claim_gate": {
+            "public_economic_value_claim_allowed": False,
+            "trading_performance_validated": False,
+            "field_performance_validated": False,
+            "external_validation_status": "not_performed",
+            "live_capital_increase_recommended": False,
         },
         "headline": headline,
         "lanes": {

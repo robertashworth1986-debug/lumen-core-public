@@ -8,7 +8,7 @@
 
 | Priority | Item | Status | Next gate |
 |---|---|---|---|
-| 1 | Current live-breadth manifest | internal target state | freeze public-safe 29-enabled / 25-measured manifest with hashes |
+| 1 | Current live-breadth manifest | no current public-safe manifest | export a timestamped source registry with per-source probe state, row depth, freshness, rights/relevance fields, and hashes |
 | 2 | LumaJet synthetic baseline capsule | internal evidence lane | create Proof Capsule for `LUMAJET_BASELINE_DONE` run |
 | 3 | LumaSuit / LumaSkin Phase I capsule | concept/packet exists | create non-actuating smart-skin simulation capsule |
 | 4 | LumaTrader measured-data proof capsule | dashboard/runtime evidence exists | promote only measured-data and runtime-control claims, not profit claims |
@@ -25,19 +25,27 @@ Older public snapshot:
 - 17 enabled sources,
 - 12 measured sources.
 
-Current internal target:
+Latest local observation, not public proof:
 
-- approximately 29 enabled live sources,
-- approximately 25 measured providers/sources.
+- an August 6 mutable local registry reported 17 configured/enabled sources,
+- 14 were marked measured by first-party probe logic,
+- the older approximately 29-enabled / 25-measured target was never frozen into a reviewable manifest and is retired as a current-state claim.
+
+These local flags do not establish current availability, useful row depth,
+freshness, relevance to a named decision, dataset fitness, data rights, or
+independent validation. They must not be used as a public headline.
 
 Required before public headline:
 
 - [ ] source registry exported,
-- [ ] measured vs estimated field present,
+- [ ] probe success separated from dataset fitness and decision relevance,
+- [ ] source rights and permitted use recorded,
+- [ ] per-source probe timestamp and freshness threshold recorded,
 - [ ] row counts included,
 - [ ] context-only rows separated,
 - [ ] hashes generated,
 - [ ] stale 17/12 language marked historical,
+- [ ] unfrozen 29/25 target language retired,
 - [ ] no dollar figure promoted as revenue or realized savings.
 
 ---

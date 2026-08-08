@@ -29,12 +29,18 @@ Older public live-breadth materials showed **17 enabled sources / 12 measured so
 
 That snapshot should now be treated as **historical / superseded** and should not be used as the current headline.
 
-Current internal target state is approximately:
+The later internal target of approximately 29 enabled / 25 measured sources was
+not frozen into a reviewable manifest and is not current proof. The latest
+locally observed mutable registry on August 6 instead reported:
 
-- **29 enabled live sources**,
-- **25 measured providers/sources**.
+- **17 configured/enabled sources**,
+- **14 sources marked measured by first-party probe logic**.
 
-This newer state must be promoted only after a current public-safe manifest is frozen, hash-recorded, and linked.
+Neither count is a public performance claim. Probe success does not establish
+freshness, material row depth, decision relevance, data rights, dataset fitness,
+or independent validation. No newer state should be promoted until a current
+public-safe registry is exported, definition-bound, freshness-checked,
+hash-recorded, and linked.
 
 ---
 

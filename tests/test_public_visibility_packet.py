@@ -36,6 +36,8 @@ def test_visibility_packet_is_public_safe_and_source_backed():
     assert "12 measured sources" in provenance_claims[0]["evidence"]
     assert "context-only" in provenance_claims[0]["evidence"]
     assert "Truth-chain interpretation" in provenance_claims[0]["evidence"]
+    assert "Economic estimates are omitted" in provenance_claims[0]["evidence"]
+    assert "$" not in provenance_claims[0]["evidence"]
     assert "does not prove actual customer savings" in provenance_claims[0]["boundary"]
     injection_claims = [
         item for item in payload["proof_claims"] if "controlled-injection benchmark" in item["claim"]

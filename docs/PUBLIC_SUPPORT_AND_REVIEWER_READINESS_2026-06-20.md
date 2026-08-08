@@ -1,6 +1,6 @@
 # Public Support And Reviewer Readiness
 
-Generated UTC: 2026-06-21T07:50:23.915729+00:00
+Generated UTC: 2026-08-08T09:54:11.394712+00:00
 
 ## Boundary
 
@@ -27,7 +27,7 @@ This is a public coordination packet for reviewers and support organizations. It
 ## Strong Public Evidence
 
 - DICE local package hygiene is tracked, and a public-safe live-breadth replay capsule summarizes 6 live-source files and 14 deterministic replay windows without publishing private portal materials.
-- Live-breadth frozen-delta evidence is provenance-gated: 12/17 live sources are measured, 11 rows are promoted, 8 rows remain context-only, and the truth-chain promoted annual value signal is $73,890,600.
+- The historical live-breadth snapshot is provenance-gated: 12/17 live sources are measured, 11 rows are promoted, and 8 rows remain context-only. Economic estimates are omitted; the snapshot is not current-runtime or performance proof.
 - HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.
 - HarborSentinel controlled-injection benchmark is available as bounded detector-vs-baseline evidence with posture PUBLIC_AIS_INJECTION_BENCHMARK_READY.
 - HarborSentinel public AIS review-burden profile estimates natural validation queue load without claiming precision or false-positive rates.

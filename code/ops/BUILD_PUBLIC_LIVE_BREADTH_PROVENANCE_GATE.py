@@ -23,20 +23,14 @@ PUBLIC_SAFE_METRICS = {
     "promoted_live_measured_source_rows": 11,
     "context_only_source_rows": 8,
     "reference_fallback_used": False,
-    "promoted_live_measured_hourly_value_signal_usd": 8435.0,
-    "promoted_live_measured_annual_value_signal_usd": 73890600.0,
-    "context_only_annual_surface_usd": 52257442740.0,
     "top_live_measured_sector": "power_grid",
-    "top_live_measured_sector_hourly_value_usd": 5562.5,
-    "truth_chain_promoted_annual_value_signal_usd": 73890600.0,
 }
 
 BOUNDARY = (
-    "This public-safe capsule does not prove actual customer savings, revenue, "
-    "trading profit, grant merit, agency acceptance, valuation, field performance, "
-    "operational deployment readiness, or portal readiness. Dollar figures are "
-    "value-signal estimates from a provenance-gated measurement layer, not "
-    "realized savings, not revenue, not an investment claim, and not a guarantee."
+    "This historical source-classification snapshot does not prove current feed "
+    "availability or freshness, customer savings, revenue, trading profit, grant "
+    "merit, agency acceptance, valuation, field performance, operational deployment "
+    "readiness, or portal readiness. Economic estimates are intentionally omitted."
 )
 
 
@@ -44,28 +38,47 @@ def now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def money(value: Any, digits: int = 0) -> str:
-    try:
-        return f"${float(value):,.{digits}f}"
-    except Exception:
-        return "$0"
-
-
 def build_payload() -> dict[str, Any]:
     metrics = dict(PUBLIC_SAFE_METRICS)
     return {
         "generated_utc": now_utc(),
-        "schema": "public_live_breadth_provenance_gate_v1",
+        "schema": "public_live_breadth_provenance_gate_v2",
+        "snapshot": {
+            "observed_utc": "2026-06-21T07:50:23.657357+00:00",
+            "status": "historical_not_current_runtime_evidence",
+            "source_registry_included": False,
+            "manifest_bound": False,
+        },
         "purpose": (
             "Document the public-safe evidence-boundary upgrade for LumenCore "
             "live-breadth and frozen-delta reporting."
         ),
         "public_safe_metrics": metrics,
+        "metric_definitions": {
+            "enabled_live_sources": (
+                "Sources configured as enabled in the historical first-party artifact; "
+                "not proof that each source was healthy, fresh, or usable."
+            ),
+            "measured_live_sources": (
+                "Sources marked measured by the historical first-party probe logic; "
+                "not proof of dataset fitness, material row depth, independent validation, or current availability."
+            ),
+            "measured_coverage_pct": (
+                "Historical measured-source flag count divided by enabled-source flag count."
+            ),
+            "promoted_live_measured_source_rows": (
+                "Rows historically classified for the measured bucket; no longer promoted as economic or performance evidence."
+            ),
+            "context_only_source_rows": "Rows retained only as historical research context.",
+        },
         "evidence_buckets": [
             {
                 "bucket": "live_measured_delta_rows",
-                "public_use": "Promoted live-breadth evidence.",
-                "boundary": "Still not proof of customer savings, grant merit, field performance, or trading profit.",
+                "public_use": "Historical first-party source-classification evidence only.",
+                "boundary": (
+                    "A successful or measured flag does not establish freshness, row depth, relevance, "
+                    "data rights, dataset fitness, customer savings, field performance, or trading profit."
+                ),
             },
             {
                 "bucket": "unmeasured_frozen_delta_rows",
@@ -79,12 +92,10 @@ def build_payload() -> dict[str, Any]:
             },
         ],
         "truth_chain_interpretation": {
-            "promoted_annual_value_signal_usd": metrics["truth_chain_promoted_annual_value_signal_usd"],
-            "context_only_annual_surface_usd": metrics["context_only_annual_surface_usd"],
+            "economic_estimates_included": False,
             "interpretation": (
-                "The public annual value signal should be read as the promoted live-measured "
-                "measurement surface only. The larger context-only surface is retained for "
-                "research prioritization and must not be described as live proof."
+                "This artifact reports historical source coverage and provenance buckets only. "
+                "It does not convert source breadth into economic, performance, or current-runtime claims."
             ),
         },
         "grant_packet_use": {
@@ -98,9 +109,9 @@ def build_payload() -> dict[str, Any]:
             ),
         },
         "reviewer_use": (
-            "Use this capsule as public evidence-quality control showing that LumenCore separates "
-            "live-measured evidence from context-only evidence before using frozen deltas in public "
-            "or grant-facing materials."
+            "Use this capsule as historical claim-quality control showing how LumenCore separated "
+            "first-party source flags from context-only rows. Do not use it as current live-breadth, "
+            "dataset-fitness, performance, or economic evidence."
         ),
         "boundary": BOUNDARY,
         "claim_gate": {
@@ -109,6 +120,10 @@ def build_payload() -> dict[str, Any]:
             "grant_merit_proven": False,
             "field_performance_proven": False,
             "trading_profit_proven": False,
+            "current_runtime_state_proven": False,
+            "economic_value_claim_allowed": False,
+            "performance_claim_allowed": False,
+            "probe_success_is_dataset_fitness": False,
             "context_only_promoted_as_live_proof": False,
         },
     }
@@ -123,6 +138,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "# Live-Breadth Provenance Gate Capsule",
         "",
         f"Generated UTC: {payload['generated_utc']}",
+        f"Snapshot observed UTC: {payload['snapshot']['observed_utc']}",
+        f"Snapshot status: `{payload['snapshot']['status']}`",
         "",
         "## Purpose",
         "",
@@ -145,11 +162,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"| Promoted live-measured source rows | {metrics['promoted_live_measured_source_rows']} |",
         f"| Context-only source rows | {metrics['context_only_source_rows']} |",
         f"| Reference fallback used | {str(metrics['reference_fallback_used']).lower()} |",
-        f"| Promoted live-measured hourly value signal | {money(metrics['promoted_live_measured_hourly_value_signal_usd'])} |",
-        f"| Promoted live-measured annual value signal | {money(metrics['promoted_live_measured_annual_value_signal_usd'])} |",
-        f"| Context-only annual surface | {money(metrics['context_only_annual_surface_usd'])} |",
         f"| Top live-measured sector | {metrics['top_live_measured_sector']} |",
-        f"| Top live-measured sector hourly value signal | {money(metrics['top_live_measured_sector_hourly_value_usd'])} |",
+        "",
+        "## Metric Definitions",
+        "",
+        f"- Enabled live sources: {payload['metric_definitions']['enabled_live_sources']}",
+        f"- Measured live sources: {payload['metric_definitions']['measured_live_sources']}",
+        f"- Measured coverage: {payload['metric_definitions']['measured_coverage_pct']}",
+        f"- Promoted rows: {payload['metric_definitions']['promoted_live_measured_source_rows']}",
+        f"- Context-only rows: {payload['metric_definitions']['context_only_source_rows']}",
         "",
         "## Evidence Buckets",
         "",
@@ -169,8 +190,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         [
             "## Truth-Chain Interpretation",
             "",
-            f"- Promoted annual value signal: {money(truth['promoted_annual_value_signal_usd'])}",
-            f"- Context-only annual surface retained as context: {money(truth['context_only_annual_surface_usd'])}",
+            f"- Economic estimates included: `{str(truth['economic_estimates_included']).lower()}`",
             f"- Interpretation: {truth['interpretation']}",
             "",
             "## Grant Packet Use",
@@ -193,6 +213,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
             f"- grant_merit_proven: `{str(gate['grant_merit_proven']).lower()}`",
             f"- field_performance_proven: `{str(gate['field_performance_proven']).lower()}`",
             f"- trading_profit_proven: `{str(gate['trading_profit_proven']).lower()}`",
+            f"- current_runtime_state_proven: `{str(gate['current_runtime_state_proven']).lower()}`",
+            f"- economic_value_claim_allowed: `{str(gate['economic_value_claim_allowed']).lower()}`",
+            f"- performance_claim_allowed: `{str(gate['performance_claim_allowed']).lower()}`",
+            f"- probe_success_is_dataset_fitness: `{str(gate['probe_success_is_dataset_fitness']).lower()}`",
             f"- context_only_promoted_as_live_proof: `{str(gate['context_only_promoted_as_live_proof']).lower()}`",
         ]
     )
@@ -226,10 +250,10 @@ def main() -> int:
                 "schema": payload["schema"],
                 "measured_sources": metrics["measured_live_sources"],
                 "enabled_sources": metrics["enabled_live_sources"],
-                "promoted_annual_value_signal_usd": metrics[
-                    "promoted_live_measured_annual_value_signal_usd"
+                "snapshot_status": payload["snapshot"]["status"],
+                "economic_estimates_included": payload["truth_chain_interpretation"][
+                    "economic_estimates_included"
                 ],
-                "context_only_annual_surface_usd": metrics["context_only_annual_surface_usd"],
                 "markdown": str(OUT_MD.relative_to(ROOT)).replace("\\", "/"),
                 "dashboard_json": str(DASHBOARD_JSON.relative_to(ROOT)).replace("\\", "/"),
             },

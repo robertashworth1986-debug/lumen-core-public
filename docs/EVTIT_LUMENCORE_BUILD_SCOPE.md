@@ -64,7 +64,13 @@ LumenCore already has public assets, internal proof-stack tooling, and module fa
 - FlowForm / LumaSpiral / EtherFrame / AetherReach / LumenShell / EchoForm architecture spine,
 - outreach underway to utility, lab, investor, and federal channels.
 
-Older public live-breadth snapshots are historical. Current internal proof status targets approximately 29 enabled live sources with approximately 25 measured providers/sources, pending a public-safe frozen manifest.
+Older public live-breadth snapshots are historical. The later approximately
+29-enabled / 25-measured internal target was never frozen and is not current
+proof. An August 6 mutable local registry reported 17 configured/enabled sources
+and 14 marked measured by first-party probe logic, but those flags do not prove
+freshness, row depth, dataset fitness, rights, relevance, or performance. No
+numeric breadth headline is current until a public-safe manifest is frozen and
+definition-bound.
 
 ---
 

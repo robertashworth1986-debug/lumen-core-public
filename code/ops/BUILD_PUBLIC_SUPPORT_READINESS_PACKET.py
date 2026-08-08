@@ -160,13 +160,12 @@ def build_payload(
         "strong_public_evidence": [
             "DICE local package hygiene is tracked, and a public-safe live-breadth replay capsule summarizes 6 live-source files and 14 deterministic replay windows without publishing private portal materials.",
             (
-                "Live-breadth frozen-delta evidence is provenance-gated: "
+                "The historical live-breadth snapshot is provenance-gated: "
                 f"{provenance_metrics.get('measured_live_sources', 12)}/"
                 f"{provenance_metrics.get('enabled_live_sources', 17)} live sources are measured, "
                 f"{provenance_metrics.get('promoted_live_measured_source_rows', 11)} rows are promoted, "
-                f"{provenance_metrics.get('context_only_source_rows', 8)} rows remain context-only, and "
-                f"the truth-chain promoted annual value signal is "
-                f"${float(truth_chain.get('promoted_annual_value_signal_usd', 73890600.0)):,.0f}."
+                f"and {provenance_metrics.get('context_only_source_rows', 8)} rows remain context-only. "
+                "Economic estimates are omitted; the snapshot is not current-runtime or performance proof."
             ),
             "HarborSentinel public AIS acquisition, held-out splits, and full-hash split preflight are tracked.",
             (
