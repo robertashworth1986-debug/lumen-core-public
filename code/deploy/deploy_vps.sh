@@ -399,6 +399,18 @@ chown -R "$SERVICE_USER:$SERVICE_GROUP" \
    "$STACK_ROOT/out/ops" \
    "$STACK_ROOT/out/execution" || true
 
+PAPER_TICKER_LEDGER="$STACK_ROOT/out/execution/multi_exchange_paper_ticker_ledger.jsonl"
+if [[ -e "$PAPER_TICKER_LEDGER" ]]; then
+   if [[ ! -f "$PAPER_TICKER_LEDGER" || -L "$PAPER_TICKER_LEDGER" ]]; then
+      echo "==> ERROR: paper-ticker ledger is not a regular non-symbolic file." >&2
+      exit 1
+   fi
+   chown --no-dereference "$SERVICE_USER:$SERVICE_GROUP" "$PAPER_TICKER_LEDGER"
+   chmod 0640 "$PAPER_TICKER_LEDGER"
+else
+   install -o "$SERVICE_USER" -g "$SERVICE_GROUP" -m 0640 /dev/null "$PAPER_TICKER_LEDGER"
+fi
+
 RUNTIME_PREFLIGHT="$CODE_DIR/ops/assert_runtime_safety.py"
 PAPER_TICKER="$CODE_DIR/multi_exchange_paper_ticker.py"
 if [[ -f "$RUNTIME_PREFLIGHT" && -f "$PAPER_TICKER" ]]; then
@@ -408,6 +420,8 @@ if [[ -f "$RUNTIME_PREFLIGHT" && -f "$PAPER_TICKER" ]]; then
 Description=Luma Multi-Exchange Paper Ticker
 After=network-online.target
 Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -416,6 +430,7 @@ Group=$SERVICE_GROUP
 WorkingDirectory=$CODE_DIR
 Environment=PYTHONUNBUFFERED=1
 Environment=LUMA_STACK_ROOT=$STACK_ROOT
+UMask=0027
 ExecStartPre=$PYTHON_BIN $RUNTIME_PREFLIGHT
 ExecStart=$PYTHON_BIN $PAPER_TICKER --profile apex --seed-capital 250000
 Restart=on-failure
@@ -439,6 +454,8 @@ if [[ -f "$AWARENESS_SCRIPT" && -f "$STACK_ROOT/symbol_registry_auto.py" ]]; the
 Description=Luma Full-Universe Symbol Awareness (Shadow Only)
 After=network-online.target
 Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -448,8 +465,9 @@ WorkingDirectory=$CODE_DIR
 Environment=PYTHONUNBUFFERED=1
 Environment=LUMA_STACK_ROOT=$STACK_ROOT
 Environment=LUMA_HARMONIC_DEBUG=0
+UMask=0027
 ExecStart=$PYTHON_BIN $AWARENESS_SCRIPT --loop-seconds 1.0 --batch-size 120
-Restart=always
+Restart=on-failure
 RestartSec=10
 
 [Install]
