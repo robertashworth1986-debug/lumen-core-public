@@ -1,0 +1,67 @@
+name: Public site exact-snapshot gate
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/deploy-public-site-release.yml'
+      - '.github/workflows/public-site-exact-snapshot-ci.yml'
+      - 'code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh'
+      - 'code/deploy/package_public_site_release.py'
+      - 'code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py'
+      - 'dashboard/operator_home.html'
+      - 'dashboard/proof_to_pilot.html'
+      - 'dashboard/external_review.html'
+      - 'dashboard/mission_control.html'
+      - 'dashboard/evidence/index_bounded.html'
+      - 'dashboard/assets/lumencore.css'
+      - 'dashboard/assets/luma_command_fabric.css'
+      - 'dashboard/assets/luma_command_fabric.js'
+      - 'dashboard/assets/prooflock/**'
+      - 'dashboard/build_week/prooflock_console/**'
+      - 'tests/test_public_site_deploy_hardening.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/deploy-public-site-release.yml'
+      - '.github/workflows/public-site-exact-snapshot-ci.yml'
+      - 'code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh'
+      - 'code/deploy/package_public_site_release.py'
+      - 'code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py'
+      - 'dashboard/operator_home.html'
+      - 'dashboard/proof_to_pilot.html'
+      - 'dashboard/external_review.html'
+      - 'dashboard/mission_control.html'
+      - 'dashboard/evidence/index_bounded.html'
+      - 'dashboard/assets/lumencore.css'
+      - 'dashboard/assets/luma_command_fabric.css'
+      - 'dashboard/assets/luma_command_fabric.js'
+      - 'dashboard/assets/prooflock/**'
+      - 'dashboard/build_week/prooflock_console/**'
+      - 'tests/test_public_site_deploy_hardening.py'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install bounded test dependency
+        run: python -m pip install --disable-pip-version-check pytest==9.1.0
+
+      - name: Check shell syntax
+        run: bash -n code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh
+
+      - name: Run exact-snapshot protocol tests
+        run: python -m pytest tests/test_public_site_deploy_hardening.py -q
