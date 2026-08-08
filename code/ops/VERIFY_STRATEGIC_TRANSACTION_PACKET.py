@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import copy
 from datetime import datetime
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -20,14 +22,17 @@ REQUIRED_TOP_LEVEL = {
     "repository",
     "status",
     "purpose",
+    "primary_offer",
     "public_contact_path",
     "transaction_options",
     "public_assets",
+    "evidence_graph_sha256",
     "diligence_requirements",
     "private_until_qualified_diligence",
     "claim_boundaries",
     "founder_control",
     "asking_price",
+    "integrity",
 }
 
 REQUIRED_OPTION_STRUCTURES = {
@@ -48,6 +53,8 @@ REQUIRED_CLAIM_BOUNDARIES = {
     "no_award_claim",
     "no_public_transaction_valuation",
     "no_binding_transfer_without_definitive_agreement",
+    "no_buyer_commitment_claim",
+    "no_pilot_execution_claim",
 }
 
 REQUIRED_FOUNDER_CONTROL = {
@@ -118,6 +125,34 @@ def require_utc_timestamp(value: Any) -> str:
     return timestamp
 
 
+def canonical_bytes(value: Any) -> bytes:
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def sha256_payload(value: Any) -> str:
+    return hashlib.sha256(canonical_bytes(value)).hexdigest()
+
+
+def require_sha256(value: Any, label: str) -> str:
+    digest = require_non_empty_string(value, label).lower()
+    if len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
+        raise ValueError(f"{label} must be a lowercase SHA-256 hex digest")
+    return digest
+
+
+def packet_sha256(packet: dict[str, Any]) -> str:
+    payload = copy.deepcopy(packet)
+    integrity = payload.get("integrity")
+    if isinstance(integrity, dict):
+        integrity.pop("packet_sha256", None)
+    return sha256_payload(payload)
+
+
 def verify_packet(packet: dict[str, Any], evidence_graph: dict[str, Any]) -> dict[str, Any]:
     missing = REQUIRED_TOP_LEVEL - packet.keys()
     extra = packet.keys() - REQUIRED_TOP_LEVEL
@@ -126,7 +161,7 @@ def verify_packet(packet: dict[str, Any], evidence_graph: dict[str, Any]) -> dic
             f"packet top-level fields mismatch; missing={sorted(missing)} extra={sorted(extra)}"
         )
 
-    if packet["schema_version"] != "1.0":
+    if packet["schema_version"] != "2.0":
         raise ValueError("unsupported schema_version")
     require_utc_timestamp(packet["generated_utc"])
     if packet["repository"] != EXPECTED_REPOSITORY:
@@ -135,10 +170,38 @@ def verify_packet(packet: dict[str, Any], evidence_graph: dict[str, Any]) -> dic
         raise ValueError("transaction packet must remain exploratory and non-binding")
     require_non_empty_string(packet["purpose"], "purpose")
 
+    primary_offer = packet["primary_offer"]
+    if not isinstance(primary_offer, dict) or set(primary_offer) != {
+        "id",
+        "customer_problem",
+        "buyer_input",
+        "lumen_deliverable",
+        "buyer_decision",
+        "commercial_boundary",
+    }:
+        raise ValueError("primary_offer fields mismatch")
+    if primary_offer["id"] != "buyer-owned-baseline-validation-sprint":
+        raise ValueError("primary_offer must be the bounded validation sprint")
+    require_non_empty_string(primary_offer["customer_problem"], "customer_problem")
+    require_unique_string_list(primary_offer["buyer_input"], "primary_offer buyer_input")
+    require_unique_string_list(
+        primary_offer["lumen_deliverable"], "primary_offer lumen_deliverable"
+    )
+    decisions = require_unique_string_list(
+        primary_offer["buyer_decision"], "primary_offer buyer_decision"
+    )
+    if set(decisions) != {"promote", "rerun", "external_review", "hold", "reject"}:
+        raise ValueError("primary_offer buyer decision set mismatch")
+    require_non_empty_string(primary_offer["commercial_boundary"], "commercial_boundary")
+
     contact = require_non_empty_string(packet["public_contact_path"], "public_contact_path")
     parsed_contact = urlparse(contact)
     if parsed_contact.scheme != "https" or parsed_contact.netloc != "lumen-core.ai":
         raise ValueError("public_contact_path must use the official HTTPS LumenCore domain")
+
+    graph_digest = sha256_payload(evidence_graph)
+    if require_sha256(packet["evidence_graph_sha256"], "evidence_graph_sha256") != graph_digest:
+        raise ValueError("evidence graph hash mismatch")
 
     options = packet["transaction_options"]
     if not isinstance(options, list) or not options:
@@ -234,6 +297,26 @@ def verify_packet(packet: dict[str, Any], evidence_graph: dict[str, Any]) -> dic
         raise ValueError("asking price amount and currency must remain null")
     require_non_empty_string(asking_price["rule"], "asking price rule")
 
+    integrity = packet["integrity"]
+    if not isinstance(integrity, dict) or set(integrity) != {
+        "algorithm",
+        "canonicalization",
+        "hash_scope",
+        "packet_sha256",
+    }:
+        raise ValueError("integrity fields mismatch")
+    if integrity["algorithm"] != "sha256":
+        raise ValueError("integrity algorithm mismatch")
+    if integrity["canonicalization"] != "utf8-json-sort-keys-compact":
+        raise ValueError("integrity canonicalization mismatch")
+    if integrity["hash_scope"] != "entire packet excluding integrity.packet_sha256":
+        raise ValueError("integrity hash scope mismatch")
+    expected_packet_hash = require_sha256(
+        integrity["packet_sha256"], "integrity.packet_sha256"
+    )
+    if expected_packet_hash != packet_sha256(packet):
+        raise ValueError("transaction packet hash mismatch")
+
     return {
         "valid": True,
         "schema_version": packet["schema_version"],
@@ -243,6 +326,9 @@ def verify_packet(packet: dict[str, Any], evidence_graph: dict[str, Any]) -> dic
         "binding_sale_authorized": founder_control["binding_sale_authorized"],
         "ip_transfer_authorized": founder_control["ip_transfer_authorized"],
         "public_asking_price": asking_price["public"],
+        "primary_offer_id": primary_offer["id"],
+        "evidence_graph_sha256": graph_digest,
+        "packet_sha256": expected_packet_hash,
     }
 
 
@@ -251,7 +337,7 @@ def main() -> int:
     parser.add_argument(
         "packet",
         nargs="?",
-        default="config/strategic_transaction_packet_v1.json",
+        default="config/strategic_transaction_packet_v2.json",
     )
     parser.add_argument(
         "--evidence-graph",
