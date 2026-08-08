@@ -97,6 +97,26 @@ def test_runtime_failure_signatures_are_allowlisted_and_redacted() -> None:
     assert "journalctl -u luma-symbol-awareness -n" not in text
 
 
+def test_paper_ticker_path_access_is_metadata_only_and_allowlisted() -> None:
+    text = _workflow_text()
+
+    assert "paper ticker output-path access (metadata only)" in text
+    assert "show_allowlisted_path_access stack_root /opt/lumencore" in text
+    assert "show_allowlisted_path_access output_root /opt/lumencore/out" in text
+    assert "show_allowlisted_path_access execution_output /opt/lumencore/out/execution" in text
+    assert (
+        "show_allowlisted_path_access paper_ticker_ledger "
+        "/opt/lumencore/out/execution/multi_exchange_paper_ticker_ledger.jsonl"
+    ) in text
+    assert "refused_unapproved_access_path" in text
+    assert 'stat --printf="exists=true type=%F mode=%a owner=%U group=%G bytes=%s modified=%y\\n"' in text
+    assert 'sudo -n -u lumencore test "-$permission" "$path"' in text
+    assert "cat /opt/lumencore/out/execution" not in text
+    assert "find /opt/lumencore/out/execution" not in text
+    assert "chmod" not in text
+    assert "chown" not in text
+
+
 def test_runtime_diagnostic_preserves_capacity_evidence() -> None:
     text = _workflow_text()
 
