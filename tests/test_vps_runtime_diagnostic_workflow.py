@@ -159,3 +159,30 @@ def test_runtime_diagnostic_preserves_capacity_evidence() -> None:
     assert "df -iP / /opt /var /home /tmp" in text
     assert "journalctl --disk-usage" in text
     assert "du -x -k -d2 /var /opt /home/opc /tmp" in text
+
+
+def test_gateway_closure_comparison_is_exact_commit_and_read_only() -> None:
+    text = _workflow_text()
+
+    assert "Compare the approved gateway closure with the VPS" in text
+    assert "ref: ${{ github.sha }}" in text
+    assert "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh" in text
+    assert '--print-files' in text
+    assert '--bundle-sha' in text
+    assert '[[ "${#files[@]}" -eq 20 ]]' in text
+    assert "approved_gateway_bundle_sha256" in text
+    assert "expected_file_count" in text
+    assert "closure_file status=match" in text
+    assert "closure_file status=mismatch" in text
+    assert "closure_file status=missing" in text
+    assert "closure_file status=symbolic" in text
+    assert "closure_file status=unreadable" in text
+    assert "closure_match_count" in text
+    assert "closure_mismatch_count" in text
+    assert "closure_missing_count" in text
+    assert "closure_symbolic_count" in text
+    assert "closure_unreadable_count" in text
+    assert 'target_root=/opt/lumencore/code' in text
+    assert 'resolved=$(realpath -m -- "$target")' in text
+    assert '[[ "$resolved" == "$target_root/"* ]]' in text
+    assert "scp " not in text
