@@ -16,6 +16,9 @@ The repository does **not** currently establish independent scientific validatio
 - Fail-closed verifier: [`code/ops/VERIFY_EVIDENCE_GRAPH.py`](code/ops/VERIFY_EVIDENCE_GRAPH.py)
 - Graph protocol: [`docs/MACHINE_EVIDENCE_GRAPH.md`](docs/MACHINE_EVIDENCE_GRAPH.md)
 - PR disposition map: [`docs/PR_CONSOLIDATION_MAP_2026-07-22.md`](docs/PR_CONSOLIDATION_MAP_2026-07-22.md)
+- Geometry protocol: [`docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md`](docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md)
+- Geometry protocol registry: [`config/geometry_evaluation_protocol_v1.json`](config/geometry_evaluation_protocol_v1.json)
+- Geometry protocol verifier: [`code/ops/VERIFY_GEOMETRY_EVALUATION_PROTOCOL.py`](code/ops/VERIFY_GEOMETRY_EVALUATION_PROTOCOL.py)
 
 The machine graph is an index over detailed source records, not a replacement for them. CI verifies that upper evidence states retain their required support markers and that the reviewer-facing documents do not silently omit indexed pull requests.
 
@@ -130,6 +133,12 @@ The EIA lane preserves an important adverse fact: the frozen eight-authority pro
 - [#67 — Agency receipt reconciliation](https://github.com/robertashworth1986-debug/lumen-core-public/pull/67): merged receipt-index and duplicate-outreach locks; not a proposal, award, contract, or validation event.
 
 ## 7. Pilot and external-engagement register
+
+### Geometry evaluation protocol — **ADOPTED PROTOCOL / NO RESULT PROMOTION**
+
+The geometry protocol admits Euclidean, curved, graph, topology-aware, parametric, biological-network, collective-motion, and field-line inspirations only as task-specific candidates. Candidate names—including mycelium, flocking, magnetic-field paths, circle packing, and brachistochrone paths—receive zero evidentiary credit until they beat matched baselines under frozen conditions. Frobenius series are treated as an analysis method, not a geometry or stability result.
+
+The adopted registry records zero task-specific experiments, zero experimentally validated results, and no universal champion. Its CI verifier fails if those counts or claim boundaries are silently promoted.
 
 A pilot or external engagement must be listed here only when the repository contains a discoverable objective, parties/roles, authorized source, baseline, locked metric, result state, limitations, and supporting artifact path.
 

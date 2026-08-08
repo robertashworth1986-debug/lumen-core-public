@@ -1,0 +1,328 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-08-08T04:57:20Z",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "status": "adopted_protocol_no_result_promotion",
+  "purpose": "Evaluate Euclidean, curved, manifold, graph, topology-aware, and parametric geometry methods under task-specific frozen scientific protocols without inventing a universal champion.",
+  "governing_rule": "No geometry is sacred until it wins under a named task, matched baselines, frozen data and seeds, declared physical assumptions, retained negative results, and an approved evidence gate.",
+  "geometry_models": [
+    "euclidean_cartesian",
+    "spherical_or_constant_curvature",
+    "riemannian_manifold",
+    "graph_geodesic",
+    "topology_aware",
+    "parametric_spiral_helix_branching_gyroid_phyllotactic"
+  ],
+  "zero_credit_candidate_labels": [
+    "brachistochrone",
+    "logarithmic_spiral",
+    "helix",
+    "gyroid",
+    "voronoi_partition",
+    "phyllotactic_packing",
+    "mycelium_inspired_network",
+    "slime_mold_inspired_network",
+    "root_and_leaf_venation_network",
+    "vascular_or_bronchial_branching",
+    "termite_ventilation_inspired_network",
+    "bird_v_formation",
+    "schooling_or_flocking_formation",
+    "magnetic_field_line_parameterization",
+    "toroidal_field_parameterization",
+    "circle_packing_flower_of_life_label"
+  ],
+  "related_analysis_methods_not_geometry": [
+    "frobenius_series_local_solution_analysis",
+    "dimensional_analysis",
+    "stability_and_boundedness_analysis",
+    "conservation_or_balance_residual_analysis",
+    "mesh_or_resolution_convergence_analysis"
+  ],
+  "claim_levels": [
+    "visualization_only",
+    "geometric_optimization",
+    "physics_informed",
+    "physics_constrained",
+    "experimentally_validated"
+  ],
+  "task_lanes": [
+    {
+      "id": "routing_and_networks",
+      "allowed_models": [
+        "euclidean_cartesian",
+        "graph_geodesic",
+        "riemannian_manifold",
+        "topology_aware",
+        "parametric_spiral_helix_branching_gyroid_phyllotactic"
+      ],
+      "candidate_metrics": [
+        "path_cost",
+        "latency",
+        "throughput",
+        "loss_or_failure_rate",
+        "reroute_cost",
+        "compute_cost"
+      ],
+      "required_physical_or_operational_constraints": [
+        "capacity",
+        "causality_or_time_order",
+        "connectivity",
+        "resource_budget"
+      ]
+    },
+    {
+      "id": "formation_and_control",
+      "allowed_models": [
+        "euclidean_cartesian",
+        "spherical_or_constant_curvature",
+        "riemannian_manifold",
+        "graph_geodesic",
+        "topology_aware",
+        "parametric_spiral_helix_branching_gyroid_phyllotactic"
+      ],
+      "candidate_metrics": [
+        "tracking_error",
+        "formation_error",
+        "minimum_separation",
+        "control_effort",
+        "settling_time",
+        "robustness_under_disturbance"
+      ],
+      "required_physical_or_operational_constraints": [
+        "bounded_acceleration_or_control",
+        "collision_or_separation_constraint",
+        "causal_update_rule",
+        "stability_or_boundedness_check"
+      ]
+    },
+    {
+      "id": "sensor_coverage_and_tasking",
+      "allowed_models": [
+        "euclidean_cartesian",
+        "spherical_or_constant_curvature",
+        "graph_geodesic",
+        "topology_aware",
+        "parametric_spiral_helix_branching_gyroid_phyllotactic"
+      ],
+      "candidate_metrics": [
+        "coverage",
+        "detection_or_observation_quality",
+        "resource_utilization",
+        "handoff_cost",
+        "miss_rate",
+        "compute_cost"
+      ],
+      "required_physical_or_operational_constraints": [
+        "field_of_view_or_reach",
+        "resource_capacity",
+        "time_window",
+        "source_quality"
+      ]
+    },
+    {
+      "id": "materials_structures_and_packaging",
+      "allowed_models": [
+        "euclidean_cartesian",
+        "spherical_or_constant_curvature",
+        "riemannian_manifold",
+        "topology_aware",
+        "parametric_spiral_helix_branching_gyroid_phyllotactic"
+      ],
+      "candidate_metrics": [
+        "mass_or_volume",
+        "stiffness_or_compliance",
+        "stress_or_strain_proxy",
+        "thermal_or_flow_proxy",
+        "manufacturability",
+        "compute_cost"
+      ],
+      "required_physical_or_operational_constraints": [
+        "dimensional_consistency",
+        "material_parameter_bounds",
+        "boundary_conditions",
+        "mesh_or_discretization_convergence"
+      ]
+    },
+    {
+      "id": "visualization_and_evidence_navigation",
+      "allowed_models": [
+        "euclidean_cartesian",
+        "spherical_or_constant_curvature",
+        "riemannian_manifold",
+        "graph_geodesic",
+        "topology_aware",
+        "parametric_spiral_helix_branching_gyroid_phyllotactic"
+      ],
+      "candidate_metrics": [
+        "task_completion_time",
+        "navigation_error",
+        "reviewer_comprehension",
+        "information_density",
+        "accessibility",
+        "render_cost"
+      ],
+      "required_physical_or_operational_constraints": [
+        "visual_state_is_projection_only",
+        "reduced_motion_fallback",
+        "no_webgl_fallback",
+        "claim_state_cannot_be_strengthened_by_layout"
+      ]
+    }
+  ],
+  "required_declarations": [
+    "task_lane",
+    "claim_level",
+    "geometry_model",
+    "dimensionality",
+    "coordinate_system_or_chart",
+    "units_for_every_physical_quantity",
+    "distance_or_metric_definition",
+    "curvature_sign_and_convention",
+    "embedding_or_intrinsic_representation",
+    "boundary_conditions",
+    "initial_conditions",
+    "discretization_or_mesh",
+    "numerical_tolerances",
+    "solver_and_version",
+    "random_seed_registry",
+    "data_rights_and_source",
+    "development_validation_holdout_split",
+    "one_primary_metric",
+    "acceptance_threshold",
+    "compute_and_memory_budget",
+    "known_limitations"
+  ],
+  "required_baselines": [
+    "incumbent_or_domain_baseline",
+    "straight_or_plain_euclidean_baseline",
+    "randomized_or_null_baseline",
+    "geometry_only_ablation",
+    "control_or_algorithm_only_ablation",
+    "hybrid_candidate"
+  ],
+  "required_checks": [
+    "dimensional_analysis",
+    "coordinate_transform_consistency",
+    "metric_symmetry_or_declared_asymmetry",
+    "distance_nonnegativity_or_declared_pseudometric",
+    "curvature_convention_consistency",
+    "boundary_and_initial_condition_consistency",
+    "numerical_stability",
+    "mesh_or_resolution_convergence_where_applicable",
+    "invariance_or_equivariance_checks_where_claimed",
+    "conservation_or_balance_checks_where_physics_claimed",
+    "causality_and_time_order_where_dynamic",
+    "constraint_satisfaction",
+    "negative_control",
+    "out_of_distribution_or_stress_test",
+    "uncertainty_or_confidence_interval",
+    "compute_cost_accounting",
+    "negative_result_retention"
+  ],
+  "comparison_rules": {
+    "one_primary_metric_required": true,
+    "secondary_metrics_may_not_override_primary_failure": true,
+    "matched_data_and_seed_sets_required": true,
+    "matched_compute_budget_required_or_explicitly_normalized": true,
+    "post_outcome_tuning_prohibited": true,
+    "cross_lane_ranking_prohibited": true,
+    "universal_champion_allowed": false,
+    "simpler_baseline_wins_ties": true,
+    "failure_and_incomplete_results_retained": true
+  },
+  "claim_level_requirements": {
+    "visualization_only": [
+      "coordinate_system_or_chart",
+      "visual_state_is_projection_only",
+      "accessibility_fallbacks"
+    ],
+    "geometric_optimization": [
+      "all_required_declarations",
+      "all_required_baselines",
+      "frozen_primary_metric",
+      "ablation_results",
+      "uncertainty_or_repeated_seed_results"
+    ],
+    "physics_informed": [
+      "geometric_optimization_requirements",
+      "named_governing_equations_or_constraints",
+      "units_and_dimensional_analysis",
+      "physical_parameter_sources",
+      "limitations_on_physical_fidelity"
+    ],
+    "physics_constrained": [
+      "physics_informed_requirements",
+      "constraint_residuals",
+      "conservation_or_balance_checks",
+      "numerical_stability_and_convergence",
+      "failure_thresholds"
+    ],
+    "experimentally_validated": [
+      "physics_constrained_requirements",
+      "authorized_experimental_or_field_source",
+      "predeclared_protocol",
+      "calibration_and_instrument_uncertainty",
+      "independent_or_external_execution_record",
+      "accepted_result_and_limitations"
+    ]
+  },
+  "evidence_promotion": [
+    {
+      "from": "visualization_only",
+      "to": "geometric_optimization",
+      "requires": [
+        "task_specific_protocol",
+        "matched_baselines",
+        "frozen_primary_metric",
+        "repeated_seed_or_uncertainty_result"
+      ]
+    },
+    {
+      "from": "geometric_optimization",
+      "to": "physics_informed",
+      "requires": [
+        "governing_equations_or_constraints",
+        "units",
+        "dimensional_analysis",
+        "physical_parameter_sources"
+      ]
+    },
+    {
+      "from": "physics_informed",
+      "to": "physics_constrained",
+      "requires": [
+        "constraint_residuals",
+        "balance_or_conservation_checks",
+        "stability_or_convergence",
+        "failure_thresholds"
+      ]
+    },
+    {
+      "from": "physics_constrained",
+      "to": "experimentally_validated",
+      "requires": [
+        "authorized_real_source",
+        "predeclared_experiment",
+        "instrument_and_calibration_uncertainty",
+        "external_execution_or_acceptance_record"
+      ]
+    }
+  ],
+  "prohibited_claims": [
+    "universal_geometry_superiority",
+    "non_euclidean_is_inherently_better",
+    "simulation_equals_field_validation",
+    "visualization_equals_physics",
+    "curved_geometry_implies_quantum_behavior",
+    "topological_language_without_defined_invariant",
+    "manifold_language_without_defined_metric_or_chart",
+    "physics_validated_without_units_and_governing_constraints",
+    "experimentally_validated_without_external_record"
+  ],
+  "current_result_state": {
+    "protocol_adopted": true,
+    "task_specific_experiments_registered": 0,
+    "experimentally_validated_results": 0,
+    "universal_champion": false
+  }
+}
