@@ -124,7 +124,7 @@ class EvidenceGraphTests(unittest.TestCase):
             self.assertEqual(node["state"], "historical")
             self.assertFalse(node["merged"])
 
-        for pr_number in (66, 67, 74, 98, 99, 100, 101):
+        for pr_number in (66, 67, 74, 98, 99, 100, 101, 131, 132):
             node = nodes[f"pr-{pr_number}"]
             self.assertEqual(node["state"], "merged_capability")
             self.assertTrue(node["merged"])
@@ -143,6 +143,36 @@ class EvidenceGraphTests(unittest.TestCase):
         node["state"] = "historical"
         node["merged"] = False
         with self.assertRaisesRegex(ValueError, "PR #101"):
+            verify_graph(graph)
+
+    def test_current_offer_cannot_be_silently_reclassified(self):
+        graph = copy.deepcopy(self.graph)
+        node = next(item for item in graph["nodes"] if item["id"] == "pr-131")
+        node["state"] = "historical"
+        node["merged"] = False
+        with self.assertRaisesRegex(ValueError, "PR #131"):
+            verify_graph(graph)
+
+    def test_current_offer_must_remain_single(self):
+        graph = copy.deepcopy(self.graph)
+        node = next(item for item in graph["nodes"] if item["id"] == "pr-131")
+        node["supports"].remove("single_primary_offer")
+        with self.assertRaisesRegex(ValueError, "single-primary-offer"):
+            verify_graph(graph)
+
+    def test_current_portfolio_cannot_be_silently_reclassified(self):
+        graph = copy.deepcopy(self.graph)
+        node = next(item for item in graph["nodes"] if item["id"] == "pr-132")
+        node["state"] = "historical"
+        node["merged"] = False
+        with self.assertRaisesRegex(ValueError, "PR #132"):
+            verify_graph(graph)
+
+    def test_current_portfolio_must_remain_one_platform_one_offer(self):
+        graph = copy.deepcopy(self.graph)
+        node = next(item for item in graph["nodes"] if item["id"] == "pr-132")
+        node["supports"].remove("one_platform_one_offer_positioning")
+        with self.assertRaisesRegex(ValueError, "one-platform-one-offer"):
             verify_graph(graph)
 
     def test_echolock_stays_held_without_indexed_evidence(self):

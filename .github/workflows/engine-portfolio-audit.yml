@@ -10,6 +10,9 @@ on:
       - "config/evidence_graph_v1.json"
       - "dashboard/data/lumencore_engine_portfolio_audit.json"
       - "docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md"
+      - "EVIDENCE_INDEX.md"
+      - "docs/REVIEWER_START_HERE.md"
+      - "docs/PR_CONSOLIDATION_MAP_2026-07-22.md"
       - "tests/test_lumencore_engine_portfolio_audit.py"
   push:
     branches: [main]
@@ -21,6 +24,9 @@ on:
       - "config/evidence_graph_v1.json"
       - "dashboard/data/lumencore_engine_portfolio_audit.json"
       - "docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md"
+      - "EVIDENCE_INDEX.md"
+      - "docs/REVIEWER_START_HERE.md"
+      - "docs/PR_CONSOLIDATION_MAP_2026-07-22.md"
       - "tests/test_lumencore_engine_portfolio_audit.py"
 
 permissions:

@@ -15,6 +15,10 @@ The repository does **not** currently establish independent scientific validatio
 - Machine graph: [`config/evidence_graph_v1.json`](config/evidence_graph_v1.json)
 - Fail-closed verifier: [`code/ops/VERIFY_EVIDENCE_GRAPH.py`](code/ops/VERIFY_EVIDENCE_GRAPH.py)
 - Graph protocol: [`docs/MACHINE_EVIDENCE_GRAPH.md`](docs/MACHINE_EVIDENCE_GRAPH.md)
+- Current buyer offer: [`docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md`](docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md)
+- Machine-sealed offer packet: [`config/strategic_transaction_packet_v2.json`](config/strategic_transaction_packet_v2.json)
+- Governed portfolio audit: [`docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md`](docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
+- Machine-readable portfolio receipt: [`dashboard/data/lumencore_engine_portfolio_audit.json`](dashboard/data/lumencore_engine_portfolio_audit.json)
 - PR disposition map: [`docs/PR_CONSOLIDATION_MAP_2026-07-22.md`](docs/PR_CONSOLIDATION_MAP_2026-07-22.md)
 - Geometry protocol: [`docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md`](docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md)
 - Geometry protocol registry: [`config/geometry_evaluation_protocol_v1.json`](config/geometry_evaluation_protocol_v1.json)
@@ -53,7 +57,8 @@ PR #34 remains the merged v2 foundation. Draft PR [#52](https://github.com/rober
 ### ProofLock Console — **DEPLOYED DEMO / MERGED RELEASE PATH**
 
 - Pull request: [#36 — ProofLock Build Week judge console](https://github.com/robertashworth1986-debug/lumen-core-public/pull/36)
-- Current release and buyer-path pull request: [#98 — ProofLock bounded validation buyer path](https://github.com/robertashworth1986-debug/lumen-core-public/pull/98)
+- Current release foundation: [#98 — ProofLock bounded validation buyer path](https://github.com/robertashworth1986-debug/lumen-core-public/pull/98)
+- Current buyer-owned offer contract: [#131 — Buyer-owned validation offer](https://github.com/robertashworth1986-debug/lumen-core-public/pull/131)
 - Public demo: <https://lumen-core.ai/build_week/prooflock_console/>
 - Demonstrates: canonical receipt verification, browser/Python parity, an authority-escalation attack, refusal to promote while required gates remain open, and restoration of the canonical receipt.
 - Recorded branch verification: focused tests and green current-head workflows are documented in the PR.
@@ -116,13 +121,28 @@ The EIA lane preserves an important adverse fact: the frozen eight-authority pro
 ### Bounded Validation Sprint — **MERGED OFFER / NOT COMMERCIALLY VALIDATED**
 
 - Historical offer ancestor: [#35 — Bounded Validation Sprint](https://github.com/robertashworth1986-debug/lumen-core-public/pull/35)
-- Current merged offer: [#98 — ProofLock bounded validation buyer path](https://github.com/robertashworth1986-debug/lumen-core-public/pull/98)
+- Release and offer foundation: [#98 — ProofLock bounded validation buyer path](https://github.com/robertashworth1986-debug/lumen-core-public/pull/98)
+- Current machine-sealed offer: [#131 — Buyer-owned validation offer](https://github.com/robertashworth1986-debug/lumen-core-public/pull/131)
 - Buyer supplies: authorized source, accepted baseline, locked metric and threshold, holdout, failure rules, and decision owner.
 - LumenCore supplies: bounded replay/assessment, negative-result retention, Proof Capsule, technical report, and one promote/rerun/external-review/hold/reject recommendation.
-- Pricing in the PR is an untested hypothesis, not booked revenue or market validation.
+- Public price bands remain hypotheses, not booked revenue or market validation; a buyer-specific price belongs in a signed statement of work.
 - Founder approval, legal review, and a signed paid scope remain separate gates.
 
-## 6. Public website and security lanes
+## 6. Canonical market position and governed portfolio
+
+### One platform, one offer, one first validation lane — **MERGED / NOT MARKET VALIDATED**
+
+- Current buyer offer specification: [#131 — Buyer-owned validation offer](https://github.com/robertashworth1986-debug/lumen-core-public/pull/131)
+- Current portfolio audit: [#132 — Governed 15-lane engine portfolio audit](https://github.com/robertashworth1986-debug/lumen-core-public/pull/132)
+- Platform: **LumenCore**.
+- Evidence and claim-governance layer: **ProofLock**.
+- Primary paid offer: **Buyer-Owned Baseline Validation Sprint**.
+- First sector validation lane: **Lumen Infrastructure Sentinel**.
+- The 15 tracked lanes are internal delivery, research, and concept lanes; they are not 15 separately saleable products.
+- The sealed offer packet is bound to the canonical evidence graph, and the portfolio receipt is bound to both artifacts plus tracked repository blobs.
+- Current portfolio receipt records zero subscription-ready lanes. It does not establish a buyer commitment, signed paid scope, executed pilot, revenue, external validation, or transaction valuation.
+
+## 7. Public website and security lanes
 
 - [#38 — Conversion-ready public website](https://github.com/robertashworth1986-debug/lumen-core-public/pull/38): bounded public offer and immutable release design; draft, not a current default-branch claim.
 - [#40 — Repository trust and contribution hardening](https://github.com/robertashworth1986-debug/lumen-core-public/pull/40): removes unsupported production/security language; draft.
@@ -132,7 +152,7 @@ The EIA lane preserves an important adverse fact: the frozen eight-authority pro
 - [#66 — Canonical evidence index](https://github.com/robertashworth1986-debug/lumen-core-public/pull/66): merged human/machine navigation foundation.
 - [#67 — Agency receipt reconciliation](https://github.com/robertashworth1986-debug/lumen-core-public/pull/67): merged receipt-index and duplicate-outreach locks; not a proposal, award, contract, or validation event.
 
-## 7. Pilot and external-engagement register
+## 8. Pilot and external-engagement register
 
 ### Geometry evaluation protocol — **ADOPTED PROTOCOL / NO RESULT PROMOTION**
 
@@ -150,7 +170,7 @@ A pilot or external engagement must be listed here only when the repository cont
 | ProofLock Build Week | Deployed demo and submission confirmation | Not an award or outside technical validation. |
 | EchoLock | **Not yet indexed in this public reviewer path** | Do not claim a completed pilot here until its report and evidence capsule are linked. |
 
-## 8. Canonical PR disposition map
+## 9. Canonical PR disposition map
 
 This map prevents reviewers from treating every open draft as an independent product or authoritative state.
 
@@ -176,8 +196,10 @@ This map prevents reviewers from treating every open draft as an independent pro
 | 99 | External replication reviewer path | Merged; template remains unassigned and held. |
 | 100 | Operator API source boundary | Merged; production activation remains HumanUnlock-gated. |
 | 101 | Proof Capsule v3 standard | Merged current standard with aggregate assurance integration. |
+| 131 | Buyer-owned validation offer and sealed strategic packet | Merged current commercial offer specification; not a buyer commitment, signed scope, pilot, revenue, or valuation. |
+| 132 | Governed 15-lane engine portfolio audit | Merged current one-platform/one-offer map; tracked lanes are not independently validated products. |
 
-## 9. Reviewer scoring boundary
+## 10. Reviewer scoring boundary
 
 A fair current evaluation is:
 
@@ -186,11 +208,13 @@ A fair current evaluation is:
 - external-review preparation: strong but incomplete;
 - independent validation: not yet established by the indexed public evidence;
 - field validation and commercial traction: must be supported by separately linked external records;
-- repository discoverability: being corrected through this index and subsequent consolidation.
+- repository discoverability: synchronized across the evidence graph, current offer packet, portfolio receipt, and reviewer entrypoints.
 
-## 10. Next promotion gate
+## 11. Next promotion gates
 
-The highest-value next event is one non-author evaluator executing the pinned EIA/CODECHECK package and returning a completed receipt. That receipt must preserve evaluator identity/disclosure, reviewer-controlled execution, exact source/runtime/dependency bindings, ordered output hashes, deviations, negative results, and timestamp order.
+The fastest credible commercial event is a qualified buyer accepting one authorized dataset or replay window, one incumbent baseline, one locked metric and threshold, and a signed paid validation scope. No performance result should be promised.
+
+The highest-value scientific event is one non-author evaluator executing the pinned EIA/CODECHECK package and returning a completed receipt. That receipt must preserve evaluator identity/disclosure, reviewer-controlled execution, exact source/runtime/dependency bindings, ordered output hashes, deviations, negative results, and timestamp order.
 
 Only after that event may the state move from **EXTERNALLY EXECUTABLE** to **EXTERNAL COMPLETE**. Field or commercial claims require additional evidence.
 

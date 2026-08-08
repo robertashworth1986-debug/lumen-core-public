@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_utc": "2026-08-08T10:17:42Z",
+  "generated_utc": "2026-08-08T10:40:00Z",
   "repository": "robertashworth1986-debug/lumen-core-public",
   "status": "exploratory_founder_authorized_inquiry",
   "purpose": "Provide a public-safe, machine-readable entrypoint for a paid buyer-owned validation sprint and, only after qualified diligence, optional licensing, acquihire, or acquisition discussions.",
@@ -148,7 +148,7 @@
       "role": "live_reviewer_surface"
     }
   ],
-  "evidence_graph_sha256": "a2a829467b6a29bdd9c5ed7019b6b2b8af1cfece195f4e74dabcf977a338e65d",
+  "evidence_graph_sha256": "cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05",
   "diligence_requirements": [
     "founder_identity_and_authority",
     "asset_inventory_and_chain_of_title",
@@ -202,6 +202,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire packet excluding integrity.packet_sha256",
-    "packet_sha256": "ec1a13ca95dbf5c75ca2c4c064fc146915771b7abff60c6f7c3e9ffc4c8b01c6"
+    "packet_sha256": "358855ad9d44ee72ef460ad70b46448a82f327a0c536d9253d3fad84590c4ad7"
   }
 }

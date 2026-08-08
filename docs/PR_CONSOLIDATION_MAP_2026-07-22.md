@@ -1,6 +1,6 @@
 # Pull Request Consolidation Map — 2026-07-22
 
-This document records the current repository consolidation state after reviewing PRs #34 through #101 on 2026-08-08. It is an information-architecture control; merge authority remains separate.
+This document records the current repository consolidation state after reviewing the principal product-spine work through PR #132 on 2026-08-08. It is an information-architecture control; merge authority remains separate.
 
 ## Canonical product spine
 
@@ -9,6 +9,7 @@ This document records the current repository consolidation state after reviewing
    - deployed demonstration and historical submission record: PR #36
    - current merged release/offer: PR #98
    - current merged strict verifier and assurance contract: PR #101
+   - current buyer-owned offer contract: PR #131
 
 2. **Reproducible benchmark / outside-review lane**
    - protocol and author-readiness origin: PR #54
@@ -23,13 +24,15 @@ This document records the current repository consolidation state after reviewing
 
 4. **Commercial conversion**
    - historical proposed offer: PR #35
-   - merged bounded offer: PR #98
+   - merged bounded release/offer foundation: PR #98
+   - current machine-sealed buyer-owned offer: PR #131
    - public buyer-facing website: PR #38
 
 5. **Reviewer navigation and public-copy governance**
    - merged reviewer-facing copy correction: PR #57
    - canonical evidence index and machine graph: PR #66
    - merged receipt and outreach-state reconciliation: PR #67
+   - current one-platform/one-offer portfolio audit: PR #132
 
 ## Recommended review and merge order
 
@@ -67,7 +70,10 @@ This document records the current repository consolidation state after reviewing
 
 ### Stage 6 — Commercial and public presentation
 
-- Founder-review signed scope, pricing, excluded data, IP, and legal terms at contract time; PR #98 is an offer, not a sale.
+- PR #131 is the current buyer-owned validation offer and machine-sealed strategic packet. PR #98 remains its release and offer foundation.
+- PR #132 is the current governed portfolio map: LumenCore is the platform, ProofLock is the evidence layer, the Buyer-Owned Baseline Validation Sprint is the primary offer, and Lumen Infrastructure Sentinel is the first sector lane.
+- The 15 tracked lanes are not 15 separately saleable products; the current audit records zero subscription-ready lanes.
+- Founder-review signed scope, pricing, excluded data, IP, and legal terms at contract time; neither #131 nor #132 is a sale, paid pilot, revenue record, external validation, or valuation.
 - Rebase PR #38 after the evidence/protocol spine is stable.
 - Ensure the public site points to the canonical evidence index and does not expose operator-only surfaces.
 
@@ -93,4 +99,4 @@ A PR is ready for canonicalization only when:
 
 ## Current highest-value external gate
 
-The next evidence promotion should be a non-author execution of the pinned EIA/CODECHECK package or the assigned external-replication docket with a completed independent-executor receipt. Until that occurs, external validation remains false.
+The fastest credible commercial gate is one signed buyer-owned validation scope with an authorized input, accepted baseline, locked metric, and bounded decision contract. The next evidence promotion remains a non-author execution of the pinned EIA/CODECHECK package or the assigned external-replication docket with a completed independent-executor receipt. Until those separate gates occur, revenue and external validation remain false.

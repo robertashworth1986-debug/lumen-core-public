@@ -11,18 +11,34 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 ## What to inspect first
 
 1. [Canonical Evidence Index](../EVIDENCE_INDEX.md)
-2. [Proof Capsule schema](PROOF_CAPSULE_SCHEMA.md)
-3. [Claim Boundary Register](CLAIM_BOUNDARY_REGISTER.md)
-4. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
-5. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
-6. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
-7. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
-8. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
+2. [Current buyer-owned validation offer](STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md)
+3. [Governed engine portfolio audit](LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
+4. [Proof Capsule schema](PROOF_CAPSULE_SCHEMA.md)
+5. [Claim Boundary Register](CLAIM_BOUNDARY_REGISTER.md)
+6. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
+7. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
+8. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
+9. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
+10. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
 
 The repository docket is the reviewable state bound to the checked-out commit.
 The live docket is a convenience projection and may lag the default branch or
 be unavailable while a deployment or gateway gate is open. Record any mismatch
 as live-release drift; do not silently substitute one source for the other.
+
+## One platform, one paid entry point
+
+LumenCore is the platform. ProofLock is its evidence and claim-governance layer.
+The primary paid entry point is the **Buyer-Owned Baseline Validation Sprint**:
+one authorized input, one accepted incumbent baseline, one locked metric and
+threshold, one replayable proof package, and one bounded promote/rerun/external
+review/hold/reject decision. Lumen Infrastructure Sentinel is the first sector
+validation lane. The other tracked engines remain governed internal research,
+delivery, or concept lanes unless separately promoted by evidence.
+
+The current machine-readable portfolio receipt records zero subscription-ready
+lanes and does not establish a signed buyer, executed pilot, revenue, external
+validation, or field performance.
 
 ## Clean-checkout verification
 
@@ -96,6 +112,9 @@ Use these terms when referring to this work:
 
 - Repository: https://github.com/robertashworth1986-debug/lumen-core-public
 - Evidence index: https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/EVIDENCE_INDEX.md
+- Buyer-owned validation offer: https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md
+- Governed portfolio audit: https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md
+- Machine-readable portfolio receipt: https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/dashboard/data/lumencore_engine_portfolio_audit.json
 - Website: https://lumen-core.ai
 - Proof-to-pilot page: https://lumen-core.ai/proof_to_pilot.html
 - Evidence surface: https://lumen-core.ai/evidence/

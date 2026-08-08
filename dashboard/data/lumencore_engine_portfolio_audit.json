@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-08T10:30:00Z",
+  "generated_at_utc": "2026-08-08T10:40:00Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "bb877daf2a1032955c0c890f5301aed42ee251ed69c15bc24295e3925b11aec0",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -13,8 +13,8 @@
     "public_contact_path": "https://lumen-core.ai/proof_to_pilot.html",
     "priority_lane_id": "lumen_infrastructure_sentinel",
     "direct_engine_sales_authorized": false,
-    "strategic_packet_sha256": "ec1a13ca95dbf5c75ca2c4c064fc146915771b7abff60c6f7c3e9ffc4c8b01c6",
-    "evidence_graph_sha256": "a2a829467b6a29bdd9c5ed7019b6b2b8af1cfece195f4e74dabcf977a338e65d"
+    "strategic_packet_sha256": "358855ad9d44ee72ef460ad70b46448a82f327a0c536d9253d3fad84590c4ad7",
+    "evidence_graph_sha256": "cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05"
   },
   "summary": {
     "portfolio_lane_count": 15,
@@ -994,6 +994,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "f9f13757c0b003d85a937820c4354c6437a16d7e12a39189a82dcdb138bcbf4b"
+    "payload_sha256": "5128e3484cf4472da4778280ff5ad0596b222c6bb7f22674297c21725e7564d3"
   }
 }
