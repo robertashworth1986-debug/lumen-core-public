@@ -654,26 +654,24 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
     assert conformance["schema"] == "lumencore.argos_response_conformance_gate.v2"
     assert conformance["notice_id"] == "ONC-ARGOS-SSN-2026-OS351107"
     assert conformance["deadline_utc"] == "2026-07-30T21:00:00Z"
-    assert conformance["decision"] == "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY"
+    assert conformance["decision"] == "FAIL_CONFORMANCE"
     assert conformance["summary"] == {
         "advisory_blocked_count": 1,
         "blocked_count": 5,
         "check_count": 24,
         "external_action_performed": False,
-        "fail_count": 0,
-        "pass_count": 19,
+        "fail_count": 2,
+        "pass_count": 17,
         "send_blocked_count": 4,
-        "send_fail_count": 0,
+        "send_fail_count": 2,
         "submission_authorized": False,
     }
 
     expected_pass = {
-        "OFFICIAL_NOTICE_CURRENT",
         "OFFICIAL_SOW_SOURCE_CUSTODY",
         "OFFICIAL_NOTICE_TEAMING_SEMANTICS",
         "PUBLIC_REPOSITORY_CREDENTIAL_RECEIPT",
         "SANITIZED_EXTERNAL_RESPONSE_SECURITY_PATH",
-        "DEADLINE_OPEN",
         "ACCEPTED_FILES_PRESENT",
         "ARTIFACT_HASH_CUSTODY",
         "US_LETTER_SIZE",
@@ -695,11 +693,12 @@ def test_argos_conformance_gate_binds_requirements_and_current_blockers():
         "ACTION_TIME_APPROVAL",
         "PUBLIC_REPOSITORY_ROTATION_AND_HISTORY",
     }
+    expected_failed = {"OFFICIAL_NOTICE_CURRENT", "DEADLINE_OPEN"}
     assert {check_id for check_id, row in checks.items() if row["status"] == "PASS"} == expected_pass
     assert {
         check_id for check_id, row in checks.items() if row["status"] == "BLOCKED"
     } == expected_blocked
-    assert all(row["status"] != "FAIL" for row in checks.values())
+    assert {check_id for check_id, row in checks.items() if row["status"] == "FAIL"} == expected_failed
     assert checks["PUBLIC_REPOSITORY_ROTATION_AND_HISTORY"]["blocks_send"] is False
     assert checks["SANITIZED_EXTERNAL_RESPONSE_SECURITY_PATH"]["blocks_send"] is True
     assert all(
@@ -815,8 +814,8 @@ def test_argos_conformance_outputs_are_deterministic():
     assert result.returncode == 0, result.stderr
     receipt = json.loads(result.stdout)
     assert receipt["status"] == "CURRENT"
-    assert receipt["decision"] == "BLOCK_SEND_MISSING_REQUIRED_FACTS_AND_AUTHORITY"
-    assert receipt["fail_count"] == 0
+    assert receipt["decision"] == "FAIL_CONFORMANCE"
+    assert receipt["fail_count"] == 2
     assert receipt["submission_authorized"] is False
     assert receipt["external_action_performed"] is False
 

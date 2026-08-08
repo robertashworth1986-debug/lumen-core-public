@@ -35,20 +35,22 @@ The machine graph is an index over detailed source records, not a replacement fo
 
 ## 1. Canonical merged assurance foundation
 
-### Proof Capsule verifier v2 — **MERGED**
+### Proof Capsule verifier v3 — **MERGED**
 
 - Pull request: [#34 — Harden the Proof Capsule verifier and CI receipt gate](https://github.com/robertashworth1986-debug/lumen-core-public/pull/34)
-- Current public role: validates capsule structure, source rights, evidence/run compatibility, canonical manifest paths, artifact identity, resource limits, bounded claims, and machine-readable receipts.
-- Recorded verification: 26 focused adversarial/valid-path tests, Windows clean-checkout validation, and successful GitHub Actions on the merged head.
-- Does not prove: the underlying experiment, external evaluator independence, field performance, or commercial value.
+- Successor pull request: [#101 — Proof Capsule v3 and assurance integration](https://github.com/robertashworth1986-debug/lumen-core-public/pull/101)
+- Current public role: strict schema v3, exact-byte and canonical-JSON custody, role-sensitive manifests, path/link defenses, aggregate resource budgets, declared external-report provenance, and machine-readable receipts.
+- Recorded verification: 51 focused adversarial/valid-path tests; full current-main regression; Windows/Linux portability on Python 3.11 and 3.13; aggregate public-assurance integration.
+- Does not prove: the underlying experiment, evaluator identity or independence, an outside report's conclusion, release authorization, field performance, or commercial value.
 
-This is the current merged evidence-integrity baseline until a later verifier revision is reviewed and merged.
+PR #34 remains the merged v2 foundation. Draft PR [#52](https://github.com/robertashworth1986-debug/lumen-core-public/pull/52) is closed as the historical ancestor superseded by #101.
 
 ## 2. ProofLock demonstration
 
-### ProofLock Console — **DEPLOYED DEMO / DRAFT PR**
+### ProofLock Console — **DEPLOYED DEMO / MERGED RELEASE PATH**
 
 - Pull request: [#36 — ProofLock Build Week judge console](https://github.com/robertashworth1986-debug/lumen-core-public/pull/36)
+- Current release and buyer-path pull request: [#98 — ProofLock bounded validation buyer path](https://github.com/robertashworth1986-debug/lumen-core-public/pull/98)
 - Public demo: <https://lumen-core.ai/build_week/prooflock_console/>
 - Demonstrates: canonical receipt verification, browser/Python parity, an authority-escalation attack, refusal to promote while required gates remain open, and restoration of the canonical receipt.
 - Recorded branch verification: focused tests and green current-head workflows are documented in the PR.
@@ -60,13 +62,14 @@ Reviewer boundary: ProofLock proves declared artifact integrity and gate policy.
 
 ### Frozen EIA replay — **FIRST-PARTY REPRODUCED**
 
-The canonical development chain is documented across the following drafts:
+The development chain is preserved across the following drafts and its merged consolidation:
 
 1. [#54 — CODECHECK EIA readiness packet](https://github.com/robertashworth1986-debug/lumen-core-public/pull/54)
 2. [#55 — Current EIA independent-reproduction handoff](https://github.com/robertashworth1986-debug/lumen-core-public/pull/55)
 3. [#61 — Windows text custody](https://github.com/robertashworth1986-debug/lumen-core-public/pull/61)
 4. [#62 — Independent reviewer entrypoint](https://github.com/robertashworth1986-debug/lumen-core-public/pull/62)
-5. [#64 — Clean mainline CODECHECK integration](https://github.com/robertashworth1986-debug/lumen-core-public/pull/64)
+5. [#64 — Historical clean-mainline consolidation branch](https://github.com/robertashworth1986-debug/lumen-core-public/pull/64)
+6. [#74 — Merged current-main CODECHECK reviewer package](https://github.com/robertashworth1986-debug/lumen-core-public/pull/74)
 
 The strongest bounded result recorded by this chain is:
 
@@ -92,23 +95,25 @@ The EIA lane preserves an important adverse fact: the frozen eight-authority pro
 
 ## 4. External replication contract
 
-### External replication docket — **DRAFT / REVIEW REQUIRED**
+### External replication docket — **MERGED / EXTERNALLY EXECUTABLE**
 
-- Pull request: [#49 — External replication docket and public assurance receipt](https://github.com/robertashworth1986-debug/lumen-core-public/pull/49)
+- Historical ancestor: [#49 — External replication docket and public assurance receipt](https://github.com/robertashworth1986-debug/lumen-core-public/pull/49)
+- Current merged implementation: [#99 — External replication reviewer path](https://github.com/robertashworth1986-debug/lumen-core-public/pull/99)
 - Purpose: preregister source rights, holdout separation, frozen code/environment, sample adequacy, uncertainty, deviations, negative results, evaluator independence, and bounded decisions.
-- Current state: unassigned template; a passing internal receipt does not create outside validation.
+- Current state: unassigned `HOLD` template with strict source-custody and independence-contract checks; a passing internal receipt does not create outside validation.
 
-### Proof Capsule verifier v3 — **DRAFT / REVIEW REQUIRED**
+### Public assurance integration — **MERGED**
 
-- Pull request: [#52 — Proof Capsule verifier v3 custody hardening](https://github.com/robertashworth1986-debug/lumen-core-public/pull/52)
-- Purpose: strict schema v3, exact-byte and canonical-JSON binding, role-sensitive manifests, path/link defenses, artifact budgets, and external-validation provenance requirements.
-- Current state: not the merged default-branch standard.
+- Pull request: [#101 — Proof Capsule v3 and assurance integration](https://github.com/robertashworth1986-debug/lumen-core-public/pull/101)
+- Purpose: make the external-replication and strict public-assurance paths consume the current v3 receipt contract instead of silently accepting v2 expectations.
+- Current state: merged and cross-platform verified; external validation remains `not_established`.
 
 ## 5. Commercial pilot package
 
-### 30-Day Bounded Validation Sprint — **PROPOSED / DRAFT**
+### Bounded Validation Sprint — **MERGED OFFER / NOT COMMERCIALLY VALIDATED**
 
-- Pull request: [#35 — Bounded Validation Sprint](https://github.com/robertashworth1986-debug/lumen-core-public/pull/35)
+- Historical offer ancestor: [#35 — Bounded Validation Sprint](https://github.com/robertashworth1986-debug/lumen-core-public/pull/35)
+- Current merged offer: [#98 — ProofLock bounded validation buyer path](https://github.com/robertashworth1986-debug/lumen-core-public/pull/98)
 - Buyer supplies: authorized source, accepted baseline, locked metric and threshold, holdout, failure rules, and decision owner.
 - LumenCore supplies: bounded replay/assessment, negative-result retention, Proof Capsule, technical report, and one promote/rerun/external-review/hold/reject recommendation.
 - Pricing in the PR is an untested hypothesis, not booked revenue or market validation.
@@ -119,7 +124,10 @@ The EIA lane preserves an important adverse fact: the frozen eight-authority pro
 - [#38 — Conversion-ready public website](https://github.com/robertashworth1986-debug/lumen-core-public/pull/38): bounded public offer and immutable release design; draft, not a current default-branch claim.
 - [#40 — Repository trust and contribution hardening](https://github.com/robertashworth1986-debug/lumen-core-public/pull/40): removes unsupported production/security language; draft.
 - [#57 — Reviewer-facing repository copy cleanup](https://github.com/robertashworth1986-debug/lumen-core-public/pull/57): merged public-copy correction; not technical validation.
-- [#60 — Protect operator gateway APIs by default](https://github.com/robertashworth1986-debug/lumen-core-public/pull/60): fail-closed outer API authentication boundary; draft and not deployed by the PR.
+- [#60 — Historical operator-boundary draft](https://github.com/robertashworth1986-debug/lumen-core-public/pull/60): closed after consolidation.
+- [#100 — Protect operator gateway APIs by default](https://github.com/robertashworth1986-debug/lumen-core-public/pull/100): merged fail-closed `/api`, `/ws`, and `/ws/live` source boundary. Runtime token injection and gateway restart remain governed production actions; merge is not production security certification.
+- [#66 — Canonical evidence index](https://github.com/robertashworth1986-debug/lumen-core-public/pull/66): merged human/machine navigation foundation.
+- [#67 — Agency receipt reconciliation](https://github.com/robertashworth1986-debug/lumen-core-public/pull/67): merged receipt-index and duplicate-outreach locks; not a proposal, award, contract, or validation event.
 
 ## 7. Pilot and external-engagement register
 
@@ -139,21 +147,26 @@ This map prevents reviewers from treating every open draft as an independent pro
 
 | PR | Role | Recommended disposition |
 |---:|---|---|
-| 34 | Merged Proof Capsule v2 foundation | Keep canonical. |
-| 35 | Commercial validation-sprint package | Review, approve boundaries, then merge as commercial documentation. |
-| 36 | ProofLock deployed demonstration and submission record | Split historical log from release docs; merge only the bounded canonical release state. |
+| 34 | Merged Proof Capsule v2 foundation | Preserve as predecessor provenance; #101 is current. |
+| 35 | Historical validation-sprint offer | Closed after bounded consolidation into #98. |
+| 36 | ProofLock deployed demonstration and submission record | Preserve unique history/media; current bounded release path is #98. |
 | 38 | Public website release | Rebase onto current main and merge only after exact-head verification. |
 | 40 | Trust/contribution wording | Rebase and merge unless superseded. |
 | 42 | Control-plane snapshot | Refresh or retire; do not let a dated snapshot drive current truth. |
-| 49 | External replication contract | Focused review, then merge as the canonical external-evaluation protocol. |
+| 49 | Historical external replication contract | Closed after consolidation into #99. |
 | 50 | Windows evidence-route portability fix | Merge before refreshing the overlapping evidence-route PR. |
-| 52 | Proof Capsule v3 | Decide explicitly: merge as the new standard or close as an unadopted draft. |
-| 54–62 | Stacked EIA/CODECHECK development history | Preserve history; consolidate the final clean implementation through #64. |
+| 52 | Historical Proof Capsule v3 branch | Closed after consolidation into #101. |
+| 54–62 | Stacked EIA/CODECHECK development history | Preserve history; merged implementation is #74. |
 | 57 | Merged reviewer-copy cleanup | Keep as merged provenance; do not treat wording cleanup as validation. |
-| 60 | Operator API security boundary | Keep as a separate focused security and deployment review. |
-| 64 | Clean-mainline reviewer package | Treat as the preferred consolidation target after focused review. |
-| 65 | Deadline-specific JCP support escalation | Keep separate from the technical evidence product; close/retire when the deadline lane is complete. |
-| 66 | Evidence index and machine navigation | Merge only after conflict reconciliation and current-head graph verification. |
+| 60 | Historical operator API security draft | Closed after consolidation into #100. |
+| 64 | Historical CODECHECK consolidation branch | Close as superseded by merged #74 after final file-parity review. |
+| 65 | Deadline-specific JCP support escalation | Closed; preserve only as historical operations lineage. |
+| 66–67 | Evidence navigation and receipt-state controls | Merged; keep bounded claim labels. |
+| 74 | Current-main CODECHECK package | Merged canonical implementation; still awaiting non-author execution. |
+| 98 | ProofLock release and bounded buyer path | Merged; not a signed sale or customer validation. |
+| 99 | External replication reviewer path | Merged; template remains unassigned and held. |
+| 100 | Operator API source boundary | Merged; production activation remains HumanUnlock-gated. |
+| 101 | Proof Capsule v3 standard | Merged current standard with aggregate assurance integration. |
 
 ## 9. Reviewer scoring boundary
 

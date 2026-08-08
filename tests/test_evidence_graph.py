@@ -109,11 +109,40 @@ class EvidenceGraphTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing required support"):
             verify_graph(graph)
 
-    def test_pr64_cannot_be_silently_reclassified(self):
+    def test_pr74_cannot_be_silently_reclassified(self):
         graph = copy.deepcopy(self.graph)
-        node = next(item for item in graph["nodes"] if item["id"] == "pr-64")
+        node = next(item for item in graph["nodes"] if item["id"] == "pr-74")
         node["state"] = "first_party_reproduced"
-        with self.assertRaisesRegex(ValueError, "PR #64"):
+        with self.assertRaisesRegex(ValueError, "merged=true requires merged_capability"):
+            verify_graph(graph)
+
+    def test_current_pr_dispositions_are_explicit(self):
+        nodes = {item["id"]: item for item in self.graph["nodes"]}
+
+        for pr_number in (49, 52, 60, 64):
+            node = nodes[f"pr-{pr_number}"]
+            self.assertEqual(node["state"], "historical")
+            self.assertFalse(node["merged"])
+
+        for pr_number in (66, 67, 74, 98, 99, 100, 101):
+            node = nodes[f"pr-{pr_number}"]
+            self.assertEqual(node["state"], "merged_capability")
+            self.assertTrue(node["merged"])
+
+        self.assertFalse(
+            any(
+                node["state"]
+                in {"external_execution_complete", "field_validated", "commercially_validated"}
+                for node in nodes.values()
+            )
+        )
+
+    def test_pr101_cannot_be_silently_reclassified(self):
+        graph = copy.deepcopy(self.graph)
+        node = next(item for item in graph["nodes"] if item["id"] == "pr-101")
+        node["state"] = "historical"
+        node["merged"] = False
+        with self.assertRaisesRegex(ValueError, "PR #101"):
             verify_graph(graph)
 
     def test_echolock_stays_held_without_indexed_evidence(self):

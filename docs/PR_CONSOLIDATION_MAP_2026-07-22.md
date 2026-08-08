@@ -1,36 +1,42 @@
 # Pull Request Consolidation Map — 2026-07-22
 
-This document records the recommended repository cleanup order after reviewing PRs #34 through #66. It is an information-architecture control, not a merge authorization.
+This document records the current repository consolidation state after reviewing PRs #34 through #101 on 2026-08-08. It is an information-architecture control; merge authority remains separate.
 
 ## Canonical product spine
 
 1. **Proof Capsule / ProofLock assurance**
    - merged foundation: PR #34
    - deployed demonstration and historical submission record: PR #36
-   - proposed strict verifier successor: PR #52
+   - current merged release/offer: PR #98
+   - current merged strict verifier and assurance contract: PR #101
 
 2. **Reproducible benchmark / outside-review lane**
    - protocol and author-readiness origin: PR #54
    - accumulated EIA handoff history: PR #55
    - cross-platform custody and reviewer entrypoint: PRs #61 and #62
-   - preferred clean-mainline consolidation target: PR #64
+   - historical clean-mainline consolidation branch: PR #64
+   - merged current-main implementation: PR #74
 
 3. **External replication governance**
-   - canonical draft contract: PR #49
+   - historical draft contract: PR #49
+   - merged current contract and assurance surface: PR #99
 
 4. **Commercial conversion**
-   - canonical proposed offer: PR #35
+   - historical proposed offer: PR #35
+   - merged bounded offer: PR #98
    - public buyer-facing website: PR #38
 
 5. **Reviewer navigation and public-copy governance**
    - merged reviewer-facing copy correction: PR #57
    - canonical evidence index and machine graph: PR #66
+   - merged receipt and outreach-state reconciliation: PR #67
 
 ## Recommended review and merge order
 
-### Stage 1 — Reviewer entrypoint
+### Stage 1 — Reviewer entrypoint — completed
 
-- Merge PR #66 only after conflict reconciliation, graph verification, and human/machine navigation parity pass.
+- PR #66 is merged; keep graph, evidence index, and consolidation map synchronized atomically.
+- PR #67 is merged; retain its no-submission/no-award/no-contract boundaries.
 - Preserve PR #57 as merged public-copy provenance; wording cleanup is not technical validation.
 - Do not promote draft PR claims into default-branch truth merely by linking them.
 
@@ -40,38 +46,37 @@ This document records the recommended repository cleanup order after reviewing P
 - Rebase or close PR #16 after retaining only non-duplicated bounded route logic.
 - Review PR #40 for trust and contribution wording.
 
-### Stage 3 — Evidence protocol
+### Stage 3 — Evidence protocol — completed on current main
 
-- Review PR #49 independently for evaluator-independence and fail-closed semantics.
-- Decide whether PR #52 becomes the new default Proof Capsule standard.
-  - If adopted: rebase, run the full named verifier suite, merge, and update the evidence index from v2 to v3.
-  - If not adopted: close it with a clear note that v2 remains canonical.
+- PR #49 is closed after its unique protocol work was consolidated into merged PR #99 with strict source-custody assurance and reviewer UI.
+- PR #52 is closed after its verifier was consolidated into merged PR #101.
+- PR #101 is the current Proof Capsule v3 standard and binds the aggregate public-assurance runner to the v3 receipt contract.
 
-### Stage 4 — EIA/CODECHECK consolidation
+### Stage 4 — EIA/CODECHECK consolidation — implementation merged
 
 - Treat PRs #54, #55, #61, and #62 as preserved development ancestry.
-- Use PR #64 as the preferred mainline consolidation candidate.
-- Before merge, verify that #64 contains every required final capability without importing stale generated-state or deadline-lane artifacts.
-- After #64 is merged, close or retarget ancestors with explicit links to the merged implementation.
+- PR #74 is the merged current-main implementation and contains the same 54-file CODECHECK/reviewer package surface as #64.
+- Close #64 and its stacked ancestors only after documenting their historical lineage and confirming no unique current implementation remains.
+- The remaining promotion gate is a non-author execution receipt, not more author-side packaging.
 
-### Stage 5 — ProofLock release cleanup
+### Stage 5 — ProofLock release cleanup — bounded release merged
 
-- Split PR #36's durable implementation/release record from its long historical execution log.
-- Preserve the exact deployed runtime identity and bounded claim text.
-- Keep contest submission confirmation separate from technical validation.
-- Merge only the canonical product and release surfaces after current-main conflict review.
+- PR #98 carries the bounded canonical release and buyer path on current main.
+- Preserve PR #36 for unique historical/media/submission lineage; submission remains separate from technical validation.
+- The public ProofLock console and proof-to-pilot surface are deployed; deployment is not external or field validation.
 
 ### Stage 6 — Commercial and public presentation
 
-- Founder-review the offer, scope, pricing hypotheses, deposit terms, excluded data, IP, and legal gates in PR #35.
+- Founder-review signed scope, pricing, excluded data, IP, and legal terms at contract time; PR #98 is an offer, not a sale.
 - Rebase PR #38 after the evidence/protocol spine is stable.
 - Ensure the public site points to the canonical evidence index and does not expose operator-only surfaces.
 
 ## PRs requiring refresh or retirement
 
-- **#42:** dated control-plane snapshot; refresh against current state or retire it as historical.
+- **#42:** dated control-plane snapshot; retire it as historical unless a new current-state control plane is built.
 - **#53, #56, #58, #59, #63, #65:** deadline/outreach/proposal operations; keep separate from the technical product and retire when their action windows close.
-- **#60:** security-significant operator API boundary; retain as a separate focused security review and deployment lane.
+- **#60:** closed after consolidation into merged PR #100. Source protection is merged; production token injection/restart remains HumanUnlock-gated.
+- **#69:** stale two-PR overlay against an old graph blob; close after this atomic graph/index/map reconciliation merges.
 
 ## Merge criteria used in this map
 
@@ -88,4 +93,4 @@ A PR is ready for canonicalization only when:
 
 ## Current highest-value external gate
 
-The next evidence promotion should be a non-author execution of the pinned EIA/CODECHECK package with a completed independent-executor receipt. Until that occurs, external validation remains false.
+The next evidence promotion should be a non-author execution of the pinned EIA/CODECHECK package or the assigned external-replication docket with a completed independent-executor receipt. Until that occurs, external validation remains false.
