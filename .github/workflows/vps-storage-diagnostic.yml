@@ -135,6 +135,36 @@ jobs:
               fi
             }
 
+            show_allowlisted_failure_signatures() {
+              local unit="$1"
+              local since="$2"
+              local max_lines="$3"
+              local journal_window=""
+
+              case "$unit" in
+                luma-gateway|luma-paper-ticker|luma-symbol-awareness) ;;
+                *)
+                  echo "refused_unapproved_journal_unit=$unit"
+                  return 2
+                  ;;
+              esac
+
+              echo "--- $unit failures since $since ---"
+              journal_window=$(sudo -n journalctl -u "$unit" --since "$since" --no-pager -o cat 2>&1 || true)
+              printf "journal_lines_in_window=%s\n" "$(printf "%s\n" "$journal_window" | wc -l)"
+              printf "%s\n" "$journal_window" \
+                | grep -E "ModuleNotFoundError|ImportError|Error loading ASGI app|Could not import module|No module named|Traceback|Permission denied|PermissionError|No such file|Address already in use|already running|singleton|SyntaxError|NameError|TypeError|ValueError|KeyError|AttributeError|RuntimeError|SystemExit|OSError|FileNotFoundError|ConnectionError|TimeoutError|AssertionError|Exception|ERROR|Error:|Main process exited|Failed with result|Start request repeated too quickly|Failed at step" \
+                | sed -E \
+                    -e "s/(Bearer )[A-Za-z0-9._~+\/=:-]+/\\1[REDACTED]/Ig" \
+                    -e "s/(sk-[A-Za-z0-9_-]{4})[A-Za-z0-9_-]+/\\1[REDACTED]/g" \
+                    -e "s/((API|ACCESS|AUTH|GITHUB|OPENAI|KRAKEN)_[A-Z0-9_]*(KEY|TOKEN|SECRET|PASSWORD)[A-Z0-9_]*=)[^[:space:]]+/\\1[REDACTED]/Ig" \
+                    -e "s#(https?://)[^/@[:space:]]+@#\\1[REDACTED]@#Ig" \
+                    -e "s/([?&](api_?key|access_?token|auth|password|secret)=)[^&[:space:]]+/\\1[REDACTED]/Ig" \
+                | cut -c1-400 \
+                | tail -n "$max_lines" \
+                || true
+            }
+
             echo "=== identity ==="
             id
             hostname
@@ -213,18 +243,10 @@ jobs:
                 2>&1 || true
             fi
 
-            echo "=== gateway allowlisted failure signatures (redacted) ==="
-            gateway_window=$(sudo -n journalctl -u luma-gateway --since "2 minutes ago" --no-pager -o cat 2>&1 || true)
-            printf "journal_lines_last_2m=%s\n" "$(printf "%s\n" "$gateway_window" | wc -l)"
-            printf "%s\n" "$gateway_window" \
-              | grep -E "ModuleNotFoundError|ImportError|Error loading ASGI app|Could not import module|No module named|Traceback|Permission denied|No such file|Address already in use|already running|singleton|SyntaxError|NameError|TypeError|ValueError|FileNotFoundError|Exception|ERROR|Error:" \
-              | sed -E \
-                  -e "s/(Bearer )[A-Za-z0-9._~+\/=:-]+/\\1[REDACTED]/Ig" \
-                  -e "s/(sk-[A-Za-z0-9_-]{4})[A-Za-z0-9_-]+/\\1[REDACTED]/g" \
-                  -e "s/((API|ACCESS|AUTH|GITHUB|OPENAI|KRAKEN)_[A-Z0-9_]*(KEY|TOKEN|SECRET|PASSWORD)[A-Z0-9_]*=)[^[:space:]]+/\\1[REDACTED]/Ig" \
-              | cut -c1-400 \
-              | tail -n 80 \
-              || true
+            echo "=== runtime allowlisted failure signatures (redacted) ==="
+            show_allowlisted_failure_signatures luma-gateway "2 minutes ago" 80
+            show_allowlisted_failure_signatures luma-paper-ticker "5 minutes ago" 80
+            show_allowlisted_failure_signatures luma-symbol-awareness "5 minutes ago" 80
 
             echo "=== expected listeners (address and port only) ==="
             ss -ltnH 2>&1 \
