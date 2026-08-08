@@ -1,0 +1,47 @@
+name: Government Snapshot Capacity Gate
+
+on:
+  pull_request:
+    paths:
+      - 'code/gov_snapshot_guard.py'
+      - 'code/CANONICAL_GOV_DATA_COLLECTOR.py'
+      - 'code/dashboard_unified_refresh.py'
+      - 'code/deploy/deploy_vps.sh'
+      - 'tests/test_gov_snapshot_guard.py'
+      - '.github/workflows/gov-snapshot-capacity-gate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'code/gov_snapshot_guard.py'
+      - 'code/CANONICAL_GOV_DATA_COLLECTOR.py'
+      - 'code/dashboard_unified_refresh.py'
+      - 'code/deploy/deploy_vps.sh'
+      - 'tests/test_gov_snapshot_guard.py'
+      - '.github/workflows/gov-snapshot-capacity-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot-capacity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Compile fail-closed dependency closure
+        run: |
+          python -m py_compile \
+            code/gov_snapshot_guard.py \
+            code/CANONICAL_GOV_DATA_COLLECTOR.py \
+            code/dashboard_unified_refresh.py \
+            tests/test_gov_snapshot_guard.py
+      - name: Validate deployment script syntax
+        run: bash -n code/deploy/deploy_vps.sh
+      - name: Run capacity and restart-regression tests
+        run: |
+          python -m pip install --disable-pip-version-check pytest
+          python -m pytest -q tests/test_gov_snapshot_guard.py

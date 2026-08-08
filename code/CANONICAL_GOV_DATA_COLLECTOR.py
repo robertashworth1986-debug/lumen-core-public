@@ -8,6 +8,8 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+from gov_snapshot_guard import snapshot_capacity_status
+
 ROOT = Path(
     os.environ.get("LUMA_STACK_ROOT", str(Path(__file__).resolve().parent.parent))
 ).expanduser().resolve()
@@ -426,6 +428,12 @@ def fetch_eia(env: dict) -> dict:
 
 def main() -> dict:
     OUT.mkdir(parents=True, exist_ok=True)
+    capacity = snapshot_capacity_status(SNAP_DIR)
+    if not capacity.get("allowed"):
+        raise RuntimeError(
+            "government snapshot collection blocked by capacity guard: "
+            f"{capacity.get('reason', 'unknown')}"
+        )
     SNAP_DIR.mkdir(parents=True, exist_ok=True)
     env = load_env()
 

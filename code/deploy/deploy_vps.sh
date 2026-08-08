@@ -368,12 +368,14 @@ if [[ -f "$REFRESH_SCRIPT" ]]; then
 Description=Luma Unified Dashboard Refresh Loop
 After=network.target luma-gateway.service
 Requires=luma-gateway.service
+StartLimitIntervalSec=300
+StartLimitBurst=5
 
 [Service]
 Type=simple
 WorkingDirectory=$CODE_DIR
 ExecStart=$PYTHON_BIN $REFRESH_SCRIPT --loop
-Restart=always
+Restart=on-failure
 RestartSec=5
 Environment=PYTHONUNBUFFERED=1
 Environment=LUMA_STACK_ROOT=$STACK_ROOT
