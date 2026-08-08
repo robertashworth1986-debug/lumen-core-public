@@ -1,9 +1,9 @@
 # Public Live-Breadth Manifest
 
-Manifest generated UTC: 2026-08-08T10:07:02.647512+00:00
+Manifest generated UTC: 2026-08-08T10:13:16.722571+00:00
 Registry generated UTC: 2026-08-06T22:31:16.191451+00:00
 Registry SHA-256: `ed21b17516aafa3561cce03c27f7c86e9615ec194188046bc6e7102e303aa82b`
-Manifest SHA-256: `533b63717e893f18b16fabdb1e07bbfe190691fbc71c5307b2784c6c289f9df3`
+Manifest SHA-256: `ff8331a1e018409a6bb9dbd500d5d25b2b1d4c85c0be12095d3f51522e019019`
 
 ## Reviewer Result
 

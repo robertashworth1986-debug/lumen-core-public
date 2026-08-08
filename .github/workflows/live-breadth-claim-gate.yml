@@ -8,6 +8,7 @@ on:
       - 'code/ops/BUILD_PUBLIC_SUPPORT_READINESS_PACKET.py'
       - 'code/ops/BUILD_PUBLIC_VISIBILITY_PACKET.py'
       - 'code/ops/build_live_breadth_value_panel.py'
+      - 'code/ops/build_live_breadth_governance_worklist.py'
       - 'code/ops/build_public_live_breadth_manifest.py'
       - 'config/public_live_breadth_governance.example.json'
       - 'dashboard/data/live_breadth_provenance_gate.json'
@@ -19,11 +20,13 @@ on:
       - 'docs/LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md'
       - 'docs/LUMENCORE_CURRENT_PROOF_STATUS_2026-07-09.md'
       - 'docs/NEXT_ACTIONS_BOARD.md'
+      - 'docs/LIVE_BREADTH_GOVERNANCE_PROTOCOL.md'
       - 'docs/PUBLIC_LIVE_BREADTH_MANIFEST_2026-08-08.md'
       - 'docs/PUBLIC_SUPPORT_AND_REVIEWER_READINESS_2026-06-20.md'
       - 'docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md'
       - 'tests/test_canonical_surface_design.py'
       - 'tests/test_live_breadth_claim_safety.py'
+      - 'tests/test_live_breadth_governance_worklist.py'
       - 'tests/test_public_live_breadth_manifest.py'
       - 'tests/test_public_live_breadth_provenance_gate.py'
       - 'tests/test_public_support_readiness_packet.py'
@@ -36,6 +39,7 @@ on:
       - 'code/ops/BUILD_PUBLIC_SUPPORT_READINESS_PACKET.py'
       - 'code/ops/BUILD_PUBLIC_VISIBILITY_PACKET.py'
       - 'code/ops/build_live_breadth_value_panel.py'
+      - 'code/ops/build_live_breadth_governance_worklist.py'
       - 'code/ops/build_public_live_breadth_manifest.py'
       - 'config/public_live_breadth_governance.example.json'
       - 'dashboard/data/live_breadth_provenance_gate.json'
@@ -47,11 +51,13 @@ on:
       - 'docs/LIVE_BREADTH_PROVENANCE_GATE_CAPSULE_2026-06-21.md'
       - 'docs/LUMENCORE_CURRENT_PROOF_STATUS_2026-07-09.md'
       - 'docs/NEXT_ACTIONS_BOARD.md'
+      - 'docs/LIVE_BREADTH_GOVERNANCE_PROTOCOL.md'
       - 'docs/PUBLIC_LIVE_BREADTH_MANIFEST_2026-08-08.md'
       - 'docs/PUBLIC_SUPPORT_AND_REVIEWER_READINESS_2026-06-20.md'
       - 'docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md'
       - 'tests/test_canonical_surface_design.py'
       - 'tests/test_live_breadth_claim_safety.py'
+      - 'tests/test_live_breadth_governance_worklist.py'
       - 'tests/test_public_live_breadth_manifest.py'
       - 'tests/test_public_live_breadth_provenance_gate.py'
       - 'tests/test_public_support_readiness_packet.py'
@@ -86,5 +92,6 @@ jobs:
           tests/test_public_visibility_packet.py
           tests/test_public_support_readiness_packet.py
           tests/test_live_breadth_claim_safety.py
+          tests/test_live_breadth_governance_worklist.py
           tests/test_public_live_breadth_manifest.py
           tests/test_canonical_surface_design.py

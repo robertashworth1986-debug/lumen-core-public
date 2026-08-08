@@ -1,6 +1,13 @@
 {
   "schema": "public_live_breadth_governance_v1",
+  "registry_sha256": null,
   "registry_max_age_hours": 1,
+  "protocol": {
+    "approval_status": "pending",
+    "reviewed_by_role": null,
+    "reviewed_utc": null,
+    "worklist_sha256": null
+  },
   "sources": {
     "SOURCE_A": {
       "rights_status": "unknown",
@@ -9,5 +16,11 @@
       "max_age_hours": 1,
       "dataset_snapshot_sha256": null
     }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "canonicalization": "utf8-json-sort-keys-compact",
+    "hash_scope": "entire governance sidecar excluding integrity.governance_sha256",
+    "governance_sha256": null
   }
 }
