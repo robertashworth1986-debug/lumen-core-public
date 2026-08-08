@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-08T10:40:00Z",
+  "generated_at_utc": "2026-08-08T14:21:57.087589Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "bb877daf2a1032955c0c890f5301aed42ee251ed69c15bc24295e3925b11aec0",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -689,9 +689,9 @@
             "path": "dashboard/quant_lab.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "9014124b2c7436206fc7e0745c06453cb853d62f",
-            "bytes": 106108,
-            "sha256": "0fd3e325d1e500e82306bad6d96945dfc29edf68be18caf0aac9d0b8af7c6296"
+            "git_blob_sha": "273d72a25604735f9f807a08dcffd2fb86a4fc96",
+            "bytes": 107964,
+            "sha256": "6ec0e77e2b2439f13f7b61d346cf631ad8dac5ebe26dc60a4e24946c01cba49d"
           }
         ]
       }
@@ -881,9 +881,9 @@
             "path": "dashboard/mission_control.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "a279d22c9c41a1daf4ad224cfadba53ff3534708",
-            "bytes": 130679,
-            "sha256": "69c5b1c253c01f88d07ff9250d9662e1ce184ddd84175f1e2c6988d60dc7fdd1"
+            "git_blob_sha": "eecad9e1e847e13da38bb4b7c7544c9e6d48d668",
+            "bytes": 132984,
+            "sha256": "17a6185709f2ff92ac163da3bac3a306178634e5a0ff43bfb55075d8cb3d62be"
           }
         ]
       }
@@ -974,9 +974,9 @@
             "path": "dashboard/grants.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "a0d7e106015a894abe35c82b1273679d49200f4d",
-            "bytes": 84494,
-            "sha256": "1f91e70e1b00a6243e434918e59676c8aeb73475ffb31f3a172780b79a1d1769"
+            "git_blob_sha": "76fbc554c007314a0330b0251ed490213c19ae09",
+            "bytes": 86020,
+            "sha256": "60e338648973babdeda4cdd40ab682f561b9ced96fee3ad797dcadca0dc1d457"
           }
         ]
       }
@@ -994,6 +994,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "5128e3484cf4472da4778280ff5ad0596b222c6bb7f22674297c21725e7564d3"
+    "payload_sha256": "78105248ed6065f42a6c08c3ee8a752d2e516e6388953a3c261d3f52695e7db9"
   }
 }
