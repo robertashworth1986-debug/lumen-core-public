@@ -48,12 +48,14 @@ def test_runtime_diagnostic_covers_gateway_failure_chain() -> None:
         assert marker in text, marker
 
 
-def test_runtime_diagnostic_does_not_publish_bodies_or_raw_logs() -> None:
+def test_runtime_diagnostic_does_not_publish_bodies_or_unfiltered_logs() -> None:
     text = _workflow_text()
 
     assert "--output /dev/null" in text
-    assert "journalctl -u" not in text
-    assert "journalctl --since" not in text
+    assert "journalctl -u luma-gateway -n" not in text
+    assert "journalctl -u luma-gateway -f" not in text
+    assert 'printf "%s\\n" "$gateway_window" \\' in text
+    assert '| grep -E "ModuleNotFoundError|ImportError|' in text
     assert "cat /var/log" not in text
     assert "EnvironmentFile" not in text
     assert "cat /etc/nginx" not in text
@@ -71,6 +73,21 @@ def test_gateway_lock_diagnostic_checks_identity_without_exposing_cmdline() -> N
     assert 'expected_marker="luma_experience_gateway:app"' not in text
     assert "echo \"$cmdline\"" not in text
     assert "cat \"$gateway_lock\"" not in text
+
+
+def test_gateway_failure_signatures_are_allowlisted_and_redacted() -> None:
+    text = _workflow_text()
+
+    assert "gateway executable and source preflight" in text
+    assert "/opt/lumencore/.venv/bin/python --version" in text
+    assert 'importlib.util.find_spec(\\"uvicorn\\")' in text
+    assert "gateway allowlisted failure signatures (redacted)" in text
+    assert 'journalctl -u luma-gateway --since "2 minutes ago"' in text
+    assert 'grep -E "ModuleNotFoundError|ImportError|' in text
+    assert "[REDACTED]" in text
+    assert "cut -c1-400" in text
+    assert "tail -n 80" in text
+    assert "journalctl -u luma-gateway -n" not in text
 
 
 def test_runtime_diagnostic_preserves_capacity_evidence() -> None:
