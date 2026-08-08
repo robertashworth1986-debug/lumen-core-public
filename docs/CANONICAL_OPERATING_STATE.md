@@ -58,8 +58,13 @@ verified dead-PID gateway lock, restarts only `luma-gateway`, validates minimal
 public health/status contracts, and rolls back every affected file on failure.
 The corresponding workflow is manual-only and requires both the exact phrase
 `REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE` and the private HumanUnlock secret.
-It has not been dispatched in this recorded state. The separate public-static-
-site release gate remains unchanged and cannot authorize gateway repair.
+The private value is transferred as an owner-only file and is never expanded
+into the remote command line; apply mode refuses any target, service, lock,
+runtime, or probe identity outside the exact production contract. Recursive
+temporary cleanup is path-bounded, and every workflow dependency is pinned to
+an immutable commit. The repair has not been dispatched in this recorded
+state. The separate public-static-site release gate remains unchanged and
+cannot authorize gateway repair.
 
 The public health contract is intentionally minimal: it reports liveness,
 service identity, the operator-access boundary, and a UTC timestamp, but no

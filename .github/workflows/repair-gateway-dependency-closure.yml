@@ -61,7 +61,7 @@ jobs:
 
     steps:
       - name: Checkout the approved commit
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -119,7 +119,7 @@ jobs:
           unset HUMAN_UNLOCK
 
       - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
+        uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
         with:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
@@ -170,7 +170,7 @@ jobs:
              install -d -m 0700 '$REMOTE_STAGE/source'
              tar -C '$REMOTE_STAGE/source' -xf '$REMOTE_STAGE/gateway-source.tar'
              sudo -n env \
-               LUMA_HUMAN_UNLOCK_TOKEN=\"\$(cat '$REMOTE_STAGE/human-unlock')\" \
+               LUMENCORE_HUMAN_UNLOCK_FILE='$REMOTE_STAGE/human-unlock' \
                LUMENCORE_GATEWAY_SOURCE_ROOT='$REMOTE_STAGE/source' \
                LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256='$BUNDLE_SHA' \
                LUMENCORE_GATEWAY_SOURCE_COMMIT='$RELEASE_COMMIT' \
@@ -223,7 +223,7 @@ jobs:
 
       - name: Upload bounded repair receipts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: gateway-repair-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
