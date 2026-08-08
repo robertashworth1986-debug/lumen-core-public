@@ -404,6 +404,7 @@ const RUN_BASES = RUN_PARAM_BASE && SAFE_RUN_BASES.includes(RUN_PARAM_BASE)
   ? [RUN_PARAM_BASE, ...SAFE_RUN_BASES.filter(base => base !== RUN_PARAM_BASE)]
   : SAFE_RUN_BASES;
 let ACTIVE_RUN_BASE = RUN_BASES[0];
+let ACTIVE_RUN_UTC = "";
 
 function isRunUtc(value) {
   return /^\d{8}T\d{6}Z$/.test(String(value || '').trim());
@@ -416,6 +417,33 @@ function isSafeArtifactPath(value) {
     && !path.includes('//');
 }
 
+function runArtifactUrl(relativePath) {
+  let base = DEFAULT_RUN_BASE;
+  if (ACTIVE_RUN_BASE === "runs") base = "runs";
+  if (ACTIVE_RUN_BASE === "../INSTITUTIONAL_STACK_V2/out/master_universe_v2") {
+    base = "../INSTITUTIONAL_STACK_V2/out/master_universe_v2";
+  }
+  const utc = String(ACTIVE_RUN_UTC || '').trim();
+  let path = "";
+  switch (relativePath) {
+    case "summary.json": path = "summary.json"; break;
+    case "family_scoreboard.csv": path = "family_scoreboard.csv"; break;
+    case "manifest.sha256.json": path = "manifest.sha256.json"; break;
+    case "dataset_polish_audit.json": path = "dataset_polish_audit.json"; break;
+    case "dataset_polish_audit.md": path = "dataset_polish_audit.md"; break;
+    case "figs/01_family_wins_bar.png": path = "figs/01_family_wins_bar.png"; break;
+    case "figs/02_per_dataset_rmse.png": path = "figs/02_per_dataset_rmse.png"; break;
+    case "figs/03_margin_histogram.png": path = "figs/03_margin_histogram.png"; break;
+    case "figs/04_periodicity_vs_margin.png": path = "figs/04_periodicity_vs_margin.png"; break;
+    case "figs/05_family_grid.png": path = "figs/05_family_grid.png"; break;
+    default: throw new Error('unapproved evidence artifact');
+  }
+  if (!isRunUtc(utc) || !isSafeArtifactPath(path)) {
+    throw new Error('invalid evidence artifact path');
+  }
+  return `${base}/${utc}/${path}`;
+}
+
 async function findLatestRun() {
   // Try a passed ?run=...&utc=... pair first.
   const utc = (new URLSearchParams(location.search)).get("utc");
@@ -425,11 +453,14 @@ async function findLatestRun() {
         const probe = await fetch(base + "/" + utc + "/summary.json", { cache: "no-store" });
         if (probe.ok) {
           ACTIVE_RUN_BASE = base;
-          return base + "/" + utc;
+          ACTIVE_RUN_UTC = utc;
+          return true;
         }
       } catch (e) {}
     }
-    return RUN_BASES[0] + "/" + utc;
+    ACTIVE_RUN_BASE = RUN_BASES[0];
+    ACTIVE_RUN_UTC = utc;
+    return true;
   }
   // Otherwise rely on a manifest-of-runs file the build step writes.
   for (const base of RUN_BASES) {
@@ -439,7 +470,8 @@ async function findLatestRun() {
         const t = (await r.text()).trim();
         if (isRunUtc(t)) {
           ACTIVE_RUN_BASE = base;
-          return base + "/" + t;
+          ACTIVE_RUN_UTC = t;
+          return true;
         }
       }
     } catch (e) {}
@@ -480,27 +512,27 @@ function parseCSV(text) {
   });
 }
 
-let SUMMARY = null, FAM_ROWS = [], MANIFEST = null, RUN_URL = "";
+let SUMMARY = null, FAM_ROWS = [], MANIFEST = null, RUN_READY = false;
 let POLISH_AUDIT = null;
 
 async function load() {
-  RUN_URL = await findLatestRun();
-  if (!RUN_URL) {
+  RUN_READY = await findLatestRun();
+  if (!RUN_READY) {
     document.getElementById("verdict").textContent =
       "No run found. Pass ?utc=YYYYMMDDTHHMMSSZ or write out/master_universe_v2/latest.txt.";
     return;
   }
 
   // summary
-  const sumR = await fetch(RUN_URL + "/summary.json");
+  const sumR = await fetch(runArtifactUrl("summary.json"));
   SUMMARY = await sumR.json();
 
   // family_scoreboard.csv
-  const famR = await fetch(RUN_URL + "/family_scoreboard.csv");
+  const famR = await fetch(runArtifactUrl("family_scoreboard.csv"));
   FAM_ROWS = parseCSV(await famR.text());
 
   // manifest
-  const manR = await fetch(RUN_URL + "/manifest.sha256.json");
+  const manR = await fetch(runArtifactUrl("manifest.sha256.json"));
   MANIFEST = await manR.json();
 
   renderKPIs();
@@ -585,7 +617,7 @@ function renderFigs() {
     const frame = document.createElement('div');
     frame.className = 'frame';
     const image = document.createElement('img');
-    image.src = `${RUN_URL}/figs/${fileName}`;
+    image.src = runArtifactUrl(`figs/${fileName}`);
     image.alt = caption;
     image.loading = 'lazy';
     const label = document.createElement('div');
@@ -690,13 +722,13 @@ async function renderPolish() {
   const statusEl = document.getElementById("polishStatus");
   const metaEl = document.getElementById("polishMeta");
   const linkEl = document.getElementById("polishLink");
-  if (!RUN_URL) {
+  if (!RUN_READY) {
     statusEl.textContent = "No run";
     metaEl.textContent = "Run URL not resolved";
     return;
   }
   try {
-    const r = await fetch(RUN_URL + "/dataset_polish_audit.json", { cache: "no-store" });
+    const r = await fetch(runArtifactUrl("dataset_polish_audit.json"), { cache: "no-store" });
     if (!r.ok) {
       statusEl.textContent = "Unavailable";
       metaEl.textContent = "dataset_polish_audit.json not found for this run";
@@ -710,7 +742,7 @@ async function renderPolish() {
     const incomplete = Number(POLISH_AUDIT.incomplete_count || 0);
     statusEl.textContent = `${polished}/${total}`;
     metaEl.textContent = `review: ${review} | incomplete: ${incomplete} | strict gate: ${POLISH_AUDIT.strict_polished_gate ? "on" : "off"}`;
-    linkEl.href = RUN_URL + "/dataset_polish_audit.md";
+    linkEl.href = runArtifactUrl("dataset_polish_audit.md");
   } catch (e) {
     statusEl.textContent = "Error";
     metaEl.textContent = "Failed to load polish audit: " + e.message;
@@ -720,14 +752,14 @@ async function renderPolish() {
 
 document.getElementById("verifyBtn").addEventListener("click", async () => {
   const status = document.getElementById("verifyStatus");
-  if (!RUN_URL || !MANIFEST) {
+  if (!RUN_READY || !MANIFEST) {
     status.textContent = "no run loaded — pass ?utc=YYYYMMDDTHHMMSSZ or ensure /out/master_universe_v2/latest.txt is reachable";
     status.className = "verify-status fail";
     return;
   }
   status.textContent = "fetching manifest…"; status.className = "verify-status";
   try {
-    const r = await fetch(RUN_URL + "/manifest.sha256.json");
+    const r = await fetch(runArtifactUrl("manifest.sha256.json"));
     const blob = await r.arrayBuffer();
     const buf = await crypto.subtle.digest("SHA-256", blob);
     const hex = [...new Uint8Array(buf)]
@@ -736,10 +768,12 @@ document.getElementById("verifyBtn").addEventListener("click", async () => {
     status.classList.add("ok");
     // Also re-hash one raw file to spot-check chain integrity
     const files = MANIFEST && MANIFEST.files ? MANIFEST.files : null;
-    const firstFile = files ? Object.keys(files).find(isSafeArtifactPath) : null;
+    const firstFile = files && Object.prototype.hasOwnProperty.call(files, "summary.json")
+      ? "summary.json"
+      : null;
     if (firstFile) {
       const expected = files[firstFile];
-      const fr = await fetch(RUN_URL + "/" + firstFile.split('/').map(encodeURIComponent).join('/'));
+      const fr = await fetch(runArtifactUrl(firstFile));
       const fb = await fr.arrayBuffer();
       const fbuf = await crypto.subtle.digest("SHA-256", fb);
       const fhex = [...new Uint8Array(fbuf)]

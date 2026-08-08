@@ -125,6 +125,9 @@ def test_active_dashboards_use_fail_closed_url_and_dom_boundaries() -> None:
     assert "\n    t.innerHTML =" not in shared
     assert 'document.getElementById("figs").innerHTML' not in evidence
     assert 'body.innerHTML = rows.map' not in evidence
+    assert "RUN_URL" not in evidence
+    assert "unapproved evidence artifact" in evidence
+    assert 'case "summary.json"' in evidence
     assert "document.getElementById('af').innerHTML" not in sector
     assert "document.getElementById('srs').innerHTML" not in sector
     assert "document.getElementById('tti').innerHTML" not in sector

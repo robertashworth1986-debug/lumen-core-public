@@ -69,4 +69,3 @@ The next priority groups are:
 - Existing alerts are not dismissed merely to improve a count.
 - Production deployment remains **HOLD** until the separately governed public
   snapshot and live-domain verification gates pass.
-
