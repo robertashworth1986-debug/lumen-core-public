@@ -8,10 +8,10 @@
   "live_exact_snapshot_status": "not_established_for_checked_out_commit",
   "status_counts": {
     "implemented_first_party": 2,
-    "documented_control": 2,
+    "documented_control": 3,
     "prepared_not_executed": 4,
     "buyer_specific_gate": 2,
-    "open_gap": 2,
+    "open_gap": 1,
     "not_applicable_to_bounded_sprint": 0
   },
   "assurance_domains": [
@@ -116,15 +116,19 @@
     {
       "id": "incident_response_and_continuity",
       "title": "Incident response, continuity, and recovery",
-      "status": "open_gap",
+      "status": "documented_control",
       "owner": "founder_operator",
       "evidence_paths": [
-        "SECURITY.md",
-        "docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md"
+        "config/incident_response_and_continuity_v1.json",
+        "docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md",
+        "code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py",
+        "code/ops/VERIFY_INCIDENT_RESPONSE_AND_CONTINUITY.py",
+        ".github/workflows/deploy.yml",
+        ".github/workflows/incident-response-readiness.yml"
       ],
-      "proves": "A best-effort security-reporting process and bounded public-site rollback protocol are documented.",
-      "does_not_prove": "A tested incident-response plan, business-continuity plan, disaster-recovery objective, customer notification SLA, or recovery exercise.",
-      "next_gate": "Adopt a buyer-appropriate incident, continuity, backup, restoration, and notification plan and run a recorded exercise."
+      "proves": "A bounded first-party incident policy, severity model, authority boundary, deterministic CI tabletop, and read-only live release classification path are documented and machine checked.",
+      "does_not_prove": "A tested live recovery exercise, completed production restoration, customer notification performance, enterprise SLA, business-continuity or disaster-recovery certification, or external audit.",
+      "next_gate": "Run a separately authorized live restoration exercise, retain rollback and current-commit verification receipts, and negotiate buyer-specific incident, continuity, backup, restoration, and notification terms."
     },
     {
       "id": "legal_certification_and_insurance",

@@ -24,7 +24,9 @@ on:
       - "dashboard/assets/prooflock/**"
       - "dashboard/build_week/prooflock_console/**"
       - "code/deploy/package_public_site_release.py"
+      - "code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py"
       - "code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py"
+      - "config/incident_response_and_continuity_v1.json"
       - ".github/workflows/deploy.yml"
       - ".github/workflows/deploy-public-site-release.yml"
   schedule:
@@ -63,12 +65,32 @@ jobs:
       - name: Verify every live byte against the immutable manifest
         shell: bash
         run: |
-          set -euo pipefail
+          set -uo pipefail
+          set +e
           python3 code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py \
             --manifest /tmp/public-site-live-audit/public-site-release-manifest.json \
             --source-commit "$GITHUB_SHA" \
             --base-url https://lumen-core.ai \
             --output /tmp/public-site-live-audit/live-verification.json
+          audit_rc=$?
+
+          classifier_rc=0
+          if [[ -s /tmp/public-site-live-audit/live-verification.json ]]; then
+            python3 code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py \
+              --policy config/incident_response_and_continuity_v1.json \
+              --manifest /tmp/public-site-live-audit/public-site-release-manifest.json \
+              --live-verification /tmp/public-site-live-audit/live-verification.json \
+              --output /tmp/public-site-live-audit/incident-classification.json
+            classifier_rc=$?
+          else
+            echo "Live verifier produced no receipt; classification fails closed." >&2
+            classifier_rc=1
+          fi
+
+          if (( classifier_rc != 0 )); then
+            exit "$classifier_rc"
+          fi
+          exit "$audit_rc"
 
       - name: Upload immutable package and live-audit receipt
         if: always()
@@ -80,8 +102,10 @@ jobs:
             /tmp/public-site-live-audit/public-site-release-manifest.json
             /tmp/public-site-live-audit/public-site-release.tar
             /tmp/public-site-live-audit/live-verification.json
+            /tmp/public-site-live-audit/incident-classification.json
           if-no-files-found: warn
           retention-days: 30
 
-# This workflow is intentionally read-only. Production mutation is allowed only
-# through deploy-public-site-release.yml with the exact human approval gate.
+# This workflow is intentionally read-only. It classifies drift but does not
+# repair or close an incident. Production mutation is allowed only through
+# deploy-public-site-release.yml with the exact human approval gate.

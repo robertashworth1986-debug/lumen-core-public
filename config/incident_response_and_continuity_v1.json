@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0",
+  "scope": "public_review_surface_and_bounded_validation_sprint",
+  "status": "documented_first_party_control_with_ci_exercise",
+  "incident_owner": {
+    "accountable_role": "founder_operator",
+    "evidence_custodian": "automated_fail_closed_workflow",
+    "customer_communications_owner": "founder_operator_with_buyer_and_legal_review",
+    "release_authority": "human_unlock_only"
+  },
+  "classification_contract": {
+    "release_verified": "NONE",
+    "any_critical_surface_not_match": "SEV-2",
+    "affected_ratio_at_or_above": 0.2,
+    "affected_ratio_severity": "SEV-2",
+    "any_other_not_match": "SEV-3",
+    "highest_automatic_severity": "SEV-2",
+    "manual_only_sev1_conditions": [
+      "confirmed credential or secret exposure",
+      "confirmed buyer-data disclosure",
+      "confirmed unauthorized production control",
+      "confirmed financial or trading impact",
+      "confirmed safety or regulated-system impact"
+    ]
+  },
+  "critical_surfaces": [
+    "operator_home.html",
+    "opportunity_sprint.html",
+    "proof_to_pilot.html",
+    "external_review.html",
+    "reviewer_docket.json",
+    "mission_control.html",
+    "evidence/index_bounded.html",
+    "assets/lumaarc_arc_seal_v1.png"
+  ],
+  "severity_levels": [
+    {
+      "id": "NONE",
+      "meaning": "Every allowlisted public release byte and required MIME contract matches the audited commit.",
+      "default_decision": "MONITOR"
+    },
+    {
+      "id": "SEV-4",
+      "meaning": "Advisory observation with no confirmed release-integrity impact; manual classification only.",
+      "default_decision": "REVIEW"
+    },
+    {
+      "id": "SEV-3",
+      "meaning": "Limited noncritical public-release drift or endpoint error below the SEV-2 threshold.",
+      "default_decision": "HOLD_AFFECTED_SURFACE_PROMOTION"
+    },
+    {
+      "id": "SEV-2",
+      "meaning": "A critical reviewer surface differs or fails, or at least 20 percent of the release manifest is affected.",
+      "default_decision": "HOLD_PUBLIC_RELEASE_PROMOTION"
+    },
+    {
+      "id": "SEV-1",
+      "meaning": "Confirmed credential, buyer-data, unauthorized-control, financial, trading, safety, or regulated-system impact requiring human classification.",
+      "default_decision": "HUMAN_EMERGENCY_RESPONSE"
+    }
+  ],
+  "automated_actions_allowed": [
+    "package immutable public-site bytes from Git",
+    "collect public HTTP status, MIME, byte count, and SHA-256 evidence",
+    "classify bounded release drift up to SEV-2",
+    "emit and upload a machine-readable incident receipt",
+    "fail the audit workflow and recommend a promotion hold"
+  ],
+  "human_authorization_required": [
+    "deploy an exact public-site snapshot",
+    "repair or restart the public gateway",
+    "install, rotate, or revoke a credential or secret",
+    "change DNS, firewall, TLS, reverse-proxy, or hosting configuration",
+    "notify a customer, regulator, insurer, partner, or the public",
+    "delete or disclose data or evidence",
+    "accept legal terms or make a certification or attestation",
+    "place a trade or enable production execution",
+    "close an incident after a live production change"
+  ],
+  "containment_sequence": [
+    "preserve the immutable release package, manifest, live audit, and incident receipt",
+    "treat the checked-out repository commit as canonical and the drifting live surface as unverified",
+    "hold public-release promotion and do not cite mismatched live bytes as current evidence",
+    "separate static release drift from gateway, secret, DNS, buyer-data, and legal incident lanes",
+    "escalate any suspected SEV-1 condition for human classification without inferring it from a public HTTP audit"
+  ],
+  "recovery_sequence": [
+    "review the exact commit, manifest, affected surfaces, and rollback boundary",
+    "obtain the literal exact-snapshot deployment approval before mutating public files",
+    "obtain the separate gateway-repair approval before changing gateway dependencies or runtime secrets",
+    "apply only the allowlisted release with rollback capture",
+    "rerun the 30-file exact-byte and MIME audit against the deployed commit",
+    "verify critical routes and retain deployment, rollback, and live-audit receipts",
+    "close only after the current commit reports release_verified true and any separate incident lane is resolved"
+  ],
+  "evidence_retention": {
+    "github_actions_artifact_days": 30,
+    "durable_local_target": "E:/LumaProofVault/public-site-releases/<source_commit>",
+    "preserve_failures": true,
+    "preserve_negative_results": true,
+    "customer_data_retention": "buyer-specific signed scope only"
+  },
+  "planning_targets": {
+    "contract_status": "non_contractual_unvalidated_planning_targets",
+    "public_audit_cadence_hours": 24,
+    "classification_target": "same audit workflow run",
+    "public_static_restore_target_hours_after_valid_human_authorization": 4,
+    "release_byte_rpo": "zero for immutable Git-tracked allowlisted release bytes",
+    "buyer_data_rto_rpo": "not established; must be negotiated in the signed buyer scope"
+  },
+  "claim_boundaries": [
+    "not_a_tested_live_incident_response_program",
+    "not_a_business_continuity_certification",
+    "not_a_disaster_recovery_certification",
+    "not_an_enterprise_sla",
+    "not_a_security_audit_or_penetration_test",
+    "not_proof_of_customer_notification_or_regulatory_compliance",
+    "not_authority_to_deploy_repair_rotate_notify_delete_trade_or_close"
+  ]
+}
