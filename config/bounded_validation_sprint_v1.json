@@ -1,7 +1,7 @@
 {
   "schema": "lumencore_bounded_validation_sprint_v1",
   "version": "1.0.0",
-  "status": "proposed_founder_review",
+  "status": "approved_for_use",
   "currency": "USD",
   "commercial_position": "LumenCore sells one controlled technical decision, not a promise of performance.",
   "offer": {
@@ -113,7 +113,7 @@
     "publicity": "No customer, partner, validation, result, or logo may be named publicly without written permission."
   },
   "approval": {
-    "founder_approved_for_external_use": false,
+    "founder_approved_for_external_use": true,
     "legal_review_complete": false,
     "pricing_tested_with_buyers": false,
     "first_paid_scope_signed": false

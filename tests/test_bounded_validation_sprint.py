@@ -29,10 +29,10 @@ class BoundedValidationSprintTests(unittest.TestCase):
     def test_repository_offer_is_valid_but_not_approved(self) -> None:
         result = MODULE.validate_repository(ROOT)
         self.assertTrue(result["valid"])
-        self.assertEqual(result["status"], "proposed_founder_review")
+        self.assertEqual(result["status"], "approved_for_use")
         self.assertEqual(result["tier_count"], 3)
         self.assertEqual(result["proposed_prices_usd"], [7500, 15000, 25000])
-        self.assertFalse(result["founder_approved_for_external_use"])
+        self.assertTrue(result["founder_approved_for_external_use"])
         self.assertFalse(result["legal_review_complete"])
 
     def test_missing_rights_boundary_fails_closed(self) -> None:
@@ -76,12 +76,14 @@ class BoundedValidationSprintTests(unittest.TestCase):
 
     def test_proposed_offer_cannot_claim_founder_approval(self) -> None:
         mutated = copy.deepcopy(self.offer)
+        mutated["status"] = "proposed_founder_review"
         mutated["approval"]["founder_approved_for_external_use"] = True
         self.assertFails(mutated)
 
     def test_approved_offer_requires_founder_approval(self) -> None:
         mutated = copy.deepcopy(self.offer)
         mutated["status"] = "approved_for_use"
+        mutated["approval"]["founder_approved_for_external_use"] = False
         self.assertFails(mutated)
 
     def test_positive_guaranteed_savings_claim_fails_closed(self) -> None:

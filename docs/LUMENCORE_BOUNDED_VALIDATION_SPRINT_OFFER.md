@@ -1,6 +1,6 @@
 # LumenCore 30-Day Bounded Validation Sprint
 
-**Status:** Proposed launch offer for founder and buyer review  
+**Status:** Founder-approved launch offer; buyer scope and legal terms remain contract-specific
 **Owner:** Robert Ashworth / LumenCore  
 **Commercial role:** Convert one technical claim into one controlled, inspectable decision.
 

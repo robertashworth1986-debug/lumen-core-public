@@ -1,0 +1,81 @@
+{
+  "schema": "lumencore.prooflock_receipt.v1",
+  "receipt_id": "prooflock-bounded-validation-protocol-v2-demo-20260808",
+  "created_utc": "2026-08-08T00:00:00Z",
+  "subject": {
+    "name": "Bounded Validation Protocol V2 Demonstration",
+    "asset_id": "bounded_validation_protocol_v2",
+    "evidence_class": "DEMONSTRATION_PROTOCOL"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "bounded_validation_protocol_v2_manifest",
+      "role": "current_protocol_manifest",
+      "repo_relative_path": "assets/prooflock/bounded_validation_protocol_v2.json",
+      "expected_sha256": "a5be86d225fd166f8802f0e97f82e95a8589e40e839c798bf8ac521623f9bef1"
+    },
+    {
+      "artifact_id": "bounded_validation_protocol_v1_manifest",
+      "role": "predecessor_protocol_manifest",
+      "repo_relative_path": "assets/prooflock/bounded_validation_protocol_v1.json",
+      "expected_sha256": "8757f2182ea76d46a3a409cd2160c6b4fab269a4ad0ef6c25ee1cbc2396f4fda"
+    }
+  ],
+  "lineage": {
+    "predecessor_asset_id": "bounded_validation_protocol_v1",
+    "current_asset_id": "bounded_validation_protocol_v2",
+    "relationship": "V2 adds explicit decision-authority gates to the bounded validation protocol demonstration."
+  },
+  "gates": [
+    {
+      "gate_id": "artifact_hashes",
+      "label": "Artifact custody",
+      "status": "PASS",
+      "required_for_promotion": true,
+      "basis": "Both protocol manifests are declared with SHA-256 identities."
+    },
+    {
+      "gate_id": "lineage_manifest",
+      "label": "Protocol lineage",
+      "status": "PASS",
+      "required_for_promotion": true,
+      "basis": "The V2 manifest declares V1 as its predecessor."
+    },
+    {
+      "gate_id": "baseline_contract",
+      "label": "Accepted baseline contract",
+      "status": "OPEN",
+      "required_for_promotion": true,
+      "basis": "This public demonstration has no buyer-authorized baseline contract."
+    },
+    {
+      "gate_id": "held_out_evaluation",
+      "label": "Held-out evaluation",
+      "status": "OPEN",
+      "required_for_promotion": true,
+      "basis": "This public demonstration contains no buyer-owned held-out result."
+    },
+    {
+      "gate_id": "independent_review",
+      "label": "Independent review",
+      "status": "OPEN",
+      "required_for_promotion": true,
+      "basis": "No outcome-independent evaluator has signed a protocol-matched review."
+    },
+    {
+      "gate_id": "human_release",
+      "label": "Human release",
+      "status": "OPEN",
+      "required_for_promotion": true,
+      "basis": "A named decision owner must authorize any promotion claim."
+    }
+  ],
+  "limitations": [
+    "This is a verifier demonstration, not a completed customer engagement.",
+    "Artifact integrity does not establish model, system, or infrastructure performance.",
+    "No savings, ROI, certification, deployment, or field-validation conclusion is supported."
+  ],
+  "decision": "HOLD",
+  "claim_boundary": "This receipt demonstrates repository artifact custody, SHA-256 identity, declared protocol lineage, and fail-closed authority gates. It does not prove candidate performance, external validation, realized savings, certification, deployment readiness, or buyer acceptance.",
+  "receipt_sha256": "a7509f90f65dfc024e1918b984a0c963811512c040df47ab22d9ea2b51195576"
+}

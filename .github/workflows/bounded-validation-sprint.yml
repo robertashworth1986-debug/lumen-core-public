@@ -65,11 +65,11 @@ jobs:
           )
           assert receipt["valid"] is True
           assert receipt["schema"] == "lumencore_bounded_validation_sprint_v1"
-          assert receipt["status"] == "proposed_founder_review"
+          assert receipt["status"] == "approved_for_use"
           assert receipt["tier_count"] == 3
           assert receipt["proposed_prices_usd"] == [7500, 15000, 25000]
           assert receipt["duration_calendar_days_max"] == 30
-          assert receipt["founder_approved_for_external_use"] is False
+          assert receipt["founder_approved_for_external_use"] is True
           assert receipt["legal_review_complete"] is False
           print(json.dumps(receipt, indent=2, sort_keys=True))
           PY
