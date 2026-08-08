@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import copy
 import importlib.util
 import json
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,7 +42,7 @@ def test_every_evidence_asset_exists_and_is_hash_bound():
     module = load_module()
     payload = module.build_payload(module.read_json(CONFIG))
 
-    assert payload["summary"]["evidence_asset_count"] == 7
+    assert payload["summary"]["evidence_asset_count"] == 10
     for row in payload["evidence_assets"]:
         assert len(row["sha256"]) == 64
         assert row["bytes"] > 0
@@ -138,6 +141,61 @@ def test_reviewer_questions_force_buyer_baseline_metric_and_negative_result_path
     assert "acceptance metric" in questions
     assert "independent evaluator" in questions
     assert "no fit" in next_steps
+
+
+def test_assurance_exercise_is_bounded_hash_bound_and_replayable():
+    module = load_module()
+    payload = module.build_payload(module.read_json(CONFIG))
+    exercise = payload["assurance_exercise"]
+
+    assert exercise["mode"] == "REVIEWER_CONTROLLED_LOCAL_REPLAY_ONLY"
+    assert payload["summary"]["assurance_scenario_count"] == 6
+    assert payload["summary"]["active_targeting_allowed"] is False
+    assert set(exercise["roles"]) == {"red_team", "blue_team", "purple_team"}
+    assert all(value is False for value in exercise["authority_boundary"].values())
+
+    scenario_ids = [row["scenario_id"] for row in exercise["scenarios"]]
+    assert len(scenario_ids) == len(set(scenario_ids))
+    for row in exercise["scenarios"]:
+        test_path = ROOT / row["test_path"]
+        assert test_path.is_file()
+        assert row["verification_command"] == (
+            f"python -m pytest -q {row['test_path']}"
+        )
+        assert row["test_sha256"] == module.sha256_file(test_path)
+        assert row["test_bytes"] == len(module.canonical_file_bytes(test_path))
+        assert len(row["boundary"]) > 40
+
+    markdown = module.render_markdown(payload)
+    assert "Reviewer-Controlled Red / Blue Assurance Exercise" in markdown
+    assert "Active targeting" in markdown
+    assert "Purple team" in markdown
+    assert "does not establish penetration testing" in markdown
+
+
+def test_assurance_exercise_rejects_active_targeting_or_duplicate_scenarios():
+    module = load_module()
+    config = module.read_json(CONFIG)
+
+    active = copy.deepcopy(config)
+    active["assurance_exercise"]["authority_boundary"][
+        "active_targeting_allowed"
+    ] = True
+    with pytest.raises(
+        module.ReviewPacketError,
+        match="ASSURANCE_AUTHORITY_BOUNDARY_INVALID",
+    ):
+        module.build_payload(active)
+
+    duplicate = copy.deepcopy(config)
+    duplicate["assurance_exercise"]["scenarios"][1]["scenario_id"] = duplicate[
+        "assurance_exercise"
+    ]["scenarios"][0]["scenario_id"]
+    with pytest.raises(
+        module.ReviewPacketError,
+        match="ASSURANCE_SCENARIO_ID_INVALID",
+    ):
+        module.build_payload(duplicate)
 
 
 def test_written_outputs_match_the_builder():
