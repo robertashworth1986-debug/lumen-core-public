@@ -1,0 +1,68 @@
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+WORKFLOW = ROOT / ".github" / "workflows" / "vps-storage-diagnostic.yml"
+
+
+def _workflow_text() -> str:
+    return WORKFLOW.read_text(encoding="utf-8")
+
+
+def test_runtime_diagnostic_is_read_only_and_host_key_strict() -> None:
+    text = _workflow_text()
+
+    assert "StrictHostKeyChecking=yes" in text
+    assert "StrictHostKeyChecking=no" not in text
+    assert "systemctl restart" not in text
+    assert "systemctl start" not in text
+    assert "systemctl stop" not in text
+    assert "systemctl enable" not in text
+    assert "systemctl disable" not in text
+    assert "rm -" not in text
+    assert "truncate" not in text
+    assert "journalctl --vacuum" not in text
+
+
+def test_runtime_diagnostic_covers_gateway_failure_chain() -> None:
+    text = _workflow_text()
+
+    required = (
+        "public_nginx_health",
+        "public_gateway_health",
+        "public_gateway_snapshot",
+        "loopback_gateway_via_nginx",
+        "loopback_gateway_direct",
+        "http://127.0.0.1:8787/health",
+        "show_unit \"$unit\"",
+        "luma-gateway",
+        "ExecMainStatus",
+        "NRestarts",
+        "ss -ltnH",
+        "nginx -t",
+        "nginx -T",
+    )
+    for marker in required:
+        assert marker in text, marker
+
+
+def test_runtime_diagnostic_does_not_publish_bodies_or_raw_logs() -> None:
+    text = _workflow_text()
+
+    assert "--output /dev/null" in text
+    assert "journalctl -u" not in text
+    assert "journalctl --since" not in text
+    assert "cat /var/log" not in text
+    assert "EnvironmentFile" not in text
+    assert "cat /etc/nginx" not in text
+    assert "allowlisted directives only" in text
+
+
+def test_runtime_diagnostic_preserves_capacity_evidence() -> None:
+    text = _workflow_text()
+
+    assert "df -hP / /opt /var /home /tmp" in text
+    assert "df -iP / /opt /var /home /tmp" in text
+    assert "journalctl --disk-usage" in text
+    assert "du -x -k -d2 /var /opt /home/opc /tmp" in text
+
