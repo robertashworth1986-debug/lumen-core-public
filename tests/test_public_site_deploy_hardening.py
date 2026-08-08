@@ -133,6 +133,16 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert "grants.html" not in names
     assert not any(name.startswith("data/") for name in names)
 
+    apply_script = APPLY_SCRIPT.read_text(encoding="utf-8")
+    match = re.search(
+        r"readonly -a RELEASE_FILES=\(\n(?P<body>.*?)\n\)",
+        apply_script,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    root_allowlist = re.findall(r'^\s+"([^"]+)"$', match.group("body"), re.MULTILINE)
+    assert root_allowlist == names
+
 
 def test_package_rejects_unpinned_or_executable_sources(tmp_path):
     module, repo, commit, _committed = make_release_repo(tmp_path)
