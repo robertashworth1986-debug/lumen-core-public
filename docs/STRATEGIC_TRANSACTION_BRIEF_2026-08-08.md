@@ -46,6 +46,24 @@ The sealed machine-readable offer is
 Its fail-closed verifier is
 [`code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py`](../code/ops/VERIFY_STRATEGIC_TRANSACTION_PACKET.py).
 
+## Scope-to-signature path
+
+A qualified buyer can begin without transferring confidential data:
+
+1. complete the
+   [non-confidential fit intake](LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md);
+2. inspect the
+   [canonical bounded offer](LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md);
+3. convert only a `scope_candidate` into the
+   [buyer-specific SOW template](LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md);
+4. complete appropriate legal, security, data-rights, procurement, and pricing
+   review; and
+5. begin work only under an accepted written scope or controlling purchase
+   instrument and after any required initial payment is confirmed.
+
+The fit intake is not a contract, invoice, commitment, or authorization to
+transfer data. Unknown facts remain `UNKNOWN`; they are not filled by inference.
+
 The canonical evidence graph currently classifies PR 34 as a merged
 capability, PR 36 and the ProofLock Console as deployed demonstrations, and PR
 55 as a first-party reproduced record. PR 49 and PR 64 are retained only as

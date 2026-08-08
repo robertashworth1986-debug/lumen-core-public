@@ -123,6 +123,9 @@ The EIA lane preserves an important adverse fact: the frozen eight-authority pro
 - Historical offer ancestor: [#35 — Bounded Validation Sprint](https://github.com/robertashworth1986-debug/lumen-core-public/pull/35)
 - Release and offer foundation: [#98 — ProofLock bounded validation buyer path](https://github.com/robertashworth1986-debug/lumen-core-public/pull/98)
 - Current machine-sealed offer: [#131 — Buyer-owned validation offer](https://github.com/robertashworth1986-debug/lumen-core-public/pull/131)
+- Non-confidential fit intake: [`docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md`](docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md)
+- Canonical offer: [`docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md`](docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md)
+- Buyer-specific SOW template: [`docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md`](docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md)
 - Buyer supplies: authorized source, accepted baseline, locked metric and threshold, holdout, failure rules, and decision owner.
 - LumenCore supplies: bounded replay/assessment, negative-result retention, Proof Capsule, technical report, and one promote/rerun/external-review/hold/reject recommendation.
 - Public price bands remain hypotheses, not booked revenue or market validation; a buyer-specific price belongs in a signed statement of work.
