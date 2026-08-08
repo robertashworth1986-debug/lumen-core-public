@@ -6,6 +6,7 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +22,84 @@ from assert_runtime_safety import assert_paper_mode
 
 
 class ProductionRepairTests(unittest.TestCase):
+    def test_grant_bundle_paths_reject_traversal_and_invalid_run_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "grants"
+            root.mkdir()
+
+            for attack in ("../outside", "..\\outside", "C:\\outside", "/outside"):
+                with self.assertRaises(ValueError):
+                    grant_factory._bounded_direct_child(
+                        root, attack, label="program id"
+                    )
+
+            for attack in ("../20260808T120000Z", "latest", "20260808T120000Z/extra"):
+                with self.assertRaises(ValueError):
+                    grant_factory._bounded_direct_child(
+                        root, attack, label="run UTC"
+                    )
+
+            safe = grant_factory._bounded_direct_child(
+                root, "nsf_sbir_phase_i", label="program id"
+            )
+            self.assertEqual(safe.parent, root.resolve())
+
+    def test_grant_approval_snapshot_is_immutable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            grants = base / "grants"
+            approved = grants / "_approved"
+            data = base / "data"
+            run = grants / "nsf_sbir_phase_i" / "20260808T120000Z"
+            run.mkdir(parents=True)
+            data.mkdir()
+            (data / "grant_catalog.json").write_text(
+                '{"programs":[{"id":"nsf_sbir_phase_i"}]}',
+                encoding="utf-8",
+            )
+            (run / "application.json").write_text("{}", encoding="utf-8")
+            (run / "approval_state.json").write_text(
+                '{"state":"draft","approved_utc":null}', encoding="utf-8"
+            )
+
+            with (
+                patch.object(grant_factory, "GRANTS", grants),
+                patch.object(grant_factory, "APPROVED_DIR", approved),
+                patch.object(grant_factory, "DATA", data),
+                patch.object(
+                    grant_factory,
+                    "_program_window_assessment",
+                    return_value={"actionable": True, "status": "open", "reason": "test"},
+                ),
+                patch.object(grant_factory, "update_queue", return_value={}),
+            ):
+                state = grant_factory.approve("nsf_sbir_phase_i")
+                self.assertEqual(state["state"], "approved")
+                snapshot = approved / "nsf_sbir_phase_i" / run.name
+                self.assertTrue(snapshot.is_dir())
+                frozen_application = (snapshot / "application.json").read_bytes()
+
+                (run / "application.json").write_text(
+                    '{"mutated":true}', encoding="utf-8"
+                )
+                (run / "approval_state.json").write_text(
+                    '{"state":"approved","approved_utc":"FIRST_APPROVAL"}',
+                    encoding="utf-8",
+                )
+                with self.assertRaises(SystemExit):
+                    grant_factory.approve("nsf_sbir_phase_i")
+                self.assertEqual(
+                    (snapshot / "application.json").read_bytes(),
+                    frozen_application,
+                )
+                self.assertEqual(
+                    (run / "approval_state.json").read_text(encoding="utf-8"),
+                    '{"state":"approved","approved_utc":"FIRST_APPROVAL"}',
+                )
+
+                with self.assertRaises(SystemExit):
+                    grant_factory.approve("../nsf_sbir_phase_i")
+
     def test_budget_never_exceeds_ceiling(self) -> None:
         for ceiling in (75_000, 100_000, 200_000, 305_000, 1_100_000):
             budget = grant_factory.render_budget(

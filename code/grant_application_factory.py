@@ -85,6 +85,55 @@ GRANTS_APPLICANT_SOAP_SERVICE_NAME = "ApplicantWebServices-V2.0"
 GRANTS_APPLICANT_SOAP_PORT_NAME = "ApplicantWebServicesSoapPort"
 SAM_GOV_OPPORTUNITIES_API = "https://api.sam.gov/opportunities/v2/search"
 
+_PROGRAM_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+_RUN_UTC_RE = re.compile(r"^\d{8}T\d{6}Z$")
+
+
+def _bounded_direct_child(root: Path, name: str, *, label: str) -> Path:
+    """Return one validated direct child of ``root``.
+
+    Program identifiers can originate in remote opportunity metadata or API
+    route parameters.  They must never become arbitrary filesystem paths.
+    Requiring a single portable filename segment and confirming the resolved
+    parent keeps every read/write inside the configured evidence root.
+    """
+    value = str(name or "")
+    pattern = _RUN_UTC_RE if label == "run UTC" else _PROGRAM_ID_RE
+    if value in {".", ".."} or pattern.fullmatch(value) is None:
+        raise ValueError(f"invalid {label}")
+    # Normalize before constructing a Path object.  Besides making the
+    # containment check explicit to static analysis, realpath protects an
+    # existing destination from escaping through a symlink below the trusted
+    # root.  The trailing separator prevents sibling-prefix confusion such as
+    # ``grants-escape`` being accepted for a ``grants`` root.
+    resolved_root = os.path.realpath(os.fspath(root))
+    candidate = os.path.realpath(
+        os.path.normpath(os.path.join(resolved_root, value))
+    )
+    root_prefix = resolved_root.rstrip(os.sep) + os.sep
+    if (
+        not candidate.startswith(root_prefix)
+        or os.path.dirname(candidate) != resolved_root
+    ):
+        raise ValueError(f"invalid {label}")
+    return Path(candidate)
+
+
+def _named_direct_child(root: Path, name: str) -> Path | None:
+    """Select an existing direct child by enumeration, never by user join."""
+    try:
+        valid_name = _bounded_direct_child(root, name, label="program id").name
+        return next(
+            (
+                child
+                for child in root.iterdir()
+                if child.is_dir() and child.name == valid_name
+            ),
+            None,
+        )
+    except (OSError, ValueError):
+        return None
+
 LAYER_ARTIFACTS = {
     "benchmark": lambda utc: OUT / "master_universe_v2" / utc / "summary.json",
     "meta_router": lambda utc: OUT / "meta_router" / utc / "eval.json",
@@ -1979,7 +2028,9 @@ def _sha256(p: Path) -> str:
 
 def write_bundle(program: dict, profile: dict, ev: dict,
                  elig: dict, utc: str) -> Path:
-    out_dir = GRANTS / program["id"] / utc
+    program_id = str(program.get("id") or "")
+    program_dir = _bounded_direct_child(GRANTS, program_id, label="program id")
+    out_dir = _bounded_direct_child(program_dir, utc, label="run UTC")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     budget = render_budget(program, profile)
@@ -2005,7 +2056,7 @@ def write_bundle(program: dict, profile: dict, ev: dict,
 
     application_json = {
         "schema_version": "1.0",
-        "program_id": program["id"],
+        "program_id": program_id,
         "agency": program["agency"],
         "program": program["program"],
         "topic_area": program["topic_area"],
@@ -2066,7 +2117,7 @@ def write_bundle(program: dict, profile: dict, ev: dict,
     files = [p for p in out_dir.iterdir() if p.is_file()
              and p.name != "manifest.sha256.json"]
     manifest = {
-        "program_id": program["id"],
+        "program_id": program_id,
         "generated_utc": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),
         "evidence_run_utc": ev["run_utc"],
         "files": {p.name: {"size_bytes": p.stat().st_size,
@@ -2168,9 +2219,10 @@ def update_queue() -> dict:
 
 
 def approve(program_id: str) -> dict:
-    prog_dir = GRANTS / program_id
-    if not prog_dir.exists():
+    prog_dir = _named_direct_child(GRANTS, program_id)
+    if prog_dir is None:
         raise SystemExit(f"no draft for {program_id}")
+    program_id = prog_dir.name
     runs = sorted([p for p in prog_dir.iterdir() if p.is_dir()])
     if not runs:
         raise SystemExit(f"no runs in {prog_dir}")
@@ -2201,16 +2253,22 @@ def approve(program_id: str) -> dict:
             f"refusing approval for non-actionable opportunity {program_id}: "
             f"{window.get('status')} ({window.get('reason')})"
         )
+    APPROVED_DIR.mkdir(parents=True, exist_ok=True)
+    approved_program_dir = _bounded_direct_child(
+        APPROVED_DIR, program_id, label="program id"
+    )
+    dest = _bounded_direct_child(approved_program_dir, latest.name, label="run UTC")
+    if dest.exists():
+        raise SystemExit(
+            f"approved snapshot already exists for {program_id}/{latest.name}; "
+            "refusing to overwrite immutable evidence"
+        )
+
     state_p = latest / "approval_state.json"
     state = json.loads(state_p.read_text(encoding="utf-8"))
     state["state"] = "approved"
     state["approved_utc"] = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     state_p.write_text(json.dumps(state, indent=2), encoding="utf-8")
-
-    APPROVED_DIR.mkdir(parents=True, exist_ok=True)
-    dest = APPROVED_DIR / program_id / latest.name
-    if dest.exists():
-        shutil.rmtree(dest)
     shutil.copytree(latest, dest)
     update_queue()
     print(f"[approve] {program_id} -> {dest}")
@@ -2274,7 +2332,8 @@ def main(argv: list[str]) -> int:
         # Innovation #17: skip programs already approved/submitted so a nightly
         # rerank cannot overwrite a locked submission. Approved bundles are
         # preserved verbatim under out/grants/_approved/<id>/<utc>/.
-        prog_dir = GRANTS / p["id"]
+        program_id = str(p.get("id") or "")
+        prog_dir = _bounded_direct_child(GRANTS, program_id, label="program id")
         preserved_state: dict | None = None
         if prog_dir.exists():
             runs = sorted([r for r in prog_dir.iterdir() if r.is_dir()])
@@ -2295,7 +2354,10 @@ def main(argv: list[str]) -> int:
                     print(f"[force] {p['id']:<32} state=approved — rebuilding with new profile")
         elig = score_eligibility(p, profile, ev)
         if not elig["eligible"]:
-            print(f"[skip] {p['id']} — gaps: {elig['gaps']}")
+            print(
+                f"[skip] {p['id']} — {len(elig.get('gaps', []))} "
+                "eligibility gap(s); see the private eligibility report"
+            )
             continue
         out_dir = write_bundle(p, profile, ev, elig, utc)
         # If this was an approved grant rebuilt with --force, restore the
