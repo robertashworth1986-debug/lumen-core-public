@@ -48,6 +48,33 @@ LumenCore will use a best-effort process to:
 
 No response-time guarantee or bug-bounty payment is currently offered.
 
+## Severity, containment, and remediation targets
+
+Confirmed findings are classified by practical impact, exploitability, scope,
+and exposure. Critical or high findings that could affect credentials, release
+authority, evidence integrity, or public operation should immediately place the
+affected path on `HOLD` or reduce its exposure while a correction is prepared.
+
+Operational targets are:
+
+- acknowledge and begin triage within three business days;
+- decide containment for a confirmed critical or high finding within one business day;
+- correct, disable, or explicitly except a confirmed critical finding within seven calendar days;
+- correct, disable, or explicitly except a confirmed high finding within thirty calendar days;
+- schedule medium and low findings according to impact, exposure, and available controls; and
+- retain the affected commit, corrected commit, regression evidence, and closure receipt.
+
+These are operational targets, not contractual guarantees. Buyer-specific
+notification, remediation, and service levels require a signed agreement.
+
+## Time-bounded exceptions
+
+An unresolved confirmed finding may be accepted temporarily only through a
+written record that names the owner, affected scope, reason, severity,
+expiration date, compensating control, review date, and closure condition.
+Exceptions do not change the finding into a pass, cannot authorize a production
+promotion by themselves, and must expire or be renewed explicitly.
+
 ## Supported versions
 
 The actively supported security surface is the current default branch and any explicitly identified current release. Historical commits, archived evidence packets, and old live-release receipts remain immutable records of their exact state and should not be interpreted as supported current deployments.

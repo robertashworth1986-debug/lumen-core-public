@@ -33,6 +33,11 @@ The repository does **not** currently establish independent scientific validatio
 - Machine signed-attestation receipt: [`evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json`](evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json)
 - Signed-attestation receipt verifier: [`code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py`](code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py)
 - Signed-attestation receipt CI: [`.github/workflows/public-site-signed-attestation-receipt.yml`](.github/workflows/public-site-signed-attestation-receipt.yml)
+- Repository security-assurance guide: [`docs/REPOSITORY_SECURITY_ASSURANCE.md`](docs/REPOSITORY_SECURITY_ASSURANCE.md)
+- Machine security-control register: [`config/repository_security_assurance_v1.json`](config/repository_security_assurance_v1.json)
+- Fail-closed security-control verifier: [`code/ops/VERIFY_REPOSITORY_SECURITY_ASSURANCE.py`](code/ops/VERIFY_REPOSITORY_SECURITY_ASSURANCE.py)
+- Code scanning: [`.github/workflows/codeql.yml`](.github/workflows/codeql.yml)
+- Pull-request dependency review: [`.github/workflows/dependency-review.yml`](.github/workflows/dependency-review.yml)
 - Machine-sealed offer packet: [`config/strategic_transaction_packet_v2.json`](config/strategic_transaction_packet_v2.json)
 - Governed portfolio audit: [`docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md`](docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
 - Machine-readable portfolio receipt: [`dashboard/data/lumencore_engine_portfolio_audit.json`](dashboard/data/lumencore_engine_portfolio_audit.json)
@@ -59,6 +64,16 @@ retained successful attestation set is bound to merge commit
 `5fff567c11bee65b5b1de5415d8b8935cd2dfab0`; its public receipt records the
 successful provenance and SBOM verification while preserving the live-domain
 `HOLD` after a 16-match, 12-mismatch, 2-error exact-path audit.
+
+The repository security-assurance lane configures pinned CodeQL analysis for
+Python and JavaScript/TypeScript, a fail-closed high-or-critical dependency
+change gate, weekly dependency update proposals, and documented remediation
+and exception handling. A green scan means the named analysis completed; it
+does not establish zero vulnerabilities, a penetration test, an external
+audit, security certification, runtime hardening, or permission to deploy.
+The current dashboard lock also moves the two known dependency alerts found
+when the graph was enabled to their patched versions; closure remains a
+default-branch and GitHub-alert state, not a claim inferred from this text.
 
 ## Evidence-state legend
 

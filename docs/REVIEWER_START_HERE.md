@@ -27,8 +27,9 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 15. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
 16. [Public-site supply-chain assurance](PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)
 17. [Retained signed-attestation receipt](PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)
-18. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
-19. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
+18. [Repository security assurance](REPOSITORY_SECURITY_ASSURANCE.md)
+19. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
+20. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
 
 The repository docket is the reviewable state bound to the checked-out commit.
 The live docket is a convenience projection and may lag the default branch or
@@ -75,6 +76,12 @@ The documented incident control classifies public-release drift and preserves
 containment and recovery gates. Its CI tabletop is not a completed live
 restoration exercise, business-continuity certification, external audit, or
 customer-notification SLA.
+
+The repository security lane adds pinned CodeQL source analysis, read-only
+pull-request dependency review, weekly dependency update proposals, and a
+machine-checked remediation/exception policy. It does not establish a
+vulnerability-free codebase, penetration test, external security audit,
+security certification, VPS/runtime hardening, or deployment authorization.
 
 ## Clean-checkout verification
 

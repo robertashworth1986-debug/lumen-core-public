@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "generated_utc": "2026-08-08T14:10:00Z",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "scope": "public_repository_source_and_declared_dependencies",
+  "decision": "CONFIGURED_FIRST_PARTY_SECURITY_CONTROLS_WITH_OPEN_RUNTIME_GAPS",
+  "production_decision": "HOLD",
+  "controls": [
+    {
+      "id": "code_scanning",
+      "status": "configured_first_party",
+      "evidence_paths": [
+        ".github/workflows/codeql.yml"
+      ],
+      "establishes": "Pinned CodeQL security-extended analysis is configured for repository Python and JavaScript/TypeScript on pull requests, main pushes, manual runs, and a weekly schedule.",
+      "does_not_establish": "A vulnerability-free repository, penetration test, runtime scan, external audit, security certification, or production authorization."
+    },
+    {
+      "id": "dependency_change_review",
+      "status": "configured_first_party",
+      "evidence_paths": [
+        ".github/workflows/dependency-review.yml"
+      ],
+      "establishes": "A pinned pull-request gate is configured to reject newly introduced high or critical dependency vulnerabilities in runtime and development scopes.",
+      "does_not_establish": "That the existing dependency set is vulnerability-free, that every undeclared dependency is inventoried, or that a proposed change has been approved for production."
+    },
+    {
+      "id": "declared_dependency_remediation",
+      "status": "configured_first_party",
+      "evidence_paths": [
+        "dashboard/package.json",
+        "dashboard/package-lock.json"
+      ],
+      "establishes": "The dashboard dependency contract resolves GHSA-fgmj-fm8m-jvvx through ECharts 6.1.0, resolves GHSA-hmw2-7cc7-3qxx through form-data 4.0.6, and uses a peer-compatible ECharts GL and Three.js dependency set.",
+      "does_not_establish": "Closure of GitHub alerts before this change reaches the default branch, absence of other vulnerabilities, runtime safety, compatibility with every dashboard, or production approval."
+    },
+    {
+      "id": "dependency_update_automation",
+      "status": "configured_first_party",
+      "evidence_paths": [
+        ".github/dependabot.yml"
+      ],
+      "establishes": "Weekly update proposals are configured for GitHub Actions, the reviewer Python dependencies, dashboard npm dependencies, and the reviewer container base image.",
+      "does_not_establish": "Automatic merge, compatibility, remediation completion, production deployment, or approval of any proposed update."
+    },
+    {
+      "id": "private_reporting",
+      "status": "documented_control",
+      "evidence_paths": [
+        "SECURITY.md"
+      ],
+      "establishes": "A private vulnerability-reporting route and bounded response process are published.",
+      "does_not_establish": "A bug bounty, response-time guarantee, third-party monitoring service, external audit, or enterprise service-level agreement."
+    },
+    {
+      "id": "triage_remediation_and_exceptions",
+      "status": "documented_control",
+      "evidence_paths": [
+        "SECURITY.md",
+        "docs/REPOSITORY_SECURITY_ASSURANCE.md"
+      ],
+      "establishes": "Severity, containment, remediation-target, exception-expiry, compensating-control, and closure-receipt expectations are documented for repository findings.",
+      "does_not_establish": "That every finding is remediated, that the targets are contractual guarantees, or that VPS, gateway, cloud-account, secret, network, and production-runtime controls were tested."
+    }
+  ],
+  "claim_boundaries": [
+    "no_vulnerability_free_claim",
+    "no_penetration_test",
+    "no_security_certification",
+    "no_external_security_audit",
+    "no_vps_gateway_or_runtime_scan",
+    "no_production_authorization",
+    "no_automatic_merge_or_deployment"
+  ]
+}

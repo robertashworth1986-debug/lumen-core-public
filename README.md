@@ -39,6 +39,8 @@ deliverable.
 
 **[Open the retained Signed-Attestation Receipt](docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)**
 
+**[Open the Repository Security Assurance guide](docs/REPOSITORY_SECURITY_ASSURANCE.md)**
+
 The index is the canonical evidence map. The reviewer page gives the shortest human path. The index identifies:
 
 - what is merged into the default branch;
@@ -76,6 +78,11 @@ The first retained successful set is bound to commit
 `5fff567c11bee65b5b1de5415d8b8935cd2dfab0` and can be reconstructed and
 checked with the repository verifier. This is not a whole-product or VPS SBOM,
 a SLSA level, or deployment proof; the live domain remains on `HOLD`.
+
+Repository source and declared dependency changes are separately covered by
+pinned CodeQL, pull-request dependency review, and weekly update proposals.
+These are first-party controls, not a vulnerability-free claim, penetration
+test, security certification, runtime scan, or deployment authorization.
 
 ## Five-minute technical path
 
