@@ -1,0 +1,50 @@
+name: Repository trust policy gate
+
+on:
+  pull_request:
+    paths:
+      - 'SECURITY.md'
+      - 'CONTRIBUTING.md'
+      - 'tests/test_repository_trust_policy.py'
+      - '.github/workflows/repository-trust.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'SECURITY.md'
+      - 'CONTRIBUTING.md'
+      - 'tests/test_repository_trust_policy.py'
+      - '.github/workflows/repository-trust.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-trust-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout without retained credentials
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Verify bounded trust policies
+        run: python -m unittest discover -s tests -p 'test_repository_trust_policy.py' -v
+
+      - name: Reject whitespace errors
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          git cat-file -e "${BASE_SHA}^{commit}"
+          git diff --check "${BASE_SHA}...HEAD"
