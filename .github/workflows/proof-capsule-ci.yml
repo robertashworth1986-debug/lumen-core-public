@@ -8,6 +8,7 @@ on:
       - "examples/proof_capsule/**"
       - "tests/test_proof_capsule_verifier.py"
       - "QUICKSTART.md"
+      - "README.md"
       - "docs/PROOF_CAPSULE_SCHEMA.md"
       - "dashboard/operator_home.html"
       - ".github/workflows/proof-capsule-ci.yml"
@@ -19,6 +20,7 @@ on:
       - "examples/proof_capsule/**"
       - "tests/test_proof_capsule_verifier.py"
       - "QUICKSTART.md"
+      - "README.md"
       - "docs/PROOF_CAPSULE_SCHEMA.md"
       - "dashboard/operator_home.html"
       - ".github/workflows/proof-capsule-ci.yml"
@@ -31,6 +33,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  portability:
+    name: ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.13"]
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Compile verifier and focused tests
+        run: python -m py_compile code/proof_capsule_verifier.py tests/test_proof_capsule_verifier.py
+
+      - name: Run focused adversarial tests
+        run: python -m unittest discover -s tests -p "test_proof_capsule_verifier.py" -v
+
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -65,25 +93,47 @@ jobs:
             --root . \
             --max-capsule-bytes 1048576 \
             --max-artifact-bytes 536870912 \
+            --max-total-artifact-bytes 1073741824 \
             > proof_capsule_receipt.json
 
       - name: Validate machine-readable verifier receipt
         run: |
           python - <<'PY'
           import json
+          import hashlib
           from pathlib import Path
 
+          capsule_path = Path(
+              "examples/proof_capsule/dice_eia_public_capsule.json"
+          )
           receipt = json.loads(
               Path("proof_capsule_receipt.json").read_text(encoding="utf-8")
           )
           assert receipt["valid"] is True
-          assert receipt["verifier_version"] == "2.0"
-          assert receipt["evidence_type"] == "replay"
+          assert receipt["receipt_schema"] == "proof-capsule-receipt-v3"
+          assert receipt["verifier_version"] == "3.0"
+          assert receipt["verification_scope"] == "capsule-schema-and-custody"
+          assert receipt["capsule_schema_version"] == "3.0"
+          assert receipt["capsule_file_custody_complete"] is True
+          assert receipt["capsule_file_sha256"] == hashlib.sha256(
+              capsule_path.read_bytes()
+          ).hexdigest()
+          assert receipt["capsule_file_bytes"] == capsule_path.stat().st_size
+          assert len(receipt["capsule_canonical_sha256"]) == 64
+          assert receipt["declared_evidence_type"] == "replay"
           assert receipt["run_type"] == "replay"
           assert receipt["verified_hash_records"] == 1
           assert receipt["verified_bytes"] > 0
+          assert receipt["manifest_format"] == "proof-capsule-manifest-v3"
           assert len(receipt["manifest_hash"]) == 64
+          assert receipt["declared_external_validation_status"] == "not_established"
+          assert receipt["external_report_manifest_bound"] is False
+          assert receipt["external_validator_identity_evaluated"] is False
+          assert receipt["external_validator_independence_evaluated"] is False
+          assert receipt["external_validation_conclusion_evaluated"] is False
           assert receipt["pilot_decision"] == "external_review"
+          assert receipt["release_authorization_evaluated"] is False
+          assert receipt["human_unlock_required"] is True
           print(json.dumps(receipt, indent=2, sort_keys=True))
           PY
 

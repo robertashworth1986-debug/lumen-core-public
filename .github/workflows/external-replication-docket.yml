@@ -145,7 +145,17 @@ jobs:
           assert receipt["schema"] == "lumencore.public_assurance_suite.v1"
           assert receipt["check_count"] == 2
           checks = {item["check_id"]: item for item in receipt["checks"]}
-          assert checks["proof_capsule_v2"]["public_result"]["pilot_decision"] == "external_review"
+          capsule = checks["proof_capsule_v3"]["public_result"]
+          assert capsule["receipt_schema"] == "proof-capsule-receipt-v3"
+          assert capsule["verifier_version"] == "3.0"
+          assert capsule["capsule_file_custody_complete"] is True
+          assert capsule["declared_external_validation_status"] == "not_established"
+          assert capsule["external_validator_identity_evaluated"] is False
+          assert capsule["external_validator_independence_evaluated"] is False
+          assert capsule["external_validation_conclusion_evaluated"] is False
+          assert capsule["pilot_decision"] == "external_review"
+          assert capsule["release_authorization_evaluated"] is False
+          assert capsule["human_unlock_required"] is True
           docket = checks["external_replication_docket_v1"]["public_result"]
           assert docket["status"] == "template_unassigned"
           assert docket["decision"] == "hold"

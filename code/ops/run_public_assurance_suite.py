@@ -24,7 +24,7 @@ WINDOWS_DRIVE_RE = re.compile(r"^[A-Za-z]:")
 
 DEFAULT_CHECKS: tuple[dict[str, Any], ...] = (
     {
-        "check_id": "proof_capsule_v2",
+        "check_id": "proof_capsule_v3",
         "command": (
             "{python}",
             "code/proof_capsule_verifier.py",
@@ -39,10 +39,21 @@ DEFAULT_CHECKS: tuple[dict[str, Any], ...] = (
         ),
         "expected": {
             "valid": True,
-            "verifier_version": "2.0",
-            "evidence_type": "replay",
+            "receipt_schema": "proof-capsule-receipt-v3",
+            "verifier_version": "3.0",
+            "verification_scope": "capsule-schema-and-custody",
+            "capsule_schema_version": "3.0",
+            "capsule_file_custody_complete": True,
+            "declared_evidence_type": "replay",
             "run_type": "replay",
+            "declared_external_validation_status": "not_established",
+            "external_report_manifest_bound": False,
+            "external_validator_identity_evaluated": False,
+            "external_validator_independence_evaluated": False,
+            "external_validation_conclusion_evaluated": False,
             "pilot_decision": "external_review",
+            "release_authorization_evaluated": False,
+            "human_unlock_required": True,
         },
     },
     {
