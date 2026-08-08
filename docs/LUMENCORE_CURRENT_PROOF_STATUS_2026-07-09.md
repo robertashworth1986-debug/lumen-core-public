@@ -36,11 +36,13 @@ locally observed mutable registry on August 6 instead reported:
 - **17 configured/enabled sources**,
 - **14 sources marked measured by first-party probe logic**.
 
-Neither count is a public performance claim. Probe success does not establish
-freshness, material row depth, decision relevance, data rights, dataset fitness,
-or independent validation. No newer state should be promoted until a current
-public-safe registry is exported, definition-bound, freshness-checked,
-hash-recorded, and linked.
+The August 6 registry is now exported into a public-safe, hash-bound manifest at
+`dashboard/data/public_live_breadth_manifest.json`. It records 17 configured
+rows and 14 explicit probe successes, but **0 review-ready sources**. Probe
+success does not establish freshness, material row depth, decision relevance,
+data rights, dataset fitness, or independent validation. No review-ready count
+should be promoted until the private governance sidecar supplies accepted
+thresholds, rights/relevance decisions, and underlying dataset hashes.
 
 ---
 

@@ -8,7 +8,7 @@
 
 | Priority | Item | Status | Next gate |
 |---|---|---|---|
-| 1 | Current live-breadth manifest | no current public-safe manifest | export a timestamped source registry with per-source probe state, row depth, freshness, rights/relevance fields, and hashes |
+| 1 | Current live-breadth manifest | public-safe first-party snapshot manifest published; 0 sources review-ready | complete the private governance sidecar and bind accepted dataset snapshots before promoting any review-ready count |
 | 2 | LumaJet synthetic baseline capsule | internal evidence lane | create Proof Capsule for `LUMAJET_BASELINE_DONE` run |
 | 3 | LumaSuit / LumaSkin Phase I capsule | concept/packet exists | create non-actuating smart-skin simulation capsule |
 | 4 | LumaTrader measured-data proof capsule | dashboard/runtime evidence exists | promote only measured-data and runtime-control claims, not profit claims |
@@ -31,22 +31,32 @@ Latest local observation, not public proof:
 - 14 were marked measured by first-party probe logic,
 - the older approximately 29-enabled / 25-measured target was never frozen into a reviewable manifest and is retired as a current-state claim.
 
-These local flags do not establish current availability, useful row depth,
-freshness, relevance to a named decision, dataset fitness, data rights, or
-independent validation. They must not be used as a public headline.
+The August 6 registry is now frozen in a privacy-bounded public manifest:
+
+- `dashboard/data/public_live_breadth_manifest.json`,
+- registry SHA-256 `ed21b17516aafa3561cce03c27f7c86e9615ec194188046bc6e7102e303aa82b`,
+- 17 configured/enabled rows,
+- 14 explicit probe successes,
+- 0 review-ready sources.
+
+The zero is intentional: no source yet has an accepted minimum row depth,
+maximum age, reviewer-use rights status, named-decision relevance, and bound
+dataset snapshot hash in the governance sidecar. These flags therefore do not
+establish current availability, dataset fitness, independent validation, or a
+public performance headline.
 
 Required before public headline:
 
-- [ ] source registry exported,
-- [ ] probe success separated from dataset fitness and decision relevance,
+- [x] source registry exported through pseudonymous source references,
+- [x] probe success separated from dataset fitness and decision relevance,
 - [ ] source rights and permitted use recorded,
-- [ ] per-source probe timestamp and freshness threshold recorded,
-- [ ] row counts included,
-- [ ] context-only rows separated,
-- [ ] hashes generated,
-- [ ] stale 17/12 language marked historical,
-- [ ] unfrozen 29/25 target language retired,
-- [ ] no dollar figure promoted as revenue or realized savings.
+- [ ] per-source freshness thresholds accepted (probe timestamps are present),
+- [x] row counts included,
+- [x] context-only and review-ready states separated,
+- [x] registry, row, and manifest hashes generated,
+- [x] stale 17/12 language marked historical,
+- [x] unfrozen 29/25 target language retired,
+- [x] no dollar figure promoted as revenue or realized savings.
 
 ---
 
