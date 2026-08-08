@@ -4,7 +4,7 @@
 
 Agent Arena is **not a separate LumenCore product**. It is the adversarial multi-agent validation sub-harness inside the existing proof-to-pilot architecture. Its job is to make an agentic candidate compete under predeclared rules while the scenario, selection split, holdout floors, baseline, referee, score function, evidence boundary, and custody system remain outside agent control.
 
-The reference implementation is intentionally provider-agnostic: a deterministic policy ships with the repository for reproducibility, while the `ProposalProvider` interface can later wrap a pinned LLM, local model, optimizer, or buyer-supplied agent without granting that provider authority over scoring or evidence.
+Release evidence bundles are intentionally limited to the committed deterministic reference policy. The lower-level `ProposalProvider` interface remains useful for tests and non-custodial experiments, but an in-process custom provider is trusted code: it can retain state, count calls, inspect its environment, or depend on remote behavior that a source hash cannot bind. Custom LLM, local-model, optimizer, or buyer-agent runs therefore require a separate isolated harness and an explicit identity/custody design before they may emit reviewable evidence.
 
 ## V2 → V5 capability chain
 
@@ -49,7 +49,7 @@ V5 binds the run to machine-verifiable identities:
 
 - exact scenario lock SHA-256;
 - engine source SHA-256;
-- provider descriptor SHA-256 bound to the executing callable's inspected source;
+- reference-provider descriptor SHA-256 bound to the committed deterministic callable's inspected source;
 - clean Git commit and source-tree identity, with dirty executions rejected;
 - event-by-event predecessor hash chain;
 - event Merkle root for the complete ordered event set;
@@ -153,7 +153,9 @@ The scoring path accepts a provider callable:
 (role, observation, control_bounds) -> proposal mapping
 ```
 
-The provider receives sensor values only, without floor identity, seed identity, holdout status, attack label, or compromise status. It may propose only declared control values. The engine rejects undeclared controls and non-finite values before synthesis, and binds the provider descriptor to the inspected implementation source. A future external-model adapter should freeze at least provider/model identity, version, inference settings, prompt or policy hash, and relevant adapter hash in its inspectable callable before execution. API keys, private prompts, credentials, and private buyer data must not be placed in the public evidence bundle.
+The committed reference provider receives sensor values only, without floor identity, seed identity, holdout status, attack label, or compromise status. It may propose only declared control values. The engine rejects undeclared controls and non-finite values before synthesis, binds the reference descriptor to the inspected implementation source, and rejects custom providers at the release-bundle boundary.
+
+The Python adapter is part of the trusted computing base. A future external-model adapter must run behind narrow process or service isolation, use a predeclared protocol that prevents stateful selection-to-holdout signaling, and bind provider/model identity, version, inference settings, prompt or policy hash, adapter configuration, relevant dependency identities, and returned evidence. API keys, private prompts, credentials, and private buyer data must not be placed in the public evidence bundle.
 
 ## Claim boundary
 
@@ -167,7 +169,7 @@ A positive holdout delta means only that the locked champion scored differently 
 
 The next meaningful promotion is external execution, not V6 naming:
 
-1. pin the commit, source tree, V5 scenario, provider implementation, and run protocol;
+1. pin the commit, source tree, V5 scenario, committed reference provider, and run protocol;
 2. have a qualified non-author evaluator execute the arena;
 3. have that evaluator run the verifier independently;
 4. return a receipt whose digest is independently published, countersigned, or cryptographically signed, including commit, source tree, scenario hash, engine hash, provider hash, event roots, manifest hash, runtime identity, and result;

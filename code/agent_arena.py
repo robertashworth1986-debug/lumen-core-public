@@ -210,6 +210,11 @@ def _validate_config(cfg: dict[str, Any]) -> dict[str, Any]:
         if _finite(raw, f"score_weights.{name}") < 0.0:
             raise ValueError(f"score weight must be nonnegative: {name}")
     _validate_exact_keys(cfg.get("baseline_plan", {}), CONTROLS, "baseline plan")
+    for name, raw in cfg["baseline_plan"].items():
+        value = _finite(raw, f"baseline_plan.{name}")
+        low, high = map(float, cfg["control_bounds"][name])
+        if not low <= value <= high:
+            raise ValueError(f"baseline_plan.{name} is outside its control bounds")
     roles = cfg.get("agent_roles", [])
     if len(roles) < 5 or len(set(roles)) != len(roles):
         raise ValueError("agent roles must be unique and contain at least five entries")
@@ -244,11 +249,22 @@ def _validate_config(cfg: dict[str, Any]) -> dict[str, Any]:
             raise ValueError(f"candidate profile lock mismatch: {profile_name}")
         for key in required - {"red_team"}:
             _finite(profile[key], f"candidate_profiles.{profile_name}.{key}")
+        if not 0.0 <= float(profile["trim_threshold"]) <= 1.0:
+            raise ValueError(f"candidate_profiles.{profile_name}.trim_threshold must be in [0, 1]")
+        if float(profile["deviation_sensitivity"]) < 0.0:
+            raise ValueError(f"candidate_profiles.{profile_name}.deviation_sensitivity must be nonnegative")
+        if float(profile["safety_margin"]) < 0.0:
+            raise ValueError(f"candidate_profiles.{profile_name}.safety_margin must be nonnegative")
         if not isinstance(profile["red_team"], bool):
             raise ValueError(f"candidate_profiles.{profile_name}.red_team must be boolean")
     selection = cfg.get("champion_selection", {})
     if set(selection) != {"mean_score_weight", "cvar10_weight", "violation_weight"}:
         raise ValueError("champion selection lock mismatch")
+    for name, raw in selection.items():
+        if _finite(raw, f"champion_selection.{name}") < 0.0:
+            raise ValueError(f"champion_selection.{name} must be nonnegative")
+    if not any(float(value) > 0.0 for value in selection.values()):
+        raise ValueError("champion selection must include a positive weight")
     oracle_grid = cfg.get("oracle_grid", {})
     _validate_exact_keys(oracle_grid, CONTROLS, "oracle grid")
     for name, points in oracle_grid.items():
@@ -298,6 +314,22 @@ def _validate_config(cfg: dict[str, Any]) -> dict[str, Any]:
             raise ValueError(f"floors[{index}] references an undeclared role")
         if set(compromised) & set(dropped):
             raise ValueError(f"floors[{index}] cannot compromise and drop the same role")
+        demand = _finite(floor.get("demand"), f"floors[{index}].demand")
+        capacity_loss = _finite(floor.get("capacity_loss"), f"floors[{index}].capacity_loss")
+        ambient_heat = _finite(floor.get("ambient_heat"), f"floors[{index}].ambient_heat")
+        failure_rate = _finite(floor.get("failure_rate"), f"floors[{index}].failure_rate")
+        telemetry_noise = _finite(floor.get("telemetry_noise"), f"floors[{index}].telemetry_noise")
+        if demand <= 0.0:
+            raise ValueError(f"floors[{index}].demand must be positive")
+        for name, value in {
+            "capacity_loss": capacity_loss,
+            "failure_rate": failure_rate,
+            "telemetry_noise": telemetry_noise,
+        }.items():
+            if not 0.0 <= value <= 0.95:
+                raise ValueError(f"floors[{index}].{name} must be in [0, 0.95]")
+        if ambient_heat < 0.0:
+            raise ValueError(f"floors[{index}].ambient_heat must be nonnegative")
     return cfg
 
 
@@ -910,7 +942,7 @@ def grid_reference_statistics(
         "reference_minus_candidate_score_mean": mean(deltas) if deltas else 0.0,
         "reference_minus_candidate_score_median": median(deltas) if deltas else 0.0,
         "reference_minus_candidate_score_max": max(deltas) if deltas else 0.0,
-        "candidate_fraction_within_5_score_points": mean(float(delta <= 5.0) for delta in deltas) if deltas else 0.0,
+        "candidate_fraction_within_5_score_points": mean(float(abs(delta) <= 5.0) for delta in deltas) if deltas else 0.0,
     }
 
 
@@ -1069,6 +1101,11 @@ def run_arena(
     generated_utc: str | None = None,
     provider_descriptor: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    if provider is not deterministic_provider:
+        raise ValueError(
+            "release evidence bundles support only the committed deterministic_provider; "
+            "custom providers require a separate isolated experimental harness"
+        )
     git_commit, git_tree = _git_state()
     raw = config_path.read_bytes()
     cfg = _validate_config(json.loads(raw.decode("utf-8")))
@@ -1081,10 +1118,9 @@ def run_arena(
     floors = [_floor_from_config(x) for x in cfg["floors"]]
     selection_floors = [floor for floor in floors if not floor.holdout]
     holdout_floors = [floor for floor in floors if floor.holdout]
-    descriptor = _bound_provider_descriptor(
-        provider_descriptor or cfg["provider_descriptor"],
-        provider,
-    )
+    if provider_descriptor is not None and dict(provider_descriptor) != cfg["provider_descriptor"]:
+        raise ValueError("reference provider descriptor must match the locked scenario")
+    descriptor = _bound_provider_descriptor(cfg["provider_descriptor"], provider)
     descriptor_hash = _provider_descriptor_hash(descriptor)
     event_path = out_dir / "events.jsonl"
     root = "0" * 64

@@ -297,7 +297,7 @@
       "universal superiority"
     ]
   },
-  "next_validation_gate": "A qualified non-author evaluator pins the commit, source tree, scenario, provider implementation and run protocol, independently executes and verifies the evidence bundle, and returns an externally pinned or signed receipt; a paid pilot may replace the abstract environment with a buyer-approved dataset or simulator while preserving the prelocked baseline, metric, threshold, selection rule, holdout split, failure definitions and prohibited claims.",
+  "next_validation_gate": "A qualified non-author evaluator pins the commit, source tree, scenario, committed deterministic reference provider and run protocol, independently executes and verifies the evidence bundle, and returns an externally pinned or signed receipt; any custom provider requires a separately isolated and predeclared identity/custody protocol. A paid pilot may replace the abstract environment with a buyer-approved dataset or simulator while preserving the prelocked baseline, metric, threshold, selection rule, holdout split, failure definitions and prohibited claims.",
   "oracle_grid": {
     "routing": 5,
     "cooling": 5,

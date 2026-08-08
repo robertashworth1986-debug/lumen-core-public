@@ -111,22 +111,36 @@ class AgentArenaV5Tests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "execution receipt custody mismatch"):
                 verify_bundle(out)
 
-    def test_provider_identity_is_bound_to_executing_callable(self):
+    def test_release_bundle_rejects_custom_in_process_provider(self):
         def substitute_provider(role, observation, bounds):
             return {name: high for name, (_, high) in bounds.items()}
 
-        with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
-            reference = run_arena(Path(first), self.config_path, generated_utc="2026-08-06T23:00:00+00:00")
-            substitute = run_arena(
-                Path(second),
-                self.config_path,
-                provider=substitute_provider,
-                generated_utc="2026-08-06T23:00:00+00:00",
-            )
-            self.assertNotEqual(
-                reference["provider_descriptor_sha256"],
-                substitute["provider_descriptor_sha256"],
-            )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with self.assertRaisesRegex(ValueError, "only the committed deterministic_provider"):
+                run_arena(
+                    Path(temp_dir),
+                    self.config_path,
+                    provider=substitute_provider,
+                    generated_utc="2026-08-06T23:00:00+00:00",
+                )
+
+    def test_invalid_scenario_semantics_fail_closed(self):
+        base = json.loads(self.config_path.read_text(encoding="utf-8"))
+        mutations = {
+            "baseline bounds": lambda cfg: cfg["baseline_plan"].__setitem__("routing", 999),
+            "negative telemetry noise": lambda cfg: cfg["floors"][0].__setitem__("telemetry_noise", -2),
+            "negative selection weight": lambda cfg: cfg["champion_selection"].__setitem__("mean_score_weight", -1),
+            "invalid trim threshold": lambda cfg: cfg["candidate_profiles"]["balanced"].__setitem__("trim_threshold", 99),
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "scenario.json"
+            for name, mutate in mutations.items():
+                with self.subTest(name=name):
+                    cfg = json.loads(json.dumps(base))
+                    mutate(cfg)
+                    path.write_text(json.dumps(cfg), encoding="utf-8")
+                    with self.assertRaises(ValueError):
+                        load_config(path)
 
     def test_provider_observation_blinds_holdout_and_attack_metadata(self):
         cfg = load_config(self.config_path)

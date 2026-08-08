@@ -41,7 +41,7 @@ jobs:
       - name: Verify locked V5 evidence bundle
         run: python code/agent_arena.py verify --out /tmp/agent-arena-v5
       - name: Retain the locked evidence bundle
-        if: always()
+        if: success()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: agent-arena-v5-${{ github.sha }}
