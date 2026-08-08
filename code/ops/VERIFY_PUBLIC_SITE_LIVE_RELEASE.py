@@ -37,6 +37,13 @@ FILE_KEYS = {
 }
 
 
+def content_type_allowed(archive_name: str, content_type: str) -> bool:
+    """Require standards-safe MIME types for the canonical discovery manifest."""
+    if archive_name != "manifest.json":
+        return True
+    return content_type in {"application/json", "application/manifest+json"}
+
+
 def _strict_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
     result: dict[str, object] = {}
     for key, value in pairs:
@@ -144,6 +151,7 @@ def verify(
             with urlopen(request, timeout=timeout) as response:
                 body = response.read()
                 status = getattr(response, "status", 200)
+                content_type = response.headers.get_content_type().casefold()
         except (HTTPError, URLError, TimeoutError) as exc:
             results.append(
                 {
@@ -157,14 +165,21 @@ def verify(
             continue
 
         actual = sha256(body)
+        mime_ok = content_type_allowed(name, content_type)
         results.append(
             {
                 "archive_name": name,
                 "bytes": len(body),
+                "content_type": content_type,
+                "content_type_allowed": mime_ok,
                 "expected_sha256": expected,
                 "actual_sha256": actual,
                 "http_status": status,
-                "status": "MATCH" if status == 200 and actual == expected else "MISMATCH",
+                "status": (
+                    "MATCH"
+                    if status == 200 and actual == expected and mime_ok
+                    else "MISMATCH"
+                ),
                 "url": url,
             }
         )

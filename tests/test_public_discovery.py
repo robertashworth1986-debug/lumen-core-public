@@ -50,7 +50,7 @@ class PublicDiscoveryTests(unittest.TestCase):
         self.assertNotIn("grants.html", serialized)
 
     def test_webmanifest_is_strict_and_bounded(self):
-        path = DASHBOARD / "site.webmanifest"
+        path = DASHBOARD / "manifest.json"
         pairs_seen: list[str] = []
 
         def strict_object(pairs):
@@ -67,6 +67,11 @@ class PublicDiscoveryTests(unittest.TestCase):
         self.assertEqual(payload["scope"], "/")
         self.assertEqual(payload["icons"][0]["src"], "/assets/lumencore-mark.svg")
         self.assertNotIn("screenshots", payload)
+        self.assertEqual(
+            payload,
+            json.loads((DASHBOARD / "site.webmanifest").read_text(encoding="utf-8")),
+            "legacy .webmanifest and canonical JSON manifest must not drift",
+        )
 
     def test_indexed_pages_declare_canonical_routes_and_public_mark(self):
         pages = {
@@ -81,7 +86,7 @@ class PublicDiscoveryTests(unittest.TestCase):
                 self.assertIn('name="robots" content="index,follow,max-image-preview:large"', text)
                 self.assertIn(f'rel="canonical" href="{canonical}"', text)
                 self.assertIn('rel="icon" href="/assets/lumencore-mark.svg"', text)
-                self.assertIn('rel="manifest" href="/site.webmanifest"', text)
+                self.assertIn('rel="manifest" href="/manifest.json"', text)
 
     def test_public_mark_is_accessible_svg_without_script(self):
         text = (DASHBOARD / "assets" / "lumencore-mark.svg").read_text(encoding="utf-8")
@@ -89,6 +94,15 @@ class PublicDiscoveryTests(unittest.TestCase):
         self.assertTrue(root.tag.endswith("svg"))
         self.assertNotIn("<script", text.casefold())
         self.assertIn("LumenCore mark", text)
+
+    def test_deploy_gate_requires_canonical_manifest_and_safe_mime_type(self):
+        workflow = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("dashboard/manifest.json", workflow)
+        self.assertIn("https://lumen-core.ai/manifest.json", workflow)
+        self.assertIn('[[ "$MANIFEST_TYPE" == application/json*', workflow)
+        self.assertIn("application/manifest+json*", workflow)
 
 
 if __name__ == "__main__":

@@ -29,6 +29,7 @@ RELEASE_PATHS: Final = (
     "dashboard/robots.txt",
     "dashboard/sitemap.xml",
     "dashboard/site.webmanifest",
+    "dashboard/manifest.json",
     "dashboard/assets/lumencore-mark.svg",
     "dashboard/assets/lumencore.css",
     "dashboard/assets/luma_command_fabric.css",
