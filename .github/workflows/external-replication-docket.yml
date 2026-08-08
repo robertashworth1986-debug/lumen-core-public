@@ -6,10 +6,14 @@ on:
       - "config/external_replication_docket_v1.json"
       - "code/ops/validate_external_replication_docket.py"
       - "code/ops/run_public_assurance_suite.py"
+      - "code/ops/run_public_assurance_suite_strict.py"
+      - "code/ops/validate_external_independence_contract.py"
       - "code/proof_capsule_verifier.py"
       - "examples/proof_capsule/**"
       - "tests/test_external_replication_docket.py"
       - "tests/test_public_assurance_suite.py"
+      - "tests/test_public_assurance_suite_strict.py"
+      - "dashboard/external_review.html"
       - "docs/EXTERNAL_REPLICATION_DOCKET_V1.md"
       - "docs/PUBLIC_ASSURANCE_QUICKSTART.md"
       - ".github/workflows/external-replication-docket.yml"
@@ -19,10 +23,14 @@ on:
       - "config/external_replication_docket_v1.json"
       - "code/ops/validate_external_replication_docket.py"
       - "code/ops/run_public_assurance_suite.py"
+      - "code/ops/run_public_assurance_suite_strict.py"
+      - "code/ops/validate_external_independence_contract.py"
       - "code/proof_capsule_verifier.py"
       - "examples/proof_capsule/**"
       - "tests/test_external_replication_docket.py"
       - "tests/test_public_assurance_suite.py"
+      - "tests/test_public_assurance_suite_strict.py"
+      - "dashboard/external_review.html"
       - "docs/EXTERNAL_REPLICATION_DOCKET_V1.md"
       - "docs/PUBLIC_ASSURANCE_QUICKSTART.md"
       - ".github/workflows/external-replication-docket.yml"
@@ -56,8 +64,11 @@ jobs:
           python -m py_compile \
             code/ops/validate_external_replication_docket.py \
             code/ops/run_public_assurance_suite.py \
+            code/ops/run_public_assurance_suite_strict.py \
+            code/ops/validate_external_independence_contract.py \
             tests/test_external_replication_docket.py \
-            tests/test_public_assurance_suite.py
+            tests/test_public_assurance_suite.py \
+            tests/test_public_assurance_suite_strict.py
 
       - name: Run replication-docket adversarial tests
         run: |
@@ -71,6 +82,13 @@ jobs:
           python -m unittest discover \
             -s tests \
             -p "test_public_assurance_suite.py" \
+            -v
+
+      - name: Run strict independence and custody adversarial tests
+        run: |
+          python -m unittest discover \
+            -s tests \
+            -p "test_public_assurance_suite_strict.py" \
             -v
 
       - name: Validate canonical docket and write receipt
@@ -107,6 +125,13 @@ jobs:
             --commit "$ASSURANCE_COMMIT" \
             --out public_assurance_receipt.json
 
+      - name: Run strict public assurance suite
+        run: |
+          python code/ops/run_public_assurance_suite_strict.py \
+            --root . \
+            --commit "$ASSURANCE_COMMIT" \
+            --out public_assurance_receipt_strict.json
+
       - name: Enforce aggregate assurance boundary
         run: |
           python - <<'PY'
@@ -129,6 +154,25 @@ jobs:
           print(json.dumps(receipt, indent=2, sort_keys=True))
           PY
 
+      - name: Enforce strict custody and independence boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(
+              Path("public_assurance_receipt_strict.json").read_text(encoding="utf-8")
+          )
+          assert receipt["valid"] is True
+          assert receipt["source_pre_post_match"] is True
+          assert receipt["strict_runner_version"] == "1.0.0"
+          checks = {item["check_id"]: item for item in receipt["checks"]}
+          docket = checks["external_replication_docket_v1"]["public_result"]
+          assert docket["independence_contract_valid"] is True
+          assert docket["safe_for_external_validation_claim"] is False
+          print(json.dumps(receipt, indent=2, sort_keys=True))
+          PY
+
       - name: Upload bounded assurance receipts
         uses: actions/upload-artifact@v4
         with:
@@ -136,5 +180,6 @@ jobs:
           path: |
             external_replication_docket_receipt.json
             public_assurance_receipt.json
+            public_assurance_receipt_strict.json
           if-no-files-found: error
           retention-days: 30
