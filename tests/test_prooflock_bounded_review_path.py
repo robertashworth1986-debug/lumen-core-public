@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 
 import pytest
 
@@ -26,9 +28,32 @@ def sample_receipt() -> dict:
     return json.loads(SAMPLE.read_text(encoding="utf-8"))
 
 
-def test_public_demo_verifies_custody_but_intentionally_holds_promotion():
+def committed_artifact_root(tmp_path: Path, receipt: dict) -> Path:
+    for artifact in receipt["artifacts"]:
+        relative = artifact["repo_relative_path"]
+        committed = subprocess.run(
+            ["git", "cat-file", "blob", f"HEAD:dashboard/{relative}"],
+            cwd=ROOT,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        ).stdout
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(committed)
+    return tmp_path
+
+
+def test_public_demo_binds_exact_committed_blobs_and_holds_promotion(tmp_path):
     module = load_module()
-    report = module.verify_receipt(sample_receipt())
+    receipt = sample_receipt()
+    root = committed_artifact_root(tmp_path, receipt)
+    for artifact in receipt["artifacts"]:
+        observed = hashlib.sha256(
+            (root / artifact["repo_relative_path"]).read_bytes()
+        ).hexdigest()
+        assert artifact["expected_sha256"] == observed
+    report = module.verify_receipt(receipt, root=root)
     assert report["integrity_valid"] is True
     assert report["policy_valid"] is True
     assert report["artifact_count"] == 2
@@ -44,7 +69,7 @@ def test_public_demo_verifies_custody_but_intentionally_holds_promotion():
 
 
 @pytest.mark.parametrize("decision", ["HOLD", "REJECT", "PROMOTE"])
-def test_resealed_self_authored_passes_cannot_mint_authority(decision):
+def test_resealed_self_authored_passes_cannot_mint_authority(decision, tmp_path):
     module = load_module()
     receipt = sample_receipt()
     for gate in receipt["gates"]:
@@ -54,7 +79,10 @@ def test_resealed_self_authored_passes_cannot_mint_authority(decision):
     receipt["receipt_sha256"] = module.stable_hash(
         module.receipt_payload(receipt)
     )
-    report = module.verify_receipt(receipt)
+    report = module.verify_receipt(
+        receipt,
+        root=committed_artifact_root(tmp_path, receipt),
+    )
     assert report["integrity_valid"] is True
     assert report["policy_valid"] is False
     assert report["promotion_allowed"] is False

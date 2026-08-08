@@ -1,6 +1,10 @@
 *.sh text eol=lf
 examples/proof_capsule/** text eol=lf
 
+# Canonical bytes for the browser-verifiable public ProofLock receipt.
+/dashboard/assets/prooflock/*.json text eol=lf
+/dashboard/build_week/prooflock_console/*.json text eol=lf
+
 # Canonical bytes for the bounded CODECHECK reviewer capsule.
 /.github/workflows/reviewer-reproducibility.yml text eol=lf
 /.gitattributes text eol=lf
