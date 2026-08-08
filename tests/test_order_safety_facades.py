@@ -99,7 +99,15 @@ class OrderSafetyFacadeTests(unittest.TestCase):
     def test_gateway_blocks_before_key_loading_or_transport(self) -> None:
         calls: list[dict[str, Any]] = []
         legacy = types.ModuleType("luma_experience_gateway_legacy")
-        legacy.app = object()
+
+        class GatewayApp:
+            def __init__(self) -> None:
+                self.middleware: list[tuple[tuple[Any, ...], dict[str, Any]]] = []
+
+            def add_middleware(self, *args: Any, **kwargs: Any) -> None:
+                self.middleware.append((args, kwargs))
+
+        legacy.app = GatewayApp()
 
         def original_add_order(payload: dict[str, Any]) -> dict[str, Any]:
             calls.append(dict(payload))
@@ -127,6 +135,11 @@ class OrderSafetyFacadeTests(unittest.TestCase):
         self.assertIn("result", validated)
         self.assertEqual(len(calls), 1)
         self.assertEqual(calls[0]["validate"], "true")
+        self.assertEqual(len(facade.app.middleware), 1)
+        self.assertEqual(
+            facade.app.middleware[0][0][0].__name__,
+            "OperatorApiAccessMiddleware",
+        )
 
     def test_ticket_facade_forces_validate_and_disables_autofire(self) -> None:
         calls: list[dict[str, Any]] = []
