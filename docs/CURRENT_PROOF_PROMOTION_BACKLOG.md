@@ -45,11 +45,18 @@ dataset snapshot hash in the governance sidecar. These flags therefore do not
 establish current availability, dataset fitness, independent validation, or a
 public performance headline.
 
+The source-named private worklist is generated outside the repository under the
+E-drive proof vault. Promotion is governed by
+`docs/LIVE_BREADTH_GOVERNANCE_PROTOCOL.md`; incomplete, unapproved, hash-mismatched,
+or tampered worklists cannot produce a valid governance sidecar.
+
 Required before public headline:
 
 - [x] source registry exported through pseudonymous source references,
 - [x] probe success separated from dataset fitness and decision relevance,
 - [ ] source rights and permitted use recorded,
+- [x] private source-governance worklist generated,
+- [x] worklist-to-sidecar promotion fails closed on missing approval or evidence,
 - [ ] per-source freshness thresholds accepted (probe timestamps are present),
 - [x] row counts included,
 - [x] context-only and review-ready states separated,

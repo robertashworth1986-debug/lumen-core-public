@@ -6,7 +6,7 @@
 |---|---|---|
 | 1 | Public claim cleanup | Keep README, PRs, and proof docs aligned with founder-owned proof-to-pilot language |
 | 2 | EVTit / Black Dog | Use founder-protected call agenda; ask for review/routing/scoped support, not ownership transfer |
-| 3 | Current proof status | Public-safe source manifest is frozen with 0 review-ready sources; complete the private governance sidecar and dataset bindings before promoting a review-ready breadth count |
+| 3 | Current proof status | Private governance worklist is generated for all 17 sources; document source-backed rights/relevance/threshold decisions and dataset hashes before approving or promoting it |
 | 4 | LumaJet | Promote synthetic baseline evidence only as simulation/synthetic proof; no aircraft or autonomous-control claim |
 | 5 | LumaSuit / LumaSkin | Promote non-actuating smart-skin/digital-twin Phase I evidence; no powered armor, medical, flight, or certified-safety claim |
 | 6 | DICE | Build full submission packet around abstract ID HR001126S0010-DICE-PA-052 with bounded simulation/replay language |

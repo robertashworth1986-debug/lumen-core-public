@@ -50,10 +50,17 @@ def fixture_registry() -> dict:
     }
 
 
-def fixture_governance() -> dict:
-    return {
+def fixture_governance(module) -> dict:
+    governance = {
         "schema": "public_live_breadth_governance_v1",
+        "registry_sha256": "b" * 64,
         "registry_max_age_hours": 2,
+        "protocol": {
+            "approval_status": "approved",
+            "reviewed_by_role": "data_governance_owner",
+            "reviewed_utc": "2026-08-08T09:45:00+00:00",
+            "worklist_sha256": "c" * 64,
+        },
         "sources": {
             "PRIVATE_PROVIDER_A": {
                 "rights_status": "verified_for_review",
@@ -70,6 +77,7 @@ def fixture_governance() -> dict:
             },
         },
     }
+    return module.seal_governance(governance)
 
 
 def test_manifest_separates_probe_success_from_review_readiness() -> None:
@@ -77,7 +85,7 @@ def test_manifest_separates_probe_success_from_review_readiness() -> None:
     manifest = module.build_manifest(
         fixture_registry(),
         registry_sha256="b" * 64,
-        governance=fixture_governance(),
+        governance=fixture_governance(module),
         generated_utc="2026-08-08T10:00:00+00:00",
     )
 
@@ -98,7 +106,7 @@ def test_manifest_is_public_safe_and_omits_provider_and_credential_names() -> No
     manifest = module.build_manifest(
         fixture_registry(),
         registry_sha256="b" * 64,
-        governance=fixture_governance(),
+        governance=fixture_governance(module),
         generated_utc="2026-08-08T10:00:00+00:00",
     )
     serialized = json.dumps(manifest).lower()
@@ -141,7 +149,7 @@ def test_manifest_hash_detects_tampering() -> None:
     manifest = module.build_manifest(
         fixture_registry(),
         registry_sha256="b" * 64,
-        governance=fixture_governance(),
+        governance=fixture_governance(module),
         generated_utc="2026-08-08T10:00:00+00:00",
     )
 
@@ -157,7 +165,7 @@ def test_duplicate_source_identifiers_fail_the_claim_gate() -> None:
     manifest = module.build_manifest(
         registry,
         registry_sha256="b" * 64,
-        governance=fixture_governance(),
+        governance=fixture_governance(module),
         generated_utc="2026-08-08T10:00:00+00:00",
     )
 
@@ -173,7 +181,7 @@ def test_future_probe_timestamp_fails_structural_and_claim_gates() -> None:
     manifest = module.build_manifest(
         registry,
         registry_sha256="b" * 64,
-        governance=fixture_governance(),
+        governance=fixture_governance(module),
         generated_utc="2026-08-08T10:00:00+00:00",
     )
 
@@ -195,6 +203,10 @@ def test_committed_manifest_is_hash_valid_and_fail_closed() -> None:
     assert manifest["summary"]["probe_success_sources"] == 14
     assert manifest["summary"]["review_ready_sources"] == 0
     assert manifest["claim_gate"]["review_ready_source_count_claim_allowed"] is False
+    assert manifest["source_snapshot"]["governance_protocol_valid"] is False
+    assert manifest["source_snapshot"]["governance_protocol_issues"] == [
+        "governance_not_supplied"
+    ]
     assert "Review-ready sources | 0" in markdown
     assert "PRIVATE" not in json.dumps(manifest)
 

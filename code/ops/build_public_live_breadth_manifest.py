@@ -77,6 +77,76 @@ def load_governance(path: Path | None) -> dict[str, Any]:
     return payload
 
 
+def governance_sha256(governance: dict[str, Any]) -> str:
+    payload = deepcopy(governance)
+    integrity = payload.setdefault("integrity", {})
+    integrity.pop("governance_sha256", None)
+    return sha256_bytes(canonical_bytes(payload))
+
+
+def seal_governance(governance: dict[str, Any]) -> dict[str, Any]:
+    sealed = deepcopy(governance)
+    integrity = sealed.setdefault("integrity", {})
+    integrity["algorithm"] = "sha256"
+    integrity["canonicalization"] = "utf8-json-sort-keys-compact"
+    integrity["hash_scope"] = "entire governance sidecar excluding integrity.governance_sha256"
+    integrity["governance_sha256"] = governance_sha256(sealed)
+    return sealed
+
+
+def validate_governance(
+    governance: dict[str, Any], registry_sha256: str
+) -> dict[str, Any]:
+    issues: list[str] = []
+    sources = governance.get("sources")
+    protocol = governance.get("protocol")
+    integrity = governance.get("integrity")
+
+    if (
+        sources == {}
+        and protocol is None
+        and integrity is None
+        and governance.get("registry_sha256") is None
+    ):
+        return {
+            "valid": False,
+            "issues": ["governance_not_supplied"],
+            "governance_sha256": None,
+        }
+
+    if governance.get("schema") != "public_live_breadth_governance_v1":
+        issues.append("unsupported_governance_schema")
+    if not isinstance(sources, dict) or not sources:
+        issues.append("missing_governance_sources")
+    if strict_sha256(governance.get("registry_sha256")) != registry_sha256.lower():
+        issues.append("registry_hash_mismatch")
+    if not isinstance(protocol, dict):
+        issues.append("missing_protocol_review")
+    else:
+        if protocol.get("approval_status") != "approved":
+            issues.append("protocol_not_approved")
+        if not str(protocol.get("reviewed_by_role") or "").strip():
+            issues.append("missing_reviewer_role")
+        if parse_utc(protocol.get("reviewed_utc")) is None:
+            issues.append("missing_or_invalid_reviewed_utc")
+        if strict_sha256(protocol.get("worklist_sha256")) is None:
+            issues.append("missing_or_invalid_worklist_sha256")
+    if not isinstance(integrity, dict):
+        issues.append("missing_governance_integrity")
+    else:
+        expected = strict_sha256(integrity.get("governance_sha256"))
+        if expected is None or expected != governance_sha256(governance):
+            issues.append("governance_hash_mismatch")
+
+    return {
+        "valid": not issues,
+        "issues": sorted(set(issues)),
+        "governance_sha256": (
+            integrity.get("governance_sha256") if isinstance(integrity, dict) else None
+        ),
+    }
+
+
 def safe_int(value: Any) -> int | None:
     if isinstance(value, bool):
         return None
@@ -131,6 +201,7 @@ def build_source_row(
     row: dict[str, Any],
     governance: dict[str, Any],
     generated_at: datetime,
+    governance_valid: bool,
 ) -> tuple[dict[str, Any], list[str]]:
     issues: list[str] = []
     source = str(row.get("source") or "").strip()
@@ -187,6 +258,7 @@ def build_source_row(
             rights_status == "verified_for_review",
             relevance_status == "verified",
             dataset_snapshot_sha256 is not None,
+            governance_valid,
             not issues,
         )
     )
@@ -232,6 +304,9 @@ def build_manifest(
     governance_sources = (governance or {}).get("sources", {})
     if not isinstance(governance_sources, dict):
         raise ValueError("Governance sidecar must contain a 'sources' object")
+    governance_validation = validate_governance(
+        governance or {"sources": {}}, registry_sha256
+    )
 
     source_names = [
         str(row.get("source") or "").strip()
@@ -254,6 +329,7 @@ def build_manifest(
             if isinstance(governance_sources.get(source, {}), dict)
             else {},
             generated_at,
+            governance_validation["valid"],
         )
         issue_count += len(issues)
         public_rows.append(public_row)
@@ -337,6 +413,9 @@ def build_manifest(
             "registry_freshness_status": registry_freshness_status,
             "registry_sha256": registry_sha256.lower(),
             "governance_sidecar_included": bool(governance_sources),
+            "governance_protocol_valid": governance_validation["valid"],
+            "governance_protocol_issues": governance_validation["issues"],
+            "governance_sha256": governance_validation["governance_sha256"],
             "source_names_disclosed": False,
             "credential_field_names_disclosed": False,
             "economic_estimates_included": False,
@@ -390,6 +469,7 @@ def build_manifest(
             "probe_success_is_dataset_fitness": False,
             "review_ready_source_count_claim_allowed": (
                 structurally_valid
+                and governance_validation["valid"]
                 and registry_freshness_status == "passed"
                 and summary["review_ready_sources"] > 0
             ),
