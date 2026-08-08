@@ -16,6 +16,7 @@ LOCAL_STATUS_URL="${LUMENCORE_LOCAL_STATUS_URL:-http://127.0.0.1:8787/api/public
 PUBLIC_STATUS_URL="${LUMENCORE_PUBLIC_STATUS_URL:-https://lumen-core.ai/api/public/status}"
 EXPECTED_BUNDLE_SHA="${LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256:-}"
 SOURCE_COMMIT="${LUMENCORE_GATEWAY_SOURCE_COMMIT:-}"
+HUMAN_UNLOCK_FILE="${LUMENCORE_HUMAN_UNLOCK_FILE:-}"
 APPLY=false
 PRINT_FILES=false
 PRINT_BUNDLE_SHA=false
@@ -61,9 +62,10 @@ Usage:
 
 Inspect mode validates every source, computes the deterministic bundle digest,
 and compares source and target SHA-256 values without writing. Apply mode
-requires root, a private HumanUnlock value, an exact expected bundle digest,
-and a full source commit. It stages and validates the entire gateway import
-closure, stops only luma-gateway, installs the exact files, removes only a
+requires root, a bounded private HumanUnlock file, exact production target
+identities, an exact expected bundle digest, and a full source commit. It
+stages and validates the entire gateway import closure, stops only luma-gateway,
+installs the exact files, removes only a
 verified dead-PID singleton lock, and rolls every file back unless local and
 public health plus the minimal public-status contract all pass.
 EOF
@@ -191,26 +193,49 @@ fi
   exit 8
 }
 
-human_unlock_token="${LUMA_HUMAN_UNLOCK_TOKEN:-}"
-if [[ ${#human_unlock_token} -lt 32 ]]; then
-  echo "ERROR: --apply requires a private HumanUnlock value of at least 32 characters" >&2
-  exit 9
-fi
-unset human_unlock_token LUMA_HUMAN_UNLOCK_TOKEN
-
 [[ "${EUID}" -eq 0 ]] || {
   echo "ERROR: --apply must run as root" >&2
-  exit 10
+  exit 9
 }
 for required_command in systemctl curl install cp stat mktemp; do
   command -v "$required_command" >/dev/null 2>&1 || {
     echo "ERROR: $required_command is required" >&2
-    exit 11
+    exit 10
   }
 done
+[[ "$TARGET_ROOT" == "/opt/lumencore/code" \
+  && "$STACK_ROOT" == "/opt/lumencore" \
+  && "$PYTHON_BIN" == "/opt/lumencore/.venv/bin/python" \
+  && "$SERVICE" == "luma-gateway" \
+  && "$LOCK_FILE" == "/opt/lumencore/run/luma_experience_gateway.lock" \
+  && "$LOCAL_HEALTH_URL" == "http://127.0.0.1:8787/health" \
+  && "$PUBLIC_HEALTH_URL" == "https://lumen-core.ai/health" \
+  && "$LOCAL_STATUS_URL" == "http://127.0.0.1:8787/api/public/status" \
+  && "$PUBLIC_STATUS_URL" == "https://lumen-core.ai/api/public/status" ]] || {
+  echo "ERROR: apply target, service, lock, runtime, or probe identity is not approved" >&2
+  exit 11
+}
+[[ "$HUMAN_UNLOCK_FILE" =~ ^/tmp/lumencore-gateway-repair-[0-9]+-[0-9]+/human-unlock$ ]] || {
+  echo "ERROR: --apply requires the bounded private HumanUnlock file" >&2
+  exit 12
+}
+[[ -f "$HUMAN_UNLOCK_FILE" && ! -L "$HUMAN_UNLOCK_FILE" ]] || {
+  echo "ERROR: private HumanUnlock file is missing or symbolic" >&2
+  exit 12
+}
+[[ "$(stat -c '%U:%a' "$HUMAN_UNLOCK_FILE")" == "opc:600" ]] || {
+  echo "ERROR: private HumanUnlock file ownership or mode is unsafe" >&2
+  exit 12
+}
+human_unlock_token="$(<"$HUMAN_UNLOCK_FILE")"
+if [[ ${#human_unlock_token} -lt 32 ]]; then
+  echo "ERROR: --apply requires a private HumanUnlock value of at least 32 characters" >&2
+  exit 12
+fi
+unset human_unlock_token
 [[ -x "$PYTHON_BIN" ]] || {
   echo "ERROR: gateway Python runtime is not executable" >&2
-  exit 12
+  exit 13
 }
 systemctl cat "$SERVICE" >/dev/null
 
@@ -219,7 +244,22 @@ BACKUP_DIR="$(mktemp -d /tmp/lumencore-gateway-rollback.XXXXXX)"
 chmod 0700 "$STAGE_DIR" "$BACKUP_DIR"
 
 cleanup() {
-  rm -rf -- "$STAGE_DIR" "$BACKUP_DIR"
+  if [[ -n "$STAGE_DIR" ]]; then
+    [[ "$STAGE_DIR" =~ ^/tmp/lumencore-gateway-stage\.[A-Za-z0-9]+$ ]] || {
+      echo "ERROR: refusing unexpected gateway-stage cleanup target" >&2
+      return 1
+    }
+    rm -rf -- "$STAGE_DIR"
+    STAGE_DIR=""
+  fi
+  if [[ -n "$BACKUP_DIR" ]]; then
+    [[ "$BACKUP_DIR" =~ ^/tmp/lumencore-gateway-rollback\.[A-Za-z0-9]+$ ]] || {
+      echo "ERROR: refusing unexpected gateway-rollback cleanup target" >&2
+      return 1
+    }
+    rm -rf -- "$BACKUP_DIR"
+    BACKUP_DIR=""
+  fi
   cleanup_manifest
 }
 trap cleanup EXIT

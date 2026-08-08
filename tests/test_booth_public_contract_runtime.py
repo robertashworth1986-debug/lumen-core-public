@@ -179,9 +179,24 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     assert "--apply" in script
     assert "--print-files" in script
     assert "--bundle-sha" in script
-    assert "LUMA_HUMAN_UNLOCK_TOKEN" in script
+    assert "LUMENCORE_HUMAN_UNLOCK_FILE" in script
+    assert "LUMA_HUMAN_UNLOCK_TOKEN" not in script
+    assert '[[ "$HUMAN_UNLOCK_FILE" =~ ^/tmp/lumencore-gateway-repair-' in script
+    assert '[[ "$(stat -c \'%U:%a\' "$HUMAN_UNLOCK_FILE")" == "opc:600" ]]' in script
     assert "${#human_unlock_token} -lt 32" in script
-    assert "unset human_unlock_token LUMA_HUMAN_UNLOCK_TOKEN" in script
+    assert "unset human_unlock_token" in script
+    for marker in (
+        '[[ "$TARGET_ROOT" == "/opt/lumencore/code"',
+        '&& "$STACK_ROOT" == "/opt/lumencore"',
+        '&& "$PYTHON_BIN" == "/opt/lumencore/.venv/bin/python"',
+        '&& "$SERVICE" == "luma-gateway"',
+        '&& "$LOCK_FILE" == "/opt/lumencore/run/luma_experience_gateway.lock"',
+        '&& "$LOCAL_HEALTH_URL" == "http://127.0.0.1:8787/health"',
+        '&& "$PUBLIC_HEALTH_URL" == "https://lumen-core.ai/health"',
+        '&& "$LOCAL_STATUS_URL" == "http://127.0.0.1:8787/api/public/status"',
+        '&& "$PUBLIC_STATUS_URL" == "https://lumen-core.ai/api/public/status"',
+    ):
+        assert marker in script
     assert _declared_gateway_closure(script) == EXPECTED_GATEWAY_CLOSURE
     assert "LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256" in script
     assert "source closure does not match the approved bundle SHA-256" in script
@@ -198,6 +213,8 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     assert "Removed verified dead-PID gateway singleton lock" in script
     assert "GATEWAY_DEPENDENCY_CLOSURE_REPAIR_OK" in script
     assert "rm -rf -- \"$TARGET_ROOT\"" not in script
+    assert '[[ "$STAGE_DIR" =~ ^/tmp/lumencore-gateway-stage\\.' in script
+    assert '[[ "$BACKUP_DIR" =~ ^/tmp/lumencore-gateway-rollback\\.' in script
     assert "systemctl restart" not in script
 
 
@@ -275,11 +292,16 @@ def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None
     assert '[[ "$(git rev-parse origin/main)" == "$RELEASE_COMMIT" ]]' in workflow
     assert "VPS_KNOWN_HOSTS" in workflow
     assert "StrictHostKeyChecking=yes" in workflow
-    assert "LUMA_HUMAN_UNLOCK_TOKEN" in workflow
+    assert "secrets.LUMA_HUMAN_UNLOCK_TOKEN" in workflow
+    assert "LUMENCORE_HUMAN_UNLOCK_FILE='$REMOTE_STAGE/human-unlock'" in workflow
+    assert 'LUMA_HUMAN_UNLOCK_TOKEN="$(cat' not in workflow
     assert "LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256" in workflow
     assert "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh" in workflow
     assert "--apply" in workflow
     assert "Remove remote repair staging" in workflow
+    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6" in workflow
+    assert "shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1" in workflow
+    assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1" in workflow
 
     workflow = (
         ROOT / ".github" / "workflows" / "gateway-public-contract-ci.yml"
@@ -289,3 +311,5 @@ def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None
     assert "Gateway Public Contract Gate" in workflow
     assert "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh" in workflow
     assert "WRONG_HASH_FAIL_CLOSED_OK" in workflow
+    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6" in workflow
+    assert "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6" in workflow
