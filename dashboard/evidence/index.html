@@ -399,13 +399,27 @@ const IS_INST_DASHBOARD = /\/INSTITUTIONAL_STACK_V2\/dashboard\//i.test(String(l
 const DEFAULT_RUN_BASE = IS_INST_DASHBOARD ? "runs" : "../INSTITUTIONAL_STACK_V2/out/master_universe_v2";
 const ALT_RUN_BASE = IS_INST_DASHBOARD ? "../INSTITUTIONAL_STACK_V2/out/master_universe_v2" : "runs";
 const RUN_PARAM_BASE = (new URLSearchParams(location.search)).get("run");
-const RUN_BASES = RUN_PARAM_BASE ? [RUN_PARAM_BASE] : [DEFAULT_RUN_BASE, ALT_RUN_BASE];
+const SAFE_RUN_BASES = Object.freeze([...new Set([DEFAULT_RUN_BASE, ALT_RUN_BASE])]);
+const RUN_BASES = RUN_PARAM_BASE && SAFE_RUN_BASES.includes(RUN_PARAM_BASE)
+  ? [RUN_PARAM_BASE, ...SAFE_RUN_BASES.filter(base => base !== RUN_PARAM_BASE)]
+  : SAFE_RUN_BASES;
 let ACTIVE_RUN_BASE = RUN_BASES[0];
+
+function isRunUtc(value) {
+  return /^\d{8}T\d{6}Z$/.test(String(value || '').trim());
+}
+
+function isSafeArtifactPath(value) {
+  const path = String(value || '').trim();
+  return /^[A-Za-z0-9][A-Za-z0-9._/-]{0,255}$/.test(path)
+    && !path.split('/').includes('..')
+    && !path.includes('//');
+}
 
 async function findLatestRun() {
   // Try a passed ?run=...&utc=... pair first.
   const utc = (new URLSearchParams(location.search)).get("utc");
-  if (utc) {
+  if (isRunUtc(utc)) {
     for (const base of RUN_BASES) {
       try {
         const probe = await fetch(base + "/" + utc + "/summary.json", { cache: "no-store" });
@@ -423,7 +437,7 @@ async function findLatestRun() {
       const r = await fetch(base + "/latest.txt", { cache: "no-store" });
       if (r.ok) {
         const t = (await r.text()).trim();
-        if (t) {
+        if (isRunUtc(t)) {
           ACTIVE_RUN_BASE = base;
           return base + "/" + t;
         }
@@ -567,12 +581,20 @@ function renderFigs() {
     ["04_periodicity_vs_margin.png", "Routing thesis — periodicity vs margin"],
     ["05_family_grid.png", "Per-family head-to-head record"],
   ];
-  document.getElementById("figs").innerHTML = figs.map(([f, cap]) =>
-    `<div class="frame">
-       <img src="${RUN_URL}/figs/${f}" alt="${cap}" loading="lazy" />
-       <div class="cap">${cap}</div>
-     </div>`,
-  ).join("");
+  const frames = figs.map(([fileName, caption]) => {
+    const frame = document.createElement('div');
+    frame.className = 'frame';
+    const image = document.createElement('img');
+    image.src = `${RUN_URL}/figs/${fileName}`;
+    image.alt = caption;
+    image.loading = 'lazy';
+    const label = document.createElement('div');
+    label.className = 'cap';
+    label.textContent = caption;
+    frame.append(image, label);
+    return frame;
+  });
+  document.getElementById("figs").replaceChildren(...frames);
 }
 
 let sortKey = "margin_pct_vs_runner", sortDir = -1;
@@ -596,20 +618,31 @@ function renderTable() {
   document.getElementById("rowCount").textContent =
     `${rows.length} / ${FAM_ROWS.length} rows`;
   const body = document.getElementById("resultsBody");
-  body.innerHTML = rows.map(r => `
-    <tr>
-      <td>${r.dataset}</td>
-      <td class="fam-${r.winning_family}">${r.winning_family}</td>
-      <td>${r.winning_model}</td>
-      <td>${pct(r.margin_pct_vs_runner)}</td>
-      <td>${fmt(r.winning_rmse)}</td>
-      <td>${fmt(r.harmonic_best)}</td>
-      <td>${fmt(r.neural_best)}</td>
-      <td>${fmt(r.tree_best)}</td>
-      <td>${fmt(r.classical_best)}</td>
-      <td>${fmt(r.baseline_best)}</td>
-    </tr>
-  `).join("");
+  const tableRows = rows.map((record) => {
+    const row = document.createElement('tr');
+    const values = [
+      record.dataset,
+      record.winning_family,
+      record.winning_model,
+      pct(record.margin_pct_vs_runner),
+      fmt(record.winning_rmse),
+      fmt(record.harmonic_best),
+      fmt(record.neural_best),
+      fmt(record.tree_best),
+      fmt(record.classical_best),
+      fmt(record.baseline_best),
+    ];
+    values.forEach((value, index) => {
+      const cell = document.createElement('td');
+      if (index === 1 && /^[A-Za-z0-9_-]+$/.test(String(value || ''))) {
+        cell.className = `fam-${value}`;
+      }
+      cell.textContent = String(value ?? '');
+      row.appendChild(cell);
+    });
+    return row;
+  });
+  body.replaceChildren(...tableRows);
 }
 
 document.addEventListener("click", (e) => {
@@ -703,10 +736,10 @@ document.getElementById("verifyBtn").addEventListener("click", async () => {
     status.classList.add("ok");
     // Also re-hash one raw file to spot-check chain integrity
     const files = MANIFEST && MANIFEST.files ? MANIFEST.files : null;
-    const firstFile = files ? Object.keys(files)[0] : null;
+    const firstFile = files ? Object.keys(files).find(isSafeArtifactPath) : null;
     if (firstFile) {
       const expected = files[firstFile];
-      const fr = await fetch(RUN_URL + "/" + firstFile);
+      const fr = await fetch(RUN_URL + "/" + firstFile.split('/').map(encodeURIComponent).join('/'));
       const fb = await fr.arrayBuffer();
       const fbuf = await crypto.subtle.digest("SHA-256", fb);
       const fhex = [...new Uint8Array(fbuf)]

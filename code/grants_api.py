@@ -30,6 +30,7 @@ import subprocess
 import sys
 import zipfile
 from datetime import datetime, timezone
+from html import escape as escape_html
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
@@ -141,14 +142,39 @@ def _latest_run(prog_dir: Path) -> Path | None:
     return runs[-1] if runs else None
 
 
+def _named_directory(root: Path, name: str) -> Path | None:
+    """Return an existing direct child directory without joining user input.
+
+    Route parameters must never become filesystem paths.  Enumerating the
+    server-owned directory and comparing names keeps the selected Path rooted
+    in the configured evidence tree even when a caller supplies traversal
+    characters or an absolute path.
+    """
+    if not isinstance(name, str) or not name or name in {".", ".."}:
+        return None
+    try:
+        return next(
+            (child for child in root.iterdir() if child.is_dir() and child.name == name),
+            None,
+        )
+    except OSError:
+        return None
+
+
+def _latest_grant_run(grant_id: str, *, approved: bool = False) -> Path | None:
+    root = GRANTS / "_approved" if approved else GRANTS
+    grant_dir = _named_directory(root, grant_id)
+    return _latest_run(grant_dir) if grant_dir is not None else None
+
+
 def _run_factory(args: list[str]) -> dict:
     """Invoke the factory CLI in-process by calling its main()."""
     sys.path.insert(0, str(ROOT / "code"))
     try:
         from grant_application_factory import main as factory_main
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500,
-                            detail=f"factory import failed: {e}")
+                            detail="grant factory is unavailable")
     rc = factory_main(args)
     if rc != 0:
         raise HTTPException(status_code=500,
@@ -283,7 +309,7 @@ def patch_profile(patch: ProfilePatch) -> JSONResponse:
 
 @router.get("/{grant_id}")
 def grant_detail(grant_id: str) -> JSONResponse:
-    run = _latest_run(GRANTS / grant_id)
+    run = _latest_grant_run(grant_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
     out: dict = {"grant_id": grant_id, "run_utc": run.name}
@@ -302,7 +328,7 @@ def grant_detail(grant_id: str) -> JSONResponse:
 @router.get("/{grant_id}/markdown")
 def grant_markdown(grant_id: str,
                    section: str = Query(default="application")) -> PlainTextResponse:
-    run = _latest_run(GRANTS / grant_id)
+    run = _latest_grant_run(grant_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
     fname = {
@@ -361,14 +387,21 @@ def _md_to_html(md: str) -> str:
     in_table = False
 
     def esc(s: str) -> str:
-        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        return escape_html(s, quote=True)
+
+    def safe_link(match: re.Match[str]) -> str:
+        label = match.group(1)
+        href = match.group(2).strip()
+        if not re.fullmatch(r"https://[^\s\"'<>]+", href, flags=re.IGNORECASE):
+            return label
+        return f'<a href="{escape_html(href, quote=True)}" rel="noopener">{label}</a>'
 
     def inline(s: str) -> str:
         s = esc(s)
         s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
         s = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", s)
         s = re.sub(r"\*([^*]+)\*", r"<i>\1</i>", s)
-        s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', s)
+        s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", safe_link, s)
         return s
 
     def flush() -> None:
@@ -416,7 +449,7 @@ def _md_to_html(md: str) -> str:
 @router.get("/{grant_id}/print", response_class=HTMLResponse)
 def print_html(grant_id: str) -> HTMLResponse:
     """Single-document print view: cover + application + technical + commercialization + budget."""
-    run = _latest_run(GRANTS / grant_id)
+    run = _latest_grant_run(grant_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
 
@@ -433,15 +466,23 @@ def print_html(grant_id: str) -> HTMLResponse:
     commercialization = _read("commercialization_plan.md")
 
     today = datetime.now(timezone.utc).strftime("%B %d, %Y")
+    agency = escape_html(str(app_json.get("agency", "")), quote=True)
+    program = escape_html(str(app_json.get("program", "")), quote=True)
+    topic_area = escape_html(str(app_json.get("topic_area", "")), quote=True)
+    run_utc = escape_html(str(app_json.get("run_utc", "")), quote=True)
+    duration_months = escape_html(str(app_json.get("duration_months", "—")), quote=True)
+    requested = float(app_json.get("ceiling_usd") or 0)
+    safe_grant_id = escape_html(grant_id, quote=True)
+    safe_run_name = escape_html(run.name, quote=True)
     title_block = f"""
     <div class="cover">
-      <h1>{app_json.get('agency','')}</h1>
-      <div class="sub">{app_json.get('program','')} — {app_json.get('topic_area','')}</div>
+      <h1>{agency}</h1>
+      <div class="sub">{program} — {topic_area}</div>
       <div class="meta">
         <b>Applicant:</b> LumenCore Research, LLC<br/>
         <b>Principal Investigator:</b> Robert (BabyRay) Ashworth<br/>
-        <b>Requested:</b> ${app_json.get('ceiling_usd', 0):,} over {app_json.get('duration_months','—')} months<br/>
-        <b>Frozen evidence run:</b> {app_json.get('run_utc','')}<br/>
+        <b>Requested:</b> ${requested:,.0f} over {duration_months} months<br/>
+        <b>Frozen evidence run:</b> {run_utc}<br/>
         <b>Prepared:</b> {today}
       </div>
     </div>
@@ -460,16 +501,21 @@ def print_html(grant_id: str) -> HTMLResponse:
 
     # Budget table
     rows = "".join(
-        f"<tr><td>{k.replace('_',' ').title()}</td>"
-        f"<td style='text-align:right'>${v:,.0f}</td></tr>"
+        f"<tr><td>{escape_html(str(k).replace('_',' ').title(), quote=True)}</td>"
+        f"<td style='text-align:right'>${float(v or 0):,.0f}</td></tr>"
         for k, v in (budget.get("categories") or {}).items()
     )
-    notes = "".join(f"<li>{n}</li>" for n in (budget.get("notes") or []))
+    notes = "".join(
+        f"<li>{escape_html(str(note), quote=True)}</li>"
+        for note in (budget.get("notes") or [])
+    )
+    budget_total = float(budget.get("total") or 0)
+    budget_duration = escape_html(str(budget.get("duration_months", "—")), quote=True)
     body_parts.append('<div class="section-break"></div>')
     body_parts.append(
         f"<h1>Budget Detail</h1>"
-        f"<p><b>Total:</b> ${budget.get('total',0):,} over "
-        f"{budget.get('duration_months','—')} months</p>"
+        f"<p><b>Total:</b> ${budget_total:,.0f} over "
+        f"{budget_duration} months</p>"
         f"<table><thead><tr><th>Category</th><th style='text-align:right'>USD</th></tr></thead>"
         f"<tbody>{rows}</tbody></table>"
         f"<h3>Notes</h3><ul>{notes}</ul>"
@@ -477,13 +523,13 @@ def print_html(grant_id: str) -> HTMLResponse:
 
     html = f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8"/>
-<title>{app_json.get('agency','')} — {grant_id}</title>
+<title>{agency} — {safe_grant_id}</title>
 <style>{_PRINT_CSS}</style>
 </head><body>
 <div class="toolbar">
   <a href="/grants.html">&larr; back to console</a>
   <button onclick="window.print()">Save as PDF</button>
-  <span style="float:right; opacity:0.7">{grant_id} · {run.name}</span>
+  <span style="float:right; opacity:0.7">{safe_grant_id} · {safe_run_name}</span>
 </div>
 {''.join(body_parts)}
 </body></html>"""
@@ -493,7 +539,7 @@ def print_html(grant_id: str) -> HTMLResponse:
 @router.get("/{grant_id}/bundle.zip")
 def bundle_zip(grant_id: str) -> Response:
     """Download a ZIP of the entire approved (or draft) submission package."""
-    run = _latest_run(GRANTS / grant_id)
+    run = _latest_grant_run(grant_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
     buf = io.BytesIO()
@@ -502,7 +548,8 @@ def bundle_zip(grant_id: str) -> Response:
             if p.is_file():
                 z.write(p, arcname=p.name)
     buf.seek(0)
-    fname = f"{grant_id}_{run.name}.zip"
+    safe_filename_id = re.sub(r"[^A-Za-z0-9._-]+", "_", grant_id).strip("._") or "grant"
+    fname = f"{safe_filename_id}_{run.name}.zip"
     return Response(
         content=buf.read(),
         media_type="application/zip",
@@ -521,11 +568,10 @@ def grant_diff(grant_id: str) -> JSONResponse:
     in application.json (eligibility score, budget total, evidence run UTC,
     layer counts) so the user can decide whether to re-approve.
     """
-    current = _latest_run(GRANTS / grant_id)
+    current = _latest_grant_run(grant_id)
     if not current:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
-    approved_root = GRANTS / "_approved" / grant_id
-    approved = _latest_run(approved_root) if approved_root.exists() else None
+    approved = _latest_grant_run(grant_id, approved=True)
 
     out: dict = {
         "grant_id": grant_id,
@@ -619,9 +665,9 @@ def _load_submission_tooling():
     sys.path.insert(0, str(ROOT / "code"))
     try:
         from grant_submission_kit import build_preflight, write_submission_kit  # type: ignore
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500,
-                            detail=f"submission kit import failed: {e}")
+                            detail="submission tooling is unavailable")
     return build_preflight, write_submission_kit
 
 
@@ -654,14 +700,14 @@ def submission_dashboard() -> JSONResponse:
         gid = row.get("program_id")
         if not gid:
             continue
-        run = _latest_run(GRANTS / gid)
+        run = _latest_grant_run(str(gid))
         if not run:
             continue
         try:
             pf = build_preflight(gid, run, row)
-        except Exception as e:
+        except Exception:
             pf = {"grant_id": gid, "ready": False,
-                  "blockers": [f"preflight error: {e}"]}
+                  "blockers": ["preflight failed; review server diagnostics"]}
         items.append(pf)
         ceiling = float(pf.get("ceiling_usd") or 0.0)
         total_ceiling += ceiling
@@ -692,7 +738,7 @@ def submission_dashboard() -> JSONResponse:
 @router.get("/{grant_id}/submission")
 def submission_status(grant_id: str) -> JSONResponse:
     """Read the latest submission packet + howto for a grant if generated."""
-    run = _latest_run(GRANTS / grant_id)
+    run = _latest_grant_run(grant_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
 
@@ -716,7 +762,7 @@ def submission_status(grant_id: str) -> JSONResponse:
 def prepare_submission(grant_id: str) -> JSONResponse:
     """Run preflight for one grant and write submission_packet.json + SUBMIT_HOWTO.md
     into the latest run directory. Returns the preflight dict."""
-    run = _latest_run(GRANTS / grant_id)
+    run = _latest_grant_run(grant_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
     catalog_entry = _catalog_entry_for(grant_id)
@@ -766,7 +812,7 @@ def draft(req: DraftRequest) -> JSONResponse:
     draft_items: list[dict] = []
     if req.prepare_submission:
         for grant_id in target_ids:
-            run = _latest_run(GRANTS / grant_id)
+            run = _latest_grant_run(grant_id)
             if not run:
                 draft_items.append({
                     "grant_id": grant_id,
@@ -839,9 +885,9 @@ def approve(grant_id: str) -> JSONResponse:
     sys.path.insert(0, str(ROOT / "code"))
     try:
         from grant_application_factory import approve as _approve, update_queue
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500,
-                            detail=f"factory import failed: {e}")
+                            detail="grant factory is unavailable")
     try:
         state = _approve(grant_id)
     except SystemExit as exc:
@@ -858,7 +904,7 @@ def approve(grant_id: str) -> JSONResponse:
 
 @router.post("/{grant_id}/submitted")
 def mark_submitted(grant_id: str, req: SubmittedRequest) -> JSONResponse:
-    run = _latest_run(GRANTS / grant_id)
+    run = _latest_grant_run(grant_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
     state_p = run / "approval_state.json"
