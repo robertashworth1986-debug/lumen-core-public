@@ -38,6 +38,8 @@ def test_runtime_diagnostic_covers_gateway_failure_chain() -> None:
         "luma-gateway",
         "ExecMainStatus",
         "NRestarts",
+        "RestartUSec",
+        "StartLimitBurst",
         "ss -ltnH",
         "nginx -t",
         "nginx -T",
@@ -58,6 +60,19 @@ def test_runtime_diagnostic_does_not_publish_bodies_or_raw_logs() -> None:
     assert "allowlisted directives only" in text
 
 
+def test_gateway_lock_diagnostic_checks_identity_without_exposing_cmdline() -> None:
+    text = _workflow_text()
+
+    assert "gateway singleton-lock identity" in text
+    assert "gateway_main_pid=$(systemctl show luma-gateway" in text
+    assert "gateway_lock=/opt/lumencore/run/luma_experience_gateway.lock" in text
+    assert "lock_pid_matches_systemd_main" in text
+    assert 'show_process_identity gateway_lock_owner "$gateway_lock_pid"' in text
+    assert 'expected_marker="luma_experience_gateway:app"' not in text
+    assert "echo \"$cmdline\"" not in text
+    assert "cat \"$gateway_lock\"" not in text
+
+
 def test_runtime_diagnostic_preserves_capacity_evidence() -> None:
     text = _workflow_text()
 
@@ -65,4 +80,3 @@ def test_runtime_diagnostic_preserves_capacity_evidence() -> None:
     assert "df -iP / /opt /var /home /tmp" in text
     assert "journalctl --disk-usage" in text
     assert "du -x -k -d2 /var /opt /home/opc /tmp" in text
-
