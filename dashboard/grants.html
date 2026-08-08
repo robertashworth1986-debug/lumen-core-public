@@ -206,21 +206,6 @@ function normalizeApiBase(value) {
 }
 
 function resolveApiBase() {
-  const fromWindow = normalizeApiBase(window.LUMA_API_BASE);
-  if (fromWindow) return fromWindow;
-
-  const params = new URLSearchParams(window.location.search || '');
-  const fromQuery = normalizeApiBase(params.get('api_base') || params.get('api'));
-  if (fromQuery) {
-    try { localStorage.setItem('LUMA_API_BASE', fromQuery); } catch {}
-    return fromQuery;
-  }
-
-  try {
-    const fromStorage = normalizeApiBase(localStorage.getItem('LUMA_API_BASE'));
-    if (fromStorage) return fromStorage;
-  } catch {}
-
   if (location.protocol === 'file:') {
     return 'https://lumen-core.ai';
   }
@@ -336,9 +321,46 @@ function clampPct(value) {
 }
 
 function resolveApiPath(path) {
-  if (/^https?:\/\//i.test(path)) return path;
-  if (API_BASE && path.startsWith('/')) return API_BASE + path;
-  return path;
+  const raw = String(path || '').trim();
+  if (!API_BASE || !raw.startsWith('/api/')) {
+    throw new Error('unapproved grants API route');
+  }
+
+  const candidate = new URL(raw, `${API_BASE}/`);
+  const trustedBase = new URL(`${API_BASE}/`);
+  if (!['https:', 'http:'].includes(candidate.protocol)
+      || candidate.origin !== trustedBase.origin
+      || candidate.username
+      || candidate.password) {
+    throw new Error('cross-origin grants API request blocked');
+  }
+
+  const fixedRoutes = new Set([
+    '/api/grants',
+    '/api/grants/submission/dashboard',
+    '/api/grants/regenerate',
+    '/api/grants/draft',
+    '/api/opportunities/tracker',
+    '/api/opportunities/autopilot',
+  ]);
+  if (fixedRoutes.has(candidate.pathname)) {
+    if (candidate.search) throw new Error('unexpected grants API query');
+    return candidate.href;
+  }
+
+  const grantRoute = /^\/api\/grants\/([A-Za-z0-9][A-Za-z0-9._-]{0,127})(?:\/(submission|diff|markdown|approve|prepare_submission|submitted))?$/.exec(candidate.pathname);
+  if (!grantRoute) throw new Error('unapproved grants API route');
+
+  if (grantRoute[2] === 'markdown') {
+    const section = candidate.searchParams.get('section');
+    const allowedSections = new Set(['application', 'technical', 'commercialization', 'cover']);
+    if (!allowedSections.has(section) || [...candidate.searchParams.keys()].some(key => key !== 'section')) {
+      throw new Error('unapproved grant document section');
+    }
+  } else if (candidate.search) {
+    throw new Error('unexpected grants API query');
+  }
+  return candidate.href;
 }
 
 function safeSeg(v) {

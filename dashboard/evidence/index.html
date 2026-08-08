@@ -398,11 +398,8 @@
 const IS_INST_DASHBOARD = /\/INSTITUTIONAL_STACK_V2\/dashboard\//i.test(String(location.pathname || '').replace(/\\/g, '/'));
 const DEFAULT_RUN_BASE = IS_INST_DASHBOARD ? "runs" : "../INSTITUTIONAL_STACK_V2/out/master_universe_v2";
 const ALT_RUN_BASE = IS_INST_DASHBOARD ? "../INSTITUTIONAL_STACK_V2/out/master_universe_v2" : "runs";
-const RUN_PARAM_BASE = (new URLSearchParams(location.search)).get("run");
 const SAFE_RUN_BASES = Object.freeze([...new Set([DEFAULT_RUN_BASE, ALT_RUN_BASE])]);
-const RUN_BASES = RUN_PARAM_BASE && SAFE_RUN_BASES.includes(RUN_PARAM_BASE)
-  ? [RUN_PARAM_BASE, ...SAFE_RUN_BASES.filter(base => base !== RUN_PARAM_BASE)]
-  : SAFE_RUN_BASES;
+const RUN_BASES = SAFE_RUN_BASES;
 let ACTIVE_RUN_BASE = RUN_BASES[0];
 let ACTIVE_RUN_UTC = "";
 
@@ -462,25 +459,8 @@ function runArtifactUrl(relativePath) {
 }
 
 async function findLatestRun() {
-  // Try a passed ?run=...&utc=... pair first.
-  const rawUtc = (new URLSearchParams(location.search)).get("utc");
-  const utc = canonicalRunUtc(rawUtc);
-  if (utc !== null) {
-    for (const base of RUN_BASES) {
-      try {
-        const probe = await fetch(base + "/" + utc + "/summary.json", { cache: "no-store" });
-        if (probe.ok) {
-          ACTIVE_RUN_BASE = base;
-          ACTIVE_RUN_UTC = utc;
-          return true;
-        }
-      } catch (e) {}
-    }
-    ACTIVE_RUN_BASE = RUN_BASES[0];
-    ACTIVE_RUN_UTC = utc;
-    return true;
-  }
-  // Otherwise rely on a manifest-of-runs file the build step writes.
+  // The browser may select only a build-owned manifest from a fixed same-origin
+  // base. Query strings never influence a network destination or run selector.
   for (const base of RUN_BASES) {
     try {
       const r = await fetch(base + "/latest.txt", { cache: "no-store" });
@@ -537,7 +517,7 @@ async function load() {
   RUN_READY = await findLatestRun();
   if (!RUN_READY) {
     document.getElementById("verdict").textContent =
-      "No run found. Pass ?utc=YYYYMMDDTHHMMSSZ or write out/master_universe_v2/latest.txt.";
+      "No run found. Publish a canonical out/master_universe_v2/latest.txt manifest.";
     return;
   }
 
@@ -771,7 +751,7 @@ async function renderPolish() {
 document.getElementById("verifyBtn").addEventListener("click", async () => {
   const status = document.getElementById("verifyStatus");
   if (!RUN_READY || !MANIFEST) {
-    status.textContent = "no run loaded — pass ?utc=YYYYMMDDTHHMMSSZ or ensure /out/master_universe_v2/latest.txt is reachable";
+    status.textContent = "no run loaded — ensure /out/master_universe_v2/latest.txt is reachable";
     status.className = "verify-status fail";
     return;
   }

@@ -126,6 +126,9 @@ def test_active_dashboards_use_fail_closed_url_and_dom_boundaries() -> None:
     assert 'document.getElementById("figs").innerHTML' not in evidence
     assert 'body.innerHTML = rows.map' not in evidence
     assert "RUN_URL" not in evidence
+    assert "RUN_PARAM_BASE" not in evidence
+    assert "URLSearchParams(location.search)" not in evidence
+    assert "Query strings never influence a network destination" in evidence
     assert "function canonicalRunUtc(value)" in evidence
     assert "match.slice(1).map(Number)" in evidence
     assert "ACTIVE_RUN_UTC = rawUtc" not in evidence
@@ -133,6 +136,13 @@ def test_active_dashboards_use_fail_closed_url_and_dom_boundaries() -> None:
     assert 'case "summary.json"' in evidence
     assert "candidate.origin !== window.location.origin" in evidence
     assert "cross-origin evidence artifact blocked" in evidence
+    assert "window.LUMA_API_BASE" not in grants
+    assert "localStorage.getItem('LUMA_API_BASE')" not in grants
+    assert "params.get('api_base')" not in grants
+    assert "cross-origin grants API request blocked" in grants
+    assert "unapproved grants API route" in grants
+    assert "const fixedRoutes = new Set([" in grants
+    assert "allowedSections" in grants
     assert "document.getElementById('af').innerHTML" not in sector
     assert "document.getElementById('srs').innerHTML" not in sector
     assert "document.getElementById('tti').innerHTML" not in sector
@@ -141,6 +151,7 @@ def test_active_dashboards_use_fail_closed_url_and_dom_boundaries() -> None:
 def test_api_error_contracts_do_not_expose_exception_text_or_server_paths() -> None:
     forecast = (ROOT / "code" / "forecast_api.py").read_text(encoding="utf-8")
     grants = (ROOT / "code" / "grants_api.py").read_text(encoding="utf-8")
+    linkedin = (ROOT / "code" / "linkedin_router.py").read_text(encoding="utf-8")
 
     forbidden = (
         'detail=f"read error:',
@@ -151,3 +162,10 @@ def test_api_error_contracts_do_not_expose_exception_text_or_server_paths() -> N
     for marker in forbidden:
         assert marker not in forecast
         assert marker not in grants
+
+    assert "detail=str(e)" not in linkedin
+    assert 'detail=f"token exchange failed:' not in linkedin
+    assert 'out["warning"] = str(e)' not in linkedin
+    assert 'out["email"]' not in linkedin
+    assert 'out["sub"]' not in linkedin
+    assert "escape(str(profile.get" in linkedin

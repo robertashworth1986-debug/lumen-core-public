@@ -17,12 +17,16 @@ clear "configure keys first" message when LINKEDIN_CLIENT_ID is missing.
 """
 from __future__ import annotations
 
+from html import escape
+import logging
+
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 import linkedin_oauth as li
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 _PENDING_STATES: dict[str, float] = {}  # state -> created_ts; pruned periodically
 _STATE_TTL = 600  # seconds
@@ -40,8 +44,8 @@ def _prune_states() -> None:
 def linkedin_login() -> RedirectResponse:
     try:
         url, state = li.auth_url()
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except RuntimeError:
+        raise HTTPException(status_code=503, detail="LinkedIn OAuth is not configured")
     import time
     _PENDING_STATES[state] = time.time()
     _prune_states()
@@ -54,7 +58,8 @@ def linkedin_callback(request: Request) -> HTMLResponse:
     err = qp.get("error")
     if err:
         return HTMLResponse(
-            f"<h2>LinkedIn auth error</h2><p>{err}: {qp.get('error_description','')}</p>",
+            "<h2>LinkedIn authorization was not completed</h2>"
+            "<p>Return to the gateway and try again when you are ready.</p>",
             status_code=400,
         )
     code = qp.get("code")
@@ -66,17 +71,22 @@ def linkedin_callback(request: Request) -> HTMLResponse:
     _PENDING_STATES.pop(state, None)
     try:
         tok = li.exchange_code(code)
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"token exchange failed: {e}")
+    except Exception:
+        logger.warning("LinkedIn token exchange failed")
+        raise HTTPException(status_code=502, detail="LinkedIn token exchange failed")
     li.save_token(tok)
     profile: dict = {}
     try:
         profile = li.me()
-    except Exception as e:
-        profile = {"warning": f"saved token but profile fetch failed: {e}"}
-    name = profile.get("name", "—")
-    email = profile.get("email", "—")
-    expires = tok.get("expires_in", 0)
+    except Exception:
+        logger.warning("LinkedIn profile fetch failed after token storage")
+        profile = {}
+    name = escape(str(profile.get("name", "—")))
+    email = escape(str(profile.get("email", "—")))
+    try:
+        expires = max(0, int(tok.get("expires_in", 0)))
+    except (TypeError, ValueError):
+        expires = 0
     return HTMLResponse(f"""
 <!doctype html>
 <html><head><meta charset='utf-8'><title>LinkedIn connected</title>
@@ -87,9 +97,8 @@ padding:48px;max-width:640px;margin:0 auto}} a{{color:#7c3aed}} code{{background
 <p><b>Name:</b> {name}</p>
 <p><b>Email:</b> {email}</p>
 <p><b>Token TTL:</b> {expires} seconds (~{expires // 86400} days)</p>
-<p>Token persisted to <code>config/linkedin_token.json</code>.</p>
-<p>You can close this tab. Auto-posts will fire from
-<code>code/linkedin_publish_evidence.py</code>.</p>
+<p>The connection credential was stored by the gateway.</p>
+<p>You can close this tab and return to the governed publishing workflow.</p>
 <p><a href='/'>back to gateway</a> · <a href='/evidence/'>evidence</a></p>
 </body></html>""")
 
@@ -115,29 +124,15 @@ def linkedin_status() -> JSONResponse:
         "configured": configured,
         "connected": bool(tok),
         "missing": missing,
-        "key_file_candidates": [
-            "config/luma_outreach_keys.env",
-            "config/luma_live_keys.env",
-            "code/execution/config/luma_live_keys.env",
-        ],
     }
     if not configured:
         out["next_actions"] = {
             "create_app": "https://www.linkedin.com/developers/apps/new",
             "set_keys_file": "config/luma_outreach_keys.env",
-            "expected_redirect": "http://127.0.0.1:8787/auth/linkedin/callback",
+            "expected_redirect_path": "/auth/linkedin/callback",
         }
     elif not tok:
         out["next_actions"] = {
-            "connect_url": "http://127.0.0.1:8787/auth/linkedin/login",
+            "connect_url": "/auth/linkedin/login",
         }
-
-    if tok:
-        try:
-            p = li.me()
-            out["name"] = p.get("name")
-            out["email"] = p.get("email")
-            out["sub"] = p.get("sub")
-        except Exception as e:
-            out["warning"] = str(e)
     return JSONResponse(out)
