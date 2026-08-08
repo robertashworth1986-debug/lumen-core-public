@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import random
+import re
 import subprocess
 import sys
 import threading
@@ -222,6 +223,17 @@ EVIDENCE_AUTO_REPAIR = str(os.getenv("LUMA_EVIDENCE_AUTO_REPAIR", "1")).strip().
 
 def now_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _record_internal_failure(context: str, exc: BaseException) -> str:
+    """Log a bounded diagnostic and return a stable public error code.
+
+    Exception messages can contain absolute paths, provider responses, request
+    fragments, or secrets.  The gateway therefore records only the exception
+    class server-side and exposes a stable code to API clients.
+    """
+    log.warning("%s failed (%s)", context, type(exc).__name__)
+    return context
 
 
 def load_json(path: Path, default: Any) -> Any:
@@ -449,9 +461,13 @@ def _probe_json_file_health(path: Path) -> dict[str, Any]:
                 json.loads(path.read_text(encoding="utf-8"))
                 details["json_parse_ok"] = True
             except Exception as exc:
-                details["json_error"] = str(exc)[:180]
+                details["json_error"] = _record_internal_failure(
+                    "invalid_dashboard_json", exc
+                )
     except Exception as exc:
-        details["json_error"] = str(exc)[:180]
+        details["json_error"] = _record_internal_failure(
+            "dashboard_artifact_unreadable", exc
+        )
 
     return details
 
@@ -549,7 +565,9 @@ def _repair_dashboard_live_feeds_if_needed(
             _atomic_write_json_text(DASH_GRID_VALUE_FILE, _build_grid_value_repair_payload(evidence_hint))
             item["ok"] = True
         except Exception as exc:
-            item["error"] = str(exc)[:180]
+            item["error"] = _record_internal_failure(
+                "grid_value_repair_failed", exc
+            )
         repairs.append(item)
 
     if _needs_repair(infra_health):
@@ -563,7 +581,9 @@ def _repair_dashboard_live_feeds_if_needed(
             _atomic_write_json_text(DASH_INFRA_LIVE_DASHBOARD_FILE, _build_infra_live_repair_payload(evidence_hint))
             item["ok"] = True
         except Exception as exc:
-            item["error"] = str(exc)[:180]
+            item["error"] = _record_internal_failure(
+                "infra_dashboard_repair_failed", exc
+            )
         repairs.append(item)
 
     return repairs
@@ -582,23 +602,70 @@ def _latest_dashboard_evidence_run_dir() -> Path | None:
     return runs[-1]
 
 
+_HARMONIC_RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+_HARMONIC_ARTIFACT_NAMES = frozenset(
+    {
+        "summary.json",
+        "manifest.sha256.json",
+        "metrics.csv",
+        "metrics_pivot.csv",
+        "holdout_predictions.csv",
+        "holdout_predictions.png",
+        "rmse_rank.png",
+        "report.pdf",
+    }
+)
+
+
 def _harmonic_proofpack_run_dirs() -> list[Path]:
     if not HARMONIC_PROOFPACK_RUNS_DIR.exists():
         return []
     runs = [
         p
         for p in HARMONIC_PROOFPACK_RUNS_DIR.iterdir()
-        if p.is_dir() and (p / "summary.json").exists()
+        if (
+            p.is_dir()
+            and not p.is_symlink()
+            and _HARMONIC_RUN_ID_RE.fullmatch(p.name) is not None
+            and (p / "summary.json").is_file()
+        )
     ]
     runs.sort(key=lambda p: p.name, reverse=True)
     return runs
 
 
-def _harmonic_proofpack_artifact_url(run_id: str, artifact_name: str) -> str | None:
-    path = HARMONIC_PROOFPACK_RUNS_DIR / run_id / artifact_name
-    if not path.exists():
+def _harmonic_proofpack_run_dir(run_id: str) -> Path | None:
+    """Select a proofpack directory by enumerating the trusted runs root."""
+    value = str(run_id or "").strip()
+    if _HARMONIC_RUN_ID_RE.fullmatch(value) is None:
         return None
-    return f"/out/execution/harmonic_backprop_proofpack/{run_id}/{artifact_name}"
+    try:
+        return next(
+            (
+                candidate
+                for candidate in _harmonic_proofpack_run_dirs()
+                if candidate.name == value
+            ),
+            None,
+        )
+    except OSError:
+        return None
+
+
+def _harmonic_proofpack_artifact_url(
+    run_dir: Path, artifact_name: str
+) -> str | None:
+    if artifact_name not in _HARMONIC_ARTIFACT_NAMES:
+        return None
+    if run_dir.parent.resolve() != HARMONIC_PROOFPACK_RUNS_DIR.resolve():
+        return None
+    path = run_dir / artifact_name
+    if path.is_symlink() or not path.is_file():
+        return None
+    return (
+        "/out/execution/harmonic_backprop_proofpack/"
+        f"{run_dir.name}/{artifact_name}"
+    )
 
 
 def _harmonic_proofpack_ledger_entry(run_id: str) -> dict[str, Any] | None:
@@ -656,14 +723,14 @@ def _harmonic_proofpack_run_payload(run_dir: Path) -> dict[str, Any]:
         manifest_files = {}
 
     artifacts = {
-        "summary_json": _harmonic_proofpack_artifact_url(run_id, "summary.json"),
-        "manifest_json": _harmonic_proofpack_artifact_url(run_id, "manifest.sha256.json"),
-        "metrics_csv": _harmonic_proofpack_artifact_url(run_id, "metrics.csv"),
-        "metrics_pivot_csv": _harmonic_proofpack_artifact_url(run_id, "metrics_pivot.csv"),
-        "holdout_predictions_csv": _harmonic_proofpack_artifact_url(run_id, "holdout_predictions.csv"),
-        "holdout_predictions_png": _harmonic_proofpack_artifact_url(run_id, "holdout_predictions.png"),
-        "rmse_rank_png": _harmonic_proofpack_artifact_url(run_id, "rmse_rank.png"),
-        "report_pdf": _harmonic_proofpack_artifact_url(run_id, "report.pdf"),
+        "summary_json": _harmonic_proofpack_artifact_url(run_dir, "summary.json"),
+        "manifest_json": _harmonic_proofpack_artifact_url(run_dir, "manifest.sha256.json"),
+        "metrics_csv": _harmonic_proofpack_artifact_url(run_dir, "metrics.csv"),
+        "metrics_pivot_csv": _harmonic_proofpack_artifact_url(run_dir, "metrics_pivot.csv"),
+        "holdout_predictions_csv": _harmonic_proofpack_artifact_url(run_dir, "holdout_predictions.csv"),
+        "holdout_predictions_png": _harmonic_proofpack_artifact_url(run_dir, "holdout_predictions.png"),
+        "rmse_rank_png": _harmonic_proofpack_artifact_url(run_dir, "rmse_rank.png"),
+        "report_pdf": _harmonic_proofpack_artifact_url(run_dir, "report.pdf"),
     }
 
     ledger_entry = _harmonic_proofpack_ledger_entry(run_id)
@@ -1908,15 +1975,15 @@ def harmonic_proofpack_latest() -> dict[str, Any]:
 @app.get("/api/proofpack/harmonic/run/{run_id}")
 def harmonic_proofpack_run(run_id: str) -> dict[str, Any]:
     safe_run_id = str(run_id or "").strip()
-    if not safe_run_id:
+    if _HARMONIC_RUN_ID_RE.fullmatch(safe_run_id) is None:
         return {
             "generated_utc": now_utc(),
             "status": "error",
-            "message": "run_id is required",
+            "message": "run_id is invalid",
         }
 
-    target_dir = HARMONIC_PROOFPACK_RUNS_DIR / safe_run_id
-    if not target_dir.exists() or not target_dir.is_dir() or not (target_dir / "summary.json").exists():
+    target_dir = _harmonic_proofpack_run_dir(safe_run_id)
+    if target_dir is None:
         return {
             "generated_utc": now_utc(),
             "status": "not_found",
@@ -2592,7 +2659,7 @@ async def voice_synthesize(req: VoiceSynthesizeRequest) -> dict[str, Any]:
         return {
             "status": "error",
             "provider": "edge-tts",
-            "error": f"tts_synthesis_failed: {exc}",
+            "error": _record_internal_failure("tts_synthesis_failed", exc),
             "generated_utc": now_utc(),
         }
 
@@ -2978,6 +3045,21 @@ def _remediation_action_map() -> dict[str, dict[str, Any]]:
     }
 
 
+_REMEDIATION_LOCK_FILES = {
+    "spike_engine": ROOT / "run" / "remediation" / "spike_engine.json",
+    "fleet_coherence": ROOT / "run" / "remediation" / "fleet_coherence.json",
+    "harmonic_resonance": ROOT / "run" / "remediation" / "harmonic_resonance.json",
+    "symbol_mesh": ROOT / "run" / "remediation" / "symbol_mesh.json",
+    "unified_alpha": ROOT / "run" / "remediation" / "unified_alpha.json",
+    "unified_trade": ROOT / "run" / "remediation" / "unified_trade.json",
+    "innovation_autopilot": ROOT / "run" / "remediation" / "innovation_autopilot.json",
+    "benchmark_beater": ROOT / "run" / "remediation" / "benchmark_beater.json",
+    "sector_clock": ROOT / "run" / "remediation" / "sector_clock.json",
+    "system_overlord": ROOT / "run" / "remediation" / "system_overlord.json",
+    "supervisor_health": ROOT / "run" / "remediation" / "supervisor_health.json",
+}
+
+
 @app.get("/api/investor/brief")
 def investor_brief() -> dict[str, Any]:
     """
@@ -3271,8 +3353,11 @@ async def ml_trigger() -> dict[str, Any]:
             cwd=str(CODE),
         )
         return {"status": "triggered", "ts": now_utc()}
-    except Exception as e:
-        return {"status": "error", "detail": str(e)}
+    except Exception as exc:
+        return {
+            "status": "error",
+            "detail": _record_internal_failure("ml_signal_trigger_failed", exc),
+        }
 
 
 # ── Prometheus raw metrics passthrough (if prometheus_client available) ──────
@@ -4706,9 +4791,8 @@ def master_remediation_trigger(req: RemediationTriggerRequest) -> dict[str, Any]
 
     argv = [str(x) for x in action.get("argv", [])]
     cooldown = int(action.get("cooldown_sec", 120) or 120)
-    lock_dir = ROOT / "run" / "remediation"
-    lock_dir.mkdir(parents=True, exist_ok=True)
-    lock_file = lock_dir / f"{engine}.json"
+    lock_file = _REMEDIATION_LOCK_FILES[engine]
+    lock_file.parent.mkdir(parents=True, exist_ok=True)
 
     now_ts = time.time()
     lock = load_json(lock_file, {})
@@ -4812,20 +4896,21 @@ def master_remediation_trigger(req: RemediationTriggerRequest) -> dict[str, Any]
             "command": " ".join(argv),
         }
     except Exception as exc:
+        error_code = _record_internal_failure("remediation_start_failed", exc)
         _append_jsonl(
             log_file,
             {
                 "ts": now_utc(),
                 "event": "remediation_error",
                 "engine": engine,
-                "error": str(exc),
+                "error": error_code,
             },
         )
         return {
             "generated_utc": now_utc(),
             "status": "error",
             "engine": engine,
-            "error": str(exc),
+            "error": error_code,
             "command": " ".join(argv),
         }
 
@@ -5333,7 +5418,7 @@ def _kraken_add_order(payload: dict[str, Any]) -> dict[str, Any]:
     """Submit signed order to Kraken. Honors payload['validate'] flag for dry-run."""
     api_key, api_secret = _load_kraken_keys()
     if not api_key or not api_secret:
-        return {"error": ["EAPI:Missing credentials in luma_live_keys.env"]}
+        return {"error": ["EAPI:CredentialsMissing"]}
 
     data = dict(payload or {})
     # Use nanosecond nonce — Kraken requires strict monotonic increase per API key.
@@ -5355,7 +5440,8 @@ def _kraken_add_order(payload: dict[str, Any]) -> dict[str, Any]:
         body = r.json()
         return body
     except Exception as exc:
-        return {"error": [f"transport:{exc}"]}
+        _record_internal_failure("kraken_transport_failed", exc)
+        return {"error": ["EAPI:Transport"]}
 
 
 @app.get("/api/master/approval-queue")
@@ -5665,7 +5751,10 @@ def master_scan_refill(req: dict | None = None) -> dict[str, Any]:
         )
         return {"status": "ok", **summary}
     except Exception as exc:  # noqa: BLE001
-        return {"status": "error", "error": str(exc)}
+        return {
+            "status": "error",
+            "error": _record_internal_failure("auto_ticket_emit_failed", exc),
+        }
 
 
 @app.get("/api/master/auto-fire/status")
@@ -6087,7 +6176,10 @@ if DASH.exists():
                     "message": "Scan running in background. Poll /api/spike-hunter/latest for results."}
         except Exception as exc:
             _SPIKE_SCAN_LOCK.unlink(missing_ok=True)
-            return {"status": "error", "message": str(exc)}
+            return {
+                "status": "error",
+                "message": _record_internal_failure("spike_scan_start_failed", exc),
+            }
 
 
 # Mount static dashboard last so all API routes take priority.
@@ -6143,7 +6235,11 @@ def api_events_recent(limit: int = 24):
             })
         return {"events": rows, "source": str(src), "count": len(rows)}
     except Exception as exc:
-        return {"events": [], "source": str(src), "error": str(exc)}
+        return {
+            "events": [],
+            "source": "execution_events",
+            "error": _record_internal_failure("events_read_failed", exc),
+        }
 
 
 @app.get("/api/positions/live")
@@ -6174,7 +6270,10 @@ def api_positions_live():
     try:
         lines = src.read_text(encoding="utf-8", errors="replace").splitlines()
     except Exception as exc:
-        return {"source": str(src), "error": str(exc)}
+        return {
+            "source": "execution_events",
+            "error": _record_internal_failure("positions_read_failed", exc),
+        }
 
     event_counts: dict[str, int] = {}
     side_counts: dict[str, int] = {"buy": 0, "sell": 0, "other": 0}
@@ -6334,7 +6433,7 @@ def _kraken_public_tickers(pairs: list[str]) -> dict[str, float]:
 def _kraken_private_balance() -> dict[str, Any]:
     api_key, api_secret = _load_kraken_keys()
     if not api_key or not api_secret:
-        return {"error": ["EAPI:Missing credentials in luma_live_keys.env"]}
+        return {"error": ["EAPI:CredentialsMissing"]}
     urlpath = "/0/private/Balance"
     data = {"nonce": str(time.time_ns())}
     headers = {
@@ -6344,8 +6443,9 @@ def _kraken_private_balance() -> dict[str, Any]:
     try:
         r = _requests_appr.post("https://api.kraken.com" + urlpath, data=data, headers=headers, timeout=12)
         return r.json()
-    except Exception as e:
-        return {"error": [f"EAPI:Network:{e}"]}
+    except Exception as exc:
+        _record_internal_failure("kraken_balance_transport_failed", exc)
+        return {"error": ["EAPI:Transport"]}
 
 
 def _build_kraken_equity_snapshot() -> dict[str, Any]:
@@ -7038,7 +7138,9 @@ async def _profit_lock_watcher() -> None:
                     _save_approval_queue(queue)
                     _PROFIT_LOCK_STATE["tickets_created_total"] = int(_PROFIT_LOCK_STATE.get("tickets_created_total") or 0) + created
         except Exception as exc:
-            _PROFIT_LOCK_STATE["last_error"] = f"{type(exc).__name__}: {exc}"
+            _PROFIT_LOCK_STATE["last_error"] = _record_internal_failure(
+                "profit_lock_watcher_failed", exc
+            )
         await asyncio.sleep(int((_load_profit_lock_cfg().get("scan_interval_s") or 30)))
 
 
@@ -7102,7 +7204,11 @@ def api_buys_best(limit: int = 10, horizon_h: int = 24) -> dict[str, Any]:
     try:
         data = json.loads(SPIKE_HUNTER_LATEST.read_text(encoding="utf-8"))
     except Exception as exc:
-        return {"ok": False, "error": f"parse: {exc}", "picks": []}
+        return {
+            "ok": False,
+            "error": _record_internal_failure("spike_hunter_parse_failed", exc),
+            "picks": [],
+        }
     sigs = data.get("signals") or data.get("results") or data.get("leaderboard") or []
     if not isinstance(sigs, list):
         sigs = []
@@ -7366,7 +7472,7 @@ def _maybe_refresh_spike_cache(max_age_minutes: float) -> dict[str, Any]:
         _AUTOBUY_STATE["spike_refresh_count"] = int(_AUTOBUY_STATE.get("spike_refresh_count") or 0) + 1
         _AUTOBUY_STATE["last_spike_refresh_utc"] = now_utc()
     except Exception as exc:
-        info["error"] = str(exc)[:200]
+        info["error"] = _record_internal_failure("spike_cache_refresh_failed", exc)
     return info
 
 
@@ -7480,8 +7586,8 @@ def _read_latest_alpha_map_summary() -> dict[str, Any]:
     except Exception as exc:
         return {
             "available": False,
-            "path": str(path),
-            "error": str(exc)[:200],
+            "path": "kraken_multi_tf_alpha_map_latest.json",
+            "error": _record_internal_failure("alpha_map_read_failed", exc),
             "age_minutes": _latest_alpha_map_age_minutes(),
         }
 
@@ -7498,7 +7604,9 @@ def _poll_alpha_scan_process() -> None:
         rc = proc.poll()
     except Exception as exc:
         _SMART_SCANNER_STATE["alpha_running"] = False
-        _SMART_SCANNER_STATE["last_error"] = f"alpha_poll_error: {str(exc)[:200]}"
+        _SMART_SCANNER_STATE["last_error"] = _record_internal_failure(
+            "alpha_poll_failed", exc
+        )
         _SMART_SCANNER_ALPHA_PROC = None
         return
 
@@ -7598,12 +7706,13 @@ def _start_alpha_scan(cfg: dict[str, Any], reason: str) -> dict[str, Any]:
         }
     except Exception as exc:
         _SMART_SCANNER_STATE["alpha_running"] = False
-        _SMART_SCANNER_STATE["last_error"] = f"alpha_start_error: {str(exc)[:200]}"
+        error_code = _record_internal_failure("alpha_start_failed", exc)
+        _SMART_SCANNER_STATE["last_error"] = error_code
         return {
             "started": False,
             "running": False,
             "reason": "start_failed",
-            "error": str(exc)[:200],
+            "error": error_code,
         }
 
 
@@ -7728,7 +7837,9 @@ async def _smart_scanner_watcher() -> None:
             tick = _smart_scanner_tick(force=False, run_spike=True, run_alpha=True)
             sleep_s = max(10, int(tick.get("effective_interval_s") or 30))
         except Exception as exc:
-            _SMART_SCANNER_STATE["last_error"] = f"watcher_error: {str(exc)[:200]}"
+            _SMART_SCANNER_STATE["last_error"] = _record_internal_failure(
+                "smart_scanner_watcher_failed", exc
+            )
         await asyncio.sleep(sleep_s)
 
 
@@ -7770,7 +7881,10 @@ def _check_circuit_breaker(cfg: dict[str, Any]) -> dict[str, Any]:
                 )
             return {"tripped": False, "scope": scope, "net_usd": float(net), "floor_usd": floor}
     except Exception as exc:
-        return {"tripped": False, "error": str(exc)[:200]}
+        return {
+            "tripped": False,
+            "error": _record_internal_failure("circuit_breaker_check_failed", exc),
+        }
 
 
 def _autobuy_scan_once(force: bool = False) -> dict[str, Any]:
@@ -7969,7 +8083,9 @@ def api_autobuy_status() -> dict[str, Any]:
         else:
             best_summary = {"spike_hunter_count": int(best.get("spike_hunter_count") or 0), "blockers": ["no picks available"], "all_clear": False}
     except Exception as exc:
-        best_summary = {"error": str(exc)[:200]}
+        best_summary = {
+            "error": _record_internal_failure("autobuy_best_summary_failed", exc)
+        }
     return {
         "ok": True,
         "ts": now_utc(),
@@ -8006,7 +8122,12 @@ async def _autobuy_watcher() -> None:
                 try:
                     _autobuy_scan_once(force=False)
                 except Exception as exc:
-                    _AUTOBUY_STATE["last_decision"] = {"ts": now_utc(), "error": str(exc)[:200]}
+                    _AUTOBUY_STATE["last_decision"] = {
+                        "ts": now_utc(),
+                        "error": _record_internal_failure(
+                            "autobuy_watcher_failed", exc
+                        ),
+                    }
             else:
                 _AUTOBUY_STATE["last_scan_utc"] = now_utc()
                 _AUTOBUY_STATE["last_scan_eligible"] = 0

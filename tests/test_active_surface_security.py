@@ -152,6 +152,9 @@ def test_api_error_contracts_do_not_expose_exception_text_or_server_paths() -> N
     forecast = (ROOT / "code" / "forecast_api.py").read_text(encoding="utf-8")
     grants = (ROOT / "code" / "grants_api.py").read_text(encoding="utf-8")
     linkedin = (ROOT / "code" / "linkedin_router.py").read_text(encoding="utf-8")
+    legacy_gateway = (
+        ROOT / "code" / "luma_experience_gateway_legacy.py"
+    ).read_text(encoding="utf-8")
 
     forbidden = (
         'detail=f"read error:',
@@ -169,3 +172,23 @@ def test_api_error_contracts_do_not_expose_exception_text_or_server_paths() -> N
     assert 'out["email"]' not in linkedin
     assert 'out["sub"]' not in linkedin
     assert "escape(str(profile.get" in linkedin
+
+    assert "str(exc)" not in legacy_gateway
+    assert "str(e)" not in legacy_gateway
+    assert "f\"tts_synthesis_failed: {exc}\"" not in legacy_gateway
+    assert "EAPI:Network:" not in legacy_gateway
+    assert "_record_internal_failure" in legacy_gateway
+
+
+def test_legacy_gateway_enumerates_untrusted_path_selectors() -> None:
+    legacy_gateway = (
+        ROOT / "code" / "luma_experience_gateway_legacy.py"
+    ).read_text(encoding="utf-8")
+
+    assert "_HARMONIC_RUN_ID_RE" in legacy_gateway
+    assert "_HARMONIC_ARTIFACT_NAMES" in legacy_gateway
+    assert "def _harmonic_proofpack_run_dir(" in legacy_gateway
+    assert "for candidate in _harmonic_proofpack_run_dirs()" in legacy_gateway
+    assert "HARMONIC_PROOFPACK_RUNS_DIR / safe_run_id" not in legacy_gateway
+    assert "_REMEDIATION_LOCK_FILES[engine]" in legacy_gateway
+    assert 'lock_dir / f"{engine}.json"' not in legacy_gateway
