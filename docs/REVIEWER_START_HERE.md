@@ -25,8 +25,9 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 13. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
 14. [Founder IP and external-review boundary](FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
 15. [Exact public-site snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md)
-16. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
-17. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
+16. [Public-site supply-chain assurance](PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)
+17. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
+18. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
 
 The repository docket is the reviewable state bound to the checked-out commit.
 The live docket is a convenience projection and may lag the default branch or
@@ -58,6 +59,12 @@ selected NIST AI RMF, NIST GenAI Profile, NIST CSF, NIST SSDF, OWASP ASVS,
 OWASP LLMSVS, and SLSA themes. It is not certification, full conformance, an
 external audit, or a penetration test; its machine verifier fails closed if a
 status is promoted or a required limitation disappears.
+
+The exact public release has a deterministic 30-file CycloneDX 1.6 inventory
+and a separate `main`-only GitHub OIDC/Sigstore signing lane. Reviewers should
+verify the downloaded archive against the repository, workflow, ref, source
+digest, and predicate type. This does not establish a complete product or VPS
+SBOM, a SLSA level, or live-domain parity.
 
 The documented incident control classifies public-release drift and preserves
 containment and recovery gates. Its CI tabletop is not a completed live

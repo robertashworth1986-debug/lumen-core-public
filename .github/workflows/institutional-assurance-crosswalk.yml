@@ -5,9 +5,16 @@ on:
   pull_request:
     paths:
       - '.github/workflows/institutional-assurance-crosswalk.yml'
+      - '.github/workflows/public-site-exact-snapshot-ci.yml'
+      - '.github/workflows/public-site-supply-chain.yml'
+      - 'code/deploy/build_public_site_supply_chain.py'
+      - 'code/deploy/package_public_site_release.py'
+      - 'code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py'
       - 'code/ops/VERIFY_INSTITUTIONAL_ASSURANCE_CROSSWALK.py'
       - 'config/institutional_assurance_crosswalk_v1.json'
       - 'docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md'
+      - 'docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md'
+      - 'docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md'
       - 'tests/test_institutional_assurance_crosswalk.py'
       - 'README.md'
       - 'EVIDENCE_INDEX.md'
@@ -16,9 +23,16 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/institutional-assurance-crosswalk.yml'
+      - '.github/workflows/public-site-exact-snapshot-ci.yml'
+      - '.github/workflows/public-site-supply-chain.yml'
+      - 'code/deploy/build_public_site_supply_chain.py'
+      - 'code/deploy/package_public_site_release.py'
+      - 'code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py'
       - 'code/ops/VERIFY_INSTITUTIONAL_ASSURANCE_CROSSWALK.py'
       - 'config/institutional_assurance_crosswalk_v1.json'
       - 'docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md'
+      - 'docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md'
+      - 'docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md'
       - 'tests/test_institutional_assurance_crosswalk.py'
       - 'README.md'
       - 'EVIDENCE_INDEX.md'

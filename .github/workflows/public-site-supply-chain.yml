@@ -1,0 +1,220 @@
+name: Public site supply-chain assurance
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/public-site-supply-chain.yml'
+      - 'code/deploy/build_public_site_supply_chain.py'
+      - 'code/deploy/package_public_site_release.py'
+      - 'code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py'
+      - 'docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md'
+      - 'dashboard/operator_home.html'
+      - 'dashboard/opportunity_sprint.html'
+      - 'dashboard/proof_to_pilot.html'
+      - 'dashboard/external_review.html'
+      - 'dashboard/reviewer_docket.json'
+      - 'dashboard/mission_control.html'
+      - 'dashboard/evidence/index_bounded.html'
+      - 'dashboard/robots.txt'
+      - 'dashboard/sitemap.xml'
+      - 'dashboard/site.webmanifest'
+      - 'dashboard/manifest.json'
+      - 'dashboard/assets/lumaarc_arc_seal_v1.png'
+      - 'dashboard/assets/lumencore.css'
+      - 'dashboard/assets/luma_command_fabric.css'
+      - 'dashboard/assets/luma_command_fabric.js'
+      - 'dashboard/assets/luma_institutional_surface.css'
+      - 'dashboard/assets/luma_institutional_surface.js'
+      - 'dashboard/assets/prooflock/**'
+      - 'dashboard/build_week/prooflock_console/**'
+      - 'tests/test_public_site_supply_chain.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/public-site-supply-chain.yml'
+      - 'code/deploy/build_public_site_supply_chain.py'
+      - 'code/deploy/package_public_site_release.py'
+      - 'code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py'
+      - 'docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md'
+      - 'dashboard/operator_home.html'
+      - 'dashboard/opportunity_sprint.html'
+      - 'dashboard/proof_to_pilot.html'
+      - 'dashboard/external_review.html'
+      - 'dashboard/reviewer_docket.json'
+      - 'dashboard/mission_control.html'
+      - 'dashboard/evidence/index_bounded.html'
+      - 'dashboard/robots.txt'
+      - 'dashboard/sitemap.xml'
+      - 'dashboard/site.webmanifest'
+      - 'dashboard/manifest.json'
+      - 'dashboard/assets/lumaarc_arc_seal_v1.png'
+      - 'dashboard/assets/lumencore.css'
+      - 'dashboard/assets/luma_command_fabric.css'
+      - 'dashboard/assets/luma_command_fabric.js'
+      - 'dashboard/assets/luma_institutional_surface.css'
+      - 'dashboard/assets/luma_institutional_surface.js'
+      - 'dashboard/assets/prooflock/**'
+      - 'dashboard/build_week/prooflock_console/**'
+      - 'tests/test_public_site_supply_chain.py'
+
+concurrency:
+  group: public-site-supply-chain-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the exact source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up the bounded Python runtime
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+
+      - name: Install the bounded test dependency
+        run: python -m pip install --disable-pip-version-check pytest==9.1.0
+
+      - name: Build the immutable release, CycloneDX inventory, and local receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d -m 700 /tmp/public-site-supply-chain
+          python code/deploy/package_public_site_release.py \
+            --source-commit "$GITHUB_SHA" \
+            --archive /tmp/public-site-supply-chain/public-site-release.tar \
+            --manifest /tmp/public-site-supply-chain/public-site-release-manifest.json \
+            | tee /tmp/public-site-supply-chain/package-receipt.json
+          python code/deploy/build_public_site_supply_chain.py \
+            --source-commit "$GITHUB_SHA" \
+            --archive /tmp/public-site-supply-chain/public-site-release.tar \
+            --manifest /tmp/public-site-supply-chain/public-site-release-manifest.json \
+            --sbom /tmp/public-site-supply-chain/public-site-release.cdx.json \
+            --receipt /tmp/public-site-supply-chain/public-site-supply-chain-receipt.json
+
+      - name: Verify exact inventory coverage and attestation policy
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          python code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py \
+            --source-commit "$GITHUB_SHA" \
+            --archive /tmp/public-site-supply-chain/public-site-release.tar \
+            --manifest /tmp/public-site-supply-chain/public-site-release-manifest.json \
+            --sbom /tmp/public-site-supply-chain/public-site-release.cdx.json \
+            --receipt /tmp/public-site-supply-chain/public-site-supply-chain-receipt.json \
+            --json-out /tmp/public-site-supply-chain/supply-chain-verification.json
+          python -m pytest tests/test_public_site_supply_chain.py -q
+          git cat-file -e "${BASE_SHA}^{commit}"
+          git diff --check "${BASE_SHA}...HEAD"
+          (
+            cd /tmp/public-site-supply-chain
+            sha256sum \
+              public-site-release.tar \
+              public-site-release-manifest.json \
+              public-site-release.cdx.json \
+              public-site-supply-chain-receipt.json \
+              supply-chain-verification.json \
+              > SHA256SUMS
+          )
+
+      - name: Upload the unsigned exact-release package and verification receipt
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: public-site-supply-chain-${{ github.sha }}
+          path: /tmp/public-site-supply-chain/
+          if-no-files-found: error
+          retention-days: 30
+
+  attest:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    steps:
+      - name: Check out the attested source identity
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Download the verified build job artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: public-site-supply-chain-${{ github.sha }}
+          path: /tmp/public-site-supply-chain
+
+      - name: Create Sigstore-signed SLSA provenance for the release archive
+        id: provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: /tmp/public-site-supply-chain/public-site-release.tar
+          show-summary: true
+
+      - name: Create Sigstore-signed CycloneDX SBOM attestation for the archive
+        id: sbom
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: /tmp/public-site-supply-chain/public-site-release.tar
+          sbom-path: /tmp/public-site-supply-chain/public-site-release.cdx.json
+          show-summary: true
+
+      - name: Verify both signed bundles against repository, workflow, ref, and source identity
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh attestation verify \
+            /tmp/public-site-supply-chain/public-site-release.tar \
+            --repo "$GITHUB_REPOSITORY" \
+            --bundle "${{ steps.provenance.outputs.bundle-path }}" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/public-site-supply-chain.yml" \
+            --source-digest "$GITHUB_SHA" \
+            --source-ref refs/heads/main \
+            --cert-oidc-issuer https://token.actions.githubusercontent.com \
+            --deny-self-hosted-runners \
+            --format json \
+            > /tmp/public-site-supply-chain/signed-provenance-verification.json
+          gh attestation verify \
+            /tmp/public-site-supply-chain/public-site-release.tar \
+            --repo "$GITHUB_REPOSITORY" \
+            --bundle "${{ steps.sbom.outputs.bundle-path }}" \
+            --predicate-type https://cyclonedx.org/bom \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/public-site-supply-chain.yml" \
+            --source-digest "$GITHUB_SHA" \
+            --source-ref refs/heads/main \
+            --cert-oidc-issuer https://token.actions.githubusercontent.com \
+            --deny-self-hosted-runners \
+            --format json \
+            > /tmp/public-site-supply-chain/signed-sbom-verification.json
+          install -m 0644 \
+            "${{ steps.provenance.outputs.bundle-path }}" \
+            /tmp/public-site-supply-chain/signed-provenance.bundle.jsonl
+          install -m 0644 \
+            "${{ steps.sbom.outputs.bundle-path }}" \
+            /tmp/public-site-supply-chain/signed-sbom.bundle.jsonl
+
+      - name: Upload signed attestation bundles and verification receipts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: public-site-signed-attestations-${{ github.sha }}
+          path: |
+            /tmp/public-site-supply-chain/signed-provenance.bundle.jsonl
+            /tmp/public-site-supply-chain/signed-sbom.bundle.jsonl
+            /tmp/public-site-supply-chain/signed-provenance-verification.json
+            /tmp/public-site-supply-chain/signed-sbom-verification.json
+          if-no-files-found: error
+          retention-days: 30

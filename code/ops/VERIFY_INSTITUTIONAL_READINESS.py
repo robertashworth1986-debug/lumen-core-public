@@ -90,7 +90,7 @@ REQUIRED_CLAIM_BOUNDARIES = {
 REQUIRED_DOSSIER_TEXT = (
     "Production decision: `HOLD`.",
     "Review-ready is not production-certified.",
-    "a complete product and deployment SBOM",
+    "a complete product, VPS, gateway, container, and deployment-runtime SBOM",
     "a customer, signed paid scope, cleared payment, revenue, or market-tested price",
     "does not currently establish",
     "unverified convenience projection",

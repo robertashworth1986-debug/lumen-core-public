@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_utc": "2026-08-08T00:00:00Z",
+  "generated_utc": "2026-08-08T12:50:00Z",
   "repository": "robertashworth1986-debug/lumen-core-public",
   "scope": "public_repository_and_bounded_validation_sprint",
   "assessment_type": "first_party_informative_crosswalk",
@@ -83,7 +83,7 @@
       "publication_date": "2025-11-24",
       "official_url": "https://slsa.dev/spec/v1.2/",
       "reference_use": "Software supply-chain orientation for source controls, build provenance, artifact identity, and provenance verification.",
-      "not_claimed": "Does not claim any SLSA Source or Build level, signed provenance, hosted-builder assessment, or hardened-build guarantee."
+      "not_claimed": "Does not claim any SLSA Source or Build level, complete product provenance, hosted-builder assurance beyond the signed GitHub workflow identity, or a hardened-build guarantee."
     }
   ],
   "controls": [
@@ -171,11 +171,15 @@
       "evidence_paths": [
         "config/reviewer_reproducibility_protocol_v1.json",
         "requirements-reviewer-ubuntu-py311.lock",
-        "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json"
+        "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+        "code/deploy/build_public_site_supply_chain.py",
+        "code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py",
+        "docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md",
+        ".github/workflows/public-site-supply-chain.yml"
       ],
-      "evidence_establishes": "The named reviewer computation has hash-locked Python dependencies and a receipt containing a scoped CycloneDX inventory.",
-      "evidence_does_not_establish": "A complete product, runtime, container, operating-system, frontend, or deployment SBOM, continuous vulnerability monitoring, or dependency approval.",
-      "next_gate": "Generate, review, and govern complete product and exact-release SBOMs with vulnerability and exception handling."
+      "evidence_establishes": "The named reviewer computation has hash-locked Python dependencies and a scoped CycloneDX inventory; the exact 30-file public release has a deterministic CycloneDX 1.6 inventory with one component per allowlisted file and a main-only signed-SBOM workflow.",
+      "evidence_does_not_establish": "A complete product, VPS operating-system, gateway, container, private-stack, or organization-wide SBOM, continuous vulnerability monitoring, dependency approval, or a successful signed attestation until the main workflow completes.",
+      "next_gate": "Complete and retain a successful main-branch signed SBOM attestation, then inventory deployment runtime layers and add vulnerability triage and exception handling."
     },
     {
       "id": "AC-06",
@@ -188,11 +192,15 @@
       "evidence_paths": [
         "docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md",
         ".github/workflows/public-site-exact-snapshot-ci.yml",
-        ".github/workflows/deploy-public-site-release.yml"
+        ".github/workflows/deploy-public-site-release.yml",
+        "docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md",
+        ".github/workflows/public-site-supply-chain.yml",
+        "code/deploy/build_public_site_supply_chain.py",
+        "code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py"
       ],
-      "evidence_establishes": "The public-site release protocol binds files to Git object identity and SHA-256 digests and defines fail-closed packaging and live comparison.",
-      "evidence_does_not_establish": "SLSA Build L1 or higher, signed provenance, builder authenticity, hardened or isolated builds, or a currently matching live deployment.",
-      "next_gate": "Emit standards-compatible signed provenance from an assessed hosted build and verify it before deployment."
+      "evidence_establishes": "The public-site release protocol binds files to Git object identity and SHA-256 digests; a separate main-only GitHub-hosted workflow creates and immediately verifies Sigstore-signed build provenance and an SBOM attestation for the exact release archive.",
+      "evidence_does_not_establish": "SLSA Build L1 or higher, signed provenance for any commit whose main workflow has not succeeded, whole-product provenance, hardened or isolated builds, or a currently matching live deployment.",
+      "next_gate": "Retain and independently re-verify a successful main-branch attestation bundle, assess the hosted build against an explicit SLSA level, and deploy only through the exact human release gate."
     },
     {
       "id": "AC-07",
@@ -340,7 +348,7 @@
     "not_an_external_audit",
     "not_a_penetration_test",
     "not_a_complete_product_or_deployment_sbom",
-    "not_signed_slsa_provenance_or_a_slsa_level",
+    "not_a_slsa_level_or_complete_product_provenance",
     "not_a_live_recovery_exercise",
     "not_an_executed_dpa_or_legal_review",
     "not_regulated_data_authorization",
