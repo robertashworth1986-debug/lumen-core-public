@@ -152,28 +152,30 @@ jobs:
           verify_route() {
             local route="$1"
             local attempt="$2"
-            local headers body code
+            local headers normalized body code
             headers=$(mktemp)
+            normalized=$(mktemp)
             body=$(mktemp)
             code=$(curl --silent --show-error --max-time 20 --noproxy '*' \
               --dump-header "$headers" --output "$body" \
               --write-out '%{http_code}' \
               "https://lumen-core.ai${route}?security=$RELEASE_COMMIT-${attempt}")
+            tr -d '\r' < "$headers" > "$normalized"
 
             if [[ "$code" == 200 ]] \
-              && grep -Eiq '^x-content-type-options:[[:space:]]*nosniff\r?$' "$headers" \
-              && grep -Eiq '^x-frame-options:[[:space:]]*DENY\r?$' "$headers" \
-              && grep -Eiq '^strict-transport-security:[[:space:]]*max-age=31536000\r?$' "$headers" \
-              && grep -Eiq "^content-security-policy:.*frame-ancestors 'none'" "$headers" \
-              && grep -Eiq '^permissions-policy:.*camera=\(\)' "$headers"; then
+              && grep -Eiq '^x-content-type-options:[[:space:]]*nosniff$' "$normalized" \
+              && grep -Eiq '^x-frame-options:[[:space:]]*DENY$' "$normalized" \
+              && grep -Eiq '^strict-transport-security:[[:space:]]*max-age=31536000$' "$normalized" \
+              && grep -Eiq "^content-security-policy:.*frame-ancestors 'none'" "$normalized" \
+              && grep -Eiq '^permissions-policy:.*camera=\(\)' "$normalized"; then
               printf 'OK\t%s\tattempt=%s\n' "$route" "$attempt" | tee -a "$receipt"
-              rm -f -- "$headers" "$body"
+              rm -f -- "$headers" "$normalized" "$body"
               return 0
             fi
 
             printf 'WAIT\t%s\tattempt=%s\thttp=%s\n' "$route" "$attempt" "$code" >&2
-            grep -Ei '^(HTTP/|x-content-type-options:|x-frame-options:|referrer-policy:|strict-transport-security:|content-security-policy:|permissions-policy:)' "$headers" >&2 || true
-            rm -f -- "$headers" "$body"
+            grep -Ei '^(HTTP/|x-content-type-options:|x-frame-options:|referrer-policy:|strict-transport-security:|content-security-policy:|permissions-policy:)' "$normalized" >&2 || true
+            rm -f -- "$headers" "$normalized" "$body"
             return 1
           }
 
