@@ -1,15 +1,15 @@
 {
-  "checked_utc": "2026-08-08T12:28:25Z",
-  "overall": "degraded",
+  "checked_utc": "2026-08-09T12:28:50Z",
+  "overall": "operational",
   "static_surface_state": "operational",
-  "dynamic_gateway_state": "outage",
-  "healthy_count": 6,
+  "dynamic_gateway_state": "operational",
+  "healthy_count": 8,
   "total_count": 8,
   "static_healthy_count": 6,
   "static_total_count": 6,
-  "dynamic_healthy_count": 0,
+  "dynamic_healthy_count": 2,
   "dynamic_total_count": 2,
-  "dynamic_reachable_count": 0,
+  "dynamic_reachable_count": 2,
   "endpoints": {
     "portal": {
       "surface": "static",
@@ -74,28 +74,28 @@
     "gateway_public_status": {
       "surface": "dynamic",
       "url": "https://lumen-core.ai/api/public/status",
-      "status": 502,
-      "status_text": "502",
-      "content_type": "text/html",
+      "status": 200,
+      "status_text": "200",
+      "content_type": "application/json",
       "contract": "public_status",
-      "http_ok": false,
-      "reachable": false,
-      "json_ok": false,
-      "contract_ok": false,
-      "ok": false
+      "http_ok": true,
+      "reachable": true,
+      "json_ok": true,
+      "contract_ok": true,
+      "ok": true
     },
     "gateway_health": {
       "surface": "dynamic",
       "url": "https://lumen-core.ai/health",
-      "status": 502,
-      "status_text": "502",
-      "content_type": "text/html",
+      "status": 200,
+      "status_text": "200",
+      "content_type": "application/json",
       "contract": "gateway_health",
-      "http_ok": false,
-      "reachable": false,
-      "json_ok": false,
-      "contract_ok": false,
-      "ok": false
+      "http_ok": true,
+      "reachable": true,
+      "json_ok": true,
+      "contract_ok": true,
+      "ok": true
     }
   }
 }
