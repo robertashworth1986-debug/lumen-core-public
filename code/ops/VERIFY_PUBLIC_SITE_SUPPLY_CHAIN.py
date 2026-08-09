@@ -38,7 +38,8 @@ WORKFLOW_REQUIREMENTS = (
 )
 GUIDE_REQUIREMENTS = (
     "CycloneDX 1.6",
-    "exact 30-file public release",
+    "exact 43-file public release",
+    "legacy-route HOLD stubs",
     "GitHub-hosted `main` workflow",
     "Sigstore-signed",
     "No SLSA level is claimed",
