@@ -1,0 +1,81 @@
+{
+  "artifact": {
+    "digest": "sha256:8ac130ba2a313c795750105141cbfec4b4656c40cfe04cb3b5c58a377681f12d",
+    "expires_utc": "2026-09-08T02:05:28Z",
+    "id": 9030952290,
+    "name": "public-security-headers-31289595192-1",
+    "size_bytes": 1205
+  },
+  "claim_boundaries": [
+    "This first-party receipt records the named workflow and observed HTTP header behavior; it is not a penetration test, security certification, or external audit.",
+    "The observations cover seven named public routes at the recorded time; they do not establish an uptime SLA, whole-system security, vulnerability-free status, or future behavior.",
+    "A successful bounded header repair does not prove application correctness, live-release byte parity, data protection, regulatory conformance, or customer acceptance."
+  ],
+  "execution": {
+    "nginx_configuration_test": "PASS",
+    "nginx_reload": "PASS",
+    "remote_staging_removed": true,
+    "rollback_triggered": false
+  },
+  "generated_utc": "2026-08-09T02:08:30Z",
+  "header_policy": {
+    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests",
+    "Permissions-Policy": "accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Strict-Transport-Security": "max-age=31536000",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY"
+  },
+  "observation_origins": [
+    {
+      "maximum_attempt": 1,
+      "name": "vps_loopback",
+      "passed_route_count": 7,
+      "route_count": 7,
+      "status": "PASS"
+    },
+    {
+      "maximum_attempt": 1,
+      "name": "vps_public_network",
+      "passed_route_count": 7,
+      "route_count": 7,
+      "status": "PASS"
+    },
+    {
+      "maximum_attempt": 1,
+      "name": "github_hosted_runner",
+      "passed_route_count": 7,
+      "route_count": 7,
+      "status": "PASS"
+    }
+  ],
+  "production_decision": "PUBLIC_HEADER_POLICY_OBSERVED_NO_BROADER_PRODUCTION_PROMOTION",
+  "receipt_sha256": "51ee7452092e007ce6ee347d1a15ae00873b32a89eee67ac851775a50721d137",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "routes": [
+    "/",
+    "/proof_to_pilot.html",
+    "/external_review.html",
+    "/evidence/",
+    "/build_week/prooflock_console/",
+    "/health",
+    "/api/public/status"
+  ],
+  "schema": "lumencore.public_security_header_deployment_receipt.v1",
+  "source_commit": "04f5397422cc8e651ddde5cc7e7c57a334866c01",
+  "source_workflow": {
+    "path": ".github/workflows/repair-public-security-headers.yml",
+    "sha256": "6ec9451af22799a5a56b1b5bd850ac1ad12e26b96e47ec1729c13341e5633f19"
+  },
+  "workflow_run": {
+    "attempt": 1,
+    "completed_utc": "2026-08-09T02:05:31Z",
+    "conclusion": "success",
+    "created_utc": "2026-08-09T02:05:11Z",
+    "event": "workflow_dispatch",
+    "head_branch": "main",
+    "id": 31289595192,
+    "name": "Repair public security headers on VPS",
+    "url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31289595192"
+  }
+}
