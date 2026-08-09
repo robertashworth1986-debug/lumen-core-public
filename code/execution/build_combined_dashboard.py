@@ -1,16 +1,23 @@
 from __future__ import annotations
 
 import csv
+import html
 import importlib.util
 import json
+import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(
+    os.environ.get("LUMA_STACK_ROOT", r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+).expanduser().resolve()
 OUT = ROOT / "out"
 EXEC_OUT = OUT / "execution"
-DASH = ROOT / "dashboard"
+DASH = Path(
+    os.environ.get("LUMA_DASHBOARD_DIR", str(ROOT / "dashboard"))
+).expanduser().resolve()
 
 SOURCES = {
     "institutional_summary": EXEC_OUT / "institutional_summary.json",
@@ -24,7 +31,6 @@ SOURCES = {
     "level4_summary": DASH / "level4_live_summary.json",
     "master_summary": DASH / "master_summary.txt",
     "watchdog": DASH / "orchestrator_watchdog_status.txt",
-    "api_keys": DASH / "api_key_status.txt",
     "compliance": DASH / "compliance_mvp_progress.json",
     "trade_log": EXEC_OUT / "trade_log.json",
     "walkforward_results": DASH / "ensemble_walkforward_results.csv",
@@ -80,11 +86,31 @@ def format_pct(value: Any) -> str:
         return str(value)
 
 
-def load_trade_txids(trades: List[Dict[str, Any]], limit: int = 5) -> List[str]:
+def count_trade_events(trades: List[Dict[str, Any]]) -> int:
     if not isinstance(trades, list):
-        return []
-    txids = [str(t.get("txid", "N/A")) for t in trades if t.get("txid")]
-    return txids[-limit:][::-1]
+        return 0
+    return sum(1 for trade in trades if isinstance(trade, dict))
+
+
+def esc(value: Any) -> str:
+    return html.escape(str(value), quote=True)
+
+
+def bounded_text_status(lines: Any) -> Dict[str, Any]:
+    """Project only availability metadata; never publish arbitrary file contents."""
+    if not isinstance(lines, list):
+        return {"available": False, "line_count": 0}
+    return {"available": bool(lines), "line_count": len(lines)}
+
+
+def safe_dashboard_href(value: Any) -> str:
+    """Allow same-directory HTML links only; reject active or external schemes."""
+    name = str(value).strip()
+    if not name or any(marker in name for marker in (":", "/", "\\")):
+        return "#"
+    if not re.fullmatch(r"[A-Za-z0-9._ -]+\.html?", name, flags=re.IGNORECASE):
+        return "#"
+    return name
 
 
 def render_lines_as_html(lines: List[str], max_chars: int = 180) -> str:
@@ -141,7 +167,6 @@ def build_dashboard(context: Dict[str, Any]) -> str:
     proof = context.get("proof_chain", {})
     live_ops = context.get("live_ops", {})
     watch = context.get("watchdog", [])
-    api_keys = context.get("api_keys", [])
     compliance = context.get("compliance", [])
     level2 = context.get("level2_summary", [])
     level3 = context.get("level3_summary", [])
@@ -149,28 +174,32 @@ def build_dashboard(context: Dict[str, Any]) -> str:
     walkforward = context.get("walkforward_results", {})
     dashboards = context.get("dashboard_links", [])
     trades = context.get("trade_log", [])
-    txids = load_trade_txids(trades, limit=5)
+    trade_event_count = count_trade_events(trades)
 
     optimization_gain = float(baseline.get("top_test_vs_baseline", 0.0)) * 100.0
-    optimization_badge = "90%+ OPTIMIZATION" if optimization_gain >= 90 else "OPTIMIZATION TRACKING"
-    badge_color = "#00ff41" if optimization_gain >= 90 else "#ffd700"
-    live_status = "LIVE" if rolling.get("live_now") else "PAPER"
+    optimization_badge = "INTERNAL DELTA REPORTED" if optimization_gain else "NO DELTA REPORTED"
+    badge_color = "#ffd700"
+    source_update_state = "CURRENT FEED REPORTED" if rolling.get("live_now") else "NO CURRENT FEED"
     proof_files = proof.get("files", []) if isinstance(proof.get("files", []), list) else []
     proof_count = len(proof_files)
     proof_chain_latest = proof_files[-1].get("path", "") if proof_files else ""
 
     grant_count = len(grant.get("grant_proposals", [])) if isinstance(grant.get("grant_proposals", []), list) else 0
-    watch_text = "\n".join(watch) if watch else "No watchdog status available."
-    api_lines = "<br>".join(api_keys) if api_keys else "No API key status available."
-    comp_lines = "<br>".join([f"{item.get('item')}: {item.get('status')}" for item in compliance]) if isinstance(compliance, list) else "No compliance data." 
-    level2_text = render_lines_as_html(level2)
-    level3_text = render_lines_as_html(level3)
-    master_text = render_lines_as_html(master)
-    txid_rows = "".join(f"<div class='txid'>{tx}</div>" for tx in txids) or "<div class='empty'>No live TXIDs</div>"
+    watch_state = "ISSUES REPORTED" if any("ISSUES DETECTED" in str(line) for line in watch) else ("REPORTED CLEAR" if watch else "NOT REPORTED")
+    comp_lines = "<br>".join(
+        f"{esc(item.get('item', ''))}: {esc(item.get('status', ''))}"
+        for item in compliance
+        if isinstance(item, dict)
+    ) if isinstance(compliance, list) else "No compliance data."
+    summary_meta = {
+        "level2": bounded_text_status(level2),
+        "level3": bounded_text_status(level3),
+        "master": bounded_text_status(master),
+    }
 
     top_strategies = baseline.get("top_strategies", []) if isinstance(baseline.get("top_strategies", []), list) else []
     strategy_rows = "".join(
-        f"<tr><td>{s.get('rank')}</td><td>{s.get('flow')}</td><td>{s.get('strategy')}</td><td>{s.get('algo')}</td><td>{float(s.get('test_sharpe', 0.0)):.3f}</td><td>{float(s.get('institutional_score', 0.0)):.2f}</td><td>{float(s.get('stability',0.0)):.3f}</td></tr>"
+        f"<tr><td>{esc(s.get('rank'))}</td><td>{esc(s.get('flow'))}</td><td>{esc(s.get('strategy'))}</td><td>{esc(s.get('algo'))}</td><td>{float(s.get('test_sharpe', 0.0)):.3f}</td><td>{float(s.get('institutional_score', 0.0)):.2f}</td><td>{float(s.get('stability',0.0)):.3f}</td></tr>"
         for s in top_strategies[:8]
     )
 
@@ -180,7 +209,7 @@ def build_dashboard(context: Dict[str, Any]) -> str:
     walkforward_worst = float(walkforward.get("worst_result", 0.0))
     walkforward_window = walkforward.get("latest_window", "n/a")
     dashboard_links_html = "".join(
-        f"<li><a href='{link}' target='_blank'>{Path(link).stem.replace('_', ' ').title()}</a></li>"
+        f"<li><a href='{esc(safe_dashboard_href(link))}' target='_blank' rel='noopener noreferrer'>{esc(Path(link).stem.replace('_', ' ').title())}</a></li>"
         for link in dashboards
     ) or "<li>No dashboard pages found.</li>"
 
@@ -227,8 +256,8 @@ th{{color:#8fd9ff;text-transform:uppercase;letter-spacing:0.08em;font-size:0.78r
   <div class='card'>
     <div class='card-title'>Master Status</div>
     <div class='metric'><span class='metric-label'>Generated UTC</span><span class='metric-value'>{timestamp}</span></div>
-    <div class='metric'><span class='metric-label'>Live Proof State</span><span class='metric-value'>{live_status}</span></div>
-    <div class='metric'><span class='metric-label'>TXIDs Tracked</span><span class='metric-value'>{len(txids)}</span></div>
+    <div class='metric'><span class='metric-label'>Source Update State</span><span class='metric-value'>{source_update_state}</span></div>
+    <div class='metric'><span class='metric-label'>Paper Event Records</span><span class='metric-value'>{trade_event_count}</span></div>
     <div class='metric'><span class='metric-label'>Optimization Badge</span><span class='badge'>{optimization_badge}</span></div>
   </div>
 
@@ -245,32 +274,32 @@ th{{color:#8fd9ff;text-transform:uppercase;letter-spacing:0.08em;font-size:0.78r
   <div class='card'>
     <div class='card-title'>Proof and Audit Summary</div>
     <div class='metric'><span class='metric-label'>Proof Chain Files</span><span class='metric-value'>{proof_count}</span></div>
-    <div class='metric'><span class='metric-label'>Live Chain Status</span><span class='metric-value'>{'ACTIVE' if proof_count else 'MISSING'}</span></div>
-    <div class='metric'><span class='metric-label'>Latest Proof Artifact</span><span class='metric-value'>{Path(proof_chain_latest).name if proof_chain_latest else 'None'}</span></div>
+    <div class='metric'><span class='metric-label'>Proof Receipt Status</span><span class='metric-value'>{'PRESENT' if proof_count else 'MISSING'}</span></div>
+    <div class='metric'><span class='metric-label'>Latest Proof Artifact</span><span class='metric-value'>{esc(Path(proof_chain_latest).name if proof_chain_latest else 'None')}</span></div>
     <div class='metric'><span class='metric-label'>Grant Proposals</span><span class='metric-value'>{grant_count}</span></div>
-    <div class='metric'><span class='metric-label'>Watchdog State</span><span class='metric-value'>{'ISSUES' if 'ISSUES DETECTED' in watch_text else 'OK'}</span></div>
+    <div class='metric'><span class='metric-label'>Watchdog State</span><span class='metric-value'>{watch_state}</span></div>
   </div>
 
   <div class='card'>
-    <div class='card-title'>Live Execution</div>
-    <div class='metric'><span class='metric-label'>Live Pair</span><span class='metric-value'>{live_ops.get('live_rows', [{}])[-1].get('top_pair', 'N/A') if live_ops.get('live_rows') else 'N/A'}</span></div>
-    <div class='metric'><span class='metric-label'>Live Strategy</span><span class='metric-value'>{live_ops.get('live_rows', [{}])[-1].get('top_strategy', 'N/A') if live_ops.get('live_rows') else 'N/A'}</span></div>
-    <div class='metric'><span class='metric-label'>Live Action</span><span class='metric-value'>{live_ops.get('live_rows', [{}])[-1].get('top_action', 'N/A') if live_ops.get('live_rows') else 'N/A'}</span></div>
-    <div class='metric'><span class='metric-label'>Live Luma Score</span><span class='metric-value'>{float(live_ops.get('live_rows', [{}])[-1].get('top_luma_score', 0.0) if live_ops.get('live_rows') else 0.0):.3f}</span></div>
-    <div class='metric'><span class='metric-label'>Capital Weight Sum</span><span class='metric-value'>{float(live_ops.get('live_rows', [{}])[-1].get('gross_effective_weight', 0.0) if live_ops.get('live_rows') else 0.0):.3f}</span></div>
+    <div class='card-title'>Observation Lane (No Orders)</div>
+    <div class='metric'><span class='metric-label'>Observed Pair</span><span class='metric-value'>{esc(live_ops.get('live_rows', [{}])[-1].get('top_pair', 'N/A') if live_ops.get('live_rows') else 'N/A')}</span></div>
+    <div class='metric'><span class='metric-label'>Observed Strategy</span><span class='metric-value'>{esc(live_ops.get('live_rows', [{}])[-1].get('top_strategy', 'N/A') if live_ops.get('live_rows') else 'N/A')}</span></div>
+    <div class='metric'><span class='metric-label'>Paper Action</span><span class='metric-value'>{esc(live_ops.get('live_rows', [{}])[-1].get('top_action', 'N/A') if live_ops.get('live_rows') else 'N/A')}</span></div>
+    <div class='metric'><span class='metric-label'>Paper Luma Score</span><span class='metric-value'>{float(live_ops.get('live_rows', [{}])[-1].get('top_luma_score', 0.0) if live_ops.get('live_rows') else 0.0):.3f}</span></div>
+    <div class='metric'><span class='metric-label'>Paper Allocation Weight Sum</span><span class='metric-value'>{float(live_ops.get('live_rows', [{}])[-1].get('gross_effective_weight', 0.0) if live_ops.get('live_rows') else 0.0):.3f}</span></div>
   </div>
 </div>
 
 <div class='grid'>
   <div class='card'>
-    <div class='card-title'>Live TXID Feed</div>
-    {txid_rows}
+    <div class='card-title'>Execution Identifier Boundary</div>
+    <div class='code-block'>Raw transaction and order identifiers are excluded from the public dashboard. Paper event count: {trade_event_count}.</div>
   </div>
 
   <div class='card'>
-    <div class='card-title'>Watchdog & Key Health</div>
-    <div class='code-block'>{watch_text}</div>
-    <div class='code-block'>{api_lines}</div>
+    <div class='card-title'>Runtime Guard State</div>
+    <div class='code-block'>Watchdog: {watch_state}</div>
+    <div class='code-block'>Credential state is private and is not inspected or published by this surface.</div>
   </div>
 
   <div class='card'>
@@ -291,16 +320,16 @@ th{{color:#8fd9ff;text-transform:uppercase;letter-spacing:0.08em;font-size:0.78r
 
 <div class='grid'>
   <div class='card'>
-    <div class='card-title'>Level 2 Summary</div>
-    <div class='code-block'>{level2_text}</div>
+    <div class='card-title'>Level 2 Summary Receipt</div>
+    <div class='code-block'>Available: {summary_meta['level2']['available']} | Lines retained privately: {summary_meta['level2']['line_count']}</div>
   </div>
   <div class='card'>
-    <div class='card-title'>Level 3 Truth Summary</div>
-    <div class='code-block'>{level3_text}</div>
+    <div class='card-title'>Level 3 Summary Receipt</div>
+    <div class='code-block'>Available: {summary_meta['level3']['available']} | Lines retained privately: {summary_meta['level3']['line_count']}</div>
   </div>
   <div class='card'>
-    <div class='card-title'>Master Summary</div>
-    <div class='code-block'>{master_text}</div>
+    <div class='card-title'>Master Summary Receipt</div>
+    <div class='code-block'>Available: {summary_meta['master']['available']} | Lines retained privately: {summary_meta['master']['line_count']}</div>
   </div>
 </div>
 
