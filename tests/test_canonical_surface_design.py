@@ -13,6 +13,12 @@ PAGES = {
     "trade": "kraken_execution_dashboard.html",
 }
 
+PUBLIC_REVIEW_PAGES = (
+    DASHBOARD / "proof_to_pilot.html",
+    DASHBOARD / "external_review.html",
+    DASHBOARD / "evidence" / "index_bounded.html",
+)
+
 
 def page(name: str) -> str:
     return (DASHBOARD / PAGES[name]).read_text(encoding="utf-8")
@@ -50,6 +56,30 @@ def test_founder_confirmed_lumaarc_is_the_shared_dashboard_mark():
     assert "LUMENCORE / QUANT LAB" in page("quant")
     assert "Lumen<span>Core</span>" in page("trade")
     assert "LUMENCORE / GRANTS" in page("grants")
+
+
+def test_public_review_pages_share_the_canonical_lumaarc_shell():
+    for path in PUBLIC_REVIEW_PAGES:
+        body = path.read_text(encoding="utf-8")
+        assert 'data-luma-surface="review"' in body
+        assert '/assets/lumaarc_arc_seal_v1.png' in body
+        assert '/assets/luma_institutional_surface.css' in body
+        assert '/assets/luma_institutional_surface.js' in body
+        assert 'class="lis-review-header"' in body
+        assert 'class="lis-review-brand"' in body
+        assert 'class="lis-review-links"' in body
+        assert "LUMEN<em>CORE</em>" in body
+
+    shared_css = (DASHBOARD / "assets" / "luma_institutional_surface.css").read_text(
+        encoding="utf-8"
+    )
+    shared_js = (DASHBOARD / "assets" / "luma_institutional_surface.js").read_text(
+        encoding="utf-8"
+    )
+    assert 'body[data-luma-surface="review"]' in shared_css
+    assert ".lis-review-header" in shared_css
+    assert 'review: {' in shared_js
+    assert 'surface === "review"' in shared_js
 
 
 def test_operator_surfaces_are_not_search_index_targets():
