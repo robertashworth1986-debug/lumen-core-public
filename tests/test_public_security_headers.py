@@ -153,6 +153,13 @@ class PublicSecurityHeaderTests(unittest.TestCase):
         self.assertIn("verify_route()", text)
         self.assertIn("for attempt in $(seq 1 10)", text)
         self.assertIn("--noproxy '*'", text)
+        self.assertIn("tr -d '\\r' < \"$headers\" > \"$normalized\"", text)
+        self.assertIn(
+            "grep -Eiq '^x-content-type-options:[[:space:]]*nosniff$'",
+            text,
+        )
+        self.assertIn('"$normalized"', text)
+        self.assertNotIn("nosniff\\r?$", text)
         self.assertIn("WAIT\\t%s\\tattempt=%s\\thttp=%s", text)
         self.assertIn("[[ \"$verified\" == true ]]", text)
 
