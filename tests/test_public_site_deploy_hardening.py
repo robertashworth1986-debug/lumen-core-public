@@ -328,7 +328,7 @@ def make_remote_sandbox(test_root: Path, module):
         path.write_bytes(body)
         path.chmod(0o600)
         old_bodies[name] = body
-    (target / "quant_lab.html").write_bytes(b"preserve non-release page\n")
+    (target / "local_operator_notes.html").write_bytes(b"preserve non-release page\n")
     (target / "data").mkdir()
     (target / "data" / "snapshot.json").write_bytes(b"{}\n")
     return target, old_bodies
@@ -376,7 +376,7 @@ def test_posix_apply_installs_allowlist_and_preserves_operator_data(tmp_path):
     rollback_match = re.search(r"^PUBLIC_SITE_ROLLBACK_DIR=(.+)$", completed.stdout, re.M)
     assert rollback_match is not None
     rollback = Path(rollback_match.group(1))
-    assert (target / "quant_lab.html").read_bytes() == b"preserve non-release page\n"
+    assert (target / "local_operator_notes.html").read_bytes() == b"preserve non-release page\n"
     assert (target / "data" / "snapshot.json").read_bytes() == b"{}\n"
     assert stat.S_IMODE((target / "assets").stat().st_mode) == 0o755
     assert stat.S_IMODE((target / "assets" / "prooflock").stat().st_mode) == 0o755

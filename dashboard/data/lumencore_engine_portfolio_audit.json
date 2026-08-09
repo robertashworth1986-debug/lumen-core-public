@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-09T02:27:45.895723Z",
+  "generated_at_utc": "2026-08-09T02:47:45.262699Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -460,9 +460,9 @@
             "path": "dashboard/kraken_execution_dashboard.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "59d7681da1baa74b31d298d36d66d32719a583ae",
-            "bytes": 71303,
-            "sha256": "602c6e947c8921660e206eb24e6730fd9388e8a3d41af675bc74e3c73b27eb29"
+            "git_blob_sha": "8678f9e80c8aa96370cd3fceae506b7ddee889ba",
+            "bytes": 71354,
+            "sha256": "1cc4e8b7cf7d0bf2680f1c43ec563d6183c779f7cf4e6c20ef6cc986009c52a3"
           }
         ]
       }
@@ -992,6 +992,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "b8050c1f043df6772078e9eb71841bcf50b8785beda3e8635a3d92952ec914a3"
+    "payload_sha256": "9455ce52e30a780c9a6db51dde65b6a04f3164d2e2b3d29c5f5866d278af56f8"
   }
 }
