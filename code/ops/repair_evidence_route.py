@@ -27,6 +27,21 @@ REDIRECT_PATTERN = re.compile(
     r"(?m)^[ \t]*location[ \t]+=[ \t]*/evidence[ \t]*\{"
 )
 SAFE_ROOT_PATTERN = re.compile(r"^/[A-Za-z0-9._/-]+$")
+PUBLIC_SECURITY_HEADERS = (
+    'add_header X-Content-Type-Options "nosniff" always;',
+    'add_header X-Frame-Options "DENY" always;',
+    'add_header Referrer-Policy "strict-origin-when-cross-origin" always;',
+    'add_header Content-Security-Policy "default-src \'self\'; base-uri \'self\'; '
+    "object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; "
+    "font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' "
+    "https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+    "connect-src 'self'; "
+    "worker-src 'self' blob:; media-src 'self'; frame-src 'none'; "
+    'upgrade-insecure-requests" always;',
+    'add_header Strict-Transport-Security "max-age=31536000" always;',
+    'add_header Permissions-Policy "accelerometer=(), autoplay=(), camera=(), '
+    'geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()" always;',
+)
 
 
 class RouteRepairError(RuntimeError):
@@ -125,6 +140,9 @@ def _find_optional_redirect(text: str) -> tuple[int, int] | None:
 
 def _static_blocks(document_root: Path | str) -> str:
     root = _safe_document_root(document_root)
+    security_headers = "\n".join(
+        f"        {header}" for header in PUBLIC_SECURITY_HEADERS
+    )
     return f"""    location = /evidence {{
         return 301 /evidence/;
     }}
@@ -134,6 +152,7 @@ def _static_blocks(document_root: Path | str) -> str:
         index index_bounded.html;
         try_files $uri $uri/ =404;
         add_header Cache-Control \"no-cache\" always;
+{security_headers}
     }}
 """
 
@@ -156,6 +175,7 @@ def repair_config(
         and "try_files $uri $uri/ =404;" in current
         and "proxy_pass" not in current
         and redirect is not None
+        and all(header in current for header in PUBLIC_SECURITY_HEADERS)
     )
     if already_static:
         validate_repaired_config(text, root)
@@ -191,6 +211,7 @@ def validate_repaired_config(
         "index index_bounded.html;",
         "try_files $uri $uri/ =404;",
         'add_header Cache-Control "no-cache" always;',
+        *PUBLIC_SECURITY_HEADERS,
     )
     missing = [item for item in required if item not in block]
     if missing:

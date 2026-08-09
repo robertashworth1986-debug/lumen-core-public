@@ -8,9 +8,14 @@ on:
       - '.github/workflows/deploy-public-site-release.yml'
       - 'code/ops/repair_evidence_route.py'
       - 'code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh'
+      - 'code/ops/repair_public_security_headers.py'
+      - 'code/ops/REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh'
+      - 'code/deploy/nginx/lumatrader.conf'
+      - '.github/workflows/repair-public-security-headers.yml'
       - 'dashboard/evidence/index_bounded.html'
       - 'docs/EVIDENCE_ROUTE_RECOVERY.md'
       - 'tests/test_repair_evidence_route.py'
+      - 'tests/test_public_security_headers.py'
   push:
     branches: [main]
     paths:
@@ -19,9 +24,14 @@ on:
       - '.github/workflows/deploy-public-site-release.yml'
       - 'code/ops/repair_evidence_route.py'
       - 'code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh'
+      - 'code/ops/repair_public_security_headers.py'
+      - 'code/ops/REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh'
+      - 'code/deploy/nginx/lumatrader.conf'
+      - '.github/workflows/repair-public-security-headers.yml'
       - 'dashboard/evidence/index_bounded.html'
       - 'docs/EVIDENCE_ROUTE_RECOVERY.md'
       - 'tests/test_repair_evidence_route.py'
+      - 'tests/test_public_security_headers.py'
 
 permissions:
   contents: read
@@ -40,12 +50,15 @@ jobs:
           set -euo pipefail
           python3 -m py_compile \
             code/ops/repair_evidence_route.py \
-            tests/test_repair_evidence_route.py
+            code/ops/repair_public_security_headers.py \
+            tests/test_repair_evidence_route.py \
+            tests/test_public_security_headers.py
 
       - name: Validate wrapper syntax
         run: |
           set -euo pipefail
           bash -n code/ops/REPAIR_EVIDENCE_ROUTE_ON_VPS.sh
+          bash -n code/ops/REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh
 
       - name: Run focused unit tests
         run: |
@@ -53,6 +66,10 @@ jobs:
           python3 -m unittest discover \
             -s tests \
             -p 'test_repair_evidence_route.py' \
+            -v
+          python3 -m unittest discover \
+            -s tests \
+            -p 'test_public_security_headers.py' \
             -v
 
       - name: Verify canonical public-page contract
@@ -83,3 +100,8 @@ jobs:
           grep -Fq 'workflow_dispatch:' .github/workflows/deploy-public-site-release.yml
           grep -Fq 'DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT' .github/workflows/deploy-public-site-release.yml
           grep -Fq 'APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh' .github/workflows/deploy-public-site-release.yml
+          grep -Fq 'workflow_dispatch:' .github/workflows/repair-public-security-headers.yml
+          grep -Fq 'APPLY_PUBLIC_SECURITY_HEADERS' .github/workflows/repair-public-security-headers.yml
+          grep -Fq 'nginx -t' code/ops/REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh
+          grep -Fq 'Rolling back Nginx configuration' code/ops/REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh
+          ! grep -Fq 'push:' .github/workflows/repair-public-security-headers.yml

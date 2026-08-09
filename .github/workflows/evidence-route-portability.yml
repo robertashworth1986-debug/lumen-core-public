@@ -5,14 +5,18 @@ on:
     branches: [main]
     paths:
       - 'code/ops/repair_evidence_route.py'
+      - 'code/ops/repair_public_security_headers.py'
       - 'tests/test_repair_evidence_route.py'
+      - 'tests/test_public_security_headers.py'
       - 'conftest.py'
       - 'tests/test_clean_checkout_artifact_policy.py'
       - '.github/workflows/evidence-route-portability.yml'
   pull_request:
     paths:
       - 'code/ops/repair_evidence_route.py'
+      - 'code/ops/repair_public_security_headers.py'
       - 'tests/test_repair_evidence_route.py'
+      - 'tests/test_public_security_headers.py'
       - 'conftest.py'
       - 'tests/test_clean_checkout_artifact_policy.py'
       - '.github/workflows/evidence-route-portability.yml'
@@ -55,7 +59,9 @@ jobs:
         run: >-
           python -m py_compile
           code/ops/repair_evidence_route.py
+          code/ops/repair_public_security_headers.py
           tests/test_repair_evidence_route.py
+          tests/test_public_security_headers.py
           conftest.py
           tests/test_clean_checkout_artifact_policy.py
 
@@ -64,6 +70,13 @@ jobs:
           python -m unittest discover
           -s tests
           -p "test_repair_evidence_route.py"
+          -v
+
+      - name: Run the public-security-header portability suite
+        run: >-
+          python -m unittest discover
+          -s tests
+          -p "test_public_security_headers.py"
           -v
 
       - name: Verify the exact clean-checkout policy
