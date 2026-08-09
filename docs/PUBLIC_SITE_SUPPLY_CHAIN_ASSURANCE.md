@@ -26,6 +26,9 @@ file, preserving:
 - byte count; and
 - install mode.
 
+The allowlist also carries `legacy-route HOLD stubs` for retired public dashboard URLs.
+Those files are intentionally shipped as noindex redirect guards so stale VPS files or old links cannot be mistaken for the current public validation surface.
+
 The root application component binds the archive SHA-256, source commit,
 repository URL, bounded target directory, inventory scope, and explicit
 absence of a SLSA-level or live-deployment claim. The verifier requires 43 of
