@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -17,6 +18,7 @@ PACKET_PATH = ROOT / "config" / "strategic_transaction_packet_v2.json"
 GRAPH_PATH = ROOT / "config" / "evidence_graph_v1.json"
 JSON_OUT = ROOT / "dashboard" / "data" / "lumencore_engine_portfolio_audit.json"
 MD_OUT = ROOT / "docs" / "LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md"
+EXPLAIN_PATH = ROOT / "dashboard" / "explain.html"
 
 
 def load_module():
@@ -88,7 +90,8 @@ def test_audit_uses_tracked_repository_evidence(module, inputs):
     assert by_id["lumen_infrastructure_sentinel"]["observed_maturity"] == "runnable_component"
     assert by_id["echoform_identity_engine"]["observed_maturity"] == "concept_only"
     assert by_id["smart_city_node_engine"]["observed_maturity"] == "concept_only"
-    assert "dashboard/alpha_burst_lab_holo_3d.html" in by_id["luma_xr_command_room"]["missing_paths"]
+    assert by_id["luma_xr_command_room"]["missing_paths"] == []
+    assert payload["summary"]["missing_evidence_path_count"] == 0
     assert payload["summary"]["untracked_evidence_path_count"] == 0
     tracked_records = [
         record
@@ -202,3 +205,14 @@ def test_duplicate_json_key_rejected(module, tmp_path):
 def test_published_artifacts_exist():
     assert JSON_OUT.is_file()
     assert MD_OUT.is_file()
+
+
+def test_explain_page_has_no_dead_local_html_links():
+    text = EXPLAIN_PATH.read_text(encoding="utf-8")
+    links = set(
+        re.findall(r'(?:href\s*=\s*["\']|href:\s*["\'])([^"\']+\.html)', text)
+    )
+    assert links
+    assert "./alpha_burst_lab_holo_3d.html" not in links
+    assert "./scenario_mission.html" not in links
+    assert all((EXPLAIN_PATH.parent / link).is_file() for link in links)

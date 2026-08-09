@@ -1,8 +1,8 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-09T02:17:36.324342Z",
+  "generated_at_utc": "2026-08-09T02:47:45.262699Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
-  "source_registry_sha256": "bb877daf2a1032955c0c890f5301aed42ee251ed69c15bc24295e3925b11aec0",
+  "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
   "source_note": "The 15 founder engine names are audited as internal platform lanes, not 15 finished products or 15 separate offers. Only repository evidence is scored.",
   "primary_offer_binding": {
@@ -41,7 +41,7 @@
     "executed_buyer_pilot_evidenced": false,
     "revenue_evidenced": false,
     "external_validation_evidenced": false,
-    "missing_evidence_path_count": 1,
+    "missing_evidence_path_count": 0,
     "untracked_evidence_path_count": 0
   },
   "engines": [
@@ -460,9 +460,9 @@
             "path": "dashboard/kraken_execution_dashboard.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "59d7681da1baa74b31d298d36d66d32719a583ae",
-            "bytes": 71303,
-            "sha256": "602c6e947c8921660e206eb24e6730fd9388e8a3d41af675bc74e3c73b27eb29"
+            "git_blob_sha": "8678f9e80c8aa96370cd3fceae506b7ddee889ba",
+            "bytes": 71354,
+            "sha256": "1cc4e8b7cf7d0bf2680f1c43ec563d6183c779f7cf4e6c20ef6cc986009c52a3"
           }
         ]
       }
@@ -477,11 +477,9 @@
       "acceptance_gate": "Users complete declared tasks within locked error, latency, and comfort thresholds.",
       "claim_boundary": "No operational command authority, training efficacy, comfort, or safety certification claim.",
       "observed_maturity": "runnable_component",
-      "evidence_classes_present": 3,
+      "evidence_classes_present": 4,
       "evidence_classes_total": 6,
-      "missing_paths": [
-        "dashboard/alpha_burst_lab_holo_3d.html"
-      ],
+      "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
         "source": [
@@ -526,12 +524,12 @@
         "artifact": [],
         "public_surface": [
           {
-            "path": "dashboard/alpha_burst_lab_holo_3d.html",
-            "exists": false,
-            "tracked": false,
-            "git_blob_sha": null,
-            "bytes": null,
-            "sha256": null
+            "path": "dashboard/mission_control.html",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "eecad9e1e847e13da38bb4b7c7544c9e6d48d668",
+            "bytes": 132984,
+            "sha256": "17a6185709f2ff92ac163da3bac3a306178634e5a0ff43bfb55075d8cb3d62be"
           }
         ]
       }
@@ -994,6 +992,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "8ef3f5dfe110616e38c2834ea832920f75fa7c6fa159ea35e75786c671f99376"
+    "payload_sha256": "9455ce52e30a780c9a6db51dde65b6a04f3164d2e2b3d29c5f5866d278af56f8"
   }
 }

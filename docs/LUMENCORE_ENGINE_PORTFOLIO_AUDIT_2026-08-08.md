@@ -1,6 +1,6 @@
 # LumenCore Engine Portfolio Audit
 
-Generated at: `2026-08-09T02:17:36.324342Z`
+Generated at: `2026-08-09T02:47:45.262699Z`
 
 ## Reviewer decision
 
@@ -24,7 +24,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 - Priority-lane maturity: `runnable_component`
 - Priority lane eligible for buyer scoping: `true`
 - Subscription-ready products: `0`
-- Missing configured evidence paths: `1`
+- Missing configured evidence paths: `0`
 - Untracked configured evidence paths: `0`
 - Buyer commitment evidenced: `false`
 - Signed paid scope evidenced: `false`
@@ -44,7 +44,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 | Energy Harmonization Engine | `research_lane` | `runnable_component` | 3/6 | Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision. |
 | FlowForm Hardware Engine | `research_lane` | `runnable_component` | 3/6 | Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan. |
 | Kraken Sentinel / LumaSniper | `research_lane` | `tested_implementation` | 5/6 | Review read-only telemetry and paper-ledger controls under a frozen protocol. |
-| Luma XR Command Room | `research_lane` | `runnable_component` | 3/6 | Test declared monitoring tasks using non-sensitive sample telemetry. |
+| Luma XR Command Room | `research_lane` | `runnable_component` | 4/6 | Test declared monitoring tasks using non-sensitive sample telemetry. |
 | LumaScout | `research_lane` | `runnable_component` | 4/6 | Compare a pre-registered shortlist with a transparent popularity baseline. |
 | LumaTrader | `research_lane` | `tested_implementation` | 6/6 | Compare a frozen paper or replay protocol with a declared baseline after costs and abstention rules. |
 | Sports Harmonic Edge | `research_lane` | `runnable_component` | 3/6 | Compare historical and prospective research scoring with simple declared market baselines. |
@@ -124,7 +124,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 - Buyer profile: Simulation, training, museum, and enterprise demonstration teams.
 - Acceptance gate: Users complete declared tasks within locked error, latency, and comfort thresholds.
 - Claim boundary: No operational command authority, training efficacy, comfort, or safety certification claim.
-- Missing configured paths: 1
+- Missing configured paths: 0
 
 ### LumaScout
 
@@ -178,7 +178,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 - Strategic packet SHA-256: `358855ad9d44ee72ef460ad70b46448a82f327a0c536d9253d3fad84590c4ad7`
 - Evidence graph SHA-256: `cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05`
-- Portfolio payload SHA-256: `8ef3f5dfe110616e38c2834ea832920f75fa7c6fa159ea35e75786c671f99376`
+- Portfolio payload SHA-256: `9455ce52e30a780c9a6db51dde65b6a04f3164d2e2b3d29c5f5866d278af56f8`
 - Public contact: <https://lumen-core.ai/proof_to_pilot.html>
 
 ## Boundaries

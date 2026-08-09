@@ -196,7 +196,7 @@
         "test": [],
         "documentation": ["docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
         "artifact": [],
-        "public_surface": ["dashboard/alpha_burst_lab_holo_3d.html"]
+        "public_surface": ["dashboard/mission_control.html"]
       }
     },
     {

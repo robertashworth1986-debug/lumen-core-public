@@ -9,6 +9,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 from typing import Any
 
@@ -143,8 +144,25 @@ def parse_utc(value: Any, label: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
-def _load_packager(root: Path):
-    path = root / "code" / "deploy" / "package_public_site_release.py"
+def _load_packager(root: Path, source_commit: str, temporary_root: Path):
+    result = subprocess.run(
+        [
+            "git",
+            "show",
+            f"{source_commit}:code/deploy/package_public_site_release.py",
+        ],
+        cwd=root,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0 or not result.stdout:
+        raise SignedAttestationReceiptError(
+            "cannot load the release packager from the pinned source commit"
+        )
+    if len(result.stdout) > 1_000_000:
+        raise SignedAttestationReceiptError("pinned release packager exceeds 1000000 bytes")
+    path = temporary_root / "package_public_site_release.py"
+    path.write_bytes(result.stdout)
     spec = importlib.util.spec_from_file_location("signed_receipt_release_packager", path)
     if spec is None or spec.loader is None:
         raise SignedAttestationReceiptError("cannot load public-site release packager")
@@ -163,7 +181,11 @@ def verify_receipt(*, root: Path = ROOT, receipt_path: Path = DEFAULT_RECEIPT) -
     root = root.resolve(strict=True)
     receipt = read_json(receipt_path)
     _require_exact_fields(receipt, TOP_LEVEL_FIELDS, "top-level receipt")
-    if receipt_path.read_bytes() != exact_render(receipt):
+    rendered_receipt = receipt_path.read_text(encoding="utf-8").replace("\r\n", "\n")
+    if (
+        "\r" in rendered_receipt
+        or rendered_receipt.encode("utf-8") != exact_render(receipt)
+    ):
         raise SignedAttestationReceiptError("receipt serialization drift")
     if receipt["schema"] != "lumencore.public_site_signed_attestation_receipt.v1":
         raise SignedAttestationReceiptError("receipt schema mismatch")
@@ -210,10 +232,10 @@ def verify_receipt(*, root: Path = ROOT, receipt_path: Path = DEFAULT_RECEIPT) -
         raise SignedAttestationReceiptError("exact release inventory coverage mismatch")
     subject_hash = require_sha256(subject["sha256"], "subject.sha256")
 
-    packager = _load_packager(root)
-    try:
-        with tempfile.TemporaryDirectory(prefix="lumencore-signed-receipt-") as temporary:
-            temporary_root = Path(temporary)
+    with tempfile.TemporaryDirectory(prefix="lumencore-signed-receipt-") as temporary:
+        temporary_root = Path(temporary)
+        packager = _load_packager(root, SOURCE_COMMIT, temporary_root)
+        try:
             archive = temporary_root / "public-site-release.tar"
             manifest_path = temporary_root / "public-site-release-manifest.json"
             manifest = packager.build_release_package(
@@ -230,8 +252,8 @@ def verify_receipt(*, root: Path = ROOT, receipt_path: Path = DEFAULT_RECEIPT) -
                 raise SignedAttestationReceiptError("manifest archive hash mismatch")
             if manifest["file_count"] != subject["release_file_count"]:
                 raise SignedAttestationReceiptError("manifest file count mismatch")
-    except (OSError, packager.ReleasePackageError) as exc:
-        raise SignedAttestationReceiptError(str(exc)) from exc
+        except (OSError, packager.ReleasePackageError) as exc:
+            raise SignedAttestationReceiptError(str(exc)) from exc
 
     attestations = receipt["attestations"]
     if not isinstance(attestations, list) or len(attestations) != 2:
