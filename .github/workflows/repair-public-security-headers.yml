@@ -148,6 +148,35 @@ jobs:
           set -euo pipefail
           receipt=/tmp/public-security-header-live-receipt.txt
           : > "$receipt"
+
+          verify_route() {
+            local route="$1"
+            local attempt="$2"
+            local headers body code
+            headers=$(mktemp)
+            body=$(mktemp)
+            code=$(curl --silent --show-error --max-time 20 --noproxy '*' \
+              --dump-header "$headers" --output "$body" \
+              --write-out '%{http_code}' \
+              "https://lumen-core.ai${route}?security=$RELEASE_COMMIT-${attempt}")
+
+            if [[ "$code" == 200 ]] \
+              && grep -Eiq '^x-content-type-options:[[:space:]]*nosniff\r?$' "$headers" \
+              && grep -Eiq '^x-frame-options:[[:space:]]*DENY\r?$' "$headers" \
+              && grep -Eiq '^strict-transport-security:[[:space:]]*max-age=31536000\r?$' "$headers" \
+              && grep -Eiq "^content-security-policy:.*frame-ancestors 'none'" "$headers" \
+              && grep -Eiq '^permissions-policy:.*camera=\(\)' "$headers"; then
+              printf 'OK\t%s\tattempt=%s\n' "$route" "$attempt" | tee -a "$receipt"
+              rm -f -- "$headers" "$body"
+              return 0
+            fi
+
+            printf 'WAIT\t%s\tattempt=%s\thttp=%s\n' "$route" "$attempt" "$code" >&2
+            grep -Ei '^(HTTP/|x-content-type-options:|x-frame-options:|referrer-policy:|strict-transport-security:|content-security-policy:|permissions-policy:)' "$headers" >&2 || true
+            rm -f -- "$headers" "$body"
+            return 1
+          }
+
           for route in \
             / \
             /proof_to_pilot.html \
@@ -157,20 +186,15 @@ jobs:
             /health \
             /api/public/status
           do
-            headers=$(mktemp)
-            body=$(mktemp)
-            code=$(curl --silent --show-error --max-time 20 \
-              --dump-header "$headers" --output "$body" \
-              --write-out '%{http_code}' \
-              "https://lumen-core.ai${route}?security=$RELEASE_COMMIT")
-            [[ "$code" == 200 ]]
-            grep -Eiq '^x-content-type-options:[[:space:]]*nosniff\r?$' "$headers"
-            grep -Eiq '^x-frame-options:[[:space:]]*DENY\r?$' "$headers"
-            grep -Eiq '^strict-transport-security:[[:space:]]*max-age=31536000\r?$' "$headers"
-            grep -Eiq "^content-security-policy:.*frame-ancestors 'none'" "$headers"
-            grep -Eiq '^permissions-policy:.*camera=\(\)' "$headers"
-            printf '%s\t%s\n' "$code" "$route" >> "$receipt"
-            rm -f -- "$headers" "$body"
+            verified=false
+            for attempt in $(seq 1 10); do
+              if verify_route "$route" "$attempt"; then
+                verified=true
+                break
+              fi
+              [[ "$attempt" -eq 10 ]] || sleep 2
+            done
+            [[ "$verified" == true ]]
           done
 
       - name: Remove remote repair staging

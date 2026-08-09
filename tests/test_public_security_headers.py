@@ -12,6 +12,7 @@ MODULE_PATH = ROOT / "code" / "ops" / "repair_public_security_headers.py"
 NGINX_CONFIG = ROOT / "code" / "deploy" / "nginx" / "lumatrader.conf"
 EVIDENCE_REPAIR_PATH = ROOT / "code" / "ops" / "repair_evidence_route.py"
 VPS_WRAPPER = ROOT / "code" / "ops" / "REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh"
+DEPLOY_WORKFLOW = ROOT / ".github" / "workflows" / "repair-public-security-headers.yml"
 
 
 def load_module(path: Path, name: str):
@@ -146,6 +147,14 @@ class PublicSecurityHeaderTests(unittest.TestCase):
         self.assertIn('"public ${route}"', text)
         self.assertIn("did not converge after", text)
         self.assertIn("X-Frame-Options=%q", text)
+
+    def test_runner_verification_waits_for_public_convergence(self) -> None:
+        text = DEPLOY_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("verify_route()", text)
+        self.assertIn("for attempt in $(seq 1 10)", text)
+        self.assertIn("--noproxy '*'", text)
+        self.assertIn("WAIT\\t%s\\tattempt=%s\\thttp=%s", text)
+        self.assertIn("[[ \"$verified\" == true ]]", text)
 
 
 if __name__ == "__main__":
