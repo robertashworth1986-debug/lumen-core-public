@@ -94,14 +94,14 @@ def test_current_commit_builds_and_verifies_exact_release_inventory(tmp_path):
 
     assert verification["valid"] is True
     assert verification["source_commit"] == commit
-    assert verification["release_file_count"] == 30
-    assert verification["inventoried_release_file_count"] == 30
+    assert verification["release_file_count"] == 43
+    assert verification["inventoried_release_file_count"] == 43
     assert verification["inventory_coverage_ratio"] == 1.0
     assert verification["production_decision"].startswith("HOLD_")
     assert payload["bomFormat"] == "CycloneDX"
     assert payload["specVersion"] == "1.6"
-    assert len(payload["components"]) == 30
-    assert len(payload["dependencies"]) == 31
+    assert len(payload["components"]) == 43
+    assert len(payload["dependencies"]) == 44
     assert local["signed_attestation_state"] == "NOT_CREATED_BY_THIS_LOCAL_BUILDER"
     assert local["coverage"]["exact_release_file_coverage_ratio"] == 1.0
 

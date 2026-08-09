@@ -113,7 +113,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 30
+    assert len(names) == len(set(names)) == 43
     assert names[:5] == [
         "operator_home.html",
         "opportunity_sprint.html",
@@ -123,6 +123,19 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     ]
     assert "evidence/index_bounded.html" in names
     assert "mission_control.html" in names
+    assert "quant_lab.html" in names
+    assert "grants.html" in names
+    assert "kraken_execution_dashboard.html" in names
+    assert "forecast.html" in names
+    assert "anomalies.html" in names
+    assert "explain.html" in names
+    assert "lab.html" in names
+    assert "assets/lumencore.js" in names
+    assert "assets/vendor/three.min.js" in names
+    assert "js/alpha_globe_3d.js" in names
+    assert "js/cinematic_telemetry_layer.js" in names
+    assert "js/luma_design_system.js" in names
+    assert "js/luma_path_resolver.js" in names
     assert "robots.txt" in names
     assert "sitemap.xml" in names
     assert "site.webmanifest" in names
@@ -135,7 +148,6 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert "assets/prooflock/bounded_validation_protocol_v2.json" in names
     assert "build_week/prooflock_console/index.html" in names
     assert "build_week/prooflock_console/three.module.min.js" in names
-    assert "grants.html" not in names
     assert not any(name.startswith("data/") for name in names)
 
     apply_script = APPLY_SCRIPT.read_text(encoding="utf-8")
