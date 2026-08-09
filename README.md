@@ -71,7 +71,7 @@ authorization boundaries. It is a documented first-party control with CI
 exercises—not proof of a completed live restoration or an enterprise SLA.
 
 The public-release supply-chain lane creates deterministic CycloneDX 1.6
-coverage for all 43 allowlisted public-release files, including proof-first pages, ProofLock assets, and noindex legacy-route HOLD stubs. Pull requests produce unsigned
+coverage for all 43 allowlisted public files, including proof-first pages, ProofLock assets, and noindex legacy-route HOLD stubs. Pull requests produce unsigned
 verification artifacts; successful `main` builds separately create and verify
 GitHub OIDC/Sigstore provenance and SBOM attestations for the exact archive.
 The first retained successful set is bound to commit
