@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = ROOT / "code" / "ops" / "repair_public_security_headers.py"
 NGINX_CONFIG = ROOT / "code" / "deploy" / "nginx" / "lumatrader.conf"
 EVIDENCE_REPAIR_PATH = ROOT / "code" / "ops" / "repair_evidence_route.py"
+VPS_WRAPPER = ROOT / "code" / "ops" / "REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh"
 
 
 def load_module(path: Path, name: str):
@@ -136,6 +137,15 @@ class PublicSecurityHeaderTests(unittest.TestCase):
             backups = list(Path(tmp).glob("lumatrader.conf.pre-security-header-repair.*"))
             self.assertEqual(1, len(backups))
             self.assertEqual(PARTIAL, backups[0].read_text(encoding="utf-8"))
+
+    def test_vps_wrapper_waits_for_reload_convergence(self) -> None:
+        text = VPS_WRAPPER.read_text(encoding="utf-8")
+        self.assertIn("verify_with_retry()", text)
+        self.assertIn("--noproxy '*'", text)
+        self.assertIn('"local ${route}"', text)
+        self.assertIn('"public ${route}"', text)
+        self.assertIn("did not converge after", text)
+        self.assertIn("X-Frame-Options=%q", text)
 
 
 if __name__ == "__main__":
