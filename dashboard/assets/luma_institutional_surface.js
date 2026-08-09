@@ -58,6 +58,12 @@
       runtime: "Read-only public posture",
       authority: "Live orders not authorized here",
     },
+    review: {
+      label: "Reviewer path",
+      evidence: "First-party · source-bounded",
+      runtime: "Static public review",
+      authority: "Promotion and submission human-only",
+    },
   };
 
   function insertProofline() {
@@ -70,6 +76,7 @@
     if (surface === "mission") anchor = document.querySelector(".stage .top-bar");
     if (surface === "grants") anchor = document.querySelector(".lc-stage .lc-topbar");
     if (surface === "trade") anchor = document.querySelector(".luma-statusbar");
+    if (surface === "review") anchor = document.querySelector(".lis-review-header");
 
     if (anchor && anchor.parentNode) {
       anchor.parentNode.insertBefore(rail, anchor.nextSibling);

@@ -10,6 +10,9 @@
   <link rel="canonical" href="https://lumen-core.ai/proof_to_pilot.html">
   <link rel="icon" href="/assets/lumaarc_arc_seal_v1.png" type="image/png">
   <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root{--ink:#10233d;--muted:#52657d;--line:#d7e0eb;--blue:#145da0;--pale:#f2f6fb;--green:#0b6b50;--max:1120px}
     *{box-sizing:border-box} body{margin:0;font:16px/1.6 Inter,Segoe UI,Arial,sans-serif;color:var(--ink);background:#fff}
@@ -28,9 +31,13 @@
     footer{padding:30px 0;border-top:1px solid var(--line);color:var(--muted)}
     @media(max-width:850px){.grid,.sequence,.prooflock{grid-template-columns:1fr}.nav{align-items:flex-start;padding:16px 0}.navlinks{justify-content:flex-end}table{display:block;overflow-x:auto}}
   </style>
+  <link rel="stylesheet" href="/assets/luma_institutional_surface.css">
 </head>
-<body>
-  <header><div class="wrap nav"><div class="brand">LUMENCORE</div><nav class="navlinks"><a href="/">Review home</a><a href="/evidence/">Evidence</a><a href="/external_review.html">External review</a><a href="/build_week/prooflock_console/">ProofLock</a></nav></div></header>
+<body data-luma-surface="review">
+  <header class="lis-review-header"><div class="wrap lis-review-nav">
+    <a class="lis-review-brand" href="/" aria-label="LumenCore review home"><img src="/assets/lumaarc_arc_seal_v1.png" alt="LumaArc seal"><span><b>LUMEN<em>CORE</em></b><small>Proof-to-pilot assurance</small></span></a>
+    <nav class="lis-review-links" aria-label="Public review"><a href="/">Review home</a><a href="/proof_to_pilot.html" aria-current="page">Paid validation</a><a href="/evidence/">Evidence</a><a href="/external_review.html">External review</a><a href="/build_week/prooflock_console/">ProofLock</a></nav>
+  </div></header>
   <main>
     <section class="hero"><div class="wrap">
       <div class="eyebrow">30-day bounded validation sprint</div>
@@ -82,5 +89,6 @@
     </div></section>
   </main>
   <footer><div class="wrap">LumenCore™ · Evidence before claims · Discover → measure → validate → freeze → decide.</div></footer>
+  <script src="/assets/luma_institutional_surface.js"></script>
 </body>
 </html>

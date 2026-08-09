@@ -10,6 +10,9 @@
   <link rel="canonical" href="https://lumen-core.ai/evidence/" />
   <link rel="icon" href="/assets/lumaarc_arc_seal_v1.png" type="image/png" />
   <link rel="manifest" href="/manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     :root {
       color-scheme: dark;
@@ -60,9 +63,16 @@
     footer { border-top: 1px solid var(--line); padding: 26px 0 40px; color: var(--muted); }
     code { color: #ddd7ff; }
   </style>
+  <link rel="stylesheet" href="/assets/luma_institutional_surface.css" />
 </head>
-<body>
-  <header>
+<body data-luma-surface="review">
+  <header class="lis-review-header"><div class="wrap lis-review-nav">
+    <a class="lis-review-brand" href="/" aria-label="LumenCore review home"><img src="/assets/lumaarc_arc_seal_v1.png" alt="LumaArc seal"><span><b>LUMEN<em>CORE</em></b><small>Public evidence surface</small></span></a>
+    <nav class="lis-review-links" aria-label="Public review"><a href="/">Review home</a><a href="/proof_to_pilot.html">Paid validation</a><a href="/evidence/" aria-current="page">Evidence</a><a href="/external_review.html">External review</a><a href="/build_week/prooflock_console/">ProofLock</a></nav>
+  </div></header>
+
+  <main>
+  <section class="hero">
     <div class="wrap">
       <div class="eyebrow">LumenCore public evidence surface</div>
       <h1>One proof path. One bounded decision.</h1>
@@ -72,9 +82,9 @@
         hashes, result, negative findings, claim boundary, and next pilot decision.
       </p>
     </div>
-  </header>
+  </section>
 
-  <main class="wrap">
+  <div class="wrap">
     <section class="notice">
       <strong>Evidence boundary:</strong> internal simulation, replay, benchmark, and hash records are not external validation.
       No membership, endorsement, field savings, deployment, certification, patent outcome, or universal model superiority is implied.
@@ -123,10 +133,12 @@
     <p class="small">
       This page is intentionally static so the public review path remains available even when an application gateway is unavailable.
     </p>
+  </div>
   </main>
 
   <footer>
     <div class="wrap">LumenCore™ · bounded light speed · evidence before claims.</div>
   </footer>
+  <script src="/assets/luma_institutional_surface.js"></script>
 </body>
 </html>
