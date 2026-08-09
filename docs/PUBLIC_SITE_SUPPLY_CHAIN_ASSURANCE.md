@@ -2,8 +2,7 @@
 
 ## Decision
 
-LumenCore now has a deterministic CycloneDX 1.6 inventory for the exact
-30-file public release and a separate GitHub-hosted `main` workflow that signs
+LumenCore now has a deterministic CycloneDX 1.6 inventory for the exact 43-file public release and a separate GitHub-hosted `main` workflow that signs
 the release archive's build provenance and SBOM association with GitHub's
 OIDC/Sigstore artifact-attestation service.
 
@@ -26,10 +25,12 @@ file, preserving:
 - byte count; and
 - install mode.
 
+The allowlist also carries `legacy-route HOLD stubs` for retired public dashboard URLs.
+Those files are intentionally shipped as noindex redirect guards so stale VPS files or old links cannot be mistaken for the current public validation surface.
+
 The root application component binds the archive SHA-256, source commit,
 repository URL, bounded target directory, inventory scope, and explicit
-absence of a SLSA-level or live-deployment claim. The verifier requires 30 of
-30 components and rejects missing, reordered, duplicated, unknown, or altered
+absence of a SLSA-level or live-deployment claim. The verifier requires 43 of 43 components and rejects missing, reordered, duplicated, unknown, or altered
 release identities.
 
 ## Two evidence layers

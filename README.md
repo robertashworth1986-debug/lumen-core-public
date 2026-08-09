@@ -71,7 +71,7 @@ authorization boundaries. It is a documented first-party control with CI
 exercises—not proof of a completed live restoration or an enterprise SLA.
 
 The public-release supply-chain lane creates deterministic CycloneDX 1.6
-coverage for all 30 allowlisted site files. Pull requests produce unsigned
+coverage for all 43 allowlisted public files, including proof-first pages, ProofLock assets, and noindex legacy-route HOLD stubs. Pull requests produce unsigned
 verification artifacts; successful `main` builds separately create and verify
 GitHub OIDC/Sigstore provenance and SBOM attestations for the exact archive.
 The first retained successful set is bound to commit
@@ -157,7 +157,7 @@ LumenCore emphasizes fail-closed decisions: missing rights, ambiguous provenance
 | ProofLock Console | Deployed bounded demonstration; verifies receipt integrity and refuses unauthorized promotion. |
 | EIA benchmark package | First-party reproducible for the named pinned package; prepared for non-author execution. |
 | External replication docket | Draft protocol for preregistration, evaluator independence, frozen inputs, deviations, and negative results. |
-| Exact public-release supply chain | Deterministic 30-file CycloneDX 1.6 inventory plus a main-only GitHub OIDC/Sigstore provenance and SBOM-attestation lane; no whole-product SBOM, SLSA level, or deployment-parity claim. |
+| Exact public-release supply chain | Deterministic 43-file CycloneDX 1.6 inventory plus a main-only GitHub OIDC/Sigstore provenance and SBOM-attestation lane; legacy operator URLs are packaged only as noindex HOLD stubs; no whole-product SBOM, SLSA level, or deployment-parity claim. |
 | Buyer-Owned Baseline Validation Sprint | Sole primary paid offer; proposed tiers are $7,500, $15,000, and from $25,000. Pricing is not buyer-tested, and no signed scope, cleared payment, or delivery is claimed. ProofLock supplies the evidence and custody layer. |
 
 ## Evidence-state definitions

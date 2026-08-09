@@ -7,10 +7,6 @@ DASHBOARD = ROOT / "dashboard"
 
 PAGES = {
     "home": "operator_home.html",
-    "mission": "mission_control.html",
-    "quant": "quant_lab.html",
-    "grants": "grants.html",
-    "trade": "kraken_execution_dashboard.html",
 }
 
 PUBLIC_REVIEW_PAGES = (
@@ -19,12 +15,33 @@ PUBLIC_REVIEW_PAGES = (
     DASHBOARD / "evidence" / "index_bounded.html",
 )
 
+LEGACY_ROUTE_HOLDS = (
+    DASHBOARD / "mission_control.html",
+    DASHBOARD / "quant_lab.html",
+    DASHBOARD / "kraken_execution_dashboard.html",
+    DASHBOARD / "grants.html",
+    DASHBOARD / "forecast.html",
+    DASHBOARD / "anomalies.html",
+    DASHBOARD / "explain.html",
+    DASHBOARD / "lab.html",
+)
+
+LEGACY_FORBIDDEN_TERMS = (
+    "/api/snapshot",
+    "/api/events/recent",
+    "mission control · v3.0",
+    "unified cockpit · all systems",
+    "kraken execution dashboard",
+    "loading live execution guardrails",
+    "active grant submissions",
+)
+
 
 def page(name: str) -> str:
     return (DASHBOARD / PAGES[name]).read_text(encoding="utf-8")
 
 
-def test_five_canonical_surfaces_share_identity_and_runtime_layer():
+def test_public_home_shares_identity_and_runtime_layer():
     for surface in PAGES:
         body = page(surface)
         assert f'data-luma-surface="{surface}"' in body
@@ -52,10 +69,6 @@ def test_founder_confirmed_lumaarc_is_the_shared_dashboard_mark():
     assert "lumencore-mark.svg" not in shared_fabric
 
     assert "LUMEN<span>CORE</span>" in page("home")
-    assert "<h1>LUMENCORE</h1>" in page("mission")
-    assert "LUMENCORE / QUANT LAB" in page("quant")
-    assert "Lumen<span>Core</span>" in page("trade")
-    assert "LUMENCORE / GRANTS" in page("grants")
 
 
 def test_public_review_pages_share_the_canonical_lumaarc_shell():
@@ -82,21 +95,16 @@ def test_public_review_pages_share_the_canonical_lumaarc_shell():
     assert 'surface === "review"' in shared_js
 
 
-def test_operator_surfaces_are_not_search_index_targets():
-    for surface in ("mission", "quant", "grants", "trade"):
-        assert '<meta name="robots" content="noindex,nofollow,noarchive">' in page(surface)
-
-
-def test_mission_live_breadth_is_an_evidence_lane_not_a_value_claim():
-    mission = page("mission")
-    assert "Live Evidence Breadth" in mission
-    assert "Dollar Claim Gate" in mission
-    assert "$0 CLAIMABLE" in mission
-    assert "NOT PROMOTED" in mission
-    assert "live breadth is an evidence collection rail, not proof of alpha or field savings" in mission
-    assert "Annual Preserved Value" not in mission
-    assert "Hourly Preserved Value" not in mission
-    assert 'data-luma-legacy="true"' in mission
+def test_legacy_public_routes_are_noindex_holds():
+    for path in LEGACY_ROUTE_HOLDS:
+        body = path.read_text(encoding="utf-8")
+        lower = body.lower()
+        assert '<meta name="robots" content="noindex,nofollow,noarchive">' in body
+        assert '<meta name="lumencore-surface" content="legacy-public-route-hold-v1">' in body
+        assert '<meta http-equiv="refresh" content="0;url=/proof_to_pilot.html">' in body
+        assert "location.replace('/proof_to_pilot.html')" in body
+        for term in LEGACY_FORBIDDEN_TERMS:
+            assert term.lower() not in lower
 
 
 def test_public_home_sells_one_bounded_assurance_sequence():
@@ -129,7 +137,7 @@ def test_public_browser_path_uses_only_minimal_public_runtime_contracts():
     fabric = (DASHBOARD / "assets" / "luma_command_fabric.js").read_text(
         encoding="utf-8"
     )
-    assert "var isOperatorSurface" in fabric
+    assert "var isOperatorSurface = false" in fabric
     public_update = fabric.split("function updatePublicStatus()", 1)[1].split(
         "function updateOperatorStatus()", 1
     )[0]
@@ -193,39 +201,14 @@ def test_opportunity_sprint_data_handling_schedule_is_fail_closed():
     assert "Do **not** email credentials" in intake
 
 
-def test_quant_visible_navigation_contains_only_canonical_routes():
-    quant = page("quant")
-    required = (
-        "/mission_control.html",
-        "/kraken_execution_dashboard.html",
-        "/forecast.html",
-        "/anomalies.html",
-        "/explain.html",
-        "/lab.html",
-        "/grants.html",
-        "/proof_to_pilot.html",
-        "/evidence/",
-    )
-    for route in required:
-        assert f'data-src="{route}"' in quant
-
-    stale_visible_routes = (
-        "/investor_command_room.html",
-        "/lumaq_brain_command_center.html",
-        "/live_positions.html",
-        "/alpaca_paper_live_dashboard.html",
-        "/dashboard_analytics.html",
-        "/lumascout.html",
-        "/investor_wallboard.html",
-        "/master_evidence.html",
-    )
-    for route in stale_visible_routes:
-        assert f'data-src="{route}"' not in quant
-
+def test_quant_legacy_route_redirects_to_public_review_path():
+    quant = (DASHBOARD / "quant_lab.html").read_text(encoding="utf-8")
+    assert "/proof_to_pilot.html" in quant
+    assert 'data-src="/mission_control.html"' not in quant
+    assert 'data-src="/kraken_execution_dashboard.html"' not in quant
     assert "$3.53M" not in quant
     assert "click-Approve" not in quant
-    assert "let localContextPromise = null" in quant
-    assert "if (!force && localContextPromise) return localContextPromise" in quant
+    assert "let localContextPromise = null" not in quant
 
 
 def test_grants_public_review_is_fail_closed_in_the_browser_layer():
@@ -238,14 +221,13 @@ def test_grants_public_review_is_fail_closed_in_the_browser_layer():
     assert "Final submission human-only" in script
 
 
-def test_trade_missing_data_defaults_to_offline_and_disarmed():
-    trade = page("trade")
-    assert "heartbeat?.live_orders_armed === true" in trade
-    assert "String(heartbeat?.runtime_mode || 'OFFLINE')" in trade
-    assert "String(heartbeat?.status || 'offline')" in trade
-    assert "!heartbeat" in trade
-    assert "OFFLINE / DISARMED" in trade
+def test_trade_legacy_route_does_not_expose_live_execution_guardrails():
+    trade = (DASHBOARD / "kraken_execution_dashboard.html").read_text(encoding="utf-8")
+    assert "/proof_to_pilot.html" in trade
+    assert "heartbeat?.live_orders_armed === true" not in trade
     assert "live_orders_armed ?? true" not in trade
+    assert "OFFLINE / DISARMED" not in trade
+    assert "/api/events/recent" not in trade
 
 
 def test_shared_visual_system_has_accessibility_and_motion_boundaries():
@@ -268,8 +250,11 @@ def test_customer_path_and_operator_path_are_deliberately_separate():
     fabric = (DASHBOARD / "assets" / "luma_command_fabric.js").read_text(
         encoding="utf-8"
     )
-    assert "var OPERATOR_ROUTES" in fabric
+    assert "var OPERATOR_ROUTES" not in fabric
     assert "var PUBLIC_ROUTES" in fabric
     assert 'label: "ProofLock"' in fabric
-    assert 'label: "Quant"' in fabric
-    assert 'label: "Grants"' in fabric
+    assert 'label: "Proof"' in fabric
+    assert 'label: "Evidence"' in fabric
+    assert 'label: "External Review"' in fabric
+    assert 'label: "Quant"' not in fabric
+    assert 'label: "Grants"' not in fabric

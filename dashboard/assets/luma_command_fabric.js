@@ -10,16 +10,6 @@
     return;
   }
 
-  var OPERATOR_ROUTES = [
-    { label: "Home", href: "/", hint: "Problem, method, evidence boundary, and review path" },
-    { label: "Mission", href: "/mission_control.html", hint: "System health and evidence control" },
-    { label: "Quant", href: "/quant_lab.html", hint: "Unified research and operator cockpit" },
-    { label: "Trade", href: "/kraken_execution_dashboard.html", hint: "Read-only paper, shadow, and receipt evidence" },
-    { label: "Grants", href: "/grants.html", hint: "Opportunity evidence, drafts, receipts, and authority" },
-    { label: "Proof", href: "/proof_to_pilot.html", hint: "One problem, one baseline, one bounded decision" },
-    { label: "Evidence", href: "/evidence/", hint: "Public-safe evidence and claim boundaries" },
-  ];
-
   var PUBLIC_ROUTES = [
     { label: "Home", href: "/", hint: "ProofLock Assurance" },
     { label: "Opportunity Sprint", href: "/opportunity_sprint.html", hint: "One fixed-scope funding decision workflow" },
@@ -31,9 +21,8 @@
 
   var isFile = location.protocol === "file:";
   var currentFile = (location.pathname.replace(/\\/g, "/").split("/").pop() || "").toLowerCase();
-  var operatorFiles = ["mission_control.html", "quant_lab.html", "kraken_execution_dashboard.html", "grants.html"];
-  var isOperatorSurface = operatorFiles.indexOf(currentFile) >= 0;
-  var ROUTES = isOperatorSurface ? OPERATOR_ROUTES : PUBLIC_ROUTES;
+  var isOperatorSurface = false;
+  var ROUTES = PUBLIC_ROUTES;
   var scriptUrl = document.currentScript && document.currentScript.src;
   var markHref = scriptUrl
     ? new URL("./lumaarc_arc_seal_v1.png", scriptUrl).href
@@ -118,9 +107,7 @@
     document.querySelectorAll(".lc-live, [data-runtime-mode]").forEach(function (badge) {
       badge.textContent = state.mode;
       badge.dataset.mode = state.mode.toLowerCase();
-      badge.title = isOperatorSurface
-        ? "Execution mode from the protected operator runtime"
-        : "Public reviewer boundary; no live-execution authority is exposed";
+      badge.title = "Public reviewer boundary; no live-execution authority is exposed";
     });
   }
 
@@ -209,7 +196,7 @@
   }
 
   function updateStatus() {
-    return isOperatorSurface ? updateOperatorStatus() : updatePublicStatus();
+    return updatePublicStatus();
   }
 
   function buildRail() {
