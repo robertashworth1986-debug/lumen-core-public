@@ -41,6 +41,12 @@ STATIC = """server {
         index index_bounded.html;
         try_files $uri $uri/ =404;
         add_header Cache-Control "no-cache" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests" always;
+        add_header Strict-Transport-Security "max-age=31536000" always;
+        add_header Permissions-Policy "accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()" always;
     }
 
     location / {
@@ -58,6 +64,18 @@ class RepairEvidenceRouteTests(unittest.TestCase):
         self.assertIn(f"root {ROOT};", result.repaired)
         self.assertIn("index index_bounded.html;", result.repaired)
         self.assertNotIn("proxy_pass http://luma_gateway", result.repaired)
+        for header in MODULE.PUBLIC_SECURITY_HEADERS:
+            self.assertIn(header, result.repaired)
+        MODULE.validate_repaired_config(result.repaired, ROOT)
+
+    def test_repairs_static_contract_that_drops_inherited_security_headers(self) -> None:
+        unbounded = STATIC
+        for header in MODULE.PUBLIC_SECURITY_HEADERS:
+            unbounded = unbounded.replace(f"        {header}\n", "")
+        result = MODULE.repair_config(unbounded, ROOT)
+        self.assertTrue(result.changed)
+        for header in MODULE.PUBLIC_SECURITY_HEADERS:
+            self.assertEqual(1, result.repaired.count(header))
         MODULE.validate_repaired_config(result.repaired, ROOT)
 
     def test_static_contract_is_idempotent(self) -> None:

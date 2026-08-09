@@ -1,0 +1,200 @@
+name: Repair public security headers on VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_commit:
+        description: Full current-main commit SHA selected for the repair
+        required: true
+        type: string
+      approval:
+        description: Explicit production security-header gate
+        required: true
+        type: choice
+        default: HOLD
+        options:
+          - HOLD
+          - APPLY_PUBLIC_SECURITY_HEADERS
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lumencore-production-nginx
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      source_commit: ${{ steps.gate.outputs.source_commit }}
+    steps:
+      - name: Fail closed unless this exact workflow commit is approved
+        id: gate
+        shell: bash
+        env:
+          APPROVAL: ${{ inputs.approval }}
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_COMMIT: ${{ inputs.release_commit }}
+          WORKFLOW_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EVENT_NAME" == "workflow_dispatch" ]]
+          [[ "$APPROVAL" == "APPLY_PUBLIC_SECURITY_HEADERS" ]]
+          [[ "$RELEASE_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]
+          printf 'source_commit=%s\n' "$RELEASE_COMMIT" >> "$GITHUB_OUTPUT"
+
+  repair:
+    needs: authorize
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://lumen-core.ai/
+    env:
+      RELEASE_COMMIT: ${{ needs.authorize.outputs.source_commit }}
+      REMOTE_STAGE: /tmp/lumencore-security-headers-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Checkout the approved commit
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ needs.authorize.outputs.source_commit }}
+
+      - name: Require the approved commit to be current main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          [[ "$(git rev-parse HEAD)" == "$RELEASE_COMMIT" ]]
+          [[ "$(git rev-parse origin/main)" == "$RELEASE_COMMIT" ]]
+
+      - name: Validate exact repair payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            code/ops/repair_public_security_headers.py \
+            tests/test_public_security_headers.py
+          bash -n code/ops/REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh
+          python3 -m unittest discover \
+            -s tests \
+            -p 'test_public_security_headers.py' \
+            -v
+          (
+            cd code/ops
+            sha256sum \
+              repair_public_security_headers.py \
+              REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh
+          ) > /tmp/public-security-header-payload.sha256
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
+        with:
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+
+      - name: Verify bounded remote prerequisites
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "opc@$VPS_HOST" '
+            set -eu
+            sudo -n true
+            for command_name in python3 nginx systemctl curl awk mktemp readlink sort sha256sum install realpath; do
+              command -v "$command_name" >/dev/null
+            done
+          '
+
+      - name: Upload exact repair payload
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-security-headers-[0-9]+-[0-9]+$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "opc@$VPS_HOST" \
+            "test ! -e '$REMOTE_STAGE' && install -d -m 0700 '$REMOTE_STAGE'"
+          scp -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            code/ops/repair_public_security_headers.py \
+            code/ops/REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh \
+            /tmp/public-security-header-payload.sha256 \
+            "opc@$VPS_HOST:$REMOTE_STAGE/"
+
+      - name: Verify uploaded bytes and apply with rollback
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "opc@$VPS_HOST" \
+            "set -eu
+             cd '$REMOTE_STAGE'
+             sha256sum --check public-security-header-payload.sha256
+             sudo -n env LUMENCORE_DOMAIN=lumen-core.ai \
+               bash '$REMOTE_STAGE/REPAIR_PUBLIC_SECURITY_HEADERS_ON_VPS.sh' --apply" \
+            | tee /tmp/public-security-header-repair-receipt.txt
+
+      - name: Verify canonical public routes from the runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          receipt=/tmp/public-security-header-live-receipt.txt
+          : > "$receipt"
+          for route in \
+            / \
+            /proof_to_pilot.html \
+            /external_review.html \
+            /evidence/ \
+            /build_week/prooflock_console/ \
+            /health \
+            /api/public/status
+          do
+            headers=$(mktemp)
+            body=$(mktemp)
+            code=$(curl --silent --show-error --max-time 20 \
+              --dump-header "$headers" --output "$body" \
+              --write-out '%{http_code}' \
+              "https://lumen-core.ai${route}?security=$RELEASE_COMMIT")
+            [[ "$code" == 200 ]]
+            grep -Eiq '^x-content-type-options:[[:space:]]*nosniff\r?$' "$headers"
+            grep -Eiq '^x-frame-options:[[:space:]]*DENY\r?$' "$headers"
+            grep -Eiq '^strict-transport-security:[[:space:]]*max-age=31536000\r?$' "$headers"
+            grep -Eiq "^content-security-policy:.*frame-ancestors 'none'" "$headers"
+            grep -Eiq '^permissions-policy:.*camera=\(\)' "$headers"
+            printf '%s\t%s\n' "$code" "$route" >> "$receipt"
+            rm -f -- "$headers" "$body"
+          done
+
+      - name: Remove remote repair staging
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-security-headers-[0-9]+-[0-9]+$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "opc@$VPS_HOST" \
+            "resolved=\$(realpath -m -- '$REMOTE_STAGE'); \
+             [[ \"\$resolved\" =~ ^/tmp/lumencore-security-headers-[0-9]+-[0-9]+$ ]]; \
+             rm -rf -- \"\$resolved\""
+
+      - name: Upload bounded repair receipts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: public-security-headers-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            /tmp/public-security-header-payload.sha256
+            /tmp/public-security-header-repair-receipt.txt
+            /tmp/public-security-header-live-receipt.txt
+          if-no-files-found: warn
+          retention-days: 30
