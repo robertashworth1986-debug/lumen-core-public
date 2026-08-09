@@ -32,7 +32,7 @@ def test_legacy_dashboard_routes_are_hold_stubs() -> None:
         text = (ROOT / relpath).read_text(encoding="utf-8")
         lowered = text.lower()
         assert "legacy-public-route-hold-v1" in lowered
-        assert "noindex,nofollow" in lowered
+        assert "noindex,nofollow,noarchive" in lowered
         assert "url=/proof_to_pilot.html" in lowered
         assert "location.replace('/proof_to_pilot.html')" in text
         assert "field validation" in lowered
