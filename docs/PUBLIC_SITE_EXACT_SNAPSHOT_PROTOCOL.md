@@ -35,12 +35,15 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
 ## Public release surfaces
 
 The allowlist covers the proof-first homepage, bounded engagement page,
-external-review page and machine-readable reviewer docket, public status page, bounded evidence page, shared
-styles/command fabric, crawl metadata and public mark, and the ProofLock browser
-verifier with its protocol fixtures.
+external-review page and machine-readable reviewer docket, public status page,
+bounded evidence page, shared styles/command fabric, crawl metadata and public
+mark, the ProofLock browser verifier with its protocol fixtures, and noindex
+HOLD stubs for previous operator and research dashboard URLs.
 
 It deliberately excludes credentials, runtime logs, live order controls,
-private evidence, grant packets, identity documents, and mutable data feeds.
+private evidence, grant packets, identity documents, and mutable data feeds. The
+legacy route stubs do not expose runtime telemetry or operational controls; they
+only redirect stale public links back to the bounded validation path.
 
 ## Human release command
 
