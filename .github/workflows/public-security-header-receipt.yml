@@ -1,0 +1,81 @@
+name: Public security-header receipt
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/public-security-header-receipt.yml'
+      - '.github/requirements/public-security-header-receipt.txt'
+      - 'code/ops/VERIFY_PUBLIC_SECURITY_HEADER_RECEIPT.py'
+      - 'docs/PUBLIC_SECURITY_HEADER_DEPLOYMENT_RECEIPT_2026-08-09.md'
+      - 'evidence/public-security-headers/04f5397422cc8e651ddde5cc7e7c57a334866c01/deployment-receipt.json'
+      - 'tests/test_public_security_header_receipt.py'
+      - 'EVIDENCE_INDEX.md'
+      - 'docs/REVIEWER_START_HERE.md'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/public-security-header-receipt.yml'
+      - '.github/requirements/public-security-header-receipt.txt'
+      - 'code/ops/VERIFY_PUBLIC_SECURITY_HEADER_RECEIPT.py'
+      - 'docs/PUBLIC_SECURITY_HEADER_DEPLOYMENT_RECEIPT_2026-08-09.md'
+      - 'evidence/public-security-headers/04f5397422cc8e651ddde5cc7e7c57a334866c01/deployment-receipt.json'
+      - 'tests/test_public_security_header_receipt.py'
+      - 'EVIDENCE_INDEX.md'
+      - 'docs/REVIEWER_START_HERE.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-security-header-receipt-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout complete Git evidence without retained credentials
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+
+      - name: Install pinned test runner
+        run: >-
+          python -m pip install --disable-pip-version-check --only-binary=:all:
+          --require-hashes -r .github/requirements/public-security-header-receipt.txt
+
+      - name: Verify retained deployment receipt
+        run: |
+          python -m py_compile code/ops/VERIFY_PUBLIC_SECURITY_HEADER_RECEIPT.py
+          python -m py_compile tests/test_public_security_header_receipt.py
+          mkdir -p out/public-security-header-receipt
+          python code/ops/VERIFY_PUBLIC_SECURITY_HEADER_RECEIPT.py \
+            --json-out out/public-security-header-receipt/verification.json
+          python -m pytest tests/test_public_security_header_receipt.py -q
+
+      - name: Upload bounded verification receipt
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: public-security-header-receipt-${{ github.sha }}
+          path: out/public-security-header-receipt/verification.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Reject whitespace errors
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          if git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null && [ "${BASE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+            git diff --check "${BASE_SHA}...HEAD"
+          else
+            git diff --check HEAD^ HEAD
+          fi
