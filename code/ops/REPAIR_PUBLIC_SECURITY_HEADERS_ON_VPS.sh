@@ -105,7 +105,7 @@ verify_policy() {
   body="$(mktemp)"
   VERIFY_TEMPS+=("$headers" "$body")
   local curl_args=(
-    --silent --show-error --max-time 20
+    --silent --show-error --max-time 20 --noproxy '*'
     --dump-header "$headers" --output "$body"
     --write-out '%{http_code}'
   )
@@ -118,19 +118,51 @@ verify_policy() {
     return 1
   }
 
-  local csp permissions
-  [[ "$(header_value X-Content-Type-Options "$headers")" == "nosniff" ]] || return 1
-  [[ "$(header_value X-Frame-Options "$headers")" == "DENY" ]] || return 1
-  [[ "$(header_value Referrer-Policy "$headers")" == "strict-origin-when-cross-origin" ]] || return 1
-  [[ "$(header_value Strict-Transport-Security "$headers")" == "max-age=31536000" ]] || return 1
+  local xcto xfo referrer hsts csp permissions
+  xcto="$(header_value X-Content-Type-Options "$headers")"
+  xfo="$(header_value X-Frame-Options "$headers")"
+  referrer="$(header_value Referrer-Policy "$headers")"
+  hsts="$(header_value Strict-Transport-Security "$headers")"
   csp="$(header_value Content-Security-Policy "$headers")"
-  [[ "$csp" == *"default-src 'self'"* ]] || return 1
-  [[ "$csp" == *"frame-ancestors 'none'"* ]] || return 1
-  [[ "$csp" == *"object-src 'none'"* ]] || return 1
   permissions="$(header_value Permissions-Policy "$headers")"
-  [[ "$permissions" == *"camera=()"* ]] || return 1
-  [[ "$permissions" == *"payment=()"* ]] || return 1
+  if [[ "$xcto" != "nosniff" \
+     || "$xfo" != "DENY" \
+     || "$referrer" != "strict-origin-when-cross-origin" \
+     || "$hsts" != "max-age=31536000" \
+     || "$csp" != *"default-src 'self'"* \
+     || "$csp" != *"frame-ancestors 'none'"* \
+     || "$csp" != *"object-src 'none'"* \
+     || "$permissions" != *"camera=()"* \
+     || "$permissions" != *"payment=()"* ]]; then
+    echo "WAIT: ${label} has not converged on the bounded policy" >&2
+    printf '  X-Content-Type-Options=%q\n' "$xcto" >&2
+    printf '  X-Frame-Options=%q\n' "$xfo" >&2
+    printf '  Referrer-Policy=%q\n' "$referrer" >&2
+    printf '  Strict-Transport-Security=%q\n' "$hsts" >&2
+    printf '  Content-Security-Policy=%q\n' "$csp" >&2
+    printf '  Permissions-Policy=%q\n' "$permissions" >&2
+    return 1
+  fi
   echo "OK: ${label} HTTP 200 with bounded public security policy"
+}
+
+verify_with_retry() {
+  local label="$1"
+  local url="$2"
+  local resolve_arg="$3"
+  local attempts="$4"
+  local delay="$5"
+  local attempt
+  for attempt in $(seq 1 "$attempts"); do
+    if verify_policy "${label} attempt ${attempt}/${attempts}" "${url}-${attempt}" "$resolve_arg"; then
+      return 0
+    fi
+    if [[ "$attempt" -lt "$attempts" ]]; then
+      sleep "$delay"
+    fi
+  done
+  echo "ERROR: ${label} did not converge after ${attempts} attempts" >&2
+  return 1
 }
 
 CONFIG="$(detect_config)"
@@ -190,18 +222,20 @@ ROUTES=(
   "/api/public/status"
 )
 for route in "${ROUTES[@]}"; do
-  verify_policy "local ${route}" "https://${DOMAIN}${route}?security=${STAMP}" "${DOMAIN}:443:127.0.0.1"
+  verify_with_retry \
+    "local ${route}" \
+    "https://${DOMAIN}${route}?security=${STAMP}" \
+    "${DOMAIN}:443:127.0.0.1" \
+    10 \
+    1
 done
 for route in "${ROUTES[@]}"; do
-  verified=false
-  for attempt in $(seq 1 5); do
-    if verify_policy "public ${route}" "https://${DOMAIN}${route}?security=${STAMP}-${attempt}"; then
-      verified=true
-      break
-    fi
-    sleep 2
-  done
-  [[ "$verified" == true ]]
+  verify_with_retry \
+    "public ${route}" \
+    "https://${DOMAIN}${route}?security=${STAMP}" \
+    "" \
+    10 \
+    2
 done
 
 REPAIR_COMPLETE=true
