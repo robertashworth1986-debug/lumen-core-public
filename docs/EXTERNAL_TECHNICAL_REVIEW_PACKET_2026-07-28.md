@@ -33,11 +33,13 @@ The receipt statuses above are bounded first-party or operator-controlled eviden
 
 | Surface | HTTP | Demo | Limitation |
 |---|---:|---|---|
-| [Reviewer home](https://lumen-core.ai/) | `200` | `yes` | A successful HTTP response proves reachability at the observation time, not uptime, adoption, or product acceptance. |
+| [Reviewer home](https://lumen-core.ai/) | `200` | `no` | The bounded reviewer home was reachable with its declared content marker at the stated time. This does not establish sustained uptime, adoption, product acceptance, or external validation. |
+| [Proof-to-Pilot review path](https://lumen-core.ai/proof_to_pilot.html) | `200` | `no` | The bounded offer page was reachable with its declared content marker at the stated time. This does not establish buyer acceptance, a pilot, field performance, or external validation. |
+| [External replication docket](https://lumen-core.ai/external_review.html) | `200` | `no` | The external-review doorway was reachable with its declared content marker at the stated time. No evaluator is assigned and no independent execution or external validation is established. |
+| [Evidence boundary](https://lumen-core.ai/evidence/) | `200` | `no` | The bounded evidence index was reachable with its declared content marker at the stated time. Its first-party records are not independent reproduction or external validation. |
 | [ProofLock Console](https://lumen-core.ai/build_week/prooflock_console/) | `200` | `yes` | The public console is a demonstrator and does not prove external validation or production readiness. |
-| [Mission Control](https://lumen-core.ai/mission_control.html) | `200` | `no` | The page is a public status surface; its existence is not evidence that every underlying service is healthy. |
-| [Funding dashboard](https://lumen-core.ai/grants.html) | `200` | `no` | The dashboard reports workflow state and does not establish eligibility, submission, selection, or award. |
-| [Dynamic health endpoint](https://lumen-core.ai/health) | `502` | `no` | The dynamic gateway is currently degraded and must not be represented as healthy. |
+| [Dynamic health endpoint](https://lumen-core.ai/health) | `200` | `no` | HTTP 200 and the minimal public JSON contract were observed at the stated time. This is point-in-time gateway liveness only; it does not establish the recovery cause, sustained uptime, current-main deployment parity, end-to-end dependency health, production readiness, or external validation. |
+| [Public status endpoint](https://lumen-core.ai/api/public/status) | `200` | `no` | HTTP 200 and the minimized public JSON contract were observed at the stated time. This is point-in-time reachability only; it does not establish sustained uptime, current-main deployment parity, broader service health, production readiness, or external validation. |
 
 ## Agenda
 
@@ -99,10 +101,11 @@ Active targeting, private-system access, production load testing, and external a
 
 ## Known Gaps
 
-- The dynamic public health endpoint returned HTTP 502 at the recorded observation time.
+- Only point-in-time HTTP 200 and minimal-contract observations exist for /health and /api/public/status; the recovery cause, sustained uptime, end-to-end dependency health, and current-main deployment parity remain unestablished.
+- The live legacy dashboard routes did not contain the current-main PR #164 HOLD marker at the August 10 observation, so exact-snapshot static release parity remains unreconciled.
 - The reproducibility receipts are first-party or operator-controlled, not independent external validation.
 - The adversarial scenarios are bounded local replays, not active penetration testing or proof of production security.
-- The engine commercialization inventory is in a draft pull request and is not main-branch state.
+- PR #77 was closed without merge and superseded by merged PR #132; its branch-only contents are excluded from this packet.
 - No recurring subscription, buyer acceptance, field deployment, realized savings, or valuation is established.
 
 ## Claims Not To Make

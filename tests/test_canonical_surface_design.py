@@ -3,6 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DASHBOARD = ROOT / "dashboard"
+CANONICAL_STATE = ROOT / "docs" / "CANONICAL_OPERATING_STATE.md"
 
 
 PAGES = {
@@ -39,6 +40,26 @@ LEGACY_FORBIDDEN_TERMS = (
 
 def page(name: str) -> str:
     return (DASHBOARD / PAGES[name]).read_text(encoding="utf-8")
+
+
+def test_canonical_state_separates_liveness_from_deployment_and_validation():
+    state = CANONICAL_STATE.read_text(encoding="utf-8")
+    lower = state.lower()
+    normalized = " ".join(lower.split())
+
+    assert "point-in-time public liveness only" in normalized
+    assert "do not establish the recovery cause" in normalized
+    assert "deployed gateway commit" in normalized
+    assert "not exact-byte release parity" in normalized
+    assert "production promotion remains `hold`" in normalized
+    assert (
+        "neither gateway liveness nor exact-byte deployment constitutes external validation"
+        in normalized
+    )
+    assert (
+        "dynamic gateway remains degraded and must continue to be reported as http 502"
+        not in normalized
+    )
 
 
 def test_public_home_shares_identity_and_runtime_layer():

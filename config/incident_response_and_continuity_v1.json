@@ -90,7 +90,7 @@
     "obtain the literal exact-snapshot deployment approval before mutating public files",
     "obtain the separate gateway-repair approval before changing gateway dependencies or runtime secrets",
     "apply only the allowlisted release with rollback capture",
-    "rerun the 30-file exact-byte and MIME audit against the deployed commit",
+    "rerun the 43-file exact-byte and MIME audit against the deployed commit",
     "verify critical routes and retain deployment, rollback, and live-audit receipts",
     "close only after the current commit reports release_verified true and any separate incident lane is resolved"
   ],

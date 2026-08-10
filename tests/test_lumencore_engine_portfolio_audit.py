@@ -215,4 +215,12 @@ def test_explain_page_has_no_dead_local_html_links():
     assert links
     assert "./alpha_burst_lab_holo_3d.html" not in links
     assert "./scenario_mission.html" not in links
-    assert all((EXPLAIN_PATH.parent / link).is_file() for link in links)
+    for link in links:
+        if link.startswith("https://lumen-core.ai/"):
+            link = link.removeprefix("https://lumen-core.ai")
+        target = (
+            ROOT / "dashboard" / link.lstrip("/")
+            if link.startswith("/")
+            else EXPLAIN_PATH.parent / link
+        )
+        assert target.is_file(), link

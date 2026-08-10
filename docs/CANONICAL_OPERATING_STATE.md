@@ -1,6 +1,6 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-08-08 UTC
+**State date:** 2026-08-10 UTC
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
@@ -35,6 +35,30 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 ### Public runtime incident and recovery boundary
 
+**Latest verified point-in-time observation (August 10):** The committed
+`data/site_health.json` snapshot at `2026-08-10T12:33:26Z` recorded all eight
+monitored endpoint checks operational: six static HTTP checks and two dynamic
+JSON-contract checks. A separate read-only probe beginning at
+`2026-08-10T13:50:06Z`
+matched the declared content contracts for the five current bounded reviewer
+surfaces and the two minimal public gateway endpoints, `/health` and
+`/api/public/status`, with HTTP 200 responses. These observations establish
+point-in-time public liveness only. They do not establish the recovery cause,
+that the guarded dependency-closure repair ran, the deployed gateway commit or
+source closure, sustained availability, production approval, or external
+validation.
+
+**Unreconciled static release:** PR #164's repository commit
+`f7662d5be7f2b144e7d79fd9b4e2a61e09242ae5`, still present in the
+`c12f4bcaf61e76358b323af5ad0deda8a8839856` `main` tree at the observation
+time, contains noindex HOLD stubs for eight retired dashboard routes. The live
+responses observed on August 10 did not contain the required
+`legacy-public-route-hold-v1` marker, so the live static surface does not match
+the current-main canonical surface. The health snapshot's static `operational`
+label tests HTTP reachability, not exact-byte release parity. Production
+promotion remains `HOLD`; a separately approved exact-snapshot release and
+post-deploy verification are still required.
+
 On August 8, read-only current-state probes established that DNS, TLS, nginx,
 the static reviewer surface, VPS storage, and filesystem inodes were available,
 while the dynamic gateway returned HTTP 502 and had no listener on loopback port
@@ -62,8 +86,9 @@ The private value is transferred as an owner-only file and is never expanded
 into the remote command line; apply mode refuses any target, service, lock,
 runtime, or probe identity outside the exact production contract. Recursive
 temporary cleanup is path-bounded, and every workflow dependency is pinned to
-an immutable commit. The repair has not been dispatched in this recorded
-state. The separate public-static-site release gate remains unchanged and
+an immutable commit. The evidence recorded here does not establish that this
+guarded repair was dispatched or that it caused the later point-in-time
+recovery. The separate public-static-site release gate remains unchanged and
 cannot authorize gateway repair.
 
 The public health contract is intentionally minimal: it reports liveness,
@@ -81,9 +106,10 @@ runtime contract. Public pages request only `/health` and
 gateway liveness without probing `/api/snapshot` or inferring execution state.
 The canonical homepage no longer links directly into the no-index operator
 mission surface. Operator pages retain their separate protected runtime path.
-This repository change is not evidence that the current VPS gateway is healthy,
-and it has not been released through the exact public-static-site deployment
-gate in this recorded state.
+That repository change alone did not establish live gateway health. The August
+9 public probes are separate point-in-time liveness evidence, not proof of the
+recovery mechanism, the deployed gateway commit, sustained service health, or
+static exact-snapshot parity.
 
 Manual gateway-repair run `31248779848` accepted the exact current-main commit
 and exact approval phrase, then failed closed before SSH because repository
@@ -214,6 +240,7 @@ A receipt proves delivery only. It does not prove selection, technical validatio
 - **PR #66** — merged canonical reviewer and agent doorway; exact-head evidence-graph and order-safety gates passed.
 - **PR #74** — merged externally executable EIA/CODECHECK reviewer package; no independent execution receipt is present.
 - **PR #94** — merged Agent Arena V5 synthetic/replay stress and holdout harness; it does not establish field or external validation.
+- **PR #164** — merged eight noindex HOLD stubs at `f7662d5`; repository state only. The August 10 live check still lacked their marker, so current-main static release parity remains unreconciled.
 - **PR #64** — superseded by PR #74 and remains conflicted; do not promote it as the current reviewer target.
 - **PR #49** — focused external-evaluation protocol candidate.
 - **PR #35** — bounded commercial validation-sprint candidate; pricing and traction remain unvalidated.
@@ -244,4 +271,4 @@ byte-identical to its reviewed commit.
 
 ## Immediate decision
 
-The next founder-facing actions are to attend the **EPRI / Open Power AI** Member Representative Committee and selected Work Group meetings, make the separate founder-controlled EC deposit decision due August 14, and privately review the active external-review material to define one measurable evaluation decision. The EPRI / OPAI contribution-path follow-up is complete and closed to further email; EC has confirmed the onboarding materials were received on time, so neither lane authorizes another acknowledgment or follow-up. The next runtime action is a separately approved execution of the exact current-main gateway dependency-closure repair followed by read-only public verification; until that occurs, the dynamic gateway remains degraded and must continue to be reported as HTTP 502. The next product action is bounded independent execution through the existing PR #74 reviewer surface, not another dashboard or platform. Agent Arena V5 is only a secondary synthetic fault-injection harness: its locked reference run improves on the weak baseline but fails the absolute zero-violation gate and does not demonstrate Byzantine tolerance. PR #67's duplicate locks and claim boundaries must remain intact. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized; in particular, no duplicate or unsolicited message is authorized.
+The next founder-facing actions are to attend the **EPRI / Open Power AI** Member Representative Committee and selected Work Group meetings, make the separate founder-controlled EC deposit decision due August 14, and privately review the active external-review material to define one measurable evaluation decision. The EPRI / OPAI contribution-path follow-up is complete and closed to further email; EC has confirmed the onboarding materials were received on time, so neither lane authorizes another acknowledgment or follow-up. The next runtime action is read-only reconciliation of the live gateway's deployed commit and source closure, followed by repeated verification of the two minimal public contracts; do not dispatch the historical repair path without a fresh failure and its existing approval gate. The August 10 observations establish point-in-time liveness, so the gateway must not be described as currently returning HTTP 502. The live static surface remains behind current `main` because the PR #164 legacy-route HOLD markers are absent; the separately approved exact-snapshot release and post-deploy byte verification remain required. Production promotion remains `HOLD`, and neither gateway liveness nor exact-byte deployment constitutes external validation. The next product action is bounded independent execution through the existing PR #74 reviewer surface, not another dashboard or platform. Agent Arena V5 is only a secondary synthetic fault-injection harness: its locked reference run improves on the weak baseline but fails the absolute zero-violation gate and does not demonstrate Byzantine tolerance. PR #67's duplicate locks and claim boundaries must remain intact. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized; in particular, no duplicate or unsolicited message is authorized.

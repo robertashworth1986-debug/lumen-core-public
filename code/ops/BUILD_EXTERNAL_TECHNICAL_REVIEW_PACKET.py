@@ -18,6 +18,19 @@ MD_OUT = ROOT / "docs" / "EXTERNAL_TECHNICAL_REVIEW_PACKET_2026-07-28.md"
 
 CONFIG_SCHEMA = "lumencore.external_technical_review_packet_config.v1"
 OUTPUT_SCHEMA = "lumencore.external_technical_review_packet.v1"
+MAX_PUBLIC_SURFACE_BYTES = 1_048_576
+RETIRED_PUBLIC_SURFACE_PATHS = frozenset(
+    {
+        "/anomalies.html",
+        "/explain.html",
+        "/forecast.html",
+        "/grants.html",
+        "/kraken_execution_dashboard.html",
+        "/lab.html",
+        "/mission_control.html",
+        "/quant_lab.html",
+    }
+)
 
 
 class ReviewPacketError(ValueError):
@@ -220,18 +233,41 @@ def validate_config(config: dict[str, Any]) -> dict[str, Any]:
     for surface in _nonempty_list(config, "public_surfaces"):
         if not isinstance(surface, dict):
             raise ReviewPacketError("PUBLIC_SURFACE_INVALID")
-        validate_https_url(str(surface.get("url") or ""))
+        url = str(surface.get("url") or "")
+        validate_https_url(url)
+        if urlsplit(url).path in RETIRED_PUBLIC_SURFACE_PATHS:
+            raise ReviewPacketError(f"RETIRED_PUBLIC_SURFACE:{url}")
         if not isinstance(surface.get("observed_http_status"), int):
             raise ReviewPacketError("PUBLIC_SURFACE_STATUS_INVALID")
         if not str(surface.get("verified_at_utc") or "").endswith("Z"):
             raise ReviewPacketError("PUBLIC_SURFACE_TIME_INVALID")
+        expected_content_type = str(
+            surface.get("expected_content_type") or ""
+        ).strip()
+        if not expected_content_type:
+            raise ReviewPacketError("PUBLIC_SURFACE_CONTENT_TYPE_MISSING")
+        required_text = surface.get("required_text")
+        required_json = surface.get("required_json")
+        has_text_contract = isinstance(required_text, str) and bool(
+            required_text.strip()
+        )
+        has_json_contract = isinstance(required_json, dict) and bool(required_json)
+        if has_text_contract == has_json_contract:
+            raise ReviewPacketError("PUBLIC_SURFACE_CONTRACT_INVALID")
+        if has_json_contract and not all(
+            isinstance(key, str) and key.strip() for key in required_json
+        ):
+            raise ReviewPacketError("PUBLIC_SURFACE_JSON_CONTRACT_INVALID")
         if not str(surface.get("limitation") or "").strip():
             raise ReviewPacketError("PUBLIC_SURFACE_LIMITATION_MISSING")
 
     for reference in _nonempty_list(config, "draft_references"):
         validate_https_url(str(reference.get("url") or ""))
-        if reference.get("state") != "DRAFT_PR_NOT_MERGED":
-            raise ReviewPacketError("DRAFT_REFERENCE_STATE_INVALID")
+        if reference.get("state") not in {
+            "CLOSED_UNMERGED",
+            "DRAFT_PR_NOT_MERGED",
+        }:
+            raise ReviewPacketError("REFERENCE_STATE_INVALID")
 
     for key in (
         "evidence_assets",
@@ -465,34 +501,91 @@ def render_markdown(payload: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def observe_http_status(url: str) -> int:
-    request = Request(url, method="HEAD", headers={"User-Agent": "LumenCoreReview/1.0"})
+def observe_public_surface(surface: dict[str, Any]) -> dict[str, Any]:
+    url = surface["url"]
+    request = Request(
+        url,
+        method="GET",
+        headers={"User-Agent": "LumenCoreReview/1.0"},
+    )
     try:
         with urlopen(request, timeout=20) as response:
-            return int(response.status)
+            status = int(response.status)
+            content_type = str(response.headers.get("Content-Type") or "")
+            body = response.read(MAX_PUBLIC_SURFACE_BYTES + 1)
     except HTTPError as exc:
-        return int(exc.code)
+        status = int(exc.code)
+        content_type = str((exc.headers or {}).get("Content-Type") or "")
+        body = exc.read(MAX_PUBLIC_SURFACE_BYTES + 1)
     except URLError as exc:
         raise ReviewPacketError(f"LIVE_SURFACE_UNREACHABLE:{url}:{exc.reason}") from exc
+
+    if len(body) > MAX_PUBLIC_SURFACE_BYTES:
+        raise ReviewPacketError(f"LIVE_SURFACE_BODY_TOO_LARGE:{url}")
+
+    observed_content_type = content_type.split(";", 1)[0].strip().lower()
+    expected_content_type = surface["expected_content_type"].strip().lower()
+    content_type_match = observed_content_type == expected_content_type
+    contract_match = content_type_match
+    if "required_text" in surface:
+        try:
+            decoded = body.decode("utf-8")
+        except UnicodeDecodeError:
+            contract_match = False
+        else:
+            contract_match = contract_match and surface["required_text"] in decoded
+    else:
+        try:
+            decoded_json = json.loads(body.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            contract_match = False
+        else:
+            contract_match = (
+                contract_match
+                and isinstance(decoded_json, dict)
+                and all(
+                    decoded_json.get(key) == value
+                    for key, value in surface["required_json"].items()
+                )
+            )
+
+    return {
+        "observed_status": status,
+        "observed_content_type": observed_content_type,
+        "content_type_match": content_type_match,
+        "contract_match": contract_match,
+    }
 
 
 def verify_live_surfaces(config: dict[str, Any]) -> list[dict[str, Any]]:
     observed = []
     for row in config["public_surfaces"]:
-        status = observe_http_status(row["url"])
+        result = observe_public_surface(row)
         observed.append(
             {
                 "url": row["url"],
                 "expected_status": row["observed_http_status"],
-                "observed_status": status,
-                "match": status == row["observed_http_status"],
+                "observed_status": result["observed_status"],
+                "expected_content_type": row["expected_content_type"],
+                "observed_content_type": result["observed_content_type"],
+                "content_type_match": result["content_type_match"],
+                "contract_match": result["contract_match"],
+                "match": (
+                    result["observed_status"] == row["observed_http_status"]
+                    and result["contract_match"]
+                ),
             }
         )
     mismatches = [row for row in observed if not row["match"]]
     if mismatches:
         raise ReviewPacketError(
-            "LIVE_SURFACE_STATUS_DRIFT:"
-            + ",".join(f"{row['url']}={row['observed_status']}" for row in mismatches)
+            "LIVE_SURFACE_CONTRACT_DRIFT:"
+            + ",".join(
+                f"{row['url']}={row['observed_status']}"
+                f"/{row['observed_content_type']}"
+                f"/contract={str(row['contract_match']).lower()}"
+                for row in mismatches
+            )
         )
     return observed
 

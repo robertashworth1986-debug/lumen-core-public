@@ -63,13 +63,14 @@ OWASP LLMSVS, and SLSA themes. It is not certification, full conformance, an
 external audit, or a penetration test; its machine verifier fails closed if a
 status is promoted or a required limitation disappears.
 
-The exact public release has a deterministic 30-file CycloneDX 1.6 inventory
+The current exact public release has deterministic 43-file CycloneDX 1.6 inventory
 and a separate `main`-only GitHub OIDC/Sigstore signing lane. Reviewers should
 verify the downloaded archive against the repository, workflow, ref, source
 digest, and predicate type. This does not establish a complete product or VPS
 SBOM, a SLSA level, or live-domain parity. The retained receipt for commit
 `5fff567c11bee65b5b1de5415d8b8935cd2dfab0` records a successful GitHub-hosted
-provenance and SBOM attestation set. Its local verifier reconstructs the exact
+provenance and SBOM attestation set for the historical 30-file release; it does
+not attest the current 43-file release. Its local verifier reconstructs the exact
 archive from Git; remote signature verification remains a separate constrained
 `gh attestation verify` step. The post-run live audit remains `HOLD`.
 

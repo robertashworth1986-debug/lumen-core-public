@@ -181,7 +181,7 @@
         ".github/workflows/public-site-signed-attestation-receipt.yml",
         "evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json"
       ],
-      "evidence_establishes": "The named reviewer computation has hash-locked Python dependencies and a scoped CycloneDX inventory; the exact 30-file public release has a deterministic CycloneDX 1.6 inventory with one component per allowlisted file and one retained, successfully verified main-branch signed-SBOM set for commit 5fff567c11bee65b5b1de5415d8b8935cd2dfab0.",
+      "evidence_establishes": "The named reviewer computation has hash-locked Python dependencies and a scoped CycloneDX inventory; the current exact 43-file public release has a deterministic CycloneDX 1.6 inventory with one component per allowlisted file. The one retained, successfully verified main-branch signed-SBOM set covers the historical 30-file release at commit 5fff567c11bee65b5b1de5415d8b8935cd2dfab0, not the current release.",
       "evidence_does_not_establish": "A complete product, VPS operating-system, gateway, container, private-stack, or organization-wide SBOM, continuous vulnerability monitoring, dependency approval, vulnerability status, or production deployment.",
       "next_gate": "Inventory deployment runtime layers, add vulnerability triage and exception handling, and periodically re-verify the retained bundles and trusted roots."
     },

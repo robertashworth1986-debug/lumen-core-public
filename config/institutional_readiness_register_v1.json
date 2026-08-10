@@ -75,7 +75,7 @@
         ".github/workflows/public-site-signed-attestation-receipt.yml",
         "evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json"
       ],
-      "proves": "The named reviewer suite has hash-locked dependencies and a scoped inventory; the exact 30-file public release has deterministic CycloneDX 1.6 file coverage, pinned workflow actions, and one retained successfully verified GitHub OIDC/Sigstore provenance and SBOM attestation set for commit 5fff567c11bee65b5b1de5415d8b8935cd2dfab0.",
+      "proves": "The named reviewer suite has hash-locked dependencies and a scoped inventory; the current exact 43-file public release has deterministic CycloneDX 1.6 file coverage and pinned workflow actions. The retained successfully verified GitHub OIDC/Sigstore provenance and SBOM attestation set covers the historical 30-file release at commit 5fff567c11bee65b5b1de5415d8b8935cd2dfab0, not the current release.",
       "does_not_prove": "A complete product SBOM, VPS operating-system or gateway inventory, continuous vulnerability management, vulnerability status, a SLSA level, production dependency approval, or live deployment parity.",
       "next_gate": "Inventory the deployment runtime, establish vulnerability triage and exception handling, periodically re-verify trusted roots, and assess any SLSA level separately."
     },
