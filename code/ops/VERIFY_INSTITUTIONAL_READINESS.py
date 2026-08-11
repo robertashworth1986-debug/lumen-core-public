@@ -52,7 +52,7 @@ EXPECTED_DOMAIN_STATUS = {
     "evidence_custody_and_claim_governance": "implemented_first_party",
     "security_reporting": "documented_control",
     "repository_supply_chain": "documented_control",
-    "public_deployment": "prepared_not_executed",
+    "public_deployment": "implemented_first_party",
     "data_rights_and_handling": "buyer_specific_gate",
     "identity_access_and_runtime": "prepared_not_executed",
     "incident_response_and_continuity": "documented_control",
@@ -66,7 +66,7 @@ REQUIRED_DOMAIN_NEGATIVES = {
     "evidence_custody_and_claim_governance": "substantively true",
     "security_reporting": "security certification",
     "repository_supply_chain": "complete product sbom",
-    "public_deployment": "currently matches the checked-out commit",
+    "public_deployment": "later checked-out commit",
     "data_rights_and_handling": "executed data-processing agreement",
     "identity_access_and_runtime": "production secrets",
     "incident_response_and_continuity": "tested live recovery exercise",
@@ -241,7 +241,7 @@ def verify_register(
         raise ReadinessError("current decision exceeds the bounded review state")
     if register["production_decision"] != "HOLD":
         raise ReadinessError("production decision must remain HOLD")
-    if register["live_exact_snapshot_status"] != "not_established_for_checked_out_commit":
+    if register["live_exact_snapshot_status"] != "verified_for_named_release_commit":
         raise ReadinessError("live exact-snapshot status is falsely promoted")
 
     domains = register["assurance_domains"]
