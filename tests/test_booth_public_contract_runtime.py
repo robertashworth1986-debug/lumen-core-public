@@ -323,6 +323,31 @@ def test_health_probe_classifies_static_and_dynamic_surfaces() -> None:
     assert "operator_api_v1" in health
 
 
+def test_health_probe_repository_writer_is_path_and_contract_bounded() -> None:
+    health = (ROOT / ".github" / "workflows" / "health-probe.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "allowed_path()" in health
+    assert "data/site_health.json|data/uptime_badge.json" in health
+    assert "out-of-scope path" in health
+    assert "git diff --name-only -z" in health
+    assert "git ls-files --others --exclude-standard -z" in health
+    assert "sort -zu" in health
+    assert "git diff --check -- data/site_health.json data/uptime_badge.json" in health
+    assert "git diff --cached --name-only -z" in health
+    assert "git diff-tree --no-commit-id --name-only -r -z HEAD" in health
+    assert "rebased health snapshot contains an out-of-scope path" in health
+    assert 'git ls-remote origin "refs/heads/${GITHUB_REF_NAME}"' in health
+    assert "remote health-snapshot receipt does not match local HEAD" in health
+    assert "Health snapshot publication receipt" in health
+    assert "(.endpoints | keys | sort)" in health
+    assert '(.url | type == "string" and startswith("https://lumen-core.ai/"))' in health
+    assert '(.ok | type == "boolean")' in health
+    assert ".healthy_count == ([.endpoints[] | select(.ok == true)] | length)" in health
+    assert ".cacheSeconds == 3600" in health
+
+
 def test_health_probe_static_contract_fails_closed() -> None:
     if not Path("/bin/bash").is_file():
         return
