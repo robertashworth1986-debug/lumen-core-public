@@ -316,4 +316,4 @@ not demonstrate Byzantine tolerance or field performance. PR #67's duplicate
 locks and claim boundaries remain intact. The urgent patent action remains
 retrieval of the official application record through the USPTO-directed
 authenticated or Document Services path. No duplicate or unsolicited outbound
-message is authorized.
+message is authorized. No other outbound message is currently authorized.
