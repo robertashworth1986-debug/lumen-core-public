@@ -79,12 +79,12 @@ For any active public-release incident:
 
 Static-site recovery requires the separately protected exact-snapshot workflow:
 
-1. review the exact commit, 30-file manifest, affected routes, and rollback
+1. review the exact commit, full allowlisted manifest, affected routes, and rollback
    scope;
 2. provide the literal `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` approval only after
    that review;
 3. apply only the allowlisted archive while capturing replaced file identity;
-4. rerun all 30 live byte and MIME checks;
+4. rerun every live byte and MIME check declared by the release manifest;
 5. retain deployment, rollback, and verification receipts; and
 6. close the static release incident only when `release_verified` is `true` for
    the deployed commit.

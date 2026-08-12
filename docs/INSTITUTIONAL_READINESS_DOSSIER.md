@@ -1,6 +1,6 @@
 # LumenCore Institutional Readiness Dossier
 
-**Register date:** 2026-08-08
+**Register date:** 2026-08-09
 
 **Scope:** public repository and Buyer-Owned Baseline Validation Sprint
 
@@ -33,8 +33,8 @@ deliverable.
 | Source and reproducibility | Implemented first-party | Public capsule verifier, pinned reviewer runtime, dependency lock, replay instructions | Protocol-matched non-author execution receipt |
 | Evidence custody and claim governance | Implemented first-party | Proof Capsule v3, claim-boundary register, fail-closed verifier | Buyer-owned source/baseline/metric binding |
 | Security reporting | Documented control | Private advisory route, supported-version boundary, best-effort response process | Buyer-specific severity, notice, and remediation terms |
-| Repository supply chain | Partial/scoped implementation | Pinned workflow actions, hash-locked reviewer dependencies, deterministic CycloneDX 1.6 coverage for the exact 30-file public release, and one retained successful GitHub OIDC/Sigstore provenance and SBOM attestation set for commit `5fff567c` | Complete VPS/runtime inventory, vulnerability process, periodic trusted-root re-verification, and any separately assessed SLSA level |
-| Public deployment | Prepared, not executed for this commit | Exact-snapshot build, deploy, and live-audit protocol | Successful current-commit live audit receipt |
+| Repository supply chain | Partial/scoped implementation | Pinned workflow actions, hash-locked reviewer dependencies, deterministic CycloneDX 1.6 coverage for the exact 43-file named public release, and constrained GitHub OIDC/Sigstore provenance and SBOM verification for commit `e513f65a` | Complete VPS/runtime inventory, vulnerability process, periodic trusted-root re-verification, and any separately assessed SLSA level |
+| Public deployment | Implemented first-party for named release `e513f65a` | Human-gated exact deployment, 43-of-43 live-byte verification, security-header receipt, independent read-only post-deployment audit, and a retained commit-bound receipt | Repeat the exact gate for every later release; separately assess gateway and runtime layers |
 | Data rights and handling | Buyer-specific gate | Intake, SOW, and handling schedule templates | Executed rights, classification, retention, access, and legal terms |
 | Identity, access, and runtime | Prepared, not executed | Default-deny operator boundary and separately gated repair path | Authorized live repair and retained negative-access evidence |
 | Incident response and continuity | Documented control | Bounded policy, severity model, deterministic CI tabletop, and read-only live release classification | Separately authorized live restoration exercise and buyer-specific incident, continuity, backup, restoration, and notice terms |
@@ -69,10 +69,12 @@ The public evidence does not currently establish:
 - a complete product, VPS, gateway, container, and deployment-runtime SBOM;
 - a tested live incident-response or recovery exercise, business-continuity or disaster-recovery certification, or customer-notification performance;
 - privacy or regulated-data authorization; or
-- an exact live-domain snapshot matching the checked-out commit.
+- an exact live-domain snapshot for any later checked-out commit without its own
+  successful release receipt.
 
-Until a successful exact-snapshot audit receipt exists for the checked-out
-commit, treat `lumen-core.ai` as an unverified convenience projection that may
+Named release `e513f65a219a12e539d9f7dd3ea47a6a081c5262` has a successful
+exact-snapshot receipt. For any later checked-out commit without its own
+receipt, treat `lumen-core.ai` as an unverified convenience projection that may
 lag the repository. Do not substitute the live site for commit-bound evidence.
 
 ## Evidence interpretation
@@ -86,12 +88,12 @@ The reviewer-suite inventory and exact-public-release CycloneDX inventory cover
 their declared scopes. Neither is described as a complete product, VPS,
 gateway, container, or organization-wide SBOM.
 
-The retained signed-attestation receipt proves only that the exact named
-archive was bound to the named GitHub-hosted workflow, source commit, and two
-verified predicate types. It is not itself a signature and does not establish
-a SLSA level, vulnerability status, complete-product provenance, or live
-deployment. The corresponding live audit remains a `SEV-2` integrity incident
-with production promotion on `HOLD`.
+The current deployment receipt proves only that the 43-file archive for named
+commit `e513f65a` was bound to the recorded supply-chain, deployment, exact-byte,
+security-header, and read-only audit results. Its local verifier is first-party
+and does not itself re-run remote signatures or live HTTP checks. The receipt
+does not establish a SLSA level, vulnerability status, complete-product
+provenance, external validation, or broader platform production authorization.
 
 ## Recommended first engagement boundary
 
@@ -113,7 +115,7 @@ python -m unittest discover -s tests -p "test_institutional_readiness.py" -v
 The receipt hashes every cited evidence file and fails closed if the register
 promotes readiness, removes a required negative boundary, cites a missing or
 unsafe path, drifts its status totals, or describes the live domain as an exact
-current snapshot without the required release evidence.
+snapshot beyond the named release evidence.
 
 ---
 

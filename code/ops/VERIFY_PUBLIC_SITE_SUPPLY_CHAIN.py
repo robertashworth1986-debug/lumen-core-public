@@ -44,7 +44,7 @@ GUIDE_REQUIREMENTS = (
     "Sigstore-signed",
     "No SLSA level is claimed",
     "not a complete VPS",
-    "live site remains `HOLD`",
+    "broader platform production decision remains `HOLD`",
     "DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT",
     "gh attestation verify",
 )

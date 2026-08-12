@@ -14,7 +14,8 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
   executed.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
-- Only the 30 files in `RELEASE_PATHS` are packaged.
+- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (43 for
+  named release commit `e513f65a219a12e539d9f7dd3ea47a6a081c5262`).
 - Package bytes are read from immutable Git blobs, not from mutable worktree
   files.
 - The manifest binds the source commit, Git blob IDs, byte counts, file hashes,

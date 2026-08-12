@@ -39,6 +39,8 @@ deliverable.
 
 **[Open the retained Signed-Attestation Receipt](docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)**
 
+**[Open the exact Public-Site Deployment Receipt](docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md)**
+
 **[Open the Repository Security Assurance guide](docs/REPOSITORY_SECURITY_ASSURANCE.md)**
 
 The index is the canonical evidence map. The reviewer page gives the shortest human path. The index identifies:
@@ -71,13 +73,18 @@ authorization boundaries. It is a documented first-party control with CI
 exercises—not proof of a completed live restoration or an enterprise SLA.
 
 The public-release supply-chain lane creates deterministic CycloneDX 1.6
-coverage for all 43 allowlisted public files, including proof-first pages, ProofLock assets, and noindex legacy-route HOLD stubs. Pull requests produce unsigned
+coverage for all 43 allowlisted public files, including proof-first pages,
+ProofLock assets, and noindex legacy-route HOLD stubs. Pull requests produce unsigned
 verification artifacts; successful `main` builds separately create and verify
 GitHub OIDC/Sigstore provenance and SBOM attestations for the exact archive.
-The first retained successful set is bound to commit
-`5fff567c11bee65b5b1de5415d8b8935cd2dfab0` and can be reconstructed and
-checked with the repository verifier. This is not a whole-product or VPS SBOM,
-a SLSA level, or deployment proof; the live domain remains on `HOLD`.
+The first retained successful signed set is bound to commit
+`5fff567c11bee65b5b1de5415d8b8935cd2dfab0`. The named deployed public release,
+commit `e513f65a219a12e539d9f7dd3ea47a6a081c5262`, contains 43 allowlisted files
+and has first-party receipts for constrained attestation verification,
+human-gated deployment, 43-of-43 exact live-byte verification, security-header
+verification, and an independent read-only post-deployment audit. This remains
+a bounded static-release result—not a whole-product or VPS SBOM, a SLSA level,
+external validation, or production authorization for the broader platform.
 
 Repository source and declared dependency changes are separately covered by
 pinned CodeQL, pull-request dependency review, and weekly update proposals.
@@ -157,7 +164,7 @@ LumenCore emphasizes fail-closed decisions: missing rights, ambiguous provenance
 | ProofLock Console | Deployed bounded demonstration; verifies receipt integrity and refuses unauthorized promotion. |
 | EIA benchmark package | First-party reproducible for the named pinned package; prepared for non-author execution. |
 | External replication docket | Draft protocol for preregistration, evaluator independence, frozen inputs, deviations, and negative results. |
-| Exact public-release supply chain | Deterministic 43-file CycloneDX 1.6 inventory plus a main-only GitHub OIDC/Sigstore provenance and SBOM-attestation lane; legacy operator URLs are packaged only as noindex HOLD stubs; no whole-product SBOM, SLSA level, or deployment-parity claim. |
+| Exact public-release supply chain and deployment | Deterministic 43-file CycloneDX 1.6 inventory for named release `e513f65a`, constrained GitHub OIDC/Sigstore provenance and SBOM verification, human-gated deployment, 43-of-43 exact live-byte verification, and an independent read-only audit; legacy operator URLs are noindex HOLD stubs; no whole-product SBOM, SLSA level, external-validation, or broader production-authorization claim. |
 | Buyer-Owned Baseline Validation Sprint | Sole primary paid offer; proposed tiers are $7,500, $15,000, and from $25,000. Pricing is not buyer-tested, and no signed scope, cleared payment, or delivery is claimed. ProofLock supplies the evidence and custody layer. |
 
 ## Evidence-state definitions
@@ -226,6 +233,7 @@ review. Action-time HumanUnlock remains outside machine verification.
 - Secondary funding-workflow data boundary: [docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md](docs/PROOFLOCK_OPPORTUNITY_SPRINT_DATA_HANDLING_SCHEDULE.md)
 - Exact public-release SBOM and signed-attestation boundary: [docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md](docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)
 - Retained exact-release attestation receipt: [docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md](docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)
+- Exact named-release deployment receipt: [docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md](docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md)
 
 ## Intellectual-property boundary
 

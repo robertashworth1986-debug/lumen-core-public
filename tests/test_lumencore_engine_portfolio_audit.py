@@ -215,4 +215,7 @@ def test_explain_page_has_no_dead_local_html_links():
     assert links
     assert "./alpha_burst_lab_holo_3d.html" not in links
     assert "./scenario_mission.html" not in links
-    assert all((EXPLAIN_PATH.parent / link).is_file() for link in links)
+    local_links = {link for link in links if "://" not in link}
+    assert local_links
+    targets = [EXPLAIN_PATH.parent / link.lstrip("/") for link in local_links]
+    assert all(target.is_file() for target in targets)
