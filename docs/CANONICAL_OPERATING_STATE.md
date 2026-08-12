@@ -89,6 +89,30 @@ gateway source closure, penetration-test or security certification, external
 validation, scientific superiority, profitable trading, customer acceptance,
 revenue, savings, or broader production authorization.
 
+**Current read-only VPS source-closure receipt (August 12):** Manual diagnostic
+run `31559668631` completed successfully against exact current-main commit
+`7164e59a54b25b95ff17455a40614a5f980fea52`. Public gateway health, the nginx
+loopback gateway route, and the direct loopback gateway port each returned HTTP
+200 during the observation. The SHA-256 comparison recorded 19 matching files,
+one mismatch, zero missing files, zero symbolic files, and zero unreadable files
+across the approved 20-file gateway closure. The sole mismatch was
+`grant_application_factory.py`: the live hash corresponds to repository commit
+`6123580daa4e6880a46ba07d6d2a46bf2eb137e9`, while current main contains the
+later `37f53fdf` sensitive-output hardening that removes applicant headcount and
+principal-investigator employment percentages from eligibility messages. The
+same read-only run confirmed that `luma-paper-ticker` is still failing with
+`PermissionError` on the exact empty paper ledger, which remains `opc:opc:644`
+and is not writable by `lumencore`; no current allowlisted failure signature
+was observed for `luma-symbol-awareness` in its five-minute window. The private
+`LUMA_HUMAN_UNLOCK_TOKEN` repository secret is not configured, so neither the
+existing rollback-capable gateway-closure repair nor the paper-ledger repair
+was dispatched and no VPS mutation was attempted. A fresh, target-specific
+founder authorization and the private HumanUnlock control are required before
+either repair. These observations prove current bounded liveness, source drift,
+and the named paper-worker failure only; they do not establish sustained
+availability, whole-VPS parity, external validation, profitable trading,
+customer acceptance, revenue, or savings.
+
 **Repository vulnerability closure (August 12):** Dependabot alert #3,
 `GHSA-5239-wwwm-4pmq`, identified a low-severity local-access ReDoS advisory in
 the security-header workflow's Pygments dependency. PR #162 upgraded the
