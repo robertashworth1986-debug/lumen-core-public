@@ -140,6 +140,31 @@ def test_runtime_failure_signatures_are_allowlisted_and_redacted() -> None:
     assert "journalctl -u luma-symbol-awareness -n" not in text
 
 
+def test_runtime_component_fingerprint_is_allowlisted_hash_bound_and_bounded() -> None:
+    text = _workflow_text()
+
+    assert "bounded runtime component fingerprint" in text
+    assert "lumencore.bounded_runtime_component_fingerprint.v1" in text
+    for marker in (
+        "runtime_os=",
+        "runtime_kernel=",
+        "runtime_architecture=",
+        "runtime_nginx=",
+        "runtime_python=",
+        "runtime_fastapi=",
+        "runtime_uvicorn=",
+        "runtime_inventory_component_count=7",
+        "runtime_inventory_sha256=",
+    ):
+        assert marker in text
+    assert 'LC_ALL=C tr -cd "A-Za-z0-9._:+~-"' in text
+    assert "pip freeze" not in text
+    assert "pip list" not in text
+    assert "rpm -qa" not in text
+    assert "dpkg-query" not in text
+    assert "cat /etc/os-release" not in text
+
+
 def test_paper_ticker_path_access_is_metadata_only_and_allowlisted() -> None:
     text = _workflow_text()
 

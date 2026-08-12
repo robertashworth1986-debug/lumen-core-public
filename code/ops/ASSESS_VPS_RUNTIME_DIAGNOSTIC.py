@@ -16,7 +16,17 @@ from pathlib import Path
 from typing import Any
 
 
-SCHEMA_VERSION = "lumencore.vps_runtime_assessment.v1"
+SCHEMA_VERSION = "lumencore.vps_runtime_assessment.v2"
+RUNTIME_COMPONENT_SCHEMA = "lumencore.bounded_runtime_component_fingerprint.v1"
+RUNTIME_COMPONENT_KEYS = (
+    "runtime_os",
+    "runtime_kernel",
+    "runtime_architecture",
+    "runtime_nginx",
+    "runtime_python",
+    "runtime_fastapi",
+    "runtime_uvicorn",
+)
 EXPECTED_ENDPOINT_CODES = {
     "public_root": 200,
     "public_nginx_health": 200,
@@ -100,6 +110,51 @@ def _check(
     return result
 
 
+def _runtime_component_fingerprint(text: str) -> tuple[str, dict[str, Any]]:
+    section = _section(
+        text,
+        "=== bounded runtime component fingerprint ===",
+        "=== paper ticker output-path access (metadata only) ===",
+    )
+    schema = _value(section, "runtime_inventory_schema")
+    values = {key: _value(section, key) for key in RUNTIME_COMPONENT_KEYS}
+    declared_count = _integer(section, "runtime_inventory_component_count")
+    declared_sha256 = _value(section, "runtime_inventory_sha256")
+    observed = {
+        "schema": schema,
+        "component_count": declared_count,
+        "components": values,
+        "declared_sha256": declared_sha256,
+        "computed_sha256": None,
+        "scope": "allowlisted_runtime_versions_not_a_complete_sbom",
+    }
+    if schema is None:
+        return "UNKNOWN", observed
+
+    values_complete = all(
+        value is not None
+        and value not in {"missing", "unknown", "unknown:unknown"}
+        and bool(re.fullmatch(r"[A-Za-z0-9._:+~-]{1,160}", value))
+        for value in values.values()
+    )
+    if values_complete:
+        canonical = "".join(f"{key}={values[key]}\n" for key in RUNTIME_COMPONENT_KEYS)
+        observed["computed_sha256"] = hashlib.sha256(
+            canonical.encode("utf-8")
+        ).hexdigest()
+
+    passed = all(
+        (
+            schema == RUNTIME_COMPONENT_SCHEMA,
+            declared_count == len(RUNTIME_COMPONENT_KEYS),
+            values_complete,
+            bool(re.fullmatch(r"[0-9a-f]{64}", declared_sha256 or "")),
+            declared_sha256 == observed["computed_sha256"],
+        )
+    )
+    return ("PASS" if passed else "FAIL"), observed
+
+
 def assess(
     text: str,
     *,
@@ -118,6 +173,10 @@ def assess(
     }
     endpoint_status = (
         "UNKNOWN" if missing_endpoints else "FAIL" if bad_endpoints else "PASS"
+    )
+
+    runtime_component_status, runtime_component_observed = (
+        _runtime_component_fingerprint(text)
     )
 
     gateway = _unit_fields(text, "luma-gateway")
@@ -268,6 +327,12 @@ def assess(
             },
         ),
         _check(
+            "bounded_runtime_component_fingerprint",
+            runtime_component_status,
+            "The allowlisted OS, kernel, architecture, Nginx, Python, FastAPI, and Uvicorn version fingerprint is complete and hash-consistent.",
+            runtime_component_observed,
+        ),
+        _check(
             "gateway_service_identity",
             gateway_status,
             "The gateway is active/running under explicit lumencore:lumencore service identity.",
@@ -357,6 +422,7 @@ def assess(
             "does_not_prove": [
                 "sustained availability",
                 "whole-VPS parity or security",
+                "a complete product, container, operating-system, or VPS SBOM",
                 "external validation or certification",
                 "profitable trading",
                 "customer acceptance, revenue, or savings",
