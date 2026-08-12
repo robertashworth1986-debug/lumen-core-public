@@ -177,12 +177,16 @@
         "code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py",
         "docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md",
         "docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md",
+        "docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md",
+        "docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-12.md",
+        "evidence/public-site-deployments/e513f65a219a12e539d9f7dd3ea47a6a081c5262/deployment-receipt.json",
+        "evidence/public-site-deployments/1ce7c35975a4011fa844e8b39ccbc950c8c0f398/deployment-receipt.json",
         ".github/workflows/public-site-supply-chain.yml",
         ".github/workflows/public-site-signed-attestation-receipt.yml",
         "evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json"
       ],
-      "evidence_establishes": "The named reviewer computation has hash-locked Python dependencies and a scoped CycloneDX inventory; the current exact 43-file public release has a deterministic CycloneDX 1.6 inventory with one component per allowlisted file. The one retained, successfully verified main-branch signed-SBOM set covers the historical 30-file release at commit 5fff567c11bee65b5b1de5415d8b8935cd2dfab0, not the current release.",
-      "evidence_does_not_establish": "A complete product, VPS operating-system, gateway, container, private-stack, or organization-wide SBOM, continuous vulnerability monitoring, dependency approval, vulnerability status, or production deployment.",
+      "evidence_establishes": "The named reviewer computation has hash-locked Python dependencies and a scoped CycloneDX inventory; current named deployed release commit 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 has a deterministic 43-file CycloneDX 1.6 inventory with one component per allowlisted file and a constrained, successfully verified main-branch signed SBOM.",
+      "evidence_does_not_establish": "A complete product, VPS operating-system, gateway, container, private-stack, or organization-wide SBOM, continuous vulnerability monitoring, dependency approval, vulnerability status, or production authorization for broader platform services.",
       "next_gate": "Inventory deployment runtime layers, add vulnerability triage and exception handling, and periodically re-verify the retained bundles and trusted roots."
     },
     {
@@ -199,6 +203,12 @@
         ".github/workflows/deploy-public-site-release.yml",
         "docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md",
         "docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md",
+        "docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md",
+        "docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-12.md",
+        "code/ops/VERIFY_PUBLIC_SITE_DEPLOYMENT_RECEIPT.py",
+        ".github/workflows/public-site-deployment-receipt.yml",
+        "evidence/public-site-deployments/e513f65a219a12e539d9f7dd3ea47a6a081c5262/deployment-receipt.json",
+        "evidence/public-site-deployments/1ce7c35975a4011fa844e8b39ccbc950c8c0f398/deployment-receipt.json",
         ".github/workflows/public-site-supply-chain.yml",
         ".github/workflows/public-site-signed-attestation-receipt.yml",
         "code/deploy/build_public_site_supply_chain.py",
@@ -206,9 +216,9 @@
         "code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py",
         "evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json"
       ],
-      "evidence_establishes": "The public-site release protocol binds files to Git object identity and SHA-256 digests; one retained main-branch GitHub-hosted run binds the exact release archive to Sigstore-signed build provenance and an SBOM attestation, with repository, workflow, ref, source digest, OIDC issuer, and runner constraints verified.",
-      "evidence_does_not_establish": "SLSA Build L1 or higher, signed provenance for any other commit, whole-product or deployment-runtime provenance, hardened or isolated builds, vulnerability status, or a currently matching live deployment.",
-      "next_gate": "Assess the hosted build against an explicit SLSA level, extend provenance to deployment runtime layers, periodically re-verify trusted roots, and deploy only through the exact human release gate."
+      "evidence_establishes": "The public-site release protocol binds files to Git object identity and SHA-256 digests; current named release commit 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 binds the exact archive to constrained GitHub OIDC/Sigstore predicates, human-gated deployment, rollback capture, 43-of-43 live-byte verification, and a separate read-only post-deployment audit; prior release e513f65a remains in the append-only history.",
+      "evidence_does_not_establish": "SLSA Build L1 or higher, signed provenance or live parity for any later release, whole-product or deployment-runtime provenance, hardened or isolated builds, vulnerability-free status, external validation, or broader production authorization.",
+      "next_gate": "Assess the hosted build against an explicit SLSA level, extend provenance to deployment runtime layers, periodically re-verify trusted roots, and repeat the exact human release gate for every later commit."
     },
     {
       "id": "AC-07",

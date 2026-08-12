@@ -29,8 +29,9 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 17. [Retained signed-attestation receipt](PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)
 18. [Repository security assurance](REPOSITORY_SECURITY_ASSURANCE.md)
 19. [Public security-header deployment receipt](PUBLIC_SECURITY_HEADER_DEPLOYMENT_RECEIPT_2026-08-09.md)
-20. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
-21. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
+20. [Exact named-release deployment receipt](PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md)
+21. [Commit-bound machine-readable reviewer docket](../dashboard/reviewer_docket.json)
+22. [Live machine-readable reviewer docket](https://lumen-core.ai/reviewer_docket.json)
 
 The repository docket is the reviewable state bound to the checked-out commit.
 The live docket is a convenience projection and may lag the default branch or
@@ -55,7 +56,7 @@ The readiness register makes the corresponding procurement boundary explicit:
 the current decision is non-confidential fit review and buyer-specific scoping;
 production remains `HOLD`. It does not claim SOC 2, ISO 27001, FedRAMP,
 penetration testing, a complete product SBOM, an enterprise SLA, legal approval,
-or an exact live-domain snapshot for the checked-out commit.
+or that any later checked-out commit matches the named live release.
 
 The assurance crosswalk gives a reviewer a current first-party evidence map to
 selected NIST AI RMF, NIST GenAI Profile, NIST CSF, NIST SSDF, OWASP ASVS,
@@ -63,16 +64,19 @@ OWASP LLMSVS, and SLSA themes. It is not certification, full conformance, an
 external audit, or a penetration test; its machine verifier fails closed if a
 status is promoted or a required limitation disappears.
 
-The current exact public release has deterministic 43-file CycloneDX 1.6 inventory
-and a separate `main`-only GitHub OIDC/Sigstore signing lane. Reviewers should
-verify the downloaded archive against the repository, workflow, ref, source
-digest, and predicate type. This does not establish a complete product or VPS
-SBOM, a SLSA level, or live-domain parity. The retained receipt for commit
-`5fff567c11bee65b5b1de5415d8b8935cd2dfab0` records a successful GitHub-hosted
-provenance and SBOM attestation set for the historical 30-file release; it does
-not attest the current 43-file release. Its local verifier reconstructs the exact
-archive from Git; remote signature verification remains a separate constrained
-`gh attestation verify` step. The post-run live audit remains `HOLD`.
+Named deployed public release `1ce7c359` has a deterministic 43-file CycloneDX
+1.6 inventory and a separate `main`-only GitHub OIDC/Sigstore signing lane.
+Reviewers should verify the downloaded archive against the repository,
+workflow, ref, source digest, and predicate type. This does not establish a
+complete product or VPS SBOM or a SLSA level. The historical receipt for commit
+`5fff567c` retains the first successful signed set. The current exact-deployment
+receipt binds commit `1ce7c35975a4011fa844e8b39ccbc950c8c0f398` to rollback
+capture, a 43-of-43 live-byte check, and a separate read-only post-deployment
+audit. The earlier `e513f65a` deployment receipt remains in the append-only
+history, while security-header evidence remains a separate bounded control.
+The local verifier reconstructs both releases from immutable Git blobs; fresh
+remote signature and live HTTP checks remain separate operations. This does not
+promote the broader platform beyond `HOLD`.
 
 The documented incident control classifies public-release drift and preserves
 containment and recovery gates. Its CI tabletop is not a completed live

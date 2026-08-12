@@ -178,13 +178,11 @@ def test_release_count_is_bound_to_current_control_records():
         )
     )
 
-    assert f"Only the {release_count} files in `RELEASE_PATHS`" in protocol
-    assert f"packages the {release_count} allowlisted files" in incident_plan
-    assert f"{release_count}-file manifest" in incident_plan
-    assert f"all {release_count} live byte and MIME checks" in incident_plan
-    assert f"all {release_count} route results" in incident_plan
+    assert f"({release_count} for" in protocol
+    assert "full allowlisted manifest" in incident_plan
+    assert "every live byte and MIME check declared by the release manifest" in incident_plan
     assert (
-        f"rerun the {release_count}-file exact-byte and MIME audit against the deployed commit"
+        "rerun the full-manifest exact-byte and MIME audit against the deployed commit"
         in incident_policy["recovery_sequence"]
     )
 

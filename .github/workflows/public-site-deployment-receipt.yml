@@ -1,0 +1,61 @@
+name: Public site deployment receipt
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'code/ops/VERIFY_PUBLIC_SITE_DEPLOYMENT_RECEIPT.py'
+      - 'tests/test_public_site_deployment_receipt.py'
+      - 'evidence/public-site-deployments/**'
+      - 'docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_*.md'
+      - '.github/workflows/public-site-deployment-receipt.yml'
+  pull_request:
+    paths:
+      - 'code/ops/VERIFY_PUBLIC_SITE_DEPLOYMENT_RECEIPT.py'
+      - 'tests/test_public_site_deployment_receipt.py'
+      - 'evidence/public-site-deployments/**'
+      - 'docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_*.md'
+      - '.github/workflows/public-site-deployment-receipt.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-site-deployment-receipt-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout receipt history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+
+      - name: Install bounded test dependency
+        run: python -m pip install --disable-pip-version-check pytest==9.1.0
+
+      - name: Verify retained deployment receipt history
+        run: |
+          python -m pytest -q tests/test_public_site_deployment_receipt.py
+          mkdir -p out/public-site-deployment-receipt
+          python code/ops/VERIFY_PUBLIC_SITE_DEPLOYMENT_RECEIPT.py \
+            --json-out out/public-site-deployment-receipt/verification.json
+
+      - name: Upload bounded verification receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: public-site-deployment-receipt-${{ github.sha }}
+          path: out/public-site-deployment-receipt/verification.json
+          if-no-files-found: warn
+          retention-days: 30

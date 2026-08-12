@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-10T14:12:58.021565Z",
+  "generated_at_utc": "2026-08-11T23:54:05.516769Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -992,6 +992,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "d395e2ec9d1f8283d5e9917f81d7c7315a2d78d754fd228cd5602ea3503dd047"
+    "payload_sha256": "7ba5f8bc2575fa7e54744e6c4cac5d26168f1628e24a3eecccb6ae160a11e4b1"
   }
 }

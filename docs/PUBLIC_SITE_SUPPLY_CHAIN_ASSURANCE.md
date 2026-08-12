@@ -2,15 +2,17 @@
 
 ## Decision
 
-LumenCore now has a deterministic CycloneDX 1.6 inventory for the exact 43-file public release and a separate GitHub-hosted `main` workflow that signs
+LumenCore now has a deterministic CycloneDX 1.6 inventory for the exact
+43-file public release at commit
+`1ce7c35975a4011fa844e8b39ccbc950c8c0f398` and a separate GitHub-hosted `main` workflow that signs
 the release archive's build provenance and SBOM association with GitHub's
 OIDC/Sigstore artifact-attestation service.
 
 This is a bounded release control. It is not a complete VPS, operating-system,
 gateway, container, private-stack, or organization-wide SBOM. No SLSA level is claimed.
 It is not certification, a penetration test, independent validation,
-production authorization, or evidence that the live domain matches the source
-commit.
+production authorization, or evidence that any later source commit matches the
+live domain.
 
 ## What is inventoried
 
@@ -30,7 +32,9 @@ Those files are intentionally shipped as noindex redirect guards so stale VPS fi
 
 The root application component binds the archive SHA-256, source commit,
 repository URL, bounded target directory, inventory scope, and explicit
-absence of a SLSA-level or live-deployment claim. The verifier requires 43 of 43 components and rejects missing, reordered, duplicated, unknown, or altered
+absence of a SLSA-level or broad live-deployment claim. The verifier requires
+one component for every file in the release manifest—43 of 43 for commit
+`1ce7c359`—and rejects missing, reordered, duplicated, unknown, or altered
 release identities.
 
 ## Two evidence layers
@@ -55,6 +59,16 @@ two predicate types, constrained verification results, and founder-controlled
 private bundle custody. The public receipt is a first-party custody record; it
 is not itself a signature or external validation.
 
+The current named deployed release is documented in
+[`PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-12.md`](PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-12.md).
+It binds the 43-file archive for commit `1ce7c359` to the successful
+supply-chain run, human-gated deployment and rollback capture, 43-of-43
+live-byte verification, and a separate read-only post-deployment audit. The
+earlier [`e513f65a` receipt](PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md)
+remains retained, and security-header evidence remains a separate bounded
+control. These are first-party deployment records for named static releases;
+they are not external validation or broader production authorization.
+
 ## Consumer verification
 
 After downloading `public-site-release.tar`, verify signed build provenance:
@@ -78,7 +92,8 @@ Verify the signed CycloneDX predicate by adding:
 The repository, workflow path, commit, and expected predicate type are policy
 inputs, not facts to infer from the artifact itself.
 
-For the retained set, also run the repository-local receipt verifier:
+For the historical retained set, also run the repository-local attestation
+receipt verifier:
 
 ```bash
 python code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py
@@ -88,17 +103,29 @@ It reconstructs the exact deterministic archive from immutable Git blobs and
 checks the public receipt's identities and `HOLD`. It does not replace the
 constrained online `gh attestation verify` signature check.
 
+For the retained named deployment history, run:
+
+```bash
+python code/ops/VERIFY_PUBLIC_SITE_DEPLOYMENT_RECEIPT.py
+```
+
+It reconstructs every retained exact 43-file archive from immutable Git blobs
+and checks the append-only first-party deployment history. It does not contact
+GitHub or the live domain, so it does not replace fresh signature or HTTP
+verification.
+
 ## Production boundary
 
-The live site remains `HOLD` until the separately gated exact-snapshot workflow
-receives the literal `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT`, applies the selected
-commit with rollback capture, and proves every public URL byte against that
-commit's release manifest. A signed build proves provenance and integrity of
-the archive; it does not prove that the archive was deployed.
+The exact static release at commit `1ce7c359` passed the separately gated
+`DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow, rollback capture, 43-of-43 live
+byte verification, and separate read-only audit. The prior `e513f65a` release
+remains independently reconstructable. A signed build by itself still does not
+prove deployment, and any later release must pass the same gate. The broader
+platform production decision remains `HOLD`.
 
 ## Remaining gates
 
-- deploy and verify an explicitly approved exact snapshot;
+- repeat the human-gated deploy and exact live audit for every later release;
 - inventory and govern the VPS OS, gateway, runtime services, and external
   dependencies in their own deployment scope;
 - add vulnerability triage and time-bounded exception handling;
