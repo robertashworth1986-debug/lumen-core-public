@@ -245,6 +245,54 @@ this recorded state. Future full deployments explicitly preserve the ledger,
 set least-privilege ownership/mode, and bound both paper-ticker and shadow
 symbol-awareness restart storms.
 
+### Institutional full-suite gate receipt — August 12, 2026
+
+PR #174 merged the repository-wide institutional test gate into `main` at
+commit `852dd05f7320705e764f0cd488e874248ae57b36`. Every pull request and every
+push to `main` now runs the complete first-party pytest collection on Ubuntu
+24.04 with exact Python 3.11.9, a hash-locked binary-only dependency closure,
+`pip check`, a source-mutation check, and a commit-bound JUnit artifact. The
+fast focused readiness verifier remains a separate job.
+
+The first PR attempt was blocked before merge because GitHub dependency review
+identified two high-severity malformed-PDF infinite-loop advisories in
+`pypdf==6.13.2` (`GHSA-5xf7-4p34-54qr` and
+`GHSA-g867-7843-wf8q`). The final reviewed head upgraded the direct pin to
+`pypdf==6.15.0`, regenerated the complete lock, and then passed dependency
+review. This is evidence that the security gate rejected one vulnerable
+dependency change and that the corrected closure passed that bounded review;
+it is not a whole-system or future vulnerability-free claim.
+
+Post-merge institutional-readiness run
+[`31563059423`](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31563059423)
+executed against the exact published `main` commit and recorded:
+
+- dependency-lock status `INSTITUTIONAL_DEPENDENCY_LOCK_VALID`;
+- 14 direct pins, 39 resolved packages, and 717 recorded SHA-256 hashes;
+- normalized lock SHA-256
+  `90cc18300371fcb3a09f3967c15880b97ddad174ec7f10e91d1f8bba5d715229`;
+- `pip check`: no broken requirements;
+- 802 passed tests, 7 explicit skips, 5 warnings, and 48 passed subtests in
+  46.87 seconds; and
+- successful source-mutation rejection and artifact upload steps.
+
+The main-bound JUnit artifact is
+`institutional-full-suite-852dd05f7320705e764f0cd488e874248ae57b36`,
+artifact ID `9128457813`, with GitHub artifact digest
+`sha256:de02d797e0c28c5c6f90c877ee43dd0a73053294f6db1450e41b73ff1e079115`.
+It expires under the workflow's 30-day retention policy on September 11, 2026.
+
+The seven Ubuntu skips are not counted as passes: four require generated
+publication or evidence artifacts absent from a clean source checkout, and
+three require Windows PowerShell rather than the Ubuntu runner. A complementary
+Windows run on the reviewed head recorded 802 passed, 7 skipped, 5 warnings,
+and 48 passed subtests in 411.82 seconds; its three platform skips were the
+POSIX-only root-side Bash integrations. Together these runs establish bounded
+cross-platform first-party software behavior for the tested source. They do
+not establish production readiness, independent or field validation,
+certification, zero vulnerabilities, revenue, savings, profitable trading, or
+sustained uptime.
+
 ### Receipt reconciliation
 
 | Lane | Verified state | Next action |
