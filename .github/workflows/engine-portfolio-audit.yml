@@ -1,33 +1,9 @@
 name: Engine Portfolio Audit Gate
 
 on:
-  pull_request:
-    paths:
-      - ".github/workflows/engine-portfolio-audit.yml"
-      - "code/ops/BUILD_LUMENCORE_ENGINE_PORTFOLIO_AUDIT.py"
-      - "config/lumencore_engine_portfolio_v2.json"
-      - "config/strategic_transaction_packet_v2.json"
-      - "config/evidence_graph_v1.json"
-      - "dashboard/data/lumencore_engine_portfolio_audit.json"
-      - "docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md"
-      - "EVIDENCE_INDEX.md"
-      - "docs/REVIEWER_START_HERE.md"
-      - "docs/PR_CONSOLIDATION_MAP_2026-07-22.md"
-      - "tests/test_lumencore_engine_portfolio_audit.py"
+  pull_request: {}
   push:
     branches: [main]
-    paths:
-      - ".github/workflows/engine-portfolio-audit.yml"
-      - "code/ops/BUILD_LUMENCORE_ENGINE_PORTFOLIO_AUDIT.py"
-      - "config/lumencore_engine_portfolio_v2.json"
-      - "config/strategic_transaction_packet_v2.json"
-      - "config/evidence_graph_v1.json"
-      - "dashboard/data/lumencore_engine_portfolio_audit.json"
-      - "docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md"
-      - "EVIDENCE_INDEX.md"
-      - "docs/REVIEWER_START_HERE.md"
-      - "docs/PR_CONSOLIDATION_MAP_2026-07-22.md"
-      - "tests/test_lumencore_engine_portfolio_audit.py"
 
 permissions:
   contents: read

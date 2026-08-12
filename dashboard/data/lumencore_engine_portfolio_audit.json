@@ -822,9 +822,9 @@
             "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "e8636a475e3da9fdf62007067ac5020094260d97",
-            "bytes": 31135,
-            "sha256": "3d6fce1aeca66ffc577f7fe5013cca0f22506cd5722d0550c89f7b2af88537a0"
+            "git_blob_sha": "78d007b9447c31030128f0451a9ef1ab72da7e90",
+            "bytes": 31107,
+            "sha256": "0ec4f644ae2f9a429aadfcaa5792e65e5daaa9e2b85abad2c1736bb16ebc6c8f"
           },
           {
             "path": "code/run_universal_meta_orchestrator.py",
@@ -840,9 +840,9 @@
             "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "e8636a475e3da9fdf62007067ac5020094260d97",
-            "bytes": 31135,
-            "sha256": "3d6fce1aeca66ffc577f7fe5013cca0f22506cd5722d0550c89f7b2af88537a0"
+            "git_blob_sha": "78d007b9447c31030128f0451a9ef1ab72da7e90",
+            "bytes": 31107,
+            "sha256": "0ec4f644ae2f9a429aadfcaa5792e65e5daaa9e2b85abad2c1736bb16ebc6c8f"
           },
           {
             "path": "code/run_universal_meta_orchestrator.py",
@@ -914,9 +914,9 @@
             "path": "code/grant_application_factory.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "e5f7cc6f11e25140a0dafa9ac49a5a79f39c7015",
-            "bytes": 100512,
-            "sha256": "9a51282bdd6551bef5fd6a4a7c509164c66ae10077da754db5f7382d5e6eeea9"
+            "git_blob_sha": "c2af80fe73df85cc7a54adf07318227d502a4b50",
+            "bytes": 100552,
+            "sha256": "d8042eebcc2838f6af602232d630c909d1ae5175774b4eb7ebe37a30846ac7b6"
           }
         ],
         "entrypoint": [
@@ -992,6 +992,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "7ba5f8bc2575fa7e54744e6c4cac5d26168f1628e24a3eecccb6ae160a11e4b1"
+    "payload_sha256": "9b45c8371577b97e4c454dd6b1601fb4b7303d114d0cdf4398008bd5564f5c64"
   }
 }
