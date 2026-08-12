@@ -54,16 +54,17 @@ def registry_rows(payload):
     return []
 
 def parse_env_file(path):
-    env = {}
+    present_names = set()
     if not Path(path).exists():
-        return env
+        return present_names
     for raw in Path(path).read_text(encoding="utf-8").splitlines():
         line = raw.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
         k, v = line.split("=", 1)
-        env[k.strip()] = v.strip().strip('"').strip("'")
-    return env
+        if v.strip().strip('"').strip("'"):
+            present_names.add(k.strip())
+    return present_names
 
 found = parse_env_file(ENV_FILE)
 
@@ -71,7 +72,7 @@ canonical = {
     "ALPACA": {
         "sector": "broker",
         "env_key": "ALPACA_API_KEY",
-        "env_secret": "ALPACA_API_SECRET"
+        "secondary_env": "ALPACA_API_SECRET"
     },
     "ALPHAVANTAGE": {
         "sector": "market_data",
@@ -109,7 +110,7 @@ canonical = {
     "KRAKEN": {
         "sector": "crypto_exec",
         "env_key": "KRAKEN_API_KEY",
-        "env_secret": "KRAKEN_API_SECRET"
+        "secondary_env": "KRAKEN_API_SECRET"
     },
     "MASSIVE": {
         "sector": "market_data",
@@ -158,16 +159,16 @@ for source, meta in canonical.items():
     old = old_by_source.get(source, {})
     env_key = meta.get("env_key")
     env_aliases = [str(x).strip() for x in (meta.get("env_aliases") or []) if str(x).strip()]
-    env_secret = meta.get("env_secret")
+    secondary_env = meta.get("secondary_env")
     env_aux = meta.get("env_aux")
 
     key_candidates = [env_key] + env_aliases
-    present_key_name = next((name for name in key_candidates if bool(found.get(name))), env_key)
-    key_present = any(bool(found.get(name)) for name in key_candidates)
-    secret_present = bool(found.get(env_secret)) if env_secret else True
-    aux_present = bool(found.get(env_aux)) if env_aux else True
+    present_key_name = next((name for name in key_candidates if name in found), env_key)
+    key_present = any(name in found for name in key_candidates)
+    secondary_present = secondary_env in found if secondary_env else True
+    aux_present = env_aux in found if env_aux else True
 
-    fully_present = key_present and secret_present and aux_present
+    fully_present = key_present and secondary_present and aux_present
 
     old_rows = int(old.get("rows", 0) or 0)
     old_evidence = str(old.get("evidence_basis", "KEY_ONLY"))
@@ -203,15 +204,15 @@ for source, meta in canonical.items():
         "enabled": enabled
     }
 
-    if env_secret:
-        row["secret_env"] = env_secret
+    if secondary_env:
+        row["secondary_credential_env"] = secondary_env
     if env_aux:
         row["aux_env"] = env_aux
     if env_aliases:
         row["env_aliases"] = env_aliases
     row["key_present"] = key_present
-    if env_secret:
-        row["secret_present"] = secret_present
+    if secondary_env:
+        row["secondary_credential_present"] = secondary_present
     if env_aux:
         row["aux_present"] = aux_present
 
@@ -236,8 +237,8 @@ for r in new_rows:
         "status": r["status"],
         "env": r["env"]
     }
-    if "secret_env" in r:
-        item["secret_env"] = r["secret_env"]
+    if "secondary_credential_env" in r:
+        item["secondary_credential_env"] = r["secondary_credential_env"]
     if "aux_env" in r:
         item["aux_env"] = r["aux_env"]
     live_sources["sources"].append(item)
@@ -251,7 +252,7 @@ registry_out = {
 
 summary = {
     "generated_utc": now_utc(),
-    "found_key_names": sorted(found.keys()),
+    "found_key_names": sorted(found),
     "enabled_registry_sources": enabled_count,
     "measured_sources": measured_count,
     "missing_sources": [r["source"] for r in new_rows if not r["enabled"]],

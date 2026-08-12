@@ -114,11 +114,9 @@ def test_active_dashboards_use_fail_closed_url_and_dom_boundaries() -> None:
         encoding="utf-8"
     )
 
-    assert "TRUSTED_GRANT_DOMAINS" in grants
-    assert "TRUSTED_GRANT_DOMAINS" in mission
-    assert "host.includes(" not in grants
-    assert "host.includes(" not in mission
-    assert "trustedGrantUrl(target)" in mission
+    for retired_surface in (grants, mission):
+        assert 'name="robots" content="noindex,nofollow,noarchive"' in retired_surface
+        assert "location.replace('/proof_to_pilot.html')" in retired_surface
     assert "li.innerHTML" not in forecast
     assert "cpList.innerHTML" not in quant
     assert "host.innerHTML" not in quant
@@ -139,10 +137,6 @@ def test_active_dashboards_use_fail_closed_url_and_dom_boundaries() -> None:
     assert "window.LUMA_API_BASE" not in grants
     assert "localStorage.getItem('LUMA_API_BASE')" not in grants
     assert "params.get('api_base')" not in grants
-    assert "cross-origin grants API request blocked" in grants
-    assert "unapproved grants API route" in grants
-    assert "const fixedRoutes = new Set([" in grants
-    assert "allowedSections" in grants
     assert "document.getElementById('af').innerHTML" not in sector
     assert "document.getElementById('srs').innerHTML" not in sector
     assert "document.getElementById('tti').innerHTML" not in sector

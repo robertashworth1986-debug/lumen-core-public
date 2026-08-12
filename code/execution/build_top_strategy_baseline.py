@@ -154,7 +154,7 @@ def build_top_strategy_baseline() -> Dict[str, Any]:
         "top_strategies": strategies,
         "grant_evidence": {
             "project_alignment": federal.get("program_alignment", []),
-            "trust_tier": evidence.get("trusted_tier", ""),
+            "validation_scope": "local_evidence_bundle_pending_independent_review",
             "proof_files": [str(p) for p in evidence.get("proof_files", [])] if isinstance(evidence.get("proof_files"), list) else [],
             "federal_brief": str(FEDERAL_BRIEF) if FEDERAL_BRIEF.exists() else "",
         },
@@ -178,7 +178,7 @@ def build_grant_proposals(context: Dict[str, Any]) -> Dict[str, Any]:
         f"Top test vs baseline: {baseline.get('top_test_vs_baseline'):.4f}",
         f"Top institutional score: {baseline.get('top_institutional_score'):.4f}",
         f"Live strategic candidates analysed: {baseline.get('total_candidates')}",
-        f"Provenance: trust tier {proof.get('trust_tier', 'unknown')}",
+        f"Provenance: {proof.get('validation_scope', 'local evidence pending independent review')}",
     ]
 
     for idx, program in enumerate(PROGRAMS, start=1):

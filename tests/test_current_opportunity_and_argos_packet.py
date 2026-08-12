@@ -3,10 +3,12 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pytest
 
@@ -1324,6 +1326,12 @@ def test_argos_outreach_sequence_preserves_sent_once_and_government_gate():
 def test_opportunity_and_science_maps_preserve_current_gates():
     opportunity = OPPORTUNITY_MAP.read_text(encoding="utf-8")
     science = SCIENCE_MAP.read_text(encoding="utf-8")
+    official_links = re.findall(r"\[[^\]]+\]\((https?://[^)\s]+)\)", opportunity)
+    official_hosts = {
+        urlparse(link).hostname
+        for link in official_links
+        if urlparse(link).hostname is not None
+    }
 
     assert "Near-Term Economic-Relief Route" not in opportunity
     assert "Personal assistance" not in opportunity
@@ -1337,8 +1345,8 @@ def test_opportunity_and_science_maps_preserve_current_gates():
     assert "Explicit Pass Lanes" in opportunity
     assert "no verified, action-safe solo-prime submission" in opportunity
     assert "SAM.gov Data Services" in opportunity
-    assert "Acquisition.gov" in opportunity
-    assert "USAspending.gov" in opportunity
+    assert "www.acquisition.gov" in official_hosts
+    assert "www.usaspending.gov" in official_hosts
     assert "not where LumenCore submits a bid" in opportunity
     assert "not an opportunity or application portal" in opportunity
     assert "No automated sign-in" in opportunity

@@ -8,6 +8,7 @@ fails before any authenticated request when an override is not exactly paper.
 
 from __future__ import annotations
 
+import os
 import sys
 import time
 from pathlib import Path
@@ -82,11 +83,19 @@ def normalize_paper_data_base(value: Any = None) -> str:
 
 def load_api_keys() -> dict[str, str]:
     keys = dict(_ORIGINAL_LOAD_API_KEYS())
+    paper_override = os.getenv("ALPACA_PAPER_BASE_URL")
+    generic_override = os.getenv("ALPACA_BASE_URL") or os.getenv(
+        "ALPACA_TRADING_BASE_URL"
+    )
+    if generic_override and not paper_override:
+        raise PaperEndpointError(
+            "generic Alpaca endpoint overrides require an explicit approved paper origin"
+        )
     keys["ALPACA_PAPER_BASE_URL"] = normalize_paper_trading_base(
-        keys.get("ALPACA_PAPER_BASE_URL")
+        paper_override
     )
     keys["ALPACA_DATA_BASE_URL"] = normalize_paper_data_base(
-        keys.get("ALPACA_DATA_BASE_URL")
+        os.getenv("ALPACA_DATA_BASE_URL")
     )
     return keys
 

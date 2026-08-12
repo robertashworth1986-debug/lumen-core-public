@@ -147,10 +147,10 @@ seen = set()
 for r in raw:
     if not isinstance(r, dict):
         continue
-    source = str(r.get("source") or r.get("name") or r.get("env") or r.get("api_key_env") or "").strip()
+    source = str(r.get("source") or r.get("name") or r.get("env") or "").strip()
     sector = str(r.get("sector") or "").strip() or infer_sector(source)
     status = str(r.get("status") or "").strip().upper()
-    env = str(r.get("env") or r.get("api_key_env") or "").strip()
+    env = str(r.get("env") or "").strip()
     enabled = bool(r.get("enabled", False))
     rows = max(as_int(r.get("rows", 0), 0), 1)
     est = as_float(
