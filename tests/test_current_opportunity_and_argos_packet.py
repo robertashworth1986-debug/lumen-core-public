@@ -1345,8 +1345,8 @@ def test_opportunity_and_science_maps_preserve_current_gates():
     assert "Explicit Pass Lanes" in opportunity
     assert "no verified, action-safe solo-prime submission" in opportunity
     assert "SAM.gov Data Services" in opportunity
-    assert "www.acquisition.gov" in official_hosts
-    assert "www.usaspending.gov" in official_hosts
+    assert any(host == "www.acquisition.gov" for host in official_hosts)
+    assert any(host == "www.usaspending.gov" for host in official_hosts)
     assert "not where LumenCore submits a bid" in opportunity
     assert "not an opportunity or application portal" in opportunity
     assert "No automated sign-in" in opportunity
