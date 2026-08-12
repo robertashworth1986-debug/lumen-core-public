@@ -91,14 +91,16 @@ revenue, savings, or broader production authorization.
 
 **Current read-only VPS runtime verdict (August 12):** PR #181 merged the
 guarded gateway runtime-closure repair at exact merge commit
-`40a0463e061e912263a62527fdab2c0fbb92c6d2`. Post-merge diagnostic run
-[`31570030174`](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31570030174)
-captured a complete bounded receipt against that exact commit at
-`2026-08-12T06:27:15Z`. The diagnostic workflow completed because the receipt
-was captured; the separate commit status correctly reported failure with
-verdict `ACTION_REQUIRED`. Its assessment recorded one passing check, six
-failing checks, and zero unknown checks. The raw diagnostic SHA-256 is
-`fb73573c9b5c70d712ccde23ebe1ae40507f4d7066c2479356209b6944b7cd12`.
+`40a0463e061e912263a62527fdab2c0fbb92c6d2`. After PR #183 merged the exact
+repository-security state, read-only diagnostic run
+[`31573034746`](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31573034746)
+captured a complete bounded receipt against current `main` commit
+`6a22b2f748ecb2457d89a0494d0c04f4374a93b9` at `2026-08-12T07:13:07Z`.
+The diagnostic workflow completed because the receipt was captured; the
+separate commit status correctly reported failure with verdict
+`ACTION_REQUIRED`. Its assessment recorded one passing check, six failing
+checks, and zero unknown checks. The raw diagnostic SHA-256 is
+`340b26868946b02a9516e91c717acff3c46e879b45cf40d7a379c2239a1ab412`.
 
 All seven declared public/loopback endpoint codes passed, including the
 expected fail-closed HTTP 503 at the unauthenticated protected snapshot route.
@@ -107,14 +109,15 @@ effective unit still had no explicit `User` or `Group` and the live lock was
 `root:root:644`. The approved 20-file current-main gateway closure recorded 19
 matches, one mismatch (`grant_application_factory.py`), and zero missing,
 symbolic, or unreadable targets. The paper-ticker process was in `activating`
-and `auto-restart` with `NRestarts=193860` under `lumencore:lumencore`; its exact
+and `auto-restart` with `NRestarts=193976` under `lumencore:lumencore`; its exact
 empty ledger remained `opc:opc:644`, was not writable by `lumencore`, and
-produced thirteen allowlisted `PermissionError` observations during the bounded
-five-minute window. Capacity was not the cause: about 108 GiB remained
-available and inode use was one percent. The retained artifact is
-`lumencore-vps-runtime-31570030174`, artifact ID `9130936121`, with GitHub
+produced twelve allowlisted `PermissionError` observations during the bounded
+five-minute window. The same receipt recorded a successful read-only `nginx -t`.
+Capacity was not the cause: about 108 GiB remained available and inode use was
+one percent. The retained artifact is `lumencore-vps-runtime-31573034746`,
+artifact ID `9132068760`, with GitHub
 artifact digest
-`sha256:e43ac46ca6ec817defdf734f40fc75a773842e041b194e09b694987221dcdce3`
+`sha256:776578b53ed73d95d1fc1e74f7a6335a5cb36bc0edd702fe1add688a6cf3ae2e`
 and seven-day retention.
 
 The existing manual gateway repair now treats source and service identity as
