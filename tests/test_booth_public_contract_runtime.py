@@ -180,6 +180,7 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     assert "--apply" in script
     assert "--print-files" in script
     assert "--bundle-sha" in script
+    assert "--hardening-sha" in script
     assert "LUMENCORE_HUMAN_UNLOCK_FILE" in script
     assert "LUMA_HUMAN_UNLOCK_TOKEN" not in script
     assert '[[ "$HUMAN_UNLOCK_FILE" =~ ^/tmp/lumencore-gateway-repair-' in script
@@ -191,6 +192,11 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
         '&& "$STACK_ROOT" == "/opt/lumencore"',
         '&& "$PYTHON_BIN" == "/opt/lumencore/.venv/bin/python"',
         '&& "$SERVICE" == "luma-gateway"',
+        '&& "$SERVICE_USER" == "lumencore"',
+        '&& "$SERVICE_GROUP" == "lumencore"',
+        '&& "$RUN_DIR" == "/opt/lumencore/run"',
+        '&& "$SERVICE_DROP_IN_DIR" == "/etc/systemd/system/luma-gateway.service.d"',
+        '&& "$SERVICE_DROP_IN" == "/etc/systemd/system/luma-gateway.service.d/20-lumencore-runtime-hardening.conf"',
         '&& "$LOCK_FILE" == "/opt/lumencore/run/luma_experience_gateway.lock"',
         '&& "$LOCAL_HEALTH_URL" == "http://127.0.0.1:8787/health"',
         '&& "$PUBLIC_HEALTH_URL" == "https://lumen-core.ai/health"',
@@ -200,7 +206,9 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
         assert marker in script
     assert _declared_gateway_closure(script) == EXPECTED_GATEWAY_CLOSURE
     assert "LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256" in script
+    assert "LUMENCORE_EXPECTED_GATEWAY_HARDENING_SHA256" in script
     assert "source closure does not match the approved bundle SHA-256" in script
+    assert "service hardening does not match the approved SHA-256" in script
     assert '[[ "$SOURCE_COMMIT" =~ ^[0-9a-f]{40}$ ]]' in script
     assert "PYTHONDONTWRITEBYTECODE=1" in script
     assert 'PYTHONPATH="$STAGE_DIR:$TARGET_ROOT"' in script
@@ -216,6 +224,27 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     assert "POST_APPLY_TARGET_SHA256" in script
     assert "POST_APPLY_HASH_PARITY=" in script
     assert "post-apply source/target SHA-256 mismatch" in script
+    for marker in (
+        "User=lumencore",
+        "Group=lumencore",
+        "Restart=on-failure",
+        "StartLimitIntervalSec=300",
+        "StartLimitBurst=10",
+        "UMask=0027",
+        "NoNewPrivileges=true",
+        "PrivateTmp=true",
+        'install -d -o "$SERVICE_USER" -g "$SERVICE_GROUP" -m 0750 -- "$RUN_DIR"',
+        'systemctl daemon-reload',
+        'effective gateway service identity is not lumencore:lumencore',
+        'gateway singleton lock did not bind to the systemd main PID',
+        'gateway singleton lock identity is not bounded',
+        'cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN"',
+        'chown --no-dereference "$prior_drop_in_uid:$prior_drop_in_gid" "$SERVICE_DROP_IN_DIR"',
+        'chown --no-dereference "$prior_run_uid:$prior_run_gid" "$RUN_DIR"',
+        'if [[ "$SERVICE_WAS_ACTIVE" == true ]]',
+        "GATEWAY_RUNTIME_CLOSURE_REPAIR_OK",
+    ):
+        assert marker in script
     assert "GATEWAY_DEPENDENCY_CLOSURE_REPAIR_OK" in script
     assert "rm -rf -- \"$TARGET_ROOT\"" not in script
     assert '[[ "$STAGE_DIR" =~ ^/tmp/lumencore-gateway-stage\\.' in script
@@ -458,6 +487,12 @@ def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None
     assert "LUMENCORE_HUMAN_UNLOCK_FILE='$REMOTE_STAGE/human-unlock'" in workflow
     assert 'LUMA_HUMAN_UNLOCK_TOKEN="$(cat' not in workflow
     assert "LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256" in workflow
+    assert "LUMENCORE_EXPECTED_GATEWAY_HARDENING_SHA256" in workflow
+    assert "--hardening-sha" in workflow
+    assert "service_hardening_sha256" in workflow
+    assert 'test "$(id -u lumencore)" -ne 0' in workflow
+    assert 'test "$(id -gn lumencore)" = lumencore' in workflow
+    assert "sudo -n -u lumencore test -x /opt/lumencore/.venv/bin/python" in workflow
     assert "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh" in workflow
     assert "--apply" in workflow
     assert "Remove remote repair staging" in workflow
@@ -473,5 +508,6 @@ def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None
     assert "Gateway Public Contract Gate" in workflow
     assert "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh" in workflow
     assert "WRONG_HASH_FAIL_CLOSED_OK" in workflow
+    assert "WRONG_HARDENING_HASH_FAIL_CLOSED_OK" in workflow
     assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1" in workflow
     assert "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0" in workflow

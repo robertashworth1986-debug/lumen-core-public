@@ -272,14 +272,14 @@ def assess(
             gateway_status,
             "The gateway is active/running under explicit lumencore:lumencore service identity.",
             gateway_observed,
-            repair_control="DEPLOY_REVIEWED_NON_ROOT_GATEWAY_SERVICE_IDENTITY",
+            repair_control="REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE",
         ),
         _check(
             "gateway_lock_identity",
             lock_status,
             "The live gateway lock is the systemd main PID and is owned lumencore:lumencore with mode 640.",
             lock_observed,
-            repair_control="DEPLOY_REVIEWED_NON_ROOT_GATEWAY_SERVICE_IDENTITY",
+            repair_control="REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE",
         ),
         _check(
             "gateway_source_closure",

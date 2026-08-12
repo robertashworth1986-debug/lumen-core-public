@@ -125,8 +125,12 @@ jobs:
           trap 'rm -rf -- "$inspect_target"' EXIT
           first_sha=$(bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --bundle-sha)
           second_sha=$(bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --bundle-sha)
+          first_hardening_sha=$(bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --hardening-sha)
+          second_hardening_sha=$(bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --hardening-sha)
           [[ "$first_sha" =~ ^[0-9a-f]{64}$ ]]
           [[ "$first_sha" == "$second_sha" ]]
+          [[ "$first_hardening_sha" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$first_hardening_sha" == "$second_hardening_sha" ]]
           [[ "$(bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --print-files | wc -l)" -eq 20 ]]
           LUMENCORE_GATEWAY_TARGET_ROOT="$inspect_target" \
             bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
@@ -142,3 +146,15 @@ jobs:
             exit 1
           fi
           echo "WRONG_HASH_FAIL_CLOSED_OK"
+
+          set +e
+          LUMENCORE_EXPECTED_GATEWAY_HARDENING_SHA256=0000000000000000000000000000000000000000000000000000000000000000 \
+            LUMENCORE_GATEWAY_TARGET_ROOT="$inspect_target" \
+            bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
+          rc=$?
+          set -e
+          if [[ "$rc" -ne 7 ]]; then
+            echo "ERROR: wrong-hardening-hash check returned $rc instead of 7" >&2
+            exit 1
+          fi
+          echo "WRONG_HARDENING_HASH_FAIL_CLOSED_OK"
