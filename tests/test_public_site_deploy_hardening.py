@@ -161,6 +161,32 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert root_allowlist == names
 
 
+def test_release_count_is_bound_to_current_control_records():
+    module = load_module(PACKAGER_PATH, "package_public_site_release_control_count")
+    release_count = len(module.RELEASE_PATHS)
+    assert release_count == 43
+
+    protocol = (ROOT / "docs" / "PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md").read_text(
+        encoding="utf-8"
+    )
+    incident_plan = (
+        ROOT / "docs" / "INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md"
+    ).read_text(encoding="utf-8")
+    incident_policy = json.loads(
+        (ROOT / "config" / "incident_response_and_continuity_v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert f"({release_count} for" in protocol
+    assert "full allowlisted manifest" in incident_plan
+    assert "every live byte and MIME check declared by the release manifest" in incident_plan
+    assert (
+        "rerun the full-manifest exact-byte and MIME audit against the deployed commit"
+        in incident_policy["recovery_sequence"]
+    )
+
+
 def test_package_rejects_unpinned_or_executable_sources(tmp_path):
     module, repo, commit, _committed = make_release_repo(tmp_path)
     archive = tmp_path / "release.tar"
@@ -211,6 +237,7 @@ def test_exact_snapshot_workflow_is_manual_commit_pinned_and_non_destructive():
 
 
 def test_legacy_auto_deploy_is_replaced_by_read_only_exact_live_audit():
+    module = load_module(PACKAGER_PATH, "package_public_site_release_audit_trigger")
     audit = LIVE_AUDIT_WORKFLOW.read_text(encoding="utf-8")
     trigger = audit.split("permissions:", maxsplit=1)[0]
     assert "push:" in trigger
@@ -230,6 +257,16 @@ def test_legacy_auto_deploy_is_replaced_by_read_only_exact_live_audit():
     ):
         assert forbidden not in audit
     assert "deploy-public-site-release.yml" in audit
+    trigger_paths = re.findall(r'^\s+- ["\']([^"\']+)["\']$', trigger, re.MULTILINE)
+    uncovered = []
+    for path in module.RELEASE_PATHS:
+        covered = any(
+            path.startswith(pattern[:-2]) if pattern.endswith("/**") else path == pattern
+            for pattern in trigger_paths
+        )
+        if not covered:
+            uncovered.append(path)
+    assert uncovered == []
 
 
 def test_live_verifier_maps_canonical_routes_and_assets_to_exact_paths():

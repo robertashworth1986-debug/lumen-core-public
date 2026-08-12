@@ -29,6 +29,7 @@ jobs:
         shell: bash
         env:
           CURL_TIMEOUT_SECONDS: '10'
+          STATIC_MAX_BYTES: '1048576'
         run: |
           set -euo pipefail
           mkdir -p data
@@ -38,17 +39,54 @@ jobs:
           check_static_endpoint() {
             local name=$1
             local url=$2
-            local code
-            code=$(curl --silent --show-error --location --max-redirs 5 \
-              --max-time "$CURL_TIMEOUT_SECONDS" --output /dev/null \
-              --write-out "%{http_code}" "$url" 2>/dev/null) || code="000"
-            [[ "$code" =~ ^[0-9]{3}$ ]] || code="000"
-            local status=$((10#$code))
+            local contract=$3
+            local marker
+            case "$contract" in
+              home) marker='proof-to-pilot-home-v1' ;;
+              offer) marker='bounded-validation-offer-v1' ;;
+              external_review) marker='external-replication-docket-v1' ;;
+              evidence) marker='proof-to-pilot-evidence-v1' ;;
+              prooflock) marker='<title>ProofLock Console</title>' ;;
+              legacy_hold) marker='legacy-public-route-hold-v1' ;;
+              *)
+                echo "ERROR: unknown static endpoint contract: $contract" >&2
+                return 2
+                ;;
+            esac
+
+            local body
+            local result
+            local code=000
+            local content_type=""
+            local status=0
+            local http_ok=false
+            local reachable=false
+            local contract_ok=false
             local ok=false
-            if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then ok=true; fi
+            body=$(mktemp)
+            result=$(curl --silent --show-error --location --max-redirs 5 \
+              --max-time "$CURL_TIMEOUT_SECONDS" --max-filesize "$STATIC_MAX_BYTES" \
+              --output "$body" --write-out $'%{http_code}\t%{content_type}' \
+              "$url" 2>/dev/null) || result=$'000\t'
+            IFS=$'\t' read -r code content_type <<<"$result"
+            [[ "$code" =~ ^[0-9]{3}$ ]] || code="000"
+            status=$((10#$code))
+            if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then
+              http_ok=true
+              reachable=true
+            fi
+            if [[ "$http_ok" == true && "${content_type,,}" == text/html* ]] && \
+              grep -Fq -- "$marker" "$body"; then
+              contract_ok=true
+              ok=true
+            fi
+            rm -f -- "$body"
             jq -n --arg name "$name" --arg url "$url" --arg text "$code" \
-              --argjson status "$status" --argjson ok "$ok" \
-              '{key:$name,value:{surface:"static",url:$url,status:$status,status_text:$text,http_ok:$ok,reachable:$ok,contract_ok:$ok,ok:$ok}}'
+              --arg content_type "$content_type" --arg contract "$contract" \
+              --argjson status "$status" --argjson http_ok "$http_ok" \
+              --argjson reachable "$reachable" --argjson contract_ok "$contract_ok" \
+              --argjson ok "$ok" \
+              '{key:$name,value:{surface:"static",url:$url,status:$status,status_text:$text,content_type:$content_type,contract:$contract,http_ok:$http_ok,reachable:$reachable,contract_ok:$contract_ok,ok:$ok}}'
           }
 
           check_json_endpoint() {
@@ -113,12 +151,19 @@ jobs:
           }
 
           endpoints=$(printf '%s\n' \
-            "$(check_static_endpoint portal https://lumen-core.ai/)" \
-            "$(check_static_endpoint evidence https://lumen-core.ai/evidence/)" \
-            "$(check_static_endpoint kraken_dashboard https://lumen-core.ai/kraken_execution_dashboard.html)" \
-            "$(check_static_endpoint mission_control https://lumen-core.ai/mission_control.html)" \
-            "$(check_static_endpoint approval_hub https://lumen-core.ai/agent_approval_hub.html)" \
-            "$(check_static_endpoint forecast https://lumen-core.ai/forecast.html)" \
+            "$(check_static_endpoint portal https://lumen-core.ai/ home)" \
+            "$(check_static_endpoint proof_to_pilot https://lumen-core.ai/proof_to_pilot.html offer)" \
+            "$(check_static_endpoint external_review https://lumen-core.ai/external_review.html external_review)" \
+            "$(check_static_endpoint evidence https://lumen-core.ai/evidence/ evidence)" \
+            "$(check_static_endpoint prooflock_console https://lumen-core.ai/build_week/prooflock_console/ prooflock)" \
+            "$(check_static_endpoint mission_control https://lumen-core.ai/mission_control.html legacy_hold)" \
+            "$(check_static_endpoint quant_lab https://lumen-core.ai/quant_lab.html legacy_hold)" \
+            "$(check_static_endpoint kraken_dashboard https://lumen-core.ai/kraken_execution_dashboard.html legacy_hold)" \
+            "$(check_static_endpoint grants https://lumen-core.ai/grants.html legacy_hold)" \
+            "$(check_static_endpoint forecast https://lumen-core.ai/forecast.html legacy_hold)" \
+            "$(check_static_endpoint anomalies https://lumen-core.ai/anomalies.html legacy_hold)" \
+            "$(check_static_endpoint explain https://lumen-core.ai/explain.html legacy_hold)" \
+            "$(check_static_endpoint lab https://lumen-core.ai/lab.html legacy_hold)" \
             "$(check_json_endpoint gateway_public_status https://lumen-core.ai/api/public/status public_status)" \
             "$(check_json_endpoint gateway_health https://lumen-core.ai/health gateway_health)" \
             | jq -s 'from_entries')

@@ -1,6 +1,6 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-08-08 UTC
+**State date:** 2026-08-12 UTC
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
@@ -35,6 +35,50 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 ### Public runtime incident and recovery boundary
 
+**Latest verified point-in-time observation (August 10):** The committed
+`data/site_health.json` snapshot at `2026-08-10T12:33:26Z` recorded all eight
+monitored endpoint checks operational: six static HTTP checks and two dynamic
+JSON-contract checks. A separate read-only probe beginning at
+`2026-08-10T13:50:06Z`
+matched the declared content contracts for the five current bounded reviewer
+surfaces and the two minimal public gateway endpoints, `/health` and
+`/api/public/status`, with HTTP 200 responses. These observations establish
+point-in-time public liveness only. They do not establish the recovery cause,
+that the guarded dependency-closure repair ran, the deployed gateway commit or
+source closure, sustained availability, production approval, or external
+validation. Those liveness observations are not exact-byte release parity;
+the later separately gated static-release receipts establish that narrower
+condition for named release `1ce7c359`.
+
+**Reconciled named static release (August 12):** PR #167 merged the exact
+43-file release-control update at commit
+`1ce7c35975a4011fa844e8b39ccbc950c8c0f398`. Main-branch supply-chain run
+`31548604617`, separately human-gated deployment run `31548829514`, and
+read-only post-deployment audit run `31548906293` all completed successfully.
+The deployment captured rollback state and the deployment and audit receipts
+each recorded 43-of-43 exact live-byte matches with `release_verified: true`.
+The audit classified `NO_INCIDENT_OBSERVED`, severity `NONE`, decision
+`MONITOR`. PR #168 then merged the append-only receipt history at commit
+`5e03e6c98e67d9f8c68ae6816d2c56a9f2cd301d`; the retained verifier
+reconstructs both named deployed Git subjects. These are first-party static
+release and custody results. They do not establish external validation,
+certification, whole-VPS or gateway provenance, scientific validity, customer
+acceptance, revenue, savings, or broader platform production authorization.
+Neither gateway liveness nor exact-byte deployment constitutes external
+validation.
+Later commits that do not change the allowlisted static bytes do not replace
+the named `1ce7c359` deployment identity.
+
+**Repository vulnerability closure (August 12):** Dependabot alert #3,
+`GHSA-5239-wwwm-4pmq`, identified a low-severity local-access ReDoS advisory in
+the security-header workflow's Pygments dependency. PR #162 upgraded the
+hash-locked requirement from 2.19.2 to patched release 2.20.0 and merged at
+`d3a6ecd78159c7dd418b1f870bf160c931a77f30`. The dependency-graph update and
+security-header receipt workflow passed, and GitHub recorded the alert as
+`fixed` at `2026-08-12T00:31:24Z`. This closes that named alert only; it does
+not establish a vulnerability-free codebase, penetration test, runtime scan,
+or external security certification.
+
 On August 8, read-only current-state probes established that DNS, TLS, nginx,
 the static reviewer surface, VPS storage, and filesystem inodes were available,
 while the dynamic gateway returned HTTP 502 and had no listener on loopback port
@@ -62,8 +106,9 @@ The private value is transferred as an owner-only file and is never expanded
 into the remote command line; apply mode refuses any target, service, lock,
 runtime, or probe identity outside the exact production contract. Recursive
 temporary cleanup is path-bounded, and every workflow dependency is pinned to
-an immutable commit. The repair has not been dispatched in this recorded
-state. The separate public-static-site release gate remains unchanged and
+an immutable commit. The evidence recorded here does not establish that this
+guarded repair was dispatched or that it caused the later point-in-time
+recovery. The separate public-static-site release gate remains unchanged and
 cannot authorize gateway repair.
 
 The public health contract is intentionally minimal: it reports liveness,
@@ -81,9 +126,10 @@ runtime contract. Public pages request only `/health` and
 gateway liveness without probing `/api/snapshot` or inferring execution state.
 The canonical homepage no longer links directly into the no-index operator
 mission surface. Operator pages retain their separate protected runtime path.
-This repository change is not evidence that the current VPS gateway is healthy,
-and it has not been released through the exact public-static-site deployment
-gate in this recorded state.
+That repository change alone did not establish live gateway health. The August
+9 public probes are separate point-in-time liveness evidence, not proof of the
+recovery mechanism, the deployed gateway commit, sustained service health, or
+static exact-snapshot parity.
 
 Manual gateway-repair run `31248779848` accepted the exact current-main commit
 and exact approval phrase, then failed closed before SSH because repository
@@ -214,6 +260,10 @@ A receipt proves delivery only. It does not prove selection, technical validatio
 - **PR #66** — merged canonical reviewer and agent doorway; exact-head evidence-graph and order-safety gates passed.
 - **PR #74** — merged externally executable EIA/CODECHECK reviewer package; no independent execution receipt is present.
 - **PR #94** — merged Agent Arena V5 synthetic/replay stress and holdout harness; it does not establish field or external validation.
+- **PR #162** — merged the hash-locked Pygments 2.20.0 security update at `d3a6ecd7`; Dependabot alert #3 is fixed, not a whole-system security claim.
+- **PR #164** — merged eight noindex HOLD stubs at `f7662d5`; those files are included in named release `1ce7c359` and its 43-of-43 live receipt.
+- **PR #167** — merged the 43-file exact public-release controls at `1ce7c359`; the separately gated deployment and read-only audit succeeded.
+- **PR #168** — merged append-only deployment receipt history at `5e03e6c9`; the broader platform remains `HOLD`.
 - **PR #64** — superseded by PR #74 and remains conflicted; do not promote it as the current reviewer target.
 - **PR #49** — focused external-evaluation protocol candidate.
 - **PR #35** — bounded commercial validation-sprint candidate; pricing and traction remain unvalidated.
@@ -244,4 +294,26 @@ byte-identical to its reviewed commit.
 
 ## Immediate decision
 
-The next founder-facing actions are to attend the **EPRI / Open Power AI** Member Representative Committee and selected Work Group meetings, make the separate founder-controlled EC deposit decision due August 14, and privately review the active external-review material to define one measurable evaluation decision. The EPRI / OPAI contribution-path follow-up is complete and closed to further email; EC has confirmed the onboarding materials were received on time, so neither lane authorizes another acknowledgment or follow-up. The next runtime action is a separately approved execution of the exact current-main gateway dependency-closure repair followed by read-only public verification; until that occurs, the dynamic gateway remains degraded and must continue to be reported as HTTP 502. The next product action is bounded independent execution through the existing PR #74 reviewer surface, not another dashboard or platform. Agent Arena V5 is only a secondary synthetic fault-injection harness: its locked reference run improves on the weak baseline but fails the absolute zero-violation gate and does not demonstrate Byzantine tolerance. PR #67's duplicate locks and claim boundaries must remain intact. The urgent patent action remains retrieval of the official application record through the USPTO-directed authenticated or Document Services path. No other outbound message is currently authorized; in particular, no duplicate or unsolicited message is authorized.
+The next founder-facing actions are to attend the **EPRI / Open Power AI**
+Member Representative Committee and selected Work Group meetings, make the
+separate founder-controlled EC deposit decision due August 14, and reduce the
+active private-review material to one buyer-owned workflow, baseline, metric,
+threshold, and go/no-go decision. EPRI / OPAI and EC remain under no-duplicate
+holds unless they make a new substantive request.
+
+The named public static release is reconciled at `1ce7c359`, but broader
+production promotion remains `HOLD`. The August 10 gateway observations prove
+point-in-time liveness only, so do not describe the gateway as currently
+returning HTTP 502 or as source-closure verified. Continue read-only gateway
+commit/source-closure reconciliation and do not dispatch a historical repair
+without a fresh failure and its existing approval gate.
+
+The next product and revenue gate is one paid or independently executed
+Buyer-Owned Baseline Validation Sprint through the existing PR #74 reviewer
+surface. Do not create another dashboard, platform, or generic evidence pack.
+Agent Arena V5 remains a secondary synthetic fault-injection harness and does
+not demonstrate Byzantine tolerance or field performance. PR #67's duplicate
+locks and claim boundaries remain intact. The urgent patent action remains
+retrieval of the official application record through the USPTO-directed
+authenticated or Document Services path. No duplicate or unsolicited outbound
+message is authorized. No other outbound message is currently authorized.

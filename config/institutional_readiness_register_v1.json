@@ -75,7 +75,7 @@
         ".github/workflows/public-site-signed-attestation-receipt.yml",
         "evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json"
       ],
-      "proves": "The named reviewer suite has hash-locked dependencies and a scoped inventory; named deployed release commit e513f65a219a12e539d9f7dd3ea47a6a081c5262 has deterministic 43-file CycloneDX 1.6 coverage, pinned workflow actions, and constrained GitHub OIDC/Sigstore provenance and SBOM verification.",
+      "proves": "The named reviewer suite has hash-locked dependencies and a scoped inventory; current named deployed release commit 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 has deterministic 43-file CycloneDX 1.6 coverage, pinned workflow actions, and constrained GitHub OIDC/Sigstore provenance and SBOM verification.",
       "does_not_prove": "A complete product SBOM, VPS operating-system or gateway inventory, continuous vulnerability management, vulnerability status, a SLSA level, production dependency approval, or parity for any later release.",
       "next_gate": "Inventory the deployment runtime, establish vulnerability triage and exception handling, periodically re-verify trusted roots, and assess any SLSA level separately."
     },
@@ -87,13 +87,15 @@
       "evidence_paths": [
         "docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md",
         "docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md",
+        "docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-12.md",
         "evidence/public-site-deployments/e513f65a219a12e539d9f7dd3ea47a6a081c5262/deployment-receipt.json",
+        "evidence/public-site-deployments/1ce7c35975a4011fa844e8b39ccbc950c8c0f398/deployment-receipt.json",
         "code/ops/VERIFY_PUBLIC_SITE_DEPLOYMENT_RECEIPT.py",
         ".github/workflows/public-site-deployment-receipt.yml",
         ".github/workflows/public-site-exact-snapshot-ci.yml",
         ".github/workflows/deploy-public-site-release.yml"
       ],
-      "proves": "Named release commit e513f65a219a12e539d9f7dd3ea47a6a081c5262 passed the human-gated deployment, 43-of-43 exact live-byte verification, security-header verification, and an independent read-only post-deployment audit, with retained first-party receipts.",
+      "proves": "Current named release commit 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 passed the human-gated deployment with rollback capture, 43-of-43 exact live-byte verification, and a separate read-only post-deployment audit; prior release e513f65a remains in the append-only first-party receipt history.",
       "does_not_prove": "That any later checked-out commit currently matches the named live release or that its runtime, gateway, private services, or broader platform are production-certified.",
       "next_gate": "Repeat the human-gated exact-snapshot release and independent read-only audit for every later public release; separately inventory and assess runtime and gateway layers."
     },

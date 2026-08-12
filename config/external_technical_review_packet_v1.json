@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.external_technical_review_packet_config.v1",
-  "generated_at_utc": "2026-08-08T07:07:49Z",
+  "generated_at_utc": "2026-08-10T13:50:36Z",
   "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
   "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
   "controls": {
@@ -70,49 +70,89 @@
       "label": "Reviewer home",
       "url": "https://lumen-core.ai/",
       "observed_http_status": 200,
-      "verified_at_utc": "2026-08-08T07:07:49Z",
-      "demo": true,
-      "limitation": "A successful HTTP response proves reachability at the observation time, not uptime, adoption, or product acceptance."
+      "verified_at_utc": "2026-08-10T13:50:06Z",
+      "expected_content_type": "text/html",
+      "required_text": "Proof-backed decision infrastructure",
+      "demo": false,
+      "limitation": "The bounded reviewer home was reachable with its declared content marker at the stated time. This does not establish sustained uptime, adoption, product acceptance, or external validation."
+    },
+    {
+      "label": "Proof-to-Pilot review path",
+      "url": "https://lumen-core.ai/proof_to_pilot.html",
+      "observed_http_status": 200,
+      "verified_at_utc": "2026-08-10T13:50:06Z",
+      "expected_content_type": "text/html",
+      "required_text": "One candidate. One accepted baseline. One decision you can defend.",
+      "demo": false,
+      "limitation": "The bounded offer page was reachable with its declared content marker at the stated time. This does not establish buyer acceptance, a pilot, field performance, or external validation."
+    },
+    {
+      "label": "External replication docket",
+      "url": "https://lumen-core.ai/external_review.html",
+      "observed_http_status": 200,
+      "verified_at_utc": "2026-08-10T13:50:06Z",
+      "expected_content_type": "text/html",
+      "required_text": "External replication docket v1",
+      "demo": false,
+      "limitation": "The external-review doorway was reachable with its declared content marker at the stated time. No evaluator is assigned and no independent execution or external validation is established."
+    },
+    {
+      "label": "Evidence boundary",
+      "url": "https://lumen-core.ai/evidence/",
+      "observed_http_status": 200,
+      "verified_at_utc": "2026-08-10T13:50:06Z",
+      "expected_content_type": "text/html",
+      "required_text": "Evidence boundary:",
+      "demo": false,
+      "limitation": "The bounded evidence index was reachable with its declared content marker at the stated time. Its first-party records are not independent reproduction or external validation."
     },
     {
       "label": "ProofLock Console",
       "url": "https://lumen-core.ai/build_week/prooflock_console/",
       "observed_http_status": 200,
-      "verified_at_utc": "2026-08-08T07:07:49Z",
+      "verified_at_utc": "2026-08-10T13:50:06Z",
+      "expected_content_type": "text/html",
+      "required_text": "ProofLock Console",
       "demo": true,
       "limitation": "The public console is a demonstrator and does not prove external validation or production readiness."
     },
     {
-      "label": "Mission Control",
-      "url": "https://lumen-core.ai/mission_control.html",
-      "observed_http_status": 200,
-      "verified_at_utc": "2026-08-08T07:07:49Z",
-      "demo": false,
-      "limitation": "The page is a public status surface; its existence is not evidence that every underlying service is healthy."
-    },
-    {
-      "label": "Funding dashboard",
-      "url": "https://lumen-core.ai/grants.html",
-      "observed_http_status": 200,
-      "verified_at_utc": "2026-08-08T07:07:49Z",
-      "demo": false,
-      "limitation": "The dashboard reports workflow state and does not establish eligibility, submission, selection, or award."
-    },
-    {
       "label": "Dynamic health endpoint",
       "url": "https://lumen-core.ai/health",
-      "observed_http_status": 502,
-      "verified_at_utc": "2026-08-08T07:07:49Z",
+      "observed_http_status": 200,
+      "verified_at_utc": "2026-08-10T13:50:06Z",
+      "expected_content_type": "application/json",
+      "required_json": {
+        "status": "ok",
+        "service": "luma-experience-gateway",
+        "access_boundary": "operator_api_v1",
+        "public_surface": "minimal"
+      },
       "demo": false,
-      "limitation": "The dynamic gateway is currently degraded and must not be represented as healthy."
+      "limitation": "HTTP 200 and the minimal public JSON contract were observed at the stated time. This is point-in-time gateway liveness only; it does not establish the recovery cause, sustained uptime, current-main deployment parity, end-to-end dependency health, production readiness, or external validation."
+    },
+    {
+      "label": "Public status endpoint",
+      "url": "https://lumen-core.ai/api/public/status",
+      "observed_http_status": 200,
+      "verified_at_utc": "2026-08-10T13:50:06Z",
+      "expected_content_type": "application/json",
+      "required_json": {
+        "status": "ok",
+        "service": "luma-experience-gateway",
+        "access_boundary": "operator_api_v1",
+        "public_surface": "minimal"
+      },
+      "demo": false,
+      "limitation": "HTTP 200 and the minimized public JSON contract were observed at the stated time. This is point-in-time reachability only; it does not establish sustained uptime, current-main deployment parity, broader service health, production readiness, or external validation."
     }
   ],
   "draft_references": [
     {
-      "label": "Engine commercialization audit",
+      "label": "Superseded engine commercialization audit",
       "url": "https://github.com/robertashworth1986-debug/lumen-core-public/pull/77",
-      "state": "DRAFT_PR_NOT_MERGED",
-      "use": "Optional discussion aid for product-lane prioritization; do not describe it as main-branch state."
+      "state": "CLOSED_UNMERGED",
+      "use": "Historical branch-only context: PR #77 was closed without merge and superseded by merged PR #132. Do not use it as packet evidence or describe it as main-branch state."
     }
   ],
   "agenda": [
@@ -247,10 +287,11 @@
     "No fit is found; record why and close the lane without implying endorsement."
   ],
   "known_gaps": [
-    "The dynamic public health endpoint returned HTTP 502 at the recorded observation time.",
+    "Only point-in-time HTTP 200 and minimal-contract observations exist for /health and /api/public/status; the recovery cause, sustained uptime, end-to-end dependency health, and current-main deployment parity remain unestablished.",
+    "The live legacy dashboard routes did not contain the current-main PR #164 HOLD marker at the August 10 observation, so exact-snapshot static release parity remains unreconciled.",
     "The reproducibility receipts are first-party or operator-controlled, not independent external validation.",
     "The adversarial scenarios are bounded local replays, not active penetration testing or proof of production security.",
-    "The engine commercialization inventory is in a draft pull request and is not main-branch state.",
+    "PR #77 was closed without merge and superseded by merged PR #132; its branch-only contents are excluded from this packet.",
     "No recurring subscription, buyer acceptance, field deployment, realized savings, or valuation is established."
   ],
   "claims_not_to_make": [

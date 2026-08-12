@@ -5,6 +5,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import re
 import subprocess
 
 import pytest
@@ -261,10 +262,29 @@ def test_guide_must_keep_slsa_and_live_deployment_boundaries(tmp_path):
         )
 
 
-def test_exact_snapshot_ci_tracks_both_machine_release_files():
-    workflow = EXACT_SNAPSHOT_CI.read_text(encoding="utf-8")
-    assert workflow.count("dashboard/reviewer_docket.json") == 2
-    assert workflow.count("dashboard/manifest.json") == 2
+def test_pr_and_main_gates_track_every_release_file():
+    for workflow_path in (EXACT_SNAPSHOT_CI, WORKFLOW_PATH):
+        workflow = workflow_path.read_text(encoding="utf-8")
+        trigger = workflow.split("permissions:", maxsplit=1)[0]
+        event_blocks = (
+            trigger.split("pull_request:", maxsplit=1)[1].split("push:", maxsplit=1)[0],
+            trigger.split("push:", maxsplit=1)[1],
+        )
+        for event_block in event_blocks:
+            patterns = re.findall(
+                r"^\s+- ['\"]([^'\"]+)['\"]$", event_block, re.MULTILINE
+            )
+            uncovered = []
+            for path in PACKAGER.RELEASE_PATHS:
+                covered = any(
+                    path.startswith(pattern[:-2])
+                    if pattern.endswith("/**")
+                    else path == pattern
+                    for pattern in patterns
+                )
+                if not covered:
+                    uncovered.append(path)
+            assert uncovered == []
 
 
 def test_output_symlink_is_rejected_when_supported(tmp_path):

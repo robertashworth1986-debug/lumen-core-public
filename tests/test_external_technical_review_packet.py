@@ -66,26 +66,55 @@ def test_text_evidence_digest_and_size_are_line_ending_stable(tmp_path):
     )
 
 
-def test_public_snapshot_discloses_the_degraded_dynamic_endpoint():
+def test_public_snapshot_uses_only_current_bounded_contract_surfaces():
     module = load_module()
     payload = module.build_payload(module.read_json(CONFIG))
     by_label = {row["label"]: row for row in payload["public_surfaces"]}
+    urls = {row["url"] for row in payload["public_surfaces"]}
 
-    assert payload["summary"]["public_surface_count"] == 5
-    assert payload["summary"]["degraded_surface_count"] == 1
-    assert by_label["Dynamic health endpoint"]["observed_http_status"] == 502
-    assert by_label["Dynamic health endpoint"]["demo"] is False
+    assert payload["summary"]["public_surface_count"] == 7
+    assert payload["summary"]["demo_surface_count"] == 1
+    assert payload["summary"]["degraded_surface_count"] == 0
+    assert by_label["Dynamic health endpoint"]["observed_http_status"] == 200
+    assert by_label["Public status endpoint"]["observed_http_status"] == 200
+    assert by_label["Dynamic health endpoint"]["required_json"]["status"] == "ok"
+    assert by_label["External replication docket"]["required_text"] == (
+        "External replication docket v1"
+    )
     assert all(row["url"].startswith("https://") for row in by_label.values())
+    assert "https://lumen-core.ai/mission_control.html" not in urls
+    assert "https://lumen-core.ai/grants.html" not in urls
+
+
+def test_packet_rejects_retired_public_surfaces():
+    module = load_module()
+    config = module.read_json(CONFIG)
+
+    for path in module.RETIRED_PUBLIC_SURFACE_PATHS:
+        retired = copy.deepcopy(config)
+        retired["public_surfaces"].append(
+            copy.deepcopy(retired["public_surfaces"][0])
+        )
+        retired["public_surfaces"][-1]["url"] = f"https://lumen-core.ai{path}"
+
+        with pytest.raises(module.ReviewPacketError, match="RETIRED_PUBLIC_SURFACE:"):
+            module.build_payload(retired)
 
 
 def test_live_surface_verification_accepts_the_exact_bounded_snapshot(monkeypatch):
     module = load_module()
     config = module.read_json(CONFIG)
     expected = {
-        row["url"]: row["observed_http_status"] for row in config["public_surfaces"]
+        row["url"]: {
+            "observed_status": row["observed_http_status"],
+            "observed_content_type": row["expected_content_type"],
+            "content_type_match": True,
+            "contract_match": True,
+        }
+        for row in config["public_surfaces"]
     }
     monkeypatch.setattr(
-        module, "observe_http_status", lambda url: expected[url]
+        module, "observe_public_surface", lambda row: expected[row["url"]]
     )
 
     observed = module.verify_live_surfaces(config)
@@ -98,32 +127,65 @@ def test_live_surface_verification_fails_closed_on_status_drift(monkeypatch):
     module = load_module()
     config = module.read_json(CONFIG)
     expected = {
-        row["url"]: row["observed_http_status"] for row in config["public_surfaces"]
+        row["url"]: {
+            "observed_status": row["observed_http_status"],
+            "observed_content_type": row["expected_content_type"],
+            "content_type_match": True,
+            "contract_match": True,
+        }
+        for row in config["public_surfaces"]
     }
     drift_url = config["public_surfaces"][0]["url"]
+    expected[drift_url]["observed_status"] = 503
     monkeypatch.setattr(
         module,
-        "observe_http_status",
-        lambda url: 503 if url == drift_url else expected[url],
+        "observe_public_surface",
+        lambda row: expected[row["url"]],
     )
 
     try:
         module.verify_live_surfaces(config)
     except module.ReviewPacketError as exc:
-        assert str(exc).startswith("LIVE_SURFACE_STATUS_DRIFT:")
+        assert str(exc).startswith("LIVE_SURFACE_CONTRACT_DRIFT:")
         assert f"{drift_url}=503" in str(exc)
     else:
         raise AssertionError("live status drift must fail closed")
 
 
-def test_packet_keeps_draft_and_external_evidence_boundaries_explicit():
+def test_live_surface_verification_fails_closed_on_content_drift(monkeypatch):
+    module = load_module()
+    config = module.read_json(CONFIG)
+    drift_url = config["public_surfaces"][0]["url"]
+
+    def observation(row):
+        return {
+            "observed_status": row["observed_http_status"],
+            "observed_content_type": row["expected_content_type"],
+            "content_type_match": True,
+            "contract_match": row["url"] != drift_url,
+        }
+
+    monkeypatch.setattr(module, "observe_public_surface", observation)
+
+    with pytest.raises(
+        module.ReviewPacketError,
+        match=r"LIVE_SURFACE_CONTRACT_DRIFT:.*contract=false",
+    ):
+        module.verify_live_surfaces(config)
+
+
+def test_packet_keeps_historical_and_external_evidence_boundaries_explicit():
     module = load_module()
     payload = module.build_payload(module.read_json(CONFIG))
     markdown = module.render_markdown(payload)
+    reference = payload["draft_references"][0]
 
-    assert payload["draft_references"][0]["state"] == "DRAFT_PR_NOT_MERGED"
+    assert reference["state"] == "CLOSED_UNMERGED"
+    assert "closed without merge" in reference["use"]
+    assert "superseded by merged PR #132" in reference["use"]
+    assert "Do not use it as packet evidence" in reference["use"]
     assert "not independent external validation" in markdown
-    assert "not main-branch state" in markdown
+    assert "branch-only contents are excluded" in markdown
     assert "does not establish attendance" in markdown
     assert "Do not send another reply or invitation" in markdown
     assert "meeting link" not in markdown.lower()

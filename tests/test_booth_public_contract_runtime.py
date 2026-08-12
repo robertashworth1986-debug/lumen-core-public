@@ -4,6 +4,7 @@ import ast
 import copy
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -276,6 +277,42 @@ def test_health_probe_classifies_static_and_dynamic_surfaces() -> None:
     health = (ROOT / ".github" / "workflows" / "health-probe.yml").read_text(
         encoding="utf-8"
     )
+    static_function = re.search(
+        r"check_static_endpoint\(\) \{(?P<body>.*?)\n\s+\}\n\n\s+check_json_endpoint",
+        health,
+        flags=re.DOTALL,
+    )
+    assert static_function is not None
+    static_body = static_function.group("body")
+    assert '--output "$body"' in static_body
+    assert "--output /dev/null" not in static_body
+    assert '--max-filesize "$STATIC_MAX_BYTES"' in static_body
+    assert '"${content_type,,}" == text/html*' in static_body
+    assert 'grep -Fq -- "$marker" "$body"' in static_body
+    assert "contract_ok:$contract_ok" in static_body
+    assert "http_ok:$http_ok" in static_body
+    assert health.count("check_static_endpoint ") == 13
+    for marker in (
+        "proof-to-pilot-home-v1",
+        "bounded-validation-offer-v1",
+        "external-replication-docket-v1",
+        "proof-to-pilot-evidence-v1",
+        "<title>ProofLock Console</title>",
+        "legacy-public-route-hold-v1",
+    ):
+        assert marker in health
+    for retired_path in (
+        "mission_control.html",
+        "quant_lab.html",
+        "kraken_execution_dashboard.html",
+        "grants.html",
+        "forecast.html",
+        "anomalies.html",
+        "explain.html",
+        "lab.html",
+    ):
+        assert f"https://lumen-core.ai/{retired_path}" in health
+    assert "agent_approval_hub.html" not in health
     assert "https://lumen-core.ai/api/public/status" in health
     assert "https://lumen-core.ai/health" in health
     assert "https://lumen-core.ai/api/snapshot" not in health
@@ -284,6 +321,68 @@ def test_health_probe_classifies_static_and_dynamic_surfaces() -> None:
     assert "contract_ok" in health
     assert "luma-experience-gateway" in health
     assert "operator_api_v1" in health
+
+
+def test_health_probe_static_contract_fails_closed() -> None:
+    if not Path("/bin/bash").is_file():
+        return
+
+    health = (ROOT / ".github" / "workflows" / "health-probe.yml").read_text(
+        encoding="utf-8"
+    )
+    match = re.search(
+        r"check_static_endpoint\(\) \{(?P<body>.*?)\n\s+\}\n\n\s+check_json_endpoint",
+        health,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    function_source = "check_static_endpoint() {" + match.group("body") + "\n}"
+    harness = (
+        """
+set -euo pipefail
+CURL_TIMEOUT_SECONDS=10
+STATIC_MAX_BYTES=1048576
+curl() {
+  local output=""
+  while (( $# )); do
+    if [[ "$1" == "--output" ]]; then
+      output=$2
+      shift 2
+    else
+      shift
+    fi
+  done
+  [[ -n "$output" ]]
+  printf '%s' "$FAKE_BODY" > "$output"
+  printf '200\\t%s' "$FAKE_CONTENT_TYPE"
+}
+"""
+        + function_source
+        + "\ncheck_static_endpoint fixture https://example.invalid/ home\n"
+    )
+
+    cases = (
+        ("<meta content='proof-to-pilot-home-v1'>", "text/html; charset=utf-8", True),
+        ("<html>wrong release</html>", "text/html; charset=utf-8", False),
+        ("proof-to-pilot-home-v1", "text/plain", False),
+    )
+    for body, content_type, expected_contract in cases:
+        completed = subprocess.run(
+            ["/bin/bash", "-c", harness],
+            check=True,
+            capture_output=True,
+            text=True,
+            env={
+                "PATH": "/usr/local/bin:/usr/bin:/bin",
+                "FAKE_BODY": body,
+                "FAKE_CONTENT_TYPE": content_type,
+            },
+        )
+        row = json.loads(completed.stdout)["value"]
+        assert row["http_ok"] is True
+        assert row["reachable"] is True
+        assert row["contract_ok"] is expected_contract
+        assert row["ok"] is expected_contract
 
 
 def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None:

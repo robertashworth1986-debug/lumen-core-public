@@ -49,7 +49,7 @@ incident. Those conditions require human investigation and classification.
 The read-only `Audit exact public-site snapshot` workflow runs on relevant main
 changes, daily, and on manual dispatch. It:
 
-1. packages the 30 allowlisted files from immutable Git blobs;
+1. packages the 43 allowlisted files from immutable Git blobs;
 2. binds the commit, Git object IDs, sizes, hashes, archive hash, and target;
 3. downloads every canonical live URL without using credentials;
 4. checks HTTP status, allowed MIME type, bytes, and SHA-256;
@@ -130,7 +130,7 @@ not evidence of a completed live restoration, backup recovery, customer
 notification, disaster-recovery exercise, or independent audit.
 
 A future live exercise must record authorization time, start time, affected
-commit, rollback capture, restoration time, all 30 route results, deviations,
+commit, rollback capture, restoration time, all 43 route results, deviations,
 communications decisions, unresolved gates, and incident-closure authority.
 
 ## Machine commands

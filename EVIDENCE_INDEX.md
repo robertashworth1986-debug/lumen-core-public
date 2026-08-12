@@ -57,16 +57,17 @@ prepared, buyer-specific, and open-gap states. It does not claim certification,
 full framework conformance, external audit, penetration testing, or production
 authorization.
 
-The public-site supply-chain lane inventories all 30 exact-release files in a
+The public-site supply-chain lane inventories all 43 current exact-release files in a
 deterministic CycloneDX 1.6 document. Pull-request artifacts remain unsigned;
 the separate `main` job is authorized to create GitHub OIDC/Sigstore build and
 SBOM attestations and verify them against the repository, workflow, ref, source
 digest, and GitHub-hosted runner. This is not a complete product or VPS SBOM,
 a SLSA level, or proof that the live domain matches the archive. The first
-retained successful attestation set is bound to merge commit
+retained successful attestation set is bound to the historical 30-file release at merge commit
 `5fff567c11bee65b5b1de5415d8b8935cd2dfab0`; its public receipt records the
 successful provenance and SBOM verification while preserving the live-domain
-`HOLD` after a 16-match, 12-mismatch, 2-error exact-path audit.
+`HOLD` after a 16-match, 12-mismatch, 2-error exact-path audit. It does not sign
+or attest the current 43-file release.
 
 The repository security-assurance lane configures pinned CodeQL analysis for
 Python and JavaScript/TypeScript, a fail-closed high-or-critical dependency
