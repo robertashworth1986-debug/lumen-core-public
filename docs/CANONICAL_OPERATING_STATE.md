@@ -396,6 +396,9 @@ A receipt proves delivery only. It does not prove selection, technical validatio
 - **PR #164** — merged eight noindex HOLD stubs at `f7662d5`; those files are included in named release `1ce7c359` and its 43-of-43 live receipt.
 - **PR #167** — merged the 43-file exact public-release controls at `1ce7c359`; the separately gated deployment and read-only audit succeeded.
 - **PR #168** — merged append-only deployment receipt history at `5e03e6c9`; the broader platform remains `HOLD`.
+- **PR #181** — merged the two guarded VPS repair controls at `40a0463e`; the merge established code and approval boundaries, not execution of either live repair.
+- **PR #183** — merged the exact remote repository-security assurance at `6a22b2f7`; the bounded checks passed, while one historical provider-key alert and unenforced `main` protection remain visible `HOLD` gates.
+- **PR #184** — merged the newest read-only VPS-runtime receipt into this canonical state at `e4a4aeaa`; the observed runtime verdict remains `ACTION_REQUIRED`, and no VPS mutation was authorized or attempted.
 - **PR #64** — superseded by PR #74 and remains conflicted; do not promote it as the current reviewer target.
 - **PR #49** — focused external-evaluation protocol candidate.
 - **PR #35** — bounded commercial validation-sprint candidate; pricing and traction remain unvalidated.
@@ -434,11 +437,15 @@ threshold, and go/no-go decision. EPRI / OPAI and EC remain under no-duplicate
 holds unless they make a new substantive request.
 
 The named public static release is reconciled at `1ce7c359`, but broader
-production promotion remains `HOLD`. The August 10 gateway observations prove
-point-in-time liveness only, so do not describe the gateway as currently
-returning HTTP 502 or as source-closure verified. Continue read-only gateway
-commit/source-closure reconciliation and do not dispatch a historical repair
-without a fresh failure and its existing approval gate.
+production promotion remains `HOLD`. The August 12 read-only runtime receipt
+against `6a22b2f7`, now recorded on `main` at `e4a4aeaa`, proves only the exact
+point-in-time endpoint, identity, source-parity, worker, ledger, and capacity
+observations stated above. Do not describe the gateway as down, repaired,
+source-complete, or production-authorized. The only prepared live changes are
+`REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE` and
+`REPAIR_PAPER_TICKER_LEDGER_OWNERSHIP`; neither may be dispatched until the
+private HumanUnlock secret exists and Robert gives fresh target-specific
+authorization at action time.
 
 The next product and revenue gate is one paid or independently executed
 Buyer-Owned Baseline Validation Sprint through the existing PR #74 reviewer
