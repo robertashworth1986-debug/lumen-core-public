@@ -31,6 +31,7 @@ TOP_LEVEL_FIELDS = {
     "decision",
     "production_decision",
     "controls",
+    "remote_observation",
     "claim_boundaries",
 }
 CONTROL_FIELDS = {
@@ -47,6 +48,10 @@ EXPECTED_CONTROL_STATUS = {
     "dependency_update_automation": "configured_first_party",
     "private_reporting": "documented_control",
     "triage_remediation_and_exceptions": "documented_control",
+    "secret_scanning_and_push_protection": (
+        "configured_remote_with_open_historical_provider_gate"
+    ),
+    "default_branch_protection": "remote_gap_observed",
 }
 REQUIRED_LIMITATION_MARKER = {
     "code_scanning": "vulnerability-free",
@@ -55,6 +60,8 @@ REQUIRED_LIMITATION_MARKER = {
     "dependency_update_automation": "automatic merge",
     "private_reporting": "response-time guarantee",
     "triage_remediation_and_exceptions": "vps",
+    "secret_scanning_and_push_protection": "provider rotation",
+    "default_branch_protection": "branch protection is configured",
 }
 REQUIRED_BOUNDARIES = {
     "no_vulnerability_free_claim",
@@ -64,6 +71,47 @@ REQUIRED_BOUNDARIES = {
     "no_vps_gateway_or_runtime_scan",
     "no_production_authorization",
     "no_automatic_merge_or_deployment",
+    "no_provider_rotation_or_revocation_claim",
+    "no_git_history_remediation_claim",
+    "no_zero_secret_alert_claim",
+    "no_branch_protection_claim",
+}
+REMOTE_OBSERVATION_FIELDS = {
+    "observed_utc",
+    "observed_main_commit",
+    "security_features",
+    "open_alerts",
+    "secret_scanning_triage",
+    "default_branch_protection",
+}
+SECURITY_FEATURE_FIELDS = {
+    "dependabot_security_updates",
+    "secret_scanning",
+    "secret_scanning_push_protection",
+}
+OPEN_ALERT_FIELDS = {"dependabot", "code_scanning", "secret_scanning"}
+SECRET_TRIAGE_FIELDS = {
+    "resolved_false_positive_alert_count",
+    "resolved_false_positive_alert_numbers",
+    "resolved_false_positive_type",
+    "verified_historical_location_count",
+    "generator_expression",
+    "current_tracked_occurrence_count",
+    "remaining_alert",
+}
+REMAINING_ALERT_FIELDS = {
+    "number",
+    "type",
+    "validity",
+    "scope",
+    "provider_rotation_confirmed",
+    "git_history_remediation_confirmed",
+}
+BRANCH_PROTECTION_FIELDS = {
+    "main_protected",
+    "required_status_checks_enforced",
+    "required_pull_request_reviews_enforced",
+    "decision",
 }
 CODEQL_SHA = "5595ccaf912efad79be6eef63a5619ff05969be3"
 DEPENDENCY_REVIEW_SHA = "a1d282b36b6f3519aa1f3fc636f609c47dddb294"
@@ -259,10 +307,80 @@ def verify_dossier(text: str) -> None:
         "do **not** establish a vulnerability-free codebase",
         "VPS operating system",
         "authorized independent penetration test",
+        "Alert 1 remains open.",
+        "default `main` branch was not protected",
+        "no non-secret provider",
     )
     for marker in required:
         if marker not in text:
             raise SecurityAssuranceError(f"security dossier missing: {marker}")
+
+
+def verify_remote_observation(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict) or set(value) != REMOTE_OBSERVATION_FIELDS:
+        raise SecurityAssuranceError("remote observation fields mismatch")
+    _parse_utc(value["observed_utc"], "remote_observation.observed_utc")
+    commit = _require_text(
+        value["observed_main_commit"], "remote_observation.observed_main_commit"
+    ).lower()
+    if len(commit) != 40 or any(
+        character not in "0123456789abcdef" for character in commit
+    ):
+        raise SecurityAssuranceError("remote observation commit must be a full SHA")
+
+    features = value["security_features"]
+    if not isinstance(features, dict) or set(features) != SECURITY_FEATURE_FIELDS:
+        raise SecurityAssuranceError("remote security feature fields mismatch")
+    if any(features[field] != "enabled" for field in SECURITY_FEATURE_FIELDS):
+        raise SecurityAssuranceError("remote security feature status drift")
+
+    alerts = value["open_alerts"]
+    if not isinstance(alerts, dict) or set(alerts) != OPEN_ALERT_FIELDS:
+        raise SecurityAssuranceError("remote open-alert fields mismatch")
+    if alerts != {"dependabot": 0, "code_scanning": 0, "secret_scanning": 1}:
+        raise SecurityAssuranceError("remote open-alert snapshot drift")
+
+    triage = value["secret_scanning_triage"]
+    if not isinstance(triage, dict) or set(triage) != SECRET_TRIAGE_FIELDS:
+        raise SecurityAssuranceError("secret-scanning triage fields mismatch")
+    expected_numbers = list(range(2, 30))
+    if triage["resolved_false_positive_alert_count"] != len(expected_numbers):
+        raise SecurityAssuranceError("false-positive alert count mismatch")
+    if triage["resolved_false_positive_alert_numbers"] != expected_numbers:
+        raise SecurityAssuranceError("false-positive alert number set mismatch")
+    if triage["resolved_false_positive_type"] != "GoCardless Live Access Token":
+        raise SecurityAssuranceError("false-positive alert type mismatch")
+    if triage["verified_historical_location_count"] != 51:
+        raise SecurityAssuranceError("historical alert location count mismatch")
+    if triage["generator_expression"] != "live_domain_proof_feeds_<UTC_STAMP>":
+        raise SecurityAssuranceError("stage-identifier generator mismatch")
+    if triage["current_tracked_occurrence_count"] != 0:
+        raise SecurityAssuranceError("current tracked secret occurrence must remain zero")
+
+    remaining = triage["remaining_alert"]
+    if not isinstance(remaining, dict) or set(remaining) != REMAINING_ALERT_FIELDS:
+        raise SecurityAssuranceError("remaining alert fields mismatch")
+    if remaining != {
+        "number": 1,
+        "type": "Google API Key",
+        "validity": "unknown",
+        "scope": "historical_only_current_tree_absent",
+        "provider_rotation_confirmed": False,
+        "git_history_remediation_confirmed": False,
+    }:
+        raise SecurityAssuranceError("remaining historical provider gate drift")
+
+    branch = value["default_branch_protection"]
+    if not isinstance(branch, dict) or set(branch) != BRANCH_PROTECTION_FIELDS:
+        raise SecurityAssuranceError("branch-protection observation fields mismatch")
+    if branch != {
+        "main_protected": False,
+        "required_status_checks_enforced": False,
+        "required_pull_request_reviews_enforced": False,
+        "decision": "HOLD_ACCOUNT_SETTING_REQUIRES_FOUNDER",
+    }:
+        raise SecurityAssuranceError("branch-protection gap must remain explicit")
+    return value
 
 
 def _git_commit(root: Path) -> str | None:
@@ -296,14 +414,17 @@ def verify_register(
     register = read_json(register_path)
     if set(register) != TOP_LEVEL_FIELDS:
         raise SecurityAssuranceError("top-level register fields mismatch")
-    if register["schema_version"] != "1.0":
-        raise SecurityAssuranceError("schema_version must be 1.0")
+    if register["schema_version"] != "1.1":
+        raise SecurityAssuranceError("schema_version must be 1.1")
     _parse_utc(register["generated_utc"], "generated_utc")
     if register["repository"] != "robertashworth1986-debug/lumen-core-public":
         raise SecurityAssuranceError("canonical repository mismatch")
     if register["scope"] != "public_repository_source_and_declared_dependencies":
         raise SecurityAssuranceError("scope mismatch")
-    if register["decision"] != "CONFIGURED_FIRST_PARTY_SECURITY_CONTROLS_WITH_OPEN_RUNTIME_GAPS":
+    if register["decision"] != (
+        "CONFIGURED_FIRST_PARTY_SECURITY_CONTROLS_WITH_OPEN_CREDENTIAL_"
+        "HISTORY_RUNTIME_AND_BRANCH_PROTECTION_GAPS"
+    ):
         raise SecurityAssuranceError("decision mismatch")
     if register["production_decision"] != "HOLD":
         raise SecurityAssuranceError("production decision must remain HOLD")
@@ -353,6 +474,7 @@ def verify_register(
         raise SecurityAssuranceError("claim boundaries mismatch")
     if len(boundaries) != len(set(boundaries)):
         raise SecurityAssuranceError("duplicate claim boundary")
+    remote_observation = verify_remote_observation(register["remote_observation"])
 
     verify_codeql_workflow(codeql_path.read_text(encoding="utf-8"))
     verify_dependency_review_workflow(
@@ -385,7 +507,15 @@ def verify_register(
             "dependency_failure_threshold": "high",
             "automatic_merge": False,
             "runtime_scan": False,
+            "secret_scanning_enabled": True,
+            "secret_scanning_push_protection_enabled": True,
+            "open_secret_scanning_alert_count": remote_observation["open_alerts"][
+                "secret_scanning"
+            ],
+            "provider_rotation_confirmed": False,
+            "default_branch_protection_enforced": False,
         },
+        "remote_observation": remote_observation,
     }
     canonical = json.dumps(
         receipt, sort_keys=True, separators=(",", ":"), allow_nan=False

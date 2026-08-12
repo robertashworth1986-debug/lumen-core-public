@@ -10,11 +10,14 @@ on:
       - '.github/workflows/repository-security-assurance.yml'
       - 'SECURITY.md'
       - 'code/ops/VERIFY_REPOSITORY_SECURITY_ASSURANCE.py'
+      - 'code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py'
       - 'config/repository_security_assurance_v1.json'
+      - 'config/public_credential_remediation_status_v1.json'
       - 'docs/REPOSITORY_SECURITY_ASSURANCE.md'
       - 'dashboard/package.json'
       - 'dashboard/package-lock.json'
       - 'tests/test_repository_security_assurance.py'
+      - 'tests/test_public_repo_credential_hygiene.py'
       - 'README.md'
       - 'EVIDENCE_INDEX.md'
       - 'docs/REVIEWER_START_HERE.md'
@@ -27,11 +30,14 @@ on:
       - '.github/workflows/repository-security-assurance.yml'
       - 'SECURITY.md'
       - 'code/ops/VERIFY_REPOSITORY_SECURITY_ASSURANCE.py'
+      - 'code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py'
       - 'config/repository_security_assurance_v1.json'
+      - 'config/public_credential_remediation_status_v1.json'
       - 'docs/REPOSITORY_SECURITY_ASSURANCE.md'
       - 'dashboard/package.json'
       - 'dashboard/package-lock.json'
       - 'tests/test_repository_security_assurance.py'
+      - 'tests/test_public_repo_credential_hygiene.py'
       - 'README.md'
       - 'EVIDENCE_INDEX.md'
       - 'docs/REVIEWER_START_HERE.md'
@@ -62,14 +68,19 @@ jobs:
       - name: Compile verifier and adversarial tests
         run: |
           python -m py_compile code/ops/VERIFY_REPOSITORY_SECURITY_ASSURANCE.py
+          python -m py_compile code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py
           python -m py_compile tests/test_repository_security_assurance.py
+          python -m py_compile tests/test_public_repo_credential_hygiene.py
 
       - name: Verify bounded security controls
         run: |
           mkdir -p out/repository-security-assurance
           python code/ops/VERIFY_REPOSITORY_SECURITY_ASSURANCE.py \
-            --verified-utc 2026-08-08T14:20:00Z \
+            --verified-utc 2026-08-12T06:44:30Z \
             --json-out out/repository-security-assurance/receipt.json
+
+      - name: Verify targeted credential history remains fail-closed
+        run: python code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py --check
 
       - name: Run adversarial security-assurance tests
         run: python -m unittest discover -s tests -p 'test_repository_security_assurance.py' -v

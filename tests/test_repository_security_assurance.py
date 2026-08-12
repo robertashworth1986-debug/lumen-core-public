@@ -37,19 +37,87 @@ class RepositorySecurityAssuranceTests(unittest.TestCase):
         receipt = self.verify_payload(self.canonical_payload())
         self.assertTrue(receipt["valid"])
         self.assertEqual(receipt["production_decision"], "HOLD")
-        self.assertEqual(receipt["control_count"], 6)
-        self.assertEqual(receipt["claim_boundary_count"], 7)
+        self.assertEqual(receipt["control_count"], 8)
+        self.assertEqual(receipt["claim_boundary_count"], 11)
         self.assertFalse(receipt["workflow_boundaries"]["automatic_merge"])
         self.assertFalse(receipt["workflow_boundaries"]["runtime_scan"])
+        self.assertTrue(
+            receipt["workflow_boundaries"]["secret_scanning_enabled"]
+        )
+        self.assertTrue(
+            receipt["workflow_boundaries"][
+                "secret_scanning_push_protection_enabled"
+            ]
+        )
+        self.assertEqual(
+            receipt["workflow_boundaries"]["open_secret_scanning_alert_count"],
+            1,
+        )
+        self.assertFalse(
+            receipt["workflow_boundaries"]["provider_rotation_confirmed"]
+        )
+        self.assertFalse(
+            receipt["workflow_boundaries"][
+                "default_branch_protection_enforced"
+            ]
+        )
         self.assertEqual(len(receipt["receipt_sha256"]), 64)
+
+    def test_remote_observation_preserves_open_security_gates(self) -> None:
+        receipt = self.verify_payload(self.canonical_payload())
+        observation = receipt["remote_observation"]
+        self.assertEqual(observation["open_alerts"]["secret_scanning"], 1)
+        triage = observation["secret_scanning_triage"]
+        self.assertEqual(triage["resolved_false_positive_alert_count"], 28)
+        self.assertEqual(triage["verified_historical_location_count"], 51)
+        self.assertEqual(triage["current_tracked_occurrence_count"], 0)
+        self.assertFalse(
+            triage["remaining_alert"]["provider_rotation_confirmed"]
+        )
+        self.assertFalse(
+            triage["remaining_alert"]["git_history_remediation_confirmed"]
+        )
+        self.assertFalse(
+            observation["default_branch_protection"]["main_protected"]
+        )
+
+    def test_false_positive_count_cannot_be_inflated(self) -> None:
+        payload = self.canonical_payload()
+        payload["remote_observation"]["secret_scanning_triage"][
+            "resolved_false_positive_alert_count"
+        ] = 29
+        with self.assertRaisesRegex(
+            MODULE.SecurityAssuranceError, "false-positive alert count"
+        ):
+            self.verify_payload(payload)
+
+    def test_provider_rotation_cannot_be_promoted_without_receipt(self) -> None:
+        payload = self.canonical_payload()
+        payload["remote_observation"]["secret_scanning_triage"][
+            "remaining_alert"
+        ]["provider_rotation_confirmed"] = True
+        with self.assertRaisesRegex(
+            MODULE.SecurityAssuranceError, "historical provider gate"
+        ):
+            self.verify_payload(payload)
+
+    def test_branch_protection_gap_cannot_be_promoted_locally(self) -> None:
+        payload = self.canonical_payload()
+        payload["remote_observation"]["default_branch_protection"][
+            "main_protected"
+        ] = True
+        with self.assertRaisesRegex(
+            MODULE.SecurityAssuranceError, "branch-protection gap"
+        ):
+            self.verify_payload(payload)
 
     def test_duplicate_json_key_is_rejected(self) -> None:
         source = (ROOT / "config" / "repository_security_assurance_v1.json").read_text(
             encoding="utf-8"
         )
         duplicate = source.replace(
-            '  "schema_version": "1.0",',
-            '  "schema_version": "1.0",\n  "schema_version": "1.0",',
+            '  "schema_version": "1.1",',
+            '  "schema_version": "1.1",\n  "schema_version": "1.1",',
             1,
         )
         with tempfile.TemporaryDirectory() as tmp:
