@@ -131,7 +131,7 @@ def test_repair_workflow_is_manual_current_main_and_secret_gated() -> None:
     assert "schedule:" not in text
     assert "pull_request:" not in text
     assert "\n  push:" not in text
-    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6" in text
+    assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1" in text
     assert "shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1" in text
 
 
@@ -183,8 +183,8 @@ def test_workflows_parse_and_recovery_gate_covers_all_owned_paths() -> None:
     ):
         assert relative in ci_text
     assert "bash -n code/ops/REPAIR_PAPER_TICKER_LEDGER_ON_VPS.sh" in ci_text
-    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6" in ci_text
-    assert "actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5" in ci_text
+    assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1" in ci_text
+    assert "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0" in ci_text
 
 
 def test_diagnostic_uses_current_artifact_runtime() -> None:

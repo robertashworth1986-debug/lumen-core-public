@@ -404,7 +404,7 @@ def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None
     assert "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh" in workflow
     assert "--apply" in workflow
     assert "Remove remote repair staging" in workflow
-    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6" in workflow
+    assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1" in workflow
     assert "shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1" in workflow
     assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1" in workflow
 
@@ -416,5 +416,5 @@ def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None
     assert "Gateway Public Contract Gate" in workflow
     assert "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh" in workflow
     assert "WRONG_HASH_FAIL_CLOSED_OK" in workflow
-    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6" in workflow
-    assert "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6" in workflow
+    assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1" in workflow
+    assert "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0" in workflow

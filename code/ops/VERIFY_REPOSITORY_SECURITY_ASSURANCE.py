@@ -65,7 +65,7 @@ REQUIRED_BOUNDARIES = {
     "no_production_authorization",
     "no_automatic_merge_or_deployment",
 }
-CODEQL_SHA = "7211b7c8077ea37d8641b6271f6a365a22a5fbfa"
+CODEQL_SHA = "5595ccaf912efad79be6eef63a5619ff05969be3"
 DEPENDENCY_REVIEW_SHA = "a1d282b36b6f3519aa1f3fc636f609c47dddb294"
 
 

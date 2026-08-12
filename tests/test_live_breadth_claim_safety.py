@@ -154,8 +154,8 @@ def test_live_breadth_claim_gate_runs_the_exact_focused_suite() -> None:
     assert "Live Breadth Claim Gate" in workflow
     assert "permissions:\n  contents: read" in workflow
     assert "persist-credentials: false" in workflow
-    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803" in workflow
-    assert "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1" in workflow
+    assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" in workflow
+    assert "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97" in workflow
     assert "pytest==9.1.0" in workflow
     for test_path in (
         "tests/test_public_live_breadth_provenance_gate.py",

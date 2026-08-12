@@ -157,9 +157,9 @@ REQUIRED_GUIDE_TEXT = (
 )
 REQUIRED_WORKFLOW_TEXT = (
     "permissions:\n  contents: read",
-    "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+    "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
     "persist-credentials: false",
-    "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+    "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
     "python code/ops/VERIFY_INSTITUTIONAL_ASSURANCE_CROSSWALK.py",
     "--json-out out/institutional-assurance-crosswalk/receipt.json",
     "test_institutional_assurance_crosswalk.py",
