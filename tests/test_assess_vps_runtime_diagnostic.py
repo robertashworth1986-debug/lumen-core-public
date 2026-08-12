@@ -29,6 +29,24 @@ def _diagnostic(*, healthy: bool) -> str:
     match_count = 20 if healthy else 19
     mismatch_count = 0 if healthy else 1
     failure = "" if healthy else "PermissionError: [Errno 13] Permission denied: ledger\n"
+    runtime_components = {
+        "runtime_os": "ol:9.6",
+        "runtime_kernel": "5.15.0-test",
+        "runtime_architecture": "x86_64",
+        "runtime_nginx": "1.26.3",
+        "runtime_python": "3.11.12",
+        "runtime_fastapi": "0.116.1",
+        "runtime_uvicorn": "0.35.0",
+    }
+    canonical_runtime_components = "".join(
+        f"{key}={value}\n" for key, value in runtime_components.items()
+    )
+    runtime_sha256 = MODULE.hashlib.sha256(
+        canonical_runtime_components.encode("utf-8")
+    ).hexdigest()
+    runtime_lines = "\n".join(
+        f"{key}={value}" for key, value in runtime_components.items()
+    )
     return f"""=== identity ===
 2026-08-12T05:36:12Z
 === public and loopback endpoint probes (status only; no bodies) ===
@@ -60,6 +78,11 @@ lock_exists=true
 lock_mode={lock_mode} lock_owner={lock_owner} lock_bytes=6
 lock_pid_matches_systemd_main=true
 === gateway executable and source preflight ===
+=== bounded runtime component fingerprint ===
+runtime_inventory_schema=lumencore.bounded_runtime_component_fingerprint.v1
+{runtime_lines}
+runtime_inventory_component_count=7
+runtime_inventory_sha256={runtime_sha256}
 === paper ticker output-path access (metadata only) ===
 --- paper_ticker_ledger ---
 symlink=false
@@ -92,7 +115,7 @@ def test_pass_requires_every_declared_runtime_contract() -> None:
 
     assert result["verdict"] == "PASS"
     assert result["summary"] == {
-        "pass_count": 7,
+        "pass_count": 8,
         "fail_count": 0,
         "unknown_count": 0,
         "failed_check_ids": [],
@@ -136,7 +159,64 @@ def test_missing_observations_fail_closed_as_indeterminate() -> None:
 
     assert result["verdict"] == "INDETERMINATE"
     assert result["summary"]["fail_count"] == 0
-    assert result["summary"]["unknown_count"] == 7
+    assert result["summary"]["unknown_count"] == 8
+
+
+def test_runtime_component_fingerprint_fails_closed_on_hash_drift() -> None:
+    diagnostic = _diagnostic(healthy=True).replace(
+        "runtime_python=3.11.12", "runtime_python=3.11.13"
+    )
+    result = assess(
+        diagnostic,
+        run_id="component-drift",
+        source_commit=COMMIT,
+        source_url="https://example.invalid/run/component-drift",
+    )
+
+    assert result["verdict"] == "ACTION_REQUIRED"
+    check = next(
+        item
+        for item in result["checks"]
+        if item["id"] == "bounded_runtime_component_fingerprint"
+    )
+    assert check["status"] == "FAIL"
+    assert check["observed"]["scope"] == "allowlisted_runtime_versions_not_a_complete_sbom"
+
+
+def test_runtime_component_fingerprint_rejects_missing_expected_component() -> None:
+    diagnostic = _diagnostic(healthy=True)
+    old_line = "runtime_fastapi=0.116.1"
+    new_line = "runtime_fastapi=missing"
+    diagnostic = diagnostic.replace(old_line, new_line)
+    old_sha = next(
+        line.split("=", 1)[1]
+        for line in diagnostic.splitlines()
+        if line.startswith("runtime_inventory_sha256=")
+    )
+    component_lines = [
+        line
+        for line in diagnostic.splitlines()
+        if any(line.startswith(f"{key}=") for key in MODULE.RUNTIME_COMPONENT_KEYS)
+    ]
+    new_sha = MODULE.hashlib.sha256(
+        ("\n".join(component_lines) + "\n").encode("utf-8")
+    ).hexdigest()
+    diagnostic = diagnostic.replace(old_sha, new_sha)
+
+    result = assess(
+        diagnostic,
+        run_id="component-missing",
+        source_commit=COMMIT,
+        source_url="https://example.invalid/run/component-missing",
+    )
+
+    assert result["verdict"] == "ACTION_REQUIRED"
+    check = next(
+        item
+        for item in result["checks"]
+        if item["id"] == "bounded_runtime_component_fingerprint"
+    )
+    assert check["status"] == "FAIL"
 
 
 def test_source_closure_must_name_the_exact_assessed_commit() -> None:
@@ -186,9 +266,12 @@ def test_cli_writes_hash_bound_json_and_bounded_summary(tmp_path: Path) -> None:
 
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert completed.stdout.strip() == "ACTION_REQUIRED"
-    assert payload["schema_version"] == "lumencore.vps_runtime_assessment.v1"
+    assert payload["schema_version"] == "lumencore.vps_runtime_assessment.v2"
     assert payload["verdict"] == "ACTION_REQUIRED"
     summary_text = summary.read_text(encoding="utf-8")
     assert "**Verdict:** `ACTION_REQUIRED`" in summary_text
     assert "first-party point-in-time evidence" in summary_text
     assert "Permission denied" not in summary_text
+    assert "complete product, container, operating-system, or VPS SBOM" in json.dumps(
+        payload["claim_boundary"]
+    )

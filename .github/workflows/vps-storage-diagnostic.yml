@@ -338,6 +338,54 @@ jobs:
                 2>&1 || true
             fi
 
+            echo "=== bounded runtime component fingerprint ==="
+            sanitize_component_value() {
+              printf "%s" "$1" \
+                | tr "\r\n" "  " \
+                | LC_ALL=C tr -cd "A-Za-z0-9._:+~-" \
+                | cut -c1-160
+            }
+            os_id=$(grep "^ID=" /etc/os-release 2>/dev/null | head -n 1 | cut -d= -f2- | tr -d "\"" || true)
+            os_version_id=$(grep "^VERSION_ID=" /etc/os-release 2>/dev/null | head -n 1 | cut -d= -f2- | tr -d "\"" || true)
+            nginx_version="missing"
+            if command -v nginx >/dev/null 2>&1; then
+              nginx_raw=$(nginx -v 2>&1 || true)
+              nginx_version=${nginx_raw#nginx version: nginx/}
+            fi
+            python_version="missing"
+            fastapi_version="missing"
+            uvicorn_version="missing"
+            if [[ -x /opt/lumencore/.venv/bin/python ]]; then
+              python_version=$(
+                /opt/lumencore/.venv/bin/python --version 2>&1 \
+                  | sed -E "s/^Python[[:space:]]+//" \
+                  || true
+              )
+              fastapi_version=$(
+                /opt/lumencore/.venv/bin/python -c \
+                  "import importlib.metadata as m; print(m.version(\"fastapi\"))" \
+                  2>/dev/null || printf "missing"
+              )
+              uvicorn_version=$(
+                /opt/lumencore/.venv/bin/python -c \
+                  "import importlib.metadata as m; print(m.version(\"uvicorn\"))" \
+                  2>/dev/null || printf "missing"
+              )
+            fi
+            runtime_inventory_payload=$(printf "%s\n" \
+              "runtime_os=$(sanitize_component_value "${os_id:-unknown}:${os_version_id:-unknown}")" \
+              "runtime_kernel=$(sanitize_component_value "$(uname -r 2>/dev/null || true)")" \
+              "runtime_architecture=$(sanitize_component_value "$(uname -m 2>/dev/null || true)")" \
+              "runtime_nginx=$(sanitize_component_value "${nginx_version:-missing}")" \
+              "runtime_python=$(sanitize_component_value "${python_version:-missing}")" \
+              "runtime_fastapi=$(sanitize_component_value "${fastapi_version:-missing}")" \
+              "runtime_uvicorn=$(sanitize_component_value "${uvicorn_version:-missing}")")
+            echo "runtime_inventory_schema=lumencore.bounded_runtime_component_fingerprint.v1"
+            printf "%s\n" "$runtime_inventory_payload"
+            echo "runtime_inventory_component_count=7"
+            printf "runtime_inventory_sha256=%s\n" \
+              "$(printf "%s\n" "$runtime_inventory_payload" | sha256sum | awk "{print \$1}")"
+
             echo "=== paper ticker output-path access (metadata only) ==="
             show_allowlisted_path_access stack_root /opt/lumencore
             show_allowlisted_path_access output_root /opt/lumencore/out
