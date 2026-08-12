@@ -1,9 +1,9 @@
 {
-  "schema_version": "1.0",
-  "generated_utc": "2026-08-08T14:10:00Z",
+  "schema_version": "1.1",
+  "generated_utc": "2026-08-12T06:44:30Z",
   "repository": "robertashworth1986-debug/lumen-core-public",
   "scope": "public_repository_source_and_declared_dependencies",
-  "decision": "CONFIGURED_FIRST_PARTY_SECURITY_CONTROLS_WITH_OPEN_RUNTIME_GAPS",
+  "decision": "CONFIGURED_FIRST_PARTY_SECURITY_CONTROLS_WITH_OPEN_CREDENTIAL_HISTORY_RUNTIME_AND_BRANCH_PROTECTION_GAPS",
   "production_decision": "HOLD",
   "controls": [
     {
@@ -61,8 +61,94 @@
       ],
       "establishes": "Severity, containment, remediation-target, exception-expiry, compensating-control, and closure-receipt expectations are documented for repository findings.",
       "does_not_establish": "That every finding is remediated, that the targets are contractual guarantees, or that VPS, gateway, cloud-account, secret, network, and production-runtime controls were tested."
+    },
+    {
+      "id": "secret_scanning_and_push_protection",
+      "status": "configured_remote_with_open_historical_provider_gate",
+      "evidence_paths": [
+        "config/public_credential_remediation_status_v1.json",
+        "code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py",
+        "SECURITY.md"
+      ],
+      "establishes": "An exact first-party remote observation records GitHub secret scanning and push protection enabled, 28 deterministic deployment-stage identifier false positives resolved, and one historical provider-key alert retained open while the detected value remains absent from the current tracked tree.",
+      "does_not_establish": "Provider rotation, revocation, Git-history remediation, removal from forks or caches, whole-repository secret absence, external security audit, or production authorization."
+    },
+    {
+      "id": "default_branch_protection",
+      "status": "remote_gap_observed",
+      "evidence_paths": [
+        "config/repository_security_assurance_v1.json",
+        "docs/REPOSITORY_SECURITY_ASSURANCE.md"
+      ],
+      "establishes": "The exact first-party remote observation records that the default main branch was not protected at the observation time and keeps the repository decision on HOLD.",
+      "does_not_establish": "That branch protection is configured, that direct pushes or force pushes are prevented, that reviews or status checks are enforced by GitHub settings, or that later remote state is unchanged."
     }
   ],
+  "remote_observation": {
+    "observed_utc": "2026-08-12T06:44:30Z",
+    "observed_main_commit": "54c81c8526a1193830f9881a51987c506234d896",
+    "security_features": {
+      "dependabot_security_updates": "enabled",
+      "secret_scanning": "enabled",
+      "secret_scanning_push_protection": "enabled"
+    },
+    "open_alerts": {
+      "dependabot": 0,
+      "code_scanning": 0,
+      "secret_scanning": 1
+    },
+    "secret_scanning_triage": {
+      "resolved_false_positive_alert_count": 28,
+      "resolved_false_positive_alert_numbers": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "resolved_false_positive_type": "GoCardless Live Access Token",
+      "verified_historical_location_count": 51,
+      "generator_expression": "live_domain_proof_feeds_<UTC_STAMP>",
+      "current_tracked_occurrence_count": 0,
+      "remaining_alert": {
+        "number": 1,
+        "type": "Google API Key",
+        "validity": "unknown",
+        "scope": "historical_only_current_tree_absent",
+        "provider_rotation_confirmed": false,
+        "git_history_remediation_confirmed": false
+      }
+    },
+    "default_branch_protection": {
+      "main_protected": false,
+      "required_status_checks_enforced": false,
+      "required_pull_request_reviews_enforced": false,
+      "decision": "HOLD_ACCOUNT_SETTING_REQUIRES_FOUNDER"
+    }
+  },
   "claim_boundaries": [
     "no_vulnerability_free_claim",
     "no_penetration_test",
@@ -70,6 +156,10 @@
     "no_external_security_audit",
     "no_vps_gateway_or_runtime_scan",
     "no_production_authorization",
-    "no_automatic_merge_or_deployment"
+    "no_automatic_merge_or_deployment",
+    "no_provider_rotation_or_revocation_claim",
+    "no_git_history_remediation_claim",
+    "no_zero_secret_alert_claim",
+    "no_branch_protection_claim"
   ]
 }
