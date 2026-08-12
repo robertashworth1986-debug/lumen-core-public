@@ -26,6 +26,7 @@ One calendar invitation already exists and is accepted. Do not send another repl
 | `docs/EXTERNAL_REPLICATION_DOCKET_V1.md` | Controlled non-author execution, independence, deviation, and negative-result protocol. | `FILE_PRESENT` | `3151940f4852af1d22d0ac7d0ccb387310b48e278995012a6014714e4bc0bdcd` |
 | `docs/AGENT_ARENA.md` | Synthetic adversarial holdout harness and explicit non-field-performance boundary. | `FILE_PRESENT` | `38e7ccd5c97edc4c95c281a06536beb403ccc214f09850cbcb160b2037f31452` |
 | `dashboard/build_week/prooflock_console/THREAT_MODEL.md` | ProofLock trust assumptions, covered attacks, authority boundary, and non-guarantees. | `FILE_PRESENT` | `13995a40cf5e1ef7dfcee3d9995a31cb4fa9c07ec9a86c5334079473bda16388` |
+| `evidence/public-site-deployments/1ce7c35975a4011fa844e8b39ccbc950c8c0f398/deployment-receipt.json` | Retained first-party deployment, rollback, 43-of-43 exact live-byte, and read-only audit receipt for the named static release only. | `FILE_PRESENT` | `d70224cc048de288540f1b04bb75ca5cef3ec01756ef9e965e559269f2ae1930` |
 
 The receipt statuses above are bounded first-party or operator-controlled evidence. Their own claim boundaries remain controlling.
 
@@ -101,8 +102,8 @@ Active targeting, private-system access, production load testing, and external a
 
 ## Known Gaps
 
-- Only point-in-time HTTP 200 and minimal-contract observations exist for /health and /api/public/status; the recovery cause, sustained uptime, end-to-end dependency health, and current-main deployment parity remain unestablished.
-- The live legacy dashboard routes did not contain the current-main PR #164 HOLD marker at the August 10 observation, so exact-snapshot static release parity remains unreconciled.
+- Only point-in-time HTTP 200 and minimal-contract observations exist for /health and /api/public/status; the recovery cause, sustained uptime, end-to-end dependency health, and parity for gateway, runtime, and later repository commits remain unestablished.
+- The earlier August 10 legacy-route observation is superseded for named static release 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 by its retained first-party deployment and audit receipt, which recorded all 43 allowlisted files including the eight noindex HOLD stubs as exact live-byte matches. That receipt is bounded to the named static release and does not establish external validation, runtime parity, sustained availability, or broader production authorization.
 - The reproducibility receipts are first-party or operator-controlled, not independent external validation.
 - The adversarial scenarios are bounded local replays, not active penetration testing or proof of production security.
 - PR #77 was closed without merge and superseded by merged PR #132; its branch-only contents are excluded from this packet.
