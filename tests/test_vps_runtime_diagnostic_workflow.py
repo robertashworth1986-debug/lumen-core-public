@@ -28,6 +28,8 @@ def test_pull_request_validation_cannot_enter_the_production_diagnostic_job() ->
     text = _workflow_text()
 
     assert "pull_request:" in text
+    assert "- 'code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py'" in text
+    assert "- 'tests/test_assess_vps_runtime_diagnostic.py'" in text
     assert "- 'tests/test_vps_runtime_diagnostic_workflow.py'" in text
     assert "if: github.event_name != 'pull_request'" in text
     assert "needs: validate" in text
@@ -35,6 +37,7 @@ def test_pull_request_validation_cannot_enter_the_production_diagnostic_job() ->
     assert "persist-credentials: false" in text
     assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" in text
     assert "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97" in text
+    assert "tests/test_assess_vps_runtime_diagnostic.py" in text
 
 
 def test_runtime_diagnostic_covers_gateway_failure_chain() -> None:
@@ -191,3 +194,17 @@ def test_gateway_closure_comparison_is_exact_commit_and_read_only() -> None:
     assert 'resolved=$(realpath -m -- "$target")' in text
     assert '[[ "$resolved" == "$target_root/"* ]]' in text
     assert "scp " not in text
+
+
+def test_runtime_diagnostic_publishes_a_separate_readiness_verdict() -> None:
+    text = _workflow_text()
+
+    assert "Classify bounded runtime readiness" in text
+    assert "code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py" in text
+    assert "/tmp/lumencore-vps-runtime-assessment.json" in text
+    assert "RUNTIME_VERDICT: ${{ steps.assess.outputs.verdict }}" in text
+    assert 'case "$RUNTIME_VERDICT" in' in text
+    assert "VPS runtime gate PASS; diagnostic receipt captured" in text
+    assert "VPS runtime gate ACTION_REQUIRED; diagnostic receipt captured" in text
+    assert "VPS runtime gate INDETERMINATE; diagnostic receipt captured" in text
+    assert "diagnostic/lumencore-vps-runtime" in text

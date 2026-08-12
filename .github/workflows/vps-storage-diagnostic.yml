@@ -4,11 +4,15 @@ on:
   pull_request:
     paths:
       - '.github/workflows/vps-storage-diagnostic.yml'
+      - 'code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py'
+      - 'tests/test_assess_vps_runtime_diagnostic.py'
       - 'tests/test_vps_runtime_diagnostic_workflow.py'
   push:
     branches: [main]
     paths:
       - '.github/workflows/vps-storage-diagnostic.yml'
+      - 'code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py'
+      - 'tests/test_assess_vps_runtime_diagnostic.py'
       - 'tests/test_vps_runtime_diagnostic_workflow.py'
   workflow_dispatch:
 
@@ -37,7 +41,10 @@ jobs:
       - name: Install bounded test dependency
         run: python -m pip install --disable-pip-version-check pytest==9.1.0
       - name: Verify the read-only diagnostic contract
-        run: python -m pytest -q tests/test_vps_runtime_diagnostic_workflow.py
+        run: >-
+          python -m pytest -q
+          tests/test_assess_vps_runtime_diagnostic.py
+          tests/test_vps_runtime_diagnostic_workflow.py
 
   diagnose:
     if: github.event_name != 'pull_request'
@@ -466,12 +473,39 @@ jobs:
             "opc@$VPS_HOST" 'bash -s' \
             | tee -a /tmp/lumencore-vps-runtime-diagnostic.txt
 
+      - name: Classify bounded runtime readiness
+        id: assess
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          verdict=$(
+            python code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py \
+              --input /tmp/lumencore-vps-runtime-diagnostic.txt \
+              --output /tmp/lumencore-vps-runtime-assessment.json \
+              --summary-output /tmp/lumencore-vps-runtime-assessment.md \
+              --run-id "$RUN_ID" \
+              --source-commit "$COMMIT_SHA" \
+              --source-url "$RUN_URL"
+          )
+          case "$verdict" in
+            PASS|ACTION_REQUIRED|INDETERMINATE) ;;
+            *) echo "Unexpected runtime verdict: $verdict" >&2; exit 1 ;;
+          esac
+          printf 'verdict=%s\n' "$verdict" >> "$GITHUB_OUTPUT"
+          cat /tmp/lumencore-vps-runtime-assessment.md >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload runtime diagnostic
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: lumencore-vps-runtime-${{ github.run_id }}
-          path: /tmp/lumencore-vps-runtime-diagnostic.txt
+          path: |
+            /tmp/lumencore-vps-runtime-diagnostic.txt
+            /tmp/lumencore-vps-runtime-assessment.json
+            /tmp/lumencore-vps-runtime-assessment.md
           if-no-files-found: error
           retention-days: 7
 
@@ -483,12 +517,25 @@ jobs:
           COMMIT_SHA: ${{ github.sha }}
           TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           JOB_STATUS: ${{ job.status }}
+          RUNTIME_VERDICT: ${{ steps.assess.outputs.verdict }}
         run: |
           set -euo pipefail
           case "$JOB_STATUS" in
             success)
-              STATE=success
-              DESCRIPTION="Read-only VPS runtime diagnostic completed"
+              case "$RUNTIME_VERDICT" in
+                PASS)
+                  STATE=success
+                  DESCRIPTION="VPS runtime gate PASS; diagnostic receipt captured"
+                  ;;
+                ACTION_REQUIRED)
+                  STATE=failure
+                  DESCRIPTION="VPS runtime gate ACTION_REQUIRED; diagnostic receipt captured"
+                  ;;
+                *)
+                  STATE=error
+                  DESCRIPTION="VPS runtime gate INDETERMINATE; diagnostic receipt captured"
+                  ;;
+              esac
               ;;
             cancelled)
               STATE=error
