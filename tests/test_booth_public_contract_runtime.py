@@ -273,6 +273,38 @@ def test_gateway_service_restart_policy_is_bounded() -> None:
     assert "StartLimitBurst=10" in service
 
 
+def test_gateway_and_refresh_services_run_as_bounded_non_root_account() -> None:
+    deploy = (ROOT / "code" / "deploy" / "deploy_vps.sh").read_text(
+        encoding="utf-8"
+    )
+    assert (
+        'install -d -o "$SERVICE_USER" -g "$SERVICE_GROUP" -m 0750 '
+        '"$STACK_ROOT/run"'
+    ) in deploy
+    assert "required non-root service account does not exist" in deploy
+    assert "refusing to run LumenCore application services as root" in deploy
+    assert 'SERVICE_USER="root"' not in deploy
+
+    gateway_match = re.search(
+        r'cat > "\$GATEWAY_SERVICE" <<EOF\n(?P<body>.*?)\nEOF',
+        deploy,
+        flags=re.DOTALL,
+    )
+    refresh_match = re.search(
+        r'cat > "\$DASH_REFRESH_SERVICE" <<EOF\n(?P<body>.*?)\nEOF',
+        deploy,
+        flags=re.DOTALL,
+    )
+    assert gateway_match is not None
+    assert refresh_match is not None
+    for service in (gateway_match.group("body"), refresh_match.group("body")):
+        assert "User=$SERVICE_USER" in service
+        assert "Group=$SERVICE_GROUP" in service
+        assert "UMask=0027" in service
+        assert "NoNewPrivileges=true" in service
+        assert "PrivateTmp=true" in service
+
+
 def test_health_probe_classifies_static_and_dynamic_surfaces() -> None:
     health = (ROOT / ".github" / "workflows" / "health-probe.yml").read_text(
         encoding="utf-8"

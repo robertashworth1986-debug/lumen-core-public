@@ -18,7 +18,12 @@ else
    SERVICE_USER="${SUDO_USER:-opc}"
 fi
 if ! id -u "$SERVICE_USER" >/dev/null 2>&1; then
-   SERVICE_USER="root"
+   echo "ERROR: required non-root service account does not exist: $SERVICE_USER" >&2
+   exit 8
+fi
+if [[ "$(id -u "$SERVICE_USER")" -eq 0 ]]; then
+   echo "ERROR: refusing to run LumenCore application services as root" >&2
+   exit 9
 fi
 SERVICE_GROUP="$(id -gn "$SERVICE_USER" 2>/dev/null || echo "$SERVICE_USER")"
 
@@ -317,6 +322,11 @@ cp "$DASHBOARD_SRC/institutional_crypto_paper_dashboard.html" "$WWW_ROOT/trading
 cp "$DASHBOARD_SRC/lumascout_dashboard.html" "$WWW_ROOT/scout.html" 2>/dev/null || true
 cp "$DASHBOARD_SRC/infra_audit_dashboard.html" "$WWW_ROOT/audit.html" 2>/dev/null || true
 
+# The gateway creates a singleton lock below the stack root. Prepare only that
+# bounded runtime directory for the non-root service account; source remains
+# root/operator-owned and output ownership is handled separately below.
+install -d -o "$SERVICE_USER" -g "$SERVICE_GROUP" -m 0750 "$STACK_ROOT/run"
+
 GATEWAY_SERVICE="/etc/systemd/system/luma-gateway.service"
 echo "==> Installing gateway service: $GATEWAY_SERVICE"
 cat > "$GATEWAY_SERVICE" <<EOF
@@ -328,10 +338,15 @@ StartLimitBurst=10
 
 [Service]
 Type=simple
+User=$SERVICE_USER
+Group=$SERVICE_GROUP
 WorkingDirectory=$CODE_DIR
 ExecStart=$PYTHON_BIN -m uvicorn luma_experience_gateway:app --app-dir $CODE_DIR --host 127.0.0.1 --port 8787
 Restart=on-failure
 RestartSec=3
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
 Environment=PYTHONUNBUFFERED=1
 Environment=LUMA_STACK_ROOT=$STACK_ROOT
 Environment=LUMA_DASHBOARD_DIR=$DASHBOARD_SRC
@@ -375,10 +390,15 @@ StartLimitBurst=5
 
 [Service]
 Type=simple
+User=$SERVICE_USER
+Group=$SERVICE_GROUP
 WorkingDirectory=$CODE_DIR
 ExecStart=$PYTHON_BIN $REFRESH_SCRIPT --loop
 Restart=on-failure
 RestartSec=5
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
 Environment=PYTHONUNBUFFERED=1
 Environment=LUMA_STACK_ROOT=$STACK_ROOT
 Environment=LUMA_DASHBOARD_DIR=$DASHBOARD_SRC
