@@ -210,10 +210,20 @@ class InstitutionalReadinessTests(unittest.TestCase):
     def test_institutional_dependency_lock_rejects_pin_drift(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             requirements = Path(tmp) / "requirements-institutional.txt"
+            canonical_requirements = (
+                ROOT / "requirements-institutional.txt"
+            ).read_text(encoding="utf-8")
+            requests_pin = next(
+                line
+                for line in canonical_requirements.splitlines()
+                if line.startswith("requests==")
+            )
             requirements.write_text(
-                (ROOT / "requirements-institutional.txt")
-                .read_text(encoding="utf-8")
-                .replace("requests==2.32.5", "requests==2.32.4", 1),
+                canonical_requirements.replace(
+                    requests_pin,
+                    "requests==0.0.0",
+                    1,
+                ),
                 encoding="utf-8",
             )
             receipt = LOCK_MODULE.verify_lock(requirements_path=requirements)
