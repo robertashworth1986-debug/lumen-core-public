@@ -89,16 +89,16 @@ gateway source closure, penetration-test or security certification, external
 validation, scientific superiority, profitable trading, customer acceptance,
 revenue, savings, or broader production authorization.
 
-**Current read-only VPS runtime verdict (August 12):** PR #180 merged the
-separate runtime classifier at exact merge commit
-`b01a54405e3b8d1035cd27ce1e03752045a9a138`. Post-merge diagnostic run
-[`31567904158`](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31567904158)
+**Current read-only VPS runtime verdict (August 12):** PR #181 merged the
+guarded gateway runtime-closure repair at exact merge commit
+`40a0463e061e912263a62527fdab2c0fbb92c6d2`. Post-merge diagnostic run
+[`31570030174`](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31570030174)
 captured a complete bounded receipt against that exact commit at
-`2026-08-12T05:51:20Z`. The diagnostic workflow completed because the receipt
+`2026-08-12T06:27:15Z`. The diagnostic workflow completed because the receipt
 was captured; the separate commit status correctly reported failure with
-verdict `ACTION_REQUIRED`. Its assessment recorded two passing checks, five
+verdict `ACTION_REQUIRED`. Its assessment recorded one passing check, six
 failing checks, and zero unknown checks. The raw diagnostic SHA-256 is
-`8112d526415abcddb537382b788649be73564e5b1fd526415d09cb1d0fbae6e6`.
+`fb73573c9b5c70d712ccde23ebe1ae40507f4d7066c2479356209b6944b7cd12`.
 
 All seven declared public/loopback endpoint codes passed, including the
 expected fail-closed HTTP 503 at the unauthenticated protected snapshot route.
@@ -106,12 +106,16 @@ The gateway was active and its lock PID matched the systemd main PID, but the
 effective unit still had no explicit `User` or `Group` and the live lock was
 `root:root:644`. The approved 20-file current-main gateway closure recorded 19
 matches, one mismatch (`grant_application_factory.py`), and zero missing,
-symbolic, or unreadable targets. The paper-ticker process was instantaneously
-active under `lumencore:lumencore`, but its exact empty ledger remained
-`opc:opc:644`, was not writable by `lumencore`, and produced twelve allowlisted
-`PermissionError` observations during the bounded five-minute window. Capacity
-was not the cause: about 108 GiB remained available and inode use was one
-percent.
+symbolic, or unreadable targets. The paper-ticker process was in `activating`
+and `auto-restart` with `NRestarts=193860` under `lumencore:lumencore`; its exact
+empty ledger remained `opc:opc:644`, was not writable by `lumencore`, and
+produced thirteen allowlisted `PermissionError` observations during the bounded
+five-minute window. Capacity was not the cause: about 108 GiB remained
+available and inode use was one percent. The retained artifact is
+`lumencore-vps-runtime-31570030174`, artifact ID `9130936121`, with GitHub
+artifact digest
+`sha256:e43ac46ca6ec817defdf734f40fc75a773842e041b194e09b694987221dcdce3`
+and seven-day retention.
 
 The existing manual gateway repair now treats source and service identity as
 one hash-bound runtime closure under the unchanged exact approval phrase
