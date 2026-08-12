@@ -133,8 +133,8 @@ def test_guide_preserves_bounded_security_claims():
 def test_receipt_workflow_pins_actions_and_python_wheels():
     workflow = RECEIPT_WORKFLOW_PATH.read_text(encoding="utf-8")
     requirements = REQUIREMENTS_PATH.read_text(encoding="utf-8")
-    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803" in workflow
-    assert "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1" in workflow
+    assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" in workflow
+    assert "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97" in workflow
     assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in workflow
     assert "--only-binary=:all:" in workflow
     assert "--require-hashes" in workflow

@@ -33,8 +33,8 @@ def test_pull_request_validation_cannot_enter_the_production_diagnostic_job() ->
     assert "needs: validate" in text
     assert "permissions:\n      contents: read\n      statuses: write" in text
     assert "persist-credentials: false" in text
-    assert "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803" in text
-    assert "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1" in text
+    assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" in text
+    assert "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97" in text
 
 
 def test_runtime_diagnostic_covers_gateway_failure_chain() -> None:
