@@ -42,7 +42,7 @@ def test_every_evidence_asset_exists_and_is_hash_bound():
     module = load_module()
     payload = module.build_payload(module.read_json(CONFIG))
 
-    assert payload["summary"]["evidence_asset_count"] == 10
+    assert payload["summary"]["evidence_asset_count"] == 11
     for row in payload["evidence_assets"]:
         assert len(row["sha256"]) == 64
         assert row["bytes"] > 0
@@ -190,6 +190,25 @@ def test_packet_keeps_historical_and_external_evidence_boundaries_explicit():
     assert "Do not send another reply or invitation" in markdown
     assert "meeting link" not in markdown.lower()
     assert "recipient_name" not in markdown
+
+
+def test_packet_reconciles_named_static_release_without_broadening_claims():
+    module = load_module()
+    payload = module.build_payload(module.read_json(CONFIG))
+    markdown = module.render_markdown(payload)
+    evidence_paths = {row["path"] for row in payload["evidence_assets"]}
+
+    assert (
+        "evidence/public-site-deployments/"
+        "1ce7c35975a4011fa844e8b39ccbc950c8c0f398/deployment-receipt.json"
+        in evidence_paths
+    )
+    assert "43 allowlisted files" in markdown
+    assert "exact live-byte matches" in markdown
+    assert "exact-snapshot static release parity remains unreconciled" not in markdown
+    assert "does not establish external validation" in markdown
+    assert "runtime parity" in markdown
+    assert "broader production authorization" in markdown
 
 
 def test_reviewer_questions_force_buyer_baseline_metric_and_negative_result_path():
