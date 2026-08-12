@@ -3,46 +3,8 @@ name: Institutional readiness gate
 on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - '.github/workflows/**'
-      - 'README.md'
-      - 'EVIDENCE_INDEX.md'
-      - 'SECURITY.md'
-      - 'CONTRIBUTING.md'
-      - 'QUICKSTART.md'
-      - 'requirements-reviewer-ubuntu-py311.lock'
-      - 'code/proof_capsule_verifier.py'
-      - 'code/operator_api_access.py'
-      - 'code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py'
-      - 'code/ops/VERIFY_INSTITUTIONAL_READINESS.py'
-      - 'code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py'
-      - 'config/institutional_readiness_register_v1.json'
-      - 'docs/**'
-      - 'evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json'
-      - 'tests/test_institutional_readiness.py'
-      - 'tests/test_public_site_signed_attestation_receipt.py'
-      - 'evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json'
   push:
     branches: [main]
-    paths:
-      - '.github/workflows/**'
-      - 'README.md'
-      - 'EVIDENCE_INDEX.md'
-      - 'SECURITY.md'
-      - 'CONTRIBUTING.md'
-      - 'QUICKSTART.md'
-      - 'requirements-reviewer-ubuntu-py311.lock'
-      - 'code/proof_capsule_verifier.py'
-      - 'code/operator_api_access.py'
-      - 'code/ops/RUN_REVIEWER_REPRODUCIBILITY_CAPSULE.py'
-      - 'code/ops/VERIFY_INSTITUTIONAL_READINESS.py'
-      - 'code/ops/VERIFY_PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT.py'
-      - 'config/institutional_readiness_register_v1.json'
-      - 'docs/**'
-      - 'evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json'
-      - 'tests/test_institutional_readiness.py'
-      - 'tests/test_public_site_signed_attestation_receipt.py'
-      - 'evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json'
 
 permissions:
   contents: read
@@ -65,7 +27,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.11'
+          python-version: '3.11.9'
 
       - name: Compile bounded verifier and tests
         run: |
@@ -97,3 +59,56 @@ jobs:
           set -euo pipefail
           git cat-file -e "${BASE_SHA}^{commit}"
           git diff --check "${BASE_SHA}...HEAD"
+
+  full-repository-suite:
+    name: Full repository suite (bounded first-party)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PYTHONHASHSEED: '0'
+      TZ: UTC
+      OMP_NUM_THREADS: '4'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - name: Checkout exact reviewed source without retained credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up authoritative Python runtime
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11.9'
+
+      - name: Install hash-locked institutional test closure
+        run: |
+          python code/ops/VERIFY_INSTITUTIONAL_DEPENDENCY_LOCK.py
+          python -m pip install \
+            --disable-pip-version-check \
+            --require-hashes \
+            --only-binary=:all: \
+            --requirement requirements-institutional-ubuntu-py311.lock
+          python -m pip check
+
+      - name: Run complete repository test collection
+        run: |
+          mkdir -p out/institutional-readiness
+          python -m pytest \
+            -q \
+            -rs \
+            --durations=20 \
+            --junitxml="out/institutional-readiness/full-suite-${GITHUB_SHA}.xml"
+
+      - name: Verify tests did not mutate reviewed source
+        run: test -z "$(git status --porcelain --untracked-files=all)"
+
+      - name: Upload commit-bound JUnit receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: institutional-full-suite-${{ github.sha }}
+          path: out/institutional-readiness/full-suite-${{ github.sha }}.xml
+          if-no-files-found: warn
+          retention-days: 30

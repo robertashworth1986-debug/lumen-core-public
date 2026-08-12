@@ -9,6 +9,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+WORKFLOW = ROOT / ".github" / "workflows" / "institutional-readiness.yml"
 SPEC = importlib.util.spec_from_file_location(
     "institutional_readiness",
     ROOT / "code" / "ops" / "VERIFY_INSTITUTIONAL_READINESS.py",
@@ -16,6 +17,13 @@ SPEC = importlib.util.spec_from_file_location(
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
+LOCK_SPEC = importlib.util.spec_from_file_location(
+    "institutional_dependency_lock",
+    ROOT / "code" / "ops" / "VERIFY_INSTITUTIONAL_DEPENDENCY_LOCK.py",
+)
+assert LOCK_SPEC and LOCK_SPEC.loader
+LOCK_MODULE = importlib.util.module_from_spec(LOCK_SPEC)
+LOCK_SPEC.loader.exec_module(LOCK_MODULE)
 
 
 class InstitutionalReadinessTests(unittest.TestCase):
@@ -151,6 +159,66 @@ class InstitutionalReadinessTests(unittest.TestCase):
                     dossier_path=dossier,
                     verified_utc="2026-08-08T00:00:00Z",
                 )
+
+    def test_workflow_runs_on_every_pull_request_and_main_push(self) -> None:
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        trigger_block, _, _ = workflow.partition("\npermissions:")
+        self.assertIn("  pull_request:\n", trigger_block)
+        self.assertIn("  push:\n    branches: [main]\n", trigger_block)
+        self.assertNotIn("    paths:", trigger_block)
+
+    def test_full_suite_is_exact_runtime_hash_locked_and_commit_bound(self) -> None:
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        _, marker, full_suite = workflow.partition("  full-repository-suite:\n")
+        self.assertTrue(marker)
+        self.assertIn("runs-on: ubuntu-24.04", full_suite)
+        self.assertIn("timeout-minutes: 30", full_suite)
+        self.assertIn("python-version: '3.11.9'", full_suite)
+        self.assertIn("persist-credentials: false", full_suite)
+        self.assertIn("fetch-depth: 0", full_suite)
+        self.assertIn(
+            "python code/ops/VERIFY_INSTITUTIONAL_DEPENDENCY_LOCK.py",
+            full_suite,
+        )
+        self.assertIn("--require-hashes", full_suite)
+        self.assertIn("--only-binary=:all:", full_suite)
+        self.assertIn(
+            "--requirement requirements-institutional-ubuntu-py311.lock",
+            full_suite,
+        )
+        self.assertIn("python -m pip check", full_suite)
+        self.assertIn("python -m pytest", full_suite)
+        self.assertIn("--junitxml=", full_suite)
+        self.assertIn("full-suite-${GITHUB_SHA}.xml", full_suite)
+        self.assertIn("institutional-full-suite-${{ github.sha }}", full_suite)
+        self.assertIn("if: always()", full_suite)
+        self.assertIn(
+            'test -z "$(git status --porcelain --untracked-files=all)"',
+            full_suite,
+        )
+
+    def test_institutional_dependency_lock_is_complete_and_claim_bounded(self) -> None:
+        receipt = LOCK_MODULE.verify_lock()
+        self.assertTrue(receipt["passed"])
+        self.assertEqual(receipt["direct_requirement_count"], 14)
+        self.assertEqual(receipt["locked_package_count"], 39)
+        self.assertGreaterEqual(receipt["locked_hash_count"], 39)
+        self.assertTrue(all(receipt["checks"].values()))
+        self.assertIn("does not establish production", receipt["scope_boundary"])
+        self.assertEqual(len(receipt["receipt_sha256"]), 64)
+
+    def test_institutional_dependency_lock_rejects_pin_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            requirements = Path(tmp) / "requirements-institutional.txt"
+            requirements.write_text(
+                (ROOT / "requirements-institutional.txt")
+                .read_text(encoding="utf-8")
+                .replace("requests==2.32.5", "requests==2.32.4", 1),
+                encoding="utf-8",
+            )
+            receipt = LOCK_MODULE.verify_lock(requirements_path=requirements)
+        self.assertFalse(receipt["passed"])
+        self.assertFalse(receipt["checks"]["all_direct_pins_matched"])
 
 
 if __name__ == "__main__":
