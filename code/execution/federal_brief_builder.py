@@ -78,7 +78,7 @@ def build_federal_brief() -> Dict[str, Any]:
     summary = {
         "generated_utc": utc_iso(),
         "mission": "cross_sector_failure_prevention_and_cost_avoidance",
-        "trust_tier": str(evidence.get("trusted_tier", "gov_audit_ready")),
+        "validation_scope": "local_evidence_bundle_pending_independent_review",
         "program_alignment": list(evidence.get("program_alignment", [])),
         "portfolio": {
             "sector_count": int(evidence.get("sector_count", len({str(r.get('sector', '')) for r in predictions}))),
@@ -133,7 +133,7 @@ def render_markdown(brief: Dict[str, Any]) -> str:
         "# Federal Brief — LumenCore Cross-Sector Intelligence",
         "",
         f"Generated UTC: {brief.get('generated_utc', '')}",
-        f"Trust Tier: {brief.get('trust_tier', '')}",
+        f"Validation Scope: {brief.get('validation_scope', '')}",
         f"Program Alignment: {', '.join(brief.get('program_alignment', []))}",
         "",
         "## Financial Impact",

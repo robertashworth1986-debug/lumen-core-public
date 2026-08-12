@@ -93,6 +93,7 @@ RUNTIME_DRIFT_ALERT_FILE = OUT / 'runtime_drift_alert.json'
 RUNTIME_DRIFT_OPERATOR_ALERT_FILE = OUT / 'runtime_drift_operator_alert.json'
 EXECUTION_LOCK_FILE = OUT / '.execution_lock'
 MAX_FALLBACK_BUYING_POWER_USD = 1_000_000_000.0
+ALPACA_LIVE_TRADING_ORIGIN = 'https://api.alpaca.markets'
 
 KNOWN_RUNTIME_WRITER_PATHS = [
     'code/FULL_TRUTH_ORCHESTRATOR.py',
@@ -1308,7 +1309,11 @@ class UniversalExchangeRouter:
     """Routes orders to correct exchange based on symbol"""
     ALPACA_SUPPORTED_SYMBOLS = {'BTC', 'ETH', 'SOL', 'XRP', 'DOGE'}
     
-    def __init__(self, api_keys: Dict):
+    def __init__(
+        self,
+        api_keys: Dict,
+        alpaca_trading_base: str = ALPACA_LIVE_TRADING_ORIGIN,
+    ):
         self.api_keys = api_keys
         self.kraken_api_key = api_keys.get('KRAKEN_API_KEY')
         self.kraken_api_secret = api_keys.get('KRAKEN_API_SECRET')
@@ -1328,11 +1333,7 @@ class UniversalExchangeRouter:
             or ''
         )
         self.alpaca_trading_base = str(
-            api_keys.get('ALPACA_BASE_URL')
-            or api_keys.get('ALPACA_TRADING_BASE_URL')
-            or os.environ.get('ALPACA_BASE_URL')
-            or os.environ.get('ALPACA_TRADING_BASE_URL')
-            or 'https://api.alpaca.markets'
+            alpaca_trading_base or ALPACA_LIVE_TRADING_ORIGIN
         ).strip().rstrip('/')
         self.alpaca_session = requests.Session()
         if self.alpaca_api_key and self.alpaca_api_secret:
@@ -2094,7 +2095,10 @@ print("\n[INIT] Loading components...")
 signal_gate = EvolutionarySignalGate()
 liquidity_guard = LiquidityGuard()
 risk_kernel = RiskKernel()
-router = UniversalExchangeRouter(api_keys)
+router = UniversalExchangeRouter(
+    api_keys,
+    alpaca_trading_base=ALPACA_LIVE_TRADING_ORIGIN,
+)
 runtime_guard = LiveRuntimeGuard(ROOT)
 
 runtime_cfg = _validate_runtime_cfg(runtime_guard.load())

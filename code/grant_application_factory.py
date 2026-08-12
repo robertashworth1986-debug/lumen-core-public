@@ -1505,16 +1505,16 @@ def score_eligibility(program: dict, profile: dict, evidence: dict) -> dict:
         n = profile["company"].get("employees", 0)
         if n >= e["employees_lt"]:
             eligible = False
-            gaps.append(f"Headcount {n} >= {e['employees_lt']}")
+            gaps.append("Applicant headcount does not meet the program threshold")
         else:
-            reasons.append(f"Headcount {n} < {e['employees_lt']} ✓")
+            reasons.append("Program headcount threshold checked ✓")
     if e.get("pi_employed_min_pct"):
         pct = profile["pi"].get("employed_pct", 0)
         if pct < e["pi_employed_min_pct"]:
-            gaps.append(f"PI employment {pct}% < required {e['pi_employed_min_pct']}%")
+            gaps.append("PI employment commitment does not meet the program threshold")
             eligible = False
         else:
-            reasons.append(f"PI employed {pct}% ✓")
+            reasons.append("PI employment commitment threshold checked ✓")
     if e.get("phase_i_completed_required"):
         gaps.append("Phase I completion needed (status: TO_BE_FILLED)")
         eligible = False

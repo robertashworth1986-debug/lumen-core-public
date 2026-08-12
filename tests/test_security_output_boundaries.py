@@ -240,3 +240,60 @@ def test_public_dashboard_builders_do_not_publish_credential_state_or_raw_ids() 
     assert "proof_txid_tail" not in unified_source
     assert 'row.get("ledger_hash") or row.get("trade_id")' not in unified_source
     assert "drilldownChipsEl.innerHTML" not in unified_source
+
+
+def test_registry_rebuilders_do_not_persist_environment_material() -> None:
+    rebuild = (ROOT / "code" / "REBUILD_REGISTRY_FROM_SINGLE_TRUTH.py").read_text(
+        encoding="utf-8"
+    )
+    seed = (ROOT / "code" / "FORCE_REBUILD_SEED_VALIDATION.py").read_text(
+        encoding="utf-8"
+    )
+    truth = (ROOT / "code" / "FULL_TRUTH_ORCHESTRATOR.py").read_text(
+        encoding="utf-8"
+    )
+    repair = (ROOT / "code" / "FIX_REGISTRY_FROM_LUMA_ENV.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "dict(os.environ)" not in rebuild
+    assert '"env": env_name' not in rebuild
+    assert 'r.get("api_key_env")' not in seed
+    assert '"env": env_name' not in truth
+    assert "env[k.strip()] =" not in repair
+    assert 'row["secret_env"]' not in repair
+    assert 'row["secret_present"]' not in repair
+
+
+def test_legacy_alpaca_endpoints_are_not_loaded_from_credential_bundles() -> None:
+    paper = (
+        ROOT / "code" / "execution" / "alpaca_paper_executor_legacy.py"
+    ).read_text(encoding="utf-8")
+    orchestrator = (
+        ROOT / "code" / "execution" / "execution_orchestrator_legacy.py"
+    ).read_text(encoding="utf-8")
+
+    assert 'keys.get("ALPACA_PAPER_BASE_URL"' not in paper
+    assert 'keys.get("ALPACA_DATA_BASE_URL"' not in paper
+    assert "api_keys.get('ALPACA_BASE_URL')" not in orchestrator
+    assert "api_keys.get('ALPACA_TRADING_BASE_URL')" not in orchestrator
+    assert "alpaca_trading_base=ALPACA_LIVE_TRADING_ORIGIN" in orchestrator
+
+
+def test_reviewer_outputs_do_not_copy_sensitive_profile_classifications() -> None:
+    federal = (
+        ROOT / "code" / "execution" / "federal_brief_builder.py"
+    ).read_text(encoding="utf-8")
+    baseline = (
+        ROOT / "code" / "execution" / "build_top_strategy_baseline.py"
+    ).read_text(encoding="utf-8")
+    grants = (ROOT / "code" / "grant_application_factory.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'evidence.get("trusted_tier"' not in federal
+    assert 'evidence.get("trusted_tier"' not in baseline
+    assert "Headcount {n}" not in grants
+    assert "PI employment {pct}" not in grants
+    assert "pending_independent_review" in federal
+    assert "pending_independent_review" in baseline

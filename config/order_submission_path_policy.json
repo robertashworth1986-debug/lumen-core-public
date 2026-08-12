@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-08.live-data-no-orders.v3",
+  "version": "2026-08-12.live-data-no-orders.v4",
   "promotion_stage": "live_data_no_orders",
   "patterns": {
     "kraken_add_order": "\\bAddOrder\\b",
@@ -62,12 +62,16 @@
     {
       "path": "code/execution/execution_orchestrator_legacy.py",
       "classification": "historical_preserved",
-      "expected_git_blob_sha": "bc4996f03fe278ddcb65ccb5e35680c370f3fe98"
+      "expected_git_blob_sha": "f7fc13c3ffb31184054d0573ff8610b19ac294de",
+      "custody_note": "Rebound after reviewed endpoint-secret separation; live-order behavior remains historical and preserved.",
+      "reviewed_source_commit": "37f53fdfa3fcfdb68a5938f0e02eb261dbbb10c7"
     },
     {
       "path": "code/execution/alpaca_paper_executor_legacy.py",
       "classification": "historical_preserved",
-      "expected_git_blob_sha": "a0e42d06cc1fb9e48653cabb18acea3c34278640"
+      "expected_git_blob_sha": "de2cf0e3f1eaa9dce71b364bd24c8212e9475111",
+      "custody_note": "Rebound after reviewed endpoint-secret separation; the fixed paper origin remains mandatory.",
+      "reviewed_source_commit": "37f53fdfa3fcfdb68a5938f0e02eb261dbbb10c7"
     },
     {"path": "code/kraken_execution.py", "classification": "guarded_facade"},
     {"path": "code/execution/live_executor.py", "classification": "guarded_facade"},

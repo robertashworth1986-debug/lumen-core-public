@@ -432,7 +432,6 @@ def sync_live_sources(usable_files):
             "evidence_basis": "MEASURED_FILE_MATCH" if measured_rows > 0 else "KEY_ONLY",
             "dollar_basis": "MEASURED" if measured_rows > 0 else "UNMEASURED",
             "last_probe_utc": iso_now(),
-            "env": env_name,
             "enabled": bool(cfg.get("enabled", False)),
         }
         registry_rows.append(row)

@@ -31,20 +31,10 @@ def save_json(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(obj, indent=2), encoding="utf-8")
 
-def merged_env():
-    env = {}
-    try:
-        env.update(dict(os.environ))
-    except Exception:
-        pass
-    return env
-
-ENV = merged_env()
-
 def env_present(name):
     if not name:
         return False
-    v = ENV.get(str(name), "")
+    v = os.getenv(str(name), "")
     return str(v).strip() != ""
 
 def sector_for(name, env_name=""):
@@ -136,7 +126,6 @@ if isinstance(live_sources, dict):
             "rows": int(rows),
             "est_dollar_per_hour": float(old.get("est_dollar_per_hour", default_est_hour(sector))),
             "last_probe_utc": last_probe,
-            "env": env_name,
             "enabled": enabled
         })
 
@@ -174,7 +163,6 @@ for src, env_name, sector in known:
             "rows": 1,
             "est_dollar_per_hour": float(default_est_hour(sector)),
             "last_probe_utc": now_utc(),
-            "env": env_name,
             "enabled": True
         })
 
@@ -182,7 +170,6 @@ for src, env_name, sector in known:
 already = {str(x.get("source","")).upper() for x in rebuilt}
 option_capable_envs = ["POLYGON_API_KEY", "FINNHUB_API_KEY", "TRADIER_API_KEY", "ALPACA_API_KEY"]
 if "IMPLIED" not in already and any(env_present(e) for e in option_capable_envs):
-    backing = next((e for e in option_capable_envs if env_present(e)), "POLYGON_API_KEY")
     rebuilt.append({
         "source": "IMPLIED",
         "sector": "market_data",
@@ -190,7 +177,6 @@ if "IMPLIED" not in already and any(env_present(e) for e in option_capable_envs)
         "rows": 1,
         "est_dollar_per_hour": float(default_est_hour("market_data")),
         "last_probe_utc": now_utc(),
-        "env": backing,
         "enabled": True
     })
 
@@ -209,7 +195,6 @@ for src, sector in open_data_known:
         "rows": 0,
         "est_dollar_per_hour": float(default_est_hour(sector)),
         "last_probe_utc": now_utc(),
-        "env": "",
         "enabled": True
     })
 
@@ -244,4 +229,4 @@ print("ENABLED + LIVE_KEY_PRESENT:", len(enabled_live))
 print("IMPLIED PRESENT:", any(str(r.get('source','')).upper() == 'IMPLIED' for r in rebuilt))
 print("")
 for r in rebuilt:
-    print(f"{r['source']:<16} | enabled={str(r['enabled']):<5} | status={r['status']:<16} | sector={r['sector']:<12} | env={r['env']}")
+    print(f"{r['source']:<16} | enabled={str(r['enabled']):<5} | status={r['status']:<16} | sector={r['sector']:<12}")

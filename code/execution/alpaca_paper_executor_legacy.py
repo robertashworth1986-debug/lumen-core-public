@@ -31,6 +31,8 @@ STATUS_FILE = EXEC_OUT / "alpaca_paper_status.json"
 ADAPTIVE_UNIVERSE_FILE = OUT / "adaptive_universe.json"
 INSTITUTIONAL_DAILY_REPORT_SCRIPT = ROOT / "code" / "institutional_daily_report.py"
 INVESTOR_EVIDENCE_PACK_SCRIPT = ROOT / "code" / "build_investor_evidence_pack.py"
+PAPER_TRADING_ORIGIN = "https://paper-api.alpaca.markets"
+ALPACA_DATA_ORIGIN = "https://data.alpaca.markets"
 
 
 def now_utc() -> str:
@@ -94,20 +96,6 @@ def load_api_keys() -> dict:
             keys.get("APCA_API_SECRET_KEY"),
             keys.get("ALPACA_SECRET"),
         ),
-        "ALPACA_PAPER_BASE_URL": _pick_first(
-            os.environ.get("ALPACA_PAPER_BASE_URL"),
-            os.environ.get("ALPACA_BASE_URL"),
-            os.environ.get("ALPACA_TRADING_BASE_URL"),
-            keys.get("ALPACA_PAPER_BASE_URL"),
-            keys.get("ALPACA_BASE_URL"),
-            keys.get("ALPACA_TRADING_BASE_URL"),
-        ),
-        "ALPACA_DATA_BASE_URL": _pick_first(
-            os.environ.get("ALPACA_DATA_BASE_URL"),
-            os.environ.get("ALPACA_DATA_BASEURL"),
-            keys.get("ALPACA_DATA_BASE_URL"),
-            keys.get("ALPACA_DATA_BASEURL"),
-        ),
     }
 
 
@@ -121,8 +109,8 @@ class AlpacaPaperClient:
     ):
         self.api_key = api_key or ""
         self.api_secret = api_secret or ""
-        self.trading_base = str(trading_base).strip().rstrip("/") or "https://paper-api.alpaca.markets"
-        self.data_base = str(data_base).strip().rstrip("/") or "https://data.alpaca.markets"
+        self.trading_base = str(trading_base or PAPER_TRADING_ORIGIN).strip().rstrip("/")
+        self.data_base = str(data_base or ALPACA_DATA_ORIGIN).strip().rstrip("/")
         self.session = requests.Session()
         self.session.headers.update(
             {
@@ -1131,8 +1119,8 @@ def main():
     client = AlpacaPaperClient(
         keys.get("ALPACA_API_KEY", ""),
         keys.get("ALPACA_API_SECRET", ""),
-        trading_base=keys.get("ALPACA_PAPER_BASE_URL", ""),
-        data_base=keys.get("ALPACA_DATA_BASE_URL", ""),
+        trading_base=PAPER_TRADING_ORIGIN,
+        data_base=ALPACA_DATA_ORIGIN,
     )
     if not client.is_configured():
         raise SystemExit(
