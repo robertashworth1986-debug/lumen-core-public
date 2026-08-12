@@ -89,29 +89,49 @@ gateway source closure, penetration-test or security certification, external
 validation, scientific superiority, profitable trading, customer acceptance,
 revenue, savings, or broader production authorization.
 
-**Current read-only VPS source-closure receipt (August 12):** Manual diagnostic
-run `31559668631` completed successfully against exact current-main commit
-`7164e59a54b25b95ff17455a40614a5f980fea52`. Public gateway health, the nginx
-loopback gateway route, and the direct loopback gateway port each returned HTTP
-200 during the observation. The SHA-256 comparison recorded 19 matching files,
-one mismatch, zero missing files, zero symbolic files, and zero unreadable files
-across the approved 20-file gateway closure. The sole mismatch was
-`grant_application_factory.py`: the live hash corresponds to repository commit
-`6123580daa4e6880a46ba07d6d2a46bf2eb137e9`, while current main contains the
-later `37f53fdf` sensitive-output hardening that removes applicant headcount and
-principal-investigator employment percentages from eligibility messages. The
-same read-only run confirmed that `luma-paper-ticker` is still failing with
+**Current read-only VPS source-closure receipt (August 12):** Post-merge
+diagnostic run
+[`31565271746`](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31565271746)
+completed successfully against exact current-main commit
+`49a4f42f1f230ddd0574a6dcd55aa1412abc9b50`. Public root, public and loopback
+gateway health, the nginx loopback gateway route, and the direct loopback
+gateway port each returned HTTP 200 during the observation. The protected
+`/api/snapshot` route returned HTTP 503 with the minimized fail-closed operator
+boundary because no runtime operator token was available; public liveness did
+not depend on that protected route. The corrected process-identity check
+recorded the active gateway process as present, readable, and matching the
+expected `luma_experience_gateway:app` identity, and its singleton-lock PID
+matched the systemd main PID. The deployed gateway unit still has no explicit
+`User` or `Group`, and the live lock remains `root:root:644`; therefore this
+receipt does not establish a least-privilege live gateway. PR #177 changed the
+future deployment source to fail closed without a non-root service account and
+to run gateway and dashboard-refresh services with bounded identity, umask,
+no-new-privileges, and private-temporary-directory controls. That repository
+change has not been applied to the VPS.
+
+The same run recorded 19 matching files, one mismatch, zero missing files,
+zero symbolic files, and zero unreadable files across the approved 20-file
+gateway closure. The sole mismatch remains `grant_application_factory.py`: the
+live hash predates the later sensitive-output hardening on current main. It also
+confirmed that `luma-paper-ticker` remains in an auto-restart failure with
 `PermissionError` on the exact empty paper ledger, which remains `opc:opc:644`
 and is not writable by `lumencore`; no current allowlisted failure signature
-was observed for `luma-symbol-awareness` in its five-minute window. The private
-`LUMA_HUMAN_UNLOCK_TOKEN` repository secret is not configured, so neither the
-existing rollback-capable gateway-closure repair nor the paper-ledger repair
-was dispatched and no VPS mutation was attempted. A fresh, target-specific
-founder authorization and the private HumanUnlock control are required before
-either repair. These observations prove current bounded liveness, source drift,
-and the named paper-worker failure only; they do not establish sustained
-availability, whole-VPS parity, external validation, profitable trading,
-customer acceptance, revenue, or savings.
+was observed for `luma-symbol-awareness` in its five-minute window. Filesystem
+capacity remained healthy at about 108 GiB available and one percent inode use.
+The retained artifact is `lumencore-vps-runtime-31565271746`, artifact ID
+`9129220448`, with GitHub artifact digest
+`sha256:48b51bd1548f471cd3ab51a34455f6f3cf3823c785358e1582b6ce5bf68b650c`
+and seven-day retention.
+
+The private `LUMA_HUMAN_UNLOCK_TOKEN` repository secret is not configured, so
+neither the existing rollback-capable gateway-closure repair nor the
+paper-ledger repair was dispatched and no VPS mutation was attempted. A fresh,
+target-specific founder authorization and the private HumanUnlock control are
+required before either repair. These observations prove current bounded
+liveness, process identity, source drift, capacity, and the named paper-worker
+failure only; they do not establish sustained availability, whole-VPS parity,
+external validation, profitable trading, customer acceptance, revenue, or
+savings.
 
 **Repository vulnerability closure (August 12):** Dependabot alert #3,
 `GHSA-5239-wwwm-4pmq`, identified a low-severity local-access ReDoS advisory in
@@ -122,6 +142,19 @@ security-header receipt workflow passed, and GitHub recorded the alert as
 `fixed` at `2026-08-12T00:31:24Z`. This closes that named alert only; it does
 not establish a vulnerability-free codebase, penetration test, runtime scan,
 or external security certification.
+
+PR #175 separately upgraded the institutional Requests pin and complete
+hash-locked closure from 2.32.5 to 2.33.0 for `CVE-2026-25645`, repaired the
+pin-drift mutation test so it follows the current manifest rather than a
+hard-coded version, and merged at
+`8f9fe26d031ff1ad2eed834a2a70fa8aa2015305`. The exact repaired head passed
+dependency review, both CodeQL language analyses, the focused institutional
+verifier, and the complete repository suite; the same complete and focused
+gates passed after merge on `main`. After the dependency graph refreshed,
+GitHub reported zero open Dependabot alerts at the point-in-time check. This
+closes the named Requests advisory and current GitHub alert queue only; it does
+not establish zero vulnerabilities, a penetration test, dependency freshness
+outside the tracked manifests, or external security certification.
 
 On August 8, read-only current-state probes established that DNS, TLS, nginx,
 the static reviewer surface, VPS storage, and filesystem inodes were available,
