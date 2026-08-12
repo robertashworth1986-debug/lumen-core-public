@@ -69,6 +69,26 @@ validation.
 Later commits that do not change the allowlisted static bytes do not replace
 the named `1ce7c359` deployment identity.
 
+**Scheduled health-writer integrity receipt (August 12):** PR #171 merged the
+exact tested head `600b138f1008022b6c5bb07695eb8c55d3aa3b2b` at merge commit
+`f2ea3a3bffbf344b7fa007c222b56f7d7e5bb5c1`. The change requires the daily
+health workflow to validate the complete 15-endpoint snapshot and badge
+contracts; permits repository mutation only for `data/site_health.json` and
+`data/uptime_badge.json` using null-delimited Git path handling; rechecks the
+committed path set after rebase; and verifies the exact remote branch head
+after publication. The clean local repository suite recorded 798 passed tests,
+7 skipped tests, and 48 passed subtests. The PR's gateway-contract, engine,
+institutional-readiness, dependency-review, repository-trust, and both
+language-specific CodeQL checks passed on that exact head. Manual post-merge
+health run `31559056763` then completed successfully, created snapshot commit
+`b1fa45003746a9b4b6c3b033034182d97ace3ac0`, and recorded 15-of-15 declared
+contracts healthy at `2026-08-12T03:07:11Z`; Pages run `31559066395` deployed
+that snapshot successfully. This is first-party software, publication-integrity,
+and point-in-time liveness evidence. It does not establish sustained uptime,
+gateway source closure, penetration-test or security certification, external
+validation, scientific superiority, profitable trading, customer acceptance,
+revenue, savings, or broader production authorization.
+
 **Repository vulnerability closure (August 12):** Dependabot alert #3,
 `GHSA-5239-wwwm-4pmq`, identified a low-severity local-access ReDoS advisory in
 the security-header workflow's Pygments dependency. PR #162 upgraded the
