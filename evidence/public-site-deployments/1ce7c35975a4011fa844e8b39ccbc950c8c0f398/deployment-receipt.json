@@ -1,0 +1,89 @@
+{
+  "claim_boundaries": [
+    "This first-party receipt records the named GitHub workflow, attestation, deployment, and live-audit observations; it is not an independent audit or certification.",
+    "Exact parity covers only the 43 allowlisted static public-release files and does not establish whole-product, VPS operating-system, gateway, container, private-stack, or organization-wide assurance.",
+    "Successful static deployment does not establish scientific validity, external or field validation, trading performance, realized savings, customer acceptance, revenue, production AI authorization, or a SLSA level.",
+    "The named deployment does not authorize later deployments, gateway repair, secret changes, DNS changes, customer notification, legal attestation, grant submission, or live trading."
+  ],
+  "deployment": {
+    "approval": "DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT",
+    "artifact_id": 9123465149,
+    "completed_utc": "2026-08-12T00:04:09Z",
+    "conclusion": "success",
+    "created_utc": "2026-08-12T00:03:40Z",
+    "deployment_receipt_sha256": "b6343a7d4ccde016b30a677666d8a3b6e9e290dba3d94224529c795a22c4daaa",
+    "expected_file_count": 43,
+    "live_gate_checked_utc": "2026-08-12T00:04:05.483835Z",
+    "live_gate_sha256": "0fb5ea848201004beb9e7859255160fae08bc674e7906c41a3acdfe839d65831",
+    "matched_file_count": 43,
+    "release_verified": true,
+    "run_id": 31548829514,
+    "url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31548829514",
+    "workflow": ".github/workflows/deploy-public-site-release.yml"
+  },
+  "generated_utc": "2026-08-12T00:06:00Z",
+  "post_deployment_audit": {
+    "artifact_id": 9123490393,
+    "classified_utc": "2026-08-12T00:05:17.522377Z",
+    "completed_utc": "2026-08-12T00:05:22Z",
+    "conclusion": "success",
+    "created_utc": "2026-08-12T00:04:54Z",
+    "decision": "MONITOR",
+    "expected_file_count": 43,
+    "incident_receipt_sha256": "2966d6ba3b8ab2a0e73cf31e83526e56fbd30244521b1dca6f4689105f8f4df8",
+    "incident_state": "NO_INCIDENT_OBSERVED",
+    "live_verification_sha256": "e22e8dfacb4b139b7b67a0d724cbebb759ccd164b3a2478a5408aa645e27da34",
+    "matched_file_count": 43,
+    "release_verified": true,
+    "run_id": 31548906293,
+    "severity": "NONE",
+    "url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31548906293",
+    "workflow": ".github/workflows/deploy.yml"
+  },
+  "private_custody": {
+    "bundle_storage": "FOUNDER_CONTROLLED_E_DRIVE_VAULT",
+    "repository_contains_private_bundle_bytes": false
+  },
+  "receipt_sha256": "c426a31bbee653bc4f7e206f92a7664f3a18388d883f341ccd26a6f160600278",
+  "release_subject": {
+    "archive_bytes": 2488320,
+    "archive_name": "public-site-release.tar",
+    "archive_sha256": "681c89bb446a83393b52d02d02ea05bb6ccabf63a60d65bdb9efb074c56b3fa9",
+    "cyclonedx_component_count": 43,
+    "cyclonedx_sha256": "258fbb0b985e2eefba22e13c1848854151ec90c56612415123b1461dac0b108e",
+    "cyclonedx_spec_version": "1.6",
+    "manifest_sha256": "36d114d34f01ec139d1e1df08e407af1c7e49ee370d5f7ca36a07a1b68063efa",
+    "release_file_count": 43
+  },
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "schema": "lumencore.public_site_exact_deployment_receipt.v1",
+  "source_commit": "1ce7c35975a4011fa844e8b39ccbc950c8c0f398",
+  "supply_chain": {
+    "attestations": [
+      {
+        "bundle_sha256": "9b2c8a7cd632c21380e5d1b7a9ee3e96febbadffddf0396000cb4d2d98c8e13b",
+        "predicate_type": "https://slsa.dev/provenance/v1",
+        "verification_sha256": "9a9fe30beec250d836d80d77f83ce92fed7eeb2e5ee5b67263a426dc930cb55b",
+        "verification_state": "VERIFIED",
+        "verified_timestamp_count": 1
+      },
+      {
+        "bundle_sha256": "de26da582b69bb5f31f7db7f5631e2865707998a924e21ec2055b4ee9303b84e",
+        "predicate_type": "https://cyclonedx.org/bom",
+        "verification_sha256": "7009656ccbdeea97c5e03dffa1af0542604bdfc734307cc2e6c2a75ee8eaeb75",
+        "verification_state": "VERIFIED",
+        "verified_timestamp_count": 1
+      }
+    ],
+    "completed_utc": "2026-08-12T00:00:54Z",
+    "conclusion": "success",
+    "created_utc": "2026-08-12T00:00:14Z",
+    "event": "push",
+    "run_id": 31548604617,
+    "signed_artifact_id": 9123394472,
+    "signed_attestation_scope": "MAIN_BRANCH_GITHUB_HOSTED_WORKFLOW_ONLY",
+    "unsigned_artifact_id": 9123387947,
+    "url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/31548604617",
+    "workflow": ".github/workflows/public-site-supply-chain.yml"
+  }
+}

@@ -64,17 +64,19 @@ OWASP LLMSVS, and SLSA themes. It is not certification, full conformance, an
 external audit, or a penetration test; its machine verifier fails closed if a
 status is promoted or a required limitation disappears.
 
-Named deployed public release `e513f65a` has a deterministic 43-file CycloneDX 1.6
-inventory and a separate `main`-only GitHub OIDC/Sigstore signing lane. Reviewers should
-verify the downloaded archive against the repository, workflow, ref, source
-digest, and predicate type. This does not establish a complete product or VPS
-SBOM or a SLSA level. The historical receipt for commit `5fff567c` retains the
-first successful signed set. The exact deployment receipt binds commit
-`e513f65a219a12e539d9f7dd3ea47a6a081c5262` to a 43-of-43 live-byte check,
-security-header verification, and an independent read-only post-deployment
-audit. Its local verifier reconstructs the release from immutable Git blobs;
-fresh remote signature and live HTTP checks remain separate operations. This
-does not promote the broader platform beyond `HOLD`.
+Named deployed public release `1ce7c359` has a deterministic 43-file CycloneDX
+1.6 inventory and a separate `main`-only GitHub OIDC/Sigstore signing lane.
+Reviewers should verify the downloaded archive against the repository,
+workflow, ref, source digest, and predicate type. This does not establish a
+complete product or VPS SBOM or a SLSA level. The historical receipt for commit
+`5fff567c` retains the first successful signed set. The current exact-deployment
+receipt binds commit `1ce7c35975a4011fa844e8b39ccbc950c8c0f398` to rollback
+capture, a 43-of-43 live-byte check, and a separate read-only post-deployment
+audit. The earlier `e513f65a` deployment receipt remains in the append-only
+history, while security-header evidence remains a separate bounded control.
+The local verifier reconstructs both releases from immutable Git blobs; fresh
+remote signature and live HTTP checks remain separate operations. This does not
+promote the broader platform beyond `HOLD`.
 
 The documented incident control classifies public-release drift and preserves
 containment and recovery gates. Its CI tabletop is not a completed live

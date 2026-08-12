@@ -81,8 +81,12 @@ the immutable Git commit, checks the subject hashes, validates the run and
 attestation fields, and enforces the negative claim boundaries:
 
 ```bash
-python code/ops/VERIFY_PUBLIC_SITE_DEPLOYMENT_RECEIPT.py
+python code/ops/VERIFY_PUBLIC_SITE_DEPLOYMENT_RECEIPT.py \
+  --receipt evidence/public-site-deployments/e513f65a219a12e539d9f7dd3ea47a6a081c5262/deployment-receipt.json
 ```
+
+Omit `--receipt` to reconstruct and verify the complete append-only deployment
+history, including later named releases.
 
 The local verifier does not perform a fresh GitHub signature lookup or live
 HTTP audit. Reviewers can inspect or download the named GitHub run artifacts
