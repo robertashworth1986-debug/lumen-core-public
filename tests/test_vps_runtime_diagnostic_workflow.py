@@ -105,6 +105,11 @@ def test_gateway_lock_diagnostic_checks_identity_without_exposing_cmdline() -> N
     assert "gateway_lock=/opt/lumencore/run/luma_experience_gateway.lock" in text
     assert "lock_pid_matches_systemd_main" in text
     assert 'show_process_identity gateway_lock_owner "$gateway_lock_pid"' in text
+    assert '[[ ! -d "/proc/$pid" ]]' in text
+    assert 'echo "identity_readable=true"' in text
+    assert 'echo "identity_readable=false"' in text
+    assert 'echo "expected_identity=unknown"' in text
+    assert 'kill -0 "$pid"' not in text
     assert 'expected_marker="luma_experience_gateway:app"' not in text
     assert "echo \"$cmdline\"" not in text
     assert "cat \"$gateway_lock\"" not in text

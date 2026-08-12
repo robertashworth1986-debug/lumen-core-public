@@ -159,16 +159,24 @@ jobs:
                 echo "valid_pid=false"
                 return
               fi
-              if ! kill -0 "$pid" 2>/dev/null; then
+              # An unprivileged kill -0 returns EPERM for a root-owned process,
+              # which proves neither absence nor death. /proc is the read-only
+              # process-existence boundary for this diagnostic.
+              if [[ ! -d "/proc/$pid" ]]; then
                 echo "process_exists=false"
                 return
               fi
               echo "process_exists=true"
               ps -p "$pid" -o pid=,ppid=,etimes=,stat=,comm= 2>&1 || true
               if [[ -r "/proc/$pid/cmdline" ]]; then
+                echo "identity_readable=true"
                 cmdline=$(tr "\\000" " " < "/proc/$pid/cmdline" 2>/dev/null || true)
+              else
+                echo "identity_readable=false"
               fi
-              if [[ -n "$cmdline" && "$cmdline" == *"$expected_marker"* ]]; then
+              if [[ ! -r "/proc/$pid/cmdline" ]]; then
+                echo "expected_identity=unknown"
+              elif [[ -n "$cmdline" && "$cmdline" == *"$expected_marker"* ]]; then
                 echo "expected_identity=true"
               else
                 echo "expected_identity=false"
