@@ -60,6 +60,7 @@ code/out/
 output/pdf/
 *.lock
 !requirements-reviewer-ubuntu-py311.lock
+!requirements-institutional-ubuntu-py311.lock
 
 # High-churn runtime JSON cache/state
 kraken_fill_prices.json
@@ -70,6 +71,7 @@ logs/
 *.log
 *.txt
 !dashboard/robots.txt
+!requirements-institutional.txt
 
 # VS Code
 .vscode/
