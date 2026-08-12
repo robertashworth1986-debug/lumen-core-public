@@ -121,7 +121,6 @@ def test_runtime_defects_are_action_required_not_a_green_diagnostic() -> None:
         "paper_ticker_recent_failures",
     }
     assert result["summary"]["required_repair_controls"] == [
-        "DEPLOY_REVIEWED_NON_ROOT_GATEWAY_SERVICE_IDENTITY",
         "REPAIR_PAPER_TICKER_LEDGER_OWNERSHIP",
         "REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE",
     ]

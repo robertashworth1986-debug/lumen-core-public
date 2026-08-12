@@ -1,14 +1,14 @@
-name: Repair exact gateway dependency closure on VPS
+name: Repair exact gateway runtime closure on VPS
 
 on:
   workflow_dispatch:
     inputs:
       release_commit:
-        description: Full main-branch commit SHA selected for gateway recovery
+        description: Full main-branch commit SHA selected for source and service-identity recovery
         required: true
         type: string
       approval:
-        description: Explicit production gateway-recovery gate
+        description: Explicit production gateway runtime-closure gate
         required: true
         type: choice
         default: HOLD
@@ -95,17 +95,23 @@ jobs:
             LUMENCORE_GATEWAY_SOURCE_ROOT="$source_root" \
               bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --bundle-sha
           )
+          hardening_sha=$(
+            bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --hardening-sha
+          )
           [[ "$bundle_sha" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$hardening_sha" =~ ^[0-9a-f]{64}$ ]]
           tar -C "$source_root" -cf "$package_root/gateway-source.tar" .
           install -m 0755 code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh \
             "$package_root/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh"
           {
             printf 'source_commit=%s\n' "$RELEASE_COMMIT"
             printf 'bundle_sha256=%s\n' "$bundle_sha"
+            printf 'service_hardening_sha256=%s\n' "$hardening_sha"
             printf 'file_count=%s\n' "${#files[@]}"
             printf '%s\n' "${files[@]}"
           } > "$package_root/gateway-repair-manifest.txt"
           printf 'bundle_sha=%s\n' "$bundle_sha" >> "$GITHUB_OUTPUT"
+          printf 'hardening_sha=%s\n' "$hardening_sha" >> "$GITHUB_OUTPUT"
 
       - name: Stage private HumanUnlock without printing it
         shell: bash
@@ -138,8 +144,14 @@ jobs:
             sudo -n true
             sudo -n test -d /opt/lumencore/code
             sudo -n test -x /opt/lumencore/.venv/bin/python
+            test "$(id -u lumencore)" -ne 0
+            test "$(id -gn lumencore)" = lumencore
+            sudo -n -u lumencore test -x /opt/lumencore/.venv/bin/python
+            sudo -n test ! -L /opt/lumencore/run
             sudo -n systemctl cat luma-gateway >/dev/null
-            for command_name in python3 sha256sum realpath install cp stat mktemp curl systemctl tar; do
+            for command_name in \
+              python3 sha256sum realpath install cp stat mktemp curl systemctl tar \
+              id getent chown chmod dirname rmdir awk seq sleep tr; do
               command -v "$command_name" >/dev/null
             done
           '
@@ -165,6 +177,7 @@ jobs:
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           BUNDLE_SHA: ${{ steps.package.outputs.bundle_sha }}
+          HARDENING_SHA: ${{ steps.package.outputs.hardening_sha }}
         run: |
           set -euo pipefail
           ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "opc@$VPS_HOST" \
@@ -176,6 +189,7 @@ jobs:
                LUMENCORE_HUMAN_UNLOCK_FILE='$REMOTE_STAGE/human-unlock' \
                LUMENCORE_GATEWAY_SOURCE_ROOT='$REMOTE_STAGE/source' \
                LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256='$BUNDLE_SHA' \
+               LUMENCORE_EXPECTED_GATEWAY_HARDENING_SHA256='$HARDENING_SHA' \
                LUMENCORE_GATEWAY_SOURCE_COMMIT='$RELEASE_COMMIT' \
                bash '$REMOTE_STAGE/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh' --apply" \
             | tee /tmp/gateway-repair/gateway-repair-receipt.txt
@@ -201,8 +215,9 @@ jobs:
             .public_surface == "minimal"
             ' "$body" >/dev/null
           done
-          printf 'source_commit=%s\nhealth_http=%s\npublic_status_http=%s\n' \
-            "$RELEASE_COMMIT" "$health_code" "$status_code" \
+          printf 'source_commit=%s\nbundle_sha256=%s\nservice_hardening_sha256=%s\nhealth_http=%s\npublic_status_http=%s\n' \
+            "$RELEASE_COMMIT" '${{ steps.package.outputs.bundle_sha }}' \
+            '${{ steps.package.outputs.hardening_sha }}' "$health_code" "$status_code" \
             > /tmp/gateway-repair/public-verification-receipt.txt
 
       - name: Remove local private unlock staging
