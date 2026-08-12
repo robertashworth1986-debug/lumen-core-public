@@ -4,7 +4,7 @@
 
 LumenCore now has a deterministic CycloneDX 1.6 inventory for the exact
 43-file public release at commit
-`e513f65a219a12e539d9f7dd3ea47a6a081c5262` and a separate GitHub-hosted `main` workflow that signs
+`1ce7c35975a4011fa844e8b39ccbc950c8c0f398` and a separate GitHub-hosted `main` workflow that signs
 the release archive's build provenance and SBOM association with GitHub's
 OIDC/Sigstore artifact-attestation service.
 
@@ -34,7 +34,7 @@ The root application component binds the archive SHA-256, source commit,
 repository URL, bounded target directory, inventory scope, and explicit
 absence of a SLSA-level or broad live-deployment claim. The verifier requires
 one component for every file in the release manifest—43 of 43 for commit
-`e513f65a`—and rejects missing, reordered, duplicated, unknown, or altered
+`1ce7c359`—and rejects missing, reordered, duplicated, unknown, or altered
 release identities.
 
 ## Two evidence layers
@@ -59,13 +59,15 @@ two predicate types, constrained verification results, and founder-controlled
 private bundle custody. The public receipt is a first-party custody record; it
 is not itself a signature or external validation.
 
-The named deployed release is documented in
-[`PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md`](PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md).
-It binds the 43-file archive for commit `e513f65a` to the successful supply-chain
-run, human-gated deployment run, 43-of-43 live-byte verification, security-header
-receipt, and a separate read-only post-deployment audit. That receipt is
-first-party deployment evidence for the named static release; it is not external
-validation or broader production authorization.
+The current named deployed release is documented in
+[`PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-12.md`](PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-12.md).
+It binds the 43-file archive for commit `1ce7c359` to the successful
+supply-chain run, human-gated deployment and rollback capture, 43-of-43
+live-byte verification, and a separate read-only post-deployment audit. The
+earlier [`e513f65a` receipt](PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md)
+remains retained, and security-header evidence remains a separate bounded
+control. These are first-party deployment records for named static releases;
+they are not external validation or broader production authorization.
 
 ## Consumer verification
 
@@ -101,23 +103,25 @@ It reconstructs the exact deterministic archive from immutable Git blobs and
 checks the public receipt's identities and `HOLD`. It does not replace the
 constrained online `gh attestation verify` signature check.
 
-For the named deployed release, run:
+For the retained named deployment history, run:
 
 ```bash
 python code/ops/VERIFY_PUBLIC_SITE_DEPLOYMENT_RECEIPT.py
 ```
 
-It reconstructs the exact 43-file archive from immutable Git blobs and checks
-the retained first-party deployment receipt. It does not contact GitHub or the
-live domain, so it does not replace fresh signature or HTTP verification.
+It reconstructs every retained exact 43-file archive from immutable Git blobs
+and checks the append-only first-party deployment history. It does not contact
+GitHub or the live domain, so it does not replace fresh signature or HTTP
+verification.
 
 ## Production boundary
 
-The exact static release at commit `e513f65a` passed the separately gated
+The exact static release at commit `1ce7c359` passed the separately gated
 `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow, rollback capture, 43-of-43 live
-byte verification, and independent read-only audit. A signed build by itself
-still does not prove deployment, and any later release must pass the same gate.
-The broader platform production decision remains `HOLD`.
+byte verification, and separate read-only audit. The prior `e513f65a` release
+remains independently reconstructable. A signed build by itself still does not
+prove deployment, and any later release must pass the same gate. The broader
+platform production decision remains `HOLD`.
 
 ## Remaining gates
 

@@ -78,12 +78,14 @@ ProofLock assets, and noindex legacy-route HOLD stubs. Pull requests produce uns
 verification artifacts; successful `main` builds separately create and verify
 GitHub OIDC/Sigstore provenance and SBOM attestations for the exact archive.
 The first retained successful signed set is bound to commit
-`5fff567c11bee65b5b1de5415d8b8935cd2dfab0`. The named deployed public release,
-commit `e513f65a219a12e539d9f7dd3ea47a6a081c5262`, contains 43 allowlisted files
-and has first-party receipts for constrained attestation verification,
-human-gated deployment, 43-of-43 exact live-byte verification, security-header
-verification, and an independent read-only post-deployment audit. This remains
-a bounded static-release result—not a whole-product or VPS SBOM, a SLSA level,
+`5fff567c11bee65b5b1de5415d8b8935cd2dfab0`. The current named deployed public
+release, commit `1ce7c35975a4011fa844e8b39ccbc950c8c0f398`, contains 43
+allowlisted files and has first-party receipts for constrained attestation
+verification, human-gated deployment, 43-of-43 exact live-byte verification,
+rollback capture, and a separate read-only post-deployment audit. The earlier
+deployed release `e513f65a` remains in the append-only receipt history, and
+public security-header verification remains a separate bounded control. These
+are static-release results—not a whole-product or VPS SBOM, a SLSA level,
 external validation, or production authorization for the broader platform.
 
 Repository source and declared dependency changes are separately covered by
@@ -164,7 +166,7 @@ LumenCore emphasizes fail-closed decisions: missing rights, ambiguous provenance
 | ProofLock Console | Deployed bounded demonstration; verifies receipt integrity and refuses unauthorized promotion. |
 | EIA benchmark package | First-party reproducible for the named pinned package; prepared for non-author execution. |
 | External replication docket | Draft protocol for preregistration, evaluator independence, frozen inputs, deviations, and negative results. |
-| Exact public-release supply chain and deployment | Deterministic 43-file CycloneDX 1.6 inventory for named release `e513f65a`, constrained GitHub OIDC/Sigstore provenance and SBOM verification, human-gated deployment, 43-of-43 exact live-byte verification, and an independent read-only audit; legacy operator URLs are noindex HOLD stubs; no whole-product SBOM, SLSA level, external-validation, or broader production-authorization claim. |
+| Exact public-release supply chain and deployment | Current named release `1ce7c359` has deterministic 43-file CycloneDX 1.6 coverage, constrained GitHub OIDC/Sigstore provenance and SBOM verification, human-gated deployment, rollback capture, 43-of-43 exact live-byte verification, and a separate read-only audit; the earlier `e513f65a` receipt remains append-only; legacy operator URLs are noindex HOLD stubs; no whole-product SBOM, SLSA level, external-validation, or broader production-authorization claim. |
 | Buyer-Owned Baseline Validation Sprint | Sole primary paid offer; proposed tiers are $7,500, $15,000, and from $25,000. Pricing is not buyer-tested, and no signed scope, cleared payment, or delivery is claimed. ProofLock supplies the evidence and custody layer. |
 
 ## Evidence-state definitions

@@ -34,10 +34,41 @@ def write_receipt(path: Path, payload: dict) -> None:
 def test_retained_receipt_reconstructs_exact_release() -> None:
     result = MODULE.verify_receipt()
     assert result["valid"] is True
+    assert result["source_commit"] == MODULE.DEFAULT_SOURCE_COMMIT
     assert result["release_file_count"] == 43
     assert result["live_release_verified"] is True
     assert result["incident_state"] == "NO_INCIDENT_OBSERVED"
     assert len(result["verification_sha256"]) == 64
+
+
+def test_full_retained_history_reconstructs_every_release() -> None:
+    result = MODULE.verify_all_receipts()
+    assert result["valid"] is True
+    assert result["receipt_count"] == 2
+    assert set(result["source_commits"]) == {
+        "e513f65a219a12e539d9f7dd3ea47a6a081c5262",
+        MODULE.DEFAULT_SOURCE_COMMIT,
+    }
+    assert all(item["live_release_verified"] for item in result["receipts"])
+    assert len(result["verification_sha256"]) == 64
+
+
+def test_repository_receipt_path_must_match_source_commit(tmp_path: Path) -> None:
+    fake_root = tmp_path / "repo"
+    bad_path = (
+        fake_root
+        / "evidence"
+        / "public-site-deployments"
+        / ("0" * 40)
+        / "deployment-receipt.json"
+    )
+    bad_path.parent.mkdir(parents=True)
+    with pytest.raises(MODULE.DeploymentReceiptError, match="not bound"):
+        MODULE._bind_repository_receipt_path(
+            root=fake_root,
+            receipt_path=bad_path,
+            source_commit=MODULE.DEFAULT_SOURCE_COMMIT,
+        )
 
 
 def test_self_hash_tampering_fails_closed(tmp_path: Path) -> None:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed verifier for the retained exact public-site deployment receipt."""
+"""Fail-closed verifier for retained exact public-site deployment receipts."""
 
 from __future__ import annotations
 
@@ -14,17 +14,17 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE_COMMIT = "e513f65a219a12e539d9f7dd3ea47a6a081c5262"
+RECEIPT_ROOT = ROOT / "evidence" / "public-site-deployments"
+DEFAULT_SOURCE_COMMIT = "1ce7c35975a4011fa844e8b39ccbc950c8c0f398"
 DEFAULT_RECEIPT = (
-    ROOT
-    / "evidence"
-    / "public-site-deployments"
-    / SOURCE_COMMIT
+    RECEIPT_ROOT
+    / DEFAULT_SOURCE_COMMIT
     / "deployment-receipt.json"
 )
 PACKAGER_PATH = ROOT / "code" / "deploy" / "package_public_site_release.py"
 SUPPLY_CHAIN_PATH = ROOT / "code" / "deploy" / "build_public_site_supply_chain.py"
 HEX64 = re.compile(r"[0-9a-f]{64}")
+HEX40 = re.compile(r"[0-9a-f]{40}")
 
 REQUIRED_BOUNDARIES = {
     "independent audit or certification",
@@ -89,7 +89,7 @@ def _require_sha(value: Any, label: str) -> str:
     return value
 
 
-def _require_successful_run(value: Any, label: str, source_commit: str) -> None:
+def _require_successful_run(value: Any, label: str) -> None:
     if not isinstance(value, dict):
         raise DeploymentReceiptError(f"{label} must be an object")
     if value.get("conclusion") != "success":
@@ -104,8 +104,19 @@ def _require_successful_run(value: Any, label: str, source_commit: str) -> None:
     )
     if url != expected_url:
         raise DeploymentReceiptError(f"{label}.url is not bound to run_id")
-    if source_commit != SOURCE_COMMIT:
-        raise DeploymentReceiptError("unexpected source commit")
+
+
+def _bind_repository_receipt_path(
+    *, root: Path, receipt_path: Path, source_commit: str
+) -> None:
+    receipt_root = (root / "evidence" / "public-site-deployments").resolve()
+    resolved = receipt_path.resolve()
+    try:
+        relative = resolved.relative_to(receipt_root)
+    except ValueError:
+        return
+    if relative.parts != (source_commit, "deployment-receipt.json"):
+        raise DeploymentReceiptError("receipt path is not bound to source commit")
 
 
 def verify_receipt(
@@ -118,8 +129,11 @@ def verify_receipt(
     if receipt.get("repository") != "robertashworth1986-debug/lumen-core-public":
         raise DeploymentReceiptError("repository mismatch")
     source_commit = receipt.get("source_commit")
-    if source_commit != SOURCE_COMMIT:
-        raise DeploymentReceiptError("source commit mismatch")
+    if not isinstance(source_commit, str) or HEX40.fullmatch(source_commit) is None:
+        raise DeploymentReceiptError("source commit must be a lowercase Git SHA")
+    _bind_repository_receipt_path(
+        root=root, receipt_path=receipt_path, source_commit=source_commit
+    )
 
     recorded_self_hash = _require_sha(receipt.get("receipt_sha256"), "receipt_sha256")
     unsigned = dict(receipt)
@@ -176,7 +190,7 @@ def verify_receipt(
             raise DeploymentReceiptError("CycloneDX SHA-256 mismatch")
 
     supply = receipt.get("supply_chain")
-    _require_successful_run(supply, "supply_chain", source_commit)
+    _require_successful_run(supply, "supply_chain")
     if supply.get("event") != "push":
         raise DeploymentReceiptError("supply-chain trigger mismatch")
     if supply.get("signed_attestation_scope") != "MAIN_BRANCH_GITHUB_HOSTED_WORKFLOW_ONLY":
@@ -201,7 +215,7 @@ def verify_receipt(
         )
 
     deployment = receipt.get("deployment")
-    _require_successful_run(deployment, "deployment", source_commit)
+    _require_successful_run(deployment, "deployment")
     if deployment.get("approval") != "DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT":
         raise DeploymentReceiptError("deployment approval mismatch")
     if deployment.get("expected_file_count") != 43 or deployment.get(
@@ -214,7 +228,7 @@ def verify_receipt(
     _require_sha(deployment.get("live_gate_sha256"), "deployment live gate")
 
     audit = receipt.get("post_deployment_audit")
-    _require_successful_run(audit, "post_deployment_audit", source_commit)
+    _require_successful_run(audit, "post_deployment_audit")
     if audit.get("expected_file_count") != 43 or audit.get("matched_file_count") != 43:
         raise DeploymentReceiptError("post-deployment audit count mismatch")
     if audit.get("release_verified") is not True:
@@ -256,14 +270,56 @@ def verify_receipt(
     return verification
 
 
+def verify_all_receipts(
+    *, root: Path = ROOT, receipt_root: Path | None = None
+) -> dict[str, Any]:
+    root = root.resolve(strict=True)
+    receipt_root = (
+        receipt_root.resolve(strict=True)
+        if receipt_root is not None
+        else root / "evidence" / "public-site-deployments"
+    )
+    paths = sorted(receipt_root.glob("*/deployment-receipt.json"))
+    if not paths:
+        raise DeploymentReceiptError("no retained deployment receipts found")
+
+    verified = [verify_receipt(root=root, receipt_path=path) for path in paths]
+    source_commits = [item["source_commit"] for item in verified]
+    if len(source_commits) != len(set(source_commits)):
+        raise DeploymentReceiptError("duplicate retained source commit")
+
+    result = {
+        "schema": "lumencore.public_site_exact_deployment_history_verification.v1",
+        "valid": True,
+        "receipt_count": len(verified),
+        "source_commits": source_commits,
+        "receipts": verified,
+        "claim_boundary": (
+            "This local history verifier reconstructs every retained Git subject and "
+            "checks each first-party receipt. It does not perform a fresh remote "
+            "signature lookup or live HTTP audit."
+        ),
+    }
+    result["verification_sha256"] = sha256_bytes(canonical_bytes(result))
+    return result
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--receipt", type=Path, default=DEFAULT_RECEIPT)
+    parser.add_argument(
+        "--receipt",
+        type=Path,
+        help="Verify one receipt; omit to reconstruct and verify the full history.",
+    )
     parser.add_argument("--json-out", type=Path)
     args = parser.parse_args()
     try:
-        result = verify_receipt(root=args.root, receipt_path=args.receipt)
+        result = (
+            verify_receipt(root=args.root, receipt_path=args.receipt)
+            if args.receipt is not None
+            else verify_all_receipts(root=args.root)
+        )
     except (OSError, DeploymentReceiptError, json.JSONDecodeError) as exc:
         print(json.dumps({"valid": False, "error": str(exc)}, sort_keys=True))
         return 1
