@@ -68,7 +68,7 @@
     }
   ],
   "external_action_performed": false,
-  "generated_utc": "2026-08-08T13:28:17Z",
+  "generated_utc": "2026-08-12T01:09:34Z",
   "notice_id": "ONC-ARGOS-SSN-2026-OS351107",
   "response": {
     "material_claim_count": 3,
@@ -96,7 +96,7 @@
     {
       "hash_mode": "TEXT_UTF8_LF",
       "path": "EVIDENCE_INDEX.md",
-      "sha256": "4cba1f720f52504a72bb54b06d3a91a8919902e5b37ff946760f9d9260a6b073"
+      "sha256": "ff1752207352fa60d28b312919ef7b1b9adb5a4612906e8d3006d793a648ca52"
     },
     {
       "hash_mode": "TEXT_UTF8_LF",
