@@ -1,0 +1,59 @@
+{
+  "schema": "lumencore.nic_dpu_packet_pipeline_protocol.v1",
+  "version": "1.0.0",
+  "frozen_date": "2026-08-17",
+  "research_question": "Can a bounded allocation-free C11 reference fast path parse and classify representative Ethernet, VLAN, IPv4, TCP, and UDP frames while failing closed on malformed or truncated input?",
+  "scope": {
+    "included": [
+      "host-user-space reference implementation",
+      "Ethernet II and single 802.1Q VLAN parsing",
+      "IPv4 header validation",
+      "TCP and UDP destination-port extraction",
+      "fragment-aware port handling",
+      "fixed rule-table pass, drop, and queue decisions",
+      "monotonic packet counters"
+    ],
+    "excluded": [
+      "live network capture or injection",
+      "kernel or driver integration",
+      "DPDK, XDP, eBPF, RDMA, RoCE, or GPUDirect",
+      "NIC firmware, FPGA, ASIC, or NVIDIA BlueField offload",
+      "line-rate, latency-SLA, production, security-certification, or hardware claims"
+    ]
+  },
+  "acceptance_gates": {
+    "strict_c11_compile": true,
+    "warnings_are_errors": true,
+    "address_and_undefined_behavior_sanitizer_smoke": true,
+    "minimum_deterministic_tests": 7,
+    "required_cases": [
+      "VLAN UDP queue rule",
+      "TCP drop rule",
+      "default pass",
+      "truncated frame fail-closed",
+      "malformed IPv4 fail-closed",
+      "non-IPv4 bounded pass",
+      "fragment does not expose unverified ports"
+    ],
+    "source_hash_manifest_required": true
+  },
+  "benchmark_policy": {
+    "purpose": "informative host measurement only",
+    "promotion_gate": false,
+    "prohibited_interpretations": [
+      "NIC throughput",
+      "DPU throughput",
+      "line-rate capacity",
+      "production latency",
+      "cross-machine comparison without a separately frozen protocol"
+    ]
+  },
+  "claim_gates": {
+    "bounded_c11_packet_pipeline": "eligible only after compiler and test receipt",
+    "deep_c_expertise": false,
+    "nic_expertise": false,
+    "dpu_expertise": false,
+    "hardware_offload": false,
+    "production_readiness": false
+  }
+}
