@@ -168,6 +168,7 @@ LumenCore emphasizes fail-closed decisions: missing rights, ambiguous provenance
 | External replication docket | Draft protocol for preregistration, evaluator independence, frozen inputs, deviations, and negative results. |
 | Exact public-release supply chain and deployment | Current named release `1ce7c359` has deterministic 43-file CycloneDX 1.6 coverage, constrained GitHub OIDC/Sigstore provenance and SBOM verification, human-gated deployment, rollback capture, 43-of-43 exact live-byte verification, and a separate read-only audit; the earlier `e513f65a` receipt remains append-only; legacy operator URLs are noindex HOLD stubs; no whole-product SBOM, SLSA level, external-validation, or broader production-authorization claim. |
 | Buyer-Owned Baseline Validation Sprint | Sole primary paid offer; proposed tiers are $7,500, $15,000, and from $25,000. Pricing is not buyer-tested, and no signed scope, cleared payment, or delivery is claimed. ProofLock supplies the evidence and custody layer. |
+| Bounded C11 packet-policy reference path | Strict-compiled, vector-tested, and sanitizer-smoked in host user space. This is not NIC/DPU hardware validation, line-rate evidence, production readiness, or expert certification. See [`NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md`](docs/NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md). |
 
 ## Evidence-state definitions
 
@@ -236,6 +237,15 @@ review. Action-time HumanUnlock remains outside machine verification.
 - Exact public-release SBOM and signed-attestation boundary: [docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md](docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)
 - Retained exact-release attestation receipt: [docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md](docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)
 - Exact named-release deployment receipt: [docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md](docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md)
+
+### Verify the bounded C11 lane
+
+```powershell
+python code/ops/BUILD_NIC_DPU_PACKET_PIPELINE_EVIDENCE.py
+python -m pytest -q tests/test_nic_dpu_packet_pipeline.py
+```
+
+The host timing output is informative only. It is not a NIC, DPU, line-rate, latency-SLA, or production-performance result.
 
 ## Intellectual-property boundary
 
