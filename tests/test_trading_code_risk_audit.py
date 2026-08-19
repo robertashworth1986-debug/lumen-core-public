@@ -36,8 +36,9 @@ def test_root_launchers_and_live_writers_are_inside_the_audit_boundary():
     by_path = {row["path"]: row for row in audit["files"]}
 
     full_truth = by_path["code/FULL_TRUTH_ORCHESTRATOR.py"]
-    assert {"live_arm_write", "live_mode_write"}.issubset(full_truth["signals"])
-    assert full_truth["classification"] == "high_review"
+    assert "live_arm_write" not in full_truth["signals"]
+    assert full_truth["classification"] == "guarded_review"
+    assert {"runtime_gate", "human_approval"}.issubset(full_truth["protections"])
 
     launcher = by_path["code/execution/RUN_LIVE_COMPOUNDING_STACK.ps1"]
     assert "live_arm_write" in launcher["signals"]

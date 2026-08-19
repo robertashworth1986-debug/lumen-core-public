@@ -16,9 +16,14 @@ def test_rebuild_engine_logic_keeps_paper_runtime_kill_switch_on():
 def test_full_truth_orchestrator_disarms_non_locked_runtime():
     text = (ROOT / "code" / "FULL_TRUTH_ORCHESTRATOR.py").read_text(encoding="utf-8")
 
-    assert 'rt["kill_switch"] = not strict_live_locked' in text
+    assert "validate_live_action_authority" in text
+    assert "human_action_time_authority" in text
+    assert 'rt["kill_switch"] = True' in text
+    assert "if not strict_live_locked:" in text
+    assert 'reason="full_truth_fail_closed_paper_sync"' in text
     assert 'ex_rt["kill_switch"] = not strict_live_locked' in text
     assert 'ex_status["kill_switch"] = not strict_live_locked' in text
+    assert 'ex_status["canonical_runtime_rewritten"] = canonical_runtime_rewritten' in text
 
 
 def test_activity_collector_has_separate_state_and_refreshes_reconciliation():

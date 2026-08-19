@@ -1,10 +1,10 @@
 import os
 import json
 # LUMENCORE UNIVERSAL META-ORCHESTRATOR
-# This script continuously scans all enabled Kraken pairs, runs all signal engines, ranks opportunities, and fires live trades with dynamic capital allocation.
+# This legacy entry point is retained for paper research and candidate ranking only.
 
 
-# UNIVERSAL META-ORCHESTRATOR: FULL LIVE, ALL ENGINES, REAL TXID, NO HUMAN APPROVAL
+# Direct live execution is quarantined behind the canonical execution stack.
 import time
 import traceback
 import sys
@@ -71,8 +71,6 @@ def _hydrate_live_keys() -> None:
                 print(f"[ORCH] Kraken secret fingerprint: { _mask_key(os.getenv('KRAKEN_API_SECRET','')) }")
             break
 
-_hydrate_live_keys()
-
 try:
     from symbol_registry_auto import SYMBOL_REGISTRY
 except Exception as e:
@@ -83,7 +81,7 @@ from bounded_infinity import MetaEngine
 from execution.rolling_capital_engine_multi import fetch_live_ohlcv, build_families, stats, build_strategy_returns
 import harmonic_hybrid_core
 import institutional_harmonic_core
-from kraken_execution import _ensure_flags, get_last_price, enforce_risk, _private_post, ADD_ORDER_PATH, assert_controller, verify_credentials
+from kraken_execution import verify_credentials
 
 ROOT = Path(__file__).resolve().parent.parent
 RUNTIME_CONTROL_PATH = ROOT / "config" / "runtime_control.json"
@@ -337,40 +335,8 @@ def binance_get_price(symbol: str) -> float:
 
 
 def fire_binance_order(symbol, notional_usd, side="buy"):
-    try:
-        key = os.getenv("BINANCE_API_KEY", "").strip()
-        secret = os.getenv("BINANCE_API_SECRET", "").strip()
-        if not key or not secret:
-            print(f"[BINANCE] Missing Binance API keys, cannot place order for {symbol}.")
-            return None
-        sym = _normalize_binance_symbol(symbol)
-        price = binance_get_price(sym)
-        if price <= 0:
-            print(f"[BINANCE] Could not resolve price for {sym}, skipping {symbol}.")
-            return None
-        quantity = float(notional_usd) / float(price)
-        if quantity <= 0:
-            print(f"[BINANCE] Quantity computed as zero for {symbol} at price {price}")
-            return None
-        params = {
-            "symbol": sym,
-            "side": "BUY" if side == "buy" else "SELL",
-            "type": "MARKET",
-            "quantity": f"{quantity:.6f}",
-            "timestamp": int(time.time() * 1000)
-        }
-        params["signature"] = _binance_sign(params, secret)
-        headers = {"X-MBX-APIKEY": key}
-        api_url = _binance_api_url()
-        resp = requests.post(f"{api_url}/api/v3/order", headers=headers, params=params, timeout=20)
-        resp.raise_for_status()
-        result = resp.json()
-        txid = result.get("orderId") or result.get("clientOrderId")
-        print(f"[BINANCE] {symbol} {side} {notional_usd:.2f} USD @ {price:.2f} ORDER_ID={txid}")
-        return txid
-    except Exception as e:
-        print(f"[BINANCE] ORDER ERROR {symbol}: {e}")
-        return None
+    del symbol, notional_usd, side
+    raise RuntimeError("legacy_live_execution_quarantined:use_canonical_execution_orchestrator")
 
 
 def evaluate_symbol(symbol):
@@ -498,56 +464,14 @@ def score_symbol(symbol):
         return -10
 
 def fire_live_order(symbol, notional_usd, side="buy"):
-    try:
-        symbol_info = SYMBOL_REGISTRY.get(symbol)
-        if not symbol_info:
-            print(f"[ORCH] Symbol {symbol} is not registered. Skipping live order.")
-            return None
-        if symbol_info.get("exchange", "").lower() != "kraken":
-            print(f"[ORCH] Skipping non-Kraken symbol {symbol} ({symbol_info.get('exchange')}).")
-            return None
-        pair = normalize_pair(symbol_info.get("pair", symbol))
-        if not pair:
-            print(f"[ORCH] No pair available for {symbol}, skipping.")
-            return None
-        flags = _ensure_flags()
-        assert_controller(CONTROLLER)
-        if not flags.get("live_enabled", False) or flags.get("kill_switch", True):
-            print(f"[ORCH] Live trading not enabled or kill switch is ON. Skipping {symbol}.")
-            return None
-        price = get_last_price(pair)
-        if price <= 0:
-            print(f"[ORCH] Could not resolve price for {pair}, skipping {symbol}.")
-            return None
-        volume_base = float(notional_usd) / float(price)
-        enforce_risk(symbol=pair, side=side, notional_usd=notional_usd)
-        payload = {
-            "pair": pair,
-            "type": side,
-            "ordertype": "market",
-            "volume": f"{float(volume_base):.8f}",
-            "validate": "false",
-            "userref": int(time.time())
-        }
-        result = _private_post(ADD_ORDER_PATH, payload)
-        txid = result.get("txid") or result.get("txid[0]") or None
-        print(f"[LIVE ORDER] {symbol} {side} {notional_usd:.2f} USD @ {price:.2f} TXID={txid}")
-        # Log to file
-        import os
-        log_dir = "out"
-        log_file = os.path.join(log_dir, "live_trade_log.txt")
-        os.makedirs(log_dir, exist_ok=True)
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())} {symbol} {side} {notional_usd:.2f} {price:.2f} TXID={txid}\n")
-        return txid
-    except Exception as e:
-        print(f"[LIVE ORDER ERROR] {symbol}: {e}\n{traceback.format_exc()}")
-        return None
+    del symbol, notional_usd, side
+    raise RuntimeError("legacy_live_execution_quarantined:use_canonical_execution_orchestrator")
 
 def main():
     if "--audit-live-keys" in sys.argv or "--audit-credentials" in sys.argv:
+        _hydrate_live_keys()
         audit_live_keys()
-        return
+        return 0
 
     runtime = load_json(RUNTIME_CONTROL_PATH, {})
     scan_top_n = int(runtime.get("scan_top_n", DEFAULT_SCAN_TOP_N) or DEFAULT_SCAN_TOP_N)
@@ -571,72 +495,11 @@ def main():
             return
         subprocess.run([sys.executable, str(paper_script)], cwd=str(Path(__file__).parent), env=env, check=False)
         print("[ORCH] Paper mode execution complete.")
-        return
+        return 0
 
-    print("[LUMENCORE] UNIVERSAL META-ORCHESTRATOR: FULL LIVE, ALL ENGINES, REAL TXID, NO HUMAN APPROVAL")
-    creds = verify_live_credentials()
-    if not creds.get("valid", False):
-        errors = creds.get("errors", {})
-        print(f"[ORCH] Live credential validation failed.")
-        print(f"[ORCH] Kraken error: {errors.get('kraken')}")
-        print(f"[ORCH] Binance error: {errors.get('binance')}")
-        return
-
-    exchange = creds.get("exchange")
-    print(f"[ORCH] Selected live exchange: {exchange}")
-    if exchange == "kraken":
-        print("[ORCH] Kraken credentials verified.")
-    elif exchange == "binance":
-        print("[ORCH] Binance credentials verified.")
-    else:
-        print("[ORCH] No valid live exchange available.")
-        return
-
-    candidates = build_live_candidate_report(exchange, scan_top_n)
-    if not candidates:
-        print(f"[ORCH] No valid live candidates available for {exchange}.")
-        return
-    print_candidate_report(candidates)
-
-    while True:
-        try:
-            symbols = [
-                s for s, info in SYMBOL_REGISTRY.items()
-                if info.get("exchange", "").lower() == exchange
-            ]
-            if not symbols:
-                symbols = list(SYMBOL_REGISTRY.keys())
-                print(f"[ORCH] No registry symbols explicitly assigned to {exchange}. Using all registry symbols.")
-
-            if not symbols:
-                print(f"[ORCH] No symbols found in registry. Exiting.")
-                break
-
-            scores = {s: score_symbol(s) for s in symbols}
-            best = sorted(scores.items(), key=lambda kv: kv[1], reverse=True)[:scan_top_n]
-            print(f"[ORCH] Scored {exchange} symbols: {best}")
-            capital = float(os.getenv("LUMENCORE_TOTAL_CAPITAL_USD", "1000"))
-            capital_per_symbol = capital / max(len(best), 1)
-            for symbol, score in best:
-                print(f"[ORCH] Attempting live order for {symbol} with score={score:.4f}")
-                if exchange == "kraken":
-                    txid = fire_live_order(symbol, capital_per_symbol, side="buy")
-                else:
-                    txid = fire_binance_order(symbol, capital_per_symbol, side="buy")
-                if txid:
-                    print(f"[ORCH] LIVE TRADE FIRED ({exchange}): {symbol} TXID={txid}")
-                time.sleep(3)  # Stagger orders by 3 seconds
-            os.makedirs("out", exist_ok=True)
-            if not os.path.exists("out/live_trade_log.txt"):
-                with open("out/live_trade_log.txt", "w", encoding="utf-8") as _:
-                    pass
-            with open("out/live_trade_log.txt", "r", encoding="utf-8") as f:
-                lines = f.readlines()
-            print(f"[ORCH] {len(lines)} LIVE TRADES FIRED. EXITING.")
-            break
-        except Exception as e:
-            print(f"[ORCH ERROR] {e}\n{traceback.format_exc()}")
-        time.sleep(SCAN_INTERVAL_SEC)
+    print("[ORCH] REFUSED: legacy direct live execution is quarantined.")
+    print("[ORCH] Use code/execution/execution_orchestrator.py through the canonical authority workflow.")
+    return 2
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

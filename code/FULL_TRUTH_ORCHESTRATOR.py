@@ -5,6 +5,7 @@ import urllib.request
 import pandas as pd
 import numpy as np
 from runtime_live_lock import is_strict_live_locked, stamp_runtime_writer
+from execution.live_action_authority import validate_live_action_authority
 try:
     import yaml
 except ImportError:
@@ -55,6 +56,7 @@ PAPER_LEDGER_JSONL         = OUT / "paper_trade_ledger.jsonl"
 EXECUTION_RUNTIME_JSON     = OUT / "execution_runtime.json"
 EXECUTION_STATUS_JSON      = OUT / "execution_status.json"
 APPROVAL_QUEUE_JSON        = OUT / "execution_approval_queue.json"
+LIVE_ACTION_RECEIPT_PATH   = OUT / "execution" / "live_action_time_approval_receipt_latest.json"
 OPS_OUT_DIR                = OUT / "ops"
 
 SECTOR_PIPELINE_WRAPPER            = CODE / "ops" / "RUN_SECTOR_ENERGY_EVIDENCE_PIPELINE.ps1"
@@ -449,27 +451,39 @@ def sync_live_sources(usable_files):
 def sync_runtime_files():
     rt = load_json(RUNTIME_CONTROL_PATH, {})
 
-    strict_live_locked = is_strict_live_locked(rt)
+    strict_live_requested = is_strict_live_locked(rt)
+    human_action_time_authority = {
+        "authorized": False,
+        "reasons": ["strict_live_lock_not_requested"],
+        "receipt_present": LIVE_ACTION_RECEIPT_PATH.exists(),
+        "receipt_age_sec": None,
+    }
+    if strict_live_requested:
+        human_action_time_authority = validate_live_action_authority(
+            runtime_path=RUNTIME_CONTROL_PATH,
+            receipt_path=LIVE_ACTION_RECEIPT_PATH,
+            ttl_seconds=300,
+        )
+    strict_live_locked = bool(
+        strict_live_requested and human_action_time_authority.get("authorized")
+    )
 
-    if strict_live_locked:
-        rt["mode"] = "live"
-        rt["allow_live_orders"] = True
-        rt["paper_enabled"] = False
-    else:
+    canonical_runtime_rewritten = False
+    if not strict_live_locked:
         rt["mode"] = "paper"
         rt["allow_live_orders"] = False
         rt["paper_enabled"] = True
-
-    rt["kill_switch"] = not strict_live_locked
-    rt["symbol"] = "UNIVERSE"
-    rt["loop_seconds"] = 5
-    stamp_runtime_writer(
-        rt,
-        writer="code/FULL_TRUTH_ORCHESTRATOR.py",
-        strict_live_lock=strict_live_locked,
-        reason="full_truth_sync_runtime_files",
-    )
-    save_json(RUNTIME_CONTROL_PATH, rt)
+        rt["kill_switch"] = True
+        rt["symbol"] = "UNIVERSE"
+        rt["loop_seconds"] = 5
+        stamp_runtime_writer(
+            rt,
+            writer="code/FULL_TRUTH_ORCHESTRATOR.py",
+            strict_live_lock=False,
+            reason="full_truth_fail_closed_paper_sync",
+        )
+        save_json(RUNTIME_CONTROL_PATH, rt)
+        canonical_runtime_rewritten = True
 
     paper = load_json(PAPER_RUNTIME_PATH, {})
     paper["starting_capital_usd"] = float(paper.get("starting_capital_usd", 100000.0))
@@ -504,10 +518,17 @@ def sync_runtime_files():
     ex_status["execution_mode"] = "live" if strict_live_locked else "paper"
     ex_status["kill_switch"] = not strict_live_locked
     ex_status["live_arm"] = "ON" if strict_live_locked else "OFF"
+    ex_status["live_action_time_authority"] = {
+        "authorized": bool(human_action_time_authority.get("authorized")),
+        "reasons": list(human_action_time_authority.get("reasons") or []),
+        "receipt_present": bool(human_action_time_authority.get("receipt_present")),
+        "receipt_age_sec": human_action_time_authority.get("receipt_age_sec"),
+    }
+    ex_status["canonical_runtime_rewritten"] = canonical_runtime_rewritten
     ex_status["note"] = (
-        "Strict live profile lock detected; preserving live execution arming."
+        "Strict live profile and fresh action-time authority verified; preserving live execution arming."
         if strict_live_locked
-        else "Paper + universe truth sync only. No live autonomous orders."
+        else "Paper + universe truth sync only. Existing live flags are not preserved without fresh action-time authority."
     )
     save_json(EXECUTION_STATUS_JSON, ex_status)
 
