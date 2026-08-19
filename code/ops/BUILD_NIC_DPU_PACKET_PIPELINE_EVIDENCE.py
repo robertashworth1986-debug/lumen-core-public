@@ -29,7 +29,6 @@ DEFAULT_MIRROR_DESTINATIONS = (
 )
 PACKAGE_PATHS = [
     ROOT / "README.md",
-    ROOT / "config" / "hybrid_agent_capability_registry_v1.json",
     ROOT / "code" / "ops" / "BUILD_NIC_DPU_PACKET_PIPELINE_EVIDENCE.py",
     ROOT / "tests" / "test_nic_dpu_packet_pipeline.py",
     ROOT / "docs" / "NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md",

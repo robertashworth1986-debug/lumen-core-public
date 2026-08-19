@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import sys
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "BUILD_NIC_DPU_PACKET_PIPELINE_EVIDENCE.py"
@@ -34,6 +36,10 @@ def test_c_fast_path_is_allocation_free_and_bounded() -> None:
 
 def test_builder_compiles_tests_and_hash_seals_receipt(tmp_path: Path) -> None:
     module = load_module()
+    try:
+        module.detect_zig_python()
+    except RuntimeError as exc:
+        pytest.skip(f"optional pinned Zig C toolchain unavailable: {exc}")
     mirrors = [tmp_path / "mirror_a", tmp_path / "mirror_b"]
     result = module.build_evidence(
         tmp_path / "out",
