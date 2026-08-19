@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 import csv
-from contextlib import contextmanager
 import hashlib
 import json
 import os
 import tempfile
-import time
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+try:
+    from .append_lock import exclusive_append_lock
+except ImportError:  # Direct execution imports this module from code/execution.
+    from append_lock import exclusive_append_lock
 
 
 LEDGER_SCHEMA_VERSION = "2.0.0"
@@ -40,33 +43,6 @@ class LedgerReconciliationError(RuntimeError):
 
 class LedgerLockError(RuntimeError):
     """Raised when another writer owns the append lock."""
-
-
-@contextmanager
-def _exclusive_lock(lock_path: Path, timeout_seconds: float = 5.0):
-    deadline = time.monotonic() + timeout_seconds
-    descriptor: int | None = None
-    while descriptor is None:
-        try:
-            descriptor = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        except FileExistsError:
-            if time.monotonic() >= deadline:
-                raise LedgerLockError(
-                    f"timed out waiting for ledger append lock: {lock_path.name}"
-                )
-            time.sleep(0.05)
-    try:
-        os.write(descriptor, f"pid={os.getpid()}\n".encode("ascii"))
-        os.close(descriptor)
-        descriptor = None
-        yield
-    finally:
-        if descriptor is not None:
-            os.close(descriptor)
-        try:
-            lock_path.unlink()
-        except FileNotFoundError:
-            pass
 
 
 def _canonical_json(value: Any) -> str:
@@ -357,7 +333,13 @@ class TradeLedger:
 
     def append(self, row: dict[str, Any]) -> str:
         lock_path = self.jsonl_path.with_name(self.jsonl_path.name + ".append.lock")
-        with _exclusive_lock(lock_path):
+        with exclusive_append_lock(
+            lock_path,
+            error_type=LedgerLockError,
+            error_message=lambda path: (
+                f"timed out waiting for ledger append lock: {path.name}"
+            ),
+        ):
             verification, records = self._read_and_verify_jsonl(self.jsonl_path)
             if verification["status"] != "pass":
                 raise LedgerIntegrityError("refusing to append to an invalid JSONL ledger")

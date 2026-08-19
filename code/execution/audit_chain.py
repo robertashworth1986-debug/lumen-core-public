@@ -3,12 +3,15 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import time
 from collections import Counter
-from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional
+
+try:
+    from .append_lock import exclusive_append_lock
+except ImportError:  # Direct execution imports this module from code/execution.
+    from append_lock import exclusive_append_lock
 
 
 GENESIS_HASH = "GENESIS"
@@ -20,33 +23,6 @@ class AuditChainIntegrityError(RuntimeError):
 
 class AuditChainLockError(RuntimeError):
     """Raised when another process owns the audit append lock."""
-
-
-@contextmanager
-def _exclusive_lock(lock_path: Path, timeout_seconds: float = 5.0):
-    deadline = time.monotonic() + timeout_seconds
-    descriptor: int | None = None
-    while descriptor is None:
-        try:
-            descriptor = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        except FileExistsError:
-            if time.monotonic() >= deadline:
-                raise AuditChainLockError(
-                    f"timed out waiting for audit append lock: {lock_path.name}"
-                )
-            time.sleep(0.05)
-    try:
-        os.write(descriptor, f"pid={os.getpid()}\n".encode("ascii"))
-        os.close(descriptor)
-        descriptor = None
-        yield
-    finally:
-        if descriptor is not None:
-            os.close(descriptor)
-        try:
-            lock_path.unlink()
-        except FileNotFoundError:
-            pass
 
 
 def _record_error(
@@ -182,7 +158,13 @@ class AuditChain:
         event_time_utc: Optional[str] = None,
     ) -> Dict[str, Any]:
         lock_path = self.chain_file.with_name(self.chain_file.name + ".append.lock")
-        with _exclusive_lock(lock_path):
+        with exclusive_append_lock(
+            lock_path,
+            error_type=AuditChainLockError,
+            error_message=lambda path: (
+                f"timed out waiting for audit append lock: {path.name}"
+            ),
+        ):
             if self._stat_signature() != self._expected_stat:
                 raise AuditChainIntegrityError(
                     "audit chain changed after initialization; re-open and verify before appending"

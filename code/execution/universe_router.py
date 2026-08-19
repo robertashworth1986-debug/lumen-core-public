@@ -14,7 +14,11 @@ MODE_FILE     = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2\config\mode.json")
 def load_mode():
     if not MODE_FILE.exists():
         return "SHADOW"
-    return json.loads(MODE_FILE.read_text()).get("mode", "SHADOW")
+    try:
+        mode = str(json.loads(MODE_FILE.read_text(encoding="utf-8")).get("mode", "SHADOW")).strip().upper()
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return "SHADOW"
+    return mode if mode in {"SHADOW", "PAPER"} else "SHADOW"
 
 # -------------------------------------------------
 # DUMMY SIGNAL ENGINE (HOOK YOUR REAL ONE HERE)
@@ -46,25 +50,23 @@ def select_top(ranked, n=5):
 # EXECUTION INTERFACE (SAFE — NO LIVE TRADING)
 # -------------------------------------------------
 def execute_trade(symbol, signal, mode):
-    if mode == "SHADOW":
+    normalized_mode = str(mode or "SHADOW").strip().upper()
+    if normalized_mode == "SHADOW":
         print(f"[SHADOW] {symbol} | score={signal:.4f}")
-        return
+        return {"status": "shadow", "symbol": str(symbol)}
 
-    if mode == "PAPER":
-        print(f"[PAPER] Simulated trade  {symbol}")
-        return
+    if normalized_mode == "PAPER":
+        print(f"[PAPER] Simulated trade - {symbol}")
+        return {"status": "paper", "symbol": str(symbol)}
 
-    if mode == "LIVE":
-        # LIVE execution: route to orchestrator's UniversalExchangeRouter
-        try:
-            from execution_orchestrator import router
-        except ImportError:
-            print(f"[ERROR] Could not import live router for {symbol}")
-            return
-        # Example: always buy 1 unit at market for demonstration (replace with real sizing/logic)
-        result = router.place_order(symbol, side="buy", size=1.0)
-        print(f"[LIVE] Trade result for {symbol}: {result}")
-        return
+    # This research router is intentionally non-executing. Live orders must enter
+    # through the canonical runtime guard, sizing, approval, audit, and ledger path.
+    print(f"[BLOCKED] Unsupported execution mode {normalized_mode!r} for {symbol}")
+    return {
+        "status": "blocked",
+        "symbol": str(symbol),
+        "reason": "canonical_live_execution_path_required",
+    }
 
 # -------------------------------------------------
 # MAIN LOOP
