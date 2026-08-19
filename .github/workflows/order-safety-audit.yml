@@ -47,7 +47,13 @@ jobs:
             code/execution/execution_orchestrator.py \
             code/execution/alpaca_paper_executor.py \
             code/ops/LIQUIDATE_ALL_TO_USD.py \
-            code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py
+            code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py \
+            code/FULL_TRUTH_ORCHESTRATOR.py \
+            code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py \
+            code/beast_mode.py \
+            code/lightning.py \
+            code/go_live_paper_trader.py \
+            code/ops/_copilot_watch.py
 
       - name: Run focused fail-closed tests
         run: |

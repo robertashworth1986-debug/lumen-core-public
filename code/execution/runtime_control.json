@@ -1,11 +1,12 @@
 {
-  "mode": "live",
-  "allow_live_orders": true,
-  "gate_override_enabled": true,
+  "mode": "paper",
+  "allow_live_orders": false,
+  "paper_enabled": true,
+  "gate_override_enabled": false,
   "max_position_usd": 50.0,
   "initial_capital": 219.0,
   "kill_switch": false,
   "daily_loss_limit": 43.8,
   "portfolio_heat_limit": 0.3,
-  "generated_utc": "2026-04-20T02:01:43.541962+00:00"
+  "generated_utc": "2026-08-19T14:15:58.9916379Z"
 }

@@ -414,14 +414,13 @@ runtime_control = load_json(RUNTIME_CONTROL_PATH, {})
 if not isinstance(runtime_control, dict):
     runtime_control = {}
 
-strict_live_lock = is_strict_live_locked(runtime_control)
-if strict_live_lock:
-    runtime_control["mode"] = "live"
-    runtime_control["allow_live_orders"] = True
-    runtime_control["paper_enabled"] = False
-else:
-    runtime_control["mode"] = "paper"
-    runtime_control["allow_live_orders"] = False
+strict_live_requested = is_strict_live_locked(runtime_control)
+strict_live_lock = False
+runtime_control["mode"] = "paper"
+runtime_control["allow_live_orders"] = False
+runtime_control["paper_enabled"] = True
+runtime_control["gate_override_enabled"] = False
+runtime_control["institutional_live_request_blocked"] = bool(strict_live_requested)
 
 runtime_control["kill_switch"] = False
 runtime_control["symbol"] = "UNIVERSE"
@@ -435,7 +434,7 @@ stamp_runtime_writer(
     runtime_control,
     writer="code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py",
     strict_live_lock=strict_live_lock,
-    reason="adaptive_rebuild_sync",
+    reason="adaptive_rebuild_sync_paper_only",
 )
 save_json(RUNTIME_CONTROL_PATH, runtime_control)
 

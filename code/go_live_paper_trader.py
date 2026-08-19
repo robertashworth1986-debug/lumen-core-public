@@ -41,38 +41,20 @@ def save_text(path: Path, text: str) -> None:
 
 
 def arm_live_mode() -> dict:
-    runtime = load_json(RUNTIME_CONTROL, {})
-    runtime["generated_utc"] = now_iso()
-    runtime["mode"] = "live"
-    runtime["allow_live_orders"] = True
-    runtime["kill_switch"] = False
-    runtime["gate_override_enabled"] = True
-    runtime.setdefault("initial_capital", 219.0)
-    save_json(RUNTIME_CONTROL, runtime)
-
-    # Maintain backward compatibility for legacy execution-only runtime files.
-    legacy_runtime = load_json(LEGACY_RUNTIME_CONTROL, {})
-    legacy_runtime.update({
-        "generated_utc": runtime["generated_utc"],
-        "mode": runtime["mode"],
-        "allow_live_orders": runtime["allow_live_orders"],
-        "kill_switch": runtime["kill_switch"],
-        "gate_override_enabled": runtime["gate_override_enabled"],
-    })
-    if "initial_capital" not in legacy_runtime:
-        legacy_runtime["initial_capital"] = runtime["initial_capital"]
-    save_json(LEGACY_RUNTIME_CONTROL, legacy_runtime)
-
-    return {"path": str(RUNTIME_CONTROL), "content": runtime}
+    raise RuntimeError(
+        "RETIRED_LIVE_ARMING: repository policy permits live market data and "
+        "paper execution only"
+    )
 
 
 def arm_paper_runtime() -> dict:
     runtime = load_json(PAPER_RUNTIME, {})
     runtime["generated_utc"] = now_iso()
-    runtime["mode"] = "live"
+    runtime["mode"] = "paper"
     runtime["paper_enabled"] = True
-    runtime["allow_live_orders"] = True
+    runtime["allow_live_orders"] = False
     runtime["kill_switch"] = False
+    runtime["gate_override_enabled"] = False
     runtime.setdefault("starting_capital_usd", 100000.0)
     runtime.setdefault("loop_seconds", 300)
     save_json(PAPER_RUNTIME, runtime)
@@ -80,20 +62,11 @@ def arm_paper_runtime() -> dict:
 
 
 def create_live_arm_confirm() -> dict:
-    save_text(LIVE_ARM_CONFIRM, f"{LIVE_ARM_PHRASE}\n")
-    return {"path": str(LIVE_ARM_CONFIRM), "phrase": LIVE_ARM_PHRASE}
+    raise RuntimeError("RETIRED_LIVE_ARMING: confirmation files are not generated")
 
 
 def write_proof(runtime_control: dict, paper_runtime: dict, confirm: dict) -> None:
-    proof = {
-        "generated_utc": now_iso(),
-        "runtime_control": runtime_control,
-        "paper_runtime": paper_runtime,
-        "live_arm_confirm": confirm,
-        "status": "live_configured",
-        "note": "Runtime flags set to live and allow_live_orders enabled. This file is a bootstrapped live-arm proof artifact.",
-    }
-    save_json(PROOF_FILE, proof)
+    raise RuntimeError("RETIRED_LIVE_ARMING: live proof artifacts are not generated")
 
 
 def main() -> int:

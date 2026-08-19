@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-12.live-data-no-orders.v4",
+  "version": "2026-08-19.live-data-no-orders.v5",
   "promotion_stage": "live_data_no_orders",
   "patterns": {
     "kraken_add_order": "\\bAddOrder\\b",
@@ -8,6 +8,30 @@
     "kraken_private_add_order_call": "_private_post\\s*\\(\\s*ADD_ORDER_PATH\\b",
     "ccxt_create_order": "\\bcreate_order\\s*\\("
   },
+  "arming_patterns": {
+    "python_allow_live_orders_true": "(?:\\[\\s*[\"']allow_live_orders[\"']\\s*\\]|\\.allow_live_orders)\\s*=\\s*True\\b",
+    "powershell_allow_live_orders_true": "\\.allow_live_orders\\s*=\\s*\\$true\\b"
+  },
+  "runtime_invariants": [
+    {
+      "path": "config/runtime_control.json",
+      "expected": {
+        "mode": "paper",
+        "allow_live_orders": false,
+        "paper_enabled": true,
+        "gate_override_enabled": false
+      }
+    },
+    {
+      "path": "code/execution/runtime_control.json",
+      "expected": {
+        "mode": "paper",
+        "allow_live_orders": false,
+        "paper_enabled": true,
+        "gate_override_enabled": false
+      }
+    }
+  ],
   "rules": [
     {
       "path": "code/execution/execution_orchestrator.py",
