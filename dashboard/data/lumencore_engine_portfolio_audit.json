@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-11T23:54:05.516769Z",
+  "generated_at_utc": "2026-08-19T14:19:16.519238Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -822,9 +822,9 @@
             "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "78d007b9447c31030128f0451a9ef1ab72da7e90",
-            "bytes": 31107,
-            "sha256": "0ec4f644ae2f9a429aadfcaa5792e65e5daaa9e2b85abad2c1736bb16ebc6c8f"
+            "git_blob_sha": "9cd89ca92a09516d4fb2c59042966ade48f4a8c1",
+            "bytes": 31149,
+            "sha256": "9f3f209fb77207428dce93aaf101fce94b172bc1c66601ad632f74e01bac52c5"
           },
           {
             "path": "code/run_universal_meta_orchestrator.py",
@@ -840,9 +840,9 @@
             "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "78d007b9447c31030128f0451a9ef1ab72da7e90",
-            "bytes": 31107,
-            "sha256": "0ec4f644ae2f9a429aadfcaa5792e65e5daaa9e2b85abad2c1736bb16ebc6c8f"
+            "git_blob_sha": "9cd89ca92a09516d4fb2c59042966ade48f4a8c1",
+            "bytes": 31149,
+            "sha256": "9f3f209fb77207428dce93aaf101fce94b172bc1c66601ad632f74e01bac52c5"
           },
           {
             "path": "code/run_universal_meta_orchestrator.py",
@@ -992,6 +992,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "9b45c8371577b97e4c454dd6b1601fb4b7303d114d0cdf4398008bd5564f5c64"
+    "payload_sha256": "983084f99486bc94023686241ecb48ea4a7d6a2880bd5aa6cd978c3d46c4d271"
   }
 }
