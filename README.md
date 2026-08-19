@@ -60,6 +60,7 @@ The authoritative definitions and prohibited interpretations are in [`quant_hub_
 ## What Is Supported
 
 - Evidence-building infrastructure is implemented and tested.
+- A bounded C11 packet-policy reference path is strict-compiled, vector-tested, and sanitizer-smoked; it is host-user-space evidence only, not NIC/DPU hardware validation or expert certification. See [`NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md`](docs/NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md).
 - The locked replay records named baselines, positive comparisons, and non-wins.
 - Failed MDA promotion gates are retained as falsification evidence rather than relabeled as success.
 - The frozen FAA SDR holdout preserves a positive point delta that did not pass multiplicity-adjusted inference and therefore was not promoted.
@@ -102,7 +103,9 @@ From the repository root:
 ```powershell
 python code/ops/BUILD_QUANT_HUB_REVIEWER_CONTEXT.py
 python code/ops/BUILD_EIA_HOURLY_RUNTIME_PROJECTION.py --check
+python code/ops/BUILD_NIC_DPU_PACKET_PIPELINE_EVIDENCE.py
 python -m pytest -q tests/test_quant_hub_reviewer_context.py tests/test_faa_sdr_source_audit.py tests/test_faa_sdr_10k_benchmark.py
+python -m pytest -q tests/test_nic_dpu_packet_pipeline.py
 python -m pytest -q tests/test_external_proof_vault.py tests/test_funding_sprint_reviewer_gate.py
 ```
 

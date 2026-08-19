@@ -150,6 +150,11 @@
       "gate": "detected compiler and project-specific tests required"
     },
     {
+      "language": "C",
+      "status": "verified_bounded_packet_pipeline",
+      "gate": "pinned Zig-hosted C11 compiler, strict warnings-as-errors build, deterministic packet-pipeline tests, and reviewer-visible receipt; no NIC or DPU hardware claim"
+    },
+    {
       "language": "POSIX shell",
       "status": "present_not_repo_wide_certified",
       "gate": "shell parser and platform-specific smoke test required"
