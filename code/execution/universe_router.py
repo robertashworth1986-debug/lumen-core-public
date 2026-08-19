@@ -55,16 +55,11 @@ def execute_trade(symbol, signal, mode):
         return
 
     if mode == "LIVE":
-        # LIVE execution: route to orchestrator's UniversalExchangeRouter
-        try:
-            from execution_orchestrator import router
-        except ImportError:
-            print(f"[ERROR] Could not import live router for {symbol}")
-            return
-        # Example: always buy 1 unit at market for demonstration (replace with real sizing/logic)
-        result = router.place_order(symbol, side="buy", size=1.0)
-        print(f"[LIVE] Trade result for {symbol}: {result}")
-        return
+        print(
+            f"[BLOCKED] {symbol} | direct LIVE routing is quarantined; "
+            "use the canonical action-time-authorized execution stack"
+        )
+        return {"status": "BLOCKED", "reason": "canonical_live_execution_stack_required"}
 
 # -------------------------------------------------
 # MAIN LOOP

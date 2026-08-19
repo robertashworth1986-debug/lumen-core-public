@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import atexit
-import hashlib
+import importlib.util
 import json
 import os
 import subprocess
@@ -13,6 +13,33 @@ from typing import Any, Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+try:
+    from execution.live_action_authority import (
+        DEFAULT_AUTHORITY_TTL_SEC,
+        sha256_file,
+        validate_live_action_authority,
+    )
+except ImportError:
+    try:
+        from live_action_authority import (
+            DEFAULT_AUTHORITY_TTL_SEC,
+            sha256_file,
+            validate_live_action_authority,
+        )
+    except ImportError:
+        _authority_path = Path(__file__).with_name("live_action_authority.py")
+        _authority_spec = importlib.util.spec_from_file_location(
+            "live_action_authority_autofire",
+            _authority_path,
+        )
+        if _authority_spec is None or _authority_spec.loader is None:
+            raise RuntimeError("live action authority validator is unavailable")
+        _authority_module = importlib.util.module_from_spec(_authority_spec)
+        _authority_spec.loader.exec_module(_authority_module)
+        DEFAULT_AUTHORITY_TTL_SEC = _authority_module.DEFAULT_AUTHORITY_TTL_SEC
+        sha256_file = _authority_module.sha256_file
+        validate_live_action_authority = _authority_module.validate_live_action_authority
+
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT_EXEC = ROOT / "out" / "execution"
@@ -22,7 +49,7 @@ DEFAULT_HEARTBEAT_FILE = OUT_EXEC / "approval_autofire_heartbeat.json"
 DEFAULT_POLICY_FILE = ROOT / "run" / "approval_autofire_policy.json"
 DEFAULT_RUNTIME_FILE = ROOT / "config" / "runtime_control.json"
 DEFAULT_ACTION_RECEIPT_FILE = OUT_EXEC / "live_action_time_approval_receipt_latest.json"
-DEFAULT_ACTION_RECEIPT_TTL_SEC = 300
+DEFAULT_ACTION_RECEIPT_TTL_SEC = DEFAULT_AUTHORITY_TTL_SEC
 LOCK_FILE = OUT_EXEC / "approval_autofire_daemon.lock"
 LOCK_STALE_SEC = 6 * 60 * 60
 
@@ -128,111 +155,7 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def autofire_authority_state(
-    runtime_path: Path,
-    receipt_path: Path,
-    controller: str,
-    ttl_seconds: int = DEFAULT_ACTION_RECEIPT_TTL_SEC,
-    now: Optional[datetime] = None,
-) -> dict[str, Any]:
-    """Validate a short-lived, hash-bound live authority without disclosing receipt contents."""
-    reasons: list[str] = []
-    runtime: dict[str, Any] = {}
-    receipt: dict[str, Any] = {}
-    runtime_sha256 = ""
-    receipt_age_sec: Optional[float] = None
-
-    if not runtime_path.exists():
-        reasons.append("runtime_missing")
-    else:
-        try:
-            loaded_runtime = json.loads(runtime_path.read_text(encoding="utf-8-sig"))
-            if isinstance(loaded_runtime, dict):
-                runtime = loaded_runtime
-                runtime_sha256 = sha256_file(runtime_path)
-            else:
-                reasons.append("runtime_not_object")
-        except Exception:
-            reasons.append("runtime_unreadable")
-
-    mode = str(runtime.get("mode") or runtime.get("runtime_mode") or "").strip().lower()
-    allow_live_orders = runtime.get("allow_live_orders") is True
-    paper_enabled = runtime.get("paper_enabled") is True
-    kill_switch = runtime.get("kill_switch") is True
-    if mode != "live":
-        reasons.append("runtime_mode_not_live")
-    if not allow_live_orders:
-        reasons.append("live_orders_not_armed")
-    if paper_enabled:
-        reasons.append("paper_mode_conflict")
-    if kill_switch:
-        reasons.append("kill_switch_enabled")
-
-    if not receipt_path.exists():
-        reasons.append("action_receipt_missing")
-    else:
-        try:
-            loaded_receipt = json.loads(receipt_path.read_text(encoding="utf-8-sig"))
-            if isinstance(loaded_receipt, dict):
-                receipt = loaded_receipt
-            else:
-                reasons.append("action_receipt_not_object")
-        except Exception:
-            reasons.append("action_receipt_unreadable")
-
-    if receipt:
-        if receipt.get("schema") != "live_action_time_approval_receipt_v1":
-            reasons.append("action_receipt_schema_mismatch")
-        if str(receipt.get("controller") or "").strip() != controller:
-            reasons.append("action_receipt_controller_mismatch")
-        if receipt.get("human_unlock_verified") is not True:
-            reasons.append("human_unlock_not_verified")
-        if receipt.get("exact_action_time_phrase_verified") is not True:
-            reasons.append("action_time_phrase_not_verified")
-        if receipt.get("authorization_scope") != "single_live_stack_start":
-            reasons.append("action_receipt_scope_mismatch")
-        if receipt.get("reusable_for_restart") is not False:
-            reasons.append("action_receipt_reusable_or_unspecified")
-        if receipt.get("runtime_control_path") != "config/runtime_control.json":
-            reasons.append("action_receipt_runtime_path_mismatch")
-        if not runtime_sha256 or receipt.get("armed_runtime_sha256") != runtime_sha256:
-            reasons.append("action_receipt_runtime_hash_mismatch")
-
-        generated_at = parse_utc(receipt.get("generated_utc"))
-        if generated_at is None:
-            reasons.append("action_receipt_timestamp_invalid")
-        else:
-            reference = now or datetime.now(timezone.utc)
-            if reference.tzinfo is None:
-                reference = reference.replace(tzinfo=timezone.utc)
-            receipt_age_sec = (reference.astimezone(timezone.utc) - generated_at).total_seconds()
-            if receipt_age_sec < -5.0:
-                reasons.append("action_receipt_timestamp_in_future")
-            if receipt_age_sec > max(1, int(ttl_seconds)):
-                reasons.append("action_receipt_expired")
-
-    return {
-        "authorized": not reasons,
-        "reasons": reasons,
-        "runtime": {
-            "mode": mode,
-            "allow_live_orders": allow_live_orders,
-            "paper_enabled": paper_enabled,
-            "kill_switch": kill_switch,
-        },
-        "runtime_sha256": runtime_sha256,
-        "receipt_present": receipt_path.exists(),
-        "receipt_age_sec": round(receipt_age_sec, 3) if receipt_age_sec is not None else None,
-        "receipt_ttl_sec": max(1, int(ttl_seconds)),
-    }
+autofire_authority_state = validate_live_action_authority
 
 
 def request_json(

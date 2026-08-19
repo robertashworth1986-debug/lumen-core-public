@@ -6,6 +6,7 @@ import asyncio
 import copy
 import csv
 import hmac
+import importlib.util
 import io
 import json
 import logging
@@ -5070,9 +5071,40 @@ APPROVAL_QUEUE_FILE = ROOT / "execution_approval_queue.json"
 APPROVAL_QUEUE_FILE_OUT = OUT / "execution_approval_queue.json"
 APPROVAL_AUDIT_FILE = EXEC_OUT / "approval_decisions.jsonl"
 LIVE_KEYS_FILE = ROOT / "config" / "luma_live_keys.env"
+LIVE_ACTION_RECEIPT_FILE = EXEC_OUT / "live_action_time_approval_receipt_latest.json"
 TRADER_LEARNINGS_OVERRIDES_FILE = OUT / "ops" / "trader_learnings" / "learned_runtime_overrides.json"
 APPROVAL_TICKET_TTL_HOURS = 24.0
 APPROVAL_MIN_OPEN_POSITIONS_FLOOR = 10
+
+
+def _load_live_action_authority_validator():
+    try:
+        from execution.live_action_authority import validate_live_action_authority
+
+        return validate_live_action_authority
+    except ImportError:
+        authority_path = CODE / "execution" / "live_action_authority.py"
+        spec = importlib.util.spec_from_file_location(
+            "live_action_authority_gateway",
+            authority_path,
+        )
+        if spec is None or spec.loader is None:
+            raise RuntimeError("live action authority validator is unavailable")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module.validate_live_action_authority
+
+
+validate_live_action_authority = _load_live_action_authority_validator()
+
+
+def _live_action_time_authority(controller: str) -> dict[str, Any]:
+    return validate_live_action_authority(
+        runtime_path=RUNTIME_CONTROL_FILE,
+        receipt_path=LIVE_ACTION_RECEIPT_FILE,
+        controller=controller,
+        ttl_seconds=300,
+    )
 
 
 def _load_control_flags() -> dict[str, Any]:
@@ -5722,6 +5754,24 @@ def master_approval_decide(req: ApprovalDecideRequest) -> dict[str, Any]:
     payload_side = str(payload.get("type") or "").strip().lower()
     payload_volume = payload.get("volume")
 
+    if not is_validate:
+        authority = _live_action_time_authority(req.controller)
+        if not authority["authorized"]:
+            _append_jsonl(APPROVAL_AUDIT_FILE, {
+                "ts": now_utc(),
+                "event": "approve_blocked_action_time_authority",
+                "ticket_id": req.ticket_id,
+                "controller": req.controller,
+                "authority_reasons": authority["reasons"],
+                "receipt_present": authority["receipt_present"],
+                "receipt_age_sec": authority["receipt_age_sec"],
+            })
+            return {
+                "status": "blocked",
+                "reason": "human_action_time_authority_required",
+                "authority_reasons": authority["reasons"],
+            }
+
     if payload_side == "sell" and not is_validate:
         sell_check = _sell_balance_precheck(payload_pair, payload_volume)
         if not bool(sell_check.get("ok", True)):
@@ -5755,6 +5805,24 @@ def master_approval_decide(req: ApprovalDecideRequest) -> dict[str, Any]:
                 "status": "blocked",
                 "reason": "guard_failure",
                 "failed_guards": [failure],
+            }
+
+    if not is_validate:
+        authority = _live_action_time_authority(req.controller)
+        if not authority["authorized"]:
+            _append_jsonl(APPROVAL_AUDIT_FILE, {
+                "ts": now_utc(),
+                "event": "approve_blocked_action_time_authority_recheck",
+                "ticket_id": req.ticket_id,
+                "controller": req.controller,
+                "authority_reasons": authority["reasons"],
+                "receipt_present": authority["receipt_present"],
+                "receipt_age_sec": authority["receipt_age_sec"],
+            })
+            return {
+                "status": "blocked",
+                "reason": "human_action_time_authority_required",
+                "authority_reasons": authority["reasons"],
             }
 
     _append_jsonl(APPROVAL_AUDIT_FILE, {

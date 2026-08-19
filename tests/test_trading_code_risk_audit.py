@@ -48,6 +48,11 @@ def test_root_launchers_and_live_writers_are_inside_the_audit_boundary():
     assert "automatic_approval" in autofire["signals"]
     assert {"runtime_gate", "human_approval"}.issubset(autofire["protections"])
 
+    gateway = by_path["code/luma_experience_gateway.py"]
+    assert gateway["classification"] == "guarded_review"
+    assert "automatic_approval" in gateway["signals"]
+    assert {"runtime_gate", "human_approval"}.issubset(gateway["protections"])
+
 
 def test_withdrawal_and_validate_false_paths_are_not_marked_safe():
     module = load_module()
@@ -77,3 +82,33 @@ def test_withdrawal_and_validate_false_paths_are_not_marked_safe():
         if "validate_false" in row["signals"] and row["classification"] != "guarded_review"
     ]
     assert all(row["classification"] in {"high_review", "critical_legacy_quarantine"} for row in risky_validate_false)
+
+
+def test_live_write_signals_do_not_treat_comparisons_as_mutations():
+    module = load_module()
+    comparison_text = """
+if mode == "live":
+    allowed = allow_live_orders == True
+    stopped = kill_switch is False
+"""
+
+    hits = module.pattern_hits(comparison_text)
+
+    assert "live_mode_write" not in hits
+    assert "live_arm_write" not in hits
+    assert "kill_switch_off_write" not in hits
+
+
+def test_live_write_signals_cover_python_powershell_and_json_mutations():
+    module = load_module()
+    mutation_text = """
+runtime["mode"] = "live"
+$runtime.allow_live_orders = $true
+{"kill_switch": false}
+"""
+
+    hits = module.pattern_hits(mutation_text)
+
+    assert "live_mode_write" in hits
+    assert "live_arm_write" in hits
+    assert "kill_switch_off_write" in hits

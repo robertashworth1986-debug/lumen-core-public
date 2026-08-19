@@ -1531,11 +1531,25 @@ class UniversalExchangeRouter:
     def place_order(self, symbol: str, side: str, size: float, limit_price: Optional[float] = None,
                     leverage: float = 1.0, preferred_exchange: Optional[str] = None,
                     maker_first: bool = False, bid: Optional[float] = None, ask: Optional[float] = None,
-                    max_slippage_pct: float = 1.0, max_retries: int = 3, retry_delay: float = 0.25) -> Dict:
+                    max_slippage_pct: float = 1.0, max_retries: int = 3, retry_delay: float = 0.25,
+                    guard_context: Optional[Dict[str, Any]] = None) -> Dict:
         """
         Enhanced: step size enforcement, slippage protection, dynamic sizing, multi-asset balance, partial fill retry, order throttling, logging, graceful degradation.
         """
         import math
+        context = guard_context if isinstance(guard_context, dict) else {}
+        context_runtime = context.get('runtime') if isinstance(context.get('runtime'), dict) else {}
+        if context.get('preflight_authorized') is not True or not context_runtime:
+            return {'error': 'live_order_authority_blocked:human_action_time_authority_context_required', 'result': None}
+        route_guard = LiveRuntimeGuard(ROOT)
+        route_allowed, route_reason = route_guard.can_place_live_order(
+            context_runtime,
+            realized_pnl_total=float(context.get('realized_pnl_total', 0.0) or 0.0),
+            portfolio_heat=float(context.get('portfolio_heat', 0.0) or 0.0),
+            open_positions=int(context.get('open_positions', 0) or 0),
+        )
+        if not route_allowed:
+            return {'error': f'live_order_authority_blocked:{route_reason}', 'result': None}
         config = self.get_symbol_config(symbol)
         if not config:
             return {'error': f'Symbol {symbol} not in registry'}
@@ -4046,10 +4060,12 @@ while True:
 
 
         if should_attempt_conversion:
-            live_convert_allowed = (
-                str(runtime_cfg.get('mode', 'paper')).lower() == 'live'
-                and bool(runtime_cfg.get('allow_live_orders', False))
-                and not bool(runtime_cfg.get('kill_switch', False))
+            conversion_portfolio_heat = portfolio.exposure() / max(portfolio.current_equity, 1.0)
+            live_convert_allowed, live_convert_guard_reason = runtime_guard.can_place_live_order(
+                runtime_cfg,
+                realized_pnl_total=float(portfolio.realized_pnl_total),
+                portfolio_heat=float(conversion_portfolio_heat),
+                open_positions=int(loop_open_positions),
             )
             strict_live_only = bool(runtime_cfg.get('strict_live_only', False))
             if strict_live_only and not live_convert_allowed:
@@ -4139,6 +4155,13 @@ while True:
                         limit_price=bid_px,
                         leverage=1.0,
                         preferred_exchange='kraken',
+                        guard_context={
+                            'preflight_authorized': bool(live_convert_allowed),
+                            'runtime': runtime_cfg,
+                            'realized_pnl_total': float(portfolio.realized_pnl_total),
+                            'portfolio_heat': float(conversion_portfolio_heat),
+                            'open_positions': int(loop_open_positions),
+                        },
                     )
                     conv_mode = 'LIVE'
                 else:
@@ -4859,6 +4882,13 @@ while True:
                 maker_first=_maker_first_enabled,
                 bid=float(bid) if bid else None,
                 ask=float(ask) if ask else None,
+                guard_context={
+                    'preflight_authorized': bool(can_live),
+                    'runtime': runtime_cfg,
+                    'realized_pnl_total': float(portfolio.realized_pnl_total),
+                    'portfolio_heat': float(portfolio_heat),
+                    'open_positions': len(portfolio.get_open_positions()),
+                },
             )
             order_mode = 'LIVE'
         else:

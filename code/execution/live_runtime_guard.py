@@ -1,7 +1,29 @@
 import json
+import importlib.util
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Tuple
+
+
+def _load_authority_validator():
+    try:
+        from execution.live_action_authority import validate_live_action_authority
+        return validate_live_action_authority
+    except ImportError:
+        try:
+            from live_action_authority import validate_live_action_authority
+            return validate_live_action_authority
+        except ImportError:
+            path = Path(__file__).with_name("live_action_authority.py")
+            spec = importlib.util.spec_from_file_location("live_action_authority_guard", path)
+            if spec is None or spec.loader is None:
+                raise RuntimeError("live action authority validator is unavailable")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return module.validate_live_action_authority
+
+
+validate_live_action_authority = _load_authority_validator()
 
 
 class LiveRuntimeGuard:
@@ -12,6 +34,8 @@ class LiveRuntimeGuard:
         self.config = self.root / "config"
         self.runtime_file = self.config / "runtime_control.json"
         self.paper_file = self.config / "paper_trader_runtime.json"
+        self.action_receipt_file = self.root / "out" / "execution" / "live_action_time_approval_receipt_latest.json"
+        self.action_receipt_ttl_sec = 300
 
     def load(self) -> Dict:
         defaults = {
@@ -154,6 +178,15 @@ class LiveRuntimeGuard:
         # Prevent conflicting modes from passing by mistake.
         if bool(runtime.get("paper_enabled", False)):
             return False, "paper_mode_conflict"
+
+        authority = validate_live_action_authority(
+            runtime_path=self.runtime_file,
+            receipt_path=self.action_receipt_file,
+            ttl_seconds=self.action_receipt_ttl_sec,
+        )
+        if not authority["authorized"]:
+            first_reason = str((authority.get("reasons") or ["unknown"])[0])
+            return False, f"action_time_authority_required:{first_reason}"
 
         max_daily_loss = float(runtime.get("max_daily_loss_usd", 100.0) or 100.0)
         if realized_pnl_total <= -abs(max_daily_loss):
