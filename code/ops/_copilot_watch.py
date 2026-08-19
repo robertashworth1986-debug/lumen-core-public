@@ -13,15 +13,16 @@ LED_PATH = r'C:\LumaTrader\INSTITUTIONAL_STACK_V2\out\execution\live_trade_ledge
 
 SAFE_DEFAULTS = {
     'kill_switch': False,
-    'mode': 'live',
-    'allow_live_orders': True,
+    'mode': 'paper',
+    'paper_enabled': True,
+    'allow_live_orders': False,
     'max_open_positions': 10,
     'max_portfolio_heat': 0.72,
     'order_notional_pct': 0.55,
     'spot_inventory_entry_fraction': 0.55,
     'edge_proof_bootstrap_min_hybrid_score': 10.0,
     'edge_proof_bootstrap_min_momentum_pct': 0.08,
-    'gate_override_enabled': True,
+    'gate_override_enabled': False,
     'conviction_sizing_enabled': True,
     'symbol_learning_enabled': True,
     'adaptive_entry_gate_enabled': True,
@@ -159,16 +160,22 @@ while True:
     # ════════════════════════════════════════════════════════════════
     fixes = {}
 
-    # Rule 1: kill switch flipped on
+    # A manual kill switch is authoritative. Monitor it; never clear it.
     if rc.get('kill_switch') == True:
-        fixes['kill_switch'] = False
-        print('  !!!  KILL SWITCH IS ON — auto-clearing')
+        print('  !!!  KILL SWITCH IS ON — remaining fail-closed')
 
-    # Rule 2: mode not live
-    if str(rc.get('mode','')).lower() != 'live':
-        fixes['mode'] = 'live'
-        fixes['allow_live_orders'] = True
-        print(f'  !!!  MODE = {rc.get("mode")} — forcing live')
+    # Rule 2: enforce the institutional live-data/no-orders posture.
+    if (
+        str(rc.get('mode', '')).lower() != 'paper'
+        or rc.get('allow_live_orders') is not False
+        or rc.get('paper_enabled') is not True
+        or rc.get('gate_override_enabled') is not False
+    ):
+        fixes['mode'] = 'paper'
+        fixes['allow_live_orders'] = False
+        fixes['paper_enabled'] = True
+        fixes['gate_override_enabled'] = False
+        print(f'  !!!  MODE = {rc.get("mode")} — restoring paper-only policy')
 
     # Rule 3: alpha_gate_watch_only slipped to True
     if rc.get('alpha_gate_watch_only') == True:
@@ -182,10 +189,9 @@ while True:
         fixes['order_notional_pct'] = 0.25
         print(f'  !!!  order_notional_pct={onp:.2f} too low — restoring 0.25')
 
-    # Rule 5: risk reasons contain kill_switch_on
+    # Rule 5: a kill-switch risk reason is evidence, not an auto-clear request.
     if 'kill_switch_on' in risk_r:
-        fixes['kill_switch'] = False
-        print('  !!!  risk_reasons has kill_switch_on — fixing')
+        print('  !!!  risk_reasons has kill_switch_on — remaining fail-closed')
 
     # Rule 6: heat dangerously high (above 85%)
     if heat > 0.85:

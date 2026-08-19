@@ -46,8 +46,12 @@ def load_policy(path: Path) -> dict[str, Any]:
     policy = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(policy, dict) or not isinstance(policy.get("patterns"), dict):
         raise ValueError("order-submission policy is invalid")
+    if not isinstance(policy.get("arming_patterns", {}), dict):
+        raise ValueError("live-arming patterns are invalid")
     if not isinstance(policy.get("rules"), list):
         raise ValueError("order-submission rules are invalid")
+    if not isinstance(policy.get("runtime_invariants", []), list):
+        raise ValueError("runtime invariants are invalid")
     return policy
 
 
@@ -56,6 +60,10 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
     patterns = {
         name: re.compile(str(expression), re.MULTILINE)
         for name, expression in policy["patterns"].items()
+    }
+    arming_patterns = {
+        name: re.compile(str(expression), re.MULTILINE | re.IGNORECASE)
+        for name, expression in policy.get("arming_patterns", {}).items()
     }
     rules = list(policy["rules"])
     matches: list[dict[str, Any]] = []
@@ -70,7 +78,10 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
         raw = file_path.read_bytes()
         text = raw.decode("utf-8", errors="replace")
         hits = sorted(name for name, pattern in patterns.items() if pattern.search(text))
-        if not hits:
+        arming_hits = sorted(
+            name for name, pattern in arming_patterns.items() if pattern.search(text)
+        )
+        if not hits and not arming_hits:
             continue
 
         rule = _matching_rule(relative, rules)
@@ -78,14 +89,28 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
         item = {
             "path": relative,
             "patterns": hits,
+            "arming_patterns": arming_hits,
             "classification": classification,
             "sha256": hashlib.sha256(raw).hexdigest(),
             "git_blob_sha": _git_blob_sha(raw),
         }
         matches.append(item)
 
-        if rule is None:
+        if hits and rule is None:
             errors.append({"path": relative, "code": "unclassified_order_submission_path", "patterns": hits})
+
+        if arming_hits and classification not in {
+            "historical_preserved",
+            "historical_backup",
+            "test_fixture",
+        }:
+            errors.append({
+                "path": relative,
+                "code": "active_live_arming_path",
+                "patterns": arming_hits,
+            })
+
+        if rule is None:
             continue
 
         expected = str(rule.get("expected_git_blob_sha", "") or "")
@@ -173,7 +198,38 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
             if missing:
                 errors.append({"path": rule_path, "code": "ticket_facade_invariant_missing", "missing": missing})
 
+    for invariant in policy.get("runtime_invariants", []):
+        invariant_path = str(invariant.get("path", "") or "")
+        expected_values = invariant.get("expected", {})
+        path = root / invariant_path
+        if not invariant_path or not isinstance(expected_values, dict):
+            errors.append({"path": invariant_path, "code": "invalid_runtime_invariant"})
+            continue
+        if not path.exists():
+            errors.append({"path": invariant_path, "code": "runtime_control_missing"})
+            continue
+        try:
+            runtime = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            errors.append({"path": invariant_path, "code": "runtime_control_invalid_json"})
+            continue
+        if not isinstance(runtime, dict):
+            errors.append({"path": invariant_path, "code": "runtime_control_not_object"})
+            continue
+        mismatches = {
+            key: {"expected": expected, "actual": runtime.get(key)}
+            for key, expected in expected_values.items()
+            if runtime.get(key) != expected
+        }
+        if mismatches:
+            errors.append({
+                "path": invariant_path,
+                "code": "runtime_control_invariant_mismatch",
+                "mismatches": mismatches,
+            })
+
     unclassified = [error for error in errors if error["code"] == "unclassified_order_submission_path"]
+    active_arming = [error for error in errors if error["code"] == "active_live_arming_path"]
     report = {
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "policy_version": policy.get("version"),
@@ -182,6 +238,7 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
         "match_count": len(matches),
         "error_count": len(errors),
         "active_unclassified_count": len(unclassified),
+        "active_arming_count": len(active_arming),
         "matches": matches,
         "errors": errors,
     }

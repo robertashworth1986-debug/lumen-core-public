@@ -448,15 +448,13 @@ def sync_live_sources(usable_files):
 def sync_runtime_files():
     rt = load_json(RUNTIME_CONTROL_PATH, {})
 
-    strict_live_locked = is_strict_live_locked(rt)
-
-    if strict_live_locked:
-        rt["mode"] = "live"
-        rt["allow_live_orders"] = True
-        rt["paper_enabled"] = False
-    else:
-        rt["mode"] = "paper"
-        rt["allow_live_orders"] = False
+    strict_live_requested = is_strict_live_locked(rt)
+    strict_live_locked = False
+    rt["mode"] = "paper"
+    rt["allow_live_orders"] = False
+    rt["paper_enabled"] = True
+    rt["gate_override_enabled"] = False
+    rt["institutional_live_request_blocked"] = bool(strict_live_requested)
 
     rt["kill_switch"] = False
     rt["symbol"] = "UNIVERSE"
@@ -465,7 +463,7 @@ def sync_runtime_files():
         rt,
         writer="code/FULL_TRUTH_ORCHESTRATOR.py",
         strict_live_lock=strict_live_locked,
-        reason="full_truth_sync_runtime_files",
+        reason="full_truth_sync_runtime_files_paper_only",
     )
     save_json(RUNTIME_CONTROL_PATH, rt)
 

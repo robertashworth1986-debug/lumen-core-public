@@ -265,6 +265,73 @@ class PromotionLaneSafetyTests(unittest.TestCase):
         self.assertEqual(report["status"], "fail")
         self.assertTrue(any(error["code"] == "preserved_blob_mismatch" for error in report["errors"]))
 
+    def test_auditor_rejects_active_arming_and_unsafe_runtime_control(self) -> None:
+        module = load_path(
+            "live_arming_audit_test",
+            ROOT / "code" / "ops" / "AUDIT_ORDER_SUBMISSION_PATHS.py",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "code").mkdir()
+            (root / "config").mkdir()
+            (root / "code" / "arm.py").write_text(
+                'runtime["allow_live_orders"] = True\n', encoding="utf-8"
+            )
+            (root / "config" / "runtime_control.json").write_text(
+                json.dumps({"mode": "live", "allow_live_orders": True}),
+                encoding="utf-8",
+            )
+            policy = {
+                "version": "test",
+                "promotion_stage": "live_data_no_orders",
+                "patterns": {},
+                "arming_patterns": {
+                    "python_allow_live_orders_true": (
+                        r"\[\s*[\"']allow_live_orders[\"']\s*\]\s*=\s*True\b"
+                    )
+                },
+                "runtime_invariants": [
+                    {
+                        "path": "config/runtime_control.json",
+                        "expected": {"mode": "paper", "allow_live_orders": False},
+                    }
+                ],
+                "rules": [],
+            }
+            report = module.audit_repository(root, policy)
+        self.assertEqual(report["status"], "fail")
+        self.assertEqual(report["active_arming_count"], 1)
+        self.assertEqual(
+            {error["code"] for error in report["errors"]},
+            {"active_live_arming_path", "runtime_control_invariant_mismatch"},
+        )
+
+    def test_repository_has_no_active_live_arming_path(self) -> None:
+        module = load_path(
+            "repository_live_arming_audit_test",
+            ROOT / "code" / "ops" / "AUDIT_ORDER_SUBMISSION_PATHS.py",
+        )
+        policy = module.load_policy(ROOT / "config" / "order_submission_path_policy.json")
+        report = module.audit_repository(ROOT, policy)
+        self.assertEqual(report["status"], "pass", report["errors"])
+        self.assertEqual(report["active_arming_count"], 0)
+
+    def test_retired_live_launchers_cannot_start_execution(self) -> None:
+        python_launcher = (ROOT / "code" / "go_live_paper_trader.py").read_text(
+            encoding="utf-8"
+        )
+        powershell_launcher = (
+            ROOT / "code" / "execution" / "RUN_LIVE_COMPOUNDING_STACK.ps1"
+        ).read_text(encoding="utf-8")
+        copilot = (ROOT / "code" / "ops" / "_copilot_watch.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("RETIRED_LIVE_ARMING", python_launcher)
+        self.assertIn("RETIRED_LIVE_ARMING", powershell_launcher)
+        self.assertNotIn("Start-Process", powershell_launcher)
+        self.assertNotIn("fixes['kill_switch'] = False", copilot)
+        self.assertIn("remaining fail-closed", copilot)
+
 
 if __name__ == "__main__":
     unittest.main()

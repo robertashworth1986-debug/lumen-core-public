@@ -265,12 +265,13 @@ def apply_super_sniper(
     if sharp_value >= sharp_trigger and not dry_run:
         allow_live, live_guard_reasons = _live_guard_passes(sniper_cfg)
 
+    out["mode"] = "paper"
+    out["allow_live_orders"] = False
+    out["paper_enabled"] = True
+    out["gate_override_enabled"] = False
+    out["institutional_live_request_blocked"] = bool(allow_live)
     if allow_live:
-        out["mode"] = "live"
-        out["allow_live_orders"] = True
-    else:
-        out["mode"] = "paper"
-        out["allow_live_orders"] = False
+        live_guard_reasons.append("institutional_policy_live_order_submission_disabled")
 
     out["super_sniper_active"] = True
     out["super_sniper_last_run_utc"] = now_utc()

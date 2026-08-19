@@ -188,14 +188,16 @@ def apply_upgrades(runtime: Dict[str, Any], health: Dict[str, Any], guardrails: 
         out["base_risk_fraction"] = min(_f(out.get("base_risk_fraction", 0.2), 0.2), 0.35)
         out["max_position_usd"] = min(_f(out.get("max_position_usd", 50.0), 50.0), 75.0)
 
-    # live arming guard (still explicit)
+    # Preserve the guard result as evidence, but never promote it to execution.
     allow_live, reasons = _live_guard_passes(guardrails)
-    if not dry_run and allow_live and not high_or_critical:
-        out["mode"] = "live"
-        out["allow_live_orders"] = True
-    else:
-        out["mode"] = "paper"
-        out["allow_live_orders"] = False
+    live_request = bool(not dry_run and allow_live and not high_or_critical)
+    out["mode"] = "paper"
+    out["allow_live_orders"] = False
+    out["paper_enabled"] = True
+    out["gate_override_enabled"] = False
+    out["institutional_live_request_blocked"] = live_request
+    if live_request:
+        reasons.append("institutional_policy_live_order_submission_disabled")
 
     out["lightning_active"] = True
     out["lightning_last_run_utc"] = now_utc()
