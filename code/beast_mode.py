@@ -10,6 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from runtime_live_lock import is_strict_live_locked
+
 ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
 CONFIG_DIR = ROOT / "config"
 OUT_DIR = ROOT / "out" / "execution"
@@ -258,19 +260,10 @@ def apply_super_sniper(
         out["selected_symbol_hint"] = top_candidates[0]["symbol"]
     out["symbol"] = "UNIVERSE"
 
-    sharp_trigger = _safe_float(hunter.get("sharp_trigger"), 2.0)
-    allow_live = False
-    live_guard_reasons: List[str] = []
-
-    if sharp_value >= sharp_trigger and not dry_run:
-        allow_live, live_guard_reasons = _live_guard_passes(sniper_cfg)
-
-    if allow_live:
-        out["mode"] = "live"
-        out["allow_live_orders"] = True
-    else:
-        out["mode"] = "paper"
-        out["allow_live_orders"] = False
+    _legacy_allow_live, live_guard_reasons = _live_guard_passes(sniper_cfg)
+    live_guard_reasons.append("legacy_runtime_tuner_live_transition_retired")
+    out["mode"] = "paper"
+    out["allow_live_orders"] = False
 
     out["super_sniper_active"] = True
     out["super_sniper_last_run_utc"] = now_utc()
@@ -339,6 +332,7 @@ def run(dry_run: bool) -> int:
 
     delta = dict_delta(runtime_cfg, patched_cfg)
     material_delta = {k: v for k, v in delta.items() if k not in NOISE_DELTA_KEYS}
+    strict_live_runtime_protected = is_strict_live_locked(runtime_cfg)
 
     audit_cfg = sniper_cfg.get("audit", {}) or {}
     delta_file = ROOT / str(audit_cfg.get("out_file", "out/execution/frozen_deltas_super_sniper.json"))
@@ -361,6 +355,8 @@ def run(dry_run: bool) -> int:
         "delta_count": len(delta),
         "material_delta_keys": sorted(list(material_delta.keys())),
         "material_delta_count": len(material_delta),
+        "strict_live_runtime_protected": strict_live_runtime_protected,
+        "runtime_write_allowed": not strict_live_runtime_protected,
     }
 
     checksum_block = {
@@ -379,10 +375,12 @@ def run(dry_run: bool) -> int:
     atomic_write_json(decision_file, decision, indent=2)
     atomic_write_json(delta_file, frozen_delta, indent=2)
 
-    if not dry_run and material_delta:
+    if not dry_run and material_delta and not strict_live_runtime_protected:
         backup = RUNTIME_FILE.with_name(f"runtime_control.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
         atomic_write_json(backup, runtime_cfg, indent=2)
         atomic_write_json(RUNTIME_FILE, patched_cfg, indent=2)
+    elif not dry_run and strict_live_runtime_protected:
+        print("  [SUPER-SNIPER] protected strict-live runtime left unchanged")
     elif not dry_run:
         print("  [SUPER-SNIPER] no material runtime change; skipped runtime write")
 

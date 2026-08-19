@@ -40,11 +40,12 @@ c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe code/lightning_smo
 
 ## Safety Notes
 - No guaranteed returns; performance is market-dependent.
-- `lightning` defaults to paper unless explicit live arming guards pass.
+- `lightning` is paper-only and cannot transition a runtime to live.
+- A strict-live runtime is left unchanged so its hash-bound authority remains intact.
 - It writes frozen delta and remediation guidance for audit-grade traceability.
 
 ## Suggested sequence
 1. Run `beast_mode.py --apply`
 2. Run `lightning.py --apply`
 3. Start execution orchestrator in paper mode
-4. Review constraints/remediation outputs before any live arming
+4. Review constraints/remediation outputs; use the canonical action-time authority path for any separately approved live action

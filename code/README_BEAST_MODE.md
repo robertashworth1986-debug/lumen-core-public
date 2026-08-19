@@ -2,7 +2,7 @@
 
 `beast_mode.py` is a **runtime control tuner** for aggressive, high-cadence candidate hunting with auditable delta-freeze outputs.
 
-It does **not place orders directly**. It updates `config/runtime_control.json` and the existing orchestrator enforces execution + risk controls.
+It does **not place orders or arm live mode**. It can apply paper-safe tuning to `config/runtime_control.json`; the existing orchestrator enforces execution and risk controls.
 
 ## Files
 - Config: `config/super_sniper.json`
@@ -19,10 +19,8 @@ It does **not place orders directly**. It updates `config/runtime_control.json` 
 - Capital boost policy (`target_multiplier` default `10x`)
 - Cadence/pyramiding burst tuning
 - Delta freeze + checksum audit output
-- Live-arming guardrails:
-  - env var gate
-  - manual confirm file phrase
-  - explicit `allow_live_switch`
+- Legacy live-arm settings are retained only as diagnostic inputs.
+- A strict-live runtime is immutable to this tuner so its hash-bound authority cannot be invalidated.
 
 ## Run
 ### 1) Dry run (safe, default)
@@ -40,24 +38,10 @@ python code/beast_mode.py --apply
 python code/beast_mode_smoke.py
 ```
 
-## Live arming (explicit only)
-By default, config keeps live disabled:
-- `live_arming.allow_live_switch = false`
-- runtime is forced to paper mode.
-
-To arm live intentionally, all must pass:
-1. Set `allow_live_switch` to `true` in `config/super_sniper.json`
-2. Create `config/live_arm.confirm` containing `ARM_LIVE_SUPER_SNIPER`
-3. Set environment variable:
-```powershell
-$env:LUMENCORE_ARM_LIVE = "YES_I_ACCEPT_REAL_CAPITAL_RISK"
-```
-4. Run apply:
-```powershell
-python code/beast_mode.py --apply
-```
+## Live boundary
+`beast_mode.py` cannot transition a runtime to live. Live execution belongs to the canonical action-time authority path, which requires a fresh hash-bound human receipt and execution-layer validation. If the current runtime is already strict-live, this tuner writes its analysis artifacts but leaves that runtime file unchanged.
 
 ## Notes
 - A backup of runtime config is saved automatically on apply.
 - `futures_mode` stays disabled by default in super sniper config.
-- Use paper mode to validate candidate quality before live arming.
+- Use paper mode to evaluate candidate quality; this tuner is not a live-arming tool.

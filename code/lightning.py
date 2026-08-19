@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from runtime_live_lock import is_strict_live_locked
+
 ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
 CONFIG = ROOT / "config"
 OUT = ROOT / "out" / "execution"
@@ -188,14 +190,10 @@ def apply_upgrades(runtime: Dict[str, Any], health: Dict[str, Any], guardrails: 
         out["base_risk_fraction"] = min(_f(out.get("base_risk_fraction", 0.2), 0.2), 0.35)
         out["max_position_usd"] = min(_f(out.get("max_position_usd", 50.0), 50.0), 75.0)
 
-    # live arming guard (still explicit)
-    allow_live, reasons = _live_guard_passes(guardrails)
-    if not dry_run and allow_live and not high_or_critical:
-        out["mode"] = "live"
-        out["allow_live_orders"] = True
-    else:
-        out["mode"] = "paper"
-        out["allow_live_orders"] = False
+    _legacy_allow_live, reasons = _live_guard_passes(guardrails)
+    reasons.append("legacy_runtime_tuner_live_transition_retired")
+    out["mode"] = "paper"
+    out["allow_live_orders"] = False
 
     out["lightning_active"] = True
     out["lightning_last_run_utc"] = now_utc()
@@ -228,6 +226,7 @@ def run(dry_run: bool) -> int:
     patched = apply_upgrades(runtime, health, guardrails, dry_run=dry_run)
     delta = dict_delta(runtime, patched)
     material_delta = {k: v for k, v in delta.items() if k not in NOISE_DELTA_KEYS}
+    strict_live_runtime_protected = is_strict_live_locked(runtime)
 
     frozen = {
         "timestamp_utc": now_utc(),
@@ -240,6 +239,8 @@ def run(dry_run: bool) -> int:
         "delta": delta,
         "mode_after": patched.get("mode"),
         "live_after": bool(patched.get("allow_live_orders", False)),
+        "strict_live_runtime_protected": strict_live_runtime_protected,
+        "runtime_write_allowed": not strict_live_runtime_protected,
     }
 
     atomic_write_json(OUT / "lightning_frozen_delta.json", frozen, indent=2)
@@ -263,10 +264,12 @@ def run(dry_run: bool) -> int:
     }
     atomic_write_json(remediation_path, remediation, indent=2)
 
-    if not dry_run and material_delta:
+    if not dry_run and material_delta and not strict_live_runtime_protected:
         backup = RUNTIME_FILE.with_name(f"runtime_control.lightning_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
         atomic_write_json(backup, runtime, indent=2)
         atomic_write_json(RUNTIME_FILE, patched, indent=2)
+    elif not dry_run and strict_live_runtime_protected:
+        print("  [LIGHTNING] protected strict-live runtime left unchanged")
     elif not dry_run:
         print("  [LIGHTNING] no material runtime change; skipped runtime write")
 

@@ -1,10 +1,11 @@
 # Multi-Account Universe Rollout
 
-This layer discovers all **key-backed execution accounts** from `config/luma_live_keys.env`, maps the full universe into each account (executable + shadow), and emits policy-gated deployment plans.
+This layer discovers locally configured account records from `config/luma_live_keys.env`, maps the full universe into each account (paper-executable + shadow), and emits masked, paper-only deployment plans.
 
 ## Important
-- It can deploy across existing key-backed accounts.
+- It can write paper-only runtime plans for existing configured accounts.
 - It does **not** auto-create brokerage/exchange accounts (KYC/compliance requirement).
+- It never writes raw credentials into its registry or output plans.
 
 ## Files
 - Policy: `config/multi_account_policy.json`
@@ -27,7 +28,7 @@ c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe code/multi_account
 c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe code/multi_account_universe_rollout.py --apply
 ```
 
-### Request live arming (still policy-gated)
+### Record a blocked legacy live request
 ```powershell
 c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe code/multi_account_universe_rollout.py --apply --arm-live
 ```
@@ -37,11 +38,8 @@ c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe code/multi_account
 c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe code/multi_account_rollout_smoke.py
 ```
 
-## Live gating
-Even with `--arm-live`, live activation only occurs if policy guards pass:
-1. `allow_live=true` in `config/multi_account_policy.json`
-2. env var `LUMENCORE_ARM_MULTI_LIVE=YES_ARM_MULTI_ACCOUNT_LIVE`
-3. file `config/multi_live_arm.confirm` contains `ARM_MULTI_ACCOUNT_LIVE`
+## Live boundary
+`--arm-live` is retained for backward-compatible diagnostics, but it records a blocked constraint and all generated account runtimes remain paper-only. Multi-account live authorization must not be inferred from local key presence, an environment variable, or a confirmation file.
 
 ## Strategy mapping model
 - `KRAKEN` accounts execute crypto symbols and shadow equities.

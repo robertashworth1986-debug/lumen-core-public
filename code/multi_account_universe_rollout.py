@@ -166,6 +166,9 @@ def build_account_plan(accounts: List[Dict[str, Any]], universe: List[Dict[str, 
     if apply_live and not global_live_armed:
         live_reasons.append("global_runtime_not_live_armed")
         allow_live = False
+    if apply_live:
+        live_reasons.append("legacy_multi_account_live_transition_retired")
+        allow_live = False
 
     plan_accounts: List[Dict[str, Any]] = []
     constraints: List[Dict[str, Any]] = []
@@ -216,13 +219,10 @@ def build_account_plan(accounts: List[Dict[str, Any]], universe: List[Dict[str, 
         constraints.extend(account_constraints)
         remediation.extend(account_constraints)
 
-        safe_live = apply_live and allow_live and acc.get("status") == "ready"
-        mode = "live" if safe_live else str(policy.get("default_mode", "paper"))
-
         runtime_patch = {
-            "mode": mode,
-            "allow_live_orders": bool(safe_live),
-            "paper_enabled": not bool(safe_live),
+            "mode": "paper",
+            "allow_live_orders": False,
+            "paper_enabled": True,
             "kill_switch": bool(global_runtime.get("kill_switch", False)),
             "inherits_global_live_gate": True,
             "symbol": "UNIVERSE",
@@ -254,7 +254,7 @@ def build_account_plan(accounts: List[Dict[str, Any]], universe: List[Dict[str, 
     return {
         "generated_utc": now_utc(),
         "allow_live_requested": apply_live,
-        "allow_live_effective": allow_live and apply_live and global_live_armed,
+        "allow_live_effective": False,
         "global_live_armed": global_live_armed,
         "live_guard_reasons": live_reasons,
         "accounts_total": len(accounts),
@@ -345,7 +345,7 @@ def run(apply: bool, arm_live: bool) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Deploy full-universe strategy plans across all key-backed accounts")
     parser.add_argument("--apply", action="store_true", help="Write per-account runtime config files")
-    parser.add_argument("--arm-live", action="store_true", help="Request live arming (still policy-gated)")
+    parser.add_argument("--arm-live", action="store_true", help="Record a blocked legacy live request; output remains paper-only")
     args = parser.parse_args()
     return run(apply=args.apply, arm_live=args.arm_live)
 
