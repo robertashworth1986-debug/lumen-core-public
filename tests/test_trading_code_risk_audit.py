@@ -18,15 +18,34 @@ def test_audit_avoids_key_files_and_names_safe_spine():
     module = load_module()
     audit = module.build_audit()
 
-    scanned = "\n".join(str(path) for path in module.iter_scan_paths()).lower()
+    scanned = "\n".join(str(path) for path in module.iter_scan_paths()).lower().replace("\\", "/")
     assert ".env" not in scanned
     assert "live_keys.env" not in scanned
     assert "keys.env" not in scanned
+    assert "code/_start_all_live_now.ps1" in scanned
 
     assert audit["secret_handling"].startswith("Scanner intentionally avoids env/key files")
     assert "code/kraken_execution.py" in audit["safe_spine"]
     assert "code/execution/live_runtime_guard.py" in audit["safe_spine"]
     assert audit["posture"] in {"BLOCK_LEGACY_LIVE", "GUARDED_REVIEW"}
+
+
+def test_root_launchers_and_live_writers_are_inside_the_audit_boundary():
+    module = load_module()
+    audit = module.build_audit()
+    by_path = {row["path"]: row for row in audit["files"]}
+
+    full_truth = by_path["code/FULL_TRUTH_ORCHESTRATOR.py"]
+    assert {"live_arm_write", "live_mode_write"}.issubset(full_truth["signals"])
+    assert full_truth["classification"] == "high_review"
+
+    launcher = by_path["code/execution/RUN_LIVE_COMPOUNDING_STACK.ps1"]
+    assert "live_arm_write" in launcher["signals"]
+    assert {"human_approval", "runtime_gate"}.issubset(launcher["protections"])
+
+    autofire = by_path["code/execution/approval_autofire_daemon.py"]
+    assert autofire["classification"] == "high_review"
+    assert "automatic_approval" in autofire["signals"]
 
 
 def test_withdrawal_and_validate_false_paths_are_not_marked_safe():

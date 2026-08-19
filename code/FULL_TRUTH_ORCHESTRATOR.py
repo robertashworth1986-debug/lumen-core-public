@@ -458,8 +458,9 @@ def sync_runtime_files():
     else:
         rt["mode"] = "paper"
         rt["allow_live_orders"] = False
+        rt["paper_enabled"] = True
 
-    rt["kill_switch"] = False
+    rt["kill_switch"] = not strict_live_locked
     rt["symbol"] = "UNIVERSE"
     rt["loop_seconds"] = 5
     stamp_runtime_writer(
@@ -491,7 +492,7 @@ def sync_runtime_files():
     ex_rt = load_json(EXECUTION_RUNTIME_JSON, {})
     ex_rt["timestamp"] = iso_now()
     ex_rt["live_enabled"] = bool(strict_live_locked)
-    ex_rt["kill_switch"] = False
+    ex_rt["kill_switch"] = not strict_live_locked
     ex_rt["runtime_mode"] = "live" if strict_live_locked else "paper"
     ex_rt["position"] = ex_rt.get("position", "flat")
     ex_rt["symbol"] = None
@@ -501,7 +502,7 @@ def sync_runtime_files():
     ex_status = load_json(EXECUTION_STATUS_JSON, {})
     ex_status["generated_utc"] = iso_now()
     ex_status["execution_mode"] = "live" if strict_live_locked else "paper"
-    ex_status["kill_switch"] = False
+    ex_status["kill_switch"] = not strict_live_locked
     ex_status["live_arm"] = "ON" if strict_live_locked else "OFF"
     ex_status["note"] = (
         "Strict live profile lock detected; preserving live execution arming."

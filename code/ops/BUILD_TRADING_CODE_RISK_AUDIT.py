@@ -15,10 +15,15 @@ MD_OUT = DOCS / "TRADING_CODE_RISK_AUDIT_2026-06-19.md"
 
 SCAN_GLOBS = (
     "code/*.py",
+    "code/*.ps1",
     "code/execution/*.py",
+    "code/execution/*.ps1",
     "code/ops/*.py",
+    "code/ops/*.ps1",
     "config/runtime_control.json",
+    "config/multi_account_policy.json",
     "config/accounts/*/runtime_control.json",
+    "out/control_flags.json",
 )
 
 EXCLUDED_NAMES = {
@@ -31,8 +36,11 @@ RISK_PATTERNS: dict[str, tuple[int, re.Pattern[str]]] = {
     "withdrawal_path": (5, re.compile(r"/0/private/Withdraw|\.withdraw\(|withdraw_btc|auto_withdraw", re.IGNORECASE)),
     "liquidation_path": (5, re.compile(r"LIQUIDATE_ALL|liquidate_all", re.IGNORECASE)),
     "cancel_all_orders": (3, re.compile(r"/0/private/CancelAll(?!OrdersAfter)|\bCancelAll\b", re.IGNORECASE)),
-    "live_arm_write": (4, re.compile(r"allow_live_orders[\"'\]\s]*[:=]\s*True|\"allow_live_orders\"\s*:\s*true", re.IGNORECASE)),
-    "kill_switch_off_write": (2, re.compile(r"kill_switch[\"'\]\s]*[:=]\s*False|\"kill_switch\"\s*:\s*false", re.IGNORECASE)),
+    "live_arm_write": (4, re.compile(r"allow_live_orders[^\n]{0,24}[:=]\s*\$?true", re.IGNORECASE)),
+    "live_mode_write": (4, re.compile(r"(?:default_)?mode[^\n]{0,24}[:=]\s*[\"']live[\"']", re.IGNORECASE)),
+    "kill_switch_off_write": (2, re.compile(r"kill_switch[^\n]{0,24}[:=]\s*\$?false", re.IGNORECASE)),
+    "automatic_approval": (5, re.compile(r"/api/master/approval/decide|build_decide_payload\(|event[\"']?\s*[:=]\s*[\"']approve_attempt", re.IGNORECASE)),
+    "startup_persistence": (3, re.compile(r"Register-ScheduledTask|Startup\\|shell:startup", re.IGNORECASE)),
     "direct_key_loader": (2, re.compile(r"luma_live_keys\.env|live_keys\.env|keys\.env|DISCOVER_AND_ROUTE_ALL_LIVE_KEYS|ROUTE_AND_BIND_ALL_LIVE_KEYS", re.IGNORECASE)),
 }
 
@@ -41,7 +49,7 @@ PROTECTION_PATTERNS: dict[str, re.Pattern[str]] = {
     "execute_confirm": re.compile(r"--execute|CONFIRM_PHRASE|confirm\s*[!=]=|confirmation", re.IGNORECASE),
     "validate_only": re.compile(r"validate_only|submit_order_validate_only|validate\s*[:=]\s*(?:True|true)", re.IGNORECASE),
     "human_approval": re.compile(r"PENDING_HUMAN_APPROVAL|approval_queue|approved_by|operator approval|human action-time approval|HUMAN_APPROVAL_ENV|LUMA_HUMAN_UNLOCK_TOKEN", re.IGNORECASE),
-    "runtime_gate": re.compile(r"LiveRuntimeGuard|allow_live_orders|kill_switch|SAFE_DRY_RUN|paper_enabled", re.IGNORECASE),
+    "runtime_gate": re.compile(r"LiveRuntimeGuard|can_place_live_order|assert_runtime_safety|SAFE_DRY_RUN|ExpectedRuntimeSha256|trading_stack_safety_audit", re.IGNORECASE),
 }
 
 SAFE_SPINE = [
@@ -107,8 +115,10 @@ def classify_file(hits: dict[str, list[dict[str, Any]]], guards: list[str]) -> t
         return "high_review", "direct order path lacks validate/runtime/human gate"
     if "cancel_all_orders" in signals and not has_confirm:
         return "high_review", "cancel-all path lacks explicit execute confirmation"
-    if "live_arm_write" in signals and not has_runtime:
-        return "high_review", "live-arm write lacks surrounding runtime gate"
+    if "automatic_approval" in signals:
+        return "high_review", "automatic approval path requires a cross-file action-time authorization review"
+    if {"live_arm_write", "live_mode_write"} & signals and not (has_runtime and has_human):
+        return "high_review", "live-arm write lacks both a runtime gate and human action-time approval"
     if signals:
         return "guarded_review", "risk-bearing path has at least one guard, but still needs review before live use"
     return "no_risk_signal", "no configured live-order risk signal detected"

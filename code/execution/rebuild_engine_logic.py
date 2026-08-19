@@ -167,7 +167,8 @@ def patch_runtime():
 
     runtime["mode"] = "paper"
     runtime["allow_live_orders"] = False
-    runtime["kill_switch"] = False
+    runtime["paper_enabled"] = True
+    runtime["kill_switch"] = True
     runtime["symbol"] = "UNIVERSE"
 
     if "paper_enabled" not in paper:
