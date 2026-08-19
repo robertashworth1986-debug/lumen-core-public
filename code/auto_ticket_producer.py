@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import importlib.util
 import json
 import sys
 import time
@@ -39,6 +40,24 @@ import urllib.request
 import urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
+
+try:
+    from execution.live_action_authority import (
+        DEFAULT_AUTHORITY_TTL_SEC,
+        validate_live_action_authority,
+    )
+except ImportError:
+    _authority_path = Path(__file__).resolve().parent / "execution" / "live_action_authority.py"
+    _authority_spec = importlib.util.spec_from_file_location(
+        "auto_ticket_live_action_authority",
+        _authority_path,
+    )
+    if _authority_spec is None or _authority_spec.loader is None:
+        raise RuntimeError("live action authority validator is unavailable")
+    _authority_module = importlib.util.module_from_spec(_authority_spec)
+    _authority_spec.loader.exec_module(_authority_module)
+    DEFAULT_AUTHORITY_TTL_SEC = _authority_module.DEFAULT_AUTHORITY_TTL_SEC
+    validate_live_action_authority = _authority_module.validate_live_action_authority
 
 ROOT = Path(__file__).resolve().parents[1]
 QUEUE_FILE = ROOT / "execution_approval_queue.json"
@@ -53,6 +72,32 @@ PRODUCER_LOG.parent.mkdir(parents=True, exist_ok=True)
 AUTO_FIRE_CONFIG = ROOT / "run" / "auto_fire_config.json"
 AUTO_FIRE_CONFIG.parent.mkdir(parents=True, exist_ok=True)
 DAEMON_PID_FILE = ROOT / "run" / "auto_ticket_producer.pid"
+RUNTIME_CONTROL_FILE = ROOT / "config" / "runtime_control.json"
+LIVE_ACTION_RECEIPT_FILE = ROOT / "out" / "execution" / "live_action_time_approval_receipt_latest.json"
+
+
+def _live_authority_state(validate: bool, controller: str) -> dict:
+    if validate:
+        return {
+            "authorized": False,
+            "required": False,
+            "reasons": ["validate_only_ticket"],
+        }
+    state = validate_live_action_authority(
+        runtime_path=RUNTIME_CONTROL_FILE,
+        receipt_path=LIVE_ACTION_RECEIPT_FILE,
+        controller=controller,
+        ttl_seconds=DEFAULT_AUTHORITY_TTL_SEC,
+    )
+    return {**state, "required": True}
+
+
+def _require_live_authority(validate: bool, controller: str, action: str) -> dict:
+    state = _live_authority_state(validate=validate, controller=controller)
+    if validate or state.get("authorized") is True:
+        return state
+    reasons = ",".join(str(reason) for reason in state.get("reasons", [])) or "not_authorized"
+    raise RuntimeError(f"{action} blocked: fresh hash-bound human action-time authority required ({reasons})")
 
 
 def _read_runtime_config(default_threshold: float | None,
@@ -1494,6 +1539,11 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
                  gateway_url: str = "http://127.0.0.1:8787",
                  scan_max_age_sec: float = SCAN_MAX_AGE_SEC_DEFAULT,
                  runtime_cfg: dict | None = None) -> dict:
+    cycle_authority = _require_live_authority(
+        validate=validate,
+        controller=controller,
+        action="live ticket cycle",
+    )
     rt_cfg = runtime_cfg if isinstance(runtime_cfg, dict) else _read_runtime_config(
         default_threshold=auto_fire_score,
         default_enabled=True,
@@ -1724,6 +1774,11 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
                 # never auto-fire DRY-RUN; pointless
                 continue
             tid = e["ticket_id"]
+            decision_authority = _require_live_authority(
+                validate=False,
+                controller=controller,
+                action=f"automatic approval for {tid}",
+            )
             body = json.dumps({
                 "ticket_id": tid,
                 "decision": "approve",
@@ -1882,6 +1937,9 @@ def emit_tickets(use_cached: bool, validate: bool, controller: str,
         "skipped_top10": skipped[:10],
         "validate_mode": validate,
         "controller": controller,
+        "live_authority_required": bool(cycle_authority.get("required")),
+        "live_authority_authorized": bool(cycle_authority.get("authorized")),
+        "live_authority_reasons": list(cycle_authority.get("reasons", [])),
         "auto_fire_score": auto_fire_score,
         "auto_fire_lane_thresholds": auto_fire_lane_thresholds,
         "auto_fire_lane_caps": auto_fire_lane_caps,
@@ -1921,6 +1979,15 @@ def main() -> int:
     args = ap.parse_args()
 
     validate = not args.live
+    try:
+        _require_live_authority(
+            validate=validate,
+            controller=args.controller,
+            action="live auto-ticket startup",
+        )
+    except RuntimeError as exc:
+        print(f"[AUTO-TKT] {exc}", flush=True)
+        return 2
     if args.auto_fire_score is not None and validate:
         print("[AUTO-TKT] WARNING: --auto-fire-score has no effect in DRY-RUN mode; "
               "pass --live to actually auto-fire.", flush=True)
