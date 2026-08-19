@@ -54,6 +54,19 @@ def test_root_launchers_and_live_writers_are_inside_the_audit_boundary():
     assert "automatic_approval" in gateway["signals"]
     assert {"runtime_gate", "human_approval"}.issubset(gateway["protections"])
 
+    for path in (
+        "code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py",
+        "code/DISCOVER_AND_ROUTE_ALL_LIVE_KEYS.py",
+    ):
+        if path not in by_path:
+            continue
+        writer = by_path[path]
+        assert writer["classification"] == "guarded_review"
+        assert "live_arm_write" not in writer["signals"]
+        assert {"runtime_gate", "human_approval"}.issubset(writer["protections"])
+
+    assert "code/BUILD_ADAPTIVE_UNIVERSE_FROM_LIVE_KEYS.py" not in by_path
+
 
 def test_withdrawal_and_validate_false_paths_are_not_marked_safe():
     module = load_module()

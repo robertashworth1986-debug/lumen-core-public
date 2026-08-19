@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
 
 
@@ -15,6 +16,39 @@ def is_strict_live_locked(runtime_control: Optional[Mapping[str, Any]]) -> bool:
         and not bool(cfg.get("paper_enabled", True))
         and not bool(cfg.get("kill_switch", False))
     )
+
+
+def human_action_time_authority_state(
+    runtime_control: Optional[Mapping[str, Any]],
+    runtime_path: Path,
+    receipt_path: Path,
+    controller: Optional[str] = None,
+    ttl_seconds: int = 300,
+) -> Dict[str, Any]:
+    requested = is_strict_live_locked(runtime_control)
+    if not requested:
+        return {
+            "strict_live_requested": False,
+            "authorized_strict_live_lock": False,
+            "authorized": False,
+            "reasons": ["strict_live_lock_not_requested"],
+            "receipt_present": Path(receipt_path).exists(),
+            "receipt_age_sec": None,
+        }
+
+    from execution.live_action_authority import validate_live_action_authority
+
+    authority = validate_live_action_authority(
+        runtime_path=Path(runtime_path),
+        receipt_path=Path(receipt_path),
+        controller=controller,
+        ttl_seconds=ttl_seconds,
+    )
+    return {
+        **authority,
+        "strict_live_requested": True,
+        "authorized_strict_live_lock": bool(authority.get("authorized")),
+    }
 
 
 def stamp_runtime_writer(

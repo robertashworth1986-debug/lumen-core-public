@@ -1,7 +1,7 @@
 import csv, json, re, urllib.request, urllib.parse, urllib.error
 from pathlib import Path
 from datetime import datetime, timezone
-from runtime_live_lock import is_strict_live_locked, stamp_runtime_writer
+from runtime_live_lock import human_action_time_authority_state, stamp_runtime_writer
 
 ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
 CONF = ROOT / "config"
@@ -12,6 +12,7 @@ KEY_ENV_PATH          = CONF / "luma_live_keys.env"
 LIVE_SOURCES_PATH     = CONF / "live_sources.json"
 LIVE_REGISTRY_PATH    = CONF / "live_source_registry.json"
 RUNTIME_CONTROL_PATH  = CONF / "runtime_control.json"
+LIVE_ACTION_RECEIPT_PATH = OUT / "execution" / "live_action_time_approval_receipt_latest.json"
 PAPER_RUNTIME_PATH    = CONF / "paper_trader_runtime.json"
 INFRA_RUNTIME_PATH    = CONF / "infra_live_runtime.json"
 
@@ -414,36 +415,37 @@ runtime_control = load_json(RUNTIME_CONTROL_PATH, {})
 if not isinstance(runtime_control, dict):
     runtime_control = {}
 
-strict_live_lock = is_strict_live_locked(runtime_control)
-if strict_live_lock:
-    runtime_control["mode"] = "live"
-    runtime_control["allow_live_orders"] = True
-    runtime_control["paper_enabled"] = False
-else:
+human_action_time_authority = human_action_time_authority_state(
+    runtime_control=runtime_control,
+    runtime_path=RUNTIME_CONTROL_PATH,
+    receipt_path=LIVE_ACTION_RECEIPT_PATH,
+)
+strict_live_lock = bool(human_action_time_authority["authorized_strict_live_lock"])
+if not strict_live_lock:
     runtime_control["mode"] = "paper"
     runtime_control["allow_live_orders"] = False
-
-runtime_control["kill_switch"] = False
-runtime_control["symbol"] = "UNIVERSE"
-runtime_control["paper_capital_usd"] = float(runtime_control.get("paper_capital_usd", 200.0) or 200.0)
-runtime_control["max_notional_per_trade_usd"] = float(runtime_control.get("max_notional_per_trade_usd", 25.0) or 25.0)
-runtime_control["max_daily_loss_usd"] = float(runtime_control.get("max_daily_loss_usd", 20.0) or 20.0)
-runtime_control["max_open_positions"] = int(runtime_control.get("max_open_positions", 1) or 1)
-runtime_control["loop_seconds"] = int(runtime_control.get("loop_seconds", 5) or 5)
-runtime_control["symbol_mode"] = "ADAPTIVE_UNIVERSE"
-stamp_runtime_writer(
-    runtime_control,
-    writer="code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py",
-    strict_live_lock=strict_live_lock,
-    reason="adaptive_rebuild_sync",
-)
-save_json(RUNTIME_CONTROL_PATH, runtime_control)
+    runtime_control["paper_enabled"] = True
+    runtime_control["kill_switch"] = True
+    runtime_control["symbol"] = "UNIVERSE"
+    runtime_control["paper_capital_usd"] = float(runtime_control.get("paper_capital_usd", 200.0) or 200.0)
+    runtime_control["max_notional_per_trade_usd"] = float(runtime_control.get("max_notional_per_trade_usd", 25.0) or 25.0)
+    runtime_control["max_daily_loss_usd"] = float(runtime_control.get("max_daily_loss_usd", 20.0) or 20.0)
+    runtime_control["max_open_positions"] = int(runtime_control.get("max_open_positions", 1) or 1)
+    runtime_control["loop_seconds"] = int(runtime_control.get("loop_seconds", 5) or 5)
+    runtime_control["symbol_mode"] = "ADAPTIVE_UNIVERSE"
+    stamp_runtime_writer(
+        runtime_control,
+        writer="code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py",
+        strict_live_lock=False,
+        reason="adaptive_rebuild_fail_closed_paper_sync",
+    )
+    save_json(RUNTIME_CONTROL_PATH, runtime_control)
 
 paper_runtime = load_json(PAPER_RUNTIME_PATH, {})
 if not isinstance(paper_runtime, dict):
     paper_runtime = {}
-paper_runtime["mode"] = "live" if strict_live_lock else "paper"
-paper_runtime["paper_enabled"] = False if strict_live_lock else True
+paper_runtime["mode"] = "paper"
+paper_runtime["paper_enabled"] = True
 paper_runtime["selection_source"] = "engine_logic"
 paper_runtime["symbol_mode"] = "ADAPTIVE_UNIVERSE"
 paper_runtime["symbols"] = [r["symbol"] for r in adaptive_final]
@@ -469,10 +471,17 @@ save_json(ADAPTIVE_SUMMARY_PATH, {
 save_json(ENGINE_AUDIT_PATH, {
     "generated_utc": now_utc(),
     "engine_symbol": "UNIVERSE",
-    "paper_enabled": False if strict_live_lock else True,
+    "paper_enabled": True,
     "selection_source": "engine_logic",
     "symbol_mode": "ADAPTIVE_UNIVERSE",
     "runtime_mode": runtime_control.get("mode", "paper"),
+    "live_runtime_preserved_read_only": strict_live_lock,
+    "live_action_time_authority": {
+        "authorized": bool(human_action_time_authority.get("authorized")),
+        "reasons": list(human_action_time_authority.get("reasons") or []),
+        "receipt_present": bool(human_action_time_authority.get("receipt_present")),
+        "receipt_age_sec": human_action_time_authority.get("receipt_age_sec"),
+    },
     "enabled_registry_sources": enabled_count,
     "measured_sources": measured_count,
     "adaptive_universe_count": len(adaptive_final),

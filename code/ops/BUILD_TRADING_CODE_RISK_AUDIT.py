@@ -51,7 +51,7 @@ PROTECTION_PATTERNS: dict[str, re.Pattern[str]] = {
     "execute_confirm": re.compile(r"--execute|CONFIRM_PHRASE|confirm\s*[!=]=|confirmation", re.IGNORECASE),
     "validate_only": re.compile(r"validate_only|submit_order_validate_only|validate\s*[:=]\s*(?:True|true)", re.IGNORECASE),
     "human_approval": re.compile(r"PENDING_HUMAN_APPROVAL|approval_queue|approved_by|operator approval|human[_ -]action[_ -]time[_ -](?:approval|authority)|HUMAN_APPROVAL_ENV|LUMA_HUMAN_UNLOCK_TOKEN", re.IGNORECASE),
-    "runtime_gate": re.compile(r"LiveRuntimeGuard|can_place_live_order|assert_runtime_safety|autofire_authority_state|validate_live_action_authority|_live_action_time_authority|SAFE_DRY_RUN|ExpectedRuntimeSha256|trading_stack_safety_audit", re.IGNORECASE),
+    "runtime_gate": re.compile(r"LiveRuntimeGuard|can_place_live_order|assert_runtime_safety|autofire_authority_state|validate_live_action_authority|_live_action_time_authority|human_action_time_authority_state|SAFE_DRY_RUN|ExpectedRuntimeSha256|trading_stack_safety_audit", re.IGNORECASE),
 }
 
 SAFE_SPINE = [
