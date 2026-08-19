@@ -49,7 +49,7 @@ PROTECTION_PATTERNS: dict[str, re.Pattern[str]] = {
     "execute_confirm": re.compile(r"--execute|CONFIRM_PHRASE|confirm\s*[!=]=|confirmation", re.IGNORECASE),
     "validate_only": re.compile(r"validate_only|submit_order_validate_only|validate\s*[:=]\s*(?:True|true)", re.IGNORECASE),
     "human_approval": re.compile(r"PENDING_HUMAN_APPROVAL|approval_queue|approved_by|operator approval|human action-time approval|HUMAN_APPROVAL_ENV|LUMA_HUMAN_UNLOCK_TOKEN", re.IGNORECASE),
-    "runtime_gate": re.compile(r"LiveRuntimeGuard|can_place_live_order|assert_runtime_safety|SAFE_DRY_RUN|ExpectedRuntimeSha256|trading_stack_safety_audit", re.IGNORECASE),
+    "runtime_gate": re.compile(r"LiveRuntimeGuard|can_place_live_order|assert_runtime_safety|autofire_authority_state|SAFE_DRY_RUN|ExpectedRuntimeSha256|trading_stack_safety_audit", re.IGNORECASE),
 }
 
 SAFE_SPINE = [
@@ -116,6 +116,8 @@ def classify_file(hits: dict[str, list[dict[str, Any]]], guards: list[str]) -> t
     if "cancel_all_orders" in signals and not has_confirm:
         return "high_review", "cancel-all path lacks explicit execute confirmation"
     if "automatic_approval" in signals:
+        if has_runtime and has_human:
+            return "guarded_review", "automatic approval is fail-closed behind runtime and human action-time authority, but still requires live-use review"
         return "high_review", "automatic approval path requires a cross-file action-time authorization review"
     if {"live_arm_write", "live_mode_write"} & signals and not (has_runtime and has_human):
         return "high_review", "live-arm write lacks both a runtime gate and human action-time approval"

@@ -44,8 +44,9 @@ def test_root_launchers_and_live_writers_are_inside_the_audit_boundary():
     assert {"human_approval", "runtime_gate"}.issubset(launcher["protections"])
 
     autofire = by_path["code/execution/approval_autofire_daemon.py"]
-    assert autofire["classification"] == "high_review"
+    assert autofire["classification"] == "guarded_review"
     assert "automatic_approval" in autofire["signals"]
+    assert {"runtime_gate", "human_approval"}.issubset(autofire["protections"])
 
 
 def test_withdrawal_and_validate_false_paths_are_not_marked_safe():

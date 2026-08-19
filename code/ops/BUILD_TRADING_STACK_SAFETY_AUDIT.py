@@ -417,34 +417,35 @@ def build_audit() -> dict[str, Any]:
         if str(row.get("decision_state") or row.get("approval_state") or "").upper().startswith("PENDING")
     ]
 
-    blockers: list[str] = []
+    safety_blockers: list[str] = []
+    operational_readiness_blockers: list[str] = []
     warnings: list[str] = []
 
-    add_blocker(blockers, runtime_mode != "paper", f"runtime mode is not paper: {runtime_mode or 'missing'}")
-    add_blocker(blockers, allow_live_orders, "allow_live_orders is true")
-    add_blocker(blockers, not paper_enabled, "paper_enabled is false")
-    add_blocker(blockers, bool(canonical_runtime["load_error"]), "canonical runtime control is unreadable")
+    add_blocker(safety_blockers, runtime_mode != "paper", f"runtime mode is not paper: {runtime_mode or 'missing'}")
+    add_blocker(safety_blockers, allow_live_orders, "allow_live_orders is true")
+    add_blocker(safety_blockers, not paper_enabled, "paper_enabled is false")
+    add_blocker(safety_blockers, bool(canonical_runtime["load_error"]), "canonical runtime control is unreadable")
     for row in account_runtimes:
-        add_blocker(blockers, not row["present"], f"account runtime is missing: {row['path']}")
+        add_blocker(safety_blockers, not row["present"], f"account runtime is missing: {row['path']}")
         add_blocker(
-            blockers,
+            safety_blockers,
             row["present"] and (row["mode"] != "paper" or row["allow_live_orders"] or not row["paper_enabled"]),
             f"account runtime is not paper-only: {row['path']}",
         )
     add_blocker(
-        blockers,
+        safety_blockers,
         legacy_runtime["present"]
         and (legacy_runtime["mode"] == "live" or legacy_runtime["allow_live_orders"] or legacy_runtime["force_live_mode"]),
         f"legacy runtime contradicts canonical paper authority: {legacy_runtime['path']}",
     )
     for row in control_flags:
         add_blocker(
-            blockers,
+            safety_blockers,
             row["present"] and (row["live_enabled"] or row["runtime_mode"] == "live"),
             f"control flag contradicts canonical paper authority: {row['path']}",
         )
     add_blocker(
-        blockers,
+        safety_blockers,
         MULTI_ACCOUNT_POLICY_FILE.exists()
         and (
             truthy(multi_account_policy.get("allow_live"))
@@ -454,46 +455,58 @@ def build_audit() -> dict[str, Any]:
     )
     for row in live_markers:
         add_blocker(
-            blockers,
+            safety_blockers,
             row["nonempty"] and row["path"].endswith(".confirm"),
             f"stale live-arm marker requires removal or reconciliation: {row['path']}",
         )
-    add_blocker(blockers, executor_age_min is None or executor_age_min > 20.0, f"executor heartbeat stale or missing: {executor_age_min}")
-    add_blocker(blockers, autofire_age_min is None or autofire_age_min > 20.0, f"autofire heartbeat stale or missing: {autofire_age_min}")
-    add_blocker(blockers, not bool(growth_guard.get("heartbeat_ok", False)), "growth controller heartbeat check is not ok")
-    add_blocker(blockers, str(growth.get("mode") or "").upper() != "SAFE_DRY_RUN", "growth controller is not in SAFE_DRY_RUN")
-    add_blocker(blockers, int(growth_summary.get("auto_fired_count") or 0) != 0, "auto-fired orders were detected")
-    add_blocker(blockers, len(paper_state_writers) != 1, f"paper state has {len(paper_state_writers)} write-capable implementations")
+    add_blocker(
+        operational_readiness_blockers,
+        executor_age_min is None or executor_age_min > 20.0,
+        f"executor heartbeat stale or missing: {executor_age_min}",
+    )
+    add_blocker(
+        operational_readiness_blockers,
+        autofire_age_min is None or autofire_age_min > 20.0,
+        f"autofire heartbeat stale or missing: {autofire_age_min}",
+    )
+    add_blocker(
+        operational_readiness_blockers,
+        not bool(growth_guard.get("heartbeat_ok", False)),
+        "growth controller heartbeat check is not ok",
+    )
+    add_blocker(safety_blockers, str(growth.get("mode") or "").upper() != "SAFE_DRY_RUN", "growth controller is not in SAFE_DRY_RUN")
+    add_blocker(safety_blockers, int(growth_summary.get("auto_fired_count") or 0) != 0, "auto-fired orders were detected")
+    add_blocker(safety_blockers, len(paper_state_writers) != 1, f"paper state has {len(paper_state_writers)} write-capable implementations")
     for ledger_key, ledger in (
         ("paper_ledger", paper_ledger),
         ("real_api_ledger", real_paper_ledger),
     ):
-        add_blocker(blockers, not ledger["present"], f"paper evidence ledger is missing: {ledger['path']}")
+        add_blocker(safety_blockers, not ledger["present"], f"paper evidence ledger is missing: {ledger['path']}")
         add_blocker(
-            blockers,
+            safety_blockers,
             ledger["invalid_json_rows"] > 0,
             f"paper evidence ledger has invalid JSON rows: {ledger['path']}",
         )
         add_blocker(
-            blockers,
+            safety_blockers,
             ledger["duplicate_fill_rows"] > 0
             and not bool(reconciliation["ledgers"].get(ledger_key, {}).get("current", False)),
             f"paper evidence ledger has unreconciled duplicate fill identities: {ledger['path']}",
         )
         add_blocker(
-            blockers,
+            safety_blockers,
             ledger["missing_fill_id_rows"] > 0,
             f"paper evidence ledger has fill rows without fill_id: {ledger['path']}",
         )
     add_blocker(
-        blockers,
+        safety_blockers,
         real_paper_ledger["unique_fill_ids"] > 0
         and real_paper_ledger["max_snapshot_trade_count"] > 0
         and real_paper_ledger["max_snapshot_trade_count"] > real_paper_ledger["unique_fill_ids"],
         "real-API snapshot trade_count exceeds the unique fill evidence available",
     )
     add_blocker(
-        blockers,
+        safety_blockers,
         real_paper_ledger["external_target"]
         and "paused" in str(real_paper_ledger["target_basename"]).lower()
         and safe_float(real_paper_ledger["modified_age_min"], 1e9) < 20.0
@@ -541,14 +554,27 @@ def build_audit() -> dict[str, Any]:
     if paper_ledger["changed_during_scan"]:
         warnings.append("paper ledger changed during audit; counts are a moving snapshot")
 
+    live_promotion_blockers = safety_blockers + [
+        item for item in operational_readiness_blockers if item not in safety_blockers
+    ]
+    safety_posture = "PAPER_SAFE" if not safety_blockers else "UNSAFE"
+    if safety_blockers:
+        operational_posture = "UNSAFE"
+    elif operational_readiness_blockers:
+        operational_posture = "OFFLINE_SAFE"
+    else:
+        operational_posture = "READY_FOR_GATED_REVIEW"
+
     posture = "BLOCK_LIVE"
-    if not blockers and runtime_mode == "paper" and not allow_live_orders and paper_enabled:
+    if not live_promotion_blockers and runtime_mode == "paper" and not allow_live_orders and paper_enabled:
         posture = "PAPER_OK"
 
     return {
         "generated_utc": now_utc().isoformat(),
-        "schema": "trading_stack_safety_audit_v2",
+        "schema": "trading_stack_safety_audit_v3",
         "posture": posture,
+        "safety_posture": safety_posture,
+        "operational_posture": operational_posture,
         "execution_authorized": False,
         "claim_status": "NOT_VALIDATED_FOR_ALPHA_OR_LIVE_EXECUTION",
         "secret_handling": "The audit reads control booleans, file metadata, and non-secret ledger fields only. It never emits credentials, order identifiers, fill identifiers, or live-arm contents.",
@@ -601,7 +627,10 @@ def build_audit() -> dict[str, Any]:
             "live_execution_validated": False,
             "boundary": "Ledger presence and local consistency are necessary controls, not proof of alpha, independent validation, or live readiness.",
         },
-        "blockers": blockers,
+        "safety_blockers": safety_blockers,
+        "operational_readiness_blockers": operational_readiness_blockers,
+        "live_promotion_blockers": live_promotion_blockers,
+        "blockers": live_promotion_blockers,
         "warnings": warnings,
         "promotion_rule": "Live execution remains blocked until authority conflicts are removed, raw duplicate history has a current hash-bound canonical reconciliation, one canonical state writer remains, paper/live heartbeats are fresh, full order/fill reconciliation passes, and a human operator grants a separate short-lived action-time approval. This audit never authorizes execution.",
     }
@@ -625,6 +654,10 @@ def render_markdown(audit: dict[str, Any]) -> str:
         f"Generated UTC: {audit['generated_utc']}",
         "",
         f"Posture: {audit['posture']}",
+        "",
+        f"Safety posture: {audit['safety_posture']}",
+        "",
+        f"Operational posture: {audit['operational_posture']}",
         "",
         f"Execution authorized: {audit['execution_authorized']}",
         "",
@@ -680,9 +713,21 @@ def render_markdown(audit: dict[str, Any]) -> str:
         f"- reconciliation current: {reconciliation['current']}",
         f"- reconciliation receipt: {reconciliation['path']}",
         "",
-        "## Live Promotion Blockers",
+        "## Safety Blockers",
         "",
     ]
+    safety_blockers = audit.get("safety_blockers", [])
+    operational_blockers = audit.get("operational_readiness_blockers", [])
+    if safety_blockers:
+        lines.extend(f"- {item}" for item in safety_blockers)
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Operational Readiness Blockers", ""])
+    if operational_blockers:
+        lines.extend(f"- {item}" for item in operational_blockers)
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Live Promotion Blockers", ""])
     if blockers:
         lines.extend(f"- {item}" for item in blockers)
     else:

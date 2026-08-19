@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import atexit
+import hashlib
 import json
 import os
 import subprocess
@@ -19,6 +20,9 @@ DEFAULT_LOG_FILE = OUT_EXEC / "approval_autofire_log.jsonl"
 DEFAULT_STATE_FILE = OUT_EXEC / "approval_autofire_state.json"
 DEFAULT_HEARTBEAT_FILE = OUT_EXEC / "approval_autofire_heartbeat.json"
 DEFAULT_POLICY_FILE = ROOT / "run" / "approval_autofire_policy.json"
+DEFAULT_RUNTIME_FILE = ROOT / "config" / "runtime_control.json"
+DEFAULT_ACTION_RECEIPT_FILE = OUT_EXEC / "live_action_time_approval_receipt_latest.json"
+DEFAULT_ACTION_RECEIPT_TTL_SEC = 300
 LOCK_FILE = OUT_EXEC / "approval_autofire_daemon.lock"
 LOCK_STALE_SEC = 6 * 60 * 60
 
@@ -122,6 +126,113 @@ def append_jsonl(path: Path, payload: dict[str, Any]) -> None:
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def autofire_authority_state(
+    runtime_path: Path,
+    receipt_path: Path,
+    controller: str,
+    ttl_seconds: int = DEFAULT_ACTION_RECEIPT_TTL_SEC,
+    now: Optional[datetime] = None,
+) -> dict[str, Any]:
+    """Validate a short-lived, hash-bound live authority without disclosing receipt contents."""
+    reasons: list[str] = []
+    runtime: dict[str, Any] = {}
+    receipt: dict[str, Any] = {}
+    runtime_sha256 = ""
+    receipt_age_sec: Optional[float] = None
+
+    if not runtime_path.exists():
+        reasons.append("runtime_missing")
+    else:
+        try:
+            loaded_runtime = json.loads(runtime_path.read_text(encoding="utf-8-sig"))
+            if isinstance(loaded_runtime, dict):
+                runtime = loaded_runtime
+                runtime_sha256 = sha256_file(runtime_path)
+            else:
+                reasons.append("runtime_not_object")
+        except Exception:
+            reasons.append("runtime_unreadable")
+
+    mode = str(runtime.get("mode") or runtime.get("runtime_mode") or "").strip().lower()
+    allow_live_orders = runtime.get("allow_live_orders") is True
+    paper_enabled = runtime.get("paper_enabled") is True
+    kill_switch = runtime.get("kill_switch") is True
+    if mode != "live":
+        reasons.append("runtime_mode_not_live")
+    if not allow_live_orders:
+        reasons.append("live_orders_not_armed")
+    if paper_enabled:
+        reasons.append("paper_mode_conflict")
+    if kill_switch:
+        reasons.append("kill_switch_enabled")
+
+    if not receipt_path.exists():
+        reasons.append("action_receipt_missing")
+    else:
+        try:
+            loaded_receipt = json.loads(receipt_path.read_text(encoding="utf-8-sig"))
+            if isinstance(loaded_receipt, dict):
+                receipt = loaded_receipt
+            else:
+                reasons.append("action_receipt_not_object")
+        except Exception:
+            reasons.append("action_receipt_unreadable")
+
+    if receipt:
+        if receipt.get("schema") != "live_action_time_approval_receipt_v1":
+            reasons.append("action_receipt_schema_mismatch")
+        if str(receipt.get("controller") or "").strip() != controller:
+            reasons.append("action_receipt_controller_mismatch")
+        if receipt.get("human_unlock_verified") is not True:
+            reasons.append("human_unlock_not_verified")
+        if receipt.get("exact_action_time_phrase_verified") is not True:
+            reasons.append("action_time_phrase_not_verified")
+        if receipt.get("authorization_scope") != "single_live_stack_start":
+            reasons.append("action_receipt_scope_mismatch")
+        if receipt.get("reusable_for_restart") is not False:
+            reasons.append("action_receipt_reusable_or_unspecified")
+        if receipt.get("runtime_control_path") != "config/runtime_control.json":
+            reasons.append("action_receipt_runtime_path_mismatch")
+        if not runtime_sha256 or receipt.get("armed_runtime_sha256") != runtime_sha256:
+            reasons.append("action_receipt_runtime_hash_mismatch")
+
+        generated_at = parse_utc(receipt.get("generated_utc"))
+        if generated_at is None:
+            reasons.append("action_receipt_timestamp_invalid")
+        else:
+            reference = now or datetime.now(timezone.utc)
+            if reference.tzinfo is None:
+                reference = reference.replace(tzinfo=timezone.utc)
+            receipt_age_sec = (reference.astimezone(timezone.utc) - generated_at).total_seconds()
+            if receipt_age_sec < -5.0:
+                reasons.append("action_receipt_timestamp_in_future")
+            if receipt_age_sec > max(1, int(ttl_seconds)):
+                reasons.append("action_receipt_expired")
+
+    return {
+        "authorized": not reasons,
+        "reasons": reasons,
+        "runtime": {
+            "mode": mode,
+            "allow_live_orders": allow_live_orders,
+            "paper_enabled": paper_enabled,
+            "kill_switch": kill_switch,
+        },
+        "runtime_sha256": runtime_sha256,
+        "receipt_present": receipt_path.exists(),
+        "receipt_age_sec": round(receipt_age_sec, 3) if receipt_age_sec is not None else None,
+        "receipt_ttl_sec": max(1, int(ttl_seconds)),
+    }
 
 
 def request_json(
@@ -940,6 +1051,9 @@ def main() -> int:
     ap.add_argument("--state-file", default=str(DEFAULT_STATE_FILE))
     ap.add_argument("--heartbeat-file", default=str(DEFAULT_HEARTBEAT_FILE))
     ap.add_argument("--policy-file", default=str(DEFAULT_POLICY_FILE))
+    ap.add_argument("--runtime-file", default=str(DEFAULT_RUNTIME_FILE))
+    ap.add_argument("--action-receipt-file", default=str(DEFAULT_ACTION_RECEIPT_FILE))
+    ap.add_argument("--action-receipt-ttl-sec", type=int, default=DEFAULT_ACTION_RECEIPT_TTL_SEC)
     args = ap.parse_args()
 
     gateway_url = str(args.gateway_url).rstrip("/")
@@ -949,6 +1063,9 @@ def main() -> int:
     state_file = Path(args.state_file)
     heartbeat_file = Path(args.heartbeat_file)
     policy_file = Path(args.policy_file)
+    runtime_file = Path(args.runtime_file)
+    action_receipt_file = Path(args.action_receipt_file)
+    action_receipt_ttl_sec = max(1, int(args.action_receipt_ttl_sec))
 
     if not _acquire_lock(log_file):
         return 0
@@ -970,6 +1087,9 @@ def main() -> int:
             "state_file": str(state_file),
             "heartbeat_file": str(heartbeat_file),
             "policy_file": str(policy_file),
+            "runtime_file": str(runtime_file),
+            "action_receipt_file": str(action_receipt_file),
+            "action_receipt_ttl_sec": action_receipt_ttl_sec,
         },
     )
 
@@ -989,6 +1109,46 @@ def main() -> int:
         cycle_start = time.time()
         policy = load_policy(policy_file)
 
+        authority = autofire_authority_state(
+            runtime_path=runtime_file,
+            receipt_path=action_receipt_file,
+            controller=controller,
+            ttl_seconds=action_receipt_ttl_sec,
+        )
+        if not authority["authorized"]:
+            append_jsonl(
+                log_file,
+                {
+                    "ts": now_utc(),
+                    "event": "action_time_authority_required",
+                    "controller": controller,
+                    "authority_reasons": authority["reasons"],
+                },
+            )
+            write_json(
+                heartbeat_file,
+                {
+                    "generated_utc": now_utc(),
+                    "schema": "approval_autofire_heartbeat_v3",
+                    "status": "disarmed",
+                    "reason": "action_time_authority_required",
+                    "controller": controller,
+                    "interval_sec": interval_sec,
+                    "policy_file": str(policy_file),
+                    "runtime_file": str(runtime_file),
+                    "action_receipt_file": str(action_receipt_file),
+                    "authority": authority,
+                    "queue_count": 0,
+                    "pending_count": 0,
+                    "eligible_count": 0,
+                    "approved_count": 0,
+                    "approved_sell_count": 0,
+                    "approved_buy_count": 0,
+                },
+            )
+            time.sleep(interval_sec)
+            continue
+
         queue_payload = request_json(f"{gateway_url}/api/master/approval-queue")
         tickets = queue_payload.get("tickets") if isinstance(queue_payload, dict) else None
         if not isinstance(tickets, list):
@@ -1004,7 +1164,7 @@ def main() -> int:
                 heartbeat_file,
                 {
                     "generated_utc": now_utc(),
-                    "schema": "approval_autofire_heartbeat_v2",
+                    "schema": "approval_autofire_heartbeat_v3",
                     "status": "degraded",
                     "reason": "queue_read_error",
                     "gateway_url": gateway_url,
@@ -1126,6 +1286,32 @@ def main() -> int:
 
             ticket = row["ticket"]
             tid = row["ticket_id"]
+            decision_authority = autofire_authority_state(
+                runtime_path=runtime_file,
+                receipt_path=action_receipt_file,
+                controller=controller,
+                ttl_seconds=action_receipt_ttl_sec,
+            )
+            if not decision_authority["authorized"]:
+                authority = decision_authority
+                rate_limited.append(
+                    {
+                        "ticket_id": tid,
+                        "side": row["side"],
+                        "reason": "action_time_authority_lost_before_decision",
+                    }
+                )
+                append_jsonl(
+                    log_file,
+                    {
+                        "ts": now_utc(),
+                        "event": "action_time_authority_lost_before_decision",
+                        "controller": controller,
+                        "ticket_id": tid,
+                        "authority_reasons": decision_authority["reasons"],
+                    },
+                )
+                break
             reason = f"approval_autofire_policy/{row['side']}"
             payload = build_decide_payload(tid, controller, reason=reason)
             result = request_json(
@@ -1192,12 +1378,15 @@ def main() -> int:
 
         heartbeat = {
             "generated_utc": now_utc(),
-            "schema": "approval_autofire_heartbeat_v2",
+            "schema": "approval_autofire_heartbeat_v3",
             "status": "running",
             "gateway_url": gateway_url,
             "controller": controller,
             "interval_sec": interval_sec,
             "policy_file": str(policy_file),
+            "runtime_file": str(runtime_file),
+            "action_receipt_file": str(action_receipt_file),
+            "authority": authority,
             "state_file": str(state_file),
             "queue_count": len(tickets),
             "pending_count": pending_count,

@@ -155,6 +155,8 @@ def test_audit_blocks_conflicting_live_authority_and_duplicate_evidence(monkeypa
     blockers = "\n".join(audit["blockers"])
 
     assert audit["posture"] == "BLOCK_LIVE"
+    assert audit["safety_posture"] == "UNSAFE"
+    assert audit["operational_posture"] == "UNSAFE"
     assert audit["execution_authorized"] is False
     assert "legacy runtime contradicts canonical paper authority" in blockers
     assert "control flag contradicts canonical paper authority" in blockers
@@ -192,6 +194,8 @@ def test_clean_paper_fixture_is_bounded_and_never_authorizes_execution(monkeypat
     audit = module.build_audit()
 
     assert audit["posture"] == "PAPER_OK"
+    assert audit["safety_posture"] == "PAPER_SAFE"
+    assert audit["operational_posture"] == "READY_FOR_GATED_REVIEW"
     assert audit["blockers"] == []
     assert audit["execution_authorized"] is False
     assert audit["claim_status"] == "NOT_VALIDATED_FOR_ALPHA_OR_LIVE_EXECUTION"
@@ -252,3 +256,41 @@ def test_current_reconciliation_preserves_raw_duplicates_without_blocking_canoni
     assert "duplicate fill identities" not in blockers
     assert audit["paper_evidence_integrity"]["reconciliation"]["current"] is True
     assert any("duplicate historical rows" in warning for warning in audit["warnings"])
+
+
+def test_stale_daemons_are_offline_safe_but_block_live_promotion(monkeypatch, tmp_path):
+    module = load_module()
+    paths = configure_fixture(monkeypatch, module, tmp_path)
+    seed_safe_runtime_inputs(paths)
+    seed_state_writer(paths["code"] / "canonical_writer.py")
+
+    stale = "2026-06-10T14:11:49+00:00"
+    write_json(paths["executor"], {"timestamp_utc": stale, "status": "running"})
+    write_json(paths["autofire"], {"generated_utc": stale, "status": "running"})
+    write_json(
+        paths["growth"],
+        {
+            "mode": "SAFE_DRY_RUN",
+            "guard": {"heartbeat_ok": False},
+            "summary": {"actionable_candidates": 0, "auto_fired_count": 0},
+        },
+    )
+    fill = {
+        "timestamp": "2026-07-19T12:00:00+00:00",
+        "event_type": "alpaca_fill",
+        "mode": "ALPACA_PAPER",
+        "source": "alpaca_api",
+        "fill_id": "fill-1",
+    }
+    write_jsonl(paths["paper_ledger"], [fill])
+    write_jsonl(paths["real_ledger"], [fill])
+
+    audit = module.build_audit()
+
+    assert audit["posture"] == "BLOCK_LIVE"
+    assert audit["safety_posture"] == "PAPER_SAFE"
+    assert audit["operational_posture"] == "OFFLINE_SAFE"
+    assert audit["safety_blockers"] == []
+    assert len(audit["operational_readiness_blockers"]) == 3
+    assert audit["blockers"] == audit["live_promotion_blockers"]
+    assert audit["execution_authorized"] is False
