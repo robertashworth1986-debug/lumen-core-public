@@ -1,6 +1,6 @@
 {
-  "live_enabled": true,
-  "kill_switch": false,
+  "live_enabled": false,
+  "kill_switch": true,
   "require_controller": true,
   "allowed_controllers": [
     "Robert",
@@ -25,6 +25,6 @@
   "default_pair": "XBTUSD",
   "default_volume_base": 0.0004,
   "default_order_type": "market",
-  "runtime_mode": "live",
-  "notes": "Set live_enabled=true and kill_switch=false only after smoke test and controller approval."
+  "runtime_mode": "shadow",
+  "notes": "Fail-closed authority. Live execution requires the canonical runtime guard and fresh action-time approval."
 }

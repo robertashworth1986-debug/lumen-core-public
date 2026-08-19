@@ -1,6 +1,20 @@
 from pathlib import Path
+import json
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_secondary_execution_authorities_default_fail_closed():
+    flags = json.loads((ROOT / "control_flags.json").read_text(encoding="utf-8"))
+    policy = json.loads((ROOT / "config" / "multi_account_policy.json").read_text(encoding="utf-8"))
+
+    assert flags["live_enabled"] is False
+    assert flags["kill_switch"] is True
+    assert flags["runtime_mode"] == "shadow"
+    assert policy["allow_live"] is False
+    assert policy["default_mode"] == "paper"
+    assert not (ROOT / "config" / "live_arm.confirm").exists()
+    assert not (ROOT / "config" / "multi_live_arm.confirm").exists()
 
 
 def test_copilot_watch_fails_closed_instead_of_forcing_live():
