@@ -1,8 +1,8 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-19T14:19:16.519238Z",
+  "generated_at_utc": "2026-08-19T14:45:00Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
-  "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
+  "source_registry_sha256": "985d0d5618b132c553b62f70233e293b4de56657acea0bedec0c970f25356318",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
   "source_note": "The 15 founder engine names are audited as internal platform lanes, not 15 finished products or 15 separate offers. Only repository evidence is scored.",
   "primary_offer_binding": {
@@ -94,9 +94,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
-            "bytes": 3968,
-            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+            "git_blob_sha": "d1c441bf2ad6a436031d69f049bd99b6b5c73a21",
+            "bytes": 5271,
+            "sha256": "508a62a2d849b8d66f111a78f76dbefda2a81f183ded76d19e0c17b308915de0"
           }
         ],
         "artifact": [
@@ -422,6 +422,22 @@
             "git_blob_sha": "666f8bfd41224fdc728bd96ada95346001b46ca7",
             "bytes": 2226,
             "sha256": "50f882ce49cfb154fe73198402560000aabf0fef030c44e8b119b7aa227151ba"
+          },
+          {
+            "path": "code/execution/trade_ledger.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "e6dc39c4fe41c77a3cc101b5e38124a22543d117",
+            "bytes": 14837,
+            "sha256": "c368cccf7b1ebf0440e6b3cebe2989160a2c42b687ec7b8bea5ab25515058c13"
+          },
+          {
+            "path": "code/execution/audit_chain.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "d40ab945eb85d2b14760cf1e26cebada36cc0b7b",
+            "bytes": 7761,
+            "sha256": "a8e54629ea73b90614416b935799425828af28e10c84be19e9efe9c43d6e2883"
           }
         ],
         "entrypoint": [
@@ -432,6 +448,22 @@
             "git_blob_sha": "666f8bfd41224fdc728bd96ada95346001b46ca7",
             "bytes": 2226,
             "sha256": "50f882ce49cfb154fe73198402560000aabf0fef030c44e8b119b7aa227151ba"
+          },
+          {
+            "path": "code/ops/VERIFY_PAPER_LEDGER_RECONCILIATION.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "61787de3de8276a4b48d210bcd731cc4b97b7098",
+            "bytes": 7289,
+            "sha256": "8bb93cb8192643594ee9a1873e2106080e17659e07906b864a818825fc06a436"
+          },
+          {
+            "path": "code/ops/MIGRATE_PAPER_LEDGER_RECONCILIATION.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "c95b1fa888387907a41ee105dccf82a3cd8b3d08",
+            "bytes": 6887,
+            "sha256": "9295a11fad18c4071ceccd03cb137c258ca6ca748054a1eb2807863f09926f60"
           }
         ],
         "test": [
@@ -442,6 +474,14 @@
             "git_blob_sha": "dc2197adea3d0699e387a4e9217e078fa98dd8ab",
             "bytes": 6043,
             "sha256": "657e2f7ed8e5e6b766c48d52376a178446740f0d320c4c6b7d7b8f8d4b6fd658"
+          },
+          {
+            "path": "tests/test_trade_ledger_reconciliation.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "226757a73fab2f949a0a5b0a4c2dfca0e7a9e505",
+            "bytes": 11525,
+            "sha256": "38f411c35d996c2bd7d4ff17a442c7dffdd75e92b98eb0ba8d28eacc2e50f33b"
           }
         ],
         "documentation": [
@@ -449,9 +489,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
-            "bytes": 3968,
-            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+            "git_blob_sha": "d1c441bf2ad6a436031d69f049bd99b6b5c73a21",
+            "bytes": 5271,
+            "sha256": "508a62a2d849b8d66f111a78f76dbefda2a81f183ded76d19e0c17b308915de0"
           }
         ],
         "artifact": [],
@@ -640,6 +680,22 @@
             "git_blob_sha": "70c54e036476d09fe05d7eb79842c5a5380abd98",
             "bytes": 27537,
             "sha256": "fd806f18cd2974c09a0265771d62d4ba49373b22022c269076d1e57a70589866"
+          },
+          {
+            "path": "code/execution/trade_ledger.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "e6dc39c4fe41c77a3cc101b5e38124a22543d117",
+            "bytes": 14837,
+            "sha256": "c368cccf7b1ebf0440e6b3cebe2989160a2c42b687ec7b8bea5ab25515058c13"
+          },
+          {
+            "path": "code/execution/audit_chain.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "d40ab945eb85d2b14760cf1e26cebada36cc0b7b",
+            "bytes": 7761,
+            "sha256": "a8e54629ea73b90614416b935799425828af28e10c84be19e9efe9c43d6e2883"
           }
         ],
         "entrypoint": [
@@ -650,6 +706,14 @@
             "git_blob_sha": "ea5fed65e726aa1b2307378707e77b3d5955470c",
             "bytes": 8789,
             "sha256": "724542006a93f202994ed7b8e78706c9dcf5c86df9d0972965165ee6785ebe87"
+          },
+          {
+            "path": "code/ops/VERIFY_PAPER_LEDGER_RECONCILIATION.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "61787de3de8276a4b48d210bcd731cc4b97b7098",
+            "bytes": 7289,
+            "sha256": "8bb93cb8192643594ee9a1873e2106080e17659e07906b864a818825fc06a436"
           }
         ],
         "test": [
@@ -660,6 +724,14 @@
             "git_blob_sha": "b53d76597e0096ba197e3663394eeeab5805eb5a",
             "bytes": 5107,
             "sha256": "fe69da2abe53702112894edaecba1bc38edc5efb52ceae90de0a2b10f323c759"
+          },
+          {
+            "path": "tests/test_trade_ledger_reconciliation.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "226757a73fab2f949a0a5b0a4c2dfca0e7a9e505",
+            "bytes": 11525,
+            "sha256": "38f411c35d996c2bd7d4ff17a442c7dffdd75e92b98eb0ba8d28eacc2e50f33b"
           }
         ],
         "documentation": [
@@ -667,9 +739,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
-            "bytes": 3968,
-            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+            "git_blob_sha": "d1c441bf2ad6a436031d69f049bd99b6b5c73a21",
+            "bytes": 5271,
+            "sha256": "508a62a2d849b8d66f111a78f76dbefda2a81f183ded76d19e0c17b308915de0"
           }
         ],
         "artifact": [
@@ -859,9 +931,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
-            "bytes": 3968,
-            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+            "git_blob_sha": "d1c441bf2ad6a436031d69f049bd99b6b5c73a21",
+            "bytes": 5271,
+            "sha256": "508a62a2d849b8d66f111a78f76dbefda2a81f183ded76d19e0c17b308915de0"
           }
         ],
         "artifact": [
@@ -952,9 +1024,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
-            "bytes": 3968,
-            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+            "git_blob_sha": "d1c441bf2ad6a436031d69f049bd99b6b5c73a21",
+            "bytes": 5271,
+            "sha256": "508a62a2d849b8d66f111a78f76dbefda2a81f183ded76d19e0c17b308915de0"
           }
         ],
         "artifact": [
@@ -992,6 +1064,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "983084f99486bc94023686241ecb48ea4a7d6a2880bd5aa6cd978c3d46c4d271"
+    "payload_sha256": "d78adce743ef1ed4b38909434c2eb554b723a0199b0ec3639f33dc9604065e7f"
   }
 }

@@ -1,6 +1,6 @@
 # LumenCore Platform, Proof, and Commercialization Map
 
-Updated: June 12, 2026
+Updated: August 19, 2026
 
 ## What Was Built
 
@@ -42,8 +42,9 @@ The authoritative runtime gate currently reports:
 - The measured benchmark supports adaptive routing and stacking as useful model
   selection methods.
 - Harmonic methods win on a subset of series, not universally.
-- Public APIs, paper execution, grant package generation, and evidence chains
-  are operational.
+- Public APIs, paper-execution controls, grant package generation, and
+  evidence-building code exist. A runtime ledger or audit chain is not treated
+  as reconciled until the read-only reconciliation receipt passes.
 
 ### Not Yet Supported
 
@@ -87,11 +88,32 @@ The shortest credible revenue path is:
 The current paper record is negative and is therefore a live-capital blocker,
 not a reason to bypass paper validation.
 
+## Paper Ledger Reconciliation Boundary
+
+The paper ledger uses JSONL as its authoritative record. New records use a
+deterministic hash chain anchored to the terminal legacy or current record.
+The CSV is a derived mirror rebuilt from the union of observed fields, so buy
+and sell rows cannot silently acquire different widths. Audit-chain appenders
+verify their existing chain and use an exclusive append lock before writing.
+
+`code/ops/VERIFY_PAPER_LEDGER_RECONCILIATION.py` is read-only and fails unless
+the JSONL record hashes, CSV parity, audit hash chain, and ledger-to-audit links
+all pass. `code/ops/MIGRATE_PAPER_LEDGER_RECONCILIATION.py` never rewrites the
+source files: it requires an explicit acknowledgement, preserves the source
+audit bytes, rebuilds the CSV into a new destination, and labels imported
+ledger links as retrospective migration custody.
+
+A passing reconciliation receipt proves internal file integrity and linkage.
+It does not prove alpha, profitability, external validation, production
+readiness, or authority to trade live capital.
+
 ## Immediate Priorities
 
-1. Finish the actionable NSF Project Pitch.
-2. Verify or renew SAM.gov, Grants.gov linkage, and AOR authority.
-3. Remove stale grant opportunities and use official deadlines.
-4. Run leakage-free V7 validation with surrogate and bootstrap tests.
-5. Produce one customer-facing frozen delta tied to a real baseline and paid
+1. Preserve and migrate any legacy paper ledger that fails the reconciliation
+   receipt before restarting its writer.
+2. Finish the actionable NSF Project Pitch.
+3. Verify or renew SAM.gov, Grants.gov linkage, and AOR authority.
+4. Remove stale grant opportunities and use official deadlines.
+5. Run leakage-free V7 validation with surrogate and bootstrap tests.
+6. Produce one customer-facing frozen delta tied to a real baseline and paid
    pilot acceptance criterion.
