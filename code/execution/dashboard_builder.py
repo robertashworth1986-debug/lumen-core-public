@@ -77,6 +77,7 @@ def generate_dashboard_html():
     chain_files = chain.get('files', []) if isinstance(chain.get('files', []), list) else []
     proof_chain_count = len(chain_files)
     proof_chain_latest = chain_files[-1]['path'] if proof_chain_count else 'No proof chain'
+    proof_chain_latest_name = Path(str(proof_chain_latest)).name
     optimization_gain_pct = float(top_baseline.get('top_test_vs_baseline', 0.0)) * 100.0
     optimization_label = f"{optimization_gain_pct:.1f}% improvement vs baseline"
     optimization_status = 'EXCEEDS 90% TARGET' if optimization_gain_pct >= 90.0 else 'TARGET IN PROGRESS'
@@ -504,7 +505,7 @@ def generate_dashboard_html():
                     </div>
                     <div class="metric">
                         <span class="metric-label">Latest Proof Path</span>
-                        <span class="metric-value">{proof_chain_latest.split('\\')[-1]}</span>
+                        <span class="metric-value">{proof_chain_latest_name}</span>
                     </div>
                     <div class="metric">
                         <span class="metric-label">Chain Status</span>
