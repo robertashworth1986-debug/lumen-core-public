@@ -6,6 +6,9 @@ import json
 import hashlib
 import math
 import statistics
+import subprocess
+import sys
+import tempfile
 from datetime import datetime, timezone
 
 import requests
@@ -24,15 +27,19 @@ DASH = Path(
 for p in [CODE, CFG, OUT, DASH]:
     p.mkdir(parents=True, exist_ok=True)
 
+from execution.append_lock import exclusive_append_lock
+
 CFG_FILE    = CFG / "paper_trader_runtime.json"
 ENV_FILE    = CFG / "luma_live_keys.env"
 LEDGER_FILE = OUT / "paper_trade_ledger.jsonl"
 REAL_LEDGER_FILE = OUT / "paper_trade_real_api_ledger.jsonl"
-STATE_FILE  = OUT / "paper_trade_state.json"
+COLLECTOR_STATE_FILE = OUT / "execution" / "alpaca_activity_collector_state.json"
+COLLECTOR_LOCK_FILE = OUT / "execution" / "alpaca_activity_collector.lock"
 RUNTIME_FILE= OUT / "paper_trade_runtime.json"
 HASH_FILE   = OUT / "paper_trade_chain_of_custody_sha256.json"
 EVIDENCE_REPORT_FILE = OUT / "investor_evidence_report.json"
 HTML_FILE   = DASH / "alpaca_paper_live_dashboard.html"
+RECONCILIATION_SCRIPT = CODE / "ops" / "BUILD_PAPER_LEDGER_RECONCILIATION.py"
 
 def now():
     return datetime.now(timezone.utc).isoformat()
@@ -47,11 +54,52 @@ def sha256_file(path: Path):
     return h.hexdigest()
 
 def write_json(path, obj):
-    path.write_text(json.dumps(obj, indent=2), encoding="utf-8")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as handle:
+            json.dump(obj, handle, indent=2, ensure_ascii=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp_name, path)
+    finally:
+        try:
+            Path(tmp_name).unlink()
+        except FileNotFoundError:
+            pass
 
 def append_jsonl(path, obj):
+    path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "a", encoding="utf-8") as f:
-        f.write(json.dumps(obj) + "\n")
+        f.write(json.dumps(obj, ensure_ascii=True, separators=(",", ":")) + "\n")
+        f.flush()
+        os.fsync(f.fileno())
+
+
+def fill_id_sha256(fill_id: str) -> str:
+    return hashlib.sha256(str(fill_id).encode("utf-8")).hexdigest()
+
+
+def load_fill_id_hashes(path: Path) -> set[str]:
+    hashes: set[str] = set()
+    if not path.exists():
+        return hashes
+    try:
+        with path.open("r", encoding="utf-8", errors="replace") as handle:
+            for raw_line in handle:
+                try:
+                    row = json.loads(raw_line)
+                except json.JSONDecodeError:
+                    continue
+                if not isinstance(row, dict):
+                    continue
+                fill_id = str(row.get("fill_id") or "").strip()
+                if fill_id:
+                    hashes.add(fill_id_sha256(fill_id))
+    except OSError:
+        return set()
+    return hashes
 
 
 def load_json(path: Path, default):
@@ -187,7 +235,7 @@ def build_investor_evidence_report(state: dict, runtime_payload: dict) -> dict:
         },
         "files": {
             "real_ledger": str(REAL_LEDGER_FILE),
-            "state": str(STATE_FILE),
+            "state": str(COLLECTOR_STATE_FILE),
             "runtime": str(RUNTIME_FILE),
         },
     }
@@ -279,7 +327,7 @@ def alpaca_get(session: requests.Session, base_url: str, endpoint: str, params: 
         }
 
 cfg = load_cfg()
-state_raw = load_json(STATE_FILE, {})
+state_raw = load_json(COLLECTOR_STATE_FILE, {})
 state = state_raw if isinstance(state_raw, dict) else {}
 
 starting_capital = float(cfg.get("starting_capital_usd", 100000.0) or 100000.0)
@@ -293,7 +341,7 @@ state.setdefault("win_count", 0)
 state.setdefault("loss_count", 0)
 state.setdefault("last_symbol", None)
 state.setdefault("last_side", None)
-state.setdefault("seen_fill_ids", [])
+state.setdefault("seen_fill_id_sha256", [])
 
 credentials = resolve_alpaca_credentials(cfg)
 api_key = credentials["api_key"]
@@ -337,65 +385,104 @@ if paper_enabled and api_key and api_secret:
     if fill_err and not fills_payload:
         runtime_error = runtime_error or f"fill_fetch_failed:{fill_err}"
 
-    seen = {str(x) for x in (state.get("seen_fill_ids") or []) if str(x).strip()}
-    for fill in reversed(fills_payload):
-        if not isinstance(fill, dict):
-            continue
-        fill_id = str(fill.get("id", "") or fill.get("activity_id", "") or "").strip()
-        if not fill_id or fill_id in seen:
-            continue
-        qty = float(fill.get("qty", 0.0) or 0.0)
-        price = float(fill.get("price", 0.0) or 0.0)
-        side = str(fill.get("side", "") or "").lower()
-        net_amount = qty * price
-        event = {
-            "timestamp": str(fill.get("transaction_time", fill.get("date", now()))),
-            "event_type": "alpaca_fill",
-            "mode": "ALPACA_PAPER",
-            "fill_id": fill_id,
-            "symbol": str(fill.get("symbol", "") or ""),
-            "side": side,
-            "qty": qty,
-            "price": price,
-            "net_amount_usd": net_amount,
-            "order_id": str(fill.get("order_id", "") or ""),
-            "source": "alpaca_api",
+    # One coordinator lock makes the read-dedupe-append checkpoint atomic
+    # across duplicate launchers. Raw fill identifiers remain only in the
+    # private ledgers; the checkpoint stores one-way hashes.
+    with exclusive_append_lock(
+        COLLECTOR_LOCK_FILE,
+        timeout_seconds=10.0,
+        stale_after_seconds=60.0,
+    ):
+        local_seen = load_fill_id_hashes(LEDGER_FILE)
+        real_seen = load_fill_id_hashes(REAL_LEDGER_FILE)
+        persisted_seen = {
+            str(value).strip()
+            for value in (state.get("seen_fill_id_sha256") or [])
+            if str(value).strip()
         }
-        append_jsonl(LEDGER_FILE, event)
-        append_jsonl(REAL_LEDGER_FILE, event)
-        new_fills.append(event)
-        seen.add(fill_id)
+        all_seen = local_seen | real_seen | persisted_seen
 
-    if account_payload:
-        equity = float(account_payload.get("equity", state.get("equity_usd", starting_capital)) or starting_capital)
-        cash = float(account_payload.get("cash", state.get("cash_usd", equity)) or equity)
-        state["equity_usd"] = round(equity, 2)
-        state["cash_usd"] = round(cash, 2)
-        state["paper_profit_usd"] = round(equity - float(state.get("starting_capital_usd", starting_capital) or starting_capital), 2)
+        for fill in reversed(fills_payload):
+            if not isinstance(fill, dict):
+                continue
+            fill_id = str(fill.get("id", "") or fill.get("activity_id", "") or "").strip()
+            if not fill_id:
+                continue
+            fill_hash = fill_id_sha256(fill_id)
+            qty = float(fill.get("qty", 0.0) or 0.0)
+            price = float(fill.get("price", 0.0) or 0.0)
+            side = str(fill.get("side", "") or "").lower()
+            event = {
+                "timestamp": str(fill.get("transaction_time", fill.get("date", now()))),
+                "event_type": "alpaca_fill",
+                "mode": "ALPACA_PAPER",
+                "fill_id": fill_id,
+                "symbol": str(fill.get("symbol", "") or ""),
+                "side": side,
+                "qty": qty,
+                "price": price,
+                "net_amount_usd": qty * price,
+                "order_id": str(fill.get("order_id", "") or ""),
+                "source": "alpaca_api",
+            }
+            appended = False
+            if fill_hash not in local_seen:
+                append_jsonl(LEDGER_FILE, event)
+                local_seen.add(fill_hash)
+                appended = True
+            if fill_hash not in real_seen:
+                append_jsonl(REAL_LEDGER_FILE, event)
+                real_seen.add(fill_hash)
+                appended = True
+            if appended:
+                new_fills.append(event)
+            all_seen.add(fill_hash)
 
-    if new_fills:
-        latest = new_fills[-1]
-        state["last_symbol"] = latest.get("symbol")
-        state["last_side"] = latest.get("side")
+        if account_payload:
+            equity = float(account_payload.get("equity", state.get("equity_usd", starting_capital)) or starting_capital)
+            cash = float(account_payload.get("cash", state.get("cash_usd", equity)) or equity)
+            state["equity_usd"] = round(equity, 2)
+            state["cash_usd"] = round(cash, 2)
+            state["paper_profit_usd"] = round(equity - float(state.get("starting_capital_usd", starting_capital) or starting_capital), 2)
 
-    state["trade_count"] = int(len(seen))
-    state["seen_fill_ids"] = list(seen)[-5000:]
+        if new_fills:
+            latest = new_fills[-1]
+            state["last_symbol"] = latest.get("symbol")
+            state["last_side"] = latest.get("side")
 
-    snapshot_event = {
-        "timestamp": now(),
-        "event_type": "account_snapshot",
-        "mode": "ALPACA_PAPER",
-        "source": "alpaca_api",
-        "equity_usd": float(state.get("equity_usd", 0.0) or 0.0),
-        "cash_usd": float(state.get("cash_usd", 0.0) or 0.0),
-        "paper_profit_usd": float(state.get("paper_profit_usd", 0.0) or 0.0),
-        "trade_count": int(state.get("trade_count", 0) or 0),
-    }
-    append_jsonl(REAL_LEDGER_FILE, snapshot_event)
+        state["trade_count"] = int(len(all_seen))
+        state["seen_fill_id_sha256"] = sorted(all_seen)[-5000:]
+
+        snapshot_event = {
+            "timestamp": now(),
+            "event_type": "account_snapshot",
+            "mode": "ALPACA_PAPER",
+            "source": "alpaca_api",
+            "equity_usd": float(state.get("equity_usd", 0.0) or 0.0),
+            "cash_usd": float(state.get("cash_usd", 0.0) or 0.0),
+            "paper_profit_usd": float(state.get("paper_profit_usd", 0.0) or 0.0),
+            "trade_count": int(state.get("trade_count", 0) or 0),
+        }
+        append_jsonl(REAL_LEDGER_FILE, snapshot_event)
 else:
     runtime_error = "alpaca_credentials_missing_or_paper_disabled"
 
-write_json(STATE_FILE, state)
+write_json(COLLECTOR_STATE_FILE, state)
+
+reconciliation_status = "NOT_RUN"
+if RECONCILIATION_SCRIPT.exists():
+    try:
+        reconciliation_proc = subprocess.run(
+            [sys.executable, str(RECONCILIATION_SCRIPT)],
+            cwd=str(CODE),
+            capture_output=True,
+            text=True,
+            timeout=180,
+            check=False,
+        )
+        reconciliation_status = "PASS" if reconciliation_proc.returncode == 0 else "FAIL"
+    except (OSError, subprocess.SubprocessError):
+        reconciliation_status = "FAIL"
 
 runtime_payload = {
     "generated_utc": now(),
@@ -412,6 +499,7 @@ runtime_payload = {
     "last_symbol": state.get("last_symbol"),
     "last_side": state.get("last_side"),
     "new_fill_events": int(len(new_fills)),
+    "ledger_reconciliation_status": reconciliation_status,
     "runtime_error": runtime_error,
 }
 write_json(RUNTIME_FILE, runtime_payload)
@@ -424,7 +512,7 @@ write_json(HASH_FILE, {
     "files": [
         {"path": str(LEDGER_FILE), "sha256": sha256_file(LEDGER_FILE)},
         {"path": str(REAL_LEDGER_FILE), "sha256": sha256_file(REAL_LEDGER_FILE) if REAL_LEDGER_FILE.exists() else ""},
-        {"path": str(STATE_FILE), "sha256": sha256_file(STATE_FILE)},
+        {"path": str(COLLECTOR_STATE_FILE), "sha256": sha256_file(COLLECTOR_STATE_FILE)},
         {"path": str(RUNTIME_FILE), "sha256": sha256_file(RUNTIME_FILE)},
         {"path": str(EVIDENCE_REPORT_FILE), "sha256": sha256_file(EVIDENCE_REPORT_FILE) if EVIDENCE_REPORT_FILE.exists() else ""}
     ]
@@ -462,14 +550,14 @@ body{{font-family:Segoe UI,Arial,sans-serif;background:#0b1020;color:#eaf2ff;mar
     <div class="card"><div class="label">New fills (last run)</div><div class="value">{runtime.get("new_fill_events", 0)}</div></div>
 </div>
 <p class="sub" style="margin-top:18px">Runtime error: {runtime.get("runtime_error", "")}</p>
-<p class="sub" style="margin-top:18px">Proof files: paper_trade_real_api_ledger.jsonl, investor_evidence_report.json, paper_trade_state.json, paper_trade_runtime.json, paper_trade_chain_of_custody_sha256.json</p>
+<p class="sub" style="margin-top:18px">Proof files: paper_trade_real_api_ledger.jsonl, investor_evidence_report.json, alpaca_activity_collector_state.json, paper_trade_runtime.json, paper_trade_chain_of_custody_sha256.json</p>
 </body>
 </html>
 """
 HTML_FILE.write_text(html, encoding="utf-8")
 
 print("WROTE:", LEDGER_FILE)
-print("WROTE:", STATE_FILE)
+print("WROTE:", COLLECTOR_STATE_FILE)
 print("WROTE:", RUNTIME_FILE)
 print("WROTE:", HASH_FILE)
 print("WROTE:", HTML_FILE)

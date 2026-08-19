@@ -19,3 +19,15 @@ def test_full_truth_orchestrator_disarms_non_locked_runtime():
     assert 'rt["kill_switch"] = not strict_live_locked' in text
     assert 'ex_rt["kill_switch"] = not strict_live_locked' in text
     assert 'ex_status["kill_switch"] = not strict_live_locked' in text
+
+
+def test_activity_collector_has_separate_state_and_refreshes_reconciliation():
+    text = (ROOT / "code" / "alpaca_paper_loop_builder.py").read_text(encoding="utf-8")
+
+    assert 'COLLECTOR_STATE_FILE = OUT / "execution" / "alpaca_activity_collector_state.json"' in text
+    assert 'load_json(COLLECTOR_STATE_FILE, {})' in text
+    assert 'write_json(COLLECTOR_STATE_FILE, state)' in text
+    assert 'STATE_FILE  = OUT / "paper_trade_state.json"' not in text
+    assert '"seen_fill_id_sha256"' in text
+    assert 'BUILD_PAPER_LEDGER_RECONCILIATION.py' in text
+    assert '"ledger_reconciliation_status": reconciliation_status' in text

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -31,6 +32,9 @@ LIVE_MARKER_FILES = [
 ]
 PAPER_LEDGER_FILE = ROOT / "out" / "paper_trade_ledger.jsonl"
 REAL_PAPER_LEDGER_FILE = ROOT / "out" / "paper_trade_real_api_ledger.jsonl"
+PAPER_CANONICAL_LEDGER_FILE = OUT_EXEC / "paper_trade_ledger_canonical.jsonl"
+REAL_PAPER_CANONICAL_LEDGER_FILE = OUT_EXEC / "paper_trade_real_api_ledger_canonical.jsonl"
+PAPER_RECONCILIATION_FILE = OUT_EXEC / "paper_ledger_reconciliation.json"
 STATE_WRITER_SCAN_ROOTS = [
     ROOT / "code",
     ROOT / "code" / "execution",
@@ -63,6 +67,14 @@ def rel(path: Path) -> str:
         return path.relative_to(ROOT).as_posix()
     except ValueError:
         return path.name
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def parse_dt(value: Any) -> datetime | None:
@@ -295,6 +307,76 @@ def jsonl_integrity(path: Path) -> dict[str, Any]:
     return result
 
 
+def reconciliation_summary(
+    raw_ledgers: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    receipt = load_json(PAPER_RECONCILIATION_FILE, {})
+    receipt_ledgers = receipt.get("ledgers") if isinstance(receipt.get("ledgers"), dict) else {}
+    definitions = {
+        "paper_ledger": (PAPER_LEDGER_FILE, PAPER_CANONICAL_LEDGER_FILE),
+        "real_api_ledger": (REAL_PAPER_LEDGER_FILE, REAL_PAPER_CANONICAL_LEDGER_FILE),
+    }
+    result: dict[str, Any] = {
+        "path": rel(PAPER_RECONCILIATION_FILE),
+        "present": PAPER_RECONCILIATION_FILE.exists(),
+        "schema": receipt.get("schema"),
+        "status": receipt.get("status"),
+        "raw_evidence_preserved": bool(receipt.get("raw_evidence_preserved", False)),
+        "ledgers": {},
+        "current": False,
+    }
+    all_current = bool(
+        result["present"]
+        and result["schema"] == "paper_ledger_reconciliation_v1"
+        and result["status"] == "PASS"
+        and result["raw_evidence_preserved"]
+    )
+    for key, (source, canonical) in definitions.items():
+        receipt_row = receipt_ledgers.get(key) if isinstance(receipt_ledgers.get(key), dict) else {}
+        canonical_integrity = jsonl_integrity(canonical)
+        source_integrity = raw_ledgers[key]
+        reasons: list[str] = []
+        source_sha256 = ""
+        canonical_sha256 = ""
+        if not source.exists():
+            reasons.append("source_missing")
+        else:
+            source_sha256 = sha256_file(source)
+            if source_sha256 != str(receipt_row.get("source_sha256") or ""):
+                reasons.append("source_hash_mismatch")
+        if not canonical.exists():
+            reasons.append("canonical_missing")
+        else:
+            canonical_sha256 = sha256_file(canonical)
+            if canonical_sha256 != str(receipt_row.get("canonical_sha256") or ""):
+                reasons.append("canonical_hash_mismatch")
+        if receipt_row.get("status") != "PASS":
+            reasons.append("receipt_row_not_pass")
+        if canonical_integrity["invalid_json_rows"]:
+            reasons.append("canonical_invalid_json")
+        if canonical_integrity["missing_fill_id_rows"]:
+            reasons.append("canonical_missing_fill_id")
+        if canonical_integrity["duplicate_fill_rows"]:
+            reasons.append("canonical_duplicate_fill_id")
+        if canonical_integrity["unique_fill_ids"] != source_integrity["unique_fill_ids"]:
+            reasons.append("canonical_unique_fill_count_mismatch")
+        current = not reasons
+        all_current = all_current and current
+        result["ledgers"][key] = {
+            "current": current,
+            "reasons": reasons,
+            "source_sha256": source_sha256,
+            "canonical_path": rel(canonical),
+            "canonical_sha256": canonical_sha256,
+            "canonical_rows": canonical_integrity["total_rows"],
+            "canonical_fill_rows": canonical_integrity["fill_rows"],
+            "canonical_unique_fill_ids": canonical_integrity["unique_fill_ids"],
+            "canonical_duplicate_fill_rows": canonical_integrity["duplicate_fill_rows"],
+        }
+    result["current"] = all_current
+    return result
+
+
 def add_blocker(blockers: list[str], condition: bool, message: str) -> None:
     if condition and message not in blockers:
         blockers.append(message)
@@ -315,6 +397,9 @@ def build_audit() -> dict[str, Any]:
     live_markers = [marker_summary(path) for path in LIVE_MARKER_FILES]
     paper_ledger = jsonl_integrity(PAPER_LEDGER_FILE)
     real_paper_ledger = jsonl_integrity(REAL_PAPER_LEDGER_FILE)
+    reconciliation = reconciliation_summary(
+        {"paper_ledger": paper_ledger, "real_api_ledger": real_paper_ledger}
+    )
     paper_state_writers = discover_python_path_writers("paper_trade_state.json")
 
     runtime_mode = str(runtime.get("mode") or runtime.get("runtime_mode") or "").strip().lower()
@@ -379,7 +464,10 @@ def build_audit() -> dict[str, Any]:
     add_blocker(blockers, str(growth.get("mode") or "").upper() != "SAFE_DRY_RUN", "growth controller is not in SAFE_DRY_RUN")
     add_blocker(blockers, int(growth_summary.get("auto_fired_count") or 0) != 0, "auto-fired orders were detected")
     add_blocker(blockers, len(paper_state_writers) != 1, f"paper state has {len(paper_state_writers)} write-capable implementations")
-    for ledger in (paper_ledger, real_paper_ledger):
+    for ledger_key, ledger in (
+        ("paper_ledger", paper_ledger),
+        ("real_api_ledger", real_paper_ledger),
+    ):
         add_blocker(blockers, not ledger["present"], f"paper evidence ledger is missing: {ledger['path']}")
         add_blocker(
             blockers,
@@ -388,8 +476,9 @@ def build_audit() -> dict[str, Any]:
         )
         add_blocker(
             blockers,
-            ledger["duplicate_fill_rows"] > 0,
-            f"paper evidence ledger has duplicate fill identities: {ledger['path']}",
+            ledger["duplicate_fill_rows"] > 0
+            and not bool(reconciliation["ledgers"].get(ledger_key, {}).get("current", False)),
+            f"paper evidence ledger has unreconciled duplicate fill identities: {ledger['path']}",
         )
         add_blocker(
             blockers,
@@ -400,14 +489,15 @@ def build_audit() -> dict[str, Any]:
         blockers,
         real_paper_ledger["unique_fill_ids"] > 0
         and real_paper_ledger["max_snapshot_trade_count"] > 0
-        and real_paper_ledger["unique_fill_ids"] != real_paper_ledger["max_snapshot_trade_count"],
-        "real-API ledger unique fill count disagrees with snapshot trade_count",
+        and real_paper_ledger["max_snapshot_trade_count"] > real_paper_ledger["unique_fill_ids"],
+        "real-API snapshot trade_count exceeds the unique fill evidence available",
     )
     add_blocker(
         blockers,
         real_paper_ledger["external_target"]
         and "paused" in str(real_paper_ledger["target_basename"]).lower()
-        and safe_float(real_paper_ledger["modified_age_min"], 1e9) < 20.0,
+        and safe_float(real_paper_ledger["modified_age_min"], 1e9) < 20.0
+        and not reconciliation["current"],
         "external paper ledger target is labeled paused but has recent writes",
     )
 
@@ -423,6 +513,29 @@ def build_audit() -> dict[str, Any]:
         warnings.append("no actionable candidates in latest growth controller run; this is a research result, not a safety failure")
     if real_paper_ledger["external_target"]:
         warnings.append("real-API paper ledger is an external symlink; custody depends on the external target")
+    if (
+        real_paper_ledger["external_target"]
+        and "paused" in str(real_paper_ledger["target_basename"]).lower()
+        and safe_float(real_paper_ledger["modified_age_min"], 1e9) < 20.0
+        and reconciliation["current"]
+    ):
+        warnings.append(
+            "external paper ledger target has a legacy paused basename but recent writes are covered by the current hash-bound reconciliation"
+        )
+    for ledger_key, ledger in (
+        ("paper_ledger", paper_ledger),
+        ("real_api_ledger", real_paper_ledger),
+    ):
+        if ledger["duplicate_fill_rows"] > 0 and reconciliation["ledgers"].get(ledger_key, {}).get("current"):
+            warnings.append(
+                f"raw {ledger_key} retains {ledger['duplicate_fill_rows']} duplicate historical rows; a current canonical reconciliation excludes them without rewriting evidence"
+            )
+    if (
+        real_paper_ledger["unique_fill_ids"] > real_paper_ledger["max_snapshot_trade_count"] > 0
+    ):
+        warnings.append(
+            "real-API snapshot trade_count is a collector checkpoint lower bound; canonical unique fills include earlier retained history"
+        )
     if real_paper_ledger["changed_during_scan"]:
         warnings.append("real-API paper ledger changed during audit; counts are a moving snapshot")
     if paper_ledger["changed_during_scan"]:
@@ -483,13 +596,14 @@ def build_audit() -> dict[str, Any]:
         "paper_evidence_integrity": {
             "paper_ledger": paper_ledger,
             "real_api_ledger": real_paper_ledger,
+            "reconciliation": reconciliation,
             "alpha_validated": False,
             "live_execution_validated": False,
             "boundary": "Ledger presence and local consistency are necessary controls, not proof of alpha, independent validation, or live readiness.",
         },
         "blockers": blockers,
         "warnings": warnings,
-        "promotion_rule": "Live execution remains blocked until authority conflicts and duplicate evidence are removed, one canonical state writer remains, paper/live heartbeats are fresh, full order/fill reconciliation passes, and a human operator grants a separate short-lived action-time approval. This audit never authorizes execution.",
+        "promotion_rule": "Live execution remains blocked until authority conflicts are removed, raw duplicate history has a current hash-bound canonical reconciliation, one canonical state writer remains, paper/live heartbeats are fresh, full order/fill reconciliation passes, and a human operator grants a separate short-lived action-time approval. This audit never authorizes execution.",
     }
 
 
@@ -502,6 +616,7 @@ def render_markdown(audit: dict[str, Any]) -> str:
     legacy = authority["legacy_runtime"]
     paper_ledger = integrity["paper_ledger"]
     real_ledger = integrity["real_api_ledger"]
+    reconciliation = integrity["reconciliation"]
     blockers = audit.get("blockers", [])
     warnings = audit.get("warnings", [])
     lines = [
@@ -562,6 +677,8 @@ def render_markdown(audit: dict[str, Any]) -> str:
         f"- real-API snapshot rows/max trade_count: {real_ledger['snapshot_rows']} / {real_ledger['max_snapshot_trade_count']}",
         f"- real-API ledger external target: {real_ledger['external_target']}",
         f"- real-API ledger changed during scan: {real_ledger['changed_during_scan']}",
+        f"- reconciliation current: {reconciliation['current']}",
+        f"- reconciliation receipt: {reconciliation['path']}",
         "",
         "## Live Promotion Blockers",
         "",
