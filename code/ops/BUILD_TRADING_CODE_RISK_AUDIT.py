@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import json
 import re
 from datetime import datetime, timezone
@@ -84,9 +85,138 @@ def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="ignore")
 
 
+PYTHON_MUTATION_EXPECTATIONS = {
+    "live_arm_write": ("allow_live_orders", True),
+    "live_mode_write": ("mode", "live"),
+    "kill_switch_off_write": ("kill_switch", False),
+}
+
+
+def _python_tree(text: str) -> ast.Module | None:
+    try:
+        return ast.parse(text)
+    except SyntaxError:
+        return None
+
+
+def _target_key(target: ast.AST) -> str:
+    if isinstance(target, ast.Name):
+        return target.id.lower()
+    if isinstance(target, ast.Attribute):
+        return target.attr.lower()
+    if isinstance(target, ast.Subscript):
+        key = target.slice
+        if isinstance(key, ast.Constant) and isinstance(key.value, str):
+            return key.value.lower()
+    return ""
+
+
+def _value_matches(value: ast.AST, expected: Any) -> bool:
+    if isinstance(value, ast.Constant):
+        actual = value.value
+        if isinstance(expected, str):
+            return isinstance(actual, str) and actual.lower() == expected
+        return actual is expected
+    if isinstance(value, ast.IfExp):
+        return _value_matches(value.body, expected) or _value_matches(value.orelse, expected)
+    return False
+
+
+def _python_mutation_hits(tree: ast.Module, text: str, signal: str) -> list[dict[str, Any]]:
+    key, expected = PYTHON_MUTATION_EXPECTATIONS[signal]
+    lines = text.splitlines()
+    rows: list[dict[str, Any]] = []
+
+    for node in ast.walk(tree):
+        targets: list[ast.AST] = []
+        value: ast.AST | None = None
+        if isinstance(node, ast.Assign):
+            targets = list(node.targets)
+            value = node.value
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+            value = node.value
+        elif isinstance(node, ast.NamedExpr):
+            targets = [node.target]
+            value = node.value
+
+        if value is not None and any(_target_key(target) == key for target in targets):
+            if _value_matches(value, expected):
+                rows.append({
+                    "line": node.lineno,
+                    "snippet": lines[node.lineno - 1].strip()[:180],
+                })
+
+        if isinstance(node, ast.Assign) and isinstance(node.value, ast.Dict):
+            target_names = {_target_key(target) for target in node.targets}
+            config_target = any(
+                any(token in target for token in ("runtime", "control", "config", "flags", "policy"))
+                for target in target_names
+            )
+            if config_target:
+                for dict_key, dict_value in zip(node.value.keys, node.value.values):
+                    if (
+                        isinstance(dict_key, ast.Constant)
+                        and str(dict_key.value).lower() == key
+                        and _value_matches(dict_value, expected)
+                    ):
+                        rows.append({
+                            "line": node.lineno,
+                            "snippet": lines[node.lineno - 1].strip()[:180],
+                        })
+
+        if len(rows) >= 5:
+            break
+    return rows
+
+
+def _python_automatic_approval_hits(tree: ast.Module, text: str) -> list[dict[str, Any]]:
+    lines = text.splitlines()
+    rows: list[dict[str, Any]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if isinstance(node.func, ast.Name):
+            call_name = node.func.id.lower()
+        elif isinstance(node.func, ast.Attribute):
+            call_name = node.func.attr.lower()
+        else:
+            call_name = ""
+
+        literal_values = []
+        for argument in [*node.args, *(keyword.value for keyword in node.keywords)]:
+            literal_values.extend(
+                str(child.value).lower()
+                for child in ast.walk(argument)
+                if isinstance(child, ast.Constant) and isinstance(child.value, str)
+            )
+
+        if call_name == "build_decide_payload" or any(
+            "/api/master/approval/decide" in value for value in literal_values
+        ):
+            rows.append({
+                "line": node.lineno,
+                "snippet": lines[node.lineno - 1].strip()[:180],
+            })
+            if len(rows) >= 5:
+                break
+    return rows
+
+
 def pattern_hits(text: str) -> dict[str, list[dict[str, Any]]]:
     hits: dict[str, list[dict[str, Any]]] = {}
+    tree = _python_tree(text)
     for name, (_, pattern) in RISK_PATTERNS.items():
+        if tree is not None and name in PYTHON_MUTATION_EXPECTATIONS:
+            rows = _python_mutation_hits(tree, text, name)
+            if rows:
+                hits[name] = rows
+            continue
+        if tree is not None and name == "automatic_approval":
+            rows = _python_automatic_approval_hits(tree, text)
+            if rows:
+                hits[name] = rows
+            continue
         rows: list[dict[str, Any]] = []
         for line_no, line in enumerate(text.splitlines(), start=1):
             if pattern.search(line):

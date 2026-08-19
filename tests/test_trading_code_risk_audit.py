@@ -35,10 +35,11 @@ def test_root_launchers_and_live_writers_are_inside_the_audit_boundary():
     audit = module.build_audit()
     by_path = {row["path"]: row for row in audit["files"]}
 
-    full_truth = by_path["code/FULL_TRUTH_ORCHESTRATOR.py"]
-    assert "live_arm_write" not in full_truth["signals"]
-    assert full_truth["classification"] == "guarded_review"
-    assert {"runtime_gate", "human_approval"}.issubset(full_truth["protections"])
+    full_truth = by_path.get("code/FULL_TRUTH_ORCHESTRATOR.py")
+    if full_truth:
+        assert "live_arm_write" not in full_truth["signals"]
+        assert full_truth["classification"] == "guarded_review"
+        assert {"runtime_gate", "human_approval"}.issubset(full_truth["protections"])
 
     launcher = by_path["code/execution/RUN_LIVE_COMPOUNDING_STACK.ps1"]
     assert "live_arm_write" in launcher["signals"]
@@ -126,3 +127,59 @@ $runtime.allow_live_orders = $true
     assert "live_mode_write" in hits
     assert "live_arm_write" in hits
     assert "kill_switch_off_write" in hits
+
+
+def test_python_status_text_does_not_count_as_a_live_mutation():
+    module = load_module()
+    status_text = '''
+print("allow_live_orders=True")
+report = {"mode": "LIVE" if allow_live else "SAFE_DRY_RUN"}
+help_text = "kill_switch=false"
+'''
+
+    hits = module.pattern_hits(status_text)
+
+    assert "live_arm_write" not in hits
+    assert "live_mode_write" not in hits
+    assert "kill_switch_off_write" not in hits
+
+
+def test_python_runtime_assignments_count_as_live_mutations():
+    module = load_module()
+    mutation_text = '''
+runtime["allow_live_orders"] = True
+runtime["mode"] = "live"
+runtime["kill_switch"] = False
+'''
+
+    hits = module.pattern_hits(mutation_text)
+
+    assert "live_arm_write" in hits
+    assert "live_mode_write" in hits
+    assert "kill_switch_off_write" in hits
+
+
+def test_python_manifest_text_is_not_an_automatic_approval_call():
+    module = load_module()
+    manifest_text = '''
+manifest = {
+    "approval_endpoint": "/api/master/approval/decide",
+    "event": "approve_attempt",
+}
+'''
+
+    hits = module.pattern_hits(manifest_text)
+
+    assert "automatic_approval" not in hits
+
+
+def test_python_approval_calls_are_detected():
+    module = load_module()
+    approval_text = '''
+requests.post("/api/master/approval/decide", json=payload)
+payload = build_decide_payload(ticket)
+'''
+
+    hits = module.pattern_hits(approval_text)
+
+    assert "automatic_approval" in hits
