@@ -166,15 +166,15 @@
     {
       "campaign_key": "darpa-dice-proposal-abstract",
       "organization": "DARPA",
-      "status": "receipt_confirmed_waiting",
+      "status": "closed",
       "thread_mode": "existing_thread_only",
       "outbound_sequence": 1,
       "duplicate_detected": false,
       "duplicate_count": 0,
       "inbound_since_last_outbound": true,
-      "next_allowed_action": "inspect_baat_or_inbound_status_then_prepare_full_proposal_only_if_authorized",
+      "next_allowed_action": "preserve_drafts_as_research_assets_no_full_proposal_work_upload_or_submission_without_explicit_founder_override_after_private_notice_review",
       "outreach_id": "LC-DARPA-DICE-ABSTRACT-001",
-      "notes": "The IPTO submission-finalization confirmation establishes receipt of the DICE proposal abstract. Do not send the stray Gmail draft or submit a duplicate abstract."
+      "notes": "The abstract receipt was followed by an official 2026-07-24 status notice discouraging a full proposal. The private notice is controlling and remains outside the public repository. Preserve existing drafts as research and lessons-learned assets; do not spend further proposal effort, upload, or submit without explicit founder override after reviewing the notice and current BAA."
     },
     {
       "campaign_key": "dla-missionweave-l26bz-nv011-1380",
