@@ -7,6 +7,8 @@
 **Prepared:** 2026-07-14  
 **Status:** Internal working checklist only. Not a submission, legal opinion, government certification, or representation.
 
+**Current decision (2026-08-20):** An official July 24 status notice discouraged full-proposal submission. The August 25 deadline remains a public solicitation fact, but this lane is **closed / NO-GO by default**. Existing drafts are retained only as research and lessons-learned assets. No further proposal production, BAAT upload, or submission is authorized unless Robert explicitly overrides this decision after reviewing the private notice and current BAA.
+
 ---
 
 ## 0. Control boundary
@@ -39,7 +41,7 @@ Every such action requires explicit founder approval after a fresh review of the
 | Abstract identifier | HR001126S0010-DICE-PA-052 | Must appear consistently where requested; do not place it in fields that prohibit it. |
 | LumenCore target | Combined TA1/TA2 concept | Reconfirm exact TA-selection rule in the controlling BAA. |
 | TA3 claim | No existing TA3 conformance claimed | Integration/adaptor work remains proposed unless independently demonstrated. |
-| Current submission state | Drafting only | No final proposal submitted. |
+| Current submission state | **Closed / NO-GO by default** | Official July 24 status notice discouraged a full proposal; no final proposal was submitted. |
 
 ### Amendment gate
 
@@ -269,9 +271,9 @@ For every upload:
 
 ---
 
-## 9. Internal production calendar
+## 9. Archived internal production calendar
 
-This is an internal target schedule, not a government deadline change.
+These historical targets are retained for provenance only. Remaining proposal-production and upload actions are cancelled by the current NO-GO unless the founder explicitly overrides after reviewing the private notice and current BAA.
 
 | Internal target | Deliverable |
 |---|---|
@@ -330,6 +332,4 @@ This is an internal target schedule, not a government deadline change.
 
 ## 12. Current sprint conclusion
 
-The narrative asset set now covers the technical concept, budget rationale, transition path, safety boundary, benchmark evidence inventory, and portal/final-assembly controls. The proposal is **not submission-ready**. The critical path has shifted from general drafting to official-template conformity, statement-of-work construction, team/facility facts, documented cost basis, evidence freeze, rights review, and portal fact verification.
-
-No submission or government/legal certification is authorized by this checklist.
+The narrative asset set is retained as bounded research and lessons-learned material. The official July 24 status notice discouraged a full proposal, so this lane is **closed / NO-GO by default**. No additional proposal-production effort, BAAT upload, submission, or government/legal certification is authorized unless the founder explicitly overrides after reviewing the private notice and current BAA.
