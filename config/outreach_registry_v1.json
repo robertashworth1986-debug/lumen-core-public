@@ -84,7 +84,7 @@
     {
       "campaign_key": "nashville-ec-fall-2026",
       "organization": "Nashville Entrepreneur Center",
-      "status": "cohort_confirmed_action_required",
+      "status": "receipt_confirmed_waiting",
       "thread_mode": "existing_thread_only",
       "outbound_sequence": 6,
       "last_outbound_utc": "2026-07-31T20:32:22Z",
@@ -93,7 +93,7 @@
       "inbound_since_last_outbound": true,
       "next_allowed_action": "founder_reviews_and_rsvps_to_takeoff_events_watch_for_unique_assessment_key_and_complete_assessment_before_2026_09_01_no_duplicate_onboarding_outreach",
       "outreach_id": "LC-NEC-FALL-2026-001",
-      "notes": "On August 20, EC sent the Fall 2026 founder kickoff notice through the TakeOff Fall 2026 Cohort PM channel, welcomed recipients as founders, and provided the August 27 pre-kickoff mixer and September 1 cross-program kickoff schedule. EC said a founder-specific Entrepreneur Impact Assessment key will arrive separately and the assessment must be completed before September 1. This confirms Fall 2026 TakeOff cohort participation and scheduled programming only. It does not establish program completion, an EC Impact Grant or finalist slot, funding, a contract, endorsement, customer adoption, or independent validation. Do not publish the unique assessment key or private cohort communications."
+      "notes": "On August 20, EC sent the Fall 2026 founder kickoff notice through the TakeOff Fall 2026 Cohort PM channel, welcomed recipients as founders, and provided the August 27 pre-kickoff mixer and September 1 cross-program kickoff schedule. EC said a founder-specific Entrepreneur Impact Assessment key will arrive separately and the assessment must be completed before September 1. This confirms Fall 2026 TakeOff cohort participation and scheduled programming only. It does not establish program completion, an EC Impact Grant or finalist slot, funding, a contract, endorsement, customer adoption, or independent validation. Do not publish the unique assessment key or private cohort communications. The registry status remains receipt_confirmed_waiting because this field controls outreach lifecycle, not program participation."
     },
     {
       "campaign_key": "launchtn-sbir-sttr-support-microgrant",
