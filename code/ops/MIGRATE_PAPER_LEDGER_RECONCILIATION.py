@@ -37,6 +37,35 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _source_hashes(
+    source_csv: Path,
+    source_jsonl: Path,
+    source_audit_chain: Path,
+) -> dict[str, str | None]:
+    return {
+        "csv": sha256_file(source_csv) if source_csv.is_file() else None,
+        "jsonl": sha256_file(source_jsonl),
+        "audit_chain": (
+            sha256_file(source_audit_chain)
+            if source_audit_chain.is_file()
+            else None
+        ),
+    }
+
+
+def _require_stable_sources(
+    expected: dict[str, str | None],
+    observed: dict[str, str | None],
+    *,
+    phase: str,
+) -> None:
+    changed = sorted(name for name in expected if expected[name] != observed[name])
+    if changed:
+        raise ValueError(
+            f"source files changed during {phase}: {', '.join(changed)}"
+        )
+
+
 def _require_empty_destination(path: Path) -> None:
     if path.exists() and any(path.iterdir()):
         raise ValueError("destination must be absent or empty")
@@ -62,11 +91,22 @@ def migrate(
     if not source_jsonl.is_file():
         raise FileNotFoundError("authoritative source JSONL ledger is missing")
 
+    source_hashes_before_verification = _source_hashes(
+        source_csv, source_jsonl, source_audit_chain
+    )
     source_ledger_verification = TradeLedger.verify_jsonl(source_jsonl)
     if source_ledger_verification["status"] != "pass":
         raise ValueError("source JSONL ledger must verify before migration")
     source_audit_verification = AuditChain.verify_file(source_audit_chain)
     source_csv_verification = TradeLedger.verify_csv_mirror(source_csv, source_jsonl)
+    source_hashes_after_verification = _source_hashes(
+        source_csv, source_jsonl, source_audit_chain
+    )
+    _require_stable_sources(
+        source_hashes_before_verification,
+        source_hashes_after_verification,
+        phase="source verification",
+    )
 
     _require_empty_destination(output_dir)
     destination_jsonl = output_dir / "multi_exchange_trade_ledger.jsonl"
@@ -79,13 +119,33 @@ def migrate(
     if source_audit_chain.is_file():
         shutil.copyfile(source_audit_chain, preserved_source_audit)
 
+    source_hashes_after_copy = _source_hashes(
+        source_csv, source_jsonl, source_audit_chain
+    )
+    _require_stable_sources(
+        source_hashes_before_verification,
+        source_hashes_after_copy,
+        phase="destination capture",
+    )
+    destination_jsonl_sha256 = sha256_file(destination_jsonl)
+    if destination_jsonl_sha256 != source_hashes_before_verification["jsonl"]:
+        raise ValueError("destination JSONL does not match the verified source bytes")
+    destination_source_audit_sha256 = (
+        sha256_file(preserved_source_audit)
+        if preserved_source_audit.is_file()
+        else None
+    )
+    if (
+        destination_source_audit_sha256
+        != source_hashes_before_verification["audit_chain"]
+    ):
+        raise ValueError("preserved audit chain does not match the verified source bytes")
+
     ledger = TradeLedger(str(destination_csv), str(destination_jsonl))
     ledger.repair_csv_mirror()
 
-    source_ledger_sha256 = sha256_file(source_jsonl)
-    source_audit_sha256 = (
-        sha256_file(source_audit_chain) if source_audit_chain.is_file() else None
-    )
+    source_ledger_sha256 = source_hashes_before_verification["jsonl"]
+    source_audit_sha256 = source_hashes_before_verification["audit_chain"]
     migration_time = generated_utc or datetime.now(timezone.utc).isoformat()
     audit = AuditChain(destination_audit)
     audit.append(
@@ -131,12 +191,21 @@ def migrate(
         "status": destination_receipt["status"],
         "mutation_scope": "new_destination_only",
         "source_files_modified": False,
+        "source_capture": {
+            "hashes_before_verification": source_hashes_before_verification,
+            "hashes_after_verification": source_hashes_after_verification,
+            "hashes_after_copy": source_hashes_after_copy,
+            "destination_jsonl_sha256": destination_jsonl_sha256,
+            "destination_source_audit_sha256": destination_source_audit_sha256,
+            "source_stable": True,
+            "destination_copies_match_sources": True,
+        },
         "legacy_boundary": {
             "authoritative_jsonl": source_ledger_verification,
             "csv_mirror": source_csv_verification,
             "audit_chain": source_audit_verification,
             "source_ledger_sha256": source_ledger_sha256,
-            "source_csv_sha256": sha256_file(source_csv) if source_csv.is_file() else None,
+            "source_csv_sha256": source_hashes_before_verification["csv"],
             "source_audit_sha256": source_audit_sha256,
         },
         "destination_reconciliation": destination_receipt,

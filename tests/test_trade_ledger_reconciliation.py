@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -254,6 +255,55 @@ class TradeLedgerReconciliationTests(unittest.TestCase):
             hashlib.sha256((output_dir / "legacy_source_execution_audit_chain.jsonl").read_bytes()).hexdigest(),
             source_hashes[self.audit_path],
         )
+        self.assertTrue(receipt["source_capture"]["source_stable"])
+        self.assertTrue(receipt["source_capture"]["destination_copies_match_sources"])
+        self.assertEqual(
+            receipt["source_capture"]["destination_jsonl_sha256"],
+            source_hashes[self.jsonl_path],
+        )
+
+    def test_migration_rejects_source_append_during_destination_capture(self) -> None:
+        migrator = load_migrator()
+        write_legacy_record(
+            self.jsonl_path,
+            {"symbol": "AAA", "side": "buy", "logged_utc": "2026-01-01T00:00:00Z"},
+        )
+        self.csv_path.write_text("symbol,side\nAAA,buy\n", encoding="utf-8")
+        AuditChain(self.audit_path).append("paper_buy", {"ledger_hash": "a" * 64})
+        output_dir = self.root / "raced_migration"
+        original_copyfile = migrator.shutil.copyfile
+
+        def append_source_after_copy(source: str | Path, destination: str | Path):
+            result = original_copyfile(source, destination)
+            if Path(source) == self.jsonl_path:
+                write_legacy_record(
+                    self.jsonl_path,
+                    {
+                        "symbol": "RACE",
+                        "side": "buy",
+                        "logged_utc": "2026-01-01T00:00:01Z",
+                    },
+                )
+            return result
+
+        with mock.patch.object(
+            migrator.shutil,
+            "copyfile",
+            side_effect=append_source_after_copy,
+        ):
+            with self.assertRaisesRegex(
+                ValueError, "source files changed during destination capture: jsonl"
+            ):
+                migrator.migrate(
+                    self.csv_path,
+                    self.jsonl_path,
+                    self.audit_path,
+                    output_dir,
+                    acknowledgement=migrator.ACKNOWLEDGEMENT,
+                    generated_utc="2026-08-19T00:00:00+00:00",
+                )
+
+        self.assertFalse((output_dir / "paper_ledger_migration_receipt.json").exists())
 
 
 if __name__ == "__main__":

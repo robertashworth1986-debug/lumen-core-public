@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-19T14:45:00Z",
+  "generated_at_utc": "2026-08-20T03:48:55.781872Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "985d0d5618b132c553b62f70233e293b4de56657acea0bedec0c970f25356318",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -461,9 +461,9 @@
             "path": "code/ops/MIGRATE_PAPER_LEDGER_RECONCILIATION.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "c95b1fa888387907a41ee105dccf82a3cd8b3d08",
-            "bytes": 6887,
-            "sha256": "9295a11fad18c4071ceccd03cb137c258ca6ca748054a1eb2807863f09926f60"
+            "git_blob_sha": "c8252ebda19a4e6a2ef8cef1a6ca9585c234d3d8",
+            "bytes": 9317,
+            "sha256": "95d345789e77f59185c794bc4685f36a2a88040ee274604de4f5f8543578baf7"
           }
         ],
         "test": [
@@ -479,9 +479,9 @@
             "path": "tests/test_trade_ledger_reconciliation.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "226757a73fab2f949a0a5b0a4c2dfca0e7a9e505",
-            "bytes": 11525,
-            "sha256": "38f411c35d996c2bd7d4ff17a442c7dffdd75e92b98eb0ba8d28eacc2e50f33b"
+            "git_blob_sha": "3ac1b97a29ee69d4bfaaa6ad7d9d20b89986b2be",
+            "bytes": 13585,
+            "sha256": "9daa2abe33a424c312ca0b1edf4a35d1239e94d169d18ba4da3480a39a660ae9"
           }
         ],
         "documentation": [
@@ -729,9 +729,9 @@
             "path": "tests/test_trade_ledger_reconciliation.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "226757a73fab2f949a0a5b0a4c2dfca0e7a9e505",
-            "bytes": 11525,
-            "sha256": "38f411c35d996c2bd7d4ff17a442c7dffdd75e92b98eb0ba8d28eacc2e50f33b"
+            "git_blob_sha": "3ac1b97a29ee69d4bfaaa6ad7d9d20b89986b2be",
+            "bytes": 13585,
+            "sha256": "9daa2abe33a424c312ca0b1edf4a35d1239e94d169d18ba4da3480a39a660ae9"
           }
         ],
         "documentation": [
@@ -1064,6 +1064,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "d78adce743ef1ed4b38909434c2eb554b723a0199b0ec3639f33dc9604065e7f"
+    "payload_sha256": "41080f7613946c719979208a3cc9e15241bd522f04fb37b48cbe4dfee040595b"
   }
 }
