@@ -340,7 +340,7 @@ sustained uptime.
 | Army AIDP Draft CfS 2 | ACC-APG confirmed receipt on July 14. | Wait for a substantive request; do not ask for another receipt. |
 | Air Force `SAF-AQ-RFI-26-0001` | The Air Force confirmed receipt on July 13. | Wait for a substantive request; do not ask for another receipt. |
 | CDC `75D301-26-RFI-73483` | CDC confirmed receipt and said it would follow up. | Wait. |
-| DARPA DICE proposal abstract | The IPTO submission-finalization confirmation establishes receipt. | Inspect BAAT or new inbound status; do not send the stray Gmail draft or a duplicate abstract. |
+| DARPA DICE proposal abstract | Receipt was followed by an official July 24 status notice discouraging a full proposal. The private notice is controlling; no identifying details or evaluator text are published here. | Close the active preparation lane and preserve existing drafts as research/lessons-learned assets. Do not spend further proposal effort, upload, or submit unless the founder explicitly overrides this no-go after reviewing the private notice and current BAA. |
 | DARPA `SN-26-97` | The package was sent after DARPA confirmed that compliant submissions were welcome. | Wait for substantive contact; do not send the existing reply draft. |
 | DLA MissionWeave `DLA26BZ03-NV011` | DLA SBIR/STTR Program Operations confirmed on July 28 that DSIP showed the proposal as `In Progress`, so it was not formally submitted. The July 22 noon ET deadline passed. | Preserve the packet. Do not claim submission or send another status request without a new official ask. |
 | Navy HarborSentinel `DON26BZ03-NV063` | No final-submission receipt was found. The July 22 noon ET deadline passed. | Preserve the packet. Do not claim submission or start late-submission outreach. |
