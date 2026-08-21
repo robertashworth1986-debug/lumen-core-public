@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -46,6 +47,8 @@ REQUIRED_PRE_REGISTERED_FIELDS = {
     "failure and incomplete-run rules",
     "allowed public claims",
     "decision owner",
+    "execution boundary and human approval owner",
+    "economic denominator, eligibility, realization, cost, and non-overlap group",
 }
 REQUIRED_DELIVERABLES = {
     "source and rights label",
@@ -56,6 +59,39 @@ REQUIRED_DELIVERABLES = {
     "offline verification instructions",
     "buyer-readable Proof Capsule",
     "one bounded go/no-go decision briefing",
+    "read-only shadow comparison receipt",
+    "non-overlapping economic conversion ledger",
+}
+REQUIRED_EXECUTION_BOUNDARY_KEYS = {
+    "mode",
+    "production_write_access",
+    "actuation_allowed",
+    "production_credentials_allowed",
+    "recommendations_require_human_approval",
+    "matched_conditions_required",
+    "incumbent_fallback_required",
+    "comparison_arms",
+}
+REQUIRED_COMPARISON_ARMS = {"incumbent", "candidate", "alternative_optional"}
+REQUIRED_ECONOMIC_CONVERSION_KEYS = {
+    "status",
+    "required_inputs",
+    "eligible_share_min",
+    "eligible_share_max",
+    "realization_factor_min",
+    "realization_factor_max",
+    "implementation_and_run_costs_required",
+    "non_overlap_ledger_required",
+    "public_value_claims_allowed",
+}
+REQUIRED_ECONOMIC_INPUTS = {
+    "buyer-owned addressable cost denominator",
+    "denominator currency, unit, and time window",
+    "eligible share",
+    "measured technical delta",
+    "realization factor",
+    "implementation and run costs",
+    "non-overlap group",
 }
 REQUIRED_DOC_PHRASES = {
     "offer": (
@@ -64,6 +100,8 @@ REQUIRED_DOC_PHRASES = {
         "classified information",
         "each retain their pre-existing",
         "evidence before claims",
+        "read-only shadow",
+        "non-overlap ledger",
     ),
     "sow": (
         "a favorable decision is not promised",
@@ -71,6 +109,8 @@ REQUIRED_DOC_PHRASES = {
         "negative-result register",
         "no ownership transfer",
         "do not sign this template",
+        "read-only shadow",
+        "buyer-owned denominator",
     ),
 }
 UNSAFE_CLAIM_PHRASES = (
@@ -173,6 +213,27 @@ def _integer(
     return value
 
 
+def _number(
+    parent: dict[str, Any],
+    key: str,
+    *,
+    context: str,
+    minimum: float | None = None,
+    maximum: float | None = None,
+) -> float:
+    value = parent.get(key)
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise OfferValidationError(f"{context}.{key} must be numeric")
+    number = float(value)
+    if not math.isfinite(number):
+        raise OfferValidationError(f"{context}.{key} must be finite")
+    if minimum is not None and number < minimum:
+        raise OfferValidationError(f"{context}.{key} must be at least {minimum}")
+    if maximum is not None and number > maximum:
+        raise OfferValidationError(f"{context}.{key} must not exceed {maximum}")
+    return number
+
+
 def _normalized_string_set(values: Iterable[Any], *, context: str) -> set[str]:
     result: set[str] = set()
     seen: set[str] = set()
@@ -270,6 +331,120 @@ def validate_offer(payload: dict[str, Any]) -> dict[str, Any]:
     if rights != ALLOWED_RIGHTS:
         raise OfferValidationError(
             "accepted_source_rights must be public, synthetic, and buyer_authorized"
+        )
+
+    execution_boundary = _mapping(offer, "execution_boundary")
+    if set(execution_boundary) != REQUIRED_EXECUTION_BOUNDARY_KEYS:
+        missing = sorted(REQUIRED_EXECUTION_BOUNDARY_KEYS - set(execution_boundary))
+        extra = sorted(set(execution_boundary) - REQUIRED_EXECUTION_BOUNDARY_KEYS)
+        raise OfferValidationError(
+            "offer.execution_boundary mismatch; "
+            f"missing={missing}, extra={extra}"
+        )
+    if execution_boundary.get("mode") != "read_only_shadow":
+        raise OfferValidationError(
+            "offer.execution_boundary.mode must be read_only_shadow"
+        )
+    for key in (
+        "production_write_access",
+        "actuation_allowed",
+        "production_credentials_allowed",
+    ):
+        if execution_boundary.get(key) is not False:
+            raise OfferValidationError(
+                f"offer.execution_boundary.{key} must be false"
+            )
+    for key in (
+        "recommendations_require_human_approval",
+        "matched_conditions_required",
+        "incumbent_fallback_required",
+    ):
+        if execution_boundary.get(key) is not True:
+            raise OfferValidationError(
+                f"offer.execution_boundary.{key} must be true"
+            )
+    comparison_arms = _normalized_string_set(
+        _list(execution_boundary, "comparison_arms"),
+        context="offer.execution_boundary.comparison_arms",
+    )
+    if comparison_arms != REQUIRED_COMPARISON_ARMS:
+        raise OfferValidationError(
+            "comparison_arms must include incumbent, candidate, and alternative_optional"
+        )
+
+    economic_gate = _mapping(offer, "economic_conversion_gate")
+    if set(economic_gate) != REQUIRED_ECONOMIC_CONVERSION_KEYS:
+        missing = sorted(REQUIRED_ECONOMIC_CONVERSION_KEYS - set(economic_gate))
+        extra = sorted(set(economic_gate) - REQUIRED_ECONOMIC_CONVERSION_KEYS)
+        raise OfferValidationError(
+            "offer.economic_conversion_gate mismatch; "
+            f"missing={missing}, extra={extra}"
+        )
+    if economic_gate.get("status") != "disabled_until_complete":
+        raise OfferValidationError(
+            "economic conversion must remain disabled until buyer-owned inputs are complete"
+        )
+    economic_inputs = _normalized_string_set(
+        _list(economic_gate, "required_inputs"),
+        context="offer.economic_conversion_gate.required_inputs",
+    )
+    if economic_inputs != REQUIRED_ECONOMIC_INPUTS:
+        missing = sorted(REQUIRED_ECONOMIC_INPUTS - economic_inputs)
+        extra = sorted(economic_inputs - REQUIRED_ECONOMIC_INPUTS)
+        raise OfferValidationError(
+            "economic conversion inputs mismatch; "
+            f"missing={missing}, extra={extra}"
+        )
+    bounds = {
+        "eligible_share_min": _number(
+            economic_gate,
+            "eligible_share_min",
+            context="offer.economic_conversion_gate",
+            minimum=0.0,
+            maximum=1.0,
+        ),
+        "eligible_share_max": _number(
+            economic_gate,
+            "eligible_share_max",
+            context="offer.economic_conversion_gate",
+            minimum=0.0,
+            maximum=1.0,
+        ),
+        "realization_factor_min": _number(
+            economic_gate,
+            "realization_factor_min",
+            context="offer.economic_conversion_gate",
+            minimum=0.0,
+            maximum=1.0,
+        ),
+        "realization_factor_max": _number(
+            economic_gate,
+            "realization_factor_max",
+            context="offer.economic_conversion_gate",
+            minimum=0.0,
+            maximum=1.0,
+        ),
+    }
+    if bounds != {
+        "eligible_share_min": 0.0,
+        "eligible_share_max": 1.0,
+        "realization_factor_min": 0.0,
+        "realization_factor_max": 1.0,
+    }:
+        raise OfferValidationError(
+            "economic conversion bounds must remain the closed interval [0, 1]"
+        )
+    for key in (
+        "implementation_and_run_costs_required",
+        "non_overlap_ledger_required",
+    ):
+        if economic_gate.get(key) is not True:
+            raise OfferValidationError(
+                f"offer.economic_conversion_gate.{key} must be true"
+            )
+    if economic_gate.get("public_value_claims_allowed") is not False:
+        raise OfferValidationError(
+            "public value claims must remain disabled by the offer registry"
         )
 
     exclusions = _normalized_string_set(
