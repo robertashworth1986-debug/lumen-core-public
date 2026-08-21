@@ -110,7 +110,7 @@ REQUIRED_DOC_PHRASES = {
         "no ownership transfer",
         "do not sign this template",
         "read-only shadow",
-        "buyer-owned denominator",
+        "buyer-owned addressable denominator",
     ),
 }
 UNSAFE_CLAIM_PHRASES = (
