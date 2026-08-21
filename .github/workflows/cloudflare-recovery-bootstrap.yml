@@ -1,0 +1,134 @@
+name: Bootstrap approved Cloudflare recovery preview
+
+on:
+  push:
+    branches:
+      - codex/cloudflare-recovery
+    paths:
+      - ".github/workflows/cloudflare-recovery-bootstrap.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lumencore-cloudflare-recovery-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    if: github.event.head_commit.message == 'Bootstrap approved Cloudflare recovery preview'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID || vars.CF_ACCOUNT_ID }}
+      WRANGLER_SEND_METRICS: "false"
+      WRANGLER_WRITE_LOGS: "false"
+      WRANGLER_NO_SKILLS_UPDATE_PROMPTS: "true"
+
+    steps:
+      - name: Fail closed unless Cloudflare credentials are available
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=0
+          if [[ -z "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo "::error::No CLOUDFLARE_API_TOKEN or CF_API_TOKEN Actions secret is configured."
+            missing=1
+          fi
+          if [[ -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo "::error::No CLOUDFLARE_ACCOUNT_ID or CF_ACCOUNT_ID Actions secret/variable is configured."
+            missing=1
+          fi
+          [[ "$missing" == "0" ]]
+
+      - name: Check out the exact approved candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.8.0"
+          cache: npm
+          cache-dependency-path: cloudflare-recovery/package-lock.json
+
+      - name: Install pinned Worker dependencies
+        working-directory: cloudflare-recovery
+        run: npm ci --no-audit --no-fund
+
+      - name: Confirm authenticated Cloudflare account access
+        working-directory: cloudflare-recovery
+        run: ./node_modules/.bin/wrangler whoami
+
+      - name: Reconstruct and validate the governed static release
+        working-directory: cloudflare-recovery
+        run: npm run check
+
+      - name: Record pre-bootstrap account state
+        working-directory: cloudflare-recovery
+        continue-on-error: true
+        run: npm run status
+
+      - name: Create the route-free Worker deployment record
+        working-directory: cloudflare-recovery
+        env:
+          CLOUDFLARE_RECOVERY_BOOTSTRAP_APPROVAL: BOOTSTRAP_CLOUDFLARE_RECOVERY_PREVIEW
+        run: npm run bootstrap:preview
+
+      - name: Upload the named preview version
+        id: upload
+        working-directory: cloudflare-recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run deploy:preview 2>&1 | tee /tmp/cloudflare-preview-upload.log
+          preview_url="$(grep -Eo 'https://[^[:space:]]+\.workers\.dev[^[:space:]]*' /tmp/cloudflare-preview-upload.log | tail -1 | sed 's/[),.;]*$//')"
+          [[ "$preview_url" =~ ^https:// ]]
+          printf 'preview_url=%s\n' "$preview_url" >> "$GITHUB_OUTPUT"
+          printf 'Cloudflare recovery preview: %s\n' "$preview_url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify routes, holds, and security headers on Cloudflare
+        shell: bash
+        env:
+          PREVIEW_URL: ${{ steps.upload.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          root_status=""
+          for attempt in $(seq 1 30); do
+            root_status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$PREVIEW_URL/" || true)"
+            [[ "$root_status" == "200" ]] && break
+            sleep 2
+          done
+          [[ "$root_status" == "200" ]]
+          [[ "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$PREVIEW_URL/evidence/")" == "200" ]]
+          [[ "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$PREVIEW_URL/build_week/prooflock_console/")" == "200" ]]
+          [[ "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$PREVIEW_URL/not-found-test")" == "404" ]]
+          [[ "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$PREVIEW_URL/api/public/status")" == "503" ]]
+
+          headers="$(curl --silent --show-error --head "$PREVIEW_URL/")"
+          for header in \
+            content-security-policy \
+            permissions-policy \
+            referrer-policy \
+            strict-transport-security \
+            x-content-type-options \
+            x-frame-options \
+            x-robots-tag; do
+            grep --ignore-case --quiet "^${header}:" <<< "$headers"
+          done
+
+          hold_body="$(curl --silent --show-error "$PREVIEW_URL/api/public/status")"
+          [[ "$hold_body" == *'"status":"hold"'* ]]
+          [[ "$hold_body" == *'"source_release":"1ce7c35975a4011fa844e8b39ccbc950c8c0f398"'* ]]
+
+      - name: Preserve bootstrap receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: cloudflare-recovery-bootstrap-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/cloudflare-preview-upload.log
+          if-no-files-found: warn
+          retention-days: 30
