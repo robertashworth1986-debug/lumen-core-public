@@ -1,0 +1,25 @@
+{
+  "name": "lumencore-cloudflare-recovery",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "prepare:site": "python3 scripts/prepare_site.py",
+    "types": "wrangler types worker-configuration.d.ts --include-runtime=false --check",
+    "types:generate": "wrangler types worker-configuration.d.ts --include-runtime=false",
+    "typecheck": "tsc --noEmit",
+    "build:dry": "wrangler versions upload --dry-run --outdir dist",
+    "check": "npm run prepare:site && npm run types && npm run typecheck && npm run build:dry",
+    "dev": "wrangler dev --local --port 8787",
+    "status": "wrangler deployments list --name lumencore-recovery-preview",
+    "bootstrap:preview": "npm run check && node scripts/bootstrap_preview.mjs",
+    "deploy:preview": "npm run check && wrangler versions upload --preview-alias recovery --tag recovery-1ce7c359 --message 'Exact governed LumenCore static recovery release 1ce7c359' --strict"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260821.1",
+    "typescript": "5.9.3",
+    "wrangler": "4.125.0"
+  }
+}
