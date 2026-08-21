@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "build:dry": "wrangler versions upload --dry-run --outdir dist",
     "check": "npm run prepare:site && npm run types && npm run typecheck && npm run build:dry",
-    "dev": "wrangler dev --local --port 8787",
+    "dev": "wrangler dev --local",
     "status": "wrangler deployments list --name lumencore-recovery-preview",
     "bootstrap:preview": "npm run check && node scripts/bootstrap_preview.mjs",
     "deploy:preview": "npm run check && wrangler versions upload --preview-alias recovery --tag recovery-1ce7c359 --message 'Exact governed LumenCore static recovery release 1ce7c359' --strict"
