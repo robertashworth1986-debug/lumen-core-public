@@ -91,8 +91,15 @@ Unless a separate written security and legal schedule is executed, Customer will
 | Live actuation, dispatch, trading, or control | `No` |
 | Production credentials collected | `No` |
 | Comparison arms | `[incumbent / candidate / optional alternative]` |
+| Approved access path | `[offline replay / approved mirror / read-only export / GET-only gateway]` |
+| Row and event keys | `[stable row ID and event-time fields]` |
+| Outcome availability rule | `[field, delay, and UTC timestamp rule]` |
+| Incumbent prediction source/version | `[value]` |
+| Decision latency | `[maximum allowed latency]` |
+| Allowed egress | `[none / explicit approved destination]` |
 | Matched cases and resource limits | `[definition]` |
 | Incumbent fallback | `Required` |
+| Retention/deletion rule | `[value]` |
 | Human approval owner for any later change | `[name and role]` |
 
 The shadow may inspect only approved copies of inputs, outputs, labels, timing, and cost telemetry. Its output is a recommendation and evidence record, not an operating command. Any later integration, write path, or actuation authority requires a separate written scope and approval boundary.
