@@ -26,6 +26,20 @@ LumenCore runs a fixed-scope validation sprint around one buyer-owned decision. 
 
 Candidate and baseline are then evaluated under the same frozen contract. Positive, neutral, incomplete, adverse, and failed results remain in the record.
 
+## Default read-only shadow mode
+
+The standard sprint sits beside the buyer's existing system; it does not replace or control it. The incumbent, the candidate, and an optional alternative receive the same authorized frozen cases and matched resource limits. The sprint may read approved copies of inputs, outputs, labels, timing, and cost telemetry, but it has no production write access, production credentials, live actuation, dispatch, trading, or control authority.
+
+All outputs are recommendations and evidence. A named human decision owner must approve any later promotion or operational change, and the incumbent remains the required fallback. A candidate is not privileged because it is a LumenCore, harmonic, or buyer-preferred method; the evidence may show that the incumbent or alternative is stronger.
+
+## Economic conversion gate
+
+Dollar conversion stays disabled until the technical gate passes and the buyer supplies an owned, addressable denominator with currency, unit, time window, eligible share, realization factor, implementation and run costs, and a non-overlap group. The bounded calculation is:
+
+`verified value = buyer-owned addressable denominator × eligible share × measured technical delta × realization factor − implementation and run costs`
+
+The non-overlap ledger prevents the same event, asset, workload, avoided failure, or cost pool from being counted twice. Market size, system scale, transaction value, asset value, revenue, or total spend is not a savings denominator by itself. If any required input is unknown, unowned, stale, or not traceable, the sprint reports a technical result without a dollar claim.
+
 ## What the buyer receives
 
 - a source and data-rights label;
