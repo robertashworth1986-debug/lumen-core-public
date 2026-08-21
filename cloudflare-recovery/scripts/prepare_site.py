@@ -100,7 +100,7 @@ def main() -> int:
                 raise RuntimeError(f"unable to read release archive member: {member.name}")
             with source, target.open("wb") as output:
                 shutil.copyfileobj(source, output)
-            os.chmod(target, 0o644)
+            os.chmod(target, 0o600)
 
     for archive_name, record in expected.items():
         target = site_root / archive_name
