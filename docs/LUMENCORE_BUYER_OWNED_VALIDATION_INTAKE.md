@@ -19,9 +19,12 @@ into a bounded validation scope. Mark unknown facts `UNKNOWN`; do not guess.
 7. **Decision owner and timing:** named role, useful-by date, and timezone.
 8. **Commercial route:** known budget range, purchase-order or vendor-onboarding
    requirements, and contracting contact. Use `UNKNOWN` when not confirmed.
-9. **Read-only shadow boundary:** confirm no production write access, no live
-   actuation, no production credentials, the incumbent fallback, matched
-   comparison conditions, and the named human approval owner.
+9. **Read-only shadow boundary:** choose `offline_replay` or
+   `read_only_shadow`; confirm no production write access, live actuation, or
+   production credentials; and name the incumbent source/version, stable row
+   and event keys, outcome-availability delay, allowed egress, decision latency,
+   fallback behavior, retention/deletion rule, matched comparison conditions,
+   and human approval owner.
 10. **Economic conversion inputs, if requested:** buyer-owned addressable
     denominator; currency, unit, and time window; eligible share; measured
     technical delta; realization factor; implementation and run costs; and a
