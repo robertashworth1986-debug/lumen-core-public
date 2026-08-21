@@ -82,7 +82,22 @@ Unless a separate written security and legal schedule is executed, Customer will
 | Baseline owner/reference | `[value]` |
 | Baseline hash/version | `[value]` |
 
-### 3.5 Pre-registered evaluation contract
+### 3.5 Read-only shadow execution boundary
+
+| Field | Agreed value |
+|---|---|
+| Execution mode | `read_only_shadow` |
+| Production write access | `No` |
+| Live actuation, dispatch, trading, or control | `No` |
+| Production credentials collected | `No` |
+| Comparison arms | `[incumbent / candidate / optional alternative]` |
+| Matched cases and resource limits | `[definition]` |
+| Incumbent fallback | `Required` |
+| Human approval owner for any later change | `[name and role]` |
+
+The shadow may inspect only approved copies of inputs, outputs, labels, timing, and cost telemetry. Its output is a recommendation and evidence record, not an operating command. Any later integration, write path, or actuation authority requires a separate written scope and approval boundary.
+
+### 3.6 Pre-registered evaluation contract
 
 | Field | Agreed value |
 |---|---|
@@ -100,6 +115,24 @@ Unless a separate written security and legal schedule is executed, Customer will
 | Economic translation rule, if any | `[separate approved rule or none]` |
 
 The primary metric, threshold, holdout, and failure rules must be approved before the scored run begins. Changes require a written change record and may require a new holdout.
+
+### 3.7 Buyer-owned economic conversion gate
+
+Dollar conversion is `disabled` unless every field below is completed from buyer-owned or buyer-approved records and the technical acceptance gate has passed.
+
+| Field | Agreed value |
+|---|---|
+| Buyer-owned addressable denominator | `[amount]` |
+| Currency, unit, and time window | `[value]` |
+| Eligible share, from 0 to 1 | `[value]` |
+| Measured technical delta | `[value and direction]` |
+| Realization factor, from 0 to 1 | `[value and basis]` |
+| Implementation and run costs | `[amount and time window]` |
+| Non-overlap group | `[stable identifier]` |
+| Economic evidence owner | `[name and role]` |
+| Dollar claim allowed | `[No / contract-specific approved wording]` |
+
+If any field is `UNKNOWN`, lacks a traceable source, or overlaps another counted value pool, the result remains technical only. Total market size, system revenue, asset value, transaction value, or total spend is not itself a savings denominator.
 
 ## 4. Work plan
 
