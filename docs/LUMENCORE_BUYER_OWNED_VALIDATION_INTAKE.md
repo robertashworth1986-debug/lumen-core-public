@@ -19,6 +19,13 @@ into a bounded validation scope. Mark unknown facts `UNKNOWN`; do not guess.
 7. **Decision owner and timing:** named role, useful-by date, and timezone.
 8. **Commercial route:** known budget range, purchase-order or vendor-onboarding
    requirements, and contracting contact. Use `UNKNOWN` when not confirmed.
+9. **Read-only shadow boundary:** confirm no production write access, no live
+   actuation, no production credentials, the incumbent fallback, matched
+   comparison conditions, and the named human approval owner.
+10. **Economic conversion inputs, if requested:** buyer-owned addressable
+    denominator; currency, unit, and time window; eligible share; measured
+    technical delta; realization factor; implementation and run costs; and a
+    stable non-overlap group. Any `UNKNOWN` keeps dollar conversion disabled.
 
 ## Do not send during the first fit check
 
