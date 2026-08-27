@@ -1,0 +1,133 @@
+name: Repair LumenCore app subdomain landing
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/repair-app-subdomain-landing.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lumencore-production-site
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production
+      url: https://app.lumen-core.ai/
+
+    steps:
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
+        with:
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+
+      - name: Replace the one stale app redirect with rollback protection
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes "opc@$VPS_HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          sudo -n true
+          sudo -n nginx -t
+
+          old='return 302 https://lumen-core.ai/investor_command_room.html;'
+          new='return 302 https://lumen-core.ai/proof_to_pilot.html;'
+          nginx_dump=$(mktemp)
+          trap 'rm -f -- "$nginx_dump"' EXIT
+          sudo -n nginx -T >"$nginx_dump" 2>&1
+
+          mapfile -t candidates < <(
+            awk -v needle="$old" '
+              /^# configuration file \/etc\/nginx\// {
+                file=$0
+                sub(/^# configuration file /, "", file)
+                sub(/:$/, "", file)
+              }
+              index($0, needle) { print file }
+            ' "$nginx_dump" | sort -u
+          )
+          if [[ "${#candidates[@]}" -ne 1 || -z "${candidates[0]}" ]]; then
+            printf 'Expected exactly one active stale redirect; found %s\n' "${#candidates[@]}" >&2
+            exit 1
+          fi
+
+          target=$(sudo -n readlink -f -- "${candidates[0]}")
+          case "$target" in
+            /etc/nginx/*) ;;
+            *) echo "Refusing nginx target outside /etc/nginx" >&2; exit 1 ;;
+          esac
+          sudo -n test -f "$target"
+          matches=$(sudo -n grep -Fc -- "$old" "$target")
+          [[ "$matches" -eq 1 ]]
+
+          backup="${target}.pre-app-landing-repair-${GITHUB_RUN_ID:-manual}"
+          sudo -n test ! -e "$backup"
+          sudo -n cp -a -- "$target" "$backup"
+          rollback() {
+            sudo -n cp -a -- "$backup" "$target"
+            sudo -n nginx -t
+            sudo -n systemctl reload nginx
+          }
+          trap 'rc=$?; if [[ $rc -ne 0 ]]; then rollback; fi; rm -f -- "$nginx_dump"; exit $rc' EXIT
+
+          sudo -n python3 - "$target" "$old" "$new" <<'PY'
+          from pathlib import Path
+          import sys
+
+          path = Path(sys.argv[1])
+          old = sys.argv[2]
+          new = sys.argv[3]
+          content = path.read_text(encoding="utf-8")
+          if content.count(old) != 1:
+              raise SystemExit("refusing non-unique app redirect replacement")
+          path.write_text(content.replace(old, new), encoding="utf-8")
+          PY
+          sudo -n nginx -t
+          sudo -n systemctl reload nginx
+          sudo -n systemctl is-active --quiet nginx
+
+          headers=$(mktemp)
+          body=$(mktemp)
+          curl --silent --show-error --dump-header "$headers" --output /dev/null \
+            --noproxy app.lumen-core.ai \
+            --resolve app.lumen-core.ai:443:127.0.0.1 \
+            --connect-timeout 5 --max-time 15 \
+            https://app.lumen-core.ai/
+          grep -Eqi '^HTTP/[^ ]+ 302([[:space:]]|$)' "$headers"
+          grep -Eqi '^location:[[:space:]]*https://lumen-core\.ai/proof_to_pilot\.html([[:space:]]|$)' "$headers"
+          curl --fail --silent --show-error --location \
+            --connect-timeout 5 --max-time 20 \
+            https://app.lumen-core.ai/ -o "$body"
+          grep -Fq 'bounded-validation-offer-v1' "$body"
+          rm -f -- "$headers" "$body"
+          trap - EXIT
+          rm -f -- "$nginx_dump"
+          printf 'APP_LANDING_REPAIR_OK target=%s backup=%s\n' "$target" "$backup"
+          REMOTE
+
+      - name: Verify the public app landing
+        shell: bash
+        run: |
+          set -euo pipefail
+          headers=$(mktemp)
+          body=$(mktemp)
+          trap 'rm -f -- "$headers" "$body"' EXIT
+          curl --silent --show-error --dump-header "$headers" --output /dev/null \
+            --connect-timeout 5 --max-time 20 \
+            https://app.lumen-core.ai/
+          grep -Eqi '^HTTP/[^ ]+ 302([[:space:]]|$)' "$headers"
+          grep -Eqi '^location:[[:space:]]*https://lumen-core\.ai/proof_to_pilot\.html([[:space:]]|$)' "$headers"
+          curl --fail --silent --show-error --location \
+            --connect-timeout 5 --max-time 20 \
+            https://app.lumen-core.ai/ -o "$body"
+          grep -Fq 'bounded-validation-offer-v1' "$body"
