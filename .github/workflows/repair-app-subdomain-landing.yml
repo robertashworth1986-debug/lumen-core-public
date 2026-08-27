@@ -1,10 +1,6 @@
 name: Repair LumenCore app subdomain landing
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/repair-app-subdomain-landing.yml'
   workflow_dispatch:
 
 permissions:
