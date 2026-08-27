@@ -1,0 +1,89 @@
+name: Restore LumenCore TLS certificate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/emergency-tls-renewal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lumencore-emergency-tls-renewal
+  cancel-in-progress: false
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production
+      url: https://lumen-core.ai/
+
+    steps:
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
+        with:
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+
+      - name: Renew the installed certificates and reload nginx
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes "opc@$VPS_HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          sudo -n true
+          command -v openssl >/dev/null
+          sudo -n nginx -t
+          sudo -n certbot certificates
+          sudo -n certbot renew --non-interactive
+          sudo -n nginx -t
+          sudo -n systemctl reload nginx
+          sleep 2
+
+          certificate=$(mktemp)
+          trap 'rm -f -- "$certificate"' EXIT
+          timeout 15 openssl s_client \
+            -connect 127.0.0.1:443 \
+            -servername lumen-core.ai \
+            -showcerts </dev/null 2>/dev/null \
+            | openssl x509 -outform PEM > "$certificate"
+          openssl x509 -in "$certificate" -noout -subject -issuer -dates
+          openssl x509 -in "$certificate" -checkend 604800 -noout
+
+          curl --fail --silent --show-error \
+            --noproxy lumen-core.ai \
+            --resolve lumen-core.ai:443:127.0.0.1 \
+            --connect-timeout 5 --max-time 15 \
+            https://lumen-core.ai/ >/dev/null
+          REMOTE
+
+      - name: Verify public TLS and mixer-critical pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          for host in lumen-core.ai www.lumen-core.ai app.lumen-core.ai research.lumen-core.ai; do
+            timeout 20 openssl s_client \
+              -connect "$host:443" \
+              -servername "$host" \
+              -verify_hostname "$host" \
+              -verify_return_error \
+              -brief </dev/null
+          done
+
+          home=$(mktemp)
+          offer=$(mktemp)
+          trap 'rm -f -- "$home" "$offer"' EXIT
+          curl --fail --silent --show-error --location \
+            --connect-timeout 5 --max-time 20 \
+            https://lumen-core.ai/ -o "$home"
+          curl --fail --silent --show-error --location \
+            --connect-timeout 5 --max-time 20 \
+            https://lumen-core.ai/proof_to_pilot.html -o "$offer"
+          grep -Fq 'proof-to-pilot-home-v1' "$home"
+          grep -Fq 'bounded-validation-offer-v1' "$offer"
