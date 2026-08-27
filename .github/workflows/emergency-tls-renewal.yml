@@ -11,13 +11,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: lumencore-emergency-tls-renewal
+  group: lumencore-production-site
   cancel-in-progress: false
 
 jobs:
   renew:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     environment:
       name: production
       url: https://lumen-core.ai/
@@ -40,10 +40,34 @@ jobs:
           sudo -n true
           command -v openssl >/dev/null
           sudo -n nginx -t
-          sudo -n certbot certificates
-          sudo -n certbot renew --non-interactive
+          export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+          CERTBOT_BIN="$(command -v certbot || true)"
+          if [[ -z "$CERTBOT_BIN" && -x /opt/certbot/bin/certbot ]]; then
+            CERTBOT_BIN=/opt/certbot/bin/certbot
+          fi
+          if [[ -z "$CERTBOT_BIN" ]]; then
+            echo 'certbot not found in the approved executable locations' >&2
+            for candidate in \
+              /usr/bin/certbot /usr/local/bin/certbot /snap/bin/certbot \
+              /opt/certbot/bin/certbot /root/.local/bin/certbot; do
+              sudo -n test -e "$candidate" && sudo -n ls -l "$candidate" || true
+            done
+            command -v dnf || command -v yum || command -v apt-get || true
+            sudo -n systemctl list-timers --all --no-pager \
+              | grep -Ei 'certbot|acme|letsencrypt' || true
+            exit 1
+          fi
+          sudo -n "$CERTBOT_BIN" --version
+          sudo -n "$CERTBOT_BIN" certificates
+          renew_args=(renew --non-interactive)
+          certbot_help="$(sudo -n "$CERTBOT_BIN" renew --help all 2>&1 || true)"
+          if [[ "$certbot_help" == *--no-random-sleep-on-renew* ]]; then
+            renew_args+=(--no-random-sleep-on-renew)
+          fi
+          sudo -n "$CERTBOT_BIN" "${renew_args[@]}"
           sudo -n nginx -t
           sudo -n systemctl reload nginx
+          sudo -n systemctl is-active --quiet nginx
           sleep 2
 
           certificate=$(mktemp)
