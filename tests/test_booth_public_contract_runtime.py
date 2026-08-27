@@ -384,29 +384,59 @@ def test_health_probe_classifies_static_and_dynamic_surfaces() -> None:
     assert "operator_api_v1" in health
 
 
-def test_health_probe_repository_writer_is_path_and_contract_bounded() -> None:
+def test_health_probe_is_read_only_artifact_only_and_outage_fails_job() -> None:
     health = (ROOT / ".github" / "workflows" / "health-probe.yml").read_text(
         encoding="utf-8"
     )
 
-    assert "allowed_path()" in health
-    assert "data/site_health.json|data/uptime_badge.json" in health
-    assert "out-of-scope path" in health
-    assert "git diff --name-only -z" in health
-    assert "git ls-files --others --exclude-standard -z" in health
-    assert "sort -zu" in health
-    assert "git diff --check -- data/site_health.json data/uptime_badge.json" in health
-    assert "git diff --cached --name-only -z" in health
-    assert "git diff-tree --no-commit-id --name-only -r -z HEAD" in health
-    assert "rebased health snapshot contains an out-of-scope path" in health
-    assert 'git ls-remote origin "refs/heads/${GITHUB_REF_NAME}"' in health
-    assert "remote health-snapshot receipt does not match local HEAD" in health
-    assert "Health snapshot publication receipt" in health
+    assert "permissions:\n  contents: read" in health
+    assert "persist-credentials: false" in health
+    assert "runner.temp }}/lumencore-health-probe" in health
+    assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in health
+    assert "retention-days: 14" in health
+    assert "Production health verdict:" in health
+    assert "A completed probe is not evidence of a healthy deployment" in health
+    assert "no repository commit or deployment occurred" in health
+    assert "exit 1" in health
+    for forbidden in (
+        "contents: write",
+        "git config user.",
+        "git add ",
+        "git commit ",
+        "git pull ",
+        "git push ",
+    ):
+        assert forbidden not in health
     assert "(.endpoints | keys | sort)" in health
     assert '(.url | type == "string" and startswith("https://lumen-core.ai/"))' in health
     assert '(.ok | type == "boolean")' in health
     assert ".healthy_count == ([.endpoints[] | select(.ok == true)] | length)" in health
     assert ".cacheSeconds == 3600" in health
+
+
+def test_live_metrics_sync_is_read_only_artifact_only_and_fail_closed() -> None:
+    metrics = (ROOT / ".github" / "workflows" / "live-metrics-sync.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "permissions:\n  contents: read" in metrics
+    assert "persist-credentials: false" in metrics
+    assert "runner.temp }}/lumencore-live-metrics" in metrics
+    assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in metrics
+    assert "retention-days: 14" in metrics
+    assert "available_objects" in metrics
+    assert "Live metrics verdict:" in metrics
+    assert "A completed metrics capture is not evidence of a healthy deployment" in metrics
+    assert "Fail closed on non-operational verdict" in metrics
+    for forbidden in (
+        "contents: write",
+        "git config user.",
+        "git add ",
+        "git commit ",
+        "git pull ",
+        "git push ",
+    ):
+        assert forbidden not in metrics
 
 
 def test_health_probe_static_contract_fails_closed() -> None:
