@@ -35,7 +35,8 @@ jobs:
           VPS_HOST: ${{ secrets.VPS_HOST }}
         run: |
           set -euo pipefail
-          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes "opc@$VPS_HOST" 'bash -s' <<'REMOTE'
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes \
+            "opc@$VPS_HOST" "RUN_ID=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT} bash -s" <<'REMOTE'
           set -euo pipefail
           sudo -n true
           sudo -n nginx -t
@@ -70,7 +71,7 @@ jobs:
           matches=$(sudo -n grep -Fc -- "$old" "$target")
           [[ "$matches" -eq 1 ]]
 
-          backup="${target}.pre-app-landing-repair-${GITHUB_RUN_ID:-manual}"
+          backup="${target}.pre-app-landing-repair-${RUN_ID:?}"
           sudo -n test ! -e "$backup"
           sudo -n cp -a -- "$target" "$backup"
           rollback() {
@@ -105,9 +106,11 @@ jobs:
             https://app.lumen-core.ai/
           grep -Eqi '^HTTP/[^ ]+ 302([[:space:]]|$)' "$headers"
           grep -Eqi '^location:[[:space:]]*https://lumen-core\.ai/proof_to_pilot\.html([[:space:]]|$)' "$headers"
-          curl --fail --silent --show-error --location \
+          curl --fail --silent --show-error \
+            --noproxy lumen-core.ai \
+            --resolve lumen-core.ai:443:127.0.0.1 \
             --connect-timeout 5 --max-time 20 \
-            https://app.lumen-core.ai/ -o "$body"
+            https://lumen-core.ai/proof_to_pilot.html -o "$body"
           grep -Fq 'bounded-validation-offer-v1' "$body"
           rm -f -- "$headers" "$body"
           trap - EXIT
