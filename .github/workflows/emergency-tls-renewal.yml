@@ -1,10 +1,6 @@
 name: Restore LumenCore TLS certificate
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/emergency-tls-renewal.yml'
   workflow_dispatch:
 
 permissions:
