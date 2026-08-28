@@ -334,8 +334,8 @@
         "expected_blue_control": "The gateway defaults to deny, validates the runtime bearer, minimizes public status, and rejects ambiguous credentials.",
         "pass_condition": "Unauthorized requests cannot reach protected operator functionality.",
         "boundary": "Local integration tests do not establish production identity-provider integration, penetration-test completion, or certification.",
-        "test_bytes": 13216,
-        "test_sha256": "30b86823394959e1be55aff899116e6e67939b25a7816689deba8e66c342052a",
+        "test_bytes": 15342,
+        "test_sha256": "ad09ec4723467711d4bdafb0dff739dba22f716e2c444ca13dd301fcc99b1a65",
         "verification_command": "python -m pytest -q tests/test_operator_api_access.py"
       },
       {
