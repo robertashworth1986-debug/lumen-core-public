@@ -105,6 +105,12 @@ class OperatorApiAccessTests(unittest.TestCase):
             "/api/grants",
             "/api/snapshot",
             "/api/operator/health",
+            "/metrics",
+            "/metrics/",
+            "/openapi.json",
+            "/docs",
+            "/docs/oauth2-redirect",
+            "/redoc",
         ):
             with self.subTest(path=path):
                 app = _ProbeApp()
@@ -113,6 +119,51 @@ class OperatorApiAccessTests(unittest.TestCase):
                 self.assertEqual(_status(messages), 503)
                 self.assertEqual(app.calls, [])
                 self.assertNotIn(b"alpha", b"".join(m.get("body", b"") for m in messages))
+
+    def test_runtime_introspection_requires_valid_operator_token(self) -> None:
+        secret = "introspection-secret-000000000000000"
+        app = _ProbeApp()
+        middleware = OperatorApiAccessMiddleware(
+            app,
+            token_provider=lambda: (secret,),
+        )
+
+        for path in (
+            "/metrics",
+            "/metrics/",
+            "/openapi.json",
+            "/docs",
+            "/docs/oauth2-redirect",
+            "/redoc",
+        ):
+            with self.subTest(path=path, credential="missing"):
+                self.assertEqual(_status(_invoke(middleware, _scope(path))), 401)
+            with self.subTest(path=path, credential="valid"):
+                allowed = _invoke(
+                    middleware,
+                    _scope(
+                        path,
+                        headers=[(b"authorization", f"Bearer {secret}".encode())],
+                    ),
+                )
+                self.assertEqual(_status(allowed), 204)
+
+        self.assertEqual(len(app.calls), 6)
+
+    def test_introspection_root_matching_does_not_overblock_nearby_paths(self) -> None:
+        app = _ProbeApp()
+        middleware = OperatorApiAccessMiddleware(app, token_provider=lambda: ())
+
+        for path in (
+            "/documentation",
+            "/metrics-export",
+            "/openapi.jsonld",
+            "/redocument",
+        ):
+            with self.subTest(path=path):
+                self.assertEqual(_status(_invoke(middleware, _scope(path))), 204)
+
+        self.assertEqual(len(app.calls), 4)
 
     def test_sensitive_get_requires_valid_bearer_or_operator_header(self) -> None:
         app = _ProbeApp()
@@ -314,6 +365,10 @@ class RealGatewayAccessIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 operator_health = await client.get("/api/operator/health")
                 balance = await client.get("/api/kraken/balance")
                 approval_queue = await client.get("/api/master/approval-queue")
+                metrics = await client.get("/metrics")
+                openapi = await client.get("/openapi.json")
+                docs = await client.get("/docs")
+                redoc = await client.get("/redoc")
 
         self.assertEqual(public.status_code, 200)
         self.assertEqual(public.json(), public_status_payload())
@@ -324,6 +379,10 @@ class RealGatewayAccessIntegrationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(operator_health.status_code, 503)
         self.assertEqual(balance.status_code, 503)
         self.assertEqual(approval_queue.status_code, 503)
+        self.assertEqual(metrics.status_code, 503)
+        self.assertEqual(openapi.status_code, 503)
+        self.assertEqual(docs.status_code, 503)
+        self.assertEqual(redoc.status_code, 503)
 
     async def test_real_gateway_accepts_valid_runtime_bearer(self) -> None:
         import luma_experience_gateway as gateway
