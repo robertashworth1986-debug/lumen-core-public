@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: scheduled-repository-writer
-  cancel-in-progress: false
+  group: read-only-live-metrics-sync
+  cancel-in-progress: true
 
 jobs:
   sync-metrics:
@@ -22,14 +22,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: Fetch daily metrics snapshot
         id: fetch
         shell: bash
+        env:
+          METRICS_ARTIFACT_DIR: ${{ runner.temp }}/lumencore-live-metrics
         run: |
           set -euo pipefail
-          mkdir -p data
+          install -d -m 700 "$METRICS_ARTIFACT_DIR"
 
           fetch_object_or_null() {
             local url=$1
@@ -61,32 +63,71 @@ jobs:
             --argjson evidence_summary "$evidence_summary" \
             --argjson executor_heartbeat "$executor_heartbeat" \
             '{snapshot_utc:$snapshot_utc,site_status:$site_status,live_status:$live_status,federal_brief:$federal_brief,evidence_summary:$evidence_summary,executor_heartbeat:$executor_heartbeat}' \
-            > data/live_snapshot.json
+            > "$METRICS_ARTIFACT_DIR/live_snapshot.json"
 
           status=$((10#$site_code))
+          available_objects=$(jq '[.live_status, .federal_brief, .evidence_summary, .executor_heartbeat] | map(select(. != null)) | length' "$METRICS_ARTIFACT_DIR/live_snapshot.json")
+          state=outage
           status_msg=unreachable
           status_color=red
           if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then
-            status_msg=online
-            status_color=brightgreen
+            state=degraded
+            status_msg="online · ${available_objects}/4 feeds"
+            status_color=yellow
+            if [[ "$available_objects" -eq 4 ]]; then
+              state=operational
+              status_color=brightgreen
+            fi
           fi
 
           jq -n --arg message "$status_msg" --arg color "$status_color" \
             '{schemaVersion:1,label:"lumen-core.ai",message:$message,color:$color,cacheSeconds:3600}' \
-            > data/site_health_badge.json
+            > "$METRICS_ARTIFACT_DIR/site_health_badge.json"
 
-          jq empty data/live_snapshot.json data/site_health_badge.json
+          jq empty "$METRICS_ARTIFACT_DIR/live_snapshot.json" "$METRICS_ARTIFACT_DIR/site_health_badge.json"
           echo "snapshot_ts=$snapshot_ts" >> "$GITHUB_OUTPUT"
+          echo "site_code=$site_code" >> "$GITHUB_OUTPUT"
+          echo "available_objects=$available_objects" >> "$GITHUB_OUTPUT"
+          echo "state=$state" >> "$GITHUB_OUTPUT"
 
-      - name: Commit daily metrics snapshot
+      - name: Publish explicit metrics verdict
+        if: always()
         shell: bash
+        env:
+          METRICS_ARTIFACT_DIR: ${{ runner.temp }}/lumencore-live-metrics
         run: |
           set -euo pipefail
-          git config user.name "lumencore-bot"
-          git config user.email "bot@lumen-core.ai"
-          git add data/live_snapshot.json data/site_health_badge.json
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(metrics): daily survival snapshot @ ${{ steps.fetch.outputs.snapshot_ts }}"
-            git pull --rebase origin "${GITHUB_REF_NAME}"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
+          if [[ -s "$METRICS_ARTIFACT_DIR/live_snapshot.json" ]]; then
+            {
+              echo "## Live metrics verdict: ${{ steps.fetch.outputs.state }}"
+              echo "- Site HTTP status: \`${{ steps.fetch.outputs.site_code }}\`"
+              echo "- Structured feeds available: \`${{ steps.fetch.outputs.available_objects }}/4\`"
+              echo "- Snapshot UTC: \`${{ steps.fetch.outputs.snapshot_ts }}\`"
+              echo "- Evidence: retained workflow artifact only; no repository commit or deployment occurred"
+              echo ""
+              echo "> A completed metrics capture is not evidence of a healthy deployment. The explicit verdict above controls."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "## Live metrics verdict: unknown"
+              echo "- No valid metrics receipt was produced."
+              echo "- No repository commit or deployment occurred."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Upload bounded metrics receipts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: live-metrics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/lumencore-live-metrics/live_snapshot.json
+            ${{ runner.temp }}/lumencore-live-metrics/site_health_badge.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Fail closed on non-operational verdict
+        if: steps.fetch.outputs.state != 'operational'
+        run: |
+          echo "::error::lumen-core.ai metrics verdict is ${{ steps.fetch.outputs.state }} — HTTP ${{ steps.fetch.outputs.site_code }}, ${{ steps.fetch.outputs.available_objects }}/4 feeds available"
+          exit 1

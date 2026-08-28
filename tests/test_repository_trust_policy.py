@@ -13,6 +13,27 @@ FULL_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 class RepositoryTrustPolicyTests(unittest.TestCase):
+    def test_scheduled_workflows_cannot_write_repository_history(self):
+        failures = []
+        workflow_paths = [
+            *WORKFLOW_DIR.glob("*.yml"),
+            *WORKFLOW_DIR.glob("*.yaml"),
+        ]
+        forbidden_commands = re.compile(
+            r"(?m)^\s*git\s+(?:add|commit|push|pull)\b"
+        )
+        for path in sorted(workflow_paths):
+            text = path.read_text(encoding="utf-8")
+            trigger, _, _ = text.partition("\npermissions:")
+            if re.search(r"(?m)^\s{2}schedule:\s*$", trigger) is None:
+                continue
+            if re.search(r"(?m)^\s*contents:\s*write\s*$", text):
+                failures.append(f"{path.name}: scheduled workflow grants contents: write")
+            if forbidden_commands.search(text):
+                failures.append(f"{path.name}: scheduled workflow mutates Git history")
+
+        self.assertEqual(failures, [], "\n".join(failures))
+
     def test_public_resume_and_generator_keep_claims_inside_evidence_boundary(self):
         resume = (ROOT / "RESUME_LUMENCORE.md").read_text(encoding="utf-8").casefold()
         generator = (ROOT / "code" / "lumalinkedin_resume_engine_v1.py").read_text(
