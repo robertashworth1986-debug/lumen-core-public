@@ -2,7 +2,7 @@
 
 The complete implementation is preserved byte-for-byte in
 ``live_executor_legacy.py``. This module remains the canonical import and
-script path, but every Kraken AddOrder request is evaluated before nonce
+script path, but every Kraken private request is evaluated before nonce
 creation, signing, credential use, or network I/O.
 
 Current promotion stage: live market data with no live orders.
@@ -34,20 +34,20 @@ def _guarded_kraken_private(
     endpoint: str,
     data: dict[str, Any],
 ) -> dict[str, Any]:
-    """Block non-validate AddOrder before the legacy private transport runs."""
+    """Block non-allowlisted private requests before legacy transport runs."""
 
     decision = evaluate_order_request(endpoint, data)
     if not decision.allowed:
         return {
-            "error": ["ELUMEN:Order safety gate blocked live AddOrder"],
+            "error": ["ELUMEN:Private endpoint safety gate blocked request"],
             "order_safety": decision.as_dict(),
         }
     return _ORIGINAL_KRAKEN_PRIVATE(self, endpoint, data)
 
 
 # Legacy methods resolve KrakenClient._private dynamically. Rebinding the class
-# method therefore protects send_order and every other AddOrder caller in the
-# preserved executor without changing the 10,000-line implementation.
+# method therefore protects order, cancellation, custody, and unknown private
+# callers in the preserved executor without changing the historical source.
 _legacy.KrakenClient._private = _guarded_kraken_private
 
 from live_executor_legacy import *  # noqa: E402,F401,F403

@@ -3,8 +3,8 @@
 The complete autonomous trading loop is preserved in
 ``kraken_swing_hunter_legacy.py``. Running this canonical module now performs a
 single live-data ranking snapshot and exits. Imported legacy functions remain
-available, but their private transport blocks every non-validate AddOrder
-before nonce creation, signing, or network I/O.
+available, but their private transport permits only explicit read-only calls
+and validate-only orders before nonce creation, signing, or network I/O.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ def _post(endpoint: str, data: dict[str, Any] | None = None) -> dict[str, Any]:
     decision = evaluate_order_request(endpoint, data)
     if not decision.allowed:
         return {
-            "_error": ["ELUMEN:Order safety gate blocked live AddOrder"],
+            "_error": ["ELUMEN:Private endpoint safety gate blocked request"],
             "order_safety": decision.as_dict(),
         }
     return _ORIGINAL_POST(endpoint, data)

@@ -6,6 +6,7 @@ on:
       - "code/**"
       - "config/order_submission_path_policy.json"
       - "tests/test_order_safety*.py"
+      - "tests/test_capital_transfer_safety.py"
       - ".github/workflows/order-safety-audit.yml"
   workflow_dispatch:
 
@@ -46,7 +47,11 @@ jobs:
             code/micro_position_kraken_bot.py \
             code/execution/execution_orchestrator.py \
             code/execution/alpaca_paper_executor.py \
+            code/multi_exchange_paper_ticker.py \
             code/ops/LIQUIDATE_ALL_TO_USD.py \
+            code/ops/cancel_open_orders.py \
+            code/execution/payout_bridge.py \
+            code/kraken_auto_withdraw_btc.py \
             code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py \
             code/FULL_TRUTH_ORCHESTRATOR.py \
             code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py \
@@ -63,6 +68,7 @@ jobs:
           python tests/test_standalone_no_orders_facades.py
           python tests/test_order_safety_promotion_lane.py
           python tests/test_order_safety_alpaca_paper_boundary.py
+          python tests/test_capital_transfer_safety.py
 
       - name: Audit all direct submission paths
         run: |

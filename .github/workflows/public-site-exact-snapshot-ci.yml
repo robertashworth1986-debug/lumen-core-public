@@ -5,8 +5,12 @@ on:
     paths:
       - '.github/workflows/deploy.yml'
       - '.github/workflows/deploy-public-site-release.yml'
+      - '.github/workflows/stage-public-site-origin.yml'
       - '.github/workflows/public-site-exact-snapshot-ci.yml'
       - 'code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh'
+      - 'code/deploy/BOOTSTRAP_PUBLIC_SITE_ORIGIN.sh'
+      - 'code/deploy/cloud-init/lumencore-public-origin-cloud-config.yml'
+      - 'code/deploy/nginx/lumencore-public-origin.conf'
       - 'code/deploy/package_public_site_release.py'
       - 'code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py'
       - 'docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md'
@@ -43,6 +47,7 @@ on:
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'tests/test_public_site_deploy_hardening.py'
+      - 'tests/test_public_site_candidate_origin.py'
       - 'tests/test_public_discovery.py'
       - 'tests/test_canonical_surface_design.py'
   push:
@@ -50,8 +55,12 @@ on:
     paths:
       - '.github/workflows/deploy.yml'
       - '.github/workflows/deploy-public-site-release.yml'
+      - '.github/workflows/stage-public-site-origin.yml'
       - '.github/workflows/public-site-exact-snapshot-ci.yml'
       - 'code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh'
+      - 'code/deploy/BOOTSTRAP_PUBLIC_SITE_ORIGIN.sh'
+      - 'code/deploy/cloud-init/lumencore-public-origin-cloud-config.yml'
+      - 'code/deploy/nginx/lumencore-public-origin.conf'
       - 'code/deploy/package_public_site_release.py'
       - 'code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py'
       - 'docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md'
@@ -88,6 +97,7 @@ on:
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'tests/test_public_site_deploy_hardening.py'
+      - 'tests/test_public_site_candidate_origin.py'
       - 'tests/test_public_discovery.py'
       - 'tests/test_canonical_surface_design.py'
 
@@ -113,7 +123,9 @@ jobs:
         run: python -m pip install --disable-pip-version-check pytest==9.1.0
 
       - name: Check shell syntax
-        run: bash -n code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh
+        run: |
+          bash -n code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh
+          bash -n code/deploy/BOOTSTRAP_PUBLIC_SITE_ORIGIN.sh
 
       - name: Run exact-snapshot protocol tests
-        run: python -m pytest tests/test_public_site_deploy_hardening.py tests/test_public_discovery.py tests/test_canonical_surface_design.py -q
+        run: python -m pytest tests/test_public_site_deploy_hardening.py tests/test_public_site_candidate_origin.py tests/test_public_discovery.py tests/test_canonical_surface_design.py -q

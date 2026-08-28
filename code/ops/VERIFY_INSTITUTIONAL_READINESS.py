@@ -50,11 +50,14 @@ ALLOWED_STATUSES = {
 EXPECTED_DOMAIN_STATUS = {
     "source_and_reproducibility": "implemented_first_party",
     "evidence_custody_and_claim_governance": "implemented_first_party",
+    "ecosystem_portfolio_and_claim_map": "implemented_first_party",
     "security_reporting": "documented_control",
     "repository_supply_chain": "documented_control",
     "public_deployment": "implemented_first_party",
+    "candidate_origin_and_migration": "prepared_not_executed",
     "data_rights_and_handling": "buyer_specific_gate",
     "identity_access_and_runtime": "prepared_not_executed",
+    "trading_execution_and_custody_safety": "prepared_not_executed",
     "incident_response_and_continuity": "documented_control",
     "legal_certification_and_insurance": "open_gap",
     "commercial_delivery": "prepared_not_executed",
@@ -64,11 +67,14 @@ EXPECTED_DOMAIN_STATUS = {
 REQUIRED_DOMAIN_NEGATIVES = {
     "source_and_reproducibility": "independent execution",
     "evidence_custody_and_claim_governance": "substantively true",
+    "ecosystem_portfolio_and_claim_map": "independent validation",
     "security_reporting": "security certification",
     "repository_supply_chain": "complete product sbom",
     "public_deployment": "later checked-out commit",
+    "candidate_origin_and_migration": "production cutover",
     "data_rights_and_handling": "executed data-processing agreement",
     "identity_access_and_runtime": "production secrets",
+    "trading_execution_and_custody_safety": "live-capital production readiness",
     "incident_response_and_continuity": "tested live recovery exercise",
     "legal_certification_and_insurance": "soc 2",
     "commercial_delivery": "signed paid scope",
@@ -86,6 +92,9 @@ REQUIRED_CLAIM_BOUNDARIES = {
     "no_executed_dpa_or_legal_review",
     "no_complete_product_sbom",
     "no_exact_live_snapshot_established_for_checked_out_commit",
+    "no_live_capital_production_readiness",
+    "no_candidate_origin_purchase_or_cutover",
+    "no_repository_history_credential_remediation",
 }
 REQUIRED_DOSSIER_TEXT = (
     "Production decision: `HOLD`.",
@@ -97,6 +106,9 @@ REQUIRED_DOSSIER_TEXT = (
     "A green verifier or hash establishes only the named property",
     "isolated replay environment",
     "SOC 2, ISO 27001, FedRAMP",
+    "No new live-capital order authority is granted",
+    "does not purchase a VPS, issue a certificate, or change DNS",
+    "19 named evidence-ranked systems",
 )
 FORBIDDEN_PROMOTION_TEXT = (
     "soc 2 certified",

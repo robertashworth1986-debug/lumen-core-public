@@ -21,6 +21,11 @@ from execution.order_router import OrderRouter, RouteIntent
 from execution.shadow_runner import ShadowRunner, ShadowFill
 from execution.trade_ledger import TradeLedger
 from execution.audit_chain import AuditChain
+from execution.alpaca_paper_executor import (
+    PAPER_TRADING_ORIGIN,
+    PaperEndpointError,
+    normalize_paper_trading_base,
+)
 import requests
 
 try:
@@ -2705,19 +2710,34 @@ def run_binanceus_paper_logic(price: float | None, cycle: int, profile: str, see
     }
 
 
+def _resolve_alpaca_paper_base() -> str:
+    paper_override = os.getenv("ALPACA_PAPER_BASE_URL", "").strip()
+    generic_override = os.getenv("ALPACA_BASE_URL", "").strip() or os.getenv(
+        "ALPACA_TRADING_BASE_URL", ""
+    ).strip()
+    if generic_override and not paper_override:
+        raise PaperEndpointError(
+            "generic Alpaca endpoint overrides require an explicit approved paper origin"
+        )
+    resolved = normalize_paper_trading_base(paper_override)
+    if resolved != PAPER_TRADING_ORIGIN:
+        raise PaperEndpointError("Alpaca trading origin is not the approved paper origin")
+    return resolved
+
+
 def alpaca_snapshot() -> Dict[str, Any]:
+    try:
+        base = _resolve_alpaca_paper_base()
+    except PaperEndpointError as exc:
+        return {"ok": False, "error": f"paper_origin_blocked:{exc}", "base_url": None}
+
     key = os.getenv("ALPACA_API_KEY", "").strip()
     secret = os.getenv("ALPACA_API_SECRET", "").strip()
-    base = os.getenv("ALPACA_PAPER_BASE_URL", "").strip() or os.getenv("ALPACA_BASE_URL", "").strip() or "https://paper-api.alpaca.markets"
 
     if not key or not secret:
         return {"ok": False, "error": "Missing ALPACA_API_KEY/ALPACA_API_SECRET", "base_url": base}
 
-    headers = {
-        "APCA-API-KEY-ID": key,
-        "APCA-API-SECRET-KEY": secret,
-    }
-    res = _get(f"{base}/v2/account", headers=headers, timeout=12)
+    res = _alpaca_request("GET", base, "/v2/account", key, secret, timeout=12)
     if not res.get("ok"):
         return {"ok": False, "base_url": base, "error": res.get("error")}
     data = res.get("data", {})
@@ -2765,14 +2785,22 @@ def _alpaca_request(
         "APCA-API-SECRET-KEY": secret,
     }
     try:
+        safe_base = normalize_paper_trading_base(base_url)
         resp = requests.request(
             method=method.upper(),
-            url=f"{base_url}{endpoint}",
+            url=f"{safe_base}{endpoint}",
             headers=headers,
             params=params or {},
             json=payload,
             timeout=timeout,
+            allow_redirects=False,
         )
+        if 300 <= int(resp.status_code) < 400:
+            return {
+                "ok": False,
+                "status_code": int(resp.status_code),
+                "error": "paper_redirect_blocked",
+            }
         if resp.status_code >= 400:
             return {"ok": False, "status_code": resp.status_code, "error": resp.text[:800]}
         data = resp.json() if resp.text else {}
@@ -2820,9 +2848,13 @@ def _alpaca_pick_candidate(candidates: List[Dict[str, Any]], supported: Set[str]
 
 
 def run_alpaca_true_paper_logic(cycle: int, profile: str, preset: Dict[str, Any], binanceus_engine: Dict[str, Any]) -> Dict[str, Any]:
+    try:
+        base = _resolve_alpaca_paper_base()
+    except PaperEndpointError as exc:
+        return {"ok": False, "error": f"paper_origin_blocked:{exc}", "base_url": None}
+
     key = os.getenv("ALPACA_API_KEY", "").strip()
     secret = os.getenv("ALPACA_API_SECRET", "").strip()
-    base = os.getenv("ALPACA_PAPER_BASE_URL", "").strip() or os.getenv("ALPACA_BASE_URL", "").strip() or "https://paper-api.alpaca.markets"
 
     if not key or not secret:
         return {"ok": False, "error": "missing_alpaca_credentials", "base_url": base}

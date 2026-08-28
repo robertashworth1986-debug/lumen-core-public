@@ -2,9 +2,9 @@
 
 The historical implementation is preserved byte-for-byte in
 ``kraken_execution_legacy.py`` for auditability. This facade is the public
-import surface. It blocks every Kraken AddOrder request unless the payload is
-explicitly validate-only and replaces the legacy validate-only helper with a
-side-effect-bounded implementation.
+import surface. It permits explicit read-only private endpoints, blocks unknown
+or mutating endpoints, and permits AddOrder only for validation or a narrowly
+scoped manual-emergency receipt.
 """
 
 from __future__ import annotations
@@ -14,6 +14,7 @@ from typing import Any, Dict, Optional
 
 import kraken_execution_legacy as _legacy
 from execution.order_safety_gate import (
+    EmergencyMutationAuthorization,
     ORDER_POLICY,
     OrderSafetyDecision,
     OrderSafetyError,
@@ -31,11 +32,17 @@ def _private_post(
     payload: Dict[str, Any],
     timeout: int = 20,
     retry_attempt: int = 0,
+    *,
+    emergency_authorization: EmergencyMutationAuthorization | None = None,
 ) -> Dict[str, Any]:
-    """Apply the no-live-order gate before keys, nonces, or network I/O."""
+    """Apply the private-endpoint gate before keys, nonces, or network I/O."""
 
     try:
-        require_order_request_allowed(url_path, payload)
+        require_order_request_allowed(
+            url_path,
+            payload,
+            emergency_authorization=emergency_authorization,
+        )
     except OrderSafetyError as exc:
         raise _legacy.KrakenExecutionError(str(exc)) from exc
 

@@ -186,15 +186,16 @@ The EIA lane preserves an important adverse fact: the frozen eight-authority pro
 
 ## 6. Canonical market position and governed portfolio
 
-### One platform, one offer, one first validation lane — **MERGED / NOT MARKET VALIDATED**
+### One platform, one offer, one evidence-ranked portfolio — **MERGED / NOT MARKET VALIDATED**
 
 - Current buyer offer specification: [#131 — Buyer-owned validation offer](https://github.com/robertashworth1986-debug/lumen-core-public/pull/131)
 - Current portfolio audit: [#132 — Governed 15-lane engine portfolio audit](https://github.com/robertashworth1986-debug/lumen-core-public/pull/132)
 - Platform: **LumenCore**.
 - Evidence and claim-governance layer: **ProofLock**.
+- Commercial method inside the sole offer: **Frozen Delta**.
 - Primary paid offer: **Buyer-Owned Baseline Validation Sprint**.
-- First sector validation lane: **Lumen Infrastructure Sentinel**.
-- The 15 tracked lanes are internal delivery, research, and concept lanes; they are not 15 separately saleable products.
+- The current audit separates 19 named evidence-ranked systems or explicit unverified states from 15 registered implementation lanes whose six-class counts measure artifact coverage only.
+- A configured sector priority is not an evidence rank. The lanes are internal delivery, research, or concept states; they are not separately saleable or validated products.
 - The sealed offer packet is bound to the canonical evidence graph, and the portfolio receipt is bound to both artifacts plus tracked repository blobs.
 - Current portfolio receipt records zero subscription-ready lanes. It does not establish a buyer commitment, signed paid scope, executed pilot, revenue, external validation, or transaction valuation.
 
@@ -253,7 +254,7 @@ This map prevents reviewers from treating every open draft as an independent pro
 | 100 | Operator API source boundary | Merged; production activation remains HumanUnlock-gated. |
 | 101 | Proof Capsule v3 standard | Merged current standard with aggregate assurance integration. |
 | 131 | Buyer-owned validation offer and sealed strategic packet | Merged current commercial offer specification; not a buyer commitment, signed scope, pilot, revenue, or valuation. |
-| 132 | Governed 15-lane engine portfolio audit | Merged current one-platform/one-offer map; tracked lanes are not independently validated products. |
+| 132 | Governed 15-lane engine portfolio audit foundation | Merged historical foundation; the current in-place audit adds evidence-ranked named systems while retaining the 15 registered lanes as artifact coverage, not independently validated products. |
 
 ## 10. Reviewer scoring boundary
 

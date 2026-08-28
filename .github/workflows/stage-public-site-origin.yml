@@ -1,0 +1,376 @@
+name: Stage exact public-site snapshot on candidate origin
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_commit:
+        description: Full commit SHA at the selected workflow ref
+        required: true
+        type: string
+      candidate_address:
+        description: Public IPv4 address of the unpromoted candidate origin
+        required: true
+        type: string
+      candidate_ssh_user:
+        description: Non-root candidate account with non-interactive sudo
+        required: true
+        default: lumencore-deploy
+        type: string
+      approval:
+        description: Explicit candidate-only bootstrap and staging gate
+        required: true
+        type: choice
+        default: HOLD
+        options:
+          - HOLD
+          - STAGE_PUBLIC_SITE_CANDIDATE
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lumencore-candidate-public-origin
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      candidate_address: ${{ steps.gate.outputs.candidate_address }}
+      candidate_ssh_user: ${{ steps.gate.outputs.candidate_ssh_user }}
+      source_commit: ${{ steps.gate.outputs.source_commit }}
+    steps:
+      - name: Fail closed unless this exact candidate and commit are approved
+        id: gate
+        shell: bash
+        env:
+          APPROVAL: ${{ inputs.approval }}
+          CANDIDATE_ADDRESS: ${{ inputs.candidate_address }}
+          CANDIDATE_SSH_USER: ${{ inputs.candidate_ssh_user }}
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_COMMIT: ${{ inputs.release_commit }}
+          WORKFLOW_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EVENT_NAME" == "workflow_dispatch" ]]
+          [[ "$APPROVAL" == "STAGE_PUBLIC_SITE_CANDIDATE" ]]
+          [[ "$RELEASE_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]
+          [[ "$CANDIDATE_SSH_USER" =~ ^[a-z_][a-z0-9_-]{0,30}$ ]]
+          [[ "$CANDIDATE_SSH_USER" != "root" ]]
+
+          normalized_address=$(
+            python3 - "$CANDIDATE_ADDRESS" <<'PY'
+          import ipaddress
+          import socket
+          import sys
+
+          candidate = ipaddress.ip_address(sys.argv[1])
+          if candidate.version != 4 or not candidate.is_global:
+              raise SystemExit("candidate address must be one globally routable IPv4 address")
+
+          current = set()
+          for hostname in (
+              "lumen-core.ai",
+              "www.lumen-core.ai",
+              "app.lumen-core.ai",
+              "research.lumen-core.ai",
+          ):
+              resolved = set()
+              for row in socket.getaddrinfo(hostname, 443, type=socket.SOCK_STREAM):
+                  try:
+                      resolved.add(ipaddress.ip_address(row[4][0]).compressed)
+                  except ValueError:
+                      continue
+              if not resolved:
+                  raise SystemExit(f"current address could not be resolved for {hostname}")
+              current.update(resolved)
+          if candidate.compressed in current:
+              raise SystemExit(
+                  "candidate workflow refuses an address currently serving lumen-core.ai"
+              )
+          print(candidate.compressed)
+          PY
+          )
+          printf 'candidate_address=%s\n' "$normalized_address" >> "$GITHUB_OUTPUT"
+          printf 'candidate_ssh_user=%s\n' "$CANDIDATE_SSH_USER" >> "$GITHUB_OUTPUT"
+          printf 'source_commit=%s\n' "$RELEASE_COMMIT" >> "$GITHUB_OUTPUT"
+
+  stage:
+    needs: authorize
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production-candidate
+    env:
+      APPROVAL: ${{ inputs.approval }}
+      CANDIDATE_ADDRESS: ${{ needs.authorize.outputs.candidate_address }}
+      CANDIDATE_SSH_USER: ${{ needs.authorize.outputs.candidate_ssh_user }}
+      RELEASE_COMMIT: ${{ needs.authorize.outputs.source_commit }}
+      REMOTE_STAGE: /tmp/lumencore-candidate-origin-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Checkout the approved commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ needs.authorize.outputs.source_commit }}
+
+      - name: Validate and package the bounded candidate payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n code/deploy/BOOTSTRAP_PUBLIC_SITE_ORIGIN.sh
+          bash -n code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh
+          install -d -m 700 /tmp/candidate-public-origin
+          python3 code/deploy/package_public_site_release.py \
+            --source-commit "$RELEASE_COMMIT" \
+            --archive /tmp/candidate-public-origin/public-site-release.tar \
+            --manifest /tmp/candidate-public-origin/public-site-release-manifest.json \
+            | tee /tmp/candidate-public-origin/package-receipt.json
+          sha256sum code/deploy/nginx/lumencore-public-origin.conf \
+            | tee /tmp/candidate-public-origin/nginx-config.sha256
+
+      - name: Install candidate-only SSH key
+        uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
+        with:
+          key: ${{ secrets.CANDIDATE_ORIGIN_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.CANDIDATE_ORIGIN_KNOWN_HOSTS }}
+
+      - name: Verify fresh Ubuntu candidate prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes \
+            "$CANDIDATE_SSH_USER@$CANDIDATE_ADDRESS" '
+              set -eu
+              sudo -n true
+              if command -v cloud-init >/dev/null 2>&1; then
+                sudo -n cloud-init status --wait
+              fi
+              test -r /etc/os-release
+              . /etc/os-release
+              test "$ID" = ubuntu
+              case "$VERSION_ID" in 22.04|24.04) ;; *) exit 1 ;; esac
+              for command_name in bash install sha256sum; do
+                command -v "$command_name" >/dev/null
+              done
+            '
+
+      - name: Upload bounded bootstrap and exact release
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-candidate-origin-[0-9]+-[0-9]+$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$CANDIDATE_SSH_USER@$CANDIDATE_ADDRESS" \
+            "test ! -e '$REMOTE_STAGE' && install -d -m 700 '$REMOTE_STAGE'"
+          scp -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            /tmp/candidate-public-origin/public-site-release.tar \
+            /tmp/candidate-public-origin/public-site-release-manifest.json \
+            code/deploy/nginx/lumencore-public-origin.conf \
+            "$CANDIDATE_SSH_USER@$CANDIDATE_ADDRESS:$REMOTE_STAGE/"
+
+      - name: Bootstrap static-only origin with rollback protection
+        shell: bash
+        run: |
+          set -euo pipefail
+          config_sha=$(awk '{print $1}' /tmp/candidate-public-origin/nginx-config.sha256)
+          [[ "$config_sha" =~ ^[0-9a-f]{64}$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$CANDIDATE_SSH_USER@$CANDIDATE_ADDRESS" \
+            "sudo -n bash -s -- \
+              --approval BOOTSTRAP_PUBLIC_SITE_CANDIDATE \
+              --nginx-config '$REMOTE_STAGE/lumencore-public-origin.conf' \
+              --nginx-config-sha256 '$config_sha' \
+              --source-commit '$RELEASE_COMMIT'" \
+            < code/deploy/BOOTSTRAP_PUBLIC_SITE_ORIGIN.sh \
+            | tee /tmp/candidate-public-origin/bootstrap-receipt.txt
+
+          grep -Fxq 'PUBLIC_ORIGIN_BOOTSTRAP_OK' \
+            /tmp/candidate-public-origin/bootstrap-receipt.txt
+          if ! grep -Fxq 'PUBLIC_ORIGIN_TLS_READY=true' \
+            /tmp/candidate-public-origin/bootstrap-receipt.txt; then
+            echo 'Candidate is safely held on HTTP health/ACME only.' >&2
+            echo 'Install the separately authorized canonical certificate, then rerun.' >&2
+            exit 1
+          fi
+
+      - name: Apply exact files with bounded rollback capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$CANDIDATE_SSH_USER@$CANDIDATE_ADDRESS" \
+            "sudo -n bash -s -- \
+              --archive '$REMOTE_STAGE/public-site-release.tar' \
+              --manifest '$REMOTE_STAGE/public-site-release-manifest.json' \
+              --source-commit '$RELEASE_COMMIT' \
+              --approval DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT" \
+            < code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh \
+            | tee /tmp/candidate-public-origin/deploy-receipt.txt
+
+      - name: Verify all candidate bytes through canonical TLS and SNI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py \
+            --manifest /tmp/candidate-public-origin/public-site-release-manifest.json \
+            --source-commit "$RELEASE_COMMIT" \
+            --base-url https://lumen-core.ai \
+            --resolve-address "$CANDIDATE_ADDRESS" \
+            --output /tmp/candidate-public-origin/live-verification.json
+          python3 code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py \
+            --policy config/incident_response_and_continuity_v1.json \
+            --manifest /tmp/candidate-public-origin/public-site-release-manifest.json \
+            --live-verification /tmp/candidate-public-origin/live-verification.json \
+            --output /tmp/candidate-public-origin/incident-classification.json
+
+      - name: Verify candidate edge, certificate, and isolation contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          health=$(
+            curl --fail --silent --show-error \
+              --resolve "lumen-core.ai:443:$CANDIDATE_ADDRESS" \
+              --connect-timeout 5 --max-time 20 \
+              https://lumen-core.ai/nginx-health
+          )
+          python3 - "$health" <<'PY'
+          import json
+          import sys
+
+          payload = json.loads(sys.argv[1])
+          expected = {
+              "platform": "nginx",
+              "status": "ok",
+              "surface": "bounded-public-origin",
+          }
+          if payload != expected:
+              raise SystemExit("candidate nginx health contract mismatch")
+          PY
+
+          candidate_certificate=$(mktemp)
+          trap 'rm -f -- "$candidate_certificate"' EXIT
+          timeout 20 openssl s_client \
+            -connect "$CANDIDATE_ADDRESS:443" \
+            -servername lumen-core.ai \
+            -showcerts </dev/null 2>/dev/null \
+            | openssl x509 -outform PEM > "$candidate_certificate"
+          openssl x509 -in "$candidate_certificate" -checkend 604800 -noout
+          openssl x509 -in "$candidate_certificate" \
+            -noout -subject -issuer -serial -dates -fingerprint -sha256 \
+            | tee /tmp/candidate-public-origin/certificate-receipt.txt
+
+          for host in lumen-core.ai www.lumen-core.ai app.lumen-core.ai research.lumen-core.ai; do
+            timeout 20 openssl s_client \
+              -connect "$CANDIDATE_ADDRESS:443" \
+              -servername "$host" \
+              -verify_hostname "$host" \
+              -verify_return_error \
+              -brief </dev/null
+            redirect=$(
+              curl --silent --show-error --output /dev/null \
+                --resolve "$host:80:$CANDIDATE_ADDRESS" \
+                --connect-timeout 5 --max-time 20 \
+                --write-out '%{http_code} %{redirect_url}' \
+                "http://$host/"
+            )
+            [[ "$redirect" == "301 https://$host/" ]]
+          done
+
+          app_redirect=$(
+            curl --silent --show-error --output /dev/null \
+              --resolve "app.lumen-core.ai:443:$CANDIDATE_ADDRESS" \
+              --connect-timeout 5 --max-time 20 \
+              --write-out '%{http_code} %{redirect_url}' \
+              https://app.lumen-core.ai/
+          )
+          research_redirect=$(
+            curl --silent --show-error --output /dev/null \
+              --resolve "research.lumen-core.ai:443:$CANDIDATE_ADDRESS" \
+              --connect-timeout 5 --max-time 20 \
+              --write-out '%{http_code} %{redirect_url}' \
+              https://research.lumen-core.ai/
+          )
+          [[ "$app_redirect" == '302 https://lumen-core.ai/proof_to_pilot.html' ]]
+          [[ "$research_redirect" == '302 https://lumen-core.ai/quant_lab.html' ]]
+
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$CANDIDATE_SSH_USER@$CANDIDATE_ADDRESS" '
+              set -eu
+              sudo -n nginx -t
+              systemctl is-active --quiet nginx
+              systemctl is-enabled --quiet certbot.timer
+              systemctl is-active --quiet certbot.timer
+              if ss -ltnH | grep -Eq ":(1880|5016|5017|7700|7701|8000|8001|8787)[[:space:]]"; then
+                echo "unexpected private runtime listener on static candidate" >&2
+                exit 1
+              fi
+            '
+
+      - name: Bind candidate target to the retained receipts
+        shell: bash
+        run: |
+          set -euo pipefail
+          config_sha=$(awk '{print $1}' /tmp/candidate-public-origin/nginx-config.sha256)
+          python3 - \
+            "$CANDIDATE_ADDRESS" \
+            "$RELEASE_COMMIT" \
+            "$config_sha" \
+            "$GITHUB_RUN_ID" \
+            "$GITHUB_RUN_ATTEMPT" \
+            > /tmp/candidate-public-origin/candidate-target-receipt.json <<'PY'
+          from datetime import datetime, timezone
+          import ipaddress
+          import json
+          import sys
+
+          address, commit, config_sha, run_id, run_attempt = sys.argv[1:]
+          payload = {
+              "candidate_address": ipaddress.ip_address(address).compressed,
+              "checked_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+              "nginx_config_sha256": config_sha,
+              "run_attempt": int(run_attempt),
+              "run_id": int(run_id),
+              "schema": "lumencore.candidate_public_origin_target.v1",
+              "source_commit": commit,
+          }
+          print(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=True))
+          PY
+
+      - name: Remove candidate transfer staging
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-candidate-origin-[0-9]+-[0-9]+$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$CANDIDATE_SSH_USER@$CANDIDATE_ADDRESS" \
+            "rm -rf -- '$REMOTE_STAGE'"
+
+      - name: Upload candidate-only staging receipts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: candidate-public-origin-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            /tmp/candidate-public-origin/package-receipt.json
+            /tmp/candidate-public-origin/public-site-release-manifest.json
+            /tmp/candidate-public-origin/nginx-config.sha256
+            /tmp/candidate-public-origin/bootstrap-receipt.txt
+            /tmp/candidate-public-origin/deploy-receipt.txt
+            /tmp/candidate-public-origin/live-verification.json
+            /tmp/candidate-public-origin/incident-classification.json
+            /tmp/candidate-public-origin/certificate-receipt.txt
+            /tmp/candidate-public-origin/candidate-target-receipt.json
+          if-no-files-found: warn
+          retention-days: 30
+
+# This workflow cannot create or purchase infrastructure, mutate DNS, change
+# the current production origin, or promote the candidate.  Those remain
+# separate action-time human approvals outside this candidate-only lane.

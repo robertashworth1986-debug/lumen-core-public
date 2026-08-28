@@ -3,8 +3,8 @@
 The complete duplicated legacy implementation is preserved in
 ``micro_position_kraken_bot_legacy.py``. The canonical script now produces a
 single portfolio snapshot and exits. Both historical private transports are
-patched so AddOrder is rejected before nonce creation, signing, or network
-I/O.
+patched so only explicit read-only calls and validate-only orders pass before
+nonce creation, signing, or network I/O.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ _ORIGINAL_KRAKEN_REQUEST = _legacy._kraken_request
 
 def _blocked_payload(error_key: str, decision: Any) -> dict[str, Any]:
     return {
-        error_key: ["ELUMEN:Order safety gate blocked live AddOrder"],
+        error_key: ["ELUMEN:Private endpoint safety gate blocked request"],
         "order_safety": decision.as_dict(),
     }
 

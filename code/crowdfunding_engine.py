@@ -1,7 +1,7 @@
 """
 crowdfunding_engine.py  ─  LumenCore Crowdfunding Intelligence Engine
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Institutional-grade crowdfunding campaign builder and platform intelligence.
+ Draft-only crowdfunding research and campaign-copy builder.
 
 CAPABILITIES:
   1. PLATFORM SCOUT  — ranks crowdfunding platforms by fit for LumenCore
@@ -9,9 +9,9 @@ CAPABILITIES:
                        FAQ, risk disclosures, investor narrative) per platform
   3. EQUITY TARGETS  — Republic, Wefunder, StartEngine (Reg CF / Reg D ready)
   4. REWARDS TARGETS — Kickstarter, Indiegogo (product/tech tier)
-  5. PROOF BUNDLE    — attaches existing execution TXIDs, audit hashes, patents
-  6. FINANCIAL MODEL — auto-generates raise model, equity offer, use-of-funds
-  7. APPROVAL QUEUE  — same human-gate pattern as grant hunter
+  5. EVIDENCE MAP    — cites only bounded public evidence and negative findings
+  6. SCOPE DRAFT     — proposes a use-of-funds structure without setting legal terms
+  7. APPROVAL QUEUE  — remains pending for founder, legal, and platform review
 
 Usage:
   python crowdfunding_engine.py generate  --platform republic
@@ -32,7 +32,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
-ROOT         = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT         = Path(__file__).resolve().parents[1]
 CODE         = ROOT / "code"
 OUT_CF       = ROOT / "out" / "crowdfunding"
 OUT_QUEUE_CF = ROOT / "out" / "crowdfunding_approval_queue.json"
@@ -40,10 +40,11 @@ PROFILE_PATH = CODE / "grants_profile_lumencore.json"
 EVIDENCE_PATH = ROOT / "investor_and_grant_evidence.json"
 INVESTOR_BRIEF = ROOT / "INVESTOR_BRIEF.md"
 
-# Opportunity policy: auto-approve queue items at creation time.
-AUTO_APPROVE_ALWAYS = True
+# Campaigns, securities terms, prices, perks, and external publication remain
+# founder-controlled. Generation creates a draft; it never authorizes use.
+AUTO_APPROVE_ALWAYS = False
 DEFAULT_APPROVAL_STATE = "APPROVED" if AUTO_APPROVE_ALWAYS else "PENDING_HUMAN_APPROVAL"
-AUTO_APPROVAL_NOTE = "Auto-approved by policy"
+AUTO_APPROVAL_NOTE = "Human approval, current platform verification, and qualified legal review required"
 
 # ─── Platform Definitions ─────────────────────────────────────────────────────
 
@@ -157,34 +158,30 @@ PLATFORMS: List[Dict[str, Any]] = [
 # ─── LumenCore Investment Narrative ───────────────────────────────────────────
 
 COMPANY_NARRATIVE = {
-    "headline": "LumenCore™ — The Predictive Intelligence Layer for Critical Infrastructure",
-    "tagline": "We see infrastructure failures before they happen. 14–47% earlier than anything else.",
+    "headline": "LumenCore — Evidence-Governed Evaluation Architecture",
+    "tagline": "One authorized source. One accepted baseline. One bounded decision.",
     "problem": (
-        "Every year, grid failures and critical infrastructure outages cost the U.S. economy "
-        "over $150 billion. Operators use reactive monitoring — they find out after the damage is done. "
-        "There has been no affordable, production-ready solution that predicts instability BEFORE it cascades."
+        "Technical teams often have a promising AI, analytics, or engineering result but lack a "
+        "reproducible way to determine whether it beats an accepted incumbent under rules fixed "
+        "before scoring."
     ),
     "solution": (
-        "LumenCore is a predictive intelligence engine that watches infrastructure telemetry 24/7, "
-        "identifies pre-failure harmonic divergence patterns, and alerts operators with actionable "
-        "insight 14–47% earlier than threshold-based systems. We have 11 validated proof iterations, "
-        "real exchange execution records (TXIDs on Kraken), and a DOE SBIR Phase I application. "
-        "Our core IP is protected under a filed patent portfolio."
+        "LumenCore is a founder-built proof-to-pilot architecture. ProofLock preserves evidence "
+        "identity and authority boundaries; the Frozen Delta method locks source rights, baseline, "
+        "metric, threshold, holdout, failure rules, and allowed claims before a bounded comparison."
     ),
     "traction": [
-        "12+ months of production-grade development across 17,000+ artifacts",
-        "11 validated proof iterations with hash-verified chain-of-custody audit trails",
-        "Real Kraken TXID execution records demonstrating live algorithm deployment",
-        "DOE SBIR Phase I application submitted",
-        "Patent portfolio covering Fibonacci Bubble Lattice Harmonic engine and EchoLock™ phase-locking IP",
-        "Cumberland Science Museum pilot deployment in progress",
-        "FSI (Financial Services Initiative) sector engagement active",
-        "PWC-validated ECHOLOCK early signal proof package",
+        "Merged Proof Capsule verifier and deployed bounded ProofLock demonstration",
+        "Pinned first-party EIA/CODECHECK replay package prepared for non-author execution",
+        "Held-out public AIS controlled-injection evidence for HarborSentinel",
+        "Frozen synthetic DICE and MissionWeave benchmarks with negative findings retained",
+        "Grant-conformance and paper-market control implementations with final submission and live-order authority withheld",
+        "No signed paid scope, buyer result, revenue, external validation, or field deployment is claimed",
     ],
     "market": (
-        "Total addressable market: $47B (critical infrastructure monitoring, predictive maintenance, "
-        "grid intelligence). Serviceable: $8.2B (U.S. energy + utility sector). Beachhead: "
-        "$1.1B (SBIR-funded DOE/DARPA pilot programs + utility contracts)."
+        "No public TAM, SAM, SOM, valuation, fundraising target, or investor-return claim is "
+        "authorized by this draft. Any market sizing requires current cited sources, explicit "
+        "assumptions, founder review, and qualified legal review."
     ),
     "use_of_funds": {
         "engineering_and_product": 0.40,
@@ -193,13 +190,10 @@ COMPANY_NARRATIVE = {
         "operations_and_compliance": 0.10,
         "reserve_and_working_capital": 0.15,
     },
-    "team": "Robert BabyRay Ashworth — Founder, PI, Lead Engineer. Built LumenCore from zero to "
-            "production in 12 months. Former self-funded researcher, now applying to institutional "
-            "and government channels simultaneously.",
+    "team": "Robert Ashworth — Founder and hands-on systems architect for the LumenCore proof-to-pilot architecture.",
     "vision": (
-        "LumenCore becomes the operating system for critical infrastructure intelligence — "
-        "embedded in every major utility, grid operator, and federal infrastructure program in the U.S., "
-        "then globally. Modeled on Bloomberg Terminal for the physical infrastructure world."
+        "Help technical decision owners reject weak claims earlier and advance only candidates that "
+        "survive buyer-owned baselines, locked metrics, retained failures, and reviewable evidence."
     ),
 }
 
@@ -208,7 +202,7 @@ PERK_TIERS = [
     {"tier": "Analyst",  "amount_usd": 100, "perks": ["Observer perks", "Monthly intelligence briefing PDF", "Early access to proof packs"]},
     {"tier": "Operator", "amount_usd": 500, "perks": ["Analyst perks", "Beta API access (when available)", "Name in credits"]},
     {"tier": "Partner",  "amount_usd": 2500,"perks": ["Operator perks", "1:1 30-min strategy call with Robert", "Custom sector report"]},
-    {"tier": "Founding Investor", "amount_usd": 10000, "perks": ["Partner perks", "Equity stake (Reg CF platforms only)", "Advisory board consideration", "First right of refusal on next round"]},
+    {"tier": "Founding Supporter", "amount_usd": 10000, "perks": ["Partner perks", "Potential non-financial supporter recognition subject to platform rules and founder approval"]},
 ]
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -254,45 +248,20 @@ def generate_campaign(platform: Dict[str, Any], raise_target_usd: float = 500_00
     ptype = platform["type"]
     ticket_id = f"CF-TICKET-{uuid.uuid4().hex[:10].upper()}"
 
-    # Equity offer calculation (for equity platforms)
+    # Securities valuation and equity terms require platform-specific legal
+    # review. This draft-only engine deliberately leaves both unset.
     equity_offer_pct = 0.0
     valuation_usd = 0.0
-    if ptype == "equity_cf":
-        # Target 10–20% dilution at seed
-        valuation_usd = raise_target_usd / 0.15  # 15% stake implies this valuation
-        equity_offer_pct = (raise_target_usd / valuation_usd) * 100
 
     # Build use-of-funds dollar breakdown
     uof = COMPANY_NARRATIVE["use_of_funds"]
     uof_dollars = {k: round(v * raise_target_usd) for k, v in uof.items()}
 
-    # Platform-specific pitch angle
-    if pid == "republic":
-        pitch_angle = (
-            "LumenCore is the Bloomberg Terminal for physical infrastructure risk. "
-            "We're raising on Republic to accelerate our DOE SBIR Phase II transition, "
-            "expand the pilot network, and file our next patent tranche."
-        )
-    elif pid == "wefunder":
-        pitch_angle = (
-            "One founder. 12 months. 17,000 artifacts. Real exchange TXIDs. "
-            "LumenCore was built from nothing into an institutional-grade predictive intelligence "
-            "engine. Now we're opening the door to community investors."
-        )
-    elif pid == "startengine":
-        pitch_angle = (
-            "Grid failures cost America $150 billion a year. LumenCore sees them coming "
-            "14–47% earlier. We've validated. We've proven. Now we're scaling. "
-            "Join us on StartEngine and own a piece of the infrastructure intelligence revolution."
-        )
-    elif pid == "kickstarter":
-        pitch_angle = (
-            "Get early access to LumenCore's live intelligence dashboard — "
-            "real-time infrastructure risk scoring, algorithmic signal feeds, and the most "
-            "transparent proof-of-work in predictive analytics."
-        )
-    else:
-        pitch_angle = COMPANY_NARRATIVE["solution"]
+    pitch_angle = (
+        f"Draft-only {platform['name']} framing for LumenCore's bounded validation architecture. "
+        "This text is not an offering, solicitation, platform approval, campaign submission, "
+        "customer claim, or authorization to publish."
+    )
 
     campaign = {
         "ticket_id": ticket_id,
@@ -301,6 +270,8 @@ def generate_campaign(platform: Dict[str, Any], raise_target_usd: float = 500_00
         "raise_target_usd": raise_target_usd,
         "valuation_usd": round(valuation_usd),
         "equity_offer_pct": round(equity_offer_pct, 2),
+        "financial_terms_status": "UNSET_REQUIRES_QUALIFIED_REVIEW",
+        "external_use_authorized": False,
         **_approval_fields(),
         "campaign_content": {
             "headline": COMPANY_NARRATIVE["headline"],
@@ -314,31 +285,21 @@ def generate_campaign(platform: Dict[str, Any], raise_target_usd: float = 500_00
             "vision": COMPANY_NARRATIVE["vision"],
             "use_of_funds": uof_dollars,
             "perk_tiers": PERK_TIERS if ptype == "rewards" else [],
-            "investment_tiers": PERK_TIERS if ptype == "equity_cf" else [],
+            "investment_tiers": [],
             "faqs": [
                 {"q": "What does LumenCore actually do?",
-                 "a": "LumenCore is a predictive intelligence engine. It ingests live telemetry from "
-                      "energy grids, infrastructure sensors, and financial markets, then uses our "
-                      "proprietary Fibonacci Bubble Lattice Harmonic engine to detect instability "
-                      "signatures before they cascade into outages or failures."},
+                 "a": "LumenCore packages one candidate-versus-baseline decision under source, metric, threshold, holdout, failure, custody, and human-authority controls."},
                 {"q": "What proof do you have it works?",
-                 "a": "11 validated proof iterations with SHA-256 hash-verified chain-of-custody records. "
-                      "Real Kraken exchange TXIDs from live algorithm deployments. DOE SBIR Phase I "
-                      "application submitted. Cumberland Science Museum and FSI pilot programs active. "
-                      "PWC-validated early signal proof package."},
+                 "a": "The public repository contains first-party code, a deployed bounded ProofLock demonstration, pinned replay packages, public-data and synthetic benchmarks, and retained negative results. It does not establish independent validation, a customer, revenue, or field deployment."},
                 {"q": "What's your competitive advantage?",
-                 "a": "We borrowed the most rigorous signal validation methodology in the world — "
-                      "institutional quantitative finance — and applied it to infrastructure risk. "
-                      "Financial quant firms lose real money when their signals fail, so the bar is "
-                      "impossibly high. That same bar is now protecting your infrastructure."},
+                 "a": "LumenCore's differentiator hypothesis is evidence and authority discipline: freeze the comparator and decision rules first, preserve failures, and return a reproducible bounded record. This remains to be commercially validated."},
                 {"q": "How will my investment be used?",
                  "a": f"40% engineering/product, 25% go-to-market, 10% IP/legal, 10% operations/compliance, "
                       f"15% working capital reserve. Full breakdown in offering documents."},
                 {"q": "What are the risks?",
                  "a": "Early-stage technology company. Key-man risk (single founder). Regulatory risk "
                       "in infrastructure sector. Market adoption risk. Competition from larger players. "
-                      "All standard early-stage risks apply. We mitigate through IP protection, "
-                      "government grant funding, and diversified pilot programs."},
+                      "All standard early-stage risks apply. No grant, pilot, patent scope, market demand, or investor return is assumed by this draft."},
             ],
             "risk_disclosures": [
                 "Investing in early-stage companies involves high risk of total loss.",

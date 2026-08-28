@@ -77,6 +77,17 @@ class StandaloneNoOrdersFacadeTests(unittest.TestCase):
         self.assertEqual(facade._post("/0/private/Balance"), {"ok": True})
         self.assertEqual(len(transport_calls), 1)
 
+        blocked_withdraw = facade._post(
+            "/0/private/Withdraw",
+            {"asset": "XBT"},
+        )
+        self.assertIn("_error", blocked_withdraw)
+        self.assertEqual(
+            blocked_withdraw["order_safety"]["mode"],
+            "blocked_private_mutation",
+        )
+        self.assertEqual(len(transport_calls), 1)
+
         self.assertEqual(facade.main(), 0)
         self.assertEqual(scan_calls, ["scan"])
         self.assertEqual(run_calls, [])
@@ -122,6 +133,17 @@ class StandaloneNoOrdersFacadeTests(unittest.TestCase):
         self.assertEqual(facade._post("/0/private/Balance"), {"ok": True})
         self.assertEqual(facade._kraken_request("/0/private/Balance"), {"ok": True})
         self.assertEqual(len(post_calls), 1)
+        self.assertEqual(len(request_calls), 1)
+
+        blocked_cancel = facade._kraken_request(
+            "/0/private/CancelOrder",
+            {"txid": "example"},
+        )
+        self.assertIn("error", blocked_cancel)
+        self.assertEqual(
+            blocked_cancel["order_safety"]["mode"],
+            "blocked_private_mutation",
+        )
         self.assertEqual(len(request_calls), 1)
 
         self.assertEqual(facade.main(), 0)

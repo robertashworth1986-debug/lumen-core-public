@@ -11,15 +11,15 @@ LumenCore is a proof-to-pilot assurance architecture for converting technical an
 ## What to inspect first
 
 1. [Canonical Evidence Index](../EVIDENCE_INDEX.md)
-2. [Current buyer-owned validation offer](STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md)
-3. [Institutional readiness and production-blocker dossier](INSTITUTIONAL_READINESS_DOSSIER.md)
-4. [Institutional assurance crosswalk](INSTITUTIONAL_ASSURANCE_CROSSWALK.md)
-5. [Machine-readable assurance register](../config/institutional_assurance_crosswalk_v1.json)
-6. [Machine-readable readiness register](../config/institutional_readiness_register_v1.json)
-7. [Incident response and continuity plan](INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)
-8. [Non-confidential buyer fit intake](LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md)
-9. [Buyer-specific SOW template](LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md)
-10. [Governed engine portfolio audit](LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
+2. [Evidence-ranked ecosystem and registered-lane audit](LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
+3. [Current buyer-owned validation offer](STRATEGIC_TRANSACTION_BRIEF_2026-08-08.md)
+4. [Institutional readiness and production-blocker dossier](INSTITUTIONAL_READINESS_DOSSIER.md)
+5. [Institutional assurance crosswalk](INSTITUTIONAL_ASSURANCE_CROSSWALK.md)
+6. [Machine-readable assurance register](../config/institutional_assurance_crosswalk_v1.json)
+7. [Machine-readable readiness register](../config/institutional_readiness_register_v1.json)
+8. [Incident response and continuity plan](INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)
+9. [Non-confidential buyer fit intake](LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md)
+10. [Buyer-specific SOW template](LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md)
 11. [Proof Capsule schema](PROOF_CAPSULE_SCHEMA.md)
 12. [Claim Boundary Register](CLAIM_BOUNDARY_REGISTER.md)
 13. [Pilot Report Template](PILOT_REPORT_TEMPLATE.md)
@@ -41,12 +41,33 @@ as live-release drift; do not silently substitute one source for the other.
 ## One platform, one paid entry point
 
 LumenCore is the platform. ProofLock is its evidence and claim-governance layer.
-The primary paid entry point is the **Buyer-Owned Baseline Validation Sprint**:
+**Frozen Delta** is the method inside the primary paid entry point, the
+**Buyer-Owned Baseline Validation Sprint**: freeze the authorized source,
+accepted incumbent baseline, metric, threshold, holdout, failure rules, and
+allowed claims before execution; then return one bounded decision. This is one
+commercial wedge, not a second product and not evidence of a signed buyer.
+
+The engagement remains deliberately narrow:
 one authorized input, one accepted incumbent baseline, one locked metric and
 threshold, one replayable proof package, and one bounded promote/rerun/external
-review/hold/reject decision. Lumen Infrastructure Sentinel is the first sector
-validation lane. The other tracked engines remain governed internal research,
-delivery, or concept lanes unless separately promoted by evidence.
+review/hold/reject decision. A configured sector priority is not an evidence
+rank. The governed portfolio separately ranks bounded evidence and labels the
+15 registered implementation lanes as artifact coverage rather than 15 products.
+
+## Evidence-ranked breadth
+
+| Evidence band | Current systems | Boundary |
+|---|---|---|
+| A | LumenCore/ProofLock; Frozen Delta offer method; EIA/CODECHECK | Deployed, merged, first-party reproduced, or externally executable does not mean external, field, or commercial validation. |
+| B | HarborSentinel public AIS controlled-injection lane | Representative public-data comparison, not real-threat or operational performance. |
+| C | DICE; MissionWeave | Frozen synthetic or generated benchmarks, not agency or field performance. |
+| D | Grant Factory; LumaTrader/Kraken controls; FAA SDR code; LumaScout; Infrastructure Sentinel | Implementations or controls with no promotable validated outcome or an open operational/evidence gate. |
+| E | LumaJet; XR; LumaSuit/LumaSkin; identity architecture; EchoLock; magnetic geometry | Internal signal, source asset, specification, or concept without a complete public result capsule. |
+| U | Cumberland museum/experience-dome assertion; Dungeon build | No public repository evidence supports a deployment or build claim. |
+
+The machine-readable portfolio defaults every named system to external,
+field, and commercial validation `false`, preserves adverse findings, and names
+the next promotion gate. It does not convert breadth into traction.
 
 The current machine-readable portfolio receipt records zero subscription-ready
 lanes and does not establish a signed buyer, executed pilot, revenue, external

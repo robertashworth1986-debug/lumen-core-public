@@ -49,6 +49,70 @@ private evidence, grant packets, identity documents, and mutable data feeds. The
 legacy route stubs do not expose runtime telemetry or operational controls; they
 only redirect stale public links back to the bounded validation path.
 
+## Candidate-origin staging lane
+
+The manual `Stage exact public-site snapshot on candidate origin` workflow is a
+separate, pre-DNS lane for a newly purchased Ubuntu host. It cannot create or
+purchase a server, call a provider API, mutate DNS, deploy to an address that is
+currently serving `lumen-core.ai`, or promote the candidate. It uses the same
+immutable 43-file packager and bounded rollback-capable apply script as the
+production lane.
+
+The candidate must be created separately with:
+
+- Ubuntu 22.04 or 24.04 LTS;
+- one globally routable IPv4 address that is not currently returned for
+  `lumen-core.ai`;
+- a non-root SSH account with non-interactive sudo;
+- its own reviewed SSH private key and `known_hosts` material in the protected
+  `production-candidate` GitHub Environment; and
+- no gateway, trading, grant, operator-data, or private runtime service.
+
+`code/deploy/BOOTSTRAP_PUBLIC_SITE_ORIGIN.sh` is noninteractive and can run as a
+cloud-init shell user-data script when cloud-init first writes the reviewed
+`code/deploy/nginx/lumencore-public-origin.conf` payload to the host. It installs
+only the bounded Ubuntu edge prerequisites, creates the static release and
+rollback roots, validates the reviewed Nginx configuration hash, and captures a
+rollback and bootstrap receipt. It does not clone Git, request a certificate,
+handle a provider token, or change DNS.
+
+For the fastest reviewed first boot, render
+`code/deploy/cloud-init/lumencore-public-origin-cloud-config.yml` only in the
+provider's user-data field by replacing its sentinel with the intended SSH
+public key. The template creates the locked `lumencore-deploy` account, disables
+root/password SSH, validates the SSH daemon configuration, and applies current
+Ubuntu package updates. Do not commit a rendered template, private key, provider
+token, or account credential. The candidate workflow subsequently uploads and
+runs the separately hash-bound origin bootstrap and Nginx configuration.
+
+Until the named canonical certificate and standard Certbot support files exist,
+the bootstrap installs an HTTP-only hold that exposes only `/nginx-health` and
+the ACME challenge path; every other request returns `503`. Certificate issuance
+or transfer is a separate credential/TLS action requiring fresh authorization.
+The expected certificate name is `lumen-core.ai`, with valid SAN coverage for
+the root, `www`, `app`, and `research` names. Re-running the bootstrap after that
+certificate is installed activates the reviewed static-only HTTPS config.
+
+Candidate staging requires all four visible workflow inputs:
+
+1. the full 40-character release commit, equal to the selected workflow ref;
+2. the exact candidate IPv4 address;
+3. the exact non-root SSH account; and
+4. the literal `STAGE_PUBLIC_SITE_CANDIDATE` approval.
+
+The candidate verifier's `--resolve-address` option connects directly to that
+literal IP while retaining `lumen-core.ai` in the URL, HTTP Host header, and TLS
+SNI. Normal certificate-chain and hostname validation remains enabled. The
+candidate must pass all 43 byte/MIME checks, canonical certificate checks,
+redirect and health contracts, Nginx validation, and private-listener negative
+checks before it can be considered for a separate DNS decision.
+
+A successful candidate run is not production promotion. Changing TTL or any A,
+AAAA, CNAME, TXT, or nameserver record still requires a fresh action-time DNS
+approval identifying every old and new value. The existing production origin
+must remain available as the blue rollback target until the separately approved
+cutover passes the canonical public audit and its stabilization window.
+
 ## Human release command
 
 Run the `Deploy exact public-site snapshot to VPS` workflow against the exact

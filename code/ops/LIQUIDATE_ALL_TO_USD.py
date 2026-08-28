@@ -70,18 +70,52 @@ def _append_authorization(record: dict[str, object]) -> Path:
     return path
 
 
-def _load_authorized_legacy():
+def _load_legacy(authorization: dict[str, object] | None = None):
     code_dir = Path(__file__).resolve().parents[1]
     if str(code_dir) not in sys.path:
         sys.path.insert(0, str(code_dir))
-    import kraken_execution_legacy as kraken_legacy
+    import kraken_execution as kraken
     from ops import LIQUIDATE_ALL_TO_USD_legacy as liquidate_legacy
 
-    # The only live-order exception in the current no-orders lane. Rebinding is
-    # delayed until after the interactive authorization gate succeeds.
-    liquidate_legacy._private_post = kraken_legacy._private_post
-    liquidate_legacy.arm_deadman_switch = kraken_legacy.arm_deadman_switch
-    liquidate_legacy.get_balance = kraken_legacy.get_balance
+    # Dry-run retains the ordinary fail-closed transport. Live emergency use
+    # receives a short-lived, receipt-backed capability limited to market sells
+    # and the protective dead-man endpoint.
+    if authorization is None:
+        liquidate_legacy._private_post = kraken._private_post
+        liquidate_legacy.arm_deadman_switch = kraken.arm_deadman_switch
+        liquidate_legacy.get_balance = kraken.get_balance
+        return liquidate_legacy
+
+    from execution.order_safety_gate import (
+        CANCEL_ALL_AFTER_PATH,
+        build_manual_emergency_authorization,
+    )
+
+    emergency = build_manual_emergency_authorization(authorization)
+
+    def authorized_private_post(
+        url_path: str,
+        payload: dict[str, object],
+        timeout: int = 20,
+        retry_attempt: int = 0,
+    ) -> dict[str, object]:
+        return kraken._private_post(
+            url_path,
+            payload,
+            timeout=timeout,
+            retry_attempt=retry_attempt,
+            emergency_authorization=emergency,
+        )
+
+    def authorized_deadman_switch(timeout_seconds: int = 30) -> dict[str, object]:
+        return authorized_private_post(
+            CANCEL_ALL_AFTER_PATH,
+            {"timeout": int(timeout_seconds)},
+        )
+
+    liquidate_legacy._private_post = authorized_private_post
+    liquidate_legacy.arm_deadman_switch = authorized_deadman_switch
+    liquidate_legacy.get_balance = kraken.get_balance
     return liquidate_legacy
 
 
@@ -111,7 +145,7 @@ def main(argv: list[str] | None = None) -> int:
             "authorization_ledger": str(ledger),
         }, indent=2))
 
-    legacy = _load_authorized_legacy()
+    legacy = _load_legacy(authorization if args.execute else None)
     legacy_args: list[str] = []
     if args.execute:
         legacy_args.append("--execute")

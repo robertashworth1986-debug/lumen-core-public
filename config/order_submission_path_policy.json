@@ -1,12 +1,24 @@
 {
-  "version": "2026-08-19.live-data-no-orders.v5",
+  "version": "2026-08-27.live-data-no-orders.v7",
   "promotion_stage": "live_data_no_orders",
   "patterns": {
     "kraken_add_order": "\\bAddOrder\\b",
     "alpaca_orders_endpoint": "/v2/orders",
     "binance_orders_endpoint": "/api/v3/order\\b",
     "kraken_private_add_order_call": "_private_post\\s*\\(\\s*ADD_ORDER_PATH\\b",
-    "ccxt_create_order": "\\bcreate_order\\s*\\("
+    "ccxt_create_order": "\\bcreate_order\\s*\\(",
+    "kraken_private_withdraw": "/0/private/Withdraw\\b",
+    "ccxt_withdraw_call": "\\.withdraw\\s*\\(",
+    "kraken_cancel_order": "/0/private/CancelOrder\\b",
+    "kraken_cancel_all": "/0/private/CancelAll\\b",
+    "kraken_cancel_all_after": "/0/private/CancelAllOrdersAfter\\b",
+    "ccxt_transfer_call": "\\.transfer\\s*\\(",
+    "ccxt_cancel_order_call": "\\.cancel_order\\s*\\(",
+    "ccxt_cancel_all_call": "\\.cancel_all_orders\\s*\\(",
+    "binance_capital_withdraw": "/sapi/v[0-9]+/capital/withdraw/apply\\b",
+    "binance_asset_transfer": "/sapi/v[0-9]+/(?:asset/transfer|sub-account/universalTransfer)\\b",
+    "alpaca_positions_endpoint": "/v2/positions",
+    "payout_webhook_dispatch": "requests\\.post\\s*\\(\\s*webhook_url\\b"
   },
   "arming_patterns": {
     "python_allow_live_orders_true": "(?:\\[\\s*[\"']allow_live_orders[\"']\\s*\\]|\\.allow_live_orders)\\s*=\\s*True\\b",
@@ -46,6 +58,21 @@
     {
       "path": "code/ops/LIQUIDATE_ALL_TO_USD.py",
       "classification": "manual_emergency_facade",
+      "required": true
+    },
+    {
+      "path": "code/kraken_auto_withdraw_btc.py",
+      "classification": "capital_transfer_blocked_facade",
+      "required": true
+    },
+    {
+      "path": "code/ops/cancel_open_orders.py",
+      "classification": "venue_mutation_blocked_facade",
+      "required": true
+    },
+    {
+      "path": "code/execution/payout_bridge.py",
+      "classification": "capital_dispatch_blocked_facade",
       "required": true
     },
     {
@@ -105,7 +132,7 @@
     {"path": "code/execution/order_safety_gate.py", "classification": "guard_implementation"},
     {"path": "code/execution/alpaca_paper_executor.py", "classification": "paper_sandbox", "required": true},
     {"path": "code/run_universal_meta_orchestrator.py", "classification": "paper_only_orchestrator", "required": true},
-    {"path": "code/multi_exchange_paper_ticker.py", "classification": "paper_sandbox"},
+    {"path": "code/multi_exchange_paper_ticker.py", "classification": "paper_supervisor_exact_host", "required": true},
     {"path": "code/alpaca_paper_loop_builder.py", "classification": "source_builder"},
     {"path": "code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py", "classification": "source_builder"},
     {"path": "code/HARD_TRUTH_LIVE_MEASUREMENT_AUDIT.py", "classification": "measurement_auditor"},

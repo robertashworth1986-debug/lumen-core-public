@@ -1,28 +1,40 @@
 {
-  "timestamp_utc": "2026-04-08T02:53:07.902206+00:00",
+  "schema": "lumencore.sanitized_historical_infrastructure_proof.v1",
+  "recorded_utc": "2026-04-08T02:53:07.902206Z",
+  "sanitized_utc": "2026-08-27T00:00:00Z",
+  "sanitization": {
+    "credential_like_query_values_removed": true,
+    "absolute_local_paths_removed": true,
+    "provider_key_rotation_confirmed": false,
+    "public_git_history_remediation_confirmed": false,
+    "rule": "Treat any provider credential present in an earlier public revision as compromised until rotation and public-history review are independently confirmed."
+  },
   "artifacts": {
     "kraken_source": {
-      "path": "C:\\LumaTrader\\data\\kraken_live_5000.csv",
+      "source_ref": "private_local_source_snapshot_not_committed",
       "sha256": "43c4ec0e4b7a9f637d178f57dc8667cbb40132b637a1bc77d5d5cc2e87cf2799"
     },
     "fred_DGS10": {
-      "path": "C:\\LumaTrader\\data\\fred_DGS10.csv",
+      "source_ref": "private_local_source_snapshot_not_committed",
       "sha256": "6547a7171f1a1d0b1c6163527e3602a52abe34966aa94fee23c723347cbe2618"
     },
     "fred_UNRATE": {
-      "path": "C:\\LumaTrader\\data\\fred_UNRATE.csv",
+      "source_ref": "private_local_source_snapshot_not_committed",
       "sha256": "245e026f8c723da644b5d4425f7290f39ded79729b5c7e13f72acbc003197ec1"
     },
     "fred_CPIAUCSL": {
-      "path": "C:\\LumaTrader\\data\\fred_CPIAUCSL.csv",
+      "source_ref": "private_local_source_snapshot_not_committed",
       "sha256": "3089c709086e3b464eb84be9960ba55e8fd57ea31c35fa381d09a3e393268aa4"
     },
     "eia_rto_daily": {
-      "error": "400 Client Error: Bad Request for url: https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=RZsPbQB0IBNSYPHOS1gJw5pdM07oZcBhr3Bvhb4j&frequency=daily&data%5B0%5D=value&facets%5Btype%5D%5B%5D=D&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=asc&length=5000"
+      "status": "ERROR",
+      "error_type": "HTTP_400_BAD_REQUEST",
+      "request_url_retained": false,
+      "credential_value_retained": false
     }
   },
   "summary": {
-    "timestamp_utc": "2026-04-08T02:53:07.897208+00:00",
+    "recorded_utc": "2026-04-08T02:53:07.897208Z",
     "rows": 1008,
     "top_stack": "fred_CPIAUCSL",
     "top_flow": "gaussian",
@@ -30,13 +42,13 @@
     "top_test_sharpe": 14.57434027698863,
     "top_test_vs_baseline": -0.1155991154589846,
     "top_institutional_score": 304.77480287317906,
-    "errors": [
-      {
-        "stack": "eia_rto_daily",
-        "error": "400 Client Error: Bad Request for url: https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=RZsPbQB0IBNSYPHOS1gJw5pdM07oZcBhr3Bvhb4j&frequency=daily&data%5B0%5D=value&facets%5Btype%5D%5B%5D=D&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=asc&length=5000"
-      }
-    ]
+    "error_count": 1,
+    "promotion_allowed": false
   },
-  "core_file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\institutional_harmonic_core.py",
-  "suite_file": "C:\\LumaTrader\\INSTITUTIONAL_STACK_V2\\code\\institutional_harmonic_suite.py"
+  "implementation": {
+    "core_file": "code/institutional_harmonic_core.py",
+    "suite_file": "code/institutional_harmonic_suite.py"
+  },
+  "claim_boundary": "This is a sanitized historical first-party artifact with a negative top-test-versus-baseline value and one failed EIA request. It does not establish infrastructure performance, outage prediction, savings, deployment readiness, external validation, source reproducibility, or a buyer result.",
+  "next_gate": "Rotate any exposed provider key, verify public-history remediation, freeze a source-authorized dataset and comparator, and produce a new hash-bound result receipt before promotion."
 }

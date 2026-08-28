@@ -155,6 +155,7 @@ def verify_contracts(
         surfaces["reviewer_start"],
         (
             "LumenCore is the platform. ProofLock is its evidence and claim-governance layer.",
+            "Frozen Delta",
             "Buyer-Owned Baseline Validation Sprint",
         ),
         "reviewer start",
@@ -175,6 +176,7 @@ def verify_contracts(
         surfaces["proof_to_pilot"],
         (
             "One candidate. One accepted baseline. One decision you can defend.",
+            "Frozen Delta is the method inside this one bounded offer",
             "$7,500",
             "$15,000",
             "From $25,000",
