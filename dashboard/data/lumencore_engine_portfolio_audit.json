@@ -94,9 +94,9 @@
           "path": "EVIDENCE_INDEX.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "8de58f9f393e568b53cfb0dfd3bedec8ef799666",
-          "bytes": 25272,
-          "sha256": "0da2dbbee25a69bd00cd85a589ace2212494391fc2ed0a139bf47a13f8aff86d"
+          "git_blob_sha": "b256de108d136a03e04175b1a2d6d3408dc01cda",
+          "bytes": 25001,
+          "sha256": "1896962a5fe43d82026082c92f283b3f30c9bbfb596c391ed1f4adc35e8d28cc"
         },
         {
           "path": "code/proof_capsule_verifier.py",
@@ -110,17 +110,17 @@
           "path": "dashboard/build_week/prooflock_console/index.html",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "d11f48fa97880243119f26cff23a345a0e7b0eee",
-          "bytes": 6318,
-          "sha256": "90da24e1b9e29904f9b5344fd25f83e8a5e5299fe9f5f671b3e84b2b399b81d6"
+          "git_blob_sha": "81964e8537f86c4cfc8c1d69083871f6a3121262",
+          "bytes": 6159,
+          "sha256": "c9029728ec758bfa85b730fe68850d7a60d5519a525bd79e09ff6839d445f4cf"
         },
         {
           "path": "tests/test_prooflock_bounded_review_path.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "160dff9f1bef5d855e4425dac3a662a0f4b26e45",
-          "bytes": 6274,
-          "sha256": "76b1c3d0e35ac8a3032b83fa5c5552a095907282905027ccf46035275cc2356d"
+          "git_blob_sha": "b40a5af69792c4852a4b763e8dc057e94ff782cd",
+          "bytes": 6095,
+          "sha256": "0efcfd90d3e486526798984d766a79c508b0cdc9c407cf18968ce0cfc1a21183"
         }
       ]
     },
@@ -147,33 +147,33 @@
           "path": "config/strategic_transaction_packet_v2.json",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "ce54ebb6996873a0002594043f3b11d37397a912",
-          "bytes": 7021,
-          "sha256": "678f3a14d19c35984f211ef3a34358f539464a5b8e5b8399bdaf40d16b73aee7"
+          "git_blob_sha": "b20b0d7900a217c75dbceac34693402373c5f3a5",
+          "bytes": 6814,
+          "sha256": "b8cfb37da46c0dbb39e4ac34b3e26d1e7f2c39efa09b8ac42dbf55c659eba800"
         },
         {
           "path": "config/bounded_validation_sprint_v1.json",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "ba7c65c136d045df12c4c69a7bd0fd92dd2541e6",
-          "bytes": 5004,
-          "sha256": "0f1ba6d3ad4d52721754371754037d711e73572bf95289e1f046d6bd2a0a0245"
+          "git_blob_sha": "b51c6aa109c3e8f58cad934947fe121359c3228e",
+          "bytes": 4883,
+          "sha256": "1b2fe633feb5c10f8d45b3900ebb7d047db22279a98ad3505819d6ec12a84601"
         },
         {
           "path": "code/ops/BUILD_FROZEN_DELTA_TRUTH_CHAIN.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "05c86d42ade05106190b70e2b366ae83275386ec",
-          "bytes": 26245,
-          "sha256": "ddc93111e84410ade2ed738b3bdf1ef0e70f79c8c29ff29e6f3b43d57b004255"
+          "git_blob_sha": "4594698484a72576d4194ea51c58294a2d3471e1",
+          "bytes": 25633,
+          "sha256": "965b28cb3ba90b66f4f2719e3d19e4b9a51639b99748d0c0b527c316dad0348f"
         },
         {
           "path": "dashboard/proof_to_pilot.html",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "875eb713ce06b0eb3b7b6622aa63fcc4f2d5a3a1",
-          "bytes": 11941,
-          "sha256": "8bb6364bb036c6dd00ed20b2fe7e4e1a1d780a644581446948faec4f19788649"
+          "git_blob_sha": "88ddb4b99cff8f4ea5690f1008589c79eed0b97a",
+          "bytes": 11854,
+          "sha256": "6c4d111b49eb6630ed3eca1adb41afc15fe4eba44b223f03dec9fc6b4d2abc7c"
         }
       ]
     },
@@ -201,9 +201,9 @@
           "path": "EVIDENCE_INDEX.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "8de58f9f393e568b53cfb0dfd3bedec8ef799666",
-          "bytes": 25272,
-          "sha256": "0da2dbbee25a69bd00cd85a589ace2212494391fc2ed0a139bf47a13f8aff86d"
+          "git_blob_sha": "b256de108d136a03e04175b1a2d6d3408dc01cda",
+          "bytes": 25001,
+          "sha256": "1896962a5fe43d82026082c92f283b3f30c9bbfb596c391ed1f4adc35e8d28cc"
         },
         {
           "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
@@ -246,33 +246,33 @@
           "path": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "d54930b0455c5a47047398209622376b73ae7d18",
-          "bytes": 6757,
-          "sha256": "7d61424f0f65e447adf70b8c81c635e4168061edd7df7b0ffc733b58c5e7619c"
+          "git_blob_sha": "f27f4b66f551bb98f5a6c2a8f74fe9fd5a03897b",
+          "bytes": 6587,
+          "sha256": "288f5e5c964fdf6603b437aa637e65f1a4eb045b742dbc31b1511937bfe2f910"
         },
         {
           "path": "docs/HARBOR_SENTINEL_VALIDATION_2026-06-13.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "7b7bbda4fdc8b3384bcf00b38c4cf1509774a29a",
-          "bytes": 3978,
-          "sha256": "718d20bb85bd163b6670440cf61d7c989b47abc5fabe93dff08c2c39d3b18b51"
+          "git_blob_sha": "c77e25576d48b01f8f5ca76a2bd9768a52b15b7a",
+          "bytes": 3889,
+          "sha256": "c634a963e2f64473f4cf6e066a7fb6e7694c6c9cc1e87b1d488c8b14e8adb2be"
         },
         {
           "path": "code/harbor_sentinel_validation_suite.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "7b8d93e2fb6d922f4e8770073cfbf77a6c57c78b",
-          "bytes": 16432,
-          "sha256": "dc9c2586efa5659b8934f02fec37e6afea4afac3780fdff6c566743b10ee14ac"
+          "git_blob_sha": "78767b81b445ee16369500bb882c6aa597610b6b",
+          "bytes": 16019,
+          "sha256": "9acf7f427faef6950275599368cb012b2a0af9a35b2f0cc44f02918a0cdf8563"
         },
         {
           "path": "tests/test_harbor_sentinel_validation_suite.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "bd2fd2f5f808082e478cbcd36ca89b239a3c6f4a",
-          "bytes": 1603,
-          "sha256": "5ba5ef9420d9ab603eb529c885a4c86f53c52bc1b19109c8eced2eab6c26dd24"
+          "git_blob_sha": "ae448bb24765d4fcc0098c3686f8cf1978b74c26",
+          "bytes": 1559,
+          "sha256": "dc9f5af7348890008cdac8cedb5434e62e8fce8d24ec4d77a20a1818cf9d8de4"
         }
       ]
     },
@@ -298,25 +298,25 @@
           "path": "docs/DICE_PRELIMINARY_BENCHMARK_2026-06-13.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "7a9fdf77216a7ec67aff2cb0459d1d1d3432daf8",
-          "bytes": 3032,
-          "sha256": "ec08e4727ec1cb723d211638240362c9eff60b83997a7267096c8ee70acbfa01"
+          "git_blob_sha": "0422cb1ab6fb7b63c1ee29663ce67de9aadebeb1",
+          "bytes": 2950,
+          "sha256": "a67bfa3ff94d61d18dfc369b8a85eeaa7c87b67770dd38a8711fdf5059fc1e14"
         },
         {
           "path": "code/dice_preliminary_benchmark.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "999e705122f6833c2abe4befd4deb91b80da7131",
-          "bytes": 21430,
-          "sha256": "b9f54993b1a5483e38d28ed003bf47ec28f2778e03322434868c1e4333a8c2bf"
+          "git_blob_sha": "ab4aea5c435eca7b87aac9777be8c802b405714c",
+          "bytes": 20829,
+          "sha256": "b340ff39c645233f86ed07b8c941684c9e225d216b615fefa355fbd27c90e224"
         },
         {
           "path": "tests/test_dice_preliminary_benchmark.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "ae4929d391a77650183bc7833983ec4d5970146e",
-          "bytes": 1633,
-          "sha256": "2b387e642d5ec4cd18b4b621c10c05cf20ccc30da64d651a9e8e6618d0401f2b"
+          "git_blob_sha": "97575c11d493828b51ef754a989b540befe75a86",
+          "bytes": 1584,
+          "sha256": "127f0ec8dbaf1c97ac75b8c9fac481e1cfad26a6006c6cd96b836460965b3776"
         }
       ]
     },
@@ -342,25 +342,25 @@
           "path": "docs/MISSIONWEAVE_GENERATED_WORKFLOW_VALIDATION_2026-06-13.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "38b87881114723ebb4a7aeb9c5e8a001f16a2307",
-          "bytes": 4049,
-          "sha256": "cf916c086ced63d89fc981272142b1fd14ff53c0e0b73842159915161e114294"
+          "git_blob_sha": "5020c659f301d9a5231171c6f89695705a8a6bc1",
+          "bytes": 3952,
+          "sha256": "64f7006b19a8eed3ba3eab27fc513ab602b03daacd20849614e0690fb25f9ad0"
         },
         {
           "path": "code/missionweave_benchmark.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "a80fdda13aa7b99284a0f5bc7449c232745f30f6",
-          "bytes": 27799,
-          "sha256": "ecff9ead66347b48aff093ffd7affe8958f355bf93273be8820dc5326331e39d"
+          "git_blob_sha": "5f0c86f3591de05464ca0fd27a6d79d6d150a7b1",
+          "bytes": 26957,
+          "sha256": "8b40de3c402b7be092b5e50c1d1bc6adcd6c0d8f44806a54688d2fccde010865"
         },
         {
           "path": "tests/test_missionweave_benchmark.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "68e2d49b40716eef3fb187591c46167d832a8ca0",
-          "bytes": 3105,
-          "sha256": "c5e1ed552e100db9e13690b3c7ac561a59a89031208aea4ea0583836313ad178"
+          "git_blob_sha": "b18bd9fd865693ff7ed828c16d2f15453363c42a",
+          "bytes": 3014,
+          "sha256": "8b621e5cd7fdb006f4fe0ada176c4a29fc913f1c93a6724308e96f305c9d41ed"
         }
       ]
     },
@@ -387,33 +387,33 @@
           "path": "code/grant_submission_kit.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "61e4d28496837100f491807cb092884ed4fe520c",
-          "bytes": 28768,
-          "sha256": "547554f9d26415cb5df492cb9a751e85ba4384e0b559702607d45eb14f85a543"
+          "git_blob_sha": "817d00dc2b053815be0f79d4a6b2fb9fcc7f6ae2",
+          "bytes": 28088,
+          "sha256": "be1c8aa24dd89c229da0693bc7ef05348fa4f590dcf5d93447c0c10cef7789b2"
         },
         {
           "path": "code/grant_application_factory.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "5fd70b50cacdc637ab8e996ecd63158881929748",
-          "bytes": 102931,
-          "sha256": "f4fd03bc35378616756b2d725f2c34efa4e06f6f6e6e1e283a54f1afaf361204"
+          "git_blob_sha": "c2af80fe73df85cc7a54adf07318227d502a4b50",
+          "bytes": 100552,
+          "sha256": "d8042eebcc2838f6af602232d630c909d1ae5175774b4eb7ebe37a30846ac7b6"
         },
         {
           "path": "dashboard/data/grant_readiness_status.json",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "82c40d8e768358bb5e2d00c17aa92838d9026c8f",
-          "bytes": 16948,
-          "sha256": "6af28e80f31784b79f5e81d11961cc7ceac8e2956ca9645cfb33f06c0c2d7a12"
+          "git_blob_sha": "9b95cc930195231458891971adb6d8b9feec8759",
+          "bytes": 16550,
+          "sha256": "c4064700755304b64742f825a6a51b77e4ca24621386fec38a8ff20a30198fb3"
         },
         {
           "path": "tests/test_grant_submission_readiness_audit.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "166142796a5bfa06d89d50fdd59fb07f64b0ac28",
-          "bytes": 2782,
-          "sha256": "e0eefe0247a4ec0883eb276e0710f12d67a88c83f14fa6ed45662b5662ff5d83"
+          "git_blob_sha": "35dd1ccae1337ce8e88d0f21f283b758fc66c702",
+          "bytes": 2709,
+          "sha256": "99d72ace0ddc27043a4cf728bbbaec4ced4cdaddde1041404e089cc9286405c7"
         }
       ]
     },
@@ -440,33 +440,33 @@
           "path": "docs/CANONICAL_OPERATING_STATE.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "49e7d61de5c9e16040da20fef1c457d95ece987f",
-          "bytes": 35529,
-          "sha256": "9e5444892c988dba72c7b3229d4bc09625ada98603dd00828223e0f5fd1e6821"
+          "git_blob_sha": "e388969fa764f4f1e2332e3485d8db182f64b253",
+          "bytes": 35071,
+          "sha256": "671dff0face90579aeb2e06caa236ee269b82217f83831300610984e27d2aa94"
         },
         {
           "path": "code/execution/execution_orchestrator.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "affeb5c4349199ddb3dbcade9a95fba25de6e272",
-          "bytes": 9026,
-          "sha256": "21ebaf9623d9b12e4b2d6db1a7c55c304358fcb7b4353c412c4093a4f9bb436e"
+          "git_blob_sha": "ea5fed65e726aa1b2307378707e77b3d5955470c",
+          "bytes": 8789,
+          "sha256": "724542006a93f202994ed7b8e78706c9dcf5c86df9d0972965165ee6785ebe87"
         },
         {
           "path": "tests/test_order_safety_gate.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "65abc44670633adc08cfcc492e7a25af03a226fe",
-          "bytes": 11378,
-          "sha256": "ce7cab5f1bf0b6fc1f4ec98e22d4844eea3b799632738f9ff8eb42379b699056"
+          "git_blob_sha": "695ca0df0b6dbe19560ab856d046d1eec5ec991a",
+          "bytes": 11232,
+          "sha256": "678d4e0faccb91444ea54d84f6f1180318b3c824f93ec36e71f390bf4119c067"
         },
         {
           "path": "tests/test_order_safety_alpaca_paper_boundary.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "cad74b2b1930b72483bbf44b15d2832098322317",
-          "bytes": 5247,
-          "sha256": "052d548b43bc14626706d8c2b556205d4fbb94352f176ca491a3e96158f5d2f2"
+          "git_blob_sha": "b53d76597e0096ba197e3663394eeeab5805eb5a",
+          "bytes": 5107,
+          "sha256": "fe69da2abe53702112894edaecba1bc38edc5efb52ceae90de0a2b10f323c759"
         }
       ]
     },
@@ -537,33 +537,33 @@
           "path": "LamaScout/README.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "165262be10a8222ff5faec2d8dd0a763abb1be2d",
-          "bytes": 6484,
-          "sha256": "2d2455b64a1da6fcea25ef34715faa4420246133230930b6fe935e766c588ce3"
+          "git_blob_sha": "511773c4632c936fa6699d0d2cf9bbfaf423d921",
+          "bytes": 6359,
+          "sha256": "0fde5a289484a66eec14e410945cd795cf926b154ecd22d85549b3e228d98ec1"
         },
         {
           "path": "LamaScout/ARCHITECTURE.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "c72176475da7741a8f9b66a9b98b989a723641eb",
-          "bytes": 3606,
-          "sha256": "c10fd788c6c6c598678c4cff5827cfdc32cbdf4d1f4cdfda859485fc1eeb0cb1"
+          "git_blob_sha": "d02d23c39c8888915d41ac550feca0ecbf07bb2d",
+          "bytes": 3526,
+          "sha256": "bc1615e0e2d9162ff3c163365d3b64235f37fca02cb9e8c39dcc966183d70235"
         },
         {
           "path": "LamaScout/src/pipeline.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "a119292a69e85c04927a4c3df290b24e9792480c",
-          "bytes": 3252,
-          "sha256": "edc7f3a357bad2d78f2106df35f5a0ac30c9b86937115547bea58ab87e1de0a4"
+          "git_blob_sha": "12aad2ecd18001878daaae6c9eb88fa26304576d",
+          "bytes": 3161,
+          "sha256": "7536d644de178a5571cdacc7100085ddd92f9f9c8f76ae5de6d8535a134fcbd8"
         },
         {
           "path": "LamaScout/src/scoring.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "eae26c9a166177cc0d79598854982b393fc503a5",
-          "bytes": 20108,
-          "sha256": "b6947bbcef9a3d89f7d4e9e155db811c8cf3960111df48d52011c5179aa39e2e"
+          "git_blob_sha": "d819702e2df180e4659b65c862c2e9deeea63cd0",
+          "bytes": 19728,
+          "sha256": "8ea84c7a0c90bc49c6c9a2810d70157ea48dcd29bb7b8ac1f53bd694479ea1d2"
         }
       ]
     },
@@ -598,17 +598,17 @@
           "path": "code/institutional_harmonic_infrastructure.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "7f4c7b6407e6276b2df3100906c73045ba1e6f0c",
-          "bytes": 10128,
-          "sha256": "dc02fc412f9cca503e50265ab75a17f8dfe4fe0fc83c99036202d48110341207"
+          "git_blob_sha": "a7bdd7c3a1e57ecc9f5a9a9a4fb5dd36f7fbe129",
+          "bytes": 9849,
+          "sha256": "e7092c5abd500245a8eb08e4f068a182205732263904a42014cf775645f18e73"
         },
         {
           "path": "code/execution/infra_constraint_monitor.py",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "3a7e3724fd525087642cd3a00069b738c89687ed",
-          "bytes": 65433,
-          "sha256": "d69a80d205238a0693e267fa285d2e1a7b57e0b039881b6348480f396a46081f"
+          "git_blob_sha": "8143c65be10734ccc7457d3215c68dff0499ee8b",
+          "bytes": 63993,
+          "sha256": "e05a39b6622a4546bb13b5578d9901b14a658203e9966c98ac4a8eff8afa1d8e"
         }
       ]
     },
@@ -635,17 +635,17 @@
           "path": "docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "af156fd94aa0ba5ba91c798d7c2831d52e85b437",
-          "bytes": 4061,
-          "sha256": "98b7165eafe14060d71e8150199c35677c09792ece0ba649a216ab49a9272ba8"
+          "git_blob_sha": "55ed157ea5d9d1c40796d4a753025d85c58f6e26",
+          "bytes": 3931,
+          "sha256": "d376b6ece1d051250903da6bc87a1861c5a110fd40d3b2351c293d71be804db2"
         },
         {
           "path": "docs/CURRENT_PROOF_PROMOTION_BACKLOG.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "9f49b466da1d4ef0e028f12c32283eddf901bfea",
-          "bytes": 5414,
-          "sha256": "c785d7b71e163eeabe77c9824e7ccbf54471cf524eb63bc5a0f541e426b92b07"
+          "git_blob_sha": "706e10a74cd59815244606a9bb2370c346aefa9f",
+          "bytes": 5265,
+          "sha256": "d665bc4b426d238a0eb7ec0f55912a0c71fbf93981d5d25a0591f8a839cddc43"
         }
       ]
     },
@@ -672,25 +672,25 @@
           "path": "code/START_IMMERSIVE_STACK.ps1",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "f63d97b02209cbe7f1285eabeda58122661e2089",
-          "bytes": 643,
-          "sha256": "def0aabb0e2076e453481ab24c64c941549347bb602d5b9dc71bbde5dc06ece9"
+          "git_blob_sha": "751c0034125948032a96768fb76f9511a0926e30",
+          "bytes": 627,
+          "sha256": "d6986be05cbccc1d01ff27eeb54191b3fa793e64ab041c139b1e4bf5d8319e22"
         },
         {
           "path": "code/unity_bridge/INSTALL_UNITY_BRIDGE.ps1",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "1b5933dd32fa39e5126b1901ec0ad5c5a99c3fe2",
-          "bytes": 1417,
-          "sha256": "234249926d908037b0c8b1a543e2008ff5c171ed2c0898e5848a213a5d9285c9"
+          "git_blob_sha": "f7241e74f039800e50540bb4f956399e96ebf994",
+          "bytes": 1387,
+          "sha256": "8fe0a704eab1391fe5f49c3c4f8a07802d8052295dcf8ad9f13d9b2840002a51"
         },
         {
           "path": "docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "af156fd94aa0ba5ba91c798d7c2831d52e85b437",
-          "bytes": 4061,
-          "sha256": "98b7165eafe14060d71e8150199c35677c09792ece0ba649a216ab49a9272ba8"
+          "git_blob_sha": "55ed157ea5d9d1c40796d4a753025d85c58f6e26",
+          "bytes": 3931,
+          "sha256": "d376b6ece1d051250903da6bc87a1861c5a110fd40d3b2351c293d71be804db2"
         }
       ]
     },
@@ -717,17 +717,17 @@
           "path": "docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "af156fd94aa0ba5ba91c798d7c2831d52e85b437",
-          "bytes": 4061,
-          "sha256": "98b7165eafe14060d71e8150199c35677c09792ece0ba649a216ab49a9272ba8"
+          "git_blob_sha": "55ed157ea5d9d1c40796d4a753025d85c58f6e26",
+          "bytes": 3931,
+          "sha256": "d376b6ece1d051250903da6bc87a1861c5a110fd40d3b2351c293d71be804db2"
         },
         {
           "path": "docs/CURRENT_PROOF_PROMOTION_BACKLOG.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "9f49b466da1d4ef0e028f12c32283eddf901bfea",
-          "bytes": 5414,
-          "sha256": "c785d7b71e163eeabe77c9824e7ccbf54471cf524eb63bc5a0f541e426b92b07"
+          "git_blob_sha": "706e10a74cd59815244606a9bb2370c346aefa9f",
+          "bytes": 5265,
+          "sha256": "d665bc4b426d238a0eb7ec0f55912a0c71fbf93981d5d25a0591f8a839cddc43"
         }
       ]
     },
@@ -753,17 +753,17 @@
           "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "1b86c44b0b4a7fcd875d2275142a633e7cdfbd39",
-          "bytes": 5279,
-          "sha256": "c098a0830ec220edffd77dd4dbad8322b5d5085d5e609f821daf783550969e37"
+          "git_blob_sha": "3256bf2eaa2e21289075290702bd2a68e37642a2",
+          "bytes": 5146,
+          "sha256": "dd42ad96883f9be86aef26b5e64b35f6a64baf6647eafad446769bec29eb9342"
         },
         {
           "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "4832f426512bc606464f215234410b5bf8c3a4f4",
-          "bytes": 4965,
-          "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+          "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+          "bytes": 4873,
+          "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
         }
       ]
     },
@@ -790,25 +790,25 @@
           "path": "EVIDENCE_INDEX.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "8de58f9f393e568b53cfb0dfd3bedec8ef799666",
-          "bytes": 25272,
-          "sha256": "0da2dbbee25a69bd00cd85a589ace2212494391fc2ed0a139bf47a13f8aff86d"
+          "git_blob_sha": "b256de108d136a03e04175b1a2d6d3408dc01cda",
+          "bytes": 25001,
+          "sha256": "1896962a5fe43d82026082c92f283b3f30c9bbfb596c391ed1f4adc35e8d28cc"
         },
         {
           "path": "docs/MACHINE_EVIDENCE_GRAPH.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "f9185228be2d48f0e6262ead22f2dde2f6457cf5",
-          "bytes": 4919,
-          "sha256": "f8138f4a0a27d6e942a3b5f7b96cad4ef5505aeaa41226e4a6e532101c2f58a1"
+          "git_blob_sha": "26dc1de0de5d1e824f836f5945a5d482330a8403",
+          "bytes": 4773,
+          "sha256": "034de7dc7c8373c233cfdc9b135d19ec2844e5e30e1e6fcce364b1b7f9b052b5"
         },
         {
           "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "4832f426512bc606464f215234410b5bf8c3a4f4",
-          "bytes": 4965,
-          "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+          "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+          "bytes": 4873,
+          "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
         }
       ]
     },
@@ -835,17 +835,17 @@
           "path": "EVIDENCE_INDEX.md",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "8de58f9f393e568b53cfb0dfd3bedec8ef799666",
-          "bytes": 25272,
-          "sha256": "0da2dbbee25a69bd00cd85a589ace2212494391fc2ed0a139bf47a13f8aff86d"
+          "git_blob_sha": "b256de108d136a03e04175b1a2d6d3408dc01cda",
+          "bytes": 25001,
+          "sha256": "1896962a5fe43d82026082c92f283b3f30c9bbfb596c391ed1f4adc35e8d28cc"
         },
         {
           "path": "config/geometry_evaluation_protocol_v1.json",
           "exists": true,
           "tracked": true,
-          "git_blob_sha": "7aa1b62ad032c38e660264beead6a6816d23e2d5",
-          "bytes": 10604,
-          "sha256": "f11250c82edfd1044db698be2f8aac81398d639356326e3c30c99d01e188e591"
+          "git_blob_sha": "8fae4b5cec03ea184b84fdf8c7c43d976ba5d5f6",
+          "bytes": 10276,
+          "sha256": "c906497dcec8895a557d9bdceaf8ecb0def3f20d935db6bc6869a05a6206831c"
         }
       ]
     },
@@ -922,17 +922,17 @@
             "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1b86c44b0b4a7fcd875d2275142a633e7cdfbd39",
-            "bytes": 5279,
-            "sha256": "c098a0830ec220edffd77dd4dbad8322b5d5085d5e609f821daf783550969e37"
+            "git_blob_sha": "3256bf2eaa2e21289075290702bd2a68e37642a2",
+            "bytes": 5146,
+            "sha256": "dd42ad96883f9be86aef26b5e64b35f6a64baf6647eafad446769bec29eb9342"
           },
           {
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "4832f426512bc606464f215234410b5bf8c3a4f4",
-            "bytes": 4965,
-            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
           }
         ],
         "artifact": [],
@@ -972,9 +972,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "4832f426512bc606464f215234410b5bf8c3a4f4",
-            "bytes": 4965,
-            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
           }
         ],
         "artifact": [],
@@ -1011,17 +1011,17 @@
             "path": "code/institutional_harmonic_infrastructure.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "7f4c7b6407e6276b2df3100906c73045ba1e6f0c",
-            "bytes": 10128,
-            "sha256": "dc02fc412f9cca503e50265ab75a17f8dfe4fe0fc83c99036202d48110341207"
+            "git_blob_sha": "a7bdd7c3a1e57ecc9f5a9a9a4fb5dd36f7fbe129",
+            "bytes": 9849,
+            "sha256": "e7092c5abd500245a8eb08e4f068a182205732263904a42014cf775645f18e73"
           },
           {
             "path": "code/execution/infra_constraint_monitor.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "3a7e3724fd525087642cd3a00069b738c89687ed",
-            "bytes": 65433,
-            "sha256": "d69a80d205238a0693e267fa285d2e1a7b57e0b039881b6348480f396a46081f"
+            "git_blob_sha": "8143c65be10734ccc7457d3215c68dff0499ee8b",
+            "bytes": 63993,
+            "sha256": "e05a39b6622a4546bb13b5578d9901b14a658203e9966c98ac4a8eff8afa1d8e"
           }
         ],
         "entrypoint": [
@@ -1029,9 +1029,9 @@
             "path": "code/institutional_harmonic_infrastructure.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "7f4c7b6407e6276b2df3100906c73045ba1e6f0c",
-            "bytes": 10128,
-            "sha256": "dc02fc412f9cca503e50265ab75a17f8dfe4fe0fc83c99036202d48110341207"
+            "git_blob_sha": "a7bdd7c3a1e57ecc9f5a9a9a4fb5dd36f7fbe129",
+            "bytes": 9849,
+            "sha256": "e7092c5abd500245a8eb08e4f068a182205732263904a42014cf775645f18e73"
           }
         ],
         "test": [],
@@ -1040,9 +1040,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "2304bc799845998a10a7846debda700396fd2306",
-            "bytes": 4065,
-            "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
+            "bytes": 3968,
+            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
           }
         ],
         "artifact": [
@@ -1060,9 +1060,9 @@
             "path": "code/execution/build_infra_audit_dashboard.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "dc0a9497476ac21052ea4b27f0132a0da276ed7f",
-            "bytes": 47081,
-            "sha256": "1d287304fb45d3742a5c4f932440274f7428e1d5f5ddfd7bafea0f14b49c9097"
+            "git_blob_sha": "8aa2e9310babdff497b4f28a1e4ab0841279b956",
+            "bytes": 46056,
+            "sha256": "2abf314b9097eec45f4e9a83ebe27692f9a3c922d4da30770c8fe108ba28075a"
           }
         ]
       }
@@ -1097,9 +1097,9 @@
             "path": "code/crowdfunding_engine.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "396e3159ed34fe63d554929ef0ec3a83f46b753f",
-            "bytes": 20434,
-            "sha256": "cfce3e447b5e7bec29413aed1036f4f895a1a1b1d4769462f43f2f91bd300443"
+            "git_blob_sha": "35f5b56206bced00cc9c68eb91d4cceb8a5d3eea",
+            "bytes": 20059,
+            "sha256": "a2abfd0a9c6ea59dc1a721335e576c3165a33b2ce42e2e03cc0ec9af421f87a8"
           }
         ],
         "entrypoint": [],
@@ -1139,9 +1139,9 @@
             "path": "code/cold_case_engine.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "a1fe91cc858c62d5208138b6e808c1eaa8193d83",
-            "bytes": 6910,
-            "sha256": "cc71f0a931afbe01b617a130b706d25a3e686cdaae2121c5ea46f716e358ddc7"
+            "git_blob_sha": "b8697c5e56ed2ff1abdb71843f65ae57f5fe29a7",
+            "bytes": 6715,
+            "sha256": "be85d81c53da8f2454715fb5c4224aa7bcd0c763c8a8ec1956f9565f8bd04e23"
           }
         ],
         "entrypoint": [],
@@ -1152,9 +1152,9 @@
             "path": "code/output/cold_case_summary.json",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "e8b09b16e5280987cd6935d259693d1b5dfaf362",
-            "bytes": 1154,
-            "sha256": "ad4ea4f09577dde153c933af22cddb7f881420bed3758c6dadd7abb120b02b72"
+            "git_blob_sha": "adeb4313f7cbd0c463e4309907ab9c74ab608525",
+            "bytes": 1108,
+            "sha256": "fab7ccea5b286d4781b9dd612fc5a3c9e2ad78d27f282a3fea4ed4d710e6ebe6"
           }
         ],
         "public_surface": [
@@ -1162,9 +1162,9 @@
             "path": "code/build_cold_case_dashboard.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "2d7d3b0048944feceee94803f6ab5cf6254c6495",
-            "bytes": 7292,
-            "sha256": "0c7488c3cc4726de7014365c7e77bcf38d1173f76e874450446a4a931bb72759"
+            "git_blob_sha": "6b477087b8e2feaa227cef2a6474c326bd4ccd09",
+            "bytes": 7136,
+            "sha256": "cc030a0a1f56e78b08ec337707f8bd16e2ab85a17b2b44a0511eb7c6e41cadde"
           }
         ]
       }
@@ -1199,17 +1199,17 @@
             "path": "code/ops/run_sector_energy_evidence_pipeline.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "92832248779fd91889c95b6c1e781e368dffb5e2",
-            "bytes": 16774,
-            "sha256": "71f599e8251fb1cb4a9672558f4c8443436afcb6bac296ad4292d14916f63014"
+            "git_blob_sha": "b3a06b0ac59b46bc5297863cc49dba4afd297f41",
+            "bytes": 16330,
+            "sha256": "fc16700b7b8f01ab6e73f9f9a3799cdcca459dbe5b7e74a55caec525aa018efa"
           },
           {
             "path": "code/institutional_harmonic_infrastructure.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "7f4c7b6407e6276b2df3100906c73045ba1e6f0c",
-            "bytes": 10128,
-            "sha256": "dc02fc412f9cca503e50265ab75a17f8dfe4fe0fc83c99036202d48110341207"
+            "git_blob_sha": "a7bdd7c3a1e57ecc9f5a9a9a4fb5dd36f7fbe129",
+            "bytes": 9849,
+            "sha256": "e7092c5abd500245a8eb08e4f068a182205732263904a42014cf775645f18e73"
           }
         ],
         "entrypoint": [
@@ -1217,9 +1217,9 @@
             "path": "code/ops/run_sector_energy_evidence_pipeline.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "92832248779fd91889c95b6c1e781e368dffb5e2",
-            "bytes": 16774,
-            "sha256": "71f599e8251fb1cb4a9672558f4c8443436afcb6bac296ad4292d14916f63014"
+            "git_blob_sha": "b3a06b0ac59b46bc5297863cc49dba4afd297f41",
+            "bytes": 16330,
+            "sha256": "fc16700b7b8f01ab6e73f9f9a3799cdcca459dbe5b7e74a55caec525aa018efa"
           }
         ],
         "test": [],
@@ -1228,9 +1228,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "4832f426512bc606464f215234410b5bf8c3a4f4",
-            "bytes": 4965,
-            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
           }
         ],
         "artifact": [],
@@ -1267,17 +1267,17 @@
             "path": "code/ops/flowform_phase_lock_audit.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "baca8051437ff3fafde8227135e523cf813f52ba",
-            "bytes": 13748,
-            "sha256": "7c591e361b6b8a20aceadd382c910cd62727ccd8f4e113793dae435111dd8845"
+            "git_blob_sha": "5cd68742258efca9bd20161b306e5fd9248468b5",
+            "bytes": 13431,
+            "sha256": "f82d402eadc8542c34a25375d3a890028ee999e26ce811032bb00f77aa1f0f66"
           },
           {
             "path": "code/ops/harmonic_flowform_impact_explainer.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "3d08b2732dfef77d9c2cd1153e99aa581b65674f",
-            "bytes": 25586,
-            "sha256": "0b55e9462800453e170cc1044381e56c01ba3fcca4dd4b3bcf1feb3553f3f2e9"
+            "git_blob_sha": "5517e338dbc10e0925c82c91f9786d345c3c251c",
+            "bytes": 24975,
+            "sha256": "a5d4d166ecf72d2d578dfa5ccc5b5f3b9aead29e8afcdc50ea6d49d2205b6dd0"
           }
         ],
         "entrypoint": [
@@ -1285,9 +1285,9 @@
             "path": "code/ops/flowform_phase_lock_audit.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "baca8051437ff3fafde8227135e523cf813f52ba",
-            "bytes": 13748,
-            "sha256": "7c591e361b6b8a20aceadd382c910cd62727ccd8f4e113793dae435111dd8845"
+            "git_blob_sha": "5cd68742258efca9bd20161b306e5fd9248468b5",
+            "bytes": 13431,
+            "sha256": "f82d402eadc8542c34a25375d3a890028ee999e26ce811032bb00f77aa1f0f66"
           }
         ],
         "test": [],
@@ -1296,9 +1296,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "4832f426512bc606464f215234410b5bf8c3a4f4",
-            "bytes": 4965,
-            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
           }
         ],
         "artifact": [],
@@ -1335,17 +1335,17 @@
             "path": "code/kraken_execution.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "69dc6e940d284f0bb25eae35e275f75319ad4cff",
-            "bytes": 5137,
-            "sha256": "c967051cd1bd7a5491a1a9111f74de783ce47ce2e9f589fc6c395e2688dd431b"
+            "git_blob_sha": "686ead85e41107d02e8a09cfb37e6691d9033bca",
+            "bytes": 4997,
+            "sha256": "ea29c2f2f6bb86123d3b3db55f349a71fe63f1704e55722510f2605d3f0e3a55"
           },
           {
             "path": "code/kraken_swing_hunter.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "ac260c712aeda43ed45862caa919c04444d670d9",
-            "bytes": 2326,
-            "sha256": "94a3f8d5723ce837d238f8e3f1c9f2c8565fc48ba3f7b696cb79020fdde3738d"
+            "git_blob_sha": "127ba2a7bce28a69928e2e21cf18101da615f1cf",
+            "bytes": 2259,
+            "sha256": "de06297584d74104380d639c567127e0f209014d31adaadd63d625dddbb66b2d"
           }
         ],
         "entrypoint": [
@@ -1353,9 +1353,9 @@
             "path": "code/kraken_swing_hunter.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "ac260c712aeda43ed45862caa919c04444d670d9",
-            "bytes": 2326,
-            "sha256": "94a3f8d5723ce837d238f8e3f1c9f2c8565fc48ba3f7b696cb79020fdde3738d"
+            "git_blob_sha": "127ba2a7bce28a69928e2e21cf18101da615f1cf",
+            "bytes": 2259,
+            "sha256": "de06297584d74104380d639c567127e0f209014d31adaadd63d625dddbb66b2d"
           }
         ],
         "test": [
@@ -1363,9 +1363,9 @@
             "path": "tests/test_order_safety_gate.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "65abc44670633adc08cfcc492e7a25af03a226fe",
-            "bytes": 11378,
-            "sha256": "ce7cab5f1bf0b6fc1f4ec98e22d4844eea3b799632738f9ff8eb42379b699056"
+            "git_blob_sha": "695ca0df0b6dbe19560ab856d046d1eec5ec991a",
+            "bytes": 11232,
+            "sha256": "678d4e0faccb91444ea54d84f6f1180318b3c824f93ec36e71f390bf4119c067"
           }
         ],
         "documentation": [
@@ -1373,9 +1373,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "2304bc799845998a10a7846debda700396fd2306",
-            "bytes": 4065,
-            "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
+            "bytes": 3968,
+            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
           }
         ],
         "artifact": [],
@@ -1384,9 +1384,9 @@
             "path": "dashboard/kraken_execution_dashboard.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "5398d8f684037a4de3f9d3fdacc1d65534f5dce7",
-            "bytes": 2719,
-            "sha256": "f7766238275634d7aad1efc4e3c400de9a8a6677053113e20ccff96cde9034a7"
+            "git_blob_sha": "b38a6937cd358728e1a8582a6d63f4a77a60e2ef",
+            "bytes": 2678,
+            "sha256": "257d70645eb0e4b9f260cc63960a8c9636f8af25f8ac0447f27232f705fa56be"
           }
         ]
       }
@@ -1421,17 +1421,17 @@
             "path": "code/START_IMMERSIVE_STACK.ps1",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "f63d97b02209cbe7f1285eabeda58122661e2089",
-            "bytes": 643,
-            "sha256": "def0aabb0e2076e453481ab24c64c941549347bb602d5b9dc71bbde5dc06ece9"
+            "git_blob_sha": "751c0034125948032a96768fb76f9511a0926e30",
+            "bytes": 627,
+            "sha256": "d6986be05cbccc1d01ff27eeb54191b3fa793e64ab041c139b1e4bf5d8319e22"
           },
           {
             "path": "code/unity_bridge/INSTALL_UNITY_BRIDGE.ps1",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1b5933dd32fa39e5126b1901ec0ad5c5a99c3fe2",
-            "bytes": 1417,
-            "sha256": "234249926d908037b0c8b1a543e2008ff5c171ed2c0898e5848a213a5d9285c9"
+            "git_blob_sha": "f7241e74f039800e50540bb4f956399e96ebf994",
+            "bytes": 1387,
+            "sha256": "8fe0a704eab1391fe5f49c3c4f8a07802d8052295dcf8ad9f13d9b2840002a51"
           }
         ],
         "entrypoint": [
@@ -1439,9 +1439,9 @@
             "path": "code/START_IMMERSIVE_STACK.ps1",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "f63d97b02209cbe7f1285eabeda58122661e2089",
-            "bytes": 643,
-            "sha256": "def0aabb0e2076e453481ab24c64c941549347bb602d5b9dc71bbde5dc06ece9"
+            "git_blob_sha": "751c0034125948032a96768fb76f9511a0926e30",
+            "bytes": 627,
+            "sha256": "d6986be05cbccc1d01ff27eeb54191b3fa793e64ab041c139b1e4bf5d8319e22"
           }
         ],
         "test": [],
@@ -1450,9 +1450,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "4832f426512bc606464f215234410b5bf8c3a4f4",
-            "bytes": 4965,
-            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
           }
         ],
         "artifact": [],
@@ -1461,9 +1461,9 @@
             "path": "dashboard/mission_control.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "da57646a3b2cd5916364d46dff61b795a6e9ec83",
-            "bytes": 2683,
-            "sha256": "9395657d807932787e60ed1d8a21a8a6743695e4e33c34014f995cb21926bc10"
+            "git_blob_sha": "b7610d5813309f7d12fd53780416a99eb1a321c2",
+            "bytes": 2642,
+            "sha256": "0997a57b814aef0cc79fec467dda3a299a7c7aa3fac1bb2e95c0ceb3576b6063"
           }
         ]
       }
@@ -1498,17 +1498,17 @@
             "path": "LamaScout/src/pipeline.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "a119292a69e85c04927a4c3df290b24e9792480c",
-            "bytes": 3252,
-            "sha256": "edc7f3a357bad2d78f2106df35f5a0ac30c9b86937115547bea58ab87e1de0a4"
+            "git_blob_sha": "12aad2ecd18001878daaae6c9eb88fa26304576d",
+            "bytes": 3161,
+            "sha256": "7536d644de178a5571cdacc7100085ddd92f9f9c8f76ae5de6d8535a134fcbd8"
           },
           {
             "path": "LamaScout/src/scoring.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "eae26c9a166177cc0d79598854982b393fc503a5",
-            "bytes": 20108,
-            "sha256": "b6947bbcef9a3d89f7d4e9e155db811c8cf3960111df48d52011c5179aa39e2e"
+            "git_blob_sha": "d819702e2df180e4659b65c862c2e9deeea63cd0",
+            "bytes": 19728,
+            "sha256": "8ea84c7a0c90bc49c6c9a2810d70157ea48dcd29bb7b8ac1f53bd694479ea1d2"
           }
         ],
         "entrypoint": [
@@ -1516,9 +1516,9 @@
             "path": "LamaScout/src/artist_scout_engine.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "11d4222cca50ee9642546a62561a0e4875440de4",
-            "bytes": 161,
-            "sha256": "1c581551297746feef853fb38cbaeeb4133c5b18a3d29bf90cb64eb53f7ea9f3"
+            "git_blob_sha": "d110aad4d1c0a1b5418dfff8e1f99e4b3050de98",
+            "bytes": 153,
+            "sha256": "e043cabbd4573670766b9904e78f4c8beaa091b60db1b20386900919694ad963"
           }
         ],
         "test": [],
@@ -1527,17 +1527,17 @@
             "path": "LamaScout/README.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "165262be10a8222ff5faec2d8dd0a763abb1be2d",
-            "bytes": 6484,
-            "sha256": "2d2455b64a1da6fcea25ef34715faa4420246133230930b6fe935e766c588ce3"
+            "git_blob_sha": "511773c4632c936fa6699d0d2cf9bbfaf423d921",
+            "bytes": 6359,
+            "sha256": "0fde5a289484a66eec14e410945cd795cf926b154ecd22d85549b3e228d98ec1"
           },
           {
             "path": "LamaScout/ARCHITECTURE.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "c72176475da7741a8f9b66a9b98b989a723641eb",
-            "bytes": 3606,
-            "sha256": "c10fd788c6c6c598678c4cff5827cfdc32cbdf4d1f4cdfda859485fc1eeb0cb1"
+            "git_blob_sha": "d02d23c39c8888915d41ac550feca0ecbf07bb2d",
+            "bytes": 3526,
+            "sha256": "bc1615e0e2d9162ff3c163365d3b64235f37fca02cb9e8c39dcc966183d70235"
           }
         ],
         "artifact": [],
@@ -1546,9 +1546,9 @@
             "path": "dashboard/lumascout.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "f8b055d817e03728e3d46dbbcc0e5ee07b42731e",
-            "bytes": 377,
-            "sha256": "bbd4a8fdb1201d5f025a48f77f2e02dd2cfb15a506818df47c05884ca7d7cb54"
+            "git_blob_sha": "fcdedb990f044805439bebd03c29e66de8a55ba8",
+            "bytes": 376,
+            "sha256": "8bbb7c36a44938a3922ad871290bb47f1b70ed79c631c30d3d2fe28f796956f8"
           }
         ]
       }
@@ -1583,17 +1583,17 @@
             "path": "code/execution/execution_orchestrator.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "affeb5c4349199ddb3dbcade9a95fba25de6e272",
-            "bytes": 9026,
-            "sha256": "21ebaf9623d9b12e4b2d6db1a7c55c304358fcb7b4353c412c4093a4f9bb436e"
+            "git_blob_sha": "ea5fed65e726aa1b2307378707e77b3d5955470c",
+            "bytes": 8789,
+            "sha256": "724542006a93f202994ed7b8e78706c9dcf5c86df9d0972965165ee6785ebe87"
           },
           {
             "path": "code/institutional_harmonic_suite.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "a1e53a6f497891b3e7759ed685ab7a5398396f49",
-            "bytes": 28333,
-            "sha256": "843cd423e4c83d7989684f1cc7574554691693909cb5442ab52c3c82e7de006a"
+            "git_blob_sha": "70c54e036476d09fe05d7eb79842c5a5380abd98",
+            "bytes": 27537,
+            "sha256": "fd806f18cd2974c09a0265771d62d4ba49373b22022c269076d1e57a70589866"
           }
         ],
         "entrypoint": [
@@ -1601,9 +1601,9 @@
             "path": "code/execution/execution_orchestrator.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "affeb5c4349199ddb3dbcade9a95fba25de6e272",
-            "bytes": 9026,
-            "sha256": "21ebaf9623d9b12e4b2d6db1a7c55c304358fcb7b4353c412c4093a4f9bb436e"
+            "git_blob_sha": "ea5fed65e726aa1b2307378707e77b3d5955470c",
+            "bytes": 8789,
+            "sha256": "724542006a93f202994ed7b8e78706c9dcf5c86df9d0972965165ee6785ebe87"
           }
         ],
         "test": [
@@ -1611,9 +1611,9 @@
             "path": "tests/test_order_safety_alpaca_paper_boundary.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "cad74b2b1930b72483bbf44b15d2832098322317",
-            "bytes": 5247,
-            "sha256": "052d548b43bc14626706d8c2b556205d4fbb94352f176ca491a3e96158f5d2f2"
+            "git_blob_sha": "b53d76597e0096ba197e3663394eeeab5805eb5a",
+            "bytes": 5107,
+            "sha256": "fe69da2abe53702112894edaecba1bc38edc5efb52ceae90de0a2b10f323c759"
           }
         ],
         "documentation": [
@@ -1621,9 +1621,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "2304bc799845998a10a7846debda700396fd2306",
-            "bytes": 4065,
-            "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
+            "bytes": 3968,
+            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
           }
         ],
         "artifact": [
@@ -1631,9 +1631,9 @@
             "path": "dashboard/data/public_live_breadth_manifest.json",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1438609e1dad22a9e3470dffdd224c0cfefce274",
-            "bytes": 17356,
-            "sha256": "8a896a3d9fc69bf8507785e0ca841e9bf26a2c3a94f6dd08c196a2d37335735b"
+            "git_blob_sha": "550a48e567930c8341168c4cff450075cfa98514",
+            "bytes": 16918,
+            "sha256": "0b878d7839662098548bd71de1aad5cac8fbd8852fb64a527dc2c6f390a916f1"
           }
         ],
         "public_surface": [
@@ -1641,9 +1641,9 @@
             "path": "dashboard/quant_lab.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "64fada6973806f7d08317df31f0ad4f4f7db8453",
-            "bytes": 2674,
-            "sha256": "d6f4c1f14a84445cab0862189d0b554330d82bebf67fff106e1a8aadef5f7d67"
+            "git_blob_sha": "2c06181fe9120626b3bd126efa20531226d6f1f2",
+            "bytes": 2633,
+            "sha256": "7b611e05ac53f0908ae3c29f1f499badd3e9fc49f42bd60b701a3a835aedf64c"
           }
         ]
       }
@@ -1678,17 +1678,17 @@
             "path": "code/sports_odds_engine.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "8d1c7769bd6631cae33fddbd5fb95b6c3921f83c",
-            "bytes": 21150,
-            "sha256": "5dd438f6ca5852882deeeb45590da3d07c54f15e1610587aae936836f9c7c32f"
+            "git_blob_sha": "d8ea08bb47b931706282e851039cfab4743c7f55",
+            "bytes": 20627,
+            "sha256": "719de09853bba01447a7c8778bcd8b3dfdcef6bc137d05489736a4f5dc416f1e"
           },
           {
             "path": "code/sports_intelligence_layer.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "ef12f5cc977a883cb07447cfbf01e36de93f4af3",
-            "bytes": 43162,
-            "sha256": "eeba728befaed1dd35dff0fd34ee07f87dccb098a33cae54ad1639192d4ae97e"
+            "git_blob_sha": "11747257b027414c04c9fc25fb91a9a01d6923c1",
+            "bytes": 42077,
+            "sha256": "166f64dc3ab5c9f917f19ea0ed64757921a0383ba4d2cc7c860da3fcbd523639"
           }
         ],
         "entrypoint": [
@@ -1696,9 +1696,9 @@
             "path": "code/sports_odds_engine.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "8d1c7769bd6631cae33fddbd5fb95b6c3921f83c",
-            "bytes": 21150,
-            "sha256": "5dd438f6ca5852882deeeb45590da3d07c54f15e1610587aae936836f9c7c32f"
+            "git_blob_sha": "d8ea08bb47b931706282e851039cfab4743c7f55",
+            "bytes": 20627,
+            "sha256": "719de09853bba01447a7c8778bcd8b3dfdcef6bc137d05489736a4f5dc416f1e"
           }
         ],
         "test": [],
@@ -1707,9 +1707,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "4832f426512bc606464f215234410b5bf8c3a4f4",
-            "bytes": 4965,
-            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
           }
         ],
         "artifact": [],
@@ -1746,9 +1746,9 @@
             "path": "code/execution/cross_sector_intel_pipeline.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "959d52b7bec94ffa7f33dd9a4cf0855893decb0a",
-            "bytes": 19264,
-            "sha256": "7b44dd1e2a46cfedcb25c62179ff57b963f8b837681d88b4df068387e3914ad0"
+            "git_blob_sha": "196ebc847e28f2801e94962feadee64f975a13db",
+            "bytes": 18801,
+            "sha256": "cfaf77f0e0b926f13770b2c2afd4528baa721cd6aed0c3c8a80117124dbcd9b7"
           }
         ],
         "entrypoint": [
@@ -1756,9 +1756,9 @@
             "path": "code/execution/cross_sector_intel_pipeline.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "959d52b7bec94ffa7f33dd9a4cf0855893decb0a",
-            "bytes": 19264,
-            "sha256": "7b44dd1e2a46cfedcb25c62179ff57b963f8b837681d88b4df068387e3914ad0"
+            "git_blob_sha": "196ebc847e28f2801e94962feadee64f975a13db",
+            "bytes": 18801,
+            "sha256": "cfaf77f0e0b926f13770b2c2afd4528baa721cd6aed0c3c8a80117124dbcd9b7"
           }
         ],
         "test": [],
@@ -1767,9 +1767,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "4832f426512bc606464f215234410b5bf8c3a4f4",
-            "bytes": 4965,
-            "sha256": "289eb10233d355e1abc926257d935284762dd6ac4974940d68008f9690b5e6bb"
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
           }
         ],
         "artifact": [],
@@ -1806,17 +1806,17 @@
             "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1b7eda7f9376f1cd6e608a8bd8fcb2152459eab5",
-            "bytes": 31995,
-            "sha256": "8c7435cc77fa934be7d14208111ccae5f2e4527c6c57bfde142e1b422f4fa2e8"
+            "git_blob_sha": "9cd89ca92a09516d4fb2c59042966ade48f4a8c1",
+            "bytes": 31149,
+            "sha256": "9f3f209fb77207428dce93aaf101fce94b172bc1c66601ad632f74e01bac52c5"
           },
           {
             "path": "code/run_universal_meta_orchestrator.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "6cfdc8644088e3e9edfb30ce0f9ce9e5606a2804",
-            "bytes": 4052,
-            "sha256": "9baa00a4b443e2c55559142485fb548010b7fe45c32a51be9662e8aa9c9a9b8b"
+            "git_blob_sha": "c311f4748e4a0fe96db477c108d3955303d972cc",
+            "bytes": 3936,
+            "sha256": "b1cf75d041450b647f89c6d312ccf7badc1e108ede62695bb655518f2e670e57"
           }
         ],
         "entrypoint": [
@@ -1824,17 +1824,17 @@
             "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1b7eda7f9376f1cd6e608a8bd8fcb2152459eab5",
-            "bytes": 31995,
-            "sha256": "8c7435cc77fa934be7d14208111ccae5f2e4527c6c57bfde142e1b422f4fa2e8"
+            "git_blob_sha": "9cd89ca92a09516d4fb2c59042966ade48f4a8c1",
+            "bytes": 31149,
+            "sha256": "9f3f209fb77207428dce93aaf101fce94b172bc1c66601ad632f74e01bac52c5"
           },
           {
             "path": "code/run_universal_meta_orchestrator.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "6cfdc8644088e3e9edfb30ce0f9ce9e5606a2804",
-            "bytes": 4052,
-            "sha256": "9baa00a4b443e2c55559142485fb548010b7fe45c32a51be9662e8aa9c9a9b8b"
+            "git_blob_sha": "c311f4748e4a0fe96db477c108d3955303d972cc",
+            "bytes": 3936,
+            "sha256": "b1cf75d041450b647f89c6d312ccf7badc1e108ede62695bb655518f2e670e57"
           }
         ],
         "test": [],
@@ -1843,9 +1843,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "2304bc799845998a10a7846debda700396fd2306",
-            "bytes": 4065,
-            "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
+            "bytes": 3968,
+            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
           }
         ],
         "artifact": [
@@ -1853,9 +1853,9 @@
             "path": "truth_orchestrator_status.json",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "42a5e3effd265eba609aa3204793023d7c6ee866",
-            "bytes": 5043,
-            "sha256": "597c61ea5b9f1e6d6513476b369c9f4c6125dc3cc305e6a697756b66aaab934f"
+            "git_blob_sha": "c28627071a5b31140c9d370117e90b254800435f",
+            "bytes": 4970,
+            "sha256": "c0e277a28f7127a755ea33d0673534987700e221ca306dc37c606c8e454201c9"
           }
         ],
         "public_surface": [
@@ -1863,9 +1863,9 @@
             "path": "dashboard/mission_control.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "da57646a3b2cd5916364d46dff61b795a6e9ec83",
-            "bytes": 2683,
-            "sha256": "9395657d807932787e60ed1d8a21a8a6743695e4e33c34014f995cb21926bc10"
+            "git_blob_sha": "b7610d5813309f7d12fd53780416a99eb1a321c2",
+            "bytes": 2642,
+            "sha256": "0997a57b814aef0cc79fec467dda3a299a7c7aa3fac1bb2e95c0ceb3576b6063"
           }
         ]
       }
@@ -1900,17 +1900,17 @@
             "path": "code/grant_submission_kit.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "61e4d28496837100f491807cb092884ed4fe520c",
-            "bytes": 28768,
-            "sha256": "547554f9d26415cb5df492cb9a751e85ba4384e0b559702607d45eb14f85a543"
+            "git_blob_sha": "817d00dc2b053815be0f79d4a6b2fb9fcc7f6ae2",
+            "bytes": 28088,
+            "sha256": "be1c8aa24dd89c229da0693bc7ef05348fa4f590dcf5d93447c0c10cef7789b2"
           },
           {
             "path": "code/grant_application_factory.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "5fd70b50cacdc637ab8e996ecd63158881929748",
-            "bytes": 102931,
-            "sha256": "f4fd03bc35378616756b2d725f2c34efa4e06f6f6e6e1e283a54f1afaf361204"
+            "git_blob_sha": "c2af80fe73df85cc7a54adf07318227d502a4b50",
+            "bytes": 100552,
+            "sha256": "d8042eebcc2838f6af602232d630c909d1ae5175774b4eb7ebe37a30846ac7b6"
           }
         ],
         "entrypoint": [
@@ -1918,9 +1918,9 @@
             "path": "code/grant_submission_kit.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "61e4d28496837100f491807cb092884ed4fe520c",
-            "bytes": 28768,
-            "sha256": "547554f9d26415cb5df492cb9a751e85ba4384e0b559702607d45eb14f85a543"
+            "git_blob_sha": "817d00dc2b053815be0f79d4a6b2fb9fcc7f6ae2",
+            "bytes": 28088,
+            "sha256": "be1c8aa24dd89c229da0693bc7ef05348fa4f590dcf5d93447c0c10cef7789b2"
           }
         ],
         "test": [
@@ -1928,17 +1928,17 @@
             "path": "tests/test_grant_submission_readiness_audit.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "166142796a5bfa06d89d50fdd59fb07f64b0ac28",
-            "bytes": 2782,
-            "sha256": "e0eefe0247a4ec0883eb276e0710f12d67a88c83f14fa6ed45662b5662ff5d83"
+            "git_blob_sha": "35dd1ccae1337ce8e88d0f21f283b758fc66c702",
+            "bytes": 2709,
+            "sha256": "99d72ace0ddc27043a4cf728bbbaec4ced4cdaddde1041404e089cc9286405c7"
           },
           {
             "path": "tests/test_grant_dashboard_status_feed.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "86dfdfa2bf10c2677bc31b30023f396138c3f18b",
-            "bytes": 4212,
-            "sha256": "b6b3bf63ffd89183853e5035be2e2b557f1a0da5a41322ccd05ecad34ffa1ac1"
+            "git_blob_sha": "019d4bb9c7e2cf8cb101cee36055db9e744fa018",
+            "bytes": 4109,
+            "sha256": "b746f297ec9deecd3c7bb57ee377476599029c98aadfcc635a37743be17ce124"
           }
         ],
         "documentation": [
@@ -1946,9 +1946,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "2304bc799845998a10a7846debda700396fd2306",
-            "bytes": 4065,
-            "sha256": "a8f60f2941b8dcec57be2e979f6716a39787eebafe3c51dc452c2023705ab957"
+            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
+            "bytes": 3968,
+            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
           }
         ],
         "artifact": [
@@ -1956,9 +1956,9 @@
             "path": "dashboard/data/grant_readiness_status.json",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "82c40d8e768358bb5e2d00c17aa92838d9026c8f",
-            "bytes": 16948,
-            "sha256": "6af28e80f31784b79f5e81d11961cc7ceac8e2956ca9645cfb33f06c0c2d7a12"
+            "git_blob_sha": "9b95cc930195231458891971adb6d8b9feec8759",
+            "bytes": 16550,
+            "sha256": "c4064700755304b64742f825a6a51b77e4ca24621386fec38a8ff20a30198fb3"
           }
         ],
         "public_surface": [
@@ -1966,9 +1966,9 @@
             "path": "dashboard/grants.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "b79c089d9f644f01f678414903457f1504a42145",
-            "bytes": 2679,
-            "sha256": "fcec94c52039f05b6af0cc0105ef6bf4f725a90f70dd82558d4e6eca7c7767a5"
+            "git_blob_sha": "3378ab04089c020580c99aa223e9c95a5a2d457c",
+            "bytes": 2638,
+            "sha256": "58abca9e8d0ed8e52d0b386c75e8978310b21a9a7b10335b4710b4f0a0b09f1f"
           }
         ]
       }
@@ -1986,6 +1986,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "a5933c692a30d31b300df87ad79ecb5f3c721c34666870fa7e665f5b40a74f9a"
+    "payload_sha256": "237d776f9a1dddabdce5ed68f919e368854cf4130156b1badf8abaf254c3d659"
   }
 }

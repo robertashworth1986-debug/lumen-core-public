@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 import re
@@ -211,6 +212,22 @@ def test_audit_uses_tracked_repository_evidence(module, inputs):
     assert tracked_records
     assert all(len(record["git_blob_sha"]) == 40 for record in tracked_records)
     assert all(len(record["sha256"]) == 64 for record in tracked_records)
+
+
+def test_tracked_evidence_uses_canonical_git_blob_bytes(module):
+    tracked = module.tracked_repository_objects()
+    path = "EVIDENCE_INDEX.md"
+    record = module.current_blob_record(path, tracked)
+    canonical = subprocess.run(
+        ["git", "cat-file", "blob", tracked[path]],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+    ).stdout
+
+    assert record["git_blob_sha"] == tracked[path]
+    assert record["bytes"] == len(canonical)
+    assert record["sha256"] == hashlib.sha256(canonical).hexdigest()
 
 
 def test_public_payload_excludes_private_drive_and_branch_inventory(module, inputs):

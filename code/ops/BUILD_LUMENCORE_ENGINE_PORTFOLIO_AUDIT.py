@@ -180,9 +180,37 @@ def current_blob_record(path: str, tracked: dict[str, str]) -> dict[str, Any]:
     is_tracked = path in tracked
     blob = absolute.read_bytes() if exists else None
     current_blob_sha = None
-    if blob is not None:
-        header = f"blob {len(blob)}\0".encode("ascii")
-        current_blob_sha = hashlib.sha1(header + blob).hexdigest()
+    if exists and is_tracked:
+        index_blob_sha = tracked[path]
+        candidates = [blob]
+        lf_blob = blob.replace(b"\r\n", b"\n")
+        if lf_blob != blob:
+            candidates.append(lf_blob)
+        for candidate in candidates:
+            header = f"blob {len(candidate)}\0".encode("ascii")
+            if hashlib.sha1(header + candidate).hexdigest() == index_blob_sha:
+                blob = candidate
+                break
+        else:
+            filtered = subprocess.run(
+                ["git", "hash-object", "--", path],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            if filtered != index_blob_sha:
+                raise ValueError(
+                    f"{path}: tracked evidence differs from the Git index; "
+                    "stage the intended evidence before rebuilding the audit"
+                )
+            blob = subprocess.run(
+                ["git", "cat-file", "blob", index_blob_sha],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+            ).stdout
+        current_blob_sha = index_blob_sha
     return {
         "path": path,
         "exists": exists,
