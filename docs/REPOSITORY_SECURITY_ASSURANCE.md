@@ -14,7 +14,7 @@ production secrets, network controls, or a deployed container image.
 
 | Surface | Control | Trigger | Failure meaning |
 |---|---|---|---|
-| Python and JavaScript/TypeScript source | CodeQL `security-extended` queries with the action pinned to an immutable commit | Pull request, push to `main`, weekly schedule, manual run | The analysis job or SARIF upload did not complete. A successful job does not mean zero vulnerabilities. |
+| Python and JavaScript/TypeScript source | CodeQL `security-extended` queries with action v4.37.8 pinned to immutable commit `db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28` | Pull request, push to `main`, weekly schedule, manual run | The analysis job or SARIF upload did not complete. A successful job does not mean zero vulnerabilities. |
 | Declared dependency changes | GitHub dependency review pinned to an immutable commit | Pull request | The proposed change introduces a high or critical advisory in a runtime or development dependency, or the review could not complete. |
 | Current dashboard dependency set | Lockfile remediation for GHSA-fgmj-fm8m-jvvx and GHSA-hmw2-7cc7-3qxx | Install, audit, verifier, and pull-request checks | The lock resolves ECharts 6.1.0, ECharts GL 2.1.0, form-data 4.0.6, and a peer-compatible Three.js set. Alert closure still depends on the default branch ingesting the merged lockfile. |
 | Dependency maintenance | Dependabot version-update proposals | Weekly | An update proposal may still require compatibility testing and human review. Nothing is auto-merged. |

@@ -113,7 +113,8 @@ BRANCH_PROTECTION_FIELDS = {
     "required_pull_request_reviews_enforced",
     "decision",
 }
-CODEQL_SHA = "5595ccaf912efad79be6eef63a5619ff05969be3"
+CODEQL_VERSION = "4.37.8"
+CODEQL_SHA = "db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28"
 DEPENDENCY_REVIEW_SHA = "a1d282b36b6f3519aa1f3fc636f609c47dddb294"
 
 
@@ -203,8 +204,8 @@ def verify_codeql_workflow(text: str) -> None:
         "javascript-typescript",
         "build-mode: none",
         "queries: security-extended",
-        f"github/codeql-action/init@{CODEQL_SHA}",
-        f"github/codeql-action/analyze@{CODEQL_SHA}",
+        f"github/codeql-action/init@{CODEQL_SHA} # v{CODEQL_VERSION}",
+        f"github/codeql-action/analyze@{CODEQL_SHA} # v{CODEQL_VERSION}",
         "persist-credentials: false",
     )
     for marker in required:
@@ -504,6 +505,9 @@ def verify_register(
         "workflow_boundaries": {
             "codeql_languages": ["javascript-typescript", "python"],
             "codeql_queries": "security-extended",
+            "codeql_action_version": f"v{CODEQL_VERSION}",
+            "codeql_action_commit": CODEQL_SHA,
+            "codeql_action_immutable_pin": True,
             "dependency_failure_threshold": "high",
             "automatic_merge": False,
             "runtime_scan": False,

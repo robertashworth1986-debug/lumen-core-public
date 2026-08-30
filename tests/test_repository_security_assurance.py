@@ -41,6 +41,17 @@ class RepositorySecurityAssuranceTests(unittest.TestCase):
         self.assertEqual(receipt["claim_boundary_count"], 11)
         self.assertFalse(receipt["workflow_boundaries"]["automatic_merge"])
         self.assertFalse(receipt["workflow_boundaries"]["runtime_scan"])
+        self.assertEqual(
+            receipt["workflow_boundaries"]["codeql_action_version"],
+            "v4.37.8",
+        )
+        self.assertEqual(
+            receipt["workflow_boundaries"]["codeql_action_commit"],
+            "db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28",
+        )
+        self.assertTrue(
+            receipt["workflow_boundaries"]["codeql_action_immutable_pin"]
+        )
         self.assertTrue(
             receipt["workflow_boundaries"]["secret_scanning_enabled"]
         )
@@ -168,6 +179,14 @@ class RepositorySecurityAssuranceTests(unittest.TestCase):
         )
         text = text.replace("security-events: write", "security-events: read")
         with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "security-events"):
+            MODULE.verify_codeql_workflow(text)
+
+    def test_codeql_version_comment_must_match_immutable_pin(self) -> None:
+        text = (ROOT / ".github" / "workflows" / "codeql.yml").read_text(
+            encoding="utf-8"
+        )
+        text = text.replace("# v4.37.8", "# v4.37.7", 1)
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "CodeQL"):
             MODULE.verify_codeql_workflow(text)
 
     def test_dependency_gate_threshold_cannot_be_weakened(self) -> None:
