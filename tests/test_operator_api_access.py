@@ -278,23 +278,48 @@ class OperatorApiAccessTests(unittest.TestCase):
             app,
             token_provider=lambda: ("socket-secret-0000000000000000000",),
         )
-        blocked = _invoke(
-            middleware,
-            _scope("/ws/live", scope_type="websocket"),
-        )
-        allowed = _invoke(
-            middleware,
-            _scope(
-                "/ws/live",
-                scope_type="websocket",
-                headers=[
-                    (b"authorization", b"Bearer socket-secret-0000000000000000000")
-                ],
-            ),
-        )
-        self.assertEqual(blocked, [{"type": "websocket.close", "code": 4401}])
-        self.assertEqual(allowed, [{"type": "websocket.accept"}])
-        self.assertEqual(len(app.calls), 1)
+
+        for path in ("/ws", "/ws/live", "/ws/future-feed"):
+            with self.subTest(path=path, credential="missing"):
+                blocked = _invoke(
+                    middleware,
+                    _scope(path, scope_type="websocket"),
+                )
+                self.assertEqual(
+                    blocked,
+                    [{"type": "websocket.close", "code": 4401}],
+                )
+            with self.subTest(path=path, credential="valid"):
+                allowed = _invoke(
+                    middleware,
+                    _scope(
+                        path,
+                        scope_type="websocket",
+                        headers=[
+                            (
+                                b"authorization",
+                                b"Bearer socket-secret-0000000000000000000",
+                            )
+                        ],
+                    ),
+                )
+                self.assertEqual(allowed, [{"type": "websocket.accept"}])
+
+        self.assertEqual(len(app.calls), 3)
+
+    def test_websocket_root_matching_does_not_overblock_nearby_paths(self) -> None:
+        app = _ProbeApp()
+        middleware = OperatorApiAccessMiddleware(app, token_provider=lambda: ())
+
+        for path in ("/wss", "/ws-live", "/websocket"):
+            with self.subTest(path=path):
+                allowed = _invoke(
+                    middleware,
+                    _scope(path, scope_type="websocket"),
+                )
+                self.assertEqual(allowed, [{"type": "websocket.accept"}])
+
+        self.assertEqual(len(app.calls), 3)
 
     def test_query_string_and_legacy_header_do_not_carry_operator_secrets(self) -> None:
         secret = "query-secret-00000000000000000000"
