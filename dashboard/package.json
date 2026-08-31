@@ -19,7 +19,7 @@
     "gsap": "^3.15.0",
     "postprocessing": "^6.39.4",
     "stats.js": "^0.17.0",
-    "three": "^0.183.2"
+    "three": "^0.185.1"
   },
   "overrides": {
     "form-data": "4.0.6"
