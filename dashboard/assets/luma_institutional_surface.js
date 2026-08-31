@@ -423,6 +423,79 @@
         lattice.add(ring);
       });
 
+      // Recursive proof clusters translate the supplied nested-sphere visual
+      // language into a deterministic custody model. They remain decorative:
+      // no cluster count, scale, motion, or color is an observed system metric.
+      var recursiveProofClusters = new THREE.Group();
+      var proofClusterGroups = [];
+      var proofCellMeshes = [];
+      var proofCellSeeds = [];
+      var proofCellGeometry = new THREE.IcosahedronGeometry(0.095, weakDevice ? 0 : 1);
+      var proofClusterProfiles = [
+        { center: [-2.92, -1.95, -1.25], radius: 0.34, cells: weakDevice ? 12 : 22, scale: 0.62, color: 0x66f6df },
+        { center: [-0.05, -2.0, -1.65], radius: 0.58, cells: weakDevice ? 24 : 46, scale: 0.78, color: 0x72aaff },
+        { center: [2.82, -1.9, -1.3], radius: 0.8, cells: weakDevice ? 38 : 78, scale: 0.92, color: 0xbd8cff },
+      ];
+      var goldenAngle = Math.PI * (3 - Math.sqrt(5));
+
+      proofClusterProfiles.forEach(function (profile, profileIndex) {
+        var cluster = new THREE.Group();
+        cluster.position.set(profile.center[0], profile.center[1], profile.center[2]);
+        var cellMaterial = new THREE.MeshBasicMaterial({
+          color: profile.color,
+          transparent: true,
+          opacity: 0.34 - profileIndex * 0.025,
+          wireframe: true,
+          depthWrite: false,
+          blending: THREE.NormalBlending,
+        });
+        var cells = new THREE.InstancedMesh(proofCellGeometry, cellMaterial, profile.cells);
+        var cellTransform = new THREE.Object3D();
+        for (var cellIndex = 0; cellIndex < profile.cells; cellIndex += 1) {
+          var normalizedY = 1 - (2 * (cellIndex + 0.5)) / profile.cells;
+          var radial = Math.sqrt(Math.max(0, 1 - normalizedY * normalizedY));
+          var cellAngle = cellIndex * goldenAngle;
+          var shellRadius = profile.radius * (0.89 + 0.11 * Math.sin(cellIndex * 2.17));
+          cellTransform.position.set(
+            Math.cos(cellAngle) * radial * shellRadius,
+            normalizedY * shellRadius,
+            Math.sin(cellAngle) * radial * shellRadius
+          );
+          cellTransform.rotation.set(cellAngle * 0.09, cellAngle * 0.13, cellAngle * 0.05);
+          cellTransform.scale.setScalar(profile.scale * (0.82 + (cellIndex % 5) * 0.055));
+          cellTransform.updateMatrix();
+          cells.setMatrixAt(cellIndex, cellTransform.matrix);
+        }
+        cells.instanceMatrix.needsUpdate = true;
+        cells.userData.fullCount = profile.cells;
+        cluster.add(cells);
+
+        var seed = new THREE.Mesh(
+          new THREE.TorusKnotGeometry(
+            profile.radius * 0.31,
+            profile.radius * 0.055,
+            weakDevice ? 32 : 72,
+            weakDevice ? 5 : 7,
+            2,
+            3
+          ),
+          new THREE.MeshBasicMaterial({
+            color: profile.color,
+            transparent: true,
+            opacity: 0.74,
+            wireframe: true,
+            depthWrite: false,
+            blending: THREE.NormalBlending,
+          })
+        );
+        cluster.add(seed);
+        proofClusterGroups.push(cluster);
+        proofCellMeshes.push(cells);
+        proofCellSeeds.push(seed);
+        recursiveProofClusters.add(cluster);
+      });
+      scene.add(recursiveProofClusters);
+
       var random = makeDeterministicRandom(1618033988);
       var particleCount = weakDevice ? 150 : 360;
       var particlePositions = new Float32Array(particleCount * 3);
@@ -650,6 +723,16 @@
           ring.rotation.z += (index % 2 === 0 ? 1 : -1) * 0.00045 * (weakDevice ? 1.2 : 1);
         });
 
+        proofClusterGroups.forEach(function (cluster, index) {
+          cluster.rotation.y = time * (0.055 + index * 0.018) * (index % 2 === 0 ? 1 : -1);
+          cluster.rotation.z = Math.sin(time * 0.21 + index) * 0.09;
+          proofCellSeeds[index].rotation.x = time * (0.13 + index * 0.025);
+          proofCellSeeds[index].rotation.y = -time * (0.16 + index * 0.02);
+          proofCellMeshes[index].material.opacity = 0.28
+            + Math.sin(time * 0.7 + index * 1.7) * 0.035;
+        });
+        recursiveProofClusters.position.y = Math.sin(time * 0.18) * 0.025;
+
         nodeMeshes.forEach(function (node, index) {
           var active = index === activeIndex;
           var scale = active ? 1.75 + Math.sin(time * 4.2) * 0.18 : 1;
@@ -695,6 +778,9 @@
               particleGeometry.setDrawRange(0, Math.floor(particleCount * 0.58));
               farStars.geometry.setDrawRange(0, 520);
               nearStars.geometry.setDrawRange(0, 120);
+              proofCellMeshes.forEach(function (cells) {
+                cells.count = Math.max(8, Math.floor(cells.userData.fullCount * 0.58));
+              });
               viewport.dataset.quality = "adaptive";
               if (modeLabel) modeLabel.textContent = "DEEP SPACE / ADAPTIVE GPU";
               resize();
@@ -864,6 +950,34 @@
       };
     });
 
+    var recursiveClusterProfiles = [
+      { center: { x: -2.92, y: -1.95, z: -1.25 }, radius: 0.34, count: weakDevice ? 8 : 14, size: 0.62, color: "#66f6df" },
+      { center: { x: -0.05, y: -2.0, z: -1.65 }, radius: 0.58, count: weakDevice ? 16 : 30, size: 0.78, color: "#72aaff" },
+      { center: { x: 2.82, y: -1.9, z: -1.3 }, radius: 0.8, count: weakDevice ? 26 : 52, size: 0.92, color: "#bd8cff" },
+    ];
+    var recursiveCellClusters = recursiveClusterProfiles.map(function (cluster, clusterIndex) {
+      var cells = Array.from({ length: cluster.count }, function (_, cellIndex) {
+        var normalizedY = 1 - (2 * (cellIndex + 0.5)) / cluster.count;
+        var radial = Math.sqrt(Math.max(0, 1 - normalizedY * normalizedY));
+        var cellAngle = cellIndex * Math.PI * (3 - Math.sqrt(5));
+        var shellRadius = cluster.radius * (0.89 + 0.11 * Math.sin(cellIndex * 2.17));
+        return {
+          x: Math.cos(cellAngle) * radial * shellRadius,
+          y: normalizedY * shellRadius,
+          z: Math.sin(cellAngle) * radial * shellRadius,
+          phase: cellAngle,
+        };
+      });
+      return {
+        center: cluster.center,
+        radius: cluster.radius,
+        size: cluster.size,
+        color: cluster.color,
+        index: clusterIndex,
+        cells: cells,
+      };
+    });
+
     var width = 1;
     var height = 1;
     var pixelRatio = 1;
@@ -978,6 +1092,52 @@
         context.fillStyle = particle.phase > Math.PI ? "#72aaff" : "#66f6df";
         context.globalAlpha = Math.max(0.06, pulse * (0.34 + rotated.z * 0.035));
         context.fill();
+      });
+
+      recursiveCellClusters.forEach(function (cluster) {
+        var localAngle = time * (0.34 + cluster.index * 0.08)
+          * (cluster.index % 2 === 0 ? 1 : -1);
+        var projectedCells = cluster.cells.map(function (cell) {
+          var local = rotate(cell, localAngle, localAngle * 0.37, localAngle * 0.16);
+          var world = {
+            x: cluster.center.x + local.x,
+            y: cluster.center.y + local.y,
+            z: cluster.center.z + local.z,
+          };
+          return project(rotate(world, angleY * 0.06, angleX * 0.12, angleZ * 0.1));
+        }).sort(function (a, b) { return a.z - b.z; });
+
+        projectedCells.forEach(function (point, cellIndex) {
+          var cellRadius = Math.max(
+            1.1,
+            cluster.size * Math.min(width, height) * 0.0095 * point.scale
+          );
+          context.beginPath();
+          context.arc(point.x, point.y, cellRadius, 0, Math.PI * 2);
+          context.fillStyle = cluster.color;
+          context.globalAlpha = 0.055 + Math.max(0, point.z + 2) * 0.012;
+          context.fill();
+          context.strokeStyle = cluster.color;
+          context.lineWidth = 0.55;
+          context.globalAlpha = 0.2 + (cellIndex % 4) * 0.025;
+          context.stroke();
+        });
+
+        var rotatedCenter = project(rotate(cluster.center, angleY * 0.06, angleX * 0.12, angleZ * 0.1));
+        for (var spiralIndex = 1; spiralIndex <= 3; spiralIndex += 1) {
+          context.beginPath();
+          context.arc(
+            rotatedCenter.x,
+            rotatedCenter.y,
+            cluster.radius * spiralIndex * 3.6 * rotatedCenter.scale,
+            localAngle + spiralIndex * 0.42,
+            localAngle + Math.PI * (0.78 + spiralIndex * 0.34)
+          );
+          context.strokeStyle = cluster.color;
+          context.lineWidth = 0.7;
+          context.globalAlpha = 0.34 - spiralIndex * 0.055;
+          context.stroke();
+        }
       });
 
       drawRing(angleY, angleX + 1.18, angleZ, 2.55, "#66f6df", 0.21);

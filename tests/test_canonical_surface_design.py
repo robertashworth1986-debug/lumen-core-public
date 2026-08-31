@@ -178,8 +178,14 @@ def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced()
     assert "THREE.ShaderMaterial" in shared_js
     assert "THREE.AdditiveBlending" in shared_js
     assert "THREE.IcosahedronGeometry" in shared_js
+    assert "THREE.InstancedMesh" in shared_js
+    assert "THREE.TorusKnotGeometry" in shared_js
     assert "THREE.Points" in shared_js
     assert "makeDeepStarField" in shared_js
+    assert "recursiveProofClusters" in shared_js
+    assert "recursiveCellClusters" in shared_js
+    assert "proofCellMeshes" in shared_js
+    assert "cells.userData.fullCount" in shared_js
     assert 'modeLabel.textContent = "DEEP SPACE / WEBGL MODEL"' in shared_js
     assert "updateProofLatticeStep" in shared_js
     assert "bindProofLatticeControls" in shared_js
@@ -188,6 +194,8 @@ def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced()
     assert 'viewport.dataset.quality = "adaptive"' in shared_js
     assert "deliveredFps < 28" in shared_js
     assert "not a scientific result or validation claim" in home
+    assert "Recursive custody clusters" in home
+    assert "Procedural recursive geometry" in home
     assert 'canvas.getContext("2d"' in shared_js
     assert "prefers-reduced-motion: reduce" in shared_js
     assert "connection.saveData" in shared_js
