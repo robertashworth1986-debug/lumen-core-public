@@ -72,6 +72,13 @@
     </div>
   </nav>
 
+  <aside class="lis-proofline" role="note" aria-label="Evidence and authority posture">
+    <span>Decision fabric</span>
+    <span data-tone="good"><small>Evidence class</small><strong>First-party · replayable</strong></span>
+    <span data-tone="paper"><small>Runtime boundary</small><strong>Public review surface</strong></span>
+    <span data-tone="warn"><small>Authority</small><strong>Pilot and promotion human-gated</strong></span>
+  </aside>
+
   <section class="hero">
     <div class="panel hero-main">
       <div class="eyebrow">Proof-backed decision infrastructure</div>
@@ -255,7 +262,50 @@
     <a class="btn primary" href="/proof_to_pilot.html">Open the primary offer</a>
   </section>
 </main>
-<script src="./assets/vendor/three.min.js"></script>
+<script data-luma-three-loader>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  var reducedMotion = window.matchMedia
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var saveData = Boolean(connection && connection.saveData);
+  var effectiveType = String(connection && connection.effectiveType || "").toLowerCase();
+  var lowMemory = Boolean(navigator.deviceMemory && navigator.deviceMemory < 4);
+  var lowCore = Boolean(navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4);
+  var constrained = reducedMotion || saveData || lowMemory || lowCore
+    || effectiveType === "slow-2g" || effectiveType === "2g";
+
+  function complete(outcome) {
+    root.dataset.lumaWebglPending = "false";
+    root.dataset.lumaWebglBootstrap = outcome;
+    window.dispatchEvent(new CustomEvent("luma:three-ready", { detail: { outcome: outcome } }));
+  }
+
+  if (constrained) {
+    root.dataset.lumaWebglBootstrap = "constrained";
+    return;
+  }
+
+  root.dataset.lumaWebglPending = "true";
+  function loadVerifiedThree() {
+    var script = document.createElement("script");
+    script.src = "./assets/vendor/three.min.js";
+    script.async = true;
+    script.integrity = "sha384-qOkzR5Ke/XkQxuGVJ9hpFEpDlcoLtWwVYhnJf06cLIZa2vaIptSqaubivErzmD5O";
+    script.crossOrigin = "anonymous";
+    script.onload = function () { complete("verified"); };
+    script.onerror = function () { complete("failed"); };
+    document.head.appendChild(script);
+  }
+
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(loadVerifiedThree, { timeout: 450 });
+  } else {
+    window.setTimeout(loadVerifiedThree, 0);
+  }
+})();
+</script>
 <script src="./assets/luma_institutional_surface.js"></script>
 <script src="./assets/luma_command_fabric.js"></script>
 <script>

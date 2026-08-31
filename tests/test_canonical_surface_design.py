@@ -1,3 +1,4 @@
+import hashlib
 from pathlib import Path
 
 
@@ -152,6 +153,15 @@ def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced()
     assert 'class="lis-lattice-webgl-canvas"' in home
     assert 'class="lis-lattice-canvas"' in home
     assert "assets/vendor/three.min.js" in home
+    assert 'data-luma-three-loader' in home
+    assert 'script.async = true' in home
+    assert 'connection.effectiveType' in home
+    assert 'navigator.deviceMemory < 4' in home
+    assert 'navigator.hardwareConcurrency < 4' in home
+    assert 'requestIdleCallback' in home
+    assert 'luma:three-ready' in home
+    assert 'sha384-qOkzR5Ke/XkQxuGVJ9hpFEpDlcoLtWwVYhnJf06cLIZa2vaIptSqaubivErzmD5O' in home
+    assert home.index('class="lis-proofline"') < home.index('class="hero"')
     assert '<button type="button" data-lattice-step="0" aria-pressed="false">Source</button>' in home
     assert 'class="lis-lattice-readout" aria-live="polite"' in home
     assert "Source" in home
@@ -181,6 +191,8 @@ def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced()
     assert 'canvas.getContext("2d"' in shared_js
     assert "prefers-reduced-motion: reduce" in shared_js
     assert "connection.saveData" in shared_js
+    assert 'dataset.lumaWebglPending === "true"' in shared_js
+    assert 'DEEP SPACE / INITIALIZING' in shared_js
     assert "navigator.deviceMemory" in shared_js
     assert "navigator.hardwareConcurrency" in shared_js
     assert '"ResizeObserver" in window' in shared_js
@@ -196,6 +208,15 @@ def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced()
     assert ".lis-lattice-viewport" in shared_css
     assert ".lis-lattice-webgl-canvas" in shared_css
     assert ".lis-lattice-canvas" in shared_css
+
+
+def test_three_dependency_is_byte_stable_and_sri_bound():
+    asset = DASHBOARD / "assets" / "vendor" / "three.min.js"
+    readme = (asset.parent / "README.md").read_text(encoding="utf-8")
+    digest = hashlib.sha256(asset.read_bytes()).hexdigest()
+    assert digest == "170c6789f43217c96b3170f4b42fafe135de7f7cd48497a4218f9757ee1d49fa"
+    assert digest in readme
+    assert "sha384-qOkzR5Ke/XkQxuGVJ9hpFEpDlcoLtWwVYhnJf06cLIZa2vaIptSqaubivErzmD5O" in readme
 
 
 def test_public_browser_path_uses_only_minimal_public_runtime_contracts():

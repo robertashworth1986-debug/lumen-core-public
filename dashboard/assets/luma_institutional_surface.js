@@ -786,6 +786,13 @@
     var modeLabel = stage.querySelector("[data-lattice-mode]");
     if (!viewport || !canvas) return;
 
+    var webglPending = document.documentElement.dataset.lumaWebglPending === "true";
+    if (webglPending && !window.THREE) {
+      viewport.dataset.mode = "pending";
+      if (modeLabel) modeLabel.textContent = "DEEP SPACE / INITIALIZING";
+      return;
+    }
+
     var reducedMotion = window.matchMedia
       && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -1123,6 +1130,7 @@
     insertProofline();
     enforcePublicReview();
     repairStaticRoutes();
+    window.addEventListener("luma:three-ready", mountProofLattice, { once: true });
     mountProofLattice();
 
     if (surface === "grants" && publicReview) {
