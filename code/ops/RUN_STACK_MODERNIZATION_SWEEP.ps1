@@ -272,7 +272,6 @@ $recommended = @(
     [PSCustomObject]@{ name = 'gsap'; category = 'motion'; reason = 'Timeline animation engine' },
     [PSCustomObject]@{ name = 'echarts'; category = 'viz'; reason = 'High-density charting' },
     [PSCustomObject]@{ name = 'echarts-gl'; category = 'viz-3d'; reason = '3D charting for dense telemetry' },
-    [PSCustomObject]@{ name = '@google/model-viewer'; category = '3d-viewer'; reason = 'Web component 3D model viewing' },
     [PSCustomObject]@{ name = 'animejs'; category = 'motion'; reason = 'Cinematic motion choreography' },
     [PSCustomObject]@{ name = 'stats.js'; category = 'perf'; reason = 'Runtime FPS and performance telemetry' },
     [PSCustomObject]@{ name = '@xenova/transformers'; category = 'ai-browser'; reason = 'On-device browser AI inference' }

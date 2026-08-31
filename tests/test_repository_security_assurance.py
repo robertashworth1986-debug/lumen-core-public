@@ -36,6 +36,7 @@ class RepositorySecurityAssuranceTests(unittest.TestCase):
     def test_current_repository_emits_bounded_receipt(self) -> None:
         receipt = self.verify_payload(self.canonical_payload())
         self.assertTrue(receipt["valid"])
+        self.assertEqual(receipt["schema_version"], "1.1")
         self.assertEqual(receipt["production_decision"], "HOLD")
         self.assertEqual(receipt["control_count"], 8)
         self.assertEqual(receipt["claim_boundary_count"], 11)
@@ -60,6 +61,29 @@ class RepositorySecurityAssuranceTests(unittest.TestCase):
             receipt["workflow_boundaries"][
                 "default_branch_protection_enforced"
             ]
+        )
+        dependency_contract = receipt["dashboard_dependency_contract"]
+        self.assertEqual(
+            dependency_contract["locked_versions"]["animejs"], "4.5.0"
+        )
+        self.assertEqual(
+            dependency_contract["locked_versions"]["three"], "0.185.1"
+        )
+        self.assertEqual(
+            dependency_contract["compatibility_decision"],
+            "REMOVE_UNUSED_INCOMPATIBLE_MODEL_VIEWER_AND_ACCEPT_STRICT_THREE_0_185_1_GRAPH",
+        )
+        self.assertEqual(
+            dependency_contract["install_policy"],
+            "STRICT_NPM_PEER_RESOLUTION_NO_FORCE_OR_LEGACY_BYPASS",
+        )
+        self.assertTrue(
+            dependency_contract["animejs_three_adapter_smoke_required"]
+        )
+        self.assertTrue(dependency_contract["incompatible_model_viewer_absent"])
+        self.assertEqual(
+            dependency_contract["runtime_claim_boundary"],
+            "DECLARED_NPM_GRAPH_VALIDATED_WITHOUT_CLAIMING_DEPLOYED_VISUAL_ASSET_REPLACEMENT",
         )
         self.assertEqual(len(receipt["receipt_sha256"]), 64)
 
@@ -194,7 +218,235 @@ class RepositorySecurityAssuranceTests(unittest.TestCase):
     def test_known_dashboard_dependency_versions_are_locked(self) -> None:
         package = MODULE.read_json(ROOT / "dashboard" / "package.json")
         lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
-        MODULE.verify_dashboard_dependencies(package, lock)
+        contract = MODULE.verify_dashboard_dependencies(package, lock)
+        self.assertEqual(contract["manifest_ranges"]["animejs"], "^4.5.0")
+        self.assertEqual(contract["manifest_ranges"]["three"], "^0.185.1")
+        self.assertEqual(
+            contract["peer_contracts"]["postprocessing"]["three"],
+            ">= 0.168.0 < 0.186.0",
+        )
+        self.assertNotIn("@google/model-viewer", package["dependencies"])
+
+    def test_dashboard_manifest_and_lock_root_must_match(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        lock["packages"][""]["dependencies"]["animejs"] = "^4.4.1"
+        with self.assertRaisesRegex(
+            MODULE.SecurityAssuranceError, "manifest and lockfile root|diverge"
+        ):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_animejs_downgrade_is_rejected(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        lock["packages"]["node_modules/animejs"]["version"] = "4.4.1"
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "animejs"):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_three_downgrade_is_rejected(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        package["dependencies"]["three"] = "^0.183.2"
+        lock["packages"][""]["dependencies"]["three"] = "^0.183.2"
+        lock["packages"]["node_modules/three"]["version"] = "0.183.2"
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "three"):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_animejs_manifest_range_drift_is_rejected(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        package["dependencies"]["animejs"] = "^4.4.1"
+        lock["packages"][""]["dependencies"]["animejs"] = "^4.4.1"
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "animejs"):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_postprocessing_three_peer_upper_bound_drift_is_rejected(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        lock["packages"]["node_modules/postprocessing"]["peerDependencies"][
+            "three"
+        ] = ">= 0.168.0 < 0.185.0"
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "postprocessing"):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_expected_three_peer_package_removal_is_rejected(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        del lock["packages"]["node_modules/postprocessing"]["peerDependencies"][
+            "three"
+        ]
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "peer package set"):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_model_viewer_manifest_reintroduction_is_rejected(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        package["dependencies"]["@google/model-viewer"] = "^4.3.1"
+        with self.assertRaisesRegex(
+            MODULE.SecurityAssuranceError, "model-viewer.*reintroduced"
+        ):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_model_viewer_lock_reintroduction_is_rejected(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        lock["packages"]["node_modules/@google/model-viewer"] = {
+            "version": "4.3.1",
+            "peerDependencies": {"three": "^0.183.0"},
+        }
+        with self.assertRaisesRegex(
+            MODULE.SecurityAssuranceError, "model-viewer.*lock.*reintroduced"
+        ):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_unexpected_three_peer_package_is_rejected(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        lock["packages"]["node_modules/unreviewed-three-plugin"] = {
+            "version": "1.0.0",
+            "peerDependencies": {"three": ">=0.1.0"},
+        }
+        with self.assertRaisesRegex(
+            MODULE.SecurityAssuranceError, "unexpected.*Three.js peer package"
+        ):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_animejs_three_adapter_peer_contract_cannot_drift(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        lock["packages"]["node_modules/animejs"]["peerDependencies"][
+            "three"
+        ] = ">=0.185.0"
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "animejs.*three"):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_dashboard_registry_provenance_is_required(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        lock["packages"]["node_modules/animejs"]["resolved"] = (
+            "https://example.invalid/animejs-4.5.0.tgz"
+        )
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "source drift"):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_dashboard_sha512_integrity_is_required(self) -> None:
+        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+        lock["packages"]["node_modules/three"]["integrity"] = "sha512-not-base64"
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "integrity"):
+            MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_security_workflow_uses_strict_peer_resolution(self) -> None:
+        text = (
+            ROOT / ".github" / "workflows" / "repository-security-assurance.yml"
+        ).read_text(encoding="utf-8")
+        MODULE.verify_repository_security_workflow(text)
+        weakened = text.replace(
+            MODULE.STRICT_NPM_CI_COMMAND,
+            "npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund",
+        )
+        with self.assertRaisesRegex(
+            MODULE.SecurityAssuranceError, "peer resolution"
+        ):
+            MODULE.verify_repository_security_workflow(weakened)
+
+    def test_security_workflow_rejects_environment_legacy_peer_mode(self) -> None:
+        text = (
+            ROOT / ".github" / "workflows" / "repository-security-assurance.yml"
+        ).read_text(encoding="utf-8")
+        weakened = text.replace(
+            "working-directory: dashboard",
+            "working-directory: dashboard\n        env:\n          NPM_CONFIG_LEGACY_PEER_DEPS: true",
+        )
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "bypass"):
+            MODULE.verify_repository_security_workflow(weakened)
+
+    def test_security_workflow_rejects_environment_force_mode(self) -> None:
+        text = (
+            ROOT / ".github" / "workflows" / "repository-security-assurance.yml"
+        ).read_text(encoding="utf-8")
+        weakened = text.replace(
+            "working-directory: dashboard",
+            "working-directory: dashboard\n        env:\n          NPM_CONFIG_FORCE: true",
+        )
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "bypass"):
+            MODULE.verify_repository_security_workflow(weakened)
+
+    def test_security_workflow_rejects_alternate_force_order_and_decoy(self) -> None:
+        text = (
+            ROOT / ".github" / "workflows" / "repository-security-assurance.yml"
+        ).read_text(encoding="utf-8")
+        weakened = text.replace(
+            MODULE.STRICT_NPM_CI_COMMAND,
+            f"# {MODULE.STRICT_NPM_CI_COMMAND}\n          npm --force ci --ignore-scripts --no-audit --no-fund",
+        )
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "peer resolution"):
+            MODULE.verify_repository_security_workflow(weakened)
+
+    def test_security_workflow_rejects_static_verification_time(self) -> None:
+        text = (
+            ROOT / ".github" / "workflows" / "repository-security-assurance.yml"
+        ).read_text(encoding="utf-8")
+        weakened = text.replace(
+            "--json-out out/repository-security-assurance/receipt.json",
+            "--verified-utc 2026-08-31T20:41:02Z "
+            "--json-out out/repository-security-assurance/receipt.json",
+        )
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "execution time"):
+            MODULE.verify_repository_security_workflow(weakened)
+
+    def test_security_workflow_watches_npmrc_and_modernization_inputs(self) -> None:
+        text = (
+            ROOT / ".github" / "workflows" / "repository-security-assurance.yml"
+        ).read_text(encoding="utf-8")
+        for watched_path in (
+            "      - '.npmrc'\n",
+            "      - 'dashboard/.npmrc'\n",
+            "      - 'code/ops/RUN_STACK_MODERNIZATION_SWEEP.ps1'\n",
+        ):
+            weakened = text.replace(watched_path, "", 1)
+            with self.subTest(watched_path=watched_path):
+                with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "watch"):
+                    MODULE.verify_repository_security_workflow(weakened)
+
+    def test_security_workflow_node_action_must_be_immutable(self) -> None:
+        text = (
+            ROOT / ".github" / "workflows" / "repository-security-assurance.yml"
+        ).read_text(encoding="utf-8")
+        weakened = text.replace(
+            f"actions/setup-node@{MODULE.SETUP_NODE_SHA} # v7.0.0",
+            "actions/setup-node@v7",
+        )
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "setup-node"):
+            MODULE.verify_repository_security_workflow(weakened)
+
+    def test_declared_graph_does_not_claim_vendored_visual_asset_upgrade(self) -> None:
+        dossier = (ROOT / "docs" / "REPOSITORY_SECURITY_ASSURANCE.md").read_text(
+            encoding="utf-8"
+        )
+        public_loader = (ROOT / "dashboard" / "assets" / "lumencore.js").read_text(
+            encoding="utf-8"
+        )
+        vendor_readme = (
+            ROOT / "dashboard" / "assets" / "vendor" / "README.md"
+        ).read_text(encoding="utf-8")
+        prooflock_three = (
+            ROOT
+            / "dashboard"
+            / "build_week"
+            / "prooflock_console"
+            / "three.core.min.js"
+        ).read_text(encoding="utf-8")
+        modernization = (
+            ROOT / "code" / "ops" / "RUN_STACK_MODERNIZATION_SWEEP.ps1"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("declared npm-graph repair", dossier)
+        self.assertIn("three@0.160.1", public_loader)
+        self.assertIn("Three.js `0.160.1`", vendor_readme)
+        self.assertIn('"184"', prooflock_three)
+        self.assertNotIn("three@0.185.1", public_loader)
+        self.assertNotIn("@google/model-viewer", modernization)
 
     def test_vulnerable_echarts_lock_is_rejected(self) -> None:
         package = MODULE.read_json(ROOT / "dashboard" / "package.json")
