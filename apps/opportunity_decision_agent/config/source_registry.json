@@ -1,0 +1,143 @@
+{
+  "schema": "lumencore.opportunity_agent_source_registry.v1",
+  "max_source_bytes": 2097152,
+  "policy_paths": {
+    "claim_boundary": "docs/CLAIM_BOUNDARY_REGISTER.md",
+    "ip_boundary": "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md"
+  },
+  "records": [
+    {
+      "record_ref": "fixture:draft-ready",
+      "path": "apps/opportunity_decision_agent/data/offline_eval_records.json",
+      "collection": "records",
+      "selector_key": "id",
+      "selector_value": "draft-ready",
+      "observed_pointer": "record.observed_utc",
+      "stale_after_hours": 168,
+      "evidence_paths": [
+        "apps/opportunity_decision_agent/data/offline_eval_records.json",
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md"
+      ]
+    },
+    {
+      "record_ref": "fixture:stale",
+      "path": "apps/opportunity_decision_agent/data/offline_eval_records.json",
+      "collection": "records",
+      "selector_key": "id",
+      "selector_value": "stale",
+      "observed_pointer": "record.observed_utc",
+      "stale_after_hours": 72,
+      "evidence_paths": [
+        "apps/opportunity_decision_agent/data/offline_eval_records.json",
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md"
+      ]
+    },
+    {
+      "record_ref": "fixture:missing-eligibility",
+      "path": "apps/opportunity_decision_agent/data/offline_eval_records.json",
+      "collection": "records",
+      "selector_key": "id",
+      "selector_value": "missing-eligibility",
+      "observed_pointer": "record.observed_utc",
+      "stale_after_hours": 168,
+      "evidence_paths": [
+        "apps/opportunity_decision_agent/data/offline_eval_records.json",
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md"
+      ]
+    },
+    {
+      "record_ref": "fixture:forbidden-action",
+      "path": "apps/opportunity_decision_agent/data/offline_eval_records.json",
+      "collection": "records",
+      "selector_key": "id",
+      "selector_value": "forbidden-action",
+      "observed_pointer": "record.observed_utc",
+      "stale_after_hours": 168,
+      "evidence_paths": [
+        "apps/opportunity_decision_agent/data/offline_eval_records.json",
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md"
+      ]
+    },
+    {
+      "record_ref": "deadline:DAF_CSDR_20260727",
+      "path": "evidence/opportunity/deadline_action_sentinel_latest.json",
+      "collection": "lanes",
+      "selector_key": "id",
+      "selector_value": "DAF_CSDR_20260727",
+      "observed_pointer": "document.evaluated_utc",
+      "stale_after_hours": 72,
+      "evidence_paths": [
+        "evidence/opportunity/deadline_action_sentinel_latest.json",
+        "evidence/opportunity/csdr_deadline_gate_2026-07-27.json",
+        "docs/CURRENT_FEDERAL_OPPORTUNITY_GATE_MAP_2026-07-26.md",
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md"
+      ]
+    },
+    {
+      "record_ref": "deadline:NSF_26_510_20260727",
+      "path": "evidence/opportunity/deadline_action_sentinel_latest.json",
+      "collection": "lanes",
+      "selector_key": "id",
+      "selector_value": "NSF_26_510_20260727",
+      "observed_pointer": "document.evaluated_utc",
+      "stale_after_hours": 72,
+      "evidence_paths": [
+        "evidence/opportunity/deadline_action_sentinel_latest.json",
+        "evidence/opportunity/nsf_26_510_deadline_gate_2026-07-27.json",
+        "docs/CURRENT_FEDERAL_OPPORTUNITY_GATE_MAP_2026-07-26.md",
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md"
+      ]
+    },
+    {
+      "record_ref": "deadline:ONC_ARGOS_20260730",
+      "path": "evidence/opportunity/deadline_action_sentinel_latest.json",
+      "collection": "lanes",
+      "selector_key": "id",
+      "selector_value": "ONC_ARGOS_20260730",
+      "observed_pointer": "document.evaluated_utc",
+      "stale_after_hours": 72,
+      "evidence_paths": [
+        "evidence/opportunity/deadline_action_sentinel_latest.json",
+        "grant_submissions/ONC_ARGOS_20260730/ARGOS_SUBMISSION_GATE_2026-07-26.json",
+        "grant_submissions/funding_sprint_20260709/ARGOS_GOVERNMENT_RESPONSE_STATUS_2026-07-29.json",
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md"
+      ]
+    },
+    {
+      "record_ref": "grant-readiness:DICE",
+      "path": "dashboard/data/grant_readiness_status.json",
+      "collection": "packages",
+      "selector_key": "name",
+      "selector_value": "DICE",
+      "observed_pointer": "document.generated_utc",
+      "stale_after_hours": 72,
+      "evidence_paths": [
+        "dashboard/data/grant_readiness_status.json",
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md"
+      ]
+    },
+    {
+      "record_ref": "outreach:nashville-ec-fall-2026",
+      "path": "config/outreach_registry_v1.json",
+      "collection": "campaigns",
+      "selector_key": "campaign_key",
+      "selector_value": "nashville-ec-fall-2026",
+      "observed_pointer": "document.updated_utc",
+      "stale_after_hours": 168,
+      "evidence_paths": [
+        "config/outreach_registry_v1.json",
+        "docs/CANONICAL_OPERATING_STATE.md",
+        "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md"
+      ]
+    }
+  ]
+}

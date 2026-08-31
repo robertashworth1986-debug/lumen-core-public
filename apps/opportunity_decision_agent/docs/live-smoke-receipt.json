@@ -1,0 +1,41 @@
+{
+  "schema": "lumencore.opportunity_decision_live_smoke_receipt.v1",
+  "generated_utc": "2026-08-31T03:05:51Z",
+  "base_commit": "1f9b342c03f81e91067d47e071b2a822fef9486b",
+  "runtime": {
+    "python": "3.11.9",
+    "openai_agents_sdk": "0.22.0",
+    "openai_python": "3.6.0",
+    "model": "gpt-5.6",
+    "trace_storage": "DISABLED"
+  },
+  "invocation": {
+    "mode": "live",
+    "record_ref": "deadline:NSF_26_510_20260727",
+    "top_level_runner_run_count": 1,
+    "manager_tools_available": 5,
+    "specialist_tool_calls_required": 4,
+    "provider_request_count": "NOT_COLLECTED_WITH_TRACING_DISABLED"
+  },
+  "result": {
+    "decision": "NO_BID",
+    "structured_output_valid": true,
+    "post_run_policy_validation_valid": true,
+    "source_receipt_count": 5,
+    "human_unlock_action_count": 8,
+    "forbidden_requested_actions": [],
+    "external_actions_performed": [],
+    "raw_output_persisted": false,
+    "api_key_value_stored": false
+  },
+  "primary_source_receipt": {
+    "path": "evidence/opportunity/deadline_action_sentinel_latest.json",
+    "sha256": "643e88e4efaa50b7257dc82a2bc796e0f0df4e47ca00a1e021c6b34e4e8ea65b",
+    "freshness_state": "STALE"
+  },
+  "limitations": [
+    "The smoke run used one allowlisted committed public-safe record.",
+    "Tracing was disabled, so provider request count and hidden reasoning were not collected.",
+    "This receipt is a runtime validation receipt, not an opportunity, eligibility, submission, award, contract, or production receipt."
+  ]
+}
