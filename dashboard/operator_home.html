@@ -109,15 +109,20 @@
       <h2 id="proof-lattice-title">Proof Lattice</h2>
       <p class="truth">Five locked states turn a complex claim into one auditable decision path.</p>
       <div class="lis-lattice-sequence" aria-label="Proof Capsule sequence">
-        <span data-lattice-step="0">Source</span>
-        <span data-lattice-step="1">Baseline</span>
-        <span data-lattice-step="2">Metric</span>
-        <span data-lattice-step="3">Hash</span>
-        <span data-lattice-step="4">Decision</span>
+        <button type="button" data-lattice-step="0" aria-pressed="false">Source</button>
+        <button type="button" data-lattice-step="1" aria-pressed="false">Baseline</button>
+        <button type="button" data-lattice-step="2" aria-pressed="false">Metric</button>
+        <button type="button" data-lattice-step="3" aria-pressed="false">Hash</button>
+        <button type="button" data-lattice-step="4" aria-pressed="false">Decision</button>
+      </div>
+      <div class="lis-lattice-readout" aria-live="polite">
+        <span data-lattice-readout-label>AUTHORIZED SOURCE</span>
+        <strong data-lattice-readout-detail>Named origin, rights status, and preserved input enter the chain.</strong>
       </div>
       <p class="lis-lattice-boundary">Deterministic visual projection · design model, not a scientific result or validation claim.</p>
     </div>
     <div class="lis-lattice-viewport" role="img" aria-label="A projected three-dimensional evidence lattice linking source, baseline, metric, hash, and decision nodes.">
+      <canvas class="lis-lattice-webgl-canvas" aria-hidden="true"></canvas>
       <canvas class="lis-lattice-canvas" aria-hidden="true"></canvas>
       <div class="lis-lattice-hud" aria-hidden="true">
         <span>PROOFLOCK / PUBLIC MODEL</span>
@@ -250,6 +255,7 @@
     <a class="btn primary" href="/proof_to_pilot.html">Open the primary offer</a>
   </section>
 </main>
+<script src="./assets/vendor/three.min.js"></script>
 <script src="./assets/luma_institutional_surface.js"></script>
 <script src="./assets/luma_command_fabric.js"></script>
 <script>

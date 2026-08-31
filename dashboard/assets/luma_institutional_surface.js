@@ -125,15 +125,679 @@
     };
   }
 
+  var proofLatticeStates = [
+    {
+      label: "AUTHORIZED SOURCE",
+      detail: "Named origin, rights status, and preserved input enter the chain.",
+    },
+    {
+      label: "LOCKED BASELINE",
+      detail: "The accepted incumbent comparator is selected before scoring begins.",
+    },
+    {
+      label: "PREDECLARED METRIC",
+      detail: "Threshold, window, and failure rules are frozen before the run.",
+    },
+    {
+      label: "REPLAY CUSTODY",
+      detail: "SHA-256 receipts bind the preserved artifacts to the reviewable record.",
+    },
+    {
+      label: "BOUNDED DECISION",
+      detail: "Promote, rerun, review, hold, or reject without widening the claim.",
+    },
+  ];
+
+  function updateProofLatticeStep(stage, activeIndex) {
+    stage.querySelectorAll("[data-lattice-step]").forEach(function (step) {
+      var active = Number(step.dataset.latticeStep) === activeIndex;
+      step.dataset.active = String(active);
+      step.setAttribute("aria-pressed", String(active));
+    });
+    var state = proofLatticeStates[activeIndex];
+    var readoutLabel = stage.querySelector("[data-lattice-readout-label]");
+    var readoutDetail = stage.querySelector("[data-lattice-readout-detail]");
+    if (state && readoutLabel) readoutLabel.textContent = state.label;
+    if (state && readoutDetail) readoutDetail.textContent = state.detail;
+  }
+
+  function bindProofLatticeControls(stage, onSelect) {
+    stage.querySelectorAll("[data-lattice-step]").forEach(function (step) {
+      step.addEventListener("click", function () {
+        onSelect(Number(step.dataset.latticeStep));
+      });
+    });
+  }
+
+  function mountWebGLProofLattice(stage, viewport, canvas, modeLabel, weakDevice) {
+    if (!window.THREE || !window.WebGLRenderingContext) return false;
+
+    var THREE = window.THREE;
+    var renderer = null;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        alpha: true,
+        antialias: !weakDevice,
+        powerPreference: "high-performance",
+      });
+    } catch (_) {
+      return false;
+    }
+
+    try {
+      renderer.setClearColor(0x000000, 0);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, weakDevice ? 1.15 : 1.55));
+      if (THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+
+      var scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x020713, 0.085);
+      var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+      camera.position.set(0, 0.08, 8.7);
+
+      var spaceUniforms = { uTime: { value: 0 } };
+      var spaceDome = new THREE.Mesh(
+        new THREE.SphereGeometry(34, weakDevice ? 24 : 40, weakDevice ? 16 : 28),
+        new THREE.ShaderMaterial({
+          uniforms: spaceUniforms,
+          side: THREE.BackSide,
+          depthWrite: false,
+          fog: false,
+          vertexShader: [
+            "varying vec3 vRay;",
+            "void main() {",
+            "  vRay = normalize(position);",
+            "  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
+            "}",
+          ].join("\n"),
+          fragmentShader: [
+            "uniform float uTime;",
+            "varying vec3 vRay;",
+            "float hash3(vec3 p) {",
+            "  p = fract(p * 0.3183099 + vec3(0.11, 0.17, 0.13));",
+            "  p *= 17.0;",
+            "  return fract(p.x * p.y * p.z * (p.x + p.y + p.z));",
+            "}",
+            "float noise3(vec3 p) {",
+            "  vec3 i = floor(p);",
+            "  vec3 f = fract(p);",
+            "  f = f * f * (3.0 - 2.0 * f);",
+            "  return mix(",
+            "    mix(mix(hash3(i), hash3(i + vec3(1.0, 0.0, 0.0)), f.x),",
+            "        mix(hash3(i + vec3(0.0, 1.0, 0.0)), hash3(i + vec3(1.0, 1.0, 0.0)), f.x), f.y),",
+            "    mix(mix(hash3(i + vec3(0.0, 0.0, 1.0)), hash3(i + vec3(1.0, 0.0, 1.0)), f.x),",
+            "        mix(hash3(i + vec3(0.0, 1.0, 1.0)), hash3(i + vec3(1.0, 1.0, 1.0)), f.x), f.y), f.z);",
+            "}",
+            "float fbm(vec3 p) {",
+            "  float value = 0.0;",
+            "  float amplitude = 0.52;",
+            "  for (int octave = 0; octave < 4; octave++) {",
+            "    value += amplitude * noise3(p);",
+            "    p = p * 2.03 + vec3(7.1, 3.7, 5.9);",
+            "    amplitude *= 0.48;",
+            "  }",
+            "  return value;",
+            "}",
+            "void main() {",
+            "  vec3 ray = normalize(vRay);",
+            "  vec3 drift = vec3(uTime * 0.002, -uTime * 0.001, uTime * 0.0015);",
+            "  float cloud = fbm(ray * 3.4 + drift);",
+            "  float filament = fbm(ray * 9.5 - drift * 1.7);",
+            "  float nebula = smoothstep(0.49, 0.83, cloud * 0.76 + filament * 0.31);",
+            "  float dust = smoothstep(0.62, 0.88, fbm(ray * 25.0 + 4.0));",
+            "  vec3 voidColor = vec3(0.0015, 0.0035, 0.014);",
+            "  vec3 blueCloud = vec3(0.015, 0.115, 0.22);",
+            "  vec3 violetCloud = vec3(0.18, 0.035, 0.26);",
+            "  float colorMix = smoothstep(-0.55, 0.65, ray.y + cloud * 0.22);",
+            "  vec3 color = voidColor + mix(blueCloud, violetCloud, colorMix) * nebula * 0.48;",
+            "  color += vec3(0.025, 0.075, 0.12) * dust * 0.18;",
+            "  float vignette = 0.76 + 0.24 * max(0.0, ray.z);",
+            "  gl_FragColor = vec4(color * vignette, 1.0);",
+            "}",
+          ].join("\n"),
+        })
+      );
+      spaceDome.renderOrder = -20;
+      scene.add(spaceDome);
+
+      function makeDeepStarField(count, minimumRadius, maximumRadius, pointSize, opacity, seed) {
+        var starRandom = makeDeterministicRandom(seed);
+        var starPositions = new Float32Array(count * 3);
+        var starColors = new Float32Array(count * 3);
+        for (var starIndex = 0; starIndex < count; starIndex += 1) {
+          var starLongitude = starRandom() * Math.PI * 2;
+          var starLatitude = Math.acos(2 * starRandom() - 1);
+          var starRadius = minimumRadius + starRandom() * (maximumRadius - minimumRadius);
+          starPositions[starIndex * 3] = Math.sin(starLatitude) * Math.cos(starLongitude) * starRadius;
+          starPositions[starIndex * 3 + 1] = Math.cos(starLatitude) * starRadius;
+          starPositions[starIndex * 3 + 2] = Math.sin(starLatitude) * Math.sin(starLongitude) * starRadius;
+          var temperature = starRandom();
+          starColors[starIndex * 3] = temperature > 0.94 ? 1 : 0.58 + temperature * 0.32;
+          starColors[starIndex * 3 + 1] = temperature > 0.94 ? 0.76 : 0.72 + temperature * 0.24;
+          starColors[starIndex * 3 + 2] = temperature > 0.94 ? 0.48 : 1;
+        }
+        var starGeometry = new THREE.BufferGeometry();
+        starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+        starGeometry.setAttribute("color", new THREE.BufferAttribute(starColors, 3));
+        return new THREE.Points(
+          starGeometry,
+          new THREE.PointsMaterial({
+            size: pointSize,
+            sizeAttenuation: true,
+            transparent: true,
+            opacity: opacity,
+            depthWrite: false,
+            fog: false,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+          })
+        );
+      }
+
+      var farStars = makeDeepStarField(weakDevice ? 420 : 980, 12, 30, weakDevice ? 0.085 : 0.065, 0.86, 2718281828);
+      var nearStars = makeDeepStarField(weakDevice ? 90 : 220, 6, 12, weakDevice ? 0.105 : 0.085, 0.68, 3141592653);
+      scene.add(farStars);
+      scene.add(nearStars);
+
+      var lattice = new THREE.Group();
+      lattice.rotation.x = -0.08;
+      scene.add(lattice);
+
+      var colors = [0x66f6df, 0x72aaff, 0xbd8cff, 0x61f3ad, 0xffc96b];
+      var labels = ["SOURCE", "BASELINE", "METRIC", "HASH", "DECISION"];
+      var nodePositions = [
+        new THREE.Vector3(-2.24, 0.28, -0.22),
+        new THREE.Vector3(-1.13, -0.77, 0.5),
+        new THREE.Vector3(0, 0.82, 0.82),
+        new THREE.Vector3(1.13, -0.68, 0.46),
+        new THREE.Vector3(2.25, 0.26, -0.18),
+      ];
+
+      var energyUniforms = {
+        uTime: { value: 0 },
+        uColorA: { value: new THREE.Color(0x66f6df) },
+        uColorB: { value: new THREE.Color(0xbd8cff) },
+      };
+      var energyMaterial = new THREE.ShaderMaterial({
+        uniforms: energyUniforms,
+        transparent: true,
+        wireframe: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        vertexShader: [
+          "uniform float uTime;",
+          "varying float vEnergy;",
+          "varying vec3 vNormalView;",
+          "void main() {",
+          "  float wave = sin(position.y * 5.0 + uTime * 1.5) * 0.025;",
+          "  vec3 displaced = position + normal * wave;",
+          "  vEnergy = 0.5 + 0.5 * sin(position.x * 4.0 - position.z * 3.0 + uTime * 2.0);",
+          "  vNormalView = normalize(normalMatrix * normal);",
+          "  gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);",
+          "}",
+        ].join("\n"),
+        fragmentShader: [
+          "uniform vec3 uColorA;",
+          "uniform vec3 uColorB;",
+          "varying float vEnergy;",
+          "varying vec3 vNormalView;",
+          "void main() {",
+          "  float edge = pow(1.0 - abs(vNormalView.z), 1.6);",
+          "  vec3 color = mix(uColorA, uColorB, vEnergy);",
+          "  gl_FragColor = vec4(color * (1.15 + edge), 0.17 + edge * 0.42);",
+          "}",
+        ].join("\n"),
+      });
+      var energyCore = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(1.2, weakDevice ? 2 : 3),
+        energyMaterial
+      );
+      lattice.add(energyCore);
+
+      var coreGlowUniforms = {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color(0x5fe8ff) },
+      };
+      var coreGlow = new THREE.Mesh(
+        new THREE.SphereGeometry(0.86, weakDevice ? 20 : 32, weakDevice ? 14 : 22),
+        new THREE.ShaderMaterial({
+          uniforms: coreGlowUniforms,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending,
+          vertexShader: [
+            "varying vec3 vNormalView;",
+            "varying vec3 vViewPosition;",
+            "void main() {",
+            "  vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);",
+            "  vViewPosition = -viewPosition.xyz;",
+            "  vNormalView = normalize(normalMatrix * normal);",
+            "  gl_Position = projectionMatrix * viewPosition;",
+            "}",
+          ].join("\n"),
+          fragmentShader: [
+            "uniform float uTime;",
+            "uniform vec3 uColor;",
+            "varying vec3 vNormalView;",
+            "varying vec3 vViewPosition;",
+            "void main() {",
+            "  float fresnel = pow(1.0 - abs(dot(normalize(vNormalView), normalize(vViewPosition))), 2.25);",
+            "  float beat = 0.82 + 0.18 * sin(uTime * 2.2);",
+            "  gl_FragColor = vec4(uColor * (0.8 + fresnel * 1.7), (0.035 + fresnel * 0.29) * beat);",
+            "}",
+          ].join("\n"),
+        })
+      );
+      lattice.add(coreGlow);
+
+      var shellGeometry = new THREE.IcosahedronGeometry(2.12, 1);
+      var shell = new THREE.LineSegments(
+        new THREE.EdgesGeometry(shellGeometry),
+        new THREE.LineBasicMaterial({
+          color: 0x72aaff,
+          transparent: true,
+          opacity: 0.3,
+          blending: THREE.AdditiveBlending,
+        })
+      );
+      lattice.add(shell);
+
+      var ringColors = [0x66f6df, 0x72aaff, 0xbd8cff];
+      var rings = [];
+      [2.65, 2.38, 1.92].forEach(function (radius, index) {
+        var ring = new THREE.Mesh(
+          new THREE.TorusGeometry(radius, index === 2 ? 0.009 : 0.013, 5, weakDevice ? 90 : 150),
+          new THREE.MeshBasicMaterial({
+            color: ringColors[index],
+            transparent: true,
+            opacity: 0.34 - index * 0.055,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+          })
+        );
+        ring.rotation.set(0.65 + index * 0.48, 0.3 + index * 0.61, index * 0.72);
+        rings.push(ring);
+        lattice.add(ring);
+      });
+
+      var random = makeDeterministicRandom(1618033988);
+      var particleCount = weakDevice ? 150 : 360;
+      var particlePositions = new Float32Array(particleCount * 3);
+      var particleSizes = new Float32Array(particleCount);
+      var particlePhases = new Float32Array(particleCount);
+      for (var particleIndex = 0; particleIndex < particleCount; particleIndex += 1) {
+        var longitude = random() * Math.PI * 2;
+        var latitude = Math.acos(2 * random() - 1);
+        var radius = 1.65 + Math.pow(random(), 0.65) * 3.5;
+        particlePositions[particleIndex * 3] = Math.sin(latitude) * Math.cos(longitude) * radius;
+        particlePositions[particleIndex * 3 + 1] = Math.cos(latitude) * radius;
+        particlePositions[particleIndex * 3 + 2] = Math.sin(latitude) * Math.sin(longitude) * radius;
+        particleSizes[particleIndex] = 2.4 + random() * 4.8;
+        particlePhases[particleIndex] = random() * Math.PI * 2;
+      }
+      var particleGeometry = new THREE.BufferGeometry();
+      particleGeometry.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
+      particleGeometry.setAttribute("aSize", new THREE.BufferAttribute(particleSizes, 1));
+      particleGeometry.setAttribute("aPhase", new THREE.BufferAttribute(particlePhases, 1));
+      var particleUniforms = {
+        uTime: { value: 0 },
+        uPixelRatio: { value: renderer.getPixelRatio() },
+      };
+      var particleCloud = new THREE.Points(
+        particleGeometry,
+        new THREE.ShaderMaterial({
+          uniforms: particleUniforms,
+          transparent: true,
+          depthWrite: false,
+          vertexColors: false,
+          blending: THREE.AdditiveBlending,
+          vertexShader: [
+            "attribute float aSize;",
+            "attribute float aPhase;",
+            "uniform float uTime;",
+            "uniform float uPixelRatio;",
+            "varying float vPhase;",
+            "void main() {",
+            "  vPhase = aPhase;",
+            "  vec3 p = position;",
+            "  p.y += sin(uTime * 0.55 + aPhase + position.x) * 0.035;",
+            "  vec4 viewPosition = modelViewMatrix * vec4(p, 1.0);",
+            "  gl_PointSize = aSize * uPixelRatio * (6.5 / max(2.0, -viewPosition.z));",
+            "  gl_Position = projectionMatrix * viewPosition;",
+            "}",
+          ].join("\n"),
+          fragmentShader: [
+            "varying float vPhase;",
+            "void main() {",
+            "  vec2 center = gl_PointCoord - vec2(0.5);",
+            "  float distanceToCenter = length(center);",
+            "  float alpha = smoothstep(0.5, 0.04, distanceToCenter);",
+            "  vec3 cyan = vec3(0.4, 0.965, 0.875);",
+            "  vec3 blue = vec3(0.45, 0.67, 1.0);",
+            "  vec3 color = mix(cyan, blue, step(3.14159, vPhase));",
+            "  gl_FragColor = vec4(color * 1.35, alpha * 0.72);",
+            "}",
+          ].join("\n"),
+        })
+      );
+      lattice.add(particleCloud);
+
+      var nodeMeshes = [];
+      var nodeHalos = [];
+      var labelSprites = [];
+      function makeLabelSprite(text, color) {
+        var labelCanvas = document.createElement("canvas");
+        labelCanvas.width = 256;
+        labelCanvas.height = 64;
+        var labelContext = labelCanvas.getContext("2d");
+        labelContext.clearRect(0, 0, 256, 64);
+        labelContext.fillStyle = "rgba(2, 7, 18, 0.82)";
+        labelContext.strokeStyle = "rgba(150, 211, 255, 0.34)";
+        labelContext.lineWidth = 2;
+        labelContext.beginPath();
+        labelContext.roundRect(16, 8, 224, 45, 12);
+        labelContext.fill();
+        labelContext.stroke();
+        labelContext.fillStyle = color;
+        labelContext.font = "700 18px Arial, sans-serif";
+        labelContext.textAlign = "center";
+        labelContext.textBaseline = "middle";
+        labelContext.fillText(text, 128, 31);
+        var texture = new THREE.CanvasTexture(labelCanvas);
+        if (THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
+        var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: texture,
+          transparent: true,
+          depthWrite: false,
+          opacity: 0.78,
+        }));
+        sprite.scale.set(1.18, 0.295, 1);
+        return sprite;
+      }
+
+      nodePositions.forEach(function (position, index) {
+        var nodeMaterial = new THREE.MeshBasicMaterial({
+          color: colors[index],
+          transparent: true,
+          opacity: 0.96,
+        });
+        var node = new THREE.Mesh(new THREE.IcosahedronGeometry(0.105, 1), nodeMaterial);
+        node.position.copy(position);
+        nodeMeshes.push(node);
+        lattice.add(node);
+
+        var halo = new THREE.Mesh(
+          new THREE.RingGeometry(0.18, 0.27, 32),
+          new THREE.MeshBasicMaterial({
+            color: colors[index],
+            transparent: true,
+            opacity: 0.34,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+          })
+        );
+        halo.position.copy(position);
+        halo.lookAt(camera.position);
+        nodeHalos.push(halo);
+        lattice.add(halo);
+
+        var labelColor = "#" + new THREE.Color(colors[index]).getHexString();
+        var label = makeLabelSprite(labels[index], labelColor);
+        label.position.copy(position).add(new THREE.Vector3(0, 0.32, 0));
+        labelSprites.push(label);
+        lattice.add(label);
+      });
+
+      var pathMaterials = [];
+      var pathPulses = [];
+      for (var edgeIndex = 0; edgeIndex < nodePositions.length - 1; edgeIndex += 1) {
+        var pathGeometry = new THREE.BufferGeometry().setFromPoints([
+          nodePositions[edgeIndex],
+          nodePositions[edgeIndex + 1],
+        ]);
+        var pathMaterial = new THREE.LineBasicMaterial({
+          color: colors[edgeIndex],
+          transparent: true,
+          opacity: 0.72,
+          blending: THREE.AdditiveBlending,
+        });
+        pathMaterials.push(pathMaterial);
+        lattice.add(new THREE.Line(pathGeometry, pathMaterial));
+
+        var pulse = new THREE.Mesh(
+          new THREE.SphereGeometry(0.055, 10, 8),
+          new THREE.MeshBasicMaterial({
+            color: colors[edgeIndex],
+            transparent: true,
+            opacity: 1,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+          })
+        );
+        pathPulses.push(pulse);
+        lattice.add(pulse);
+      }
+
+      var polarGrid = new THREE.PolarGridHelper(4.6, 10, 7, 64, 0x72aaff, 0x17436b);
+      polarGrid.material.transparent = true;
+      polarGrid.material.opacity = 0.11;
+      polarGrid.material.blending = THREE.AdditiveBlending;
+      polarGrid.rotation.x = Math.PI / 2;
+      polarGrid.position.z = -1.9;
+      scene.add(polarGrid);
+
+      var width = 1;
+      var height = 1;
+      var targetPointerX = 0;
+      var targetPointerY = 0;
+      var pointerX = 0;
+      var pointerY = 0;
+      var inView = true;
+      var frameId = null;
+      var lastFrame = 0;
+      var frameInterval = weakDevice ? 34 : 16;
+      var manualStep = -1;
+      var manualStepUntil = 0;
+      var qualitySampleStart = performance.now();
+      var qualityFrames = 0;
+      var adaptiveQuality = false;
+
+      function setActiveStep(activeIndex) {
+        updateProofLatticeStep(stage, activeIndex);
+      }
+
+      function resize() {
+        var bounds = viewport.getBoundingClientRect();
+        width = Math.max(1, Math.round(bounds.width));
+        height = Math.max(1, Math.round(bounds.height));
+        renderer.setSize(width, height, false);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+      }
+
+      function render(timestamp) {
+        var time = timestamp * 0.001;
+        var activeIndex = manualStep >= 0 && timestamp < manualStepUntil
+          ? manualStep
+          : Math.floor(timestamp / 1400) % nodePositions.length;
+        setActiveStep(activeIndex);
+
+        pointerX += (targetPointerX - pointerX) * 0.045;
+        pointerY += (targetPointerY - pointerY) * 0.045;
+        lattice.rotation.y = time * 0.075 + pointerX * 0.17;
+        lattice.rotation.x = -0.07 + Math.sin(time * 0.16) * 0.035 + pointerY * 0.1;
+        lattice.position.y = Math.sin(time * 0.38) * 0.035;
+        shell.rotation.y = -time * 0.12;
+        shell.rotation.z = time * 0.035;
+        energyCore.rotation.y = time * 0.14;
+        energyCore.rotation.x = -time * 0.08;
+        energyUniforms.uTime.value = time;
+        coreGlowUniforms.uTime.value = time;
+        spaceUniforms.uTime.value = time;
+        particleUniforms.uTime.value = time;
+        particleCloud.rotation.y = -time * 0.018;
+        polarGrid.rotation.z = time * 0.012;
+        spaceDome.rotation.y = time * 0.00035;
+        farStars.rotation.y = time * 0.0016;
+        farStars.rotation.x = Math.sin(time * 0.011) * 0.012;
+        nearStars.rotation.y = -time * 0.0034;
+
+        rings.forEach(function (ring, index) {
+          ring.rotation.z += (index % 2 === 0 ? 1 : -1) * 0.00045 * (weakDevice ? 1.2 : 1);
+        });
+
+        nodeMeshes.forEach(function (node, index) {
+          var active = index === activeIndex;
+          var scale = active ? 1.75 + Math.sin(time * 4.2) * 0.18 : 1;
+          node.scale.setScalar(scale);
+          nodeHalos[index].scale.setScalar(active ? 1.5 : 1);
+          nodeHalos[index].material.opacity = active ? 0.75 : 0.28;
+          labelSprites[index].material.opacity = active ? 1 : 0.62;
+        });
+
+        pathPulses.forEach(function (pulse, index) {
+          var progress = (time * 0.27 + index * 0.19) % 1;
+          pulse.position.lerpVectors(nodePositions[index], nodePositions[index + 1], progress);
+          var pulseScale = 0.8 + Math.sin(time * 5 + index) * 0.22;
+          pulse.scale.setScalar(pulseScale);
+          pathMaterials[index].opacity = index === activeIndex || index + 1 === activeIndex ? 1 : 0.55;
+        });
+
+        camera.position.x = pointerX * 0.16 + Math.sin(time * 0.09) * 0.07;
+        camera.position.y = 0.08 - pointerY * 0.1 + Math.cos(time * 0.08) * 0.035;
+        camera.position.z = 8.7 + Math.sin(time * 0.055) * 0.055;
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+      }
+
+      function requestFrame() {
+        if (frameId !== null || !inView || document.hidden) return;
+        frameId = window.requestAnimationFrame(frame);
+      }
+
+      function frame(timestamp) {
+        frameId = null;
+        if (!inView || document.hidden) return;
+        if (timestamp - lastFrame >= frameInterval) {
+          lastFrame = timestamp;
+          render(timestamp);
+          qualityFrames += 1;
+          if (!weakDevice && !adaptiveQuality && timestamp - qualitySampleStart >= 5000) {
+            var deliveredFps = qualityFrames * 1000 / (timestamp - qualitySampleStart);
+            if (deliveredFps < 28) {
+              adaptiveQuality = true;
+              frameInterval = 34;
+              renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.05));
+              particleGeometry.setDrawRange(0, Math.floor(particleCount * 0.58));
+              farStars.geometry.setDrawRange(0, 520);
+              nearStars.geometry.setDrawRange(0, 120);
+              viewport.dataset.quality = "adaptive";
+              if (modeLabel) modeLabel.textContent = "DEEP SPACE / ADAPTIVE GPU";
+              resize();
+            } else {
+              viewport.dataset.quality = "high";
+            }
+            qualitySampleStart = timestamp;
+            qualityFrames = 0;
+          }
+        }
+        requestFrame();
+      }
+
+      bindProofLatticeControls(stage, function (selectedIndex) {
+        manualStep = selectedIndex;
+        manualStepUntil = performance.now() + 15000;
+        render(performance.now());
+      });
+
+      canvas.addEventListener("webglcontextlost", function (event) {
+        event.preventDefault();
+        if (frameId !== null) window.cancelAnimationFrame(frameId);
+        frameId = null;
+        viewport.dataset.quality = "recovery";
+        if (modeLabel) modeLabel.textContent = "GPU CONTEXT / RESTORING";
+      });
+      canvas.addEventListener("webglcontextrestored", function () {
+        renderer.resetState();
+        viewport.dataset.quality = adaptiveQuality ? "adaptive" : (weakDevice ? "efficient" : "high");
+        if (modeLabel) {
+          modeLabel.textContent = adaptiveQuality
+            ? "DEEP SPACE / ADAPTIVE GPU"
+            : "DEEP SPACE / WEBGL MODEL";
+        }
+        resize();
+        requestFrame();
+      });
+
+      viewport.addEventListener("pointermove", function (event) {
+        var bounds = viewport.getBoundingClientRect();
+        targetPointerX = ((event.clientX - bounds.left) / Math.max(1, bounds.width) - 0.5) * 2;
+        targetPointerY = ((event.clientY - bounds.top) / Math.max(1, bounds.height) - 0.5) * 2;
+      }, { passive: true });
+      viewport.addEventListener("pointerleave", function () {
+        targetPointerX = 0;
+        targetPointerY = 0;
+      }, { passive: true });
+
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(resize).observe(viewport);
+      } else {
+        window.addEventListener("resize", resize, { passive: true });
+      }
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(function (entries) {
+          inView = Boolean(entries[0] && entries[0].isIntersecting);
+          if (inView) requestFrame();
+        }, { rootMargin: "120px" }).observe(stage);
+      }
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) requestFrame();
+      });
+
+      viewport.dataset.mode = "webgl";
+      viewport.dataset.quality = weakDevice ? "efficient" : "measuring";
+      if (modeLabel) modeLabel.textContent = "DEEP SPACE / WEBGL MODEL";
+      resize();
+      render(720);
+      requestFrame();
+      return true;
+    } catch (_) {
+      try {
+        renderer.dispose();
+      } catch (__) {
+        // The two-dimensional deterministic fallback remains available.
+      }
+      return false;
+    }
+  }
+
   function mountProofLattice() {
     if (surface !== "home") return;
     var stage = document.querySelector("[data-proof-lattice]");
     if (!stage || stage.dataset.latticeMounted === "true") return;
 
     var viewport = stage.querySelector(".lis-lattice-viewport");
+    var webglCanvas = stage.querySelector(".lis-lattice-webgl-canvas");
     var canvas = stage.querySelector(".lis-lattice-canvas");
     var modeLabel = stage.querySelector("[data-lattice-mode]");
     if (!viewport || !canvas) return;
+
+    var reducedMotion = window.matchMedia
+      && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    var saveData = Boolean(connection && connection.saveData);
+    var weakDevice = (navigator.deviceMemory && navigator.deviceMemory < 4)
+      || (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4);
+    var staticMode = Boolean(reducedMotion || saveData);
+    if (!staticMode && webglCanvas
+      && mountWebGLProofLattice(stage, viewport, webglCanvas, modeLabel, weakDevice)) {
+      stage.dataset.latticeMounted = "true";
+      return;
+    }
 
     var context = null;
     try {
@@ -148,13 +812,6 @@
     }
 
     stage.dataset.latticeMounted = "true";
-    var reducedMotion = window.matchMedia
-      && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    var saveData = Boolean(connection && connection.saveData);
-    var weakDevice = (navigator.deviceMemory && navigator.deviceMemory < 4)
-      || (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4);
-    var staticMode = Boolean(reducedMotion || saveData);
     var frameInterval = weakDevice ? 50 : 32;
     var particleCount = weakDevice ? 34 : 68;
     viewport.dataset.mode = staticMode ? "static" : "dynamic";
@@ -210,6 +867,8 @@
     var inView = true;
     var frameId = null;
     var lastFrame = 0;
+    var manualStep = -1;
+    var manualStepUntil = 0;
 
     function resize() {
       var bounds = viewport.getBoundingClientRect();
@@ -286,9 +945,7 @@
     }
 
     function setActiveStep(activeIndex) {
-      stage.querySelectorAll("[data-lattice-step]").forEach(function (step) {
-        step.dataset.active = String(Number(step.dataset.latticeStep) === activeIndex);
-      });
+      updateProofLatticeStep(stage, activeIndex);
     }
 
     function draw(timestamp) {
@@ -300,7 +957,9 @@
       var angleY = time + pointerX * 0.18;
       var angleX = -0.18 + Math.sin(time * 0.7) * 0.08 + pointerY * 0.13;
       var angleZ = Math.sin(time * 0.42) * 0.06;
-      var activeIndex = staticMode ? 4 : Math.floor(timestamp / 1400) % coreNodes.length;
+      var activeIndex = manualStep >= 0 && (staticMode || timestamp < manualStepUntil)
+        ? manualStep
+        : (staticMode ? 4 : Math.floor(timestamp / 1400) % coreNodes.length);
       setActiveStep(activeIndex);
 
       particles.forEach(function (particle) {
@@ -421,6 +1080,12 @@
       }
       requestFrame();
     }
+
+    bindProofLatticeControls(stage, function (selectedIndex) {
+      manualStep = selectedIndex;
+      manualStepUntil = performance.now() + 15000;
+      draw(performance.now());
+    });
 
     viewport.addEventListener("pointermove", function (event) {
       if (staticMode) return;

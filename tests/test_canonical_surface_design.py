@@ -149,7 +149,11 @@ def test_public_home_sells_one_bounded_assurance_sequence():
 def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced():
     home = page("home")
     assert 'data-proof-lattice' in home
+    assert 'class="lis-lattice-webgl-canvas"' in home
     assert 'class="lis-lattice-canvas"' in home
+    assert "assets/vendor/three.min.js" in home
+    assert '<button type="button" data-lattice-step="0" aria-pressed="false">Source</button>' in home
+    assert 'class="lis-lattice-readout" aria-live="polite"' in home
     assert "Source" in home
     assert "Baseline" in home
     assert "Metric" in home
@@ -160,6 +164,20 @@ def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced()
     shared_js = (DASHBOARD / "assets" / "luma_institutional_surface.js").read_text(
         encoding="utf-8"
     )
+    assert "THREE.WebGLRenderer" in shared_js
+    assert "THREE.ShaderMaterial" in shared_js
+    assert "THREE.AdditiveBlending" in shared_js
+    assert "THREE.IcosahedronGeometry" in shared_js
+    assert "THREE.Points" in shared_js
+    assert "makeDeepStarField" in shared_js
+    assert 'modeLabel.textContent = "DEEP SPACE / WEBGL MODEL"' in shared_js
+    assert "updateProofLatticeStep" in shared_js
+    assert "bindProofLatticeControls" in shared_js
+    assert 'canvas.addEventListener("webglcontextlost"' in shared_js
+    assert 'canvas.addEventListener("webglcontextrestored"' in shared_js
+    assert 'viewport.dataset.quality = "adaptive"' in shared_js
+    assert "deliveredFps < 28" in shared_js
+    assert "not a scientific result or validation claim" in home
     assert 'canvas.getContext("2d"' in shared_js
     assert "prefers-reduced-motion: reduce" in shared_js
     assert "connection.saveData" in shared_js
@@ -169,12 +187,14 @@ def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced()
     assert '"IntersectionObserver" in window' in shared_js
     assert "requestAnimationFrame" in shared_js
     assert "execution_authorized" not in shared_js
+    assert "WebSocket" not in shared_js
 
     shared_css = (DASHBOARD / "assets" / "luma_institutional_surface.css").read_text(
         encoding="utf-8"
     )
     assert ".lis-lattice-stage" in shared_css
     assert ".lis-lattice-viewport" in shared_css
+    assert ".lis-lattice-webgl-canvas" in shared_css
     assert ".lis-lattice-canvas" in shared_css
 
 
