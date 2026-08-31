@@ -8,77 +8,30 @@ import hashlib
 import io
 import json
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import re
 import subprocess
 import sys
 import tarfile
 import tempfile
-from typing import Final
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from public_site_release_contract import (  # noqa: E402
+    RELEASE_PATHS,
+    SCHEMA,
+    TARGET_DIRECTORY,
+    PublicSiteReleaseContractError,
+    archive_name,
+    validate_release_manifest,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SCHEMA: Final = "lumencore.public_site_release_manifest.v1"
 FULL_COMMIT = re.compile(r"[0-9a-fA-F]{40}")
-RELEASE_PATHS: Final = (
-    "dashboard/operator_home.html",
-    "dashboard/opportunity_sprint.html",
-    "dashboard/proof_to_pilot.html",
-    "dashboard/external_review.html",
-    "dashboard/reviewer_docket.json",
-    "dashboard/mission_control.html",
-    "dashboard/quant_lab.html",
-    "dashboard/grants.html",
-    "dashboard/kraken_execution_dashboard.html",
-    "dashboard/forecast.html",
-    "dashboard/anomalies.html",
-    "dashboard/explain.html",
-    "dashboard/lab.html",
-    "dashboard/evidence/index_bounded.html",
-    "dashboard/robots.txt",
-    "dashboard/sitemap.xml",
-    "dashboard/site.webmanifest",
-    "dashboard/manifest.json",
-    "dashboard/assets/lumaarc_arc_seal_v1.png",
-    "dashboard/assets/lumencore.css",
-    "dashboard/assets/lumencore.js",
-    "dashboard/assets/luma_command_fabric.css",
-    "dashboard/assets/luma_command_fabric.js",
-    "dashboard/assets/luma_institutional_surface.css",
-    "dashboard/assets/luma_institutional_surface.js",
-    "dashboard/assets/vendor/three.min.js",
-    "dashboard/js/alpha_globe_3d.js",
-    "dashboard/js/cinematic_telemetry_layer.js",
-    "dashboard/js/luma_design_system.js",
-    "dashboard/js/luma_path_resolver.js",
-    "dashboard/assets/prooflock/bounded_validation_protocol_v1.json",
-    "dashboard/assets/prooflock/bounded_validation_protocol_v2.json",
-    "dashboard/build_week/prooflock_console/app.js",
-    "dashboard/build_week/prooflock_console/bootstrap.js",
-    "dashboard/build_week/prooflock_console/index.html",
-    "dashboard/build_week/prooflock_console/prooflock_core.js",
-    "dashboard/build_week/prooflock_console/prooflock_favicon.svg",
-    "dashboard/build_week/prooflock_console/prooflock_lattice.css",
-    "dashboard/build_week/prooflock_console/prooflock_lattice.js",
-    "dashboard/build_week/prooflock_console/sample_receipt.json",
-    "dashboard/build_week/prooflock_console/styles.css",
-    "dashboard/build_week/prooflock_console/three.core.min.js",
-    "dashboard/build_week/prooflock_console/three.module.min.js",
-)
 
 
 class ReleasePackageError(RuntimeError):
     """Raised when the requested Git snapshot is not a safe release source."""
-
-
-def archive_name(repo_path: str) -> str:
-    path = PurePosixPath(repo_path)
-    if not path.parts or path.parts[0] != "dashboard":
-        raise ReleasePackageError(f"release path is outside dashboard: {repo_path}")
-    relative = PurePosixPath(*path.parts[1:])
-    if relative.is_absolute() or ".." in relative.parts or not relative.parts:
-        raise ReleasePackageError(f"unsafe release path: {repo_path}")
-    return relative.as_posix()
 
 
 def _git(repo_root: Path, *args: str) -> bytes:
@@ -194,7 +147,10 @@ def build_release_package(
     manifest_files: list[dict[str, object]] = []
     seen_names: set[str] = set()
     for repo_path in RELEASE_PATHS:
-        name = archive_name(repo_path)
+        try:
+            name = archive_name(repo_path)
+        except PublicSiteReleaseContractError as exc:
+            raise ReleasePackageError(str(exc)) from exc
         if name in seen_names:
             raise ReleasePackageError(f"duplicate archive path: {name}")
         seen_names.add(name)
@@ -218,8 +174,12 @@ def build_release_package(
         "files": manifest_files,
         "schema": SCHEMA,
         "source_commit": resolved_commit,
-        "target_directory": "/opt/lumencore/dashboard",
+        "target_directory": TARGET_DIRECTORY,
     }
+    try:
+        validate_release_manifest(payload, source_commit=resolved_commit)
+    except PublicSiteReleaseContractError as exc:
+        raise ReleasePackageError(str(exc)) from exc
     _write_manifest(manifest_path, payload)
     return payload
 

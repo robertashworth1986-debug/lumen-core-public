@@ -185,11 +185,15 @@ class PublicExternalReviewSurfaceTests(unittest.TestCase):
         packager = (
             ROOT / "code" / "deploy" / "package_public_site_release.py"
         ).read_text(encoding="utf-8")
+        release_contract = (
+            ROOT / "code" / "deploy" / "public_site_release_contract.py"
+        ).read_text(encoding="utf-8")
         self.assertIn('"dashboard/external_review.html"', workflow)
         self.assertIn('"dashboard/reviewer_docket.json"', workflow)
         self.assertIn("VERIFY_PUBLIC_SITE_LIVE_RELEASE.py", workflow)
-        self.assertIn('"dashboard/external_review.html"', packager)
-        self.assertIn('"dashboard/reviewer_docket.json"', packager)
+        self.assertIn("public_site_release_contract", packager)
+        self.assertIn('"dashboard/external_review.html"', release_contract)
+        self.assertIn('"dashboard/reviewer_docket.json"', release_contract)
 
 
 if __name__ == "__main__":
