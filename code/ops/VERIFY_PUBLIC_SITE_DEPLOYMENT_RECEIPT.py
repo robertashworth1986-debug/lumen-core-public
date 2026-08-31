@@ -9,6 +9,7 @@ import importlib.util
 import json
 from pathlib import Path
 import re
+import subprocess
 import tempfile
 from typing import Any
 
@@ -45,6 +46,33 @@ def _load(path: Path, name: str):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _load_packager_at_commit(
+    *, root: Path, source_commit: str, destination: Path
+):
+    """Load the packager retained by the receipt's Git subject, not today's allowlist."""
+    try:
+        completed = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(root),
+                "show",
+                f"{source_commit}:code/deploy/package_public_site_release.py",
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        detail = getattr(exc, "stderr", b"").decode("utf-8", errors="replace").strip()
+        suffix = f": {detail}" if detail else ""
+        raise DeploymentReceiptError(
+            f"cannot recover historical packager from {source_commit}{suffix}"
+        ) from exc
+    destination.write_bytes(completed.stdout)
+    return _load(destination, f"deployment_packager_{source_commit}")
 
 
 def _reject_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -153,13 +181,17 @@ def verify_receipt(
     for field in ("archive_sha256", "manifest_sha256", "cyclonedx_sha256"):
         _require_sha(subject.get(field), f"release_subject.{field}")
 
-    packager = _load(root / PACKAGER_PATH.relative_to(ROOT), "deployment_packager")
     supply_chain = _load(
         root / SUPPLY_CHAIN_PATH.relative_to(ROOT), "deployment_supply_chain"
     )
-    if len(packager.RELEASE_PATHS) != 43:
-        raise DeploymentReceiptError("current allowlist count drifted from receipt")
     with tempfile.TemporaryDirectory() as tmp:
+        packager = _load_packager_at_commit(
+            root=root,
+            source_commit=source_commit,
+            destination=Path(tmp) / "package_public_site_release.py",
+        )
+        if len(packager.RELEASE_PATHS) != 43:
+            raise DeploymentReceiptError("historical allowlist count drifted from receipt")
         archive = Path(tmp) / "public-site-release.tar"
         manifest_path = Path(tmp) / "public-site-release-manifest.json"
         built = packager.build_release_package(
@@ -176,12 +208,10 @@ def verify_receipt(
             raise DeploymentReceiptError("archive SHA-256 mismatch")
         if sha256_bytes(manifest_path.read_bytes()) != subject.get("manifest_sha256"):
             raise DeploymentReceiptError("manifest SHA-256 mismatch")
-        manifest, rows = supply_chain.validate_release_inputs(
-            repo_root=root,
-            archive_path=archive,
-            manifest_path=manifest_path,
-            source_commit=source_commit,
-        )
+        manifest = supply_chain.read_json(manifest_path)
+        rows = manifest.get("files")
+        if not isinstance(rows, list) or len(rows) != 43:
+            raise DeploymentReceiptError("historical manifest row count mismatch")
         sbom = supply_chain.build_sbom(manifest=manifest, rows=rows)
         rendered_sbom = json.dumps(
             sbom, indent=2, sort_keys=True, ensure_ascii=True

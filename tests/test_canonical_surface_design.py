@@ -1,4 +1,5 @@
 import hashlib
+import json
 from pathlib import Path
 
 
@@ -13,6 +14,7 @@ PAGES = {
 
 PUBLIC_REVIEW_PAGES = (
     DASHBOARD / "proof_to_pilot.html",
+    DASHBOARD / "visual_library.html",
     DASHBOARD / "external_review.html",
     DASHBOARD / "evidence" / "index_bounded.html",
 )
@@ -144,7 +146,61 @@ def test_public_home_sells_one_bounded_assurance_sequence():
     assert "Pricing is not buyer-tested" in home
     assert "No favorable result, savings, ROI, certification" in home
     assert 'href="/proof_to_pilot.html"' in home
+    assert 'href="/visual_library.html"' in home
     assert "ProofLock Opportunity Sprint" not in home
+
+
+def test_public_visual_library_is_complete_hash_bound_and_claim_bounded():
+    visual_root = DASHBOARD / "assets" / "visuals"
+    payload = json.loads((visual_root / "manifest.json").read_text(encoding="utf-8"))
+    page_body = (DASHBOARD / "visual_library.html").read_text(encoding="utf-8")
+
+    assert payload["schema"] == "lumencore.public_visual_library.v1"
+    assert payload["asset_count"] == 12
+    assert len(payload["items"]) == 12
+    assert payload["total_web_bytes"] == sum(item["bytes"] for item in payload["items"])
+    assert "concept art" in payload["authority_boundary"].lower()
+    assert "external validation" in payload["authority_boundary"].lower()
+    assert 'rel="canonical" href="https://lumen-core.ai/visual_library.html"' in page_body
+    assert 'href="/assets/visuals/manifest.json"' in page_body
+    assert "CONCEPT ART ≠ OBSERVATION" in page_body
+    assert "CUSTODY ≠ AUTHORITY" in page_body
+    assert "FIRST-PARTY ≠ INDEPENDENT VALIDATION" in page_body
+    assert page_body.count('<article class="card') == 12
+
+    seen_assets = set()
+    total_bytes = 0
+    for item in payload["items"]:
+        assert set(item) == {
+            "id",
+            "title",
+            "evidence_class",
+            "public_boundary",
+            "source_filename",
+            "source_sha256",
+            "web_asset",
+            "web_sha256",
+            "width",
+            "height",
+            "bytes",
+        }
+        asset_name = item["web_asset"]
+        assert asset_name not in seen_assets
+        seen_assets.add(asset_name)
+        assert asset_name.endswith(".webp")
+        asset = visual_root / asset_name
+        body = asset.read_bytes()
+        assert len(body) == item["bytes"]
+        assert hashlib.sha256(body).hexdigest() == item["web_sha256"]
+        assert item["width"] > 0 and item["height"] > 0
+        assert item["public_boundary"].strip()
+        assert f'/assets/visuals/{asset_name}' in page_body
+        total_bytes += len(body)
+
+    assert len(seen_assets) == 12
+    assert total_bytes == payload["total_web_bytes"]
+    assert total_bytes < 3_500_000
+    assert "C:\\Users\\" not in json.dumps(payload)
 
 
 def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced():
