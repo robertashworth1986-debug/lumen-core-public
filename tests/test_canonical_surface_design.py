@@ -146,6 +146,38 @@ def test_public_home_sells_one_bounded_assurance_sequence():
     assert "ProofLock Opportunity Sprint" not in home
 
 
+def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced():
+    home = page("home")
+    assert 'data-proof-lattice' in home
+    assert 'class="lis-lattice-canvas"' in home
+    assert "Source" in home
+    assert "Baseline" in home
+    assert "Metric" in home
+    assert "Hash" in home
+    assert "Decision" in home
+    assert "design model, not a scientific result or validation claim" in home
+
+    shared_js = (DASHBOARD / "assets" / "luma_institutional_surface.js").read_text(
+        encoding="utf-8"
+    )
+    assert 'canvas.getContext("2d"' in shared_js
+    assert "prefers-reduced-motion: reduce" in shared_js
+    assert "connection.saveData" in shared_js
+    assert "navigator.deviceMemory" in shared_js
+    assert "navigator.hardwareConcurrency" in shared_js
+    assert '"ResizeObserver" in window' in shared_js
+    assert '"IntersectionObserver" in window' in shared_js
+    assert "requestAnimationFrame" in shared_js
+    assert "execution_authorized" not in shared_js
+
+    shared_css = (DASHBOARD / "assets" / "luma_institutional_surface.css").read_text(
+        encoding="utf-8"
+    )
+    assert ".lis-lattice-stage" in shared_css
+    assert ".lis-lattice-viewport" in shared_css
+    assert ".lis-lattice-canvas" in shared_css
+
+
 def test_public_browser_path_uses_only_minimal_public_runtime_contracts():
     home = page("home")
     assert "/api/public/status" in home
