@@ -10,7 +10,7 @@ and six primary operator surfaces:
 | Surface | Route | Responsibility |
 | --- | --- | --- |
 | Operator Home | `/` or `/operator_home.html` | Product map, proof boundaries, commercialization, and live readiness |
-| Visual Library | `/visual_library.html` | Public cinematic visuals with per-asset evidence classes, boundaries, and hashes |
+| Visual Library + R&amp;D Portfolio | `/visual_library.html` and `#research-portfolio` | Public cinematic visuals plus eight maturity-labelled research programs; per-asset evidence classes, boundaries, and hashes remain separate from technical authority |
 | Mission Control | `/mission_control.html` | System health, evidence, approvals, and operating posture |
 | Quant Lab | `/quant_lab.html` | Unified research cockpit and navigation host |
 | Kraken Execution | `/kraken_execution_dashboard.html` | Paper execution, order evidence, positions, and market awareness |

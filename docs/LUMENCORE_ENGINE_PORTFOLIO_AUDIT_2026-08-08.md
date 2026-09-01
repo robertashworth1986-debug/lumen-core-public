@@ -1,6 +1,6 @@
 # LumenCore Engine Portfolio Audit
 
-Generated at: `2026-08-19T14:19:16.519238Z`
+Generated at: `2026-09-01T00:08:48Z`
 
 ## Reviewer decision
 
@@ -38,11 +38,11 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 |---|---|---|---:|---|
 | Lumen Infrastructure Sentinel | `priority_validation_lane` | `runnable_component` | 5/6 | Test one declared infrastructure claim against an accepted incumbent baseline and return replayable decision evidence. |
 | EchoForm Identity Engine | `concept_lane` | `concept_only` | 1/6 | Requirements workshop only after privacy, consent, threat-model, and minimization rules are defined. |
-| Smart City Node Engine | `concept_lane` | `concept_only` | 1/6 | Requirements and simulation-scoping workshop only. |
+| Smart City Node Engine | `concept_lane` | `concept_only` | 2/6 | Define one authorized telemetry source, accepted incumbent, deterministic simulation or shadow replay, locked metric, and human-owned decision with no actuation. |
 | CrowdFund Radar | `research_lane` | `component_only` | 1/6 | Compare a pre-registered campaign ranking with a simple popularity baseline. |
 | Cyber Forensics Assist | `research_lane` | `component_only` | 3/6 | Measure chronology completeness and reviewer agreement without modifying source evidence. |
-| Energy Harmonization Engine | `research_lane` | `runnable_component` | 3/6 | Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision. |
-| FlowForm Hardware Engine | `research_lane` | `runnable_component` | 3/6 | Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan. |
+| Energy Harmonization Engine | `research_lane` | `runnable_component` | 4/6 | Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision. |
+| FlowForm Hardware Engine | `research_lane` | `runnable_component` | 4/6 | Freeze one non-enabling geometry, comparator, metric set, conventional model, safety boundary, and independent bench or manufacturability plan. |
 | Kraken Sentinel / LumaSniper | `research_lane` | `tested_implementation` | 5/6 | Review read-only telemetry and paper-ledger controls under a frozen protocol. |
 | Luma XR Command Room | `research_lane` | `runnable_component` | 4/6 | Test declared monitoring tasks using non-sensitive sample telemetry. |
 | LumaScout | `research_lane` | `runnable_component` | 4/6 | Compare a pre-registered shortlist with a transparent popularity baseline. |
@@ -72,10 +72,10 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 ### Smart City Node Engine
 
-- Safe description: Smart-city and telecom edge-routing concept.
+- Safe description: Read-only Smart City and telecom edge-system decision-assurance concept.
 - Buyer profile: Future municipal, utility, and telecom research partners.
 - Acceptance gate: A deterministic simulator beats a named baseline on a locked latency, resilience, or allocation metric.
-- Claim boundary: No city deployment, critical-infrastructure control, latency, resilience, or savings claim.
+- Claim boundary: No city or network control, commercial-board or 5G replacement, RF/EMC, latency, resilience, privacy, safety, savings, or deployment claim.
 - Missing configured paths: 0
 
 ### CrowdFund Radar
@@ -96,18 +96,18 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 ### Energy Harmonization Engine
 
-- Safe description: Energy-data evidence pipeline and simulation research component.
+- Safe description: Conventional energy-data evidence, forecasting, calibration, and simulation research component; legacy Nuclear Harmonization material remains a restricted speculative archive.
 - Buyer profile: Utilities, facility operators, energy researchers, and government laboratories with authorized data.
 - Acceptance gate: Meet locked accuracy, calibration, timeliness, and economic-conversion rules against a named baseline.
-- Claim boundary: No nuclear control, field validation, outage savings, or universal harmonic-superiority claim.
+- Claim boundary: No nuclear conversion or control, radiation, healing, safety, usable-energy, field-validation, outage-savings, or universal harmonic-superiority claim.
 - Missing configured paths: 0
 
 ### FlowForm Hardware Engine
 
-- Safe description: Simulation and audit tooling for geometry-informed routing concepts.
+- Safe description: Simulation, audit, and matched-test planning for curved electronics, honeycomb energy, ground robotics, and versioned digital geometry concepts.
 - Buyer profile: Aerospace, robotics, EV, and electronics R&D teams with a declared comparator.
 - Acceptance gate: Pre-registered simulation and independent bench tests beat named baselines on declared measures.
-- Claim boundary: No physical thermal, electromagnetic, battery, structural, manufacturing, or field-performance claim.
+- Claim boundary: Concept renders are not CAD or prototypes; no thermal, electromagnetic, battery, robotics, structural, print, manufacturing, safety, certification, or field-performance claim.
 - Missing configured paths: 0
 
 ### Kraken Sentinel / LumaSniper
@@ -178,7 +178,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 - Strategic packet SHA-256: `358855ad9d44ee72ef460ad70b46448a82f327a0c536d9253d3fad84590c4ad7`
 - Evidence graph SHA-256: `cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05`
-- Portfolio payload SHA-256: `983084f99486bc94023686241ecb48ea4a7d6a2880bd5aa6cd978c3d46c4d271`
+- Portfolio payload SHA-256: `d5f435757ef7af76cefe98cc062a65d394b597fa2cba6d6c052fa5c4d916e132`
 - Public contact: <https://lumen-core.ai/proof_to_pilot.html>
 
 ## Boundaries

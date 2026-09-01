@@ -203,54 +203,54 @@
       "id": "smart_city_node_engine",
       "name": "Smart City Node Engine",
       "lane": "concept_lane",
-      "safe_description": "Smart-city and telecom edge-routing concept.",
+      "safe_description": "Read-only Smart City and telecom edge-system decision-assurance concept.",
       "buyer_profile": "Future municipal, utility, and telecom research partners.",
-      "scoping_use": "Requirements and simulation-scoping workshop only.",
+      "scoping_use": "Define one authorized telemetry source, accepted incumbent, deterministic simulation or shadow replay, locked metric, and human-owned decision with no actuation.",
       "acceptance_gate": "A deterministic simulator beats a named baseline on a locked latency, resilience, or allocation metric.",
-      "claim_boundary": "No city deployment, critical-infrastructure control, latency, resilience, or savings claim.",
+      "claim_boundary": "No city or network control, commercial-board or 5G replacement, RF/EMC, latency, resilience, privacy, safety, savings, or deployment claim.",
       "evidence": {
         "source": [],
         "entrypoint": [],
         "test": [],
         "documentation": ["docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
         "artifact": [],
-        "public_surface": []
+        "public_surface": ["dashboard/visual_library.html"]
       }
     },
     {
       "id": "flowform_hardware_engine",
       "name": "FlowForm Hardware Engine",
       "lane": "research_lane",
-      "safe_description": "Simulation and audit tooling for geometry-informed routing concepts.",
+      "safe_description": "Simulation, audit, and matched-test planning for curved electronics, honeycomb energy, ground robotics, and versioned digital geometry concepts.",
       "buyer_profile": "Aerospace, robotics, EV, and electronics R&D teams with a declared comparator.",
-      "scoping_use": "Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan.",
+      "scoping_use": "Freeze one non-enabling geometry, comparator, metric set, conventional model, safety boundary, and independent bench or manufacturability plan.",
       "acceptance_gate": "Pre-registered simulation and independent bench tests beat named baselines on declared measures.",
-      "claim_boundary": "No physical thermal, electromagnetic, battery, structural, manufacturing, or field-performance claim.",
+      "claim_boundary": "Concept renders are not CAD or prototypes; no thermal, electromagnetic, battery, robotics, structural, print, manufacturing, safety, certification, or field-performance claim.",
       "evidence": {
         "source": ["code/ops/flowform_phase_lock_audit.py", "code/ops/harmonic_flowform_impact_explainer.py"],
         "entrypoint": ["code/ops/flowform_phase_lock_audit.py"],
         "test": [],
         "documentation": ["docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
         "artifact": [],
-        "public_surface": []
+        "public_surface": ["dashboard/visual_library.html"]
       }
     },
     {
       "id": "energy_harmonization_engine",
       "name": "Energy Harmonization Engine",
       "lane": "research_lane",
-      "safe_description": "Energy-data evidence pipeline and simulation research component.",
+      "safe_description": "Conventional energy-data evidence, forecasting, calibration, and simulation research component; legacy Nuclear Harmonization material remains a restricted speculative archive.",
       "buyer_profile": "Utilities, facility operators, energy researchers, and government laboratories with authorized data.",
       "scoping_use": "Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision.",
       "acceptance_gate": "Meet locked accuracy, calibration, timeliness, and economic-conversion rules against a named baseline.",
-      "claim_boundary": "No nuclear control, field validation, outage savings, or universal harmonic-superiority claim.",
+      "claim_boundary": "No nuclear conversion or control, radiation, healing, safety, usable-energy, field-validation, outage-savings, or universal harmonic-superiority claim.",
       "evidence": {
         "source": ["code/ops/run_sector_energy_evidence_pipeline.py", "code/institutional_harmonic_infrastructure.py"],
         "entrypoint": ["code/ops/run_sector_energy_evidence_pipeline.py"],
         "test": [],
         "documentation": ["docs/LUMA_UNIVERSE_MODULE_CATALOG.md"],
         "artifact": [],
-        "public_surface": []
+        "public_surface": ["dashboard/visual_library.html"]
       }
     },
     {

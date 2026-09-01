@@ -203,6 +203,70 @@ def test_public_visual_library_is_complete_hash_bound_and_claim_bounded():
     assert "C:\\Users\\" not in json.dumps(payload)
 
 
+def test_public_research_portfolio_is_complete_maturity_labeled_and_claim_bounded():
+    portfolio = (DASHBOARD / "visual_library.html").read_text(encoding="utf-8")
+    home = page("home")
+
+    assert 'id="research-portfolio"' in portfolio
+    assert "Eight source-audited programs. A larger governed constellation." in portfolio
+    for program in (
+        "LumaJet",
+        "FlowForm curved electronics",
+        "Honeycomb energy module",
+        "Ground robotics",
+        "LumenFrame / STL",
+        "Smart City + Telecom",
+        "Energy + Nuclear Harmonization",
+        "Dungeon / Dungieon",
+    ):
+        assert program in portfolio
+    for maturity in (
+        "Internal simulation",
+        "Concept program",
+        "Measured digital artifact",
+        "Restricted archive",
+        "Unresolved source identity",
+    ):
+        assert maturity in portfolio
+    for boundary in (
+        "NOT PROVEN",
+        "NO SOURCE · NO PUBLIC CARD",
+        "A concept render is not CAD",
+        "An internal simulation is not external validation",
+    ):
+        assert boundary in portfolio
+    assert "1,120-scenario V1" in portfolio
+    assert "1,400-scenario V2" in portfolio
+    assert "4,884-byte binary STL" in portfolio
+    assert "96 triangles" in portfolio
+    assert "64 unique vertices" in portfolio
+    assert "eight disconnected closed components" in portfolio
+    assert "Measured-claim contract" in portfolio
+    assert "New experiment required" in portfolio
+    for module in (
+        "ProofLock",
+        "Agent Arena",
+        "LumaTrader",
+        "LumaScout",
+        "LumaSuit",
+        "LumaSkin",
+        "EchoForm",
+        "LumaSpiral",
+        "EtherFrame",
+        "AetherReach",
+        "LumenShell",
+        "EchoLock",
+        "NovaCore",
+        "LumenGov",
+        "Infrastructure Sentinel",
+        "World Model",
+        "XR Command Room",
+    ):
+        assert module in portfolio
+    assert 'href="/visual_library.html#research-portfolio"' in home
+    assert "Massive scope. One governed commercial doorway." in home
+
+
 def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced():
     home = page("home")
     assert 'data-proof-lattice' in home

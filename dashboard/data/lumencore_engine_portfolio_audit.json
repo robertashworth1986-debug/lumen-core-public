@@ -1,8 +1,8 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-19T14:19:16.519238Z",
+  "generated_at_utc": "2026-09-01T00:08:48Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
-  "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
+  "source_registry_sha256": "5ef85dec06104d676277a03ef916764504de8687e55245b9fda844c3dbf1e50b",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
   "source_note": "The 15 founder engine names are audited as internal platform lanes, not 15 finished products or 15 separate offers. Only repository evidence is scored.",
   "primary_offer_binding": {
@@ -165,13 +165,13 @@
       "id": "smart_city_node_engine",
       "name": "Smart City Node Engine",
       "lane": "concept_lane",
-      "safe_description": "Smart-city and telecom edge-routing concept.",
+      "safe_description": "Read-only Smart City and telecom edge-system decision-assurance concept.",
       "buyer_profile": "Future municipal, utility, and telecom research partners.",
-      "scoping_use": "Requirements and simulation-scoping workshop only.",
+      "scoping_use": "Define one authorized telemetry source, accepted incumbent, deterministic simulation or shadow replay, locked metric, and human-owned decision with no actuation.",
       "acceptance_gate": "A deterministic simulator beats a named baseline on a locked latency, resilience, or allocation metric.",
-      "claim_boundary": "No city deployment, critical-infrastructure control, latency, resilience, or savings claim.",
+      "claim_boundary": "No city or network control, commercial-board or 5G replacement, RF/EMC, latency, resilience, privacy, safety, savings, or deployment claim.",
       "observed_maturity": "concept_only",
-      "evidence_classes_present": 1,
+      "evidence_classes_present": 2,
       "evidence_classes_total": 6,
       "missing_paths": [],
       "untracked_paths": [],
@@ -190,7 +190,16 @@
           }
         ],
         "artifact": [],
-        "public_surface": []
+        "public_surface": [
+          {
+            "path": "dashboard/visual_library.html",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "1a1ae69ea067fa13ca4cded489b7ce8060f8e9d0",
+            "bytes": 17671,
+            "sha256": "dffbdaf428add004a1153e3b0401b5f54ac951f8235cc9183d78fb8d219c671c"
+          }
+        ]
       }
     },
     {
@@ -279,13 +288,13 @@
       "id": "energy_harmonization_engine",
       "name": "Energy Harmonization Engine",
       "lane": "research_lane",
-      "safe_description": "Energy-data evidence pipeline and simulation research component.",
+      "safe_description": "Conventional energy-data evidence, forecasting, calibration, and simulation research component; legacy Nuclear Harmonization material remains a restricted speculative archive.",
       "buyer_profile": "Utilities, facility operators, energy researchers, and government laboratories with authorized data.",
       "scoping_use": "Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision.",
       "acceptance_gate": "Meet locked accuracy, calibration, timeliness, and economic-conversion rules against a named baseline.",
-      "claim_boundary": "No nuclear control, field validation, outage savings, or universal harmonic-superiority claim.",
+      "claim_boundary": "No nuclear conversion or control, radiation, healing, safety, usable-energy, field-validation, outage-savings, or universal harmonic-superiority claim.",
       "observed_maturity": "runnable_component",
-      "evidence_classes_present": 3,
+      "evidence_classes_present": 4,
       "evidence_classes_total": 6,
       "missing_paths": [],
       "untracked_paths": [],
@@ -330,20 +339,29 @@
           }
         ],
         "artifact": [],
-        "public_surface": []
+        "public_surface": [
+          {
+            "path": "dashboard/visual_library.html",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "1a1ae69ea067fa13ca4cded489b7ce8060f8e9d0",
+            "bytes": 17671,
+            "sha256": "dffbdaf428add004a1153e3b0401b5f54ac951f8235cc9183d78fb8d219c671c"
+          }
+        ]
       }
     },
     {
       "id": "flowform_hardware_engine",
       "name": "FlowForm Hardware Engine",
       "lane": "research_lane",
-      "safe_description": "Simulation and audit tooling for geometry-informed routing concepts.",
+      "safe_description": "Simulation, audit, and matched-test planning for curved electronics, honeycomb energy, ground robotics, and versioned digital geometry concepts.",
       "buyer_profile": "Aerospace, robotics, EV, and electronics R&D teams with a declared comparator.",
-      "scoping_use": "Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan.",
+      "scoping_use": "Freeze one non-enabling geometry, comparator, metric set, conventional model, safety boundary, and independent bench or manufacturability plan.",
       "acceptance_gate": "Pre-registered simulation and independent bench tests beat named baselines on declared measures.",
-      "claim_boundary": "No physical thermal, electromagnetic, battery, structural, manufacturing, or field-performance claim.",
+      "claim_boundary": "Concept renders are not CAD or prototypes; no thermal, electromagnetic, battery, robotics, structural, print, manufacturing, safety, certification, or field-performance claim.",
       "observed_maturity": "runnable_component",
-      "evidence_classes_present": 3,
+      "evidence_classes_present": 4,
       "evidence_classes_total": 6,
       "missing_paths": [],
       "untracked_paths": [],
@@ -388,7 +406,16 @@
           }
         ],
         "artifact": [],
-        "public_surface": []
+        "public_surface": [
+          {
+            "path": "dashboard/visual_library.html",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "1a1ae69ea067fa13ca4cded489b7ce8060f8e9d0",
+            "bytes": 17671,
+            "sha256": "dffbdaf428add004a1153e3b0401b5f54ac951f8235cc9183d78fb8d219c671c"
+          }
+        ]
       }
     },
     {
@@ -992,6 +1019,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "983084f99486bc94023686241ecb48ea4a7d6a2880bd5aa6cd978c3d46c4d271"
+    "payload_sha256": "d5f435757ef7af76cefe98cc062a65d394b597fa2cba6d6c052fa5c4d916e132"
   }
 }

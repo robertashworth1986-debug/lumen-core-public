@@ -43,6 +43,10 @@ deliverable.
 
 **[Open the Repository Security Assurance guide](docs/REPOSITORY_SECURITY_ASSURANCE.md)**
 
+**[Open the claim-bounded Luma Universe R&amp;D portfolio](docs/LUMA_UNIVERSE_MODULE_CATALOG.md)**
+
+**[Open the LumenFrame V1 digital-mesh measurement receipt](docs/LUMENFRAME_V1_DIGITAL_MESH_RECEIPT_2026-08-31.md)**
+
 The index is the canonical evidence map. The reviewer page gives the shortest human path. The index identifies:
 
 - what is merged into the default branch;
@@ -227,6 +231,7 @@ review. Action-time HumanUnlock remains outside machine verification.
 - Proof Capsule schema: [docs/PROOF_CAPSULE_SCHEMA.md](docs/PROOF_CAPSULE_SCHEMA.md)
 - Claim boundaries: [docs/CLAIM_BOUNDARY_REGISTER.md](docs/CLAIM_BOUNDARY_REGISTER.md)
 - Conceptual R&D and visual asset boundary: [docs/CONCEPTUAL_RND_AND_VISUAL_ASSET_BOUNDARY.md](docs/CONCEPTUAL_RND_AND_VISUAL_ASSET_BOUNDARY.md)
+- Public Visual Library and evidence-labelled R&D portfolio: <https://lumen-core.ai/visual_library.html#research-portfolio>
 - Private asset quarantine and redaction checklist: [docs/PRIVATE_ASSET_QUARANTINE_AND_REDACTION_CHECKLIST.md](docs/PRIVATE_ASSET_QUARANTINE_AND_REDACTION_CHECKLIST.md)
 - Founder/IP boundary: [docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md](docs/FOUNDER_IP_AND_EXTERNAL_REVIEW_BOUNDARY.md)
 - Pilot report template: [docs/PILOT_REPORT_TEMPLATE.md](docs/PILOT_REPORT_TEMPLATE.md)
