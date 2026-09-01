@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-09-01T00:08:48Z",
+  "generated_at_utc": "2026-09-01T00:26:23Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "5ef85dec06104d676277a03ef916764504de8687e55245b9fda844c3dbf1e50b",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -144,17 +144,17 @@
             "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "3256bf2eaa2e21289075290702bd2a68e37642a2",
-            "bytes": 5146,
-            "sha256": "dd42ad96883f9be86aef26b5e64b35f6a64baf6647eafad446769bec29eb9342"
+            "git_blob_sha": "6e8d4dd12ff97949095032c967010fda631a6eac",
+            "bytes": 7203,
+            "sha256": "011e082968bcc62dc4ae49c03d431b568826c9c6bd80e6d02d745df7abfa611c"
           },
           {
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
-            "bytes": 4873,
-            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+            "git_blob_sha": "4757fff0dd5843d7149fe00af1eda7d5b17bab63",
+            "bytes": 11655,
+            "sha256": "4a12ddc191307a8ac25f3247ef34544614fcb206e350a4e2ef692575981bc952"
           }
         ],
         "artifact": [],
@@ -184,9 +184,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
-            "bytes": 4873,
-            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+            "git_blob_sha": "4757fff0dd5843d7149fe00af1eda7d5b17bab63",
+            "bytes": 11655,
+            "sha256": "4a12ddc191307a8ac25f3247ef34544614fcb206e350a4e2ef692575981bc952"
           }
         ],
         "artifact": [],
@@ -195,9 +195,9 @@
             "path": "dashboard/visual_library.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1a1ae69ea067fa13ca4cded489b7ce8060f8e9d0",
-            "bytes": 17671,
-            "sha256": "dffbdaf428add004a1153e3b0401b5f54ac951f8235cc9183d78fb8d219c671c"
+            "git_blob_sha": "92d16295ef09a93cea30e2283be6a00fd091a2aa",
+            "bytes": 31815,
+            "sha256": "3ce67719fa9d70273203a8f87fa65c10670408cfa31d7c9f4f049c12de78dfef"
           }
         ]
       }
@@ -333,9 +333,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
-            "bytes": 4873,
-            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+            "git_blob_sha": "4757fff0dd5843d7149fe00af1eda7d5b17bab63",
+            "bytes": 11655,
+            "sha256": "4a12ddc191307a8ac25f3247ef34544614fcb206e350a4e2ef692575981bc952"
           }
         ],
         "artifact": [],
@@ -344,9 +344,9 @@
             "path": "dashboard/visual_library.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1a1ae69ea067fa13ca4cded489b7ce8060f8e9d0",
-            "bytes": 17671,
-            "sha256": "dffbdaf428add004a1153e3b0401b5f54ac951f8235cc9183d78fb8d219c671c"
+            "git_blob_sha": "92d16295ef09a93cea30e2283be6a00fd091a2aa",
+            "bytes": 31815,
+            "sha256": "3ce67719fa9d70273203a8f87fa65c10670408cfa31d7c9f4f049c12de78dfef"
           }
         ]
       }
@@ -400,9 +400,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
-            "bytes": 4873,
-            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+            "git_blob_sha": "4757fff0dd5843d7149fe00af1eda7d5b17bab63",
+            "bytes": 11655,
+            "sha256": "4a12ddc191307a8ac25f3247ef34544614fcb206e350a4e2ef692575981bc952"
           }
         ],
         "artifact": [],
@@ -411,9 +411,9 @@
             "path": "dashboard/visual_library.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1a1ae69ea067fa13ca4cded489b7ce8060f8e9d0",
-            "bytes": 17671,
-            "sha256": "dffbdaf428add004a1153e3b0401b5f54ac951f8235cc9183d78fb8d219c671c"
+            "git_blob_sha": "92d16295ef09a93cea30e2283be6a00fd091a2aa",
+            "bytes": 31815,
+            "sha256": "3ce67719fa9d70273203a8f87fa65c10670408cfa31d7c9f4f049c12de78dfef"
           }
         ]
       }
@@ -543,9 +543,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
-            "bytes": 4873,
-            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+            "git_blob_sha": "4757fff0dd5843d7149fe00af1eda7d5b17bab63",
+            "bytes": 11655,
+            "sha256": "4a12ddc191307a8ac25f3247ef34544614fcb206e350a4e2ef692575981bc952"
           }
         ],
         "artifact": [],
@@ -770,9 +770,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
-            "bytes": 4873,
-            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+            "git_blob_sha": "4757fff0dd5843d7149fe00af1eda7d5b17bab63",
+            "bytes": 11655,
+            "sha256": "4a12ddc191307a8ac25f3247ef34544614fcb206e350a4e2ef692575981bc952"
           }
         ],
         "artifact": [],
@@ -820,9 +820,9 @@
             "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
-            "bytes": 4873,
-            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+            "git_blob_sha": "4757fff0dd5843d7149fe00af1eda7d5b17bab63",
+            "bytes": 11655,
+            "sha256": "4a12ddc191307a8ac25f3247ef34544614fcb206e350a4e2ef692575981bc952"
           }
         ],
         "artifact": [],
@@ -1019,6 +1019,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "d5f435757ef7af76cefe98cc062a65d394b597fa2cba6d6c052fa5c4d916e132"
+    "payload_sha256": "690127fcbdbb46c8edb84a6975cd85ec88b36903f31a2cedc0f928668653bebe"
   }
 }
