@@ -6,12 +6,16 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import hashlib
+import http.client
+import ipaddress
 import json
 from pathlib import Path
 import re
+import socket
+import ssl
 import sys
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urljoin
+from urllib.parse import quote, urljoin, urlparse, urlunsplit
 from urllib.request import Request, urlopen
 
 
@@ -34,6 +38,11 @@ FILE_KEYS = {
     "install_mode",
     "repo_path",
     "sha256",
+}
+REQUEST_HEADERS = {
+    "Accept-Encoding": "identity",
+    "Cache-Control": "no-cache",
+    "User-Agent": "LumenCore-Public-Release-Verifier/1.0",
 }
 
 
@@ -76,6 +85,99 @@ def sha256(body: bytes) -> str:
     return hashlib.sha256(body).hexdigest()
 
 
+def normalize_resolve_address(value: str | None) -> str | None:
+    """Return one normalized literal IP without performing a DNS lookup."""
+    if value is None:
+        return None
+    if "%" in value:
+        raise ValueError("resolve address must be one literal IPv4 or IPv6 address")
+    try:
+        return ipaddress.ip_address(value).compressed
+    except ValueError as exc:
+        raise ValueError("resolve address must be one literal IPv4 or IPv6 address") from exc
+
+
+class ResolvedHTTPSConnection(http.client.HTTPSConnection):
+    """Connect to one IP while retaining the canonical Host and TLS SNI name."""
+
+    def __init__(
+        self,
+        host: str,
+        *,
+        resolve_address: str,
+        port: int = 443,
+        timeout: float,
+        context: ssl.SSLContext | None = None,
+    ) -> None:
+        self.resolve_address = normalize_resolve_address(resolve_address)
+        super().__init__(host, port=port, timeout=timeout, context=context)
+
+    def connect(self) -> None:
+        self.sock = socket.create_connection(
+            (str(self.resolve_address), self.port),
+            self.timeout,
+            self.source_address,
+        )
+        if self._tunnel_host:
+            self._tunnel()
+        self.sock = self._context.wrap_socket(self.sock, server_hostname=self.host)
+
+
+def fetch_url(
+    url: str, *, timeout: float, resolve_address: str | None
+) -> tuple[bytes, int, str]:
+    """Fetch one URL, optionally pinning the connection without weakening TLS."""
+    if resolve_address is None:
+        request = Request(url, headers=REQUEST_HEADERS)
+        with urlopen(request, timeout=timeout) as response:
+            return (
+                response.read(),
+                getattr(response, "status", 200),
+                response.headers.get_content_type().casefold(),
+            )
+
+    parsed = urlparse(url)
+    if (
+        parsed.scheme != "https"
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.fragment
+    ):
+        raise ValueError(
+            "resolve-address verification requires a credential-free HTTPS URL"
+        )
+    port = parsed.port or 443
+    host_header = parsed.hostname if port == 443 else f"{parsed.hostname}:{port}"
+    target = urlunsplit(("", "", parsed.path or "/", parsed.query, ""))
+    connection = ResolvedHTTPSConnection(
+        parsed.hostname,
+        resolve_address=resolve_address,
+        port=port,
+        timeout=timeout,
+        context=ssl.create_default_context(),
+    )
+    try:
+        connection.request(
+            "GET",
+            target,
+            headers={**REQUEST_HEADERS, "Host": host_header},
+        )
+        response = connection.getresponse()
+        body = response.read()
+        if response.status >= 400:
+            raise HTTPError(
+                url,
+                response.status,
+                response.reason,
+                response.headers,
+                None,
+            )
+        return body, response.status, response.headers.get_content_type().casefold()
+    finally:
+        connection.close()
+
+
 def live_url(base_url: str, archive_name: str, source_commit: str) -> str:
     route_map = {
         "operator_home.html": "/",
@@ -91,8 +193,26 @@ def live_url(base_url: str, archive_name: str, source_commit: str) -> str:
 
 
 def verify(
-    *, manifest_path: Path, source_commit: str, base_url: str, timeout: float
+    *,
+    manifest_path: Path,
+    source_commit: str,
+    base_url: str,
+    timeout: float,
+    resolve_address: str | None = None,
 ) -> dict[str, object]:
+    resolve_address = normalize_resolve_address(resolve_address)
+    parsed_base = urlparse(base_url)
+    if resolve_address is not None and (
+        parsed_base.scheme != "https"
+        or not parsed_base.hostname
+        or parsed_base.username is not None
+        or parsed_base.password is not None
+        or parsed_base.query
+        or parsed_base.fragment
+    ):
+        raise ValueError(
+            "resolve-address verification requires a credential-free HTTPS base URL"
+        )
     manifest = load_manifest(manifest_path)
     if manifest.get("schema") != SCHEMA:
         raise ValueError("unexpected public-site manifest schema")
@@ -141,20 +261,19 @@ def verify(
             raise ValueError(f"invalid manifest row: {name or '<missing>'}")
         seen_names.add(name)
         url = live_url(base_url, name, source_commit)
-        request = Request(
-            url,
-            headers={
-                "Accept-Encoding": "identity",
-                "Cache-Control": "no-cache",
-                "User-Agent": "LumenCore-Public-Release-Verifier/1.0",
-            },
-        )
         try:
-            with urlopen(request, timeout=timeout) as response:
-                body = response.read()
-                status = getattr(response, "status", 200)
-                content_type = response.headers.get_content_type().casefold()
-        except (HTTPError, URLError, TimeoutError) as exc:
+            body, status, content_type = fetch_url(
+                url,
+                timeout=timeout,
+                resolve_address=resolve_address,
+            )
+        except (
+            HTTPError,
+            URLError,
+            TimeoutError,
+            OSError,
+            http.client.HTTPException,
+        ) as exc:
             results.append(
                 {
                     "archive_name": name,
@@ -204,6 +323,13 @@ def main() -> int:
     parser.add_argument("--manifest", required=True, type=Path)
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--base-url", default="https://lumen-core.ai")
+    parser.add_argument(
+        "--resolve-address",
+        help=(
+            "Connect to this literal IP while preserving the URL hostname for "
+            "the Host header, TLS SNI, and certificate verification"
+        ),
+    )
     parser.add_argument("--timeout", type=float, default=20.0)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
@@ -214,6 +340,7 @@ def main() -> int:
             source_commit=args.source_commit,
             base_url=args.base_url,
             timeout=args.timeout,
+            resolve_address=args.resolve_address,
         )
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)

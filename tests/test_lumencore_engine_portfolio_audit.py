@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 import re
@@ -63,10 +64,11 @@ def test_one_platform_one_offer_one_priority_lane(module, inputs):
 
     assert binding["platform"] == "LumenCore"
     assert binding["evidence_layer"] == "ProofLock"
+    assert binding["commercial_method"] == "Frozen Delta"
     assert binding["primary_offer_id"] == "buyer-owned-baseline-validation-sprint"
     assert summary["primary_offer_count"] == 1
-    assert summary["priority_lane_id"] == "lumen_infrastructure_sentinel"
-    assert summary["priority_lane_scoping_candidate"] is True
+    assert summary["configured_priority_lane_id"] == "lumen_infrastructure_sentinel"
+    assert summary["configured_priority_is_evidence_rank"] is False
     assert summary["direct_engine_sales_authorized"] is False
 
 
@@ -82,20 +84,127 @@ def test_current_commercial_truth_is_fail_closed(module, inputs):
     assert summary["external_validation_evidenced"] is False
 
 
+def test_evidence_ranked_named_ec_scope_is_complete_and_ordered(module, inputs):
+    payload = build(module, inputs)
+    systems = payload["evidence_ranked_systems"]
+
+    assert [system["rank"] for system in systems] == list(range(1, 20))
+    assert payload["summary"]["evidence_ranked_system_count"] == 19
+    assert payload["summary"]["registered_implementation_lane_count"] == 15
+    assert payload["summary"]["unverified_or_absent_system_count"] == 2
+    ids = {system["id"] for system in systems}
+    assert {
+        "lumencore_prooflock",
+        "frozen_delta_buyer_owned_validation_sprint",
+        "eia_codecheck",
+        "harbor_sentinel",
+        "dice",
+        "missionweave",
+        "lumengov_grant_factory",
+        "lumatrader_kraken_controls",
+        "faa_sdr_10k",
+        "lumascout",
+        "lumen_infrastructure_sentinel",
+        "lumajet",
+        "luma_xr_command_room",
+        "lumasuit_lumaskin",
+        "echoform_identity_architecture",
+        "echolock",
+        "magneto_magnetic_geometry",
+        "cumberland_museum_experience_dome",
+        "dungeon",
+    } == ids
+
+
+def test_every_ranked_system_preserves_authority_defaults(module, inputs):
+    payload = build(module, inputs)
+    for system in payload["evidence_ranked_systems"]:
+        assert system["external_validation"] is False
+        assert system["field_validation"] is False
+        assert system["commercial_validation"] is False
+        assert system["adverse_result"].strip()
+        assert system["current_gate"].strip()
+        if system["evidence_band"] == "U":
+            assert system["result_state"] == "unverified"
+        else:
+            assert system["evidence_refs"]
+
+
+def test_negative_results_and_open_gates_are_not_promoted(module, inputs):
+    payload = build(module, inputs)
+    by_id = {system["id"]: system for system in payload["evidence_ranked_systems"]}
+
+    infrastructure = by_id["lumen_infrastructure_sentinel"]
+    assert infrastructure["evidence_band"] == "D"
+    assert infrastructure["result_state"] == "negative"
+    assert "negative top-test-versus-baseline" in infrastructure["adverse_result"]
+    grant = by_id["lumengov_grant_factory"]
+    assert grant["result_state"] == "no_result"
+    assert "zero submissions" in grant["adverse_result"]
+    trading = by_id["lumatrader_kraken_controls"]
+    assert trading["evidence_band"] == "D"
+    assert "paper-ticker" in trading["adverse_result"]
+    eia = by_id["eia_codecheck"]
+    assert "zero common settled hours" in eia["adverse_result"]
+
+
+def test_artifact_coverage_is_not_exposed_as_evidence_strength(module, inputs):
+    payload = build(module, inputs)
+    assert "engines" not in payload
+    for lane in payload["registered_implementation_lanes"]:
+        assert "artifact_coverage" in lane
+        assert "evidence_classes_present" not in lane
+        assert "observed_maturity" not in lane
+    rendered = module.render_markdown(payload).lower()
+    assert "artifact coverage counts" in rendered
+    assert "does **not** measure scientific evidence strength" in rendered
+
+
+def test_sanitized_infrastructure_receipt_has_no_embedded_api_query():
+    raw = (ROOT / "institutional_harmonic_infrastructure_proof.json").read_bytes()
+    assert re.search(rb"api[_-]?key=[a-z0-9_-]{12,}", raw, re.IGNORECASE) is None
+    receipt = json.loads(raw)
+    assert receipt["sanitization"]["credential_like_query_values_removed"] is True
+    assert receipt["sanitization"]["provider_key_rotation_confirmed"] is False
+    assert receipt["sanitization"]["public_git_history_remediation_confirmed"] is False
+    assert receipt["summary"]["top_test_vs_baseline"] < 0
+    assert receipt["summary"]["promotion_allowed"] is False
+
+
+def test_crowdfunding_source_is_draft_only_and_claim_bounded():
+    text = (ROOT / "code" / "crowdfunding_engine.py").read_text(encoding="utf-8")
+    lowered = text.casefold()
+    assert "auto_approve_always = false" in lowered
+    assert "external_use_authorized" in lowered
+    assert "financial_terms_status" in lowered
+    for unsafe in (
+        "14–47% earlier",
+        "real kraken txid",
+        "cumberland science museum pilot deployment",
+        "pwc-validated",
+        "doe sbir phase ii transition",
+        "we've validated. we've proven.",
+    ):
+        assert unsafe not in lowered
+
+
 def test_audit_uses_tracked_repository_evidence(module, inputs):
     payload = build(module, inputs)
-    by_id = {engine["id"]: engine for engine in payload["engines"]}
+    by_id = {
+        engine["id"]: engine
+        for engine in payload["registered_implementation_lanes"]
+    }
 
-    assert by_id["lumengov_grant_factory"]["observed_maturity"] == "tested_implementation"
-    assert by_id["lumen_infrastructure_sentinel"]["observed_maturity"] == "runnable_component"
-    assert by_id["echoform_identity_engine"]["observed_maturity"] == "concept_only"
-    assert by_id["smart_city_node_engine"]["observed_maturity"] == "concept_only"
+    assert by_id["lumengov_grant_factory"]["implementation_state"] == "tested_implementation"
+    assert by_id["lumen_infrastructure_sentinel"]["implementation_state"] == "runnable_component"
+    assert by_id["echoform_identity_engine"]["implementation_state"] == "concept_only"
+    assert by_id["smart_city_node_engine"]["implementation_state"] == "concept_only"
     assert by_id["luma_xr_command_room"]["missing_paths"] == []
     assert payload["summary"]["missing_evidence_path_count"] == 0
     assert payload["summary"]["untracked_evidence_path_count"] == 0
     tracked_records = [
         record
-        for engine in payload["engines"]
+        for engine in payload["registered_implementation_lanes"]
         for records in engine["evidence"].values()
         for record in records
         if record["tracked"]
@@ -103,6 +212,22 @@ def test_audit_uses_tracked_repository_evidence(module, inputs):
     assert tracked_records
     assert all(len(record["git_blob_sha"]) == 40 for record in tracked_records)
     assert all(len(record["sha256"]) == 64 for record in tracked_records)
+
+
+def test_tracked_evidence_uses_canonical_git_blob_bytes(module):
+    tracked = module.tracked_repository_objects()
+    path = "EVIDENCE_INDEX.md"
+    record = module.current_blob_record(path, tracked)
+    canonical = subprocess.run(
+        ["git", "cat-file", "blob", tracked[path]],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+    ).stdout
+
+    assert record["git_blob_sha"] == tracked[path]
+    assert record["bytes"] == len(canonical)
+    assert record["sha256"] == hashlib.sha256(canonical).hexdigest()
 
 
 def test_public_payload_excludes_private_drive_and_branch_inventory(module, inputs):
@@ -142,7 +267,7 @@ def test_payload_integrity_seals_all_public_content(module, inputs):
     payload = build(module, inputs)
     assert payload["integrity"]["payload_sha256"] == module.payload_sha256(payload)
 
-    payload["engines"][0]["safe_description"] += " drift"
+    payload["evidence_ranked_systems"][0]["result_summary"] += " drift"
     assert payload["integrity"]["payload_sha256"] != module.payload_sha256(payload)
 
 
@@ -151,7 +276,10 @@ def test_markdown_keeps_one_offer_and_no_stale_sales_sequence(module, inputs):
     lowered = markdown.lower()
 
     assert "one platform with one primary commercial offer" in lowered
-    assert "buyer-owned baseline validation sprint" in markdown
+    assert "buyer-owned baseline validation sprint" in lowered
+    assert "commercial method:** frozen delta" in lowered
+    assert "artifact coverage" in lowered
+    assert "configured sector priority is an evidence rank: `false`" in lowered
     assert "first revenue sequence" not in lowered
     assert "design_partner_ready" not in lowered
     assert "subscription-ready products: `0`" in lowered

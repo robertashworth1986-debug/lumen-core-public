@@ -1,13 +1,29 @@
 {
-  "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-19T14:19:16.519238Z",
+  "schema": "lumencore_engine_portfolio_audit_v3",
+  "generated_at_utc": "2026-08-27T23:30:00Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
-  "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
+  "source_registry_sha256": "1bed019174d69b22f8559bb1cce982646181ea4196dce68012b3911e849c9e13",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
-  "source_note": "The 15 founder engine names are audited as internal platform lanes, not 15 finished products or 15 separate offers. Only repository evidence is scored.",
+  "source_note": "The 15 registered implementation lanes are an artifact-coverage inventory, not 15 finished products or a complete ecosystem catalog. Evidence strength is ranked separately and only from bounded repository evidence.",
+  "inventory_scope": {
+    "registered_implementation_lane_count": 15,
+    "evidence_ranked_system_count": 19,
+    "comprehensive_for_named_ec_scope": true,
+    "separate_products_implied": false,
+    "unverified_or_absent_states_included": true
+  },
+  "evidence_band_legend": {
+    "A": "Deployed bounded demonstration, first-party reproduced package, or externally executable assurance method; not external, field, or commercial validation.",
+    "B": "Measured public-data or controlled representative-data benchmark with a frozen comparator and explicit limits.",
+    "C": "Synthetic or generated benchmark with a frozen comparator and retained adverse results.",
+    "D": "Tested implementation, control, or workflow with no promotable validated outcome or with an open operational gate.",
+    "E": "Documented concept, specification, internal signal, or source asset without a complete public result capsule.",
+    "U": "Unverified or absent in the public repository; no build or outcome claim is permitted."
+  },
   "primary_offer_binding": {
     "platform": "LumenCore",
     "evidence_layer": "ProofLock",
+    "commercial_method": "Frozen Delta",
     "primary_offer_id": "buyer-owned-baseline-validation-sprint",
     "customer_problem": "Technical buyers lack a reproducible, authority-bounded way to decide whether an AI, analytics, or engineering claim deserves pilot capital.",
     "public_contact_path": "https://lumen-core.ai/proof_to_pilot.html",
@@ -17,12 +33,13 @@
     "evidence_graph_sha256": "cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05"
   },
   "summary": {
-    "portfolio_lane_count": 15,
+    "registered_implementation_lane_count": 15,
+    "evidence_ranked_system_count": 19,
     "primary_offer_count": 1,
-    "priority_lane_id": "lumen_infrastructure_sentinel",
-    "priority_lane_maturity": "runnable_component",
-    "priority_lane_scoping_candidate": true,
-    "maturity_counts": {
+    "configured_priority_lane_id": "lumen_infrastructure_sentinel",
+    "configured_priority_lane_implementation_state": "runnable_component",
+    "configured_priority_is_evidence_rank": false,
+    "implementation_state_counts": {
       "component_only": 2,
       "concept_only": 2,
       "runnable_component": 8,
@@ -34,6 +51,15 @@
       "research_lane": 10,
       "workflow_module": 2
     },
+    "evidence_band_counts": {
+      "A": 3,
+      "B": 1,
+      "C": 2,
+      "D": 5,
+      "E": 6,
+      "U": 2
+    },
+    "unverified_or_absent_system_count": 2,
     "subscription_ready_count": 0,
     "direct_engine_sales_authorized": false,
     "buyer_commitment_evidenced": false,
@@ -44,7 +70,917 @@
     "missing_evidence_path_count": 0,
     "untracked_evidence_path_count": 0
   },
-  "engines": [
+  "evidence_ranked_systems": [
+    {
+      "rank": 1,
+      "id": "lumencore_prooflock",
+      "name": "LumenCore / ProofLock",
+      "role": "platform_and_evidence_layer",
+      "evidence_band": "A",
+      "evidence_type": [
+        "deployed_demo",
+        "tested_control"
+      ],
+      "result_state": "bounded_positive",
+      "result_summary": "The merged verifier and deployed bounded console demonstrate artifact-integrity checks, browser/Python parity, and refusal to promote while required authority gates remain open.",
+      "adverse_result": "The public sample intentionally ends at HOLD; self-authored custody does not establish the underlying engineering conclusion.",
+      "current_gate": "Obtain a qualified non-author execution receipt or a buyer-owned source, baseline, metric, threshold, and decision contract.",
+      "evidence_as_of_utc": "2026-08-12T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "EVIDENCE_INDEX.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "b256de108d136a03e04175b1a2d6d3408dc01cda",
+          "bytes": 25001,
+          "sha256": "1896962a5fe43d82026082c92f283b3f30c9bbfb596c391ed1f4adc35e8d28cc"
+        },
+        {
+          "path": "code/proof_capsule_verifier.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "ae9c65302b3ff389011455ce0977f063a6cba3c9",
+          "bytes": 37092,
+          "sha256": "1213f995ab87bb371452296e95f9213a64e5d5e3cb8b52d61979563c35997351"
+        },
+        {
+          "path": "dashboard/build_week/prooflock_console/index.html",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "81964e8537f86c4cfc8c1d69083871f6a3121262",
+          "bytes": 6159,
+          "sha256": "c9029728ec758bfa85b730fe68850d7a60d5519a525bd79e09ff6839d445f4cf"
+        },
+        {
+          "path": "tests/test_prooflock_bounded_review_path.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "b40a5af69792c4852a4b763e8dc057e94ff782cd",
+          "bytes": 6095,
+          "sha256": "0efcfd90d3e486526798984d766a79c508b0cdc9c407cf18968ce0cfc1a21183"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "frozen_delta_buyer_owned_validation_sprint",
+      "name": "Frozen Delta / Buyer-Owned Baseline Validation Sprint",
+      "role": "commercial_method_and_primary_offer",
+      "evidence_band": "A",
+      "evidence_type": [
+        "merged_offer_method",
+        "tested_control"
+      ],
+      "result_state": "not_applicable",
+      "result_summary": "Frozen Delta is the method inside the sole primary offer: freeze source rights, accepted baseline, metric, threshold, holdout, failure rules, and allowed claims before execution, then return one bounded decision.",
+      "adverse_result": "No signed paid scope, cleared payment, executed buyer sprint, or buyer result is evidenced.",
+      "current_gate": "One qualified buyer accepts one authorized source, one baseline, one locked metric and threshold, one decision owner, and a signed paid scope.",
+      "evidence_as_of_utc": "2026-08-08T10:40:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "config/strategic_transaction_packet_v2.json",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "b20b0d7900a217c75dbceac34693402373c5f3a5",
+          "bytes": 6814,
+          "sha256": "b8cfb37da46c0dbb39e4ac34b3e26d1e7f2c39efa09b8ac42dbf55c659eba800"
+        },
+        {
+          "path": "config/bounded_validation_sprint_v1.json",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "b51c6aa109c3e8f58cad934947fe121359c3228e",
+          "bytes": 4883,
+          "sha256": "1b2fe633feb5c10f8d45b3900ebb7d047db22279a98ad3505819d6ec12a84601"
+        },
+        {
+          "path": "code/ops/BUILD_FROZEN_DELTA_TRUTH_CHAIN.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "4594698484a72576d4194ea51c58294a2d3471e1",
+          "bytes": 25633,
+          "sha256": "965b28cb3ba90b66f4f2719e3d19e4b9a51639b99748d0c0b527c316dad0348f"
+        },
+        {
+          "path": "dashboard/proof_to_pilot.html",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "88ddb4b99cff8f4ea5690f1008589c79eed0b97a",
+          "bytes": 11854,
+          "sha256": "6c4d111b49eb6630ed3eca1adb41afc15fe4eba44b223f03dec9fc6b4d2abc7c"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "eia_codecheck",
+      "name": "EIA / CODECHECK Reviewer Package",
+      "role": "first_party_reproduced_reviewer_package",
+      "evidence_band": "A",
+      "evidence_type": [
+        "measured_public_data",
+        "first_party_reproduced",
+        "externally_executable"
+      ],
+      "result_state": "mixed",
+      "result_summary": "The pinned package records a network-disabled first-party replay, 3 of 3 suites, 31 of 31 assertions, manifest reconciliation, and a fail-closed independent-executor receipt verifier.",
+      "adverse_result": "The locked eight-authority protocol has zero common settled hours; no non-author execution receipt or CODECHECK certificate is present.",
+      "current_gate": "A qualified non-author executes the pinned package and returns the completed independent-executor receipt with deviations and negative results preserved.",
+      "evidence_as_of_utc": "2026-07-21T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "EVIDENCE_INDEX.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "b256de108d136a03e04175b1a2d6d3408dc01cda",
+          "bytes": 25001,
+          "sha256": "1896962a5fe43d82026082c92f283b3f30c9bbfb596c391ed1f4adc35e8d28cc"
+        },
+        {
+          "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "8c4c55464ce2a6253fda8d303602d10217b06822",
+          "bytes": 7613,
+          "sha256": "63da7f4b970d458c66e39e3def978051a2ec24c8304ca4091c5ac90106259900"
+        },
+        {
+          "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "f38f020597efe3dbe6b793cfa9205bac3323613d",
+          "bytes": 27422,
+          "sha256": "3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d"
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "harbor_sentinel",
+      "name": "HarborSentinel",
+      "role": "maritime_research_lane",
+      "evidence_band": "B",
+      "evidence_type": [
+        "measured_public_data",
+        "controlled_injection"
+      ],
+      "result_state": "bounded_positive",
+      "result_summary": "A frozen motion-consistency detector caught controlled kinematic perturbations on held-out public AIS validation segments better than the declared speed-only and strongest current single-axis p99 baselines.",
+      "adverse_result": "Natural candidate rates are unlabeled review queues, not false-positive rates; the synthetic severe-stress benchmark also records a breakdown region.",
+      "current_gate": "Add labeled or analyst-adjudicated cases and separately authorized ADS-B or radar sources before any operational claim.",
+      "evidence_as_of_utc": "2026-06-20T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "f27f4b66f551bb98f5a6c2a8f74fe9fd5a03897b",
+          "bytes": 6587,
+          "sha256": "288f5e5c964fdf6603b437aa637e65f1a4eb045b742dbc31b1511937bfe2f910"
+        },
+        {
+          "path": "docs/HARBOR_SENTINEL_VALIDATION_2026-06-13.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "c77e25576d48b01f8f5ca76a2bd9768a52b15b7a",
+          "bytes": 3889,
+          "sha256": "c634a963e2f64473f4cf6e066a7fb6e7694c6c9cc1e87b1d488c8b14e8adb2be"
+        },
+        {
+          "path": "code/harbor_sentinel_validation_suite.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "78767b81b445ee16369500bb882c6aa597610b6b",
+          "bytes": 16019,
+          "sha256": "9acf7f427faef6950275599368cb012b2a0af9a35b2f0cc44f02918a0cdf8563"
+        },
+        {
+          "path": "tests/test_harbor_sentinel_validation_suite.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "ae448bb24765d4fcc0098c3686f8cf1978b74c26",
+          "bytes": 1559,
+          "sha256": "dc9f5af7348890008cdac8cedb5434e62e8fce8d24ec4d77a20a1818cf9d8de4"
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "dice",
+      "name": "DICE Research Lane",
+      "role": "defense_relevant_synthetic_research",
+      "evidence_band": "C",
+      "evidence_type": [
+        "synthetic_benchmark"
+      ],
+      "result_state": "mixed",
+      "result_summary": "The frozen discrete-event benchmark supports bounded message-efficiency and harness-scalability hypotheses across declared scales.",
+      "adverse_result": "Mission-success confidence intervals crossed zero at the larger scales, and an early baseline implementation defect required correction and rerun.",
+      "current_gate": "Use heterogeneous agentic systems, preregister adversarial behaviors and thresholds, compare current frameworks, and obtain independent evaluation.",
+      "evidence_as_of_utc": "2026-06-13T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "docs/DICE_PRELIMINARY_BENCHMARK_2026-06-13.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "0422cb1ab6fb7b63c1ee29663ce67de9aadebeb1",
+          "bytes": 2950,
+          "sha256": "a67bfa3ff94d61d18dfc369b8a85eeaa7c87b67770dd38a8711fdf5059fc1e14"
+        },
+        {
+          "path": "code/dice_preliminary_benchmark.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "ab4aea5c435eca7b87aac9777be8c802b405714c",
+          "bytes": 20829,
+          "sha256": "b340ff39c645233f86ed07b8c941684c9e225d216b615fefa355fbd27c90e224"
+        },
+        {
+          "path": "tests/test_dice_preliminary_benchmark.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "97575c11d493828b51ef754a989b540befe75a86",
+          "bytes": 1584,
+          "sha256": "127f0ec8dbaf1c97ac75b8c9fac481e1cfad26a6006c6cd96b836460965b3776"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "missionweave",
+      "name": "MissionWeave",
+      "role": "generated_workflow_research",
+      "evidence_band": "C",
+      "evidence_type": [
+        "synthetic_benchmark"
+      ],
+      "result_state": "mixed",
+      "result_summary": "A development-selected routing policy improved selected deadline and cycle-time measures over cross-trained FIFO on disjoint generated validation seeds.",
+      "adverse_result": "Some seeds were worse and combined-stress absolute on-time rates were poor for both policies.",
+      "current_gate": "Replace generated parameters with one approved representative process, freeze service levels and constraints, and obtain independent domain review.",
+      "evidence_as_of_utc": "2026-06-13T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "docs/MISSIONWEAVE_GENERATED_WORKFLOW_VALIDATION_2026-06-13.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "5020c659f301d9a5231171c6f89695705a8a6bc1",
+          "bytes": 3952,
+          "sha256": "64f7006b19a8eed3ba3eab27fc513ab602b03daacd20849614e0690fb25f9ad0"
+        },
+        {
+          "path": "code/missionweave_benchmark.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "5f0c86f3591de05464ca0fd27a6d79d6d150a7b1",
+          "bytes": 26957,
+          "sha256": "8b40de3c402b7be092b5e50c1d1bc6adcd6c0d8f44806a54688d2fccde010865"
+        },
+        {
+          "path": "tests/test_missionweave_benchmark.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "b18bd9fd865693ff7ed828c16d2f15453363c42a",
+          "bytes": 3014,
+          "sha256": "8b621e5cd7fdb006f4fe0ada176c4a29fc913f1c93a6724308e96f305c9d41ed"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "lumengov_grant_factory",
+      "name": "LumenGov Grant Factory",
+      "role": "human_controlled_workflow_module",
+      "evidence_band": "D",
+      "evidence_type": [
+        "tested_control",
+        "workflow_implementation"
+      ],
+      "result_state": "no_result",
+      "result_summary": "Opportunity qualification, evidence assembly, conformance checks, status tracking, and human-controlled submission preflight code are present and tested.",
+      "adverse_result": "The committed status feed is dated June 20, records 23 portal or user blockers, and marks zero submissions by the feed.",
+      "current_gate": "Refresh opportunity and conformance state from official sources, retain portal authority with the human submitter, and measure preparation latency or defect reduction on a buyer-owned workflow.",
+      "evidence_as_of_utc": "2026-06-20T22:56:29Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "code/grant_submission_kit.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "817d00dc2b053815be0f79d4a6b2fb9fcc7f6ae2",
+          "bytes": 28088,
+          "sha256": "be1c8aa24dd89c229da0693bc7ef05348fa4f590dcf5d93447c0c10cef7789b2"
+        },
+        {
+          "path": "code/grant_application_factory.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "c2af80fe73df85cc7a54adf07318227d502a4b50",
+          "bytes": 100552,
+          "sha256": "d8042eebcc2838f6af602232d630c909d1ae5175774b4eb7ebe37a30846ac7b6"
+        },
+        {
+          "path": "dashboard/data/grant_readiness_status.json",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "9b95cc930195231458891971adb6d8b9feec8759",
+          "bytes": 16550,
+          "sha256": "c4064700755304b64742f825a6a51b77e4ca24621386fec38a8ff20a30198fb3"
+        },
+        {
+          "path": "tests/test_grant_submission_readiness_audit.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "35dd1ccae1337ce8e88d0f21f283b758fc66c702",
+          "bytes": 2709,
+          "sha256": "99d72ace0ddc27043a4cf728bbbaec4ced4cdaddde1041404e089cc9286405c7"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "lumatrader_kraken_controls",
+      "name": "LumaTrader / Kraken Control Plane",
+      "role": "paper_market_research_and_safety_controls",
+      "evidence_band": "D",
+      "evidence_type": [
+        "tested_control",
+        "paper_research"
+      ],
+      "result_state": "mixed",
+      "result_summary": "Read-only public-market monitoring, paper boundaries, no-order modes, and order-safety tests are present.",
+      "adverse_result": "The retained runtime record reports a paper-ticker restart and ledger-permission failure; no economic edge, reliable production SLO, or live-capital result is established.",
+      "current_gate": "Restore bounded paper-worker stability, pass prospective after-cost and reconciliation gates, and obtain independent review while live orders remain unavailable.",
+      "evidence_as_of_utc": "2026-08-12T07:13:07Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "docs/CANONICAL_OPERATING_STATE.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "e388969fa764f4f1e2332e3485d8db182f64b253",
+          "bytes": 35071,
+          "sha256": "671dff0face90579aeb2e06caa236ee269b82217f83831300610984e27d2aa94"
+        },
+        {
+          "path": "code/execution/execution_orchestrator.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "ea5fed65e726aa1b2307378707e77b3d5955470c",
+          "bytes": 8789,
+          "sha256": "724542006a93f202994ed7b8e78706c9dcf5c86df9d0972965165ee6785ebe87"
+        },
+        {
+          "path": "tests/test_order_safety_gate.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "695ca0df0b6dbe19560ab856d046d1eec5ec991a",
+          "bytes": 11232,
+          "sha256": "678d4e0faccb91444ea54d84f6f1180318b3c824f93ec36e71f390bf4119c067"
+        },
+        {
+          "path": "tests/test_order_safety_alpaca_paper_boundary.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "b53d76597e0096ba197e3663394eeeab5805eb5a",
+          "bytes": 5107,
+          "sha256": "fe69da2abe53702112894edaecba1bc38edc5efb52ceae90de0a2b10f323c759"
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "faa_sdr_10k",
+      "name": "FAA SDR 10K Benchmark",
+      "role": "aviation_public_data_research",
+      "evidence_band": "D",
+      "evidence_type": [
+        "tested_control",
+        "public_data_benchmark_code"
+      ],
+      "result_state": "no_result",
+      "result_summary": "Benchmark code and deterministic fixture tests are present.",
+      "adverse_result": "The current CODECHECK receipt says the official source files were not bundled and the 10,000-report result was not clean-room replayed in that package.",
+      "current_gate": "Produce a source-authorized, hash-bound public result receipt and protocol-matched reproduction without promoting the fixture result.",
+      "evidence_as_of_utc": "2026-07-21T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "code/ops/RUN_FAA_SDR_10K_BENCHMARK.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "f079cf2fa364ef00e8bc4e30b737b57ee8df8bbc",
+          "bytes": 38394,
+          "sha256": "1ea879aebdd45c58778d6ebb21ee4bd1be4d071250e779d6257288979f8c20bb"
+        },
+        {
+          "path": "tests/test_faa_sdr_10k_benchmark.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "7e2225aaadcc15682d087fe41885234d8e7f9734",
+          "bytes": 3342,
+          "sha256": "c2bbaac93e10883f30424998fa676bd69d313e4815760b97e43f84d20a86c7d5"
+        },
+        {
+          "path": "evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "f38f020597efe3dbe6b793cfa9205bac3323613d",
+          "bytes": 27422,
+          "sha256": "3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d"
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "id": "lumascout",
+      "name": "LumaScout",
+      "role": "creator_discovery_research",
+      "evidence_band": "D",
+      "evidence_type": [
+        "implementation_no_validated_result"
+      ],
+      "result_state": "no_result",
+      "result_summary": "Pipeline, scoring, and architecture source assets are present.",
+      "adverse_result": "No current forward-label champion, external adoption, or revenue result is linked into the public evidence path.",
+      "current_gate": "Freeze permitted source rights, a transparent baseline, forward labels, and a prospective result capsule.",
+      "evidence_as_of_utc": "2026-08-08T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "LamaScout/README.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "511773c4632c936fa6699d0d2cf9bbfaf423d921",
+          "bytes": 6359,
+          "sha256": "0fde5a289484a66eec14e410945cd795cf926b154ecd22d85549b3e228d98ec1"
+        },
+        {
+          "path": "LamaScout/ARCHITECTURE.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "d02d23c39c8888915d41ac550feca0ecbf07bb2d",
+          "bytes": 3526,
+          "sha256": "bc1615e0e2d9162ff3c163365d3b64235f37fca02cb9e8c39dcc966183d70235"
+        },
+        {
+          "path": "LamaScout/src/pipeline.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "12aad2ecd18001878daaae6c9eb88fa26304576d",
+          "bytes": 3161,
+          "sha256": "7536d644de178a5571cdacc7100085ddd92f9f9c8f76ae5de6d8535a134fcbd8"
+        },
+        {
+          "path": "LamaScout/src/scoring.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "d819702e2df180e4659b65c862c2e9deeea63cd0",
+          "bytes": 19728,
+          "sha256": "8ea84c7a0c90bc49c6c9a2810d70157ea48dcd29bb7b8ac1f53bd694479ea1d2"
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "id": "lumen_infrastructure_sentinel",
+      "name": "Lumen Infrastructure Sentinel",
+      "role": "infrastructure_research_hold",
+      "evidence_band": "D",
+      "evidence_type": [
+        "implementation_no_validated_result",
+        "negative_result"
+      ],
+      "result_state": "negative",
+      "result_summary": "Infrastructure source and dashboard components exist, but the retained April proof artifact does not establish a favorable comparator result.",
+      "adverse_result": "The artifact records a negative top-test-versus-baseline value and a failed EIA request; credential-like query content was redacted from the working-tree copy.",
+      "current_gate": "Rotate any exposed provider key, verify public-history remediation, freeze a clean source and comparator, and rerun before buyer-scoping promotion.",
+      "evidence_as_of_utc": "2026-04-08T02:53:07Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "institutional_harmonic_infrastructure_proof.json",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "347cfd5b325698f84b4cc6924174a238eee8cfd0",
+          "bytes": 2501,
+          "sha256": "c1e6507fae5b9930f2abc948056cfbb2f97d59848ab5813a2df0499ef52fa564"
+        },
+        {
+          "path": "code/institutional_harmonic_infrastructure.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "a7bdd7c3a1e57ecc9f5a9a9a4fb5dd36f7fbe129",
+          "bytes": 9849,
+          "sha256": "e7092c5abd500245a8eb08e4f068a182205732263904a42014cf775645f18e73"
+        },
+        {
+          "path": "code/execution/infra_constraint_monitor.py",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "8143c65be10734ccc7457d3215c68dff0499ee8b",
+          "bytes": 63993,
+          "sha256": "e05a39b6622a4546bb13b5578d9901b14a658203e9966c98ac4a8eff8afa1d8e"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "id": "lumajet",
+      "name": "LumaJet",
+      "role": "simulation_first_aerospace_concept",
+      "evidence_band": "E",
+      "evidence_type": [
+        "internal_signal_unbound",
+        "conceptual"
+      ],
+      "result_state": "no_result",
+      "result_summary": "A simulation-first geometry, routing, thermal, diagnostic, and resilience research frame is documented.",
+      "adverse_result": "The public backlog has no identified run ID, source simulation, baseline, locked metric, result, negative-result register, or input/output manifest.",
+      "current_gate": "Freeze the named synthetic baseline run into a Proof Capsule before using it as headline evidence.",
+      "evidence_as_of_utc": "2026-07-09T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "55ed157ea5d9d1c40796d4a753025d85c58f6e26",
+          "bytes": 3931,
+          "sha256": "d376b6ece1d051250903da6bc87a1861c5a110fd40d3b2351c293d71be804db2"
+        },
+        {
+          "path": "docs/CURRENT_PROOF_PROMOTION_BACKLOG.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "706e10a74cd59815244606a9bb2370c346aefa9f",
+          "bytes": 5265,
+          "sha256": "d665bc4b426d238a0eb7ec0f55912a0c71fbf93981d5d25a0591f8a839cddc43"
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "id": "luma_xr_command_room",
+      "name": "Luma XR Command Room",
+      "role": "xr_interface_research",
+      "evidence_band": "E",
+      "evidence_type": [
+        "source_asset",
+        "conceptual"
+      ],
+      "result_state": "no_result",
+      "result_summary": "PowerShell launch and Unity bridge source assets support an immersive system-state visualization concept.",
+      "adverse_result": "No packaged device build, declared user-task result, latency or comfort result, or museum-authored acceptance receipt is linked.",
+      "current_gate": "Create a reproducible packaged build and test declared monitoring tasks on non-sensitive sample telemetry.",
+      "evidence_as_of_utc": "2026-08-08T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "code/START_IMMERSIVE_STACK.ps1",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "751c0034125948032a96768fb76f9511a0926e30",
+          "bytes": 627,
+          "sha256": "d6986be05cbccc1d01ff27eeb54191b3fa793e64ab041c139b1e4bf5d8319e22"
+        },
+        {
+          "path": "code/unity_bridge/INSTALL_UNITY_BRIDGE.ps1",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "f7241e74f039800e50540bb4f956399e96ebf994",
+          "bytes": 1387,
+          "sha256": "8fe0a704eab1391fe5f49c3c4f8a07802d8052295dcf8ad9f13d9b2840002a51"
+        },
+        {
+          "path": "docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "55ed157ea5d9d1c40796d4a753025d85c58f6e26",
+          "bytes": 3931,
+          "sha256": "d376b6ece1d051250903da6bc87a1861c5a110fd40d3b2351c293d71be804db2"
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "id": "lumasuit_lumaskin",
+      "name": "LumaSuit / LumaSkin",
+      "role": "non_actuating_smart_skin_concept",
+      "evidence_band": "E",
+      "evidence_type": [
+        "conceptual",
+        "bench_planned"
+      ],
+      "result_state": "no_result",
+      "result_summary": "A non-actuating smart-skin, sensor-ingestion, haptics, and human-performance digital-twin frame is documented.",
+      "adverse_result": "The public backlog has no identified bench or simulation source, baseline, metric, output, manifest, or qualified lab review.",
+      "current_gate": "Create the non-actuating Phase I capsule and obtain qualified mentor or lab review before performance promotion.",
+      "evidence_as_of_utc": "2026-07-09T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "55ed157ea5d9d1c40796d4a753025d85c58f6e26",
+          "bytes": 3931,
+          "sha256": "d376b6ece1d051250903da6bc87a1861c5a110fd40d3b2351c293d71be804db2"
+        },
+        {
+          "path": "docs/CURRENT_PROOF_PROMOTION_BACKLOG.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "706e10a74cd59815244606a9bb2370c346aefa9f",
+          "bytes": 5265,
+          "sha256": "d665bc4b426d238a0eb7ec0f55912a0c71fbf93981d5d25a0591f8a839cddc43"
+        }
+      ]
+    },
+    {
+      "rank": 15,
+      "id": "echoform_identity_architecture",
+      "name": "EchoForm / Identity Architecture",
+      "role": "identity_consistent_digital_twin_concept",
+      "evidence_band": "E",
+      "evidence_type": [
+        "conceptual"
+      ],
+      "result_state": "no_result",
+      "result_summary": "Identity-consistent digital-twin, consent, provenance, deletion, and revocation requirements are documented as an architecture lane.",
+      "adverse_result": "No runnable identity proof, biometric certification, medical claim, or continuity-of-person evidence is present.",
+      "current_gate": "Build a consent-first prototype and pass deletion, provenance, revocation, minimization, and identity-consistency tests.",
+      "evidence_as_of_utc": "2026-08-08T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "3256bf2eaa2e21289075290702bd2a68e37642a2",
+          "bytes": 5146,
+          "sha256": "dd42ad96883f9be86aef26b5e64b35f6a64baf6647eafad446769bec29eb9342"
+        },
+        {
+          "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+          "bytes": 4873,
+          "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+        }
+      ]
+    },
+    {
+      "rank": 16,
+      "id": "echolock",
+      "name": "EchoLock",
+      "role": "held_internal_research",
+      "evidence_band": "E",
+      "evidence_type": [
+        "internal_signal_unbound",
+        "conceptual"
+      ],
+      "result_state": "no_result",
+      "result_summary": "Founder-controlled phase-locking and coherence research references exist.",
+      "adverse_result": "The canonical evidence graph says no discoverable report, baseline, locked metric, result state, limitations, and artifact manifest are linked for promotion.",
+      "current_gate": "Link a bounded report and Proof Capsule that preserves failed candidates and comparison limits.",
+      "evidence_as_of_utc": "2026-08-08T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "EVIDENCE_INDEX.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "b256de108d136a03e04175b1a2d6d3408dc01cda",
+          "bytes": 25001,
+          "sha256": "1896962a5fe43d82026082c92f283b3f30c9bbfb596c391ed1f4adc35e8d28cc"
+        },
+        {
+          "path": "docs/MACHINE_EVIDENCE_GRAPH.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "26dc1de0de5d1e824f836f5945a5d482330a8403",
+          "bytes": 4773,
+          "sha256": "034de7dc7c8373c233cfdc9b135d19ec2844e5e30e1e6fcce364b1b7f9b052b5"
+        },
+        {
+          "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+          "bytes": 4873,
+          "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+        }
+      ]
+    },
+    {
+      "rank": 17,
+      "id": "magneto_magnetic_geometry",
+      "name": "Magneto / Magnetic Geometry",
+      "role": "geometry_specification",
+      "evidence_band": "E",
+      "evidence_type": [
+        "specification_only",
+        "conceptual"
+      ],
+      "result_state": "no_result",
+      "result_summary": "Magnetic-field paths are admitted as task-specific candidate geometries under the adopted evaluation protocol.",
+      "adverse_result": "The adopted registry records zero task-specific experiments, zero experimentally validated results, and no universal champion; no artifact named Magneto was found.",
+      "current_gate": "Define one task, baseline, frozen candidate, metric, and matched experiment before assigning any performance credit.",
+      "evidence_as_of_utc": "2026-08-08T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": [
+        {
+          "path": "EVIDENCE_INDEX.md",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "b256de108d136a03e04175b1a2d6d3408dc01cda",
+          "bytes": 25001,
+          "sha256": "1896962a5fe43d82026082c92f283b3f30c9bbfb596c391ed1f4adc35e8d28cc"
+        },
+        {
+          "path": "config/geometry_evaluation_protocol_v1.json",
+          "exists": true,
+          "tracked": true,
+          "git_blob_sha": "8fae4b5cec03ea184b84fdf8c7c43d976ba5d5f6",
+          "bytes": 10276,
+          "sha256": "c906497dcec8895a557d9bdceaf8ecb0def3f20d935db6bc6869a05a6206831c"
+        }
+      ]
+    },
+    {
+      "rank": 18,
+      "id": "cumberland_museum_experience_dome",
+      "name": "Cumberland Museum / Experience Dome",
+      "role": "unverified_external_assertion",
+      "evidence_band": "U",
+      "evidence_type": [
+        "unverified"
+      ],
+      "result_state": "unverified",
+      "result_summary": "Museum and immersive-demonstration use is a possible application context, not a verified deployment in the public repository.",
+      "adverse_result": "No museum-authored acceptance, deployment, task result, or external-validation receipt was found.",
+      "current_gate": "Locate a museum-authored record and bind it to an exact build, scope, date, and allowed claim before mentioning a pilot or deployment.",
+      "evidence_as_of_utc": "2026-08-27T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": []
+    },
+    {
+      "rank": 19,
+      "id": "dungeon",
+      "name": "Dungeon Build",
+      "role": "absent_unverified",
+      "evidence_band": "U",
+      "evidence_type": [
+        "absent"
+      ],
+      "result_state": "unverified",
+      "result_summary": "No canonical repository path or substantive public evidence record was found for this named build.",
+      "adverse_result": "The repository cannot currently support a built, runnable, deployed, or validated claim.",
+      "current_gate": "Locate and inventory the canonical source or build, then add a bounded evidence record; otherwise keep the lane absent.",
+      "evidence_as_of_utc": "2026-08-27T00:00:00Z",
+      "external_validation": false,
+      "field_validation": false,
+      "commercial_validation": false,
+      "evidence_refs": []
+    }
+  ],
+  "registered_implementation_lanes": [
+    {
+      "id": "echoform_identity_engine",
+      "name": "EchoForm Identity Engine",
+      "lane": "concept_lane",
+      "safe_description": "Identity-consistent digital-twin architecture concept.",
+      "buyer_profile": "Future privacy-preserving personal-AI and simulation research partners.",
+      "scoping_use": "Requirements workshop only after privacy, consent, threat-model, and minimization rules are defined.",
+      "acceptance_gate": "A consent-first prototype passes deletion, provenance, revocation, and identity-consistency tests.",
+      "claim_boundary": "No biometric certification, medical inference, identity proof, or continuity-of-person claim.",
+      "implementation_state": "concept_only",
+      "artifact_coverage": {
+        "classes_present": 1,
+        "classes_total": 6,
+        "classes": {
+          "source": false,
+          "entrypoint": false,
+          "test": false,
+          "documentation": true,
+          "artifact": false,
+          "public_surface": false
+        }
+      },
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [],
+        "entrypoint": [],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "3256bf2eaa2e21289075290702bd2a68e37642a2",
+            "bytes": 5146,
+            "sha256": "dd42ad96883f9be86aef26b5e64b35f6a64baf6647eafad446769bec29eb9342"
+          },
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
+    {
+      "id": "smart_city_node_engine",
+      "name": "Smart City Node Engine",
+      "lane": "concept_lane",
+      "safe_description": "Smart-city and telecom edge-routing concept.",
+      "buyer_profile": "Future municipal, utility, and telecom research partners.",
+      "scoping_use": "Requirements and simulation-scoping workshop only.",
+      "acceptance_gate": "A deterministic simulator beats a named baseline on a locked latency, resilience, or allocation metric.",
+      "claim_boundary": "No city deployment, critical-infrastructure control, latency, resilience, or savings claim.",
+      "implementation_state": "concept_only",
+      "artifact_coverage": {
+        "classes_present": 1,
+        "classes_total": 6,
+        "classes": {
+          "source": false,
+          "entrypoint": false,
+          "test": false,
+          "documentation": true,
+          "artifact": false,
+          "public_surface": false
+        }
+      },
+      "missing_paths": [],
+      "untracked_paths": [],
+      "evidence": {
+        "source": [],
+        "entrypoint": [],
+        "test": [],
+        "documentation": [
+          {
+            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
+            "bytes": 4873,
+            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          }
+        ],
+        "artifact": [],
+        "public_surface": []
+      }
+    },
     {
       "id": "lumen_infrastructure_sentinel",
       "name": "Lumen Infrastructure Sentinel",
@@ -54,9 +990,19 @@
       "scoping_use": "Test one declared infrastructure claim against an accepted incumbent baseline and return replayable decision evidence.",
       "acceptance_gate": "Detect declared injected or historical failure modes at an agreed false-alert rate on buyer-authorized data.",
       "claim_boundary": "No outage prevention, realized savings, field validation, safety control, or production deployment claim.",
-      "observed_maturity": "runnable_component",
-      "evidence_classes_present": 5,
-      "evidence_classes_total": 6,
+      "implementation_state": "runnable_component",
+      "artifact_coverage": {
+        "classes_present": 5,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": false,
+          "documentation": true,
+          "artifact": true,
+          "public_surface": true
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -104,9 +1050,9 @@
             "path": "institutional_harmonic_infrastructure_proof.json",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "27fdf1e2235cdd9b7c6d6271bf14bc1457e211fa",
-            "bytes": 1975,
-            "sha256": "d809a67123e87e8db1bd41a715afac6eb2e5efb89c530ed8b099f47b72f3037f"
+            "git_blob_sha": "347cfd5b325698f84b4cc6924174a238eee8cfd0",
+            "bytes": 2501,
+            "sha256": "c1e6507fae5b9930f2abc948056cfbb2f97d59848ab5813a2df0499ef52fa564"
           }
         ],
         "public_surface": [
@@ -122,78 +1068,6 @@
       }
     },
     {
-      "id": "echoform_identity_engine",
-      "name": "EchoForm Identity Engine",
-      "lane": "concept_lane",
-      "safe_description": "Identity-consistent digital-twin architecture concept.",
-      "buyer_profile": "Future privacy-preserving personal-AI and simulation research partners.",
-      "scoping_use": "Requirements workshop only after privacy, consent, threat-model, and minimization rules are defined.",
-      "acceptance_gate": "A consent-first prototype passes deletion, provenance, revocation, and identity-consistency tests.",
-      "claim_boundary": "No biometric certification, medical inference, identity proof, or continuity-of-person claim.",
-      "observed_maturity": "concept_only",
-      "evidence_classes_present": 1,
-      "evidence_classes_total": 6,
-      "missing_paths": [],
-      "untracked_paths": [],
-      "evidence": {
-        "source": [],
-        "entrypoint": [],
-        "test": [],
-        "documentation": [
-          {
-            "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
-            "exists": true,
-            "tracked": true,
-            "git_blob_sha": "3256bf2eaa2e21289075290702bd2a68e37642a2",
-            "bytes": 5146,
-            "sha256": "dd42ad96883f9be86aef26b5e64b35f6a64baf6647eafad446769bec29eb9342"
-          },
-          {
-            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
-            "exists": true,
-            "tracked": true,
-            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
-            "bytes": 4873,
-            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
-          }
-        ],
-        "artifact": [],
-        "public_surface": []
-      }
-    },
-    {
-      "id": "smart_city_node_engine",
-      "name": "Smart City Node Engine",
-      "lane": "concept_lane",
-      "safe_description": "Smart-city and telecom edge-routing concept.",
-      "buyer_profile": "Future municipal, utility, and telecom research partners.",
-      "scoping_use": "Requirements and simulation-scoping workshop only.",
-      "acceptance_gate": "A deterministic simulator beats a named baseline on a locked latency, resilience, or allocation metric.",
-      "claim_boundary": "No city deployment, critical-infrastructure control, latency, resilience, or savings claim.",
-      "observed_maturity": "concept_only",
-      "evidence_classes_present": 1,
-      "evidence_classes_total": 6,
-      "missing_paths": [],
-      "untracked_paths": [],
-      "evidence": {
-        "source": [],
-        "entrypoint": [],
-        "test": [],
-        "documentation": [
-          {
-            "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
-            "exists": true,
-            "tracked": true,
-            "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
-            "bytes": 4873,
-            "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
-          }
-        ],
-        "artifact": [],
-        "public_surface": []
-      }
-    },
-    {
       "id": "crowdfund_radar",
       "name": "CrowdFund Radar",
       "lane": "research_lane",
@@ -202,9 +1076,19 @@
       "scoping_use": "Compare a pre-registered campaign ranking with a simple popularity baseline.",
       "acceptance_gate": "Forward labels show useful lift over the named baseline using permitted sources.",
       "claim_boundary": "No investment recommendation, campaign quality guarantee, or return claim.",
-      "observed_maturity": "component_only",
-      "evidence_classes_present": 1,
-      "evidence_classes_total": 6,
+      "implementation_state": "component_only",
+      "artifact_coverage": {
+        "classes_present": 1,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": false,
+          "test": false,
+          "documentation": false,
+          "artifact": false,
+          "public_surface": false
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -213,9 +1097,9 @@
             "path": "code/crowdfunding_engine.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "ce59436e9f719227092c9e6d3c43546ba20cad69",
-            "bytes": 22125,
-            "sha256": "76e6de120f7dd293a0e4cc9f30aebc4cae62483c394fdb7b06f785f54423445c"
+            "git_blob_sha": "35f5b56206bced00cc9c68eb91d4cceb8a5d3eea",
+            "bytes": 20059,
+            "sha256": "a2abfd0a9c6ea59dc1a721335e576c3165a33b2ce42e2e03cc0ec9af421f87a8"
           }
         ],
         "entrypoint": [],
@@ -234,9 +1118,19 @@
       "scoping_use": "Measure chronology completeness and reviewer agreement without modifying source evidence.",
       "acceptance_gate": "A blinded synthetic-case review meets a locked completeness and agreement threshold.",
       "claim_boundary": "No forensic conclusion, chain-of-custody certification, legal admissibility, or autonomous response claim.",
-      "observed_maturity": "component_only",
-      "evidence_classes_present": 3,
-      "evidence_classes_total": 6,
+      "implementation_state": "component_only",
+      "artifact_coverage": {
+        "classes_present": 3,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": false,
+          "test": false,
+          "documentation": false,
+          "artifact": true,
+          "public_surface": true
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -284,9 +1178,19 @@
       "scoping_use": "Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision.",
       "acceptance_gate": "Meet locked accuracy, calibration, timeliness, and economic-conversion rules against a named baseline.",
       "claim_boundary": "No nuclear control, field validation, outage savings, or universal harmonic-superiority claim.",
-      "observed_maturity": "runnable_component",
-      "evidence_classes_present": 3,
-      "evidence_classes_total": 6,
+      "implementation_state": "runnable_component",
+      "artifact_coverage": {
+        "classes_present": 3,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": false,
+          "documentation": true,
+          "artifact": false,
+          "public_surface": false
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -342,9 +1246,19 @@
       "scoping_use": "Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan.",
       "acceptance_gate": "Pre-registered simulation and independent bench tests beat named baselines on declared measures.",
       "claim_boundary": "No physical thermal, electromagnetic, battery, structural, manufacturing, or field-performance claim.",
-      "observed_maturity": "runnable_component",
-      "evidence_classes_present": 3,
-      "evidence_classes_total": 6,
+      "implementation_state": "runnable_component",
+      "artifact_coverage": {
+        "classes_present": 3,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": false,
+          "documentation": true,
+          "artifact": false,
+          "public_surface": false
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -400,9 +1314,19 @@
       "scoping_use": "Review read-only telemetry and paper-ledger controls under a frozen protocol.",
       "acceptance_gate": "Prospective after-fee paper results, deterministic kill controls, and complete ledger reconciliation.",
       "claim_boundary": "No live trading authority, profit, return, signal service, or investment-advice claim.",
-      "observed_maturity": "tested_implementation",
-      "evidence_classes_present": 5,
-      "evidence_classes_total": 6,
+      "implementation_state": "tested_implementation",
+      "artifact_coverage": {
+        "classes_present": 5,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": true,
+          "documentation": true,
+          "artifact": false,
+          "public_surface": true
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -411,17 +1335,17 @@
             "path": "code/kraken_execution.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1c704111b73f224101828658640ccb8f44dbe12d",
-            "bytes": 4780,
-            "sha256": "985860a84269c29a1a81ff906d53fb9c4f76d529964b464cd4c88646aa483b10"
+            "git_blob_sha": "686ead85e41107d02e8a09cfb37e6691d9033bca",
+            "bytes": 4997,
+            "sha256": "ea29c2f2f6bb86123d3b3db55f349a71fe63f1704e55722510f2605d3f0e3a55"
           },
           {
             "path": "code/kraken_swing_hunter.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "666f8bfd41224fdc728bd96ada95346001b46ca7",
-            "bytes": 2226,
-            "sha256": "50f882ce49cfb154fe73198402560000aabf0fef030c44e8b119b7aa227151ba"
+            "git_blob_sha": "127ba2a7bce28a69928e2e21cf18101da615f1cf",
+            "bytes": 2259,
+            "sha256": "de06297584d74104380d639c567127e0f209014d31adaadd63d625dddbb66b2d"
           }
         ],
         "entrypoint": [
@@ -429,9 +1353,9 @@
             "path": "code/kraken_swing_hunter.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "666f8bfd41224fdc728bd96ada95346001b46ca7",
-            "bytes": 2226,
-            "sha256": "50f882ce49cfb154fe73198402560000aabf0fef030c44e8b119b7aa227151ba"
+            "git_blob_sha": "127ba2a7bce28a69928e2e21cf18101da615f1cf",
+            "bytes": 2259,
+            "sha256": "de06297584d74104380d639c567127e0f209014d31adaadd63d625dddbb66b2d"
           }
         ],
         "test": [
@@ -439,9 +1363,9 @@
             "path": "tests/test_order_safety_gate.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "dc2197adea3d0699e387a4e9217e078fa98dd8ab",
-            "bytes": 6043,
-            "sha256": "657e2f7ed8e5e6b766c48d52376a178446740f0d320c4c6b7d7b8f8d4b6fd658"
+            "git_blob_sha": "695ca0df0b6dbe19560ab856d046d1eec5ec991a",
+            "bytes": 11232,
+            "sha256": "678d4e0faccb91444ea54d84f6f1180318b3c824f93ec36e71f390bf4119c067"
           }
         ],
         "documentation": [
@@ -476,9 +1400,19 @@
       "scoping_use": "Test declared monitoring tasks using non-sensitive sample telemetry.",
       "acceptance_gate": "Users complete declared tasks within locked error, latency, and comfort thresholds.",
       "claim_boundary": "No operational command authority, training efficacy, comfort, or safety certification claim.",
-      "observed_maturity": "runnable_component",
-      "evidence_classes_present": 4,
-      "evidence_classes_total": 6,
+      "implementation_state": "runnable_component",
+      "artifact_coverage": {
+        "classes_present": 4,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": false,
+          "documentation": true,
+          "artifact": false,
+          "public_surface": true
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -543,9 +1477,19 @@
       "scoping_use": "Compare a pre-registered shortlist with a transparent popularity baseline.",
       "acceptance_gate": "Forward outcomes improve on a declared baseline using licensed or permitted data.",
       "claim_boundary": "No hit prediction, label adoption, revenue lift, or undocumented data-rights claim.",
-      "observed_maturity": "runnable_component",
-      "evidence_classes_present": 4,
-      "evidence_classes_total": 6,
+      "implementation_state": "runnable_component",
+      "artifact_coverage": {
+        "classes_present": 4,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": false,
+          "documentation": true,
+          "artifact": false,
+          "public_surface": true
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -618,9 +1562,19 @@
       "scoping_use": "Compare a frozen paper or replay protocol with a declared baseline after costs and abstention rules.",
       "acceptance_gate": "Prospective paper results meet a locked after-cost threshold without breaching risk or reconciliation gates.",
       "claim_boundary": "No alpha, profitability, institutional readiness, investment advice, or live-capital claim.",
-      "observed_maturity": "tested_implementation",
-      "evidence_classes_present": 6,
-      "evidence_classes_total": 6,
+      "implementation_state": "tested_implementation",
+      "artifact_coverage": {
+        "classes_present": 6,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": true,
+          "documentation": true,
+          "artifact": true,
+          "public_surface": true
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -703,9 +1657,19 @@
       "scoping_use": "Compare historical and prospective research scoring with simple declared market baselines.",
       "acceptance_gate": "Prospective calibration and ranking metrics beat declared baselines without hidden selection.",
       "claim_boundary": "No betting advice, guaranteed edge, profit, or consumer wagering automation.",
-      "observed_maturity": "runnable_component",
-      "evidence_classes_present": 3,
-      "evidence_classes_total": 6,
+      "implementation_state": "runnable_component",
+      "artifact_coverage": {
+        "classes_present": 3,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": false,
+          "documentation": true,
+          "artifact": false,
+          "public_surface": false
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -761,9 +1725,19 @@
       "scoping_use": "Model one buyer-owned decision using a declared source set, baseline, and uncertainty register.",
       "acceptance_gate": "Reproduce declared scenarios and meet a locked decision metric without hidden data or hindsight.",
       "claim_boundary": "No complete world model, operational prediction, policy authority, or cross-sector-superiority claim.",
-      "observed_maturity": "runnable_component",
-      "evidence_classes_present": 3,
-      "evidence_classes_total": 6,
+      "implementation_state": "runnable_component",
+      "artifact_coverage": {
+        "classes_present": 3,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": false,
+          "documentation": true,
+          "artifact": false,
+          "public_surface": false
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -811,9 +1785,19 @@
       "scoping_use": "Compare a declared governed workflow with the buyer's existing process while preserving approvals and abstentions.",
       "acceptance_gate": "Complete the workflow with fewer verified defects or less preparation time and no approval-boundary breach.",
       "claim_boundary": "No autonomous legal, procurement, financial, trading, safety-critical, or production-gateway authority.",
-      "observed_maturity": "runnable_component",
-      "evidence_classes_present": 5,
-      "evidence_classes_total": 6,
+      "implementation_state": "runnable_component",
+      "artifact_coverage": {
+        "classes_present": 5,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": false,
+          "documentation": true,
+          "artifact": true,
+          "public_surface": true
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -895,9 +1879,19 @@
       "scoping_use": "Measure preparation latency and conformance defects against the buyer's existing human-controlled workflow.",
       "acceptance_gate": "Reduce verified preparation latency or conformance defects while preserving source and approval controls.",
       "claim_boundary": "No guaranteed eligibility, submission, award, savings, certification, signature, or portal authority.",
-      "observed_maturity": "tested_implementation",
-      "evidence_classes_present": 6,
-      "evidence_classes_total": 6,
+      "implementation_state": "tested_implementation",
+      "artifact_coverage": {
+        "classes_present": 6,
+        "classes_total": 6,
+        "classes": {
+          "source": true,
+          "entrypoint": true,
+          "test": true,
+          "documentation": true,
+          "artifact": true,
+          "public_surface": true
+        }
+      },
       "missing_paths": [],
       "untracked_paths": [],
       "evidence": {
@@ -992,6 +1986,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "983084f99486bc94023686241ecb48ea4a7d6a2880bd5aa6cd978c3d46c4d271"
+    "payload_sha256": "237d776f9a1dddabdce5ed68f919e368854cf4130156b1badf8abaf254c3d659"
   }
 }

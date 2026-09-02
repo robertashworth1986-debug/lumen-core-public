@@ -38,6 +38,9 @@ def test_reviewer_start_separates_commit_bound_live_and_computation_truth():
     assert "CPython 3.11.9" in start
     assert "a Windows or different-Python run is not protocol-matched evidence" in normalized
     assert "No non-author execution receipt or CODECHECK certificate is currently claimed" in normalized
+    assert "Frozen Delta" in start
+    assert "configured sector priority is not an evidence rank" in normalized.lower()
+    assert "Cumberland museum/experience-dome assertion; Dungeon build" in start
 
 
 def test_readme_labels_current_proof_capsule_standard_as_v3():

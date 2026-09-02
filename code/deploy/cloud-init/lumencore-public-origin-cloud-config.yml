@@ -1,0 +1,42 @@
+#cloud-config
+#
+# Provider-neutral first-boot identity for an Ubuntu candidate origin. Replace
+# the sentinel below with one reviewed SSH *public* key only in the provider's
+# user-data field. Never commit the rendered file or a private key.
+
+package_update: true
+package_upgrade: true
+packages:
+  - ca-certificates
+  - curl
+
+disable_root: true
+ssh_pwauth: false
+
+users:
+  - default
+  - name: lumencore-deploy
+    gecos: LumenCore candidate deployment account
+    groups:
+      - sudo
+    lock_passwd: true
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - __LUMENCORE_DEPLOY_SSH_PUBLIC_KEY__
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/60-lumencore-candidate.conf
+    owner: root:root
+    permissions: "0644"
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PubkeyAuthentication yes
+
+runcmd:
+  - [sshd, -t]
+  - [systemctl, reload, ssh.service]
+
+final_message: LumenCore candidate identity bootstrap complete

@@ -146,6 +146,16 @@ def test_public_home_sells_one_bounded_assurance_sequence():
     assert "ProofLock Opportunity Sprint" not in home
 
 
+def test_proof_to_pilot_keeps_one_offer_and_evidence_ranked_breadth():
+    offer = (DASHBOARD / "proof_to_pilot.html").read_text(encoding="utf-8")
+    assert "ProofLock is the evidence and claim-governance layer" in offer
+    assert "Frozen Delta is the method inside this one bounded offer" in offer
+    assert "Breadth is ranked by evidence, not product count" in offer
+    assert "These lanes are not separately validated products" in offer
+    assert "Museum deployment and Dungeon build claims remain unverified" in offer
+    assert 'href="/evidence/"' in offer
+
+
 def test_public_browser_path_uses_only_minimal_public_runtime_contracts():
     home = page("home")
     assert "/api/public/status" in home

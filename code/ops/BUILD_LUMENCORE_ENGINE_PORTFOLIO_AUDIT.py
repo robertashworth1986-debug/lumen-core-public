@@ -5,9 +5,9 @@ from __future__ import annotations
 
 import argparse
 import copy
-from functools import lru_cache
 import hashlib
 import json
+import re
 import subprocess
 from collections import Counter
 from datetime import datetime, timezone
@@ -29,6 +29,36 @@ EVIDENCE_CLASSES = (
     "documentation",
     "artifact",
     "public_surface",
+)
+EVIDENCE_BANDS = ("A", "B", "C", "D", "E", "U")
+RESULT_STATES = {
+    "bounded_positive",
+    "mixed",
+    "negative",
+    "no_result",
+    "not_applicable",
+    "unverified",
+}
+RANKED_SYSTEM_FIELDS = {
+    "rank",
+    "id",
+    "name",
+    "role",
+    "evidence_band",
+    "evidence_type",
+    "result_state",
+    "result_summary",
+    "adverse_result",
+    "current_gate",
+    "evidence_as_of_utc",
+    "external_validation",
+    "field_validation",
+    "commercial_validation",
+    "evidence_refs",
+}
+RAW_API_QUERY_RE = re.compile(
+    rb"api[_-]?key=(?!\[?redacted\]?|\$\{|\{\{|<)[A-Za-z0-9_-]{12,}",
+    re.IGNORECASE,
 )
 ALLOWED_LANES = {
     "priority_validation_lane",
@@ -133,17 +163,6 @@ def tracked_repository_objects() -> dict[str, str]:
     return tracked
 
 
-@lru_cache(maxsize=None)
-def git_blob_bytes(blob_sha: str) -> bytes:
-    result = subprocess.run(
-        ["git", "cat-file", "blob", blob_sha],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-    )
-    return result.stdout
-
-
 def validate_relative_path(value: Any, label: str) -> str:
     path = require_text(value, label).replace("\\", "/")
     pure = PurePosixPath(path)
@@ -153,6 +172,63 @@ def validate_relative_path(value: Any, label: str) -> str:
     if any(marker in lowered for marker in FORBIDDEN_PATH_MARKERS):
         raise ValueError(f"{label} contains a private or secret path marker")
     return path
+
+
+def current_blob_record(path: str, tracked: dict[str, str]) -> dict[str, Any]:
+    absolute = ROOT / path
+    exists = absolute.is_file()
+    is_tracked = path in tracked
+    blob = absolute.read_bytes() if exists else None
+    current_blob_sha = None
+    if exists and is_tracked:
+        index_blob_sha = tracked[path]
+        candidates = [blob]
+        lf_blob = blob.replace(b"\r\n", b"\n")
+        if lf_blob != blob:
+            candidates.append(lf_blob)
+        for candidate in candidates:
+            header = f"blob {len(candidate)}\0".encode("ascii")
+            if hashlib.sha1(header + candidate).hexdigest() == index_blob_sha:
+                blob = candidate
+                break
+        else:
+            filtered = subprocess.run(
+                ["git", "hash-object", "--", path],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            if filtered != index_blob_sha:
+                raise ValueError(
+                    f"{path}: tracked evidence differs from the Git index; "
+                    "stage the intended evidence before rebuilding the audit"
+                )
+            blob = subprocess.run(
+                ["git", "cat-file", "blob", index_blob_sha],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+            ).stdout
+        current_blob_sha = index_blob_sha
+    return {
+        "path": path,
+        "exists": exists,
+        "tracked": is_tracked,
+        "git_blob_sha": current_blob_sha if is_tracked else None,
+        "bytes": len(blob) if blob is not None else None,
+        "sha256": hashlib.sha256(blob).hexdigest() if blob is not None else None,
+    }
+
+
+def reject_embedded_api_query(path: str) -> None:
+    if path.startswith("tests/"):
+        return
+    absolute = ROOT / path
+    if not absolute.is_file():
+        return
+    if RAW_API_QUERY_RE.search(absolute.read_bytes()):
+        raise ValueError(f"{path}: embedded API credential-like query value")
 
 
 def verify_strategic_binding(
@@ -166,6 +242,7 @@ def verify_strategic_binding(
     expected_position_fields = {
         "platform",
         "evidence_layer",
+        "commercial_method",
         "canonical_offer_packet",
         "primary_offer_id",
         "priority_lane_id",
@@ -175,6 +252,8 @@ def verify_strategic_binding(
         raise ValueError("market_position fields mismatch")
     if position["platform"] != "LumenCore" or position["evidence_layer"] != "ProofLock":
         raise ValueError("canonical platform identity mismatch")
+    if position["commercial_method"] != "Frozen Delta":
+        raise ValueError("canonical commercial method mismatch")
     if position["canonical_offer_packet"] != DEFAULT_PACKET.relative_to(ROOT).as_posix():
         raise ValueError("canonical offer packet path mismatch")
     if position["direct_engine_sales_authorized"] is not False:
@@ -224,6 +303,7 @@ def verify_strategic_binding(
     return {
         "platform": position["platform"],
         "evidence_layer": position["evidence_layer"],
+        "commercial_method": position["commercial_method"],
         "primary_offer_id": primary_offer["id"],
         "customer_problem": require_text(
             primary_offer.get("customer_problem"), "customer problem"
@@ -280,23 +360,10 @@ def audit_engine(engine: dict[str, Any], tracked: dict[str, str]) -> dict[str, A
         records: list[dict[str, Any]] = []
         for index, raw_path in enumerate(values):
             path = validate_relative_path(raw_path, f"{engine_id}.{evidence_class}[{index}]")
-            absolute = ROOT / path
-            exists = absolute.is_file()
-            blob_sha = tracked.get(path)
-            is_tracked = blob_sha is not None
-            blob = git_blob_bytes(blob_sha) if blob_sha is not None else None
-            records.append(
-                {
-                    "path": path,
-                    "exists": exists,
-                    "tracked": is_tracked,
-                    "git_blob_sha": blob_sha,
-                    "bytes": len(blob) if blob is not None else None,
-                    "sha256": hashlib.sha256(blob).hexdigest()
-                    if blob is not None
-                    else None,
-                }
-            )
+            record = current_blob_record(path, tracked)
+            records.append(record)
+            exists = record["exists"]
+            is_tracked = record["tracked"]
             if not exists:
                 missing_paths.append(path)
             elif not is_tracked:
@@ -326,13 +393,85 @@ def audit_engine(engine: dict[str, Any], tracked: dict[str, str]) -> dict[str, A
         "scoping_use": engine["scoping_use"],
         "acceptance_gate": engine["acceptance_gate"],
         "claim_boundary": engine["claim_boundary"],
-        "observed_maturity": maturity,
-        "evidence_classes_present": sum(present.values()),
-        "evidence_classes_total": len(EVIDENCE_CLASSES),
+        "implementation_state": maturity,
+        "artifact_coverage": {
+            "classes_present": sum(present.values()),
+            "classes_total": len(EVIDENCE_CLASSES),
+            "classes": present,
+        },
         "missing_paths": sorted(missing_paths),
         "untracked_paths": sorted(untracked_paths),
         "evidence": audited,
     }
+
+
+def audit_ranked_system(
+    system: dict[str, Any], tracked: dict[str, str]
+) -> dict[str, Any]:
+    if not isinstance(system, dict) or set(system) != RANKED_SYSTEM_FIELDS:
+        raise ValueError(
+            f"ranked system fields mismatch: {system.get('id') if isinstance(system, dict) else '?'}"
+        )
+    system_id = require_text(system["id"], "ranked system id")
+    rank = system["rank"]
+    if not isinstance(rank, int) or isinstance(rank, bool) or rank < 1:
+        raise ValueError(f"{system_id}: rank must be a positive integer")
+    band = require_text(system["evidence_band"], f"{system_id}.evidence_band")
+    if band not in EVIDENCE_BANDS:
+        raise ValueError(f"{system_id}: unsupported evidence band")
+    result_state = require_text(system["result_state"], f"{system_id}.result_state")
+    if result_state not in RESULT_STATES:
+        raise ValueError(f"{system_id}: unsupported result state")
+    evidence_type = system["evidence_type"]
+    if (
+        not isinstance(evidence_type, list)
+        or not evidence_type
+        or len(evidence_type) != len(set(evidence_type))
+    ):
+        raise ValueError(f"{system_id}: evidence_type must be a non-empty unique list")
+    for index, value in enumerate(evidence_type):
+        require_text(value, f"{system_id}.evidence_type[{index}]")
+    for field in (
+        "name",
+        "role",
+        "result_summary",
+        "adverse_result",
+        "current_gate",
+        "evidence_as_of_utc",
+    ):
+        require_text(system[field], f"{system_id}.{field}")
+    parse_utc(system["evidence_as_of_utc"])
+    for field in (
+        "external_validation",
+        "field_validation",
+        "commercial_validation",
+    ):
+        if system[field] is not False:
+            raise ValueError(f"{system_id}: {field} must remain false")
+
+    refs = system["evidence_refs"]
+    if not isinstance(refs, list) or len(refs) != len(set(refs)):
+        raise ValueError(f"{system_id}: evidence_refs must be a unique list")
+    if band in {"A", "B", "C", "D", "E"} and not refs:
+        raise ValueError(f"{system_id}: evidence band {band} requires references")
+    audited_refs: list[dict[str, Any]] = []
+    for index, raw_path in enumerate(refs):
+        path = validate_relative_path(raw_path, f"{system_id}.evidence_refs[{index}]")
+        reject_embedded_api_query(path)
+        record = current_blob_record(path, tracked)
+        if not record["exists"]:
+            raise ValueError(f"{system_id}: missing evidence reference: {path}")
+        if not record["tracked"]:
+            raise ValueError(f"{system_id}: untracked evidence reference: {path}")
+        audited_refs.append(record)
+    if band == "U" and result_state != "unverified":
+        raise ValueError(f"{system_id}: band U must remain unverified")
+    if band != "U" and result_state == "unverified":
+        raise ValueError(f"{system_id}: only band U may be unverified")
+
+    audited = copy.deepcopy(system)
+    audited["evidence_refs"] = audited_refs
+    return audited
 
 
 def payload_sha256(payload: dict[str, Any]) -> str:
@@ -347,7 +486,7 @@ def build_payload(
     graph: dict[str, Any],
     generated_at_utc: str,
 ) -> dict[str, Any]:
-    if registry.get("schema_version") != "2.0":
+    if registry.get("schema_version") != "2.1":
         raise ValueError("portfolio registry schema mismatch")
     require_text(registry.get("source_note"), "source_note")
     boundaries = registry.get("boundaries")
@@ -356,13 +495,37 @@ def build_payload(
     for boundary in boundaries:
         require_text(boundary, "boundary")
 
+    inventory_scope = registry.get("inventory_scope")
+    if not isinstance(inventory_scope, dict) or set(inventory_scope) != {
+        "registered_implementation_lane_count",
+        "evidence_ranked_system_count",
+        "comprehensive_for_named_ec_scope",
+        "separate_products_implied",
+        "unverified_or_absent_states_included",
+    }:
+        raise ValueError("inventory_scope fields mismatch")
+    if inventory_scope["comprehensive_for_named_ec_scope"] is not True:
+        raise ValueError("named EC scope must remain comprehensive")
+    if inventory_scope["separate_products_implied"] is not False:
+        raise ValueError("portfolio must not imply separate products")
+    if inventory_scope["unverified_or_absent_states_included"] is not True:
+        raise ValueError("unverified and absent states must remain visible")
+    band_legend = registry.get("evidence_band_legend")
+    if not isinstance(band_legend, dict) or tuple(band_legend) != EVIDENCE_BANDS:
+        raise ValueError("evidence band legend mismatch")
+    for band, definition in band_legend.items():
+        require_text(definition, f"evidence band {band}")
+
     binding = verify_strategic_binding(registry, packet, graph)
     engines = registry.get("engines")
-    if not isinstance(engines, list) or len(engines) != 15:
-        raise ValueError("portfolio registry must define exactly 15 lanes")
+    registered_count = inventory_scope["registered_implementation_lane_count"]
+    if not isinstance(registered_count, int) or registered_count < 1:
+        raise ValueError("registered implementation lane count is invalid")
+    if not isinstance(engines, list) or len(engines) != registered_count:
+        raise ValueError("registered implementation lane count mismatch")
     ids = [engine.get("id") for engine in engines if isinstance(engine, dict)]
-    if len(ids) != 15 or len(ids) != len(set(ids)):
-        raise ValueError("portfolio lane ids must be 15 unique strings")
+    if len(ids) != registered_count or len(ids) != len(set(ids)):
+        raise ValueError("registered implementation lane ids must be unique")
     if binding["priority_lane_id"] not in ids:
         raise ValueError("priority lane is missing from the portfolio")
     if sum(engine.get("lane") == "priority_validation_lane" for engine in engines) != 1:
@@ -370,38 +533,77 @@ def build_payload(
 
     tracked = tracked_repository_objects()
     audited = [audit_engine(engine, tracked) for engine in engines]
-    audited.sort(
-        key=lambda item: (
-            item["id"] != binding["priority_lane_id"],
-            item["lane"],
-            item["name"].lower(),
-        )
-    )
+    audited.sort(key=lambda item: (item["lane"], item["name"].lower()))
     priority = next(
         engine for engine in audited if engine["id"] == binding["priority_lane_id"]
     )
-    maturity_counts = Counter(engine["observed_maturity"] for engine in audited)
+    maturity_counts = Counter(engine["implementation_state"] for engine in audited)
     lane_counts = Counter(engine["lane"] for engine in audited)
     missing_path_count = sum(len(engine["missing_paths"]) for engine in audited)
     untracked_path_count = sum(len(engine["untracked_paths"]) for engine in audited)
 
+    systems = registry.get("evidence_ranked_systems")
+    ranked_count = inventory_scope["evidence_ranked_system_count"]
+    if not isinstance(ranked_count, int) or ranked_count < 1:
+        raise ValueError("evidence ranked system count is invalid")
+    if not isinstance(systems, list) or len(systems) != ranked_count:
+        raise ValueError("evidence ranked system count mismatch")
+    ranked = [audit_ranked_system(system, tracked) for system in systems]
+    ranks = [system["rank"] for system in ranked]
+    ranked_ids = [system["id"] for system in ranked]
+    ranked_names = [system["name"] for system in ranked]
+    if ranks != list(range(1, ranked_count + 1)):
+        raise ValueError("evidence ranks must be contiguous and ordered")
+    if len(ranked_ids) != len(set(ranked_ids)) or len(ranked_names) != len(set(ranked_names)):
+        raise ValueError("evidence-ranked system ids and names must be unique")
+    required_named_scope = {
+        "lumencore_prooflock",
+        "frozen_delta_buyer_owned_validation_sprint",
+        "eia_codecheck",
+        "harbor_sentinel",
+        "dice",
+        "missionweave",
+        "lumengov_grant_factory",
+        "lumatrader_kraken_controls",
+        "faa_sdr_10k",
+        "lumascout",
+        "lumen_infrastructure_sentinel",
+        "lumajet",
+        "luma_xr_command_room",
+        "lumasuit_lumaskin",
+        "echoform_identity_architecture",
+        "echolock",
+        "magneto_magnetic_geometry",
+        "cumberland_museum_experience_dome",
+        "dungeon",
+    }
+    if set(ranked_ids) != required_named_scope:
+        raise ValueError("evidence-ranked named EC scope mismatch")
+    evidence_band_counts = Counter(system["evidence_band"] for system in ranked)
+
     payload: dict[str, Any] = {
-        "schema": "lumencore_engine_portfolio_audit_v2",
+        "schema": "lumencore_engine_portfolio_audit_v3",
         "generated_at_utc": generated_at_utc,
         "source_registry": DEFAULT_CONFIG.relative_to(ROOT).as_posix(),
         "source_registry_sha256": canonical_sha256(registry),
         "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
         "source_note": registry["source_note"],
+        "inventory_scope": inventory_scope,
+        "evidence_band_legend": band_legend,
         "primary_offer_binding": binding,
         "summary": {
-            "portfolio_lane_count": len(audited),
+            "registered_implementation_lane_count": len(audited),
+            "evidence_ranked_system_count": len(ranked),
             "primary_offer_count": 1,
-            "priority_lane_id": priority["id"],
-            "priority_lane_maturity": priority["observed_maturity"],
-            "priority_lane_scoping_candidate": priority["observed_maturity"]
-            in {"tested_implementation", "runnable_component"},
-            "maturity_counts": dict(sorted(maturity_counts.items())),
+            "configured_priority_lane_id": priority["id"],
+            "configured_priority_lane_implementation_state": priority["implementation_state"],
+            "configured_priority_is_evidence_rank": False,
+            "implementation_state_counts": dict(sorted(maturity_counts.items())),
             "lane_counts": dict(sorted(lane_counts.items())),
+            "evidence_band_counts": {
+                band: evidence_band_counts.get(band, 0) for band in EVIDENCE_BANDS
+            },
+            "unverified_or_absent_system_count": evidence_band_counts.get("U", 0),
             "subscription_ready_count": 0,
             "direct_engine_sales_authorized": False,
             "buyer_commitment_evidenced": False,
@@ -412,7 +614,8 @@ def build_payload(
             "missing_evidence_path_count": missing_path_count,
             "untracked_evidence_path_count": untracked_path_count,
         },
-        "engines": audited,
+        "evidence_ranked_systems": ranked,
+        "registered_implementation_lanes": audited,
         "boundaries": boundaries,
     }
     payload["integrity"] = {
@@ -434,25 +637,30 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Reviewer decision",
         "",
-        "LumenCore is one platform with one primary commercial offer, not 15 finished products.",
-        "The 15 founder engine names are retained as internal delivery, workflow, research, or concept lanes.",
-        "ProofLock is the evidence layer for the buyer-owned baseline validation sprint.",
+        "LumenCore is one platform with one primary commercial offer, not a collection of separately validated products.",
+        "ProofLock is the evidence and claim-governance layer.",
+        "Frozen Delta is the method inside the Buyer-Owned Baseline Validation Sprint: freeze source rights, the accepted baseline, metric, threshold, holdout, failure rules, and allowed claims before execution.",
         "",
         f"**Customer problem:** {binding['customer_problem']}",
         "",
-        "**Primary offer:** Buyer-Owned Baseline Validation Sprint",
+        "**Platform:** LumenCore",
         "",
-        f"**First market lane:** `{summary['priority_lane_id']}`",
+        "**Evidence layer:** ProofLock",
+        "",
+        f"**Commercial method:** {binding['commercial_method']}",
+        "",
+        "**Primary offer:** Buyer-Owned Baseline Validation Sprint",
         "",
         "The buyer supplies authorized data, accepts the incumbent baseline, and locks the metric and threshold before execution.",
         "LumenCore returns replay receipts, negative results, hashes, an offline verifier, and a buyer-readable Proof Capsule.",
         "",
         "## Current commercial truth",
         "",
-        f"- Portfolio lanes audited: `{summary['portfolio_lane_count']}`",
+        f"- Evidence-ranked systems and explicit unverified states: `{summary['evidence_ranked_system_count']}`",
+        f"- Registered implementation lanes with artifact coverage: `{summary['registered_implementation_lane_count']}`",
         f"- Primary offers: `{summary['primary_offer_count']}`",
-        f"- Priority-lane maturity: `{summary['priority_lane_maturity']}`",
-        f"- Priority lane eligible for buyer scoping: `{str(summary['priority_lane_scoping_candidate']).lower()}`",
+        f"- Configured sector priority is an evidence rank: `{str(summary['configured_priority_is_evidence_rank']).lower()}`",
+        f"- Unverified or absent named systems: `{summary['unverified_or_absent_system_count']}`",
         f"- Subscription-ready products: `{summary['subscription_ready_count']}`",
         f"- Missing configured evidence paths: `{summary['missing_evidence_path_count']}`",
         f"- Untracked configured evidence paths: `{summary['untracked_evidence_path_count']}`",
@@ -462,20 +670,48 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "- Revenue evidenced: `false`",
         "- External validation evidenced: `false`",
         "",
-        "## Portfolio lanes",
+        "## Evidence-ranked systems",
         "",
-        "| Lane | Role | Repository maturity | Evidence classes | Buyer-safe scoping use |",
-        "|---|---|---|---:|---|",
+        "Evidence band is not product readiness. Every ranked record retains a result state, adverse result, current gate, and false external, field, and commercial validation defaults.",
+        "",
+        "| Rank | Band | System or method | Evidence type | Result state | Bounded result | Adverse result / current gate |",
+        "|---:|:---:|---|---|---|---|---|",
     ]
-    for engine in payload["engines"]:
-        scoping_use = engine["scoping_use"].replace("|", "/")
+    for system in payload["evidence_ranked_systems"]:
+        types = ", ".join(system["evidence_type"]).replace("|", "/")
+        result = system["result_summary"].replace("|", "/")
+        adverse = system["adverse_result"].replace("|", "/")
+        gate = system["current_gate"].replace("|", "/")
         lines.append(
-            f"| {engine['name']} | `{engine['lane']}` | `{engine['observed_maturity']}` | "
-            f"{engine['evidence_classes_present']}/{engine['evidence_classes_total']} | {scoping_use} |"
+            f"| {system['rank']} | **{system['evidence_band']}** | {system['name']} | "
+            f"{types} | `{system['result_state']}` | {result} | {adverse} **Next:** {gate} |"
         )
 
-    lines.extend(["", "## Lane gates", ""])
-    for engine in payload["engines"]:
+    lines.extend(["", "### Evidence-band legend", ""])
+    for band, definition in payload["evidence_band_legend"].items():
+        lines.append(f"- **{band}:** {definition}")
+
+    lines.extend(
+        [
+            "",
+            "## Registered implementation lanes and artifact coverage",
+            "",
+            "Artifact coverage counts tracked source, entrypoint, test, documentation, artifact, and public-surface classes. It does **not** measure scientific evidence strength, operational reliability, external validation, or commercial readiness.",
+            "",
+            "| Lane | Role | Implementation state | Artifact coverage | Buyer-safe scoping use |",
+            "|---|---|---|---:|---|",
+        ]
+    )
+    for engine in payload["registered_implementation_lanes"]:
+        scoping_use = engine["scoping_use"].replace("|", "/")
+        coverage = engine["artifact_coverage"]
+        lines.append(
+            f"| {engine['name']} | `{engine['lane']}` | `{engine['implementation_state']}` | "
+            f"{coverage['classes_present']}/{coverage['classes_total']} | {scoping_use} |"
+        )
+
+    lines.extend(["", "## Registered-lane gates", ""])
+    for engine in payload["registered_implementation_lanes"]:
         lines.extend(
             [
                 f"### {engine['name']}",
@@ -484,6 +720,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- Buyer profile: {engine['buyer_profile']}",
                 f"- Acceptance gate: {engine['acceptance_gate']}",
                 f"- Claim boundary: {engine['claim_boundary']}",
+                f"- Implementation state: `{engine['implementation_state']}`",
+                f"- Artifact coverage: {engine['artifact_coverage']['classes_present']}/{engine['artifact_coverage']['classes_total']}",
                 f"- Missing configured paths: {len(engine['missing_paths'])}",
                 "",
             ]

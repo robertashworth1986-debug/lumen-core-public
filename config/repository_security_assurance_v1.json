@@ -68,10 +68,11 @@
       "evidence_paths": [
         "config/public_credential_remediation_status_v1.json",
         "code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py",
+        "code/ops/VERIFY_TRACKED_CREDENTIAL_LITERALS.py",
         "SECURITY.md"
       ],
-      "establishes": "An exact first-party remote observation records GitHub secret scanning and push protection enabled, 28 deterministic deployment-stage identifier false positives resolved, and one historical provider-key alert retained open while the detected value remains absent from the current tracked tree.",
-      "does_not_establish": "Provider rotation, revocation, Git-history remediation, removal from forks or caches, whole-repository secret absence, external security audit, or production authorization."
+      "establishes": "An exact first-party remote observation records GitHub secret scanning and push protection enabled, 28 deterministic deployment-stage identifier false positives resolved, and one historical provider-key alert retained open. A first-party current-tree gate also rejects non-placeholder credential literals in URL query parameters across tracked UTF-8 text files without emitting detected values.",
+      "does_not_establish": "Provider rotation, revocation, Git-history remediation, removal from forks or caches, absence from non-text assets or untracked files, whole-repository secret absence, external security audit, or production authorization."
     },
     {
       "id": "default_branch_protection",

@@ -96,6 +96,14 @@ class OrderSafetyFacadeTests(unittest.TestCase):
         self.assertEqual(balance, {"transport": "called"})
         self.assertEqual(len(calls), 2)
 
+        blocked_cancel = client._private("/0/private/CancelAll", {})
+        self.assertIn("error", blocked_cancel)
+        self.assertEqual(
+            blocked_cancel["order_safety"]["mode"],
+            "blocked_private_mutation",
+        )
+        self.assertEqual(len(calls), 2)
+
     def test_gateway_blocks_before_key_loading_or_transport(self) -> None:
         calls: list[dict[str, Any]] = []
         legacy = types.ModuleType("luma_experience_gateway_legacy")

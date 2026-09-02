@@ -49,8 +49,8 @@ class InstitutionalReadinessTests(unittest.TestCase):
         receipt = self.verify_payload(self.canonical_payload())
         self.assertTrue(receipt["valid"])
         self.assertEqual(receipt["production_decision"], "HOLD")
-        self.assertEqual(receipt["assurance_domain_count"], 12)
-        self.assertEqual(receipt["claim_boundary_count"], 10)
+        self.assertEqual(receipt["assurance_domain_count"], 15)
+        self.assertEqual(receipt["claim_boundary_count"], 13)
         self.assertGreaterEqual(receipt["evidence_file_count"], 20)
         self.assertEqual(len(receipt["receipt_sha256"]), 64)
 
@@ -126,6 +126,28 @@ class InstitutionalReadinessTests(unittest.TestCase):
         )
         domain["does_not_prove"] = "Paying customer secured and revenue generated."
         with self.assertRaisesRegex(MODULE.ReadinessError, "negative boundary missing"):
+            self.verify_payload(payload)
+
+    def test_trading_production_promotion_is_rejected(self) -> None:
+        payload = self.canonical_payload()
+        domain = next(
+            item
+            for item in payload["assurance_domains"]
+            if item["id"] == "trading_execution_and_custody_safety"
+        )
+        domain["status"] = "implemented_first_party"
+        with self.assertRaisesRegex(MODULE.ReadinessError, "status promotion"):
+            self.verify_payload(payload)
+
+    def test_candidate_cutover_negative_boundary_is_required(self) -> None:
+        payload = self.canonical_payload()
+        domain = next(
+            item
+            for item in payload["assurance_domains"]
+            if item["id"] == "candidate_origin_and_migration"
+        )
+        domain["does_not_prove"] = "All remaining actions require later review."
+        with self.assertRaisesRegex(MODULE.ReadinessError, "production cutover"):
             self.verify_payload(payload)
 
     def test_domain_negative_boundary_is_required(self) -> None:

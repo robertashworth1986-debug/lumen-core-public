@@ -9,7 +9,7 @@ Website: [https://lumen-core.ai](https://lumen-core.ai)
 
 ## EXECUTIVE PROFILE
 
-Founder and hands-on systems engineer building Python automation, API services, evaluation harnesses, and evidence controls across the LumenCore and LumaTrader codebases. Designs fail-closed workflows that preserve source provenance, negative findings, exact artifacts, and human authority instead of turning internal results into unsupported claims. Seeking remote contract work in software infrastructure, AI evaluation, platform reliability, and quality engineering.
+Founder and hands-on systems engineer building Python automation, API services, evaluation harnesses, and evidence controls across the LumenCore platform. ProofLock is the evidence and claim-governance layer; Frozen Delta is the method inside the sole primary offer, the Buyer-Owned Baseline Validation Sprint. Designs fail-closed workflows that preserve source provenance, negative findings, exact artifacts, and human authority instead of turning internal results into unsupported claims. Seeking remote contract work in software infrastructure, AI evaluation, platform reliability, and quality engineering.
 
 ## ENGINEERING STRENGTHS
 
@@ -27,6 +27,15 @@ Founder and hands-on systems engineer building Python automation, API services, 
 - Built FastAPI and dashboard integration surfaces for bounded review, telemetry, and operator decision support.
 - Created buyer-owned baseline-validation templates that lock the source, comparator, metric, threshold, holdout, failure policy, and claim boundary before scoring.
 - Maintained Windows and Linux CI paths for evidence portability, deterministic packet generation, and reviewer reproduction.
+
+## SELECTED EVIDENCE-RANKED SYSTEMS
+
+- **LumenCore / ProofLock:** Merged verifier and deployed bounded demonstration for artifact identity, authority-gate refusal, and reviewer-readable Proof Capsules; not independent validation of the underlying engineering claim.
+- **EIA / CODECHECK:** Pinned first-party replay package with three reproduced suites and 31 checked assertions, prepared for non-author execution; no outside execution receipt or CODECHECK certificate is claimed.
+- **HarborSentinel:** Held-out public AIS controlled-injection comparison with stronger recall than the declared single-axis baselines; not real-threat labels, Navy/SSDS integration, or field performance.
+- **DICE / MissionWeave:** Frozen synthetic multi-agent and generated-workflow benchmarks with adverse seeds, breakdown regions, and corrected baseline defects retained.
+- **Grant Factory / LumaTrader controls:** Tested human-controlled submission preflight and paper-market safety paths; no grant award, live-capital authority, profitable edge, or production trading readiness is claimed.
+- **LumaJet, LumaSuit/LumaSkin, XR/haptics, EchoLock, and identity architecture:** Simulation-first, source-asset, or conceptual research lanes awaiting their named capsules, reproducible builds, and qualified outside review.
 
 ## PROFESSIONAL EXPERIENCE
 

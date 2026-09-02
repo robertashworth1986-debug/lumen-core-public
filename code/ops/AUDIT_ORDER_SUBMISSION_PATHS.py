@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail CI when a direct order-submission path is new or unclassified."""
+"""Fail CI when an order or capital-transfer path is new or unclassified."""
 
 from __future__ import annotations
 
@@ -187,7 +187,13 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
                 })
 
         if classification == "manual_emergency_facade":
-            required_values = ("LIQUIDATE_ALL_TO_USD", "isatty", "--reason")
+            required_values = (
+                "LIQUIDATE_ALL_TO_USD",
+                "isatty",
+                "--reason",
+                "build_manual_emergency_authorization",
+                "authorization_sha256",
+            )
             missing = [value for value in required_values if value not in text]
             if missing:
                 errors.append({"path": rule_path, "code": "manual_emergency_gate_incomplete", "missing": missing})
@@ -197,6 +203,132 @@ def audit_repository(repo_root: Path, policy: dict[str, Any]) -> dict[str, Any]:
             missing = [value for value in required_values if value not in text]
             if missing:
                 errors.append({"path": rule_path, "code": "ticket_facade_invariant_missing", "missing": missing})
+
+        if classification == "capital_transfer_blocked_facade":
+            required_values = (
+                "CAPITAL_TRANSFER_BLOCKED",
+                '"credentials_loaded": False',
+                '"network_access": False',
+                '"destination_address_loaded": False',
+                '"withdrawal_authorized": False',
+            )
+            missing = [value for value in required_values if value not in text]
+            if missing:
+                errors.append({
+                    "path": rule_path,
+                    "code": "capital_transfer_facade_invariant_missing",
+                    "missing": missing,
+                })
+            hits = sorted(name for name, pattern in patterns.items() if pattern.search(text))
+            if hits:
+                errors.append({
+                    "path": rule_path,
+                    "code": "capital_transfer_facade_contains_submission_path",
+                    "patterns": hits,
+                })
+            forbidden_values = (
+                "KRAKEN_API_KEY",
+                "KRAKEN_API_SECRET",
+                "luma_live_keys.env",
+            )
+            present = [value for value in forbidden_values if value in text]
+            if present:
+                errors.append({
+                    "path": rule_path,
+                    "code": "capital_transfer_facade_loads_sensitive_runtime_data",
+                    "present": present,
+                })
+
+        if classification in {
+            "venue_mutation_blocked_facade",
+            "capital_dispatch_blocked_facade",
+        }:
+            marker = (
+                "VENUE_MUTATION_BLOCKED"
+                if classification == "venue_mutation_blocked_facade"
+                else "CAPITAL_DISPATCH_BLOCKED"
+            )
+            required_values = (
+                marker,
+                '"credentials_loaded": False',
+                '"network_access": False',
+                (
+                    '"mutation_authorized": False'
+                    if classification == "venue_mutation_blocked_facade"
+                    else '"transfer_authorized": False'
+                ),
+            )
+            missing = [value for value in required_values if value not in text]
+            if missing:
+                errors.append({
+                    "path": rule_path,
+                    "code": "blocked_mutation_facade_invariant_missing",
+                    "missing": missing,
+                })
+            hits = sorted(name for name, pattern in patterns.items() if pattern.search(text))
+            if hits:
+                errors.append({
+                    "path": rule_path,
+                    "code": "blocked_mutation_facade_contains_mutation_path",
+                    "patterns": hits,
+                })
+            forbidden_values = (
+                "requests",
+                "httpx",
+                "ccxt",
+                "urlopen",
+                "luma_live_keys.env",
+                "_API_KEY",
+                "_API_SECRET",
+            )
+            present = [value for value in forbidden_values if value in text]
+            if present:
+                errors.append({
+                    "path": rule_path,
+                    "code": "blocked_mutation_facade_contains_runtime_transport",
+                    "present": present,
+                })
+
+        if classification == "paper_supervisor_exact_host":
+            required_values = (
+                "PAPER_TRADING_ORIGIN",
+                "normalize_paper_trading_base",
+                "_resolve_alpaca_paper_base",
+                "generic_override and not paper_override",
+                "allow_redirects=False",
+            )
+            missing = [value for value in required_values if value not in text]
+            if missing:
+                errors.append({
+                    "path": rule_path,
+                    "code": "paper_supervisor_origin_gate_incomplete",
+                    "missing": missing,
+                })
+            if PRODUCTION_ALPACA_ORIGIN_PATTERN.search(text):
+                errors.append({
+                    "path": rule_path,
+                    "code": "paper_supervisor_contains_production_alpaca_host",
+                })
+
+        if classification == "guard_implementation":
+            required_values = (
+                "READ_ONLY_PRIVATE_PATHS",
+                "blocked_private_mutation",
+                "build_manual_emergency_authorization",
+                "private_endpoint_allowlist_fail_closed",
+            )
+            missing = [value for value in required_values if value not in text]
+            if missing:
+                errors.append({
+                    "path": rule_path,
+                    "code": "private_endpoint_guard_incomplete",
+                    "missing": missing,
+                })
+            if "request is not an AddOrder submission" in text:
+                errors.append({
+                    "path": rule_path,
+                    "code": "private_endpoint_guard_retains_allow_unknown_logic",
+                })
 
     for invariant in policy.get("runtime_invariants", []):
         invariant_path = str(invariant.get("path", "") or "")

@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0",
-  "generated_utc": "2026-08-09T03:30:00Z",
+  "generated_utc": "2026-08-28T04:30:00Z",
   "repository": "robertashworth1986-debug/lumen-core-public",
   "register_scope": "public_repository_and_bounded_validation_sprint",
   "current_decision": "ready_for_non_confidential_fit_review_and_buyer_specific_scoping",
   "production_decision": "HOLD",
   "live_exact_snapshot_status": "verified_for_named_release_commit",
   "status_counts": {
-    "implemented_first_party": 3,
+    "implemented_first_party": 4,
     "documented_control": 3,
-    "prepared_not_executed": 3,
+    "prepared_not_executed": 5,
     "buyer_specific_gate": 2,
     "open_gap": 1,
     "not_applicable_to_bounded_sprint": 0
@@ -44,6 +44,22 @@
       "next_gate": "Bind a buyer-owned source, baseline, metric, and decision owner to a signed sprint scope."
     },
     {
+      "id": "ecosystem_portfolio_and_claim_map",
+      "title": "Evidence-ranked ecosystem and claim map",
+      "status": "implemented_first_party",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "config/lumencore_engine_portfolio_v2.json",
+        "dashboard/data/lumencore_engine_portfolio_audit.json",
+        "docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md",
+        "RESUME_LUMENCORE.md",
+        "docs/REVIEWER_START_HERE.md"
+      ],
+      "proves": "The public repository maps LumenCore as one platform, ProofLock as its evidence and claim-governance layer, Frozen Delta as the method inside one primary offer, 19 named evidence-ranked systems or explicit unverified states, and 15 registered implementation lanes with adverse findings and next gates retained.",
+      "does_not_prove": "Independent validation, field validation, commercial validation, customer acceptance, or that every named concept is a built or separately saleable product.",
+      "next_gate": "Use the ranked map for fit review, then advance only the buyer-relevant system after its named source, baseline, metric, result, and outside-review gates are satisfied."
+    },
+    {
       "id": "security_reporting",
       "title": "Security reporting and disclosure",
       "status": "documented_control",
@@ -73,11 +89,15 @@
         "docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md",
         ".github/workflows/public-site-supply-chain.yml",
         ".github/workflows/public-site-signed-attestation-receipt.yml",
-        "evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json"
+        "evidence/public-site-supply-chain/5fff567c11bee65b5b1de5415d8b8935cd2dfab0/attestation-receipt.json",
+        ".github/workflows/repository-security-assurance.yml",
+        "code/ops/VERIFY_TRACKED_CREDENTIAL_LITERALS.py",
+        "tests/test_tracked_credential_literals.py",
+        "institutional_harmonic_infrastructure_proof.json"
       ],
-      "proves": "The named reviewer suite has hash-locked dependencies and a scoped inventory; current named deployed release commit 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 has deterministic 43-file CycloneDX 1.6 coverage, pinned workflow actions, and constrained GitHub OIDC/Sigstore provenance and SBOM verification.",
-      "does_not_prove": "A complete product SBOM, VPS operating-system or gateway inventory, continuous vulnerability management, vulnerability status, a SLSA level, production dependency approval, or parity for any later release.",
-      "next_gate": "Inventory the deployment runtime, establish vulnerability triage and exception handling, periodically re-verify trusted roots, and assess any SLSA level separately."
+      "proves": "The named reviewer suite has hash-locked dependencies and a scoped inventory; named deployed release commit 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 has deterministic 43-file CycloneDX 1.6 coverage, pinned workflow actions, constrained GitHub OIDC/Sigstore provenance, and a current-tracked-text URL-query credential-literal gate. The known infrastructure proof no longer retains the credential-like query value or absolute private paths.",
+      "does_not_prove": "A complete product SBOM, VPS operating-system or gateway inventory, continuous vulnerability management, vulnerability status, a SLSA level, production dependency approval, provider credential rotation, public-history remediation, absence from non-text or untracked files, or parity for any later release.",
+      "next_gate": "Rotate the historically exposed provider credential, verify public-history remediation, inventory the deployment runtime, establish vulnerability triage and exception handling, periodically re-verify trusted roots, and assess any SLSA level separately."
     },
     {
       "id": "public_deployment",
@@ -98,6 +118,24 @@
       "proves": "Current named release commit 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 passed the human-gated deployment with rollback capture, 43-of-43 exact live-byte verification, and a separate read-only post-deployment audit; prior release e513f65a remains in the append-only first-party receipt history.",
       "does_not_prove": "That any later checked-out commit currently matches the named live release or that its runtime, gateway, private services, or broader platform are production-certified.",
       "next_gate": "Repeat the human-gated exact-snapshot release and independent read-only audit for every later public release; separately inventory and assess runtime and gateway layers."
+    },
+    {
+      "id": "candidate_origin_and_migration",
+      "title": "Candidate public origin and migration",
+      "status": "prepared_not_executed",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        ".github/workflows/stage-public-site-origin.yml",
+        "code/deploy/BOOTSTRAP_PUBLIC_SITE_ORIGIN.sh",
+        "code/deploy/cloud-init/lumencore-public-origin-cloud-config.yml",
+        "code/deploy/nginx/lumencore-public-origin.conf",
+        "code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py",
+        "docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md",
+        "tests/test_public_site_candidate_origin.py"
+      ],
+      "proves": "A provider-neutral, manual, commit-pinned lane can bootstrap and verify an isolated static-only Ubuntu candidate while preserving canonical host, TLS SNI, certificate validation, exact public bytes, rollback capture, and private-listener negative checks.",
+      "does_not_prove": "Infrastructure purchase, provider account approval, certificate issuance or transfer, production cutover, DNS change, stabilization, rollback execution, or decommissioning of the current origin.",
+      "next_gate": "Approve the exact provider plan, region, monthly ceiling, SSH public key, firewall policy, protected candidate environment, TLS method, staging inputs, and later a separate record-by-record DNS cutover."
     },
     {
       "id": "data_rights_and_handling",
@@ -126,6 +164,27 @@
       "proves": "Source and tests define a default-deny operator API boundary and a separately gated gateway repair path.",
       "does_not_prove": "That production secrets are installed, the live gateway is repaired, identity is enterprise-federated, or access controls were independently tested.",
       "next_gate": "Execute the separately authorized runtime repair, verify secret ownership, and retain current live negative-access tests."
+    },
+    {
+      "id": "trading_execution_and_custody_safety",
+      "title": "Trading execution and custody safety",
+      "status": "prepared_not_executed",
+      "owner": "founder_operator",
+      "evidence_paths": [
+        "config/order_submission_path_policy.json",
+        "code/execution/order_safety_gate.py",
+        "code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py",
+        "code/multi_exchange_paper_ticker.py",
+        ".github/workflows/order-safety-audit.yml",
+        ".github/workflows/repair-paper-ticker-ledger.yml",
+        "code/ops/REPAIR_PAPER_TICKER_LEDGER_ON_VPS.sh",
+        "tests/test_order_safety_gate.py",
+        "tests/test_capital_transfer_safety.py",
+        "tests/test_paper_ticker_ledger_repair.py"
+      ],
+      "proves": "Canonical repository paths implement a fail-closed Kraken private-endpoint allowlist, validate-only order boundary, receipt-limited manual liquidation exception, blocked automatic cancellation, payout, and withdrawal facades, exact Alpaca paper origin enforcement, and an approval-gated paper-ledger repair path.",
+      "does_not_prove": "Live-capital production readiness, profitability, institutional execution quality, deployed-code parity, venue-side permission restriction, healthy long-run paper availability, a fresh SLO epoch, or authorization for autonomous trading.",
+      "next_gate": "Use the existing HumanUnlock repair workflow, verify deployed ownership and service recovery, begin a new observation-only SLO epoch, audit venue permissions and deployed copies, and obtain independent review before any production promotion."
     },
     {
       "id": "incident_response_and_continuity",
@@ -209,6 +268,9 @@
     "no_enterprise_sla",
     "no_executed_dpa_or_legal_review",
     "no_complete_product_sbom",
-    "no_exact_live_snapshot_established_for_checked_out_commit"
+    "no_exact_live_snapshot_established_for_checked_out_commit",
+    "no_live_capital_production_readiness",
+    "no_candidate_origin_purchase_or_cutover",
+    "no_repository_history_credential_remediation"
   ]
 }

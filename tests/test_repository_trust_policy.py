@@ -65,6 +65,9 @@ class RepositoryTrustPolicyTests(unittest.TestCase):
             "live-order authority",
             "final external submission authority",
             "swe infrastructure specialist / ai trainer",
+            "frozen delta",
+            "harborsentinel",
+            "no outside execution receipt",
         )
         for phrase in required_boundaries:
             self.assertIn(phrase, resume)

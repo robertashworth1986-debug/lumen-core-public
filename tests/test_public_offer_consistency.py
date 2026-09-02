@@ -83,6 +83,15 @@ class PublicOfferConsistencyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "superseded primary offer"):
             self.verify(surfaces=surfaces)
 
+    def test_frozen_delta_method_cannot_disappear_from_primary_surfaces(self):
+        surfaces = dict(self.surfaces)
+        surfaces["proof_to_pilot"] = surfaces["proof_to_pilot"].replace(
+            "Frozen Delta is the method inside this one bounded offer",
+            "The method is unnamed",
+        )
+        with self.assertRaisesRegex(ValueError, "missing canonical offer text"):
+            self.verify(surfaces=surfaces)
+
     def test_secondary_page_without_boundary_rejected(self):
         surfaces = dict(self.surfaces)
         surfaces["opportunity_sprint"] = surfaces["opportunity_sprint"].replace(
