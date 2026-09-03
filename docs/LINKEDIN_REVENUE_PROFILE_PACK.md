@@ -187,6 +187,8 @@ connection requests or messages.
 
 - Confirm the LinkedIn profile name matches the legal/provider name used in a
   buyer-specific agreement.
+- Upload [luma_linkedin_cover.svg](../assets/luma_linkedin_cover.svg) as the
+  cover image. It is sized to LinkedIn's 1584-by-396 cover ratio.
 - Add the active UEI and CAGE identifiers only where a buyer’s approved form
   or secure vendor system requires them.
 - Use a current professional headshot and the LumenCore/LumaArc brand image.
