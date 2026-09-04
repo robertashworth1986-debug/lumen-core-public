@@ -1,6 +1,15 @@
 {
-  "generated_utc": "2026-06-10T18:02:20.862320+00:00",
+  "generated_utc": "2026-09-04T17:45:00+00:00",
   "paper_live_linked": true,
+  "registry_semantics": {
+    "authenticated_status": "LIVE_KEY_PRESENT",
+    "public_statuses": [
+      "PUBLIC_NO_KEY_LIVE",
+      "PUBLIC_NO_KEY_DATASET"
+    ],
+    "measured_rule": "rows>0 or probe_ok=true; registration alone is not measurement",
+    "secret_policy": "store only environment-variable names in git; never commit secret values"
+  },
   "rows": [
     {
       "source": "ALPACA",
@@ -188,6 +197,95 @@
       "last_probe_utc": "2026-06-10T18:02:20.795209+00:00",
       "env": "WEBHOOK_SHARED_SECRET",
       "enabled": true
+    },
+    {
+      "source": "DOE_GDR_FORGE_1683",
+      "sector": "geothermal_egs",
+      "status": "PUBLIC_NO_KEY_DATASET",
+      "rows": 0,
+      "evidence_basis": "OFFICIAL_SOURCE_ACQUIRED",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": "2026-09-04T17:40:34+00:00",
+      "env": "",
+      "enabled": true,
+      "auth_mode": "public_no_key",
+      "endpoint": "https://gdr.openei.org/files/1683/Extended%20Circulation%20Test.zip",
+      "probe_ok": true,
+      "doi": "10.15121/2475065"
+    },
+    {
+      "source": "DOE_GDR_FORGE_1109",
+      "sector": "geothermal_egs",
+      "status": "PUBLIC_NO_KEY_DATASET",
+      "rows": 0,
+      "evidence_basis": "OFFICIAL_SOURCE_REGISTERED",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": null,
+      "env": "",
+      "enabled": true,
+      "auth_mode": "public_no_key",
+      "endpoint": "https://gdr.openei.org/submissions/1109",
+      "probe_ok": false,
+      "doi": "10.15121/1495401"
+    },
+    {
+      "source": "DOE_GDR_FORGE_1149",
+      "sector": "geothermal_egs",
+      "status": "PUBLIC_NO_KEY_DATASET",
+      "rows": 0,
+      "evidence_basis": "OFFICIAL_SOURCE_REGISTERED",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": null,
+      "env": "",
+      "enabled": true,
+      "auth_mode": "public_no_key",
+      "endpoint": "https://gdr.openei.org/submissions/1149",
+      "probe_ok": false,
+      "doi": "10.15121/1542650"
+    },
+    {
+      "source": "NOAA_NDBC_WAVES",
+      "sector": "marine_wave",
+      "status": "PUBLIC_NO_KEY_LIVE",
+      "rows": 0,
+      "evidence_basis": "OFFICIAL_ENDPOINT_REGISTERED",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": null,
+      "env": "",
+      "enabled": true,
+      "auth_mode": "public_no_key",
+      "endpoint": "https://www.ndbc.noaa.gov/data/realtime2/",
+      "probe_ok": false
+    },
+    {
+      "source": "USGS_GEOTHERMAL_OFR83250",
+      "sector": "geothermal_resource",
+      "status": "PUBLIC_NO_KEY_DATASET",
+      "rows": 0,
+      "evidence_basis": "OFFICIAL_SOURCE_REGISTERED",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": null,
+      "env": "",
+      "enabled": true,
+      "auth_mode": "public_no_key",
+      "endpoint": "https://www.usgs.gov/data/digital-data-usgs-ofr-83-250-selected-data-low-temperature-less-90-degrees-c-geothermal",
+      "probe_ok": false,
+      "doi": "10.5066/P92BBP60",
+      "declared_records": 2071
+    },
+    {
+      "source": "OEDI_AASG_EGS_WELLS",
+      "sector": "geothermal_boreholes",
+      "status": "PUBLIC_NO_KEY_DATASET",
+      "rows": 0,
+      "evidence_basis": "OFFICIAL_SOURCE_REGISTERED",
+      "dollar_basis": "UNMEASURED",
+      "last_probe_utc": null,
+      "env": "",
+      "enabled": true,
+      "auth_mode": "public_no_key",
+      "endpoint": "https://gdr.openei.org/submissions/252",
+      "probe_ok": false
     }
   ]
 }
