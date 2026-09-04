@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "task_lane": "materials_structures_and_packaging",
+  "claim_level": "physics_informed",
+  "purpose": "Rank flexible conductive-trace geometries under frozen electrical, thermal, bend, stretch, and manufacturability assumptions before physical coupon testing.",
+  "footprint_mm": {"width": 40.0, "height": 12.0},
+  "trace": {
+    "width_mm": 0.50,
+    "thickness_um": 20.0,
+    "substrate_thickness_mm": 0.125
+  },
+  "environment": {
+    "ambient_c": 25.0,
+    "current_a": 0.10,
+    "lumped_thermal_resistance_c_per_w": 85.0
+  },
+  "materials": [
+    {
+      "name": "silver_nanoparticle_ink_proxy",
+      "resistivity_ohm_m": 8.0e-8,
+      "tempco_per_c": 0.0038,
+      "max_operating_c": 120.0,
+      "fatigue_exponent": 2.0
+    },
+    {
+      "name": "copper_reference_proxy",
+      "resistivity_ohm_m": 1.68e-8,
+      "tempco_per_c": 0.00393,
+      "max_operating_c": 150.0,
+      "fatigue_exponent": 2.2
+    }
+  ],
+  "geometries": ["straight", "sinusoid", "serpentine", "chirped_sinusoid"],
+  "bend_radius_mm": [2.0, 5.0, 10.0, 20.0],
+  "stretch_pct": [0.0, 1.0, 2.0, 5.0],
+  "acceptance": {
+    "min_trace_width_mm": 0.20,
+    "min_trace_thickness_um": 5.0,
+    "max_tortuosity": 3.5,
+    "max_estimated_temp_c": 100.0,
+    "max_strain_proxy_pct": 6.0,
+    "reference_resistance_ohm": 1.0
+  },
+  "frozen_comparison_rules": {
+    "primary_metric": "primary_score_lower_is_better",
+    "same_footprint": true,
+    "same_trace_width_and_thickness": true,
+    "same_current": true,
+    "same_material_parameters_within_material": true,
+    "negative_results_retained": true,
+    "post_outcome_tuning_prohibited": true,
+    "simulation_equals_experimental_validation": false
+  }
+}
