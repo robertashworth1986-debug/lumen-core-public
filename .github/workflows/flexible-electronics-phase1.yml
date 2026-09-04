@@ -29,16 +29,24 @@ jobs:
         with:
           python-version: "3.11"
       - name: Compile
-        run: python -m py_compile experiments/flexible_electronics/phase1_trace_reliability.py tests/test_flexible_electronics_phase1.py
+        run: |
+          python -m py_compile experiments/flexible_electronics/phase1_trace_reliability.py
+          python -m py_compile experiments/flexible_electronics/phase1_uncertainty_sweep.py
+          python -m py_compile tests/test_flexible_electronics_phase1.py
       - name: Run invariants
         run: python -m unittest tests/test_flexible_electronics_phase1.py -v
       - name: Run frozen experiment matrix
         run: python experiments/flexible_electronics/phase1_trace_reliability.py
+      - name: Run frozen manufacturing uncertainty sweep
+        run: python experiments/flexible_electronics/phase1_uncertainty_sweep.py
       - name: Validate outputs
         run: |
           python -m json.tool out/flexible-electronics-phase1/summary.json >/dev/null
           python -m json.tool out/flexible-electronics-phase1/sha256_manifest.json >/dev/null
+          python -m json.tool out/flexible-electronics-phase1/uncertainty_summary.json >/dev/null
+          python -m json.tool out/flexible-electronics-phase1/uncertainty_sha256.json >/dev/null
           test -s out/flexible-electronics-phase1/trace_reliability_matrix.csv
+          test -s out/flexible-electronics-phase1/manufacturing_uncertainty_sweep.csv
       - name: Upload evidence artifact
         uses: actions/upload-artifact@v4
         with:
