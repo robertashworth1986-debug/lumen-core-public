@@ -1,0 +1,48 @@
+name: Flexible Electronics Phase I Experiment
+
+on:
+  push:
+    branches:
+      - "exp/dmea-flex-electronics-phase1"
+    paths:
+      - "experiments/flexible_electronics/**"
+      - "tests/test_flexible_electronics_phase1.py"
+      - ".github/workflows/flexible-electronics-phase1.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flexible-electronics-phase1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  experiment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile
+        run: python -m py_compile experiments/flexible_electronics/phase1_trace_reliability.py tests/test_flexible_electronics_phase1.py
+      - name: Run invariants
+        run: python -m unittest tests/test_flexible_electronics_phase1.py -v
+      - name: Run frozen experiment matrix
+        run: python experiments/flexible_electronics/phase1_trace_reliability.py
+      - name: Validate outputs
+        run: |
+          python -m json.tool out/flexible-electronics-phase1/summary.json >/dev/null
+          python -m json.tool out/flexible-electronics-phase1/sha256_manifest.json >/dev/null
+          test -s out/flexible-electronics-phase1/trace_reliability_matrix.csv
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flexible-electronics-phase1-${{ github.sha }}
+          path: out/flexible-electronics-phase1/
+          if-no-files-found: error
+          retention-days: 30
