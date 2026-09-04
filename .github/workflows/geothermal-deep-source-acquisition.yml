@@ -82,11 +82,19 @@ jobs:
           find out/geothermal-deep/usgs/extracted -type f -printf '%P\t%s bytes\n' | sort > out/geothermal-deep/usgs/inventory.txt
           test -s out/geothermal-deep/usgs/inventory.txt
 
+      - name: Setup Python for schema profiling
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Install schema profiler dependency
+        run: python -m pip install --disable-pip-version-check openpyxl
+
       - name: Profile table schemas without promoting results
         shell: bash
         run: |
           python - <<'PY'
-          import csv, json, pathlib, zipfile
+          import csv, json, pathlib
           from openpyxl import load_workbook
           root=pathlib.Path('out/geothermal-deep')
           profile={'claim_boundary':'schema/data acquisition only; no performance result','files':[]}
