@@ -1,0 +1,12 @@
+{
+  "dataset": "Utah FORGE Wells 16A(78)-32 and 16B(78)-32 Extended Circulation Test Data - August and September 2024",
+  "gdr_submission": 1683,
+  "doi": "10.15121/2475065",
+  "official_download": "https://gdr.openei.org/files/1683/Extended%20Circulation%20Test.zip",
+  "publisher": "Energy and Geoscience Institute at the University of Utah",
+  "data_window": "2024-08-08 to 2024-09-05",
+  "measurements": ["wellhead pressure", "flow rate", "temperature"],
+  "sample_interval_seconds": 30,
+  "source_state": "raw_uncorrected_with_calibration_and_final_report",
+  "claim_boundary": "external field dataset; optimization claims require frozen preprocessing, baseline, primary metric, acceptance threshold, and retained negative results"
+}
