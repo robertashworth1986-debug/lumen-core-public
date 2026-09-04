@@ -1,0 +1,124 @@
+{
+  "generated_utc": "2026-09-04T18:15:00Z",
+  "branch": "exp/energy-multisource-breadth",
+  "claim_boundary": "Offline retrospective research only. These findings are screening/prioritization evidence, not live control guidance, safe operating limits, causal reservoir conclusions, site recommendations, bankability, reserve estimates, or externally validated LumenCore performance.",
+  "runs": {
+    "multisource": {
+      "run_id": 33903657157,
+      "artifact": "energy-multisource-wedge-d9ad42af25d1e58ddaa1f7e6c2fe322a30f339b2",
+      "artifact_sha256": "b229d3303dd96f27b743525a6b09a03669a055864b1ae6575ad12e0190010aa1"
+    },
+    "deep_source_acquisition": {
+      "run_id": 33904028641,
+      "artifact": "geothermal-deep-sources-f2d540531cd2c4d9233200353184c1368de9854b",
+      "artifact_sha256": "d2313ee619fc12aadbee2472511318019ccecc34a16544e13144b8092b387c3c"
+    },
+    "deep_analysis": {
+      "run_id": 33904479723,
+      "artifact": "geothermal-deep-wedge-0f1885ef3894e1065345427bbaf21d421d787f81",
+      "artifact_sha256": "8727aaf20914ca321b1a4e3a246417d484db978892c82ea516d19438d590e89f"
+    }
+  },
+  "registered_public_no_key_sources": [
+    "DOE_GDR_FORGE_1683",
+    "DOE_GDR_FORGE_1109",
+    "DOE_GDR_FORGE_1149",
+    "NOAA_NDBC_WAVES",
+    "USGS_GEOTHERMAL_OFR83250",
+    "OEDI_AASG_EGS_WELLS"
+  ],
+  "measured_source_rows_or_samples": {
+    "FORGE1683_half_minute_samples": 81239,
+    "FORGE1109_flow_rows": 87563,
+    "FORGE1109_pressure_rows": 65385,
+    "NOAA_NDBC_valid_wave_rows_across_6_stations": 17420,
+    "USGS_OFR83250_table1_rows": 2071,
+    "USGS_OFR83250_table2_rows": 978,
+    "USGS_OFR83250_table3_rows": 190
+  },
+  "promoted_screening_wedges": [
+    {
+      "source": "DOE_GDR_FORGE_1683",
+      "wedge": "production-flow transient forecasting",
+      "held_out_candidate": "fixed rolling-20 baseline challenger",
+      "mae_improvement_pct": {
+        "10_min": 11.904439305072627,
+        "30_min": 9.112030996168897,
+        "60_min": 8.785384468832541
+      },
+      "status": "PROMOTE_FOR_FURTHER_TEST"
+    },
+    {
+      "source": "NOAA_NDBC_WAVES",
+      "wedge": "short-horizon wave-resource-proxy forecasting",
+      "stations": {
+        "46237": {
+          "reporting_interval_min": 30,
+          "approx_1h_improvement_pct": 8.257871462442012,
+          "approx_3h_improvement_pct": 7.265047187769475,
+          "approx_6h_improvement_pct": 6.538947474884201
+        },
+        "46042": {
+          "reporting_interval_min": 20,
+          "approx_1h_improvement_pct": 5.646778546764962
+        }
+      },
+      "status": "PROMOTE_FOR_FURTHER_TEST"
+    },
+    {
+      "source": "DOE_GDR_FORGE_1149",
+      "wedge": "state/path-dependence modeling",
+      "cycles_reviewed": 9,
+      "cycles_flagged_by_normalized_hysteresis_screen": 3,
+      "status": "PRIORITY_MODELING_WEDGE"
+    },
+    {
+      "source": "USGS_GEOTHERMAL_OFR83250",
+      "wedge": "uncertainty-aware geothermal resource screening",
+      "geothermometer_sites_with_at_least_3_estimators": 1395,
+      "geothermometer_spread_degC": {
+        "median": 146.0,
+        "p90": 306.0,
+        "p95": 366.3
+      },
+      "accessible_resource_relative_uncertainty": {
+        "systems": 977,
+        "median": 0.4193548387096774,
+        "p90": 0.5099091985787604,
+        "fraction_above_50pct": 0.11361310133060389
+      },
+      "status": "PRIORITY_SCREENING_WEDGE"
+    }
+  ],
+  "negative_or_hold_results": [
+    {
+      "source": "DOE_GDR_FORGE_1683",
+      "target": "production-side pressure",
+      "result": "simple rolling challenger lost to persistence across tested horizons"
+    },
+    {
+      "source": "DOE_GDR_FORGE_1683",
+      "target": "production temperature",
+      "result": "improvement below 5 percent promotion threshold across tested horizons"
+    },
+    {
+      "source": "DOE_GDR_FORGE_1109",
+      "target": "pressure and flow forecasting",
+      "result": "simple rolling challenger failed the 5 percent promotion threshold at all tested horizons; pressure challenger was materially worse at the shortest horizon"
+    },
+    {
+      "source": "NOAA_NDBC_WAVES",
+      "target": "wave-resource-proxy forecast at several stations/horizons",
+      "result": "several station/horizon combinations failed the 5 percent promotion threshold and are retained as hold/negative results"
+    }
+  ],
+  "priority_next_experiments": [
+    "regime-conditioned geothermal production-flow models versus the frozen persistence and rolling baselines",
+    "missing/noisy-sensor robustness and timestamp-alignment stress tests",
+    "state-aware versus memoryless models on FORGE1149 historical cycles",
+    "wave spectral-shape and directionality features versus simple significant-wave-height/period baseline",
+    "cross-station wave complementarity after strict timestamp alignment",
+    "uncertainty-aware versus point-estimate USGS resource ranking with chemistry/flow missingness holdouts",
+    "OEDI/AASG borehole temperature-depth ingestion and cross-source consistency checks"
+  ]
+}
