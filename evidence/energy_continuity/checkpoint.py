@@ -122,36 +122,12 @@ def package(out: Path) -> None:
 
 
 def publish(out: Path) -> None:
-    dist = out/'dist'; manifest=json.loads((dist/'CHECKPOINT_MANIFEST.json').read_text())
-    tag,sha = manifest['tag'],manifest['code_commit']
-    if sha != os.environ['GITHUB_SHA'] or os.environ.get('GITHUB_REPOSITORY') != REPO:
-        raise ValueError('Publication identity mismatch')
-    expected={p.name:{'bytes':p.stat().st_size,'sha256':digest(p)} for p in sorted(dist.iterdir()) if p.is_file()}
-    for r in manifest['files']: verify_file(dist/r['file'],r)
-    c=subprocess.run(['gh','api',f'repos/{REPO}/releases/tags/{tag}'],capture_output=True,text=True,timeout=120)
-    if c.returncode:
-        if 'HTTP 404' not in c.stderr: raise RuntimeError('Release lookup failed')
-        subprocess.run(['gh','release','create',tag,*[str(dist/n) for n in expected],'-R',REPO,
-            '--target',sha,'--draft','--prerelease','--latest=false','--title','RESEARCH ONLY: energy benchmark checkpoint 2026-09-05',
-            '--notes-file',str(dist/'README.md')],check=True,timeout=600)
-    release=gh_json(f'repos/{REPO}/releases/tags/{tag}')
-    if release['target_commitish'] != sha or not release['prerelease']:
-        raise ValueError('Existing release identity/claim type mismatch; not overwritten')
-    assets={r['name']:r for r in release['assets']}
-    if set(assets) != set(expected): raise ValueError('Release asset set mismatch; draft remains unpublished')
-    for name,r in assets.items():
-        if r['size'] != expected[name]['bytes'] or r.get('digest') != 'sha256:'+expected[name]['sha256']:
-            raise ValueError('Uploaded asset digest mismatch; no publication authorized')
-    if release['draft']:
-        subprocess.run(['gh','release','edit',tag,'-R',REPO,'--draft=false','--prerelease','--latest=false'],check=True,timeout=120)
-    verified=gh_json(f'repos/{REPO}/releases/tags/{tag}')
-    ref=gh_json(f'repos/{REPO}/git/ref/tags/{tag}')
-    if verified['draft'] or not verified['prerelease'] or ref['object']['type']!='commit' or ref['object']['sha']!=sha:
-        raise ValueError('Publication/tag read-back failed')
-    (out/'PUBLICATION_RECEIPT.json').write_text(json.dumps({'status':'PUBLISHED_RESEARCH_PRERELEASE',
-        'release_url':verified['html_url'],'release_id':verified['id'],'tag':tag,'code_commit':sha,
-        'verified_asset_count':len(assets),'verified_assets':expected,'main_modified':False,'production_deployed':False},indent=2)+'\n')
-    print(json.dumps({'publication':verified['html_url'],'verified_assets':len(assets)}))
+    # Numeric-ID draft publication is shared with the explicitly pinned resume.
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('publication_fixed', Path(__file__).with_name('publication.py'))
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    module.publish(out)
 
 
 def main() -> None:
