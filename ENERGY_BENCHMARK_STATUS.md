@@ -4,6 +4,18 @@
 
 This is the entry point for continuing the energy benchmark without losing the branch, evidence or negative findings. A successful preservation workflow publishes a research prerelease, not a production version and not a valuation claim.
 
+## Verified published checkpoint — 2026-09-05
+
+Research archive: https://github.com/robertashworth1986-debug/lumen-core-public/releases/tag/research-energy-20260905-584e88a0f376
+
+The archive is published (not draft), marked prerelease and not promoted as the latest production version. Its 16 assets include nine original source/result archives, all 600 Stage 5 diagnostic records, source code, hashes and a recoverable Git-history bundle containing 2,444 reachable commits. An isolated offline restore and `git fsck --full` passed. This is not an audit of laptop/VPS-only history.
+
+The original publication attempt failed after upload because draft lookup by tag failed. The same existing draft was subsequently verified and published by numeric release ID; nothing was overwritten and no scientific data were rescored to obtain success. The general publisher is repaired in the working branch. The original checkpoint snapshot is retained unchanged for traceability.
+
+Published scientific checkpoint: `584e88a0f376ca016a085077047052d406081f98`. Publisher repair: `920e5146bb4294ffefb9b4c717c9efd74915b6ec`. Publication verification run: `33975030133`. Later closeout files document publication rather than changing the frozen scientific result.
+
+Read `evidence/energy_continuity/CLOSEOUT_20260905.json`, `PUBLICATION_RECEIPT_20260905.json`, and `OFFLINE_RECOVERY_20260905.json` for exact receipts. Review remains in draft PR #215; continuity tracker #214 stays open for the next bounded batch. Main, DNS and production were not modified.
+
 ## Where to continue
 
 - Cumulative review: https://github.com/robertashworth1986-debug/lumen-core-public/pull/215
@@ -48,6 +60,6 @@ Create a new empty directory, initialize Git there, fetch `HEAD` from the downlo
 
 ## Next acceptance gates
 
-Review same-origin diagnostics, quantify clean-accuracy versus dropout tradeoffs, improve uncertainty calibration, and register an actually fresh evaluation period before scoring revised methods. Review registry/provenance compatibility and historical-script status before considering PR #215 for merge. A separate read-only laptop/VPS inventory is needed to resolve the user's reported local-only history.
+Review same-origin diagnostics, quantify clean-accuracy versus dropout tradeoffs, improve uncertainty calibration, and register an actually fresh evaluation period before scoring revised methods. Review registry/provenance compatibility and historical-script status before considering PR #215 for merge. A separate read-only laptop/VPS inventory is needed to resolve local-only history.
 
 Every continuation must record its source commit, protocol, execution ID, result files, claim decision, publication/read-back status and next action in issue #214. Do not replace this with a promise of unattended background work.

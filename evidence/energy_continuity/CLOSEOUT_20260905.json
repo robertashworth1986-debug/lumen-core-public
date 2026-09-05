@@ -1,0 +1,84 @@
+{
+  "schema_version":"1.0",
+  "batch":"energy_research_continuity_and_stage5_20260905",
+  "status":"RESEARCH_ARCHIVE_PUBLISHED_AND_RECOVERY_VERIFIED",
+  "branch":"exp/energy-stage4-delayed-router-20260905",
+  "continuity_issue":214,
+  "cumulative_review_pr":215,
+  "initial_remote_research_commit":"a369e1ce658faf89d67e26ed36c85d3d69cccf41",
+  "initial_main_commit":"8395b3599b0fd303305b30d8aad865b13376f783",
+  "initial_remote_ahead_of_main":33,
+  "initial_remote_behind_main":0,
+  "protocol_commit":"b7c5a01cf4eddbb9451963dba482cf0154b1444c",
+  "published_code_checkpoint":"584e88a0f376ca016a085077047052d406081f98",
+  "publisher_repair_commit":"920e5146bb4294ffefb9b4c717c9efd74915b6ec",
+  "publication":{
+    "release_id":383284902,
+    "release_url":"https://github.com/robertashworth1986-debug/lumen-core-public/releases/tag/research-energy-20260905-584e88a0f376",
+    "tag":"research-energy-20260905-584e88a0f376",
+    "published_utc":"2026-09-05T15:31:43Z",
+    "draft":false,"prerelease":true,"immutable":false,
+    "asset_count":16,"all_asset_digests_verified":true,
+    "original_archives":9,"original_archive_bytes":222287455,
+    "full_download_zip_bytes":233171034,
+    "full_download_zip_sha256":"bf58d106fafdee5b9b67496f3067044907c1ab3d0e8eac188b554a8452f6bdc2",
+    "retention_boundary":"Published release assets are separate from Actions artifact retention; repository deletion or deliberate asset removal can still remove them."
+  },
+  "execution":{
+    "experiment_package_run_id":33974572079,
+    "experiment_package_job":"success",
+    "initial_publication_job":"failure",
+    "failure_reason":"Draft lookup by tag failed after successful asset upload; original draft retained.",
+    "publication_repair_run_id":33975030133,
+    "publication_repair_job":"success",
+    "same_draft_id_resumed":true,"assets_overwritten":false,
+    "experiment_and_custody_tests_passed":56,
+    "publisher_regression_tests_added_and_passed":10,
+    "publication_test_execution_count":18,
+    "publication_test_count_includes_8_previously_counted_custody_tests":true,
+    "unique_tests_across_runs":66,
+    "whole_repository_ci_claimed":false
+  },
+  "offline_history_recovery":{
+    "status":"OFFLINE_RECOVERY_VERIFIED",
+    "bundle_sha256":"aff8cd461238f40a386a922a205789971cfbcae6c10dce3311ca176b52887d72",
+    "recovered_checkpoint":"584e88a0f376ca016a085077047052d406081f98",
+    "reachable_commits":2444,"git_fsck_returncode":0,"network_used":false,
+    "laptop_vps_local_only_history_included":false
+  },
+  "stage5":{
+    "classification":"ENGINEERING_DIAGNOSTIC_ON_PREVIOUSLY_EXAMINED_2025_NOT_FRESH_CONFIRMATION",
+    "records":600,"stations":5,"horizons":3,"seeds":10,"scenarios":4,
+    "reuses_historical_outcomes":true,
+    "fairness":"Each station/horizon/seed uses exactly the same original target pairs across all four scenarios and all five methods.",
+    "source_artifact_id":9970692612,
+    "replay_verification":{
+      "matched_records":600,"same_origin_scenario_groups":150,
+      "exact_origin_digests_matched":true,
+      "maximum_absolute_numeric_difference":8.498757253505573e-14,
+      "bitwise_identical":false,"independent_external_validation":false,
+      "summary_sha256":"47b01166eb2caa647df1709cca22b46fb971ee294470697cb54657b63df4f3b2",
+      "diagnostics_sha256":"cd5bfd0cd3433a4b2e1d36422e8579ad4ab26774093eaec02f5f712979b1affa"
+    },
+    "illustrative_46237_60min_mean_gain_pct_over_10_seeds":{
+      "clean":{"vs_persistence":5.831096958358563,"vs_selected_rolling":0.7771905447101786,"vs_static_champion":-0.5097390172770516},
+      "missing_10pct":{"vs_persistence":5.325465926581953,"vs_selected_rolling":0.6914702765880839,"vs_static_champion":2.555426270809258},
+      "missing_30pct":{"vs_persistence":4.0065268143236725,"vs_selected_rolling":0.5618036867093057,"vs_static_champion":3.6920351229557298},
+      "block_missing_3h_per_14d":{"vs_persistence":5.840000075577753,"vs_selected_rolling":0.7680999322634421,"vs_static_champion":-0.48590838799570174}
+    },
+    "cells_beating_static_champion_out_of_15":{"clean":13,"missing_10pct":8,"missing_30pct":4,"block_missing_3h_per_14d":12},
+    "interpretation":"Short-context missingness-aware Ridge helps this illustrated station under scattered dropout but loses some clean accuracy; only 4 of 15 station-horizon cells beat the static champion under 30 percent dropout. Gains versus rolling remain small. No performance promotion.",
+    "promotion_allowed":false
+  },
+  "unchanged_boundaries":{
+    "main_merged":false,"production_deployed":false,"dns_modified":false,
+    "independent_external_validation":false,"electricity_gain_claim":false,"valuation_claim":false,
+    "local_laptop_vps_only_history_audited":false
+  },
+  "remaining_gates":[
+    "Review cumulative PR legacy scripts and registry/provenance compatibility before merge.",
+    "Evaluate uncertainty calibration and adverse regimes, then predeclare a genuinely fresh evaluation period for any revised-method superiority test.",
+    "Audit local laptop/VPS repositories and branches before claiming recovery or synchronization of local-only commits."
+  ],
+  "continuation":"Read ENERGY_BENCHMARK_STATUS.md, this closeout and issue #214; use the saved source/protocol/checkpoint identifiers, not chat memory alone."
+}
