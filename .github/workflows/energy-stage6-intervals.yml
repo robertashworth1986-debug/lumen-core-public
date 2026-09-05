@@ -24,12 +24,12 @@ jobs:
       artifact_digest: ${{ steps.package.outputs.artifact-digest }}
     steps:
       - name: Checkout exact code and reachable ancestry
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
       - name: Setup Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
       - name: Install fixed numerical dependency
@@ -62,7 +62,7 @@ jobs:
         run: python experiments/energy_multisource/stage6/package_stage6.py --out out/stage6
       - name: Upload exact publication and mirror packet
         id: package
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: energy-stage6-download-${{ github.sha }}
           path: out/stage6/dist/
@@ -71,7 +71,7 @@ jobs:
           retention-days: 30
       - name: Preserve test and execution receipts even on failure
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: energy-stage6-execution-${{ github.sha }}
           path: |
@@ -91,7 +91,7 @@ jobs:
       actions: read
     steps:
       - name: Checkout exact audited publisher
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
           persist-credentials: false
@@ -124,7 +124,7 @@ jobs:
         run: python evidence/energy_continuity/publication.py --out out/stage6
       - name: Preserve exact publication or failure receipt
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: energy-stage6-publication-${{ github.sha }}
           path: |

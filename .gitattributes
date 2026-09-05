@@ -1,6 +1,13 @@
 *.sh text eol=lf
 examples/proof_capsule/** text eol=lf
 
+# Preserve the exact predecessor bytes required by energy research hash gates.
+/experiments/energy_multisource/stage3/run_stage3.py text eol=lf
+/experiments/energy_multisource/stage4/run_stage4.py text eol=lf
+/experiments/energy_multisource/stage6/run_stage6.py text eol=lf
+/experiments/energy_multisource/stage6/verify_stage6.py text eol=lf
+/experiments/energy_multisource/stage6/package_stage6.py text eol=lf
+
 # Canonical bytes for the bounded CODECHECK reviewer capsule.
 /.github/workflows/reviewer-reproducibility.yml text eol=lf
 /.gitattributes text eol=lf
