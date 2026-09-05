@@ -2,64 +2,73 @@
 
 **RESEARCH ONLY. Performance promotion: HOLD. Production deployment: NOT AUTHORIZED.**
 
-This is the entry point for continuing the energy benchmark without losing the branch, evidence or negative findings. A successful preservation workflow publishes a research prerelease, not a production version and not a valuation claim.
+Start here to continue without losing code, evidence, corrections or negative findings. Research publication, reproducibility, performance and production approval are separate states.
 
-## Verified published checkpoint — 2026-09-05
+## Latest completed pass: Stage 6 — 2026-09-05
 
-Research archive: https://github.com/robertashworth1986-debug/lumen-core-public/releases/tag/research-energy-20260905-584e88a0f376
+Stage 6 is implemented, executed, published and mirrored. Read `evidence/energy_continuity/STAGE6_CLOSEOUT_20260905.json` for the exact scientific and preservation receipts.
 
-The archive is published (not draft), marked prerelease and not promoted as the latest production version. Its 16 assets include nine original source/result archives, all 600 Stage 5 diagnostic records, source code, hashes and a recoverable Git-history bundle containing 2,444 reachable commits. An isolated offline restore and `git fsck --full` passed. This is not an audit of laptop/VPS-only history.
+- Protocol: `65d45b1a7ef9f21a42c10c684cdcf38c5287d06f`.
+- Executed code: `731170a9da7f8ba553117b4c10705203f41af16c`.
+- Successful execution and publication run: `33984083106`.
+- Published research prerelease: https://github.com/robertashworth1986-debug/lumen-core-public/releases/tag/research-energy-stage6-20260905-731170a9da7f
+- 94 research/custody tests passed, including 28 new interval tests; this is not a whole-repository CI claim.
+- 240 interval metric records and 90 descriptive comparisons. Fixed prior point forecasts; 187,987 matched station/horizon target pairs reused across methods. They are not independent experiments.
+- Local execution exactly matched all 240 metric records, 90 comparison records and 465 arrays in the GitHub result.
+- The 77,535,338-byte download wrapper was uploaded to the existing private Google Drive `Energy-Checkpoint-2026-09-05` folder, downloaded back and verified by SHA-256 and ZIP integrity. File: `LumenCore_Energy_Stage6_Download_20260905.zip`.
+- Wrapper SHA-256: `7e04e7d7ce0b1a0754cbb2859a9dec11a9a957f5a49b7df31dd3598e82e72ebd`.
+- Its Git bundle was restored offline into a separate empty repository: exact executed checkpoint, 2,453 reachable commits, `git fsck --full` passed.
 
-The original publication attempt failed after upload because draft lookup by tag failed. The same existing draft was subsequently verified and published by numeric release ID; nothing was overwritten and no scientific data were rescored to obtain success. The general publisher is repaired in the working branch. The original checkpoint snapshot is retained unchanged for traceability.
+The latest documentation commits record publication/mirror completion; they do not change the frozen scientific checkpoint. Laptop, E-drive, iCloud and VPS copies remain unverified. No laptop/VPS-only history was audited or recovered.
 
-Published scientific checkpoint: `584e88a0f376ca016a085077047052d406081f98`. Publisher repair: `920e5146bb4294ffefb9b4c717c9efd74915b6ec`. Publication verification run: `33975030133`. Later closeout files document publication rather than changing the frozen scientific result.
+### What Stage 6 means
 
-Read `evidence/energy_continuity/CLOSEOUT_20260905.json`, `PUBLICATION_RECEIPT_20260905.json`, and `OFFLINE_RECOVERY_20260905.json` for exact receipts. Review remains in draft PR #215; continuity tracker #214 stays open for the next bounded batch. Main, DNS and production were not modified.
+The adaptive activity-scaled uncertainty wrapper lowered interval score by a median 16.11% across 30 correlated point-model/station/horizon cells versus the old interval wrapper. Lower interval score rewards narrower useful bands and penalizes missed outcomes. It is NOT improved point-forecast MAE, electricity production, plant efficiency or revenue.
 
-## Where to continue
+The important remaining failure: median coverage in conditions already classified as high activity at issue time increased from 38.63% to 66.55%, still far short of nominal 90%. Overall average coverage does not establish coverage in adverse regimes.
 
-- Cumulative review: https://github.com/robertashworth1986-debug/lumen-core-public/pull/215
-- Open owner-assigned continuity tracker: https://github.com/robertashworth1986-debug/lumen-core-public/issues/214
-- Working branch: `exp/energy-stage4-delayed-router-20260905`
-- Publication workflow: `.github/workflows/energy-research-checkpoint.yml`
-- Original source/result archive index: `evidence/energy_continuity/ARCHIVE_PLAN.json`
-- Exact published tag, SHA, asset digests and execution lineage: the release's `CHECKPOINT_MANIFEST.json` and workflow `PUBLICATION_RECEIPT.json`.
-- Findings and final read-back receipts added after execution live in `evidence/energy_continuity/`.
+This uses already examined 2025 observations. Bootstrap intervals are descriptive, not multiplicity-adjusted or familywise. The clipped, delayed, daily-batched adaptive rule is ACI-inspired and has no claimed formal coverage guarantee or established proprietary novelty. No performance promotion is authorized.
 
-## Claim authority, newest first
+## Keep the earlier cumulative backup as well
 
-Stage 5 is a same-origin missing-data engineering diagnostic on already examined 2025 observations. It cannot authorize a superiority claim. Its 600 records reuse historical outcomes across seeds; they are not 600 independent field experiments.
+Earlier cumulative archive: https://github.com/robertashworth1986-debug/lumen-core-public/releases/tag/research-energy-20260905-584e88a0f376
 
-Stage 4 (`evidence/energy_stage4/FINDINGS_20260905.json`) scored 90/108 planned comparisons. No candidate/station/horizon cell passed all three comparators. The missing 46042 2025 source remains a hold, not a substituted station.
+The roughly 233 MB cumulative checkpoint preserves nine original source/result archives (222,287,455 bytes), the earlier code, Stage 5 results and a recoverable Git-history bundle. The new Stage 6 packet is an additional versioned backup, not a replacement for all nine original data archives. Keep both.
 
-Stage 3 (`experiments/energy_multisource/stage3/FINDINGS_20260905.json`) documents exact-time and delayed-outcome corrections. Earlier geothermal percentages and zero-selected-loss claims must not be used without those corrections. Earlier artifacts are retained for audit, not reinstated as current claim authority.
+Published earlier scientific checkpoint: `584e88a0f376ca016a085077047052d406081f98`; publisher repair: `920e5146bb4294ffefb9b4c717c9efd74915b6ec`; publication repair run: `33975030133`. The draft lookup failure was fixed by resuming the same verified release by numeric ID, without overwriting assets or rescoring science.
 
-No independent validation, generated-electricity gain, safe operating limits, causal reservoir benefit, revenue or valuation has been established by these releases.
+Earlier closeout, publication and recovery records remain in `evidence/energy_continuity/CLOSEOUT_20260905.json`, `PUBLICATION_RECEIPT_20260905.json` and `OFFLINE_RECOVERY_20260905.json`.
 
-## What the archive preserves
+## Scientific authority and corrections
 
-Nine original artifact ZIPs (222,287,455 bytes total) are checked against their exact SHA-256 digests. The publication adds Stage 5 results and tests, a research-code snapshot, an offline Git bundle of the checkpoint's full reachable ancestry, the archive plan, and a checksum manifest. The Git bundle does not establish that laptop/VPS-only history has been audited or recovered.
+Stage 6: uncertainty engineering diagnostics only, not fresh confirmation. Point forecasts were unchanged. High-activity coverage remains deficient.
 
-Nothing is promoted based on a green workflow alone. Archive verification, experiment completion, research performance and production authority are separate states. Published release assets are outside the Actions artifact retention lifecycle; they still depend on maintaining the repository/account and must not be treated as undeletable storage.
+Stage 5: 600 same-origin missing-data diagnostic records on reused observations; not 600 independent field experiments and no superiority promotion.
 
-## Reproduce the next diagnostic
+Stage 4 (`evidence/energy_stage4/FINDINGS_20260905.json`): 90/108 planned comparisons scored; zero candidate cells passing all three comparators. Missing 46042 2025 remains a hold, not a substituted station.
 
-Using the research code snapshot and the preserved `energy-stage4-ci.zip`, extract that archive into `prior/`, then run from the code root:
+Stage 3 (`experiments/energy_multisource/stage3/FINDINGS_20260905.json`): exact-time and delayed-outcome corrections supersede earlier geothermal percentages and zero-selected-loss claims. Preserve original artifacts for audit, not current claim authority.
 
-```sh
-python -m pip install numpy==2.3.5
-python -m unittest discover -s experiments/energy_multisource/stage5 -p 'test_*.py' -v
-python experiments/energy_multisource/stage5/run_stage5.py --prior prior --out replay-stage5
-```
+No independent validation, generated-electricity gain, operational safety guarantee, causal reservoir benefit, revenue or valuation has been established by these research releases.
 
-Verify `SHA256SUMS.txt` before using downloaded archives. Never fill missing future targets, select replacement data after scoring, or label reused 2025 data as untouched confirmation.
+## Reproduction and recovery
 
-## Recover the checkpoint's Git history without overwriting another checkout
+Verify the wrapper's `SHA256SUMS.txt` and `CHECKPOINT_MANIFEST.json`, extract the inner Stage 6 packet, then extract its `research-code.zip` into a separate code directory. Python 3.11 and NumPy 2.3.5 are required. The exact run command is in `experiments/energy_multisource/stage6/README.md`.
 
-Create a new empty directory, initialize Git there, fetch `HEAD` from the downloaded `research-history.bundle`, then create a recovery branch at `FETCH_HEAD`. The bundle is a backup of remotely reachable checkpoint ancestry only; do not force-push it over another branch.
+The source archive, complete per-issue interval arrays, all metric records, comparisons, code, test log and Git bundle are included. Numerical arrays and JSON outcomes, not ZIP compression timestamps, are the reproduction comparison targets.
 
-## Next acceptance gates
+To restore Git history, initialize a new empty directory, fetch `HEAD` from the downloaded `research-history.bundle`, and create a recovery branch at `FETCH_HEAD`. Do not force-push a backup over another checkout. Published release assets are outside Actions retention, but can still be removed with the repository/account or by deliberate asset deletion.
 
-Review same-origin diagnostics, quantify clean-accuracy versus dropout tradeoffs, improve uncertainty calibration, and register an actually fresh evaluation period before scoring revised methods. Review registry/provenance compatibility and historical-script status before considering PR #215 for merge. A separate read-only laptop/VPS inventory is needed to resolve local-only history.
+## Explicit next gates
 
-Every continuation must record its source commit, protocol, execution ID, result files, claim decision, publication/read-back status and next action in issue #214. Do not replace this with a promise of unattended background work.
+1. Select one auditable uncertainty method and preregister a genuinely fresh evaluation period before scoring a revised-method superiority claim. Do not keep re-labeling examined 2025 data as untouched.
+2. Require both interval score and adverse-regime coverage; obtain independent review before a deployment or benefit claim.
+3. Use the bounded assurance example in buyer-owned paid-evaluation discovery, not as a claim that wave results automatically transfer to geothermal, HVAC or financial outcomes.
+4. Review registry/provenance compatibility and older scripts with documented methodological flaws before merging cumulative PR #215.
+5. Inventory laptop/VPS local-only Git history separately before claiming all devices or all prior commits are synchronized.
+
+## Where to resume
+
+Working branch: `exp/energy-stage4-delayed-router-20260905`. Cumulative review: https://github.com/robertashworth1986-debug/lumen-core-public/pull/215 . Owner-assigned continuity tracker: https://github.com/robertashworth1986-debug/lumen-core-public/issues/214 . Keep the tracker open for subsequent gates.
+
+Every pass must append its source/protocol/commit/run/result/claim/publication/mirror state and remaining gate. Do not rely on conversation memory or imply unattended background work. Main, production, DNS and domain `lumen-core.ai` were not changed by this pass.
