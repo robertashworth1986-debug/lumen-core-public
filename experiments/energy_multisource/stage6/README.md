@@ -47,3 +47,29 @@ The input path above assumes the code folder is a direct child of the extracted 
 ## Continuation
 
 Cumulative review remains PR #215; the owner-assigned tracker is issue #214. This pass does not close the scientific or merge gates. Use the Stage 6 closeout in `evidence/energy_continuity/` when available for exact execution, publication and mirror receipts. Select a clearly specified interval method only for a fresh registered evaluation, then obtain independent technical review before making a deployment or commercial-benefit claim.
+
+## Replay and regime assurance continuation
+
+`verify_stage6.py` checks the exact result inventory through the package verifier, binds primitive arrays to the SHA-pinned original Stage 4 archive, replays all interval bounds and feedback metadata with the retained implementation, and recomputes all 240 metric records and 90 comparisons. Duplicate JSON members, missing or repeated cells, invalid Boolean gates, malformed CSV columns, altered intervals, and inconsistent metric claims are rejected. `package_stage6.py` now requires this check before Git/archive side effects and only packages the exact declared result files into fresh output directories.
+
+This is deterministic replay and numerical consistency, not validation by an independent implementation or evaluator. It does not establish a fresh holdout, a physical benefit, or algorithmic novelty. Numeric replay uses absolute and relative tolerance 1e-10; identities, masks and discrete metadata are exact.
+
+Against the published Stage 6 packet, all 15 `adaptive_scaled_28d` / `delayed_blend_v01` / 30-minute-delay high-at-issue slices fall below nominal 90% empirical coverage (46.30% to 87.67%). The 100-row reporting floor is descriptive, not an effective independent sample size or inferential guarantee. These slices are dependent and use the same examined 2025 record. The verifier retains all methods, delays, months and insufficient slices; it does not select a favorable subset.
+
+Run this continuation from the current review code against an extracted original packet. The output path must not already exist:
+
+```sh
+python experiments/energy_multisource/stage6/verify_stage6.py --results /path/to/packet/results --output /path/to/new-assurance.json
+```
+
+The default frozen source is `/path/to/packet/inputs/energy-stage4-ci.zip`. Use `--source-zip` only to select another location for the exact same SHA-pinned bytes. The older release's embedded code does not contain this continuation; retain the reviewed continuation commit and receipt alongside the immutable original download.
+
+## Fresh evaluation design
+
+`FRESH_EVALUATION_DRAFT.json` selects one candidate for review: the existing `adaptive_scaled_28d` wrapper around `delayed_blend_v01`, applied to all five stations and all three horizons. It compares that candidate with the legacy wrapper and the same activity scaling without adaptive feedback. This advances the existing external-evaluation outcome. The draft has **not been frozen or executed**; prospective execution and promotion remain false.
+
+The future decision must require useful interval scores and high-activity coverage in every declared cell. A favorable aggregate cannot erase a regime failure. For example, the preserved 46237 / one-hour / blend result contains 219 misses among 601 high-activity issues, versus 1,597 misses among 16,867 ordinary issues: miss rates of 36.44% and 9.47%. Overall coverage of 89.60% hides this 3.85-fold descriptive difference. These are dependent observations in the already examined record, not additional independent evidence.
+
+Starting today, using a new download, or labeling data "2026" does not establish a fresh test. The draft requires a consumed-data inventory, actual retrieval and durable prediction timestamps, a source-revision rule, a fixed future window, and exact code/state/environment bindings. The evaluator, independent timestamp receipt, dates, sample-support floors, material-effect thresholds and confirmatory inference implementation remain explicitly unassigned. Insufficient high-activity evidence yields a hold; the window cannot be extended after seeing a result.
+
+[Original adaptive conformal inference](https://proceedings.neurips.cc/paper/2021/hash/0d441de75945e5acbc865406fc9a2559-Abstract.html) concerns an exact update and long-time coverage, while [later distribution-shift work](https://www.jmlr.org/papers/v25/22-1218.html) studies local regret and adaptive step sizes. Neither source confers its guarantee on this clipped, delayed, batched heuristic. [Sequential forecast-comparison methods](https://arxiv.org/abs/2110.00115) offer a route to appropriate monitoring, but require a reviewed score, information boundary and treatment of delayed/overlapping outcomes. The current diagnostic bootstrap remains descriptive.
