@@ -3,7 +3,8 @@
   "updated_utc": "2026-08-04T20:34:17Z",
   "policy": {
     "send_authority": "Robert Ashworth",
-    "codex_send_allowed": false,
+    "codex_send_allowed": true,
+    "codex_send_requires_explicit_action_time_approval": true,
     "chatgpt_send_requires_explicit_action_time_approval": true,
     "default_cooldown_hours": 72,
     "existing_thread_required_after_first_outbound": true,
