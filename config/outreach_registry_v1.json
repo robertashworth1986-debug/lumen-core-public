@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_outreach_registry.v1",
-  "updated_utc": "2026-08-04T20:34:17Z",
+  "updated_utc": "2026-08-31T05:02:29Z",
   "policy": {
     "send_authority": "Robert Ashworth",
     "codex_send_allowed": false,
@@ -91,9 +91,9 @@
       "duplicate_detected": false,
       "duplicate_count": 0,
       "inbound_since_last_outbound": true,
-      "next_allowed_action": "no_onboarding_resend_founder_decides_on_separate_125_usd_deposit_due_2026_08_14_then_wait_for_specific_ec_request",
+      "next_allowed_action": "founder_verifies_official_private_kickoff_time_location_and_eia_status_before_2026_09_01_then_completes_public_profile_after_review_no_duplicate_onboarding_outreach",
       "outreach_id": "LC-NEC-FALL-2026-001",
-      "notes": "EC confirmed receipt of the authorization, electronic signature, and onboarding responses, confirmed that everything was received on time, and said the materials would be included with the onboarding submission. EC said no further onboarding action is needed for now unless it requests something specific. This establishes timely receipt of the onboarding materials only. It does not establish payment of the separate 125 USD deposit, a secured cohort spot, program completion, funding beyond the stated financial-aid award, a contract, endorsement, or independent validation. Do not resend or send another acknowledgment."
+      "notes": "EC's public Fall 2026 cohort directory now lists LumenCore and Robert Ashworth, while the public founder profile still says Profile coming soon. The private August 20 kickoff notice provided an August 27 pre-kickoff mixer and September 1 cross-program kickoff; the mixer has elapsed and the kickoff is the next confirmed program milestone. The repository contains no receipt establishing completion of the founder-specific Entrepreneur Impact Assessment. Before September 1, the founder should use the official private EC account or invitation to verify the kickoff time, location, assessment status, and any remaining founder-only requirements; complete the public profile only after reviewing the final copy. This confirms cohort listing and scheduled participation only. It does not establish program completion, an EC Impact Grant or finalist slot, funding, a contract, endorsement, customer adoption, or independent validation. Do not publish the unique assessment key or private cohort communications. The registry status remains receipt_confirmed_waiting because this field controls outreach lifecycle, not program participation. EC previously confirmed that everything was received on time. The onboarding receipt itself does not establish payment. Do not resend onboarding materials or send a duplicate acknowledgment."
     },
     {
       "campaign_key": "launchtn-sbir-sttr-support-microgrant",
@@ -166,15 +166,15 @@
     {
       "campaign_key": "darpa-dice-proposal-abstract",
       "organization": "DARPA",
-      "status": "receipt_confirmed_waiting",
+      "status": "closed",
       "thread_mode": "existing_thread_only",
       "outbound_sequence": 1,
       "duplicate_detected": false,
       "duplicate_count": 0,
       "inbound_since_last_outbound": true,
-      "next_allowed_action": "inspect_baat_or_inbound_status_then_prepare_full_proposal_only_if_authorized",
+      "next_allowed_action": "preserve_drafts_as_research_assets_no_full_proposal_work_upload_or_submission_without_explicit_founder_override_after_private_notice_review",
       "outreach_id": "LC-DARPA-DICE-ABSTRACT-001",
-      "notes": "The IPTO submission-finalization confirmation establishes receipt of the DICE proposal abstract. Do not send the stray Gmail draft or submit a duplicate abstract."
+      "notes": "The abstract receipt was followed by an official 2026-07-24 status notice discouraging a full proposal. The private notice is controlling and remains outside the public repository. Preserve existing drafts as research and lessons-learned assets; do not spend further proposal effort, upload, or submit without explicit founder override after reviewing the notice and current BAA."
     },
     {
       "campaign_key": "dla-missionweave-l26bz-nv011-1380",
