@@ -587,6 +587,17 @@ def test_live_metrics_sync_is_read_only_artifact_only_and_fail_closed() -> None:
     assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in metrics
     assert "retention-days: 14" in metrics
     assert "available_objects" in metrics
+    assert "https://lumen-core.ai/health" in metrics
+    assert "https://lumen-core.ai/api/public/status" in metrics
+    for protected_endpoint in (
+        "https://lumen-core.ai/api/live_status.json",
+        "https://lumen-core.ai/api/federal_brief.json",
+        "https://lumen-core.ai/api/evidence_summary.json",
+        "https://lumen-core.ai/api/executor_heartbeat.json",
+    ):
+        assert protected_endpoint not in metrics
+    assert '"$available_objects" -eq 2' in metrics
+    assert "public gateway contracts available" in metrics
     assert "Live metrics verdict:" in metrics
     assert "A completed metrics capture is not evidence of a healthy deployment" in metrics
     assert "Fail closed on non-operational verdict" in metrics

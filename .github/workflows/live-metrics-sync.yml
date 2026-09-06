@@ -45,10 +45,8 @@ jobs:
             echo 'null'
           }
 
-          live_status=$(fetch_object_or_null "https://lumen-core.ai/api/live_status.json")
-          federal_brief=$(fetch_object_or_null "https://lumen-core.ai/api/federal_brief.json")
-          evidence_summary=$(fetch_object_or_null "https://lumen-core.ai/api/evidence_summary.json")
-          executor_heartbeat=$(fetch_object_or_null "https://lumen-core.ai/api/executor_heartbeat.json")
+          gateway_health=$(fetch_object_or_null "https://lumen-core.ai/health")
+          public_status=$(fetch_object_or_null "https://lumen-core.ai/api/public/status")
 
           site_code=$(curl --silent --show-error --location --max-redirs 5 --max-time 10 \
             --output /dev/null --write-out "%{http_code}" "https://lumen-core.ai/" 2>/dev/null) || site_code="000"
@@ -58,23 +56,21 @@ jobs:
           jq -n \
             --arg snapshot_utc "$snapshot_ts" \
             --arg site_status "$site_code" \
-            --argjson live_status "$live_status" \
-            --argjson federal_brief "$federal_brief" \
-            --argjson evidence_summary "$evidence_summary" \
-            --argjson executor_heartbeat "$executor_heartbeat" \
-            '{snapshot_utc:$snapshot_utc,site_status:$site_status,live_status:$live_status,federal_brief:$federal_brief,evidence_summary:$evidence_summary,executor_heartbeat:$executor_heartbeat}' \
+            --argjson gateway_health "$gateway_health" \
+            --argjson public_status "$public_status" \
+            '{snapshot_utc:$snapshot_utc,site_status:$site_status,gateway_health:$gateway_health,public_status:$public_status}' \
             > "$METRICS_ARTIFACT_DIR/live_snapshot.json"
 
           status=$((10#$site_code))
-          available_objects=$(jq '[.live_status, .federal_brief, .evidence_summary, .executor_heartbeat] | map(select(. != null)) | length' "$METRICS_ARTIFACT_DIR/live_snapshot.json")
+          available_objects=$(jq '[.gateway_health, .public_status] | map(select(. != null)) | length' "$METRICS_ARTIFACT_DIR/live_snapshot.json")
           state=outage
           status_msg=unreachable
           status_color=red
           if [[ "$status" -ge 200 && "$status" -lt 300 ]]; then
             state=degraded
-            status_msg="online · ${available_objects}/4 feeds"
+            status_msg="online · ${available_objects}/2 public gateway contracts"
             status_color=yellow
-            if [[ "$available_objects" -eq 4 ]]; then
+            if [[ "$available_objects" -eq 2 ]]; then
               state=operational
               status_color=brightgreen
             fi
@@ -101,7 +97,7 @@ jobs:
             {
               echo "## Live metrics verdict: ${{ steps.fetch.outputs.state }}"
               echo "- Site HTTP status: \`${{ steps.fetch.outputs.site_code }}\`"
-              echo "- Structured feeds available: \`${{ steps.fetch.outputs.available_objects }}/4\`"
+              echo "- Public gateway contracts available: \`${{ steps.fetch.outputs.available_objects }}/2\`"
               echo "- Snapshot UTC: \`${{ steps.fetch.outputs.snapshot_ts }}\`"
               echo "- Evidence: retained workflow artifact only; no repository commit or deployment occurred"
               echo ""
@@ -129,5 +125,5 @@ jobs:
       - name: Fail closed on non-operational verdict
         if: steps.fetch.outputs.state != 'operational'
         run: |
-          echo "::error::lumen-core.ai metrics verdict is ${{ steps.fetch.outputs.state }} — HTTP ${{ steps.fetch.outputs.site_code }}, ${{ steps.fetch.outputs.available_objects }}/4 feeds available"
+          echo "::error::lumen-core.ai metrics verdict is ${{ steps.fetch.outputs.state }} — HTTP ${{ steps.fetch.outputs.site_code }}, ${{ steps.fetch.outputs.available_objects }}/2 public gateway contracts available"
           exit 1
