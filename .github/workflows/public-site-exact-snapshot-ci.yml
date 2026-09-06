@@ -7,8 +7,16 @@ on:
       - '.github/workflows/deploy-public-site-release.yml'
       - '.github/workflows/public-site-exact-snapshot-ci.yml'
       - 'code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh'
+      - 'code/deploy/DISCOVER_PUBLIC_SITE_ROLLBACK_AUTHORITY_ON_VPS.py'
+      - 'code/deploy/RESTORE_PUBLIC_SITE_RELEASE_ON_VPS.sh'
       - 'code/deploy/package_public_site_release.py'
+      - 'code/deploy/public_site_release_contract.py'
+      - 'code/ops/BUILD_PUBLIC_SITE_DEPLOYMENT_TRANSACTION_RECEIPT.py'
       - 'code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py'
+      - 'code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py'
+      - 'code/ops/VERIFY_INCIDENT_RESPONSE_AND_CONTINUITY.py'
+      - 'config/incident_response_and_continuity_v1.json'
+      - 'docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md'
       - 'docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md'
       - 'dashboard/operator_home.html'
       - 'dashboard/opportunity_sprint.html'
@@ -43,6 +51,8 @@ on:
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'tests/test_public_site_deploy_hardening.py'
+      - 'tests/test_public_site_deployment_transaction_receipt.py'
+      - 'tests/test_incident_response_and_continuity.py'
       - 'tests/test_public_discovery.py'
       - 'tests/test_canonical_surface_design.py'
   push:
@@ -52,8 +62,16 @@ on:
       - '.github/workflows/deploy-public-site-release.yml'
       - '.github/workflows/public-site-exact-snapshot-ci.yml'
       - 'code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh'
+      - 'code/deploy/DISCOVER_PUBLIC_SITE_ROLLBACK_AUTHORITY_ON_VPS.py'
+      - 'code/deploy/RESTORE_PUBLIC_SITE_RELEASE_ON_VPS.sh'
       - 'code/deploy/package_public_site_release.py'
+      - 'code/deploy/public_site_release_contract.py'
+      - 'code/ops/BUILD_PUBLIC_SITE_DEPLOYMENT_TRANSACTION_RECEIPT.py'
       - 'code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py'
+      - 'code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py'
+      - 'code/ops/VERIFY_INCIDENT_RESPONSE_AND_CONTINUITY.py'
+      - 'config/incident_response_and_continuity_v1.json'
+      - 'docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md'
       - 'docs/PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md'
       - 'dashboard/operator_home.html'
       - 'dashboard/opportunity_sprint.html'
@@ -88,6 +106,8 @@ on:
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'tests/test_public_site_deploy_hardening.py'
+      - 'tests/test_public_site_deployment_transaction_receipt.py'
+      - 'tests/test_incident_response_and_continuity.py'
       - 'tests/test_public_discovery.py'
       - 'tests/test_canonical_surface_design.py'
 
@@ -113,7 +133,21 @@ jobs:
         run: python -m pip install --disable-pip-version-check pytest==9.1.0
 
       - name: Check shell syntax
-        run: bash -n code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh
+        run: bash -n code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh code/deploy/RESTORE_PUBLIC_SITE_RELEASE_ON_VPS.sh
+
+      - name: Compile deployment receipt controls
+        run: >-
+          python -m py_compile
+          code/deploy/DISCOVER_PUBLIC_SITE_ROLLBACK_AUTHORITY_ON_VPS.py
+          code/deploy/public_site_release_contract.py
+          code/ops/BUILD_PUBLIC_SITE_DEPLOYMENT_TRANSACTION_RECEIPT.py
 
       - name: Run exact-snapshot protocol tests
-        run: python -m pytest tests/test_public_site_deploy_hardening.py tests/test_public_discovery.py tests/test_canonical_surface_design.py -q
+        run: >-
+          python -m pytest
+          tests/test_public_site_deploy_hardening.py
+          tests/test_public_site_deployment_transaction_receipt.py
+          tests/test_incident_response_and_continuity.py
+          tests/test_public_discovery.py
+          tests/test_canonical_surface_design.py
+          -q

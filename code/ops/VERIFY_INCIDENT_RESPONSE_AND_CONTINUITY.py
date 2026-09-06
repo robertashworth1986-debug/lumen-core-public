@@ -36,6 +36,8 @@ REQUIRED_PLAN_TEXT = (
     "non-contractual, unvalidated planning targets",
     "No automated workflow may notify",
     "not evidence of a completed live restoration",
+    "keep every rejected candidate attempt red",
+    "later recovery requires a separate human-reviewed decision",
     "A red live audit is an incident signal, not permission to mutate production.",
 )
 REQUIRED_LIVE_WORKFLOW_TEXT = (

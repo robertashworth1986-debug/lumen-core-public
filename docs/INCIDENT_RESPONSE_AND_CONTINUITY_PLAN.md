@@ -25,7 +25,7 @@ current-commit live receipt.
 | Role | Responsibility | Authority boundary |
 |---|---|---|
 | Founder/operator | Accountable incident owner and final release authority | Must personally authorize production mutation and incident closure |
-| Automated evidence custodian | Package Git bytes, collect public HTTP evidence, classify bounded drift, and retain receipts | Cannot deploy, repair, rotate secrets, notify outside parties, delete data, trade, attest, or close an incident |
+| Automated evidence custodian | Package Git bytes, collect public HTTP evidence, classify bounded drift, retain receipts, and execute the one bounded same-attempt compensation described below | Cannot initiate deployment, perform arbitrary or later rollback/repair, rotate secrets, notify outside parties, delete data, trade, attest, or close an incident |
 | Buyer decision owner | Approves buyer source, baseline, metrics, handling, acceptance, and buyer communications | Exists only in a signed buyer-specific scope |
 | Legal/security reviewer | Reviews notification, privacy, regulatory, insurance, contractual, and disclosure duties | No such approval is implied by this repository |
 
@@ -85,9 +85,42 @@ Static-site recovery requires the separately protected exact-snapshot workflow:
    that review;
 3. apply only the allowlisted archive while capturing replaced file identity;
 4. rerun every live byte and MIME check declared by the release manifest;
-5. retain deployment, rollback, and verification receipts; and
-6. close the static release incident only when `release_verified` is `true` for
+5. if that external gate rejects the candidate or cannot emit a valid receipt
+   while the same approved workflow attempt is still running, validate the
+   immutable run/attempt/capability-bound authority capsule and all current
+   allowlisted targets before restoring the exact captured local state;
+6. retain deployment, rollback-authority, live-gate, compensation, and aggregate
+   transaction receipts; keep every rejected candidate attempt red even when
+   prior-state restoration is verified; and
+7. close the static release incident only when `release_verified` is `true` for
    the deployed commit.
+
+The one-attempt capability is masked and ephemeral; only its digest is retained.
+It is not a dispatch input or later recovery credential. The pinned runner
+runtime, explicit remote Python floor, one fixed root-owned mutation lock, global
+preflight, and immediate per-target revalidation protect cooperating writers.
+A target that differs from both the candidate and captured prior state stops
+before that target is touched, leaves no verified receipt, and is not
+overwritten. Earlier targets may already equal prior state; the same authorized
+attempt can resume idempotently only after separate reconciliation of the third
+state. Uncooperative root mutation is outside the control guarantee.
+
+A malformed or contradictory live-gate file is retained only as explicitly
+untrusted evidence. It is not passed to the VPS or treated as rejected-gate
+authority; compensation uses the error-or-missing route and the aggregate
+receipt records no trusted live-gate hash. Verified compensation establishes only
+the prior allowlisted local bytes, numeric ownership, and modes. It does not
+establish public recovery through Nginx, a cache or CDN, DNS, or TLS, and it is
+not candidate success or incident closure. Cancellation, runner loss, network
+loss, or host loss can prevent compensation; later recovery requires a separate
+human-reviewed decision.
+
+If apply transport or local receipt parsing is ambiguous, the workflow does not
+trust the local command outcome. Live verification and compensation each
+rediscover the exact remote authority independently and require its self-hash,
+run/attempt/commit/capability bindings, and bound state-file hashes before
+continuing. Failure to discover exactly one authority remains red and emits no
+success claim.
 
 Gateway repair remains a separate lane. It requires its own literal approval,
 private runtime prerequisites, negative-access checks, and retained receipts.
@@ -125,7 +158,8 @@ require human review under the controlling agreement and applicable law.
 ## Tabletop and live exercise boundary
 
 CI exercises exact, critical-drift, threshold-drift, limited-drift, malformed
-receipt, and manual-SEV-1 boundaries. These are deterministic control exercises,
+receipt, manual-SEV-1, same-attempt replay/tamper rejection, and transaction-state
+boundaries. These are deterministic control exercises,
 not evidence of a completed live restoration, backup recovery, customer
 notification, disaster-recovery exercise, or independent audit.
 

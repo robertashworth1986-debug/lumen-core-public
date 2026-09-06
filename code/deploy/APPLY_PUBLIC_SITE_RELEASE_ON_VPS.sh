@@ -7,6 +7,10 @@ readonly REQUIRED_APPROVAL="DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT"
 readonly PRODUCTION_TARGET="/opt/lumencore/dashboard"
 readonly PRODUCTION_ROLLBACK_BASE="/opt/lumencore/rollbacks/public-site"
 readonly MANIFEST_SCHEMA="lumencore.public_site_release_manifest.v1"
+readonly ROLLBACK_AUTHORITY_SCHEMA="lumencore.public_site_same_run_rollback_authority.v1"
+readonly REPOSITORY="robertashworth1986-debug/lumen-core-public"
+readonly WORKFLOW=".github/workflows/deploy-public-site-release.yml"
+readonly AUTHORITY_SCOPE="FAILED_EXTERNAL_LIVE_GATE_COMPENSATION_IN_SAME_WORKFLOW_RUN_ONLY"
 readonly EXPECTED_TARGET_DIRECTORY="/opt/lumencore/dashboard"
 readonly -a RELEASE_FILES=(
   "operator_home.html"
@@ -68,6 +72,9 @@ archive=""
 manifest=""
 source_commit=""
 approval=""
+run_id=""
+run_attempt=""
+capability_stdin=0
 
 die() {
   printf 'ERROR: %s\n' "$*" >&2
@@ -78,6 +85,8 @@ usage() {
   cat >&2 <<'EOF'
 Usage: APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh \
   --archive PATH --manifest PATH --source-commit FULL_SHA \
+  --run-id POSITIVE_INTEGER --run-attempt POSITIVE_INTEGER \
+  --rollback-capability-stdin \
   --approval DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT
 EOF
   return 2
@@ -105,6 +114,20 @@ while (($#)); do
       approval="$2"
       shift 2
       ;;
+    --run-id)
+      (($# >= 2)) || usage
+      run_id="$2"
+      shift 2
+      ;;
+    --run-attempt)
+      (($# >= 2)) || usage
+      run_attempt="$2"
+      shift 2
+      ;;
+    --rollback-capability-stdin)
+      capability_stdin=1
+      shift
+      ;;
     *)
       usage
       ;;
@@ -113,6 +136,9 @@ done
 
 [[ "$approval" == "$REQUIRED_APPROVAL" ]] || die "explicit public-site deployment approval is required"
 [[ "$source_commit" =~ ^[0-9a-f]{40}$ ]] || die "source commit must be a full lowercase SHA-1"
+[[ "$run_id" =~ ^[1-9][0-9]*$ ]] || die "run ID must be a positive integer"
+[[ "$run_attempt" =~ ^[1-9][0-9]*$ ]] || die "run attempt must be a positive integer"
+[[ "$capability_stdin" -eq 1 ]] || die "rollback capability must be supplied through standard input"
 [[ -f "$archive" && ! -L "$archive" ]] || die "archive must be a regular non-symlink file"
 [[ -f "$manifest" && ! -L "$manifest" ]] || die "manifest must be a regular non-symlink file"
 
@@ -132,9 +158,20 @@ else
   rollback_base="$PRODUCTION_ROLLBACK_BASE"
 fi
 
-for command_name in python3 sha256sum stat cp cmp install date mktemp realpath; do
+for command_name in python3 sha256sum stat cp cmp install date mktemp realpath dirname basename flock; do
   command -v "$command_name" >/dev/null 2>&1 || die "missing required command: $command_name"
 done
+python3 -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 9) else 1)' || \
+  die "python3 3.9 or newer is required"
+
+rollback_capability=""
+IFS= read -r rollback_capability || [[ -n "$rollback_capability" ]] || \
+  die "rollback capability could not be read from standard input"
+[[ "$rollback_capability" =~ ^[0-9a-f]{64}$ ]] || die "rollback capability must be 256 bits encoded as lowercase hex"
+rollback_capability_sha256="$(printf '%s' "$rollback_capability" | sha256sum)"
+rollback_capability_sha256="${rollback_capability_sha256%% *}"
+rollback_capability=""
+[[ "$rollback_capability_sha256" =~ ^[0-9a-f]{64}$ ]] || die "rollback capability digest is invalid"
 
 root_stage="$(mktemp -d /tmp/lumencore-public-site-root.XXXXXXXX)"
 rollback_dir=""
@@ -361,6 +398,23 @@ done < "$root_stage/expected.tsv"
 [[ "${#expected_hashes[@]}" -eq "$EXPECTED_FILE_COUNT" ]] || \
   die "expected hash set does not match the exact-file allowlist"
 
+[[ "$(realpath -m -- "$rollback_base")" == "$rollback_base" ]] || die "rollback path cannot traverse a symlink"
+[[ ! -L "$rollback_base" ]] || die "rollback directory cannot be a symlink"
+install -d -m 0750 -- "$rollback_base"
+read -r rollback_base_uid rollback_base_mode < <(stat -c '%u %a' -- "$rollback_base")
+[[ "$rollback_base_uid" == "$EUID" && "$rollback_base_mode" == "750" ]] || \
+  die "rollback base identity is invalid"
+lock_path="$rollback_base/.deployment.lock"
+[[ "$(realpath -m -- "$lock_path")" == "$lock_path" ]] || die "deployment lock path cannot traverse a symlink"
+[[ ! -e "$lock_path" || -f "$lock_path" ]] || die "deployment lock has an unsupported type"
+[[ ! -L "$lock_path" ]] || die "deployment lock cannot be a symlink"
+exec 9>>"$lock_path"
+chmod 0600 -- "$lock_path"
+read -r lock_uid lock_mode lock_links < <(stat -c '%u %a %h' -- "$lock_path")
+[[ "$lock_uid" == "$EUID" && "$lock_mode" == "600" && "$lock_links" == "1" ]] || \
+  die "deployment lock identity is invalid"
+flock -n 9 || die "another public-site mutation holds the deployment lock"
+
 [[ -d "$target_root" && ! -L "$target_root" ]] || die "dashboard root must be a real directory"
 [[ "$(realpath -m -- "$target_root")" == "$target_root" ]] || die "dashboard root cannot traverse a symlink"
 for relative in "${RELEASE_DIRECTORIES[@]}"; do
@@ -377,9 +431,6 @@ for name in "${RELEASE_FILES[@]}"; do
 done
 
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
-[[ "$(realpath -m -- "$rollback_base")" == "$rollback_base" ]] || die "rollback path cannot traverse a symlink"
-[[ ! -L "$rollback_base" ]] || die "rollback directory cannot be a symlink"
-install -d -m 0750 -- "$rollback_base"
 rollback_dir="$rollback_base/${timestamp}-${source_commit:0:12}"
 [[ ! -e "$rollback_dir" ]] || die "timestamped rollback directory already exists"
 mkdir -m 0700 -- "$rollback_dir" "$rollback_dir/files"
@@ -408,6 +459,16 @@ for name in "${RELEASE_FILES[@]}"; do
     printf '%s\tPRESENT\t%s\t%s\t%s\t%s\t%s\t%s\n' \
       "$name" "$current_hash" "$owner" "$group" "$uid" "$gid" "$mode" >> "$rollback_dir/pre-deploy.tsv"
     cp -a -- "$target_path" "$backup_path"
+    [[ -f "$backup_path" && ! -L "$backup_path" ]] || die "rollback backup is not regular: $name"
+    backup_hash="$(sha256sum -- "$backup_path")"
+    backup_hash="${backup_hash%% *}"
+    [[ "$backup_hash" == "$current_hash" ]] || die "rollback backup hash mismatch: $name"
+    read -r backup_uid backup_gid backup_mode < <(stat -c '%u %g %a' -- "$backup_path")
+    [[ "$backup_uid" == "$uid" && "$backup_gid" == "$gid" && "$backup_mode" == "$mode" ]] || \
+      die "rollback backup metadata mismatch: $name"
+    [[ "$(stat -c '%d:%i' -- "$backup_path")" != "$(stat -c '%d:%i' -- "$target_path")" ]] || \
+      die "rollback backup is not an independent inode: $name"
+    [[ "$(stat -c '%h' -- "$backup_path")" == "1" ]] || die "rollback backup has multiple hard links: $name"
   else
     printf '%s\tMISSING\t-\t-\t-\t-\t-\t-\n' "$name" >> "$rollback_dir/pre-deploy.tsv"
   fi
@@ -459,9 +520,324 @@ for name in "${RELEASE_FILES[@]}"; do
     "$name" "${expected_hashes[$name]}" "$actual_hash" "$owner" "$group" "$uid" "$gid" "$mode" >> "$rollback_dir/post-deploy.tsv"
 done
 
+created_at_utc="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+rollback_authority_sha256="$(python3 - \
+  "$rollback_dir/rollback-authority.json" \
+  "$rollback_dir/release-manifest.json" \
+  "$rollback_dir/pre-deploy.tsv" \
+  "$rollback_dir/directory-state.tsv" \
+  "$rollback_dir/post-deploy.tsv" \
+  "$rollback_dir/files" \
+  "$run_id" \
+  "$run_attempt" \
+  "$rollback_capability_sha256" \
+  "$source_commit" \
+  "$ROLLBACK_AUTHORITY_SCHEMA" \
+  "$MANIFEST_SCHEMA" \
+  "$REPOSITORY" \
+  "$WORKFLOW" \
+  "$AUTHORITY_SCOPE" \
+  "$REQUIRED_APPROVAL" \
+  "$EXPECTED_TARGET_DIRECTORY" \
+  "$timestamp" \
+  "$created_at_utc" \
+  "$EXPECTED_FILE_COUNT" \
+  "${RELEASE_FILES[@]}" \
+  --directories \
+  "${RELEASE_DIRECTORIES[@]}" <<'PY'
+import hashlib
+import json
+import os
+from pathlib import Path, PurePosixPath
+import re
+import stat
+import sys
+
+
+(
+    state_path_raw,
+    manifest_path_raw,
+    pre_path_raw,
+    directory_path_raw,
+    post_path_raw,
+    backup_root_raw,
+    run_id_raw,
+    run_attempt_raw,
+    rollback_capability_sha256,
+    source_commit,
+    authority_schema,
+    manifest_schema,
+    repository,
+    workflow,
+    authority_scope,
+    deployment_approval,
+    target_directory,
+    rollback_capture_id,
+    created_at_utc,
+    file_count_raw,
+    *remaining,
+) = sys.argv[1:]
+try:
+    separator = remaining.index("--directories")
+except ValueError as exc:
+    raise SystemExit("ERROR: rollback state allowlist separator is missing") from exc
+expected_files = remaining[:separator]
+expected_directories = remaining[separator + 1 :]
+file_count = int(file_count_raw)
+run_id = int(run_id_raw)
+run_attempt = int(run_attempt_raw)
+if file_count != len(expected_files):
+    raise SystemExit("ERROR: rollback state file count is inconsistent")
+
+state_path = Path(state_path_raw)
+manifest_path = Path(manifest_path_raw)
+pre_path = Path(pre_path_raw)
+directory_path = Path(directory_path_raw)
+post_path = Path(post_path_raw)
+backup_root = Path(backup_root_raw)
+sha_pattern = re.compile(r"[0-9a-f]{64}")
+identity_pattern = re.compile(r"[A-Za-z0-9_.+-]+")
+mode_pattern = re.compile(r"[0-7]{3,4}")
+
+
+def fail(message: str) -> None:
+    raise SystemExit(f"ERROR: {message}")
+
+
+def strict_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            fail(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def reject_constant(value):
+    fail(f"non-finite JSON value: {value}")
+
+
+def digest(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def read_tsv(path: Path, header: str, width: int) -> list[list[str]]:
+    body = path.read_bytes()
+    if not body.endswith(b"\n") or b"\r" in body or b"\0" in body:
+        fail(f"rollback TSV framing is invalid: {path.name}")
+    try:
+        lines = body.decode("utf-8").splitlines()
+    except UnicodeDecodeError as exc:
+        fail(f"rollback TSV encoding is invalid: {path.name}: {exc}")
+    if not lines or lines[0] != header:
+        fail(f"rollback TSV header is invalid: {path.name}")
+    rows = [line.split("\t") for line in lines[1:]]
+    if any(len(row) != width for row in rows):
+        fail(f"rollback TSV row width is invalid: {path.name}")
+    return rows
+
+
+try:
+    manifest = json.loads(
+        manifest_path.read_text(encoding="utf-8"),
+        object_pairs_hook=strict_object,
+        parse_constant=reject_constant,
+    )
+except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+    fail(f"rollback manifest is invalid: {exc}")
+manifest_keys = {
+    "archive_sha256",
+    "file_count",
+    "files",
+    "schema",
+    "source_commit",
+    "target_directory",
+}
+manifest_file_keys = {
+    "archive_name",
+    "bytes",
+    "git_blob_oid",
+    "install_mode",
+    "repo_path",
+    "sha256",
+}
+if not isinstance(manifest, dict) or set(manifest) != manifest_keys:
+    fail("rollback manifest fields do not match the strict schema")
+if manifest.get("schema") != manifest_schema:
+    fail("rollback manifest schema mismatch")
+if manifest.get("source_commit") != source_commit:
+    fail("rollback manifest source commit mismatch")
+if manifest.get("target_directory") != target_directory:
+    fail("rollback manifest target directory mismatch")
+manifest_rows = manifest.get("files")
+if not isinstance(manifest_rows, list) or manifest.get("file_count") != file_count:
+    fail("rollback manifest file count mismatch")
+manifest_hashes = {}
+for row in manifest_rows:
+    if not isinstance(row, dict) or set(row) != manifest_file_keys:
+        fail("rollback manifest file row fields mismatch")
+    name = row.get("archive_name")
+    if name in manifest_hashes:
+        fail("rollback manifest contains a duplicate file")
+    manifest_hashes[name] = row.get("sha256")
+if list(manifest_hashes) != expected_files:
+    fail("rollback manifest allowlist or order mismatch")
+if any(sha_pattern.fullmatch(str(value)) is None for value in manifest_hashes.values()):
+    fail("rollback manifest contains an invalid file hash")
+
+pre_rows = read_tsv(
+    pre_path,
+    "file\tstate\tsha256\towner\tgroup\tuid\tgid\tmode",
+    8,
+)
+if len(pre_rows) != file_count or [row[0] for row in pre_rows] != expected_files:
+    fail("pre-deploy rows do not match the exact allowlist and order")
+present = {}
+missing = set()
+for name, state, sha256, owner, group, uid, gid, mode in pre_rows:
+    if state == "PRESENT":
+        if (
+            sha_pattern.fullmatch(sha256) is None
+            or identity_pattern.fullmatch(owner) is None
+            or identity_pattern.fullmatch(group) is None
+            or not uid.isdigit()
+            or not gid.isdigit()
+            or mode_pattern.fullmatch(mode) is None
+        ):
+            fail(f"invalid present pre-deploy row: {name}")
+        present[name] = (sha256, int(uid), int(gid), int(mode, 8))
+    elif state == "MISSING":
+        if [sha256, owner, group, uid, gid, mode] != ["-"] * 6:
+            fail(f"invalid missing pre-deploy row: {name}")
+        missing.add(name)
+    else:
+        fail(f"invalid pre-deploy state: {name}")
+
+directory_rows = read_tsv(
+    directory_path,
+    "directory\tstate\tuid\tgid\tmode",
+    5,
+)
+if (
+    len(directory_rows) != len(expected_directories)
+    or [row[0] for row in directory_rows] != expected_directories
+):
+    fail("directory-state rows do not match the exact allowlist and order")
+for name, state, uid, gid, mode in directory_rows:
+    if state == "PRESENT":
+        if not uid.isdigit() or not gid.isdigit() or mode_pattern.fullmatch(mode) is None:
+            fail(f"invalid present directory-state row: {name}")
+    elif state == "MISSING":
+        if [uid, gid, mode] != ["-"] * 3:
+            fail(f"invalid missing directory-state row: {name}")
+    else:
+        fail(f"invalid directory state: {name}")
+
+post_rows = read_tsv(
+    post_path,
+    "file\texpected_sha256\tactual_sha256\towner\tgroup\tuid\tgid\tmode",
+    8,
+)
+if len(post_rows) != file_count or [row[0] for row in post_rows] != expected_files:
+    fail("post-deploy rows do not match the exact allowlist and order")
+for name, expected, actual, owner, group, uid, gid, mode in post_rows:
+    if (
+        expected != manifest_hashes[name]
+        or actual != expected
+        or identity_pattern.fullmatch(owner) is None
+        or identity_pattern.fullmatch(group) is None
+        or not uid.isdigit()
+        or not gid.isdigit()
+        or mode != "644"
+    ):
+        fail(f"invalid post-deploy row: {name}")
+
+if not backup_root.is_dir() or backup_root.is_symlink():
+    fail("rollback backup root is not a real directory")
+actual_files = set()
+actual_directories = set()
+for current_root, directories, files in os.walk(backup_root, followlinks=False):
+    root_path = Path(current_root)
+    relative_root = root_path.relative_to(backup_root)
+    for directory in directories:
+        path = root_path / directory
+        if path.is_symlink():
+            fail("rollback backup contains a symbolic directory")
+        actual_directories.add((relative_root / directory).as_posix())
+    for filename in files:
+        path = root_path / filename
+        if path.is_symlink() or not stat.S_ISREG(path.stat().st_mode):
+            fail("rollback backup contains an unsupported file")
+        actual_files.add((relative_root / filename).as_posix())
+expected_backup_directories = set()
+for name in present:
+    parent = PurePosixPath(name).parent
+    while parent != PurePosixPath("."):
+        expected_backup_directories.add(parent.as_posix())
+        parent = parent.parent
+if actual_files != set(present) or actual_directories != expected_backup_directories:
+    fail("rollback backup inventory does not match the captured present-file set")
+for name, (expected_hash, uid, gid, mode) in present.items():
+    path = backup_root.joinpath(*PurePosixPath(name).parts)
+    file_stat = path.stat()
+    if (
+        digest(path) != expected_hash
+        or file_stat.st_uid != uid
+        or file_stat.st_gid != gid
+        or stat.S_IMODE(file_stat.st_mode) != mode
+        or file_stat.st_nlink != 1
+    ):
+        fail(f"rollback backup identity mismatch: {name}")
+
+payload = {
+    "authority_scope": authority_scope,
+    "created_at_utc": created_at_utc,
+    "deployment_approval": deployment_approval,
+    "directory_state_sha256": digest(directory_path),
+    "post_deploy_sha256": digest(post_path),
+    "pre_deploy_sha256": digest(pre_path),
+    "python_version": ".".join(map(str, sys.version_info[:3])),
+    "release_manifest_sha256": digest(manifest_path),
+    "repository": repository,
+    "rollback_capability_sha256": rollback_capability_sha256,
+    "rollback_capture_id": f"{rollback_capture_id}-{source_commit[:12]}",
+    "run_attempt": run_attempt,
+    "run_id": run_id,
+    "schema": authority_schema,
+    "source_commit": source_commit,
+    "target_directory": target_directory,
+    "workflow": workflow,
+}
+canonical = json.dumps(
+    payload,
+    sort_keys=True,
+    separators=(",", ":"),
+    ensure_ascii=True,
+).encode("ascii")
+receipt_hash = hashlib.sha256(canonical).hexdigest()
+payload["receipt_sha256"] = receipt_hash
+rendered = json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=True) + "\n"
+descriptor = os.open(state_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+with os.fdopen(descriptor, "w", encoding="ascii", newline="\n") as handle:
+    handle.write(rendered)
+verified = json.loads(
+    state_path.read_text(encoding="ascii"),
+    object_pairs_hook=strict_object,
+    parse_constant=reject_constant,
+)
+if verified != payload or digest(state_path) != hashlib.sha256(rendered.encode("ascii")).hexdigest():
+    fail("rollback authority did not survive write verification")
+print(receipt_hash)
+PY
+)"
+[[ "$rollback_authority_sha256" =~ ^[0-9a-f]{64}$ ]] || die "rollback authority digest is invalid"
+
 deployment_started=0
 printf 'PUBLIC_SITE_SOURCE_COMMIT=%s\n' "$source_commit"
+printf 'PUBLIC_SITE_RUN_ID=%s\n' "$run_id"
+printf 'PUBLIC_SITE_RUN_ATTEMPT=%s\n' "$run_attempt"
 printf 'PUBLIC_SITE_ROLLBACK_DIR=%s\n' "$rollback_dir"
+printf 'PUBLIC_SITE_ROLLBACK_AUTHORITY_SHA256=%s\n' "$rollback_authority_sha256"
 printf '%s\n' '--- remote pre-deploy identity ---'
 cat "$rollback_dir/pre-deploy.tsv"
 printf '%s\n' '--- exact post-deploy identity ---'
