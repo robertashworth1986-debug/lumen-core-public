@@ -14,6 +14,12 @@ It is not certification, a penetration test, independent validation,
 production authorization, or evidence that any later source commit matches the
 live domain.
 
+The current candidate source allowlist contains 57 files: the historical
+43-file surface plus a claim-bounded Visual Library page, a strict asset
+manifest, and 12 WebP visuals. Candidate builds inventory all 57 files. This
+does not alter or supersede the retained 43-file deployment receipts, and it is
+not evidence that the candidate is live.
+
 ## What is inventoried
 
 The builder consumes the immutable public release archive and strict release

@@ -12,11 +12,14 @@ Safe public sentence:
 
 > LumaJet applies LumenCore geometry, FlowForm-style routing, thermal/diagnostic visibility, and resilience scoring to synthetic or controlled simulation environments so reviewers can compare geometry-informed candidates against baseline patterns.
 
-Current internal signal language:
+Current internal evidence summary, audited 2026-08-31:
 
-- LumaJet baseline benchmark activity exists.
-- `LUMAJET_BASELINE_DONE` is the internal completion marker to preserve in proof notes.
-- Any LumaJet win should be labeled as synthetic/simulation evidence unless externally reviewed.
+- V1 retained 1,120 frozen validation scenarios and failed its internal assurance gate: `NOT_PROMOTED_ASSURANCE_GATE_FAILED`.
+- V2 used 1,400 fresh, disjoint validation scenarios and recorded `INTERNAL_GENERATED_ASSURANCE_PASS_NOT_AIRWORTHINESS`.
+- The V2 paired score delta was `0.00004771`, with paired CI95 `[0.00001361, 0.00008181]`; the packet classifies this as a tiny internal effect, not practical or field superiority.
+- The public-safe evidence-packet identity is SHA-256 `E7684FFF35EE0A1C2A5B701436F17C11A60019C3B5566F431484E81BC654AA88`.
+- Independent reproduction, representative dynamics review, field validation, airworthiness, operational authority, FAA/DoD approval, and economic claims remain false or incomplete.
+- Raw local evidence JSON is not a public download because it contains local paths and implementation detail; publish only a sanitized Proof Capsule derived from the frozen packet.
 
 Do not claim:
 
@@ -27,12 +30,15 @@ Do not claim:
 - safety certification,
 - weapons capability,
 - customer deployment.
+- independent reproduction or field validation,
+- FAA, DoD, Air Force, NASA, laboratory, investor, or customer approval,
+- economic savings, procurement readiness, or production authority.
 
 ---
 
 ## 2. LumaJet Proof Capsule requirements
 
-Before LumaJet evidence is public headline material, freeze a Proof Capsule with:
+Before LumaJet evidence is promoted beyond the bounded public summary, freeze a sanitized Proof Capsule with:
 
 - source simulation or synthetic benchmark name,
 - baseline/control pattern,
@@ -44,6 +50,8 @@ Before LumaJet evidence is public headline material, freeze a Proof Capsule with
 - negative results,
 - limitations,
 - safe public sentence.
+
+The capsule must retain both the adverse V1 and tiny-effect V2. It must not publish local absolute paths, disclose private implementation detail, or hide null/adverse rows. The next accepted gate is a qualified non-author blind reproduction using the frozen protocol without the expected leaderboard.
 
 Recommended capsule title:
 

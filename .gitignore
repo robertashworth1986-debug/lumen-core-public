@@ -42,6 +42,7 @@ dashboard/*.html
 !dashboard/operator_home.html
 !dashboard/agent_approval_hub.html
 !dashboard/proof_to_pilot.html
+!dashboard/visual_library.html
 !dashboard/external_review.html
 !dashboard/anomalies.html
 !dashboard/lab.html

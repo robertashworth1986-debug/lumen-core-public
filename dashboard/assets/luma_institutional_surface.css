@@ -52,6 +52,29 @@ body[data-luma-surface]::before {
   mask-image: radial-gradient(circle at 50% 12%, #000 0, transparent 72%);
 }
 
+body[data-luma-surface="home"]::before {
+  inset: -5%;
+  opacity: 0.27;
+  background-image:
+    radial-gradient(circle, rgba(218, 238, 255, 0.9) 0 0.7px, transparent 1.2px),
+    radial-gradient(circle, rgba(102, 246, 223, 0.72) 0 0.6px, transparent 1.05px),
+    radial-gradient(circle, rgba(189, 140, 255, 0.58) 0 0.55px, transparent 1px),
+    linear-gradient(rgba(126, 163, 204, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126, 163, 204, 0.09) 1px, transparent 1px);
+  background-position: 0 0, 31px 19px, 73px 47px, 0 0, 0 0;
+  background-size: 97px 107px, 149px 137px, 211px 193px, 54px 54px, 54px 54px;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 18%, #000 0, rgba(0, 0, 0, 0.88) 53%, transparent 92%);
+  mask-image: radial-gradient(ellipse at 50% 18%, #000 0, rgba(0, 0, 0, 0.88) 53%, transparent 92%);
+  animation: lis-space-drift 42s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes lis-space-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-1.2%, 1.6%, 0) scale(1.015); }
+  100% { transform: translate3d(-2.4%, 3.2%, 0) scale(1.03); }
+}
+
 body[data-luma-surface]::after {
   content: "";
   position: fixed;
@@ -391,6 +414,250 @@ body[data-luma-surface="home"] .hero-main::before {
   background: linear-gradient(110deg, rgba(102, 246, 223, 0.035), transparent 45%);
 }
 
+/* Proof Lattice: a deterministic projected-3D explanation of the existing
+   Source -> Baseline -> Metric -> Hash -> Decision contract. It is a visual
+   model, never a physics, validation, or performance claim. */
+.lis-lattice-stage {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.7fr) minmax(420px, 1.3fr);
+  min-height: 390px;
+  gap: 26px;
+  margin: 0 0 16px;
+  padding: clamp(22px, 3vw, 38px) !important;
+  overflow: hidden;
+  border-color: rgba(102, 246, 223, 0.28) !important;
+  background:
+    radial-gradient(circle at 72% 48%, rgba(102, 246, 223, 0.08), transparent 34%),
+    radial-gradient(circle at 88% 22%, rgba(189, 140, 255, 0.1), transparent 28%),
+    linear-gradient(135deg, rgba(10, 24, 48, 0.97), rgba(3, 8, 20, 0.98)) !important;
+}
+
+.lis-lattice-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.34;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(114, 170, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(114, 170, 255, 0.045) 1px, transparent 1px);
+  background-size: 36px 36px;
+  -webkit-mask-image: radial-gradient(circle at 76% 48%, #000 0, transparent 68%);
+  mask-image: radial-gradient(circle at 76% 48%, #000 0, transparent 68%);
+}
+
+.lis-lattice-copy {
+  position: relative;
+  z-index: 3;
+  align-self: center;
+}
+
+.lis-lattice-copy h2 {
+  margin: 10px 0 10px;
+  color: var(--lis-text);
+  font: 900 clamp(2rem, 4vw, 4rem)/0.96 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: -0.04em;
+  text-transform: none;
+}
+
+.lis-lattice-copy .truth {
+  max-width: 35rem;
+  margin-bottom: 18px;
+}
+
+.lis-lattice-sequence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  max-width: 38rem;
+}
+
+.lis-lattice-sequence button {
+  position: relative;
+  appearance: none;
+  padding: 7px 9px 7px 18px;
+  color: var(--lis-muted);
+  border: 1px solid rgba(114, 170, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(3, 9, 22, 0.58);
+  font: 800 8px/1.2 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 0.85px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.lis-lattice-sequence button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateY(-50%);
+  box-shadow: 0 0 8px currentColor;
+}
+
+.lis-lattice-sequence button:hover,
+.lis-lattice-sequence button[data-active="true"] {
+  color: var(--lis-cyan);
+  border-color: rgba(102, 246, 223, 0.46);
+  background: rgba(102, 246, 223, 0.075);
+  box-shadow: 0 0 20px rgba(102, 246, 223, 0.08);
+}
+
+.lis-lattice-sequence button:active {
+  transform: translateY(1px);
+}
+
+.lis-lattice-readout {
+  display: grid;
+  gap: 4px;
+  max-width: 36rem;
+  min-height: 62px;
+  margin-top: 14px;
+  padding: 11px 13px;
+  overflow: hidden;
+  border: 1px solid rgba(114, 170, 255, 0.17);
+  border-left: 2px solid var(--lis-cyan);
+  border-radius: 0 11px 11px 0;
+  background: linear-gradient(90deg, rgba(102, 246, 223, 0.055), rgba(3, 9, 22, 0.38));
+}
+
+.lis-lattice-readout span {
+  color: var(--lis-cyan);
+  font: 800 8px/1.25 "Orbitron", "Segoe UI", sans-serif;
+  letter-spacing: 1.25px;
+}
+
+.lis-lattice-readout strong {
+  color: var(--lis-text);
+  font: 600 11px/1.5 "Inter", "Segoe UI", sans-serif;
+}
+
+.lis-lattice-boundary {
+  max-width: 37rem;
+  margin: 16px 0 0;
+  color: var(--lis-muted);
+  font: 700 9px/1.55 "JetBrains Mono", Consolas, monospace;
+  letter-spacing: 0.25px;
+}
+
+.lis-lattice-viewport {
+  position: relative;
+  z-index: 2;
+  align-self: stretch;
+  min-height: 315px;
+  overflow: hidden;
+  border: 1px solid rgba(102, 246, 223, 0.19);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 52% 48%, rgba(102, 246, 223, 0.09), transparent 17%),
+    radial-gradient(circle at 52% 48%, rgba(114, 170, 255, 0.06), transparent 42%),
+    linear-gradient(145deg, rgba(2, 7, 17, 0.6), rgba(5, 12, 29, 0.92));
+  box-shadow:
+    inset 0 0 70px rgba(3, 8, 20, 0.52),
+    0 25px 70px rgba(0, 0, 0, 0.28),
+    0 0 42px rgba(102, 246, 223, 0.045);
+}
+
+.lis-lattice-viewport::before,
+.lis-lattice-viewport::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+  width: min(72%, 470px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  border: 1px solid rgba(102, 246, 223, 0.08);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotateX(66deg) rotateZ(18deg);
+  box-shadow:
+    0 0 0 34px rgba(114, 170, 255, 0.018),
+    0 0 0 68px rgba(189, 140, 255, 0.012);
+}
+
+.lis-lattice-viewport::after {
+  width: min(48%, 320px);
+  border-color: rgba(189, 140, 255, 0.1);
+  transform: translate(-50%, -50%) rotateX(72deg) rotateZ(-28deg);
+  box-shadow: none;
+}
+
+.lis-lattice-webgl-canvas,
+.lis-lattice-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.lis-lattice-canvas {
+  z-index: 1;
+  opacity: 0.96;
+}
+
+.lis-lattice-webgl-canvas {
+  z-index: 2;
+  opacity: 0;
+  filter: saturate(1.08) contrast(1.04);
+  transition: opacity 360ms ease;
+}
+
+.lis-lattice-viewport[data-mode="webgl"] {
+  border-color: rgba(102, 246, 223, 0.34);
+  box-shadow:
+    inset 0 0 54px rgba(38, 88, 144, 0.1),
+    0 0 0 1px rgba(114, 170, 255, 0.035),
+    0 22px 70px rgba(0, 5, 18, 0.34),
+    0 0 42px rgba(102, 246, 223, 0.055);
+}
+
+.lis-lattice-viewport[data-mode="webgl"] .lis-lattice-webgl-canvas {
+  opacity: 1;
+}
+
+.lis-lattice-viewport[data-mode="webgl"] .lis-lattice-canvas {
+  opacity: 0;
+}
+
+.lis-lattice-hud {
+  position: absolute;
+  inset: 14px 14px auto;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: rgba(193, 214, 236, 0.68);
+  pointer-events: none;
+  font: 800 8px/1.3 "JetBrains Mono", Consolas, monospace;
+  letter-spacing: 0.9px;
+}
+
+.lis-lattice-hud b {
+  color: var(--lis-green);
+  font: inherit;
+}
+
+.lis-lattice-viewport[data-mode="static"] .lis-lattice-hud b {
+  color: var(--lis-blue);
+}
+
+.lis-lattice-viewport[data-mode="webgl"] .lis-lattice-hud b {
+  color: var(--lis-cyan);
+  text-shadow: 0 0 14px rgba(102, 246, 223, 0.45);
+}
+
 body[data-luma-surface="mission"] .top-bar,
 body[data-luma-surface="trade"] .luma-header {
   border: 1px solid var(--lis-line) !important;
@@ -709,6 +976,8 @@ body[data-luma-surface="review"] footer {
   .lis-proofline { grid-template-columns: auto repeat(2, minmax(0, 1fr)); }
   .lis-proofline > span:last-child { grid-column: 2 / -1; }
   .lis-offer { grid-template-columns: 1fr; }
+  .lis-lattice-stage { grid-template-columns: 1fr; }
+  .lis-lattice-viewport { min-height: 350px; }
 }
 
 @media (max-width: 1180px) {
@@ -727,6 +996,9 @@ body[data-luma-surface="review"] footer {
   .lis-review-links { gap: 2px; }
   .lis-review-links a { padding: 7px 8px; font-size: 8px; }
   body[data-luma-surface="review"] h1 { font-size: clamp(2.15rem, 12vw, 3.4rem) !important; }
+  .lis-lattice-stage { padding: 22px 16px !important; gap: 18px; }
+  .lis-lattice-viewport { min-height: 280px; border-radius: 14px; }
+  .lis-lattice-hud { inset: 10px 10px auto; font-size: 7px; }
 }
 
 @media (max-width: 480px) {
@@ -738,6 +1010,10 @@ body[data-luma-surface="review"] footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  body[data-luma-surface="home"]::before {
+    animation: none !important;
+  }
+
   body[data-luma-surface] *,
   body[data-luma-surface] *::before,
   body[data-luma-surface] *::after {

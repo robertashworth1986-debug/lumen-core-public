@@ -113,11 +113,12 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 43
-    assert names[:5] == [
+    assert len(names) == len(set(names)) == 57
+    assert names[:6] == [
         "operator_home.html",
         "opportunity_sprint.html",
         "proof_to_pilot.html",
+        "visual_library.html",
         "external_review.html",
         "reviewer_docket.json",
     ]
@@ -145,6 +146,13 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert "assets/luma_command_fabric.js" in names
     assert "assets/luma_institutional_surface.css" in names
     assert "assets/luma_institutional_surface.js" in names
+    assert "assets/visuals/manifest.json" in names
+    for index in range(1, 13):
+        assert any(
+            name.startswith(f"assets/visuals/{index:02d}_")
+            and name.endswith(".webp")
+            for name in names
+        )
     assert "assets/prooflock/bounded_validation_protocol_v2.json" in names
     assert "build_week/prooflock_console/index.html" in names
     assert "build_week/prooflock_console/three.module.min.js" in names
@@ -164,7 +172,7 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
 def test_release_count_is_bound_to_current_control_records():
     module = load_module(PACKAGER_PATH, "package_public_site_release_control_count")
     release_count = len(module.RELEASE_PATHS)
-    assert release_count == 43
+    assert release_count == 57
 
     protocol = (ROOT / "docs" / "PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md").read_text(
         encoding="utf-8"
@@ -297,6 +305,22 @@ def test_live_verifier_maps_canonical_routes_and_assets_to_exact_paths():
     )
     assert verifier.content_type_allowed(
         "site.webmanifest", "application/octet-stream"
+    )
+    assert verifier.content_type_allowed(
+        "assets/visuals/manifest.json", "application/json"
+    )
+    assert not verifier.content_type_allowed(
+        "assets/visuals/manifest.json", "application/octet-stream"
+    )
+    assert verifier.content_type_allowed(
+        "assets/visuals/01_lumencore_hero.webp", "image/webp"
+    )
+    assert not verifier.content_type_allowed(
+        "assets/visuals/01_lumencore_hero.webp", "application/octet-stream"
+    )
+    assert verifier.content_type_allowed("visual_library.html", "text/html")
+    assert not verifier.content_type_allowed(
+        "visual_library.html", "application/octet-stream"
     )
 
 
