@@ -77,8 +77,23 @@ def validate_registry(payload: dict[str, Any]) -> None:
     missing_policy = sorted(required_policy - set(policy))
     if missing_policy:
         raise RegistryError(f"missing policy fields: {', '.join(missing_policy)}")
-    if policy["codex_send_allowed"] is not False:
-        raise RegistryError("policy.codex_send_allowed must remain false")
+    if type(policy["codex_send_allowed"]) is not bool:
+        raise RegistryError("policy.codex_send_allowed must be boolean")
+    # Older private registries may keep Codex disabled. Enabling the actor is
+    # conditional permission, never an exemption from action-time approval.
+    if policy["codex_send_allowed"] and (
+        policy.get("codex_send_requires_explicit_action_time_approval") is not True
+    ):
+        raise RegistryError(
+            "Codex sends require explicit action-time approval policy"
+        )
+    for field in (
+        "chatgpt_send_requires_explicit_action_time_approval",
+        "gmail_sent_preflight_required",
+        "draft_only_by_default",
+    ):
+        if policy[field] is not True:
+            raise RegistryError(f"policy.{field} must remain true")
     if (
         not isinstance(policy["default_cooldown_hours"], int)
         or policy["default_cooldown_hours"] < 1
@@ -159,6 +174,7 @@ def validate_registry(payload: dict[str, Any]) -> None:
 def campaign_by_key(
     registry: dict[str, Any], campaign_key: str
 ) -> dict[str, Any]:
+    validate_registry(registry)
     for campaign in registry["campaigns"]:
         if campaign["campaign_key"] == campaign_key:
             return campaign
@@ -219,24 +235,23 @@ def evaluate(
         }
 
     # Send path: fail closed.
-    if actor == "codex":
-        reasons.append("Codex is draft-only and may never send outreach")
+    if actor == "codex" and not policy["codex_send_allowed"]:
+        reasons.append("Codex sends are disabled in this controlling registry")
 
     if (
-        actor == "chatgpt"
-        and policy["chatgpt_send_requires_explicit_action_time_approval"]
-        and not explicit_approval
+        actor in {"codex", "chatgpt"}
+        and explicit_approval is not True
     ):
         reasons.append(
-            "ChatGPT send requires explicit action-time approval from Robert"
+            f"{actor.capitalize()} send requires explicit action-time approval from Robert"
         )
 
-    if actor == "human" and not explicit_approval:
+    if actor == "human" and explicit_approval is not True:
         reasons.append(
             "human send must still record explicit approval for the gate"
         )
 
-    if policy["gmail_sent_preflight_required"] and not gmail_preflight_complete:
+    if policy["gmail_sent_preflight_required"] and gmail_preflight_complete is not True:
         reasons.append("Gmail sent-mail/thread preflight has not been recorded")
 
     status = campaign["status"]

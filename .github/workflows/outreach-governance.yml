@@ -38,6 +38,7 @@ jobs:
         run: python -m unittest discover -s tests -p "test_outreach_gate.py" -v
       - name: Enforce the canonical operating contract
         run: |
-          grep -q "Codex is \*\*draft-only for all external communication\*\*" AGENTS.md
+          grep -Fq "not restricted to drafts because of its agent name" AGENTS.md
+          grep -Fq "same outreach preflight required of ChatGPT / Luma" AGENTS.md
+          grep -Fq "Removing the agent-name restriction does not enable live orders" AGENTS.md
           grep -q "Work-in-progress limit" docs/CANONICAL_OPERATING_STATE.md
-          grep -q "No other outbound message is currently authorized" docs/CANONICAL_OPERATING_STATE.md

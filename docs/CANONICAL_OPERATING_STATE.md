@@ -5,6 +5,24 @@
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
 
+## Execution policy update — September 5, 2026
+
+Codex is no longer categorically draft-only. Codex and ChatGPT / Luma may execute
+an exact founder-approved outreach message after the same campaign, existing-thread,
+mailbox and duplicate checks. The current `AGENTS.md` and `code/ops/outreach_gate.py`
+govern this role parity. Approval is action-specific, not blanket authority, and
+the existing single-use dispatch/consumption controls remain in place. The gate
+does not send email or authenticate an approval; a CLI flag is not a consent source.
+Unknown, closed and waiting campaigns remain blocked. No trading, transfer,
+signature, certification, account-consent or final-submission authority is added.
+
+Implementation work should be finished, tested and committed/pushed when that
+publication is authorized, without mixing unrelated dirty files or exposing private
+records. Git uncommitted files, unmerged PRs, unpublished commits and undeployed
+releases are different states; count and reconcile them separately. Existing
+dated evidence and outreach observations below remain historical, not renewed
+authorizations or current portal status.
+
 ## One commercial sentence
 
 LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routing, or infrastructure candidate against an accepted baseline under predeclared rules, then packages the result, failures, provenance, and claim boundary into a hash-verifiable decision record.
