@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "stage": 6,
+  "status": "EXECUTED_PUBLISHED_MIRRORED_AND_RESTORED",
+  "protocol_commit": "65d45b1a7ef9f21a42c10c684cdcf38c5287d06f",
+  "execution_commit": "731170a9da7f8ba553117b4c10705203f41af16c",
+  "working_branch": "exp/energy-stage4-delayed-router-20260905",
+  "cumulative_review_pr": 215,
+  "continuity_issue": 214,
+  "execution": {
+    "run_id": 33984083106,
+    "verify_package_job": "success",
+    "publication_job": "success",
+    "unit_tests_passed": 94,
+    "new_unit_tests": 28,
+    "previous_unit_tests": 66,
+    "whole_repository_CI_claimed": false,
+    "interval_records": 240,
+    "descriptive_comparisons": 90,
+    "paired_station_horizon_targets": 187987,
+    "forecasts_and_comparisons_are_dependent": true,
+    "point_forecasts_changed": false,
+    "legacy_radius_replay_max_abs_error": 5.684341886080802e-14
+  },
+  "method_summary_30minute_interval_feedback": {
+    "legacy_pooled_28d": {
+      "correlated_station_horizon_model_cells": 30,
+      "median_overall_coverage": 0.8899093197025174,
+      "overall_coverage_range": [0.8715673454137867, 0.8975638051044084],
+      "median_high_at_issue_coverage_n_ge_100": 0.38626432581212,
+      "high_activity_cells_n_ge_100": 30,
+      "overall_coverage_within_one_percentage_point_of_90pct_count": 15,
+      "median_interval_score_gain_pct_vs_legacy": 0,
+      "positive_interval_score_gain_count": 0,
+      "median_width_change_pct_vs_legacy": 0
+    },
+    "activity_scaled_28d": {
+      "correlated_station_horizon_model_cells": 30,
+      "median_overall_coverage": 0.8923847024348883,
+      "overall_coverage_range": [0.876798057164207, 0.8988376107722408],
+      "median_high_at_issue_coverage_n_ge_100": 0.5199667221297837,
+      "high_activity_cells_n_ge_100": 30,
+      "overall_coverage_within_one_percentage_point_of_90pct_count": 18,
+      "median_interval_score_gain_pct_vs_legacy": 12.733301114883218,
+      "positive_interval_score_gain_count": 30,
+      "median_width_change_pct_vs_legacy": -12.4923926249688
+    },
+    "signed_scaled_28d": {
+      "correlated_station_horizon_model_cells": 30,
+      "median_overall_coverage": 0.8874232543313656,
+      "overall_coverage_range": [0.8726882122174482, 0.8992979629416503],
+      "median_high_at_issue_coverage_n_ge_100": 0.45325779036827196,
+      "high_activity_cells_n_ge_100": 30,
+      "overall_coverage_within_one_percentage_point_of_90pct_count": 14,
+      "median_interval_score_gain_pct_vs_legacy": 10.238696239659202,
+      "positive_interval_score_gain_count": 30,
+      "median_width_change_pct_vs_legacy": -9.40570145652891
+    },
+    "adaptive_scaled_28d": {
+      "correlated_station_horizon_model_cells": 30,
+      "median_overall_coverage": 0.8927379445275636,
+      "overall_coverage_range": [0.884460141271443, 0.8975555140884494],
+      "median_high_at_issue_coverage_n_ge_100": 0.6654531623560096,
+      "high_activity_cells_n_ge_100": 30,
+      "overall_coverage_within_one_percentage_point_of_90pct_count": 21,
+      "median_interval_score_gain_pct_vs_legacy": 16.114889316783476,
+      "positive_interval_score_gain_count": 30,
+      "median_width_change_pct_vs_legacy": -4.334801225088475
+    }
+  },
+  "example_46237_1hour_blend": {
+    "n": 17468,
+    "high_at_issue_n": 601,
+    "legacy": {"n": 17468, "coverage": 0.8907716968170368, "mean_width": 14.975066029260496, "interval_score": 27.66148468080852, "lower_miss_rate": 0.05472864666819327, "upper_miss_rate": 0.054499656514769866},
+    "adaptive": {"n": 17468, "coverage": 0.8960384703457751, "mean_width": 14.018062483873653, "interval_score": 22.810272724163113, "lower_miss_rate": 0.046828486375085875, "upper_miss_rate": 0.057133043279139},
+    "legacy_high_at_issue_coverage": 0.39933444259567386,
+    "adaptive_high_at_issue_coverage": 0.6356073211314476,
+    "interval_score_gain_pct": 17.537785887578075,
+    "width_change_pct": -6.3906465822381575,
+    "ci7_day_gain_pct": [13.969328577940168, 20.90921632350029],
+    "ci14_day_gain_pct": [13.661228908498419, 20.91713692877539]
+  },
+  "interpretation": "Three new wrappers reduce interval score in all 30 point-model/station/horizon cells each in this reused record. Activity-conditioned feedback is promising, but high-activity coverage remains far below nominal 90%. Lower interval score is not improved point-forecast MAE or electricity gain. Do not promote from this engineering diagnostic.",
+  "source_and_inference_boundaries": {
+    "source_archive_sha256": "a0c693328a3a614ee7646731b81497f7d5f4b33b5338c9fab0595797d1017a2d",
+    "observations": "Previously examined 2025 wave proxy observations",
+    "fresh_holdout": false,
+    "source_hold": "46042 2025 still unavailable, not substituted",
+    "nominal_coverage": 0.9,
+    "delays": "30 and 90 minutes are assumptions; 90-minute stress changes interval feedback ONLY, inherited point forecasts retain original timing",
+    "bootstrap": "2000 paired 7-calendar-day draws with 14-day sensitivity. Exploratory, not multiplicity-adjusted, not familywise. No new discovery or superiority claim.",
+    "adaptive_method": "Standard activity normalization and clipped/batched delayed ACI-inspired feedback, not a formal coverage/regret guarantee or established proprietary novelty"
+  },
+  "publication": {
+    "release_id": 383335796,
+    "tag": "research-energy-stage6-20260905-731170a9da7f",
+    "release_url": "https://github.com/robertashworth1986-debug/lumen-core-public/releases/tag/research-energy-stage6-20260905-731170a9da7f",
+    "published_utc": "2026-09-05T18:27:29Z",
+    "draft": false,
+    "prerelease": true,
+    "immutable": false,
+    "verified_assets": 4,
+    "inner_packet_bytes": 77528722,
+    "inner_packet_sha256": "77e7cfdb6ae5e77840b81d2e93905735679600ebbc729c09207ca3a4290bf629"
+  },
+  "mirror": {
+    "google_drive_uploaded": true,
+    "google_drive_roundtrip_sha256_verified": true,
+    "google_drive_shared": false,
+    "download_wrapper_bytes": 77535338,
+    "download_wrapper_sha256": "7e04e7d7ce0b1a0754cbb2859a9dec11a9a957f5a49b7df31dd3598e82e72ebd",
+    "private_location": "Existing Energy-Checkpoint-2026-09-05 folder; private identifiers intentionally omitted here",
+    "laptop_Edrive_iCloud_VPS_copies_verified": false,
+    "retention_note": "Keep the earlier 233 MB cumulative checkpoint too. This Stage 6 packet adds new results and ancestry but does not duplicate all nine earlier original dataset/result archives."
+  },
+  "internal_reproduction": {
+    "interval_metric_records_exact": 240,
+    "comparison_records_exact": 90,
+    "arrays_compared": 465,
+    "maximum_absolute_array_difference": 0.0,
+    "offline_restored_git_commits": 2453,
+    "offline_restored_commit": "731170a9da7f8ba553117b4c10705203f41af16c",
+    "git_fsck_passed": true,
+    "independent_external_validation": false
+  },
+  "unchanged": {"main_merged": false, "production_deployed": false, "dns_modified": false, "new_outreach_sent": false, "paid_contract_or_revenue_created": false, "performance_promotion": false},
+  "next_gates": [
+    "Select a single auditable uncertainty method and preregister a genuinely fresh period before scoring revised-method superiority.",
+    "Require coverage and interval score in high-activity conditions, not aggregate coverage alone; get independent review.",
+    "Use a bounded assurance report to support buyer-owned paid evaluation discovery; no wave-to-geothermal or financial benefit transfer claim.",
+    "Keep PR215 draft pending registry/provenance and legacy-script review; local laptop/VPS history remains unaudited."
+  ]
+}

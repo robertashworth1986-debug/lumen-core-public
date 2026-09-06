@@ -1,0 +1,80 @@
+name: Energy Drift Abstention Screen
+
+on:
+  push:
+    branches:
+      - "exp/energy-multisource-breadth"
+    paths:
+      - "experiments/energy_multisource/run_drift_abstention_screen.py"
+      - ".github/workflows/energy-drift-abstention.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Install frozen dependencies
+        run: python -m pip install --disable-pip-version-check numpy==2.3.5 pandas==2.2.3 scipy==1.17.0 openpyxl==3.1.5
+
+      - name: Compile
+        run: python -m py_compile experiments/energy_multisource/run_drift_abstention_screen.py
+
+      - name: Acquire official FORGE 1683 field archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/drift-abstention/raw
+          curl --fail --location --retry 6 --retry-delay 3 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0 reproducible-benchmark" \
+            "https://gdr.openei.org/files/1683/Extended%20Circulation%20Test.zip" \
+            -o out/drift-abstention/raw/source.zip
+          unzip -t out/drift-abstention/raw/source.zip
+          unzip -q out/drift-abstention/raw/source.zip -d out/drift-abstention/raw/extracted
+          test -s "out/drift-abstention/raw/extracted/Extended Circulation Test/Extended Circulation Test Data 08082024 to 09052024 (30 sec increment).xlsx"
+
+      - name: Run causal drift-abstention experiment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python experiments/energy_multisource/run_drift_abstention_screen.py \
+            --forge-xlsx "out/drift-abstention/raw/extracted/Extended Circulation Test/Extended Circulation Test Data 08082024 to 09052024 (30 sec increment).xlsx" \
+            --out out/drift-abstention/results
+          python -m json.tool out/drift-abstention/results/summary.json >/dev/null
+
+      - name: Build custody receipt
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('out/drift-abstention'); rows=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file() and p.name!='CHAIN_OF_CUSTODY.json':
+                  h=hashlib.sha256()
+                  with p.open('rb') as f:
+                      for b in iter(lambda:f.read(1024*1024),b''): h.update(b)
+                  rows.append({'path':str(p.relative_to(root)),'size_bytes':p.stat().st_size,'sha256':h.hexdigest()})
+          (root/'CHAIN_OF_CUSTODY.json').write_text(json.dumps({'files':rows,'claim_boundary':'Offline forecast-model selection only; not operational control or external validation.'},indent=2)+'\n')
+          PY
+
+      - name: Upload evidence artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: energy-drift-abstention-${{ github.sha }}
+          path: out/drift-abstention/
+          if-no-files-found: error
+          retention-days: 30

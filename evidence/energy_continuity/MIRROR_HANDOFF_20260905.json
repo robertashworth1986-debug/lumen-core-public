@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "batch": "energy_checkpoint_google_drive_mirror_handoff_20260905",
+  "domain": "lumen-core.ai",
+  "prior_remote_closeout_commit": "1ac6434ef4268ea2f6c5e322961be82cd4752300",
+  "scientific_checkpoint": "584e88a0f376ca016a085077047052d406081f98",
+  "continuity_issue": 214,
+  "cumulative_review_pr": 215,
+  "scope": "Published energy-research checkpoint and supplementary handoff. Not a full backup of every project, local-only commit, database, personal file or machine.",
+  "archive": {
+    "file": "LumenCore_Energy_Checkpoint_20260905.zip",
+    "bytes": 233171034,
+    "sha256": "bf58d106fafdee5b9b67496f3067044907c1ab3d0e8eac188b554a8452f6bdc2"
+  },
+  "google_drive": {
+    "status": "RAW_DOWNLOAD_REASSEMBLY_AND_HASH_VERIFIED",
+    "folder": "LumenCore-Laptop-Handoff/Energy-Checkpoint-2026-09-05",
+    "private_file_ids_and_links": "Retained in private handoff, not published in this public record",
+    "sharing_permissions_added": false,
+    "transfer_limit_workaround": "233 MB archive split into three parts below the connector's 100 MiB transfer limit; no storage upgrade purchased",
+    "parts": [
+      {"file": "LumenCore_Energy_Checkpoint_20260905.zip.part001", "bytes": 78643200, "sha256": "ce02786413691c5d857462a80645455799874d57381b6c3fa1cd6c2335b65faa"},
+      {"file": "LumenCore_Energy_Checkpoint_20260905.zip.part002", "bytes": 78643200, "sha256": "bc822c0e7ab69bd5fcb02178ea78ea23da3b3cef2fa636b0df158eba104db354"},
+      {"file": "LumenCore_Energy_Checkpoint_20260905.zip.part003", "bytes": 75884634, "sha256": "eeb840ae07480e1576a091e270cee6a114a9037514ae05743151ef38a2bcff6a"}
+    ],
+    "all_three_parts_downloaded_back_from_drive": true,
+    "part_hashes_and_sizes_matched": true,
+    "reassembled_archive_hash_and_size_matched": true,
+    "zip_crc_passed": true,
+    "all_inner_checkpoint_manifest_entries_verified": true,
+    "top_level_archive_assets": 16
+  },
+  "handoff_kit": {
+    "file": "LumenCore_Mirror_Handoff_20260905.zip",
+    "bytes": 32023,
+    "sha256": "30a6d78992dbb32d10de69bde59e7d1bf4a22869f4dcba1eb843be06d8a409a6",
+    "google_drive_upload_and_raw_download_hash_verification": "PASS",
+    "inner_supplementary_file_manifest_verification": "PASS",
+    "contents": "Restore/copy helper and tests, three-part manifest, Drive verification receipt, backup guide, prior closeout receipts and private paid-pilot action memo",
+    "helper_unit_tests_passed": 7,
+    "full_archive_copy_smoke_test": "PASS_IN_ASSISTANT_LINUX_WORKSPACE",
+    "windows_launcher_executed": false,
+    "no_network_credentials_or_admin_access_required_by_helper": true,
+    "overwrite_policy": "Refuse different existing files; only copy and verify"
+  },
+  "destination_status": {
+    "github": "Previously published archive retained; this handoff record committed on research branch",
+    "google_drive": "Verified second-provider copy of frozen checkpoint",
+    "user_laptop": "PENDING_USER_COPY",
+    "user_E_drive": "PENDING_USER_COPY_AND_PHYSICAL_DEVICE_INDEPENDENCE_CHECK",
+    "icloud_drive": "PENDING_USER_UPLOAD_AND_CLOUD_READBACK",
+    "VPS": "NOT_ACCESSED_OR_COPIED_THIS_BATCH",
+    "domain": "PUBLICATION_ADDRESS_NOT_AN_INDEPENDENT_BACKUP"
+  },
+  "commercial_continuation": {
+    "action": "Two factual buyer/mentor follow-up drafts saved privately in Gmail; existing launch price retained",
+    "emails_sent": 0,
+    "private_buyer_correspondence_published": false,
+    "buyer_acceptance_or_cleared_payment_claimed": false,
+    "recommendation": "Prioritize a named buyer, data owner, decision and paid scope; do not treat extra backups or more experiments as customer demand"
+  },
+  "unchanged_boundaries": {
+    "main_merged": false,
+    "production_deployed": false,
+    "dns_modified": false,
+    "scientific_results_changed": false,
+    "independent_external_validation": false,
+    "valuation_or_financial_freedom_guaranteed": false
+  },
+  "remaining_gates": [
+    "User downloads and verifies laptop and genuinely separate E-drive copies; iCloud upload must be checked separately.",
+    "VPS backup requires an actual authorized host and protected path outside the web root; domain is not another storage device.",
+    "Review PR 215 registry and legacy-script compatibility before merge.",
+    "Read-only local-history inventory remains outstanding; no claim that unpushed laptop/VPS commits were recovered.",
+    "Review saved buyer/mentor drafts and pursue one paid, bounded customer decision before expanding speculative research."
+  ]
+}

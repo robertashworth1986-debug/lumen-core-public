@@ -1,0 +1,164 @@
+name: Energy Multi-Source Wedge Discovery
+
+on:
+  push:
+    branches:
+      - "exp/energy-multisource-breadth"
+    paths:
+      - "config/live_source_registry.json"
+      - "experiments/energy_multisource/**"
+      - "experiments/geothermal/**"
+      - "tests/test_energy_multisource_wedge.py"
+      - ".github/workflows/energy-multisource-wedge.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: energy-multisource-wedge-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Install analysis dependencies
+        run: python -m pip install --disable-pip-version-check numpy pandas openpyxl
+
+      - name: Validate registry and experiment code
+        run: |
+          python -m py_compile experiments/energy_multisource/run_energy_wedge_sweep.py tests/test_energy_multisource_wedge.py
+          python -m unittest tests/test_energy_multisource_wedge.py -v
+          python -m json.tool config/live_source_registry.json >/dev/null
+
+      - name: Acquire official Utah FORGE GDR1683 field archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/energy-multisource/raw/forge1683
+          curl --fail --location --retry 5 --retry-delay 3 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0 reproducible-benchmark" \
+            "https://gdr.openei.org/files/1683/Extended%20Circulation%20Test.zip" \
+            -o out/energy-multisource/raw/forge1683/source.zip
+          unzip -t out/energy-multisource/raw/forge1683/source.zip
+          unzip -q out/energy-multisource/raw/forge1683/source.zip \
+            -d out/energy-multisource/raw/forge1683/extracted
+          test -s "out/energy-multisource/raw/forge1683/extracted/Extended Circulation Test/Extended Circulation Test Data 08082024 to 09052024 (30 sec increment).xlsx"
+
+      - name: Acquire NOAA NDBC live wave observations without a key
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/energy-multisource/raw/ndbc
+          success=0
+          for station in 41002 42001 44025 46042 46050 46237; do
+            url="https://www.ndbc.noaa.gov/data/realtime2/${station}.txt"
+            if curl --fail --location --retry 3 --retry-delay 2 \
+              --user-agent "LumenCore-Research/1.0" "$url" \
+              -o "out/energy-multisource/raw/ndbc/${station}.txt"; then
+              if grep -q '^#YY' "out/energy-multisource/raw/ndbc/${station}.txt"; then
+                success=$((success+1))
+              else
+                rm -f "out/energy-multisource/raw/ndbc/${station}.txt"
+              fi
+            fi
+          done
+          echo "NDBC_STATIONS_ACQUIRED=$success"
+          test "$success" -ge 2
+
+      - name: Discover additional public GDR hot-rock resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/energy-multisource/raw/gdr-discovery
+          python - <<'PY'
+          import html, pathlib, re, urllib.request
+          root=pathlib.Path('out/energy-multisource/raw/gdr-discovery')
+          for sid in (1109,1149):
+              url=f'https://gdr.openei.org/submissions/{sid}'
+              req=urllib.request.Request(url,headers={'User-Agent':'LumenCore-Research/1.0'})
+              try:
+                  text=urllib.request.urlopen(req,timeout=30).read().decode('utf-8','ignore')
+              except Exception as exc:
+                  (root/f'{sid}_ERROR.txt').write_text(repr(exc)+'\n')
+                  continue
+              links=[]
+              for raw in re.findall(r'href=["\']([^"\']+)["\']',text):
+                  raw=html.unescape(raw)
+                  if f'/files/{sid}/' in raw:
+                      if raw.startswith('/'):
+                          raw='https://gdr.openei.org'+raw
+                      if raw not in links:
+                          links.append(raw)
+              (root/f'{sid}_resource_urls.txt').write_text('\n'.join(links)+'\n')
+          PY
+
+      - name: Capture USGS national geothermal release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/energy-multisource/raw/usgs
+          curl --fail --location --retry 3 \
+            --user-agent "LumenCore-Research/1.0" \
+            "https://www.sciencebase.gov/catalog/item/5d40b3f3e4b01d82ce8d9df5?format=json" \
+            -o out/energy-multisource/raw/usgs/ofr83250_sciencebase.json || true
+          if test -s out/energy-multisource/raw/usgs/ofr83250_sciencebase.json; then
+            python -m json.tool out/energy-multisource/raw/usgs/ofr83250_sciencebase.json >/dev/null
+          fi
+
+      - name: Run frozen geothermal and wave wedge sweep
+        shell: bash
+        run: |
+          set -euo pipefail
+          python experiments/energy_multisource/run_energy_wedge_sweep.py \
+            --forge-xlsx "out/energy-multisource/raw/forge1683/extracted/Extended Circulation Test/Extended Circulation Test Data 08082024 to 09052024 (30 sec increment).xlsx" \
+            --wave-dir out/energy-multisource/raw/ndbc \
+            --out out/energy-multisource/results
+          python -m json.tool out/energy-multisource/results/summary.json >/dev/null
+          python -m json.tool out/energy-multisource/results/sha256_manifest.json >/dev/null
+
+      - name: Build acquisition and chain-of-custody receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('out/energy-multisource')
+          files=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file():
+                  h=hashlib.sha256()
+                  with p.open('rb') as f:
+                      for b in iter(lambda:f.read(1024*1024),b''): h.update(b)
+                  files.append({'path':str(p.relative_to(root)),'size_bytes':p.stat().st_size,'sha256':h.hexdigest()})
+          receipt={
+            'schema_version':'1.0',
+            'sources':['DOE_GDR_FORGE_1683','NOAA_NDBC_WAVES','DOE_GDR_FORGE_1109_DISCOVERY','DOE_GDR_FORGE_1149_DISCOVERY','USGS_GEOTHERMAL_OFR83250_METADATA'],
+            'auth_boundary':'No API keys are required by the acquired GDR/FORGE, NDBC, or USGS public sources.',
+            'file_count':len(files),'files':files,
+            'claim_boundary':'Acquisition and internal analysis do not constitute external validation, safe operating limits, device performance, bankability, or production authorization.'
+          }
+          (root/'ACQUISITION_AND_CUSTODY.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          PY
+          python -m json.tool out/energy-multisource/ACQUISITION_AND_CUSTODY.json >/dev/null
+
+      - name: Upload evidence bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: energy-multisource-wedge-${{ github.sha }}
+          path: out/energy-multisource/
+          if-no-files-found: error
+          retention-days: 30
