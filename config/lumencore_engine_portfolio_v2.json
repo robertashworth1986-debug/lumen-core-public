@@ -47,9 +47,9 @@
       "acceptance_gate": "Prospective paper results meet a locked after-cost threshold without breaching risk or reconciliation gates.",
       "claim_boundary": "No alpha, profitability, institutional readiness, investment advice, or live-capital claim.",
       "evidence": {
-        "source": ["code/execution/execution_orchestrator.py", "code/institutional_harmonic_suite.py"],
-        "entrypoint": ["code/execution/execution_orchestrator.py"],
-        "test": ["tests/test_order_safety_alpaca_paper_boundary.py"],
+        "source": ["code/execution/execution_orchestrator.py", "code/institutional_harmonic_suite.py", "code/execution/trade_ledger.py", "code/execution/audit_chain.py"],
+        "entrypoint": ["code/execution/execution_orchestrator.py", "code/ops/VERIFY_PAPER_LEDGER_RECONCILIATION.py"],
+        "test": ["tests/test_order_safety_alpaca_paper_boundary.py", "tests/test_trade_ledger_reconciliation.py"],
         "documentation": ["docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"],
         "artifact": ["dashboard/data/public_live_breadth_manifest.json"],
         "public_surface": ["dashboard/quant_lab.html"]
@@ -65,9 +65,9 @@
       "acceptance_gate": "Prospective after-fee paper results, deterministic kill controls, and complete ledger reconciliation.",
       "claim_boundary": "No live trading authority, profit, return, signal service, or investment-advice claim.",
       "evidence": {
-        "source": ["code/kraken_execution.py", "code/kraken_swing_hunter.py"],
-        "entrypoint": ["code/kraken_swing_hunter.py"],
-        "test": ["tests/test_order_safety_gate.py"],
+        "source": ["code/kraken_execution.py", "code/kraken_swing_hunter.py", "code/execution/trade_ledger.py", "code/execution/audit_chain.py"],
+        "entrypoint": ["code/kraken_swing_hunter.py", "code/ops/VERIFY_PAPER_LEDGER_RECONCILIATION.py", "code/ops/MIGRATE_PAPER_LEDGER_RECONCILIATION.py"],
+        "test": ["tests/test_order_safety_gate.py", "tests/test_trade_ledger_reconciliation.py"],
         "documentation": ["docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"],
         "artifact": [],
         "public_surface": ["dashboard/kraken_execution_dashboard.html"]
