@@ -131,6 +131,51 @@ class BoundedValidationSprintTests(unittest.TestCase):
             ):
                 MODULE.validate_documents(root)
 
+    def test_production_write_access_fails_closed(self) -> None:
+        mutated = copy.deepcopy(self.offer)
+        mutated["offer"]["execution_boundary"]["production_write_access"] = True
+        self.assertFails(mutated)
+
+    def test_actuation_authority_fails_closed(self) -> None:
+        mutated = copy.deepcopy(self.offer)
+        mutated["offer"]["execution_boundary"]["actuation_allowed"] = True
+        self.assertFails(mutated)
+
+    def test_missing_human_approval_fails_closed(self) -> None:
+        mutated = copy.deepcopy(self.offer)
+        mutated["offer"]["execution_boundary"][
+            "recommendations_require_human_approval"
+        ] = False
+        self.assertFails(mutated)
+
+    def test_missing_comparison_arm_fails_closed(self) -> None:
+        mutated = copy.deepcopy(self.offer)
+        mutated["offer"]["execution_boundary"]["comparison_arms"].remove(
+            "incumbent"
+        )
+        self.assertFails(mutated)
+
+    def test_public_value_claims_fail_closed(self) -> None:
+        mutated = copy.deepcopy(self.offer)
+        mutated["offer"]["economic_conversion_gate"][
+            "public_value_claims_allowed"
+        ] = True
+        self.assertFails(mutated)
+
+    def test_missing_non_overlap_input_fails_closed(self) -> None:
+        mutated = copy.deepcopy(self.offer)
+        mutated["offer"]["economic_conversion_gate"]["required_inputs"].remove(
+            "non-overlap group"
+        )
+        self.assertFails(mutated)
+
+    def test_invalid_realization_bounds_fail_closed(self) -> None:
+        mutated = copy.deepcopy(self.offer)
+        mutated["offer"]["economic_conversion_gate"][
+            "realization_factor_max"
+        ] = 1.1
+        self.assertFails(mutated)
+
     def test_validator_output_is_json_serializable(self) -> None:
         result = MODULE.validate_repository(ROOT)
         encoded = json.dumps(result, sort_keys=True)
