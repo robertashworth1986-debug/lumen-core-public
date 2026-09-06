@@ -8,7 +8,9 @@ on:
       - '.github/workflows/codeql.yml'
       - '.github/workflows/dependency-review.yml'
       - '.github/workflows/repository-security-assurance.yml'
+      - '.npmrc'
       - 'SECURITY.md'
+      - 'code/ops/RUN_STACK_MODERNIZATION_SWEEP.ps1'
       - 'code/ops/VERIFY_REPOSITORY_SECURITY_ASSURANCE.py'
       - 'code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py'
       - 'config/repository_security_assurance_v1.json'
@@ -16,6 +18,7 @@ on:
       - 'docs/REPOSITORY_SECURITY_ASSURANCE.md'
       - 'dashboard/package.json'
       - 'dashboard/package-lock.json'
+      - 'dashboard/.npmrc'
       - 'tests/test_repository_security_assurance.py'
       - 'tests/test_public_repo_credential_hygiene.py'
       - 'README.md'
@@ -28,7 +31,9 @@ on:
       - '.github/workflows/codeql.yml'
       - '.github/workflows/dependency-review.yml'
       - '.github/workflows/repository-security-assurance.yml'
+      - '.npmrc'
       - 'SECURITY.md'
+      - 'code/ops/RUN_STACK_MODERNIZATION_SWEEP.ps1'
       - 'code/ops/VERIFY_REPOSITORY_SECURITY_ASSURANCE.py'
       - 'code/ops/VERIFY_PUBLIC_REPO_CREDENTIAL_HYGIENE.py'
       - 'config/repository_security_assurance_v1.json'
@@ -36,6 +41,7 @@ on:
       - 'docs/REPOSITORY_SECURITY_ASSURANCE.md'
       - 'dashboard/package.json'
       - 'dashboard/package-lock.json'
+      - 'dashboard/.npmrc'
       - 'tests/test_repository_security_assurance.py'
       - 'tests/test_public_repo_credential_hygiene.py'
       - 'README.md'
@@ -52,7 +58,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout without retained credentials
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -65,6 +71,38 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Set up exact dashboard Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.18.0'
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+
+      - name: Resolve and exercise the strict dashboard dependency graph
+        working-directory: dashboard
+        run: |
+          set -euo pipefail
+          npm ci --strict-peer-deps --legacy-peer-deps=false --force=false --ignore-scripts --no-audit --no-fund
+          npm ls --all
+          npm audit --omit=dev --audit-level=moderate
+          node --input-type=module <<'NODE'
+          const three = await import("three");
+          const anime = await import("animejs");
+          const postprocessing = await import("postprocessing");
+          const adapter = await import("animejs/adapters/three");
+          if (three.REVISION !== "185") throw new Error("unexpected Three.js revision");
+          if (typeof anime.animate !== "function") throw new Error("Anime.js animate export missing");
+          if (typeof postprocessing.EffectComposer !== "function") throw new Error("postprocessing export missing");
+          if (typeof adapter.threeAdapter !== "object") throw new Error("Anime.js Three adapter missing");
+          if (typeof adapter.commitChanges !== "function") throw new Error("Anime.js adapter commit hook missing");
+          console.log(JSON.stringify({
+            animejs: "4.5.0",
+            three_revision: three.REVISION,
+            anime_three_adapter: true,
+            postprocessing: true,
+          }));
+          NODE
+
       - name: Compile verifier and adversarial tests
         run: |
           python -m py_compile code/ops/VERIFY_REPOSITORY_SECURITY_ASSURANCE.py
@@ -76,7 +114,6 @@ jobs:
         run: |
           mkdir -p out/repository-security-assurance
           python code/ops/VERIFY_REPOSITORY_SECURITY_ASSURANCE.py \
-            --verified-utc 2026-08-12T06:44:30Z \
             --json-out out/repository-security-assurance/receipt.json
 
       - name: Verify targeted credential history remains fail-closed
