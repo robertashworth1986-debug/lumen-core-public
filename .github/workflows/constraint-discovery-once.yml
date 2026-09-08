@@ -1,0 +1,40 @@
+name: Bounded constraint discovery and evidence capture
+on:
+  push:
+    branches: ['exp/constraint-discovery-20260907']
+    paths: ['experiments/constraint_discovery/**', '.github/workflows/constraint-discovery-once.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: constraint-discovery-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Test bounded reads and no-savings inference
+        run: |
+          mkdir -p out
+          python3 -m unittest discover -s experiments/constraint_discovery -p 'test_*.py' -v 2>&1 | tee out/constraint-tests.txt
+        shell: bash --noprofile --norc -eo pipefail {0}
+      - name: One source pass with explicit access holds
+        env:
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_REFRESH_TOKEN: ${{ secrets.REDDIT_REFRESH_TOKEN }}
+        run: python3 experiments/constraint_discovery/constraint_watch.py --out out/capture --with-reddit
+      - name: Preserve observations and holds
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: constraint-discovery-${{ github.sha }}
+          path: |
+            out/capture/
+            out/constraint-tests.txt
+          if-no-files-found: error
+          retention-days: 30
