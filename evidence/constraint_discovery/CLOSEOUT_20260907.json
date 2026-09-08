@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "batch": "constraint_discovery_and_takeoff_preparation_20260907_Central",
+  "source_code_commit": "c0762e4329aff1b6d8ef212679aeb88d9503697b",
+  "base_main_commit": "3dc5205c759ab264e4e49cc78f59feb2846f005c",
+  "branch": "exp/constraint-discovery-20260907",
+  "continuity_issue": 214,
+  "related_research_review": 215,
+  "execution": {
+    "run_id": 34176613317,
+    "workflow_conclusion": "success",
+    "tests_passed_local": 24,
+    "tests_passed_CI": 24,
+    "whole_repository_CI_claimed": false,
+    "artifact_id": 10037461877,
+    "artifact_sha256": "eae43abbeb759ea0aaa1107dde06e51404376a26cf615f7ec13399fe93b3bf53",
+    "artifact_download_hash_verified": true,
+    "payload_hash_manifest_verified": true,
+    "source_code_sha256": "e573107302fbc5623bafa289c9fa926eb4499263bc059a4ce98831e084cae886",
+    "local_code_equals_CI_code": true
+  },
+  "capture": {
+    "observed_at_utc": "2026-09-08T01:25:52.327457+00:00",
+    "cloudflare_state": "ACQUIRED_PROVIDER_REPORT",
+    "cloudflare_raw_bytes": 6567,
+    "cloudflare_raw_sha256": "7298a74edcc5609bc3c02092949288c5d316248f5a99fc34afd70cdfdc05be93",
+    "provider_records": [
+      {"id": "pjr4m9q1xxb1", "title": "Cloudflare Account Member Invite Issue", "reported_status_at_capture": "investigating", "created_at": "2026-09-08T00:35:28.000Z", "url": "https://www.cloudflarestatus.com/incidents/pjr4m9q1xxb1"},
+      {"id": "9g65dxfbcjln", "title": "Incorrect geo location for some Cloudflare WARP users", "reported_status_at_capture": "identified", "created_at": "2026-08-27T18:46:19.000Z", "url": "https://www.cloudflarestatus.com/incidents/9g65dxfbcjln"}
+    ],
+    "reddit_runtime_state": "HOLD_MISSING_RUNTIME_CREDENTIALS",
+    "reddit_authenticated_records": 0,
+    "reddit_environment_names_reused_from_existing_profile_engine": true,
+    "laptop_VPS_credential_state_audited": false,
+    "public_cached_Reddit_leads": 3,
+    "cached_post_dates_verified": false,
+    "cached_posts_count_as_live_breadth": false,
+    "lead_hypotheses": 5,
+    "lead_register_private_delivery_path": "public/LumenCore_Constraint_Lead_Register_20260907.json",
+    "measured_customer_deltas": 0,
+    "verified_savings_usd": null,
+    "performance_promotion": false
+  },
+  "public_source_examples": [
+    {"type": "PROVIDER_HISTORICAL_POSTMORTEM", "url": "https://azure.status.microsoft/en-us/status/history/", "event": "ZJV6-SGG, 2026-07-23", "hypothesis": "combined-change checks and independent recovery dependencies", "caveat": "Provider lists completed fixes and further work; no claim of preventing this event or owning its remediation."},
+    {"type": "CACHED_PUBLIC_ANECDOTE", "url": "https://www.reddit.com/r/sysadmin/comments/1vvfb7y/", "hypothesis": "recovery-path dependency review", "caveat": "Author reported recovery; exact date unverified, not a current confirmed outage."},
+    {"type": "CACHED_PUBLIC_ANECDOTE", "url": "https://www.reddit.com/r/sysadmin/comments/1vup66w/", "hypothesis": "patch-policy versus installation-outcome reconciliation", "caveat": "Microsoft documents the general distinction but does not corroborate this particular report."},
+    {"type": "CACHED_PUBLIC_ANECDOTE", "url": "https://www.reddit.com/r/sysadmin/comments/1vuts15/", "hypothesis": "like-for-like three-year total-cost comparison", "caveat": "Anonymous quotation unverified; do not treat it as a vendor price or a measured saving."}
+  ],
+  "delivery": {
+    "private_package_filename": "LumenCore_TakeOff_Pack_20260909.zip",
+    "bytes": 264398,
+    "sha256": "638116a34789459c1bf11cb01918d6c8fe427631872478ef4023e4809692bb0f",
+    "verified_internal_manifest_files": 17,
+    "google_drive_roundtrip_hash_verified": true,
+    "google_drive_shared": false,
+    "private_Drive_identifiers_omitted": true,
+    "editable_deck_slides": 10,
+    "private_workbook_pages": 6,
+    "private_quick_brief_pages": 1,
+    "deck_overflow_test": "PASS",
+    "visual_review": "All slides and workbook pages inspected; spill pages corrected before delivery",
+    "private_course_emails_or_assessment_in_public_repo": false,
+    "original_course_portal_accessed": false,
+    "course_activity_submission_claimed": false,
+    "outreach_sent": false,
+    "local_Edrive_iCloud_VPS_mirrors_verified": false
+  },
+  "next_gate": "Use the prepared evidence-aligned working map for buyer discovery; securely connect authorized Reddit credentials to the intended runtime before asserting authenticated live ingestion. Obtain buyer authorization, locked comparator and actual matched data before measuring a delta. Retain public signal hashes and negative or missing-source states.",
+  "boundaries": {
+    "no_scheduled_background_monitor_added": true,
+    "no_reddit_posting_or_messages": true,
+    "no_customer_network_probing": true,
+    "no_credentials_disclosed": true,
+    "main_merged": false,
+    "production_deployed": false,
+    "DNS_modified": false,
+    "domain_lumen_core_ai_modified": false,
+    "independent_external_validation": false,
+    "revenue_or_valuation_created": false
+  }
+}
