@@ -7,6 +7,7 @@ examples/proof_capsule/** text eol=lf
 /experiments/energy_multisource/stage6/run_stage6.py text eol=lf
 /experiments/energy_multisource/stage6/verify_stage6.py text eol=lf
 /experiments/energy_multisource/stage6/package_stage6.py text eol=lf
+/experiments/energy_multisource/stage8/** text eol=lf
 
 # Canonical bytes for the bounded CODECHECK reviewer capsule.
 /.github/workflows/reviewer-reproducibility.yml text eol=lf

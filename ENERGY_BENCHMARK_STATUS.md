@@ -4,7 +4,18 @@
 
 Start here to continue without losing code, evidence, corrections or negative findings. Research publication, reproducibility, performance and production approval are separate states.
 
-## Latest continuation: replay assurance and repository repair — 2026-09-05
+## Latest continuation: Stage 8 frozen delta packets — 2026-09-09
+
+This extends the existing external-validation outcome with three measured energy-domain packets and six explicitly unmeasured sector transfer contracts. The canonical entry point is `experiments/energy_multisource/stage8/README.md`; findings are in that directory's `FINDINGS.md`.
+
+- 17 series, 23 synthetic observation-stress scenarios, 1,173 prediction-array packets and 21,114 retained comparison records. All are historical/reused, dependent research observations.
+- Eight clean grid candidate/horizon cells clear both aggregate reference-baseline screens; none clears all clean-data regime screens. All 45 clean marine candidate comparisons against persistence regress. No cross-sector performance transfer or deployment promotion is established.
+- A consolidated first-run JSON was truncated and correctly rejected. The format-only rerun uses bounded metric shards; the two complete CSV outputs match exactly. Frozen result-manifest SHA-256: `73ff9e4ca4fb27eea70b6e74180cf959217a38d2f8a4487f56ae280f99dec370`.
+- Source authentication, full normalization/prediction replay, independent metric recomputation, scalar forecast spot checks, exact planned-cell coverage and CSV reconciliation are required before bundle assembly. Detailed closeout receipt: `evidence/energy_continuity/STAGE8_CLOSEOUT_20260909.json`.
+- The local research suite passes 176 tests and 13 subtests, including 60 Stage 8 adversarial/cache tests. A manual-only `energy-stage8.yml` workflow makes the same replay reviewable; no new remote execution or whole-repository pass is claimed here.
+- No live control, outreach, trade, cost conversion or public production change. Prior Stage 6 evidence and its prospective-evaluation draft retain their separate identities and limits.
+
+## Prior continuation: replay assurance and repository repair — 2026-09-05
 
 This continuation advances the existing external-validation outcome. It is a code/review improvement, not a new scientific trial, release, independent validation or production deployment. The original Stage 6 checkpoint below remains immutable.
 

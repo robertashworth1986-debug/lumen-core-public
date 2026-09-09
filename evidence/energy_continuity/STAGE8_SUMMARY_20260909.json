@@ -1,0 +1,26 @@
+{
+  "schema": "lumencore.frozen_delta.summary.v1",
+  "created_utc": "2026-09-09T08:44:18.491217+00:00",
+  "python": "3.11.9",
+  "numpy": "2.3.5",
+  "protocol_sha256": "dd460a565f49e0fde5385f5ee830e08bd268ba0bc6d8b246d1fcad5b4991e9f5",
+  "series_count": 17,
+  "scenario_count": 23,
+  "array_count": 1173,
+  "metric_records": 21114,
+  "status_counts": {
+    "DESCRIPTIVE_CANDIDATE_ONLY": 3219,
+    "HOLD_INSUFFICIENT_SUPPORT": 10684,
+    "HOLD_THRESHOLD_OR_STABILITY": 2297,
+    "REJECT_MAE_REGRESSION": 4914
+  },
+  "source_holds": [
+    {
+      "source": "NDBC_46042_2025",
+      "reason": "Absent in inherited frozen archive; no substitution."
+    }
+  ],
+  "independent_validation": false,
+  "decision": "RESEARCH_ONLY_NO_DEPLOYMENT_OR_FINANCIAL_CLAIM",
+  "denominator_note": "Metric records share observations, methods and stress seeds; they are not independent trials."
+}

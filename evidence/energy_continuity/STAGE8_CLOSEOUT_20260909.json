@@ -1,0 +1,81 @@
+{
+  "schema": "lumencore.stage8.closeout.v1",
+  "date": "2026-09-09",
+  "active_outcome": "one_external_validation_or_paid_pilot_conversion",
+  "status": "VERIFIED_HISTORICAL_RESEARCH_PACKET",
+  "summary": {
+    "schema": "lumencore.frozen_delta.summary.v1",
+    "created_utc": "2026-09-09T08:44:18.491217+00:00",
+    "python": "3.11.9",
+    "numpy": "2.3.5",
+    "protocol_sha256": "dd460a565f49e0fde5385f5ee830e08bd268ba0bc6d8b246d1fcad5b4991e9f5",
+    "series_count": 17,
+    "scenario_count": 23,
+    "array_count": 1173,
+    "metric_records": 21114,
+    "status_counts": {
+      "DESCRIPTIVE_CANDIDATE_ONLY": 3219,
+      "HOLD_INSUFFICIENT_SUPPORT": 10684,
+      "HOLD_THRESHOLD_OR_STABILITY": 2297,
+      "REJECT_MAE_REGRESSION": 4914
+    },
+    "source_holds": [
+      {
+        "source": "NDBC_46042_2025",
+        "reason": "Absent in inherited frozen archive; no substitution."
+      }
+    ],
+    "independent_validation": false,
+    "decision": "RESEARCH_ONLY_NO_DEPLOYMENT_OR_FINANCIAL_CLAIM",
+    "denominator_note": "Metric records share observations, methods and stress seeds; they are not independent trials."
+  },
+  "verification": {
+    "status": "PASS",
+    "manifest_sha256": "73ff9e4ca4fb27eea70b6e74180cf959217a38d2f8a4487f56ae280f99dec370",
+    "source_hashes_verified": 3,
+    "normalization_replayed_series": 17,
+    "full_prediction_arrays_replayed": 1173,
+    "independent_scalar_predictions": 275655,
+    "independently_recomputed_metric_records": 21114,
+    "csv_records_reconciled": 21114,
+    "assurance": "Internal computational verification; no independent field validation.",
+    "io_cache": "NPZ entries decoded once per context; all frozen verifier checks retained",
+    "cache_wrapper_sha256": "937a81b4b11963b92ef5fabf48589cd9a5ae83bf2d3ed2618370e776116eb2e1",
+    "frozen_verifier_sha256": "a0518a7360721831d0d99ea51819c5b8c958232a62713e90af18c6fe4020092c",
+    "elapsed_seconds": 130.1629739429991
+  },
+  "tests": {
+    "research_suite_passed": 176,
+    "research_subtests_passed": 13,
+    "stage8_tests_included": 60,
+    "whole_repository_pass_claimed": false,
+    "manual_replay_workflow": ".github/workflows/energy-stage8.yml",
+    "new_workflow_executed": false
+  },
+  "original_run_rejection": {
+    "reason": "Consolidated metric JSON truncated in artifact handoff; hash verifier rejected it.",
+    "manifest_sha256": "c8314726b3509535e741096c687798bb97e085c8316944e87f0f72793b029f91",
+    "format_only_repair": true,
+    "complete_csv_byte_equal_after_repair": true,
+    "csv_sha256": "f1951a90e229cd6f0d573f1e112fd848e174217c2ebdfd33acbdcfb14e919223"
+  },
+  "measured_domain_packets": 3,
+  "unmeasured_transfer_contracts": 6,
+  "clean_cells_passing_both_aggregate_baselines": 8,
+  "clean_cells_passing_both_baselines_all_slices": 0,
+  "production_promotion": false,
+  "financial_conversion": false,
+  "main_changed": false,
+  "external_messages_sent": false,
+  "bundle": {
+    "status": "PACKAGED_AND_READ_BACK",
+    "bytes": 152509696,
+    "sha256": "897a89a06660642b4fa24932c8385c2872feb14f95ed9e89c2501609660e6b20",
+    "members": 2402,
+    "measured_domain_packets": 3,
+    "transfer_contracts": 6,
+    "result_manifest_sha256": "73ff9e4ca4fb27eea70b6e74180cf959217a38d2f8a4487f56ae280f99dec370",
+    "descriptive_shortlist_cells": 8,
+    "filename": "LumenCore_Frozen_Delta_Packets_20260909.zip"
+  }
+}

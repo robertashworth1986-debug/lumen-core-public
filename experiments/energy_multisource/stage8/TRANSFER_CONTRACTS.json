@@ -1,0 +1,300 @@
+{
+  "schema": "lumencore.transfer_contracts.v1",
+  "purpose": "Prepared field mappings for the existing external-validation outcome; zero cross-sector performance claims.",
+  "contracts": [
+    {
+      "sector": "manufacturing",
+      "status": "DRAFT_UNMEASURED_NOT_EXECUTABLE",
+      "task": "Machine downtime / throughput forecasting",
+      "measured_rows": 0,
+      "validated_improvement": null,
+      "financial_benefit": null,
+      "minimum_source_fields": [
+        "asset_id",
+        "cycle_start",
+        "cycle_end",
+        "good_units",
+        "scrap_units",
+        "downtime_reason",
+        "sensor_unit",
+        "maintenance_event"
+      ],
+      "extra_edge_cases": [
+        "machine replacement",
+        "maintenance reset",
+        "counter rollover",
+        "product mix shift",
+        "batch boundary",
+        "sensor saturation"
+      ],
+      "metric_contract": "minutes of downtime or good units per fixed interval",
+      "required_before_execution": {
+        "buyer_owner": null,
+        "authorized_frozen_dataset_sha256": null,
+        "publication_time_evidence": null,
+        "incumbent_version": null,
+        "candidate_version": null,
+        "unit_mapping": null,
+        "primary_metric": null,
+        "minimum_material_effect": null,
+        "maximum_allowed_harm": null,
+        "holdout_window": null,
+        "independent_evaluator": null,
+        "failure_and_abstention_thresholds": null
+      },
+      "transfer_rules": [
+        "Use an existing proof-to-pilot intake and replay runner; this is not a new platform.",
+        "Re-freeze the protocol for this data domain; energy thresholds and error distributions do not transfer.",
+        "Keep late-arriving or revised data separate from what was available at issue time.",
+        "Run in read-only replay; human decision owner retains operational authority.",
+        "Supply native units, exact denominators, causal as-of joins, negative cases and cost basis before any value claim."
+      ],
+      "promotion_allowed": false
+    },
+    {
+      "sector": "water",
+      "status": "DRAFT_UNMEASURED_NOT_EXECUTABLE",
+      "task": "Flow and demand anomaly screening",
+      "measured_rows": 0,
+      "validated_improvement": null,
+      "financial_benefit": null,
+      "minimum_source_fields": [
+        "meter_id",
+        "event_time",
+        "published_time",
+        "flow",
+        "pressure",
+        "unit",
+        "calibration_revision",
+        "maintenance_event"
+      ],
+      "extra_edge_cases": [
+        "meter rollover",
+        "unit conversion",
+        "negative reverse flow",
+        "pipe isolation",
+        "seasonal demand",
+        "sensor fouling"
+      ],
+      "metric_contract": "flow in declared native volume/time; pressure separately",
+      "required_before_execution": {
+        "buyer_owner": null,
+        "authorized_frozen_dataset_sha256": null,
+        "publication_time_evidence": null,
+        "incumbent_version": null,
+        "candidate_version": null,
+        "unit_mapping": null,
+        "primary_metric": null,
+        "minimum_material_effect": null,
+        "maximum_allowed_harm": null,
+        "holdout_window": null,
+        "independent_evaluator": null,
+        "failure_and_abstention_thresholds": null
+      },
+      "transfer_rules": [
+        "Use an existing proof-to-pilot intake and replay runner; this is not a new platform.",
+        "Re-freeze the protocol for this data domain; energy thresholds and error distributions do not transfer.",
+        "Keep late-arriving or revised data separate from what was available at issue time.",
+        "Run in read-only replay; human decision owner retains operational authority.",
+        "Supply native units, exact denominators, causal as-of joins, negative cases and cost basis before any value claim."
+      ],
+      "promotion_allowed": false
+    },
+    {
+      "sector": "telecom",
+      "status": "DRAFT_UNMEASURED_NOT_EXECUTABLE",
+      "task": "Capacity and incident forecasting",
+      "measured_rows": 0,
+      "validated_improvement": null,
+      "financial_benefit": null,
+      "minimum_source_fields": [
+        "cell_id",
+        "event_time",
+        "published_time",
+        "traffic_bytes",
+        "latency_ms",
+        "dropped_sessions",
+        "total_sessions",
+        "topology_revision"
+      ],
+      "extra_edge_cases": [
+        "counter reset",
+        "network partition",
+        "topology change",
+        "clock skew",
+        "zero denominator",
+        "partial telemetry"
+      ],
+      "metric_contract": "latency in ms or traffic bytes; loss-rate denominators explicit",
+      "required_before_execution": {
+        "buyer_owner": null,
+        "authorized_frozen_dataset_sha256": null,
+        "publication_time_evidence": null,
+        "incumbent_version": null,
+        "candidate_version": null,
+        "unit_mapping": null,
+        "primary_metric": null,
+        "minimum_material_effect": null,
+        "maximum_allowed_harm": null,
+        "holdout_window": null,
+        "independent_evaluator": null,
+        "failure_and_abstention_thresholds": null
+      },
+      "transfer_rules": [
+        "Use an existing proof-to-pilot intake and replay runner; this is not a new platform.",
+        "Re-freeze the protocol for this data domain; energy thresholds and error distributions do not transfer.",
+        "Keep late-arriving or revised data separate from what was available at issue time.",
+        "Run in read-only replay; human decision owner retains operational authority.",
+        "Supply native units, exact denominators, causal as-of joins, negative cases and cost basis before any value claim."
+      ],
+      "promotion_allowed": false
+    },
+    {
+      "sector": "aviation",
+      "status": "DRAFT_UNMEASURED_NOT_EXECUTABLE",
+      "task": "Read-only maintenance planning research",
+      "measured_rows": 0,
+      "validated_improvement": null,
+      "financial_benefit": null,
+      "minimum_source_fields": [
+        "asset_id",
+        "event_time",
+        "published_time",
+        "flight_cycle",
+        "sensor_value",
+        "unit",
+        "maintenance_record",
+        "configuration_revision"
+      ],
+      "extra_edge_cases": [
+        "irregular flight cycles",
+        "maintenance censoring",
+        "sensor replacement",
+        "altitude regime",
+        "aircraft configuration change",
+        "sparse failure labels"
+      ],
+      "metric_contract": "declared maintenance-planning metric; no flight-control output",
+      "required_before_execution": {
+        "buyer_owner": null,
+        "authorized_frozen_dataset_sha256": null,
+        "publication_time_evidence": null,
+        "incumbent_version": null,
+        "candidate_version": null,
+        "unit_mapping": null,
+        "primary_metric": null,
+        "minimum_material_effect": null,
+        "maximum_allowed_harm": null,
+        "holdout_window": null,
+        "independent_evaluator": null,
+        "failure_and_abstention_thresholds": null
+      },
+      "transfer_rules": [
+        "Use an existing proof-to-pilot intake and replay runner; this is not a new platform.",
+        "Re-freeze the protocol for this data domain; energy thresholds and error distributions do not transfer.",
+        "Keep late-arriving or revised data separate from what was available at issue time.",
+        "Run in read-only replay; human decision owner retains operational authority.",
+        "Supply native units, exact denominators, causal as-of joins, negative cases and cost basis before any value claim."
+      ],
+      "promotion_allowed": false
+    },
+    {
+      "sector": "healthcare_operations",
+      "status": "DRAFT_UNMEASURED_NOT_EXECUTABLE",
+      "task": "Staffing / queue forecasting research",
+      "measured_rows": 0,
+      "validated_improvement": null,
+      "financial_benefit": null,
+      "minimum_source_fields": [
+        "site_id",
+        "event_time",
+        "published_time",
+        "arrivals",
+        "completed_visits",
+        "queue_length",
+        "staff_hours",
+        "calendar_version"
+      ],
+      "extra_edge_cases": [
+        "censored queues",
+        "shift boundary",
+        "holiday demand",
+        "missing arrivals",
+        "site transfer",
+        "coding revision"
+      ],
+      "metric_contract": "queue length or waiting minutes; operational data only",
+      "required_before_execution": {
+        "buyer_owner": null,
+        "authorized_frozen_dataset_sha256": null,
+        "publication_time_evidence": null,
+        "incumbent_version": null,
+        "candidate_version": null,
+        "unit_mapping": null,
+        "primary_metric": null,
+        "minimum_material_effect": null,
+        "maximum_allowed_harm": null,
+        "holdout_window": null,
+        "independent_evaluator": null,
+        "failure_and_abstention_thresholds": null
+      },
+      "transfer_rules": [
+        "Use an existing proof-to-pilot intake and replay runner; this is not a new platform.",
+        "Re-freeze the protocol for this data domain; energy thresholds and error distributions do not transfer.",
+        "Keep late-arriving or revised data separate from what was available at issue time.",
+        "Run in read-only replay; human decision owner retains operational authority.",
+        "Supply native units, exact denominators, causal as-of joins, negative cases and cost basis before any value claim."
+      ],
+      "promotion_allowed": false
+    },
+    {
+      "sector": "finance_operations",
+      "status": "DRAFT_UNMEASURED_NOT_EXECUTABLE",
+      "task": "Reconciliation / settlement workload research",
+      "measured_rows": 0,
+      "validated_improvement": null,
+      "financial_benefit": null,
+      "minimum_source_fields": [
+        "ledger_id",
+        "event_time",
+        "published_time",
+        "currency",
+        "amount",
+        "settlement_status",
+        "revision_id",
+        "business_calendar"
+      ],
+      "extra_edge_cases": [
+        "currency mismatch",
+        "late corrections",
+        "duplicate event",
+        "settlement reversal",
+        "holiday calendar",
+        "survivorship selection"
+      ],
+      "metric_contract": "unreconciled record count or processing latency; currencies never pooled",
+      "required_before_execution": {
+        "buyer_owner": null,
+        "authorized_frozen_dataset_sha256": null,
+        "publication_time_evidence": null,
+        "incumbent_version": null,
+        "candidate_version": null,
+        "unit_mapping": null,
+        "primary_metric": null,
+        "minimum_material_effect": null,
+        "maximum_allowed_harm": null,
+        "holdout_window": null,
+        "independent_evaluator": null,
+        "failure_and_abstention_thresholds": null
+      },
+      "transfer_rules": [
+        "Use an existing proof-to-pilot intake and replay runner; this is not a new platform.",
+        "Re-freeze the protocol for this data domain; energy thresholds and error distributions do not transfer.",
+        "Keep late-arriving or revised data separate from what was available at issue time.",
+        "Run in read-only replay; human decision owner retains operational authority.",
+        "Supply native units, exact denominators, causal as-of joins, negative cases and cost basis before any value claim."
+      ],
+      "promotion_allowed": false
+    }
+  ]
+}

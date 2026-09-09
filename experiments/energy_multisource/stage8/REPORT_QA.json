@@ -1,0 +1,46 @@
+{
+  "audience": "technical-report",
+  "delivery": "private_sites_snapshot",
+  "data_validation": {
+    "report_rows": 50,
+    "datasets": 3,
+    "all_rows_reproduced_from_metric_shards": true,
+    "report_dataset_sql_projection_matches_direct_python_projection": true,
+    "worker_manifest_and_snapshot_exact_canonical_equality": true,
+    "browser_visual_qa": "Not performed: Sites Work Mode guidance limits browser testing to explicit requests.",
+    "independent_validation": false
+  },
+  "chart_map": [
+    {
+      "chart": "Three-day grid MAE change",
+      "question": "Does baseline choice change the sign of the candidate delta?",
+      "form": "horizontal grouped bar",
+      "rows": 16,
+      "palette_policy": "binary categorical groups; native artifact styling",
+      "non_color": "baseline legend and labeled regions"
+    },
+    {
+      "chart": "Marine outcome availability and pair coverage",
+      "question": "How much does conditioning on observed outcomes hide missing scheduled truth?",
+      "form": "horizontal grouped bar",
+      "rows": 10,
+      "palette_policy": "binary categorical groups; native artifact styling",
+      "non_color": "denominator legend and station labels"
+    },
+    {
+      "chart": "Screen decisions under selected observation stresses",
+      "question": "Which stresses force support holds or error regressions?",
+      "form": "horizontal stacked bar",
+      "rows": 24,
+      "palette_policy": "four categorical decisions; native artifact styling",
+      "non_color": "decision legend and named scenario categories"
+    }
+  ],
+  "repeated_family_reason": "All three comparisons have discrete categories; two compare measures within entities and one shows composition. A time-trend or scatter would add no defensible relationship.",
+  "omissions": {
+    "financial_conversion": "No buyer cost, decision or realized savings data.",
+    "confirmatory_inference": "Previously exposed historical data; dependent cells and heuristic thresholds.",
+    "other_sectors": "Six unmeasured contracts only.",
+    "live_connector": "This report is a fixed snapshot."
+  }
+}
