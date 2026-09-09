@@ -16,12 +16,50 @@ production secrets, network controls, or a deployed container image.
 |---|---|---|---|
 | Python and JavaScript/TypeScript source | CodeQL `security-extended` queries with the action pinned to an immutable commit | Pull request, push to `main`, weekly schedule, manual run | The analysis job or SARIF upload did not complete. A successful job does not mean zero vulnerabilities. |
 | Declared dependency changes | GitHub dependency review pinned to an immutable commit | Pull request | The proposed change introduces a high or critical advisory in a runtime or development dependency, or the review could not complete. |
-| Current dashboard dependency set | Lockfile remediation for GHSA-fgmj-fm8m-jvvx and GHSA-hmw2-7cc7-3qxx | Install, audit, verifier, and pull-request checks | The lock resolves ECharts 6.1.0, ECharts GL 2.1.0, form-data 4.0.6, and a peer-compatible Three.js set. Alert closure still depends on the default branch ingesting the merged lockfile. |
+| Current dashboard dependency set | Lockfile remediation for GHSA-fgmj-fm8m-jvvx and GHSA-hmw2-7cc7-3qxx, plus an explicit compatibility and provenance contract | Strict install, full npm tree, audit, verifier, module-load smoke, and pull-request checks | The lock resolves ECharts 6.1.0, ECharts GL 2.1.0, form-data 4.0.6, Anime.js 4.5.0, and Three.js 0.185.1. The unused model-viewer package that required Three.js `^0.183.0` is absent. Alert closure still depends on the default branch ingesting the merged lockfile. |
 | Dependency maintenance | Dependabot version-update proposals | Weekly | An update proposal may still require compatibility testing and human review. Nothing is auto-merged. |
 | Vulnerability intake | Private GitHub advisory route and direct security contact | Reporter initiated | A report enters the bounded triage process; receipt is not validation of the report. |
 | Remediation governance | Severity, containment, target, exception, and closure rules in `SECURITY.md` | Confirmed finding | A finding remains open until a correction or explicitly bounded, expiring exception is recorded. |
 | Secret scanning | GitHub secret scanning and push protection, plus the targeted credential-history verifier | Push, remote scan, and bounded manual reconciliation | A detected value or unresolved provider-history gate remains visible; absence from the current tree is not provider rotation or Git-history remediation. |
 | Default-branch governance | Exact remote branch-protection observation | Bounded manual reconciliation | `main` was not protected at the recorded observation time; merge discipline in prior PRs is not an enforced repository setting. |
+
+## Visual dependency compatibility decision — August 31, 2026
+
+Dependabot PR #189 proposed Anime.js 4.5.0 and Three.js 0.185.1. A strict
+`npm ci` reproduction rejected that graph because `@google/model-viewer` 4.3.1
+requires Three.js `^0.183.0`. A repository reference audit found no dashboard
+source that imports or renders model-viewer; outside the package files, it was
+only an optional recommendation in the modernization sweep. Removing that
+unused package is therefore narrower and more truthful than forcing npm or
+downgrading the requested Three.js update.
+
+The bounded repair therefore makes the deployable compatibility decision
+explicit:
+
+- upgrade Anime.js from resolved version 4.4.1 to 4.5.0 and require its Three.js
+  adapter exports to load;
+- upgrade Three.js to 0.185.1, which satisfies Anime.js 4.5.0 and
+  postprocessing 6.39.4;
+- remove model-viewer from both the package graph and the modernization
+  recommender so an unattended sweep cannot recreate the incompatible graph;
+- require `--strict-peer-deps`, explicitly disable force and legacy-peer mode,
+  watch root and dashboard `.npmrc` files, and reject workflow/environment
+  bypass configuration, manifest/lock divergence, non-registry source or
+  malformed SHA-512 integrity for the named remediation packages,
+  model-viewer reintroduction, unexpected Three.js peer packages, dependency
+  downgrades, and peer-contract drift;
+- run `npm ci`, `npm ls --all`, `npm audit --omit=dev
+  --audit-level=moderate`, and direct module-load smoke checks on the pinned
+  Node 24.18.0 runtime.
+
+This is a declared npm-graph repair, not a claim that the public visual runtime
+was upgraded. The primary dashboard field still uses its separately vendored
+Three.js 0.160.1 asset and pinned 0.160.1 CDN fallbacks; the ProofLock console
+still carries its separate revision-184 module. Neither asset is changed here.
+These checks establish a coherent declared dependency graph and bounded
+first-party module loading only. They do not establish browser/GPU
+compatibility across devices, visual quality, sustained runtime behavior,
+vulnerability freedom, production deployment, or external validation.
 
 ## Evidence protocol
 

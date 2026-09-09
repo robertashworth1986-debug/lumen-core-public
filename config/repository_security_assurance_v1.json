@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "generated_utc": "2026-08-12T06:44:30Z",
+  "generated_utc": "2026-08-31T20:41:02Z",
   "repository": "robertashworth1986-debug/lumen-core-public",
   "scope": "public_repository_source_and_declared_dependencies",
   "decision": "CONFIGURED_FIRST_PARTY_SECURITY_CONTROLS_WITH_OPEN_CREDENTIAL_HISTORY_RUNTIME_AND_BRANCH_PROTECTION_GAPS",
@@ -29,10 +29,12 @@
       "status": "configured_first_party",
       "evidence_paths": [
         "dashboard/package.json",
-        "dashboard/package-lock.json"
+        "dashboard/package-lock.json",
+        ".github/workflows/repository-security-assurance.yml",
+        "code/ops/RUN_STACK_MODERNIZATION_SWEEP.ps1"
       ],
-      "establishes": "The dashboard dependency contract resolves GHSA-fgmj-fm8m-jvvx through ECharts 6.1.0, resolves GHSA-hmw2-7cc7-3qxx through form-data 4.0.6, and uses a peer-compatible ECharts GL and Three.js dependency set.",
-      "does_not_establish": "Closure of GitHub alerts before this change reaches the default branch, absence of other vulnerabilities, runtime safety, compatibility with every dashboard, or production approval."
+      "establishes": "The dashboard dependency contract resolves GHSA-fgmj-fm8m-jvvx through ECharts 6.1.0, resolves GHSA-hmw2-7cc7-3qxx through form-data 4.0.6, upgrades Anime.js to 4.5.0 and Three.js to 0.185.1, and removes the unused model-viewer 4.3.1 package whose Three.js ^0.183.0 peer range made the proposed graph impossible under strict npm resolution. The pull-request gate uses strict npm peer resolution, npm tree validation, an audit threshold, registry provenance and integrity checks, peer-contract checks, and a module-load smoke test without force or legacy-peer bypasses.",
+      "does_not_establish": "Closure of GitHub alerts before this change reaches the default branch, replacement of the separately vendored public visual assets, absence of other vulnerabilities, browser or GPU compatibility with every dashboard, field performance, runtime safety, or production approval."
     },
     {
       "id": "dependency_update_automation",

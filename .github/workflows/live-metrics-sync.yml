@@ -29,36 +29,112 @@ jobs:
         shell: bash
         env:
           METRICS_ARTIFACT_DIR: ${{ runner.temp }}/lumencore-live-metrics
+          JSON_MAX_BYTES: '65536'
+          STATIC_MAX_BYTES: '1048576'
         run: |
           set -euo pipefail
           install -d -m 700 "$METRICS_ARTIFACT_DIR"
 
-          fetch_object_or_null() {
+          fetch_contract_or_null() {
             local url=$1
+            local contract=$2
             local body
-            if body=$(curl --fail --silent --show-error --location --max-redirs 5 --max-time 10 "$url" 2>/dev/null); then
-              if jq -e 'type == "object"' >/dev/null 2>&1 <<<"$body"; then
-                jq -cS . <<<"$body"
-                return
-              fi
-            fi
-            echo 'null'
+            local result
+            local code
+            local content_type
+            local validated
+            body=$(mktemp)
+            result=$(curl --fail --silent --show-error --location --max-redirs 5 \
+              --proto '=https' --proto-redir '=https' --max-time 10 \
+              --max-filesize "$JSON_MAX_BYTES" --output "$body" \
+              --write-out $'%{http_code}\t%{content_type}' "$url" 2>/dev/null) || result=$'000\t'
+            IFS=$'\t' read -r code content_type <<<"$result"
+            # Use the exact minimal payload from operator_api_access.py. Reject
+            # malformed or private fields before retaining any response bytes.
+            validated=$(python3 - "$body" "$code" "$content_type" "$contract" "$JSON_MAX_BYTES" <<'PY'
+          import json
+          import re
+          import sys
+          from datetime import datetime, timezone
+
+          def unique_object(pairs):
+              value = {}
+              for key, item in pairs:
+                  if key in value:
+                      raise ValueError("duplicate key")
+                  value[key] = item
+              return value
+
+          def reject_constant(value):
+              raise ValueError("non-finite value")
+
+          try:
+              path, code, content_type, contract, limit = sys.argv[1:]
+              if code != "200":
+                  raise ValueError("HTTP contract")
+              if content_type.split(";", 1)[0].strip().lower() != "application/json":
+                  raise ValueError("media type")
+              with open(path, "rb") as source:
+                  raw = source.read(int(limit) + 1)
+              if len(raw) > int(limit):
+                  raise ValueError("body limit")
+              value = json.loads(raw.decode("utf-8"), object_pairs_hook=unique_object,
+                                 parse_constant=reject_constant)
+              expected = {"status": "ok", "service": "luma-experience-gateway",
+                          "access_boundary": "operator_api_v1", "public_surface": "minimal"}
+              if contract == "gateway_health":
+                  timestamp = value.get("generated_utc") if isinstance(value, dict) else None
+                  if not isinstance(timestamp, str) or not re.fullmatch(
+                      r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", timestamp
+                  ):
+                      raise ValueError("health timestamp")
+                  generated = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                  # Point-in-time liveness: five minutes old, one minute of clock skew.
+                  age = (datetime.now(timezone.utc) - generated).total_seconds()
+                  if not -60 <= age <= 300:
+                      raise ValueError("health freshness")
+                  expected["generated_utc"] = timestamp
+              elif contract != "public_status":
+                  raise ValueError("unknown contract")
+              if value != expected:
+                  raise ValueError("minimal public contract")
+              print(json.dumps(expected, separators=(",", ":"), sort_keys=True))
+          except (OSError, UnicodeError, ValueError, TypeError, RecursionError):
+              print("null")
+          PY
+            ) || validated=null
+            rm -f -- "$body"
+            printf '%s\n' "$validated"
           }
 
-          gateway_health=$(fetch_object_or_null "https://lumen-core.ai/health")
-          public_status=$(fetch_object_or_null "https://lumen-core.ai/api/public/status")
+          gateway_health=$(fetch_contract_or_null "https://lumen-core.ai/health" gateway_health)
+          public_status=$(fetch_contract_or_null "https://lumen-core.ai/api/public/status" public_status)
 
-          site_code=$(curl --silent --show-error --location --max-redirs 5 --max-time 10 \
-            --output /dev/null --write-out "%{http_code}" "https://lumen-core.ai/" 2>/dev/null) || site_code="000"
+          site_body=$(mktemp)
+          site_result=$(curl --silent --show-error --location --max-redirs 5 \
+            --proto '=https' --proto-redir '=https' --max-time 10 \
+            --max-filesize "$STATIC_MAX_BYTES" --output "$site_body" \
+            --write-out $'%{http_code}\t%{content_type}' "https://lumen-core.ai/" 2>/dev/null) || site_result=$'000\t'
+          IFS=$'\t' read -r site_code site_content_type <<<"$site_result"
           [[ "$site_code" =~ ^[0-9]{3}$ ]] || site_code="000"
+          site_media_type=${site_content_type%%;*}
+          site_body_bytes=$(wc -c < "$site_body")
+          site_contract_ok=false
+          if [[ "$site_code" == 200 && "${site_media_type,,}" == text/html ]] && \
+            (( site_body_bytes <= STATIC_MAX_BYTES )) && \
+            grep -Fq -- '<meta name="lumencore-surface" content="proof-to-pilot-home-v1">' "$site_body"; then
+            site_contract_ok=true
+          fi
+          rm -f -- "$site_body"
 
           snapshot_ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           jq -n \
             --arg snapshot_utc "$snapshot_ts" \
             --arg site_status "$site_code" \
+            --argjson site_contract_ok "$site_contract_ok" \
             --argjson gateway_health "$gateway_health" \
             --argjson public_status "$public_status" \
-            '{snapshot_utc:$snapshot_utc,site_status:$site_status,gateway_health:$gateway_health,public_status:$public_status}' \
+            '{snapshot_utc:$snapshot_utc,site_status:$site_status,site_contract_ok:$site_contract_ok,gateway_health:$gateway_health,public_status:$public_status}' \
             > "$METRICS_ARTIFACT_DIR/live_snapshot.json"
 
           status=$((10#$site_code))
@@ -70,7 +146,7 @@ jobs:
             state=degraded
             status_msg="online · ${available_objects}/2 public gateway contracts"
             status_color=yellow
-            if [[ "$available_objects" -eq 2 ]]; then
+            if [[ "$available_objects" -eq 2 && "$site_contract_ok" == true ]]; then
               state=operational
               status_color=brightgreen
             fi
@@ -83,6 +159,7 @@ jobs:
           jq empty "$METRICS_ARTIFACT_DIR/live_snapshot.json" "$METRICS_ARTIFACT_DIR/site_health_badge.json"
           echo "snapshot_ts=$snapshot_ts" >> "$GITHUB_OUTPUT"
           echo "site_code=$site_code" >> "$GITHUB_OUTPUT"
+          echo "site_contract_ok=$site_contract_ok" >> "$GITHUB_OUTPUT"
           echo "available_objects=$available_objects" >> "$GITHUB_OUTPUT"
           echo "state=$state" >> "$GITHUB_OUTPUT"
 
@@ -97,6 +174,7 @@ jobs:
             {
               echo "## Live metrics verdict: ${{ steps.fetch.outputs.state }}"
               echo "- Site HTTP status: \`${{ steps.fetch.outputs.site_code }}\`"
+              echo "- Homepage content contract: \`${{ steps.fetch.outputs.site_contract_ok }}\`"
               echo "- Public gateway contracts available: \`${{ steps.fetch.outputs.available_objects }}/2\`"
               echo "- Snapshot UTC: \`${{ steps.fetch.outputs.snapshot_ts }}\`"
               echo "- Evidence: retained workflow artifact only; no repository commit or deployment occurred"
