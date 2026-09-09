@@ -1,0 +1,216 @@
+{
+  "schema": "lumencore.frozen_delta.stage8.v1",
+  "active_outcome": "one_external_validation_or_paid_pilot_conversion",
+  "status": "FROZEN_HISTORICAL_STRESS_SCREEN_NOT_INDEPENDENT_VALIDATION",
+  "data_exposure": "All records are historical and previously available to this research lane. The protocol is frozen before this run, not before original outcomes or prior research.",
+  "sources": {
+    "energy-stage4-ci.zip": "a0c693328a3a614ee7646731b81497f7d5f4b33b5338c9fab0595797d1017a2d",
+    "utah-forge-gdr1683.zip": "d27e25495e0a7a6eac31e54442e0a9f39fe2e4566dcad8e85a725547654b9545",
+    "eia_grid_validation_panel_20260713.json.gz": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9"
+  },
+  "ndbc_stations": [
+    "41002",
+    "42001",
+    "44025",
+    "46050",
+    "46237"
+  ],
+  "retained_source_holds": [
+    {
+      "source": "NDBC_46042_2025",
+      "reason": "Absent in inherited frozen archive; no substitution."
+    }
+  ],
+  "eia_regions": [
+    "CISO",
+    "ERCO",
+    "ISNE",
+    "MISO",
+    "NYIS",
+    "PJM",
+    "SWPP",
+    "TVA"
+  ],
+  "forge_channels": {
+    "flow_sep": {
+      "column": 7,
+      "unit": "gpm"
+    },
+    "pressure_16a": {
+      "column": 8,
+      "unit": "psi"
+    },
+    "temperature_16b": {
+      "column": 4,
+      "unit": "degF"
+    },
+    "pump_rate": {
+      "column": 9,
+      "unit": "bpm"
+    }
+  },
+  "aggregation": "Nonnegative finite measurements averaged within (end-cadence,end]; no future-target filling. Preserve empty buckets as NaN.",
+  "families": {
+    "grid": {
+      "cadence_seconds": 86400,
+      "horizon_steps": [
+        1,
+        3,
+        7
+      ],
+      "seasonal_steps": 7,
+      "cut": "2025-01-01",
+      "clock": "EIA source local calendar-day label; final revised values, no publication-time guarantee"
+    },
+    "marine": {
+      "cadence_seconds": 3600,
+      "horizon_steps": [
+        1,
+        3,
+        6
+      ],
+      "seasonal_steps": 24,
+      "cut": "2025-01-01",
+      "clock": "UTC closed hourly means"
+    },
+    "geothermal": {
+      "cadence_seconds": 300,
+      "horizon_steps": [
+        2,
+        6,
+        12
+      ],
+      "seasonal_steps": 288,
+      "cut_fraction": 0.4,
+      "clock": "Source clock unspecified timezone; no cross-source alignment"
+    }
+  },
+  "methods": [
+    "persistence",
+    "seasonal",
+    "median5",
+    "damped_trend",
+    "robust_blend"
+  ],
+  "method_rules": {
+    "max_age_steps": 3,
+    "window_steps": 5,
+    "min_window_observations": 3,
+    "slope_clip_calibration_iqr": 0.1,
+    "trend_damping": 0.5,
+    "blend_median_weight": 0.5,
+    "outputs_nonnegative": true,
+    "seasonal": "Value at issue+horizon-seasonal_steps, only when observed and already available; no fallback."
+  },
+  "scenarios": [
+    "clean",
+    "missing10_s17",
+    "missing10_s29",
+    "missing30_s17",
+    "missing30_s29",
+    "burst12",
+    "delay1",
+    "delay3",
+    "delay12",
+    "spike_positive",
+    "spike_negative",
+    "stuck12",
+    "bias_positive",
+    "bias_negative",
+    "drift_positive",
+    "drift_negative",
+    "noise_s17",
+    "noise_s29",
+    "quantize",
+    "gain110",
+    "gain90",
+    "combined",
+    "outage"
+  ],
+  "scenario_rules": {
+    "application": "Only observations at/after evaluation boundary; ground truth never mutated. Freshness expires after 3 cadence steps. Simulated delays apply at all issue times including pre-boundary warmup.",
+    "missing_fractions": [
+      0.1,
+      0.3
+    ],
+    "random_seeds": [
+      17,
+      29
+    ],
+    "burst_period_steps": 120,
+    "burst_length_steps": 12,
+    "spike_period_steps": 97,
+    "spike_iqr": 5,
+    "stuck_period_steps": 120,
+    "stuck_length_steps": 12,
+    "bias_iqr": 0.1,
+    "drift_final_iqr": 0.5,
+    "noise_sigma_iqr": 0.1,
+    "quantization_iqr": 0.1,
+    "combined": "30% missing seed17 plus delay3",
+    "outage": "All evaluation observations missing; warmup ages out."
+  },
+  "slices": [
+    "all",
+    "high_at_issue",
+    "ramp_at_issue"
+  ],
+  "slice_rules": "High threshold=calibration observed-value q90; ramp threshold=calibration adjacent-bucket absolute change q90. Slice labels use clean issue-time truth for offline audit only and are not supplied to models.",
+  "metrics": [
+    "paired_MAE",
+    "paired_RMSE",
+    "paired_p95_absolute_error",
+    "signed_mean_error",
+    "prediction_coverage",
+    "pair_coverage",
+    "MAE_delta_native",
+    "MAE_improvement_pct",
+    "chronological_quartile_deltas"
+  ],
+  "comparison": "Every candidate versus both persistence and seasonal on identical finite target/baseline/candidate rows; also report all eligible and available counts. Never pool native errors across units.",
+  "decision_rules": {
+    "min_pairs": 100,
+    "min_pair_coverage": 0.9,
+    "min_mae_improvement_pct": 5,
+    "max_p95_regression_pct": 0,
+    "required_positive_quartiles": 3,
+    "quartile_min_pairs": 20,
+    "status": "Descriptive prioritization only. No p-values, significance, external validation, financial conversion, or deployment approval."
+  },
+  "failure_rules": [
+    "No zero-error denominator percentages",
+    "Nonfinite predictions abstain",
+    "No cross-boundary calibration targets",
+    "Duplicate/nonmonotonic source timestamps reject",
+    "Missing source archive/hash mismatch reject",
+    "All planned sources/scenarios/horizons/methods/slices required in manifest",
+    "Missing/tampered/unlisted result files reject"
+  ],
+  "scope": "Three energy-related operational domains, seventeen measured series, multiple native units. Other sectors are transfer hypotheses only.",
+  "unmeasured_sectors": [
+    "aviation",
+    "manufacturing",
+    "water",
+    "healthcare",
+    "finance",
+    "telecom"
+  ],
+  "prohibited_claims": [
+    "guaranteed_profit",
+    "realized_savings",
+    "independent_validation",
+    "production_readiness",
+    "safety_certification",
+    "cross_sector_transfer_proven",
+    "wave_electricity_generation"
+  ],
+  "freeze_note": "Git commit and protocol SHA provide a reviewable local freeze; neither is an independently witnessed pre-outcome seal.",
+  "serialization_revision": {
+    "version": 2,
+    "reason": "First run rejected after consolidated JSON truncation during artifact handoff. Per-array metric shards bounded below 2 MiB replace the consolidated file. No model, data, threshold or scenario changes.",
+    "prior_protocol_sha256": "0edd75fa5620581e91e297cdc92c352e2595b9eee5212ddddd4d9dbc0fdc89e4",
+    "prior_local_freeze_commit": "ddfef1f4",
+    "rejected_manifest_sha256": "c8314726b3509535e741096c687798bb97e085c8316944e87f0f72793b029f91",
+    "exposure": "Aggregate status counts from first run were visible before this format-only revision; no new untouched-evaluation claim."
+  }
+}
