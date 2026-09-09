@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.0",
+  "experiment": "wave_interval_fresh_evaluation_draft_20260905",
+  "status": "DRAFT_NOT_FROZEN_NOT_STARTED",
+  "active_outcome": "One external validation or paid-pilot conversion: prepare a reviewable uncertainty-evaluation contract within the existing energy research lane.",
+  "parent_stage6_protocol_commit": "65d45b1a7ef9f21a42c10c684cdcf38c5287d06f",
+  "parent_stage6_execution_commit": "731170a9da7f8ba553117b4c10705203f41af16c",
+  "parent_source_sha256": "a0c693328a3a614ee7646731b81497f7d5f4b33b5338c9fab0595797d1017a2d",
+  "promotion_allowed": false,
+  "prospective_execution_allowed": false,
+  "prospective_executed": false,
+  "candidate_design": {
+    "selection_status": "ONE_METHOD_SELECTED_FOR_DRAFT_FROM_EXPLORATORY_STAGE6",
+    "candidate_interval_method": "adaptive_scaled_28d",
+    "point_forecaster": "delayed_blend_v01",
+    "stations": ["41002", "42001", "44025", "46050", "46237"],
+    "horizons_minutes": [60, 180, 360],
+    "planned_station_horizon_cells": 15,
+    "candidate_selection_rule": "The same method and point-forecast recipe apply to all 15 cells. No station-specific winner selection, dropping adverse cells, or method switching after freeze.",
+    "source_hold": "46042 is excluded from this five-station design because its prior source was unavailable; no substitute may be inserted after freeze.",
+    "comparators": [
+      {
+        "interval_method": "legacy_pooled_28d",
+        "role": "PRIMARY_INCUMBENT",
+        "point_forecaster": "delayed_blend_v01"
+      },
+      {
+        "interval_method": "activity_scaled_28d",
+        "role": "INFORMATION_MATCHED_NO_ADAPTIVE_FEEDBACK_ABLATION",
+        "point_forecaster": "delayed_blend_v01"
+      }
+    ],
+    "nominal_coverage": 0.9,
+    "recipe": "Preserve the Stage 6 activity scale, 28-day calibration window, minimum 96 matured residuals, daily UTC updates, alpha step 0.005 and alpha clipping [0.02,0.25]. Feedback consumes each own issued interval's outcome once in deterministic maturity order. Any modification requires a new candidate version before the future window.",
+    "fairness": "All three wrappers receive exactly the same source-vintage observations, point forecast, issue times, target times, matured-label eligibility and information budget. They differ only in their declared interval rule.",
+    "initial_state": {
+      "calibration_data_inventory_sha256": null,
+      "calibration_cutoff_utc": null,
+      "point_forecaster_state_sha256": null,
+      "wrapper_initial_state_sha256": null,
+      "station_horizon_2023_scales_and_thresholds_sha256": null,
+      "rule": "Bind actual artifacts for all 15 cells. All calibration and development outcomes are consumed data and excluded from the scored period. A saved 2025 point-forecast array is not a prospective forecasting implementation."
+    }
+  },
+  "estimand": {
+    "target": "WVHT squared times APD",
+    "units": "m^2 s",
+    "interpretation": "Wave-activity proxy only; not electricity, calibrated wave power, device capture or monetary value.",
+    "primary_metric": "Mean 90-percent interval score, scaled by each cell's frozen positive 2023 mean proxy, first averaged over eligible issue origins within each UTC day and cell, then equally across the 15 cells and eligible calendar days.",
+    "interval_score": "upper-lower + 20*max(lower-truth,0) + 20*max(truth-upper,0)",
+    "primary_effect": "Paired incumbent mean scaled interval score minus candidate mean scaled interval score; positive favors candidate. Report native-unit cell scores and widths alongside scaled aggregation.",
+    "paired_ablation_effect": "Paired nonadaptive activity-scaled mean score minus candidate mean score; this isolates the adaptive feedback component conditional on the common forecast and scale recipe.",
+    "smallest_material_primary_effect": null,
+    "smallest_material_ablation_effect": null,
+    "effect_threshold_basis": "UNASSIGNED: an evaluator or use-case owner must set and justify the material effect before future outcomes; do not copy the observed Stage 6 improvement.",
+    "denominator_rule": "Every frozen station-horizon-calendar-day unit remains in the disposition inventory. Missing truth is not imputed. Only pairs with common valid truth enter score arithmetic, subject to the predeclared missingness gates; no omitted failure may become an apparent win."
+  },
+  "regime_contract": {
+    "high_at_issue": "Current proxy from the latest admissible observation is at least the cell's fixed 2023 95th-percentile threshold, evaluated and sealed before the target outcome is available.",
+    "ordinary_at_issue": "Complement of high_at_issue among admissible issues.",
+    "mandatory_reports": [
+      "overall coverage, interval score, width, lower misses and upper misses for every cell",
+      "high_at_issue coverage, interval score, width and miss counts for every cell",
+      "ordinary_at_issue coverage, interval score, width and miss counts for every cell",
+      "every calendar month, including missing and insufficient months",
+      "number of observed regime days and distinct fixed calendar blocks",
+      "fraction of all misses occurring in high_at_issue and its fraction of issued forecasts",
+      "warmup, alpha-clipping, missing-label and source-staleness fractions"
+    ],
+    "retrospective_only_slice": "High realized target may be reported after scoring, but must never define issue-time selection, calibration membership, abstention or the primary operational regime.",
+    "empirical_target": 0.9,
+    "minimum_high_activity_labels_per_cell": null,
+    "minimum_high_activity_calendar_blocks_per_cell": null,
+    "maximum_acceptable_coverage_shortfall": null,
+    "maximum_acceptable_width_or_score_degradation": null,
+    "guardrail_rule": "All 15 mandatory high-at-issue cells must satisfy the frozen coverage, sample-support and utility guardrails. An insufficient regime yields HOLD_INSUFFICIENT_REGIME_EVIDENCE. Aggregate coverage or a favorable median cannot rescue a failed or unknown mandatory cell.",
+    "threshold_status": "UNASSIGNED: label counts are not independent storm counts. Choose sample floors and material shortfall limits before the future period using development-only design work and reviewer judgment."
+  },
+  "freshness_and_source_vintage": {
+    "status": "UNASSIGNED",
+    "consumed_data_inventory_sha256": null,
+    "independent_freeze_timestamp_utc": null,
+    "independent_timestamp_receipt_sha256": null,
+    "source_vintage_contract_sha256": null,
+    "source_acquisition_implementation_sha256": null,
+    "rule": "All previously inspected 2025 data and every later row consumed by analysis, tuning, debugging or candidate selection are development data. A date in 2026, a new download, or starting today does not by itself establish freshness.",
+    "observation_record": [
+      "source station and measurement timestamp",
+      "first successful local retrieval UTC timestamp",
+      "raw response SHA-256 and retained response bytes",
+      "source quality flags and missing/sentinel disposition",
+      "revision identity and source URL",
+      "forecast issue, target and durable seal timestamps"
+    ],
+    "information_boundary": "Every input must have been retrieved before the actual issue timestamp, and every forecast must be durably sealed before its target. The horizon is elapsed time from actual issue to target, not from a backdated observation timestamp.",
+    "feedback_boundary": "At a daily update, consume only labels whose frozen first-admissible vintage was actually received strictly before that update. Preserve original issued intervals and process every matured outcome at most once. The Stage 6 assumed 30/90-minute lags do not demonstrate live publication availability.",
+    "revision_rule": "Use the first admissible quality-controlled vintage received within a frozen settlement window as primary truth. Retain later revisions as separately versioned sensitivity evidence; never overwrite the primary label or old forecast.",
+    "maximum_source_age_minutes": null,
+    "settlement_grace_hours": null,
+    "maximum_missing_label_fraction": null,
+    "failure_rule": "Log stale, missing, invalid, late and unavailable units under the predeclared policy. Missing required chronology, source vintage or seal evidence yields HOLD_SOURCE_OR_CHRONOLOGY."
+  },
+  "window_and_stopping": {
+    "status": "UNASSIGNED",
+    "first_eligible_issue_utc": null,
+    "last_eligible_target_utc": null,
+    "outcome_blind_embargo_hours": null,
+    "fixed_calendar_duration_days": null,
+    "terminal_settlement_cutoff_utc": null,
+    "rule": "Choose exact start, end, embargo and settlement cutoff before the first eligible issue, after final code/state/protocol bindings and the attributable freeze receipt exist. Score every eligible issue under this window. Do not stop when favorable, extend after an adverse result, or reuse pre-freeze observations.",
+    "insufficient_data_at_end": "HOLD_INSUFFICIENT_EVIDENCE. A new window requires a separately registered successor; the original result and denominator are preserved."
+  },
+  "inference": {
+    "status": "UNASSIGNED_NOT_IMPLEMENTED_FOR_CONFIRMATION",
+    "familywise_alpha": 0.05,
+    "comparison_family": ["adaptive versus legacy", "adaptive versus activity-scaled nonadaptive"],
+    "multiplicity_rule": "Holm control across the two preregistered global superiority hypotheses, using valid dependence-aware base p-values. Per-cell and regime superiority claims, if added, require a predeclared expanded family before scoring.",
+    "base_inference_method": null,
+    "dependence_unit_and_block_rule": null,
+    "confidence_bound_construction": null,
+    "coverage_guardrail_error_control": null,
+    "reference_implementation_sha256": null,
+    "rule": "Forecast horizons overlap, adjacent observations are dependent and stations can share storms. Do not treat forecasts as IID Bernoulli trials or independent facilities. Stage 6 seven/fourteen-day bootstrap intervals remain descriptive and do not automatically become confirmatory.",
+    "adaptive_path_rule": "Freeze the complete update algorithm, initial states, admitted-vintage rule and deterministic state ledger. Evaluation must reproduce the issued sequence. Resampling realized errors alone does not automatically establish uncertainty for a modified adaptive policy.",
+    "monitoring": "Descriptive monitoring is allowed without altering the fixed window or method. Any anytime-valid claim requires a separately reviewed implementation with explicit score bounds, horizon/feedback filtration and predictable subgroup rules; no theorem transfer from method names.",
+    "acceptance_expression": "PASS only if every freeze/source/window/integrity/sample gate passes; both Holm-controlled superiority tests pass and their paired effects exceed the frozen material thresholds; and every mandatory regime coverage/utility guardrail passes. Any null requirement, invalid unit handling, insufficient regime evidence or failed guardrail yields HOLD or FAIL, never promotion."
+  },
+  "reproducibility_and_review": {
+    "prospective_code_commit": null,
+    "environment_digest": null,
+    "dependency_lock_sha256": null,
+    "prospective_runtime_test_receipt_sha256": null,
+    "candidate_and_baseline_state_transition_verifier_sha256": null,
+    "frozen_protocol_sha256": null,
+    "independent_evaluator": "UNASSIGNED",
+    "evaluator_acceptance_receipt_sha256": null,
+    "independent_execution_receipt_sha256": null,
+    "required_adversarial_checks": [
+      "reject a feature or label first retrieved after its decision/update",
+      "reject backdated issues, pre-freeze targets and reused development rows",
+      "reject duplicate or revised primary seals and replay every adaptive update",
+      "retain missing stations, label failures and all declared regime cells",
+      "reject passing aggregate coverage paired with a failing mandatory regime",
+      "reject nominal coverage achieved only by unbounded intervals or failed utility limits",
+      "reject altered source/protocol/model/environment hashes"
+    ],
+    "null_requirement_rule": "Any unassigned required field blocks freeze and prospective execution. A hash verifies identity, not independence, truthful execution, scientific novelty or external validation."
+  },
+  "scientific_limits": [
+    "The candidate is the existing clipped, delayed, daily-batched ACI-inspired heuristic. The original ACI coverage theorem is not claimed for it.",
+    "Long-run marginal coverage is different from high-activity subgroup coverage, local storm coverage or a conditional guarantee for each future forecast.",
+    "An interval-score improvement is a distributional-forecast result and does not improve the fixed point forecasts by itself.",
+    "The selected method is standard-method engineering; no mathematical novelty, discovery, prize-level achievement, field safety, power gain or revenue is established."
+  ],
+  "references": [
+    {
+      "title": "Gibbs and Candes (2021), Adaptive Conformal Inference Under Distribution Shift",
+      "url": "https://proceedings.neurips.cc/paper/2021/hash/0d441de75945e5acbc865406fc9a2559-Abstract.html",
+      "relevance": "Original online update and long-time coverage result; does not directly validate this clipped delayed batched implementation or its high-activity subgroups."
+    },
+    {
+      "title": "Gibbs and Candes (2024), Conformal Inference for Online Prediction with Arbitrary Distribution Shifts",
+      "url": "https://www.jmlr.org/papers/v25/22-1218.html",
+      "relevance": "Local-time regret and adaptive learning-rate research; cited as methodology context, not an implemented or inherited guarantee."
+    },
+    {
+      "title": "Choe and Ramdas (2023), Comparing Sequential Forecasters",
+      "url": "https://arxiv.org/abs/2110.00115",
+      "relevance": "Anytime-valid forecast comparison requires a specified score, filtration and method; extensions address forecast lag and predictable subsequences. No such inferential guarantee is enabled by this draft."
+    },
+    {
+      "title": "NOAA NDBC, Measurement Descriptions and Units",
+      "url": "https://www.ndbc.noaa.gov/faq/measdes.shtml",
+      "relevance": "Measurement definitions and distinction between real-time automatically checked observations and historical records; pin the actual source-vintage contract before execution."
+    }
+  ]
+}

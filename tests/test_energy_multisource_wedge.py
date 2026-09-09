@@ -4,6 +4,7 @@ import pathlib
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "experiments" / "energy_multisource" / "run_energy_wedge_sweep.py"
@@ -17,6 +18,21 @@ spec.loader.exec_module(mod)
 
 
 class EnergyMultiSourceTests(unittest.TestCase):
+    def test_wave_module_loads_without_optional_excel_dependency(self):
+        with mock.patch.dict(sys.modules, {"openpyxl": None}):
+            isolated_spec = importlib.util.spec_from_file_location(
+                "energy_wedge_without_excel", SCRIPT
+            )
+            isolated = importlib.util.module_from_spec(isolated_spec)
+            assert isolated_spec.loader is not None
+            isolated_spec.loader.exec_module(isolated)
+            self.assertAlmostEqual(isolated.pct_improve(10.0, 9.0), 10.0)
+
+    def test_excel_request_fails_explicitly_without_optional_dependency(self):
+        with mock.patch.dict(sys.modules, {"openpyxl": None}):
+            with self.assertRaisesRegex(RuntimeError, "requires the optional openpyxl"):
+                mod.load_forge1683(pathlib.Path("missing.xlsx"))
+
     def test_registry_public_sources_do_not_require_secrets(self):
         payload = json.loads(REGISTRY.read_text(encoding="utf-8"))
         rows = {row["source"]: row for row in payload["rows"]}

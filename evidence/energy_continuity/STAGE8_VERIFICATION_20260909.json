@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "manifest_sha256": "73ff9e4ca4fb27eea70b6e74180cf959217a38d2f8a4487f56ae280f99dec370",
+  "source_hashes_verified": 3,
+  "normalization_replayed_series": 17,
+  "full_prediction_arrays_replayed": 1173,
+  "independent_scalar_predictions": 275655,
+  "independently_recomputed_metric_records": 21114,
+  "csv_records_reconciled": 21114,
+  "assurance": "Internal computational verification; no independent field validation.",
+  "io_cache": "NPZ entries decoded once per context; all frozen verifier checks retained",
+  "cache_wrapper_sha256": "937a81b4b11963b92ef5fabf48589cd9a5ae83bf2d3ed2618370e776116eb2e1",
+  "frozen_verifier_sha256": "a0518a7360721831d0d99ea51819c5b8c958232a62713e90af18c6fe4020092c",
+  "elapsed_seconds": 130.1629739429991
+}

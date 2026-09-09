@@ -1,0 +1,74 @@
+name: Frozen multi-source delta replay
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frozen-delta-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11.9'
+      - name: Install the institutional hash lock
+        run: python -m pip install --require-hashes -r requirements-institutional-ubuntu-py311.lock
+      - name: Run research and adversarial contracts
+        run: python -m pytest -q experiments/energy_multisource
+      - name: Acquire only the frozen public inputs
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, shutil, urllib.request
+          root = pathlib.Path('out/stage8/inputs')
+          root.mkdir(parents=True)
+          protocol = json.loads(pathlib.Path('experiments/energy_multisource/stage8/PROTOCOL.json').read_text())
+          base = 'https://github.com/robertashworth1986-debug/lumen-core-public/releases/download/research-energy-20260905-584e88a0f376/'
+          for name, expected in protocol['sources'].items():
+              path = root / name
+              if name.endswith('.json.gz'):
+                  shutil.copyfile(pathlib.Path('evidence/reproducibility') / name, path)
+              else:
+                  size = 0
+                  with urllib.request.urlopen(base + name, timeout=45) as response, path.open('xb') as target:
+                      while chunk := response.read(1 << 20):
+                          size += len(chunk)
+                          if size > 40_000_000:
+                              raise ValueError('Source exceeded frozen download bound')
+                          target.write(chunk)
+              if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                  raise ValueError('Frozen source mismatch: ' + name)
+          PY
+      - name: Run the frozen historical screen
+        run: python experiments/energy_multisource/stage8/run_stage8.py --inputs out/stage8/inputs --out out/stage8/results
+      - name: Replay and independently recompute all metrics
+        run: |
+          python - <<'PY'
+          import hashlib, pathlib, subprocess, sys
+          root = pathlib.Path('out/stage8')
+          digest = hashlib.sha256((root / 'results/MANIFEST.json').read_bytes()).hexdigest()
+          (root / 'RESULT_MANIFEST_SHA256.txt').write_text(digest + '\n')
+          subprocess.run([sys.executable, 'experiments/energy_multisource/stage8/verify_stage8_cached.py',
+                          '--packet', str(root / 'results'), '--inputs', str(root / 'inputs'),
+                          '--expected-manifest-sha256', digest, '--receipt', str(root / 'VERIFICATION.json')], check=True)
+          PY
+      - name: Preserve the complete successful or failed run
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: frozen-delta-${{ github.sha }}
+          path: out/stage8/
+          if-no-files-found: warn
+          retention-days: 14

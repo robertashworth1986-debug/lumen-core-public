@@ -4,7 +4,35 @@
 
 Start here to continue without losing code, evidence, corrections or negative findings. Research publication, reproducibility, performance and production approval are separate states.
 
-## Latest completed pass: Stage 6 — 2026-09-05
+## Latest continuation: Stage 8 frozen delta packets — 2026-09-09
+
+This extends the existing external-validation outcome with three measured energy-domain packets and six explicitly unmeasured sector transfer contracts. The canonical entry point is `experiments/energy_multisource/stage8/README.md`; findings are in that directory's `FINDINGS.md`.
+
+- 17 series, 23 synthetic observation-stress scenarios, 1,173 prediction-array packets and 21,114 retained comparison records. All are historical/reused, dependent research observations.
+- Eight clean grid candidate/horizon cells clear both aggregate reference-baseline screens; none clears all clean-data regime screens. All 45 clean marine candidate comparisons against persistence regress. No cross-sector performance transfer or deployment promotion is established.
+- A consolidated first-run JSON was truncated and correctly rejected. The format-only rerun uses bounded metric shards; the two complete CSV outputs match exactly. Frozen result-manifest SHA-256: `73ff9e4ca4fb27eea70b6e74180cf959217a38d2f8a4487f56ae280f99dec370`.
+- Source authentication, full normalization/prediction replay, independent metric recomputation, scalar forecast spot checks, exact planned-cell coverage and CSV reconciliation are required before bundle assembly. Detailed closeout receipt: `evidence/energy_continuity/STAGE8_CLOSEOUT_20260909.json`.
+- The local research suite passes 176 tests and 13 subtests, including 60 Stage 8 adversarial/cache tests. A manual-only `energy-stage8.yml` workflow makes the same replay reviewable; no new remote execution or whole-repository pass is claimed here.
+- No live control, outreach, trade, cost conversion or public production change. Prior Stage 6 evidence and its prospective-evaluation draft retain their separate identities and limits.
+
+## Prior continuation: replay assurance and repository repair — 2026-09-05
+
+This continuation advances the existing external-validation outcome. It is a code/review improvement, not a new scientific trial, release, independent validation or production deployment. The original Stage 6 checkpoint below remains immutable.
+
+Exact local replay receipt: `evidence/energy_continuity/STAGE6_ASSURANCE_20260905.json`.
+
+- Rechecked the original published inner packet: 77,528,722 bytes; SHA-256 `77e7cfdb6ae5e77840b81d2e93905735679600ebbc729c09207ca3a4290bf629`.
+- The new Stage 6 verifier binds inputs to the original archive, replays all interval bounds and feedback metadata, and recomputes 240 metric records, 90 descriptive comparisons and 465 retained arrays over the same 187,987 matched station/horizon targets. It rejects inconsistent or incomplete evidence before packaging.
+- All 15 adaptive/blend/original-delay high-at-issue cells remain below 90% empirical coverage (46.30%–87.67%). In station 46237 at one hour, high activity accounts for 219/601 misses versus 1,597/16,867 ordinary misses: 3.44% of issues but 12.06% of all misses, with a 3.85-fold descriptive miss-rate ratio. These are dependent retrospective observations, not new independent replications.
+- Package hardening requires an exact manifest/file inventory, strict JSON, explicit archive membership, a pinned original source, fresh build/dist directories, and numerical replay. Hash-consistent but semantically altered results do not pass.
+- Six energy workflows received 22 missing human-readable action-version comments without changing SHA pins. XLSX ingestion now imports its optional dependency only when requested. Exact LF checkout rules preserve the two predecessor files whose bytes are hash-bound by Stage 4/5; hash gates were not relaxed.
+- Local validation: 134 research/custody tests plus 15 targeted repository/energy tests passed. This includes 40 new package/verifier tests and two new optional-dependency tests. This is not a complete institutional-suite or remote-CI pass claim.
+- The single-candidate `experiments/energy_multisource/stage6/FRESH_EVALUATION_DRAFT.json` adds information-matched nonadaptive ablation, actual retrieval/forecast seals, all-cell adverse-regime guardrails and an independent-review requirement. Dates, evaluator, meaningful-effect thresholds and confirmatory inference remain unassigned. It is not frozen or executed; prospective execution and promotion are false.
+- Current public provenance remains a HOLD: 23 configured sources, one successful probe, zero review-ready sources under the existing canonical builder. Governance, rights, relevance and snapshot receipts must be supplied, not inferred from a probe or a row count.
+
+Changes are isolated on `codex/stage7-regime-assurance-20260905`, based on PR #215 head `e840cb1978634860567d2a55ca24b0761402784b`. The original heavily modified laptop checkout is preserved. Main, the production domain, DNS and VPS were not changed. No new release or mirror is claimed by this continuation.
+
+## Latest published scientific pass: Stage 6 — 2026-09-05
 
 Stage 6 is implemented, executed, published and mirrored. Read `evidence/energy_continuity/STAGE6_CLOSEOUT_20260905.json` for the exact scientific and preservation receipts.
 

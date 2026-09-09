@@ -8,7 +8,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from openpyxl import load_workbook
 
 RHO_WATER = 1025.0
 G = 9.80665
@@ -60,6 +59,17 @@ def forecast_bench(series: pd.Series, horizons=(20, 60, 120), rolling=20) -> dic
 
 
 def load_forge1683(xlsx: Path) -> pd.DataFrame:
+    # Excel ingestion is optional for wave analysis and the repository test suite.
+    # Keep the requirement local to the only path that reads an XLSX source.
+    try:
+        from openpyxl import load_workbook
+    except ModuleNotFoundError as exc:
+        if exc.name != "openpyxl":
+            raise
+        raise RuntimeError(
+            "FORGE XLSX ingestion requires the optional openpyxl dependency; "
+            "install the research acquisition dependencies before using --forge-xlsx."
+        ) from exc
     wb = load_workbook(xlsx, read_only=True, data_only=True)
     ws = wb["Data (30 sec)"] if "Data (30 sec)" in wb.sheetnames else wb[wb.sheetnames[0]]
     labels = [
