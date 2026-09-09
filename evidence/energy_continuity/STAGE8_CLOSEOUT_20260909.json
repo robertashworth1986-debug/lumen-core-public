@@ -77,5 +77,7 @@
     "result_manifest_sha256": "73ff9e4ca4fb27eea70b6e74180cf959217a38d2f8a4487f56ae280f99dec370",
     "descriptive_shortlist_cells": 8,
     "filename": "LumenCore_Frozen_Delta_Packets_20260909.zip"
-  }
+  },
+  "uncached_verifier_also_passed": true,
+  "cached_and_uncached_receipts_agree_on_every_frozen_verification_field": true
 }

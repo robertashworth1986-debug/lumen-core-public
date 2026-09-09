@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "manifest_sha256": "73ff9e4ca4fb27eea70b6e74180cf959217a38d2f8a4487f56ae280f99dec370",
+  "source_hashes_verified": 3,
+  "normalization_replayed_series": 17,
+  "full_prediction_arrays_replayed": 1173,
+  "independent_scalar_predictions": 275655,
+  "independently_recomputed_metric_records": 21114,
+  "csv_records_reconciled": 21114,
+  "assurance": "Internal computational verification; no independent field validation."
+}
