@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "label": "lumen-core.ai",
-  "message": "unreachable",
-  "color": "red",
+  "message": "online",
+  "color": "brightgreen",
   "cacheSeconds": 3600
 }

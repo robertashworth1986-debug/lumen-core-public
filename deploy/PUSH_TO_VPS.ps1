@@ -210,6 +210,6 @@ Write-Host "   https://lumen-core.ai/dashboard/  -> Institutional Crypto Dashboa
 Write-Host "   https://lumen-core.ai/api/scout/  -> LamaScout API"
 Write-Host "   https://lumen-core.ai/intel/      -> Cross-sector opportunity API"
 Write-Host "   https://lumen-core.ai/proof/      -> Proof artifacts & reports"
-Write-Host "   https://app.lumen-core.ai/        -> Investor app dashboard"
+Write-Host "   https://app.lumen-core.ai/        -> Governed Proof-to-Pilot landing"
 Write-Host "   https://research.lumen-core.ai/   -> Research/scout dashboard"
 Write-Host "=====================================================" -ForegroundColor Green

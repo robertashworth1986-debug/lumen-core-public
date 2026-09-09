@@ -4,13 +4,17 @@
 from __future__ import annotations
 
 import argparse
+import base64
+import binascii
 import hashlib
 import json
+import re
 import subprocess
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
+from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -19,6 +23,9 @@ DEFAULT_DOSSIER = ROOT / "docs" / "REPOSITORY_SECURITY_ASSURANCE.md"
 DEFAULT_CODEQL = ROOT / ".github" / "workflows" / "codeql.yml"
 DEFAULT_DEPENDENCY_REVIEW = ROOT / ".github" / "workflows" / "dependency-review.yml"
 DEFAULT_DEPENDABOT = ROOT / ".github" / "dependabot.yml"
+DEFAULT_ASSURANCE_WORKFLOW = (
+    ROOT / ".github" / "workflows" / "repository-security-assurance.yml"
+)
 DEFAULT_SECURITY_POLICY = ROOT / "SECURITY.md"
 DEFAULT_PACKAGE = ROOT / "dashboard" / "package.json"
 DEFAULT_PACKAGE_LOCK = ROOT / "dashboard" / "package-lock.json"
@@ -115,6 +122,38 @@ BRANCH_PROTECTION_FIELDS = {
 }
 CODEQL_SHA = "5595ccaf912efad79be6eef63a5619ff05969be3"
 DEPENDENCY_REVIEW_SHA = "a1d282b36b6f3519aa1f3fc636f609c47dddb294"
+SETUP_NODE_SHA = "820762786026740c76f36085b0efc47a31fe5020"
+DASHBOARD_NODE_VERSION = "24.18.0"
+DASHBOARD_EXPECTED_RANGES = {
+    "animejs": "^4.5.0",
+    "echarts": "^6.1.0",
+    "echarts-gl": "^2.1.0",
+    "postprocessing": "^6.39.4",
+    "three": "^0.185.1",
+}
+DASHBOARD_EXPECTED_VERSIONS = {
+    "animejs": "4.5.0",
+    "echarts": "6.1.0",
+    "echarts-gl": "2.1.0",
+    "form-data": "4.0.6",
+    "postprocessing": "6.39.4",
+    "three": "0.185.1",
+}
+DASHBOARD_EXPECTED_PEERS = {
+    "animejs": {"three": ">=0.150.0"},
+    "postprocessing": {"three": ">= 0.168.0 < 0.186.0"},
+}
+DASHBOARD_ALLOWED_THREE_PEER_PACKAGES = {
+    "node_modules/animejs",
+    "node_modules/postprocessing",
+}
+DASHBOARD_COMPATIBILITY_DECISION = (
+    "REMOVE_UNUSED_INCOMPATIBLE_MODEL_VIEWER_AND_ACCEPT_STRICT_THREE_0_185_1_GRAPH"
+)
+STRICT_NPM_CI_COMMAND = (
+    "npm ci --strict-peer-deps --legacy-peer-deps=false --force=false "
+    "--ignore-scripts --no-audit --no-fund"
+)
 
 
 class SecurityAssuranceError(ValueError):
@@ -249,39 +288,205 @@ def verify_dependabot_config(text: str) -> None:
             raise SecurityAssuranceError(f"Dependabot config missing: {marker}")
 
 
-def verify_dashboard_dependencies(package: dict[str, Any], lock: dict[str, Any]) -> None:
+def verify_repository_security_workflow(text: str) -> None:
+    executable_lines = [
+        line.strip()
+        for line in text.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    npm_ci_lines = [
+        line
+        for line in executable_lines
+        if line.startswith("npm ") and re.search(r"\bci\b", line)
+    ]
+    if npm_ci_lines != [STRICT_NPM_CI_COMMAND]:
+        raise SecurityAssuranceError(
+            "repository-security workflow must use one exact strict npm peer resolution command"
+        )
+    forbidden_configuration = (
+        "NPM_CONFIG_LEGACY_PEER_DEPS",
+        "NPM_CONFIG_FORCE",
+        "legacy-peer-deps=true",
+        "force=true",
+        "npm --force",
+    )
+    for marker in forbidden_configuration:
+        if marker in text:
+            raise SecurityAssuranceError(
+                f"repository-security workflow contains npm peer resolution bypass: {marker}"
+            )
+    if "--verified-utc" in text:
+        raise SecurityAssuranceError(
+            "repository-security workflow must derive verified_utc at execution time"
+        )
+    required = (
+        "permissions:\n  contents: read",
+        "timeout-minutes: 10",
+        "persist-credentials: false",
+        f"actions/setup-node@{SETUP_NODE_SHA} # v7.0.0",
+        f"node-version: '{DASHBOARD_NODE_VERSION}'",
+        "cache: npm",
+        "cache-dependency-path: dashboard/package-lock.json",
+        "working-directory: dashboard",
+        STRICT_NPM_CI_COMMAND,
+        "npm ls --all",
+        "npm audit --omit=dev --audit-level=moderate",
+        "node --input-type=module",
+        "animejs/adapters/three",
+        'three.REVISION !== "185"',
+    )
+    for marker in required:
+        if marker not in text:
+            raise SecurityAssuranceError(
+                f"repository-security workflow missing: {marker}"
+            )
+    for watched_path in (
+        "- '.npmrc'",
+        "- 'dashboard/.npmrc'",
+        "- 'code/ops/RUN_STACK_MODERNIZATION_SWEEP.ps1'",
+    ):
+        if text.count(watched_path) != 2:
+            raise SecurityAssuranceError(
+                f"repository-security workflow must watch pull and push path: {watched_path}"
+            )
+
+
+def _verify_registry_lock_entry(
+    packages: dict[str, Any], package_name: str, expected_version: str
+) -> dict[str, Any]:
+    path = f"node_modules/{package_name}"
+    entry = packages.get(path)
+    if not isinstance(entry, dict) or entry.get("version") != expected_version:
+        raise SecurityAssuranceError(f"dashboard lockfile version drift: {path}")
+
+    resolved = entry.get("resolved")
+    if not isinstance(resolved, str):
+        raise SecurityAssuranceError(f"dashboard lockfile source missing: {path}")
+    parsed = urlparse(resolved)
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname != "registry.npmjs.org"
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.query
+        or parsed.fragment
+        or not parsed.path.endswith(".tgz")
+    ):
+        raise SecurityAssuranceError(f"dashboard lockfile source drift: {path}")
+
+    integrity = entry.get("integrity")
+    if not isinstance(integrity, str) or not integrity.startswith("sha512-"):
+        raise SecurityAssuranceError(f"dashboard lockfile integrity missing: {path}")
+    try:
+        decoded = base64.b64decode(integrity.removeprefix("sha512-"), validate=True)
+    except (binascii.Error, ValueError) as exc:
+        raise SecurityAssuranceError(
+            f"dashboard lockfile integrity malformed: {path}"
+        ) from exc
+    if len(decoded) != 64:
+        raise SecurityAssuranceError(f"dashboard lockfile integrity malformed: {path}")
+    return entry
+
+
+def verify_dashboard_dependencies(
+    package: dict[str, Any], lock: dict[str, Any]
+) -> dict[str, Any]:
     dependencies = package.get("dependencies")
     overrides = package.get("overrides")
     if not isinstance(dependencies, dict) or not isinstance(overrides, dict):
         raise SecurityAssuranceError("dashboard package dependency contract missing")
-    expected_ranges = {
-        "@google/model-viewer": "^4.3.1",
-        "echarts": "^6.1.0",
-        "echarts-gl": "^2.1.0",
-        "postprocessing": "^6.39.4",
-        "three": "^0.183.2",
-    }
-    for name, expected in expected_ranges.items():
+    if "@google/model-viewer" in dependencies:
+        raise SecurityAssuranceError(
+            "unused incompatible @google/model-viewer dependency reintroduced"
+        )
+    for name, expected in DASHBOARD_EXPECTED_RANGES.items():
         if dependencies.get(name) != expected:
             raise SecurityAssuranceError(f"dashboard dependency range drift: {name}")
     if overrides.get("form-data") != "4.0.6":
         raise SecurityAssuranceError("form-data remediation override missing")
 
     packages = lock.get("packages")
-    if lock.get("lockfileVersion") != 3 or not isinstance(packages, dict):
+    if (
+        lock.get("name") != package.get("name")
+        or lock.get("version") != package.get("version")
+        or lock.get("lockfileVersion") != 3
+        or lock.get("requires") is not True
+        or not isinstance(packages, dict)
+    ):
         raise SecurityAssuranceError("dashboard lockfile v3 package map missing")
-    expected_versions = {
-        "node_modules/@google/model-viewer": "4.3.1",
-        "node_modules/echarts": "6.1.0",
-        "node_modules/echarts-gl": "2.1.0",
-        "node_modules/form-data": "4.0.6",
-        "node_modules/postprocessing": "6.39.4",
-        "node_modules/three": "0.183.2",
+    root_entry = packages.get("")
+    if (
+        not isinstance(root_entry, dict)
+        or root_entry.get("dependencies") != dependencies
+    ):
+        raise SecurityAssuranceError(
+            "dashboard package and lockfile root dependencies diverge"
+        )
+
+    model_viewer_paths = sorted(
+        path
+        for path in packages
+        if path == "node_modules/@google/model-viewer"
+        or path.endswith("/node_modules/@google/model-viewer")
+    )
+    if model_viewer_paths:
+        raise SecurityAssuranceError(
+            "unused incompatible @google/model-viewer lock entry reintroduced"
+        )
+
+    three_peer_paths = {
+        path
+        for path, entry in packages.items()
+        if isinstance(entry, dict)
+        and isinstance(entry.get("peerDependencies"), dict)
+        and "three" in entry["peerDependencies"]
     }
-    for path, expected in expected_versions.items():
-        entry = packages.get(path)
-        if not isinstance(entry, dict) or entry.get("version") != expected:
-            raise SecurityAssuranceError(f"dashboard lockfile version drift: {path}")
+    unexpected_three_peers = sorted(
+        three_peer_paths - DASHBOARD_ALLOWED_THREE_PEER_PACKAGES
+    )
+    if unexpected_three_peers:
+        raise SecurityAssuranceError(
+            "unexpected dashboard Three.js peer package: "
+            + ", ".join(unexpected_three_peers)
+        )
+    if three_peer_paths != DASHBOARD_ALLOWED_THREE_PEER_PACKAGES:
+        raise SecurityAssuranceError("dashboard Three.js peer package set drift")
+
+    locked_entries = {
+        name: _verify_registry_lock_entry(packages, name, version)
+        for name, version in DASHBOARD_EXPECTED_VERSIONS.items()
+    }
+    for name, expected_peers in DASHBOARD_EXPECTED_PEERS.items():
+        peers = locked_entries[name].get("peerDependencies")
+        if not isinstance(peers, dict):
+            raise SecurityAssuranceError(f"dashboard peer dependency missing: {name}")
+        for peer_name, expected_range in expected_peers.items():
+            if peers.get(peer_name) != expected_range:
+                raise SecurityAssuranceError(
+                    f"dashboard peer dependency drift: {name} -> {peer_name}"
+                )
+    anime_peer_meta = locked_entries["animejs"].get("peerDependenciesMeta")
+    if (
+        not isinstance(anime_peer_meta, dict)
+        or anime_peer_meta.get("three") != {"optional": True}
+    ):
+        raise SecurityAssuranceError("animejs Three.js peer metadata drift")
+
+    return {
+        "manifest_ranges": dict(sorted(DASHBOARD_EXPECTED_RANGES.items())),
+        "locked_versions": dict(sorted(DASHBOARD_EXPECTED_VERSIONS.items())),
+        "peer_contracts": {
+            name: dict(sorted(peers.items()))
+            for name, peers in sorted(DASHBOARD_EXPECTED_PEERS.items())
+        },
+        "compatibility_decision": DASHBOARD_COMPATIBILITY_DECISION,
+        "install_policy": "STRICT_NPM_PEER_RESOLUTION_NO_FORCE_OR_LEGACY_BYPASS",
+        "incompatible_model_viewer_absent": True,
+        "animejs_three_adapter_smoke_required": True,
+        "runtime_claim_boundary": (
+            "DECLARED_NPM_GRAPH_VALIDATED_WITHOUT_CLAIMING_DEPLOYED_VISUAL_ASSET_REPLACEMENT"
+        ),
+    }
 
 
 def verify_security_policy(text: str) -> None:
@@ -405,6 +610,7 @@ def verify_register(
     codeql_path: Path = DEFAULT_CODEQL,
     dependency_review_path: Path = DEFAULT_DEPENDENCY_REVIEW,
     dependabot_path: Path = DEFAULT_DEPENDABOT,
+    assurance_workflow_path: Path = DEFAULT_ASSURANCE_WORKFLOW,
     security_policy_path: Path = DEFAULT_SECURITY_POLICY,
     package_path: Path = DEFAULT_PACKAGE,
     package_lock_path: Path = DEFAULT_PACKAGE_LOCK,
@@ -481,7 +687,12 @@ def verify_register(
         dependency_review_path.read_text(encoding="utf-8")
     )
     verify_dependabot_config(dependabot_path.read_text(encoding="utf-8"))
-    verify_dashboard_dependencies(read_json(package_path), read_json(package_lock_path))
+    verify_repository_security_workflow(
+        assurance_workflow_path.read_text(encoding="utf-8")
+    )
+    dashboard_dependency_contract = verify_dashboard_dependencies(
+        read_json(package_path), read_json(package_lock_path)
+    )
     verify_security_policy(security_policy_path.read_text(encoding="utf-8"))
     verify_dossier(dossier_path.read_text(encoding="utf-8"))
 
@@ -489,7 +700,7 @@ def verify_register(
         verified_utc or datetime.now(timezone.utc).isoformat(), "verified_utc"
     )
     receipt: dict[str, Any] = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "valid": True,
         "repository": register["repository"],
         "scope": register["scope"],
@@ -515,6 +726,7 @@ def verify_register(
             "provider_rotation_confirmed": False,
             "default_branch_protection_enforced": False,
         },
+        "dashboard_dependency_contract": dashboard_dependency_contract,
         "remote_observation": remote_observation,
     }
     canonical = json.dumps(

@@ -25,6 +25,10 @@ into a bounded validation scope. Mark unknown facts `UNKNOWN`; do not guess.
    and event keys, outcome-availability delay, allowed egress, decision latency,
    fallback behavior, retention/deletion rule, matched comparison conditions,
    and human approval owner.
+   Identify the records that can establish when both arms' predictions and
+   the protocol were committed, their model identities, and what information
+   was available at issuance. Supplied timestamps or SHA-256 hashes alone do
+   not establish pre-outcome custody; unknown custody keeps promotion on hold.
 10. **Economic conversion inputs, if requested:** buyer-owned addressable
     denominator; currency, unit, and time window; eligible share; measured
     technical delta; realization factor; implementation and run costs; and a

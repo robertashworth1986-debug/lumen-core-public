@@ -480,7 +480,7 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
     location / {
-        return 302 https://yourdomain.com/investor_command_room.html;
+        return 302 https://yourdomain.com/proof_to_pilot.html;
     }
 }
 

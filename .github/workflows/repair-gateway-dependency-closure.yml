@@ -151,7 +151,7 @@ jobs:
             sudo -n systemctl cat luma-gateway >/dev/null
             for command_name in \
               python3 sha256sum realpath install cp stat mktemp curl systemctl tar \
-              id getent chown chmod dirname rmdir awk seq sleep tr; do
+              id getent chown chmod dirname rmdir awk grep seq sleep tr; do
               command -v "$command_name" >/dev/null
             done
           '
@@ -200,7 +200,11 @@ jobs:
           set -euo pipefail
           health_body=$(mktemp)
           status_body=$(mktemp)
-          trap 'rm -f -- "$health_body" "$status_body"' EXIT
+          operator_body=$(mktemp)
+          operator_headers=$(mktemp)
+          websocket_body=$(mktemp)
+          operator_receipt=$(mktemp)
+          trap 'rm -f -- "$health_body" "$status_body" "$operator_body" "$operator_headers" "$websocket_body" "$operator_receipt"' EXIT
           health_code=$(curl --fail-with-body -sS --max-time 15 \
             -o "$health_body" -w '%{http_code}' https://lumen-core.ai/health)
           status_code=$(curl --fail-with-body -sS --max-time 15 \
@@ -215,10 +219,66 @@ jobs:
             .public_surface == "minimal"
             ' "$body" >/dev/null
           done
+
+          probe_anonymous_operator_http() {
+            local path="$1"
+            local label="$2"
+            local result
+            local code
+            local content_type
+            local normalized_headers
+            local expected_detail
+            : > "$operator_body"
+            : > "$operator_headers"
+            result=$(curl -sS --max-time 15 \
+              --header 'Cache-Control: no-cache' \
+              --output "$operator_body" \
+              --dump-header "$operator_headers" \
+              --write-out '%{http_code}\t%{content_type}' \
+              "https://lumen-core.ai${path}?verify=${RELEASE_COMMIT:0:12}-${label}")
+            IFS=$'\t' read -r code content_type <<< "$result"
+            [[ "$code" == 401 || "$code" == 503 ]]
+            [[ "${content_type,,}" == application/json* ]]
+            normalized_headers=$(tr -d '\r' < "$operator_headers")
+            if [[ "$code" == 401 ]]; then
+              expected_detail='operator API authentication required'
+              grep -Eiq '^www-authenticate:[[:space:]]*Bearer([[:space:]]|$)' \
+                <<< "$normalized_headers"
+            else
+              expected_detail='operator API access unavailable'
+            fi
+            jq -e --arg detail "$expected_detail" \
+              'type == "object" and keys == ["detail"] and .detail == $detail' \
+              "$operator_body" >/dev/null
+            grep -Eiq '^cache-control:[[:space:]]*no-store([[:space:]]|$)' \
+              <<< "$normalized_headers"
+            grep -Eiq '^pragma:[[:space:]]*no-cache([[:space:]]|$)' \
+              <<< "$normalized_headers"
+            printf 'anonymous_%s_http=%s\n' "$label" "$code" >> "$operator_receipt"
+          }
+
+          probe_anonymous_operator_http /metrics metrics
+          probe_anonymous_operator_http /openapi.json openapi_json
+          probe_anonymous_operator_http /docs docs
+          probe_anonymous_operator_http /redoc redoc
+
+          websocket_code=$(curl -sS --max-time 15 --http1.1 \
+            --header 'Cache-Control: no-cache' \
+            --header 'Connection: Upgrade' \
+            --header 'Upgrade: websocket' \
+            --header 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' \
+            --header 'Sec-WebSocket-Version: 13' \
+            --output "$websocket_body" \
+            --write-out '%{http_code}' \
+            "https://lumen-core.ai/ws?verify=${RELEASE_COMMIT:0:12}")
+          [[ "$websocket_code" == 403 || "$websocket_code" == 404 ]]
+          printf 'anonymous_ws_upgrade_http=%s\n' "$websocket_code" >> "$operator_receipt"
+
           printf 'source_commit=%s\nbundle_sha256=%s\nservice_hardening_sha256=%s\nhealth_http=%s\npublic_status_http=%s\n' \
             "$RELEASE_COMMIT" '${{ steps.package.outputs.bundle_sha }}' \
             '${{ steps.package.outputs.hardening_sha }}' "$health_code" "$status_code" \
             > /tmp/gateway-repair/public-verification-receipt.txt
+          cat "$operator_receipt" >> /tmp/gateway-repair/public-verification-receipt.txt
 
       - name: Remove local private unlock staging
         if: always()

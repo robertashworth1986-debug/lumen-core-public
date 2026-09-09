@@ -132,12 +132,17 @@ class BuyerOwnedShadowReplayTests(unittest.TestCase):
             self.protocol_path, self.cases_path, self.predictions_path
         )
 
-    def test_deterministic_promote_receipt_and_self_hash(self) -> None:
+    def test_deterministic_metric_pass_custody_hold_and_self_hash(self) -> None:
         first = self.evaluate()
         second = self.evaluate()
         self.assertEqual(first, second)
-        self.assertTrue(first["all_gates_pass"])
-        self.assertEqual(first["recommended_decision"], "promote")
+        self.assertTrue(first["metric_gates_pass"])
+        self.assertFalse(first["all_gates_pass"])
+        self.assertEqual(first["recommended_decision"], "hold")
+        self.assertTrue(first["gates"]["declared_prediction_time_order"])
+        self.assertFalse(first["gates"]["sealed_before_outcome"])
+        self.assertEqual(first["version"], "1.0.0")
+        self.assertEqual(first["runner_version"], "1.0.1")
         claimed_hash = first.pop("receipt_sha256")
         actual_hash = hashlib.sha256(MODULE._canonical_json(first)).hexdigest()
         self.assertEqual(claimed_hash, actual_hash)
@@ -160,8 +165,82 @@ class BuyerOwnedShadowReplayTests(unittest.TestCase):
         value = predictions()
         value["rows"][0]["prediction_time_utc"] = "2026-01-01T01:00:00Z"
         self.predictions_path = self.write("predictions.json", value)
-        with self.assertRaisesRegex(MODULE.ShadowReplayError, "not sealed"):
+        with self.assertRaisesRegex(MODULE.ShadowReplayError, "at or after"):
             self.evaluate()
+
+    def test_backdated_post_outcome_perfect_predictions_cannot_promote(self) -> None:
+        # This reproduces the prior false sealing claim: outputs are copied
+        # from known outcomes while timestamps still claim earlier issuance.
+        known_cases = cases()
+        fabricated = predictions()
+        for row, known in zip(fabricated["rows"], known_cases["rows"]):
+            row["candidate_output"] = known["outcome"]
+            row["abstain"] = False
+        self.predictions_path = self.write("predictions.json", fabricated)
+        for mode in ("offline_replay", "read_only_shadow"):
+            with self.subTest(mode=mode):
+                value = protocol()
+                value["mode"] = mode
+                self.protocol_path = self.write("protocol.json", value)
+                receipt = self.evaluate()
+                self.assertEqual(receipt["metrics"]["relative_improvement"], 1.0)
+                self.assertTrue(receipt["metric_gates_pass"])
+                self.assertFalse(receipt["gates"]["sealed_before_outcome"])
+                self.assertFalse(receipt["all_gates_pass"])
+                self.assertEqual(receipt["recommended_decision"], "hold")
+                self.assertIn(
+                    {"type": "gate_failure", "gate": "sealed_before_outcome"},
+                    receipt["negative_result_register"],
+                )
+
+    def test_consistent_labels_do_not_verify_model_or_chronology(self) -> None:
+        receipt = self.evaluate()
+        assurance = receipt["evidence_assurance"]
+        self.assertEqual(assurance["declared_incumbent_version"], "inc-v1")
+        self.assertEqual(assurance["declared_candidate_version"], "candidate-v1")
+        self.assertEqual(assurance["prediction_timing"], "declared_only")
+        for key in (
+            "pre_outcome_commitment_verified",
+            "protocol_preregistration_verified",
+            "model_identity_verified",
+            "matched_information_availability_verified",
+        ):
+            self.assertFalse(assurance[key])
+
+    def test_incumbent_version_drift_fails_closed(self) -> None:
+        value = cases()
+        value["rows"][1]["incumbent_version"] = "inc-v2"
+        self.cases_path = self.write("cases.json", value)
+        with self.assertRaisesRegex(MODULE.ShadowReplayError, "one incumbent_version"):
+            self.evaluate()
+
+    def test_candidate_version_drift_including_abstention_fails_closed(self) -> None:
+        for row_index in (1, 2):
+            with self.subTest(row_index=row_index):
+                value = predictions()
+                value["rows"][row_index]["candidate_version"] = "candidate-v2"
+                self.predictions_path = self.write("predictions.json", value)
+                with self.assertRaisesRegex(
+                    MODULE.ShadowReplayError, "one candidate_version"
+                ):
+                    self.evaluate()
+
+    def test_self_asserted_commitment_cannot_unlock_promotion(self) -> None:
+        value = protocol()
+        value["pre_outcome_commitment_verified"] = True
+        self.protocol_path = self.write("protocol.json", value)
+        with self.assertRaisesRegex(MODULE.ShadowReplayError, "keys mismatch"):
+            self.evaluate()
+
+    def test_custody_hold_does_not_hide_metric_failure(self) -> None:
+        value = protocol()
+        value["acceptance"]["minimum_candidate_coverage"] = 1.0
+        self.protocol_path = self.write("protocol.json", value)
+        receipt = self.evaluate()
+        self.assertFalse(receipt["metric_gates_pass"])
+        self.assertFalse(receipt["gates"]["minimum_candidate_coverage"])
+        self.assertFalse(receipt["gates"]["sealed_before_outcome"])
+        self.assertEqual(receipt["recommended_decision"], "hold")
 
     def test_outcome_field_in_candidate_payload_fails_closed(self) -> None:
         value = predictions()

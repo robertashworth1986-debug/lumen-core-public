@@ -32,6 +32,18 @@ The standard sprint sits beside the buyer's existing system; it does not replace
 
 All outputs are recommendations and evidence. A named human decision owner must approve any later promotion or operational change, and the incumbent remains the required fallback. A candidate is not privileged because it is a LumenCore, harmonic, or buyer-preferred method; the evidence may show that the incumbent or alternative is stronger.
 
+The local shadow runner checks supplied prediction timestamps and requires one
+declared incumbent version and one declared candidate version per run. Those
+labels and timestamps do not verify when the predictions, model, or protocol
+were created. Input hashes establish the evaluated bytes, not pre-outcome
+sealing or preregistration. Its `metric_gates_pass` reports numerical acceptance
+separately; `sealed_before_outcome` remains false, `all_gates_pass` remains false,
+and favorable replay results remain `hold`. A worse aggregate result remains
+`reject`. Buyer or qualified reviewer custody assessment, including matched
+information availability and model identity, is required before a later
+promotion decision. Changing a version during evaluation requires a separately
+declared comparison; repeated labels alone cannot establish model identity.
+
 ## Economic conversion gate
 
 Dollar conversion stays disabled until the technical gate passes and the buyer supplies an owned, addressable denominator with currency, unit, time window, eligible share, realization factor, implementation and run costs, and a non-overlap group. The bounded calculation is:

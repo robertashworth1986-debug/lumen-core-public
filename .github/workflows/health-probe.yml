@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: scheduled-repository-writer
-  cancel-in-progress: false
+  group: read-only-site-health-probe
+  cancel-in-progress: true
 
 jobs:
   health-probe:
@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: Probe production endpoints
         id: probe
@@ -30,9 +30,10 @@ jobs:
         env:
           CURL_TIMEOUT_SECONDS: '10'
           STATIC_MAX_BYTES: '1048576'
+          HEALTH_ARTIFACT_DIR: ${{ runner.temp }}/lumencore-health-probe
         run: |
           set -euo pipefail
-          mkdir -p data
+          install -d -m 700 "$HEALTH_ARTIFACT_DIR"
 
           timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
@@ -209,16 +210,16 @@ jobs:
             --argjson dynamic_reachable_count "$dynamic_reachable" \
             --argjson endpoints "$endpoints" \
             '{checked_utc:$checked_utc,overall:$overall,static_surface_state:$static_surface_state,dynamic_gateway_state:$dynamic_gateway_state,healthy_count:$healthy_count,total_count:$total_count,static_healthy_count:$static_healthy_count,static_total_count:$static_total_count,dynamic_healthy_count:$dynamic_healthy_count,dynamic_total_count:$dynamic_total_count,dynamic_reachable_count:$dynamic_reachable_count,endpoints:$endpoints}' \
-            > data/site_health.json
+            > "$HEALTH_ARTIFACT_DIR/site_health.json"
 
           jq -n --arg message "$overall · static=$static_surface_state · gateway=$dynamic_gateway_state" --arg color "$color" \
             '{schemaVersion:1,label:"status",message:$message,color:$color,cacheSeconds:3600}' \
-            > data/uptime_badge.json
+            > "$HEALTH_ARTIFACT_DIR/uptime_badge.json"
 
-          test -f data/site_health.json
-          test ! -L data/site_health.json
-          test -f data/uptime_badge.json
-          test ! -L data/uptime_badge.json
+          test -f "$HEALTH_ARTIFACT_DIR/site_health.json"
+          test ! -L "$HEALTH_ARTIFACT_DIR/site_health.json"
+          test -f "$HEALTH_ARTIFACT_DIR/uptime_badge.json"
+          test ! -L "$HEALTH_ARTIFACT_DIR/uptime_badge.json"
           jq -e '
             (keys | sort) == ([
               "checked_utc", "dynamic_gateway_state",
@@ -260,7 +261,7 @@ jobs:
             (.dynamic_total_count == ([.endpoints[] | select(.surface == "dynamic")] | length)) and
             (.dynamic_healthy_count == ([.endpoints[] | select(.surface == "dynamic" and .ok == true)] | length)) and
             (.dynamic_reachable_count == ([.endpoints[] | select(.surface == "dynamic" and .reachable == true)] | length))
-          ' data/site_health.json >/dev/null
+          ' "$HEALTH_ARTIFACT_DIR/site_health.json" >/dev/null
           jq -e '
             (keys | sort) == (["cacheSeconds", "color", "label", "message", "schemaVersion"] | sort) and
             .schemaVersion == 1 and
@@ -268,7 +269,7 @@ jobs:
             (.message | type == "string" and length > 0) and
             (.color | IN("brightgreen", "yellow", "red")) and
             .cacheSeconds == 3600
-          ' data/uptime_badge.json >/dev/null
+          ' "$HEALTH_ARTIFACT_DIR/uptime_badge.json" >/dev/null
           echo "overall=$overall" >> "$GITHUB_OUTPUT"
           echo "healthy=$healthy" >> "$GITHUB_OUTPUT"
           echo "total=$total" >> "$GITHUB_OUTPUT"
@@ -276,76 +277,51 @@ jobs:
           echo "dynamic_gateway_state=$dynamic_gateway_state" >> "$GITHUB_OUTPUT"
           echo "timestamp=$timestamp" >> "$GITHUB_OUTPUT"
 
-      - name: Commit daily health snapshot
+      - name: Publish explicit health verdict
+        if: always()
         shell: bash
+        env:
+          HEALTH_ARTIFACT_DIR: ${{ runner.temp }}/lumencore-health-probe
         run: |
           set -euo pipefail
-          allowed_path() {
-            case "$1" in
-              data/site_health.json|data/uptime_badge.json) return 0 ;;
-              *) return 1 ;;
-            esac
-          }
-
-          mapfile -d '' -t dirty_paths < <(
+          if [[ -s "$HEALTH_ARTIFACT_DIR/site_health.json" ]]; then
+            overall=$(jq -r '.overall' "$HEALTH_ARTIFACT_DIR/site_health.json")
+            healthy=$(jq -r '.healthy_count' "$HEALTH_ARTIFACT_DIR/site_health.json")
+            total=$(jq -r '.total_count' "$HEALTH_ARTIFACT_DIR/site_health.json")
+            static_state=$(jq -r '.static_surface_state' "$HEALTH_ARTIFACT_DIR/site_health.json")
+            gateway_state=$(jq -r '.dynamic_gateway_state' "$HEALTH_ARTIFACT_DIR/site_health.json")
+            checked_utc=$(jq -r '.checked_utc' "$HEALTH_ARTIFACT_DIR/site_health.json")
             {
-              git diff --name-only -z
-              git diff --cached --name-only -z
-              git ls-files --others --exclude-standard -z
-            } | sort -zu
-          )
-          for path in "${dirty_paths[@]}"; do
-            if ! allowed_path "$path"; then
-              echo "ERROR: health writer observed an out-of-scope path: $path" >&2
-              exit 1
-            fi
-          done
-
-          git diff --check -- data/site_health.json data/uptime_badge.json
-          git config user.name "lumencore-bot"
-          git config user.email "bot@lumen-core.ai"
-          git add data/site_health.json data/uptime_badge.json
-          if ! git diff --cached --quiet; then
-            while IFS= read -r -d '' path; do
-              if ! allowed_path "$path"; then
-                echo "ERROR: refusing to commit an out-of-scope path: $path" >&2
-                exit 1
-              fi
-            done < <(git diff --cached --name-only -z)
-            git commit -m "chore(health): daily survival snapshot — ${{ steps.probe.outputs.overall }} — ${{ steps.probe.outputs.healthy }}/${{ steps.probe.outputs.total }} @ ${{ steps.probe.outputs.timestamp }}"
-            while IFS= read -r -d '' path; do
-              if ! allowed_path "$path"; then
-                echo "ERROR: committed health snapshot contains an out-of-scope path: $path" >&2
-                exit 1
-              fi
-            done < <(git diff-tree --no-commit-id --name-only -r -z HEAD)
-            git pull --rebase origin "${GITHUB_REF_NAME}"
-            while IFS= read -r -d '' path; do
-              if ! allowed_path "$path"; then
-                echo "ERROR: rebased health snapshot contains an out-of-scope path: $path" >&2
-                exit 1
-              fi
-            done < <(git diff-tree --no-commit-id --name-only -r -z HEAD)
-            git push origin "HEAD:${GITHUB_REF_NAME}"
-            local_head=$(git rev-parse HEAD)
-            remote_head=$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)
-            if [[ -z "$remote_head" || "$remote_head" != "$local_head" ]]; then
-              echo "ERROR: remote health-snapshot receipt does not match local HEAD" >&2
-              exit 1
-            fi
-            {
-              echo "### Health snapshot publication receipt"
-              echo "- Commit: \`$local_head\`"
-              echo "- Branch: \`${GITHUB_REF_NAME}\`"
-              echo "- Result: \`${{ steps.probe.outputs.overall }}\`"
-              echo "- Contracts: \`${{ steps.probe.outputs.healthy }}/${{ steps.probe.outputs.total }}\`"
-              echo "- Checked UTC: \`${{ steps.probe.outputs.timestamp }}\`"
-              echo "- Changed-path allowlist: \`data/site_health.json\`, \`data/uptime_badge.json\`"
+              echo "## Production health verdict: ${overall^^}"
+              echo "- Contracts healthy: \`$healthy/$total\`"
+              echo "- Static surface: \`$static_state\`"
+              echo "- Dynamic gateway: \`$gateway_state\`"
+              echo "- Checked UTC: \`$checked_utc\`"
+              echo "- Evidence: retained workflow artifact only; no repository commit or deployment occurred"
+              echo ""
+              echo "> A completed probe is not evidence of a healthy deployment. The explicit verdict above controls."
             } >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "No health snapshot change required." >> "$GITHUB_STEP_SUMMARY"
+            {
+              echo "## Production health verdict: UNKNOWN"
+              echo "- No valid health receipt was produced."
+              echo "- No repository commit or deployment occurred."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Upload bounded health receipts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: site-health-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/lumencore-health-probe/site_health.json
+            ${{ runner.temp }}/lumencore-health-probe/uptime_badge.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Warn on degraded or outage state
         if: steps.probe.outputs.overall != 'operational'
-        run: echo "::warning::lumen-core.ai is ${{ steps.probe.outputs.overall }} — static=${{ steps.probe.outputs.static_surface_state }}, gateway=${{ steps.probe.outputs.dynamic_gateway_state }}, ${{ steps.probe.outputs.healthy }}/${{ steps.probe.outputs.total }} endpoint contracts healthy"
+        run: |
+          echo "::error::lumen-core.ai is ${{ steps.probe.outputs.overall }} — static=${{ steps.probe.outputs.static_surface_state }}, gateway=${{ steps.probe.outputs.dynamic_gateway_state }}, ${{ steps.probe.outputs.healthy }}/${{ steps.probe.outputs.total }} endpoint contracts healthy"
+          exit 1

@@ -3,8 +3,10 @@
 
 The runner reads frozen local JSON inputs, evaluates one locked MAE contract,
 falls back exactly to the incumbent on explicit abstention, and emits a
-hash-verifiable receipt. It has no network, credential, subprocess, trading,
-dispatch, or production-write capability.
+hash-verifiable receipt. Declared timestamps are not verified pre-outcome
+commitments, so favorable metrics remain on hold for custody review. It has
+no network, credential, subprocess, trading, dispatch, or production-write
+capability.
 """
 
 from __future__ import annotations
@@ -24,6 +26,7 @@ CASES_SCHEMA = "lumencore_buyer_owned_shadow_cases_v1"
 PREDICTIONS_SCHEMA = "lumencore_buyer_owned_shadow_predictions_v1"
 RECEIPT_SCHEMA = "lumencore_buyer_owned_shadow_receipt_v1"
 VERSION = "1.0.0"
+RUNNER_VERSION = "1.0.1"
 MAX_INPUT_BYTES = 16 * 1024 * 1024
 MAX_ROWS = 100_000
 
@@ -74,6 +77,8 @@ STANDARD_CLAIM_BOUNDARY = [
     "This receipt is an offline replay or read-only shadow result, not field or external validation.",
     "Forecast or model skill is not a savings, ROI, revenue, or production-performance claim.",
     "The receipt recommends a bounded decision; it does not authorize deployment or control.",
+    "Input hashes verify evaluated bytes, not when predictions or the protocol were created.",
+    "Timestamp order and consistent version labels are declared metadata; pre-outcome sealing, preregistration, model identity, and matched information availability are not independently verified.",
 ]
 
 
@@ -306,6 +311,7 @@ def _validate_cases(value: dict[str, Any]) -> list[dict[str, Any]]:
         raise ShadowReplayError(f"cases.rows must contain 1 to {MAX_ROWS} rows")
     seen: set[str] = set()
     normalized: list[dict[str, Any]] = []
+    incumbent_version: str | None = None
     for index, raw in enumerate(rows):
         context = f"cases.rows[{index}]"
         if not isinstance(raw, dict):
@@ -321,6 +327,10 @@ def _validate_cases(value: dict[str, Any]) -> list[dict[str, Any]]:
             raise ShadowReplayError(
                 f"{context}.actual_available_at_utc must follow event_time_utc"
             )
+        row_version = _string(raw, "incumbent_version", context)
+        if incumbent_version is not None and row_version != incumbent_version:
+            raise ShadowReplayError("cases must declare one incumbent_version per run")
+        incumbent_version = row_version
         normalized.append(
             {
                 "row_id": row_id,
@@ -328,7 +338,7 @@ def _validate_cases(value: dict[str, Any]) -> list[dict[str, Any]]:
                 "event_time": event_time,
                 "actual_available_at_utc": raw["actual_available_at_utc"],
                 "actual_time": actual_time,
-                "incumbent_version": _string(raw, "incumbent_version", context),
+                "incumbent_version": row_version,
                 "incumbent_output": _number(raw, "incumbent_output", context),
                 "outcome": _number(raw, "outcome", context),
             }
@@ -347,6 +357,7 @@ def _validate_predictions(
         raise ShadowReplayError("predictions.rows must be an array")
     case_map = {row["row_id"]: row for row in cases}
     result: dict[str, dict[str, Any]] = {}
+    candidate_version: str | None = None
     for index, raw in enumerate(rows):
         context = f"predictions.rows[{index}]"
         if not isinstance(raw, dict):
@@ -363,8 +374,14 @@ def _validate_predictions(
             raise ShadowReplayError(f"{context} precedes the case event")
         if prediction_time >= case["actual_time"]:
             raise ShadowReplayError(
-                f"{context} was not sealed before the outcome became available"
+                f"{context} declares a prediction time at or after outcome availability"
             )
+        row_version = _string(raw, "candidate_version", context)
+        if candidate_version is not None and row_version != candidate_version:
+            raise ShadowReplayError(
+                "predictions must declare one candidate_version per run"
+            )
+        candidate_version = row_version
         abstain = raw.get("abstain")
         if not isinstance(abstain, bool):
             raise ShadowReplayError(f"{context}.abstain must be boolean")
@@ -380,7 +397,7 @@ def _validate_predictions(
         result[row_id] = {
             "row_id": row_id,
             "prediction_time_utc": raw["prediction_time_utc"],
-            "candidate_version": _string(raw, "candidate_version", context),
+            "candidate_version": row_version,
             "candidate_output": normalized_output,
             "confidence": _number(
                 raw, "confidence", context, minimum=0.0, maximum=1.0
@@ -459,7 +476,7 @@ def evaluate_shadow_replay(
         row["error_increase"] for row in per_row
     )
     acceptance = protocol["acceptance"]
-    gates = {
+    metric_gates = {
         "minimum_eligible_rows": count >= acceptance["minimum_eligible_rows"],
         "minimum_candidate_coverage": coverage
         >= acceptance["minimum_candidate_coverage"],
@@ -467,13 +484,17 @@ def evaluate_shadow_replay(
         >= acceptance["minimum_relative_improvement"],
         "maximum_worst_row_error_increase": worst_increase
         <= acceptance["maximum_worst_row_error_increase"],
-        "sealed_before_outcome": True,
+    }
+    gates = {
+        **metric_gates,
+        "declared_prediction_time_order": True,
+        # The v1 input contract has no authenticated pre-outcome commitment.
+        # A caller can backdate a timestamp after reading the outcomes.
+        "sealed_before_outcome": False,
         "non_actuating_boundary": True,
     }
     all_gates_pass = all(gates.values())
-    if all_gates_pass:
-        recommended_decision = "promote"
-    elif effective_mae > incumbent_mae:
+    if effective_mae > incumbent_mae:
         recommended_decision = "reject"
     else:
         recommended_decision = "hold"
@@ -515,6 +536,7 @@ def evaluate_shadow_replay(
     receipt: dict[str, Any] = {
         "schema": RECEIPT_SCHEMA,
         "version": VERSION,
+        "runner_version": RUNNER_VERSION,
         "status": "complete",
         "run_id": run_id,
         "contract": protocol,
@@ -532,7 +554,20 @@ def evaluate_shadow_replay(
             "worst_row_error_increase": worst_increase,
         },
         "gates": gates,
+        "metric_gates_pass": all(metric_gates.values()),
         "all_gates_pass": all_gates_pass,
+        "evidence_assurance": {
+            "prediction_timing": "declared_only",
+            "pre_outcome_commitment_verified": False,
+            "protocol_preregistration_verified": False,
+            "model_identity_verified": False,
+            "matched_information_availability_verified": False,
+            "declared_incumbent_version": cases[0]["incumbent_version"],
+            "declared_candidate_version": predictions[cases[0]["row_id"]][
+                "candidate_version"
+            ],
+            "next_gate": "Buyer or qualified reviewer must assess pre-outcome prediction and protocol custody, model identity, and matched information availability before any promotion decision.",
+        },
         "recommended_decision": recommended_decision,
         "human_approval_required": True,
         "production_change_authorized": False,
@@ -588,6 +623,7 @@ def main(argv: list[str] | None = None) -> int:
         json.dumps(
             {
                 "all_gates_pass": receipt["all_gates_pass"],
+                "metric_gates_pass": receipt["metric_gates_pass"],
                 "recommended_decision": receipt["recommended_decision"],
                 "receipt_sha256": receipt["receipt_sha256"],
                 "run_id": receipt["run_id"],

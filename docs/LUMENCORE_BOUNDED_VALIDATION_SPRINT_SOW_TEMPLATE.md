@@ -104,6 +104,15 @@ Unless a separate written security and legal schedule is executed, Customer will
 
 The shadow may inspect only approved copies of inputs, outputs, labels, timing, and cost telemetry. Its output is a recommendation and evidence record, not an operating command. Any later integration, write path, or actuation authority requires a separate written scope and approval boundary.
 
+The local JSON runner verifies declared timestamp order and consistent model
+version labels. It cannot authenticate pre-outcome prediction custody, protocol
+preregistration, actual model identity, or matched information availability.
+The numerical acceptance result is reported separately as `metric_gates_pass`;
+favorable runs stay `hold` pending buyer or qualified reviewer assessment of
+those records. Input hashes and earlier timestamp strings cannot satisfy that
+assessment by themselves. The runner does not accept a self-declared approval
+flag as evidence of sealing, and no local receipt authorizes a later change.
+
 ### 3.6 Pre-registered evaluation contract
 
 | Field | Agreed value |
