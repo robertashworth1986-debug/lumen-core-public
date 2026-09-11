@@ -235,6 +235,16 @@ class OutreachGateTests(unittest.TestCase):
         self.assertIn("everything was received on time", campaign["notes"])
         self.assertIn("does not establish payment", campaign["notes"])
         self.assertIn("Do not resend", campaign["notes"])
+        self.assertIn("Profile coming soon", campaign["notes"])
+        self.assertIn("mixer has elapsed", campaign["notes"])
+        self.assertIn(
+            "no receipt establishing completion",
+            campaign["notes"],
+        )
+        self.assertIn(
+            "founder_verifies_official_private_kickoff_time_location_and_eia_status",
+            campaign["next_allowed_action"],
+        )
 
         send = MODULE.evaluate(
             self.registry,
