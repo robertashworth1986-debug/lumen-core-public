@@ -39,6 +39,15 @@ FILE_KEYS = {
 
 def content_type_allowed(archive_name: str, content_type: str) -> bool:
     """Require standards-safe MIME types for public JSON review contracts."""
+    if archive_name.startswith("cohort/"):
+        expected = {
+            ".html": {"text/html"}, ".css": {"text/css"},
+            ".mjs": {"application/javascript", "text/javascript"},
+            ".js": {"application/javascript", "text/javascript"},
+            ".json": {"application/json"}, ".svg": {"image/svg+xml"},
+            ".zip": {"application/zip", "application/x-zip-compressed", "application/octet-stream"},
+        }
+        return content_type in expected.get(Path(archive_name).suffix, set())
     if archive_name not in {"manifest.json", "reviewer_docket.json"}:
         return True
     if archive_name == "manifest.json":
@@ -81,6 +90,7 @@ def live_url(base_url: str, archive_name: str, source_commit: str) -> str:
         "operator_home.html": "/",
         "evidence/index_bounded.html": "/evidence/",
         "build_week/prooflock_console/index.html": "/build_week/prooflock_console/",
+        "cohort/index.html": "/cohort/",
     }
     path = route_map.get(archive_name)
     if path is None:

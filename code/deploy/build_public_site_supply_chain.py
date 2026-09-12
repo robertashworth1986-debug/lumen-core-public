@@ -145,7 +145,8 @@ def _safe_archive_name(value: Any) -> str:
 
 
 def validate_release_inputs(
-    *, repo_root: Path, archive_path: Path, manifest_path: Path, source_commit: str
+    *, repo_root: Path, archive_path: Path, manifest_path: Path, source_commit: str,
+    release_paths: tuple[str, ...] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     if FULL_SHA1.fullmatch(source_commit) is None:
         raise SupplyChainBuildError("source commit must be a full lowercase SHA-1")
@@ -169,7 +170,7 @@ def validate_release_inputs(
     packager = _load_packager(repo_root)
     expected_rows = [
         (repo_path, packager.archive_name(repo_path))
-        for repo_path in packager.RELEASE_PATHS
+        for repo_path in (packager.RELEASE_PATHS if release_paths is None else release_paths)
     ]
     commit_files: dict[str, bytes] = {}
     rows = manifest["files"]

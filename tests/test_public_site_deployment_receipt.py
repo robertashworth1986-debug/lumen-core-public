@@ -53,6 +53,15 @@ def test_full_retained_history_reconstructs_every_release() -> None:
     assert len(result["verification_sha256"]) == 64
 
 
+def test_historical_allowlist_is_read_as_data_after_current_membership_expands():
+    packager = MODULE._load(MODULE.PACKAGER_PATH, "historical_allowlist_regression")
+    assert len(packager.RELEASE_PATHS) == 119
+    pinned = packager.release_paths_at_commit(ROOT, MODULE.DEFAULT_SOURCE_COMMIT)
+    assert len(pinned) == 43
+    assert not any(path.startswith("dashboard/cohort/") for path in pinned)
+    assert tuple(packager.RELEASE_PATHS[:43]) == pinned
+
+
 def test_repository_receipt_path_must_match_source_commit(tmp_path: Path) -> None:
     fake_root = tmp_path / "repo"
     bad_path = (

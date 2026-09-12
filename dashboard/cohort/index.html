@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>EC Strength Studio · LumenCore</title>
+  <meta name="description" content="A free, practical workspace for the TakeOff community. Build on your strengths with a workboard, Grant Factory, LumaScout, Paper Lab and measurement tools.">
+  <meta name="theme-color" content="#09111d">
+  <meta property="og:title" content="EC Strength Studio · LumenCore"><meta property="og:description" content="Our strength is making everyone else stronger. Free tools for the TakeOff community.">
+  <meta property="og:type" content="website"><meta property="og:url" content="https://lumen-core.ai/cohort/">
+  <link rel="canonical" href="https://lumen-core.ai/cohort/">
+  <link rel="icon" href="./mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./studio.css">
+  <script type="module" src="./studio.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to workspace</a>
+<aside class="sidebar">
+  <a class="studio-brand" href="./"><span class="brand-orbit" aria-hidden="true">L</span><span>STRENGTH<small>STUDIO / by LumenCore</small></span></a>
+  <button class="company-switch" id="company-switch" aria-haspopup="dialog"><span class="company-monogram" id="monogram">EX</span><span><strong id="sidebar-company">Excalis</strong><small id="sidebar-industry">Manufacturing</small></span><span aria-hidden="true">⌄</span></button>
+  <div class="nav-label">YOUR WORKSPACE</div>
+  <nav id="workspace-nav" aria-label="Workspace">
+    <button data-view="overview" class="active" aria-current="page"><span aria-hidden="true">◈</span> Overview</button>
+    <button data-view="workboard"><span aria-hidden="true">▦</span> Workboard <span class="nav-count" id="work-count">0</span></button>
+    <button data-view="measure"><span aria-hidden="true">⌁</span> Measure & improve</button>
+    <div class="nav-label">YOUR LUMA TOOLS</div>
+    <button data-view="grants"><span aria-hidden="true">▤</span> Grant Factory</button>
+    <button data-view="scout"><span aria-hidden="true">◎</span> LumaScout</button>
+    <button data-view="paper"><span aria-hidden="true">⌁</span> Paper Lab</button>
+    <button data-view="care"><span aria-hidden="true">✧</span> LumaCare</button>
+    <button data-view="assistant"><span aria-hidden="true">✳</span> Luma Assistant</button>
+    <div class="nav-label">COMMUNITY</div>
+    <button data-view="directory"><span aria-hidden="true">⊞</span> Discover the cohort</button>
+    <button data-view="package"><span aria-hidden="true">↓</span> Your free package</button>
+  </nav>
+  <div class="sidebar-note"><span class="status-dot"></span> Made for TakeOff<p>Our strength is making<br>everyone else stronger.</p><a href="https://lumen-core.ai/proof_to_pilot.html">About LumenCore ↗</a></div>
+</aside>
+<div class="app">
+  <header class="topbar"><div class="breadcrumb">TakeOff <span>/</span> Fall 2026 <span>/</span> <b id="crumb">Overview</b></div><div class="top-actions"><span id="storage-state" class="storage-label"><span class="status-dot"></span> This browser</span><button class="subtle" id="export-workspace" title="Download a backup of this member's workspace">Export workspace ↓</button><button class="avatar" id="open-package" title="Open your package">L</button></div></header>
+  <main id="main" tabindex="-1"><div id="view"></div></main>
+  <footer class="app-footer"><span>Free tools. Shared strengths. Real work.</span><span>Independent LumenCore contribution · No EC or member endorsement implied.</span></footer>
+</div>
+<dialog id="company-dialog"><div class="dialog-head"><div><span class="eyebrow">69 BUSINESSES · ONE COMMUNITY</span><h2>Find your workspace</h2></div><button class="close-dialog icon-button" aria-label="Close">×</button></div><label class="search"><span>Search businesses</span><input id="company-search" type="search" placeholder="Name, industry, or strength…" autocomplete="off"></label><div id="company-results" class="company-results"></div></dialog>
+<dialog id="edit-dialog"><div id="dialog-content"></div></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<noscript><p class="noscript">JavaScript is needed for the interactive workspace. Read the <a href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/EC_COHORT_STRENGTH_RESEARCH_2026-09-11.md">complete public cohort research</a>.</p></noscript>
+</body>
+</html>

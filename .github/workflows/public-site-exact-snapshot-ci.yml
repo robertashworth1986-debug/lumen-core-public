@@ -42,6 +42,7 @@ on:
       - 'dashboard/js/luma_path_resolver.js'
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
+      - 'dashboard/cohort/**'
       - 'tests/test_public_site_deploy_hardening.py'
       - 'tests/test_public_discovery.py'
       - 'tests/test_canonical_surface_design.py'
@@ -87,6 +88,7 @@ on:
       - 'dashboard/js/luma_path_resolver.js'
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
+      - 'dashboard/cohort/**'
       - 'tests/test_public_site_deploy_hardening.py'
       - 'tests/test_public_discovery.py'
       - 'tests/test_canonical_surface_design.py'
@@ -115,5 +117,11 @@ jobs:
       - name: Check shell syntax
         run: bash -n code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh
 
+      - name: Fetch the two retained release subjects for historical reconstruction
+        run: git fetch --no-tags --depth=1 origin e513f65a219a12e539d9f7dd3ea47a6a081c5262 1ce7c35975a4011fa844e8b39ccbc950c8c0f398
+
       - name: Run exact-snapshot protocol tests
-        run: python -m pytest tests/test_public_site_deploy_hardening.py tests/test_public_discovery.py tests/test_canonical_surface_design.py -q
+        run: python -m pytest tests/test_public_site_deploy_hardening.py tests/test_public_discovery.py tests/test_canonical_surface_design.py tests/test_public_site_deployment_receipt.py tests/test_ec_member_runtime.py -q
+
+      - name: Check member-workspace browser logic
+        run: node --test tests/ec_studio_core.test.mjs

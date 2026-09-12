@@ -40,6 +40,7 @@ on:
       - 'dashboard/js/luma_path_resolver.js'
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
+      - 'dashboard/cohort/**'
       - 'tests/test_public_site_supply_chain.py'
   push:
     branches: [main]
@@ -81,6 +82,7 @@ on:
       - 'dashboard/js/luma_path_resolver.js'
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
+      - 'dashboard/cohort/**'
       - 'tests/test_public_site_supply_chain.py'
 
 concurrency:
