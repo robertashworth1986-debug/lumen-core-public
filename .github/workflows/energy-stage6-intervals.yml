@@ -1,0 +1,134 @@
+name: Energy Stage 6 Interval Assurance and Research Publication
+
+on:
+  push:
+    branches: ["exp/energy-stage4-delayed-router-20260905"]
+    paths:
+      - "experiments/energy_multisource/stage6/**"
+      - ".github/workflows/energy-stage6-intervals.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: energy-stage6-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-and-package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      artifact_id: ${{ steps.package.outputs.artifact-id }}
+      artifact_digest: ${{ steps.package.outputs.artifact-digest }}
+    steps:
+      - name: Checkout exact code and reachable ancestry
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.11"
+      - name: Install fixed numerical dependency
+        run: python -m pip install --disable-pip-version-check numpy==2.3.5
+      - name: Run all inherited research-custody tests and new interval tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/stage6/inputs
+          for suite in experiments/energy_multisource/stage3 experiments/energy_multisource/stage4 experiments/energy_multisource/stage5 experiments/energy_multisource/stage6 evidence/energy_continuity; do
+            python -m unittest discover -s "$suite" -p 'test_*.py' -v 2>&1 | tee -a out/stage6/TESTS.txt
+          done
+          python -m py_compile experiments/energy_multisource/stage6/*.py
+      - name: Fetch exact previously published source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 3 --connect-timeout 20 --max-time 180 \
+            'https://github.com/robertashworth1986-debug/lumen-core-public/releases/download/research-energy-20260905-584e88a0f376/energy-stage4-ci.zip' \
+            -o out/stage6/inputs/energy-stage4-ci.zip
+          echo 'a0c693328a3a614ee7646731b81497f7d5f4b33b5338c9fab0595797d1017a2d  out/stage6/inputs/energy-stage4-ci.zip' | sha256sum --check
+      - name: Execute fixed-point uncertainty and adverse-regime diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python experiments/energy_multisource/stage6/run_stage6.py \
+            --prior-zip out/stage6/inputs/energy-stage4-ci.zip \
+            --out out/stage6/results 2>&1 | tee out/stage6/EXPERIMENT.log
+      - name: Verify complete evidence and build offline recovery packet
+        run: python experiments/energy_multisource/stage6/package_stage6.py --out out/stage6
+      - name: Upload exact publication and mirror packet
+        id: package
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: energy-stage6-download-${{ github.sha }}
+          path: out/stage6/dist/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+      - name: Preserve test and execution receipts even on failure
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: energy-stage6-execution-${{ github.sha }}
+          path: |
+            out/stage6/TESTS.txt
+            out/stage6/EXPERIMENT.log
+            out/stage6/RUN_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  publish-research-only:
+    needs: verify-and-package
+    if: github.ref == 'refs/heads/exp/energy-stage4-delayed-router-20260905'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Checkout exact audited publisher
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Verify exact job-to-job artifact before extraction
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACKAGE_ID: ${{ needs.verify-and-package.outputs.artifact_id }}
+          PACKAGE_SHA256: ${{ needs.verify-and-package.outputs.artifact_digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/stage6/dist
+          [[ "$PACKAGE_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$PACKAGE_ID/zip" > out/stage6/transfer.zip
+          python - <<'PY'
+          import importlib.util, os, pathlib
+          p=pathlib.Path('evidence/energy_continuity/checkpoint.py')
+          spec=importlib.util.spec_from_file_location('custody',p)
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          p=pathlib.Path('out/stage6/transfer.zip')
+          if m.digest(p)!=os.environ['PACKAGE_SHA256'].removeprefix('sha256:'):
+              raise SystemExit('Job-to-job digest mismatch')
+          m.checked_zip(p)
+          import zipfile
+          with zipfile.ZipFile(p) as z:z.extractall('out/stage6/dist')
+          PY
+      - name: Publish non-latest research prerelease with full digest and tag read-back
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python evidence/energy_continuity/publication.py --out out/stage6
+      - name: Preserve exact publication or failure receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: energy-stage6-publication-${{ github.sha }}
+          path: |
+            out/stage6/PUBLICATION_RECEIPT.json
+            out/stage6/PUBLICATION_FAILURE.json
+          if-no-files-found: warn
+          retention-days: 30

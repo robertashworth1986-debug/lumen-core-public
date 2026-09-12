@@ -1,0 +1,53 @@
+name: Energy Stage 3 Historical Source Acquisition
+on:
+  push:
+    branches: ["exp/energy-stage3-integrity-20260905"]
+    paths: [".github/workflows/energy-stage3-history.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Fetch fixed 2023 and 2024 station set
+        run: |
+          python - <<'PY'
+          import datetime,gzip,hashlib,json,pathlib,urllib.request
+          root=pathlib.Path('out/stage3-history'); root.mkdir(parents=True,exist_ok=True)
+          records=[]
+          for station in ('41002','42001','44025','46042','46050','46237'):
+              for year in (2023,2024):
+                  name=f'{station}h{year}.txt.gz'
+                  url='https://www.ndbc.noaa.gov/data/historical/stdmet/'+name
+                  rec={'station':station,'year':year,'url':url,'retrieved_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+                  try:
+                      req=urllib.request.Request(url,headers={'User-Agent':'LumenCore-Research/1.0 retrospective-validation'})
+                      with urllib.request.urlopen(req,timeout=45) as r:
+                          b=r.read(25000001)
+                      if len(b)>25000000: raise ValueError('source exceeds frozen byte budget')
+                      txt=gzip.decompress(b)
+                      first=txt.splitlines()[0].decode('ascii')
+                      if 'WVHT' not in first or 'APD' not in first: raise ValueError('wave schema absent')
+                      (root/name).write_bytes(b)
+                      rec.update(status='ACQUIRED',bytes=len(b),sha256=hashlib.sha256(b).hexdigest(),decoded_bytes=len(txt),header=first)
+                  except Exception as e:
+                      rec.update(status='FAILED',error=type(e).__name__+': '+str(e)[:300])
+                  records.append(rec)
+                  print(station,year,rec['status'])
+          receipt={'records':records,'successful':sum(x['status']=='ACQUIRED' for x in records),'expected':12,'claim_boundary':'Acquisition only; no prediction or physical performance result.'}
+          (root/'SOURCE_MANIFEST.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          if receipt['successful']<12: raise SystemExit('Partial acquisition; failures retained in artifact')
+          PY
+      - name: Preserve source receipt including failures
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: energy-stage3-history-${{ github.sha }}
+          path: out/stage3-history/
+          retention-days: 30
+          if-no-files-found: error

@@ -1,0 +1,126 @@
+name: Preserve energy research checkpoint and paired-origin diagnostic
+
+on:
+  push:
+    branches: [exp/energy-stage4-delayed-router-20260905]
+    paths: [.github/workflows/energy-research-checkpoint.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: energy-research-checkpoint-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-and-package:
+    if: github.repository == 'robertashworth1986-debug/lumen-core-public' && github.ref == 'refs/heads/exp/energy-stage4-delayed-router-20260905'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      artifact_id: ${{ steps.archive.outputs.artifact-id }}
+      artifact_digest: ${{ steps.archive.outputs.artifact-digest }}
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.11'
+      - name: Install pinned numerical dependency
+        run: python -m pip install --disable-pip-version-check numpy==2.3.5
+      - name: Integrity and custody tests before acquisition
+        run: |
+          set -euo pipefail
+          mkdir -p out/checkpoint
+          python -m unittest discover -s experiments/energy_multisource/stage3 -p 'test_*.py' -v > out/checkpoint/TESTS_STAGE3.txt 2>&1
+          python -m unittest discover -s experiments/energy_multisource/stage4 -p 'test_*.py' -v > out/checkpoint/TESTS_STAGE4.txt 2>&1
+          python -m unittest discover -s experiments/energy_multisource/stage5 -p 'test_*.py' -v > out/checkpoint/TESTS_STAGE5.txt 2>&1
+          python -m unittest discover -s evidence/energy_continuity -p 'test_*.py' -v > out/checkpoint/TESTS_CUSTODY.txt 2>&1
+      - name: Preserve and verify nine exact prior research artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python evidence/energy_continuity/checkpoint.py acquire --out out/checkpoint | tee out/checkpoint/ACQUISITION.log
+      - name: Execute all 600 same-origin engineering diagnostics
+        run: |
+          set -euo pipefail
+          python experiments/energy_multisource/stage5/run_stage5.py --prior out/checkpoint/prior --out out/checkpoint/results | tee out/checkpoint/EXPERIMENT.log
+      - name: Package verified evidence and complete reachable Git ancestry
+        run: python evidence/energy_continuity/checkpoint.py package --out out/checkpoint
+      - name: Transfer verified package to publication job
+        id: archive
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: energy-checkpoint-package-${{ github.sha }}
+          path: out/checkpoint/dist/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Preserve execution receipts even on failure
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: energy-checkpoint-receipts-${{ github.sha }}
+          path: |
+            out/checkpoint/*.txt
+            out/checkpoint/*.json
+            out/checkpoint/*.log
+            out/checkpoint/results/
+          if-no-files-found: warn
+          retention-days: 30
+
+  publish-research-only:
+    needs: verify-and-package
+    if: github.repository == 'robertashworth1986-debug/lumen-core-public' && github.ref == 'refs/heads/exp/energy-stage4-delayed-router-20260905'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Read only the exact verified package artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACKAGE_ID: ${{ needs.verify-and-package.outputs.artifact_id }}
+          PACKAGE_SHA256: ${{ needs.verify-and-package.outputs.artifact_digest }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/checkpoint/dist
+          [[ "$PACKAGE_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$PACKAGE_ID/zip" > out/checkpoint/transfer.zip
+          python - <<'PY'
+          import importlib.util, os, pathlib, zipfile
+          script=pathlib.Path('evidence/energy_continuity/checkpoint.py')
+          spec=importlib.util.spec_from_file_location('custody',script)
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          p=pathlib.Path('out/checkpoint/transfer.zip')
+          expected=os.environ['PACKAGE_SHA256'].removeprefix('sha256:')
+          if m.digest(p)!=expected: raise SystemExit('Job-to-job artifact digest mismatch')
+          m.checked_zip(p)
+          with zipfile.ZipFile(p) as z:z.extractall('out/checkpoint/dist')
+          PY
+      - name: Publish non-latest research prerelease only after every uploaded digest matches
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python evidence/energy_continuity/checkpoint.py publish --out out/checkpoint
+      - name: Preserve publication read-back receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: energy-checkpoint-publication-${{ github.sha }}
+          path: out/checkpoint/PUBLICATION_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 30

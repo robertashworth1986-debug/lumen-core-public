@@ -1,0 +1,156 @@
+name: Energy Next-Stage Robustness Experiments
+
+on:
+  push:
+    branches:
+      - "exp/energy-multisource-breadth"
+    paths:
+      - "experiments/energy_multisource/run_next_stage_experiments.py"
+      - "tests/test_energy_next_stage_experiments.py"
+      - ".github/workflows/energy-next-stage-experiments.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: energy-next-stage-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Install frozen analysis dependencies
+        run: |
+          python -m pip install --disable-pip-version-check \
+            numpy==2.3.5 \
+            pandas==2.2.3 \
+            scipy==1.17.0 \
+            scikit-learn==1.8.0 \
+            openpyxl==3.1.5
+          python - <<'PY'
+          import numpy, pandas, scipy, sklearn, openpyxl
+          print('numpy', numpy.__version__)
+          print('pandas', pandas.__version__)
+          print('scipy', scipy.__version__)
+          print('scikit-learn', sklearn.__version__)
+          print('openpyxl', openpyxl.__version__)
+          PY
+
+      - name: Compile and run invariant tests
+        run: |
+          python -m py_compile experiments/energy_multisource/run_next_stage_experiments.py tests/test_energy_next_stage_experiments.py
+          python -m unittest tests/test_energy_next_stage_experiments.py -v
+
+      - name: Acquire official FORGE 1683 circulation workbook
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/next-stage/raw/forge1683
+          curl --fail --location --retry 6 --retry-delay 3 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0 reproducible-benchmark" \
+            "https://gdr.openei.org/files/1683/Extended%20Circulation%20Test.zip" \
+            -o out/next-stage/raw/forge1683/source.zip
+          unzip -t out/next-stage/raw/forge1683/source.zip
+          unzip -q out/next-stage/raw/forge1683/source.zip -d out/next-stage/raw/forge1683/extracted
+          test -s "out/next-stage/raw/forge1683/extracted/Extended Circulation Test/Extended Circulation Test Data 08082024 to 09052024 (30 sec increment).xlsx"
+
+      - name: Acquire FORGE 1149 open-hole stimulation workbook
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/next-stage/raw/forge1149
+          curl --fail --location --retry 6 --retry-delay 3 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0 reproducible-benchmark" \
+            "https://gdr.openei.org/files/1149/58-32_OpenHoleStimulation%20(1).xlsx" \
+            -o "out/next-stage/raw/forge1149/58-32_OpenHoleStimulation (1).xlsx"
+          test -s "out/next-stage/raw/forge1149/58-32_OpenHoleStimulation (1).xlsx"
+
+      - name: Acquire NOAA NDBC wave observations
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/next-stage/raw/ndbc
+          success=0
+          for station in 41002 42001 44025 46042 46050 46237; do
+            if curl --fail --location --retry 3 --retry-delay 2 \
+              --user-agent "LumenCore-Research/1.0" \
+              "https://www.ndbc.noaa.gov/data/realtime2/${station}.txt" \
+              -o "out/next-stage/raw/ndbc/${station}.txt"; then
+              if grep -q '^#YY' "out/next-stage/raw/ndbc/${station}.txt"; then
+                success=$((success+1))
+              else
+                rm -f "out/next-stage/raw/ndbc/${station}.txt"
+              fi
+            fi
+          done
+          echo "NDBC_STATIONS_ACQUIRED=$success"
+          test "$success" -ge 4
+
+      - name: Acquire complete USGS OFR 83-250 tables
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/next-stage/raw/usgs
+          curl --fail --location --retry 5 --retry-delay 3 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0" \
+            "https://www.sciencebase.gov/catalog/file/get/5d40b3f3e4b01d82ce8d9df5?f=__disk__63%2Fb7%2F80%2F63b7802742dd1ba7cc367f82981300c8a2b221c8" \
+            -o out/next-stage/raw/usgs/source.zip
+          unzip -t out/next-stage/raw/usgs/source.zip
+          unzip -q out/next-stage/raw/usgs/source.zip -d out/next-stage/raw/usgs/extracted
+          test -s out/next-stage/raw/usgs/extracted/OFR83250_DigitalData/OFR83250_Table1.csv
+          test -s out/next-stage/raw/usgs/extracted/OFR83250_DigitalData/OFR83250_Table2.csv
+
+      - name: Run next-stage experiment matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python experiments/energy_multisource/run_next_stage_experiments.py \
+            --forge1683-xlsx "out/next-stage/raw/forge1683/extracted/Extended Circulation Test/Extended Circulation Test Data 08082024 to 09052024 (30 sec increment).xlsx" \
+            --forge1149-openhole "out/next-stage/raw/forge1149/58-32_OpenHoleStimulation (1).xlsx" \
+            --wave-dir out/next-stage/raw/ndbc \
+            --usgs-table1 out/next-stage/raw/usgs/extracted/OFR83250_DigitalData/OFR83250_Table1.csv \
+            --usgs-table2 out/next-stage/raw/usgs/extracted/OFR83250_DigitalData/OFR83250_Table2.csv \
+            --out out/next-stage/results
+          python -m json.tool out/next-stage/results/summary.json >/dev/null
+          python -m json.tool out/next-stage/results/source_sha256.json >/dev/null
+
+      - name: Build chain-of-custody receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('out/next-stage')
+          files=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file() and p.name!='CHAIN_OF_CUSTODY.json':
+                  h=hashlib.sha256()
+                  with p.open('rb') as f:
+                      for b in iter(lambda:f.read(1024*1024),b''): h.update(b)
+                  files.append({'path':str(p.relative_to(root)),'size_bytes':p.stat().st_size,'sha256':h.hexdigest()})
+          receipt={'schema_version':'1.0','file_count':len(files),'files':files,'claim_boundary':'Offline retrospective screening only; no live control, safety, siting, reserve, bankability, or external-validation claim.'}
+          (root/'CHAIN_OF_CUSTODY.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          PY
+          python -m json.tool out/next-stage/CHAIN_OF_CUSTODY.json >/dev/null
+
+      - name: Upload next-stage evidence artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: energy-next-stage-${{ github.sha }}
+          path: out/next-stage/
+          if-no-files-found: error
+          retention-days: 30

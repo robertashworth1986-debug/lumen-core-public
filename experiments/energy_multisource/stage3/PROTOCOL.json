@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "experiment": "stage3_exact_time_separate_year_replication",
+  "parent_commit": "f5f98158a7d71137ac8974abd4ba9b574889ef0b",
+  "claim_boundary": "Offline research only; no production writes, equipment control, safety certification, energy-yield claim, or independent validation. FORGE reanalysis is exploratory because the historical record was already examined. Standard moving averages are baselines, not proprietary LumenCore inventions.",
+  "sources": {
+    "forge1683": {"source": "https://gdr.openei.org/submissions/1683", "prior_artifact_sha256": "dd995b13f8a16e29a58103d39542284010d02638bec16b2f49c9e13943c4cb5f", "target": "raw uncorrected SEP FLOW TOTAL (gpm)", "calibration_fraction_of_elapsed_time": 0.4, "horizon_minutes": [10,30,60], "window_minutes": [2.5,5,10,20,40,80], "issue_stride_minutes": 5, "external_validation": false},
+    "ndbc": {"source": "https://www.ndbc.noaa.gov/data/historical/stdmet/", "stations": ["41002","42001","44025","46042","46050","46237"], "calibration_year": 2023, "evaluation_year": 2024, "target": "WVHT squared times APD, units m^2 s; activity proxy only, not electrical generation or calibrated wave power", "horizon_minutes": [60,180,360], "window_minutes": [60,120,180,360], "issue_stride_minutes": 30, "missing_sentinels": {"WVHT": 99, "APD": 99}}
+  },
+  "timestamp_rules": ["Preserve original timeline; never remove rows before defining elapsed-time horizons", "Exact timestamp target join; missing target is unscored and never imputed", "No future-fill or backfill", "Duplicate timestamps fail validation", "Calibration target timestamp must be strictly before evaluation start", "Use observed finite nonnegative target values only; no unrelated sensor filters", "Moving averages require at least 80 percent of expected within-window observations", "Zero-baseline-error comparisons fail closed rather than divide by zero"],
+  "models": {
+    "persistence": "Most recent available valid observation; no learned parameters",
+    "rolling": "Choose one elapsed-time moving-average window by lowest pooled calibration MAE; tie goes to shorter window; freeze window before evaluation",
+    "matured_error_gate": "Use frozen rolling forecast only when the last seven fully matured calendar days contain at least five scored days, at least 80 percent of possible origin scores per day, pooled gain over persistence is at least five percent, and daily paired-error mean exceeds 1.96 times its standard error. Otherwise use persistence. A day's outcomes become eligible only after day-end plus forecast horizon; no use of partially matured outcomes. This is a heuristic fallback, not a safety guarantee."
+  },
+  "scoring": {"primary": "pooled MAE on common origin-target pairs", "secondary": ["95th percentile absolute error", "fraction of evaluated days worse than comparator", "fallback coverage", "unscored target fraction"], "comparisons": ["rolling versus persistence", "gate versus persistence", "gate versus rolling"], "family_size": 63, "bootstrap_replicates": 10000, "moving_block_days": {"forge": 3, "wave": 7}, "interval": "pointwise 95 percent paired moving-block bootstrap", "multiplicity": "Holm correction over 63 predeclared comparisons; unavailable cases assigned p=1", "replication_screen": "At least 5 percent lower pooled MAE, positive pointwise interval lower bound, and Holm-adjusted centered-bootstrap p below 0.05. These are screening criteria, not guarantees; short/nonstationary records weaken uncertainty estimates."},
+  "audit": ["Quantify original filtered-row horizon drift", "Count forward-filled target cells under previous protocol", "Check previous validation/test and completed-block outcome availability", "Retain failed acquisitions, negative results and code defects"],
+  "random_seed": 20260905,
+  "compute_budget": {"max_wall_minutes": 20, "max_new_source_downloads": 12, "max_source_bytes_each": 25000000},
+  "no_holdout_tuning": true
+}
