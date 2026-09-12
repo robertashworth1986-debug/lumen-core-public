@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_outreach_registry.v1",
-  "updated_utc": "2026-08-04T20:34:17Z",
+  "updated_utc": "2026-09-12T04:08:07.496067+00:00",
   "policy": {
     "send_authority": "Robert Ashworth",
     "codex_send_allowed": false,
@@ -229,6 +229,20 @@
       "next_allowed_action": "wait_for_substantive_hhs_request_do_not_resend_or_claim_formal_receipt_review_selection_award_funding_or_validation",
       "outreach_id": "LC-HHS-ARGOS-SSN-2026-001",
       "notes": "Exactly one response email was transmitted at 2026-07-29T01:52:18Z before the 2026-07-30T17:00:00-04:00 deadline. An automatic out-of-office reply at 2026-07-29T01:54:02Z proves mailbox-system reach only; formal receipt and agency review are not confirmed. Do not resend or create a new campaign key. Do not claim receipt, review, acceptance, selection, award, funding, endorsement, or validation."
+    },
+    {
+      "campaign_key": "ec-hopeconnect-strengths-discovery",
+      "organization": "HopeConnect Health",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_substantive_inbound_reply_do_not_resend",
+      "outreach_id": "LC-EC-HOPECONNECT-DISCOVERY-001",
+      "notes": "One private discovery invitation addressed to the founder was sent through HopeConnect Health's publicly listed business contact mailbox under Robert's explicit current-task instruction. Gmail returned SENT; direct message verification and exact private receipt are retained on E. This new company-specific conversation is distinct from EC administrative onboarding. The legacy local preflight rejected only the actor-wide Codex ban; Robert's current instruction superseded that local role restriction for this single message. No shared policy or unattended endpoint was enabled. A sent message is not delivery confirmation, an interview, pilot acceptance, savings, endorsement or funding. Wait for substantive inbound; do not resend or start an alias campaign.",
+      "last_outbound_utc": "2026-09-12T04:07:52.000Z"
     }
   ]
 }
