@@ -6,6 +6,7 @@ on:
       - "code/**"
       - "config/order_submission_path_policy.json"
       - "tests/test_order_safety*.py"
+      - "tests/test_trade_ledger_reconciliation.py"
       - ".github/workflows/order-safety-audit.yml"
   workflow_dispatch:
 
@@ -48,6 +49,10 @@ jobs:
             code/execution/alpaca_paper_executor.py \
             code/ops/LIQUIDATE_ALL_TO_USD.py \
             code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py \
+            code/ops/VERIFY_PAPER_LEDGER_RECONCILIATION.py \
+            code/ops/MIGRATE_PAPER_LEDGER_RECONCILIATION.py \
+            code/execution/trade_ledger.py \
+            code/execution/audit_chain.py \
             code/FULL_TRUTH_ORCHESTRATOR.py \
             code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py \
             code/beast_mode.py \
@@ -63,6 +68,7 @@ jobs:
           python tests/test_standalone_no_orders_facades.py
           python tests/test_order_safety_promotion_lane.py
           python tests/test_order_safety_alpaca_paper_boundary.py
+          python tests/test_trade_ledger_reconciliation.py
 
       - name: Audit all direct submission paths
         run: |
