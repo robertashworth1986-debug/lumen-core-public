@@ -3,10 +3,16 @@ from __future__ import annotations
 import ast
 import copy
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
+import textwrap
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest import SkipTest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -587,9 +593,27 @@ def test_live_metrics_sync_is_read_only_artifact_only_and_fail_closed() -> None:
     assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in metrics
     assert "retention-days: 14" in metrics
     assert "available_objects" in metrics
+    assert "https://lumen-core.ai/health" in metrics
+    assert "https://lumen-core.ai/api/public/status" in metrics
+    for protected_endpoint in (
+        "https://lumen-core.ai/api/live_status.json",
+        "https://lumen-core.ai/api/federal_brief.json",
+        "https://lumen-core.ai/api/evidence_summary.json",
+        "https://lumen-core.ai/api/executor_heartbeat.json",
+    ):
+        assert protected_endpoint not in metrics
+    assert '"$available_objects" -eq 2' in metrics
+    assert "public gateway contracts available" in metrics
     assert "Live metrics verdict:" in metrics
     assert "A completed metrics capture is not evidence of a healthy deployment" in metrics
     assert "Fail closed on non-operational verdict" in metrics
+    assert '--max-filesize "$JSON_MAX_BYTES"' in metrics
+    assert '--max-filesize "$STATIC_MAX_BYTES"' in metrics
+    assert "--proto '=https' --proto-redir '=https'" in metrics
+    workflow = (ROOT / ".github/workflows/gateway-public-contract-ci.yml").read_text(
+        encoding="utf-8"
+    )
+    assert workflow.count("- '.github/workflows/live-metrics-sync.yml'") == 2
     for forbidden in (
         "contents: write",
         "git config user.",
@@ -599,6 +623,214 @@ def test_live_metrics_sync_is_read_only_artifact_only_and_fail_closed() -> None:
         "git push ",
     ):
         assert forbidden not in metrics
+
+
+def _run_live_metrics_fixture(
+    *,
+    health_body: str | None = None,
+    status_body: str | None = None,
+    health_code: str = "200",
+    health_type: str = "application/json; charset=utf-8",
+    health_curl_status: str = "0",
+    homepage_body: str = '<meta name="lumencore-surface" content="proof-to-pilot-home-v1">',
+    homepage_code: str = "200",
+    homepage_type: str = "text/html; charset=utf-8",
+) -> tuple[dict, dict, dict, str]:
+    from operator_api_access import public_health_payload, public_status_payload
+
+    workflow = (ROOT / ".github/workflows/live-metrics-sync.yml").read_text(
+        encoding="utf-8"
+    )
+    match = re.search(
+        r"      - name: Fetch daily metrics snapshot\n.*?        run: \|\n"
+        r"(?P<script>.*?)\n      - name:",
+        workflow,
+        flags=re.DOTALL,
+    )
+    assert match is not None
+    script = textwrap.dedent(match.group("script"))
+    # Execute the actual workflow shell with an in-process curl replacement.
+    # No public or protected endpoint is contacted during this test.
+    fake_curl = r'''
+curl() {
+  local url="${!#}"
+  local output=""
+  while (( $# )); do
+    if [[ "$1" == "--output" ]]; then
+      output=$2
+      shift 2
+    else
+      shift
+    fi
+  done
+  [[ -n "$output" ]]
+  printf '%s\n' "$url" >> "$FIXTURE_CALLS"
+  case "$url" in
+    https://lumen-core.ai/health)
+      cat "$FIXTURE_HEALTH_FILE" > "$output"
+      printf '%s\t%s' "$FIXTURE_HEALTH_CODE" "$FIXTURE_HEALTH_TYPE"
+      return "$FIXTURE_HEALTH_CURL_STATUS"
+      ;;
+    https://lumen-core.ai/api/public/status)
+      cat "$FIXTURE_STATUS_FILE" > "$output"
+      printf '200\tapplication/json'
+      ;;
+    https://lumen-core.ai/)
+      cat "$FIXTURE_HOME_FILE" > "$output"
+      printf '%s\t%s' "$FIXTURE_HOME_CODE" "$FIXTURE_HOME_TYPE"
+      ;;
+    *) return 99 ;;
+  esac
+}
+'''
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        output = root / "outputs"
+        calls = root / "calls"
+        health_file = root / "health-fixture"
+        status_file = root / "status-fixture"
+        homepage_file = root / "homepage-fixture"
+        health_file.write_text(
+            json.dumps(public_health_payload()) if health_body is None else health_body,
+            encoding="utf-8",
+        )
+        status_file.write_text(
+            json.dumps(public_status_payload()) if status_body is None else status_body,
+            encoding="utf-8",
+        )
+        homepage_file.write_text(homepage_body, encoding="utf-8")
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
+            "METRICS_ARTIFACT_DIR": temporary,
+            "JSON_MAX_BYTES": "65536",
+            "STATIC_MAX_BYTES": "1048576",
+            "GITHUB_OUTPUT": str(output),
+            "FIXTURE_CALLS": str(calls),
+            "FIXTURE_HEALTH_FILE": str(health_file),
+            "FIXTURE_STATUS_FILE": str(status_file),
+            "FIXTURE_HEALTH_CODE": health_code,
+            "FIXTURE_HEALTH_TYPE": health_type,
+            "FIXTURE_HEALTH_CURL_STATUS": health_curl_status,
+            "FIXTURE_HOME_FILE": str(homepage_file),
+            "FIXTURE_HOME_CODE": homepage_code,
+            "FIXTURE_HOME_TYPE": homepage_type,
+        }
+        completed = subprocess.run(
+            ["/bin/bash", "-c", fake_curl + script],
+            env=env,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=20,
+        )
+        assert calls.read_text(encoding="utf-8").splitlines() == [
+            "https://lumen-core.ai/health",
+            "https://lumen-core.ai/api/public/status",
+            "https://lumen-core.ai/",
+        ]
+        outputs = dict(line.split("=", 1) for line in output.read_text().splitlines())
+        snapshot = json.loads((root / "live_snapshot.json").read_text())
+        badge = json.loads((root / "site_health_badge.json").read_text())
+        return outputs, snapshot, badge, completed.stdout + completed.stderr
+
+
+def test_live_metrics_workflow_accepts_current_minimal_public_contracts() -> None:
+    if not Path("/bin/bash").is_file() or shutil.which("jq") is None:
+        raise SkipTest("live metrics shell fixture requires Bash and jq")
+    outputs, snapshot, badge, _ = _run_live_metrics_fixture()
+    assert outputs["state"] == "operational"
+    assert outputs["available_objects"] == "2"
+    assert snapshot["site_contract_ok"] is True
+    assert snapshot["gateway_health"]["service"] == "luma-experience-gateway"
+    assert badge["color"] == "brightgreen"
+
+
+def test_live_metrics_workflow_rejects_invalid_or_private_gateway_payloads() -> None:
+    if not Path("/bin/bash").is_file() or shutil.which("jq") is None:
+        raise SkipTest("live metrics shell fixture requires Bash and jq")
+    from operator_api_access import public_health_payload, public_status_payload
+
+    public = public_status_payload()
+    private_marker = "SYNTHETIC_PRIVATE_VALUE_MUST_NOT_BE_RETAINED"
+    cases = [
+        {},
+        {"error": "offline"},
+        {**public, "status": "error"},
+        {**public, "service": "unrelated-service"},
+        {**public, "access_boundary": "operator_api_v0"},
+        {**public, "public_surface": "full"},
+        {**public, "status": True},
+        {**public, "private_detail": private_marker},
+        {key: value for key, value in public.items() if key != "service"},
+        [],
+    ]
+    raw_cases = [json.dumps(value) for value in cases] + [
+        "{malformed",
+        json.dumps(public) + json.dumps(public),
+        json.dumps(public)[:-1] + ',"status":"ok"}',
+        json.dumps(public)[:-1] + ',"extra":NaN}',
+    ]
+    for body in raw_cases:
+        outputs, snapshot, badge, logs = _run_live_metrics_fixture(status_body=body)
+        assert outputs["state"] == "degraded", body
+        assert outputs["available_objects"] == "1", body
+        assert snapshot["public_status"] is None, body
+        assert badge["color"] == "yellow", body
+        assert private_marker not in json.dumps(snapshot) + logs
+
+    health = public_health_payload()
+    for timestamp in (
+        "2020-01-01T00:00:00Z",
+        (datetime.now(timezone.utc) + timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "2026-02-30T00:00:00Z",
+        "not-a-timestamp",
+        "2026-09-09T00:00:00",
+        None,
+    ):
+        outputs, snapshot, _, _ = _run_live_metrics_fixture(
+            health_body=json.dumps({**health, "generated_utc": timestamp})
+        )
+        assert outputs["state"] == "degraded"
+        assert snapshot["gateway_health"] is None
+    # Even a valid object fails if its transfer exceeds the body limit.
+    outputs, snapshot, _, _ = _run_live_metrics_fixture(
+        health_body=json.dumps(health) + " " * 65536
+    )
+    assert outputs["state"] == "degraded"
+    assert snapshot["gateway_health"] is None
+
+
+def test_live_metrics_workflow_requires_successful_transport_and_homepage_contract() -> None:
+    if not Path("/bin/bash").is_file() or shutil.which("jq") is None:
+        raise SkipTest("live metrics shell fixture requires Bash and jq")
+    for fixture in (
+        {"health_code": "503"},
+        {"health_code": "206"},
+        {"health_code": "000"},
+        {"health_type": "text/html"},
+        {"health_curl_status": "28"},
+    ):
+        outputs, snapshot, badge, _ = _run_live_metrics_fixture(**fixture)
+        assert outputs["state"] == "degraded"
+        assert outputs["available_objects"] == "1"
+        assert snapshot["gateway_health"] is None
+        assert badge["color"] != "brightgreen"
+    for fixture in (
+        {"homepage_body": "<html>unrelated hosting page</html>"},
+        {"homepage_code": "206"},
+        {"homepage_body": "proof-to-pilot-home-v1"},
+        {"homepage_type": "text/plain"},
+        {"homepage_type": "text/html-unrelated"},
+        {"homepage_body": '<meta name="lumencore-surface" content="proof-to-pilot-home-v1">' + " " * 1048576},
+    ):
+        outputs, snapshot, badge, _ = _run_live_metrics_fixture(**fixture)
+        assert outputs["state"] == "degraded"
+        assert snapshot["site_contract_ok"] is False
+        assert badge["color"] == "yellow"
+    outputs, snapshot, badge, _ = _run_live_metrics_fixture(homepage_code="503")
+    assert outputs["state"] == "outage"
+    assert snapshot["site_contract_ok"] is False
+    assert badge["color"] == "red"
 
 
 def test_health_probe_static_contract_fails_closed() -> None:

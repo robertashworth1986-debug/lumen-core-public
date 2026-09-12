@@ -5,6 +5,85 @@
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
 
+## Engineering and paid-pilot reconciliation — September 9, 2026
+
+This pass advances **active outcome 2: one external validation or paid-pilot
+conversion**. The dated operating receipts below remain historical. They are
+not current uptime, buyer acceptance, or deployment authorization.
+
+**Inspected source:** `main@3dc5205c759ab264e4e49cc78f59feb2846f005c`.
+GitHub inspection found 18 open pull requests. PR #200's read-only monitoring
+change is already in this source. PR #196 (buyer-owned shadow replay), #211
+(public monitor endpoints), #215/#216 (energy research), and #217 (actor-policy
+parity) remain unmerged in this observation. Implementation on a PR branch is
+not evidence that its behavior is on main or deployed.
+
+### Immediate implementation and review path
+
+1. **Reliable observations — continue PR #211.** Its endpoint repair correctly
+   uses `/health` and `/api/public/status`, but merely accepting any JSON object
+   permits empty objects and error objects to produce an operational badge.
+   Require HTTP 200, the exact minimal public response, fresh health timestamps, bounded
+   response sizes, expected media types, and the existing homepage marker.
+   Retain only accepted public fields; failed checks remain non-operational.
+   Exercise the actual workflow shell with adversarial offline responses.
+   This is point-in-time liveness, not sustained availability, release parity,
+   private worker health, production readiness, or business performance.
+2. **Truthful replay custody — continue PR #196.** Its existing MAE/fallback
+   runner is the canonical buyer-owned implementation under review. A supplied
+   timestamp that precedes a supplied outcome-availability timestamp does not
+   prove that the forecast was committed before the outcome. Separate declared
+   ordering and metric qualification from verified custody. Favorable replay
+   scores require a custody hold until a real, reviewable pre-outcome commitment
+   exists; adverse results remain visible. Keep production credentials and
+   actuation absent. Do not create a competing replay engine.
+3. **One coherent offer — maintain the existing acquisition playbook.** Route
+   all current acquisition instructions through the Buyer-Owned Baseline
+   Validation Sprint, its fit intake, SOW, and offer registry. The proposed
+   $7,500 / $15,000 / from $25,000 tiers are untested prices. The registry does
+   not establish a signed paid scope or revenue. Historical four-product,
+   separate funding-sprint, and bulk-prospect directions are superseded.
+
+### Scientific and commercial priorities
+
+The Stage 6 closeout on research PR #215 at
+`e840cb1978634860567d2a55ca24b0761402784b` reports improved interval scores on
+reused data while high-activity coverage remains about 66.55% against nominal
+90%. Those are uncertainty-assurance diagnostics, not improved point forecasts,
+energy savings, customer economics, independent validation, or a fresh holdout.
+PR #216 is the newer regime-assurance continuation and must be reviewed before
+new research work is started.
+
+The next scientific gate is a frozen fresh-period evaluation with the primary
+metric, nominal coverage, high-activity definition, baseline, failure limits,
+and decision rule fixed before access to the evaluation outcomes. Report
+coverage and interval width together, retain undercoverage and regressions,
+and request qualified independent execution through the existing reviewer
+path. Repeated tuning on the same holdout cannot satisfy this gate.
+
+The next commercial gate is a single buyer-owned decision: an authorized data
+source, accepted incumbent, versioned candidate, primary metric and threshold,
+holdout, decision owner, purchasing route, and written acceptance terms. Use
+the existing intake and SOW. Delivery includes failures and neutral findings;
+payment must not depend on manufacturing a positive result. Recurring assurance
+is a follow-on hypothesis after a buyer accepts the first bounded engagement.
+
+Automation should first reduce the cost and delay of evidence collection,
+replay, adverse-case analysis, and reviewer handoff. Existing opportunity-agent
+PR #205 and custody-watchdog PR #206 are review candidates, not enabled runtime
+authority. They do not justify unattended outreach, financial execution, or
+physical control. Preserve the current campaign holds and existing production
+gates. No new product, dashboard, live-trading strategy, or patent disclosure
+is introduced by this pass.
+
+**Read-only live observation:** The revised monitor's capture step was executed
+locally against the three public URLs at `2026-09-09T00:45:41Z`. The homepage
+returned HTTP 200 and its expected meta marker; both minimal gateway contracts
+passed, including `/health` timestamp `2026-09-09T00:45:30Z`. The resulting
+verdict was `operational`. This establishes that bounded observation only.
+It did not dispatch a workflow, publish a badge, alter main, or change the VPS,
+DNS, production release, credentials, or any private endpoint.
+
 ## One commercial sentence
 
 LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routing, or infrastructure candidate against an accepted baseline under predeclared rules, then packages the result, failures, provenance, and claim boundary into a hash-verifiable decision record.

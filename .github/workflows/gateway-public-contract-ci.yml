@@ -28,6 +28,7 @@ on:
       - '.github/workflows/repair-gateway-dependency-closure.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
+      - '.github/workflows/live-metrics-sync.yml'
       - '.github/workflows/vps-storage-diagnostic.yml'
       - 'tests/test_vps_runtime_diagnostic_workflow.py'
   push:
@@ -58,6 +59,7 @@ on:
       - '.github/workflows/repair-gateway-dependency-closure.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
+      - '.github/workflows/live-metrics-sync.yml'
       - '.github/workflows/vps-storage-diagnostic.yml'
       - 'tests/test_vps_runtime_diagnostic_workflow.py'
   workflow_dispatch:
