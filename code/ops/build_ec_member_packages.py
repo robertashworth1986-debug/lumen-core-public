@@ -95,6 +95,10 @@ The public page keeps entries in this browser. This local runtime also saves a
 member-specific backup in .luma_data/{slug}/workspace.sqlite3. Its journal files
 are in the same folder. Use Export workspace to move data between computers;
 Your free package > Import a backup loads the matching member's backup.
+If this browser and the local backup contain different records, automatic
+backup pauses. Choose Review saved versions to download either version and
+select which records to keep. Two simultaneous sessions cannot silently
+overwrite each other's local backup. Closing the notice leaves backup paused.
 Keep the entire .luma_data folder private. It is ordinary local storage, not an
 encrypted clinical database. Do not enter patient identifiers, diagnoses, secrets,
 bank details or sensitive customer records. Revision files never leave the

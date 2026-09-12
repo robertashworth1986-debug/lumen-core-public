@@ -119,11 +119,58 @@ def test_private_http_boundaries(tmp_path):
         with urllib.request.urlopen(base+'/api/member/status') as r:assert json.load(r)['member']=='excalis'
         for path,headers in [('/api/member/status',{'Host':'attacker.example'}),('/api/member/status',{'Origin':'https://attacker.example'}),('/.luma_data/store.sqlite3',{})]:
             with pytest.raises(urllib.error.HTTPError):urllib.request.urlopen(urllib.request.Request(base+path,headers=headers))
-        req=urllib.request.Request(base+'/api/member/workspace',data=json.dumps({'member':'excalis','workspace':empty()}).encode(),headers={'Content-Type':'application/json','X-Luma-Local':'1'})
+        req=urllib.request.Request(base+'/api/member/workspace',data=json.dumps({'member':'excalis','workspace':empty(),'expected_revision':0}).encode(),headers={'Content-Type':'application/json','X-Luma-Local':'1'})
         with urllib.request.urlopen(req) as r:assert json.load(r)['saved'] is True
         with urllib.request.urlopen(base+'/api/member/workspace') as r:assert json.load(r)['workspace']['member']=='excalis'
         req=urllib.request.Request(base+'/api/member/workspace',data=b'{}',headers={'Content-Type':'application/json'})
         with pytest.raises(urllib.error.HTTPError):urllib.request.urlopen(req)
+    finally:server.shutdown();server.server_close();thread.join(timeout=2)
+
+def test_backup_revision_survives_restart_and_serializes_competing_writers(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    path=tmp_path/'workspace.sqlite3'
+    store=rt.Store(path)
+    # Existing unversioned backups remain readable during the upgrade.
+    store.put('workspace',empty())
+    assert store.workspace_snapshot()=={'workspace':empty(),'revision':0}
+    assert store.save_workspace(empty(),0)=={'saved':True,'revision':0}
+    for revision in (None,True,-1,'0'):
+        with pytest.raises(rt.UserError):store.save_workspace(empty(),revision)
+    barrier=threading.Barrier(2)
+    def writer(identity):
+        other=rt.Store(path);value=empty();value['scout']=[{'id':identity}]
+        barrier.wait(timeout=3)
+        try:return other.save_workspace(value,0)
+        except rt.WorkspaceConflict as exc:return {'conflict':exc.snapshot}
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results=list(pool.map(writer,['first','second']))
+    assert sum(r.get('saved',False) for r in results)==1
+    rejected=next(r['conflict'] for r in results if 'conflict' in r)
+    assert rt.Store(path).workspace_snapshot()==rejected
+    assert rejected['revision']==1
+
+def test_stale_browser_cannot_overwrite_a_newer_local_backup(tmp_path):
+    runtime=rt.MemberRuntime(PROFILE,rt.Store(tmp_path/'private/store.sqlite3'))
+    server=rt.ThreadingHTTPServer(('127.0.0.1',0),rt.make_handler(runtime,tmp_path/'public'))
+    thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+    base=f'http://127.0.0.1:{server.server_port}/api/member/workspace'
+    def post(workspace,revision):
+        req=urllib.request.Request(base,data=json.dumps({'member':'excalis','workspace':workspace,'expected_revision':revision}).encode(),headers={'Content-Type':'application/json','X-Luma-Local':'1'})
+        with urllib.request.urlopen(req) as response:return json.load(response)
+    try:
+        post(empty(),0)
+        newer=empty();newer['scout']=[{'id':'new-opportunity','title':'Newer owner record'}]
+        result=post(newer,1)
+        stale=empty();stale['scout']=[{'id':'old-opportunity','title':'Older browser record'}]
+        with pytest.raises(urllib.error.HTTPError) as conflict:
+            post(stale,1)
+        assert conflict.value.code==409
+        body=json.load(conflict.value)
+        assert body['conflict']['workspace']==newer
+        with urllib.request.urlopen(base) as response:
+            saved=json.load(response)
+        assert saved['workspace']==newer and saved['revision']==result['revision']
+        assert rt.Store(runtime.store.path).workspace_snapshot()==saved
     finally:server.shutdown();server.server_close();thread.join(timeout=2)
 
 def test_all_69_archives_are_bounded_scoped_and_hash_verified():
@@ -141,6 +188,8 @@ def test_all_69_archives_are_bounded_scoped_and_hash_verified():
             own=json.loads(z.read('public/cohort/catalog.json'))
             assert len(own['companies'])==1 and own['companies'][0]['id']==entry['member']
             pm=json.loads(z.read('package-manifest.json'));assert pm['member']==entry['member']
+            for archived,source in [('luma_runtime.py','code/ec_member_runtime.py'),('public/cohort/studio.js','dashboard/cohort/studio.js'),('public/cohort/core.js','dashboard/cohort/core.js')]:
+                assert z.read(archived)==(ROOT/source).read_bytes().replace(b'\r\n',b'\n')
             for f in pm['files']:
                 b=z.read(f['path']);assert len(b)==f['bytes'];assert hashlib.sha256(b).hexdigest()==f['sha256']
             assert {f['path'] for f in pm['files']}==set(names)-{'package-manifest.json'}

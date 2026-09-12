@@ -7,6 +7,15 @@ export function emptyWorkspace(member) {
   return {schema:SCHEMA, member, items:[], measurements:[], grants:[], scout:[], care:[], reviews:[], paper:null};
 }
 export function validText(value, max=2000) { return typeof value === 'string' && value.length <= max; }
+export function workspaceStartupChoice(local, saved) {
+  validateWorkspace(local, local.member);
+  if (saved === null) return 'browser';
+  validateWorkspace(saved, local.member);
+  const ordered=value=>Array.isArray(value)?value.map(ordered):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(k=>[k,ordered(value[k])])):value;
+  if (JSON.stringify(ordered(local)) === JSON.stringify(ordered(saved))) return 'same';
+  if (['items','measurements','grants','scout','care','reviews'].every(k=>local[k].length===0)&&local.paper===null) return 'backup';
+  return 'conflict';
+}
 export function validateWorkspace(value, member) {
   if (!value || value.schema !== SCHEMA || value.member !== member) throw new Error('This file belongs to a different member or workspace version.');
   const expected=['schema','member','items','measurements','grants','scout','care','reviews','paper'];

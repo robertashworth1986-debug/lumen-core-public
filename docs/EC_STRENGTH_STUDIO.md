@@ -29,7 +29,13 @@ members pay their own optional API usage.
 
 The public website stores work in the member's browser. The downloaded runtime
 also saves a local SQLite backup outside its public directory. Export/import
-preserves member identity. These are local workspaces, not hosted multi-user
+preserves member identity. A saved revision is required for each local backup
+write; the revision check and update share one SQLite transaction. If another
+session saved first, the server preserves that backup and returns a conflict.
+On startup, different nonempty browser and local versions pause backup until
+the owner reviews them. The recovery screen offers separate downloads and an
+explicit choice. An empty browser can restore its local backup automatically.
+These are local workspaces, not hosted multi-user
 accounts. Team access, business-system connections and regulated data require
 an owner-approved deployment and review. Government certification, HIPAA
 compliance, independent validation, achieved savings and trading profit are not

@@ -45,6 +45,11 @@ ALLOWED_API = {'api.openai.com', 'api.grants.gov', 'api.exchange.coinbase.com'}
 class UserError(ValueError):
     pass
 
+class WorkspaceConflict(UserError):
+    def __init__(self, snapshot):
+        super().__init__('Another session changed the local backup. Review both saved versions before replacing it.')
+        self.snapshot = snapshot
+
 def now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')
 
@@ -154,6 +159,28 @@ class Store:
     def put(self, key, value):
         with self.connect() as con:
             con.execute('INSERT INTO state VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value', (key, canonical(value)))
+    @staticmethod
+    def _workspace_snapshot(con):
+        rows = dict(con.execute("SELECT key,value FROM state WHERE key IN ('workspace','workspace_revision')"))
+        return {'workspace': json.loads(rows['workspace']) if 'workspace' in rows else None,
+                'revision': json.loads(rows.get('workspace_revision', '0'))}
+    def workspace_snapshot(self):
+        with self.connect() as con:
+            return self._workspace_snapshot(con)
+    def save_workspace(self, workspace, expected_revision):
+        if type(expected_revision) is not int or expected_revision < 0:
+            raise UserError('A current backup revision is required. Reload this workspace before saving.')
+        with self.connect() as con:
+            con.execute('BEGIN IMMEDIATE')
+            current = self._workspace_snapshot(con)
+            if expected_revision != current['revision']:
+                raise WorkspaceConflict(current)
+            revision = current['revision']
+            if current['workspace'] != workspace:
+                revision += 1
+                con.executemany('INSERT INTO state VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value',
+                                [('workspace', canonical(workspace)), ('workspace_revision', canonical(revision))])
+        return {'saved': True, 'revision': revision}
     def event(self, kind, payload):
         with self.connect() as con:
             con.execute('BEGIN IMMEDIATE')
@@ -440,8 +467,8 @@ def make_handler(runtime: MemberRuntime, public_dir: Path):
                 if path=='/':
                     self.send_response(302);self.send_header('Location',f'/cohort/?member={runtime.profile["id"]}');self.end_headers();return
                 if path=='/health': return self.respond(200,{'status':'ok'})
-                if path=='/api/member/status':return self.respond(200,{'ready':True,'member':runtime.profile['id'],'ai_ready':bool(os.environ.get('OPENAI_API_KEY')),'schedules':runtime.store.get('schedules',{}),'live_orders':False})
-                if path=='/api/member/workspace':return self.respond(200,{'workspace':runtime.store.get('workspace')})
+                if path=='/api/member/status':return self.respond(200,{'ready':True,'member':runtime.profile['id'],'ai_ready':bool(os.environ.get('OPENAI_API_KEY')),'schedules':runtime.store.get('schedules',{}),'live_orders':False,'workspace_revision_check':True})
+                if path=='/api/member/workspace':return self.respond(200,runtime.store.workspace_snapshot())
                 if path=='/api/member/activity':return self.respond(200,{'paper':runtime.store.get('paper_bot'),'scout':runtime.store.get('scout_latest'),'schedules':runtime.store.get('schedules',{}),'errors':{k:runtime.store.get(k+'_last_error') for k in ('paper','scout')}})
                 if path=='/api/member/audit':return self.respond(200,{'events':runtime.store.audit(),'boundary':'Local integrity chain; not external attestation.'})
                 if path not in STATIC_PATHS: return self.respond(404,{'detail':'Not found.'})
@@ -477,13 +504,14 @@ def make_handler(runtime: MemberRuntime, public_dir: Path):
                 path=urlparse(self.path).path
                 if path=='/api/member/workspace':
                     workspace=validate_workspace(payload.get('workspace'),runtime.profile['id'])
-                    runtime.store.put('workspace',workspace)
-                    return self.respond(200,{'saved':True})
+                    return self.respond(200,runtime.store.save_workspace(workspace,payload.get('expected_revision')))
                 if path=='/api/member/schedule':
                     return self.respond(200,{'schedules':runtime.schedule(payload.get('kind'),payload.get('enabled'))})
                 if path in {'/api/member/assistant','/api/member/scout','/api/member/paper'}:
                     return self.respond(200,runtime.run(path.rsplit('/',1)[1],payload))
                 return self.respond(404,{'detail':'No such operation.'})
+            except WorkspaceConflict as exc:
+                return self.respond(409,{'detail':str(exc),'conflict':exc.snapshot})
             except UserError as exc:
                 return self.respond(400,{'detail':str(exc)})
             except (ValueError,TypeError):
