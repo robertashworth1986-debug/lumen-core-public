@@ -79,6 +79,19 @@ class IncidentReadinessTests(unittest.TestCase):
         with self.assertRaisesRegex(readiness.ContinuityVerificationError, "ISO-8601"):
             readiness.verify(root=ROOT, verified_utc="not-a-time")
 
+    def test_same_attempt_compensation_authority_remains_narrow(self) -> None:
+        policy = json.loads(
+            (ROOT / "config" / "incident_response_and_continuity_v1.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        automated = " ".join(policy["automated_actions_allowed"]).lower()
+        human = " ".join(policy["human_authorization_required"]).lower()
+        self.assertIn("same still-running human-approved exact-snapshot workflow attempt", automated)
+        self.assertIn("captured allowlisted local static state", automated)
+        self.assertIn("arbitrary or earlier rollback capture", human)
+        self.assertIn("later incident repair", human)
+
 
 if __name__ == "__main__":
     unittest.main()

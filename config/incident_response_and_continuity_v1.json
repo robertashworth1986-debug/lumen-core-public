@@ -65,7 +65,8 @@
     "collect public HTTP status, MIME, byte count, and SHA-256 evidence",
     "classify bounded release drift up to SEV-2",
     "emit and upload a machine-readable incident receipt",
-    "fail the audit workflow and recommend a promotion hold"
+    "fail the audit workflow and recommend a promotion hold",
+    "within the same still-running human-approved exact-snapshot workflow attempt, restore only its captured allowlisted local static state after external live-gate rejection"
   ],
   "human_authorization_required": [
     "deploy an exact public-site snapshot",
@@ -76,7 +77,9 @@
     "delete or disclose data or evidence",
     "accept legal terms or make a certification or attestation",
     "place a trade or enable production execution",
-    "close an incident after a live production change"
+    "close an incident after a live production change",
+    "restore an arbitrary or earlier rollback capture outside its still-running approved exact-snapshot attempt",
+    "retry, redeploy, or initiate later incident repair after same-run compensation is incomplete or verified"
   ],
   "containment_sequence": [
     "preserve the immutable release package, manifest, live audit, and incident receipt",
@@ -91,7 +94,9 @@
     "obtain the separate gateway-repair approval before changing gateway dependencies or runtime secrets",
     "apply only the allowlisted release with rollback capture",
     "rerun the full-manifest exact-byte and MIME audit against the deployed commit",
-    "verify critical routes and retain deployment, rollback, and live-audit receipts",
+    "if the external gate rejects or cannot produce a valid receipt while the approved attempt is still running, require its one-attempt capability and restore only the exact captured allowlisted local state after complete no-drift preflight",
+    "retain the immutable rollback authority, deployment, live-audit, compensation, and aggregate transaction receipts while keeping a rejected candidate workflow red",
+    "verify critical routes for a successful candidate; treat verified local compensation as bounded prior-state restoration rather than public recovery or incident closure",
     "close only after the current commit reports release_verified true and any separate incident lane is resolved"
   ],
   "evidence_retention": {

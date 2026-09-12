@@ -106,6 +106,7 @@ EXPECTED_AUTOMATED_ACTIONS = {
     "classify bounded release drift up to SEV-2",
     "emit and upload a machine-readable incident receipt",
     "fail the audit workflow and recommend a promotion hold",
+    "within the same still-running human-approved exact-snapshot workflow attempt, restore only its captured allowlisted local static state after external live-gate rejection",
 }
 REQUIRED_HUMAN_ACTIONS = {
     "deploy an exact public-site snapshot",

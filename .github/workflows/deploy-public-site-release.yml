@@ -50,7 +50,7 @@ jobs:
     needs: authorize
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     environment:
       name: production
       url: https://lumen-core.ai/
@@ -58,6 +58,7 @@ jobs:
       APPROVAL: ${{ inputs.approval }}
       RELEASE_COMMIT: ${{ needs.authorize.outputs.source_commit }}
       REMOTE_STAGE: /tmp/lumencore-public-site-${{ github.run_id }}-${{ github.run_attempt }}
+      CAPABILITY_FILE: /tmp/public-site-rollback-capability-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
       - name: Checkout the approved commit
@@ -67,16 +68,42 @@ jobs:
           persist-credentials: false
           ref: ${{ needs.authorize.outputs.source_commit }}
 
+      - name: Set up the bounded runner Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11.9'
+
       - name: Package the exact immutable public site
         shell: bash
         run: |
           set -euo pipefail
           install -d -m 700 /tmp/public-site-release
-          python3 code/deploy/package_public_site_release.py \
+          python code/deploy/package_public_site_release.py \
             --source-commit "$RELEASE_COMMIT" \
             --archive /tmp/public-site-release/public-site-release.tar \
             --manifest /tmp/public-site-release/public-site-release-manifest.json \
             | tee /tmp/public-site-package-receipt.json
+
+      - name: Create one-attempt rollback capability
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$CAPABILITY_FILE" =~ ^/tmp/public-site-rollback-capability-[0-9]+-[0-9]+$ ]]
+          test ! -e "$CAPABILITY_FILE"
+          python - "$CAPABILITY_FILE" <<'PY'
+          from pathlib import Path
+          import secrets
+          import sys
+
+          path = Path(sys.argv[1])
+          path.write_text(secrets.token_hex(32) + "\n", encoding="ascii", newline="\n")
+          PY
+          chmod 600 "$CAPABILITY_FILE"
+          capability="$(tr -d '\n' < "$CAPABILITY_FILE")"
+          [[ "$capability" =~ ^[0-9a-f]{64}$ ]]
+          printf '::add-mask::%s\n' "$capability"
+          unset capability
 
       - name: Install SSH key
         uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
@@ -94,9 +121,10 @@ jobs:
             set -eu
             sudo -n true
             sudo -n test -d /opt/lumencore/dashboard
-            for command_name in python3 sha256sum stat cp cmp install date mktemp realpath; do
+            for command_name in python3 sha256sum stat cp cmp install date mktemp realpath dirname basename flock; do
               command -v "$command_name" >/dev/null
             done
+            python3 -c "import sys; print('REMOTE_PYTHON_VERSION=' + '.'.join(map(str, sys.version_info[:3]))); raise SystemExit(0 if sys.version_info >= (3, 9) else 1)"
           '
 
       - name: Upload bounded release package
@@ -111,32 +139,211 @@ jobs:
           scp -o BatchMode=yes \
             /tmp/public-site-release/public-site-release.tar \
             /tmp/public-site-release/public-site-release-manifest.json \
+            code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh \
+            code/deploy/DISCOVER_PUBLIC_SITE_ROLLBACK_AUTHORITY_ON_VPS.py \
+            code/deploy/RESTORE_PUBLIC_SITE_RELEASE_ON_VPS.sh \
             "opc@$VPS_HOST:$REMOTE_STAGE/"
 
       - name: Apply exact files with rollback capture
+        id: apply
+        continue-on-error: true
         shell: bash
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
         run: |
           set -euo pipefail
-          ssh -o BatchMode=yes "opc@$VPS_HOST" \
-            "sudo -n bash -s -- \
+          test -f "$CAPABILITY_FILE"
+          set +e
+          cat "$CAPABILITY_FILE" \
+            | ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "sudo -n bash '$REMOTE_STAGE/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh' \
               --archive '$REMOTE_STAGE/public-site-release.tar' \
               --manifest '$REMOTE_STAGE/public-site-release-manifest.json' \
               --source-commit '$RELEASE_COMMIT' \
+              --run-id '${{ github.run_id }}' \
+              --run-attempt '${{ github.run_attempt }}' \
+              --rollback-capability-stdin \
               --approval '$APPROVAL'" \
-            < code/deploy/APPLY_PUBLIC_SITE_RELEASE_ON_VPS.sh \
-            | tee /tmp/public-site-deploy-receipt.txt
+            | tee /tmp/public-site-apply-command.txt
+          apply_status=$?
+          set -e
+          exit "$apply_status"
 
-      - name: Verify every live byte against the release manifest
+      - name: Discover exact remote authority and verify every live byte
+        id: live_gate
+        if: always()
+        continue-on-error: true
         shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
         run: |
           set -euo pipefail
-          python3 code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py \
+          test -f "$CAPABILITY_FILE"
+          capability="$(tr -d '\n' < "$CAPABILITY_FILE")"
+          [[ "$capability" =~ ^[0-9a-f]{64}$ ]]
+          capability_sha256="$(printf '%s' "$capability" | sha256sum)"
+          capability_sha256="${capability_sha256%% *}"
+          unset capability
+          [[ "$capability_sha256" =~ ^[0-9a-f]{64}$ ]]
+          ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "sudo -n python3 '$REMOTE_STAGE/DISCOVER_PUBLIC_SITE_ROLLBACK_AUTHORITY_ON_VPS.py' \
+              --source-commit '$RELEASE_COMMIT' \
+              --run-id '${{ github.run_id }}' \
+              --run-attempt '${{ github.run_attempt }}' \
+              --capability-sha256 '$capability_sha256'" \
+            | tee /tmp/public-site-deploy-receipt.txt
+          extract_one() {
+            local key="$1" value
+            mapfile -t values < <(sed -n "s/^${key}=//p" /tmp/public-site-deploy-receipt.txt)
+            [[ "${#values[@]}" -eq 1 ]]
+            value="${values[0]}"
+            printf '%s' "$value"
+          }
+          [[ "$(extract_one PUBLIC_SITE_SOURCE_COMMIT)" == "$RELEASE_COMMIT" ]]
+          [[ "$(extract_one PUBLIC_SITE_RUN_ID)" == "${{ github.run_id }}" ]]
+          [[ "$(extract_one PUBLIC_SITE_RUN_ATTEMPT)" == "${{ github.run_attempt }}" ]]
+          rollback_dir="$(extract_one PUBLIC_SITE_ROLLBACK_DIR)"
+          authority_hash="$(extract_one PUBLIC_SITE_ROLLBACK_AUTHORITY_SHA256)"
+          [[ "$rollback_dir" =~ ^/opt/lumencore/rollbacks/public-site/[0-9]{8}T[0-9]{6}Z-${RELEASE_COMMIT:0:12}$ ]]
+          [[ "$authority_hash" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$(grep -c '^PUBLIC_SITE_DEPLOYMENT_OK$' /tmp/public-site-deploy-receipt.txt)" -eq 1 ]]
+          ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "sudo -n cat '$rollback_dir/rollback-authority.json'" \
+            > /tmp/public-site-rollback-authority.json
+          test -s /tmp/public-site-rollback-authority.json
+          python code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py \
             --manifest /tmp/public-site-release/public-site-release-manifest.json \
             --source-commit "$RELEASE_COMMIT" \
             --base-url https://lumen-core.ai \
             --output /tmp/public-site-live-gate.json
+
+      - name: Compensate a rejected candidate within the same approved attempt
+        id: compensation
+        if: always() && steps.live_gate.outcome == 'failure'
+        continue-on-error: true
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          test -f "$CAPABILITY_FILE"
+          capability="$(tr -d '\n' < "$CAPABILITY_FILE")"
+          [[ "$capability" =~ ^[0-9a-f]{64}$ ]]
+          capability_sha256="$(printf '%s' "$capability" | sha256sum)"
+          capability_sha256="${capability_sha256%% *}"
+          unset capability
+          [[ "$capability_sha256" =~ ^[0-9a-f]{64}$ ]]
+          ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "sudo -n python3 '$REMOTE_STAGE/DISCOVER_PUBLIC_SITE_ROLLBACK_AUTHORITY_ON_VPS.py' \
+              --source-commit '$RELEASE_COMMIT' \
+              --run-id '${{ github.run_id }}' \
+              --run-attempt '${{ github.run_attempt }}' \
+              --capability-sha256 '$capability_sha256'" \
+            | tee /tmp/public-site-deploy-receipt.txt
+          extract_one() {
+            local key="$1" value
+            mapfile -t values < <(sed -n "s/^${key}=//p" /tmp/public-site-deploy-receipt.txt)
+            [[ "${#values[@]}" -eq 1 ]]
+            value="${values[0]}"
+            printf '%s' "$value"
+          }
+          [[ "$(extract_one PUBLIC_SITE_SOURCE_COMMIT)" == "$RELEASE_COMMIT" ]]
+          [[ "$(extract_one PUBLIC_SITE_RUN_ID)" == "${{ github.run_id }}" ]]
+          [[ "$(extract_one PUBLIC_SITE_RUN_ATTEMPT)" == "${{ github.run_attempt }}" ]]
+          ROLLBACK_DIR="$(extract_one PUBLIC_SITE_ROLLBACK_DIR)"
+          authority_hash="$(extract_one PUBLIC_SITE_ROLLBACK_AUTHORITY_SHA256)"
+          [[ "$ROLLBACK_DIR" =~ ^/opt/lumencore/rollbacks/public-site/[0-9]{8}T[0-9]{6}Z-${RELEASE_COMMIT:0:12}$ ]]
+          [[ "$authority_hash" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$(grep -c '^PUBLIC_SITE_DEPLOYMENT_OK$' /tmp/public-site-deploy-receipt.txt)" -eq 1 ]]
+          ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "sudo -n cat '$ROLLBACK_DIR/rollback-authority.json'" \
+            > /tmp/public-site-rollback-authority.json
+          test -s /tmp/public-site-rollback-authority.json
+          trigger="LIVE_GATE_ERROR_OR_MISSING"
+          live_gate_argument=""
+          if [[ -f /tmp/public-site-live-gate.json ]]; then
+            if python code/ops/BUILD_PUBLIC_SITE_DEPLOYMENT_TRANSACTION_RECEIPT.py \
+              validate-rejected-live \
+              --manifest /tmp/public-site-release/public-site-release-manifest.json \
+              --receipt /tmp/public-site-live-gate.json \
+              --source-commit "$RELEASE_COMMIT"; then
+              trigger="LIVE_GATE_REJECTED"
+              scp -o BatchMode=yes /tmp/public-site-live-gate.json \
+                "opc@$VPS_HOST:$REMOTE_STAGE/public-site-live-gate.json"
+              live_gate_argument="--live-gate-receipt '$REMOTE_STAGE/public-site-live-gate.json'"
+            else
+              mv -- /tmp/public-site-live-gate.json /tmp/public-site-live-gate.untrusted.json
+            fi
+          fi
+          set +e
+          cat "$CAPABILITY_FILE" \
+            | ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "sudo -n bash '$REMOTE_STAGE/RESTORE_PUBLIC_SITE_RELEASE_ON_VPS.sh' \
+              --rollback-dir '$ROLLBACK_DIR' \
+              --source-commit '$RELEASE_COMMIT' \
+              --run-id '${{ github.run_id }}' \
+              --run-attempt '${{ github.run_attempt }}' \
+              --rollback-capability-stdin \
+              --trigger '$trigger' \
+              $live_gate_argument \
+              --approval '$APPROVAL'" \
+            | tee /tmp/public-site-compensation-command.txt
+          compensation_status=$?
+          set -e
+          if ssh -o BatchMode=yes "opc@$VPS_HOST" \
+            "sudo -n test -f '$ROLLBACK_DIR/rollback-receipt.json' && sudo -n cat '$ROLLBACK_DIR/rollback-receipt.json'" \
+            > /tmp/public-site-compensation-receipt.json; then
+            test -s /tmp/public-site-compensation-receipt.json
+          else
+            rm -f /tmp/public-site-compensation-receipt.json
+            [[ "$compensation_status" -ne 0 ]]
+          fi
+          exit "$compensation_status"
+
+      - name: Build status-only deployment transaction receipt
+        id: transaction
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          LIVE_OUTCOME: ${{ steps.live_gate.outcome }}
+          COMPENSATION_OUTCOME: ${{ steps.compensation.outcome }}
+        run: |
+          set -euo pipefail
+          apply_outcome="failure"
+          live_outcome="skipped"
+          compensation_outcome="skipped"
+          apply_receipt="-"
+          authority_receipt="-"
+          live_receipt="-"
+          compensation_receipt="-"
+          if [[ -s /tmp/public-site-deploy-receipt.txt && -s /tmp/public-site-rollback-authority.json ]]; then
+            apply_outcome="success"
+            apply_receipt=/tmp/public-site-deploy-receipt.txt
+            authority_receipt=/tmp/public-site-rollback-authority.json
+            live_outcome="$LIVE_OUTCOME"
+            compensation_outcome="$COMPENSATION_OUTCOME"
+          fi
+          if [[ -f /tmp/public-site-live-gate.json ]]; then
+            live_receipt=/tmp/public-site-live-gate.json
+          fi
+          if [[ "$COMPENSATION_OUTCOME" == "success" ]]; then
+            compensation_receipt=/tmp/public-site-compensation-receipt.json
+          fi
+          python code/ops/BUILD_PUBLIC_SITE_DEPLOYMENT_TRANSACTION_RECEIPT.py \
+            --source-commit "$RELEASE_COMMIT" \
+            --run-id '${{ github.run_id }}' \
+            --run-attempt '${{ github.run_attempt }}' \
+            --manifest /tmp/public-site-release/public-site-release-manifest.json \
+            --package-receipt /tmp/public-site-package-receipt.json \
+            --apply-receipt "$apply_receipt" \
+            --authority-receipt "$authority_receipt" \
+            --live-gate-receipt "$live_receipt" \
+            --compensation-receipt "$compensation_receipt" \
+            --apply-outcome "$apply_outcome" \
+            --live-gate-outcome "$live_outcome" \
+            --compensation-outcome "$compensation_outcome" \
+            --output /tmp/public-site-deployment-transaction.json
 
       - name: Remove remote transfer staging
         if: always()
@@ -149,6 +356,14 @@ jobs:
           [[ "$REMOTE_STAGE" =~ ^/tmp/lumencore-public-site-[0-9]+-[0-9]+$ ]]
           ssh -o BatchMode=yes "opc@$VPS_HOST" "rm -rf -- '$REMOTE_STAGE'"
 
+      - name: Remove the ephemeral rollback capability
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$CAPABILITY_FILE" =~ ^/tmp/public-site-rollback-capability-[0-9]+-[0-9]+$ ]]
+          rm -f -- "$CAPABILITY_FILE"
+
       - name: Upload deployment receipts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -156,7 +371,42 @@ jobs:
           name: public-site-deploy-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             /tmp/public-site-package-receipt.json
+            /tmp/public-site-apply-command.txt
             /tmp/public-site-deploy-receipt.txt
+            /tmp/public-site-rollback-authority.json
             /tmp/public-site-live-gate.json
+            /tmp/public-site-live-gate.untrusted.json
+            /tmp/public-site-compensation-command.txt
+            /tmp/public-site-compensation-receipt.json
+            /tmp/public-site-deployment-transaction.json
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Upload the strict transaction receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: public-site-transaction-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/public-site-deployment-transaction.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Adjudicate the deployment transaction
+        if: always()
+        shell: bash
+        env:
+          TRANSACTION_OUTCOME: ${{ steps.transaction.outcome }}
+        run: |
+          set -euo pipefail
+          [[ "$TRANSACTION_OUTCOME" == "success" ]]
+          python code/ops/BUILD_PUBLIC_SITE_DEPLOYMENT_TRANSACTION_RECEIPT.py \
+            verify \
+            --receipt /tmp/public-site-deployment-transaction.json \
+            --source-commit "$RELEASE_COMMIT" \
+            --run-id '${{ github.run_id }}' \
+            --run-attempt '${{ github.run_attempt }}' \
+            --manifest /tmp/public-site-release/public-site-release-manifest.json \
+            --package-receipt /tmp/public-site-package-receipt.json \
+            --apply-receipt /tmp/public-site-deploy-receipt.txt \
+            --authority-receipt /tmp/public-site-rollback-authority.json \
+            --live-gate-receipt /tmp/public-site-live-gate.json
