@@ -111,6 +111,7 @@ Your three specific workflow hypotheses and source URLs: member-research.json
 Package contents and hashes: package-manifest.json
 Repository: https://github.com/robertashworth1986-debug/lumen-core-public
 Public gift: https://lumen-core.ai/cohort/?member={slug}
+Public strength profile: https://lumen-core.ai/cohort/members/{slug}.html
 Grants.gov: https://www.grants.gov/search-grants
 OpenAI Responses: https://developers.openai.com/api/docs/guides/text
 Coinbase public candles: https://docs.cdp.coinbase.com/api-reference/exchange-api/rest-api/products/get-product-candles

@@ -91,8 +91,9 @@ and submission paths are excluded from member workspaces.
 
 ## Publication
 
-The existing manual exact-snapshot workflow publishes the 119 explicitly allowed
-files: the original 43 public files plus 76 cohort files, including 69 ZIPs.
+The existing manual exact-snapshot workflow publishes the 189 explicitly allowed
+files: the original 43 public files plus 146 cohort files, including 69 ZIPs,
+69 standalone public member profiles and one public directory.
 It uses existing production deployment credentials. It does not redeploy the
 gateway, modify server secrets, or expose a shared API key.
 
@@ -112,3 +113,25 @@ certification or a vulnerability-free assertion.
 
 Public business descriptions and improvement questions remain subject to owner
 correction. This contribution does not imply EC or individual member endorsement.
+
+## Public member discovery
+
+Each business has a permanent, pre-rendered strength profile under
+`/cohort/members/<member-id>.html`, linked from `/cohort/directory.html` and the
+interactive directory. The returned HTML includes the business name, public
+strength, three hypotheses, measurement plans, source links and toolkit access.
+Unique title, description, canonical and Open Graph metadata identify that
+profile. The sitemap lists all 69 profiles and the public directory. This makes
+the pages available to crawlers and link previews; indexing, ranking and actual
+discovery are not established by publication.
+
+The existing catalog builder generates these pages from the same reviewed public
+CSV. It makes no AI request. The static profile remains readable without
+JavaScript, and links to the shared interactive workspace and the matching ZIP.
+Member profiles identify the contribution as independent, preserve unknown
+baselines and direct readers to each business's source material.
+
+Google's [JavaScript SEO guidance](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics)
+supports pre-rendered content, crawlable links, unique metadata and consistent
+canonical URLs. Its [sitemap guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview)
+describes discovery assistance without guaranteeing indexing.
