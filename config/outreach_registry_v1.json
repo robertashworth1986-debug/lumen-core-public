@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_outreach_registry.v1",
-  "updated_utc": "2026-09-12T04:08:07.496067+00:00",
+  "updated_utc": "2026-09-12T11:57:39.515579+00:00",
   "policy": {
     "send_authority": "Robert Ashworth",
     "codex_send_allowed": false,
@@ -243,6 +243,20 @@
       "outreach_id": "LC-EC-HOPECONNECT-DISCOVERY-001",
       "notes": "One private discovery invitation addressed to the founder was sent through HopeConnect Health's publicly listed business contact mailbox under Robert's explicit current-task instruction. Gmail returned SENT; direct message verification and exact private receipt are retained on E. This new company-specific conversation is distinct from EC administrative onboarding. The legacy local preflight rejected only the actor-wide Codex ban; Robert's current instruction superseded that local role restriction for this single message. No shared policy or unattended endpoint was enabled. A sent message is not delivery confirmation, an interview, pilot acceptance, savings, endorsement or funding. Wait for substantive inbound; do not resend or start an alias campaign.",
       "last_outbound_utc": "2026-09-12T04:07:52.000Z"
+    },
+    {
+      "campaign_key": "ec-takeoff-strengths-resource",
+      "organization": "Nashville Entrepreneur Center - TakeOff Fall 2026 AM and PM cohort groups",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 2,
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_program_manager_distribution_guidance_and_substantive_owner_replies_no_group_retry",
+      "outreach_id": "LC-EC-COHORT-STRENGTHS-001",
+      "notes": "One owner-requested resource introduction was sent to the official Fall 2026 AM and PM mailing groups. Direct Gmail readback verified SENT, exact body and addressed groups. The AM group returned a delivery failure: missing group or posting permission was not distinguished. PM individual delivery is unconfirmed. One direct delivery-resolution request was then sent to the verified EC program manager in the same resource thread; SENT and exact body were verified. Both outbound messages carry the Outreach Lock label. The research links cover 69 companies and invite corrections; the text explicitly states that member software remains in development. Exact route, content, failure and send identities remain private on E. This is not a completed interview, pilot, savings result, software delivery or endorsement. Current explicit founder instruction covers this bounded cohort-sharing work; older local actor and waiting-state restrictions were not changed. Administrative onboarding and the private HopeConnect thread remain untouched. Do not retry the groups, scrape personal addresses as a fallback, or send another follow-up without a substantive response or new owner direction.",
+      "last_outbound_utc": "2026-09-12T11:56:11.000Z"
     }
   ]
 }

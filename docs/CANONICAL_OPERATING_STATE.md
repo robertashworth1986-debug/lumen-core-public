@@ -456,3 +456,14 @@ locks and claim boundaries remain intact. The urgent patent action remains
 retrieval of the official application record through the USPTO-directed
 authenticated or Document Services path. No duplicate or unsolicited outbound
 message is authorized. No other outbound message is currently authorized.
+
+
+## Founder-directed EC cohort contribution - 2026-09-12
+
+Robert's current direction adds a strengths-first cohort contribution: **Our strength is making everyone else stronger.** Energy remains a major research focus. The existing evidence discipline applies to each owner's workflow: understand what already works, identify a testable constraint, agree a baseline and verify the effect. This dated instruction supersedes earlier no-new-EC-outbound statements for the scoped cohort contribution; administrative onboarding and unrelated outreach holds remain.
+
+The [published cohort research](EC_COHORT_STRENGTH_RESEARCH_2026-09-11.md) covers all 69 businesses on the official TakeOff roster, with three hypotheses per company and unknown baselines. Research publication is complete. Owner interviews, participation, measured losses and savings remain unestablished.
+
+On September 12, one resource introduction was sent to both official cohort mailing groups, followed by one direct request to the EC program manager after the AM group returned a delivery failure. Both sends were verified by exact Gmail readback and recorded under `ec-takeoff-strengths-resource`. The AM failure does not distinguish a missing group from posting restrictions. Delivery to individual PM members and any manager redistribution are unconfirmed. Do not retry the group addresses or treat the messages as completed customer conversations. Wait for a substantive response. Exact message content, private identifiers and delivery-failure receipts remain in the existing private review estate.
+
+The personalized websites, dashboards, trading/research tools, Grant Factory, LumaScout, LumaCare, PowerShell installers and complete domain deployment remain unfinished. The resource introduction expressly describes these tools as in development. The intended software gift has not been launched. API-dependent implementation awaits the required choice to reuse the configured API key or create a separate one; no secret is included in this record. The full requested scope remains open.
