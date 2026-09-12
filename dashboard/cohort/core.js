@@ -65,6 +65,119 @@ export function energyComparison(input) {
     percent:equivalent&&input.baseline_wh>0?100*(input.baseline_wh-totalCandidate)/input.baseline_wh:null,
     status:!equivalent?'NOT_COMPARABLE':totalCandidate<input.baseline_wh?'OBSERVED_REDUCTION_UNVALIDATED':totalCandidate>input.baseline_wh?'OBSERVED_INCREASE':'NO_CHANGE'};
 }
+export const ENERGY_REVIEW_SCHEMA = 'lumencore.ec_strength_studio.energy_review.v1';
+export const ENERGY_CONSTRAINT_UNITS = ['ms','s','min','W','Wh','kWh','degC','%','count','mm','Pa','dB'];
+// Checks owner-entered historical evidence declarations. Never authorizes an action.
+// No unit conversion, source retrieval, independent metrology or statistical fitting.
+export function reviewEnergyChange(input, reviewedAt) {
+  const checks=[],refs=new Set();
+  const check=(id,status,message,details={})=>checks.push({id,status,message,...details});
+  const text=(value,max=3000)=>typeof value==='string'&&value.trim().length>0&&value.length<=max;
+  const finite=value=>typeof value==='number'&&Number.isFinite(value)&&Math.abs(value)<=1e12;
+  const object=(value,id,keys)=>{
+    if(!value||typeof value!=='object'||Array.isArray(value)){check(id,'DATA_INVALID',`${id}: a structured record is missing.`);return {};}
+    if(Object.keys(value).some(k=>!keys.includes(k)))check(id,'DATA_INVALID',`${id}: unexpected fields need correction.`);
+    return value;
+  };
+  const reference=value=>{if(text(value,600))refs.add(value.trim());};
+  const stamp=value=>{
+    if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value))return null;
+    const ms=Date.parse(value);if(!Number.isFinite(ms))return null;
+    return new Date(ms).toISOString()===(value.length===20?value.slice(0,-1)+'.000Z':value)?ms:null;
+  };
+  input=object(input,'input',['measurement','service','observations','overhead','action','constraints','constraints_complete','uncertainty','fallback','freshness_hours']);
+  let comparison=null;
+  try{comparison=energyComparison(input.measurement);}catch(error){check('measurement','DATA_INVALID',error.message);}
+  const now=stamp(reviewedAt);
+  if(now===null)check('review_time','DATA_INVALID','Record a valid review timestamp in UTC.');
+  if(!finite(input.freshness_hours)||input.freshness_hours<=0)check('freshness_policy','DATA_INVALID','Declare a positive maximum measurement age in hours.');
+  const service=object(input.service,'service',['description','specification','conditions','boundary','equivalence','evidence_ref']);
+  for(const key of ['description','specification','conditions','boundary','evidence_ref'])if(!text(service[key],key==='evidence_ref'?600:3000))check(`service.${key}`,'EVIDENCE_INSUFFICIENT',`Describe the service ${key.replaceAll('_',' ')} before advancing.`);
+  reference(service.evidence_ref);
+  if(!['matched','mismatched','unknown'].includes(service.equivalence))check('service.equivalence','DATA_INVALID','Select matched, mismatched or unknown service equivalence.');
+  else if(service.equivalence==='mismatched'||(comparison&&input.measurement.baseline_accepted!==input.measurement.candidate_accepted))check('service.equivalence','CONSTRAINT_FAILED','The declared service or accepted batch output differs. Retain the baseline.');
+  else if(service.equivalence!=='matched'||input.measurement?.equivalent!==true)check('service.equivalence','EVIDENCE_INSUFFICIENT','Equivalent quality, conditions and useful output have not been declared.');
+  else check('service.equivalence','PASS','Equivalent service is declared; the supporting reference still needs owner review.');
+  if(input.measurement?.boundary_complete!==true)check('boundary','EVIDENCE_INSUFFICIENT','Full energy accounting, including failed work and rework, is not declared complete.');
+  else check('boundary','PASS','Full energy accounting is declared complete; source completeness is not independently verified.');
+  const observations=object(input.observations,'observations',['baseline','candidate','overhead']);
+  const observation=(role)=>{
+    const o=object(observations[role],`source.${role}`,['source_id','evidence_ref','sha256','started_at','ended_at','available_at','evidence_class']);
+    let invalid=false;
+    for(const key of ['source_id','evidence_ref'])if(!text(o[key],600)){check(`source.${role}.${key}`,'DATA_INVALID',`Add the ${role} ${key.replaceAll('_',' ')}.`);invalid=true;}
+    reference(o.evidence_ref);
+    if(o.sha256!==undefined&&o.sha256!==''&&(typeof o.sha256!=='string'||!/^[a-f0-9]{64}$/i.test(o.sha256))){check(`source.${role}.sha256`,'DATA_INVALID',`The ${role} artifact fingerprint must be 64 hexadecimal characters.`);invalid=true;}
+    const start=stamp(o.started_at),end=stamp(o.ended_at),available=stamp(o.available_at);
+    if(start===null||end===null||available===null||start>=end||end>available||(now!==null&&available>now)){
+      check(`source.${role}.time`,'DATA_INVALID',`The ${role} timestamps must be valid UTC: start < end <= available <= review time.`);invalid=true;
+    }else if(now!==null&&finite(input.freshness_hours)&&input.freshness_hours>0&&now-end>input.freshness_hours*3600000){
+      check(`source.${role}.time`,'DATA_INVALID',`The ${role} measurement exceeds the declared maximum age.`);invalid=true;
+    }
+    if(!['metered_electricity','modeled','unknown'].includes(o.evidence_class)){check(`source.${role}.class`,'DATA_INVALID',`Select the ${role} evidence class.`);invalid=true;}
+    else if(o.evidence_class!=='metered_electricity')check(`source.${role}.class`,'EVIDENCE_INSUFFICIENT',`The ${role} electricity effect has not been declared metered.`);
+    if(!invalid)check(`source.${role}`,'PASS',`${role}: references and timing are recorded; the artifact has not been fetched or verified.`);
+  };
+  observation('baseline');observation('candidate');
+  const overhead=object(input.overhead,'overhead',['mode','basis','evidence_ref']);
+  reference(overhead.evidence_ref);
+  if(!['outside_meter','included_in_candidate','none'].includes(overhead.mode))check('overhead.mode','DATA_INVALID','Select how additional overhead was accounted for.');
+  if(!text(overhead.basis)||!text(overhead.evidence_ref,600))check('overhead.basis','EVIDENCE_INSUFFICIENT','Explain and reference overhead accounting, including a zero or already-included amount.');
+  if(overhead.mode==='outside_meter')observation('overhead');
+  else if(['included_in_candidate','none'].includes(overhead.mode)){
+    if(input.measurement?.overhead_wh!==0)check('overhead.amount','DATA_INVALID','Already-included or absent overhead must have zero additional Wh; do not count it twice.');
+    else check('overhead.amount','PASS','Zero additional overhead is declared; its accounting basis remains for owner review.');
+    if(observations.overhead!==null&&observations.overhead!==undefined)check('overhead.source','DATA_INVALID','A separate overhead observation conflicts with the selected accounting mode.');
+  }
+  const action=object(input.action,'action',['candidate_id','allowed_ids']);
+  if(!text(action.candidate_id,600))check('action','EVIDENCE_INSUFFICIENT','Identify the candidate change before reviewing it.');
+  if(!Array.isArray(action.allowed_ids)||action.allowed_ids.length>20||action.allowed_ids.some(id=>!text(id,600))||new Set(action.allowed_ids.map(id=>typeof id==='string'?id.trim():id)).size!==action.allowed_ids.length)check('action.allowed_ids','DATA_INVALID','Use at most 20 distinct, nonempty allowed action IDs.');
+  else if(!action.allowed_ids.length)check('action.allowed_ids','EVIDENCE_INSUFFICIENT','List the changes the owner has allowed for evaluation.');
+  else if(text(action.candidate_id,600)){
+    if(!action.allowed_ids.includes(action.candidate_id))check('action','CONSTRAINT_FAILED','The candidate action is outside the declared allowed set.');
+    else check('action','PASS','The action ID is allowed for evaluation only. Execution is not authorized.');
+  }
+  if(input.constraints_complete!==true)check('constraints.complete','EVIDENCE_INSUFFICIENT','Confirm that all required hard limits and candidate-window observations are listed.');
+  const constraints=Array.isArray(input.constraints)?input.constraints:[];
+  if(!Array.isArray(input.constraints)||constraints.length>12)check('constraints','DATA_INVALID','Use an array of at most 12 hard constraints.');
+  if(!constraints.length)check('constraints','EVIDENCE_INSUFFICIENT','At least one explicit hard operating limit is needed.');
+  const ids=new Set();
+  for(const [i,row] of constraints.slice(0,12).entries()){
+    const c=object(row,`constraint.${i+1}`,['id','unit','minimum','maximum','observed_min','observed_max','evidence_ref']);
+    const id=`constraint.${text(c.id,600)?c.id:i+1}`;
+    reference(c.evidence_ref);
+    if(!text(c.id,600)||ids.has(c.id.trim())){check(id,'DATA_INVALID','Constraint IDs must be nonempty and unique.');continue;}ids.add(c.id.trim());
+    if(!ENERGY_CONSTRAINT_UNITS.includes(c.unit)||['minimum','maximum','observed_min','observed_max'].some(k=>c[k]!==null&&!finite(c[k]))){check(id,'DATA_INVALID','Use a supported unit and finite values, or null for an unknown or unused bound.');continue;}
+    if((c.minimum!==null&&c.maximum!==null&&c.minimum>c.maximum)||(c.observed_min!==null&&c.observed_max!==null&&c.observed_min>c.observed_max)){check(id,'DATA_INVALID','Lower bounds cannot exceed upper bounds.');continue;}
+    const detail={unit:c.unit,limits:{minimum:c.minimum,maximum:c.maximum},observed_interval:{minimum:c.observed_min,maximum:c.observed_max},evidence_ref:c.evidence_ref};
+    if((c.minimum===null&&c.maximum===null)||c.observed_min===null||c.observed_max===null||!text(c.evidence_ref,600)){check(id,'EVIDENCE_INSUFFICIENT','A hard limit, conservative observed interval and evidence reference are required.',detail);continue;}
+    if((c.minimum!==null&&c.observed_max<c.minimum)||(c.maximum!==null&&c.observed_min>c.maximum))check(id,'CONSTRAINT_FAILED','The entire declared observed interval lies outside a hard limit.',detail);
+    else if((c.minimum!==null&&c.observed_min<c.minimum)||(c.maximum!==null&&c.observed_max>c.maximum))check(id,'EVIDENCE_INSUFFICIENT','The declared interval crosses a hard limit; compliance is unresolved.',detail);
+    else check(id,'PASS','The declared observed interval is within the stated limits.',detail);
+  }
+  const uncertainty=object(input.uncertainty,'uncertainty',['bound_wh','minimum_net_wh','method','evidence_ref']);
+  reference(uncertainty.evidence_ref);
+  for(const k of ['bound_wh','minimum_net_wh']){
+    if(uncertainty[k]===null)check(`uncertainty.${k}`,'EVIDENCE_INSUFFICIENT',`Declare ${k.replaceAll('_',' ')} in Wh.`);
+    else if(!finite(uncertainty[k])||uncertainty[k]<0)check(`uncertainty.${k}`,'DATA_INVALID',`${k} must be finite and nonnegative.`);
+  }
+  if(!text(uncertainty.method)||!text(uncertainty.evidence_ref,600))check('uncertainty.basis','EVIDENCE_INSUFFICIENT','Document the aggregate uncertainty method and reference; meter accuracy alone does not cover the whole comparison.');
+  const fallback=object(input.fallback,'fallback',['baseline_id','trigger']);
+  if(!text(fallback.baseline_id,600)||!text(fallback.trigger))check('fallback','EVIDENCE_INSUFFICIENT','Identify the accepted baseline and the conditions that keep it in place.');
+  let effect=null;
+  if(comparison?.net_wh!==null&&comparison&&finite(uncertainty.bound_wh)&&uncertainty.bound_wh>=0&&finite(uncertainty.minimum_net_wh)&&uncertainty.minimum_net_wh>=0){
+    // Outward allowance for binary input representation and the bounded arithmetic
+    // above. Keep it separate from the owner's metrology/process error bound.
+    const roundoff=Math.max(Number.MIN_VALUE,16*Number.EPSILON*Math.max(input.measurement.baseline_wh,input.measurement.candidate_wh,input.measurement.overhead_wh,uncertainty.bound_wh,uncertainty.minimum_net_wh));
+    effect={net_difference_wh:comparison.net_wh,declared_error_bound_wh:uncertainty.bound_wh,arithmetic_allowance_wh:roundoff,lower_bound_wh:comparison.net_wh-uncertainty.bound_wh-roundoff,upper_bound_wh:comparison.net_wh+uncertainty.bound_wh+roundoff,minimum_net_wh:uncertainty.minimum_net_wh};
+    if(comparison.net_wh<=0)check('net_effect','RETAIN_BASELINE','The comparable full batch is a non-win. Keep the result and baseline.',effect);
+    else if(effect.lower_bound_wh<=effect.minimum_net_wh)check('net_effect','EVIDENCE_INSUFFICIENT','The conservative net difference does not exceed the declared advancement threshold.',effect);
+    else check('net_effect','PASS','The declared net difference and uncertainty clear the threshold for owner review only.',effect);
+  }else if(comparison&&comparison.net_wh!==null&&comparison.net_wh<=0)check('net_effect','RETAIN_BASELINE','The comparable full batch is a non-win, even while other evidence is incomplete.');
+  const decision=['DATA_INVALID','CONSTRAINT_FAILED','EVIDENCE_INSUFFICIENT','RETAIN_BASELINE'].find(status=>checks.some(c=>c.status===status))||'CANDIDATE_FOR_REVIEW';
+  return {schema:ENERGY_REVIEW_SCHEMA,reviewed_at:reviewedAt,decision,comparison,checks,expected_effect:effect,evidence_refs:[...refs],
+    evidence_scope:'OWNER_ENTERED_HISTORICAL_OBSERVATIONS',source_verification:'REFERENCES_RECORDED_NOT_INDEPENDENTLY_VERIFIED',
+    fallback:{action:'RETAIN_BASELINE',baseline_id:fallback.baseline_id||null,trigger:fallback.trigger||null},actuation_authorized:false};
+}
 export function parsePriceCSV(text) {
   if(typeof text!=='string'||text.length>500000) throw new Error('CSV must be under 500 KB.');
   const lines=text.replace(/^\uFEFF/,'').trim().split(/\r?\n/);

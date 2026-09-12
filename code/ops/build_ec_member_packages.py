@@ -72,6 +72,10 @@ WHAT THE TOOLS DO
 - Workboard: briefs, acceptance criteria, owner review, dates and file hashes.
 - Measure & improve: record observations and compare full-batch energy for
   equivalent accepted output. Failed work, rework and overhead remain included.
+  The optional evidence review checks source dates, declared operating limits,
+  overhead, allowed changes and uncertainty. Download each record with every
+  finding. A candidate result requires owner review and never operates equipment.
+  This review runs offline and needs no API credits.
 - Grant Factory: turn your supplied facts into Markdown drafts. Unknowns remain
   marked. No applicant attributes, eligibility, signatures or awards are invented.
 - LumaScout: retrieve public Grants.gov listings; rank keywords, not eligibility.

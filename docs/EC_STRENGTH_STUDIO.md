@@ -20,7 +20,7 @@ members pay their own optional API usage.
 | Tool | Working behavior | Evidence and action boundary |
 | --- | --- | --- |
 | Workboard | Create/edit briefs, review missing inputs, track owner acceptance, stage work, hash a selected revision file locally | The file itself is not uploaded. Starting/completing work requires recorded owner acceptance. |
-| Measure & improve | Record source-backed observations; calculate Wh per accepted part and complete-batch net differences | Equal accepted output, quality/conditions and full energy accounting are required for comparison. Failures, rework, warm-up and auxiliaries remain included. |
+| Measure & improve | Record observations; calculate complete-batch Wh differences; review evidence and operating constraints; export each record | Equivalent useful output and full accounting are required. References, uncertainty and hard limits are owner declarations; no equipment action or independently validated savings follows from a passing review. |
 | Grant Factory | Produce and export a member-specific Markdown working draft from supplied facts | Unknown identity, organization type, costs and eligibility remain unknown. No certification or submission. |
 | LumaScout | Save opportunities; the local runtime retrieves official Grants.gov search results and ranks topic keywords | Relevance is not eligibility, award likelihood, a verified deadline or a customer introduction. |
 | Paper Lab | Daily CSV simulation; local hourly BTC-USD paper bot with a reconciled Decimal ledger | Fictional money only, long-only, 25% cash allocation, modeled 10 bps fees and 5 bps slippage. No broker-order endpoint. |
@@ -40,6 +40,34 @@ accounts. Team access, business-system connections and regulated data require
 an owner-approved deployment and review. Government certification, HIPAA
 compliance, independent validation, achieved savings and trading profit are not
 established by these tools.
+
+## Energy evidence review
+
+The optional energy review lives inside **Measure & improve** and uses the same
+batch calculator. It records useful-service specifications and conditions,
+separate source references and UTC windows, allowed changes, up to 12 hard
+limits, aggregate net-energy uncertainty, a freshness policy and the baseline
+fallback. Outside overhead is added once; an included or absent amount requires
+zero additional Wh and a documented basis. Unknown numeric inputs remain null.
+Every check and the original form entries are kept with the measurement and
+included in its JSON download, including holds and non-wins.
+
+`reviewEnergyChange` in `dashboard/cohort/core.js` checks those declarations
+offline. Its result is `DATA_INVALID`, `CONSTRAINT_FAILED`,
+`EVIDENCE_INSUFFICIENT`, `RETAIN_BASELINE`, or `CANDIDATE_FOR_REVIEW`. Precedence
+follows that order; every detected finding remains visible. An observed interval
+crossing a hard limit is unresolved, while an interval entirely outside it is a
+declared violation. A candidate must clear the owner's strict net-Wh threshold
+after the declared error bound and a separate, magnitude-scaled binary arithmetic
+allowance. The original `energyComparison` result remains unchanged.
+
+The tool records references and optional supplied SHA-256 values without opening
+or verifying source artifacts. It does not estimate a confidence interval,
+qualify a meter, establish true service equivalence or authorize a change.
+`actuation_authorized` is always false and the fallback always retains the
+baseline, including for a candidate. All outcomes concern the entered historical
+observations. The review is available in the website and all local packages and
+requires no API credits.
 
 ## Runtime
 
