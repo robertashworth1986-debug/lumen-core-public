@@ -17,6 +17,8 @@ class PublicDiscoveryTests(unittest.TestCase):
             "Allow: /opportunity_sprint.html",
             "Allow: /proof_to_pilot.html",
             "Allow: /evidence/",
+            "Allow: /visual_library.html",
+            "Allow: /assets/visuals/",
             "Allow: /external_review.html",
             "Allow: /build_week/prooflock_console/",
         ):
@@ -44,6 +46,7 @@ class PublicDiscoveryTests(unittest.TestCase):
                 "https://lumen-core.ai/proof_to_pilot.html",
                 "https://lumen-core.ai/evidence/",
                 "https://lumen-core.ai/external_review.html",
+                "https://lumen-core.ai/visual_library.html",
                 "https://lumen-core.ai/build_week/prooflock_console/",
             ],
         )
@@ -80,6 +83,7 @@ class PublicDiscoveryTests(unittest.TestCase):
             "operator_home.html": "https://lumen-core.ai/",
             "opportunity_sprint.html": "https://lumen-core.ai/opportunity_sprint.html",
             "proof_to_pilot.html": "https://lumen-core.ai/proof_to_pilot.html",
+            "visual_library.html": "https://lumen-core.ai/visual_library.html",
             "external_review.html": "https://lumen-core.ai/external_review.html",
             "evidence/index_bounded.html": "https://lumen-core.ai/evidence/",
         }
@@ -148,11 +152,14 @@ class PublicDiscoveryTests(unittest.TestCase):
         )
         self.assertIn("dashboard/manifest.json", audit)
         self.assertIn("dashboard/reviewer_docket.json", audit)
+        self.assertIn("dashboard/visual_library.html", audit)
+        self.assertIn("dashboard/assets/visuals/**", audit)
         self.assertIn("https://lumen-core.ai", audit)
         self.assertIn("VERIFY_PUBLIC_SITE_LIVE_RELEASE.py", audit)
         self.assertIn("VERIFY_PUBLIC_SITE_LIVE_RELEASE.py", exact_release)
         self.assertIn('"application/json", "application/manifest+json"', verifier)
         self.assertIn('content_type == "application/json"', verifier)
+        self.assertIn('content_type == "image/webp"', verifier)
 
 
 if __name__ == "__main__":

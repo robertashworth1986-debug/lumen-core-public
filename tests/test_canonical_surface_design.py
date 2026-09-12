@@ -1,3 +1,5 @@
+import hashlib
+import json
 from pathlib import Path
 
 
@@ -12,6 +14,7 @@ PAGES = {
 
 PUBLIC_REVIEW_PAGES = (
     DASHBOARD / "proof_to_pilot.html",
+    DASHBOARD / "visual_library.html",
     DASHBOARD / "external_review.html",
     DASHBOARD / "evidence" / "index_bounded.html",
 )
@@ -143,7 +146,205 @@ def test_public_home_sells_one_bounded_assurance_sequence():
     assert "Pricing is not buyer-tested" in home
     assert "No favorable result, savings, ROI, certification" in home
     assert 'href="/proof_to_pilot.html"' in home
+    assert 'href="/visual_library.html"' in home
     assert "ProofLock Opportunity Sprint" not in home
+
+
+def test_public_visual_library_is_complete_hash_bound_and_claim_bounded():
+    visual_root = DASHBOARD / "assets" / "visuals"
+    payload = json.loads((visual_root / "manifest.json").read_text(encoding="utf-8"))
+    page_body = (DASHBOARD / "visual_library.html").read_text(encoding="utf-8")
+
+    assert payload["schema"] == "lumencore.public_visual_library.v1"
+    assert payload["asset_count"] == 12
+    assert len(payload["items"]) == 12
+    assert payload["total_web_bytes"] == sum(item["bytes"] for item in payload["items"])
+    assert "concept art" in payload["authority_boundary"].lower()
+    assert "external validation" in payload["authority_boundary"].lower()
+    assert 'rel="canonical" href="https://lumen-core.ai/visual_library.html"' in page_body
+    assert 'href="/assets/visuals/manifest.json"' in page_body
+    assert "CONCEPT ART ≠ OBSERVATION" in page_body
+    assert "CUSTODY ≠ AUTHORITY" in page_body
+    assert "FIRST-PARTY ≠ INDEPENDENT VALIDATION" in page_body
+    assert page_body.count('<article class="card') == 12
+
+    seen_assets = set()
+    total_bytes = 0
+    for item in payload["items"]:
+        assert set(item) == {
+            "id",
+            "title",
+            "evidence_class",
+            "public_boundary",
+            "source_filename",
+            "source_sha256",
+            "web_asset",
+            "web_sha256",
+            "width",
+            "height",
+            "bytes",
+        }
+        asset_name = item["web_asset"]
+        assert asset_name not in seen_assets
+        seen_assets.add(asset_name)
+        assert asset_name.endswith(".webp")
+        asset = visual_root / asset_name
+        body = asset.read_bytes()
+        assert len(body) == item["bytes"]
+        assert hashlib.sha256(body).hexdigest() == item["web_sha256"]
+        assert item["width"] > 0 and item["height"] > 0
+        assert item["public_boundary"].strip()
+        assert f'/assets/visuals/{asset_name}' in page_body
+        total_bytes += len(body)
+
+    assert len(seen_assets) == 12
+    assert total_bytes == payload["total_web_bytes"]
+    assert total_bytes < 3_500_000
+    assert "C:\\Users\\" not in json.dumps(payload)
+
+
+def test_public_research_portfolio_is_complete_maturity_labeled_and_claim_bounded():
+    portfolio = (DASHBOARD / "visual_library.html").read_text(encoding="utf-8")
+    home = page("home")
+
+    assert 'id="research-portfolio"' in portfolio
+    assert "Eight source-audited programs. A larger governed constellation." in portfolio
+    for program in (
+        "LumaJet",
+        "FlowForm curved electronics",
+        "Honeycomb energy module",
+        "Ground robotics",
+        "LumenFrame / STL",
+        "Smart City + Telecom",
+        "Energy + Nuclear Harmonization",
+        "Dungeon / Dungieon",
+    ):
+        assert program in portfolio
+    for maturity in (
+        "Internal simulation",
+        "Concept program",
+        "Measured digital artifact",
+        "Restricted archive",
+        "Unresolved source identity",
+    ):
+        assert maturity in portfolio
+    for boundary in (
+        "NOT PROVEN",
+        "NO SOURCE · NO PUBLIC CARD",
+        "A concept render is not CAD",
+        "An internal simulation is not external validation",
+    ):
+        assert boundary in portfolio
+    assert "1,120-scenario V1" in portfolio
+    assert "1,400-scenario V2" in portfolio
+    assert "4,884-byte binary STL" in portfolio
+    assert "96 triangles" in portfolio
+    assert "64 unique vertices" in portfolio
+    assert "eight disconnected closed components" in portfolio
+    assert "Measured-claim contract" in portfolio
+    assert "New experiment required" in portfolio
+    for module in (
+        "ProofLock",
+        "Agent Arena",
+        "LumaTrader",
+        "LumaScout",
+        "LumaSuit",
+        "LumaSkin",
+        "EchoForm",
+        "LumaSpiral",
+        "EtherFrame",
+        "AetherReach",
+        "LumenShell",
+        "EchoLock",
+        "NovaCore",
+        "LumenGov",
+        "Infrastructure Sentinel",
+        "World Model",
+        "XR Command Room",
+    ):
+        assert module in portfolio
+    assert 'href="/visual_library.html#research-portfolio"' in home
+    assert "Massive scope. One governed commercial doorway." in home
+
+
+def test_public_home_proof_lattice_is_claim_bounded_and_progressively_enhanced():
+    home = page("home")
+    assert 'data-proof-lattice' in home
+    assert 'class="lis-lattice-webgl-canvas"' in home
+    assert 'class="lis-lattice-canvas"' in home
+    assert "assets/vendor/three.min.js" in home
+    assert 'data-luma-three-loader' in home
+    assert 'script.async = true' in home
+    assert 'connection.effectiveType' in home
+    assert 'navigator.deviceMemory < 4' in home
+    assert 'navigator.hardwareConcurrency < 4' in home
+    assert 'requestIdleCallback' in home
+    assert 'luma:three-ready' in home
+    assert 'sha384-qOkzR5Ke/XkQxuGVJ9hpFEpDlcoLtWwVYhnJf06cLIZa2vaIptSqaubivErzmD5O' in home
+    assert home.index('class="lis-proofline"') < home.index('class="hero"')
+    assert '<button type="button" data-lattice-step="0" aria-pressed="false">Source</button>' in home
+    assert 'class="lis-lattice-readout" aria-live="polite"' in home
+    assert "Source" in home
+    assert "Baseline" in home
+    assert "Metric" in home
+    assert "Hash" in home
+    assert "Decision" in home
+    assert "design model, not a scientific result or validation claim" in home
+
+    shared_js = (DASHBOARD / "assets" / "luma_institutional_surface.js").read_text(
+        encoding="utf-8"
+    )
+    assert "THREE.WebGLRenderer" in shared_js
+    assert "THREE.ShaderMaterial" in shared_js
+    assert "THREE.AdditiveBlending" in shared_js
+    assert "THREE.IcosahedronGeometry" in shared_js
+    assert "THREE.InstancedMesh" in shared_js
+    assert "THREE.TorusKnotGeometry" in shared_js
+    assert "THREE.Points" in shared_js
+    assert "makeDeepStarField" in shared_js
+    assert "recursiveProofClusters" in shared_js
+    assert "recursiveCellClusters" in shared_js
+    assert "proofCellMeshes" in shared_js
+    assert "cells.userData.fullCount" in shared_js
+    assert 'modeLabel.textContent = "DEEP SPACE / WEBGL MODEL"' in shared_js
+    assert "updateProofLatticeStep" in shared_js
+    assert "bindProofLatticeControls" in shared_js
+    assert 'canvas.addEventListener("webglcontextlost"' in shared_js
+    assert 'canvas.addEventListener("webglcontextrestored"' in shared_js
+    assert 'viewport.dataset.quality = "adaptive"' in shared_js
+    assert "deliveredFps < 28" in shared_js
+    assert "not a scientific result or validation claim" in home
+    assert "Recursive custody clusters" in home
+    assert "Procedural recursive geometry" in home
+    assert 'canvas.getContext("2d"' in shared_js
+    assert "prefers-reduced-motion: reduce" in shared_js
+    assert "connection.saveData" in shared_js
+    assert 'dataset.lumaWebglPending === "true"' in shared_js
+    assert 'DEEP SPACE / INITIALIZING' in shared_js
+    assert "navigator.deviceMemory" in shared_js
+    assert "navigator.hardwareConcurrency" in shared_js
+    assert '"ResizeObserver" in window' in shared_js
+    assert '"IntersectionObserver" in window' in shared_js
+    assert "requestAnimationFrame" in shared_js
+    assert "execution_authorized" not in shared_js
+    assert "WebSocket" not in shared_js
+
+    shared_css = (DASHBOARD / "assets" / "luma_institutional_surface.css").read_text(
+        encoding="utf-8"
+    )
+    assert ".lis-lattice-stage" in shared_css
+    assert ".lis-lattice-viewport" in shared_css
+    assert ".lis-lattice-webgl-canvas" in shared_css
+    assert ".lis-lattice-canvas" in shared_css
+
+
+def test_three_dependency_is_byte_stable_and_sri_bound():
+    asset = DASHBOARD / "assets" / "vendor" / "three.min.js"
+    readme = (asset.parent / "README.md").read_text(encoding="utf-8")
+    digest = hashlib.sha256(asset.read_bytes()).hexdigest()
+    assert digest == "170c6789f43217c96b3170f4b42fafe135de7f7cd48497a4218f9757ee1d49fa"
+    assert digest in readme
+    assert "sha384-qOkzR5Ke/XkQxuGVJ9hpFEpDlcoLtWwVYhnJf06cLIZa2vaIptSqaubivErzmD5O" in readme
 
 
 def test_public_browser_path_uses_only_minimal_public_runtime_contracts():

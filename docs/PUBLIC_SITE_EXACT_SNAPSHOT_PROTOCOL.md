@@ -16,6 +16,11 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
   before SSH credentials are installed.
 - Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (43 for
   current named release commit `1ce7c35975a4011fa844e8b39ccbc950c8c0f398`).
+- The current candidate source contract contains an expanded allowlist (57 for
+  the current candidate release): the retained
+  43-file surface plus the Visual Library page, its strict manifest, and 12
+  WebP assets. This candidate count is not a deployment claim; it becomes a
+  named release fact only after a separately approved exact-snapshot run.
 - Package bytes are read from immutable Git blobs, not from mutable worktree
   files.
 - The manifest binds the source commit, Git blob IDs, byte counts, file hashes,
@@ -40,7 +45,8 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
 
 The allowlist covers the proof-first homepage, bounded engagement page,
 external-review page and machine-readable reviewer docket, public status page,
-bounded evidence page, shared styles/command fabric, crawl metadata and public
+bounded evidence page, claim-bounded Visual Library and asset manifest, shared
+styles/command fabric, crawl metadata and public
 mark, the ProofLock browser verifier with its protocol fixtures, and noindex
 HOLD stubs for previous operator and research dashboard URLs.
 

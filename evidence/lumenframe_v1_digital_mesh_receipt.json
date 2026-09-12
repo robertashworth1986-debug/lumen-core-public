@@ -1,0 +1,70 @@
+{
+  "allowed_claims": [
+    "The exact source file exists at the recorded SHA-256 and byte count.",
+    "The mesh contains the recorded number of triangles, vertices, edges, and connected components.",
+    "The recorded bounds, extents, area, and signed-volume calculations are digital measurements in undeclared source units.",
+    "Edge-incidence checks establish only the recorded digital topology result."
+  ],
+  "measured_at_utc": "2026-08-31T23:55:00Z",
+  "measurement_scope": "digital STL structure only",
+  "mesh": {
+    "absolute_signed_volume_source_units_cubed": 12000.0,
+    "boundary_edge_count": 0,
+    "bounds_max_source_units": [
+      30.0,
+      57.5,
+      117.5
+    ],
+    "bounds_min_source_units": [
+      -30.0,
+      -30.0,
+      -2.5
+    ],
+    "connected_component_count": 8,
+    "coordinate_unit_declared": false,
+    "degenerate_triangle_count": 0,
+    "extents_source_units": [
+      60.0,
+      87.5,
+      120.0
+    ],
+    "non_manifold_edge_count": 0,
+    "signed_volume_source_units_cubed": 12000.0,
+    "stored_normal_mismatch_count": 0,
+    "surface_area_source_units_squared": 10000.0,
+    "triangle_count": 96,
+    "two_incident_triangle_edge_count": 144,
+    "unique_edge_count": 144,
+    "unique_vertex_count": 64,
+    "watertight_by_edge_incidence": true
+  },
+  "next_gate": [
+    "Founder declares units, intended function, and source-CAD provenance.",
+    "Run qualified mesh checks for normals, self-intersections, minimum wall thickness, and intended component relationships.",
+    "Generate a slicer receipt using declared printer, material, orientation, supports, and tolerances.",
+    "Print a low-risk test article and preserve measurement photos, failures, settings, and hashes.",
+    "Complete IP and public-license review before releasing the raw STL."
+  ],
+  "not_proven": [
+    "coordinate unit or intended physical scale",
+    "design intent or source-CAD provenance",
+    "printability, slicer success, or fabricated prototype",
+    "dimensional accuracy or manufacturing tolerance",
+    "material, structural, thermal, vibration, resonance, aerospace, or safety performance",
+    "patent scope, public license, certification, or external validation"
+  ],
+  "public_source_release_authorized": false,
+  "quality_assessment": {
+    "confidence": "high for digital structure; none for physical performance",
+    "finding": "The file is a non-empty parseable digital mesh. Multiple disconnected components and an undeclared coordinate unit require design-owner review before slicing, fabrication, or dimensional interpretation.",
+    "severity": "medium"
+  },
+  "receipt_sha256": "007fd1f64f59000e5f6f472408f8e14ccd9af32bf45c1be0366bdf670b22a309",
+  "schema": "lumencore.stl_digital_mesh_receipt.v1",
+  "source": {
+    "bytes": 4884,
+    "format": "binary",
+    "name": "LumenFrame_v1 3D printing ready.stl",
+    "sha256": "28c96fbc19d032d0cfe70f4252b4abf8e5daa444fff825a706b01bca6fdd1ad4"
+  }
+}

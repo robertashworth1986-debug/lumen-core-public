@@ -38,7 +38,13 @@ FILE_KEYS = {
 
 
 def content_type_allowed(archive_name: str, content_type: str) -> bool:
-    """Require standards-safe MIME types for public JSON review contracts."""
+    """Require standards-safe MIME types for public review contracts and visuals."""
+    if archive_name == "visual_library.html":
+        return content_type == "text/html"
+    if archive_name.startswith("assets/visuals/") and archive_name.endswith(".webp"):
+        return content_type == "image/webp"
+    if archive_name == "assets/visuals/manifest.json":
+        return content_type == "application/json"
     if archive_name not in {"manifest.json", "reviewer_docket.json"}:
         return True
     if archive_name == "manifest.json":

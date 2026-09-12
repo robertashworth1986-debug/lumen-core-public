@@ -37,6 +37,15 @@ No lower state may be described using the language of a higher state.
 
 Unless a linked Proof Capsule or external record says otherwise, LumenCore concept art is classified as **CONCEPT ILLUSTRATION**.
 
+For the current portfolio, apply these audited classifications:
+
+- LumaJet: **FIRST-PARTY SIMULATION** for the named generated-software packet only; external reproduction and field validation remain open.
+- FlowForm curved motherboard, honeycomb energy module, and ground-robot renders: **CONCEPT ILLUSTRATION**; not CAD, schematics, prototypes, or test evidence.
+- LumenFrame V1 STL: **MEASURED DIGITAL ARTIFACT** for the exact receipt-bound file structure only. Its measured counts and bounds do not establish a print, joined enclosure, intended unit, or physical result. Empty V3 STL stubs and placeholder photo files are excluded.
+- Smart City and Telecom legacy materials: **CONCEPT ILLUSTRATION / REQUIREMENTS INPUT**; their unsupported infrastructure and replacement claims are superseded by bounded public summaries.
+- Nuclear Harmonization legacy paper: **RESTRICTED SPECULATIVE ARCHIVE**; it is not eligible for public technical-claim promotion.
+- Dungeon / Dungieon: **UNRESOLVED SOURCE IDENTITY**; no visual, purpose, or maturity may be inferred.
+
 A concept image does not by itself establish:
 
 - physical feasibility;

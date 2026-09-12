@@ -95,6 +95,10 @@ examples/proof_capsule/** text eol=lf
 /grant_submissions/ONC_ARGOS_20260730/ARGOS_PUBLIC_REPOSITORY_SECURITY_GATE_2026-07-28.json text eol=lf
 /grant_submissions/funding_sprint_20260709/source_attachments/Project?Argos?SOW?-?SSN.pdf binary
 
+# Canonical browser dependency bytes. SRI and provenance hashes bind the exact
+# LF-normalized npm artifact on Windows and POSIX checkouts.
+/dashboard/assets/vendor/three.min.js text eol=lf
+
 # Canonical bytes for the external technical-review packet.
 /.github/workflows/external-technical-review-packet.yml text eol=lf
 /QUICKSTART.md text eol=lf

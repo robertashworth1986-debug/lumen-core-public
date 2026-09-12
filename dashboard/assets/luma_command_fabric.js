@@ -15,6 +15,7 @@
     { label: "Opportunity Sprint", href: "/opportunity_sprint.html", hint: "One fixed-scope funding decision workflow" },
     { label: "Proof", href: "/proof_to_pilot.html", hint: "Scope one bounded paid review" },
     { label: "Evidence", href: "/evidence/", hint: "Inspect public-safe evidence and boundaries" },
+    { label: "Visual Library", href: "/visual_library.html", hint: "Explore claim-bounded concept and offer visuals" },
     { label: "External Review", href: "/external_review.html", hint: "Independent execution and review path" },
     { label: "ProofLock", href: "/build_week/prooflock_console/", hint: "Verify a bounded receipt" },
   ];

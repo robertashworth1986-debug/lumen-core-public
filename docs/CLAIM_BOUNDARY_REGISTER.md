@@ -110,6 +110,26 @@ Avoid: medical, biometric certification, or safety-critical identity claims with
 Safe: architecture, geometry-informed routing, simulation, proof packaging, interface concepts, patentable system design.  
 Avoid: physics-defying performance claims, certified field control, or claims of external validation without proof.
 
+### FlowForm curved electronics / honeycomb energy / ground robotics
+Safe: integrity-bound concept renders, null hypotheses, matched-test requirements, conventional simulation plans, non-energized or low-energy lab planning, and qualified-review requests.
+Avoid: describing renders as CAD, schematics, prototypes, or test results; do not claim signal-integrity, EMI, thermal, battery, propagation, autonomy, payload, safety, reliability, manufacturing, certification, or deployment performance.
+
+### LumenFrame / STL
+Safe: one founder-originated V1 digital mesh exists. Its receipt supports exact claims of 4,884 bytes, binary STL format, 96 triangles, 64 unique vertices, 144 unique edges, eight disconnected closed components, zero degenerate triangles, zero boundary or non-manifold edges, and extents of 60 × 87.5 × 120 in undeclared source units.
+Avoid: print success, structural suitability, dimensional accuracy, aerospace use, manufacturability, or performance. Empty V3 STL stubs and placeholder photo files are not evidence.
+
+### Smart City / Telecom
+Safe: read-only requirements, deterministic simulation, shadow-mode telemetry, matched RF/thermal coupon planning, accepted incumbent baseline, locked metric, and human-owned decision.
+Avoid: city or network control, autonomous mobility, commercial-board or 5G replacement, latency, resilience, RF/EMC, privacy compliance, low-EMF safety, savings, production readiness, or deployment.
+
+### Energy / Nuclear Harmonization
+Safe: conventional energy-data forecasting, calibration, evidence quality, and historical research-lineage disclosure.
+Avoid: nuclear conversion, radiation attenuation, healing, biometric energy transfer, field stabilization, usable-energy generation, safety, facility control, or validated mechanism. The legacy Nuclear Harmonization source remains a restricted speculative archive.
+
+### Dungeon / Dungieon
+Safe: state only that the source identity is unresolved.
+Avoid: inventing its function, maturity, visual, application, evidence, or relationship to another module.
+
 ---
 
 ## 7. Promotion gate
