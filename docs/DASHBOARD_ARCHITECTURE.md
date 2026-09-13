@@ -1,6 +1,31 @@
 # Dashboard Architecture
 
-Updated: June 12, 2026
+Updated: September 13, 2026
+
+## September 13 connected review revision
+
+At the founder's request, the eight legacy public redirect routes are now
+source-backed, dated research review pages in the proposed source change.
+`code/ops/build_research_review_surfaces.py` builds Mission Control, Quant Lab,
+Kraken research, Grant Factory, Forecast, Anomalies, Explainer and Lab from
+existing committed evidence. Mission Control leads the shared navigation.
+This advances the existing external validation / paid-pilot review outcome.
+
+The table below describes the original operator responsibilities. Public review
+pages summarize their evidence and connect the remaining tools; they do not
+reconnect the private operator runtime. Full August 8 implementations are
+preserved in Git history at `987e37ea47858c9c7dcc03f179f859f78fc9e995`.
+
+Public pages retain HOLD boundaries, dated sources and noindex metadata, and
+never request private snapshots or submit orders/applications. Shared dynamic
+requests remain limited to `/health` and `/api/public/status`. Historical
+TXIDs, selected strategy results, later held paper tests and accounting gaps
+are shown separately. Zero measured PnL and unknown PnL are distinct.
+
+Run the builder with `--check` to detect stale generated pages. The existing
+release allowlist already contains all eight routes and shared assets; this
+revision adds no live-data endpoint or deployment authority. The exact snapshot
+release and live byte verification remain separate from source review.
 
 ## Canonical Surfaces
 

@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import csv
+import argparse
 import hashlib
 import html
 import json
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 from statistics import mean
 from typing import Any
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "out"
 EXEC_OUT = OUT / "execution"
 DASH = ROOT / "dashboard"
@@ -29,6 +31,7 @@ LEADERBOARD_SOURCES = [
 ]
 
 ROLLING_PERFORMANCE_SOURCES = [
+    ROOT / "rolling_performance.json",
     OUT / "rolling_performance.json",
     ROOT / "data" / "out" / "rolling_performance.json",
 ]
@@ -38,6 +41,7 @@ REALIZED_OUTCOME_SOURCES = [
     OUT / "execution" / "institutional_crypto_paper_report.json",
     OUT / "rolling_performance.json",
     ROOT / "data" / "out" / "rolling_performance.json",
+    ROOT / "rolling_performance.json",
 ]
 
 CHAIN_FILES = [
@@ -110,6 +114,9 @@ def load_events(paths: list[Path]) -> list[dict[str, Any]]:
 def extract_txids(events: list[dict[str, Any]]) -> list[str]:
     txids: list[str] = []
     for e in events:
+        direct = e.get("txid")
+        if direct:
+            txids.extend(str(x) for x in (direct if isinstance(direct, list) else [direct]) if x)
         vr = e.get("validation_result", {})
         if isinstance(vr, dict) and vr.get("txid"):
             payload = vr.get("txid")
@@ -160,24 +167,83 @@ def get_last_non_empty_timestamp(events: list[dict[str, Any]]) -> str | None:
     return None
 
 
-def pick_realized_outcome() -> tuple[float, str | None]:
+def finite_number(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    try:
+        number = float(value)
+    except (ValueError, TypeError, OverflowError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def classify_outcome(data: dict[str, Any], source: str) -> dict[str, Any]:
+    """Require explicit closed-fill reconciliation before reporting realized PnL.
+
+    Historical paper/portfolio summaries are not exchange accounting. An absent
+    result remains null; a reconciled zero remains a real zero. All reconciliation
+    metadata is first-party reported, never described as independently verified.
+    """
+    mode = str(data.get("mode", data.get("execution_mode", ""))).lower()
+    is_paper = "paper" in source.lower() or mode in {"paper", "shadow", "simulation", "backtest"} or "paper_profit" in data
+    result = {"realized_source": source, "rolling_performance_net_pnl": None,
+              "unit": None, "status": "PAPER_ONLY" if is_paper else "UNRECONCILED",
+              "note": "Historical paper, shadow and unjoined summaries are not realized exchange PnL."}
+    if is_paper:
+        return result
+    rec = data.get("reconciliation")
+    value = finite_number(data.get("realized_net_pnl"))
+    window = data.get("time_window")
+    if (mode != "live" or not isinstance(rec, dict) or
+        rec.get("status") != "MATCHED" or rec.get("fees_included") is not True or
+        rec.get("cost_basis_complete") is not True or
+        not isinstance(rec.get("closed_trade_count"), int) or
+        isinstance(rec.get("closed_trade_count"), bool) or rec["closed_trade_count"] <= 0 or
+        not rec.get("fills_source") or not isinstance(window, dict) or
+        not window.get("start_utc") or not window.get("end_utc") or
+        not isinstance(data.get("quote_currency"), str) or not data["quote_currency"].strip() or value is None):
+        return result
+    result.update(rolling_performance_net_pnl=value, unit=data["quote_currency"],
+                  time_window=window, reconciliation=rec,
+                  status="REPORTED_RECONCILED", note="First-party closed-fill accounting with explicit fees, cost basis, currency and window; independent review pending.")
+    return result
+
+
+def pick_realized_outcome() -> dict[str, Any]:
+    seen = []
     for p in REALIZED_OUTCOME_SOURCES:
         data = load_json(p, {})
         if not isinstance(data, dict) or not data:
             continue
-        if "total_net_pnl_pct" in data:
-            return safe_float(data.get("total_net_pnl_pct", 0.0), 0.0), str(p)
-        if isinstance(data.get("portfolio"), dict):
-            portfolio = data.get("portfolio", {})
-            return safe_float(portfolio.get("return_pct", 0.0), 0.0), str(p)
-        if "paper_profit" in data:
-            return safe_float(data.get("paper_profit", 0.0), 0.0), str(p)
-    return 0.0, None
+        candidate = classify_outcome(data, str(p))
+        seen.append({"source": str(p), "status": candidate["status"]})
+        if candidate["status"] == "REPORTED_RECONCILED":
+            candidate["sources_reviewed"] = seen
+            return candidate
+    return {"realized_source": None, "rolling_performance_net_pnl": None,
+            "unit": None, "status": "UNKNOWN", "sources_reviewed": seen,
+            "note": "No complete closed-fill reconciliation located. Paper profit and missing results are not realized profit or a measured zero."}
+
+
+def mode_conflicts(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    conflicts = []
+    for event in events:
+        payload = event.get("payload", {})
+        validate = payload.get("validate") if isinstance(payload, dict) else None
+        declared = str(event.get("mode", event.get("event", ""))).lower()
+        if "validate" in declared and (validate is False or str(validate).lower() == "false"):
+            conflicts.append({"timestamp": event.get("timestamp"),
+                              "reason": "validate-only label conflicts with validate=false payload",
+                              "txids": extract_txids([event])})
+    return conflicts
 
 
 def build_payload() -> dict[str, Any]:
     events = load_events(EVENT_SOURCES)
-    txids = extract_txids(events)
+    trade_log = load_json(ROOT / "investor_txids" / "trade_log.json", [])
+    if not isinstance(trade_log, list):
+        trade_log = []
+    txids = extract_txids(events + [row for row in trade_log if isinstance(row, dict)])
 
     submit_events = [e for e in events if e.get("event") in {"submit_order", "submit_order_validate_only"}]
     deadman_events = [e for e in events if e.get("event") == "deadman_armed"]
@@ -201,7 +267,6 @@ def build_payload() -> dict[str, Any]:
     }
     controls_successes = sum(1 for v in controls.values() if v)
     controls_total = len(controls)
-    controls_confidence_lb = compute_wilson_lower_bound(controls_successes, controls_total)
     controls_coverage_pct = 100.0 * (controls_successes / controls_total if controls_total else 0.0)
     txid_depth_bonus = min(15.0, len(txids) * 2.0)
     event_depth_bonus = min(15.0, len(submit_events) * 1.5)
@@ -210,32 +275,26 @@ def build_payload() -> dict[str, Any]:
     leaderboard_path = pick_existing(LEADERBOARD_SOURCES)
     leaderboard_rows = load_csv_rows(leaderboard_path) if leaderboard_path else []
     top_rows = leaderboard_rows[:10]
-    top_test_sharpes = [safe_float(r.get("test_sharpe", r.get("test_sharpe_clean", 0.0))) for r in top_rows]
-    top_win_rates = [safe_float(r.get("test_win_rate", 0.0)) for r in top_rows]
+    top_test_sharpes = [n for r in top_rows if (n := finite_number(r.get("test_sharpe", r.get("test_sharpe_clean")))) is not None]
+    top_win_rates = [n for r in top_rows if (n := finite_number(r.get("test_win_rate"))) is not None]
 
     edge_quality = {
         "leaderboard_source": str(leaderboard_path) if leaderboard_path else None,
         "top10_count": len(top_rows),
-        "mean_test_sharpe_top10": round(mean(top_test_sharpes), 4) if top_test_sharpes else 0.0,
-        "mean_test_win_rate_top10": round(mean(top_win_rates), 4) if top_win_rates else 0.0,
+        "mean_test_sharpe_top10": round(mean(top_test_sharpes), 4) if top_test_sharpes else None,
+        "mean_test_win_rate_top10": round(mean(top_win_rates), 4) if top_win_rates else None,
+        "evidence_basis": "historical leaderboard diagnostics; not verified net trading performance",
     }
 
     rolling_path = pick_existing(ROLLING_PERFORMANCE_SOURCES)
-    realized_net_pnl, realized_source = pick_realized_outcome()
+    realized_outcome = pick_realized_outcome()
 
     first_ts = get_first_non_empty_timestamp(events)
     last_ts = get_last_non_empty_timestamp(events)
 
-    if realized_net_pnl < 0:
-        pnl_status = "NEGATIVE_REALIZED"
-    elif realized_net_pnl > 0:
-        pnl_status = "POSITIVE_REALIZED"
-    else:
-        pnl_status = "FLAT_OR_UNKNOWN"
-
     return {
         "generated_utc": now_utc(),
-        "proof_type": "kraken_positive_institutional_proof_v1",
+        "proof_type": "kraken_execution_evidence_v2",
         "time_window": {
             "first_event_utc": first_ts,
             "last_event_utc": last_ts,
@@ -248,29 +307,29 @@ def build_payload() -> dict[str, Any]:
             "env_verification_events": len(env_events),
             "txid_count": len(txids),
             "txids": txids,
+            "evidence_basis": "first_party_order_records_not_reconciled_exchange_fills",
+            "mode_conflicts": mode_conflicts(events),
         },
         "control_integrity": {
             "controls": controls,
             "controls_success_count": controls_successes,
             "controls_total": controls_total,
             "controls_coverage_pct": round(controls_coverage_pct, 2),
-            "wilson_lower_bound": round(controls_confidence_lb, 4),
-            "statistical_confidence_0_100": round(100.0 * controls_confidence_lb, 2),
+            "wilson_lower_bound": None,
+            "statistical_confidence_0_100": None,
+            "score_basis": "heuristic artifact-presence checklist; not statistical confidence or verified control effectiveness",
             "control_integrity_score_0_100": control_score,
             "chain_files": chain_present,
         },
         "edge_quality": edge_quality,
         "realized_outcome": {
+            **realized_outcome,
             "rolling_performance_source": str(rolling_path) if rolling_path else None,
-            "realized_source": realized_source,
-            "rolling_performance_net_pnl": realized_net_pnl,
-            "status": pnl_status,
-            "note": "Realized PnL is reported as-is; proof score is integrity/control focused and not a profitability claim.",
         },
         "institutional_narrative": {
-            "claim": "Execution stack proves deterministic controls, auditable chain-of-custody, and live exchange acknowledgement with verified TXIDs.",
-            "caveat": "Sample size for TXID-linked submits is currently small; expand controlled runs for stronger statistical confidence.",
-            "next_milestone": "Reach >= 25 TXID-backed submits with stable control score and improving realized PnL trajectory.",
+            "claim": "The stack contains historical order IDs, control artifacts and research results; each has a distinct evidence basis.",
+            "caveat": "An order ID does not establish a completed fill, strategy attribution, profitability, current authority or independent verification.",
+            "next_milestone": "Reconcile existing order IDs to closed fills, fees and strategy decisions; preserve paper/live boundaries and dated holdouts.",
         },
     }
 
@@ -281,7 +340,7 @@ def write_markdown(payload: dict[str, Any]) -> None:
     eq = payload.get("edge_quality", {})
     ro = payload.get("realized_outcome", {})
     lines = [
-        "# Kraken Positive Institutional Proof",
+        "# Kraken Execution Evidence",
         "",
         f"Generated UTC: {payload.get('generated_utc')}",
         "",
@@ -297,7 +356,7 @@ def write_markdown(payload: dict[str, Any]) -> None:
         f"- Mean test win-rate (top10): {eq.get('mean_test_win_rate_top10', 0.0)}",
         "",
         "## Realized Outcome",
-        f"- Net PnL: {ro.get('rolling_performance_net_pnl', 0.0)}",
+        f"- Net PnL: {format_pnl(ro)}",
         f"- Status: {ro.get('status', 'UNKNOWN')}",
         f"- Note: {ro.get('note', '')}",
         "",
@@ -306,6 +365,11 @@ def write_markdown(payload: dict[str, Any]) -> None:
     for txid in ev.get("txids", []):
         lines.append(f"- {txid}")
     OUTPUT_MD.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def format_pnl(outcome: dict[str, Any]) -> str:
+    value = finite_number(outcome.get("rolling_performance_net_pnl"))
+    return "Unknown / not reconciled" if value is None else f"{value:.2f} {outcome.get('unit', '')}"
 
 
 def write_html(payload: dict[str, Any]) -> None:
@@ -318,15 +382,15 @@ def write_html(payload: dict[str, Any]) -> None:
     if not txid_html:
         txid_html = "<li>No TXIDs found</li>"
 
-    pnl = safe_float(ro.get("rolling_performance_net_pnl", 0.0), 0.0)
-    pnl_class = "neg" if pnl < 0 else "pos"
+    pnl = finite_number(ro.get("rolling_performance_net_pnl"))
+    pnl_class = "acc" if pnl is None else "neg" if pnl < 0 else "pos"
 
     html_doc = f"""<!doctype html>
 <html>
 <head>
 <meta charset=\"utf-8\" />
 <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />
-<title>Kraken Positive Proof</title>
+<title>Kraken Execution Evidence</title>
 <style>
 :root {{ --bg:#0b0f14; --panel:#111826; --line:#23314c; --text:#eaf0ff; --muted:#9fb0d1; --pos:#1dd1a1; --neg:#ff6b6b; --acc:#ffd166; }}
 * {{ box-sizing:border-box; }}
@@ -350,15 +414,16 @@ ul {{ margin:8px 0 0 18px; }}
 <body>
 <div class=\"wrap\">
   <div class=\"hero\">
-    <h1>Kraken Positive Institutional Proof</h1>
-    <p>Control integrity + edge quality + chain-of-custody, with transparent realized outcome.</p>
+    <h1>Kraken Execution Evidence</h1>
+    <p>Historical order records, research diagnostics and explicit accounting provenance.</p>
+    <p><a href="/mission_control.html">Mission Control</a> · <a href="/quant_lab.html">Quant Lab</a> · <a href="/kraken_execution_dashboard.html">Kraken research</a></p>
   </div>
 
   <div class=\"grid\">
     <div class=\"card\"><div class=\"kicker\">TXID Count</div><div class=\"big\">{ev.get('txid_count',0)}</div></div>
-    <div class=\"card\"><div class=\"kicker\">Control Score</div><div class=\"big acc\">{ci.get('control_integrity_score_0_100',0)}</div></div>
+    <div class=\"card\"><div class=\"kicker\">Artifact checklist score (heuristic)</div><div class=\"big acc\">{ci.get('control_integrity_score_0_100',0)}</div></div>
     <div class=\"card\"><div class=\"kicker\">Mean Top10 Sharpe</div><div class=\"big\">{eq.get('mean_test_sharpe_top10',0.0)}</div></div>
-    <div class=\"card\"><div class=\"kicker\">Realized Net PnL</div><div class=\"big {pnl_class}\">{pnl:.2f}</div></div>
+    <div class=\"card\"><div class=\"kicker\">Reported reconciled Net PnL</div><div class=\"big {pnl_class}\">{html.escape(format_pnl(ro))}</div></div>
   </div>
 
   <div class=\"card section\">
@@ -369,7 +434,7 @@ ul {{ margin:8px 0 0 18px; }}
   </div>
 
   <div class=\"card section\">
-    <div class=\"kicker\">Verified TXIDs</div>
+    <div class=\"kicker\">Recorded order IDs — fill reconciliation pending</div>
     <ul>{txid_html}</ul>
   </div>
 </div>
@@ -395,6 +460,8 @@ def write_hash_manifest() -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Read local evidence and write a report; no exchange calls.")
+    parser.parse_args()
     EXEC_OUT.mkdir(parents=True, exist_ok=True)
     DASH.mkdir(parents=True, exist_ok=True)
 

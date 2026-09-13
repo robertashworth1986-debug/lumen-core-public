@@ -12,6 +12,11 @@
 
   var PUBLIC_ROUTES = [
     { label: "Home", href: "/", hint: "ProofLock Assurance" },
+    { label: "Mission Control", href: "/mission_control.html", hint: "Connected build and dated source evidence" },
+    { label: "Quant Lab", href: "/quant_lab.html", hint: "Research candidates and follow-on validation" },
+    { label: "Kraken Research", href: "/kraken_execution_dashboard.html", hint: "Historical order IDs and trading research" },
+    { label: "Grant Factory", href: "/grants.html", hint: "Evidence-to-application workflow" },
+    { label: "Cohort Tools", href: "/cohort/", hint: "Grant Factory, scouting and paper research tools" },
     { label: "Opportunity Sprint", href: "/opportunity_sprint.html", hint: "One fixed-scope funding decision workflow" },
     { label: "Proof", href: "/proof_to_pilot.html", hint: "Scope one bounded paid review" },
     { label: "Evidence", href: "/evidence/", hint: "Inspect public-safe evidence and boundaries" },
