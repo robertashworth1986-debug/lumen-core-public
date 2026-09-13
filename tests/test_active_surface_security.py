@@ -114,9 +114,22 @@ def test_active_dashboards_use_fail_closed_url_and_dom_boundaries() -> None:
         encoding="utf-8"
     )
 
-    for retired_surface in (grants, mission):
-        assert 'name="robots" content="noindex,nofollow,noarchive"' in retired_surface
-        assert "location.replace('/proof_to_pilot.html')" in retired_surface
+    for review_surface in (grants, mission, forecast, quant):
+        assert 'name="robots" content="noindex,nofollow,noarchive"' in review_surface
+        assert 'name="luma-surface" content="research-review-v2"' in review_surface
+        assert "READ-ONLY REVIEW" in review_surface
+        assert "HOLD" in review_surface
+        assert "location.replace" not in review_surface
+        for forbidden in (
+            "/api/snapshot",
+            "/api/events/recent",
+            "window.LUMA_API_BASE",
+            "URLSearchParams",
+            "Authorization:",
+            "onclick=",
+            "javascript:",
+        ):
+            assert forbidden not in review_surface
     assert "li.innerHTML" not in forecast
     assert "cpList.innerHTML" not in quant
     assert "host.innerHTML" not in quant
