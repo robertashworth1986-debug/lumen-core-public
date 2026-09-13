@@ -121,9 +121,13 @@ def test_legacy_public_routes_are_noindex_holds():
         body = path.read_text(encoding="utf-8")
         lower = body.lower()
         assert '<meta name="robots" content="noindex,nofollow,noarchive">' in body
-        assert '<meta name="lumencore-surface" content="legacy-public-route-hold-v1">' in body
-        assert '<meta http-equiv="refresh" content="0;url=/proof_to_pilot.html">' in body
-        assert "location.replace('/proof_to_pilot.html')" in body
+        assert '<meta name="luma-surface" content="research-review-v2">' in body
+        assert '<meta http-equiv="refresh"' not in body
+        assert "location.replace" not in body
+        assert 'READ-ONLY REVIEW' in body
+        assert 'HOLD' in body
+        assert 'field validation' in lower and 'production readiness' in lower
+        assert 'href="/proof_to_pilot.html"' in body
         for term in LEGACY_FORBIDDEN_TERMS:
             assert term.lower() not in lower
 

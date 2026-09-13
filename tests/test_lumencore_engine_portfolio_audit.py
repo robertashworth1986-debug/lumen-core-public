@@ -218,6 +218,9 @@ def test_explain_page_has_no_dead_local_html_links():
     for link in links:
         if link.startswith("https://lumen-core.ai/"):
             link = link.removeprefix("https://lumen-core.ai")
+        elif link.startswith(("https://", "http://")):
+            # External source-history citations are not local dashboard paths.
+            continue
         target = (
             ROOT / "dashboard" / link.lstrip("/")
             if link.startswith("/")
