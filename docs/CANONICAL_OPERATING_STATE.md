@@ -536,3 +536,17 @@ process presence remains separate from application health. The
 [production context](LUMA_PRODUCTION_CONTEXT.md#supervisor-process-ownership-corrected-september-14-2026)
 records compatibility effects, direct-child cleanup limits and the absence of
 runtime activation. The original service processes and controls were not changed.
+
+The NIC/DPU host reference builder now freezes the exact compilation inputs,
+requires its pinned primary compiler version, and tests its sanitizer compiler
+with deliberate heap-overflow and signed-overflow controls. The old Windows
+Zig combined-flag path did not detect the heap fault; its ASAN assurance is
+withdrawn for that reproduced environment. A verified portable Clang rerun
+passed both controls, all seven vectors and the unchanged 500,000-iteration
+generated supplement with no reported invariant or sanitizer finding. The
+[existing NIC foundation](NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md)
+retains the correction, source-custody rules and exact claim boundary. This is
+host software evidence, not NIC/DPU hardware, independent validation or
+production authorization. Sixteen focused builder checks passed, including
+silent-sanitizer rejection, changed-source rejection and portable mirror
+manifest verification. The original frozen v1 records remain unchanged.

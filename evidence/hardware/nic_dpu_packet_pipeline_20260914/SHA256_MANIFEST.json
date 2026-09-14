@@ -1,0 +1,176 @@
+{
+  "schema": "lumencore.sha256_manifest.v1",
+  "entry_count": 34,
+  "entries": [
+    {
+      "path": "run_20260914T054835Z/property_compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "run_20260914T054835Z/property_run.log",
+      "bytes": 104,
+      "sha256": "1428eefffdd7f10fda2883972f008a65aa3bcb979f8e026969ca8bda3352cec9"
+    },
+    {
+      "path": "run_20260914T054835Z/RECEIPT.json",
+      "bytes": 8875,
+      "sha256": "235a7014e0da7a9dd54fff4c3c7960b4b074bb6ceaaf21dab97d1f174bd93756"
+    },
+    {
+      "path": "run_20260914T054835Z/REPORT.md",
+      "bytes": 2045,
+      "sha256": "38ad4f8f26308410502bf27efc9daa8d8b138ede7511781a24b9a9239e60e530"
+    },
+    {
+      "path": "run_20260914T054835Z/sanitizer_controls/address_compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "run_20260914T054835Z/sanitizer_controls/address_positive_control.c",
+      "bytes": 166,
+      "sha256": "e8ef6b6151b791fd0e076e7219222b518db6fca67aa1c495c10f7419c5716ed4"
+    },
+    {
+      "path": "run_20260914T054835Z/sanitizer_controls/address_run.log",
+      "bytes": 3258,
+      "sha256": "cf5618ee78ae1f17211cde61eb6dff0f29a9a737fb309bbf817d705cd4f0903b"
+    },
+    {
+      "path": "run_20260914T054835Z/sanitizer_controls/undefined_compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "run_20260914T054835Z/sanitizer_controls/undefined_positive_control.c",
+      "bytes": 122,
+      "sha256": "c3eafc0e7e560dd4f7f2cb1aa4d6cc74fa96c75b78580f555d7643700807a193"
+    },
+    {
+      "path": "run_20260914T054835Z/sanitizer_controls/undefined_run.log",
+      "bytes": 575,
+      "sha256": "4cc817135917453da270e88c6baabf69d915d533c4d5dc20875e6d28ea24abef"
+    },
+    {
+      "path": "run_20260914T054835Z/SHA256_MANIFEST.json",
+      "bytes": 3743,
+      "sha256": "faa5b00c3418fe7538084325587fc8a5fc4919244b59168f84ca9877677fd3f3"
+    },
+    {
+      "path": "run_20260914T054835Z/sources/code/hardware/nic_dpu_packet_pipeline.c",
+      "bytes": 6489,
+      "sha256": "a80603b43c3cadb7be75c8abc94f93c4704d8ef5a192b158fad376d304025266"
+    },
+    {
+      "path": "run_20260914T054835Z/sources/code/hardware/nic_dpu_packet_pipeline.h",
+      "bytes": 2122,
+      "sha256": "38ce84440ef1d0206871e1e3bf38ded77de9e6c110f53f23834275045808e5e2"
+    },
+    {
+      "path": "run_20260914T054835Z/sources/code/hardware/nic_dpu_packet_pipeline_property_test.c",
+      "bytes": 6622,
+      "sha256": "b276533a4024ee006c3a0bb4f6fa6fc0af9f0b480fcf8a4456f99218918e21ec"
+    },
+    {
+      "path": "run_20260914T054835Z/sources/code/hardware/nic_dpu_packet_pipeline_test.c",
+      "bytes": 7418,
+      "sha256": "9a8d2abf791a439bf36aca2481cefa0dc53caa9dc8b6100146d38a8381a990fb"
+    },
+    {
+      "path": "run_20260914T054835Z/sources/code/ops/BUILD_NIC_DPU_PACKET_PIPELINE_EVIDENCE.py",
+      "bytes": 27608,
+      "sha256": "c917b43db71ee9c9cf418eb60139f14c4e1fe2beafd3259c238c4bed10a896fa"
+    },
+    {
+      "path": "run_20260914T054835Z/sources/config/nic_dpu_packet_pipeline_property_protocol_v1.json",
+      "bytes": 2282,
+      "sha256": "e3360ed3d0673e085593ba73888ff9cdbdfeb1f1ff06fbeee9cc051217418df4"
+    },
+    {
+      "path": "run_20260914T054835Z/sources/config/nic_dpu_packet_pipeline_protocol_v1.json",
+      "bytes": 2127,
+      "sha256": "8cabf617a22ddf829f76c96f428b858c66c08badca94bd545f32261f3571f090"
+    },
+    {
+      "path": "run_20260914T054835Z/sources/docs/NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md",
+      "bytes": 7491,
+      "sha256": "8f700a819542d34875420b91f5c9ead73ccc03f9de898cdb10193c245dd88b3a"
+    },
+    {
+      "path": "run_20260914T054835Z/sources/README.md",
+      "bytes": 16486,
+      "sha256": "33e0dd408b47b1a57e39481704acfd4b9bb11e3118f5ec8739d4cb4c1287b241"
+    },
+    {
+      "path": "run_20260914T054835Z/sources/tests/test_nic_dpu_packet_pipeline.py",
+      "bytes": 10517,
+      "sha256": "6fa272cc508717326ac93a6e10ffa844827970152d1ec39c9a8d35327a1e6531"
+    },
+    {
+      "path": "sanitizer_correction/address-control-modes.json",
+      "bytes": 460,
+      "sha256": "fee76d6c17060ff6941d33a4a978ae7f7e95122ccf42d57c26127eee43c0fb28"
+    },
+    {
+      "path": "sanitizer_correction/address_control_address_compile.log",
+      "bytes": 1107,
+      "sha256": "adede9beae4df49b89fe7a99e8f55e3d474466f8ac2ad16674b7c457fa9cbd57"
+    },
+    {
+      "path": "sanitizer_correction/address_control_combined_compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "sanitizer_correction/address_control_combined_run.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "sanitizer_correction/address_control_separate_compile.log",
+      "bytes": 1107,
+      "sha256": "9545132233c1be82b4c7dccbaf1ecbd5eee23caf0d11f6b40941945ac8348750"
+    },
+    {
+      "path": "sanitizer_correction/address_positive_control.c",
+      "bytes": 155,
+      "sha256": "4f7bddaf496a873518f3abfd1b482ef13c9bbf87ce3962378d26702709840b6f"
+    },
+    {
+      "path": "sanitizer_correction/check_sanitizer_modes.py",
+      "bytes": 1524,
+      "sha256": "1cf141499b98038c2d9a242bb6bb91f12fdc2b634cef77f59930c8cedaf8074f"
+    },
+    {
+      "path": "sanitizer_correction/CORRECTION.json",
+      "bytes": 2122,
+      "sha256": "b30ec5079bd74e842f5c737371e3a8614294ae906dc2e187570f37d489e2217f"
+    },
+    {
+      "path": "sanitizer_correction/llvm-positive-controls.json",
+      "bytes": 1667,
+      "sha256": "b53bec639d1fb1d010f2c6080023db166547029c0c27f75d199cfebfd53025ea"
+    },
+    {
+      "path": "sanitizer_correction/llvm-toolchain-installation.json",
+      "bytes": 700,
+      "sha256": "2a0b0008765442e7bf0e407352cdcf8342b8c5299d0f45c5dd9f0176387a0d1b"
+    },
+    {
+      "path": "sanitizer_correction/PLAN.json",
+      "bytes": 2140,
+      "sha256": "f09eac50bac5bb3890765723bdc96b2dcb1dbf44667b8f2bd96d0292cc0fedfc"
+    },
+    {
+      "path": "sanitizer_correction/property-run.log",
+      "bytes": 104,
+      "sha256": "1428eefffdd7f10fda2883972f008a65aa3bcb979f8e026969ca8bda3352cec9"
+    },
+    {
+      "path": "sanitizer_correction/source-freeze.json",
+      "bytes": 1143,
+      "sha256": "d1093143fcd6a67a5a595c32f6783c4bf211ad9fbe9e56137862a370ccf0de86"
+    }
+  ]
+}

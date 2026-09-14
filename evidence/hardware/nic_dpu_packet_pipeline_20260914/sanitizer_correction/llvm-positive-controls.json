@@ -1,0 +1,32 @@
+[
+  {
+    "kind": "address",
+    "compile_exit": 0,
+    "flags": [
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-fsanitize=address",
+      "-fsanitize=undefined",
+      "-fno-sanitize-recover=all"
+    ],
+    "run_exit": 1,
+    "expected_diagnostic_present": true,
+    "diagnostic_preview": "=================================================================\n==27612==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x122320ea0034 at pc 0x7ff660ea151b bp 0x00bedbaffaa0 sp 0x00bedbaffae8\nWRITE of size 1 at 0x122320ea0034 thread T0\n    #0 0x7ff660ea151a in main C:\\Users\\Novac\\Documents\\Codex\\2026-09-13\\plan-outreach-and-funding-chatgpt-conversation\\work\\institutional-five-hour\\nic-dpu-property-review/llvm_address_control.c:2:100\n    #1 0x7ff660ea10fa in __tmainCRTStartup /home/ru"
+  },
+  {
+    "kind": "undefined",
+    "compile_exit": 0,
+    "flags": [
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-fsanitize=address",
+      "-fsanitize=undefined",
+      "-fno-sanitize-recover=all"
+    ],
+    "run_exit": 1,
+    "expected_diagnostic_present": true,
+    "diagnostic_preview": "C:\\Users\\Novac\\Documents\\Codex\\2026-09-13\\plan-outreach-and-funding-chatgpt-conversation\\work\\institutional-five-hour\\nic-dpu-property-review\\llvm_undefined_control.c:2:87: runtime error: signed integer overflow: 2147483647 + 1 cannot be represented in type 'int'\nSUMMARY: UndefinedBehaviorSanitizer: undefined-behavior C:\\Users\\Novac\\Documents\\Codex\\2026-09-13\\plan-outreach-and-funding-chatgpt-conversation\\work\\institutional-five-hour\\nic-dpu-property-review\\llvm_undefined_control.c:2:87 \n"
+  }
+]

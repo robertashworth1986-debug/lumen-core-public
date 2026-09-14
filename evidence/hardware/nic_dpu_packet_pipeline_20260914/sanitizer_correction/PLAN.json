@@ -1,0 +1,28 @@
+{
+  "schema": "lumencore.nic_dpu_property_extension_plan.v1",
+  "frozen_date_utc": "2026-09-14",
+  "source_commit": "be34cf133d874a496a421ac2609dcc048bab4020",
+  "decision": "Assess additional host parser and policy invariants beyond the seven retained v1 vector tests.",
+  "relationship": "Supplement the frozen 2026-08-17 protocol; do not rewrite its earlier receipts or claim hardware validation.",
+  "input_method": "Deterministic xorshift32 seed, generated Ethernet/single-VLAN/IPv4/TCP/UDP templates, byte mutations, arbitrary byte arrays and prefix truncations.",
+  "seed": 20260914,
+  "cases": 500000,
+  "maximum_frame_bytes": 65553,
+  "alignment_offsets": [0, 1, 3],
+  "checks": [
+    "No AddressSanitizer or UndefinedBehaviorSanitizer finding for the generated inputs.",
+    "Parser and pipeline status values remain in the declared enum.",
+    "Valid configured policies return only pass, drop or queue.",
+    "Malformed and truncated frames are dropped.",
+    "A fragmented packet never exposes valid transport ports.",
+    "Ports are exposed only for TCP or UDP.",
+    "Repeated parsing of the same input gives the same initialized view.",
+    "Fresh per-packet parse and action counters each partition one observed packet.",
+    "Parsing and classification preserve all declared input bytes."
+  ],
+  "stop_rule": "Stop on the first violated invariant or sanitizer error and retain the case index, seed and input bytes for reproduction. No threshold or generator tuning after outcome selection.",
+  "toolchain": "ziglang 0.15.2; strict C11 warnings-as-errors; -fsanitize=address,undefined",
+  "coverage_guided_fuzzing": false,
+  "toolchain_limit": "A separate libFuzzer compile probe failed because the installed Windows GNU target rejects -fsanitize=fuzzer-no-link. This run uses a deterministic standalone generator and does not report libFuzzer coverage.",
+  "excluded_claims": ["unique independent test cases", "exhaustive coverage", "full IPv4 conformance", "checksums", "IPv6", "stacked VLAN support", "security certification", "hardware offload", "line rate", "production readiness", "external validation", "revenue"]
+}
