@@ -623,30 +623,21 @@ def build_status_payload(
 
 
 def run_periodic_artifacts(paper_runtime: dict, state: dict, now_ts: float) -> tuple[float, float, list[str]]:
-    report_refresh_minutes = max(0.5, float(paper_runtime.get("report_refresh_minutes", 5.0) or 5.0))
-    evidence_pack_refresh_minutes = max(1.0, float(paper_runtime.get("evidence_pack_refresh_minutes", 30.0) or 30.0))
-
-    last_report_ts = float(state.get("last_report_refresh_ts", 0.0) or 0.0)
-    last_pack_ts = float(state.get("last_evidence_pack_refresh_ts", 0.0) or 0.0)
-    notes: list[str] = []
-
-    if INSTITUTIONAL_DAILY_REPORT_SCRIPT.exists() and (now_ts - last_report_ts) >= (report_refresh_minutes * 60.0):
+    # Retire implicit financial-report publication. The daily diagnostic needs
+    # a selected snapshot; the old pack still consumes unreconciled shared data.
+    # Do not spawn a permanently incompatible CLI repeatedly or label failure
+    # as success. Manual legacy pack arithmetic is not validated by this hold.
+    def prior_success(name):
+        value = state.get(name)
         try:
-            subprocess.run([sys.executable, str(INSTITUTIONAL_DAILY_REPORT_SCRIPT)], cwd=str(ROOT / "code"), check=False)
-            last_report_ts = now_ts
-            notes.append("report_refresh=ok")
-        except Exception as exc:
-            notes.append(f"report_refresh_error={type(exc).__name__}")
-
-    if INVESTOR_EVIDENCE_PACK_SCRIPT.exists() and (now_ts - last_pack_ts) >= (evidence_pack_refresh_minutes * 60.0):
-        try:
-            subprocess.run([sys.executable, str(INVESTOR_EVIDENCE_PACK_SCRIPT)], cwd=str(ROOT / "code"), check=False)
-            last_pack_ts = now_ts
-            notes.append("evidence_pack_refresh=ok")
-        except Exception as exc:
-            notes.append(f"evidence_pack_refresh_error={type(exc).__name__}")
-
-    return last_report_ts, last_pack_ts, notes
+            number = float(value)
+            return number if not isinstance(value, bool) and math.isfinite(number) and number >= 0 else 0.0
+        except (TypeError, ValueError, OverflowError):
+            return 0.0
+    return prior_success('last_report_refresh_ts'), prior_success('last_evidence_pack_refresh_ts'), [
+        'report_refresh=held_explicit_snapshot_required',
+        'evidence_pack_refresh=held_legacy_financial_inputs_unreviewed',
+    ]
 
 
 def execute_once(client: AlpacaPaperClient, runtime: dict, paper_runtime: dict, selection: dict, args) -> dict:

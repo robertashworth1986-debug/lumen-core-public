@@ -71,6 +71,70 @@ c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe c:/LumaTrader/INST
 
 ---
 
+### Offline daily record report (`../institutional_daily_report.py`)
+
+The September 14 correction retires the implicit credential/network/shared-file
+refresh. A synthetic legacy probe with all readers replaced produced $100,000
+starting capital, -$100,000 PnL, zero win rate, and -101% versus a one-day SPY
+input from an empty account fixture. A future-dated record also counted in its
+recent window. Those were report arithmetic defects, not account observations.
+
+The replacement requires one explicit local JSON snapshot and a **new output
+directory whose parent already exists**:
+
+```powershell
+python code/institutional_daily_report.py --snapshot review-input.json --output-dir review-result
+```
+
+Input contract (these values are a synthetic example):
+
+```json
+{
+  "schema": "lumencore.daily_report_input.v1",
+  "as_of_utc": "2026-09-14T08:00:00Z",
+  "declared_mode": "synthetic",
+  "declared_currency": "USD",
+  "status": {},
+  "state": {},
+  "evidence": {},
+  "ledger": []
+}
+```
+
+The strict reader captures at most 16 MiB once, hashes those bytes, rejects
+duplicate JSON members/non-finite literals, and requires at most 100,000 object
+records. It does not authenticate the source, prove chronology/completeness or
+make the file immutable. The supplied aware timestamp fixes the inclusive
+60-minute window. Timestamps must use extended ISO form with seconds, an explicit
+offset/Z, and at most six fractional digits; finer precision is rejected rather
+than silently rounded into the window. Future, naive, invalid and older records have explicit counts.
+Counts describe submitted records, never unique trades or actual executions.
+
+Account, risk, performance, execution-flow and benchmark KPIs remain null.
+Numeric declarations are kept separately as exact decimal strings, with no
+fallback between sources; a real zero stays zero. Investment readiness, broker
+reconciliation and live authority remain false. Optional recent-record notional
+arithmetic requires complete nonnegative amounts, consistent declared mode/USD,
+and no missing, conflicting or duplicate identities or invalid/future times.
+This is not volume verification or account performance. Identity aliases
+`event_id`, `id` and `trade_id`, when present together, must agree exactly.
+
+Outputs are the existing report JSON, a diagnostic-only CSV, and a two-file hash
+manifest inside the selected new directory. Validation/serialization precedes
+directory creation, and existing directories/files are never overwritten.
+An I/O failure during writing can leave a partial directory; a manifest is not
+a transactional-publication or decompression/CPU-sandbox guarantee.
+
+The old no-argument CLI exits 2. The legacy executor's implicit report and
+evidence-pack subprocess paths are held without launches or repeated retries;
+prior successful-refresh timestamps are retained and no success is claimed.
+This does not validate the manually invoked pack's separate arithmetic or
+stale shared inputs. `alpaca_paper_loop_builder.py`,
+historical shared reports and `build_investor_evidence_pack.py` remain legacy
+paths requiring separate review. No original account, credentials, ledgers,
+scheduled processes or execution controls were accessed or changed for these
+synthetic tests. Caller tests execute an AST-isolated function with inert fakes.
+
 ## 3) DuckDB + Parquet investor pipeline (`trade_log_duckdb_pipeline.py`)
 
 Builds normalized Parquet from `trade_log.json`, then computes KPI metrics via DuckDB.

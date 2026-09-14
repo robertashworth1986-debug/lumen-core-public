@@ -615,3 +615,17 @@ or emit measured savings, operational failure times or investment readiness.
 The [existing cross-sector documentation](../code/execution/README_CROSS_SECTOR_INTEL.md)
 records the changed CLI contract and unreviewed legacy-consumer boundary.
 Historical source outputs and the original runtime remain unchanged.
+
+The legacy daily-report entry point now requires an explicit local snapshot
+and new output directory. A synthetic probe reproduced invented starting
+capital, negative PnL and a mismatched one-day benchmark comparison from empty
+inputs, plus future records counted as recent. The replacement retains source
+hashes, fixed aware time windows, record-quality coverage and exact declared
+numeric inputs while withholding unreconciled financial KPIs. Fifty
+focused tests cover these boundaries and an AST-isolated scheduled caller:
+implicit report/package subprocesses are held without launches, retry loops
+or false success timestamps.
+The [existing reporting documentation](../code/execution/README_OPTIMIZATION_TOOLS.md)
+describes the intentional CLI change and remaining legacy collector/packaging
+paths. This supports buyer diligence without private account access, original
+runtime activation, financial performance or independent acceptance claims.
