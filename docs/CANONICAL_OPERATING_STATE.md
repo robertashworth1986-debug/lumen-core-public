@@ -627,6 +627,19 @@ the canonical paper facade holds report/package subprocesses without launches, r
 or false success timestamps. The historical executor and its frozen policy
 digest are preserved; the facade binds the hold into the loop.
 The [existing reporting documentation](../code/execution/README_OPTIMIZATION_TOOLS.md)
-describes the intentional CLI change and remaining legacy collector/packaging
+describes the intentional CLI change and remaining legacy collector
 paths. This supports buyer diligence without private account access, original
 runtime activation, financial performance or independent acceptance claims.
+
+The existing investor evidence packager now requires a caller-selected source
+directory, explicit bounded relative file list and new output directory. A
+synthetic redirected-root probe reproduced missing/malformed inputs promoted as
+zero performance, duplicate records counted as separate profitable trades, and
+different source bytes hashed versus archived. The correction captures selected
+bytes once and uses them for both manifest and ZIP; financial metrics remain
+unknown. Forty-nine focused checks and the combined daily/order-facade checks
+pass. The elite optimizer holds its implicit pack step, does not advertise a
+stale shared ZIP and rejects native step failures. This advances the existing
+external-validation/paid-pilot handoff; it does not validate the packaged source
+claims, grant distribution rights, or establish financial performance. The
+original runtime and historical executor bytes remain unchanged.

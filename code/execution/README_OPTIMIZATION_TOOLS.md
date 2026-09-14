@@ -132,12 +132,50 @@ The facade binds this hold into the preserved loop, as it already binds the
 exact-origin guards. Historical executor bytes and their order-safety policy
 digest remain unchanged. Direct execution of the historical file is outside
 this canonical facade correction and is not an approved invocation route.
-This does not validate the manually invoked pack's separate arithmetic or
-stale shared inputs. `alpaca_paper_loop_builder.py`,
-historical shared reports and `build_investor_evidence_pack.py` remain legacy
+The manual packager has the separate explicit-capture contract below.
+`alpaca_paper_loop_builder.py` and historical shared reports remain legacy
 paths requiring separate review. No original account, credentials, ledgers,
 scheduled processes or execution controls were accessed or changed for these
 synthetic tests. Caller tests execute an AST-isolated function with inert fakes.
+
+### Explicit offline evidence pack
+
+`code/build_investor_evidence_pack.py` no longer chooses runtime/account files,
+creates a directory on import, or runs with no arguments. Provide an existing
+plain source directory, a UTF-8 JSON list of 1 to 128 relative file paths, and a
+new output directory under an existing plain parent. Example selection:
+
+```json
+["protocol.json", "results/report.json"]
+```
+
+```powershell
+python code/build_investor_evidence_pack.py --source-root C:/review/captured --artifacts-json C:/review/selection.json --output-dir C:/review/new-pack
+```
+
+Every selected file must exist. Limits are 64 KiB for the selection, 16 MiB per
+source and 64 MiB total source bytes. Observed links/reparse points, nonregular
+files, traversal/drive paths, case collisions, reserved Windows names and path
+components starting with spreadsheet-formula characters are rejected. Files are
+captured once; the ledger, source hashes and ZIP use those same buffers. Observed
+file identity/size/mtime changes during capture cause a hold. This is per-file
+capture, not an atomic multi-file snapshot or exclusion of concurrent writers.
+
+The new directory contains `artifact_hash_manifest.json`,
+`artifact_hash_ledger.csv` and `institutional_evidence_pack.zip`; sources live
+under `sources/` in the ZIP. The v2 manifest declares its exact self-hash rule.
+The CLI receipt separately gives the SHA-256 of the final manifest bytes and
+final archive bytes. Older v1 readers must not assume compatibility. All account
+and performance fields are null, with `NOT_EVALUATED`, no broker reconciliation,
+no investment readiness and no execution authority. Source contents are retained
+as evidence bytes, not interpreted or certified. Review distribution rights and
+contained claims before sharing; this tool does not redact source files.
+
+Existing output is refused. Serialization occurs before creating output; a disk
+error can still leave a partial new directory. Payload limits do not constitute
+a hostile-filesystem, CPU or peak-memory sandbox. The elite optimizer's implicit
+pack step remains HOLD, does not advertise old ZIPs, and now rejects failed
+native steps. The original runtime was not activated for these corrections.
 
 ## 3) DuckDB + Parquet investor pipeline (`trade_log_duckdb_pipeline.py`)
 
