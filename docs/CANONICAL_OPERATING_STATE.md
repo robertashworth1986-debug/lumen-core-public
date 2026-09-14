@@ -477,6 +477,19 @@ The existing Measure & improve view now includes an optional offline energy evid
 
 ## EC portal cohort announcement - 2026-09-12
 
+
 Robert explicitly provided the signed-in EC portal route and requested delivery of the existing gift announcement. One group-scoped message was posted to TakeOff Fall 2026. The portal confirmed successful sending; the posted title, author, substantive body, public directory link and group recipient list were read back. This is the fourth scoped outbound under `ec-takeoff-strengths-resource`. No email group was retried and no new campaign was created.
 
 The cohort announcement requirement is complete for group posting. Individual notification delivery, reads, owner adoption, six actual customer conversations, baselines and measured results remain unconfirmed. The prior waiting-for-distribution checkpoint is superseded by this verified portal event; other external dependencies remain. Exact portal identifiers, displayed recipients, message text and delivery evidence are retained in the existing private E-drive review estate. Continue substantive replies in that thread or follow new explicit founder direction; do not repost the announcement.
+
+## Connected dashboard and trading evidence recovery — 2026-09-13
+
+Robert explicitly requested a fuller recovery of the connected dashboards and trading research, with Mission Control as the visual lead and Quant Lab / Grant Factory retained as built assets. This scoped source change advances the existing external-review / paid-pilot outcome. It updates the eight canonical research routes and shared navigation; it creates no new company identity or execution authority.
+
+The proposed public views retain dated evidence, HOLD boundaries, archive links and public-health-only dynamic requests. The April 5 log contains five distinct recorded order IDs; the later Level 6 paper guardrail holds all five Level 4 candidates. Historical losses and unknown accounting remain visible. The proof builder no longer treats paper reports as realized PnL or a missing result as zero, and no longer describes an artifact-presence heuristic as statistical confidence. The current validation-only helper already forces validate=True; no order code was executed or changed.
+
+The maintained trading quickstart now indexes generations, timeframe screening, movement clusters, timing holdouts, edge guards, allocation, execution and accounting. Frozen source digests prevent changed data from retaining an old citation. Historical raw evidence remains unchanged.
+
+Source verification was extended on September 14. The focused pytest suite passed 24 checks, and all eight generated pages match their builder. Browser review covered all eight pages at desktop 1440 x 1000 and mobile 390 x 1000, including horizontal table scrolling by keyboard and footer access. A narrow table-width correction preserves readable columns on mobile. The retained [browser QA receipt](../evidence/public_research_review/20260914/BROWSER_QA.json) records scope and exclusions. After rebinding the engine portfolio audit to the corrected HTML bytes, all ten workflows passed at `c2427222fad8176a12d5895223fb961d9be8878d`; its Linux full suite passed 934 tests with 8 skips and 82 subtests passing. These are source and browser checks pending PR review and the separately controlled public release; no deployment or private runtime restoration is claimed.
+
+Private exchange email receipts, screenshots, notebook records and counterparty correspondence remain outside this public repository. Additional iCloud/notebook recovery is incomplete because source access is not available in this session. The existing private milestone addendum is the handoff for those findings; no external message or submission was sent in this pass.

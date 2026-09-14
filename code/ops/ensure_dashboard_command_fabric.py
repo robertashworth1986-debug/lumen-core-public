@@ -15,6 +15,8 @@ CANONICAL_PAGES = (
     "grants.html",
     "forecast.html",
     "explain.html",
+    "anomalies.html",
+    "lab.html",
 )
 CSS_REF = '<link rel="stylesheet" href="./assets/luma_command_fabric.css">'
 JS_REF = '<script src="./assets/luma_command_fabric.js"></script>'

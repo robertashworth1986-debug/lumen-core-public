@@ -1,388 +1,76 @@
-# Unified Trading System — Quick Start Guide
+# LumenCore trading research and evidence map
 
-## What You Now Have
+Updated September 13, 2026. This supersedes the earlier launch-oriented quickstart. It advances the existing external-review / paid-pilot outcome by making the built trading lane inspectable.
 
-A **complete trading engine** that:
-- ✅ Finds alpha like sports discovery (arbitrage, momentum, value bets)
-- ✅ Detects moonshots (extreme payoff ratios: 10→1000)
-- ✅ Executes paper AND live trades on thousands of symbols simultaneously
-- ✅ Tracks real P&L in real-time (replaces stale "-37%")
-- ✅ Supports 5-day lookback validation (proves edge works)
-- ✅ Never creates backed-up trades (atomic execution)
-- ✅ Uses exact same alpha logic as sports discovery + luma scout
+## Start with the connected views
 
----
+- [Mission Control](https://lumen-core.ai/mission_control.html): build and source breadth.
+- [Quant Lab](https://lumen-core.ai/quant_lab.html): candidate research and later gates.
+- [Kraken research](https://lumen-core.ai/kraken_execution_dashboard.html): historical order records and accounting boundary.
+- [Grant Factory](https://lumen-core.ai/grants.html): turn bounded evidence into reviewable application work.
 
-## Three Core Engines
+These URLs show the connected review views only after the separate public release. Source changes and tests do not prove deployment. The complete August 8 operator interfaces remain in Git history at `987e37ea47858c9c7dcc03f179f859f78fc9e995`; their private runtime is not reconnected by this change.
 
-### 1. Unified Alpha Engine (`unified_alpha_engine.py`)
-**Finds alpha signals across asset classes.**
+## What has actually been recovered
 
-```bash
-# Single scan
-python code/unified_alpha_engine.py
+| Evidence | Result | Interpretation |
+| --- | --- | --- |
+| `investor_txids/trade_log.json` | Five distinct April 5 order IDs across SOLUSD, ADAUSD and SPXUSD | Historical first-party rows labeled LIVE/CLOSED. Missing closing-fill and fee joins prevent a strategy-level net-profit claim. |
+| `runtime_env_hydration_proof.json` | April 4 smoke output contains an order ID and a validate=false payload under a VALIDATE_ONLY label | Historical mode-label conflict. Do not rerun this receipt as a smoke test. Current `code/kraken_execution.py` explicitly forces validate=True in the validation helper. |
+| `dashboard/level3_truth_dashboard.json` | 1,872 input rows; 17 selected champions | Selection output, not 17 externally validated strategies. |
+| `dashboard/level4_live_summary.json` | Five HYPE/PAXG/XRP/FET candidates; test MC Sharpes 4.142–6.006 | Historical research. The LIVE_ALLOCATION_READY label does not authorize trading. |
+| `dashboard/level6_paper_guardrail.json` | Zero approved winners, zero observed paper events, paper_ready_for_live=false | The later gate held all five; four follow-on Sharpe values are negative. |
+| `gen4_real/champion.json` | USDC/USD mean reversion, reported Sharpe 8.501 | Recover costs, sampling interval and source window before interpreting this stablecoin result. |
+| `gen4_validate_scale/validated_champion.json` | ZEC/USD trend, reported Sharpe 1.782 | Candidate-specific historical result. |
+| `gen5_output/gen5_champion.json` | ZEC stress windows have mixed results | Does not establish stable performance across periods. |
+| `gen6_5/gen6_5_state.json` | 41 trades, reported PnL -6.21 | State-file units and exchange attribution require reconciliation. |
+| `gen7/state.json` | Three trades, reported PnL +3,079.687 | Mode and venue reconciliation are not established in the summary; not verified cash profit. |
+| `gen7_clean/best.json` | Shadow XRP/USD, 126 trades, PnL -19.41 | Explicit shadow result. |
+| `credible_top10.json` | Repeated 721-row Kraken input entries, test Sharpe 5.082 | Deduplicate dataset references and recover metric units, costs and baseline definition. |
+| `adaptive_champion.json` | Sharpe 15.058; vs_baseline -0.117 | High Sharpe does not establish improvement over the incumbent. |
+| `rolling_performance.json` | Paper source, zero trades and paper PnL zero | Fictional/paper accounting, not realized exchange PnL. |
+| `config/accounts/KRAKEN_PRIMARY/runtime_control.json` | Paper mode, live orders disabled | Committed configuration; current server state must be checked separately by an authorized operator. |
 
-# Continuous daemon (45-second scans)
-python code/unified_alpha_engine.py --daemon
+Historical measurements are preserved. No current market edge, fixed daily return, five-day proof rule or blanket “all generations live-tested” claim is established by this recovered set.
+
+## The research stack
+
+| Family | Existing implementation | How it connects |
+| --- | --- | --- |
+| Broad strategy search | `code/backtest_all_strategies.py`, `code/universe_backtest.py`, `code/universe_backtest_multi.py`, `code/mega_backtest.py`, `code/mega_backtest_deep.py` | Candidate generation and baselines; retain the complete selection universe. |
+| Walk-forward research | `code/backtest_walkforward_engine.py` | Sequential train/test scaffolding; its example is synthetic and is not production evidence. |
+| Unified signals | `code/unified_alpha_engine.py`, `code/adaptive_engine.py`, `code/universal_harmonic_edge_core.py` | Signal/ranking architecture, distinct from realized execution. |
+| Pair and timeframe screening | `code/ops/build_kraken_multi_tf_alpha_map.py` | Spread, trend, recent movement and ranked pair diagnostics. An alpha score is a heuristic. |
+| Move clustering | `code/ops/build_kraken_6m_move_clusters.py` | Movement by time-of-day/weekday with observed history coverage. A six-month target does not prove six months were obtained. |
+| Timing holdouts | `code/ops/build_symbol_timing_edge_model.py`, `code/ops/collect_kraken_hourly_history.py` | Chronological selection, holdout diagnostics and a default 52-bps round-trip cost; review history support and overlap. |
+| Spike and swing research | `code/backtest_spike_hunter.py`, `code/kraken_dislocation_scan.py`, `code/kraken_followup_review.py` | Event-specific research; do not infer net profit from alerts. |
+| Edge quality | `code/edge_truth_guard.py` | Baseline-relative quality, extreme Sharpe and sample checks. Preserve fail/hold verdicts. |
+| Cross-sector prioritization | `code/ops/BUILD_ALPHA_EDGE_LOCK_ENGINE.py` | Heuristic scoring and seeded Gaussian confidence simulations. These are not an empirical probability of trading profit. |
+| Allocation and regime | `code/execution/crypto_allocator.py`, `code/execution/crypto_regime_controller.py` | Allocation decisions remain downstream of data and authorization gates. |
+| Execution | `code/kraken_execution.py`, `code/unified_trade_executor.py`, `code/execution/kraken_live_growth_controller.py` | Order integration and safeguards; no order action is part of the review build. |
+| Accounting and proof | `code/ops/ANALYZE_TRADER_BLEED.py`, `code/build_kraken_positive_proof.py` | Join fills, cost basis, fees and strategy attribution. The bleed helper's gross-price comparisons alone do not establish net results. |
+| Dashboard and review | `code/ops/build_research_review_surfaces.py`, `dashboard/assets/luma_command_fabric.js` | Eight connected static review pages, public health only, source links and archived full-interface links. |
+
+## Read-only verification
+
+From the repository root:
+
+```sh
+python code/ops/build_research_review_surfaces.py --check
+python code/ops/ensure_dashboard_command_fabric.py --strict
+python -m pytest tests/test_kraken_evidence_accounting.py tests/test_public_legacy_route_holds.py tests/test_public_offer_consistency.py
 ```
 
-**Output Files:**
-- `out/unified_alpha/unified_alpha_signals.json` — Top 100 signals ranked by Kelly value
-- `out/unified_alpha/unified_alpha_performance.json` — Scorecard with moonshot counts
-- `out/unified_alpha/unified_alpha_ledger.jsonl` — Append-only signal audit trail
+The evidence builder reads local artifacts and writes a report; it never calls Kraken. Unknown PnL is null. A measured zero requires complete accounting provenance. Paper and shadow reports are never eligible for the realized field.
 
-**Signal Types:**
-- **Arbitrage**: Price mismatch across exchanges (Buy low, sell high)
-- **Momentum**: Trending price with volume confirmation (Steam moves)
-- **Technical**: Volatility mean reversion (IV skew edge)
-- **Fundamental**: Valuation cheapness (Value bets)
+For a first-party reconciled result, the input must explicitly provide: mode=live, finite realized_net_pnl, quote_currency, start/end UTC window, and a reconciliation record with status=MATCHED, fees_included=true, cost_basis_complete=true, positive closed_trade_count and fills_source. This is reported reconciliation, not independent verification. Preserve the underlying fill export privately.
 
-**Moonshot Detection:**
-- Signals with payoff > 2x
-- Confidence > 80% AND expected value > 5%
-- Ranked separately for trader approval
+## Remaining research gates
 
----
+1. Recover the exact original input files, symbols, dates, strategy versions and parameter selection history.
+2. Freeze the baseline, train/holdout split, overlap/embargo policy and market-cost assumptions.
+3. Compare all selected candidates on untouched data; keep losing and held results.
+4. Join existing historical order IDs to fills, fees, closing cost basis and strategy decisions.
+5. Confirm paper operation and source health separately from historical research. Runtime changes, live orders, withdrawals and deployment remain separate actions.
 
-### 2. Unified Trade Executor (`unified_trade_executor.py`)
-**Executes trades from alpha signals with full risk management.**
-
-```bash
-# Paper trading (simulated, safe)
-python code/unified_trade_executor.py --daemon --mode paper
-
-# Live trading (real execution)
-python code/unified_trade_executor.py --daemon --mode live
-```
-
-**Output Files:**
-- `out/unified_trade/unified_trade_state.json` — Current positions + bankroll
-- `out/unified_trade/unified_trade_performance.json` — Real-time P&L metrics
-- `out/unified_trade/unified_trade_ledger.jsonl` — All fills (settlement audit trail)
-
-**Execution Features:**
-- **Position Sizing**: Kelly fraction × bankroll (optimal growth)
-- **Risk Management**: Auto stop-loss at -10%, take-profit at +20%
-- **Real P&L**: Tracks unrealized + realized P&L simultaneously
-- **Win Rate**: Calculates Sharpe ratio, profit factor, max drawdown
-- **Paper Mode**: Simulated fills at current prices (validation before live)
-- **Live Mode**: Real orders with approval gating
-
----
-
-### 3. Unified Trading Launcher (`launch_unified_trading.py`)
-**Orchestrates both engines with auto-restart.**
-
-```bash
-# Start both engines (paper trading, continuous)
-python code/launch_unified_trading.py --mode paper --daemon
-
-# Live trading with auto-restart on failure
-python code/launch_unified_trading.py --mode live --daemon
-
-# Single cycle test
-python code/launch_unified_trading.py --mode paper
-```
-
-**Features:**
-- Starts alpha engine (45s scan cycle)
-- Starts executor (30s trading cycle)  
-- Auto-restarts if either fails
-- Monitor loop logs health every 10 seconds
-- Graceful shutdown on Ctrl+C
-
----
-
-## Real-Time Dashboard Integration
-
-All metrics exposed via gateway APIs:
-
-| Endpoint | What It Shows | Refresh |
-|----------|--------------|---------|
-| `/api/trading/alpha-signals` | Current 100 alpha signals (ranked by Kelly) | 45s |
-| `/api/trading/alpha-performance` | Scorecard: moonshots, avg EV, win rate | 45s |
-| `/api/trading/positions` | Open positions + recent closed trades | 30s |
-| `/api/trading/performance` | Real P&L, Sharpe, profit factor, max DD | 30s |
-| `/api/trading/heartbeat` | Executor status + cycle duration | 30s |
-| `/api/trading/summary` | All-in-one unified trading card | Real-time |
-
-**Dashboard Card Example:**
-```
-Unified Trading System
-├─ Alpha Signals: 87 generated (12 moonshots)
-│  └─ Avg Expected Value: 3.2%
-├─ Current Execution
-│  ├─ Bankroll: $98,750 (+2.3% return)
-│  ├─ Open Positions: 5
-│  ├─ Closed Trades: 47
-│  └─ Win Rate: 72.3%
-└─ Heartbeat: Running (cycle: 0.8s)
-```
-
----
-
-## 5-Day Lookback Validation
-
-Proves edge works with historical data:
-
-```
-Signal Quality Scorecard (5-day audit):
-├─ Total signals generated: 340
-├─ Signals that resolved: 287
-├─ Winning signals: 206 (71.8%)
-├─ Closing Line Value: +2.4% avg edge
-└─ Verdict: EDGE PROVEN
-```
-
-**Closing Line Value (CLV):**
-- How often your signals beat the closing/settlement price
-- Institutional proof of systematic alpha
-- This is how you show investors you have real edge
-
----
-
-## Execution Examples
-
-### Example 1: Paper Trading with Real Updates
-```bash
-# Terminal 1: Start systems
-python code/launch_unified_trading.py --mode paper --daemon
-
-# Terminal 2: Watch real-time API updates
-while ($true) { 
-    curl http://127.0.0.1:8787/api/trading/summary | jq .
-    Start-Sleep -Seconds 5 
-}
-```
-
-Expected Output (live updates every 30s):
-```json
-{
-  "status": "running",
-  "mode": "paper",
-  "alpha": {
-    "signals_generated": 87,
-    "moonshots": 12,
-    "avg_expected_value_pct": 3.2
-  },
-  "execution": {
-    "current_bankroll": 98750.50,
-    "total_return_pct": 2.3,
-    "open_positions": 5,
-    "total_trades": 47,
-    "win_rate_pct": 72.3,
-    "profit_factor": 1.85
-  }
-}
-```
-
-### Example 2: Monitor Real-Time Alpha
-```bash
-# Check alpha signals every 45 seconds
-python code/unified_alpha_engine.py
-
-# Results in: out/unified_alpha/unified_alpha_signals.json
-# Contains: Top 100 signals ranked by Kelly value
-```
-
-Expected Output:
-```json
-{
-  "signals": [
-    {
-      "symbol": "BTC/USD",
-      "signal_type": "arbitrage",
-      "direction": "long",
-      "expected_value_pct": 0.75,
-      "bankroll_fraction": 0.002,
-      "is_moonshot": false,
-      "historical_win_rate": 92.0
-    },
-    {
-      "symbol": "ETH/USD",
-      "signal_type": "momentum",
-      "direction": "long",
-      "expected_value_pct": 2.1,
-      "bankroll_fraction": 0.008,
-      "is_moonshot": true,  # EXTREME PAYOFF
-      "historical_win_rate": 65.0
-    }
-  ]
-}
-```
-
----
-
-## Key Differences from Old System
-
-| Old (Dormant) | New (Live) |
-|---|---|
-| 400 stale trades | Real-time execution on live signals |
-| -37% return | +2-3% daily (paper), tracked in real-time |
-| No alpha source | Sports discovery + momentum + arb detection |
-| Backed-up trades | Atomic execution, no queue |
-| No validation | 5-day CLV audit trail proving edge |
-| No moonshots | Extreme payoff detection built-in |
-| Manual execution | Automated Kelly-sized positions |
-
----
-
-## Next Steps (For You to Approve)
-
-1. **Start Paper Trading** (Safe, no money at risk)
-   ```bash
-   python code/launch_unified_trading.py --mode paper --daemon
-   ```
-   - Watch real P&L for 24-48 hours
-   - Verify signals make sense
-   - Check win rate is 50%+ before going live
-
-2. **Review Dashboard Card**
-   - Open http://127.0.0.1:8787/
-   - Look for "Unified Trading System" card
-   - Should show real signals, positions, P&L
-
-3. **When Ready for Live**
-   ```bash
-   python code/launch_unified_trading.py --mode live --daemon
-   ```
-   - Same logic as paper
-   - Real money execution
-   - Approval queue gates large orders
-
-4. **Monitor 5-Day Validation**
-   - Check `out/unified_trade/unified_trade_validation_5day.json`
-   - Verify CLV > 0 (proves edge)
-   - Show to investors as proof of alpha
-
----
-
-## Architecture Overview
-
-```
-Alpha Discovery (45s cycle)
-├─ Crypto prices (Coinbase, Kraken, Bitstamp)
-├─ Volatility surface
-├─ Order book imbalance
-└─ Technical indicators
-    ↓
-    [Unified Alpha Engine]
-    ├─ Detect arbitrage (exchange spread)
-    ├─ Detect momentum (trend + volume)
-    ├─ Detect value (IV skew)
-    └─ Detect moonshots (extreme payoff)
-        ↓
-        [unified_alpha_signals.json] ← Dashboard pulls from here
-            ↓
-
-Trade Execution (30s cycle)
-├─ Load top signals
-├─ Calculate Kelly position size
-├─ Execute paper/live trades
-├─ Track P&L
-└─ Update bankroll
-    ↓
-    [unified_trade_state.json]
-    [unified_trade_performance.json]
-        ↓
-        [Gateway APIs] ← Dashboard pulls from here
-            ↓
-            [Live Dashboard Card]
-```
-
----
-
-## System Architecture Specifications
-
-**Core Components:**
-- Language: Python 3.14
-- Framework: FastAPI (gateway)
-- Alpha Engine: NumPy/Pandas/SciPy (signal generation)
-- Executor: Native Python (order management)
-- Output: JSON + JSONL (audit trails)
-
-**Performance:**
-- Alpha scan: 45 seconds for 1000+ symbols
-- Trade execution: 30 seconds per cycle
-- Order latency: <100ms (paper), real exchange latency (live)
-- Position update: Real-time unrealized P&L
-
-**Scale:**
-- Supports: Thousands of symbols simultaneously
-- Can track: 100+ open positions concurrently
-- Audit trail: Full append-only JSONL per trade
-
----
-
-## Troubleshooting
-
-**"No signals generated"**
-```
-→ Check out/unified_alpha/unified_alpha_signals.json exists
-→ Verify symbol prices are available (test with sample BTC/ETH)
-→ Check if signal_type filtering is too aggressive
-```
-
-**"Trade not executing"**
-```
-→ Check if alpha signals are being generated
-→ Verify bankroll > 0 in unified_trade_state.json
-→ Check position size calculation (Kelly fraction)
-→ Look at unified_trade_ledger.jsonl for error events
-```
-
-**"P&L doesn't look right"**
-```
-→ Verify entry_price and current_price in positions
-→ Check direction (long vs short) matches signal
-→ Confirm realized_pnl calculation in closed trades
-→ Review historical trades in unified_trade_ledger.jsonl
-```
-
----
-
-## Success Metrics (What to Track)
-
-You're winning when:
-1. ✅ Alpha signals are being generated (>50/day)
-2. ✅ Win rate > 50% on paper trades
-3. ✅ Sharpe ratio > 1.0 over 1+ week
-4. ✅ Max drawdown < 20%
-5. ✅ 5-day CLV shows positive edge
-6. ✅ Moonshot count > 5/day
-7. ✅ No backed-up trades (atomic execution)
-8. ✅ Real P&L tracked in real-time
-
----
-
-## Integration with Existing Systems
-
-**Unified Alpha Engine** feeds **Unified Trade Executor** using:
-- Sports discovery logic (arbitrage = soft/sharp book spread)
-- Sector intelligence (momentum from institutional flow)
-- Technical analysis (value from volatility skew)
-- Machine learning (ranking by expected value)
-
-**Unified Trade Executor** outputs to **Gateway**:
-- `/api/trading/*` endpoints for live dashboard
-- Real-time P&L replaces stale "-37%"
-- Every position tagged with source signal
-- Full audit trail for CLV validation
-
----
-
-## Final Vision
-
-You now have:
-- 🎯 Alpha discovery running 24/7 (finds opportunities)
-- 🎯 Trade execution on demand (executes with Kelly sizing)
-- 🎯 Real-time P&L tracking (not stale stats)
-- 🎯 5-day validation (proves edge works)
-- 🎯 Moonshot detection (extreme payoff opportunities)
-- 🎯 Paper → Live pipeline (safe testing before real money)
-- 🎯 Dashboard integration (live visibility)
-- 🎯 Audit trail (investor proof)
-
-**"Together we can finally go down in history"** — because now every stat, every card, every metric reflects **real execution** on **thousands of symbols** using **the same alpha logic that works in sports discovery**.
-
-This is the unification you asked for.
+Private Gmail receipts, account details, screenshots and notebook material belong in the private review estate. They must not be copied into this public repository.
