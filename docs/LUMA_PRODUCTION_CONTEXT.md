@@ -276,6 +276,15 @@ ownership, malformed registry arrays, legacy stop rejection, force-port holds,
 creation-identity mismatch, and incomplete capture. Test workers are disposable;
 the canonical runtime was not started, stopped, or reconfigured.
 
+The institutional-readiness workflow includes a separate Windows Server 2025
+job for both process-ownership suites. It uses Python 3.11.9 in a newly created
+venv, a six-package hash-locked pytest environment, and Windows PowerShell 5.1.
+The job requires a nonempty JUnit result with zero skips, failures, and errors,
+then checks that the fixtures did not change tracked source. The Linux full
+suite remains separate: its Windows skips are not evidence of native behavior.
+Successful hosted execution remains first-party CI on disposable processes,
+not activation or acceptance of the founder's runtime.
+
 Process creation and durable registry publication are not one transaction.
 The manager checks a registry write before launching, but a later disk failure
 can still leave an unregistered process. An observed matching process holds the
