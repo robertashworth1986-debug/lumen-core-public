@@ -1,4 +1,7 @@
 *.sh text eol=lf
+# Stable bytes for the retained PDF dependency audit comparison.
+/evidence/dependency_security/20260914/*.json text eol=lf
+/tests/test_pdf_dependency_security.py text eol=lf
 examples/proof_capsule/** text eol=lf
 
 # Canonical bytes for the bounded CODECHECK reviewer capsule.
