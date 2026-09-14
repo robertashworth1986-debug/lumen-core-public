@@ -35,6 +35,21 @@ def test_c_fast_path_is_allocation_free_and_bounded() -> None:
     assert "view->fragmented" in text
 
 
+def test_retained_reference_manifests_have_every_exact_dependency() -> None:
+    root = ROOT / "evidence/hardware/nic_dpu_packet_pipeline_20260914"
+    manifests = list(root.rglob("SHA256_MANIFEST.json"))
+    assert len(manifests) == 2
+    for manifest_path in manifests:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        assert manifest["entry_count"] == len(manifest["entries"])
+        for entry in manifest["entries"]:
+            path = (manifest_path.parent / entry["path"]).resolve()
+            assert path.is_relative_to(root.resolve())
+            body = path.read_bytes()
+            assert len(body) == entry["bytes"]
+            assert hashlib.sha256(body).hexdigest() == entry["sha256"]
+
+
 def test_builder_compiles_tests_and_hash_seals_receipt(tmp_path: Path) -> None:
     module = load_module()
     try:

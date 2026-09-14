@@ -69,6 +69,7 @@ profit_lock_peaks.json
 # Log files
 logs/
 *.log
+!evidence/hardware/nic_dpu_packet_pipeline_20260914/**/*.log
 *.txt
 !dashboard/robots.txt
 !requirements-institutional.txt
