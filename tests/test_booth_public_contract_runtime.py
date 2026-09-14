@@ -173,6 +173,16 @@ def _declared_gateway_closure(script: str) -> set[str]:
     return set(re.findall(r'^\s+"([^"]+)"$', match.group("body"), re.MULTILINE))
 
 
+def _bash_function(script: str, name: str) -> str:
+    match = re.search(
+        rf"^{re.escape(name)}\(\) \{{.*?^\}}\n",
+        script,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    assert match is not None
+    return match.group(0)
+
+
 def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     script = _repair_script()
 
@@ -202,6 +212,8 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
         '&& "$PUBLIC_HEALTH_URL" == "https://lumen-core.ai/health"',
         '&& "$LOCAL_STATUS_URL" == "http://127.0.0.1:8787/api/public/status"',
         '&& "$PUBLIC_STATUS_URL" == "https://lumen-core.ai/api/public/status"',
+        '&& "$LOCAL_GATEWAY_BASE_URL" == "http://127.0.0.1:8787"',
+        '&& "$PUBLIC_GATEWAY_BASE_URL" == "https://lumen-core.ai"',
     ):
         assert marker in script
     assert _declared_gateway_closure(script) == EXPECTED_GATEWAY_CLOSURE
@@ -246,10 +258,160 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     ):
         assert marker in script
     assert "GATEWAY_DEPENDENCY_CLOSURE_REPAIR_OK" in script
+    for path in ("/metrics", "/openapi.json", "/docs", "/redoc"):
+        assert f'  "{path}"' in script
+    for marker in (
+        "PROTECTED_OPERATOR_HTTP_PATHS=(",
+        'PROTECTED_OPERATOR_WEBSOCKET_PATH="/ws"',
+        "probe_operator_http_boundary()",
+        "probe_operator_websocket_boundary()",
+        '[[ "$status" == "401" || "$status" == "503" ]]',
+        "operator API authentication required",
+        "operator API access unavailable",
+        "^cache-control:",
+        "^pragma:",
+        "^www-authenticate:",
+        "awk grep seq sleep tr",
+        '[[ "$status" == "403" || ( "$allow_not_found" == "true" && "$status" == "404" ) ]]',
+        "local anonymous operator boundary failed",
+        "public anonymous operator boundary failed",
+        "local anonymous WebSocket boundary failed",
+        "public anonymous WebSocket boundary failed",
+        "Local anonymous operator HTTP boundaries:",
+        "Public anonymous operator HTTP boundaries:",
+        "Local anonymous WebSocket boundary:",
+        "Public anonymous WebSocket boundary:",
+    ):
+        assert marker in script
+    assert "Authorization: Bearer" not in script
+    assert "x-luma-operator-token" not in script.lower()
     assert "rm -rf -- \"$TARGET_ROOT\"" not in script
     assert '[[ "$STAGE_DIR" =~ ^/tmp/lumencore-gateway-stage\\.' in script
     assert '[[ "$BACKUP_DIR" =~ ^/tmp/lumencore-gateway-rollback\\.' in script
     assert "systemctl restart" not in script
+
+
+def test_gateway_repair_http_boundary_probe_fails_closed() -> None:
+    if not Path("/bin/bash").is_file():
+        return
+
+    function_source = _bash_function(
+        _repair_script(), "probe_operator_http_boundary"
+    )
+    harness = (
+        """
+set -u
+SOURCE_COMMIT=0123456789abcdef0123456789abcdef01234567
+seq() { printf '1\\n'; }
+sleep() { :; }
+curl() {
+  local body_file=""
+  local header_file=""
+  while (( $# )); do
+    case "$1" in
+      --output) body_file=$2; shift 2 ;;
+      --dump-header) header_file=$2; shift 2 ;;
+      --write-out) shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  [[ -n "$body_file" && -n "$header_file" ]]
+  printf '{"detail":"%s"}' "$FAKE_DETAIL" > "$body_file"
+  {
+    printf 'HTTP/1.1 %s Fixture\\r\\n' "$FAKE_STATUS"
+    printf 'Content-Type: application/json\\r\\n'
+    printf 'Cache-Control: no-store\\r\\n'
+    printf 'Pragma: no-cache\\r\\n'
+    if [[ "$FAKE_STATUS" == 401 ]]; then
+      printf 'WWW-Authenticate: Bearer\\r\\n'
+    fi
+    printf '\\r\\n'
+  } > "$header_file"
+  printf '%s\\tapplication/json' "$FAKE_STATUS"
+}
+body_file=$(mktemp)
+header_file=$(mktemp)
+trap 'rm -f -- "$body_file" "$header_file"' EXIT
+"""
+        + function_source
+        + '\nprobe_operator_http_boundary "https://example.invalid/metrics" "$body_file" "$header_file"\n'
+    )
+
+    cases = (
+        ("401", "operator API authentication required", True),
+        ("503", "operator API access unavailable", True),
+        ("200", "unexpected public body", False),
+        ("401", "wrong denial detail", False),
+    )
+    for status, detail, should_pass in cases:
+        completed = subprocess.run(
+            ["/bin/bash", "-c", harness],
+            check=False,
+            capture_output=True,
+            text=True,
+            env={
+                "PATH": "/usr/local/bin:/usr/bin:/bin",
+                "FAKE_STATUS": status,
+                "FAKE_DETAIL": detail,
+            },
+        )
+        assert (completed.returncode == 0) is should_pass
+        assert completed.stdout.strip() == status
+
+
+def test_gateway_repair_websocket_probe_distinguishes_origin_and_edge() -> None:
+    if not Path("/bin/bash").is_file():
+        return
+
+    function_source = _bash_function(
+        _repair_script(), "probe_operator_websocket_boundary"
+    )
+    harness = (
+        """
+set -u
+SOURCE_COMMIT=0123456789abcdef0123456789abcdef01234567
+seq() { printf '1\\n'; }
+sleep() { :; }
+curl() {
+  local output=""
+  while (( $# )); do
+    case "$1" in
+      --output) output=$2; shift 2 ;;
+      --write-out) shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  [[ -n "$output" ]]
+  : > "$output"
+  printf '%s' "$FAKE_STATUS"
+}
+output=$(mktemp)
+trap 'rm -f -- "$output"' EXIT
+"""
+        + function_source
+        + '\nprobe_operator_websocket_boundary "https://example.invalid/ws" "$output" "$ALLOW_NOT_FOUND"\n'
+    )
+
+    cases = (
+        ("403", "false", True),
+        ("404", "false", False),
+        ("404", "true", True),
+        ("101", "true", False),
+    )
+    for status, allow_not_found, should_pass in cases:
+        completed = subprocess.run(
+            ["/bin/bash", "-c", harness],
+            check=False,
+            capture_output=True,
+            text=True,
+            env={
+                "PATH": "/usr/local/bin:/usr/bin:/bin",
+                "FAKE_STATUS": status,
+                "ALLOW_NOT_FOUND": allow_not_found,
+            },
+        )
+        assert (completed.returncode == 0) is should_pass
+        assert completed.stdout.strip() == status
 
 
 def test_declared_gateway_closure_covers_recursive_local_imports() -> None:
@@ -525,6 +687,23 @@ def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None
     assert "sudo -n -u lumencore test -x /opt/lumencore/.venv/bin/python" in workflow
     assert "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh" in workflow
     assert "--apply" in workflow
+    for path in ("/metrics", "/openapi.json", "/docs", "/redoc"):
+        assert f"probe_anonymous_operator_http {path} " in workflow
+    for marker in (
+        "probe_anonymous_operator_http()",
+        "anonymous_%s_http=%s",
+        "anonymous_ws_upgrade_http=%s",
+        '[[ "$code" == 401 || "$code" == 503 ]]',
+        '[[ "$websocket_code" == 403 || "$websocket_code" == 404 ]]',
+        "operator API authentication required",
+        "operator API access unavailable",
+        "keys == [\"detail\"]",
+        "public-verification-receipt.txt",
+        "awk grep seq sleep tr",
+    ):
+        assert marker in workflow
+    assert "Authorization: Bearer" not in workflow
+    assert "x-luma-operator-token" not in workflow.lower()
     assert "Remove remote repair staging" in workflow
     assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1" in workflow
     assert "shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1" in workflow

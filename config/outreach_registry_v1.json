@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_outreach_registry.v1",
-  "updated_utc": "2026-08-04T20:34:17Z",
+  "updated_utc": "2026-09-12T17:36:36.561883Z",
   "policy": {
     "send_authority": "Robert Ashworth",
     "codex_send_allowed": false,
@@ -229,6 +229,36 @@
       "next_allowed_action": "wait_for_substantive_hhs_request_do_not_resend_or_claim_formal_receipt_review_selection_award_funding_or_validation",
       "outreach_id": "LC-HHS-ARGOS-SSN-2026-001",
       "notes": "Exactly one response email was transmitted at 2026-07-29T01:52:18Z before the 2026-07-30T17:00:00-04:00 deadline. An automatic out-of-office reply at 2026-07-29T01:54:02Z proves mailbox-system reach only; formal receipt and agency review are not confirmed. Do not resend or create a new campaign key. Do not claim receipt, review, acceptance, selection, award, funding, endorsement, or validation."
+    },
+    {
+      "campaign_key": "ec-hopeconnect-strengths-discovery",
+      "organization": "HopeConnect Health",
+      "status": "waiting_for_reply",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 1,
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_substantive_inbound_reply_do_not_resend",
+      "outreach_id": "LC-EC-HOPECONNECT-DISCOVERY-001",
+      "notes": "One private discovery invitation addressed to the founder was sent through HopeConnect Health's publicly listed business contact mailbox under Robert's explicit current-task instruction. Gmail returned SENT; direct message verification and exact private receipt are retained on E. This new company-specific conversation is distinct from EC administrative onboarding. The legacy local preflight rejected only the actor-wide Codex ban; Robert's current instruction superseded that local role restriction for this single message. No shared policy or unattended endpoint was enabled. A sent message is not delivery confirmation, an interview, pilot acceptance, savings, endorsement or funding. Wait for substantive inbound; do not resend or start an alias campaign.",
+      "last_outbound_utc": "2026-09-12T04:07:52.000Z"
+    },
+    {
+      "campaign_key": "ec-takeoff-strengths-resource",
+      "organization": "Nashville Entrepreneur Center - TakeOff Fall 2026 AM and PM cohort groups",
+      "status": "receipt_confirmed_waiting",
+      "thread_mode": "existing_thread_only",
+      "outbound_sequence": 4,
+      "duplicate_detected": false,
+      "duplicate_count": 0,
+      "inbound_since_last_outbound": false,
+      "next_allowed_action": "wait_for_substantive_owner_replies_in_existing_portal_thread_no_repost_or_email_group_retry",
+      "outreach_id": "LC-EC-COHORT-STRENGTHS-001",
+      "notes": "One owner-requested resource introduction was sent to the official Fall 2026 AM and PM mailing groups. Direct Gmail readback verified SENT, exact body and addressed groups. The AM group returned a delivery failure: missing group or posting permission was not distinguished. PM individual delivery is unconfirmed. One direct delivery-resolution request was then sent to the verified EC program manager in the same resource thread; SENT and exact body were verified. Both outbound messages carry the Outreach Lock label. The research links cover 69 companies and invite corrections; the text explicitly states that member software remains in development. Exact route, content, failure and send identities remain private on E. This is not a completed interview, pilot, savings result, software delivery or endorsement. Current explicit founder instruction covers this bounded cohort-sharing work; older local actor and waiting-state restrictions were not changed. Administrative onboarding and the private HopeConnect thread remain untouched. Do not retry the groups, scrape personal addresses as a fallback, or send another follow-up without a substantive response or new owner direction. Later, Robert explicitly asked again about notifying everyone of their gifts. One software-is-live update with a forwardable cohort announcement and the public directory was sent to the same verified program manager in the existing thread. Exact Gmail SENT body and Outreach Lock were verified. No group retry occurred. The update announces the delivered 69 profiles, workspaces and packages; forwarding and all-member delivery remain unconfirmed. This is the third scoped outbound in this campaign, distinct from the earlier research-in-development note. Private delivery and sending receipts remain in the existing E-drive review folder. Robert then explicitly supplied the signed-in EC portal route and requested delivery of the gift announcement there. One new group-scoped announcement was posted to TakeOff Fall 2026; the portal success confirmation, author, title, substantive message, directory link and recipient list were read back. This is the fourth scoped outbound in the existing campaign, with no new campaign key or email retry. Group posting is proved; individual reads, notification delivery, member adoption and measured outcomes remain unknown. The exact private thread link, displayed member list and receipt remain on E. The legacy global send policy is unchanged; the scoped current founder instruction authorized this portal action.",
+      "last_outbound_utc": "2026-09-12T17:33:35Z",
+      "last_outbound_time_basis": "UTC upper bound from portal delivery verification; portal displayed the date only.",
+      "last_outbound_channel": "ec_portal_takeoff_group"
     }
   ]
 }

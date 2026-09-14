@@ -36,6 +36,7 @@ on:
       - "dashboard/js/luma_path_resolver.js"
       - "dashboard/assets/prooflock/**"
       - "dashboard/build_week/prooflock_console/**"
+      - "dashboard/cohort/**"
       - "code/deploy/package_public_site_release.py"
       - "code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py"
       - "code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py"

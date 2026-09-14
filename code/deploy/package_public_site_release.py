@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import io
 import json
@@ -64,6 +65,152 @@ RELEASE_PATHS: Final = (
     "dashboard/build_week/prooflock_console/styles.css",
     "dashboard/build_week/prooflock_console/three.core.min.js",
     "dashboard/build_week/prooflock_console/three.module.min.js",
+    "dashboard/cohort/index.html",
+    "dashboard/cohort/studio.css",
+    "dashboard/cohort/studio.js",
+    "dashboard/cohort/core.js",
+    "dashboard/cohort/mark.svg",
+    "dashboard/cohort/catalog.json",
+    "dashboard/cohort/downloads/manifest.json",
+    "dashboard/cohort/downloads/aa-window-washing.zip",
+    "dashboard/cohort/downloads/advia-solutions.zip",
+    "dashboard/cohort/downloads/aegiskeep.zip",
+    "dashboard/cohort/downloads/aligned-strategy-partners.zip",
+    "dashboard/cohort/downloads/amara-bitters.zip",
+    "dashboard/cohort/downloads/autarko.zip",
+    "dashboard/cohort/downloads/bagel.zip",
+    "dashboard/cohort/downloads/buyunrepped.zip",
+    "dashboard/cohort/downloads/c3-measures-registry.zip",
+    "dashboard/cohort/downloads/claridense.zip",
+    "dashboard/cohort/downloads/clark-wester-corporation.zip",
+    "dashboard/cohort/downloads/cog-learning-inc.zip",
+    "dashboard/cohort/downloads/compounds-dev-inc.zip",
+    "dashboard/cohort/downloads/csh-hub.zip",
+    "dashboard/cohort/downloads/decre.zip",
+    "dashboard/cohort/downloads/double-r-strategies-and-consulting.zip",
+    "dashboard/cohort/downloads/dust-to-dust-llc.zip",
+    "dashboard/cohort/downloads/encompass-financial-services-inc.zip",
+    "dashboard/cohort/downloads/excalis.zip",
+    "dashboard/cohort/downloads/firma-q-gaas.zip",
+    "dashboard/cohort/downloads/fizzy-mixology.zip",
+    "dashboard/cohort/downloads/fox-force.zip",
+    "dashboard/cohort/downloads/glow-up-sports.zip",
+    "dashboard/cohort/downloads/govfetchr-ai.zip",
+    "dashboard/cohort/downloads/gutless-topical-supplements.zip",
+    "dashboard/cohort/downloads/happy-overall.zip",
+    "dashboard/cohort/downloads/holastra.zip",
+    "dashboard/cohort/downloads/hopeconnect-health.zip",
+    "dashboard/cohort/downloads/hot-mess-inc.zip",
+    "dashboard/cohort/downloads/incourage-enterprises.zip",
+    "dashboard/cohort/downloads/itty-bitty-city.zip",
+    "dashboard/cohort/downloads/learnkairo.zip",
+    "dashboard/cohort/downloads/limer.zip",
+    "dashboard/cohort/downloads/lode-labs.zip",
+    "dashboard/cohort/downloads/lumencore.zip",
+    "dashboard/cohort/downloads/maaven.zip",
+    "dashboard/cohort/downloads/margaret-ray-interiors.zip",
+    "dashboard/cohort/downloads/moneybot.zip",
+    "dashboard/cohort/downloads/music-utility-network.zip",
+    "dashboard/cohort/downloads/obviecare.zip",
+    "dashboard/cohort/downloads/paragon-parcels.zip",
+    "dashboard/cohort/downloads/petrarch-strategy.zip",
+    "dashboard/cohort/downloads/proworx.zip",
+    "dashboard/cohort/downloads/prsnt.zip",
+    "dashboard/cohort/downloads/ptln.zip",
+    "dashboard/cohort/downloads/public-speaking-pros.zip",
+    "dashboard/cohort/downloads/recovery-matters.zip",
+    "dashboard/cohort/downloads/remedy-haus.zip",
+    "dashboard/cohort/downloads/renuiam.zip",
+    "dashboard/cohort/downloads/scoreboardz-inc.zip",
+    "dashboard/cohort/downloads/smr-pet-services.zip",
+    "dashboard/cohort/downloads/specinate.zip",
+    "dashboard/cohort/downloads/spilburg-solutions.zip",
+    "dashboard/cohort/downloads/starra-llc.zip",
+    "dashboard/cohort/downloads/tarapy-inc.zip",
+    "dashboard/cohort/downloads/the-37208.zip",
+    "dashboard/cohort/downloads/the-designery-nashville-south.zip",
+    "dashboard/cohort/downloads/the-nash-philanthropist.zip",
+    "dashboard/cohort/downloads/the-tennessee-hospitality-group.zip",
+    "dashboard/cohort/downloads/threadwell-studio.zip",
+    "dashboard/cohort/downloads/true-vena.zip",
+    "dashboard/cohort/downloads/ultra-beauty-supply-skin-and-nails.zip",
+    "dashboard/cohort/downloads/unapologetically-me.zip",
+    "dashboard/cohort/downloads/validflo.zip",
+    "dashboard/cohort/downloads/volume-one-nashville.zip",
+    "dashboard/cohort/downloads/voxring.zip",
+    "dashboard/cohort/downloads/wednesday.zip",
+    "dashboard/cohort/downloads/xi.zip",
+    "dashboard/cohort/downloads/yoamigo.zip",
+    "dashboard/cohort/directory.html",
+    "dashboard/cohort/members/aa-window-washing.html",
+    "dashboard/cohort/members/advia-solutions.html",
+    "dashboard/cohort/members/aegiskeep.html",
+    "dashboard/cohort/members/aligned-strategy-partners.html",
+    "dashboard/cohort/members/amara-bitters.html",
+    "dashboard/cohort/members/autarko.html",
+    "dashboard/cohort/members/bagel.html",
+    "dashboard/cohort/members/buyunrepped.html",
+    "dashboard/cohort/members/c3-measures-registry.html",
+    "dashboard/cohort/members/claridense.html",
+    "dashboard/cohort/members/clark-wester-corporation.html",
+    "dashboard/cohort/members/cog-learning-inc.html",
+    "dashboard/cohort/members/compounds-dev-inc.html",
+    "dashboard/cohort/members/csh-hub.html",
+    "dashboard/cohort/members/decre.html",
+    "dashboard/cohort/members/double-r-strategies-and-consulting.html",
+    "dashboard/cohort/members/dust-to-dust-llc.html",
+    "dashboard/cohort/members/encompass-financial-services-inc.html",
+    "dashboard/cohort/members/excalis.html",
+    "dashboard/cohort/members/firma-q-gaas.html",
+    "dashboard/cohort/members/fizzy-mixology.html",
+    "dashboard/cohort/members/fox-force.html",
+    "dashboard/cohort/members/glow-up-sports.html",
+    "dashboard/cohort/members/govfetchr-ai.html",
+    "dashboard/cohort/members/gutless-topical-supplements.html",
+    "dashboard/cohort/members/happy-overall.html",
+    "dashboard/cohort/members/holastra.html",
+    "dashboard/cohort/members/hopeconnect-health.html",
+    "dashboard/cohort/members/hot-mess-inc.html",
+    "dashboard/cohort/members/incourage-enterprises.html",
+    "dashboard/cohort/members/itty-bitty-city.html",
+    "dashboard/cohort/members/learnkairo.html",
+    "dashboard/cohort/members/limer.html",
+    "dashboard/cohort/members/lode-labs.html",
+    "dashboard/cohort/members/lumencore.html",
+    "dashboard/cohort/members/maaven.html",
+    "dashboard/cohort/members/margaret-ray-interiors.html",
+    "dashboard/cohort/members/moneybot.html",
+    "dashboard/cohort/members/music-utility-network.html",
+    "dashboard/cohort/members/obviecare.html",
+    "dashboard/cohort/members/paragon-parcels.html",
+    "dashboard/cohort/members/petrarch-strategy.html",
+    "dashboard/cohort/members/proworx.html",
+    "dashboard/cohort/members/prsnt.html",
+    "dashboard/cohort/members/ptln.html",
+    "dashboard/cohort/members/public-speaking-pros.html",
+    "dashboard/cohort/members/recovery-matters.html",
+    "dashboard/cohort/members/remedy-haus.html",
+    "dashboard/cohort/members/renuiam.html",
+    "dashboard/cohort/members/scoreboardz-inc.html",
+    "dashboard/cohort/members/smr-pet-services.html",
+    "dashboard/cohort/members/specinate.html",
+    "dashboard/cohort/members/spilburg-solutions.html",
+    "dashboard/cohort/members/starra-llc.html",
+    "dashboard/cohort/members/tarapy-inc.html",
+    "dashboard/cohort/members/the-37208.html",
+    "dashboard/cohort/members/the-designery-nashville-south.html",
+    "dashboard/cohort/members/the-nash-philanthropist.html",
+    "dashboard/cohort/members/the-tennessee-hospitality-group.html",
+    "dashboard/cohort/members/threadwell-studio.html",
+    "dashboard/cohort/members/true-vena.html",
+    "dashboard/cohort/members/ultra-beauty-supply-skin-and-nails.html",
+    "dashboard/cohort/members/unapologetically-me.html",
+    "dashboard/cohort/members/validflo.html",
+    "dashboard/cohort/members/volume-one-nashville.html",
+    "dashboard/cohort/members/voxring.html",
+    "dashboard/cohort/members/wednesday.html",
+    "dashboard/cohort/members/xi.html",
+    "dashboard/cohort/members/yoamigo.html",
 )
 
 
@@ -138,6 +285,32 @@ def _sha256(body: bytes) -> str:
     return hashlib.sha256(body).hexdigest()
 
 
+def release_paths_at_commit(repo_root: Path, source_commit: str) -> tuple[str, ...]:
+    """Read a pinned literal allowlist as data; never execute historical code."""
+    source_commit = _resolve_commit(repo_root, source_commit)
+    _oid, body = _read_commit_blob(repo_root, source_commit, "code/deploy/package_public_site_release.py")
+    tree = ast.parse(body.decode("utf-8-sig"))
+    definitions = []
+    for node in tree.body:
+        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.target.id == "RELEASE_PATHS":
+            definitions.append(node.value)
+        elif isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "RELEASE_PATHS" for t in node.targets):
+            definitions.append(node.value)
+    if len(definitions) != 1:
+        raise ReleasePackageError("pinned release must contain one literal allowlist")
+    try:
+        paths = ast.literal_eval(definitions[0])
+    except (ValueError, TypeError) as exc:
+        raise ReleasePackageError("pinned allowlist must be literal data") from exc
+    if not isinstance(paths, tuple) or not 1 <= len(paths) <= 1000 or any(not isinstance(p, str) for p in paths) or len(set(paths)) != len(paths):
+        raise ReleasePackageError("invalid pinned release membership")
+    for path in paths:
+        if "\\" in path or PurePosixPath(path).as_posix() != path:
+            raise ReleasePackageError("noncanonical pinned release path")
+        archive_name(path)
+    return paths
+
+
 def _write_archive(archive_path: Path, files: list[tuple[str, bytes]]) -> None:
     archive_path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
@@ -181,7 +354,8 @@ def _write_manifest(manifest_path: Path, payload: dict[str, object]) -> None:
 
 
 def build_release_package(
-    *, repo_root: Path, source_commit: str, archive_path: Path, manifest_path: Path
+    *, repo_root: Path, source_commit: str, archive_path: Path, manifest_path: Path,
+    release_paths: tuple[str, ...] | None = None,
 ) -> dict[str, object]:
     repo_root = repo_root.resolve()
     archive_path = archive_path.resolve()
@@ -193,7 +367,7 @@ def build_release_package(
     archive_files: list[tuple[str, bytes]] = []
     manifest_files: list[dict[str, object]] = []
     seen_names: set[str] = set()
-    for repo_path in RELEASE_PATHS:
+    for repo_path in RELEASE_PATHS if release_paths is None else release_paths:
         name = archive_name(repo_path)
         if name in seen_names:
             raise ReleasePackageError(f"duplicate archive path: {name}")

@@ -28,7 +28,7 @@ HEX40 = re.compile(r"[0-9a-f]{40}")
 
 REQUIRED_BOUNDARIES = {
     "independent audit or certification",
-    "43 allowlisted static public-release files",
+    "allowlisted static public-release files",
     "does not establish scientific validity",
     "does not authorize later deployments",
 }
@@ -144,21 +144,21 @@ def verify_receipt(
     subject = receipt.get("release_subject")
     if not isinstance(subject, dict):
         raise DeploymentReceiptError("release_subject must be an object")
-    if subject.get("release_file_count") != 43:
+    packager = _load(root / PACKAGER_PATH.relative_to(ROOT), "deployment_packager")
+    pinned_paths = packager.release_paths_at_commit(root, source_commit)
+    expected_count = len(pinned_paths)
+    if subject.get("release_file_count") != expected_count:
         raise DeploymentReceiptError("release file count mismatch")
-    if subject.get("cyclonedx_component_count") != 43:
+    if subject.get("cyclonedx_component_count") != expected_count:
         raise DeploymentReceiptError("CycloneDX component count mismatch")
     if subject.get("cyclonedx_spec_version") != "1.6":
         raise DeploymentReceiptError("CycloneDX version mismatch")
     for field in ("archive_sha256", "manifest_sha256", "cyclonedx_sha256"):
         _require_sha(subject.get(field), f"release_subject.{field}")
 
-    packager = _load(root / PACKAGER_PATH.relative_to(ROOT), "deployment_packager")
     supply_chain = _load(
         root / SUPPLY_CHAIN_PATH.relative_to(ROOT), "deployment_supply_chain"
     )
-    if len(packager.RELEASE_PATHS) != 43:
-        raise DeploymentReceiptError("current allowlist count drifted from receipt")
     with tempfile.TemporaryDirectory() as tmp:
         archive = Path(tmp) / "public-site-release.tar"
         manifest_path = Path(tmp) / "public-site-release-manifest.json"
@@ -167,8 +167,9 @@ def verify_receipt(
             source_commit=source_commit,
             archive_path=archive,
             manifest_path=manifest_path,
+            release_paths=pinned_paths,
         )
-        if built.get("file_count") != 43:
+        if built.get("file_count") != expected_count:
             raise DeploymentReceiptError("reconstructed file count mismatch")
         if archive.stat().st_size != subject.get("archive_bytes"):
             raise DeploymentReceiptError("archive byte count mismatch")
@@ -181,6 +182,7 @@ def verify_receipt(
             archive_path=archive,
             manifest_path=manifest_path,
             source_commit=source_commit,
+            release_paths=pinned_paths,
         )
         sbom = supply_chain.build_sbom(manifest=manifest, rows=rows)
         rendered_sbom = json.dumps(
@@ -218,9 +220,9 @@ def verify_receipt(
     _require_successful_run(deployment, "deployment")
     if deployment.get("approval") != "DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT":
         raise DeploymentReceiptError("deployment approval mismatch")
-    if deployment.get("expected_file_count") != 43 or deployment.get(
+    if deployment.get("expected_file_count") != expected_count or deployment.get(
         "matched_file_count"
-    ) != 43:
+    ) != expected_count:
         raise DeploymentReceiptError("deployment live-gate count mismatch")
     if deployment.get("release_verified") is not True:
         raise DeploymentReceiptError("deployment release is not verified")
@@ -229,7 +231,7 @@ def verify_receipt(
 
     audit = receipt.get("post_deployment_audit")
     _require_successful_run(audit, "post_deployment_audit")
-    if audit.get("expected_file_count") != 43 or audit.get("matched_file_count") != 43:
+    if audit.get("expected_file_count") != expected_count or audit.get("matched_file_count") != expected_count:
         raise DeploymentReceiptError("post-deployment audit count mismatch")
     if audit.get("release_verified") is not True:
         raise DeploymentReceiptError("post-deployment release is not verified")
@@ -244,6 +246,8 @@ def verify_receipt(
     if not isinstance(boundaries, list) or len(boundaries) != 4:
         raise DeploymentReceiptError("claim boundary set mismatch")
     boundary_text = " ".join(boundaries).lower()
+    if f"{expected_count} allowlisted static public-release files" not in boundary_text:
+        raise DeploymentReceiptError("missing exact release count claim boundary")
     for required in REQUIRED_BOUNDARIES:
         if required.lower() not in boundary_text:
             raise DeploymentReceiptError(f"missing claim boundary: {required}")
@@ -252,7 +256,7 @@ def verify_receipt(
         "schema": "lumencore.public_site_exact_deployment_verification.v1",
         "valid": True,
         "source_commit": source_commit,
-        "release_file_count": 43,
+        "release_file_count": expected_count,
         "archive_sha256": subject["archive_sha256"],
         "supply_chain_run_id": supply["run_id"],
         "deployment_run_id": deployment["run_id"],

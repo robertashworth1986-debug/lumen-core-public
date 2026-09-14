@@ -119,6 +119,34 @@ class PublicReleaseIncidentTests(unittest.TestCase):
         self.assertTrue(receipt["release_verified"])
         self.assertFalse(receipt["production_mutation_performed"])
 
+    def test_current_release_accepts_urls_from_the_live_verifier(self) -> None:
+        modules = {}
+        for name, relative in {
+            "packager": "code/deploy/package_public_site_release.py",
+            "live_verifier": "code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py",
+        }.items():
+            spec = importlib.util.spec_from_file_location(name, ROOT / relative)
+            assert spec and spec.loader
+            value = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(value)
+            modules[name] = value
+        packager = modules["packager"]
+        manifest = make_manifest(
+            [packager.archive_name(path) for path in packager.RELEASE_PATHS]
+        )
+        audit = make_audit(manifest)
+        for row in audit["results"]:
+            row["url"] = modules["live_verifier"].live_url(
+                "https://lumen-core.ai", row["archive_name"], manifest["source_commit"]
+            )
+        receipt = incident.classify(policy=self.policy, manifest=manifest, audit=audit)
+        self.assertEqual(receipt["severity"], "NONE")
+        self.assertTrue(receipt["release_verified"])
+        cohort = next(row for row in audit["results"] if row["archive_name"] == "cohort/index.html")
+        cohort["url"] = f"https://lumen-core.ai/cohort/index.html?release={manifest['source_commit']}"
+        with self.assertRaisesRegex(incident.IncidentClassificationError, "route mismatch"):
+            incident.classify(policy=self.policy, manifest=manifest, audit=audit)
+
     def test_critical_mismatch_is_sev2(self) -> None:
         receipt = self.classify({"operator_home.html": "MISMATCH"})
         self.assertEqual(receipt["severity"], "SEV-2")

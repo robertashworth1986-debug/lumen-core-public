@@ -1,9 +1,9 @@
 """Fail-closed access boundary for the Luma operator gateway.
 
 The legacy gateway contains both reviewer-safe and operator-sensitive routes.
-This middleware keeps that distinction explicit: one minimal status route is
-public, while every other API route and live WebSocket requires a runtime
-operator token.
+This middleware keeps that distinction explicit: minimal liveness routes are
+public, while every other API route, runtime-introspection surface, and live
+WebSocket requires a runtime operator token.
 """
 
 from __future__ import annotations
@@ -34,7 +34,16 @@ OPERATOR_TOKEN_ENV_NAMES = (
 PUBLIC_STATUS_PATH = "/api/public/status"
 PUBLIC_HEALTH_PATH = "/health"
 PUBLIC_API_READ_PATHS = frozenset({PUBLIC_STATUS_PATH})
-PROTECTED_WEBSOCKET_PATHS = frozenset({"/ws", "/ws/live"})
+PROTECTED_OPERATOR_HTTP_ROOTS = frozenset(
+    {
+        "/api",
+        "/docs",
+        "/metrics",
+        "/openapi.json",
+        "/redoc",
+    }
+)
+PROTECTED_WEBSOCKET_ROOT = "/ws"
 MIN_OPERATOR_TOKEN_CHARS = 32
 _TOKEN_SPLIT_RE = re.compile(r"[\r\n,]+")
 
@@ -112,7 +121,18 @@ def is_public_api_read(scope: Mapping[str, Any]) -> bool:
 
 
 def is_operator_http_path(path: str) -> bool:
-    return path == "/api" or path.startswith("/api/")
+    return any(
+        path == root or path.startswith(f"{root}/")
+        for root in PROTECTED_OPERATOR_HTTP_ROOTS
+    )
+
+
+def is_operator_websocket_path(path: str) -> bool:
+    """Protect the WebSocket route family without matching nearby paths."""
+
+    return path == PROTECTED_WEBSOCKET_ROOT or path.startswith(
+        f"{PROTECTED_WEBSOCKET_ROOT}/"
+    )
 
 
 async def _http_error(send: Callable[..., Awaitable[Any]], status: int) -> None:
@@ -219,7 +239,7 @@ class OperatorApiAccessMiddleware:
                 await self.app(scope, receive, send)
                 return
         elif scope_type == "websocket":
-            if path not in PROTECTED_WEBSOCKET_PATHS:
+            if not is_operator_websocket_path(path):
                 await self.app(scope, receive, send)
                 return
         else:

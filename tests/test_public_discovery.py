@@ -36,6 +36,12 @@ class PublicDiscoveryTests(unittest.TestCase):
         root = ET.parse(DASHBOARD / "sitemap.xml").getroot()
         namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
         locations = [node.text for node in root.findall("sm:url/sm:loc", namespace)]
+        catalog = json.loads((DASHBOARD / "cohort/catalog.json").read_text(encoding="utf-8"))
+        member_routes = [
+            f"https://lumen-core.ai/cohort/members/{member['id']}.html"
+            for member in catalog["companies"]
+        ]
+        self.assertEqual(len(member_routes), 69)
         self.assertEqual(
             locations,
             [
@@ -45,7 +51,9 @@ class PublicDiscoveryTests(unittest.TestCase):
                 "https://lumen-core.ai/evidence/",
                 "https://lumen-core.ai/external_review.html",
                 "https://lumen-core.ai/build_week/prooflock_console/",
-            ],
+                "https://lumen-core.ai/cohort/",
+                "https://lumen-core.ai/cohort/directory.html",
+            ] + member_routes,
         )
         serialized = (DASHBOARD / "sitemap.xml").read_text(encoding="utf-8")
         self.assertNotIn("mission_control", serialized)

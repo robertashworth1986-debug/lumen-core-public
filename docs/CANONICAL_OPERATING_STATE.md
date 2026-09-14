@@ -456,3 +456,27 @@ locks and claim boundaries remain intact. The urgent patent action remains
 retrieval of the official application record through the USPTO-directed
 authenticated or Document Services path. No duplicate or unsolicited outbound
 message is authorized. No other outbound message is currently authorized.
+
+
+## Founder-directed EC cohort contribution - 2026-09-12
+
+Robert's current direction adds a strengths-first cohort contribution: **Our strength is making everyone else stronger.** Energy remains a major research focus. The existing evidence discipline applies to each owner's workflow: understand what already works, identify a testable constraint, agree a baseline and verify the effect. This dated instruction supersedes earlier no-new-EC-outbound statements for the scoped cohort contribution; administrative onboarding and unrelated outreach holds remain.
+
+The [published cohort research](EC_COHORT_STRENGTH_RESEARCH_2026-09-11.md) covers all 69 businesses on the official TakeOff roster, with three hypotheses per company and unknown baselines. Research publication is complete. Owner interviews, participation, measured losses and savings remain unestablished.
+
+On September 12, one resource introduction was sent to both official cohort mailing groups, followed by one direct request to the EC program manager after the AM group returned a delivery failure. Both sends were verified by exact Gmail readback and recorded under `ec-takeoff-strengths-resource`. The AM failure does not distinguish a missing group from posting restrictions. Delivery to individual PM members and any manager redistribution are unconfirmed. Do not retry the group addresses or treat the messages as completed customer conversations. Wait for a substantive response. Exact message content, private identifiers and delivery-failure receipts remain in the existing private review estate.
+
+The 69 public profiles, personalized workspaces and downloadable toolkits were published on the domain at source `5dbdf654caa630923869b3e6d3cf7ace221d5e16`; deployment `34703378307` verified all 189 exact files. The packages include Grant Factory drafts, public-source LumaScout, fictional-funds paper trading, nonclinical LumaCare, measurement tools and optional local AI drafting. Robert delegated the key choice and the existing key was selected; the last inference attempt was blocked by exhausted API credits. No successful AI inference, hosted team deployment, government certification, owner acceptance or savings is established.
+
+At Robert's renewed request, a software-is-live update with a forwardable gift announcement was sent to the same program manager in the existing thread on September 12. Gmail SENT content and Outreach Lock were verified. This makes three scoped outbounds under `ec-takeoff-strengths-resource`; no group retry occurred. Manager forwarding, all-member delivery, six actual customer conversations and owner baselines remain unconfirmed. The earlier in-development text describes the first research note, not the current package availability. The full requested scope remains open.
+
+The member runtime now checks a saved revision before updating its SQLite workspace. Competing browser versions pause backup and offer separate downloads and an owner choice; queued edits wait for the preceding write to finish. Regression checks reproduce the former stale-write overwrite and verify its rejection. This is local data-preservation behavior, not multi-user authorization or external business validation.
+
+The existing Measure & improve view now includes an optional offline energy evidence and constraint review. It preserves the full-batch calculator and records declared service equivalence, source timing, overhead, allowed changes, hard limits, uncertainty and fallback. A candidate can advance only to owner review; every result retains the baseline and disables actuation. Synthetic counterexamples cover net losses, uncertain constraints, missing evidence and binary arithmetic residue. This implements the recommendation-review portion of the research charter without a new dashboard or a performance experiment. Physical metrology, independently accepted results, owner participation, cohort redistribution and successful AI inference remain unestablished. Exact publication and validation receipts stay in the existing private review estate.
+
+
+## EC portal cohort announcement - 2026-09-12
+
+Robert explicitly provided the signed-in EC portal route and requested delivery of the existing gift announcement. One group-scoped message was posted to TakeOff Fall 2026. The portal confirmed successful sending; the posted title, author, substantive body, public directory link and group recipient list were read back. This is the fourth scoped outbound under `ec-takeoff-strengths-resource`. No email group was retried and no new campaign was created.
+
+The cohort announcement requirement is complete for group posting. Individual notification delivery, reads, owner adoption, six actual customer conversations, baselines and measured results remain unconfirmed. The prior waiting-for-distribution checkpoint is superseded by this verified portal event; other external dependencies remain. Exact portal identifiers, displayed recipients, message text and delivery evidence are retained in the existing private E-drive review estate. Continue substantive replies in that thread or follow new explicit founder direction; do not repost the announcement.
