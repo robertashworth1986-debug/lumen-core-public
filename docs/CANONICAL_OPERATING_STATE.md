@@ -527,3 +527,12 @@ These changes support the existing buyer-validation delivery path. They do not
 close owner acceptance, external evaluation, revenue, hardware validation or
 deployment gates. The original working checkout and its running services were
 preserved; repair commits are being reviewed in an isolated worktree.
+
+The existing Python supervisor now uses passive Windows process observations,
+an operating-system singleton lock, exact command matching with bounded venv
+redirector handling, and explicit unknown states. Automatic shared-port killing
+is disabled. Startup and shutdown checks use isolated disposable processes;
+process presence remains separate from application health. The
+[production context](LUMA_PRODUCTION_CONTEXT.md#supervisor-process-ownership-corrected-september-14-2026)
+records compatibility effects, direct-child cleanup limits and the absence of
+runtime activation. The original service processes and controls were not changed.

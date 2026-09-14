@@ -187,6 +187,59 @@ versioned diagnostic and synthetic replay instructions. The historical
 `code/validation_proof_pack.py` helper and retained historical files are not
 retroactively reclassified.
 
+### Supervisor process ownership corrected September 14, 2026
+
+The existing `code/luma_supervisor.py` now observes Windows process objects with
+zero-timeout waits and creation-time identity. It requests only synchronization
+and limited-query rights. Windows PID observation never sends a signal. Unknown
+or inaccessible process state is preserved as unknown and cannot trigger a
+replacement launch. A changed creation identity prevents a reused PID from
+inheriting the earlier observation.
+
+The compatibility adoption reader uses CIM and Windows command-line parsing,
+checks the expected arguments, interpreter and stack path, and rejects ambiguous
+matches. The current interpreter's Windows venv redirector is recognized only
+with its observed parent/child relationship, known base interpreter and matching
+remaining arguments. Unsupported interpreter relationships remain review holds.
+Unreadable inventory cannot establish absence and authorize a new launch; a
+separately identified exact match can still be observed. Adopted processes are
+external observations and are never terminated by `Service.stop`.
+
+A held operating-system file lock protects the supervisor's singleton state.
+The bounded legacy PID record remains readable and is preserved if its PID is
+present or unknown. A malformed record stops recovery for review. The lock file
+is retained after release so concurrent processes cannot lock different inodes.
+Import and `--help` no longer create runtime directories or acquire the lock.
+
+The supervisor no longer clears shared ports or calls `taskkill` during startup.
+Startup, polling and publication failures clean up owned direct child handles;
+one cleanup failure does not skip the remaining handles. Failed termination
+remains explicit and preserves the process reference. This does not establish
+ownership or verified cleanup of a complete descendant process tree, including
+children behind a Windows redirector. No automatic foreign-process takeover or
+full-tree recovery is claimed.
+
+`supervisor_health.json` now declares `process_presence_only`, `all_running`,
+per-service observation and ownership, and `application_health_verified=false`.
+The legacy `all_healthy` field is false because process presence is insufficient
+to certify application work. Consumers must not interpret that false field as
+proof the platform is down; endpoint behavior, source freshness, artifact
+progress and execution controls require their own evidence.
+
+Isolated regression checks include real disposable Windows child processes,
+concurrent lock acquisition, base and venv command identity, PID reuse,
+unreadable inventory, access denial, partial startup and shutdown failures.
+No running canonical supervisor was restarted and this source repair is not a
+runtime-activation receipt. The earlier signal-zero experiment did not reproduce
+termination of its disposable child; the repair follows the documented API
+semantics and the now-passing passive-observation checks, not a claimed crash.
+
+API references: [Python process signals](https://docs.python.org/3.11/library/os.html#os.kill),
+[Windows process handles](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess),
+[zero-timeout waits](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject),
+[creation times](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocesstimes),
+and [Windows command parsing](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-commandlinetoargvw).
+
 ## Grant Factory
 
 The frozen benchmark remains 673 series. Measured artifact breadth is currently
