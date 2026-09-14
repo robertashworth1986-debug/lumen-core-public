@@ -133,6 +133,60 @@ Healthy public output must be based on fresh artifact heartbeats. A stale
 supervisor heartbeat is nonauthoritative and must not make the domain appear
 healthy.
 
+### Legacy dashboard observations corrected September 14, 2026
+
+`dashboard/update_compliance_progress.py` now reports file metadata only.
+Its existing list format is retained, but statuses are
+`artifact_present_unverified` or `no_usable_artifact_observed`; every item
+explicitly keeps functional completion and compliance unverified. Empty files,
+directories, symlinks, paths escaping the selected root, and unreadable metadata
+cannot establish completion. The inventory does not read artifact contents.
+Status publication uses an atomic replacement so a failed write preserves the
+previous record.
+
+`dashboard/orchestrator_watchdog.py` compares timezone-aware UTC timestamps,
+observes only a bounded 64 KiB / 100-line error tail, and does not classify a
+quiet or absent error log as a stalled process. Stale activity, future mtimes
+beyond a two-second observation tolerance, and indicators in a recently
+modified error tail call for inspection. Tail indicators are not an event
+rate. Every report keeps process health and restart authority unverified;
+logs alone do not identify a process or prove successful work. An optional
+`--json-output` exports the same bounded observation. The alert reader rejects
+stale, future-dated, malformed, and legacy watchdog records and never treats an
+old inventory `complete` label as compliance acceptance.
+
+The legacy `dashboard/self_heal_orchestrator.py` full-stack launch loop is
+retired. Its former importable restart function fails explicitly, and its CLI
+exits without starting a process or writing a successful-recovery record.
+The existing runtime manager remains the operating path:
+
+```powershell
+code/ops/MANAGE_LOCAL_STACK.ps1 -Action status
+```
+
+That manager's status action may maintain its local process registry; it is
+not a scientific validation or an authorization to change execution controls.
+Any actual recovery must still establish current process identity, intended
+stack group, runtime controls, and post-action health separately.
+
+`dashboard/automate_luma_stack.ps1 -Python <intended-python-path>` now runs
+only the three existing inventory/log collectors from its own directory.
+Exit 0 means those observations were written; exit 2 means the watchdog
+reported log issues; exit 1 means a collector failed. These outcomes do not
+certify runtime health or compliance. The driver does not invoke example
+proofs, alerts, recovery, or trades. PowerShell regression tests use harmless
+stub collectors to verify success, diagnostic issues, failure, and path
+independence.
+
+`dashboard/generate_validation_proof.py` is now a compatibility entry point
+for `run_ensemble_meta_strategy.py`. It requires the same explicit input and
+cost arguments, delegates to that single corrected evaluator, and creates no
+`proof_live` artifacts. The old one-row/empty-result always-long example is
+not validation evidence. See `docs/HARMONIC_VALIDATION_PROTOCOL.md` for the
+versioned diagnostic and synthetic replay instructions. The historical
+`code/validation_proof_pack.py` helper and retained historical files are not
+retroactively reclassified.
+
 ## Grant Factory
 
 The frozen benchmark remains 673 series. Measured artifact breadth is currently

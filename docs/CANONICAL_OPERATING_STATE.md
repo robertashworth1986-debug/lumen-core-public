@@ -52,6 +52,18 @@ The controlling method and replay commands are in
 `docs/HARMONIC_VALIDATION_PROTOCOL.md`. Historical outputs and the fifteen
 component formulas remain retained; no live execution authority changed.
 
+**Legacy operational evidence repair (September 14, 2026):** The dashboard's
+file-presence checklist now reports unverified implementation inventory,
+and the watchdog reports bounded UTC log observations rather than inferred
+process health. The legacy text-triggered full-stack restart loop is retired;
+the existing runtime manager remains the separate operating path. The status
+driver now preserves collector failures and log-issue exit codes, and the old
+example-proof command delegates to the corrected explicit-input evaluator.
+Twenty-seven focused checks passed, including PowerShell tests with harmless
+stub collectors. This is local source/test evidence, not runtime activation,
+successful recovery, functional acceptance, or compliance certification.
+The operational contract is recorded in `docs/LUMA_PRODUCTION_CONTEXT.md`.
+
 ### Public runtime incident and recovery boundary
 
 **Latest verified point-in-time observation (August 10):** The committed

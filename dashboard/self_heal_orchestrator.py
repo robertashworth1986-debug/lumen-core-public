@@ -1,28 +1,30 @@
-import os
-import time
+"""Retired legacy restart entry point.
+
+A dashboard status phrase cannot authorize starting the full stack. Inspect the
+existing runtime manager instead: code/ops/MANAGE_LOCAL_STACK.ps1 -Action status.
+This module never launches a process, alters runtime controls, or writes a
+successful-recovery record.
+"""
 from pathlib import Path
+import sys
 
-# Self-healing: restart orchestrator if watchdog detects a stall or error
-WATCHDOG_STATUS = Path('dashboard/orchestrator_watchdog_status.txt')
-ORCH_LAUNCH_SCRIPT = Path('launch_all_engines.ps1')
-RESTART_LOG = Path('dashboard/self_heal_log.txt')
-
-CHECK_INTERVAL = 300  # seconds (5 min)
+ROOT = Path(__file__).resolve().parents[1]
+REASON = (
+    "Legacy automatic restart is retired: log observations do not establish "
+    "process failure or restart authority. Inspect the existing runtime manager "
+    "with code/ops/MANAGE_LOCAL_STACK.ps1 -Action status before a governed runtime change."
+)
 
 
 def restart_orchestrator():
-    # This assumes PowerShell launch script is in workspace root
-    os.system(f'powershell -ExecutionPolicy Bypass -File "{ORCH_LAUNCH_SCRIPT}"')
-    with open(RESTART_LOG, 'a') as f:
-        f.write(f'Restarted orchestrator at {time.ctime()}\n')
+    """Fail closed for callers that still import the former launch wrapper."""
+    raise RuntimeError(REASON)
+
 
 def main():
-    while True:
-        if WATCHDOG_STATUS.exists():
-            txt = WATCHDOG_STATUS.read_text()
-            if "ISSUES DETECTED" in txt:
-                restart_orchestrator()
-        time.sleep(CHECK_INTERVAL)
+    print(REASON, file=sys.stderr)
+    return 2
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
