@@ -325,6 +325,27 @@ Official sources:
 - DOE SBIR: https://science.osti.gov/sbir/Funding-Opportunities/FY-2026
 - NIST SBIR: https://www.nist.gov/tpo/small-business-innovation-research-program-sbir
 
+## Local evidence discovery coverage
+
+`code/ops/CURATE_ICLOUD_TOP_ASSETS.py` ranks local discovery candidates by
+keywords. Its score is not technical validity, investment readiness, or
+commercial value. PDF inspection now binds one bounded source-byte snapshot,
+enforces the configured page prefix for text and image-object inspection,
+counts retained-text separators inside the character budget, and reports
+warnings and page errors. The CSV, JSON and Markdown outputs carry partial
+coverage explicitly. Successful text-layer inspection does not mean OCR,
+visual review, full document understanding, or access to every Apple Note.
+Non-PDF format coverage remains explicitly unverified.
+
+Preview extraction requires the same PDF hash recorded during inspection,
+stays within that page prefix, and records source and extracted-byte hashes.
+Failures consume the document-attempt budget and remain visible in the
+summary. Diagnostic messages are bounded while their total count is retained.
+These are output/input and selected-page bounds, not a parser CPU/memory
+sandbox; pypdf security updates remain a separate dependency gate. The
+coverage tests use generated PDFs and small fake pages, with no corpus script
+execution or original notebook modification.
+
 ## Identity, Patent, And Compliance
 
 SAM registration status and expiration have not been verified from an
