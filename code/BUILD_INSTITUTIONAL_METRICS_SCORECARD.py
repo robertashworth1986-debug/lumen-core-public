@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -39,9 +40,10 @@ def load_json(path: Path, default: Any) -> Any:
 
 def as_float(value: Any, default: float = 0.0) -> float:
     try:
-        return float(value)
+        result = float(value)
+        return result if not isinstance(value, bool) and math.isfinite(result) else default
     except Exception:
-        return float(default)
+        return default
 
 
 def as_int(value: Any, default: int = 0) -> int:
@@ -64,21 +66,28 @@ def registry_rows(payload: Any) -> list[dict[str, Any]]:
 
 
 def build_scorecard() -> dict[str, Any]:
-    daily = load_json(DAILY_REPORT, {})
-    perf = load_json(INVESTOR_PERF, {})
-    lineages = load_json(CHAMPION_LINEAGES, {})
-    seed = load_json(SEED_VALIDATION, {})
-    registry = load_json(REGISTRY, {})
-    opp = load_json(OPPORTUNITY_BRIEF, {})
-    breadth = load_json(SOURCE_BREADTH, {})
-    edge = load_json(EDGE_TRUTH, {})
+    shape_issues = []
+    def mapping(value, label):
+        if isinstance(value, dict):
+            return value
+        shape_issues.append(label + ': expected an object')
+        return {}
+    daily = mapping(load_json(DAILY_REPORT, {}), 'daily_report')
+    perf = mapping(load_json(INVESTOR_PERF, {}), 'investor_performance')
+    lineages = mapping(load_json(CHAMPION_LINEAGES, {}), 'champion_lineages')
+    seed = mapping(load_json(SEED_VALIDATION, {}), 'seed_validation')
+    registry = mapping(load_json(REGISTRY, {}), 'registry')
+    opp = mapping(load_json(OPPORTUNITY_BRIEF, {}), 'opportunity_brief')
+    breadth = mapping(load_json(SOURCE_BREADTH, {}), 'source_breadth')
+    edge = mapping(load_json(EDGE_TRUTH, {}), 'edge_truth')
 
-    account = daily.get("account", {}) if isinstance(daily, dict) else {}
-    risk = daily.get("risk", {}) if isinstance(daily, dict) else {}
-    daily_perf = daily.get("performance", {}) if isinstance(daily, dict) else {}
+    account = mapping(daily.get('account', {}), 'daily_report.account')
+    risk = mapping(daily.get('risk', {}), 'daily_report.risk')
+    daily_perf = mapping(daily.get('performance', {}), 'daily_report.performance')
+    champion = mapping(seed.get('champion', {}), 'seed_validation.champion')
 
     rows = registry_rows(registry)
-    enabled_rows = [r for r in rows if bool(r.get("enabled", False))]
+    enabled_rows = [r for r in rows if r.get('enabled') is True]
     measured_rows = [
         r
         for r in rows
@@ -88,7 +97,9 @@ def build_scorecard() -> dict[str, Any]:
     ]
 
     top_lineages = lineages.get("top_lineages", []) if isinstance(lineages, dict) else []
-    best_lineage = top_lineages[0] if isinstance(top_lineages, list) and top_lineages else {}
+    best_lineage = mapping(top_lineages[0], 'champion_lineages.top_lineages[0]') if isinstance(top_lineages, list) and top_lineages else {}
+    if not isinstance(top_lineages, list):
+        shape_issues.append('champion_lineages.top_lineages: expected a list')
 
     realized_roi_pct = as_float(account.get("return_total_pct"), 0.0)
     win_rate_pct = as_float(daily_perf.get("win_rate_pct"), as_float(perf.get("win_rate_pct"), 0.0))
@@ -97,8 +108,8 @@ def build_scorecard() -> dict[str, Any]:
 
     walkforward_sharpe = as_float(best_lineage.get("wf_sharpe_mean"), 0.0)
     walkforward_stability = as_float(best_lineage.get("wf_stability"), 0.0)
-    test_sharpe = as_float(best_lineage.get("test_sharpe"), as_float(seed.get("champion", {}).get("test_sharpe"), 0.0))
-    institutional_score = as_float(best_lineage.get("institutional_score"), as_float(seed.get("champion", {}).get("institutional_score"), 0.0))
+    test_sharpe = as_float(best_lineage.get("test_sharpe"), as_float(champion.get("test_sharpe"), 0.0))
+    institutional_score = as_float(best_lineage.get("institutional_score"), as_float(champion.get("institutional_score"), 0.0))
 
     measured_hour = as_float(opp.get("measured_total_hour_usd"), 0.0)
     rolling_hour = as_float(opp.get("rolling_total_hour_usd"), 0.0)
@@ -172,9 +183,9 @@ def build_scorecard() -> dict[str, Any]:
             "top_institutional_score": institutional_score,
             "edge_truth_score": edge_quality_score,
             "edge_truth_verdict": edge_verdict,
-            "champion_flow": str(best_lineage.get("flow", seed.get("champion", {}).get("flow", "unknown"))),
-            "champion_strategy": str(best_lineage.get("strategy", seed.get("champion", {}).get("strategy", "unknown"))),
-            "champion_algo": str(best_lineage.get("algo", seed.get("champion", {}).get("algo", "unknown"))),
+            "champion_flow": str(best_lineage.get("flow", champion.get("flow", "unknown"))),
+            "champion_strategy": str(best_lineage.get("strategy", champion.get("strategy", "unknown"))),
+            "champion_algo": str(best_lineage.get("algo", champion.get("algo", "unknown"))),
         },
         "source_coverage": {
             "registry_total": len(rows),
@@ -218,6 +229,19 @@ def build_scorecard() -> dict[str, Any]:
     payload['trading_kpis'] = {key: None for key in payload['trading_kpis']}
     payload['broker_reconciled'] = False
     payload['investment_ready'] = False
+    payload['source_shape_issues'] = shape_issues
+    payload['source_completeness_verified'] = False
+    payload['source_freshness_verified'] = False
+    payload['source_coverage']['measured_sources'] = None
+    payload['source_coverage']['measurement_pct'] = None
+    payload['source_coverage']['declared_row_presence_sources'] = sum(type(row.get('rows')) is int and row['rows'] > 0 for row in rows)
+    payload['declared_opportunity_inputs'] = {
+        'rolling_total_hour_usd': as_float(opp.get('rolling_total_hour_usd'), None),
+        'measured_total_hour_usd': as_float(opp.get('measured_total_hour_usd'), None),
+        'boundary': 'Unverified legacy declarations; no realized savings or financial effect established.',
+    }
+    payload['opportunity_kpis']['measured_total_hour_usd'] = None
+    payload['opportunity_kpis']['rolling_total_hour_usd'] = None
     payload['gaps'] = [
         'Account performance is unknown: authenticated initial balances, external flows, fills, fees, and final balances are not reconciled here.',
         'Source coverage and modeled opportunity amounts do not establish institutional investment readiness.',
@@ -253,16 +277,16 @@ def render_markdown(scorecard: dict[str, Any]) -> str:
         "",
         "## Coverage KPIs",
         f"- Registry Sources: {as_int(s.get('registry_total'))}",
-        f"- Enabled Sources: {as_int(s.get('enabled_sources'))}",
-        f"- Measured Sources: {as_int(s.get('measured_sources'))}",
-        f"- Coverage %: {as_float(s.get('coverage_pct')):.2f}",
-        f"- Measurement %: {as_float(s.get('measurement_pct')):.2f}",
+        f"- Declared Enabled Sources: {as_int(s.get('enabled_sources'))}",
+        f"- Declared Row-Presence Sources: {as_int(s.get('declared_row_presence_sources'))}",
+        f"- Declared Enabled Share %: {as_float(s.get('coverage_pct')):.2f}",
+        '- Validated measurement sources and coverage: Unknown / not established',
         f"- Open-Access Approved Sources: {as_int(s.get('open_access_approved_sources'))}",
         f"- Combined Approved Sources: {as_int(s.get('combined_approved_sources'))}",
         "",
         "## Opportunity KPIs",
-        f"- Rolling $/hr: {as_float(o.get('rolling_total_hour_usd')):,.2f}",
-        f"- Measured $/hr: {as_float(o.get('measured_total_hour_usd')):,.2f}",
+        '- Realized or measured USD/hour: Unknown / not established',
+        '- Legacy opportunity declarations are retained separately in JSON and are not financial actuals.',
         f"- Top Sector: {o.get('top_sector', 'n/a')}",
         f"- Sector Count: {as_int(o.get('sector_count'))}",
         f"- Critical Alerts: {as_int(o.get('critical_lane_alerts'))}",
@@ -277,6 +301,10 @@ def render_markdown(scorecard: dict[str, Any]) -> str:
     else:
         lines.append("- No blocking gaps detected in the latest scorecard snapshot.")
 
+    if scorecard.get('source_shape_issues'):
+        lines += ['', '## Input shape holds', '']
+        lines += ['- ' + issue for issue in scorecard['source_shape_issues']]
+
     lines.append("")
     return "\n".join(lines)
 
@@ -284,7 +312,7 @@ def render_markdown(scorecard: dict[str, Any]) -> str:
 def main() -> int:
     EXEC.mkdir(parents=True, exist_ok=True)
     scorecard = build_scorecard()
-    SCORECARD_JSON.write_text(json.dumps(scorecard, indent=2), encoding="utf-8")
+    SCORECARD_JSON.write_text(json.dumps(scorecard, indent=2, allow_nan=False), encoding="utf-8")
     SCORECARD_MD.write_text(render_markdown(scorecard), encoding="utf-8")
     kpi_summary = {
         "timestamp_utc": scorecard.get("generated_utc"),
@@ -305,7 +333,7 @@ def main() -> int:
         "open_access_approved_sources": scorecard.get("source_coverage", {}).get("open_access_approved_sources"),
         "combined_approved_sources": scorecard.get("source_coverage", {}).get("combined_approved_sources"),
     }
-    KPI_SUMMARY_JSON.write_text(json.dumps(kpi_summary, indent=2), encoding="utf-8")
+    KPI_SUMMARY_JSON.write_text(json.dumps(kpi_summary, indent=2, allow_nan=False), encoding="utf-8")
 
     print("INSTITUTIONAL METRICS SCORECARD WRITTEN")
     print(SCORECARD_JSON)

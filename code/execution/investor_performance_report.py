@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation, localcontext
 import hashlib
 import json
-import math
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -34,9 +33,14 @@ def _reject_constant(value):
 
 
 def _json_float(value):
-    result = float(value)
-    if not math.isfinite(result):
-        raise ValueError('Non-finite JSON number')
+    if len(value) > 80:
+        raise ValueError('JSON decimal exceeds precision limit')
+    try:
+        result = Decimal(value)
+    except InvalidOperation as exc:
+        raise ValueError('JSON decimal exceeds representable exponent range') from exc
+    if not result.is_finite() or result.adjusted() > 308:
+        raise ValueError('Non-finite or out-of-range JSON number')
     return result
 
 
@@ -86,6 +90,12 @@ def _sum(values):
         return sum(values, Decimal(0))
 
 
+def _money(values):
+    value = _sum(values)
+    text = format(value, 'f')
+    return '0' if value == 0 else text.rstrip('0').rstrip('.') if '.' in text else text
+
+
 def _field(rows, names, *, nonnegative=False):
     values = []
     coverage = {'records': len(rows), 'valid': 0, 'missing': 0, 'invalid': 0, 'conflicting': 0}
@@ -113,7 +123,13 @@ def analyze_rows(rows):
     usd = bool(closed) and all(r.get('currency') == 'USD' for r in closed)
     identities = []
     identity_missing = 0
+    identity_conflicts = 0
     for row in closed:
+        if 'trade_id' in row and 'id' in row:
+            aliases = [row['trade_id'], row['id']]
+            valid_aliases = all(isinstance(v, (str, int)) and not isinstance(v, bool) and str(v).strip() for v in aliases)
+            if not valid_aliases or str(aliases[0]) != str(aliases[1]):
+                identity_conflicts += 1
         identity = row.get('trade_id', row.get('id'))
         if not isinstance(identity, (str, int)) or isinstance(identity, bool) or not str(identity).strip():
             identity_missing += 1
@@ -122,7 +138,7 @@ def analyze_rows(rows):
     duplicate_ids = sum(count - 1 for count in Counter(identities).values())
     fingerprints = [json.dumps(r, sort_keys=True, default=str, ensure_ascii=True) for r in closed]
     duplicate_content = sum(count - 1 for count in Counter(fingerprints).values())
-    record_basis = bool(closed) and not (duplicate_ids or duplicate_content or unknown_status) and mode != 'UNKNOWN_OR_MIXED'
+    record_basis = bool(closed) and not (duplicate_ids or duplicate_content or identity_conflicts or unknown_status) and mode != 'UNKNOWN_OR_MIXED'
     pnl, pnl_coverage = _field(closed, ['net_pnl', 'realized_pnl_usd'])
     percent, percent_coverage = _field(closed, ['net_pnl_pct'])
     fees, fee_coverage = _field(closed, ['round_trip_fee_usd'], nonnegative=True)
@@ -136,7 +152,7 @@ def analyze_rows(rows):
         'Reported net fields are not independently reconciled to fills, fees or balances.',
     ]
     if not record_basis:
-        reasons.append('Financial aggregates held: empty records, duplicate identities/content, unknown statuses, or unknown/mixed mode.')
+        reasons.append('Financial aggregates held: empty records, duplicate/conflicting identities or content, unknown statuses, or unknown/mixed mode.')
     if not usd:
         reasons.append('USD aggregates held: each closed record must explicitly declare currency USD.')
     if not pnl_complete:
@@ -148,14 +164,15 @@ def analyze_rows(rows):
         'distinct_declared_closed_ids': len(set(identities)) if not identity_missing else None,
         'missing_identity_records': identity_missing,
         'duplicate_identity_records': duplicate_ids, 'duplicate_content_records': duplicate_content,
+        'conflicting_identity_records': identity_conflicts,
         'unknown_status_records': unknown_status, 'declared_mode': mode,
         'declared_currency': 'USD' if usd else 'UNKNOWN_OR_MIXED',
         'sample_quality_tier': 'UNVERIFIED_RECORDS', 'sample_confidence_note': BOUNDARY,
         'field_coverage': {'net_pnl_usd': pnl_coverage, 'net_pnl_pct': percent_coverage, 'fees_usd': fee_coverage},
-        'reported_net_pnl_sum_usd': float(_sum(pnl)) if pnl_complete else None,
+        'reported_net_pnl_sum_usd': _money(pnl) if pnl_complete else None,
         'win_rate_pct': 100.0 * sum(value > 0 for value in pnl) / len(pnl) if pnl_complete else None,
         'avg_net_pnl_pct': float(_sum(percent)) / len(percent) if percent_complete else None,
-        'total_round_trip_fees_usd': float(_sum(fees)) if fees_complete else None,
+        'total_round_trip_fees_usd': _money(fees) if fees_complete else None,
         'total_net_pnl_pct': None, 'sharpe': None, 'sortino': None, 'calmar': None,
         'max_drawdown': None, 'portfolio_equity_usd': None,
         'reported_pnl_by_closed_record': [float(value) for value in pnl] if pnl_complete else [],

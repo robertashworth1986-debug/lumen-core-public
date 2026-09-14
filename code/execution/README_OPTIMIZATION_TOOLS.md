@@ -32,7 +32,9 @@ JSON numbers are rejected. Closed records require an explicit `CLOSED` status;
 duplicate IDs/content, unknown statuses, or missing/mixed mode hold aggregates.
 USD aggregates additionally require `currency: USD` on every closed record.
 Amounts must be finite, at most 1e15 in absolute value, and have at most 12
-decimal places. Conflicting aliases or incomplete coverage hold the whole
+decimal places. JSON decimals retain their decimal representation before
+aggregation; monetary totals are exact decimal strings, not binary floats.
+Both identity aliases must agree when present. Conflicting aliases or incomplete coverage hold the whole
 affected metric. Labels and arithmetic are not source authentication.
 
 Sharpe, Sortino, Calmar, equity, drawdown, portfolio percentage return and
@@ -41,10 +43,17 @@ supply initial equity, external cash flows, regular return intervals, or
 broker reconciliation. The old 100,000 USD starting-capital fallback and
 252/365-per-trade annualization are removed. The dashboard entry point reuses
 this report and displays reported PnL per record, with no fabricated equity.
+Loaded source rows retain their original missing-field distinctions; changing
+the display frame requires reloading the source before reusing its receipt.
+The plot is optional; exact supplied fields remain in the record table.
 
 Compatibility: old consumers must honor the new schema and nulls, rather than
 coercing unknowns to zero. The legacy institutional scorecard now explicitly
 holds investment-readiness promotion and leaves its account KPIs unknown.
+Malformed object shapes are recorded as holds. Enabled status requires an
+actual boolean, declared row presence is separate from validated measurement,
+and non-finite numbers cannot escape into its JSON output. Legacy opportunity
+declarations are retained separately without becoming realized dollar effects.
 Other archived/legacy analytics, including the DuckDB pipeline below, are not
 upgraded or validated by this correction. Historical generated outputs remain
 unchanged and must not be treated as current v2 diagnostics.

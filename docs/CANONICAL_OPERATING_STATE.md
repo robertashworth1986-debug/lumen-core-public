@@ -590,8 +590,16 @@ declared modes and duplicate records cannot silently become a zero-loss or
 high-confidence investment result. Invented starting equity, per-trade
 annualization and row-count quality tiers are removed. The legacy scorecard
 holds institutional promotion and account KPIs until an actual reconciliation
-contract exists. Forty focused synthetic checks cover the correction; no
+contract exists. Fifty-nine focused synthetic checks cover the correction; no
 private account or live ledger was executed or altered. This supports the
 existing buyer-review path without establishing alpha, revenue, account
 performance or external acceptance. Compatibility and remaining legacy-reader
 limits are in `code/execution/README_OPTIMIZATION_TOOLS.md`.
+
+The follow-up preserves exact decimal monetary totals as JSON strings and
+retains source field absence through the dashboard's DataFrame conversion.
+Changed frames cannot reuse their prior source receipt. Conflicting identity
+aliases withhold aggregates; malformed scorecard shapes and non-finite values
+remain controlled holds. Declared row presence is separate from verified
+measurement coverage. Extreme JSON exponents receive a controlled input error
+without replacing an existing report. These checks use synthetic records only.

@@ -1,6 +1,7 @@
 """Offline view of the existing reported-trade diagnostic, without invented equity."""
 from __future__ import annotations
 import argparse
+import copy
 import html
 import importlib.util
 from pathlib import Path
@@ -16,10 +17,16 @@ def load_trade_log(path: str) -> pd.DataFrame:
     rows, receipt = _reporter.read_trade_snapshot(Path(path))
     frame = pd.DataFrame(rows)
     frame.attrs['source_snapshot'] = receipt
+    frame.attrs['source_rows'] = copy.deepcopy(rows)
+    frame.attrs['frame_state'] = repr(frame.to_dict(orient='records'))
     return frame
 
 
 def _report(df):
+    if 'source_rows' in df.attrs:
+        if repr(df.to_dict(orient='records')) != df.attrs.get('frame_state'):
+            raise ValueError('Data frame changed after source snapshot; reload the source before reporting')
+        return _reporter.analyze_rows(df.attrs['source_rows'])
     return _reporter.analyze_rows(df.to_dict(orient='records'))
 
 
@@ -71,7 +78,7 @@ def render_report(df: pd.DataFrame) -> str:
     if receipt:
         sections.append('<p>Source SHA-256: <code>' + html.escape(receipt['sha256']) + '</code></p>')
     if not df.empty:
-        columns = [name for name in ('symbol', 'side', 'entry_time', 'exit_time', 'net_pnl', 'net_pnl_pct', 'status', 'mode', 'currency') if name in df]
+        columns = [name for name in ('symbol', 'side', 'entry_time', 'exit_time', 'net_pnl', 'realized_pnl_usd', 'net_pnl_pct', 'status', 'mode', 'currency') if name in df]
         sections.append('<h2>Recent supplied records</h2><div class="scroll">' + df[columns].tail(30).to_html(index=False, escape=True, border=0) + '</div>')
     css = ('body{max-width:1100px;margin:auto;padding:24px;font:16px/1.5 system-ui;color:#142534;background:#f5f7fa}'
            'h1,h2{color:#123c59}dt{font-weight:700}dd{margin:0 0 12px}td,th{padding:8px;text-align:left}'

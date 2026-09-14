@@ -1,5 +1,6 @@
 """Legacy trade rows must not silently become institutional account evidence."""
 import importlib.util
+from decimal import Decimal
 import json
 from pathlib import Path
 import subprocess
@@ -40,7 +41,7 @@ def test_record_count_never_promotes_confidence(reporter):
     assert result['sample_quality_tier'] == 'UNVERIFIED_RECORDS'
     assert result['investment_ready'] is False
     assert result['broker_reconciled'] is False
-    assert result['reported_net_pnl_sum_usd'] == 200.0
+    assert result['reported_net_pnl_sum_usd'] == '200'
     assert result['sharpe'] is None
     assert result['total_net_pnl_pct'] is None
 
@@ -92,7 +93,7 @@ def test_missing_id_does_not_claim_unique_trades(reporter):
     item = row(); del item['trade_id']
     result = reporter.analyze_rows([item])
     assert result['unique_closed_trades'] is None
-    assert result['reported_net_pnl_sum_usd'] == 2.0
+    assert result['reported_net_pnl_sum_usd'] == '2'
 
 
 def test_conflicting_aliases_hold_sum(reporter):
@@ -103,7 +104,7 @@ def test_conflicting_aliases_hold_sum(reporter):
 
 def test_zero_is_valid_when_explicitly_reported(reporter):
     result = reporter.analyze_rows([row(net_pnl=0, net_pnl_pct=0)])
-    assert result['reported_net_pnl_sum_usd'] == 0.0
+    assert result['reported_net_pnl_sum_usd'] == '0'
     assert result['win_rate_pct'] == 0.0
     assert result['sharpe'] is None
 
@@ -112,7 +113,7 @@ def test_signed_cancellation_preserves_reported_cents(reporter):
     result = reporter.analyze_rows([row('a', net_pnl='1000000000000000'),
                                     row('b', net_pnl='0.01'),
                                     row('c', net_pnl='-1000000000000000')])
-    assert result['reported_net_pnl_sum_usd'] == 0.01
+    assert result['reported_net_pnl_sum_usd'] == '0.01'
 
 
 def test_negative_fees_are_not_silently_accepted(reporter):
@@ -123,7 +124,7 @@ def test_negative_fees_are_not_silently_accepted(reporter):
 def test_open_records_do_not_enter_closed_statistics(reporter):
     result = reporter.analyze_rows([row(), row('b', status='OPEN', net_pnl=999)])
     assert result['closed_records'] == 1
-    assert result['reported_net_pnl_sum_usd'] == 2
+    assert result['reported_net_pnl_sum_usd'] == '2'
 
 
 def test_full_false_green_fixture_cannot_promote_scorecard(monkeypatch):
@@ -164,7 +165,8 @@ def test_source_has_exact_byte_identity(reporter, tmp_path):
     source = tmp_path / 'rows.json'
     raw = json.dumps([row()]).encode(); source.write_bytes(raw)
     rows, receipt = reporter.read_trade_snapshot(source)
-    assert rows == [row()]
+    assert rows[0]['trade_id'] == 'a'
+    assert str(rows[0]['round_trip_fee_usd']) == '0.1'
     assert receipt['sha256'] == hashlib.sha256(raw).hexdigest()
     assert receipt['bytes'] == len(raw)
 
@@ -195,7 +197,7 @@ def test_dashboard_reuses_report_and_does_not_invent_equity():
     dashboard = load('dashboard/dashboard_analytics.py', 'legacy_dashboard_test')
     frame = pd.DataFrame([row(), row('b', net_pnl=-3)])
     metrics = dashboard.compute_metrics(frame)
-    assert metrics['total_pnl'] == -1
+    assert metrics['total_pnl'] == '-1'
     assert metrics['sharpe'] is None
     assert metrics['max_drawdown'] is None
     assert dashboard.plot_equity_curve(frame) is None
@@ -226,6 +228,105 @@ def test_optional_plotly_absence_keeps_complete_table_report(monkeypatch):
     assert 'Optional chart unavailable' in markup
     assert '-2.25' in markup
     assert 'Unknown / not established' in markup
+
+
+def test_json_decimal_amounts_survive_parse_and_sum(reporter, tmp_path):
+    source = tmp_path / 'precision.json'
+    source.write_text('[{"trade_id":"a","status":"CLOSED","mode":"paper","currency":"USD","net_pnl":900000000000000.01},'
+                      '{"trade_id":"b","status":"CLOSED","mode":"paper","currency":"USD","net_pnl":-900000000000000}]')
+    rows, _ = reporter.read_trade_snapshot(source)
+    assert Decimal(str(rows[0]['net_pnl'])) == Decimal('900000000000000.01')
+    result = reporter.analyze_rows(rows)
+    assert result['reported_net_pnl_sum_usd'] == '0.01'
+
+
+@pytest.mark.parametrize('exponent', ['99999999999999999999999999999', '-99999999999999999999999999999'])
+def test_unrepresentable_decimal_exponent_is_controlled(reporter, tmp_path, exponent):
+    source = tmp_path / 'rows.json'
+    source.write_text('[{"trade_id":"a","status":"CLOSED","mode":"paper","currency":"USD","net_pnl":1e' + exponent + '}]')
+    with pytest.raises(ValueError, match='exponent range'):
+        reporter.read_trade_snapshot(source)
+    target = tmp_path / 'report.json'; target.write_text('retain me')
+    proc = subprocess.run([sys.executable, str(ROOT / 'code/execution/investor_performance_report.py'),
+                           '--trade-log', str(source), '--out-json', str(target),
+                           '--out-md', str(tmp_path / 'report.md')], capture_output=True, timeout=15)
+    assert proc.returncode == 2
+    assert b'Traceback' not in proc.stderr
+    assert target.read_text() == 'retain me'
+
+
+def test_large_single_amount_is_serialized_exactly(reporter):
+    result = reporter.analyze_rows([row(net_pnl='900000000000000.01')])
+    assert result['reported_net_pnl_sum_usd'] == '900000000000000.01'
+    assert '900000000000000.01' in json.dumps(result, allow_nan=False)
+
+
+def test_source_aliases_are_preserved_in_dashboard(tmp_path):
+    pytest.importorskip('pandas')
+    dashboard = load('dashboard/dashboard_analytics.py', 'ledger_source_alias_test')
+    second = row('b'); del second['net_pnl']; second['realized_pnl_usd'] = 3
+    source = tmp_path / 'rows.json'; source.write_text(json.dumps([row(), second]))
+    frame = dashboard.load_trade_log(str(source))
+    assert dashboard.compute_metrics(frame)['total_pnl'] == '5'
+    assert 'realized_pnl_usd' in dashboard.render_report(frame)
+
+
+def test_changed_source_frame_cannot_keep_old_receipt(tmp_path):
+    pytest.importorskip('pandas')
+    dashboard = load('dashboard/dashboard_analytics.py', 'ledger_source_mutation_test')
+    source = tmp_path / 'rows.json'; source.write_text(json.dumps([row()]))
+    frame = dashboard.load_trade_log(str(source)); frame.loc[0, 'net_pnl'] = 300
+    with pytest.raises(ValueError, match='changed'):
+        dashboard.render_report(frame)
+
+
+def test_explicit_invalid_alias_is_not_erased_in_dashboard(tmp_path):
+    pytest.importorskip('pandas')
+    dashboard = load('dashboard/dashboard_analytics.py', 'ledger_invalid_alias_test')
+    source = tmp_path / 'rows.json'; source.write_text(json.dumps([row(realized_pnl_usd=None)]))
+    frame = dashboard.load_trade_log(str(source))
+    assert dashboard.compute_metrics(frame)['total_pnl'] is None
+
+
+@pytest.mark.parametrize('other', ['common', None, True, ''])
+def test_conflicting_identity_alias_holds_aggregate(reporter, other):
+    result = reporter.analyze_rows([row('a', id=other), row('b', id=other)])
+    assert result['conflicting_identity_records'] == 2
+    assert result['reported_net_pnl_sum_usd'] is None
+
+
+def test_equal_identity_aliases_are_one_declaration(reporter):
+    result = reporter.analyze_rows([row('a', id='a')])
+    assert result['conflicting_identity_records'] == 0
+    assert result['distinct_declared_closed_ids'] == 1
+
+
+@pytest.mark.parametrize('target,payload', [('INVESTOR_PERF', []), ('DAILY_REPORT', {'account': None}),
+                                         ('CHAMPION_LINEAGES', {'top_lineages': [1]}),
+                                         ('SEED_VALIDATION', {'champion': None})])
+def test_scorecard_malformed_shapes_are_controlled_hold(monkeypatch, target, payload):
+    scorecard = load('code/BUILD_INSTITUTIONAL_METRICS_SCORECARD.py', 'scorecard_bad_shape_test')
+    monkeypatch.setattr(scorecard, 'load_json', lambda path, default: payload if path == getattr(scorecard, target) else {})
+    result = scorecard.build_scorecard()
+    assert result['readiness_tier'] == 'HOLD'
+    assert result['source_shape_issues']
+
+
+def test_scorecard_nonfinite_input_cannot_escape_as_json_nan(monkeypatch):
+    scorecard = load('code/BUILD_INSTITUTIONAL_METRICS_SCORECARD.py', 'scorecard_nonfinite_test')
+    monkeypatch.setattr(scorecard, 'load_json', lambda path, default: {'measured_total_hour_usd': float('nan')} if path == scorecard.OPPORTUNITY_BRIEF else {})
+    result = scorecard.build_scorecard()
+    assert result['opportunity_kpis']['measured_total_hour_usd'] is None
+    json.dumps(result, allow_nan=False)
+
+
+def test_scorecard_string_false_and_rows_do_not_prove_measurement(monkeypatch):
+    scorecard = load('code/BUILD_INSTITUTIONAL_METRICS_SCORECARD.py', 'scorecard_declarations_test')
+    monkeypatch.setattr(scorecard, 'load_json', lambda path, default: {'rows': [{'enabled': 'false', 'rows': 1}]} if path == scorecard.REGISTRY else {})
+    result = scorecard.build_scorecard()
+    assert result['source_coverage']['enabled_sources'] == 0
+    assert result['source_coverage']['measured_sources'] is None
+    assert result['source_coverage']['declared_row_presence_sources'] == 1
 
 
 def test_scorecard_does_not_convert_unverified_diagnostics_to_green(monkeypatch):
