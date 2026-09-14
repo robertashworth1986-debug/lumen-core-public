@@ -61,6 +61,36 @@ first-party module loading only. They do not establish browser/GPU
 compatibility across devices, visual quality, sustained runtime behavior,
 vulnerability freedom, production deployment, or external validation.
 
+## PDF dependency correction - September 14, 2026
+
+The institutional dependency set and deadline-sentinel workflow now pin
+`pypdf==6.17.0`. The institutional Ubuntu/Python 3.11.9 lock changes only
+pypdf and its two distribution hashes; its other 38 package versions and the
+separate frozen reviewer dependency files remain unchanged.
+
+A current remote observation found three open moderate pypdf advisories:
+[cyclic tree insertion](https://github.com/py-pdf/pypdf/security/advisories/GHSA-jp53-mhqp-8xcg),
+[outline expansion](https://github.com/py-pdf/pypdf/security/advisories/GHSA-23w6-3w8w-8484),
+and [repeated form extraction](https://github.com/py-pdf/pypdf/security/advisories/GHSA-763m-79hh-57f2).
+The older August snapshot below is historical, not a current zero-alert claim.
+
+Four small generated-fixture checks in `tests/test_pdf_dependency_security.py`
+exercise those three guards and an ordinary PDF text/outline/metadata round
+trip. Against pypdf 6.15.0, three checks failed and the compatibility check
+passed; against 6.17.0, all four passed. The cyclic-tree check runs in a
+separate, five-second-bounded process. Outline and form budgets are reduced
+inside the tests, so these checks do not measure default-limit memory use or
+establish safety for arbitrary documents. No attached document is executed.
+
+`pip-audit==2.10.1` reported three known advisories in one package for the
+baseline 39-package lock, and zero known advisories for the candidate lock at
+the recorded query time. The retained package-level outputs and bounded
+comparison are in `evidence/dependency_security/20260914/`. A clean dependency
+audit is not vulnerability freedom, PDF sandboxing, deployment, or remote
+alert closure. Default-branch alerts remain open until an approved merge and
+fresh GitHub reconciliation. Existing PR #210 carries this narrow repair;
+PR #199 overlaps on pypdf but also proposes broader numerical-library changes.
+
 ## Evidence protocol
 
 For a named commit, retain the workflow URL, run ID, conclusion, analyzed
