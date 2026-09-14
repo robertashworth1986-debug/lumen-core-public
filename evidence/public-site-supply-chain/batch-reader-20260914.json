@@ -1,0 +1,58 @@
+{
+  "schema": "lumencore.public_site_local_batch_observation.v1",
+  "observed_date_utc": "2026-09-14",
+  "source_commit": "7dc72f0cbda864156f848ed6870e9f44b3e4320b",
+  "before": {
+    "stage": "before",
+    "source_commit": "7dc72f0cbda864156f848ed6870e9f44b3e4320b",
+    "packager_source_sha256": "f0322c2299025f7584e527815580d55e8d5e8078b6132195fb8a0819f10b8a59",
+    "wall_seconds": 38.4700888999505,
+    "git_calls": 379,
+    "git_operations": {
+      "cat-file": 189,
+      "rev-parse": 1,
+      "ls-tree": 189
+    },
+    "file_count": 189,
+    "artifact_bytes": 20825185,
+    "archive_sha256": "006a40f133ce7837e0cb4a1d762eed39a8dd2a3b874ba740200992ed9aefcc3d",
+    "manifest_sha256": "a69b2ec9921945fa46fde8e97bf7a80127232396a68307e9507eea4a5df0fdae",
+    "scope": "single first-party Windows build; no deployment or energy savings claim"
+  },
+  "after": {
+    "stage": "after",
+    "source_commit": "7dc72f0cbda864156f848ed6870e9f44b3e4320b",
+    "packager_source_sha256": "aee97aed5acedfff711afeef109d47fb563bb3fa1a5808e267fc97dc3f575838",
+    "wall_seconds": 2.068401900003664,
+    "git_calls": 4,
+    "git_operations": {
+      "cat-file": 1,
+      "ls-tree": 1,
+      "rev-parse": 2
+    },
+    "file_count": 189,
+    "artifact_bytes": 20825185,
+    "archive_sha256": "006a40f133ce7837e0cb4a1d762eed39a8dd2a3b874ba740200992ed9aefcc3d",
+    "manifest_sha256": "a69b2ec9921945fa46fde8e97bf7a80127232396a68307e9507eea4a5df0fdae",
+    "archive_equal": true,
+    "manifest_equal": true,
+    "observed_speedup": 18.5989429326488,
+    "scope": "single first-party Windows paired build with concurrent test load; not a benchmark SLO, deployment, economic value, or energy savings claim"
+  },
+  "method": "One paired first-party build on the same Windows host and interpreter, using the same immutable source commit and release membership. Concurrent repository tests were running. Time measured by Python perf_counter around build_release_package. Git calls counted by wrapping the packager helper. Artifact equality checked from complete file bytes.",
+  "environment": {
+    "os": "Windows",
+    "python": "3.11.9",
+    "sample_pairs": 1,
+    "independent_evaluation": false
+  },
+  "claims": {
+    "same_archive_bytes": true,
+    "same_manifest_bytes": true,
+    "general_speedup_guarantee": false,
+    "energy_savings": false,
+    "financial_valuation": false,
+    "production_deployment": false,
+    "independent_validation": false
+  }
+}

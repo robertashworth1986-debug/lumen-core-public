@@ -1,0 +1,75 @@
+{
+  "affected": [],
+  "affected_file_count": 0,
+  "affected_ratio": 0.0,
+  "automatic_actions_performed": [
+    "machine_classification",
+    "incident_receipt_generation"
+  ],
+  "base_url": "https://lumen-core.ai",
+  "claim_boundaries": [
+    "not_a_tested_live_incident_response_program",
+    "not_a_business_continuity_certification",
+    "not_a_disaster_recovery_certification",
+    "not_an_enterprise_sla",
+    "not_a_security_audit_or_penetration_test",
+    "not_proof_of_customer_notification_or_regulatory_compliance",
+    "not_authority_to_deploy_repair_rotate_notify_delete_trade_or_close"
+  ],
+  "classified_at_utc": "2026-09-14T06:56:08.595870Z",
+  "containment_sequence": [
+    "preserve the immutable release package, manifest, live audit, and incident receipt",
+    "treat the checked-out repository commit as canonical and the drifting live surface as unverified",
+    "hold public-release promotion and do not cite mismatched live bytes as current evidence",
+    "separate static release drift from gateway, secret, DNS, buyer-data, and legal incident lanes",
+    "escalate any suspected SEV-1 condition for human classification without inferring it from a public HTTP audit"
+  ],
+  "critical_affected": [],
+  "decision": "MONITOR",
+  "error_count": 0,
+  "expected_file_count": 189,
+  "external_notification_performed": false,
+  "human_authorization_required": [
+    "deploy an exact public-site snapshot",
+    "repair or restart the public gateway",
+    "install, rotate, or revoke a credential or secret",
+    "change DNS, firewall, TLS, reverse-proxy, or hosting configuration",
+    "notify a customer, regulator, insurer, partner, or the public",
+    "delete or disclose data or evidence",
+    "accept legal terms or make a certification or attestation",
+    "place a trade or enable production execution",
+    "close an incident after a live production change"
+  ],
+  "incident_closure_authorized": false,
+  "incident_fingerprint_sha256": "d92a4a569c094b5f07c53bd0ccbae384df96918e6834dcf030e02e78d3974564",
+  "incident_state": "NO_INCIDENT_OBSERVED",
+  "live_audit_canonical_sha256": "a6c078e77510433b81c2410a3b0687948471df67571078f06d1488079d06c53c",
+  "manifest_canonical_sha256": "f92219161295597913803caaf32461a0ebe3038d8c8e403841959790d5138dcd",
+  "matched_file_count": 189,
+  "mismatch_count": 0,
+  "planning_targets": {
+    "buyer_data_rto_rpo": "not established; must be negotiated in the signed buyer scope",
+    "classification_target": "same audit workflow run",
+    "contract_status": "non_contractual_unvalidated_planning_targets",
+    "public_audit_cadence_hours": 24,
+    "public_static_restore_target_hours_after_valid_human_authorization": 4,
+    "release_byte_rpo": "zero for immutable Git-tracked allowlisted release bytes"
+  },
+  "policy_canonical_sha256": "8047dd8ccaed37f496639647ed6258c5afe539010814e7630b65c0c2b08c093a",
+  "production_mutation_performed": false,
+  "receipt_schema": "lumencore.public_release_incident.v1",
+  "receipt_sha256": "9448fc55d29cab500c1b19714cfac20daaf719f6d50376331c67996308de2ab6",
+  "recovery_sequence": [
+    "review the exact commit, manifest, affected surfaces, and rollback boundary",
+    "obtain the literal exact-snapshot deployment approval before mutating public files",
+    "obtain the separate gateway-repair approval before changing gateway dependencies or runtime secrets",
+    "apply only the allowlisted release with rollback capture",
+    "rerun the full-manifest exact-byte and MIME audit against the deployed commit",
+    "verify critical routes and retain deployment, rollback, and live-audit receipts",
+    "close only after the current commit reports release_verified true and any separate incident lane is resolved"
+  ],
+  "release_verified": true,
+  "severity": "NONE",
+  "source_commit": "c3bddd48768a23acdce727246291d48a62984ed8",
+  "valid": true
+}

@@ -1,0 +1,13 @@
+zig: warning: argument unused during compilation: '-fno-rtlib-defaultlib' [-Wunused-command-line-argument]
+lld-link: error: undefined symbol: __asan_report_store1
+>>> referenced by C:\Users\Novac\Documents\Codex\2026-09-13\plan-outreach-and-funding-chatgpt-conversation\work\institutional-five-hour\nic-dpu-property-review\address_positive_control.c:3
+>>>               C:\Users\Novac\AppData\Local\zig\o\be16c7a884a777eba194cda4beab8dda\address_positive_control.obj:(main)
+
+lld-link: error: undefined symbol: __asan_init
+>>> referenced by C:\Users\Novac\AppData\Local\zig\o\be16c7a884a777eba194cda4beab8dda\address_positive_control.obj:(asan.module_ctor)
+
+lld-link: error: undefined symbol: __asan_version_mismatch_check_v8
+>>> referenced by C:\Users\Novac\AppData\Local\zig\o\be16c7a884a777eba194cda4beab8dda\address_positive_control.obj:(asan.module_ctor)
+
+lld-link: error: undefined symbol: __asan_shadow_memory_dynamic_address
+>>> referenced by C:\Users\Novac\AppData\Local\zig\o\be16c7a884a777eba194cda4beab8dda\address_positive_control.obj:(.refptr.__asan_shadow_memory_dynamic_address)

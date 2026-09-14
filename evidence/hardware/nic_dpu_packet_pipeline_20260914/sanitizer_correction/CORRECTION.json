@@ -1,0 +1,43 @@
+{
+  "schema": "lumencore.nic_sanitizer_assurance_correction.v1",
+  "date_utc": "2026-09-14",
+  "old_environment": "Windows x86_64 GNU target; ziglang 0.15.2; combined -fsanitize=address,undefined",
+  "observed_failure": "Deliberate heap overflow exited zero with no ASAN diagnostic; separately enabled ASAN failed to link its runtime.",
+  "disposition": "Withdraw ASAN assurance for the reproduced old path. Retain old vector/property outcomes as bounded logical checks only.",
+  "historical_protocol_preserved": true,
+  "generator_unchanged_sha256": "b276533a4024ee006c3a0bb4f6fa6fc0af9f0b480fcf8a4456f99218918e21ec",
+  "replacement_run": "run_20260914T054835Z/RECEIPT.json",
+  "replacement_controls": "Both deliberate faults exited nonzero with expected ASAN and UBSAN diagnostics.",
+  "replacement_result": {
+    "protocol_schema": "lumencore.nic_dpu_generated_property_protocol.v1",
+    "protocol_sha256": "e3360ed3d0673e085593ba73888ff9cdbdfeb1f1ff06fbeee9cc051217418df4",
+    "generator_sha256": "b276533a4024ee006c3a0bb4f6fa6fc0af9f0b480fcf8a4456f99218918e21ec",
+    "executable_sha256": "76491f5671446311c1716ee9740212369fdbdabe1bde28793873370603c3e1fb",
+    "cases": 500000,
+    "seed": 20260914,
+    "outcomes": {
+      "ok": 228933,
+      "non_ipv4": 128504,
+      "truncated": 135592,
+      "malformed": 6971
+    },
+    "failed": 0,
+    "exit_code": 0,
+    "stdout": "PROPERTY cases=500000 seed=20260914 ok=228933 non_ipv4=128504 truncated=135592 malformed=6971 failed=0\n",
+    "stderr": "",
+    "coverage_guided_fuzzing": false,
+    "interpretation": "generated input iterations under one frozen deterministic method; not independent tests, exhaustive coverage or hardware evidence"
+  },
+  "not_claimed": [
+    "unique independent tests",
+    "exhaustive or coverage-guided fuzzing",
+    "security certification",
+    "NIC/DPU hardware",
+    "production readiness",
+    "outside validation"
+  ],
+  "primary_sources": [
+    "https://raw.githubusercontent.com/ziglang/zig/0.15.2/src/main.zig",
+    "https://github.com/mstorsjo/llvm-mingw/releases/tag/20260908"
+  ]
+}

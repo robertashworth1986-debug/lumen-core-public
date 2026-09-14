@@ -1,73 +1,70 @@
-# Cross-Sector Intelligence Pipeline
+# Cross-sector scenario sensitivity
 
-This pipeline freezes high-integrity cross-sector drift/failure deltas and writes grant-ready audit artifacts.
+The existing pipeline is an offline calculator over three hardcoded examples.
+It does not fetch infrastructure, health, financial, or government source feeds.
+The ISO_NE, HHS_FEED and FEDWIRE_OPS labels are historical scenario labels.
 
-## What it does
+## September 14 correction
 
-- Captures immutable delta records in `out/infra_frozen_deltas.jsonl`
-- Writes failure predictions to `out/cross_sector_failure_predictions.jsonl`
-- Appends an audit event to `out/infra_audit_ledger.jsonl`
-- Produces summary evidence in `out/investor_and_grant_evidence.json`
-- Updates chain-of-custody hashes in `out/infra_chain_of_custody_sha256.json`
+Four synthetic regressions reproduced these legacy behaviors:
 
-## Run
+- a caller-supplied `gov_audit_ready` label and `key_present: true` appeared on a hardcoded example;
+- a parameter sweep with `optimization_auto_apply: true` rewrote runtime configuration;
+- the highest assumed detection/mitigation pair was presented as recommended operating parameters;
+- zero detection efficiency was silently replaced with the 0.72 default, creating a positive modeled avoided-cost result.
 
-```powershell
-c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe c:/LumaTrader/INSTITUTIONAL_STACK_V2/code/execution/run_cross_sector_intel.py
-```
+The corrected calculator preserves the hypothetical formula and example inputs,
+but labels every report `HARDCODED_SCENARIO` / `MODELED_ONLY`. Numerical fields
+inside the model are hypothetical arithmetic. Measured savings, verified source
+presence, operational failure time and recommendations remain unknown. The
+sweep is pure and cannot apply parameters or write files. Higher assumed
+fractions mechanically improve the formula; this is sensitivity analysis, not
+learned detection/mitigation performance or a new experiment.
 
-## Build federal brief
+The legacy drift, confidence and lag clamps remain part of the stated formula.
+They have no calibration or probability interpretation. Repeated runs do not
+create new observations. No buyer ROI, agency readiness, grant eligibility,
+realized savings, revenue or company valuation follows from these examples.
 
-```powershell
-c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe c:/LumaTrader/INSTITUTIONAL_STACK_V2/code/execution/run_federal_brief.py
-```
+## Run the existing calculator
 
-Outputs:
-
-- `out/federal_brief.json`
-- `out/federal_brief.md`
-
-## Optimization artifacts
-
-Each cross-sector run now emits bounded optimization simulation artifacts:
-
-- `out/cross_sector_optimization_report.json`
-- `out/cross_sector_optimization_matrix.csv`
-- `out/cross_sector_optimization_report.md`
-
-## Run 24/7 federal brief daemon
+Use the reviewed Python environment and an explicitly named **new** directory:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File c:/LumaTrader/INSTITUTIONAL_STACK_V2/code/RUN_FEDERAL_BRIEF_247.ps1
+python code/execution/run_cross_sector_intel.py --output-dir path/to/new-scenario
 ```
 
-Daemon outputs:
+Optional `--assumptions path/to/assumptions.json` reads a bounded 64 KiB JSON
+object. Duplicate members, invalid numbers, unsafe axis sizes and invalid
+budgets are rejected before creating outputs. The runtime configuration file
+is not read implicitly and is never updated. Zero fractions remain zero.
 
-- `out/federal_brief_run_ledger.jsonl`
-- `out/federal_brief_daemon_heartbeat.json`
+The output directory contains:
 
-## Build Nobel-tier dashboard and deck pack
+- `scenario_report.json`: the declared inputs, base modeled records, sweep rows, evaluated maximum and limits;
+- `scenario_matrix.csv`: numeric formula cases, not measured observations;
+- `scenario_readme.md`: interpretation and evidence limits;
+- `SCENARIO_MANIFEST.json`: sizes and SHA-256 hashes of those three files, supporting file custody only.
 
-```powershell
-c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe c:/LumaTrader/INSTITUTIONAL_STACK_V2/code/execution/run_nobel_tier_assets.py
-```
+The grid has at most 101 values per axis and evaluates at most 5,000 cases.
+A truncated sweep is labeled, and its maximum is only the maximum among the
+evaluated cases. It is not an operating recommendation. Requested auto-apply
+is recorded but always remains disabled. Output directories cannot be reused,
+so old scenario runs and historical evidence are preserved.
 
-Generated outputs:
+## Compatibility and delivery boundary
 
-- `dashboard/nobel_tier_command_center.html`
-- `out/INSTITUTIONAL_REVIEW_BUNDLE/nobel_tier_slides.json`
-- `out/INSTITUTIONAL_REVIEW_BUNDLE/nobel_tier_powerpoint_slides.md`
-- `out/INSTITUTIONAL_REVIEW_BUNDLE/nobel_tier_executive_summary.json`
+Legacy invocations without `--output-dir` now exit 2 with a usage message.
+The wrapper keeps its existing path. Direct `run_pipeline()` callers must pass
+an output directory. `run_optimization_simulations()` returns a report without
+writing output. `freeze_delta()` is retained as a compatibility name for a
+modeled record; it does not freeze, append or authenticate evidence.
 
-## Runtime configuration
-
-Optional runtime config:
-
-- `config/cross_sector_intel_runtime.json`
-
-Supported keys:
-
-- `lumen_detection_efficiency` (default `0.72`)
-- `mitigation_multiplier` (default `0.86`)
-- `trust_tier` (default `gov_audit_ready`)
-- `program_alignment` (default `DARPA/DOE/DOD/NSF/NASA`)
+The calculator no longer appends to the shared infrastructure ledgers, writes
+`investor_and_grant_evidence.json`, produces operational failure timestamps,
+updates runtime settings, or feeds federal/investor summaries automatically.
+Historical files and the original running checkout were not changed. Other
+legacy consumers and generated summaries require their own review; changing
+this source does not retrospectively correct those reports or activate a new
+runtime. Use the buyer-owned evaluation and economic-conversion gates for any
+actual measurement or commercial claim.

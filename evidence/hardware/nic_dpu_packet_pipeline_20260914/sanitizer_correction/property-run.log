@@ -1,0 +1,1 @@
+PROPERTY cases=500000 seed=20260914 ok=228933 non_ipv4=128504 truncated=135592 malformed=6971 failed=0

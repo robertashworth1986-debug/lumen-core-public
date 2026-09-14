@@ -1,0 +1,27 @@
+[
+  {
+    "mode": "combined",
+    "flags": [
+      "-fsanitize=address,undefined"
+    ],
+    "compile_exit": 0,
+    "run_exit": 0,
+    "asan_diagnostic": false,
+    "diagnostic_preview": ""
+  },
+  {
+    "mode": "separate",
+    "flags": [
+      "-fsanitize=address",
+      "-fsanitize=undefined"
+    ],
+    "compile_exit": 1
+  },
+  {
+    "mode": "address",
+    "flags": [
+      "-fsanitize=address"
+    ],
+    "compile_exit": 1
+  }
+]

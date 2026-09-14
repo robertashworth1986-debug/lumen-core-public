@@ -1,47 +1,183 @@
 [
   {
     "item": "User onboarding flow",
-    "status": "incomplete",
-    "notes": "UI, registration, and account creation"
+    "notes": "UI, registration, and account creation",
+    "status": "no_usable_artifact_observed",
+    "schema": "lumencore.implementation_inventory.v2",
+    "evidence_scope": "file_metadata_only",
+    "checked_utc": "2026-09-14T05:01:50.715118+00:00",
+    "completion_verified": false,
+    "compliance_verified": false,
+    "boundary": "File inventory only. Functionality, legal sufficiency, compliance, credential validity and account access are not verified.",
+    "artifacts": [
+      {
+        "path": "dashboard/user_onboarding.html",
+        "state": "not_found"
+      },
+      {
+        "path": "dashboard/user_onboarding.json",
+        "state": "not_found"
+      }
+    ]
   },
   {
     "item": "KYC/AML integration",
-    "status": "incomplete",
-    "notes": "ID verification, compliance checks"
+    "notes": "ID verification, compliance checks",
+    "status": "no_usable_artifact_observed",
+    "schema": "lumencore.implementation_inventory.v2",
+    "evidence_scope": "file_metadata_only",
+    "checked_utc": "2026-09-14T05:01:50.715118+00:00",
+    "completion_verified": false,
+    "compliance_verified": false,
+    "boundary": "File inventory only. Functionality, legal sufficiency, compliance, credential validity and account access are not verified.",
+    "artifacts": [
+      {
+        "path": "dashboard/kyc_status.json",
+        "state": "not_found"
+      },
+      {
+        "path": "dashboard/kyc_module.py",
+        "state": "not_found"
+      }
+    ]
   },
   {
     "item": "Funding/deposit system",
-    "status": "incomplete",
-    "notes": "Bank, crypto, and fiat onramp"
+    "notes": "Bank, crypto, and fiat onramp",
+    "status": "no_usable_artifact_observed",
+    "schema": "lumencore.implementation_inventory.v2",
+    "evidence_scope": "file_metadata_only",
+    "checked_utc": "2026-09-14T05:01:50.715118+00:00",
+    "completion_verified": false,
+    "compliance_verified": false,
+    "boundary": "File inventory only. Functionality, legal sufficiency, compliance, credential validity and account access are not verified.",
+    "artifacts": [
+      {
+        "path": "dashboard/funding_status.json",
+        "state": "not_found"
+      },
+      {
+        "path": "dashboard/funding_module.py",
+        "state": "not_found"
+      }
+    ]
   },
   {
     "item": "Withdrawal/settlement system",
-    "status": "incomplete",
-    "notes": "User-initiated withdrawals, compliance review"
+    "notes": "User-initiated withdrawals, compliance review",
+    "status": "no_usable_artifact_observed",
+    "schema": "lumencore.implementation_inventory.v2",
+    "evidence_scope": "file_metadata_only",
+    "checked_utc": "2026-09-14T05:01:50.715118+00:00",
+    "completion_verified": false,
+    "compliance_verified": false,
+    "boundary": "File inventory only. Functionality, legal sufficiency, compliance, credential validity and account access are not verified.",
+    "artifacts": [
+      {
+        "path": "dashboard/withdrawal_status.json",
+        "state": "not_found"
+      },
+      {
+        "path": "dashboard/withdrawal_module.py",
+        "state": "not_found"
+      }
+    ]
   },
   {
     "item": "Live dashboard for users",
-    "status": "incomplete",
-    "notes": "Personalized analytics, notifications"
+    "notes": "Personalized analytics, notifications",
+    "status": "no_usable_artifact_observed",
+    "schema": "lumencore.implementation_inventory.v2",
+    "evidence_scope": "file_metadata_only",
+    "checked_utc": "2026-09-14T05:01:50.715118+00:00",
+    "completion_verified": false,
+    "compliance_verified": false,
+    "boundary": "File inventory only. Functionality, legal sufficiency, compliance, credential validity and account access are not verified.",
+    "artifacts": [
+      {
+        "path": "dashboard/live_user_dashboard.html",
+        "state": "not_found"
+      }
+    ]
   },
   {
     "item": "Notifications/alerts",
-    "status": "incomplete",
-    "notes": "Email, SMS, in-app"
+    "notes": "Email, SMS, in-app",
+    "status": "no_usable_artifact_observed",
+    "schema": "lumencore.implementation_inventory.v2",
+    "evidence_scope": "file_metadata_only",
+    "checked_utc": "2026-09-14T05:01:50.715118+00:00",
+    "completion_verified": false,
+    "compliance_verified": false,
+    "boundary": "File inventory only. Functionality, legal sufficiency, compliance, credential validity and account access are not verified.",
+    "artifacts": [
+      {
+        "path": "dashboard/notifications.json",
+        "state": "not_found"
+      },
+      {
+        "path": "dashboard/notifications_module.py",
+        "state": "not_found"
+      }
+    ]
   },
   {
     "item": "Audit trail & reporting",
-    "status": "incomplete",
-    "notes": "Exportable logs, compliance evidence"
+    "notes": "Exportable logs, compliance evidence",
+    "status": "no_usable_artifact_observed",
+    "schema": "lumencore.implementation_inventory.v2",
+    "evidence_scope": "file_metadata_only",
+    "checked_utc": "2026-09-14T05:01:50.715118+00:00",
+    "completion_verified": false,
+    "compliance_verified": false,
+    "boundary": "File inventory only. Functionality, legal sufficiency, compliance, credential validity and account access are not verified.",
+    "artifacts": [
+      {
+        "path": "dashboard/audit_log.json",
+        "state": "not_found"
+      },
+      {
+        "path": "dashboard/audit_module.py",
+        "state": "not_found"
+      }
+    ]
   },
   {
     "item": "API key management UI",
-    "status": "complete",
-    "notes": "User and admin key management"
+    "notes": "User and admin key management",
+    "status": "no_usable_artifact_observed",
+    "schema": "lumencore.implementation_inventory.v2",
+    "evidence_scope": "file_metadata_only",
+    "checked_utc": "2026-09-14T05:01:50.715118+00:00",
+    "completion_verified": false,
+    "compliance_verified": false,
+    "boundary": "File inventory only. Functionality, legal sufficiency, compliance, credential validity and account access are not verified.",
+    "artifacts": [
+      {
+        "path": "dashboard/api_key_status.txt",
+        "state": "not_found"
+      }
+    ]
   },
   {
     "item": "Legal/terms of service",
-    "status": "incomplete",
-    "notes": "User agreements, disclosures"
+    "notes": "User agreements, disclosures",
+    "status": "no_usable_artifact_observed",
+    "schema": "lumencore.implementation_inventory.v2",
+    "evidence_scope": "file_metadata_only",
+    "checked_utc": "2026-09-14T05:01:50.715118+00:00",
+    "completion_verified": false,
+    "compliance_verified": false,
+    "boundary": "File inventory only. Functionality, legal sufficiency, compliance, credential validity and account access are not verified.",
+    "artifacts": [
+      {
+        "path": "dashboard/legal.html",
+        "state": "not_found"
+      },
+      {
+        "path": "dashboard/terms_of_service.html",
+        "state": "not_found"
+      }
+    ]
   }
 ]

@@ -21,6 +21,8 @@ from typing import Final
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA: Final = "lumencore.public_site_release_manifest.v1"
 FULL_COMMIT = re.compile(r"[0-9a-fA-F]{40}")
+MAX_RELEASE_BYTES = 128 * 1024 * 1024
+MAX_RELEASE_FILES = 1000
 RELEASE_PATHS: Final = (
     "dashboard/operator_home.html",
     "dashboard/opportunity_sprint.html",
@@ -228,16 +230,18 @@ def archive_name(repo_path: str) -> str:
     return relative.as_posix()
 
 
-def _git(repo_root: Path, *args: str) -> bytes:
+def _git(repo_root: Path, *args: str, input_data: bytes | None = None) -> bytes:
     try:
         completed = subprocess.run(
-            ["git", "-C", str(repo_root), *args],
+            ["git", "--no-replace-objects", "-C", str(repo_root), *args],
             check=True,
+            input=input_data,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            timeout=30,
         )
-    except (OSError, subprocess.CalledProcessError) as exc:
-        detail = getattr(exc, "stderr", b"").decode("utf-8", errors="replace").strip()
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        detail = (getattr(exc, "stderr", b"") or b"").decode("utf-8", errors="replace").strip()
         suffix = f": {detail}" if detail else ""
         raise ReleasePackageError(f"git {' '.join(args)} failed{suffix}") from exc
     return completed.stdout
@@ -279,6 +283,94 @@ def _read_commit_blob(
             f"release path must be a non-executable regular Git blob: {repo_path}"
         )
     return blob_oid, _git(repo_root, "cat-file", "blob", blob_oid)
+
+
+def _parse_batch_objects(data: bytes, expected: list[tuple[str, int]]) -> dict[str, bytes]:
+    """Parse size-delimited Git output; binary contents are never line-parsed."""
+    offset = 0
+    objects = {}
+    for oid, size in expected:
+        end = data.find(b"\n", offset, offset + 128)
+        if end < 0:
+            raise ReleasePackageError("missing or oversized Git batch header")
+        header = data[offset:end]
+        if header != f"{oid} blob {size}".encode("ascii"):
+            raise ReleasePackageError("Git batch object identity, type, or size mismatch")
+        start = end + 1
+        stop = start + size
+        if stop >= len(data) or data[stop:stop + 1] != b"\n":
+            raise ReleasePackageError("truncated Git batch object or missing terminator")
+        body = data[start:stop]
+        # Git's SHA-1 is an object identifier here, not a security signature.
+        actual_oid = hashlib.sha1(f"blob {size}\0".encode("ascii") + body, usedforsecurity=False).hexdigest()
+        if actual_oid != oid:
+            raise ReleasePackageError("Git batch content does not match its object identity")
+        objects[oid] = body
+        offset = stop + 1
+    if offset != len(data):
+        raise ReleasePackageError("unexpected trailing Git batch output")
+    return objects
+
+
+def _read_commit_blobs(
+    repo_root: Path, source_commit: str, repo_paths: tuple[str, ...]
+) -> dict[str, tuple[str, bytes]]:
+    """Read one bounded dashboard snapshot without caching across calls.
+
+    Tree metadata is NUL-delimited. Only explicitly requested, regular,
+    non-executable dashboard blobs are read, using one cat-file process.
+    """
+    source_commit = _resolve_commit(repo_root, source_commit)
+    if not 1 <= len(repo_paths) <= MAX_RELEASE_FILES or len(set(repo_paths)) != len(repo_paths):
+        raise ReleasePackageError("release membership must contain 1..1000 unique paths")
+    for path in repo_paths:
+        if not isinstance(path, str) or "\\" in path or PurePosixPath(path).as_posix() != path:
+            raise ReleasePackageError("noncanonical release path")
+        archive_name(path)
+    requested = {path.encode("utf-8"): path for path in repo_paths}
+    # One recursive metadata listing avoids Windows command-line length limits.
+    # Nonselected entries never enter the body reader or release manifest.
+    tree = _git(repo_root, "ls-tree", "--full-tree", "-r", "-l", "-z", source_commit, "--", "dashboard")
+    if tree and not tree.endswith(b"\0"):
+        raise ReleasePackageError("unterminated Git tree output")
+    selected = {}
+    for entry in tree.split(b"\0"):
+        if not entry:
+            continue
+        if b"\t" not in entry:
+            raise ReleasePackageError("invalid Git tree framing")
+        metadata, encoded_path = entry.split(b"\t", 1)
+        if encoded_path not in requested:
+            continue
+        path = requested[encoded_path]
+        if path in selected:
+            raise ReleasePackageError(f"duplicate Git tree entry: {path}")
+        try:
+            mode, kind, oid, size_text = metadata.decode("ascii").split()
+            size = int(size_text)
+        except (UnicodeDecodeError, ValueError) as exc:
+            raise ReleasePackageError(f"invalid Git tree metadata: {path}") from exc
+        if mode != "100644" or kind != "blob":
+            raise ReleasePackageError(f"release path must be a non-executable regular Git blob: {path}")
+        if FULL_COMMIT.fullmatch(oid) is None or not 0 <= size <= MAX_RELEASE_BYTES:
+            raise ReleasePackageError(f"invalid or oversized Git blob: {path}")
+        selected[path] = (oid.lower(), size)
+    if set(selected) != set(repo_paths):
+        raise ReleasePackageError("release path is missing or ambiguous in the pinned tree")
+    if sum(size for _, size in selected.values()) > MAX_RELEASE_BYTES:
+        raise ReleasePackageError("release exceeds the 128 MiB snapshot limit")
+    unique_objects = {}
+    for path in repo_paths:
+        oid, size = selected[path]
+        if oid in unique_objects and unique_objects[oid] != size:
+            raise ReleasePackageError("one Git object has inconsistent declared sizes")
+        unique_objects[oid] = size
+    request = ("\n".join(unique_objects) + "\n").encode("ascii")
+    data = _git(repo_root, "cat-file", "--batch", input_data=request)
+    if len(data) > MAX_RELEASE_BYTES + MAX_RELEASE_FILES * 128:
+        raise ReleasePackageError("Git batch output exceeds the snapshot limit")
+    objects = _parse_batch_objects(data, list(unique_objects.items()))
+    return {path: (selected[path][0], objects[selected[path][0]]) for path in repo_paths}
 
 
 def _sha256(body: bytes) -> str:
@@ -367,12 +459,16 @@ def build_release_package(
     archive_files: list[tuple[str, bytes]] = []
     manifest_files: list[dict[str, object]] = []
     seen_names: set[str] = set()
-    for repo_path in RELEASE_PATHS if release_paths is None else release_paths:
+    selected_paths = RELEASE_PATHS if release_paths is None else release_paths
+    for repo_path in selected_paths:
         name = archive_name(repo_path)
         if name in seen_names:
             raise ReleasePackageError(f"duplicate archive path: {name}")
         seen_names.add(name)
-        blob_oid, body = _read_commit_blob(repo_root, resolved_commit, repo_path)
+    snapshot = _read_commit_blobs(repo_root, resolved_commit, selected_paths)
+    for repo_path in selected_paths:
+        name = archive_name(repo_path)
+        blob_oid, body = snapshot[repo_path]
         archive_files.append((name, body))
         manifest_files.append(
             {

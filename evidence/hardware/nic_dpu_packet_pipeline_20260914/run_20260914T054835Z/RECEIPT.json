@@ -1,0 +1,210 @@
+{
+  "schema": "lumencore.nic_dpu_packet_pipeline_evidence.v2",
+  "version": "2.0.0",
+  "run_id": "run_20260914T054835Z",
+  "generated_utc": "2026-09-14T05:48:35.031277+00:00",
+  "protocol": {
+    "schema": "lumencore.nic_dpu_packet_pipeline_protocol.v1",
+    "version": "1.0.0",
+    "sha256": "8cabf617a22ddf829f76c96f428b858c66c08badca94bd545f32261f3571f090"
+  },
+  "toolchain": {
+    "provider": "ziglang Python wheel",
+    "zig_version": "0.15.2",
+    "compiler_version": "clang version 20.1.2 (https://github.com/ziglang/zig-bootstrap 7ef74e656cf8ddbd6bf891a8475892aa1afa6891)",
+    "compile_flags": [
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      "-O2"
+    ]
+  },
+  "sources": [
+    {
+      "path": "code/hardware/nic_dpu_packet_pipeline.h",
+      "frozen_path": "sources/code/hardware/nic_dpu_packet_pipeline.h",
+      "bytes": 2122,
+      "sha256": "38ce84440ef1d0206871e1e3bf38ded77de9e6c110f53f23834275045808e5e2"
+    },
+    {
+      "path": "code/hardware/nic_dpu_packet_pipeline.c",
+      "frozen_path": "sources/code/hardware/nic_dpu_packet_pipeline.c",
+      "bytes": 6489,
+      "sha256": "a80603b43c3cadb7be75c8abc94f93c4704d8ef5a192b158fad376d304025266"
+    },
+    {
+      "path": "code/hardware/nic_dpu_packet_pipeline_test.c",
+      "frozen_path": "sources/code/hardware/nic_dpu_packet_pipeline_test.c",
+      "bytes": 7418,
+      "sha256": "9a8d2abf791a439bf36aca2481cefa0dc53caa9dc8b6100146d38a8381a990fb"
+    },
+    {
+      "path": "config/nic_dpu_packet_pipeline_protocol_v1.json",
+      "frozen_path": "sources/config/nic_dpu_packet_pipeline_protocol_v1.json",
+      "bytes": 2127,
+      "sha256": "8cabf617a22ddf829f76c96f428b858c66c08badca94bd545f32261f3571f090"
+    }
+  ],
+  "frozen_package": [
+    {
+      "path": "README.md",
+      "frozen_path": "sources/README.md",
+      "bytes": 16486,
+      "sha256": "33e0dd408b47b1a57e39481704acfd4b9bb11e3118f5ec8739d4cb4c1287b241"
+    },
+    {
+      "path": "code/ops/BUILD_NIC_DPU_PACKET_PIPELINE_EVIDENCE.py",
+      "frozen_path": "sources/code/ops/BUILD_NIC_DPU_PACKET_PIPELINE_EVIDENCE.py",
+      "bytes": 27608,
+      "sha256": "c917b43db71ee9c9cf418eb60139f14c4e1fe2beafd3259c238c4bed10a896fa"
+    },
+    {
+      "path": "tests/test_nic_dpu_packet_pipeline.py",
+      "frozen_path": "sources/tests/test_nic_dpu_packet_pipeline.py",
+      "bytes": 10517,
+      "sha256": "6fa272cc508717326ac93a6e10ffa844827970152d1ec39c9a8d35327a1e6531"
+    },
+    {
+      "path": "docs/NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md",
+      "frozen_path": "sources/docs/NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md",
+      "bytes": 7491,
+      "sha256": "8f700a819542d34875420b91f5c9ead73ccc03f9de898cdb10193c245dd88b3a"
+    },
+    {
+      "path": "code/hardware/nic_dpu_packet_pipeline.h",
+      "frozen_path": "sources/code/hardware/nic_dpu_packet_pipeline.h",
+      "bytes": 2122,
+      "sha256": "38ce84440ef1d0206871e1e3bf38ded77de9e6c110f53f23834275045808e5e2"
+    },
+    {
+      "path": "code/hardware/nic_dpu_packet_pipeline.c",
+      "frozen_path": "sources/code/hardware/nic_dpu_packet_pipeline.c",
+      "bytes": 6489,
+      "sha256": "a80603b43c3cadb7be75c8abc94f93c4704d8ef5a192b158fad376d304025266"
+    },
+    {
+      "path": "code/hardware/nic_dpu_packet_pipeline_test.c",
+      "frozen_path": "sources/code/hardware/nic_dpu_packet_pipeline_test.c",
+      "bytes": 7418,
+      "sha256": "9a8d2abf791a439bf36aca2481cefa0dc53caa9dc8b6100146d38a8381a990fb"
+    },
+    {
+      "path": "config/nic_dpu_packet_pipeline_protocol_v1.json",
+      "frozen_path": "sources/config/nic_dpu_packet_pipeline_protocol_v1.json",
+      "bytes": 2127,
+      "sha256": "8cabf617a22ddf829f76c96f428b858c66c08badca94bd545f32261f3571f090"
+    },
+    {
+      "path": "code/hardware/nic_dpu_packet_pipeline_property_test.c",
+      "frozen_path": "sources/code/hardware/nic_dpu_packet_pipeline_property_test.c",
+      "bytes": 6622,
+      "sha256": "b276533a4024ee006c3a0bb4f6fa6fc0af9f0b480fcf8a4456f99218918e21ec"
+    },
+    {
+      "path": "config/nic_dpu_packet_pipeline_property_protocol_v1.json",
+      "frozen_path": "sources/config/nic_dpu_packet_pipeline_property_protocol_v1.json",
+      "bytes": 2282,
+      "sha256": "e3360ed3d0673e085593ba73888ff9cdbdfeb1f1ff06fbeee9cc051217418df4"
+    }
+  ],
+  "source_identity_scope": "retained worktree input bytes compiled from the run snapshot; no clean Git or authorship claim",
+  "verification": {
+    "compile_exit_code": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "tests": {
+      "passed": 7,
+      "failed": 0
+    },
+    "test_stdout": "TESTS passed=7 failed=0\nBENCH packets=250000 elapsed_seconds=0.003000000 packets_per_second=83333333.333 queued=250000\n",
+    "sanitizers": {
+      "address_sanitizer": true,
+      "undefined_behavior_sanitizer": true,
+      "toolchain": {
+        "compiler_path": "C:/LumaTrader/_toolchains/llvm-mingw-20260908-ucrt-x86_64/bin/x86_64-w64-mingw32-clang.exe",
+        "compiler_file_sha256": "93303edd5791e4b60682f819267a34c349e5f52d052d067e006e76d21cc82ea4",
+        "compiler_version": "clang version 23.1.1 (https://github.com/llvm/llvm-project.git 6dfe1677ab8dffbc6ec13d53a1e0215d75147689)\nTarget: x86_64-w64-windows-gnu\nThread model: posix\nInstalledDir: C:/LumaTrader/_toolchains/llvm-mingw-20260908-ucrt-x86_64/bin\nConfiguration file: C:/LumaTrader/_toolchains/llvm-mingw-20260908-ucrt-x86_64/bin/x86_64-w64-windows-gnu.cfg",
+        "flags": [
+          "-std=c11",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-pedantic",
+          "-O1",
+          "-g",
+          "-fsanitize=address",
+          "-fsanitize=undefined",
+          "-fno-sanitize-recover=all"
+        ],
+        "positive_controls": {
+          "address": {
+            "source_path": "sanitizer_controls/address_positive_control.c",
+            "source_sha256": "e8ef6b6151b791fd0e076e7219222b518db6fca67aa1c495c10f7419c5716ed4",
+            "executable_sha256": "1add780a729a71256cee2bcfe74c402f42f411b9054360e18f91cca2a24eec41",
+            "compile_exit_code": 0,
+            "test_exit_code": 1,
+            "expected_diagnostic": "AddressSanitizer: heap-buffer-overflow",
+            "detected": true
+          },
+          "undefined": {
+            "source_path": "sanitizer_controls/undefined_positive_control.c",
+            "source_sha256": "c3eafc0e7e560dd4f7f2cb1aa4d6cc74fa96c75b78580f555d7643700807a193",
+            "executable_sha256": "b9ec9148aacb8166486321c275aaa1d8c950f264744bb99f18a3d7e7e207e46c",
+            "compile_exit_code": 0,
+            "test_exit_code": 1,
+            "expected_diagnostic": "runtime error: signed integer overflow",
+            "detected": true
+          }
+        },
+        "identity_scope": "selected compiler executable and reported version; not a complete toolchain dependency attestation"
+      },
+      "recover_on_error": false,
+      "diagnostic_scan_passed": true,
+      "compile_exit_code": 0,
+      "test_exit_code": 0,
+      "test_stdout": "TESTS passed=7 failed=0\n",
+      "test_stderr": ""
+    },
+    "benchmark": {
+      "packets": 250000,
+      "elapsed_seconds": 0.003,
+      "packets_per_second": 83333333.333,
+      "queued": 250000,
+      "interpretation": "informative host-user-space measurement only",
+      "promotion_gate": false
+    },
+    "generated_properties": {
+      "protocol_schema": "lumencore.nic_dpu_generated_property_protocol.v1",
+      "protocol_sha256": "e3360ed3d0673e085593ba73888ff9cdbdfeb1f1ff06fbeee9cc051217418df4",
+      "generator_sha256": "b276533a4024ee006c3a0bb4f6fa6fc0af9f0b480fcf8a4456f99218918e21ec",
+      "executable_sha256": "76491f5671446311c1716ee9740212369fdbdabe1bde28793873370603c3e1fb",
+      "cases": 500000,
+      "seed": 20260914,
+      "outcomes": {
+        "ok": 228933,
+        "non_ipv4": 128504,
+        "truncated": 135592,
+        "malformed": 6971
+      },
+      "failed": 0,
+      "exit_code": 0,
+      "stdout": "PROPERTY cases=500000 seed=20260914 ok=228933 non_ipv4=128504 truncated=135592 malformed=6971 failed=0\n",
+      "stderr": "",
+      "coverage_guided_fuzzing": false,
+      "interpretation": "generated input iterations under one frozen deterministic method; not independent tests, exhaustive coverage or hardware evidence"
+    }
+  },
+  "claim_gates": {
+    "bounded_c11_packet_pipeline_implemented_and_tested": true,
+    "host_user_space_reference_only": true,
+    "deep_c_expertise": false,
+    "nic_expertise": false,
+    "dpu_expertise": false,
+    "dpdk_or_xdp_validation": false,
+    "rdma_or_roce_validation": false,
+    "nic_or_dpu_hardware_offload": false,
+    "production_readiness": false
+  }
+}

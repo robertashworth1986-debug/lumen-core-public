@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-19T14:19:16.519238Z",
+  "generated_at_utc": "2026-09-14T08:04:22.683722Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -772,9 +772,9 @@
             "path": "code/execution/cross_sector_intel_pipeline.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "196ebc847e28f2801e94962feadee64f975a13db",
-            "bytes": 18801,
-            "sha256": "cfaf77f0e0b926f13770b2c2afd4528baa721cd6aed0c3c8a80117124dbcd9b7"
+            "git_blob_sha": "dedec3123960d69b3efadcd6f97c919d828031f3",
+            "bytes": 14494,
+            "sha256": "889f30818b5e8b1363166e593370bd365ea225eb729c0f117508e4d79ba67140"
           }
         ],
         "entrypoint": [
@@ -782,9 +782,9 @@
             "path": "code/execution/cross_sector_intel_pipeline.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "196ebc847e28f2801e94962feadee64f975a13db",
-            "bytes": 18801,
-            "sha256": "cfaf77f0e0b926f13770b2c2afd4528baa721cd6aed0c3c8a80117124dbcd9b7"
+            "git_blob_sha": "dedec3123960d69b3efadcd6f97c919d828031f3",
+            "bytes": 14494,
+            "sha256": "889f30818b5e8b1363166e593370bd365ea225eb729c0f117508e4d79ba67140"
           }
         ],
         "test": [],
@@ -992,6 +992,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "983084f99486bc94023686241ecb48ea4a7d6a2880bd5aa6cd978c3d46c4d271"
+    "payload_sha256": "be5576912add7ae7626bad652473f567c39d8175c29c3fe8c0af0767adeb8929"
   }
 }

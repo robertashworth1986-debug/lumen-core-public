@@ -1,4 +1,25 @@
 *.sh text eol=lf
+/.github/workflows/institutional-readiness.yml text eol=lf
+/requirements-windows-ownership.txt text eol=lf
+/requirements-windows-ownership-py311.lock text eol=lf
+/evidence/public-site-deployments/observations/20260914T065608Z/*.json text eol=lf
+# Frozen supplemental NIC property generator and method.
+/code/hardware/nic_dpu_packet_pipeline_property_test.c text eol=lf
+/config/nic_dpu_packet_pipeline_property_protocol_v1.json text eol=lf
+# Preserve captured CRLF bytes while retaining the ordinary whitespace checks.
+/evidence/hardware/nic_dpu_packet_pipeline_20260914/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# These two raw sanitizer diagnostics contain compiler-generated trailing spaces.
+# Their frozen hashes, not source-formatting rules, govern the captured bytes.
+/evidence/hardware/nic_dpu_packet_pipeline_20260914/run_20260914T054835Z/sanitizer_controls/address_run.log -whitespace
+/evidence/hardware/nic_dpu_packet_pipeline_20260914/run_20260914T054835Z/sanitizer_controls/undefined_run.log -whitespace
+# Canonical bytes for the offline ensemble evaluator and its synthetic example.
+/dashboard/run_ensemble_meta_strategy.py text eol=lf
+/dashboard/visualize_ensemble_results.py text eol=lf
+/code/hybrid_harmonic_strategies.py text eol=lf
+/code/hybrid_harmonic_algorithms.py text eol=lf
+/code/novel_harmonic_layers.py text eol=lf
+/tests/test_ensemble_walkforward_causality.py text eol=lf
+/examples/ensemble_research/** text eol=lf
 examples/proof_capsule/** text eol=lf
 
 # Canonical bytes for the bounded CODECHECK reviewer capsule.

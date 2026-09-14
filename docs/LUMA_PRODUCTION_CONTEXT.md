@@ -133,6 +133,171 @@ Healthy public output must be based on fresh artifact heartbeats. A stale
 supervisor heartbeat is nonauthoritative and must not make the domain appear
 healthy.
 
+### Legacy dashboard observations corrected September 14, 2026
+
+`dashboard/update_compliance_progress.py` now reports file metadata only.
+Its existing list format is retained, but statuses are
+`artifact_present_unverified` or `no_usable_artifact_observed`; every item
+explicitly keeps functional completion and compliance unverified. Empty files,
+directories, symlinks, paths escaping the selected root, and unreadable metadata
+cannot establish completion. The inventory does not read artifact contents.
+Status publication uses an atomic replacement so a failed write preserves the
+previous record.
+
+`dashboard/orchestrator_watchdog.py` compares timezone-aware UTC timestamps,
+observes only a bounded 64 KiB / 100-line error tail, and does not classify a
+quiet or absent error log as a stalled process. Stale activity, future mtimes
+beyond a two-second observation tolerance, and indicators in a recently
+modified error tail call for inspection. Tail indicators are not an event
+rate. Every report keeps process health and restart authority unverified;
+logs alone do not identify a process or prove successful work. An optional
+`--json-output` exports the same bounded observation. The alert reader rejects
+stale, future-dated, malformed, and legacy watchdog records and never treats an
+old inventory `complete` label as compliance acceptance.
+
+The legacy `dashboard/self_heal_orchestrator.py` full-stack launch loop is
+retired. Its former importable restart function fails explicitly, and its CLI
+exits without starting a process or writing a successful-recovery record.
+The existing runtime manager remains the operating path:
+
+```powershell
+code/ops/MANAGE_LOCAL_STACK.ps1 -Action status
+```
+
+That manager's status action is now read-only and does not create runtime
+directories, rewrite its registry, or resolve a Python launch environment. It is
+not a scientific validation or an authorization to change execution controls.
+Any actual recovery must still establish current process identity, intended
+stack group, runtime controls, and post-action health separately.
+
+`dashboard/automate_luma_stack.ps1 -Python <intended-python-path>` now runs
+only the three existing inventory/log collectors from its own directory.
+Exit 0 means those observations were written; exit 2 means the watchdog
+reported log issues; exit 1 means a collector failed. These outcomes do not
+certify runtime health or compliance. The driver does not invoke example
+proofs, alerts, recovery, or trades. PowerShell regression tests use harmless
+stub collectors to verify success, diagnostic issues, failure, and path
+independence.
+
+`dashboard/generate_validation_proof.py` is now a compatibility entry point
+for `run_ensemble_meta_strategy.py`. It requires the same explicit input and
+cost arguments, delegates to that single corrected evaluator, and creates no
+`proof_live` artifacts. The old one-row/empty-result always-long example is
+not validation evidence. See `docs/HARMONIC_VALIDATION_PROTOCOL.md` for the
+versioned diagnostic and synthetic replay instructions. The historical
+`code/validation_proof_pack.py` helper and retained historical files are not
+retroactively reclassified.
+
+### Supervisor process ownership corrected September 14, 2026
+
+The existing `code/luma_supervisor.py` now observes Windows process objects with
+zero-timeout waits and creation-time identity. It requests only synchronization
+and limited-query rights. Windows PID observation never sends a signal. Unknown
+or inaccessible process state is preserved as unknown and cannot trigger a
+replacement launch. A changed creation identity prevents a reused PID from
+inheriting the earlier observation.
+
+The compatibility adoption reader uses CIM and Windows command-line parsing,
+checks the expected arguments, interpreter and stack path, and rejects ambiguous
+matches. The current interpreter's Windows venv redirector is recognized only
+with its observed parent/child relationship, known base interpreter and matching
+remaining arguments. Unsupported interpreter relationships remain review holds.
+Unreadable inventory cannot establish absence and authorize a new launch; a
+separately identified exact match can still be observed. Adopted processes are
+external observations and are never terminated by `Service.stop`.
+
+A held operating-system file lock protects the supervisor's singleton state.
+The bounded legacy PID record remains readable and is preserved if its PID is
+present or unknown. A malformed record stops recovery for review. The lock file
+is retained after release so concurrent processes cannot lock different inodes.
+Import and `--help` no longer create runtime directories or acquire the lock.
+
+The supervisor no longer clears shared ports or calls `taskkill` during startup.
+Startup, polling and publication failures clean up owned direct child handles;
+one cleanup failure does not skip the remaining handles. Failed termination
+remains explicit and preserves the process reference. This does not establish
+ownership or verified cleanup of a complete descendant process tree, including
+children behind a Windows redirector. No automatic foreign-process takeover or
+full-tree recovery is claimed.
+
+`supervisor_health.json` now declares `process_presence_only`, `all_running`,
+per-service observation and ownership, and `application_health_verified=false`.
+The legacy `all_healthy` field is false because process presence is insufficient
+to certify application work. Consumers must not interpret that false field as
+proof the platform is down; endpoint behavior, source freshness, artifact
+progress and execution controls require their own evidence.
+
+Isolated regression checks include real disposable Windows child processes,
+concurrent lock acquisition, base and venv command identity, PID reuse,
+unreadable inventory, access denial, partial startup and shutdown failures.
+No running canonical supervisor was restarted and this source repair is not a
+runtime-activation receipt. The earlier signal-zero experiment did not reproduce
+termination of its disposable child; the repair follows the documented API
+semantics and the now-passing passive-observation checks, not a claimed crash.
+
+API references: [Python process signals](https://docs.python.org/3.11/library/os.html#os.kill),
+[Windows process handles](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess),
+[zero-timeout waits](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject),
+[creation times](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocesstimes),
+and [Windows command parsing](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-commandlinetoargvw).
+
+### PowerShell runtime manager ownership corrected September 14, 2026
+
+`code/ops/STACK_RUNTIME_MANAGER.ps1` keeps the existing service groups and
+`MANAGE_LOCAL_STACK.ps1` entry point. A small adjacent C# helper holds Windows
+process handles and compares creation FILETIME and executable path before any
+termination. All recorded members are checked before the first stop; the same
+held handles are used to stop and confirm exit. `-Force` does not authorize
+substring matching, adoption of a legacy PID, or killing the listener on port
+8787. Exact or ambiguous unregistered workers hold startup for review.
+
+New launches record schema `lumencore.managed_runtime_process.v2`. The initial
+process identity comes from the handle returned by `Process.Start`, not a later
+PID lookup. A Windows venv redirector may add one directly related Python child
+after exact command, executable, parent, and creation-time checks. Its initial
+receipt remains `capture_complete=false` until capture succeeds. An incomplete
+receipt cannot authorize reuse, force-start, or a purported complete stop.
+This covers the recorded launch and optional redirector pair, not arbitrary
+descendants or complete process-tree cleanup. No application-health or
+successful-business-work claim follows from process presence.
+
+The registry is bounded to 8 MiB, rejects malformed/null records and duplicate
+service names, and is replaced through a same-directory temporary file. An
+exclusive operating-system file lock serializes mutations. Status observes only;
+unknown and inaccessible identities remain explicit. Legacy records are not
+silently upgraded to owned records. A failed stop retains its record while the
+manager attempts the remaining requested services and returns failure.
+
+The Windows PowerShell 5.1 launch path uses `ProcessStartInfo`, per-child
+environment variables, and explicit Windows argument quoting. Native temporary
+fixtures verify spaces, quotes, an empty argument, trailing backslashes, base
+Python, and a venv child. Other checks cover registry failure, concurrent
+ownership, malformed registry arrays, legacy stop rejection, force-port holds,
+creation-identity mismatch, and incomplete capture. Test workers are disposable;
+the canonical runtime was not started, stopped, or reconfigured.
+
+The institutional-readiness workflow includes a separate Windows Server 2025
+job for both process-ownership suites. It uses Python 3.11.9 in a newly created
+venv, a six-package hash-locked pytest environment, and Windows PowerShell 5.1.
+The job requires a nonempty JUnit result with zero skips, failures, and errors,
+then checks that the fixtures did not change tracked source. The Linux full
+suite remains separate: its Windows skips are not evidence of native behavior.
+Successful hosted execution remains first-party CI on disposable processes,
+not activation or acceptance of the founder's runtime.
+
+Process creation and durable registry publication are not one transaction.
+The manager checks a registry write before launching, but a later disk failure
+can still leave an unregistered process. An observed matching process holds the
+next launch; no automatic rollback or recovery is claimed. The registry is a
+same-user operational record, not an authorization boundary against an attacker
+who can edit the manager or its records. CIM command visibility can also hold
+startup in a partly unreadable estate. These limits require operator review,
+not an automatic success label.
+
+References: [Windows process identity and parent reuse](https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-process),
+[CIM timestamp precision](https://learn.microsoft.com/en-us/windows/win32/wmisdk/cim-datetime),
+and [termination through an owned handle](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-terminateprocess).
+
 ## Grant Factory
 
 The frozen benchmark remains 673 series. Measured artifact breadth is currently
@@ -159,6 +324,27 @@ Official sources:
 - NSF solicitation: https://seedfund.nsf.gov/solicitation-proposal/
 - DOE SBIR: https://science.osti.gov/sbir/Funding-Opportunities/FY-2026
 - NIST SBIR: https://www.nist.gov/tpo/small-business-innovation-research-program-sbir
+
+## Local evidence discovery coverage
+
+`code/ops/CURATE_ICLOUD_TOP_ASSETS.py` ranks local discovery candidates by
+keywords. Its score is not technical validity, investment readiness, or
+commercial value. PDF inspection now binds one bounded source-byte snapshot,
+enforces the configured page prefix for text and image-object inspection,
+counts retained-text separators inside the character budget, and reports
+warnings and page errors. The CSV, JSON and Markdown outputs carry partial
+coverage explicitly. Successful text-layer inspection does not mean OCR,
+visual review, full document understanding, or access to every Apple Note.
+Non-PDF format coverage remains explicitly unverified.
+
+Preview extraction requires the same PDF hash recorded during inspection,
+stays within that page prefix, and records source and extracted-byte hashes.
+Failures consume the document-attempt budget and remain visible in the
+summary. Diagnostic messages are bounded while their total count is retained.
+These are output/input and selected-page bounds, not a parser CPU/memory
+sandbox; pypdf security updates remain a separate dependency gate. The
+coverage tests use generated PDFs and small fake pages, with no corpus script
+execution or original notebook modification.
 
 ## Identity, Patent, And Compliance
 

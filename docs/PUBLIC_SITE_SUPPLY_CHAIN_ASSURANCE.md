@@ -92,6 +92,15 @@ Verify the signed CycloneDX predicate by adding:
 The repository, workflow path, commit, and expected predicate type are policy
 inputs, not facts to infer from the artifact itself.
 
+The September 14 local reader revision batches immutable blob reads for both
+packaging and supply-chain verification. It disables Git replacement objects
+and checks size-delimited object bodies against their Git identities before
+the existing manifest and archive checks. The current allowlist and historical
+literal allowlists retain their own membership. The bounded local timing
+observation is recorded in
+[the exact-snapshot protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md#local-batching-observation---2026-09-14);
+it establishes neither a signed build nor a live deployment of this revision.
+
 For the historical retained set, also run the repository-local attestation
 receipt verifier:
 

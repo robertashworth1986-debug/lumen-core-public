@@ -107,3 +107,99 @@ Validation output may rank paper or shadow candidates. It must not authorize
 live orders. Promotion to live execution requires a separate reviewed runtime
 change, stable paper evidence, reconciliation, risk limits, and an explicit
 operator decision.
+
+## Existing offline ensemble evaluator: corrected research contract
+
+The existing `dashboard/run_ensemble_meta_strategy.py` now implements the
+versioned `lumencore.ensemble_past_only_research.v2` diagnostic. This repair
+advances the existing external-validation or paid-pilot outcome by making one
+supporting research evaluator inspectable. It does not satisfy the V7 claim
+gate above or create a separate commercial product.
+
+The previous runner supplied future test rows to vector generators, dropped
+the first return at fold boundaries, padded malformed signals, and accepted a
+fallback numeric column or filled missing prices. Its historical results and
+the old chart's `Cumulative PnL` label must not be cited as validated
+out-of-sample performance. Historical files remain retained; the corrected
+method requires a new output directory.
+
+### Information set and score
+
+For target row `i`, the signal function receives only rows `[i-window, i)`.
+The last returned signal is clipped to `[-1, 1]` and weights the transition
+`close[i] / close[i-1] - 1`. Every transition from `window` through the final
+input row is scored exactly once. `step` groups the report; it does not reset
+positions or change the strategy's information set. A caller must select
+`window` on separate development data: the placeholder tuner now refuses to
+run. The evaluator does not certify how parameters or input datasets were
+selected.
+
+The same fifteen components and their existing formulas are retained. Some
+components normalize their full input vector or fill internal warm-up values.
+Only a preceding window reaches those components here, and only the final
+signal is used. This confines future-row access in this evaluator; it does
+not certify those shared vector functions as causal when used elsewhere.
+Existing component-internal shifts remain in effect.
+
+Scores are additive unitless weighted returns less assumed turnover costs,
+not compounded portfolio returns or realized PnL. Initial weight is zero.
+One-way fees and slippage are charged on `abs(weight - previous_weight)`;
+the final weight is not liquidated. The buy-and-hold comparator uses the same
+transitions with one initial entry cost. Cash scores zero. Same-close decision
+and entry timing is an idealization; fills, financing, borrow, market impact,
+taxes, and achievable performance are outside this diagnostic.
+
+### Input and custody
+
+Input is bounded to 32 MiB and 10,000 rows. CSV headers must be unique and
+nonempty; every record must match the header width. Blank records, NUL bytes,
+malformed quoting, nonfinite or nonpositive prices, duplicate or unordered
+indices, and malformed signal vectors are rejected. No numeric-column
+fallback, interpolation, filling, signal padding, or silent failed-component
+substitution is allowed. `window` and `step` are integers from 1 to 10,000.
+
+Select the price column explicitly (default `close`). Optional timestamps
+must parse in increasing, unique order; naive timestamps are interpreted as
+UTC. Parsed ordering is not independent source-vintage or availability-time
+verification. Without timestamps, supplied row order is the only chronology
+established.
+
+The runner loads exactly three named canonical files under `code/`, ignoring
+legacy `data/code` paths and ordinary module caches. The receipt binds the
+executed strategy bytes, evaluator source, raw input bytes, configuration,
+Python/NumPy/pandas versions, per-transition CSV, and reporting-block CSV.
+Input and loaded-source changes detected during a run prevent a completion
+receipt. The receipt is written last; a directory without it is incomplete.
+Self-hashes establish internal custody only, not authorship, independent
+validation, or scientific truth.
+
+### Reproduce the synthetic software check
+
+Use Python 3.11.9 with NumPy 2.3.5 and pandas 2.3.3, as pinned in
+`requirements-institutional.txt`. The optional HTML chart also requires
+`plotly==6.3.0`. Test execution uses pytest 9.1.0. These are the directly used
+versions; the main institutional Ubuntu dependency lock remains the authority
+for the full repository test closure.
+
+From the repository root, using new output destinations:
+
+```text
+python dashboard/run_ensemble_meta_strategy.py --input examples/ensemble_research/synthetic_price_fixture.csv --input-kind synthetic --timestamp-column timestamp --window 65 --step 7 --fee-bps 10 --slippage-bps 5 --output-dir out/ensemble_research_check
+python dashboard/visualize_ensemble_results.py --run-dir out/ensemble_research_check --output out/ensemble_research_check.html
+python -m pytest -q tests/test_ensemble_walkforward_causality.py
+```
+
+The 96 synthetic prices use `100 + 0.15*i + 0.25*((i % 9)-4)` for
+`i = 0..95`, serialized to two decimal places. Daily synthetic timestamps
+begin at 2026-01-01 UTC. They are an explicit software fixture with 31 scored
+transitions, not market observations or a source of investment evidence.
+`--input-kind` records the operator's declaration. Its default is
+`unverified_source`; neither choice independently authenticates the source.
+
+The viewer requires a complete receipt, checks exact file hashes and byte
+counts, rejects duplicate JSON members and unsupported evidence claims, and
+reconciles row arithmetic, baselines, costs, counts, boundaries, and totals.
+Rehashing an inconsistent score does not make it valid. Both CSV artifacts
+remain available for reviewer inspection; the HTML presents cumulative
+additive scores and the original run identity. The viewer does not re-run the
+strategies or establish that the input came from a trusted market source.
