@@ -19,6 +19,12 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
   membership, reconstructed from their pinned literal allowlists as data.
 - Package bytes are read from immutable Git blobs, not from mutable worktree
   files.
+- The local packager reads the selected tree once and fetches unique blob
+  objects in one size-delimited Git batch. Git replacement objects are disabled;
+  returned object identities, types, sizes, body hashes and framing are checked.
+  Missing or repeated paths, noncanonical membership, more than 1,000 files or
+  more than 128 MiB of selected payload fail before an archive is published.
+  Each Git invocation has a 30-second timeout. No snapshot cache survives a call.
 - The manifest binds the source commit, Git blob IDs, byte counts, file hashes,
   archive hash, target directory, and install mode.
 - Duplicate JSON keys, non-finite JSON values, unknown fields, unsafe paths,
@@ -67,3 +73,18 @@ deployment of any trading or infrastructure-control system.
 Signed build provenance establishes workflow and artifact identity for the
 archive. It does not establish a SLSA level, whole-product security, or that the
 archive was deployed.
+
+## Local batching observation - 2026-09-14
+
+A paired first-party Windows build of the same 189 files at source commit
+`7dc72f0cbda864156f848ed6870e9f44b3e4320b` took 38.4701 seconds with the previous
+reader and 2.0684 seconds with the batch reader. Git calls fell from 379 to 4.
+The 20,825,185 selected payload bytes produced byte-identical tar archives and
+manifests. The observed ratio was 18.60 times in this one pair under concurrent
+test load; it is not a general performance guarantee, an energy measurement or
+a financial valuation. The exact timings and hashes are retained in the
+[local observation receipt](../evidence/public-site-supply-chain/batch-reader-20260914.json).
+
+The same reader is used by the supply-chain input verifier. Its existing row,
+archive, inventory, provenance and authority checks remain required. Neither
+this optimization nor its local checks authorize or demonstrate deployment.

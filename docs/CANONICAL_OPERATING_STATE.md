@@ -511,3 +511,19 @@ The existing Measure & improve view now includes an optional offline energy evid
 Robert explicitly provided the signed-in EC portal route and requested delivery of the existing gift announcement. One group-scoped message was posted to TakeOff Fall 2026. The portal confirmed successful sending; the posted title, author, substantive body, public directory link and group recipient list were read back. This is the fourth scoped outbound under `ec-takeoff-strengths-resource`. No email group was retried and no new campaign was created.
 
 The cohort announcement requirement is complete for group posting. Individual notification delivery, reads, owner adoption, six actual customer conversations, baselines and measured results remain unconfirmed. The prior waiting-for-distribution checkpoint is superseded by this verified portal event; other external dependencies remain. Exact portal identifiers, displayed recipients, message text and delivery evidence are retained in the existing private E-drive review estate. Continue substantive replies in that thread or follow new explicit founder direction; do not repost the announcement.
+
+## Founder-directed local evidence repairs - 2026-09-14
+
+The existing public-release packager and supply-chain reader now fetch a
+bounded, immutable Git snapshot in one batch instead of spawning Git for every
+file. A reproduced replacement-object case no longer substitutes content under
+the original pinned identity. A paired 189-file Windows observation retained
+identical archive and manifest bytes while reducing 379 Git calls to 4 and
+38.4701 seconds to 2.0684 seconds. The
+[existing release protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md#local-batching-observation---2026-09-14)
+records the exact source, limits and first-party measurement boundary.
+
+These changes support the existing buyer-validation delivery path. They do not
+close owner acceptance, external evaluation, revenue, hardware validation or
+deployment gates. The original working checkout and its running services were
+preserved; repair commits are being reviewed in an isolated worktree.
