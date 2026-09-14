@@ -437,6 +437,7 @@ def validate_audit(
         computed_match = (
             row["http_status"] == 200
             and row["actual_sha256"] == row["expected_sha256"]
+            and row["bytes"] == manifest_row["bytes"]
             and row["content_type_allowed"] is True
         )
         if (status == "MATCH") != computed_match:

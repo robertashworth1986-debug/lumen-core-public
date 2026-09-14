@@ -6,11 +6,12 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import hashlib
+from http.client import HTTPException
 import json
+import math
 from pathlib import Path
 import re
 import sys
-from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urljoin
 from urllib.request import Request, urlopen
 
@@ -19,6 +20,9 @@ SCHEMA = "lumencore.public_site_release_manifest.v1"
 FULL_COMMIT = re.compile(r"[0-9a-f]{40}")
 SHA256 = re.compile(r"[0-9a-f]{64}")
 GIT_BLOB = re.compile(r"[0-9a-f]{40}")
+MAX_MANIFEST_BYTES = 1024 * 1024
+MAX_FILE_COUNT = 1000
+MAX_RELEASE_BYTES = 128 * 1024 * 1024
 MANIFEST_KEYS = {
     "archive_sha256",
     "file_count",
@@ -69,8 +73,12 @@ def _reject_constant(value: str) -> object:
 
 
 def load_manifest(path: Path) -> dict[str, object]:
+    with path.open("rb") as handle:
+        raw = handle.read(MAX_MANIFEST_BYTES + 1)
+    if len(raw) > MAX_MANIFEST_BYTES:
+        raise ValueError("release manifest exceeds byte budget")
     payload = json.loads(
-        path.read_text(encoding="utf-8"),
+        raw.decode("utf-8"),
         object_pairs_hook=_strict_object,
         parse_constant=_reject_constant,
     )
@@ -103,6 +111,8 @@ def live_url(base_url: str, archive_name: str, source_commit: str) -> str:
 def verify(
     *, manifest_path: Path, source_commit: str, base_url: str, timeout: float
 ) -> dict[str, object]:
+    if type(timeout) not in (int, float) or not math.isfinite(timeout) or not 0 < timeout <= 60:
+        raise ValueError("timeout must be finite and between 0 and 60 seconds")
     manifest = load_manifest(manifest_path)
     if manifest.get("schema") != SCHEMA:
         raise ValueError("unexpected public-site manifest schema")
@@ -112,7 +122,8 @@ def verify(
         raise ValueError("manifest source commit does not match requested commit")
     if manifest.get("target_directory") != "/opt/lumencore/dashboard":
         raise ValueError("manifest target directory is not the bounded dashboard root")
-    if not SHA256.fullmatch(str(manifest.get("archive_sha256", ""))):
+    archive_hash = manifest.get("archive_sha256")
+    if not isinstance(archive_hash, str) or not SHA256.fullmatch(archive_hash):
         raise ValueError("manifest archive hash is invalid")
 
     rows = manifest.get("files")
@@ -122,16 +133,20 @@ def verify(
         or isinstance(file_count, bool)
         or not isinstance(file_count, int)
         or file_count != len(rows)
+        or not 1 <= file_count <= MAX_FILE_COUNT
     ):
         raise ValueError("manifest file rows are incomplete")
 
-    results: list[dict[str, object]] = []
     seen_names: set[str] = set()
+    declared_bytes = 0
     for row in rows:
         if not isinstance(row, dict) or set(row) != FILE_KEYS:
             raise ValueError("manifest file row must be an object")
-        name = str(row.get("archive_name", ""))
-        expected = str(row.get("sha256", ""))
+        name = row.get("archive_name")
+        expected = row.get("sha256")
+        blob_oid = row.get("git_blob_oid")
+        if not all(isinstance(value, str) for value in (name, expected, blob_oid)):
+            raise ValueError("manifest file row identifiers must be strings")
         name_path = Path(name)
         byte_count = row.get("bytes")
         if (
@@ -141,7 +156,7 @@ def verify(
             or ".." in name_path.parts
             or "\\" in name
             or not SHA256.fullmatch(expected)
-            or not GIT_BLOB.fullmatch(str(row.get("git_blob_oid", "")))
+            or not GIT_BLOB.fullmatch(blob_oid)
             or row.get("install_mode") != "0644"
             or row.get("repo_path") != f"dashboard/{name}"
             or isinstance(byte_count, bool)
@@ -150,6 +165,17 @@ def verify(
         ):
             raise ValueError(f"invalid manifest row: {name or '<missing>'}")
         seen_names.add(name)
+        declared_bytes += byte_count
+        if declared_bytes > MAX_RELEASE_BYTES:
+            raise ValueError("release exceeds declared byte budget")
+
+    # Validate the entire manifest before the first network request. A late
+    # malformed entry cannot yield an apparently useful partial audit.
+    results: list[dict[str, object]] = []
+    for row in rows:
+        name = row["archive_name"]
+        expected = row["sha256"]
+        byte_count = row["bytes"]
         url = live_url(base_url, name, source_commit)
         request = Request(
             url,
@@ -161,10 +187,17 @@ def verify(
         )
         try:
             with urlopen(request, timeout=timeout) as response:
-                body = response.read()
+                body = response.read(byte_count + 1)
+                if len(body) > byte_count:
+                    results.append({
+                        "archive_name": name, "expected_sha256": expected,
+                        "status": "ERROR", "url": url,
+                        "detail": f"response exceeds declared byte count ({byte_count}); incomplete body was not hashed",
+                    })
+                    continue
                 status = getattr(response, "status", 200)
                 content_type = response.headers.get_content_type().casefold()
-        except (HTTPError, URLError, TimeoutError) as exc:
+        except (OSError, HTTPException) as exc:
             results.append(
                 {
                     "archive_name": name,
@@ -189,7 +222,7 @@ def verify(
                 "http_status": status,
                 "status": (
                     "MATCH"
-                    if status == 200 and actual == expected and mime_ok
+                    if status == 200 and actual == expected and len(body) == byte_count and mime_ok
                     else "MISMATCH"
                 ),
                 "url": url,

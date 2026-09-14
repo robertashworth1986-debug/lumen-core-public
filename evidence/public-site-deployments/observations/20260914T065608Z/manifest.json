@@ -1,0 +1,1521 @@
+{
+  "archive_sha256": "006a40f133ce7837e0cb4a1d762eed39a8dd2a3b874ba740200992ed9aefcc3d",
+  "file_count": 189,
+  "files": [
+    {
+      "archive_name": "operator_home.html",
+      "bytes": 16994,
+      "git_blob_oid": "60adbcfcc28be09a72f0b2ec46507926cdc47e8a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/operator_home.html",
+      "sha256": "0577b21e08c8409502d699147804f62cabebf2133d1dbaca7595319a011183fb"
+    },
+    {
+      "archive_name": "opportunity_sprint.html",
+      "bytes": 12211,
+      "git_blob_oid": "66c12dcff23f7e6c1ce0d71de30dd10dacbb95f9",
+      "install_mode": "0644",
+      "repo_path": "dashboard/opportunity_sprint.html",
+      "sha256": "d011e3ecfae4d5201637357523e1e8780b44ec9261b75cdb5842e3032041e972"
+    },
+    {
+      "archive_name": "proof_to_pilot.html",
+      "bytes": 10275,
+      "git_blob_oid": "2820466863bf8703e38d4b497b4ca0a34c644f4c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/proof_to_pilot.html",
+      "sha256": "ab2a38007d23565721a8d37f7e171e7b6bdb752025a7d27ae9256c053bf5ec2d"
+    },
+    {
+      "archive_name": "external_review.html",
+      "bytes": 9578,
+      "git_blob_oid": "88c6568ae6e07d4918282ad04de95545f2ca59f0",
+      "install_mode": "0644",
+      "repo_path": "dashboard/external_review.html",
+      "sha256": "336ebc36e7638343d0dab822a19cbc063556f662ece20f20a955d53ee7f10268"
+    },
+    {
+      "archive_name": "reviewer_docket.json",
+      "bytes": 4985,
+      "git_blob_oid": "9b2f29854502bebf4b8f9a220bc468a6673f3638",
+      "install_mode": "0644",
+      "repo_path": "dashboard/reviewer_docket.json",
+      "sha256": "24146f8594260cb16060596e6a1ecdd1317ed4a3518e1d24d5412c7146739ada"
+    },
+    {
+      "archive_name": "mission_control.html",
+      "bytes": 2642,
+      "git_blob_oid": "b7610d5813309f7d12fd53780416a99eb1a321c2",
+      "install_mode": "0644",
+      "repo_path": "dashboard/mission_control.html",
+      "sha256": "0997a57b814aef0cc79fec467dda3a299a7c7aa3fac1bb2e95c0ceb3576b6063"
+    },
+    {
+      "archive_name": "quant_lab.html",
+      "bytes": 2633,
+      "git_blob_oid": "2c06181fe9120626b3bd126efa20531226d6f1f2",
+      "install_mode": "0644",
+      "repo_path": "dashboard/quant_lab.html",
+      "sha256": "7b611e05ac53f0908ae3c29f1f499badd3e9fc49f42bd60b701a3a835aedf64c"
+    },
+    {
+      "archive_name": "grants.html",
+      "bytes": 2638,
+      "git_blob_oid": "3378ab04089c020580c99aa223e9c95a5a2d457c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/grants.html",
+      "sha256": "58abca9e8d0ed8e52d0b386c75e8978310b21a9a7b10335b4710b4f0a0b09f1f"
+    },
+    {
+      "archive_name": "kraken_execution_dashboard.html",
+      "bytes": 2678,
+      "git_blob_oid": "b38a6937cd358728e1a8582a6d63f4a77a60e2ef",
+      "install_mode": "0644",
+      "repo_path": "dashboard/kraken_execution_dashboard.html",
+      "sha256": "257d70645eb0e4b9f260cc63960a8c9636f8af25f8ac0447f27232f705fa56be"
+    },
+    {
+      "archive_name": "forecast.html",
+      "bytes": 2647,
+      "git_blob_oid": "31c4d8812d276513244a3a4a9409edb7de6fd51f",
+      "install_mode": "0644",
+      "repo_path": "dashboard/forecast.html",
+      "sha256": "735cef4afc37fb50655030f08797c73156139528be41ca2293d80cc5d8cbd647"
+    },
+    {
+      "archive_name": "anomalies.html",
+      "bytes": 2629,
+      "git_blob_oid": "660401e92a46e3ad756ab63ecac3dfa2dd9f1e2c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/anomalies.html",
+      "sha256": "97352a586bb4d25d490b33feb535c4a3c64b0fea9bc3dbbc465ed83e645eb91f"
+    },
+    {
+      "archive_name": "explain.html",
+      "bytes": 2632,
+      "git_blob_oid": "f11a792f9250c27415b4dbc4adbf6c647947fef7",
+      "install_mode": "0644",
+      "repo_path": "dashboard/explain.html",
+      "sha256": "704dc4d18f12a3fd9966172e2fe1b742012f7a82053961e7459bc18ff6b86218"
+    },
+    {
+      "archive_name": "lab.html",
+      "bytes": 2617,
+      "git_blob_oid": "ae9b0ac8617d704dcea83ec6b716c1036204c015",
+      "install_mode": "0644",
+      "repo_path": "dashboard/lab.html",
+      "sha256": "cbf6b4382044751ef871cf77b5ca75d03bdb0f4aff66cc5d117db969bb0f5ffd"
+    },
+    {
+      "archive_name": "evidence/index_bounded.html",
+      "bytes": 7597,
+      "git_blob_oid": "4dee06d9b43b91a84712132f6ee3ad966689e356",
+      "install_mode": "0644",
+      "repo_path": "dashboard/evidence/index_bounded.html",
+      "sha256": "32db82e6ebf99efab0954a3d873c4cc6771f52d61576030779719ea92f82ba61"
+    },
+    {
+      "archive_name": "robots.txt",
+      "bytes": 630,
+      "git_blob_oid": "62a5523de48bc8c968ae1d75f1d80ca84dcd7b88",
+      "install_mode": "0644",
+      "repo_path": "dashboard/robots.txt",
+      "sha256": "68564a5ddc2b475d865e3705bd306ebbb714ade88305c278af89956c031f59d0"
+    },
+    {
+      "archive_name": "sitemap.xml",
+      "bytes": 8986,
+      "git_blob_oid": "7fef5b0adadb7890bd8ea86f0defd45cc6e65027",
+      "install_mode": "0644",
+      "repo_path": "dashboard/sitemap.xml",
+      "sha256": "5d633c220f00fa2f7219cd088e5f4fd4f10d0c9e13847f61842136ff7b99c980"
+    },
+    {
+      "archive_name": "site.webmanifest",
+      "bytes": 447,
+      "git_blob_oid": "87f2b936b6d540a0cdc6bc837a03b5e9834b9626",
+      "install_mode": "0644",
+      "repo_path": "dashboard/site.webmanifest",
+      "sha256": "5ecaed4d8b737de2d072cfa87f8e1e92533b20d46476e14c642f5b560bde62f7"
+    },
+    {
+      "archive_name": "manifest.json",
+      "bytes": 447,
+      "git_blob_oid": "87f2b936b6d540a0cdc6bc837a03b5e9834b9626",
+      "install_mode": "0644",
+      "repo_path": "dashboard/manifest.json",
+      "sha256": "5ecaed4d8b737de2d072cfa87f8e1e92533b20d46476e14c642f5b560bde62f7"
+    },
+    {
+      "archive_name": "assets/lumaarc_arc_seal_v1.png",
+      "bytes": 696635,
+      "git_blob_oid": "e7a688298e8e81875a33cccba91d5cc806b3120a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/assets/lumaarc_arc_seal_v1.png",
+      "sha256": "1ed1c9b00e273aa9e781bd7fd0a4fcc3fc542257c6d294c8e8fbfada500701af"
+    },
+    {
+      "archive_name": "assets/lumencore.css",
+      "bytes": 13103,
+      "git_blob_oid": "ae0651c4c3f2f5c690b051901511f7e11aed9e87",
+      "install_mode": "0644",
+      "repo_path": "dashboard/assets/lumencore.css",
+      "sha256": "9c3c394b6dad339810199cf6c8e0197b8e6e114b0594968132ab7aff30e3034c"
+    },
+    {
+      "archive_name": "assets/lumencore.js",
+      "bytes": 24444,
+      "git_blob_oid": "67ea04092484c6138d5b641faadab8f1efe629e5",
+      "install_mode": "0644",
+      "repo_path": "dashboard/assets/lumencore.js",
+      "sha256": "81aaab2425156fe765d608a062f95d1a8f6fa896917404ecd2558918a638d8b5"
+    },
+    {
+      "archive_name": "assets/luma_command_fabric.css",
+      "bytes": 7451,
+      "git_blob_oid": "0dcb13465cc1e12184484cb1679eabb5a20c9c59",
+      "install_mode": "0644",
+      "repo_path": "dashboard/assets/luma_command_fabric.css",
+      "sha256": "97fa707cdaa3c73c0bd291dfcff3170fcae959affd8a9bf33293d29164cff622"
+    },
+    {
+      "archive_name": "assets/luma_command_fabric.js",
+      "bytes": 12107,
+      "git_blob_oid": "ea53c923e49039746c5cf75cc686a2930837f7b6",
+      "install_mode": "0644",
+      "repo_path": "dashboard/assets/luma_command_fabric.js",
+      "sha256": "73ce55b7b4ef0f02390cf76b68de253f6dc83e8487acaa502891055b9504bf62"
+    },
+    {
+      "archive_name": "assets/luma_institutional_surface.css",
+      "bytes": 21264,
+      "git_blob_oid": "d3b141a6bc5e71df258e083ae64469317627c634",
+      "install_mode": "0644",
+      "repo_path": "dashboard/assets/luma_institutional_surface.css",
+      "sha256": "2b3ab202bbebdb2cb6790ad71bffef5ad5655aec3aa3096018211086734373b1"
+    },
+    {
+      "archive_name": "assets/luma_institutional_surface.js",
+      "bytes": 5089,
+      "git_blob_oid": "f54c80bd435162864d2ec4f826dfc892ce9786d9",
+      "install_mode": "0644",
+      "repo_path": "dashboard/assets/luma_institutional_surface.js",
+      "sha256": "f1b6aae8264b22964136565e865c8568a13d305439b1f044d535c4e7bcd56ebe"
+    },
+    {
+      "archive_name": "assets/vendor/three.min.js",
+      "bytes": 669884,
+      "git_blob_oid": "0c2f4ba351000d47f413873d8bb9c1a2f18cb37a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/assets/vendor/three.min.js",
+      "sha256": "170c6789f43217c96b3170f4b42fafe135de7f7cd48497a4218f9757ee1d49fa"
+    },
+    {
+      "archive_name": "js/alpha_globe_3d.js",
+      "bytes": 17940,
+      "git_blob_oid": "a98453ba5ec5ecb6b11893f5280e8eddcff603ab",
+      "install_mode": "0644",
+      "repo_path": "dashboard/js/alpha_globe_3d.js",
+      "sha256": "8b73c83ca235c001523350a258132ad72347af5b2f912deb2e3595072193fa70"
+    },
+    {
+      "archive_name": "js/cinematic_telemetry_layer.js",
+      "bytes": 15112,
+      "git_blob_oid": "6e6b8398c76f70241bd39c7e51f0e022d1d66db7",
+      "install_mode": "0644",
+      "repo_path": "dashboard/js/cinematic_telemetry_layer.js",
+      "sha256": "5f247042a14b581749f448ba00e3bbaa4aa9131df24155109af6ea0c32f26106"
+    },
+    {
+      "archive_name": "js/luma_design_system.js",
+      "bytes": 38543,
+      "git_blob_oid": "5d42059b8a68619f438342fb0624c5395ac1b53c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/js/luma_design_system.js",
+      "sha256": "16bed71bf0728bba09682f374cd4eb3fd26859fe172863520b4b17353702c4ba"
+    },
+    {
+      "archive_name": "js/luma_path_resolver.js",
+      "bytes": 4104,
+      "git_blob_oid": "2477bcbff9cc4638bca0c48f3c03ffedbe96d234",
+      "install_mode": "0644",
+      "repo_path": "dashboard/js/luma_path_resolver.js",
+      "sha256": "afa14ad8597f5764f639c632241d8d03047e33f8e4cf3d7c6188a7d7933bbb85"
+    },
+    {
+      "archive_name": "assets/prooflock/bounded_validation_protocol_v1.json",
+      "bytes": 369,
+      "git_blob_oid": "2623934a92ca023359329475b39cb9babebb28da",
+      "install_mode": "0644",
+      "repo_path": "dashboard/assets/prooflock/bounded_validation_protocol_v1.json",
+      "sha256": "8757f2182ea76d46a3a409cd2160c6b4fab269a4ad0ef6c25ee1cbc2396f4fda"
+    },
+    {
+      "archive_name": "assets/prooflock/bounded_validation_protocol_v2.json",
+      "bytes": 621,
+      "git_blob_oid": "2b494690b70e991f22daf15da0ae3f86725eb9af",
+      "install_mode": "0644",
+      "repo_path": "dashboard/assets/prooflock/bounded_validation_protocol_v2.json",
+      "sha256": "a5be86d225fd166f8802f0e97f82e95a8589e40e839c798bf8ac521623f9bef1"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/app.js",
+      "bytes": 11923,
+      "git_blob_oid": "f17077cda8a91649ef289b5ee77f2fc1a177852b",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/app.js",
+      "sha256": "3c3a49e797f7e38ae80fbb67857f6051c57ee6e54334aec2e9f2c2ddd1b1a5f2"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/bootstrap.js",
+      "bytes": 230,
+      "git_blob_oid": "d8017d93817bbba587270c22a54f87b05802110d",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/bootstrap.js",
+      "sha256": "9f70f3229a0b5792bf336546e636e8c196878d7b23711e2bcdab2d2e1926e9c7"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/index.html",
+      "bytes": 6159,
+      "git_blob_oid": "81964e8537f86c4cfc8c1d69083871f6a3121262",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/index.html",
+      "sha256": "c9029728ec758bfa85b730fe68850d7a60d5519a525bd79e09ff6839d445f4cf"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/prooflock_core.js",
+      "bytes": 17985,
+      "git_blob_oid": "316629f0fa4a8604ce4f728978da05732fcde1e6",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/prooflock_core.js",
+      "sha256": "db2edd1900a3f6dfb703993509edef543d87fbe734a6ce15fd13f69cd41dd334"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/prooflock_favicon.svg",
+      "bytes": 313,
+      "git_blob_oid": "875915673a48aff202e2a4bd79ce4dd07640195f",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/prooflock_favicon.svg",
+      "sha256": "fccfaa85618a824cd186613006113add6bef64cce33122fee4167ab897765f82"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/prooflock_lattice.css",
+      "bytes": 3841,
+      "git_blob_oid": "09d0dc48e8b575f4e131ee5e98431db5b2fefe36",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/prooflock_lattice.css",
+      "sha256": "d9597d5f0035456b925c028c50bc201df7ef2a16e67b9803961668e3f7e76ed5"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/prooflock_lattice.js",
+      "bytes": 30542,
+      "git_blob_oid": "be7d5c13853b313b4c3e214bf29d6fe0d9d39ebf",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/prooflock_lattice.js",
+      "sha256": "5320c5daaa0a56b33ab9c2040cdfbdb349fa6cf149be5d960689afd7d25ce47a"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/sample_receipt.json",
+      "bytes": 3295,
+      "git_blob_oid": "e807698dfb5baaafd6a4df4fdf7f5e8fea8eddfd",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/sample_receipt.json",
+      "sha256": "c26ef3096ea2db921316cc988b5ba6fe6d2bb59e65e9bd0b481da15b4e092304"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/styles.css",
+      "bytes": 9511,
+      "git_blob_oid": "9b185a3233f9bf094277aa1a7a5a5772030997bb",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/styles.css",
+      "sha256": "916d8fb479c5ade2bd4c04f534535f9c09dbe9e6c8260388956ee28bebc0e3af"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/three.core.min.js",
+      "bytes": 384222,
+      "git_blob_oid": "05d3505751f7143a2bedae61eac3408b3f388d57",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/three.core.min.js",
+      "sha256": "6486aa0d719cfa87ec88dc47223b59b1fb8417a1a407fc0e52467c943e2f8cc9"
+    },
+    {
+      "archive_name": "build_week/prooflock_console/three.module.min.js",
+      "bytes": 365024,
+      "git_blob_oid": "41502aa5bf041e38fed4011d2216b22a1be004ed",
+      "install_mode": "0644",
+      "repo_path": "dashboard/build_week/prooflock_console/three.module.min.js",
+      "sha256": "a38c21912ea8c9fd2c92b8dfb2064297d073ec19ac815faf75a686c179202f33"
+    },
+    {
+      "archive_name": "cohort/index.html",
+      "bytes": 4766,
+      "git_blob_oid": "31ec1e6368a6e5db6a3d0d58d78b00bf67be4c76",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/index.html",
+      "sha256": "0dd47a2b89a25adb6b7b4b23b10457b5bbb4910fc68962528106dc1518daacd8"
+    },
+    {
+      "archive_name": "cohort/studio.css",
+      "bytes": 21119,
+      "git_blob_oid": "8a9d5fb059b91b302e8b3dd39309b8269834390c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/studio.css",
+      "sha256": "49a390b6dacc7581d6f286772cb692038a3b9195f41779b238516e42dbabc22c"
+    },
+    {
+      "archive_name": "cohort/studio.js",
+      "bytes": 70477,
+      "git_blob_oid": "e6dafe05c7dfa17be393c1f6f15e47d736873f69",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/studio.js",
+      "sha256": "330effbabb80b2fbcf64b4a37ff497432ad138f42447c1ce5ca228daa707c467"
+    },
+    {
+      "archive_name": "cohort/core.js",
+      "bytes": 24769,
+      "git_blob_oid": "c923fb71aadd122dde3f7e89ce5d1890791195c0",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/core.js",
+      "sha256": "83639e4c9944b3440ac81ffaa61b13a9cfd155f4020834f9dc47febb03b060e1"
+    },
+    {
+      "archive_name": "cohort/mark.svg",
+      "bytes": 249,
+      "git_blob_oid": "1c511e4396ddafad632b224d64987a511aee3e8b",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/mark.svg",
+      "sha256": "51b1e6203c3ec8b2168538cb05b8089cbbdea5dd332e941f445cd3cbf91328e1"
+    },
+    {
+      "archive_name": "cohort/catalog.json",
+      "bytes": 223570,
+      "git_blob_oid": "514f6e3caf6ccf094832a2bd447e3ba3eebaec30",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/catalog.json",
+      "sha256": "d0a244ee01017467c60bf9516c3fa6361075512db0deb45ab2c86b5bb8a30075"
+    },
+    {
+      "archive_name": "cohort/downloads/manifest.json",
+      "bytes": 13211,
+      "git_blob_oid": "44426a478455f759bd974758efdc7e4ec5612a31",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/manifest.json",
+      "sha256": "0dfbe4a2d3e712177ccec9ca4654c63770a6736194a0f00086b80f06f8eea843"
+    },
+    {
+      "archive_name": "cohort/downloads/aa-window-washing.zip",
+      "bytes": 251681,
+      "git_blob_oid": "e11f6cc9d71a5238e75d8f73c48bb9d2c8790140",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/aa-window-washing.zip",
+      "sha256": "7e7c1c403319c5fddf126ffb941e2cbd2a91a683eba60fb825899205a2b0af2e"
+    },
+    {
+      "archive_name": "cohort/downloads/advia-solutions.zip",
+      "bytes": 251632,
+      "git_blob_oid": "73fc4a9f28ec97f0b6ec934dffb50b636cfa3e4d",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/advia-solutions.zip",
+      "sha256": "62cf9f180f2d702592b217fd755c67d83079b4bd72bde8211e9a86d2790c4cc1"
+    },
+    {
+      "archive_name": "cohort/downloads/aegiskeep.zip",
+      "bytes": 251696,
+      "git_blob_oid": "2b37e132c5a34871d78f0474fa20a72e3dca4469",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/aegiskeep.zip",
+      "sha256": "0728680ea715295a5602e67a165df5a2423b4c601ea21f5b96120b4c9458a91d"
+    },
+    {
+      "archive_name": "cohort/downloads/aligned-strategy-partners.zip",
+      "bytes": 251778,
+      "git_blob_oid": "e796ee9d9bb9686e495d48bb2bfe7e8996ee2d1a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/aligned-strategy-partners.zip",
+      "sha256": "d69575e73f3e915185bacd5cfca7444699b7f856d8c8c6f909b848e60127cb98"
+    },
+    {
+      "archive_name": "cohort/downloads/amara-bitters.zip",
+      "bytes": 251685,
+      "git_blob_oid": "b90f56ae52d9801773954c27d4a290acf2b9e6ff",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/amara-bitters.zip",
+      "sha256": "f16f002961c524c49003754e5f84ab1afd33a77a3d4f536db9e5569e6e3dfb85"
+    },
+    {
+      "archive_name": "cohort/downloads/autarko.zip",
+      "bytes": 251725,
+      "git_blob_oid": "4c80c6558a5d2e8e06e5a340994572771ffd0aa0",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/autarko.zip",
+      "sha256": "6aa16b3ccc4f9cebbfe1471576c4a3d8e82050b5435d77b95090663511617004"
+    },
+    {
+      "archive_name": "cohort/downloads/bagel.zip",
+      "bytes": 251580,
+      "git_blob_oid": "13b9aa1e575a210e7e403e86396a2f9b8504eb55",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/bagel.zip",
+      "sha256": "d7320525d6173cb0c7472fc246f63193cbedcdd5b8dab486618e5d188a533fe7"
+    },
+    {
+      "archive_name": "cohort/downloads/buyunrepped.zip",
+      "bytes": 251728,
+      "git_blob_oid": "803133fd6657cd1a18493811c1890aedc2b606d3",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/buyunrepped.zip",
+      "sha256": "647a89e13a1216bdcc7aae3a72a6c41074c0dc09367b7755eb1bf695326a32cc"
+    },
+    {
+      "archive_name": "cohort/downloads/c3-measures-registry.zip",
+      "bytes": 252181,
+      "git_blob_oid": "5a541bdcf23522e7a8ca2401eddd95881a2e1dbf",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/c3-measures-registry.zip",
+      "sha256": "f6e3825014776d5644ce4915fe0aac27223aa6ba4a07af9066a4532cef8b71f9"
+    },
+    {
+      "archive_name": "cohort/downloads/claridense.zip",
+      "bytes": 251564,
+      "git_blob_oid": "ace1dfed06f31e3fefbbbf67fb1226295fcce973",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/claridense.zip",
+      "sha256": "8808a546edad23d0897c3afaccf3d935e8373c14b04d764b07f3fd886ad61c25"
+    },
+    {
+      "archive_name": "cohort/downloads/clark-wester-corporation.zip",
+      "bytes": 251673,
+      "git_blob_oid": "eef0a3e1c0e6597b3ed064012d39eda3e4a86b73",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/clark-wester-corporation.zip",
+      "sha256": "820f55dd58e414cc68b1f304a82813c4e47b7fd82e8412534a03020969fcafe0"
+    },
+    {
+      "archive_name": "cohort/downloads/cog-learning-inc.zip",
+      "bytes": 251652,
+      "git_blob_oid": "01db259c16f9a2e0dff8d6396e19a0ee5be943b3",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/cog-learning-inc.zip",
+      "sha256": "f5056bb8ffcbb5517b8b3ee425dd94ee074bff7900969d522378351f993a9451"
+    },
+    {
+      "archive_name": "cohort/downloads/compounds-dev-inc.zip",
+      "bytes": 251783,
+      "git_blob_oid": "45af392a59050f9fc9c94b25d8d6cdc6852455d1",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/compounds-dev-inc.zip",
+      "sha256": "5dd7ddc3bf6a52b0a6628c09e2388648a414799b03926e2620a3f08ef472842c"
+    },
+    {
+      "archive_name": "cohort/downloads/csh-hub.zip",
+      "bytes": 251564,
+      "git_blob_oid": "7b1f54bff7346d99c2532cc78a1bf134661b836e",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/csh-hub.zip",
+      "sha256": "3014072d66066aad2db841ca662199de56d5172e00a70318934295fc769695f2"
+    },
+    {
+      "archive_name": "cohort/downloads/decre.zip",
+      "bytes": 251603,
+      "git_blob_oid": "9a924dbc4d95b1324b3492662c91c69a3e1c6b51",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/decre.zip",
+      "sha256": "025feedbf0bd7eb87093d8d8d68b0474e977ae4825749fde30c067a8eb8f67c6"
+    },
+    {
+      "archive_name": "cohort/downloads/double-r-strategies-and-consulting.zip",
+      "bytes": 251701,
+      "git_blob_oid": "916d416e4b280e1f40f837a9b201c41f311a9cd1",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/double-r-strategies-and-consulting.zip",
+      "sha256": "c920b5f1e3d42f7b9ea94689f0a70feaf53d67f5d1d29cd2c95e536967811488"
+    },
+    {
+      "archive_name": "cohort/downloads/dust-to-dust-llc.zip",
+      "bytes": 251829,
+      "git_blob_oid": "1fca2621aec2dbcde4bb465c03b3bedcb8df709b",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/dust-to-dust-llc.zip",
+      "sha256": "105e1619894b5b62f5bf3d32df7d48ffc842cb0406c1f3245ffd609e2df75d4f"
+    },
+    {
+      "archive_name": "cohort/downloads/encompass-financial-services-inc.zip",
+      "bytes": 251714,
+      "git_blob_oid": "7cb48a40067700807146052851436d9c9641ab38",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/encompass-financial-services-inc.zip",
+      "sha256": "846fc0823357bf68f427306070521a736b2102ea0d3f9f233a29da96c6140b52"
+    },
+    {
+      "archive_name": "cohort/downloads/excalis.zip",
+      "bytes": 252096,
+      "git_blob_oid": "91b06679589f3a483dfe4aaa4cc144df8d2eafe4",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/excalis.zip",
+      "sha256": "9dee67e7be77038414a00bfb5db500fbdcefc91d1e22fc65c41e76c36cdf910a"
+    },
+    {
+      "archive_name": "cohort/downloads/firma-q-gaas.zip",
+      "bytes": 251760,
+      "git_blob_oid": "42508a73bdb34fd9bf8ee273e86a22e1e5594bfa",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/firma-q-gaas.zip",
+      "sha256": "96e779bcffb807bd006f8550eb635c39e5e2b52607280d13ec74dd39ec8db37d"
+    },
+    {
+      "archive_name": "cohort/downloads/fizzy-mixology.zip",
+      "bytes": 251619,
+      "git_blob_oid": "94b61901d0c7a3eced20c01a94ad48e06468a0e4",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/fizzy-mixology.zip",
+      "sha256": "43bc3fa607d98a8951efc32fc1d98ca74d4ebd79088c20fbacf47c71cced50fa"
+    },
+    {
+      "archive_name": "cohort/downloads/fox-force.zip",
+      "bytes": 251649,
+      "git_blob_oid": "ea62b8004c22829dab0860738d79c3d5978652d3",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/fox-force.zip",
+      "sha256": "15ce1c8247da9dea6fa79d8b7c9974bc8929a1e6057317a87c9e6ec78f213784"
+    },
+    {
+      "archive_name": "cohort/downloads/glow-up-sports.zip",
+      "bytes": 252155,
+      "git_blob_oid": "223494fd1e69a3d44bc04765f78727c7f3810813",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/glow-up-sports.zip",
+      "sha256": "c500a72015744c1d16efc0fd74c990531d145be89ee05665ef74b8761d60fc54"
+    },
+    {
+      "archive_name": "cohort/downloads/govfetchr-ai.zip",
+      "bytes": 251825,
+      "git_blob_oid": "9d6907ccdf6f4b6cf9e713dae380ed0b0a2b8d4b",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/govfetchr-ai.zip",
+      "sha256": "a9056633af9c3849b2bf3452aabb95c238beb2f73bcb76b2df00667fc58cc7e6"
+    },
+    {
+      "archive_name": "cohort/downloads/gutless-topical-supplements.zip",
+      "bytes": 252180,
+      "git_blob_oid": "72a7ce5c2e002c876d935418561be429ade954ef",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/gutless-topical-supplements.zip",
+      "sha256": "f9662d92eb03900c4936e30c4cbf88bf4b3e8598295be052a35eac3aa332fa4a"
+    },
+    {
+      "archive_name": "cohort/downloads/happy-overall.zip",
+      "bytes": 252561,
+      "git_blob_oid": "d540c0b92d5c785495ce120eb83e901d8873eb08",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/happy-overall.zip",
+      "sha256": "e6cad9fb87511ce53e74466baac1d3ffb4b813f9e56215f2088e96284c48a322"
+    },
+    {
+      "archive_name": "cohort/downloads/holastra.zip",
+      "bytes": 251652,
+      "git_blob_oid": "3fd4d9f485fce1332a5b1e3327ba9d405922179e",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/holastra.zip",
+      "sha256": "b8e93dc100dee430a3a519cc731208773b8d7568c70f0092c67c03c52db9112e"
+    },
+    {
+      "archive_name": "cohort/downloads/hopeconnect-health.zip",
+      "bytes": 251849,
+      "git_blob_oid": "2d22d8c1b2df5e3047dd43cefe0da22e3db517d6",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/hopeconnect-health.zip",
+      "sha256": "24710db70053cd85db75bb007c0f4423b833a04749b0fc7d929cbfa65560d953"
+    },
+    {
+      "archive_name": "cohort/downloads/hot-mess-inc.zip",
+      "bytes": 252198,
+      "git_blob_oid": "3233aaf93e77aeb9e8b53b5e5c5c2175bcdd9a15",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/hot-mess-inc.zip",
+      "sha256": "6a54e4ec96f137a7104749a7482768ea49fe2348d3a6191fa1891b6c96bc4245"
+    },
+    {
+      "archive_name": "cohort/downloads/incourage-enterprises.zip",
+      "bytes": 251970,
+      "git_blob_oid": "214de38386eb73d468ef9a2a64225d4e803bd7c2",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/incourage-enterprises.zip",
+      "sha256": "db1db81fb6d3559e71eda9338b54e5efebe02a0d4b6c54282cfb12fd10711558"
+    },
+    {
+      "archive_name": "cohort/downloads/itty-bitty-city.zip",
+      "bytes": 251917,
+      "git_blob_oid": "cb0f1e6e800ecca15a9eaebd1c4d6512a48aa7bf",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/itty-bitty-city.zip",
+      "sha256": "53e49c1c1f6580d64cd0bc2f4f35efa1873feb07eaf5389cd447d86bac0e6e0a"
+    },
+    {
+      "archive_name": "cohort/downloads/learnkairo.zip",
+      "bytes": 251854,
+      "git_blob_oid": "33a9b9879b92ab6ba52c19d9da3a14c69ee82a42",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/learnkairo.zip",
+      "sha256": "0124b7ce80b6bb5cddb558c1cf394b0238231cfe2cd150425898dd46ba68d83d"
+    },
+    {
+      "archive_name": "cohort/downloads/limer.zip",
+      "bytes": 251744,
+      "git_blob_oid": "78522fa000199890a1268ecec7080e43b3cedaa6",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/limer.zip",
+      "sha256": "50040507d0074007e7d058e762b67fc0dbd32c43f48f07f32f6b18f7af7178fb"
+    },
+    {
+      "archive_name": "cohort/downloads/lode-labs.zip",
+      "bytes": 251838,
+      "git_blob_oid": "1af06c9838870c4bb085cc48d04c9ec57b668b95",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/lode-labs.zip",
+      "sha256": "75d48ebd18e83284b06f1e5c73686cab5799b3df5adaad4376a9d465ece1ad13"
+    },
+    {
+      "archive_name": "cohort/downloads/lumencore.zip",
+      "bytes": 252157,
+      "git_blob_oid": "b6dd1408086eb6d96091c094f193b94522bdef18",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/lumencore.zip",
+      "sha256": "43d6dd69a7652591a8a2483730870b36655d124e614b62779cf743c4bbe82ed0"
+    },
+    {
+      "archive_name": "cohort/downloads/maaven.zip",
+      "bytes": 251803,
+      "git_blob_oid": "1dfb3de1e1d3db9549e1c91954cffe9ff755c35a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/maaven.zip",
+      "sha256": "1fc70ed442ee502d870d84de556984423b778d092e0561ee695c112be9950483"
+    },
+    {
+      "archive_name": "cohort/downloads/margaret-ray-interiors.zip",
+      "bytes": 251833,
+      "git_blob_oid": "889a13b2d4775ef98aa1322dd792cc8b4be19a2f",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/margaret-ray-interiors.zip",
+      "sha256": "bda79d7ea6ccbf616358d014d73c725cfef1aaf386068077ca24ff490e303e98"
+    },
+    {
+      "archive_name": "cohort/downloads/moneybot.zip",
+      "bytes": 251925,
+      "git_blob_oid": "b59ba08e9c5bb11e98736917967f9cefddb94304",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/moneybot.zip",
+      "sha256": "7c7389aa0ab9d172382c901674378584ee96b67ce9f0b233523f83e8f084e0f5"
+    },
+    {
+      "archive_name": "cohort/downloads/music-utility-network.zip",
+      "bytes": 251982,
+      "git_blob_oid": "31406f75ca6199ace6edb6649e5bbcc387e97236",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/music-utility-network.zip",
+      "sha256": "2629c3552e8043ce0eded8b4ddb4636ff5ba9996224ba76dcbd4fdad382f34f8"
+    },
+    {
+      "archive_name": "cohort/downloads/obviecare.zip",
+      "bytes": 251756,
+      "git_blob_oid": "ae3da2df05e3631a96cbbff24e6fed1498aab07f",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/obviecare.zip",
+      "sha256": "42439f329bfb2c788a288446bba7441e16c3979750d5691ff575b55396b6beca"
+    },
+    {
+      "archive_name": "cohort/downloads/paragon-parcels.zip",
+      "bytes": 252049,
+      "git_blob_oid": "25d0ff2c1344a7a6839f3776da505a9cae64c6ad",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/paragon-parcels.zip",
+      "sha256": "e2db6f1c0295b091583a691c39662ddc13533fff1e6cfcb1aabcb68878a11ff6"
+    },
+    {
+      "archive_name": "cohort/downloads/petrarch-strategy.zip",
+      "bytes": 252186,
+      "git_blob_oid": "ee0ec7bf68b97ff195261ba13738f187f96915c8",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/petrarch-strategy.zip",
+      "sha256": "d16bbac95fb32dd314463a7a0c60fdedcbcb453c5d7a27bbdb4d41651e066dec"
+    },
+    {
+      "archive_name": "cohort/downloads/proworx.zip",
+      "bytes": 252548,
+      "git_blob_oid": "37cec6bb4121f223f869814953f151f1e2d790c6",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/proworx.zip",
+      "sha256": "b3c7504361081210072c5a799f9954a0f8a2daec791e31825f20e8f0dbd3ce61"
+    },
+    {
+      "archive_name": "cohort/downloads/prsnt.zip",
+      "bytes": 251857,
+      "git_blob_oid": "c4089cffdd3499c99d425dd100da7015f9935565",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/prsnt.zip",
+      "sha256": "edfbf9129733fdbe646be880398db0a54aeb4d71cd5574ff69c569b40ab16996"
+    },
+    {
+      "archive_name": "cohort/downloads/ptln.zip",
+      "bytes": 251872,
+      "git_blob_oid": "3d129062803d3c18ae73d0a3495b129df0070119",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/ptln.zip",
+      "sha256": "8f89352f07011e53a6e6c3402a296ca283ff82792f06cfcd8d105b4747f02ee6"
+    },
+    {
+      "archive_name": "cohort/downloads/public-speaking-pros.zip",
+      "bytes": 251913,
+      "git_blob_oid": "b5535c4cdd18e4a485d34fd1bcc573be36b139ff",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/public-speaking-pros.zip",
+      "sha256": "69631745822523bd7c1554fc84777dda9b4bbf05a220bced9c221c309be7b496"
+    },
+    {
+      "archive_name": "cohort/downloads/recovery-matters.zip",
+      "bytes": 251895,
+      "git_blob_oid": "b644d8b743ceea6664c7d9e752ba0140bd311f53",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/recovery-matters.zip",
+      "sha256": "b888b670182b509117f8a4b18ec2b0c52fd650de027f69ad40188a6bfb593f41"
+    },
+    {
+      "archive_name": "cohort/downloads/remedy-haus.zip",
+      "bytes": 251796,
+      "git_blob_oid": "f029d4dad43e3a3f5e322f00e404d742d1981b3f",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/remedy-haus.zip",
+      "sha256": "1015cafb53039664faa8ce341ce3f4b3a636456190c8288085d3ef452aa265ae"
+    },
+    {
+      "archive_name": "cohort/downloads/renuiam.zip",
+      "bytes": 251845,
+      "git_blob_oid": "5621f2d343fd2c9d8c2d99851671d3872b286d8c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/renuiam.zip",
+      "sha256": "325540447610236c76b43b1fe2d5cf197a63c8c661fd49f20b5d4a88afa743b7"
+    },
+    {
+      "archive_name": "cohort/downloads/scoreboardz-inc.zip",
+      "bytes": 251948,
+      "git_blob_oid": "9223e362d16b888f149ae7957b994f4cefa2d24f",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/scoreboardz-inc.zip",
+      "sha256": "dec927a280884fcc71af7daf5278412a031ebc76d99a3039b5214b4a0dee3fc0"
+    },
+    {
+      "archive_name": "cohort/downloads/smr-pet-services.zip",
+      "bytes": 251740,
+      "git_blob_oid": "99677b9ddb4cb92b5f3734c47ddcb22962236539",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/smr-pet-services.zip",
+      "sha256": "75b130f572975b309980a26f34066736f302913a1263735a8d36065959e02f67"
+    },
+    {
+      "archive_name": "cohort/downloads/specinate.zip",
+      "bytes": 251735,
+      "git_blob_oid": "b25be8896377e947863375f7b79c50ba1f723202",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/specinate.zip",
+      "sha256": "a1388f409304ab1805e3be59c9fbd700413841429c28765226916d8f8d661a19"
+    },
+    {
+      "archive_name": "cohort/downloads/spilburg-solutions.zip",
+      "bytes": 252212,
+      "git_blob_oid": "ae65ac7dc637d9448a3ee997f8dfe7a79e2630e1",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/spilburg-solutions.zip",
+      "sha256": "dc3b182f9e639825702171bdca73f03d8d886f2f138c11d2e02cb9babe31c861"
+    },
+    {
+      "archive_name": "cohort/downloads/starra-llc.zip",
+      "bytes": 252123,
+      "git_blob_oid": "cd941e41ad238aac9ab923738208752fe294c66a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/starra-llc.zip",
+      "sha256": "2d1ae5e3f1da4c4fb61f1d6865b982c6cd8329a7b33800e8745f9891c9b35c75"
+    },
+    {
+      "archive_name": "cohort/downloads/tarapy-inc.zip",
+      "bytes": 252140,
+      "git_blob_oid": "3089565b2b0048501a73751cfc564333844bb748",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/tarapy-inc.zip",
+      "sha256": "1c4e788efccd17c72816b0343eeb163e91cc856c33a1aa94ae75e944aa1325b7"
+    },
+    {
+      "archive_name": "cohort/downloads/the-37208.zip",
+      "bytes": 252506,
+      "git_blob_oid": "0c18495aec166a06e2041d2e4db2eeb3fcf8555c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/the-37208.zip",
+      "sha256": "92342e4ba0175724b381ea019f31ab7c6d9621e2a5ced81a06d8db18a1221912"
+    },
+    {
+      "archive_name": "cohort/downloads/the-designery-nashville-south.zip",
+      "bytes": 252164,
+      "git_blob_oid": "b7c515dc21ef75f378c498a79c1dd28f4852d26c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/the-designery-nashville-south.zip",
+      "sha256": "9b507f4e63d75e3e2b6bb7564fdf79c3f4103a02342c6fd4e162211a94bd8359"
+    },
+    {
+      "archive_name": "cohort/downloads/the-nash-philanthropist.zip",
+      "bytes": 252065,
+      "git_blob_oid": "5337174b4065bb76232d1f9eb90e14b81f407b72",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/the-nash-philanthropist.zip",
+      "sha256": "cbe965a1f4d3c31eac8d33709c3eabf202d3160819de0345700bf1622ac9fcfe"
+    },
+    {
+      "archive_name": "cohort/downloads/the-tennessee-hospitality-group.zip",
+      "bytes": 252326,
+      "git_blob_oid": "9f937743055147de8f25fb4f2247a5ce443fe75c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/the-tennessee-hospitality-group.zip",
+      "sha256": "8bc508965757a713a2ce99bb465578114bee4a668d387613022de3cac92c56a2"
+    },
+    {
+      "archive_name": "cohort/downloads/threadwell-studio.zip",
+      "bytes": 252173,
+      "git_blob_oid": "10a2be2ba6d3d3e494b3d2ab055ef1c736bebeeb",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/threadwell-studio.zip",
+      "sha256": "10cc53097fa5f059dc6d8851839d9d7835e302d276272cfdab513da37901f18f"
+    },
+    {
+      "archive_name": "cohort/downloads/true-vena.zip",
+      "bytes": 252276,
+      "git_blob_oid": "2b3d4aa9ca35b9170ac29239845ec9115452e637",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/true-vena.zip",
+      "sha256": "903dd8114cf037cea18c9f38d32a231149fdc84483b3becbe1f481052c2e7cd7"
+    },
+    {
+      "archive_name": "cohort/downloads/ultra-beauty-supply-skin-and-nails.zip",
+      "bytes": 252202,
+      "git_blob_oid": "03410a169a4edc00db18f5ceefafdcb478b6f452",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/ultra-beauty-supply-skin-and-nails.zip",
+      "sha256": "5462f9a01ac93c11346de1c7ec0d06307b5bb2e9e5814ee795c612c35cd17596"
+    },
+    {
+      "archive_name": "cohort/downloads/unapologetically-me.zip",
+      "bytes": 252338,
+      "git_blob_oid": "75475694792972d46dfd34fdba2a6bd937f1194b",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/unapologetically-me.zip",
+      "sha256": "6159b5a2a3d40eaea954ce7a070b960f2b32ee23431a32f7c9d9e57fc1e6955e"
+    },
+    {
+      "archive_name": "cohort/downloads/validflo.zip",
+      "bytes": 251747,
+      "git_blob_oid": "f3a1d79c817d0540ba14181ae29f3881b30ca7e4",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/validflo.zip",
+      "sha256": "ab1a704255af91b9bf5bc6b721ae4ca8984edd73100f45261da81def3747af3a"
+    },
+    {
+      "archive_name": "cohort/downloads/volume-one-nashville.zip",
+      "bytes": 252000,
+      "git_blob_oid": "1a10a38e0b0d5a6518ab7fb44176ebc3ee635aff",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/volume-one-nashville.zip",
+      "sha256": "57f42ed65098669d61991426f099b558d54d6693115089cb88e2fe4980aa1fed"
+    },
+    {
+      "archive_name": "cohort/downloads/voxring.zip",
+      "bytes": 251827,
+      "git_blob_oid": "6782df74acdf0af6a1dd9baea4308a2b96c0c362",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/voxring.zip",
+      "sha256": "6e8c3ab2928e1b34d3ab13e3dd72166e82159ee96c1f8e29ca0c657b9b0646de"
+    },
+    {
+      "archive_name": "cohort/downloads/wednesday.zip",
+      "bytes": 251732,
+      "git_blob_oid": "d36e96ab47f3331d6ab11d9d98a1f31c18d2996a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/wednesday.zip",
+      "sha256": "da0b6f5f39338c2cc7888e07308a751f84882cf742b28960d0fa07fca8e43e0b"
+    },
+    {
+      "archive_name": "cohort/downloads/xi.zip",
+      "bytes": 251678,
+      "git_blob_oid": "efd7e1982a2efdd90d84578df90e0c7c80708535",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/xi.zip",
+      "sha256": "10b2ec1b2fbd4c29302c9eff68b902c33aa36dfc7464c6a4bd46a0f2d425e86b"
+    },
+    {
+      "archive_name": "cohort/downloads/yoamigo.zip",
+      "bytes": 251688,
+      "git_blob_oid": "7b19acdb5fb82bca8f5126c7bed97ce2b25a05e7",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/downloads/yoamigo.zip",
+      "sha256": "fd598553ddb63b87e1ea75990db286a8bc5b4abe6768f13f43520acbc49cad5a"
+    },
+    {
+      "archive_name": "cohort/directory.html",
+      "bytes": 27920,
+      "git_blob_oid": "1ee80310c524325bf812efd171dc67e9fd2a9248",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/directory.html",
+      "sha256": "e4bed4ce5e5b58d959e7ab2be95ab5e33560688d644eb59fb6e34f4273fb8461"
+    },
+    {
+      "archive_name": "cohort/members/aa-window-washing.html",
+      "bytes": 8505,
+      "git_blob_oid": "80014eb6d10b5f96d7f49f7fc69322853fddf51f",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/aa-window-washing.html",
+      "sha256": "f9b77bc2444e28bf621a45e41a85f5d371417a02abcca92f8bc00d549066276d"
+    },
+    {
+      "archive_name": "cohort/members/advia-solutions.html",
+      "bytes": 8431,
+      "git_blob_oid": "b37a854286767b6f66f37723f1326e1f6e65d76f",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/advia-solutions.html",
+      "sha256": "e56d6ce3aef567c056650177d8d6b6c8a4d7521d7be3a0e2208c1f1a810ed9ec"
+    },
+    {
+      "archive_name": "cohort/members/aegiskeep.html",
+      "bytes": 8460,
+      "git_blob_oid": "7cafac589c2c28b31a3150e935256728ccae802c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/aegiskeep.html",
+      "sha256": "dd01d73b0d929520c8179ee3632d093ae0c9f4bb011a532964b0bb182be4a4f3"
+    },
+    {
+      "archive_name": "cohort/members/aligned-strategy-partners.html",
+      "bytes": 8767,
+      "git_blob_oid": "e6f227a325685f61e39e2ac6caa422366b889788",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/aligned-strategy-partners.html",
+      "sha256": "9f18559d67f7774e7bf15a3b6c4a6a9f4b55da50a7ed58a17388a658903afcc4"
+    },
+    {
+      "archive_name": "cohort/members/amara-bitters.html",
+      "bytes": 8435,
+      "git_blob_oid": "11e409b058540b7d26877ad3898715c8c0e8f9b6",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/amara-bitters.html",
+      "sha256": "f117d71feb98993a4a9fc9bf790db053db64b4d37ac8b6c312a5ce9543f0806b"
+    },
+    {
+      "archive_name": "cohort/members/autarko.html",
+      "bytes": 8438,
+      "git_blob_oid": "0dec5492725f4c4e9dc67a3669d594af35d38c22",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/autarko.html",
+      "sha256": "340dd313833d5d276f030dfb6fa7740c35c5a71ca9eab4da641c8afb500c5973"
+    },
+    {
+      "archive_name": "cohort/members/bagel.html",
+      "bytes": 8241,
+      "git_blob_oid": "81d42f14d1b2a744af52c1a882f62e54b4ae38f2",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/bagel.html",
+      "sha256": "cefc8b4ec2b388577105d7e2f87733178bfdad22760b98b97df015af86086777"
+    },
+    {
+      "archive_name": "cohort/members/buyunrepped.html",
+      "bytes": 8600,
+      "git_blob_oid": "9f8728a3ee1d5a406b668bada64ad2bbfbc8df1e",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/buyunrepped.html",
+      "sha256": "e3862f84922d337e331a26601951d5ed78e2a86f278e05e108781f604d811596"
+    },
+    {
+      "archive_name": "cohort/members/c3-measures-registry.html",
+      "bytes": 9477,
+      "git_blob_oid": "f66e04b8ddc2782230c8ea71efd6ac9820b8f3d4",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/c3-measures-registry.html",
+      "sha256": "c09fd98f94a19837b6e225dde46e3dfef341a978ec73477375e798d8f6122753"
+    },
+    {
+      "archive_name": "cohort/members/claridense.html",
+      "bytes": 8293,
+      "git_blob_oid": "7ae30c54191706a69236e49e995d3cb0bfe17749",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/claridense.html",
+      "sha256": "ecba2fa697898bff0f1ce5b12453f5198cc7f1e9b7944feebcfe3ba0b84eac84"
+    },
+    {
+      "archive_name": "cohort/members/clark-wester-corporation.html",
+      "bytes": 8554,
+      "git_blob_oid": "ff159283a96b871ad295f89d3be6aa92c62188cf",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/clark-wester-corporation.html",
+      "sha256": "30eb87d4a290a57ad87a731e15e4e32a5dc6f5c00174d13dac0734b513a901d0"
+    },
+    {
+      "archive_name": "cohort/members/cog-learning-inc.html",
+      "bytes": 8482,
+      "git_blob_oid": "774e0883dd027133acc79fff91757c30cfd48f26",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/cog-learning-inc.html",
+      "sha256": "142cb189227054a85db6427645c39bfd16fef2370eeb75691def599985dc8b50"
+    },
+    {
+      "archive_name": "cohort/members/compounds-dev-inc.html",
+      "bytes": 8595,
+      "git_blob_oid": "61f049a005679811102a3bba288d2053d22e6065",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/compounds-dev-inc.html",
+      "sha256": "3ca4c5400768b18b4300f407a7a1e6af13ba02a3dfbc6aaeea2bfc0b048e635a"
+    },
+    {
+      "archive_name": "cohort/members/csh-hub.html",
+      "bytes": 8285,
+      "git_blob_oid": "3a391fe19bc8fdb135585f2719204193734d7edb",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/csh-hub.html",
+      "sha256": "72db6dd82409d4e32ac23be87e9d5b29db1cbc9788d9f58516cf1ea43a197aef"
+    },
+    {
+      "archive_name": "cohort/members/decre.html",
+      "bytes": 8350,
+      "git_blob_oid": "ada9465da8df82b73816c196a2b80699fe99bc28",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/decre.html",
+      "sha256": "d8bd545446f2d8e283d8c33be18ef7fb74e7f7f7af167358ceadeb2b1e1e7e9d"
+    },
+    {
+      "archive_name": "cohort/members/double-r-strategies-and-consulting.html",
+      "bytes": 8801,
+      "git_blob_oid": "6998cbba8d673ad6f7c4781f58961c51b990b32e",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/double-r-strategies-and-consulting.html",
+      "sha256": "134db4450db089e3569550fa23c092f97ddb977328f91d4b72228c16e6852bb2"
+    },
+    {
+      "archive_name": "cohort/members/dust-to-dust-llc.html",
+      "bytes": 8554,
+      "git_blob_oid": "881081a04594799595ad330c44d7b7369769de9d",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/dust-to-dust-llc.html",
+      "sha256": "1304b2e2606f7b4c8a26b9585b4a8b8c22ce35439fd0c88172a7aa31c52270a6"
+    },
+    {
+      "archive_name": "cohort/members/encompass-financial-services-inc.html",
+      "bytes": 9103,
+      "git_blob_oid": "f7d56594784999abcf2bc6f4ea09bef53605b12e",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/encompass-financial-services-inc.html",
+      "sha256": "309bce90019409890e912f9d1380d2cc61f5395d714aeb64101d3ed68cfc839b"
+    },
+    {
+      "archive_name": "cohort/members/excalis.html",
+      "bytes": 9045,
+      "git_blob_oid": "2a0e43ffba34e37f9b15e636c8b3486dffef9905",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/excalis.html",
+      "sha256": "666b6f6292cfcaa93c87bd6cd2252b77081b105c1b9f41991233ee61e572ad5c"
+    },
+    {
+      "archive_name": "cohort/members/firma-q-gaas.html",
+      "bytes": 8673,
+      "git_blob_oid": "98ad52ea14602f107a378f5ab4287097b9c97d3a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/firma-q-gaas.html",
+      "sha256": "b0342fc3f9c647c567308b9d07f9d9f8fecac6cd612e9a9c614ec017ed351e24"
+    },
+    {
+      "archive_name": "cohort/members/fizzy-mixology.html",
+      "bytes": 8405,
+      "git_blob_oid": "d0c3d5e72f06e68ebfb78090e392733af5a483d0",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/fizzy-mixology.html",
+      "sha256": "e139ea5132243f3d509bcf218e65dbc3e3d6cba496c0e0e94545d2153063139c"
+    },
+    {
+      "archive_name": "cohort/members/fox-force.html",
+      "bytes": 8494,
+      "git_blob_oid": "7fed8e721f9cefb90dc62723d6eaefa454467cf7",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/fox-force.html",
+      "sha256": "cf051a19ffeb2caed2962c4c4e42956f97f04822b2127b842ea0a0efede68296"
+    },
+    {
+      "archive_name": "cohort/members/glow-up-sports.html",
+      "bytes": 9142,
+      "git_blob_oid": "9fa93a03f21df5fa1eea355fcef46ccc4ac802d5",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/glow-up-sports.html",
+      "sha256": "c5d24644fa50c2e0ddeb584121c43bd42c282032f8efe0967706fb1d5728ae36"
+    },
+    {
+      "archive_name": "cohort/members/govfetchr-ai.html",
+      "bytes": 8609,
+      "git_blob_oid": "38cbf59171e2836d9f74e5135a589942d2695f27",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/govfetchr-ai.html",
+      "sha256": "8ddd8a7a506af1ab0e8d3482ab9dae0536c386794fdf26cb0a3844ab2ee0138c"
+    },
+    {
+      "archive_name": "cohort/members/gutless-topical-supplements.html",
+      "bytes": 9309,
+      "git_blob_oid": "c89dd5f9e9c3377ba9479b247dde02a089d4cbcc",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/gutless-topical-supplements.html",
+      "sha256": "9e56bac81fb0ce67a039dfb14f13b6973f86ba04e85470c2e871cf995eaf4f07"
+    },
+    {
+      "archive_name": "cohort/members/happy-overall.html",
+      "bytes": 9458,
+      "git_blob_oid": "578f8ea592cd1cf618c520a3659b00692acff663",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/happy-overall.html",
+      "sha256": "850b09f99a4206087446c6c30c16f3265b194d6bb7f34476d93ef4ab05991010"
+    },
+    {
+      "archive_name": "cohort/members/holastra.html",
+      "bytes": 8441,
+      "git_blob_oid": "a4e341ba74c440855a7bfc6ede50932e431ad3ca",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/holastra.html",
+      "sha256": "762f47a6fd449fedbce27072716abfee570c23391aa25e9151a4509cb32cdf3c"
+    },
+    {
+      "archive_name": "cohort/members/hopeconnect-health.html",
+      "bytes": 8933,
+      "git_blob_oid": "1f5e6f5fb6f5ea7f81f296dbe119d2cc4b7cf8b4",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/hopeconnect-health.html",
+      "sha256": "d037cdf127f0d5262a189a7cd3f1f4e21c4aa2830593e6bdb8abc64b6a6ed35e"
+    },
+    {
+      "archive_name": "cohort/members/hot-mess-inc.html",
+      "bytes": 9147,
+      "git_blob_oid": "2492c70425e36e06a28d80ff823b89fea65de1ba",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/hot-mess-inc.html",
+      "sha256": "6835c7d5292187120e8be82ae26159361c7309d4fe44e35343991f50f7f36bcc"
+    },
+    {
+      "archive_name": "cohort/members/incourage-enterprises.html",
+      "bytes": 8713,
+      "git_blob_oid": "4a35ffaee1507b64e4e92c789dbe8b0505f98b67",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/incourage-enterprises.html",
+      "sha256": "d3196b41e9992939a03f1c9af245d144980571f3225a04ef4fe313c5877bbbf9"
+    },
+    {
+      "archive_name": "cohort/members/itty-bitty-city.html",
+      "bytes": 8731,
+      "git_blob_oid": "4a41b8e986e90ca694ccda561ecb3eda8285ee7f",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/itty-bitty-city.html",
+      "sha256": "3a0b305fa382d3354e5187ad2622bb9d016dc103c87e2f73e6b71c2ec2b2e040"
+    },
+    {
+      "archive_name": "cohort/members/learnkairo.html",
+      "bytes": 8416,
+      "git_blob_oid": "b553aca15698623c42321aa14e85ebf63968a59b",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/learnkairo.html",
+      "sha256": "8672d5e88c9578c8fab0785ca07e74a7c54cea0c47605daa5a0007ac225ddf29"
+    },
+    {
+      "archive_name": "cohort/members/limer.html",
+      "bytes": 8340,
+      "git_blob_oid": "659da1474d30d3f1c560a5dfcabb134f3a8d477d",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/limer.html",
+      "sha256": "e88133abaa070043f03ea7a7309dea01e13a506cd110cfad32c3e76b516e520b"
+    },
+    {
+      "archive_name": "cohort/members/lode-labs.html",
+      "bytes": 8608,
+      "git_blob_oid": "4a8897cf53cb6ada0c5fb18e8f30fee80c3f32cd",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/lode-labs.html",
+      "sha256": "7fb0358e4398d28a43f6a802afa8d8ac3532866e0d1795fc533524b4fba8e760"
+    },
+    {
+      "archive_name": "cohort/members/lumencore.html",
+      "bytes": 8881,
+      "git_blob_oid": "8d7a7a3c4934e76ad84d1a0bbd9e77c70165b6f5",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/lumencore.html",
+      "sha256": "d70a4569cd5e06cbe658b17b6d281ae2d1f86b4efa30c9b97c25d785ed23bc1d"
+    },
+    {
+      "archive_name": "cohort/members/maaven.html",
+      "bytes": 8435,
+      "git_blob_oid": "26f3df776eefc593b9c93b2962830d16300d4e82",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/maaven.html",
+      "sha256": "be45342d577521a8bde7cdbb4f9721923ec52812c4d52515523b3d4f2f196d05"
+    },
+    {
+      "archive_name": "cohort/members/margaret-ray-interiors.html",
+      "bytes": 8805,
+      "git_blob_oid": "eded27f7afcbb937bfe4fc457449a13af51a5cc9",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/margaret-ray-interiors.html",
+      "sha256": "da7812740787bb0cc2e567236cc707eb238009577bfeb3c026503717e48670b0"
+    },
+    {
+      "archive_name": "cohort/members/moneybot.html",
+      "bytes": 8562,
+      "git_blob_oid": "850c1c25f1c98b22c9a73deb5bbfc1a318c3113a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/moneybot.html",
+      "sha256": "d7a940be4449da6215e20ca3533124d07267363e8cbd04aa3be29a1c5ff37ee1"
+    },
+    {
+      "archive_name": "cohort/members/music-utility-network.html",
+      "bytes": 8706,
+      "git_blob_oid": "d259d5ac1d0eee50e91c3ea02b510605e221ced2",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/music-utility-network.html",
+      "sha256": "cbbae18a9e068eae7148fe0d039bd100371e963af1c8478eba67546c4f6d96b4"
+    },
+    {
+      "archive_name": "cohort/members/obviecare.html",
+      "bytes": 8440,
+      "git_blob_oid": "da40882580d4a5bac1f7dde323987123c8915c9f",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/obviecare.html",
+      "sha256": "528e549191f7514ef7c2140a8d77246c9ef41ea27eb7235fc0fbdf5485be0b8a"
+    },
+    {
+      "archive_name": "cohort/members/paragon-parcels.html",
+      "bytes": 9094,
+      "git_blob_oid": "95adbd3ffbabff45a5f76de4ea7015db5fc0ffb5",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/paragon-parcels.html",
+      "sha256": "ae28d942247fd768b49fa7418e5f3015d0748db1bdd8ac21e9f7a36384e834e2"
+    },
+    {
+      "archive_name": "cohort/members/petrarch-strategy.html",
+      "bytes": 9338,
+      "git_blob_oid": "76f4bc80870dbc1264f782e0d67889c009e9088d",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/petrarch-strategy.html",
+      "sha256": "d40b2b141cf4e4160c1650eef101324404a3b5df0fa4c7966450794cfa07b8fd"
+    },
+    {
+      "archive_name": "cohort/members/proworx.html",
+      "bytes": 9344,
+      "git_blob_oid": "5a2b4146dff51f28025d97c5038563379e34b5a1",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/proworx.html",
+      "sha256": "dde9a8283498e614c3ade6ceddc36929fea33af5fae5b95ebc16045a9e22cce6"
+    },
+    {
+      "archive_name": "cohort/members/prsnt.html",
+      "bytes": 8433,
+      "git_blob_oid": "96fb0beed6e1fd09e432b493923f810f95c3dd39",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/prsnt.html",
+      "sha256": "92e06a3309f65c2fbea1430f37399481c3f90fe5dc532d00c4de43f921f4779e"
+    },
+    {
+      "archive_name": "cohort/members/ptln.html",
+      "bytes": 8319,
+      "git_blob_oid": "2ade4d8b08283b8c7245725ba5464a20faa32c91",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/ptln.html",
+      "sha256": "91c54ded9c4909b2b3ed97b85cb34181a27fe0c8da20f6a81c630bfa5f66b2cc"
+    },
+    {
+      "archive_name": "cohort/members/public-speaking-pros.html",
+      "bytes": 8916,
+      "git_blob_oid": "9fd9239e6b07dc84868b242894c181b26af04c2a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/public-speaking-pros.html",
+      "sha256": "e48b8d55e096d3c40b054cc13ace9c049219b7e14b894ffd308af4ed8748929d"
+    },
+    {
+      "archive_name": "cohort/members/recovery-matters.html",
+      "bytes": 8726,
+      "git_blob_oid": "3862fe9d46d0fbcfa2c4f74ca9f8c236ee0c3b6b",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/recovery-matters.html",
+      "sha256": "f04a4ac0cac020e80b84237d469dbdd07c5012d600054416da9be019c092a73c"
+    },
+    {
+      "archive_name": "cohort/members/remedy-haus.html",
+      "bytes": 8568,
+      "git_blob_oid": "c05aba4f0fd96598ada45f85a4747759b4f492d2",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/remedy-haus.html",
+      "sha256": "18ae1d73e19c499898619d00adb111487cebebaf6a948fe8ab7909dd85d92a17"
+    },
+    {
+      "archive_name": "cohort/members/renuiam.html",
+      "bytes": 8407,
+      "git_blob_oid": "cf7c7eefd43141fbc275a72e9ff6a65a74ff9745",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/renuiam.html",
+      "sha256": "41643f3956565e1e82a58b9ba33e031fba9b9da149305645a89369a7827dc1cc"
+    },
+    {
+      "archive_name": "cohort/members/scoreboardz-inc.html",
+      "bytes": 8620,
+      "git_blob_oid": "ef896377fe100e9c64f72faea54c796975eb8ed6",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/scoreboardz-inc.html",
+      "sha256": "f20d7d5eab7db3b1c66e217e46716818243d465a05735260f67c5f2d68b695c1"
+    },
+    {
+      "archive_name": "cohort/members/smr-pet-services.html",
+      "bytes": 8566,
+      "git_blob_oid": "2b7392d754990ee53a7170f5c5f5b3b6ec637698",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/smr-pet-services.html",
+      "sha256": "aea9f34fa67267e2062e165bdc02c17fefed2e6372cd71e59a4e7db29859a449"
+    },
+    {
+      "archive_name": "cohort/members/specinate.html",
+      "bytes": 8553,
+      "git_blob_oid": "3ca09f1e195df405040ab3f50f2e8bcd4b272400",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/specinate.html",
+      "sha256": "6c5fe2e832e4c1deef6199e68c4a42de83e36ce1a7acc6b6afd04051dfe560f1"
+    },
+    {
+      "archive_name": "cohort/members/spilburg-solutions.html",
+      "bytes": 9067,
+      "git_blob_oid": "663892d818d40b3b1a1cca12902012801bef50b6",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/spilburg-solutions.html",
+      "sha256": "47f0da169bb56d3d0dff94ad5f0eff1cf0525bb501acb3f5c9217e881d4de451"
+    },
+    {
+      "archive_name": "cohort/members/starra-llc.html",
+      "bytes": 8763,
+      "git_blob_oid": "461ba4a7a47fc70975da483e3a90ac7b5d77f602",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/starra-llc.html",
+      "sha256": "357a4ed5d20331cad14028767249b73542d27355873f0b894536e1565d58b31a"
+    },
+    {
+      "archive_name": "cohort/members/tarapy-inc.html",
+      "bytes": 8725,
+      "git_blob_oid": "b1edcf0fec459b21a7dc4b7d722a96016026655a",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/tarapy-inc.html",
+      "sha256": "59c1a35d376e03005771df84439ea69f295adf282dd60bc20291a06cb1f766db"
+    },
+    {
+      "archive_name": "cohort/members/the-37208.html",
+      "bytes": 8931,
+      "git_blob_oid": "6a755e567ec2314bbd3f6428130e87c157bd711b",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/the-37208.html",
+      "sha256": "5914fafcd63693521ca0f61175a8b7ecaaa71e05aaea93c63ac2399c2b7add7f"
+    },
+    {
+      "archive_name": "cohort/members/the-designery-nashville-south.html",
+      "bytes": 9712,
+      "git_blob_oid": "9b0b91d63fc61b1893317853cd4b302a137a583c",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/the-designery-nashville-south.html",
+      "sha256": "9454db51e41c0a891df04963a741981a6a937406743027791904d56a6e250495"
+    },
+    {
+      "archive_name": "cohort/members/the-nash-philanthropist.html",
+      "bytes": 8953,
+      "git_blob_oid": "4b24d685c6e497ab01949bca0827f075c8a19e93",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/the-nash-philanthropist.html",
+      "sha256": "89d5476708ba180d3f1be9697309a42c0fafa07599ae535c10955b5a0843416b"
+    },
+    {
+      "archive_name": "cohort/members/the-tennessee-hospitality-group.html",
+      "bytes": 9813,
+      "git_blob_oid": "0c907e7363912bfcc31c8707f63e3296a79fb9cb",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/the-tennessee-hospitality-group.html",
+      "sha256": "6c3d66a457bd5996ac853cfc3a36dd01fcb6a32d6c4fd705cfc090cb4f4b61b1"
+    },
+    {
+      "archive_name": "cohort/members/threadwell-studio.html",
+      "bytes": 9546,
+      "git_blob_oid": "d3fe3bc8fc09bcefb4fa2df5e37d090b954ce542",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/threadwell-studio.html",
+      "sha256": "6b9c6f7684e5d898f9748390e9413430c5bd952eb5996b52c1f60d75cffb5945"
+    },
+    {
+      "archive_name": "cohort/members/true-vena.html",
+      "bytes": 9040,
+      "git_blob_oid": "75a40a8af22eb6fbeef7201b889c81debb10ec5b",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/true-vena.html",
+      "sha256": "5a8e2970ee628ef7fc1e20ec23e0514d3ff5c88322419acf53bb3a0f4a43acf0"
+    },
+    {
+      "archive_name": "cohort/members/ultra-beauty-supply-skin-and-nails.html",
+      "bytes": 9466,
+      "git_blob_oid": "436ce297d0cd17b62144d03bcb21dfbda74c67b0",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/ultra-beauty-supply-skin-and-nails.html",
+      "sha256": "59905c6531ba04bcc925d3f56e516561afe969e9856f1a5c46a6a34f7934e767"
+    },
+    {
+      "archive_name": "cohort/members/unapologetically-me.html",
+      "bytes": 9160,
+      "git_blob_oid": "b8ea6a1201acdaae38fb5b84b8d962734037709e",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/unapologetically-me.html",
+      "sha256": "57add4802d75aad02d7c7daaf9d6c7d0f1670a5875262a4efb5741202c4841d1"
+    },
+    {
+      "archive_name": "cohort/members/validflo.html",
+      "bytes": 8632,
+      "git_blob_oid": "7b90bb9526a8489b5a1eaaf89fc78287e54b7dae",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/validflo.html",
+      "sha256": "351749cd5b93ecbe3e521add7ee6cd58322e147e9571e9d8da9457a0097dd296"
+    },
+    {
+      "archive_name": "cohort/members/volume-one-nashville.html",
+      "bytes": 8931,
+      "git_blob_oid": "d4ec192840fee380a69902ad1ce649f10d321d25",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/volume-one-nashville.html",
+      "sha256": "fad77e0356c1324f798f66f884d07010571456faa7f275dc5a2a91f0b41f073b"
+    },
+    {
+      "archive_name": "cohort/members/voxring.html",
+      "bytes": 8701,
+      "git_blob_oid": "560c26fd94908b3ae14c591c12cf53d88b17711d",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/voxring.html",
+      "sha256": "2c3666722c4f8871f452a54431471ae101170b7b072cb9ddc59e5bd32d40dd4c"
+    },
+    {
+      "archive_name": "cohort/members/wednesday.html",
+      "bytes": 8541,
+      "git_blob_oid": "33381fcc330fccbbb5a3fb2a3fb08a3e359e7cde",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/wednesday.html",
+      "sha256": "bc38830bf153bcf64f918a841226c3936b39ebabc9949a50a6e2919d9d04a5d6"
+    },
+    {
+      "archive_name": "cohort/members/xi.html",
+      "bytes": 8388,
+      "git_blob_oid": "8248f79de33b92f28cbc09c11ebb7b31c5b3c000",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/xi.html",
+      "sha256": "45ca388c31d9a6ba9a8fc3ca7b38c32d7af32572b114a2dbe936279795b6d744"
+    },
+    {
+      "archive_name": "cohort/members/yoamigo.html",
+      "bytes": 8537,
+      "git_blob_oid": "1e1dacea138d5eb0d104d1be12b88bd80193ffdf",
+      "install_mode": "0644",
+      "repo_path": "dashboard/cohort/members/yoamigo.html",
+      "sha256": "bdaab2a1f7f0c1029171a929b4d781d3d0a87769286007f1ebfc4616547481a1"
+    }
+  ],
+  "schema": "lumencore.public_site_release_manifest.v1",
+  "source_commit": "c3bddd48768a23acdce727246291d48a62984ed8",
+  "target_directory": "/opt/lumencore/dashboard"
+}

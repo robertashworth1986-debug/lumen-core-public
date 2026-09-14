@@ -506,6 +506,28 @@ The member runtime now checks a saved revision before updating its SQLite worksp
 The existing Measure & improve view now includes an optional offline energy evidence and constraint review. It preserves the full-batch calculator and records declared service equivalence, source timing, overhead, allowed changes, hard limits, uncertainty and fallback. A candidate can advance only to owner review; every result retains the baseline and disables actuation. Synthetic counterexamples cover net losses, uncertain constraints, missing evidence and binary arithmetic residue. This implements the recommendation-review portion of the research charter without a new dashboard or a performance experiment. Physical metrology, independently accepted results, owner participation, cohort redistribution and successful AI inference remain unestablished. Exact publication and validation receipts stay in the existing private review estate.
 
 
+## Public release reconciliation - 2026-09-14
+
+**Public release reconciliation (September 14, 2026):** The earlier source
+`5dbdf654` above was followed by successful deployments of `edd425de` and
+`30d81c6b902391300b561443e3fe57791f41aeaa`. The latest observed deployment is
+[run 34706387323](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/34706387323),
+whose authorization and deployment jobs succeeded and whose live gate matched
+189 files. The current main commit `c3bddd48768a23acdce727246291d48a62984ed8`
+has identical public dashboard bytes. A fresh read-only audit completed at
+`2026-09-14T06:56:08Z` matched all 189 hashes, declared byte counts, HTTP statuses
+and applicable MIME checks. Its incident classification is
+`NO_INCIDENT_OBSERVED`, decision `MONITOR`.
+
+The first comparison against the older `5dbdf654` reference matched 115 files;
+all 74 differences are explained by the later cohort release. Both observations
+and their source reconciliation are retained under
+`evidence/public-site-deployments/observations/20260914T065608Z/`.
+This establishes current point-in-time static release parity only. It is not
+independent evaluation, private/gateway runtime provenance, sustained
+availability, customer acceptance, revenue, savings, or investment valuation.
+No production mutation or external notification occurred in this review.
+
 ## EC portal cohort announcement - 2026-09-12
 
 Robert explicitly provided the signed-in EC portal route and requested delivery of the existing gift announcement. One group-scoped message was posted to TakeOff Fall 2026. The portal confirmed successful sending; the posted title, author, substantive body, public directory link and group recipient list were read back. This is the fourth scoped outbound under `ec-takeoff-strengths-resource`. No email group was retried and no new campaign was created.

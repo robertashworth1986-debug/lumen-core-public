@@ -74,6 +74,19 @@ Signed build provenance establishes workflow and artifact identity for the
 archive. It does not establish a SLSA level, whole-product security, or that the
 archive was deployed.
 
+## Live observation bounds - 2026-09-14
+
+The read-only live verifier rejects empty releases and validates every manifest
+row before requesting any URL. It bounds manifest input to 1 MiB, declared
+release content to 128 MiB and 1,000 files, and accepts only finite positive
+per-request timeouts up to 60 seconds. Each response read is limited to the
+declared file size plus one detection byte. An oversized or interrupted body
+produces an explicit error; a partial prefix is never presented as a complete
+body hash. A match requires the expected byte count as well as the SHA-256,
+HTTP status and applicable MIME check. The incident classifier independently
+checks the byte count before accepting a matching observation. These controls
+retain the v1 receipt format and do not authorize any production mutation.
+
 ## Local batching observation - 2026-09-14
 
 A paired first-party Windows build of the same 189 files at source commit

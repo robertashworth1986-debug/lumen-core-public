@@ -2,6 +2,7 @@
 /.github/workflows/institutional-readiness.yml text eol=lf
 /requirements-windows-ownership.txt text eol=lf
 /requirements-windows-ownership-py311.lock text eol=lf
+/evidence/public-site-deployments/observations/20260914T065608Z/*.json text eol=lf
 # Frozen supplemental NIC property generator and method.
 /code/hardware/nic_dpu_packet_pipeline_property_test.c text eol=lf
 /config/nic_dpu_packet_pipeline_property_protocol_v1.json text eol=lf
