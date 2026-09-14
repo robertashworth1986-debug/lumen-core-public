@@ -603,3 +603,15 @@ aliases withhold aggregates; malformed scorecard shapes and non-finite values
 remain controlled holds. Declared row presence is separate from verified
 measurement coverage. Extreme JSON exponents receive a controlled input error
 without replacing an existing report. These checks use synthetic records only.
+
+The existing cross-sector calculator is now explicitly a hardcoded scenario
+sensitivity tool. Four synthetic regressions reproduced a government-ready
+label on example data, runtime parameter rewriting, an assumed maximum promoted
+as a recommendation, and a zero-efficiency input replaced with a positive
+default. The corrected tool passes 33 focused checks, retains the hypothetical
+formula and examples, and writes only to an explicitly selected new scenario
+directory. It cannot append to shared evidence ledgers, update runtime settings
+or emit measured savings, operational failure times or investment readiness.
+The [existing cross-sector documentation](../code/execution/README_CROSS_SECTOR_INTEL.md)
+records the changed CLI contract and unreviewed legacy-consumer boundary.
+Historical source outputs and the original runtime remain unchanged.
