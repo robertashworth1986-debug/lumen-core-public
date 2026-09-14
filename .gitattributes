@@ -1,4 +1,12 @@
 *.sh text eol=lf
+# Canonical bytes for the offline ensemble evaluator and its synthetic example.
+/dashboard/run_ensemble_meta_strategy.py text eol=lf
+/dashboard/visualize_ensemble_results.py text eol=lf
+/code/hybrid_harmonic_strategies.py text eol=lf
+/code/hybrid_harmonic_algorithms.py text eol=lf
+/code/novel_harmonic_layers.py text eol=lf
+/tests/test_ensemble_walkforward_causality.py text eol=lf
+/examples/ensemble_research/** text eol=lf
 examples/proof_capsule/** text eol=lf
 
 # Canonical bytes for the bounded CODECHECK reviewer capsule.

@@ -33,6 +33,25 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 **Selection rule:** The first qualified party that agrees to a controlled dataset, incumbent baseline, prelocked metric and threshold, reporting format, failure rules, and one go/no-go decision becomes the single active external-validation lane. All other pilot outreach pauses.
 
+### Supporting offline research integrity
+
+**Offline ensemble research repair (September 14, 2026):** The existing
+`dashboard/run_ensemble_meta_strategy.py` now confines each signal call to the
+preceding input window, scores every next-row transition once, keeps reporting
+blocks independent of decisions, rejects malformed inputs and signals, and
+records explicit turnover-cost assumptions with buy-and-hold and cash
+comparators. The existing viewer requires a matching receipt and reconciled
+calculations, and labels the metric as an additive unitless research score.
+The retained 96-row synthetic fixture in `examples/ensemble_research/` provides
+31 scored transitions and a source-bound replay example. The focused
+51-check suite passed on Python 3.11.9, NumPy 2.3.5, pandas 2.3.3, pytest 9.1.0,
+and Plotly 6.3.0. These are first-party software checks on an isolated local
+branch; they do not establish deployment, alpha, market performance,
+independent validation, accepted buyer scope, revenue, or investment value.
+The controlling method and replay commands are in
+`docs/HARMONIC_VALIDATION_PROTOCOL.md`. Historical outputs and the fifteen
+component formulas remain retained; no live execution authority changed.
+
 ### Public runtime incident and recovery boundary
 
 **Latest verified point-in-time observation (August 10):** The committed
