@@ -87,6 +87,25 @@ per-file SHA-256 identities, captures bounded rollback material, and verifies
 the canonical live URLs byte-for-byte. It complements the automatic site
 maintenance workflow and does not authorize itself.
 
+## Connected research browser review - September 14, 2026
+
+The eight dated public research pages were rendered from the exact 189-file
+release for UI source `027d924f12c3c953dd1fb649582d76a6a4d3ddd8` at 1440x1000
+and 390x1000. All 16 renders returned HTTP 200 with one main heading, the dated
+review badge, the matching active workspace and no document-width overflow.
+The first mobile review found cramped strategy names. The existing generator
+now keeps tables with at least four columns 640 pixels wide inside their
+labeled, focusable scroll region. Print rendering removes that width floor.
+A focused region moved 40 pixels after ArrowRight and retained focus; the
+bottom-of-page source and evidence caveats remained readable.
+
+The [review receipt and selected screenshots](../evidence/public_research_review/20260914/BROWSER_QA.json)
+record the exact UI source, the 24 passing focused checks and local-preview
+limits. Missing `/health` and `/api/public/status` responses were expected in
+the static preview and displayed as GATEWAY OFFLINE. This review does not
+establish deployed byte parity, backend integration, private dashboard
+restoration or a full accessibility audit.
+
 ## Storage
 
 - Source code and canonical dashboard assets remain in the Git repository on C:.
