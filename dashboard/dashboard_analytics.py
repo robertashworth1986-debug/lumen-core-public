@@ -35,24 +35,37 @@ def plot_equity_curve(df: pd.DataFrame) -> None:
     return None
 
 
+def _pnl_chart(values):
+    try:
+        import plotly.graph_objects as go
+        import plotly.io as pio
+    except ModuleNotFoundError as exc:
+        if exc.name != 'plotly' and not str(exc.name).startswith('plotly.'):
+            raise
+        return '<p>Optional chart unavailable in this environment. Reported values remain in the record table.</p>'
+    figure = go.Figure(go.Bar(x=list(range(1, len(values) + 1)), y=values))
+    figure.update_layout(title='Reported net PnL by closed record (unverified)',
+                         xaxis_title='Closed record in supplied order', yaxis_title='Reported USD')
+    return pio.to_html(figure, full_html=False, include_plotlyjs=True, config={'responsive': True})
+
+
 def render_report(df: pd.DataFrame) -> str:
     report = _report(df)
-    sections = ['<h1>Reported Trade Diagnostics</h1>', '<p class="status">UNVERIFIED_RECORDS</p>',
+    sections = ['<h1>Reported Trade Diagnostics</h1>', '<p class="status" data-evidence="UNVERIFIED_RECORDS">Unverified supplied records</p>',
                 '<p>' + html.escape(report['boundary']) + '</p>', '<h2>Record summary</h2><dl>']
-    for key in ('record_count', 'closed_records', 'declared_mode', 'declared_currency',
-                'reported_net_pnl_sum_usd', 'win_rate_pct', 'sharpe', 'max_drawdown'):
-        sections.append(f'<dt>{html.escape(key.replace("_", " "))}</dt><dd>{html.escape(_reporter.display(report[key]))}</dd>')
+    labels = {'record_count': 'Supplied records', 'closed_records': 'Records marked closed',
+              'declared_mode': 'Reported mode', 'declared_currency': 'Reported currency',
+              'reported_net_pnl_sum_usd': 'Sum of reported net PnL (USD)',
+              'win_rate_pct': 'Positive closed records (%)', 'sharpe': 'Portfolio Sharpe ratio',
+              'max_drawdown': 'Account drawdown'}
+    for key, label in labels.items():
+        sections.append(f'<dt>{label}</dt><dd>{html.escape(_reporter.display(report[key]))}</dd>')
     sections.append('</dl><h2>Field coverage</h2><div class="scroll">')
     sections.append(pd.DataFrame(report['field_coverage']).T.to_html(escape=True, border=0) + '</div>')
     values = report['reported_pnl_by_closed_record']
     if values:
         # Only numeric values enter the embedded script; source strings remain escaped HTML.
-        import plotly.graph_objects as go
-        import plotly.io as pio
-        figure = go.Figure(go.Bar(x=list(range(1, len(values) + 1)), y=values))
-        figure.update_layout(title='Reported net PnL by closed record (unverified)',
-                             xaxis_title='Closed record in supplied order', yaxis_title='Reported USD')
-        sections.append(pio.to_html(figure, full_html=False, include_plotlyjs=True, config={'responsive': True}))
+        sections.append(_pnl_chart(values))
     sections.append('<h2>Limits</h2><ul>' + ''.join('<li>' + html.escape(reason) + '</li>' for reason in report['limitations']) + '</ul>')
     receipt = df.attrs.get('source_snapshot')
     if receipt:
@@ -64,7 +77,7 @@ def render_report(df: pd.DataFrame) -> str:
            'h1,h2{color:#123c59}dt{font-weight:700}dd{margin:0 0 12px}td,th{padding:8px;text-align:left}'
            'table{border-collapse:collapse}tr{border-bottom:1px solid #c9d3de}.scroll{overflow:auto}'
            '.status{background:#fff0cd;padding:12px}code{overflow-wrap:anywhere}')
-    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reported Trade Diagnostics</title><style>' + css + '</style></head><body>' + ''.join(sections) + '</body></html>'
+    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Reported Trade Diagnostics</title><style>' + css + '</style></head><body>' + ''.join(sections) + '</body></html>'
 
 
 def main() -> int:

@@ -212,6 +212,22 @@ def test_dashboard_escapes_supplied_labels_and_marks_unverified():
     assert '100000' not in markup
 
 
+def test_optional_plotly_absence_keeps_complete_table_report(monkeypatch):
+    import builtins
+    pd = pytest.importorskip('pandas')
+    dashboard = load('dashboard/dashboard_analytics.py', 'legacy_dashboard_no_plotly_test')
+    original = builtins.__import__
+    def without_plotly(name, *args, **kwargs):
+        if name.startswith('plotly'):
+            raise ModuleNotFoundError("No module named 'plotly'", name='plotly')
+        return original(name, *args, **kwargs)
+    monkeypatch.setattr(builtins, '__import__', without_plotly)
+    markup = dashboard.render_report(pd.DataFrame([row(net_pnl=-2.25)]))
+    assert 'Optional chart unavailable' in markup
+    assert '-2.25' in markup
+    assert 'Unknown / not established' in markup
+
+
 def test_scorecard_does_not_convert_unverified_diagnostics_to_green(monkeypatch):
     scorecard = load('code/BUILD_INSTITUTIONAL_METRICS_SCORECARD.py', 'legacy_scorecard_test')
     monkeypatch.setattr(scorecard, 'load_json', lambda *args: {})
