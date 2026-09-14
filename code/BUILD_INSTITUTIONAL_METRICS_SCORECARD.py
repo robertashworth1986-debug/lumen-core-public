@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(r"C:\LumaTrader\INSTITUTIONAL_STACK_V2")
+ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "out"
 EXEC = OUT / "execution"
 CONF = ROOT / "config"
@@ -152,7 +152,7 @@ def build_scorecard() -> dict[str, Any]:
     if edge_verdict == "FAIL":
         gaps.append("Edge truth guard is FAIL; champion likely overfit or insufficiently robust versus baseline.")
 
-    return {
+    payload = {
         "generated_utc": now_utc(),
         "readiness_tier": readiness_tier,
         "readiness_score": readiness_score,
@@ -205,6 +205,25 @@ def build_scorecard() -> dict[str, Any]:
             "edge_truth_report": str(EDGE_TRUTH),
         },
     }
+    # These legacy inputs contain no authenticated account-reconciliation or
+    # buyer-acceptance contract. A score assembled from them cannot authorize
+    # institutional promotion, even when all heuristic thresholds are met.
+    payload['legacy_heuristic_diagnostic'] = {
+        'score': readiness_score, 'tier': readiness_tier,
+        'boundary': 'Unverified legacy arithmetic only; not investment or production readiness.',
+    }
+    payload['readiness_tier'] = 'HOLD'
+    payload['readiness_score'] = None
+    payload['score_components'] = None
+    payload['trading_kpis'] = {key: None for key in payload['trading_kpis']}
+    payload['broker_reconciled'] = False
+    payload['investment_ready'] = False
+    payload['gaps'] = [
+        'Account performance is unknown: authenticated initial balances, external flows, fills, fees, and final balances are not reconciled here.',
+        'Source coverage and modeled opportunity amounts do not establish institutional investment readiness.',
+        'Use the existing buyer-owned baseline validation and acceptance gate for commercial decisions.',
+    ]
+    return payload
 
 
 def render_markdown(scorecard: dict[str, Any]) -> str:
@@ -215,18 +234,13 @@ def render_markdown(scorecard: dict[str, Any]) -> str:
     gaps = scorecard.get("gaps", [])
 
     lines = [
-        "# Institutional Metrics Scorecard",
+        "# Legacy Input Diagnostics - Investment Readiness Held",
         "",
         f"Generated UTC: {scorecard.get('generated_utc', 'n/a')}",
         f"Readiness Tier: {scorecard.get('readiness_tier', 'n/a')} | Score: {scorecard.get('readiness_score', 0)}",
         "",
         "## Trading KPIs",
-        f"- Equity USD: {as_float(t.get('equity_usd')):,.2f}",
-        f"- PnL USD: {as_float(t.get('pnl_total_usd')):,.2f}",
-        f"- Realized ROI %: {as_float(t.get('realized_roi_pct')):.4f}",
-        f"- Win Rate %: {as_float(t.get('win_rate_pct')):.2f}",
-        f"- Annualized Sharpe Proxy: {as_float(t.get('annualized_sharpe_proxy')):.4f}",
-        f"- Max Drawdown %: {as_float(t.get('max_drawdown_pct')):.2f}",
+        '- Equity, PnL, realized ROI, win rate, Sharpe, drawdown: Unknown / not reconciled',
         "",
         "## Research KPIs",
         f"- Top Test Sharpe: {as_float(r.get('top_test_sharpe')):.4f}",

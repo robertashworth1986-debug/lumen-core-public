@@ -1,6 +1,7 @@
 # Execution Optimization Tools
 
-This folder includes utility scripts for improving net profitability and investor reporting.
+This folder contains research and offline reporting utilities. Their presence or
+successful execution does not establish profitability or investment readiness.
 
 ## 1) Runtime threshold optimizer (`runtime_optimizer_optuna.py`)
 
@@ -18,9 +19,35 @@ c:/LumaTrader/INSTITUTIONAL_STACK_V2/.venv/Scripts/python.exe c:/LumaTrader/INST
 
 ---
 
-## 2) Investor performance report (`investor_performance_report.py`)
+## 2) Reported trade diagnostics (`investor_performance_report.py`)
 
-Builds investor-facing metrics from `trade_log.json`, including Sharpe/Sortino/Calmar/max drawdown and fee drag.
+The existing filename now emits `lumencore.reported_trade_diagnostics.v2`.
+It reads one byte-bound, SHA-256-identified JSON snapshot, reports record and
+field coverage, and computes descriptive arithmetic only when every included
+record supplies a complete compatible basis. It never promotes a sample to
+institutional quality based on its row count.
+
+Input is at most 16 MiB and 100,000 objects. Duplicate JSON keys and non-finite
+JSON numbers are rejected. Closed records require an explicit `CLOSED` status;
+duplicate IDs/content, unknown statuses, or missing/mixed mode hold aggregates.
+USD aggregates additionally require `currency: USD` on every closed record.
+Amounts must be finite, at most 1e15 in absolute value, and have at most 12
+decimal places. Conflicting aliases or incomplete coverage hold the whole
+affected metric. Labels and arithmetic are not source authentication.
+
+Sharpe, Sortino, Calmar, equity, drawdown, portfolio percentage return and
+unique executed-trade counts remain JSON `null`. Trade-event rows do not
+supply initial equity, external cash flows, regular return intervals, or
+broker reconciliation. The old 100,000 USD starting-capital fallback and
+252/365-per-trade annualization are removed. The dashboard entry point reuses
+this report and displays reported PnL per record, with no fabricated equity.
+
+Compatibility: old consumers must honor the new schema and nulls, rather than
+coercing unknowns to zero. The legacy institutional scorecard now explicitly
+holds investment-readiness promotion and leaves its account KPIs unknown.
+Other archived/legacy analytics, including the DuckDB pipeline below, are not
+upgraded or validated by this correction. Historical generated outputs remain
+unchanged and must not be treated as current v2 diagnostics.
 
 ### Investor Report Run
 

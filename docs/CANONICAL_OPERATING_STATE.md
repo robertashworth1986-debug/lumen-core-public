@@ -580,6 +580,18 @@ generated supplement with no reported invariant or sanitizer finding. The
 [existing NIC foundation](NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md)
 retains the correction, source-custody rules and exact claim boundary. This is
 host software evidence, not NIC/DPU hardware, independent validation or
-production authorization. Sixteen focused builder checks passed, including
+production authorization. Seventeen focused builder checks passed, including
 silent-sanitizer rejection, changed-source rejection and portable mirror
 manifest verification. The original frozen v1 records remain unchanged.
+
+The existing trade dashboard and investor-report entry point now share a
+bounded, source-identified record diagnostic. Missing/invalid fields, mixed
+declared modes and duplicate records cannot silently become a zero-loss or
+high-confidence investment result. Invented starting equity, per-trade
+annualization and row-count quality tiers are removed. The legacy scorecard
+holds institutional promotion and account KPIs until an actual reconciliation
+contract exists. Forty focused synthetic checks cover the correction; no
+private account or live ledger was executed or altered. This supports the
+existing buyer-review path without establishing alpha, revenue, account
+performance or external acceptance. Compatibility and remaining legacy-reader
+limits are in `code/execution/README_OPTIMIZATION_TOOLS.md`.
