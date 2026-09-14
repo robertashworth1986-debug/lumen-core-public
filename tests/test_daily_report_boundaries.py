@@ -177,7 +177,7 @@ def test_invalid_input_does_not_create_output(tmp_path):
 def test_legacy_caller_holds_without_retry_or_claiming_success(prior):
     # Execute only the selected function with inert fake dependencies. Never
     # import the credentialed legacy executor or launch a process.
-    source = ast.parse((ROOT / 'code/execution/alpaca_paper_executor_legacy.py').read_text())
+    source = ast.parse((ROOT / 'code/execution/alpaca_paper_executor.py').read_text())
     function = next(node for node in source.body if isinstance(node, ast.FunctionDef) and node.name == 'run_periodic_artifacts')
     fake_path = SimpleNamespace(exists=lambda: True)
     calls = []
@@ -193,3 +193,18 @@ def test_legacy_caller_holds_without_retry_or_claiming_success(prior):
         assert notes == ['report_refresh=held_explicit_snapshot_required',
                          'evidence_pack_refresh=held_legacy_financial_inputs_unreviewed']
     assert calls == []
+
+
+def test_canonical_facade_installs_publication_hold_before_legacy_exports():
+    source = ast.parse((ROOT / 'code/execution/alpaca_paper_executor.py').read_text())
+    binding = next(node for node in source.body if isinstance(node, ast.Assign)
+                   and any(isinstance(target, ast.Attribute) and isinstance(target.value, ast.Name)
+                           and target.value.id == '_legacy' and target.attr == 'run_periodic_artifacts'
+                           for target in node.targets))
+    held = object()
+    legacy = SimpleNamespace()
+    exec(compile(ast.Module(body=[binding], type_ignores=[]), '<isolated facade binding>', 'exec'),
+         {'_legacy': legacy, 'run_periodic_artifacts': held})
+    assert legacy.run_periodic_artifacts is held
+    export_loop = next(node for node in source.body if isinstance(node, ast.For) and ast.unparse(node.iter) == 'dir(_legacy)')
+    assert binding.lineno < export_loop.lineno

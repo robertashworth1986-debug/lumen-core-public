@@ -125,9 +125,13 @@ directory creation, and existing directories/files are never overwritten.
 An I/O failure during writing can leave a partial directory; a manifest is not
 a transactional-publication or decompression/CPU-sandbox guarantee.
 
-The old no-argument CLI exits 2. The legacy executor's implicit report and
+The old no-argument CLI exits 2. The canonical paper facade's implicit report and
 evidence-pack subprocess paths are held without launches or repeated retries;
 prior successful-refresh timestamps are retained and no success is claimed.
+The facade binds this hold into the preserved loop, as it already binds the
+exact-origin guards. Historical executor bytes and their order-safety policy
+digest remain unchanged. Direct execution of the historical file is outside
+this canonical facade correction and is not an approved invocation route.
 This does not validate the manually invoked pack's separate arithmetic or
 stale shared inputs. `alpaca_paper_loop_builder.py`,
 historical shared reports and `build_investor_evidence_pack.py` remain legacy

@@ -621,10 +621,11 @@ and new output directory. A synthetic probe reproduced invented starting
 capital, negative PnL and a mismatched one-day benchmark comparison from empty
 inputs, plus future records counted as recent. The replacement retains source
 hashes, fixed aware time windows, record-quality coverage and exact declared
-numeric inputs while withholding unreconciled financial KPIs. Fifty
+numeric inputs while withholding unreconciled financial KPIs. Fifty-one
 focused tests cover these boundaries and an AST-isolated scheduled caller:
-implicit report/package subprocesses are held without launches, retry loops
-or false success timestamps.
+the canonical paper facade holds report/package subprocesses without launches, retry loops
+or false success timestamps. The historical executor and its frozen policy
+digest are preserved; the facade binds the hold into the loop.
 The [existing reporting documentation](../code/execution/README_OPTIMIZATION_TOOLS.md)
 describes the intentional CLI change and remaining legacy collector/packaging
 paths. This supports buyer diligence without private account access, original
