@@ -537,6 +537,17 @@ process presence remains separate from application health. The
 records compatibility effects, direct-child cleanup limits and the absence of
 runtime activation. The original service processes and controls were not changed.
 
+The existing PowerShell stack manager now rejects substring/PID-only stop
+authority and shared-port takeover. It serializes mutations, preserves failed
+records, quotes Windows arguments explicitly, and records creation identity for
+its launch plus a verified venv child. Status is read-only. Incomplete capture
+and unknown ownership hold further control. The
+[production context](LUMA_PRODUCTION_CONTEXT.md#powershell-runtime-manager-ownership-corrected-september-14-2026)
+records the disposable native checks, migration limits, and the remaining
+nontransactional disk-publication and unrecorded-descendant boundaries. This
+strengthens delivery controls for the existing validation offer without changing
+the original runtime, execution authority, buyer acceptance, or revenue status.
+
 The NIC/DPU host reference builder now freezes the exact compilation inputs,
 requires its pinned primary compiler version, and tests its sanitizer compiler
 with deliberate heap-overflow and signed-overflow controls. The old Windows

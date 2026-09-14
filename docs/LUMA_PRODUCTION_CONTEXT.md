@@ -164,7 +164,8 @@ The existing runtime manager remains the operating path:
 code/ops/MANAGE_LOCAL_STACK.ps1 -Action status
 ```
 
-That manager's status action may maintain its local process registry; it is
+That manager's status action is now read-only and does not create runtime
+directories, rewrite its registry, or resolve a Python launch environment. It is
 not a scientific validation or an authorization to change execution controls.
 Any actual recovery must still establish current process identity, intended
 stack group, runtime controls, and post-action health separately.
@@ -239,6 +240,54 @@ API references: [Python process signals](https://docs.python.org/3.11/library/os
 [zero-timeout waits](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject),
 [creation times](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocesstimes),
 and [Windows command parsing](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-commandlinetoargvw).
+
+### PowerShell runtime manager ownership corrected September 14, 2026
+
+`code/ops/STACK_RUNTIME_MANAGER.ps1` keeps the existing service groups and
+`MANAGE_LOCAL_STACK.ps1` entry point. A small adjacent C# helper holds Windows
+process handles and compares creation FILETIME and executable path before any
+termination. All recorded members are checked before the first stop; the same
+held handles are used to stop and confirm exit. `-Force` does not authorize
+substring matching, adoption of a legacy PID, or killing the listener on port
+8787. Exact or ambiguous unregistered workers hold startup for review.
+
+New launches record schema `lumencore.managed_runtime_process.v2`. The initial
+process identity comes from the handle returned by `Process.Start`, not a later
+PID lookup. A Windows venv redirector may add one directly related Python child
+after exact command, executable, parent, and creation-time checks. Its initial
+receipt remains `capture_complete=false` until capture succeeds. An incomplete
+receipt cannot authorize reuse, force-start, or a purported complete stop.
+This covers the recorded launch and optional redirector pair, not arbitrary
+descendants or complete process-tree cleanup. No application-health or
+successful-business-work claim follows from process presence.
+
+The registry is bounded to 8 MiB, rejects malformed/null records and duplicate
+service names, and is replaced through a same-directory temporary file. An
+exclusive operating-system file lock serializes mutations. Status observes only;
+unknown and inaccessible identities remain explicit. Legacy records are not
+silently upgraded to owned records. A failed stop retains its record while the
+manager attempts the remaining requested services and returns failure.
+
+The Windows PowerShell 5.1 launch path uses `ProcessStartInfo`, per-child
+environment variables, and explicit Windows argument quoting. Native temporary
+fixtures verify spaces, quotes, an empty argument, trailing backslashes, base
+Python, and a venv child. Other checks cover registry failure, concurrent
+ownership, malformed registry arrays, legacy stop rejection, force-port holds,
+creation-identity mismatch, and incomplete capture. Test workers are disposable;
+the canonical runtime was not started, stopped, or reconfigured.
+
+Process creation and durable registry publication are not one transaction.
+The manager checks a registry write before launching, but a later disk failure
+can still leave an unregistered process. An observed matching process holds the
+next launch; no automatic rollback or recovery is claimed. The registry is a
+same-user operational record, not an authorization boundary against an attacker
+who can edit the manager or its records. CIM command visibility can also hold
+startup in a partly unreadable estate. These limits require operator review,
+not an automatic success label.
+
+References: [Windows process identity and parent reuse](https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-process),
+[CIM timestamp precision](https://learn.microsoft.com/en-us/windows/win32/wmisdk/cim-datetime),
+and [termination through an owned handle](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-terminateprocess).
 
 ## Grant Factory
 
