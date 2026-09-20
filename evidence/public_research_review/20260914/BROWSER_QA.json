@@ -1,0 +1,903 @@
+{
+  "schema": "lumencore.public_research_browser_review.v1",
+  "generated_utc": "2026-09-14T06:04:38.140805+00:00",
+  "original_pr_head": "a46d805a994ecbdae743514beb69f9e3c293fd0d",
+  "reviewed_ui_source_commit": "027d924f12c3c953dd1fb649582d76a6a4d3ddd8",
+  "release_file_count": 189,
+  "release_archive_sha256": "0d035979a52e614c9b8ae898ac61487e6627d10a648a0df0a1c706276a7cb633",
+  "exact_extracted_files_verified": true,
+  "environment": "Local static HTTP preview on Windows; Chrome controlled through Playwright CLI. No gateway backend was started or connected.",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "height": 1000
+    }
+  ],
+  "observed_issue": "On the original head, wide mobile research tables compressed strategy names into short fragments.",
+  "repair": "Existing generator gives tables with four or more columns a640px minimum width within the existing scroll region; print removes that minimum.",
+  "render_results": [
+    {
+      "slug": "mission_control",
+      "width": 1440,
+      "status": 200,
+      "title": "Mission Control | LumenCore",
+      "h1": [
+        "One connected view of the build."
+      ],
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Mission Control"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Dated source registry \u2014 2026-06-10"
+        },
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical selection and March 26, 2026 paper guardrail"
+        },
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Evidence-to-application workflow"
+        }
+      ],
+      "sources": 6,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/cohort/#grants",
+        "/opportunity_sprint.html",
+        "/proof_to_pilot.html",
+        "/"
+      ]
+    },
+    {
+      "slug": "mission_control",
+      "width": 390,
+      "status": 200,
+      "title": "Mission Control | LumenCore",
+      "h1": [
+        "One connected view of the build."
+      ],
+      "viewport": 390,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Mission Control"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 640,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Dated source registry \u2014 2026-06-10"
+        },
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 640,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical selection and March 26, 2026 paper guardrail"
+        },
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 320,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Evidence-to-application workflow"
+        }
+      ],
+      "sources": 6,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/cohort/#grants",
+        "/opportunity_sprint.html",
+        "/proof_to_pilot.html",
+        "/"
+      ]
+    },
+    {
+      "slug": "quant_lab",
+      "width": 1440,
+      "status": 200,
+      "title": "Quant Lab | LumenCore",
+      "h1": [
+        "Follow the research through every gate."
+      ],
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Quant Lab"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical selection and March 26, 2026 paper guardrail"
+        },
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        }
+      ],
+      "sources": 7,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "quant_lab",
+      "width": 390,
+      "status": 200,
+      "title": "Quant Lab | LumenCore",
+      "h1": [
+        "Follow the research through every gate."
+      ],
+      "viewport": 390,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Quant Lab"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 640,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical selection and March 26, 2026 paper guardrail"
+        },
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 320,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        }
+      ],
+      "sources": 7,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "kraken_execution_dashboard",
+      "width": 1440,
+      "status": 200,
+      "title": "Kraken Research & Execution Evidence | LumenCore",
+      "h1": [
+        "Real order records. Traceable research."
+      ],
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Kraken Research & Execution Evidence"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical order records"
+        },
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical selection and March 26, 2026 paper guardrail"
+        },
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        }
+      ],
+      "sources": 8,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "kraken_execution_dashboard",
+      "width": 390,
+      "status": 200,
+      "title": "Kraken Research & Execution Evidence | LumenCore",
+      "h1": [
+        "Real order records. Traceable research."
+      ],
+      "viewport": 390,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Kraken Research & Execution Evidence"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 640,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical order records"
+        },
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 640,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical selection and March 26, 2026 paper guardrail"
+        },
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 320,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        }
+      ],
+      "sources": 8,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "grants",
+      "width": 1440,
+      "status": 200,
+      "title": "Grant Factory | LumenCore",
+      "h1": [
+        "Turn evidence into reviewable applications."
+      ],
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Grant Factory"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Evidence-to-application workflow"
+        }
+      ],
+      "sources": 2,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/#grants",
+        "/opportunity_sprint.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/"
+      ]
+    },
+    {
+      "slug": "grants",
+      "width": 390,
+      "status": 200,
+      "title": "Grant Factory | LumenCore",
+      "h1": [
+        "Turn evidence into reviewable applications."
+      ],
+      "viewport": 390,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Grant Factory"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 320,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Evidence-to-application workflow"
+        }
+      ],
+      "sources": 2,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/#grants",
+        "/opportunity_sprint.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/"
+      ]
+    },
+    {
+      "slug": "forecast",
+      "width": 1440,
+      "status": 200,
+      "title": "Forecast Research | LumenCore",
+      "h1": [
+        "A forecast needs a fair comparison."
+      ],
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Forecast Research"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        },
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical selection and March 26, 2026 paper guardrail"
+        }
+      ],
+      "sources": 7,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "forecast",
+      "width": 390,
+      "status": 200,
+      "title": "Forecast Research | LumenCore",
+      "h1": [
+        "A forecast needs a fair comparison."
+      ],
+      "viewport": 390,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Forecast Research"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 320,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        },
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 640,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical selection and March 26, 2026 paper guardrail"
+        }
+      ],
+      "sources": 7,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "anomalies",
+      "width": 1440,
+      "status": 200,
+      "title": "Anomaly & Source Review | LumenCore",
+      "h1": [
+        "Keep data health beside the result."
+      ],
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Anomaly & Source Review"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Dated source registry \u2014 2026-06-10"
+        },
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        }
+      ],
+      "sources": 5,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "anomalies",
+      "width": 390,
+      "status": 200,
+      "title": "Anomaly & Source Review | LumenCore",
+      "h1": [
+        "Keep data health beside the result."
+      ],
+      "viewport": 390,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Anomaly & Source Review"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 640,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Dated source registry \u2014 2026-06-10"
+        },
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 320,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        }
+      ],
+      "sources": 5,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "explain",
+      "width": 1440,
+      "status": 200,
+      "title": "Evidence Explainer | LumenCore",
+      "h1": [
+        "Understand what each result establishes."
+      ],
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Evidence Explainer"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        },
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical order records"
+        }
+      ],
+      "sources": 5,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "explain",
+      "width": 390,
+      "status": 200,
+      "title": "Evidence Explainer | LumenCore",
+      "h1": [
+        "Understand what each result establishes."
+      ],
+      "viewport": 390,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Evidence Explainer"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 320,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        },
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 640,
+          "role": "region",
+          "tabindex": "0",
+          "label": "Historical order records"
+        }
+      ],
+      "sources": 5,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "lab",
+      "width": 1440,
+      "status": 200,
+      "title": "Research & Proof Lab | LumenCore",
+      "h1": [
+        "Carry the build into a bounded review."
+      ],
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Research & Proof Lab"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 1174,
+          "scrollWidth": 1174,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        }
+      ],
+      "sources": 4,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    },
+    {
+      "slug": "lab",
+      "width": 390,
+      "status": 200,
+      "title": "Research & Proof Lab | LumenCore",
+      "h1": [
+        "Carry the build into a bounded review."
+      ],
+      "viewport": 390,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "datedBadge": "READ-ONLY REVIEW \u00b7 DATED EVIDENCE",
+      "mode": "PUBLIC",
+      "gateway": "GATEWAY OFFLINE",
+      "activeWorkspace": [
+        "Research & Proof Lab"
+      ],
+      "tables": [
+        {
+          "visibleWidth": 320,
+          "scrollWidth": 320,
+          "role": "region",
+          "tabindex": "0",
+          "label": "From exploratory research to a bounded claim"
+        }
+      ],
+      "sources": 4,
+      "internalLinks": [
+        "/mission_control.html",
+        "/quant_lab.html",
+        "/kraken_execution_dashboard.html",
+        "/grants.html",
+        "/forecast.html",
+        "/anomalies.html",
+        "/explain.html",
+        "/lab.html",
+        "/cohort/",
+        "/build_week/prooflock_console/",
+        "/external_review.html",
+        "/evidence/",
+        "/proof_to_pilot.html",
+        "/",
+        "/opportunity_sprint.html"
+      ]
+    }
+  ],
+  "keyboard_check": {
+    "route": "quant_lab.html",
+    "viewport_width": 390,
+    "focused_region": "Historical selection and March26,2026 paper guardrail",
+    "arrow_right_scroll_left_before": 0,
+    "arrow_right_scroll_left_after": 40,
+    "table_width": 640,
+    "region_width": 320,
+    "focus_retained": true
+  },
+  "manual_visual_review": "All eight desktop/mobile page starts reviewed; wide-table comparison and bottom-of-page evidence/source caveats reviewed. The narrow table retains horizontal scrolling and readable strategy cells.",
+  "preview_limits": [
+    "HTTP404 for /health and /api/public/status is expected on this static-only preview; PUBLIC and GATEWAY OFFLINE remained displayed.",
+    "The initial missing favicon is a preview asset observation, not a gateway or application failure.",
+    "No live-domain byte parity, backend integration, screen-reader audit, private dashboard restoration or deployment approval is claimed."
+  ],
+  "focused_validation": {
+    "passed": 24,
+    "source_builder_check": "all8pagesmatch",
+    "tests": [
+      "test_public_legacy_route_holds.py",
+      "test_canonical_surface_design.py",
+      "test_active_surface_security.py"
+    ]
+  },
+  "retained_screenshots": [
+    {
+      "path": "pr219-quant-mobile-table-keyboard.png",
+      "bytes": 54890,
+      "sha256": "23d6d2f18ef9f42b65f6867ebbb2d5f7183279bf46c0d0ef8ee2f639143acff1"
+    },
+    {
+      "path": "pr219-final-quant-mobile-table-left.png",
+      "bytes": 68380,
+      "sha256": "718befcd3142ff3ffaf5f8700188daba44fb43650be6f911b6e86bc50a4c6dcf"
+    },
+    {
+      "path": "pr219-final-quant-mobile-table-end.png",
+      "bytes": 65335,
+      "sha256": "d0afe6f3dfd9eeb042297e0a8b7d841b79fa46ca8f0fb9f27772e5941dc18ffb"
+    }
+  ],
+  "additional_screenshots": "Full-page and viewport screenshots for all16renders retained in the local review workspace; not all are included in this public receipt."
+}

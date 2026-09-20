@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-19T14:19:16.519238Z",
+  "generated_at_utc": "2026-09-14T06:24:00.587420Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -460,9 +460,9 @@
             "path": "dashboard/kraken_execution_dashboard.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "b38a6937cd358728e1a8582a6d63f4a77a60e2ef",
-            "bytes": 2678,
-            "sha256": "257d70645eb0e4b9f260cc63960a8c9636f8af25f8ac0447f27232f705fa56be"
+            "git_blob_sha": "49a3c9157ee85290718d27bd95a2eedf12ac9dc0",
+            "bytes": 13825,
+            "sha256": "b4c191ed7fa7def95a504017f45c6bac02e7c39a415029d2e76a531271db2075"
           }
         ]
       }
@@ -527,9 +527,9 @@
             "path": "dashboard/mission_control.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "b7610d5813309f7d12fd53780416a99eb1a321c2",
-            "bytes": 2642,
-            "sha256": "0997a57b814aef0cc79fec467dda3a299a7c7aa3fac1bb2e95c0ceb3576b6063"
+            "git_blob_sha": "4225caa3467872b7d8adcf17188983edd4817fab",
+            "bytes": 13730,
+            "sha256": "405d889fa02c1fe5f151cd084a5ced12ab46ad0d941d337518f1093890540fee"
           }
         ]
       }
@@ -687,9 +687,9 @@
             "path": "dashboard/quant_lab.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "2c06181fe9120626b3bd126efa20531226d6f1f2",
-            "bytes": 2633,
-            "sha256": "7b611e05ac53f0908ae3c29f1f499badd3e9fc49f42bd60b701a3a835aedf64c"
+            "git_blob_sha": "e7339892f75c2c7233731dbb6a09cf15075852f4",
+            "bytes": 11839,
+            "sha256": "22a026f91904403308b2dca4cbd04d82e27679c06a8ab7f3d557656197c42501"
           }
         ]
       }
@@ -879,9 +879,9 @@
             "path": "dashboard/mission_control.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "b7610d5813309f7d12fd53780416a99eb1a321c2",
-            "bytes": 2642,
-            "sha256": "0997a57b814aef0cc79fec467dda3a299a7c7aa3fac1bb2e95c0ceb3576b6063"
+            "git_blob_sha": "4225caa3467872b7d8adcf17188983edd4817fab",
+            "bytes": 13730,
+            "sha256": "405d889fa02c1fe5f151cd084a5ced12ab46ad0d941d337518f1093890540fee"
           }
         ]
       }
@@ -972,9 +972,9 @@
             "path": "dashboard/grants.html",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "3378ab04089c020580c99aa223e9c95a5a2d457c",
-            "bytes": 2638,
-            "sha256": "58abca9e8d0ed8e52d0b386c75e8978310b21a9a7b10335b4710b4f0a0b09f1f"
+            "git_blob_sha": "1579c62474e8dea0653d6cb5043f0c896325a041",
+            "bytes": 9150,
+            "sha256": "2aa0d1a94dbe500833c49542e4f80a6f27a6ed2756f2e9dc214f66d44662c417"
           }
         ]
       }
@@ -992,6 +992,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "983084f99486bc94023686241ecb48ea4a7d6a2880bd5aa6cd978c3d46c4d271"
+    "payload_sha256": "894adf8392b032122ea1426d5ee1bc6eb76851ae3f7a73a35eaff216031965df"
   }
 }
