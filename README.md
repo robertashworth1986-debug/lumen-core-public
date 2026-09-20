@@ -1,12 +1,31 @@
-![LumenCore Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,50:00ffe7,100:7928ca&height=220&section=header&text=LumenCore%E2%84%A2&fontSize=72&fontColor=ffffff&fontAlignY=38&desc=Proof-to-Pilot%20AI%20%C2%B7%20Replay%20Validation%20%C2%B7%20Founder-Owned%20Architecture&descSize=18&descAlignY=62&animation=fadeIn)
+# LumenCore™
 
-# LumenCore™ — Proof-to-Pilot Assurance Architecture
+## AI decisions, backed by inspectable proof.
 
-**Robert Ashworth** | Founder / Systems Architect | LumenCore™
+**Proof-to-pilot AI infrastructure validation**
+Robert Ashworth · Founder / Systems Architect
 
-LumenCore turns complex-system claims into bounded, inspectable evidence packages: authorized source, accepted baseline, locked metric, controlled replay or evaluation, hash manifest, result, limitations, and next-pilot decision.
+LumenCore helps a buyer compare a forecasting, routing, or infrastructure
+candidate against an accepted baseline under rules agreed before scoring.
+ProofLock packages the result, failures, provenance, and decision gates into a
+hash-verifiable record a reviewer can inspect and replay.
 
-The public repository is a review surface. It is not a certification, an audited revenue report, a field-savings claim, or an outside grant of rights to founder-owned intellectual property.
+[**Reviewer overview →**](docs/REVIEWER_START_HERE.md) ·
+[**Investor brief →**](INVESTOR_BRIEF.md) ·
+[**Run the verifier →**](QUICKSTART.md) ·
+[**Live website →**](https://lumen-core.ai/)
+
+| Inspect the foundation | Open the evidence | Read the result correctly |
+|---|---|---|
+| **Proof Capsule v3** | [Executable verifier and adversarial tests](QUICKSTART.md) | Implemented first-party schema, custody, and claim-gate checks. |
+| **3 replay suites · 31 assertions** | [Pinned July 21 computation receipt](evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json) | First-party reproduction; non-author execution remains pending. |
+| **43-file named release** | [August 12 deployment receipt](docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-12.md) | Recorded 43/43 byte matches for `1ce7c359`; today's live parity requires a fresh check. |
+| **14 assurance controls** | [Evidence-linked standards crosswalk](docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md) | Selected NIST, OWASP, and SLSA themes with explicit control states and remaining gates. |
+
+**Ready now:** non-confidential technical fit review and buyer-specific scoping.
+**Next milestone:** qualified external execution and one buyer-owned validation.
+The public record does not yet establish independent validation, customer
+revenue, field savings, or certification. Production remains **HOLD**.
 
 ## Commercial entry offer
 
@@ -23,36 +42,22 @@ Work begins only after written agreement on data rights, scope, acceptance,
 payment, IP, and decision authority. A neutral or failed result remains a valid
 deliverable.
 
-## Start here
+## Choose your review path
 
-**[Open the Canonical Evidence Index](EVIDENCE_INDEX.md)**
+| Your question | Start here | Then inspect |
+|---|---|---|
+| What does the company do, and what is the next commercial milestone? | [Investor brief](INVESTOR_BRIEF.md) | [Buyer-owned validation offer](docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md) |
+| What can I verify myself? | [Reviewer overview](docs/REVIEWER_START_HERE.md) | [Canonical Evidence Index](EVIDENCE_INDEX.md) and [QUICKSTART](QUICKSTART.md) |
+| How mature are the controls? | [Readiness dossier](docs/INSTITUTIONAL_READINESS_DOSSIER.md) | [Assurance crosswalk](docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md) and [repository security](docs/REPOSITORY_SECURITY_ASSURANCE.md) |
+| What supports the release and recovery claims? | [Exact deployment receipt](docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-12.md) | [Supply-chain guide](docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md), [signed receipt](docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md), and [incident plan](docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md) |
 
-**[Open the Reviewer Start Here page](docs/REVIEWER_START_HERE.md)**
+The evidence index separates merged implementation, dated demonstrations,
+first-party reproduction, external-review readiness, and commercial gates.
+Historical experiments and superseded pull requests remain available as lineage.
+Use the current canonical route for a present-day decision.
 
-**[Open the Institutional Readiness Dossier](docs/INSTITUTIONAL_READINESS_DOSSIER.md)**
-
-**[Open the Institutional Assurance Crosswalk](docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md)**
-
-**[Open the Incident Response and Continuity Plan](docs/INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)**
-
-**[Open the Public Site Supply-Chain Assurance guide](docs/PUBLIC_SITE_SUPPLY_CHAIN_ASSURANCE.md)**
-
-**[Open the retained Signed-Attestation Receipt](docs/PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md)**
-
-**[Open the exact Public-Site Deployment Receipt](docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-09.md)**
-
-**[Open the Repository Security Assurance guide](docs/REPOSITORY_SECURITY_ASSURANCE.md)**
-
-The index is the canonical evidence map. The reviewer page gives the shortest human path. The index identifies:
-
-- what is merged into the default branch;
-- what is a deployed demonstration;
-- which benchmark is first-party reproducible;
-- which package is prepared for independent execution;
-- which pull requests are canonical, stacked, or superseded;
-- which external, field, and commercial gates remain open.
-
-A reviewer should not infer current truth by reading every historical or draft pull request independently.
+<details>
+<summary><strong>Read the assurance and release boundaries</strong></summary>
 
 The readiness dossier is the procurement and assurance control map. It says
 which controls are implemented first-party, which are only documented or
@@ -72,19 +77,21 @@ with severity, affected surfaces, containment, recovery, and explicit human
 authorization boundaries. It is a documented first-party control with CI
 exercises—not proof of a completed live restoration or an enterprise SLA.
 
-The public-release supply-chain lane creates deterministic CycloneDX 1.6
-coverage for all 43 allowlisted public files, including proof-first pages,
+For the named August 12 release, the public-release supply-chain lane created
+deterministic CycloneDX 1.6 coverage for all 43 allowlisted public files, including proof-first pages,
 ProofLock assets, and noindex legacy-route HOLD stubs. Pull requests produce unsigned
 verification artifacts; successful `main` builds separately create and verify
 GitHub OIDC/Sigstore provenance and SBOM attestations for the exact archive.
 The first retained successful signed set is bound to commit
-`5fff567c11bee65b5b1de5415d8b8935cd2dfab0`. The current named deployed public
+`5fff567c11bee65b5b1de5415d8b8935cd2dfab0`. The named August 12 public
 release, commit `1ce7c35975a4011fa844e8b39ccbc950c8c0f398`, contains 43
 allowlisted files and has first-party receipts for constrained attestation
 verification, human-gated deployment, 43-of-43 exact live-byte verification,
 rollback capture, and a separate read-only post-deployment audit. The earlier
 deployed release `e513f65a` remains in the append-only receipt history, and
-public security-header verification remains a separate bounded control. These
+public security-header verification remains a separate bounded control. Later
+releases may have different inventories; the retained August receipt is not a
+claim about the current live deployment. These
 are static-release results—not a whole-product or VPS SBOM, a SLSA level,
 external validation, or production authorization for the broader platform.
 
@@ -92,6 +99,8 @@ Repository source and declared dependency changes are separately covered by
 pinned CodeQL, pull-request dependency review, and weekly update proposals.
 These are first-party controls, not a vulnerability-free claim, penetration
 test, security certification, runtime scan, or deployment authorization.
+
+</details>
 
 ## Five-minute technical path
 
@@ -263,5 +272,3 @@ Review, discussion, repository access, comments, introductions, or proposed serv
 ---
 
 *Founder-owned. Evidence before claims. Bounded light speed.*
-
-![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:7928ca,100:00ffe7&height=120&section=footer&text=lumen-core.ai%20%C2%B7%20Evidence%20before%20claims&fontSize=16&fontColor=ffffff&fontAlignY=65)
