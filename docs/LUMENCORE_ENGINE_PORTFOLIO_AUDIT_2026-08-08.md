@@ -1,6 +1,6 @@
 # LumenCore Engine Portfolio Audit
 
-Generated at: `2026-08-19T14:19:16.519238Z`
+Generated at: `2026-09-09T00:50:00Z`
 
 ## Reviewer decision
 
@@ -178,7 +178,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 - Strategic packet SHA-256: `358855ad9d44ee72ef460ad70b46448a82f327a0c536d9253d3fad84590c4ad7`
 - Evidence graph SHA-256: `cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05`
-- Portfolio payload SHA-256: `983084f99486bc94023686241ecb48ea4a7d6a2880bd5aa6cd978c3d46c4d271`
+- Portfolio payload SHA-256: `62d1024a4a22d89e314a51ae0505ecee665294904fa32e15167197d477ef02ba`
 - Public contact: <https://lumen-core.ai/proof_to_pilot.html>
 
 ## Boundaries

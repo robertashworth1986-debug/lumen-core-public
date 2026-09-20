@@ -1,73 +1,138 @@
-# ProofLock Opportunity Sprint — Customer Acquisition Playbook
+# LumenCore Buyer-Owned Validation — Customer Acquisition Playbook
 
-## Positioning
+**Reconciled:** 2026-09-09
 
-**ProofLock helps small technology firms decide whether to pursue one funding opportunity and preflight the package before proposal week consumes them.**
+**Active outcome:** One external validation or paid-pilot conversion.
 
-Do not lead with the full LumenCore ecosystem, harmonic theory, dashboard count, or internal trading results. Lead with one expensive buyer problem: teams waste days on opportunities that later fail an eligibility, evidence, attachment, authority, or submission gate.
+**Controlling records:** [Canonical operating state](CANONICAL_OPERATING_STATE.md),
+[outreach registry](../config/outreach_registry_v1.json), and
+[claim boundaries](CLAIM_BOUNDARY_REGISTER.md).
 
-## Competitive answer
+## Positioning and first fit
 
-If a prospect asks, "Why not have our AI review it?", answer plainly:
+LumenCore helps a technical decision owner compare one candidate against an
+accepted baseline under rules fixed before scoring, then returns a replayable
+decision record. ProofLock is the evidence layer for this single primary offer.
 
-> Use your AI for drafting. ProofLock is the governed layer around the draft: exact official sources and amendments, client-confirmed facts, evidence-to-claim mapping, missing-fact abstention, package and authority gates, acceptance criteria, and a replayable decision receipt. You are buying an accountable bounded handoff, not access to a chatbot.
+The existing portfolio identifies infrastructure baseline, drift, anomaly, and
+evidence-packet tooling as the first market lane. A useful initial question is
+whether a candidate detects agreed historical or injected failures at an
+accepted false-alert rate. This is a scoping direction, not a demonstrated
+buyer outcome or authorization to connect to production.
 
-Do not claim this is better until buyer evidence exists. The first three completed sprints must measure hours to decision, late blockers found, rework avoided, and whether the resulting record was usable by the buyer's reviewer.
+Prefer the existing qualified review conversation. Confirm the buyer's problem,
+decision owner, lawful source, incumbent, primary metric, useful-by date, and
+purchasing route through the
+[non-confidential fit intake](LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md).
+Keep unknown facts `UNKNOWN`. Describe data and restrictions without requesting
+confidential datasets or credentials during this first check.
 
-## Ideal first buyers
+If asked how the work differs from an AI-generated report, explain the concrete
+deliverable: the accepted comparator, pre-run contract, source and dependency
+manifests, matched execution, failure register, offline verification, and
+bounded decision. Any claim that this reduces effort, improves performance, or
+changes a purchasing decision requires measured buyer evidence.
 
-1. U.S. small technology firms with prior SBIR/STTR or federal R&D awards and a small proposal team.
-2. Grant and federal-contract consultants who need a traceable qualification and package-preflight layer for client work.
-3. Small federal subcontractors pursuing adjacent R&D, energy, infrastructure, AI, data, or advanced-manufacturing work.
-4. Incubators, APEX counselors, and accelerators that can refer companies but do not themselves need to buy the sprint.
+## Canonical commercial scope
 
-## Disqualifiers
+Use the [canonical offer](LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md) and its
+[machine-readable registry](../config/bounded_validation_sprint_v1.json).
 
-- No official opportunity source.
-- Buyer expects guaranteed eligibility, award, or agency acceptance.
-- Buyer will not identify a decision owner or provide truthful eligibility facts.
-- Required work includes unapproved certifications, signatures, portal submission, or invented evidence.
-- Deadline is too close for a bounded review and the buyer will not reduce scope.
+| Tier | Proposed price | Bounded starting scope |
+|---|---:|---|
+| Launch Replay | $7,500 | One authorized source, one baseline, one primary metric, one held-out window, one Proof Capsule, one briefing |
+| Standard Sprint | $15,000 | Up to three held-out windows, one controlled reviewer rerun, offline verifier, technical and executive briefings |
+| Institutional Sprint | Starting at $25,000 | Up to two sources and two baselines, buyer-owned holdout, two reruns, integration workshop, procurement-ready handoff |
 
-## First campaign: 25 named prospects, not bulk advertising
+These remain pricing hypotheses. The offer registry does not establish tested
+buyer pricing, completed legal review, or a signed first paid scope. Commercial
+terms propose 50% at signed scope and 50% on delivery of the agreed packet;
+government invoicing and acceptance follow the controlling procurement
+instrument. Confirm buyer-specific terms in the
+[SOW template](LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md).
 
-- 10 prior SBIR/STTR awardees in a relevant technical lane.
-- 5 specialist grant or federal-contract consultants.
-- 5 small federal technology contractors with repeat awards.
-- 5 warm Tennessee/Nashville, APEX, lab, accelerator, or founder-network introductions.
+## One-buyer acquisition and delivery sequence
 
-For each prospect, record the exact reason they may have this problem, the official source for that inference, the named person or role, the date contacted, and the next permitted follow-up date. Do not scrape or publish private contact data.
+1. Complete the existing fit intake. Return `scope_candidate`, `needs_facts`,
+   `needs_separate_controls`, or `no_fit`; a positive result is not promised.
+2. For a `scope_candidate`, draft the existing SOW with the agreed source,
+   rights, candidate, baseline, metric, threshold, holdout, failure rules,
+   reporting format, allowed claims, decision owner, fee, and acceptance terms.
+3. Record required procurement and vendor-onboarding steps privately. Work
+   begins only under accepted written scope or a controlling purchase
+   instrument, completed applicable handling controls, and confirmation of any
+   required initial payment.
+4. Before scoring, bind the approved evaluation contract to the exact input,
+   code/model, configuration, dependency, baseline, and holdout versions. Verify
+   that the proposed buyer comparison can actually be executed within scope.
+5. Execute the matched evaluation, preserve negative and incomplete outcomes,
+   and use the existing Proof Capsule and verifier paths. A schema/custody pass
+   alone does not reproduce a metric or establish that rules were fixed before
+   scoring. Retain the pre-run approval and execution evidence separately.
+6. Perform the included reviewer rerun, if any, record discrepancies, and brief
+   the decision owner on `promote`, `rerun`, `external_review`, `hold`, or
+   `reject`. Record delivery and acceptance against the written conditions.
+7. Propose a later paid scope only when the buyer identifies the next decision.
+   Public use of a buyer name, logo, testimonial, or result requires the
+   applicable written permission and claim review.
 
-## Outreach message
+The first qualified party accepting a controlled source, baseline, metric,
+threshold, reporting format, failure rules, and one decision becomes the single
+active validation lane under the canonical operating state. Other pilot
+outreach pauses. No new prospect-count campaign or advertising spend is
+authorized by this playbook.
 
-Subject: `A fixed-scope preflight for one funding opportunity`
+## Draft fit question
 
-> I built ProofLock for small technical teams that lose proposal time to late eligibility, evidence, attachment, and authority surprises. For one official opportunity, the $3,500 sprint produces a source register, pursue/no-pursue brief, package outline, blocker ledger, and replayable decision record. It does not promise eligibility or an award and leaves final certification and submission with your team. If you have one real deadline, send the official link and the decision you need to make; I will confirm fit before invoicing.
+Use only within an authorized existing conversation after checking its current
+state; this text is a draft, not send approval.
 
-## Sales sequence
+> What is the one decision you need to make, which incumbent should we compare
+> against, and what metric and threshold would make the result useful? Please
+> describe the available source and its restrictions without sending raw data.
+> We can use those facts to scope one bounded replay and a decision packet that
+> preserves failures and limitations.
 
-1. Prospect supplies one official opportunity link and intake facts.
-2. LumenCore performs a short fit check without making eligibility or award claims.
-3. Both parties accept the one-page scope and handling boundary in writing.
-4. Issue the $1,750 kickoff invoice.
-5. Start only after the deposit clears and the required inputs are available.
-6. Deliver the bounded sprint and review unresolved facts with the decision owner.
-7. Issue the $1,750 balance invoice before final handoff.
-8. Request a testimonial only about the workflow outcome actually observed.
+External communication remains subject to the operating contract, exact
+action-time approval, fresh Sent/thread duplicate check, and outreach preflight.
+Keep buyer identity, private materials, invoices, and purchasing details out of
+the public repository. A receipt, invitation, review, or proposed scope does
+not establish a customer, partnership, paid pilot, revenue, or validation.
 
-## Advertising rule
+## Stop or reduce scope
 
-Do not buy broad ads until at least three buyers have completed the sprint and the real buying language, objections, delivery effort, and measurable outcomes are known. Initial acquisition should be direct and source-specific.
+- The buyer cannot identify source rights, an accepted comparator, or a decision
+  owner.
+- The metric, threshold, or holdout would be selected after seeing the outcome.
+- The required data or access exceeds the standard offer's approved boundary.
+- The buyer expects guaranteed improvement, ROI, eligibility, award, or
+  certification, or asks for failures to be concealed.
+- The candidate interface or deadline cannot support a fair matched evaluation
+  within the agreed resources.
 
-## Metrics
+## Private operating measures
 
-- Qualified conversations per 25 named prospects.
-- Scopes requested and accepted.
-- Deposit invoices issued and paid.
-- Days from first contact to paid kickoff.
-- Delivery hours and gross margin per sprint.
-- Decisions changed from pursue to hold/stop or from uncertain to pursue.
-- Material blockers discovered before proposal assembly.
-- Repeat or referral work.
+Track completed fit facts, scopes requested and accepted, payment receipts,
+days to authorized kickoff, delivery hours, direct delivery costs, acceptance
+defects, reviewer discrepancies, and the buyer's recorded decision. Invoice
+creation is distinct from cleared payment; payment and revenue recognition
+must follow the controlling agreement and accounting record.
 
-Never convert these workflow metrics into an award-rate, savings, or eligibility claim without an appropriate independently reviewed protocol.
+These measures help test whether the service is repeatable and economically
+viable. They do not establish savings, profitable autonomous operation, award
+rates, external validation, or market acceptance by themselves.
+
+## Superseded funding-workflow hypothesis
+
+Before this 2026-09-09 reconciliation, this file proposed a separate $3,500
+ProofLock Opportunity Sprint, two $1,750 invoices, and a 25-prospect campaign
+across awardees, consultants, contractors, and warm introductions. Those were
+commercial hypotheses; this file supplies no executed-sale or outcome evidence
+for them. They are superseded as current pricing and acquisition instructions.
+
+The useful workflow idea remains as a supporting LumenGov lane: preserve
+official opportunity sources, client-confirmed facts, missing-fact abstention,
+evidence-to-claim mapping, and package/authority checks. Any buyer-requested
+evaluation of that workflow must use the canonical intake and scope. Funding
+stays a deadline queue under the operating contract; it does not create a
+second product or authorize fresh outreach or submission.
