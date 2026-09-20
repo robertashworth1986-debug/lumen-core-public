@@ -1,0 +1,107 @@
+{
+  "schema": "lumencore.sha256_manifest.v1",
+  "generated_utc": "2026-09-14T05:48:40.313267+00:00",
+  "entries": [
+    {
+      "path": "property_compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "property_run.log",
+      "bytes": 104,
+      "sha256": "1428eefffdd7f10fda2883972f008a65aa3bcb979f8e026969ca8bda3352cec9"
+    },
+    {
+      "path": "RECEIPT.json",
+      "bytes": 8875,
+      "sha256": "235a7014e0da7a9dd54fff4c3c7960b4b074bb6ceaaf21dab97d1f174bd93756"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 2045,
+      "sha256": "38ad4f8f26308410502bf27efc9daa8d8b138ede7511781a24b9a9239e60e530"
+    },
+    {
+      "path": "sanitizer_controls/address_compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "sanitizer_controls/address_positive_control.c",
+      "bytes": 166,
+      "sha256": "e8ef6b6151b791fd0e076e7219222b518db6fca67aa1c495c10f7419c5716ed4"
+    },
+    {
+      "path": "sanitizer_controls/address_run.log",
+      "bytes": 3258,
+      "sha256": "cf5618ee78ae1f17211cde61eb6dff0f29a9a737fb309bbf817d705cd4f0903b"
+    },
+    {
+      "path": "sanitizer_controls/undefined_compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "sanitizer_controls/undefined_positive_control.c",
+      "bytes": 122,
+      "sha256": "c3eafc0e7e560dd4f7f2cb1aa4d6cc74fa96c75b78580f555d7643700807a193"
+    },
+    {
+      "path": "sanitizer_controls/undefined_run.log",
+      "bytes": 575,
+      "sha256": "4cc817135917453da270e88c6baabf69d915d533c4d5dc20875e6d28ea24abef"
+    },
+    {
+      "path": "sources/code/hardware/nic_dpu_packet_pipeline.c",
+      "bytes": 6489,
+      "sha256": "a80603b43c3cadb7be75c8abc94f93c4704d8ef5a192b158fad376d304025266"
+    },
+    {
+      "path": "sources/code/hardware/nic_dpu_packet_pipeline.h",
+      "bytes": 2122,
+      "sha256": "38ce84440ef1d0206871e1e3bf38ded77de9e6c110f53f23834275045808e5e2"
+    },
+    {
+      "path": "sources/code/hardware/nic_dpu_packet_pipeline_property_test.c",
+      "bytes": 6622,
+      "sha256": "b276533a4024ee006c3a0bb4f6fa6fc0af9f0b480fcf8a4456f99218918e21ec"
+    },
+    {
+      "path": "sources/code/hardware/nic_dpu_packet_pipeline_test.c",
+      "bytes": 7418,
+      "sha256": "9a8d2abf791a439bf36aca2481cefa0dc53caa9dc8b6100146d38a8381a990fb"
+    },
+    {
+      "path": "sources/code/ops/BUILD_NIC_DPU_PACKET_PIPELINE_EVIDENCE.py",
+      "bytes": 27608,
+      "sha256": "c917b43db71ee9c9cf418eb60139f14c4e1fe2beafd3259c238c4bed10a896fa"
+    },
+    {
+      "path": "sources/config/nic_dpu_packet_pipeline_property_protocol_v1.json",
+      "bytes": 2282,
+      "sha256": "e3360ed3d0673e085593ba73888ff9cdbdfeb1f1ff06fbeee9cc051217418df4"
+    },
+    {
+      "path": "sources/config/nic_dpu_packet_pipeline_protocol_v1.json",
+      "bytes": 2127,
+      "sha256": "8cabf617a22ddf829f76c96f428b858c66c08badca94bd545f32261f3571f090"
+    },
+    {
+      "path": "sources/docs/NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md",
+      "bytes": 7491,
+      "sha256": "8f700a819542d34875420b91f5c9ead73ccc03f9de898cdb10193c245dd88b3a"
+    },
+    {
+      "path": "sources/README.md",
+      "bytes": 16486,
+      "sha256": "33e0dd408b47b1a57e39481704acfd4b9bb11e3118f5ec8739d4cb4c1287b241"
+    },
+    {
+      "path": "sources/tests/test_nic_dpu_packet_pipeline.py",
+      "bytes": 10517,
+      "sha256": "6fa272cc508717326ac93a6e10ffa844827970152d1ec39c9a8d35327a1e6531"
+    }
+  ],
+  "entry_count": 20
+}

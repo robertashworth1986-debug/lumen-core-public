@@ -16,6 +16,12 @@ import pytest
 
 ROOT = Path(__file__).resolve().parent
 
+# Retained source bytes are custody artifacts, not another active test suite.
+# Their live counterparts remain collected normally from tests/.
+collect_ignore_glob = [
+    "evidence/hardware/nic_dpu_packet_pipeline_20260914/**/sources/tests/*.py",
+]
+
 ARTIFACT_DEPENDENT_TESTS = {
     "tests/test_eia_grid_wave_champion_benchmark.py::test_frozen_eia_panel_and_result_manifests_are_hash_valid_and_claim_safe": (
         ROOT / "data/live_measured/eia_grid_validation/eia_grid_validation_panel_latest.json",

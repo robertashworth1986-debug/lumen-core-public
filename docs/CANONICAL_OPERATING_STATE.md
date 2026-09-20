@@ -52,6 +52,37 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 **Selection rule:** The first qualified party that agrees to a controlled dataset, incumbent baseline, prelocked metric and threshold, reporting format, failure rules, and one go/no-go decision becomes the single active external-validation lane. All other pilot outreach pauses.
 
+### Supporting offline research integrity
+
+**Offline ensemble research repair (September 14, 2026):** The existing
+`dashboard/run_ensemble_meta_strategy.py` now confines each signal call to the
+preceding input window, scores every next-row transition once, keeps reporting
+blocks independent of decisions, rejects malformed inputs and signals, and
+records explicit turnover-cost assumptions with buy-and-hold and cash
+comparators. The existing viewer requires a matching receipt and reconciled
+calculations, and labels the metric as an additive unitless research score.
+The retained 96-row synthetic fixture in `examples/ensemble_research/` provides
+31 scored transitions and a source-bound replay example. The focused
+51-check suite passed on Python 3.11.9, NumPy 2.3.5, pandas 2.3.3, pytest 9.1.0,
+and Plotly 6.3.0. These are first-party software checks on an isolated local
+branch; they do not establish deployment, alpha, market performance,
+independent validation, accepted buyer scope, revenue, or investment value.
+The controlling method and replay commands are in
+`docs/HARMONIC_VALIDATION_PROTOCOL.md`. Historical outputs and the fifteen
+component formulas remain retained; no live execution authority changed.
+
+**Legacy operational evidence repair (September 14, 2026):** The dashboard's
+file-presence checklist now reports unverified implementation inventory,
+and the watchdog reports bounded UTC log observations rather than inferred
+process health. The legacy text-triggered full-stack restart loop is retired;
+the existing runtime manager remains the separate operating path. The status
+driver now preserves collector failures and log-issue exit codes, and the old
+example-proof command delegates to the corrected explicit-input evaluator.
+Twenty-seven focused checks passed, including PowerShell tests with harmless
+stub collectors. This is local source/test evidence, not runtime activation,
+successful recovery, functional acceptance, or compliance certification.
+The operational contract is recorded in `docs/LUMA_PRODUCTION_CONTEXT.md`.
+
 ### Public runtime incident and recovery boundary
 
 **Latest verified point-in-time observation (August 10):** The committed
@@ -494,8 +525,140 @@ The member runtime now checks a saved revision before updating its SQLite worksp
 The existing Measure & improve view now includes an optional offline energy evidence and constraint review. It preserves the full-batch calculator and records declared service equivalence, source timing, overhead, allowed changes, hard limits, uncertainty and fallback. A candidate can advance only to owner review; every result retains the baseline and disables actuation. Synthetic counterexamples cover net losses, uncertain constraints, missing evidence and binary arithmetic residue. This implements the recommendation-review portion of the research charter without a new dashboard or a performance experiment. Physical metrology, independently accepted results, owner participation, cohort redistribution and successful AI inference remain unestablished. Exact publication and validation receipts stay in the existing private review estate.
 
 
+## Public release reconciliation - 2026-09-14
+
+**Public release reconciliation (September 14, 2026):** The earlier source
+`5dbdf654` above was followed by successful deployments of `edd425de` and
+`30d81c6b902391300b561443e3fe57791f41aeaa`. The latest observed deployment is
+[run 34706387323](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/34706387323),
+whose authorization and deployment jobs succeeded and whose live gate matched
+189 files. The current main commit `c3bddd48768a23acdce727246291d48a62984ed8`
+has identical public dashboard bytes. A fresh read-only audit completed at
+`2026-09-14T06:56:08Z` matched all 189 hashes, declared byte counts, HTTP statuses
+and applicable MIME checks. Its incident classification is
+`NO_INCIDENT_OBSERVED`, decision `MONITOR`.
+
+The first comparison against the older `5dbdf654` reference matched 115 files;
+all 74 differences are explained by the later cohort release. Both observations
+and their source reconciliation are retained under
+`evidence/public-site-deployments/observations/20260914T065608Z/`.
+This establishes current point-in-time static release parity only. It is not
+independent evaluation, private/gateway runtime provenance, sustained
+availability, customer acceptance, revenue, savings, or investment valuation.
+No production mutation or external notification occurred in this review.
+
 ## EC portal cohort announcement - 2026-09-12
 
 Robert explicitly provided the signed-in EC portal route and requested delivery of the existing gift announcement. One group-scoped message was posted to TakeOff Fall 2026. The portal confirmed successful sending; the posted title, author, substantive body, public directory link and group recipient list were read back. This is the fourth scoped outbound under `ec-takeoff-strengths-resource`. No email group was retried and no new campaign was created.
 
 The cohort announcement requirement is complete for group posting. Individual notification delivery, reads, owner adoption, six actual customer conversations, baselines and measured results remain unconfirmed. The prior waiting-for-distribution checkpoint is superseded by this verified portal event; other external dependencies remain. Exact portal identifiers, displayed recipients, message text and delivery evidence are retained in the existing private E-drive review estate. Continue substantive replies in that thread or follow new explicit founder direction; do not repost the announcement.
+
+## Founder-directed local evidence repairs - 2026-09-14
+
+The existing public-release packager and supply-chain reader now fetch a
+bounded, immutable Git snapshot in one batch instead of spawning Git for every
+file. A reproduced replacement-object case no longer substitutes content under
+the original pinned identity. A paired 189-file Windows observation retained
+identical archive and manifest bytes while reducing 379 Git calls to 4 and
+38.4701 seconds to 2.0684 seconds. The
+[existing release protocol](PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md#local-batching-observation---2026-09-14)
+records the exact source, limits and first-party measurement boundary.
+
+These changes support the existing buyer-validation delivery path. They do not
+close owner acceptance, external evaluation, revenue, hardware validation or
+deployment gates. The original working checkout and its running services were
+preserved; repair commits are being reviewed in an isolated worktree.
+
+The existing Python supervisor now uses passive Windows process observations,
+an operating-system singleton lock, exact command matching with bounded venv
+redirector handling, and explicit unknown states. Automatic shared-port killing
+is disabled. Startup and shutdown checks use isolated disposable processes;
+process presence remains separate from application health. The
+[production context](LUMA_PRODUCTION_CONTEXT.md#supervisor-process-ownership-corrected-september-14-2026)
+records compatibility effects, direct-child cleanup limits and the absence of
+runtime activation. The original service processes and controls were not changed.
+
+The existing PowerShell stack manager now rejects substring/PID-only stop
+authority and shared-port takeover. It serializes mutations, preserves failed
+records, quotes Windows arguments explicitly, and records creation identity for
+its launch plus a verified venv child. Status is read-only. Incomplete capture
+and unknown ownership hold further control. The
+[production context](LUMA_PRODUCTION_CONTEXT.md#powershell-runtime-manager-ownership-corrected-september-14-2026)
+records the disposable native checks, migration limits, and the remaining
+nontransactional disk-publication and unrecorded-descendant boundaries. This
+strengthens delivery controls for the existing validation offer without changing
+the original runtime, execution authority, buyer acceptance, or revenue status.
+
+The NIC/DPU host reference builder now freezes the exact compilation inputs,
+requires its pinned primary compiler version, and tests its sanitizer compiler
+with deliberate heap-overflow and signed-overflow controls. The old Windows
+Zig combined-flag path did not detect the heap fault; its ASAN assurance is
+withdrawn for that reproduced environment. A verified portable Clang rerun
+passed both controls, all seven vectors and the unchanged 500,000-iteration
+generated supplement with no reported invariant or sanitizer finding. The
+[existing NIC foundation](NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md)
+retains the correction, source-custody rules and exact claim boundary. This is
+host software evidence, not NIC/DPU hardware, independent validation or
+production authorization. Seventeen focused builder checks passed, including
+silent-sanitizer rejection, changed-source rejection and portable mirror
+manifest verification. The original frozen v1 records remain unchanged.
+
+The existing trade dashboard and investor-report entry point now share a
+bounded, source-identified record diagnostic. Missing/invalid fields, mixed
+declared modes and duplicate records cannot silently become a zero-loss or
+high-confidence investment result. Invented starting equity, per-trade
+annualization and row-count quality tiers are removed. The legacy scorecard
+holds institutional promotion and account KPIs until an actual reconciliation
+contract exists. Fifty-nine focused synthetic checks cover the correction; no
+private account or live ledger was executed or altered. This supports the
+existing buyer-review path without establishing alpha, revenue, account
+performance or external acceptance. Compatibility and remaining legacy-reader
+limits are in `code/execution/README_OPTIMIZATION_TOOLS.md`.
+
+The follow-up preserves exact decimal monetary totals as JSON strings and
+retains source field absence through the dashboard's DataFrame conversion.
+Changed frames cannot reuse their prior source receipt. Conflicting identity
+aliases withhold aggregates; malformed scorecard shapes and non-finite values
+remain controlled holds. Declared row presence is separate from verified
+measurement coverage. Extreme JSON exponents receive a controlled input error
+without replacing an existing report. These checks use synthetic records only.
+
+The existing cross-sector calculator is now explicitly a hardcoded scenario
+sensitivity tool. Four synthetic regressions reproduced a government-ready
+label on example data, runtime parameter rewriting, an assumed maximum promoted
+as a recommendation, and a zero-efficiency input replaced with a positive
+default. The corrected tool passes 33 focused checks, retains the hypothetical
+formula and examples, and writes only to an explicitly selected new scenario
+directory. It cannot append to shared evidence ledgers, update runtime settings
+or emit measured savings, operational failure times or investment readiness.
+The [existing cross-sector documentation](../code/execution/README_CROSS_SECTOR_INTEL.md)
+records the changed CLI contract and unreviewed legacy-consumer boundary.
+Historical source outputs and the original runtime remain unchanged.
+
+The legacy daily-report entry point now requires an explicit local snapshot
+and new output directory. A synthetic probe reproduced invented starting
+capital, negative PnL and a mismatched one-day benchmark comparison from empty
+inputs, plus future records counted as recent. The replacement retains source
+hashes, fixed aware time windows, record-quality coverage and exact declared
+numeric inputs while withholding unreconciled financial KPIs. Fifty-one
+focused tests cover these boundaries and an AST-isolated scheduled caller:
+the canonical paper facade holds report/package subprocesses without launches, retry loops
+or false success timestamps. The historical executor and its frozen policy
+digest are preserved; the facade binds the hold into the loop.
+The [existing reporting documentation](../code/execution/README_OPTIMIZATION_TOOLS.md)
+describes the intentional CLI change and remaining legacy collector
+paths. This supports buyer diligence without private account access, original
+runtime activation, financial performance or independent acceptance claims.
+
+The existing investor evidence packager now requires a caller-selected source
+directory, explicit bounded relative file list and new output directory. A
+synthetic redirected-root probe reproduced missing/malformed inputs promoted as
+zero performance, duplicate records counted as separate profitable trades, and
+different source bytes hashed versus archived. The correction captures selected
+bytes once and uses them for both manifest and ZIP; financial metrics remain
+unknown. Forty-nine focused checks and the combined daily/order-facade checks
+pass. The elite optimizer holds its implicit pack step, does not advertise a
+stale shared ZIP and rejects native step failures. This advances the existing
+external-validation/paid-pilot handoff; it does not validate the packaged source
+claims, grant distribution rights, or establish financial performance. The
+original runtime and historical executor bytes remain unchanged.

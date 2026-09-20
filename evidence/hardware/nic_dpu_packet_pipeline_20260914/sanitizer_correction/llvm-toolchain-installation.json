@@ -1,0 +1,14 @@
+{
+  "release": {
+    "tag": "20260908",
+    "name": "llvm-mingw 20260908 with LLVM 23.1.1",
+    "published_at": "2026-09-08T20:31:08Z",
+    "asset": "llvm-mingw-20260908-ucrt-x86_64.zip",
+    "bytes": 190677197,
+    "digest": "sha256:1bcf74d06b724aeecaa6412ca85f5b26fb1da770e7cdcefa9263c9c5c3ad34b6",
+    "url": "https://github.com/mstorsjo/llvm-mingw/releases/download/20260908/llvm-mingw-20260908-ucrt-x86_64.zip"
+  },
+  "archive_sha256": "1bcf74d06b724aeecaa6412ca85f5b26fb1da770e7cdcefa9263c9c5c3ad34b6",
+  "installed_root": "C:\\LumaTrader\\_toolchains\\llvm-mingw-20260908-ucrt-x86_64",
+  "scope": "isolated portable compiler; no PATH, registry, service or application changes"
+}

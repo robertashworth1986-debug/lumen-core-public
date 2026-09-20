@@ -9,6 +9,7 @@ fails before any authenticated request when an override is not exactly paper.
 from __future__ import annotations
 
 import os
+import math
 import sys
 import time
 from pathlib import Path
@@ -181,9 +182,27 @@ class AlpacaPaperClient(_legacy.AlpacaPaperClient):
         return {}
 
 
+def run_periodic_artifacts(paper_runtime: dict, state: dict, now_ts: float) -> tuple[float, float, list[str]]:
+    """Hold implicit financial publication while preserving the historical source."""
+    # The daily diagnostic requires an explicit snapshot; the old pack consumes
+    # unreconciled shared inputs. Do not repeatedly spawn incompatible commands.
+    def prior_success(name):
+        value = state.get(name)
+        try:
+            number = float(value)
+            return number if not isinstance(value, bool) and math.isfinite(number) and number >= 0 else 0.0
+        except (TypeError, ValueError, OverflowError):
+            return 0.0
+    return prior_success('last_report_refresh_ts'), prior_success('last_evidence_pack_refresh_ts'), [
+        'report_refresh=held_explicit_snapshot_required',
+        'evidence_pack_refresh=held_legacy_financial_inputs_unreviewed',
+    ]
+
+
 # The preserved main loop resolves these names in its own module globals.
 _legacy.load_api_keys = load_api_keys
 _legacy.AlpacaPaperClient = AlpacaPaperClient
+_legacy.run_periodic_artifacts = run_periodic_artifacts
 
 # Export the rest of the historical public surface without overriding guards.
 for _name in dir(_legacy):

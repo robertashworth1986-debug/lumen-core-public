@@ -119,6 +119,12 @@ class PublicReleaseIncidentTests(unittest.TestCase):
         self.assertTrue(receipt["release_verified"])
         self.assertFalse(receipt["production_mutation_performed"])
 
+    def test_matching_hash_does_not_hide_live_byte_count_drift(self) -> None:
+        audit = make_audit(self.manifest)
+        audit["results"][0]["bytes"] += 1
+        with self.assertRaises(incident.IncidentClassificationError):
+            incident.classify(policy=deepcopy(self.policy), manifest=deepcopy(self.manifest), audit=audit)
+
     def test_current_release_accepts_urls_from_the_live_verifier(self) -> None:
         modules = {}
         for name, relative in {

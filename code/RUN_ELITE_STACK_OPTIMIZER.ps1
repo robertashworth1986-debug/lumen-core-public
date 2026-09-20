@@ -24,7 +24,11 @@ function Run-Step {
     Write-Host "`n[$Label]" -ForegroundColor Yellow
     Push-Location $WorkingDirectory
     try {
+        $global:LASTEXITCODE = 0
         Invoke-Expression $Command
+        if ($LASTEXITCODE -ne 0) {
+            throw "Step '$Label' failed with native exit code $LASTEXITCODE."
+        }
     }
     finally {
         Pop-Location
@@ -35,7 +39,7 @@ Run-Step -Label "1/10 Sync provider registry + source truth" -Command "& '$PY' '
 Run-Step -Label "2/10 Rebuild measured source audit" -Command "& '$PY' '$CODE\FIX_MEASURED_SOURCE_AUDIT.py'"
 Run-Step -Label "3/10 Rebuild institutional command center" -Command "& '$PY' '$CODE\execution\build_institutional_crypto_paper_dashboard.py' --mode export"
 Run-Step -Label "4/10 Rebuild stage wallboard" -Command "powershell -ExecutionPolicy Bypass -File '$CODE\RUN_INVESTOR_WALLBOARD.ps1' -StageMode -Mode export"
-Run-Step -Label "5/10 Build investor evidence pack" -Command "& '$PY' '$CODE\build_investor_evidence_pack.py'"
+Write-Warning "[5/10 Investor evidence pack] HOLD: run the explicit offline packager separately with a selected file list and new output directory."
 Run-Step -Label "6/10 Build audit derivation pack" -Command "& '$PY' '$CODE\BUILD_AUDIT_GRADE_DERIVATION_PACK.py'"
 Run-Step -Label "7/11 Build approved source breadth" -Command "& '$PY' '$CODE\BUILD_APPROVED_SOURCE_BREADTH.py'"
 Run-Step -Label "8/11 Build institutional metrics scorecard" -Command "& '$PY' '$CODE\BUILD_INSTITUTIONAL_METRICS_SCORECARD.py'"
@@ -52,7 +56,6 @@ Write-Host "`n[Verification Snapshot]" -ForegroundColor Yellow
 $registry = Join-Path $ROOT "config\live_source_registry.json"
 $brief = Join-Path $ROOT "out\execution\institutional_opportunity_executive_brief.json"
 $orch = Join-Path $ROOT "out\execution\live_engine_heartbeat.json"
-$evidenceDir = Join-Path $ROOT "out\evidence_pack"
 $auditPack = Join-Path $ROOT "out\AUDIT_GRADE_DERIVATION_PACK.json"
 $unifiedDash = Join-Path $ROOT "dashboard\lumascout_dashboard.html"
 $scorecard = Join-Path $ROOT "out\execution\institutional_metrics_scorecard.json"
@@ -87,12 +90,6 @@ if (Test-Path $breadth) {
 if (Test-Path $investorBreadthPage) {
     Write-Host ("Investor breadth page: {0}" -f $investorBreadthPage) -ForegroundColor Green
 }
-if (Test-Path $evidenceDir) {
-    $latestZip = Get-ChildItem -Path $evidenceDir -Filter "institutional_evidence_pack_*.zip" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-    if ($null -ne $latestZip) {
-        Write-Host ("Latest evidence pack: {0}" -f $latestZip.FullName) -ForegroundColor Green
-    }
-}
 if (Test-Path $unifiedDash) {
     Write-Host ("Unified dashboard surface: {0}" -f $unifiedDash) -ForegroundColor Green
 }
@@ -103,4 +100,4 @@ $stage = Join-Path $ROOT "dashboard\stage_wallboard.html"
 if ($OpenDashboard -and (Test-Path $dashboard)) { Invoke-Item $dashboard }
 if ($OpenWallboards -and (Test-Path $stage)) { Invoke-Item $stage }
 
-Write-Host "`nElite stack optimization complete." -ForegroundColor Cyan
+Write-Host "`nRequested steps ended; evidence packaging remains HOLD. Outputs are not operational or investment acceptance." -ForegroundColor Cyan

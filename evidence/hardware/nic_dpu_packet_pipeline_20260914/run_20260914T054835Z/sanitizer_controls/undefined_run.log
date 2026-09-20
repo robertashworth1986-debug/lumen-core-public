@@ -1,0 +1,2 @@
+C:\Users\Novac\Documents\Codex\2026-09-13\plan-outreach-and-funding-chatgpt-conversation\work\institutional-five-hour\nic-final-reference\run_20260914T054835Z\sanitizer_controls\undefined_positive_control.c:3:56: runtime error: signed integer overflow: 2147483647 + 1 cannot be represented in type 'int'
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior C:\Users\Novac\Documents\Codex\2026-09-13\plan-outreach-and-funding-chatgpt-conversation\work\institutional-five-hour\nic-final-reference\run_20260914T054835Z\sanitizer_controls\undefined_positive_control.c:3:56 

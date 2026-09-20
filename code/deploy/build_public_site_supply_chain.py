@@ -183,6 +183,12 @@ def validate_release_inputs(
 
     normalized: list[dict[str, Any]] = []
     seen_names: set[str] = set()
+    try:
+        snapshot = packager._read_commit_blobs(
+            repo_root, source_commit, tuple(repo_path for repo_path, _ in expected_rows)
+        )
+    except packager.ReleasePackageError as exc:
+        raise SupplyChainBuildError("release paths cannot be resolved from source commit") from exc
     for index, (row, expected) in enumerate(zip(rows, expected_rows, strict=True)):
         if not isinstance(row, dict) or set(row) != MANIFEST_FILE_FIELDS:
             raise SupplyChainBuildError(f"release manifest file row {index} fields mismatch")
@@ -201,14 +207,7 @@ def validate_release_inputs(
             raise SupplyChainBuildError(f"release Git blob identity is invalid: {name}")
         if FULL_SHA256.fullmatch(str(row["sha256"])) is None:
             raise SupplyChainBuildError(f"release SHA-256 is invalid: {name}")
-        try:
-            expected_blob_oid, expected_body = packager._read_commit_blob(
-                repo_root, source_commit, repo_path
-            )
-        except packager.ReleasePackageError as exc:
-            raise SupplyChainBuildError(
-                f"release path cannot be resolved from source commit: {repo_path}"
-            ) from exc
+        expected_blob_oid, expected_body = snapshot[repo_path]
         if row["git_blob_oid"] != expected_blob_oid:
             raise SupplyChainBuildError(
                 f"release Git blob identity does not match source commit: {name}"

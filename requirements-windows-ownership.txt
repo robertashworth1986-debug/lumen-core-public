@@ -1,0 +1,2 @@
+# Minimal test-only environment for Windows process-ownership CI.
+pytest==9.1.0

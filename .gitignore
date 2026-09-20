@@ -61,6 +61,7 @@ output/pdf/
 *.lock
 !requirements-reviewer-ubuntu-py311.lock
 !requirements-institutional-ubuntu-py311.lock
+!requirements-windows-ownership-py311.lock
 
 # High-churn runtime JSON cache/state
 kraken_fill_prices.json
@@ -69,9 +70,11 @@ profit_lock_peaks.json
 # Log files
 logs/
 *.log
+!evidence/hardware/nic_dpu_packet_pipeline_20260914/**/*.log
 *.txt
 !dashboard/robots.txt
 !requirements-institutional.txt
+!requirements-windows-ownership.txt
 
 # VS Code
 .vscode/
