@@ -10,6 +10,7 @@ candidate against an accepted baseline under rules agreed before scoring.
 ProofLock packages the result, failures, provenance, and decision gates into a
 hash-verifiable record a reviewer can inspect and replay.
 
+[Open the Canonical Evidence Index](EVIDENCE_INDEX.md) ·
 [**Reviewer overview →**](docs/REVIEWER_START_HERE.md) ·
 [**Investor brief →**](INVESTOR_BRIEF.md) ·
 [**Run the verifier →**](QUICKSTART.md) ·
