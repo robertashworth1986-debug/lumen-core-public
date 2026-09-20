@@ -3,230 +3,70 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="LumenCore is a proof-backed decision infrastructure platform for bounded AI and infrastructure review, validation, and pilot design.">
+<meta name="description" content="LumenCore develops inspectable evaluations for AI, forecasting and infrastructure decisions. Explore implemented evidence controls, reproducible research and the buyer-owned validation sprint.">
 <meta name="lumencore-surface" content="proof-to-pilot-home-v1">
 <meta name="robots" content="index,follow,max-image-preview:large">
-<title>LumenCore | Proof-Backed Decision Infrastructure</title>
+<title>LumenCore | AI Decisions. Inspectable Proof.</title>
 <link rel="canonical" href="https://lumen-core.ai/">
 <link rel="icon" href="/assets/lumaarc_arc_seal_v1.png" type="image/png">
 <link rel="manifest" href="/manifest.json">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./assets/lumencore.css">
 <link rel="stylesheet" href="./assets/luma_command_fabric.css">
-<style>
-  .home { max-width: 1480px; margin: 0 auto; padding: 26px 28px 130px; }
-  .nav { display:flex; justify-content:space-between; align-items:center; gap:18px; padding:10px 2px 24px; }
-  .brand { font:900 18px 'Orbitron',sans-serif; letter-spacing:1px; color:var(--ink); }
-  .brand span { color:var(--neon-c); }
-  .navlinks { display:flex; flex-wrap:wrap; gap:10px; }
-  .hero { display:grid; grid-template-columns:1.25fr .75fr; gap:16px; margin-bottom:16px; }
-  .panel { border:1px solid var(--border); border-radius:16px; padding:22px; background:rgba(7,13,31,.84); box-shadow:0 24px 70px rgba(0,0,0,.28); }
-  .hero-main { padding:34px; position:relative; overflow:hidden; }
-  .hero-main:after { content:""; position:absolute; width:320px; height:320px; right:-140px; top:-150px; border-radius:50%; background:radial-gradient(circle,rgba(0,255,238,.15),rgba(0,255,238,0) 70%); pointer-events:none; }
-  .eyebrow,.label { font:700 10px 'Orbitron',sans-serif; letter-spacing:2px; text-transform:uppercase; color:var(--neon-c); }
-  h1 { margin:14px 0 14px; max-width:980px; font:900 clamp(2.2rem,5.5vw,5rem)/1.01 'Orbitron',sans-serif; }
-  h2 { margin:0 0 12px; font:700 14px 'Orbitron',sans-serif; letter-spacing:1.4px; text-transform:uppercase; }
-  h3 { margin:10px 0 8px; font:800 18px 'Inter',sans-serif; color:var(--ink); }
-  p { color:var(--ink-dim); line-height:1.65; }
-  .truth { color:var(--ink); font-size:1.08rem; max-width:920px; }
-  .subtruth { max-width:850px; margin-top:8px; }
-  .mode { margin-top:18px; display:inline-flex; gap:8px; align-items:center; border:1px solid var(--neon-a); border-radius:999px; padding:8px 12px; color:var(--neon-a); font:700 11px 'JetBrains Mono',monospace; }
-  .hero-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
-  .stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:18px; }
-  .stat { border:1px solid var(--border); border-radius:12px; padding:13px; background:rgba(255,255,255,.018); }
-  .stat strong { display:block; margin-bottom:4px; color:var(--neon-c); font:800 13px 'Orbitron',sans-serif; }
-  .stat span { color:var(--ink-dim); font-size:.86rem; line-height:1.4; }
-  .grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin-bottom:16px; }
-  .lane { display:flex; flex-direction:column; min-height:330px; }
-  .lane .state { margin:8px 0 12px; font:700 12px 'JetBrains Mono',monospace; }
-  .good { color:var(--neon-g); } .warn { color:var(--neon-a); } .bad { color:var(--neon-r); }
-  .metric { font:900 25px 'Orbitron',sans-serif; color:var(--neon-c); margin:5px 0; }
-  .actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:auto; padding-top:16px; }
-  .btn { display:inline-block; padding:10px 13px; border-radius:8px; border:1px solid var(--border); color:var(--ink); text-decoration:none; font:700 11px 'Orbitron',sans-serif; letter-spacing:.7px; transition:.2s ease; }
-  .btn:hover { transform:translateY(-1px); border-color:var(--neon-c); }
-  .btn.primary { border-color:var(--neon-c); color:var(--neon-c); background:rgba(0,255,238,.04); }
-  .three { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-bottom:16px; }
-  .usecases { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-top:14px; }
-  .usecase { border:1px solid var(--border); border-radius:12px; padding:15px; background:rgba(255,255,255,.018); }
-  .usecase p { margin-bottom:0; }
-  .footer-cta { display:grid; grid-template-columns:1fr auto; align-items:center; gap:18px; }
-  ul,ol { color:var(--ink-dim); line-height:1.65; padding-left:19px; }
-  code { color:var(--neon-c); }
-  .stamp { margin-top:12px; color:var(--ink-dim); font:400 10px 'JetBrains Mono',monospace; }
-  .fine { font-size:.82rem; color:var(--ink-dim); }
-  @media(max-width:1100px){.grid,.usecases{grid-template-columns:repeat(2,1fr)}.hero,.three{grid-template-columns:1fr}.footer-cta{grid-template-columns:1fr}}
-  @media(max-width:700px){.grid,.usecases,.stats{grid-template-columns:1fr}.home{padding:18px 14px 120px}.nav{align-items:flex-start}.navlinks{justify-content:flex-end}.hero-main{padding:24px}}
-</style>
 <link rel="stylesheet" href="./assets/luma_institutional_surface.css">
+<style>
+:root{--lc-ink:#081f2c;--lc-mint:#75e3cc;--lc-paper:#f5f2eb;--lc-copper:#c49a6c;--lc-muted:#adc0c4;--lc-line:rgba(173,192,196,.22)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body[data-luma-surface="home"]{margin:0;background:var(--lc-ink)!important;color:var(--lc-paper);font-family:Inter,"Segoe UI",Arial,sans-serif;line-height:1.5}body[data-luma-surface="home"]::before,body[data-luma-surface="home"]::after{display:none}.home{max-width:1360px;margin:auto;padding:0 48px}.lc-skip{position:absolute;top:-80px;left:18px;z-index:1000;background:var(--lc-mint);color:var(--lc-ink);padding:12px}.lc-skip:focus{top:12px}.lc-primary-nav{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:28px 0;border-bottom:1px solid var(--lc-line)}.lc-brandmark{display:flex;align-items:center;gap:12px;font-size:18px;font-weight:800;letter-spacing:.04em;color:var(--lc-paper);text-decoration:none}.lc-brandmark img{width:42px;height:42px;object-fit:contain}.lc-brandmark span{color:var(--lc-mint)}.lc-navlinks{display:flex;flex-wrap:wrap;gap:26px;align-items:center;font-size:13px}.lc-navlinks a{color:var(--lc-muted);text-decoration:none}.lc-navlinks a:hover{color:var(--lc-mint)}a{color:inherit}a:focus-visible,summary:focus-visible{outline:2px solid var(--lc-mint);outline-offset:6px}p{margin:0 0 18px}h1,h2,h3{margin:0;font-weight:650}h2{font-size:clamp(29px,3.1vw,43px);line-height:1.12;letter-spacing:-.035em}h3{font-size:21px;line-height:1.25;letter-spacing:-.015em}.lc-eyebrow{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--lc-mint);margin-bottom:23px}.lc-hero{display:grid;grid-template-columns:1.12fr 1fr;gap:70px;align-items:center;padding:88px 0 72px}.lc-hero h1{font-size:clamp(50px,5.6vw,78px);line-height:1.02;letter-spacing:-.05em!important;text-wrap:initial!important;margin:0 0 28px}.lc-hero h1 span{color:var(--lc-mint)}.lc-intro{font-size:18px;line-height:1.7;color:var(--lc-muted);max-width:580px}.lc-buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}.lc-button{display:inline-flex;gap:18px;align-items:center;justify-content:center;min-height:48px;padding:12px 19px;font-size:13px;font-weight:650;border:1px solid var(--lc-line);text-decoration:none;border-radius:3px;transition:border-color .2s,background .2s}.lc-button:hover{border-color:var(--lc-mint);background:rgba(117,227,204,.06)}.lc-button.primary{color:var(--lc-ink);background:var(--lc-mint);border-color:var(--lc-mint)}.lc-button.primary:hover{background:#a0f0df}.lc-hero-status{font-size:11px;color:var(--lc-muted);margin-top:22px;letter-spacing:.02em}.lc-hero-status::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--lc-copper);margin-right:8px}.lc-proof{position:relative;padding:29px;background:#0d2a37;border:1px solid rgba(117,227,204,.25);border-radius:6px;box-shadow:18px 20px 0 rgba(117,227,204,.025)}.lc-proof::before{content:"";position:absolute;inset:11px -12px -12px 11px;border:1px solid rgba(117,227,204,.12);border-radius:6px;z-index:-1}.lc-proof-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--lc-line);padding-bottom:20px;margin-bottom:24px}.lc-proof-head span{font-family:ui-monospace,monospace;font-size:10px;color:var(--lc-muted);letter-spacing:.06em}.lc-proof-head b{font-size:10px;font-weight:600;color:var(--lc-copper);border:1px solid rgba(196,154,108,.4);padding:5px 8px;border-radius:2px}.lc-proof h2{font-size:30px;margin:0 0 8px}.lc-proof-lead{font-size:13px;color:var(--lc-muted);margin-bottom:25px}.lc-proof-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--lc-line);border-bottom:1px solid var(--lc-line);margin-bottom:21px}.lc-proof-grid div{padding:17px 8px 17px 0}.lc-proof-grid div+div{padding-left:18px;border-left:1px solid var(--lc-line)}.lc-proof-grid small{display:block;color:var(--lc-copper);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}.lc-proof-grid strong{font-size:15px;font-weight:550}.lc-proof-list{display:grid;gap:12px;padding:0;list-style:none;font-size:12px;color:var(--lc-muted);margin-bottom:23px}.lc-proof-list li{display:flex;justify-content:space-between;gap:12px}.lc-proof-list b{color:var(--lc-mint);font-weight:500}.lc-proof-outcome{border-left:2px solid var(--lc-copper);padding-left:15px;font-size:12px;color:var(--lc-muted)}.lc-proof-outcome strong{display:block;color:var(--lc-paper);font-size:15px;margin-bottom:5px}.lc-proof-link{display:block;text-decoration:none;margin-top:25px;font-size:12px;color:var(--lc-mint)}.lc-facts{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--lc-line);border-bottom:1px solid var(--lc-line)}.lc-fact{padding:29px 25px;text-decoration:none;border-right:1px solid var(--lc-line)}.lc-fact:first-child{padding-left:0}.lc-fact:last-child{border:0}.lc-fact strong{display:block;font-size:41px;font-weight:500;line-height:1;color:var(--lc-paper);letter-spacing:-.04em}.lc-fact span{display:block;font-size:12px;margin-top:12px;color:var(--lc-paper)}.lc-fact small{display:block;font-size:10px;color:var(--lc-muted);margin-top:7px}.lc-fact:hover strong{color:var(--lc-mint)}.lc-section{padding:85px 0;border-bottom:1px solid var(--lc-line)}.lc-section-head{display:grid;grid-template-columns:1.2fr 1fr;gap:85px;align-items:end;margin-bottom:42px}.lc-section-head p{color:var(--lc-muted);font-size:15px;margin:0;line-height:1.8}.lc-section-head .lc-eyebrow{margin-bottom:16px}.lc-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}.lc-capability{padding:27px 0;border-top:1px solid var(--lc-mint)}.lc-capability .lc-number{font-family:ui-monospace,monospace;color:var(--lc-copper);font-size:11px}.lc-capability h3{margin:18px 0 15px}.lc-capability p{font-size:14px;color:var(--lc-muted);line-height:1.8}.lc-link{font-size:12px;color:var(--lc-mint);text-decoration:none;border-bottom:1px solid rgba(117,227,204,.35);padding-bottom:4px}.lc-link:hover{border-color:var(--lc-mint)}.lc-caption{font-size:11px;color:var(--lc-muted);margin-top:27px;line-height:1.7}.lc-light{color:var(--lc-ink);background:var(--lc-paper);padding:46px;border-radius:4px}.lc-light .lc-eyebrow{color:#126e66}.lc-light p{color:#435b64}.lc-light .lc-link{color:#126e66;border-color:#126e66}.lc-governance{display:grid;grid-template-columns:.95fr 1.15fr;gap:52px}.lc-governance h2{margin-bottom:20px}.lc-governance p{font-size:15px;line-height:1.8}.lc-controls{margin:0}.lc-control{display:flex;align-items:center;gap:17px;justify-content:space-between;padding:13px 0;border-bottom:1px solid #cad4d3;font-size:12px}.lc-control:last-child{border:0}.lc-control dt{flex:1}.lc-control dd{margin:0;white-space:nowrap;font-size:11px;font-weight:650}.lc-control b{display:inline-block;font-weight:600;width:25px;color:#126e66}.lc-governance-note{font-size:11px!important;margin-top:22px!important;line-height:1.65!important}.lc-review{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--lc-line);border-radius:4px;overflow:hidden}.lc-review a{padding:28px;text-decoration:none;border-right:1px solid var(--lc-line);transition:background .2s}.lc-review a:last-child{border:0}.lc-review a:hover{background:#10313f}.lc-review span{display:block;color:var(--lc-copper);font-size:10px;letter-spacing:.1em;margin-bottom:25px}.lc-review h3{font-size:24px;margin-bottom:15px}.lc-review p{font-size:13px;color:var(--lc-muted);line-height:1.7;min-height:65px}.lc-review b{font-size:12px;font-weight:550;color:var(--lc-mint)}.lc-sequence{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;margin-top:40px}.lc-sequence a{border-top:1px solid var(--lc-line);padding-top:17px;text-decoration:none}.lc-sequence span{display:block;font-size:12px;color:var(--lc-mint);margin-bottom:9px}.lc-sequence strong{font-size:11px;font-weight:400;color:var(--lc-muted);line-height:1.7;display:block}.lc-offer{display:grid;grid-template-columns:1.2fr .75fr;gap:65px;align-items:start}.lc-offer h2{margin-bottom:23px}.lc-offer p{font-size:15px;color:var(--lc-muted);line-height:1.8}.lc-checks{padding-left:19px;color:var(--lc-muted);font-size:13px;line-height:2}.lc-pricing{padding:30px;border:1px solid var(--lc-line);background:#0b2734}.lc-pricing small{font-size:11px;color:var(--lc-copper)}.lc-pricing strong{display:block;font-weight:500;font-size:54px;margin:14px 0 5px;letter-spacing:-.04em}.lc-pricing b{font-size:12px;font-weight:500}.lc-pricing p{font-size:12px;margin-top:18px}.lc-research details{border-top:1px solid var(--lc-line);padding:19px 0}.lc-research details:last-child{border-bottom:1px solid var(--lc-line)}.lc-research summary{display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:16px;cursor:pointer;list-style:none}.lc-research summary::after{content:"+";font-size:25px;color:var(--lc-mint)}.lc-research details[open] summary::after{content:"−"}.lc-research summary small{font-size:10px;text-transform:uppercase;color:var(--lc-copper);letter-spacing:.08em;margin-left:auto}.lc-research details p{max-width:860px;margin:20px 0 15px;color:var(--lc-muted);font-size:14px;line-height:1.8}.lc-footer{padding:65px 0 30px}.lc-footer-top{display:flex;justify-content:space-between;align-items:start;gap:35px}.lc-footer h2{max-width:750px}.lc-footer-note{border-top:1px solid var(--lc-line);margin-top:45px;padding-top:25px;color:var(--lc-muted);font-size:11px;display:grid;grid-template-columns:1.3fr 1fr;gap:50px}.lc-footer-note strong{color:var(--lc-paper);font-weight:500}.lc-footer-note a{color:var(--lc-mint)}.lc-runtime{font-size:10px;color:var(--lc-muted);margin-top:28px}.lc-runtime summary{cursor:pointer}.lc-runtime p{margin:12px 0}.lc-runtime .mode{font-size:10px;color:var(--lc-copper)}body[data-luma-surface="home"] .lcf-rail{position:relative;left:auto;bottom:auto;transform:none;margin:0 auto 20px;max-width:1264px;border-radius:4px;box-shadow:none;font-family:inherit}body[data-luma-surface="home"] .lis-proofline{margin-top:25px;border-radius:3px;box-shadow:none;background:#0b2734}body[data-luma-surface="home"] .lis-proofline>span{font-family:inherit;letter-spacing:0}body[data-luma-surface="home"] .lis-proofline>span:first-child{background:#153c46;color:var(--lc-mint)}
+body[data-luma-surface="home"] .lc-light a:focus-visible{outline-color:#126e66!important;box-shadow:none!important}
+@media(max-width:1000px){.home{padding:0 30px}.lc-hero{gap:38px}.lc-section-head{gap:40px}.lc-governance{gap:32px}.lc-light{padding:30px}.lc-fact{padding:24px 15px}.lc-fact strong{font-size:36px}.lc-offer{gap:30px}}
+@media(max-width:760px){.home{padding:0 22px}.lc-primary-nav{gap:20px;align-items:flex-start}.lc-navlinks{gap:14px;justify-content:flex-end;font-size:11px}.lc-brandmark{font-size:14px;gap:8px}.lc-brandmark img{width:31px;height:31px}.lc-hero{grid-template-columns:1fr;padding:54px 0;gap:42px}.lc-hero h1{font-size:clamp(44px,9.8vw,69px)}.lc-intro{font-size:16px}.lc-proof{padding:24px}.lc-facts{grid-template-columns:1fr 1fr}.lc-fact:nth-child(2){border-right:0}.lc-fact:nth-child(-n+2){border-bottom:1px solid var(--lc-line)}.lc-fact:nth-child(3){padding-left:0}.lc-section{padding:57px 0}.lc-section-head,.lc-governance,.lc-offer{grid-template-columns:1fr;gap:24px}.lc-grid3,.lc-review{grid-template-columns:1fr}.lc-grid3{gap:16px}.lc-review a{border-right:0;border-bottom:1px solid var(--lc-line);padding:25px}.lc-review span{margin-bottom:15px}.lc-review p{min-height:0}.lc-sequence{grid-template-columns:1fr 1fr;gap:23px}.lc-light{padding:25px}.lc-footer-top{display:block}.lc-footer-top .lc-button{margin-top:25px}.lc-footer-note{grid-template-columns:1fr;gap:15px}.lc-research summary{font-size:14px;flex-wrap:wrap}.lc-research summary small{margin-left:0}.lc-research summary::after{margin-left:auto}.lc-control{font-size:11px}.lc-control dd{font-size:10px}.lc-control b{width:18px}.lc-footer{padding-top:50px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+@media print{.lc-navlinks,.lc-buttons,.lcf-rail,.lc-runtime{display:none!important}body[data-luma-surface="home"]{background:white!important;color:#081f2c}.home{padding:0 20px}.home *{color:#081f2c!important;text-shadow:none!important}.lc-section{break-inside:avoid}.lc-proof,.lc-pricing{background:#e9f0ef;color:#081f2c}p,.lc-caption{color:#435b64!important}}
+</style>
 </head>
 <body data-luma-surface="home">
+<a href="#review" class="lc-skip">Skip to the review path</a>
 <main class="home">
-  <nav class="nav" aria-label="Primary">
-    <a href="/cohort/">EC Strength Studio</a>
-    <div class="brand lis-home-brand"><img src="./assets/lumaarc_arc_seal_v1.png" alt="LumaArc seal">LUMEN<span>CORE</span></div>
-    <div class="navlinks">
-      <a class="btn" href="/proof_to_pilot.html">Proof</a>
-      <a class="btn" href="/external_review.html">External Review</a>
-      <a class="btn primary" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20bounded%20technical%20review">Request Review</a>
-    </div>
-  </nav>
-
-  <section class="hero">
-    <div class="panel hero-main">
-      <div class="eyebrow">Proof-backed decision infrastructure</div>
-      <h1>Turn complex system claims into bounded decisions.</h1>
-      <p class="truth">LumenCore packages source data, incumbent baselines, locked metrics, reproducible hashes, negative findings, and claim boundaries into one reviewer-readable Proof Capsule.</p>
-      <p class="subtruth">The goal is not to manufacture certainty. It is to make the next decision inspectable: reject, request information, rerun, seek external review, or define a controlled pilot.</p>
-      <div class="hero-actions">
-        <a class="btn primary" href="/proof_to_pilot.html">Open Proof-to-Pilot</a>
-        <a class="btn" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/QUICKSTART.md">Run Five-Minute Review</a>
-        <a class="btn" href="https://github.com/robertashworth1986-debug/lumen-core-public">Inspect Repository</a>
-      </div>
-      <div class="mode warn" id="mode">PUBLIC REVIEW MODE · HUMAN-AUTHORIZED PILOTS ONLY</div>
-    </div>
-
-    <aside class="panel">
-      <div class="label">What a reviewer gets</div>
-      <div class="stats">
-        <div class="stat"><strong>TRACEABILITY</strong><span>Named source, rights status, run type, and preserved artifacts.</span></div>
-        <div class="stat"><strong>COMPARABILITY</strong><span>Baseline and metric selected before scoring.</span></div>
-        <div class="stat"><strong>BOUNDARY</strong><span>Explicit statement of what the evidence does not establish.</span></div>
-      </div>
-      <ol>
-        <li>Read the capsule and limitation.</li>
-        <li>Run the verifier and focused tests.</li>
-        <li>Inspect source, baseline, metric, hashes, and negative results.</li>
-        <li>Choose the next controlled gate.</li>
-      </ol>
-      <div class="stamp" id="stamp">No membership, endorsement, savings, deployment, or field-validation claim is implied.</div>
-    </aside>
-  </section>
-
-  <nav class="lis-surface-map" aria-label="ProofLock assurance sequence">
-    <a href="/proof_to_pilot.html"><span>01 · Scope</span><strong>One buyer-owned candidate, one baseline, and one decision owner.</strong></a>
-    <a href="/proof_to_pilot.html"><span>02 · Lock</span><strong>Source rights, metric, threshold, holdout, failure rules, and allowed claims.</strong></a>
-    <a href="/proof_to_pilot.html"><span>03 · Run</span><strong>Execute candidate and baseline under matched conditions; preserve adverse results.</strong></a>
-    <a href="/build_week/prooflock_console/"><span>04 · ProofLock</span><strong>Source receipts, decision chain, limitations, manifest, and replay steps.</strong></a>
-    <a href="/proof_to_pilot.html"><span>05 · Decide</span><strong>Promote, rerun, external review, hold, or reject—with a reviewable record.</strong></a>
-  </nav>
-
-  <section class="panel lis-offer" id="prooflock-assurance">
-    <div>
-      <div class="label">Fixed-scope paid service</div>
-      <h2>Buyer-Owned Baseline Validation Sprint</h2>
-      <p class="truth">One buyer-authorized candidate is compared with one accepted incumbent baseline under rules locked before scoring.</p>
-      <ul class="lis-offer-list">
-        <li>Authorized source and rights label with a frozen evaluation contract</li>
-        <li>Candidate-versus-baseline execution under matched conditions</li>
-        <li>Negative-result and failure register with SHA-256 custody</li>
-        <li>Offline verification instructions and buyer-readable Proof Capsule</li>
-        <li>One bounded decision: promote, rerun, external review, hold, or reject</li>
-      </ul>
-      <div class="fine">No favorable result, savings, ROI, certification, deployment, endorsement, award, or production authorization is promised.</div>
-    </div>
-    <aside class="lis-offer-commercial" aria-label="Bounded validation commercial terms">
-      <span>Founder-approved launch tier</span>
-      <strong>$7,500</strong>
-      <b>Launch Replay · 30 calendar days maximum</b>
-      <p>Commercial default: 50% at signed scope and 50% at delivery. Pricing is not buyer-tested; no signed scope or cleared payment is claimed.</p>
-      <a class="btn primary" href="/proof_to_pilot.html">Open scope and all tiers</a>
-    </aside>
-  </section>
-
-  <section class="panel" style="margin-bottom:16px">
-    <div class="label">Where the method applies</div>
-    <div class="usecases">
-      <div class="usecase"><h3>Infrastructure</h3><p>Compare observed system behavior with a predeclared operating baseline and document the next pilot decision.</p></div>
-      <div class="usecase"><h3>AI systems</h3><p>Separate internal replay, modeled output, and external validation so downstream claims remain bounded.</p></div>
-      <div class="usecase"><h3>Market research</h3><p>Preserve source lineage, comparator choice, scoring rules, adverse results, and execution boundaries.</p></div>
-      <div class="usecase"><h3>Technical review</h3><p>Give a buyer, lab, mentor, or consortium a compact artifact they can inspect, rerun, challenge, or reject.</p></div>
-    </div>
-  </section>
-
-  <section class="grid">
-    <article class="panel lane">
-      <div class="label">Canonical evidence unit</div>
-      <div class="metric">PROOF CAPSULE</div>
-      <div class="state good">SOURCE → BASELINE → METRIC → HASH → DECISION</div>
-      <p>The public schema records what was tested, what happened, what failed, what remains unproven, and which controlled gate comes next.</p>
-      <div class="actions">
-        <a class="btn primary" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/QUICKSTART.md">Run Quick Start</a>
-        <a class="btn" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PROOF_CAPSULE_SCHEMA.md">Read Schema</a>
-      </div>
-    </article>
-
-    <article class="panel lane">
-      <div class="label">Public replay example</div>
-      <div class="metric">EIA + KRAKEN</div>
-      <div class="state warn">PUBLIC SUMMARY · EXTERNAL REVIEW NEXT</div>
-      <p>The current example summarizes frozen EIA and Kraken time-series stress windows, including an adverse false-rejection result. The underlying private run is not represented as independently reproduced.</p>
-      <div class="actions">
-        <a class="btn primary" href="/proof_to_pilot.html">Open Review Path</a>
-        <a class="btn" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/DICE_PUBLIC_LIVE_BREADTH_REPLAY_CAPSULE_2026-06-21.md">Read Source Summary</a>
-      </div>
-    </article>
-
-    <article class="panel lane">
-      <div class="label">Claim and safety boundary</div>
-      <div class="metric">FAIL CLOSED</div>
-      <div class="state good">MEASURED ≠ EXTERNALLY VALIDATED</div>
-      <p>Promotion requires explicit data rights, a preselected comparator and metric, preserved negative findings, public-safe artifacts, and a direct statement of what remains unproven.</p>
-      <div class="actions">
-        <a class="btn primary" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CLAIM_BOUNDARY_REGISTER.md">Claim Register</a>
-        <a class="btn" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CONCEPTUAL_RND_AND_VISUAL_ASSET_BOUNDARY.md">Concept Boundary</a>
-      </div>
-    </article>
-
-    <article class="panel lane">
-      <div class="label">External validation / pilot</div>
-      <div class="metric">CONTROLLED GATE</div>
-      <div class="state warn">ROUTING ACTIVE · NO ENDORSEMENT CLAIM</div>
-      <p>A valid next step is a buyer-, lab-, or consortium-reviewed test using authorized data, an incumbent baseline, a locked threshold, and one documented go/no-go decision.</p>
-      <div class="actions">
-        <a class="btn primary" href="https://github.com/robertashworth1986-debug/lumen-core-public/tree/main/examples/proof_capsule">Open Public Capsule</a>
-        <a class="btn" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20bounded%20technical%20review">Request Bounded Review</a>
-      </div>
-    </article>
-  </section>
-
-  <section class="three">
-    <article class="panel">
-      <h2>Proven today</h2>
-      <ul>
-        <li>A public Proof Capsule schema and reviewer-first evidence method.</li>
-        <li>A bounded EIA/Kraken replay summary with positive and negative metrics.</li>
-        <li>Deterministic hash verification and fail-closed validation tests.</li>
-      </ul>
-    </article>
-    <article class="panel">
-      <h2>Not proven yet</h2>
-      <ul>
-        <li>External validation, field savings, production deployment, or agency endorsement.</li>
-        <li>Independent reproduction of the underlying private replay artifacts.</li>
-        <li>Universal model, geometry, trading, or infrastructure superiority.</li>
-      </ul>
-    </article>
-    <article class="panel">
-      <h2>Commercial next gate</h2>
-      <ul>
-        <li>Qualified reviewer approves data rights and comparator.</li>
-        <li>Metric, threshold, window, and failure rules are locked before scoring.</li>
-        <li>The run produces a hash-verified report and a bounded pilot decision.</li>
-      </ul>
-    </article>
-  </section>
-
-  <section class="panel footer-cta">
-    <div>
-      <div class="label">Next step</div>
-      <h3>Bring one problem, one baseline, and one decision.</h3>
-      <p>We will define the evidence boundary before scoring and return a reviewer-readable result without converting internal evidence into an external-validation claim.</p>
-      <div class="fine">LumenCore is presented as a controlled review and pilot-design architecture. Public artifacts do not imply deployment, endorsement, or guaranteed performance.</div>
-    </div>
-    <a class="btn primary" href="/proof_to_pilot.html">Open the primary offer</a>
-  </section>
+<header class="lc-primary-nav" aria-label="Primary navigation">
+<a class="lc-brandmark" href="/" aria-label="LumenCore home"><img src="./assets/lumaarc_arc_seal_v1.png" alt="LumaArc seal"><b>LUMEN<span>CORE</span></b></a>
+<nav class="lc-navlinks" aria-label="Main"><a href="#evidence">Evidence</a><a href="#governance">Governance</a><a href="#review">Start a review</a><a href="/cohort/">EC Strength Studio ↗</a></nav>
+</header>
+<section class="lc-hero" aria-labelledby="hero-title">
+<div><span class="lc-eyebrow">AI evaluation · Forecasting · System constraints</span><h1 id="hero-title">AI decisions.<br><span>Inspectable proof.</span></h1><p class="lc-intro"><strong>Turn complex system claims into bounded decisions.</strong> LumenCore helps technical teams compare a proposed change against an accepted baseline, preserve the full result, and make a decision another reviewer can examine.</p><div class="lc-buttons"><a class="lc-button primary" href="#review">Explore the evidence <span aria-hidden="true">↘</span></a><a class="lc-button" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/INVESTOR_BRIEF.md">Read the company brief ↗</a></div><p class="lc-hero-status">Founder-built prototype · First-party evidence · External review next</p></div>
+<aside class="lc-proof" aria-label="Proof Capsule evaluation architecture">
+<div class="lc-proof-head"><span>PROOF CAPSULE / v3</span><b>HUMAN DECISION REQUIRED</b></div><h2>A claim with a record.</h2><p class="lc-proof-lead">A defined comparison. A result you can challenge.</p>
+<div class="lc-proof-grid"><div><small>Reference</small><strong>Accepted baseline</strong></div><div><small>Challenger</small><strong>Proposed candidate</strong></div></div>
+<ul class="lc-proof-list"><li><span>Source and data rights</span><b>Named before intake</b></li><li><span>Metric and evaluation rules</span><b>Locked before scoring</b></li><li><span>Adverse and incomplete results</span><b>Preserved in the record</b></li><li><span>Artifacts and provenance</span><b>Bound to a manifest</b></li></ul>
+<div class="lc-proof-outcome"><strong>Adopt, investigate, hold or reject.</strong>Evidence informs the decision. Approval stays with the authorized reviewer.</div><a class="lc-proof-link" href="/build_week/prooflock_console/">Inspect the public ProofLock demonstration →</a>
+</aside></section>
+<div class="lc-facts" aria-label="Selected dated engineering evidence">
+<a class="lc-fact" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PROOF_CAPSULE_SCHEMA.md"><strong>v3</strong><span>Strict evidence schema</span><small>Custody and claim gates · inspect source ↗</small></a>
+<a class="lc-fact" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md"><strong>31</strong><span>Pinned replay assertions</span><small>3 suites · first-party receipt, Jul 21 ↗</small></a>
+<a class="lc-fact" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md"><strong>14</strong><span>Mapped assurance controls</span><small>Mixed maturity · inspect each status ↗</small></a>
+<a class="lc-fact" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PUBLIC_SITE_EXACT_DEPLOYMENT_RECEIPT_2026-08-12.md"><strong>43/43</strong><span>Named release byte matches</span><small>Historical static release · Aug 12 ↗</small></a>
+</div>
+<p class="lc-caption">These describe specific first-party implementations and dated receipts. They are not an independent assessment or a statement of current live-release parity.</p>
+<section class="lc-section" id="evidence"><div class="lc-section-head"><div><span class="lc-eyebrow">01 / Technical depth</span><h2>Built to make complex<br>work reviewable.</h2></div><p>Proof-backed decision infrastructure connects evaluation, evidence custody and human authority. Forecasting is the first customer focus; the same discipline supports broader research.</p></div>
+<div class="lc-grid3">
+<article class="lc-capability"><span class="lc-number">01 — EVALUATION</span><h3>Reproduce the comparison.</h3><p>A frozen EIA computation, hash-locked dependencies and an independent-executor handoff give reviewers a defined target to rerun. Internal execution exists; qualified non-author execution remains the next gate.</p><a class="lc-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md">Inspect the computation ↗</a></article>
+<article class="lc-capability"><span class="lc-number">02 — ADVERSARIAL RESEARCH</span><h3>Keep the difficult cases.</h3><p>Agent Arena tests seven specialist roles against corrupted telemetry, hidden faults, role dropout and adversarial proposals. Selection and holdout are separated. Results remain synthetic or replay evidence.</p><a class="lc-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/AGENT_ARENA.md">Inspect the stress harness ↗</a></article>
+<article class="lc-capability"><span class="lc-number">03 — EVIDENCE AUTHORITY</span><h3>Make promotion explicit.</h3><p>Proof Capsule and ProofLock bind artifacts to records and preserve the authority boundary. A self-authored receipt cannot grant independent-review or human-release approval. The public demonstration intentionally ends at HOLD, without converting internal evidence into an external-validation claim.</p><a class="lc-link" href="/build_week/prooflock_console/">Run the bounded demonstration →</a></article>
+</div>
+<nav class="lc-sequence" aria-label="ProofLock assurance sequence"><a href="/proof_to_pilot.html"><span>01 · Scope</span><strong>One buyer-owned candidate, accepted baseline and decision owner.</strong></a><a href="/proof_to_pilot.html"><span>02 · Lock</span><strong>Rights, metrics, holdout, thresholds and failure rules.</strong></a><a href="/proof_to_pilot.html"><span>03 · Run</span><strong>Matched conditions with adverse results retained.</strong></a><a href="/build_week/prooflock_console/"><span>04 · ProofLock</span><strong>Source receipts, lineage, limitations and replay instructions.</strong></a><a href="/proof_to_pilot.html"><span>05 · Decide</span><strong>Human review determines the next authorized step.</strong></a></nav>
+</section>
+<section class="lc-section" id="governance"><div class="lc-light lc-governance"><div><span class="lc-eyebrow">02 / Institutional path</span><h2>Assurance you<br>can inspect.</h2><p>The institutional crosswalk maps evidence to selected NIST, OWASP and SLSA themes. Each control has a stated maturity level, a source and a next gate.</p><p>That makes the path to stronger assurance visible: scoped assessment, independent reproduction, buyer acceptance and authorized deployment.</p><a class="lc-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/INSTITUTIONAL_ASSURANCE_CROSSWALK.md">Open the control-to-evidence map ↗</a></div><div><dl class="lc-controls"><div class="lc-control"><dt><b>02</b> Governance and measurement</dt><dd>Implemented first-party</dd></div><div class="lc-control"><dt><b>02</b> Reporting and incident policy</dt><dd>Documented</dd></div><div class="lc-control"><dt><b>06</b> Security, software and release controls</dt><dd>Partial or scoped</dd></div><div class="lc-control"><dt><b>01</b> Independent execution</dt><dd>Prepared, not executed</dd></div><div class="lc-control"><dt><b>02</b> Data rights and privacy</dt><dd>Buyer-specific gates</dd></div><div class="lc-control"><dt><b>01</b> External assurance and acceptance</dt><dd>Open gap</dd></div></dl><p class="lc-governance-note">First-party register, dated August 2026. This is an informative crosswalk, not certification, full conformance, a government approval or an external security audit. Production authorization remains HOLD.</p></div></div></section>
+<section class="lc-section" id="review"><div class="lc-section-head"><div><span class="lc-eyebrow">03 / Start here</span><h2>A clear review path.<br>No meeting required.</h2></div><p>Choose the question you need answered. Each route connects the company story to inspectable source material and identifies what remains to be proven.</p></div><div class="lc-review">
+<a href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/INVESTOR_BRIEF.md"><span>FOR EC &amp; INVESTORS</span><h3>Understand the business.</h3><p>The customer, implemented capabilities, proposed offer and milestones that capital would need to advance.</p><b>Open the company brief ↗</b></a>
+<a href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/QUICKSTART.md"><span>FOR TECHNICAL REVIEWERS</span><h3>Inspect and rerun.</h3><p>Start with the dependency-free evidence verifier. Follow the pinned computation for a deeper execution review.</p><b>Open the five-minute technical path ↗</b></a>
+<a href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/INSTITUTIONAL_READINESS_DOSSIER.md"><span>FOR BUYERS &amp; ASSURANCE TEAMS</span><h3>Check the readiness gates.</h3><p>Review data handling, evidence custody, scoped security controls and the requirements before an engagement.</p><b>Open the readiness dossier ↗</b></a>
+</div><p class="lc-caption">For the complete source map, open <a href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/EVIDENCE_INDEX.md">the canonical evidence index</a>. For a qualified non-author execution, use <a href="/external_review.html">the external-review path</a>.</p></section>
+<section class="lc-section" id="offer"><div class="lc-offer"><div><span class="lc-eyebrow">04 / First commercial engagement</span><h2>Buyer-Owned Baseline Validation Sprint</h2><p>Initial customer focus: a utility forecasting team evaluating a change to its day-ahead load model or input pipeline. The discovery question is whether assembling a decision-ready comparison costs enough analyst time and delay to justify a focused service.</p><ul class="lc-checks"><li>One authorized source and accepted incumbent baseline</li><li>Metric, holdout and acceptance rules agreed before scoring</li><li>Matched evaluation with negative findings preserved</li><li>Replay instructions and a reviewer-readable Proof Capsule</li><li>One documented next decision under buyer authority</li></ul><p class="lc-caption">Review effort, willingness to pay and customer savings remain to be measured. A neutral or failed result is a valid deliverable.</p></div><aside class="lc-pricing"><small>FOUNDER-APPROVED LAUNCH OFFER</small><strong>$7,500</strong><b>Launch Replay · 30 calendar days maximum</b><p>Commercial default: 50% at signed scope and 50% at delivery. Pricing is not buyer-tested; no signed scope or cleared payment is claimed.</p><a class="lc-button primary" href="/proof_to_pilot.html">Read the scope and tiers →</a><p class="lc-caption">No favorable result, savings, ROI, certification, deployment, endorsement, award, or production authorization is promised.</p></aside></div></section>
+<section class="lc-section lc-research"><div class="lc-section-head"><div><span class="lc-eyebrow">05 / Research portfolio</span><h2>Breadth with a<br>defined evidence boundary.</h2></div><p>Reusable engineering comes from exploring difficult systems. Each research lane retains its own validation requirements; the primary commercial offer stays focused.</p></div>
+<details><summary>Forecasting and constraint evaluation <small>Research &amp; replay</small></summary><p>Compare candidate behavior with the accepted baseline across defined operating regimes. Aggregate gains can coexist with worse failure cases. The useful outcome is an inspectable decision about the actual constraint, not an assumed universal improvement.</p><a class="lc-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/EVIDENCE_INDEX.md">Follow the evidence map ↗</a></details>
+<details><summary>Agent coordination and software systems <small>Implemented &amp; synthetic</small></summary><p>Research workflows include adversarial multi-agent evaluation, evidence packaging and a bounded C11 packet-policy reference path. Host tests and synthetic benchmarks do not establish hardware line rate or operational deployment.</p><a class="lc-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md">Inspect the systems reference path ↗</a></details>
+<details><summary>Geometry and physical-system concepts <small>Concept &amp; simulation</small></summary><p>Geometry-informed concepts are evaluated through matched conditions and explicit objectives. Illustrations, mathematical structures and modeled results remain distinct from physical performance, safety certification and field validation.</p><a class="lc-link" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md">Inspect the geometry evaluation protocol ↗</a></details>
+<details><summary>Claim Register and Concept Boundary <small>Reviewer rules</small></summary><p>Public artifacts do not imply deployment or third-party acceptance. No membership, endorsement, savings, or certification follows from a passing software check. Consult the <a href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CLAIM_BOUNDARY_REGISTER.md">Claim Register</a> and <a href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CONCEPTUAL_RND_AND_VISUAL_ASSET_BOUNDARY.md">Concept Boundary</a> before reusing a result.</p></details>
+</section>
+<footer class="lc-footer"><div class="lc-footer-top"><div><span class="lc-eyebrow">The next decision</span><h2>Bring one problem, one baseline, and one decision.</h2></div><a class="lc-button primary" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20bounded%20technical%20review">Request a scoped review ↗</a></div><div class="lc-footer-note"><p><strong>Robert Ashworth · Founder &amp; Systems Architect</strong><br>LumenCore · Evidence before claims.<br><a href="/cohort/">Explore EC Strength Studio</a> · <a href="https://github.com/robertashworth1986-debug/lumen-core-public">Inspect the repository</a></p><p>Current evidence supports a founder-built prototype and bounded buyer review. External validation, field savings, production deployment, or agency endorsement are not established. Independent reproduction and buyer acceptance remain the next milestones.</p></div><aside class="lis-proofline" aria-label="Evidence and authority posture"><span>Review posture</span><span><small>Evidence</small><strong>First-party · source-linked</strong></span><span><small>Release authority</small><strong>Human approval required</strong></span><span><small>Commercial validation</small><strong>Buyer acceptance pending</strong></span></aside><details class="lc-runtime"><summary>Public gateway status and access boundary</summary><p class="mode" id="mode">PUBLIC REVIEW MODE · LIVE ORDERS NOT AUTHORIZED</p><p id="stamp">Static evidence review is available. Checking the separate public gateway.</p></details></footer>
 </main>
 <script src="./assets/luma_institutional_surface.js"></script>
 <script src="./assets/luma_command_fabric.js"></script>
@@ -238,19 +78,12 @@ async function updatePublicGatewayStamp() {
     const response = await fetch('/api/public/status', {cache: 'no-store'});
     if (!response.ok) throw new Error(String(response.status));
     const status = await response.json();
-    if (
-      status.status !== 'ok' ||
-      status.service !== 'luma-experience-gateway' ||
-      status.access_boundary !== 'operator_api_v1' ||
-      status.public_surface !== 'minimal'
-    ) throw new Error('unexpected public status contract');
+    if (status.status !== 'ok' || status.service !== 'luma-experience-gateway' || status.access_boundary !== 'operator_api_v1' || status.public_surface !== 'minimal') throw new Error('unexpected public status contract');
     mode.className = 'mode good';
-    document.getElementById('stamp').textContent =
-      'public gateway liveness confirmed · operational detail remains token-protected';
+    document.getElementById('stamp').textContent = 'public gateway liveness confirmed · operational detail remains token-protected';
   } catch (error) {
     mode.className = 'mode warn';
-    document.getElementById('stamp').textContent =
-      'dynamic gateway unavailable · static Proof Capsule review remains available';
+    document.getElementById('stamp').textContent = 'dynamic gateway unavailable · static Proof Capsule review remains available';
   }
 }
 updatePublicGatewayStamp();

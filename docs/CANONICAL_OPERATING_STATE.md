@@ -7,6 +7,25 @@
 
 ## One commercial sentence
 
+### September 20 reviewer-surface update
+
+The canonical homepage, repository introduction, investor brief, and reviewer
+start page have been refreshed as one evidence-led review path for EC mentors,
+technical reviewers, and prospective buyers. The former trading-led investor
+brief is superseded; its valuation ranges and broad production-readiness claims
+are not current company claims. The review path uses source-linked, dated
+first-party receipts and exposes the remaining independent-execution,
+buyer-acceptance, and production-authorization gates.
+
+This is a presentation and navigation update supporting active outcome 2. It
+does not create another product, validation package, external-review result,
+customer relationship, or outreach authorization. Public-site deployment is a
+separate exact-snapshot action under the existing guarded release workflow;
+this source update is not a live deployment receipt. The August operating and
+runtime observations below remain dated historical observations.
+
+### Company scope
+
 LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routing, or infrastructure candidate against an accepted baseline under predeclared rules, then packages the result, failures, provenance, and claim boundary into a hash-verifiable decision record.
 
 ## Active outcomes
