@@ -31,6 +31,20 @@ hash-verifiable record a reviewer can inspect and replay.
 The public record does not yet establish independent validation, customer
 revenue, field savings, or certification. Production remains **HOLD**.
 
+## Frozen research comparisons
+
+The September 21 replay retained the original model-selection rules and all
+failed gates. Against direct LightGBM on matched historical rows, the selected
+residual model reduced mean absolute forecast error by **10.602% over 1,176
+authority-days** and **18.509% over 285 later authority-days**. Both results remain
+**HOLD**: original coverage and a regional regression gate failed; later coverage
+is 61.42% and excludes SWPP, so that regression remains unresolved.
+
+These are first-party retrospective comparisons, with no buyer-approved
+operational incumbent, prospective validation or customer savings established.
+The [frozen results and reproduction instructions](docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md)
+retain the predictions, every comparator, limitations and strict manifest checks.
+
 ## The engineering portfolio
 
 | Family | Assets and contribution | Evidence stage |

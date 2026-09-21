@@ -75,6 +75,22 @@ and workflow bindings. They do not establish independently assessed control
 operating effectiveness. The [ProofLock demonstration](https://lumen-core.ai/build_week/prooflock_console/)
 provides a visual companion to the evidence and decision gates.
 
+## September 21 constraint evidence
+
+The [current computation note](CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md)
+includes two retained historical windows, all baseline comparisons and the
+remaining HOLD gates. Verify both reviewed packet identities with:
+
+```bash
+python code/ops/VERIFY_EIA_CONSTRAINT_REVIEW.py
+```
+
+This standard-library check requires the reviewed manifest pins and complete
+input/output membership. It checks artifact integrity, not the scientific
+merit of the comparison or independent validation. The original frozen runners
+remain unchanged for historical reproducibility; their membership-only checks
+are superseded by this strict verifier.
+
 ## The stronger pinned computation
 
 The externally executable computation is frozen at commit

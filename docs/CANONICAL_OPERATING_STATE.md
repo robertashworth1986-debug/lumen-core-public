@@ -31,6 +31,13 @@ repository-setting gap; no setting was changed. No certification, independent
 security review, historical credential revocation or broader production
 authorization is established by the source correction or local tests.
 
+The follow-up evidence review also reproduced an empty-manifest acceptance in
+the new frozen replay runner's generic check. The original runner and manifest
+bytes remain immutable. The dedicated `VERIFY_EIA_CONSTRAINT_REVIEW.py` now
+supersedes that check with reviewed digest pins, exact required membership,
+strict schemas and contained paths. Seventeen adversarial tests and both retained
+packets pass. This establishes bounded first-party integrity only.
+
 ### September 21 frozen constraint replay
 
 Active outcome 2 now includes a retained replay of the unchanged July EIA

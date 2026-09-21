@@ -218,10 +218,18 @@ The six input identities and four output files verified after execution. Python
 the earlier Ubuntu replay (0.2112062642583228); this supplemental environment is
 not the authoritative Python 3.11.9 CODECHECK container and does not replace it.
 
-Verify the committed packet without numerical dependencies:
+Verify the committed packet without numerical dependencies. The strict verifier
+requires the reviewed schema, complete exact input/output membership, canonical
+contained paths, byte counts and SHA-256 values, and a repository-pinned manifest
+digest. Empty, stripped or rehashed replacement manifests fail. Obtain this
+verifier and its pins from a trusted reviewed repository revision. The original
+runners remain byte-for-byte frozen; their legacy `--verify` only checks entries
+listed by a manifest and is superseded for reviewer verification. These checks
+establish first-party integrity, not independent validation or promotion:
+
 
 ```bash
-python code/ops/REPLAY_EIA_CONSTRAINT_REVIEW.py --verify
+python code/ops/VERIFY_EIA_CONSTRAINT_REVIEW.py --packet original
 ```
 
 Replay with the recorded numerical dependencies and bounded thread controls;
@@ -279,7 +287,7 @@ retain every comparator and modeled authority. The frozen numerical environment
 is the same one recorded for the preceding replay. Verify without model fitting:
 
 ```bash
-python code/ops/REPLAY_EIA_LATER_WINDOW.py --verify
+python code/ops/VERIFY_EIA_CONSTRAINT_REVIEW.py --packet later
 ```
 
 The next useful constraint is now explicit: secure a scope-matched, time-stamped
