@@ -125,6 +125,176 @@ until an external process supplies them.
 
 This workflow does not read or report current prospective EIA prediction or settlement counts. It cannot promote the live router, satisfy its sample gates, or replace an evaluator-controlled prospective experiment. Current live status must be cited only from a dated, hash-verified runtime projection created under the frozen prospective protocol.
 
+## September 21 constraint review: measured improvement, promotion still held
+
+The unchanged July residual protocol was executed again on September 21. The
+[pre-run review plan](../config/eia_constraint_replay_review_v1.json) and runner
+were committed at `3404bb2` before this replay. Seven development candidates and
+six holdout comparators were retained; no parameters, splits, thresholds or
+selected-model identity were changed using holdout performance. This supports
+active outcome 2: a reviewable external-validation or paid-pilot decision.
+
+This is an **author-operated replay of a previously inspected historical panel**.
+It is not a new untouched holdout, a current live-data capture, an as-issued
+forecast archive, an independent validation, or a production promotion.
+
+The selected `xgboost_residual` and EIA's archived day-ahead forecast series were scored
+on exactly the same 1,176 authority-days from January 1 through July 12, 2026,
+across eight balancing authorities. Daily observations and cross-authority
+results are correlated; 1,176 rows are not 1,176 independent experiments.
+
+| Metric on identical rows | EIA day-ahead forecast | Selected residual candidate | Descriptive change |
+|---|---:|---:|---:|
+| Mean absolute forecast error | 36,568.783 MWh | 15,979.087 MWh | 56.304% lower |
+| WAPE | 3.53355% | 1.54402% | 1.98953 percentage points lower |
+| 95th-percentile absolute error, nearest rank | 99,674.000 MWh | 56,377.064 MWh | 43.439% lower |
+| Primary mean seasonal MASE | 0.579383 | 0.211206 | Lower on the measured panel |
+
+The primary metric remains seasonal MASE. The supplemental MAE, WAPE, tail and
+subgroup tables diagnose the already selected candidate; they do not add new
+superiority tests. The selected candidate has the lowest aggregate MASE among
+the six original baselines, including direct LightGBM (0.235871) and direct
+XGBoost (0.248338). This is an actual candidate-versus-comparator result, not a
+comparison of two baselines presented as LumenCore performance. Against the
+strongest aggregate algorithmic baseline, direct LightGBM, the candidate
+reduces MAE by 10.602% (17,874.172 to 15,979.087 MWh).
+
+| Authority | Paired days | MAE reduction vs EIA | p95 absolute-error reduction vs EIA |
+|---|---:|---:|---:|
+| CISO | 164 | 85.282% | 74.355% |
+| ERCO | 190 | 6.731% | 19.634% |
+| ISNE | 193 | 64.590% | 49.507% |
+| MISO | 107 | 53.056% | 39.584% |
+| NYIS | 135 | 29.378% | 16.924% |
+| PJM | 164 | 42.194% | 40.123% |
+| SWPP | 133 | 65.093% | 44.516% |
+| TVA | 90 | 22.423% | 27.240% |
+
+Every authority is reported, not just favorable subsets. These descriptive
+results are candidates for investigation, not eight independently validated
+utility engagements. Across the original 52 authority-month comparisons with
+EIA, 45 improve and seven worsen on seasonal MASE. The favorable whole-authority
+and whole-month averages do not imply every observation or operating regime wins.
+
+**The original promotion gate still fails.** MISO, NYIS, SWPP and TVA have fewer
+than the required 150 common days; the minimum is 90. Against autoregressive
+ridge, SWPP's authority-month-weighted seasonal-MASE regression is 0.074058,
+exceeding the original maximum tolerated regression of 0.05. The aggregate
+winner therefore remains on HOLD. Do not loosen either rule to promote this run.
+
+The [official EIA-930 instructions, page 9](https://www.eia.gov/survey/form/eia_930/instructions.pdf)
+allow a balancing authority to report its ordinary business forecast even when
+its scope differs from EIA physical demand. The DF series is therefore a
+**descriptive archival comparator**, not an established matched operational
+incumbent. A scope-adjustment or reporting difference could explain part of the
+measured residual; no underlying utility forecast deficiency is established.
+
+The inputs are historical EIA records and may contain revisions. The code's
+history-only features pass a target-actual leakage test, but that does not prove
+that every lag and target forecast was available at the real decision cutoff.
+The next evaluator must verify as-of timestamps, source licensing, reporting
+latency, demand/forecast scope, and missingness on fresh prospective records.
+
+**Forecast error in MWh is not electricity saved.** Economic value requires a
+buyer-approved action policy and cost function, service-equivalent comparisons,
+implementation and integration costs, and actual operating outcomes. Multiplying
+this error percentage by utility spending or sector revenue is unsupported.
+A small genuine net cost reduction can matter: 0.1% of an illustrative $1 billion
+addressable annual cost is $1 million before implementation costs. That arithmetic
+is a scenario, not a valuation or savings result from this experiment.
+
+### Retained replay and reproduction
+
+- [Full benchmark and all original gates](../evidence/reproducibility/eia_constraint_review_20260921/benchmark.json)
+- [All-authority and all-month diagnostic summary](../evidence/reproducibility/eia_constraint_review_20260921/constraint_summary.json)
+- [All development and holdout prediction rows](../evidence/reproducibility/eia_constraint_review_20260921/predictions.csv.gz)
+- [Exact runtime versions](../evidence/reproducibility/eia_constraint_review_20260921/environment.json)
+- [Input/code/output manifest](../evidence/reproducibility/eia_constraint_review_20260921/manifest.json)
+
+Manifest SHA-256:
+`d89c5503a5191531b66bedd22d5cda6d316a7fa12e611cff1979eb926b47f92f`.
+The six input identities and four output files verified after execution. Python
+3.12.14 and the package versions are recorded. The observed candidate MASE equals
+the earlier Ubuntu replay (0.2112062642583228); this supplemental environment is
+not the authoritative Python 3.11.9 CODECHECK container and does not replace it.
+
+Verify the committed packet without numerical dependencies. The strict verifier
+requires the reviewed schema, complete exact input/output membership, canonical
+contained paths, byte counts and SHA-256 values, and a repository-pinned manifest
+digest. Empty, stripped or rehashed replacement manifests fail. Obtain this
+verifier and its pins from a trusted reviewed repository revision. The original
+runners remain byte-for-byte frozen; their legacy `--verify` only checks entries
+listed by a manifest and is superseded for reviewer verification. These checks
+establish first-party integrity, not independent validation or promotion:
+
+
+```bash
+python code/ops/VERIFY_EIA_CONSTRAINT_REVIEW.py --packet original
+```
+
+Replay with the recorded numerical dependencies and bounded thread controls;
+choose a new directory so retained evidence cannot be overwritten:
+
+```bash
+PYTHONHASHSEED=0 TZ=UTC OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+python code/ops/REPLAY_EIA_CONSTRAINT_REVIEW.py --run-dir out/eia_constraint_review
+```
+
+Ten targeted tests passed, covering the original candidate registry, target-actual
+feature isolation, correction/abstention safety, selection rule, exact pair
+alignment, adverse-tail preservation, and rejection of altered evidence.
+
+### Additional temporal test: July 13–September 8 archive
+
+A second [plan](../config/eia_later_window_review_v1.json) and exact later EIA
+snapshot were frozen at `8afe493` before scoring. The original model selection,
+features, fit parameters and 2024–2025 training/development data remained
+unchanged. The selected residual model was evaluated on subsequent July
+13–September 8 dates; no 2026 labels entered model fitting. Earlier 2026 values
+were permitted as causal lag features under the original protocol.
+
+This is an additional retrospective temporal test. The recovered September 9
+archive had already been analyzed with other models, so this work does not
+claim untouched data, new live telemetry, prospective issuance or independence.
+
+| Same 285 retained authority-days | MAE | Mean seasonal MASE |
+|---|---:|---:|
+| Selected XGBoost residual model | 16,107.044 MWh | 0.200574 |
+| Direct LightGBM baseline, identical features | 19,765.544 MWh | 0.268516 |
+| Direct XGBoost baseline, identical features | 20,956.566 MWh | 0.290483 |
+| Archived EIA DF comparator | 35,092.867 MWh | 0.558483 |
+
+The candidate's MAE is **18.509% lower than direct LightGBM**, the strongest
+aggregate algorithmic baseline; its original-window reduction was 10.602%.
+Versus the scope-unmatched archival DF comparator, MAE is 54.102% lower and
+nearest-rank p95 absolute error is 40.702% lower (94,670 to 56,137.113 MWh).
+These percentages measure forecast error, not energy or cost savings.
+
+**Coverage and promotion remain HOLD.** Only 285 of 464 possible authority-days
+(61.42%) survive the original target and 28-day forecast-history requirements.
+Retained counts are CISO 58, ERCO 24, ISNE 58, MISO 25, NYIS 27, PJM 58 and TVA 35;
+**SWPP contributes zero eligible rows**. Its original regression against ridge
+is not resolved by this absence. Seven authorities and at most 58 days do not
+satisfy eight authorities with 150 days each. Only 18 authority-month units are
+available, below the 40-unit gate. The favorable aggregate comparisons are
+conditional on this missingness pattern and cannot be extended to excluded rows.
+
+The [full later benchmark](../evidence/reproducibility/eia_constraint_later_window_20260921/benchmark.json),
+[all predictions](../evidence/reproducibility/eia_constraint_later_window_20260921/predictions.csv.gz),
+[manifest](../evidence/reproducibility/eia_constraint_later_window_20260921/manifest.json)
+and [exact archived source rows](../evidence/reproducibility/eia_daily_20260713_20260908_selected.json.gz)
+retain every comparator and modeled authority. The frozen numerical environment
+is the same one recorded for the preceding replay. Verify without model fitting:
+
+```bash
+python code/ops/VERIFY_EIA_CONSTRAINT_REVIEW.py --packet later
+```
+
+The next useful constraint is now explicit: secure a scope-matched, time-stamped
+buyer baseline and complete forecast-history capture, then test this unchanged
+candidate prospectively under the buyer's error and cost policy. More repeated
+runs of these archives cannot fill those evidence gaps.
+
 ## Claim Boundary
 
 A successful CODECHECK would confirm that the declared computations were independently executable and that the manifest outputs were recreated. It would not certify the scientific conclusions, establish field or production performance, prove savings, validate a patent, approve a government use, demonstrate profitable trading, or determine a company valuation.

@@ -1,0 +1,54 @@
+{
+  "boundary": "Additional retrospective temporal test. No operational-incumbent, untouched-holdout, independent-validation or savings claim.",
+  "environment_reference": "../eia_constraint_review_20260921/environment.json",
+  "git_commit": "8afe493a4e220f2a3658b6375e6c9a57016e66e7",
+  "inputs": {
+    "code/eia_grid_residual_moe_benchmark.py": {
+      "bytes": 42097,
+      "sha256": "c8478829cc9119cfd8b1391d6581ab8b8446062a9b011f92065579326a8d2a6e"
+    },
+    "code/ops/REPLAY_EIA_CONSTRAINT_REVIEW.py": {
+      "bytes": 8510,
+      "sha256": "13a7619bf585375ecb55ce3151abd31020b867933df11adbb7c21e109029e864"
+    },
+    "code/ops/REPLAY_EIA_LATER_WINDOW.py": {
+      "bytes": 6336,
+      "sha256": "f8c1eae14019d2d6fe18064d8c7dc4943c848b3ea27f2b5677a9659f8370ef77"
+    },
+    "config/eia_constraint_replay_review_v1.json": {
+      "bytes": 2475,
+      "sha256": "8f164f9c7bbf03ed855339f60a52a189267325db61dbcaed6fb72398adf9a33c"
+    },
+    "config/eia_grid_residual_moe_protocol_v1.json": {
+      "bytes": 8422,
+      "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+    },
+    "config/eia_later_window_review_v1.json": {
+      "bytes": 1728,
+      "sha256": "897f47c53a66c07ad382c928a5d5b898f31e91e0ac5c76bb9e7e2c1cbe06adf3"
+    },
+    "config/reviewer_protocol_provenance_v1.json": {
+      "bytes": 1263,
+      "sha256": "9768865e9e1aab551aea678c871de05c1085c0e2152e93afd0309a592edae32a"
+    },
+    "evidence/reproducibility/eia_daily_20260713_20260908_selected.json.gz": {
+      "bytes": 7913,
+      "sha256": "edafa88d9e6e3ac336a36768d0f929d04814c5813d9f8f79fc48085d5489812c"
+    },
+    "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": {
+      "bytes": 114366,
+      "sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9"
+    }
+  },
+  "outputs": {
+    "benchmark.json": {
+      "bytes": 21653,
+      "sha256": "e2b5298a335a8591f100e5ce7f5d07f3bf6d1cc6b80e2c8392e45a03cf9c7ec4"
+    },
+    "predictions.csv.gz": {
+      "bytes": 398656,
+      "sha256": "23ab470aae6e13c8143ecfffeb7a4854a8d8eb208c26c724b68422a2dd36c318"
+    }
+  },
+  "schema": "eia_later_window_manifest.v1"
+}

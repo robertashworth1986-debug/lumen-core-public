@@ -122,6 +122,13 @@ into passing evidence.
 
 ## Next gates
 
+September 21 recheck: the read-only GitHub `branches/main` response at commit
+`01edc688003e3e22387cd78d7db4715b0f75f675` again reported `protected=false`,
+required-status enforcement `off`, and empty required check lists. The
+default-branch enforcement gap therefore remains current. This response does
+not recheck secret alerts or prove provider-key rotation. The August secret
+snapshot above remains explicitly historical.
+
 1. Rotate or revoke the historical Google/YouTube provider key, retain only a
    non-secret provider receipt, and then reconcile alert 1 without exposing the
    detected value.

@@ -7,6 +7,67 @@
 
 ## One commercial sentence
 
+### September 21 live-release audit hardening
+
+Active outcome 2 now includes a bounded correction to the existing exact-byte
+audit: an empty manifest cannot produce a passing release receipt, all rows are
+validated before HTTP requests, and manifest inputs and response bodies have
+explicit size limits. Both the live verifier and incident classifier require
+the declared byte count to match in addition to SHA-256. Oversized and
+interrupted responses remain visible failures. The existing signed release,
+human approval, installation, rollback and trading boundaries are unchanged.
+
+The focused local release, incident, supply-chain, historical-receipt,
+repository-security and institutional-crosswalk suite passed 167 tests and
+eight subtests on Python 3.12; three existing root-incompatible POSIX installation
+tests were skipped. This is not a complete-suite pass. The existing hash-locked
+Python 3.11.9 CI remains the authoritative complete-suite gate for the eventual
+reviewed commit.
+
+A fresh September 21 read-only GitHub branch observation at main commit
+`01edc688003e3e22387cd78d7db4715b0f75f675` still reported `protected=false`,
+required-status enforcement `off`, and no required checks. This is an open
+repository-setting gap; no setting was changed. No certification, independent
+security review, historical credential revocation or broader production
+authorization is established by the source correction or local tests.
+
+The follow-up evidence review also reproduced an empty-manifest acceptance in
+the new frozen replay runner's generic check. The original runner and manifest
+bytes remain immutable. The dedicated `VERIFY_EIA_CONSTRAINT_REVIEW.py` now
+supersedes that check with reviewed digest pins, exact required membership,
+strict schemas and contained paths. Seventeen adversarial tests and both retained
+packets pass. This establishes bounded first-party integrity only.
+
+### September 21 frozen constraint replay
+
+Active outcome 2 now includes a retained replay of the unchanged July EIA
+residual protocol. The review plan and runner were committed before execution;
+all seven development candidates, six holdout baselines and original failed
+gates remain visible. On 1,176 identical authority-days, the selected residual
+candidate reduced descriptive MAE from 36,568.783 to 15,979.087 MWh (56.304%)
+versus EIA's archival DF series; WAPE was 3.53355% versus 1.54402%. This is an
+actual historical candidate-versus-comparator comparison. EIA permits forecast
+scope to differ from physical demand, so DF is not an established matched
+operational incumbent. The reduction versus the strongest aggregate algorithmic
+baseline, direct LightGBM, is 10.602% MAE.
+
+Promotion remains HOLD: four authorities fail the 150-day minimum, and SWPP's
+0.074058 seasonal-MASE regression against autoregressive ridge exceeds 0.05.
+The panel was already inspected; the new run is reproduction, not a fresh
+untouched or prospective holdout. As-of data availability, independent replay,
+a buyer action/cost function and operating savings remain unestablished. No
+sector-dollar extrapolation or production authority follows from forecast-error
+reduction. The existing [CODECHECK note](CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md)
+contains full comparisons and the hash-verifiable input/code/output receipt.
+
+A fixed-model later-archive test on July 13–September 8 also reduced MAE by
+18.509% versus the same direct LightGBM baseline. Only 285 of 464 possible
+authority-days survive (61.42%); SWPP has zero eligible rows and its original
+regression remains unresolved. The model was not refitted on 2026 labels and
+all six comparators remain visible. This additional retrospective test fails
+the original coverage gates and establishes no matched operational baseline,
+prospective forecast, independent validation or operating savings.
+
 ### September 21 portfolio and review-path update
 
 At the founder's request, the canonical homepage, README, investor brief and
