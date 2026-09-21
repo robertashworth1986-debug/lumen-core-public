@@ -1,0 +1,345 @@
+{
+  "by_authority": {
+    "CISO": {
+      "absolute_mae_reduction_mwh": 49622.5359528259,
+      "first_target": "2026-01-01",
+      "last_target": "2026-07-12",
+      "paired_authority_days": 164,
+      "relative_mae_reduction_pct": 85.28232693161144,
+      "relative_p95_reduction_pct": 74.35529815788426,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 58186.189024390245,
+          "p95_absolute_error_mwh_nearest_rank": 77892.0,
+          "wape_pct": 9.638520787574306
+        },
+        "xgboost_residual": {
+          "mae_mwh": 8563.653071564346,
+          "p95_absolute_error_mwh_nearest_rank": 19975.171158860787,
+          "wape_pct": 1.418565978143857
+        }
+      }
+    },
+    "ERCO": {
+      "absolute_mae_reduction_mwh": 1254.3610514074753,
+      "first_target": "2026-01-04",
+      "last_target": "2026-07-12",
+      "paired_authority_days": 190,
+      "relative_mae_reduction_pct": 6.731294014850009,
+      "relative_p95_reduction_pct": 19.634210100207397,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 18634.76842105263,
+          "p95_absolute_error_mwh_nearest_rank": 60666.0,
+          "wape_pct": 1.3920844996926143
+        },
+        "xgboost_residual": {
+          "mae_mwh": 17380.407369645156,
+          "p95_absolute_error_mwh_nearest_rank": 48754.71010060818,
+          "wape_pct": 1.2983791990831506
+        }
+      }
+    },
+    "ISNE": {
+      "absolute_mae_reduction_mwh": 4902.667511022305,
+      "first_target": "2026-01-01",
+      "last_target": "2026-07-12",
+      "paired_authority_days": 193,
+      "relative_mae_reduction_pct": 64.59015924257619,
+      "relative_p95_reduction_pct": 49.50722584554207,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 7590.424870466321,
+          "p95_absolute_error_mwh_nearest_rank": 13409.0,
+          "wape_pct": 2.3572691148204674
+        },
+        "xgboost_residual": {
+          "mae_mwh": 2687.7573594440164,
+          "p95_absolute_error_mwh_nearest_rank": 6770.576086371264,
+          "wape_pct": 0.8347052397818612
+        }
+      }
+    },
+    "MISO": {
+      "absolute_mae_reduction_mwh": 25115.065692865806,
+      "first_target": "2026-01-29",
+      "last_target": "2026-07-12",
+      "paired_authority_days": 107,
+      "relative_mae_reduction_pct": 53.056212702805226,
+      "relative_p95_reduction_pct": 39.58352655194345,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 47336.71028037383,
+          "p95_absolute_error_mwh_nearest_rank": 104153.0,
+          "wape_pct": 2.52736320850743
+        },
+        "xgboost_residual": {
+          "mae_mwh": 22221.644587508024,
+          "p95_absolute_error_mwh_nearest_rank": 62925.56959035434,
+          "wape_pct": 1.1864400088292852
+        }
+      }
+    },
+    "NYIS": {
+      "absolute_mae_reduction_mwh": 3864.433300194727,
+      "first_target": "2026-01-01",
+      "last_target": "2026-07-12",
+      "paired_authority_days": 135,
+      "relative_mae_reduction_pct": 29.378140929115986,
+      "relative_p95_reduction_pct": 16.923923467171626,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 13154.111111111111,
+          "p95_absolute_error_mwh_nearest_rank": 24863.0,
+          "wape_pct": 3.0702130045474916
+        },
+        "xgboost_residual": {
+          "mae_mwh": 9289.677810916384,
+          "p95_absolute_error_mwh_nearest_rank": 20655.20490835712,
+          "wape_pct": 2.168241501247483
+        }
+      }
+    },
+    "PJM": {
+      "absolute_mae_reduction_mwh": 21746.5797680829,
+      "first_target": "2026-01-01",
+      "last_target": "2026-07-12",
+      "paired_authority_days": 164,
+      "relative_mae_reduction_pct": 42.19388628320461,
+      "relative_p95_reduction_pct": 40.12292718284151,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 51539.64634146341,
+          "p95_absolute_error_mwh_nearest_rank": 115260.0,
+          "wape_pct": 2.1429128076910544
+        },
+        "xgboost_residual": {
+          "mae_mwh": 29793.066573380514,
+          "p95_absolute_error_mwh_nearest_rank": 69014.31412905687,
+          "wape_pct": 1.238734614465664
+        }
+      }
+    },
+    "SWPP": {
+      "absolute_mae_reduction_mwh": 59227.54555227314,
+      "first_target": "2026-01-01",
+      "last_target": "2026-06-11",
+      "paired_authority_days": 133,
+      "relative_mae_reduction_pct": 65.09342753937746,
+      "relative_p95_reduction_pct": 44.51641565263323,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 90988.51879699249,
+          "p95_absolute_error_mwh_nearest_rank": 159390.0,
+          "wape_pct": 11.58625539509109
+        },
+        "xgboost_residual": {
+          "mae_mwh": 31760.973244719346,
+          "p95_absolute_error_mwh_nearest_rank": 88435.2850912679,
+          "wape_pct": 4.04436463496026
+        }
+      }
+    },
+    "TVA": {
+      "absolute_mae_reduction_mwh": 2645.893036641801,
+      "first_target": "2026-01-01",
+      "last_target": "2026-07-06",
+      "paired_authority_days": 90,
+      "relative_mae_reduction_pct": 22.42307571250919,
+      "relative_p95_reduction_pct": 27.24006105902928,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 11799.866666666667,
+          "p95_absolute_error_mwh_nearest_rank": 35742.0,
+          "wape_pct": 2.3906544076185208
+        },
+        "xgboost_residual": {
+          "mae_mwh": 9153.973630024866,
+          "p95_absolute_error_mwh_nearest_rank": 26005.857376281754,
+          "wape_pct": 1.854596159773782
+        }
+      }
+    }
+  },
+  "by_month": {
+    "2026-01": {
+      "absolute_mae_reduction_mwh": 19773.91817909862,
+      "first_target": "2026-01-01",
+      "last_target": "2026-01-31",
+      "paired_authority_days": 206,
+      "relative_mae_reduction_pct": 55.72255872955377,
+      "relative_p95_reduction_pct": 53.69838687335354,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 35486.3786407767,
+          "p95_absolute_error_mwh_nearest_rank": 129122.0,
+          "wape_pct": 3.6208882957371933
+        },
+        "xgboost_residual": {
+          "mae_mwh": 15712.460461678076,
+          "p95_absolute_error_mwh_nearest_rank": 59785.56890138844,
+          "wape_pct": 1.603236688613497
+        }
+      }
+    },
+    "2026-02": {
+      "absolute_mae_reduction_mwh": 14465.237274046045,
+      "first_target": "2026-02-01",
+      "last_target": "2026-02-28",
+      "paired_authority_days": 206,
+      "relative_mae_reduction_pct": 48.04798347920208,
+      "relative_p95_reduction_pct": 42.57496078216456,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 30105.81553398058,
+          "p95_absolute_error_mwh_nearest_rank": 95853.0,
+          "wape_pct": 2.867011936353017
+        },
+        "xgboost_residual": {
+          "mae_mwh": 15640.578259934537,
+          "p95_absolute_error_mwh_nearest_rank": 55043.622841471806,
+          "wape_pct": 1.4894705148273677
+        }
+      }
+    },
+    "2026-03": {
+      "absolute_mae_reduction_mwh": 16090.256269926502,
+      "first_target": "2026-03-01",
+      "last_target": "2026-03-31",
+      "paired_authority_days": 173,
+      "relative_mae_reduction_pct": 55.66013052143981,
+      "relative_p95_reduction_pct": 42.811397010780745,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 28908.046242774566,
+          "p95_absolute_error_mwh_nearest_rank": 87703.0,
+          "wape_pct": 3.526253155739327
+        },
+        "xgboost_residual": {
+          "mae_mwh": 12817.789972848064,
+          "p95_absolute_error_mwh_nearest_rank": 50156.12047963496,
+          "wape_pct": 1.5635360467384274
+        }
+      }
+    },
+    "2026-04": {
+      "absolute_mae_reduction_mwh": 24143.606608029262,
+      "first_target": "2026-04-01",
+      "last_target": "2026-04-30",
+      "paired_authority_days": 168,
+      "relative_mae_reduction_pct": 55.52102814400192,
+      "relative_p95_reduction_pct": 34.2857875357444,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 43485.517857142855,
+          "p95_absolute_error_mwh_nearest_rank": 99674.0,
+          "wape_pct": 4.713232481900366
+        },
+        "xgboost_residual": {
+          "mae_mwh": 19341.911249113593,
+          "p95_absolute_error_mwh_nearest_rank": 65499.98413162213,
+          "wape_pct": 2.0963973491322236
+        }
+      }
+    },
+    "2026-05": {
+      "absolute_mae_reduction_mwh": 28153.316544536345,
+      "first_target": "2026-05-01",
+      "last_target": "2026-05-31",
+      "paired_authority_days": 161,
+      "relative_mae_reduction_pct": 63.41297460982285,
+      "relative_p95_reduction_pct": 42.603498739701344,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 44396.776397515525,
+          "p95_absolute_error_mwh_nearest_rank": 96341.0,
+          "wape_pct": 4.23840427138646
+        },
+        "xgboost_residual": {
+          "mae_mwh": 16243.45985297918,
+          "p95_absolute_error_mwh_nearest_rank": 55296.36327918433,
+          "wape_pct": 1.5507060469105167
+        }
+      }
+    },
+    "2026-06": {
+      "absolute_mae_reduction_mwh": 23353.713045104414,
+      "first_target": "2026-06-01",
+      "last_target": "2026-06-30",
+      "paired_authority_days": 184,
+      "relative_mae_reduction_pct": 58.86743548988571,
+      "relative_p95_reduction_pct": 45.89421087404594,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 39671.70108695652,
+          "p95_absolute_error_mwh_nearest_rank": 106238.0,
+          "wape_pct": 3.1705449885654433
+        },
+        "xgboost_residual": {
+          "mae_mwh": 16317.988041852104,
+          "p95_absolute_error_mwh_nearest_rank": 57480.908251631074,
+          "wape_pct": 1.304126462743877
+        }
+      }
+    },
+    "2026-07": {
+      "absolute_mae_reduction_mwh": 19111.659382989987,
+      "first_target": "2026-07-01",
+      "last_target": "2026-07-12",
+      "paired_authority_days": 78,
+      "relative_mae_reduction_pct": 54.43000681596585,
+      "relative_p95_reduction_pct": 58.85531845814107,
+      "scores": {
+        "eia_day_ahead_forecast": {
+          "mae_mwh": 35112.35897435898,
+          "p95_absolute_error_mwh_nearest_rank": 110241.0,
+          "wape_pct": 2.6554566939428224
+        },
+        "xgboost_residual": {
+          "mae_mwh": 16000.699591368988,
+          "p95_absolute_error_mwh_nearest_rank": 45358.3083785607,
+          "wape_pct": 1.2100914344347227
+        }
+      }
+    }
+  },
+  "evidence_type": "author-operated historical public-data replay; previously inspected holdout",
+  "interpretation": [
+    "The frozen July 2026 holdout has already been inspected. This is a reproduction and diagnostic review, not a new untouched or prospective test.",
+    "Original primary metric is seasonal MASE. Supplemental MAE/WAPE/p95 and authority/month deltas are descriptive, not new predeclared superiority gates.",
+    "Historical EIA rows may have been revised; pre-origin calendar dates do not establish publication-time availability or an as-issued forecast archive.",
+    "Forecast error measured in MWh is not electricity saved, reduced fuel use, avoided outages or economic benefit. There is no accepted buyer cost function, action policy or service-equivalence proof.",
+    "No sector-wide dollar extrapolation or aggregation of overlapping opportunities is permitted. Next gate is an independent replay followed by an as-of, buyer-owned prospective test.",
+    "All original coverage, baseline-comparison, external-validation and field-validation gates remain unchanged. Numerical improvement alone does not clear promotion."
+  ],
+  "original_promotion_gate": {
+    "all_baseline_comparisons_pass": false,
+    "allowed_claim": "No protocol-grade internal champion; retain the incumbent and report the result.",
+    "coverage_pass": false,
+    "external_replication_complete": false,
+    "field_validation_complete": false,
+    "protocol_grade_internal_champion": false
+  },
+  "overall": {
+    "absolute_mae_reduction_mwh": 20589.696312956446,
+    "first_target": "2026-01-01",
+    "last_target": "2026-07-12",
+    "paired_authority_days": 1176,
+    "relative_mae_reduction_pct": 56.30402362865483,
+    "relative_p95_reduction_pct": 43.438545583924785,
+    "scores": {
+      "eia_day_ahead_forecast": {
+        "mae_mwh": 36568.7831632653,
+        "p95_absolute_error_mwh_nearest_rank": 99674.0,
+        "wape_pct": 3.533548861554173
+      },
+      "xgboost_residual": {
+        "mae_mwh": 15979.086850308855,
+        "p95_absolute_error_mwh_nearest_rank": 56377.06407467881,
+        "wape_pct": 1.5440186756146472
+      }
+    }
+  },
+  "schema": "eia_constraint_replay_review.v1",
+  "selected_candidate": "xgboost_residual"
+}

@@ -1,0 +1,49 @@
+{
+  "boundary": "First-party hash freeze. No signature, independent validation, prospective forecast or realized savings is asserted.",
+  "git_commit": "3404bb2743fa7bf7693163d9fb99cfff93b286bc",
+  "inputs": {
+    "code/eia_grid_residual_moe_benchmark.py": {
+      "bytes": 42097,
+      "sha256": "c8478829cc9119cfd8b1391d6581ab8b8446062a9b011f92065579326a8d2a6e"
+    },
+    "code/ops/REPLAY_EIA_CONSTRAINT_REVIEW.py": {
+      "bytes": 8510,
+      "sha256": "13a7619bf585375ecb55ce3151abd31020b867933df11adbb7c21e109029e864"
+    },
+    "config/eia_constraint_replay_review_v1.json": {
+      "bytes": 2475,
+      "sha256": "8f164f9c7bbf03ed855339f60a52a189267325db61dbcaed6fb72398adf9a33c"
+    },
+    "config/eia_grid_residual_moe_protocol_v1.json": {
+      "bytes": 8422,
+      "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+    },
+    "config/reviewer_protocol_provenance_v1.json": {
+      "bytes": 1263,
+      "sha256": "9768865e9e1aab551aea678c871de05c1085c0e2152e93afd0309a592edae32a"
+    },
+    "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": {
+      "bytes": 114366,
+      "sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9"
+    }
+  },
+  "outputs": {
+    "benchmark.json": {
+      "bytes": 18700,
+      "sha256": "a75031e562c926b7a020caab9e68563bb697f381822c2c696f5bf0ae4f1f93ad"
+    },
+    "constraint_summary.json": {
+      "bytes": 12738,
+      "sha256": "7de4743f1153969c079818983e15c62b8558a3aa4a9f13b11ef11e897874c06d"
+    },
+    "environment.json": {
+      "bytes": 681,
+      "sha256": "ec0348164c448bef8555440836e14bd0e1aa1ab91b5e19a48c0f6766322fb32b"
+    },
+    "predictions.csv.gz": {
+      "bytes": 670509,
+      "sha256": "9001bf1ab2c3e785fc2be5c190e078848a6b35daf5ba5564bdaeef344d82598a"
+    }
+  },
+  "schema": "eia_constraint_replay_manifest.v1"
+}

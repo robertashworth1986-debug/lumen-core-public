@@ -1,0 +1,22 @@
+{
+  "schema": "eia_constraint_replay_review_plan.v1",
+  "recorded_before_this_replay": "2026-09-21",
+  "active_outcome": "2: one external validation or paid-pilot conversion",
+  "decision": "Identify reproducible forecast-error constraints suitable for evaluator-owned prospective review, preserving every original negative gate.",
+  "panel_path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+  "frozen_inputs": {
+    "code/eia_grid_residual_moe_benchmark.py": "c8478829cc9119cfd8b1391d6581ab8b8446062a9b011f92065579326a8d2a6e",
+    "config/eia_grid_residual_moe_protocol_v1.json": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8",
+    "config/reviewer_protocol_provenance_v1.json": "9768865e9e1aab551aea678c871de05c1085c0e2152e93afd0309a592edae32a",
+    "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9"
+  },
+  "analysis": "Run original seven-candidate development selection and six-baseline holdout evaluation unchanged. Retain all development candidates and selected-candidate plus all baseline holdout predictions. Descriptive official-versus-selected overall, all eight authorities and every holdout calendar month: paired MAE, WAPE and nearest-rank p95 absolute error. No model retuning, subset selection or multiplicity-adjusted significance claims from new descriptive tables.",
+  "interpretation": [
+    "The frozen July 2026 holdout has already been inspected. This is a reproduction and diagnostic review, not a new untouched or prospective test.",
+    "Original primary metric is seasonal MASE. Supplemental MAE/WAPE/p95 and authority/month deltas are descriptive, not new predeclared superiority gates.",
+    "Historical EIA rows may have been revised; pre-origin calendar dates do not establish publication-time availability or an as-issued forecast archive.",
+    "Forecast error measured in MWh is not electricity saved, reduced fuel use, avoided outages or economic benefit. There is no accepted buyer cost function, action policy or service-equivalence proof.",
+    "No sector-wide dollar extrapolation or aggregation of overlapping opportunities is permitted. Next gate is an independent replay followed by an as-of, buyer-owned prospective test.",
+    "All original coverage, baseline-comparison, external-validation and field-validation gates remain unchanged. Numerical improvement alone does not clear promotion."
+  ]
+}
