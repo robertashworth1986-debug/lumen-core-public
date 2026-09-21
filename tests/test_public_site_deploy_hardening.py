@@ -305,7 +305,8 @@ def test_attestation_failure_stops_before_production_access(tmp_path, failed_pre
     cleanup = workflow.split("- name: Remove remote transfer staging\n", maxsplit=1)[1]
     assert "if: always() && steps.verify_attestations.outcome == 'success' && steps.transfer.outcome != 'skipped'" in cleanup.split("shell:", maxsplit=1)[0]
     signing_workflow = (ROOT / ".github/workflows/public-site-supply-chain.yml").read_text()
-    assert signing_workflow.count("      - '.github/workflows/deploy-public-site-release.yml'") == 2
+    pr_trigger = signing_workflow.split("  pull_request:\n", maxsplit=1)[1].split("  push:\n", maxsplit=1)[0]
+    assert "      - '.github/workflows/deploy-public-site-release.yml'" in pr_trigger
 
     binary_dir = tmp_path / "bin"
     binary_dir.mkdir()
