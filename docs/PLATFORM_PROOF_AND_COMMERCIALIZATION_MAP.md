@@ -1,97 +1,91 @@
 # LumenCore Platform, Proof, and Commercialization Map
 
-Updated: June 12, 2026
+Updated: September 21, 2026 · Public, non-confidential review
 
-## What Was Built
+LumenCore is a founder-built engineering platform spanning quantitative systems,
+workflow software, evidence tooling, forecasting and simulation-led research.
+ProofLock is the shared evidence and review layer. The first commercial entry
+point remains the **Buyer-Owned Baseline Validation Sprint**: one authorized
+source, one accepted incumbent, agreed metrics and a reviewable decision.
+This map supports active founder outcome 2: external validation or a paid pilot.
 
-LumenCore is currently four related products sharing an evidence layer:
+The source review began at repository commit
+`ea842a24896bde68f8c51925496f746e0fa63ead`. A source file establishes implementation
+presence; a test receipt establishes only its named run and environment.
+Neither establishes current service operation, independent validation or revenue.
+The [portfolio configuration](../config/lumencore_engine_portfolio_v2.json),
+[maintained artifact audit](LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md) and
+[evidence graph](MACHINE_EVIDENCE_GRAPH.md) provide the public source hierarchy.
 
-1. **Market intelligence and guarded execution** ranks symbols, timing windows,
-   and risk signals, then records paper and historical execution evidence.
-2. **Forecast and evidence lab** benchmarks model families across 673 datasets
-   and trains routers and stackers to choose among them.
-3. **Grant factory** qualifies opportunities, creates application packages,
-   checks blockers, and preserves submission artifacts.
-4. **LumaScout** ranks artist discovery signals and produces auditable
-   shortlists.
+## Portfolio and next verification gates
 
-Frozen deltas, manifests, hashes, ledgers, and proof packs are the shared
-evidence infrastructure. They make a result reproducible and reviewable. They
-do not create economic value by themselves.
+| Asset | Evidence-supported stage and contribution | Inspect and advance |
+|---|---|---|
+| **LumaTrader / Kraken Sentinel / LumaSniper** | Tested research implementations for market data, strategy comparison, exchange integration and guarded execution. Historical transaction records exist. The canonical runtime configuration is paper-only; legacy settings are not authorization. | [Execution architecture](../code/execution/execution_orchestrator.py), [order-safety tests](../tests/test_order_safety_gate.py), [canonical account controls](../config/accounts/KRAKEN_PRIMARY/runtime_control.json). Next: reconciled, strategy-attributed forward evidence after fees and slippage, with risk limits and separate human authority. |
+| **Grant Factory / LumenGov** | Tested workflow implementation for opportunity qualification, eligibility checks, proposal sections, budgets, approval states and hashed evidence packages. | [Application factory](../code/grant_application_factory.py), [portfolio artifact map](../config/lumencore_engine_portfolio_v2.json). Next: demonstrate one current end-to-end workflow against an actual opportunity's rules and obtain buyer acceptance. Final submission remains human-reviewed. |
+| **Mission Control** | Substantial historical operating-interface implementation joining research, diagnostics, source status and application workflows. The public route is a retired HOLD placeholder. | [Module catalog](LUMA_UNIVERSE_MODULE_CATALOG.md) and founder-held September 13 implementation addendum. Next: a scoped current-runtime demonstration with authorized data and access. |
+| **Quant Lab** | Historical research-interface implementation with trading, forecasting, funding and proof workspaces. The current public route is a retired HOLD placeholder. | [Portfolio audit](LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md) and founder-held implementation addendum. Next: demonstrate model comparison and a reproducible reviewer handoff. |
+| **ProofLock / Proof Capsule** | Implemented custody, manifest and claim-gate controls, with a deployed bounded demonstration. | [Schema](PROOF_CAPSULE_SCHEMA.md), [verifier](../code/proof_capsule_verifier.py), [public demo](https://lumen-core.ai/build_week/prooflock_console/). Next: qualified non-author execution and a buyer-accepted evidence packet. A hash verifies identity, not truth of an underlying claim. |
+| **Utility and energy forecasting** | Pipeline implementations and completed historical replay research. Results retain adverse regimes and baseline comparisons. Some pipeline scripts depend on a named local Windows environment and external inputs. | [Energy pipeline](../code/ops/run_sector_energy_evidence_pipeline.py), [pinned independent-executor target](CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md). Next: protocol-matched reproduction and buyer-authorized data. |
+| **Geothermal / constraint research** | Historical forecast screening plus scoped commercial hypotheses. The reviewed constraint brief reports 2.5336% better clean MAE alongside 8.9208% worse p95 error for its selected candidate. | Founder-held constraint opportunity brief; [evidence index](../EVIDENCE_INDEX.md). Next: agree the buyer's objective and failure limits, then evaluate untouched data. Proposed scheduling/logistics benefits remain untested. |
+| **FlowForm / thermal-routing research** | Geometry-informed audit and comparison implementations, simulation and physical-system concepts. No independently measured thermal, impedance or battery advantage is established here. | [Phase-lock audit](../code/ops/flowform_phase_lock_audit.py), [geometry protocol](GEOMETRY_EVALUATION_PROTOCOL_V1.md). Next: matched baseline experiments with physical measurements appropriate to the claim. |
+| **HyperCore** | Privately held numerical experiment implementation: NumPy phase-gradient updates, recorded metrics and saved arrays. No fresh execution receipt was recovered in this review. | Founder-held `hypercore_v4.py` source recovered in `text 2(3).txt`. Next: freeze source/environment, rerun against an explicit numerical comparator and retain failures. |
+| **EchoLock** | Phase-coherence research using conceptual, replay and synthetic evidence. Pilot promotion remains held. | [Evidence graph](MACHINE_EVIDENCE_GRAPH.md). Next: bind the report, baseline, metric, result, limitations and manifest before changing the promotion state. |
+| **LumaJet** | Simulation-first aerospace research: geometry-informed routing/layout comparisons, thermal proxies and resilience concepts. | [Safe-promotion packet](LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md) and founder-held technical abstract. Next: complete the bounded proof capsule and matched evaluation. No flight-certified hardware or autonomous flight authority is established. |
+| **LumaSkin** | Implemented offline virtual engineering lab: 24 virtual zones, 10 replay scenarios and a first-party 34-test receipt. A separate September 18 synthetic endurance report records 200,000 trials with no reported invariant failures. Zero hardware or human tests. | Founder-held `LumaSkin_Lab.html` v2 and September 18 `endurance_report.json`. Next: reproduce the simulation receipts, then plan a separately authorized physical prototype. This advances the software evidence beyond older concept-only descriptions. |
+| **EchoForm / digital identity twin** | Architecture concept exploring identity consistency, consent, provenance and personal-AI continuity. The audited configuration has documentation but no configured implementation/test artifacts for this lane. | [Module catalog](LUMA_UNIVERSE_MODULE_CATALOG.md), [claim register](CLAIM_BOUNDARY_REGISTER.md). Next: define a bounded consent/provenance use case and implement a testable prototype. |
+| **Node-RED / immersive systems / science education** | Implemented flow-inspection/import tooling and immersive launcher/integration components. Science-museum installations are a possible application; deployment or customer acceptance is unverified. | [Node-RED tooling](../code/ENSURE_NODERED_LUMA_FLOWS.py), [immersive launcher](../code/START_IMMERSIVE_STACK.ps1). Next: reproduce a scoped demonstration and obtain an agreed educational-use pilot. |
+| **Agent Arena / systems engineering** | Synthetic adversarial coordination research and a bounded C11 packet-policy reference path tested in host user space. | [Agent Arena](AGENT_ARENA.md), [C11 foundation](NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md). Next: independent evaluation in the declared environment; hardware throughput, resilience and production claims need separate tests. |
 
-## Active Production Graph
+## Founder-held evidence and historical boundaries
 
-The public VPS runs the gateway/API, dashboard refresh, LumaScout API, paper
-ticker, and symbol-awareness services. The large `live_executor.py` and
-`execution_orchestrator.py` are separate engines and are not the public VPS
-paper loop. Their presence and line count do not mean they are combined or
-authorized.
+The September 13 built-assets addendum documents recovered Mission Control and
+Quant Lab implementations, recorded API order identifiers and exchange
+purchase/sale confirmations. Those records support transaction existence and
+implementation history. They do not by themselves establish strategy attribution,
+net profitability, current automated live operation or institutional acceptance.
+Private transaction documents are not republished in this map.
 
-The authoritative runtime gate currently reports:
+The reviewed LumaSkin September 18 lab and endurance receipts, HyperCore source,
+LumaJet technical abstract and constraint opportunity brief are founder-held
+artifacts. Their descriptions here identify what was inspected; they are not
+public downloadable evidence. A reviewer needs an authorized evidence handoff
+and an independent rerun before treating them as externally verified results.
+The LumaSkin endurance receipt records 82,841 accepted and 117,159 rejected
+synthetic packets. These are software-model outcomes, not wearable efficacy.
 
-- mode: `paper`
-- execution authorized: `false`
-- allow live orders: `false`
-- paper enabled: `true`
+Old generated marketing strings mentioning a museum pilot or third-party
+validation are not counterparty receipts. No museum deployment, outside audit,
+award or government certification is inferred from such strings.
 
-## Evidence Status
+## Operating and commercial boundary
 
-### Supported
+The legacy public Mission Control, Quant Lab, trading, grants, forecast and lab
+routes remain retired noindex HOLD pages. Code, historical interface recovery
+and point-in-time public gateway liveness are different evidence states.
+The old June 12 description of an active production graph is superseded by this
+map; do not use it as a current runtime-health assertion.
 
-- Reproducible 673-dataset benchmark artifacts exist.
-- The measured benchmark supports adaptive routing and stacking as useful model
-  selection methods.
-- Harmonic methods win on a subset of series, not universally.
-- Public APIs, paper execution, grant package generation, and evidence chains
-  are operational.
+The [canonical operating state](CANONICAL_OPERATING_STATE.md) and
+[readiness dossier](INSTITUTIONAL_READINESS_DOSSIER.md) control present review and
+promotion boundaries. Broader platform production remains **HOLD**. The static
+website has its own exact-commit release and verification workflow.
 
-### Not Yet Supported
+The [buyer-owned validation offer](LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md)
+remains the primary commercial route. Other portfolio assets are reusable
+engineering and research, not a verified count of production products, customers
+or revenue streams. A positive, neutral or failed evaluation can each be a valid
+deliverable when scope and acceptance are agreed before work.
 
-- Profitable live or institutional trading performance.
-- Universal harmonic superiority.
-- Physical FlowForm, hardware phase-locking, thermal, impedance, or battery
-  performance claims.
-- Realized multibillion-dollar savings.
-- A fixed government or commercial price for each frozen delta.
+## Ownership and assurance evidence still required
 
-The exploratory V6 harmonic-versus-backprop script contains holdout leakage.
-Use `docs/HARMONIC_VALIDATION_PROTOCOL.md` for the required V7 evidence gate.
+Engineering artifacts do not complete company diligence. Reviewers still need
+formation and current-status documents, founder equity and vesting records,
+the cap table, executed contributor/IP assignments or licenses, asset/account
+ownership, applicable open-source terms and official patent records.
+Founder origin is not evidence of an executed transfer to a company.
 
-## Patent Boundary
-
-Local records contain a USPTO application receipt and multiple draft invention
-families. A filing receipt is evidence that an application was submitted; it is
-not an issued patent, a validity opinion, or proof that every later software
-feature is covered.
-
-The hardware geometry, identity architecture, and software evidence/trading
-systems must be mapped as separate invention families. Software benchmark
-results do not prove curved-PCB, thermal, impedance, battery, or physical
-phase-locking claims. Current application status and deadlines must be checked
-in USPTO Patent Center and reviewed with a registered patent practitioner.
-
-## Commercial Path
-
-The shortest credible revenue path is:
-
-1. Submit one narrow NSF Project Pitch around a measurable, technically risky
-   evidence-routing or decision-integrity innovation.
-2. Sell a scoped pilot with a named baseline, acceptance metric, data boundary,
-   implementation cost, and reproducible result package.
-3. Convert successful pilots into evidence-platform licensing or managed
-   validation services.
-4. Treat trading as a separate capital-risk product. Start live only after
-   positive forward evidence after fees and slippage, reconciliation, risk
-   limits, and a tiny canary allocation.
-
-The current paper record is negative and is therefore a live-capital blocker,
-not a reason to bypass paper validation.
-
-## Immediate Priorities
-
-1. Finish the actionable NSF Project Pitch.
-2. Verify or renew SAM.gov, Grants.gov linkage, and AOR authority.
-3. Remove stale grant opportunities and use official deadlines.
-4. Run leakage-free V7 validation with surrogate and bootstrap tests.
-5. Produce one customer-facing frozen delta tied to a real baseline and paid
-   pilot acceptance criterion.
+Institutional and public-sector trust requires scoped assurance and buyer
+acceptance. The [assurance crosswalk](INSTITUTIONAL_ASSURANCE_CROSSWALK.md) maps
+first-party controls and remaining gates; it is not certification, government
+approval, award selection or an external audit.

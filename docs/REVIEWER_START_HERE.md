@@ -6,7 +6,8 @@ Robert Ashworth · Founder / Systems Architect
 [Website](https://lumen-core.ai/) ·
 [Repository](https://github.com/robertashworth1986-debug/lumen-core-public) ·
 [Investor brief](../INVESTOR_BRIEF.md) ·
-[Full evidence index](../EVIDENCE_INDEX.md)
+[Full evidence index](../EVIDENCE_INDEX.md) ·
+[Portfolio and maturity map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md)
 
 ## The 90-second overview
 
@@ -35,6 +36,16 @@ customer revenue, field savings, and certification remain open milestones.
 The [readiness dossier](INSTITUTIONAL_READINESS_DOSSIER.md) makes those gates
 specific. The machine-readable portfolio receipt records zero subscription-ready
 lanes; research breadth does not establish customers or deployed products.
+
+## Reviewing the full portfolio
+
+The [portfolio map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md) covers trading,
+Grant Factory, Mission Control, Quant Lab, ProofLock, energy and thermal research,
+HyperCore, EchoLock, LumaJet, LumaSkin, digital-twin concepts and Node-RED/immersive
+integrations. Start with the asset-specific maturity, source and next gate.
+Historical implementation, a current source file, a simulated result and a
+publicly operating service are different evidence states. Private-held receipts
+are identified separately from public artifacts.
 
 ## The five-minute verification path
 

@@ -1,15 +1,18 @@
 # LumenCore™
 
-## AI decisions, backed by inspectable proof.
+## Frontier engineering, backed by inspectable proof.
 
-**Proof-to-pilot AI infrastructure validation**
+**Applied AI, quantitative systems, and engineering research**
 Robert Ashworth · Founder / Systems Architect
 
-LumenCore helps a buyer compare a forecasting, routing, or infrastructure
+LumenCore is a founder-built engineering platform spanning quantitative systems,
+grant workflows, forecasting, simulation, and evidence tooling. Its commercial
+entry point helps a buyer compare a forecasting, routing, or infrastructure
 candidate against an accepted baseline under rules agreed before scoring.
 ProofLock packages the result, failures, provenance, and decision gates into a
 hash-verifiable record a reviewer can inspect and replay.
 
+[**Explore the full portfolio →**](docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md) ·
 [Open the Canonical Evidence Index](EVIDENCE_INDEX.md) ·
 [**Reviewer overview →**](docs/REVIEWER_START_HERE.md) ·
 [**Investor brief →**](INVESTOR_BRIEF.md) ·
@@ -27,6 +30,23 @@ hash-verifiable record a reviewer can inspect and replay.
 **Next milestone:** qualified external execution and one buyer-owned validation.
 The public record does not yet establish independent validation, customer
 revenue, field savings, or certification. Production remains **HOLD**.
+
+## The engineering portfolio
+
+| Family | Assets and contribution | Evidence stage |
+|---|---|---|
+| Quantitative systems | LumaTrader, Kraken Sentinel, LumaSniper: market data, strategy comparison, exchange integration and guarded execution. | Tested research implementations and historical transaction records; canonical runtime configuration is paper-only. |
+| Workflow and research operations | Grant Factory / LumenGov, Mission Control and Quant Lab: opportunity qualification, proposal production, diagnostics and reviewer handoffs. | Implemented workflows and interface history; public operator routes remain retired HOLD stubs. |
+| Evidence and systems | ProofLock / Proof Capsule, Agent Arena and bounded C11 packet-policy tooling. | Executable custody controls, synthetic stress tests and host-tested systems code. |
+| Energy and physical-system research | Utility/geothermal forecasting, FlowForm and thermal-routing research; LumaJet simulation; LumaSkin virtual engineering lab. | Pipeline implementations, replay and simulation; physical validation remains asset-specific and open. |
+| Phase networks, twins and immersion | HyperCore numerical experiments, EchoLock research, EchoForm digital-twin concepts and Node-RED/immersive integrations. | Numerical implementation, held research, architecture concepts and prototype components. |
+
+The [portfolio evidence map](docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md)
+identifies source artifacts, private-held receipts, limitations and the next
+validation gate for each family. Historical trades do not establish
+strategy-attributed net profit. Virtual tests do not establish hardware or human
+performance. Museum installations remain a possible application, not a verified
+customer deployment.
 
 ## Commercial entry offer
 
@@ -176,7 +196,7 @@ LumenCore emphasizes fail-closed decisions: missing rights, ambiguous provenance
 | ProofLock Console | Deployed bounded demonstration; verifies receipt integrity and refuses unauthorized promotion. |
 | EIA benchmark package | First-party reproducible for the named pinned package; prepared for non-author execution. |
 | External replication docket | Draft protocol for preregistration, evaluator independence, frozen inputs, deviations, and negative results. |
-| Exact public-release supply chain and deployment | Current named release `1ce7c359` has deterministic 43-file CycloneDX 1.6 coverage, constrained GitHub OIDC/Sigstore provenance and SBOM verification, human-gated deployment, rollback capture, 43-of-43 exact live-byte verification, and a separate read-only audit; the earlier `e513f65a` receipt remains append-only; legacy operator URLs are noindex HOLD stubs; no whole-product SBOM, SLSA level, external-validation, or broader production-authorization claim. |
+| Exact public-release supply chain and deployment | Historical August 12 release `1ce7c359` has deterministic 43-file CycloneDX 1.6 coverage, constrained GitHub OIDC/Sigstore provenance and SBOM verification, human-gated deployment, rollback capture, 43-of-43 exact live-byte verification, and a separate read-only audit; the earlier `e513f65a` receipt remains append-only; legacy operator URLs are noindex HOLD stubs; no whole-product SBOM, SLSA level, external-validation, or broader production-authorization claim. |
 | Buyer-Owned Baseline Validation Sprint | Sole primary paid offer; proposed tiers are $7,500, $15,000, and from $25,000. Pricing is not buyer-tested, and no signed scope, cleared payment, or delivery is claimed. ProofLock supplies the evidence and custody layer. |
 | Bounded C11 packet-policy reference path | Strict-compiled, vector-tested, and sanitizer-smoked in host user space. This is not NIC/DPU hardware validation, line-rate evidence, production readiness, or expert certification. See [`NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md`](docs/NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md). |
 

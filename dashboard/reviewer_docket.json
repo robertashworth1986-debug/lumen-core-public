@@ -1,11 +1,11 @@
 {
   "schema": "lumencore.public_reviewer_docket.v2",
-  "updated_utc": "2026-08-08T00:00:00Z",
+  "updated_utc": "2026-09-21T00:00:00Z",
   "canonical_repository": "https://github.com/robertashworth1986-debug/lumen-core-public",
   "public_base_url": "https://lumen-core.ai",
   "current_decision": "HOLD",
   "primary_customer_problem": "Technical and funding decisions are delayed or rejected when the source, eligibility rules, baseline, metric, holdout, evidence lineage, limitations, and decision authority are not locked into one inspectable record.",
-  "primary_positioning": "LumenCore provides buyer-controlled baseline validation for one bounded technical decision. ProofLock is the evidence, custody, and claim-gating layer; it is not a separate claim of performance or external validation.",
+  "primary_positioning": "LumenCore is an engineering platform spanning quantitative systems, grant workflows, forecasting and simulation. Its commercial entry point is buyer-controlled baseline validation for one bounded technical decision. ProofLock is the shared evidence, custody and claim-gating layer. Portfolio maturity is asset-specific and does not confer production authorization.",
   "primary_paid_offer": {
     "id": "buyer-owned-baseline-validation-sprint",
     "name": "LumenCore 30-Day Bounded Validation Sprint",
@@ -72,6 +72,14 @@
       "purpose": "Give a qualified non-author evaluator control of source access, held-out execution, analysis, deviations, and reporting.",
       "source_url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/external_replication_docket_v1.json",
       "claim_boundary": "No evaluator, external result, field validation, certification, savings, deployment, or endorsement is claimed."
+    },
+    {
+      "id": "portfolio_evidence_map",
+      "title": "Engineering portfolio and maturity map",
+      "status": "asset_specific_implementation_research_simulation_and_concept",
+      "purpose": "Locate evidence, distinguish public artifacts from founder-held receipts, and identify the next gate for trading, workflows, energy, simulation and integration work.",
+      "source_url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+      "claim_boundary": "Source presence and historical transactions do not establish present operation, strategy profit, physical performance, customer deployment, independent validation or government certification."
     }
   ],
   "claim_gates": {
