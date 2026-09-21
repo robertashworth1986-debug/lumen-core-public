@@ -7,6 +7,16 @@
 
 ## One commercial sentence
 
+### September 21 production release preflight
+
+Active outcome 2 now has a stricter static-release workflow: production access
+requires an explicitly approved exact main commit and successful verification
+of both GitHub signed provenance and SBOM attestations for the rebuilt archive.
+The source change adds no deployment, runtime repair, DNS change, or broader
+platform production approval. The September 20 main audit for `ea842a2` matched
+188 of 189 files and held the release because `operator_home.html` differed;
+that dated observation requires a fresh audit after any approved deployment.
+
 ### September 20 reviewer-surface update
 
 The canonical homepage, repository introduction, investor brief, and reviewer

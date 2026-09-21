@@ -236,6 +236,120 @@ def test_exact_snapshot_workflow_is_manual_commit_pinned_and_non_destructive():
     assert "rm -rf -- \"$target_root\"" not in apply_script
 
 
+def workflow_shell_step(name: str) -> str:
+    workflow = PUBLIC_WORKFLOW.read_text(encoding="utf-8")
+    section = workflow.split(f"- name: {name}\n", maxsplit=1)[1]
+    section = section.split("\n      - name:", maxsplit=1)[0]
+    script = section.split("        run: |\n", maxsplit=1)[1]
+    lines = []
+    for line in script.splitlines():
+        if not line.strip():
+            continue
+        if not line.startswith(" " * 10):
+            break
+        lines.append(line[10:])
+    return "\n".join(lines)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="executes the Linux deployment gate")
+@pytest.mark.parametrize(
+    ("overrides", "accepted"),
+    [
+        ({}, True),
+        ({"WORKFLOW_REF": "refs/heads/unmerged-change"}, False),
+        ({"WORKFLOW_REF": "refs/tags/release"}, False),
+        ({"RELEASE_COMMIT": "b" * 40}, False),
+        ({"APPROVAL": "HOLD"}, False),
+        ({"EVENT_NAME": "push"}, False),
+    ],
+)
+def test_production_authorization_executes_main_and_exact_identity_gate(tmp_path, overrides, accepted):
+    output = tmp_path / "github-output"
+    env = {
+        **os.environ,
+        "APPROVAL": "DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT",
+        "EVENT_NAME": "workflow_dispatch",
+        "RELEASE_COMMIT": "a" * 40,
+        "WORKFLOW_COMMIT": "a" * 40,
+        "WORKFLOW_REF": "refs/heads/main",
+        "GITHUB_OUTPUT": str(output),
+        **overrides,
+    }
+    result = subprocess.run(
+        ["bash", "-c", workflow_shell_step("Fail closed unless this exact workflow commit is approved")],
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    assert (result.returncode == 0) is accepted
+    if accepted:
+        assert output.read_text() == f"source_commit={'a' * 40}\n"
+    else:
+        assert not output.exists()
+
+
+@pytest.mark.skipif(os.name != "posix", reason="executes the Linux attestation gate")
+@pytest.mark.parametrize(
+    ("failed_predicate", "expected_calls"),
+    [("", 2), ("https://slsa.dev/provenance/v1", 1), ("https://cyclonedx.org/bom", 2)],
+)
+def test_attestation_failure_stops_before_production_access(tmp_path, failed_predicate, expected_calls):
+    workflow = PUBLIC_WORKFLOW.read_text(encoding="utf-8")
+    step_name = "Verify signed provenance and SBOM before production access"
+    assert workflow.index(step_name) < workflow.index("Install SSH key")
+    assert "attestations: read" in workflow
+    assert "attestations: write" not in workflow
+    cleanup = workflow.split("- name: Remove remote transfer staging\n", maxsplit=1)[1]
+    assert "if: always() && steps.verify_attestations.outcome == 'success' && steps.transfer.outcome != 'skipped'" in cleanup.split("shell:", maxsplit=1)[0]
+    signing_workflow = (ROOT / ".github/workflows/public-site-supply-chain.yml").read_text()
+    assert signing_workflow.count("      - '.github/workflows/deploy-public-site-release.yml'") == 2
+
+    binary_dir = tmp_path / "bin"
+    binary_dir.mkdir()
+    gh = binary_dir / "gh"
+    gh.write_text(
+        '#!/bin/sh\n'
+        'printf "%s\\n" "$*" >> "$ATTEST_LOG"\n'
+        'if [ -n "$FAIL_PREDICATE" ]; then\n'
+        '  case "$*" in *"$FAIL_PREDICATE"*) exit 1 ;; esac\n'
+        'fi\n'
+        'printf "{}\\n"\n'
+    )
+    gh.chmod(0o755)
+    release = tmp_path / "release"
+    release.mkdir()
+    log = tmp_path / "attestation-calls"
+    reached = tmp_path / "production-access"
+    script = workflow_shell_step(step_name).replace("/tmp/public-site-release", str(release))
+    result = subprocess.run(
+        ["bash", "-c", script + '\n touch "$PRODUCTION_ACCESS_MARKER"'],
+        env={
+            **os.environ,
+            "PATH": f"{binary_dir}{os.pathsep}{os.environ['PATH']}",
+            "GITHUB_REPOSITORY": "robertashworth1986-debug/lumen-core-public",
+            "RELEASE_COMMIT": "a" * 40,
+            "ATTEST_LOG": str(log),
+            "FAIL_PREDICATE": failed_predicate,
+            "PRODUCTION_ACCESS_MARKER": str(reached),
+        },
+        capture_output=True,
+        text=True,
+    )
+    assert (result.returncode == 0) is (not failed_predicate)
+    assert reached.exists() is (not failed_predicate)
+    calls = log.read_text().splitlines()
+    assert len(calls) == expected_calls
+    for call in calls:
+        assert f"--source-digest {'a' * 40}" in call
+        assert "--source-ref refs/heads/main" in call
+        assert "--signer-workflow robertashworth1986-debug/lumen-core-public/.github/workflows/public-site-supply-chain.yml" in call
+        assert "--cert-oidc-issuer https://token.actions.githubusercontent.com" in call
+        assert "--deny-self-hosted-runners" in call
+    assert "--predicate-type https://slsa.dev/provenance/v1" in calls[0]
+    if expected_calls == 2:
+        assert "--predicate-type https://cyclonedx.org/bom" in calls[1]
+
+
 def test_legacy_auto_deploy_is_replaced_by_read_only_exact_live_audit():
     module = load_module(PACKAGER_PATH, "package_public_site_release_audit_trigger")
     audit = LIVE_AUDIT_WORKFLOW.read_text(encoding="utf-8")

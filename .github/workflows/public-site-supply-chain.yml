@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/public-site-supply-chain.yml'
+      - '.github/workflows/deploy-public-site-release.yml'
       - 'code/deploy/build_public_site_supply_chain.py'
       - 'code/deploy/package_public_site_release.py'
       - 'code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py'
@@ -46,6 +47,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/public-site-supply-chain.yml'
+      - '.github/workflows/deploy-public-site-release.yml'
       - 'code/deploy/build_public_site_supply_chain.py'
       - 'code/deploy/package_public_site_release.py'
       - 'code/ops/VERIFY_PUBLIC_SITE_SUPPLY_CHAIN.py'
