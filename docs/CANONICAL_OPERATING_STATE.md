@@ -7,6 +7,34 @@
 
 ## One commercial sentence
 
+### September 21 portfolio and review-path update
+
+At the founder's request, the canonical homepage, README, investor brief and
+reviewer start page now show the wider LumenCore engineering portfolio. The
+existing `docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md` is the portfolio
+source map, with asset-specific implementation, research, simulation and concept
+states. This work supports active outcome 2 and retains the buyer-owned baseline
+validation sprint as the primary commercial entry point.
+
+The public story now includes the trading/exchange architecture, Grant Factory,
+Mission Control, Quant Lab, ProofLock, utility/geothermal and thermal research,
+HyperCore, EchoLock, LumaJet, the LumaSkin virtual engineering lab, digital-twin
+concepts and Node-RED/immersive prototypes. Historical transaction evidence is
+recognized without asserting strategy-attributed net profit. Virtual engineering
+receipts are not physical or human validation. Science-museum work is a possible
+application, not a verified counterparty deployment. Founder-held evidence is
+identified separately from public source artifacts.
+
+The shared navigation now compares normalized complete paths; the homepage no
+longer marks nested Evidence and ProofLock routes active. The public reviewer
+docket points to the portfolio map while preserving every unestablished claim
+gate as false. The legacy operator routes remain noindex HOLD stubs, and no live
+order, hardware, data-rights or public-sector certification authority changes.
+
+This source update is not a production deployment receipt. Release identity,
+attestation verification, bounded installation, rollback capture and live-byte
+verification remain separate requirements of the guarded static-site workflow.
+
 ### September 21 production release preflight
 
 Active outcome 2 now has a stricter static-release workflow: production access

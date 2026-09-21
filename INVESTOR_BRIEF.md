@@ -1,10 +1,13 @@
 # LumenCore | Investor & Partner Brief
 
-**AI decisions, backed by inspectable proof.**
+**Frontier engineering, backed by inspectable proof.**
 Robert Ashworth · Founder / Systems Architect
-Updated September 20, 2026 · Public, non-confidential review
+Updated September 21, 2026 · Public, non-confidential review
 
-LumenCore is building a proof-to-pilot AI infrastructure validation architecture.
+LumenCore is a founder-built engineering platform spanning quantitative systems,
+grant workflows, energy forecasting, evidence tooling and simulation-led research.
+Its proof-to-pilot AI infrastructure validation architecture provides the first
+commercial entry point.
 It helps a buyer compare a forecasting, routing, or infrastructure candidate
 against an accepted baseline under rules agreed before scoring, then turns the
 result into a decision record a technical reviewer can inspect and replay.
@@ -50,6 +53,22 @@ They support a technical diligence conversation today. Software checks and
 cryptographic hashes establish their named properties; they do not establish
 that an underlying scientific or commercial conclusion is correct.
 
+## The broader engineering asset base
+
+| Asset family | What the engineering record supports | Next evidence gate |
+|---|---|---|
+| Trading and quantitative systems | LumaTrader, Kraken Sentinel and LumaSniper include market-data research, strategy comparison, exchange integration and execution controls. Historical transaction records exist. | Reconciled, strategy-attributed forward results after fees and slippage; canonical runtime configuration remains paper-only. |
+| Workflow and operating interfaces | Grant Factory / LumenGov implement qualification and application preparation. Mission Control and Quant Lab have substantial interface implementation history. | A scoped current-runtime demonstration and buyer acceptance for a specific workflow. |
+| Forecasting, thermal and geometry research | Utility/geothermal pipelines, FlowForm tools and LumaJet simulation preserve declared baselines, adverse results and physical-validation boundaries. | Buyer-authorized evaluation or matched physical experiment appropriate to the claim. |
+| Virtual engineering and frontier concepts | LumaSkin has an implemented virtual lab and first-party synthetic test receipts. HyperCore has numerical implementation; EchoLock remains held research. EchoForm explores digital-twin architecture; Node-RED and immersive tooling support prototypes. | Reproduce each claimed result; complete controlled hardware/human work only where appropriate and authorized. |
+
+The [portfolio evidence map](docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md)
+separates publicly inspectable code from founder-held receipts and identifies
+which evidence is historical, simulated or conceptual. This asset base supplies
+reusable methods and test environments. It does not establish a portfolio of
+revenue-producing products, institutional trading performance, certified
+hardware or a museum customer.
+
 ## One platform, one commercial entry point
 
 LumenCore is the platform. ProofLock is its evidence and claim-governance layer.
@@ -80,7 +99,7 @@ commercial value is a repeatable path from a technical claim to a buyer-owned
 decision. That value must now be tested with a buyer.
 
 The broader research portfolio supplies methods and stress cases for this
-architecture. Its [governed portfolio audit](docs/LUMENCORE_ENGINE_PORTFOLIO_AUDIT_2026-08-08.md)
+architecture. Its [current portfolio evidence map](docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md)
 separates research, delivery, and concept lanes. Breadth is a development asset;
 it is not a count of products, paying customers, or production deployments.
 
@@ -98,6 +117,18 @@ penetration test, agency endorsement, field savings, or production
 authorization. Consortium participation provides a contribution path; it does
 not establish technical validation or procurement selection. These distinctions
 let reviewers assess progress against actual requirements.
+
+## Company and IP diligence to close
+
+The technical record should sit alongside a legal and ownership file containing
+formation and current-status records, the issued and fully diluted cap table,
+founder equity and vesting documents, signed assignments or licenses for relevant
+code and inventions, contributor agreements, and an asset/account ownership
+register. This public engineering record does not verify that those records are
+complete or that founder-originated assets have been assigned to a company.
+Public repository material also carries license terms; source access does not
+establish exclusive company ownership. Official patent status and title require
+the underlying official records and signed instruments.
 
 ## The next investable milestone
 
