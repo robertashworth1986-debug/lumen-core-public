@@ -32,6 +32,14 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
 - Every installed file is re-hashed before the deployment can succeed.
 - Every canonical public URL is downloaded and compared byte-for-byte with the
   release manifest after installation.
+- The live audit validates every manifest row before requesting any URL and
+  refuses an empty release. Its bounded static scope allows at most 1,000 files,
+  a 1 MiB manifest, 64 MiB per file and 512 MiB of declared files in total.
+  Canonical paths and positive finite timeouts are required. Each response is
+  read only up to its declared byte count plus one; an oversized or interrupted
+  response remains an error. A match requires both the declared length and
+  SHA-256, as well as the existing HTTP and MIME checks. The incident classifier
+  independently checks the recorded length against the same manifest.
 - The separate public-site supply-chain workflow inventories every allowlisted
   release file and, on `main`, signs and verifies build-provenance and SBOM
   attestations for the release archive before any human deployment decision.

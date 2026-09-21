@@ -222,6 +222,12 @@ class PublicReleaseIncidentTests(unittest.TestCase):
         with self.assertRaisesRegex(incident.IncidentClassificationError, "summary"):
             incident.classify(policy=self.policy, manifest=self.manifest, audit=audit)
 
+    def test_false_match_with_correct_hash_but_wrong_byte_count_rejected(self) -> None:
+        audit = make_audit(self.manifest)
+        audit["results"][0]["bytes"] += 1  # type: ignore[index]
+        with self.assertRaisesRegex(incident.IncidentClassificationError, "inconsistent"):
+            incident.classify(policy=self.policy, manifest=self.manifest, audit=audit)
+
     def test_noncanonical_domain_rejected(self) -> None:
         audit = make_audit(self.manifest)
         audit["base_url"] = "https://example.com"

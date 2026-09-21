@@ -436,6 +436,7 @@ def validate_audit(
             raise IncidentClassificationError(f"MIME decision is invalid for {name}")
         computed_match = (
             row["http_status"] == 200
+            and row["bytes"] == manifest_row["bytes"]
             and row["actual_sha256"] == row["expected_sha256"]
             and row["content_type_allowed"] is True
         )

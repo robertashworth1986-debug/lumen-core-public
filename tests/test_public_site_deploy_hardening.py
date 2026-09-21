@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import hashlib
+from email.message import Message
+from http.client import IncompleteRead
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -456,6 +459,157 @@ def test_live_verifier_rejects_unknown_manifest_row_fields(tmp_path):
             base_url="https://example.invalid",
             timeout=0.1,
         )
+
+
+def live_manifest(body=b"reviewed bytes", name="operator_home.html"):
+    return {
+        "archive_sha256": "b" * 64,
+        "file_count": 1,
+        "files": [{
+            "archive_name": name,
+            "bytes": len(body),
+            "git_blob_oid": "c" * 40,
+            "install_mode": "0644",
+            "repo_path": f"dashboard/{name}",
+            "sha256": hashlib.sha256(body).hexdigest(),
+        }],
+        "schema": "lumencore.public_site_release_manifest.v1",
+        "source_commit": "a" * 40,
+        "target_directory": "/opt/lumencore/dashboard",
+    }
+
+
+def verify_live_fixture(verifier, tmp_path, payload, **kwargs):
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps(payload), encoding="utf-8")
+    return verifier.verify(
+        manifest_path=manifest,
+        source_commit=payload["source_commit"],
+        base_url="https://lumen-core.ai",
+        timeout=kwargs.get("timeout", 1),
+    )
+
+
+class BoundedLiveResponse(io.BytesIO):
+    status = 200
+
+    def __init__(self, body):
+        super().__init__(body)
+        self.headers = Message()
+        self.headers["Content-Type"] = "text/html"
+        self.read_sizes = []
+
+    def read(self, size=-1):
+        assert size >= 0, "live responses must never be read without a bound"
+        self.read_sizes.append(size)
+        return super().read(size)
+
+
+@pytest.mark.parametrize("count", [0, False, 1001])
+def test_live_verifier_rejects_empty_or_invalid_membership_before_http(tmp_path, monkeypatch, count):
+    verifier = load_module(VERIFY_PATH, "verify_live_membership")
+    payload = live_manifest()
+    payload["file_count"] = count
+    payload["files"] = [] if count in (0, False) else payload["files"] * count
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: pytest.fail("unexpected HTTP"))
+    with pytest.raises(ValueError, match="file rows"):
+        verify_live_fixture(verifier, tmp_path, payload)
+
+
+@pytest.mark.parametrize("name", [".", "./a.html", "a//b.html", "a/./b.html", "a/../b.html", "a\nb.html"])
+def test_live_verifier_validates_all_paths_before_any_http(tmp_path, monkeypatch, name):
+    verifier = load_module(VERIFY_PATH, "verify_live_paths")
+    payload = live_manifest()
+    payload["files"].extend(live_manifest(name=name)["files"])
+    payload["file_count"] = 2
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: pytest.fail("unexpected HTTP"))
+    with pytest.raises(ValueError, match="invalid manifest row"):
+        verify_live_fixture(verifier, tmp_path, payload)
+
+
+def test_live_verifier_rejects_oversized_manifest_before_parsing(tmp_path):
+    verifier = load_module(VERIFY_PATH, "verify_live_document_bound")
+    manifest = tmp_path / "manifest.json"
+    manifest.write_bytes(b" " * (verifier.MAX_MANIFEST_BYTES + 1))
+    with pytest.raises(ValueError, match="bounded input size"):
+        verifier.load_manifest(manifest)
+
+
+def test_live_verifier_rejects_excessive_declared_body_before_http(tmp_path, monkeypatch):
+    verifier = load_module(VERIFY_PATH, "verify_live_file_bound")
+    payload = live_manifest()
+    payload["files"][0]["bytes"] = verifier.MAX_FILE_BYTES + 1
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: pytest.fail("unexpected HTTP"))
+    with pytest.raises(ValueError, match="invalid manifest row"):
+        verify_live_fixture(verifier, tmp_path, payload)
+
+
+def test_live_verifier_rejects_excessive_total_before_http(tmp_path, monkeypatch):
+    verifier = load_module(VERIFY_PATH, "verify_live_total_bound")
+    payload = live_manifest()
+    payload["files"] = [live_manifest(name=f"{i}.html")["files"][0] for i in range(9)]
+    payload["file_count"] = len(payload["files"])
+    for row in payload["files"]:
+        row["bytes"] = verifier.MAX_FILE_BYTES
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: pytest.fail("unexpected HTTP"))
+    with pytest.raises(ValueError, match="bounded total size"):
+        verify_live_fixture(verifier, tmp_path, payload)
+
+
+@pytest.mark.parametrize("timeout", [0, -1, float("inf"), float("nan")])
+def test_live_verifier_rejects_invalid_timeout(tmp_path, monkeypatch, timeout):
+    verifier = load_module(VERIFY_PATH, "verify_live_timeout")
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: pytest.fail("unexpected HTTP"))
+    with pytest.raises(ValueError, match="positive and finite"):
+        verify_live_fixture(verifier, tmp_path, live_manifest(), timeout=timeout)
+
+
+@pytest.mark.parametrize("body", [b"", b"reviewed bytes"])
+def test_live_verifier_accepts_exact_bytes_with_bounded_reads(tmp_path, monkeypatch, body):
+    verifier = load_module(VERIFY_PATH, "verify_live_exact_bytes")
+    response = BoundedLiveResponse(body)
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: response)
+    result = verify_live_fixture(verifier, tmp_path, live_manifest(body))
+    assert result["release_verified"] is True
+    assert result["matched_file_count"] == 1
+    assert response.read_sizes == [len(body) + 1]
+
+
+def test_live_verifier_rejects_oversized_response_without_reading_it_all(tmp_path, monkeypatch):
+    verifier = load_module(VERIFY_PATH, "verify_live_oversized_response")
+    response = BoundedLiveResponse(b"reviewed bytes" + b"x" * 100_000)
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: response)
+    result = verify_live_fixture(verifier, tmp_path, live_manifest())
+    assert result["release_verified"] is False
+    assert result["results"][0]["status"] == "ERROR"
+    assert result["results"][0]["detail"] == "response exceeds manifest byte count"
+    assert response.read_sizes == [len(b"reviewed bytes") + 1]
+
+
+def test_live_verifier_rejects_correct_hash_with_wrong_declared_length(tmp_path, monkeypatch):
+    verifier = load_module(VERIFY_PATH, "verify_live_length_match")
+    body = b"reviewed bytes"
+    payload = live_manifest(body)
+    payload["files"][0]["bytes"] += 1
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: BoundedLiveResponse(body))
+    result = verify_live_fixture(verifier, tmp_path, payload)
+    assert result["release_verified"] is False
+    row = result["results"][0]
+    assert row["status"] == "MISMATCH"
+    assert row["actual_sha256"] == row["expected_sha256"]
+
+
+def test_live_verifier_retains_incomplete_http_failure(tmp_path, monkeypatch):
+    verifier = load_module(VERIFY_PATH, "verify_live_incomplete_response")
+
+    def interrupted(*args, **kwargs):
+        raise IncompleteRead(b"partial", 20)
+
+    monkeypatch.setattr(verifier, "urlopen", interrupted)
+    result = verify_live_fixture(verifier, tmp_path, live_manifest())
+    assert result["release_verified"] is False
+    assert result["results"][0]["status"] == "ERROR"
+    assert "IncompleteRead" in result["results"][0]["detail"]
 
 
 def require_posix_apply_test() -> str:

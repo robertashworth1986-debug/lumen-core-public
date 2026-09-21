@@ -7,6 +7,30 @@
 
 ## One commercial sentence
 
+### September 21 live-release audit hardening
+
+Active outcome 2 now includes a bounded correction to the existing exact-byte
+audit: an empty manifest cannot produce a passing release receipt, all rows are
+validated before HTTP requests, and manifest inputs and response bodies have
+explicit size limits. Both the live verifier and incident classifier require
+the declared byte count to match in addition to SHA-256. Oversized and
+interrupted responses remain visible failures. The existing signed release,
+human approval, installation, rollback and trading boundaries are unchanged.
+
+The focused local release, incident, supply-chain, historical-receipt,
+repository-security and institutional-crosswalk suite passed 167 tests and
+eight subtests on Python 3.12; three existing root-incompatible POSIX installation
+tests were skipped. This is not a complete-suite pass. The existing hash-locked
+Python 3.11.9 CI remains the authoritative complete-suite gate for the eventual
+reviewed commit.
+
+A fresh September 21 read-only GitHub branch observation at main commit
+`01edc688003e3e22387cd78d7db4715b0f75f675` still reported `protected=false`,
+required-status enforcement `off`, and no required checks. This is an open
+repository-setting gap; no setting was changed. No certification, independent
+security review, historical credential revocation or broader production
+authorization is established by the source correction or local tests.
+
 ### September 21 portfolio and review-path update
 
 At the founder's request, the canonical homepage, README, investor brief and
