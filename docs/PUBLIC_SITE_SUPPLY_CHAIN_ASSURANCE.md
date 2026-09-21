@@ -39,7 +39,7 @@ release identities.
 
 ## Two evidence layers
 
-1. **Every pull request and `main` build:** deterministic release package,
+1. **Release-related pull requests and every `main` push:** deterministic release package,
    CycloneDX inventory, first-party local receipt, verification receipt, and
    SHA-256 manifest. These are unsigned build outputs.
 2. **GitHub-hosted `main` build only:** Sigstore-signed SLSA provenance and a
@@ -50,6 +50,15 @@ release identities.
 The signed bundles are verified in the workflow against the repository,
 signer workflow, `refs/heads/main`, source digest, GitHub OIDC issuer, and a
 GitHub-hosted runner requirement before they are retained as artifacts.
+
+The `main` push trigger deliberately has no path filter. The manual deployment
+gate requires the exact current main commit and attestations with that same
+source digest. A documentation-, verifier-, or evidence-only commit still
+changes that identity even when all public archive bytes remain unchanged.
+Signing every main push keeps that commit eligible for review under the existing
+release gate; it does not deploy it. Pull-request path filtering and the
+read-only build/main-only signing separation remain in place. This closes a
+release-readiness gap for active outcome 2 without granting production access.
 
 The first retained successful set is documented in
 [`PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md`](PUBLIC_SITE_SIGNED_ATTESTATION_RECEIPT_2026-08-08.md).
