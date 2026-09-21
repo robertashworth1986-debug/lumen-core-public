@@ -12,6 +12,8 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
 - The requested release must be a full 40-character commit SHA.
 - The requested commit must be the same commit that contains the workflow being
   executed.
+- The workflow must be dispatched from `refs/heads/main`; a matching SHA on
+  an unmerged branch or tag cannot authorize production access.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
 - Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (189 for
@@ -33,6 +35,12 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
 - The separate public-site supply-chain workflow inventories every allowlisted
   release file and, on `main`, signs and verifies build-provenance and SBOM
   attestations for the release archive before any human deployment decision.
+- The deployment independently verifies both signed predicates against the
+  locally rebuilt archive, canonical repository, signing workflow, exact source
+  commit, main ref, GitHub OIDC issuer, and hosted-runner requirement before
+  installing an SSH key. Missing or invalid attestations stop the deployment;
+  an unsigned package cannot reach the VPS through this workflow. Verification
+  receipts are retained with the deployment artifacts.
 - Successful named deployments are added to an append-only receipt history;
   the repository verifier reconstructs every retained Git subject rather than
   allowing a newer receipt to replace an earlier one.
@@ -52,8 +60,10 @@ only redirect stale public links back to the bounded validation path.
 
 ## Human release command
 
-Run the `Deploy exact public-site snapshot to VPS` workflow against the exact
-commit to be released. Enter that full commit SHA and select
+Wait for the `Public site supply-chain assurance` workflow to finish both build
+and signing jobs for the exact main commit to be released. Run the
+`Deploy exact public-site snapshot to VPS` workflow on `main`. Enter that full
+commit SHA and select
 `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` only after reviewing the commit and the
 production-environment approval gate.
 
