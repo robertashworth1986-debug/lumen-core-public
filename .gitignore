@@ -38,6 +38,7 @@ dashboard/*.html
 !dashboard/quant_lab.html
 !dashboard/kraken_execution_dashboard.html
 !dashboard/grants.html
+!dashboard/capital_research_lab.html
 !dashboard/forecast.html
 !dashboard/explain.html
 !dashboard/operator_home.html

@@ -212,6 +212,11 @@ RELEASE_PATHS: Final = (
     "dashboard/cohort/members/xi.html",
     "dashboard/cohort/members/yoamigo.html",
     "dashboard/downloads/eia-two-window-review-20260922.zip",
+    "dashboard/capital_research_lab.html",
+    "dashboard/assets/capital_research_lab.css",
+    "dashboard/assets/capital_research.json",
+    "dashboard/js/capital_math.mjs",
+    "dashboard/js/capital_research_lab.mjs",
 )
 
 

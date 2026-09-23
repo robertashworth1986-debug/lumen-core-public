@@ -199,6 +199,11 @@ readonly -a RELEASE_FILES=(
   "cohort/members/xi.html"
   "cohort/members/yoamigo.html"
   "downloads/eia-two-window-review-20260922.zip"
+  "capital_research_lab.html"
+  "assets/capital_research_lab.css"
+  "assets/capital_research.json"
+  "js/capital_math.mjs"
+  "js/capital_research_lab.mjs"
 )
 readonly -a RELEASE_DIRECTORIES=(
   "assets"
