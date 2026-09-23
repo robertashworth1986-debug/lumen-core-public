@@ -16,8 +16,8 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
   an unmerged branch or tag cannot authorize production access.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
-- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (189 for
-  the cohort-enabled release). Earlier 43-file and 119-file releases retain their original
+- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (190 for
+  the cohort and frozen EIA review release). Earlier 43-file, 119-file and 189-file releases retain their original
   membership, reconstructed from their pinned literal allowlists as data.
 - Package bytes are read from immutable Git blobs, not from mutable worktree
   files.
@@ -59,7 +59,9 @@ The allowlist covers the proof-first homepage, bounded engagement page,
 external-review page and machine-readable reviewer docket, public status page,
 bounded evidence page, shared styles/command fabric, crawl metadata and public
 mark, the ProofLock browser verifier with its protocol fixtures, and noindex
-HOLD stubs for previous operator and research dashboard URLs.
+HOLD stubs for previous operator and research dashboard URLs. The reviewed
+`downloads/eia-two-window-review-20260922.zip` is part of the same immutable
+release and must pass exact-byte and ZIP MIME verification before promotion.
 
 It deliberately excludes credentials, runtime logs, live order controls,
 private evidence, grant packets, identity documents, and mutable data feeds. The

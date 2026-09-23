@@ -44,8 +44,8 @@ FILE_KEYS = {
 
 
 def content_type_allowed(archive_name: str, content_type: str) -> bool:
-    """Require standards-safe MIME types for public JSON review contracts."""
-    if archive_name.startswith("cohort/"):
+    """Require standards-safe MIME types for public review files and downloads."""
+    if archive_name.startswith(("cohort/", "downloads/")):
         expected = {
             ".html": {"text/html"}, ".css": {"text/css"},
             ".mjs": {"application/javascript", "text/javascript"},

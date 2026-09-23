@@ -211,6 +211,7 @@ RELEASE_PATHS: Final = (
     "dashboard/cohort/members/wednesday.html",
     "dashboard/cohort/members/xi.html",
     "dashboard/cohort/members/yoamigo.html",
+    "dashboard/downloads/eia-two-window-review-20260922.zip",
 )
 
 

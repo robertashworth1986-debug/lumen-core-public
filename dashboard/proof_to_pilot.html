@@ -56,7 +56,21 @@
       </div>
     </div></section>
 
-    <section class="tint"><div class="wrap">
+    <section class="tint" id="frozen-results"><div class="wrap">
+      <div class="eyebrow">Frozen electricity-forecast comparisons · September 2026</div>
+      <h2>Inspect the results and the gates they did not pass.</h2>
+      <p class="sub">Two retrospective windows use the same development-selected candidate. These are first-party replay results. The complete download preserves inputs, predictions, hashes and the original failed gates.</p>
+      <table><caption>Descriptive MAE on identical paired rows; lower is better.</caption><thead><tr><th scope="col">Window</th><th scope="col">Paired authority-days</th><th scope="col">Direct LightGBM baseline</th><th scope="col">Residual candidate</th><th scope="col">Error reduction</th></tr></thead><tbody>
+        <tr><th scope="row">Original historical window</th><td>1,176</td><td>17,874.172 MWh</td><td>15,979.087 MWh</td><td>10.602%</td></tr>
+        <tr><th scope="row">July 13–September 8 archive</th><td>285</td><td>19,765.544 MWh</td><td>16,107.044 MWh</td><td>18.509%</td></tr>
+      </tbody></table>
+      <p class="boundary"><strong>Decision: HOLD.</strong> Original coverage and a SWPP regression gate failed. The later window has no eligible SWPP rows and too few days and authority-month units. Historical records may contain revisions. These comparisons do not prove prospective performance, independent validation, electricity saved or annual dollar savings.</p>
+      <div class="actions"><a class="button primary" href="/downloads/eia-two-window-review-20260922.zip" download>Download both frozen EIA packets · 1.23 MB</a><a class="button" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMENCORE_LIVE_BREADTH_PROOF_ADDENDUM.md">Review five sectors and their constraints</a></div>
+      <details><summary>Verify the download</summary><p>ZIP SHA-256: <code style="overflow-wrap:anywhere">cc05eb52559bca53035bfe09e36438ad191634767e2d9cc684f94048d448a8fb</code></p><p>After extraction, run <code>python code/ops/VERIFY_EIA_CONSTRAINT_REVIEW.py --packet original</code> and repeat with <code>--packet later</code>. Hash verification establishes artifact identity; it does not establish scientific correctness or a favorable decision.</p></details>
+      <p class="sub">The next useful test needs a buyer-owned incumbent with matching target and issue time, complete source history, unchanged service requirements and an agreed operating-cost policy. <a href="mailto:robertashworth4444@gmail.com?subject=Frozen%20EIA%20review%20-%20one%20buyer%20baseline">Discuss one validation scope</a>.</p>
+    </div></section>
+
+    <section><div class="wrap">
       <h2>What the buyer receives</h2>
       <div class="grid">
         <div class="card"><h3>Pre-registered contract</h3><p>Named data rights, comparator, metric, threshold, holdout, failure rules, decision owner, and claim boundary.</p></div>

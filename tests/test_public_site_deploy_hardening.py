@@ -7,7 +7,7 @@ import importlib.util
 import io
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import shutil
 import stat
@@ -116,7 +116,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 189
+    assert len(names) == len(set(names)) == 190
     assert names[:5] == [
         "operator_home.html",
         "opportunity_sprint.html",
@@ -151,6 +151,7 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert "assets/prooflock/bounded_validation_protocol_v2.json" in names
     assert "build_week/prooflock_console/index.html" in names
     assert "build_week/prooflock_console/three.module.min.js" in names
+    assert "downloads/eia-two-window-review-20260922.zip" in names
     assert not any(name.startswith("data/") for name in names)
 
     apply_script = APPLY_SCRIPT.read_text(encoding="utf-8")
@@ -162,12 +163,29 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert match is not None
     root_allowlist = re.findall(r'^\s+"([^"]+)"$', match.group("body"), re.MULTILINE)
     assert root_allowlist == names
+    directories_match = re.search(
+        r"readonly -a RELEASE_DIRECTORIES=\(\n(?P<body>.*?)\n\)",
+        apply_script,
+        flags=re.DOTALL,
+    )
+    assert directories_match is not None
+    release_directories = re.findall(
+        r'^\s+"([^"]+)"$', directories_match.group("body"), re.MULTILINE
+    )
+    required_directories = {
+        parent.as_posix()
+        for name in names
+        for parent in PurePosixPath(name).parents
+        if parent != PurePosixPath(".")
+    }
+    assert set(release_directories) == required_directories
+    assert len(release_directories) == len(required_directories)
 
 
 def test_release_count_is_bound_to_current_control_records():
     module = load_module(PACKAGER_PATH, "package_public_site_release_control_count")
     release_count = len(module.RELEASE_PATHS)
-    assert release_count == 189
+    assert release_count == 190
 
     protocol = (ROOT / "docs" / "PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md").read_text(
         encoding="utf-8"
@@ -587,6 +605,38 @@ def test_live_verifier_rejects_oversized_response_without_reading_it_all(tmp_pat
     assert response.read_sizes == [len(b"reviewed bytes") + 1]
 
 
+@pytest.mark.parametrize(
+    ("content_type", "allowed"),
+    [
+        ("application/zip", True),
+        ("application/x-zip-compressed", True),
+        ("application/octet-stream", True),
+        ("text/html", False),
+        ("text/plain", False),
+        ("application/json", False),
+    ],
+)
+def test_frozen_eia_download_requires_zip_mime_with_exact_bytes(
+    tmp_path, monkeypatch, content_type, allowed
+):
+    verifier = load_module(VERIFY_PATH, "verify_frozen_eia_zip_mime")
+    body = b"PK\x03\x04reviewed ZIP fixture"
+    name = "downloads/eia-two-window-review-20260922.zip"
+    response = BoundedLiveResponse(body)
+    response.headers.replace_header("Content-Type", content_type)
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: response)
+    result = verify_live_fixture(verifier, tmp_path, live_manifest(body, name))
+    row = result["results"][0]
+    assert row["actual_sha256"] == row["expected_sha256"]
+    assert row["bytes"] == len(body)
+    assert row["content_type_allowed"] is allowed
+    assert result["release_verified"] is allowed
+    assert result["matched_file_count"] == int(allowed)
+    assert row["url"] == (
+        f"https://lumen-core.ai/{name}?release={'a' * 40}"
+    )
+
+
 def test_live_verifier_rejects_correct_hash_with_wrong_declared_length(tmp_path, monkeypatch):
     verifier = load_module(VERIFY_PATH, "verify_live_length_match")
     body = b"reviewed bytes"
@@ -694,6 +744,49 @@ def test_posix_apply_installs_allowlist_and_preserves_operator_data(tmp_path):
         assert installed.read_bytes() == committed[repo_path]
         assert stat.S_IMODE(installed.stat().st_mode) == 0o644
         assert (rollback / "files" / name).read_bytes() == old_bodies[name]
+
+
+def test_posix_apply_creates_missing_download_directory_and_retains_rollback_state(tmp_path):
+    bash = require_posix_apply_test()
+    module, _repo, commit, committed, archive, manifest, _payload = build_package(tmp_path)
+    test_root = tmp_path / "remote"
+    target, old_bodies = make_remote_sandbox(test_root, module)
+    name = "downloads/eia-two-window-review-20260922.zip"
+    (target / name).unlink()
+    (target / "downloads").rmdir()
+    old_bodies.pop(name)
+    assert not (target / "downloads").exists()
+    env = dict(os.environ)
+    env.update(
+        PUBLIC_SITE_DEPLOY_TEST_MODE="1",
+        PUBLIC_SITE_DEPLOY_TEST_ROOT=str(test_root),
+    )
+    completed = subprocess.run(
+        apply_command(bash, archive, manifest, commit),
+        check=True,
+        text=True,
+        capture_output=True,
+        env=env,
+    )
+    assert "PUBLIC_SITE_DEPLOYMENT_OK" in completed.stdout
+    rollback_match = re.search(r"^PUBLIC_SITE_ROLLBACK_DIR=(.+)$", completed.stdout, re.M)
+    assert rollback_match is not None
+    rollback = Path(rollback_match.group(1))
+    assert stat.S_IMODE((target / "downloads").stat().st_mode) == 0o755
+    assert (target / name).read_bytes() == committed[f"dashboard/{name}"]
+    assert stat.S_IMODE((target / name).stat().st_mode) == 0o644
+    assert "downloads\tMISSING\t-\t-\t-" in (
+        rollback / "directory-state.tsv"
+    ).read_text().splitlines()
+    assert any(
+        row.startswith(f"{name}\tMISSING\t")
+        for row in (rollback / "pre-deploy.tsv").read_text().splitlines()
+    )
+    assert not (rollback / "files" / name).exists()
+    for previous_name, body in old_bodies.items():
+        assert (rollback / "files" / previous_name).read_bytes() == body
+    assert (target / "local_operator_notes.html").read_bytes() == b"preserve non-release page\n"
+    assert (target / "data" / "snapshot.json").read_bytes() == b"{}\n"
 
 
 def test_apply_rejects_hold_before_touching_target(tmp_path):

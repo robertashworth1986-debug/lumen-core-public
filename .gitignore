@@ -27,6 +27,7 @@ luma_live_keys.env
 *.csv
 *.jsonl
 *.zip
+!/dashboard/downloads/eia-two-window-review-20260922.zip
 *.tar.gz
 *.parquet
 

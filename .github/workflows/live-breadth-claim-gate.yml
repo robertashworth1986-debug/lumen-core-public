@@ -7,6 +7,10 @@ on:
       - 'code/ops/BUILD_PUBLIC_LIVE_BREADTH_PROVENANCE_GATE.py'
       - 'code/ops/BUILD_PUBLIC_SUPPORT_READINESS_PACKET.py'
       - 'code/ops/BUILD_PUBLIC_VISIBILITY_PACKET.py'
+      - 'code/ops/BUILD_MULTI_ASSET_FROZEN_DELTA_PACK.py'
+      - 'code/ops/BUILD_FROZEN_DELTA_TRUTH_CHAIN.py'
+      - 'code/ops/BUILD_FROZEN_DELTA_BUYER_OUTREACH.py'
+      - 'code/ops/BUILD_CHAMPION_SAMPLE_EXPANSION_AND_ECONOMIC_BRIDGE.py'
       - 'code/ops/build_live_breadth_value_panel.py'
       - 'code/ops/build_live_breadth_governance_worklist.py'
       - 'code/ops/build_public_live_breadth_manifest.py'
@@ -26,6 +30,8 @@ on:
       - 'docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md'
       - 'tests/test_canonical_surface_design.py'
       - 'tests/test_live_breadth_claim_safety.py'
+      - 'tests/test_frozen_delta_buyer_outreach.py'
+      - 'tests/test_champion_sample_expansion_and_economic_bridge.py'
       - 'tests/test_live_breadth_governance_worklist.py'
       - 'tests/test_public_live_breadth_manifest.py'
       - 'tests/test_public_live_breadth_provenance_gate.py'
@@ -38,6 +44,10 @@ on:
       - 'code/ops/BUILD_PUBLIC_LIVE_BREADTH_PROVENANCE_GATE.py'
       - 'code/ops/BUILD_PUBLIC_SUPPORT_READINESS_PACKET.py'
       - 'code/ops/BUILD_PUBLIC_VISIBILITY_PACKET.py'
+      - 'code/ops/BUILD_MULTI_ASSET_FROZEN_DELTA_PACK.py'
+      - 'code/ops/BUILD_FROZEN_DELTA_TRUTH_CHAIN.py'
+      - 'code/ops/BUILD_FROZEN_DELTA_BUYER_OUTREACH.py'
+      - 'code/ops/BUILD_CHAMPION_SAMPLE_EXPANSION_AND_ECONOMIC_BRIDGE.py'
       - 'code/ops/build_live_breadth_value_panel.py'
       - 'code/ops/build_live_breadth_governance_worklist.py'
       - 'code/ops/build_public_live_breadth_manifest.py'
@@ -57,6 +67,8 @@ on:
       - 'docs/PUBLIC_VISIBILITY_AND_SOURCE_AUTHORITY_2026-06-20.md'
       - 'tests/test_canonical_surface_design.py'
       - 'tests/test_live_breadth_claim_safety.py'
+      - 'tests/test_frozen_delta_buyer_outreach.py'
+      - 'tests/test_champion_sample_expansion_and_economic_bridge.py'
       - 'tests/test_live_breadth_governance_worklist.py'
       - 'tests/test_public_live_breadth_manifest.py'
       - 'tests/test_public_live_breadth_provenance_gate.py'
@@ -92,6 +104,8 @@ jobs:
           tests/test_public_visibility_packet.py
           tests/test_public_support_readiness_packet.py
           tests/test_live_breadth_claim_safety.py
+          tests/test_frozen_delta_buyer_outreach.py
+          tests/test_champion_sample_expansion_and_economic_bridge.py
           tests/test_live_breadth_governance_worklist.py
           tests/test_public_live_breadth_manifest.py
           tests/test_canonical_surface_design.py
