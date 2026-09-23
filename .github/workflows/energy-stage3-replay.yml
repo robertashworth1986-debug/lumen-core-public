@@ -1,0 +1,102 @@
+name: Energy Stage 3 Exact-Time Replay
+on:
+  push:
+    branches: ["exp/energy-stage3-integrity-20260905"]
+    paths: [".github/workflows/energy-stage3-replay.yml", "experiments/energy_multisource/stage3/run_stage3.py", "experiments/energy_multisource/stage3/test_stage3.py"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.13.5"
+      - name: Install pinned numerical dependency
+        run: python -m pip install --disable-pip-version-check numpy==2.3.5
+      - name: Execute timeline and evidence-boundary tests
+        run: |
+          mkdir -p out/stage3/results
+          set -o pipefail
+          python -m unittest discover -s experiments/energy_multisource/stage3 -p test_stage3.py -v 2>&1 | tee out/stage3/TESTS.txt
+      - name: Acquire two immutable existing artifacts without repeating NOAA downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib,stat,urllib.error,urllib.parse,urllib.request,zipfile
+          root=pathlib.Path('out/stage3')
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,req,fp,code,msg,headers,newurl): return None
+          opener=urllib.request.build_opener(NoRedirect())
+          sources=[(9965191841,'dd995b13f8a16e29a58103d39542284010d02638bec16b2f49c9e13943c4cb5f','prior'),(9970027256,'ae6d24e849043fc0175c63fafce20a78a7852711bb85e87de266eabaf2efd4dc','history')]
+          receipt=[]
+          for aid,expected,folder in sources:
+              url=f'https://api.github.com/repos/{os.environ["GITHUB_REPOSITORY"]}/actions/artifacts/{aid}/zip'
+              req=urllib.request.Request(url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'})
+              try:
+                  response=opener.open(req,timeout=60)
+              except urllib.error.HTTPError as e:
+                  if e.code not in (301,302,303,307,308): raise RuntimeError(f'artifact fetch HTTP {e.code}') from None
+                  loc=e.headers['Location']; u=urllib.parse.urlparse(loc)
+                  if u.scheme!='https' or not (u.hostname.endswith('.blob.core.windows.net') or u.hostname.endswith('.githubusercontent.com') or u.hostname.endswith('.github.com')): raise RuntimeError('unexpected artifact host')
+                  response=urllib.request.urlopen(urllib.request.Request(loc),timeout=60)
+              p=root/(folder+'.zip'); h=hashlib.sha256(); total=0
+              with response as r,p.open('wb') as f:
+                  while True:
+                      b=r.read(1<<20)
+                      if not b: break
+                      total+=len(b)
+                      if total>80000000: raise RuntimeError('artifact byte budget exceeded')
+                      f.write(b); h.update(b)
+              if h.hexdigest()!=expected: raise RuntimeError('artifact hash mismatch')
+              target=root/folder; target.mkdir(exist_ok=True)
+              with zipfile.ZipFile(p) as z:
+                  if sum(i.file_size for i in z.infolist())>300000000: raise RuntimeError('expanded size budget exceeded')
+                  for i in z.infolist():
+                      if not (target/i.filename).resolve().is_relative_to(target.resolve()) or stat.S_ISLNK(i.external_attr>>16): raise RuntimeError('unsafe artifact path')
+                  z.extractall(target)
+              receipt.append({'artifact_id':aid,'sha256':expected,'bytes':total,'folder':folder})
+              print(folder,aid,'HASH_VERIFIED')
+          (root/'INPUT_RECEIPT.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          PY
+      - name: Replay predeclared comparisons
+        run: |
+          python experiments/energy_multisource/stage3/run_stage3.py --prior out/stage3/prior --history out/stage3/history --out out/stage3/results
+          python - <<'PY'
+          import json,pathlib
+          root=pathlib.Path('out/stage3'); s=json.loads((root/'results/summary.json').read_text())
+          state='COMPLETE' if s['comparisons_scored']==s['comparisons_expected'] else 'COMPLETE_WITH_SOURCE_HOLD'
+          (root/'EXECUTION_STATUS.json').write_text(json.dumps({'execution_status':state,'comparisons_scored':s['comparisons_scored'],'comparisons_expected':s['comparisons_expected'],'unavailable_source_cases':s['acquisition_or_analysis_failures'],'independent_validation':False,'execution_success_is_not_performance_success':True},indent=2)+'\n')
+          print(state)
+          PY
+      - name: Bind code, environment and result hashes
+        if: always()
+        run: |
+          python - <<'PY'
+          import datetime,hashlib,json,os,pathlib
+          root=pathlib.Path('out/stage3'); root.mkdir(parents=True,exist_ok=True)
+          files=[]
+          for p in [*sorted((root/'results').glob('*')),pathlib.Path('experiments/energy_multisource/stage3/run_stage3.py'),pathlib.Path('experiments/energy_multisource/stage3/test_stage3.py'),pathlib.Path('experiments/energy_multisource/stage3/PROTOCOL.json')]:
+              if p.is_file(): files.append({'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size})
+          (root/'RUN_RECEIPT.json').write_text(json.dumps({'recorded_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'commit':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],'files':files,'claim_boundary':'Same-party reproducible research, not third-party validation or deployment.'},indent=2)+'\n')
+          PY
+      - name: Preserve results including failures
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: energy-stage3-replay-${{ github.sha }}
+          path: |
+            out/stage3/results/
+            out/stage3/TESTS.txt
+            out/stage3/INPUT_RECEIPT.json
+            out/stage3/EXECUTION_STATUS.json
+            out/stage3/RUN_RECEIPT.json
+          retention-days: 30
+          if-no-files-found: error
