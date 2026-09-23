@@ -1,0 +1,97 @@
+name: Cloudflare Pages continuity package
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/cloudflare-pages-continuity.yml'
+      - 'code/deploy/build_cloudflare_pages_preview.py'
+      - 'code/deploy/package_public_site_release.py'
+      - 'dashboard/**'
+      - 'docs/API_AND_DEMO_CONTINUITY_CHECKLIST.md'
+      - 'tests/test_cloudflare_pages_continuity.py'
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: Full 40-character commit to package (must equal the workflow commit)
+        required: true
+        type: string
+      approval:
+        description: Package a preview artifact only; this does not deploy or change DNS
+        required: true
+        default: HOLD
+        type: choice
+        options:
+          - HOLD
+          - PACKAGE_CLOUDFLARE_PAGES_PREVIEW
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    if: >-
+      github.event_name == 'pull_request' ||
+      inputs.approval == 'PACKAGE_CLOUDFLARE_PAGES_PREVIEW'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SOURCE_COMMIT: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || inputs.source_commit }}
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.SOURCE_COMMIT }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify exact source and manual approval
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          APPROVAL: ${{ inputs.approval }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_COMMIT" =~ ^[0-9a-fA-F]{40}$ ]]
+          [[ "$(git rev-parse HEAD)" == "${SOURCE_COMMIT,,}" ]]
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            [[ "$APPROVAL" == "PACKAGE_CLOUDFLARE_PAGES_PREVIEW" ]]
+            [[ "$SOURCE_COMMIT" == "$GITHUB_SHA" ]]
+          fi
+
+      - name: Build immutable Pages preview
+        run: |
+          set -euo pipefail
+          python code/deploy/build_cloudflare_pages_preview.py \
+            --source-commit "$SOURCE_COMMIT" \
+            --output-dir /tmp/lumencore-cloudflare-pages \
+            --manifest /tmp/lumencore-cloudflare-pages-manifest.json
+
+      - name: Smoke-test buyer routes locally
+        run: |
+          set -euo pipefail
+          python -m http.server 4173 --bind 127.0.0.1 \
+            --directory /tmp/lumencore-cloudflare-pages >/tmp/pages-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            curl --silent --fail http://127.0.0.1:4173/ >/tmp/home.html && break
+            sleep 0.25
+          done
+          grep -F 'proof-to-pilot-home-v1' /tmp/home.html
+          curl --silent --fail http://127.0.0.1:4173/proof_to_pilot.html \
+            | grep -F 'bounded-validation-offer-v1'
+          curl --silent --fail http://127.0.0.1:4173/evidence/ \
+            | grep -F '<html'
+          curl --silent --fail http://127.0.0.1:4173/external_review.html \
+            | grep -F 'external-replication-docket-v1'
+          curl --silent --fail http://127.0.0.1:4173/build_week/prooflock_console/ \
+            | grep -F 'ProofLock'
+
+      - name: Upload non-deploying preview artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: cloudflare-pages-preview-${{ env.SOURCE_COMMIT }}
+          path: |
+            /tmp/lumencore-cloudflare-pages
+            /tmp/lumencore-cloudflare-pages-manifest.json
+          if-no-files-found: error
+          retention-days: 7
