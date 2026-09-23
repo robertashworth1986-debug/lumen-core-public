@@ -2,6 +2,7 @@
 
 The cycle/outline/XForm attack surfaces are described by upstream advisories
 GHSA-jp53-mhqp-8xcg, GHSA-23w6-3w8w-8484 and GHSA-763m-79hh-57f2.
+Alphabetic page-label bounds cover GHSA-w23x-9jrw-r45c.
 Fixtures here are generated in memory; no uploaded PDF or exploit file runs.
 """
 from io import BytesIO
@@ -9,11 +10,11 @@ from pathlib import Path
 import os
 import subprocess
 import sys
-from unittest.mock import patch
 
 import pypdf
 import pytest
 from pypdf import PdfReader, PdfWriter
+from pypdf._page_labels import number2lowercase_letter, number2uppercase_letter
 from pypdf.errors import LimitReachedError
 from pypdf.generic import (
     ArrayObject, DecodedStreamObject, DictionaryObject, NameObject,
@@ -64,7 +65,7 @@ def test_outline_alias_expansion_obeys_a_shared_entry_budget():
     })
     # A tiny test budget exercises the upstream limit without allocating a
     # large tree. It does not measure the default limit's memory consumption.
-    with patch('pypdf._doc_common.OUTLINE_MAX_ENTRIES', 8, create=True):
+    with pypdf.apply_configuration(outline_maximum_entries=8):
         with pytest.raises(LimitReachedError, match='outline entry limit'):
             _ = writer.outline
 
@@ -95,17 +96,31 @@ def page_with_repeated_form(repeats):
 
 def test_repeated_form_extraction_stops_at_budget_and_reports_truncation(caplog):
     _, page = page_with_repeated_form(7)
-    with patch('pypdf._page.MAX_XFORM_INVOCATIONS_PER_EXTRACTION', 3, create=True):
+    with pypdf.apply_configuration(xform_maximum_invocations_per_extraction=3):
         with caplog.at_level('WARNING', logger='pypdf'):
             text = page.extract_text()
     assert text.count('fixture') == 3
     assert 'further form content is skipped' in caplog.text
 
 
-def test_normal_pdf_round_trip_preserves_text_outline_and_metadata():
+@pytest.mark.parametrize('label,letter', [
+    (number2uppercase_letter, 'Z'), (number2lowercase_letter, 'z'),
+])
+def test_alphabetic_page_label_accepts_boundary_and_rejects_next_length(label, letter):
+    # These small integer inputs exercise the upstream 512-character bound.
+    # The old release also returns a short string, so the negative control
+    # establishes a missing rejection, not a measured exhaustion incident.
+    with pytest.raises(ValueError, match='too large'):
+        label(26 * 512 + 1)
+    assert label(26 * 512) == letter * 512
+
+
+def test_normal_pdf_round_trip_preserves_text_outline_metadata_and_attachments():
     writer, _ = page_with_repeated_form(2)
     writer.add_outline_item('Evidence fixture', 0)
     writer.add_metadata({'/Title': 'LumenCore dependency compatibility'})
+    writer.add_attachment('receipt.txt', b'bounded fixture')
+    writer.add_attachment('context.txt', b'compatibility only')
     stream = BytesIO()
     writer.write(stream)
     stream.seek(0)
@@ -114,3 +129,7 @@ def test_normal_pdf_round_trip_preserves_text_outline_and_metadata():
     assert reader.pages[0].extract_text().count('fixture') == 2
     assert reader.outline[0].title == 'Evidence fixture'
     assert reader.metadata.title == 'LumenCore dependency compatibility'
+    assert dict(reader.attachments) == {
+        'receipt.txt': [b'bounded fixture'],
+        'context.txt': [b'compatibility only'],
+    }

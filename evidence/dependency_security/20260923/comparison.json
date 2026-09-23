@@ -1,0 +1,106 @@
+{
+  "schema": "lumencore.pdf_dependency_security_comparison.v1",
+  "recorded_utc": "2026-09-23T12:44:02.699964Z",
+  "active_outcome": "2: external validation or paid-pilot conversion; existing repository assurance package",
+  "baseline_commit": "40cbeacf8308d3e090b673a8f2c460d7c69784b1",
+  "current_main_observed": "16ad51d111ddaa1867276a1014defed542bd7fcd",
+  "baseline_pypdf": "6.17.0",
+  "candidate_pypdf": "6.19.0",
+  "audit_tool": "pip-audit==2.10.1",
+  "audit_command": "python -m pip_audit --no-deps --disable-pip -r <complete institutional lock> --format json --output <receipt>",
+  "audit_method": "Public advisory lookup for all 39 package names/versions from each complete lock. Dependency resolution and package installation disabled.",
+  "baseline_audit": {
+    "known_advisories": 0,
+    "affected_packages": 0,
+    "exit_code": 0
+  },
+  "candidate_audit": {
+    "known_advisories": 0,
+    "affected_packages": 0,
+    "exit_code": 0
+  },
+  "scanner_coverage_discrepancy": "The fresh scanner returned no advisories for 6.17.0 despite the three upstream September 16 advisories below declaring versions <6.19.0 affected. Zero scanner findings cannot establish closure. Remediation is based on upstream fixed-version declarations.",
+  "changed_locked_packages": [
+    "pypdf"
+  ],
+  "unchanged_locked_packages": 38,
+  "frozen_reviewer_dependencies_unchanged": true,
+  "lock_target": "x86_64-unknown-linux-gnu, Python 3.11.9",
+  "local_test_environment": "Linux, Python 3.12.14, pytest 9.1.0; supplementary installed dependencies, not a replay of the locked Ubuntu/Python 3.11.9 closure.",
+  "baseline_label_counterexample": {
+    "tests": "2",
+    "failures": "2",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.105",
+    "timestamp": "2026-09-23T15:42:45.896089+03:00"
+  },
+  "candidate_focused_suite": {
+    "tests": "79",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.462",
+    "timestamp": "2026-09-23T15:42:45.935457+03:00"
+  },
+  "candidate_focused_stdout": "76 passed, 3 subtests passed",
+  "test_scope": "Six generated-fixture PDF cases plus repository-assurance, deadline-sentinel and frozen-reviewer-lock tests. Existing cyclic tree bounded to five seconds; reduced outline/XForm configuration; alphabetic labels exercise a 512-character boundary. Ordinary round trip includes text, outline, metadata and two attachments.",
+  "counterexample_boundary": "Both alphabetic-label tests fail on 6.17.0 because no ValueError is raised for input 13313. Its output is short. This is missing rejection evidence, not an observed memory-exhaustion event.",
+  "upstream_advisories": [
+    {
+      "id": "GHSA-php9-fj8v-98fj",
+      "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-php9-fj8v-98fj",
+      "published": "2026-09-16",
+      "affected": "<6.19.0",
+      "patched": ">=6.19.0"
+    },
+    {
+      "id": "GHSA-w23x-9jrw-r45c",
+      "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-w23x-9jrw-r45c",
+      "published": "2026-09-16",
+      "affected": "<6.19.0",
+      "patched": ">=6.19.0"
+    },
+    {
+      "id": "GHSA-v247-6f48-mgcj",
+      "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-v247-6f48-mgcj",
+      "published": "2026-09-16",
+      "affected": "<6.19.0",
+      "patched": ">=6.19.0"
+    }
+  ],
+  "distribution_hash_verification": {
+    "method": "Downloaded both official PyPI distribution byte streams and matched SHA-256 to PyPI metadata and the committed institutional hash lock.",
+    "pypi_metadata_url": "https://pypi.org/pypi/pypdf/6.19.0/json",
+    "distributions": [
+      {
+        "filename": "pypdf-6.19.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/3c/2c/c43c03eaf630435f023f1dc61ec4a4a78951ad5530a62c71cc89bde307b7/pypdf-6.19.0-py3-none-any.whl",
+        "sha256": "7e5d6e730e7dae87d560a2cee218b852f6498c8be61966f3cd02ead971e48d14",
+        "downloaded_bytes": 395480
+      },
+      {
+        "filename": "pypdf-6.19.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/1f/ac/63d71aaedb59acbcdef491e6ca6469165e3771c9c74358204818fd9bc5a6/pypdf-6.19.0.tar.gz",
+        "sha256": "bbc43aca292369ccc6cbc8a921991ecf2538a3587ab5a116eff06c321d647155",
+        "downloaded_bytes": 7033266
+      }
+    ]
+  },
+  "normalized_source_sha256": {
+    "requirements-institutional.txt": "2bd9776ea0dfdde343dfcfcc983d564aea05d06d529c46665aecd3b88b9d2283",
+    "requirements-institutional-ubuntu-py311.lock": "db207432cca950b4d96fe5c16814a041adb1bd31c5cd295ed66e2db71c1b6015",
+    "tests/test_pdf_dependency_security.py": "906b3b2ea3e78c44e70b1c367007799b4297d3abbaa81a74d5fb57a540154cb0",
+    ".github/workflows/deadline-action-sentinel.yml": "5e9c72a23eb4b2fb5755105fb1893d54320453ffe79aa15577688984a4524663"
+  },
+  "audit_files_sha256": {
+    "baseline-pip-audit.json": "dbb3a75ba4b8ce3b44ecae5c736ad12accfd6f4275e661d58da7759f6cc92011",
+    "candidate-pip-audit.json": "d76e32cd30a8daaf5784e67d6743fa63f3a78bfad4f8255d2cfbfa3aab6274cf"
+  },
+  "limits": [
+    "Supplementary local suite; exact-current-head Ubuntu/Python 3.11.9 institutional CI remains required.",
+    "Appearance-stream and embedded-file complexity fixes rely on upstream fixed-version declarations, not local attack benchmarks.",
+    "No vulnerability-freedom, PDF-sandboxing, certification, external validation, production-deployment or remote-alert-closure claim.",
+    "September 14 evidence remains historical and unchanged."
+  ]
+}

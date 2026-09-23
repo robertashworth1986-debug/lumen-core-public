@@ -61,9 +61,46 @@ first-party module loading only. They do not establish browser/GPU
 compatibility across devices, visual quality, sustained runtime behavior,
 vulnerability freedom, production deployment, or external validation.
 
-## PDF dependency correction - September 14, 2026
+## PDF dependency refresh - September 23, 2026
 
-The institutional dependency set and deadline-sentinel workflow now pin
+This refresh advances active outcome 2, a bounded external review or pilot,
+by keeping the existing reviewer dependency repair current. The institutional
+requirements, complete Ubuntu/Python 3.11.9 hash lock and deadline sentinel
+now pin `pypdf==6.19.0`; only pypdf changes among the 39 locked packages.
+The separate frozen reviewer dependency files and September 14 receipts are
+unchanged. Both distribution hashes were checked against downloaded PyPI bytes.
+
+Upstream published three additional moderate advisories on September 16 and
+marks versions below 6.19.0 affected: [appearance-stream generation](https://github.com/py-pdf/pypdf/security/advisories/GHSA-php9-fj8v-98fj),
+[alphabetic page labels](https://github.com/py-pdf/pypdf/security/advisories/GHSA-w23x-9jrw-r45c),
+and [dictionary-based embedded-file access](https://github.com/py-pdf/pypdf/security/advisories/GHSA-v247-6f48-mgcj).
+The September 14 zero-advisory candidate result therefore cannot justify
+merging the earlier 6.17.0 pin today.
+
+Fresh `pip-audit==2.10.1` queries nevertheless reported zero known advisories
+for both complete 39-package locks, including the affected 6.17.0 baseline.
+This scanner/advisory discrepancy is retained, not counted as remediation
+evidence. The upgrade decision follows the upstream affected/fixed ranges.
+
+The six generated-fixture PDF tests retain the three prior guards, exercise
+both alphabetic-label bounds, and check normal text, outline, metadata and
+attachment round trips. Guard configuration uses pypdf's current temporary
+configuration API. The two small label counterexamples fail on 6.17.0 because
+it does not reject the input; all six pass on 6.19.0. This is a bounded guard
+regression, not a resource-exhaustion measurement. Appearance-stream and
+embedded-file complexity fixes are covered by the upstream fixed-version
+declaration, not independent local attack benchmarks.
+
+The focused local suite passed 76 tests and 3 subtests on Linux/Python 3.12.14.
+That supplementary environment does not replay the locked Python 3.11.9
+closure; current-head institutional CI remains the integration gate. The
+audit outputs, distribution verification and bounded comparison are retained
+in `evidence/dependency_security/20260923/`. No production deployment,
+default-branch alert closure or external security validation is implied.
+
+## Historical PDF dependency correction - September 14, 2026
+
+The September 14 candidate institutional dependency set and deadline-sentinel workflow pinned
 `pypdf==6.17.0`. The institutional Ubuntu/Python 3.11.9 lock changes only
 pypdf and its two distribution hashes; its other 38 package versions and the
 separate frozen reviewer dependency files remain unchanged.
