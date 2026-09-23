@@ -1,0 +1,92 @@
+{
+  "schema": "eia_grid_hourly_hybrid_confirmation_custody_watchdog_policy.v1",
+  "frozen_source": {
+    "repository": "robertashworth1986-debug/lumen-core-public",
+    "commit": "47380e82d9acb45dd5ca3401bf8611a6b431fddf",
+    "artifacts": {
+      "protocol": {
+        "path": "config/eia_grid_hourly_hybrid_confirmation_protocol_v3.json",
+        "sha256": "0e9ee00d2f8897bbd8375effcfe96559a33052474ce267f193a3449690193fbf",
+        "git_blob_sha1": "d2151acae11a83ec21c2d5bc766374119be7a64d"
+      },
+      "runtime": {
+        "path": "code/eia_grid_hourly_hybrid_confirmation.py",
+        "sha256": "7dd1f5a68bc6119dde1cd5cc76f1ebb9812566156505203b11a4ab6abfeaf58c",
+        "git_blob_sha1": "8d1000369719da592c892426472ba7fba994227b"
+      },
+      "parent_v2_protocol": {
+        "path": "config/eia_grid_all_authority_direct_hourly_protocol_v2.json",
+        "sha256": "c10e0efb2b7d530728e36bac9a4a9293b4f9584d657c8058e30943d5d12a5abe",
+        "git_blob_sha1": "d908d0376572f989afbfdba558d6ba735cd557c6"
+      },
+      "historical_design": {
+        "path": "evidence/external_validation/eia_grid_all_authority_direct_hourly_design_benchmark_20260716.json",
+        "sha256": "97f21742f1664af0fb7eacc50539e706919f5f731f7e8200f9eaade88e5a407f",
+        "git_blob_sha1": "e523604f75b35f69db811cca5e425495bfdea99d"
+      }
+    }
+  },
+  "protocol_contract": {
+    "protocol_id": "EIA_GRID_HOURLY_HYBRID_CONFIRMATION_V3_20260802",
+    "parent_v2_protocol_id": "EIA_GRID_ALL_AUTHORITY_DIRECT_HOURLY_20260716",
+    "parent_v2_protocol_commit": "14795d5dd7058e9e8283ee88dd065b6da7f3d1e0",
+    "first_allowed_period_end_utc": "2026-08-02T12",
+    "minimum_seal_lead_seconds": 3600,
+    "maximum_seal_lead_seconds": 7200,
+    "balancing_authorities": [
+      "CISO",
+      "ERCO",
+      "ISNE",
+      "MISO",
+      "NYIS",
+      "PJM",
+      "SWPP",
+      "TVA"
+    ],
+    "operational_shakeout_common_hours": 168,
+    "preliminary_common_hours": 720,
+    "confirmatory_common_hours": 2160,
+    "minimum_complete_utc_days": 90,
+    "backfilled_predictions_allowed": false,
+    "target_actual_present_at_seal_allowed": false,
+    "parent_v2_binding_required": true,
+    "scores_suppressed": true,
+    "automatic_promotion_allowed": false
+  },
+  "input_contract": {
+    "snapshot_schema": "eia_grid_hourly_hybrid_confirmation_public_custody_snapshot.v1",
+    "prediction_schema": "eia_grid_hourly_hybrid_confirmation_public_custody_prediction_panel.v1",
+    "settlement_schema": "eia_grid_hourly_hybrid_confirmation_public_custody_settlement_panel.v1",
+    "status_schema": "eia_grid_hourly_hybrid_confirmation_public_custody_status.v1",
+    "operational_receipt_schema": "eia_grid_hourly_hybrid_confirmation_public_custody_operational_receipt.v1",
+    "files": [
+      "manifest.json",
+      "operational_receipt.json",
+      "prediction_custody_panels.jsonl",
+      "settlement_custody_panels.jsonl",
+      "status.json"
+    ],
+    "maximum_file_bytes": 25000000,
+    "maximum_records_per_chain": 10000,
+    "public_safe_projection_only": true
+  },
+  "classification_policy": {
+    "status_warn_after_seconds": 7200,
+    "status_stale_after_seconds": 14400,
+    "receipt_warn_after_seconds": 7200,
+    "receipt_stale_after_seconds": 14400,
+    "maximum_future_clock_skew_seconds": 300,
+    "unsettled_backlog_warn_count": 3,
+    "unsettled_lag_warn_seconds": 10800,
+    "missing_periods_classification": "WARN",
+    "ci_success_classifications": [
+      "OK",
+      "WARN",
+      "STALE"
+    ],
+    "fail_closed_on_corruption": true,
+    "scheduled_repository_mutation_allowed": false,
+    "network_access_required": false,
+    "performance_fields_allowed_in_snapshot_or_receipt": false
+  }
+}

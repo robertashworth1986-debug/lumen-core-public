@@ -1,0 +1,96 @@
+name: EIA V3 public-safe custody watchdog
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/eia-v3-custody-watchdog.yml"
+      - "code/ops/VERIFY_EIA_GRID_HOURLY_HYBRID_V3_CUSTODY.py"
+      - "config/eia_grid_hourly_hybrid_confirmation_custody_watchdog_v1.json"
+      - "docs/EIA_GRID_HOURLY_HYBRID_V3_CUSTODY_WATCHDOG.md"
+      - "tests/fixture_builders/eia_v3_custody_fixture.py"
+      - "tests/fixtures/eia_v3_custody_watchdog/**"
+      - "tests/test_eia_grid_hourly_hybrid_v3_custody_watchdog.py"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/eia-v3-custody-watchdog.yml"
+      - "code/ops/VERIFY_EIA_GRID_HOURLY_HYBRID_V3_CUSTODY.py"
+      - "config/eia_grid_hourly_hybrid_confirmation_custody_watchdog_v1.json"
+      - "docs/EIA_GRID_HOURLY_HYBRID_V3_CUSTODY_WATCHDOG.md"
+      - "tests/fixture_builders/eia_v3_custody_fixture.py"
+      - "tests/fixtures/eia_v3_custody_watchdog/**"
+      - "tests/test_eia_grid_hourly_hybrid_v3_custody_watchdog.py"
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eia-v3-custody-watchdog-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-public-safe-custody-contract:
+    name: Verify frozen V3 custody contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out watchdog source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check out the exact frozen V3 source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: 47380e82d9acb45dd5ca3401bf8611a6b431fddf
+          path: _frozen_v3_source
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Compile the watchdog and fixture builder
+        run: >-
+          python -m py_compile
+          code/ops/VERIFY_EIA_GRID_HOURLY_HYBRID_V3_CUSTODY.py
+          tests/fixture_builders/eia_v3_custody_fixture.py
+          tests/test_eia_grid_hourly_hybrid_v3_custody_watchdog.py
+
+      - name: Run offline adversarial custody tests
+        run: >-
+          python -m unittest -v
+          tests.test_eia_grid_hourly_hybrid_v3_custody_watchdog
+
+      - name: Materialize the synthetic public-safe contract fixture
+        run: >-
+          python tests/fixture_builders/eia_v3_custody_fixture.py
+          --output-dir "${RUNNER_TEMP}/eia-v3-custody-fixture"
+
+      - name: Verify immutable source and public-safe custody fixture
+        run: >-
+          python code/ops/VERIFY_EIA_GRID_HOURLY_HYBRID_V3_CUSTODY.py
+          --input-dir "${RUNNER_TEMP}/eia-v3-custody-fixture"
+          --source-root _frozen_v3_source
+          --as-of-utc 2026-08-02T14:30:00Z
+          --json-out out/eia-v3-custody-watchdog/receipt.json
+          --summary-out out/eia-v3-custody-watchdog/summary.md
+
+      - name: Publish public-safe workflow summary
+        if: always() && hashFiles('out/eia-v3-custody-watchdog/summary.md') != ''
+        run: cat out/eia-v3-custody-watchdog/summary.md >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload public-safe custody receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eia-v3-public-safe-custody-watchdog-${{ github.run_id }}
+          path: out/eia-v3-custody-watchdog/
+          if-no-files-found: error
+          retention-days: 30
