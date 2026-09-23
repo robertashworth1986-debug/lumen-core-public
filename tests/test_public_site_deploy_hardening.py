@@ -436,6 +436,16 @@ def test_live_verifier_maps_canonical_routes_and_assets_to_exact_paths():
     )
 
 
+@pytest.mark.parametrize("archive_name", ["js/capital_research_lab.js", "js/capital_math.mjs"])
+@pytest.mark.parametrize("content_type,allowed", [
+    ("text/javascript", True), ("application/javascript", True),
+    ("application/octet-stream", False), ("text/html", False),
+])
+def test_javascript_mime_check_applies_outside_cohort_directory(archive_name, content_type, allowed):
+    verifier = load_module(VERIFY_PATH, "verify_public_site_module_mime")
+    assert verifier.content_type_allowed(archive_name, content_type) is allowed
+
+
 def test_live_verifier_rejects_duplicate_json_keys(tmp_path):
     verifier = load_module(VERIFY_PATH, "verify_public_site_duplicate_keys")
     manifest = tmp_path / "manifest.json"

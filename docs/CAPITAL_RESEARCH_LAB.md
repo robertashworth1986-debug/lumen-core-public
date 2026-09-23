@@ -24,3 +24,5 @@ python -m http.server 8778 --bind 127.0.0.1 --directory dashboard
 Then open `http://127.0.0.1:8778/capital_research_lab.html`. Direct `file:` opening cannot reliably load browser modules and the JSON snapshot.
 
 Run calculation checks with `node --test tests/capital_math.test.mjs`. The release packager and VPS allowlist include all five lab assets; exact-snapshot CI also exercises the calculation checks. Browser QA covers filtering, conditions, example/clear behavior, note recovery, export, desktop/mobile layout, and rendering errors.
+
+The browser modules use `.js` paths because the current VPS serves that extension with a JavaScript MIME type. The live release verifier checks JavaScript MIME types across every directory; matching bytes served as `application/octet-stream` cannot pass deployment verification.

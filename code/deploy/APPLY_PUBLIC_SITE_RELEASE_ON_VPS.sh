@@ -202,8 +202,8 @@ readonly -a RELEASE_FILES=(
   "capital_research_lab.html"
   "assets/capital_research_lab.css"
   "assets/capital_research.json"
-  "js/capital_math.mjs"
-  "js/capital_research_lab.mjs"
+  "js/capital_math.js"
+  "js/capital_research_lab.js"
 )
 readonly -a RELEASE_DIRECTORIES=(
   "assets"

@@ -215,8 +215,8 @@ RELEASE_PATHS: Final = (
     "dashboard/capital_research_lab.html",
     "dashboard/assets/capital_research_lab.css",
     "dashboard/assets/capital_research.json",
-    "dashboard/js/capital_math.mjs",
-    "dashboard/js/capital_research_lab.mjs",
+    "dashboard/js/capital_math.js",
+    "dashboard/js/capital_research_lab.js",
 )
 
 

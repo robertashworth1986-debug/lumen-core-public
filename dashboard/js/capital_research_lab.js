@@ -1,4 +1,4 @@
-import {nonnegative, runway, fundingGap, dilution, debtPayment} from './capital_math.mjs';
+import {nonnegative, runway, fundingGap, dilution, debtPayment} from './capital_math.js';
 
 const $ = (q) => document.querySelector(q);
 const $$ = (q) => [...document.querySelectorAll(q)];

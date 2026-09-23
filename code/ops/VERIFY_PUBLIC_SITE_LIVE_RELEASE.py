@@ -45,6 +45,9 @@ FILE_KEYS = {
 
 def content_type_allowed(archive_name: str, content_type: str) -> bool:
     """Require standards-safe MIME types for public review files and downloads."""
+    if Path(archive_name).suffix in {".js", ".mjs"}:
+        # Module scripts require a JavaScript MIME type regardless of directory.
+        return content_type in {"application/javascript", "text/javascript"}
     if archive_name.startswith(("cohort/", "downloads/")):
         expected = {
             ".html": {"text/html"}, ".css": {"text/css"},
