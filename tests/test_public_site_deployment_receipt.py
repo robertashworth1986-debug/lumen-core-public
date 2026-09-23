@@ -55,7 +55,7 @@ def test_full_retained_history_reconstructs_every_release() -> None:
 
 def test_historical_allowlist_is_read_as_data_after_current_membership_expands():
     packager = MODULE._load(MODULE.PACKAGER_PATH, "historical_allowlist_regression")
-    assert len(packager.RELEASE_PATHS) == 190
+    assert len(packager.RELEASE_PATHS) == 195
     pinned = packager.release_paths_at_commit(ROOT, MODULE.DEFAULT_SOURCE_COMMIT)
     assert len(pinned) == 43
     assert not any(path.startswith("dashboard/cohort/") for path in pinned)

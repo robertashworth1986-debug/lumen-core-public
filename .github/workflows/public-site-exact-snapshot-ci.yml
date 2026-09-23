@@ -18,6 +18,12 @@ on:
       - 'dashboard/mission_control.html'
       - 'dashboard/quant_lab.html'
       - 'dashboard/grants.html'
+      - 'dashboard/capital_research_lab.html'
+      - 'dashboard/assets/capital_research_lab.css'
+      - 'dashboard/assets/capital_research.json'
+      - 'dashboard/js/capital_math.mjs'
+      - 'dashboard/js/capital_research_lab.mjs'
+      - 'tests/capital_math.test.mjs'
       - 'dashboard/kraken_execution_dashboard.html'
       - 'dashboard/forecast.html'
       - 'dashboard/anomalies.html'
@@ -66,6 +72,12 @@ on:
       - 'dashboard/mission_control.html'
       - 'dashboard/quant_lab.html'
       - 'dashboard/grants.html'
+      - 'dashboard/capital_research_lab.html'
+      - 'dashboard/assets/capital_research_lab.css'
+      - 'dashboard/assets/capital_research.json'
+      - 'dashboard/js/capital_math.mjs'
+      - 'dashboard/js/capital_research_lab.mjs'
+      - 'tests/capital_math.test.mjs'
       - 'dashboard/kraken_execution_dashboard.html'
       - 'dashboard/forecast.html'
       - 'dashboard/anomalies.html'
@@ -128,4 +140,4 @@ jobs:
         run: python -m pytest tests/test_public_site_deploy_hardening.py tests/test_public_discovery.py tests/test_canonical_surface_design.py tests/test_public_site_deployment_receipt.py tests/test_ec_member_runtime.py tests/test_ec_public_profiles.py -q
 
       - name: Check member-workspace browser logic
-        run: node --test tests/ec_studio_core.test.mjs
+        run: node --test tests/ec_studio_core.test.mjs tests/capital_math.test.mjs
