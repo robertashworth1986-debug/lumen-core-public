@@ -29,7 +29,8 @@
     table{width:100%;border-collapse:collapse;margin-top:24px;background:#fff}th,td{border:1px solid var(--line);padding:14px;text-align:left;vertical-align:top}th{background:#e8f0f8}.price{font-weight:900;white-space:nowrap}
     .boundary{border-left:5px solid #b26a00;background:#fff8ed;padding:20px 24px}.prooflock{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:center}.prooflock .card{border-color:#b6c9df}.status{color:var(--green);font-weight:800}
     footer{padding:30px 0;border-top:1px solid var(--line);color:var(--muted)}
-    @media(max-width:850px){.grid,.sequence,.prooflock{grid-template-columns:1fr}.nav{align-items:flex-start;padding:16px 0}.navlinks{justify-content:flex-end}table{display:block;overflow-x:auto}}
+    #start-conversation{scroll-margin-top:100px}
+    @media(max-width:850px){.grid,.sequence,.prooflock{grid-template-columns:1fr}.nav{align-items:flex-start;padding:16px 0}.navlinks{justify-content:flex-end}table{display:block;overflow-x:auto}#start-conversation{scroll-margin-top:180px}}
   </style>
   <link rel="stylesheet" href="/assets/luma_institutional_surface.css">
 </head>
@@ -43,7 +44,7 @@
       <div class="eyebrow">30-day bounded validation sprint</div>
       <h1>One candidate. One accepted baseline. One decision you can defend.</h1>
       <p class="lead">LumenCore helps a technical decision owner determine whether a promising AI, forecast, routing, optimization, or infrastructure candidate should be promoted, rerun, held, rejected, or sent to external review—under rules fixed before scoring.</p>
-      <div class="actions"><a class="button primary" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20bounded%20validation%20sprint">Scope one decision</a><a class="button" href="/build_week/prooflock_console/">Open ProofLock verifier</a></div>
+      <div class="actions"><a class="button primary" href="#start-conversation">Scope one decision</a><a class="button" href="/build_week/prooflock_console/">Open ProofLock verifier</a></div>
     </div></section>
 
     <section><div class="wrap">
@@ -67,7 +68,7 @@
       <p class="boundary"><strong>Decision: HOLD.</strong> Original coverage and a SWPP regression gate failed. The later window has no eligible SWPP rows and too few days and authority-month units. Historical records may contain revisions. These comparisons do not prove prospective performance, independent validation, electricity saved or annual dollar savings.</p>
       <div class="actions"><a class="button primary" href="/downloads/eia-two-window-review-20260922.zip" download>Download both frozen EIA packets · 1.23 MB</a><a class="button" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMENCORE_LIVE_BREADTH_PROOF_ADDENDUM.md">Review five sectors and their constraints</a></div>
       <details><summary>Verify the download</summary><p>ZIP SHA-256: <code style="overflow-wrap:anywhere">cc05eb52559bca53035bfe09e36438ad191634767e2d9cc684f94048d448a8fb</code></p><p>After extraction, run <code>python code/ops/VERIFY_EIA_CONSTRAINT_REVIEW.py --packet original</code> and repeat with <code>--packet later</code>. Hash verification establishes artifact identity; it does not establish scientific correctness or a favorable decision.</p></details>
-      <p class="sub">The next useful test needs a buyer-owned incumbent with matching target and issue time, complete source history, unchanged service requirements and an agreed operating-cost policy. <a href="mailto:robertashworth4444@gmail.com?subject=Frozen%20EIA%20review%20-%20one%20buyer%20baseline">Discuss one validation scope</a>.</p>
+      <p class="sub">The next useful test needs a buyer-owned incumbent with matching target and issue time, complete source history, unchanged service requirements and an agreed operating-cost policy. <a href="#start-conversation">Discuss one validation scope</a>.</p>
     </div></section>
 
     <section><div class="wrap">
@@ -97,9 +98,19 @@
       <div class="card"><h3>What it does not prove</h3><p>Artifact hashes do not establish performance, realized savings, certification, field validation, safety approval, deployment readiness, or buyer acceptance.</p><a class="button" href="/build_week/prooflock_console/">Verify the demonstration</a></div>
     </div></section>
 
-    <section><div class="wrap">
+    <section id="start-conversation" aria-labelledby="conversation-heading"><div class="wrap">
+      <h2 id="conversation-heading">Start with three short answers.</h2>
+      <p class="sub">Tell us about one real task or decision. A few sentences are enough; write UNKNOWN for anything you have not established.</p>
+      <ol>
+        <li><strong>Your business and decision:</strong> What recent task or technical decision would you like to improve?</li>
+        <li><strong>What you use today:</strong> What process, tool or baseline would a useful improvement need to beat?</li>
+        <li><strong>Owner and timing:</strong> Who reviews the result, and when would it be useful?</li>
+      </ol>
+      <p class="sub">Send a non-confidential description only. Keep datasets, personal records and account credentials out of the first email. This starts a fit conversation; it does not book a sprint, transfer data rights or accept terms.</p>
+      <div class="actions"><a class="button primary" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20validation%20fit%20conversation&amp;body=Hello%20Robert%2C%0D%0A%0D%0A1.%20My%20business%20and%20one%20recent%20task%20or%20decision%3A%0D%0A%0D%0A2.%20The%20process%2C%20tool%20or%20baseline%20we%20use%20today%3A%0D%0A%0D%0A3.%20Who%20reviews%20the%20result%20and%20when%20it%20would%20be%20useful%3A%0D%0A%0D%0AUNKNOWN%20is%20fine.%20Non-confidential%20descriptions%20only.%0D%0A">Open the three-question email</a><a class="button" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md">Read the full fit intake</a><a class="button" href="https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md">Preview the scope template</a></div>
+      <p class="sub">If no email app opens, copy the three questions into your email and send them to <a href="mailto:robertashworth4444@gmail.com">robertashworth4444@gmail.com</a>. We review fit first; scope, deliverables and commercial terms are agreed separately.</p>
       <div class="boundary"><strong>No favorable result is promised.</strong> The sprint does not establish guaranteed ROI, realized savings, certification, agency endorsement, award likelihood, autonomous control authority, or field validation. A neutral or failed result remains part of the deliverable and may prevent a more expensive bad decision.</div>
-      <div class="actions"><a class="button primary" href="mailto:robertashworth4444@gmail.com?subject=LumenCore%20one%20baseline%20one%20decision">Request a bounded scope call</a><a class="button" href="/external_review.html">Open the external-replication protocol</a><a class="button" href="/evidence/">Review current evidence boundaries</a></div>
+      <div class="actions"><a class="button" href="/external_review.html">Open the external-replication protocol</a><a class="button" href="/evidence/">Review current evidence boundaries</a></div>
     </div></section>
   </main>
   <footer><div class="wrap">LumenCore™ · Evidence before claims · Discover → measure → validate → freeze → decide.</div></footer>

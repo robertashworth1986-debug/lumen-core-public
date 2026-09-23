@@ -6,6 +6,25 @@ invoice, commitment, validation result, or authorization to transfer data.
 Use this page to determine whether one buyer-owned decision can be converted
 into a bounded validation scope. Mark unknown facts `UNKNOWN`; do not guess.
 
+## Start the conversation
+
+For a first email, three short answers are enough:
+
+1. **Your business and decision:** What recent task or technical decision would
+   you like to improve?
+2. **What you use today:** What process, tool or baseline would a useful
+   improvement need to beat?
+3. **Owner and timing:** Who reviews the result, and when would it be useful?
+
+Use the [three-question email on the public offer](https://lumen-core.ai/proof_to_pilot.html#start-conversation),
+or copy those questions into your own email to the contact shown there. Share
+only a non-confidential description; keep datasets, personal records and
+credentials out of the first email. `UNKNOWN` is an acceptable answer.
+
+These answers start a fit conversation. They do not book a sprint, transfer
+data rights, accept terms or authorize evaluation. Complete the facts below
+before treating an inquiry as a scope candidate.
+
 ## First-fit facts
 
 1. **Buyer:** legal organization name, public website, and buyer contact role.
