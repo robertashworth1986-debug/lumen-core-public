@@ -12,7 +12,7 @@ This notebook covers the 69 companies on the official [TakeOff Fall 2026 roster]
 
 ## Evidence and participation
 
-Company descriptions are public positioning. Proposed constraints are hypotheses; no operating data or owner interviews were used. All baseline values are unknown. This publication does not establish company participation, endorsement, measured losses, savings, grant eligibility, profitability, certification, or government approval. Proposed contributions have not been delivered as cohort packages.
+Company descriptions are public positioning. Proposed constraints are hypotheses; no operating data or owner interviews were used to build this research. All baseline values are unknown. This publication does not establish company participation, endorsement, measured losses, savings, grant eligibility, profitability, certification, or government approval. The [69 member profiles, workspaces and downloadable packages](https://lumen-core.ai/cohort/directory.html) were subsequently published; publication does not establish owner adoption or measured workflow improvements. The [live breadth proof addendum](LUMENCORE_LIVE_BREADTH_PROOF_ADDENDUM.md) separates frozen comparisons, failed gates and illustrative economics.
 
 Some company sites were unavailable or exposed only indexed content. Those limits remain beside each entry. Existing features are respected when suggesting a contribution. CareHome, an adjacent EC business absent from this TakeOff roster, is excluded from the 69-company count and this publication.
 

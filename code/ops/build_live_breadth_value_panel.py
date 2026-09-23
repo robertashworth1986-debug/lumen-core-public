@@ -3,12 +3,45 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 HOURS_PER_DAY = 24.0
 DAYS_PER_YEAR = 365.0
+MODEL_BOUNDARY = (
+    "Unvalidated model context: baseline loss rate * explicit signed metric gain / 100, "
+    "annualized at 8,760 constant hours. A metric gain is not an accepted cost or energy effect. "
+    "Equivalent service, causal attribution, overhead, persistence, uncertainty and overlap "
+    "have not been established. Totals are arithmetic scenario sums, not additive savings, "
+    "revenue, measured electricity reductions or permission to scale."
+)
+
+
+def finite_number(value: Any) -> float | None:
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def complete_sum(values: list[Any]) -> float | None:
+    numbers = [finite_number(value) for value in values]
+    if not numbers or any(value is None for value in numbers):
+        return None
+    try:
+        return finite_number(math.fsum(numbers))
+    except OverflowError:
+        return None
+
+
+def rounded_number(value: Any, digits: int = 4) -> float | None:
+    number = finite_number(value)
+    return round(number, digits) if number is not None else None
 
 
 def now_iso() -> str:
@@ -20,10 +53,8 @@ def now_tag() -> str:
 
 
 def to_float(value: Any, default: float = 0.0) -> float:
-    try:
-        return float(value)
-    except Exception:
-        return default
+    number = finite_number(value)
+    return number if number is not None else default
 
 
 def to_int(value: Any, default: int = 0) -> int:
@@ -90,34 +121,39 @@ def rel_path(path: Path, root: Path) -> str:
         return str(path).replace("\\", "/")
 
 
+def reject_duplicate_members(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON member: {key}")
+        result[key] = value
+    return result
+
+
+def reject_nonfinite_constant(value: str) -> Any:
+    raise ValueError(f"Nonfinite JSON number: {value}")
+
+
 def load_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    if isinstance(payload, dict):
-        return payload
-    return {}
+    payload = json.loads(path.read_text(encoding="utf-8-sig"), object_pairs_hook=reject_duplicate_members, parse_constant=reject_nonfinite_constant)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected JSON object: {path}")
+    return payload
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
-    rows: list[dict[str, Any]] = []
     if not path.exists():
-        return rows
-
-    with path.open("r", encoding="utf-8", errors="ignore") as handle:
-        for raw in handle:
-            text = raw.strip()
-            if not text:
-                continue
-            try:
-                obj = json.loads(text)
-            except Exception:
-                continue
-            if isinstance(obj, dict):
-                rows.append(obj)
+        return []
+    rows = []
+    for raw in path.read_text(encoding="utf-8-sig").splitlines():
+        if not raw.strip():
+            continue
+        row = json.loads(raw, object_pairs_hook=reject_duplicate_members, parse_constant=reject_nonfinite_constant)
+        if not isinstance(row, dict):
+            raise ValueError("Frozen delta rows must be JSON objects")
+        rows.append(row)
     return rows
 
 
@@ -133,8 +169,9 @@ def load_csv(path: Path) -> list[dict[str, Any]]:
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
+    serialized = json.dumps(payload, indent=2, allow_nan=False)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    path.write_text(serialized, encoding="utf-8")
 
 
 def write_text(path: Path, content: str) -> None:
@@ -172,11 +209,19 @@ def pick_latest_frozen_deltas(rows: list[dict[str, Any]]) -> list[dict[str, Any]
         constraint = str(row.get("constraint") or "default")
         key = (normalize_token(source), normalize_token(sector), normalize_token(constraint))
 
-        ts = parse_utc(row.get("generated_utc"))
+        try:
+            ts = datetime.fromisoformat(str(row.get("generated_utc")).replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ValueError("Frozen row needs a valid generated_utc timestamp") from exc
+        if ts.tzinfo is None:
+            raise ValueError("Frozen row generated_utc must contain a timezone")
+        ts = ts.astimezone(timezone.utc)
         prev = latest_ts.get(key)
-        if prev is None or ts >= prev:
+        if prev is None or ts > prev:
             latest[key] = row
             latest_ts[key] = ts
+        elif ts == prev and row != latest[key]:
+            raise ValueError("Conflicting frozen rows share an identity and timestamp")
 
     out = list(latest.values())
     out.sort(key=lambda r: parse_utc(r.get("generated_utc")), reverse=True)
@@ -208,8 +253,8 @@ def build_registry_summary(path: Path) -> dict[str, Any]:
                     env_name = str(raw.get("env") or "").strip()
                     row_count = to_int(raw.get("rows"), 0)
 
-                    enabled = bool(raw.get("enabled", False))
-                    if not enabled:
+                    enabled = raw.get("enabled") is True
+                    if not isinstance(raw.get("enabled"), bool):
                         enabled = bool(env_name) or status in {
                             "LIVE_KEY_PRESENT",
                             "LIVE",
@@ -218,10 +263,9 @@ def build_registry_summary(path: Path) -> dict[str, Any]:
                             "HEALTHY",
                         }
 
-                    measured = bool(raw.get("measured", False))
-                    if not measured:
+                    measured = raw.get("measured") is True
+                    if not isinstance(raw.get("measured"), bool):
                         measured = row_count > 0 or status in {
-                            "LIVE_KEY_PRESENT",
                             "MEASURED",
                             "LIVE",
                         }
@@ -235,8 +279,8 @@ def build_registry_summary(path: Path) -> dict[str, Any]:
 
                 rows = normalized_rows
 
-    enabled_rows = [r for r in rows if isinstance(r, dict) and bool(r.get("enabled", False))]
-    measured_rows = [r for r in enabled_rows if bool(r.get("measured", False))]
+    enabled_rows = [r for r in rows if isinstance(r, dict) and r.get("enabled") is True]
+    measured_rows = [r for r in enabled_rows if r.get("measured") is True]
 
     source_lookup: dict[str, dict[str, Any]] = {}
     for row in enabled_rows:
@@ -268,6 +312,7 @@ def build_registry_summary(path: Path) -> dict[str, Any]:
         sectors.add(str(row.get("sector") or "unknown"))
 
     enabled_sources = len(enabled_rows)
+    translations = [r.get("translated_value") if isinstance(r.get("translated_value"), dict) else {} for r in measured_rows]
     measured_sources = len(measured_rows)
     coverage_pct = (float(measured_sources) / float(enabled_sources) * 100.0) if enabled_sources else 0.0
 
@@ -278,187 +323,129 @@ def build_registry_summary(path: Path) -> dict[str, Any]:
         "measured_sources": measured_sources,
         "measured_coverage_pct": coverage_pct,
         "measured_sectors": sorted(sectors),
-        "translated_hourly_value_usd": translated_hour,
-        "translated_daily_value_usd": translated_day,
-        "translated_annual_value_usd": translated_year,
+        "translated_hourly_value_usd": None,
+        "translated_daily_value_usd": None,
+        "translated_annual_value_usd": None,
+        "reported_translated_hourly_value_usd": complete_sum([r.get("hour") for r in translations]),
+        "reported_translated_daily_value_usd": complete_sum([r.get("day") for r in translations]),
+        "reported_translated_annual_value_usd": complete_sum([r.get("year") for r in translations]),
+        "evidence_status": "REGISTRY_REPORTED_INTAKE_NOT_EFFECT_VALIDATION",
         "source_lookup": source_lookup,
     }
 
 
-def classify_action(weighted_gain_pct: float) -> str:
-    if weighted_gain_pct >= 10.0:
-        return "scale_now"
-    if weighted_gain_pct >= 3.0:
-        return "scale_guarded"
-    if weighted_gain_pct >= 1.0:
-        return "compound"
-    return "observe"
+def classify_action(weighted_gain_pct: float | None, *, invalid_input: bool = False) -> str:
+    if invalid_input or finite_number(weighted_gain_pct) is None:
+        return "review_invalid_input"
+    return "retain_baseline" if weighted_gain_pct <= 0 else "review_evidence"
 
 
 def build_sector_rollup(
     latest_rows: list[dict[str, Any]],
     source_lookup: dict[str, dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    sector_rollup: dict[str, dict[str, Any]] = {}
     source_rows: list[dict[str, Any]] = []
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for raw in latest_rows:
+        source = str(raw.get("source") or "UNKNOWN")
+        sector = str(raw.get("sector") or "unknown")
+        registry = source_lookup.get(normalize_token(source), {})
+        baseline = finite_number(raw.get("baseline_loss_rate_usd_per_hour"))
+        gain = finite_number(raw.get("optimization_gain_pct"))
+        reported = finite_number(raw.get("estimated_hourly_value_usd"))
+        issues = []
+        if baseline is None or baseline < 0:
+            issues.append("missing_invalid_or_negative_baseline")
+        if gain is None:
+            issues.append("missing_or_invalid_explicit_gain")
+        if "estimated_hourly_value_usd" in raw and reported is None:
+            issues.append("invalid_reported_hourly_value")
+        modeled = finite_number(baseline * (gain / 100)) if baseline is not None and baseline >= 0 and gain is not None else None
+        daily = finite_number(modeled * HOURS_PER_DAY) if modeled is not None else None
+        annual = finite_number(modeled * HOURS_PER_DAY * DAYS_PER_YEAR) if modeled is not None else None
+        if not issues and any(value is None for value in (modeled, daily, annual)):
+            issues.append("modeled_value_overflow")
+        conflict = not math.isclose(reported, modeled, rel_tol=1e-9, abs_tol=1e-9) if reported is not None and modeled is not None else None
+        if conflict:
+            issues.append("reported_value_conflicts_with_signed_model")
+        if gain is not None and gain > 100:
+            issues.append("gain_exceeds_100_pct_loss_reduction_bound")
+        row = {
+            "generated_utc": str(raw.get("generated_utc") or ""),
+            "source": source, "sector": sector,
+            "constraint": str(raw.get("constraint") or "default"),
+            "baseline_loss_rate_usd_per_hour": baseline,
+            "optimization_gain_pct": gain,
+            "estimated_hourly_value_usd": None,
+            "estimated_daily_value_usd": None,
+            "estimated_annual_value_usd": None,
+            "reported_estimated_hourly_value_usd": reported,
+            "modeled_hourly_value_usd": modeled,
+            "modeled_daily_value_usd": daily,
+            "modeled_annual_value_usd": annual,
+            "reported_hourly_value_conflict": conflict,
+            "predicted_failure_cost_usd": None,
+            "estimated_avoided_loss_usd": None,
+            "estimated_residual_loss_usd": None,
+            "translated_source_yearly_value_usd": None,
+            "trust_tier": str(raw.get("trust_tier") or ""),
+            "key_present": raw.get("key_present") if isinstance(raw.get("key_present"), bool) else None,
+            "enabled_source": registry.get("enabled") is True,
+            "measured_source": registry.get("measured") is True,
+            "registry_reported_intake": registry.get("measured") is True,
+            "primary_live_evidence": False, "effect_validated": False,
+            "evidence_source": "infra_frozen_delta_ledger",
+            "evidence_status": "INVALID_INPUT_REVIEW" if issues else "UNVALIDATED_MODEL_INPUT",
+            "effect_uncertainty": None, "source_freshness": "UNASSESSED",
+            "input_issues": issues,
+            "recommended_action": classify_action(gain, invalid_input=bool(issues)),
+            "model_boundary": MODEL_BOUNDARY,
+        }
+        for name in ("predicted_failure_cost_usd", "estimated_avoided_loss_usd", "estimated_residual_loss_usd"):
+            row["reported_" + name] = finite_number(raw.get(name))
+        source_rows.append(row)
+        groups.setdefault(sector, []).append(row)
 
-    for row in latest_rows:
-        source = str(row.get("source") or "UNKNOWN")
-        sector = str(row.get("sector") or "unknown")
-        constraint = str(row.get("constraint") or "default")
-        generated_utc = str(row.get("generated_utc") or "")
-
-        baseline = to_float(row.get("baseline_loss_rate_usd_per_hour"), 0.0)
-        gain_pct = to_float(row.get("optimization_gain_pct"), 0.0)
-        est_hour = to_float(row.get("estimated_hourly_value_usd"), 0.0)
-
-        if est_hour <= 0.0 and baseline > 0.0 and gain_pct > 0.0:
-            est_hour = baseline * (gain_pct / 100.0)
-
-        source_registry = source_lookup.get(normalize_token(source), {})
-        measured_source = bool(source_registry.get("measured", False)) if isinstance(source_registry, dict) else False
-        enabled_source = bool(source_registry.get("enabled", False)) if isinstance(source_registry, dict) else False
-
-        translated = source_registry.get("translated_value", {}) if isinstance(source_registry, dict) else {}
-        if not isinstance(translated, dict):
-            translated = {}
-
-        source_rows.append(
-            {
-                "generated_utc": generated_utc,
-                "source": source,
-                "sector": sector,
-                "constraint": constraint,
-                "baseline_loss_rate_usd_per_hour": round(baseline, 4),
-                "optimization_gain_pct": round(gain_pct, 4),
-                "estimated_hourly_value_usd": round(est_hour, 4),
-                "estimated_daily_value_usd": round(est_hour * HOURS_PER_DAY, 4),
-                "estimated_annual_value_usd": round(est_hour * HOURS_PER_DAY * DAYS_PER_YEAR, 4),
-                "predicted_failure_cost_usd": round(to_float(row.get("predicted_failure_cost_usd"), 0.0), 4),
-                "estimated_avoided_loss_usd": round(to_float(row.get("estimated_avoided_loss_usd"), 0.0), 4),
-                "estimated_residual_loss_usd": round(to_float(row.get("estimated_residual_loss_usd"), 0.0), 4),
-                "trust_tier": str(row.get("trust_tier") or ""),
-                "key_present": bool(row.get("key_present", False)),
-                "enabled_source": enabled_source,
-                "measured_source": measured_source,
-                "translated_source_yearly_value_usd": round(to_float(translated.get("year"), 0.0), 4),
-            }
-        )
-
-        agg = sector_rollup.setdefault(
-            sector,
-            {
-                "sector": sector,
-                "source_count": 0,
-                "measured_source_count": 0,
-                "total_baseline_loss_rate_usd_per_hour": 0.0,
-                "total_estimated_hourly_value_usd": 0.0,
-                "weighted_gain_numerator": 0.0,
-                "weighted_gain_denominator": 0.0,
-                "latest_generated_utc": "",
-                "sources": set(),
-                "trust_tiers": set(),
-            },
-        )
-
-        agg["source_count"] += 1
-        if measured_source:
-            agg["measured_source_count"] += 1
-        agg["total_baseline_loss_rate_usd_per_hour"] += baseline
-        agg["total_estimated_hourly_value_usd"] += est_hour
-        agg["weighted_gain_numerator"] += gain_pct * max(baseline, 0.0)
-        agg["weighted_gain_denominator"] += max(baseline, 0.0)
-        agg["latest_generated_utc"] = max(str(agg["latest_generated_utc"]), generated_utc)
-        agg["sources"].add(source)
-
-        trust = str(row.get("trust_tier") or "")
-        if trust:
-            agg["trust_tiers"].add(trust)
-
-    sectors: list[dict[str, Any]] = []
-    for sector, agg in sector_rollup.items():
-        denom = to_float(agg.get("weighted_gain_denominator"), 0.0)
-        weighted_gain_pct = to_float(agg.get("weighted_gain_numerator"), 0.0) / denom if denom > 0.0 else 0.0
-
-        est_hour = to_float(agg.get("total_estimated_hourly_value_usd"), 0.0)
-        sectors.append(
-            {
-                "sector": sector,
-                "source_count": to_int(agg.get("source_count"), 0),
-                "measured_source_count": to_int(agg.get("measured_source_count"), 0),
-                "total_baseline_loss_rate_usd_per_hour": round(to_float(agg.get("total_baseline_loss_rate_usd_per_hour"), 0.0), 4),
-                "weighted_optimization_gain_pct": round(weighted_gain_pct, 4),
-                "total_estimated_hourly_value_usd": round(est_hour, 4),
-                "total_estimated_daily_value_usd": round(est_hour * HOURS_PER_DAY, 4),
-                "total_estimated_annual_value_usd": round(est_hour * HOURS_PER_DAY * DAYS_PER_YEAR, 4),
-                "recommended_action": classify_action(weighted_gain_pct),
-                "latest_generated_utc": str(agg.get("latest_generated_utc") or ""),
-                "sample_sources": ", ".join(sorted(agg.get("sources", set()))[:6]),
-                "trust_tiers": ", ".join(sorted(agg.get("trust_tiers", set()))),
-            }
-        )
-
-    sectors.sort(key=lambda r: to_float(r.get("total_estimated_hourly_value_usd"), 0.0), reverse=True)
-    source_rows.sort(key=lambda r: to_float(r.get("estimated_hourly_value_usd"), 0.0), reverse=True)
-    return sectors, source_rows
+    sector_rows = []
+    for sector, rows in groups.items():
+        baseline = complete_sum([row["baseline_loss_rate_usd_per_hour"] for row in rows])
+        modeled = complete_sum([row["modeled_hourly_value_usd"] for row in rows])
+        daily = complete_sum([row["modeled_daily_value_usd"] for row in rows])
+        annual = complete_sum([row["modeled_annual_value_usd"] for row in rows])
+        weighted = finite_number(modeled / baseline * 100) if modeled is not None and baseline is not None and baseline > 0 else None
+        invalid_count = sum(bool(row["input_issues"]) for row in rows)
+        sector_rows.append({
+            "sector": sector, "source_count": len(rows),
+            "unique_source_count": len({row["source"] for row in rows}),
+            "measured_source_count": sum(row["measured_source"] for row in rows),
+            "total_baseline_loss_rate_usd_per_hour": baseline,
+            "weighted_optimization_gain_pct": weighted,
+            "total_estimated_hourly_value_usd": None,
+            "total_estimated_daily_value_usd": None,
+            "total_estimated_annual_value_usd": None,
+            "modeled_hourly_value_usd": modeled,
+            "modeled_daily_value_usd": daily,
+            "modeled_annual_value_usd": annual,
+            "primary_live_evidence": False, "effect_validated": False,
+            "invalid_input_count": invalid_count,
+            "positive_gain_count": sum(row["optimization_gain_pct"] is not None and row["optimization_gain_pct"] > 0 for row in rows),
+            "nonpositive_gain_count": sum(row["optimization_gain_pct"] is not None and row["optimization_gain_pct"] <= 0 for row in rows),
+            "recommended_action": classify_action(weighted, invalid_input=bool(invalid_count)),
+            "latest_generated_utc": max((row["generated_utc"] for row in rows), key=parse_utc),
+            "sample_sources": ", ".join(sorted({row["source"] for row in rows})[:6]),
+            "trust_tiers": ", ".join(sorted({row["trust_tier"] for row in rows if row["trust_tier"]})),
+            "model_boundary": MODEL_BOUNDARY,
+        })
+    sector_rows.sort(key=lambda row: (row["modeled_hourly_value_usd"] is not None, row["modeled_hourly_value_usd"] or 0), reverse=True)
+    source_rows.sort(key=lambda row: (row["modeled_hourly_value_usd"] is not None, row["modeled_hourly_value_usd"] or 0), reverse=True)
+    return sector_rows, source_rows
 
 
 def fallback_sectors_from_reference(reference_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    grouped: dict[str, dict[str, Any]] = {}
-
-    for row in reference_rows:
-        sector = str(row.get("sector") or "unknown")
-        source = str(row.get("source") or "UNKNOWN")
-
-        gain_pct = to_float(row.get("optimization_gain_pct"), 0.0)
-        est_hour = to_float(row.get("estimated_hourly_value_usd"), 0.0)
-
-        agg = grouped.setdefault(
-            sector,
-            {
-                "sector": sector,
-                "source_count": 0,
-                "measured_source_count": 0,
-                "total_baseline_loss_rate_usd_per_hour": 0.0,
-                "weighted_optimization_gain_pct": 0.0,
-                "weighted_gain_numerator": 0.0,
-                "weighted_gain_denominator": 0.0,
-                "total_estimated_hourly_value_usd": 0.0,
-                "latest_generated_utc": "",
-                "sources": set(),
-            },
-        )
-
-        agg["source_count"] += 1
-        agg["total_estimated_hourly_value_usd"] += est_hour
-        agg["weighted_gain_numerator"] += gain_pct * max(est_hour, 1.0)
-        agg["weighted_gain_denominator"] += max(est_hour, 1.0)
-        agg["sources"].add(source)
-
-    rows: list[dict[str, Any]] = []
-    for sector, agg in grouped.items():
-        denom = to_float(agg.get("weighted_gain_denominator"), 0.0)
-        weighted_gain_pct = to_float(agg.get("weighted_gain_numerator"), 0.0) / denom if denom > 0.0 else 0.0
-        est_hour = to_float(agg.get("total_estimated_hourly_value_usd"), 0.0)
-        rows.append(
-            {
-                "sector": sector,
-                "source_count": to_int(agg.get("source_count"), 0),
-                "measured_source_count": 0,
-                "total_baseline_loss_rate_usd_per_hour": 0.0,
-                "weighted_optimization_gain_pct": round(weighted_gain_pct, 4),
-                "total_estimated_hourly_value_usd": round(est_hour, 4),
-                "total_estimated_daily_value_usd": round(est_hour * HOURS_PER_DAY, 4),
-                "total_estimated_annual_value_usd": round(est_hour * HOURS_PER_DAY * DAYS_PER_YEAR, 4),
-                "recommended_action": classify_action(weighted_gain_pct),
-                "latest_generated_utc": "",
-                "sample_sources": ", ".join(sorted(agg.get("sources", set()))[:6]),
-                "trust_tiers": "",
-            }
-        )
-
-    rows.sort(key=lambda r: to_float(r.get("total_estimated_hourly_value_usd"), 0.0), reverse=True)
-    return rows
+    sectors, _ = build_sector_rollup(reference_rows, {})
+    for row in sectors:
+        row["evidence_source"] = "UNVERIFIED_REFERENCE_MODEL_CONTEXT"
+    return sectors
 
 
 def mission_kalisha_score(
@@ -950,32 +937,12 @@ def build_panel(
         vps_growth_proof_path=vps_growth_proof_path,
     )
 
-    total_baseline = sum(to_float(r.get("total_baseline_loss_rate_usd_per_hour"), 0.0) for r in sector_rows)
-    total_hourly = sum(to_float(r.get("total_estimated_hourly_value_usd"), 0.0) for r in sector_rows)
-    total_daily = total_hourly * HOURS_PER_DAY
-    total_annual = total_daily * DAYS_PER_YEAR
-
+    total_baseline = complete_sum([r.get("total_baseline_loss_rate_usd_per_hour") for r in sector_rows])
+    total_hourly = complete_sum([r.get("modeled_hourly_value_usd") for r in sector_rows])
+    total_daily = complete_sum([r.get("modeled_daily_value_usd") for r in sector_rows])
+    total_annual = complete_sum([r.get("modeled_annual_value_usd") for r in sector_rows])
     top_sector_row = sector_rows[0] if sector_rows else {}
-
-    top_sector_rows: list[dict[str, Any]] = []
-    for idx, row in enumerate(sector_rows[: max(1, top_n)]):
-        top_sector_rows.append(
-            {
-                "rank": idx + 1,
-                "sector": str(row.get("sector") or "unknown"),
-                "source_count": to_int(row.get("source_count"), 0),
-                "measured_source_count": to_int(row.get("measured_source_count"), 0),
-                "weighted_optimization_gain_pct": round(to_float(row.get("weighted_optimization_gain_pct"), 0.0), 4),
-                "total_baseline_loss_rate_usd_per_hour": round(to_float(row.get("total_baseline_loss_rate_usd_per_hour"), 0.0), 4),
-                "total_estimated_hourly_value_usd": round(to_float(row.get("total_estimated_hourly_value_usd"), 0.0), 4),
-                "total_estimated_daily_value_usd": round(to_float(row.get("total_estimated_daily_value_usd"), 0.0), 4),
-                "total_estimated_annual_value_usd": round(to_float(row.get("total_estimated_annual_value_usd"), 0.0), 4),
-                "recommended_action": str(row.get("recommended_action") or "observe"),
-                "sample_sources": str(row.get("sample_sources") or ""),
-                "trust_tiers": str(row.get("trust_tiers") or ""),
-                "latest_generated_utc": str(row.get("latest_generated_utc") or ""),
-            }
-        )
+    top_sector_rows = [dict(row, rank=index) for index, row in enumerate(sector_rows[: max(1, top_n)], start=1)]
 
     market_lane = next(
         (
@@ -992,21 +959,33 @@ def build_panel(
     first_thursday_action = str(thursday_plan[0]) if thursday_plan else ""
 
     headline = {
-        "total_baseline_loss_rate_usd_per_hour": round(total_baseline, 2),
-        "total_estimated_hourly_value_usd": round(total_hourly, 2),
-        "total_estimated_daily_value_usd": round(total_daily, 2),
-        "total_estimated_annual_value_usd": round(total_annual, 2),
-        "translated_source_hourly_value_usd": round(to_float(registry_summary.get("translated_hourly_value_usd"), 0.0), 2),
-        "translated_source_daily_value_usd": round(to_float(registry_summary.get("translated_daily_value_usd"), 0.0), 2),
-        "translated_source_annual_value_usd": round(to_float(registry_summary.get("translated_annual_value_usd"), 0.0), 2),
+        "total_baseline_loss_rate_usd_per_hour": rounded_number(total_baseline, 2),
+        "total_estimated_hourly_value_usd": None,
+        "total_estimated_daily_value_usd": None,
+        "total_estimated_annual_value_usd": None,
+        "modeled_hourly_value_usd": rounded_number(total_hourly, 2),
+        "modeled_daily_value_usd": rounded_number(total_daily, 2),
+        "modeled_annual_value_usd": rounded_number(total_annual, 2),
+        "translated_source_hourly_value_usd": None,
+        "translated_source_daily_value_usd": None,
+        "translated_source_annual_value_usd": None,
+        "reported_translated_source_annual_value_usd": registry_summary.get("reported_translated_annual_value_usd"),
+        "evidence_status": "UNVALIDATED_MODEL_AND_REPORTED_INTAKE_CONTEXT",
+        "primary_live_evidence": False,
+        "model_boundary": MODEL_BOUNDARY,
+        "invalid_input_count": sum(r["invalid_input_count"] for r in sector_rows),
         "enabled_sources": to_int(registry_summary.get("enabled_sources"), 0),
         "measured_sources": to_int(registry_summary.get("measured_sources"), 0),
         "measured_coverage_pct": round(to_float(registry_summary.get("measured_coverage_pct"), 0.0), 2),
-        "live_sector_count": len(sector_rows),
+        "live_sector_count": None,
+        "modeled_sector_count": len(sector_rows),
         "top_sector": str(top_sector_row.get("sector") or "n/a"),
-        "top_sector_hourly_value_usd": round(to_float(top_sector_row.get("total_estimated_hourly_value_usd"), 0.0), 2),
-        "cross_sector_recommended_prevented_pct": round(to_percent(recommended.get("prevented_pct")), 2),
-        "cross_sector_recommended_avoided_cost_usd": round(to_float(recommended.get("avoided_cost_usd"), 0.0), 2),
+        "top_sector_hourly_value_usd": None,
+        "top_sector_modeled_hourly_value_usd": rounded_number(top_sector_row.get("modeled_hourly_value_usd"), 2),
+        "cross_sector_recommended_prevented_pct": None,
+        "reported_cross_sector_prevented_pct": finite_number(recommended.get("prevented_pct")),
+        "cross_sector_recommended_avoided_cost_usd": None,
+        "reported_cross_sector_avoided_cost_usd": finite_number(recommended.get("avoided_cost_usd")),
         "router_edge_pct": round(to_float(evidence.get("router_edge_pct"), 0.0), 2),
         "harmonic_win_rate_pct": round(to_float(evidence.get("harmonic_win_rate_pct"), 0.0), 2),
         "kalisha_prediction_score": round(to_float(evidence.get("kalisha_prediction_score"), 0.0), 2),
@@ -1098,6 +1077,8 @@ def build_panel(
         },
         "claim_gate": {
             "public_economic_value_claim_allowed": False,
+            "accepted_annual_savings_usd": None,
+            "boundary": MODEL_BOUNDARY,
             "trading_performance_validated": False,
             "field_performance_validated": False,
             "external_validation_status": "not_performed",
@@ -1106,17 +1087,22 @@ def build_panel(
         "headline": headline,
         "lanes": {
             "cross_sector_intel": {
-                "recommended_prevented_pct": round(to_percent(recommended.get("prevented_pct")), 2),
-                "recommended_avoided_cost_usd": round(to_float(recommended.get("avoided_cost_usd"), 0.0), 2),
-                "recommended_residual_cost_usd": round(to_float(recommended.get("residual_cost_usd"), 0.0), 2),
+                "recommended_prevented_pct": None,
+                "reported_prevented_pct": finite_number(recommended.get("prevented_pct")),
+                "recommended_avoided_cost_usd": None,
+                "reported_avoided_cost_usd": finite_number(recommended.get("avoided_cost_usd")),
+                "recommended_residual_cost_usd": None,
+                "reported_residual_cost_usd": finite_number(recommended.get("residual_cost_usd")),
                 "recommended_efficiency_score": round(to_float(recommended.get("efficiency_score"), 0.0), 2),
             },
             "live_source_translation": {
                 "enabled_sources": to_int(registry_summary.get("enabled_sources"), 0),
                 "measured_sources": to_int(registry_summary.get("measured_sources"), 0),
                 "measured_coverage_pct": round(to_float(registry_summary.get("measured_coverage_pct"), 0.0), 2),
-                "translated_hourly_value_usd": round(to_float(registry_summary.get("translated_hourly_value_usd"), 0.0), 2),
-                "translated_annual_value_usd": round(to_float(registry_summary.get("translated_annual_value_usd"), 0.0), 2),
+                "translated_hourly_value_usd": None,
+                "reported_translated_hourly_value_usd": registry_summary.get("reported_translated_hourly_value_usd"),
+                "translated_annual_value_usd": None,
+                "reported_translated_annual_value_usd": registry_summary.get("reported_translated_annual_value_usd"),
             },
             "flowform_router": {
                 "evidence_run_utc": str(evidence.get("run_utc") or ""),
@@ -1127,7 +1113,8 @@ def build_panel(
             },
             "trader_execution": {
                 "sector": str(market_lane.get("sector") or "market_execution"),
-                "hourly_value_usd": round(to_float(market_lane.get("total_estimated_hourly_value_usd"), 0.0), 2),
+                "hourly_value_usd": None,
+                "modeled_hourly_value_usd": rounded_number(market_lane.get("modeled_hourly_value_usd"), 2),
                 "weighted_gain_pct": round(to_float(market_lane.get("weighted_optimization_gain_pct"), 0.0), 2),
                 "source_count": to_int(market_lane.get("source_count"), 0),
             },
@@ -1176,11 +1163,13 @@ def build_panel(
                 "source": str(r.get("source") or ""),
                 "sector": str(r.get("sector") or ""),
                 "optimization_gain_pct": round(to_float(r.get("optimization_gain_pct"), 0.0), 4),
-                "estimated_hourly_value_usd": round(to_float(r.get("estimated_hourly_value_usd"), 0.0), 4),
+                "estimated_hourly_value_usd": None,
+                "reported_estimated_hourly_value_usd": finite_number(r.get("estimated_hourly_value_usd")),
+                "evidence_status": "UNVERIFIED_REFERENCE_CONTEXT",
             }
             for r in reference_rows[: max(1, top_n)]
         ],
-        "source_rows": source_rows[: max(1, top_n * 2)],
+        "source_rows": source_rows,
         "proof_refs": {
             "frozen_deltas_jsonl": rel_path(frozen_deltas_path, workspace_root),
             "live_source_registry_json": rel_path(source_registry_path, workspace_root),
@@ -1196,7 +1185,8 @@ def build_panel(
     }
 
     csv_rows: list[dict[str, Any]] = []
-    for row in top_sector_rows:
+    for rank, source in enumerate(sector_rows, start=1):
+        row = dict(source, rank=rank)
         csv_rows.append(
             {
                 "rank": row.get("rank"),
@@ -1208,6 +1198,9 @@ def build_panel(
                 "total_estimated_hourly_value_usd": row.get("total_estimated_hourly_value_usd"),
                 "total_estimated_daily_value_usd": row.get("total_estimated_daily_value_usd"),
                 "total_estimated_annual_value_usd": row.get("total_estimated_annual_value_usd"),
+                "modeled_hourly_value_usd": row.get("modeled_hourly_value_usd"),
+                "modeled_annual_value_usd": row.get("modeled_annual_value_usd"),
+                "model_boundary": MODEL_BOUNDARY,
                 "recommended_action": row.get("recommended_action"),
                 "sample_sources": row.get("sample_sources"),
                 "trust_tiers": row.get("trust_tiers"),

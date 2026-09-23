@@ -198,6 +198,7 @@ readonly -a RELEASE_FILES=(
   "cohort/members/wednesday.html"
   "cohort/members/xi.html"
   "cohort/members/yoamigo.html"
+  "downloads/eia-two-window-review-20260922.zip"
 )
 readonly -a RELEASE_DIRECTORIES=(
   "assets"
@@ -210,6 +211,7 @@ readonly -a RELEASE_DIRECTORIES=(
   "cohort"
   "cohort/downloads"
   "cohort/members"
+  "downloads"
 )
 readonly EXPECTED_FILE_COUNT="${#RELEASE_FILES[@]}"
 

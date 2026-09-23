@@ -105,3 +105,19 @@ examples/proof_capsule/** text eol=lf
 /docs/EXTERNAL_TECHNICAL_REVIEW_PACKET_2026-07-28.md text eol=lf
 /docs/PROOF_CAPSULE_SCHEMA.md text eol=lf
 /tests/test_external_technical_review_packet.py text eol=lf
+
+# Preserve exact reviewed bytes for the two frozen EIA constraint packets.
+# Their strict verifier pins raw files, so checkout must not convert line endings.
+/code/ops/REPLAY_EIA_CONSTRAINT_REVIEW.py -text
+/code/ops/REPLAY_EIA_LATER_WINDOW.py -text
+/config/eia_constraint_replay_review_v1.json -text
+/config/eia_later_window_review_v1.json -text
+/evidence/reproducibility/eia_constraint_review_20260921/benchmark.json -text
+/evidence/reproducibility/eia_constraint_review_20260921/constraint_summary.json -text
+/evidence/reproducibility/eia_constraint_review_20260921/environment.json -text
+/evidence/reproducibility/eia_constraint_review_20260921/manifest.json -text
+/evidence/reproducibility/eia_constraint_review_20260921/predictions.csv.gz -text
+/evidence/reproducibility/eia_constraint_later_window_20260921/benchmark.json -text
+/evidence/reproducibility/eia_constraint_later_window_20260921/manifest.json -text
+/evidence/reproducibility/eia_constraint_later_window_20260921/predictions.csv.gz -text
+/evidence/reproducibility/eia_daily_20260713_20260908_selected.json.gz -text
