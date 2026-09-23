@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {nonnegative,runway,fundingGap,dilution,debtPayment} from '../dashboard/js/capital_math.mjs';
+import {nonnegative,runway,fundingGap,dilution,debtPayment} from '../dashboard/js/capital_math.js';
 
 test('missing or invalid inputs cannot silently become a zero-dollar assumption',()=>{
   for(const value of ['', '  ',null,undefined,-1,'invalid',Infinity,NaN])assert.equal(nonnegative(value),null);
