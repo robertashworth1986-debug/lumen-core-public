@@ -105,7 +105,28 @@ def audit_cell(truth: Any, candidate: Any, baselines: dict, mask: Any) -> dict:
     for values in b.values():
         common &= np.isfinite(values)
     scheduled = int(m.sum()); outcomes = int(observed.sum()); pairs = int(common.sum())
+    # Count every scheduled target once by its complete missing-input pattern.
+    # Marginal counts overlap and must never be added as lost-target totals.
+    availability = {"truth": np.isfinite(y), "candidate": np.isfinite(c),
+                    **{name: np.isfinite(values) for name, values in b.items()}}
+    input_names = ("truth", "candidate", *REQUIRED_BASELINES)
+    missing_codes = np.zeros(len(y), dtype=np.uint8)
+    for bit, name in enumerate(input_names):
+        missing_codes |= (~availability[name]).astype(np.uint8) << bit
+    pattern_counts = np.bincount(missing_codes[m], minlength=1 << len(input_names))
+    exclusions = {
+        "excluded_scheduled_targets": scheduled - pairs,
+        "missing_by_input_over_scheduled": {
+            name: int((m & ~available).sum())
+            for name, available in availability.items()},
+        "exclusive_missing_patterns": [
+            {"missing_inputs": [name for bit, name in enumerate(input_names)
+                                if code & (1 << bit)], "scheduled_targets": int(count)}
+            for code, count in enumerate(pattern_counts) if code and count],
+        "interpretation": "Marginal counts overlap; exclusive patterns partition excluded scheduled targets. Missingness does not establish its cause or as-of availability.",
+    }
     result = {"scheduled_targets": scheduled, "observed_targets": outcomes,
+              "coverage_exclusions": exclusions,
               "common_pairs": pairs,
               "observed_over_scheduled": ratio(outcomes, scheduled),
               "common_over_observed": ratio(pairs, outcomes),
