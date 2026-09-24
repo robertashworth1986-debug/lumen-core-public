@@ -7,6 +7,21 @@
 
 ## One commercial sentence
 
+### September 24 sector coverage diagnostic
+
+Active outcome 2 now includes a source-level extension of the existing offline
+denominator audit for grid, marine and geothermal research. Each scheduled
+target excluded from a comparison is attributed to its complete missing-input
+pattern; overlapping marginal counts are explicitly separated from exclusive
+lost-target totals. This makes the next source-repair work more precise without
+changing forecasts, thresholds, frozen results or research-only decisions.
+The [existing assurance note](DENOMINATOR_AND_PAPER_ASSURANCE_2026-09-11.md)
+records 81 passing focused local tests and both intact EIA packet identities.
+No complete-suite CI pass, rescored historical packet, improved coverage,
+independent validation, deployment or external action is established by this
+source change. Buyer-owned scope, chronology and prospective capture remain
+the next validation gates.
+
 ### September 21 live-release audit hardening
 
 Active outcome 2 now includes a bounded correction to the existing exact-byte
