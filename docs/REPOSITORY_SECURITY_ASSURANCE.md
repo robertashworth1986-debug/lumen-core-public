@@ -61,6 +61,73 @@ first-party module loading only. They do not establish browser/GPU
 compatibility across devices, visual quality, sustained runtime behavior,
 vulnerability freedom, production deployment, or external validation.
 
+## PDF dependency refresh - September 23, 2026
+
+This refresh advances active outcome 2, a bounded external review or pilot,
+by keeping the existing reviewer dependency repair current. The institutional
+requirements, complete Ubuntu/Python 3.11.9 hash lock and deadline sentinel
+now pin `pypdf==6.19.0`; only pypdf changes among the 39 locked packages.
+The separate frozen reviewer dependency files and September 14 receipts are
+unchanged. Both distribution hashes were checked against downloaded PyPI bytes.
+
+Upstream published three additional moderate advisories on September 16 and
+marks versions below 6.19.0 affected: [appearance-stream generation](https://github.com/py-pdf/pypdf/security/advisories/GHSA-php9-fj8v-98fj),
+[alphabetic page labels](https://github.com/py-pdf/pypdf/security/advisories/GHSA-w23x-9jrw-r45c),
+and [dictionary-based embedded-file access](https://github.com/py-pdf/pypdf/security/advisories/GHSA-v247-6f48-mgcj).
+The September 14 zero-advisory candidate result therefore cannot justify
+merging the earlier 6.17.0 pin today.
+
+Fresh `pip-audit==2.10.1` queries nevertheless reported zero known advisories
+for both complete 39-package locks, including the affected 6.17.0 baseline.
+This scanner/advisory discrepancy is retained, not counted as remediation
+evidence. The upgrade decision follows the upstream affected/fixed ranges.
+
+The six generated-fixture PDF tests retain the three prior guards, exercise
+both alphabetic-label bounds, and check normal text, outline, metadata and
+attachment round trips. Guard configuration uses pypdf's current temporary
+configuration API. The two small label counterexamples fail on 6.17.0 because
+it does not reject the input; all six pass on 6.19.0. This is a bounded guard
+regression, not a resource-exhaustion measurement. Appearance-stream and
+embedded-file complexity fixes are covered by the upstream fixed-version
+declaration, not independent local attack benchmarks.
+
+The focused local suite passed 76 tests and 3 subtests on Linux/Python 3.12.14.
+That supplementary environment does not replay the locked Python 3.11.9
+closure; current-head institutional CI remains the integration gate. The
+audit outputs, distribution verification and bounded comparison are retained
+in `evidence/dependency_security/20260923/`. No production deployment,
+default-branch alert closure or external security validation is implied.
+
+## Historical PDF dependency correction - September 14, 2026
+
+The September 14 candidate institutional dependency set and deadline-sentinel workflow pinned
+`pypdf==6.17.0`. The institutional Ubuntu/Python 3.11.9 lock changes only
+pypdf and its two distribution hashes; its other 38 package versions and the
+separate frozen reviewer dependency files remain unchanged.
+
+A current remote observation found three open moderate pypdf advisories:
+[cyclic tree insertion](https://github.com/py-pdf/pypdf/security/advisories/GHSA-jp53-mhqp-8xcg),
+[outline expansion](https://github.com/py-pdf/pypdf/security/advisories/GHSA-23w6-3w8w-8484),
+and [repeated form extraction](https://github.com/py-pdf/pypdf/security/advisories/GHSA-763m-79hh-57f2).
+The older August snapshot below is historical, not a current zero-alert claim.
+
+Four small generated-fixture checks in `tests/test_pdf_dependency_security.py`
+exercise those three guards and an ordinary PDF text/outline/metadata round
+trip. Against pypdf 6.15.0, three checks failed and the compatibility check
+passed; against 6.17.0, all four passed. The cyclic-tree check runs in a
+separate, five-second-bounded process. Outline and form budgets are reduced
+inside the tests, so these checks do not measure default-limit memory use or
+establish safety for arbitrary documents. No attached document is executed.
+
+`pip-audit==2.10.1` reported three known advisories in one package for the
+baseline 39-package lock, and zero known advisories for the candidate lock at
+the recorded query time. The retained package-level outputs and bounded
+comparison are in `evidence/dependency_security/20260914/`. A clean dependency
+audit is not vulnerability freedom, PDF sandboxing, deployment, or remote
+alert closure. Default-branch alerts remain open until an approved merge and
+fresh GitHub reconciliation. Existing PR #210 carries this narrow repair;
+PR #199 overlaps on pypdf but also proposes broader numerical-library changes.
+
 ## Evidence protocol
 
 For a named commit, retain the workflow URL, run ID, conclusion, analyzed
