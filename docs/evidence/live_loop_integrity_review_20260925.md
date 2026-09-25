@@ -1,8 +1,10 @@
 # Live-loop integrity review — September 25, 2026
 
-**Active outcome:** 2 — one external validation or paid-pilot conversion.  
-**Evidence type:** First-party source inspection and local regression tests.  
-**Base commit:** `dfc45fe2a05102c835dafe05d9b847cd04566086`.  
+**Active outcome:** 2 — one external validation or paid-pilot conversion.
+
+**Evidence type:** First-party source inspection and local regression tests.
+
+**Base commit:** `dfc45fe2a05102c835dafe05d9b847cd04566086`.
 **Scope:** Existing source monitor, government collection summary and public
 live-breadth manifest. This receipt covers the working-file identities below;
 it is not a deployment or independent-validation receipt.
