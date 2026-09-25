@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 import urllib.parse
 import urllib.request
@@ -124,28 +125,20 @@ def redact_url(url: str) -> str:
                 safe_pairs.append((key, value))
         safe_query = urllib.parse.urlencode(safe_pairs, doseq=True)
         return urllib.parse.urlunsplit((parsed.scheme, parsed.netloc, parsed.path, safe_query, parsed.fragment))
-    except Exception:
-        return url
+    except (TypeError, ValueError):
+        return "[invalid URL withheld]"
 
 
 def redact_text_secrets(text: str) -> str:
+    """Remove credential assignment values rather than merely prefixing them."""
     if not text:
         return text
-    redacted = text
-    patterns = (
-        "api_key",
-        "apikey",
-        "key",
-        "token",
-        "access_token",
-        "registrationkey",
-        "userid",
-        "user_id",
+    names = "|".join(re.escape(key) for key in sorted(SENSITIVE_QUERY_KEYS, key=len, reverse=True))
+    assignment = re.compile(
+        rf'''(?<![\w])((?:{names})\s*["']?\s*[:=]\s*)(?:"[^"]*"|'[^']*'|[^&\s<>"']+)''',
+        re.IGNORECASE,
     )
-    for token in patterns:
-        redacted = redacted.replace(f"{token}=", f"{token}=REDACTED_")
-        redacted = redacted.replace(f"{token.upper()}=", f"{token.upper()}=REDACTED_")
-    return redacted
+    return assignment.sub(lambda match: match.group(1) + "REDACTED", text)
 
 
 def sanitize_check_row(row: dict) -> dict:
@@ -345,6 +338,7 @@ def fetch_bea(env: dict) -> dict:
 
 
 def load_registry_gov_rows() -> list[dict]:
+    """Retain historical context; registry flags never establish a current collection."""
     if not REGISTRY_PATH.exists():
         return []
     try:
@@ -371,21 +365,75 @@ def load_registry_gov_rows() -> list[dict]:
         )
         if not inferred_gov:
             continue
-        probe_ok = bool(row.get("probe_ok", False))
-        measured = bool(row.get("measured", False))
-        ok = probe_ok or measured
         out.append(
             {
                 "source": src,
-                "ok": ok,
-                "rows": int(row.get("rows", 0) or 0),
-                "probe_ok": probe_ok,
-                "measured": measured,
-                "probe_note": str(row.get("probe_note", "")),
-                "basis": "registry_live_probe",
+                "ok": False,
+                "reported_rows": nonnegative_count(row.get("rows")),
+                "reported_probe_ok": row.get("probe_ok") is True,
+                "reported_measured": row.get("measured") is True,
+                "last_probe_utc": row.get("last_probe_utc"),
+                "registry_generated_utc": payload.get("generated_utc"),
+                "basis": "historical_registry_context_not_current_collection",
             }
         )
     return out
+
+
+def nonnegative_count(value) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        return None
+    return value
+
+
+# Count units describe these exact collector endpoints, not provider-wide coverage.
+RESPONSE_KINDS = {
+    "FRED": "data_rows",
+    "USGS": "data_rows",
+    "CENSUS": "data_rows",
+    "EIA": "data_rows",
+    "BLS": "data_rows",
+    "NOAA": "metadata_entries",
+    "EPA_AQS": "metadata_entries",
+    "BEA": "metadata_entries",
+    "NASA": "content_items",
+    "NREL": "output_fields",
+}
+
+
+def build_collection_summary(direct_checks: list[dict], registry_context: list[dict]) -> dict:
+    """Preserve current failures and keep previous registry evidence out of live counts."""
+    checks = []
+    for original in direct_checks:
+        check = dict(original)
+        count = nonnegative_count(check.get("rows"))
+        check["transport_ok"] = original.get("ok") is True
+        check["ok"] = check["transport_ok"] and count is not None and count > 0
+        check["rows"] = count
+        check["basis"] = "current_direct_collection"
+        check["response_kind"] = RESPONSE_KINDS.get(str(check.get("source", "")).upper(), "unknown")
+        check["dataset_review_ready"] = False
+        checks.append(sanitize_check_row(check))
+    return {
+        "generated_utc": now_utc(),
+        "collector": "canonical_gov_live",
+        "sources_ok": sum(check["ok"] for check in checks),
+        "sources_total": len(checks),
+        "rows_total": sum(
+            check["rows"] for check in checks
+            if check["ok"] and check["response_kind"] == "data_rows"
+        ),
+        "response_items_total": sum(check["rows"] for check in checks if check["ok"]),
+        "checks": checks,
+        "historical_registry_context": registry_context,
+        "metric_definitions": {
+            "sources_ok": "Current direct checks with an explicit successful response and positive item count; not dataset suitability.",
+            "rows_total": "Returned data-row observations from successful direct checks; metadata, content items and output-field counts are excluded. Not unique portfolio rows or decision-ready datasets.",
+            "response_items_total": "Heterogeneous returned item counts from successful direct checks; not comparable data rows.",
+        },
+        "dataset_review_ready": False,
+        "claim_boundary": "A successful collection does not establish dataset rights, relevance, row-level freshness, matched scope, independent validation, savings or production readiness.",
+    }
 
 
 def fetch_census(env: dict) -> dict:
@@ -450,34 +498,11 @@ def main() -> dict:
         fetch_bea(env),
     ]
 
-    by_source: dict[str, dict] = {str(c.get("source", "")).upper(): c for c in direct_checks}
-    for row in load_registry_gov_rows():
-        src = str(row.get("source", "")).upper()
-        existing = by_source.get(src)
-        if existing is None:
-            by_source[src] = row
-            continue
-        # Keep registry row only when direct probe failed and registry has measured/probe evidence.
-        if (not bool(existing.get("ok", False))) and bool(row.get("ok", False)):
-            by_source[src] = row
-
-    checks = list(by_source.values())
-
-    ok_count = sum(1 for c in checks if c.get("ok"))
-    rows = sum(int(c.get("rows", 0) or 0) for c in checks)
-
-    payload = {
-        "generated_utc": now_utc(),
-        "collector": "canonical_gov_live",
-        "sources_ok": ok_count,
-        "sources_total": len(checks),
-        "rows_total": rows,
-        "env_keys_detected": sorted([k for k in env.keys() if k.endswith("_KEY") or k.endswith("_TOKEN")]),
-        "checks": [sanitize_check_row(c) for c in checks],
-    }
+    payload = build_collection_summary(direct_checks, load_registry_gov_rows())
+    payload["env_keys_detected"] = sorted([k for k in env.keys() if k.endswith("_KEY") or k.endswith("_TOKEN")])
     SUMMARY_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"[GOV] wrote {SUMMARY_PATH}")
-    print(f"[GOV] sources_ok={ok_count}/{len(checks)} rows_total={rows}")
+    print(f"[GOV] sources_ok={payload['sources_ok']}/{payload['sources_total']} rows_total={payload['rows_total']}")
     return payload
 
 
