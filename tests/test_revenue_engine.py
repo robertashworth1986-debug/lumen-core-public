@@ -1,4 +1,16 @@
-from code.revenue.revenue_engine import evaluate, SCHEMA
+import importlib.util
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+# `code` is also a standard-library module; load the script by its exact path.
+SPEC = importlib.util.spec_from_file_location(
+    "revenue_engine", ROOT / "code" / "revenue" / "revenue_engine.py"
+)
+assert SPEC and SPEC.loader
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+evaluate, SCHEMA = MODULE.evaluate, MODULE.SCHEMA
 
 def base():
     return {

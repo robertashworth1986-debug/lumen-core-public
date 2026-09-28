@@ -1,5 +1,23 @@
-from code.revenue.evidence_mapper import map_evidence
-from code.revenue.sow_builder import build_sow_prefill
+import importlib.util
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load_revenue_script(name):
+    # Avoid treating the standard-library `code` module as a package.
+    spec = importlib.util.spec_from_file_location(
+        name, ROOT / "code" / "revenue" / f"{name}.py"
+    )
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+map_evidence = _load_revenue_script("evidence_mapper").map_evidence
+build_sow_prefill = _load_revenue_script("sow_builder").build_sow_prefill
 
 def test_mapper_excludes_held_and_historical():
     d={"schema":"lumencore_revenue_decision_v1","outcome":"scope_candidate","opportunity_id":"X"}
