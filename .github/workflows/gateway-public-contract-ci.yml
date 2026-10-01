@@ -24,7 +24,10 @@ on:
       - 'code/universe_v2_fetchers.py'
       - 'code/deploy/deploy_vps.sh'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
+      - 'code/ops/VERIFY_PUBLIC_TLS_RECEIPT.py'
       - 'tests/test_booth_public_contract_runtime.py'
+      - 'tests/test_public_tls_preflight.py'
+      - 'tests/fixtures/public_tls_leaf.pem'
       - '.github/workflows/repair-gateway-dependency-closure.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
@@ -54,7 +57,10 @@ on:
       - 'code/universe_v2_fetchers.py'
       - 'code/deploy/deploy_vps.sh'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
+      - 'code/ops/VERIFY_PUBLIC_TLS_RECEIPT.py'
       - 'tests/test_booth_public_contract_runtime.py'
+      - 'tests/test_public_tls_preflight.py'
+      - 'tests/fixtures/public_tls_leaf.pem'
       - '.github/workflows/repair-gateway-dependency-closure.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
@@ -88,7 +94,9 @@ jobs:
           printf -v gateway_paths 'code/%s ' "${gateway_files[@]}"
           # shellcheck disable=SC2086
           python -m py_compile $gateway_paths \
+            code/ops/VERIFY_PUBLIC_TLS_RECEIPT.py \
             tests/test_booth_public_contract_runtime.py \
+            tests/test_public_tls_preflight.py \
             tests/test_vps_runtime_diagnostic_workflow.py
 
       - name: Run public contract tests without third-party dependencies
@@ -100,6 +108,7 @@ jobs:
           tests = []
           for path in (
               "tests/test_booth_public_contract_runtime.py",
+              "tests/test_public_tls_preflight.py",
               "tests/test_vps_runtime_diagnostic_workflow.py",
           ):
               namespace = runpy.run_path(path)

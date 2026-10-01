@@ -24,18 +24,76 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Set up pinned Python runtime
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
       - name: Probe production endpoints
         id: probe
         shell: bash
         env:
           CURL_TIMEOUT_SECONDS: '10'
           STATIC_MAX_BYTES: '1048576'
+          TLS_CONNECT_TIMEOUT_SECONDS: '15'
+          TLS_WARNING_DAYS: '30'
           HEALTH_ARTIFACT_DIR: ${{ runner.temp }}/lumencore-health-probe
         run: |
           set -euo pipefail
           install -d -m 700 "$HEALTH_ARTIFACT_DIR"
 
           timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          capture_tls_receipt() {
+            local certificate
+            local chain_trust_status=not_run
+            local probe_error=""
+            local -a receipt_args
+            certificate=$(mktemp)
+
+            if timeout "$TLS_CONNECT_TIMEOUT_SECONDS" openssl s_client \
+              -connect lumen-core.ai:443 -servername lumen-core.ai \
+              -showcerts </dev/null 2>/dev/null \
+              | openssl x509 -outform PEM > "$certificate" 2>/dev/null && \
+              [[ -s "$certificate" ]]; then
+              chain_trust_status=passed
+              for tls_host in \
+                lumen-core.ai www.lumen-core.ai \
+                app.lumen-core.ai research.lumen-core.ai; do
+                if ! timeout "$TLS_CONNECT_TIMEOUT_SECONDS" openssl s_client \
+                  -connect "$tls_host:443" -servername "$tls_host" \
+                  -verify_hostname "$tls_host" -verify_return_error \
+                  </dev/null >/dev/null 2>&1; then
+                  chain_trust_status=failed
+                  break
+                fi
+              done
+            else
+              probe_error=certificate_acquisition_failed
+            fi
+
+            receipt_args=(
+              python code/ops/VERIFY_PUBLIC_TLS_RECEIPT.py
+              --checked-at "$timestamp"
+              --connect-host lumen-core.ai
+              --hostname lumen-core.ai
+              --hostname www.lumen-core.ai
+              --hostname app.lumen-core.ai
+              --hostname research.lumen-core.ai
+              --warning-days "$TLS_WARNING_DAYS"
+              --chain-trust-status "$chain_trust_status"
+              --output "$HEALTH_ARTIFACT_DIR/tls_receipt.json"
+            )
+            if [[ -n "$probe_error" ]]; then
+              receipt_args+=(--probe-error "$probe_error")
+            else
+              receipt_args+=(--certificate "$certificate")
+            fi
+            "${receipt_args[@]}"
+            rm -f -- "$certificate"
+          }
+
+          capture_tls_receipt
 
           check_static_endpoint() {
             local name=$1
@@ -176,6 +234,8 @@ jobs:
           dynamic_healthy=$(jq '[.[] | select(.surface == "dynamic" and .ok == true)] | length' <<<"$endpoints")
           dynamic_total=$(jq '[.[] | select(.surface == "dynamic")] | length' <<<"$endpoints")
           dynamic_reachable=$(jq '[.[] | select(.surface == "dynamic" and .reachable == true)] | length' <<<"$endpoints")
+          tls=$(jq -c '.' "$HEALTH_ARTIFACT_DIR/tls_receipt.json")
+          tls_state=$(jq -r '.state' <<<"$tls")
 
           static_surface_state=degraded
           if [[ "$static_healthy" -eq "$static_total" ]]; then
@@ -192,27 +252,37 @@ jobs:
           fi
 
           overall=outage
-          color=red
           if [[ "$static_surface_state" == operational && "$dynamic_gateway_state" == operational ]]; then
             overall=operational
-            color=brightgreen
           elif [[ "$static_surface_state" != outage || "$dynamic_gateway_state" != outage ]]; then
             overall=degraded
+          fi
+          if [[ "$tls_state" == outage ]]; then
+            overall=outage
+          elif [[ "$tls_state" == degraded && "$overall" == operational ]]; then
+            overall=degraded
+          fi
+
+          color=red
+          if [[ "$overall" == operational ]]; then
+            color=brightgreen
+          elif [[ "$overall" == degraded ]]; then
             color=yellow
           fi
 
           jq -n --arg checked_utc "$timestamp" --arg overall "$overall" \
             --arg static_surface_state "$static_surface_state" \
             --arg dynamic_gateway_state "$dynamic_gateway_state" \
+            --arg tls_state "$tls_state" \
             --argjson healthy_count "$healthy" --argjson total_count "$total" \
             --argjson static_healthy_count "$static_healthy" --argjson static_total_count "$static_total" \
             --argjson dynamic_healthy_count "$dynamic_healthy" --argjson dynamic_total_count "$dynamic_total" \
             --argjson dynamic_reachable_count "$dynamic_reachable" \
-            --argjson endpoints "$endpoints" \
-            '{checked_utc:$checked_utc,overall:$overall,static_surface_state:$static_surface_state,dynamic_gateway_state:$dynamic_gateway_state,healthy_count:$healthy_count,total_count:$total_count,static_healthy_count:$static_healthy_count,static_total_count:$static_total_count,dynamic_healthy_count:$dynamic_healthy_count,dynamic_total_count:$dynamic_total_count,dynamic_reachable_count:$dynamic_reachable_count,endpoints:$endpoints}' \
+            --argjson endpoints "$endpoints" --argjson tls "$tls" \
+            '{checked_utc:$checked_utc,overall:$overall,static_surface_state:$static_surface_state,dynamic_gateway_state:$dynamic_gateway_state,tls_state:$tls_state,healthy_count:$healthy_count,total_count:$total_count,static_healthy_count:$static_healthy_count,static_total_count:$static_total_count,dynamic_healthy_count:$dynamic_healthy_count,dynamic_total_count:$dynamic_total_count,dynamic_reachable_count:$dynamic_reachable_count,endpoints:$endpoints,tls:$tls}' \
             > "$HEALTH_ARTIFACT_DIR/site_health.json"
 
-          jq -n --arg message "$overall · static=$static_surface_state · gateway=$dynamic_gateway_state" --arg color "$color" \
+          jq -n --arg message "$overall · tls=$tls_state · static=$static_surface_state · gateway=$dynamic_gateway_state" --arg color "$color" \
             '{schemaVersion:1,label:"status",message:$message,color:$color,cacheSeconds:3600}' \
             > "$HEALTH_ARTIFACT_DIR/uptime_badge.json"
 
@@ -226,13 +296,44 @@ jobs:
               "dynamic_healthy_count", "dynamic_reachable_count",
               "dynamic_total_count", "endpoints", "healthy_count",
               "overall", "static_healthy_count", "static_surface_state",
-              "static_total_count", "total_count"
+              "static_total_count", "tls", "tls_state", "total_count"
             ] | sort) and
             (.checked_utc | type == "string" and
               test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")) and
             (.overall | IN("operational", "degraded", "outage")) and
             (.static_surface_state | IN("operational", "degraded", "outage")) and
             (.dynamic_gateway_state | IN("operational", "degraded", "outage")) and
+            (.tls_state | IN("operational", "degraded", "outage")) and
+            (.tls | type == "object") and
+            (.tls.schema == "lumencore.public_tls_preflight.v1") and
+            (.tls.checked_utc == .checked_utc) and
+            (.tls.state == .tls_state) and
+            (.tls.ok | type == "boolean") and
+            (.tls.chain_trust_evaluated | type == "boolean") and
+            (.tls.chain_trust_ok | type == "boolean") and
+            (.tls.certificate_valid_now | type == "boolean") and
+            (.tls.hostname_coverage_ok | type == "boolean") and
+            (.tls.renewal_window_entered | type == "boolean") and
+            (.tls.warning_threshold_days == 30) and
+            (.tls.target.expected_hosts == [
+              "app.lumen-core.ai", "lumen-core.ai",
+              "research.lumen-core.ai", "www.lumen-core.ai"
+            ]) and
+            (.tls.missing_expected_hosts | type == "array") and
+            (.tls.certificate | type == "object") and
+            (.tls.certificate.subject_alt_names | type == "array") and
+            (.tls.certificate.dns_names | type == "array") and
+            ((.tls.certificate.sha256_fingerprint == null) or
+              (.tls.certificate.sha256_fingerprint |
+                type == "string" and test("^[0-9a-f]{64}$"))) and
+            ((.tls.certificate.not_before_utc == null) or
+              (.tls.certificate.not_before_utc |
+                type == "string" and
+                test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"))) and
+            ((.tls.certificate.not_after_utc == null) or
+              (.tls.certificate.not_after_utc |
+                type == "string" and
+                test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"))) and
             (.endpoints | type == "object") and
             ((.endpoints | keys | sort) == ([
               "anomalies", "evidence", "explain", "external_review",
@@ -275,6 +376,7 @@ jobs:
           echo "total=$total" >> "$GITHUB_OUTPUT"
           echo "static_surface_state=$static_surface_state" >> "$GITHUB_OUTPUT"
           echo "dynamic_gateway_state=$dynamic_gateway_state" >> "$GITHUB_OUTPUT"
+          echo "tls_state=$tls_state" >> "$GITHUB_OUTPUT"
           echo "timestamp=$timestamp" >> "$GITHUB_OUTPUT"
 
       - name: Publish explicit health verdict
@@ -290,12 +392,23 @@ jobs:
             total=$(jq -r '.total_count' "$HEALTH_ARTIFACT_DIR/site_health.json")
             static_state=$(jq -r '.static_surface_state' "$HEALTH_ARTIFACT_DIR/site_health.json")
             gateway_state=$(jq -r '.dynamic_gateway_state' "$HEALTH_ARTIFACT_DIR/site_health.json")
+            tls_state=$(jq -r '.tls_state' "$HEALTH_ARTIFACT_DIR/site_health.json")
+            tls_subject=$(jq -r '.tls.certificate.subject_common_name // "unavailable"' "$HEALTH_ARTIFACT_DIR/site_health.json")
+            tls_not_after=$(jq -r '.tls.certificate.not_after_utc // "unavailable"' "$HEALTH_ARTIFACT_DIR/site_health.json")
+            tls_remaining=$(jq -r '.tls.remaining_days // "unavailable"' "$HEALTH_ARTIFACT_DIR/site_health.json")
+            tls_missing=$(jq -r '.tls.missing_expected_hosts | if length == 0 then "none" else join(", ") end' "$HEALTH_ARTIFACT_DIR/site_health.json")
             checked_utc=$(jq -r '.checked_utc' "$HEALTH_ARTIFACT_DIR/site_health.json")
             {
               echo "## Production health verdict: ${overall^^}"
               echo "- Contracts healthy: \`$healthy/$total\`"
               echo "- Static surface: \`$static_state\`"
               echo "- Dynamic gateway: \`$gateway_state\`"
+              echo "- Public TLS: \`$tls_state\`"
+              echo "- Certificate subject CN: \`$tls_subject\`"
+              echo "- Certificate notAfter: \`$tls_not_after\`"
+              echo "- Whole days remaining: \`$tls_remaining\`"
+              echo "- Missing expected SAN hosts: \`$tls_missing\`"
+              echo "- Warning/fail-closed threshold: \`30 days\`"
               echo "- Checked UTC: \`$checked_utc\`"
               echo "- Evidence: retained workflow artifact only; no repository commit or deployment occurred"
               echo ""
@@ -316,6 +429,7 @@ jobs:
           name: site-health-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/lumencore-health-probe/site_health.json
+            ${{ runner.temp }}/lumencore-health-probe/tls_receipt.json
             ${{ runner.temp }}/lumencore-health-probe/uptime_badge.json
           if-no-files-found: error
           retention-days: 14
@@ -323,5 +437,5 @@ jobs:
       - name: Warn on degraded or outage state
         if: steps.probe.outputs.overall != 'operational'
         run: |
-          echo "::error::lumen-core.ai is ${{ steps.probe.outputs.overall }} — static=${{ steps.probe.outputs.static_surface_state }}, gateway=${{ steps.probe.outputs.dynamic_gateway_state }}, ${{ steps.probe.outputs.healthy }}/${{ steps.probe.outputs.total }} endpoint contracts healthy"
+          echo "::error::lumen-core.ai is ${{ steps.probe.outputs.overall }} — tls=${{ steps.probe.outputs.tls_state }}, static=${{ steps.probe.outputs.static_surface_state }}, gateway=${{ steps.probe.outputs.dynamic_gateway_state }}, ${{ steps.probe.outputs.healthy }}/${{ steps.probe.outputs.total }} endpoint contracts healthy"
           exit 1
