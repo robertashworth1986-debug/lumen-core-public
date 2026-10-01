@@ -7,6 +7,35 @@
 
 ## One commercial sentence
 
+### September 25 live-loop integrity repairs
+
+Active outcome 2 includes a bounded repair of the existing source-to-evidence
+path, based on main commit `dfc45fe2a05102c835dafe05d9b847cd04566086`.
+The API source monitor now accepts the checked-in registry and provider-config
+shapes, rejects ambiguous inputs, and requires an explicit successful probe
+with a valid, non-future timestamp inside the accepted age limit before showing
+ACTIVE. Credential presence remains a separate diagnostic. The report itself
+does not perform network probes or establish dataset readiness.
+
+The canonical government collector now preserves direct collection failures;
+historical registry records cannot replace them or increase current successful
+source and row counts. Metadata, content items and output-field counts remain
+separate from data rows. Diagnostic credential assignments are redacted by
+removing their values. The public live-breadth manifest separately checks probe
+and dataset snapshot observation age, with finite positive age thresholds;
+missing, stale or future snapshot timestamps cannot become review-ready.
+
+Seven focused modules passed **134 local tests** on Python 3.12.14 / pytest
+9.1.1. This is not a full-suite or exact-commit CI pass. The
+[bounded review receipt](evidence/live_loop_integrity_review_20260925.md)
+records the command, source identities, covered failures and remaining gates.
+No provider collection, current availability measurement, new performance
+experiment, frozen-delta promotion, production deployment or external
+validation occurred in this repair pass. Existing frozen EIA evidence remains
+unchanged and on HOLD. The next operating gate remains a permissioned,
+timestamped source snapshot followed by the accepted comparison protocol and
+human review; code repair alone does not prove continuous operation or savings.
+
 ### September 21 live-release audit hardening
 
 Active outcome 2 now includes a bounded correction to the existing exact-byte

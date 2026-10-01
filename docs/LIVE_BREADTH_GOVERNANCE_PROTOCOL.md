@@ -48,6 +48,15 @@ python code/ops/build_public_live_breadth_manifest.py --registry <private-regist
   manifest input.
 - A governance sidecar is invalid without protocol approval, reviewer role,
   review time, worklist hash, and its own valid SHA-256 receipt.
+- Probe time and dataset snapshot observation time are separate clocks. Both
+  must fall within the accepted finite, positive `max_age_hours` threshold.
+  Refreshing a probe does not refresh the dataset.
+- `dataset_snapshot_observed_utc` must include a timezone and must not be later
+  than manifest generation. Missing, invalid, future or stale snapshot times
+  cannot produce a review-ready source.
+- Snapshot observation time establishes when that snapshot was observed. It
+  does not establish each row's measurement date, issue time or availability at
+  an earlier forecast cutoff; those remain decision-specific review gates.
 - Public source rows remain pseudonymous and use a strict field allowlist.
 - No manifest permits claims of alpha, savings, independent validation,
   current runtime state, or live-capital readiness.
@@ -58,3 +67,9 @@ The August 6 registry is frozen in a public-safe manifest with 17
 configured/enabled sources, 14 explicit probe successes, and 0 review-ready
 sources. The next evidence task is completing the private worklist with
 source-backed decisions; it is not increasing the public count by assertion.
+
+The [September 25 loop integrity review](evidence/live_loop_integrity_review_20260925.md)
+documents corrections to the source monitor, current-collection counters and
+the two freshness clocks. The retained August manifest is historical and was
+not regenerated. These source corrections and local tests do not establish
+current provider availability, continuous ingestion or a newly measured delta.

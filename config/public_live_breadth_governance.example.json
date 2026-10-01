@@ -14,7 +14,8 @@
       "relevance_status": "unknown",
       "minimum_rows": 100,
       "max_age_hours": 1,
-      "dataset_snapshot_sha256": null
+      "dataset_snapshot_sha256": null,
+      "dataset_snapshot_observed_utc": null
     }
   },
   "integrity": {
