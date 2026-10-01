@@ -168,6 +168,21 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 
 ### 2. One external validation or paid-pilot conversion
 
+**September 28 Revenue Engine import repair:** The existing PR #222 test
+modules now load the three revenue scripts by exact repository path, following
+the existing test convention. This removes their collision with Python's
+standard-library `code` module without making the source directory a package,
+changing the revenue behavior, or altering frozen evidence. The original
+collection error was reproduced before the correction. On local Python
+3.12.14 with pytest 9.1.0, all seven existing revenue tests passed with the
+standard-library `code` module already loaded; its module identity remained
+unchanged. Repository-wide collection reached 826 tests, including all seven
+revenue tests, but remained blocked by 11 unrelated import errors for missing
+local NumPy, pandas, Requests, FastAPI and PyYAML dependencies. This is a
+bounded local repair, not a full-suite pass. The hash-locked Python 3.11.9 CI
+suite remains the authoritative merge gate. No deployment, external action,
+buyer acceptance, revenue or validation is established.
+
 **Reviewer doorway:** PR #66 was merged on July 23 at `aed61134407426114148e3201cd357099d155864`. It is the canonical human-and-machine evidence-navigation layer. PR #74 is the current merged CODECHECK/reviewer package. Route a qualified non-author evaluator through those existing surfaces; do not create another platform or validation package.
 
 **Private external-review follow-up:** After a private technical review, a prospective collaborator shared private product documentation, requested LumenCore's thoughts, and proposed another discussion. Keep the counterparty identity and materials out of the public repository. This is not a partnership, customer, paid pilot, endorsement, validation, or permission to publish the material. Reduce any follow-up to one buyer-owned workflow, baseline, metric, data-rights boundary, and go/no-go decision.
