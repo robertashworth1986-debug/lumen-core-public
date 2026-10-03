@@ -503,11 +503,15 @@ def test_health_probe_classifies_static_and_dynamic_surfaces() -> None:
     endpoints = health["ENDPOINTS"]
     assert len(endpoints) == 16
     assert sum(contract in health["MARKERS"] for _, _, contract in endpoints) == 14
-    urls = {url for _, url, _ in endpoints}
-    assert "https://www.lumen-core.ai/" in urls
-    assert "https://lumen-core.ai/api/public/status" in urls
-    assert "https://lumen-core.ai/health" in urls
-    assert "https://lumen-core.ai/api/snapshot" not in urls
+    by_name = {name: (url, contract) for name, url, contract in endpoints}
+    assert by_name["www_portal"] == ("https://www.lumen-core.ai/", "home")
+    assert by_name["gateway_public_status"] == (
+        "https://lumen-core.ai/api/public/status", "public_status"
+    )
+    assert by_name["gateway_health"] == (
+        "https://lumen-core.ai/health", "gateway_health"
+    )
+    assert all(url != "https://lumen-core.ai/api/snapshot" for _, url, _ in endpoints)
     for retired_path in (
         "mission_control.html", "quant_lab.html", "kraken_execution_dashboard.html",
         "grants.html", "forecast.html", "anomalies.html", "explain.html", "lab.html",
