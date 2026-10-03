@@ -497,60 +497,28 @@ def test_gateway_and_refresh_services_run_as_bounded_non_root_account() -> None:
 
 
 def test_health_probe_classifies_static_and_dynamic_surfaces() -> None:
-    health = (ROOT / ".github" / "workflows" / "health-probe.yml").read_text(
-        encoding="utf-8"
-    )
-    static_function = re.search(
-        r"check_static_endpoint\(\) \{(?P<body>.*?)\n\s+\}\n\n\s+check_json_endpoint",
-        health,
-        flags=re.DOTALL,
-    )
-    assert static_function is not None
-    static_body = static_function.group("body")
-    assert '--output "$body"' in static_body
-    assert "--output /dev/null" not in static_body
-    assert '--max-filesize "$STATIC_MAX_BYTES"' in static_body
-    assert '"${content_type,,}" == text/html*' in static_body
-    assert 'grep -Fq -- "$marker" "$body"' in static_body
-    assert "contract_ok:$contract_ok" in static_body
-    assert "http_ok:$http_ok" in static_body
-    assert health.count("check_static_endpoint ") == 13
-    for marker in (
-        "proof-to-pilot-home-v1",
-        "bounded-validation-offer-v1",
-        "external-replication-docket-v1",
-        "proof-to-pilot-evidence-v1",
-        "<title>ProofLock Console</title>",
-        "legacy-public-route-hold-v1",
-    ):
-        assert marker in health
+    import runpy
+
+    health = runpy.run_path(str(ROOT / "code/ops/probe_public_health.py"))
+    endpoints = health["ENDPOINTS"]
+    assert len(endpoints) == 16
+    assert sum(contract in health["MARKERS"] for _, _, contract in endpoints) == 14
+    urls = {url for _, url, _ in endpoints}
+    assert "https://www.lumen-core.ai/" in urls
+    assert "https://lumen-core.ai/api/public/status" in urls
+    assert "https://lumen-core.ai/health" in urls
+    assert "https://lumen-core.ai/api/snapshot" not in urls
     for retired_path in (
-        "mission_control.html",
-        "quant_lab.html",
-        "kraken_execution_dashboard.html",
-        "grants.html",
-        "forecast.html",
-        "anomalies.html",
-        "explain.html",
-        "lab.html",
+        "mission_control.html", "quant_lab.html", "kraken_execution_dashboard.html",
+        "grants.html", "forecast.html", "anomalies.html", "explain.html", "lab.html",
     ):
-        assert f"https://lumen-core.ai/{retired_path}" in health
-    assert "agent_approval_hub.html" not in health
-    assert "https://lumen-core.ai/api/public/status" in health
-    assert "https://lumen-core.ai/health" in health
-    assert "https://lumen-core.ai/api/snapshot" not in health
-    assert "static_surface_state" in health
-    assert "dynamic_gateway_state" in health
-    assert "contract_ok" in health
-    assert "luma-experience-gateway" in health
-    assert "operator_api_v1" in health
+        assert (f"https://lumen-core.ai/{retired_path}", "legacy_hold") in {
+            (url, contract) for _, url, contract in endpoints
+        }
 
 
 def test_health_probe_is_read_only_artifact_only_and_outage_fails_job() -> None:
-    health = (ROOT / ".github" / "workflows" / "health-probe.yml").read_text(
-        encoding="utf-8"
-    )
-
+    health = (ROOT / ".github/workflows/health-probe.yml").read_text(encoding="utf-8")
     assert "permissions:\n  contents: read" in health
     assert "persist-credentials: false" in health
     assert "runner.temp }}/lumencore-health-probe" in health
@@ -559,21 +527,14 @@ def test_health_probe_is_read_only_artifact_only_and_outage_fails_job() -> None:
     assert "Production health verdict:" in health
     assert "A completed probe is not evidence of a healthy deployment" in health
     assert "no repository commit or deployment occurred" in health
+    assert "site_health_samples.jsonl" in health
+    assert "--rounds 4 --interval-seconds 60" in health
+    assert ".observation_window.all_samples_complete == true" in health
+    assert ".observation_window.failed_observations == 0" in health
+    assert "if: always()" in health
     assert "exit 1" in health
-    for forbidden in (
-        "contents: write",
-        "git config user.",
-        "git add ",
-        "git commit ",
-        "git pull ",
-        "git push ",
-    ):
+    for forbidden in ("contents: write", "git config user.", "git add ", "git commit ", "git pull ", "git push "):
         assert forbidden not in health
-    assert "(.endpoints | keys | sort)" in health
-    assert '(.url | type == "string" and startswith("https://lumen-core.ai/"))' in health
-    assert '(.ok | type == "boolean")' in health
-    assert ".healthy_count == ([.endpoints[] | select(.ok == true)] | length)" in health
-    assert ".cacheSeconds == 3600" in health
 
 
 def test_live_metrics_sync_is_read_only_artifact_only_and_fail_closed() -> None:
@@ -602,65 +563,19 @@ def test_live_metrics_sync_is_read_only_artifact_only_and_fail_closed() -> None:
 
 
 def test_health_probe_static_contract_fails_closed() -> None:
-    if not Path("/bin/bash").is_file():
-        return
+    import runpy
 
-    health = (ROOT / ".github" / "workflows" / "health-probe.yml").read_text(
-        encoding="utf-8"
-    )
-    match = re.search(
-        r"check_static_endpoint\(\) \{(?P<body>.*?)\n\s+\}\n\n\s+check_json_endpoint",
-        health,
-        flags=re.DOTALL,
-    )
-    assert match is not None
-    function_source = "check_static_endpoint() {" + match.group("body") + "\n}"
-    harness = (
-        """
-set -euo pipefail
-CURL_TIMEOUT_SECONDS=10
-STATIC_MAX_BYTES=1048576
-curl() {
-  local output=""
-  while (( $# )); do
-    if [[ "$1" == "--output" ]]; then
-      output=$2
-      shift 2
-    else
-      shift
-    fi
-  done
-  [[ -n "$output" ]]
-  printf '%s' "$FAKE_BODY" > "$output"
-  printf '200\\t%s' "$FAKE_CONTENT_TYPE"
-}
-"""
-        + function_source
-        + "\ncheck_static_endpoint fixture https://example.invalid/ home\n"
-    )
-
-    cases = (
-        ("<meta content='proof-to-pilot-home-v1'>", "text/html; charset=utf-8", True),
-        ("<html>wrong release</html>", "text/html; charset=utf-8", False),
-        ("proof-to-pilot-home-v1", "text/plain", False),
-    )
-    for body, content_type, expected_contract in cases:
-        completed = subprocess.run(
-            ["/bin/bash", "-c", harness],
-            check=True,
-            capture_output=True,
-            text=True,
-            env={
-                "PATH": "/usr/local/bin:/usr/bin:/bin",
-                "FAKE_BODY": body,
-                "FAKE_CONTENT_TYPE": content_type,
-            },
-        )
-        row = json.loads(completed.stdout)["value"]
+    classify = runpy.run_path(str(ROOT / "code/ops/probe_public_health.py"))["classify"]
+    for body, content_type, expected in (
+        (b"<meta content='proof-to-pilot-home-v1'>", "text/html; charset=utf-8", True),
+        (b"<html>wrong release</html>", "text/html; charset=utf-8", False),
+        (b"proof-to-pilot-home-v1", "text/plain", False),
+    ):
+        row = classify("home", 200, content_type, body, transport_ok=True, same_origin_ok=True)
         assert row["http_ok"] is True
         assert row["reachable"] is True
-        assert row["contract_ok"] is expected_contract
-        assert row["ok"] is expected_contract
+        assert row["contract_ok"] is expected
+        assert row["ok"] is expected
 
 
 def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None:

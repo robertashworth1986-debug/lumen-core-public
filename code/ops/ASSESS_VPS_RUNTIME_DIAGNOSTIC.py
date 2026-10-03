@@ -38,6 +38,33 @@ EXPECTED_ENDPOINT_CODES = {
 }
 
 
+def _origin_instability(text: str) -> dict[str, Any]:
+    """Keep history supplemental and allowlisted; absence is never zero errors."""
+    raw = _value(text, "origin_instability_json")
+    empty = {"status": "UNKNOWN", "sources": {}}
+    try:
+        payload = json.loads(raw or "null")
+        if not isinstance(payload, dict) or payload.get("schema") != "lumencore.vps_instability_evidence.v1":
+            return empty
+        sources = payload["sources"]
+        if not isinstance(sources, dict):
+            return empty
+        result = {"status": "OBSERVATIONS_RECORDED", "sources": {}}
+        for name in ("kernel_journal", "nginx_journal", "gateway_journal", "nginx_error_current", "nginx_error_previous"):
+            source = sources.get(name, {})
+            status = source.get("collection_status")
+            if status not in {"read_success", "unavailable", "time_limit", "byte_limit", "record_limit"}:
+                status = "unknown"
+            counts = {}
+            for signature in ("oom_kill", "upstream_connection_refused", "upstream_timeout", "upstream_closed", "resource_exhaustion", "worker_exit", "service_failed", "service_started"):
+                count = source.get("signatures", {}).get(signature, {}).get("count")
+                counts[signature] = count if type(count) is int and 0 <= count <= 10000 else None
+            result["sources"][name] = {"collection_status": status, "signature_counts": counts}
+        return result
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return empty
+
+
 def _section(text: str, start: str, end: str) -> str:
     if start not in text:
         return ""
@@ -417,6 +444,7 @@ def assess(
             "required_repair_controls": repair_controls,
         },
         "checks": checks,
+        "origin_instability_history": _origin_instability(text),
         "claim_boundary": {
             "proves": "A first-party, point-in-time, bounded runtime assessment of the declared checks.",
             "does_not_prove": [
@@ -452,6 +480,12 @@ def _render_summary(payload: dict[str, Any]) -> str:
             ["", "### Existing gated repair controls", ""]
             + [f"- `{item}`" for item in summary["required_repair_controls"]]
         )
+    history = payload["origin_instability_history"]
+    lines.extend(["", "### Bounded origin instability history", "", f"History receipt: `{history['status']}`. Separate from the point-in-time readiness verdict."])
+    for source, observation in history["sources"].items():
+        matches = ", ".join(f"{key}={count}" for key, count in observation["signature_counts"].items() if count)
+        lines.append(f"- `{source}`: `{observation['collection_status']}`; {matches or 'no positive signature count reported'}.")
+    lines.extend(["", "Read the separate instability JSON for UTC windows, event times, memory counters and collection limits. Sources may overlap and must not be summed. Missing, limited or rotated history and zero matches do not establish sustained availability or a root cause."])
     lines.extend(
         [
             "",

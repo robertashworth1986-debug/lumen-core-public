@@ -124,6 +124,24 @@ def test_pass_requires_every_declared_runtime_contract() -> None:
     }
     assert result["source"]["observed_at_utc"] == "2026-08-12T05:36:12Z"
     assert len(result["source"]["diagnostic_sha256"]) == 64
+    assert result["origin_instability_history"]["status"] == "UNKNOWN"
+
+
+def test_origin_history_is_separate_allowlisted_evidence_not_an_uptime_claim() -> None:
+    evidence = {"schema": "lumencore.vps_instability_evidence.v1", "sources": {
+        "kernel_journal": {"collection_status": "read_success", "raw_message": "secret-value", "signatures": {"oom_kill": {"count": 2}}}
+    }}
+    result = assess(_diagnostic(healthy=True) + "\norigin_instability_json=" + json.dumps(evidence), run_id="1", source_commit=COMMIT, source_url="https://example.invalid/run/1")
+    assert result["verdict"] == "PASS"
+    history = result["origin_instability_history"]
+    assert history["sources"]["kernel_journal"]["signature_counts"]["oom_kill"] == 2
+    assert history["sources"]["nginx_journal"]["collection_status"] == "unknown"
+    assert "secret-value" not in json.dumps(result)
+    assert "Separate from the point-in-time readiness verdict" in MODULE._render_summary(result)
+
+
+def test_malformed_history_does_not_become_zero_failures() -> None:
+    assert MODULE._origin_instability("origin_instability_json={invalid") == {"status": "UNKNOWN", "sources": {}}
 
 
 def test_runtime_defects_are_action_required_not_a_green_diagnostic() -> None:
