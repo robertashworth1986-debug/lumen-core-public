@@ -1,62 +1,2090 @@
 [
   {
-    "name": "LumaTrader / Kraken Sentinel / LumaSniper",
-    "stage": "Tested research implementations for market data, strategy comparison, exchange integration and guarded execution. Historical transaction records exist. The canonical runtime configuration is paper-only; legacy settings are not authorization."
+    "id": "lumatrader",
+    "name": "LumaTrader research architecture",
+    "group": "Trading, data and dashboards",
+    "stage": "Implemented research software",
+    "summary": "The source estate contains implemented research, orchestration, ledger, exchange-boundary and dashboard components.",
+    "counts": [],
+    "limitations": [
+      "This inspection did not execute a trader or probe exchanges.",
+      "Canonical runtime control is paper mode with live orders disabled.",
+      "Source presence does not establish current runtime operation or reconciled profit."
+    ],
+    "sources": [
+      {
+        "path": "code/institutional_harmonic_suite.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/institutional_harmonic_suite.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "fd806f18cd2974c09a0265771d62d4ba49373b22022c269076d1e57a70589866",
+        "bytes": 27537,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/execution/execution_orchestrator.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/execution/execution_orchestrator.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "724542006a93f202994ed7b8e78706c9dcf5c86df9d0972965165ee6785ebe87",
+        "bytes": 8789,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "config/accounts/KRAKEN_PRIMARY/runtime_control.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/config/accounts/KRAKEN_PRIMARY/runtime_control.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "1733ee42c6ad4be4946a2f277993c7e49eda293618881683585957683b0adfcf",
+        "bytes": 471,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "tests/test_evidence_denominator_and_paper_audits.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/tests/test_evidence_denominator_and_paper_audits.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "62464d47aac42397d94de36e57f2590da33d7d39faa7b33e1edbc19e36a7bc52",
+        "bytes": 8624,
+        "coverage": "read primary source"
+      }
+    ]
   },
   {
-    "name": "Grant Factory / LumenGov",
-    "stage": "Tested workflow implementation for opportunity qualification, eligibility checks, proposal sections, budgets, approval states and hashed evidence packages."
+    "id": "full_beast",
+    "name": "Full Beast parameter sweep",
+    "group": "Trading, data and dashboards",
+    "stage": "Historical reported computational sweep",
+    "summary": "The April 2 receipt records 541,728 candidate-scoring rows across 12 usable files, 22 flowforms, 18 algorithms, 19 strategies and 6 metric profiles. Metric-profile rescoring reuses underlying outcomes. Its extreme top score does not match the current runner\u2019s cap, so historical source reconciliation is still required.",
+    "counts": [
+      {
+        "value": 25,
+        "unit": "files scanned"
+      },
+      {
+        "value": 12,
+        "unit": "usable files"
+      },
+      {
+        "value": 22,
+        "unit": "flowforms"
+      },
+      {
+        "value": 18,
+        "unit": "algorithms"
+      },
+      {
+        "value": 19,
+        "unit": "strategies"
+      },
+      {
+        "value": 6,
+        "unit": "metric profiles"
+      },
+      {
+        "value": 541728,
+        "unit": "reported candidate rows scored"
+      }
+    ],
+    "limitations": [
+      "541,728 = 12 \u00d7 22 \u00d7 18 \u00d7 19 \u00d7 6; metric-profile rescoring reuses underlying candidate outcomes.",
+      "Full leaderboard and input closure were not located in the current tracked checkout; hashes are retained in the proof.",
+      "The preserved extreme score exceeds the current runner\u2019s explicit \u00b11,000,000 cap. This proves a source/result-version gap remains; the current runner cannot be assumed to reproduce this historical receipt.",
+      "Current runner uses whole-series normalization/winsorization before a 70/30 split, fixed 252 annualization and test metrics for ranking; no explicit transaction-cost subtraction is present in its evaluate_path.",
+      "Top result did not beat its recorded baseline-relative measure; no trading alpha is established."
+    ],
+    "sources": [
+      {
+        "path": "full_beast_summary.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/full_beast_summary.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "a0a529144103e96d8eb50ef707ad7260c8e8d9ef71a805911b2b564ab01000cc",
+        "bytes": 927,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "full_beast_registry.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/full_beast_registry.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "8ca7c30e85f8408e47f36c44b679d35a8504f90dcd012ae8e26074d34df4d749",
+        "bytes": 1662,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "full_beast_proof.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/full_beast_proof.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "8c146e0a4d848b71606609c333f7bc8189fed1910d4a2eb522e4bd4f3bba1625",
+        "bytes": 505,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/full_beast_universe_runner.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/full_beast_universe_runner.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "0f520e02dda04df9f354ce659319120e1e6c7da29950badf9843cba30a534d0c",
+        "bytes": 26884,
+        "coverage": "read primary source"
+      }
+    ]
   },
   {
-    "name": "Mission Control",
-    "stage": "Substantial historical operating-interface implementation joining research, diagnostics, source status and application workflows. The public route is a retired HOLD placeholder."
+    "id": "institutional_tournament",
+    "name": "Institutional harmonic tournament",
+    "group": "Trading, data and dashboards",
+    "stage": "Implemented tournament with historical summary",
+    "summary": "A retained summary reports 7,056 scored candidates; source calculates chronological split metrics, costs, leaderboards and selection exports.",
+    "counts": [
+      {
+        "value": 21,
+        "unit": "implemented flowforms"
+      },
+      {
+        "value": 12,
+        "unit": "strategies"
+      },
+      {
+        "value": 7,
+        "unit": "post processors"
+      },
+      {
+        "value": 1764,
+        "unit": "combinations per eligible file"
+      },
+      {
+        "value": 5,
+        "unit": "summary files scanned"
+      },
+      {
+        "value": 7056,
+        "unit": "summary candidate rows"
+      }
+    ],
+    "limitations": [
+      "This is separate from the 541,728-row Full Beast sweep; do not add them as independent experiments.",
+      "Static source confirms same-bar/segment-return information in flow/postprocessing, test-dependent selection, fixed timebase assumptions and exposure-cost mismatches.",
+      "These are research implementations and recorded summaries, not validated executable alpha."
+    ],
+    "sources": [
+      {
+        "path": "institutional_summary.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/institutional_summary.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "ed924f3f24bdff2fa169d9a156ea7ff72c74fc2a0697db41a3836e6c008bd775",
+        "bytes": 548,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/institutional_harmonic_suite.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/institutional_harmonic_suite.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "fd806f18cd2974c09a0265771d62d4ba49373b22022c269076d1e57a70589866",
+        "bytes": 27537,
+        "coverage": "read primary source"
+      }
+    ]
   },
   {
-    "name": "Quant Lab",
-    "stage": "Historical research-interface implementation with trading, forecasting, funding and proof workspaces. The current public route is a retired HOLD placeholder."
+    "id": "master_evolution",
+    "name": "Lumen Quant Lab Master Evolution Tournament",
+    "group": "Trading, data and dashboards",
+    "stage": "Historical research snapshot",
+    "summary": "The stack preserves an early tournament, a later truth-filter stage and allocation/execution summaries.",
+    "counts": [
+      {
+        "value": 40,
+        "unit": "max pairs"
+      },
+      {
+        "value": 12,
+        "unit": "strategies"
+      },
+      {
+        "value": 1920,
+        "unit": "ranked systems"
+      },
+      {
+        "value": 20,
+        "unit": "champions found"
+      },
+      {
+        "value": 1872,
+        "unit": "later truth filter input rows"
+      },
+      {
+        "value": 17,
+        "unit": "later truth filter output rows"
+      }
+    ],
+    "limitations": [
+      "Stablecoin Sharpe figures in the early output are exceptionally large; metric/timebase/cost validity needs the original input and full run identity.",
+      "Historical LIVE_ALLOCATION_READY labels do not override current paper-only controls."
+    ],
+    "sources": [
+      {
+        "path": "dashboard/master_dashboard.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/master_dashboard.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "6a9c23122c13d2406890c5710c63f50f2dc46d0605922ef38e98658342602072",
+        "bytes": 24054,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "dashboard/level3_truth_dashboard.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/level3_truth_dashboard.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "225c3a2dac1dc4f9f259159222836259017fdb5f06827282940eb880870d9421",
+        "bytes": 4125,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "dashboard/level4_live_summary.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/level4_live_summary.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "7a15fdd592d4840c44d9b2d344d2bc38a54300e4c5f191f2b8fcf2836fa1303a",
+        "bytes": 1676,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "dashboard/level5_execution_dashboard.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/level5_execution_dashboard.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "972ee0aa2bc0daf04de19b4bea64e5ba299570e04fad7bd03a233cc249ec686a",
+        "bytes": 315,
+        "coverage": "read primary source"
+      }
+    ]
   },
   {
-    "name": "ProofLock / Proof Capsule",
-    "stage": "Implemented custody, manifest and claim-gate controls, with a deployed bounded demonstration."
+    "id": "paper_guardrail",
+    "name": "Five-coin follow-on paper guardrail",
+    "group": "Trading, data and dashboards",
+    "stage": "Completed historical rejection",
+    "summary": "HYPE, PAXG, XRP/EUR, XRP/USDT and FET candidate results were followed by a guardrail that held every candidate; paper_ready_for_live=false.",
+    "counts": [
+      {
+        "value": 5,
+        "unit": "rows scanned"
+      },
+      {
+        "value": 0,
+        "unit": "approved winners"
+      },
+      {
+        "value": 0,
+        "unit": "paper trade events observed"
+      }
+    ],
+    "limitations": [
+      "The field live_sharpe_now is a historical source label, not independently reconciled account performance.",
+      "Null and negative outcomes are retained as accumulated research."
+    ],
+    "sources": [
+      {
+        "path": "dashboard/level6_paper_guardrail.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/level6_paper_guardrail.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "439af6115a894336a2ca97731679cd609c04fa8ba66dbe76893749fee4588298",
+        "bytes": 2318,
+        "coverage": "read primary source"
+      }
+    ]
   },
   {
-    "name": "Utility and energy forecasting",
-    "stage": "Pipeline implementations and completed historical replay research. Results retain adverse regimes and baseline comparisons. Some pipeline scripts depend on a named local Windows environment and external inputs."
+    "id": "gen4_7",
+    "name": "Gen4\u20137 candidate, stress and shadow studies",
+    "group": "Trading, data and dashboards",
+    "stage": "Historical result artifacts",
+    "summary": "Recovered Gen4 rankings, Gen5 split-window and Monte Carlo stress summaries, and Gen6.5/Gen7 shadow-state records. The preserved stress and shadow results include negative outcomes; they are historical research evidence.",
+    "counts": [],
+    "limitations": [
+      "Results include mixed stress behavior and losses.",
+      "Currency, execution attribution and net account reconciliation are not established by these snapshots.",
+      "Shadow-state PnL is not live cash profit."
+    ],
+    "sources": [
+      {
+        "path": "gen4_real/champion.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/gen4_real/champion.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "243cabb2df8e05af6ed01490456ca834e183c86c08695e13a234184c1209152c",
+        "bytes": 186,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "gen4_validate_scale/validated_champion.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/gen4_validate_scale/validated_champion.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "b3edf6b0f50e46f13c3aabaa054df222e1a411a92025902888ea219962adecb2",
+        "bytes": 243,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "gen5_output/gen5_champion.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/gen5_output/gen5_champion.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "712b787aac3e6b1331de2463699e2e67fbdced7d6431c1a0f6f8ef8f374d6548",
+        "bytes": 872,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "gen6_5/gen6_5_dashboard.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/gen6_5/gen6_5_dashboard.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "49f39e72f0cdbc39c0256abe12814f329e2f05d38ac5be95e959769af57e6a3c",
+        "bytes": 364,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "gen7_clean/best.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/gen7_clean/best.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "0725e95fa538d6686b198ec13f1b1e73b76368f001a88a9a3ed189309e6b86b9",
+        "bytes": 398,
+        "coverage": "read primary source"
+      }
+    ]
   },
   {
-    "name": "Geothermal / constraint research",
-    "stage": "Historical forecast screening plus scoped commercial hypotheses. The reviewed constraint brief reports 2.5336% better clean MAE alongside 8.9208% worse p95 error for its selected candidate."
+    "id": "exchange_controls",
+    "name": "Kraken Sentinel / LumaSniper and Alpaca controls",
+    "group": "Trading, data and dashboards",
+    "stage": "Implemented guarded interfaces",
+    "summary": "Canonical orchestrator states it loads no credentials; Kraken facade forces validate=True; canonical account configuration disables live orders.",
+    "counts": [],
+    "limitations": [
+      "Test files were inspected, not rerun in this audit.",
+      "Historical transaction records are a distinct evidence class and do not grant current order authority.",
+      "The separate legacy unified_trade_executor simulates random-normal prices in both nominal paper and live branches."
+    ],
+    "sources": [
+      {
+        "path": "code/execution/execution_orchestrator.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/execution/execution_orchestrator.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "724542006a93f202994ed7b8e78706c9dcf5c86df9d0972965165ee6785ebe87",
+        "bytes": 8789,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/kraken_execution.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/kraken_execution.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "985860a84269c29a1a81ff906d53fb9c4f76d529964b464cd4c88646aa483b10",
+        "bytes": 4780,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/execution/alpaca_paper_executor.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/execution/alpaca_paper_executor.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "affc073392ed6050d9beffb67c61434903e3dca5a6f1de8dee642a2a295f7bd7",
+        "bytes": 6912,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "tests/test_order_safety_gate.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/tests/test_order_safety_gate.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "657e2f7ed8e5e6b766c48d52376a178446740f0d320c4c6b7d7b8f8d4b6fd658",
+        "bytes": 6043,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "tests/test_order_safety_alpaca_paper_boundary.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/tests/test_order_safety_alpaca_paper_boundary.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "fe69da2abe53702112894edaecba1bc38edc5efb52ceae90de0a2b10f323c759",
+        "bytes": 5107,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/unified_trade_executor.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/unified_trade_executor.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "da07902cb724c05542942887124aea82814b65aede793811c4150a802aacb722",
+        "bytes": 21367,
+        "coverage": "read primary source"
+      }
+    ]
   },
   {
-    "name": "FlowForm / thermal-routing research",
-    "stage": "Geometry-informed audit and comparison implementations, simulation and physical-system concepts. No independently measured thermal, impedance or battery advantage is established here."
+    "id": "mission_control",
+    "name": "Mission Control original cockpit",
+    "group": "Trading, data and dashboards",
+    "stage": "Recovered historical interface implementation",
+    "summary": "Full interface combines evidence/source breadth, model diagnostics, grant pipeline, anomaly watch, regime scanner, calibration and execution mirror.",
+    "counts": [
+      {
+        "value": 132984,
+        "unit": "html bytes"
+      }
+    ],
+    "limitations": [
+      "Recovered archived source, not a verified current private runtime.",
+      "Current public Mission Control route is a separate retired HOLD page.",
+      "Labels such as independent proof inside old UI strings are not independent verification receipts."
+    ],
+    "sources": [
+      {
+        "path": "dashboard/mission_control.html",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/987e37ea47858c9c7dcc03f179f859f78fc9e995/dashboard/mission_control.html",
+        "commit": "987e37ea47858c9c7dcc03f179f859f78fc9e995",
+        "sha256": "17a6185709f2ff92ac163da3bac3a306178634e5a0ff43bfb55075d8cb3d62be",
+        "bytes": 132984,
+        "coverage": "read primary source"
+      }
+    ]
   },
   {
-    "name": "HyperCore",
-    "stage": "Privately held numerical experiment implementation: NumPy phase-gradient updates, recorded metrics and saved arrays. No fresh execution receipt was recovered in this review."
+    "id": "quant_lab",
+    "name": "Quant Lab original cockpit",
+    "group": "Trading, data and dashboards",
+    "stage": "Recovered historical interface implementation",
+    "summary": "Full Command, Trading, Forecast Suite, Funding and Proof workspaces with split panes, pop-outs, command palette, shareable state and print handoff.",
+    "counts": [
+      {
+        "value": 107964,
+        "unit": "html bytes"
+      }
+    ],
+    "limitations": [
+      "Recovered archived source, not a verified current private runtime.",
+      "Current public Quant Lab route is a separate retired HOLD page."
+    ],
+    "sources": [
+      {
+        "path": "dashboard/quant_lab.html",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/987e37ea47858c9c7dcc03f179f859f78fc9e995/dashboard/quant_lab.html",
+        "commit": "987e37ea47858c9c7dcc03f179f859f78fc9e995",
+        "sha256": "6ec0e77e2b2439f13f7b61d346cf631ad8dac5ebe26dc60a4e24946c01cba49d",
+        "bytes": 107964,
+        "coverage": "read primary source"
+      }
+    ]
   },
   {
-    "name": "EchoLock",
-    "stage": "Phase-coherence research using conceptual, replay and synthetic evidence. Pilot promotion remains held."
+    "id": "grant_lab_interface",
+    "name": "Grant Lab original interface",
+    "group": "Trading, data and dashboards",
+    "stage": "Recovered historical interface implementation",
+    "summary": "Application, Technical Volume, Commercialization, Cover Letter, Budget, Submission Kit, approved-draft differences, blocker and portal checklist views.",
+    "counts": [
+      {
+        "value": 86020,
+        "unit": "html bytes"
+      }
+    ],
+    "limitations": [
+      "This interface is distinct from the current cohort tools and separate private Grant Factory project.",
+      "Grant packets and submission status are reconciled in the grant audit, not inferred from interface tabs."
+    ],
+    "sources": [
+      {
+        "path": "dashboard/grants.html",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/987e37ea47858c9c7dcc03f179f859f78fc9e995/dashboard/grants.html",
+        "commit": "987e37ea47858c9c7dcc03f179f859f78fc9e995",
+        "sha256": "60e338648973babdeda4cdd40ab682f561b9ced96fee3ad797dcadca0dc1d457",
+        "bytes": 86020,
+        "coverage": "read primary source"
+      }
+    ]
   },
   {
+    "id": "alpha_scanner",
+    "name": "LumaTrader Alpha Scanner",
+    "group": "Trading, data and dashboards",
+    "stage": "Implemented research interface",
+    "summary": "Root-level sports/odds research dashboard with no-vig calculations, local research logging and supporting feed references.",
+    "counts": [
+      {
+        "value": 66851,
+        "unit": "bytes"
+      }
+    ],
+    "limitations": [
+      "No betting, exchange activity, present feed health or realized outcome was tested.",
+      "This HTML is outside dashboard/ and would be missed by inspecting only that folder."
+    ],
+    "sources": [
+      {
+        "path": "dashboard_analytics.html",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard_analytics.html",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "13ec4685ad44e4e93ba08ed188b1859541ed7c6562f195dfbd7709eb7f1d7e5d",
+        "bytes": 66851,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "dashboard/js/live_registry_bridge.js",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/js/live_registry_bridge.js",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "5c7abf07d159944bcc4420fecbd3657dcf41a82307cef9be936ac7b49062807f",
+        "bytes": 2940,
+        "coverage": "read primary source"
+      }
+    ]
+  },
+  {
+    "id": "dashboard_builders",
+    "name": "Unified dashboard and portal builders",
+    "group": "Trading, data and dashboards",
+    "stage": "Implemented historical dashboard generation",
+    "summary": "Builder/reference source preserves unified master, combined master, Alpaca paper, infrastructure, experience, fleet validation, lane separation, investor and audit surfaces.",
+    "counts": [
+      {
+        "value": 29,
+        "unit": "historical deployment targets"
+      },
+      {
+        "value": 22,
+        "unit": "exact targets missing from current tracked html"
+      }
+    ],
+    "limitations": [
+      "A named output or builder is not proof the generated HTML exists now or that its data dependencies are healthy.",
+      "The current checkout and historical Windows root are different scopes."
+    ],
+    "sources": [
+      {
+        "path": "code/BUILD_DASHBOARD_PORTAL.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/BUILD_DASHBOARD_PORTAL.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "803574525ee98521f9645325752d10456c41ca17bfd71acd38008f54bf8d03ef",
+        "bytes": 25253,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/UNIFIED_MASTER_DASHBOARD_BUILDER.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/UNIFIED_MASTER_DASHBOARD_BUILDER.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "4fa126717098f95ad40b01f64ad59a1097edab3e699d122ba82dc43581dff7e4",
+        "bytes": 78990,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/dashboard_unified_refresh.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/dashboard_unified_refresh.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "9b31b7500614b93fc4f197dfc04ed3e88e1740cfb3acec78b603d2527b151d41",
+        "bytes": 42989,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/ops/PRUNE_OBSOLETE_DASHBOARDS.ps1",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/ops/PRUNE_OBSOLETE_DASHBOARDS.ps1",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "ee92e79c07c60360e377f2b7db79c41ef9a442b384aa8c48b07032f55140569f",
+        "bytes": 7793,
+        "coverage": "read primary source"
+      }
+    ]
+  },
+  {
+    "id": "june_source_breadth",
+    "name": "June 10 measured-source registry",
+    "group": "Trading, data and dashboards",
+    "stage": "Historical source inventory directly recounted",
+    "summary": "The 1,481,321 total was recalculated from the registry\u2019s 12 MEASURED_FILE_MATCH rows during this audit.",
+    "counts": [
+      {
+        "value": 17,
+        "unit": "enabled entries"
+      },
+      {
+        "value": 12,
+        "unit": "measured file match entries"
+      },
+      {
+        "value": 1481321,
+        "unit": "reported row references"
+      }
+    ],
+    "limitations": [
+      "These are dated file-match row references, not a fresh fetch or a deduplicated cross-source dataset.",
+      "The underlying 12 files were not all recounted here.",
+      "Five key-only entries have zero measured rows; the registry does not prove current source health or rights."
+    ],
+    "sources": [
+      {
+        "path": "config/live_source_registry.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/config/live_source_registry.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "1fff19f9e399a86c4582baeb0449b51465b0cfda6521455eeb706fd4eb9f5636",
+        "bytes": 5499,
+        "coverage": "read primary source"
+      }
+    ]
+  },
+  {
+    "id": "april_source_breadth",
+    "name": "April 12 measured-sector inventory",
+    "group": "Trading, data and dashboards",
+    "stage": "Historical source summary directly recounted",
+    "summary": "Measured-sector rows are retained separately from estimated placeholders, adaptive-universe names and monetary scenario columns.",
+    "counts": [
+      {
+        "value": 698153,
+        "unit": "measured sector rows"
+      },
+      {
+        "value": 8,
+        "unit": "measured sectors"
+      },
+      {
+        "value": 6,
+        "unit": "estimated one row placeholders excluded"
+      }
+    ],
+    "limitations": [
+      "Different grain/date from June provider references; do not add the two totals or present them as a like-for-like growth series.",
+      "Economic translations in the historical report are not observed revenue or savings."
+    ],
+    "sources": [
+      {
+        "path": "stack_truth_report.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/stack_truth_report.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "ada8ccd26b4439dc6463f1e4cb3c513162186f0a4bc57234b48e4cd6cde0087a",
+        "bytes": 3818,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "adaptive_universe_audit.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/adaptive_universe_audit.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "ecbf5f2b0e8e19c416206c40d280718fc18a9c6e30ed30f2a3b3c37ad6f1df21",
+        "bytes": 505,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "adaptive_universe_summary.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/adaptive_universe_summary.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "5f4cd80309c79e74e56a873b9c252248f0ca77158e81f70fe91b959507f288a3",
+        "bytes": 519,
+        "coverage": "read primary source"
+      }
+    ]
+  },
+  {
+    "id": "august_source_governance",
+    "name": "August source-probe and governance manifest",
+    "group": "Trading, data and dashboards",
+    "stage": "Implemented provenance gate with historical receipt",
+    "summary": "The manifest distinguishes configured source flags from source-specific depth, freshness, rights, relevance and dataset-bound governance.",
+    "counts": [
+      {
+        "value": 17,
+        "unit": "registry entries"
+      },
+      {
+        "value": 17,
+        "unit": "configured enabled"
+      },
+      {
+        "value": 14,
+        "unit": "first party measured flags"
+      },
+      {
+        "value": 14,
+        "unit": "explicit successful probe flags"
+      },
+      {
+        "value": 0,
+        "unit": "review ready sources"
+      }
+    ],
+    "limitations": [
+      "Zero review-ready sources reflects missing governance fields in that dated manifest; it does not erase the earlier measured files.",
+      "Current feeds were not probed in this audit."
+    ],
+    "sources": [
+      {
+        "path": "dashboard/data/public_live_breadth_manifest.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/public_live_breadth_manifest.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "0b878d7839662098548bd71de1aad5cac8fbd8852fb64a527dc2c6f390a916f1",
+        "bytes": 16918,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/ops/build_public_live_breadth_manifest.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/ops/build_public_live_breadth_manifest.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "07df3f95b95b5e07adf559e26580f9ecaa8003286633c71355f83b7fbc8471e4",
+        "bytes": 29021,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "tests/test_public_live_breadth_manifest.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/tests/test_public_live_breadth_manifest.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "f86bdbddec6391853a1106a6917b318457e5fb0bf2ac95a4304eab9d48f84cff",
+        "bytes": 14130,
+        "coverage": "read primary source"
+      }
+    ]
+  },
+  {
+    "id": "master_universe_v2",
+    "name": "Master Universe V2",
+    "group": "Trading, data and dashboards",
+    "stage": "Dated research audit and implementation recovered",
+    "summary": "The June 18 audit records broad public/market-series model comparison and a 5.9% median RMSE margin over runner-up families where harmonic won.",
+    "counts": [
+      {
+        "value": 2172,
+        "unit": "successful frozen series"
+      },
+      {
+        "value": 9,
+        "unit": "models"
+      },
+      {
+        "value": 5,
+        "unit": "model families"
+      },
+      {
+        "value": 304,
+        "unit": "harmonic wins"
+      },
+      {
+        "value": 14.0,
+        "unit": "harmonic win rate percent"
+      }
+    ],
+    "limitations": [
+      "Result figures are transcribed from the dated audit; its original result bundle was not rerun or fully recovered here.",
+      "Single 80/20 holdout; not universal advantage or independent confirmation."
+    ],
+    "sources": [
+      {
+        "path": "docs/LUMAUNIVERSE_RESEARCH_EVIDENCE_AUDIT_2026-06-18.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/docs/LUMAUNIVERSE_RESEARCH_EVIDENCE_AUDIT_2026-06-18.md",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "54c9f47f37cc556dc30b36af4ed777029d607542758f1fe20dde0ee60af05c7f",
+        "bytes": 10984,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/master_universe_benchmark_v2.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/master_universe_benchmark_v2.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "5d5975aa74c21252c4c08545968f8fdeab9e150b16a30e71921430be563c6310",
+        "bytes": 32597,
+        "coverage": "read primary source"
+      }
+    ]
+  },
+  {
+    "id": "hybrid_edge_v71",
+    "name": "Hybrid Edge V7.1 and phase-lock follow-up",
+    "group": "Trading, data and dashboards",
+    "stage": "Dated negative/selection evidence preserved",
+    "summary": "Past-only/nested selection and bootstrap are recorded for V7.1; phase-lock active candidate ranked 557 by score and 631 by test Sharpe.",
+    "counts": [
+      {
+        "value": 80,
+        "unit": "hybrid edge series"
+      },
+      {
+        "value": 5,
+        "unit": "outer folds"
+      },
+      {
+        "value": 11,
+        "unit": "screening positive series"
+      },
+      {
+        "value": 0,
+        "unit": "robust claim gates"
+      },
+      {
+        "value": 0,
+        "unit": "median MAE improvement percent"
+      },
+      {
+        "value": 1764,
+        "unit": "phase lock candidate rows"
+      },
+      {
+        "value": 532,
+        "unit": "phase lock tagged rows"
+      }
+    ],
+    "limitations": [
+      "These are distinct dated research records and overlapping candidate denominators.",
+      "No surrogate or multiple-comparison tests were run in the cited V7.1 audit.",
+      "The active phase-lock candidate was worse than baseline."
+    ],
+    "sources": [
+      {
+        "path": "docs/LUMAUNIVERSE_RESEARCH_EVIDENCE_AUDIT_2026-06-18.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/docs/LUMAUNIVERSE_RESEARCH_EVIDENCE_AUDIT_2026-06-18.md",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "54c9f47f37cc556dc30b36af4ed777029d607542758f1fe20dde0ee60af05c7f",
+        "bytes": 10984,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "code/ops/flowform_phase_lock_audit.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/ops/flowform_phase_lock_audit.py",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "f82d402eadc8542c34a25375d3a890028ee999e26ce811032bb00f77aa1f0f66",
+        "bytes": 13431,
+        "coverage": "read primary source"
+      }
+    ]
+  },
+  {
+    "id": "eia_replay",
+    "name": "Frozen EIA data and two-window forecast replay",
+    "group": "Trading, data and dashboards",
+    "stage": "Retained measured input and retrospective comparison",
+    "summary": "A directly recounted frozen input contains 14,704 EIA rows. Two retrospective windows contain 1,176 and 285 paired authority-days. Candidate MAE was 10.602% and 18.509% below direct LightGBM respectively; source coverage and promotion gates remain open.",
+    "counts": [
+      {
+        "value": 14704,
+        "unit": "frozen input rows directly recounted"
+      },
+      {
+        "value": 1176,
+        "unit": "original paired authority days"
+      },
+      {
+        "value": 285,
+        "unit": "later paired authority days"
+      },
+      {
+        "value": 464,
+        "unit": "later possible authority days"
+      },
+      {
+        "value": 6,
+        "unit": "declared baselines"
+      }
+    ],
+    "limitations": [
+      "Both windows are previously inspected retrospective evidence; forecast availability at original decision cutoffs and an operationally matched incumbent are unestablished.",
+      "Original coverage failures and SWPP subgroup regression remain; later coverage is 61.42% with no eligible SWPP rows.",
+      "Forecast-error improvement is not energy savings."
+    ],
+    "sources": [
+      {
+        "path": "evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/evidence/reproducibility/eia_grid_validation_panel_20260713.json.gz",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "9855d52add091912035e959d431bbb3d1b5727a2c4ef84cd8aa772ef2fe4f6f9",
+        "bytes": 114366,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "evidence/reproducibility/eia_constraint_review_20260921/benchmark.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/evidence/reproducibility/eia_constraint_review_20260921/benchmark.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "a75031e562c926b7a020caab9e68563bb697f381822c2c696f5bf0ae4f1f93ad",
+        "bytes": 18700,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "evidence/reproducibility/eia_constraint_later_window_20260921/benchmark.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/evidence/reproducibility/eia_constraint_later_window_20260921/benchmark.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "e2b5298a335a8591f100e5ce7f5d07f3bf6d1cc6b80e2c8392e45a03cf9c7ec4",
+        "bytes": 21653,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "docs/LUMENCORE_LIVE_BREADTH_PROOF_ADDENDUM.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/docs/LUMENCORE_LIVE_BREADTH_PROOF_ADDENDUM.md",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "d1c72b17244da9b931e351019577ddbf2926f42860105ee1f185c0e0a351b170",
+        "bytes": 11995,
+        "coverage": "read primary source"
+      }
+    ]
+  },
+  {
+    "id": "codecheck",
+    "name": "Bounded reproducibility capsule",
+    "group": "Trading, data and dashboards",
+    "stage": "First-party execution receipts preserved",
+    "summary": "A pinned reviewer environment and frozen input support three named replay/falsification suites, preserving failed promotion gates.",
+    "counts": [
+      {
+        "value": 3,
+        "unit": "suites"
+      },
+      {
+        "value": 31,
+        "unit": "assertions"
+      },
+      {
+        "value": 1525,
+        "unit": "EIA wave holdout rows"
+      },
+      {
+        "value": 1176,
+        "unit": "EIA residual holdout rows"
+      },
+      {
+        "value": 128,
+        "unit": "synthetic MDA fixtures"
+      },
+      {
+        "value": 36,
+        "unit": "synthetic MDA holdout fixtures"
+      }
+    ],
+    "limitations": [
+      "31/31 passing assertions are retained first-party execution results, not a fresh execution in this audit or external acceptance.",
+      "A disclosed 1% XGBoost portability tolerance was amended after observing a drift failure."
+    ],
+    "sources": [
+      {
+        "path": "docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/docs/CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "532cd5b33282a417ad75cd7201a0131f8b19b2d67e5cae21300af50235149408",
+        "bytes": 17742,
+        "coverage": "read primary source"
+      },
+      {
+        "path": "config/reviewer_reproducibility_protocol_v1.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/config/reviewer_reproducibility_protocol_v1.json",
+        "commit": "58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4",
+        "sha256": "c69fb78965cdf420e8354042f1e90d11c6b7dde59f0a4d9fb27d9dec58f4cb01",
+        "bytes": 10103,
+        "coverage": "read primary source"
+      }
+    ]
+  },
+  {
+    "id": "lumajet",
     "name": "LumaJet",
-    "stage": "Simulation-first aerospace research: geometry-informed routing/layout comparisons, thermal proxies and resilience concepts."
+    "group": "Engineering, energy and identity",
+    "stage": "Implemented synthetic research; internal receipts recovered",
+    "summary": "Recovered baseline Python source and four-pattern results, plus a later frozen assurance record preserving an adverse v1 run and a tiny positive v2 result. V2 used 1,400 generated validation scenarios on fresh disjoint seeds; mean score difference was +0.00004771 with CI95 [0.00001361, 0.00008181], while planner expansions were about 5.08 times the A-star baseline. These are generated software results, not aircraft or flight performance.",
+    "counts": [
+      {
+        "value": 4,
+        "unit": "patterns in July 9 toy geometry benchmark"
+      },
+      {
+        "value": 169,
+        "unit": "honeycomb cells per toy pattern"
+      },
+      {
+        "value": 1120,
+        "unit": "v1 validation scenarios; assurance gate failed"
+      },
+      {
+        "value": 1400,
+        "unit": "v2 validation scenarios; tiny-effect internal gate pass"
+      }
+    ],
+    "limitations": [
+      "Recover complete v1/v2 source snapshots and independent reproduction receipt.",
+      "No aerospace field, airworthiness, propulsion or actuator validation."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "path": "docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md"
+      },
+      {
+        "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+      }
+    ]
   },
   {
-    "name": "LumaSkin",
-    "stage": "Implemented offline virtual engineering lab: 24 virtual zones, 10 replay scenarios and a first-party 34-test receipt. A separate September 18 synthetic endurance report records 200,000 trials with no reported invariant failures. Zero hardware or human tests."
+    "id": "lumaskin",
+    "name": "LumaSkin / LumaSuit / LumenShell",
+    "group": "Engineering, energy and identity",
+    "stage": "Implemented virtual engineering lab and synthetic fault campaign",
+    "summary": "The recovered offline lab implements 24 virtual zone addresses and 10 replay scenarios. Its separate September 18 endurance receipt reports 200,000 synthetic packet trials: 82,841 accepted, 117,159 rejected and no recorded invariant failures. The interface has zero hardware outputs; hardware and human testing remain unverified.",
+    "counts": [
+      {
+        "value": 24,
+        "unit": "virtual addresses"
+      },
+      {
+        "value": 10,
+        "unit": "prerecorded scenarios"
+      },
+      {
+        "value": 200000,
+        "unit": "synthetic fresh packet trials, not physical trials"
+      },
+      {
+        "value": 25000,
+        "unit": "long-session steps target, separate denominator"
+      }
+    ],
+    "limitations": [
+      "Engineering ZIP located but download returned HTTP 502 twice; source archive not inspected in this pass.",
+      "Reproduce model receipts; physical prototype needs separate authorization and domain review."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "path": "docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMAJET_LUMASUIT_SAFE_PROMOTION_PACKET.md"
+      },
+      {
+        "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+      }
+    ]
   },
   {
-    "name": "EchoForm / digital identity twin",
-    "stage": "Architecture concept exploring identity consistency, consent, provenance and personal-AI continuity. The audited configuration has documentation but no configured implementation/test artifacts for this lane."
+    "id": "echoform",
+    "name": "EchoForm / Identity Architecture / digital twins",
+    "group": "Engineering, energy and identity",
+    "stage": "Architecture corpus plus implemented conventional memory-boundary scaffold",
+    "summary": "The September 25 findings advance this lane beyond concept-only: a conventional structured-event memory boundary passed 32/32 authored invariant scenarios and 50/50 event checks, retaining all 21 eligible store events. A deliberately corrupted upstream identity probe failed, giving 32/33 combined scenarios. No harmonic or fractal candidate was scored; automatic real-profile writes remain held.",
+    "counts": [
+      {
+        "value": 32,
+        "unit": "passing authored invariant scenarios out of 32"
+      },
+      {
+        "value": 50,
+        "unit": "passing event-level checks out of 50"
+      },
+      {
+        "value": 21,
+        "unit": "eligible store events retained out of 21"
+      },
+      {
+        "value": 0,
+        "unit": "passing deliberately corrupt upstream-identity probes out of 1"
+      }
+    ],
+    "limitations": [
+      "Guard and Boundary ZIPs are distinct located artifacts; neither re-executed here.",
+      "Identity lock bundle download failed; no complete historical source census.",
+      "No real speaker recognition, consent-independent use or harmonic/fractal advantage established."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMA_UNIVERSE_MODULE_CATALOG.md"
+      },
+      {
+        "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CLAIM_BOUNDARY_REGISTER.md"
+      },
+      {
+        "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+      }
+    ]
   },
   {
-    "name": "Node-RED / immersive systems / science education",
-    "stage": "Implemented flow-inspection/import tooling and immersive launcher/integration components. Science-museum installations are a possible application; deployment or customer acceptance is unverified."
+    "id": "immersive",
+    "name": "Luma XR / AetherReach / immersive command room",
+    "group": "Engineering, energy and identity",
+    "stage": "Implemented integration and visualization components",
+    "summary": "Repository sources include eight Unity C# components, golden-angle signal rendering, live-truth and scene-cue bridges, voice-guide requests, and Windows launch/install scripts. They constitute substantial prototype integration work. Current Unity execution, headset deployment, haptic hardware and user outcomes have not been demonstrated by this source review.",
+    "counts": [
+      {
+        "value": 8,
+        "unit": "C# files found under code/unity_bridge including Editor"
+      }
+    ],
+    "limitations": [
+      "Legacy launchers require C:\\LumaTrader\\INSTITUTIONAL_STACK_V2 and named local dependencies.",
+      "No current local Windows root or AR/VR hardware session accessible in this pass."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/START_IMMERSIVE_STACK.ps1",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/START_IMMERSIVE_STACK.ps1"
+      },
+      {
+        "path": "code/BUILD_LUMA_EXPERIENCE_WEBAPP.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/BUILD_LUMA_EXPERIENCE_WEBAPP.py"
+      },
+      {
+        "path": "code/unity_bridge/LumaHarmonicFieldRenderer.cs",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/unity_bridge/LumaHarmonicFieldRenderer.cs"
+      },
+      {
+        "path": "code/unity_bridge/LumaSceneCueDriver.cs",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/unity_bridge/LumaSceneCueDriver.cs"
+      },
+      {
+        "path": "code/unity_bridge/LumaSceneCueReceiver.cs",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/unity_bridge/LumaSceneCueReceiver.cs"
+      },
+      {
+        "path": "code/unity_bridge/LumaRealtimeBridge.cs",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/unity_bridge/LumaRealtimeBridge.cs"
+      },
+      {
+        "path": "code/unity_bridge/LumaLiveTruthBridge.cs",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/unity_bridge/LumaLiveTruthBridge.cs"
+      },
+      {
+        "path": "code/unity_bridge/LumaVoiceGuideController.cs",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/unity_bridge/LumaVoiceGuideController.cs"
+      },
+      {
+        "path": "code/unity_bridge/LumaWsClientBridge.cs",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/unity_bridge/LumaWsClientBridge.cs"
+      },
+      {
+        "path": "code/unity_bridge/Editor/LumaExperienceAutoRigEditor.cs",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/unity_bridge/Editor/LumaExperienceAutoRigEditor.cs"
+      }
+    ]
   },
   {
-    "name": "Agent Arena / systems engineering",
-    "stage": "Synthetic adversarial coordination research and a bounded C11 packet-policy reference path tested in host user space."
+    "id": "node_red",
+    "name": "Node-RED / immersive bridge",
+    "group": "Engineering, energy and identity",
+    "stage": "Implemented flow and import tooling",
+    "summary": "Two committed Node-RED flow definitions connect gateway snapshots, guide requests and bidirectional events. Inspection/import tooling is present. Configured routes and integration source do not establish that the user\u2019s local flow runtime is currently running.",
+    "counts": [],
+    "limitations": [],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/node_red/flows_luma_bootstrap.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/node_red/flows_luma_bootstrap.json"
+      },
+      {
+        "path": "code/node_red/flows_luma_bidirectional.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/node_red/flows_luma_bidirectional.json"
+      },
+      {
+        "path": "code/ENSURE_NODERED_LUMA_FLOWS.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/ENSURE_NODERED_LUMA_FLOWS.py"
+      },
+      {
+        "path": "code/IMPORT_NODERED_LUMA_FLOWS.ps1",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/IMPORT_NODERED_LUMA_FLOWS.ps1"
+      }
+    ]
+  },
+  {
+    "id": "wave_uncertainty",
+    "name": "Marine energy / wave-activity uncertainty",
+    "group": "Engineering, energy and identity",
+    "stage": "Historical research with exact source/history recovered offline",
+    "summary": "The Stage 6 report documents 240 interval metric records, 90 descriptive comparisons, 94 tests and an internal repeat matching 465 numerical arrays. These counts belong to wave-activity uncertainty, not geothermal performance. The adaptive method improved median interval score 16.11% on examined data; high-activity coverage remained deficient.",
+    "counts": [
+      {
+        "value": 240,
+        "unit": "interval metric records"
+      },
+      {
+        "value": 90,
+        "unit": "descriptive method comparisons"
+      },
+      {
+        "value": 94,
+        "unit": "research and evidence-integrity tests in reported receipt"
+      },
+      {
+        "value": 465,
+        "unit": "numerical arrays matched by internal repeat"
+      },
+      {
+        "value": 187987,
+        "unit": "dependent and reused station/horizon pairs"
+      }
+    ],
+    "limitations": [
+      "Prior periods had already been examined; fresh and independent validation remain open.",
+      "Research history/source recovered offline; large source/result archives were not replayed in this audit.",
+      "Historical test and replay receipts are not new scientific executions."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+      }
+    ]
+  },
+  {
+    "id": "geothermal",
+    "name": "Geothermal / constraint-to-value research",
+    "group": "Engineering, energy and identity",
+    "stage": "Historical forecast screens plus scoped commercial hypotheses",
+    "summary": "The September opportunity brief preserves a geothermal screen with 2.5336% better clean MAE and 8.9208% worse p95 error. Separately, Stage 3 documents timestamp/feedback corrections to earlier FORGE tests and a revised selected smoother worse than persistence at all three horizons. These separately dated screens still require exact run and protocol reconciliation. Scheduling, logistics and time-to-power opportunities are specified but buyer benefits remain untested.",
+    "counts": [],
+    "limitations": [
+      "Bind each geothermal claim to its exact run, timestamp treatment, source, baseline and complete arrays.",
+      "No buyer operational schedules, physical intervention or measured savings reviewed."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+      },
+      {
+        "path": "EVIDENCE_INDEX.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/EVIDENCE_INDEX.md"
+      }
+    ]
+  },
+  {
+    "id": "constraints",
+    "name": "Infrastructure constraint detection / Lumen Infrastructure Sentinel",
+    "group": "Engineering, energy and identity",
+    "stage": "Implemented monitoring, synthetic scenario and evidence routines",
+    "summary": "The source implements audit-chain verification, reproducibility fingerprints, provider/data-feed/execution/account metrics, constraint violations and a bounded monitor lock. A separate Monte Carlo detector declares 1,000 synthetic failure scenarios per provider with assumed probabilities. That configured scenario budget is not evidence that 1,000 physical experiments were executed.",
+    "counts": [
+      {
+        "value": 1000,
+        "unit": "configured synthetic scenarios per provider, execution count unverified"
+      }
+    ],
+    "limitations": [
+      "Need dated current runtime receipts and buyer-owned measured constraint/cost data."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/execution/infra_constraint_monitor.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/execution/infra_constraint_monitor.py"
+      },
+      {
+        "path": "code/execution/institutional_constraint_detector.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/execution/institutional_constraint_detector.py"
+      },
+      {
+        "path": "code/institutional_harmonic_infrastructure.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/institutional_harmonic_infrastructure.py"
+      },
+      {
+        "path": "config/lumencore_engine_portfolio_v2.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/lumencore_engine_portfolio_v2.json"
+      }
+    ]
+  },
+  {
+    "id": "hypercore",
+    "name": "HyperCore",
+    "group": "Engineering, energy and identity",
+    "stage": "Numerical implementation recovered",
+    "summary": "The recovered HyperCore V4 script implements NumPy phase-gradient updates, coherence/stability/energy proxy calculations and array/metric exports. Defaults are 256 phase variables, 3,000 update steps and learning rate 0.003. No run receipt for that recovered script was independently executed in this pass; V6\u2013V10 names in the asset ledger require exact source matching.",
+    "counts": [],
+    "limitations": [
+      "Freeze numeric definitions and comparator; recover later versions and run identities."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+      }
+    ]
+  },
+  {
+    "id": "echolock_qmpl",
+    "name": "EchoLock / QMPL / phase networks",
+    "group": "Engineering, energy and identity",
+    "stage": "Historical simulation suite and custody artifacts located",
+    "summary": "The July 16 operating snapshot reports 768 phase-network runs and 42 generic formation-transition simulations with manifested source/config/output. A matching QMPL ZIP is located. The older coherence ledger records an index over WhiteHole, WhiteHoleLab, EchoLock and EchoLockPilot roots; it is a historical ledger, not current access to those devices.",
+    "counts": [
+      {
+        "value": 768,
+        "unit": "reported phase-network simulation runs"
+      },
+      {
+        "value": 42,
+        "unit": "reported generic formation-transition simulations"
+      },
+      {
+        "value": 64612,
+        "unit": "historical ledger files indexed, not experiments"
+      }
+    ],
+    "limitations": [
+      "QMPL contents not materialized/re-executed this pass.",
+      "External, hardware, flight and operational validation unestablished."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMA_UNIVERSE_MODULE_CATALOG.md"
+      },
+      {
+        "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CLAIM_BOUNDARY_REGISTER.md"
+      }
+    ]
+  },
+  {
+    "id": "flowform_thermal",
+    "name": "FlowForm / thermal routing / LumaSpiral",
+    "group": "Engineering, energy and identity",
+    "stage": "Geometry-informed simulation and audit implementations",
+    "summary": "Existing phase-lock and impact-explainer code, LumaJet geometry comparisons, named geometry registries and physical-system concepts form this research lane. The existing 1,764-row phase-lock audit retains an unfavorable selected candidate; no physical thermal or signal-loss advantage is established by those mathematical or trading analogues.",
+    "counts": [],
+    "limitations": [
+      "Matched resource constraints, governing-physics models and appropriate bench measurements required."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/ops/flowform_phase_lock_audit.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/ops/flowform_phase_lock_audit.py"
+      },
+      {
+        "path": "code/ops/harmonic_flowform_impact_explainer.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/ops/harmonic_flowform_impact_explainer.py"
+      },
+      {
+        "path": "docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/GEOMETRY_EVALUATION_PROTOCOL_V1.md"
+      },
+      {
+        "path": "docs/LUMAUNIVERSE_RESEARCH_EVIDENCE_AUDIT_2026-06-18.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMAUNIVERSE_RESEARCH_EVIDENCE_AUDIT_2026-06-18.md"
+      }
+    ]
+  },
+  {
+    "id": "agent_arena",
+    "name": "Agent Arena",
+    "group": "Engineering, energy and identity",
+    "stage": "Implemented adversarial synthetic evaluation harness",
+    "summary": "V5 implements role-specific telemetry, controlled Byzantine proposals/dropout, trust filtering, fixed candidate selection before disjoint holdouts, cluster-bootstrap statistics, a finite-grid reference, event chains and an unsigned manifest-bound receipt. The reference run fails the absolute zero-violation gate; passing custody checks is separate from acceptance.",
+    "counts": [
+      {
+        "value": 7,
+        "unit": "configured agent roles"
+      },
+      {
+        "value": 6,
+        "unit": "selection floors"
+      },
+      {
+        "value": 2,
+        "unit": "holdout boss floors"
+      },
+      {
+        "value": 8,
+        "unit": "selection seeds and separately 8 disjoint holdout seeds"
+      }
+    ],
+    "limitations": [
+      "Independent evaluator, isolated external-model adapter and buyer representative model remain required."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/agent_arena.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/agent_arena.py"
+      },
+      {
+        "path": "config/agent_arena_v5.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/agent_arena_v5.json"
+      },
+      {
+        "path": "tests/test_agent_arena.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/tests/test_agent_arena.py"
+      },
+      {
+        "path": "docs/AGENT_ARENA.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/AGENT_ARENA.md"
+      }
+    ]
+  },
+  {
+    "id": "nic_dpu",
+    "name": "NIC / DPU packet-policy foundation",
+    "group": "Engineering, energy and identity",
+    "stage": "Implemented C11 host reference and evidence harness",
+    "summary": "A bounded allocation-free C11 implementation parses Ethernet II, one VLAN, IPv4 and eligible TCP/UDP ports, applies first-match pass/drop/queue rules and records counters. The existing packet documents seven deterministic vectors and sanitizer smoke runs. This is host user-space evidence, not NIC/DPU offload or measured line-rate throughput.",
+    "counts": [],
+    "limitations": [],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/hardware/nic_dpu_packet_pipeline.c",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/hardware/nic_dpu_packet_pipeline.c"
+      },
+      {
+        "path": "code/hardware/nic_dpu_packet_pipeline.h",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/hardware/nic_dpu_packet_pipeline.h"
+      },
+      {
+        "path": "code/hardware/nic_dpu_packet_pipeline_test.c",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/hardware/nic_dpu_packet_pipeline_test.c"
+      },
+      {
+        "path": "code/ops/BUILD_NIC_DPU_PACKET_PIPELINE_EVIDENCE.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/ops/BUILD_NIC_DPU_PACKET_PIPELINE_EVIDENCE.py"
+      },
+      {
+        "path": "tests/test_nic_dpu_packet_pipeline.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/tests/test_nic_dpu_packet_pipeline.py"
+      },
+      {
+        "path": "docs/NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md"
+      }
+    ]
+  },
+  {
+    "id": "harbor_sentinel",
+    "name": "HarborSentinel / maritime anomaly review",
+    "group": "Engineering, energy and identity",
+    "stage": "Implemented synthetic and public-AIS controlled-injection studies",
+    "summary": "A public packet records frozen 50,000-row development and validation splits, 20,000 controlled validation injections and comparison with four single-axis baselines. A separate 140-scenario synthetic stress study preserves a severe-condition precision breakdown. The natural AIS queue is explicitly unlabeled.",
+    "counts": [
+      {
+        "value": 50000,
+        "unit": "frozen development rows; separate 50000 validation rows"
+      },
+      {
+        "value": 20000,
+        "unit": "controlled injected validation segments"
+      },
+      {
+        "value": 140,
+        "unit": "synthetic validation scenarios, 20 per seven conditions"
+      },
+      {
+        "value": 1742,
+        "unit": "natural candidate queue entries among 48616 validation segments"
+      }
+    ],
+    "limitations": [
+      "Controlled perturbations are not real adversary labels; no operational Navy/SSDS or sensor-fusion validation."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/harbor_sentinel_benchmark.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/harbor_sentinel_benchmark.py"
+      },
+      {
+        "path": "code/harbor_sentinel_validation_suite.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/harbor_sentinel_validation_suite.py"
+      },
+      {
+        "path": "code/ops/BUILD_HARBOR_AIS_INJECTION_BENCHMARK.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/ops/BUILD_HARBOR_AIS_INJECTION_BENCHMARK.py"
+      },
+      {
+        "path": "tests/test_harbor_ais_injection_benchmark.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/tests/test_harbor_ais_injection_benchmark.py"
+      },
+      {
+        "path": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md"
+      },
+      {
+        "path": "docs/HARBOR_SENTINEL_VALIDATION_2026-06-13.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/HARBOR_SENTINEL_VALIDATION_2026-06-13.md"
+      },
+      {
+        "path": "docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/HARBOR_PUBLIC_AIS_REVIEW_BURDEN_CAPSULE_2026-06-21.md"
+      }
+    ]
+  },
+  {
+    "id": "missionweave",
+    "name": "MissionWeave",
+    "group": "Engineering, energy and identity",
+    "stage": "Implemented generated-workflow comparison",
+    "summary": "A frozen workflow-routing study selected weights on development cases, then compared three policies on 30 disjoint seeds under five conditions. Recorded on-time deltas versus cross-trained FIFO range +0.030 to +0.127, with adverse seeds preserved. Combined-stress absolute on-time rates remain poor.",
+    "counts": [
+      {
+        "value": 150,
+        "unit": "generated validation seed-condition cases, 30 across five conditions"
+      },
+      {
+        "value": 3,
+        "unit": "compared routing policies"
+      }
+    ],
+    "limitations": [
+      "No measured workforce productivity, fairness, operational integration or agency validation."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/missionweave_benchmark.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/missionweave_benchmark.py"
+      },
+      {
+        "path": "tests/test_missionweave_benchmark.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/tests/test_missionweave_benchmark.py"
+      },
+      {
+        "path": "docs/MISSIONWEAVE_GENERATED_WORKFLOW_VALIDATION_2026-06-13.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/MISSIONWEAVE_GENERATED_WORKFLOW_VALIDATION_2026-06-13.md"
+      }
+    ]
+  },
+  {
+    "id": "orchestration",
+    "name": "EtherFrame / LumaCore / NovaCore orchestration",
+    "group": "Engineering, energy and identity",
+    "stage": "Implemented routing, scheduled workflow and state components",
+    "summary": "Source includes dataset discovery, CSV metadata audit, live-source synchronization, script cadence, runtime-file synchronization, energy-pipeline triggers, ecosystem startup and supervisor components. These preserve substantial implementation scope while current availability is tracked separately.",
+    "counts": [],
+    "limitations": [
+      "Historical Windows roots/dependencies and current production diagnostics must be reconciled before runtime claims."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/FULL_TRUTH_ORCHESTRATOR.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/FULL_TRUTH_ORCHESTRATOR.py"
+      },
+      {
+        "path": "code/run_universal_meta_orchestrator.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/run_universal_meta_orchestrator.py"
+      },
+      {
+        "path": "code/luma_supervisor.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/luma_supervisor.py"
+      },
+      {
+        "path": "code/START_LUMA_ECOSYSTEM_STACK.ps1",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/START_LUMA_ECOSYSTEM_STACK.ps1"
+      },
+      {
+        "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMA_UNIVERSE_MODULE_CATALOG.md"
+      }
+    ]
+  },
+  {
+    "id": "lumascout",
+    "name": "LumaScout",
+    "group": "Engineering, energy and identity",
+    "stage": "Source-present research prototype",
+    "summary": "Source-receipted creator discovery shortlists with forward outcome tracking. The canonical registry links the existing source implementation; it configures no dedicated test artifacts for this lane. Source presence does not establish current service operation or buyer acceptance.",
+    "counts": [],
+    "limitations": [
+      "Next acceptance gate: demonstrate improved forward outcomes against a declared baseline using licensed or permitted data.",
+      "No hit prediction, label adoption, revenue lift, or undocumented data-rights claim."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "LamaScout/src/pipeline.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/LamaScout/src/pipeline.py"
+      },
+      {
+        "path": "LamaScout/src/scoring.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/LamaScout/src/scoring.py"
+      },
+      {
+        "path": "LamaScout/src/artist_scout_engine.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/LamaScout/src/artist_scout_engine.py"
+      },
+      {
+        "path": "LamaScout/README.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/LamaScout/README.md"
+      },
+      {
+        "path": "LamaScout/ARCHITECTURE.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/LamaScout/ARCHITECTURE.md"
+      },
+      {
+        "path": "dashboard/lumascout.html",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/dashboard/lumascout.html"
+      },
+      {
+        "path": "config/lumencore_engine_portfolio_v2.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/lumencore_engine_portfolio_v2.json"
+      }
+    ]
+  },
+  {
+    "id": "sports_harmonic_edge",
+    "name": "Sports Harmonic Edge",
+    "group": "Engineering, energy and identity",
+    "stage": "Source-present research prototype",
+    "summary": "Sports-odds ingestion and research scoring under explicit uncertainty and paper-only controls. The canonical registry links the existing source implementation; it configures no dedicated test artifacts for this lane. Source presence does not establish current service operation or buyer acceptance.",
+    "counts": [],
+    "limitations": [
+      "Next acceptance gate: demonstrate that prospective calibration and ranking metrics beat declared baselines without hidden selection.",
+      "No betting advice, guaranteed edge, profit, or consumer wagering automation."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/sports_odds_engine.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/sports_odds_engine.py"
+      },
+      {
+        "path": "code/sports_intelligence_layer.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/sports_intelligence_layer.py"
+      },
+      {
+        "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMA_UNIVERSE_MODULE_CATALOG.md"
+      },
+      {
+        "path": "config/lumencore_engine_portfolio_v2.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/lumencore_engine_portfolio_v2.json"
+      }
+    ]
+  },
+  {
+    "id": "crowdfund_radar",
+    "name": "CrowdFund Radar",
+    "group": "Engineering, energy and identity",
+    "stage": "Source-present research prototype",
+    "summary": "Campaign discovery and evidence-linked research queue tooling. The canonical registry links the existing source implementation; it configures no dedicated test artifacts for this lane. Source presence does not establish current service operation or buyer acceptance.",
+    "counts": [],
+    "limitations": [
+      "Next acceptance gate: demonstrate useful forward-label lift over the named baseline using permitted sources.",
+      "No investment recommendation, campaign quality guarantee, or return claim."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/crowdfunding_engine.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/crowdfunding_engine.py"
+      },
+      {
+        "path": "config/lumencore_engine_portfolio_v2.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/lumencore_engine_portfolio_v2.json"
+      }
+    ]
+  },
+  {
+    "id": "cyber_forensics_assist",
+    "name": "Cyber Forensics Assist",
+    "group": "Engineering, energy and identity",
+    "stage": "Source-present research prototype",
+    "summary": "Prototype evidence-component scoring and investigation chronology support. The canonical registry links the existing source implementation; it configures no dedicated test artifacts for this lane. Source presence does not establish current service operation or buyer acceptance.",
+    "counts": [],
+    "limitations": [
+      "Next acceptance gate: complete a blinded synthetic-case review against a locked completeness and agreement threshold.",
+      "No forensic conclusion, chain-of-custody certification, legal admissibility, or autonomous response claim."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/cold_case_engine.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/cold_case_engine.py"
+      },
+      {
+        "path": "code/output/cold_case_summary.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/output/cold_case_summary.json"
+      },
+      {
+        "path": "code/build_cold_case_dashboard.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/build_cold_case_dashboard.py"
+      },
+      {
+        "path": "config/lumencore_engine_portfolio_v2.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/lumencore_engine_portfolio_v2.json"
+      }
+    ]
+  },
+  {
+    "id": "smart_city_node_engine",
+    "name": "Smart City Node Engine",
+    "group": "Engineering, energy and identity",
+    "stage": "Architecture concept",
+    "summary": "Smart-city and telecom edge-routing concept. Architecture documentation is present; the canonical registry configures no implementation or test artifacts for this lane.",
+    "counts": [],
+    "limitations": [
+      "Next acceptance gate: implement and evaluate a deterministic simulator against a named baseline and locked latency, resilience or allocation metric.",
+      "No city deployment, critical-infrastructure control, latency, resilience, or savings claim."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMA_UNIVERSE_MODULE_CATALOG.md"
+      },
+      {
+        "path": "config/lumencore_engine_portfolio_v2.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/lumencore_engine_portfolio_v2.json"
+      }
+    ]
+  },
+  {
+    "id": "world_model_engine",
+    "name": "World Model Engine",
+    "group": "Engineering, energy and identity",
+    "stage": "Source-present research prototype",
+    "summary": "Cross-sector data-normalization and scenario-analysis prototype. The canonical registry links the existing source implementation; it configures no dedicated test artifacts for this lane. Source presence does not establish current service operation or buyer acceptance.",
+    "counts": [],
+    "limitations": [
+      "Next acceptance gate: reproduce declared scenarios and meet a locked decision metric without hidden data or hindsight.",
+      "No complete world model, operational prediction, policy authority, or cross-sector-superiority claim."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "path": "code/execution/cross_sector_intel_pipeline.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/code/execution/cross_sector_intel_pipeline.py"
+      },
+      {
+        "path": "docs/LUMA_UNIVERSE_MODULE_CATALOG.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/LUMA_UNIVERSE_MODULE_CATALOG.md"
+      },
+      {
+        "path": "config/lumencore_engine_portfolio_v2.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/config/lumencore_engine_portfolio_v2.json"
+      }
+    ]
+  },
+  {
+    "id": "prooflock",
+    "name": "ProofLock / Proof Capsule",
+    "group": "Evidence infrastructure",
+    "stage": "Implemented custody and review controls",
+    "summary": "Manifest, hash, evidence-index and claim-gate controls connect source, inputs, results and the decision boundary. A bounded demonstration and reproducibility records are preserved.",
+    "limitations": [
+      "Evidence integrity establishes what was preserved; scientific acceptance and buyer acceptance require their own records."
+    ],
+    "sources": [
+      {
+        "path": "docs/MACHINE_EVIDENCE_GRAPH.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/MACHINE_EVIDENCE_GRAPH.md"
+      },
+      {
+        "path": "docs/CLAIM_BOUNDARY_REGISTER.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/CLAIM_BOUNDARY_REGISTER.md"
+      }
+    ]
+  },
+  {
+    "id": "grant_grant_factory",
+    "name": "Grant Factory / LumenGov",
+    "group": "Grants and institutional records",
+    "stage": "Implemented software; source inspected",
+    "summary": "Discovery, eligibility and deadline scoring; project summary, technical volume, commercialization, cover letter, budget and NSF pitch rendering; evidence hashes and approval/queue state. Current source creates drafts, keeps external tracking separate, refuses stale-opportunity approval and protects approved snapshots.",
+    "limitations": [
+      "No fresh execution, user adoption, revenue or automatic agency submission established."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "kind": "repository",
+        "path": "code/grant_application_factory.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/grant_application_factory.py"
+      },
+      {
+        "kind": "repository",
+        "path": "code/grant_submission_kit.py",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/grant_submission_kit.py"
+      }
+    ]
+  },
+  {
+    "id": "grant_portfolio_register",
+    "name": "Recovered opportunity and outreach register",
+    "group": "Grants and institutional records",
+    "stage": "Historical workbook recovered in full",
+    "summary": "September 13 workbook contains 68 curated opportunity/partnership records and 221 business outreach threads. Its five sheets were parsed; originals for selected high-consequence stages were reread.",
+    "limitations": [
+      "Different denominators: not 68 awards or 221 customers. Later primary evidence adds DOT applications absent from this register. Estate remains open."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_sam_registration",
+    "name": "Federal registration",
+    "group": "Grants and institutional records",
+    "stage": "Activation confirmed by dated official notice",
+    "summary": "July 11, 2026 activation notice gives July 9, 2027 renewal date. August 19 update notice expressly says an unsubmitted update does not remove the existing registration.",
+    "limitations": [
+      "This is dated notice evidence, not a live October 4 SAM status check. Registration identifiers are private in this summary."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_research_mou",
+    "name": "Research collaboration agreement",
+    "group": "Grants and institutional records",
+    "stage": "Executed agreement and completion receipt read",
+    "summary": "A research collaboration MOU was executed in July 2026. The private review index retains signatures, scope and publicity restrictions.",
+    "limitations": [
+      "No paid purchase order, endorsement, independently accepted result or award inferred. Counterparty and agreement details omitted from public copy."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_dot_ngdism",
+    "name": "DOT / NGDISM applications",
+    "group": "Grants and institutional records",
+    "stage": "Two applications received, validated and retrieved by agency",
+    "summary": "Official May 20-21 Grants.gov chains establish two application records for opportunity 693JK326NF0013, each with an agency tracking assignment.",
+    "limitations": [
+      "Two records for one opportunity; eligibility, merits, selection, funding and current portal outcome are not established by transport receipts."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_dot_pidp",
+    "name": "DOT / Port Infrastructure Development Program",
+    "group": "Grants and institutional records",
+    "stage": "Application received, validated and retrieved; tracking assigned",
+    "summary": "May 21 submission for MA-PID-26-001 passed validation and was retrieved; agency tracking was assigned June 2. An earlier same-day schema-rejected attempt is retained separately.",
+    "limitations": [
+      "Receipt is not an award or merits/eligibility determination. Do not count the rejected attempt as an additional successful application."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_doe_magnito",
+    "name": "DOE / ARPA-E MAGNITO",
+    "group": "Grants and institutional records",
+    "stage": "Concept paper submitted; noncompliance determination",
+    "summary": "October 3, 2025 agency determination confirms concept paper 3591-1502 under DE-FOA-0003591. It cites concept-paper/summary-slide template and content compliance defects.",
+    "limitations": [
+      "Three duplicate notices concern one concept paper. MAGNITO is the DOE/ARPA-E pursuit; a separate Navy magnetometer submission remains unlocated. No award inferred."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_darpa_dice",
+    "name": "DARPA DICE / Coherence-Bounded Peer Mesh",
+    "group": "Grants and institutional records",
+    "stage": "Abstract received and reviewed",
+    "summary": "June 29 IPTO finalization receipt assigned HR001126S0010-DICE-PA-052. July 24 letter confirms review and discourages a full proposal, citing program-objective fit and insufficiently articulated foundational advance.",
+    "limitations": [
+      "The received abstract supersedes June 20 prepared-only status. Complete local proposal preparation is retained; final full-proposal submission or award is not established."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "kind": "repository",
+        "path": "docs/DICE_FULL_SUBMISSION_SPRINT.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/docs/DICE_FULL_SUBMISSION_SPRINT.md"
+      },
+      {
+        "kind": "repository",
+        "path": "dashboard/data/grant_readiness_status.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/grant_readiness_status.json"
+      }
+    ]
+  },
+  {
+    "id": "grant_darpa_low_resource",
+    "name": "DARPA Low Resource Computing",
+    "group": "Grants and institutional records",
+    "stage": "Response and slide sent; reviewed without workshop invitation",
+    "summary": "July 17 non-proprietary DARPA-SN-26-97 response and one-slide summary were sent. Subsequent review did not produce a workshop invitation.",
+    "limitations": [
+      "Separate pursuit from DICE. Submitted internal synthetic results are not hardware, operational or independent validation."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_nasa_quote",
+    "name": "NASA AI Technology Support Services quotation",
+    "group": "Grants and institutional records",
+    "stage": "Complete firm-fixed-price quotation sent",
+    "summary": "July 24 sent body for 80NSSC26935917Q-R1 specifies price schedule, four-month approach, two testing-tool demonstrations, report, ASTRA-compatible prototype and handoff.",
+    "limitations": [
+      "The quotation is a completed offer artifact. No acceptance, award, NASA deployment or revenue established; its 30-day validity is historical."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_nasa_rfi",
+    "name": "NASA data-center infrastructure RFI",
+    "group": "Grants and institutional records",
+    "stage": "Five-page response sent",
+    "summary": "July 13 response to 80TECH26RFI0020 proposes bounded validation and evidence work inside a qualified modernization partnership. The full five-page attachment was read.",
+    "limitations": [
+      "Market research without pricing; no NASA access, facilities-prime readiness, authorization, savings or accepted performance established."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_dhs_phase1",
+    "name": "DHS Procurement Modernization",
+    "group": "Grants and institutional records",
+    "stage": "Phase 1 brief and video sent",
+    "summary": "August 27 sent submission to 70RDA126R00000009 contains a three-page solution brief and video for Use Case 22 Proposal Evaluator: buyer-owned read-only shadow replay and a proposed 30-day scope.",
+    "limitations": [
+      "Corrects earlier inquiry-only classification. No agency acknowledgment, selection, award or production integration established."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_dhs_border",
+    "name": "DHS Border Security Testbed",
+    "group": "Grants and institutional records",
+    "stage": "Corrected seven-page response sent",
+    "summary": "July 24 corrected response to 70RSAT26RFI000024 supersedes the initial email-body version. The full packet maps an evidence-orchestration role and proposed 90-day demonstration.",
+    "limitations": [
+      "Completed market-research response; later receipt/acceptance or award not established."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_argos",
+    "name": "HHS / ONC Project Argos",
+    "group": "Grants and institutional records",
+    "stage": "Capability response sent",
+    "summary": "July 29 sent message includes ARGOS_PRIVATE_ACTION_COPY.docx for ONC-ARGOS-SSN-2026-OS351107. Ten rendered pages were read: task-fit matrix, evidence workstream, security, team gaps and mobilization plan.",
+    "limitations": [
+      "Market research, not a price proposal. Direct health-domain prior performance, ATO, full-prime readiness and external teaming commitments are expressly unproved."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "kind": "repository",
+        "path": "grant_submissions/ONC_ARGOS_20260730/",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/tree/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/grant_submissions/ONC_ARGOS_20260730/"
+      }
+    ]
+  },
+  {
+    "id": "grant_airforce_automation",
+    "name": "Air Force Advanced Automation",
+    "group": "Grants and institutional records",
+    "stage": "Capability response sent; agency receipt confirmed",
+    "summary": "July 9 SAF-AQ-RFI-26-0001 capability statement sent; July 13 contracting reply explicitly confirms receipt.",
+    "limitations": [
+      "Receipt is not technical acceptance, operational deployment or award."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_harborsentinel",
+    "name": "Navy HarborSentinel / NV063",
+    "group": "Grants and institutional records",
+    "stage": "Substantial prepared proposal and technical evidence",
+    "summary": "June 20 readiness receipt records 14/14 required artifacts and 4/4 manifest matches. Separate synthetic validation preserves nominal F1 0.930 and severe-stress F1 0.500; public AIS controlled-injection evidence is separately indexed.",
+    "limitations": [
+      "Historical packet readiness; final DSIP submission receipt remains unlocated. Synthetic and injected-event results are not field or adversary validation."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "kind": "repository",
+        "path": "dashboard/data/grant_readiness_status.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/grant_readiness_status.json"
+      },
+      {
+        "kind": "repository",
+        "path": "docs/HARBOR_SENTINEL_VALIDATION_2026-06-13.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/docs/HARBOR_SENTINEL_VALIDATION_2026-06-13.md"
+      },
+      {
+        "kind": "repository",
+        "path": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md"
+      }
+    ]
+  },
+  {
+    "id": "grant_missionweave",
+    "name": "DLA MissionWeave / NV011",
+    "group": "Grants and institutional records",
+    "stage": "Prepared package; officially not formally submitted",
+    "summary": "June 20 readiness feed records 4/4 required artifacts and 3/3 manifest matches. July 28 DLA reply reports DSIP proposal status In Progress, not formally submitted.",
+    "limitations": [
+      "Retain technical volume, portal work and evidence assets despite missed final submission. No award inferred."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "kind": "repository",
+        "path": "dashboard/data/grant_readiness_status.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/grant_readiness_status.json"
+      }
+    ]
+  },
+  {
+    "id": "grant_nv065",
+    "name": "Navy NV065 sensor tasking",
+    "group": "Grants and institutional records",
+    "stage": "Prepared package; portal completion unverified",
+    "summary": "June 20 readiness feed records 3/3 required artifacts, 4/4 manifest matches, zero local blockers and four portal/user gates.",
+    "limitations": [
+      "Dated readiness is not a submission receipt. Separate Navy magnetometer wording is unresolved and is not silently mapped onto NV065."
+    ],
+    "evidence_held_private": false,
+    "sources": [
+      {
+        "kind": "repository",
+        "path": "dashboard/data/grant_readiness_status.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/grant_readiness_status.json"
+      }
+    ]
+  },
+  {
+    "id": "grant_nsf_pitch",
+    "name": "NSF Project Pitch",
+    "group": "Grants and institutional records",
+    "stage": "Prepared portal-ready draft",
+    "summary": "June 20 readiness feed records 3/3 required artifacts and four portal/user gates; July 24 mailbox draft identifies updated portal-ready pitch.",
+    "limitations": [
+      "No final submission receipt located. This does not erase the completed draft work."
+    ],
+    "evidence_held_private": true,
+    "sources": [
+      {
+        "kind": "repository",
+        "path": "dashboard/data/grant_readiness_status.json",
+        "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/grant_readiness_status.json"
+      }
+    ]
+  },
+  {
+    "id": "grant_navy_readiness",
+    "name": "Navy PMA-273 / CNATRA",
+    "group": "Grants and institutional records",
+    "stage": "Substantive sources-sought capability response sent",
+    "summary": "July 24 N00421-26-RFPREQ-TPM273-0198 response proposes baseline locking, deterministic replay, calibration/drift checks and reviewer evidence for predictive-readiness modules.",
+    "limitations": [
+      "A capability workstream, not a firm quotation or verified Navy integration/award."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_airforce_csdr",
+    "name": "Air Force CSDR verification and curation",
+    "group": "Grants and institutional records",
+    "stage": "Substantive CSO capability response sent",
+    "summary": "July 24 FA701426SCS01 response specifies schemas, source lineage, exceptions, reproducibility, reviewer tooling and a qualified-prime teaming posture.",
+    "limitations": [
+      "Nonbinding planning ranges, not a firm quotation, cleared staffing, accepted Step 1 submission or award."
+    ],
+    "evidence_held_private": true,
+    "sources": []
+  },
+  {
+    "id": "grant_tradewinds",
+    "name": "Tradewinds Solutions Marketplace",
+    "group": "Grants and institutional records",
+    "stage": "Submission reviewed; revision invited",
+    "summary": "September 10 result for submission 8-26-3361 was not awardable; revision and resubmission were invited. A feedback booking is retained in the private timeline.",
+    "limitations": [
+      "A submitted and reviewed package remains a built asset. It is not an award or validation of claimed performance."
+    ],
+    "evidence_held_private": true,
+    "sources": []
   }
 ]

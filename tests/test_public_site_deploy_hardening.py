@@ -116,7 +116,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 239
+    assert len(names) == len(set(names)) == 240
     assert names[:5] == [
         "operator_home.html",
         "opportunity_sprint.html",
@@ -185,7 +185,7 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
 def test_release_count_is_bound_to_current_control_records():
     module = load_module(PACKAGER_PATH, "package_public_site_release_control_count")
     release_count = len(module.RELEASE_PATHS)
-    assert release_count == 239
+    assert release_count == 240
 
     protocol = (ROOT / "docs" / "PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md").read_text(
         encoding="utf-8"
