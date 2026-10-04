@@ -111,17 +111,40 @@ def test_reader_refuses_symlinks_and_bounds_tail(tmp_path, monkeypatch):
 
 def test_command_reader_has_byte_and_time_limits(monkeypatch):
     monkeypatch.setattr(MODULE, "MAX_BYTES", 32)
-    data, status = MODULE.bounded_command([sys.executable, "-c", "print('x' * 100)"])
+    data, status, error = MODULE.bounded_command([sys.executable, "-c", "print('x' * 100)"])
     assert status == "byte_limit"
+    assert error == "stdout_limit"
     assert len(data) <= 32
     monkeypatch.setattr(MODULE, "COMMAND_SECONDS", 0.05)
-    _, status = MODULE.bounded_command([sys.executable, "-c", "import time; time.sleep(1)"])
+    _, status, error = MODULE.bounded_command([sys.executable, "-c", "import time; time.sleep(1)"])
     assert status == "time_limit"
+    assert error == "time_limit"
+
+
+def test_command_failure_exposes_only_a_bounded_error_enum():
+    result = MODULE.bounded_command([sys.executable, "-c", "import sys; sys.stderr.write('Failed to parse timestamp: private-value'); sys.exit(1)"])
+    assert result == (b"", "unavailable", "invalid_time")
+    assert "private-value" not in str(result)
+    assert MODULE.command_error(b"journalctl: unrecognized option '--private=value'") == "unsupported_option"
+    assert MODULE.command_error(b"Failed to open private-path: Permission denied") == "permission_denied"
+    assert MODULE.command_error(b"No journal files were found") == "journal_unavailable"
+
+
+def test_stderr_is_bounded_and_cannot_deadlock_stdout(monkeypatch):
+    monkeypatch.setattr(MODULE, "MAX_ERROR_BYTES", 32)
+    result = MODULE.bounded_command([sys.executable, "-c", "import sys; sys.stderr.write('secret' * 100000); sys.stderr.flush()"])
+    assert result == (b"", "byte_limit", "stderr_limit")
+
+
+def test_journal_time_uses_legacy_compatible_utc_with_exact_window():
+    offset_time = dt.datetime(2026, 10, 3, 20, 30, tzinfo=dt.timezone(dt.timedelta(hours=-4)))
+    assert MODULE.journal_time(offset_time) == "2026-10-04 00:30:00 UTC"
+    assert MODULE.utc(offset_time) == "2026-10-04T00:30:00Z"
 
 
 def test_collector_uses_only_fixed_read_sources(monkeypatch):
     commands, paths = [], []
-    monkeypatch.setattr(MODULE, "bounded_command", lambda command: (commands.append(command) or b"", "unavailable"))
+    monkeypatch.setattr(MODULE, "bounded_command", lambda command: (commands.append(command) or b"", "unavailable", "invalid_time"))
     monkeypatch.setattr(MODULE, "bounded_log", lambda path: (paths.append(path) or b"", "unavailable"))
     monkeypatch.setattr(MODULE, "memory_snapshot", lambda: {"collection_status": "unavailable"})
     result = MODULE.collect()
@@ -132,5 +155,10 @@ def test_collector_uses_only_fixed_read_sources(monkeypatch):
     assert paths == ["/var/log/nginx/error.log", "/var/log/nginx/error.log.1"]
     assert all("--lines=10001" in command for command in commands)
     assert all("--output-fields=__REALTIME_TIMESTAMP,MESSAGE" in command for command in commands)
+    for command in commands:
+        since = next(arg.removeprefix("--since=") for arg in command if arg.startswith("--since="))
+        until = next(arg.removeprefix("--until=") for arg in command if arg.startswith("--until="))
+        assert dt.datetime.strptime(until, "%Y-%m-%d %H:%M:%S UTC") - dt.datetime.strptime(since, "%Y-%m-%d %H:%M:%S UTC") == dt.timedelta(hours=24)
+    assert result["sources"]["kernel_journal"]["collection_error"] == "invalid_time"
     assert result["schema"] == MODULE.SCHEMA
     assert "No matches does not establish sustained availability" in result["claim_boundary"]

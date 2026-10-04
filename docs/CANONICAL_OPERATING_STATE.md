@@ -7,6 +7,44 @@
 
 ## One commercial sentence
 
+### October 4 runtime follow-up
+
+PR #235 merged as `1350a1a97ab8bc75f1c965f331905a4578092214` after all
+pull-request checks passed, including CodeQL and the full repository suite.
+The October 3 23:50:30–23:54:53 UTC local public sampler recorded **64/64**
+successful contract observations across four rounds. These observations cover
+one bounded request path and do not establish sustained uptime.
+
+The fresh [VPS diagnostic run 37163621741](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37163621741)
+captured origin evidence at October 4 00:01–00:02 UTC and returned
+**ACTION_REQUIRED: two checks passed, six failed**. Public and loopback
+endpoint expectations passed. The gateway was active with no systemd restarts,
+but still lacked the required explicit non-root service identity and retained a
+root-owned lock. Eighteen of twenty runtime files matched current main;
+`grant_application_factory.py` and `operator_api_access.py` differed. The paper
+ticker was in auto-restart at 380,075 restarts; its ledger was `opc:opc:644`,
+not writable by the service account, with twelve permission-error matches in
+the bounded recent journal sample. These are confirmed runtime defects, not a
+proven cause of the intermittent public availability reports.
+
+Memory available was 13,064,052 KiB of 15,906,768 KiB; the OOM-kill counter since
+boot was zero. Disk space was approximately 100 GiB free, with one percent
+inode use. The current fixed nginx error log had no parsed records in the
+requested day; the previous fixed log was unavailable. All three new journal
+history queries were unavailable, so their zero signature counts are **not**
+negative evidence. The follow-up collector uses explicitly UTC, space-separated
+journal timestamps for older systemd compatibility and bounded error enums;
+a fresh origin receipt remains the gate for confirming that collection works.
+
+The two existing mutation paths remain
+`REPAIR_PAPER_TICKER_LEDGER_OWNERSHIP` and
+`REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE`. They require exact current-main
+workflow dispatch and the configured private HumanUnlock secret. No restart,
+runtime installation, ledger ownership change or authentication bypass was
+performed by this diagnostic pass. Issue #234 remains open for the four
+unmapped legacy data contracts. Public reachability, runtime integrity and
+data-product availability retain separate verdicts.
+
 ### October 3 public-availability monitoring repair
 
 Active outcome 2 includes correction of two confirmed monitoring defects, based
