@@ -7,6 +7,41 @@
 
 ## One commercial sentence
 
+### October 3 public-availability monitoring repair
+
+Active outcome 2 includes correction of two confirmed monitoring defects, based
+on main `6be9b1456472ef01e38ebe1838539297111da406`. Site Health Probe run
+`37128009457` sampled the 15 contracts within four seconds; that dated green
+sample did not establish continuous availability. The revised sampler records
+four rounds across at least three minutes, adds the www homepage, bypasses
+request caches, retains each timestamped observation and preserves failures
+even when a later round recovers. Daily scheduling remains unchanged.
+
+The metrics capture now reports homepage reachability, minimal public gateway
+health, each legacy feed's response disposition and data freshness separately.
+A read-only October 3 observation at 23:50–23:51 UTC found the homepage and both
+minimal gateway routes healthy, while all four legacy feeds returned HTTP 503
+with `operator API access unavailable`. This is a specific operator-boundary
+response, not evidence that the public site was down. The source mapping and
+remaining service-contract gate are in [PUBLIC_METRICS_CONTRACT.md](PUBLIC_METRICS_CONTRACT.md).
+Issue #234 remains unresolved; no producer was restored and no operator route,
+credential or private payload was made public.
+
+The existing VPS diagnostic now captures bounded retained memory/OOM and
+nginx/gateway/kernel history using reviewed code over SSH stdin. It emits
+allowlisted counters and timestamps, explicitly reports collection limits and
+does not mutate the VPS. Its push-main run provides a new opportunity to collect
+origin evidence. Neither source repair nor a successful current HTTP request
+establishes the cause or durable resolution of the reported intermittent
+failures. Existing release, authentication and production controls remain in
+force; this pass does not authorize a blind restart or redeployment.
+
+The seven focused health, metrics, operator-access and diagnostic modules pass
+99 local tests plus 37 subtests on Python 3.12 / pytest 9.1.0. The collector's
+regressions include request-controlled filenames that must not become outage
+signatures. This local result is not an exact-commit full-suite CI receipt or a
+production recovery receipt.
+
 ### September 25 live-loop integrity repairs
 
 Active outcome 2 includes a bounded repair of the existing source-to-evidence

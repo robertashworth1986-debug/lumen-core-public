@@ -194,6 +194,15 @@ def test_runtime_diagnostic_preserves_capacity_evidence() -> None:
     assert "du -x -k -d2 /var /opt /home/opc /tmp" in text
 
 
+def test_origin_history_executes_reviewed_read_only_source_without_installation() -> None:
+    text = _workflow_text()
+    assert "< code/ops/COLLECT_VPS_INSTABILITY_EVIDENCE.py" in text
+    assert "'sudo -n python3 -'" in text
+    assert "tests/test_collect_vps_instability_evidence.py" in text
+    assert "/tmp/lumencore-vps-instability-evidence.json" in text
+    assert "origin_instability_json=" in text
+
+
 def test_gateway_closure_comparison_is_exact_commit_and_read_only() -> None:
     text = _workflow_text()
 
