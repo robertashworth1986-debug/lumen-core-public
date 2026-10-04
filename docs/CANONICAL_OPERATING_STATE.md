@@ -7,6 +7,77 @@
 
 ## One commercial sentence
 
+### October 4 portfolio, registry and meeting preparation
+
+At Robert's explicit request to organize and publish his portfolio for a
+founder-reported October 5 meeting, active outcome 2 now includes an integrated
+portfolio doorway and an expansion of the existing geometry registry. The
+registry has 26 named candidate families across 11 lanes, preserving all 18
+historical entries and negative results; none is promoted to performance-ready.
+Five Platonic solids are grouped as one family. The existing four Echo Geometry
+families are a conceptual taxonomy, not a physical law or performance receipt.
+
+The June 19 registry snapshot remains immutable. The expanded catalog, artwork,
+formula renderers and bounded synthetic benchmark have separate denominators
+and evidence types. A screenshot, candidate name, synthetic trial, software test
+and independently executed physical experiment are not interchangeable counts.
+Current source preparation neither substantiates thousands of prior experiments
+nor raises the existing valuation bands. The most recent located evaluation
+must retain its assumptions, uncertainty and commercial-evidence gaps.
+
+Public material uses sanitized institutional status and source-linked evidence.
+Raw private emails, contact details, private agreements and private third-party
+materials are excluded. The founder's public-release request authorizes this
+sanitized preparation; static production still follows the exact-main signed
+release workflow and configured environment gate. No external message, grant
+submission, legal acceptance or runtime repair is included.
+
+The sanitized Wonder Studio is publicly published at
+`https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/` and contains
+the 19-artwork collection and review room. The domain homepage links to that
+public Studio and its local `/portfolio/` route. The prior private-Studio
+restriction below describes the earlier preparation stage and is superseded
+for this sanitized collection by the founder's explicit publication request.
+The custom-domain release still requires its own verified deployment receipt.
+The October 4 evidence-index expansion also refreshes two dependent Argos
+custody hashes. Historical evaluation dates, failed and blocked checks, and
+expired action authority remain unchanged; no submission is authorized.
+
+### October 4 Bounded Light visual collection candidate
+
+At Robert's explicit request to continue the domain and use his wormhole and
+EchoForm papers as visual inspiration, active outcome 2 includes a bounded
+presentation update to the existing reviewer surface. The existing homepage
+links to `/bounded-light/`: six original AI-generated concept illustrations
+and an educational light-time and wave-interference lab. This extends the
+visual-presentation lineage of draft PR #207 without importing that conflicted
+branch or changing the sole primary buyer-owned validation offer.
+
+Every conceptual image remains **CONCEPT ILLUSTRATION**. The lab uses declared
+ideal assumptions; it is not a wormhole simulation, quantum-advantage result,
+new physical theory, faster-than-light communication, or validation of the
+source papers. Source papers and private Studio links are not published.
+The shared static bundle introduces no login, tracking, telemetry or control
+connection. Website artwork is compressed for delivery; any large-format
+exports are separately labeled enlargements rather than native 16K/20K detail.
+
+The same founder-directed collection now includes `/bounded-light/observatory/`:
+an interactive geometry study with four defined families, three additional
+concept artworks, a bounded point budget, shareable settings and local exports.
+Trefoil tubes, projected Hopf fibers, a trigonometric gyroid approximation and
+superformula shells retain their formulas and assumptions. WebGL rendering and
+a Canvas fallback visualize those mathematical samples; they do not establish
+physical, hardware, quantum, wormhole or performance validation. Share settings
+and exports are user-operated; no account, telemetry or operator endpoint is
+connected. The geometry module has numerical invariant and invalid-input tests.
+
+This is an isolated source candidate, not a live deployment receipt. The
+existing exact-main release approval, signed provenance and SBOM verification,
+production-environment gate, rollback capture and exact live-byte checks remain
+required. DNS, email records, VPS runtime and operator routes are unchanged.
+PR #207 and deployment-control PR #208 must be reconciled by file overlap
+before their later merges; neither old branch is a deployment shortcut.
+
 ### October 4 runtime follow-up
 
 PR #235 merged as `1350a1a97ab8bc75f1c965f331905a4578092214` after all

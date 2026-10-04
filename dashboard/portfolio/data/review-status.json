@@ -1,0 +1,170 @@
+{
+  "schema_version": "lumencore-public-evidence-summary/1.0",
+  "as_of": "2026-10-04",
+  "title": "Portfolio review and evidence status",
+  "scope": "Source-linked status review of selected portfolio records and correspondence. Not a full private-archive audit.",
+  "portfolio_counts": {
+    "legacy_asset_ids": 60,
+    "historical_evidence_entries": 93,
+    "review_families": 14,
+    "as_of": "2026-09-25",
+    "boundary": "Overlapping inventory measures; do not add or present as validated products."
+  },
+  "geometry_baseline": {
+    "registered_families": 18,
+    "lanes": 9,
+    "readiness_snapshot": "2026-06-19",
+    "performance_ready": 0,
+    "legacy": 3,
+    "pending": 15,
+    "champion": null,
+    "boundary": "Frozen source-reported readiness snapshot, not a new performance comparison."
+  },
+  "valuation": {
+    "current_transaction_value_established": false,
+    "new_numeric_uplift_supported": false,
+    "public_statement": "The portfolio is being prepared for technical and commercial diligence. No independent company appraisal or accepted transaction price is established by the reviewed packet.",
+    "review_basis": "September 25 master valuation and October 4 source review."
+  },
+  "milestones": [
+    {
+      "id": "review-scoping",
+      "date": "2026-10-03",
+      "title": "Independent technical review scoping",
+      "evidence_tier": "Direct correspondence",
+      "status": "Complimentary introductory discussion offered; review scope and timing remain to be agreed.",
+      "establishes": "An external reviewer conversation is possible.",
+      "does_not_establish": "Completed audit, independent reproduction, certification, endorsement or paid engagement."
+    },
+    {
+      "id": "research-collaboration",
+      "date": "2026-07-27",
+      "title": "Research collaboration record",
+      "evidence_tier": "Executed document and completion receipt",
+      "status": "A collaboration document is preserved in the private evidence room.",
+      "establishes": "A documented route for research discussions.",
+      "does_not_establish": "Paid purchase order, technical validation or ownership of third-party data.",
+      "disclosure": "Counterparty naming and promotional use remain subject to the document's publicity provisions."
+    },
+    {
+      "id": "market-research-response",
+      "date": "2026-08-07",
+      "title": "Government market-research response",
+      "evidence_tier": "Direct decision correspondence",
+      "status": "Workshop invitation was not extended.",
+      "establishes": "Submission was considered.",
+      "does_not_establish": "Funding, award, validation or endorsement."
+    },
+    {
+      "id": "demonstration-response",
+      "date": "2026-09-11",
+      "title": "Government demonstration consideration",
+      "evidence_tier": "Direct decision correspondence",
+      "status": "Demonstration invitation was not extended; individual feedback was unavailable.",
+      "establishes": "A recorded pursuit outcome.",
+      "does_not_establish": "Accepted demonstration, customer or deployment."
+    },
+    {
+      "id": "marketplace-assessment",
+      "date": "2026-09-10",
+      "title": "Marketplace submission assessment",
+      "evidence_tier": "Forwarded official outcome notice",
+      "status": "Not awardable; feedback and revision path retained.",
+      "establishes": "An assessed submission and improvement workstream.",
+      "does_not_establish": "Awardable status, contract or award."
+    },
+    {
+      "id": "program-fit",
+      "date": "2026-10-01",
+      "title": "Climate-program scope inquiry",
+      "evidence_tier": "Direct correspondence",
+      "status": "Proposed solution area confirmed within scope; application completion and selection not established here.",
+      "establishes": "Program-fit clarification.",
+      "does_not_establish": "Admission, grant award or funding."
+    }
+  ],
+  "evaluation_gates": [
+    "Identified question and versioned geometry or candidate",
+    "Authorized inputs and accepted comparator",
+    "Frozen constraints, primary metric and failure rules",
+    "Reproducible execution with uncertainty and adverse results",
+    "Independent review",
+    "Buyer acceptance and measured economics"
+  ],
+  "public_links": [
+    {
+      "label": "Domain",
+      "url": "https://lumen-core.ai/"
+    },
+    {
+      "label": "Repository",
+      "url": "https://github.com/robertashworth1986-debug/lumen-core-public"
+    },
+    {
+      "label": "Reviewer start",
+      "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/main/docs/REVIEWER_START_HERE.md"
+    }
+  ],
+  "privacy": "Private email bodies, addresses, calendar access details and executed agreements are excluded.",
+  "geometry_catalog_current": {
+    "date": "2026-10-04",
+    "families": 26,
+    "lanes": 11,
+    "added_families": [
+      "Brachistochrone / cycloidal descent",
+      "Sunflower / phyllotactic packing",
+      "Voronoi partitions",
+      "Platonic solids",
+      "Gyroid nodal approximation",
+      "Projected Hopf fibers",
+      "Trefoil tube",
+      "Superformula shell"
+    ],
+    "promotion_gate_passed": false,
+    "boundary": "Catalog expansion; no new performance champion or physically validated family."
+  },
+  "fresh_network_screen": {
+    "date": "2026-10-04",
+    "evidence_tier": "Internal synthetic ideal-DC network screening",
+    "networks": 8,
+    "nodes_per_network": 64,
+    "terminal_pairs_per_network": 2016,
+    "controlled_same_terminal_networks": 6,
+    "exploratory_different_terminal_networks": 2,
+    "promotion_gate_passed": false,
+    "boundary": "No time, frequency, attenuation, signal-to-noise, Maxwell or fluid-dynamics model. Different-terminal graphs are not part of the controlled topology ranking."
+  },
+  "historical_breadth": {
+    "audit_date": "2026-06-18",
+    "master_universe": {
+      "series": 2172,
+      "models": 9,
+      "model_families": 5,
+      "harmonic_winners": 304,
+      "boundary": "Historical single-80/20-holdout exploratory result, not rerun for this report."
+    },
+    "hybrid_edge_v71": {
+      "untouched_series": 80,
+      "outer_folds": 5,
+      "screening_positive_series": 11,
+      "robust_claim_gates": 0,
+      "median_mae_improvement_pct": 0,
+      "boundary": "Surrogate tests and multiple-comparison control not run in cited audit."
+    },
+    "phase_lock": {
+      "candidate_rows": 1764,
+      "phase_lock_tagged_rows": 532,
+      "boundary": "Active candidate underperformed its reported baseline. Rows are not physical experiments."
+    }
+  },
+  "screenshot_review": {
+    "photos_reviewed": 10,
+    "visible_geometry_results": 0,
+    "pictured_source_audit": {
+      "enabled_registry_sources": 0,
+      "measured_sources": 0,
+      "adaptive_universe_count": 57
+    },
+    "boundary": "Visible labels in supplied photographs; underlying audit not executed and chronology unestablished. 57 entries are not 57 measured sources."
+  }
+}

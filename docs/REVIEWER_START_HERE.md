@@ -9,6 +9,20 @@ Robert Ashworth · Founder / Systems Architect
 [Full evidence index](../EVIDENCE_INDEX.md) ·
 [Portfolio and maturity map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md)
 
+## October 5 review route
+
+1. Open the [portfolio doorway](https://lumen-core.ai/portfolio/) for the artwork,
+   candidate geometry catalog and bounded benchmark.
+2. Use the [portfolio map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md) to follow
+   each engineering asset to its evidence and next gate.
+3. Review the [geometry protocol](GEOMETRY_EVALUATION_PROTOCOL_V1.md) before
+   treating any attractive shape as an efficiency result.
+4. Choose one authorized source, one incumbent baseline, one primary metric and
+   one decision owner for the next external evaluation.
+
+The meeting is founder-reported for October 5, 2026. This page does not confirm
+attendance, time, endorsement, an executed audit or a commercial agreement.
+
 ## The 90-second overview
 
 LumenCore is a **proof-to-pilot AI infrastructure validation architecture**.

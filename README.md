@@ -12,6 +12,7 @@ candidate against an accepted baseline under rules agreed before scoring.
 ProofLock packages the result, failures, provenance, and decision gates into a
 hash-verifiable record a reviewer can inspect and replay.
 
+[**Open the portfolio review room →**](https://lumen-core.ai/portfolio/) ·
 [**Explore the full portfolio →**](docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md) ·
 [Open the Canonical Evidence Index](EVIDENCE_INDEX.md) ·
 [**Reviewer overview →**](docs/REVIEWER_START_HERE.md) ·

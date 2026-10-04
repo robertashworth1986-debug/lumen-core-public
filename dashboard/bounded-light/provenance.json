@@ -1,0 +1,96 @@
+{
+  "collection": "Bounded Light",
+  "version": 1,
+  "artworks": [
+    {
+      "number": 1,
+      "artwork": "01_bridge_of_light",
+      "generated_source_pixels": [
+        1672,
+        941
+      ],
+      "web_file": "assets/01_bridge_of_light.webp",
+      "creation_date": "2026-10-04",
+      "method": "AI-assisted image generation using OpenAI image_gen",
+      "state": "CONCEPT ILLUSTRATION",
+      "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
+      "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
+    },
+    {
+      "number": 2,
+      "artwork": "02_light_boundary",
+      "generated_source_pixels": [
+        1672,
+        941
+      ],
+      "web_file": "assets/02_light_boundary.webp",
+      "creation_date": "2026-10-04",
+      "method": "AI-assisted image generation using OpenAI image_gen",
+      "state": "CONCEPT ILLUSTRATION",
+      "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
+      "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
+    },
+    {
+      "number": 3,
+      "artwork": "03_toroidal_observatory",
+      "generated_source_pixels": [
+        1672,
+        941
+      ],
+      "web_file": "assets/03_toroidal_observatory.webp",
+      "creation_date": "2026-10-04",
+      "method": "AI-assisted image generation using OpenAI image_gen",
+      "state": "CONCEPT ILLUSTRATION",
+      "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
+      "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
+    },
+    {
+      "number": 4,
+      "artwork": "04_echo_cathedral",
+      "generated_source_pixels": [
+        1672,
+        941
+      ],
+      "web_file": "assets/04_echo_cathedral.webp",
+      "creation_date": "2026-10-04",
+      "method": "AI-assisted image generation using OpenAI image_gen",
+      "state": "CONCEPT ILLUSTRATION",
+      "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
+      "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
+    },
+    {
+      "number": 5,
+      "artwork": "05_phase_garden",
+      "generated_source_pixels": [
+        1672,
+        941
+      ],
+      "web_file": "assets/05_phase_garden.webp",
+      "creation_date": "2026-10-04",
+      "method": "AI-assisted image generation using OpenAI image_gen",
+      "state": "CONCEPT ILLUSTRATION",
+      "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
+      "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
+    },
+    {
+      "number": 6,
+      "artwork": "06_hemilink",
+      "generated_source_pixels": [
+        1672,
+        941
+      ],
+      "web_file": "assets/06_hemilink.webp",
+      "creation_date": "2026-10-04",
+      "method": "AI-assisted image generation using OpenAI image_gen",
+      "state": "CONCEPT ILLUSTRATION",
+      "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
+      "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
+    }
+  ]
+}
