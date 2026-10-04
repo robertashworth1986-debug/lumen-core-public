@@ -17,6 +17,7 @@ import time
 
 SCHEMA = "lumencore.vps_instability_evidence.v1"
 MAX_BYTES = 2 * 1024 * 1024
+MAX_ERROR_BYTES = 4096
 MAX_RECORDS = 10000
 COMMAND_SECONDS = 15
 MEMORY_KEYS = ("MemTotal", "MemAvailable", "SwapTotal", "SwapFree")
@@ -52,31 +53,61 @@ def utc(value):
     return value.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def journal_time(value):
+    # Older systemd parsers require spaces and an explicit UTC suffix rather
+    # than the ISO T/Z form used in our JSON receipt.
+    return value.astimezone(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
+def command_error(data):
+    """Classify a bounded stderr prefix; never return its text or operands."""
+    message = data.decode("utf-8", errors="replace").lower()
+    if "failed to parse timestamp" in message:
+        return "invalid_time"
+    if any(term in message for term in ("unrecognized option", "unknown option", "invalid option")):
+        return "unsupported_option"
+    if "permission denied" in message or "operation not permitted" in message:
+        return "permission_denied"
+    if "no journal files" in message or "failed to open" in message:
+        return "journal_unavailable"
+    return "command_failed"
+
+
 def bounded_command(command):
     """Limit elapsed time and bytes without printing command output or errors."""
     data = bytearray()
+    error_data = bytearray()
+    error_reason = None
     status = "read_success"
     try:
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=dict(os.environ, LC_ALL="C"))
     except OSError:
-        return b"", "unavailable"
+        return b"", "unavailable", "command_unavailable"
     deadline = time.monotonic() + COMMAND_SECONDS
+    pending = [process.stdout, process.stderr]
     try:
-        while True:
+        while pending:
             remaining = deadline - time.monotonic()
             if remaining <= 0:
                 status = "time_limit"
                 break
-            ready, _, _ = select.select([process.stdout], [], [], remaining)
+            ready, _, _ = select.select(pending, [], [], remaining)
             if not ready:
                 status = "time_limit"
                 break
-            chunk = os.read(process.stdout.fileno(), min(65536, MAX_BYTES + 1 - len(data)))
-            if not chunk:
-                break
-            data.extend(chunk)
-            if len(data) > MAX_BYTES:
-                status = "byte_limit"
+            for stream in ready:
+                target = data if stream is process.stdout else error_data
+                limit = MAX_BYTES if stream is process.stdout else MAX_ERROR_BYTES
+                chunk = os.read(stream.fileno(), min(65536, limit + 1 - len(target)))
+                if not chunk:
+                    pending.remove(stream)
+                    continue
+                target.extend(chunk)
+                if len(target) > limit:
+                    status = "byte_limit"
+                    error_reason = "stderr_limit" if stream is process.stderr else "stdout_limit"
+                    break
+            if status != "read_success":
                 break
         if status != "read_success":
             process.kill()
@@ -89,15 +120,19 @@ def bounded_command(command):
             status = "time_limit"
         if code != 0 and status == "read_success":
             status = "unavailable"
+            error_reason = command_error(error_data)
+        elif status == "time_limit":
+            error_reason = "time_limit"
     finally:
         if process.poll() is None:
             process.kill()
             process.wait()
         process.stdout.close()
+        process.stderr.close()
     # Discard an incomplete last record instead of parsing partial data.
     if status != "read_success":
         data = data[:data.rfind(b"\n") + 1]
-    return bytes(data[:MAX_BYTES]), status
+    return bytes(data[:MAX_BYTES]), status, error_reason
 
 
 def bounded_log(path):
@@ -188,9 +223,10 @@ def collect():
     # A transport match includes retained previous boots; journalctl --dmesg
     # would silently restrict this diagnostic to the current boot.
     for name, selector in (("kernel_journal", ["_TRANSPORT=kernel"]), ("nginx_journal", ["--unit=nginx"]), ("gateway_journal", ["--unit=luma-gateway"])):
-        command = ["journalctl", *selector, "--since=" + utc(start), "--until=" + utc(end), "--no-pager", "--output=json", "--output-fields=__REALTIME_TIMESTAMP,MESSAGE", "--lines=" + str(MAX_RECORDS + 1)]
-        data, status = bounded_command(command)
+        command = ["journalctl", *selector, "--since=" + journal_time(start), "--until=" + journal_time(end), "--no-pager", "--output=json", "--output-fields=__REALTIME_TIMESTAMP,MESSAGE", "--lines=" + str(MAX_RECORDS + 1)]
+        data, status, error_reason = bounded_command(command)
         sources[name] = summarize_records(data, journal=True, start=start, end=end, status=status, source=name)
+        sources[name]["collection_error"] = error_reason
     for name, path in (("nginx_error_current", "/var/log/nginx/error.log"), ("nginx_error_previous", "/var/log/nginx/error.log.1")):
         data, status = bounded_log(path)
         sources[name] = summarize_records(data, journal=False, start=start, end=end, status=status, source=name)
@@ -199,7 +235,7 @@ def collect():
         "observed_at_utc": utc(end),
         "requested_window_start_utc": utc(start),
         "requested_window_end_utc": utc(end),
-        "bounds": {"bytes_per_source": MAX_BYTES, "records_per_source": MAX_RECORDS, "seconds_per_command": COMMAND_SECONDS},
+        "bounds": {"bytes_per_source": MAX_BYTES, "stderr_bytes_per_command": MAX_ERROR_BYTES, "records_per_source": MAX_RECORDS, "seconds_per_command": COMMAND_SECONDS},
         "memory": memory_snapshot(),
         "sources": sources,
         "claim_boundary": "Signature counts are observations, not a root-cause finding. Sources can overlap; do not sum them. Journal retention and fixed current/previous error logs may not cover the requested day. Compressed or custom-path logs are not read. No matches does not establish sustained availability. Memory is a current snapshot; the OOM counter is cumulative since boot.",
