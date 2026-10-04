@@ -7,6 +7,44 @@
 
 ## One commercial sentence
 
+### October 4 expanded estate reconciliation — OPEN
+
+The first portfolio edition was a selected sample. The expanded review now
+contains 64 overlapping catalogue records covering all 15 configured engine
+names, recovered trading and dashboard work, Grant Factory and institutional
+submission stages, identity/immersive/haptics, geometry and energy research.
+The [expanded scope review](LUMENCORE_ESTATE_SCOPE_REVIEW_2026-10-04.md) is the
+sanitized item-level handoff for active outcome 2. It does not change the single
+primary commercial offer or create 64 finished products.
+
+Accessible Drive metadata covers 3,111 records and includes shared-reference
+material with unverified ownership. Discovery counts are not owned-asset or
+experiment counts. Whole-estate completion, disconnected device roots, shortcut
+targets, all screenshots and larger numerical archive replay remain OPEN.
+
+The exact research history was restored offline at `2c06c8315c667dec6bed426b533024ecb8300f59`
+with 2,456 reachable commits, 1,308 tracked paths, 58 selected source/receipt
+files and 24 matching artifact-integrity comparisons. No recovered project code
+or scientific tests ran in this recovery. Historical Stage 6 and later assurance
+receipts remain retrospective, correlated and unpromoted; their test scopes
+must not be summed. The public source index now distinguishes recovered source
+from remaining data replay and independent-validation gates.
+
+EchoForm now has a privately reviewed conventional memory-boundary prototype:
+32/32 authored invariants, 50/50 event handling and a deliberately wrong
+upstream identity challenge failing 0/1. This does not validate harmonic identity.
+LumaJet has recovered synthetic baseline source and later assurance receipts:
+v1 failed its gate; v2 has a tiny internal effect with about 5.08 times baseline
+planner expansions. Neither is flight or hardware validation. The canonical
+portfolio map carries these corrected stages; repository-only file-presence
+maturity labels do not measure privately held evidence or all historical work.
+
+The final 64-record review-room source and public PDF are synchronized with the
+sanitized Studio publication. Custom-domain deployment remains a separate,
+paused exact-main signed release action. No domain login, production mutation,
+external message, grant submission, legal acceptance or valuation uplift is
+part of this source update.
+
 ### October 4 portfolio, registry and meeting preparation
 
 At Robert's explicit request to organize and publish his portfolio for a

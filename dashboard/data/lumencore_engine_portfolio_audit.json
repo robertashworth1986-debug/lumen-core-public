@@ -1,10 +1,10 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-10-04T20:38:25.882037Z",
+  "generated_at_utc": "2026-10-04T21:37:58.980166Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
-  "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
+  "source_registry_sha256": "aa4b951bf0b7095bf92012a7ee2e02e02f14aedacbc66dc643fef86064b6f85d",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
-  "source_note": "The 15 founder engine names are audited as internal platform lanes, not 15 finished products or 15 separate offers. Only repository evidence is scored.",
+  "source_note": "The 15 founder engine names are internal platform lanes, not finished products or separate offers. Observed maturity scores only configured tracked repository files; the October 4 expanded scope review separately records privately recovered source and historical receipts.",
   "primary_offer_binding": {
     "platform": "LumenCore",
     "evidence_layer": "ProofLock",
@@ -94,9 +94,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "852b33500af6bc2c7983cce45da1e05b25271991",
-            "bytes": 14899,
-            "sha256": "405afce03876c9fef64a21cb1172184aa821efac9b52c00c8f7bfe52bc91b437"
+            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
+            "bytes": 16361,
+            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
           }
         ],
         "artifact": [
@@ -125,9 +125,9 @@
       "id": "echoform_identity_engine",
       "name": "EchoForm Identity Engine",
       "lane": "concept_lane",
-      "safe_description": "Identity-consistent digital-twin architecture concept.",
+      "safe_description": "Identity-consistent digital-twin architecture with privately reviewed conventional memory-boundary prototype evidence; configured repository implementation/test paths remain absent.",
       "buyer_profile": "Future privacy-preserving personal-AI and simulation research partners.",
-      "scoping_use": "Requirements workshop only after privacy, consent, threat-model, and minimization rules are defined.",
+      "scoping_use": "Reproduce the bounded memory/consent/provenance prototype and retain the failed upstream identity challenge before any broader identity claim.",
       "acceptance_gate": "A consent-first prototype passes deletion, provenance, revocation, and identity-consistency tests.",
       "claim_boundary": "No biometric certification, medical inference, identity proof, or continuity-of-person claim.",
       "observed_maturity": "concept_only",
@@ -155,6 +155,14 @@
             "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
             "bytes": 4873,
             "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          },
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
+            "bytes": 16361,
+            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
           }
         ],
         "artifact": [],
@@ -279,7 +287,7 @@
       "id": "energy_harmonization_engine",
       "name": "Energy Harmonization Engine",
       "lane": "research_lane",
-      "safe_description": "Energy-data evidence pipeline and simulation research component.",
+      "safe_description": "Energy-data evidence pipeline plus historical wave/geothermal research with offline source-history recovery; full data replay and independent evaluation remain open.",
       "buyer_profile": "Utilities, facility operators, energy researchers, and government laboratories with authorized data.",
       "scoping_use": "Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision.",
       "acceptance_gate": "Meet locked accuracy, calibration, timeliness, and economic-conversion rules against a named baseline.",
@@ -337,7 +345,7 @@
       "id": "flowform_hardware_engine",
       "name": "FlowForm Hardware Engine",
       "lane": "research_lane",
-      "safe_description": "Simulation and audit tooling for geometry-informed routing concepts.",
+      "safe_description": "Geometry-informed routing research including privately recovered synthetic LumaJet baseline and assurance receipts; no physical performance established.",
       "buyer_profile": "Aerospace, robotics, EV, and electronics R&D teams with a declared comparator.",
       "scoping_use": "Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan.",
       "acceptance_gate": "Pre-registered simulation and independent bench tests beat named baselines on declared measures.",
@@ -449,9 +457,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "852b33500af6bc2c7983cce45da1e05b25271991",
-            "bytes": 14899,
-            "sha256": "405afce03876c9fef64a21cb1172184aa821efac9b52c00c8f7bfe52bc91b437"
+            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
+            "bytes": 16361,
+            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
           }
         ],
         "artifact": [],
@@ -667,9 +675,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "852b33500af6bc2c7983cce45da1e05b25271991",
-            "bytes": 14899,
-            "sha256": "405afce03876c9fef64a21cb1172184aa821efac9b52c00c8f7bfe52bc91b437"
+            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
+            "bytes": 16361,
+            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
           }
         ],
         "artifact": [
@@ -859,9 +867,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "852b33500af6bc2c7983cce45da1e05b25271991",
-            "bytes": 14899,
-            "sha256": "405afce03876c9fef64a21cb1172184aa821efac9b52c00c8f7bfe52bc91b437"
+            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
+            "bytes": 16361,
+            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
           }
         ],
         "artifact": [
@@ -952,9 +960,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "852b33500af6bc2c7983cce45da1e05b25271991",
-            "bytes": 14899,
-            "sha256": "405afce03876c9fef64a21cb1172184aa821efac9b52c00c8f7bfe52bc91b437"
+            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
+            "bytes": 16361,
+            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
           }
         ],
         "artifact": [
@@ -992,6 +1000,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "f68730220c25ebd349ee30a1e12c97d6d349b07f967c1364bed734369ccfd3eb"
+    "payload_sha256": "12e69d1f15d7b8d4e369c603ab487c8147c1b9f1300347045e92aa45c37066ea"
   }
 }

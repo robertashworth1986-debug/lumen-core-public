@@ -237,6 +237,7 @@ readonly -a RELEASE_FILES=(
   "portfolio/assets/phyllotaxis.svg"
   "portfolio/assets/tetrahedron.svg"
   "portfolio/assets/transport-study.svg"
+  "portfolio/data/grants-summary.json"
   "portfolio/data/math-sources.md"
   "portfolio/data/portfolio.json"
   "portfolio/data/registry.json"

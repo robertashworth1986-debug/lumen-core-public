@@ -1,6 +1,6 @@
 # LumenCore Engine Portfolio Audit
 
-Generated at: `2026-10-04T20:38:25.882037Z`
+Generated at: `2026-10-04T21:37:58.980166Z`
 
 ## Reviewer decision
 
@@ -37,7 +37,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 | Lane | Role | Repository maturity | Evidence classes | Buyer-safe scoping use |
 |---|---|---|---:|---|
 | Lumen Infrastructure Sentinel | `priority_validation_lane` | `runnable_component` | 5/6 | Test one declared infrastructure claim against an accepted incumbent baseline and return replayable decision evidence. |
-| EchoForm Identity Engine | `concept_lane` | `concept_only` | 1/6 | Requirements workshop only after privacy, consent, threat-model, and minimization rules are defined. |
+| EchoForm Identity Engine | `concept_lane` | `concept_only` | 1/6 | Reproduce the bounded memory/consent/provenance prototype and retain the failed upstream identity challenge before any broader identity claim. |
 | Smart City Node Engine | `concept_lane` | `concept_only` | 1/6 | Requirements and simulation-scoping workshop only. |
 | CrowdFund Radar | `research_lane` | `component_only` | 1/6 | Compare a pre-registered campaign ranking with a simple popularity baseline. |
 | Cyber Forensics Assist | `research_lane` | `component_only` | 3/6 | Measure chronology completeness and reviewer agreement without modifying source evidence. |
@@ -64,7 +64,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 ### EchoForm Identity Engine
 
-- Safe description: Identity-consistent digital-twin architecture concept.
+- Safe description: Identity-consistent digital-twin architecture with privately reviewed conventional memory-boundary prototype evidence; configured repository implementation/test paths remain absent.
 - Buyer profile: Future privacy-preserving personal-AI and simulation research partners.
 - Acceptance gate: A consent-first prototype passes deletion, provenance, revocation, and identity-consistency tests.
 - Claim boundary: No biometric certification, medical inference, identity proof, or continuity-of-person claim.
@@ -96,7 +96,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 ### Energy Harmonization Engine
 
-- Safe description: Energy-data evidence pipeline and simulation research component.
+- Safe description: Energy-data evidence pipeline plus historical wave/geothermal research with offline source-history recovery; full data replay and independent evaluation remain open.
 - Buyer profile: Utilities, facility operators, energy researchers, and government laboratories with authorized data.
 - Acceptance gate: Meet locked accuracy, calibration, timeliness, and economic-conversion rules against a named baseline.
 - Claim boundary: No nuclear control, field validation, outage savings, or universal harmonic-superiority claim.
@@ -104,7 +104,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 ### FlowForm Hardware Engine
 
-- Safe description: Simulation and audit tooling for geometry-informed routing concepts.
+- Safe description: Geometry-informed routing research including privately recovered synthetic LumaJet baseline and assurance receipts; no physical performance established.
 - Buyer profile: Aerospace, robotics, EV, and electronics R&D teams with a declared comparator.
 - Acceptance gate: Pre-registered simulation and independent bench tests beat named baselines on declared measures.
 - Claim boundary: No physical thermal, electromagnetic, battery, structural, manufacturing, or field-performance claim.
@@ -178,7 +178,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 - Strategic packet SHA-256: `358855ad9d44ee72ef460ad70b46448a82f327a0c536d9253d3fad84590c4ad7`
 - Evidence graph SHA-256: `cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05`
-- Portfolio payload SHA-256: `f68730220c25ebd349ee30a1e12c97d6d349b07f967c1364bed734369ccfd3eb`
+- Portfolio payload SHA-256: `12e69d1f15d7b8d4e369c603ab487c8147c1b9f1300347045e92aa45c37066ea`
 - Public contact: <https://lumen-core.ai/proof_to_pilot.html>
 
 ## Boundaries

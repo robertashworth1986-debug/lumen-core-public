@@ -250,6 +250,7 @@ RELEASE_PATHS: Final = (
     "dashboard/portfolio/assets/phyllotaxis.svg",
     "dashboard/portfolio/assets/tetrahedron.svg",
     "dashboard/portfolio/assets/transport-study.svg",
+    "dashboard/portfolio/data/grants-summary.json",
     "dashboard/portfolio/data/math-sources.md",
     "dashboard/portfolio/data/portfolio.json",
     "dashboard/portfolio/data/registry.json",

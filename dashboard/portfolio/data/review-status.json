@@ -1,14 +1,14 @@
 {
-  "schema_version": "lumencore-public-evidence-summary/1.0",
+  "schema_version": "lumencore-public-evidence-summary/2.0",
   "as_of": "2026-10-04",
   "title": "Portfolio review and evidence status",
-  "scope": "Source-linked status review of selected portfolio records and correspondence. Not a full private-archive audit.",
+  "scope": "OPEN. Expanded review of connected Drive metadata, selected image contents, repository source and historical dashboards, private research records and primary institutional correspondence. Private Windows/VPS roots and the complete historical estate remain unreconciled.",
   "portfolio_counts": {
     "legacy_asset_ids": 60,
     "historical_evidence_entries": 93,
     "review_families": 14,
     "as_of": "2026-09-25",
-    "boundary": "Overlapping inventory measures; do not add or present as validated products."
+    "boundary": "Historical September 25 overlapping inventory measures, retained as a dated record. Broader October 4 coverage appears separately; neither is a count of validated products."
   },
   "geometry_baseline": {
     "registered_families": 18,
@@ -23,10 +23,58 @@
   "valuation": {
     "current_transaction_value_established": false,
     "new_numeric_uplift_supported": false,
-    "public_statement": "The portfolio is being prepared for technical and commercial diligence. No independent company appraisal or accepted transaction price is established by the reviewed packet.",
-    "review_basis": "September 25 master valuation and October 4 source review."
+    "public_statement": "Recovered research, source, submissions and dashboard interfaces expand the documented asset basis. This inventory does not establish an independent appraisal or accepted transaction price.",
+    "review_basis": "September 25 master valuation and expanded October 4 estate review. Asset coverage is larger than the first edition; the price hypothesis still requires independent diligence."
   },
   "milestones": [
+    {
+      "id": "dot_ngdism",
+      "date": "2026-05-21",
+      "title": "DOT / NGDISM applications",
+      "evidence_tier": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "status": "Two applications received, validated and retrieved by agency. Official May 20-21 Grants.gov chains establish two application records for opportunity 693JK326NF0013, each with an agency tracking assignment.",
+      "does_not_establish": "Award, paid revenue or independent technical validation."
+    },
+    {
+      "id": "dot_pidp",
+      "date": "2026-06-02",
+      "title": "DOT / Port Infrastructure Development Program",
+      "evidence_tier": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "status": "Application received, validated and retrieved; tracking assigned. May 21 submission for MA-PID-26-001 passed validation and was retrieved; agency tracking was assigned June 2. An earlier same-day schema-rejected attempt is retained separately.",
+      "does_not_establish": "Award, paid revenue or independent technical validation."
+    },
+    {
+      "id": "darpa_dice",
+      "date": "2026-07-24",
+      "title": "DARPA DICE / Coherence-Bounded Peer Mesh",
+      "evidence_tier": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "status": "Abstract received and reviewed. June 29 IPTO finalization receipt assigned HR001126S0010-DICE-PA-052. July 24 letter confirms review and discourages a full proposal, citing program-objective fit and insufficiently articulated foundational advance.",
+      "does_not_establish": "Award, paid revenue or independent technical validation."
+    },
+    {
+      "id": "nasa_quote",
+      "date": "2026-07-24",
+      "title": "NASA AI Technology Support Services quotation",
+      "evidence_tier": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "status": "Complete firm-fixed-price quotation sent. July 24 sent body for 80NSSC26935917Q-R1 specifies price schedule, four-month approach, two testing-tool demonstrations, report, ASTRA-compatible prototype and handoff.",
+      "does_not_establish": "Award, paid revenue or independent technical validation."
+    },
+    {
+      "id": "dhs_phase1",
+      "date": "2026-08-27",
+      "title": "DHS Procurement Modernization",
+      "evidence_tier": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "status": "Phase 1 brief and video sent. August 27 sent submission to 70RDA126R00000009 contains a three-page solution brief and video for Use Case 22 Proposal Evaluator: buyer-owned read-only shadow replay and a proposed 30-day scope.",
+      "does_not_establish": "Award, paid revenue or independent technical validation."
+    },
+    {
+      "id": "sam_registration",
+      "date": "2026-07-11",
+      "title": "Federal registration",
+      "evidence_tier": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "status": "Activation confirmed by dated official notice. July 11, 2026 activation notice gives July 9, 2027 renewal date. August 19 update notice expressly says an unsubmitted update does not remove the existing registration.",
+      "does_not_establish": "Award, paid revenue or independent technical validation. Registration is a dated notice rather than a fresh portal check."
+    },
     {
       "id": "review-scoping",
       "date": "2026-10-03",
@@ -166,5 +214,28 @@
       "adaptive_universe_count": 57
     },
     "boundary": "Visible labels in supplied photographs; underlying audit not executed and chronology unestablished. 57 entries are not 57 measured sources."
+  },
+  "current_coverage": {
+    "public_catalogue_records": 64,
+    "google_drive_discovered_metadata_records": 3111,
+    "google_drive_image_metadata_records": 1466,
+    "google_drive_document_spreadsheet_presentation_records": 1416,
+    "google_drive_folder_metadata_records": 104,
+    "google_drive_other_file_metadata_records": 125,
+    "drive_ownership_boundary": "Accessible metadata includes shared-reference material with unverified ownership; it is not an inventory of LumenCore-owned assets. Root listing cap and shortcut targets remain open.",
+    "tracked_repository_files_in_snapshot": 1507,
+    "tracked_html_files": 103,
+    "html_cohort_profiles": 69,
+    "historical_dashboard_targets": 29,
+    "configured_engines_mapped": 15,
+    "recovered_curated_opportunity_records": 68,
+    "recovered_business_outreach_threads": 221,
+    "grants_gov_agency_tracked_applications": 3,
+    "opportunities_for_those_applications": 2,
+    "restored_research_bundle_commits": 2456,
+    "restored_research_bundle_paths_at_head": 1308,
+    "selected_research_source_receipt_files_read": 58,
+    "matched_source_integrity_comparisons": 24,
+    "boundary": "Overlapping inventory measures. Counts do not establish independent experiments, unique products, awards, revenue or current runtime."
   }
 }

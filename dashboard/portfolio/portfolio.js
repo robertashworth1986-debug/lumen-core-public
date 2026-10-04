@@ -20,7 +20,26 @@ if(transportLoad.status==='fulfilled'){
  for(const l of transport.limitations)$('transport-limitations').append(el('li',l));
  const square=transport.graphs.find(g=>g.id==='square_grid').metrics,tri=transport.graphs.find(g=>g.id==='triangulated_grid').metrics;$('transport-finding').textContent=`A useful negative result: diagonal connections reduce mean path stretch by ${(100*(1-tri.mean_path_stretch/square.mean_path_stretch)).toFixed(1)}%, but mean conductance falls ${(100*(1-tri.mean_effective_conductance/square.mean_effective_conductance)).toFixed(1)}% against the square grid. With fixed material, extra wire makes every conductor thinner. This result belongs to this model and layout.`;
 }else{$('failure-status').textContent='Network data could not load. Download the saved results or open the review brief.';$('graph-select').disabled=true;$('failed-edge').disabled=true;$('reset-edge').disabled=true;}
-if(portfolioLoad.status==='fulfilled'){for(const item of portfolioLoad.value){const article=el('article');article.append(el('h3',item.name),el('p',item.stage));const a=el('a','Evidence and next gate ↗');a.href=repo+'docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md';article.append(a);$('portfolio-map').append(article);}}
+if(portfolioLoad.status==='fulfilled'){
+ const records=portfolioLoad.value;
+ for(const group of [...new Set(records.map(x=>x.group))]){const o=el('option',group);o.value=group;$('portfolio-group').append(o);}
+ const renderPortfolio=()=>{
+  const q=$('portfolio-search').value.trim().toLowerCase(),group=$('portfolio-group').value;
+  const matches=records.filter(x=>(group==='all'||x.group===group)&&JSON.stringify(x).toLowerCase().includes(q));
+  $('portfolio-map').replaceChildren();
+  for(const item of matches){const article=el('article');article.id='record-'+item.id;
+   article.append(el('span',item.group,'lane'),el('h3',item.name),el('span',item.stage,'badge'),el('p',item.summary));
+   const details=el('details'),summary=el('summary','Evidence and remaining work');details.append(summary);
+   if(item.counts?.length){const list=el('ul');for(const c of item.counts)list.append(el('li',Number(c.value).toLocaleString('en-US')+' '+c.unit));details.append(list);}
+   if(item.limitations?.length){const list=el('ul');for(const text of item.limitations)list.append(el('li',text));details.append(list);}
+   if(item.evidence_held_private)details.append(el('p','Detailed receipt held in the founder’s private review records.'+(item.sources?.length?' Public links provide the associated implementation or portfolio context.':''),'note'));
+   for(const source of item.sources||[]){const p=el('p'),a=el('a',source.label||source.path);a.href=source.url;p.append(a);details.append(p);}
+   article.append(details);$('portfolio-map').append(article);
+  }
+  if(!matches.length)$('portfolio-map').append(el('p','No matching records. Try a project name or choose all areas.','empty'));
+  $('portfolio-status').textContent=`${matches.length} of ${records.length} evidence records · overlapping work areas, not a count of products`;
+ };$('portfolio-search').addEventListener('input',renderPortfolio);$('portfolio-group').addEventListener('change',renderPortfolio);renderPortfolio();
+}else{$('portfolio-status').textContent='The evidence catalogue could not load. Open the saved JSON or review brief.';}
 if(reviewLoad.status==='fulfilled'){for(const item of reviewLoad.value.milestones){const p=el('p');p.append(el('strong',item.title+' · '+item.date),document.createTextNode(' — '+item.status));$('institutional-summary').append(p);}}
 const failed=[registryLoad,transportLoad,reviewLoad,portfolioLoad].filter(r=>r.status==='rejected').length;if(failed)$('page-status').textContent='Some saved sections could not load. The printable review brief and source links remain available.';
 try{const model=await import('./math-models.mjs');for(const kind of ['tetrahedron','cube','octahedron','dodecahedron','icosahedron']){const tile=el('div',undefined,'solid');tile.innerHTML=model.platonicSolidSVG(kind);tile.append(el('span',kind));$('solids').append(tile);}$('cycloid').innerHTML=model.brachistochroneSVG();const d=model.brachistochroneData();$('cycloid-result').textContent=`For a 1 m horizontal run and 1 m drop: cycloid ${d.cycloidTime.toFixed(3)} s; straight incline ${d.straightTime.toFixed(3)} s.`;$('sunflower').innerHTML=model.phyllotaxisSVG();$('branching').innerHTML=model.murrayBranchingSVG();}catch(error){$('page-status').textContent='The equation illustrations could not load. Definitions and source notes remain available.';}

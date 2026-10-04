@@ -1,0 +1,363 @@
+{
+  "schema": "lumencore-grants-public-v1",
+  "audit_date": "2026-10-04",
+  "status": "OPEN \u2014 first edition was a selected sample; broader estate reconciliation continues",
+  "summary": "Implemented Grant Factory, substantial completed packets, actual submissions and official receipt chains are recovered. Prepared, sent, received, reviewed, signed and awarded stages are kept distinct.",
+  "counts": {
+    "recovered_curated_register_records": 68,
+    "recovered_business_outreach_threads": 221,
+    "grants_gov_agency_tracked_applications": 3,
+    "unique_opportunities_in_those_three": 2,
+    "dated_readiness_packages": 5
+  },
+  "cards": [
+    {
+      "id": "grant_factory",
+      "name": "Grant Factory / LumenGov",
+      "stage": "Implemented software; source inspected",
+      "result": "Discovery, eligibility and deadline scoring; project summary, technical volume, commercialization, cover letter, budget and NSF pitch rendering; evidence hashes and approval/queue state. Current source creates drafts, keeps external tracking separate, refuses stale-opportunity approval and protects approved snapshots.",
+      "summary": "Discovery, eligibility and deadline scoring; project summary, technical volume, commercialization, cover letter, budget and NSF pitch rendering; evidence hashes and approval/queue state. Current source creates drafts, keeps external tracking separate, refuses stale-opportunity approval and protects approved snapshots.",
+      "limitations": [
+        "No fresh execution, user adoption, revenue or automatic agency submission established."
+      ],
+      "evidence_type": "Canonical repository source or historical readiness receipt inspected",
+      "sources": [
+        {
+          "kind": "repository",
+          "path": "code/grant_application_factory.py",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/grant_application_factory.py"
+        },
+        {
+          "kind": "repository",
+          "path": "code/grant_submission_kit.py",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/code/grant_submission_kit.py"
+        }
+      ],
+      "evidence_held_private": false
+    },
+    {
+      "id": "portfolio_register",
+      "name": "Recovered opportunity and outreach register",
+      "stage": "Historical workbook recovered in full",
+      "result": "September 13 workbook contains 68 curated opportunity/partnership records and 221 business outreach threads. Its five sheets were parsed; originals for selected high-consequence stages were reread.",
+      "summary": "September 13 workbook contains 68 curated opportunity/partnership records and 221 business outreach threads. Its five sheets were parsed; originals for selected high-consequence stages were reread.",
+      "limitations": [
+        "Different denominators: not 68 awards or 221 customers. Later primary evidence adds DOT applications absent from this register. Estate remains open."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "sam_registration",
+      "name": "Federal registration",
+      "stage": "Activation confirmed by dated official notice",
+      "result": "July 11, 2026 activation notice gives July 9, 2027 renewal date. August 19 update notice expressly says an unsubmitted update does not remove the existing registration.",
+      "summary": "July 11, 2026 activation notice gives July 9, 2027 renewal date. August 19 update notice expressly says an unsubmitted update does not remove the existing registration.",
+      "limitations": [
+        "This is dated notice evidence, not a live October 4 SAM status check. Registration identifiers are private in this summary."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "research_mou",
+      "name": "Research collaboration agreement",
+      "stage": "Executed agreement and completion receipt read",
+      "result": "A research collaboration MOU was executed in July 2026. The private review index retains signatures, scope and publicity restrictions.",
+      "summary": "A research collaboration MOU was executed in July 2026. The private review index retains signatures, scope and publicity restrictions.",
+      "limitations": [
+        "No paid purchase order, endorsement, independently accepted result or award inferred. Counterparty and agreement details omitted from public copy."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "dot_ngdism",
+      "name": "DOT / NGDISM applications",
+      "stage": "Two applications received, validated and retrieved by agency",
+      "result": "Official May 20-21 Grants.gov chains establish two application records for opportunity 693JK326NF0013, each with an agency tracking assignment.",
+      "summary": "Official May 20-21 Grants.gov chains establish two application records for opportunity 693JK326NF0013, each with an agency tracking assignment.",
+      "limitations": [
+        "Two records for one opportunity; eligibility, merits, selection, funding and current portal outcome are not established by transport receipts."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "dot_pidp",
+      "name": "DOT / Port Infrastructure Development Program",
+      "stage": "Application received, validated and retrieved; tracking assigned",
+      "result": "May 21 submission for MA-PID-26-001 passed validation and was retrieved; agency tracking was assigned June 2. An earlier same-day schema-rejected attempt is retained separately.",
+      "summary": "May 21 submission for MA-PID-26-001 passed validation and was retrieved; agency tracking was assigned June 2. An earlier same-day schema-rejected attempt is retained separately.",
+      "limitations": [
+        "Receipt is not an award or merits/eligibility determination. Do not count the rejected attempt as an additional successful application."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "doe_magnito",
+      "name": "DOE / ARPA-E MAGNITO",
+      "stage": "Concept paper submitted; noncompliance determination",
+      "result": "October 3, 2025 agency determination confirms concept paper 3591-1502 under DE-FOA-0003591. It cites concept-paper/summary-slide template and content compliance defects.",
+      "summary": "October 3, 2025 agency determination confirms concept paper 3591-1502 under DE-FOA-0003591. It cites concept-paper/summary-slide template and content compliance defects.",
+      "limitations": [
+        "Three duplicate notices concern one concept paper. MAGNITO is the DOE/ARPA-E pursuit; a separate Navy magnetometer submission remains unlocated. No award inferred."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "darpa_dice",
+      "name": "DARPA DICE / Coherence-Bounded Peer Mesh",
+      "stage": "Abstract received and reviewed",
+      "result": "June 29 IPTO finalization receipt assigned HR001126S0010-DICE-PA-052. July 24 letter confirms review and discourages a full proposal, citing program-objective fit and insufficiently articulated foundational advance.",
+      "summary": "June 29 IPTO finalization receipt assigned HR001126S0010-DICE-PA-052. July 24 letter confirms review and discourages a full proposal, citing program-objective fit and insufficiently articulated foundational advance.",
+      "limitations": [
+        "The received abstract supersedes June 20 prepared-only status. Complete local proposal preparation is retained; final full-proposal submission or award is not established."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [
+        {
+          "kind": "repository",
+          "path": "docs/DICE_FULL_SUBMISSION_SPRINT.md",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/docs/DICE_FULL_SUBMISSION_SPRINT.md"
+        },
+        {
+          "kind": "repository",
+          "path": "dashboard/data/grant_readiness_status.json",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/grant_readiness_status.json"
+        }
+      ],
+      "evidence_held_private": true
+    },
+    {
+      "id": "darpa_low_resource",
+      "name": "DARPA Low Resource Computing",
+      "stage": "Response and slide sent; reviewed without workshop invitation",
+      "result": "July 17 non-proprietary DARPA-SN-26-97 response and one-slide summary were sent. Subsequent review did not produce a workshop invitation.",
+      "summary": "July 17 non-proprietary DARPA-SN-26-97 response and one-slide summary were sent. Subsequent review did not produce a workshop invitation.",
+      "limitations": [
+        "Separate pursuit from DICE. Submitted internal synthetic results are not hardware, operational or independent validation."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "nasa_quote",
+      "name": "NASA AI Technology Support Services quotation",
+      "stage": "Complete firm-fixed-price quotation sent",
+      "result": "July 24 sent body for 80NSSC26935917Q-R1 specifies price schedule, four-month approach, two testing-tool demonstrations, report, ASTRA-compatible prototype and handoff.",
+      "summary": "July 24 sent body for 80NSSC26935917Q-R1 specifies price schedule, four-month approach, two testing-tool demonstrations, report, ASTRA-compatible prototype and handoff.",
+      "limitations": [
+        "The quotation is a completed offer artifact. No acceptance, award, NASA deployment or revenue established; its 30-day validity is historical."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "nasa_rfi",
+      "name": "NASA data-center infrastructure RFI",
+      "stage": "Five-page response sent",
+      "result": "July 13 response to 80TECH26RFI0020 proposes bounded validation and evidence work inside a qualified modernization partnership. The full five-page attachment was read.",
+      "summary": "July 13 response to 80TECH26RFI0020 proposes bounded validation and evidence work inside a qualified modernization partnership. The full five-page attachment was read.",
+      "limitations": [
+        "Market research without pricing; no NASA access, facilities-prime readiness, authorization, savings or accepted performance established."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "dhs_phase1",
+      "name": "DHS Procurement Modernization",
+      "stage": "Phase 1 brief and video sent",
+      "result": "August 27 sent submission to 70RDA126R00000009 contains a three-page solution brief and video for Use Case 22 Proposal Evaluator: buyer-owned read-only shadow replay and a proposed 30-day scope.",
+      "summary": "August 27 sent submission to 70RDA126R00000009 contains a three-page solution brief and video for Use Case 22 Proposal Evaluator: buyer-owned read-only shadow replay and a proposed 30-day scope.",
+      "limitations": [
+        "Corrects earlier inquiry-only classification. No agency acknowledgment, selection, award or production integration established."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "dhs_border",
+      "name": "DHS Border Security Testbed",
+      "stage": "Corrected seven-page response sent",
+      "result": "July 24 corrected response to 70RSAT26RFI000024 supersedes the initial email-body version. The full packet maps an evidence-orchestration role and proposed 90-day demonstration.",
+      "summary": "July 24 corrected response to 70RSAT26RFI000024 supersedes the initial email-body version. The full packet maps an evidence-orchestration role and proposed 90-day demonstration.",
+      "limitations": [
+        "Completed market-research response; later receipt/acceptance or award not established."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "argos",
+      "name": "HHS / ONC Project Argos",
+      "stage": "Capability response sent",
+      "result": "July 29 sent message includes ARGOS_PRIVATE_ACTION_COPY.docx for ONC-ARGOS-SSN-2026-OS351107. Ten rendered pages were read: task-fit matrix, evidence workstream, security, team gaps and mobilization plan.",
+      "summary": "July 29 sent message includes ARGOS_PRIVATE_ACTION_COPY.docx for ONC-ARGOS-SSN-2026-OS351107. Ten rendered pages were read: task-fit matrix, evidence workstream, security, team gaps and mobilization plan.",
+      "limitations": [
+        "Market research, not a price proposal. Direct health-domain prior performance, ATO, full-prime readiness and external teaming commitments are expressly unproved."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [
+        {
+          "kind": "repository",
+          "path": "grant_submissions/ONC_ARGOS_20260730/",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/tree/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/grant_submissions/ONC_ARGOS_20260730/"
+        }
+      ],
+      "evidence_held_private": true
+    },
+    {
+      "id": "airforce_automation",
+      "name": "Air Force Advanced Automation",
+      "stage": "Capability response sent; agency receipt confirmed",
+      "result": "July 9 SAF-AQ-RFI-26-0001 capability statement sent; July 13 contracting reply explicitly confirms receipt.",
+      "summary": "July 9 SAF-AQ-RFI-26-0001 capability statement sent; July 13 contracting reply explicitly confirms receipt.",
+      "limitations": [
+        "Receipt is not technical acceptance, operational deployment or award."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "harborsentinel",
+      "name": "Navy HarborSentinel / NV063",
+      "stage": "Substantial prepared proposal and technical evidence",
+      "result": "June 20 readiness receipt records 14/14 required artifacts and 4/4 manifest matches. Separate synthetic validation preserves nominal F1 0.930 and severe-stress F1 0.500; public AIS controlled-injection evidence is separately indexed.",
+      "summary": "June 20 readiness receipt records 14/14 required artifacts and 4/4 manifest matches. Separate synthetic validation preserves nominal F1 0.930 and severe-stress F1 0.500; public AIS controlled-injection evidence is separately indexed.",
+      "limitations": [
+        "Historical packet readiness; final DSIP submission receipt remains unlocated. Synthetic and injected-event results are not field or adversary validation."
+      ],
+      "evidence_type": "Canonical repository source or historical readiness receipt inspected",
+      "sources": [
+        {
+          "kind": "repository",
+          "path": "dashboard/data/grant_readiness_status.json",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/grant_readiness_status.json"
+        },
+        {
+          "kind": "repository",
+          "path": "docs/HARBOR_SENTINEL_VALIDATION_2026-06-13.md",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/docs/HARBOR_SENTINEL_VALIDATION_2026-06-13.md"
+        },
+        {
+          "kind": "repository",
+          "path": "docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/docs/HARBOR_PUBLIC_AIS_PROOF_PACKET_2026-06-20.md"
+        }
+      ],
+      "evidence_held_private": false
+    },
+    {
+      "id": "missionweave",
+      "name": "DLA MissionWeave / NV011",
+      "stage": "Prepared package; officially not formally submitted",
+      "result": "June 20 readiness feed records 4/4 required artifacts and 3/3 manifest matches. July 28 DLA reply reports DSIP proposal status In Progress, not formally submitted.",
+      "summary": "June 20 readiness feed records 4/4 required artifacts and 3/3 manifest matches. July 28 DLA reply reports DSIP proposal status In Progress, not formally submitted.",
+      "limitations": [
+        "Retain technical volume, portal work and evidence assets despite missed final submission. No award inferred."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [
+        {
+          "kind": "repository",
+          "path": "dashboard/data/grant_readiness_status.json",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/grant_readiness_status.json"
+        }
+      ],
+      "evidence_held_private": true
+    },
+    {
+      "id": "nv065",
+      "name": "Navy NV065 sensor tasking",
+      "stage": "Prepared package; portal completion unverified",
+      "result": "June 20 readiness feed records 3/3 required artifacts, 4/4 manifest matches, zero local blockers and four portal/user gates.",
+      "summary": "June 20 readiness feed records 3/3 required artifacts, 4/4 manifest matches, zero local blockers and four portal/user gates.",
+      "limitations": [
+        "Dated readiness is not a submission receipt. Separate Navy magnetometer wording is unresolved and is not silently mapped onto NV065."
+      ],
+      "evidence_type": "Canonical repository source or historical readiness receipt inspected",
+      "sources": [
+        {
+          "kind": "repository",
+          "path": "dashboard/data/grant_readiness_status.json",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/grant_readiness_status.json"
+        }
+      ],
+      "evidence_held_private": false
+    },
+    {
+      "id": "nsf_pitch",
+      "name": "NSF Project Pitch",
+      "stage": "Prepared portal-ready draft",
+      "result": "June 20 readiness feed records 3/3 required artifacts and four portal/user gates; July 24 mailbox draft identifies updated portal-ready pitch.",
+      "summary": "June 20 readiness feed records 3/3 required artifacts and four portal/user gates; July 24 mailbox draft identifies updated portal-ready pitch.",
+      "limitations": [
+        "No final submission receipt located. This does not erase the completed draft work."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [
+        {
+          "kind": "repository",
+          "path": "dashboard/data/grant_readiness_status.json",
+          "url": "https://github.com/robertashworth1986-debug/lumen-core-public/blob/58ffc15439a9bcdf09db7a8c5aa72c3c0d3308c4/dashboard/data/grant_readiness_status.json"
+        }
+      ],
+      "evidence_held_private": true
+    },
+    {
+      "id": "navy_readiness",
+      "name": "Navy PMA-273 / CNATRA",
+      "stage": "Substantive sources-sought capability response sent",
+      "result": "July 24 N00421-26-RFPREQ-TPM273-0198 response proposes baseline locking, deterministic replay, calibration/drift checks and reviewer evidence for predictive-readiness modules.",
+      "summary": "July 24 N00421-26-RFPREQ-TPM273-0198 response proposes baseline locking, deterministic replay, calibration/drift checks and reviewer evidence for predictive-readiness modules.",
+      "limitations": [
+        "A capability workstream, not a firm quotation or verified Navy integration/award."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "airforce_csdr",
+      "name": "Air Force CSDR verification and curation",
+      "stage": "Substantive CSO capability response sent",
+      "result": "July 24 FA701426SCS01 response specifies schemas, source lineage, exceptions, reproducibility, reviewer tooling and a qualified-prime teaming posture.",
+      "summary": "July 24 FA701426SCS01 response specifies schemas, source lineage, exceptions, reproducibility, reviewer tooling and a qualified-prime teaming posture.",
+      "limitations": [
+        "Nonbinding planning ranges, not a firm quotation, cleared staffing, accepted Step 1 submission or award."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    },
+    {
+      "id": "tradewinds",
+      "name": "Tradewinds Solutions Marketplace",
+      "stage": "Submission reviewed; revision invited",
+      "result": "September 10 result for submission 8-26-3361 was not awardable; revision and resubmission were invited. A feedback booking is retained in the private timeline.",
+      "summary": "September 10 result for submission 8-26-3361 was not awardable; revision and resubmission were invited. A feedback booking is retained in the private timeline.",
+      "limitations": [
+        "A submitted and reviewed package remains a built asset. It is not an award or validation of claimed performance."
+      ],
+      "evidence_type": "Primary correspondence or attachment read, except explicitly marked historical-register-only sources",
+      "sources": [],
+      "evidence_held_private": true
+    }
+  ]
+}
