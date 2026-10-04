@@ -116,7 +116,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 240
+    assert len(names) == len(set(names)) == 242
     assert names[:5] == [
         "operator_home.html",
         "opportunity_sprint.html",
@@ -185,7 +185,7 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
 def test_release_count_is_bound_to_current_control_records():
     module = load_module(PACKAGER_PATH, "package_public_site_release_control_count")
     release_count = len(module.RELEASE_PATHS)
-    assert release_count == 240
+    assert release_count == 242
 
     protocol = (ROOT / "docs" / "PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md").read_text(
         encoding="utf-8"
@@ -896,3 +896,12 @@ def test_portfolio_audit_uses_canonical_directory_route():
     assert verifier.live_url("https://lumen-core.ai", "portfolio/index.html", "a" * 40) == (
         "https://lumen-core.ai/portfolio/?release=" + "a" * 40
     )
+
+
+def test_creator_rights_audit_uses_canonical_route_and_mime():
+    verifier = load_module(VERIFY_PATH, "creator_rights_route")
+    assert verifier.live_url("https://lumen-core.ai", "rights/index.html", "a" * 40) == (
+        "https://lumen-core.ai/rights/?release=" + "a" * 40
+    )
+    assert verifier.content_type_allowed("rights/artwork-register.json", "application/json")
+    assert not verifier.content_type_allowed("rights/artwork-register.json", "text/html")

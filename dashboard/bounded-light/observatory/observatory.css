@@ -4,3 +4,5 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
 
 @media(max-width:600px){header{align-items:flex-start;flex-direction:column;gap:15px}header nav{flex-wrap:wrap}}
+
+footer .creator-credit{display:block!important;flex-basis:100%;font-size:.875rem;line-height:1.65;max-width:54rem;overflow-wrap:anywhere}footer .creator-credit a{text-decoration:underline;text-underline-offset:.2em}

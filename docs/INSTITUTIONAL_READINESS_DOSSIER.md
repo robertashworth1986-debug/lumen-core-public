@@ -26,6 +26,55 @@ locked primary metric and threshold, one replayable evidence package, and one
 explicit decision. A neutral, incomplete, or negative result remains a valid
 deliverable.
 
+## October 4 operational check
+
+Current main `39b20a3f3af0d8410529fd2081456575a3c04a1c` passed the
+[full first-party repository suite](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37237223735):
+1,221 tests and 82 subtests passed; eight tests were skipped and five warnings
+remain. The skips cover artifact-dependent checks, optional Zig and Windows-only
+PowerShell coverage. Both CodeQL language checks also passed. These results
+support the reviewed source; they do not certify the institution or product.
+
+Its [live-domain audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37237223673)
+failed: 192/240 exact file matches, three mismatches and 45 missing files.
+`HOLD_PUBLIC_RELEASE_PROMOTION` remains in effect until the approved current
+release passes exact-byte verification. Earlier successful 43-file releases
+below remain historical evidence only. Branch protection and required status
+checks were observed as unenforced; the ruleset list was empty. Those settings
+were not changed by this source update.
+
+## Proposed required-check policy
+
+The following minimal policy is prepared for `main`; it is **not installed**.
+The connected repository tools cannot write branch protection or rulesets.
+These five uniquely named contexts run on every pull request. The full suite
+includes immutable release packaging, rollback, MIME and live-verifier unit
+coverage; a successful unit test is not a successful production deployment.
+
+| Required status context | Expected app | Purpose |
+|---|---|---|
+| `Full repository suite (bounded first-party)` | GitHub Actions | Entire pinned Python test collection, including release regressions |
+| `Readiness register and claim boundaries` | GitHub Actions | Bounded readiness register, limits and adversarial checks |
+| `Analyze python` | GitHub Actions | Python CodeQL analysis |
+| `Analyze javascript-typescript` | GitHub Actions | JavaScript/TypeScript CodeQL analysis |
+| `Dependency review` | GitHub Actions | Pull-request dependency policy |
+
+In repository **Settings → Rules → Rulesets**, add an active branch ruleset
+for `refs/heads/main`, require a pull request and these five checks, and require
+the branch to be up to date before merging. Select GitHub Actions as the expected
+check source (observed app ID `15368`). Block force pushes and branch deletion.
+Do not add a bypass actor or change write permissions. Do not require an
+unavailable second reviewer for this single-founder workflow; independent
+scientific review remains its own explicit external-validation gate.
+
+Before activating, confirm the renamed checks have successful receipts on a
+current pull request and re-read existing settings to avoid overwriting any
+new protection. The exact-live audit and signed production attestation belong
+to the existing deployment gate, not this pre-merge list. Dynamic AI review is
+an additional service and is not substituted for CodeQL or the full suite.
+Setting this policy does not supply certification, buyer acceptance, security
+assessment or any other external readiness evidence.
+
 ## Control register
 
 | Domain | Current state | What exists | Gate before promotion |

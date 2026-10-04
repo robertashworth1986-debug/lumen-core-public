@@ -262,6 +262,8 @@ RELEASE_PATHS: Final = (
     "dashboard/portfolio/portfolio.css",
     "dashboard/portfolio/portfolio.js",
     "dashboard/portfolio/review.html",
+    "dashboard/rights/index.html",
+    "dashboard/rights/artwork-register.json",
 )
 
 
