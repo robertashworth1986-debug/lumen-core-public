@@ -32,6 +32,17 @@ sanitized preparation; static production still follows the exact-main signed
 release workflow and configured environment gate. No external message, grant
 submission, legal acceptance or runtime repair is included.
 
+The sanitized Wonder Studio is publicly published at
+`https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/` and contains
+the 19-artwork collection and review room. The domain homepage links to that
+public Studio and its local `/portfolio/` route. The prior private-Studio
+restriction below describes the earlier preparation stage and is superseded
+for this sanitized collection by the founder's explicit publication request.
+The custom-domain release still requires its own verified deployment receipt.
+The October 4 evidence-index expansion also refreshes two dependent Argos
+custody hashes. Historical evaluation dates, failed and blocked checks, and
+expired action authority remain unchanged; no submission is authorized.
+
 ### October 4 Bounded Light visual collection candidate
 
 At Robert's explicit request to continue the domain and use his wormhole and
