@@ -204,6 +204,17 @@ readonly -a RELEASE_FILES=(
   "assets/capital_research.json"
   "js/capital_math.js"
   "js/capital_research_lab.js"
+  "bounded-light/assets/01_bridge_of_light.webp"
+  "bounded-light/assets/02_light_boundary.webp"
+  "bounded-light/assets/03_toroidal_observatory.webp"
+  "bounded-light/assets/04_echo_cathedral.webp"
+  "bounded-light/assets/05_phase_garden.webp"
+  "bounded-light/assets/06_hemilink.webp"
+  "bounded-light/index.html"
+  "bounded-light/lab.js"
+  "bounded-light/math.js"
+  "bounded-light/provenance.json"
+  "bounded-light/style.css"
 )
 readonly -a RELEASE_DIRECTORIES=(
   "assets"
@@ -217,6 +228,8 @@ readonly -a RELEASE_DIRECTORIES=(
   "cohort/downloads"
   "cohort/members"
   "downloads"
+  "bounded-light"
+  "bounded-light/assets"
 )
 readonly EXPECTED_FILE_COUNT="${#RELEASE_FILES[@]}"
 

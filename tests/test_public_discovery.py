@@ -17,6 +17,7 @@ class PublicDiscoveryTests(unittest.TestCase):
             "Allow: /opportunity_sprint.html",
             "Allow: /proof_to_pilot.html",
             "Allow: /evidence/",
+            "Allow: /bounded-light/",
             "Allow: /external_review.html",
             "Allow: /build_week/prooflock_console/",
         ):
@@ -53,7 +54,7 @@ class PublicDiscoveryTests(unittest.TestCase):
                 "https://lumen-core.ai/build_week/prooflock_console/",
                 "https://lumen-core.ai/cohort/",
                 "https://lumen-core.ai/cohort/directory.html",
-            ] + member_routes,
+            ] + member_routes + ["https://lumen-core.ai/bounded-light/"],
         )
         serialized = (DASHBOARD / "sitemap.xml").read_text(encoding="utf-8")
         self.assertNotIn("mission_control", serialized)

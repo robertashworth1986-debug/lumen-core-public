@@ -137,6 +137,7 @@ def expected_live_url(archive_name: str, source_commit: str) -> str:
         "evidence/index_bounded.html": "/evidence/",
         "build_week/prooflock_console/index.html": "/build_week/prooflock_console/",
         "cohort/index.html": "/cohort/",
+        "bounded-light/index.html": "/bounded-light/",
     }
     path = route_map.get(archive_name, "/" + quote(archive_name, safe="/"))
     return urljoin("https://lumen-core.ai/", path.lstrip("/")) + (

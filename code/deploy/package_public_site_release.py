@@ -217,6 +217,17 @@ RELEASE_PATHS: Final = (
     "dashboard/assets/capital_research.json",
     "dashboard/js/capital_math.js",
     "dashboard/js/capital_research_lab.js",
+    "dashboard/bounded-light/assets/01_bridge_of_light.webp",
+    "dashboard/bounded-light/assets/02_light_boundary.webp",
+    "dashboard/bounded-light/assets/03_toroidal_observatory.webp",
+    "dashboard/bounded-light/assets/04_echo_cathedral.webp",
+    "dashboard/bounded-light/assets/05_phase_garden.webp",
+    "dashboard/bounded-light/assets/06_hemilink.webp",
+    "dashboard/bounded-light/index.html",
+    "dashboard/bounded-light/lab.js",
+    "dashboard/bounded-light/math.js",
+    "dashboard/bounded-light/provenance.json",
+    "dashboard/bounded-light/style.css",
 )
 
 

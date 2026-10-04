@@ -16,8 +16,8 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
   an unmerged branch or tag cannot authorize production access.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
-- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (195 for
-  the cohort and frozen EIA review release). Earlier 43-file, 119-file and 189-file releases retain their original
+- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (206 for
+  the cohort, frozen EIA review and Bounded Light concept collection). Earlier 43-file, 119-file and 189-file releases retain their original
   membership, reconstructed from their pinned literal allowlists as data.
 - Package bytes are read from immutable Git blobs, not from mutable worktree
   files.

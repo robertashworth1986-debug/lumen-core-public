@@ -7,6 +7,31 @@
 
 ## One commercial sentence
 
+### October 4 Bounded Light visual collection candidate
+
+At Robert's explicit request to continue the domain and use his wormhole and
+EchoForm papers as visual inspiration, active outcome 2 includes a bounded
+presentation update to the existing reviewer surface. The existing homepage
+links to `/bounded-light/`: six original AI-generated concept illustrations
+and an educational light-time and wave-interference lab. This extends the
+visual-presentation lineage of draft PR #207 without importing that conflicted
+branch or changing the sole primary buyer-owned validation offer.
+
+Every conceptual image remains **CONCEPT ILLUSTRATION**. The lab uses declared
+ideal assumptions; it is not a wormhole simulation, quantum-advantage result,
+new physical theory, faster-than-light communication, or validation of the
+source papers. Source papers and private Studio links are not published.
+The shared static bundle introduces no login, tracking, telemetry or control
+connection. Website artwork is compressed for delivery; any large-format
+exports are separately labeled enlargements rather than native 16K/20K detail.
+
+This is an isolated source candidate, not a live deployment receipt. The
+existing exact-main release approval, signed provenance and SBOM verification,
+production-environment gate, rollback capture and exact live-byte checks remain
+required. DNS, email records, VPS runtime and operator routes are unchanged.
+PR #207 and deployment-control PR #208 must be reconciled by file overlap
+before their later merges; neither old branch is a deployment shortcut.
+
 ### October 4 runtime follow-up
 
 PR #235 merged as `1350a1a97ab8bc75f1c965f331905a4578092214` after all

@@ -24,6 +24,7 @@ on:
       - 'dashboard/js/capital_math.js'
       - 'dashboard/js/capital_research_lab.js'
       - 'tests/capital_math.test.mjs'
+      - 'tests/bounded_light_math.test.mjs'
       - 'dashboard/kraken_execution_dashboard.html'
       - 'dashboard/forecast.html'
       - 'dashboard/anomalies.html'
@@ -49,6 +50,7 @@ on:
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'dashboard/cohort/**'
+      - 'dashboard/bounded-light/**'
       - 'dashboard/downloads/eia-two-window-review-20260922.zip'
       - 'tests/test_public_site_deploy_hardening.py'
       - 'tests/test_public_discovery.py'
@@ -78,6 +80,7 @@ on:
       - 'dashboard/js/capital_math.js'
       - 'dashboard/js/capital_research_lab.js'
       - 'tests/capital_math.test.mjs'
+      - 'tests/bounded_light_math.test.mjs'
       - 'dashboard/kraken_execution_dashboard.html'
       - 'dashboard/forecast.html'
       - 'dashboard/anomalies.html'
@@ -103,6 +106,7 @@ on:
       - 'dashboard/assets/prooflock/**'
       - 'dashboard/build_week/prooflock_console/**'
       - 'dashboard/cohort/**'
+      - 'dashboard/bounded-light/**'
       - 'dashboard/downloads/eia-two-window-review-20260922.zip'
       - 'tests/test_public_site_deploy_hardening.py'
       - 'tests/test_public_discovery.py'
@@ -140,4 +144,4 @@ jobs:
         run: python -m pytest tests/test_public_site_deploy_hardening.py tests/test_public_discovery.py tests/test_canonical_surface_design.py tests/test_public_site_deployment_receipt.py tests/test_ec_member_runtime.py tests/test_ec_public_profiles.py -q
 
       - name: Check member-workspace browser logic
-        run: node --test tests/ec_studio_core.test.mjs tests/capital_math.test.mjs
+        run: node --test tests/ec_studio_core.test.mjs tests/capital_math.test.mjs tests/bounded_light_math.test.mjs

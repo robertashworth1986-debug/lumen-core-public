@@ -116,7 +116,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 195
+    assert len(names) == len(set(names)) == 206
     assert names[:5] == [
         "operator_home.html",
         "opportunity_sprint.html",
@@ -185,7 +185,7 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
 def test_release_count_is_bound_to_current_control_records():
     module = load_module(PACKAGER_PATH, "package_public_site_release_control_count")
     release_count = len(module.RELEASE_PATHS)
-    assert release_count == 195
+    assert release_count == 206
 
     protocol = (ROOT / "docs" / "PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md").read_text(
         encoding="utf-8"
@@ -850,3 +850,22 @@ def test_apply_rejects_duplicate_manifest_key_before_touching_target(tmp_path):
     assert not (test_root / "opt" / "lumencore" / "rollbacks").exists()
     for name, body in old_bodies.items():
         assert (target / name).read_bytes() == body
+
+
+@pytest.mark.parametrize("name,mime", [
+    ("index.html", "text/html"), ("style.css", "text/css"),
+    ("assets/concept.webp", "image/webp"), ("manifest.json", "application/json"),
+])
+def test_bounded_light_release_rejects_wrong_mime(name, mime):
+    verifier = load_module(VERIFY_PATH, "bounded_light_mime")
+    assert verifier.content_type_allowed("bounded-light/" + name, mime)
+    assert not verifier.content_type_allowed("bounded-light/" + name, "application/octet-stream")
+    if mime != "text/html":
+        assert not verifier.content_type_allowed("bounded-light/" + name, "text/html")
+
+
+def test_bounded_light_audit_uses_canonical_directory_route():
+    verifier = load_module(VERIFY_PATH, "bounded_light_route")
+    assert verifier.live_url("https://lumen-core.ai", "bounded-light/index.html", "a" * 40) == (
+        "https://lumen-core.ai/bounded-light/?release=" + "a" * 40
+    )

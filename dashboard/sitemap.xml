@@ -109,4 +109,10 @@
   <url><loc>https://lumen-core.ai/cohort/members/xi.html</loc><lastmod>2026-09-12</lastmod></url>
   <url><loc>https://lumen-core.ai/cohort/members/yoamigo.html</loc><lastmod>2026-09-12</lastmod></url>
   <!-- EC STRENGTH PROFILES END -->
+  <url>
+    <loc>https://lumen-core.ai/bounded-light/</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>
