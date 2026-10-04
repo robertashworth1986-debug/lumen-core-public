@@ -7,6 +7,46 @@
 
 ## One commercial sentence
 
+### October 4 current-main readiness and creator attribution
+
+Active outcome 2 includes the founder-requested **Bounded Light Speed** naming
+correction and explicit credit, **Created by Robert Ashworth using AI tools**.
+Stable `/bounded-light/` URLs remain unchanged. The 19-asset creator register
+records source dimensions, hashes and AI generation; it does not establish
+copyright registration or exclusive rights in purely AI-generated material.
+Existing repository and third-party licenses remain unchanged.
+
+The exact-main audit at `39b20a3f3af0d8410529fd2081456575a3c04a1c` found
+1,221 passing tests, 8 skipped tests, 82 passing subtests and 5 warnings in the
+[authoritative full-suite run](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37237223735).
+Both CodeQL language analyses passed. These are bounded first-party checks,
+not institutional certification or independent validation. The skipped checks
+include four missing artifact-dependent cases, one unavailable optional Zig
+toolchain case and three Windows PowerShell cases on Linux.
+
+The same main commit did **not** pass its
+[exact live-domain audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37237223673):
+192 of 240 files matched, three differed and 45 returned HTTP 404. The incident
+receipt records SEV-2 and `HOLD_PUBLIC_RELEASE_PROMOTION`. The unmatched paths
+are the old homepage/discovery files and the missing Bounded Light/portfolio
+collections. New source tests cannot replace a successful exact-release and
+live-byte receipt. The current source candidate adds two rights files to the
+bounded allowlist, for 242 expected files at its later release commit.
+
+A fresh GitHub branch/ruleset read found `main` unprotected, no enforced
+required-status contexts, and no rulesets. No protection or permission setting
+was changed. The prior PR #238 optional dynamic AI review was unavailable due
+to monthly account quota; it did not produce a clean review. The current main
+failure is the live-domain audit, a separate issue.
+
+The installed connector has no workflow-dispatch operation. The prepared
+production path remains the existing manual exact-main release workflow, its
+literal approval input, signed provenance/SBOM, configured production gate,
+rollback capture and full live verification. This update neither executes that
+production action nor reclassifies production readiness. The portfolio estate
+and external validation remain OPEN.
+
+
 ### October 4 expanded estate reconciliation — OPEN
 
 The first portfolio edition was a selected sample. The expanded review now

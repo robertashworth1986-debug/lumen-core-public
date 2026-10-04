@@ -112,6 +112,12 @@ class PublicReleaseIncidentTests(unittest.TestCase):
             audit=make_audit(self.manifest, statuses),
         )
 
+    def test_creator_rights_canonical_route(self) -> None:
+        self.assertEqual(
+            incident.expected_live_url("rights/index.html", "a" * 40),
+            "https://lumen-core.ai/rights/?release=" + "a" * 40,
+        )
+
     def test_exact_release_is_none(self) -> None:
         receipt = self.classify()
         self.assertEqual(receipt["severity"], "NONE")

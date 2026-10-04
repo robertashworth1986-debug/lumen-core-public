@@ -1,5 +1,5 @@
 {
-  "collection": "Bounded Light",
+  "collection": "Bounded Light Speed",
   "version": 1,
   "artworks": [
     {
@@ -15,6 +15,8 @@
       "state": "CONCEPT ILLUSTRATION",
       "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
       "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "creative_director": "Robert Ashworth",
+      "human_expression_review": "Specific protectable human contributions require work-by-work documentation; prompting alone is not asserted as copyrightable authorship.",
       "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
     },
     {
@@ -30,6 +32,8 @@
       "state": "CONCEPT ILLUSTRATION",
       "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
       "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "creative_director": "Robert Ashworth",
+      "human_expression_review": "Specific protectable human contributions require work-by-work documentation; prompting alone is not asserted as copyrightable authorship.",
       "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
     },
     {
@@ -45,6 +49,8 @@
       "state": "CONCEPT ILLUSTRATION",
       "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
       "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "creative_director": "Robert Ashworth",
+      "human_expression_review": "Specific protectable human contributions require work-by-work documentation; prompting alone is not asserted as copyrightable authorship.",
       "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
     },
     {
@@ -60,6 +66,8 @@
       "state": "CONCEPT ILLUSTRATION",
       "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
       "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "creative_director": "Robert Ashworth",
+      "human_expression_review": "Specific protectable human contributions require work-by-work documentation; prompting alone is not asserted as copyrightable authorship.",
       "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
     },
     {
@@ -75,6 +83,8 @@
       "state": "CONCEPT ILLUSTRATION",
       "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
       "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "creative_director": "Robert Ashworth",
+      "human_expression_review": "Specific protectable human contributions require work-by-work documentation; prompting alone is not asserted as copyrightable authorship.",
       "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
     },
     {
@@ -90,7 +100,12 @@
       "state": "CONCEPT ILLUSTRATION",
       "source_inputs": "Text motifs from the owner-provided LumenCore wormhole and EchoForm notes; authored visual prompts.",
       "claim_boundary": "Concept artwork, not an engineering drawing, physical simulation, operational device or validation of a wormhole.",
+      "creative_director": "Robert Ashworth",
+      "human_expression_review": "Specific protectable human contributions require work-by-work documentation; prompting alone is not asserted as copyrightable authorship.",
       "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
     }
-  ]
+  ],
+  "creator_credit": "Created by Robert Ashworth using AI tools.",
+  "rights_notice": "© 2026 Robert Ashworth. Rights reserved in protectable human-authored contributions.",
+  "rights_scope": "AI-generated elements are identified separately. This record is not a registration certificate or a determination of copyrightability."
 }

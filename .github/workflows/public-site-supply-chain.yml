@@ -50,6 +50,7 @@ on:
       - 'dashboard/cohort/**'
       - 'dashboard/bounded-light/**'
       - 'dashboard/portfolio/**'
+      - 'dashboard/rights/**'
       - 'dashboard/downloads/eia-two-window-review-20260922.zip'
       - 'tests/test_public_site_supply_chain.py'
   push:

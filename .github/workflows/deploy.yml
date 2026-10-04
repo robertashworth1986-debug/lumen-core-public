@@ -44,6 +44,7 @@ on:
       - "dashboard/cohort/**"
       - "dashboard/bounded-light/**"
       - "dashboard/portfolio/**"
+      - "dashboard/rights/**"
       - "dashboard/downloads/eia-two-window-review-20260922.zip"
       - "code/deploy/package_public_site_release.py"
       - "code/ops/CLASSIFY_PUBLIC_RELEASE_INCIDENT.py"
