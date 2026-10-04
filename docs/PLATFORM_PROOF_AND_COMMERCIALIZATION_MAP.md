@@ -1,6 +1,6 @@
 # LumenCore Platform, Proof, and Commercialization Map
 
-Updated: September 21, 2026 · Public, non-confidential review
+Updated: October 4, 2026 · Public, non-confidential review
 
 LumenCore is a founder-built engineering platform spanning quantitative systems,
 workflow software, evidence tooling, forecasting and simulation-led research.
@@ -36,6 +36,64 @@ The [portfolio configuration](../config/lumencore_engine_portfolio_v2.json),
 | **EchoForm / digital identity twin** | Architecture concept exploring identity consistency, consent, provenance and personal-AI continuity. The audited configuration has documentation but no configured implementation/test artifacts for this lane. | [Module catalog](LUMA_UNIVERSE_MODULE_CATALOG.md), [claim register](CLAIM_BOUNDARY_REGISTER.md). Next: define a bounded consent/provenance use case and implement a testable prototype. |
 | **Node-RED / immersive systems / science education** | Implemented flow-inspection/import tooling and immersive launcher/integration components. Science-museum installations are a possible application; deployment or customer acceptance is unverified. | [Node-RED tooling](../code/ENSURE_NODERED_LUMA_FLOWS.py), [immersive launcher](../code/START_IMMERSIVE_STACK.ps1). Next: reproduce a scoped demonstration and obtain an agreed educational-use pilot. |
 | **Agent Arena / systems engineering** | Synthetic adversarial coordination research and a bounded C11 packet-policy reference path tested in host user space. | [Agent Arena](AGENT_ARENA.md), [C11 foundation](NIC_DPU_PACKET_PIPELINE_FOUNDATION_2026-08-17.md). Next: independent evaluation in the declared environment; hardware throughput, resilience and production claims need separate tests. |
+
+## October 5 reviewer meeting: geometry and creative portfolio
+
+The founder-requested [portfolio doorway](https://lumen-core.ai/portfolio/)
+combines the existing engineering map, artwork, the geometry catalog and a
+bounded synthetic comparison. The source candidate supports active outcome 2:
+one external validation or paid-pilot conversation. Publication or a meeting does
+not itself establish reviewer acceptance, scientific validation or a higher
+company valuation.
+
+The [geometry registry](../config/geometry_championship_v1_registry.json) now
+contains **26 candidate families across 11 lanes**. The historical June 19
+readiness receipt remains unchanged: 18 families, nine lanes, no performance-ready
+family. The expanded catalog preserves the three legacy-only entries and all
+negative results. It adds eight named candidates, including brachistochrone,
+phyllotaxis and a single Platonic-solids family containing five polyhedra.
+Catalog membership and the four mathematical renderers do not pass the
+[geometry evaluation protocol](GEOMETRY_EVALUATION_PROTOCOL_V1.md).
+
+The catalog uses normalized names: **brachistochrone** for ideal cycloidal
+descent, **mycelium** for the fungal-network inspiration, honeycomb for the
+existing hexagonal packing family and sunflower for phyllotactic packing.
+Branching-tree motifs map to leaf-vein, river-delta or vascular-network candidates.
+There is no single accepted equation for every “Tree of Life” symbol.
+
+The founder's existing *Four Great Families of Echo Geometry* PDF organizes
+concept vocabulary into Echo Field Dynamics, Echo Sequence Geometry, Echo Lattice
+Geometries, and Echo Waveforms & Gradient Structures. That four-part conceptual
+taxonomy is separate from the five Platonic solids. Neither list is evidence
+that a fixed number of shapes constitutes reality.
+
+The cinematic [Bounded Light gallery](https://lumen-core.ai/bounded-light/) and
+[Geometry Observatory](https://lumen-core.ai/bounded-light/observatory/) are
+visual and mathematical companions. Formula tests establish sampled construction
+properties; they do not demonstrate lower signal loss, electromagnetic gain,
+thermal improvement, physical wormholes or faster-than-light communication.
+The appropriate next test fixes a task, comparator, resource budget and failure
+rule, then measures the claimed improvement with the governing physics or a
+clearly labeled proxy.
+
+## Research counts and their denominators
+
+The existing [June 18 research audit](LUMAUNIVERSE_RESEARCH_EVIDENCE_AUDIT_2026-06-18.md)
+records substantial historical work. The table below transcribes dated audit
+findings; it is not a fresh rerun or an independently verified aggregate.
+
+| Recorded evidence | Denominator | Retained result and boundary |
+|---|---|---|
+| Master Universe V2 | 2,172 successful frozen series; nine models; five model families | Harmonic models won 304 series (14.0%). A single 80/20 holdout does not establish a universal edge. |
+| Hybrid Edge V7.1 | 80 untouched series; five outer folds | 11 screening-positive series, median MAE improvement 0.000%, zero robust claim gates; no surrogate or multiple-comparison tests were run. |
+| May 11 phase-lock audit | 1,764 candidate rows, of which 532 were phase-lock tagged | Active candidate ranked 557 by institutional score and 631 by test Sharpe; it did not beat the comparator. |
+| Full Beast configuration registry | 22 transforms, 18 algorithms, 19 strategies, six metric profiles | These are separate configuration categories, not 65 independently validated geometries or products. See the [source registry](../full_beast_registry.json). |
+| Legacy flowform suite | 21 named transforms | Exploratory mathematical transforms paired with five trading strategies; name similarity does not establish physical geometry experiments. |
+
+Historical simulation, a dataset row, a parameter combination, a screenshot,
+a software assertion and a bench measurement each have different denominators.
+The public catalog preserves those distinctions rather than adding them into
+an unsupported total experiment count.
 
 ## Founder-held evidence and historical boundaries
 

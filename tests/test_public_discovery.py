@@ -54,7 +54,7 @@ class PublicDiscoveryTests(unittest.TestCase):
                 "https://lumen-core.ai/build_week/prooflock_console/",
                 "https://lumen-core.ai/cohort/",
                 "https://lumen-core.ai/cohort/directory.html",
-            ] + member_routes + ["https://lumen-core.ai/bounded-light/", "https://lumen-core.ai/bounded-light/observatory/"],
+            ] + member_routes + ["https://lumen-core.ai/bounded-light/", "https://lumen-core.ai/bounded-light/observatory/", "https://lumen-core.ai/portfolio/", "https://lumen-core.ai/portfolio/review.html"],
         )
         serialized = (DASHBOARD / "sitemap.xml").read_text(encoding="utf-8")
         self.assertNotIn("mission_control", serialized)

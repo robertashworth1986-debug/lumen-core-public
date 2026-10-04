@@ -1,0 +1,62 @@
+[
+  {
+    "name": "LumaTrader / Kraken Sentinel / LumaSniper",
+    "stage": "Tested research implementations for market data, strategy comparison, exchange integration and guarded execution. Historical transaction records exist. The canonical runtime configuration is paper-only; legacy settings are not authorization."
+  },
+  {
+    "name": "Grant Factory / LumenGov",
+    "stage": "Tested workflow implementation for opportunity qualification, eligibility checks, proposal sections, budgets, approval states and hashed evidence packages."
+  },
+  {
+    "name": "Mission Control",
+    "stage": "Substantial historical operating-interface implementation joining research, diagnostics, source status and application workflows. The public route is a retired HOLD placeholder."
+  },
+  {
+    "name": "Quant Lab",
+    "stage": "Historical research-interface implementation with trading, forecasting, funding and proof workspaces. The current public route is a retired HOLD placeholder."
+  },
+  {
+    "name": "ProofLock / Proof Capsule",
+    "stage": "Implemented custody, manifest and claim-gate controls, with a deployed bounded demonstration."
+  },
+  {
+    "name": "Utility and energy forecasting",
+    "stage": "Pipeline implementations and completed historical replay research. Results retain adverse regimes and baseline comparisons. Some pipeline scripts depend on a named local Windows environment and external inputs."
+  },
+  {
+    "name": "Geothermal / constraint research",
+    "stage": "Historical forecast screening plus scoped commercial hypotheses. The reviewed constraint brief reports 2.5336% better clean MAE alongside 8.9208% worse p95 error for its selected candidate."
+  },
+  {
+    "name": "FlowForm / thermal-routing research",
+    "stage": "Geometry-informed audit and comparison implementations, simulation and physical-system concepts. No independently measured thermal, impedance or battery advantage is established here."
+  },
+  {
+    "name": "HyperCore",
+    "stage": "Privately held numerical experiment implementation: NumPy phase-gradient updates, recorded metrics and saved arrays. No fresh execution receipt was recovered in this review."
+  },
+  {
+    "name": "EchoLock",
+    "stage": "Phase-coherence research using conceptual, replay and synthetic evidence. Pilot promotion remains held."
+  },
+  {
+    "name": "LumaJet",
+    "stage": "Simulation-first aerospace research: geometry-informed routing/layout comparisons, thermal proxies and resilience concepts."
+  },
+  {
+    "name": "LumaSkin",
+    "stage": "Implemented offline virtual engineering lab: 24 virtual zones, 10 replay scenarios and a first-party 34-test receipt. A separate September 18 synthetic endurance report records 200,000 trials with no reported invariant failures. Zero hardware or human tests."
+  },
+  {
+    "name": "EchoForm / digital identity twin",
+    "stage": "Architecture concept exploring identity consistency, consent, provenance and personal-AI continuity. The audited configuration has documentation but no configured implementation/test artifacts for this lane."
+  },
+  {
+    "name": "Node-RED / immersive systems / science education",
+    "stage": "Implemented flow-inspection/import tooling and immersive launcher/integration components. Science-museum installations are a possible application; deployment or customer acceptance is unverified."
+  },
+  {
+    "name": "Agent Arena / systems engineering",
+    "stage": "Synthetic adversarial coordination research and a bounded C11 packet-policy reference path tested in host user space."
+  }
+]

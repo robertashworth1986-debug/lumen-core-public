@@ -39,6 +39,14 @@ REQUIRED_FAMILY_IDS = {
     "termite_mound_ventilation",
     "hibernation_bounded_wake_logic",
     "hybrid_flowforms",
+    "brachistochrone_cycloid",
+    "sunflower_phyllotaxis",
+    "voronoi_partition",
+    "platonic_solids",
+    "gyroid_nodal_surface",
+    "hopf_fibers",
+    "trefoil_tube",
+    "superformula_shell",
 }
 PERFORMANCE_READY_STATUSES = {"implemented", "validated"}
 LEGACY_STATUSES = {"legacy_analogue_only", "legacy_transform_only"}

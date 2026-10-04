@@ -116,7 +116,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 217
+    assert len(names) == len(set(names)) == 239
     assert names[:5] == [
         "operator_home.html",
         "opportunity_sprint.html",
@@ -185,7 +185,7 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
 def test_release_count_is_bound_to_current_control_records():
     module = load_module(PACKAGER_PATH, "package_public_site_release_control_count")
     release_count = len(module.RELEASE_PATHS)
-    assert release_count == 217
+    assert release_count == 239
 
     protocol = (ROOT / "docs" / "PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md").read_text(
         encoding="utf-8"
@@ -872,4 +872,27 @@ def test_bounded_light_audit_uses_canonical_directory_route():
     )
     assert verifier.live_url("https://lumen-core.ai", "bounded-light/observatory/index.html", "a" * 40) == (
         "https://lumen-core.ai/bounded-light/observatory/?release=" + "a" * 40
+    )
+
+
+@pytest.mark.parametrize("name,mime", [
+    ("index.html", "text/html"), ("portfolio.css", "text/css"),
+    ("assets/hopf-atlas.webp", "image/webp"), ("data/registry.json", "application/json"),
+    ("math-models.mjs", "text/javascript"), ("assets/cube.svg", "image/svg+xml"),
+    ("Public_Portfolio_Review_Brief_2026-10-04.pdf", "application/pdf"),
+    ("data/math-sources.md", "text/plain"),
+])
+def test_portfolio_release_rejects_wrong_mime(name, mime):
+    verifier = load_module(VERIFY_PATH, "portfolio_mime")
+    assert verifier.content_type_allowed("portfolio/" + name, mime)
+    if mime != "text/html":
+        assert not verifier.content_type_allowed("portfolio/" + name, "text/html")
+    if not name.endswith(".md"):
+        assert not verifier.content_type_allowed("portfolio/" + name, "application/octet-stream")
+
+
+def test_portfolio_audit_uses_canonical_directory_route():
+    verifier = load_module(VERIFY_PATH, "portfolio_route")
+    assert verifier.live_url("https://lumen-core.ai", "portfolio/index.html", "a" * 40) == (
+        "https://lumen-core.ai/portfolio/?release=" + "a" * 40
     )

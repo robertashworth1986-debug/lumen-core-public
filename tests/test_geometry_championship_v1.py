@@ -42,11 +42,29 @@ class GeometryChampionshipV1Tests(unittest.TestCase):
     def test_readiness_does_not_invent_performance_results(self) -> None:
         registry = load_registry(DEFAULT_REGISTRY)
         readiness = build_readiness(registry)
-        self.assertEqual(readiness["family_count"], 18)
+        self.assertEqual(readiness["family_count"], 26)
         self.assertFalse(readiness["championship_ready"])
         self.assertFalse(readiness["performance_results_generated"])
         self.assertFalse(readiness["claim_gate_passed"])
         self.assertEqual(readiness["performance_ready_families"], [])
+
+    def test_new_visualizations_do_not_become_performance_ready(self) -> None:
+        registry = load_registry(DEFAULT_REGISTRY)
+        readiness = build_readiness(registry)
+        self.assertEqual(readiness["lane_count"], 11)
+        self.assertEqual(len(readiness["legacy_only_families"]), 3)
+        self.assertEqual(len(readiness["pending_families"]), 23)
+        platonic = next(f for f in registry["families"] if f["id"] == "platonic_solids")
+        self.assertEqual(len(platonic["members"]), 5)
+        self.assertEqual(platonic["status"], "visualization_only")
+        self.assertEqual(readiness["performance_ready_families"], [])
+
+    def test_historical_negative_mycelium_result_is_retained(self) -> None:
+        registry = load_registry(DEFAULT_REGISTRY)
+        family = next(f for f in registry["families"] if f["id"] == "mycelium_network")
+        self.assertEqual(family["status"], "legacy_analogue_only")
+        self.assertIn("ranked last", family["located_result"])
+        self.assertIn("No routing implementation", family["located_result"])
 
     def test_frozen_readiness_run_hashes_every_artifact(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

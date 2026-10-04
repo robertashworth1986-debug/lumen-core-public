@@ -7,6 +7,31 @@
 
 ## One commercial sentence
 
+### October 4 portfolio, registry and meeting preparation
+
+At Robert's explicit request to organize and publish his portfolio for a
+founder-reported October 5 meeting, active outcome 2 now includes an integrated
+portfolio doorway and an expansion of the existing geometry registry. The
+registry has 26 named candidate families across 11 lanes, preserving all 18
+historical entries and negative results; none is promoted to performance-ready.
+Five Platonic solids are grouped as one family. The existing four Echo Geometry
+families are a conceptual taxonomy, not a physical law or performance receipt.
+
+The June 19 registry snapshot remains immutable. The expanded catalog, artwork,
+formula renderers and bounded synthetic benchmark have separate denominators
+and evidence types. A screenshot, candidate name, synthetic trial, software test
+and independently executed physical experiment are not interchangeable counts.
+Current source preparation neither substantiates thousands of prior experiments
+nor raises the existing valuation bands. The most recent located evaluation
+must retain its assumptions, uncertainty and commercial-evidence gaps.
+
+Public material uses sanitized institutional status and source-linked evidence.
+Raw private emails, contact details, private agreements and private third-party
+materials are excluded. The founder's public-release request authorizes this
+sanitized preparation; static production still follows the exact-main signed
+release workflow and configured environment gate. No external message, grant
+submission, legal acceptance or runtime repair is included.
+
 ### October 4 Bounded Light visual collection candidate
 
 At Robert's explicit request to continue the domain and use his wormhole and
